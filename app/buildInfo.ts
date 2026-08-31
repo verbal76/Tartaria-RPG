@@ -26150,7 +26150,36 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // spawned. The second: when the card sends you into a fight, the escort clear
 // must NOT advance the stage, or the aftermath the buttons promised - TAKE, or
 // TAKE AND KILL - is skipped by the engine on the player's behalf.
-export const OTA_BUILD_ID = '2026-08-30-1581-the-card-they-cannot-walk-past';
+// OTA-1582 - THE GUY WHO GIVES YOU THE JOB.
+//
+// THE MEASUREMENT, and it is the largest single finding of the whole mission
+// audit. All 50 staged missions - 18 hunts, 18 mysteries, 14 storylines - open
+// on a stage that NAMES A PERSON at a hub: the Drakovan reeve closing his bounty
+// book, the Order envoy sliding a sealed reliquary across the table, a physician
+// grabbing your sleeve. All 50 of those stages were skipped at accept. Hunts
+// walked past every leading narration stage and then the same door overwrote its
+// own answer with a literal `stage: 1` four lines later; mysteries and
+// storylines wrote that literal directly. Three doors, three answers to one
+// question, one outcome: the token appeared in the pack and the person who
+// handed it over never existed.
+//
+// The owner asked it in exactly those words - "I have to meet a guy to get a
+// note, right?" - and for every mission in the game the answer was no.
+//
+// THE RULE NOW: a stage that names a person is a MEETING, and a meeting is never
+// skipped. Pure narration - no verb AND nobody in it - still auto-consumes,
+// which is all the skip was ever for. The 50 opening beats carry a verb, so both
+// doors work: the conversation card's button, and the typed command, through the
+// same handler. Reachable stages naming a person go from 50 to 100 of 114.
+//
+// AND A GATE, because this was the third mission-text audit. An audit is a
+// snapshot and the data kept moving. check:missionclaims holds three things
+// permanently: an objective that points at no tile, a post nobody authored, and
+// the trap this OTA itself created - a leading stage that names a person and
+// carries no verb, which a fresh record starts ON and which nothing can ever
+// advance. Verified to fire. The prose-promises-a-fight-with-no-spawn count
+// rides as a shrink-only ratchet at 9.
+export const OTA_BUILD_ID = '2026-08-30-1582-the-guy-who-gives-you-the-job';
 // golem catch-up 2026-08-30: markerless publish of OTA-1581 — the mission
 // conversation card wired end to end (arming selector, card UI, persuade roll,
 // the post-keyed kill ledger), plus the two engine holes the wiring exposed:

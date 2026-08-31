@@ -60,7 +60,7 @@ const VERBLESS = new Set([null, undefined, '']);
 
 const out = [];
 const W = (s = '') => out.push(s);
-const tally = { stages: 0, byFamily: {}, npcNotPlaced: 0, npcStages: [], locBad: [], combatProseNoSpawn: [], autoWithAction: [], takeProseNoGrant: [] };
+const tally = { stages: 0, byFamily: {}, npcNotPlaced: 0, npcStages: [], npcUnreachable: [], locBad: [], combatProseNoSpawn: [], autoWithAction: [], takeProseNoGrant: [] };
 
 function scan(family, items) {
   for (const h of items) {
@@ -73,11 +73,27 @@ function scan(family, items) {
       const prose = `${s.narration ?? ''} ${s.arbiter ?? ''}`;
       const ref = `${family} · ${h.title} · stage ${i + 1} (${s.stageType ?? '?'})`;
 
-      // 1. NPC PRESENT. VERIFIED FACT: `npcName` is read in exactly one place in
-      //    the codebase — questStage.ts building the hint string "find <name>".
-      //    Nothing places the person on the tile. So EVERY stage naming a person
-      //    fails the spec's "NPC PRESENT" requirement today.
-      if (who) { tally.npcNotPlaced += 1; tally.npcStages.push(`${ref} — "${who}"`); }
+      // 1. NPC PRESENT.
+      //
+      // ⚠ THIS SECTION WAS REWRITTEN BY OTA-1582 BECAUSE ITS FACT EXPIRED. It
+      //   used to read: "`npcName` is read in exactly one place in the codebase
+      //   — questStage.ts, building the hint string `find <name>`. Nothing
+      //   places the person on the tile." That was true when it was written and
+      //   it is what motivated the conversation card. It is no longer true: the
+      //   card reads npcName, mission-roles.json gives every post a person, and
+      //   armedEncounter raises the card on the stage's own tile.
+      //
+      //   A report that keeps announcing a fixed gap is a report nobody reads.
+      //   What matters NOW is whether the player can actually be put in front of
+      //   the person, so that is what this counts: a stage is REACHABLE when
+      //   something can stop the chain on it. A stage with no verb and a person
+      //   in it is consumed on the way past — the person is still named and
+      //   still never met.
+      if (who) {
+        tally.npcNotPlaced += 1;
+        if (VERBLESS.has(s.checkKind)) tally.npcUnreachable.push(`${ref} — "${who}"`);
+        else tally.npcStages.push(`${ref} — "${who}"`);
+      }
 
       // 2. GO TO. The tile has to resolve or the objective points nowhere.
       if (where && !locResolves(where)) tally.locBad.push(`${ref} — "${where}"`);
@@ -114,14 +130,25 @@ W();
 W('> Faction quests (65) have no stages and whisper chains (21) run on their own');
 W('> machinery; both are scanned separately. This report covers the 197 staged beats.');
 W();
-W('## 1. NPC PRESENT — the largest gap, and it is total');
+W('## 1. NPC PRESENT — who the player can actually be put in front of');
 W();
-W('**VERIFIED FACT:** `npcName` is read in exactly one place in the codebase —');
-W('`questStage.ts:112`, which builds the hint string `find <name>`. Nothing');
-W('places the person on the tile, gives them dialogue, or lets them hand anything');
-W('over. Every stage below names somebody who is not there.');
+W('OTA-1580 gave every post a person (`app/data/npcs/mission-roles.json`) and');
+W('OTA-1581 gave them a conversation card that opens on the stage\'s own tile.');
+W('OTA-1582 stopped the accept doors skipping the opening beat, which is where 50');
+W('of these people stood. So this section is no longer "all of them fail" — it is');
+W('the split between the ones the card can raise and the ones the engine still');
+W('walks past.');
 W();
-W(`**Stages naming an NPC: ${tally.npcNotPlaced} — all of them fail this requirement.**`);
+W(`**Stages naming a person: ${tally.npcNotPlaced}.**`);
+W(`- **${tally.npcStages.length} are reachable** — the stage carries a verb, so the chain stops there and the card opens.`);
+W(`- **${tally.npcUnreachable.length} are not** — no verb, so the beat is consumed on the way past and the person is named but never met.`);
+W();
+W('### Still walked past');
+W();
+W(tally.npcUnreachable.length ? '' : '**None.**');
+for (const r of tally.npcUnreachable) W(`- ${r}`);
+W();
+W('### Reachable');
 W();
 for (const r of tally.npcStages) W(`- ${r}`);
 W();

@@ -1,5 +1,5 @@
 import { findByTitle } from './titleMatch';
-import type { StageBinding } from './questStage';
+import { firstActionableStage, type StageBinding } from './questStage';
 // Hunt engine — long-form, multi-stage monster hunts (5-9 prep stages + a
 // final boss combat). Hunts are accepted from vendors or from beast-sign
 // hooks, scale the target enemy to the player's current power level, and
@@ -216,11 +216,21 @@ export function findHuntById(id: string): HuntDef | null {
  *  (OTA-871); hunts never got that loop, so every hunt accepted after 1236 was
  *  wedged at stage 0 forever — no verb, no dice, nothing could move it. The
  *  hunt walker found it on its first step. Accept starts the record HERE, and
- *  advanceHunt + the save backfill consume any nulls mid-chain. */
-export function firstActionableHuntStage(hunt: { stages: ReadonlyArray<{ checkKind: string | null }> }): number {
-  let i = 0;
-  while (i < hunt.stages.length && hunt.stages[i]!.checkKind === null) i++;
-  return i;
+ *  advanceHunt + the save backfill consume any nulls mid-chain.
+ *
+ *  ⚠⚠⚠ OTA-1582 — AND IT NO LONGER SKIPS A STAGE SOMEBODY IS STANDING IN. Every
+ *  one of those opening stages NAMES A PERSON — the reeve with the bounty book,
+ *  the Order envoy with the sealed reliquary — and skipping it is how the token
+ *  came to be in the pack with nobody attached to it. The skip's real job is
+ *  narrower than it was written: a stage NO VERB CAN MATCH must not wedge the
+ *  chain. A stage with a person in it now carries a verb, so it wedges nothing,
+ *  and it is not skipped. `firstActionableStage` is the one definition all three
+ *  families share; this wrapper keeps the hunt-shaped signature its six call
+ *  sites already use. */
+export function firstActionableHuntStage(
+  hunt: { stages: ReadonlyArray<{ checkKind: string | null; npcName?: string }> },
+): number {
+  return firstActionableStage(hunt.stages);
 }
 
 /** ⚠⚠ OTA-1450 — A CARRY CAP WAS BUILT HERE AND THEN REMOVED, DELIBERATELY.

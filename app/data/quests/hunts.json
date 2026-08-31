@@ -24,7 +24,7 @@
           "stageType": "inciting_hook",
           "narration": "The Drakovan reeve closes the bounty book and pushes a stamped brass token across it. \"I don't know where it roosts. Old Mira does — she keeps a holding out at the Monarch's Waystation, and she lost half her cattle to it. Show her this token and she'll talk. Go by way of the Cradle of Dusk; that's where the last wing-shadow was called in.\"",
           "arbiter": "\"Posters in this country mean someone is desperate or someone has died,\" the Arbiter says. \"Read the room before you sign.\"",
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Reeve's Brass Token"
           },
@@ -127,7 +127,7 @@
           "stageType": "inciting_hook",
           "narration": "The True Tartarian agent doesn't sit. \"We can't go down there ourselves — every shake brings the Stair down on whoever's mid-descent.\" She seals a writ and hands it over. \"Master Karin holds the upper concourse at Asgardar. She was lead engineer when the Stair was still a stair. Cut through the Buried Cities on your way — one of our gantries went down there this morning and nobody has reported back.\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Enclave Writ"
           },
@@ -233,7 +233,7 @@
           "stageType": "inciting_hook",
           "narration": "The Reclaimers Guild Speaker pushes a sealed tube across the table. \"Coordinates. Jarn, old dive-master, keeps his rope at the Builders' Survey Camp — he survived the last attack and he's the only mouth open on this. The road runs through the Mud Seas and it is not a quiet road. Take the tube. He won't say a word without it.\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Sealed Coordinate Tube"
           },
@@ -342,7 +342,7 @@
           "stageType": "inciting_hook",
           "narration": "The Order envoy taps a sealed reliquary box twice and slides it across. \"Brother Ammon keeps the old Ward maps at the cloister in Karok-Sa. He'll give them to you when he sees this. Do not open the box.\" A pause. \"Take the Obsidian Pillars road. The Sentinels there still walk their loop, and I would rather you learned that from the road than from the archive.\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Sealed Reliquary Box"
           },
@@ -451,7 +451,7 @@
           "stageType": "urgent_dispatch",
           "narration": "The drifter presses the poster into your hand and points out past the stalls. \"Her chorus took another crew this morning — pinned them in the south spires, out in the Mud Seas. She'll move at dusk. Go now or there's no point going at all.\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Drifter's South-Spire Poster"
           },
@@ -530,7 +530,7 @@
           "stageType": "urgent_dispatch",
           "narration": "The Servants priest bows just enough and marks a strip of bone with the shrine's sanction. \"His last camp is out on the Great Tartary Plains. He moves at dawn — if you start now, you take him before he does. We do not raise our hand against him. You raise yours, and we will remember. Carry the mark so his people know who sent you.\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Servants' Mark of Sanction"
           },
@@ -609,7 +609,7 @@
           "stageType": "inciting_hook",
           "narration": "The caravan-master jabs the pass on his map and stamps you a pass-chit. \"Something old woke in the rocks at Zharak's Teeth and now it boils anyone who tries them. My drovers won't go. A wheelwright named Ost saw it and came down alive — he's wintering at the Pilgrim Camp. Walk the Teeth first if you want to believe me, then go and find him.\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Caravan-Master's Pass-Chit"
           },
@@ -718,7 +718,7 @@
           "stageType": "inciting_hook",
           "narration": "The dive-boss counts three lost this season and cuts you a chit for the Cathedral moorings. \"It nests where the nave floods deepest. My last diver, Wren, mapped its runs before it took her line — and her sister keeps the logbook out at the Revivalist camp. Get down there first and see what's left of Wren's rig. You'll need something to show the sister.\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Dive-Boss's Mooring Chit"
           },
@@ -827,7 +827,7 @@
           "stageType": "inciting_hook",
           "narration": "The stair-warden has stopped counting the missing and hands you the tally instead. \"They go up whole and come down never. A Shade lives in the turns where the light can't reach. An old climber, Bael, survived it once — he keeps a vigil at Thametan's Tower now, and he won't talk to anyone who hasn't been up the Stair themselves.\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Warden's Tally of the Missing"
           },
@@ -933,7 +933,7 @@
           "stageType": "inciting_hook",
           "narration": "The head ferryman won't meet your eye, but he cuts you a crossing-token anyway. \"It sings my brother's voice some nights. My wife's, others. Whoever it takes, it learns. Go out on the water at dusk and see for yourself — then find Halla. She's a netter, works the far quay at Ostragar. She plugged her ears with wax and lived.\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Ferryman's Crossing-Token"
           },
@@ -1042,7 +1042,7 @@
           "stageType": "inciting_hook",
           "narration": "The salvage-boss cuts you a length of wire fine as hair and strong as cable. \"It spins old Tartarian filament into webs and my crews walk into them in the dark. Go up to the Pillars and see what it does to a crew. Then take that coil to a scavenger called Pike, out at the Architect's Blind — he mapped the Pillars before it took his legs.\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Coil of Tartarian Filament"
           },
@@ -1151,7 +1151,7 @@
           "stageType": "inciting_hook",
           "narration": "The Order archivist is grey with grief and signs the requisition without reading it. \"We sent scholars into the Red Tower to read the cursed core's casing. They did not come back — and now something up there wears their faces and calls in their voices. Go and see it. Then take what you find to Vesryn, down in Nimari. He kept their field-notes and he will not part with them for asking.\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Archivist's Requisition"
           },
@@ -1260,7 +1260,7 @@
           "stageType": "inciting_hook",
           "narration": "The road-warden points at the sky and stamps you a dusk-warrant for the Cradle road. \"It takes them at dusk — that hour when the eye can't tell bird from shadow. Walk the road and bring me back something off it. Then take that to a trapper named Ferel; he keeps a line out on the Great Tartary Plains past the dead spires. It took his daughter and he lived.\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Warden's Dusk-Warrant"
           },
@@ -1369,7 +1369,7 @@
           "stageType": "inciting_hook",
           "narration": "The caravan-mother spits grit and presses her house-token into your hand. \"It comes in the wall of dust and leaves the wind its plate. My outriders won't cross the deep plains now. Go and look at what's left of the last crossing, then take the token to a storm-reader called Yenna — she keeps the last well down in Samarran and she does nothing for free.\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Caravan-Mother's Grit-Token"
           },
@@ -1478,7 +1478,7 @@
           "stageType": "inciting_hook",
           "narration": "The lodge-surveyor nurses a broken arm and signs the warrant left-handed. \"We only wanted to read the Tower. Something in the footing stood up — a Golem, old as the stone — and it will not let us past the second floor. My apprentice Del stayed behind, trapped above it. Get up there and find him.\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Lodge Survey Warrant"
           },
@@ -1587,7 +1587,7 @@
           "stageType": "urgent_dispatch",
           "narration": "A physician grabs your sleeve and pushes a soaked rot-ward mask at you. \"There's no time for the usual dance. Whole quarters are wasting — a Moth in the upper vaults, dusting the air with rot. Start at the Giant Vault, that's where the first cases walked in from. Every hour it lives, another street coughs. Wear this and go NOW.\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Physician's Rot-Ward Mask"
           },
@@ -1668,7 +1668,7 @@
           "stageType": "urgent_dispatch",
           "narration": "The Yuldra-Tul reeve is out of patience and writes the road-writ standing up. \"No time for tracking. The pack owns the road out on the plains and the Alpha's clever — it fakes a lone lame hound to draw folk in, then the pack takes them. Cut the head off and the rest scatter. Ride out and do it.\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Reeve's Road-Writ"
           },
@@ -1749,7 +1749,7 @@
           "stageType": "urgent_dispatch",
           "narration": "A Voronov engineer wipes soot and sweat and shoves a conduit chit at you. \"No time to be thorough — the underworks are climbing past what the stone can hold. A Salamander's denned in a live conduit out under the Buried Cities and it's feeding on the flow, getting hotter. If it doesn't stop, the quarter above bakes. Get down there.\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Engineer's Conduit Chit"
           },

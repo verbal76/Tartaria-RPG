@@ -55,7 +55,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Drakova | the Drakovan reeve | — | Reeve's Brass Token | auto | — |
+| Drakova | the Drakovan reeve | — | Reeve's Brass Token | diplomacy | — |
 
 **Text:**
 
@@ -175,7 +175,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| The Sunken Enclave | the True Tartarian agent | — | Enclave Writ | auto | — |
+| The Sunken Enclave | the True Tartarian agent | — | Enclave Writ | diplomacy | — |
 
 **Text:**
 
@@ -289,7 +289,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Reclaimer's Stake | the Reclaimers Guild Speaker | — | Sealed Coordinate Tube | auto | — |
+| Reclaimer's Stake | the Reclaimers Guild Speaker | — | Sealed Coordinate Tube | diplomacy | — |
 
 **Text:**
 
@@ -401,7 +401,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Varakush | the Order envoy | — | Sealed Reliquary Box | auto | — |
+| Varakush | the Order envoy | — | Sealed Reliquary Box | diplomacy | — |
 
 **Text:**
 
@@ -512,7 +512,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| The Hidden Market | the wandering drifter | — | Drifter's South-Spire Poster | auto | — |
+| The Hidden Market | the wandering drifter | — | Drifter's South-Spire Poster | diplomacy | — |
 
 **Text:**
 
@@ -597,7 +597,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Giant-Watch Shrine | the Servants priest | — | Servants' Mark of Sanction | auto | — |
+| Giant-Watch Shrine | the Servants priest | — | Servants' Mark of Sanction | diplomacy | — |
 
 **Text:**
 
@@ -682,7 +682,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Dynasty Border Post | the caravan-master | — | Caravan-Master's Pass-Chit | auto | — |
+| Dynasty Border Post | the caravan-master | — | Caravan-Master's Pass-Chit | diplomacy | — |
 
 **Text:**
 
@@ -793,7 +793,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Ostragar | the dive-boss | — | Dive-Boss's Mooring Chit | auto | — |
+| Ostragar | the dive-boss | — | Dive-Boss's Mooring Chit | diplomacy | — |
 
 **Text:**
 
@@ -908,7 +908,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Tartarian Pilgrim Camp | the stair-warden | — | Warden's Tally of the Missing | auto | — |
+| Tartarian Pilgrim Camp | the stair-warden | — | Warden's Tally of the Missing | diplomacy | — |
 
 **Text:**
 
@@ -1021,7 +1021,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Drakova | the head ferryman | — | Ferryman's Crossing-Token | auto | — |
+| Drakova | the head ferryman | — | Ferryman's Crossing-Token | diplomacy | — |
 
 **Text:**
 
@@ -1132,7 +1132,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Reclaimer's Stake | the salvage-boss | — | Coil of Tartarian Filament | auto | — |
+| Reclaimer's Stake | the salvage-boss | — | Coil of Tartarian Filament | diplomacy | — |
 
 **Text:**
 
@@ -1243,7 +1243,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Varakush | the Order archivist | — | Archivist's Requisition | auto | — |
+| Varakush | the Order archivist | — | Archivist's Requisition | diplomacy | — |
 
 **Text:**
 
@@ -1354,7 +1354,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| The Monarch's Waystation | the road-warden | — | Warden's Dusk-Warrant | auto | — |
+| The Monarch's Waystation | the road-warden | — | Warden's Dusk-Warrant | diplomacy | — |
 
 **Text:**
 
@@ -1467,7 +1467,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| The Parley Ground | the caravan-mother | — | Caravan-Mother's Grit-Token | auto | — |
+| The Parley Ground | the caravan-mother | — | Caravan-Mother's Grit-Token | diplomacy | — |
 
 **Text:**
 
@@ -1578,7 +1578,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Builders' Survey Camp | the lodge-surveyor | — | Lodge Survey Warrant | auto | — |
+| Builders' Survey Camp | the lodge-surveyor | — | Lodge Survey Warrant | diplomacy | — |
 
 **Text:**
 
@@ -1691,7 +1691,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Tartarian Outskirts | the physician | — | Physician's Rot-Ward Mask | auto | — |
+| Tartarian Outskirts | the physician | — | Physician's Rot-Ward Mask | diplomacy | — |
 
 **Text:**
 
@@ -1774,7 +1774,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Yuldra-Tul | the Yuldra-Tul reeve | — | Reeve's Road-Writ | auto | — |
+| Yuldra-Tul | the Yuldra-Tul reeve | — | Reeve's Road-Writ | diplomacy | — |
 
 **Text:**
 
@@ -1857,7 +1857,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Voronov | the Voronov engineer | — | Engineer's Conduit Chit | auto | — |
+| Voronov | the Voronov engineer | — | Engineer's Conduit Chit | diplomacy | — |
 
 **Text:**
 
@@ -1941,7 +1941,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Varakush | the Order scholar | — | Scholar's Survey Chit | auto | — |
+| Varakush | the Order scholar | — | Scholar's Survey Chit | diplomacy | — |
 
 **Text:**
 
@@ -2008,7 +2008,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| The Hidden Market | Halem the Trader | — | Halem's Broken Compass | auto | — |
+| The Hidden Market | Halem the Trader | — | Halem's Broken Compass | diplomacy | — |
 
 **Text:**
 
@@ -2062,7 +2062,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| The Sunken Enclave | the True Tartarian agent | — | Jar of Aetherstone Packing | auto | — |
+| The Sunken Enclave | the True Tartarian agent | — | Jar of Aetherstone Packing | diplomacy | — |
 
 **Text:**
 
@@ -2130,7 +2130,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Reclaimer's Stake | the Reclaimers Guild Speaker | — | Guild Eddy-Gauge | auto | — |
+| Reclaimer's Stake | the Reclaimers Guild Speaker | — | Guild Eddy-Gauge | diplomacy | — |
 
 **Text:**
 
@@ -2198,7 +2198,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| The Monarch's Waystation | the Mud Monarch courier | — | Monarch Courier Writ | auto | — |
+| The Monarch's Waystation | the Mud Monarch courier | — | Monarch Courier Writ | diplomacy | — |
 
 **Text:**
 
@@ -2266,7 +2266,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Giant-Watch Shrine | Vael | — | Vael's Three Listening Stones | auto | — |
+| Giant-Watch Shrine | Vael | — | Vael's Three Listening Stones | diplomacy | — |
 
 **Text:**
 
@@ -2348,7 +2348,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Varakush | the Order savant | — | Sealed Catch-Vial | auto | — |
+| Varakush | the Order savant | — | Sealed Catch-Vial | diplomacy | — |
 
 **Text:**
 
@@ -2416,7 +2416,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Dynasty Border Post | the Dynasty agent | — | Dynasty Seal | auto | — |
+| Dynasty Border Post | the Dynasty agent | — | Dynasty Seal | diplomacy | — |
 
 **Text:**
 
@@ -2483,7 +2483,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Ostragar | the bell-founder | — | Founder's Tuning-Rod | auto | — |
+| Ostragar | the bell-founder | — | Founder's Tuning-Rod | diplomacy | — |
 
 **Text:**
 
@@ -2551,7 +2551,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Builders' Survey Camp | the lodge-scribe | — | Lodge Brace-Kit | auto | — |
+| Builders' Survey Camp | the lodge-scribe | — | Lodge Brace-Kit | diplomacy | — |
 
 **Text:**
 
@@ -2619,7 +2619,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| The Architect's Blind | the Architect handler | — | Market Letter of Credit | auto | — |
+| The Architect's Blind | the Architect handler | — | Market Letter of Credit | diplomacy | — |
 
 **Text:**
 
@@ -2687,7 +2687,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Revivalist Field Camp | the Revivalist cell-leader | — | Glyph-Frame | auto | — |
+| Revivalist Field Camp | the Revivalist cell-leader | — | Glyph-Frame | diplomacy | — |
 
 **Text:**
 
@@ -2755,7 +2755,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Reclaimer's Stake | the Reclaimer broker | — | Merik's Estate Claim-Chit | auto | — |
+| Reclaimer's Stake | the Reclaimer broker | — | Merik's Estate Claim-Chit | diplomacy | — |
 
 **Text:**
 
@@ -2823,7 +2823,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Tartarian Pilgrim Camp | the pilgrim-elder | — | Listening-Cord | auto | — |
+| Tartarian Pilgrim Camp | the pilgrim-elder | — | Listening-Cord | diplomacy | — |
 
 **Text:**
 
@@ -2890,7 +2890,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| The Monarch's Waystation | the Monarch factor | — | Hoard Manifest | auto | — |
+| The Monarch's Waystation | the Monarch factor | — | Hoard Manifest | diplomacy | — |
 
 **Text:**
 
@@ -2958,7 +2958,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Varakush | the Order archivist | — | Ash-Frame | auto | — |
+| Varakush | the Order archivist | — | Ash-Frame | diplomacy | — |
 
 **Text:**
 
@@ -3026,7 +3026,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Builders' Survey Camp | the lodge-master | — | Lodge-Master's Common Fork | auto | — |
+| Builders' Survey Camp | the lodge-master | — | Lodge-Master's Common Fork | diplomacy | — |
 
 **Text:**
 
@@ -3092,7 +3092,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| The Parley Ground | the hooded buyer | — | Beat-Counter | auto | — |
+| The Parley Ground | the hooded buyer | — | Beat-Counter | diplomacy | — |
 
 **Text:**
 
@@ -3162,7 +3162,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Varakush | Vesryn | — | Vesryn's Fragment Map | auto | — |
+| Varakush | Vesryn | — | Vesryn's Fragment Map | diplomacy | — |
 
 **Text:**
 
@@ -3300,7 +3300,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| The Sunken Enclave | Korash of the Deep | — | Korash's Trial-Token | auto | — |
+| The Sunken Enclave | Korash of the Deep | — | Korash's Trial-Token | diplomacy | — |
 
 **Text:**
 
@@ -3424,7 +3424,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Reclaimer's Stake | the Reclaimers Guild Speaker | — | Sealed Five-Mark Map | auto | — |
+| Reclaimer's Stake | the Reclaimers Guild Speaker | — | Sealed Five-Mark Map | diplomacy | — |
 
 **Text:**
 
@@ -3533,7 +3533,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| The Monarch's Waystation | Dr. Lucius Kincaid | — | Kincaid's List of Six | auto | — |
+| The Monarch's Waystation | Dr. Lucius Kincaid | — | Kincaid's List of Six | diplomacy | — |
 
 **Text:**
 
@@ -3657,7 +3657,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| The Monarch's Waystation | the Monarch factor | — | Factor's Name and Route | auto | — |
+| The Monarch's Waystation | the Monarch factor | — | Factor's Name and Route | diplomacy | — |
 
 **Text:**
 
@@ -3753,7 +3753,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| The Sunken Enclave | the enclave-mother | — | Enclave-Mother's Ash Mark | auto | — |
+| The Sunken Enclave | the enclave-mother | — | Enclave-Mother's Ash Mark | diplomacy | — |
 
 **Text:**
 
@@ -3863,7 +3863,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Dynasty Border Post | the Dynasty proctor | — | Proctor's Fetch-Order | auto | — |
+| Dynasty Border Post | the Dynasty proctor | — | Proctor's Fetch-Order | diplomacy | — |
 
 **Text:**
 
@@ -3959,7 +3959,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Giant-Watch Shrine | the vigil-keeper | — | Vigil-Keeper's Ear-Stone | auto | — |
+| Giant-Watch Shrine | the vigil-keeper | — | Vigil-Keeper's Ear-Stone | diplomacy | — |
 
 **Text:**
 
@@ -4055,7 +4055,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Builders' Survey Camp | the lodge-master | — | The Lodge's Faulty Rubbing | auto | — |
+| Builders' Survey Camp | the lodge-master | — | The Lodge's Faulty Rubbing | diplomacy | — |
 
 **Text:**
 
@@ -4151,7 +4151,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Revivalist Field Camp | Sasha Ironheart | — | Sasha's Core-Line Order | auto | — |
+| Revivalist Field Camp | Sasha Ironheart | — | Sasha's Core-Line Order | diplomacy | — |
 
 **Text:**
 
@@ -4247,7 +4247,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Reclaimer's Stake | the Reclaimer broker | — | Auction Floor-Warrant | auto | — |
+| Reclaimer's Stake | the Reclaimer broker | — | Auction Floor-Warrant | diplomacy | — |
 
 **Text:**
 
@@ -4343,7 +4343,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| The Architect's Blind | the Architect handler | — | The Protocol Order | auto | — |
+| The Architect's Blind | the Architect handler | — | The Protocol Order | diplomacy | — |
 
 **Text:**
 
@@ -4439,7 +4439,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Varakush | Vesryn | — | Vesryn's Case-Straps | auto | — |
+| Varakush | Vesryn | — | Vesryn's Case-Straps | diplomacy | — |
 
 **Text:**
 
@@ -4535,7 +4535,7 @@ Write bullets under each stage's **Checklist**. Suggested shorthand:
 
 | Where | Who | Needs | Gives | Verb | Spawns |
 |---|---|---|---|---|---|
-| Dynasty Border Post | the Dynasty enforcer | — | The Enforcer's Retirement Order | auto | — |
+| Dynasty Border Post | the Dynasty enforcer | — | The Enforcer's Retirement Order | diplomacy | — |
 
 **Text:**
 

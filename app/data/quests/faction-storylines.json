@@ -14,7 +14,7 @@
         {
           "narration": "Vesryn spreads a map of the south plains and marks seven crosses on it. \"We need every Fragment of the Red Tower we can put hands on — there are at least seven scattered across the silt belt. Work the map in order. Bring them here as you go or bring them all at once, but bring them.\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Vesryn's Fragment Map"
           },
@@ -132,7 +132,7 @@
         {
           "narration": "Korash motions you to sit and puts a trial-token in your hand. \"You have shown enough. The trial is seven steps and they are not all here — the pilgrimage, the rune, the dive. Refuse any and walk away. Complete them all and the enclave will know you as kin.\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Korash's Trial-Token"
           },
@@ -237,7 +237,7 @@
         {
           "narration": "The Speaker hands you a sealed map with five marks on it. \"Each is a relic cache. Hit them in the order they're numbered — they're spread wide on purpose. You keep nothing of the haul beyond a finder's cut, but you walk out a name in the Guild.\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Sealed Five-Mark Map"
           },
@@ -329,7 +329,7 @@
         {
           "narration": "Kincaid slides a list of six names across a polished table. \"All of these have been writing about Tartaria where they should not. We do not require them dead. We require them quiet. They are scattered — the list has where. Means are your business.\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Kincaid's List of Six"
           },
@@ -435,7 +435,7 @@
         {
           "narration": "The factor does not look up from his ledger. \"A Guardian stirred at Ostragar. A surveyor of the Order saw it wake and lived. His notes cannot reach Varakush. Nor can he.\" He slides you a name and a route. \"Start at the relay-hut on the Ostragar road.\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Factor's Name and Route"
           },
@@ -517,7 +517,7 @@
         {
           "narration": "The enclave-mother marks a shaft on your palm in ash. \"Karok-Sa held a Giant-shrine before the Flood took it. The Aether there has gone sour and the way is fouled. Walk our pilgrims down, keep them breathing, and light the shrine again.\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Enclave-Mother's Ash Mark"
           },
@@ -605,7 +605,7 @@
         {
           "narration": "The proctor speaks of bloodlines the way a butcher speaks of cuts. \"A claimant petitions the Dynasty. Before he is raised or discarded, his blood must be tested against the Vein-Reliquary in the Sinking Cathedral. Fetch it. The relic decides; we merely watch.\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Proctor's Fetch-Order"
           },
@@ -681,7 +681,7 @@
         {
           "narration": "The vigil-keeper presses your ear to the shrine stone. Far below, a slow tremor, like breath. \"A Giant turns in its sleep beneath the Vault,\" she says. \"The order splits over it — wake it, or let it dream. Go down and read the truth of it, and bring the reading back to me.\" She gives you her own ear-stone to read it with.",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Vigil-Keeper's Ear-Stone"
           },
@@ -757,7 +757,7 @@
         {
           "narration": "The lodge-master unrolls a rubbing taken from the Grand Spire of Etheria. \"The Tartarians wrote their engineering into their stone — load, Aether and prayer in one script. We copied this passage into our lodge wall and now the lodge groans at night. Take the rubbing back to the original and read it properly before it comes down on us.\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "The Lodge's Faulty Rubbing"
           },
@@ -832,7 +832,7 @@
         {
           "narration": "Sasha Ironheart does not soften it. \"Every other faction tinkers at the edges. I mean to switch Tartaria back on — one core-line at the Aetheric Chamber, reactivated. Yes, it could flood the world again. Doing nothing floods it slower.\" She signs the order and holds it out. \"Are you a blade or a bystander?\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Sasha's Core-Line Order"
           },
@@ -907,7 +907,7 @@
         {
           "narration": "The broker taps a strongbox and writes you a floor-warrant. \"One relic. A Guardian control-key — points a dormant construct at whatever you like. The Order, the Dynasty and the Monarchs all bid, at the Market, tomorrow. I need someone who owes none of them to run the floor and keep me breathing when the loser draws steel.\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Auction Floor-Warrant"
           },
@@ -988,7 +988,7 @@
         {
           "narration": "The handler speaks in the flat voice of someone who has done this before, and gives you the order in writing, which they never do. \"A Voronov schoolmaster found a Tartarian relay under his town and started teaching from it. Children are drawing Aether-glyphs in their primers. The Protocol is simple: the lesson stops. How, we leave to you.\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "The Protocol Order"
           },
@@ -1064,7 +1064,7 @@
         {
           "narration": "Vesryn lays a hand on an empty shelf and gives you a set of case-straps. \"The Sunken Enclave held every treatise we ever recovered. When it flooded we saved the readers, not the reading. Aether-proof cases keep the pages down there yet. Bring back what you can — and choose well, because you cannot carry it all.\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Vesryn's Case-Straps"
           },
@@ -1139,7 +1139,7 @@
         {
           "narration": "The enforcer will not say the word \"kill,\" and signs the order without reading it back. \"A cadet branch at Asgardar has thinned. Their blood no longer reads pure. The court would spend them in the machines. I would rather retire them quietly, with their dignity. Help me do the merciful thing.\" He believes it.",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "The Enforcer's Retirement Order"
           },

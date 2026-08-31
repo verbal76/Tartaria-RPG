@@ -78,6 +78,7 @@ import {
 } from '../../engine/contractRefusal';
 import { findFactionQuestById, availableFactionQuests, factionOfFactionQuest } from '../../engine/factionQuests';
 import { HUNTS, findHuntById, availableHunts, fuzzyFindHunt, scaleHuntBoss, scaleHuntEscort, firstActionableHuntStage, huntBlockReason, emptyBoardTally, emptyBoardLine } from '../../engine/hunts';
+import { firstActionableStage as QS_firstActionableStage } from '../../engine/questStage';
 import { MYSTERIES, findMysteryById, availableMysteries, fuzzyFindMystery } from '../../engine/mysteries';
 import { findStorylineById, availableStorylines, fuzzyFindStoryline } from '../../engine/factionStorylines';
 
@@ -1309,7 +1310,14 @@ export const createQuestSlice = (
         get().appendLog('reward', `✦ Hunt accepted — ${hunt.title}${parkedTag(huntTracked)} → ${where}.`);
       } else {
         get().appendLog('reward', `✦ Hunt accepted — ${hunt.title}${parkedTag(huntTracked)}. ${hunt.posterText}`);
-        get().appendLog('world', stage0.narration);
+        // ⚠⚠ OTA-1582 — THE OPENING BEAT'S WORDS BELONG TO THE MEETING, NOT THE
+        // RECEIPT. Stage 0 is no longer skipped, so `advance*` prints this exact
+        // narration when the player answers the conversation card standing in
+        // front of the person. Printing it here as well would say the same
+        // paragraph twice, a few taps apart. Nothing is lost: the accept line
+        // still carries the poster text, and the narration always arrives — at
+        // the beat it describes.
+
         // 2026-05-26 OTA-053 — playtester ask: "I get handed a poster.
         // It doesn't give me an idea of where I'm supposed to go."
         // Emit an explicit Arbiter line naming the target location so
@@ -1353,13 +1361,22 @@ export const createQuestSlice = (
         }
       }
     }
+    // ⚠⚠⚠ OTA-1582 — THE OPENING STAGE IS A MEETING, AND IT IS NO LONGER SKIPPED.
+    // All 50 staged missions open with a named person at a hub handing the player
+    // a token; all 50 of those stages were stepped over, so the token appeared in
+    // the pack with nobody attached to it. Three accept doors had three different
+    // answers to "where does a record start" — two of them a literal `1` — which
+    // is how the hunt door came to compute `firstActionableHuntStage` at insert
+    // and then clobber it with 1 four lines later. One answer now, and it lives
+    // in questStage.firstActionableStage: skip pure narration, never skip a
+    // person.
     set((s) =>
       s.player
         ? {
             player: {
               ...s.player,
               activeHunts: (s.player.activeHunts ?? []).map((h) =>
-                h.id === hunt.id ? { ...h, stage: 1 } : h,
+                h.id === hunt.id ? { ...h, stage: QS_firstActionableStage(hunt.stages) } : h,
               ),
             },
           }
@@ -1856,7 +1873,14 @@ export const createQuestSlice = (
         get().appendLog('reward', `✦ Mystery accepted — ${m.title}${parkedTag(mysteryTracked)}.`);
       } else {
         get().appendLog('reward', `✦ Mystery accepted — ${m.title}${parkedTag(mysteryTracked)}. ${m.posterText}`);
-        get().appendLog('world', stage0.narration);
+        // ⚠⚠ OTA-1582 — THE OPENING BEAT'S WORDS BELONG TO THE MEETING, NOT THE
+        // RECEIPT. Stage 0 is no longer skipped, so `advance*` prints this exact
+        // narration when the player answers the conversation card standing in
+        // front of the person. Printing it here as well would say the same
+        // paragraph twice, a few taps apart. Nothing is lost: the accept line
+        // still carries the poster text, and the narration always arrives — at
+        // the beat it describes.
+
       }
     }
     set((s) =>
@@ -1865,7 +1889,7 @@ export const createQuestSlice = (
             player: {
               ...s.player,
               activeMysteries: (s.player.activeMysteries ?? []).map((mm) =>
-                mm.id === m.id ? { ...mm, stage: 1 } : mm,
+                mm.id === m.id ? { ...mm, stage: QS_firstActionableStage(m.stages) } : mm,
               ),
             },
           }
@@ -2180,7 +2204,14 @@ export const createQuestSlice = (
         get().appendLog('reward', `✦ Storyline accepted — ${s.title}${parkedTag(storyTracked)}.`);
       } else {
         get().appendLog('reward', `✦ Storyline accepted — ${s.title}${parkedTag(storyTracked)}. ${s.posterText}`);
-        get().appendLog('world', stage0.narration);
+        // ⚠⚠ OTA-1582 — THE OPENING BEAT'S WORDS BELONG TO THE MEETING, NOT THE
+        // RECEIPT. Stage 0 is no longer skipped, so `advance*` prints this exact
+        // narration when the player answers the conversation card standing in
+        // front of the person. Printing it here as well would say the same
+        // paragraph twice, a few taps apart. Nothing is lost: the accept line
+        // still carries the poster text, and the narration always arrives — at
+        // the beat it describes.
+
       }
     }
     set((st) =>
@@ -2189,7 +2220,7 @@ export const createQuestSlice = (
             player: {
               ...st.player,
               activeStorylines: (st.player.activeStorylines ?? []).map((rec) =>
-                rec.id === s.id ? { ...rec, stage: 1 } : rec,
+                rec.id === s.id ? { ...rec, stage: QS_firstActionableStage(s.stages) } : rec,
               ),
             },
           }

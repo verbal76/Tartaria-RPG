@@ -30,6 +30,7 @@
     "check:quotedpins": "node scripts/check-quoted-pins.mjs",
     "check:voicepools": "node scripts/check-voice-pools.mjs",
     "check:slicepins": "node scripts/check-slice-pins.mjs",
+    "check:missionclaims": "node scripts/check-mission-claims.mjs",
     "check:guardianclaims": "node scripts/check-guardian-claims.mjs"
   },
   "dependencies": {

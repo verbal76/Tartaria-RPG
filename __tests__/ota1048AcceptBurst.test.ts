@@ -121,7 +121,15 @@ describe('OTA-1048 — the first accept of a burst is narrated in full', () => {
     const out = since(store, mark).join('\n');
 
     expect(out).toContain(hunt.posterText);
-    expect(out).toContain(hunt.stages[0]!.narration);
+    // ⚠⚠ SUPERSEDED BY OTA-1582, and the claim this test defends is UNCHANGED:
+    // accept #1 is narrated IN FULL. What moved is who owns the opening
+    // paragraph. Stage 0 is the giver's own beat — the reeve with the bounty
+    // book, this envoy with the sealed reliquary — and it is no longer skipped,
+    // so `advanceHunt` prints exactly this narration when the player answers the
+    // conversation card standing in front of him. Printing it here as well would
+    // say the same paragraph twice a few taps apart. Nothing is lost; the words
+    // arrive at the beat they describe.
+    expect(out).not.toContain(hunt.stages[0]!.narration);
     expect(out).toContain(hunt.targetLocationName ?? '');
     // Apex tier, Legendary weapon wanted, 75 HP wanted — a fresh character
     // meets neither, so the warning is exactly the one the owner saw.
@@ -207,8 +215,17 @@ describe('OTA-1048 — the reported case: thirteen contracts at one board', () =
     // rolled into a bigger magic number, because the rule OTA-1048 defends is about the
     // Arbiter repeating himself, and a grant receipt is not the Arbiter talking. If the
     // compaction ever regresses, the narration count below still catches it.
+    //
+    // ⚠⚠ AND OTA-1582 TOOK THE GRANTS BACK OUT, which is the same correction one
+    // layer down. P19's receipts existed because accept SKIPPED the giver's
+    // stage and handed his token over on his behalf. It no longer skips it: the
+    // record starts on the meeting, and the token is handed over when the player
+    // actually meets him. So a burst of thirteen accepts grants nothing — there
+    // are thirteen people still to go and see — and the count this test was
+    // really written to defend, the Arbiter not repeating himself, is now the
+    // whole of the output.
     const grantReceipts = out.filter((t) => t.endsWith('— mission item.'));
-    expect(grantReceipts.length).toBe(take.length);
+    expect(grantReceipts.length).toBe(0);
     expect(out.length - grantReceipts.length).toBe(16);
 
     // ...and the twelve really are the compact form, not merely fewer lines.

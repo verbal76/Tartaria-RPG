@@ -15,7 +15,7 @@
         {
           "narration": "The scholar slides a sketch across the table — hexagonal Tartarian ironwork, the seal of Nimari embossed into one face — and pins a survey chit to it. \"The Red Tower's outer ring shed pieces when it cooled. They roll downhill and end up wherever mud collects. Walk the Cradle of Dusk with this and read the mudstone. Then bring what you find to the Tower itself so I can match it against the ring.\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Scholar's Survey Chit"
           },
@@ -72,7 +72,7 @@
         {
           "narration": "Halem unrolls a worn map of the Mud Seas and taps the Cradle of Dusk. \"Old Tartarian surveying instrument. Brass face, three needles. Anyone who sails the Mud Seas wants one.\" He hands you his own broken one. \"Take mine for the pattern. There's a surveying wreck out at the Cradle — match the bracket and you'll find the good one.\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Halem's Broken Compass"
           },
@@ -117,7 +117,7 @@
         {
           "narration": "The True Tartarian agent meets you in the dark and gives you a jar of Aetherstone packing. \"Leviathan, Mud Seas. Old beast, long dead, but its eye does not rot in Aetherstone. Find the carcass, take the eye, pack it in this before the air gets at it. Bring it back to the Enclave.\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Jar of Aetherstone Packing"
           },
@@ -175,7 +175,7 @@
         {
           "narration": "The Speaker spreads the contract and lends you a Guild eddy-gauge. \"Watch — Tartarian make, hexagonal face, three dials. Counts the way local Aetheric time bends. They turn up on the dead: anyone caught in an eddy got theirs fossilised with them. Read the Buried Cities with the gauge and find a body worth unstrapping.\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Guild Eddy-Gauge"
           },
@@ -233,7 +233,7 @@
         {
           "narration": "The courier is well-dressed and brief, and leaves a sealed writ on the table. \"Obsidian Pillars. The Orbs only form where a pillar cracks under an Aetheric storm. Find a recently-struck pillar, recover the Orb, and bring it to the Blind — not to me, and not anywhere anyone can watch you carry it.\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Monarch Courier Writ"
           },
@@ -290,7 +290,7 @@
         {
           "narration": "Vael presses three small carved stones into your palm. \"One at the Obsidian Pillars. One at the Endless Stair. One at the Sinking Cathedral. Press each to the rock and let it listen. They will know which note is which when you bring them back to the shrine.\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Vael's Three Listening Stones"
           },
@@ -360,7 +360,7 @@
         {
           "narration": "The savant blots a bead of blue light off her workbench and gives you a sealed catch-vial. \"One core in a hundred cracks without dying — it weeps, and the tears are worth more than the core. One was seen in the Buried Cities before the seller vanished. Find it before it runs dry, and catch what it sheds on the way out.\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Sealed Catch-Vial"
           },
@@ -418,7 +418,7 @@
         {
           "narration": "The agent keeps his voice low and gives you a Dynasty seal to open doors with. \"A mother ran from us with an infant who might be pure-blooded. She left a token — a bloodline-marked locket — with someone she trusted in Samarran. Find the token. The Dynasty will handle the rest.\" He does not say what \"the rest\" means.",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Dynasty Seal"
           },
@@ -477,7 +477,7 @@
         {
           "narration": "The founder taps a cracked bell that will not ring true and hands you his tuning-rod. \"The old empire cast bells that tuned the Aether itself. One sank with a Samarran barge in the shallows and still tolls down there when the field runs high. Take the rod — you'll find the wreck by ear before you find it by eye.\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Founder's Tuning-Rod"
           },
@@ -532,7 +532,7 @@
         {
           "narration": "The lodge-scribe hums a note and a nearby wall answers faintly. She gives you a lodge brace-kit. \"The Tartarians cut keystones that sing the load they carry. Ostragar's great vault still holds one, unbroken — and the vault is failing. Brace it the old way or you will be the one who brought the roof down.\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Lodge Brace-Kit"
           },
@@ -587,7 +587,7 @@
         {
           "narration": "The handler slides you a scrap — half a sentence, the rest inked black — and a market letter of credit. \"A Monarch ledger leaked. One page names a Guardian site they mean kept secret forever, and it is loose in the Hidden Market. Recover it before anyone reads under the redaction. The silence is a kindness.\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Market Letter of Credit"
           },
@@ -645,7 +645,7 @@
         {
           "narration": "The Revivalist cell-leader is hungry-eyed and hands you a glyph-frame. \"The Tartarians wrote down how the Flood began — a cipher-plate, buried at the Aetheric Chamber's threshold. Sasha wants it read. It is a warning. A warning is only a set of instructions read backward.\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Glyph-Frame"
           },
@@ -700,7 +700,7 @@
         {
           "narration": "The broker unrolls a blank scrap and writes you a claim-chit against Merik's estate. \"Old Merik mapped every vault worth robbing, then found one he wouldn't sell the map to — sealed, Tartarian, unopened. He died with it on him. His effects went out through the Market. Find the map before a rival does.\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Merik's Estate Claim-Chit"
           },
@@ -758,7 +758,7 @@
         {
           "narration": "The pilgrim-elder speaks of it like a saint's bone, and ties a listening-cord around your wrist. \"When the Flood took the Giants, one lost a tooth — a relic the length of a man, humming with the old Aether still. It sank in the Mud Seas. The cord will shiver when you are near it. To hold it is to touch the divine.\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Listening-Cord"
           },
@@ -812,7 +812,7 @@
         {
           "narration": "The factor keeps his voice even, but his hand tightens on the hoard-manifest he gives you. \"The Hollow Crown is proof the Monarchs descend from Tartaria's last true rulers. A Reclaimer hoard at the Giant Vault holds it, unknowing, filed as scrap. We want it back before someone learns to read it. Discreetly.\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Hoard Manifest"
           },
@@ -870,7 +870,7 @@
         {
           "narration": "The archivist shows you a single charred page under glass and gives you an ash-frame to carry the rest in. \"The Monarchs burned the Aphelion treatise a generation ago — but Tartarian ink does not truly burn, it only chars. The words are still in the ash. It was last seen at the purge-site, Nimari.\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Ash-Frame"
           },
@@ -925,7 +925,7 @@
         {
           "narration": "The lodge-master rings a common fork and frowns, then gives it to you. \"Ours are guesses. The Tartarians had a true one — strike it to a wall and it sings back the stone's real health. One lies in the Asgardar ruins. Take mine to tell them apart. With the true one we stop guessing; without it we keep burying apprentices.\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Lodge-Master's Common Fork"
           },
@@ -979,7 +979,7 @@
         {
           "narration": "The buyer keeps their hood up and pushes a beat-counter across the table. \"Something at the Mud Flood Nexus is pulsing — faint, patient, on a beat. Not weather. Not a beast. A signal. It has repeated for months and no faction will admit to hearing it. Count it, then bring me its source. I only want to know what is calling, and to whom.\"",
           "arbiter": null,
-          "checkKind": null,
+          "checkKind": "diplomacy",
           "grants": {
             "item": "Beat-Counter"
           },

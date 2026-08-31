@@ -133,6 +133,16 @@ jobs:
       - name: Relative require() specifiers all resolve (blocking)
         run: npm run check:requires
 
+      # ⚠⚠⚠ OTA-1582 — THE ANSWER TO "THIS IS THE THIRD TIME YOU HAD TO DO THIS."
+      # Three mission-text audits found three sets of the same class of defect,
+      # because an audit is a snapshot and the data kept moving. This one holds:
+      # a stage whose objective points at no tile, a post nobody authored, and —
+      # the trap OTA-1582 itself created — a leading stage that names a person
+      # and carries no verb, which a freshly-accepted record starts ON and which
+      # nothing can ever advance. See scripts/check-mission-claims.mjs.
+      - name: Mission data claims what the engine can deliver (blocking)
+        run: npm run check:missionclaims
+
   test:
     name: jest (fast · required)
     runs-on: ubuntu-latest

@@ -5,14 +5,38 @@ Stages scanned: **281** (Hunt 116 · Mystery 72 · Storyline 93)
 > Faction quests (65) have no stages and whisper chains (21) run on their own
 > machinery; both are scanned separately. This report covers the 197 staged beats.
 
-## 1. NPC PRESENT — the largest gap, and it is total
+## 1. NPC PRESENT — who the player can actually be put in front of
 
-**VERIFIED FACT:** `npcName` is read in exactly one place in the codebase —
-`questStage.ts:112`, which builds the hint string `find <name>`. Nothing
-places the person on the tile, gives them dialogue, or lets them hand anything
-over. Every stage below names somebody who is not there.
+OTA-1580 gave every post a person (`app/data/npcs/mission-roles.json`) and
+OTA-1581 gave them a conversation card that opens on the stage's own tile.
+OTA-1582 stopped the accept doors skipping the opening beat, which is where 50
+of these people stood. So this section is no longer "all of them fail" — it is
+the split between the ones the card can raise and the ones the engine still
+walks past.
 
-**Stages naming an NPC: 114 — all of them fail this requirement.**
+**Stages naming a person: 114.**
+- **100 are reachable** — the stage carries a verb, so the chain stops there and the card opens.
+- **14 are not** — no verb, so the beat is consumed on the way past and the person is named but never met.
+
+### Still walked past
+
+
+- Mystery · The Drowned Bell of Samarran · stage 4 (?) — "the bell-founder"
+- Mystery · The Singing Stone of Ostragar · stage 4 (?) — "the lodge-scribe"
+- Mystery · The Second Flood Cipher · stage 4 (?) — "the Revivalist cell-leader"
+- Mystery · The Giant's Tooth · stage 4 (?) — "the pilgrim-elder"
+- Mystery · The Ashen Codex · stage 4 (?) — "the Order archivist"
+- Mystery · The Tuning Fork of Asgardar · stage 4 (?) — "the lodge-master"
+- Storyline · The Descent to Karok-Sa · stage 7 (?) — "the enclave-mother"
+- Storyline · Blood of the Aetherborn · stage 6 (?) — "the Dynasty proctor"
+- Storyline · The Giant-Watch Vigil · stage 6 (?) — "the vigil-keeper"
+- Storyline · Scripture in Stone · stage 6 (?) — "the lodge-master"
+- Storyline · Sasha's Gambit · stage 6 (?) — "Sasha Ironheart"
+- Storyline · The Silence Protocol · stage 6 (?) — "the Architect handler"
+- Storyline · The Drowned Library · stage 6 (?) — "Vesryn"
+- Storyline · The Purge at Asgardar · stage 6 (?) — "the Dynasty enforcer"
+
+### Reachable
 
 - Hunt · The Bog Dragon of Old Drakova · stage 1 (inciting_hook) — "the Drakovan reeve"
 - Hunt · The Bog Dragon of Old Drakova · stage 3 (toll) — "Old Mira"
@@ -73,23 +97,17 @@ over. Every stage below names somebody who is not there.
 - Mystery · The Aetherborn Foundling · stage 3 (?) — "the Reclaimer broker"
 - Mystery · The Aetherborn Foundling · stage 4 (?) — "the Dynasty agent"
 - Mystery · The Drowned Bell of Samarran · stage 1 (?) — "the bell-founder"
-- Mystery · The Drowned Bell of Samarran · stage 4 (?) — "the bell-founder"
 - Mystery · The Singing Stone of Ostragar · stage 1 (?) — "the lodge-scribe"
-- Mystery · The Singing Stone of Ostragar · stage 4 (?) — "the lodge-scribe"
 - Mystery · The Monarch's Redaction · stage 1 (?) — "the Architect handler"
 - Mystery · The Monarch's Redaction · stage 4 (?) — "the Architect handler"
 - Mystery · The Second Flood Cipher · stage 1 (?) — "the Revivalist cell-leader"
-- Mystery · The Second Flood Cipher · stage 4 (?) — "the Revivalist cell-leader"
 - Mystery · The Cartographer's Last Map · stage 1 (?) — "the Reclaimer broker"
 - Mystery · The Cartographer's Last Map · stage 4 (?) — "the Reclaimer broker"
 - Mystery · The Giant's Tooth · stage 1 (?) — "the pilgrim-elder"
-- Mystery · The Giant's Tooth · stage 4 (?) — "the pilgrim-elder"
 - Mystery · The Hollow Crown · stage 1 (?) — "the Monarch factor"
 - Mystery · The Hollow Crown · stage 4 (?) — "the Monarch factor"
 - Mystery · The Ashen Codex · stage 1 (?) — "the Order archivist"
-- Mystery · The Ashen Codex · stage 4 (?) — "the Order archivist"
 - Mystery · The Tuning Fork of Asgardar · stage 1 (?) — "the lodge-master"
-- Mystery · The Tuning Fork of Asgardar · stage 4 (?) — "the lodge-master"
 - Mystery · The Pale Signal · stage 1 (?) — "the hooded buyer"
 - Mystery · The Pale Signal · stage 4 (?) — "the hooded buyer"
 - Storyline · The Red Tower's Mouth · stage 1 (?) — "Vesryn"
@@ -107,27 +125,19 @@ over. Every stage below names somebody who is not there.
 - Storyline · The Ledger of Silence · stage 6 (?) — "the Monarch factor"
 - Storyline · The Descent to Karok-Sa · stage 1 (?) — "the enclave-mother"
 - Storyline · The Descent to Karok-Sa · stage 5 (?) — "the eldest pilgrim"
-- Storyline · The Descent to Karok-Sa · stage 7 (?) — "the enclave-mother"
 - Storyline · Blood of the Aetherborn · stage 1 (?) — "the Dynasty proctor"
 - Storyline · Blood of the Aetherborn · stage 4 (?) — "the claimant"
-- Storyline · Blood of the Aetherborn · stage 6 (?) — "the Dynasty proctor"
 - Storyline · The Giant-Watch Vigil · stage 1 (?) — "the vigil-keeper"
 - Storyline · The Giant-Watch Vigil · stage 3 (?) — "the vigil-keeper"
-- Storyline · The Giant-Watch Vigil · stage 6 (?) — "the vigil-keeper"
 - Storyline · Scripture in Stone · stage 1 (?) — "the lodge-master"
-- Storyline · Scripture in Stone · stage 6 (?) — "the lodge-master"
 - Storyline · Sasha's Gambit · stage 1 (?) — "Sasha Ironheart"
-- Storyline · Sasha's Gambit · stage 6 (?) — "Sasha Ironheart"
 - Storyline · The Highest Bidder · stage 1 (?) — "the Reclaimer broker"
 - Storyline · The Highest Bidder · stage 6 (?) — "the Reclaimer broker"
 - Storyline · The Silence Protocol · stage 1 (?) — "the Architect handler"
 - Storyline · The Silence Protocol · stage 3 (?) — "the schoolmaster"
-- Storyline · The Silence Protocol · stage 6 (?) — "the Architect handler"
 - Storyline · The Drowned Library · stage 1 (?) — "Vesryn"
-- Storyline · The Drowned Library · stage 6 (?) — "Vesryn"
 - Storyline · The Purge at Asgardar · stage 1 (?) — "the Dynasty enforcer"
 - Storyline · The Purge at Asgardar · stage 3 (?) — "the cadet matriarch"
-- Storyline · The Purge at Asgardar · stage 6 (?) — "the Dynasty enforcer"
 
 ## 2. GO TO — tiles that do not resolve
 
@@ -141,7 +151,7 @@ end-to-end by the hunt walker.
 **9 stages.**
 - Hunt · The Bog Dragon of Old Drakova · stage 3 (toll) — verb diplomacy
 - Hunt · The Bog Dragon of Old Drakova · stage 6 (catalyst) — verb attack_provoke
-- Hunt · The Sludge Behemoth at the Cradle of Dusk · stage 1 (inciting_hook) — verb auto
+- Hunt · The Sludge Behemoth at the Cradle of Dusk · stage 1 (inciting_hook) — verb diplomacy
 - Hunt · The Iron Titan in the Sentinel Ward · stage 6 (catalyst) — verb attack_provoke
 - Hunt · The Siren Queen of Zharak's Teeth · stage 4 (gauntlet) — verb attack_provoke
 - Hunt · The Weaver of the Obsidian Pillars · stage 6 (catalyst) — verb cast
@@ -155,31 +165,14 @@ end-to-end by the hunt walker.
 you or the player taking something, arrival alone completes a beat the text says
 you performed.
 
-**25 stages.**
-- Hunt · The Bog Dragon of Old Drakova · stage 1 (inciting_hook)
-- Hunt · The Sludge Behemoth at the Cradle of Dusk · stage 1 (inciting_hook)
-- Hunt · The Siren Queen of Zharak's Teeth · stage 1 (urgent_dispatch)
-- Hunt · Silence the Doubter · stage 1 (urgent_dispatch)
-- Hunt · The Shade of the Endless Stair · stage 1 (inciting_hook)
-- Hunt · The Fiend in the Tartary Dust · stage 1 (inciting_hook)
-- Mystery · Cradle of Dusk Compass · stage 1 (?)
-- Mystery · The Leviathan's Eye · stage 1 (?)
-- Mystery · The Hum Beneath Ural · stage 1 (?)
-- Mystery · The Drowned Bell of Samarran · stage 1 (?)
+**8 stages.**
 - Mystery · The Singing Stone of Ostragar · stage 4 (?)
-- Mystery · The Second Flood Cipher · stage 1 (?)
 - Mystery · The Second Flood Cipher · stage 4 (?)
-- Mystery · The Giant's Tooth · stage 1 (?)
 - Mystery · The Giant's Tooth · stage 4 (?)
 - Mystery · The Ashen Codex · stage 4 (?)
 - Mystery · The Tuning Fork of Asgardar · stage 4 (?)
-- Mystery · The Pale Signal · stage 1 (?)
-- Storyline · The Reclaimer Relic Run · stage 1 (?)
-- Storyline · Blood of the Aetherborn · stage 1 (?)
-- Storyline · The Giant-Watch Vigil · stage 1 (?)
 - Storyline · Scripture in Stone · stage 6 (?)
 - Storyline · Sasha's Gambit · stage 6 (?)
-- Storyline · The Silence Protocol · stage 1 (?)
 - Storyline · The Drowned Library · stage 6 (?)
 
 ## 5. Prose says you take something, the stage grants nothing
