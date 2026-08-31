@@ -211,6 +211,7 @@ import {
 // OTA: single-owner state moves WITH its owner, shared state moves DOWN.
 import { notePlayerActionForSprint, playerIsSprinting, _resetSprintForTest } from './sprint';
 import { playerGridCell } from './playerGrid';
+import { armSpawnStagesAtArrival, checkStandingGround, healStageDebtsAtArrival } from './stageArrival';
 // ⚠⚠ OTA-1461 — the pools for the lines a player hears ten times an hour. Each is
 // consumed through `rotatingPick`, which cycles in order and refuses an immediate
 // repeat, so a pool of forty is forty distinct fires before anything comes round.
@@ -9695,8 +9696,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // ⚠⚠ OTA-1596 — the debt is settled BEFORE the receipt prints, so the
     // arrival line reads "finish it" instead of naming an item the player has
     // no road to. See stageArrival.ts.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    (require('./stageArrival') as typeof import('./stageArrival')).healStageDebtsAtArrival(get, set, grantStageItems);
+    healStageDebtsAtArrival(get, set, grantStageItems);
     // ⚠⚠⚠ OTA-1586 — AND THE PLAYER IS TOLD WHY THEY CAME. See
     // missionTrace.missionArrivalLines: the conversation card only arms where a
     // stage NAMES somebody, so every investigate / stealth / cast beat ended a
@@ -10818,10 +10818,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // the pack survives the scene build, a microtask later so beginScene's
     // writes settle, and not on load (a save does not re-arrive). stageArrival.ts.
     if (!opts?.isOpening) {
-      void Promise.resolve().then(() => {
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        (require('./stageArrival') as typeof import('./stageArrival')).armSpawnStagesAtArrival(get, set);
-      });
+      void Promise.resolve().then(() => armSpawnStagesAtArrival(get, set));
     }
     // arb36 — announce a discovered structure so the new ENTER affordance
     // isn't unexplained. Skipped on the opening scene (you start on the
@@ -21960,10 +21957,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Surface the time the action consumed so the player can feel the day
     // shrink. Only logs when the action actually advanced the clock — a
     // pure parser miss doesn't print "0h passed".
-    // OTA-128 — silent re-dispatch skips the Time passed log; the outer
-    // submit's own end-of-submit owns the bookkeeping. Without this
-    // gate the inner submit logged once at its own end AND the outer
-    // submit's snapshot saw the same dt and logged again.
+    // OTA-128 — silent re-dispatch skips the Time passed log; the outer submit
+    // owns the bookkeeping (else inner + outer both logged the same dt).
     const hoursAfter = get().player?.hoursElapsed ?? hoursBefore;
     const dt = hoursAfter - hoursBefore;
     if (dt > 0 && !_opts?.silent) {
@@ -21989,13 +21984,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // who's taken a side. No-op unless the cooldown has passed and the scene is a safe
     // outdoor moment.
     maybeSpawnRaid(get, set);
-    // ⚠ OTA-1166 — CATCH-ALL for standing on a contract's ground. The two travel-arrival
-    // paths call this too, and the redundancy is deliberate: those only cover AUTOROUTED
-    // arrivals, and a player who walks the last tiles with typed cardinals would otherwise
-    // reach the outpost and find nothing there — which is the exact failure this OTA
-    // exists to remove. Idempotent by construction (one-shot flag on the contract), so
-    // being called from three places costs nothing but cannot silently miss a route in.
+    // ⚠ OTA-1166 — CATCH-ALL for standing on a contract's ground: the travel-arrival
+    // paths only cover AUTOROUTED arrivals; a player who walks the last tiles with typed
+    // cardinals would reach the outpost and find nothing. Idempotent (one-shot flag),
+    // so being called from three places costs nothing but cannot silently miss a route in.
     maybeSeedQuarry(get, set);
+    // ⚠⚠⚠ OTA-1597 — and the STAGE ground gets the same catch-all, cell-keyed. Owner: "you
+    // need to know that I stepped on that tile. that is it. it is coordinate based." Any
+    // action standing on a stage's canon cell heals its debts and arms the fight it owes.
+    checkStandingGround(get, set, grantStageItems);
     // OTA-1168 — the road odometer. Self-guards: no movement, no tick.
     tickRoadOdometer(get, set);
     // ⚠ OTA-1170 — the dodge cooldown refills one step per ACTION, which is what makes the
@@ -26461,6 +26458,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         set((s) => (s.player ? { player: { ...s.player, travelTarget: undefined } } : s));
         // OTA-1166 — arriving on a contract's ground puts the quarry on it.
         maybeSeedQuarry(get, set);
+        checkStandingGround(get, set, grantStageItems); // OTA-1597 — stage ground too
       } else if (after?.travelTarget && ag) {
         const d = canonicalDistanceFromGrid(ag.x, ag.y, locationId);
         set((s) => (s.player?.travelTarget ? {
@@ -26518,6 +26516,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           player: { ...s.player, travelTarget: undefined },
           currentScene: s.currentScene ? { ...s.currentScene, transitArea: null } : s.currentScene,
         } : s));
+        // OTA-1597 — CONTINUE bypasses submitPlayerAction's tail, and this in-place
+        // clear was the owner's dead route: back on the cell, nothing checked it.
+        checkStandingGround(get, set, grantStageItems);
         return;
       }
     }
@@ -26600,6 +26601,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // same tile through setTravelCourse and then again through continueTravel does not
       // double-seed.
       maybeSeedQuarry(get, set);
+      checkStandingGround(get, set, grantStageItems); // OTA-1597 — stage ground too
     } else if (after?.travelTarget && afterGrid) {
       // arb47 — EXACT distance from the player's absolute cell to the target's
       // fixed canon cell, fresh each step. Walks down monotonically as auto-travel
@@ -27088,13 +27090,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       //     squall as you cross a thermocline. Cheap; one roll per
       //     step.
       if (Math.random() < 0.12) {
-        // OTA-141 — was `require('../engine/weather')` (OTA-127), which
-        // crashes with MODULE_NOT_FOUND because pickWeather actually
-        // lives in '../engine/encounter' (top-of-file import). The
-        // OTA-127 weather-drift branch fires at 12% per in-transit
-        // step; on a long traverse the player would near-certainly
-        // hit the crash. Fix: use the already-imported pickWeather
-        // reference, no require needed.
+        // OTA-141 — use the already-imported pickWeather (encounter.ts), not the
+        // OTA-127 `require('../engine/weather')`, which was MODULE_NOT_FOUND.
         const liveWorldMem = get().worldMemory;
         // OTA-980 — #122: the open road carries no locale bias (null location) and
         // the drift updates the persisted sky so arrival doesn't re-roll it.
@@ -27330,7 +27327,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
               mmRng(mmHash(`micro-micro:${live.currentLocationId}:${live.mapX},${live.mapY}`)),
             )
           : null;
-        const siteId = tileSite?.microMicro.id ?? scene.microMicroId;
+        // ⚠ OTA-1597 — a WILD tile's site is its own seeded pick or NOTHING. The old
+        // `?? scene.microMicroId` fallback carried a climbed interior across open silt
+        // forever ("no I am not in the buried skyscraper"). Indoors keeps the carried id.
+        const siteId = wildTile ? (tileSite?.microMicro.id ?? null) : scene.microMicroId;
         const newKey = makeRoomKey(live.currentLocationId, siteId, live.mapX, live.mapY, live.hubRoomId);
         const fresh = rollTileGear(get, set, newKey);
         set((s) => {

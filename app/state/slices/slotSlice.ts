@@ -445,6 +445,20 @@ export const createSlotSlice = (
             const bi = require('../../diagnostics/bootIdentity') as typeof import('../../diagnostics/bootIdentity');
             const ll = bi.launchLineCached();
             if (ll) get().appendLog('debug', ll);
+            // ⚠⚠⚠ OTA-1597 — A SAVE THAT OPENS WITH BOOTS ON THE GROUND. The
+            // owner's Doubter save loaded him already standing on the stage's
+            // cell — no arrival, no beginScene, so OTA-1596's heal+arm never
+            // ran and the pack never spawned. Checked HERE, right after the
+            // trace slate, so the log reads: trace (HERE, requirement MISSING)
+            // → heal receipt → spawn narration. Owner's spec: "you need to
+            // know that I stepped on that tile. that is it." A save standing
+            // on it counts. Idempotent; the per-action catch-all is the belt,
+            // this is the buckle at the door.
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const sa = require('../stageArrival') as typeof import('../stageArrival');
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const gs = require('../gameStore') as typeof import('../gameStore');
+            sa.checkStandingGround(get, set as never, gs.grantStageItems as never);
           })
           .catch(() => { /* a missing banner must never cost a load */ });
       } catch { /* hardened: never block slot load on a debug log failure */ }

@@ -26492,11 +26492,24 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // spawn stage ARMS through advanceHunt the moment the player stands on it paid
 // up - "arrived on the tile, that's me starting it." Plus his copy note: the
 // card now reads "Advance by winning the fight," not "by defeat in combat."
-export const OTA_BUILD_ID = '2026-08-31-1596-the-mark-catches-up-at-the-door';
 // golem catch-up 2026-08-31: markerless publish of OTA-1596 — arrival back-
 // grants any earlier-stage item a record was never handed (all families), a
 // hunt spawn stage arms its pack the moment the player stands on it paid up,
 // and the Contracts card says "Advance by winning the fight."
+// OTA-1597 - THE TILE IS THE TRIGGER. He re-tested ON 1596 and the Doubter
+// still never spawned: the heal+arm lived only in beginScene, and his session
+// never produced one - the save LOADED him already standing on the cell, a
+// cardinal step back onto ground whose id currentLocationId already names is
+// arrival=null, and continueTravel's in-place clear (arb103) rebuilds nothing.
+// Owner: "all of these missions are token based ... you need to know that I
+// stepped on that tile. that is it. it is coordinate based." Repair: the
+// standing match is the stage's CANON GRID CELL under the player's boots, and
+// checkStandingGround (heal + arm) runs from the per-action catch-all, both
+// continueTravel arrival clears, the setTravelCourse arrival, and the slot-
+// load seam - every road onto the tile. Also: a wild tile's micro-site is its
+// own seeded pick or nothing, so a climbed interior label no longer follows
+// the player across open ground ("no I am not in the buried skyscraper").
+export const OTA_BUILD_ID = '2026-08-31-1597-the-tile-is-the-trigger';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-31-1595-the-guide-and-the-ground-agree';
 // golem catch-up 2026-08-31: markerless publish of OTA-1595 — a whisper course
 // clears the outpost room (the minimap stops showing the interior on open

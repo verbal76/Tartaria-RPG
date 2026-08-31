@@ -158,7 +158,8 @@ describe('OTA-1596 — beginScene wires both halves', () => {
   const SRC = readFileSync(join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8');
 
   it('⚠⚠ the heal runs BEFORE the arrival receipt prints', () => {
-    const heal = SRC.indexOf('.healStageDebtsAtArrival(get, set, grantStageItems)');
+    // (OTA-1597 moved the wiring to a static import — same call, no require dot.)
+    const heal = SRC.indexOf('healStageDebtsAtArrival(get, set, grantStageItems)');
     const receipt = SRC.indexOf('for (const l of missionArrivalLines(get().player))');
     expect(heal).toBeGreaterThan(-1);
     expect(receipt).toBeGreaterThan(heal);
@@ -166,7 +167,7 @@ describe('OTA-1596 — beginScene wires both halves', () => {
 
   it('⚠⚠ the arm runs AFTER the scene commits, and not on load', () => {
     const commit = SRC.indexOf('set({ currentScene: scene, pendingRolls: null');
-    const arm = SRC.indexOf('.armSpawnStagesAtArrival(get, set)');
+    const arm = SRC.indexOf('armSpawnStagesAtArrival(get, set)'); // OTA-1597: static import
     expect(commit).toBeGreaterThan(-1);
     expect(arm).toBeGreaterThan(commit);
     // Not on load: a save opens where it closed; it does not re-arrive.

@@ -42,6 +42,30 @@
 //
 // Lives outside gameStore.ts on the OTA-1583 principle: the cheapest way past
 // a shrink-only line ratchet is to put code where it belongs.
+//
+// ⚠⚠⚠ OTA-1597 — THE TILE IS THE TRIGGER. The owner re-tested on 1596 and the
+// Doubter STILL never spawned, because both halves above ran only inside
+// beginScene — and his save never produced a beginScene: the slot LOADED him
+// already standing on great_tartary_plains; a cardinal step back onto a tile
+// whose id currentLocationId ALREADY names is `arrival = null` (stepDirection
+// only fires travelTo on a NEW named tile); and continueTravel's in-place
+// arrival (arb103) clears the course without any scene rebuild. Three roads
+// onto the ground, none of them a "scene arrival".
+//
+// The owner's spec, verbatim: "all of these missions are token based … you
+// need to know that I stepped on that tile. that is it. it is coordinate
+// based." So:
+//
+//   1. The match is the CANON GRID CELL, not currentLocationId — the exact
+//      (x,y) the autoroute drives to and the atlas pin marks. A player
+//      nominally "at" a location but standing tiles off it is NOT on the
+//      ground; a player whose id is stale but whose boots are on the cell IS.
+//   2. `checkStandingGround` (heal, then arm) runs from the per-action
+//      catch-all beside maybeSeedQuarry, from continueTravel's arrival
+//      clears, and from the slot-load seam — every way you can come to be
+//      standing on the tile, not just the one that rebuilds a scene. All of
+//      it is idempotent: the heal is pack-guarded, the arm is guarded by the
+//      live hostiles it just spawned.
 
 import type { GameStore } from './gameStore';
 
@@ -65,10 +89,18 @@ interface StandingStage {
   stage: { requires?: { item: string; quantity?: number }; spawn?: { enemyName: string; count?: number } };
 }
 
-/** Every tracked contract whose CURRENT stage stands on the player's ground. */
+/** Every tracked contract whose CURRENT stage stands on the player's ground.
+ *  ⚠ OTA-1597 — "ground" means the stage's CANON GRID CELL under the player's
+ *  boots. currentLocationId is a label that goes stale in the open (it names
+ *  the origin for a whole walk-around); the cell is where the player IS. */
 function standingStages(get: Get): StandingStage[] {
   const player = get().player;
   if (!player?.currentLocationId) return [];
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { playerGridCell } = require('./playerGrid') as typeof import('./playerGrid');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { canonicalCellOf } = require('../engine/worldMap') as typeof import('../engine/worldMap');
+  const cell = playerGridCell(player);
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const QS = require('../engine/questStage') as typeof import('../engine/questStage');
   // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -93,7 +125,8 @@ function standingStages(get: Get): StandingStage[] {
       const st = def?.stages?.[rec.stage] as StandingStage['stage'] | undefined;
       if (!def || !st) continue;
       const ground = QS.stageLocationId(st as never, anchorOf(def as never), CM.resolvePosterLocation);
-      if (player.currentLocationId !== ground) continue;
+      const gc = canonicalCellOf(ground);
+      if (cell.x !== gc.x || cell.y !== gc.y) continue;
       out.push({
         family, recId: rec.id, title: def.title,
         stages: (def.stages ?? []) as StandingStage['stages'],
@@ -131,7 +164,10 @@ export function armSpawnStagesAtArrival(get: Get, _set: Set): void {
   const player = get().player;
   // ⚠ Never inside a roof — these grounds are open country, and a pack spawned
   // into an outpost room would be OTA-1583's machinery pointed at furniture.
-  if (!player || player.hubRoomId) return;
+  // OTA-1597 — the building-interior and no-scene cases join the guard: this
+  // now runs per ACTION, and advanceHunt narrates every call, so a spawn that
+  // could not land (nowhere to put enemies) would re-narrate forever.
+  if (!player || player.hubRoomId || get().activeBuildingId || !get().currentScene) return;
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const QS = require('../engine/questStage') as typeof import('../engine/questStage');
   for (const s of standingStages(get)) {
@@ -149,4 +185,17 @@ export function armSpawnStagesAtArrival(get: Get, _set: Set): void {
     get().advanceHunt(s.recId);
     return; // one armed fight per arrival — two packs at once helps nobody.
   }
+}
+
+/** ⚠⚠ OTA-1597 — THE ONE DOOR for every way of standing on the tile: heal the
+ *  record's debts, then arm the fight. Called from the per-action catch-all
+ *  (typed cardinals, chips, any verb while standing there), from
+ *  continueTravel's cell-based arrival clears (the CONTINUE button bypasses
+ *  submitPlayerAction), and from the slot-load seam (a save that opens with
+ *  boots already on the ground). beginScene keeps its own two calls for the
+ *  routed-arrival copy ordering. Every path is idempotent, so overlap between
+ *  these doors costs nothing — but a route in cannot silently miss. */
+export function checkStandingGround(get: Get, set: Set, grantStageItems: GrantStageItems): void {
+  healStageDebtsAtArrival(get, set, grantStageItems);
+  armSpawnStagesAtArrival(get, set);
 }
