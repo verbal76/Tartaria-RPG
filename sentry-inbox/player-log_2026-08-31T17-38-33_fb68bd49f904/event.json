@@ -1,0 +1,237 @@
+{
+  "id": "fb68bd49f90446dab45c6eb017ba97c7",
+  "groupID": "7702880162",
+  "eventID": "fb68bd49f90446dab45c6eb017ba97c7",
+  "projectID": "4511945117532160",
+  "size": 18141,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-31-1594-the-pinch-demands-the-lift #mthgzm4ylhgw [inline 13/24]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-08-31-1594-the-pinch-demands-the-lift",
+  "message": "player-log 2026-08-31-1594-the-pinch-demands-the-lift #mthgzm4ylhgw [inline 13/24]",
+  "title": "player-log 2026-08-31-1594-the-pinch-demands-the-lift #mthgzm4ylhgw [inline 13/24]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "a16053f3e26a4c23b66e98d8b6d6402c",
+      "span_id": "97fc59db7b8c0db8",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "rs)\n[2026-08-31T03:01:49.068Z] [world] You hear a kettle whistling before you see them. Skiv, fence, has made camp here.\n[2026-08-31T03:01:49.068Z] [arbiter] The Arbiter inclines their head toward the newcomer. \"Skiv, fence. A figure under a hood, leaned against a half-broken cart. Doesn't make eye contact. The merchandise is suspiciously cheap. The hand under the cloak doesn't move.\"\n",
+      "[2026-08-31T03:01:49.072Z] [world] Rare workings for sale: Lich-Heart Pendant (200 TC), Many-Colored Tonic (200 TC), Mire Stave (200 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n",
+      "[2026-08-31T03:01:49.078Z] [world] The Core in your pack has changed the hum \u2014 harmonized it, one true chord where the old ache used to be. At the outpost an old woman stops you with a hand on your sleeve. \"You hear it too,\" she says. Not a question. Hers is faint, she says, always was; she weeps, without ceremony, when your pack passes her. \"Louder,\" she calls after you. \"It likes you better.\"\n",
+      "[2026-08-31T03:01:49.078Z] [arbiter] The Arbiter is quiet for a stretch, then: \"One Core. Most who say they are going after them stop before the first. I have adjusted what I expect of you. Do not make me adjust it back.\"\n[2026-08-31T03:01:56.926Z] [debug] ui: tap \"take / salvage\"\n[2026-08-31T03:01:58.248Z] [world] You break the trapper camp apart. Among the pieces, something worth keeping.\n",
+      "[2026-08-31T03:01:58.249Z] [reward] \u2726 Salvage haul:\n[2026-08-31T03:01:58.249Z] [reward]     \u2022 Scrap Metal (Common)\n[2026-08-31T03:02:02.328Z] [debug] ui: tap \"less \u25be\"\n[2026-08-31T03:02:18.899Z] [player] Ask why the stall is here\n[2026-08-31T03:02:18.900Z] [world] \"Stall goes up where the ground is flat and comes down when it is not worth it,\" the trader says. \"That is the whole business plan.\"\n",
+      "[2026-08-31T03:02:18.901Z] [world] Skiv looks at the road behind you before they answer anything at all.\n[2026-08-31T03:02:20.498Z] [world] You let the conversation go and Skiv gets back to it.\n[2026-08-31T03:02:20.661Z] [debug] qwen\u23f1 flourish ok 3554ms read/write unusable (native mis-reported 145991ms/1721ms \u2014 llama.rn split bug, not this call) in 172t\u2192out 13t (50ch)\n",
+      "[2026-08-31T03:02:20.661Z] [debug] qwen\u23f1 stats \u2014 investigate_lore n16 avg1.9s max3.8s read0.8s/write1.2s in127t\u2192out33t ms/tok 2.3-12.5 | narration:scene_intro_fill n7 avg7.6s max11.3s read7.8s/write1.1s \u26a03unusable in741t\u2192out24t ms/tok 4.0-13.9 cap5 \u23f82 \u27025/39.2s | ambient n3 avg7.3s max8.0s read3.8s/write2.5s \u26a01unusable in368t\u2192out31t ms/tok 10.3-10.4 cap3 wait0.6s \u27022/14.0s | item_synthesis_hw n2 avg",
+      "4.6s max5.2s read3.8s/write0.8s in324t\u2192out24t ms/tok 10.5-13.2 \u27021/5.2s | ambient_fill n1 avg5.8s max5.8s \u26a01unusable in370t\u2192out0t wait1.9s \u23f81 \u27021/5.8s | flourish n1 avg3.6s max3.6s \u26a01unusable in172t\u2192out13t || WASTED 9 calls / 64.3s\n[2026-08-31T03:02:20.776Z] [debug] qwen\u23f1 \u2702 DISCARDED flourish after 3554ms \u2014 flourish:stale-walked-away\n[2026-08-31T03:02:20.776Z] [debug] flourish: stale 3795ms\n",
+      "[2026-08-31T03:02:22.498Z] [debug] ui: tap \"investigate\"\n[2026-08-31T03:02:24.215Z] [player] investigate catwalk\n[2026-08-31T03:02:24.216Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=catwalk resolved=catwalk range=- enemies=0 hooks=0\n",
+      "[2026-08-31T03:02:24.218Z] [world] Among the rubble: a child's shoe, still laced. Beside it, a second shoe \u2014 the same size, but for the opposite foot of the same child. Tucked into the seam: a small rock.\n[2026-08-31T03:02:24.218Z] [reward] \u2726 Small Rock from the catwalk.\n[2026-08-31T03:02:24.362Z] [cognitive] TRAVEL  (142ms)\n[2026-08-31T03:02:25.866Z] [debug] ui: tap \"more \u25b8\"\n",
+      "[2026-08-31T03:02:26.435Z] [debug] qwen\u23f1 investigate_lore ok 2081ms read 1300ms/write 752ms in 127t\u2192out 24t 10.2ms/t (112ch)\n[2026-08-31T03:02:28.850Z] [debug] ui: tap \"missions\"\n[2026-08-31T03:03:10.931Z] [debug] ui: tap \"look around you\"\n[2026-08-31T03:03:10.942Z] [player] look\n",
+      "[2026-08-31T03:03:10.943Z] [debug] parser: intent=investigate conf=1.00 verb=look target=- resolved=- range=- enemies=0 hooks=0\n[2026-08-31T03:03:10.944Z] [world] You look around, favoring your wounds (10/36 HP). You're in Buried Skyscraper \u2014 Upper Floors, in Great Tartary Plains. You've worked over everything here. Time to move. Skiv is here. Cardinal travel: north, east, south, west.\n",
+      "[2026-08-31T03:03:11.084Z] [cognitive] neutral  (136ms)\n[2026-08-31T03:03:14.781Z] [debug] ui: tap \"less \u25be\"\n[2026-08-31T03:03:18.470Z] [debug] qwen\u23f1 ambient ok 7285ms read 3885ms/write 1323ms in 378t\u2192out 31t 10.3ms/t HIT-CAP (138ch)\n[2026-08-31T03:03:18.573Z] [arbiter] Your journey has brought you to the upper floors of the Buried Skyscraper, one of the oldest structures in the Silt Wastes.\n",
+      "[2026-08-31T03:03:18.573Z] [debug] arbiter: ambient \u2713 7627ms\n[2026-08-31T03:03:18.573Z] [debug] arbiter: ambient-said \"Your journey has brought you to the upper floors of the Buried Skyscraper, one of the oldest structures in the Silt Wastes.\"\n[2026-08-31T03:03:35.338Z] [debug] ui: tap \"more \u25b8\"\n[2026-08-31T03:03:37.070Z] [debug] ui: tap \"missions\"\n",
+      "[2026-08-31T03:03:37.172Z] [debug] persist sizes(KB): total=197 player=44 wm=68[rooms=33 events=3 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=82 scene=3\n[2026-08-31T03:03:51.424Z] [debug] send-log: #mtgnmcrn0ya9 \u2014 DELIVERED (inline, no attachments): beacon out, 13/13 parts accepted (190704 chars) \u2014 flush said yes\n",
+      "[2026-08-31T03:03:51.425Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mtgnmcrn0ya9 kept on disk, boots retry up to 5 sends total\n[2026-08-31T03:03:56.449Z] [debug] appstate: active \u2192 background (was active for 951088ms)\n[2026-08-31T03:04:05.821Z] [debug] appstate: background \u2192 active (was background for 9372ms)\n",
+      "[2026-08-31T03:04:09.364Z] [debug] appstate: active \u2192 background (was active for 3542ms)\n[2026-08-31T03:04:13.973Z] [debug] appstate: background \u2192 active (was background for 4610ms)\n[2026-08-31T03:04:17.293Z] [debug] appstate: active \u2192 background (was active for 3320ms)\n[2026-08-31T03:04:21.188Z] [debug] appstate: background \u2192 active (was background for 3895ms)\n",
+      "[2026-08-31T03:04:24.932Z] [debug] appstate: active \u2192 background (was active for 3744ms)\n[2026-08-31T03:04:29.865Z] [debug] appstate: background \u2192 active (was background for 4933ms)\n[2026-08-31T03:04:33.511Z] [debug] appstate: active \u2192 background (was active for 3646ms)\n[2026-08-31T03:04:37.770Z] [debug] appstate: background \u2192 active (was background for 4259ms)\n",
+      "[2026-08-31T03:04:41.232Z] [debug] appstate: active \u2192 background (was active for 3462ms)\n[2026-08-31T03:04:44.895Z] [debug] appstate: background \u2192 active (was background for 3663ms)\n[2026-08-31T03:04:48.503Z] [debug] appstate: active \u2192 background (was active for 3607ms)\n",
+      "[2026-08-31T03:04:48.550Z] [debug] persist sizes(KB): total=196 player=44 wm=67[rooms=33 events=3 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=82 scene=3\n[2026-08-31T03:04:51.878Z] [debug] appstate: background \u2192 active (was background for 3375ms)\n[2026-08-31T03:04:55.452Z] [debug] appstate: active \u2192 background (was active for 3575ms)\n",
+      "[2026-08-31T03:25:48.586Z] [debug] appstate: background \u2192 active (was background for 1253133ms)\n[2026-08-31T03:25:55.460Z] [debug] ctx: RELEASED \u2014 live=0 (opened=1 released=1)\n[2026-08-31T03:25:55.717Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a055d5-6be2-732e-a0e6-c23dd4239ac6\n[2026-08-31T03:25:55.717Z] [debug] ota: Checking\u2026\n",
+      "[2026-08-31T03:25:55.809Z] [debug] ota: Already up to date\n[2026-08-31T03:25:55.810Z] [debug] ota: boot check result = noUpdate\n[2026-08-31T03:25:55.877Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-31T03:25:55.877Z] [debug] voice: bundled idle\n[2026-08-31T03:25:56.253Z] [debug] send-log: bundle #mtgnmcrn0ya9 attempt 2/5 delivered to Sentry\n",
+      "[2026-08-31T03:45:01.553Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a055e7-aec5-7e8c-b21c-9c5199054af4\n[2026-08-31T03:45:01.553Z] [debug] ota: Checking\u2026\n[2026-08-31T03:45:01.769Z] [debug] ota: Already up to date\n[2026-08-31T03:45:01.770Z] [debug] ota: boot check result = noUpdate\n[2026-08-31T03:45:01.829Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-08-31T03:45:01.829Z] [debug] voice: bundled idle\n[2026-08-31T03:45:02.144Z] [debug] send-log: bundle #mtgnmcrn0ya9 attempt 3/5 delivered to Sentry\n[2026-08-31T12:34:45.558Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a055e7-aec5-7e8c-b21c-9c5199054af4\n[2026-08-31T12:34:45.558Z] [debug] ota: Checking\u2026\n",
+      "[2026-08-31T12:34:46.636Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-08-31T12:34:46.728Z] [debug] ota: Saving progress\u2026\n[2026-08-31T12:34:46.729Z] [debug] ota: Restarting to apply\u2026\n[2026-08-31T12:34:46.799Z] [debug] ota: boot check result = applied\n",
+      "[2026-08-31T12:34:46.923Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a057bc-e606-73c7-81bd-54751f102b83\n[2026-08-31T12:34:46.923Z] [debug] ota: Checking\u2026\n[2026-08-31T12:34:47.057Z] [debug] ota: Already up to date\n[2026-08-31T12:34:47.058Z] [debug] ota: boot check result = noUpdate\n[2026-08-31T12:34:47.115Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-08-31T12:34:47.115Z] [debug] voice: bundled idle\n[2026-08-31T12:34:47.500Z] [debug] send-log: bundle #mtgnmcrn0ya9 attempt 4/5 delivered to Sentry\n[2026-08-31T14:24:04.725Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a057bc-e606-73c7-81bd-54751f102b83\n[2026-08-31T14:24:04.725Z] [debug] ota: Checking\u2026\n",
+      "[2026-08-31T14:24:07.100Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-08-31T14:24:07.193Z] [debug] ota: Saving progress\u2026\n[2026-08-31T14:24:07.196Z] [debug] ota: Restarting to apply\u2026\n[2026-08-31T14:24:07.260Z] [debug] ota: boot check result = applied\n",
+      "[2026-08-31T14:24:07.482Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a057ff-a24c-763d-9f49-e7b643e23868\n[2026-08-31T14:24:07.482Z] [debug] ota: Checking\u2026\n[2026-08-31T14:24:07.585Z] [debug] ota: Already up to date\n[2026-08-31T14:24:07.586Z] [debug] ota: boot check result = noUpdate\n[2026-08-31T14:24:07.642Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-08-31T14:24:07.643Z] [debug] voice: bundled idle\n[2026-08-31T14:24:08.783Z] [debug] send-log: bundle #mtgnmcrn0ya9 attempt 5/5 delivered to Sentry \u2014 final try, cleared\n[2026-08-31T14:24:14.384Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a057ff-a24c-763d-9f49-e7b643e23868\n[2026-08-31T14:24:14.384Z] [debug] ota: Checking\u2026\n",
+      "[2026-08-31T14:24:14.451Z] [debug] ota: Already up to date\n[2026-08-31T14:24:14.451Z] [debug] ota: boot check result = noUpdate\n[2026-08-31T14:24:14.491Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-31T14:24:14.492Z] [debug] voice: bundled idle\n",
+      "[2026-08-31T14:24:20.468Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a057ff-a24c-763d-9f49-e7b643e23868\n[2026-08-31T14:24:20.468Z] [debug] ota: Checking\u2026\n[2026-08-31T14:24:20.526Z] [debug] ota: Already up to date\n[2026-08-31T14:24:20.526Z] [debug] ota: boot check result = noUpdate\n[2026-08-31T14:24:20.577Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-08-31T14:24:20.577Z] [debug] voice: bundled idle\n[2026-08-31T14:24:33.536Z] [debug] OTA session start: 2026-08-31-1592-the-events-say-which-build.\n[2026-08-31T14:24:33.536Z] [world] You step back into Great Tartary Plains. The world waits for your move.\n",
+      "[2026-08-31T14:24:33.536Z] [world] Whispers carried while you slept off the world. Something that was rumour the last time you walked here is closer to fact now.\n[2026-08-31T14:24:33.539Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. \"Welcome back, Cheddar Bob. We've still got ground to cover, you and I. The waste did not sleep while you were gone \u2014 blood was spilled and g",
+      "round changed hands. Read the World for the account.\"\n[2026-08-31T14:24:33.784Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-31T14:24:33.782Z \u00b7 build 2026-08-31-1592-the-events-say-which-build \u00b7 previous entry moments earlier \u2550\u2550\u2550\n",
+      "[2026-08-31T14:24:33.785Z] [debug] missions: hunt:hunt_servants_doubter stage 1/5 [boss\u2192attack] @great_tartary_plains HERE needs=Servants' Mark of Sanction\u2717MISSING spawn=Tartarian Raider\u00d73\n[2026-08-31T14:24:33.785Z] [debug] missions: \u00b7 at=great_tartary_plains\n",
+      "[2026-08-31T14:24:34.343Z] [debug] send-log: crash on record (2026-08-31T14:24:08.210Z) \u2014 game log pushed automatically, delivered to Sentry, kept on disk as #mthbxrkq1jas\n[2026-08-31T14:24:50.098Z] [debug] ui: tap \"more \u25b8\"\n[2026-08-31T14:24:51.401Z] [debug] ui: tap \"less \u25be\"\n",
+      "[2026-08-31T14:25:08.783Z] [debug] send-log: #mthbyi8ignjv \u2014 DELIVERED (inline, no attachments): beacon out, 14/14 parts accepted (198732 chars) \u2014 flush said yes\n[2026-08-31T14:25:08.784Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mthbyi8ignjv kept on disk, boots retry up to 5 sends total\n",
+      "[2026-08-31T16:02:48.471Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a057ff-a24c-763d-9f49-e7b643e23868\n[2026-08-31T16:02:48.472Z] [debug] ota: Checking\u2026\n[2026-08-31T16:02:49.656Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-08-31T16:02:49.771Z] [debug] ota: Saving progress\u2026\n[2026-08-31T16:02:49.772Z] [debug] ota: Restarting to apply\u2026\n",
+      "[2026-08-31T16:02:49.849Z] [debug] ota: boot check result = applied\n[2026-08-31T16:02:49.986Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a0585a-304a-7d8e-bd87-6a327c2aea9a\n[2026-08-31T16:02:49.986Z] [debug] ota: Checking\u2026\n[2026-08-31T16:02:50.080Z] [debug] ota: Already up to date\n[2026-08-31T16:02:50.080Z] [debug] ota: boot check result = noUpdate\n",
+      "[2026-08-31T16:02:50.137Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-31T16:02:50.137Z] [debug] voice: bundled idle\n[2026-08-31T16:02:50.314Z] [debug] send-log: bundle #mthbyi8ignjv attempt 2/5 delivered to Sentry\n[2026-08-31T16:02:53.776Z] [debug] OTA applied: 2026-08-31-1592-the-events-say-which-build \u2192 2026-08-31-1593-the-boot-gets-checkpoints.\n",
+      "[2026-08-31T16:02:53.776Z] [debug] OTA session start: 2026-08-31-1593-the-boot-gets-checkpoints.\n[2026-08-31T16:02:53.776Z] [world] You step back into Great Tartary Plains. The world waits for your move.\n[2026-08-31T16:02:53.776Z] [arbiter] The Arbiter sets the quiet aside. \"Welcome back, Cheddar Bob. I kept watch while you were gone.\"\n",
+      "[2026-08-31T16:02:53.984Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-31T16:02:53.982Z \u00b7 build 2026-08-31-1593-the-boot-gets-checkpoints \u00b7 updated from 2026-08-31-1592-the-events-say-which-build \u00b7 previous entry moments earlier \u2550\u2550\u2550\n",
+      "[2026-08-31T16:02:53.984Z] [debug] missions: hunt:hunt_servants_doubter stage 1/5 [boss\u2192attack] @great_tartary_plains HERE needs=Servants' Mark of Sanction\u2717MISSING spawn=Tartarian Raider\u00d73\n[2026-08-31T16:02:53.984Z] [debug] missions: \u00b7 at=great_tartary_plains\n[2026-08-31T16:02:53.984Z] [debug] boot: life bmthfg4wjoc started 2026-08-31T16"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-31-1594-the-pinch-demands-the-lift #mthgzm4ylhgw [inline 13/24]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mthgzm4ylhgw"
+    },
+    {
+      "key": "dist",
+      "value": "2026-08-31-1594-the-pinch-demands-the-lift"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "13"
+    },
+    {
+      "key": "parts",
+      "value": "24"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-08-31-1594-the-pinch-demands-the-lift"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-31T17:38:32.272225Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-31T17:38:33.981000Z",
+  "fingerprints": [
+    "aca5f7b21a055597ef162cdb0b7254fb"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1946489288,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-08-31T17:38:33.982000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-08-31-1594-the-pinch-demands-the-lift",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-08-31-1594-the-pinch-demands-the-lift",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-08-31-1594-the-pinch-demands-the-lift",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-08-31-1594-the-pinch-demands-the-lift)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "086a7160dc4f438287f4a885edcaacff",
+  "previousEventID": "f05babe2bef741b4a5a5f3cddbba71e8"
+}
