@@ -35,7 +35,7 @@
 import Constants from 'expo-constants';
 import type { CrashRecord } from './crashLedger';
 import { crashReportDsn, installCrashTransport, reportingEnabled } from './crashReporter';
-import { OTA_BUILD_ID } from '../buildInfo';
+import { OTA_BUILD_ID, DISPLAY_VERSION } from '../buildInfo';
 
 /** Minimal shape of the bits of the SDK this file uses. Declared rather than
  *  imported so the type does not drag the module into the bundle graph. */
@@ -298,6 +298,18 @@ export function installSentryIfAvailable(): boolean {
       // breadcrumb collection would duplicate it and disagree at the edges.
       maxBreadcrumbs: 0,
       environment: productLine(),
+      // ⚠⚠⚠ OTA-1592 — THE EVENTS FINALLY SAY WHICH BUILD SENT THEM. All 356
+      // delivered events carried `release: null · dist: null`, so the repo link
+      // the owner added to the Sentry project could do nothing: suspect commits,
+      // release grouping and regression detection all key on `release`, and the
+      // only identity our events carried was a `build` TAG a human has to read.
+      // Sentry auto-creates the release record from the first event that names
+      // one, so the client half alone lights up grouping; wiring set-commits in
+      // CI (the other half of #109) can follow without touching this again.
+      // ⚠ The OTA stamp IS the release: JS behaviour changes per OTA, not per
+      // store binary, and every forensic session in this repo is keyed by it.
+      release: `tartaria@${DISPLAY_VERSION}+${OTA_BUILD_ID}`,
+      dist: OTA_BUILD_ID,
     });
     try { s.setTag?.('line', productLine()); } catch { /* optional API */ }
     installCrashTransport({

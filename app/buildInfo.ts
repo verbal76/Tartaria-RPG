@@ -26430,7 +26430,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // store, whose refusal speaks - free, no stamina, no swing. The combat primer's
 // prose moved with the behaviour ("buzzes and nothing happens" described the
 // old game), and ota1321's rule-2 pin moved with it.
-export const OTA_BUILD_ID = '2026-08-31-1591-the-buzz-learns-to-talk';
+// OTA-1592 - THE EVENTS SAY WHICH BUILD SENT THEM (task #109, client half).
+//
+// 356 delivered Sentry events, release and dist NULL on every one - so the repo
+// link the owner connected had nothing to bite on: suspect commits, release
+// grouping and regression detection all key on the event's release field, and
+// ours only ever carried a build TAG a human has to read. The SDK init now
+// stamps release (tartaria@<version>+<OTA stamp>) and dist (the stamp) on every
+// outgoing event; Sentry auto-creates the release record from the first event
+// that names one. The CI set-commits half of #109 remains open - it needs a
+// workflow this box cannot test and will be handed over as a reviewed diff.
+export const OTA_BUILD_ID = '2026-08-31-1592-the-events-say-which-build';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-31-1591-the-buzz-learns-to-talk';
 // golem catch-up 2026-08-31: markerless publish of OTA-1591 — an out-of-range
 // weapon tap now reaches the store's spoken refusal instead of dying as a
 // silent 30ms buzz, and the combat primer describes the new behaviour.
