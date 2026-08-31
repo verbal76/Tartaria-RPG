@@ -26361,6 +26361,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // families. check:missionclaims fails the build if a second boss map appears, in
 // either of the two shapes this defect took.
 export const OTA_BUILD_ID = '2026-08-31-1588-the-verb-that-pays-it';
+// golem catch-up 2026-08-31: markerless publish of OTA-1588 — one family-aware
+// answer to "what verb pays this stage", so the last beat of every mystery and
+// every storyline stops telling the player to finish a fight that is not there,
+// and the Contracts card finally names the verb for all three families.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-31-1587-which-life-died';
 // golem catch-up 2026-08-31: markerless publish of OTA-1587 — a JS life now has
 // a name and an age, the reload leaves the next boot a note carrying its model
