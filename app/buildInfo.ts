@@ -26493,6 +26493,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // up - "arrived on the tile, that's me starting it." Plus his copy note: the
 // card now reads "Advance by winning the fight," not "by defeat in combat."
 export const OTA_BUILD_ID = '2026-08-31-1596-the-mark-catches-up-at-the-door';
+// golem catch-up 2026-08-31: markerless publish of OTA-1596 — arrival back-
+// grants any earlier-stage item a record was never handed (all families), a
+// hunt spawn stage arms its pack the moment the player stands on it paid up,
+// and the Contracts card says "Advance by winning the fight."
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-31-1595-the-guide-and-the-ground-agree';
 // golem catch-up 2026-08-31: markerless publish of OTA-1595 — a whisper course
 // clears the outpost room (the minimap stops showing the interior on open
