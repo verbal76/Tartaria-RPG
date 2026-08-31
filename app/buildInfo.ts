@@ -26222,6 +26222,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // without a clear is a wedge, and extending one without the other would have
 // bricked the very storyline this fixed.
 export const OTA_BUILD_ID = '2026-08-31-1583-the-favour-beat-fights-what-it-names';
+// golem catch-up 2026-08-31: markerless publish of OTA-1583 — the fourteen
+// mid-chain boss stages that stood the hunt's Legendary apex up at stage 3 now
+// fight the creature their own prose names, seventeen of the twenty-one stage
+// spawns ambush and draw first blood, `spawn` and its clear moved to the shared
+// binding so all three families can use them, and the escort clear left
+// gameStore for questSlice where it belongs.
 // golem catch-up 2026-08-31: markerless publish of OTA-1582 — the opening stage
 // of all 50 staged missions stops being skipped, so the person who hands you the
 // job is finally somebody you meet; one shared definition of where a record
