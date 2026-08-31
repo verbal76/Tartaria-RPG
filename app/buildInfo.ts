@@ -26413,6 +26413,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // first author to put bodies behind a person would have armed a modal whose
 // FIGHT button did nothing. All three families dispatch now, pinned.
 export const OTA_BUILD_ID = '2026-08-31-1590-the-whole-gamut';
+// golem catch-up 2026-08-31: markerless publish of OTA-1590 — the gamut walker
+// plays all 18 hunts through the conversation-card door and the turn-in leg
+// (all pass), and the card's FIGHT dispatch reaches all three families.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-31-1589-the-pin-comes-home';
 // golem catch-up 2026-08-31: markerless publish of OTA-1589 — a finished
 // contract's pin routes to the nearest pay window instead of the far anchor, the
