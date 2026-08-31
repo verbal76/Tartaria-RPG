@@ -76,8 +76,9 @@ export function CombatPrimerModal({
             <Text style={styles.row}>
               <Text style={styles.term}>APPROACH — </Text>
               picks who you are fighting and closes the gap. Every weapon works at its
-              own range: if a weapon button just buzzes and nothing happens, you are
-              standing too far out — not swinging too weak. <Text style={styles.btnRef}>approach</Text>
+              own range: an amber weapon button buzzes when tapped and the Arbiter says
+              why it cannot land from here — too far out, or the wrong tool for this
+              ground — not that you swing too weak. <Text style={styles.btnRef}>approach</Text>
               {' '}lights up whenever you are not yet in close. Moving costs you a beat,
               and anything already in reach gets a swing at you.
             </Text>

@@ -26412,7 +26412,26 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // carry a spawn today (measured), so no card currently renders FIGHT, but the
 // first author to put bodies behind a person would have armed a modal whose
 // FIGHT button did nothing. All three families dispatch now, pinned.
-export const OTA_BUILD_ID = '2026-08-31-1590-the-whole-gamut';
+// OTA-1591 - THE BUZZ LEARNS TO TALK.
+//
+// From the owner's 2026-08-31 log, fighting raiders from the top of a dead tree,
+// foes grounded at the base: NINE taps on his main-hand cleaver in 2.7 seconds,
+// nine silent 30ms buzzes, not one word - then one tap on the ranged off-hand
+// worked instantly, and he reasonably concluded the button was broken.
+//
+// QuickBtn's outOfRange branch (OTA-1517) vibrated and RETURNED - while three
+// layers down, the store's OTA-960 elevation gate held a FREE, fully written
+// refusal that names the weapon, the reason and the remedy ("down at the base -
+// won't reach from up here - use something that SHOOTS, or climb down") and
+// never got to say it. A silent gate in front of a spoken one is the defect
+// class B15 closed ("refusals always speak"), rebuilt in the UI layer.
+//
+// The amber tint stays, the buzz stays, and the tap now passes through to the
+// store, whose refusal speaks - free, no stamina, no swing. The combat primer's
+// prose moved with the behaviour ("buzzes and nothing happens" described the
+// old game), and ota1321's rule-2 pin moved with it.
+export const OTA_BUILD_ID = '2026-08-31-1591-the-buzz-learns-to-talk';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-31-1590-the-whole-gamut';
 // golem catch-up 2026-08-31: markerless publish of OTA-1590 — the gamut walker
 // plays all 18 hunts through the conversation-card door and the turn-in leg
 // (all pass), and the card's FIGHT dispatch reaches all three families.

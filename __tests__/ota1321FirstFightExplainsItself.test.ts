@@ -130,11 +130,22 @@ describe('OTA-1321 — the card describes the game that shipped', () => {
     expect(CARD_PROSE).not.toContain('costs you the turn');
   });
 
-  it('⚠⚠ APPROACH: an out-of-range weapon BUZZES and says nothing — the card is what says it', () => {
+  it('⚠⚠ APPROACH: an out-of-range weapon buzzes AND the store says why — the card describes exactly that', () => {
+    // ⚠ SUPERSEDED BY OTA-1591 — and the supersession is the point of rule 2.
+    // This pin used to assert the buzz-and-return swallow, and the card taught
+    // it ("buzzes and nothing happens"). The 2026-08-31 device log then showed
+    // nine silent cleaver taps in 2.7 seconds while elevated: the player read
+    // the silence as a broken button, because a buzz explains nothing. The tap
+    // now passes through to the store's own free refusal (OTA-960's elevation
+    // gate, the reach gate), which names the weapon and the remedy — and the
+    // card's prose moved with the behaviour, because rule 2 says it MUST.
     expect(INPUTBOX).toContain('outOfRange');
-    // The buzz-and-return path: no Arbiter line, no log entry, no turn.
-    expect(INPUTBOX).toContain('// Combat range gate — buzz only (no tutorial nudge).');
-    expect(CARD_PROSE).toContain('buzzes and nothing happens');
+    // Stated against CODE: the buzz stays, the early return is gone, so the
+    // press falls through to onPress() and the store's refusal runs.
+    expect(INPUTBOX).toContain('try { Vibration.vibrate(30); } catch { /* ignore */ }');
+    expect(INPUTBOX).not.toContain('try { Vibration.vibrate(30); } catch { /* ignore */ }\n      return;');
+    expect(CARD_PROSE).toContain('the Arbiter says');
+    expect(CARD_PROSE).not.toContain('buzzes and nothing happens');
     expect(CARD_PROSE).not.toContain('greyed');
   });
 

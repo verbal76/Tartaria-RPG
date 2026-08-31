@@ -1200,9 +1200,27 @@ function QuickBtn({
       return;
     }
     if (outOfRange) {
-      // Combat range gate — buzz only (no tutorial nudge).
+      // ⚠⚠⚠ OTA-1591 — THE BUZZ LEARNS TO TALK: buzz, then LET THE TAP THROUGH.
+      //
+      // This branch used to `return` after the vibrate, and the field proved
+      // that design wrong: the owner's 2026-08-31 log has NINE taps on his
+      // main-hand cleaver in 2.7 seconds while elevated over grounded foes —
+      // nine 30ms buzzes, not one word, and he reasonably concluded the button
+      // was broken.
+      //
+      // The bitter part: the store ALREADY HAD the words. OTA-960's elevation
+      // gate and the reach gate beside it are FREE refusals — no stamina, no
+      // time — that name the weapon, the reason, and the remedy ("X is down at
+      // the base — the cleaver won't reach from up here. Use something that
+      // SHOOTS, or climb down"). OTA-1517's swallow, added so a green chip
+      // would stop "bouncing", sat IN FRONT of that refusal and traded the
+      // spoken answer for a silent one — the defect class B15 closed
+      // ("refusals always speak"), rebuilt one layer up in the UI.
+      //
+      // So: the amber tint stays (the hint before the tap), the buzz stays (the
+      // hint at the tap), and the tap now REACHES the store, whose refusal says
+      // why. One implementation of the answer, and it is the one with words.
       try { Vibration.vibrate(30); } catch { /* ignore */ }
-      return;
     }
     onPress();
   };
