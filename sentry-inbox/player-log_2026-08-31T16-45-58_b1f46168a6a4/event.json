@@ -1,0 +1,233 @@
+{
+  "id": "b1f46168a6a44613880c8f597508bac9",
+  "groupID": "7702787988",
+  "eventID": "b1f46168a6a44613880c8f597508bac9",
+  "projectID": "4511945117532160",
+  "size": 18084,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-31-1593-the-boot-gets-checkpoints #mthgzm4ylhgw [inline 22/24]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-08-31-1593-the-boot-gets-checkpoints",
+  "message": "player-log 2026-08-31-1593-the-boot-gets-checkpoints #mthgzm4ylhgw [inline 22/24]",
+  "title": "player-log 2026-08-31-1593-the-boot-gets-checkpoints #mthgzm4ylhgw [inline 22/24]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "19bc49dd6018494eb6e9d3e148f0ea22",
+      "span_id": "8a0153f13bcd26ec",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "291Z] [debug] qwen\u23f1 stats \u2014 investigate_lore n10 avg4.0s max9.8s read0.5s/write1.1s \u26a01unusable in127t\u2192out35t ms/tok 2.1-10.7 wait2.2s | narration:scene_intro_fill n3 avg9.4s max14.4s read8.9s/write1.2s \u26a02unusable in745t\u2192out11t ms/tok 11.9-11.9 cap1 wait1.4s \u23f82 \u27023/28.3s | ambient n3 avg10.5s max16.8s read3.9s/write1.8s \u26a01unusable in365t\u2192out31t ms/tok 9.7-11.5 cap3 wait4.1s \u27021/7.8s | ask_arbiter n1 ",
+      "avg5.3s max5.3s read2.6s/write2.4s in246t\u2192out73t ms/tok 10.4-10.4 | item_synthesis_hw n1 avg5.4s max5.4s read3.9s/write1.5s in327t\u2192out46t ms/tok 12.0-12.0 | flourish n1 avg3.5s max3.5s read1.8s/write1.7s in174t\u2192out20t ms/tok 10.5-10.5 \u27021/3.5s | narration:scene_intro n1 avg9.0s max9.0s read8.8s in755t\u2192out3t ms/tok 11.7-11.7 \u23f81 \u27021/9.0s || WASTED 6 calls / 48.6s\n",
+      "[2026-08-31T16:43:54.411Z] [debug] arbiter: ambient stale:moved-scene\u2192banked 17297ms\n[2026-08-31T16:43:54.411Z] [debug] arbiter: ambient-empty reason=near-duplicate-of-recent raw=\"You've traveled a long road, my friend. Your journey has taken you through the thickets of the borderlands, past the roc\"\n[2026-08-31T16:43:56.775Z] [debug] ui: tap \"rest\"\n[2026-08-31T16:43:56.783Z] [player] rest\n",
+      "[2026-08-31T16:43:56.783Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-31T16:43:56.784Z] [world] Soot paws the ground flat before trusting it, then folds down onto it.\n[2026-08-31T16:43:56.785Z] [world] You rest for 8 hours. +6 HP, +8 stamina, \u22122 corruption recovered. (Day 33, afternoon)\n",
+      "[2026-08-31T16:43:56.785Z] [arbiter] The Arbiter is quiet a long moment after you stir. \"I was wrong about something earlier. I'll say so when the moment's right.\"\n[2026-08-31T16:43:56.796Z] [debug] arbiter: template (reason=intent-not-allowed:rest)\n",
+      "[2026-08-31T16:43:56.797Z] [arbiter] The Arbiter looks around. \"From the road: a collapsed waystation, not worth a second look. The second look is the test.\"\n[2026-08-31T16:43:56.797Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-31T16:43:56.798Z] [system] \u23f3 Time passed: 8h\n",
+      "[2026-08-31T16:43:56.804Z] [world] A Conspiracy Architects war party crests the rise \u2014 5 of them, blades already out. They've marked you for standing with the Forgotten Order.\n[2026-08-31T16:43:56.805Z] [arbiter] \"The Conspiracy Architects do not forgive a friend of the Forgotten Order,\" the Arbiter murmurs. \"Stand, or run \u2014 but decide now.\"\n[2026-08-31T16:43:57.087Z] [cognitive] REST  (287ms)\n",
+      "[2026-08-31T16:43:57.301Z] [debug] qwen\u23f1 investigate_lore ok 12935ms wait 10161ms read 1311ms/write 1095ms in 127t\u2192out 34t 10.3ms/t (160ch)\n[2026-08-31T16:43:58.183Z] [arbiter] The Arbiter tilts their head. \"I do not see a 'atrium' here. Choose words carefully \u2014 try: Giant-Watch Greatspear, standing water, silt, rubble, crate, barrel.\"\n[2026-08-31T16:43:59.176Z] [debug] ui: tap \"\u2697 auralite talon\"\n",
+      "[2026-08-31T16:43:59.215Z] [player] attack with the auralite talon\n[2026-08-31T16:43:59.219Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=5 hooks=1\n[2026-08-31T16:43:59.221Z] [debug] attack: target=Conspiracy Architects Raider 1 range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n",
+      "[2026-08-31T16:43:59.222Z] [arbiter] Glass Hail hangs between you. \"\u22121 to the swing \u2014 see what you can,\" the Arbiter says.\n[2026-08-31T16:43:59.222Z] [debug] attack: visibility penalty \u22121 (Glass Hail)\n[2026-08-31T16:43:59.263Z] [world] You commit forward with the acid-etched auralite talon. Conspiracy Architects Raider 1 watches your hands.\n[2026-08-31T16:43:59.264Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-31T16:43:59.487Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (223ms)\n[2026-08-31T16:44:05.826Z] [world] Conspiracy Architects Raider 1 moves first. The pressure is immediate.\n[2026-08-31T16:44:05.828Z] [combat] Conspiracy Architects Raider 1 \u2014 d20 \u2192 14 + ATK 10 = 24 vs your AC 22 \u2014 \u2713 HIT\n",
+      "[2026-08-31T16:44:05.829Z] [combat] Conspiracy Architects Raider 2 turns on Soot \u2014 d20 9 + ATK 7 = 16 vs Soot's AC 12 (vest +2) \u2014 \u2713 HIT\n[2026-08-31T16:44:05.830Z] [combat] Soot takes 1. (14/15 HP left)\n[2026-08-31T16:44:05.830Z] [combat] Conspiracy Architects Raider 4 and 2 others close the distance.\n",
+      "[2026-08-31T16:44:05.830Z] [combat] You \u2014 d20 \u2192 10 + INT 11 \u2212 1 (Glass Hail) = 20 vs Conspiracy Architects Raider 1 AC 12 \u2014 \u2713 HIT\n[2026-08-31T16:44:05.831Z] [combat] Conspiracy Architects Raider 1 shrugs off the aetheric. (resisted, \u00d70.5 for 7)\n",
+      "[2026-08-31T16:44:05.833Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Reclaimers Guild Geode-Cored Cleaver \u2014 slashing will bite where aetheric won't.\"\n[2026-08-31T16:44:05.834Z] [combat] You crack the Conspiracy Architects Raider 1 with the Acid-Etched Auralite Talon for 7 \u2014 half their fight, gone in one blow. They crumple, out cold. (5/12 HP) Loot them before they come to.\n",
+      "[2026-08-31T16:44:05.834Z] [combat] Conspiracy Architects Raider 1 is out of it. Conspiracy Architects Raider 2 now in your sights.\n[2026-08-31T16:44:05.835Z] [combat] Acid-Etched Auralite Talon \u2014 4 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n",
+      "[2026-08-31T16:44:05.835Z] [arbiter] \"You can fight, hide, or speak,\" the Arbiter says low. \"The Conspiracy Architects Raider 2 is already deciding for itself.\"\n[2026-08-31T16:44:06.082Z] [combat] Conspiracy Architects Raider 1 deals 6 slashing damage [armor \u221257%]. You have 26 HP remaining.\n",
+      "[2026-08-31T16:44:06.082Z] [combat] That's your slashing resist working \u2014 the armor drank most of that hit (6 of 7 got through).\n[2026-08-31T16:44:09.111Z] [debug] ui: tap \"approach\"\n[2026-08-31T16:44:09.168Z] [player] approach Conspiracy Architects Raider 2\n",
+      "[2026-08-31T16:44:09.168Z] [debug] parser: intent=advance conf=1.00 verb=approach target=conspiracy architects raider 2 resolved=Conspiracy Architects Raider 2 range=mid enemies=5 hooks=1\n[2026-08-31T16:44:09.169Z] [debug] move: advance from range=mid enemies=5 weather=Glass Hail cost=1 partial=0\n",
+      "[2026-08-31T16:44:09.169Z] [debug] move: field advance target=Conspiracy Architects Raider 2 d 1.71->0.71 band mid->close\n[2026-08-31T16:44:09.170Z] [world] You close the gap with the Conspiracy Architects Raider 2 and 4 others. (range: close / arm's reach)\n",
+      "[2026-08-31T16:44:09.170Z] [world] The field shifts around you \u2014 Conspiracy Architects Raider 3 now close / arm's reach; Conspiracy Architects Raider 4 now mid-range; Conspiracy Architects Raider 5 now mid-range.\n[2026-08-31T16:44:09.170Z] [combat] Conspiracy Architects Raider 1 smokes \u2014 acid eats 4. (1/12 HP, 2 turns left)\n",
+      "[2026-08-31T16:44:09.170Z] [combat] Conspiracy Architects Raider 4 turns on Soot \u2014 d20 4 + ATK 6 = 10 vs Soot's AC 12 (vest +2) \u2014 \u2717 MISS\n[2026-08-31T16:44:09.171Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 5 + ATK 7 = 12 vs your AC 22 \u2014 \u2717 MISS\n[2026-08-31T16:44:09.172Z] [combat] Conspiracy Architects Raider 2 \u2014 d20 \u2192 1 + ATK 7 = 8 vs your AC 22 \u2014 \u2717 FUMBLE\n",
+      "[2026-08-31T16:44:09.173Z] [combat] Conspiracy Architects Raider 3 turns on Soot \u2014 d20 13 + ATK 6 = 19 vs Soot's AC 12 (vest +2) \u2014 \u2713 HIT\n[2026-08-31T16:44:09.173Z] [combat] Soot takes 3. (11/15 HP left)\n[2026-08-31T16:44:09.417Z] [cognitive] neutral  (243ms)\n",
+      "[2026-08-31T16:44:09.671Z] [debug] persist sizes(KB): total=200 player=44 wm=67[rooms=29 events=3 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=82 scene=6\n[2026-08-31T16:44:10.846Z] [debug] ui: tap \"dodge\"\n[2026-08-31T16:44:10.860Z] [player] dodge\n[2026-08-31T16:44:10.861Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=5 hooks=1\n",
+      "[2026-08-31T16:44:10.861Z] [world] You commit to the dodge. Slip Conspiracy Architects Raider 2's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-08-31T16:44:10.862Z] [combat] Conspiracy Architects Raider 1 smokes \u2014 acid eats 4. (0/12 HP, 1 turn left)\n",
+      "[2026-08-31T16:44:10.863Z] [reward] Conspiracy Architects Raider 1 defeated. You recover Patched Cloth \u00d72.\n[2026-08-31T16:44:10.865Z] [reward] You strip the body: Bone Knife, Mud-Bound Cloak (+6 TC). The kit took the fight badly.\n[2026-08-31T16:44:10.865Z] [combat] 4 attackers remain. Conspiracy Architects Raider 2 now in your sights.\n",
+      "[2026-08-31T16:44:10.866Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-08-31T16:44:10.866Z] [reward] +18 TC pried from the dust.\n[2026-08-31T16:44:10.954Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 8 + ATK 6 = 14 vs your AC 22 \u2014 \u2717 EVADED\n",
+      "[2026-08-31T16:44:10.954Z] [combat] Dodge \u2014 d20 \u2192 12 + DEX 23 = 35 vs ATK 14. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-08-31T16:44:10.954Z] [world] You slip Conspiracy Architects Raider 4's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n",
+      "[2026-08-31T16:44:10.994Z] [reward] \u2726 The shadows move with you. +1 STE (base 4, 6 as you stand).\n[2026-08-31T16:44:10.995Z] [debug] ac-shift 22\u219225: race/base 10 + gear 18 + title 0 \u2192 trimmed 22 + status 3 | worn: head=Architect's Sight Enhancer chest=Forgotten Protector's Plate hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n",
+      "[2026-08-31T16:44:10.995Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 11 + ATK 7 = 18 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-31T16:44:10.995Z] [combat] Conspiracy Architects Raider 2 turns on Soot \u2014 d20 17 + ATK 7 = 24 vs Soot's AC 12 (vest +2) \u2014 \u2713 HIT\n[2026-08-31T16:44:10.996Z] [combat] Soot takes 1. (10/15 HP left)\n",
+      "[2026-08-31T16:44:10.997Z] [combat] Conspiracy Architects Raider 3 \u2014 d20 \u2192 18 + ATK 8 = 26 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-08-31T16:44:10.997Z] [debug] arbiter: template (reason=combat)\n[2026-08-31T16:44:10.997Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T16:44:10.998Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-31T16:44:11.238Z] [combat] Conspiracy Architects Raider 3 deals 4 bludgeoning damage. You have 22 HP remaining.\n[2026-08-31T16:44:11.440Z] [cognitive] neutral  (240ms)\n[2026-08-31T16:44:12.179Z] [debug] ui: tap \"\ud83d\udd25 bone crossbow\"\n[2026-08-31T16:44:12.181Z] [system] evasive \u2014 harder to hit fades.\n[2026-08-31T16:44:12.209Z] [player] attack with the off-hand bone crossbow\n",
+      "[2026-08-31T16:44:12.209Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=4 hooks=1\n[2026-08-31T16:44:12.210Z] [debug] attack: target=Conspiracy Architects Raider 2 range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n",
+      "[2026-08-31T16:44:12.211Z] [debug] attack: visibility penalty \u22121 (Glass Hail)\n[2026-08-31T16:44:12.211Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-08-31T16:44:12.253Z] [world] You commit forward with the searing bone crossbow. Conspiracy Architects Raider 2 watches your hands.\n[2026-08-31T16:44:12.254Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-31T16:44:12.464Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (210ms)\n[2026-08-31T16:44:18.739Z] [world] You seize the initiative. Conspiracy Architects Raider 2 has no time to react.\n[2026-08-31T16:44:18.739Z] [combat] You \u2014 d20 \u2192 16 + DEX 22 \u2212 1 (Glass Hail) + 2 (point blank) perfect opening (2\u00d7 dice) = 39 vs Conspiracy Architects Raider 2 AC 11 \u2014 \u2713 HIT\n",
+      "[2026-08-31T16:44:18.740Z] [combat] You crack the Conspiracy Architects Raider 2 with the Searing Bone Crossbow for 10 \u2014 the better part of their fight, gone in one blow. They crumple, out cold. (2/12 HP) Loot them before they come to.\n[2026-08-31T16:44:18.741Z] [combat] Conspiracy Architects Raider 2 is out of it. Conspiracy Architects Raider 3 now in your sights.\n",
+      "[2026-08-31T16:44:18.741Z] [combat] Searing Bone Crossbow \u2014 1 burn bites in and festers (3 turns).\n[2026-08-31T16:44:18.742Z] [debug] ac-shift 25\u219222: race/base 10 + gear 18 + title 0 \u2192 trimmed 22 + status 0 | worn: head=Architect's Sight Enhancer chest=Forgotten Protector's Plate hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n",
+      "[2026-08-31T16:44:18.742Z] [combat] Conspiracy Architects Raider 3 \u2014 d20 \u2192 12 + ATK 6 = 18 vs your AC 22 \u2014 \u2717 MISS\n[2026-08-31T16:44:18.743Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 11 + ATK 6 = 17 vs your AC 22 \u2014 \u2717 MISS\n[2026-08-31T16:44:18.744Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 12 + ATK 7 = 19 vs your AC 22 \u2014 \u2717 MISS\n",
+      "[2026-08-31T16:44:18.744Z] [arbiter] \"You attack as if you mean to leave,\" the Arbiter murmurs. \"Good.\"\n[2026-08-31T16:44:21.738Z] [debug] ui: tap \"stealth\"\n[2026-08-31T16:44:21.742Z] [world] A shard of mud-glass nicks you. Small wound, steady reminder. (\u22121 HP)\n[2026-08-31T16:44:21.744Z] [player] sneak\n",
+      "[2026-08-31T16:44:21.744Z] [debug] parser: intent=stealth conf=1.00 verb=sneak target=- resolved=- range=close enemies=4 hooks=1\n[2026-08-31T16:44:21.800Z] [system] \u23f3 Time passed: 15 min\n[2026-08-31T16:44:22.011Z] [cognitive] DISENGAGE \u00b7 HIDE \u00b7 TAKE_COVER  (209ms)\n[2026-08-31T16:44:23.344Z] [debug] skillcheck: stealth d20=18 STE 6 + 1 (title: Shadow Diver) = 25 vs DC 12 \u2014 Hard \u2192 (resolved below)\n",
+      "[2026-08-31T16:44:23.422Z] [debug] stats: STR11 DEX23 INT11 WIS11 CHA3 STE6 | gear: WIS+4,INT+2,DEX+15,STR+5,STE+2 | worn: main=Auralite Talon off=Bone Crossbow head=Architect's Sight Enhancer chest=Forgotten Protector's Plate hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n",
+      "[2026-08-31T16:44:23.423Z] [debug] train: stealth (stealth check) \u2192 progress 5/100\n[2026-08-31T16:44:23.423Z] [world] The daylight leaves you little cover. (stealth \u22121, day)\n[2026-08-31T16:44:23.424Z] [world] You fling a fistful of grit into Conspiracy Architects Raider 3's eyes and slip their line of sight. Half-blind, they swing at where you were. (+5 next attack)\n",
+      "[2026-08-31T16:44:23.424Z] [debug] stealth: reset WIN init 26 vs 18 (dust, +5 1r)\n[2026-08-31T16:44:23.424Z] [combat] Conspiracy Architects Raider 2 blisters \u2014 clinging fire sears 1. (1/12 HP, 2 turns left)\n[2026-08-31T16:44:23.425Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 10 + ATK 6 = 16 vs your AC 22 \u2014 \u2717 MISS\n",
+      "[2026-08-31T16:44:23.425Z] [combat] Conspiracy Architects Raider 5 turns on Soot \u2014 d20 6 + ATK 7 = 13 vs Soot's AC 12 (vest +2) \u2014 \u2713 HIT\n[2026-08-31T16:44:23.426Z] [combat] Soot takes 3. (7/15 HP left)\n[2026-08-31T16:44:23.427Z] [combat] Conspiracy Architects Raider 3 \u2014 d20 \u2192 2 + ATK 6 = 8 vs your AC 22 \u2014 \u2717 MISS\n[2026-08-31T16:44:24.056Z] [debug] ui: tap \"approach\"\n",
+      "[2026-08-31T16:44:24.059Z] [system] unseen \u2014 next strike +5 fades.\n[2026-08-31T16:44:24.110Z] [player] approach Conspiracy Architects Raider 3\n[2026-08-31T16:44:24.111Z] [debug] parser: intent=advance conf=1.00 verb=approach target=conspiracy architects raider 3 resolved=Conspiracy Architects Raider 3 range=close enemies=4 hooks=1\n[2026"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-31-1593-the-boot-gets-checkpoints #mthgzm4ylhgw [inline 22/24]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mthgzm4ylhgw"
+    },
+    {
+      "key": "dist",
+      "value": "2026-08-31-1593-the-boot-gets-checkpoints"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "22"
+    },
+    {
+      "key": "parts",
+      "value": "24"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-08-31-1593-the-boot-gets-checkpoints"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-31T16:45:56.792103Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-31T16:45:58.374000Z",
+  "fingerprints": [
+    "9de83d6a6434b541ca07baec35f0ff73"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1946321458,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-08-31T16:02:50.126000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-08-31-1593-the-boot-gets-checkpoints",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-08-31-1593-the-boot-gets-checkpoints",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-08-31-1593-the-boot-gets-checkpoints",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-08-31-1593-the-boot-gets-checkpoints)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "b55d4d5b35a5418b8c39f1b4eeb2c254",
+  "previousEventID": "99bb65966e894908a6f28514d91e0d33"
+}

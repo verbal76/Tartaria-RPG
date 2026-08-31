@@ -1,0 +1,234 @@
+{
+  "id": "99bb65966e894908a6f28514d91e0d33",
+  "groupID": "7702787988",
+  "eventID": "99bb65966e894908a6f28514d91e0d33",
+  "projectID": "4511945117532160",
+  "size": 18079,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-31-1593-the-boot-gets-checkpoints #mthgzm4ylhgw [inline 18/24]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-08-31-1593-the-boot-gets-checkpoints",
+  "message": "player-log 2026-08-31-1593-the-boot-gets-checkpoints #mthgzm4ylhgw [inline 18/24]",
+  "title": "player-log 2026-08-31-1593-the-boot-gets-checkpoints #mthgzm4ylhgw [inline 18/24]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "19bc49dd6018494eb6e9d3e148f0ea22",
+      "span_id": "8a0153f13bcd26ec",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "u strip the body: Bone Crossbow, Reclaimer's Salvage Vest (+8 TC). The kit took the fight badly.\n[2026-08-31T16:38:45.287Z] [combat] 2 attackers remain. Conspiracy Architects Patrol 3 now in your sights.\n[2026-08-31T16:38:45.287Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-08-31T16:38:45.287Z] [reward] +20 TC pried from the dust.\n",
+      "[2026-08-31T16:38:45.333Z] [debug] attack: target=Conspiracy Architects Patrol 3 range=close reach.bands=[close] reach.label=Reclaimers Guild Geode-Cored Cleaver bareHand=false\n[2026-08-31T16:38:45.376Z] [world] You raise the smoldering reclaimers guild geode-cored cleaver toward Conspiracy Architects Patrol 3. The room narrows around the both of you.\n",
+      "[2026-08-31T16:38:45.376Z] [system] \u23f3 Time passed: 6 min\n[2026-08-31T16:38:45.600Z] [cognitive] TALK  (223ms)\n[2026-08-31T16:38:51.709Z] [world] You seize the initiative. Conspiracy Architects Patrol 3 has no time to react.\n[2026-08-31T16:38:51.709Z] [combat] You \u2014 d20 \u2192 12 + DEX 24 = 36 vs Conspiracy Architects Patrol 3 AC 11 \u2014 \u2713 HIT\n",
+      "[2026-08-31T16:38:51.710Z] [combat] Bludgeoning flares \u2014 +1 on hit.\n[2026-08-31T16:38:51.712Z] [combat] You crack the Conspiracy Architects Patrol 3 with the Smoldering Reclaimers Guild Geode-Cored Cleaver for 11 \u2014 the better part of their fight, gone in one blow. They crumple, out cold. (4/15 HP) Loot them before they come to.\n",
+      "[2026-08-31T16:38:51.712Z] [combat] Conspiracy Architects Patrol 3 is out of it. Conspiracy Architects Patrol 4 now in your sights.\n[2026-08-31T16:38:51.713Z] [combat] Smoldering Reclaimers Guild Geode-Cored Cleaver \u2014 3 burn bites in and festers (3 turns).\n[2026-08-31T16:38:51.713Z] [combat] Conspiracy Architects Patrol 3 is left exposed \u2014 easier to hit.\n",
+      "[2026-08-31T16:38:51.715Z] [combat] Conspiracy Architects Patrol 4 \u2014 d20 \u2192 9 + ATK 6 = 15 vs your AC 22 \u2014 \u2717 MISS\n[2026-08-31T16:38:53.311Z] [debug] ui: tap \"\ud83d\udd25 bone crossbow\"\n[2026-08-31T16:38:53.366Z] [player] attack with the off-hand bone crossbow\n",
+      "[2026-08-31T16:38:53.367Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=2 hooks=1\n[2026-08-31T16:38:53.368Z] [combat] Conspiracy Architects Patrol 3 blisters \u2014 clinging fire sears 3. (1/15 HP, 2 turns left)\n",
+      "[2026-08-31T16:38:53.369Z] [debug] attack: target=Conspiracy Architects Patrol 4 range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-08-31T16:38:53.415Z] [world] Your searing bone crossbow comes around in an arc; Conspiracy Architects Patrol 4 squares up to meet it.\n[2026-08-31T16:38:53.416Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-31T16:38:53.623Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (206ms)\n[2026-08-31T16:38:56.979Z] [world] Conspiracy Architects Patrol 4 moves first. The pressure is immediate.\n[2026-08-31T16:38:56.981Z] [combat] Conspiracy Architects Patrol 4 \u2014 d20 \u2192 8 + ATK 6 = 14 vs your AC 22 \u2014 \u2717 MISS\n",
+      "[2026-08-31T16:38:56.981Z] [combat] You \u2014 d20 \u2192 1 + DEX 24 + 2 (point blank) = 27 vs Conspiracy Architects Patrol 4 AC 10 \u2014 \u2717 FUMBLE\n[2026-08-31T16:38:56.982Z] [combat] The searing bone crossbow cuts air. Conspiracy Architects Patrol 4 answers immediately.\n",
+      "[2026-08-31T16:38:57.268Z] [debug] persist sizes(KB): total=214 player=54 wm=73[rooms=37 events=3 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=82 scene=5\n[2026-08-31T16:39:09.753Z] [debug] kbbar: mounted bottom=355 raw=0 from=estimate winH=986 beat=-\n[2026-08-31T16:39:10.215Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n",
+      "[2026-08-31T16:39:27.060Z] [player] why do r I see burn damage on them? I hit them with my coated weapons\n[2026-08-31T16:39:27.061Z] [debug] parser: intent=ask conf=1.00 verb=why target=r see burn damage hit resolved=Conspiracy Architects Patrol 3 range=close enemies=2 hooks=1\n",
+      "[2026-08-31T16:39:27.064Z] [arbiter] \"Burn damage,\" the Arbiter says. \"Intense Aetheric heat from overloaded relics or high-energy Aetherstone. Burn leaves Aetheric scars that weaken your resistance to further Aetheric attacks for 1d6 rounds, and halves natural healing until you rest an hour or take Aetheric healing.\"\n",
+      "[2026-08-31T16:39:27.065Z] [arbiter] The Arbiter studies you a long moment. \"You have earned a name to carry: Scholar of Forgotten Lore. Passive: +2 to Investigate / lore checks.\"\n[2026-08-31T16:39:27.547Z] [cognitive] ATTACK  (481ms)\n[2026-08-31T16:39:32.097Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=cached winH=986 beat=-\n",
+      "[2026-08-31T16:39:32.556Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-08-31T16:39:43.828Z] [player] why did the crucible pop up after I typed that\n[2026-08-31T16:39:43.828Z] [debug] parser: intent=ask conf=1.00 verb=why target=crucible pop after typed resolved=- range=close enemies=2 hooks=1\n",
+      "[2026-08-31T16:39:43.837Z] [debug] arbiter: template (reason=combat)\n[2026-08-31T16:39:43.838Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T16:39:44.301Z] [cognitive] neutral  (461ms)\n[2026-08-31T16:39:45.968Z] [debug] ui: tap \"dodge\"\n[2026-08-31T16:39:45.972Z] [world] An Aetheric arc finds you \u2014 copper taste, blue afterimage, and a bite of damage. (\u22121 HP)\n",
+      "[2026-08-31T16:39:45.979Z] [player] dodge\n[2026-08-31T16:39:45.979Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=2 hooks=1\n[2026-08-31T16:39:45.980Z] [world] You commit to the dodge. Slip Conspiracy Architects Patrol 4's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-08-31T16:39:45.981Z] [combat] Conspiracy Architects Patrol 3 blisters \u2014 clinging fire sears 3. (0/15 HP, 1 turn left)\n[2026-08-31T16:39:45.982Z] [reward] Conspiracy Architects Patrol 3 defeated. You recover Patched Cloth, Aether Residue.\n[2026-08-31T16:39:45.984Z] [reward] You strip the body: Cudgel, Mud-Bound Cloak (+6 TC). The kit took the fight badly.\n",
+      "[2026-08-31T16:39:45.987Z] [combat] 1 attacker remains. Conspiracy Architects Patrol 4 now in your sights.\n[2026-08-31T16:39:45.987Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-08-31T16:39:45.988Z] [reward] +10 TC pried from the dust.\n[2026-08-31T16:39:46.069Z] [combat] Conspiracy Architects Patrol 4 \u2014 d20 \u2192 12 + ATK 6 = 18 vs your AC 22 \u2014 \u2717 EVADED\n",
+      "[2026-08-31T16:39:46.069Z] [combat] Dodge \u2014 d20 \u2192 2 + DEX 24 = 26 vs ATK 18. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-08-31T16:39:46.069Z] [debug] arbiter: template (reason=combat)\n[2026-08-31T16:39:46.070Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T16:39:46.070Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-31T16:39:46.301Z] [cognitive] neutral  (230ms)\n[2026-08-31T16:39:46.905Z] [debug] ui: tap \"\ud83d\udd25 bone crossbow\"\n[2026-08-31T16:39:46.931Z] [player] attack with the off-hand bone crossbow\n[2026-08-31T16:39:46.931Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=1 hooks=1\n",
+      "[2026-08-31T16:39:46.932Z] [debug] attack: target=Conspiracy Architects Patrol 4 range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-08-31T16:39:46.933Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-08-31T16:39:46.972Z] [world] You raise the searing bone crossbow toward Conspiracy Architects Patrol 4. The room narrows around the both of you.\n[2026-08-31T16:39:46.973Z] [system] \u23f3 Time passed: 6 min\n[2026-08-31T16:39:47.167Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (193ms)\n",
+      "[2026-08-31T16:39:54.172Z] [world] You seize the initiative. Conspiracy Architects Patrol 4 has no time to react.\n[2026-08-31T16:39:54.173Z] [combat] You \u2014 d20 \u2192 15 + DEX 24 + 2 (point blank) perfect opening (2\u00d7 dice) = 41 vs Conspiracy Architects Patrol 4 AC 10 \u2014 \u2713 HIT\n[2026-08-31T16:39:54.175Z] [combat] Piercing flares \u2014 +3 on hit.\n",
+      "[2026-08-31T16:39:54.175Z] [combat] Conspiracy Architects Patrol 4 folds under the searing bone crossbow. 22 damage was enough. The room exhales.\n[2026-08-31T16:39:54.177Z] [reward] Conspiracy Architects Patrol 4 defeated. You recover Patched Cloth \u00d73.\n[2026-08-31T16:39:54.178Z] [reward] You strip the body: Bone Knife, Mud-Warden's Vest (+6 TC). The kit took the fight badly.\n",
+      "[2026-08-31T16:39:54.178Z] [reward] \u2726 You feel hardier from your trials. +1 max HP (now 40). [52 enemies defeated]\n[2026-08-31T16:39:54.179Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-08-31T16:39:54.179Z] [reward] +12 TC pried from the dust.\n[2026-08-31T16:39:55.437Z] [debug] homework: intro-fill armed after 6000ms idle (strike 3/3)\n",
+      "[2026-08-31T16:39:55.917Z] [debug] ui: tap \"more \u25b8\"\n[2026-08-31T16:39:56.766Z] [debug] ui: tap \"inventory\"\n[2026-08-31T16:39:59.847Z] [debug] qwen\u23f1 ask_arbiter ok 5252ms read 2566ms/write 2379ms in 246t\u2192out 73t 10.4ms/t (315ch)\n",
+      "[2026-08-31T16:40:00.443Z] [arbiter] I was typing in the Arbiter's voice. I'm a witness to Tartaria, old and mysterious. The crucible may have been a relic or artifact from a previous era, forgotten but not forgotten. Its presence could be a message from the past or a symbol of the current era's power. I'm here to listen and understand, not to judge.\n",
+      "[2026-08-31T16:40:09.992Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 14353ms wait 4209ms read 8918ms/write 1197ms in 747t\u2192out 33t 11.9ms/t HIT-CAP (154ch)\n[2026-08-31T16:40:09.993Z] [debug] qwen\u23f1 stats \u2014 investigate_lore n5 avg3.0s max7.8s read0.5s/write1.0s \u26a01unusable in127t\u2192out35t ms/tok 2.1-9.7 wait1.2s | narration:scene_intro_fill n3 avg9.4s max14.4s read8.9s/write1.2s \u26a02unusable in745t\u2192out1",
+      "1t ms/tok 11.9-11.9 cap1 wait1.4s \u23f82 \u27022/14.0s | ambient n1 avg6.9s max6.9s \u26a01unusable in367t\u2192out31t cap1 wait3.3s | ask_arbiter n1 avg5.3s max5.3s read2.6s/write2.4s in246t\u2192out73t ms/tok 10.4-10.4 || WASTED 2 calls / 14.0s\n[2026-08-31T16:40:10.000Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 14353ms \u2014 intro-fill:action-opener\n",
+      "[2026-08-31T16:40:10.001Z] [debug] homework: scene_intro \"Great Tartary Plains\" \u2713 14565ms\n[2026-08-31T16:40:16.360Z] [debug] qwen\u23f1 item_synthesis_hw ok 5441ms read 3912ms/write 1494ms in 327t\u2192out 46t 12.0ms/t (182ch)\n[2026-08-31T16:40:16.370Z] [debug] homework: item_desc \"Mud Scanner\" \u2713 5455ms\n[2026-08-31T16:40:23.623Z] [player] Ask why the stall is here\n",
+      "[2026-08-31T16:40:23.625Z] [world] \"Stall goes up where the ground is flat and comes down when it is not worth it,\" the trader says. \"That is the whole business plan.\"\n[2026-08-31T16:40:23.628Z] [world] Teska Nightweigh looks at the road behind you before they answer anything at all.\n",
+      "[2026-08-31T16:40:23.857Z] [debug] persist sizes(KB): total=215 player=54 wm=75[rooms=37 events=3 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=82 scene=4\n[2026-08-31T16:40:24.738Z] [world] You let the conversation go and Teska Nightweigh gets back to it.\n[2026-08-31T16:40:26.252Z] [debug] qwen\u23f1 flourish ok 3506ms read 1819ms/write 1674ms in 174t\u2192out 20t 10.5ms/t (76ch)\n",
+      "[2026-08-31T16:40:26.254Z] [debug] qwen\u23f1 \u2702 DISCARDED flourish after 3506ms \u2014 flourish:stale-walked-away\n[2026-08-31T16:40:26.254Z] [debug] flourish: stale 3617ms\n[2026-08-31T16:40:29.997Z] [reward] Bought 3\u00d7 Trail Rations from Teska Nightweigh for 21 TC. (1171 TC left)\n[2026-08-31T16:40:31.893Z] [reward] Bought Blue Cap Mushroom from Teska Nightweigh for 5 TC. (1166 TC left)\n",
+      "[2026-08-31T16:40:37.819Z] [reward] Bought the Aetherstone Signet working for 200 TC. \u2726 Recipe learned (Rare)! Open Crafting to forge it \u2014 you'll still need the materials.\n[2026-08-31T16:40:40.705Z] [reward] Bought the Aetherstone Gauntlet working for 200 TC. \u2726 Recipe learned (Rare)! Open Crafting to forge it \u2014 you'll still need the materials.\n",
+      "[2026-08-31T16:40:46.208Z] [reward] Sold Tartarian Bone Knife (Common) to Teska Nightweigh for 15 TC. (781 TC on hand)\n[2026-08-31T16:40:46.255Z] [reward] Sold Bone Knife (Common) to Teska Nightweigh for 15 TC. (796 TC on hand)\n[2026-08-31T16:40:46.295Z] [reward] Sold Giant Bone Longbow (Common) to Teska Nightweigh for 15 TC. (811 TC on hand)\n",
+      "[2026-08-31T16:40:46.333Z] [reward] Sold Repeater Crossbow (Common) to Teska Nightweigh for 15 TC. (826 TC on hand)\n[2026-08-31T16:40:46.371Z] [reward] Sold Throwing Knife (Common) to Teska Nightweigh for 15 TC. (841 TC on hand)\n[2026-08-31T16:40:46.409Z] [reward] Sold Bone Knife (Common) to Teska Nightweigh for 15 TC. (856 TC on hand)\n",
+      "[2026-08-31T16:40:46.448Z] [reward] Sold Bone Knife (Common) to Teska Nightweigh for 15 TC. (871 TC on hand)\n[2026-08-31T16:40:46.485Z] [reward] Sold Bone Knife (Common) to Teska Nightweigh for 15 TC. (886 TC on hand)\n[2026-08-31T16:40:46.523Z] [reward] Sold Bone Knife (Common) to Teska Nightweigh for 15 TC. (901 TC on hand)\n",
+      "[2026-08-31T16:40:46.561Z] [reward] Sold Mud Long Axe (Common) to Teska Nightweigh for 15 TC. (916 TC on hand)\n[2026-08-31T16:40:46.598Z] [reward] Sold Club (Common) to Teska Nightweigh for 14 TC. (930 TC on hand)\n[2026-08-31T16:40:46.636Z] [reward] Sold Throwing Knife (Common) to Teska Nightweigh for 14 TC. (944 TC on hand)\n",
+      "[2026-08-31T16:40:46.673Z] [reward] Sold Plasma Dagger (Common) to Teska Nightweigh for 14 TC. (958 TC on hand)\n[2026-08-31T16:40:46.710Z] [reward] Sold Cudgel (Common) to Teska Nightweigh for 13 TC. (971 TC on hand)\n[2026-08-31T16:40:46.748Z] [reward] Sold Cudgel (Common) to Teska Nightweigh for 13 TC. (984 TC on hand)\n",
+      "[2026-08-31T16:40:46.784Z] [reward] Sold Rail Saber (Common) to Teska Nightweigh for 13 TC. (997 TC on hand)\n[2026-08-31T16:40:46.821Z] [reward] Sold Rust Rifle (Common) to Teska Nightweigh for 13 TC. (1010 TC on hand)\n[2026-08-31T16:40:46.857Z] [reward] Sold Iron Spear (Common) to Teska Nightweigh for 13 TC. (1023 TC on hand)\n",
+      "[2026-08-31T16:40:46.894Z] [reward] Sold Rough-Hewn Chestplate (Common) to Teska Nightweigh for 8 TC. (1031 TC on hand)\n[2026-08-31T16:40:46.931Z] [reward] Sold Titan's Vest (Common) to Teska Nightweigh for 8 TC. (1039 TC on hand)\n[2026-08-31T16:40:46.967Z] [reward] Sold Lost Scholar's Robe (Common) to Teska Nightweigh for 8 TC. (1047 TC on hand)\n",
+      "[2026-08-31T16:40:47.003Z] [reward] Sold Titan's Forehead Guard (Common) to Teska Nightweigh for 8 TC. (1055 TC on hand)\n[2026-08-31T16:40:47.040Z] [reward] Sold Golem-Warden's Legplates (Common) to Teska Nightweigh for 8 TC. (1063 TC on hand)\n[2026-08-31T16:40:47.076Z] [reward] Sold Architect's Mantle (Common) to Teska Nightweigh for 8 TC. (1071 TC on hand)\n",
+      "[2026-08-31T16:40:47.112Z] [reward] Sold Titan's Trail Leggings (Common) to Teska Nightweigh for 8 TC. (1079 TC on hand)\n[2026-08-31T16:40:47.148Z] [reward] Sold Aetheric Scout Greaves (Common) to Teska Nightweigh for 6 TC. (1085 TC on hand)\n[2026-08-31T16:40:47.183Z] [reward] Sold Aether-Walker's Cape (Common) to Teska Nightweigh for 6 TC. (1091 TC on hand)\n",
+      "[2026-08-31T16:40:47.218Z] [reward] Sold Mud-Bound Cloak (Common) to Teska Nightweigh for 6 TC. (1097 TC on hand)\n[2026-0"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-31-1593-the-boot-gets-checkpoints #mthgzm4ylhgw [inline 18/24]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mthgzm4ylhgw"
+    },
+    {
+      "key": "dist",
+      "value": "2026-08-31-1593-the-boot-gets-checkpoints"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "18"
+    },
+    {
+      "key": "parts",
+      "value": "24"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-08-31-1593-the-boot-gets-checkpoints"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-31T16:45:56.760858Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-31T16:45:58.374000Z",
+  "fingerprints": [
+    "9de83d6a6434b541ca07baec35f0ff73"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1946321458,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-08-31T16:02:50.126000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-08-31-1593-the-boot-gets-checkpoints",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-08-31-1593-the-boot-gets-checkpoints",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-08-31-1593-the-boot-gets-checkpoints",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-08-31-1593-the-boot-gets-checkpoints)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "b1f46168a6a44613880c8f597508bac9",
+  "previousEventID": "93765f44cfcc42b3b542b6026afaf58e"
+}
