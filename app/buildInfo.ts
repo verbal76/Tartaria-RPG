@@ -26510,6 +26510,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // own seeded pick or nothing, so a climbed interior label no longer follows
 // the player across open ground ("no I am not in the buried skyscraper").
 export const OTA_BUILD_ID = '2026-08-31-1597-the-tile-is-the-trigger';
+// golem catch-up 2026-08-31: markerless publish of OTA-1597 — the standing
+// check is keyed on the stage's canon grid cell and runs from the per-action
+// catch-all, both continueTravel arrival clears, the setTravelCourse arrival,
+// and the slot-load seam; a wild tile's micro-site never carries a climbed
+// interior label across open ground.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-31-1595-the-guide-and-the-ground-agree';
 // golem catch-up 2026-08-31: markerless publish of OTA-1595 — a whisper course
 // clears the outpost room (the minimap stops showing the interior on open
