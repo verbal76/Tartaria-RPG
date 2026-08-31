@@ -26388,7 +26388,32 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // pass (engine/missionRepair) moves any record an old build parked on a beat no
 // verb can pay - each repair logged beside the session marker so the next device
 // log shows exactly what was moved and why.
-export const OTA_BUILD_ID = '2026-08-31-1589-the-pin-comes-home';
+// OTA-1590 - THE WHOLE GAMUT. Owner: "test a whole different hunt and see if
+// you have run the whole gamut of the hunts before I even move on."
+//
+// The 1219 walker plays every hunt on TYPED VERBS and stops at "turn-in ready".
+// He does not play that way any more: since OTA-1581 every person-stage fronts a
+// MODAL conversation card - on the device you cannot type past it - and since
+// OTA-1589 a finished hunt routes to a pay window where the trophy changes
+// hands. Neither the card door nor the turn-in leg had a walker, and those are
+// the two newest pieces of the mission structure.
+//
+// So a second walker now plays all 18 hunts the way HE does: accept (real door
+// for neutral hunts), every stage on its own ground, PERSON stages answered
+// through the card (armed -> PROCEED -> advance -> the card stands down),
+// spawns cleared, apex killed, the 1589 pin comes home, walk to the pay window,
+// hand the trophy to an agent, the record leaves the slate and the TC lands.
+// ALL 18 PASS. Plus a cross-family sweep: every one of the 114 person-stages
+// offers a way forward when the pack is satisfied.
+//
+// One latent wedge found and closed while building it: the card's FIGHT
+// dispatch (start_fight) reached only advanceHunt, with no else - while
+// complete_stage right below handles all three families. Zero person-stages
+// carry a spawn today (measured), so no card currently renders FIGHT, but the
+// first author to put bodies behind a person would have armed a modal whose
+// FIGHT button did nothing. All three families dispatch now, pinned.
+export const OTA_BUILD_ID = '2026-08-31-1590-the-whole-gamut';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-31-1589-the-pin-comes-home';
 // golem catch-up 2026-08-31: markerless publish of OTA-1589 — a finished
 // contract's pin routes to the nearest pay window instead of the far anchor, the
 // READY card says HAND IN AT, arriving there says find the counter, and a

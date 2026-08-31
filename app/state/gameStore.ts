@@ -26779,7 +26779,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // same one the typed verb runs, which spawns the pack and freezes the stage
       // for the kill. A second spawner would be a second truth about what is
       // standing on this tile.
+      //
+      // ⚠⚠ OTA-1590 — ALL THREE FAMILIES, not just hunts. This branch read
+      // `if (armed.family === 'hunt')` with no else, while `complete_stage`
+      // right below dispatches to all three — so a mystery or storyline card
+      // offering FIGHT would have parked the encounter in `fighting` with
+      // nothing spawned and no way forward. LATENT today (the gamut measured
+      // it: zero person-stages carry a spawn, so no card currently renders
+      // FIGHT), but OTA-1583 built exactly the spawn machinery all three
+      // families share, and the first author to put bodies behind a person
+      // would have armed this wedge without touching a line of code.
       if (armed.family === 'hunt') get().advanceHunt(armed.missionId);
+      else if (armed.family === 'mystery') get().advanceMystery(armed.missionId);
+      else get().advanceStoryline(armed.missionId);
     } else if (step.effect.kind === 'complete_stage') {
       if (killed) {
         get().appendLog('combat', `You finish ${armed.person.name} where they stand. The post will be filled by someone who remembers this.`);
