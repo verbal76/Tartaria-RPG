@@ -26246,6 +26246,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // in the combat log, which is the very class 1576 was filed for surviving inside
 // 1576's own fix. Both say the species out loud now without losing the voice.
 export const OTA_BUILD_ID = '2026-08-31-1584-the-report-stops-crying-wolf';
+// golem catch-up 2026-08-31: markerless publish of OTA-1584 — the gap report's
+// last two sections stop firing at fourteen stages that were never defects, the
+// epilogue class gets a hard mid-chain guard, and the two false summits name the
+// pack they stand up.
 // golem catch-up 2026-08-31: markerless publish of OTA-1583 — the fourteen
 // mid-chain boss stages that stood the hunt's Legendary apex up at stage 3 now
 // fight the creature their own prose names, seventeen of the twenty-one stage
