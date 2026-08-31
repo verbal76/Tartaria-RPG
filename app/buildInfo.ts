@@ -26299,7 +26299,38 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // walked twenty hours to the tile the game routed him to and the game said
 // nothing about why he had come. Arrival now names the mission, the place and
 // the ask - person or no person - and says what is still owed.
-export const OTA_BUILD_ID = '2026-08-31-1586-the-slate-in-every-part';
+// OTA-1587 - WHICH LIFE DIED. AN INSTRUMENT, NOT A FIX.
+//
+// Owner: "add the telemetry."
+//
+// THE MEASUREMENT. Ten native-death records in the crash ledger and SIX OF THE
+// LAST SEVEN land on an OTA apply - 1571, 1578, 1580, 1581, 1582, one each. All
+// read the same: stage native:cognition:done, 3xx-5xxms into the action, alive
+// 0ms after it, and the same session's report reads Live now: 1 / Opened: 1 /
+// Released: 0. Task #77 closed this class as device memory pressure; that RCA
+// measured a different FREQUENCY, and a standing condition of the device does
+// not explain a kill on essentially every update-and-restart.
+//
+// AND THE LEDGER STRUCTURALLY COULD NOT SAY WHICH PROCESS DIED. A breadcrumb
+// carried no process identity, so a kill in the teardown BEFORE reloadAsync and
+// a kill seconds INTO the boot reloadAsync started produced an identical record
+// - and those two have opposite fixes.
+//
+// So a process gets a name and the reload leaves a note. BOOT_ID / BOOT_AT are
+// minted once per JS life and ride on every breadcrumb, so a survivor names the
+// life that wrote it and, subtracting, HOW OLD it was: a death 1.4s in is a
+// boot-time OOM, a death forty minutes in is not. The handoff, written just
+// before the reload, carries the dying life's model-context ledger, so the next
+// boot can say what it inherited - the reload swaps the JS bundle inside the
+// SAME native process. The OTA teardown and reload window is phase-stamped, the
+// crash record carries the launch facts, and the ledger prints the rollup.
+//
+// NOTHING HERE CHANGES BEHAVIOUR, which is the owner's own rule recorded in
+// contextLedger.ts and violated once at a cost of a day: measure the cause, or
+// ship an instrument. The candidate above is not a number yet, so it ships as a
+// question the next device log answers, not as a fix.
+export const OTA_BUILD_ID = '2026-08-31-1587-which-life-died';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-31-1586-the-slate-in-every-part';
 // golem catch-up 2026-08-31: markerless publish of OTA-1586 — the mission trace
 // on every arrival and under every session seam, and the arrival line that tells
 // the player why they walked here even when no one is standing on the tile.

@@ -798,14 +798,44 @@ export interface LiveBreadcrumb {
    *  reclaimed a backgrounded process — normal for a ~400MB model app — and NOT
    *  that anything died mid-action. See stampBreadcrumbPhase. */
   afterOrderlyExit?: boolean;
+  /**
+   * ⚠⚠⚠ OTA-1587 — WHICH LIFE WROTE THIS, AND HOW OLD IT WAS.
+   *
+   * Minted once per JS life (see diagnostics/bootIdentity), so a crumb that
+   * survives to the next boot finally names the process that died — and
+   * `aliveAt - bootAt` gives its AGE, which is the number that separates the two
+   * opposite explanations of the owner's OTA-boot kills: a death 1.4s into a
+   * life is a boot-time OOM, a death forty minutes in is not, and until this
+   * field existed both printed the same line.
+   */
+  bootId?: string;
+  bootAt?: number;
+  /** The model ledger, compact (`o1/r0/l1/p1/dn0`), at the moment of the stamp.
+   *  A death with a native context live is a different fact from a death on an
+   *  idle runtime, and the session summary that carries those counters is the
+   *  one thing a killed process never gets to print. */
+  ctx?: string;
+}
+
+/** ⚠ OTA-1587 — every crumb write goes through here, so none can be born without
+ *  its life's name on it. Lazy require: bootIdentity reaches the model ledger,
+ *  which has no business in this module's import graph, and Metro resolves and
+ *  caches the require at call time. Never throws — a breadcrumb that can fail is
+ *  worse than a vague one, because surviving a bad moment is its entire job. */
+function withBootIdentity(c: LiveBreadcrumb): LiveBreadcrumb {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const bi = require('../diagnostics/bootIdentity') as typeof import('../diagnostics/bootIdentity');
+    return { ...c, ...bi.bootStampFields() };
+  } catch { return c; }
 }
 
 /** Fire-and-forget. Never awaited by callers — a breadcrumb that could block an
  *  action would be a worse bug than the one it documents. */
 export function stampLiveBreadcrumb(crumb: LiveBreadcrumb): void {
   try {
-    _lastLiveCrumb = crumb;
-    void AsyncStorage.setItem(LAST_BREADCRUMB_KEY, JSON.stringify(crumb)).catch(() => { /* ignore */ });
+    _lastLiveCrumb = withBootIdentity(crumb);
+    void AsyncStorage.setItem(LAST_BREADCRUMB_KEY, JSON.stringify(_lastLiveCrumb)).catch(() => { /* ignore */ });
   } catch { /* never let instrumentation break the game */ }
 }
 
@@ -920,7 +950,10 @@ export function stampBreadcrumbPhase(phase: string, detail?: string): void {
       if (!base.phase) { beat.phase = HEARTBEAT_PHASE; beat.phaseAt = now; }
       if (_exitedCleanly) beat.afterOrderlyExit = true;
       else delete beat.afterOrderlyExit;
-      _lastLiveCrumb = beat;
+      // ⚠ OTA-1587 — the heartbeat re-stamps the ledger tag too. It is the only
+      // writer that runs while nothing else is happening, so on an idle process
+      // it is the only witness to a context count that changed underneath it.
+      _lastLiveCrumb = withBootIdentity(beat);
       _lastPhaseWriteAt = now;
       void AsyncStorage.setItem(LAST_BREADCRUMB_KEY, JSON.stringify(_lastLiveCrumb)).catch(() => { /* ignore */ });
       return;
@@ -940,7 +973,7 @@ export function stampBreadcrumbPhase(phase: string, detail?: string): void {
     const next: LiveBreadcrumb = { ...base, phase, phaseAt: now, phaseDetail: detail, aliveAt: now };
     if (_exitedCleanly) next.afterOrderlyExit = true;
     else delete next.afterOrderlyExit;
-    _lastLiveCrumb = next;
+    _lastLiveCrumb = withBootIdentity(next);
     _lastPhaseWriteAt = now;
     void AsyncStorage.setItem(LAST_BREADCRUMB_KEY, JSON.stringify(_lastLiveCrumb)).catch(() => { /* ignore */ });
   } catch { /* never let instrumentation break the game */ }

@@ -79,6 +79,30 @@ export interface CrashRecord {
      *  reporting "the player was playing". See saveSystem.LiveBreadcrumb. */
     aliveAt?: number;
   };
+  /**
+   * ⚠⚠⚠ OTA-1587 — WHICH LIFE DIED, AND HOW OLD IT WAS.
+   *
+   * Ten `native-death` records on file and SIX OF THE LAST SEVEN land on an OTA
+   * apply, all reading `stage native:cognition:done`. The ledger could not say
+   * whether the killed process was the OLD one (dying in the teardown that
+   * precedes `reloadAsync`) or the NEW one (dying seconds into the boot that
+   * reload started) — two explanations with opposite fixes and one identical
+   * record. These fields are that discrimination; see diagnostics/bootIdentity.
+   */
+  launch?: {
+    /** How long the process that died had been alive. A death 1.4s in is a
+     *  boot-time OOM; a death forty minutes in is not. */
+    ageMs?: number;
+    /** This boot followed an OTA apply, per the handoff the reloading life left. */
+    afterOtaApply?: boolean;
+    /** Handoff → this boot. Small means the death sits inside the reload window. */
+    otaGapMs?: number;
+    /** The PREVIOUS life's model ledger at the reload (`o1/r0/l1/p1/dn0`). A
+     *  non-zero `l` is the orphaned-context hypothesis with a number under it. */
+    prevCtx?: string;
+    /** The DEAD life's own model ledger at its last stamp. */
+    ctx?: string;
+  };
   /** Set once a transport has accepted it. Absent = never delivered anywhere. */
   sent?: boolean;
 }
@@ -121,6 +145,7 @@ export function recordCrash(
       build: OTA_BUILD_ID,
       version: DISPLAY_VERSION,
       breadcrumb: rec.breadcrumb,
+      launch: rec.launch,
       sent: rec.sent,
     };
     writeTail = writeTail.then(async () => {
@@ -196,6 +221,20 @@ export function crashLedgerSummary(): string {
   if (cache === null) return 'Crash ledger\n  (not loaded yet)';
   if (cache.length === 0) return 'Crash ledger\n  No crashes recorded.';
   const out: string[] = [`Crash ledger — ${cache.length} recorded (newest last)`];
+  // ⚠⚠⚠ OTA-1587 — THE ROLLUP THAT NAMES THE PATTERN, because the pattern is
+  // what a reader misses. Six of the owner's last seven kills followed an OTA
+  // apply, and finding that took reading ten records against a list of OTA
+  // timestamps by hand. Any reader who has the ledger now has the count.
+  const kills = cache.filter((r) => r.kind === 'native-death');
+  const onOta = kills.filter((r) => r.launch?.afterOtaApply);
+  if (onOta.length > 0) {
+    out.push(`  ⚠⚠ ${onOta.length} of ${kills.length} process kills landed on an OTA-apply boot`);
+    const orphaned = onOta.filter((r) => /\/l[1-9]/.test(r.launch?.prevCtx ?? ''));
+    if (orphaned.length > 0) {
+      out.push(`     ⚠⚠⚠ ${orphaned.length} of those inherited a native model context the `
+        + `previous life never released — reloadAsync reuses the same native process`);
+    }
+  }
   for (const r of cache) {
     const age = Math.round(Math.max(0, Date.now() - r.ts) / 60_000);
     out.push(`  • ${new Date(r.ts).toISOString()} (${age}m ago) — ${KIND_LABEL[r.kind] ?? r.kind}`);
@@ -226,6 +265,26 @@ export function crashLedgerSummary(): string {
           `      last checkpoint: ${b.phase}${b.phaseDetail ? ` [${b.phaseDetail}]` : ''}${into}${after}`,
         );
       }
+    }
+    if (r.launch) {
+      // ⚠⚠⚠ OTA-1587 — THE TWO LINES THAT SAY WHICH PROCESS THIS WAS. Without
+      // them a kill in the teardown BEFORE reloadAsync and a kill seconds INTO
+      // the boot reloadAsync started read identically, and they have opposite
+      // fixes. The age is the discriminator; the ledger tags are the evidence
+      // for what the new life inherited.
+      const l = r.launch;
+      const age = l.ageMs != null ? `died ${l.ageMs}ms into the process` : 'age of the process unknown';
+      const ota = l.afterOtaApply
+        ? ` · THIS BOOT FOLLOWED AN OTA APPLY ${l.otaGapMs}ms earlier`
+        : ' · not an OTA-apply boot';
+      out.push(`      launch: ${age}${ota}`);
+      if (l.prevCtx) {
+        out.push(/\/l[1-9]/.test(l.prevCtx)
+          ? `      ⚠⚠ the previous life handed over a LIVE native context (${l.prevCtx}) — `
+            + `reloadAsync reuses the same native process, so this life's own model is the second one`
+          : `      previous life released its contexts before reloading (${l.prevCtx})`);
+      }
+      if (l.ctx) out.push(`      its own model ledger at the last stamp: ${l.ctx}`);
     }
     if (r.stack) out.push(`      ${r.stack.split('\n').slice(0, 4).join('\n      ')}`);
   }

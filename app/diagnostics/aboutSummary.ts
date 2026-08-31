@@ -70,6 +70,11 @@ function contextLedgerBlock(): string {
 import { saveLoadHealthSummary } from './saveLoadHealth';
 import { lastCrashSummary } from './lastCrash';
 import { crashLedgerSummary } from './crashLedger';
+// ⚠⚠ OTA-1587 — how THIS session began. A bundle whose kills cluster on OTA
+// applies is a completely different report from one whose kills are scattered,
+// and until this block existed a reader had to reconstruct that by hand from a
+// list of OTA timestamps. See bootIdentity for the measurement behind it.
+import { launchFactsSummary } from './bootIdentity';
 import { reportingStatusLine } from './crashReporter';
 
 export function buildBasicDeviceSummary(): string {
@@ -179,6 +184,10 @@ export function buildBasicDeviceSummary(): string {
     // is gone. This is the last ten — and it is the only place a NATIVE death
     // appears at all, because a process killed by the OS runs no JS and so
     // never reaches the handler that writes lastCrash. That was B9.
+    // ⚠ OTA-1587 — printed ABOVE the ledger, because it is the frame the ledger
+    // below is read in: "six kills, all of them on an OTA-apply boot" is a
+    // finding, and "six kills" alone is a shrug.
+    launchFactsSummary(),
     crashLedgerSummary(),
     // And whether any of it is being DELIVERED anywhere, which is a different
     // question from whether it was captured, and one a reader of this report

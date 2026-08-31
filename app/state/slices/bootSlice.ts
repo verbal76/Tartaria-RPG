@@ -46,6 +46,12 @@ import {
 } from '../../ai/generation/qwenTelemetry';
 import { OTA_BUILD_ID } from '../../buildInfo';
 import { loadLastCrash } from '../../diagnostics/lastCrash';
+import {
+  launchFacts,
+  launchLine,
+  noteLaunchFacts,
+  readOtaHandoff,
+} from '../../diagnostics/bootIdentity';
 import { setLastBootBreadcrumb } from '../../diagnostics/runtimePressure';
 import { getCrashedSlotIds, loadSaveLoadHealth } from '../../diagnostics/saveLoadHealth';
 import { createCharacter, type CreateCharacterInput } from '../../engine/character';
@@ -133,6 +139,17 @@ export const createBootSlice = (
       // any component can render, so before any stamp can have run — which is
       // the only reading of "what the last session left" that a live read cannot
       // give. See saveSystem.readSurvivingBreadcrumb for the measurement.
+      //
+      // ⚠⚠⚠ OTA-1587 — AND READ THE HANDOFF, WHICH IS THE OTHER HALF OF THE SAME
+      // QUESTION. A boot that followed `reloadAsync` and a cold start have been
+      // indistinguishable in every log this project has ever collected — which
+      // is how six process kills in a row could sit on OTA applies with nothing
+      // naming the pattern. The note the reloading life left carries its id and
+      // its model ledger. `launchLine` prints "not an OTA apply" just as loudly,
+      // because an absent line is not an answer.
+      const launch = launchFacts(await readOtaHandoff());
+      noteLaunchFacts(launch);
+      get().appendLog('debug', launchLine(launch));
       const crumb = await readSurvivingBreadcrumb();
       // ⚠⚠ OTA-1413 — AN OS RECLAIM OF A BACKGROUNDED APP IS NOT A CRASH.
       // The owner's golem ledger: `PROCESS KILLED — no JS ran · stage
@@ -220,6 +237,21 @@ export const createBootSlice = (
                   : ''),
             isFatal: !idle,
             breadcrumb: crumb,
+            // ⚠⚠⚠ OTA-1587 — HOW OLD THE DEAD PROCESS WAS, AND WHAT IT WAS
+            // HANDED. `lastAlive - crumb.bootAt` is the number the ledger has
+            // never carried and the one that decides #110: a death 1.4s into a
+            // life is a boot-time OOM, a death forty minutes in is not, and the
+            // record read identically for both. `bootAt` is absent on every
+            // crumb written before this OTA, so old records simply omit the
+            // block rather than inventing an age from the boot that read them.
+            sinceBoot: crumb.bootAt != null ? Math.max(0, lastAlive - crumb.bootAt) : undefined,
+            launch: {
+              ageMs: crumb.bootAt != null ? Math.max(0, lastAlive - crumb.bootAt) : undefined,
+              afterOtaApply: launch.afterOtaApply,
+              otaGapMs: launch.otaGapMs,
+              prevCtx: launch.prevCtx,
+              ctx: crumb.ctx,
+            },
           });
         }
         await clearLiveBreadcrumb();

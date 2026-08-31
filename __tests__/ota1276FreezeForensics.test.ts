@@ -63,7 +63,14 @@ describe('OTA-1276 — the breadcrumb outruns the wedge', () => {
     expect(ret).toBeUndefined();
     await flush();
     const back = await readLiveBreadcrumb();
-    expect(back).toEqual({ at: 1_000, what: 'tap "take / salvage"', screen: 'exploration', room: 'outpost_relic_vault' });
+    // ⚠ SUPERSEDED BY OTA-1587 — the crumb now also carries the identity of the
+    // LIFE that wrote it (bootId / bootAt / ctx), so an exact-shape equality no
+    // longer states this test's claim. What OTA-1276 asserts is that everything
+    // handed in survives the round trip unawaited: matched rather than equalled,
+    // with the new fields asserted separately so neither claim hides the other.
+    expect(back).toMatchObject({ at: 1_000, what: 'tap "take / salvage"', screen: 'exploration', room: 'outpost_relic_vault' });
+    expect(typeof back?.bootId).toBe('string');
+    expect(typeof back?.bootAt).toBe('number');
   });
 
   it('⚠⚠ A SURVIVOR MEANS A HARD KILL: orderly exit clears it, a freeze does not', async () => {

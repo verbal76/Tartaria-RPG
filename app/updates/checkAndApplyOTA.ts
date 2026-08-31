@@ -37,7 +37,26 @@ import { disposePiperEngine } from '../voice/PiperTTSManager';
  * only needs on the rare occasion it is actually restarting. The cost belongs at
  * the call, not at every import of this module.
  */
-async function markOrderlyExitForReload(): Promise<void> {
+async function markOrderlyExitForReload(path: 'boot-front' | 'mid-session'): Promise<void> {
+  try {
+    // ⚠⚠⚠ OTA-1587 — AND LEAVE A NOTE FOR THE LIFE THAT COMES NEXT, BEFORE the
+    // crumb is cleared. `reloadAsync` swaps the JS bundle inside the SAME native
+    // process, so the boot on the other side of this call inherits whatever this
+    // one failed to release — and until now it had no way to know that, or even
+    // that it WAS a reload boot rather than a cold start. Six of the owner's
+    // last seven process kills land on exactly that boot; see
+    // diagnostics/bootIdentity for the measurement and the two candidates it
+    // separates. The handoff carries this life's id and its model-context
+    // ledger, which is the difference between the hypothesis and a number.
+    //
+    // ⚠ Awaited: a note written after the restart has begun is a note that does
+    // not exist. It is also why it goes in its OWN try — a throw here must not
+    // cost the orderly-exit mark below, which is a correctness fix (OTA-1521),
+    // where this is only an instrument.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const boot = require('../diagnostics/bootIdentity') as typeof import('../diagnostics/bootIdentity');
+    await boot.noteOtaHandoff(path);
+  } catch { /* an instrument may never break the thing it measures */ }
   try {
     // ⚠ `require`, not `await import()` — this project's tsconfig rejects
     // dynamic import expressions (TS1323), and Metro resolves the require at
@@ -49,6 +68,30 @@ async function markOrderlyExitForReload(): Promise<void> {
     // ⚠ NEVER BLOCK THE RESTART. A missed clear costs one phantom death record;
     // a hung restart costs the player their session.
   }
+}
+
+/** ⚠⚠ OTA-1587 — NAME THE TEARDOWN WINDOW. A process killed between "Releasing
+ *  resources…" and `reloadAsync` currently dies wearing whatever phase the ML
+ *  lock last stamped — `native:cognition:done` among them, which is exactly the
+ *  phase on six of the owner's last seven kills. That coincidence is either the
+ *  answer or a red herring, and no reading of the ledger can tell which while
+ *  the OTA window itself is unlabelled. Same lazy-require discipline and the
+ *  same swallow: an instrument may never break the restart it is watching. */
+function stampOtaPhase(phase: string, detail?: string): void {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const save = require('../engine/saveSystem') as typeof import('../engine/saveSystem');
+    save.stampBreadcrumbPhase(phase, detail);
+  } catch { /* ignore */ }
+}
+
+/** The model ledger in eighteen characters, for the teardown stamp. */
+function otaContextTag(): string {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const boot = require('../diagnostics/bootIdentity') as typeof import('../diagnostics/bootIdentity');
+    return boot.contextTag();
+  } catch { return ''; }
 }
 
 /** 2026-05-25 — race a promise against a timeout. expo-updates
@@ -239,8 +282,9 @@ export async function checkAndApplyOTA(opts: CheckAndApplyOptions = {}): Promise
     // old mid-load banner-tap could — no open native handles to race.)
     if (skipTeardown) {
       onStatus?.('Restarting to apply…');
+      stampOtaPhase('ota:reload', 'boot-front'); // OTA-1587
       // ⚠⚠⚠ OTA-1521 — an intentional restart is an orderly exit; say so first.
-      await markOrderlyExitForReload();
+      await markOrderlyExitForReload('boot-front');
       try {
         await Updates.reloadAsync();
         return 'applied';
@@ -252,6 +296,7 @@ export async function checkAndApplyOTA(opts: CheckAndApplyOptions = {}): Promise
       }
     }
     onStatus?.('Releasing resources…');
+    stampOtaPhase('ota:teardown:start'); // OTA-1587
     // Each dispose await is given 3 seconds. The existing module-
     // level `withTimeout` rejects on timeout; we want to RESOLVE
     // (move on, never hang the player) so we use a local helper
@@ -309,6 +354,13 @@ export async function checkAndApplyOTA(opts: CheckAndApplyOptions = {}): Promise
       disposeWithDeadline('shutdownQwen', useGameStore.getState().shutdownQwen()),
       disposeWithDeadline('disposePiperEngine', disposePiperEngine()),
     ]);
+    // ⚠⚠ OTA-1587 — STAMPED WITH WHAT THE TEARDOWN ACTUALLY ACHIEVED. Every one
+    // of the four disposes above resolves `null` on a 3-second deadline rather
+    // than failing, by design (OTA-243) — so "teardown finished" has never meant
+    // "the native handles are gone". The context ledger knows which it was, and
+    // this is the last moment anything can say so before the process is replaced.
+    stampOtaPhase('ota:teardown:done', otaContextTag());
+
     if (Platform.OS === 'ios') {
       // iOS belt-and-suspenders: give the native side an extra
       // event-loop tick to fully release.
@@ -316,8 +368,9 @@ export async function checkAndApplyOTA(opts: CheckAndApplyOptions = {}): Promise
     }
 
     onStatus?.('Restarting to apply…');
+    stampOtaPhase('ota:reload', 'mid-session'); // OTA-1587
     // ⚠⚠⚠ OTA-1521 — an intentional restart is an orderly exit; say so first.
-    await markOrderlyExitForReload();
+    await markOrderlyExitForReload('mid-session');
     try {
       await Updates.reloadAsync();
       return 'applied';
