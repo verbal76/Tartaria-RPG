@@ -322,8 +322,20 @@ export const createSlotSlice = (
       // default to false on legacy saves so the safety net only
       // engages once the player actually loses a dog in combat.
       const migratedWorldMemory = deps.migrateLoadedWorldMemory(saved.worldMemory);
+      // ⚠⚠⚠ OTA-1589 — REPAIR THE MISSION RECORDS AT THE ONE DOOR A SAVE ENTERS
+      // THROUGH. The stage index is a raw persisted integer into stage arrays
+      // that have been rewritten repeatedly; every earlier fix repaired a DOOR
+      // (accept, kill path, arrival), which helps records that pass through it
+      // AFTER the fix — and this save carries records placed by every previous
+      // era. A record parked on a beat no verb can pay is wedged forever with no
+      // symptom except "mission is still broken". The pass is pure, cheap,
+      // idempotent, and each repair is logged below so a device log shows what
+      // was moved and why. See engine/missionRepair.
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { repairMissionRecords } = require('../../engine/missionRepair') as typeof import('../../engine/missionRepair');
+      const { player: repairedPlayer, notes: repairNotes } = repairMissionRecords({ ...player, hasSeenIntro: true });
       set({
-        player: { ...player, hasSeenIntro: true },
+        player: repairedPlayer,
         worldMemory: migratedWorldMemory,
         gameLog: saved.gameLog,
         currentScreen: 'exploration',
@@ -395,6 +407,10 @@ export const createSlotSlice = (
           );
         }
         get().appendLog('debug', `OTA session start: ${OTA_BUILD_ID}.`);
+        // ⚠ OTA-1589 — the repair receipts, right beside the session marker so a
+        // log reader sees "this build moved these records" before any mission
+        // line that depends on it.
+        for (const n of repairNotes) get().appendLog('debug', n);
         // ⚠⚠ OTA-1494 — AND SAY WHICH ERA THE LINES BELOW BELONG TO. The
         // owner's iPhone bundle was 987 entries from Aug 9, 22 from Aug 23 and
         // 18 from Aug 24 with no visible seam — which produced a wrong

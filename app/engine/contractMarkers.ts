@@ -53,6 +53,12 @@ export interface ContractMarker {
   y: number;
   /** 1-based number, in Contracts-screen list order. */
   number: number;
+  /** ⚠⚠ OTA-1589 — THE WORK IS DONE AND ONLY THE HAND-IN REMAINS. When true,
+   *  `anchorId` is NOT the contract's ground — it is the nearest place the
+   *  contract can be PAID (a hub tile with a posting agent). Set from the same
+   *  `stage >= stageCount` question missionReady asks, so a pin can never point
+   *  at the field while the card says READY. */
+  ready?: boolean;
 }
 
 /** ⚠⚠ OTA-1218 — THE POSTER STOPS LYING ABOUT THE MAP. 15 of 18 hunts NAME a
@@ -179,36 +185,88 @@ function anchorForFaction(factionId: string | null | undefined): string {
   }
 }
 
+/**
+ * ⚠⚠⚠ OTA-1589 — WHERE A FINISHED CONTRACT GETS PAID: the nearest hub tile.
+ *
+ * THE HOLE THIS CLOSES WAS THE OWNER'S WHOLE "mission is still broken" LOOP,
+ * read straight out of his device log. A record past its last stage — READY —
+ * fell through `contractStageAnchorId(def, stage)` to the CONTRACT'S FAR ANCHOR,
+ * because `stages[stage]` is undefined there. So the card said READY, the only
+ * button on it said "ROUTE TO NIMARI · ◈ 8 moves away", and `turnInMystery`'s
+ * own refusal said *"set a course to the ◆ pin in Contracts"* — the same wrong
+ * pin. He walked 20 hours to a drowned capital where the mission could neither
+ * advance (no stage left) nor be handed in (no vendor, no board, no hall),
+ * investigated, got generic lore, walked 20 hours back, opened the missions
+ * screen twice, and sent the log. Every fact in that log fits this state and
+ * no other.
+ *
+ * A finished contract's pin now points at the nearest place that can PAY it.
+ * Hub tiles are where posting agents reliably stand — the same set the turn-in
+ * gate's own hub-room logic runs on — so the pin is a promise the counter can
+ * keep. A nearer market vendor still works when met; the pin just guarantees
+ * *a* pay window instead of pointing at the field the work is already done in.
+ */
+export function nearestTurnInSiteId(player: PlayerCharacter): string {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { hubLocationIds } = require('./hub') as typeof import('./hub');
+  const sites = hubLocationIds();
+  const here = canonicalCellOf(player.currentLocationId);
+  let best: string = sites[0] ?? player.currentLocationId;
+  let bestD = Number.POSITIVE_INFINITY;
+  for (const id of sites) {
+    const c = canonicalCellOf(id);
+    const d = Math.abs(c.x - here.x) + Math.abs(c.y - here.y);
+    if (d < bestD) { bestD = d; best = id; }
+  }
+  return best;
+}
+
+/** The one "is the work done" question for a staged record — the same expression
+ *  `missionTurnInReady` asks for these three families, kept in this module so the
+ *  pin builder below cannot drift from the READY pill (see missionReady.ts). */
+function stagedWorkDone(stage: number, def: { stages?: ReadonlyArray<unknown> }): boolean {
+  return stage >= (def.stages?.length ?? 0);
+}
+
 /** Every OPEN contract as a numbered atlas pin, in Contracts-screen list order. */
 export function openContractMarkers(player: PlayerCharacter | null | undefined): ContractMarker[] {
   if (!player) return [];
   const draft: Omit<ContractMarker, 'number'>[] = [];
   const seen = new Set<string>();
-  const add = (family: ContractFamily, id: string, label: string, anchorId: string): void => {
+  const add = (family: ContractFamily, id: string, label: string, anchorId: string, ready = false): void => {
     const key = `${family}:${id}`;
     if (seen.has(key)) return; // a corrupt save with a duplicate id must not double-number
     seen.add(key);
     const c = canonicalCellOf(anchorId);
-    draft.push({ key, family, label, anchorId, x: c.x, y: c.y });
+    draft.push({ key, family, label, anchorId, x: c.x, y: c.y, ...(ready ? { ready: true } : {}) });
   };
+  // ⚠ Resolved once per call, not per contract — the nearest pay window is the
+  // same for every finished record on the slate.
+  let paySite: string | null = null;
+  const payWindow = (): string => (paySite ??= nearestTurnInSiteId(player));
 
   for (const h of player.activeHunts ?? []) {
     const def = findHuntById(h.id);
     if (!def) continue;
-    // ⚠ P19 — the pin walks WITH the hunt. `h.stage` is the stage the player owes next.
-    add('hunt', h.id, def.title, huntStageAnchorId(def, h.stage));
+    // ⚠ P19 — the pin walks WITH the hunt; ⚠ OTA-1589 — and comes HOME when the
+    // work is done. `huntStageAnchorId` past the end fell back to the contract's
+    // far anchor — the field the player has already left.
+    if (stagedWorkDone(h.stage, def)) add('hunt', h.id, def.title, payWindow(), true);
+    else add('hunt', h.id, def.title, huntStageAnchorId(def, h.stage));
   }
   for (const m of player.activeMysteries ?? []) {
     const def = findMysteryById(m.id);
     if (!def) continue;
-    // ⚠ P19 — the pin walks with the mystery.
-    add('mystery', m.id, def.title, contractStageAnchorId(def, m.stage));
+    // ⚠ P19 — the pin walks with the mystery; ⚠ OTA-1589 — and comes home when done.
+    if (stagedWorkDone(m.stage, def)) add('mystery', m.id, def.title, payWindow(), true);
+    else add('mystery', m.id, def.title, contractStageAnchorId(def, m.stage));
   }
   for (const s of player.activeStorylines ?? []) {
     const def = findStorylineById(s.id);
     if (!def) continue;
-    // ⚠ P19 — the pin walks with the storyline.
-    add('storyline', s.id, def.title, contractStageAnchorId(def, s.stage));
+    // ⚠ P19 — the pin walks with the storyline; ⚠ OTA-1589 — and comes home when done.
+    if (stagedWorkDone(s.stage, def)) add('storyline', s.id, def.title, payWindow(), true);
+    else add('storyline', s.id, def.title, contractStageAnchorId(def, s.stage));
   }
   for (const fq of player.activeFactionQuests ?? []) {
     const def = findFactionQuestById(fq.id);

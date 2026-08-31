@@ -164,7 +164,19 @@ export function missionArrivalLines(player: PlayerCharacter | null | undefined):
   ): void => {
     if (!def || rec.tracked === false) return;
     const st = (def.stages ?? [])[rec.stage];
-    if (!st) return;
+    if (!st) {
+      // ⚠⚠ OTA-1589 — A FINISHED CONTRACT SPEAKS AT THE PAY WINDOW. Past the last
+      // stage the old early-return went silent everywhere — including at the very
+      // hub the READY pin now routes to, so a player could follow the new button
+      // the whole way and still arrive to nothing. Any hub pays, so any hub says
+      // so. (Lazy require: this file is a reader and stays light.)
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { isHubLocation } = require('./hub') as typeof import('./hub');
+      if (rec.stage >= (def.stages ?? []).length && isHubLocation(player.currentLocationId)) {
+        out.push(`▸ ${def.title}: the work is done — find the counter and hand it in.`);
+      }
+      return;
+    }
     if (stageLocationId(st, anchor ?? '', resolvePosterLocation) !== player.currentLocationId) return;
     const who = st.npcName ? ` — find ${st.npcName}` : '';
     const ask = stageVerbAsk(family, st);

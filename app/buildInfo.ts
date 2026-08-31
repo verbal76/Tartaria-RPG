@@ -26360,7 +26360,36 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the conversation card's PROCEED button, and the Contracts card for all three
 // families. check:missionclaims fails the build if a second boss map appears, in
 // either of the two shapes this defect took.
-export const OTA_BUILD_ID = '2026-08-31-1588-the-verb-that-pays-it';
+// OTA-1589 - THE PIN COMES HOME. Owner: "audit all the work that has been done,
+// analyze the mission structure we tried to put in place and identify the root
+// cause of the failure and fix it."
+//
+// THE ROOT CAUSE, read out of his own device log (run mtgnmcrn0ya9). He set a
+// contract active; the route said Nimari, 20 hours; he walked it; the main quest
+// spoke and the contract said nothing; he tapped INVESTIGATE twice and got
+// generic lore; he walked 20 hours back, opened the missions screen twice, and
+// sent the log. Only ONE record state fits every line: PAST THE LAST STAGE.
+// A finished record's pin fell through contractStageAnchorId (stages[stage] is
+// undefined past the end) to the CONTRACT'S FAR ANCHOR - so the card said READY,
+// its only button said ROUTE TO NIMARI, and the turn-in refusal said "set a
+// course to the pin in Contracts": the same wrong pin. A closed loop marching
+// the player to a place where the mission can neither advance nor be paid.
+//
+// AND THE STRUCTURAL HALF: the stage index is a raw persisted integer into
+// arrays rewritten four times, while every fix repaired a DOOR (accept 1582,
+// kill path 1583, arrival 1586). Door fixes help records that pass through
+// AFTER the fix; his save carries records placed by every previous era, and the
+// walkers - which create fresh records - could never see them. Green tests, one
+// broken phone: that is the whole story of "mission is still broken".
+//
+// THE FIX, both halves: a finished contract's pin routes to the nearest PAY
+// WINDOW (hub tile, where posting agents stand) and its button reads HAND IN AT;
+// arriving there says "find the counter and hand it in"; and a load-time repair
+// pass (engine/missionRepair) moves any record an old build parked on a beat no
+// verb can pay - each repair logged beside the session marker so the next device
+// log shows exactly what was moved and why.
+export const OTA_BUILD_ID = '2026-08-31-1589-the-pin-comes-home';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-31-1588-the-verb-that-pays-it';
 // golem catch-up 2026-08-31: markerless publish of OTA-1588 — one family-aware
 // answer to "what verb pays this stage", so the last beat of every mystery and
 // every storyline stops telling the player to finish a fight that is not there,

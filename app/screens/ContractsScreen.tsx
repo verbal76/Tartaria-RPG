@@ -210,11 +210,11 @@ export function ContractsScreen() {
   // arb100 — open-contract pins: key (`${family}:${id}`) → its atlas number +
   // routable anchor, so each card can carry the same "N◆" its map pin shows and
   // offer a route to its anchor place.
-  const contractMarkerByKey: Record<string, { number: number; anchorId: string; anchorName: string }> = {};
+  const contractMarkerByKey: Record<string, { number: number; anchorId: string; anchorName: string; ready?: boolean }> = {};
   for (const cm of openContractMarkers(player)) {
     let anchorName = cm.anchorId;
     try { anchorName = getLocationById(cm.anchorId).name ?? cm.anchorId; } catch { /* keep id */ }
-    contractMarkerByKey[cm.key] = { number: cm.number, anchorId: cm.anchorId, anchorName };
+    contractMarkerByKey[cm.key] = { number: cm.number, anchorId: cm.anchorId, anchorName, ready: cm.ready };
   }
   // Translate a card's local toggle key (`h_`/`m_`/`s_`/`q_…_i`/`lead_`) to the
   // contract-marker key (`hunt:`/`mystery:`/`storyline:`/`faction:`/`lead:`) so the
@@ -255,7 +255,16 @@ export function ContractsScreen() {
       );
     }
     if (standingAtLocation(player, info.anchorId)) {
-      return <Text style={styles.routeHereNote}>▸ {info.number}◆ You're at {info.anchorName}.</Text>;
+      // ⚠ OTA-1589 — at the pay window the note says what to DO here, because
+      // "You're at Varakush." under a READY pill still leaves the last step
+      // unsaid — and the unsaid step is the one this whole loop kept losing.
+      return (
+        <Text style={styles.routeHereNote}>
+          {info.ready
+            ? `▸ ${info.number}◆ You're at ${info.anchorName} — find the counter and HAND IT IN.`
+            : `▸ ${info.number}◆ You're at ${info.anchorName}.`}
+        </Text>
+      );
     }
     return (
       <Pressable
@@ -263,7 +272,18 @@ export function ContractsScreen() {
         onPress={() => setPendingRoute({ id: info.anchorId, name: info.anchorName })}
         accessibilityRole="button"
       >
-        <Text style={styles.routeBtnText}>▸ {info.number}◆ ROUTE TO {info.anchorName.toUpperCase()}</Text>
+        {/* ⚠⚠⚠ OTA-1589 — A FINISHED CONTRACT'S BUTTON SAYS WHERE IT GETS PAID.
+            This exact button, on a READY card, used to read "ROUTE TO NIMARI"
+            — the far anchor the completed pin fell back to — and the owner
+            followed the only button on the card 20 hours into a drowned
+            capital where the contract could neither advance nor be handed in.
+            The pin now points at the pay window (contractMarkers), and the
+            label says which errand the walk is. */}
+        <Text style={styles.routeBtnText}>
+          {info.ready
+            ? `▸ ${info.number}◆ HAND IN AT ${info.anchorName.toUpperCase()}`
+            : `▸ ${info.number}◆ ROUTE TO ${info.anchorName.toUpperCase()}`}
+        </Text>
       </Pressable>
     );
   };

@@ -127,6 +127,15 @@ export function isHubLocation(locationId: string | null | undefined): boolean {
   return HUB_LOCATION_SET.has(locationId);
 }
 
+/** ⚠ OTA-1589 — the hub tiles as a list, for callers that need to pick one: the
+ *  completed-contract pin routes to the NEAREST of these, because they are where
+ *  a posting agent reliably stands — which makes them the places a finished
+ *  contract can actually be handed in. Same set `isHubLocation` answers from,
+ *  handed out as a copy so no caller can mutate the truth. */
+export function hubLocationIds(): readonly string[] {
+  return [...HUB_LOCATION_SET];
+}
+
 /** Display title for the hub minimap + opening narrative, scoped to
  *  the player's faction. Falls back to "Reclaimers' Outpost" if the
  *  factionId is missing or unmapped (legacy saves predating per-
