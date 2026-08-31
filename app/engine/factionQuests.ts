@@ -14,7 +14,14 @@ import { findByTitle } from './titleMatch';
  * behavior. QA flagged that defaulting to 'any' was the source of
  * 4-stage pilgrimages auto-completing on 3 generic rat-kills — each
  * stage of the new JSON now sets this explicitly. */
-export type StageAdvanceTrigger = 'kill' | 'travel' | 'any';
+// ⚠⚠ OTA-1594 — `steal` joins the vocabulary, because "Pinch from the Monarchs"
+// — *"Steal something from a Mud Monarchs vendor without being caught"* — shipped
+// with `advanceOn: 'any'` on both stages and the owner completed it, in play,
+// off an investigate, a flee and a Mud Spider kill. He then typed the bug report
+// into the game itself: *"mission completed on stage 1?"*. A theft quest that
+// any action pays is the OTA-1584 class (a promise the machine cannot pay) in
+// the one family the P19 audits never fully reached.
+export type StageAdvanceTrigger = 'kill' | 'travel' | 'steal' | 'any';
 
 export interface FactionQuestStageDef {
   /** What the player sees in the world feed when this stage opens. */
@@ -40,6 +47,12 @@ export interface FactionQuestDef {
   title: string;
   description: string;
   objective: string;
+  /** ⚠ OTA-1594 — a WEALTH gate on completion. "Run the haul" reads
+   *  "Reach 100 TC, then complete the quest" and its stages advanced on ANY
+   *  action, so two arbitrary taps completed it with 3 TC in the purse. When
+   *  set, the FINAL stage refuses to close (and says so) until the purse holds
+   *  this much — same shape as the tribute quest's destination gate. */
+  tcThreshold?: number;
   /** Minimum rep with the faction required to accept the quest. */
   requirement: { rep: number };
   /** Reward on completion. */

@@ -242,7 +242,8 @@
           "narration": "Coin gathers in your pack faster than you expected. The broker's slip is half-filled.",
           "advanceOn": "any"
         }
-      ]
+      ],
+      "tcThreshold": 100
     },
     {
       "id": "fq_reclaimers_pinch",
@@ -265,7 +266,7 @@
         },
         {
           "narration": "You feel eyes on you wherever Monarch silver shows. The opportunity will come once.",
-          "advanceOn": "any"
+          "advanceOn": "steal"
         }
       ]
     },

@@ -89,9 +89,13 @@ describe('faction quest stage advanceOn gating (batch D)', () => {
   // QA finding: 4-stage pilgrimage auto-completed on 3 generic
   // kills because every stage advanced on any trigger.
   it('every shipped stage declares an advanceOn trigger', () => {
+    // OTA-1594 widened the vocabulary with 'steal': "Pinch from the Monarchs"
+    // shipped with 'any' on both stages and completed, on device, without a
+    // single theft. The pin keeps its job — every stage declares — while
+    // admitting the new trigger.
     for (const q of FACTION_QUESTS) {
       for (const s of q.stages ?? []) {
-        expect(['kill', 'travel', 'any']).toContain(s.advanceOn);
+        expect(['kill', 'travel', 'steal', 'any']).toContain(s.advanceOn);
       }
     }
   });

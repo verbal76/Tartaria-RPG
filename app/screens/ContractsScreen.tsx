@@ -1774,9 +1774,13 @@ export function ContractsScreen() {
                         <Text style={styles.cardStageBody}>{stageDef.narration}</Text>
                         {stageDef.advanceOn && stageDef.advanceOn !== 'any' && (
                           <Text style={styles.cardStageHint}>
+                            {/* ⚠ OTA-1594 — 'steal' joined the vocabulary; without its own
+                                branch this ternary would tell the thief to go traveling. */}
                             {stageDef.advanceOn === 'kill'
                               ? '→ Advance by defeating an enemy.'
-                              : '→ Advance by traveling to a new location.'}
+                              : stageDef.advanceOn === 'steal'
+                                ? '→ Advance with a successful steal.'
+                                : '→ Advance by traveling to a new location.'}
                           </Text>
                         )}
                       </>
@@ -1815,7 +1819,13 @@ export function ContractsScreen() {
                                 ? 'Defeat an enemy to advance the next stage.'
                                 : stageDef?.advanceOn === 'travel'
                                   ? 'Travel to a new location to advance the next stage.'
-                                  : 'Continue play — the next stage triggers on the matching event.'}
+                                  : stageDef?.advanceOn === 'steal'
+                                    ? 'Pull off a successful steal to advance the next stage.'
+                                    /* ⚠ OTA-1594 — the purse gate says its number here, the same
+                                       number the Arbiter's refusal speaks in the feed. */
+                                    : def.tcThreshold && rec.stage >= (def.stages?.length ?? 0) - 1
+                                      ? `Reach ${def.tcThreshold} TC in hand — you carry ${player?.tc ?? 0}. The next significant action then closes it.`
+                                      : 'Continue play — the next stage triggers on the matching event.'}
                         </Text>
                       </View>
                     )}

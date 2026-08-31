@@ -37,6 +37,7 @@ import type { PlayerCharacter } from './types';
 import { findHuntById } from './hunts';
 import { findMysteryById } from './mysteries';
 import { findStorylineById } from './factionStorylines';
+import { findFactionQuestById, type FactionQuestDef } from './factionQuests';
 import { huntAnchorId, contractAnchorId, resolvePosterLocation } from './contractMarkers';
 import {
   stageLocationId, stageRequirementMet, stageVerbAsk, payingIntent, type MissionFamily,
@@ -93,6 +94,39 @@ function line(
   return bits.join(' ');
 }
 
+// ⚠⚠ OTA-1594 — THE FOURTH FAMILY JOINS THE TRACE. In the owner's 16:45 session
+// the trace faithfully printed his two PAUSED hunts while the one contract he
+// was ACTUALLY RUNNING — "Pinch from the Monarchs", the faction quest that then
+// completed without a single steal — never appeared in any line of the log. A
+// slate trace that omits a family is the OTA-1586 defect it was built to end,
+// one door over. Faction stages are tally beats (narration + advanceOn), not
+// grounded checkKind stages, so the line answers the questions THIS family
+// raises: which action pays the current stage, and what the purse gate wants.
+function factionLine(rec: Rec, def: FactionQuestDef | null, player: PlayerCharacter): string {
+  if (!def) return `faction:${rec.id} stage ${rec.stage} — DEF MISSING (id not in the catalogue)`;
+  const paused = rec.tracked === false ? ' PAUSED' : '';
+  const stages = def.stages ?? [];
+  if (stages.length === 0) {
+    // Fetch and legacy single-objective contracts have no stage machine to trace;
+    // what matters in a log is that they are on the slate at all.
+    const shape = def.fetch ? `fetch=${def.fetch.itemName}×${def.fetch.quantity}` : 'single objective';
+    return `faction:${rec.id} [${shape}]${paused}`;
+  }
+  if (rec.stage >= stages.length) {
+    return `faction:${rec.id} stage ${rec.stage}/${stages.length} — ALL STAGES DONE, ready to turn in${paused}`;
+  }
+  const gate = stages[rec.stage]?.advanceOn ?? 'any';
+  const bits = [`faction:${rec.id} stage ${rec.stage}/${stages.length} [advanceOn=${gate}]`];
+  // The purse gate holds the FINAL advance, so it is live exactly when the
+  // player sits on the last stage — that is when a reader needs the number.
+  if (def.tcThreshold && rec.stage === stages.length - 1) {
+    const tc = player.tc ?? 0;
+    bits.push(`tc=${tc}/${def.tcThreshold}${tc >= def.tcThreshold ? '✓' : '✗SHORT'}`);
+  }
+  if (paused) bits.push('PAUSED');
+  return bits.join(' ');
+}
+
 /**
  * One line per live contract, plus the player's own position for comparison.
  * Empty slate returns a single line saying so — "no missions" is an answer, and
@@ -112,6 +146,9 @@ export function missionTraceLines(player: PlayerCharacter | null | undefined): s
   for (const rec of player.activeStorylines ?? []) {
     const def = findStorylineById(rec.id);
     out.push(line('storyline', rec, def, def ? contractAnchorId(def) : undefined, player));
+  }
+  for (const rec of player.activeFactionQuests ?? []) {
+    out.push(factionLine(rec, findFactionQuestById(rec.id), player));
   }
   // ⚠ The ROUTE is part of the sequence he described — "set it active and
   // autoroutes to it". Without it, a trace showing the right stage and a player

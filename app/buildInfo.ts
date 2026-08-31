@@ -26454,7 +26454,21 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the 1587 launch line, which hydrate() had been printing into the pre-slot
 // buffer the save load replaces (the owner's log had the trace and the banner
 // and not one launch line).
-export const OTA_BUILD_ID = '2026-08-31-1593-the-boot-gets-checkpoints';
+// OTA-1594 - THE PINCH DEMANDS THE LIFT.
+//
+// From the 16:45 play session (device on 1593): "Pinch from the Monarchs" -
+// objective "Steal successfully from any vendor" - completed off an
+// investigate, a flee and a Mud Spider kill, because both stages shipped
+// advanceOn:'any'. The owner typed the bug report into the game itself:
+// "mission completed on stage 1?". The 18-quest audit found exactly one
+// sibling: "Run the haul" ("Reach 100 TC") also ['any','any']. Repair: 'steal'
+// joins the trigger vocabulary and BOTH clean-theft doors (stealFromVendor +
+// pickpocketPerson) report the deed; tcThreshold holds the haul's final
+// advance, out loud, until the purse holds 100; the mission trace learns the
+// faction family (his live quest was invisible while two PAUSED hunts traced
+// faithfully); the Contracts card speaks the new verb.
+export const OTA_BUILD_ID = '2026-08-31-1594-the-pinch-demands-the-lift';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-08-31-1593-the-boot-gets-checkpoints';
 // golem catch-up 2026-08-31: markerless publish of OTA-1593 — every boot stage
 // stamps the dying breath (boot:<stage>), and the seam re-emits the launch line
 // hydrate had been printing into a buffer nobody keeps.

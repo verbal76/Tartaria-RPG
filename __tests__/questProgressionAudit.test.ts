@@ -383,7 +383,43 @@ describe('Quest progression audit', () => {
         const stageBefore = (store.getState().player?.activeFactionQuests ?? [])
           .find((r) => r.id === q.id)?.stage ?? -1;
 
-        if (trigger === 'travel' || trigger === 'any' && stage.advanceOn === undefined) {
+        // ⚠ OTA-1594 — THE PURSE GATE. A quest with a tcThreshold refuses its
+        // FINAL advance (and says so) until the purse holds the number its
+        // objective names. Top the purse up before the last trigger: this audit
+        // asks whether the content is walkable, not whether the Auditor is rich
+        // — and the refusal path has its own dedicated coverage in ota1594.
+        if (i === stages.length - 1 && q.tcThreshold) {
+          store.setState((s) => (s.player
+            ? { ...s, player: { ...s.player, tc: Math.max(s.player.tc, q.tcThreshold!) } }
+            : s));
+        }
+
+        if (trigger === 'steal') {
+          // ⚠ OTA-1594 — drive the REAL theft door, stealFromVendor, with a
+          // stacked deck: STE 30 clears the alert-merchant DC 16 on any d20, so
+          // the clean-lift branch (the one that now reports the deed to the
+          // quest machine) always runs. Anything less would be the audit
+          // hand-bumping the stage — the exact shortcut that let "Pinch from
+          // the Monarchs" ship broken.
+          store.setState((s) => {
+            if (!s.player || !s.currentScene) return s;
+            return {
+              ...s,
+              player: { ...s.player, stats: { ...s.player.stats, stealth: 30 } },
+              currentScene: {
+                ...s.currentScene,
+                vendor: {
+                  id: 'audit_vendor', name: 'Audit Vendor', title: 'Auditor',
+                  faction: q.factionId, description: '', gender: 'female' as const,
+                  demeanor: 'sketchy' as const,
+                  offers: [{ itemName: 'Audit Trinket', price: 1 }],
+                },
+                enemies: [], enemyHps: [], range: null,
+              },
+            };
+          });
+          store.getState().stealFromVendor('Audit Trinket');
+        } else if (trigger === 'travel' || trigger === 'any' && stage.advanceOn === undefined) {
           // For travel: hop to a NEW location each stage (these stages advance on
           // discovering a fresh place, so rotate the ring rather than bounce two).
           const cur = store.getState().player?.currentLocationId;

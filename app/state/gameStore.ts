@@ -8976,6 +8976,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         : wandererMark ? vendorNpcId(wandererMark)
         : vendorNpcId({ id: `escort_${markName}`, name: markName });
       set((s) => ({ worldMemory: recordNpcDealing(s.worldMemory, markId, { pocketsLifted: 1 }) }));
+      // ⚠⚠ OTA-1594 — A CLEAN LIFT IS A TRIGGER, like a kill and a travel. The
+      // theft quest could never be paid by the deed it asks for, because the
+      // deed never told the quest machine it happened.
+      advanceActiveFactionQuests(get, set, 'steal');
     } else if ((stats.stealth ?? 0) >= STEALTH_QUIET_FAIL_STE) {
       // OTA-847 quiet fail — the practiced thief withdraws a beat early.
       get().appendLog(
@@ -25826,6 +25830,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
         }
       }
+      // ⚠⚠ OTA-1594 — BOTH clean-theft doors report the deed, or the quest pays
+      // at only one of them. "Steal successfully from any vendor" reads most
+      // literally as THIS path — the item off the table — while the pickpocket
+      // path is the pocket. A 'steal'-gated stage that only one door advances
+      // would be the OTA-1584 partial-instrument lesson as gameplay.
+      advanceActiveFactionQuests(get, set, 'steal');
     } else if ((stats.stealth ?? 0) >= STEALTH_QUIET_FAIL_STE) {
       // OTA-847 (STEALTH SYSTEM) — STE-gated QUIET FAIL. A practiced thief
       // (Stealth ≥ STEALTH_QUIET_FAIL_STE) who blows the roll doesn't get
@@ -31280,7 +31290,7 @@ function grantQuestHook(
 function advanceActiveFactionQuests(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
-  trigger: 'kill' | 'travel' = 'kill',
+  trigger: 'kill' | 'travel' | 'steal' = 'kill',
 ): void {
   const player = get().player;
   if (!player) return;
@@ -31334,6 +31344,18 @@ function advanceActiveFactionQuests(
         if (!recent) get().appendLog('arbiter', line);
         return rec;
       }
+    }
+    // ⚠⚠ OTA-1594 — A QUEST THAT NAMES A PRICE HAS TO COUNT THE PURSE. "Run the
+    // haul" reads *"Reach 100 TC, then complete the quest"* and both its stages
+    // advanced on ANY action — two arbitrary taps completed it broke. Same shape
+    // as the tribute destination gate above: the FINAL stage holds, and SAYS
+    // what it is waiting on, until the purse actually holds the number the
+    // objective names. Throttled like every refusal on this path.
+    if (nextStage >= def.stages.length && def.tcThreshold && (player.tc ?? 0) < def.tcThreshold) {
+      const line = `The Arbiter taps the broker's slip. "${def.title} pays out at ${def.tcThreshold} TC in hand — you carry ${player.tc ?? 0}."`;
+      const recent = get().gameLog.slice(-30).some((e) => e.text === line);
+      if (!recent) get().appendLog('arbiter', line);
+      return rec;
     }
     mutated = true;
     // We just BUMPED to stage `nextStage`. If a stage exists at the new
