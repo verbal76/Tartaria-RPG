@@ -1,0 +1,202 @@
+{
+  "id": "3ec77ea7beda456e81b469242a5cfa3e",
+  "groupID": "7700149815",
+  "eventID": "3ec77ea7beda456e81b469242a5cfa3e",
+  "projectID": "4511945117532160",
+  "size": 17877,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-30-1552-are-you-sure-about-that #mtf18j1mlkuk [inline 12/23]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-30-1552-are-you-sure-about-that #mtf18j1mlkuk [inline 12/23]",
+  "title": "player-log 2026-08-30-1552-are-you-sure-about-that #mtf18j1mlkuk [inline 12/23]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Trafford",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "b1fb0693832440b0bd6716093071af42",
+      "span_id": "87e986df9d891937",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "12.5s read9.5s/write2.5s in743t\u2192out33t ms/tok 12.7-12.7 cap1 | ambient_fill n1 avg2.6s max2.6s \u26a01unusable in364t\u2192out0t \u23f81 \u27021/2.6s || WASTED 12 calls / 91.3s\n[2026-08-28T23:09:48.790Z] [debug] homework: item_desc \"Reclaimer's Cloak\" \u2713 5022ms\n",
+      "[2026-08-28T23:10:14.279Z] [debug] persist sizes(KB): total=140 player=20 wm=37[rooms=12 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=79 scene=3\n[2026-08-28T23:10:15.157Z] [debug] qwen\u23f1 item_synthesis_hw ok 1120ms read 347ms/write 745ms in 323t\u2192out 23t 1.1ms/t (111ch)\n[2026-08-28T23:10:15.163Z] [debug] homework: item_desc \"Automaton Circuit\" \u2713 1338ms\n",
+      "[2026-08-28T23:10:21.609Z] [player] give the Aetheric Helm of Command to Ilva Sidelong\n[2026-08-28T23:10:21.613Z] [world] You watched me sidelong for an hour to hand over a Aetheric Helm of Command. Watch the road instead.\n[2026-08-28T23:10:32.487Z] [debug] ui: tap \"inventory\"\n",
+      "[2026-08-28T23:10:38.866Z] [debug] stats: STR5 DEX16 INT12 WIS4 CHA2 STE6 | gear: DEX+10,INT+3,STR+3,STE+3 | worn: main=Cudgel off=Earthshaker head=Forgotten Seeker's Mask chest=Reclaimer's Scrapplate hands=Wanderer's Worn Gauntlets legs=Aetheric Scout Greaves feet=Wanderer's Footwraps cloak=Reclaimer's Cloak ring=Light-Finger Guild Band\n[2026-08-28T23:10:54.737Z] [player] she gave it back?\n",
+      "[2026-08-28T23:10:54.737Z] [debug] parser: intent=help conf=0.64 verb=backup target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-28T23:10:54.738Z] [world] You shoulder in beside the nearest ally \u2014 but here, alone on the road, there's no second pair of hands to lift. The gesture costs you the moment and gains you nothing. (No allies to help in single-player.)\n",
+      "[2026-08-28T23:10:54.739Z] [debug] arbiter: template (reason=intent-not-allowed:help)\n[2026-08-28T23:10:54.739Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-28T23:10:54.739Z] [system] \u23f3 Time passed: 6 min\n[2026-08-28T23:10:54.894Z] [cognitive] neutral  (154ms)\n[2026-08-28T23:11:10.344Z] [debug] ui: tap \"missions\"\n",
+      "[2026-08-28T23:11:22.683Z] [debug] ui: tap \"look around you\"\n[2026-08-28T23:11:22.691Z] [player] look\n[2026-08-28T23:11:22.692Z] [debug] parser: intent=investigate conf=1.00 verb=look target=- resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-28T23:11:22.693Z] [world] You look around. You're in Black Market Bazaar, in Reclaimer's Stake. You see: footprint. Ilva Sidelong is here. The shelf is unaddressed. Cardinal travel: north, east, south, west.\n[2026-08-28T23:11:22.694Z] [arbiter] \u25b8 Still open \u2014 Travel south of the outpost. Yulka camps somewhere in tiles 2-3 south, after dark (8 pm to 4 am).\n",
+      "[2026-08-28T23:11:22.695Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-28T23:11:22.695Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-28T23:11:22.796Z] [cognitive] neutral  (99ms)\n[2026-08-28T23:11:22.910Z] [debug] persist sizes(KB): total=139 player=20 wm=38[rooms=12 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=79 scene=3\n",
+      "[2026-08-28T23:11:32.472Z] [player] approach yulka\n[2026-08-28T23:11:32.473Z] [debug] parser: intent=advance conf=1.00 verb=approach target=yulka resolved=- range=- enemies=0 hooks=1\n[2026-08-28T23:11:32.475Z] [debug] move: advance from range=- enemies=0 weather=Aether Lightning cost=1 partial=0\n[2026-08-28T23:11:32.477Z] [debug] move: bail \u2014 no active enemy\n",
+      "[2026-08-28T23:11:32.477Z] [arbiter] The Arbiter shrugs. \"Nothing to advance on. The ground here is quiet.\"\n[2026-08-28T23:11:32.639Z] [cognitive] neutral  (159ms)\n[2026-08-28T23:11:52.171Z] [player] myission says yulkas on this tile, take me to her\n[2026-08-28T23:11:52.172Z] [debug] parser: intent=pickup conf=1.00 verb=take target=- resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-28T23:11:52.172Z] [world] The ground here is bare. Nothing to pick up.\n[2026-08-28T23:11:52.340Z] [cognitive] neutral  (166ms)\n[2026-08-28T23:11:58.908Z] [debug] qwen\u23f1 ambient ok 6657ms read 3833ms/write 1971ms in 364t\u2192out 31t 10.5ms/t HIT-CAP (165ch)\n",
+      "[2026-08-28T23:11:59.049Z] [arbiter] You had traversed the borders of the ancient lands, navigating through the labyrinthine streets of the bustling markets, each one a testament to the rich tapestry of\n[2026-08-28T23:11:59.049Z] [debug] arbiter: ambient \u2713 6876ms\n",
+      "[2026-08-28T23:11:59.050Z] [debug] arbiter: ambient-said \"You had traversed the borders of the ancient lands, navigating through the labyrinthine streets of the bustling markets, each one a testament to the rich tapest\"\n[2026-08-28T23:12:15.009Z] [player] when I typed that take me to her line, there was no text box\n",
+      "[2026-08-28T23:12:15.010Z] [arbiter] The Arbiter studies you, plainly. \"I'm not sure what you're trying to tell me. I'll keep your note in the log either way. If you mean to act, phrase it as a verb \u2014 'investigate the rubble', 'go east', 'attack the figure'.\"\n[2026-08-28T23:12:15.010Z] [debug] meta-comment guard: skipped intent parse (engine-vocabulary: \"text box\") on 60-char input\n",
+      "[2026-08-28T23:12:31.645Z] [debug] send-log: #mtdkh5r6ci9z \u2014 DELIVERED (inline, no attachments): beacon out, 12/12 parts accepted (175583 chars) \u2014 flush said yes\n[2026-08-28T23:12:31.647Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mtdkh5r6ci9z kept on disk, boots retry up to 5 sends total\n[2026-08-28T23:12:36.957Z] [debug] appstate: active \u2192 background (was active for 298373ms)\n",
+      "[2026-08-28T23:12:44.394Z] [debug] appstate: background \u2192 active (was background for 7437ms)\n[2026-08-28T23:12:47.460Z] [debug] appstate: active \u2192 background (was active for 3066ms)\n[2026-08-28T23:12:51.403Z] [debug] appstate: background \u2192 active (was background for 3943ms)\n[2026-08-28T23:12:54.345Z] [debug] appstate: active \u2192 background (was active for 2942ms)\n",
+      "[2026-08-28T23:12:57.756Z] [debug] appstate: background \u2192 active (was background for 3411ms)\n[2026-08-28T23:13:00.484Z] [debug] appstate: active \u2192 background (was active for 2728ms)\n[2026-08-28T23:13:03.407Z] [debug] appstate: background \u2192 active (was background for 2923ms)\n[2026-08-28T23:13:06.178Z] [debug] appstate: active \u2192 background (was active for 2771ms)\n",
+      "[2026-08-28T23:13:09.081Z] [debug] appstate: background \u2192 active (was background for 2902ms)\n[2026-08-28T23:13:11.300Z] [debug] send-log: #mtdki0hdtv3e \u2014 DELIVERED (inline, no attachments): beacon out, 12/12 parts accepted (176801 chars) \u2014 flush said yes\n[2026-08-28T23:13:11.301Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mtdki0hdtv3e kept on disk, boots retry up to 5 sends total\n",
+      "[2026-08-28T23:13:12.445Z] [debug] appstate: active \u2192 background (was active for 3365ms)\n[2026-08-28T23:13:12.500Z] [debug] persist sizes(KB): total=139 player=20 wm=37[rooms=12 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=78 scene=3\n[2026-08-28T23:13:15.796Z] [debug] appstate: background \u2192 active (was background for 3351ms)\n",
+      "[2026-08-28T23:13:19.184Z] [debug] appstate: active \u2192 background (was active for 3387ms)\n[2026-08-28T23:17:39.004Z] [debug] appstate: background \u2192 active (was background for 259821ms)\n[2026-08-28T23:17:42.908Z] [debug] ctx: RELEASED \u2014 live=0 (opened=1 released=1)\n",
+      "[2026-08-28T23:17:45.473Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a04a83-156d-76f3-9607-e5a643416177\n[2026-08-28T23:17:45.473Z] [debug] ota: Checking\u2026\n[2026-08-28T23:17:45.624Z] [debug] ota: Already up to date\n[2026-08-28T23:17:45.626Z] [debug] ota: boot check result = noUpdate\n[2026-08-28T23:17:45.765Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-08-28T23:17:45.765Z] [debug] voice: bundled idle\n[2026-08-28T23:17:46.026Z] [debug] send-log: bundle #mtdki0hdtv3e attempt 2/5 delivered to Sentry\n[2026-08-28T23:28:24.265Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a04a83-156d-76f3-9607-e5a643416177\n[2026-08-28T23:28:24.265Z] [debug] ota: Checking\u2026\n",
+      "[2026-08-28T23:28:25.835Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-08-28T23:28:25.948Z] [debug] ota: Saving progress\u2026\n[2026-08-28T23:28:25.950Z] [debug] ota: Restarting to apply\u2026\n[2026-08-28T23:28:26.019Z] [debug] ota: boot check result = applied\n",
+      "[2026-08-28T23:28:26.199Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a04ab1-8df6-7a71-9e9a-cb11cfaf62a4\n[2026-08-28T23:28:26.199Z] [debug] ota: Checking\u2026\n[2026-08-28T23:28:26.311Z] [debug] ota: Already up to date\n[2026-08-28T23:28:26.311Z] [debug] ota: boot check result = noUpdate\n[2026-08-28T23:28:26.357Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-08-28T23:28:26.357Z] [debug] voice: bundled idle\n[2026-08-28T23:28:26.646Z] [debug] send-log: bundle #mtdki0hdtv3e attempt 3/5 delivered to Sentry\n[2026-08-29T01:09:28.002Z] [debug] OTA applied: 2026-08-28-1532-the-journeys-of-cheddar-bob \u2192 2026-08-29-1537-two-pieces-or-it-is-not-made-of-that.\n",
+      "[2026-08-29T01:09:28.002Z] [debug] OTA session start: 2026-08-29-1537-two-pieces-or-it-is-not-made-of-that.\n[2026-08-29T01:09:28.003Z] [world] You step back into Reclaimer's Stake. The world waits for your move.\n[2026-08-29T01:09:28.003Z] [arbiter] The Arbiter meets your eyes. \"Welcome back, Cheddar Bob. The buried country is no place to walk alone.\"\n",
+      "[2026-08-29T01:09:28.156Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-29T01:09:28.154Z \u00b7 build 2026-08-29-1537-two-pieces-or-it-is-not-made-of-that \u00b7 updated from 2026-08-28-1532-the-journeys-of-cheddar-bob \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-08-29T01:09:39.414Z] [reward] Sold Aetheric Helm of Command to Ilva Sidelong for 6 TC. (126 TC on hand)\n",
+      "[2026-08-29T01:09:57.327Z] [world] You set course for Nimari. 27 tiles \u2014 about 2 days, 20 hours of travel, all in. You set off now \u2014 the ground ahead is new ground. Keep tapping \u2192 NIMARI on the travel row to close the distance; STOP TRAVEL to halt.\n[2026-08-29T01:09:57.370Z] [debug] spawn: gear=[Aetheric Gauntlets, Aetheric Rod] window=10 roster=new\n",
+      "[2026-08-29T01:09:57.371Z] [world] You walk east. The ground here looks much like the ground behind you. You have lost track of distance.\n[2026-08-29T01:09:57.372Z] [reward] Following the lead \u2014 a stash tucked under a collapsed overpass, off to the north \u2014 you turn up the cache: 28 TC + Scrap Metal.\n",
+      "[2026-08-29T01:09:57.372Z] [world] An Aetheric storm passed through here recently. The ground is scattered with small fused chunks of mud-glass and the still-warm remains of something pre-flood that the storm pulled out of the earth.\n[2026-08-29T01:09:57.373Z] [reward] \u2726 Recovered Aether Crystal x2.\n[2026-08-29T01:09:57.379Z] [world] The thread you were following waits where you left it.\n",
+      "[2026-08-29T01:09:59.264Z] [debug] ui: tap \"take / salvage\"\n[2026-08-29T01:10:01.116Z] [world] You take the Aetheric Rod from where it lay.\n[2026-08-29T01:10:01.117Z] [reward] \u2726 Aetheric Rod (Common).\n[2026-08-29T01:10:01.127Z] [world] You pick up the Aetheric Gauntlets.\n[2026-08-29T01:10:01.128Z] [reward] \u2726 Aetheric Gauntlets (Common).\n",
+      "[2026-08-29T01:10:01.905Z] [world] You lift the Scrap Metal clear.\n[2026-08-29T01:10:01.905Z] [reward] \u2726 Scrap Metal (Common).\n[2026-08-29T01:10:02.863Z] [world] You salvage the banner. The take is small but real.\n[2026-08-29T01:10:02.863Z] [world] You work the cold spring apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n",
+      "[2026-08-29T01:10:02.863Z] [world] You work the tent over. A part of it comes loose, intact.\n[2026-08-29T01:10:02.864Z] [reward] \u2726 Salvage haul:\n[2026-08-29T01:10:02.864Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-08-29T01:10:02.864Z] [reward]     \u2022 Faded Ribbon Coil (Common)\n[2026-08-29T01:10:02.864Z] [reward]     \u2022 Aetheric Cloth (Uncommon)\n",
+      "[2026-08-29T01:10:03.176Z] [debug] persist sizes(KB): total=134 player=21 wm=32[rooms=7 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=79 scene=2\n[2026-08-29T01:10:03.870Z] [debug] kbbar: mounted bottom=355 from=estimate winH=986 beat=-\n[2026-08-29T01:10:04.042Z] [debug] kbbar: mounted bottom=359.79486083984375 from=live winH=986 beat=-\n",
+      "[2026-08-29T01:10:13.102Z] [player] no text box right jere\n[2026-08-29T01:10:13.102Z] [arbiter] The Arbiter studies you, plainly. \"I'm not sure what you're trying to tell me. I'll keep your note in the log either way. If you mean to act, phrase it as a verb \u2014 'investigate the rubble', 'go east', 'attack the figure'.\"\n",
+      "[2026-08-29T01:10:13.102Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter studies you, plainly. \"I'm not sure what you're \u2026\"\n[2026-08-29T01:10:13.102Z] [debug] meta-comment guard: skipped intent parse (engine-vocabulary: \"text box\") on 22-char input\n[2026-08-29T01:10:14.133Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n",
+      "[2026-08-29T01:10:14.368Z] [debug] kbbar: mounted bottom=359.79486083984375 from=cached winH=986 beat=-\n[2026-08-29T01:10:14.508Z] [debug] kbbar: mounted bottom=359.79486083984375 from=live winH=986 beat=-\n[2026-08-29T01:10:19.805Z] [world] The ash burns your throat. The breath you spend on this action costs more than usual.\n[2026-08-29T01:10:19.843Z] [player] none here either\n",
+      "[2026-08-29T01:10:19.844Z] [debug] parser: intent=unknown conf=0.10 verb=- target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-29T01:10:19.844Z] [debug] parse-fallback: handing \"none here either\" to qwen\n[2026-08-29T01:10:19.845Z] [system] The Arbiter considers your words\u2026\n[2026-08-29T01:10:20.940Z] [debug] kbbar: mounted bottom=359.79486083984375 from=cached winH=986 beat=-\n",
+      "[2026-08-29T01:10:21.159Z] [debug] kbbar: mounted bottom=359.79486083984375 from=live winH=986 beat=-\n[2026-08-29T01:10:24.516Z] [debug] qwen\u23f1 parse_fallback ok 4593ms read 4276ms/write 294ms in 396t\u2192out 9t 10.8ms/t (33ch)\n[2026-08-29T01:10:24.629Z] [debug] parse-fallback: qwen no usable result \u2192 soft refusal\n",
+      "[2026-08-29T01:10:24.629Z] [arbiter] The Arbiter glances at your pack. \"Your small rock is still there, if it suits the moment.\"\n[2026-08-29T01:10:24.629Z] [system] Try: look around \u00b7 search \u00b7 rest\n[2026-08-29T01:10:26.246Z] [debug] homework: intro-fill armed after 6000ms idle\n",
+      "[2026-08-29T01:10:36.058Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 9735ms read 8634ms/write 1072ms in 752t\u2192out 33t 11.5ms/t HIT-CAP (136ch)\n[2026-08-29T01:10:36.171Z] [debug] homework: scene_intro \"Reclaimer's Stake\" \u2713 9925ms\n[2026-08-29T01:10:37.655Z] [player] still none, it's too low I can see the very top edge of it\n",
+      "[2026-08-29T01:10:37.659Z] [debug] parser: intent=wait conf=1.00 verb=still target=none too low can see very top edge resolved=- range=- enemies=0 hooks=1\n[2026-08-29T01:10:37.660Z] [world] You hold still. Tartaria holds still longer.\n[2026-08-29T01:10:37.660Z] [debug] arbiter: template (reason=intent-not-allowed:wait)\n",
+      "[2026-08-29T01:10:37.660Z] [arbiter] The Arbiter studies you, plainly. \"I'm not sure what you're trying to tell me. Phrase it as the deed you mean to do \u2014 'search', 'attack', 'go east'.\"\n[2026-08-29T01:10:37.660Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-29T01:10:37.661Z] [arbiter] \"There's coin on the board for a willing blade,\" the Arbiter says. \"Read the World.\"\n",
+      "[2026-08-29T01:10:37.821Z] [c"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-30-1552-are-you-sure-about-that #mtf18j1mlkuk [inline 12/23]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtf18j1mlkuk"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "12"
+    },
+    {
+      "key": "parts",
+      "value": "23"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "5"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+      "query": "user.ip:\"2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-30T01:08:30.869708Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-30T01:08:31.367000Z",
+  "fingerprints": [
+    "62526ea58b2c63210482d8abf21f0d1e"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "41d72241f12441f0b2a0b7d59e7864a6",
+  "previousEventID": "26b5a5b66efe4bdb9bda3851bab9f99c"
+}

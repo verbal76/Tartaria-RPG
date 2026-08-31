@@ -1,0 +1,200 @@
+{
+  "id": "9c6e97dacd22488c85c9cce9f5ccc757",
+  "groupID": "7702525179",
+  "eventID": "9c6e97dacd22488c85c9cce9f5ccc757",
+  "projectID": "4511945117532160",
+  "size": 6621,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-31-1592-the-events-say-which-build #mthbyi8ignjv [inline 14/14]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-08-31-1592-the-events-say-which-build",
+  "message": "player-log 2026-08-31-1592-the-events-say-which-build #mthbyi8ignjv [inline 14/14]",
+  "title": "player-log 2026-08-31-1592-the-events-say-which-build #mthbyi8ignjv [inline 14/14]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "32bb9a09204041d7aedad6a2ab6f06e8",
+      "span_id": "83304064f2ffce0b",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "g: action \"rest\" \u00b7 room great_tartary_plains \u00b7 screen exploration\n      last checkpoint: native:cognition:done [q0] \u00b7 80822ms into the action \u00b7 alive 0ms after it\n  \u2022 2026-08-30T21:23:57.150Z (1021m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-30-1578-the-stage-says-who-is-there \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n",
+      "      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done [q0] \u00b7 535ms into the action \u00b7 alive 0ms after it\n  \u2022 2026-08-30T22:25:39.849Z (959m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-30-1580-the-guy-who-was-never-there \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n",
+      "      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done [q0] \u00b7 329ms into the action \u00b7 alive 0ms after it\n  \u2022 2026-08-30T23:42:09.758Z (883m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-30-1581-the-card-they-cannot-walk-past \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n",
+      "      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done [q0] \u00b7 414ms into the action \u00b7 alive 0ms after it\n  \u2022 2026-08-31T00:21:58.332Z (843m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-30-1582-the-guy-who-gives-you-the-job \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n",
+      "      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done [q0] \u00b7 383ms into the action \u00b7 alive 0ms after it\n  \u2022 2026-08-31T03:45:02.432Z (640m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-31-1586-the-slate-in-every-part \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n",
+      "      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done [q0] \u00b7 541ms into the action \u00b7 alive 0ms after it\n  \u2022 2026-08-31T12:34:47.772Z (110m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-31-1589-the-pin-comes-home \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n",
+      "      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done [q0] \u00b7 578ms into the action \u00b7 alive 0ms after it\n      launch: died 892ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-08-31T14:24:08.210Z (1m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-31-1592-the-events-say-which-build \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done [q0] \u00b7 508ms into the action \u00b7 alive 0ms after it\n      launch: died 859ms into the process \u00b7 not an OTA-apply boot\n",
+      "      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\nCrash delivery: ON \u2014 reports go to Sentry when you crash.\nRuntime pressure\n  \u00b7 Last boot exited cleanly, then the OS reclaimed it \u2014 not a crash.\n     A ~400MB model app is what Android drops first when it needs memory.\n     Kept because the phase is still evidence if a real freeze lands here.\n",
+      "     Last checkpoint: native:cognition:done at 2026-08-31T14:24:14.988Z (1 min before this boot)\n  Memory warnings: none this session\n  Freeze watch: no stalls seen (JS clocks only \u2014 see the native queue below)\n  Native queue: worst wait 0.0s \u00b7 0 job kinds queued >3s \u00b7 worst 0.0ms/prompt-token\n  App state trail: (none recorded)\nModel contexts\n  Live now: 0\n  Opened: 0 \u00b7 Released: 0 \u00b7 Peak live: 0\n",
+      "  Narration engine: idle\n"
+    ],
+    "chunkChars": 3732
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-31-1592-the-events-say-which-build #mthbyi8ignjv [inline 14/14]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mthbyi8ignjv"
+    },
+    {
+      "key": "dist",
+      "value": "2026-08-31-1592-the-events-say-which-build"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "14"
+    },
+    {
+      "key": "parts",
+      "value": "14"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-08-31-1592-the-events-say-which-build"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-31T14:25:06.975235Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-31T14:25:08.577000Z",
+  "fingerprints": [
+    "c47ebf70618a1cdc461b81fb064f197f"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1946131048,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-08-31T14:24:07.632000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-08-31-1592-the-events-say-which-build",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-08-31-1592-the-events-say-which-build",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-08-31-1592-the-events-say-which-build",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-08-31-1592-the-events-say-which-build)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "9e2a69ba7e0d480cb1cadb5a28e8e626",
+  "previousEventID": "702d0fefe0d24289a2803ff575b80ea0"
+}

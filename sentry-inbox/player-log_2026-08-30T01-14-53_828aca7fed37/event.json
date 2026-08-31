@@ -1,0 +1,201 @@
+{
+  "id": "828aca7fed37455a923a21e06e367079",
+  "groupID": "7700163529",
+  "eventID": "828aca7fed37455a923a21e06e367079",
+  "projectID": "4511945117532160",
+  "size": 17870,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-30-1553-glyph-glyph-name-star #mtf482aclxul [inline 11/24]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-30-1553-glyph-glyph-name-star #mtf482aclxul [inline 11/24]",
+  "title": "player-log 2026-08-30-1553-glyph-glyph-name-star #mtf482aclxul [inline 11/24]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Trafford",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "5bf0ca10ef194929bfff557f8d980025",
+      "span_id": "8f5b78882a47e2c7",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      " ambient held (he just spoke)\n[2026-08-28T23:03:28.910Z] [debug] arbiter: template (reason=intent-not-allowed:rest)\n[2026-08-28T23:03:28.911Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-28T23:03:28.911Z] [system] \u23f3 Time passed: 8h\n[2026-08-28T23:03:28.912Z] [arbiter] \"There's coin on the board for a willing blade,\" the Arbiter says. \"Read the World.\"\n",
+      "[2026-08-28T23:03:28.912Z] [debug] dedup: suppressed arbiter repeat \u2014 \"\"There's coin on the board for a willing blade,\" the Arbiter\u2026\"\n[2026-08-28T23:03:28.996Z] [cognitive] REST  (83ms)\n[2026-08-28T23:03:29.224Z] [debug] persist sizes(KB): total=138 player=20 wm=36[rooms=12 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=79 scene=3\n[2026-08-28T23:03:29.577Z] [debug] ui: tap \"rest\"\n",
+      "[2026-08-28T23:03:29.586Z] [player] rest\n[2026-08-28T23:03:29.586Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-28T23:03:29.587Z] [world] You rest for 8 hours. Whole already \u2014 the Aetherstone hums steady. (Day 5, afternoon)\n[2026-08-28T23:03:29.588Z] [debug] arbiter: ambient held (he just spoke)\n",
+      "[2026-08-28T23:03:29.598Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-28T23:03:29.599Z] [system] \u23f3 Time passed: 8h\n[2026-08-28T23:03:29.692Z] [cognitive] REST  (93ms)\n[2026-08-28T23:03:30.393Z] [debug] ui: tap \"rest\"\n[2026-08-28T23:03:30.402Z] [player] rest\n[2026-08-28T23:03:30.402Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-28T23:03:30.404Z] [world] You rest for 8 hours. Whole already \u2014 the Aetherstone hums steady. (Day 5, evening)\n[2026-08-28T23:03:30.404Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-28T23:03:30.409Z] [arbiter] The Arbiter goes still. \"There are prints in the silt that were not there when you lay down. They come in and they do not go out.\"\n",
+      "[2026-08-28T23:03:30.410Z] [world] A Dust Fiend closes the distance through the dark. The rest is over.\n[2026-08-28T23:03:30.411Z] [debug] enemy: Dust Fiend hp=47 ac=10 atk=Wind Slash dmg=2D6 rarity=Uncommon ap=5\n[2026-08-28T23:03:30.417Z] [debug] arbiter: template (reason=combat)\n[2026-08-28T23:03:30.417Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-08-28T23:03:30.418Z] [system] \u23f3 Time passed: 8h\n[2026-08-28T23:03:30.585Z] [cognitive] REST  (166ms)\n[2026-08-28T23:03:31.145Z] [debug] ui: tap \"cudgel\"\n[2026-08-28T23:03:45.849Z] [debug] ui: tap \"off: earthshaker\"\n[2026-08-28T23:03:45.892Z] [player] attack with the off-hand earthshaker\n",
+      "[2026-08-28T23:03:45.893Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand earthshaker resolved=Earthshaker range=far enemies=1 hooks=1\n[2026-08-28T23:03:45.898Z] [debug] attack: target=Dust Fiend range=far reach.bands=[distant,far,mid,close] reach.label=Earthshaker bareHand=false\n",
+      "[2026-08-28T23:03:45.919Z] [world] Your earthshaker comes around in an arc; Dust Fiend squares up to meet it.\n[2026-08-28T23:03:45.920Z] [system] \u23f3 Time passed: 6 min\n[2026-08-28T23:03:46.028Z] [cognitive] AGGRESSION \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (108ms)\n[2026-08-28T23:03:50.965Z] [world] Dust Fiend moves first. The pressure is immediate.\n",
+      "[2026-08-28T23:03:50.965Z] [combat] Dust Fiend closes the distance.\n[2026-08-28T23:03:50.965Z] [combat] You \u2014 d20 \u2192 2 + INT 12 = 14 vs Dust Fiend AC 11 \u2014 \u2713 HIT\n[2026-08-28T23:03:50.966Z] [combat] Bludgeoning flares \u2014 +2 on hit (weak \u2014 bites deep!).\n[2026-08-28T23:03:50.967Z] [combat] Weakness exposed \u2014 Dust Fiend flinches. (bludgeoning \u00d71.5 for 10)\n",
+      "[2026-08-28T23:03:50.971Z] [combat] Your strike with the earthshaker lands for 10. Dust Fiend staggers \u2014 37 HP remaining. It answers.\n[2026-08-28T23:03:50.971Z] [combat] Dust Fiend is left exposed \u2014 easier to hit.\n[2026-08-28T23:03:58.763Z] [debug] ui: tap \"dodge\"\n[2026-08-28T23:03:58.774Z] [player] dodge\n",
+      "[2026-08-28T23:03:58.774Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=1 hooks=1\n[2026-08-28T23:03:58.776Z] [world] You commit to the dodge. Slip Dust Fiend's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-08-28T23:03:58.808Z] [combat] Dust Fiend \u2014 d20 \u2192 18 + ATK 6 = 24 vs your AC 20 \u2014 \u2717 EVADED\n[2026-08-28T23:03:58.809Z] [combat] Dodge \u2014 d20 \u2192 14 + DEX 13 = 27 vs ATK 24. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-08-28T23:03:58.813Z] [debug] arbiter: template (reason=combat)\n[2026-08-28T23:03:58.813Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-08-28T23:03:58.814Z] [system] \u23f3 Time passed: 6 min\n[2026-08-28T23:03:59.033Z] [cognitive] neutral  (219ms)\n[2026-08-28T23:03:59.512Z] [debug] ui: tap \"off: earthshaker\"\n[2026-08-28T23:03:59.557Z] [player] attack with the off-hand earthshaker\n[2026-08-28T23:03:59.558Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand earthshaker resolved=Earthshaker range=mid enemies=1 hooks=1\n",
+      "[2026-08-28T23:03:59.559Z] [debug] attack: target=Dust Fiend range=mid reach.bands=[distant,far,mid,close] reach.label=Earthshaker bareHand=false\n[2026-08-28T23:03:59.560Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-08-28T23:03:59.579Z] [world] You commit forward with the earthshaker. Dust Fiend watches your hands.\n[2026-08-28T23:03:59.579Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-28T23:03:59.680Z] [cognitive] AGGRESSION \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (100ms)\n[2026-08-28T23:04:04.749Z] [world] Dust Fiend moves first. The pressure is immediate.\n[2026-08-28T23:04:04.751Z] [combat] Dust Fiend \u2014 d20 \u2192 15 + ATK 6 = 21 vs your AC 20 \u2014 \u2713 HIT\n[2026-08-28T23:04:04.752Z] [combat] You \u2014 d20 \u2192 2 + INT 12 perfect opening (2\u00d7 dice) = 14 vs Dust Fiend AC 11 \u2014 \u2713 HIT\n",
+      "[2026-08-28T23:04:04.752Z] [combat] Bludgeoning flares \u2014 +4 on hit (weak \u2014 bites deep!).\n[2026-08-28T23:04:04.752Z] [combat] Weakness exposed \u2014 Dust Fiend flinches. (bludgeoning \u00d71.5 for 18)\n[2026-08-28T23:04:04.753Z] [combat] Your strike with the earthshaker lands for 18. Dust Fiend staggers \u2014 19 HP remaining. It answers.\n",
+      "[2026-08-28T23:04:04.754Z] [combat] Dust Fiend is left exposed \u2014 easier to hit.\n[2026-08-28T23:04:04.884Z] [combat] Dust Fiend deals 3 slashing damage [armor \u221235%] [edge of reach \u2014 halved]. You have 29 HP remaining.\n[2026-08-28T23:04:05.085Z] [debug] persist sizes(KB): total=138 player=20 wm=36[rooms=12 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=78 scene=3\n",
+      "[2026-08-28T23:05:02.264Z] [debug] ui: tap \"off: earthshaker\"\n[2026-08-28T23:05:02.295Z] [player] attack with the off-hand earthshaker\n[2026-08-28T23:05:02.295Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand earthshaker resolved=Earthshaker range=mid enemies=1 hooks=1\n",
+      "[2026-08-28T23:05:02.296Z] [debug] attack: target=Dust Fiend range=mid reach.bands=[distant,far,mid,close] reach.label=Earthshaker bareHand=false\n[2026-08-28T23:05:02.315Z] [world] You raise the earthshaker toward Dust Fiend. The room narrows around the both of you.\n[2026-08-28T23:05:02.316Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-28T23:05:02.416Z] [cognitive] AGGRESSION \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (100ms)\n[2026-08-28T23:05:07.162Z] [world] You seize the initiative. Dust Fiend has no time to react.\n[2026-08-28T23:05:07.162Z] [combat] You \u2014 d20 \u2192 17 + INT 12 = 29 vs Dust Fiend AC 11 \u2014 \u2713 HIT\n[2026-08-28T23:05:07.163Z] [combat] Bludgeoning flares \u2014 +1 on hit (weak \u2014 bites deep!).\n",
+      "[2026-08-28T23:05:07.163Z] [combat] Weakness exposed \u2014 Dust Fiend flinches. (bludgeoning \u00d71.5 for 3)\n[2026-08-28T23:05:07.164Z] [combat] Clean hit with the earthshaker for 3. Dust Fiend has 16 left and does not back away.\n[2026-08-28T23:05:07.164Z] [combat] Dust Fiend is left exposed \u2014 easier to hit.\n[2026-08-28T23:05:07.166Z] [combat] Dust Fiend \u2014 d20 \u2192 6 + ATK 6 = 12 vs your AC 20 \u2014 \u2717 MISS\n",
+      "[2026-08-28T23:05:25.073Z] [debug] ui: tap \"dodge\"\n[2026-08-28T23:05:25.085Z] [player] dodge\n[2026-08-28T23:05:25.085Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=1 hooks=1\n",
+      "[2026-08-28T23:05:25.086Z] [world] You commit to the dodge. Slip Dust Fiend's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-08-28T23:05:25.117Z] [combat] Dust Fiend \u2014 d20 \u2192 7 + ATK 6 = 13 vs your AC 20 \u2014 \u2717 EVADED\n",
+      "[2026-08-28T23:05:25.117Z] [combat] Dodge \u2014 d20 \u2192 18 + DEX 13 = 31 vs ATK 13. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-08-28T23:05:25.118Z] [debug] arbiter: template (reason=combat)\n[2026-08-28T23:05:25.118Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-28T23:05:25.118Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-28T23:05:25.234Z] [cognitive] neutral  (115ms)\n[2026-08-28T23:05:25.658Z] [debug] ui: tap \"off: earthshaker\"\n[2026-08-28T23:05:25.664Z] [world] A silent bolt strikes near enough to singe your sleeve. (\u22122 HP)\n[2026-08-28T23:05:25.702Z] [player] attack with the off-hand earthshaker\n",
+      "[2026-08-28T23:05:25.703Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand earthshaker resolved=Earthshaker range=mid enemies=1 hooks=1\n[2026-08-28T23:05:25.704Z] [debug] attack: target=Dust Fiend range=mid reach.bands=[distant,far,mid,close] reach.label=Earthshaker bareHand=false\n[2026-08-28T23:05:25.704Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-08-28T23:05:25.723Z] [world] You raise the earthshaker toward Dust Fiend. The room narrows around the both of you.\n[2026-08-28T23:05:25.724Z] [system] \u23f3 Time passed: 6 min\n[2026-08-28T23:05:25.824Z] [cognitive] AGGRESSION \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (100ms)\n[2026-08-28T23:05:39.166Z] [debug] appstate: active \u2192 background (was active for 673768ms)\n",
+      "[2026-08-28T23:07:38.587Z] [debug] appstate: background \u2192 active (was background for 119418ms)\n[2026-08-28T23:07:43.785Z] [world] You seize the initiative. Dust Fiend has no time to react.\n[2026-08-28T23:07:43.786Z] [combat] You \u2014 d20 \u2192 6 + INT 12 perfect opening (2\u00d7 dice) = 18 vs Dust Fiend AC 11 \u2014 \u2713 HIT\n",
+      "[2026-08-28T23:07:43.787Z] [combat] Weakness exposed \u2014 Dust Fiend flinches. (bludgeoning \u00d71.5 for 8)\n[2026-08-28T23:07:43.788Z] [combat] Clean hit with the earthshaker for 8. Dust Fiend has 8 left and does not back away.\n[2026-08-28T23:07:43.789Z] [combat] Dust Fiend \u2014 d20 \u2192 16 + ATK 6 = 22 vs your AC 20 \u2014 \u2713 HIT\n",
+      "[2026-08-28T23:07:43.790Z] [arbiter] \"Footwork over fury,\" the Arbiter says quietly. \"The dust fiend is patient. Be patienter.\"\n[2026-08-28T23:07:43.930Z] [combat] Dust Fiend deals 1 slashing damage [armor \u221235%] [edge of reach \u2014 halved]. You have 26 HP remaining.\n[2026-08-28T23:07:47.098Z] [debug] ui: tap \"stealth\"\n[2026-08-28T23:07:47.106Z] [player] sneak\n",
+      "[2026-08-28T23:07:47.108Z] [debug] parser: intent=stealth conf=1.00 verb=sneak target=- resolved=- range=mid enemies=1 hooks=1\n[2026-08-28T23:07:47.145Z] [system] \u23f3 Time passed: 15 min\n[2026-08-28T23:07:47.265Z] [cognitive] DISENGAGE \u00b7 HIDE \u00b7 TAKE_COVER  (119ms)\n[2026-08-28T23:07:48.653Z] [debug] skillcheck: stealth d20=11 STE 6 = 17 vs DC 12 \u2014 Hard \u2192 (resolved below)\n",
+      "[2026-08-28T23:07:48.698Z] [debug] stats: STR5 DEX13 INT11 WIS4 CHA2 STE6 | gear: INT+2,STR+3,DEX+7,STE+3 | worn: main=Cudgel off=Earthshaker head=Aetheric Helm of Command chest=Reclaimer's Scrapplate hands=Wanderer's Worn Gauntlets legs=Aetheric Scout Greaves feet=Wanderer's Footwraps cloak=Reclaimer's Cloak ring=Light-Finger Guild Band\n",
+      "[2026-08-28T23:07:48.698Z] [debug] train: stealth (stealth check) \u2192 progress 9/100\n[2026-08-28T23:07:48.702Z] [world] Dusk is with you \u2014 the silt eats sound after dark. (stealth +1, night)\n[2026-08-28T23:07:48.703Z] [world] You drop low and move quiet, closing on Dust Fiend unseen across the open ground. (+5 next attack)\n",
+      "[2026-08-28T23:07:48.703Z] [debug] stealth: opener carried by the skill roll (17 vs DC 12 \u2014 Hard) \u2014 UNSEEN\n[2026-08-28T23:07:48.989Z] [debug] persist sizes(KB): total=139 player=20 wm=37[rooms=12 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=78 scene=3\n[2026-08-28T23:07:50.866Z] [debug] ui: tap \"off: earthshaker\"\n",
+      "[2026-08-28T23:07:50.910Z] [player] attack with the off-hand earthshaker\n[2026-08-28T23:07:50.910Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand earthshaker resolved=Earthshaker range=mid enemies=1 hooks=1\n[2026-08-28T23:07:50.911Z] [debug] attack: target=Dust Fiend range=mid reach.bands=[distant,far,mid,close] reach.label=Earthshaker bareHand=false\n",
+      "[2026-08-28T23:07:50.912Z] [debug] attack: status mods stealthed +5\n[2026-08-28T23:07:50.934Z] [world] Your earthshaker comes around in an arc; Dust Fiend squares up to meet it.\n[2026-08-28T23:07:50.934Z] [system] \u23f3 Time passed: 6 min\n[2026-08-28T23:07:51.037Z] [cognitive] AGGRESSION \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (101ms)\n",
+      "[2026-08-28T23:08:32.770Z] [world] You seize the initiative. Dust Fiend has no time to react.\n[2026-08-28T23:08:32.771Z] [combat] You \u2014 d20 \u2192 5 + INT 12 stealthed +5 = 22 vs Dust Fiend AC 11 \u2014 \u2713 HIT\n[2026-08-28T23:08:32.771Z] [combat] Bludgeoning flares \u2014 +1 on hit (weak \u2014 bites deep!).\n[2026-08-28T23:08:32.771Z] [combat] Weakness exposed \u2014 Dust Fiend flinches. (bludgeoning \u00d71.5 for 10)\n",
+      "[2026-08-28T23:08:32.774Z] [combat] Final strike with the earthshaker for 10. Dust Fiend is still. The Aetherstone hums on, indifferent.\n[2026-08-28T23:08:32.775Z] [reward] Dust Fiend defeated. You recover Aetheric Dust \u00d72, Riveted Leather Vest.\n[2026-08-28T23:08:32.776Z] [reward] +14 TC pried from the dust.\n",
+      "[2026-08-28T23:08:32.795Z] [arbiter] The Arbiter eyes your new pieces. \"You could make a Storm Rod now, if you wanted.\"\n[2026-08-28T23:09:26.847Z] [world] You let the conversation go and Ilva Sidelong gets back to it.\n[2026-08-28T23:09:30.311Z] [debug] qwen\u23f1 flourish ok 4923ms read \u26a0364996ms/write \u26a0346ms NOT-PER-CALL in 175t\u2192out 9t (25ch)\n",
+      "[2026-08-28T23:09:30.318Z] [debug] qwen\u23f1 \u2702 DISCARDED flourish after 4923ms \u2014 flourish:stale-walked-away\n[2026-08-28T23:09:30.320Z] [debug] flourish: stale 5041ms\n[2026-08-28T23:09:38.846Z] [world] You let the conversation go and Ilva Sidelong gets back to it.\n[2026-08-28T23:09:48.783Z] [debug] qwen\u23f1 item_synthesis_hw ok 5008ms read 3590ms/write 1367ms in 330t\u2192out 40t 10.9ms/t (159ch)\n",
+      "[2026-08-28T23:09:48.786Z] [debug] qwen\u23f1 stats \u2014 investigate_lore n10 avg3.7s max8.1s read1.0s/write1.0s in128t\u2192out32t ms/tok 2.2-19.0 wait1.7s | narration:scene_intro_fill n7 avg6.8s max12.6s read6.4s/write1.3s in735t\u2192out33t ms/tok 3.7-14.1 cap7 \u27022/16.6s | ambient n6 avg9.9s max14.3s read4.4s/write2.0s in364t\u2192out31t ms/tok 6.8-16.1 cap5 wait4.2s \u27023/32.2s | flourish n5 avg3.0s max4.9s read2.0s/wri",
+      "te0.5s \u26a01unusable in176t\u2192out14t ms/tok 10.5-14.2 \u27023/10.4s | item_synthesis_hw n4 avg5.6s max7.1s read4.5s/write1.1s in330t\u2192out34t ms/tok 10.5-18.9 | narration:travel n3 avg9.8s max10.5s read9.8s in800t\u2192out0t ms/tok 11.7-13.2 \u23f83 \u27023/29.5s | ask_arbiter n2 avg3.7s max4.4s read2.9s/write0.9s in248t\u2192out28t ms/tok 10.2-12.9 | parse_fallback n1 avg4.8s max4.8s read4.3s/write0.5s in404t\u2192out14t ms/tok 10.6",
+      "-10.6 | narration:scene_intro n1 avg12.5s max"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-30-1553-glyph-glyph-name-star #mtf482aclxul [inline 11/24]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtf482aclxul"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "11"
+    },
+    {
+      "key": "parts",
+      "value": "24"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+      "query": "user.ip:\"2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-30T01:14:53.192488Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-30T01:14:53.695000Z",
+  "fingerprints": [
+    "c137ae228baf9f502d72cd2165ea9978"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "8639d3815d0049868d36a17c207c27ec",
+  "previousEventID": "776d0cdf26184ec28370cd38d844c17f"
+}

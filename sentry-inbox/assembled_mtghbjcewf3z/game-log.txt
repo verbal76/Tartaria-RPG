@@ -1,0 +1,274 @@
+=== TARTARIA LOG · 17070 CHARS · BEGIN ===
+[2026-08-30T18:43:30.754Z] [debug] persist sizes(KB): total=102 player=37 wm=61[rooms=30 events=1 memos=0 npcs=1 defeated=1 tags=0 discovered=0] log=0 scene=3
+[2026-08-30T18:44:24.801Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a053da-1891-7b49-8e92-321b7cba6e67
+[2026-08-30T18:44:24.802Z] [debug] ota: Checking…
+[2026-08-30T18:44:24.865Z] [debug] ota: Already up to date
+[2026-08-30T18:44:24.865Z] [debug] ota: boot check result = noUpdate
+[2026-08-30T18:44:24.921Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-08-30T18:44:24.922Z] [debug] voice: bundled idle
+[2026-08-30T18:44:25.206Z] [debug] send-log: bundle #mtg55shijei7 attempt 2/5 delivered to Sentry
+[2026-08-30T18:44:28.734Z] [debug] OTA session start: 2026-08-30-1571-the-slot-moves-on.
+[2026-08-30T18:44:28.734Z] [world] You step back into Great Tartary Plains. The world waits for your move.
+[2026-08-30T18:44:28.734Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. "Welcome back, Cheddar Bob. We've still got ground to cover, you and I."
+[2026-08-30T18:44:28.885Z] [debug] ═══ SESSION 2026-08-30T18:44:28.885Z · build 2026-08-30-1571-the-slot-moves-on · previous entry moments earlier ═══
+[2026-08-30T18:44:29.238Z] [debug] send-log: crash on record (2026-08-30T18:43:29.524Z) — game log pushed automatically, delivered to Sentry, kept on disk as #mtg5s64oul66
+[2026-08-30T18:44:32.575Z] [debug] send-log: #mtg5s8s9w0sz — DELIVERED (inline, no attachments): beacon out, 1/1 parts accepted (7273 chars) — flush said yes
+[2026-08-30T18:44:32.576Z] [debug] send-log: all parts accepted by the SDK — bundle #mtg5s8s9w0sz kept on disk, boots retry up to 5 sends total
+[2026-08-30T20:29:25.327Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a053da-1891-7b49-8e92-321b7cba6e67
+[2026-08-30T20:29:25.328Z] [debug] ota: Checking…
+[2026-08-30T20:29:27.196Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-08-30T20:29:27.348Z] [debug] ota: Saving progress…
+[2026-08-30T20:29:27.351Z] [debug] ota: Restarting to apply…
+[2026-08-30T20:29:27.464Z] [debug] ota: boot check result = applied
+[2026-08-30T20:29:27.613Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a05438-45c0-73a1-babe-4f1f7c9e3724
+[2026-08-30T20:29:27.614Z] [debug] ota: Checking…
+[2026-08-30T20:29:27.779Z] [debug] ota: Already up to date
+[2026-08-30T20:29:27.780Z] [debug] ota: boot check result = noUpdate
+[2026-08-30T20:29:27.809Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-08-30T20:29:27.810Z] [debug] voice: bundled idle
+[2026-08-30T20:29:28.159Z] [debug] send-log: bundle #mtg5s8s9w0sz attempt 2/5 delivered to Sentry
+[2026-08-30T20:40:33.780Z] [debug] OTA applied: 2026-08-30-1571-the-slot-moves-on → 2026-08-30-1575-the-stone-marks-you.
+[2026-08-30T20:40:33.780Z] [debug] OTA session start: 2026-08-30-1575-the-stone-marks-you.
+[2026-08-30T20:40:33.780Z] [world] You step back into Great Tartary Plains. The world waits for your move.
+[2026-08-30T20:40:33.780Z] [arbiter] The Arbiter meets your eyes. "Welcome back, Cheddar Bob. The buried country is no place to walk alone."
+[2026-08-30T20:40:33.979Z] [debug] ═══ SESSION 2026-08-30T20:40:33.979Z · build 2026-08-30-1575-the-stone-marks-you · updated from 2026-08-30-1571-the-slot-moves-on · previous entry moments earlier ═══
+[2026-08-30T20:41:24.080Z] [debug] ui: tap "more ▸"
+[2026-08-30T20:41:26.383Z] [debug] ui: tap "missions"
+[2026-08-30T20:51:53.463Z] [world] You set course for Nimari. 8 tiles — about 20 hours of travel, all in. You set off now — the ground ahead is new ground. Keep tapping → NIMARI on the travel row to close the distance; STOP TRAVEL to halt.
+[2026-08-30T20:51:53.513Z] [debug] spawn: gear=[Seer's Veil of the Aether, Order Letter-Opener] window=10 roster=new
+[2026-08-30T20:51:53.514Z] [world] You walk south. The ground here looks much like the ground behind you. You have lost track of distance.
+[2026-08-30T20:51:53.516Z] [world] The top of a flooded Tartarian cathedral pierces the standing water ahead — steeple intact, the rest drowned.
+[2026-08-30T20:51:55.448Z] [debug] ui: tap "missions"
+[2026-08-30T20:51:57.126Z] [debug] persist sizes(KB): total=98 player=42 wm=50[rooms=19 events=1 memos=0 npcs=1 defeated=1 tags=0 discovered=0] log=3 scene=4
+[2026-08-30T20:51:58.663Z] [debug] ui: tap "craft"
+[2026-08-30T20:52:01.150Z] [world] You repair the Smoldering Reclaimers Guild Geode-Cored Cleaver. Back to full. (spent: Small Rock x2)
+[2026-08-30T20:52:02.334Z] [arbiter] The Arbiter nods. "Patched in: Cloth Scrap → Patched Cloth."
+[2026-08-30T20:52:02.343Z] [world] You repair the Rough-Hewn Chestplate. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)
+[2026-08-30T20:52:09.335Z] [debug] ui: tap "inventory"
+[2026-08-30T20:52:52.337Z] [world] You break the Bone Knife down. ✦ Recovered: Scrap Metal x2, Stick.
+[2026-08-30T20:52:52.373Z] [world] The first pass on the Bone Knife crumbles in your hands — but your training kicks in. You stop, breathe, change angle, and try again.
+[2026-08-30T20:52:52.373Z] [world] You break the Bone Knife down. ✦ Recovered: Scrap Metal x2, Stick.
+[2026-08-30T20:52:52.403Z] [world] You break the Bone Knife down. ✦ Recovered: Scrap Metal x2, Stick.
+[2026-08-30T20:52:52.431Z] [world] You break the Bone Knife down. ✦ Recovered: Scrap Metal x2, Stick.
+[2026-08-30T20:52:52.458Z] [world] You break the Bone Knife down. ✦ Recovered: Scrap Metal x2, Stick.
+[2026-08-30T20:52:52.486Z] [world] You break the Bone Knife down. ✦ Recovered: Scrap Metal x2, Stick.
+[2026-08-30T20:52:52.514Z] [world] You break the Bone Knife down. ✦ Recovered: Scrap Metal x2, Stick.
+[2026-08-30T20:52:52.541Z] [world] You break the Cudgel down. ✦ Recovered: Small Rock x2, Stick.
+[2026-08-30T20:52:52.568Z] [world] You break the Cudgel down. ✦ Recovered: Small Rock x2, Stick.
+[2026-08-30T20:52:52.596Z] [world] You break the Cudgel down. ✦ Recovered: Small Rock x2, Stick.
+[2026-08-30T20:53:03.805Z] [debug] persist sizes(KB): total=97 player=39 wm=50[rooms=19 events=1 memos=0 npcs=1 defeated=1 tags=0 discovered=0] log=5 scene=4
+[2026-08-30T20:53:17.764Z] [debug] stats: STR11 DEX27 INT12 WIS6 CHA2 STE5 | gear: DEX+20,INT+3,STR+6,STE+2,WIS+1 | worn: main=Reclaimers Guild Geode-Cored Cleaver off=Bone Crossbow head=Forgotten Seeker's Mask chest=Rough-Hewn Chestplate hands=Relic Hunter's Gauntlets legs=Aetheric Scout Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band
+[2026-08-30T20:53:49.349Z] [debug] ui: tap "inventory"
+[2026-08-30T20:54:39.403Z] [world] You break the Mud-Warden's Vest down. ✦ Recovered: Scrap Metal x2, Patched Cloth x2.
+[2026-08-30T20:54:39.438Z] [world] The first pass on the Mud-Warden's Vest crumbles in your hands — but your training kicks in. You stop, breathe, change angle, and try again.
+[2026-08-30T20:54:39.438Z] [world] You break the Mud-Warden's Vest down. ✦ Recovered: Scrap Metal x2, Patched Cloth x2.
+[2026-08-30T20:54:39.466Z] [world] You break the Mud-Warden's Vest down. ✦ Recovered: Scrap Metal x2, Patched Cloth x2.
+[2026-08-30T20:54:39.493Z] [world] You break the Mud-Warden's Vest down. ✦ Recovered: Scrap Metal x2, Patched Cloth x2.
+[2026-08-30T20:54:39.519Z] [world] You break the Reclaimer's Salvage Vest down. ✦ Recovered: Scrap Metal x2, Patched Cloth x2.
+[2026-08-30T20:54:39.545Z] [world] You break the Reclaimer's Salvage Vest down. ✦ Recovered: Scrap Metal x2, Patched Cloth x2.
+[2026-08-30T20:54:39.571Z] [world] You break the Reclaimer's Salvage Vest down. ✦ Recovered: Scrap Metal x2, Patched Cloth x2.
+[2026-08-30T20:54:39.597Z] [world] You break the Reclaimer's Salvage Vest down. ✦ Recovered: Scrap Metal x2, Patched Cloth x2.
+[2026-08-30T20:54:39.622Z] [world] You break the Mud-Stalker Leggings down. ✦ Recovered: Patched Cloth x2.
+[2026-08-30T20:54:39.647Z] [world] You break the Resonant Faulds down. ✦ Recovered: Small Rock.
+[2026-08-30T20:54:39.671Z] [world] You break the Sentinel's Greaves down. ✦ Recovered: Patched Cloth x2.
+[2026-08-30T20:54:39.695Z] [world] You break the Wanderer's Footwraps down. ✦ Recovered: Patched Cloth x2.
+[2026-08-30T20:54:39.719Z] [world] You break the Mud-Bound Cloak down. ✦ Recovered: Patched Cloth x2.
+[2026-08-30T20:54:39.743Z] [world] You break the Mud-Bound Cloak down. ✦ Recovered: Patched Cloth x2.
+[2026-08-30T20:54:39.767Z] [world] You break the Reclaimer's Cloak down. ✦ Recovered: Patched Cloth x2.
+[2026-08-30T20:55:09.897Z] [world] You break the Mud Buckler down. ✦ Recovered: Scrap Metal x2, Stick.
+[2026-08-30T20:55:10.714Z] [debug] persist sizes(KB): total=94 player=34 wm=49[rooms=19 events=1 memos=0 npcs=1 defeated=1 tags=0 discovered=0] log=7 scene=4
+[2026-08-30T20:55:23.338Z] [debug] ui: tap "craft"
+[2026-08-30T21:22:56.351Z] [debug] OTA session start: 2026-08-30-1575-the-stone-marks-you.
+[2026-08-30T21:22:56.351Z] [world] You step back into Great Tartary Plains. The world waits for your move.
+[2026-08-30T21:22:56.351Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. "Welcome back, Cheddar Bob. We've still got ground to cover, you and I."
+[2026-08-30T21:22:56.453Z] [debug] ═══ SESSION 2026-08-30T21:22:56.453Z · build 2026-08-30-1575-the-stone-marks-you · previous entry moments earlier ═══
+[2026-08-30T21:23:01.940Z] [debug] ui: tap "craft"
+[2026-08-30T21:23:38.143Z] [debug] ui: tap "take / salvage"
+[2026-08-30T21:23:39.646Z] [world] You take the Order Letter-Opener from where it lay.
+[2026-08-30T21:23:39.647Z] [reward] ✦ Order Letter-Opener (Common).
+[2026-08-30T21:23:39.661Z] [world] You pick up the Seer's Veil of the Aether.
+[2026-08-30T21:23:39.661Z] [reward] ✦ Seer's Veil of the Aether (Common).
+[2026-08-30T21:23:39.823Z] [debug] persist sizes(KB): total=95 player=34 wm=49[rooms=19 events=1 memos=0 npcs=1 defeated=1 tags=0 discovered=0] log=9 scene=3
+[2026-08-30T21:23:40.780Z] [reward] ✦ Found Final Entry — Upper Tower — Elior Zalmar. (open Contracts → Collectibles to read)
+[2026-08-30T21:23:40.793Z] [world] You salvage the overturned wagon. The take is small but real.
+[2026-08-30T21:23:40.793Z] [world] You work the track apart. Tucked inside, sealed against the silt: a folded note.
+[2026-08-30T21:23:40.793Z] [world] You salvage the weathered obsidian pillar. The take is small but real.
+[2026-08-30T21:23:40.794Z] [reward] ✦ Salvage haul:
+[2026-08-30T21:23:40.794Z] [reward]     • Worn Tartarian Coin x3 (Common)
+[2026-08-30T21:23:40.794Z] [reward]     • Aetheric Shard (Uncommon)
+[2026-08-30T21:23:42.452Z] [world] The ash burns your throat. The breath you spend on this action costs more than usual.
+[2026-08-30T21:23:42.468Z] [player] investigate standing water
+[2026-08-30T21:23:42.469Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=standing water resolved=standing water range=- enemies=0 hooks=1
+[2026-08-30T21:23:42.469Z] [debug] route: hook intercept (kind=submerged_steeple, target="standing water") — original intent=investigate
+[2026-08-30T21:23:42.471Z] [world] ★ STORY THREAD (step 1) — You wade out to the steeple. The window-slits at the top open onto a flooded nave — Aetherstone shimmer in the water below.
+[2026-08-30T21:23:42.472Z] [arbiter] "Explorers have gone in," the Arbiter says, "and the water keeps them."
+[2026-08-30T21:23:43.459Z] [debug] ctx: OPENED — live=1 (opened=1 released=0) ≈425MB est
+[2026-08-30T21:23:44.078Z] [combat] You take 4 damage from the flooded nave.
+[2026-08-30T21:23:44.085Z] [world] ★★ STORY THREAD COMPLETE — You dive. The Aetherstone gives you a half-minute of breathable air. You grab what you can — a heavy reliquary off the altar — and break back to the surface, lungs burning.
+[2026-08-30T21:23:44.085Z] [reward] ✦ Golem Core, +60 TC.
+[2026-08-30T21:23:44.086Z] [reward] ✦ For your persistence — Sentinel Core Plate (Uncommon).
+[2026-08-30T21:23:50.320Z] [debug] homework: intro-fill armed after 6000ms idle
+[2026-08-30T21:23:56.074Z] [debug] qwen⏱ narration:scene_intro_fill dormant 5650ms read 0ms/write 0ms in 723t→out 0t (0ch)
+[2026-08-30T21:23:56.102Z] [debug] qwen⏱ ✂ DISCARDED narration:scene_intro_fill after 5650ms — intro-fill:∅
+[2026-08-30T21:23:56.103Z] [debug] homework: scene_intro "Great Tartary Plains" ∅ 5783ms
+[2026-08-30T21:23:56.161Z] [debug] ctx: RELEASED — live=0 (opened=1 released=1)
+[2026-08-30T21:23:56.208Z] [debug] appstate: active → background (was active for 12664ms)
+[2026-08-30T21:23:56.399Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a0548b-3a99-7834-b7c6-55cf5141fe11
+[2026-08-30T21:23:56.399Z] [debug] ota: Checking…
+[2026-08-30T21:23:56.493Z] [debug] ota: Already up to date
+[2026-08-30T21:23:56.494Z] [debug] ota: boot check result = noUpdate
+[2026-08-30T21:23:56.573Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-08-30T21:23:56.573Z] [debug] voice: bundled idle
+[2026-08-30T21:23:57.011Z] [debug] send-log: bundle #mtg5s8s9w0sz attempt 3/5 delivered to Sentry
+[2026-08-30T21:43:01.182Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a0548b-3a99-7834-b7c6-55cf5141fe11
+[2026-08-30T21:43:01.182Z] [debug] ota: Checking…
+[2026-08-30T21:43:01.242Z] [debug] ota: Already up to date
+[2026-08-30T21:43:01.243Z] [debug] ota: boot check result = noUpdate
+[2026-08-30T21:43:01.288Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-08-30T21:43:01.290Z] [debug] voice: bundled idle
+[2026-08-30T21:43:01.452Z] [debug] send-log: bundle #mtg5s8s9w0sz attempt 4/5 delivered to Sentry
+[2026-08-30T21:43:04.949Z] [debug] OTA session start: 2026-08-30-1578-the-stage-says-who-is-there.
+[2026-08-30T21:43:04.950Z] [world] You step back into Great Tartary Plains. The world waits for your move.
+[2026-08-30T21:43:04.950Z] [arbiter] The Arbiter meets your eyes. "Welcome back, Cheddar Bob. The buried country is no place to walk alone."
+[2026-08-30T21:43:05.109Z] [debug] ═══ SESSION 2026-08-30T21:43:05.109Z · build 2026-08-30-1578-the-stage-says-who-is-there · previous entry moments earlier ═══
+[2026-08-30T21:43:05.406Z] [debug] send-log: crash on record (2026-08-30T21:23:57.150Z) — game log pushed automatically, delivered to Sentry, kept on disk as #mtgc5ut96dzn
+[2026-08-30T22:25:37.372Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a0548b-3a99-7834-b7c6-55cf5141fe11
+[2026-08-30T22:25:37.372Z] [debug] ota: Checking…
+[2026-08-30T22:25:38.842Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-08-30T22:25:38.925Z] [debug] ota: Saving progress…
+[2026-08-30T22:25:38.926Z] [debug] ota: Restarting to apply…
+[2026-08-30T22:25:39.157Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a054bc-60ff-74b7-bd2c-a1e3ab983c2c
+[2026-08-30T22:25:39.157Z] [debug] ota: Checking…
+[2026-08-30T22:25:39.447Z] [debug] ota: Already up to date
+[2026-08-30T22:25:39.447Z] [debug] ota: boot check result = noUpdate
+[2026-08-30T22:25:39.481Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-08-30T22:25:39.481Z] [debug] voice: bundled idle
+[2026-08-30T22:25:39.925Z] [debug] send-log: bundle #mtgc5ut96dzn attempt 2/5 delivered to Sentry
+[2026-08-30T23:42:06.377Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a054bc-60ff-74b7-bd2c-a1e3ab983c2c
+[2026-08-30T23:42:06.377Z] [debug] ota: Checking…
+[2026-08-30T23:42:08.922Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-08-30T23:42:08.991Z] [debug] ota: Saving progress…
+[2026-08-30T23:42:08.993Z] [debug] ota: Restarting to apply…
+[2026-08-30T23:42:09.054Z] [debug] ota: boot check result = applied
+[2026-08-30T23:42:09.214Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a05503-b522-7120-a224-c3bd40c41c8b
+[2026-08-30T23:42:09.214Z] [debug] ota: Checking…
+[2026-08-30T23:42:09.284Z] [debug] ota: Already up to date
+[2026-08-30T23:42:09.284Z] [debug] ota: boot check result = noUpdate
+[2026-08-30T23:42:09.324Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-08-30T23:42:09.324Z] [debug] voice: bundled idle
+[2026-08-30T23:42:09.425Z] [debug] send-log: bundle #mtgc5ut96dzn attempt 3/5 delivered to Sentry
+[2026-08-31T00:07:24.004Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a05503-b522-7120-a224-c3bd40c41c8b
+[2026-08-31T00:07:24.004Z] [debug] ota: Checking…
+[2026-08-31T00:07:24.052Z] [debug] ota: Already up to date
+[2026-08-31T00:07:24.053Z] [debug] ota: boot check result = noUpdate
+[2026-08-31T00:07:24.081Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-08-31T00:07:24.081Z] [debug] voice: bundled idle
+[2026-08-31T00:07:24.241Z] [debug] send-log: bundle #mtgc5ut96dzn attempt 4/5 delivered to Sentry
+[2026-08-31T00:07:28.127Z] [debug] OTA session start: 2026-08-30-1581-the-card-they-cannot-walk-past.
+[2026-08-31T00:07:28.127Z] [world] You step back into Great Tartary Plains. The world waits for your move.
+[2026-08-31T00:07:28.127Z] [arbiter] The Arbiter sets the quiet aside. "Welcome back, Cheddar Bob. I kept watch while you were gone."
+
+=== END LOG · 17070 CHARS ===
+
+Tartaria Realms
+
+Device
+  Name: Pixel 10 Pro XL
+  Platform: android 37
+  Hermes: yes
+  Locale: en-US
+  Timezone: America/New_York
+  Screen: window 443×986 / screen 443×986 @ 2.4375x density
+  Captured at: 2026-08-31T00:07:28.354Z
+
+Install
+  App ID: com.hotatticgames.tartarprim
+  App version: 4.32.11
+  APK build version: 2.4.1
+  APK build: 293
+  AAB: (build 293)
+  OTA: (2026-08-30-1581-the-card-they-cannot-walk-past)
+  Boot stage: qwen:deferred
+
+ML runtime health
+  Status: active (no crashes detected)
+  Crash count: 0
+  Last init attempt: 2026-08-31T00:07:24.086Z
+  Last init success: 2026-08-31T00:07:24.554Z
+  Crashes-before-disable threshold: 2
+  Qwen completion guard: clean (no completion crashes)
+  Qwen kernel variant: rnllama_v8_2_fp16_dotprod
+  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k
+  Voice (TTS) guard: clean (no voice crashes on this build)
+Save-load health
+  Status: clean (no load-crash flags)
+Last JS crash
+  Status: none recorded
+Crash ledger — 10 recorded (newest last)
+  • 2026-08-30T00:56:46.075Z (1391m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-08-30-1552-are-you-sure-about-that · stage native:voice:done
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: native:voice:done · 11080ms into the action
+  • 2026-08-30T01:15:03.072Z (1372m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-08-30-1553-glyph-glyph-name-star · stage rendered
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: rendered · 9351ms into the action
+  • 2026-08-30T02:14:43.966Z (1313m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-08-30-1556-two-cudgels-are-two-objects · stage native:cognition:done
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: native:cognition:done · 4739ms into the action
+  • 2026-08-30T03:06:04.800Z (1261m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-08-30-1559-the-coating-ladder-means-something · stage native:cognition:done
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: native:cognition:done · 5502ms into the action
+  • 2026-08-30T08:28:32.485Z (939m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-08-30-1567-the-heartbeat-ate-the-checkpoint · stage native:cognition:done
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: native:cognition:done [q0] · 459ms into the action · alive 0ms after it
+  • 2026-08-30T16:12:35.586Z (475m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-08-30-1569-the-glyph-brings-its-own-ground · stage rendered
+      Process died with no orderly exit while: tap "✦ bandolier (1)"
+      doing: tap "✦ bandolier (1)" · room builders_survey_camp · screen exploration
+      last checkpoint: rendered · 126ms into the action · alive 5884ms after it
+  • 2026-08-30T18:43:29.524Z (324m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-08-30-1571-the-slot-moves-on · stage native:cognition:done
+      Process died with no orderly exit while: action "rest"
+      doing: action "rest" · room great_tartary_plains · screen exploration
+      last checkpoint: native:cognition:done [q0] · 80822ms into the action · alive 0ms after it
+  • 2026-08-30T21:23:57.150Z (164m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-08-30-1578-the-stage-says-who-is-there · stage native:cognition:done
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: native:cognition:done [q0] · 535ms into the action · alive 0ms after it
+  • 2026-08-30T22:25:39.849Z (102m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-08-30-1580-the-guy-who-was-never-there · stage native:cognition:done
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: native:cognition:done [q0] · 329ms into the action · alive 0ms after it
+  • 2026-08-30T23:42:09.758Z (25m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-08-30-1581-the-card-they-cannot-walk-past · stage native:cognition:done
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: native:cognition:done [q0] · 414ms into the action · alive 0ms after it
+Crash delivery: ON — reports go to Sentry when you crash.
+Runtime pressure
+  ⚠⚠ LAST BOOT DIED MID-ACTION — no orderly exit was recorded.
+     Last thing the app did: (no action yet)
+     Where: (unknown) on (unknown) screen
+     Last seen alive: 2026-08-30T23:42:09.758Z (25 min before this boot — the kill landed somewhere in that gap)
+     Last checkpoint reached: native:cognition:done [q0] (+414ms after it)
+     ⚠ The disk log's tail is UNRELIABLE for that session — batched lines
+       die in memory when the JS thread wedges. Trust this line over it.
+  Memory warnings: none this session
+  Freeze watch: no stalls seen (JS clocks only — see the native queue below)
+  Native queue: worst wait 0.0s · 0 job kinds queued >3s · worst 0.0ms/prompt-token
+  App state trail: (none recorded)
+Model contexts
+  Live now: 0
+  Opened: 0 · Released: 0 · Peak live: 0
+  Narration engine: idle

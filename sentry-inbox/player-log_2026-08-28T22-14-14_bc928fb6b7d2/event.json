@@ -1,0 +1,202 @@
+{
+  "id": "bc928fb6b7d241d59cff6e8d6ffb1621",
+  "groupID": "7697053520",
+  "eventID": "bc928fb6b7d241d59cff6e8d6ffb1621",
+  "projectID": "4511945117532160",
+  "size": 17872,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-28-1530-the-stranger-gets-the-screen #mtcgc1vw57ml [inline 24/27]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-28-1530-the-stranger-gets-the-screen #mtcgc1vw57ml [inline 24/27]",
+  "title": "player-log 2026-08-28-1530-the-stranger-gets-the-screen #mtcgc1vw57ml [inline 24/27]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db2f:4653:ad2:ae51:4f0f:3e39",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "7b3fcdf9d94c43a8a477de1aea938687",
+      "span_id": "843b24ec022fd6b6",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "ina recovered. (Day 32, evening)\n[2026-08-28T04:22:23.959Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-28T04:22:23.975Z] [system] \u23f3 Time passed: 8h\n[2026-08-28T04:22:23.984Z] [world] An Eternal Dynasty war party crests the rise \u2014 2 of them, blades already out. They've marked you for standing with the Mud Monarchs.\n",
+      "[2026-08-28T04:22:23.984Z] [arbiter] \"The Eternal Dynasty do not forgive a friend of the Mud Monarchs,\" the Arbiter murmurs. \"Stand, or run \u2014 but decide now.\"\n[2026-08-28T04:22:24.234Z] [cognitive] REST  (258ms)\n[2026-08-28T04:22:29.440Z] [debug] ui: tap \"dodge\"\n[2026-08-28T04:22:29.455Z] [player] dodge\n",
+      "[2026-08-28T04:22:29.455Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=2 hooks=2\n[2026-08-28T04:22:29.457Z] [world] You commit to the dodge. Slip Eternal Dynasty Raider 1's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-08-28T04:22:29.554Z] [combat] Eternal Dynasty Raider 1 \u2014 d20 \u2192 11 + ATK 8 = 19 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n[2026-08-28T04:22:29.554Z] [combat] Dodge \u2014 d20 \u2192 6 + DEX 16 = 22 vs ATK 19. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n",
+      "[2026-08-28T04:22:29.555Z] [world] You slip Eternal Dynasty Raider 1's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n[2026-08-28T04:22:29.558Z] [debug] ac-shift 28\u219231: race/base 12 + gear 24 + title 0 \u2192 trimmed 28 + status 3 | worn: head=Forge-Black Cowl chest=Burl Aegis hands=Wanderer's Worn Gauntlets legs=Spore-Crusted Tassets",
+      " feet=Choir-Bound Boots cloak=Traveler's Cloak\n[2026-08-28T04:22:29.559Z] [combat] Eternal Dynasty Raider 2 \u2014 d20 \u2192 3 + ATK 8 = 11 vs your AC 31 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-28T04:22:29.559Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-08-28T04:22:29.559Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-08-28T04:22:29.560Z] [system] \u23f3 Time passed: 6 min\n[2026-08-28T04:22:30.001Z] [cognitive] neutral  (440ms)\n[2026-08-28T04:22:30.206Z] [debug] ui: tap \"knot-grained gouge\"\n[2026-08-28T04:22:30.207Z] [system] evasive \u2014 harder to hit fades.\n[2026-08-28T04:22:30.227Z] [player] attack with the knot-grained gouge\n",
+      "[2026-08-28T04:22:30.227Z] [debug] parser: intent=attack conf=1.00 verb=attack target=knot grained gouge resolved=Knot-Grained Gouge range=close enemies=2 hooks=2\n[2026-08-28T04:22:30.230Z] [debug] attack: target=Eternal Dynasty Raider 1 range=close reach.bands=[close] reach.label=Knot-Grained Gouge bareHand=false\n",
+      "[2026-08-28T04:22:30.230Z] [arbiter] Ash Storm hangs between you. \"\u22121 to the swing \u2014 see what you can,\" the Arbiter says.\n[2026-08-28T04:22:30.231Z] [debug] attack: visibility penalty \u22121 (Ash Storm)\n[2026-08-28T04:22:30.231Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-08-28T04:22:30.273Z] [world] Your knot-grained gouge comes around in an arc; Eternal Dynasty Raider 1 squares up to meet it.\n[2026-08-28T04:22:30.273Z] [system] \u23f3 Time passed: 6 min\n[2026-08-28T04:22:30.683Z] [cognitive] neutral  (409ms)\n[2026-08-28T04:22:35.413Z] [world] Eternal Dynasty Raider 1 moves first. The pressure is immediate.\n",
+      "[2026-08-28T04:22:35.415Z] [debug] ac-shift 31\u219228: race/base 12 + gear 24 + title 0 \u2192 trimmed 28 + status 0 | worn: head=Forge-Black Cowl chest=Burl Aegis hands=Wanderer's Worn Gauntlets legs=Spore-Crusted Tassets feet=Choir-Bound Boots cloak=Traveler's Cloak\n[2026-08-28T04:22:35.415Z] [combat] Eternal Dynasty Raider 2 \u2014 d20 \u2192 9 + ATK 6 = 15 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-08-28T04:22:35.417Z] [combat] Eternal Dynasty Raider 1 \u2014 d20 \u2192 20 + ATK 6 = 26 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 CRITICAL HIT\n[2026-08-28T04:22:35.418Z] [combat] You \u2014 d20 \u2192 18 + DEX 16 \u2212 1 (Ash Storm) perfect opening (2\u00d7 dice) = 33 vs Eternal Dynasty Raider 1 AC 10 \u2014 \u2713 HIT\n",
+      "[2026-08-28T04:22:35.419Z] [combat] You crack the Eternal Dynasty Raider 1 with the Knot-Grained Gouge for 16 \u2014 half their fight, gone in one blow. They crumple, out cold. (6/22 HP) Loot them before they come to.\n[2026-08-28T04:22:35.420Z] [combat] Eternal Dynasty Raider 1 is out of it. Eternal Dynasty Raider 2 now in your sights.\n",
+      "[2026-08-28T04:22:35.676Z] [combat] Eternal Dynasty Raider 1 deals 2 slashing damage [armor \u221265%, plate \u22123, floor 30%]. You have 56 HP remaining.\n[2026-08-28T04:22:35.676Z] [combat] That's your slashing resist working \u2014 the armor drank most of that hit (2 of 6 got through).\n",
+      "[2026-08-28T04:22:35.980Z] [debug] persist sizes(KB): total=231 player=54 wm=91[rooms=42 events=5 memos=0 npcs=5 defeated=0 tags=1 discovered=0] log=82 scene=4\n[2026-08-28T04:22:39.712Z] [debug] ui: tap \"off: bone crossbow\"\n[2026-08-28T04:22:39.720Z] [world] The ash burns your throat. The breath you spend on this action costs more than usual.\n",
+      "[2026-08-28T04:22:39.771Z] [player] attack with the off-hand bone crossbow\n[2026-08-28T04:22:39.772Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=2 hooks=2\n[2026-08-28T04:22:39.773Z] [debug] attack: target=Eternal Dynasty Raider 2 range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n",
+      "[2026-08-28T04:22:39.774Z] [debug] attack: visibility penalty \u22121 (Ash Storm)\n[2026-08-28T04:22:39.833Z] [world] You raise the bone crossbow toward Eternal Dynasty Raider 2. The room narrows around the both of you.\n[2026-08-28T04:22:39.833Z] [system] \u23f3 Time passed: 6 min\n[2026-08-28T04:22:40.251Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (417ms)\n",
+      "[2026-08-28T04:22:44.864Z] [world] Eternal Dynasty Raider 2 moves first. The pressure is immediate.\n[2026-08-28T04:22:44.866Z] [combat] Eternal Dynasty Raider 2 \u2014 d20 \u2192 11 + ATK 6 = 17 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-28T04:22:44.867Z] [combat] You \u2014 d20 \u2192 5 + DEX 16 \u2212 1 (Ash Storm) = 20 vs Eternal Dynasty Raider 2 AC 10 \u2014 \u2713 HIT\n",
+      "[2026-08-28T04:22:44.868Z] [combat] Piercing flares \u2014 +2 on hit.\n[2026-08-28T04:22:44.868Z] [combat] You crack the Eternal Dynasty Raider 2 with the Bone Crossbow for 13 \u2014 half their fight, gone in one blow. They crumple, out cold. (9/22 HP) Loot them before they come to.\n",
+      "[2026-08-28T04:22:44.869Z] [combat] Nobody left standing \u2014 the fight is yours. You take your time and strip the sleepers where they lie.\n[2026-08-28T04:22:44.870Z] [reward] You strip the unconscious Eternal Dynasty Raider 2 \u2014 Bone Knife, Mud-Warden's Vest, Patched Cloth, Aether Residue, +24 TC. The gear's seen better days (worn from the fight).\n",
+      "[2026-08-28T04:22:44.880Z] [reward] You strip the unconscious Eternal Dynasty Raider 1 \u2014 Bone Knife, Mud-Warden's Vest, Patched Cloth, Aether Residue, +22 TC. The gear's seen better days (worn from the fight).\n[2026-08-28T04:22:44.881Z] [system] \u23f3 Time passed: 12 min\n[2026-08-28T04:22:50.113Z] [debug] ui: tap \"\u2192 ISKAN-VEIL\"\n",
+      "[2026-08-28T04:22:50.133Z] [world] You set out west. Your boots sink half an inch into the mud-flats and pull free with each step.\n[2026-08-28T04:22:50.134Z] [world] What you started here has not finished itself in your absence.\n[2026-08-28T04:22:50.302Z] [debug] ui: tap \"\u2192 ISKAN-VEIL\"\n[2026-08-28T04:22:50.305Z] [world] You walk north. You arrive at Iskan-Veil.\n",
+      "[2026-08-28T04:22:50.305Z] [world] Etched into a fallen lintel you find a map drawn in false ink \u2014 the Labyrinth of Shadows. (Type ENTER LABYRINTH to attempt it.)\n[2026-08-28T04:22:50.306Z] [debug] scene: loc=iskan_veil hub=- arrival=y opening=n passing=n\n[2026-08-28T04:22:50.316Z] [debug] spawn: gear=[Scrap-Forged Breastplate] window=10 roster=new\n",
+      "[2026-08-28T04:22:50.327Z] [arbiter] The Arbiter takes you in. \"Iskan-Veil is lethal country. The things that wake here pull above your weight. 58 HP carries you through Varakush (danger 1). 3/9 Cores recovered. Visit the remaining Lost Capitals. Or move on until you've got your legs under you.\"\n",
+      "[2026-08-28T04:22:50.329Z] [world] You've left The Monarch's Waystation and entered Iskan-Veil. The corridor you came in by is not behind you. This is normal here. Keep walking. It's night. An aetheric spider and a bog hound and a mud giant are already here. east leads to The Monarch's Waystation; south leads to Reclaimer's Stake. Nothing named to the north or west.\n",
+      "[2026-08-28T04:22:50.329Z] [combat] Distance: close / arm's reach. Knot-Grained Gouge \u2713 in range \u00b7 Bone Crossbow \u2713 in range.\n[2026-08-28T04:22:50.330Z] [arbiter] The Arbiter's voice drops. \"This one's beyond you for now \u2014 there's no shame in it. Type 'flee' and put ground between you, and come back when you're harder to kill.\"\n",
+      "[2026-08-28T04:22:50.331Z] [world] [Iskan-Veil] north: open ground \u00b7 east: The Monarch's Waystation (3 tiles, 8 hours) \u00b7 south: Reclaimer's Stake (2 tiles, 5 hours) \u00b7 west: open ground\n[2026-08-28T04:22:50.331Z] [combat] An Aetheric Spider, a Bog Hound, and a Mud Giant close on you. Tap the right-side panel to cycle targets.\n",
+      "[2026-08-28T04:22:50.332Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-08-28T04:22:50.332Z] [arbiter] \"Make the next strike count for two,\" the Arbiter says. \"Tartaria taxes the first.\"\n[2026-08-28T04:22:50.338Z] [world] Iskan-Veil refuses to hold still in your head. The Conspiracy Architects built a maze of false doors and lying corridors, and the far-northwestern light comes in flat ",
+      "and grey through windows that open onto walls. Twice you are sure you've been here already. Twice you are wrong. Or right.\n[2026-08-28T04:22:50.339Z] [arbiter] (Monarch route \u2014 claim the Iskan-Veil Core by force or by tongue. The keepers will yield to threat or to a Monarch's address.)\n",
+      "[2026-08-28T04:22:50.339Z] [arbiter] The Arbiter is quiet for a stretch, then: \"One Core. Most who say they are going after them stop before the first. I have adjusted what I expect of you. Do not make me adjust it back.\"\n[2026-08-28T04:22:54.814Z] [debug] ui: tap \"dodge\"\n[2026-08-28T04:22:54.833Z] [player] dodge\n",
+      "[2026-08-28T04:22:54.834Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=3 hooks=0\n[2026-08-28T04:22:54.836Z] [world] You commit to the dodge. Slip Aetheric Spider's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-08-28T04:22:54.837Z] [combat] The light around Aetheric Spider bends and declines to leave. It spends the beat VEILED \u2014 the next strike will come from somewhere you are not watching.\n[2026-08-28T04:22:54.937Z] [combat] Bog Hound \u2014 d20 \u2192 15 + ATK 6 = 21 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n",
+      "[2026-08-28T04:22:54.938Z] [combat] Dodge \u2014 d20 \u2192 18 + DEX 16 = 34 vs ATK 21. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-08-28T04:22:54.938Z] [world] You slip Bog Hound's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n[2026-08-28T04:22:54.941Z] [combat] Mud Giant closes the distance.\n",
+      "[2026-08-28T04:22:54.941Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-08-28T04:22:54.941Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-28T04:22:54.942Z] [system] \u23f3 Time passed: 6 min\n[2026-08-28T04:22:55.190Z] [cognitive] neutral  (248ms)\n[2026-08-28T04:22:55.998Z] [debug] ui: tap \"knot-grained gouge\"\n",
+      "[2026-08-28T04:22:56.001Z] [system] evasive \u2014 harder to hit fades.\n[2026-08-28T04:22:56.048Z] [player] attack with the knot-grained gouge\n[2026-08-28T04:22:56.049Z] [debug] parser: intent=attack conf=1.00 verb=attack target=knot grained gouge resolved=Knot-Grained Gouge range=close enemies=3 hooks=0\n",
+      "[2026-08-28T04:22:56.050Z] [debug] attack: target=Aetheric Spider range=close reach.bands=[close] reach.label=Knot-Grained Gouge bareHand=false\n[2026-08-28T04:22:56.052Z] [arbiter] Ash Storm hangs between you. \"\u22121 to the swing \u2014 see what you can,\" the Arbiter says.\n[2026-08-28T04:22:56.052Z] [debug] attack: visibility penalty \u22121 (Ash Storm)\n",
+      "[2026-08-28T04:22:56.053Z] [debug] attack: status mods tired -1 \u00b7 perfect opening (2\u00d7 dice)\n[2026-08-28T04:22:56.118Z] [world] Your knot-grained gouge comes around in an arc; Aetheric Spider squares up to meet it.\n[2026-08-28T04:22:56.119Z] [system] \u23f3 Time passed: 6 min\n[2026-08-28T04:22:56.344Z] [cognitive] neutral  (224ms)\n",
+      "[2026-08-28T04:23:02.282Z] [world] Aetheric Spider moves first. The pressure is immediate.\n[2026-08-28T04:23:02.284Z] [combat] Bog Hound \u2014 d20 \u2192 12 + ATK 6 = 18 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-28T04:23:02.286Z] [combat] Mud Giant \u2014 d20 \u2192 3 + ATK 11 = 14 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-08-28T04:23:02.287Z] [combat] Aetheric Spider strikes OUT OF THE VEIL \u2014 the blow comes from nowhere you were watching (+5).\n[2026-08-28T04:23:02.288Z] [combat] Aetheric Spider \u2014 d20 \u2192 16 + ATK 12 = 28 vs your AC 28 \u2014 \u2713 HIT\n[2026-08-28T04:23:02.289Z] [combat] You \u2014 d20 \u2192 4 + DEX 16 \u2212 1 (Ash Storm) tired -1 perfect opening (2\u00d7 dice) = 18 vs Aetheric Spider AC 9 \u2014 \u2713 HIT\n",
+      "[2026-08-28T04:23:02.289Z] [combat] Bludgeoning flares \u2014 +4 on hit.\n[2026-08-28T04:23:02.290Z] [combat] Your blow with the knot-grained gouge lands clean \u2014 25 damage. Aetheric Spider crumples in the dust. The Aetherstone settles.\n[2026-08-28T04:23:02.291Z] [reward] Aetheric Spider defeated. You recover Aether Venom \u00d72.\n",
+      "[2026-08-28T04:23:02.292Z] [combat] 2 attackers remain. Bog Hound now in your sights.\n[2026-08-28T04:23:02.292Z] [reward] \u2726 You feel hardier from your trials. +1 max HP (now 59). [45 enemies defeated]\n[2026-08-28T04:23:02.293Z] [reward] +4 TC pried from the dust.\n[2026-08-28T04:23:02.597Z] [combat] Aetheric Spider deals 2 piercing damage [armor \u221235%]. You have 54 HP remaining.\n",
+      "[2026-08-28T04:23:02.597Z] [combat] Aetheric Spider's strike leaves you poisoned.\n[2026-08-28T04:23:04.118Z] [debug] ui: tap \"off: bone crossbow\"\n[2026-08-28T04:23:04.177Z] [player] attack with the off-hand bone crossbow\n[2026-08-28T04:23:04.178Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=2 hooks=0\n",
+      "[2026-08-28T04:23:04.180Z] [debug] attack: target=Bog Hound range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-08-28T04:23:04.181Z] [debug] attack: visibility penalty \u22121 (Ash Storm)\n[2026-08-28T04:23:04.182Z] [debug] attack: status mods exhausted -2 \u00b7 poisoned -2\n",
+      "[2026-08-28T04:23:04.244Z] [world] You commit forward with the bone crossbow. Bog Hound watches your hands.\n[2026-08-28T04:23:04.244Z] [system] \u23f3 Time passed: 6 min\n[2026-08-28T04:23:04.469Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (224ms)\n",
+      "[2026-08-28T04:23:04.774Z] [debug] persist sizes(KB): total=236 player=56 wm=93[rooms=43 events=5 memos=0 npcs=5 defeated=0 tags=1 discovered=0] log=84 scene=3\n[2026-08-28T04:23:09.483Z] [world] Bog Hound moves first. The pressure is immediate.\n[2026-08-28T04:23:09.485Z] [combat] Mud Giant \u2014 d20 \u2192 8 + ATK 11 = 19 vs your AC 28 (needs nat 16+ \u2014 AC ca"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-28-1530-the-stranger-gets-the-screen #mtcgc1vw57ml [inline 24/27]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtcgc1vw57ml"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "24"
+    },
+    {
+      "key": "parts",
+      "value": "27"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db2f:4653:ad2:ae51:4f0f:3e39",
+      "query": "user.ip:\"2607:fb90:db2f:4653:ad2:ae51:4f0f:3e39\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-28T22:14:15.438964Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-28T22:14:14.841000Z",
+  "fingerprints": [
+    "be748ce85802371e970795a28e86f05d"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "c1ec198abdc8472ebfa49ad54b186fe0",
+  "previousEventID": "a9fbb0a28d0345d099e2d9e4c016d814"
+}

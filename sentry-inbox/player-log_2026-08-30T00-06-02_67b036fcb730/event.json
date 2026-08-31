@@ -1,0 +1,225 @@
+{
+  "id": "67b036fcb730449ea8898f367ccb1a01",
+  "groupID": "7700076616",
+  "eventID": "67b036fcb730449ea8898f367ccb1a01",
+  "projectID": "4511945117532160",
+  "size": 17526,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-29-1548-twenty-more-fires-in-the-dark #mtf18j1mlkuk [inline 2/23]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-29-1548-twenty-more-fires-in-the-dark #mtf18j1mlkuk [inline 2/23]",
+  "title": "player-log 2026-08-29-1548-twenty-more-fires-in-the-dark #mtf18j1mlkuk [inline 2/23]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "befab179691243b6ace3b12a5aacdfb2",
+      "span_id": "a14224f205452869",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "liver (Common)\n[2026-08-28T22:18:32.769Z] [reward]     \u2022 Aether Dust (Common)\n[2026-08-28T22:18:32.769Z] [reward]     \u2022 Cloth Scrap (Common)\n[2026-08-28T22:18:32.769Z] [reward]     \u2022 Automaton Circuit (Common)\n[2026-08-28T22:18:34.663Z] [debug] ui: tap \"investigate\"\n[2026-08-28T22:18:37.507Z] [player] investigate the floor\n",
+      "[2026-08-28T22:18:37.508Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=floor resolved=- range=- enemies=0 hooks=1\n[2026-08-28T22:18:37.510Z] [world] You scan the floor. Something small catches the light, half-kicked under the boards.\n[2026-08-28T22:18:37.510Z] [reward] \u2726 Cloth Scrap.\n[2026-08-28T22:18:37.575Z] [cognitive] neutral  (61ms)\n",
+      "[2026-08-28T22:18:38.745Z] [player] investigate path\n[2026-08-28T22:18:38.746Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=path resolved=path range=- enemies=0 hooks=1\n[2026-08-28T22:18:38.747Z] [world] You look for a way forward. The Arbiter notes a region toward Revivalist Field Camp and a stronghold toward Varakush.\n",
+      "[2026-08-28T22:18:38.749Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-28T22:18:38.749Z] [arbiter] The Arbiter looks around. \"Claim-posts driven in rows, each one a bet against the mud. The Guild plays long odds on purpose.\"\n[2026-08-28T22:18:38.750Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-28T22:18:38.811Z] [cognitive] neutral  (60ms)\n",
+      "[2026-08-28T22:18:40.748Z] [debug] ui: tap \"\u2191 VAULT\"\n[2026-08-28T22:18:40.768Z] [player] go north\n[2026-08-28T22:18:40.769Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=1\n[2026-08-28T22:18:40.770Z] [world] You head on to the Vault.\n[2026-08-28T22:18:40.770Z] [debug] scene: loc=reclaimer_stake hub=outpost_relic_vault arrival=n opening=n passing=n\n",
+      "[2026-08-28T22:18:40.779Z] [debug] spawn: gear=[Wanderer's Footwraps] window=3 roster=new\n[2026-08-28T22:18:40.779Z] [world] Reclaimers' Outpost \u2014 The Relic Vault. Aether-shielded shelves under a high ceiling, the tagged crates of un-identified relics waiting on their assessor. The vault block is the outpost's north junction: the square lies south, the lab west, the workshop east. The strongroom d",
+      "oor at the back is mechanical \u2014 Reclaimer trust over Reclaimer tech.\n[2026-08-28T22:18:40.780Z] [world] Paths: south to Square \u00b7 east to Workshop \u00b7 west to Lab. (Type 'leave outpost' to head into the wilds.)\n[2026-08-28T22:18:40.780Z] [debug] arbiter: template (reason=sprinting)\n[2026-08-28T22:18:40.781Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-08-28T22:18:40.782Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-28T22:18:40.836Z] [cognitive] TRAVEL  (53ms)\n[2026-08-28T22:18:40.901Z] [debug] persist sizes(KB): total=37 player=8 wm=4[rooms=3 events=0 memos=0 npcs=0 defeated=0 tags=0 discovered=0] log=23 scene=2\n[2026-08-28T22:18:41.698Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-28T22:18:43.254Z] [world] You get a hand under the Wanderer's Footwraps and take it.\n[2026-08-28T22:18:43.254Z] [reward] \u2726 Wanderer's Footwraps (Common).\n[2026-08-28T22:18:43.260Z] [debug] take&wear: equipping \"Wanderer's Footwraps\" -> feet\n",
+      "[2026-08-28T22:18:43.282Z] [debug] stats: STR7 DEX9 INT10 WIS4 CHA1 STE6 | gear: INT+1,STR+5,DEX+3,STE+3 | worn: main=Cudgel head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest hands=Wanderer's Worn Gauntlets feet=Wanderer's Footwraps cloak=Reclaimer's Cloak\n[2026-08-28T22:18:44.201Z] [world] You break the door apart. Among the pieces, something worth keeping.\n",
+      "[Filtered]",
+      "[2026-08-28T22:18:44.202Z] [world] You strip the salt-crusted vault relic pedestal carefully. Something usable comes free in your hand.\n[2026-08-28T22:18:44.202Z] [world] Already worked over: shelf.\n[2026-08-28T22:18:44.202Z] [reward] \u2726 Salvage haul:\n[2026-08-28T22:18:44.203Z] [reward]     \u2022 Cloth Scrap x2 (Common)\n[2026-08-28T22:18:44.203Z] [reward]     \u2022 Scrap Metal (Common)\n",
+      "[2026-08-28T22:18:44.203Z] [reward]     \u2022 Slate-Weighted Netting (Common)\n[2026-08-28T22:18:44.203Z] [reward]     \u2022 Aether Dust (Common)\n[2026-08-28T22:18:44.203Z] [reward]     \u2022 Worn Tartarian Coin x6 (Common)\n[2026-08-28T22:18:45.616Z] [debug] ui: tap \"investigate\"\n[2026-08-28T22:18:47.000Z] [player] investigate the floor\n",
+      "[2026-08-28T22:18:47.001Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=floor resolved=- range=- enemies=0 hooks=0\n[2026-08-28T22:18:47.002Z] [world] You give the floor a once-over. Clean enough to fail you.\n[2026-08-28T22:18:47.002Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n",
+      "[2026-08-28T22:18:47.003Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-28T22:18:47.074Z] [cognitive] neutral  (70ms)\n[2026-08-28T22:18:48.231Z] [player] investigate tag\n[2026-08-28T22:18:48.232Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=tag resolved=tag range=- enemies=0 hooks=0\n",
+      "[2026-08-28T22:18:48.233Z] [world] The tag reads as ordinary, which in Tartaria is a small kind of relief. You leave it be.\n[2026-08-28T22:18:48.290Z] [debug] ui: tap \"\u2192 WORKSHOP\"\n[2026-08-28T22:18:48.295Z] [player] go east\n[2026-08-28T22:18:48.295Z] [debug] parser: intent=travel conf=1.00 verb=go target=east resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-08-28T22:18:48.296Z] [world] You head on to the Workshop.\n[2026-08-28T22:18:48.296Z] [debug] scene: loc=reclaimer_stake hub=outpost_workshop arrival=n opening=n passing=n\n[2026-08-28T22:18:48.305Z] [debug] spawn: gear=[Pyric Wand, Earthshaker] window=4 roster=new\n",
+      "[2026-08-28T22:18:48.306Z] [world] Reclaimers' Outpost \u2014 The Workshop. Tarek the Tinkerer's domain \u2014 half-disassembled drones on every bench, sparking conduits, and a runecaster being calibrated in a vise. Smell of ozone and burnt mud. The only way back is the door you came in by.\n[2026-08-28T22:18:48.306Z] [world] Paths: west to Vault. (Type 'leave outpost' to head into the wilds.)\n",
+      "[2026-08-28T22:18:48.307Z] [world] A figure crests the rise \u2014 Tarek the Tinkerer, Mechanical Outfitter, pack heavy across the shoulders. They set down to trade.\n[2026-08-28T22:18:48.307Z] [arbiter] The Arbiter inclines their head toward the newcomer. \"Tarek the Tinkerer, Mechanical Outfitter. Eccentric and energetic, Tarek runs a Reclaimer workshop full of half-finished gadgets. Carries golem part",
+      "s and experimental gear.\"\n[2026-08-28T22:18:48.312Z] [world] Rare workings for sale: Violet Cap Distillate (200 TC), Void Edge (500 TC), Voidspawn Bolt (200 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n",
+      "[2026-08-28T22:18:48.312Z] [world] Tarek the Tinkerer offers a contract: \"Scrap Run.\" (Say 'accept scrap' or open Contracts for details.)\n[2026-08-28T22:18:48.312Z] [world] Tarek the Tinkerer points at the bounty board: \"Silence the Doubter.\" (Say 'accept doubter' or open Contracts.)\n[2026-08-28T22:18:48.312Z] [debug] arbiter: template (reason=outpost-room)\n",
+      "[2026-08-28T22:18:48.312Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-28T22:18:48.362Z] [cognitive] neutral  (127ms)\n[2026-08-28T22:18:48.406Z] [cognitive] neutral  (92ms)\n[2026-08-28T22:18:49.215Z] [debug] ui: tap \"take / salvage\"\n[2026-08-28T22:18:50.601Z] [world] You claim the Earthshaker.\n[2026-08-28T22:18:50.602Z] [reward] \u2726 Earthshaker (Common).\n",
+      "[2026-08-28T22:18:50.606Z] [debug] take&wear: equipping \"Earthshaker\" -> off\n[2026-08-28T22:18:50.623Z] [debug] stats: STR7 DEX9 INT11 WIS4 CHA1 STE6 | gear: INT+2,STR+5,DEX+3,STE+3 | worn: main=Cudgel off=Earthshaker head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest hands=Wanderer's Worn Gauntlets feet=Wanderer's Footwraps cloak=Reclaimer's Cloak\n",
+      "[2026-08-28T22:18:51.379Z] [debug] qwen\u23f1 investigate_lore ok 3017ms read 2115ms/write 836ms in 126t\u2192out 27t 16.8ms/t (117ch)\n[2026-08-28T22:18:55.471Z] [world] The Pyric Wand comes up out of the silt with a small sucking protest.\n[2026-08-28T22:18:55.472Z] [reward] \u2726 Pyric Wand (Common).\n",
+      "[2026-08-28T22:18:55.593Z] [debug] persist sizes(KB): total=47 player=9 wm=5[rooms=4 events=0 memos=0 npcs=0 defeated=0 tags=0 discovered=0] log=30 scene=2\n[2026-08-28T22:18:56.351Z] [world] You work the bench over. A part of it comes loose, intact.\n[2026-08-28T22:18:56.351Z] [world] You strip the broken library archive console carefully. Something usable comes free in your hand.\n",
+      "[2026-08-28T22:18:56.351Z] [world] You break the crate apart. Among the pieces, something worth keeping.\n[2026-08-28T22:18:56.352Z] [world] You work the dust-buried hidden weapon locker over. A part of it comes loose, intact.\n[2026-08-28T22:18:56.352Z] [world] You break the weathered royal vault pedestal apart. Among the pieces, something worth keeping.\n",
+      "[2026-08-28T22:18:56.352Z] [reward] \u2726 Salvage haul:\n[2026-08-28T22:18:56.352Z] [reward]     \u2022 Bent Nail x3 (Common)\n[2026-08-28T22:18:56.353Z] [reward]     \u2022 Automaton Circuit x2 (Common)\n[2026-08-28T22:18:56.353Z] [reward]     \u2022 Scrap Metal x3 (Common)\n[2026-08-28T22:18:56.353Z] [reward]     \u2022 Worn Tartarian Coin x3 (Common)\n[2026-08-28T22:18:58.484Z] [debug] ui: tap \"\u2190 \u2713 VAULT\"\n",
+      "[2026-08-28T22:18:58.504Z] [player] go west\n[2026-08-28T22:18:58.504Z] [debug] parser: intent=travel conf=1.00 verb=go target=west resolved=- range=- enemies=0 hooks=0\n[2026-08-28T22:18:58.505Z] [world] You head on to the Vault.\n[2026-08-28T22:18:58.506Z] [debug] scene: loc=reclaimer_stake hub=outpost_relic_vault arrival=n opening=n passing=n\n",
+      "[2026-08-28T22:18:58.510Z] [world] Reclaimers' Outpost \u2014 The Relic Vault. Aether-shielded shelves under a high ceiling, the tagged crates of un-identified relics waiting on their assessor. The vault block is the outpost's north junction: the square lies south, the lab west, the workshop east. The strongroom door at the back is mechanical \u2014 Reclaimer trust over Reclaimer tech.\n",
+      "[2026-08-28T22:18:58.511Z] [world] You have been here. The shape of it comes back before the details do.\n[2026-08-28T22:18:58.511Z] [world] Paths: south to Square \u00b7 east to Workshop \u00b7 west to Lab. (Type 'leave outpost' to head into the wilds.)\n[2026-08-28T22:18:58.511Z] [system] Weather effect \u2014 Aetheric Storm: +1 INT \u00b7 -1 WIS\n[2026-08-28T22:18:58.678Z] [cognitive] TRAVEL  (163ms)\n",
+      "[2026-08-28T22:19:00.186Z] [debug] ui: tap \"\u2190 LAB\"\n[2026-08-28T22:19:00.213Z] [player] go west\n[2026-08-28T22:19:00.214Z] [debug] parser: intent=travel conf=1.00 verb=go target=west resolved=- range=- enemies=0 hooks=0\n[2026-08-28T22:19:00.215Z] [world] You head on to the Lab.\n[2026-08-28T22:19:00.215Z] [debug] scene: loc=reclaimer_stake hub=outpost_lab arrival=n opening=n passing=n\n",
+      "[2026-08-28T22:19:00.234Z] [debug] spawn: gear=[Mud-Walker Mask, Aetheric Scout Greaves, Titan's Swiftstep Boots] window=6 roster=new\n[2026-08-28T22:19:00.235Z] [world] Reclaimers' Outpost \u2014 The Aether Lab. A small room of glass jars, Aether-charged crystals, and chalkboards covered in cramped handwriting. Jorah looks up from a tome when you enter \u2014 unhurried, curious. The lab is a cul-de-sac off ",
+      "the vault block; you leave the way you came.\n[2026-08-28T22:19:00.236Z] [world] Paths: east to Vault. (Type 'leave outpost' to head into the wilds.)\n[2026-08-28T22:19:00.236Z] [world] Jorah the Scholar (Tomekeeper) is already here when you arrive, stall half-unpacked. They look up and nod once.\n",
+      "[2026-08-28T22:19:00.236Z] [arbiter] The Arbiter inclines their head toward the newcomer. \"Jorah the Scholar, Tomekeeper. Kind and knowledgeable, Jorah keeps a stall at the Reclaimers' University. Focuses on wisdom-based items, scrolls, and staves.\"\n",
+      "[2026-08-28T22:19:00.244Z] [world] Rare workings for sale: Shadow Caller (200 TC), Stormcaller (200 TC), Titan's Iron Band (200 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n",
+      "[2026-08-28T22:19:00.245Z] [world] Jorah the Scholar nods at a mystery notice: \"Fragment of the Red Tower.\" (Say 'accept tower' or open Contracts.)\n[2026-08-28T22:19:00.248Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-28T22:19:00.308Z] [cognitive] TRAVEL  (59ms)\n[2026-08-28T22:19:01.200Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-28T22:19:02.669Z] [world] The Aetheric Scout Greaves was half under something. It is not now.\n[2026-08-28T22:19:02.669Z] [reward] \u2726 Aetheric Scout Greaves (Common).\n[2026-08-28T22:19:02.671Z] [debug] take&wear: equipping \"Aetheric Scout Greaves\" -> legs\n",
+      "[2026-08-28T22:19:02.689Z] [debug] stats: STR7 DEX11 INT11 WIS4 CHA1 STE6 | gear: INT+2,STR+5,DEX+5,STE+3 | worn: main=Cudgel off=Earthshaker head=Reclaimer's Salvage Cap chest=Mud-Warden's Vest hands=Wanderer's Worn Gauntlets legs=Aetheric Scout Greaves feet=Wanderer's Footwraps cloak=Reclaimer's Cloak\n",
+      "[2026-08-28T22:19:03.903Z] [world] You work the Mud-Walker Mask loose from where the mud had it.\n[2026-08-28T22:19:03.904Z] [reward] \u2726 Mud-Walker Mask (Common).\n[2026-08-28T22:19:03.912Z] [world] The Titan's Swiftstep Boots had settled into the ground. You unsettle it.\n[2026-08-28T22:19:03.912Z] [reward] \u2726 Titan's Swiftstep Boots (Common).\n",
+      "[2026-08-28T22:19:05.016Z] [world] You salvage the desk. The take is small but real.\n[2026-08-28T22:19:05.016Z] [world] You strip the lantern carefully. Something usable comes free in your hand.\n[2026-08-28T22:19:05.016Z] [world] You work the mud-glazed vault relic pedestal over. A part of it comes loose, intact.\n",
+      "[2026-08-28T22:19:05.016Z] [world] You break the shattered aether-tether grapple point apart. Among the pieces, something worth keeping.\n[2026-08-28T22:19:05.017Z] [world] You salvage the shattered tartarian power conduit. The take is small but real.\n[2026-08-28T22:19:05.017Z] [world] You salvage the shelf. The take is small but real.\n",
+      "[2026-08-28T22:19:05.017Z] [world] You strip the tome carefully. Something usable comes free in your hand.\n[2026-08-28T22:19:05.017Z] [reward] \u2726 Salvage haul:\n[2026-08-28T22:19:05.017Z] [reward]     \u2022 Spider Silk x2 (Common)\n[2026-08-28T22:19:05.018Z] [reward]     \u2022 Aether Crystal x3 (Common)\n[2026-08-28T22:19:05.018Z] [reward]     \u2022 Aether Dust x2 (Common)\n",
+      "[2026-08-28T22:19:05.018Z] [reward]     \u2022 Worn Tartarian Coin x7 (Common)\n[2026-08-28T22:19:05.203Z] [debug] persist sizes(KB): total=58 player=10 wm=7[rooms=5 events=0 memos=0 npcs=0 defeated=0 tags=0 discovered=0] log=38 scene=3\n[2026-08-28T22:19:06.919Z] [debug] ui: tap \"\u2192 \u2713 VAULT\"\n[2026-08-28T22:19:06.940Z] [player] go east\n",
+      "[2026-08-28T22:19:06.941Z] [debug] parser: intent=travel conf=1.00 verb=go target=east resolved=- range=- enemies=0 hooks=0\n[2026-08-28T22:19:06.941Z] [world] You head on to the Vault.\n[2026-08-28T"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-29-1548-twenty-more-fires-in-the-dark #mtf18j1mlkuk [inline 2/23]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtf18j1mlkuk"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "2"
+    },
+    {
+      "key": "parts",
+      "value": "23"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-30T00:06:02.569187Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "10": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 388,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-30T00:06:02.978000Z",
+  "fingerprints": [
+    "14c799cb88dcf9f9206b5cbcc59d3a6a"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "77f33536e9df4ac2a0216fb125304147",
+  "previousEventID": "63e8ce4373e54892b1184c4e43e3a20b"
+}

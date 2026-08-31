@@ -1,0 +1,196 @@
+{
+  "id": "b22f2b80c3274b1e8c0918845ab7cce7",
+  "groupID": "7700163529",
+  "eventID": "b22f2b80c3274b1e8c0918845ab7cce7",
+  "projectID": "4511945117532160",
+  "size": 17837,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-30-1553-glyph-glyph-name-star #mtf482aclxul [inline 18/24]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-30-1553-glyph-glyph-name-star #mtf482aclxul [inline 18/24]",
+  "title": "player-log 2026-08-30-1553-glyph-glyph-name-star #mtf482aclxul [inline 18/24]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Trafford",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "a4ac0471fac548c495b866ce7dc8146d",
+      "span_id": "b07e00e817bb34b8",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "e conf=1.00 verb=investigate target=small fire resolved=small fire range=- enemies=0 hooks=1\n[2026-08-29T23:28:22.444Z] [world] The small fire sits the way ordinary things sit. The Arbiter does not lean in. You move on.\n[2026-08-29T23:28:22.528Z] [cognitive] neutral  (82ms)\n[2026-08-29T23:28:23.692Z] [player] investigate shelf\n",
+      "[2026-08-29T23:28:23.693Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=shelf resolved=- range=- enemies=0 hooks=1\n[2026-08-29T23:28:23.695Z] [world] You sift the shelf and pull out a piece worth keeping.\n[2026-08-29T23:28:23.696Z] [reward] \u2726 Bone Crossbow (Uncommon).\n[2026-08-29T23:28:23.697Z] [system] \u23f3 Time passed: 15 min\n",
+      "[2026-08-29T23:28:24.421Z] [debug] qwen\u23f1 investigate_lore ok 1902ms read 1245ms/write 632ms in 127t\u2192out 20t 9.8ms/t (86ch)\n[2026-08-29T23:28:24.596Z] [cognitive] neutral  (899ms)\n[2026-08-29T23:28:26.365Z] [debug] ui: tap \"climb down\"\n[2026-08-29T23:28:26.384Z] [player] climb down\n",
+      "[2026-08-29T23:28:26.384Z] [debug] parser: intent=climb conf=1.00 verb=climb target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-29T23:28:26.385Z] [world] You climb down from the pilgrim's perch and rejoin the ground beside the ladder. Boots back on the ground.\n[2026-08-29T23:28:26.386Z] [system] \u23f3 Time passed: 15 min\n[2026-08-29T23:28:26.480Z] [cognitive] CLIMB  (93ms)\n",
+      "[2026-08-29T23:28:35.144Z] [debug] send-log: #mtf0hncu56cv \u2014 DELIVERED (inline, no attachments): beacon out, 18/18 parts accepted (262052 chars) \u2014 flush said yes\n[2026-08-29T23:28:35.146Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mtf0hncu56cv kept on disk, boots retry up to 5 sends total\n[2026-08-29T23:28:37.799Z] [debug] homework: intro-fill armed after 7263ms idle\n",
+      "[2026-08-29T23:28:38.720Z] [debug] persist sizes(KB): total=142 player=22 wm=38[rooms=13 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=79 scene=3\n[2026-08-29T23:28:43.468Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 5571ms read 0ms/write 0ms in 737t\u2192out 0t (0ch)\n[2026-08-29T23:28:43.477Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 5571ms \u2014 intro-fill:\u2205\n",
+      "[2026-08-29T23:28:43.477Z] [debug] homework: scene_intro \"Iskan-Veil\" \u2205 5680ms\n[2026-08-29T23:28:44.321Z] [debug] voice\u23f1 gap 4823ms (wait 3958ms + synth 848ms, live) \"Choose your character.\"\n[2026-08-29T23:28:49.876Z] [debug] appstate: active \u2192 background (was active for 277346ms)\n[2026-08-29T23:30:20.305Z] [debug] appstate: background \u2192 active (was background for 90424ms)\n",
+      "[2026-08-29T23:30:20.320Z] [debug] homework: intro-fill armed after 7238ms idle\n[2026-08-29T23:30:24.538Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 4169ms read/write unusable (native mis-reported 105418ms/1182ms \u2014 llama.rn split bug, not this call) in 737t\u2192out 33t HIT-CAP (174ch)\n",
+      "[2026-08-29T23:30:24.555Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 4169ms \u2014 intro-fill:action-opener\n[2026-08-29T23:30:24.556Z] [debug] homework: scene_intro \"Iskan-Veil\" \u2713 4238ms\n[2026-08-29T23:30:34.613Z] [debug] ctx: RELEASED \u2014 live=0 (opened=1 released=1)\n[2026-08-29T23:30:34.659Z] [debug] appstate: active \u2192 background (was active for 14359ms)\n",
+      "[2026-08-29T23:30:35.938Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a04fda-0843-7cb2-9480-9136533ae9db\n[2026-08-29T23:30:35.938Z] [debug] ota: Checking\u2026\n[2026-08-29T23:30:36.144Z] [debug] ota: Already up to date\n[2026-08-29T23:30:36.145Z] [debug] ota: boot check result = noUpdate\n[2026-08-29T23:30:36.216Z] [debug] voice: engine=bundled tts=on voice=am_michael\n",
+      "[2026-08-29T23:30:36.216Z] [debug] voice: bundled loading\n[2026-08-29T23:30:36.653Z] [debug] send-log: bundle #mtf0hncu56cv attempt 2/5 delivered to Sentry\n[2026-08-29T23:30:38.313Z] [debug] voice: bundled downloading\n[2026-08-29T23:33:16.621Z] [debug] voice: bundled loading\n[2026-08-29T23:33:18.319Z] [debug] voice: bundled ready\n",
+      "[2026-08-29T23:33:19.260Z] [debug] voice\u23f1 gap 892ms (wait 51ms + synth 839ms, live) \"Choose your character.\"\n[2026-08-29T23:33:37.765Z] [debug] OTA applied: 2026-08-29-1547-the-conversation-holds-the-floor \u2192 2026-08-29-1548-twenty-more-fires-in-the-dark.\n[2026-08-29T23:33:37.765Z] [debug] OTA session start: 2026-08-29-1548-twenty-more-fires-in-the-dark.\n",
+      "[2026-08-29T23:33:37.765Z] [world] You step back into Reclaimer's Stake. The world waits for your move.\n[2026-08-29T23:33:37.765Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. \"Welcome back, Cheddar Bob. We've still got ground to cover, you and I.\"\n",
+      "[2026-08-29T23:33:37.919Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-29T23:33:37.917Z \u00b7 build 2026-08-29-1548-twenty-more-fires-in-the-dark \u00b7 updated from 2026-08-29-1547-the-conversation-holds-the-floor \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-08-29T23:33:53.040Z] [world] Re-activated Silence the Doubter. It's back in play.\n",
+      "[2026-08-29T23:34:03.153Z] [world] You set course for Great Tartary Plains. 19 tiles \u2014 about 2 days of travel, all in. You set off now \u2014 the ground ahead is new ground. Keep tapping \u2192 GREAT TARTARY PLAINS on the travel row to close the distance; STOP TRAVEL to halt.\n",
+      "[2026-08-29T23:34:03.196Z] [world] You walk east. The ground here looks much like the ground behind you. You have lost track of distance.\n[2026-08-29T23:34:03.197Z] [world] The thread you were following waits where you left it.\n[2026-08-29T23:34:06.010Z] [debug] ui: tap \"ENTER\"\n[2026-08-29T23:34:06.012Z] [world] You step inside the quiet outbuilding, into the shed.\n",
+      "[2026-08-29T23:34:06.013Z] [world] Tools hang on pegs over a scarred workbench; the air is oil and dust. The floorboards by the bench sit oddly proud, as if something underneath pushes them up.\n[2026-08-29T23:34:06.020Z] [world] Something stirs in the dark of the place \u2014 a shape peeling itself up off the floor where the mud had set it.\n",
+      "[2026-08-29T23:34:06.020Z] [arbiter] You've heard of these on the road: the Aetherkin, the ones the mud drowned and the Aether raised back up.\n[2026-08-29T23:34:06.021Z] [world] In life it was a lamplighter, a cold dead wick clutched to their chest like a charm \u2014 there's a ring worn thin on one finger; someone loved them, whoever they were. This was their home. They have not left it in a very long",
+      " time, and did not mean to now.\n[2026-08-29T23:34:06.021Z] [world] There's no hunger in it, only fright. It shrinks from your step, then squares up on trembling legs \u2014 it will defend itself, and nothing more.\n[2026-08-29T23:34:11.611Z] [debug] ui: tap \"step back\"\n[2026-08-29T23:34:11.623Z] [player] step back\n",
+      "[2026-08-29T23:34:11.624Z] [debug] parser: intent=retreat conf=1.00 verb=stepback target=- resolved=- range=mid enemies=1 hooks=0\n[2026-08-29T23:34:11.626Z] [debug] move: retreat from range=mid enemies=1 weather=Ash Storm cost=1 partial=0\n[2026-08-29T23:34:11.626Z] [debug] move: field retreat target=Drowned Aetherkin d 1.50->2.50 band mid->far\n",
+      "[2026-08-29T23:34:11.627Z] [world] You pull back from Drowned Aetherkin. (range: far)\n[2026-08-29T23:34:11.633Z] [combat] Drowned Aetherkin \u2014 d20 \u2192 1 + ATK 2 = 3 vs your AC 19 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 FUMBLE\n[2026-08-29T23:34:11.792Z] [cognitive] neutral  (157ms)\n[2026-08-29T23:34:12.275Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n",
+      "[2026-08-29T23:34:12.388Z] [debug] ui: tap \"step back\"\n[2026-08-29T23:34:12.392Z] [player] step back\n[2026-08-29T23:34:12.392Z] [debug] parser: intent=retreat conf=1.00 verb=stepback target=- resolved=- range=far enemies=1 hooks=0\n[2026-08-29T23:34:12.393Z] [debug] move: retreat from range=far enemies=1 weather=Ash Storm cost=1 partial=0\n",
+      "[2026-08-29T23:34:12.393Z] [debug] move: field retreat target=Drowned Aetherkin d 2.50->3.50 band far->distant\n[2026-08-29T23:34:12.393Z] [world] You pull back from Drowned Aetherkin. (range: distant)\n[2026-08-29T23:34:12.394Z] [combat] Drowned Aetherkin \u2014 d20 \u2192 20 + ATK 2 = 22 vs your AC 19 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 CRITICAL HIT\n",
+      "[2026-08-29T23:34:12.502Z] [combat] Drowned Aetherkin deals 7 aetheric damage [armor \u221239%] [edge of reach \u2014 halved] +3 electrical [Aetheric Scout Greaves took it]. You have 18 HP remaining.\n[2026-08-29T23:34:12.595Z] [cognitive] neutral  (108ms)\n[2026-08-29T23:34:13.528Z] [debug] ui: tap \"off: earthshaker\"\n[2026-08-29T23:34:13.569Z] [player] attack with the off-hand earthshaker\n",
+      "[2026-08-29T23:34:13.570Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand earthshaker resolved=Earthshaker range=distant enemies=1 hooks=0\n[2026-08-29T23:34:13.572Z] [debug] attack: target=Drowned Aetherkin range=distant reach.bands=[distant,far,mid,close] reach.label=Earthshaker bareHand=false\n[2026-08-29T23:34:13.573Z] [debug] attack: visibility penalty \u22121 (Ash Storm)\n",
+      "[2026-08-29T23:34:13.591Z] [world] You bring the earthshaker to bear on Drowned Aetherkin.\n[2026-08-29T23:34:13.591Z] [system] \u23f3 Time passed: 6 min\n[2026-08-29T23:34:13.696Z] [cognitive] AGGRESSION \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (104ms)\n[2026-08-29T23:34:18.353Z] [world] Drowned Aetherkin moves first. The pressure is immediate.\n",
+      "[2026-08-29T23:34:18.355Z] [combat] Drowned Aetherkin \u2014 d20 \u2192 18 + ATK 2 = 20 vs your AC 19 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-08-29T23:34:18.356Z] [combat] You \u2014 d20 \u2192 11 + INT 12 \u2212 1 (Ash Storm) = 22 vs Drowned Aetherkin AC 8 \u2014 \u2713 HIT\n[2026-08-29T23:34:18.357Z] [combat] Clean hit with the earthshaker for 2. Drowned Aetherkin has 43 left and does not back away.\n",
+      "[2026-08-29T23:34:18.358Z] [arbiter] The Arbiter watches the drowned aetherkin. \"It is not the first thing here that decided to keep its distance, then changed its mind.\"\n[2026-08-29T23:34:18.475Z] [combat] Drowned Aetherkin deals 6 aetheric damage [armor \u221239%] [edge of reach \u2014 halved] +3 electrical [Reclaimer's Scrapplate took it]. You have 12 HP remaining.\n",
+      "[2026-08-29T23:34:19.463Z] [debug] ui: tap \"dodge\"\n[2026-08-29T23:34:19.474Z] [player] dodge\n[2026-08-29T23:34:19.475Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=distant enemies=1 hooks=0\n",
+      "[2026-08-29T23:34:19.476Z] [world] You commit to the dodge. Slip Drowned Aetherkin's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-08-29T23:34:19.506Z] [combat] Drowned Aetherkin \u2014 d20 \u2192 3 + ATK 2 = 5 vs your AC 19 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n",
+      "[2026-08-29T23:34:19.506Z] [combat] Dodge \u2014 d20 \u2192 7 + DEX 16 = 23 vs ATK 5. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-08-29T23:34:19.506Z] [debug] arbiter: template (reason=combat)\n[2026-08-29T23:34:19.507Z] [arbiter] \"Footwork over fury,\" the Arbiter says quietly. \"The drowned aetherkin is patient. Be patienter.\"\n[2026-08-29T23:34:19.507Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-29T23:34:19.617Z] [cognitive] neutral  (109ms)\n[2026-08-29T23:34:20.130Z] [debug] ui: tap \"off: earthshaker\"\n[2026-08-29T23:34:20.173Z] [player] attack with the off-hand earthshaker\n[2026-08-29T23:34:20.174Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand earthshaker resolved=Earthshaker range=distant enemies=1 hooks=0\n",
+      "[2026-08-29T23:34:20.174Z] [debug] attack: target=Drowned Aetherkin range=distant reach.bands=[distant,far,mid,close] reach.label=Earthshaker bareHand=false\n[2026-08-29T23:34:20.175Z] [debug] attack: visibility penalty \u22121 (Ash Storm)\n[2026-08-29T23:34:20.176Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-08-29T23:34:20.193Z] [world] You bring the earthshaker to bear on Drowned Aetherkin.\n[2026-08-29T23:34:20.193Z] [system] \u23f3 Time passed: 6 min\n[2026-08-29T23:34:20.285Z] [cognitive] AGGRESSION \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (91ms)\n[2026-08-29T23:34:20.461Z] [debug] persist sizes(KB): total=140 player=25 wm=32[rooms=8 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=80 scene=2\n",
+      "[2026-08-29T23:34:24.699Z] [world] Drowned Aetherkin moves first. The pressure is immediate.\n[2026-08-29T23:34:24.701Z] [combat] Drowned Aetherkin \u2014 d20 \u2192 19 + ATK 2 = 21 vs your AC 19 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-08-29T23:34:24.702Z] [combat] You \u2014 d20 \u2192 17 + INT 12 \u2212 1 (Ash Storm) perfect opening (2\u00d7 dice) = 28 vs Drowned Aetherkin AC 8 \u2014 \u2713 HIT\n",
+      "[2026-08-29T23:34:24.706Z] [combat] The blow with the earthshaker finds purchase \u2014 5 damage, 38 HP standing. Drowned Aetherkin commits to the counter.\n[2026-08-29T23:34:24.706Z] [arbiter] The Arbiter does not look away from the drowned aetherkin. \"Decide quickly. It already has.\"\n",
+      "[2026-08-29T23:34:24.822Z] [combat] Drowned Aetherkin deals 4 aetheric damage [edge of reach \u2014 halved] +1 electrical [Reclaimer's Scrapplate took it]. You have 8 HP remaining.\n[2026-08-29T23:34:24.822Z] [combat] The aetheric went through clean \u2014 nothing you're wearing resists aetheric. A matching coating worked into your armor would blunt the next one.\n",
+      "[2026-08-29T23:34:26.731Z] [debug] ui: tap \"stealth\"\n[2026-08-29T23:34:26.736Z] [player] sneak\n[2026-08-29T23:34:26.737Z] [debug] parser: intent=stealth conf=1.00 verb=sneak target=- resolved=- range=distant enemies=1 hooks=0\n[2026-08-29T23:34:26.770Z] [system] \u23f3 Time passed: 15 min\n[2026-08-29T23:34:26.876Z] [cognitive] DISENGAGE \u00b7 HIDE \u00b7 TAKE_COVER  (105ms)\n",
+      "[2026-08-29T23:34:28.334Z] [debug] skillcheck: stealth d20=2 STE 6 = 8 vs DC 12 \u2014 Hard \u2192 FAIL\n[2026-08-29T23:34:28.382Z] [debug] stats: STR6 DEX16 INT12 WIS4 CHA2 STE6 | gear: DEX+10,INT+3,STR+3,STE+3 | worn: main=Cudgel off=Earthshaker head=Forgotten Seeker's Mask chest=Reclaimer's Scrapplate hands=Wanderer's Worn Gauntlets legs=Aetheric Scout Greaves feet=Wanderer's Footwraps cloak=Reclaimer's C",
+      "loak ring=Light-Finger Guild Band\n[2026-08-29T23:34:28.382Z] [world] Your foot scrapes stone. Something stirs in the dark.\n[2026-08-29T23:34:28.384Z] [combat] Drowned Aetherkin \u2014 d20 \u2192 10 + ATK 2 = 12 vs your AC 19 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-29T23:34:29.351Z] [debug] ui: tap \"off: earthshaker\"\n[2026-08-29T23:34:29.393Z] [player] attack with the off-hand earthshaker\n",
+      "[2026-08-29T23:34:29.394Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand earthshaker resolved=Earthshaker range=distant enemies=1 hooks=0\n[2026-08-29T23:34:29.394Z] [debug] attack: target=Drowned Aetherkin range=distant reach.bands=[distant,far,mid,close] reach.label=Earthshaker bareHand=false\n[2026-08-29T23:34:29.395Z] [debug] attack: visibility penalty \u22121 (Ash Storm)\n",
+      "[2026-08-29T23:34:29.413Z] [world] You commit forward with the earthshaker. Drowned Aetherkin watches your hands.\n[2026-08-29T23:34:29.413Z] [system] \u23f3 Time passed: 6 min\n[2026-08-29T23:34:29.505Z] [cognitive] AGGRESSION \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (91ms)\n[2026-08-29T23:34:36.056Z] [world] You seize the initiative. Drowned Aetherkin has no time to react.\n",
+      "[2026-08-29T23:34:36.056Z] [combat] You \u2014 d20 \u2192 9 + INT 12 \u2212 1 (Ash Storm) = 20 vs Drowned Aetherkin AC 8 \u2014 \u2713 HIT\n[2026-08-29T23:34:36.058Z] [combat] Your strike with the earthshaker lands for 2. Drowned Aetherkin staggers \u2014 36 HP remaining. It answers.\n[2026-08-29T23:34:36.059Z] [combat] Drowned Aetherkin \u2014 d20 \u2192 17 + ATK 2 = 19 vs your AC 19 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[20"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-30-1553-glyph-glyph-name-star #mtf482aclxul [inline 18/24]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtf482aclxul"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "18"
+    },
+    {
+      "key": "parts",
+      "value": "24"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+      "query": "user.ip:\"2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-30T01:13:04.961446Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-30T01:13:05.310000Z",
+  "fingerprints": [
+    "c137ae228baf9f502d72cd2165ea9978"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "b26d79958fc744b6bbdd58c5f53c9164",
+  "previousEventID": "acc26424db884bf3b7e90cb708189999"
+}

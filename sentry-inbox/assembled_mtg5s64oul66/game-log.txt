@@ -1,0 +1,117 @@
+=== TARTARIA LOG · 1075 CHARS · BEGIN ===
+[2026-08-30T18:43:30.754Z] [debug] persist sizes(KB): total=102 player=37 wm=61[rooms=30 events=1 memos=0 npcs=1 defeated=1 tags=0 discovered=0] log=0 scene=3
+[2026-08-30T18:44:24.801Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a053da-1891-7b49-8e92-321b7cba6e67
+[2026-08-30T18:44:24.802Z] [debug] ota: Checking…
+[2026-08-30T18:44:24.865Z] [debug] ota: Already up to date
+[2026-08-30T18:44:24.865Z] [debug] ota: boot check result = noUpdate
+[2026-08-30T18:44:24.921Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-08-30T18:44:24.922Z] [debug] voice: bundled idle
+[2026-08-30T18:44:25.206Z] [debug] send-log: bundle #mtg55shijei7 attempt 2/5 delivered to Sentry
+[2026-08-30T18:44:28.734Z] [debug] OTA session start: 2026-08-30-1571-the-slot-moves-on.
+[2026-08-30T18:44:28.734Z] [world] You step back into Great Tartary Plains. The world waits for your move.
+[2026-08-30T18:44:28.734Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. "Welcome back, Cheddar Bob. We've still got ground to cover, you and I."
+
+=== END LOG · 1075 CHARS ===
+
+Tartaria Realms
+
+Device
+  Name: Pixel 10 Pro XL
+  Platform: android 37
+  Hermes: yes
+  Locale: en-US
+  Timezone: America/New_York
+  Screen: window 443×986 / screen 443×986 @ 2.4375x density
+  Captured at: 2026-08-30T18:44:28.982Z
+
+Install
+  App ID: com.hotatticgames.tartarprim
+  App version: 4.32.11
+  APK build version: 2.4.1
+  APK build: 293
+  AAB: (build 293)
+  OTA: (2026-08-30-1571-the-slot-moves-on)
+  Boot stage: qwen:deferred
+
+ML runtime health
+  Status: active (no crashes detected)
+  Crash count: 0
+  Last init attempt: 2026-08-30T18:44:24.898Z
+  Last init success: 2026-08-30T18:44:25.399Z
+  Crashes-before-disable threshold: 2
+  Qwen completion guard: retrying this boot (cooldown elapsed after 1 completion crashes)
+  Qwen kernel variant: rnllama_v8_2_fp16_dotprod
+  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k
+  Voice (TTS) guard: clean (no voice crashes on this build)
+Save-load health
+  Status: clean (no load-crash flags)
+Last JS crash
+  Status: none recorded
+Crash ledger — 10 recorded (newest last)
+  • 2026-08-28T04:28:43.279Z (3736m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-08-28-1530-the-stranger-gets-the-screen · stage rendered
+      Process died with no orderly exit while: action "investigate the ground"
+      doing: action "investigate the ground" · room iskan_veil · screen exploration
+      last checkpoint: rendered · 16317ms into the action
+  • 2026-08-29T18:14:56.559Z (1470m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-08-29-1542-the-rendezvous-is-a-place · stage rendered
+      Process died with no orderly exit while: tap "missions" — begun 5m before the last sign of life; treat the action label as stale, not as the killer
+      doing: tap "missions" · room reclaimer_stake · screen exploration
+      last checkpoint: rendered · 306713ms into the action
+  • 2026-08-29T22:34:17.576Z (1210m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-08-29-1547-the-conversation-holds-the-floor · stage native:cognition:done
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: native:cognition:done · 575ms into the action
+  • 2026-08-30T00:56:46.075Z (1068m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-08-30-1552-are-you-sure-about-that · stage native:voice:done
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: native:voice:done · 11080ms into the action
+  • 2026-08-30T01:15:03.072Z (1049m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-08-30-1553-glyph-glyph-name-star · stage rendered
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: rendered · 9351ms into the action
+  • 2026-08-30T02:14:43.966Z (990m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-08-30-1556-two-cudgels-are-two-objects · stage native:cognition:done
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: native:cognition:done · 4739ms into the action
+  • 2026-08-30T03:06:04.800Z (938m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-08-30-1559-the-coating-ladder-means-something · stage native:cognition:done
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: native:cognition:done · 5502ms into the action
+  • 2026-08-30T08:28:32.485Z (616m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-08-30-1567-the-heartbeat-ate-the-checkpoint · stage native:cognition:done
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: native:cognition:done [q0] · 459ms into the action · alive 0ms after it
+  • 2026-08-30T16:12:35.586Z (152m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-08-30-1569-the-glyph-brings-its-own-ground · stage rendered
+      Process died with no orderly exit while: tap "✦ bandolier (1)"
+      doing: tap "✦ bandolier (1)" · room builders_survey_camp · screen exploration
+      last checkpoint: rendered · 126ms into the action · alive 5884ms after it
+  • 2026-08-30T18:43:29.524Z (1m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-08-30-1571-the-slot-moves-on · stage native:cognition:done
+      Process died with no orderly exit while: action "rest"
+      doing: action "rest" · room great_tartary_plains · screen exploration
+      last checkpoint: native:cognition:done [q0] · 80822ms into the action · alive 0ms after it
+Crash delivery: ON — reports go to Sentry when you crash.
+Runtime pressure
+  ⚠⚠ LAST BOOT DIED MID-ACTION — no orderly exit was recorded.
+     Last thing the app did: action "rest"
+     Where: great_tartary_plains on exploration screen
+     Last seen alive: 2026-08-30T18:43:29.524Z (1 min before this boot — the kill landed somewhere in that gap)
+     Last checkpoint reached: native:cognition:done [q0] (+80822ms after it)
+     ⚠ The disk log's tail is UNRELIABLE for that session — batched lines
+       die in memory when the JS thread wedges. Trust this line over it.
+  Memory warnings: none this session
+  Freeze watch: no stalls seen (JS clocks only — see the native queue below)
+  Native queue: worst wait 0.0s · 0 job kinds queued >3s · worst 0.0ms/prompt-token
+  App state trail: (none recorded)
+Model contexts
+  Live now: 0
+  Opened: 0 · Released: 0 · Peak live: 0
+  Narration engine: idle

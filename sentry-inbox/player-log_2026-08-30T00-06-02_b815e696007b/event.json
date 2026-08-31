@@ -1,0 +1,202 @@
+{
+  "id": "b815e696007b4c79b1523071f41d9cab",
+  "groupID": "7700076616",
+  "eventID": "b815e696007b4c79b1523071f41d9cab",
+  "projectID": "4511945117532160",
+  "size": 17813,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-29-1548-twenty-more-fires-in-the-dark #mtf18j1mlkuk [inline 8/23]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-29-1548-twenty-more-fires-in-the-dark #mtf18j1mlkuk [inline 8/23]",
+  "title": "player-log 2026-08-29-1548-twenty-more-fires-in-the-dark #mtf18j1mlkuk [inline 8/23]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "befab179691243b6ace3b12a5aacdfb2",
+      "span_id": "a14224f205452869",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "target=mud resolved=Aether Mud range=- enemies=0 hooks=1\n[2026-08-28T22:29:42.098Z] [world] You scrape at the silt with the worn tartarian coin. Nothing of worth.\n[2026-08-28T22:29:42.104Z] [system] \u23f3 Time passed: 24 min\n[2026-08-28T22:29:42.185Z] [cognitive] SWIM  (80ms)\n[2026-08-28T22:29:54.143Z] [player] give the Speckled Egg to Nix\n",
+      "[2026-08-28T22:29:54.147Z] [world] A Speckled Egg \u2014 truly? For me? We left with what was on our backs and it was not this. I will not forget the face, I promise you that.\n[2026-08-28T22:29:54.355Z] [debug] persist sizes(KB): total=120 player=15 wm=18[rooms=11 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=84 scene=3\n",
+      "[2026-08-28T22:29:57.523Z] [debug] qwen\u23f1 item_synthesis_hw ok 6057ms read 4534ms/write 1486ms in 328t\u2192out 46t 13.8ms/t (156ch)\n[2026-08-28T22:29:57.632Z] [debug] homework: item_desc \"Speckled Egg\" \u2713 6182ms\n[2026-08-28T22:30:04.716Z] [player] talk to Nix\n[2026-08-28T22:30:04.743Z] [world] Nix studies you a moment. \"I might know a thing or two. Depends who's asking, and how.\"\n",
+      "[2026-08-28T22:30:04.743Z] [world] They meet your eye, tired but level-headed. There's a person in there you could reason with.\n[2026-08-28T22:30:04.743Z] [world] Persuade Nix for what they know, or intimidate them for what they carry?\n[2026-08-28T22:30:16.620Z] [combat] You \u2014 persuade Nix \u2192 d20 19 + CHA 1 = 20 vs DC 10 \u2014 \u2713\n",
+      "[2026-08-28T22:30:16.621Z] [world] You find the words that cost Nix nothing to give. They lower their guard and, after a beat, tell you what they know.\n[2026-08-28T22:30:16.621Z] [reward] Nix lowers their voice: \"a stash tucked under a collapsed overpass, off to the north.\" (a lead \u2014 you'll turn it up when you next cross fresh ground)\n[2026-08-28T22:30:51.607Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-08-28T22:30:53.454Z] [player] investigate the mud\n[2026-08-28T22:30:53.454Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=1\n[2026-08-28T22:30:53.459Z] [reward] You scrape at the silt with the worn tartarian coin. \u2726 Recovered Big Rock (Common).\n[2026-08-28T22:30:53.465Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-08-28T22:30:53.545Z] [cognitive] SWIM  (80ms)\n[2026-08-28T22:31:01.403Z] [debug] ui: tap \"investigate\"\n[2026-08-28T22:31:02.915Z] [player] investigate the mud\n[2026-08-28T22:31:02.916Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=1\n",
+      "[2026-08-28T22:31:02.921Z] [reward] You scrape at the silt with the worn tartarian coin. \u2726 Recovered Aetheric Shard (Uncommon).\n[2026-08-28T22:31:02.930Z] [system] \u23f3 Time passed: 24 min\n[2026-08-28T22:31:03.011Z] [cognitive] SWIM  (80ms)\n[2026-08-28T22:31:08.584Z] [debug] ui: tap \"WEST\"\n[2026-08-28T22:31:08.613Z] [player] go west\n",
+      "[2026-08-28T22:31:08.614Z] [debug] parser: intent=travel conf=1.00 verb=go target=west resolved=- range=- enemies=0 hooks=1\n[2026-08-28T22:31:08.621Z] [debug] spawn: gear=[Sentinel's Greaves] window=10 roster=new\n[2026-08-28T22:31:08.622Z] [world] You walk west. The ground here looks much like the ground behind you. You have lost track of distance.\n",
+      "[2026-08-28T22:31:08.622Z] [world] The thread you were following waits where you left it.\n[2026-08-28T22:31:08.623Z] [system] \u23f3 Time passed: 15 min\n[2026-08-28T22:31:08.711Z] [cognitive] TRAVEL  (87ms)\n[2026-08-28T22:31:13.309Z] [debug] ui: tap \"missions\"\n",
+      "[2026-08-28T22:31:13.427Z] [debug] persist sizes(KB): total=112 player=15 wm=12[rooms=5 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=83 scene=2\n[2026-08-28T22:31:41.949Z] [player] somo was supposed to see a lead.from.nix when I traveled  where is it?\n",
+      "[2026-08-28T22:31:41.951Z] [arbiter] The Arbiter studies you, plainly. \"I'm not sure what you're trying to tell me. I'll keep your note in the log either way. If you mean to act, phrase it as a verb \u2014 'investigate the rubble', 'go east', 'attack the figure'.\"\n[2026-08-28T22:31:41.952Z] [debug] meta-comment guard: skipped intent parse (report-of-behaviour: \"supposed to\") on 70-char input\n",
+      "[2026-08-28T22:31:43.934Z] [debug] ui: tap \"investigate\"\n[2026-08-28T22:31:45.720Z] [player] investigate the mud\n[2026-08-28T22:31:45.721Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=1\n[2026-08-28T22:31:45.723Z] [world] You scrape at the silt with the worn tartarian coin. Nothing of worth.\n",
+      "[2026-08-28T22:31:45.729Z] [system] \u23f3 Time passed: 24 min\n[2026-08-28T22:31:45.809Z] [cognitive] SWIM  (80ms)\n[2026-08-28T22:31:46.956Z] [player] investigate Sentinel's Greaves\n[2026-08-28T22:31:46.956Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=sentinel greaves resolved=Sentinel's Greaves range=- enemies=0 hooks=1\n",
+      "[2026-08-28T22:31:46.957Z] [world] The dial moves a hair while you watch it. Nothing is powering it. When you look away and back, it has moved again \u2014 toward you.\n[2026-08-28T22:31:46.958Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n",
+      "[2026-08-28T22:31:46.958Z] [arbiter] The Arbiter looks around. \"New hires learn the winch first and the tally-board second. Everything else, the mud teaches.\"\n[2026-08-28T22:31:47.059Z] [cognitive] HIDE \u00b7 ATTACK \u00b7 SEARCH  (99ms)\n[2026-08-28T22:31:48.197Z] [player] investigate cold spring\n",
+      "[2026-08-28T22:31:48.198Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=cold spring resolved=cold spring range=- enemies=0 hooks=1\n[2026-08-28T22:31:48.198Z] [world] You study the cold spring and find no answer. The silence here is patient; whatever it knew, it has decided to keep.\n[2026-08-28T22:31:48.199Z] [debug] arbiter: ambient held (he just spoke)\n",
+      "[2026-08-28T22:31:49.454Z] [player] investigate cracked supply crate\n[2026-08-28T22:31:49.455Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=cracked supply crate resolved=cracked supply crate range=- enemies=0 hooks=1\n",
+      "[2026-08-28T22:31:49.456Z] [world] The lid is warped, the contents are unknown until you try. The latch held \u2014 that's either reassuring or sinister, depending on what's inside.\n[2026-08-28T22:31:49.457Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-28T22:31:49.619Z] [debug] qwen\u23f1 investigate_lore ok 2578ms read 1395ms/write 1030ms in 129t\u2192out 31t 10.8ms/t (148ch)\n",
+      "[2026-08-28T22:31:49.694Z] [cognitive] neutral  (1492ms)\n[2026-08-28T22:31:49.761Z] [cognitive] neutral  (303ms)\n[2026-08-28T22:31:50.720Z] [player] investigate rusted toppled obelisk fragment\n[2026-08-28T22:31:50.721Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=rusted toppled obelisk fragment resolved=rusted toppled obelisk fragment range=- enemies=0 hooks=1\n",
+      "[2026-08-28T22:31:50.721Z] [world] The spire leans a fraction more each time you blink. You have not walked any closer to it \u2014 but it has walked closer to you.\n[2026-08-28T22:31:50.722Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-28T22:31:50.723Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-08-28T22:31:50.920Z] [debug] qwen\u23f1 investigate_lore ok 2611ms wait 1452ms read 288ms/write 797ms in 127t\u2192out 26t 2.3ms/t (121ch)\n[2026-08-28T22:31:50.991Z] [cognitive] SEARCH \u00b7 THROW  (267ms)\n[2026-08-28T22:31:51.980Z] [player] investigate abandoned wasp gall\n",
+      "[2026-08-28T22:31:51.980Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=abandoned wasp gall resolved=abandoned wasp gall range=- enemies=0 hooks=1\n[2026-08-28T22:31:51.981Z] [arbiter] The Arbiter follows your gaze up. \"The abandoned wasp gall is up on the rusted toppled obelisk fragment, tier 2. Climb the rusted toppled obelisk fragment for it.\"\n",
+      "[2026-08-28T22:31:52.559Z] [debug] qwen\u23f1 investigate_lore ok 3008ms wait 1441ms read 298ms/write 1254ms in 128t\u2192out 41t 2.3ms/t (185ch)\n[2026-08-28T22:31:52.681Z] [cognitive] neutral  (695ms)\n[2026-08-28T22:31:54.436Z] [debug] qwen\u23f1 investigate_lore ok 3519ms wait 1762ms read 351ms/write 1387ms in 133t\u2192out 44t 2.6ms/t (176ch)\n[2026-08-28T22:31:54.787Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-28T22:31:55.999Z] [world] The Sentinel's Greaves leaves a shape behind it in the mud, filling slowly.\n[2026-08-28T22:31:56.000Z] [reward] \u2726 Sentinel's Greaves (Common).\n[2026-08-28T22:31:56.437Z] [debug] persist sizes(KB): total=120 player=16 wm=19[rooms=13 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=83 scene=2\n",
+      "[2026-08-28T22:31:56.682Z] [reward] \u2726 Found Third Inscription \u2014 The Giant's Watch. (open Contracts \u2192 Collectibles to read)\n[2026-08-28T22:31:56.695Z] [world] You strip the banner carefully. Something usable comes free in your hand.\n[2026-08-28T22:31:56.696Z] [world] Something papery rustles as you strip the barrel. You pull free a journal leaf.\n",
+      "[2026-08-28T22:31:56.696Z] [world] You work the cold spring apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n[2026-08-28T22:31:56.696Z] [world] You salvage the cracked supply crate. The take is small but real.\n[2026-08-28T22:31:56.696Z] [world] You break the rusted toppled obelisk fragment apart. Among the pieces, something worth keeping.\n",
+      "[2026-08-28T22:31:56.697Z] [world] You salvage the signpost. The take is small but real.\n[2026-08-28T22:31:56.697Z] [reward] \u2726 Salvage haul:\n[2026-08-28T22:31:56.697Z] [reward]     \u2022 Aetheric Shard (Uncommon)\n[2026-08-28T22:31:56.697Z] [reward]     \u2022 Yellowed Tusk Stub (Common)\n[2026-08-28T22:31:56.697Z] [reward]     \u2022 Aether Crystal (Common)\n",
+      "[2026-08-28T22:31:56.698Z] [reward]     \u2022 Scrap Metal (Common)\n[2026-08-28T22:31:56.698Z] [reward]     \u2022 Worn Tartarian Coin (Common)\n[2026-08-28T22:31:57.921Z] [debug] ui: tap \"investigate\"\n[2026-08-28T22:32:00.987Z] [player] investigate the mud\n[2026-08-28T22:32:00.988Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=1\n",
+      "[2026-08-28T22:32:00.993Z] [reward] You scrape at the silt with the worn tartarian coin. \u2726 Recovered Mudstone (Rare).\n[2026-08-28T22:32:01.002Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-28T22:32:01.002Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-28T22:32:01.002Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-08-28T22:32:01.087Z] [cognitive] SWIM  (83ms)\n[2026-08-28T22:32:02.256Z] [player] investigate abandoned wasp gall\n[2026-08-28T22:32:02.257Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=abandoned wasp gall resolved=abandoned wasp gall range=- enemies=0 hooks=1\n",
+      "[2026-08-28T22:32:02.258Z] [arbiter] The Arbiter follows your gaze up. \"The abandoned wasp gall is up on the rusted toppled obelisk fragment, tier 2. Climb the rusted toppled obelisk fragment for it.\"\n[2026-08-28T22:32:02.258Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-28T22:32:02.258Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-08-28T22:32:02.258Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-28T22:32:02.327Z] [cognitive] neutral  (68ms)\n[2026-08-28T22:32:14.303Z] [debug] send-log: #mtdj1ckjghkd \u2014 DELIVERED (inline, no attachments): beacon out, 9/9 parts accepted (121640 chars) \u2014 flush said yes\n",
+      "[2026-08-28T22:32:14.305Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mtdj1ckjghkd kept on disk, boots retry up to 5 sends total\n[2026-08-28T22:32:16.361Z] [debug] appstate: active \u2192 background (was active for 380146ms)\n[2026-08-28T22:32:58.173Z] [debug] appstate: background \u2192 active (was background for 41812ms)\n",
+      "[2026-08-28T22:33:01.148Z] [debug] appstate: active \u2192 background (was active for 2975ms)\n[2026-08-28T22:33:05.432Z] [debug] appstate: background \u2192 active (was background for 4284ms)\n[2026-08-28T22:33:08.804Z] [debug] appstate: active \u2192 background (was active for 3372ms)\n",
+      "[2026-08-28T22:33:08.844Z] [debug] persist sizes(KB): total=120 player=16 wm=19[rooms=13 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=83 scene=2\n[2026-08-28T22:33:12.873Z] [debug] appstate: background \u2192 active (was background for 4067ms)\n[2026-08-28T22:33:16.336Z] [debug] appstate: active \u2192 background (was active for 3465ms)\n",
+      "[2026-08-28T22:33:21.134Z] [debug] appstate: background \u2192 active (was background for 4797ms)\n[2026-08-28T22:33:24.437Z] [debug] appstate: active \u2192 background (was active for 3304ms)\n[2026-08-28T22:33:27.638Z] [debug] appstate: background \u2192 active (was background for 3201ms)\n[2026-08-28T22:33:31.123Z] [debug] appstate: active \u2192 background (was active for 3485ms)\n",
+      "[2026-08-28T22:33:33.604Z] [debug] appstate: background \u2192 active (was background for 2481ms)\n[2026-08-28T22:33:38.837Z] [debug] appstate: active \u2192 background (was active for 5233ms)\n[2026-08-28T22:40:56.611Z] [debug] appstate: background \u2192 active (was background for 437774ms)\n[2026-08-28T22:41:04.116Z] [debug] OTA session start: 2026-08-28-1530-the-stranger-gets-the-screen.\n",
+      "[2026-08-28T22:41:04.116Z] [world] You step back into Reclaimer's Stake. The world waits for your move.\n[2026-08-28T22:41:04.116Z] [arbiter] The Arbiter meets your eyes. \"Welcome back, Cheddar Bob. The buried country is no place to walk alone.\"\n",
+      "[2026-08-28T22:41:04.220Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-28T22:41:04.220Z \u00b7 build 2026-08-28-1530-the-stranger-gets-the-screen \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-08-28T22:41:04.822Z] [debug] send-log: crash on record (2026-08-28T04:28:43.279Z) \u2014 game log pushed automatically, delivered to Sentry, kept on disk as #mtdjcpyiijyl\n",
+      "[2026-08-28T22:41:09.470Z] [debug] appstate: active \u2192 background (was active for 12859ms)\n[2026-08-28T22:47:17.675Z] [debug] appstate: background \u2192 active (was background for 368205ms)\n[2026-08-28T22:47:19.141Z] [debug] ui: tap \"investigate\"\n[2026-08-28T22:47:20.751Z] [player] investigate the mud\n",
+      "[2026-08-28T22:47:20.753Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=mud range=- enemies=0 hooks=1\n[2026-08-28T22:47:20.756Z] [world] You study the mud. The Aetheric haze around it thickens, then settles.\n[2026-08-28T22:47:20.758Z] [world] A strip of dried meat falls free of the mud. Smoke-cured, still good.\n",
+      "[2026-08-28T22:47:20.764Z] [reward] \u2726 Smoke-Cured Jerky Strip (Common).\n[2026-08-28T22:47:20.765Z] [world] Mud Scanner reads flat. Nothing in the mud.\n[2026-08-28T22:47:20.888Z] [debug] persist sizes(KB): total=139 player=23 wm=32[rooms=13 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=82 scene=2\n[2026-08-28T22:47:22.010Z] [player] investigate abandoned wasp gall\n",
+      "[2026-08-28T22:47:22.010Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=abandoned wasp gall resolved=abandoned wasp gall range=- enemies=0 hooks=1\n[2026-08-28T22:47:22.011Z] [arbiter] The Arbiter follows your gaze up. \"The abandoned wasp gall is up on the rusted toppled obelisk fragment, tier 2. Climb the rusted toppled obelisk fragment for it.\"\n",
+      "[2026-08-28T22:47:22.011Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-28T22:47:22.011Z] [debug] arbiter: flavor held (bud"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-29-1548-twenty-more-fires-in-the-dark #mtf18j1mlkuk [inline 8/23]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtf18j1mlkuk"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "8"
+    },
+    {
+      "key": "parts",
+      "value": "23"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-30T00:06:02.737383Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-30T00:06:02.980000Z",
+  "fingerprints": [
+    "14c799cb88dcf9f9206b5cbcc59d3a6a"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "c5660101d18f46d790e09819a12c917d",
+  "previousEventID": "b538d165fed74dfeb3401d5c81983f48"
+}

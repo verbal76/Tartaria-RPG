@@ -1,0 +1,233 @@
+{
+  "id": "3e70b8e4f7d14f5aa1f653ab51ebe409",
+  "groupID": "7702524218",
+  "eventID": "3e70b8e4f7d14f5aa1f653ab51ebe409",
+  "projectID": "4511945117532160",
+  "size": 18103,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-31-1592-the-events-say-which-build #mthbxrkq1jas [inline 6/14]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-08-31-1592-the-events-say-which-build",
+  "message": "player-log 2026-08-31-1592-the-events-say-which-build #mthbxrkq1jas [inline 6/14]",
+  "title": "player-log 2026-08-31-1592-the-events-say-which-build #mthbxrkq1jas [inline 6/14]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "32bb9a09204041d7aedad6a2ab6f06e8",
+      "span_id": "83304064f2ffce0b",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "iracy Architects Raider 5 and 1 other circle the base \u2014 nothing down there can reach you.\n[2026-08-31T02:53:03.087Z] [debug] persist sizes(KB): total=187 player=35 wm=64[rooms=33 events=1 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=80 scene=8\n[2026-08-31T02:53:03.389Z] [debug] ui: tap \"\u2726 bandolier (1)\"\n",
+      "[2026-08-31T02:53:04.310Z] [reward] You hurl the Acid Flask. It bursts across Conspiracy Architects Raider 5 \u2014 6 acid (2/turn \u00d7 3). (6 HP left)\n[2026-08-31T02:53:04.314Z] [world] Below, Conspiracy Architects Raider 3 and 1 other circle the base \u2014 nothing down there can reach you.\n[2026-08-31T02:53:06.840Z] [debug] ui: tap \"\ud83d\udd25 bone crossbow \u2605\"\n",
+      "[2026-08-31T02:53:06.841Z] [system] unseen \u2014 next strike +5 fades.\n[2026-08-31T02:53:06.863Z] [player] attack with the off-hand bone crossbow\n[2026-08-31T02:53:06.863Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=2 hooks=0\n",
+      "[2026-08-31T02:53:06.863Z] [debug] attack: target=Conspiracy Architects Raider 5 range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-08-31T02:53:06.864Z] [debug] attack: status mods stealthed +5\n[2026-08-31T02:53:06.894Z] [world] You commit forward with the searing bone crossbow. Conspiracy Architects Raider 5 watches your hands.\n",
+      "[2026-08-31T02:53:06.895Z] [system] \u23f3 Time passed: 6 min\n[2026-08-31T02:53:07.044Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (148ms)\n[2026-08-31T02:53:17.135Z] [world] Conspiracy Architects Raider 5 moves first. The pressure is immediate.\n[2026-08-31T02:53:17.136Z] [world] Below, Conspiracy Architects Raider 3 and 1 other circle the base \u2014 nothing down there can reach you.\n",
+      "[2026-08-31T02:53:17.136Z] [combat] You \u2014 d20 \u2192 20 + DEX 28 + 2 (point blank) stealthed +5 = 55 vs Conspiracy Architects Raider 5 AC 10 \u2014 \u2713 CRITICAL HIT\n[2026-08-31T02:53:17.137Z] [combat] Piercing flares \u2014 +3 on hit (weak \u2014 bites deep!).\n[2026-08-31T02:53:17.137Z] [combat] Weakness exposed \u2014 Conspiracy Architects Raider 5 flinches. (piercing \u00d72.25 for 60)\n",
+      "[2026-08-31T02:53:17.138Z] [combat] The killing blow with the searing bone crossbow: 60. Conspiracy Architects Raider 5 drops where it stood.\n[2026-08-31T02:53:17.141Z] [reward] Conspiracy Architects Raider 5 defeated. You recover Patched Cloth \u00d73.\n[2026-08-31T02:53:17.149Z] [reward] You strip the body: Cudgel, Mud-Bound Cloak (+6 TC). The kit took the fight badly.\n",
+      "[2026-08-31T02:53:17.149Z] [combat] 1 attacker remains. Conspiracy Architects Raider 3 now in your sights.\n[2026-08-31T02:53:17.150Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-08-31T02:53:17.150Z] [reward] +16 TC pried from the dust.\n",
+      "[2026-08-31T02:53:17.183Z] [arbiter] The Arbiter does not look away from the Conspiracy Architects Raider 3. \"Decide quickly. It already has.\"\n[2026-08-31T02:53:19.127Z] [debug] ui: tap \"\ud83d\udd25 bone crossbow\"\n[2026-08-31T02:53:19.171Z] [player] attack with the off-hand bone crossbow\n",
+      "[2026-08-31T02:53:19.171Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=1 hooks=0\n[2026-08-31T02:53:19.172Z] [debug] attack: target=Conspiracy Architects Raider 3 range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n",
+      "[2026-08-31T02:53:19.204Z] [world] Your searing bone crossbow comes around in an arc; Conspiracy Architects Raider 3 squares up to meet it.\n[2026-08-31T02:53:19.204Z] [system] \u23f3 Time passed: 6 min\n[2026-08-31T02:53:19.347Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (142ms)\n[2026-08-31T02:53:31.013Z] [world] Conspiracy Architects Raider 3 moves first. The pressure is immediate.\n",
+      "[2026-08-31T02:53:31.013Z] [world] Below, Conspiracy Architects Raider 3 circles the base \u2014 it cannot reach you up here.\n[2026-08-31T02:53:31.014Z] [combat] You \u2014 d20 \u2192 8 + DEX 28 + 2 (point blank) = 38 vs Conspiracy Architects Raider 3 AC 11 \u2014 \u2713 HIT\n",
+      "[2026-08-31T02:53:31.015Z] [combat] Clean hit with the searing bone crossbow for 6. Conspiracy Architects Raider 3 has 8 left and does not back away.\n[2026-08-31T02:53:31.016Z] [combat] Searing Bone Crossbow \u2014 1 burn bites in and festers (3 turns).\n[2026-08-31T02:53:34.191Z] [debug] ui: tap \"\ud83d\udd25 bone crossbow\"\n[2026-08-31T02:53:34.235Z] [player] attack with the off-hand bone crossbow\n",
+      "[2026-08-31T02:53:34.236Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=1 hooks=0\n[2026-08-31T02:53:34.236Z] [combat] Conspiracy Architects Raider 3 blisters \u2014 clinging fire sears 1. (7/14 HP, 2 turns left)\n",
+      "[2026-08-31T02:53:34.237Z] [debug] attack: target=Conspiracy Architects Raider 3 range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-08-31T02:53:34.268Z] [world] Your searing bone crossbow comes around in an arc; Conspiracy Architects Raider 3 squares up to meet it.\n[2026-08-31T02:53:34.269Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-31T02:53:34.411Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (141ms)\n[2026-08-31T02:53:42.995Z] [world] Conspiracy Architects Raider 3 moves first. The pressure is immediate.\n[2026-08-31T02:53:42.995Z] [world] Below, Conspiracy Architects Raider 3 circles the base \u2014 it cannot reach you up here.\n",
+      "[2026-08-31T02:53:42.995Z] [combat] You \u2014 d20 \u2192 19 + DEX 28 + 2 (point blank) = 49 vs Conspiracy Architects Raider 3 AC 11 \u2014 \u2713 HIT\n[2026-08-31T02:53:42.997Z] [combat] Your blow with the searing bone crossbow lands clean \u2014 13 damage. Conspiracy Architects Raider 3 crumples in the dust. The Aetherstone settles.\n",
+      "[2026-08-31T02:53:42.997Z] [reward] Conspiracy Architects Raider 3 defeated. You recover Patched Cloth \u00d73, Architect Sigil.\n[2026-08-31T02:53:43.005Z] [reward] You strip the body: Cudgel, Mud-Warden's Vest (+6 TC). The kit took the fight badly.\n[2026-08-31T02:53:43.006Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n",
+      "[2026-08-31T02:53:43.008Z] [reward] +22 TC pried from the dust.\n[2026-08-31T02:53:43.341Z] [debug] persist sizes(KB): total=187 player=36 wm=64[rooms=33 events=1 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=80 scene=6\n[2026-08-31T02:53:49.063Z] [debug] ui: tap \"investigate\"\n[2026-08-31T02:53:50.514Z] [player] investigate scratched markings\n",
+      "[2026-08-31T02:53:50.514Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=scratched markings resolved=scratched markings range=- enemies=0 hooks=0\n[2026-08-31T02:53:50.515Z] [world] The scratched markings resists your reading. Not hostile \u2014 just closed. Some things in the buried world don't open for the curious.\n[2026-08-31T02:53:50.622Z] [cognitive] neutral  (105ms)\n",
+      "[2026-08-31T02:53:51.744Z] [debug] qwen\u23f1 investigate_lore ok 1130ms read 294ms/write 813ms in 127t\u2192out 26t 2.3ms/t (137ch)\n[2026-08-31T02:53:51.747Z] [debug] qwen\u23f1 stats \u2014 investigate_lore n5 avg2.0s max2.7s read0.7s/write1.3s in127t\u2192out39t ms/tok 2.3-10.6 | narration:scene_intro_fill n4 avg6.0s max9.4s read5.6s/write1.1s \u26a02unusable in738t\u2192out25t ms/tok 4.0-11.4 cap3 \u23f81 \u27022/10.3s | ambient n1 avg7.",
+      "9s max7.9s read3.8s/write1.6s in367t\u2192out31t ms/tok 10.3-10.3 cap1 wait1.7s \u27021/7.9s || WASTED 3 calls / 18.1s\n[2026-08-31T02:53:52.981Z] [debug] ui: tap \"climb down\"\n[2026-08-31T02:53:53.007Z] [player] climb down\n[2026-08-31T02:53:53.008Z] [debug] parser: intent=climb conf=1.00 verb=climb target=- resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-08-31T02:53:53.009Z] [world] You climb down from the nook and rejoin the ground beside the dead tree. Boots back on the ground.\n[2026-08-31T02:53:53.009Z] [world] Soot stands and stretches as you hit the ground. She has waited.\n[2026-08-31T02:53:53.011Z] [system] \u23f3 Time passed: 15 min\n[2026-08-31T02:53:53.127Z] [cognitive] CLIMB  (115ms)\n[2026-08-31T02:53:55.280Z] [debug] ui: tap \"\u2192 NIMARI\"\n",
+      "[2026-08-31T02:53:55.288Z] [debug] spawn: gear=[Architect's Aether Gloves, Forgotten Faceshroud] window=10 roster=new\n[2026-08-31T02:53:55.289Z] [world] You walk south through open silt. The compass points south into open ground.\n[2026-08-31T02:53:55.290Z] [world] Whatever you turned over here is still turned over.\n[2026-08-31T02:53:56.582Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-31T02:53:58.119Z] [world] The Architect's Aether Gloves is heavier than it looks. Most things down here are.\n[2026-08-31T02:53:58.120Z] [reward] \u2726 Architect's Aether Gloves (Common).\n[2026-08-31T02:53:58.131Z] [world] The Forgotten Faceshroud is lighter than it looks, which is its own kind of warning.\n[2026-08-31T02:53:58.132Z] [reward] \u2726 Forgotten Faceshroud (Common).\n",
+      "[2026-08-31T02:53:59.779Z] [world] You scavenge the marker thoroughly. One Stick survives the sorting.\n[2026-08-31T02:53:59.779Z] [world] You strip the salvage sack carefully. Something usable comes free in your hand.\n[2026-08-31T02:53:59.779Z] [reward] \u2726 Salvage haul:\n[2026-08-31T02:53:59.779Z] [reward]     \u2022 Stick (Common)\n[2026-08-31T02:53:59.779Z] [reward]     \u2022 Spider Silk (Common)\n",
+      "[2026-08-31T02:54:01.104Z] [debug] qwen\u23f1 ambient ok 7985ms read 3811ms/write 3360ms in 367t\u2192out 31t 10.4ms/t HIT-CAP (136ch)\n[2026-08-31T02:54:01.192Z] [debug] ui: tap \"investigate\"\n[2026-08-31T02:54:01.404Z] [debug] arbiter: ambient stale:moved-scene\u2192banked 8393ms\n",
+      "[2026-08-31T02:54:01.404Z] [debug] arbiter: ambient-empty reason=near-duplicate-of-recent raw=\"You have traversed through the submerged transit hub, the heart of the Silt Wastes. Every step has been treacherous, yet\"\n[2026-08-31T02:54:08.400Z] [player] investigate the ground\n",
+      "[2026-08-31T02:54:08.401Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2\n[2026-08-31T02:54:08.406Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Aetheric Pelt (Rare).\n[2026-08-31T02:54:08.414Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n",
+      "[2026-08-31T02:54:08.417Z] [arbiter] The Arbiter looks around. \"Walk softly. The ground above the buried cities is thin in places, and listening.\"\n[2026-08-31T02:54:08.417Z] [system] \u23f3 Time passed: 24 min\n[2026-08-31T02:54:08.529Z] [cognitive] CLIMB  (110ms)\n[2026-08-31T02:54:09.684Z] [player] investigate sludge pool\n",
+      "[2026-08-31T02:54:09.685Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=sludge pool resolved=sludge pool range=- enemies=0 hooks=2\n[2026-08-31T02:54:09.687Z] [world] You study the sludge pool. It bears no marks worth naming \u2014 no glyph, no fingerprint, no trace the Reclaimers would catalog.\n[2026-08-31T02:54:09.688Z] [debug] arbiter: ambient held (he just spoke)\n",
+      "[2026-08-31T02:54:09.811Z] [cognitive] neutral  (121ms)\n[2026-08-31T02:54:11.085Z] [debug] ui: tap \"\u2192 NIMARI\"\n[2026-08-31T02:54:11.102Z] [debug] spawn: gear=[Crude Golem Greatsword] window=10 roster=new\n[2026-08-31T02:54:11.103Z] [arbiter] The Arbiter, walking with you: \"Tartaria was a continent once. A flood older than any honest map drowned it. We are crossing the top of it.\"\n",
+      "[2026-08-31T02:54:11.104Z] [world] You walk east through open silt. The compass points east into open ground.\n[2026-08-31T02:54:11.105Z] [world] It sits where it sat. Patient is the wrong word \u2014 it simply does not move.\n[2026-08-31T02:54:12.349Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-31T02:54:13.613Z] [debug] qwen\u23f1 investigate_lore ok 3810ms read 1279ms/write 2506ms in 128t\u2192out 27t 10.0ms/t (122ch)\n[2026-08-31T02:54:13.935Z] [world] The Crude Golem Greatsword is cold through your glove.\n[2026-08-31T02:54:13.936Z] [reward] \u2726 Crude Golem Greatsword (Common).\n",
+      "[2026-08-31T02:54:15.033Z] [world] Tucked inside the wagon: an oddment that matches no quartermaster's list. The kind of thing that fuses well.\n[2026-08-31T02:54:15.033Z] [world] You work the well apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n[2026-08-31T02:54:15.034Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-08-31T02:54:15.034Z] [reward]     \u2022 Fractured Geode Half (Common)\n[2026-08-31T02:54:15.034Z] [reward]     \u2022 Flint Core Nodule (Common)\n[2026-08-31T02:54:15.304Z] [debug] persist sizes(KB): total=174 player=37 wm=53[rooms=21 events=1 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=81 scene=4\n[2026-08-31T02:54:16.336Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-08-31T02:54:18.120Z] [player] investigate the ground\n[2026-08-31T02:54:18.121Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2\n[2026-08-31T02:54:18.125Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Wild Carrot (Common).\n",
+      "[2026-08-31T02:54:18.130Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-31T02:54:18.130Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T02:54:18.131Z] [system] \u23f3 Time passed: 24 min\n[2026-08-31T02:54:18.246Z] [cognitive] CLIMB  (114ms)\n[2026-08-31T02:54:19.351Z] [player] investigate rift\n",
+      "[2026-08-31T02:54:19.352Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=rift resolved=rift range=- enemies=0 hooks=2\n[2026-08-31T02:54:19.356Z] [world] The rift resists your reading. Not hostile \u2014 just closed. Some things in the buried world don't open for the curious.\n[2026-08-31T02:54:19.357Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n",
+      "[2026-08-31T02:54:19.358Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T02:54:19.493Z] [cognitive] neutral  (134ms)\n[2026-08-31T02:54:20.602Z] [player] investigate sinkhole\n[2026-08-31T02:54:20.603Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=sinkhole resolved=sinkhole range=- enemies=0 hooks=2\n",
+      "[2026-08-31T02:54:20.604Z] [world] You take the measure of the sinkhole. The Aetheric haze does not gather; the dust does not stir. Just a thing, in a place.\n[2026-08-31T02:54:20.605Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-31T02:54:20.605Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-08-31T02:54:20.605Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-31T02:54:20.909Z] [debug] qwen\u23f1 investigate_lore ok 1425ms read 286ms/write 1113ms in 126t\u2192out 36t 2.3ms/t (195ch)\n[2026-08-31T02:54:21.113Z] [cognitive] neutral  (507ms)\n[2026-08-31T02:54:22.061Z] [debug] qwen\u23f1 investigate_lore ok 1259ms wait 312ms read 292ms/write 642ms in 127t\u2192out 21t 2.3ms/t (100ch)\n",
+      "[2026-08-31T02:54:27.799Z] [debug] ui: tap \"\u2192 NIMARI\"\n[2026-08-31T02:54:27.815Z] [world] You walk south. You arrive at Nimari.\n[2026-08-31T02:54:27.821Z] [debug] scene: loc=nimari hub=- arrival=y opening=n passing=n\n[2026-08-31T02:54:27.855Z] [debug] spawn: gear=[Mud Grip] window=10 roster=new\n",
+      "[2026-08-31T02:54:27.878Z] [arbiter] The Arbiter takes you in. \"Nimari is lethal country. The things that wake here pull above your weight. 35 HP carries you through Varakush (danger 1). Visit a Lost Capital (Asgardar, Samarran, Nimari, Drakova, Voronov, Karok-Sa, Yuldra-Tul, Ostragar, Iskan-Veil) to learn what the Cores de"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-31-1592-the-events-say-which-build #mthbxrkq1jas [inline 6/14]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mthbxrkq1jas"
+    },
+    {
+      "key": "dist",
+      "value": "2026-08-31-1592-the-events-say-which-build"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "6"
+    },
+    {
+      "key": "parts",
+      "value": "14"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-08-31-1592-the-events-say-which-build"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-31T14:24:32.503131Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-31T14:24:34.123000Z",
+  "fingerprints": [
+    "a8ca8de7a5fab2451d48145e696ff526"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1946131048,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-08-31T14:24:07.632000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-08-31-1592-the-events-say-which-build",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-08-31-1592-the-events-say-which-build",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-08-31-1592-the-events-say-which-build",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-08-31-1592-the-events-say-which-build)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "5d723ffd01c7491b86ee1b7b0687ffad",
+  "previousEventID": "2984c6a8a4044d43b7ec0a1a2c055842"
+}

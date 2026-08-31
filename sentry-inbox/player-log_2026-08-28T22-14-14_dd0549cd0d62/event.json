@@ -1,0 +1,224 @@
+{
+  "id": "dd0549cd0d6249c5af80f631b8fad594",
+  "groupID": "7697053520",
+  "eventID": "dd0549cd0d6249c5af80f631b8fad594",
+  "projectID": "4511945117532160",
+  "size": 17659,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-28-1530-the-stranger-gets-the-screen #mtcgc1vw57ml [inline 3/27]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-28-1530-the-stranger-gets-the-screen #mtcgc1vw57ml [inline 3/27]",
+  "title": "player-log 2026-08-28-1530-the-stranger-gets-the-screen #mtcgc1vw57ml [inline 3/27]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db2f:4653:ad2:ae51:4f0f:3e39",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "7b3fcdf9d94c43a8a477de1aea938687",
+      "span_id": "843b24ec022fd6b6",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      " Fog) stealthed +5 = 31 vs Rust Lurker AC 12 \u2014 \u2713 HIT\n[2026-08-26T22:43:18.205Z] [combat] Weakness exposed \u2014 Rust Lurker flinches. (bludgeoning \u00d71.5 for 9)\n[2026-08-26T22:43:18.207Z] [combat] Rust Lurker takes 9. It reels: 12 left. Then it fights back.\n[2026-08-26T22:43:19.525Z] [debug] ui: tap \"kick\"\n[2026-08-26T22:43:19.531Z] [player] kick\n",
+      "[2026-08-26T22:43:19.531Z] [debug] parser: intent=attack conf=1.00 verb=kick target=- resolved=- range=close enemies=1 hooks=1\n[2026-08-26T22:43:19.533Z] [debug] attack: target=Rust Lurker range=close reach.bands=[close] reach.label=Bare hands bareHand=true\n[2026-08-26T22:43:19.535Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n",
+      "[2026-08-26T22:43:19.612Z] [world] You close on Rust Lurker. The room narrows around the both of you.\n[2026-08-26T22:43:19.612Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T22:43:19.813Z] [cognitive] AGGRESSION \u00b7 DISENGAGE  (200ms)\n[2026-08-26T22:43:24.269Z] [world] You seize the initiative. Rust Lurker has no time to react.\n",
+      "[2026-08-26T22:43:24.271Z] [combat] You \u2014 d20 \u2192 18 + STR 20 \u2212 1 (Whisper Fog) = 37 vs Rust Lurker AC 12 \u2014 \u2713 HIT\n[2026-08-26T22:43:24.273Z] [combat] Bludgeoning flares \u2014 +2 on hit (weak \u2014 bites deep!).\n[2026-08-26T22:43:24.273Z] [combat] Weakness exposed \u2014 Rust Lurker flinches. (bludgeoning \u00d71.5 for 10)\n",
+      "[2026-08-26T22:43:24.275Z] [combat] Clean hit for 10. Rust Lurker has 2 left and does not back away.\n[2026-08-26T22:43:24.276Z] [combat] Rust Lurker is left exposed \u2014 easier to hit.\n[2026-08-26T22:43:24.279Z] [combat] Rust Lurker \u2014 d20 \u2192 3 + ATK 5 = 8 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-26T22:43:25.542Z] [debug] ui: tap \"punch\"\n[2026-08-26T22:43:25.548Z] [player] punch\n",
+      "[2026-08-26T22:43:25.549Z] [debug] parser: intent=attack conf=1.00 verb=punch target=- resolved=- range=close enemies=1 hooks=1\n[2026-08-26T22:43:25.551Z] [debug] attack: target=Rust Lurker range=close reach.bands=[close] reach.label=Bare hands bareHand=true\n[2026-08-26T22:43:25.553Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n",
+      "[2026-08-26T22:43:25.625Z] [world] Rust Lurker fixes on you. You commit to the strike.\n[2026-08-26T22:43:25.626Z] [system] \u23f3 Time passed: 6 min\n[2026-08-26T22:43:25.824Z] [cognitive] AGGRESSION \u00b7 DISENGAGE  (198ms)\n[2026-08-26T22:43:26.264Z] [debug] persist sizes(KB): total=226 player=64 wm=79[rooms=33 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=79 scene=4\n",
+      "[2026-08-26T22:43:30.568Z] [world] Rust Lurker moves first. The pressure is immediate.\n[2026-08-26T22:43:30.576Z] [combat] Rust Lurker \u2014 d20 \u2192 17 + ATK 5 = 22 vs your AC 28 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-08-26T22:43:30.579Z] [combat] You \u2014 d20 \u2192 15 + STR 20 \u2212 1 (Whisper Fog) = 34 vs Rust Lurker AC 12 \u2014 \u2713 HIT\n",
+      "[2026-08-26T22:43:30.580Z] [combat] Bludgeoning flares \u2014 +4 on hit (weak \u2014 bites deep!).\n[2026-08-26T22:43:30.580Z] [combat] Weakness exposed \u2014 Rust Lurker flinches. (bludgeoning \u00d71.5 for 9)\n[2026-08-26T22:43:30.581Z] [combat] The killing blow: 9. Rust Lurker drops where it stood.\n[2026-08-26T22:43:30.583Z] [reward] Rust Lurker defeated. You recover Blank Runecaster Casing (Uncommon) \u00d73.\n",
+      "[2026-08-26T22:43:30.586Z] [reward] +20 TC pried from the dust.\n[2026-08-26T22:43:30.648Z] [arbiter] The Arbiter eyes your new pieces. \"You could make a Stone Fist now, if you wanted.\"\n[2026-08-26T22:43:30.831Z] [combat] Rust Lurker deals 2 slashing damage [armor \u221265%, plate \u22123, floor 30%]. You have 51 HP remaining.\n[2026-08-26T22:43:35.564Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n",
+      "[2026-08-26T22:43:35.581Z] [debug] spawn: gear=[Stone-Forged War Armor, Sentinel's Faceguard] window=10 roster=new\n[2026-08-26T22:43:35.582Z] [world] You set out north. Your boots sink half an inch into the mud-flats and pull free with each step.\n[2026-08-26T22:43:35.583Z] [world] It sits where it sat. Patient is the wrong word \u2014 it simply does not move.\n",
+      "[2026-08-26T22:43:37.364Z] [debug] ui: tap \"take / salvage\"\n[2026-08-26T22:43:39.025Z] [world] You work the Sentinel's Faceguard loose from where the mud had it.\n[2026-08-26T22:43:39.026Z] [reward] \u2726 Sentinel's Faceguard (Common).\n[2026-08-26T22:43:39.046Z] [world] The Stone-Forged War Armor had settled into the ground. You unsettle it.\n",
+      "[2026-08-26T22:43:39.046Z] [reward] \u2726 Stone-Forged War Armor (Uncommon).\n[2026-08-26T22:43:40.144Z] [world] You strip the broken shell carefully. Something usable comes free in your hand.\n[2026-08-26T22:43:40.144Z] [world] You break the core apart. Among the pieces, something worth keeping.\n",
+      "[2026-08-26T22:43:40.145Z] [world] Tucked inside the horn: an oddment that matches no quartermaster's list. The kind of thing that fuses well.\n[2026-08-26T22:43:40.145Z] [world] You work the staircase over. A part of it comes loose, intact.\n[2026-08-26T22:43:40.146Z] [world] You work the torn tarp over. A part of it comes loose, intact.\n[2026-08-26T22:43:40.146Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-08-26T22:43:40.146Z] [reward]     \u2022 Stick x2 (Common)\n[2026-08-26T22:43:40.147Z] [reward]     \u2022 Aether Crystal x2 (Common)\n[2026-08-26T22:43:40.147Z] [reward]     \u2022 Hollow Quill Sheaf (Uncommon)\n[2026-08-26T22:43:40.147Z] [reward]     \u2022 Worn Tartarian Coin x10 (Common)\n[2026-08-26T22:43:40.147Z] [reward]     \u2022 Cloth Scrap x2 (Common)\n[2026-08-26T22:43:41.849Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-08-26T22:43:43.304Z] [player] investigate the ground\n[2026-08-26T22:43:43.305Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n[2026-08-26T22:43:43.309Z] [reward] You scrape at the silt with the aetheric crystal blade. \u2726 Recovered Big Rock (Common).\n",
+      "[2026-08-26T22:43:43.316Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-26T22:43:43.316Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-26T22:43:43.317Z] [system] \u23f3 Time passed: 24 min\n[2026-08-26T22:43:43.489Z] [cognitive] CLIMB  (171ms)\n[2026-08-26T22:43:45.681Z] [debug] ui: tap \"rest\"\n[2026-08-26T22:43:45.689Z] [player] rest\n",
+      "[2026-08-26T22:43:45.689Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-26T22:43:45.690Z] [world] You rest for 8 hours. +7 HP, +8 stamina recovered. (Day 26, night)\n[2026-08-26T22:43:45.707Z] [system] \u23f3 Time passed: 8h\n[2026-08-26T22:43:45.864Z] [cognitive] REST  (156ms)\n[2026-08-26T22:43:46.748Z] [debug] ui: tap \"climb\"\n",
+      "[2026-08-26T22:43:48.220Z] [player] climb staircase\n[2026-08-26T22:43:48.221Z] [debug] parser: intent=climb conf=1.00 verb=climb target=staircase resolved=staircase range=- enemies=0 hooks=1\n[2026-08-26T22:43:48.276Z] [world] You loop your Reclaimer's Rope around the staircase and walk the line. Tier 1/2 cleared.\n",
+      "[2026-08-26T22:43:48.276Z] [world] You reach the first hold of the staircase (tier 1/2). Higher still to go.\n[2026-08-26T22:43:48.277Z] [system] \u23f3 Time passed: 30 min\n[2026-08-26T22:43:48.461Z] [cognitive] CLIMB  (183ms)\n[2026-08-26T22:43:48.672Z] [debug] persist sizes(KB): total=224 player=65 wm=77[rooms=31 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=78 scene=4\n",
+      "[2026-08-26T22:43:49.466Z] [debug] ui: tap \"climb up (1/2)\"\n[2026-08-26T22:43:49.502Z] [player] climb staircase\n[2026-08-26T22:43:49.503Z] [debug] parser: intent=climb conf=1.00 verb=climb target=staircase resolved=staircase range=- enemies=0 hooks=1\n[2026-08-26T22:43:49.565Z] [world] You loop your Reclaimer's Rope around the staircase and walk the line. Tier 2/2 cleared.\n",
+      "[2026-08-26T22:43:49.566Z] [world] You reach the top of the staircase (tier 2/2). The view changes; the room reads differently from here.\n[2026-08-26T22:43:49.566Z] [debug] arbiter: template (reason=intent-not-allowed:climb)\n[2026-08-26T22:43:49.566Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-26T22:43:49.567Z] [system] \u23f3 Time passed: 30 min\n",
+      "[2026-08-26T22:43:49.746Z] [cognitive] CLIMB  (178ms)\n[2026-08-26T22:43:50.567Z] [debug] ui: tap \"climb down\"\n[2026-08-26T22:43:50.578Z] [reward] \u2726 The corruption tightens its grip \u2014 Tainted. (CHA \u22121)\n[2026-08-26T22:43:50.579Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.\n[2026-08-26T22:43:50.598Z] [player] climb down\n",
+      "[2026-08-26T22:43:50.599Z] [debug] parser: intent=climb conf=1.00 verb=climb target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-26T22:43:50.600Z] [world] You make your way back down the staircase. Boots back on the ground.\n[2026-08-26T22:43:50.601Z] [system] \u23f3 Time passed: 15 min\n[2026-08-26T22:43:50.778Z] [cognitive] CLIMB  (177ms)\n",
+      "[2026-08-26T22:43:52.250Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-08-26T22:43:52.267Z] [debug] spawn: gear=[Mud-Bound Cloak] window=10 roster=new\n[2026-08-26T22:43:52.268Z] [arbiter] The Arbiter, walking with you: \"Tartaria was a continent once. A flood older than any honest map drowned it. We are crossing the top of it.\"\n",
+      "[2026-08-26T22:43:52.269Z] [world] You set out west. Your boots sink half an inch into the mud-flats and pull free with each step.\n[2026-08-26T22:43:52.270Z] [world] Your eye goes back to it before you decide to look.\n[2026-08-26T22:43:53.300Z] [debug] ui: tap \"take / salvage\"\n[2026-08-26T22:43:56.166Z] [world] Whatever the Mud-Bound Cloak was lying against, it lets go without much argument.\n",
+      "[Filtered]",
+      "[2026-08-26T22:43:58.117Z] [world] You strip the fungus carefully. Something usable comes free in your hand.\n[2026-08-26T22:43:58.118Z] [world] You strip the mirror carefully. Something usable comes free in your hand.\n[2026-08-26T22:43:58.118Z] [world] You break the rusted lockbox apart. Among the pieces, something worth keeping.\n",
+      "[2026-08-26T22:43:58.119Z] [world] You work the tower relay over. A part of it comes loose, intact.\n[2026-08-26T22:43:58.119Z] [reward] \u2726 Salvage haul:\n[2026-08-26T22:43:58.119Z] [reward]     \u2022 Stiffened Leather Offcut (Uncommon)\n[2026-08-26T22:43:58.119Z] [reward]     \u2022 Bone Sliver x2 (Common)\n[2026-08-26T22:43:58.120Z] [reward]     \u2022 Aether Crystal x2 (Common)\n",
+      "[2026-08-26T22:43:58.120Z] [reward]     \u2022 Worn Tartarian Coin x9 (Common)\n[2026-08-26T22:43:59.451Z] [debug] ui: tap \"more \u25b8\"\n[2026-08-26T22:44:00.936Z] [debug] ui: tap \"inventory\"\n[2026-08-26T22:44:05.980Z] [debug] ui: tap \"craft\"\n[2026-08-26T22:44:08.084Z] [arbiter] The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\"\n",
+      "[2026-08-26T22:44:08.090Z] [world] You repair the Anvil-Struck Footguards. Back to full. (spent: Small Rock x2)\n[2026-08-26T22:44:08.133Z] [arbiter] The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\"\n[2026-08-26T22:44:08.133Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\u2026\"\n",
+      "[2026-08-26T22:44:08.135Z] [world] You repair the Burl Aegis. Back to full. (spent: Small Rock x2)\n[2026-08-26T22:44:08.155Z] [world] You repair the Compact Blaster. Back to full. (spent: Scrap Metal x4, Stick x2)\n[2026-08-26T22:44:08.170Z] [arbiter] The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\"\n",
+      "[2026-08-26T22:44:08.170Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\u2026\"\n[2026-08-26T22:44:08.170Z] [world] You repair the Forge-Black Cowl. Back to full. (spent: Small Rock x2)\n[2026-08-26T22:44:08.184Z] [arbiter] The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\"\n",
+      "[2026-08-26T22:44:08.184Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\u2026\"\n[2026-08-26T22:44:08.185Z] [world] You repair the Spore-Crusted Tassets. Back to full. (spent: Small Rock x2)\n[2026-08-26T22:44:08.198Z] [world] You repair the Wanderer's Worn Gauntlets. Back to full. (spent: Patched Cloth x4)\n",
+      "[2026-08-26T22:44:08.212Z] [arbiter] The Arbiter nods. \"Patched in: 5\u00d7 Bent Nail \u2192 Scrap Metal.\"\n[2026-08-26T22:44:08.214Z] [world] You repair the Aetheric Crystal Blade. Back to full. (spent: Scrap Metal x6, Stick x2)\n[2026-08-26T22:44:08.238Z] [arbiter] The Arbiter nods. \"Patched in: 6\u00d7 Bent Nail \u2192 Scrap Metal, Firewood \u2192 Stick.\"\n",
+      "[2026-08-26T22:44:08.249Z] [world] You repair the Bone Crossbow. Back to full. (spent: Scrap Metal x6, Stick x2)\n[2026-08-26T22:44:08.273Z] [arbiter] The Arbiter nods. \"Patched in: 6\u00d7 Bent Nail \u2192 Scrap Metal, 2\u00d7 Firewood \u2192 Stick.\"\n[2026-08-26T22:44:08.285Z] [world] You repair the Bone Crossbow. Back to full. (spent: Scrap Metal x6, Stick x2)\n",
+      "[2026-08-26T22:44:08.297Z] [arbiter] The Arbiter eyes the Bone Crossbow. \"Short on stock: Stick 1 short. Gather, then return.\"\n[2026-08-26T22:44:08.297Z] [arbiter] The Arbiter eyes the Bone Knife. \"Short on stock: Stick 1 short. Gather, then return.\"\n[2026-08-26T22:44:08.298Z] [arbiter] The Arbiter eyes the Bone Knife. \"Short on stock: Stick 1 short. Gather, then return.\"\n",
+      "[2026-08-26T22:44:08.298Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter eyes the Bone Knife. \"Short on stock: Stick 1 sh\u2026\"\n[2026-08-26T22:44:08.298Z] [arbiter] The Arbiter eyes the Cudgel. \"Short on stock: Stick 1 short. Gather, then return.\"\n[2026-08-26T22:44:08.298Z] [arbiter] The Arbiter eyes the Cudgel. \"Short on stock: Stick 1 short. Gather, then return.\"\n",
+      "[2026-08-26T22:44:08.298Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter eyes the Cudgel. \"Short on stock: Stick 1 short.\u2026\"\n[2026-08-26T22:44:08.298Z] [arbiter] The Arbiter eyes the Acid-Etched Cudgel. \"Short on stock: Stick 1 short. Gather, then return.\"\n[2026-08-26T22:44:08.298Z] [arbiter] The Arbiter eyes the Iron Spear. \"Short on stock: Stick 1 short. Gather, then return.\"\n",
+      "[2026-08-26T22:44:08.299Z] [arbiter] The Arbiter nods. \"Patched in: 3\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n[2026-08-26T22:44:08.301Z] [world] You repair the Mud-Bound Cloak. Back to full. (spent: Patched Cloth x4)\n",
+      "[2026-08-26T22:44:08.322Z] [arbiter] The Arbiter nods. \"Patched in: Bent Nail \u2192 Scrap Metal, Reeve's Brass Token \u2192 Scrap Metal, 2\u00d7 Worn Tartarian Coin \u2192 Scrap Metal, 4\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n[2026-08-26T22:44:08.332Z] [world] You repair the Mud-Warden's Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n",
+      "[2026-08-26T22:44:08.353Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Worn Tartarian Coin \u2192 Scrap Metal, 4\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n[2026-08-26T22:44:08.362Z] [world] You repair the Mud-Warden's Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n",
+      "[2026-08-26T22:44:08.383Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Worn Tartarian Coin \u2192 Scrap Metal, 4\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n[2026-08-26T22:44:08.383Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Patched in: 4\u00d7 Worn Tartarian Coin \u2192 Scra\u2026\"\n[2026-08-26T22:44:08.392Z] [world] You repair the Mud-Warden's Vest. Back t"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-28-1530-the-stranger-gets-the-screen #mtcgc1vw57ml [inline 3/27]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtcgc1vw57ml"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "3"
+    },
+    {
+      "key": "parts",
+      "value": "27"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db2f:4653:ad2:ae51:4f0f:3e39",
+      "query": "user.ip:\"2607:fb90:db2f:4653:ad2:ae51:4f0f:3e39\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-28T22:14:14.916000Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "26": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 383,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-28T22:14:14.836000Z",
+  "fingerprints": [
+    "be748ce85802371e970795a28e86f05d"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "dd0bf5fbd09a4d04b55ae61287ae3f50",
+  "previousEventID": "d391b6b40837494d9fea0cc56e9604e0"
+}

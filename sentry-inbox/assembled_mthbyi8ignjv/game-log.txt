@@ -1,0 +1,1917 @@
+=== TARTARIA LOG · 192602 CHARS · BEGIN ===
+[2026-08-30T18:43:30.754Z] [debug] persist sizes(KB): total=102 player=37 wm=61[rooms=30 events=1 memos=0 npcs=1 defeated=1 tags=0 discovered=0] log=0 scene=3
+[2026-08-30T18:44:24.801Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a053da-1891-7b49-8e92-321b7cba6e67
+[2026-08-30T18:44:24.802Z] [debug] ota: Checking…
+[2026-08-30T18:44:24.865Z] [debug] ota: Already up to date
+[2026-08-30T18:44:24.865Z] [debug] ota: boot check result = noUpdate
+[2026-08-30T18:44:24.921Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-08-30T18:44:24.922Z] [debug] voice: bundled idle
+[2026-08-30T18:44:25.206Z] [debug] send-log: bundle #mtg55shijei7 attempt 2/5 delivered to Sentry
+[2026-08-30T18:44:28.734Z] [debug] OTA session start: 2026-08-30-1571-the-slot-moves-on.
+[2026-08-30T18:44:28.734Z] [world] You step back into Great Tartary Plains. The world waits for your move.
+[2026-08-30T18:44:28.734Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. "Welcome back, Cheddar Bob. We've still got ground to cover, you and I."
+[2026-08-30T18:44:28.885Z] [debug] ═══ SESSION 2026-08-30T18:44:28.885Z · build 2026-08-30-1571-the-slot-moves-on · previous entry moments earlier ═══
+[2026-08-30T18:44:29.238Z] [debug] send-log: crash on record (2026-08-30T18:43:29.524Z) — game log pushed automatically, delivered to Sentry, kept on disk as #mtg5s64oul66
+[2026-08-30T18:44:32.575Z] [debug] send-log: #mtg5s8s9w0sz — DELIVERED (inline, no attachments): beacon out, 1/1 parts accepted (7273 chars) — flush said yes
+[2026-08-30T18:44:32.576Z] [debug] send-log: all parts accepted by the SDK — bundle #mtg5s8s9w0sz kept on disk, boots retry up to 5 sends total
+[2026-08-30T20:29:25.327Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a053da-1891-7b49-8e92-321b7cba6e67
+[2026-08-30T20:29:25.328Z] [debug] ota: Checking…
+[2026-08-30T20:29:27.196Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-08-30T20:29:27.348Z] [debug] ota: Saving progress…
+[2026-08-30T20:29:27.351Z] [debug] ota: Restarting to apply…
+[2026-08-30T20:29:27.464Z] [debug] ota: boot check result = applied
+[2026-08-30T20:29:27.613Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a05438-45c0-73a1-babe-4f1f7c9e3724
+[2026-08-30T20:29:27.614Z] [debug] ota: Checking…
+[2026-08-30T20:29:27.779Z] [debug] ota: Already up to date
+[2026-08-30T20:29:27.780Z] [debug] ota: boot check result = noUpdate
+[2026-08-30T20:29:27.809Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-08-30T20:29:27.810Z] [debug] voice: bundled idle
+[2026-08-30T20:29:28.159Z] [debug] send-log: bundle #mtg5s8s9w0sz attempt 2/5 delivered to Sentry
+[2026-08-30T20:40:33.780Z] [debug] OTA applied: 2026-08-30-1571-the-slot-moves-on → 2026-08-30-1575-the-stone-marks-you.
+[2026-08-30T20:40:33.780Z] [debug] OTA session start: 2026-08-30-1575-the-stone-marks-you.
+[2026-08-30T20:40:33.780Z] [world] You step back into Great Tartary Plains. The world waits for your move.
+[2026-08-30T20:40:33.780Z] [arbiter] The Arbiter meets your eyes. "Welcome back, Cheddar Bob. The buried country is no place to walk alone."
+[2026-08-30T20:40:33.979Z] [debug] ═══ SESSION 2026-08-30T20:40:33.979Z · build 2026-08-30-1575-the-stone-marks-you · updated from 2026-08-30-1571-the-slot-moves-on · previous entry moments earlier ═══
+[2026-08-30T20:41:24.080Z] [debug] ui: tap "more ▸"
+[2026-08-30T20:41:26.383Z] [debug] ui: tap "missions"
+[2026-08-30T20:51:53.463Z] [world] You set course for Nimari. 8 tiles — about 20 hours of travel, all in. You set off now — the ground ahead is new ground. Keep tapping → NIMARI on the travel row to close the distance; STOP TRAVEL to halt.
+[2026-08-30T20:51:53.513Z] [debug] spawn: gear=[Seer's Veil of the Aether, Order Letter-Opener] window=10 roster=new
+[2026-08-30T20:51:53.514Z] [world] You walk south. The ground here looks much like the ground behind you. You have lost track of distance.
+[2026-08-30T20:51:53.516Z] [world] The top of a flooded Tartarian cathedral pierces the standing water ahead — steeple intact, the rest drowned.
+[2026-08-30T20:51:55.448Z] [debug] ui: tap "missions"
+[2026-08-30T20:51:57.126Z] [debug] persist sizes(KB): total=98 player=42 wm=50[rooms=19 events=1 memos=0 npcs=1 defeated=1 tags=0 discovered=0] log=3 scene=4
+[2026-08-30T20:51:58.663Z] [debug] ui: tap "craft"
+[2026-08-30T20:52:01.150Z] [world] You repair the Smoldering Reclaimers Guild Geode-Cored Cleaver. Back to full. (spent: Small Rock x2)
+[2026-08-30T20:52:02.334Z] [arbiter] The Arbiter nods. "Patched in: Cloth Scrap → Patched Cloth."
+[2026-08-30T20:52:02.343Z] [world] You repair the Rough-Hewn Chestplate. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)
+[2026-08-30T20:52:09.335Z] [debug] ui: tap "inventory"
+[2026-08-30T20:52:52.337Z] [world] You break the Bone Knife down. ✦ Recovered: Scrap Metal x2, Stick.
+[2026-08-30T20:52:52.373Z] [world] The first pass on the Bone Knife crumbles in your hands — but your training kicks in. You stop, breathe, change angle, and try again.
+[2026-08-30T20:52:52.373Z] [world] You break the Bone Knife down. ✦ Recovered: Scrap Metal x2, Stick.
+[2026-08-30T20:52:52.403Z] [world] You break the Bone Knife down. ✦ Recovered: Scrap Metal x2, Stick.
+[2026-08-30T20:52:52.431Z] [world] You break the Bone Knife down. ✦ Recovered: Scrap Metal x2, Stick.
+[2026-08-30T20:52:52.458Z] [world] You break the Bone Knife down. ✦ Recovered: Scrap Metal x2, Stick.
+[2026-08-30T20:52:52.486Z] [world] You break the Bone Knife down. ✦ Recovered: Scrap Metal x2, Stick.
+[2026-08-30T20:52:52.514Z] [world] You break the Bone Knife down. ✦ Recovered: Scrap Metal x2, Stick.
+[2026-08-30T20:52:52.541Z] [world] You break the Cudgel down. ✦ Recovered: Small Rock x2, Stick.
+[2026-08-30T20:52:52.568Z] [world] You break the Cudgel down. ✦ Recovered: Small Rock x2, Stick.
+[2026-08-30T20:52:52.596Z] [world] You break the Cudgel down. ✦ Recovered: Small Rock x2, Stick.
+[2026-08-30T20:53:03.805Z] [debug] persist sizes(KB): total=97 player=39 wm=50[rooms=19 events=1 memos=0 npcs=1 defeated=1 tags=0 discovered=0] log=5 scene=4
+[2026-08-30T20:53:17.764Z] [debug] stats: STR11 DEX27 INT12 WIS6 CHA2 STE5 | gear: DEX+20,INT+3,STR+6,STE+2,WIS+1 | worn: main=Reclaimers Guild Geode-Cored Cleaver off=Bone Crossbow head=Forgotten Seeker's Mask chest=Rough-Hewn Chestplate hands=Relic Hunter's Gauntlets legs=Aetheric Scout Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band
+[2026-08-30T20:53:49.349Z] [debug] ui: tap "inventory"
+[2026-08-30T20:54:39.403Z] [world] You break the Mud-Warden's Vest down. ✦ Recovered: Scrap Metal x2, Patched Cloth x2.
+[2026-08-30T20:54:39.438Z] [world] The first pass on the Mud-Warden's Vest crumbles in your hands — but your training kicks in. You stop, breathe, change angle, and try again.
+[2026-08-30T20:54:39.438Z] [world] You break the Mud-Warden's Vest down. ✦ Recovered: Scrap Metal x2, Patched Cloth x2.
+[2026-08-30T20:54:39.466Z] [world] You break the Mud-Warden's Vest down. ✦ Recovered: Scrap Metal x2, Patched Cloth x2.
+[2026-08-30T20:54:39.493Z] [world] You break the Mud-Warden's Vest down. ✦ Recovered: Scrap Metal x2, Patched Cloth x2.
+[2026-08-30T20:54:39.519Z] [world] You break the Reclaimer's Salvage Vest down. ✦ Recovered: Scrap Metal x2, Patched Cloth x2.
+[2026-08-30T20:54:39.545Z] [world] You break the Reclaimer's Salvage Vest down. ✦ Recovered: Scrap Metal x2, Patched Cloth x2.
+[2026-08-30T20:54:39.571Z] [world] You break the Reclaimer's Salvage Vest down. ✦ Recovered: Scrap Metal x2, Patched Cloth x2.
+[2026-08-30T20:54:39.597Z] [world] You break the Reclaimer's Salvage Vest down. ✦ Recovered: Scrap Metal x2, Patched Cloth x2.
+[2026-08-30T20:54:39.622Z] [world] You break the Mud-Stalker Leggings down. ✦ Recovered: Patched Cloth x2.
+[2026-08-30T20:54:39.647Z] [world] You break the Resonant Faulds down. ✦ Recovered: Small Rock.
+[2026-08-30T20:54:39.671Z] [world] You break the Sentinel's Greaves down. ✦ Recovered: Patched Cloth x2.
+[2026-08-30T20:54:39.695Z] [world] You break the Wanderer's Footwraps down. ✦ Recovered: Patched Cloth x2.
+[2026-08-30T20:54:39.719Z] [world] You break the Mud-Bound Cloak down. ✦ Recovered: Patched Cloth x2.
+[2026-08-30T20:54:39.743Z] [world] You break the Mud-Bound Cloak down. ✦ Recovered: Patched Cloth x2.
+[2026-08-30T20:54:39.767Z] [world] You break the Reclaimer's Cloak down. ✦ Recovered: Patched Cloth x2.
+[2026-08-30T20:55:09.897Z] [world] You break the Mud Buckler down. ✦ Recovered: Scrap Metal x2, Stick.
+[2026-08-30T20:55:10.714Z] [debug] persist sizes(KB): total=94 player=34 wm=49[rooms=19 events=1 memos=0 npcs=1 defeated=1 tags=0 discovered=0] log=7 scene=4
+[2026-08-30T20:55:23.338Z] [debug] ui: tap "craft"
+[2026-08-30T21:22:56.351Z] [debug] OTA session start: 2026-08-30-1575-the-stone-marks-you.
+[2026-08-30T21:22:56.351Z] [world] You step back into Great Tartary Plains. The world waits for your move.
+[2026-08-30T21:22:56.351Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. "Welcome back, Cheddar Bob. We've still got ground to cover, you and I."
+[2026-08-30T21:22:56.453Z] [debug] ═══ SESSION 2026-08-30T21:22:56.453Z · build 2026-08-30-1575-the-stone-marks-you · previous entry moments earlier ═══
+[2026-08-30T21:23:01.940Z] [debug] ui: tap "craft"
+[2026-08-30T21:23:38.143Z] [debug] ui: tap "take / salvage"
+[2026-08-30T21:23:39.646Z] [world] You take the Order Letter-Opener from where it lay.
+[2026-08-30T21:23:39.647Z] [reward] ✦ Order Letter-Opener (Common).
+[2026-08-30T21:23:39.661Z] [world] You pick up the Seer's Veil of the Aether.
+[2026-08-30T21:23:39.661Z] [reward] ✦ Seer's Veil of the Aether (Common).
+[2026-08-30T21:23:39.823Z] [debug] persist sizes(KB): total=95 player=34 wm=49[rooms=19 events=1 memos=0 npcs=1 defeated=1 tags=0 discovered=0] log=9 scene=3
+[2026-08-30T21:23:40.780Z] [reward] ✦ Found Final Entry — Upper Tower — Elior Zalmar. (open Contracts → Collectibles to read)
+[2026-08-30T21:23:40.793Z] [world] You salvage the overturned wagon. The take is small but real.
+[2026-08-30T21:23:40.793Z] [world] You work the track apart. Tucked inside, sealed against the silt: a folded note.
+[2026-08-30T21:23:40.793Z] [world] You salvage the weathered obsidian pillar. The take is small but real.
+[2026-08-30T21:23:40.794Z] [reward] ✦ Salvage haul:
+[2026-08-30T21:23:40.794Z] [reward]     • Worn Tartarian Coin x3 (Common)
+[2026-08-30T21:23:40.794Z] [reward]     • Aetheric Shard (Uncommon)
+[2026-08-30T21:23:42.452Z] [world] The ash burns your throat. The breath you spend on this action costs more than usual.
+[2026-08-30T21:23:42.468Z] [player] investigate standing water
+[2026-08-30T21:23:42.469Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=standing water resolved=standing water range=- enemies=0 hooks=1
+[2026-08-30T21:23:42.469Z] [debug] route: hook intercept (kind=submerged_steeple, target="standing water") — original intent=investigate
+[2026-08-30T21:23:42.471Z] [world] ★ STORY THREAD (step 1) — You wade out to the steeple. The window-slits at the top open onto a flooded nave — Aetherstone shimmer in the water below.
+[2026-08-30T21:23:42.472Z] [arbiter] "Explorers have gone in," the Arbiter says, "and the water keeps them."
+[2026-08-30T21:23:43.459Z] [debug] ctx: OPENED — live=1 (opened=1 released=0) ≈425MB est
+[2026-08-30T21:23:44.078Z] [combat] You take 4 damage from the flooded nave.
+[2026-08-30T21:23:44.085Z] [world] ★★ STORY THREAD COMPLETE — You dive. The Aetherstone gives you a half-minute of breathable air. You grab what you can — a heavy reliquary off the altar — and break back to the surface, lungs burning.
+[2026-08-30T21:23:44.085Z] [reward] ✦ Golem Core, +60 TC.
+[2026-08-30T21:23:44.086Z] [reward] ✦ For your persistence — Sentinel Core Plate (Uncommon).
+[2026-08-30T21:23:50.320Z] [debug] homework: intro-fill armed after 6000ms idle
+[2026-08-30T21:23:56.074Z] [debug] qwen⏱ narration:scene_intro_fill dormant 5650ms read 0ms/write 0ms in 723t→out 0t (0ch)
+[2026-08-30T21:23:56.102Z] [debug] qwen⏱ ✂ DISCARDED narration:scene_intro_fill after 5650ms — intro-fill:∅
+[2026-08-30T21:23:56.103Z] [debug] homework: scene_intro "Great Tartary Plains" ∅ 5783ms
+[2026-08-30T21:23:56.161Z] [debug] ctx: RELEASED — live=0 (opened=1 released=1)
+[2026-08-30T21:23:56.208Z] [debug] appstate: active → background (was active for 12664ms)
+[2026-08-30T21:23:56.399Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a0548b-3a99-7834-b7c6-55cf5141fe11
+[2026-08-30T21:23:56.399Z] [debug] ota: Checking…
+[2026-08-30T21:23:56.493Z] [debug] ota: Already up to date
+[2026-08-30T21:23:56.494Z] [debug] ota: boot check result = noUpdate
+[2026-08-30T21:23:56.573Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-08-30T21:23:56.573Z] [debug] voice: bundled idle
+[2026-08-30T21:23:57.011Z] [debug] send-log: bundle #mtg5s8s9w0sz attempt 3/5 delivered to Sentry
+[2026-08-30T21:43:01.182Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a0548b-3a99-7834-b7c6-55cf5141fe11
+[2026-08-30T21:43:01.182Z] [debug] ota: Checking…
+[2026-08-30T21:43:01.242Z] [debug] ota: Already up to date
+[2026-08-30T21:43:01.243Z] [debug] ota: boot check result = noUpdate
+[2026-08-30T21:43:01.288Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-08-30T21:43:01.290Z] [debug] voice: bundled idle
+[2026-08-30T21:43:01.452Z] [debug] send-log: bundle #mtg5s8s9w0sz attempt 4/5 delivered to Sentry
+[2026-08-30T21:43:04.949Z] [debug] OTA session start: 2026-08-30-1578-the-stage-says-who-is-there.
+[2026-08-30T21:43:04.950Z] [world] You step back into Great Tartary Plains. The world waits for your move.
+[2026-08-30T21:43:04.950Z] [arbiter] The Arbiter meets your eyes. "Welcome back, Cheddar Bob. The buried country is no place to walk alone."
+[2026-08-30T21:43:05.109Z] [debug] ═══ SESSION 2026-08-30T21:43:05.109Z · build 2026-08-30-1578-the-stage-says-who-is-there · previous entry moments earlier ═══
+[2026-08-30T21:43:05.406Z] [debug] send-log: crash on record (2026-08-30T21:23:57.150Z) — game log pushed automatically, delivered to Sentry, kept on disk as #mtgc5ut96dzn
+[2026-08-30T22:25:37.372Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a0548b-3a99-7834-b7c6-55cf5141fe11
+[2026-08-30T22:25:37.372Z] [debug] ota: Checking…
+[2026-08-30T22:25:38.842Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-08-30T22:25:38.925Z] [debug] ota: Saving progress…
+[2026-08-30T22:25:38.926Z] [debug] ota: Restarting to apply…
+[2026-08-30T22:25:39.157Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a054bc-60ff-74b7-bd2c-a1e3ab983c2c
+[2026-08-30T22:25:39.157Z] [debug] ota: Checking…
+[2026-08-30T22:25:39.447Z] [debug] ota: Already up to date
+[2026-08-30T22:25:39.447Z] [debug] ota: boot check result = noUpdate
+[2026-08-30T22:25:39.481Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-08-30T22:25:39.481Z] [debug] voice: bundled idle
+[2026-08-30T22:25:39.925Z] [debug] send-log: bundle #mtgc5ut96dzn attempt 2/5 delivered to Sentry
+[2026-08-30T23:42:06.377Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a054bc-60ff-74b7-bd2c-a1e3ab983c2c
+[2026-08-30T23:42:06.377Z] [debug] ota: Checking…
+[2026-08-30T23:42:08.922Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-08-30T23:42:08.991Z] [debug] ota: Saving progress…
+[2026-08-30T23:42:08.993Z] [debug] ota: Restarting to apply…
+[2026-08-30T23:42:09.054Z] [debug] ota: boot check result = applied
+[2026-08-30T23:42:09.214Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a05503-b522-7120-a224-c3bd40c41c8b
+[2026-08-30T23:42:09.214Z] [debug] ota: Checking…
+[2026-08-30T23:42:09.284Z] [debug] ota: Already up to date
+[2026-08-30T23:42:09.284Z] [debug] ota: boot check result = noUpdate
+[2026-08-30T23:42:09.324Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-08-30T23:42:09.324Z] [debug] voice: bundled idle
+[2026-08-30T23:42:09.425Z] [debug] send-log: bundle #mtgc5ut96dzn attempt 3/5 delivered to Sentry
+[2026-08-31T00:07:24.004Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a05503-b522-7120-a224-c3bd40c41c8b
+[2026-08-31T00:07:24.004Z] [debug] ota: Checking…
+[2026-08-31T00:07:24.052Z] [debug] ota: Already up to date
+[2026-08-31T00:07:24.053Z] [debug] ota: boot check result = noUpdate
+[2026-08-31T00:07:24.081Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-08-31T00:07:24.081Z] [debug] voice: bundled idle
+[2026-08-31T00:07:24.241Z] [debug] send-log: bundle #mtgc5ut96dzn attempt 4/5 delivered to Sentry
+[2026-08-31T00:07:28.127Z] [debug] OTA session start: 2026-08-30-1581-the-card-they-cannot-walk-past.
+[2026-08-31T00:07:28.127Z] [world] You step back into Great Tartary Plains. The world waits for your move.
+[2026-08-31T00:07:28.127Z] [arbiter] The Arbiter sets the quiet aside. "Welcome back, Cheddar Bob. I kept watch while you were gone."
+[2026-08-31T00:07:28.276Z] [debug] ═══ SESSION 2026-08-31T00:07:28.276Z · build 2026-08-30-1581-the-card-they-cannot-walk-past · previous entry moments earlier ═══
+[2026-08-31T00:07:28.613Z] [debug] send-log: crash on record (2026-08-30T23:42:09.758Z) — game log pushed automatically, delivered to Sentry, kept on disk as #mtghbjcewf3z
+[2026-08-31T00:07:31.713Z] [debug] send-log: #mtghbloc64g4 — DELIVERED (inline, no attachments): beacon out, 2/2 parts accepted (23208 chars) — flush said yes
+[2026-08-31T00:07:31.713Z] [debug] send-log: all parts accepted by the SDK — bundle #mtghbloc64g4 kept on disk, boots retry up to 5 sends total
+[2026-08-31T00:21:56.531Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a05503-b522-7120-a224-c3bd40c41c8b
+[2026-08-31T00:21:56.531Z] [debug] ota: Checking…
+[2026-08-31T00:21:57.511Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-08-31T00:21:57.608Z] [debug] ota: Saving progress…
+[2026-08-31T00:21:57.609Z] [debug] ota: Restarting to apply…
+[2026-08-31T00:21:57.681Z] [debug] ota: boot check result = applied
+[2026-08-31T00:21:57.806Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a0552e-ecd7-7809-9d77-60c13c17117a
+[2026-08-31T00:21:57.806Z] [debug] ota: Checking…
+[2026-08-31T00:21:57.896Z] [debug] ota: Already up to date
+[2026-08-31T00:21:57.896Z] [debug] ota: boot check result = noUpdate
+[2026-08-31T00:21:57.928Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-08-31T00:21:57.928Z] [debug] voice: bundled idle
+[2026-08-31T00:21:58.136Z] [debug] send-log: bundle #mtghbloc64g4 attempt 2/5 delivered to Sentry
+[2026-08-31T02:44:51.154Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a0552e-ecd7-7809-9d77-60c13c17117a
+[2026-08-31T02:44:51.154Z] [debug] ota: Checking…
+[2026-08-31T02:44:52.191Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-08-31T02:44:52.296Z] [debug] ota: Saving progress…
+[2026-08-31T02:44:52.298Z] [debug] ota: Restarting to apply…
+[2026-08-31T02:44:52.373Z] [debug] ota: boot check result = applied
+[2026-08-31T02:44:52.534Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a0556e-99da-7f43-bd28-ff011ea84139
+[2026-08-31T02:44:52.534Z] [debug] ota: Checking…
+[2026-08-31T02:44:52.664Z] [debug] ota: Already up to date
+[2026-08-31T02:44:52.665Z] [debug] ota: boot check result = noUpdate
+[2026-08-31T02:44:52.702Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-08-31T02:44:52.703Z] [debug] voice: bundled idle
+[2026-08-31T02:44:52.893Z] [debug] send-log: bundle #mtghbloc64g4 attempt 3/5 delivered to Sentry
+[2026-08-31T02:44:56.640Z] [debug] OTA applied: 2026-08-30-1582-the-guy-who-gives-you-the-job → 2026-08-31-1583-the-favour-beat-fights-what-it-names.
+[2026-08-31T02:44:56.640Z] [debug] OTA session start: 2026-08-31-1583-the-favour-beat-fights-what-it-names.
+[2026-08-31T02:44:56.640Z] [world] You step back into Great Tartary Plains. The world waits for your move.
+[2026-08-31T02:44:56.641Z] [arbiter] The Arbiter meets your eyes. "Welcome back, Cheddar Bob. The buried country is no place to walk alone."
+[2026-08-31T02:44:56.784Z] [debug] ═══ SESSION 2026-08-31T02:44:56.783Z · build 2026-08-31-1583-the-favour-beat-fights-what-it-names · updated from 2026-08-30-1582-the-guy-who-gives-you-the-job · previous entry moments earlier ═══
+[2026-08-31T02:44:57.112Z] [debug] send-log: crash on record (2026-08-31T00:21:58.332Z) — game log pushed automatically, delivered to Sentry, kept on disk as #mtgmy1ut4oor
+[2026-08-31T02:45:03.748Z] [debug] ui: tap "→ NIMARI"
+[2026-08-31T02:45:03.797Z] [world] A stall has been thrown up on the next stretch of ground — Ymer Tinpot, wandering trader. Tap the vendor banner to trade.
+[2026-08-31T02:45:03.803Z] [world] Rare workings for sale: Lich-Heart Pendant (200 TC), Many-Colored Tonic (200 TC), Mire Stave (200 TC) — buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem — just ask.
+[2026-08-31T02:45:03.803Z] [world] You walk south. The ground here looks much like the ground behind you. You have lost track of distance.
+[2026-08-31T02:45:03.804Z] [world] A crystal embedded in a half-broken pillar whispers — actual words, almost — when you pass within arm's reach.
+[2026-08-31T02:45:06.133Z] [reward] Ymer Tinpot fires up a portable Crucible for you. (−25 TC)
+[2026-08-31T02:45:16.011Z] [reward] ✦ The Crucible drinks the five pieces and works an extra resist channel into the Aetheric Scout Greaves. It can now hold one more worked-in resist. (Its armor rating is unchanged.)
+[2026-08-31T02:45:18.114Z] [reward] Ymer Tinpot fires up a portable Crucible for you. (−25 TC)
+[2026-08-31T02:45:30.907Z] [reward] ✦ The Crucible drinks the five pieces and works an extra resist channel into the Forgotten Seeker's Mask. It can now hold one more worked-in resist. (Its armor rating is unchanged.)
+[2026-08-31T02:45:33.806Z] [arbiter] Ymer Tinpot taps the cold Crucible. "Need at least 3 inferred items reserved for fusion (♥ in inventory). You have 1." No charge until you are ready.
+[2026-08-31T02:45:36.501Z] [debug] ui: tap "more ▸"
+[2026-08-31T02:45:38.267Z] [debug] ui: tap "inventory"
+[2026-08-31T02:45:44.278Z] [reward] Ymer Tinpot fires up a portable Crucible for you. (−25 TC)
+[2026-08-31T02:45:58.586Z] [reward] ✦ The Crucible drinks the five pieces and works an extra resist channel into the Relic Hunter's Gauntlets. It can now hold one more worked-in resist. (Its armor rating is unchanged.)
+[2026-08-31T02:46:01.798Z] [debug] ui: tap "take / salvage"
+[2026-08-31T02:46:03.063Z] [world] You take the Aetheric Compass from where it lay.
+[2026-08-31T02:46:03.064Z] [reward] ✦ Aetheric Compass (Uncommon).
+[2026-08-31T02:46:03.075Z] [world] You pick up the Aetheric Torch.
+[2026-08-31T02:46:03.075Z] [reward] ✦ Aetheric Torch (Common).
+[2026-08-31T02:46:04.245Z] [world] You break the fossil rib apart. Among the pieces, something worth keeping.
+[Filtered][2026-08-31T02:46:04.246Z] [reward]     • Copper Wire Spool (Uncommon)
+[2026-08-31T02:46:04.246Z] [reward]     • Bent Nail x2 (Common)
+[2026-08-31T02:46:04.589Z] [debug] persist sizes(KB): total=107 player=34 wm=50[rooms=19 events=1 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=19 scene=4
+[2026-08-31T02:47:41.355Z] [debug] ui: tap "inventory"
+[2026-08-31T02:47:54.083Z] [player] Ask why the stall is here
+[2026-08-31T02:47:54.086Z] [world] "Stall goes up where the ground is flat and comes down when it is not worth it," the trader says. "That is the whole business plan."
+[2026-08-31T02:47:54.087Z] [world] Ymer Tinpot shifts the pack higher on their shoulder and does not put it down.
+[2026-08-31T02:47:56.349Z] [world] You let the conversation go and Ymer Tinpot gets back to it.
+[2026-08-31T02:48:02.536Z] [debug] ui: tap "investigate"
+[2026-08-31T02:48:04.156Z] [player] investigate the ground
+[2026-08-31T02:48:04.157Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2
+[2026-08-31T02:48:04.160Z] [reward] You scrape at the silt with the bent nail. ✦ Recovered Small Rock (Common).
+[2026-08-31T02:48:04.163Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-31T02:48:04.163Z] [arbiter] The Arbiter looks around. "The horizon refuses to settle. Aether moves under the grass like breath under a sheet."
+[2026-08-31T02:48:04.164Z] [debug] arbiter: ambient held (he just spoke)
+[2026-08-31T02:48:04.164Z] [system] ⏳ Time passed: 24 min
+[2026-08-31T02:48:04.294Z] [cognitive] CLIMB  (129ms)
+[2026-08-31T02:48:05.285Z] [debug] ctx: OPENED — live=1 (opened=1 released=0) ≈425MB est
+[2026-08-31T02:48:05.401Z] [player] investigate storm crystal
+[2026-08-31T02:48:05.401Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=storm crystal resolved=storm crystal range=- enemies=0 hooks=2
+[2026-08-31T02:48:05.401Z] [debug] route: hook intercept (kind=whisper_crystal, target="storm crystal") — original intent=investigate
+[2026-08-31T02:48:05.402Z] [world] ★ STORY THREAD (step 1) — You lean toward the crystal. The whispering shapes itself — Tartarian, you think, though no language you can name. It is saying a location.
+[2026-08-31T02:48:11.416Z] [debug] homework: intro-fill armed after 6000ms idle
+[2026-08-31T02:48:13.193Z] [reward] Sold Short Hunting Bow (Common) to Ymer Tinpot for 14 TC. (499 TC on hand)
+[2026-08-31T02:48:13.228Z] [reward] Sold Order Letter-Opener (Common) to Ymer Tinpot for 14 TC. (513 TC on hand)
+[2026-08-31T02:48:13.260Z] [reward] Sold Mud Claymore (Common) to Ymer Tinpot for 12 TC. (525 TC on hand)
+[2026-08-31T02:48:13.292Z] [reward] Sold Throwing Knife (Common) to Ymer Tinpot for 12 TC. (537 TC on hand)
+[2026-08-31T02:48:13.323Z] [reward] Sold Iron Buckler (Common) to Ymer Tinpot for 12 TC. (549 TC on hand)
+[2026-08-31T02:48:13.354Z] [reward] Sold Aetheric Helm of Command (Common) to Ymer Tinpot for 6 TC. (555 TC on hand)
+[2026-08-31T02:48:13.386Z] [reward] Sold Wanderer's Outercoat (Common) to Ymer Tinpot for 6 TC. (561 TC on hand)
+[2026-08-31T02:48:13.416Z] [reward] Sold Seer's Veil of the Aether (Common) to Ymer Tinpot for 6 TC. (567 TC on hand)
+[2026-08-31T02:48:13.829Z] [debug] persist sizes(KB): total=110 player=34 wm=50[rooms=19 events=1 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=22 scene=4
+[2026-08-31T02:48:20.871Z] [debug] qwen⏱ narration:scene_intro_fill ok 9446ms read 8358ms/write 1044ms in 734t→out 33t 11.4ms/t HIT-CAP (178ch)
+[2026-08-31T02:48:20.895Z] [debug] homework: scene_intro "Great Tartary Plains" ✓ 9481ms
+[2026-08-31T02:48:29.954Z] [reward] Bought 4× Wild Oats from Ymer Tinpot for 16 TC. (551 TC left)
+[2026-08-31T02:48:32.150Z] [reward] Bought 3× Smoke-Cured Jerky Strip from Ymer Tinpot for 24 TC. (527 TC left)
+[2026-08-31T02:48:34.041Z] [reward] Bought Water Bottle from Ymer Tinpot for 5 TC. (522 TC left)
+[2026-08-31T02:48:38.660Z] [reward] Bought 3× Firewood from Ymer Tinpot for 9 TC. (513 TC left)
+[2026-08-31T02:48:42.768Z] [debug] ui: tap "craft"
+[2026-08-31T02:48:54.092Z] [world] You repair the Searing Bone Crossbow. Back to full. (spent: Scrap Metal x6, Stick x2)
+[2026-08-31T02:48:54.115Z] [world] You repair the Forgotten Seeker's Mask. Back to full. (spent: Patched Cloth x6)
+[2026-08-31T02:48:54.127Z] [world] You repair the Reclaimer's Rope. Back to full. (spent: Patched Cloth x4)
+[2026-08-31T02:48:54.136Z] [world] You repair the Reclaimer's Rope. Back to full. (spent: Patched Cloth x4)
+[2026-08-31T02:48:55.637Z] [debug] persist sizes(KB): total=110 player=31 wm=51[rooms=19 events=1 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=24 scene=4
+[2026-08-31T02:48:56.443Z] [debug] homework: intro-fill armed after 6000ms idle
+[2026-08-31T02:48:58.008Z] [debug] ui: tap "→ NIMARI"
+[2026-08-31T02:48:58.025Z] [debug] spawn: gear=[Mud-Bound Cloak, Reclaimer's Trousers, Aether-Walker's Cape] window=10 roster=new
+[2026-08-31T02:48:58.026Z] [world] You walk south through open silt. The compass points south into open ground.
+[2026-08-31T02:48:58.027Z] [world] A body sits cross-legged in the silt, mud-glassed in place. The pose is patient. Whatever they were waiting for never arrived.
+[2026-08-31T02:48:58.028Z] [world] A locket on their chest holds a pre-flood photograph — a face you don't recognise, smiling at a sky that doesn't exist anymore.
+[2026-08-31T02:48:58.028Z] [reward] ✦ Recovered Aether Dust x3.
+[2026-08-31T02:48:58.032Z] [world] The thread you were following waits where you left it.
+[2026-08-31T02:48:59.506Z] [debug] ui: tap "take / salvage"
+[2026-08-31T02:49:00.630Z] [debug] qwen⏱ narration:scene_intro_fill ok 4094ms read 2934ms/write 1123ms in 737t→out 33t 4.0ms/t HIT-CAP (170ch)
+[2026-08-31T02:49:00.698Z] [debug] qwen⏱ ✂ DISCARDED narration:scene_intro_fill after 4094ms — intro-fill:action-opener
+[2026-08-31T02:49:00.699Z] [debug] homework: scene_intro "Great Tartary Plains" ✓ 4257ms
+[2026-08-31T02:49:01.199Z] [world] You lift the Aether-Walker's Cape clear.
+[2026-08-31T02:49:01.201Z] [reward] ✦ Aether-Walker's Cape (Common).
+[2026-08-31T02:49:01.213Z] [world] You get a hand under the Mud-Bound Cloak and take it.
+[2026-08-31T02:49:01.213Z] [reward] ✦ Mud-Bound Cloak (Common).
+[2026-08-31T02:49:01.215Z] [world] You claim the Reclaimer's Trousers.
+[2026-08-31T02:49:01.215Z] [reward] ✦ Reclaimer's Trousers (Common).
+[2026-08-31T02:49:02.000Z] [world] The Scrap Metal comes up out of the silt with a small sucking protest.
+[2026-08-31T02:49:02.001Z] [reward] ✦ Scrap Metal (Common).
+[2026-08-31T02:49:02.830Z] [world] You salvage the overturned wagon. The take is small but real.
+[2026-08-31T02:49:02.831Z] [reward] ✦ Salvage haul:
+[2026-08-31T02:49:02.831Z] [reward]     • Scrap Metal x3 (Common)
+[2026-08-31T02:49:03.975Z] [debug] ui: tap "investigate"
+[2026-08-31T02:49:05.302Z] [player] investigate the ground
+[2026-08-31T02:49:05.303Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2
+[2026-08-31T02:49:05.308Z] [reward] You scrape at the silt with the bent nail. ✦ Recovered Small Rock (Common).
+[2026-08-31T02:49:05.314Z] [system] ⏳ Time passed: 24 min
+[2026-08-31T02:49:05.394Z] [cognitive] CLIMB  (79ms)
+[2026-08-31T02:49:06.211Z] [debug] ui: tap "→ NIMARI"
+[2026-08-31T02:49:06.228Z] [debug] spawn: gear=[Titan's Vest] window=10 roster=new
+[2026-08-31T02:49:06.229Z] [world] You walk south through open silt. The compass points south into open ground.
+[2026-08-31T02:49:06.230Z] [world] What you started here has not finished itself in your absence.
+[2026-08-31T02:49:06.564Z] [player] investigate flood trench
+[2026-08-31T02:49:06.564Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=flood trench resolved=flood trench range=- enemies=0 hooks=2
+[2026-08-31T02:49:06.566Z] [world] You study the flood trench. It bears no marks worth naming — no glyph, no fingerprint, no trace the Reclaimers would catalog.
+[2026-08-31T02:49:06.650Z] [cognitive] SEARCH · TALK · RETREAT · SWIM  (83ms)
+[2026-08-31T02:49:07.591Z] [debug] ui: tap "take / salvage"
+[2026-08-31T02:49:09.274Z] [debug] qwen⏱ investigate_lore ok 2632ms read 1346ms/write 1262ms in 127t→out 39t 10.6ms/t (188ch)
+[2026-08-31T02:49:09.993Z] [world] The Titan's Vest was half under something. It is not now.
+[2026-08-31T02:49:09.994Z] [reward] ✦ Titan's Vest (Common).
+[2026-08-31T02:49:10.153Z] [debug] persist sizes(KB): total=128 player=32 wm=62[rooms=30 events=1 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=30 scene=4
+[2026-08-31T02:49:11.037Z] [world] You break the buried structure apart. Among the pieces, something worth keeping.
+[2026-08-31T02:49:11.037Z] [world] You break the fossil rib apart. Among the pieces, something worth keeping.
+[2026-08-31T02:49:11.038Z] [world] You strip the lantern shard carefully. Something usable comes free in your hand.
+[2026-08-31T02:49:11.039Z] [reward] ✦ Salvage haul:
+[2026-08-31T02:49:11.039Z] [reward]     • Cloth Scrap (Common)
+[2026-08-31T02:49:11.039Z] [reward]     • Aether Crystal (Common)
+[2026-08-31T02:49:11.039Z] [reward]     • Aether Dust x3 (Common)
+[2026-08-31T02:49:12.077Z] [debug] ui: tap "investigate"
+[2026-08-31T02:49:13.570Z] [player] investigate the ground
+[2026-08-31T02:49:13.570Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2
+[2026-08-31T02:49:13.575Z] [reward] You scrape at the silt with the bent nail. ✦ Recovered Aether Residue (Common).
+[2026-08-31T02:49:13.583Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-08-31T02:49:13.584Z] [arbiter] The Arbiter glances toward the crystal. "Still there. Still yours, if you take it."
+[2026-08-31T02:49:13.584Z] [system] ⏳ Time passed: 24 min
+[2026-08-31T02:49:13.671Z] [cognitive] CLIMB  (86ms)
+[2026-08-31T02:49:14.832Z] [player] investigate dust whirlwind
+[2026-08-31T02:49:14.833Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=dust whirlwind resolved=dust whirlwind range=- enemies=0 hooks=2
+[2026-08-31T02:49:14.834Z] [world] Something shifted while you were turned away — an Aetheric Leech breaks cover, fast and low. (range: close)
+[2026-08-31T02:49:14.834Z] [combat] Aetheric Leech — Energy Drain ready, 1D10 Aetheric damage on a hit.
+[2026-08-31T02:49:14.834Z] [debug] enemy: Aetheric Leech hp=16 ac=9 atk=Energy Drain dmg=1D10 Aetheric rarity=Common ap=4
+[2026-08-31T02:49:14.834Z] [debug] arbiter: template (reason=combat)
+[2026-08-31T02:49:14.834Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-31T02:49:14.977Z] [cognitive] THROW  (141ms)
+[2026-08-31T02:49:17.396Z] [debug] ui: tap "approach"
+[2026-08-31T02:49:17.442Z] [player] approach Aetheric Leech
+[2026-08-31T02:49:17.443Z] [debug] parser: intent=advance conf=1.00 verb=approach target=aetheric leech resolved=Aetheric Leech range=mid enemies=1 hooks=2
+[2026-08-31T02:49:17.444Z] [debug] move: advance from range=mid enemies=1 weather=Ash Storm cost=1 partial=0
+[2026-08-31T02:49:17.445Z] [debug] move: field advance target=Aetheric Leech d 1.50->0.50 band mid->close
+[2026-08-31T02:49:17.445Z] [world] You close the gap with Aetheric Leech. (range: close / arm's reach)
+[2026-08-31T02:49:17.445Z] [combat] Aetheric Leech blisters — clinging fire sears 4. (12/16 HP, 2 turns left)
+[2026-08-31T02:49:17.447Z] [combat] Aetheric Leech — d20 → 7 + ATK 4 = 11 vs your AC 21 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-08-31T02:49:17.448Z] [debug] arbiter: template (reason=combat)
+[2026-08-31T02:49:17.448Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-31T02:49:17.583Z] [cognitive] USE_ITEM · RETREAT  (134ms)
+[2026-08-31T02:49:19.632Z] [debug] ui: tap "dodge"
+[2026-08-31T02:49:19.647Z] [player] dodge
+[2026-08-31T02:49:19.648Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=2
+[2026-08-31T02:49:19.649Z] [world] You commit to the dodge. Slip Aetheric Leech's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-08-31T02:49:19.649Z] [combat] Aetheric Leech blisters — clinging fire sears 4. (8/16 HP, 1 turn left)
+[2026-08-31T02:49:19.685Z] [combat] Aetheric Leech — d20 → 20 + ATK 4 = 24 vs your AC 21 (needs nat 16+ — AC capped) — ✓ CRITICAL HIT
+[2026-08-31T02:49:19.685Z] [combat] Dodge — Aetheric Leech rolls a NAT 20. No read beats a perfect strike; it lands through your dodge.
+[2026-08-31T02:49:19.686Z] [system] ⏳ Time passed: 6 min
+[2026-08-31T02:49:19.825Z] [combat] Aetheric Leech deals 2 aetheric damage [armor −46%, title ½, floor 30%]. You have 28 HP remaining.
+[2026-08-31T02:49:19.825Z] [combat] That's your aetheric resist working — the armor drank most of that hit (2 of 6 got through).
+[2026-08-31T02:49:19.825Z] [combat] Aetheric Leech's strike leaves you bleeding.
+[2026-08-31T02:49:20.055Z] [cognitive] neutral  (368ms)
+[2026-08-31T02:49:20.885Z] [debug] ui: tap "🔥 geode-cored cleaver"
+[2026-08-31T02:49:20.937Z] [player] attack with the reclaimers guild geode-cored cleaver
+[2026-08-31T02:49:20.937Z] [debug] parser: intent=attack conf=1.00 verb=attack target=reclaimers guild geode cored cleaver resolved=Reclaimers Guild Geode-Cored Cleaver range=close enemies=1 hooks=2
+[2026-08-31T02:49:20.938Z] [combat] Aetheric Leech blisters — clinging fire sears 4. (4/16 HP, 0 turns left)
+[2026-08-31T02:49:20.938Z] [combat] Aetheric Leech shakes off the last of the fire — the Bone Crossbow has run its course.
+[2026-08-31T02:49:20.938Z] [debug] attack: target=Aetheric Leech range=close reach.bands=[close] reach.label=Reclaimers Guild Geode-Cored Cleaver bareHand=false
+[2026-08-31T02:49:20.939Z] [debug] attack: visibility penalty −1 (Ash Storm)
+[2026-08-31T02:49:20.963Z] [world] Your smoldering reclaimers guild geode-cored cleaver comes around in an arc; Aetheric Leech squares up to meet it.
+[2026-08-31T02:49:20.963Z] [system] ⏳ Time passed: 6 min
+[2026-08-31T02:49:21.086Z] [cognitive] TALK  (120ms)
+[2026-08-31T02:49:27.990Z] [world] Aetheric Leech moves first. The pressure is immediate.
+[2026-08-31T02:49:27.992Z] [combat] Aetheric Leech — d20 → 15 + ATK 4 = 19 vs your AC 21 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-08-31T02:49:27.992Z] [combat] You — d20 → 13 + DEX 27 − 1 (Ash Storm) = 39 vs Aetheric Leech AC 9 — ✓ HIT
+[2026-08-31T02:49:27.993Z] [combat] Bludgeoning flares — +2 on hit (weak — bites deep!).
+[2026-08-31T02:49:27.993Z] [combat] Weakness exposed — Aetheric Leech flinches. (bludgeoning ×1.5 for 7)
+[2026-08-31T02:49:27.994Z] [combat] Your blow with the smoldering reclaimers guild geode-cored cleaver lands clean — 7 damage. Aetheric Leech crumples in the dust. The Aetherstone settles.
+[2026-08-31T02:49:27.995Z] [reward] Aetheric Leech defeated. You recover Leech Mucus.
+[2026-08-31T02:49:27.996Z] [reward] ✦ You feel hardier from your trials. +1 max HP (now 35). [33 enemies defeated]
+[2026-08-31T02:49:27.996Z] [reward] +2 TC pried from the dust.
+[2026-08-31T02:49:32.291Z] [debug] ui: tap "investigate"
+[2026-08-31T02:49:34.938Z] [player] investigate dust whirlwind
+[2026-08-31T02:49:34.938Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=dust whirlwind resolved=dust whirlwind range=- enemies=0 hooks=2
+[2026-08-31T02:49:34.939Z] [world] You give the dust whirlwind your full attention. It returns the gesture by being exactly what it appears to be.
+[2026-08-31T02:49:35.024Z] [cognitive] THROW  (84ms)
+[2026-08-31T02:49:35.150Z] [debug] persist sizes(KB): total=139 player=32 wm=62[rooms=31 events=1 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=41 scene=4
+[2026-08-31T02:49:36.358Z] [debug] ui: tap "→ NIMARI"
+[2026-08-31T02:49:36.372Z] [debug] spawn: gear=[Tartarian Bone Knife, Minor Repair] window=10 roster=new
+[2026-08-31T02:49:36.374Z] [world] You walk south through open silt. The compass points south into open ground.
+[2026-08-31T02:49:36.376Z] [world] The ground rolls before you hear them. A herd of Mud Boars breaks the rise at full panic — something behind them, probably an Aether-storm cell, has driven them past the threshold a Boar usually keeps. They do not see you. They do not need to.
+[2026-08-31T02:49:36.377Z] [combat] Mud Boar closes — Tusk Charge ready, 2D6 damage on a hit. (range: close)
+[2026-08-31T02:49:36.387Z] [world] The loose end is exactly as loose as you left it.
+[2026-08-31T02:49:37.081Z] [debug] qwen⏱ investigate_lore ok 1987ms read 293ms/write 1668ms in 128t→out 54t 2.3ms/t (252ch)
+[2026-08-31T02:49:38.959Z] [debug] ui: tap "🔥 geode-cored cleaver"
+[2026-08-31T02:49:38.964Z] [system] bleeding fades.
+[2026-08-31T02:49:39.016Z] [player] attack with the reclaimers guild geode-cored cleaver
+[2026-08-31T02:49:39.016Z] [debug] parser: intent=attack conf=1.00 verb=attack target=reclaimers guild geode cored cleaver resolved=Reclaimers Guild Geode-Cored Cleaver range=close enemies=1 hooks=2
+[2026-08-31T02:49:39.017Z] [debug] attack: target=Mud Boar range=close reach.bands=[close] reach.label=Reclaimers Guild Geode-Cored Cleaver bareHand=false
+[2026-08-31T02:49:39.042Z] [world] You raise the smoldering reclaimers guild geode-cored cleaver toward Mud Boar. The room narrows around the both of you.
+[2026-08-31T02:49:39.042Z] [system] ⏳ Time passed: 6 min
+[2026-08-31T02:49:39.162Z] [cognitive] TALK  (119ms)
+[2026-08-31T02:49:45.766Z] [world] You seize the initiative. Mud Boar has no time to react.
+[2026-08-31T02:49:45.767Z] [combat] You — d20 → 18 + DEX 27 = 45 vs Mud Boar AC 9 — ✓ HIT
+[2026-08-31T02:49:45.768Z] [combat] Bludgeoning flares — +3 on hit.
+[2026-08-31T02:49:45.769Z] [combat] The blow with the smoldering reclaimers guild geode-cored cleaver finds purchase — 16 damage, 4 HP standing. Mud Boar commits to the counter.
+[2026-08-31T02:49:45.770Z] [combat] Smoldering Reclaimers Guild Geode-Cored Cleaver — 4 burn bites in and festers (3 turns).
+[2026-08-31T02:49:45.770Z] [combat] Mud Boar is left exposed — easier to hit.
+[2026-08-31T02:49:45.772Z] [combat] Mud Boar — d20 → 10 + ATK 7 = 17 vs your AC 21 — ✗ MISS
+[2026-08-31T02:49:46.995Z] [debug] ui: tap "🔥 bone crossbow"
+[2026-08-31T02:49:47.040Z] [player] attack with the off-hand bone crossbow
+[2026-08-31T02:49:47.041Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=1 hooks=2
+[2026-08-31T02:49:47.042Z] [combat] Mud Boar blisters — clinging fire sears 4. (0/20 HP, 2 turns left)
+[2026-08-31T02:49:47.043Z] [reward] Mud Boar defeated. You recover Boar Hide.
+[2026-08-31T02:49:47.043Z] [reward] +10 TC pried from the dust.
+[2026-08-31T02:49:48.778Z] [debug] ui: tap "take / salvage"
+[2026-08-31T02:49:50.084Z] [world] You work the Minor Repair loose from where the mud had it.
+[2026-08-31T02:49:50.085Z] [reward] ✦ Minor Repair (Common).
+[2026-08-31T02:49:50.101Z] [world] The Tartarian Bone Knife had settled into the ground. You unsettle it.
+[2026-08-31T02:49:50.102Z] [reward] ✦ Tartarian Bone Knife (Common).
+[2026-08-31T02:49:50.849Z] [world] Whatever the Aetheric Torch was lying against, it lets go without much argument.
+[2026-08-31T02:49:50.851Z] [reward] ✦ Aetheric Torch (Common).
+[2026-08-31T02:49:52.093Z] [world] You strip the bone tool carefully. Something usable comes free in your hand.
+[2026-08-31T02:49:52.093Z] [world] You break the weather beacon apart. Among the pieces, something worth keeping.
+[2026-08-31T02:49:52.093Z] [reward] ✦ Salvage haul:
+[2026-08-31T02:49:52.094Z] [reward]     • Aether Dust x4 (Common)
+[2026-08-31T02:49:53.230Z] [debug] ui: tap "investigate"
+[2026-08-31T02:49:55.102Z] [player] investigate the ground
+[2026-08-31T02:49:55.103Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2
+[2026-08-31T02:49:55.107Z] [reward] You scrape at the silt with the bent nail. ✦ Recovered Small Rock (Common).
+[2026-08-31T02:49:55.113Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-08-31T02:49:55.113Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-31T02:49:55.113Z] [system] ⏳ Time passed: 24 min
+[2026-08-31T02:49:55.200Z] [cognitive] CLIMB  (86ms)
+[2026-08-31T02:49:55.466Z] [debug] persist sizes(KB): total=136 player=33 wm=51[rooms=20 events=1 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=48 scene=4
+[2026-08-31T02:49:56.352Z] [player] investigate window
+[2026-08-31T02:49:56.353Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=window resolved=window range=- enemies=0 hooks=2
+[2026-08-31T02:49:56.356Z] [world] You look the window over. Nothing about it sings, nothing about it warns — Tartaria is full of things waiting to be remembered.
+[2026-08-31T02:49:56.452Z] [cognitive] neutral  (93ms)
+[2026-08-31T02:49:58.072Z] [debug] qwen⏱ investigate_lore ok 1623ms read 286ms/write 1314ms in 126t→out 41t 2.3ms/t (184ch)
+[2026-08-31T02:49:58.681Z] [debug] ui: tap "look around you"
+[2026-08-31T02:49:58.688Z] [player] look
+[2026-08-31T02:49:58.689Z] [debug] parser: intent=investigate conf=1.00 verb=look target=- resolved=- range=- enemies=0 hooks=2
+[2026-08-31T02:49:58.690Z] [world] You look around. You're in Submerged Transit Hub, in Great Tartary Plains. You see: standing water, dead tree. The crystal is unaddressed. Hazard active: Tartarian Trap. Cardinal travel: north, east, south, west. You're near a flooded house — a way in stands clear. (Tap ENTER, or type 'enter', to step inside.)
+[2026-08-31T02:50:04.308Z] [debug] qwen⏱ ambient ok 7859ms wait 1724ms read 3792ms/write 1584ms in 367t→out 31t 10.3ms/t HIT-CAP (146ch)
+[2026-08-31T02:50:04.380Z] [debug] qwen⏱ ✂ DISCARDED ambient after 7859ms — ambient:∅
+[2026-08-31T02:50:04.380Z] [debug] arbiter: ambient ∅ 8023ms
+[2026-08-31T02:50:04.381Z] [debug] arbiter: ambient-empty reason=unknown raw="You, my companion, have traversed the depths of the Silt Wastes, navigating the treacherous terrain with practiced ease."
+[2026-08-31T02:50:04.456Z] [cognitive] neutral  (5764ms)
+[2026-08-31T02:50:04.888Z] [debug] kbbar: mounted bottom=355 raw=0 from=estimate winH=986 beat=-
+[2026-08-31T02:50:05.089Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=408 from=live winH=986 beat=-
+[2026-08-31T02:50:05.294Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-
+[2026-08-31T02:50:06.495Z] [debug] homework: intro-fill armed after 6000ms idle (strike 2/3)
+[2026-08-31T02:50:08.392Z] [player] drink
+[2026-08-31T02:50:08.392Z] [debug] parser: intent=drink conf=1.00 verb=drink target=- resolved=- range=- enemies=0 hooks=2
+[2026-08-31T02:50:08.394Z] [world] You cup the well in your hands and drink. You weren't tired; mostly you were thirsty. (+1 corruption, 5 min)
+[2026-08-31T02:50:08.394Z] [arbiter] The Arbiter watches you wipe your mouth. "Raw well carries what the ground put in it. Fill a bottle next time — the filter takes the taint out."
+[2026-08-31T02:50:08.395Z] [system] ⏳ Time passed: 5 min
+[2026-08-31T02:50:12.788Z] [debug] qwen⏱ narration:scene_intro_fill preempted 6185ms read 0ms/write 0ms in 732t→out 0t (0ch)
+[2026-08-31T02:50:12.903Z] [debug] qwen⏱ ✂ DISCARDED narration:scene_intro_fill after 6185ms — intro-fill:∅
+[2026-08-31T02:50:12.903Z] [debug] homework: scene_intro "Great Tartary Plains" ∅ 6411ms
+[2026-08-31T02:50:12.978Z] [cognitive] neutral  (4582ms)
+[2026-08-31T02:50:26.496Z] [debug] ui: tap "climb"
+[2026-08-31T02:50:28.011Z] [player] climb dead tree
+[2026-08-31T02:50:28.012Z] [debug] parser: intent=climb conf=1.00 verb=climb target=dead tree resolved=dead tree range=- enemies=0 hooks=2
+[2026-08-31T02:50:28.046Z] [world] You loop your Reclaimer's Rope around the dead tree and walk the line. Tier 1/3 cleared.
+[2026-08-31T02:50:28.047Z] [world] You reach the first hold of the dead tree (tier 1/3). Higher still to go.
+[2026-08-31T02:50:28.047Z] [world] Soot eyes the dead tree, then settles at its base. She is not built for the climb.
+[2026-08-31T02:50:28.047Z] [world] Plinth sets its stone feet at the base of dead tree and will climb no further — the construct holds the ground while you go up alone.
+[2026-08-31T02:50:28.048Z] [debug] arbiter: template (reason=intent-not-allowed:climb)
+[2026-08-31T02:50:28.048Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-31T02:50:28.048Z] [system] ⏳ Time passed: 30 min
+[2026-08-31T02:50:28.154Z] [cognitive] CLIMB  (105ms)
+[2026-08-31T02:50:29.013Z] [debug] ui: tap "climb up (1/3)"
+[2026-08-31T02:50:29.044Z] [player] climb dead tree
+[2026-08-31T02:50:29.044Z] [debug] parser: intent=climb conf=1.00 verb=climb target=dead tree resolved=dead tree range=- enemies=0 hooks=2
+[2026-08-31T02:50:29.077Z] [world] You loop your Reclaimer's Rope around the dead tree and walk the line. Tier 2/3 cleared.
+[2026-08-31T02:50:29.077Z] [world] You reach the last stretch of the dead tree (tier 2/3). Higher still to go.
+[2026-08-31T02:50:29.078Z] [debug] arbiter: template (reason=intent-not-allowed:climb)
+[2026-08-31T02:50:29.078Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-31T02:50:29.078Z] [system] ⏳ Time passed: 30 min
+[2026-08-31T02:50:29.170Z] [cognitive] CLIMB  (91ms)
+[2026-08-31T02:50:29.830Z] [debug] ui: tap "climb up (2/3)"
+[2026-08-31T02:50:29.864Z] [player] climb dead tree
+[2026-08-31T02:50:29.865Z] [debug] parser: intent=climb conf=1.00 verb=climb target=dead tree resolved=dead tree range=- enemies=0 hooks=2
+[2026-08-31T02:50:29.894Z] [world] You loop your Reclaimer's Rope around the dead tree and walk the line. Tier 3/3 cleared.
+[2026-08-31T02:50:29.895Z] [world] You reach the top of the dead tree (tier 3/3). The view changes; the room reads differently from here.
+[2026-08-31T02:50:29.895Z] [world] At the top you find a nook carved into the structure — sheltered, lived-in, currently occupied.
+[2026-08-31T02:50:29.895Z] [combat] Aetheric Scarab is here — and it has seen you.
+[2026-08-31T02:50:29.896Z] [debug] enemy: Aetheric Scarab hp=58 ac=11 atk=Energy Spike dmg=2D6 rarity=Uncommon ap=4
+[2026-08-31T02:50:29.896Z] [debug] arbiter: template (reason=combat)
+[2026-08-31T02:50:29.896Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-31T02:50:29.896Z] [system] ⏳ Time passed: 30 min
+[2026-08-31T02:50:30.041Z] [cognitive] CLIMB  (144ms)
+[2026-08-31T02:50:31.364Z] [debug] ui: tap "🔥 bone crossbow"
+[2026-08-31T02:50:31.412Z] [player] attack with the off-hand bone crossbow
+[2026-08-31T02:50:31.412Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=1 hooks=0
+[2026-08-31T02:50:31.413Z] [debug] attack: target=Aetheric Scarab range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false
+[2026-08-31T02:50:31.440Z] [world] You commit forward with the searing bone crossbow. Aetheric Scarab watches your hands.
+[2026-08-31T02:50:31.440Z] [system] ⏳ Time passed: 6 min
+[2026-08-31T02:50:31.578Z] [cognitive] AGGRESSION · ATTACK · AIM · DISENGAGE  (137ms)
+[2026-08-31T02:50:41.853Z] [world] You seize the initiative. Aetheric Scarab has no time to react.
+[2026-08-31T02:50:41.853Z] [combat] You — d20 → 18 + DEX 27 = 45 vs Aetheric Scarab AC 11 — ✓ HIT
+[2026-08-31T02:50:41.854Z] [combat] Aetheric Scarab shrugs off the piercing. (resisted, ×0.5 for 4)
+[2026-08-31T02:50:41.860Z] [arbiter] The Arbiter watches the piercing skid off. "Swap to the Reclaimers Guild Geode-Cored Cleaver — slashing will bite where piercing won't."
+[2026-08-31T02:50:41.889Z] [reward] ✦ The work hones you. +1 DEX (base 7, 28 as you stand).
+[2026-08-31T02:50:41.890Z] [combat] Your strike with the searing bone crossbow lands for 4. Aetheric Scarab staggers — 54 HP remaining. It answers.
+[2026-08-31T02:50:41.890Z] [combat] Searing Bone Crossbow — 2 burn bites in and festers (3 turns).
+[2026-08-31T02:50:41.890Z] [world] Below, Aetheric Scarab circles the base — it cannot reach you up here.
+[2026-08-31T02:50:43.743Z] [debug] ui: tap "approach"
+[2026-08-31T02:50:43.791Z] [player] approach Aetheric Scarab
+[2026-08-31T02:50:43.792Z] [debug] parser: intent=advance conf=1.00 verb=approach target=aetheric scarab resolved=Aetheric Scarab range=mid enemies=1 hooks=0
+[2026-08-31T02:50:43.794Z] [debug] move: advance from range=mid enemies=1 weather=Eerie Calm cost=1 partial=0
+[2026-08-31T02:50:43.794Z] [debug] move: field advance target=Aetheric Scarab d 1.50->0.50 band mid->close
+[2026-08-31T02:50:43.794Z] [world] You close the gap with Aetheric Scarab. (range: close / arm's reach)
+[2026-08-31T02:50:43.795Z] [combat] Aetheric Scarab blisters — clinging fire sears 2. (52/58 HP, 2 turns left)
+[2026-08-31T02:50:43.795Z] [world] Below, Aetheric Scarab circles the base — it cannot reach you up here.
+[2026-08-31T02:50:43.948Z] [cognitive] RETREAT · USE_ITEM  (149ms)
+[2026-08-31T02:50:44.127Z] [debug] persist sizes(KB): total=164 player=33 wm=63[rooms=32 events=1 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=60 scene=7
+[2026-08-31T02:50:45.093Z] [debug] ui: tap "soot (15/15)"
+[2026-08-31T02:50:45.095Z] [arbiter] "Soot is holding the ground below," the Arbiter says. "Dogs don't climb — come down to fight at Soot's side."
+[2026-08-31T02:50:50.766Z] [debug] ui: tap "🔥 bone crossbow"
+[2026-08-31T02:50:50.821Z] [player] attack with the off-hand bone crossbow
+[2026-08-31T02:50:50.822Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=1 hooks=0
+[2026-08-31T02:50:50.823Z] [combat] Aetheric Scarab blisters — clinging fire sears 2. (50/58 HP, 1 turn left)
+[2026-08-31T02:50:50.823Z] [debug] attack: target=Aetheric Scarab range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false
+[2026-08-31T02:50:50.855Z] [world] Your searing bone crossbow comes around in an arc; Aetheric Scarab squares up to meet it.
+[2026-08-31T02:50:50.856Z] [system] ⏳ Time passed: 6 min
+[2026-08-31T02:50:50.983Z] [cognitive] AGGRESSION · ATTACK · AIM · DISENGAGE  (126ms)
+[2026-08-31T02:50:58.429Z] [world] You seize the initiative. Aetheric Scarab has no time to react.
+[2026-08-31T02:50:58.430Z] [combat] You — d20 → 14 + DEX 28 + 2 (point blank) = 44 vs Aetheric Scarab AC 11 — ✓ HIT
+[2026-08-31T02:50:58.431Z] [combat] Piercing flares — +3 on hit.
+[2026-08-31T02:50:58.431Z] [combat] Aetheric Scarab shrugs off the piercing. (resisted, ×0.5 for 9)
+[2026-08-31T02:50:58.433Z] [combat] Aetheric Scarab takes 9 with the searing bone crossbow. It reels: 41 left. Then it fights back.
+[2026-08-31T02:50:58.433Z] [combat] Searing Bone Crossbow — 4 burn bites in and festers (3 turns).
+[2026-08-31T02:50:58.434Z] [world] Below, Aetheric Scarab circles the base — it cannot reach you up here.
+[2026-08-31T02:50:59.840Z] [debug] ui: tap "🔥 bone crossbow"
+[2026-08-31T02:50:59.885Z] [player] attack with the off-hand bone crossbow
+[2026-08-31T02:50:59.886Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=1 hooks=0
+[2026-08-31T02:50:59.888Z] [combat] Aetheric Scarab blisters — clinging fire sears 4. (37/58 HP, 2 turns left)
+[2026-08-31T02:50:59.888Z] [debug] attack: target=Aetheric Scarab range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false
+[2026-08-31T02:50:59.918Z] [world] Your searing bone crossbow comes around in an arc; Aetheric Scarab squares up to meet it.
+[2026-08-31T02:50:59.918Z] [system] ⏳ Time passed: 6 min
+[2026-08-31T02:51:00.043Z] [cognitive] AGGRESSION · ATTACK · AIM · DISENGAGE  (124ms)
+[2026-08-31T02:51:03.516Z] [world] You seize the initiative. Aetheric Scarab has no time to react.
+[2026-08-31T02:51:03.517Z] [combat] You — d20 → 1 + DEX 28 + 2 (point blank) = 31 vs Aetheric Scarab AC 11 — ✗ FUMBLE
+[2026-08-31T02:51:03.518Z] [combat] Aetheric Scarab reads the motion and slips it — the searing bone crossbow carves only air. The counter is already coming.
+[2026-08-31T02:51:03.518Z] [world] Below, Aetheric Scarab circles the base — it cannot reach you up here.
+[2026-08-31T02:51:05.428Z] [debug] ui: tap "✦ bandolier (1)"
+[2026-08-31T02:51:06.827Z] [reward] You hurl the Acid Flask. It bursts across Aetheric Scarab — 3 acid (2/turn × 3, resisted). (34 HP left)
+[2026-08-31T02:51:06.827Z] [combat] Aetheric Scarab blisters — clinging fire sears 4. (30/58 HP, 1 turn left)
+[2026-08-31T02:51:06.828Z] [world] Below, Aetheric Scarab circles the base — it cannot reach you up here.
+[2026-08-31T02:51:09.093Z] [debug] ui: tap "🔥 bone crossbow"
+[2026-08-31T02:51:09.139Z] [player] attack with the off-hand bone crossbow
+[2026-08-31T02:51:09.140Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=1 hooks=0
+[2026-08-31T02:51:09.140Z] [combat] Aetheric Scarab blisters — clinging fire sears 4. (26/58 HP, 0 turns left)
+[2026-08-31T02:51:09.140Z] [combat] Aetheric Scarab shakes off the last of the fire — the Bone Crossbow has run its course.
+[2026-08-31T02:51:09.141Z] [debug] attack: target=Aetheric Scarab range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false
+[2026-08-31T02:51:09.169Z] [world] Your searing bone crossbow comes around in an arc; Aetheric Scarab squares up to meet it.
+[2026-08-31T02:51:09.169Z] [system] ⏳ Time passed: 6 min
+[2026-08-31T02:51:09.297Z] [cognitive] AGGRESSION · ATTACK · AIM · DISENGAGE  (127ms)
+[2026-08-31T02:51:16.136Z] [world] You seize the initiative. Aetheric Scarab has no time to react.
+[2026-08-31T02:51:16.136Z] [combat] You — d20 → 3 + DEX 28 + 2 (point blank) = 33 vs Aetheric Scarab AC 11 — ✓ HIT
+[2026-08-31T02:51:16.137Z] [combat] Aetheric Scarab shrugs off the piercing. (resisted, ×0.5 for 4)
+[2026-08-31T02:51:16.137Z] [combat] The piercing has worn Aetheric Scarab's guard through — it bites full from here.
+[2026-08-31T02:51:16.138Z] [combat] Clean hit with the searing bone crossbow for 4. Aetheric Scarab has 22 left and does not back away.
+[2026-08-31T02:51:16.139Z] [combat] Searing Bone Crossbow — 1 burn bites in and festers (3 turns).
+[2026-08-31T02:51:16.139Z] [world] Below, Aetheric Scarab circles the base — it cannot reach you up here.
+[2026-08-31T02:51:16.139Z] [arbiter] "Footwork over fury," the Arbiter says quietly. "The aetheric scarab is patient. Be patienter."
+[2026-08-31T02:51:17.444Z] [debug] ui: tap "🔥 bone crossbow"
+[2026-08-31T02:51:17.491Z] [player] attack with the off-hand bone crossbow
+[2026-08-31T02:51:17.492Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=1 hooks=0
+[2026-08-31T02:51:17.492Z] [combat] Aetheric Scarab blisters — clinging fire sears 1. (21/58 HP, 2 turns left)
+[2026-08-31T02:51:17.492Z] [debug] attack: target=Aetheric Scarab range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false
+[2026-08-31T02:51:17.522Z] [world] You raise the searing bone crossbow toward Aetheric Scarab. The room narrows around the both of you.
+[2026-08-31T02:51:17.522Z] [system] ⏳ Time passed: 6 min
+[2026-08-31T02:51:17.650Z] [cognitive] AGGRESSION · ATTACK · AIM · DISENGAGE  (127ms)
+[2026-08-31T02:51:23.688Z] [world] You seize the initiative. Aetheric Scarab has no time to react.
+[2026-08-31T02:51:23.688Z] [combat] You — d20 → 7 + DEX 28 + 2 (point blank) = 37 vs Aetheric Scarab AC 11 — ✓ HIT
+[2026-08-31T02:51:23.689Z] [combat] Piercing flares — +1 on hit.
+[2026-08-31T02:51:23.690Z] [combat] Your strike with the searing bone crossbow lands for 15. Aetheric Scarab staggers — 6 HP remaining. It answers.
+[2026-08-31T02:51:23.691Z] [combat] Searing Bone Crossbow — 2 burn bites in and festers (3 turns).
+[2026-08-31T02:51:23.691Z] [world] Below, Aetheric Scarab circles the base — it cannot reach you up here.
+[2026-08-31T02:51:25.796Z] [debug] ui: tap "🔥 bone crossbow"
+[2026-08-31T02:51:25.843Z] [player] attack with the off-hand bone crossbow
+[2026-08-31T02:51:25.843Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=1 hooks=0
+[2026-08-31T02:51:25.844Z] [combat] Aetheric Scarab blisters — clinging fire sears 2. (4/58 HP, 2 turns left)
+[2026-08-31T02:51:25.844Z] [debug] attack: target=Aetheric Scarab range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false
+[2026-08-31T02:51:25.872Z] [world] You bring the searing bone crossbow to bear on Aetheric Scarab.
+[2026-08-31T02:51:25.872Z] [system] ⏳ Time passed: 6 min
+[2026-08-31T02:51:25.999Z] [cognitive] AGGRESSION · ATTACK · AIM · DISENGAGE  (126ms)
+[2026-08-31T02:51:26.168Z] [debug] persist sizes(KB): total=176 player=33 wm=64[rooms=32 events=1 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=72 scene=7
+[2026-08-31T02:51:34.370Z] [world] You seize the initiative. Aetheric Scarab has no time to react.
+[2026-08-31T02:51:34.371Z] [combat] You — d20 → 12 + DEX 28 + 2 (point blank) = 42 vs Aetheric Scarab AC 11 — ✓ HIT
+[2026-08-31T02:51:34.372Z] [combat] Your blow with the searing bone crossbow lands clean — 7 damage. Aetheric Scarab crumples in the dust. The Aetherstone settles.
+[2026-08-31T02:51:34.373Z] [reward] Aetheric Scarab defeated. You recover Aether Gem ×2, Scarab Shell, Burlap Vest.
+[2026-08-31T02:51:34.375Z] [reward] ✦ Hard-won spoils — Drone Core (Uncommon).
+[2026-08-31T02:51:34.376Z] [reward] +24 TC pried from the dust.
+[2026-08-31T02:51:36.591Z] [debug] homework: intro-fill armed after 8219ms idle (strike 3/3)
+[2026-08-31T02:51:38.882Z] [debug] ui: tap "take / salvage"
+[Filtered][2026-08-31T02:51:40.325Z] [reward]     • Spider Silk (Common)
+[2026-08-31T02:51:41.133Z] [debug] qwen⏱ narration:scene_intro_fill ok 4424ms read/write unusable (native mis-reported 93418ms/1074ms — llama.rn split bug, not this call) in 750t→out 33t HIT-CAP (170ch)
+[2026-08-31T02:51:41.261Z] [debug] homework: scene_intro "Great Tartary Plains" ✓ 4673ms
+[2026-08-31T02:51:42.316Z] [debug] ui: tap "investigate"
+[2026-08-31T02:51:43.935Z] [debug] ui: tap "investigate"
+[2026-08-31T02:51:45.137Z] [player] investigate nook
+[2026-08-31T02:51:45.138Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=nook resolved=nook range=- enemies=0 hooks=0
+[2026-08-31T02:51:45.139Z] [world] The nook resists your reading. Not hostile — just closed. Some things in the buried world don't open for the curious.
+[2026-08-31T02:51:45.141Z] [arbiter] "There's coin on the board for a willing blade," the Arbiter says. "Read the World."
+[2026-08-31T02:51:45.146Z] [world] A Conspiracy Architects war party crests the rise — 5 of them, blades already out. They've marked you for standing with the Forgotten Order.
+[2026-08-31T02:51:45.146Z] [arbiter] "The Conspiracy Architects do not forgive a friend of the Forgotten Order," the Arbiter murmurs. "Stand, or run — but decide now."
+[2026-08-31T02:51:45.341Z] [cognitive] neutral  (200ms)
+[2026-08-31T02:51:48.001Z] [debug] qwen⏱ investigate_lore ok 2676ms read 1266ms/write 1342ms in 127t→out 36t 10.0ms/t (156ch)
+[2026-08-31T02:51:48.775Z] [debug] ui: tap "🔥 bone crossbow ★"
+[2026-08-31T02:51:48.805Z] [player] attack with the off-hand bone crossbow
+[2026-08-31T02:51:48.805Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=5 hooks=0
+[2026-08-31T02:51:48.805Z] [debug] attack: target=Conspiracy Architects Raider 1 range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false
+[2026-08-31T02:51:48.834Z] [world] You raise the searing bone crossbow toward Conspiracy Architects Raider 1. The room narrows around the both of you.
+[2026-08-31T02:51:48.834Z] [system] ⏳ Time passed: 6 min
+[2026-08-31T02:51:48.982Z] [cognitive] AGGRESSION · ATTACK · AIM · DISENGAGE  (147ms)
+[2026-08-31T02:52:12.031Z] [world] Conspiracy Architects Raider 1 moves first. The pressure is immediate.
+[2026-08-31T02:52:12.032Z] [combat] Conspiracy Architects Raider 5 and 2 others close the distance.
+[2026-08-31T02:52:12.032Z] [world] Below, Conspiracy Architects Raider 1 and 1 other circle the base — nothing down there can reach you.
+[2026-08-31T02:52:12.032Z] [combat] You — d20 → 12 + DEX 28 + 2 (point blank) = 42 vs Conspiracy Architects Raider 1 AC 11 — ✓ HIT
+[2026-08-31T02:52:12.033Z] [combat] Piercing flares — +2 on hit (weak — bites deep!).
+[2026-08-31T02:52:12.034Z] [combat] Weakness exposed — Conspiracy Architects Raider 1 flinches. (piercing ×2.25 for 16)
+[2026-08-31T02:52:12.034Z] [combat] Final strike with the searing bone crossbow for 16. Conspiracy Architects Raider 1 is still. The Aetherstone hums on, indifferent.
+[2026-08-31T02:52:12.035Z] [reward] Conspiracy Architects Raider 1 defeated. You recover Patched Cloth ×3.
+[2026-08-31T02:52:12.037Z] [reward] You strip the body: Cudgel, Mud-Warden's Vest (+10 TC). The kit took the fight badly.
+[2026-08-31T02:52:12.037Z] [combat] 4 attackers remain. Conspiracy Architects Raider 2 now in your sights.
+[2026-08-31T02:52:12.037Z] [system] Word moves through the buried world — many people view you differently now.
+[2026-08-31T02:52:12.037Z] [system] ▼ Conspiracy Architects marks you HATED — their counters charge you +25%, and no charm changes it.
+[2026-08-31T02:52:12.038Z] [reward] +14 TC pried from the dust.
+[2026-08-31T02:52:20.811Z] [debug] ui: tap "approach"
+[2026-08-31T02:52:20.864Z] [player] approach Conspiracy Architects Raider 2
+[2026-08-31T02:52:20.865Z] [debug] parser: intent=advance conf=1.00 verb=approach target=conspiracy architects raider 2 resolved=Conspiracy Architects Raider 2 range=mid enemies=4 hooks=0
+[2026-08-31T02:52:20.866Z] [debug] move: advance from range=mid enemies=4 weather=Eerie Calm cost=1 partial=0
+[2026-08-31T02:52:20.866Z] [debug] move: field advance target=Conspiracy Architects Raider 2 d 1.19->0.35 band mid->close
+[2026-08-31T02:52:20.866Z] [world] You close the gap with the Conspiracy Architects Raider 2 and 3 others. (range: close / arm's reach)
+[2026-08-31T02:52:20.867Z] [world] The field shifts around you — Conspiracy Architects Raider 3 now close / arm's reach; Conspiracy Architects Raider 4 now mid-range; Conspiracy Architects Raider 5 now mid-range.
+[2026-08-31T02:52:20.867Z] [world] Below, Conspiracy Architects Raider 2 and 3 others circle the base — nothing down there can reach you.
+[2026-08-31T02:52:21.032Z] [cognitive] neutral  (163ms)
+[2026-08-31T02:52:23.196Z] [debug] ui: tap "approach"
+[2026-08-31T02:52:23.271Z] [player] approach Conspiracy Architects Raider 2
+[2026-08-31T02:52:23.272Z] [debug] parser: intent=advance conf=1.00 verb=approach target=conspiracy architects raider 2 resolved=Conspiracy Architects Raider 2 range=close enemies=4 hooks=0
+[2026-08-31T02:52:23.273Z] [debug] move: advance from range=close enemies=4 weather=Eerie Calm cost=1 partial=0
+[2026-08-31T02:52:23.273Z] [world] You are already at close / arm's reach with the Conspiracy Architects Raider 2 and 3 others.
+[2026-08-31T02:52:23.432Z] [cognitive] neutral  (157ms)
+[2026-08-31T02:52:23.620Z] [debug] persist sizes(KB): total=189 player=34 wm=64[rooms=32 events=1 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=82 scene=9
+[2026-08-31T02:52:24.809Z] [debug] ui: tap "approach"
+[2026-08-31T02:52:24.839Z] [player] approach Conspiracy Architects Raider 2
+[2026-08-31T02:52:24.839Z] [debug] parser: intent=advance conf=1.00 verb=approach target=conspiracy architects raider 2 resolved=Conspiracy Architects Raider 2 range=close enemies=4 hooks=0
+[2026-08-31T02:52:24.840Z] [debug] move: advance from range=close enemies=4 weather=Eerie Calm cost=1 partial=0
+[2026-08-31T02:52:24.840Z] [world] You are already at close / arm's reach with the Conspiracy Architects Raider 2 and 3 others.
+[2026-08-31T02:52:24.841Z] [debug] arbiter: template (reason=combat)
+[2026-08-31T02:52:24.841Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-31T02:52:24.995Z] [cognitive] neutral  (153ms)
+[2026-08-31T02:52:27.581Z] [debug] ui: tap "🔥 geode-cored cleaver"
+[2026-08-31T02:52:28.563Z] [debug] ui: tap "🔥 geode-cored cleaver"
+[2026-08-31T02:52:28.997Z] [debug] ui: tap "🔥 geode-cored cleaver"
+[2026-08-31T02:52:29.247Z] [debug] ui: tap "🔥 geode-cored cleaver"
+[2026-08-31T02:52:29.466Z] [debug] ui: tap "🔥 geode-cored cleaver"
+[2026-08-31T02:52:29.681Z] [debug] ui: tap "🔥 geode-cored cleaver"
+[2026-08-31T02:52:29.862Z] [debug] ui: tap "🔥 geode-cored cleaver"
+[2026-08-31T02:52:30.080Z] [debug] ui: tap "🔥 geode-cored cleaver"
+[2026-08-31T02:52:30.297Z] [debug] ui: tap "🔥 geode-cored cleaver"
+[2026-08-31T02:52:35.861Z] [debug] ui: tap "🔥 bone crossbow"
+[2026-08-31T02:52:35.917Z] [player] attack with the off-hand bone crossbow
+[2026-08-31T02:52:35.918Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=4 hooks=0
+[2026-08-31T02:52:35.920Z] [debug] attack: target=Conspiracy Architects Raider 2 range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false
+[2026-08-31T02:52:35.953Z] [world] You bring the searing bone crossbow to bear on Conspiracy Architects Raider 2.
+[2026-08-31T02:52:35.954Z] [system] ⏳ Time passed: 6 min
+[2026-08-31T02:52:36.100Z] [cognitive] AGGRESSION · ATTACK · AIM · DISENGAGE  (145ms)
+[2026-08-31T02:52:43.106Z] [world] You seize the initiative. Conspiracy Architects Raider 2 has no time to react.
+[2026-08-31T02:52:43.106Z] [combat] You — d20 → 10 + DEX 28 + 2 (point blank) = 40 vs Conspiracy Architects Raider 2 AC 10 — ✓ HIT
+[2026-08-31T02:52:43.107Z] [combat] Piercing flares — +4 on hit.
+[2026-08-31T02:52:43.108Z] [combat] You crack the Conspiracy Architects Raider 2 with the Searing Bone Crossbow for 11 — the better part of their fight, gone in one blow. They crumple, out cold. (2/13 HP) Loot them before they come to.
+[2026-08-31T02:52:43.109Z] [combat] Conspiracy Architects Raider 2 is out of it. Conspiracy Architects Raider 3 now in your sights.
+[2026-08-31T02:52:43.109Z] [combat] Searing Bone Crossbow — 3 burn bites in and festers (3 turns).
+[2026-08-31T02:52:43.109Z] [world] Below, Conspiracy Architects Raider 3 and 2 others circle the base — nothing down there can reach you.
+[2026-08-31T02:52:46.978Z] [debug] ui: tap "approach"
+[2026-08-31T02:52:47.047Z] [player] approach Conspiracy Architects Raider 4
+[2026-08-31T02:52:47.048Z] [debug] parser: intent=advance conf=1.00 verb=approach target=conspiracy architects raider 4 resolved=Conspiracy Architects Raider 4 range=mid enemies=4 hooks=0
+[2026-08-31T02:52:47.049Z] [debug] move: advance from range=mid enemies=4 weather=Eerie Calm cost=1 partial=0
+[2026-08-31T02:52:47.049Z] [debug] move: field advance target=Conspiracy Architects Raider 4 d 1.43->0.43 band mid->close
+[2026-08-31T02:52:47.049Z] [world] You close the gap with the Conspiracy Architects Raider 4 and 3 others. (range: close / arm's reach)
+[2026-08-31T02:52:47.049Z] [world] The field shifts around you — Conspiracy Architects Raider 5 now close / arm's reach.
+[2026-08-31T02:52:47.050Z] [combat] Conspiracy Architects Raider 2 blisters — clinging fire sears 3. (0/13 HP, 2 turns left)
+[2026-08-31T02:52:47.051Z] [reward] Conspiracy Architects Raider 2 defeated. You recover Patched Cloth ×3.
+[2026-08-31T02:52:47.052Z] [reward] You strip the body: Bone Knife, Reclaimer's Salvage Vest (+6 TC). The kit took the fight badly.
+[2026-08-31T02:52:47.052Z] [combat] 3 attackers remain. Conspiracy Architects Raider 3 now in your sights.
+[2026-08-31T02:52:47.052Z] [system] Word moves through the buried world — many people view you differently now.
+[2026-08-31T02:52:47.052Z] [system] ▲ Reclaimers Guild now counts you TRUSTED — their counters take 10% off.
+[2026-08-31T02:52:47.053Z] [reward] +20 TC pried from the dust.
+[2026-08-31T02:52:47.082Z] [world] Below, Conspiracy Architects Raider 5 and 2 others circle the base — nothing down there can reach you.
+[2026-08-31T02:52:47.257Z] [cognitive] neutral  (173ms)
+[2026-08-31T02:52:49.578Z] [debug] ui: tap "🔥 geode-cored cleaver"
+[2026-08-31T02:52:50.728Z] [debug] ui: tap "🔥 bone crossbow"
+[2026-08-31T02:52:50.776Z] [player] attack with the off-hand bone crossbow
+[2026-08-31T02:52:50.777Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=3 hooks=0
+[2026-08-31T02:52:50.778Z] [debug] attack: target=Conspiracy Architects Raider 4 range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false
+[2026-08-31T02:52:50.808Z] [world] Your searing bone crossbow comes around in an arc; Conspiracy Architects Raider 4 squares up to meet it.
+[2026-08-31T02:52:50.808Z] [system] ⏳ Time passed: 6 min
+[2026-08-31T02:52:50.956Z] [cognitive] AGGRESSION · ATTACK · AIM · DISENGAGE  (147ms)
+[2026-08-31T02:52:57.577Z] [world] You seize the initiative. Conspiracy Architects Raider 4 has no time to react.
+[2026-08-31T02:52:57.577Z] [combat] You — d20 → 10 + DEX 28 + 2 (point blank) = 40 vs Conspiracy Architects Raider 4 AC 10 — ✓ HIT
+[2026-08-31T02:52:57.579Z] [combat] Conspiracy Architects Raider 4 folds under the searing bone crossbow. 13 damage was enough. The room exhales.
+[2026-08-31T02:52:57.580Z] [reward] Conspiracy Architects Raider 4 defeated. You recover Patched Cloth ×3.
+[2026-08-31T02:52:57.581Z] [reward] You strip the body: Cudgel, Mud-Bound Cloak (+6 TC). The kit took the fight badly.
+[2026-08-31T02:52:57.581Z] [combat] 2 attackers remain. Conspiracy Architects Raider 3 now in your sights.
+[2026-08-31T02:52:57.582Z] [system] Word moves through the buried world — many people view you differently now.
+[2026-08-31T02:52:57.582Z] [reward] +10 TC pried from the dust.
+[2026-08-31T02:52:57.620Z] [world] Below, Conspiracy Architects Raider 5 and 1 other circle the base — nothing down there can reach you.
+[2026-08-31T02:53:00.973Z] [debug] ui: tap "stealth"
+[2026-08-31T02:53:00.978Z] [player] sneak
+[2026-08-31T02:53:00.979Z] [debug] parser: intent=stealth conf=1.00 verb=sneak target=- resolved=- range=close enemies=2 hooks=0
+[2026-08-31T02:53:01.029Z] [system] ⏳ Time passed: 15 min
+[2026-08-31T02:53:01.200Z] [cognitive] DISENGAGE · HIDE · TAKE_COVER  (170ms)
+[2026-08-31T02:53:02.644Z] [debug] skillcheck: stealth d20=11 STE 5 + 1 (title: Shadow Diver) = 17 vs DC 12 — Hard → (resolved below)
+[2026-08-31T02:53:02.707Z] [debug] stats: STR11 DEX28 INT12 WIS7 CHA2 STE5 | gear: DEX+20,INT+3,STR+6,STE+2,WIS+1 | worn: main=Reclaimers Guild Geode-Cored Cleaver off=Bone Crossbow head=Forgotten Seeker's Mask chest=Rough-Hewn Chestplate hands=Relic Hunter's Gauntlets legs=Aetheric Scout Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band
+[2026-08-31T02:53:02.708Z] [debug] train: stealth (stealth check) → progress 78/100
+[2026-08-31T02:53:02.708Z] [world] The daylight leaves you little cover. (stealth −1, day)
+[2026-08-31T02:53:02.708Z] [world] You fling a fistful of grit into Conspiracy Architects Raider 5's eyes and slip their line of sight. Half-blind, they swing at where you were. (+5 next attack)
+[2026-08-31T02:53:02.708Z] [debug] stealth: reset WIN init 18 vs 8 (dust, +5 1r)
+[2026-08-31T02:53:02.709Z] [world] Below, Conspiracy Architects Raider 5 and 1 other circle the base — nothing down there can reach you.
+[2026-08-31T02:53:03.087Z] [debug] persist sizes(KB): total=187 player=35 wm=64[rooms=33 events=1 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=80 scene=8
+[2026-08-31T02:53:03.389Z] [debug] ui: tap "✦ bandolier (1)"
+[2026-08-31T02:53:04.310Z] [reward] You hurl the Acid Flask. It bursts across Conspiracy Architects Raider 5 — 6 acid (2/turn × 3). (6 HP left)
+[2026-08-31T02:53:04.314Z] [world] Below, Conspiracy Architects Raider 3 and 1 other circle the base — nothing down there can reach you.
+[2026-08-31T02:53:06.840Z] [debug] ui: tap "🔥 bone crossbow ★"
+[2026-08-31T02:53:06.841Z] [system] unseen — next strike +5 fades.
+[2026-08-31T02:53:06.863Z] [player] attack with the off-hand bone crossbow
+[2026-08-31T02:53:06.863Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=2 hooks=0
+[2026-08-31T02:53:06.863Z] [debug] attack: target=Conspiracy Architects Raider 5 range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false
+[2026-08-31T02:53:06.864Z] [debug] attack: status mods stealthed +5
+[2026-08-31T02:53:06.894Z] [world] You commit forward with the searing bone crossbow. Conspiracy Architects Raider 5 watches your hands.
+[2026-08-31T02:53:06.895Z] [system] ⏳ Time passed: 6 min
+[2026-08-31T02:53:07.044Z] [cognitive] AGGRESSION · ATTACK · AIM · DISENGAGE  (148ms)
+[2026-08-31T02:53:17.135Z] [world] Conspiracy Architects Raider 5 moves first. The pressure is immediate.
+[2026-08-31T02:53:17.136Z] [world] Below, Conspiracy Architects Raider 3 and 1 other circle the base — nothing down there can reach you.
+[2026-08-31T02:53:17.136Z] [combat] You — d20 → 20 + DEX 28 + 2 (point blank) stealthed +5 = 55 vs Conspiracy Architects Raider 5 AC 10 — ✓ CRITICAL HIT
+[2026-08-31T02:53:17.137Z] [combat] Piercing flares — +3 on hit (weak — bites deep!).
+[2026-08-31T02:53:17.137Z] [combat] Weakness exposed — Conspiracy Architects Raider 5 flinches. (piercing ×2.25 for 60)
+[2026-08-31T02:53:17.138Z] [combat] The killing blow with the searing bone crossbow: 60. Conspiracy Architects Raider 5 drops where it stood.
+[2026-08-31T02:53:17.141Z] [reward] Conspiracy Architects Raider 5 defeated. You recover Patched Cloth ×3.
+[2026-08-31T02:53:17.149Z] [reward] You strip the body: Cudgel, Mud-Bound Cloak (+6 TC). The kit took the fight badly.
+[2026-08-31T02:53:17.149Z] [combat] 1 attacker remains. Conspiracy Architects Raider 3 now in your sights.
+[2026-08-31T02:53:17.150Z] [system] Word moves through the buried world — many people view you differently now.
+[2026-08-31T02:53:17.150Z] [reward] +16 TC pried from the dust.
+[2026-08-31T02:53:17.183Z] [arbiter] The Arbiter does not look away from the Conspiracy Architects Raider 3. "Decide quickly. It already has."
+[2026-08-31T02:53:19.127Z] [debug] ui: tap "🔥 bone crossbow"
+[2026-08-31T02:53:19.171Z] [player] attack with the off-hand bone crossbow
+[2026-08-31T02:53:19.171Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=1 hooks=0
+[2026-08-31T02:53:19.172Z] [debug] attack: target=Conspiracy Architects Raider 3 range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false
+[2026-08-31T02:53:19.204Z] [world] Your searing bone crossbow comes around in an arc; Conspiracy Architects Raider 3 squares up to meet it.
+[2026-08-31T02:53:19.204Z] [system] ⏳ Time passed: 6 min
+[2026-08-31T02:53:19.347Z] [cognitive] AGGRESSION · ATTACK · AIM · DISENGAGE  (142ms)
+[2026-08-31T02:53:31.013Z] [world] Conspiracy Architects Raider 3 moves first. The pressure is immediate.
+[2026-08-31T02:53:31.013Z] [world] Below, Conspiracy Architects Raider 3 circles the base — it cannot reach you up here.
+[2026-08-31T02:53:31.014Z] [combat] You — d20 → 8 + DEX 28 + 2 (point blank) = 38 vs Conspiracy Architects Raider 3 AC 11 — ✓ HIT
+[2026-08-31T02:53:31.015Z] [combat] Clean hit with the searing bone crossbow for 6. Conspiracy Architects Raider 3 has 8 left and does not back away.
+[2026-08-31T02:53:31.016Z] [combat] Searing Bone Crossbow — 1 burn bites in and festers (3 turns).
+[2026-08-31T02:53:34.191Z] [debug] ui: tap "🔥 bone crossbow"
+[2026-08-31T02:53:34.235Z] [player] attack with the off-hand bone crossbow
+[2026-08-31T02:53:34.236Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=1 hooks=0
+[2026-08-31T02:53:34.236Z] [combat] Conspiracy Architects Raider 3 blisters — clinging fire sears 1. (7/14 HP, 2 turns left)
+[2026-08-31T02:53:34.237Z] [debug] attack: target=Conspiracy Architects Raider 3 range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false
+[2026-08-31T02:53:34.268Z] [world] Your searing bone crossbow comes around in an arc; Conspiracy Architects Raider 3 squares up to meet it.
+[2026-08-31T02:53:34.269Z] [system] ⏳ Time passed: 6 min
+[2026-08-31T02:53:34.411Z] [cognitive] AGGRESSION · ATTACK · AIM · DISENGAGE  (141ms)
+[2026-08-31T02:53:42.995Z] [world] Conspiracy Architects Raider 3 moves first. The pressure is immediate.
+[2026-08-31T02:53:42.995Z] [world] Below, Conspiracy Architects Raider 3 circles the base — it cannot reach you up here.
+[2026-08-31T02:53:42.995Z] [combat] You — d20 → 19 + DEX 28 + 2 (point blank) = 49 vs Conspiracy Architects Raider 3 AC 11 — ✓ HIT
+[2026-08-31T02:53:42.997Z] [combat] Your blow with the searing bone crossbow lands clean — 13 damage. Conspiracy Architects Raider 3 crumples in the dust. The Aetherstone settles.
+[2026-08-31T02:53:42.997Z] [reward] Conspiracy Architects Raider 3 defeated. You recover Patched Cloth ×3, Architect Sigil.
+[2026-08-31T02:53:43.005Z] [reward] You strip the body: Cudgel, Mud-Warden's Vest (+6 TC). The kit took the fight badly.
+[2026-08-31T02:53:43.006Z] [system] Word moves through the buried world — many people view you differently now.
+[2026-08-31T02:53:43.008Z] [reward] +22 TC pried from the dust.
+[2026-08-31T02:53:43.341Z] [debug] persist sizes(KB): total=187 player=36 wm=64[rooms=33 events=1 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=80 scene=6
+[2026-08-31T02:53:49.063Z] [debug] ui: tap "investigate"
+[2026-08-31T02:53:50.514Z] [player] investigate scratched markings
+[2026-08-31T02:53:50.514Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=scratched markings resolved=scratched markings range=- enemies=0 hooks=0
+[2026-08-31T02:53:50.515Z] [world] The scratched markings resists your reading. Not hostile — just closed. Some things in the buried world don't open for the curious.
+[2026-08-31T02:53:50.622Z] [cognitive] neutral  (105ms)
+[2026-08-31T02:53:51.744Z] [debug] qwen⏱ investigate_lore ok 1130ms read 294ms/write 813ms in 127t→out 26t 2.3ms/t (137ch)
+[2026-08-31T02:53:51.747Z] [debug] qwen⏱ stats — investigate_lore n5 avg2.0s max2.7s read0.7s/write1.3s in127t→out39t ms/tok 2.3-10.6 | narration:scene_intro_fill n4 avg6.0s max9.4s read5.6s/write1.1s ⚠2unusable in738t→out25t ms/tok 4.0-11.4 cap3 ⏸1 ✂2/10.3s | ambient n1 avg7.9s max7.9s read3.8s/write1.6s in367t→out31t ms/tok 10.3-10.3 cap1 wait1.7s ✂1/7.9s || WASTED 3 calls / 18.1s
+[2026-08-31T02:53:52.981Z] [debug] ui: tap "climb down"
+[2026-08-31T02:53:53.007Z] [player] climb down
+[2026-08-31T02:53:53.008Z] [debug] parser: intent=climb conf=1.00 verb=climb target=- resolved=- range=- enemies=0 hooks=0
+[2026-08-31T02:53:53.009Z] [world] You climb down from the nook and rejoin the ground beside the dead tree. Boots back on the ground.
+[2026-08-31T02:53:53.009Z] [world] Soot stands and stretches as you hit the ground. She has waited.
+[2026-08-31T02:53:53.011Z] [system] ⏳ Time passed: 15 min
+[2026-08-31T02:53:53.127Z] [cognitive] CLIMB  (115ms)
+[2026-08-31T02:53:55.280Z] [debug] ui: tap "→ NIMARI"
+[2026-08-31T02:53:55.288Z] [debug] spawn: gear=[Architect's Aether Gloves, Forgotten Faceshroud] window=10 roster=new
+[2026-08-31T02:53:55.289Z] [world] You walk south through open silt. The compass points south into open ground.
+[2026-08-31T02:53:55.290Z] [world] Whatever you turned over here is still turned over.
+[2026-08-31T02:53:56.582Z] [debug] ui: tap "take / salvage"
+[2026-08-31T02:53:58.119Z] [world] The Architect's Aether Gloves is heavier than it looks. Most things down here are.
+[2026-08-31T02:53:58.120Z] [reward] ✦ Architect's Aether Gloves (Common).
+[2026-08-31T02:53:58.131Z] [world] The Forgotten Faceshroud is lighter than it looks, which is its own kind of warning.
+[2026-08-31T02:53:58.132Z] [reward] ✦ Forgotten Faceshroud (Common).
+[2026-08-31T02:53:59.779Z] [world] You scavenge the marker thoroughly. One Stick survives the sorting.
+[2026-08-31T02:53:59.779Z] [world] You strip the salvage sack carefully. Something usable comes free in your hand.
+[2026-08-31T02:53:59.779Z] [reward] ✦ Salvage haul:
+[2026-08-31T02:53:59.779Z] [reward]     • Stick (Common)
+[2026-08-31T02:53:59.779Z] [reward]     • Spider Silk (Common)
+[2026-08-31T02:54:01.104Z] [debug] qwen⏱ ambient ok 7985ms read 3811ms/write 3360ms in 367t→out 31t 10.4ms/t HIT-CAP (136ch)
+[2026-08-31T02:54:01.192Z] [debug] ui: tap "investigate"
+[2026-08-31T02:54:01.404Z] [debug] arbiter: ambient stale:moved-scene→banked 8393ms
+[2026-08-31T02:54:01.404Z] [debug] arbiter: ambient-empty reason=near-duplicate-of-recent raw="You have traversed through the submerged transit hub, the heart of the Silt Wastes. Every step has been treacherous, yet"
+[2026-08-31T02:54:08.400Z] [player] investigate the ground
+[2026-08-31T02:54:08.401Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2
+[2026-08-31T02:54:08.406Z] [reward] You scrape at the silt with the bent nail. ✦ Recovered Aetheric Pelt (Rare).
+[2026-08-31T02:54:08.414Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-08-31T02:54:08.417Z] [arbiter] The Arbiter looks around. "Walk softly. The ground above the buried cities is thin in places, and listening."
+[2026-08-31T02:54:08.417Z] [system] ⏳ Time passed: 24 min
+[2026-08-31T02:54:08.529Z] [cognitive] CLIMB  (110ms)
+[2026-08-31T02:54:09.684Z] [player] investigate sludge pool
+[2026-08-31T02:54:09.685Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=sludge pool resolved=sludge pool range=- enemies=0 hooks=2
+[2026-08-31T02:54:09.687Z] [world] You study the sludge pool. It bears no marks worth naming — no glyph, no fingerprint, no trace the Reclaimers would catalog.
+[2026-08-31T02:54:09.688Z] [debug] arbiter: ambient held (he just spoke)
+[2026-08-31T02:54:09.811Z] [cognitive] neutral  (121ms)
+[2026-08-31T02:54:11.085Z] [debug] ui: tap "→ NIMARI"
+[2026-08-31T02:54:11.102Z] [debug] spawn: gear=[Crude Golem Greatsword] window=10 roster=new
+[2026-08-31T02:54:11.103Z] [arbiter] The Arbiter, walking with you: "Tartaria was a continent once. A flood older than any honest map drowned it. We are crossing the top of it."
+[2026-08-31T02:54:11.104Z] [world] You walk east through open silt. The compass points east into open ground.
+[2026-08-31T02:54:11.105Z] [world] It sits where it sat. Patient is the wrong word — it simply does not move.
+[2026-08-31T02:54:12.349Z] [debug] ui: tap "take / salvage"
+[2026-08-31T02:54:13.613Z] [debug] qwen⏱ investigate_lore ok 3810ms read 1279ms/write 2506ms in 128t→out 27t 10.0ms/t (122ch)
+[2026-08-31T02:54:13.935Z] [world] The Crude Golem Greatsword is cold through your glove.
+[2026-08-31T02:54:13.936Z] [reward] ✦ Crude Golem Greatsword (Common).
+[2026-08-31T02:54:15.033Z] [world] Tucked inside the wagon: an oddment that matches no quartermaster's list. The kind of thing that fuses well.
+[2026-08-31T02:54:15.033Z] [world] You work the well apart and come away with a curiosity — no catalog name, but real weight in the hand.
+[2026-08-31T02:54:15.034Z] [reward] ✦ Salvage haul:
+[2026-08-31T02:54:15.034Z] [reward]     • Fractured Geode Half (Common)
+[2026-08-31T02:54:15.034Z] [reward]     • Flint Core Nodule (Common)
+[2026-08-31T02:54:15.304Z] [debug] persist sizes(KB): total=174 player=37 wm=53[rooms=21 events=1 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=81 scene=4
+[2026-08-31T02:54:16.336Z] [debug] ui: tap "investigate"
+[2026-08-31T02:54:18.120Z] [player] investigate the ground
+[2026-08-31T02:54:18.121Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2
+[2026-08-31T02:54:18.125Z] [reward] You scrape at the silt with the bent nail. ✦ Recovered Wild Carrot (Common).
+[2026-08-31T02:54:18.130Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-08-31T02:54:18.130Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-31T02:54:18.131Z] [system] ⏳ Time passed: 24 min
+[2026-08-31T02:54:18.246Z] [cognitive] CLIMB  (114ms)
+[2026-08-31T02:54:19.351Z] [player] investigate rift
+[2026-08-31T02:54:19.352Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=rift resolved=rift range=- enemies=0 hooks=2
+[2026-08-31T02:54:19.356Z] [world] The rift resists your reading. Not hostile — just closed. Some things in the buried world don't open for the curious.
+[2026-08-31T02:54:19.357Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-08-31T02:54:19.358Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-31T02:54:19.493Z] [cognitive] neutral  (134ms)
+[2026-08-31T02:54:20.602Z] [player] investigate sinkhole
+[2026-08-31T02:54:20.603Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=sinkhole resolved=sinkhole range=- enemies=0 hooks=2
+[2026-08-31T02:54:20.604Z] [world] You take the measure of the sinkhole. The Aetheric haze does not gather; the dust does not stir. Just a thing, in a place.
+[2026-08-31T02:54:20.605Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-08-31T02:54:20.605Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-31T02:54:20.605Z] [debug] arbiter: ambient held (he just spoke)
+[2026-08-31T02:54:20.909Z] [debug] qwen⏱ investigate_lore ok 1425ms read 286ms/write 1113ms in 126t→out 36t 2.3ms/t (195ch)
+[2026-08-31T02:54:21.113Z] [cognitive] neutral  (507ms)
+[2026-08-31T02:54:22.061Z] [debug] qwen⏱ investigate_lore ok 1259ms wait 312ms read 292ms/write 642ms in 127t→out 21t 2.3ms/t (100ch)
+[2026-08-31T02:54:27.799Z] [debug] ui: tap "→ NIMARI"
+[2026-08-31T02:54:27.815Z] [world] You walk south. You arrive at Nimari.
+[2026-08-31T02:54:27.821Z] [debug] scene: loc=nimari hub=- arrival=y opening=n passing=n
+[2026-08-31T02:54:27.855Z] [debug] spawn: gear=[Mud Grip] window=10 roster=new
+[2026-08-31T02:54:27.878Z] [arbiter] The Arbiter takes you in. "Nimari is lethal country. The things that wake here pull above your weight. 35 HP carries you through Varakush (danger 1). Visit a Lost Capital (Asgardar, Samarran, Nimari, Drakova, Voronov, Karok-Sa, Yuldra-Tul, Ostragar, Iskan-Veil) to learn what the Cores demand. Or move on until you've got your legs under you."
+[2026-08-31T02:54:27.879Z] [world] Soot noses at the faint musk and snorts. There's something there.
+[2026-08-31T02:54:27.880Z] [world] You've left Great Tartary Plains and entered Nimari. Half-swallowed. The half that remains has stopped pretending it is whole. It's night. An aetheric spider is already here. Open ground in every direction.
+[2026-08-31T02:54:27.881Z] [combat] Distance: mid-range. Reclaimers Guild Geode-Cored Cleaver — needs approach · Bone Crossbow ✓ in range.
+[2026-08-31T02:54:27.910Z] [system] Weather effect — Whisper Fog: -1 WIS
+[2026-08-31T02:54:27.912Z] [world] [Nimari] north: Zharak's Teeth (6 tiles, 15 hours) · east: The Parley Ground (9 tiles, 23 hours) · south: Red Tower of Nimari (3 tiles, 8 hours) · west: Obsidian Pillars (9 tiles, 23 hours)
+[2026-08-31T02:54:27.912Z] [debug] arbiter: template (reason=combat)
+[2026-08-31T02:54:27.912Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-31T02:54:27.917Z] [arbiter] A Reclaimer foreman taps the open shaft. "Down there is one of nine. Asgardar, Samarran, Nimari, Drakova, Voronov — the original five. Karok-Sa, Yuldra-Tul, Ostragar, Iskan-Veil — the four we have only re-confirmed in the last decade. Tools first; we'll teach you the trick at each site."
+[2026-08-31T02:54:27.917Z] [world] Half of Nimari is under the silt; the half that isn't is red. The Red Tower throws a long rust-coloured shadow across drowned streets, and somewhere inside it a working Aetheric core pulses warm enough that the mud around your boots steams faintly.
+[2026-08-31T02:54:27.917Z] [arbiter] (Reclaimer route — to recover the Nimari Core, SALVAGE something here. The Aetheric housing comes loose under the right trowel.)
+[2026-08-31T02:54:27.918Z] [arbiter] The Arbiter's voice drops. "This is one of the nine Lost Capitals — and it holds a Core, the whole reason we walk. Open CONTRACTS, find the Primary Objective, and press ★ SUMMON to call up this place's Guardian. Put it down and the Core is yours. That is the main road; everything else is a detour."
+[2026-08-31T02:54:31.766Z] [arbiter] They do not seem surprised, which is the first bad sign, and they have a word for it, which is the second. It is an old word and they use it carefully. They ask to hear it — to sit with you in a dry room while it happens and write down what you say — and they pay for the privilege, and by the third session you understand that you are not the one being studied. Not primarily.
+[2026-08-31T02:54:31.768Z] [reward] +180 TC.
+[2026-08-31T02:54:31.769Z] [system] Word moves through the buried world — many people view you differently now.
+[2026-08-31T02:54:31.770Z] [system] ▼ Mud Monarchs marks you HATED — their counters charge you +25%, and no charm changes it.
+[2026-08-31T02:54:33.515Z] [debug] ui: tap "🔥 bone crossbow"
+[2026-08-31T02:54:33.563Z] [player] attack with the off-hand bone crossbow
+[2026-08-31T02:54:33.563Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=1 hooks=0
+[2026-08-31T02:54:33.564Z] [debug] attack: target=Aetheric Spider range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false
+[2026-08-31T02:54:33.565Z] [arbiter] Whisper Fog hangs between you. "−1 to the swing — see what you can," the Arbiter says.
+[2026-08-31T02:54:33.565Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-08-31T02:54:33.597Z] [world] You raise the searing bone crossbow toward Aetheric Spider. The room narrows around the both of you.
+[2026-08-31T02:54:33.597Z] [system] ⏳ Time passed: 6 min
+[2026-08-31T02:54:33.767Z] [cognitive] AGGRESSION · ATTACK · AIM · DISENGAGE  (169ms)
+[2026-08-31T02:54:40.227Z] [world] Aetheric Spider moves first. The pressure is immediate.
+[2026-08-31T02:54:40.228Z] [combat] Aetheric Spider turns on Soot — d20 19 + ATK 4 = 23 vs Soot's AC 12 (vest +2) — ✓ HIT
+[2026-08-31T02:54:40.228Z] [combat] Soot takes 4. (11/15 HP left)
+[2026-08-31T02:54:40.228Z] [combat] You — d20 → 12 + DEX 28 − 1 (Whisper Fog) = 39 vs Aetheric Spider AC 8 — ✓ HIT
+[2026-08-31T02:54:40.229Z] [combat] Piercing flares — +3 on hit.
+[2026-08-31T02:54:40.230Z] [combat] Aetheric Spider folds under the searing bone crossbow. 15 damage was enough. The room exhales.
+[2026-08-31T02:54:40.232Z] [reward] Aetheric Spider defeated. You recover Spider Silk.
+[2026-08-31T02:54:40.233Z] [reward] ✦ You feel hardier from your trials. +1 max HP (now 36). [41 enemies defeated]
+[2026-08-31T02:54:40.233Z] [reward] +8 TC pried from the dust.
+[2026-08-31T02:54:40.617Z] [debug] persist sizes(KB): total=187 player=37 wm=65[rooms=33 events=1 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=82 scene=3
+[2026-08-31T02:54:41.774Z] [debug] homework: intro-fill armed after 7546ms idle
+[2026-08-31T02:54:42.906Z] [debug] ui: tap "take / salvage"
+[2026-08-31T02:54:45.569Z] [world] The Mud Grip fits the hand better than it has any right to.
+[2026-08-31T02:54:45.569Z] [reward] ✦ Mud Grip (Common).
+[2026-08-31T02:54:46.976Z] [world] You turn the Aetheric Shard over once, then keep it.
+[Filtered][2026-08-31T02:54:48.231Z] [world] You strip the dust bottle carefully. Something usable comes free in your hand.
+[2026-08-31T02:54:48.231Z] [world] You break the hook chain apart. Among the pieces, something worth keeping.
+[2026-08-31T02:54:48.232Z] [world] You break the merchant bones apart. Among the pieces, something worth keeping.
+[2026-08-31T02:54:48.232Z] [world] You break the pebble apart. Among the pieces, something worth keeping.
+[2026-08-31T02:54:48.232Z] [world] You work the wagon axle over. A part of it comes loose, intact.
+[2026-08-31T02:54:48.232Z] [reward] ✦ Salvage haul:
+[2026-08-31T02:54:48.232Z] [reward]     • Clouded Lens Blank (Common)
+[2026-08-31T02:54:48.233Z] [reward]     • Cloth Scrap x2 (Common)
+[2026-08-31T02:54:48.233Z] [reward]     • Worn Tartarian Coin x21 (Common)
+[2026-08-31T02:54:48.233Z] [reward]     • Aether Dust (Common)
+[2026-08-31T02:54:48.233Z] [reward]     • Aether Crystal (Common)
+[2026-08-31T02:54:53.236Z] [debug] qwen⏱ narration:scene_intro_fill ok 11325ms read 10172ms/write 1122ms in 734t→out 33t 13.9ms/t HIT-CAP (165ch)
+[2026-08-31T02:54:53.381Z] [debug] qwen⏱ ✂ DISCARDED narration:scene_intro_fill after 11325ms — intro-fill:action-opener
+[2026-08-31T02:54:53.382Z] [debug] homework: scene_intro "Nimari" ✓ 11610ms
+[2026-08-31T02:54:54.289Z] [debug] ui: tap "investigate"
+[2026-08-31T02:54:55.833Z] [player] investigate the ground
+[2026-08-31T02:54:55.834Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=0
+[2026-08-31T02:54:55.839Z] [world] You scrape at the silt with the bent nail. Nothing of worth.
+[2026-08-31T02:54:55.848Z] [system] ⏳ Time passed: 24 min
+[2026-08-31T02:54:55.975Z] [cognitive] CLIMB  (126ms)
+[2026-08-31T02:54:57.113Z] [player] investigate crevice-pool
+[2026-08-31T02:54:57.115Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=crevice pool resolved=crevice-pool range=- enemies=0 hooks=0
+[2026-08-31T02:54:57.116Z] [world] You study the crevice-pool. It bears no marks worth naming — no glyph, no fingerprint, no trace the Reclaimers would catalog.
+[2026-08-31T02:54:57.316Z] [cognitive] SWIM  (198ms)
+[2026-08-31T02:54:59.994Z] [debug] qwen⏱ investigate_lore ok 2700ms read 1262ms/write 1400ms in 127t→out 42t 9.9ms/t (170ch)
+[2026-08-31T02:55:00.118Z] [world] You lay a hand on the cold Core seat and call its Guardian up.
+[2026-08-31T02:55:00.118Z] [combat] Iron Litany Brother Konrad closes — Litany Hammer-Down ready, 1d8+3+1d6 damage on a hit. (range: mid) ★ CORE GUARDIAN
+[2026-08-31T02:55:00.119Z] [arbiter] A low chant rises out of nowhere — three voices, then six, then one. The Core's housing opens and Brother Konrad steps from it in full plate, hammer in both hands, the Iron Litany on his tongue. "Aether-born, defend this seat. Aether-born, end this hand." He fixes you. "End it, brother, before we end you."
+[2026-08-31T02:55:03.423Z] [debug] ui: tap "🔥 bone crossbow"
+[2026-08-31T02:55:03.467Z] [player] attack with the off-hand bone crossbow
+[2026-08-31T02:55:03.467Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=1 hooks=0
+[2026-08-31T02:55:03.468Z] [debug] attack: target=Iron Litany Brother Konrad range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false
+[2026-08-31T02:55:03.469Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-08-31T02:55:03.501Z] [world] You raise the searing bone crossbow toward Iron Litany Brother Konrad. The room narrows around the both of you.
+[2026-08-31T02:55:03.502Z] [system] ⏳ Time passed: 6 min
+[2026-08-31T02:55:03.658Z] [cognitive] AGGRESSION · ATTACK · AIM · DISENGAGE  (155ms)
+[2026-08-31T02:55:11.605Z] [world] You seize the initiative. Iron Litany Brother Konrad has no time to react.
+[2026-08-31T02:55:11.605Z] [combat] You — d20 → 6 + DEX 28 − 1 (Whisper Fog) = 33 vs Iron Litany Brother Konrad AC 16 — ✓ HIT
+[2026-08-31T02:55:11.608Z] [combat] Clean hit with the searing bone crossbow for 11. Iron Litany Brother Konrad has 31 left and does not back away.
+[2026-08-31T02:55:11.608Z] [combat] Searing Bone Crossbow — 3 burn bites in and festers (3 turns).
+[2026-08-31T02:55:11.610Z] [combat] Iron Litany Brother Konrad — d20 → 14 + ATK 5 = 19 vs your AC 21 — ✗ MISS
+[2026-08-31T02:55:11.882Z] [debug] persist sizes(KB): total=191 player=37 wm=67[rooms=34 events=1 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=82 scene=4
+[2026-08-31T02:55:13.194Z] [debug] ui: tap "inventory"
+[2026-08-31T02:55:18.099Z] [world] You rack Sentinel Core Plate on your bandolier. Ready to throw.
+[2026-08-31T02:55:20.931Z] [world] You rack Frost Paste on your bandolier. Ready to throw.
+[2026-08-31T02:55:27.841Z] [debug] ui: tap "approach"
+[2026-08-31T02:55:27.849Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.
+[2026-08-31T02:55:27.895Z] [player] approach Iron Litany Brother Konrad
+[2026-08-31T02:55:27.896Z] [debug] parser: intent=advance conf=1.00 verb=approach target=iron litany brother konrad resolved=Iron Litany Brother Konrad range=mid enemies=1 hooks=0
+[2026-08-31T02:55:27.897Z] [debug] move: advance from range=mid enemies=1 weather=Whisper Fog cost=1 partial=0
+[2026-08-31T02:55:27.897Z] [debug] move: field advance target=Iron Litany Brother Konrad d 1.50->0.50 band mid->close
+[2026-08-31T02:55:27.897Z] [world] You close the gap with Iron Litany Brother Konrad. (range: close / arm's reach)
+[2026-08-31T02:55:27.897Z] [combat] Iron Litany Brother Konrad blisters — clinging fire sears 3. (28/42 HP, 2 turns left)
+[2026-08-31T02:55:27.899Z] [combat] Iron Litany Brother Konrad — d20 → 16 + ATK 5 = 21 vs your AC 21 — ✓ HIT
+[2026-08-31T02:55:27.900Z] [debug] arbiter: template (reason=combat)
+[2026-08-31T02:55:27.900Z] [arbiter] "You hit what you commit to," the Arbiter says. "The Iron Litany Brother Konrad hears the difference."
+[2026-08-31T02:55:28.089Z] [combat] Iron Litany Brother Konrad deals 9 bludgeoning damage. You have 21 HP remaining.
+[2026-08-31T02:55:28.260Z] [cognitive] neutral  (358ms)
+[2026-08-31T02:55:28.924Z] [debug] ui: tap "🔥 geode-cored cleaver"
+[2026-08-31T02:55:28.981Z] [player] attack with the reclaimers guild geode-cored cleaver
+[2026-08-31T02:55:28.982Z] [debug] parser: intent=attack conf=1.00 verb=attack target=reclaimers guild geode cored cleaver resolved=core range=close enemies=1 hooks=0
+[2026-08-31T02:55:28.982Z] [arbiter] The Arbiter holds out a hand. "That is the Tartarian Core. It does not come out with that hand — and what keeps it will not be taken by surprise. When you mean to take it, say so."
+[2026-08-31T02:55:28.983Z] [system] (Tap ★ SUMMON on the MAIN QUEST chip to face what guards it.)
+[2026-08-31T02:55:30.994Z] [debug] ui: tap "dodge"
+[2026-08-31T02:55:30.997Z] [player] dodge
+[2026-08-31T02:55:30.997Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=0
+[2026-08-31T02:55:30.997Z] [world] You commit to the dodge. Slip Iron Litany Brother Konrad's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-08-31T02:55:30.997Z] [combat] Iron Litany Brother Konrad blisters — clinging fire sears 3. (25/42 HP, 1 turn left)
+[2026-08-31T02:55:31.029Z] [combat] Iron Litany Brother Konrad — d20 → 12 + ATK 5 = 17 vs your AC 21 — ✗ EVADED
+[2026-08-31T02:55:31.030Z] [combat] Dodge — d20 → 12 + DEX 28 = 40 vs ATK 17. ✓ You slip the arc — PERFECT OPENING (next strike ×2 dice).
+[2026-08-31T02:55:31.031Z] [system] ⏳ Time passed: 6 min
+[2026-08-31T02:55:31.204Z] [cognitive] neutral  (173ms)
+[2026-08-31T02:55:32.274Z] [debug] ui: tap "🔥 geode-cored cleaver"
+[2026-08-31T02:55:32.330Z] [player] attack with the reclaimers guild geode-cored cleaver
+[2026-08-31T02:55:32.331Z] [debug] parser: intent=attack conf=1.00 verb=attack target=reclaimers guild geode cored cleaver resolved=core range=close enemies=1 hooks=0
+[2026-08-31T02:55:32.331Z] [arbiter] The Arbiter holds out a hand. "That is the Tartarian Core. It does not come out with that hand — and what keeps it will not be taken by surprise. When you mean to take it, say so."
+[2026-08-31T02:55:32.331Z] [debug] dedup: suppressed arbiter repeat — "The Arbiter holds out a hand. "That is the Tartarian Core. I…"
+[2026-08-31T02:55:32.331Z] [system] (Tap ★ SUMMON on the MAIN QUEST chip to face what guards it.)
+[2026-08-31T02:55:34.392Z] [debug] ui: tap "🔥 bone crossbow"
+[2026-08-31T02:55:34.397Z] [system] perfect opening fades.
+[2026-08-31T02:55:34.448Z] [player] attack with the off-hand bone crossbow
+[2026-08-31T02:55:34.448Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=1 hooks=0
+[2026-08-31T02:55:34.449Z] [combat] Iron Litany Brother Konrad blisters — clinging fire sears 3. (22/42 HP, 0 turns left)
+[2026-08-31T02:55:34.449Z] [combat] Iron Litany Brother Konrad shakes off the last of the fire — the Bone Crossbow has run its course.
+[2026-08-31T02:55:34.452Z] [debug] attack: target=Iron Litany Brother Konrad range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false
+[2026-08-31T02:55:34.453Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-08-31T02:55:34.453Z] [debug] attack: status mods perfect opening (2× dice)
+[2026-08-31T02:55:34.486Z] [world] You bring the searing bone crossbow to bear on Iron Litany Brother Konrad.
+[2026-08-31T02:55:34.487Z] [system] ⏳ Time passed: 6 min
+[2026-08-31T02:55:34.649Z] [cognitive] AGGRESSION · ATTACK · AIM · DISENGAGE  (162ms)
+[2026-08-31T02:55:41.790Z] [world] You seize the initiative. Iron Litany Brother Konrad has no time to react.
+[2026-08-31T02:55:41.790Z] [combat] You — d20 → 18 + DEX 28 − 1 (Whisper Fog) + 2 (point blank) perfect opening (2× dice) = 47 vs Iron Litany Brother Konrad AC 16 — ✓ HIT
+[2026-08-31T02:55:41.791Z] [system] ⚠ Your Bone Crossbow is coming apart — a few more hits will finish it. Mend it or lose it.
+[2026-08-31T02:55:41.792Z] [combat] Clean hit with the searing bone crossbow for 16. Iron Litany Brother Konrad has 6 left and does not back away.
+[2026-08-31T02:55:41.792Z] [combat] Searing Bone Crossbow — 1 burn bites in and festers (3 turns).
+[2026-08-31T02:55:41.794Z] [combat] Iron Litany Brother Konrad — d20 → 8 + ATK 5 = 13 vs your AC 21 — ✗ MISS
+[2026-08-31T02:55:41.794Z] [arbiter] "Tartaria does not award style points," the Arbiter says, eyes on the Iron Litany Brother Konrad. "End it."
+[2026-08-31T02:55:44.571Z] [debug] ui: tap "🔥 bone crossbow"
+[2026-08-31T02:55:44.615Z] [player] attack with the off-hand bone crossbow
+[2026-08-31T02:55:44.616Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=1 hooks=0
+[2026-08-31T02:55:44.616Z] [combat] Iron Litany Brother Konrad blisters — clinging fire sears 1. (5/42 HP, 2 turns left)
+[2026-08-31T02:55:44.617Z] [debug] attack: target=Iron Litany Brother Konrad range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false
+[2026-08-31T02:55:44.618Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-08-31T02:55:44.650Z] [world] Your searing bone crossbow comes around in an arc; Iron Litany Brother Konrad squares up to meet it.
+[2026-08-31T02:55:44.651Z] [system] ⏳ Time passed: 6 min
+[2026-08-31T02:55:44.814Z] [cognitive] AGGRESSION · ATTACK · AIM · DISENGAGE  (163ms)
+[2026-08-31T02:55:51.238Z] [world] Iron Litany Brother Konrad moves first. The pressure is immediate.
+[2026-08-31T02:55:51.240Z] [combat] Iron Litany Brother Konrad — d20 → 6 + ATK 5 = 11 vs your AC 21 — ✗ MISS
+[2026-08-31T02:55:51.240Z] [combat] You — d20 → 13 + DEX 28 − 1 (Whisper Fog) + 2 (point blank) = 42 vs Iron Litany Brother Konrad AC 16 — ✓ HIT
+[2026-08-31T02:55:51.241Z] [combat] Piercing flares — +4 on hit.
+[2026-08-31T02:55:51.242Z] [combat] Your blow with the searing bone crossbow lands clean — 14 damage. Iron Litany Brother Konrad crumples in the dust. The Aetherstone settles.
+[2026-08-31T02:55:51.243Z] [reward] Iron Litany Brother Konrad defeated.
+[2026-08-31T02:55:51.244Z] [reward] ✦ Boss spoils: Leviathan Scale, Throne Shard.
+[2026-08-31T02:55:51.244Z] [reward] +48 TC pried from the dust.
+[2026-08-31T02:55:51.278Z] [arbiter] The Arbiter eyes your new pieces. "You could make a Hollow Crown Circlet now, if you wanted."
+[2026-08-31T02:55:51.278Z] [arbiter] Konrad slumps against the Core's housing, breath rattling out the last line of the Litany. "...Aether... keep... the seat..." The chant goes quiet. The Core comes free in your hand without resistance.
+[2026-08-31T02:55:51.278Z] [reward] ✦ Litany Maul taken from Iron Litany Brother Konrad. ✦ Litany Greaves taken from Iron Litany Brother Konrad.
+[2026-08-31T02:55:51.279Z] [arbiter] The Nimari Core comes loose under your trowel — pried clean from its Tartarian seat. 8 Cores still to recover.
+[2026-08-31T02:55:51.449Z] [reward] ✦ Boss spoils: a Resurrection Gem, prised from the wreckage where Iron Litany Brother Konrad fell. Yours — the buried world is one boss lighter. (33 held)
+[2026-08-31T02:55:51.712Z] [debug] persist sizes(KB): total=193 player=39 wm=67[rooms=34 events=2 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=83 scene=3
+[2026-08-31T02:55:56.863Z] [debug] homework: intro-fill armed after 8869ms idle (strike 2/3)
+[2026-08-31T02:55:59.755Z] [debug] ui: tap "inventory"
+[2026-08-31T02:56:07.832Z] [debug] qwen⏱ narration:scene_intro_fill ok 10827ms read 9698ms/write 1090ms in 750t→out 33t 12.9ms/t HIT-CAP (156ch)
+[2026-08-31T02:56:07.840Z] [debug] qwen⏱ ✂ DISCARDED narration:scene_intro_fill after 10827ms — intro-fill:∅
+[2026-08-31T02:56:07.841Z] [debug] homework: scene_intro "Nimari" ∅ 10980ms
+[2026-08-31T02:56:17.101Z] [debug] qwen⏱ item_synthesis_hw ok 5218ms read 4276ms/write 918ms in 323t→out 29t 13.2ms/t (116ch)
+[2026-08-31T02:56:18.201Z] [debug] qwen⏱ ✂ DISCARDED item_synthesis_hw after 5218ms — item_synth:rejected-by-clamp bad-kind="cloth"
+[2026-08-31T02:56:18.201Z] [debug] homework: item_desc "Aetheric Cloth" ∅ 6331ms
+[2026-08-31T02:56:19.145Z] [debug] stats: STR11 DEX26 INT12 WIS7 CHA2 STE5 | gear: DEX+18,INT+3,STR+6,STE+2,WIS+1 | worn: main=Reclaimers Guild Geode-Cored Cleaver off=Bone Crossbow head=Forgotten Seeker's Mask chest=Rough-Hewn Chestplate hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band
+[2026-08-31T02:56:29.620Z] [debug] stats: STR11 DEX23 INT11 WIS10 CHA2 STE5 | gear: WIS+4,INT+2,STR+6,DEX+15,STE+2 | worn: main=Reclaimers Guild Geode-Cored Cleaver off=Bone Crossbow head=Architect's Sight Enhancer chest=Rough-Hewn Chestplate hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band
+[2026-08-31T02:56:41.892Z] [debug] homework: intro-fill armed after 9646ms idle (strike 3/3)
+[2026-08-31T02:56:45.168Z] [arbiter] The Arbiter studies you a long moment. "You have earned a name to carry: Aetheric Explorer. Passive: +1 to social (diplomacy) checks."
+[2026-08-31T02:56:45.231Z] [player] arm golem with Crude Golem Greatsword
+[2026-08-31T02:56:45.231Z] [player] arm golem with Crude Golem Greatsword
+[2026-08-31T02:56:45.232Z] [world] Plinth takes up the Crude Golem Greatsword. It settles into the construct's grip like it was cast for it.
+[2026-08-31T02:56:48.718Z] [debug] qwen⏱ narration:scene_intro_fill preempted 6818ms read 0ms/write 0ms in 748t→out 0t (0ch)
+[2026-08-31T02:56:48.820Z] [debug] qwen⏱ ✂ DISCARDED narration:scene_intro_fill after 6818ms — intro-fill:∅
+[2026-08-31T02:56:48.821Z] [debug] homework: scene_intro "Nimari" ∅ 6930ms
+[2026-08-31T02:57:05.812Z] [debug] persist sizes(KB): total=193 player=39 wm=67[rooms=34 events=2 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=83 scene=3
+[2026-08-31T02:57:17.942Z] [debug] ui: tap "climb"
+[2026-08-31T02:57:19.910Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.
+[2026-08-31T02:57:19.926Z] [player] climb tower
+[2026-08-31T02:57:19.927Z] [debug] parser: intent=climb conf=1.00 verb=climb target=tower resolved=tower range=- enemies=0 hooks=0
+[2026-08-31T02:57:19.968Z] [world] You loop your Reclaimer's Rope around the tower and walk the line. Tier 1/4 cleared.
+[2026-08-31T02:57:19.969Z] [world] You reach the first hold of the tower (tier 1/4). Higher still to go.
+[2026-08-31T02:57:19.969Z] [world] Soot eyes the tower, then settles at its base. She is not built for the climb.
+[2026-08-31T02:57:19.969Z] [world] Plinth sets its stone feet at the base of tower and will climb no further — the construct holds the ground while you go up alone.
+[2026-08-31T02:57:19.970Z] [system] ⏳ Time passed: 30 min
+[2026-08-31T02:57:20.098Z] [cognitive] CLIMB  (127ms)
+[2026-08-31T02:57:21.043Z] [debug] ui: tap "climb up (1/4)"
+[2026-08-31T02:57:21.056Z] [player] climb tower
+[2026-08-31T02:57:21.056Z] [debug] parser: intent=climb conf=1.00 verb=climb target=tower resolved=tower range=- enemies=0 hooks=0
+[2026-08-31T02:57:21.099Z] [world] You loop your Reclaimer's Rope around the tower and walk the line. Tier 2/4 cleared.
+[2026-08-31T02:57:21.099Z] [world] You reach the next hold of the tower (tier 2/4). Higher still to go.
+[2026-08-31T02:57:21.100Z] [system] ⏳ Time passed: 30 min
+[2026-08-31T02:57:21.224Z] [cognitive] CLIMB  (124ms)
+[2026-08-31T02:57:21.809Z] [debug] ui: tap "climb up (2/4)"
+[2026-08-31T02:57:21.836Z] [player] climb tower
+[2026-08-31T02:57:21.837Z] [debug] parser: intent=climb conf=1.00 verb=climb target=tower resolved=tower range=- enemies=0 hooks=0
+[2026-08-31T02:57:21.879Z] [world] You loop your Reclaimer's Rope around the tower and walk the line. Tier 3/4 cleared.
+[2026-08-31T02:57:21.880Z] [world] You reach the last stretch of the tower (tier 3/4). Higher still to go.
+[2026-08-31T02:57:21.880Z] [world] A line of wind-torn prayer flags snaps just over your head, knotted to a rusted cleat.
+[2026-08-31T02:57:21.881Z] [system] ⏳ Time passed: 30 min
+[2026-08-31T02:57:22.001Z] [cognitive] CLIMB  (119ms)
+[2026-08-31T02:57:24.744Z] [debug] ui: tap "take / salvage"
+[2026-08-31T02:57:27.321Z] [world] You break the wind-torn prayer flags apart. Among the pieces, something worth keeping.
+[2026-08-31T02:57:27.322Z] [reward] ✦ Salvage haul:
+[2026-08-31T02:57:27.322Z] [reward]     • Aetheric Cloth (Uncommon)
+[2026-08-31T02:57:28.459Z] [debug] ui: tap "climb up (3/4)"
+[2026-08-31T02:57:28.483Z] [player] climb tower
+[2026-08-31T02:57:28.484Z] [debug] parser: intent=climb conf=1.00 verb=climb target=tower resolved=tower range=- enemies=0 hooks=0
+[2026-08-31T02:57:28.529Z] [world] You loop your Reclaimer's Rope around the tower and walk the line. Tier 4/4 cleared.
+[2026-08-31T02:57:28.529Z] [world] You reach the top of the tower (tier 4/4). The view changes; the room reads differently from here.
+[2026-08-31T02:57:28.530Z] [reward] ✦ Bioluminescent Fungus (Uncommon) — tucked into a crack at the top of the tower.
+[2026-08-31T02:57:28.531Z] [system] ⏳ Time passed: 30 min
+[2026-08-31T02:57:28.658Z] [cognitive] CLIMB  (126ms)
+[2026-08-31T02:57:29.594Z] [debug] ui: tap "climb down"
+[2026-08-31T02:57:29.606Z] [player] climb down
+[2026-08-31T02:57:29.607Z] [debug] parser: intent=climb conf=1.00 verb=climb target=- resolved=- range=- enemies=0 hooks=0
+[2026-08-31T02:57:29.608Z] [world] You make your way back down the tower. Boots back on the ground.
+[2026-08-31T02:57:29.608Z] [world] Soot stands and stretches as you hit the ground. She has waited.
+[2026-08-31T02:57:29.609Z] [debug] arbiter: template (reason=intent-not-allowed:climb)
+[2026-08-31T02:57:29.609Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-31T02:57:29.609Z] [system] ⏳ Time passed: 15 min
+[2026-08-31T02:57:29.785Z] [cognitive] CLIMB  (174ms)
+[2026-08-31T02:57:31.478Z] [debug] ui: tap "climb"
+[2026-08-31T02:57:34.861Z] [debug] qwen⏱ ambient ok 6104ms read/write unusable (native mis-reported 49410ms/2118ms — llama.rn split bug, not this call) in 371t→out 31t HIT-CAP (147ch)
+[2026-08-31T02:57:34.862Z] [debug] qwen⏱ stats — investigate_lore n9 avg2.1s max3.8s read0.7s/write1.3s in127t→out36t ms/tok 2.3-10.6 | narration:scene_intro_fill n7 avg7.6s max11.3s read7.8s/write1.1s ⚠3unusable in741t→out24t ms/tok 4.0-13.9 cap5 ⏸2 ✂5/39.2s | ambient n3 avg7.3s max8.0s read3.8s/write2.5s ⚠1unusable in368t→out31t ms/tok 10.3-10.4 cap3 wait0.6s ✂1/7.9s | item_synthesis_hw n1 avg5.2s max5.2s read4.3s/write0.9s in323t→out29t ms/tok 13.2-13.2 ✂1/5.2s || WASTED 7 calls / 52.3s
+[2026-08-31T02:57:34.986Z] [player] climb cracked ruined skyscraper
+[2026-08-31T02:57:34.987Z] [debug] parser: intent=climb conf=1.00 verb=climb target=cracked ruined skyscraper resolved=cracked ruined skyscraper range=- enemies=0 hooks=0
+[2026-08-31T02:57:35.021Z] [world] You loop your Reclaimer's Rope around the cracked ruined skyscraper and walk the line. Tier 1/4 cleared.
+[2026-08-31T02:57:35.021Z] [world] You reach the first hold of the cracked ruined skyscraper (tier 1/4). Higher still to go.
+[2026-08-31T02:57:35.021Z] [world] Soot eyes the cracked ruined skyscraper, then settles at its base. She is not built for the climb.
+[2026-08-31T02:57:35.022Z] [world] Plinth sets its stone feet at the base of cracked ruined skyscraper and will climb no further — the construct holds the ground while you go up alone.
+[2026-08-31T02:57:35.022Z] [system] ⏳ Time passed: 30 min
+[2026-08-31T02:57:35.141Z] [debug] qwen⏱ ✂ DISCARDED ambient after 6104ms — ambient:∅
+[2026-08-31T02:57:35.141Z] [debug] arbiter: ambient ∅ 6610ms
+[2026-08-31T02:57:35.142Z] [debug] arbiter: ambient-empty reason=action-opener raw="You look back at the Royal Vaults Beneath the Spire, a grand hall of stone that seems to stretch endlessly into the dist"
+[2026-08-31T02:57:35.242Z] [cognitive] neutral  (219ms)
+[2026-08-31T02:57:35.462Z] [debug] ui: tap "climb up (1/4)"
+[2026-08-31T02:57:35.510Z] [player] climb cracked ruined skyscraper
+[2026-08-31T02:57:35.510Z] [debug] parser: intent=climb conf=1.00 verb=climb target=cracked ruined skyscraper resolved=cracked ruined skyscraper range=- enemies=0 hooks=0
+[2026-08-31T02:57:35.545Z] [world] You loop your Reclaimer's Rope around the cracked ruined skyscraper and walk the line. Tier 2/4 cleared.
+[2026-08-31T02:57:35.545Z] [world] You reach the next hold of the cracked ruined skyscraper (tier 2/4). Higher still to go.
+[2026-08-31T02:57:35.546Z] [system] ⏳ Time passed: 30 min
+[2026-08-31T02:57:35.670Z] [cognitive] neutral  (123ms)
+[2026-08-31T02:57:36.329Z] [debug] ui: tap "climb up (2/4)"
+[2026-08-31T02:57:36.380Z] [player] climb cracked ruined skyscraper
+[2026-08-31T02:57:36.381Z] [debug] parser: intent=climb conf=1.00 verb=climb target=cracked ruined skyscraper resolved=cracked ruined skyscraper range=- enemies=0 hooks=0
+[2026-08-31T02:57:36.418Z] [world] You loop your Reclaimer's Rope around the cracked ruined skyscraper and walk the line. Tier 3/4 cleared.
+[2026-08-31T02:57:36.419Z] [world] You reach the last stretch of the cracked ruined skyscraper (tier 3/4). Higher still to go.
+[2026-08-31T02:57:36.419Z] [world] Beside your handhold, a weathered bird nest — twigs, wire, and something that glints.
+[2026-08-31T02:57:36.420Z] [system] ⏳ Time passed: 30 min
+[2026-08-31T02:57:36.542Z] [cognitive] neutral  (122ms)
+[2026-08-31T02:57:37.629Z] [debug] ui: tap "take / salvage"
+[2026-08-31T02:57:38.885Z] [world] You work the weathered bird nest over. A part of it comes loose, intact.
+[2026-08-31T02:57:38.886Z] [reward] ✦ Salvage haul:
+[2026-08-31T02:57:38.887Z] [reward]     • Bent Nail x2 (Common)
+[2026-08-31T02:57:39.178Z] [debug] persist sizes(KB): total=194 player=39 wm=68[rooms=34 events=2 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=84 scene=3
+[2026-08-31T02:57:40.162Z] [debug] ui: tap "climb up (3/4)"
+[2026-08-31T02:57:40.167Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.
+[2026-08-31T02:57:40.217Z] [player] climb cracked ruined skyscraper
+[2026-08-31T02:57:40.217Z] [debug] parser: intent=climb conf=1.00 verb=climb target=cracked ruined skyscraper resolved=cracked ruined skyscraper range=- enemies=0 hooks=0
+[2026-08-31T02:57:40.253Z] [world] You loop your Reclaimer's Rope around the cracked ruined skyscraper and walk the line. Tier 4/4 cleared.
+[2026-08-31T02:57:40.253Z] [world] You reach the top of the cracked ruined skyscraper (tier 4/4). The view changes; the room reads differently from here.
+[2026-08-31T02:57:40.254Z] [system] ⏳ Time passed: 30 min
+[2026-08-31T02:57:40.384Z] [cognitive] neutral  (127ms)
+[2026-08-31T02:57:41.296Z] [debug] ui: tap "climb down"
+[2026-08-31T02:57:41.316Z] [player] climb down
+[2026-08-31T02:57:41.317Z] [debug] parser: intent=climb conf=1.00 verb=climb target=- resolved=- range=- enemies=0 hooks=0
+[2026-08-31T02:57:41.318Z] [world] You make your way back down the cracked ruined skyscraper. Boots back on the ground.
+[2026-08-31T02:57:41.319Z] [world] Soot stands and stretches as you hit the ground. She has waited.
+[2026-08-31T02:57:41.319Z] [system] ⏳ Time passed: 15 min
+[2026-08-31T02:57:41.448Z] [cognitive] CLIMB  (127ms)
+[2026-08-31T02:57:50.230Z] [world] You set course for Great Tartary Plains. 8 tiles — about 20 hours of travel, all in. You set off now — the ground ahead is new ground. Keep tapping → GREAT TARTARY PLAINS on the travel row to close the distance; STOP TRAVEL to halt.
+[2026-08-31T02:57:50.240Z] [debug] spawn: gear=[Lost Scholar's Robe, Rail Saber] window=10 roster=new
+[2026-08-31T02:57:50.242Z] [world] You walk north through open silt. The compass points north into open ground.
+[2026-08-31T02:57:50.243Z] [world] A patch of mud just off the path pulses with a faint blue glow, in time with nothing you can hear.
+[2026-08-31T02:57:52.920Z] [debug] ui: tap "take / salvage"
+[2026-08-31T02:57:54.339Z] [world] The Rail Saber comes away clean.
+[2026-08-31T02:57:54.340Z] [reward] ✦ Rail Saber (Common).
+[2026-08-31T02:57:54.356Z] [world] It takes two pulls. The Lost Scholar's Robe is yours on the second.
+[2026-08-31T02:57:54.357Z] [reward] ✦ Lost Scholar's Robe (Common).
+[2026-08-31T02:57:55.370Z] [world] You strip the core carefully. Something usable comes free in your hand.
+[2026-08-31T02:57:55.371Z] [world] You strip the insignia carefully. Something usable comes free in your hand.
+[2026-08-31T02:57:55.371Z] [world] You strip the merchant bones carefully. Something usable comes free in your hand.
+[2026-08-31T02:57:55.371Z] [world] You work the wagon axle over. A part of it comes loose, intact.
+[2026-08-31T02:57:55.371Z] [reward] ✦ Salvage haul:
+[2026-08-31T02:57:55.372Z] [reward]     • Aether Crystal (Common)
+[2026-08-31T02:57:55.372Z] [reward]     • Bent Nail (Common)
+[2026-08-31T02:57:55.372Z] [reward]     • Aether Dust x2 (Common)
+[2026-08-31T02:57:55.372Z] [reward]     • Scrap Metal x3 (Common)
+[2026-08-31T02:57:56.452Z] [debug] ui: tap "investigate"
+[2026-08-31T02:57:57.951Z] [player] investigate the ground
+[2026-08-31T02:57:57.952Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1
+[2026-08-31T02:57:57.957Z] [reward] You scrape at the silt with the bent nail. ✦ Recovered Stick (Common).
+[2026-08-31T02:57:57.964Z] [system] ⏳ Time passed: 24 min
+[2026-08-31T02:57:58.079Z] [cognitive] CLIMB  (113ms)
+[2026-08-31T02:57:59.212Z] [player] investigate crevice-pool
+[2026-08-31T02:57:59.213Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=crevice pool resolved=crevice-pool range=- enemies=0 hooks=1
+[2026-08-31T02:57:59.214Z] [world] You study the crevice-pool. It bears no marks worth naming — no glyph, no fingerprint, no trace the Reclaimers would catalog.
+[2026-08-31T02:57:59.320Z] [cognitive] SWIM  (104ms)
+[2026-08-31T02:57:59.415Z] [debug] ui: tap "→ GREAT TARTARY PLAINS"
+[2026-08-31T02:57:59.422Z] [debug] spawn: gear=[Club] window=10 roster=new
+[2026-08-31T02:57:59.423Z] [world] You walk north through open silt. The compass points north into open ground.
+[2026-08-31T02:57:59.423Z] [world] Your eye goes back to it before you decide to look.
+[2026-08-31T02:57:59.575Z] [debug] persist sizes(KB): total=195 player=40 wm=68[rooms=35 events=2 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=84 scene=4
+[2026-08-31T02:58:00.479Z] [player] investigate weathered bird nest
+[2026-08-31T02:58:00.480Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=weathered bird nest resolved=weathered bird nest range=- enemies=0 hooks=1
+[2026-08-31T02:58:00.481Z] [arbiter] The Arbiter follows your gaze up. "The weathered bird nest is up on the cracked ruined skyscraper, tier 3. Climb the cracked ruined skyscraper for it."
+[2026-08-31T02:58:00.768Z] [debug] ui: tap "take / salvage"
+[2026-08-31T02:58:01.670Z] [debug] qwen⏱ investigate_lore ok 2254ms read 1269ms/write 970ms in 127t→out 30t 10.0ms/t (142ch)
+[2026-08-31T02:58:01.908Z] [cognitive] neutral  (1425ms)
+[2026-08-31T02:58:02.548Z] [world] The Club resists, then does not.
+[2026-08-31T02:58:02.549Z] [reward] ✦ Club (Common).
+[2026-08-31T02:58:03.742Z] [world] You strip the chest carefully. Something usable comes free in your hand.
+[Filtered][2026-08-31T02:58:03.743Z] [world] You work the pebble over. A part of it comes loose, intact.
+[2026-08-31T02:58:03.743Z] [world] You salvage the smuggler sack. The take is small but real.
+[2026-08-31T02:58:03.743Z] [reward] ✦ Salvage haul:
+[2026-08-31T02:58:03.744Z] [reward]     • Aether Crystal x2 (Common)
+[2026-08-31T02:58:03.744Z] [reward]     • Coarse Canvas Patch (Common)
+[2026-08-31T02:58:03.744Z] [reward]     • Frayed Rigging Twine (Common)
+[2026-08-31T02:58:03.744Z] [reward]     • Worn Tartarian Coin (Common)
+[2026-08-31T02:58:03.744Z] [reward]     • Cloth Scrap (Common)
+[2026-08-31T02:58:05.638Z] [debug] ui: tap "investigate"
+[2026-08-31T02:58:07.110Z] [player] investigate the ground
+[2026-08-31T02:58:07.110Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1
+[2026-08-31T02:58:07.112Z] [world] You scrape at the silt with the bent nail. Nothing of worth.
+[2026-08-31T02:58:07.117Z] [system] ⏳ Time passed: 24 min
+[2026-08-31T02:58:07.233Z] [cognitive] CLIMB  (115ms)
+[2026-08-31T02:58:08.359Z] [player] investigate crevice-pool
+[2026-08-31T02:58:08.360Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=crevice pool resolved=crevice-pool range=- enemies=0 hooks=1
+[2026-08-31T02:58:08.362Z] [world] You study the crevice-pool. It bears no marks worth naming — no glyph, no fingerprint, no trace the Reclaimers would catalog.
+[2026-08-31T02:58:08.476Z] [cognitive] SWIM  (110ms)
+[2026-08-31T02:58:09.606Z] [debug] qwen⏱ investigate_lore ok 1033ms read 0ms/write 1008ms in 127t→out 32t (143ch)
+[2026-08-31T02:58:16.893Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=cached winH=986 beat=-
+[2026-08-31T02:58:17.161Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-
+[2026-08-31T02:58:19.994Z] [player] drink
+[2026-08-31T02:58:19.995Z] [debug] parser: intent=drink conf=1.00 verb=drink target=- resolved=- range=- enemies=0 hooks=1
+[2026-08-31T02:58:19.997Z] [world] You cup the crevice in your hands and drink. The wet cuts the dust in your throat. (+3 stamina, +1 corruption, 5 min)
+[2026-08-31T02:58:19.997Z] [arbiter] The Arbiter watches you wipe your mouth. "Raw crevice carries what the ground put in it. Fill a bottle next time — the filter takes the taint out."
+[2026-08-31T02:58:19.999Z] [system] ⏳ Time passed: 5 min
+[2026-08-31T02:58:20.130Z] [cognitive] neutral  (131ms)
+[2026-08-31T02:58:22.255Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=cached winH=986 beat=-
+[2026-08-31T02:58:22.497Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-
+[2026-08-31T02:58:26.246Z] [player] drink
+[2026-08-31T02:58:26.247Z] [debug] parser: intent=drink conf=1.00 verb=drink target=- resolved=- range=- enemies=0 hooks=1
+[2026-08-31T02:58:26.248Z] [arbiter] The Arbiter shakes their head. "You've drunk your fill from the crevice. Give it time to settle, or bottle some if you want more for the road."
+[2026-08-31T02:58:26.378Z] [cognitive] neutral  (127ms)
+[2026-08-31T02:58:30.610Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=cached winH=986 beat=-
+[2026-08-31T02:58:30.853Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-
+[2026-08-31T02:58:34.032Z] [player] drink
+[2026-08-31T02:58:34.032Z] [debug] parser: intent=drink conf=1.00 verb=drink target=- resolved=- range=- enemies=0 hooks=1
+[2026-08-31T02:58:34.033Z] [arbiter] The Arbiter shakes their head. "You've drunk your fill from the crevice. Give it time to settle, or bottle some if you want more for the road."
+[2026-08-31T02:58:34.034Z] [debug] dedup: suppressed arbiter repeat — "The Arbiter shakes their head. "You've drunk your fill from …"
+[2026-08-31T02:58:34.162Z] [cognitive] neutral  (127ms)
+[2026-08-31T02:58:34.424Z] [debug] persist sizes(KB): total=195 player=40 wm=68[rooms=35 events=2 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=84 scene=4
+[2026-08-31T02:58:37.389Z] [debug] ui: tap "→ GREAT TARTARY PLAINS"
+[2026-08-31T02:58:37.453Z] [reward] ✦ The pack on your back makes you stronger. +1 STR (base 6, 12 as you stand).
+[2026-08-31T02:58:37.454Z] [debug] spawn: gear=[Mud Shell] window=10 roster=new
+[2026-08-31T02:58:37.455Z] [world] You walk north through open silt. The compass points north into open ground.
+[2026-08-31T02:58:37.455Z] [world] You had a question here. You still have it.
+[2026-08-31T02:58:38.739Z] [debug] ui: tap "take / salvage"
+[Filtered][2026-08-31T02:58:40.376Z] [world] You strip the silt mound carefully. Something usable comes free in your hand.
+[2026-08-31T02:58:40.377Z] [reward] ✦ Salvage haul:
+[2026-08-31T02:58:40.377Z] [reward]     • Smooth Stone (Common)
+[2026-08-31T02:58:40.378Z] [reward]     • Clouded Lens Blank (Common)
+[2026-08-31T02:58:40.378Z] [reward]     • Cloth Scrap x2 (Common)
+[2026-08-31T02:58:40.378Z] [reward]     • Scrap Metal x2 (Common)
+[2026-08-31T02:58:41.960Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.
+[2026-08-31T02:58:41.987Z] [player] investigate Mud Shell
+[2026-08-31T02:58:41.988Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud shell resolved=Mud Shell range=- enemies=0 hooks=1
+[2026-08-31T02:58:41.991Z] [debug] route: hook intercept (kind=pulsing_mud, target="mud shell") — original intent=investigate
+[2026-08-31T02:58:41.992Z] [world] ★ STORY THREAD (step 1) — You step toward the glow. The mud is warm against your boot — an Aetherstone deposit, surface-thin but real.
+[2026-08-31T02:58:43.146Z] [world] ★★ STORY THREAD COMPLETE — You pry the deposit out of the silt. A few good shards, dense and humming, plus a thumb-sized core.
+[2026-08-31T02:58:43.146Z] [reward] ✦ Aetheric Shard, Aetheric Shard, Aether Crystal.
+[2026-08-31T02:58:47.276Z] [debug] ui: tap "investigate"
+[2026-08-31T02:58:52.169Z] [player] investigate the ground
+[2026-08-31T02:58:52.170Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1
+[2026-08-31T02:58:52.173Z] [world] You scrape at the silt with the bent nail. Nothing of worth.
+[2026-08-31T02:58:52.179Z] [system] ⏳ Time passed: 24 min
+[2026-08-31T02:58:52.331Z] [cognitive] CLIMB  (150ms)
+[2026-08-31T02:58:53.441Z] [player] investigate crevice-pool
+[2026-08-31T02:58:53.444Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=crevice pool resolved=crevice-pool range=- enemies=0 hooks=1
+[2026-08-31T02:58:53.447Z] [world] You study the crevice-pool. It bears no marks worth naming — no glyph, no fingerprint, no trace the Reclaimers would catalog.
+[2026-08-31T02:58:53.559Z] [cognitive] SWIM  (110ms)
+[2026-08-31T02:58:53.660Z] [debug] ui: tap "→ GREAT TARTARY PLAINS"
+[2026-08-31T02:58:53.664Z] [debug] spawn: gear=[Giant Bone Longbow, Titan's Forehead Guard] window=10 roster=new
+[2026-08-31T02:58:53.665Z] [world] You walk north through open silt. The compass points north into open ground.
+[2026-08-31T02:58:53.665Z] [world] A line of pale-blue fungus blooms across the ground ahead — the True Tartarians grow this where they walk often.
+[2026-08-31T02:58:54.686Z] [player] investigate vent
+[2026-08-31T02:58:54.688Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=vent resolved=vent range=- enemies=0 hooks=2
+[2026-08-31T02:58:54.691Z] [world] The vent resists your reading. Not hostile — just closed. Some things in the buried world don't open for the curious.
+[2026-08-31T02:58:54.692Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-08-31T02:58:54.692Z] [arbiter] The Arbiter looks around. "The Red Tower watches the plains. Faction banners change at its foot. The Tower does not."
+[2026-08-31T02:58:54.692Z] [debug] arbiter: ambient held (he just spoke)
+[2026-08-31T02:58:54.830Z] [debug] qwen⏱ investigate_lore ok 1053ms read 0ms/write 960ms in 127t→out 31t (138ch)
+[2026-08-31T02:58:54.932Z] [debug] ui: tap "take / salvage"
+[2026-08-31T02:58:55.264Z] [cognitive] neutral  (568ms)
+[2026-08-31T02:58:56.355Z] [debug] qwen⏱ investigate_lore ok 1525ms wait 432ms read 303ms/write 778ms in 124t→out 25t 2.4ms/t (116ch)
+[2026-08-31T02:58:56.612Z] [world] You brace a foot and the Giant Bone Longbow gives.
+[2026-08-31T02:58:56.612Z] [reward] ✦ Giant Bone Longbow (Common).
+[2026-08-31T02:58:56.619Z] [world] One good tug and the Titan's Forehead Guard is out.
+[2026-08-31T02:58:56.619Z] [reward] ✦ Titan's Forehead Guard (Common).
+[2026-08-31T02:58:57.565Z] [world] The Scrap Metal leaves a shape behind it in the mud, filling slowly.
+[2026-08-31T02:58:57.566Z] [reward] ✦ Scrap Metal (Common).
+[2026-08-31T02:58:58.593Z] [world] You work the broken lantern over. A part of it comes loose, intact.
+[2026-08-31T02:58:58.593Z] [world] You strip the merchant sign carefully. Something usable comes free in your hand.
+[2026-08-31T02:58:58.594Z] [world] You work the parchment over. A part of it comes loose, intact.
+[2026-08-31T02:58:58.594Z] [world] You salvage the torn tarp. The take is small but real.
+[2026-08-31T02:58:58.594Z] [reward] ✦ Salvage haul:
+[2026-08-31T02:58:58.595Z] [reward]     • Aether Crystal (Common)
+[2026-08-31T02:58:58.595Z] [reward]     • Smooth Stone x3 (Common)
+[2026-08-31T02:58:58.595Z] [reward]     • Worn Tartarian Coin x2 (Common)
+[2026-08-31T02:58:58.595Z] [reward]     • Aether Dust x2 (Common)
+[2026-08-31T02:58:58.898Z] [debug] persist sizes(KB): total=197 player=41 wm=69[rooms=36 events=2 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=83 scene=4
+[2026-08-31T02:59:00.129Z] [debug] ui: tap "inventory"
+[2026-08-31T02:59:09.334Z] [debug] ui: tap "investigate"
+[2026-08-31T02:59:11.124Z] [debug] qwen⏱ item_synthesis_hw ok 4067ms read 3412ms/write 598ms in 324t→out 18t 10.5ms/t (82ch)
+[2026-08-31T02:59:11.228Z] [debug] homework: item_desc "Climbing Rope" ✓ 4181ms
+[2026-08-31T02:59:11.451Z] [player] investigate the ground
+[2026-08-31T02:59:11.451Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2
+[2026-08-31T02:59:11.455Z] [reward] You scrape at the silt with the bent nail. ✦ Recovered Big Rock (Common).
+[2026-08-31T02:59:11.460Z] [system] ⏳ Time passed: 24 min
+[2026-08-31T02:59:11.578Z] [cognitive] CLIMB  (118ms)
+[2026-08-31T02:59:12.711Z] [player] investigate crevice-pool
+[2026-08-31T02:59:12.712Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=crevice pool resolved=crevice-pool range=- enemies=0 hooks=2
+[2026-08-31T02:59:12.713Z] [world] You study the crevice-pool. It bears no marks worth naming — no glyph, no fingerprint, no trace the Reclaimers would catalog.
+[2026-08-31T02:59:12.714Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-08-31T02:59:12.714Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-31T02:59:12.839Z] [cognitive] SWIM  (123ms)
+[2026-08-31T02:59:14.066Z] [debug] ui: tap "rest"
+[2026-08-31T02:59:14.076Z] [player] rest
+[2026-08-31T02:59:14.077Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=2
+[2026-08-31T02:59:14.078Z] [world] Soot circles three times and curls beside you. Her breathing slows to yours.
+[2026-08-31T02:59:14.079Z] [world] You rest for 8 hours. +6 HP, +8 stamina recovered. (Day 30, evening)
+[2026-08-31T02:59:14.079Z] [debug] arbiter: ambient held (he just spoke)
+[2026-08-31T02:59:14.088Z] [debug] arbiter: template (reason=intent-not-allowed:rest)
+[2026-08-31T02:59:14.088Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-31T02:59:14.089Z] [system] ⏳ Time passed: 8h
+[2026-08-31T02:59:14.432Z] [debug] persist sizes(KB): total=197 player=41 wm=70[rooms=36 events=2 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=82 scene=4
+[2026-08-31T02:59:15.050Z] [debug] ui: tap "→ GREAT TARTARY PLAINS"
+[2026-08-31T02:59:15.066Z] [debug] spawn: gear=[Mud Sling, Reclaimer's Salvage Cap, Mud-Stalker's Footwraps] window=10 roster=new
+[2026-08-31T02:59:15.067Z] [world] You walk north through open silt. The compass points north into open ground.
+[2026-08-31T02:59:15.068Z] [world] Some part of you has been keeping the place bookmarked.
+[2026-08-31T02:59:15.367Z] [debug] qwen⏱ investigate_lore ok 2428ms read 1584ms/write 737ms in 127t→out 23t 12.5ms/t (99ch)
+[2026-08-31T02:59:15.475Z] [cognitive] REST  (1385ms)
+[2026-08-31T02:59:16.434Z] [debug] ui: tap "take / salvage"
+[2026-08-31T02:59:18.070Z] [world] Where the Reclaimer's Salvage Cap was, the ground is a shade darker.
+[2026-08-31T02:59:18.071Z] [reward] ✦ Reclaimer's Salvage Cap (Common).
+[2026-08-31T02:59:19.079Z] [world] You take the Worn Tartarian Coin. The hollow it came out of starts closing.
+[2026-08-31T02:59:19.079Z] [reward] ✦ Worn Tartarian Coin (Common).
+[2026-08-31T02:59:20.183Z] [world] You work the gate over. A part of it comes loose, intact.
+[2026-08-31T02:59:20.183Z] [world] You salvage the mirror. The take is small but real.
+[2026-08-31T02:59:20.183Z] [reward] ✦ Salvage haul:
+[2026-08-31T02:59:20.184Z] [reward]     • Aether Dust (Common)
+[2026-08-31T02:59:20.184Z] [reward]     • Smooth Stone (Common)
+[2026-08-31T02:59:21.286Z] [debug] ui: tap "investigate"
+[2026-08-31T02:59:22.759Z] [player] investigate the ground
+[2026-08-31T02:59:22.760Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2
+[2026-08-31T02:59:22.767Z] [reward] You scrape at the silt with the bent nail. ✦ Recovered Patched Cloth (Common).
+[2026-08-31T02:59:22.773Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-08-31T02:59:22.773Z] [arbiter] The Arbiter looks around. "The Mud Monarchs were born here, as much as they were born anywhere."
+[2026-08-31T02:59:22.773Z] [system] ⏳ Time passed: 24 min
+[2026-08-31T02:59:22.896Z] [cognitive] CLIMB  (122ms)
+[2026-08-31T02:59:23.885Z] [debug] ui: tap "→ GREAT TARTARY PLAINS"
+[2026-08-31T02:59:23.945Z] [reward] ✦ Your bearing reads. +1 CHA (base 4, 3 as you stand).
+[2026-08-31T02:59:23.946Z] [debug] spawn: gear=[Repeater Crossbow] window=10 roster=new
+[2026-08-31T02:59:23.947Z] [world] You walk north through open silt. The compass points north into open ground.
+[2026-08-31T02:59:23.948Z] [world] Your foot snags on the silt. You crouch, look — and find something worth keeping.
+[2026-08-31T02:59:23.948Z] [reward] ✦ Aether Dust x2 (Common).
+[2026-08-31T02:59:23.948Z] [world] You catch yourself checking, the way you check a pocket you already know is empty.
+[2026-08-31T02:59:24.079Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.
+[2026-08-31T02:59:24.079Z] [arbiter] The Arbiter studies you a long moment. "You have earned a name to carry: Survivor of Aetherstone. Passive: halves corruption gained from Etheric weather."
+[2026-08-31T02:59:24.093Z] [player] investigate crevice-pool
+[2026-08-31T02:59:24.094Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=crevice pool resolved=crevice-pool range=- enemies=0 hooks=2
+[2026-08-31T02:59:24.097Z] [world] You study the crevice-pool. It bears no marks worth naming — no glyph, no fingerprint, no trace the Reclaimers would catalog.
+[2026-08-31T02:59:24.098Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-08-31T02:59:24.098Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-31T02:59:24.098Z] [debug] arbiter: ambient held (he just spoke)
+[2026-08-31T02:59:24.215Z] [cognitive] SWIM  (115ms)
+[2026-08-31T02:59:25.121Z] [debug] qwen⏱ investigate_lore ok 804ms read 0ms/write 778ms in 127t→out 25t (102ch)
+[2026-08-31T02:59:25.334Z] [debug] ui: tap "take / salvage"
+[2026-08-31T02:59:27.258Z] [world] The Throwing Knife goes in your pack. Its outline stays in the silt a while.
+[2026-08-31T02:59:27.259Z] [reward] ✦ Throwing Knife (Common).
+[2026-08-31T02:59:27.274Z] [world] You crouch, take the Repeater Crossbow, and are moving again before you have straightened up.
+[2026-08-31T02:59:27.275Z] [reward] ✦ Repeater Crossbow (Common).
+[2026-08-31T02:59:28.291Z] [world] You do not think about it. The Aetheric Shard is simply in your hand now.
+[2026-08-31T02:59:28.292Z] [reward] ✦ Aetheric Shard (Uncommon).
+[2026-08-31T02:59:28.506Z] [debug] persist sizes(KB): total=197 player=42 wm=69[rooms=36 events=2 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=82 scene=4
+[2026-08-31T02:59:29.449Z] [world] You break the market debris apart. Among the pieces, something worth keeping.
+[2026-08-31T02:59:29.449Z] [world] You strip the merchant sign carefully. Something usable comes free in your hand.
+[2026-08-31T02:59:29.450Z] [world] You work the salvage crate over. A part of it comes loose, intact.
+[2026-08-31T02:59:29.450Z] [world] You break the vault apart. Among the pieces, something worth keeping.
+[2026-08-31T02:59:29.450Z] [reward] ✦ Salvage haul:
+[2026-08-31T02:59:29.451Z] [reward]     • Mud Fragment x3 (Common)
+[2026-08-31T02:59:29.451Z] [reward]     • Smooth Stone (Common)
+[2026-08-31T02:59:29.451Z] [reward]     • Aether Crystal x2 (Common)
+[2026-08-31T02:59:30.620Z] [debug] ui: tap "investigate"
+[2026-08-31T02:59:32.873Z] [player] investigate the ground
+[2026-08-31T02:59:32.874Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2
+[2026-08-31T02:59:32.878Z] [reward] You scrape at the silt with the bent nail. ✦ Recovered Stick (Common).
+[2026-08-31T02:59:32.884Z] [system] ⏳ Time passed: 24 min
+[2026-08-31T02:59:33.009Z] [cognitive] CLIMB  (124ms)
+[2026-08-31T02:59:35.971Z] [debug] ui: tap "→ GREAT TARTARY PLAINS"
+[2026-08-31T02:59:35.987Z] [debug] spawn: gear=[Bone Knife, Rust Rifle] window=10 roster=new
+[2026-08-31T02:59:35.989Z] [world] The flat silt heaves, and a hand breaks the surface, then an arm, then a face caked grey with a thousand years of it.
+[2026-08-31T02:59:35.990Z] [arbiter] These are the Aetherkin the roadside traders whisper about — the flood-dead the Aether would not let rest.
+[2026-08-31T02:59:35.990Z] [world] In life it was a market-scribe, ink and silt run together down the front of them — or maybe just someone who happened to live here — you can't be sure. Something you stirred woke the Aetherstone that held them; now they're awake and out.
+[2026-08-31T02:59:35.991Z] [world] It flinches from you and puts its back to the wall, hands raised — not a hunter, just something frightened that has forgotten everything except how to be afraid.
+[2026-08-31T02:59:35.991Z] [world] You walk west through open silt. The compass tells you The Buried Cities lies further west — 7 tiles, about 18 hours of travel.
+[2026-08-31T02:59:35.991Z] [world] The thought you set down here is right where you set it down.
+[2026-08-31T02:59:39.289Z] [debug] ui: tap "flee"
+[2026-08-31T02:59:39.298Z] [player] flee
+[2026-08-31T02:59:39.299Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=mid enemies=1 hooks=2
+[2026-08-31T02:59:39.351Z] [system] ⏳ Time passed: 15 min
+[2026-08-31T02:59:39.537Z] [cognitive] FEAR · RETREAT · HIDE  (185ms)
+[2026-08-31T02:59:40.966Z] [debug] skillcheck: escape d20=2 DEX 23 = 25 vs Pursuit 9 — Drowned Aetherkin (d20 9 + SPD 0) → PASS
+[2026-08-31T02:59:41.036Z] [debug] stats: STR12 DEX23 INT11 WIS10 CHA3 STE5 | gear: WIS+4,INT+2,STR+6,DEX+15,STE+2 | worn: main=Reclaimers Guild Geode-Cored Cleaver off=Bone Crossbow head=Architect's Sight Enhancer chest=Rough-Hewn Chestplate hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band
+[2026-08-31T02:59:41.038Z] [debug] train: dexterity (escape check) → progress 48/100
+[2026-08-31T02:59:41.038Z] [world] You break away across the open ground. Behind you the thing you ran from gives up the chase.
+[2026-08-31T02:59:41.040Z] [arbiter] The Arbiter looks around. "Faction agents pass each other in Nimari's plazas without acknowledging the other exists. It is a small etiquette."
+[2026-08-31T02:59:43.103Z] [debug] ui: tap "take / salvage"
+[2026-08-31T02:59:44.345Z] [world] Old habit: see it, take it, keep walking. The Throwing Knife is yours.
+[2026-08-31T02:59:44.347Z] [reward] ✦ Throwing Knife (Common).
+[2026-08-31T02:59:44.365Z] [world] You take the Rust Rifle the way you take everything out here — quickly, and without ceremony.
+[2026-08-31T02:59:44.365Z] [reward] ✦ Rust Rifle (Common).
+[2026-08-31T02:59:45.474Z] [world] You strip the cache carefully. Something usable comes free in your hand.
+[2026-08-31T02:59:45.475Z] [world] You salvage the market debris. The take is small but real.
+[2026-08-31T02:59:45.475Z] [world] You strip the merchant sign carefully. Something usable comes free in your hand.
+[2026-08-31T02:59:45.475Z] [world] You break the pebble apart. Among the pieces, something worth keeping.
+[2026-08-31T02:59:45.476Z] [world] You work the rusted fallen sentinel husk over. A part of it comes loose, intact.
+[2026-08-31T02:59:45.476Z] [reward] ✦ Salvage haul:
+[2026-08-31T02:59:45.476Z] [reward]     • Aether Dust x3 (Common)
+[2026-08-31T02:59:45.476Z] [reward]     • Scrap Metal x3 (Common)
+[2026-08-31T02:59:45.477Z] [reward]     • Smooth Stone (Common)
+[2026-08-31T02:59:45.477Z] [reward]     • Worn Tartarian Coin (Common)
+[2026-08-31T02:59:47.142Z] [debug] ui: tap "investigate"
+[2026-08-31T02:59:48.710Z] [player] investigate the ground
+[2026-08-31T02:59:48.710Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2
+[2026-08-31T02:59:48.713Z] [world] You scrape at the silt with the bent nail. Nothing of worth.
+[2026-08-31T02:59:48.719Z] [system] ⏳ Time passed: 24 min
+[2026-08-31T02:59:48.846Z] [cognitive] CLIMB  (126ms)
+[2026-08-31T02:59:49.100Z] [debug] persist sizes(KB): total=186 player=43 wm=57[rooms=24 events=2 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=82 scene=4
+[2026-08-31T02:59:49.977Z] [player] investigate crevice-pool
+[2026-08-31T02:59:49.979Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=crevice pool resolved=crevice-pool range=- enemies=0 hooks=2
+[2026-08-31T02:59:49.983Z] [world] You study the crevice-pool. It bears no marks worth naming — no glyph, no fingerprint, no trace the Reclaimers would catalog.
+[2026-08-31T02:59:50.097Z] [cognitive] SWIM  (113ms)
+[2026-08-31T02:59:50.423Z] [debug] ui: tap "rest"
+[2026-08-31T02:59:50.428Z] [player] rest
+[2026-08-31T02:59:50.429Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=2
+[2026-08-31T02:59:50.430Z] [world] Soot turns twice, thinks about a third, and drops where she stands.
+[2026-08-31T02:59:50.430Z] [world] You rest for 8 hours. +2 HP, +8 stamina recovered. (Day 31, morning)
+[2026-08-31T02:59:50.432Z] [world] Wind in the silt overnight. Patterns in the mud around your camp — boot prints not yours, walked around you and away.
+[2026-08-31T02:59:50.442Z] [debug] arbiter: template (reason=busy)
+[2026-08-31T02:59:50.443Z] [arbiter] The Arbiter looks around. "The cracked statues here still bleed Aether when the storms come close."
+[2026-08-31T02:59:50.443Z] [system] ⏳ Time passed: 8h
+[2026-08-31T02:59:50.449Z] [world] A Conspiracy Architects war party crests the rise — 5 of them, blades already out. They've marked you for standing with the Forgotten Order.
+[2026-08-31T02:59:50.449Z] [arbiter] "The Conspiracy Architects do not forgive a friend of the Forgotten Order," the Arbiter murmurs. "Stand, or run — but decide now."
+[2026-08-31T02:59:50.762Z] [cognitive] REST  (317ms)
+[2026-08-31T02:59:52.723Z] [debug] qwen⏱ investigate_lore ok 2518ms read 0ms/write 2284ms in 127t→out 40t (198ch)
+[2026-08-31T02:59:54.210Z] [debug] ui: tap "dodge"
+[2026-08-31T02:59:54.228Z] [player] dodge
+[2026-08-31T02:59:54.229Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=5 hooks=2
+[2026-08-31T02:59:54.230Z] [world] You commit to the dodge. Slip Conspiracy Architects Raider 1's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-08-31T02:59:54.287Z] [combat] Conspiracy Architects Raider 1 — d20 → 18 + ATK 10 = 28 vs your AC 22 — ✓ HIT
+[2026-08-31T02:59:54.287Z] [combat] Dodge — d20 → 2 + DEX 23 = 25 vs ATK 28. ✗ You misread it — no opening, and the blow lands as it normally would (armor still counts).
+[2026-08-31T02:59:54.288Z] [world] Your read is a beat off — you fail to make the opening, and the swing lands the way it always meant to.
+[2026-08-31T02:59:54.290Z] [combat] Conspiracy Architects Raider 2 — d20 → 12 + ATK 11 = 23 vs your AC 22 — ✓ HIT
+[2026-08-31T02:59:54.291Z] [combat] Conspiracy Architects Raider 4 and 2 others close the distance.
+[2026-08-31T02:59:54.291Z] [debug] arbiter: template (reason=combat)
+[2026-08-31T02:59:54.292Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-31T02:59:54.292Z] [system] ⏳ Time passed: 6 min
+[2026-08-31T02:59:54.625Z] [combat] Conspiracy Architects Raider 1 deals 4 slashing damage [armor −34%]. You have 32 HP remaining.
+[2026-08-31T02:59:54.625Z] [combat] Conspiracy Architects Raider 2 deals 4 bludgeoning damage [edge of reach — halved]. You have 28 HP remaining.
+[2026-08-31T02:59:54.914Z] [cognitive] neutral  (334ms)
+[2026-08-31T02:59:55.492Z] [debug] ui: tap "🔥 geode-cored cleaver"
+[2026-08-31T02:59:55.548Z] [player] attack with the reclaimers guild geode-cored cleaver
+[2026-08-31T02:59:55.549Z] [debug] parser: intent=attack conf=1.00 verb=attack target=reclaimers guild geode cored cleaver resolved=core range=close enemies=5 hooks=2
+[2026-08-31T02:59:55.550Z] [debug] attack: target=Conspiracy Architects Raider 1 range=close reach.bands=[close] reach.label=Reclaimers Guild Geode-Cored Cleaver bareHand=false
+[2026-08-31T02:59:55.552Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-08-31T02:59:55.593Z] [world] You raise the smoldering reclaimers guild geode-cored cleaver toward Conspiracy Architects Raider 1. The room narrows around the both of you.
+[2026-08-31T02:59:55.593Z] [system] ⏳ Time passed: 6 min
+[2026-08-31T02:59:55.773Z] [cognitive] TALK  (179ms)
+[2026-08-31T02:59:56.854Z] [debug] qwen⏱ ambient_fill preempted 5822ms wait 1874ms read 0ms/write 0ms in 370t→out 0t (0ch)
+[2026-08-31T02:59:57.073Z] [debug] arbiter: ambient-fill ∅ 6641ms
+[2026-08-31T02:59:57.074Z] [debug] qwen⏱ ✂ DISCARDED ambient_fill after 5822ms — ambient:fill-∅
+[2026-08-31T03:00:03.782Z] [world] You seize the initiative. Conspiracy Architects Raider 1 has no time to react.
+[2026-08-31T03:00:03.782Z] [combat] You — d20 → 9 + DEX 23 − 1 (Whisper Fog) = 31 vs Conspiracy Architects Raider 1 AC 12 — ✓ HIT
+[2026-08-31T03:00:03.784Z] [combat] You crack the Conspiracy Architects Raider 1 with the Smoldering Reclaimers Guild Geode-Cored Cleaver for 11 — the better part of their fight, gone in one blow. They crumple, out cold. (4/15 HP) Loot them before they come to.
+[2026-08-31T03:00:03.784Z] [combat] Conspiracy Architects Raider 1 is out of it. Conspiracy Architects Raider 2 now in your sights.
+[2026-08-31T03:00:03.784Z] [combat] Smoldering Reclaimers Guild Geode-Cored Cleaver — 3 burn bites in and festers (3 turns).
+[2026-08-31T03:00:03.785Z] [combat] Conspiracy Architects Raider 3 turns on Soot — d20 16 + ATK 9 = 25 vs Soot's AC 12 (vest +2) — ✓ HIT
+[2026-08-31T03:00:03.785Z] [combat] Soot takes 9. (6/15 HP left)
+[2026-08-31T03:00:03.787Z] [combat] Conspiracy Architects Raider 2 — d20 → 19 + ATK 9 = 28 vs your AC 22 — ✓ HIT
+[2026-08-31T03:00:03.791Z] [combat] Conspiracy Architects Raider 4 and 1 other close the distance.
+[2026-08-31T03:00:03.791Z] [arbiter] "Make the next strike count for two," the Arbiter says. "Tartaria taxes the first."
+[2026-08-31T03:00:04.005Z] [combat] Conspiracy Architects Raider 2 deals 5 bludgeoning damage [edge of reach — halved]. You have 23 HP remaining.
+[2026-08-31T03:00:06.514Z] [debug] ui: tap "approach"
+[2026-08-31T03:00:06.582Z] [player] approach Conspiracy Architects Raider 2
+[2026-08-31T03:00:06.583Z] [debug] parser: intent=advance conf=1.00 verb=approach target=conspiracy architects raider 2 resolved=Conspiracy Architects Raider 2 range=mid enemies=5 hooks=2
+[2026-08-31T03:00:06.584Z] [debug] move: advance from range=mid enemies=5 weather=Whisper Fog cost=1 partial=0
+[2026-08-31T03:00:06.585Z] [debug] move: field advance target=Conspiracy Architects Raider 2 d 1.42->0.42 band mid->close
+[2026-08-31T03:00:06.585Z] [world] You close the gap with the Conspiracy Architects Raider 2 and 4 others. (range: close / arm's reach)
+[2026-08-31T03:00:06.585Z] [world] The field shifts around you — Conspiracy Architects Raider 3 now close / arm's reach; Conspiracy Architects Raider 4 now close / arm's reach; Conspiracy Architects Raider 5 now close / arm's reach.
+[2026-08-31T03:00:06.585Z] [combat] Conspiracy Architects Raider 1 blisters — clinging fire sears 3. (1/15 HP, 2 turns left)
+[2026-08-31T03:00:06.586Z] [combat] Conspiracy Architects Raider 2 turns on Soot — d20 12 + ATK 9 = 21 vs Soot's AC 12 (vest +2) — ✓ HIT
+[2026-08-31T03:00:06.586Z] [combat] Soot takes 6. (0/15 HP left)
+[2026-08-31T03:00:06.586Z] [arbiter] Soot drops under the Conspiracy Architects Raider 2 and drags herself clear of the fight. She is down — tend her within a day or she won't get back up.
+[2026-08-31T03:00:06.588Z] [combat] Conspiracy Architects Raider 3 — d20 → 10 + ATK 11 = 21 vs your AC 22 — ✗ MISS
+[2026-08-31T03:00:06.589Z] [combat] Conspiracy Architects Raider 4 — d20 → 1 + ATK 11 = 12 vs your AC 22 — ✗ FUMBLE
+[2026-08-31T03:00:06.591Z] [combat] Conspiracy Architects Raider 5 — d20 → 3 + ATK 11 = 14 vs your AC 22 — ✗ MISS
+[2026-08-31T03:00:06.591Z] [debug] arbiter: template (reason=combat)
+[2026-08-31T03:00:06.591Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-31T03:00:06.788Z] [cognitive] neutral  (196ms)
+[2026-08-31T03:00:08.380Z] [debug] ui: tap "dodge"
+[2026-08-31T03:00:08.393Z] [player] dodge
+[2026-08-31T03:00:08.394Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=5 hooks=2
+[2026-08-31T03:00:08.395Z] [world] You commit to the dodge. Slip Conspiracy Architects Raider 2's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-08-31T03:00:08.395Z] [combat] Conspiracy Architects Raider 1 blisters — clinging fire sears 3. (0/15 HP, 1 turn left)
+[2026-08-31T03:00:08.397Z] [reward] Conspiracy Architects Raider 1 defeated. You recover Aether Residue ×2.
+[2026-08-31T03:00:08.398Z] [world] You crouch for the blade — the Hollow Edge, the black mark of the Forgotten Order's enforcers, its steel weeping a faint corruption that fogs the air. But the grip is wrong. It's honed: razored along the inner curve so the handle itself is a second blade, and only one of its edges is meant for the enemy. Take it up untrained and you flay your own palm to the bone. Only a hand that knows the Order's hold — that two-finger grip they teach behind sealed doors — can carry it. You leave it where it fell.
+[2026-08-31T03:00:08.399Z] [reward] You strip the body: Mud-Bound Cloak (+15 TC). The kit took the fight badly.
+[2026-08-31T03:00:08.400Z] [combat] 4 attackers remain. Conspiracy Architects Raider 2 now in your sights.
+[2026-08-31T03:00:08.401Z] [system] Word moves through the buried world — many people view you differently now.
+[2026-08-31T03:00:08.401Z] [reward] +24 TC pried from the dust.
+[2026-08-31T03:00:08.485Z] [combat] Conspiracy Architects Raider 5 — d20 → 15 + ATK 9 = 24 vs your AC 22 — ✗ EVADED
+[2026-08-31T03:00:08.485Z] [combat] Dodge — d20 → 11 + DEX 23 = 34 vs ATK 24. ✓ You slip the arc — PERFECT OPENING (next strike ×2 dice).
+[2026-08-31T03:00:08.485Z] [world] You slip Conspiracy Architects Raider 5's arc clean and stay light on your feet — the rest of the pack still swings, but you're a harder mark for the moment.
+[2026-08-31T03:00:08.487Z] [debug] ac-shift 22→25: race/base 10 + gear 17 + title 0 → trimmed 22 + status 3 | worn: head=Architect's Sight Enhancer chest=Rough-Hewn Chestplate hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak
+[2026-08-31T03:00:08.487Z] [combat] Conspiracy Architects Raider 2 — d20 → 12 + ATK 9 = 21 vs your AC 25 — ✗ MISS
+[2026-08-31T03:00:08.488Z] [combat] Conspiracy Architects Raider 3 — d20 → 12 + ATK 9 = 21 vs your AC 25 — ✗ MISS
+[2026-08-31T03:00:08.488Z] [combat] Conspiracy Architects Raider 4 presses in behind the others, waiting for an opening.
+[2026-08-31T03:00:08.489Z] [system] ⏳ Time passed: 6 min
+[2026-08-31T03:00:08.701Z] [cognitive] neutral  (211ms)
+[2026-08-31T03:00:09.378Z] [debug] persist sizes(KB): total=202 player=43 wm=69[rooms=36 events=2 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=82 scene=7
+[2026-08-31T03:00:09.558Z] [debug] ui: tap "🔥 geode-cored cleaver"
+[2026-08-31T03:00:09.559Z] [system] evasive — harder to hit fades.
+[2026-08-31T03:00:09.594Z] [player] attack with the reclaimers guild geode-cored cleaver
+[2026-08-31T03:00:09.595Z] [debug] parser: intent=attack conf=1.00 verb=attack target=reclaimers guild geode cored cleaver resolved=core range=close enemies=4 hooks=2
+[2026-08-31T03:00:09.595Z] [debug] attack: target=Conspiracy Architects Raider 2 range=close reach.bands=[close] reach.label=Reclaimers Guild Geode-Cored Cleaver bareHand=false
+[2026-08-31T03:00:09.596Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-08-31T03:00:09.597Z] [debug] attack: status mods perfect opening (2× dice)
+[2026-08-31T03:00:09.634Z] [world] You raise the smoldering reclaimers guild geode-cored cleaver toward Conspiracy Architects Raider 2. The room narrows around the both of you.
+[2026-08-31T03:00:09.635Z] [system] ⏳ Time passed: 6 min
+[2026-08-31T03:00:09.819Z] [cognitive] TALK  (183ms)
+[2026-08-31T03:00:18.493Z] [world] You seize the initiative. Conspiracy Architects Raider 2 has no time to react.
+[2026-08-31T03:00:18.493Z] [combat] You — d20 → 18 + DEX 23 − 1 (Whisper Fog) perfect opening (2× dice) = 40 vs Conspiracy Architects Raider 2 AC 13 — ✓ HIT
+[2026-08-31T03:00:18.495Z] [combat] You crack the Conspiracy Architects Raider 2 with the Smoldering Reclaimers Guild Geode-Cored Cleaver for 15 — the better part of their fight, gone in one blow. They crumple, out cold. (6/21 HP) Loot them before they come to.
+[2026-08-31T03:00:18.495Z] [combat] Conspiracy Architects Raider 2 is out of it. Conspiracy Architects Raider 3 now in your sights.
+[2026-08-31T03:00:18.495Z] [combat] Smoldering Reclaimers Guild Geode-Cored Cleaver — 4 burn bites in and festers (3 turns).
+[2026-08-31T03:00:18.496Z] [debug] ac-shift 25→22: race/base 10 + gear 17 + title 0 → trimmed 22 + status 0 | worn: head=Architect's Sight Enhancer chest=Rough-Hewn Chestplate hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak
+[2026-08-31T03:00:18.496Z] [combat] Conspiracy Architects Raider 3 — d20 → 19 + ATK 9 = 28 vs your AC 22 — ✓ HIT
+[2026-08-31T03:00:18.498Z] [combat] Conspiracy Architects Raider 4 — d20 → 5 + ATK 9 = 14 vs your AC 22 — ✗ MISS
+[2026-08-31T03:00:18.499Z] [combat] Conspiracy Architects Raider 5 — d20 → 2 + ATK 9 = 11 vs your AC 22 — ✗ MISS
+[2026-08-31T03:00:18.712Z] [combat] Conspiracy Architects Raider 3 deals 12 bludgeoning damage. You have 11 HP remaining.
+[2026-08-31T03:00:18.712Z] [combat] Conspiracy Architects Raider 3's strike leaves you bleeding.
+[2026-08-31T03:00:20.902Z] [debug] ui: tap "inventory"
+[2026-08-31T03:00:32.105Z] [player] use First Aid Kit
+[2026-08-31T03:00:32.106Z] [debug] parser: intent=use_relic conf=1.00 verb=use target=first aid kit resolved=Conspiracy Architects Raider 2 range=close enemies=4 hooks=2
+[2026-08-31T03:00:32.110Z] [world] You use one First Aid Kit. +25 HP, +3 stamina, bleeding stopped.
+[2026-08-31T03:00:32.120Z] [debug] arbiter: template (reason=combat)
+[2026-08-31T03:00:32.120Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-31T03:00:32.121Z] [system] ⏳ Time passed: 15 min
+[2026-08-31T03:00:33.156Z] [cognitive] neutral  (1034ms)
+[2026-08-31T03:00:38.477Z] [world] You feed Soot 7× Smoke-Cured Jerky Strip. +14 HP (14/15), +loyalty.
+[2026-08-31T03:00:44.551Z] [debug] ui: tap "dodge"
+[2026-08-31T03:00:44.570Z] [player] dodge
+[2026-08-31T03:00:44.571Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=4 hooks=2
+[2026-08-31T03:00:44.572Z] [world] You commit to the dodge. Slip Conspiracy Architects Raider 3's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-08-31T03:00:44.573Z] [combat] Conspiracy Architects Raider 2 blisters — clinging fire sears 4. (2/21 HP, 2 turns left)
+[2026-08-31T03:00:44.624Z] [combat] Conspiracy Architects Raider 3 — d20 → 18 + ATK 9 = 27 vs your AC 22 — ✗ EVADED
+[2026-08-31T03:00:44.624Z] [combat] Dodge — d20 → 19 + DEX 23 = 42 vs ATK 27. ✓ You slip the arc — PERFECT OPENING (next strike ×2 dice).
+[2026-08-31T03:00:44.624Z] [world] You slip Conspiracy Architects Raider 3's arc clean and stay light on your feet — the rest of the pack still swings, but you're a harder mark for the moment.
+[2026-08-31T03:00:44.626Z] [debug] ac-shift 22→25: race/base 10 + gear 17 + title 0 → trimmed 22 + status 3 | worn: head=Architect's Sight Enhancer chest=Rough-Hewn Chestplate hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak
+[2026-08-31T03:00:44.626Z] [combat] Conspiracy Architects Raider 4 — d20 → 10 + ATK 9 = 19 vs your AC 25 — ✗ MISS
+[2026-08-31T03:00:44.627Z] [combat] Conspiracy Architects Raider 5 — d20 → 14 + ATK 9 = 23 vs your AC 25 — ✗ MISS
+[2026-08-31T03:00:44.628Z] [system] ⏳ Time passed: 6 min
+[2026-08-31T03:00:44.996Z] [cognitive] neutral  (191ms)
+[2026-08-31T03:00:45.899Z] [debug] ui: tap "🔥 geode-cored cleaver"
+[2026-08-31T03:00:45.904Z] [system] evasive — harder to hit fades.
+[2026-08-31T03:00:45.908Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.
+[2026-08-31T03:00:45.959Z] [player] attack with the reclaimers guild geode-cored cleaver
+[2026-08-31T03:00:45.959Z] [debug] parser: intent=attack conf=1.00 verb=attack target=reclaimers guild geode cored cleaver resolved=core range=close enemies=4 hooks=2
+[2026-08-31T03:00:45.960Z] [combat] Conspiracy Architects Raider 2 blisters — clinging fire sears 4. (0/21 HP, 1 turn left)
+[2026-08-31T03:00:45.961Z] [reward] Conspiracy Architects Raider 2 defeated. You recover Aether Residue ×2, Aetheric Shard, Architect Sigil.
+[2026-08-31T03:00:45.962Z] [reward] You strip the body: Bone Knife, Mud-Bound Cloak (+14 TC). The kit took the fight badly.
+[2026-08-31T03:00:45.962Z] [reward] ✦ Hard-won spoils — Golem Core (Rare).
+[2026-08-31T03:00:45.962Z] [combat] 3 attackers remain. Conspiracy Architects Raider 3 now in your sights.
+[2026-08-31T03:00:45.962Z] [system] Word moves through the buried world — many people view you differently now.
+[2026-08-31T03:00:45.963Z] [reward] +36 TC pried from the dust.
+[2026-08-31T03:00:45.984Z] [arbiter] The Arbiter eyes your new pieces. "You could make an Elder Golem Sledge now, if you wanted."
+[2026-08-31T03:00:45.990Z] [debug] attack: target=Conspiracy Architects Raider 3 range=close reach.bands=[close] reach.label=Reclaimers Guild Geode-Cored Cleaver bareHand=false
+[2026-08-31T03:00:45.991Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-08-31T03:00:45.991Z] [debug] attack: status mods perfect opening (2× dice)
+[2026-08-31T03:00:46.041Z] [world] You bring the smoldering reclaimers guild geode-cored cleaver to bear on Conspiracy Architects Raider 3.
+[2026-08-31T03:00:46.042Z] [system] ⏳ Time passed: 6 min
+[2026-08-31T03:00:46.256Z] [cognitive] TALK  (213ms)
+[2026-08-31T03:00:46.849Z] [debug] persist sizes(KB): total=202 player=43 wm=70[rooms=36 events=2 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=82 scene=6
+[2026-08-31T03:00:53.674Z] [world] You seize the initiative. Conspiracy Architects Raider 3 has no time to react.
+[2026-08-31T03:00:53.674Z] [combat] You — d20 → 10 + DEX 23 − 1 (Whisper Fog) perfect opening (2× dice) = 32 vs Conspiracy Architects Raider 3 AC 13 — ✓ HIT
+[2026-08-31T03:00:53.675Z] [combat] Bludgeoning flares — +1 on hit.
+[2026-08-31T03:00:53.676Z] [combat] You crack the Conspiracy Architects Raider 3 with the Smoldering Reclaimers Guild Geode-Cored Cleaver for 15 — the better part of their fight, gone in one blow. They crumple, out cold. (6/21 HP) Loot them before they come to.
+[2026-08-31T03:00:53.676Z] [combat] Conspiracy Architects Raider 3 is out of it. Conspiracy Architects Raider 4 now in your sights.
+[2026-08-31T03:00:53.676Z] [combat] Smoldering Reclaimers Guild Geode-Cored Cleaver — 2 burn bites in and festers (3 turns).
+[2026-08-31T03:00:53.677Z] [combat] Conspiracy Architects Raider 3 is left exposed — easier to hit.
+[2026-08-31T03:00:53.678Z] [debug] ac-shift 25→22: race/base 10 + gear 17 + title 0 → trimmed 22 + status 0 | worn: head=Architect's Sight Enhancer chest=Rough-Hewn Chestplate hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak
+[2026-08-31T03:00:53.681Z] [combat] Conspiracy Architects Raider 4 — d20 → 19 + ATK 9 = 28 vs your AC 22 — ✓ HIT
+[2026-08-31T03:00:53.683Z] [combat] Conspiracy Architects Raider 5 — d20 → 18 + ATK 9 = 27 vs your AC 22 — ✓ HIT
+[2026-08-31T03:00:53.900Z] [combat] Conspiracy Architects Raider 4 deals 6 slashing damage [armor −34%]. You have 30 HP remaining.
+[2026-08-31T03:00:53.900Z] [combat] Conspiracy Architects Raider 5 deals 5 slashing damage [armor −34%]. You have 25 HP remaining.
+[2026-08-31T03:00:53.900Z] [combat] Conspiracy Architects Raider 5's strike leaves you bleeding.
+[2026-08-31T03:00:56.893Z] [debug] ui: tap "golem (29/40)"
+[2026-08-31T03:00:56.899Z] [player] use golem
+[2026-08-31T03:00:56.899Z] [combat] Plinth attacks Conspiracy Architects Raider 4 — d20 17 + 1 = 18 vs AC 13 — ✓ HIT
+[2026-08-31T03:00:56.900Z] [combat] Plinth swings the Crude Golem Greatsword — 9 slashing damage on Conspiracy Architects Raider 4. (15 HP left)
+[2026-08-31T03:00:56.901Z] [combat] Conspiracy Architects Raider 4 retaliates — d20 6 + 8 hits Plinth for 4 (30% resisted). (25/40)
+[2026-08-31T03:00:56.912Z] [combat] Conspiracy Architects Raider 3 blisters — clinging fire sears 2. (4/21 HP, 2 turns left)
+[2026-08-31T03:00:56.915Z] [combat] Conspiracy Architects Raider 4 — d20 → 6 + ATK 9 = 15 vs your AC 22 — ✗ MISS
+[2026-08-31T03:00:56.916Z] [combat] Conspiracy Architects Raider 5 — d20 → 12 + ATK 9 = 21 vs your AC 22 — ✗ MISS
+[2026-08-31T03:00:57.794Z] [debug] ui: tap "golem (25/40)"
+[2026-08-31T03:00:57.800Z] [player] use golem
+[2026-08-31T03:00:57.801Z] [combat] Plinth attacks Conspiracy Architects Raider 4 — d20 7 + 1 = 8 vs AC 13 — ✗ MISS
+[2026-08-31T03:00:57.801Z] [world] Plinth's strike sails wide of Conspiracy Architects Raider 4.
+[2026-08-31T03:00:57.801Z] [combat] Conspiracy Architects Raider 4 retaliates — d20 16 + 8 hits Plinth for 5 (30% resisted). (20/40)
+[2026-08-31T03:00:57.813Z] [combat] Conspiracy Architects Raider 3 blisters — clinging fire sears 2. (2/21 HP, 1 turn left)
+[2026-08-31T03:00:57.816Z] [combat] Conspiracy Architects Raider 4 — d20 → 1 + ATK 9 = 10 vs your AC 22 — ✗ FUMBLE
+[2026-08-31T03:00:57.817Z] [combat] Conspiracy Architects Raider 5 — d20 → 1 + ATK 9 = 10 vs your AC 22 — ✗ FUMBLE
+[2026-08-31T03:00:58.693Z] [debug] ui: tap "golem (20/40)"
+[2026-08-31T03:00:58.695Z] [system] bleeding fades.
+[2026-08-31T03:00:58.697Z] [player] use golem
+[2026-08-31T03:00:58.697Z] [combat] Plinth attacks Conspiracy Architects Raider 4 — d20 8 + 1 = 9 vs AC 13 — ✗ MISS
+[2026-08-31T03:00:58.698Z] [world] Plinth's strike sails wide of Conspiracy Architects Raider 4.
+[2026-08-31T03:00:58.698Z] [combat] Conspiracy Architects Raider 4 retaliates — d20 13 + 8 hits Plinth for 4 (30% resisted). (16/40)
+[2026-08-31T03:00:58.709Z] [combat] Conspiracy Architects Raider 3 blisters — clinging fire sears 2. (0/21 HP, 0 turns left)
+[2026-08-31T03:00:58.713Z] [combat] Conspiracy Architects Raider 3 shakes off the last of the fire — the Reclaimers Guild Geode-Cored Cleaver has run its course.
+[2026-08-31T03:00:58.716Z] [reward] Conspiracy Architects Raider 3 defeated. You recover Aether Residue ×2, Aetheric Shard.
+[2026-08-31T03:00:58.718Z] [reward] You strip the body: Bone Knife, Mud-Bound Cloak (+14 TC). The kit took the fight badly.
+[2026-08-31T03:00:58.720Z] [reward] ✦ Hard-won spoils — Sentinel Core Plate (Uncommon).
+[2026-08-31T03:00:58.736Z] [reward] ✦ Recipe recovered from the kill: Amulet of the Silt Warden (Rare)! Open Crafting to forge it.
+[2026-08-31T03:00:58.737Z] [combat] 2 attackers remain. Conspiracy Architects Raider 4 now in your sights.
+[2026-08-31T03:00:58.737Z] [system] Word moves through the buried world — many people view you differently now.
+[2026-08-31T03:00:58.738Z] [reward] +27 TC pried from the dust.
+[2026-08-31T03:00:58.794Z] [combat] Conspiracy Architects Raider 5 — d20 → 14 + ATK 9 = 23 vs your AC 22 — ✓ HIT
+[2026-08-31T03:00:58.796Z] [combat] Conspiracy Architects Raider 4 — d20 → 17 + ATK 9 = 26 vs your AC 22 — ✓ HIT
+[2026-08-31T03:00:59.013Z] [combat] Conspiracy Architects Raider 5 deals 7 slashing damage [armor −34%]. You have 18 HP remaining.
+[2026-08-31T03:00:59.014Z] [combat] Conspiracy Architects Raider 4 deals 7 slashing damage [armor −34%]. You have 11 HP remaining.
+[2026-08-31T03:01:01.445Z] [debug] ui: tap "inventory"
+[2026-08-31T03:01:14.173Z] [world] You use 3× Trail Rations. +18 HP (29/36), +1 stamina.
+[2026-08-31T03:01:16.004Z] [debug] persist sizes(KB): total=201 player=43 wm=71[rooms=36 events=2 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=82 scene=5
+[2026-08-31T03:01:17.905Z] [debug] ui: tap "🔥 geode-cored cleaver"
+[2026-08-31T03:01:17.961Z] [player] attack with the reclaimers guild geode-cored cleaver
+[2026-08-31T03:01:17.961Z] [debug] parser: intent=attack conf=1.00 verb=attack target=reclaimers guild geode cored cleaver resolved=core range=close enemies=2 hooks=2
+[2026-08-31T03:01:17.964Z] [debug] attack: target=Conspiracy Architects Raider 4 range=close reach.bands=[close] reach.label=Reclaimers Guild Geode-Cored Cleaver bareHand=false
+[2026-08-31T03:01:17.965Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-08-31T03:01:18.000Z] [world] You commit forward with the smoldering reclaimers guild geode-cored cleaver. Conspiracy Architects Raider 4 watches your hands.
+[2026-08-31T03:01:18.001Z] [system] ⏳ Time passed: 6 min
+[2026-08-31T03:01:18.178Z] [cognitive] TALK  (176ms)
+[2026-08-31T03:01:24.931Z] [world] You seize the initiative. Conspiracy Architects Raider 4 has no time to react.
+[2026-08-31T03:01:24.931Z] [combat] You — d20 → 9 + DEX 23 − 1 (Whisper Fog) = 31 vs Conspiracy Architects Raider 4 AC 13 — ✓ HIT
+[2026-08-31T03:01:24.933Z] [combat] Conspiracy Architects Raider 4 takes 8 with the smoldering reclaimers guild geode-cored cleaver. It reels: 7 left. Then it fights back.
+[2026-08-31T03:01:24.933Z] [combat] Smoldering Reclaimers Guild Geode-Cored Cleaver — 6 burn bites in and festers (3 turns).
+[2026-08-31T03:01:24.937Z] [combat] Conspiracy Architects Raider 4 — d20 → 4 + ATK 9 = 13 vs your AC 22 — ✗ MISS
+[2026-08-31T03:01:24.938Z] [combat] Conspiracy Architects Raider 5 — d20 → 13 + ATK 9 = 22 vs your AC 22 — ✓ HIT
+[2026-08-31T03:01:25.144Z] [combat] Conspiracy Architects Raider 5 deals 4 slashing damage [armor −34%]. You have 25 HP remaining.
+[2026-08-31T03:01:25.145Z] [combat] Conspiracy Architects Raider 5's strike leaves you bleeding.
+[2026-08-31T03:01:26.092Z] [debug] ui: tap "🔥 geode-cored cleaver"
+[2026-08-31T03:01:26.159Z] [player] attack with the reclaimers guild geode-cored cleaver
+[2026-08-31T03:01:26.160Z] [debug] parser: intent=attack conf=1.00 verb=attack target=reclaimers guild geode cored cleaver resolved=core range=close enemies=2 hooks=2
+[2026-08-31T03:01:26.160Z] [combat] Conspiracy Architects Raider 4 blisters — clinging fire sears 6. (1/24 HP, 2 turns left)
+[2026-08-31T03:01:26.161Z] [debug] attack: target=Conspiracy Architects Raider 4 range=close reach.bands=[close] reach.label=Reclaimers Guild Geode-Cored Cleaver bareHand=false
+[2026-08-31T03:01:26.162Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-08-31T03:01:26.199Z] [world] You commit forward with the smoldering reclaimers guild geode-cored cleaver. Conspiracy Architects Raider 4 watches your hands.
+[2026-08-31T03:01:26.199Z] [system] ⏳ Time passed: 6 min
+[2026-08-31T03:01:26.387Z] [cognitive] TALK  (187ms)
+[2026-08-31T03:01:32.364Z] [world] You seize the initiative. Conspiracy Architects Raider 4 has no time to react.
+[2026-08-31T03:01:32.364Z] [combat] You — d20 → 15 + DEX 23 − 1 (Whisper Fog) = 37 vs Conspiracy Architects Raider 4 AC 13 — ✓ HIT
+[2026-08-31T03:01:32.366Z] [combat] Final strike with the smoldering reclaimers guild geode-cored cleaver for 12. Conspiracy Architects Raider 4 is still. The Aetherstone hums on, indifferent.
+[2026-08-31T03:01:32.367Z] [reward] Conspiracy Architects Raider 4 defeated. You recover Patched Cloth ×3, Architect Sigil.
+[2026-08-31T03:01:32.373Z] [reward] You strip the body: Bone Knife, Mud-Bound Cloak (+14 TC). The kit took the fight badly.
+[2026-08-31T03:01:32.373Z] [reward] ✦ Hard-won spoils — Energy Fragment (Uncommon).
+[2026-08-31T03:01:32.373Z] [combat] 1 attacker remains. Conspiracy Architects Raider 5 now in your sights.
+[2026-08-31T03:01:32.374Z] [system] Word moves through the buried world — many people view you differently now.
+[2026-08-31T03:01:32.374Z] [reward] +27 TC pried from the dust.
+[2026-08-31T03:01:32.404Z] [combat] Conspiracy Architects Raider 5 — d20 → 19 + ATK 9 = 28 vs your AC 22 — ✓ HIT
+[2026-08-31T03:01:32.605Z] [combat] Conspiracy Architects Raider 5 deals 7 slashing damage [armor −34%]. You have 18 HP remaining.
+[2026-08-31T03:01:35.394Z] [debug] ui: tap "dodge"
+[2026-08-31T03:01:35.402Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.
+[2026-08-31T03:01:35.412Z] [player] dodge
+[2026-08-31T03:01:35.413Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=2
+[2026-08-31T03:01:35.414Z] [world] You commit to the dodge. Slip Conspiracy Architects Raider 5's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-08-31T03:01:35.461Z] [combat] Conspiracy Architects Raider 5 — d20 → 3 + ATK 9 = 12 vs your AC 22 — ✗ EVADED
+[2026-08-31T03:01:35.461Z] [combat] Dodge — d20 → 18 + DEX 23 = 41 vs ATK 12. ✓ You slip the arc — PERFECT OPENING (next strike ×2 dice).
+[2026-08-31T03:01:35.462Z] [system] ⏳ Time passed: 6 min
+[2026-08-31T03:01:35.647Z] [cognitive] neutral  (184ms)
+[2026-08-31T03:01:37.362Z] [debug] ui: tap "🔥 bone crossbow"
+[2026-08-31T03:01:37.365Z] [system] bleeding fades.
+[2026-08-31T03:01:37.408Z] [player] attack with the off-hand bone crossbow
+[2026-08-31T03:01:37.408Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=1 hooks=2
+[2026-08-31T03:01:37.410Z] [debug] attack: target=Conspiracy Architects Raider 5 range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false
+[2026-08-31T03:01:37.412Z] [debug] attack: visibility penalty −1 (Whisper Fog)
+[2026-08-31T03:01:37.412Z] [debug] attack: status mods perfect opening (2× dice)
+[2026-08-31T03:01:37.455Z] [world] You commit forward with the searing bone crossbow. Conspiracy Architects Raider 5 watches your hands.
+[2026-08-31T03:01:37.455Z] [system] ⏳ Time passed: 6 min
+[2026-08-31T03:01:37.638Z] [cognitive] AGGRESSION · ATTACK · AIM · DISENGAGE  (181ms)
+[2026-08-31T03:01:44.119Z] [world] Conspiracy Architects Raider 5 moves first. The pressure is immediate.
+[2026-08-31T03:01:44.121Z] [combat] Conspiracy Architects Raider 5 — d20 → 15 + ATK 9 = 24 vs your AC 22 — ✓ HIT
+[2026-08-31T03:01:44.122Z] [combat] You — d20 → 3 + DEX 23 − 1 (Whisper Fog) + 2 (point blank) perfect opening (2× dice) = 27 vs Conspiracy Architects Raider 5 AC 13 — ✓ HIT
+[2026-08-31T03:01:44.124Z] [combat] Piercing flares — +3 on hit.
+[2026-08-31T03:01:44.124Z] [combat] You crack the Conspiracy Architects Raider 5 with the Searing Bone Crossbow for 21 — nearly the whole of their fight, gone in one blow. They crumple, out cold. (3/24 HP) Loot them before they come to.
+[2026-08-31T03:01:44.125Z] [combat] Nobody left standing — the fight is yours.
+[2026-08-31T03:01:44.125Z] [reward] You strip the unconscious Conspiracy Architects Raider 5 — Bone Knife, Mud-Bound Cloak, Aetheric Shard, Patched Cloth, +35 TC. The gear's seen better days (worn from the fight).
+[2026-08-31T03:01:44.133Z] [combat] Searing Bone Crossbow — 3 burn bites in and festers (3 turns).
+[2026-08-31T03:01:44.133Z] [arbiter] The Arbiter looks around. "Doors in Nimari open inward, even the ones built to open out. The mud rewrote them."
+[2026-08-31T03:01:44.133Z] [system] ⏳ Time passed: 6 min
+[2026-08-31T03:01:44.271Z] [combat] Conspiracy Architects Raider 5 deals 9 slashing damage [armor −34%]. You have 9 HP remaining.
+[2026-08-31T03:01:44.271Z] [combat] Conspiracy Architects Raider 5's strike leaves you bleeding.
+[2026-08-31T03:01:44.706Z] [debug] persist sizes(KB): total=200 player=44 wm=71[rooms=36 events=3 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=81 scene=4
+[2026-08-31T03:01:48.964Z] [debug] ui: tap "→ GREAT TARTARY PLAINS"
+[2026-08-31T03:01:48.975Z] [world] You walk north. You arrive at Great Tartary Plains.
+[2026-08-31T03:01:48.976Z] [debug] scene: loc=great_tartary_plains hub=- arrival=y opening=n passing=n
+[2026-08-31T03:01:49.063Z] [world] You've left Nimari and entered Great Tartary Plains. The horizon refuses to settle. Aether moves under the grass like breath under a sheet. It's midday. Skiv is the only soul in sight. west leads to The Buried Cities. Nothing named to the north or east or south.
+[2026-08-31T03:01:49.063Z] [world] You have been here. The shape of it comes back before the details do.
+[2026-08-31T03:01:49.064Z] [world] Still open from before: tartarian trap, titarian trap hit look.
+[2026-08-31T03:01:49.065Z] [system] Weather effect — Aetheric Storm: +1 INT · -1 WIS
+[2026-08-31T03:01:49.068Z] [world] [Great Tartary Plains] north: the Silt Thief (19 tiles, 2 days) · east: Zharak's Teeth (4 tiles, 10 hours) · south: Nimari (8 tiles, 20 hours) · west: Builders' Survey Camp (5 tiles, 13 hours)
+[2026-08-31T03:01:49.068Z] [world] You hear a kettle whistling before you see them. Skiv, fence, has made camp here.
+[2026-08-31T03:01:49.068Z] [arbiter] The Arbiter inclines their head toward the newcomer. "Skiv, fence. A figure under a hood, leaned against a half-broken cart. Doesn't make eye contact. The merchandise is suspiciously cheap. The hand under the cloak doesn't move."
+[2026-08-31T03:01:49.072Z] [world] Rare workings for sale: Lich-Heart Pendant (200 TC), Many-Colored Tonic (200 TC), Mire Stave (200 TC) — buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem — just ask.
+[2026-08-31T03:01:49.078Z] [world] The Core in your pack has changed the hum — harmonized it, one true chord where the old ache used to be. At the outpost an old woman stops you with a hand on your sleeve. "You hear it too," she says. Not a question. Hers is faint, she says, always was; she weeps, without ceremony, when your pack passes her. "Louder," she calls after you. "It likes you better."
+[2026-08-31T03:01:49.078Z] [arbiter] The Arbiter is quiet for a stretch, then: "One Core. Most who say they are going after them stop before the first. I have adjusted what I expect of you. Do not make me adjust it back."
+[2026-08-31T03:01:56.926Z] [debug] ui: tap "take / salvage"
+[2026-08-31T03:01:58.248Z] [world] You break the trapper camp apart. Among the pieces, something worth keeping.
+[2026-08-31T03:01:58.249Z] [reward] ✦ Salvage haul:
+[2026-08-31T03:01:58.249Z] [reward]     • Scrap Metal (Common)
+[2026-08-31T03:02:02.328Z] [debug] ui: tap "less ▾"
+[2026-08-31T03:02:18.899Z] [player] Ask why the stall is here
+[2026-08-31T03:02:18.900Z] [world] "Stall goes up where the ground is flat and comes down when it is not worth it," the trader says. "That is the whole business plan."
+[2026-08-31T03:02:18.901Z] [world] Skiv looks at the road behind you before they answer anything at all.
+[2026-08-31T03:02:20.498Z] [world] You let the conversation go and Skiv gets back to it.
+[2026-08-31T03:02:20.661Z] [debug] qwen⏱ flourish ok 3554ms read/write unusable (native mis-reported 145991ms/1721ms — llama.rn split bug, not this call) in 172t→out 13t (50ch)
+[2026-08-31T03:02:20.661Z] [debug] qwen⏱ stats — investigate_lore n16 avg1.9s max3.8s read0.8s/write1.2s in127t→out33t ms/tok 2.3-12.5 | narration:scene_intro_fill n7 avg7.6s max11.3s read7.8s/write1.1s ⚠3unusable in741t→out24t ms/tok 4.0-13.9 cap5 ⏸2 ✂5/39.2s | ambient n3 avg7.3s max8.0s read3.8s/write2.5s ⚠1unusable in368t→out31t ms/tok 10.3-10.4 cap3 wait0.6s ✂2/14.0s | item_synthesis_hw n2 avg4.6s max5.2s read3.8s/write0.8s in324t→out24t ms/tok 10.5-13.2 ✂1/5.2s | ambient_fill n1 avg5.8s max5.8s ⚠1unusable in370t→out0t wait1.9s ⏸1 ✂1/5.8s | flourish n1 avg3.6s max3.6s ⚠1unusable in172t→out13t || WASTED 9 calls / 64.3s
+[2026-08-31T03:02:20.776Z] [debug] qwen⏱ ✂ DISCARDED flourish after 3554ms — flourish:stale-walked-away
+[2026-08-31T03:02:20.776Z] [debug] flourish: stale 3795ms
+[2026-08-31T03:02:22.498Z] [debug] ui: tap "investigate"
+[2026-08-31T03:02:24.215Z] [player] investigate catwalk
+[2026-08-31T03:02:24.216Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=catwalk resolved=catwalk range=- enemies=0 hooks=0
+[2026-08-31T03:02:24.218Z] [world] Among the rubble: a child's shoe, still laced. Beside it, a second shoe — the same size, but for the opposite foot of the same child. Tucked into the seam: a small rock.
+[2026-08-31T03:02:24.218Z] [reward] ✦ Small Rock from the catwalk.
+[2026-08-31T03:02:24.362Z] [cognitive] TRAVEL  (142ms)
+[2026-08-31T03:02:25.866Z] [debug] ui: tap "more ▸"
+[2026-08-31T03:02:26.435Z] [debug] qwen⏱ investigate_lore ok 2081ms read 1300ms/write 752ms in 127t→out 24t 10.2ms/t (112ch)
+[2026-08-31T03:02:28.850Z] [debug] ui: tap "missions"
+[2026-08-31T03:03:10.931Z] [debug] ui: tap "look around you"
+[2026-08-31T03:03:10.942Z] [player] look
+[2026-08-31T03:03:10.943Z] [debug] parser: intent=investigate conf=1.00 verb=look target=- resolved=- range=- enemies=0 hooks=0
+[2026-08-31T03:03:10.944Z] [world] You look around, favoring your wounds (10/36 HP). You're in Buried Skyscraper — Upper Floors, in Great Tartary Plains. You've worked over everything here. Time to move. Skiv is here. Cardinal travel: north, east, south, west.
+[2026-08-31T03:03:11.084Z] [cognitive] neutral  (136ms)
+[2026-08-31T03:03:14.781Z] [debug] ui: tap "less ▾"
+[2026-08-31T03:03:18.470Z] [debug] qwen⏱ ambient ok 7285ms read 3885ms/write 1323ms in 378t→out 31t 10.3ms/t HIT-CAP (138ch)
+[2026-08-31T03:03:18.573Z] [arbiter] Your journey has brought you to the upper floors of the Buried Skyscraper, one of the oldest structures in the Silt Wastes.
+[2026-08-31T03:03:18.573Z] [debug] arbiter: ambient ✓ 7627ms
+[2026-08-31T03:03:18.573Z] [debug] arbiter: ambient-said "Your journey has brought you to the upper floors of the Buried Skyscraper, one of the oldest structures in the Silt Wastes."
+[2026-08-31T03:03:35.338Z] [debug] ui: tap "more ▸"
+[2026-08-31T03:03:37.070Z] [debug] ui: tap "missions"
+[2026-08-31T03:03:37.172Z] [debug] persist sizes(KB): total=197 player=44 wm=68[rooms=33 events=3 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=82 scene=3
+[2026-08-31T03:03:51.424Z] [debug] send-log: #mtgnmcrn0ya9 — DELIVERED (inline, no attachments): beacon out, 13/13 parts accepted (190704 chars) — flush said yes
+[2026-08-31T03:03:51.425Z] [debug] send-log: all parts accepted by the SDK — bundle #mtgnmcrn0ya9 kept on disk, boots retry up to 5 sends total
+[2026-08-31T03:03:56.449Z] [debug] appstate: active → background (was active for 951088ms)
+[2026-08-31T03:04:05.821Z] [debug] appstate: background → active (was background for 9372ms)
+[2026-08-31T03:04:09.364Z] [debug] appstate: active → background (was active for 3542ms)
+[2026-08-31T03:04:13.973Z] [debug] appstate: background → active (was background for 4610ms)
+[2026-08-31T03:04:17.293Z] [debug] appstate: active → background (was active for 3320ms)
+[2026-08-31T03:04:21.188Z] [debug] appstate: background → active (was background for 3895ms)
+[2026-08-31T03:04:24.932Z] [debug] appstate: active → background (was active for 3744ms)
+[2026-08-31T03:04:29.865Z] [debug] appstate: background → active (was background for 4933ms)
+[2026-08-31T03:04:33.511Z] [debug] appstate: active → background (was active for 3646ms)
+[2026-08-31T03:04:37.770Z] [debug] appstate: background → active (was background for 4259ms)
+[2026-08-31T03:04:41.232Z] [debug] appstate: active → background (was active for 3462ms)
+[2026-08-31T03:04:44.895Z] [debug] appstate: background → active (was background for 3663ms)
+[2026-08-31T03:04:48.503Z] [debug] appstate: active → background (was active for 3607ms)
+[2026-08-31T03:04:48.550Z] [debug] persist sizes(KB): total=196 player=44 wm=67[rooms=33 events=3 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=82 scene=3
+[2026-08-31T03:04:51.878Z] [debug] appstate: background → active (was background for 3375ms)
+[2026-08-31T03:04:55.452Z] [debug] appstate: active → background (was active for 3575ms)
+[2026-08-31T03:25:48.586Z] [debug] appstate: background → active (was background for 1253133ms)
+[2026-08-31T03:25:55.460Z] [debug] ctx: RELEASED — live=0 (opened=1 released=1)
+[2026-08-31T03:25:55.717Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a055d5-6be2-732e-a0e6-c23dd4239ac6
+[2026-08-31T03:25:55.717Z] [debug] ota: Checking…
+[2026-08-31T03:25:55.809Z] [debug] ota: Already up to date
+[2026-08-31T03:25:55.810Z] [debug] ota: boot check result = noUpdate
+[2026-08-31T03:25:55.877Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-08-31T03:25:55.877Z] [debug] voice: bundled idle
+[2026-08-31T03:25:56.253Z] [debug] send-log: bundle #mtgnmcrn0ya9 attempt 2/5 delivered to Sentry
+[2026-08-31T03:45:01.553Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a055e7-aec5-7e8c-b21c-9c5199054af4
+[2026-08-31T03:45:01.553Z] [debug] ota: Checking…
+[2026-08-31T03:45:01.769Z] [debug] ota: Already up to date
+[2026-08-31T03:45:01.770Z] [debug] ota: boot check result = noUpdate
+[2026-08-31T03:45:01.829Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-08-31T03:45:01.829Z] [debug] voice: bundled idle
+[2026-08-31T03:45:02.144Z] [debug] send-log: bundle #mtgnmcrn0ya9 attempt 3/5 delivered to Sentry
+[2026-08-31T12:34:45.558Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a055e7-aec5-7e8c-b21c-9c5199054af4
+[2026-08-31T12:34:45.558Z] [debug] ota: Checking…
+[2026-08-31T12:34:46.636Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-08-31T12:34:46.728Z] [debug] ota: Saving progress…
+[2026-08-31T12:34:46.729Z] [debug] ota: Restarting to apply…
+[2026-08-31T12:34:46.799Z] [debug] ota: boot check result = applied
+[2026-08-31T12:34:46.923Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a057bc-e606-73c7-81bd-54751f102b83
+[2026-08-31T12:34:46.923Z] [debug] ota: Checking…
+[2026-08-31T12:34:47.057Z] [debug] ota: Already up to date
+[2026-08-31T12:34:47.058Z] [debug] ota: boot check result = noUpdate
+[2026-08-31T12:34:47.115Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-08-31T12:34:47.115Z] [debug] voice: bundled idle
+[2026-08-31T12:34:47.500Z] [debug] send-log: bundle #mtgnmcrn0ya9 attempt 4/5 delivered to Sentry
+[2026-08-31T14:24:04.725Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a057bc-e606-73c7-81bd-54751f102b83
+[2026-08-31T14:24:04.725Z] [debug] ota: Checking…
+[2026-08-31T14:24:07.100Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-08-31T14:24:07.193Z] [debug] ota: Saving progress…
+[2026-08-31T14:24:07.196Z] [debug] ota: Restarting to apply…
+[2026-08-31T14:24:07.260Z] [debug] ota: boot check result = applied
+[2026-08-31T14:24:07.482Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a057ff-a24c-763d-9f49-e7b643e23868
+[2026-08-31T14:24:07.482Z] [debug] ota: Checking…
+[2026-08-31T14:24:07.585Z] [debug] ota: Already up to date
+[2026-08-31T14:24:07.586Z] [debug] ota: boot check result = noUpdate
+[2026-08-31T14:24:07.642Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-08-31T14:24:07.643Z] [debug] voice: bundled idle
+[2026-08-31T14:24:08.783Z] [debug] send-log: bundle #mtgnmcrn0ya9 attempt 5/5 delivered to Sentry — final try, cleared
+[2026-08-31T14:24:14.384Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a057ff-a24c-763d-9f49-e7b643e23868
+[2026-08-31T14:24:14.384Z] [debug] ota: Checking…
+[2026-08-31T14:24:14.451Z] [debug] ota: Already up to date
+[2026-08-31T14:24:14.451Z] [debug] ota: boot check result = noUpdate
+[2026-08-31T14:24:14.491Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-08-31T14:24:14.492Z] [debug] voice: bundled idle
+[2026-08-31T14:24:20.468Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a057ff-a24c-763d-9f49-e7b643e23868
+[2026-08-31T14:24:20.468Z] [debug] ota: Checking…
+[2026-08-31T14:24:20.526Z] [debug] ota: Already up to date
+[2026-08-31T14:24:20.526Z] [debug] ota: boot check result = noUpdate
+[2026-08-31T14:24:20.577Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-08-31T14:24:20.577Z] [debug] voice: bundled idle
+[2026-08-31T14:24:33.536Z] [debug] OTA session start: 2026-08-31-1592-the-events-say-which-build.
+[2026-08-31T14:24:33.536Z] [world] You step back into Great Tartary Plains. The world waits for your move.
+[2026-08-31T14:24:33.536Z] [world] Whispers carried while you slept off the world. Something that was rumour the last time you walked here is closer to fact now.
+[2026-08-31T14:24:33.539Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. "Welcome back, Cheddar Bob. We've still got ground to cover, you and I. The waste did not sleep while you were gone — blood was spilled and ground changed hands. Read the World for the account."
+[2026-08-31T14:24:33.784Z] [debug] ═══ SESSION 2026-08-31T14:24:33.782Z · build 2026-08-31-1592-the-events-say-which-build · previous entry moments earlier ═══
+[2026-08-31T14:24:33.785Z] [debug] missions: hunt:hunt_servants_doubter stage 1/5 [boss→attack] @great_tartary_plains HERE needs=Servants' Mark of Sanction✗MISSING spawn=Tartarian Raider×3
+[2026-08-31T14:24:33.785Z] [debug] missions: · at=great_tartary_plains
+[2026-08-31T14:24:34.343Z] [debug] send-log: crash on record (2026-08-31T14:24:08.210Z) — game log pushed automatically, delivered to Sentry, kept on disk as #mthbxrkq1jas
+[2026-08-31T14:24:50.098Z] [debug] ui: tap "more ▸"
+[2026-08-31T14:24:51.401Z] [debug] ui: tap "less ▾"
+
+=== END LOG · 192602 CHARS ===
+
+Tartaria Realms
+
+Device
+  Name: Pixel 10 Pro XL
+  Platform: android 37
+  Hermes: yes
+  Locale: en-US
+  Timezone: America/New_York
+  Screen: window 443×986 / screen 443×986 @ 2.4375x density
+  Captured at: 2026-08-31T14:25:08.463Z
+
+Install
+  App ID: com.hotatticgames.tartarprim
+  App version: 4.32.11
+  APK build version: 2.4.1
+  APK build: 293
+  AAB: (build 293)
+  OTA: (2026-08-31-1592-the-events-say-which-build)
+  Boot stage: qwen:deferred
+
+ML runtime health
+  Status: active (no crashes detected)
+  Crash count: 0
+  Last init attempt: 2026-08-31T14:24:20.595Z
+  Last init success: 2026-08-31T14:24:21.087Z
+  Crashes-before-disable threshold: 2
+  Qwen completion guard: clean (no completion crashes)
+  Qwen kernel variant: rnllama_v8_2_fp16_dotprod
+  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k
+  Voice (TTS) guard: clean (no voice crashes on this build)
+Save-load health
+  Status: clean (no load-crash flags)
+Last JS crash
+  Status: none recorded
+This launch
+  Life: bmthbxh28tl · started 2026-08-31T14:24:20.384Z
+  Cold start — this boot did not follow an OTA apply
+Crash ledger — 10 recorded (newest last)
+  • 2026-08-30T08:28:32.485Z (1797m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-08-30-1567-the-heartbeat-ate-the-checkpoint · stage native:cognition:done
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: native:cognition:done [q0] · 459ms into the action · alive 0ms after it
+  • 2026-08-30T16:12:35.586Z (1333m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-08-30-1569-the-glyph-brings-its-own-ground · stage rendered
+      Process died with no orderly exit while: tap "✦ bandolier (1)"
+      doing: tap "✦ bandolier (1)" · room builders_survey_camp · screen exploration
+      last checkpoint: rendered · 126ms into the action · alive 5884ms after it
+  • 2026-08-30T18:43:29.524Z (1182m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-08-30-1571-the-slot-moves-on · stage native:cognition:done
+      Process died with no orderly exit while: action "rest"
+      doing: action "rest" · room great_tartary_plains · screen exploration
+      last checkpoint: native:cognition:done [q0] · 80822ms into the action · alive 0ms after it
+  • 2026-08-30T21:23:57.150Z (1021m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-08-30-1578-the-stage-says-who-is-there · stage native:cognition:done
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: native:cognition:done [q0] · 535ms into the action · alive 0ms after it
+  • 2026-08-30T22:25:39.849Z (959m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-08-30-1580-the-guy-who-was-never-there · stage native:cognition:done
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: native:cognition:done [q0] · 329ms into the action · alive 0ms after it
+  • 2026-08-30T23:42:09.758Z (883m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-08-30-1581-the-card-they-cannot-walk-past · stage native:cognition:done
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: native:cognition:done [q0] · 414ms into the action · alive 0ms after it
+  • 2026-08-31T00:21:58.332Z (843m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-08-30-1582-the-guy-who-gives-you-the-job · stage native:cognition:done
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: native:cognition:done [q0] · 383ms into the action · alive 0ms after it
+  • 2026-08-31T03:45:02.432Z (640m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-08-31-1586-the-slate-in-every-part · stage native:cognition:done
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: native:cognition:done [q0] · 541ms into the action · alive 0ms after it
+  • 2026-08-31T12:34:47.772Z (110m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-08-31-1589-the-pin-comes-home · stage native:cognition:done
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: native:cognition:done [q0] · 578ms into the action · alive 0ms after it
+      launch: died 892ms into the process · not an OTA-apply boot
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-08-31T14:24:08.210Z (1m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-08-31-1592-the-events-say-which-build · stage native:cognition:done
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: native:cognition:done [q0] · 508ms into the action · alive 0ms after it
+      launch: died 859ms into the process · not an OTA-apply boot
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+Crash delivery: ON — reports go to Sentry when you crash.
+Runtime pressure
+  · Last boot exited cleanly, then the OS reclaimed it — not a crash.
+     A ~400MB model app is what Android drops first when it needs memory.
+     Kept because the phase is still evidence if a real freeze lands here.
+     Last checkpoint: native:cognition:done at 2026-08-31T14:24:14.988Z (1 min before this boot)
+  Memory warnings: none this session
+  Freeze watch: no stalls seen (JS clocks only — see the native queue below)
+  Native queue: worst wait 0.0s · 0 job kinds queued >3s · worst 0.0ms/prompt-token
+  App state trail: (none recorded)
+Model contexts
+  Live now: 0
+  Opened: 0 · Released: 0 · Peak live: 0
+  Narration engine: idle

@@ -1,0 +1,224 @@
+{
+  "id": "a6c80b5524a145a7902973acf5709a6b",
+  "groupID": "7697053520",
+  "eventID": "a6c80b5524a145a7902973acf5709a6b",
+  "projectID": "4511945117532160",
+  "size": 17631,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-28-1530-the-stranger-gets-the-screen #mtcgc1vw57ml [inline 17/27]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-28-1530-the-stranger-gets-the-screen #mtcgc1vw57ml [inline 17/27]",
+  "title": "player-log 2026-08-28-1530-the-stranger-gets-the-screen #mtcgc1vw57ml [inline 17/27]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db2f:4653:ad2:ae51:4f0f:3e39",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "7b3fcdf9d94c43a8a477de1aea938687",
+      "span_id": "843b24ec022fd6b6",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "rries (Uncommon).\n[2026-08-27T19:37:01.332Z] [system] \u23f3 Time passed: 24 min\n[2026-08-27T19:37:01.508Z] [cognitive] CLIMB  (175ms)\n[2026-08-27T19:37:02.439Z] [debug] ui: tap \"\u2192 Cellar\"\n[2026-08-27T19:37:02.444Z] [world] You step into the cellar.\n[2026-08-27T19:37:02.445Z] [world] Cool dark under the stone. Casks line the walls; a few have not been tapped. Crates molder in the corner.\n",
+      "[2026-08-27T19:37:03.305Z] [debug] ui: tap \"take / salvage\"\n[2026-08-27T19:37:04.717Z] [world] You strip the crate carefully. Something usable comes free in your hand.\n[2026-08-27T19:37:04.718Z] [world] You strip the shelf carefully. Something usable comes free in your hand.\n[2026-08-27T19:37:04.718Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-08-27T19:37:04.719Z] [reward]     \u2022 Worn Tartarian Coin x7 (Common)\n[2026-08-27T19:37:06.089Z] [debug] ui: tap \"investigate\"\n[2026-08-27T19:37:07.595Z] [player] investigate the ground\n[2026-08-27T19:37:07.595Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-08-27T19:37:07.598Z] [reward] You scrape at the silt with the aetheric crystal blade. \u2726 Recovered Pocket Knife (Common).\n[2026-08-27T19:37:07.603Z] [system] \u23f3 Time passed: 24 min\n[2026-08-27T19:37:07.780Z] [cognitive] CLIMB  (175ms)\n[2026-08-27T19:37:08.607Z] [debug] ui: tap \"\u2199 Vault\"\n[2026-08-27T19:37:08.610Z] [world] You step into the vault.\n",
+      "[2026-08-27T19:37:08.610Z] [world] An iron door stands ajar. Strongboxes line the floor, most pried open long ago, one still sealed.\n[2026-08-27T19:37:08.858Z] [player] investigate cask\n[2026-08-27T19:37:08.859Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=cask resolved=- range=- enemies=0 hooks=0\n[2026-08-27T19:37:09.017Z] [cognitive] neutral  (156ms)\n",
+      "[2026-08-27T19:37:09.163Z] [arbiter] The Arbiter tilts their head. \"I do not see a 'cask' here. Choose words carefully \u2014 try: strongbox, iron door, lockbox.\"\n[2026-08-27T19:37:09.163Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter tilts their head. \"I do not see a 'cask' here. C\u2026\"\n[2026-08-27T19:37:10.173Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-27T19:37:11.420Z] [world] You strip the iron door carefully. Something usable comes free in your hand.\n[2026-08-27T19:37:11.420Z] [world] You strip the lockbox carefully. Something usable comes free in your hand.\n[2026-08-27T19:37:11.421Z] [world] You work the strongbox over. A part of it comes loose, intact.\n[2026-08-27T19:37:11.421Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-08-27T19:37:11.421Z] [reward]     \u2022 Cloth Scrap x2 (Common)\n[2026-08-27T19:37:11.422Z] [reward]     \u2022 Aether Dust x2 (Common)\n[2026-08-27T19:37:11.422Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-08-27T19:37:12.642Z] [debug] ui: tap \"investigate\"\n[2026-08-27T19:37:14.214Z] [player] investigate the ground\n",
+      "[2026-08-27T19:37:14.215Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=0\n[2026-08-27T19:37:14.218Z] [reward] You scrape at the silt with the aetheric crystal blade. \u2726 Recovered Wild Chicken (Rare).\n[2026-08-27T19:37:14.224Z] [system] \u23f3 Time passed: 24 min\n[2026-08-27T19:37:14.399Z] [cognitive] CLIMB  (174ms)\n",
+      "[2026-08-27T19:37:14.774Z] [debug] persist sizes(KB): total=238 player=77 wm=82[rooms=35 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=77 scene=3\n[2026-08-27T19:37:14.996Z] [debug] ui: tap \"\u2191 Hall \u2713\"\n[2026-08-27T19:37:14.997Z] [world] You step into the great hall.\n",
+      "[2026-08-27T19:37:14.997Z] [world] A long hall under a sagging roof. Trestle tables run its length, a central fire pit sits cold, and banners hang gone to rags.\n[2026-08-27T19:37:16.824Z] [debug] ui: tap \"\ud83d\udeaa EXIT\"\n[2026-08-27T19:37:16.828Z] [world] You step back outside, leaving abandoned outpost behind.\n[2026-08-27T19:37:18.120Z] [debug] ui: tap \"rest\"\n[2026-08-27T19:37:18.126Z] [player] rest\n",
+      "[2026-08-27T19:37:18.126Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-27T19:37:18.127Z] [world] You rest for 8 hours. +8 stamina recovered. (Day 31, night)\n[2026-08-27T19:37:18.133Z] [system] \u23f3 Time passed: 8h\n[2026-08-27T19:37:18.294Z] [cognitive] REST  (160ms)\n[2026-08-27T19:37:19.108Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n",
+      "[2026-08-27T19:37:19.115Z] [debug] spawn: gear=[Wanderer's Worn Gauntlets, Mud Heater Sword] window=10 roster=new\n[2026-08-27T19:37:19.117Z] [world] You push north. The silt is heavy underfoot, the horizon unchanged.\n[2026-08-27T19:37:19.117Z] [world] Whatever you turned over here is still turned over.\n",
+      "[2026-08-27T19:37:24.300Z] [debug] qwen\u23f1 ambient ok 9758ms read 4767ms/write 1122ms in 364t\u2192out 31t 13.1ms/t HIT-CAP (145ch)\n[2026-08-27T19:37:24.451Z] [debug] ui: tap \"take / salvage\"\n[2026-08-27T19:37:24.451Z] [debug] ui: tap \"take / salvage\"\n[2026-08-27T19:37:24.777Z] [debug] homework: intro-fill armed after 6000ms idle\n",
+      "[2026-08-27T19:37:24.934Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient after 9758ms \u2014 ambient:stale:moved-scene\n[2026-08-27T19:37:24.934Z] [debug] arbiter: ambient stale:moved-scene 10710ms\n[2026-08-27T19:37:24.935Z] [debug] arbiter: ambient-empty reason=action-opener raw=\"You step up to the threshold of the Red Tower, its towering walls enveloping you in a deep blue aura. The sun's warm ray\"\n",
+      "[2026-08-27T19:37:26.946Z] [world] You work the Mud Heater Sword loose from where the mud had it.\n[2026-08-27T19:37:26.946Z] [reward] \u2726 Mud Heater Sword (Common).\n[2026-08-27T19:37:26.955Z] [world] The Wanderer's Worn Gauntlets had settled into the ground. You unsettle it.\n[2026-08-27T19:37:26.955Z] [reward] \u2726 Wanderer's Worn Gauntlets (Common).\n",
+      "[2026-08-27T19:37:27.929Z] [world] You strip the cracked chest carefully. Something usable comes free in your hand.\n[2026-08-27T19:37:27.930Z] [world] You strip the crystal carefully. Something usable comes free in your hand.\n[2026-08-27T19:37:27.930Z] [world] You work the door over. A part of it comes loose, intact.\n",
+      "[Filtered]",
+      "[2026-08-27T19:37:27.931Z] [reward]     \u2022 Hollow Quill Sheaf (Uncommon)\n[2026-08-27T19:37:29.363Z] [debug] ui: tap \"investigate\"\n[2026-08-27T19:37:31.271Z] [player] investigate the ground\n[2026-08-27T19:37:31.272Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-27T19:37:31.279Z] [reward] You scrape at the silt with the aetheric crystal blade. \u2726 Recovered Blueberries (Uncommon).\n[2026-08-27T19:37:31.288Z] [system] \u23f3 Time passed: 24 min\n[2026-08-27T19:37:31.600Z] [cognitive] CLIMB  (311ms)\n[2026-08-27T19:37:31.808Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 6711ms read 0ms/write 0ms in 660t\u2192out 0t (0ch)\n",
+      "[2026-08-27T19:37:31.963Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 6711ms \u2014 intro-fill:\u2205\n[2026-08-27T19:37:31.963Z] [debug] homework: scene_intro \"Nimari\" \u2205 7187ms\n[2026-08-27T19:37:32.549Z] [player] investigate crumbling balcony\n",
+      "[2026-08-27T19:37:32.549Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=crumbling balcony resolved=crumbling balcony range=- enemies=0 hooks=1\n[2026-08-27T19:37:32.551Z] [world] The crumbling balcony resists your reading. Not hostile \u2014 just closed. Some things in the buried world don't open for the curious.\n",
+      "[2026-08-27T19:37:32.552Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-27T19:37:32.552Z] [arbiter] \"The cold \u2014 still waiting,\" the Arbiter says. \"Decide if it matters.\"\n[2026-08-27T19:37:32.734Z] [cognitive] REST \u00b7 SEARCH  (180ms)\n[2026-08-27T19:37:35.047Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n",
+      "[2026-08-27T19:37:35.068Z] [debug] spawn: gear=[Bone Shiv (Stealth)] window=10 roster=new\n[2026-08-27T19:37:35.070Z] [world] You set out west. Your boots sink half an inch into the mud-flats and pull free with each step.\n[2026-08-27T19:37:35.071Z] [world] It sits where it sat. Patient is the wrong word \u2014 it simply does not move.\n",
+      "[2026-08-27T19:37:35.501Z] [debug] qwen\u23f1 investigate_lore ok 2775ms read \u26a08909ms/write \u26a01295ms NOT-PER-CALL in 125t\u2192out 40t (186ch)\n[2026-08-27T19:37:36.849Z] [debug] ui: tap \"take / salvage\"\n[2026-08-27T19:37:38.717Z] [world] Whatever the Bone Shiv (Stealth) was lying against, it lets go without much argument.\n[2026-08-27T19:37:38.717Z] [reward] \u2726 Bone Shiv (Stealth) (Common).\n",
+      "[2026-08-27T19:37:39.527Z] [world] The Scrap Metal is heavier than it looks. Most things down here are.\n[2026-08-27T19:37:39.527Z] [reward] \u2726 Scrap Metal (Common).\n[2026-08-27T19:37:39.795Z] [debug] persist sizes(KB): total=240 player=78 wm=82[rooms=36 events=5 memos=0 npcs=4 defeated=0 tags=1 discovered=0] log=77 scene=4\n",
+      "[2026-08-27T19:37:40.534Z] [world] You strip the crystal carefully. Something usable comes free in your hand.\n[2026-08-27T19:37:40.534Z] [world] You strip the rusted bowl carefully. Something usable comes free in your hand.\n[2026-08-27T19:37:40.535Z] [world] You strip the shard carefully. Something usable comes free in your hand.\n[2026-08-27T19:37:40.535Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-08-27T19:37:40.536Z] [reward]     \u2022 Scrap Metal x4 (Common)\n[2026-08-27T19:37:41.717Z] [debug] ui: tap \"investigate\"\n[2026-08-27T19:37:43.179Z] [player] investigate the ground\n[2026-08-27T19:37:43.180Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-27T19:37:43.183Z] [reward] You scrape at the silt with the aetheric crystal blade. \u2726 Recovered Stick (Common).\n[2026-08-27T19:37:43.190Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-27T19:37:43.190Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-27T19:37:43.190Z] [debug] arbiter: ambient held (he just spoke)\n",
+      "[2026-08-27T19:37:43.190Z] [system] \u23f3 Time passed: 24 min\n[2026-08-27T19:37:43.195Z] [world] An Eternal Dynasty war party crests the rise \u2014 2 of them, blades already out. They've marked you for standing with the Mud Monarchs.\n[2026-08-27T19:37:43.195Z] [arbiter] \"The Eternal Dynasty do not forgive a friend of the Mud Monarchs,\" the Arbiter murmurs. \"Stand, or run \u2014 but decide now.\"\n",
+      "[2026-08-27T19:37:43.453Z] [cognitive] CLIMB  (261ms)\n[2026-08-27T19:39:53.688Z] [debug] ui: tap \"dodge\"\n[2026-08-27T19:39:53.698Z] [world] A silent bolt strikes near enough to singe your sleeve. (\u22123 HP)\n[2026-08-27T19:39:53.707Z] [player] dodge\n[2026-08-27T19:39:53.708Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=2 hooks=1\n",
+      "[2026-08-27T19:39:53.709Z] [world] You commit to the dodge. Slip Eternal Dynasty Raider 1's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-08-27T19:39:53.794Z] [combat] Eternal Dynasty Raider 2 \u2014 d20 \u2192 9 + ATK 17 = 26 vs your AC 28 \u2014 \u2717 MISS\n",
+      "[2026-08-27T19:39:53.794Z] [combat] Dodge \u2014 d20 \u2192 3 + DEX 14 = 17 vs ATK 26. \u2717 You misread it \u2014 no opening, and the blow lands as it normally would (armor still counts).\n[2026-08-27T19:39:53.794Z] [world] Your read is a beat off \u2014 no opening this time \u2014 but the swing goes wide on its own.\n[2026-08-27T19:39:53.795Z] [combat] Eternal Dynasty Raider 1 \u2014 d20 \u2192 5 + ATK 17 = 22 vs your AC 28 \u2014 \u2717 MISS\n",
+      "[2026-08-27T19:39:53.796Z] [debug] arbiter: template (reason=combat)\n[2026-08-27T19:39:53.796Z] [arbiter] The Arbiter watches the Eternal Dynasty Raider 1. \"It is not the first thing here that decided to keep its distance, then changed its mind.\"\n[2026-08-27T19:39:53.797Z] [system] \u23f3 Time passed: 6 min\n[2026-08-27T19:39:54.049Z] [cognitive] neutral  (251ms)\n",
+      "[2026-08-27T19:39:54.774Z] [debug] ui: tap \"searing tuning fork\"\n[2026-08-27T19:39:54.823Z] [player] attack with the cantor's tuning fork\n[2026-08-27T19:39:54.823Z] [debug] parser: intent=attack conf=1.00 verb=attack target=cantor tuning fork resolved=- range=close enemies=2 hooks=1\n",
+      "[2026-08-27T19:39:54.824Z] [debug] attack: target=Eternal Dynasty Raider 1 range=close reach.bands=[close] reach.label=Cantor's Tuning Fork bareHand=false\n[2026-08-27T19:39:54.825Z] [debug] attack: status mods exhausted -2\n[2026-08-27T19:39:54.887Z] [world] You commit forward with the searing cantor's tuning fork. Eternal Dynasty Raider 1 watches your hands.\n",
+      "[2026-08-27T19:39:54.887Z] [system] \u23f3 Time passed: 6 min\n[2026-08-27T19:39:55.112Z] [cognitive] neutral  (224ms)\n[2026-08-27T19:40:04.658Z] [world] You seize the initiative. Eternal Dynasty Raider 1 has no time to react.\n[2026-08-27T19:40:04.658Z] [combat] You \u2014 d20 \u2192 12 + INT 11 exhausted -2 = 21 vs Eternal Dynasty Raider 1 AC 20 \u2014 \u2713 HIT\n",
+      "[2026-08-27T19:40:04.660Z] [combat] Eternal Dynasty Raider 1 takes 5 with the searing cantor's tuning fork. It reels: 50 left. Then it fights back.\n[2026-08-27T19:40:04.660Z] [combat] Searing Cantor's Tuning Fork \u2014 2 burn bites in and festers (3 turns).\n[2026-08-27T19:40:04.661Z] [combat] Eternal Dynasty Raider 1 \u2014 d20 \u2192 2 + ATK 15 = 17 vs your AC 28 \u2014 \u2717 MISS\n",
+      "[2026-08-27T19:40:04.662Z] [combat] Eternal Dynasty Raider 2 \u2014 d20 \u2192 20 + ATK 15 = 35 vs your AC 28 \u2014 \u2713 CRITICAL HIT\n[2026-08-27T19:40:04.915Z] [combat] Eternal Dynasty Raider 2 deals 15 bludgeoning damage [edge of reach \u2014 halved]. You have 40 HP remaining.\n[2026-08-27T19:40:04.916Z] [combat] Eternal Dynasty Raider 2's strike leaves you bleeding.\n",
+      "[2026-08-27T19:40:06.383Z] [debug] ui: tap \"off: compact blaster\"\n[2026-08-27T19:40:06.410Z] [player] attack with the off-hand compact blaster\n[2026-08-27T19:40:06.410Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand compact blaster resolved=Compact Blaster range=close enemies=2 hooks=1\n",
+      "[2026-08-27T19:40:06.410Z] [combat] Eternal Dynasty Raider 1 blisters \u2014 clinging fire sears 2. (48/55 HP, 2 turns left)\n[2026-08-27T19:40:06.411Z] [debug] attack: target=Eternal Dynasty Raider 1 range=close reach.bands=[distant,far,mid,close] reach.label=Compact Blaster bareHand=false\n[2026-08-27T19:40:06.412Z] [debug] attack: status mods exhausted -2\n",
+      "[2026-08-27T19:40:06.471Z] [world] You commit forward with the compact blaster. Eternal Dynasty Raider 1 watches your hands.\n[2026-08-27T19:40:06.472Z] [system] \u23f3 Time passed: 6 min\n[2026-08-27T19:40:06.704Z] [cognitive] AGGRESSION \u00b7 AIM \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (231ms)\n[2026-08-27T19:40:11.375Z] [world] Eternal Dynasty Raider 1 moves first. The pressure is immediate.\n",
+      "[2026-08-27T19:40:11.377Z] [combat] Eternal Dynasty Raider 2 \u2014 d20 \u2192 8 + ATK 15 = 23 vs your AC 28 \u2014 \u2717 MISS\n[2026-08-27T19:40:11.379Z] [combat] Eternal Dynasty Raider 1 \u2014 d20 \u2192 5 + ATK 15 = 20 vs your AC 28 \u2014 \u2717 MISS\n[2026-08-27T19:40:11.379Z] [combat] You \u2014 d20 \u2192 16 + DEX 14 + 2 (point blank) exhausted -2 = 30 vs Eternal Dynasty Raider 1 AC 20 \u2014 \u2713 HIT\n[2026-08-27T19:40:11.381Z] "
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-28-1530-the-stranger-gets-the-screen #mtcgc1vw57ml [inline 17/27]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtcgc1vw57ml"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "17"
+    },
+    {
+      "key": "parts",
+      "value": "27"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db2f:4653:ad2:ae51:4f0f:3e39",
+      "query": "user.ip:\"2607:fb90:db2f:4653:ad2:ae51:4f0f:3e39\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-28T22:14:15.293000Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "17": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 387,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-28T22:14:14.840000Z",
+  "fingerprints": [
+    "be748ce85802371e970795a28e86f05d"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "a9fbb0a28d0345d099e2d9e4c016d814",
+  "previousEventID": "96c58145679448e2bc51aa0ee9f3258b"
+}

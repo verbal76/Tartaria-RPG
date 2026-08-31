@@ -1,0 +1,225 @@
+{
+  "id": "c1ec198abdc8472ebfa49ad54b186fe0",
+  "groupID": "7697053520",
+  "eventID": "c1ec198abdc8472ebfa49ad54b186fe0",
+  "projectID": "4511945117532160",
+  "size": 17668,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-28-1530-the-stranger-gets-the-screen #mtcgc1vw57ml [inline 23/27]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-28-1530-the-stranger-gets-the-screen #mtcgc1vw57ml [inline 23/27]",
+  "title": "player-log 2026-08-28-1530-the-stranger-gets-the-screen #mtcgc1vw57ml [inline 23/27]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db2f:4653:ad2:ae51:4f0f:3e39",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "7b3fcdf9d94c43a8a477de1aea938687",
+      "span_id": "843b24ec022fd6b6",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "avenger crouches over a picked-clean carcass of machinery, stuffing bolts into a sack. They half-rise, eyeing your hands and your pack in equal measure. This is Tolen, a twitchy scavenger. (Try \"talk to Tolen\" \u2014 a fair word carries.)\n[2026-08-28T02:21:38.997Z] [world] A wall of grey ash rolls across the plain. Breathing burns. Skin gathers a film of dead world.\n\n",
+      "You are at The Monarch's Waystation. A frontier toll-court of the Mud Monarchs, last ordered ground before the buried capitals. Banners hang stiff with silt; a seneschal logs every traveler who passes toward the deeper cities.\n[2026-08-28T02:21:38.997Z] [world] The look of it lands a half-second before the memory does.\n[2026-08-28T02:21:38.998Z] [system] Weather effect \u2014 Ash Storm: -1 STR\n",
+      "[2026-08-28T02:21:39.000Z] [world] [The Monarch's Waystation] north: open ground \u00b7 east: Dynasty Border Post (4 tiles, 10 hours) \u00b7 south: The Architect's Blind (5 tiles, 13 hours) \u00b7 west: Iskan-Veil (3 tiles, 8 hours)\n[2026-08-28T02:21:39.001Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-08-28T02:21:39.001Z] [arbiter] The Arbiter eyes one corner of The Monarch's Waystation. \"Begin there, if you must begin somewhere.\"\n[2026-08-28T02:21:39.001Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter eyes one corner of The Monarch's Waystation. \"Be\u2026\"\n[2026-08-28T02:21:39.009Z] [system] \u23f3 Time passed: 1h\n",
+      "[2026-08-28T02:21:39.149Z] [cognitive] RETREAT \u00b7 DISENGAGE \u00b7 HIDE  (139ms)\n[2026-08-28T02:21:45.060Z] [player] talk to Tolen\n[2026-08-28T02:21:45.122Z] [world] Tolen smiles without warmth. \"Everyone wants something. Question is what it's worth to you \u2014 and whether I like how you ask.\"\n",
+      "[2026-08-28T02:21:45.122Z] [world] You read them at a glance: greedy and craven. They'll only fold to a threat \u2014 kindness is wasted.\n[2026-08-28T02:21:45.123Z] [world] Persuade Tolen for what they know, or intimidate them for what they carry?\n[2026-08-28T02:23:52.036Z] [world] You let the moment pass without pushing it.\n[2026-08-28T02:23:52.068Z] [player] talk to Tolen\n",
+      "[2026-08-28T02:23:52.133Z] [world] Tolen smiles without warmth. \"Everyone wants something. Question is what it's worth to you \u2014 and whether I like how you ask.\"\n[2026-08-28T02:23:52.134Z] [world] You read them at a glance: greedy and craven. They'll only fold to a threat \u2014 kindness is wasted.\n",
+      "[2026-08-28T02:23:52.134Z] [world] Persuade Tolen for what they know, or intimidate them for what they carry?\n[2026-08-28T02:23:52.368Z] [debug] persist sizes(KB): total=228 player=52 wm=90[rooms=40 events=5 memos=0 npcs=5 defeated=0 tags=1 discovered=0] log=84 scene=2\n[2026-08-28T02:24:23.536Z] [combat] You \u2014 intimidate Tolen \u2192 d20 2 + CHA 11 = 13 vs DC 11 \u2014 \u2713\n",
+      "[2026-08-28T02:24:23.539Z] [world] You put steel in it and mean it. Tolen weighs you, weighs the odds, and gives up what they're carrying rather than what's left of their luck.\n[2026-08-28T02:24:23.539Z] [reward] You shake it loose from Tolen: 25 TC, Scrap Metal \u00d73.\n[2026-08-28T02:24:23.540Z] [system] Word spreads that you strong-armed one of theirs. (\u22126 standing with the Conspiracy Architects)\n",
+      "[2026-08-28T02:24:23.541Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-08-28T02:27:49.764Z] [debug] ui: tap \"take / salvage\"\n[2026-08-28T02:27:51.219Z] [reward] \u2726 Found First Inscription \u2014 The Giant's Watch. (open Contracts \u2192 Collectibles to read)\n",
+      "[2026-08-28T02:27:51.239Z] [world] Behind the tent, where the floods didn't reach: a single page, in a hand you haven't read before.\n[2026-08-28T02:27:51.240Z] [world] Nothing carried over from this round of salvage.\n",
+      "[2026-08-28T02:28:06.192Z] [world] You set course for Iskan-Veil. 5 tiles \u2014 about 13 hours of travel, all in. You set off now \u2014 the ground ahead is new ground. Keep tapping \u2192 ISKAN-VEIL on the travel row to close the distance; STOP TRAVEL to halt.\n[2026-08-28T02:28:06.210Z] [world] You walk west. The ground here looks much like the ground behind you. You have lost track of distance.\n",
+      "[2026-08-28T02:28:06.214Z] [world] Your shadow falls across a glimmer in the ground. You stoop to lift it.\n[2026-08-28T02:28:06.214Z] [reward] \u2726 Wild Carrot (Common).\n[2026-08-28T02:28:06.215Z] [world] You spot what looks like a stone arch, half-swallowed by old mud.\n[2026-08-28T02:28:08.497Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-28T02:28:10.017Z] [world] You get a hand under the Bonebreaker Mace and take it.\n[2026-08-28T02:28:10.018Z] [reward] \u2726 Bonebreaker Mace (Common).\n[2026-08-28T02:28:10.045Z] [world] You claim the Gale Binder.\n[2026-08-28T02:28:10.045Z] [reward] \u2726 Gale Binder (Common).\n[2026-08-28T02:28:10.047Z] [world] The Salvager's Worn Greaves comes up out of the silt with a small sucking protest.\n",
+      "[2026-08-28T02:28:10.047Z] [reward] \u2726 Salvager's Worn Greaves (Common).\n[2026-08-28T02:28:10.302Z] [debug] persist sizes(KB): total=224 player=52 wm=86[rooms=36 events=5 memos=0 npcs=5 defeated=0 tags=1 discovered=0] log=84 scene=2\n[2026-08-28T02:28:11.053Z] [world] The Scrap Metal was half under something. It is not now.\n[2026-08-28T02:28:11.054Z] [reward] \u2726 Scrap Metal (Common).\n",
+      "[Filtered]",
+      "[2026-08-28T02:28:14.379Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=weathered ruined skyscraper resolved=weathered ruined skyscraper range=- enemies=0 hooks=1\n[2026-08-28T02:28:14.380Z] [debug] route: hook intercept (kind=arch, target=\"weathered ruined skyscraper\") \u2014 original intent=investigate\n",
+      "[2026-08-28T02:28:14.381Z] [world] \u2605 STORY THREAD (step 1) \u2014 You duck under the half-buried arch. The passage opens into a hollow \u2014 a Tartarian work-room, equipment long since hauled away, but the walls still hum.\n",
+      "[2026-08-28T02:28:16.004Z] [world] \u2605\u2605 STORY THREAD COMPLETE \u2014 Set into the back wall, behind a curtain of dried mud, you find a small cache. Whoever told you of this place was telling the truth.\n[2026-08-28T02:28:16.005Z] [reward] \u2726 Aetheric Shard, Aether Crystal, +40 TC.\n[2026-08-28T02:28:16.008Z] [reward] \u2726 For your persistence \u2014 Drone Core (Uncommon).\n",
+      "[2026-08-28T02:28:16.009Z] [arbiter] \"This is what they sell information for,\" the Arbiter says.\n[2026-08-28T02:34:34.013Z] [debug] send-log: #mtcc94ponsaa \u2014 DELIVERED (inline, no attachments): beacon out, 27/27 parts accepted (404774 chars) \u2014 flush said yes\n",
+      "[2026-08-28T02:34:34.015Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mtcc94ponsaa kept on disk, boots retry up to 5 sends total\n[2026-08-28T02:34:36.580Z] [debug] persist sizes(KB): total=224 player=53 wm=86[rooms=36 events=5 memos=0 npcs=5 defeated=0 tags=1 discovered=0] log=83 scene=2\n",
+      "[2026-08-28T04:21:39.714Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a04513-38e1-73b3-acbd-1d3273df8cc5\n[2026-08-28T04:21:39.714Z] [debug] ota: Checking\u2026\n[2026-08-28T04:21:40.530Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-08-28T04:21:40.654Z] [debug] ota: Saving progress\u2026\n[2026-08-28T04:21:40.655Z] [debug] ota: Restarting to apply\u2026\n",
+      "[2026-08-28T04:21:40.732Z] [debug] ota: boot check result = applied\n[2026-08-28T04:21:40.939Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a04660-2b8b-78ea-b630-14b43393f6ab\n[2026-08-28T04:21:40.939Z] [debug] ota: Checking\u2026\n[2026-08-28T04:21:41.178Z] [debug] ota: Already up to date\n[2026-08-28T04:21:41.178Z] [debug] ota: boot check result = noUpdate\n",
+      "[2026-08-28T04:21:41.411Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-28T04:21:41.411Z] [debug] voice: bundled idle\n[2026-08-28T04:21:41.845Z] [debug] send-log: bundle #mtcc94ponsaa attempt 2/5 delivered to Sentry\n[2026-08-28T04:21:47.470Z] [debug] OTA applied: 2026-08-27-1528-the-name-was-not-the-identity \u2192 2026-08-28-1530-the-stranger-gets-the-screen.\n",
+      "[2026-08-28T04:21:47.471Z] [debug] OTA session start: 2026-08-28-1530-the-stranger-gets-the-screen.\n[2026-08-28T04:21:47.471Z] [world] You step back into The Monarch's Waystation. The world waits for your move.\n[2026-08-28T04:21:47.471Z] [arbiter] The Arbiter meets your eyes. \"Welcome back, Great Scott. The buried country is no place to walk alone.\"\n",
+      "[2026-08-28T04:21:47.760Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-28T04:21:47.756Z \u00b7 build 2026-08-28-1530-the-stranger-gets-the-screen \u00b7 updated from 2026-08-27-1528-the-name-was-not-the-identity \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-08-28T04:21:48.648Z] [debug] send-log: crash on record (2026-08-28T02:29:33.897Z) \u2014 game log pushed automatically, delivered to Sentry, kept on disk as #mtcg31ttas2w\n",
+      "[2026-08-28T04:21:51.233Z] [debug] ui: tap \"investigate\"\n[2026-08-28T04:21:53.147Z] [world] The ash burns your throat. The breath you spend on this action costs more than usual.\n[2026-08-28T04:21:53.155Z] [player] investigate watch fire\n[2026-08-28T04:21:53.156Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=watch fire resolved=watch fire range=- enemies=0 hooks=1\n",
+      "[2026-08-28T04:21:53.157Z] [world] The watch fire sits the way ordinary things sit. The Arbiter does not lean in. You move on.\n[2026-08-28T04:21:53.288Z] [cognitive] READY  (129ms)\n[2026-08-28T04:21:54.231Z] [debug] ui: tap \"investigate\"\n[2026-08-28T04:21:55.578Z] [player] investigate footprint\n",
+      "[2026-08-28T04:21:55.579Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=footprint resolved=footprint range=- enemies=0 hooks=1\n[2026-08-28T04:21:55.580Z] [world] The footprint sits the way ordinary things sit. The Arbiter does not lean in. You move on.\n[2026-08-28T04:21:55.581Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-08-28T04:21:55.581Z] [arbiter] The Arbiter looks around. \"The seneschal logs your name without asking it. The Monarchs' ledgers have their ways.\"\n[2026-08-28T04:21:55.743Z] [cognitive] neutral  (160ms)\n[2026-08-28T04:21:57.332Z] [debug] ui: tap \"rest\"\n[2026-08-28T04:21:57.342Z] [player] rest\n",
+      "[2026-08-28T04:21:57.343Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-28T04:21:57.344Z] [world] You rest for 8 hours. +8 stamina recovered. (Day 32, morning)\n[2026-08-28T04:21:57.345Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-28T04:21:57.359Z] [system] \u23f3 Time passed: 8h\n[2026-08-28T04:21:57.647Z] [cognitive] REST  (287ms)\n",
+      "[2026-08-28T04:21:58.949Z] [debug] ui: tap \"\u2192 ISKAN-VEIL\"\n[2026-08-28T04:21:59.000Z] [world] You walk west. The ground here looks much like the ground behind you. You have lost track of distance.\n[2026-08-28T04:21:59.001Z] [world] Your foot snags on the silt. You crouch, look \u2014 and find something worth keeping.\n[2026-08-28T04:21:59.001Z] [reward] \u2726 Aether Residue (Common).\n",
+      "[2026-08-28T04:21:59.002Z] [world] A column of smoke or steam rises in the distance, thin and straight.\n[2026-08-28T04:22:00.753Z] [debug] ui: tap \"take / salvage\"\n[2026-08-28T04:22:02.419Z] [world] You take the Aetheric Bolt Gun from where it lay.\n[2026-08-28T04:22:02.419Z] [reward] \u2726 Aetheric Bolt Gun (Common).\n[2026-08-28T04:22:02.442Z] [world] You pick up the Mud Darts.\n",
+      "[2026-08-28T04:22:02.443Z] [reward] \u2726 Mud Darts (Common).\n[2026-08-28T04:22:03.615Z] [reward] \u2726 Found Third Inscription \u2014 The Giant's Watch. (open Contracts \u2192 Collectibles to read)\n[2026-08-28T04:22:03.629Z] [world] You salvage the bandage. The take is small but real.\n[2026-08-28T04:22:03.630Z] [world] You break the marker apart. Among the pieces, something worth keeping.\n",
+      "[2026-08-28T04:22:03.630Z] [world] Something papery rustles as you strip the signpost. You pull free a journal leaf.\n[2026-08-28T04:22:03.630Z] [reward] \u2726 Salvage haul:\n[2026-08-28T04:22:03.630Z] [reward]     \u2022 Spider Silk (Common)\n[2026-08-28T04:22:03.631Z] [reward]     \u2022 Smooth Stone x3 (Common)\n[2026-08-28T04:22:04.851Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-08-28T04:22:08.731Z] [player] investigate watch fire\n[2026-08-28T04:22:08.732Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=watch fire resolved=watch fire range=- enemies=0 hooks=2\n[2026-08-28T04:22:08.734Z] [world] The watch fire sits the way ordinary things sit. The Arbiter does not lean in. You move on.\n[2026-08-28T04:22:08.870Z] [cognitive] READY  (135ms)\n",
+      "[2026-08-28T04:22:11.152Z] [debug] ui: tap \"\u2192 ISKAN-VEIL\"\n[2026-08-28T04:22:11.158Z] [world] You push west. The silt is heavy underfoot, the horizon unchanged.\n[2026-08-28T04:22:11.158Z] [world] The thread you were following waits where you left it.\n[2026-08-28T04:22:12.669Z] [debug] ui: tap \"take / salvage\"\n[2026-08-28T04:22:14.673Z] [world] You lift the Lost Scholar's Robe clear.\n",
+      "[2026-08-28T04:22:14.674Z] [reward] \u2726 Lost Scholar's Robe (Common).\n[2026-08-28T04:22:14.699Z] [world] You get a hand under the Wanderer's Footwraps and take it.\n[2026-08-28T04:22:14.700Z] [reward] \u2726 Wanderer's Footwraps (Common).\n[2026-08-28T04:22:14.982Z] [debug] persist sizes(KB): total=226 player=54 wm=86[rooms=37 events=5 memos=0 npcs=5 defeated=0 tags=1 discovered=0] log=83 scene=2\n",
+      "[2026-08-28T04:22:16.376Z] [world] You claim the Climbing Rope.\n[2026-08-28T04:22:16.376Z] [reward] \u2726 Climbing Rope (Common).\n[2026-08-28T04:22:17.673Z] [reward] \u2726 Found Entry 3 \u2014 the Pillars \u2014 The Greedy Reclaimer. (open Contracts \u2192 Collectibles to read)\n[2026-08-28T04:22:17.699Z] [world] You work the cart over. A part of it comes loose, intact.\n",
+      "[2026-08-28T04:22:17.700Z] [world] You crack the lantern open. A page slides out \u2014 paper somehow dry, ink somehow still legible.\n[2026-08-28T04:22:17.700Z] [world] You break the signpost apart. Among the pieces, something worth keeping.\n[2026-08-28T04:22:17.700Z] [reward] \u2726 Salvage haul:\n[2026-08-28T04:22:17.701Z] [reward]     \u2022 Scrap Metal (Common)\n",
+      "[2026-08-28T04:22:17.701Z] [reward]     \u2022 Smooth Stone x3 (Common)\n[2026-08-28T04:22:19.205Z] [debug] ui: tap \"investigate\"\n[2026-08-28T04:22:21.116Z] [player] investigate watch fire\n[2026-08-28T04:22:21.117Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=watch fire resolved=watch fire range=- enemies=0 hooks=2\n",
+      "[2026-08-28T04:22:21.118Z] [world] The watch fire sits the way ordinary things sit. The Arbiter does not lean in. You move on.\n[2026-08-28T04:22:21.118Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-08-28T04:22:21.119Z] [arbiter] The Arbiter looks around. \"Silt-stiff banners crack in the wind like slow applause. The court has standards to keep, even here.\"\n",
+      "[2026-08-28T04:22:21.119Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-28T04:22:21.265Z] [cognitive] READY  (145ms)\n[2026-08-28T04:22:23.942Z] [debug] ui: tap \"rest\"\n[2026-08-28T04:22:23.956Z] [player] rest\n[2026-08-28T04:22:23.957Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=2\n",
+      "[2026-08-28T04:22:23.958Z] [world] You rest for 8 hours. +8 stam"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-28-1530-the-stranger-gets-the-screen #mtcgc1vw57ml [inline 23/27]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtcgc1vw57ml"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "23"
+    },
+    {
+      "key": "parts",
+      "value": "27"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db2f:4653:ad2:ae51:4f0f:3e39",
+      "query": "user.ip:\"2607:fb90:db2f:4653:ad2:ae51:4f0f:3e39\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-28T22:14:15.388174Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "15": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 338,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-28T22:14:14.841000Z",
+  "fingerprints": [
+    "be748ce85802371e970795a28e86f05d"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "ce18c0b64ca845078bd5e325302084e3",
+  "previousEventID": "bc928fb6b7d241d59cff6e8d6ffb1621"
+}

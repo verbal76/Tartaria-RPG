@@ -1,0 +1,203 @@
+{
+  "id": "4b9c95069e5349c0b1c16647c412f4a2",
+  "groupID": "7702334557",
+  "eventID": "4b9c95069e5349c0b1c16647c412f4a2",
+  "projectID": "4511945117532160",
+  "size": 17858,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-31-1589-the-pin-comes-home #mtgnmcrn0ya9 [inline 4/13]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-31-1589-the-pin-comes-home #mtgnmcrn0ya9 [inline 4/13]",
+  "title": "player-log 2026-08-31-1589-the-pin-comes-home #mtgnmcrn0ya9 [inline 4/13]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db9f:6b0a:ad2:ae57:4e16:2ac6",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "27c9a45907e3466ca34056a404ce746c",
+      "span_id": "a1649f796368721e",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "k 7859ms wait 1724ms read 3792ms/write 1584ms in 367t\u2192out 31t 10.3ms/t HIT-CAP (146ch)\n[2026-08-31T02:50:04.380Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient after 7859ms \u2014 ambient:\u2205\n[2026-08-31T02:50:04.380Z] [debug] arbiter: ambient \u2205 8023ms\n",
+      "[2026-08-31T02:50:04.381Z] [debug] arbiter: ambient-empty reason=unknown raw=\"You, my companion, have traversed the depths of the Silt Wastes, navigating the treacherous terrain with practiced ease.\"\n[2026-08-31T02:50:04.456Z] [cognitive] neutral  (5764ms)\n[2026-08-31T02:50:04.888Z] [debug] kbbar: mounted bottom=355 raw=0 from=estimate winH=986 beat=-\n",
+      "[2026-08-31T02:50:05.089Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=408 from=live winH=986 beat=-\n[2026-08-31T02:50:05.294Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-08-31T02:50:06.495Z] [debug] homework: intro-fill armed after 6000ms idle (strike 2/3)\n[2026-08-31T02:50:08.392Z] [player] drink\n",
+      "[2026-08-31T02:50:08.392Z] [debug] parser: intent=drink conf=1.00 verb=drink target=- resolved=- range=- enemies=0 hooks=2\n[2026-08-31T02:50:08.394Z] [world] You cup the well in your hands and drink. You weren't tired; mostly you were thirsty. (+1 corruption, 5 min)\n",
+      "[2026-08-31T02:50:08.394Z] [arbiter] The Arbiter watches you wipe your mouth. \"Raw well carries what the ground put in it. Fill a bottle next time \u2014 the filter takes the taint out.\"\n[2026-08-31T02:50:08.395Z] [system] \u23f3 Time passed: 5 min\n[2026-08-31T02:50:12.788Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 6185ms read 0ms/write 0ms in 732t\u2192out 0t (0ch)\n",
+      "[2026-08-31T02:50:12.903Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 6185ms \u2014 intro-fill:\u2205\n[2026-08-31T02:50:12.903Z] [debug] homework: scene_intro \"Great Tartary Plains\" \u2205 6411ms\n[2026-08-31T02:50:12.978Z] [cognitive] neutral  (4582ms)\n[2026-08-31T02:50:26.496Z] [debug] ui: tap \"climb\"\n[2026-08-31T02:50:28.011Z] [player] climb dead tree\n",
+      "[2026-08-31T02:50:28.012Z] [debug] parser: intent=climb conf=1.00 verb=climb target=dead tree resolved=dead tree range=- enemies=0 hooks=2\n[2026-08-31T02:50:28.046Z] [world] You loop your Reclaimer's Rope around the dead tree and walk the line. Tier 1/3 cleared.\n[2026-08-31T02:50:28.047Z] [world] You reach the first hold of the dead tree (tier 1/3). Higher still to go.\n",
+      "[2026-08-31T02:50:28.047Z] [world] Soot eyes the dead tree, then settles at its base. She is not built for the climb.\n[2026-08-31T02:50:28.047Z] [world] Plinth sets its stone feet at the base of dead tree and will climb no further \u2014 the construct holds the ground while you go up alone.\n[2026-08-31T02:50:28.048Z] [debug] arbiter: template (reason=intent-not-allowed:climb)\n",
+      "[2026-08-31T02:50:28.048Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T02:50:28.048Z] [system] \u23f3 Time passed: 30 min\n[2026-08-31T02:50:28.154Z] [cognitive] CLIMB  (105ms)\n[2026-08-31T02:50:29.013Z] [debug] ui: tap \"climb up (1/3)\"\n[2026-08-31T02:50:29.044Z] [player] climb dead tree\n",
+      "[2026-08-31T02:50:29.044Z] [debug] parser: intent=climb conf=1.00 verb=climb target=dead tree resolved=dead tree range=- enemies=0 hooks=2\n[2026-08-31T02:50:29.077Z] [world] You loop your Reclaimer's Rope around the dead tree and walk the line. Tier 2/3 cleared.\n[2026-08-31T02:50:29.077Z] [world] You reach the last stretch of the dead tree (tier 2/3). Higher still to go.\n",
+      "[2026-08-31T02:50:29.078Z] [debug] arbiter: template (reason=intent-not-allowed:climb)\n[2026-08-31T02:50:29.078Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T02:50:29.078Z] [system] \u23f3 Time passed: 30 min\n[2026-08-31T02:50:29.170Z] [cognitive] CLIMB  (91ms)\n[2026-08-31T02:50:29.830Z] [debug] ui: tap \"climb up (2/3)\"\n",
+      "[2026-08-31T02:50:29.864Z] [player] climb dead tree\n[2026-08-31T02:50:29.865Z] [debug] parser: intent=climb conf=1.00 verb=climb target=dead tree resolved=dead tree range=- enemies=0 hooks=2\n[2026-08-31T02:50:29.894Z] [world] You loop your Reclaimer's Rope around the dead tree and walk the line. Tier 3/3 cleared.\n",
+      "[2026-08-31T02:50:29.895Z] [world] You reach the top of the dead tree (tier 3/3). The view changes; the room reads differently from here.\n[2026-08-31T02:50:29.895Z] [world] At the top you find a nook carved into the structure \u2014 sheltered, lived-in, currently occupied.\n[2026-08-31T02:50:29.895Z] [combat] Aetheric Scarab is here \u2014 and it has seen you.\n",
+      "[2026-08-31T02:50:29.896Z] [debug] enemy: Aetheric Scarab hp=58 ac=11 atk=Energy Spike dmg=2D6 rarity=Uncommon ap=4\n[2026-08-31T02:50:29.896Z] [debug] arbiter: template (reason=combat)\n[2026-08-31T02:50:29.896Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T02:50:29.896Z] [system] \u23f3 Time passed: 30 min\n[2026-08-31T02:50:30.041Z] [cognitive] CLIMB  (144ms)\n",
+      "[2026-08-31T02:50:31.364Z] [debug] ui: tap \"\ud83d\udd25 bone crossbow\"\n[2026-08-31T02:50:31.412Z] [player] attack with the off-hand bone crossbow\n[2026-08-31T02:50:31.412Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=1 hooks=0\n",
+      "[2026-08-31T02:50:31.413Z] [debug] attack: target=Aetheric Scarab range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-08-31T02:50:31.440Z] [world] You commit forward with the searing bone crossbow. Aetheric Scarab watches your hands.\n[2026-08-31T02:50:31.440Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-31T02:50:31.578Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (137ms)\n[2026-08-31T02:50:41.853Z] [world] You seize the initiative. Aetheric Scarab has no time to react.\n[2026-08-31T02:50:41.853Z] [combat] You \u2014 d20 \u2192 18 + DEX 27 = 45 vs Aetheric Scarab AC 11 \u2014 \u2713 HIT\n[2026-08-31T02:50:41.854Z] [combat] Aetheric Scarab shrugs off the piercing. (resisted, \u00d70.5 for 4)\n",
+      "[2026-08-31T02:50:41.860Z] [arbiter] The Arbiter watches the piercing skid off. \"Swap to the Reclaimers Guild Geode-Cored Cleaver \u2014 slashing will bite where piercing won't.\"\n[2026-08-31T02:50:41.889Z] [reward] \u2726 The work hones you. +1 DEX (base 7, 28 as you stand).\n",
+      "[2026-08-31T02:50:41.890Z] [combat] Your strike with the searing bone crossbow lands for 4. Aetheric Scarab staggers \u2014 54 HP remaining. It answers.\n[2026-08-31T02:50:41.890Z] [combat] Searing Bone Crossbow \u2014 2 burn bites in and festers (3 turns).\n[2026-08-31T02:50:41.890Z] [world] Below, Aetheric Scarab circles the base \u2014 it cannot reach you up here.\n",
+      "[2026-08-31T02:50:43.743Z] [debug] ui: tap \"approach\"\n[2026-08-31T02:50:43.791Z] [player] approach Aetheric Scarab\n[2026-08-31T02:50:43.792Z] [debug] parser: intent=advance conf=1.00 verb=approach target=aetheric scarab resolved=Aetheric Scarab range=mid enemies=1 hooks=0\n[2026-08-31T02:50:43.794Z] [debug] move: advance from range=mid enemies=1 weather=Eerie Calm cost=1 partial=0\n",
+      "[2026-08-31T02:50:43.794Z] [debug] move: field advance target=Aetheric Scarab d 1.50->0.50 band mid->close\n[2026-08-31T02:50:43.794Z] [world] You close the gap with Aetheric Scarab. (range: close / arm's reach)\n[2026-08-31T02:50:43.795Z] [combat] Aetheric Scarab blisters \u2014 clinging fire sears 2. (52/58 HP, 2 turns left)\n",
+      "[2026-08-31T02:50:43.795Z] [world] Below, Aetheric Scarab circles the base \u2014 it cannot reach you up here.\n[2026-08-31T02:50:43.948Z] [cognitive] RETREAT \u00b7 USE_ITEM  (149ms)\n[2026-08-31T02:50:44.127Z] [debug] persist sizes(KB): total=164 player=33 wm=63[rooms=32 events=1 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=60 scene=7\n[2026-08-31T02:50:45.093Z] [debug] ui: tap \"soot (15/15)\"\n",
+      "[2026-08-31T02:50:45.095Z] [arbiter] \"Soot is holding the ground below,\" the Arbiter says. \"Dogs don't climb \u2014 come down to fight at Soot's side.\"\n[2026-08-31T02:50:50.766Z] [debug] ui: tap \"\ud83d\udd25 bone crossbow\"\n[2026-08-31T02:50:50.821Z] [player] attack with the off-hand bone crossbow\n",
+      "[2026-08-31T02:50:50.822Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=1 hooks=0\n[2026-08-31T02:50:50.823Z] [combat] Aetheric Scarab blisters \u2014 clinging fire sears 2. (50/58 HP, 1 turn left)\n",
+      "[2026-08-31T02:50:50.823Z] [debug] attack: target=Aetheric Scarab range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-08-31T02:50:50.855Z] [world] Your searing bone crossbow comes around in an arc; Aetheric Scarab squares up to meet it.\n[2026-08-31T02:50:50.856Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-31T02:50:50.983Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (126ms)\n[2026-08-31T02:50:58.429Z] [world] You seize the initiative. Aetheric Scarab has no time to react.\n[2026-08-31T02:50:58.430Z] [combat] You \u2014 d20 \u2192 14 + DEX 28 + 2 (point blank) = 44 vs Aetheric Scarab AC 11 \u2014 \u2713 HIT\n[2026-08-31T02:50:58.431Z] [combat] Piercing flares \u2014 +3 on hit.\n",
+      "[2026-08-31T02:50:58.431Z] [combat] Aetheric Scarab shrugs off the piercing. (resisted, \u00d70.5 for 9)\n[2026-08-31T02:50:58.433Z] [combat] Aetheric Scarab takes 9 with the searing bone crossbow. It reels: 41 left. Then it fights back.\n[2026-08-31T02:50:58.433Z] [combat] Searing Bone Crossbow \u2014 4 burn bites in and festers (3 turns).\n",
+      "[2026-08-31T02:50:58.434Z] [world] Below, Aetheric Scarab circles the base \u2014 it cannot reach you up here.\n[2026-08-31T02:50:59.840Z] [debug] ui: tap \"\ud83d\udd25 bone crossbow\"\n[2026-08-31T02:50:59.885Z] [player] attack with the off-hand bone crossbow\n",
+      "[2026-08-31T02:50:59.886Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=1 hooks=0\n[2026-08-31T02:50:59.888Z] [combat] Aetheric Scarab blisters \u2014 clinging fire sears 4. (37/58 HP, 2 turns left)\n",
+      "[2026-08-31T02:50:59.888Z] [debug] attack: target=Aetheric Scarab range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-08-31T02:50:59.918Z] [world] Your searing bone crossbow comes around in an arc; Aetheric Scarab squares up to meet it.\n[2026-08-31T02:50:59.918Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-31T02:51:00.043Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (124ms)\n[2026-08-31T02:51:03.516Z] [world] You seize the initiative. Aetheric Scarab has no time to react.\n[2026-08-31T02:51:03.517Z] [combat] You \u2014 d20 \u2192 1 + DEX 28 + 2 (point blank) = 31 vs Aetheric Scarab AC 11 \u2014 \u2717 FUMBLE\n",
+      "[2026-08-31T02:51:03.518Z] [combat] Aetheric Scarab reads the motion and slips it \u2014 the searing bone crossbow carves only air. The counter is already coming.\n[2026-08-31T02:51:03.518Z] [world] Below, Aetheric Scarab circles the base \u2014 it cannot reach you up here.\n[2026-08-31T02:51:05.428Z] [debug] ui: tap \"\u2726 bandolier (1)\"\n",
+      "[2026-08-31T02:51:06.827Z] [reward] You hurl the Acid Flask. It bursts across Aetheric Scarab \u2014 3 acid (2/turn \u00d7 3, resisted). (34 HP left)\n[2026-08-31T02:51:06.827Z] [combat] Aetheric Scarab blisters \u2014 clinging fire sears 4. (30/58 HP, 1 turn left)\n[2026-08-31T02:51:06.828Z] [world] Below, Aetheric Scarab circles the base \u2014 it cannot reach you up here.\n",
+      "[2026-08-31T02:51:09.093Z] [debug] ui: tap \"\ud83d\udd25 bone crossbow\"\n[2026-08-31T02:51:09.139Z] [player] attack with the off-hand bone crossbow\n[2026-08-31T02:51:09.140Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=1 hooks=0\n",
+      "[2026-08-31T02:51:09.140Z] [combat] Aetheric Scarab blisters \u2014 clinging fire sears 4. (26/58 HP, 0 turns left)\n[2026-08-31T02:51:09.140Z] [combat] Aetheric Scarab shakes off the last of the fire \u2014 the Bone Crossbow has run its course.\n[2026-08-31T02:51:09.141Z] [debug] attack: target=Aetheric Scarab range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n",
+      "[2026-08-31T02:51:09.169Z] [world] Your searing bone crossbow comes around in an arc; Aetheric Scarab squares up to meet it.\n[2026-08-31T02:51:09.169Z] [system] \u23f3 Time passed: 6 min\n[2026-08-31T02:51:09.297Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (127ms)\n[2026-08-31T02:51:16.136Z] [world] You seize the initiative. Aetheric Scarab has no time to react.\n",
+      "[2026-08-31T02:51:16.136Z] [combat] You \u2014 d20 \u2192 3 + DEX 28 + 2 (point blank) = 33 vs Aetheric Scarab AC 11 \u2014 \u2713 HIT\n[2026-08-31T02:51:16.137Z] [combat] Aetheric Scarab shrugs off the piercing. (resisted, \u00d70.5 for 4)\n[2026-08-31T02:51:16.137Z] [combat] The piercing has worn Aetheric Scarab's guard through \u2014 it bites full from here.\n",
+      "[2026-08-31T02:51:16.138Z] [combat] Clean hit with the searing bone crossbow for 4. Aetheric Scarab has 22 left and does not back away.\n[2026-08-31T02:51:16.139Z] [combat] Searing Bone Crossbow \u2014 1 burn bites in and festers (3 turns).\n[2026-08-31T02:51:16.139Z] [world] Below, Aetheric Scarab circles the base \u2014 it cannot reach you up here.\n",
+      "[2026-08-31T02:51:16.139Z] [arbiter] \"Footwork over fury,\" the Arbiter says quietly. \"The aetheric scarab is patient. Be patienter.\"\n[2026-08-31T02:51:17.444Z] [debug] ui: tap \"\ud83d\udd25 bone crossbow\"\n[2026-08-31T02:51:17.491Z] [player] attack with the off-hand bone crossbow\n",
+      "[2026-08-31T02:51:17.492Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=1 hooks=0\n[2026-08-31T02:51:17.492Z] [combat] Aetheric Scarab blisters \u2014 clinging fire sears 1. (21/58 HP, 2 turns left)\n",
+      "[2026-08-31T02:51:17.492Z] [debug] attack: target=Aetheric Scarab range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-08-31T02:51:17.522Z] [world] You raise the searing bone crossbow toward Aetheric Scarab. The room narrows around the both of you.\n[2026-08-31T02:51:17.522Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-31T02:51:17.650Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (127ms)\n[2026-08-31T02:51:23.688Z] [world] You seize the initiative. Aetheric Scarab has no time to react.\n[2026-08-31T02:51:23.688Z] [combat] You \u2014 d20 \u2192 7 + DEX 28 + 2 (point blank) = 37 vs Aetheric Scarab AC 11 \u2014 \u2713 HIT\n[2026-08-31T02:51:23.689Z] [combat] Piercing flares \u2014 +1 on hit.\n",
+      "[2026-08-31T02:51:23.690Z] [combat] Your strike with the searing bone crossbow lands for 15. Aetheric Scarab staggers \u2014 6 HP remaining. It answers.\n[2026-08-31T02:51:23.691Z] [combat] Searing Bone Crossbow \u2014 2 burn bites in and festers (3 turns).\n[2026-08-31T02:51:23.691Z] [world] Below, Aetheric Scarab circles the base \u2014 it cannot reach you up here.\n",
+      "[2026-08-31T02:51:25.796Z] [debug] ui: tap \"\ud83d\udd25 bone crossbow\"\n[2026-08-31T02:51:25.843Z] [player] attack with the off-hand bone crossbow\n[2026-08-31T02:51:25.843Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=1 hooks=0\n",
+      "[2026-08-31T02:51:25.844Z] [combat] Aetheric Scarab blisters \u2014 clinging fire sears 2. (4/58 HP, 2 turns left)\n[2026-08-31T02:51:25.844Z] [debug] attack: target=Aetheric Scarab range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-08-31T02:51:25.872Z] [world] You bring the searing bone crossbow to bear on Aetheric Scarab.\n",
+      "[2026-08-31T02:51:25.872Z] [system] \u23f3 Time passed: 6 min\n[2026-08-31T02:51:25.999Z] [cognitive] AGGR"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-31-1589-the-pin-comes-home #mtgnmcrn0ya9 [inline 4/13]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtgnmcrn0ya9"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "4"
+    },
+    {
+      "key": "parts",
+      "value": "13"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "4"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db9f:6b0a:ad2:ae57:4e16:2ac6",
+      "query": "user.ip:\"2607:fb90:db9f:6b0a:ad2:ae57:4e16:2ac6\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-31T12:34:45.565000Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-31T12:34:47.123000Z",
+  "fingerprints": [
+    "adc8d0e7a85e6e2a3bd771dbb71d268b"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "534e8fd4bb6444f689b14cf19b10a303",
+  "previousEventID": "06a7d7cc467e4ecda8a7bd25423b213d"
+}

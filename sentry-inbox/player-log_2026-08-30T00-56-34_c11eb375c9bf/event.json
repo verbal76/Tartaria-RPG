@@ -1,0 +1,201 @@
+{
+  "id": "c11eb375c9bf42a5a450ab2cdd4b1bec",
+  "groupID": "7700149815",
+  "eventID": "c11eb375c9bf42a5a450ab2cdd4b1bec",
+  "projectID": "4511945117532160",
+  "size": 17884,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-30-1552-are-you-sure-about-that #mtf18j1mlkuk [inline 16/23]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-30-1552-are-you-sure-about-that #mtf18j1mlkuk [inline 16/23]",
+  "title": "player-log 2026-08-30-1552-are-you-sure-about-that #mtf18j1mlkuk [inline 16/23]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Trafford",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "3ff4f5f4b91c45669a17de5edecdd7f2",
+      "span_id": "a31660b5f632f6d6",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "ate: active \u2192 background (was active for 170316ms)\n[2026-08-29T23:24:12.531Z] [debug] appstate: background \u2192 active (was background for 61768ms)\n[2026-08-29T23:24:12.689Z] [debug] homework: intro-fill armed after 7258ms idle\n[2026-08-29T23:24:14.968Z] [debug] ui: tap \"missions\"\n",
+      "[2026-08-29T23:24:15.823Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 2999ms read/write unusable (native mis-reported 89004ms/1110ms \u2014 llama.rn split bug, not this call) in 805t\u2192out 33t HIT-CAP (161ch)\n",
+      "[2026-08-29T23:24:15.826Z] [debug] qwen\u23f1 stats \u2014 narration:scene_intro_fill n7 avg5.4s max9.0s read7.5s/write1.1s \u26a05unusable in760t\u2192out19t ms/tok 10.1-10.1 cap3 \u23f83 \u27025/30.6s | ambient n3 avg4.5s max5.6s read2.5s/write1.0s \u26a01unusable in364t\u2192out30t ms/tok 6.9-7.1 cap2 wait0.6s \u27023/13.6s || WASTED 8 calls / 44.1s\n",
+      "[2026-08-29T23:24:15.847Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 2999ms \u2014 intro-fill:near-dup\n[2026-08-29T23:24:15.847Z] [debug] homework: scene_intro \"Reclaimer's Stake\" \u2205 3158ms\n[2026-08-29T23:24:18.805Z] [world] You set out toward the Silt Thief. Tap the travel row to press on; STOP to halt.\n",
+      "[2026-08-29T23:24:18.848Z] [world] A quiet outbuilding stands off the path here \u2014 weathered and quiet, a way in still clear. (You\u2019re on a route \u2014 type ENTER to step inside, or keep traveling.)\n[2026-08-29T23:24:18.848Z] [world] You walk east. The ground here looks much like the ground behind you. You have lost track of distance.\n",
+      "[2026-08-29T23:24:18.848Z] [world] The thread you were following waits where you left it.\n[2026-08-29T23:24:22.256Z] [debug] ui: tap \"take / salvage\"\n[2026-08-29T23:24:23.567Z] [reward] \u2726 Found Frantic Note \u2014 front hall \u2014 The Family in the Mud. (open Contracts \u2192 Collectibles to read)\n[2026-08-29T23:24:23.580Z] [world] You break the barrel apart. Among the pieces, something worth keeping.\n",
+      "[2026-08-29T23:24:23.580Z] [world] Something papery rustles as you strip the bedroll. You pull free a journal leaf.\n[2026-08-29T23:24:23.580Z] [world] You strip the cart carefully. Something usable comes free in your hand.\n[2026-08-29T23:24:23.580Z] [world] You strip the crate carefully. Something usable comes free in your hand.\n",
+      "[2026-08-29T23:24:23.580Z] [world] You work the firepit over. A part of it comes loose, intact.\n[2026-08-29T23:24:23.581Z] [world] You work the sign over. A part of it comes loose, intact.\n[2026-08-29T23:24:23.581Z] [reward] \u2726 Salvage haul:\n[2026-08-29T23:24:23.581Z] [reward]     \u2022 Worn Tartarian Coin x12 (Common)\n[2026-08-29T23:24:23.581Z] [reward]     \u2022 Scrap Metal (Common)\n",
+      "[2026-08-29T23:24:23.581Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-08-29T23:24:23.582Z] [reward]     \u2022 Smooth Stone (Common)\n[2026-08-29T23:24:25.024Z] [debug] ui: tap \"investigate\"\n[2026-08-29T23:24:26.497Z] [player] investigate the mud\n[2026-08-29T23:24:26.498Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=mud range=- enemies=0 hooks=1\n",
+      "[2026-08-29T23:24:26.500Z] [world] You look closer at the mud. Mud-glazed, undisturbed for a long while.\n[2026-08-29T23:24:26.501Z] [world] The mud carries the same blue-mud crust every relic-age artifact wears down here. Six inches of silt accreted since the flood last raised the seas.\n[2026-08-29T23:24:26.502Z] [world] A strip of dried meat falls free of the mud. Smoke-cured, still good.\n",
+      "[2026-08-29T23:24:26.502Z] [reward] \u2726 Smoke-Cured Jerky Strip (Common).\n[2026-08-29T23:24:26.506Z] [world] Mud Scanner reads flat. Nothing in the mud.\n[2026-08-29T23:24:26.599Z] [cognitive] SWIM  (90ms)\n[2026-08-29T23:24:28.124Z] [debug] ui: tap \"\u2192 THE SILT THIEF\"\n[2026-08-29T23:24:28.137Z] [debug] spawn: gear=[Stone Seeker's Brow Guard, Bone Splitter Axe, Mud Knife] window=10 roster=new\n",
+      "[2026-08-29T23:24:28.139Z] [world] You push east. The silt is heavy underfoot, the horizon unchanged.\n[2026-08-29T23:24:28.140Z] [world] What you started here has not finished itself in your absence.\n[2026-08-29T23:24:29.208Z] [debug] ui: tap \"take / salvage\"\n[2026-08-29T23:24:30.876Z] [world] You take the Bone Splitter Axe from where it lay.\n",
+      "[2026-08-29T23:24:30.876Z] [reward] \u2726 Bone Splitter Axe (Common).\n[2026-08-29T23:24:30.889Z] [world] You pick up the Mud Knife.\n[2026-08-29T23:24:30.889Z] [reward] \u2726 Mud Knife (Common).\n[2026-08-29T23:24:30.891Z] [world] You lift the Stone Seeker's Brow Guard clear.\n[2026-08-29T23:24:30.891Z] [reward] \u2726 Stone Seeker's Brow Guard (Common).\n",
+      "[2026-08-29T23:24:31.601Z] [world] You get a hand under the Climbing Rope and take it.\n[2026-08-29T23:24:31.602Z] [reward] \u2726 Climbing Rope (Common).\n[2026-08-29T23:24:31.612Z] [world] You claim the Scrap Metal.\n[2026-08-29T23:24:31.612Z] [reward] \u2726 Scrap Metal (Common).\n",
+      "[2026-08-29T23:24:31.740Z] [debug] persist sizes(KB): total=135 player=21 wm=32[rooms=7 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=79 scene=2\n[2026-08-29T23:24:32.338Z] [world] You break the cart apart. Among the pieces, something worth keeping.\n[2026-08-29T23:24:32.338Z] [world] You strip the cold spring carefully. Something usable comes free in your hand.\n",
+      "[2026-08-29T23:24:32.338Z] [world] You break the reclaimer stake apart. Among the pieces, something worth keeping.\n[2026-08-29T23:24:32.339Z] [reward] \u2726 Salvage haul:\n[2026-08-29T23:24:32.339Z] [reward]     \u2022 Worn Tartarian Coin x7 (Common)\n[2026-08-29T23:24:32.339Z] [reward]     \u2022 Scrap Metal x2 (Common)\n[2026-08-29T23:24:32.340Z] [reward]     \u2022 Bent Nail x3 (Common)\n",
+      "[2026-08-29T23:24:46.007Z] [debug] ui: tap \"\u2192 THE SILT THIEF\"\n[2026-08-29T23:24:46.022Z] [debug] spawn: gear=[Aether-Weaver's Mantle] window=10 roster=new\n[2026-08-29T23:24:46.024Z] [world] A figure rises out of the silt ahead, hands inside a slick mud-cloak. The cloak's lining glints \u2014 Aetheric Discs, more than they should be carrying. The Silt Thief sees you, and decides you saw too much.\n",
+      "[2026-08-29T23:24:46.024Z] [combat] Silt Thief closes \u2014 Quick Knife ready, 1D8 damage on a hit. (range: close)\n[2026-08-29T23:24:46.025Z] [arbiter] The Arbiter, walking with you: \"Tartaria was a continent once. A flood older than any honest map drowned it. We are crossing the top of it.\"\n[2026-08-29T23:24:46.025Z] [world] The loose end is exactly as loose as you left it.\n",
+      "[2026-08-29T23:24:49.325Z] [debug] ui: tap \"off: earthshaker\"\n[2026-08-29T23:24:49.370Z] [player] attack with the off-hand earthshaker\n[2026-08-29T23:24:49.370Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand earthshaker resolved=Earthshaker range=mid enemies=1 hooks=1\n",
+      "[2026-08-29T23:24:49.372Z] [debug] attack: target=Silt Thief range=mid reach.bands=[distant,far,mid,close] reach.label=Earthshaker bareHand=false\n[2026-08-29T23:24:49.372Z] [debug] attack: visibility penalty \u22121 (Ash Storm)\n[2026-08-29T23:24:49.389Z] [world] You bring the earthshaker to bear on Silt Thief.\n[2026-08-29T23:24:49.389Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-29T23:24:49.482Z] [cognitive] AGGRESSION \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (92ms)\n[2026-08-29T23:24:54.063Z] [world] Silt Thief moves first. The pressure is immediate.\n[2026-08-29T23:24:54.065Z] [combat] Silt Thief \u2014 d20 \u2192 6 + ATK 8 = 14 vs your AC 19 \u2014 \u2717 MISS\n[2026-08-29T23:24:54.065Z] [combat] You \u2014 d20 \u2192 5 + INT 12 \u2212 1 (Ash Storm) = 16 vs Silt Thief AC 10 \u2014 \u2713 HIT\n",
+      "[2026-08-29T23:24:54.066Z] [combat] Bludgeoning flares \u2014 +1 on hit.\n[2026-08-29T23:24:54.067Z] [combat] The blow with the earthshaker finds purchase \u2014 6 damage, 22 HP standing. Silt Thief commits to the counter.\n[2026-08-29T23:24:54.067Z] [combat] Silt Thief is left exposed \u2014 easier to hit.\n",
+      "[2026-08-29T23:24:54.068Z] [arbiter] \"Tartaria does not award style points,\" the Arbiter says, eyes on the silt thief. \"End it.\"\n[2026-08-29T23:24:55.494Z] [debug] ui: tap \"dodge\"\n[2026-08-29T23:24:55.501Z] [world] The ash burns your throat. The breath you spend on this action costs more than usual.\n[2026-08-29T23:24:55.510Z] [player] dodge\n",
+      "[2026-08-29T23:24:55.511Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=1 hooks=1\n[2026-08-29T23:24:55.512Z] [world] You commit to the dodge. Slip Silt Thief's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-08-29T23:24:55.533Z] [combat] Silt Thief \u2014 d20 \u2192 1 + ATK 6 = 7 vs your AC 19 \u2014 \u2717 EVADED\n[2026-08-29T23:24:55.533Z] [combat] Dodge \u2014 Silt Thief overcommits past you. \u2713 Free opening (next strike \u00d72 dice).\n[2026-08-29T23:24:55.535Z] [debug] arbiter: template (reason=combat)\n[2026-08-29T23:24:55.535Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-08-29T23:24:55.535Z] [system] \u23f3 Time passed: 6 min\n[2026-08-29T23:24:55.635Z] [cognitive] neutral  (98ms)\n[2026-08-29T23:24:56.727Z] [debug] ui: tap \"off: earthshaker\"\n[2026-08-29T23:24:56.769Z] [player] attack with the off-hand earthshaker\n[2026-08-29T23:24:56.769Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand earthshaker resolved=Earthshaker range=mid enemies=1 hooks=1\n",
+      "[2026-08-29T23:24:56.770Z] [debug] attack: target=Silt Thief range=mid reach.bands=[distant,far,mid,close] reach.label=Earthshaker bareHand=false\n[2026-08-29T23:24:56.771Z] [debug] attack: visibility penalty \u22121 (Ash Storm)\n[2026-08-29T23:24:56.771Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-08-29T23:24:56.786Z] [world] You raise the earthshaker toward Silt Thief. The room narrows around the both of you.\n[2026-08-29T23:24:56.787Z] [system] \u23f3 Time passed: 6 min\n[2026-08-29T23:24:56.879Z] [cognitive] AGGRESSION \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (91ms)\n[2026-08-29T23:25:01.522Z] [world] Silt Thief moves first. The pressure is immediate.\n",
+      "[2026-08-29T23:25:01.524Z] [combat] Silt Thief \u2014 d20 \u2192 2 + ATK 6 = 8 vs your AC 19 \u2014 \u2717 MISS\n[2026-08-29T23:25:01.524Z] [combat] You \u2014 d20 \u2192 8 + INT 12 \u2212 1 (Ash Storm) perfect opening (2\u00d7 dice) = 19 vs Silt Thief AC 10 \u2014 \u2713 HIT\n[2026-08-29T23:25:01.526Z] [combat] The blow with the earthshaker finds purchase \u2014 5 damage, 17 HP standing. Silt Thief commits to the counter.\n",
+      "[2026-08-29T23:25:03.962Z] [debug] ui: tap \"off: earthshaker\"\n[2026-08-29T23:25:04.009Z] [player] attack with the off-hand earthshaker\n[2026-08-29T23:25:04.010Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand earthshaker resolved=Earthshaker range=mid enemies=1 hooks=1\n",
+      "[2026-08-29T23:25:04.011Z] [debug] attack: target=Silt Thief range=mid reach.bands=[distant,far,mid,close] reach.label=Earthshaker bareHand=false\n[2026-08-29T23:25:04.013Z] [debug] attack: visibility penalty \u22121 (Ash Storm)\n[2026-08-29T23:25:04.032Z] [world] You raise the earthshaker toward Silt Thief. The room narrows around the both of you.\n",
+      "[2026-08-29T23:25:04.032Z] [system] \u23f3 Time passed: 6 min\n[2026-08-29T23:25:04.122Z] [cognitive] AGGRESSION \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (89ms)\n[2026-08-29T23:25:08.621Z] [world] Silt Thief moves first. The pressure is immediate.\n[2026-08-29T23:25:08.623Z] [combat] Silt Thief \u2014 d20 \u2192 17 + ATK 6 = 23 vs your AC 19 \u2014 \u2713 HIT\n",
+      "[2026-08-29T23:25:08.624Z] [combat] You \u2014 d20 \u2192 2 + INT 12 \u2212 1 (Ash Storm) = 13 vs Silt Thief AC 10 \u2014 \u2713 HIT\n[2026-08-29T23:25:08.625Z] [combat] The blow with the earthshaker finds purchase \u2014 2 damage, 15 HP standing. Silt Thief commits to the counter.\n[2026-08-29T23:25:08.625Z] [arbiter] The Arbiter does not look up. \"Hit it before it hits you. That's the entire trick.\"\n",
+      "[2026-08-29T23:25:08.741Z] [combat] Silt Thief deals 1 slashing damage [armor \u221247%] [edge of reach \u2014 halved]. You have 24 HP remaining.\n[2026-08-29T23:25:08.741Z] [combat] That's your slashing resist working \u2014 the armor drank most of that hit (1 of 2 got through).\n[2026-08-29T23:25:08.741Z] [combat] Silt Thief's strike leaves you bleeding.\n[2026-08-29T23:25:10.864Z] [debug] ui: tap \"approach\"\n",
+      "[2026-08-29T23:25:10.887Z] [player] approach Silt Thief\n[2026-08-29T23:25:10.888Z] [debug] parser: intent=advance conf=1.00 verb=approach target=silt thief resolved=Silt Thief range=mid enemies=1 hooks=1\n[2026-08-29T23:25:10.889Z] [debug] move: advance from range=mid enemies=1 weather=Ash Storm cost=1 partial=0\n",
+      "[2026-08-29T23:25:10.890Z] [debug] move: field advance target=Silt Thief d 1.50->0.50 band mid->close\n[2026-08-29T23:25:10.890Z] [world] You close the gap with Silt Thief. (range: close / arm's reach)\n[2026-08-29T23:25:10.892Z] [combat] Silt Thief \u2014 d20 \u2192 5 + ATK 6 = 11 vs your AC 19 \u2014 \u2717 MISS\n[2026-08-29T23:25:11.008Z] [cognitive] neutral  (114ms)\n",
+      "[2026-08-29T23:25:11.156Z] [debug] persist sizes(KB): total=135 player=21 wm=32[rooms=8 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=79 scene=3\n[2026-08-29T23:25:11.632Z] [debug] ui: tap \"cudgel\"\n[2026-08-29T23:25:11.659Z] [player] attack with the cudgel\n",
+      "[2026-08-29T23:25:11.660Z] [debug] parser: intent=attack conf=1.00 verb=attack target=cudgel resolved=Cudgel range=close enemies=1 hooks=1\n[2026-08-29T23:25:11.661Z] [debug] attack: target=Silt Thief range=close reach.bands=[close] reach.label=Cudgel bareHand=false\n[2026-08-29T23:25:11.662Z] [debug] attack: visibility penalty \u22121 (Ash Storm)\n",
+      "[2026-08-29T23:25:11.682Z] [world] You commit forward with the cudgel. Silt Thief watches your hands.\n[2026-08-29T23:25:11.682Z] [system] \u23f3 Time passed: 6 min\n[2026-08-29T23:25:11.773Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 TAKE_COVER \u00b7 DISENGAGE  (90ms)\n[2026-08-29T23:25:16.292Z] [world] Silt Thief moves first. The pressure is immediate.\n",
+      "[2026-08-29T23:25:16.294Z] [combat] Silt Thief \u2014 d20 \u2192 4 + ATK 6 = 10 vs your AC 19 \u2014 \u2717 MISS\n[2026-08-29T23:25:16.294Z] [combat] You \u2014 d20 \u2192 12 + STR 5 \u2212 1 (Ash Storm) = 16 vs Silt Thief AC 10 \u2014 \u2713 HIT\n[2026-08-29T23:25:16.295Z] [combat] Bludgeoning flares \u2014 +4 on hit.\n",
+      "[2026-08-29T23:25:16.296Z] [combat] The blow with the cudgel finds purchase \u2014 6 damage, 9 HP standing. Silt Thief commits to the counter.\n[2026-08-29T23:25:16.296Z] [combat] Silt Thief is left exposed \u2014 easier to hit.\n[2026-08-29T23:25:18.068Z] [debug] ui: tap \"dodge\"\n[2026-08-29T23:25:18.071Z] [system] bleeding fades.\n[2026-08-29T23:25:18.079Z] [player] dodge\n",
+      "[2026-08-29T23:25:18.080Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=1\n[2026-08-29T23:25:18.081Z] [world] You commit to the dodge. Slip Silt Thief's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-08-29T23:25:18.105Z] [combat] Silt Thief \u2014 d20 \u2192 4 + ATK 6 = 10 vs your AC 19 \u2014 \u2717 EVADED\n[2026-08-29T23:25:18.106Z] [combat] Dodge \u2014 d20 \u2192 15 + DEX 16 = 31 vs ATK 10. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-08-29T23:25:18.106Z] [system] \u23f3 Time passed: 6 min\n[2026-08-29T23:25:18.211Z] [cognitive] neutral  (104ms)\n[2026-08-29T23:25:18.867Z] [debug] ui: tap \"cudgel\"\n",
+      "[2026-08-29T23:25:18.894Z] [player] attack with the cudgel\n[2026-08-29T23:25:18.895Z] [debug] parser: intent=attack conf=1.00 verb=attack target=cudgel resolved=Cudgel range=close enemies=1 hooks=1\n[2026-08-29T23:25:18.896Z] [debug] attack: target=Silt Thief range=close reach.bands=[close] reach.label=Cudgel bareHand=false\n[2026-08-29T23:25:18.899Z] [debug] attack: v"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-30-1552-are-you-sure-about-that #mtf18j1mlkuk [inline 16/23]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtf18j1mlkuk"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "16"
+    },
+    {
+      "key": "parts",
+      "value": "23"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "4"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+      "query": "user.ip:\"2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-30T00:56:34.766024Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-30T00:56:34.959000Z",
+  "fingerprints": [
+    "62526ea58b2c63210482d8abf21f0d1e"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "de3ea7b1ecbf43a9a17f7c4a8aa6137f",
+  "previousEventID": "bf8bc5fff5b4467e90e565c540f1dbb0"
+}

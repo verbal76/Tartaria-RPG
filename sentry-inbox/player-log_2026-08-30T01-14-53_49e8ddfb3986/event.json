@@ -1,0 +1,200 @@
+{
+  "id": "49e8ddfb39864210972d6219c462070a",
+  "groupID": "7700163529",
+  "eventID": "49e8ddfb39864210972d6219c462070a",
+  "projectID": "4511945117532160",
+  "size": 17888,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-30-1553-glyph-glyph-name-star #mtf482aclxul [inline 13/24]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-30-1553-glyph-glyph-name-star #mtf482aclxul [inline 13/24]",
+  "title": "player-log 2026-08-30-1553-glyph-glyph-name-star #mtf482aclxul [inline 13/24]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Trafford",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "5bf0ca10ef194929bfff557f8d980025",
+      "span_id": "8f5b78882a47e2c7",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "ognitive] neutral  (159ms)\n[2026-08-29T01:10:38.702Z] [debug] kbbar: mounted bottom=359.79486083984375 from=cached winH=986 beat=-\n[2026-08-29T01:10:38.863Z] [debug] kbbar: mounted bottom=359.79486083984375 from=live winH=986 beat=-\n[2026-08-29T01:10:56.961Z] [player] also this tile just repopulated after I hit autoroute to the mission\n",
+      "[2026-08-29T01:10:56.962Z] [arbiter] The Arbiter studies you, plainly. \"I'm not sure what you're trying to tell me. I'll keep your note in the log either way. If you mean to act, phrase it as a verb \u2014 'investigate the rubble', 'go east', 'attack the figure'.\"\n[2026-08-29T01:10:56.962Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter studies you, plainly. \"I'm not sure what you're \u2026\"\n",
+      "[2026-08-29T01:10:56.962Z] [debug] meta-comment guard: skipped intent parse (suggestion: \"also\") on 68-char input\n[2026-08-29T01:11:05.940Z] [debug] appstate: active \u2192 background (was active for 51703ms)\n[2026-08-29T01:11:09.527Z] [debug] appstate: background \u2192 active (was background for 3586ms)\n[2026-08-29T01:11:12.477Z] [debug] appstate: active \u2192 background (was active for 2951ms)\n",
+      "[2026-08-29T01:37:44.130Z] [debug] appstate: background \u2192 active (was background for 1591647ms)\n[2026-08-29T01:37:44.150Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-08-29T01:37:48.308Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 4103ms read 3856ms/write 137ms in 762t\u2192out 4t 5.1ms/t (26ch)\n[2026-08-29T01:37:48.312Z] [debug] homework: scene_intro \"Reclaimer's Stake\" \u2713 4163ms\n",
+      "[2026-08-29T01:37:48.437Z] [debug] ctx: RELEASED \u2014 live=0 (opened=1 released=1)\n[2026-08-29T01:37:48.730Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a04b10-4522-751e-acc1-d1a7ffa2bcd4\n[2026-08-29T01:37:48.730Z] [debug] ota: Checking\u2026\n[2026-08-29T01:37:48.858Z] [debug] ota: Already up to date\n[2026-08-29T01:37:48.858Z] [debug] ota: boot check result = noUpdate\n",
+      "[2026-08-29T01:37:48.885Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-29T01:37:48.885Z] [debug] voice: bundled idle\n[2026-08-29T02:09:41.095Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a04b10-4522-751e-acc1-d1a7ffa2bcd4\n[2026-08-29T02:09:41.095Z] [debug] ota: Checking\u2026\n[2026-08-29T02:09:41.163Z] [debug] ota: Already up to date\n",
+      "[2026-08-29T02:09:41.163Z] [debug] ota: boot check result = noUpdate\n[2026-08-29T02:09:41.201Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-29T02:09:41.201Z] [debug] voice: bundled idle\n[2026-08-29T02:52:48.086Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a04b10-4522-751e-acc1-d1a7ffa2bcd4\n[2026-08-29T02:52:48.087Z] [debug] ota: Checking\u2026\n",
+      "[2026-08-29T02:52:48.142Z] [debug] ota: Already up to date\n[2026-08-29T02:52:48.142Z] [debug] ota: boot check result = noUpdate\n[2026-08-29T02:52:48.177Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-29T02:52:48.184Z] [debug] voice: bundled idle\n",
+      "[2026-08-29T03:22:10.182Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a04b10-4522-751e-acc1-d1a7ffa2bcd4\n[2026-08-29T03:22:10.182Z] [debug] ota: Checking\u2026\n[2026-08-29T03:22:10.608Z] [debug] ota: Already up to date\n[2026-08-29T03:22:10.608Z] [debug] ota: boot check result = noUpdate\n[2026-08-29T03:22:10.632Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-08-29T03:22:10.632Z] [debug] voice: bundled idle\n[2026-08-29T04:23:19.876Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a04bbb-4eb7-771b-93d7-5a32f63bf543\n[2026-08-29T04:23:19.876Z] [debug] ota: Checking\u2026\n[2026-08-29T04:23:20.000Z] [debug] ota: Already up to date\n[2026-08-29T04:23:20.000Z] [debug] ota: boot check result = noUpdate\n",
+      "[2026-08-29T04:23:20.029Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-29T04:23:20.030Z] [debug] voice: bundled idle\n[2026-08-29T18:09:37.595Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a04bbb-4eb7-771b-93d7-5a32f63bf543\n[2026-08-29T18:09:37.595Z] [debug] ota: Checking\u2026\n[2026-08-29T18:09:37.723Z] [debug] ota: Already up to date\n",
+      "[2026-08-29T18:09:37.723Z] [debug] ota: boot check result = noUpdate\n[2026-08-29T18:09:37.978Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-29T18:09:37.978Z] [debug] voice: bundled idle\n[2026-08-29T18:09:46.844Z] [debug] OTA session start: 2026-08-29-1542-the-rendezvous-is-a-place.\n",
+      "[2026-08-29T18:09:46.844Z] [world] You step back into Reclaimer's Stake. The world waits for your move.\n[2026-08-29T18:09:46.844Z] [world] A Forgotten Order pilgrim is said to have asked after you in your absence. They left without saying where they were headed.\n",
+      "[2026-08-29T18:09:46.848Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. \"Welcome back, Cheddar Bob. We've still got ground to cover, you and I. The waste did not sleep while you were gone \u2014 blood was spilled and ground changed hands. Read the World for the account.\"\n",
+      "[2026-08-29T18:09:47.019Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-29T18:09:47.018Z \u00b7 build 2026-08-29-1542-the-rendezvous-is-a-place \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-08-29T18:09:49.011Z] [debug] ui: tap \"more \u25b8\"\n[2026-08-29T18:09:49.845Z] [debug] ui: tap \"missions\"\n[2026-08-29T18:09:55.529Z] [world] You set out toward Yulka's fire. Tap the travel row to press on; STOP to halt.\n",
+      "[2026-08-29T18:09:55.587Z] [world] A hooded figure crouches over a small Aether-fire ahead. She watches you approach without standing. The fire's blue glow plays across a flat tin tray covered in palm-sized Aetheric Discs.\n",
+      "[2026-08-29T18:09:55.587Z] [arbiter] \"Yulka,\" she says without asking your name. \"If you came for Discs, sit. Five for fifty TC. If you came for trouble, keep walking.\" She watches your hands more than your face. \"There's a third option. Some pendejo took half my stock \u2014 three tiles east, that direction.\" She nods at the dark. \"Get them back, you keep five. I keep the rest. Either way, decide now.",
+      " I've got somewhere to be by sunrise.\"\n[2026-08-29T18:09:55.588Z] [system] Type \"accept yulka\" to take the fetch (five Discs on return). Type \"buy from yulka\" to skip the fetch and trade 50 TC for 5 Discs. Type \"leave yulka\" to walk away.\n[2026-08-29T18:09:55.588Z] [world] You walk west. The ground here looks much like the ground behind you. You have lost track of distance.\n",
+      "[2026-08-29T18:09:55.589Z] [world] The thread you were following waits where you left it.\n[2026-08-29T18:57:30.840Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a04bbb-4eb7-771b-93d7-5a32f63bf543\n[2026-08-29T18:57:30.840Z] [debug] ota: Checking\u2026\n[2026-08-29T18:57:31.903Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n",
+      "[2026-08-29T18:57:31.997Z] [debug] ota: Saving progress\u2026\n[2026-08-29T18:57:31.998Z] [debug] ota: Restarting to apply\u2026\n[2026-08-29T18:57:32.075Z] [debug] ota: boot check result = applied\n[2026-08-29T18:57:32.211Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a04ed0-8824-79f0-93f7-6f84d9710b25\n[2026-08-29T18:57:32.211Z] [debug] ota: Checking\u2026\n",
+      "[2026-08-29T18:57:32.304Z] [debug] ota: Already up to date\n[2026-08-29T18:57:32.304Z] [debug] ota: boot check result = noUpdate\n[2026-08-29T18:57:32.323Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-29T18:57:32.323Z] [debug] voice: bundled idle\n",
+      "[2026-08-29T22:34:16.773Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a04ee2-5fc8-7d83-9e47-112f06157700\n[2026-08-29T22:34:16.774Z] [debug] ota: Checking\u2026\n[2026-08-29T22:34:16.909Z] [debug] ota: Already up to date\n[2026-08-29T22:34:16.910Z] [debug] ota: boot check result = noUpdate\n[2026-08-29T22:34:16.970Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-08-29T22:34:16.971Z] [debug] voice: bundled idle\n[2026-08-29T23:16:33.910Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a04ee2-5fc8-7d83-9e47-112f06157700\n[2026-08-29T23:16:33.910Z] [debug] ota: Checking\u2026\n[2026-08-29T23:16:33.969Z] [debug] ota: Already up to date\n[2026-08-29T23:16:33.969Z] [debug] ota: boot check result = noUpdate\n",
+      "[2026-08-29T23:16:34.020Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-29T23:16:34.020Z] [debug] voice: bundled idle\n[2026-08-29T23:16:41.027Z] [debug] OTA session start: 2026-08-29-1547-the-conversation-holds-the-floor.\n[2026-08-29T23:16:41.027Z] [world] You step back into Reclaimer's Stake. The world waits for your move.\n",
+      "[2026-08-29T23:16:41.029Z] [arbiter] The Arbiter looks up as you return. \"Welcome back, Cheddar Bob. I wondered when you'd take up the thread again. The waste did not sleep while you were gone \u2014 blood was spilled and ground changed hands. Read the World for the account.\"\n",
+      "[2026-08-29T23:16:41.263Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-29T23:16:41.261Z \u00b7 build 2026-08-29-1547-the-conversation-holds-the-floor \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-08-29T23:16:41.694Z] [debug] send-log: crash on record (2026-08-29T22:34:17.576Z) \u2014 game log pushed automatically, delivered to Sentry, kept on disk as #mtf02dl2fokn\n[2026-08-29T23:16:53.483Z] [debug] voice: bundled loading\n",
+      "[2026-08-29T23:16:56.881Z] [debug] voice: bundled ready\n[2026-08-29T23:17:00.312Z] [debug] voice\u23f1 gap 960ms (wait 0ms + synth 955ms, live) \"Welcome to tar taireeuh.\"\n[2026-08-29T23:17:05.444Z] [debug] voice\u23f1 gap 4479ms (wait 0ms + synth 0ms, cached) \"Welcome to tar taireeuh.\"\n[2026-08-29T23:17:11.069Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-29T23:17:12.637Z] [world] You salvage the banner. The take is small but real.\n[2026-08-29T23:17:12.637Z] [world] You lever something loose from the reclaimer stake \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n[2026-08-29T23:17:12.638Z] [world] You salvage the rubble. The take is small but real.\n",
+      "[2026-08-29T23:17:12.638Z] [world] You strip the stone marker carefully. Something usable comes free in your hand.\n[2026-08-29T23:17:12.638Z] [reward] \u2726 Salvage haul:\n[2026-08-29T23:17:12.639Z] [reward]     \u2022 Worn Tartarian Coin x2 (Common)\n[2026-08-29T23:17:12.639Z] [reward]     \u2022 Coiled Snare Thread (Common)\n[2026-08-29T23:17:12.639Z] [reward]     \u2022 Scrap Metal x3 (Common)\n",
+      "[2026-08-29T23:17:12.639Z] [reward]     \u2022 Mud Fragment x2 (Common)\n[2026-08-29T23:17:15.019Z] [debug] ui: tap \"investigate\"\n[2026-08-29T23:17:16.767Z] [player] investigate footprint\n[2026-08-29T23:17:16.767Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=footprint resolved=footprint range=- enemies=0 hooks=1\n",
+      "[2026-08-29T23:17:16.768Z] [world] The footprint sits the way ordinary things sit. The Arbiter does not lean in. You move on.\n[2026-08-29T23:17:16.770Z] [world] A Mud Monarchs war party crests the rise \u2014 2 of them, blades already out. They've marked you for standing with the Reclaimers Guild.\n",
+      "[2026-08-29T23:17:16.770Z] [arbiter] \"The Mud Monarchs do not forgive a friend of the Reclaimers Guild,\" the Arbiter murmurs. \"Stand, or run \u2014 but decide now.\"\n[2026-08-29T23:17:16.914Z] [cognitive] neutral  (144ms)\n[2026-08-29T23:17:17.718Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-08-29T23:17:20.396Z] [debug] ui: tap \"approach\"\n",
+      "[2026-08-29T23:17:20.439Z] [player] approach Mud Monarchs Raider 1\n[2026-08-29T23:17:20.441Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud monarchs raider 1 resolved=Mud Monarchs Raider 1 range=close enemies=2 hooks=1\n[2026-08-29T23:17:20.446Z] [debug] move: advance from range=close enemies=2 weather=Ash Storm cost=1 partial=0\n",
+      "[2026-08-29T23:17:20.446Z] [world] You are already at close / arm's reach with the Mud Monarchs Raider 1 and Mud Monarchs Raider 2.\n[2026-08-29T23:17:20.447Z] [debug] arbiter: template (reason=combat)\n[2026-08-29T23:17:20.447Z] [arbiter] The Arbiter watches the Mud Monarchs Raider 1. \"It is not the first thing here that decided to keep its distance, then changed its mind.\"\n",
+      "[2026-08-29T23:17:20.580Z] [cognitive] neutral  (131ms)\n[2026-08-29T23:17:22.813Z] [debug] ui: tap \"off: earthshaker\"\n[2026-08-29T23:17:22.854Z] [player] attack with the off-hand earthshaker\n[2026-08-29T23:17:22.854Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand earthshaker resolved=Earthshaker range=close enemies=2 hooks=1\n",
+      "[2026-08-29T23:17:22.855Z] [debug] attack: target=Mud Monarchs Raider 1 range=close reach.bands=[distant,far,mid,close] reach.label=Earthshaker bareHand=false\n[2026-08-29T23:17:22.856Z] [arbiter] Ash Storm hangs between you. \"\u22121 to the swing \u2014 see what you can,\" the Arbiter says.\n[2026-08-29T23:17:22.858Z] [debug] attack: visibility penalty \u22121 (Ash Storm)\n",
+      "[2026-08-29T23:17:22.878Z] [world] You bring the earthshaker to bear on Mud Monarchs Raider 1.\n[2026-08-29T23:17:22.878Z] [system] \u23f3 Time passed: 6 min\n[2026-08-29T23:17:23.003Z] [cognitive] AGGRESSION \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (124ms)\n[2026-08-29T23:17:35.436Z] [world] You seize the initiative. Mud Monarchs Raider 1 has no time to react.\n",
+      "[2026-08-29T23:17:35.437Z] [combat] You \u2014 d20 \u2192 10 + INT 12 \u2212 1 (Ash Storm) + 2 (point blank) = 23 vs Mud Monarchs Raider 1 AC 9 \u2014 \u2713 HIT\n[2026-08-29T23:17:35.438Z] [combat] Bludgeoning flares \u2014 +3 on hit.\n[2026-08-29T23:17:35.438Z] [combat] The blow with the earthshaker finds purchase \u2014 9 damage, 10 HP standing. Mud Monarchs Raider 1 commits to the counter.\n",
+      "[2026-08-29T23:17:35.439Z] [combat] Mud Monarchs Raider 1 is left exposed \u2014 easier to hit.\n[2026-08-29T23:17:35.444Z] [combat] Mud Monarchs Raider 1 \u2014 d20 \u2192 3 + ATK 5 = 8 vs your AC 19 \u2014 \u2717 MISS\n[2026-08-29T23:17:35.446Z] [combat] Mud Monarchs Raider 2 \u2014 d20 \u2192 1 + ATK 8 = 9 vs your AC 19 \u2014 \u2717 FUMBLE\n[2026-08-29T23:17:36.865Z] [debug] ui: tap \"off: earthshaker\"\n",
+      "[2026-08-29T23:17:36.907Z] [player] attack with the off-hand earthshaker\n[2026-08-29T23:17:36.908Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand earthshaker resolved=Earthshaker range=close enemies=2 hooks=1\n[2026-08-29T23:17:36.909Z] [debug] attack: target=Mud Monarchs Raider 1 range=close reach.bands=[distant,far,mid,close] reach.label=Earthshaker bareHand=false\n",
+      "[2026-08-29T23:17:36.909Z] [debug] attack: visibility penalty \u22121 (Ash Storm)\n[2026-08-29T23:17:36.929Z] [world] You raise the earthshaker toward Mud Monarchs Raider 1. The room narrows around the both of you.\n[2026-08-29T23:17:36.930Z] [system] \u23f3 Time passed: 6 min\n[2026-08-29T23:17:37.038Z] [cognitive] AGGRESSION \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 THROW  (107ms)\n",
+      "[2026-08-29T23:17:41.456Z] [world] Mud Monarchs Raider 1 moves first. The pressure is immediate.\n[2026-08-29T23:17:41.458Z] [combat] Mud Monarchs Raider 2 \u2014 d20 \u2192 9 + ATK 6 = 15 vs your AC 19 \u2014 \u2717 MISS\n[2026-08-29T23:17:41.459Z] [combat] Mud Monarchs Raider 1 \u2014 d20 \u2192 17 + ATK 5 = 22 vs your AC 19 \u2014 \u2713 HIT\n",
+      "[2026-08-29T23:17:41.460Z] [combat] You \u2014 d20 \u2192 10 + INT 12 \u2212 1 (Ash Storm) + 2 (point blank) = 23 vs Mud Monarchs Raider 1 AC 9 \u2014 \u2713 HIT\n[2026-08-29T23:17:41.461Z] [combat] Your strike with the earthshaker lands for 2. Mud Monarchs Raider 1 staggers \u2014 8 HP remaining. It answers.\n[2026-08-2"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-30-1553-glyph-glyph-name-star #mtf482aclxul [inline 13/24]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtf482aclxul"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "13"
+    },
+    {
+      "key": "parts",
+      "value": "24"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+      "query": "user.ip:\"2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-30T01:14:53.223353Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-30T01:14:53.695000Z",
+  "fingerprints": [
+    "c137ae228baf9f502d72cd2165ea9978"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "5d5657fe8f63493faecb98901d091cdd",
+  "previousEventID": "490fd882a5534be7a7a2c312c9cb69df"
+}

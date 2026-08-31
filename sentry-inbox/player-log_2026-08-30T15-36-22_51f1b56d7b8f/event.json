@@ -1,0 +1,246 @@
+{
+  "id": "51f1b56d7b8f4a8787f88c836b531210",
+  "groupID": "7700811178",
+  "eventID": "51f1b56d7b8f4a8787f88c836b531210",
+  "projectID": "4511945117532160",
+  "size": 17386,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-30-1568-one-string-two-fonts #mtfva3flr9ic [inline 12/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": null,
+  "message": "player-log 2026-08-30-1568-one-string-two-fonts #mtfva3flr9ic [inline 12/28]",
+  "title": "player-log 2026-08-30-1568-one-string-two-fonts #mtfva3flr9ic [inline 12/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Trafford",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "92f988728f4940798659c2ad5e77600a",
+      "span_id": "a2cdde7ddf9d4150",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "s hand over your pack. \"Before I touch the Reclaimer's Scrapplate \u2014 1 piece of this is Crucible stock: Copper-Threaded Veil. Say the word and I'll set it aside instead.\"\n[2026-08-30T01:59:44.160Z] [arbiter] The Arbiter sets it aside on the bench. \"\u2665 Held for the Crucible: Copper-Threaded Veil. I'll not touch it.\"\n",
+      "[2026-08-30T01:59:44.442Z] [debug] persist sizes(KB): total=162 player=32 wm=44[rooms=17 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=81 scene=5\n[2026-08-30T01:59:51.279Z] [world] You repair the Bone Knife. Back to full. (spent: Scrap Metal x4, Stick x2)\n[2026-08-30T01:59:51.314Z] [arbiter] The Arbiter eyes the Bone Knife. \"Short on stock: Stick 2 short. Gather, then return.\"\n",
+      "[2026-08-30T01:59:51.315Z] [arbiter] The Arbiter eyes the Bone Knife. \"Short on stock: Stick 2 short. Gather, then return.\"\n[2026-08-30T01:59:51.315Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter eyes the Bone Knife. \"Short on stock: Stick 2 sh\u2026\"\n[2026-08-30T01:59:51.315Z] [arbiter] The Arbiter eyes the Cudgel. \"Short on stock: Stick 2 short. Gather, then return.\"\n",
+      "[2026-08-30T01:59:51.315Z] [arbiter] The Arbiter eyes the Cudgel. \"Short on stock: Stick 2 short. Gather, then return.\"\n[2026-08-30T01:59:51.315Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter eyes the Cudgel. \"Short on stock: Stick 2 short.\u2026\"\n[2026-08-30T01:59:51.316Z] [arbiter] The Arbiter eyes the Cudgel. \"Short on stock: Stick 2 short. Gather, then return.\"\n",
+      "[2026-08-30T01:59:51.316Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter eyes the Cudgel. \"Short on stock: Stick 2 short.\u2026\"\n[2026-08-30T01:59:51.316Z] [arbiter] The Arbiter eyes the Cudgel. \"Short on stock: Stick 2 short. Gather, then return.\"\n[2026-08-30T01:59:51.316Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter eyes the Cudgel. \"Short on stock: Stick 2 short.\u2026\"\n",
+      "[2026-08-30T01:59:51.316Z] [arbiter] The Arbiter eyes the Earthshaker. \"Short on stock: Stick 2 short. Gather, then return.\"\n[2026-08-30T01:59:51.504Z] [debug] homework: intro-fill armed after 20000ms idle\n",
+      "[2026-08-30T01:59:55.678Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 4152ms read/write unusable (native mis-reported 48197ms/1037ms \u2014 llama.rn split bug, not this call) in 729t\u2192out 33t HIT-CAP (148ch)\n[2026-08-30T01:59:55.685Z] [debug] homework: scene_intro \"The Monarch's Waystation\" \u2713 4181ms\n[2026-08-30T02:00:10.323Z] [debug] appstate: active \u2192 background (was active for 209039ms)\n",
+      "[2026-08-30T02:03:29.105Z] [debug] appstate: background \u2192 active (was background for 198778ms)\n[2026-08-30T02:03:29.128Z] [debug] homework: intro-fill armed after 20000ms idle\n[2026-08-30T02:03:31.754Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 2512ms read 0ms/write 2371ms in 729t\u2192out 34t HIT-CAP (141ch)\n",
+      "[2026-08-30T02:03:31.763Z] [debug] homework: scene_intro \"The Monarch's Waystation\" \u2713 2636ms\n[2026-08-30T02:03:37.040Z] [debug] appstate: active \u2192 background (was active for 7939ms)\n[2026-08-30T02:14:38.979Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a05050-a87c-7218-acf2-c163fbaab18d\n[2026-08-30T02:14:38.979Z] [debug] ota: Checking\u2026\n",
+      "[2026-08-30T02:14:39.188Z] [debug] ota: Already up to date\n[2026-08-30T02:14:39.189Z] [debug] ota: boot check result = noUpdate\n[2026-08-30T02:14:39.228Z] [debug] voice: engine=bundled tts=on voice=am_michael\n[2026-08-30T02:14:39.228Z] [debug] voice: bundled loading\n[2026-08-30T02:14:39.647Z] [debug] send-log: bundle #mtf5ivgldrkj attempt 2/5 delivered to Sentry\n",
+      "[2026-08-30T02:14:42.597Z] [debug] voice: bundled ready\n[2026-08-30T02:14:43.557Z] [debug] voice\u23f1 gap 909ms (wait 120ms + synth 785ms, live) \"Choose your character.\"\n[2026-08-30T03:05:57.812Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a05050-a87c-7218-acf2-c163fbaab18d\n[2026-08-30T03:05:57.812Z] [debug] ota: Checking\u2026\n",
+      "[2026-08-30T03:05:58.798Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-08-30T03:05:58.889Z] [debug] ota: Saving progress\u2026\n[2026-08-30T03:05:58.889Z] [debug] ota: Restarting to apply\u2026\n[2026-08-30T03:05:59.113Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a05082-acd1-7f98-a167-7337425a9d23\n[2026-08-30T03:05:59.113Z] [debug] ota: Checking\u2026\n",
+      "[2026-08-30T03:05:59.217Z] [debug] ota: Already up to date\n[2026-08-30T03:05:59.217Z] [debug] ota: boot check result = noUpdate\n[2026-08-30T03:05:59.299Z] [debug] voice: engine=bundled tts=on voice=am_michael\n[2026-08-30T03:05:59.299Z] [debug] voice: bundled loading\n[2026-08-30T03:06:00.072Z] [debug] send-log: bundle #mtf5ivgldrkj attempt 3/5 delivered to Sentry\n",
+      "[2026-08-30T03:06:03.379Z] [debug] voice: bundled ready\n[2026-08-30T03:06:04.449Z] [debug] voice\u23f1 gap 1000ms (wait 91ms + synth 908ms, live) \"Choose your character.\"\n[2026-08-30T08:00:31.920Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a05082-acd1-7f98-a167-7337425a9d23\n[2026-08-30T08:00:31.920Z] [debug] ota: Checking\u2026\n",
+      "[2026-08-30T08:00:32.881Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-08-30T08:00:32.964Z] [debug] ota: Saving progress\u2026\n[2026-08-30T08:00:32.965Z] [debug] ota: Restarting to apply\u2026\n[2026-08-30T08:00:33.166Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a0519a-4004-721b-9fe4-870844f60b85\n[2026-08-30T08:00:33.167Z] [debug] ota: Checking\u2026\n",
+      "[2026-08-30T08:00:33.277Z] [debug] ota: Already up to date\n[2026-08-30T08:00:33.277Z] [debug] ota: boot check result = noUpdate\n[2026-08-30T08:00:33.312Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-30T08:00:33.313Z] [debug] voice: bundled idle\n[2026-08-30T08:00:33.708Z] [debug] send-log: bundle #mtf5ivgldrkj attempt 4/5 delivered to Sentry\n",
+      "[2026-08-30T08:00:37.634Z] [debug] OTA applied: 2026-08-30-1559-the-coating-ladder-means-something \u2192 2026-08-30-1566-the-first-one-is-the-one-that-counts.\n[2026-08-30T08:00:37.634Z] [debug] OTA session start: 2026-08-30-1566-the-first-one-is-the-one-that-counts.\n[2026-08-30T08:00:37.635Z] [world] You step back into The Monarch's Waystation. The world waits for your move.\n",
+      "[2026-08-30T08:00:37.637Z] [arbiter] The Arbiter meets your eyes. \"Welcome back, Cheddar Bob. The buried country is no place to walk alone. The waste did not sleep while you were gone \u2014 blood was spilled and ground changed hands. Read the World for the account.\"\n[2026-08-30T08:00:37.637Z] [debug] dog: rescue amnesty applied at load \u2014 no active companion, quest gates reopened\n",
+      "[2026-08-30T08:00:37.955Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-30T08:00:37.952Z \u00b7 build 2026-08-30-1566-the-first-one-is-the-one-that-counts \u00b7 updated from 2026-08-30-1559-the-coating-ladder-means-something \u00b7 previous entry moments earlier \u2550\u2550\u2550\n",
+      "[2026-08-30T08:00:38.480Z] [debug] send-log: crash on record (2026-08-30T03:06:04.800Z) \u2014 game log pushed automatically, delivered to Sentry, kept on disk as #mtfis6air29i\n[2026-08-30T08:00:40.830Z] [debug] ui: tap \"take / salvage\"\n[2026-08-30T08:00:42.182Z] [world] You break the scope stand apart. Among the pieces, something worth keeping.\n",
+      "[2026-08-30T08:00:42.182Z] [world] You salvage the spent flare. The take is small but real.\n[2026-08-30T08:00:42.182Z] [reward] \u2726 Salvage haul:\n[2026-08-30T08:00:42.182Z] [reward]     \u2022 Automaton Circuit (Common)\n[2026-08-30T08:00:42.183Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-08-30T08:00:43.280Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:00:45.064Z] [player] investigate the mud\n",
+      "[2026-08-30T08:00:45.065Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=mud range=- enemies=0 hooks=0\n[2026-08-30T08:00:45.065Z] [world] You crouch beside the mud. The silt has half-swallowed it.\n",
+      "[2026-08-30T08:00:45.065Z] [world] The mud carries the same blue-mud crust every relic-age artifact wears down here. Six inches of silt accreted since the flood last raised the seas.\n[2026-08-30T08:00:45.066Z] [world] Your study of the mud draws your eye to something past it \u2014 A wagon, abandoned and broken-axled, leans into the mud ahead.\n",
+      "[2026-08-30T08:00:45.066Z] [world] Mud Scanner reads flat. Nothing in the mud.\n[2026-08-30T08:00:45.067Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-08-30T08:00:45.067Z] [arbiter] The Arbiter watches. \"I saw the way you came at that.\"\n[2026-08-30T08:00:45.163Z] [cognitive] SWIM  (95ms)\n[2026-08-30T08:00:45.981Z] [debug] ui: tap \"\u2192 GREAT TARTARY PLAINS\"\n",
+      "[2026-08-30T08:00:45.994Z] [world] You walk east. You arrive at Dynasty Border Post.\n[2026-08-30T08:00:45.995Z] [debug] scene: loc=dynasty_border_post hub=- arrival=y opening=n passing=y\n[2026-08-30T08:00:46.043Z] [debug] spawn: gear=[Aetherium Spear, Bonebreaker Mace, Mud Shell] window=10 roster=new\n",
+      "[2026-08-30T08:00:46.057Z] [world] You've left The Monarch's Waystation and entered Dynasty Border Post. The garrison lamps are kept lit around the clock. The Dynasty does not explain to the dark. It's night. Nobody else is in sight. east leads to Tartarian Pilgrim Camp; south leads to Samarran; west leads to The Monarch's Waystation. Nothing named to the north.\n",
+      "[2026-08-30T08:00:46.057Z] [system] Weather effect \u2014 Iron Fog: -1 DEX\n[2026-08-30T08:00:46.059Z] [world] [Dynasty Border Post] north: the Silt Thief (19 tiles, 2 days) \u00b7 east: Tartarian Pilgrim Camp (4 tiles, 10 hours) \u00b7 south: Samarran (6 tiles, 15 hours) \u00b7 west: The Monarch's Waystation (4 tiles, 10 hours)\n",
+      "[2026-08-30T08:00:46.059Z] [world] A circular Tartarian vault door, mud-pasted but intact, lies recessed into the slope. The locking glyphs are dim \u2014 but not gone.\n[2026-08-30T08:00:46.063Z] [world] You wake facing down-slope again \u2014 third night running, bedroll dragged a hand's width in your sleep, your palm flat against the ground like an ear. The hum is quieter than it was above. Not weaker. Qu",
+      "ieter, the way a voice goes quiet when it no longer has to shout across a distance.\n[2026-08-30T08:00:46.064Z] [arbiter] The Arbiter falls into step without being asked. \"I do not walk with everyone who comes down. Understand that I have not decided anything yet.\"\n[2026-08-30T08:00:46.191Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n",
+      "[2026-08-30T08:00:46.299Z] [player] investigate ledge\n[2026-08-30T08:00:46.300Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ledge resolved=- range=- enemies=0 hooks=1\n[2026-08-30T08:00:46.407Z] [cognitive] JUMP \u00b7 SEARCH \u00b7 CLIMB \u00b7 DISENGAGE  (104ms)\n",
+      "[2026-08-30T08:00:46.895Z] [arbiter] The Arbiter tilts their head. \"I do not see a 'ledge' here. Choose words carefully \u2014 try: vault, door, Aetherium Spear, Bonebreaker Mace, Mud Shell, shallow pool.\"\n[2026-08-30T08:00:47.531Z] [world] Iron fog disorients you. Compasses spin; intent costs more.\n[2026-08-30T08:00:47.578Z] [player] investigate charcoal sketches\n",
+      "[2026-08-30T08:00:47.578Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=charcoal sketches resolved=- range=- enemies=0 hooks=1\n[2026-08-30T08:00:47.583Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-30T08:00:47.583Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-08-30T08:00:47.692Z] [arbiter] The Arbiter tilts their head. \"I do not see a 'charcoal sketches' here. Choose words carefully \u2014 try: vault, door, Aetherium Spear, Bonebreaker Mace, Mud Shell, shallow pool.\"\n[2026-08-30T08:00:47.791Z] [cognitive] SEARCH  (207ms)\n[2026-08-30T08:00:58.198Z] [debug] homework: intro-fill armed after 6000ms idle\n",
+      "[2026-08-30T08:01:00.245Z] [debug] ui: tap \"\u2605 Take & wield Mud Shell \u2014 your off hand is free\"\n[2026-08-30T08:01:00.251Z] [world] You take the Mud Shell from where it lay.\n[2026-08-30T08:01:00.251Z] [reward] \u2726 Mud Shell (Common).\n[2026-08-30T08:01:00.262Z] [debug] take&wear: equipping \"Mud Shell\" -> off\n",
+      "[2026-08-30T08:01:00.309Z] [debug] stats: STR5 DEX16 INT12 WIS4 CHA2 STE6 | gear: DEX+10,INT+3,STR+2,STE+3 | worn: main=Cudgel off=Mud Shell head=Forgotten Seeker's Mask chest=Reclaimer's Scrapplate hands=Wanderer's Worn Gauntlets legs=Aetheric Scout Greaves feet=Wanderer's Footwraps cloak=Reclaimer's Cloak ring=Light-Finger Guild Band\n[2026-08-30T08:01:07.206Z] [debug] ui: tap \"more \u25b8\"\n",
+      "[2026-08-30T08:01:07.339Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 9013ms read 7820ms/write 1118ms in 722t\u2192out 33t 10.8ms/t HIT-CAP (163ch)\n[2026-08-30T08:01:07.438Z] [debug] homework: scene_intro \"Dynasty Border Post\" \u2713 9241ms\n[2026-08-30T08:01:09.965Z] [debug] ui: tap \"inventory\"\n",
+      "[2026-08-30T08:01:17.845Z] [debug] qwen\u23f1 item_synthesis_hw ok 4607ms read 3497ms/write 1012ms in 334t\u2192out 31t 10.5ms/t (131ch)\n[2026-08-30T08:01:17.954Z] [debug] homework: item_desc \"Wanderer's Footwraps\" \u2713 4722ms\n[2026-08-30T08:01:22.253Z] [debug] ui: tap \"take / salvage\"\n[2026-08-30T08:01:23.923Z] [world] You pick up the Aetherium Spear.\n",
+      "[2026-08-30T08:01:23.925Z] [reward] \u2726 Aetherium Spear (Common).\n[2026-08-30T08:01:23.939Z] [world] You lift the Bonebreaker Mace clear.\n[2026-08-30T08:01:23.940Z] [reward] \u2726 Bonebreaker Mace (Common).\n[2026-08-30T08:01:24.158Z] [debug] persist sizes(KB): total=163 player=35 wm=44[rooms=17 events=1 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=81 scene=2\n",
+      "[2026-08-30T08:01:25.297Z] [world] You get a hand under the Scrap Metal and take it.\n[2026-08-30T08:01:25.298Z] [reward] \u2726 Scrap Metal (Common).\n[2026-08-30T08:01:26.659Z] [world] You work the banner over. A part of it comes loose, intact.\n[2026-08-30T08:01:26.659Z] [world] You salvage the cart. The take is small but real.\n",
+      "[Filtered]",
+      "[Filtered]",
+      "[2026-08-30T08:01:26.661Z] [reward] \u2726 Salvage haul:\n[2026-08-30T08:01:26.661Z] [reward]     \u2022 Worn Tartarian Coin x11 (Common)\n[2026-08-30T08:01:26.661Z] [reward]     \u2022 Bent Nail x2 (Common)\n[2026-08-30T08:01:26.662Z] [reward]     \u2022 Salt-Cured Dowel (Common)\n[2026-08-30T08:01:26.662Z] [reward]     \u2022 Smooth Stone (Common)\n[2026-08-30T08:01:26.662Z] [reward]     \u2022 Obsidian Chip (Common)\n",
+      "[2026-08-30T08:01:26.662Z] [reward]     \u2022 Cloth Scrap (Common)\n[2026-08-30T08:01:27.771Z] [debug] ui: tap \"investigate\"\n[2026-08-30T08:01:29.299Z] [player] investigate shallow pool\n[2026-08-30T08:01:29.300Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=shallow pool resolved=shallow pool range=- enemies=0 hooks=1\n",
+      "[2026-08-30T08:01:29.301Z] [world] You look the shallow pool over. Nothing about it sings, nothing about it warns \u2014 Tartaria is full of things waiting to b"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-30-1568-one-string-two-fonts #mtfva3flr9ic [inline 12/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtfva3flr9ic"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "12"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad",
+      "query": "user.ip:\"2607:fb90:db9c:9d4f:ad2:ae57:4dd4:8aad\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-30T15:36:21.957000Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "39": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 289,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        },
+        "40": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 387,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-30T15:36:22.808000Z",
+  "fingerprints": [
+    "e1071513e990170768dca90bece93c8f"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": null,
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "52bc58a678c9443782653520903bb417",
+  "previousEventID": "4e4e2ebb351b412fab6a14e8bde07946"
+}
