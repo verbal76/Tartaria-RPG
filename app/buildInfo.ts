@@ -26245,7 +26245,34 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // jaw-marked in the old sign" - good prose a player could not connect to the name
 // in the combat log, which is the very class 1576 was filed for surviving inside
 // 1576's own fix. Both say the species out loud now without losing the voice.
-export const OTA_BUILD_ID = '2026-08-31-1584-the-report-stops-crying-wolf';
+// OTA-1585 - "CORE" HIDING INSIDE "GEODE-CORED".
+//
+// From the 4.32.11 log, in Nimari - a Lost Capital, so "core" is a scene noun -
+// mid-fight with the Guardian:
+//
+//   [player] attack with the reclaimers guild geode-cored cleaver
+//   parser: intent=attack ... target=reclaimers guild geode cored cleaver
+//           resolved=core range=close enemies=1
+//   [arbiter] "That is the Tartarian Core. It does not come out with that hand"
+//
+// He tapped his weapon. Twice. Both taps were swallowed by a main-quest lecture
+// while a boss stood in front of him. The identical command had resolved
+// correctly one tile earlier, because "core" is not a scene noun out on the
+// Plains - which is exactly what made this look like a mission bug.
+//
+// THE CAUSE: the parser's ambient pre-pass compared with a RAW SUBSTRING, so
+// "core" matched inside "geode COREd". Winning that pre-pass skips resolveItem
+// entirely, so the weapon was never resolved and resolvedNoun came back as the
+// Core. The main-quest guard reads resolvedNoun, correctly, and did its job on
+// a lie.
+//
+// AND THE FIX ALREADY EXISTED, ONE FUNCTION AWAY. OTA-947 tore this exact
+// comparison down to word level inside matchAmbientNoun, with a note about
+// "arch" hiding inside "research chart" - the same bug, found once, fixed once,
+// and never propagated to the parser's private copy of the same logic. The copy
+// is deleted rather than patched. Two implementations of one question is one
+// implementation plus a time bomb.
+export const OTA_BUILD_ID = '2026-08-31-1585-the-core-inside-the-cleaver';
 // golem catch-up 2026-08-31: markerless publish of OTA-1584 — the gap report's
 // last two sections stop firing at fourteen stages that were never defects, the
 // epilogue class gets a hard mid-chain guard, and the two false summits name the

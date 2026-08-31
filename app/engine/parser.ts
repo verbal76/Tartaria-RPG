@@ -3,7 +3,7 @@ import { levenshtein } from './editDistance';
 import { FILLER_DESCRIPTORS } from './fillerWords';
 import { frameFor } from './verbFrames';
 import { validateParse, shouldRejectParse, META_TALK_REGEX } from './parseValidator';
-import { normalizeForCompare } from './ambientNouns';
+import { normalizeForCompare, matchAmbientNoun } from './ambientNouns';
 
 // Verb pools. Goal of 10 synonyms per intent for natural-language
 // robustness — the player can phrase the same intent ten ways and the
@@ -1398,38 +1398,35 @@ export function parseInput(raw: string, context: ParseContext = {}): ParsedInput
   // whitespace differences match. Without this, the parser's
   // hyphen-stripping tokenizer breaks every curated noun that
   // includes a hyphen ("dust-buried", "salt-crusted", "half-buried").
+  // ⚠⚠⚠ OTA-1585 — THIS PRE-PASS WAS A RAW SUBSTRING TEST AND IT ATE THE OWNER'S
+  // ATTACKS IN THE MIDDLE OF A GUARDIAN FIGHT. From his 4.32.11 log, in Nimari,
+  // a Lost Capital where "core" is a scene noun:
+  //
+  //   [player] attack with the reclaimers guild geode-cored cleaver
+  //   parser: intent=attack ... target=reclaimers guild geode cored cleaver
+  //           resolved=core
+  //   [arbiter] "That is the Tartarian Core. It does not come out with that hand"
+  //
+  // `targetPhraseNorm.includes(nNorm)` found "core" inside "geode COREd", so the
+  // ambient pre-pass claimed the phrase, `resolveItem` was skipped entirely, and
+  // the main-quest Core guard swallowed the swing. He tapped his weapon twice
+  // mid-boss and got a lecture about the Core both times. The identical command
+  // had resolved correctly one tile earlier, because "core" is not a scene noun
+  // out on the Plains.
+  //
+  // ⚠⚠ AND THE FIX ALREADY EXISTED, ONE FUNCTION AWAY. OTA-947 rebuilt exactly
+  // this comparison at the WORD level inside `matchAmbientNoun`, with a note
+  // about "arch" hiding inside "research chart" — the same bug, found once,
+  // fixed once, and never propagated to the parser's own private copy. So the
+  // copy is deleted rather than patched: the pre-pass now calls the function
+  // that solved it. Exact-match-first, whole-word containment, prefix shorthand
+  // ("hatch" still finds the "drain hatch") — all of it, from one place.
   const targetPhraseRaw = targetTokens.join(' ').toLowerCase().trim();
   const targetPhraseNorm = normalizeForCompare(targetPhraseRaw);
-  const ambientCandidates = (context.ambientNouns ?? [])
-    .slice()
-    .sort((a, b) => b.length - a.length);
-  let ambientStrongMatch: string | undefined;
-  if (targetPhraseNorm && !enemyHit) {
-    // 2026-05-25 — exact-equality pre-pass. Without this, a target
-    // typed as a short noun ('rope') would resolve to a LONGER
-    // ambient that contains it ('rope coil') because the length-DESC
-    // sort hits the long one first and the OR'd `nNorm.includes(target)`
-    // matches before we get a chance to see the exact 'rope'. Pre-pass
-    // ensures the player's literal phrase always wins when present.
-    for (const n of ambientCandidates) {
-      if (normalizeForCompare(n) === targetPhraseNorm) {
-        ambientStrongMatch = n;
-        break;
-      }
-    }
-    if (!ambientStrongMatch) {
-      for (const n of ambientCandidates) {
-        const nNorm = normalizeForCompare(n);
-        if (
-          targetPhraseNorm.includes(nNorm) ||
-          nNorm.includes(targetPhraseNorm)
-        ) {
-          ambientStrongMatch = n;
-          break;
-        }
-      }
-    }
-  }
+  const ambientStrongMatch: string | undefined =
+    targetPhraseNorm && !enemyHit
+      ? matchAmbientNoun(targetPhraseRaw, context.ambientNouns ?? []) ?? undefined
+      : undefined;
   const item = enemyHit || ambientStrongMatch
     ? undefined
     : resolveItem(targetTokens, inventory, context.equippedOffHand ?? null);
