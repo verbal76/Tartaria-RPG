@@ -1,0 +1,258 @@
+{
+  "id": "5e7d9d7def154552ac992ee0fa80ab61",
+  "groupID": "7703230798",
+  "eventID": "5e7d9d7def154552ac992ee0fa80ab61",
+  "projectID": "4511945117532160",
+  "size": 17987,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-31-1594-the-pinch-demands-the-lift #mthq364gh205 [inline 14/24]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-08-31-1594-the-pinch-demands-the-lift",
+  "message": "player-log 2026-08-31-1594-the-pinch-demands-the-lift #mthq364gh205 [inline 14/24]",
+  "title": "player-log 2026-08-31-1594-the-pinch-demands-the-lift #mthq364gh205 [inline 14/24]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "c85e2d2ae09d416f9dad31f645d9f291",
+      "span_id": "bbf9aa35f44894e8",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      ":02:49.939Z \u00b7 FOLLOWED AN OTA APPLY 167ms ago via boot-front \u00b7 prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)\n[2026-08-31T16:02:57.858Z] [debug] ui: tap \"more \u25b8\"\n[2026-08-31T16:02:59.276Z] [debug] ui: tap \"missions\"\n[2026-08-31T16:03:04.679Z] [world] Deactivated Silence the Doubter. It stays on your slate but won't advance until you re-activate it.\n",
+      "[2026-08-31T16:35:46.202Z] [world] Now on Pinch from the Monarchs. It's the contract you're running.\n[2026-08-31T16:35:46.232Z] [world] You set course for Reclaimer's Stake. 17 tiles \u2014 about 1 day, 19 hours of travel, all in. You set off now \u2014 the ground ahead is new ground. Keep tapping \u2192 RECLAIMER'S STAKE on the travel row to close the distance; STOP TRAVEL to halt.\n",
+      "[2026-08-31T16:35:46.268Z] [debug] spawn: gear=[Golem-Warden's Legplates, Traveler's Cloak] window=10 roster=new\n[2026-08-31T16:35:46.269Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Vosk Barrowman, wandering trader. Tap the vendor banner to trade.\n",
+      "[2026-08-31T16:35:46.275Z] [world] Rare workings for sale: Aetherforged Mantle (200 TC), Aetherforged Treads (200 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n",
+      "[2026-08-31T16:35:46.275Z] [world] You walk west through open silt. The compass tells you The Buried Cities lies further west \u2014 6 tiles, about 15 hours of travel.\n[2026-08-31T16:35:46.276Z] [world] A thread of cold air leaks from somewhere behind the rubble.\n[2026-08-31T16:35:46.277Z] [world] \u2726 Course set \u2014 Pinch from the Monarchs. Heading to the objective: Reclaimer's Stake.\n",
+      "[2026-08-31T16:35:52.587Z] [debug] ui: tap \"take / salvage\"\n[2026-08-31T16:35:53.874Z] [world] You take the Golem-Warden's Legplates from where it lay.\n[2026-08-31T16:35:53.875Z] [reward] \u2726 Golem-Warden's Legplates (Common).\n[2026-08-31T16:35:53.894Z] [world] You pick up the Traveler's Cloak.\n[2026-08-31T16:35:53.894Z] [reward] \u2726 Traveler's Cloak (Common).\n",
+      "[Filtered]",
+      "[2026-08-31T16:35:55.454Z] [world] You lever something loose from the overturned wagon \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n[2026-08-31T16:35:55.456Z] [world] You salvage the shimmering rift. The take is small but real.\n",
+      "[2026-08-31T16:35:55.456Z] [world] You lever something loose from the well \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n[2026-08-31T16:35:55.456Z] [reward] \u2726 Salvage haul:\n[2026-08-31T16:35:55.456Z] [reward]     \u2022 Horn-Capped Dowel (Common)\n[2026-08-31T16:35:55.457Z] [reward]     \u2022 Coarse Canvas Patch (Common)\n",
+      "[2026-08-31T16:35:55.457Z] [reward]     \u2022 Scrap Metal x3 (Common)\n[2026-08-31T16:35:55.457Z] [reward]     \u2022 Iron-Pinned Plank Shard (Uncommon)\n[2026-08-31T16:35:55.974Z] [debug] persist sizes(KB): total=197 player=50 wm=60[rooms=24 events=3 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=83 scene=3\n[2026-08-31T16:35:56.571Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-08-31T16:35:57.959Z] [system] bleeding fades.\n[2026-08-31T16:35:57.981Z] [player] investigate the ground\n[2026-08-31T16:35:57.981Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n[2026-08-31T16:35:57.984Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n",
+      "[2026-08-31T16:35:57.989Z] [system] \u23f3 Time passed: 24 min\n[2026-08-31T16:35:57.989Z] [arbiter] \"There's coin on the board for a willing blade,\" the Arbiter says. \"Read the World.\"\n[2026-08-31T16:35:58.232Z] [cognitive] CLIMB  (243ms)\n[2026-08-31T16:35:59.090Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-08-31T16:36:00.624Z] [debug] ui: tap \"\u2192 RECLAIMER'S STAKE\"\n",
+      "[2026-08-31T16:36:00.642Z] [debug] spawn: gear=[Tartarian Bone Knife, Rough Hewn Mask] window=10 roster=new\n[2026-08-31T16:36:00.644Z] [combat] The aether under your skin draws something out \u2014 Dust Fiend forms from the haze.\n[2026-08-31T16:36:00.644Z] [world] You walk west through open silt. The compass tells you The Buried Cities lies further west \u2014 5 tiles, about 13 hours of travel.\n",
+      "[2026-08-31T16:36:00.644Z] [world] The thread you were following waits where you left it.\n[2026-08-31T16:36:04.174Z] [debug] ui: tap \"flee\"\n[2026-08-31T16:36:04.181Z] [player] flee\n[2026-08-31T16:36:04.182Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=mid enemies=1 hooks=1\n[2026-08-31T16:36:04.238Z] [system] \u23f3 Time passed: 15 min\n",
+      "[2026-08-31T16:36:04.238Z] [reward] \u2726 The miles have done their work \u2014 you carry the road better than you did. +1 max stamina (now 14). [40 on the odometer]\n[2026-08-31T16:36:04.599Z] [cognitive] FEAR \u00b7 RETREAT \u00b7 HIDE  (360ms)\n[2026-08-31T16:36:05.910Z] [debug] skillcheck: escape d20=17 DEX 23 = 40 vs Pursuit 21 \u2014 Dust Fiend (d20 12 + SPD 9) \u2192 PASS\n",
+      "[2026-08-31T16:36:05.976Z] [debug] stats: STR12 DEX23 INT11 WIS10 CHA3 STE5 | gear: WIS+4,INT+2,STR+6,DEX+15,STE+2 | worn: main=Reclaimers Guild Geode-Cored Cleaver off=Bone Crossbow head=Architect's Sight Enhancer chest=Rough-Hewn Chestplate hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n",
+      "[2026-08-31T16:36:05.976Z] [debug] train: dexterity (escape check) \u2192 progress 66/100\n[2026-08-31T16:36:05.976Z] [world] You break away across the open ground. Behind you the thing you ran from gives up the chase.\n[2026-08-31T16:36:07.358Z] [debug] ui: tap \"\u2192 RECLAIMER'S STAKE\"\n[2026-08-31T16:36:07.429Z] [reward] \u2726 The road teaches you. +1 WIS (base 6, 11 as you stand).\n",
+      "[2026-08-31T16:36:07.430Z] [debug] spawn: gear=[Architect's Mantle, Plasma Dagger] window=10 roster=new\n[2026-08-31T16:36:07.431Z] [world] You walk west through open silt. The compass tells you The Buried Cities lies further west \u2014 4 tiles, about 10 hours of travel.\n[2026-08-31T16:36:07.431Z] [world] What you started here has not finished itself in your absence.\n",
+      "[2026-08-31T16:36:08.393Z] [debug] ui: tap \"take / salvage\"\n[2026-08-31T16:36:09.562Z] [world] You get a hand under the Plasma Dagger and take it.\n[2026-08-31T16:36:09.563Z] [reward] \u2726 Plasma Dagger (Common).\n[2026-08-31T16:36:09.579Z] [world] You claim the Architect's Mantle.\n[2026-08-31T16:36:09.579Z] [reward] \u2726 Architect's Mantle (Common).\n",
+      "[2026-08-31T16:36:10.382Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-08-31T16:36:10.494Z] [reward] \u2726 Found Entry 4 \u2014 the Core \u2014 The Greedy Reclaimer. (open Contracts \u2192 Collectibles to read)\n[2026-08-31T16:36:10.499Z] [reward] \u2726 Found Fifth Inscription \u2014 the prophecy \u2014 The Giant's Watch. (open Contracts \u2192 Collectibles to read)\n",
+      "[2026-08-31T16:36:10.500Z] [world] You strip the fossil rib carefully. Something usable comes free in your hand.\n[2026-08-31T16:36:10.500Z] [world] You crack the glass open. A page slides out \u2014 paper somehow dry, ink somehow still legible.\n[2026-08-31T16:36:10.500Z] [world] You work the snare pit over. A part of it comes loose, intact.\n",
+      "[2026-08-31T16:36:10.500Z] [world] You work the spark stone apart. Tucked inside, sealed against the silt: a folded note.\n[2026-08-31T16:36:10.500Z] [world] You break the wagon wheel apart. Among the pieces, something worth keeping.\n[2026-08-31T16:36:10.500Z] [reward] \u2726 Salvage haul:\n[2026-08-31T16:36:10.500Z] [reward]     \u2022 Worn Tartarian Coin x10 (Common)\n",
+      "[2026-08-31T16:36:10.501Z] [reward]     \u2022 Scrap Metal x5 (Common)\n[2026-08-31T16:36:11.575Z] [debug] ui: tap \"investigate\"\n[2026-08-31T16:36:13.256Z] [player] investigate the ground\n[2026-08-31T16:36:13.257Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-31T16:36:13.262Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Small Rock (Common).\n[2026-08-31T16:36:13.271Z] [system] \u23f3 Time passed: 24 min\n[2026-08-31T16:36:13.451Z] [cognitive] CLIMB  (179ms)\n[2026-08-31T16:36:13.807Z] [debug] persist sizes(KB): total=197 player=51 wm=60[rooms=25 events=3 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=83 scene=3\n",
+      "[2026-08-31T16:36:14.519Z] [player] investigate flat\n[2026-08-31T16:36:14.520Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=flat resolved=flat range=- enemies=0 hooks=1\n[2026-08-31T16:36:14.523Z] [world] You study the flat and find no answer. The silence here is patient; whatever it knew, it has decided to keep.\n[2026-08-31T16:36:14.699Z] [debug] ui: tap \"less \u25be\"\n",
+      "[2026-08-31T16:36:15.776Z] [debug] ui: tap \"more \u25b8\"\n[2026-08-31T16:36:16.244Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 5612ms read 0ms/write 0ms in 738t\u2192out 0t (0ch)\n[2026-08-31T16:36:16.508Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 5612ms \u2014 intro-fill:\u2205\n[2026-08-31T16:36:16.508Z] [debug] homework: scene_intro \"Great Tartary Plains\" \u2205 6126ms\n",
+      "[2026-08-31T16:36:16.615Z] [debug] ui: tap \"craft\"\n[2026-08-31T16:36:16.896Z] [cognitive] neutral  (2370ms)\n[2026-08-31T16:36:19.767Z] [world] You repair the Aether-Walker's Boots. Back to full. (spent: Patched Cloth x4)\n[2026-08-31T16:36:19.796Z] [world] You repair the Architect's Sight Enhancer. Back to full. (spent: Patched Cloth x4)\n",
+      "[2026-08-31T16:36:19.809Z] [world] You repair the Searing Bone Crossbow. Back to full. (spent: Scrap Metal x6, Stick x2)\n[2026-08-31T16:36:19.823Z] [world] You repair the Litany Greaves. Back to full. (spent: Aetheric Shard x10, Aetheric Dust x4, Aetheric Cloth x2)\n[2026-08-31T16:36:19.835Z] [world] You repair the Reclaimer's Cloak. Back to full. (spent: Patched Cloth x4)\n",
+      "[2026-08-31T16:36:19.848Z] [world] You repair the Smoldering Reclaimers Guild Geode-Cored Cleaver. Back to full. (spent: Small Rock x2)\n[2026-08-31T16:36:19.864Z] [world] You repair the Relic Hunter's Gauntlets. Back to full. (spent: Patched Cloth x4)\n[2026-08-31T16:36:19.876Z] [world] You repair the Rough-Hewn Chestplate. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n",
+      "[2026-08-31T16:36:19.889Z] [world] You repair the Bone Knife. Back to full. (spent: Scrap Metal x4, Stick x2)\n[2026-08-31T16:36:19.901Z] [world] You repair the Bone Knife. Back to full. (spent: Scrap Metal x4, Stick x2)\n[2026-08-31T16:36:19.914Z] [world] You repair the Bone Knife. Back to full. (spent: Scrap Metal x4, Stick x2)\n",
+      "[2026-08-31T16:36:19.927Z] [world] You repair the Bone Knife. Back to full. (spent: Scrap Metal x4, Stick x2)\n[2026-08-31T16:36:19.939Z] [world] You repair the Bone Knife. Back to full. (spent: Scrap Metal x4, Stick x2)\n[2026-08-31T16:36:19.966Z] [arbiter] The Arbiter nods. \"Patched in: 2\u00d7 Firewood \u2192 Stick.\"\n",
+      "[2026-08-31T16:36:19.975Z] [world] You repair the Cudgel. Back to full. (spent: Small Rock x4, Stick x2)\n[2026-08-31T16:36:20.001Z] [arbiter] The Arbiter nods. \"Patched in: 2\u00d7 Firewood \u2192 Stick.\"\n[2026-08-31T16:36:20.001Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Patched in: 2\u00d7 Firewood \u2192 Stick.\"\"\n",
+      "[2026-08-31T16:36:20.010Z] [world] You repair the Cudgel. Back to full. (spent: Small Rock x4, Stick x2)\n[2026-08-31T16:36:20.021Z] [arbiter] The Arbiter eyes the Cudgel. \"Short on stock: Stick 2 short. Gather, then return.\"\n[2026-08-31T16:36:20.021Z] [arbiter] The Arbiter eyes the Cudgel. \"Short on stock: Stick 2 short. Gather, then return.\"\n",
+      "[2026-08-31T16:36:20.022Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter eyes the Cudgel. \"Short on stock: Stick 2 short.\u2026\"\n[2026-08-31T16:36:20.022Z] [world] You repair the Forgotten Seeker's Mask. Back to full. (spent: Patched Cloth x6)\n[2026-08-31T16:36:20.034Z] [world] You repair the Mud-Bound Cloak. Back to full. (spent: Patched Cloth x4)\n",
+      "[2026-08-31T16:36:20.046Z] [world] You repair the Mud-Bound Cloak. Back to full. (spent: Patched Cloth x4)\n[2026-08-31T16:36:20.073Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n[2026-08-31T16:36:20.082Z] [world] You repair the Mud-Bound Cloak. Back to full. (spent: Patched Cloth x4)\n",
+      "[2026-08-31T16:36:20.111Z] [arbiter] The Arbiter nods. \"Patched in: 3\u00d7 Cloth Scrap \u2192 Patched Cloth, Spider Silk \u2192 Patched Cloth.\"\n[2026-08-31T16:36:20.121Z] [world] You repair the Mud-Bound Cloak. Back to full. (spent: Patched Cloth x4)\n[2026-08-31T16:36:20.133Z] [arbiter] The Arbiter eyes the Mud-Bound Cloak. \"Short on stock: Patched Cloth 2 short. Gather, then return.\"\n",
+      "[2026-08-31T16:36:20.134Z] [arbiter] The Arbiter eyes the Mud-Bound Cloak. \"Short on stock: Patched Cloth 2 short. Gather, then return.\"\n[2026-08-31T16:36:20.134Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter eyes the Mud-Bound Cloak. \"Short on stock: Patch\u2026\"\n",
+      "[2026-08-31T16:36:20.134Z] [arbiter] The Arbiter eyes the Mud-Bound Cloak. \"Short on stock: Patched Cloth 2 short. Gather, then return.\"\n[2026-08-31T16:36:20.134Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter eyes the Mud-Bound Cloak. \"Short on stock: Patch\u2026\"\n",
+      "[2026-08-31T16:36:20.135Z] [arbiter] The Arbiter eyes the Mud-Warden's Vest. \"Short on stock: Patched Cloth 2 short. Gather, then return.\"\n[2026-08-31T16:36:20.135Z] [arbiter] The Arbiter eyes the Mud-Warden's Vest. \"Short on stock: Patched Cloth 2 short. Gather, then return.\"\n",
+      "[2026-08-31T16:36:20.135Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter eyes the Mud-Warden's Vest. \"Short on stock: Pat\u2026\"\n[2026-08-31T16:36:20.135Z] [arbiter] The Arbiter eyes the Reclaimer's Rope. \"Short on stock: Patched Cloth 2 short. Gather, then return.\"\n",
+      "[2026-08-31T16:36:20.136Z] [arbiter] The Arbiter eyes the Reclaimer's Rope. \"Short on stock: Patched Cloth 2 short. Gather, then return.\"\n[2026-08-31T16:36:20.136Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter eyes the Reclaimer's Rope. \"Short on stock: Patc\u2026\"\n",
+      "[2026-08-31T16:36:20.136Z] [arbiter] The Arbiter eyes the Reclaimer's Salvage Vest. \"Short on stock: Patched Cloth 2 short. Gather, then return.\"\n[2026-08-31T16:36:20.437Z] [debug] qwen\u23f1 ambient ok 6875ms wait 3334ms read/write unusable (native mis-reported 8770ms/1006ms \u2014 llama.rn split bug, not this call) in 367t\u2192out 31t HIT-CAP (149ch)\n",
+      "[2026-08-31T16:36:20.438Z] [debug] arbiter: ambient stale:log-moved-on\u2192banked 7167ms\n[2026-08-31T16:36:20.439Z] [debug] arbiter: ambient-empty reason=near-duplicate-of-recent raw=\"You have traversed the winding paths of the Silt Wastes, navigating through the dense thicket of trees and the silent va\"\n",
+      "[2026-08-31T16:36:22.695Z] [debug] qwen\u23f1 investigate_lore ok 7844ms wait 5587ms read 1217ms/write 1023ms in 126t\u2192out 33t 9.7ms/t (166ch)\n[2026-08-31T16:36:27.139Z] [debug] ui: tap \"less \u25be\"\n[2026-08-31T16:36:29.189Z] [debug] ui: tap \"ENTER\"\n[2026-08-31T16:36:29.191Z] [world] You step inside the quiet hovel, into the den.\n",
+      "[2026-08-31T16:36:29.192Z] [world] A low room with a dead stove and a threadbare rug. A board creaks loose underfoot near the wall.\n[2026"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-31-1594-the-pinch-demands-the-lift #mthq364gh205 [inline 14/24]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mthq364gh205"
+    },
+    {
+      "key": "dist",
+      "value": "2026-08-31-1594-the-pinch-demands-the-lift"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "14"
+    },
+    {
+      "key": "parts",
+      "value": "24"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-08-31-1594-the-pinch-demands-the-lift"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-31T21:00:39.040936Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "6": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 274,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-31T21:00:40.795000Z",
+  "fingerprints": [
+    "6aac11f7ffcb985849192ee77641c63a"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1946489288,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-08-31T17:38:33.982000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-08-31-1594-the-pinch-demands-the-lift",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-08-31-1594-the-pinch-demands-the-lift",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-08-31-1594-the-pinch-demands-the-lift",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-08-31-1594-the-pinch-demands-the-lift)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "75ca7f017e604fc6807a2338100cb736",
+  "previousEventID": "544824a9739f4a21af0efcc05fe4f3ed"
+}

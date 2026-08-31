@@ -1,0 +1,257 @@
+{
+  "id": "acf9017a7c6947a09fe0c9bd1e46bfe6",
+  "groupID": "7703230798",
+  "eventID": "acf9017a7c6947a09fe0c9bd1e46bfe6",
+  "projectID": "4511945117532160",
+  "size": 17818,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-31-1594-the-pinch-demands-the-lift #mthq364gh205 [inline 5/24]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-08-31-1594-the-pinch-demands-the-lift",
+  "message": "player-log 2026-08-31-1594-the-pinch-demands-the-lift #mthq364gh205 [inline 5/24]",
+  "title": "player-log 2026-08-31-1594-the-pinch-demands-the-lift #mthq364gh205 [inline 5/24]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "c85e2d2ae09d416f9dad31f645d9f291",
+      "span_id": "bbf9aa35f44894e8",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "ESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (126ms)\n[2026-08-31T02:51:26.168Z] [debug] persist sizes(KB): total=176 player=33 wm=64[rooms=32 events=1 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=72 scene=7\n[2026-08-31T02:51:34.370Z] [world] You seize the initiative. Aetheric Scarab has no time to react.\n",
+      "[2026-08-31T02:51:34.371Z] [combat] You \u2014 d20 \u2192 12 + DEX 28 + 2 (point blank) = 42 vs Aetheric Scarab AC 11 \u2014 \u2713 HIT\n[2026-08-31T02:51:34.372Z] [combat] Your blow with the searing bone crossbow lands clean \u2014 7 damage. Aetheric Scarab crumples in the dust. The Aetherstone settles.\n[2026-08-31T02:51:34.373Z] [reward] Aetheric Scarab defeated. You recover Aether Gem \u00d72, Scarab Shell, Burlap Vest.\n",
+      "[2026-08-31T02:51:34.375Z] [reward] \u2726 Hard-won spoils \u2014 Drone Core (Uncommon).\n[2026-08-31T02:51:34.376Z] [reward] +24 TC pried from the dust.\n[2026-08-31T02:51:36.591Z] [debug] homework: intro-fill armed after 8219ms idle (strike 3/3)\n[2026-08-31T02:51:38.882Z] [debug] ui: tap \"take / salvage\"\n",
+      "[Filtered]",
+      "[2026-08-31T02:51:40.325Z] [reward]     \u2022 Spider Silk (Common)\n[2026-08-31T02:51:41.133Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 4424ms read/write unusable (native mis-reported 93418ms/1074ms \u2014 llama.rn split bug, not this call) in 750t\u2192out 33t HIT-CAP (170ch)\n[2026-08-31T02:51:41.261Z] [debug] homework: scene_intro \"Great Tartary Plains\" \u2713 4673ms\n",
+      "[2026-08-31T02:51:42.316Z] [debug] ui: tap \"investigate\"\n[2026-08-31T02:51:43.935Z] [debug] ui: tap \"investigate\"\n[2026-08-31T02:51:45.137Z] [player] investigate nook\n[2026-08-31T02:51:45.138Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=nook resolved=nook range=- enemies=0 hooks=0\n",
+      "[2026-08-31T02:51:45.139Z] [world] The nook resists your reading. Not hostile \u2014 just closed. Some things in the buried world don't open for the curious.\n[2026-08-31T02:51:45.141Z] [arbiter] \"There's coin on the board for a willing blade,\" the Arbiter says. \"Read the World.\"\n",
+      "[2026-08-31T02:51:45.146Z] [world] A Conspiracy Architects war party crests the rise \u2014 5 of them, blades already out. They've marked you for standing with the Forgotten Order.\n[2026-08-31T02:51:45.146Z] [arbiter] \"The Conspiracy Architects do not forgive a friend of the Forgotten Order,\" the Arbiter murmurs. \"Stand, or run \u2014 but decide now.\"\n[2026-08-31T02:51:45.341Z] [cognitive] neutral  (200ms)\n",
+      "[2026-08-31T02:51:48.001Z] [debug] qwen\u23f1 investigate_lore ok 2676ms read 1266ms/write 1342ms in 127t\u2192out 36t 10.0ms/t (156ch)\n[2026-08-31T02:51:48.775Z] [debug] ui: tap \"\ud83d\udd25 bone crossbow \u2605\"\n[2026-08-31T02:51:48.805Z] [player] attack with the off-hand bone crossbow\n",
+      "[2026-08-31T02:51:48.805Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=5 hooks=0\n[2026-08-31T02:51:48.805Z] [debug] attack: target=Conspiracy Architects Raider 1 range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n",
+      "[2026-08-31T02:51:48.834Z] [world] You raise the searing bone crossbow toward Conspiracy Architects Raider 1. The room narrows around the both of you.\n[2026-08-31T02:51:48.834Z] [system] \u23f3 Time passed: 6 min\n[2026-08-31T02:51:48.982Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (147ms)\n[2026-08-31T02:52:12.031Z] [world] Conspiracy Architects Raider 1 moves first. The pressure is immediate.\n",
+      "[2026-08-31T02:52:12.032Z] [combat] Conspiracy Architects Raider 5 and 2 others close the distance.\n[2026-08-31T02:52:12.032Z] [world] Below, Conspiracy Architects Raider 1 and 1 other circle the base \u2014 nothing down there can reach you.\n[2026-08-31T02:52:12.032Z] [combat] You \u2014 d20 \u2192 12 + DEX 28 + 2 (point blank) = 42 vs Conspiracy Architects Raider 1 AC 11 \u2014 \u2713 HIT\n",
+      "[2026-08-31T02:52:12.033Z] [combat] Piercing flares \u2014 +2 on hit (weak \u2014 bites deep!).\n[2026-08-31T02:52:12.034Z] [combat] Weakness exposed \u2014 Conspiracy Architects Raider 1 flinches. (piercing \u00d72.25 for 16)\n[2026-08-31T02:52:12.034Z] [combat] Final strike with the searing bone crossbow for 16. Conspiracy Architects Raider 1 is still. The Aetherstone hums on, indifferent.\n",
+      "[2026-08-31T02:52:12.035Z] [reward] Conspiracy Architects Raider 1 defeated. You recover Patched Cloth \u00d73.\n[2026-08-31T02:52:12.037Z] [reward] You strip the body: Cudgel, Mud-Warden's Vest (+10 TC). The kit took the fight badly.\n[2026-08-31T02:52:12.037Z] [combat] 4 attackers remain. Conspiracy Architects Raider 2 now in your sights.\n",
+      "[2026-08-31T02:52:12.037Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-08-31T02:52:12.037Z] [system] \u25bc Conspiracy Architects marks you HATED \u2014 their counters charge you +25%, and no charm changes it.\n[2026-08-31T02:52:12.038Z] [reward] +14 TC pried from the dust.\n[2026-08-31T02:52:20.811Z] [debug] ui: tap \"approach\"\n",
+      "[2026-08-31T02:52:20.864Z] [player] approach Conspiracy Architects Raider 2\n[2026-08-31T02:52:20.865Z] [debug] parser: intent=advance conf=1.00 verb=approach target=conspiracy architects raider 2 resolved=Conspiracy Architects Raider 2 range=mid enemies=4 hooks=0\n[2026-08-31T02:52:20.866Z] [debug] move: advance from range=mid enemies=4 weather=Eerie Calm cost=1 partial=0\n",
+      "[2026-08-31T02:52:20.866Z] [debug] move: field advance target=Conspiracy Architects Raider 2 d 1.19->0.35 band mid->close\n[2026-08-31T02:52:20.866Z] [world] You close the gap with the Conspiracy Architects Raider 2 and 3 others. (range: close / arm's reach)\n",
+      "[2026-08-31T02:52:20.867Z] [world] The field shifts around you \u2014 Conspiracy Architects Raider 3 now close / arm's reach; Conspiracy Architects Raider 4 now mid-range; Conspiracy Architects Raider 5 now mid-range.\n[2026-08-31T02:52:20.867Z] [world] Below, Conspiracy Architects Raider 2 and 3 others circle the base \u2014 nothing down there can reach you.\n",
+      "[2026-08-31T02:52:21.032Z] [cognitive] neutral  (163ms)\n[2026-08-31T02:52:23.196Z] [debug] ui: tap \"approach\"\n[2026-08-31T02:52:23.271Z] [player] approach Conspiracy Architects Raider 2\n[2026-08-31T02:52:23.272Z] [debug] parser: intent=advance conf=1.00 verb=approach target=conspiracy architects raider 2 resolved=Conspiracy Architects Raider 2 range=close enemies=4 hooks=0\n",
+      "[2026-08-31T02:52:23.273Z] [debug] move: advance from range=close enemies=4 weather=Eerie Calm cost=1 partial=0\n[2026-08-31T02:52:23.273Z] [world] You are already at close / arm's reach with the Conspiracy Architects Raider 2 and 3 others.\n[2026-08-31T02:52:23.432Z] [cognitive] neutral  (157ms)\n",
+      "[2026-08-31T02:52:23.620Z] [debug] persist sizes(KB): total=189 player=34 wm=64[rooms=32 events=1 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=82 scene=9\n[2026-08-31T02:52:24.809Z] [debug] ui: tap \"approach\"\n[2026-08-31T02:52:24.839Z] [player] approach Conspiracy Architects Raider 2\n",
+      "[2026-08-31T02:52:24.839Z] [debug] parser: intent=advance conf=1.00 verb=approach target=conspiracy architects raider 2 resolved=Conspiracy Architects Raider 2 range=close enemies=4 hooks=0\n[2026-08-31T02:52:24.840Z] [debug] move: advance from range=close enemies=4 weather=Eerie Calm cost=1 partial=0\n",
+      "[2026-08-31T02:52:24.840Z] [world] You are already at close / arm's reach with the Conspiracy Architects Raider 2 and 3 others.\n[2026-08-31T02:52:24.841Z] [debug] arbiter: template (reason=combat)\n[2026-08-31T02:52:24.841Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T02:52:24.995Z] [cognitive] neutral  (153ms)\n",
+      "[2026-08-31T02:52:27.581Z] [debug] ui: tap \"\ud83d\udd25 geode-cored cleaver\"\n[2026-08-31T02:52:28.563Z] [debug] ui: tap \"\ud83d\udd25 geode-cored cleaver\"\n[2026-08-31T02:52:28.997Z] [debug] ui: tap \"\ud83d\udd25 geode-cored cleaver\"\n[2026-08-31T02:52:29.247Z] [debug] ui: tap \"\ud83d\udd25 geode-cored cleaver\"\n[2026-08-31T02:52:29.466Z] [debug] ui: tap \"\ud83d\udd25 geode-cored cleaver\"\n",
+      "[2026-08-31T02:52:29.681Z] [debug] ui: tap \"\ud83d\udd25 geode-cored cleaver\"\n[2026-08-31T02:52:29.862Z] [debug] ui: tap \"\ud83d\udd25 geode-cored cleaver\"\n[2026-08-31T02:52:30.080Z] [debug] ui: tap \"\ud83d\udd25 geode-cored cleaver\"\n[2026-08-31T02:52:30.297Z] [debug] ui: tap \"\ud83d\udd25 geode-cored cleaver\"\n[2026-08-31T02:52:35.861Z] [debug] ui: tap \"\ud83d\udd25 bone crossbow\"\n",
+      "[2026-08-31T02:52:35.917Z] [player] attack with the off-hand bone crossbow\n[2026-08-31T02:52:35.918Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=4 hooks=0\n",
+      "[2026-08-31T02:52:35.920Z] [debug] attack: target=Conspiracy Architects Raider 2 range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-08-31T02:52:35.953Z] [world] You bring the searing bone crossbow to bear on Conspiracy Architects Raider 2.\n[2026-08-31T02:52:35.954Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-31T02:52:36.100Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (145ms)\n[2026-08-31T02:52:43.106Z] [world] You seize the initiative. Conspiracy Architects Raider 2 has no time to react.\n[2026-08-31T02:52:43.106Z] [combat] You \u2014 d20 \u2192 10 + DEX 28 + 2 (point blank) = 40 vs Conspiracy Architects Raider 2 AC 10 \u2014 \u2713 HIT\n[2026-08-31T02:52:43.107Z] [combat] Piercing flares \u2014 +4 on hit.\n",
+      "[2026-08-31T02:52:43.108Z] [combat] You crack the Conspiracy Architects Raider 2 with the Searing Bone Crossbow for 11 \u2014 the better part of their fight, gone in one blow. They crumple, out cold. (2/13 HP) Loot them before they come to.\n[2026-08-31T02:52:43.109Z] [combat] Conspiracy Architects Raider 2 is out of it. Conspiracy Architects Raider 3 now in your sights.\n",
+      "[2026-08-31T02:52:43.109Z] [combat] Searing Bone Crossbow \u2014 3 burn bites in and festers (3 turns).\n[2026-08-31T02:52:43.109Z] [world] Below, Conspiracy Architects Raider 3 and 2 others circle the base \u2014 nothing down there can reach you.\n[2026-08-31T02:52:46.978Z] [debug] ui: tap \"approach\"\n[2026-08-31T02:52:47.047Z] [player] approach Conspiracy Architects Raider 4\n",
+      "[2026-08-31T02:52:47.048Z] [debug] parser: intent=advance conf=1.00 verb=approach target=conspiracy architects raider 4 resolved=Conspiracy Architects Raider 4 range=mid enemies=4 hooks=0\n[2026-08-31T02:52:47.049Z] [debug] move: advance from range=mid enemies=4 weather=Eerie Calm cost=1 partial=0\n",
+      "[2026-08-31T02:52:47.049Z] [debug] move: field advance target=Conspiracy Architects Raider 4 d 1.43->0.43 band mid->close\n[2026-08-31T02:52:47.049Z] [world] You close the gap with the Conspiracy Architects Raider 4 and 3 others. (range: close / arm's reach)\n[2026-08-31T02:52:47.049Z] [world] The field shifts around you \u2014 Conspiracy Architects Raider 5 now close / arm's reach.\n",
+      "[2026-08-31T02:52:47.050Z] [combat] Conspiracy Architects Raider 2 blisters \u2014 clinging fire sears 3. (0/13 HP, 2 turns left)\n[2026-08-31T02:52:47.051Z] [reward] Conspiracy Architects Raider 2 defeated. You recover Patched Cloth \u00d73.\n[2026-08-31T02:52:47.052Z] [reward] You strip the body: Bone Knife, Reclaimer's Salvage Vest (+6 TC). The kit took the fight badly.\n",
+      "[2026-08-31T02:52:47.052Z] [combat] 3 attackers remain. Conspiracy Architects Raider 3 now in your sights.\n[2026-08-31T02:52:47.052Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-08-31T02:52:47.052Z] [system] \u25b2 Reclaimers Guild now counts you TRUSTED \u2014 their counters take 10% off.\n[2026-08-31T02:52:47.053Z] [reward] +20 TC pried from the dust.\n",
+      "[2026-08-31T02:52:47.082Z] [world] Below, Conspiracy Architects Raider 5 and 2 others circle the base \u2014 nothing down there can reach you.\n[2026-08-31T02:52:47.257Z] [cognitive] neutral  (173ms)\n[2026-08-31T02:52:49.578Z] [debug] ui: tap \"\ud83d\udd25 geode-cored cleaver\"\n[2026-08-31T02:52:50.728Z] [debug] ui: tap \"\ud83d\udd25 bone crossbow\"\n[2026-08-31T02:52:50.776Z] [player] attack with the off-hand bone crossbow\n",
+      "[2026-08-31T02:52:50.777Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=3 hooks=0\n[2026-08-31T02:52:50.778Z] [debug] attack: target=Conspiracy Architects Raider 4 range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n",
+      "[2026-08-31T02:52:50.808Z] [world] Your searing bone crossbow comes around in an arc; Conspiracy Architects Raider 4 squares up to meet it.\n[2026-08-31T02:52:50.808Z] [system] \u23f3 Time passed: 6 min\n[2026-08-31T02:52:50.956Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (147ms)\n[2026-08-31T02:52:57.577Z] [world] You seize the initiative. Conspiracy Architects Raider 4 has no time to react.\n",
+      "[2026-08-31T02:52:57.577Z] [combat] You \u2014 d20 \u2192 10 + DEX 28 + 2 (point blank) = 40 vs Conspiracy Architects Raider 4 AC 10 \u2014 \u2713 HIT\n[2026-08-31T02:52:57.579Z] [combat] Conspiracy Architects Raider 4 folds under the searing bone crossbow. 13 damage was enough. The room exhales.\n[2026-08-31T02:52:57.580Z] [reward] Conspiracy Architects Raider 4 defeated. You recover Patched Cloth \u00d73.\n",
+      "[2026-08-31T02:52:57.581Z] [reward] You strip the body: Cudgel, Mud-Bound Cloak (+6 TC). The kit took the fight badly.\n[2026-08-31T02:52:57.581Z] [combat] 2 attackers remain. Conspiracy Architects Raider 3 now in your sights.\n[2026-08-31T02:52:57.582Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n",
+      "[2026-08-31T02:52:57.582Z] [reward] +10 TC pried from the dust.\n[2026-08-31T02:52:57.620Z] [world] Below, Conspiracy Architects Raider 5 and 1 other circle the base \u2014 nothing down there can reach you.\n[2026-08-31T02:53:00.973Z] [debug] ui: tap \"stealth\"\n[2026-08-31T02:53:00.978Z] [player] sneak\n",
+      "[2026-08-31T02:53:00.979Z] [debug] parser: intent=stealth conf=1.00 verb=sneak target=- resolved=- range=close enemies=2 hooks=0\n[2026-08-31T02:53:01.029Z] [system] \u23f3 Time passed: 15 min\n[2026-08-31T02:53:01.200Z] [cognitive] DISENGAGE \u00b7 HIDE \u00b7 TAKE_COVER  (170ms)\n[2026-08-31T02:53:02.644Z] [debug] skillcheck: stealth d20=11 STE 5 + 1 (title: Shadow Diver) = 17 vs DC 12 \u2014 Hard \u2192 (resolved below)\n",
+      "[2026-08-31T02:53:02.707Z] [debug] stats: STR11 DEX28 INT12 WIS7 CHA2 STE5 | gear: DEX+20,INT+3,STR+6,STE+2,WIS+1 | worn: main=Reclaimers Guild Geode-Cored Cleaver off=Bone Crossbow head=Forgotten Seeker's Mask chest=Rough-Hewn Chestplate hands=Relic Hunter's Gauntlets legs=Aetheric Scout Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band",
+      "\n[2026-08-31T02:53:02.708Z] [debug] train: stealth (stealth check) \u2192 progress 78/100\n[2026-08-31T02:53:02.708Z] [world] The daylight leaves you little cover. (stealth \u22121, day)\n[2026-08-31T02:53:02.708Z] [world] You fling a fistful of grit into Conspiracy Architects Raider 5's eyes and slip their line of sight. Half-blind, they swing at where you were. (+5 next attack)\n",
+      "[2026-08-31T02:53:02.708Z] [debug] stealth: reset WIN init 18 vs 8 (dust, +5 1r)\n[2026-08-31T02:53:02.709Z] [world] Below, Consp"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-31-1594-the-pinch-demands-the-lift #mthq364gh205 [inline 5/24]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mthq364gh205"
+    },
+    {
+      "key": "dist",
+      "value": "2026-08-31-1594-the-pinch-demands-the-lift"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "5"
+    },
+    {
+      "key": "parts",
+      "value": "24"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-08-31-1594-the-pinch-demands-the-lift"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-31T21:00:39.000139Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "3": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 390,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-31T21:00:40.792000Z",
+  "fingerprints": [
+    "6aac11f7ffcb985849192ee77641c63a"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1946489288,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-08-31T17:38:33.982000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-08-31-1594-the-pinch-demands-the-lift",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-08-31-1594-the-pinch-demands-the-lift",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-08-31-1594-the-pinch-demands-the-lift",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-08-31-1594-the-pinch-demands-the-lift)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "acfbc8f811834bbbbc35a48d2380accd",
+  "previousEventID": "a7a0e7e7372947d3b7976b362dcaa081"
+}

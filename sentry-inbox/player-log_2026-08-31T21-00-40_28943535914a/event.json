@@ -1,0 +1,233 @@
+{
+  "id": "28943535914a445b932f8b859b45c031",
+  "groupID": "7703230798",
+  "eventID": "28943535914a445b932f8b859b45c031",
+  "projectID": "4511945117532160",
+  "size": 18077,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-31-1594-the-pinch-demands-the-lift #mthq364gh205 [inline 11/24]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-08-31-1594-the-pinch-demands-the-lift",
+  "message": "player-log 2026-08-31-1594-the-pinch-demands-the-lift #mthq364gh205 [inline 11/24]",
+  "title": "player-log 2026-08-31-1594-the-pinch-demands-the-lift #mthq364gh205 [inline 11/24]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "c85e2d2ae09d416f9dad31f645d9f291",
+      "span_id": "bbf9aa35f44894e8",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "31T02:59:54.290Z] [combat] Conspiracy Architects Raider 2 \u2014 d20 \u2192 12 + ATK 11 = 23 vs your AC 22 \u2014 \u2713 HIT\n[2026-08-31T02:59:54.291Z] [combat] Conspiracy Architects Raider 4 and 2 others close the distance.\n[2026-08-31T02:59:54.291Z] [debug] arbiter: template (reason=combat)\n[2026-08-31T02:59:54.292Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-08-31T02:59:54.292Z] [system] \u23f3 Time passed: 6 min\n[2026-08-31T02:59:54.625Z] [combat] Conspiracy Architects Raider 1 deals 4 slashing damage [armor \u221234%]. You have 32 HP remaining.\n[2026-08-31T02:59:54.625Z] [combat] Conspiracy Architects Raider 2 deals 4 bludgeoning damage [edge of reach \u2014 halved]. You have 28 HP remaining.\n[2026-08-31T02:59:54.914Z] [cognitive] neutral  (334ms)\n",
+      "[2026-08-31T02:59:55.492Z] [debug] ui: tap \"\ud83d\udd25 geode-cored cleaver\"\n[2026-08-31T02:59:55.548Z] [player] attack with the reclaimers guild geode-cored cleaver\n[2026-08-31T02:59:55.549Z] [debug] parser: intent=attack conf=1.00 verb=attack target=reclaimers guild geode cored cleaver resolved=core range=close enemies=5 hooks=2\n",
+      "[2026-08-31T02:59:55.550Z] [debug] attack: target=Conspiracy Architects Raider 1 range=close reach.bands=[close] reach.label=Reclaimers Guild Geode-Cored Cleaver bareHand=false\n[2026-08-31T02:59:55.552Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n",
+      "[2026-08-31T02:59:55.593Z] [world] You raise the smoldering reclaimers guild geode-cored cleaver toward Conspiracy Architects Raider 1. The room narrows around the both of you.\n[2026-08-31T02:59:55.593Z] [system] \u23f3 Time passed: 6 min\n[2026-08-31T02:59:55.773Z] [cognitive] TALK  (179ms)\n",
+      "[2026-08-31T02:59:56.854Z] [debug] qwen\u23f1 ambient_fill preempted 5822ms wait 1874ms read 0ms/write 0ms in 370t\u2192out 0t (0ch)\n[2026-08-31T02:59:57.073Z] [debug] arbiter: ambient-fill \u2205 6641ms\n[2026-08-31T02:59:57.074Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient_fill after 5822ms \u2014 ambient:fill-\u2205\n[2026-08-31T03:00:03.782Z] [world] You seize the initiative. Conspiracy Architects Raider 1 has no time to react.\n",
+      "[2026-08-31T03:00:03.782Z] [combat] You \u2014 d20 \u2192 9 + DEX 23 \u2212 1 (Whisper Fog) = 31 vs Conspiracy Architects Raider 1 AC 12 \u2014 \u2713 HIT\n[2026-08-31T03:00:03.784Z] [combat] You crack the Conspiracy Architects Raider 1 with the Smoldering Reclaimers Guild Geode-Cored Cleaver for 11 \u2014 the better part of their fight, gone in one blow. They crumple, out cold. (4/15 HP) Loot them before they come to.\n",
+      "[2026-08-31T03:00:03.784Z] [combat] Conspiracy Architects Raider 1 is out of it. Conspiracy Architects Raider 2 now in your sights.\n[2026-08-31T03:00:03.784Z] [combat] Smoldering Reclaimers Guild Geode-Cored Cleaver \u2014 3 burn bites in and festers (3 turns).\n[2026-08-31T03:00:03.785Z] [combat] Conspiracy Architects Raider 3 turns on Soot \u2014 d20 16 + ATK 9 = 25 vs Soot's AC 12 (vest +2) \u2014 \u2713 HIT\n",
+      "[2026-08-31T03:00:03.785Z] [combat] Soot takes 9. (6/15 HP left)\n[2026-08-31T03:00:03.787Z] [combat] Conspiracy Architects Raider 2 \u2014 d20 \u2192 19 + ATK 9 = 28 vs your AC 22 \u2014 \u2713 HIT\n[2026-08-31T03:00:03.791Z] [combat] Conspiracy Architects Raider 4 and 1 other close the distance.\n[2026-08-31T03:00:03.791Z] [arbiter] \"Make the next strike count for two,\" the Arbiter says. \"Tartaria taxes the first.\"\n",
+      "[2026-08-31T03:00:04.005Z] [combat] Conspiracy Architects Raider 2 deals 5 bludgeoning damage [edge of reach \u2014 halved]. You have 23 HP remaining.\n[2026-08-31T03:00:06.514Z] [debug] ui: tap \"approach\"\n[2026-08-31T03:00:06.582Z] [player] approach Conspiracy Architects Raider 2\n",
+      "[2026-08-31T03:00:06.583Z] [debug] parser: intent=advance conf=1.00 verb=approach target=conspiracy architects raider 2 resolved=Conspiracy Architects Raider 2 range=mid enemies=5 hooks=2\n[2026-08-31T03:00:06.584Z] [debug] move: advance from range=mid enemies=5 weather=Whisper Fog cost=1 partial=0\n",
+      "[2026-08-31T03:00:06.585Z] [debug] move: field advance target=Conspiracy Architects Raider 2 d 1.42->0.42 band mid->close\n[2026-08-31T03:00:06.585Z] [world] You close the gap with the Conspiracy Architects Raider 2 and 4 others. (range: close / arm's reach)\n",
+      "[2026-08-31T03:00:06.585Z] [world] The field shifts around you \u2014 Conspiracy Architects Raider 3 now close / arm's reach; Conspiracy Architects Raider 4 now close / arm's reach; Conspiracy Architects Raider 5 now close / arm's reach.\n[2026-08-31T03:00:06.585Z] [combat] Conspiracy Architects Raider 1 blisters \u2014 clinging fire sears 3. (1/15 HP, 2 turns left)\n",
+      "[2026-08-31T03:00:06.586Z] [combat] Conspiracy Architects Raider 2 turns on Soot \u2014 d20 12 + ATK 9 = 21 vs Soot's AC 12 (vest +2) \u2014 \u2713 HIT\n[2026-08-31T03:00:06.586Z] [combat] Soot takes 6. (0/15 HP left)\n[2026-08-31T03:00:06.586Z] [arbiter] Soot drops under the Conspiracy Architects Raider 2 and drags herself clear of the fight. She is down \u2014 tend her within a day or she won't get back up.\n",
+      "[2026-08-31T03:00:06.588Z] [combat] Conspiracy Architects Raider 3 \u2014 d20 \u2192 10 + ATK 11 = 21 vs your AC 22 \u2014 \u2717 MISS\n[2026-08-31T03:00:06.589Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 1 + ATK 11 = 12 vs your AC 22 \u2014 \u2717 FUMBLE\n[2026-08-31T03:00:06.591Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 3 + ATK 11 = 14 vs your AC 22 \u2014 \u2717 MISS\n",
+      "[2026-08-31T03:00:06.591Z] [debug] arbiter: template (reason=combat)\n[2026-08-31T03:00:06.591Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T03:00:06.788Z] [cognitive] neutral  (196ms)\n[2026-08-31T03:00:08.380Z] [debug] ui: tap \"dodge\"\n[2026-08-31T03:00:08.393Z] [player] dodge\n",
+      "[2026-08-31T03:00:08.394Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=5 hooks=2\n[2026-08-31T03:00:08.395Z] [world] You commit to the dodge. Slip Conspiracy Architects Raider 2's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-08-31T03:00:08.395Z] [combat] Conspiracy Architects Raider 1 blisters \u2014 clinging fire sears 3. (0/15 HP, 1 turn left)\n[2026-08-31T03:00:08.397Z] [reward] Conspiracy Architects Raider 1 defeated. You recover Aether Residue \u00d72.\n",
+      "[2026-08-31T03:00:08.398Z] [world] You crouch for the blade \u2014 the Hollow Edge, the black mark of the Forgotten Order's enforcers, its steel weeping a faint corruption that fogs the air. But the grip is wrong. It's honed: razored along the inner curve so the handle itself is a second blade, and only one of its edges is meant for the enemy. Take it up untrained and you flay your own palm to the bone",
+      ". Only a hand that knows the Order's hold \u2014 that two-finger grip they teach behind sealed doors \u2014 can carry it. You leave it where it fell.\n[2026-08-31T03:00:08.399Z] [reward] You strip the body: Mud-Bound Cloak (+15 TC). The kit took the fight badly.\n[2026-08-31T03:00:08.400Z] [combat] 4 attackers remain. Conspiracy Architects Raider 2 now in your sights.\n",
+      "[2026-08-31T03:00:08.401Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-08-31T03:00:08.401Z] [reward] +24 TC pried from the dust.\n[2026-08-31T03:00:08.485Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 15 + ATK 9 = 24 vs your AC 22 \u2014 \u2717 EVADED\n",
+      "[2026-08-31T03:00:08.485Z] [combat] Dodge \u2014 d20 \u2192 11 + DEX 23 = 34 vs ATK 24. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-08-31T03:00:08.485Z] [world] You slip Conspiracy Architects Raider 5's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n",
+      "[2026-08-31T03:00:08.487Z] [debug] ac-shift 22\u219225: race/base 10 + gear 17 + title 0 \u2192 trimmed 22 + status 3 | worn: head=Architect's Sight Enhancer chest=Rough-Hewn Chestplate hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n[2026-08-31T03:00:08.487Z] [combat] Conspiracy Architects Raider 2 \u2014 d20 \u2192 12 + ATK 9 = 21 vs your AC 25 \u2014 \u2717 MISS\n",
+      "[2026-08-31T03:00:08.488Z] [combat] Conspiracy Architects Raider 3 \u2014 d20 \u2192 12 + ATK 9 = 21 vs your AC 25 \u2014 \u2717 MISS\n[2026-08-31T03:00:08.488Z] [combat] Conspiracy Architects Raider 4 presses in behind the others, waiting for an opening.\n[2026-08-31T03:00:08.489Z] [system] \u23f3 Time passed: 6 min\n[2026-08-31T03:00:08.701Z] [cognitive] neutral  (211ms)\n",
+      "[2026-08-31T03:00:09.378Z] [debug] persist sizes(KB): total=202 player=43 wm=69[rooms=36 events=2 memos=0 npcs=2 defeated=1 tags=0 discovered=0] log=82 scene=7\n[2026-08-31T03:00:09.558Z] [debug] ui: tap \"\ud83d\udd25 geode-cored cleaver\"\n[2026-08-31T03:00:09.559Z] [system] evasive \u2014 harder to hit fades.\n[2026-08-31T03:00:09.594Z] [player] attack with the reclaimers guild geode-cored cleaver\n",
+      "[2026-08-31T03:00:09.595Z] [debug] parser: intent=attack conf=1.00 verb=attack target=reclaimers guild geode cored cleaver resolved=core range=close enemies=4 hooks=2\n[2026-08-31T03:00:09.595Z] [debug] attack: target=Conspiracy Architects Raider 2 range=close reach.bands=[close] reach.label=Reclaimers Guild Geode-Cored Cleaver bareHand=false\n",
+      "[2026-08-31T03:00:09.596Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-08-31T03:00:09.597Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-08-31T03:00:09.634Z] [world] You raise the smoldering reclaimers guild geode-cored cleaver toward Conspiracy Architects Raider 2. The room narrows around the both of you.\n[2026-08-31T03:00:09.635Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-31T03:00:09.819Z] [cognitive] TALK  (183ms)\n[2026-08-31T03:00:18.493Z] [world] You seize the initiative. Conspiracy Architects Raider 2 has no time to react.\n[2026-08-31T03:00:18.493Z] [combat] You \u2014 d20 \u2192 18 + DEX 23 \u2212 1 (Whisper Fog) perfect opening (2\u00d7 dice) = 40 vs Conspiracy Architects Raider 2 AC 13 \u2014 \u2713 HIT\n",
+      "[2026-08-31T03:00:18.495Z] [combat] You crack the Conspiracy Architects Raider 2 with the Smoldering Reclaimers Guild Geode-Cored Cleaver for 15 \u2014 the better part of their fight, gone in one blow. They crumple, out cold. (6/21 HP) Loot them before they come to.\n[2026-08-31T03:00:18.495Z] [combat] Conspiracy Architects Raider 2 is out of it. Conspiracy Architects Raider 3 now in your sights.\n",
+      "[2026-08-31T03:00:18.495Z] [combat] Smoldering Reclaimers Guild Geode-Cored Cleaver \u2014 4 burn bites in and festers (3 turns).\n[2026-08-31T03:00:18.496Z] [debug] ac-shift 25\u219222: race/base 10 + gear 17 + title 0 \u2192 trimmed 22 + status 0 | worn: head=Architect's Sight Enhancer chest=Rough-Hewn Chestplate hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Clo",
+      "ak\n[2026-08-31T03:00:18.496Z] [combat] Conspiracy Architects Raider 3 \u2014 d20 \u2192 19 + ATK 9 = 28 vs your AC 22 \u2014 \u2713 HIT\n[2026-08-31T03:00:18.498Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 5 + ATK 9 = 14 vs your AC 22 \u2014 \u2717 MISS\n[2026-08-31T03:00:18.499Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 2 + ATK 9 = 11 vs your AC 22 \u2014 \u2717 MISS\n",
+      "[2026-08-31T03:00:18.712Z] [combat] Conspiracy Architects Raider 3 deals 12 bludgeoning damage. You have 11 HP remaining.\n[2026-08-31T03:00:18.712Z] [combat] Conspiracy Architects Raider 3's strike leaves you bleeding.\n[2026-08-31T03:00:20.902Z] [debug] ui: tap \"inventory\"\n[2026-08-31T03:00:32.105Z] [player] use First Aid Kit\n",
+      "[2026-08-31T03:00:32.106Z] [debug] parser: intent=use_relic conf=1.00 verb=use target=first aid kit resolved=Conspiracy Architects Raider 2 range=close enemies=4 hooks=2\n[2026-08-31T03:00:32.110Z] [world] You use one First Aid Kit. +25 HP, +3 stamina, bleeding stopped.\n[2026-08-31T03:00:32.120Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-08-31T03:00:32.120Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T03:00:32.121Z] [system] \u23f3 Time passed: 15 min\n[2026-08-31T03:00:33.156Z] [cognitive] neutral  (1034ms)\n[2026-08-31T03:00:38.477Z] [world] You feed Soot 7\u00d7 Smoke-Cured Jerky Strip. +14 HP (14/15), +loyalty.\n[2026-08-31T03:00:44.551Z] [debug] ui: tap \"dodge\"\n",
+      "[2026-08-31T03:00:44.570Z] [player] dodge\n[2026-08-31T03:00:44.571Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=4 hooks=2\n[2026-08-31T03:00:44.572Z] [world] You commit to the dodge. Slip Conspiracy Architects Raider 3's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-08-31T03:00:44.573Z] [combat] Conspiracy Architects Raider 2 blisters \u2014 clinging fire sears 4. (2/21 HP, 2 turns left)\n[2026-08-31T03:00:44.624Z] [combat] Conspiracy Architects Raider 3 \u2014 d20 \u2192 18 + ATK 9 = 27 vs your AC 22 \u2014 \u2717 EVADED\n[2026-08-31T03:00:44.624Z] [combat] Dodge \u2014 d20 \u2192 19 + DEX 23 = 42 vs ATK 27. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n",
+      "[2026-08-31T03:00:44.624Z] [world] You slip Conspiracy Architects Raider 3's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n[2026-08-31T03:00:44.626Z] [debug] ac-shift 22\u219225: race/base 10 + gear 17 + title 0 \u2192 trimmed 22 + status 3 | worn: head=Architect's Sight Enhancer chest=Rough-Hewn Chestplate hands=Relic Hunter's Gauntlets ",
+      "legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n[2026-08-31T03:00:44.626Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 10 + ATK 9 = 19 vs your AC 25 \u2014 \u2717 MISS\n[2026-08-31T03:00:44.627Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 14 + ATK 9 = 23 vs your AC 25 \u2014 \u2717 MISS\n[2026-08-31T03:00:44.628Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-31T03:00:44.996Z] [cognitive] neutral  (191ms)\n[2026-08-31T03:00:45.899Z] [debug] ui: tap \"\ud83d\udd25 geode-cored cleaver\"\n[2026-08-31T03:00:45.904Z] [system] evasive \u2014 harder to hit fades.\n[2026-08-31T03:00:45.908Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.\n[2026-08-31T03:00:45.959Z] [player] attack with the reclaimers guild geode-cored cleaver\n",
+      "[2026-08-31T03:00:45.959Z] [debug] parser: intent=attack conf=1.00 verb=attack target=reclaimers guild geode cored cleaver resolved=core range=close enemies=4 hooks=2\n[2026-08-31T03:00:45.960Z] [combat] Conspiracy Architects Raider 2 blisters \u2014 clinging fire sears 4. (0/21 HP, 1 turn left)\n",
+      "[2026-08-31T03:00:45.961Z] [reward] Conspiracy Architects Raider 2 defeated. You recover Aether Residue \u00d72, Aetheric Shard, Architect Sigil.\n[2026-08-31T03:00:45.962Z] [reward] You strip the body: Bone Knife, Mud-Bound Cloak (+14 TC). The kit took the fight badly.\n[2026-08-31T03:00:45.962Z] [reward] \u2726 Hard-won spoils \u2014 Golem Core (Rare).\n",
+      "[2026-08-31T03:00:45.962Z] [combat] 3 attackers remain. Conspiracy Architects Raider 3 now in your sights.\n[2026-08-31T03:00:45.962Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-08-31T03:00:45.963Z] [reward] +36 TC pried from the dust.\n",
+      "[2026-08-31T03:00:45.984Z] [arbiter] The Arbiter eyes your new pieces. \"You could make an Elder Golem Sledge now, if you wanted.\"\n[2026-08-31T03:00:45.990Z] [debug] attack: target=Conspiracy Architects Raider 3 range=close reach.bands=[close] reach.label=Reclaimers Guild Geode-Cored Cleaver bareHand=false\n[2026-08-31T03:00:45.991Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n",
+      "[2026-08-31T03:00:45.991Z] [debug] attack: st"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-31-1594-the-pinch-demands-the-lift #mthq364gh205 [inline 11/24]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mthq364gh205"
+    },
+    {
+      "key": "dist",
+      "value": "2026-08-31-1594-the-pinch-demands-the-lift"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "11"
+    },
+    {
+      "key": "parts",
+      "value": "24"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-08-31-1594-the-pinch-demands-the-lift"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-31T21:00:39.032999Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-31T21:00:40.794000Z",
+  "fingerprints": [
+    "6aac11f7ffcb985849192ee77641c63a"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1946489288,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-08-31T17:38:33.982000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-08-31-1594-the-pinch-demands-the-lift",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-08-31-1594-the-pinch-demands-the-lift",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-08-31-1594-the-pinch-demands-the-lift",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-08-31-1594-the-pinch-demands-the-lift)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "2cd90368c3e14a91b4cf95bd44286100",
+  "previousEventID": "278dfaae25374e779f7fe71f6efa2e6c"
+}

@@ -1,0 +1,232 @@
+{
+  "id": "9e58d3fa981540a59ea7efb04cc37e86",
+  "groupID": "7703253341",
+  "eventID": "9e58d3fa981540a59ea7efb04cc37e86",
+  "projectID": "4511945117532160",
+  "size": 18131,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-31-1594-the-pinch-demands-the-lift #mthqftbaluhw [inline 25/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-08-31-1594-the-pinch-demands-the-lift",
+  "message": "player-log 2026-08-31-1594-the-pinch-demands-the-lift #mthqftbaluhw [inline 25/28]",
+  "title": "player-log 2026-08-31-1594-the-pinch-demands-the-lift #mthqftbaluhw [inline 25/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "c85e2d2ae09d416f9dad31f645d9f291",
+      "span_id": "bbf9aa35f44894e8",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "5.533Z] [reward]     \u2022 Chipped Phial Neck (Common)\n[2026-08-31T21:01:05.534Z] [reward]     \u2022 Stick x2 (Common)\n[2026-08-31T21:01:05.534Z] [reward]     \u2022 Scrap Metal x3 (Common)\n[2026-08-31T21:01:05.534Z] [reward]     \u2022 Beetle-Chitin Flake (Common)\n[2026-08-31T21:01:05.534Z] [reward]     \u2022 Splintered Haft End (Common)\n[2026-08-31T21:01:05.535Z] [reward]     \u2022 Worn Tartarian Coin x7 (Common)\n",
+      "[2026-08-31T21:01:05.535Z] [reward]     \u2022 Smooth Stone (Common)\n[2026-08-31T21:01:07.005Z] [player] investigate crate\n[2026-08-31T21:01:07.005Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=crate resolved=crate range=- enemies=0 hooks=1\n[2026-08-31T21:01:07.005Z] [debug] route: hook intercept (kind=thread, target=\"crate\") \u2014 original intent=investigate\n",
+      "[2026-08-31T21:01:07.006Z] [world] \u2605 STORY THREAD (step 1) \u2014 You pull the rubble aside. A draft of cold, old air, and a tight passage angling down into the dark.\n[2026-08-31T21:01:08.295Z] [world] \u2605\u2605 STORY THREAD COMPLETE \u2014 You wedge yourself into the gap. At the bottom \u2014 a small antechamber, half-flooded, with three sealed jars on a shelf. You take what you can carry.\n",
+      "[2026-08-31T21:01:08.295Z] [reward] \u2726 Trail Rations, Aether Residue, +12 TC.\n[2026-08-31T21:01:08.295Z] [reward] \u2726 For your persistence \u2014 Aetheric Shard (Uncommon).\n[2026-08-31T21:01:10.528Z] [debug] ui: tap \"investigate\"\n[2026-08-31T21:01:12.195Z] [player] investigate the mud\n",
+      "[2026-08-31T21:01:12.196Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=1\n[2026-08-31T21:01:12.199Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Stick (Common).\n[2026-08-31T21:01:12.204Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-31T21:01:12.204Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-08-31T21:01:12.204Z] [arbiter] \"There's coin on the board for a willing blade,\" the Arbiter says. \"Read the World.\"\n[2026-08-31T21:01:12.359Z] [cognitive] SWIM  (154ms)\n[2026-08-31T21:01:12.727Z] [debug] ui: tap \"climb\"\n[2026-08-31T21:01:12.729Z] [arbiter] The Arbiter catches your arm. \"Not on empty \u2014 rest or eat, then climb.\"\n[2026-08-31T21:01:13.463Z] [debug] ui: tap \"rest\"\n",
+      "[2026-08-31T21:01:13.472Z] [world] Black rain runs down your collar. Something in you tightens that should not have.\n[2026-08-31T21:01:13.476Z] [player] rest\n[2026-08-31T21:01:13.476Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-31T21:01:13.477Z] [world] Soot circles three times and curls beside you. Her breathing slows to yours.\n",
+      "[2026-08-31T21:01:13.478Z] [world] You rest for 8 hours. +6 HP, +8 stamina recovered. (Day 34, morning)\n[2026-08-31T21:01:13.478Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-31T21:01:13.486Z] [system] \u23f3 Time passed: 8h\n[2026-08-31T21:01:13.627Z] [cognitive] REST  (140ms)\n[2026-08-31T21:01:14.264Z] [debug] ui: tap \"rest\"\n[2026-08-31T21:01:14.267Z] [player] rest\n",
+      "[2026-08-31T21:01:14.267Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-08-31T21:01:14.267Z] [world] Soot turns twice, thinks about a third, and drops where she stands.\n[2026-08-31T21:01:14.267Z] [world] You rest for 8 hours. +6 HP, +6 stamina recovered. (Day 34, afternoon)\n[2026-08-31T21:01:14.272Z] [system] \u23f3 Time passed: 8h\n",
+      "[2026-08-31T21:01:14.397Z] [cognitive] REST  (124ms)\n[2026-08-31T21:01:14.811Z] [debug] ui: tap \"investigate\"\n[2026-08-31T21:01:16.314Z] [player] investigate the mud\n[2026-08-31T21:01:16.315Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=1\n",
+      "[2026-08-31T21:01:16.318Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-08-31T21:01:16.331Z] [system] \u23f3 Time passed: 24 min\n[2026-08-31T21:01:16.576Z] [cognitive] SWIM  (243ms)\n[2026-08-31T21:01:16.837Z] [debug] persist sizes(KB): total=209 player=49 wm=72[rooms=35 events=3 memos=0 npcs=2 defeated=1 tags=1 discovered=0] log=86 scene=3\n",
+      "[2026-08-31T21:01:17.333Z] [debug] qwen\u23f1 ambient_fill preempted 2816ms read 0ms/write 0ms in 365t\u2192out 0t (0ch)\n[2026-08-31T21:01:17.493Z] [debug] arbiter: ambient-fill \u2205 3225ms\n[2026-08-31T21:01:17.493Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient_fill after 2816ms \u2014 ambient:fill-\u2205\n[2026-08-31T21:01:23.148Z] [debug] homework: intro-fill armed after 6000ms idle\n",
+      "[2026-08-31T21:01:31.493Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 8186ms read/write unusable (native mis-reported 29319ms/1143ms \u2014 llama.rn split bug, not this call) in 743t\u2192out 33t HIT-CAP (143ch)\n[2026-08-31T21:01:31.657Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 8186ms \u2014 intro-fill:near-dup\n",
+      "[2026-08-31T21:01:31.657Z] [debug] homework: scene_intro \"Reclaimer's Stake\" \u2205 8511ms\n[2026-08-31T21:01:42.566Z] [debug] ui: tap \"investigate\"\n[2026-08-31T21:01:44.279Z] [player] investigate the mud\n[2026-08-31T21:01:44.279Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=1\n",
+      "[2026-08-31T21:01:44.282Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Big Rock (Common).\n[2026-08-31T21:01:44.289Z] [system] \u23f3 Time passed: 24 min\n[2026-08-31T21:01:44.424Z] [cognitive] SWIM  (134ms)\n[2026-08-31T21:01:45.718Z] [debug] ui: tap \"investigate\"\n[2026-08-31T21:01:47.235Z] [player] investigate the mud\n",
+      "[2026-08-31T21:01:47.236Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=1\n[2026-08-31T21:01:47.244Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Mud Fragment (Common).\n[2026-08-31T21:01:47.253Z] [system] \u23f3 Time passed: 24 min\n[2026-08-31T21:01:47.405Z] [cognitive] SWIM  (151ms)\n",
+      "[2026-08-31T21:01:48.034Z] [debug] ui: tap \"investigate\"\n[2026-08-31T21:01:49.402Z] [player] investigate the mud\n[2026-08-31T21:01:49.402Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=1\n[2026-08-31T21:01:49.407Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n",
+      "[2026-08-31T21:01:49.414Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-31T21:01:49.415Z] [arbiter] The Arbiter looks around. \"The tally-board lists marked ruins in grease-pencil: DUG, DIGGING, DEEP, LATER. 'Later' is doing heavy work.\"\n[2026-08-31T21:01:49.415Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-31T21:01:49.415Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-08-31T21:01:49.553Z] [cognitive] SWIM  (137ms)\n[2026-08-31T21:01:49.878Z] [debug] ui: tap \"investigate\"\n[2026-08-31T21:01:51.251Z] [player] investigate the mud\n[2026-08-31T21:01:51.252Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=1\n",
+      "[2026-08-31T21:01:51.257Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Violet Cap Mushroom (Uncommon).\n[2026-08-31T21:01:51.267Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-31T21:01:51.270Z] [system] \u23f3 Time passed: 24 min\n[2026-08-31T21:01:51.420Z] [cognitive] SWIM  (149ms)\n[2026-08-31T21:01:52.646Z] [debug] appstate: active \u2192 background (was active for 62676ms)\n",
+      "[2026-08-31T21:01:52.823Z] [debug] persist sizes(KB): total=209 player=49 wm=72[rooms=35 events=3 memos=0 npcs=2 defeated=1 tags=1 discovered=0] log=85 scene=3\n[2026-08-31T21:03:53.536Z] [debug] appstate: background \u2192 active (was background for 120885ms)\n[2026-08-31T21:03:53.790Z] [debug] homework: intro-fill armed after 6000ms idle (strike 2/3)\n[2026-08-31T21:03:56.915Z] [debug] ui: tap \"more \u25b8\"\n",
+      "[2026-08-31T21:03:58.416Z] [debug] ui: tap \"missions\"\n[2026-08-31T21:03:58.646Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 4477ms read 3203ms/write 1182ms in 747t\u2192out 33t 4.3ms/t HIT-CAP (157ch)\n[2026-08-31T21:03:58.651Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 4477ms \u2014 intro-fill:action-opener\n",
+      "[2026-08-31T21:03:58.651Z] [debug] homework: scene_intro \"Reclaimer's Stake\" \u2713 4862ms\n[2026-08-31T21:04:07.903Z] [world] Re-activated The Bog Dragon of Old Drakova. It's back in play.\n[2026-08-31T21:04:10.931Z] [world] You set course for Drakova. 31 tiles \u2014 about 3 days, 6 hours of travel, all in. You set off now \u2014 the ground ahead is new ground. Keep tapping \u2192 DRAKOVA on the travel row to close t",
+      "he distance; STOP TRAVEL to halt.\n[2026-08-31T21:04:10.945Z] [world] You walk east through open silt. The compass points east into open ground.\n[2026-08-31T21:04:10.945Z] [world] A line of pale-blue fungus blooms across the ground ahead \u2014 the True Tartarians grow this where they walk often.\n[2026-08-31T21:04:19.863Z] [debug] ui: tap \"missions\"\n",
+      "[2026-08-31T21:04:33.893Z] [world] Deactivated The Bog Dragon of Old Drakova. It stays on your slate but won't advance until you re-activate it.\n[2026-08-31T21:04:40.286Z] [world] Now on Run the haul. It's the contract you're running.\n[2026-08-31T21:04:42.048Z] [world] You're already at the objective for Run the haul.\n",
+      "[2026-08-31T21:04:43.575Z] [debug] homework: intro-fill armed after 6000ms idle (strike 3/3)\n[2026-08-31T21:04:49.930Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 6224ms read 5099ms/write 1096ms in 747t\u2192out 33t 6.8ms/t HIT-CAP (150ch)\n[2026-08-31T21:04:50.068Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 6224ms \u2014 intro-fill:near-dup\n",
+      "[2026-08-31T21:04:50.068Z] [debug] homework: scene_intro \"Reclaimer's Stake\" \u2205 6496ms\n[2026-08-31T21:05:00.675Z] [debug] ui: tap \"look around you\"\n[2026-08-31T21:05:00.687Z] [player] look\n[2026-08-31T21:05:00.688Z] [debug] parser: intent=investigate conf=1.00 verb=look target=- resolved=- range=- enemies=0 hooks=2\n",
+      "[2026-08-31T21:05:00.689Z] [world] You look around. You're in Active Dig Trench, in Reclaimer's Stake. You see: snagged climbing cache, bedroll, anvil post, banner, firepit, ladder, rubble. The fungus is unaddressed. Hazard active: Aether Mist. Cardinal travel: north, east, south, west.\n",
+      "[2026-08-31T21:05:00.689Z] [arbiter] \u25b8 Still open \u2014 Travel south of the outpost. Hollis camps somewhere in tiles 2-3 south, in daylight (5 am to 5 pm).\n[2026-08-31T21:05:00.849Z] [cognitive] neutral  (157ms)\n[2026-08-31T21:05:01.015Z] [debug] persist sizes(KB): total=204 player=49 wm=67[rooms=30 events=3 memos=0 npcs=2 defeated=1 tags=1 discovered=0] log=85 scene=3\n",
+      "[2026-08-31T21:05:27.552Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=360 from=cached winH=986 beat=-\n[2026-08-31T21:05:27.839Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-08-31T21:05:28.629Z] [debug] homework: intro-fill armed after 7870ms idle\n",
+      "[2026-08-31T21:05:35.143Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 6374ms read 5219ms/write 1113ms in 740t\u2192out 33t 7.1ms/t HIT-CAP (161ch)\n[2026-08-31T21:05:35.296Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 6374ms \u2014 intro-fill:action-opener\n[2026-08-31T21:05:35.296Z] [debug] homework: scene_intro \"The Architect's Blind\" \u2713 6668ms\n",
+      "[2026-08-31T21:05:35.949Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=cached winH=986 beat=-\n[2026-08-31T21:05:36.220Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-08-31T21:05:41.487Z] [player] take the bedroll\n",
+      "[2026-08-31T21:05:41.488Z] [debug] parser: intent=pickup conf=1.00 verb=take target=bedroll resolved=bedroll range=- enemies=0 hooks=2\n[2026-08-31T21:05:41.489Z] [world] The bedroll weighs more than you do. The Arbiter watches you try anyway, then mercifully looks away. (Try SALVAGE.)\n[2026-08-31T21:05:41.749Z] [cognitive] neutral  (259ms)\n",
+      "[2026-08-31T21:05:44.951Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=cached winH=986 beat=-\n[2026-08-31T21:05:45.223Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-08-31T21:05:57.322Z] [world] Iron fog disorients you. Compasses spin; intent costs more.\n[2026-08-31T21:05:57.366Z] [player] what's at Hollis vamps\n",
+      "[2026-08-31T21:05:57.366Z] [debug] parser: intent=ask conf=1.00 verb=what target=hollis vamps resolved=- range=- enemies=0 hooks=2\n[2026-08-31T21:05:57.670Z] [cognitive] neutral  (299ms)\n[2026-08-31T21:06:08.604Z] [debug] qwen\u23f1 ask_arbiter ok 3811ms read 2873ms/write 917ms in 242t\u2192out 29t 11.9ms/t (133ch)\n",
+      "[2026-08-31T21:06:08.767Z] [arbiter] I'm not familiar with this specific band or its music. If you could provide more details or context, I might be able to help further.\n[2026-08-31T21:06:10.821Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=408 from=cached winH=986 beat=-\n[2026-08-31T21:06:11.100Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n",
+      "[2026-08-31T21:06:13.688Z] [debug] homework: intro-fill armed after 7894ms idle (strike 2/3)\n[2026-08-31T21:06:14.867Z] [player] what's it Hollis camps?\n[2026-08-31T21:06:14.868Z] [debug] parser: intent=ask conf=1.00 verb=what target=hollis camps resolved=guild camp range=- enemies=0 hooks=2\n",
+      "[2026-08-31T21:06:20.041Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 6231ms read 0ms/write 0ms in 745t\u2192out 0t (0ch)\n[2026-08-31T21:06:20.191Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 6231ms \u2014 intro-fill:\u2205\n[2026-08-31T21:06:20.191Z] [debug] homework: scene_intro \"The Architect's Blind\" \u2205 6504ms\n[2026-08-31T21:06:20.350Z] [cognitive] neutral  (5479ms)\n",
+      "[2026-08-31T21:06:24.611Z] [debug] qwen\u23f1 ask_arbiter ok 4269ms read/write unusable (native mis-reported 9294ms/1475ms \u2014 llama.rn split bug, not this call) in 242t\u2192out 46t (212ch)\n[2026-08-31T21:06:24.804Z] [arbiter] Hollis camps are the abandoned, forgotten cities that once stood on Tartaria's shores. They are buried under the mud and debris, but their history is etched in the earth, waiting to be",
+      " uncovered and rediscovered.\n[2026-08-31T21:06:31.669Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=cached winH=986 beat=-\n[2026-08-31T21:06:31.935Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-08-31T21:06:36.866Z] [player] is something waiting for me at Hollis camps?\n",
+      "[2026-08-31T21:06:36.866Z] [debug] parser: intent=rest conf=0.82 verb=camp target=- resolved=- range=- enemies=0 hooks=2\n[2026-08-31T21:06:36.869Z] [world] Soot paws the ground flat before trusting it, then folds down onto it.\n[2026-08-31T21:06:36.869Z] [world] You rest for 8 hours. +6 HP recovered. (Day 35, night)\n[2026-08-31T21:06:36.877Z] [debug] arbiter: template (reason=busy)\n",
+      "[2026-08-31T21:06:36.878Z] [arbiter] The Arbiter looks around. \"The winch rig groans all day. What comes up on the hook decides the evening's mood.\"\n[2026-08-31T21:06:36.878Z] [system] \u23f3 Time passed: 8h\n[2026-08-31T21:06:37.168Z] [cognitive] neutral  (288ms)\n[2026-08-31T21:06:45.542Z] [debug] qwen\u23f1 ambient_fill ok 8513ms read 4150ms/write 1478ms in 365t\u2192out 31t 11.4ms/t HIT-CAP (146ch)\n",
+      "[2026-08-31T21:06:45.542Z] [debug] qwen\u23f1 stats \u2014 narration:scene_intro_fill n5 avg6.3s max8.2s read4.5s/write1.1s \u26a02unusable in744t\u2192out26t ms/tok 4.3-7.1 cap4 \u23f81 \u27025/31."
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-31-1594-the-pinch-demands-the-lift #mthqftbaluhw [inline 25/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mthqftbaluhw"
+    },
+    {
+      "key": "dist",
+      "value": "2026-08-31-1594-the-pinch-demands-the-lift"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "25"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-08-31-1594-the-pinch-demands-the-lift"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-31T21:10:29.002089Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-31T21:10:30.724000Z",
+  "fingerprints": [
+    "6634c6e2ed54099c9e7ef9834dd3dbf3"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1946489288,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-08-31T17:38:33.982000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-08-31-1594-the-pinch-demands-the-lift",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-08-31-1594-the-pinch-demands-the-lift",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-08-31-1594-the-pinch-demands-the-lift",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-08-31-1594-the-pinch-demands-the-lift)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "a0739f14e2434f278bc31f9d6913c54e",
+  "previousEventID": "9a1535895ae94dbca2c42555f5a9a91a"
+}

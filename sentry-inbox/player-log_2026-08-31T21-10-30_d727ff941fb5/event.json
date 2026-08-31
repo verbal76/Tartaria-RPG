@@ -1,0 +1,257 @@
+{
+  "id": "d727ff941fb546868cf9467a3ea59679",
+  "groupID": "7703253341",
+  "eventID": "d727ff941fb546868cf9467a3ea59679",
+  "projectID": "4511945117532160",
+  "size": 17834,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-31-1594-the-pinch-demands-the-lift #mthqftbaluhw [inline 24/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-08-31-1594-the-pinch-demands-the-lift",
+  "message": "player-log 2026-08-31-1594-the-pinch-demands-the-lift #mthqftbaluhw [inline 24/28]",
+  "title": "player-log 2026-08-31-1594-the-pinch-demands-the-lift #mthqftbaluhw [inline 24/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "c85e2d2ae09d416f9dad31f645d9f291",
+      "span_id": "bbf9aa35f44894e8",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "er] mission completed on stage 1?\n[2026-08-31T16:45:29.630Z] [debug] parser: intent=turn_in conf=0.84 verb=complete target=stage 1 resolved=- range=- enemies=0 hooks=0\n[2026-08-31T16:45:29.630Z] [arbiter] the Reclaimers Guild hall doesn't list that one on your active slate.\n[2026-08-31T16:45:29.894Z] [cognitive] neutral  (262ms)\n[2026-08-31T16:45:33.284Z] [debug] ui: tap \"missions\"\n",
+      "[2026-08-31T16:45:58.634Z] [debug] homework: intro-fill armed after 11794ms idle\n[2026-08-31T16:45:58.665Z] [debug] send-log: #mthgzm4ylhgw \u2014 DELIVERED (inline, no attachments): beacon out, 24/24 parts accepted (351696 chars) \u2014 flush said yes\n[2026-08-31T16:45:58.666Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mthgzm4ylhgw kept on disk, boots retry up to 5 sends total\n",
+      "[2026-08-31T16:46:05.709Z] [debug] appstate: active \u2192 background (was active for 226785ms)\n[2026-08-31T16:46:05.757Z] [debug] persist sizes(KB): total=201 player=44 wm=68[rooms=30 events=3 memos=0 npcs=2 defeated=1 tags=1 discovered=0] log=86 scene=2\n[2026-08-31T17:38:28.837Z] [debug] appstate: background \u2192 active (was background for 3143121ms)\n",
+      "[2026-08-31T17:38:28.852Z] [debug] homework: intro-fill armed after 11794ms idle\n[2026-08-31T17:38:32.543Z] [debug] ctx: RELEASED \u2014 live=0 (opened=1 released=1)\n[2026-08-31T17:38:33.829Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a058e2-43ab-7e41-89a7-70e1ca3f3df9\n[2026-08-31T17:38:33.829Z] [debug] ota: Checking\u2026\n",
+      "[2026-08-31T17:38:33.925Z] [debug] ota: Already up to date\n[2026-08-31T17:38:33.925Z] [debug] ota: boot check result = noUpdate\n[2026-08-31T17:38:34.031Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-08-31T17:38:34.031Z] [debug] voice: bundled idle\n[2026-08-31T17:38:34.217Z] [debug] send-log: bundle #mthgzm4ylhgw attempt 2/5 delivered to Sentry\n",
+      "[2026-08-31T18:57:53.778Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a058e2-43ab-7e41-89a7-70e1ca3f3df9\n[2026-08-31T18:57:53.779Z] [debug] ota: Checking\u2026\n[2026-08-31T18:57:53.844Z] [debug] ota: Already up to date\n[2026-08-31T18:57:53.845Z] [debug] ota: boot check result = noUpdate\n[2026-08-31T18:57:53.909Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-08-31T18:57:53.909Z] [debug] voice: bundled idle\n[2026-08-31T18:57:54.096Z] [debug] send-log: bundle #mthgzm4ylhgw attempt 3/5 delivered to Sentry\n[2026-08-31T21:00:40.111Z] [debug] OTA session start: 2026-08-31-1594-the-pinch-demands-the-lift.\n[2026-08-31T21:00:40.111Z] [world] You step back into Reclaimer's Stake. The world waits for your move.\n",
+      "[2026-08-31T21:00:40.112Z] [arbiter] The Arbiter sets the quiet aside. \"Welcome back, Cheddar Bob. I kept watch while you were gone.\"\n[2026-08-31T21:00:40.551Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-31T21:00:40.549Z \u00b7 build 2026-08-31-1594-the-pinch-demands-the-lift \u00b7 previous entry moments earlier \u2550\u2550\u2550\n",
+      "[2026-08-31T21:00:40.555Z] [debug] missions: hunt:hunt_servants_doubter stage 1/5 [boss\u2192attack] @great_tartary_plains needs=Servants' Mark of Sanction\u2717MISSING spawn=Tartarian Raider\u00d73 PAUSED\n[2026-08-31T21:00:40.555Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n",
+      "[2026-08-31T21:00:40.555Z] [debug] missions: faction:fq_reclaimers_haul stage 0/2 [advanceOn=any] PAUSED\n[2026-08-31T21:00:40.555Z] [debug] missions: \u00b7 at=reclaimer_stake\n[2026-08-31T21:00:40.555Z] [debug] boot: life bmthlp9n248 started 2026-08-31T18:57:53.678Z \u00b7 not an OTA apply (no handoff on disk)\n",
+      "[2026-08-31T21:00:41.070Z] [debug] send-log: crash on record (2026-08-31T17:38:34.699Z) \u2014 game log pushed automatically, delivered to Sentry, kept on disk as #mthq364gh205\n[2026-08-31T21:00:45.006Z] [debug] ui: tap \"take / salvage\"\n[2026-08-31T21:00:46.282Z] [world] You strip the stairwell carefully. Something usable comes free in your hand.\n[2026-08-31T21:00:46.283Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-08-31T21:00:46.283Z] [reward]     \u2022 Smooth Stone x2 (Common)\n[2026-08-31T21:00:48.643Z] [debug] ui: tap \"\u2191 SQUARE\"\n[2026-08-31T21:00:48.675Z] [player] go north\n[2026-08-31T21:00:48.679Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=0\n[2026-08-31T21:00:48.680Z] [world] You head on to the Square.\n",
+      "[2026-08-31T21:00:48.680Z] [debug] scene: loc=reclaimer_stake hub=outpost_central arrival=n opening=n passing=n\n[2026-08-31T21:00:48.681Z] [debug] missions: hunt:hunt_servants_doubter stage 1/5 [boss\u2192attack] @great_tartary_plains needs=Servants' Mark of Sanction\u2717MISSING spawn=Tartarian Raider\u00d73 PAUSED\n",
+      "[2026-08-31T21:00:48.681Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n[2026-08-31T21:00:48.681Z] [debug] missions: faction:fq_reclaimers_haul stage 0/2 [advanceOn=any] PAUSED\n[2026-08-31T21:00:48.681Z] [debug] missions: \u00b7 at=reclaimer_stake\n",
+      "[2026-08-31T21:00:48.712Z] [world] The outpost has restocked since you were last through \u2014 supplies have been set out again.\n[2026-08-31T21:00:48.712Z] [arbiter] A porter sets down two crates in the square and stretches his back. \"Salt's short again. Hollis carts it up from the pans, south of here, daylight man. Runner cracked his last load and he's paying for the recovery.\"\n",
+      "[2026-08-31T21:00:48.713Z] [world] Reclaimers' Outpost \u2014 The Central Square. A small open square strung with Aetheric lanterns. A worn map-stone sits in the center, the Cradle of Dusk drawn in three different hands. Four paths spoke off it \u2014 north to the vault block, west to the mess, east to the armory, south to the gate \u2014 and a side door in the wall lets you straight out.\n",
+      "[2026-08-31T21:00:48.714Z] [world] You have been here. The shape of it comes back before the details do.\n[2026-08-31T21:00:48.714Z] [world] Paths: north to Vault \u00b7 south to Gate \u00b7 east to Armory \u00b7 west to Mess. (Type 'leave outpost' to head into the wilds.)\n[2026-08-31T21:00:48.714Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-08-31T21:00:48.715Z] [arbiter] \"The Guild has no rivals, only invoices,\" the Arbiter says drily.\n[2026-08-31T21:00:48.715Z] [debug] dedup: suppressed arbiter repeat \u2014 \"\"The Guild has no rivals, only invoices,\" the Arbiter says d\u2026\"\n[2026-08-31T21:00:48.862Z] [cognitive] TRAVEL  (141ms)\n[2026-08-31T21:00:49.823Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n",
+      "[2026-08-31T21:00:51.007Z] [debug] ui: tap \"\u2191 VAULT\"\n[2026-08-31T21:00:51.043Z] [player] go north\n[2026-08-31T21:00:51.044Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=0\n[2026-08-31T21:00:51.045Z] [world] You head on to the Vault.\n[2026-08-31T21:00:51.046Z] [debug] scene: loc=reclaimer_stake hub=outpost_relic_vault arrival=n opening=n passing=n\n",
+      "[2026-08-31T21:00:51.046Z] [debug] missions: hunt:hunt_servants_doubter stage 1/5 [boss\u2192attack] @great_tartary_plains needs=Servants' Mark of Sanction\u2717MISSING spawn=Tartarian Raider\u00d73 PAUSED\n[2026-08-31T21:00:51.047Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n",
+      "[2026-08-31T21:00:51.047Z] [debug] missions: faction:fq_reclaimers_haul stage 0/2 [advanceOn=any] PAUSED\n[2026-08-31T21:00:51.047Z] [debug] missions: \u00b7 at=reclaimer_stake\n[2026-08-31T21:00:51.052Z] [world] The outpost has restocked since you were last through \u2014 supplies have been set out again.\n",
+      "[2026-08-31T21:00:51.053Z] [world] Reclaimers' Outpost \u2014 The Relic Vault. Aether-shielded shelves under a high ceiling, the tagged crates of un-identified relics waiting on their assessor. The vault block is the outpost's north junction: the square lies south, the lab west, the workshop east. The strongroom door at the back is mechanical \u2014 Reclaimer trust over Reclaimer tech.\n",
+      "[2026-08-31T21:00:51.056Z] [world] Something about this ground is already familiar.\n[2026-08-31T21:00:51.056Z] [world] Paths: south to Square \u00b7 east to Workshop \u00b7 west to Lab. (Type 'leave outpost' to head into the wilds.)\n[2026-08-31T21:00:51.057Z] [debug] arbiter: template (reason=outpost-room)\n[2026-08-31T21:00:51.057Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-08-31T21:00:51.207Z] [cognitive] TRAVEL  (139ms)\n[2026-08-31T21:00:53.441Z] [debug] ui: tap \"take / salvage\"\n[2026-08-31T21:00:55.264Z] [world] You work the crate over. A part of it comes loose, intact.\n[2026-08-31T21:00:55.264Z] [world] You salvage the door. The take is small but real.\n",
+      "[2026-08-31T21:00:55.265Z] [world] You work the mud-glazed capacitor coil rack over. A part of it comes loose, intact.\n[2026-08-31T21:00:55.265Z] [world] You strip the relic carefully. Something usable comes free in your hand.\n[2026-08-31T21:00:55.265Z] [world] You strip the rusted submerged library shelf carefully. Something usable comes free in your hand.\n",
+      "[2026-08-31T21:00:55.267Z] [world] Already worked over: salt-crusted vault relic pedestal, shelf.\n[2026-08-31T21:00:55.268Z] [reward] \u2726 Salvage haul:\n[2026-08-31T21:00:55.268Z] [reward]     \u2022 Worn Tartarian Coin x11 (Common)\n[2026-08-31T21:00:55.268Z] [reward]     \u2022 Stick x2 (Common)\n[2026-08-31T21:00:55.269Z] [reward]     \u2022 Scrap Metal (Common)\n",
+      "[2026-08-31T21:00:55.269Z] [reward]     \u2022 Aether Dust x2 (Common)\n[2026-08-31T21:00:56.624Z] [debug] ui: tap \"investigate\"\n[2026-08-31T21:00:58.143Z] [player] investigate the floor\n[2026-08-31T21:00:58.144Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=floor resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-08-31T21:00:58.145Z] [world] You give the floor a once-over. Clean enough to fail you.\n[2026-08-31T21:00:58.974Z] [debug] ui: tap \"\u2193 \u2713 SQUARE\"\n[2026-08-31T21:00:58.997Z] [player] go south\n[2026-08-31T21:00:58.997Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=0\n[2026-08-31T21:00:58.998Z] [world] You head on to the Square.\n",
+      "[2026-08-31T21:00:58.999Z] [debug] scene: loc=reclaimer_stake hub=outpost_central arrival=n opening=n passing=n\n[2026-08-31T21:00:58.999Z] [debug] missions: hunt:hunt_servants_doubter stage 1/5 [boss\u2192attack] @great_tartary_plains needs=Servants' Mark of Sanction\u2717MISSING spawn=Tartarian Raider\u00d73 PAUSED\n",
+      "[2026-08-31T21:00:58.999Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n[2026-08-31T21:00:59.001Z] [debug] missions: faction:fq_reclaimers_haul stage 0/2 [advanceOn=any] PAUSED\n[2026-08-31T21:00:59.001Z] [debug] missions: \u00b7 at=reclaimer_stake\n",
+      "[2026-08-31T21:00:59.005Z] [world] Reclaimers' Outpost \u2014 The Central Square. A small open square strung with Aetheric lanterns. A worn map-stone sits in the center, the Cradle of Dusk drawn in three different hands. Four paths spoke off it \u2014 north to the vault block, west to the mess, east to the armory, south to the gate \u2014 and a side door in the wall lets you straight out.\n",
+      "[2026-08-31T21:00:59.006Z] [world] You could walk this stretch with your eyes shut, and nearly do.\n[2026-08-31T21:00:59.007Z] [world] Paths: north to Vault \u00b7 south to Gate \u00b7 east to Armory \u00b7 west to Mess. (Type 'leave outpost' to head into the wilds.)\n[2026-08-31T21:00:59.013Z] [debug] arbiter: template (reason=cooldown)\n",
+      "[2026-08-31T21:00:59.014Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T21:01:00.276Z] [debug] ui: tap \"\ud83d\udeaa EXIT\"\n[2026-08-31T21:01:00.304Z] [player] leave outpost\n[2026-08-31T21:01:00.305Z] [debug] parser: intent=travel conf=1.00 verb=leave target=outpost resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-08-31T21:01:00.308Z] [world] You let yourself out the Square's side door and into the open ground. The outpost falls away behind you.\n[2026-08-31T21:01:00.308Z] [debug] scene: loc=reclaimer_stake hub=- arrival=n opening=n passing=n\n",
+      "[2026-08-31T21:01:00.308Z] [debug] missions: hunt:hunt_servants_doubter stage 1/5 [boss\u2192attack] @great_tartary_plains needs=Servants' Mark of Sanction\u2717MISSING spawn=Tartarian Raider\u00d73 PAUSED\n[2026-08-31T21:01:00.308Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n",
+      "[2026-08-31T21:01:00.309Z] [debug] missions: faction:fq_reclaimers_haul stage 0/2 [advanceOn=any] PAUSED\n[2026-08-31T21:01:00.309Z] [debug] missions: \u00b7 at=reclaimer_stake\n[2026-08-31T21:01:00.346Z] [world] Rain the color of old oil. It pools on Aetherstone and refuses to soak in.\n\n",
+      "You are at Reclaimer's Stake. A Reclaimers' Guild salvage-stake driven into the frontier mud: claim-posts, a tally-board of marked ruins, and a winch rig for hauling up whatever the wastes give. The expedition launches from here.\n\nHazard: Aether Mist. A glowing low mist that pulses with each heartbeat \u2014 yours, or something else's.\n",
+      "[2026-08-31T21:01:00.346Z] [world] You know this place. Not well, but you know it.\n[2026-08-31T21:01:00.349Z] [world] [Reclaimer's Stake] north: Iskan-Veil (2 tiles, 5 hours) \u00b7 east: The Architect's Blind (3 tiles, 8 hours) \u00b7 south: Asgardar (13 tiles, 1 day, 9 hours) \u00b7 west: open ground\n",
+      "[2026-08-31T21:01:00.350Z] [world] You think back to the crate from earlier \u2014 the salvage you pulled from it. Something here reminds you of it.\n[2026-08-31T21:01:00.350Z] [debug] arbiter: template (reason=cooldown)\n[2026-08-31T21:01:00.350Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T21:01:00.359Z] [system] \u23f3 Time passed: 1h\n",
+      "[2026-08-31T21:01:00.645Z] [debug] persist sizes(KB): total=210 player=48 wm=72[rooms=35 events=3 memos=0 npcs=2 defeated=1 tags=1 discovered=0] log=86 scene=3\n[2026-08-31T21:01:01.051Z] [debug] qwen\u23f1 narration:travel preempted 9728ms read 9550ms/write 116ms in 763t\u2192out 3t 12.5ms/t (11ch)\n",
+      "[2026-08-31T21:01:01.182Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:travel after 9728ms \u2014 cancelled:player-acted-again\n[2026-08-31T21:01:01.316Z] [cognitive] neutral  (3170ms)\n[2026-08-31T21:01:01.446Z] [cognitive] neutral  (2430ms)\n[2026-08-31T21:01:01.573Z] [cognitive] RETREAT \u00b7 DISENGAGE \u00b7 HIDE  (1214ms)\n[2026-08-31T21:01:04.129Z] [debug] ui: tap \"take / salvage\"\n",
+      "[Filtered]",
+      "[2026-08-31T21:01:05.532Z] [world] You work the jagged submerged giant statue apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n[2026-08-31T21:01:05.532Z] [world] You work the rubble apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n",
+      "[2026-08-31T21:01:05.533Z] [world] You work the salt-crusted lockbox over. A part of it comes loose, intact.\n[2026-08-31T21:01:05.533Z] [world] You salvage the standing water. The take is small but real.\n[2026-08-31T21:01:05.533Z] [reward] \u2726 Salvage haul:\n[2026-08-31T21:01:0"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-31-1594-the-pinch-demands-the-lift #mthqftbaluhw [inline 24/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mthqftbaluhw"
+    },
+    {
+      "key": "dist",
+      "value": "2026-08-31-1594-the-pinch-demands-the-lift"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "24"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-08-31-1594-the-pinch-demands-the-lift"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-31T21:10:28.998931Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "41": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 381,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-31T21:10:30.724000Z",
+  "fingerprints": [
+    "6634c6e2ed54099c9e7ef9834dd3dbf3"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1946489288,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-08-31T17:38:33.982000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-08-31-1594-the-pinch-demands-the-lift",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-08-31-1594-the-pinch-demands-the-lift",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-08-31-1594-the-pinch-demands-the-lift",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-08-31-1594-the-pinch-demands-the-lift)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "e4a03670886e483a961bfe223b39c944",
+  "previousEventID": "c5b879374f4846b58e5f36aa8f68d5c3"
+}
