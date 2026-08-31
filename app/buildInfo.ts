@@ -26482,6 +26482,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the leak to the authored silent line, and a question naming a live whisper
 // NPC now answers from the chain record instead of the model.
 export const OTA_BUILD_ID = '2026-08-31-1595-the-guide-and-the-ground-agree';
+// golem catch-up 2026-08-31: markerless publish of OTA-1595 — a whisper course
+// clears the outpost room (the minimap stops showing the interior on open
+// silt), whisper hints state the true remaining walk from where you stand, the
+// ask persona can no longer break character, and a meet tile visited outside
+// its hours says who works when instead of nothing.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-31-1594-the-pinch-demands-the-lift';
 // golem catch-up 2026-08-31: markerless publish of OTA-1594 — the theft quest
 // is paid only by a theft ('steal' trigger from both clean-lift doors), the
