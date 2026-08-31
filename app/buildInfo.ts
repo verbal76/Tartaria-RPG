@@ -26180,6 +26180,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // advance. Verified to fire. The prose-promises-a-fight-with-no-spawn count
 // rides as a shrink-only ratchet at 9.
 export const OTA_BUILD_ID = '2026-08-30-1582-the-guy-who-gives-you-the-job';
+// golem catch-up 2026-08-31: markerless publish of OTA-1582 — the opening stage
+// of all 50 staged missions stops being skipped, so the person who hands you the
+// job is finally somebody you meet; one shared definition of where a record
+// starts, replacing three; and check:missionclaims, the 17th gate, which holds
+// the mission data to what the engine can actually deliver.
 // golem catch-up 2026-08-30: markerless publish of OTA-1581 — the mission
 // conversation card wired end to end (arming selector, card UI, persuade roll,
 // the post-keyed kill ledger), plus the two engine holes the wiring exposed:
