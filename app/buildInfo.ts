@@ -26273,6 +26273,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // is deleted rather than patched. Two implementations of one question is one
 // implementation plus a time bomb.
 export const OTA_BUILD_ID = '2026-08-31-1585-the-core-inside-the-cleaver';
+// golem catch-up 2026-08-31: markerless publish of OTA-1585 — the parser's
+// ambient pre-pass stops matching a scene noun from the middle of a longer word,
+// which is what turned "attack with the geode-cored cleaver" into a lecture
+// about the Tartarian Core while a Guardian was swinging.
 // golem catch-up 2026-08-31: markerless publish of OTA-1584 — the gap report's
 // last two sections stop firing at fourteen stages that were never defects, the
 // epilogue class gets a hard mid-chain guard, and the two false summits name the
