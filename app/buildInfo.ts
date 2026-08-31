@@ -26468,6 +26468,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // faction family (his live quest was invisible while two PAUSED hunts traced
 // faithfully); the Contracts card speaks the new verb.
 export const OTA_BUILD_ID = '2026-08-31-1594-the-pinch-demands-the-lift';
+// golem catch-up 2026-08-31: markerless publish of OTA-1594 — the theft quest
+// is paid only by a theft ('steal' trigger from both clean-lift doors), the
+// haul's final advance counts the purse against its spoken 100 TC price, and
+// the mission trace finally covers the faction family he was playing.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-31-1593-the-boot-gets-checkpoints';
 // golem catch-up 2026-08-31: markerless publish of OTA-1593 — every boot stage
 // stamps the dying breath (boot:<stage>), and the seam re-emits the launch line
