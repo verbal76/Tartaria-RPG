@@ -26330,6 +26330,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ship an instrument. The candidate above is not a number yet, so it ships as a
 // question the next device log answers, not as a fix.
 export const OTA_BUILD_ID = '2026-08-31-1587-which-life-died';
+// golem catch-up 2026-08-31: markerless publish of OTA-1587 — a JS life now has
+// a name and an age, the reload leaves the next boot a note carrying its model
+// ledger, the OTA window is phase-stamped, and the crash ledger prints how many
+// of its kills landed on an OTA-apply boot.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-08-31-1586-the-slate-in-every-part';
 // golem catch-up 2026-08-31: markerless publish of OTA-1586 — the mission trace
 // on every arrival and under every session seam, and the arrival line that tells
