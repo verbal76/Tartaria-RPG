@@ -126,6 +126,9 @@ export interface QuestSlice {
    *  advances exactly as it would have; only the spawn and the freeze-for-kill
    *  are skipped. Absent/false is the old behaviour, unchanged. */
   advanceHunt: (huntId: string, opts?: { peaceful?: boolean }) => void;
+  /** OTA-1600 — the stinger popup state + its one dismiss. */
+  pendingMissionStinger: { title: string; line: string } | null;
+  dismissMissionStinger: () => void;
   turnInHunt: (titleOrId: string, remote?: boolean) => void;
   acceptMystery: (titleOrId: string) => void;
   advanceMystery: (mysteryId: string) => void;
@@ -1665,6 +1668,10 @@ export const createQuestSlice = (
     void get().persist();
   },
 
+  pendingMissionStinger: null,
+  dismissMissionStinger() {
+    set(() => ({ pendingMissionStinger: null }));
+  },
   advanceHunt(huntId, opts) {
     const peaceful = opts?.peaceful === true;
     const state = get();
@@ -1787,11 +1794,16 @@ export const createQuestSlice = (
     //
     // The boss SCALING stays boss-only. Only the escort moved out.
     const override = peaceful ? null : stageDef.spawn;
-    spawnStageEscort(get, set, deps, player, override);
+    let stoodUp = spawnStageEscort(get, set, deps, player, override);
     if (stageDef.checkKind === 'boss') {
       // ⚠ OTA-1167 — pass the REAL power measure, so the boss sees stats, weapon and AC
       // rather than max HP alone. `scalePowerOf` carries the guarded gear read.
-      const boss = override ? null : scaleHuntBoss(player, hunt, deps.scalePowerOf(player));
+      // ⚠ OTA-1600 — AND `peaceful` finally reaches the boss scale. OTA-1581's
+      // contract says a peaceful advance puts NOBODY in front of you; the spawn
+      // and the freeze honoured it, but this line read only `override`, so a
+      // persuade landed on a boss stage stood the boss up anyway (and would now
+      // have shouted a stinger over a fight the persuade had just bought off).
+      const boss = peaceful || override ? null : scaleHuntBoss(player, hunt, deps.scalePowerOf(player));
       if (boss) {
         set((s) =>
           s.currentScene
@@ -1808,7 +1820,24 @@ export const createQuestSlice = (
             : s,
         );
         get().appendLog('combat', `${boss.name} closes the distance. The hunt comes to its end.`);
+        stoodUp = true;
       }
+    }
+    // ⚠⚠⚠ OTA-1600 — THE STINGER. Owner: "should the big boss of the mission
+    // have a line of dialogue on a pop up to pull your attention back into the
+    // mission ... not a talk card, just a popup to focus your attention? a text
+    // cutscene?" Yes — his own log made the case: the raider pack and the
+    // Reaver's arrival were single lines scrolling past in combat noise, and he
+    // typed "still didn't progress" while standing in the middle of the
+    // mission's own fight. The moment a fight-stage actually STANDS BODIES UP
+    // (an escort landed, or the boss committed — never on a prose-only close,
+    // which would shout over an empty field), the authored `stinger` line goes
+    // up as a modal with the mission title, and into the log so the record
+    // keeps it. One writer, so the verb path, the card door, and the arrival
+    // arm all get the same curtain.
+    if (stoodUp && stageDef.stinger) {
+      get().appendLog('combat', stageDef.stinger);
+      set(() => ({ pendingMissionStinger: { title: hunt.title, line: stageDef.stinger! } }));
     }
     if (!freezeForKill) {
       // ⚠ OTA-1219 — auto-consume pure-narration (checkKind: null) stages, the

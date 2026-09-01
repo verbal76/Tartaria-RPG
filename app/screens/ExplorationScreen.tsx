@@ -35,6 +35,7 @@ import { SearchModal } from '../components/SearchModal';
 import { BrandedModal } from '../components/BrandedModal';
 import { GatherModal } from '../components/GatherModal'; // OTA-1233 — one picker, both verbs
 import { CombatPrimerModal } from '../components/CombatPrimerModal'; // OTA-1321 — the first fight explains itself
+import { MissionStingerModal } from '../components/MissionStingerModal'; // OTA-1600 — the mission's fight announces itself
 
 /** ⚠ OTA-1263 — the beat between INVESTIGATE ALL's results. The owner asked for
  *  "maybe 2+3 seconds"; 2.2s was the low end of that, because the sweep can be six
@@ -373,7 +374,13 @@ export function ExplorationScreen() {
   // flipping the Settings toggle or tapping "turn off tips" inside any card
   // takes effect here live.
   const hintsOff = useHintsDisabled();
-  const combatPrimerOpen = liveEnemyCount > 0 && !combatPrimerSeen && enemiesDefeatedEver === 0 && !hintsOff;
+  // ⚠ OTA-1600 — the stinger: the mission's own fight announces itself. Story
+  // content, not a tip — no hints gate. While it is up, the first-fight primer
+  // holds back (two cards on one beat is the OTA-1321 noise rule); the primer's
+  // own condition still holds after dismiss, so nothing is lost, only ordered.
+  const pendingMissionStinger = useGameStore((s) => s.pendingMissionStinger);
+  const dismissMissionStinger = useGameStore((s) => s.dismissMissionStinger);
+  const combatPrimerOpen = liveEnemyCount > 0 && !pendingMissionStinger && !combatPrimerSeen && enemiesDefeatedEver === 0 && !hintsOff;
   // OTA 031 — climb-target picker. Opens to a chip list of every
   // climbable noun in the current scene; tapping one fires `climb
   // <noun>` which resolves one tier in the climb handler.
@@ -2868,6 +2875,11 @@ export function ExplorationScreen() {
         enemyName={currentScene?.enemies?.[0]?.name ?? null}
         onClose={markCombatPrimerSeen}
       />
+
+      {/* ⚠ OTA-1600 — the stinger: mission title up top, the shouted line, one
+          FIGHT button. Raised the moment advanceHunt stands bodies up; the line
+          is already in the log, so dismissing loses nothing. */}
+      <MissionStingerModal stinger={pendingMissionStinger} onClose={dismissMissionStinger} />
 
       {/* ⚠⚠ OTA-1233 — ONE PICKER. TakeModal + SalvageModal were two modals over the
           SAME `displayedAmbientNouns`, each with its own consumed-predicate — the

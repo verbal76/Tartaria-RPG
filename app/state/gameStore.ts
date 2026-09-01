@@ -7262,6 +7262,9 @@ export interface GameStore {
   /** ⚠ OTA-1581 — `peaceful` skips the spawn and the freeze-for-kill; see the
    *  questSlice declaration for why the mission card needs both. */
   advanceHunt: (huntId: string, opts?: { peaceful?: boolean }) => void;
+  /** OTA-1600 — the stinger popup: set when a fight-stage stands bodies up. */
+  pendingMissionStinger: { title: string; line: string } | null;
+  dismissMissionStinger: () => void;
   turnInHunt: (titleOrId: string, remote?: boolean) => void;
   acceptMystery: (titleOrId: string) => void;
   advanceMystery: (mysteryId: string) => void;
@@ -9693,9 +9696,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // See missionTrace.ts — it is a READER, using the same resolvers the engine
     // decides with.
     for (const l of missionTraceLines(get().player)) get().appendLog('debug', l);
-    // ⚠⚠ OTA-1596 — the debt is settled BEFORE the receipt prints, so the
-    // arrival line reads "finish it" instead of naming an item the player has
-    // no road to. See stageArrival.ts.
+    // ⚠⚠ OTA-1596 — the debt is settled BEFORE the receipt prints, so the arrival
+    // line reads "finish it", not an item with no road to it. See stageArrival.ts.
     healStageDebtsAtArrival(get, set, grantStageItems);
     // ⚠⚠⚠ OTA-1586 — AND THE PLAYER IS TOLD WHY THEY CAME. See
     // missionTrace.missionArrivalLines: the conversation card only arms where a
@@ -10813,10 +10815,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // ⚠ OTA-1409 — stamped in the SAME set() that installs the scene, so there is
     // no window in which the scene is current and the boundary is not.
     set({ currentScene: scene, pendingRolls: null, pendingHookContinue: null, sceneStartedAt: Date.now() });
-    // ⚠⚠⚠ OTA-1596 — AND THE SPAWN STANDS UP AT THE DOOR: a hunt spawn stage
-    // arms when the player stands on its ground paid up — after the commit so
-    // the pack survives the scene build, a microtask later so beginScene's
-    // writes settle, and not on load (a save does not re-arrive). stageArrival.ts.
+    // ⚠⚠⚠ OTA-1596 — AND THE SPAWN STANDS UP AT THE DOOR: after the commit so the
+    // pack survives the scene build, and not on load (a save does not re-arrive).
     if (!opts?.isOpening) {
       void Promise.resolve().then(() => armSpawnStagesAtArrival(get, set));
     }

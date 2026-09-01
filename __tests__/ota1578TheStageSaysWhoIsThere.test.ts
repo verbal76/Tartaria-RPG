@@ -140,7 +140,10 @@ describe('OTA-1576 — the false summit stops spawning the boss it says is gone'
   it('⚠⚠ the APEX stages are untouched — they SHOULD spawn the hunt boss', () => {
     // This changed what a false_summit does, not what a boss stage is.
     const QS = src('app/state/slices/questSlice.ts');
-    expect(QS).toContain('const boss = override ? null : scaleHuntBoss(player, hunt, deps.scalePowerOf(player));');
+    // (OTA-1600 supersede: `peaceful` now reaches the boss scale too — the
+    // OTA-1581 contract, finally honoured. Apex stages still spawn on a
+    // normal advance; only a landed persuade stands nobody up.)
+    expect(QS).toContain('const boss = peaceful || override ? null : scaleHuntBoss(player, hunt, deps.scalePowerOf(player));');
     for (const h of HUNTS) {
       const apex = h.stages.filter((s) => s.stageType === 'apex');
       for (const a of apex) expect(a.spawn).toBeUndefined();

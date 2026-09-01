@@ -51,6 +51,13 @@ export interface StageBinding {
   locationName?: string;
   /** Who is standing there for this stage — "his sister" needs to be somebody. */
   npcName?: string;
+  /** ⚠ OTA-1600 — the STINGER: one shouted line for the moment this stage
+   *  STANDS BODIES UP (a boss commits, an authored escort lands). Shown as the
+   *  mission-title popup that pulls attention back into the mission — the
+   *  owner's "text cutscene". Authored ONLY on stages that actually put a
+   *  fight in front of the player (ota1600 pins the exact set); a prose-only
+   *  close must never shout over an empty field. */
+  stinger?: string;
   /**
    * ⚠⚠⚠ OTA-1576 — WHAT THIS STAGE ACTUALLY PUTS IN FRONT OF YOU. Every boss
    * stage used to spawn `HuntDef.targetEnemyName` — the hunt's ONE global

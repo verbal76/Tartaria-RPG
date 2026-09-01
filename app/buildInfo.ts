@@ -26536,7 +26536,21 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // cell trigger starts the fight - no gate, no truce line, no LEAVE OUTPOST
 // detour. The 1598 guard stays as the belt; the ota1598 sweep pin flips to
 // the empty-list ratchet: no fight-stage on a hub tile, ever again.
-export const OTA_BUILD_ID = '2026-09-01-1599-set-the-bone';
+// OTA-1600 - THE STINGER. Owner: "should the big boss of the mission have a
+// line of dialogue on a pop up to pull your attention back into the mission
+// ... not a talk card, just a popup to focus your attention? a text
+// cutscenes?" Yes - his own bundle showed him typing "still didn't progress"
+// while standing in the middle of the mission's own fight, because the pack
+// and the Reaver arrived as single log lines inside combat noise. Now every
+// hunt stage that STANDS BODIES UP (boss commits, authored escort lands - 37
+// stages, each with its own authored shout) raises a modal: mission title up
+// top, the line, one FIGHT button; the line also lands in the log. Never on a
+// prose-only close (no shouting over an empty field), never on the indoor
+// truce refusal, and never on a peaceful advance - which also fixes a latent
+// OTA-1581 hole: a persuade landed on a boss stage still stood the boss up,
+// because the boss scale never read `peaceful`. The first-fight primer holds
+// back while the stinger is up, so two cards never land on one beat.
+export const OTA_BUILD_ID = '2026-09-01-1600-the-stinger';
 // golem catch-up 2026-09-01: markerless publish of OTA-1599 — the five hunt
 // fight-stages stand on authored open ground one tile beside their outposts
 // (Raider's Ridge, The Vault Steps, The Drowned Quarter), the Doubter's poster
