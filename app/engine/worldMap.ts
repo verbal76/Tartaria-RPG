@@ -196,7 +196,15 @@ export function generateWorldMap(characterSeed: string, startingLocationId: stri
     if (ah !== bh) return ah - bh;
     return a.id.localeCompare(b.id);
   });
-  const startAtlas = LOCATION_ATLAS_COORDS[startLoc.id] ?? OUTPOST_ATLAS_COORD;
+  // ⚠ OTA-1601 — the START anchor consults the satellite table too. A map
+  // centered ON a battle-ground (the player is standing there) used to fall
+  // back to the OUTPOST's fraction, which placed every other location relative
+  // to the wrong end of the world — arb29's symmetry probe caught it the
+  // moment a satellite id sorted into its sample window.
+  const startAtlas = LOCATION_ATLAS_COORDS[startLoc.id] ?? SATELLITE_ATLAS_COORDS[startLoc.id]
+    ?? (HIDDEN_LOCATIONS[startLoc.id]
+      ? { fx: HIDDEN_LOCATIONS[startLoc.id]!.fx, fy: HIDDEN_LOCATIONS[startLoc.id]!.fy }
+      : OUTPOST_ATLAS_COORD);
   const taken = new Set<string>([`${CENTER_X},${CENTER_Y}`]);
   for (const loc of others) {
     // OTA-498 — a hidden location (the Hidden Market) is kept OUT of

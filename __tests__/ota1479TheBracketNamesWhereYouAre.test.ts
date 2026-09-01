@@ -112,7 +112,10 @@ describe('the banner and the radar cannot disagree', () => {
     // Standing on it — no area label, so the bracket falls through to the name.
     expect(overlandAreaLabel(seat.x, seat.y, null)).toBeNull();
     // One step out — a label, and it is not the bare location name.
-    const off = overlandAreaLabel(seat.x + 1, seat.y, null);
+    // ⚠ OTA-1601 — one step WEST: the eastern neighbour is now a named
+    // fight-ground (The Conduit Line), and a named tile correctly has no
+    // area label of its own.
+    const off = overlandAreaLabel(seat.x - 1, seat.y, null);
     expect(off).not.toBeNull();
     expect(off).not.toBe('Voronov');
     expect(typeof off).toBe('string');

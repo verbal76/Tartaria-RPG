@@ -197,7 +197,7 @@ describe('OTA-1578 — the escort has to be dealt with, not walked away from', (
     // advance without waiting on a kill that will never come. The freeze this
     // test exists for still fires for every ordinary spawn stage.
     expect(QS).toContain('|| !!stageDef.spawn');
-    expect(QS).toContain('const freezeForKill = !peaceful && (');
+    expect(QS).toContain('const willFreezeForKill = !peaceful && ('); // OTA-1601: computed early so the route gate can read it
   });
 
   it('⚠⚠⚠ AND CLEARING THEM IS WHAT MOVES IT ON', () => {

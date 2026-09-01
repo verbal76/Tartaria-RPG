@@ -26550,7 +26550,23 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // OTA-1581 hole: a persuade landed on a boss stage still stood the boss up,
 // because the boss scale never read `peaceful`. The first-fight primer holds
 // back while the stinger is up, so two cards never land on one beat.
-export const OTA_BUILD_ID = '2026-09-01-1600-the-stinger';
+// OTA-1601 - COMBAT SEPARATES. Owner, ruling on the 74-pair same-tile sweep:
+// "the combat should be separated" - the ambush and the Reaver shared one
+// ridge tile, and "the next ambush was further up the hill, that could have
+// been a tile north." Twenty-one hunt fight-stages stood on their
+// predecessor's tile; each of their narrations already named a micro-place
+// the map never had. Sixteen authored fight-grounds now exist (The Broken
+// Steeple, The Sixth Landing, The Slack Flats, The Inner Archive, The Central
+// Pillars, The Reaver's Crest, The Deep Nave, The Builders' Scaffold, The
+// Siren's Roost, The Master-Strand, The Core-Casing, The Cistern Intake, The
+// Storm's Eye, The Flooded Reliquary, The Tomb-Gate Rise, The Conduit Line) -
+// unpainted satellites one exact tile from their parents, full lore, shared
+// where hunts share a site - and all 21 stages retarget there. Closing the
+// previous stage auto-routes the one-tile leg; the 1597 cell trigger and the
+// 1600 stinger meet the player on fresh ground. Ratchet: no hunt fight-stage
+// on its predecessor's tile, ever again. (Single-site story arcs keep their
+// tiles per the same ruling; the between-stages beat card is the next OTA.)
+export const OTA_BUILD_ID = '2026-09-01-1601-combat-separates';
 // golem catch-up 2026-09-01: markerless publish of OTA-1600 — 37 authored
 // stinger shouts, the mission-title popup raised the moment a fight-stage
 // stands bodies up, and the peaceful flag finally reaching the boss scale.

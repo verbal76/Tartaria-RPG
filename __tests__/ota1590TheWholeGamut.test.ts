@@ -185,7 +185,13 @@ describe('OTA-1590 — every hunt, played the way the owner plays it', () => {
       const want = huntStageAnchorId(def, s);
       if (store.getState().player!.currentLocationId !== want) {
         const course = store.getState().player!.travelTarget?.locationId;
-        expect({ hunt: def.id, stage: s, routedTo: course, needs: want })
+        // ⚠ OTA-1601 — on a miss, the payload carries where the player actually
+        // stands and the last log lines. This instrumentation is how the walker
+        // caught the pre-spawn auto-route dragging the player one tile off the
+        // ground (the golem's iron weavers standing up inside Thametan's Tower).
+        const dbgP = store.getState().player!;
+        const routedDbg = course === want ? want : { got: course, loc: dbgP.currentLocationId, log: store.getState().gameLog.slice(-8).map((e) => e.text) };
+        expect({ hunt: def.id, stage: s, routedTo: routedDbg, needs: want })
           .toEqual({ hunt: def.id, stage: s, routedTo: want, needs: want });
         moveTo(want);
       }

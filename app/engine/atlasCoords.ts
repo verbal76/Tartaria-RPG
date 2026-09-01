@@ -202,6 +202,28 @@ export const SATELLITE_ATLAS_COORDS: Record<string, AtlasCoord> = {
   vault_steps: { fx: 0.755, fy: 0.86 },
   // One tile EAST of drakova (52,16), on the water — the Siren's reed shallows.
   drowned_quarter: { fx: 0.775, fy: 0.318 },
+  // ⚠⚠ OTA-1601 — THE FIGHT-GROUNDS: owner, on the same-tile stage sweep:
+  // "the combat should be separated." Every hunt fight-stage that shared its
+  // predecessor's tile now stands on the micro-place its own prose already
+  // named — one exact fx-only tile from its parent site, shared where hunts
+  // share the site. Same rules as the OTA-1599 three: unpainted, unlabeled,
+  // routable, and the arb29-safe offset discipline (fx steps only).
+  broken_steeple: { fx: 0.735, fy: 0.22 },
+  sixth_landing: { fx: 0.565, fy: 0.76 },
+  slack_flats: { fx: 0.645, fy: 0.17 },
+  inner_archive: { fx: 0.905, fy: 0.87 },
+  central_pillars: { fx: 0.555, fy: 0.29 },
+  reavers_crest: { fx: 0.15, fy: 0.13 },
+  deep_nave: { fx: 0.385, fy: 0.12 },
+  builders_scaffold: { fx: 0.29, fy: 0.47 },
+  sirens_roost: { fx: 0.8, fy: 0.318 },
+  master_strand: { fx: 0.405, fy: 0.33 },
+  core_casing: { fx: 0.545, fy: 0.6 },
+  cistern_intake: { fx: 0.26, fy: 0.379 },
+  storms_eye: { fx: 0.455, fy: 0.2 },
+  flooded_reliquary: { fx: 0.265, fy: 0.4 },
+  tomb_gate_rise: { fx: 0.919, fy: 0.06 },
+  conduit_line: { fx: 0.695, fy: 0.813 },
 };
 
 /**

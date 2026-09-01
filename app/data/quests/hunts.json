@@ -112,7 +112,7 @@
           "requires": {
             "item": "Eshren's Name-Token"
           },
-          "locationName": "Mud Seas",
+          "locationName": "The Broken Steeple",
           "stinger": "The bog swells and parts. The old Dragon has decided you are worth surfacing for."
         }
       ]
@@ -225,7 +225,7 @@
           "requires": {
             "item": "Rigged Sentinel Core"
           },
-          "locationName": "Endless Stair",
+          "locationName": "The Sixth Landing",
           "stinger": "The sixth landing shudders. The Titan pulls itself out of the Stair to meet you."
         }
       ]
@@ -346,7 +346,7 @@
           "requires": {
             "item": "Charged Harpoon-Rig"
           },
-          "locationName": "Cradle of Dusk",
+          "locationName": "The Slack Flats",
           "stinger": "The ground you stand on inhales. The Behemoth was never beside the trail — it IS the trail."
         }
       ]
@@ -468,7 +468,7 @@
           "requires": {
             "item": "Ward Bypass Codes"
           },
-          "locationName": "the Sentinel Ward",
+          "locationName": "The Inner Archive",
           "stinger": "Floor plates ring in sequence, closer, closer — the Iron Titan answers the archive door."
         }
       ]
@@ -555,7 +555,7 @@
           "requires": {
             "item": "North-Pillar Bearing"
           },
-          "locationName": "Zharak's Teeth",
+          "locationName": "The Central Pillars",
           "stinger": "Every song in the Teeth cuts out at once. The Queen prefers silence for this."
         }
       ]
@@ -636,7 +636,7 @@
           "requires": {
             "item": "Raider's Ridge-Sign"
           },
-          "locationName": "Raider's Ridge",
+          "locationName": "The Reaver's Crest",
           "stinger": "The Reaver rises on the ridge line: \"You climbed all this way to die tired. Come, then.\""
         }
       ]
@@ -752,7 +752,7 @@
           "requires": {
             "item": "Walker's Valve-Key"
           },
-          "locationName": "Zharak's Teeth",
+          "locationName": "The Central Pillars",
           "stinger": "Steam blasts from every fissure at once. The Walker has built pressure for exactly this."
         }
       ]
@@ -868,7 +868,7 @@
           "requires": {
             "item": "Fouled Font-Charm"
           },
-          "locationName": "the Sinking Cathedral",
+          "locationName": "The Deep Nave",
           "stinger": "The nave floor bows, then splits — the Serpent has been under you the whole prayer."
         }
       ]
@@ -941,7 +941,7 @@
           "requires": {
             "item": "Bael's Vigil-Candle"
           },
-          "locationName": "Thametan's Tower",
+          "locationName": "The Builders' Scaffold",
           "spawn": {
             "enemyName": "Aetheric Apparition",
             "count": 1,
@@ -981,7 +981,7 @@
           "requires": {
             "item": "Kessa's Written Name"
           },
-          "locationName": "Endless Stair",
+          "locationName": "The Sixth Landing",
           "stinger": "Every lantern on the Stair gutters together. The Shade has stopped pretending to be yours."
         }
       ]
@@ -1097,7 +1097,7 @@
           "requires": {
             "item": "Reed-Throat Mark"
           },
-          "locationName": "The Drowned Quarter",
+          "locationName": "The Siren's Roost",
           "stinger": "The roost opens a hundred stolen mouths at once. Foul the reed. End the song."
         }
       ]
@@ -1213,7 +1213,7 @@
           "requires": {
             "item": "Master-Strand Cutter"
           },
-          "locationName": "Obsidian Pillars",
+          "locationName": "The Master-Strand",
           "stinger": "The web you have been walking on tightens. The Weaver reels you in itself."
         }
       ]
@@ -1329,7 +1329,7 @@
           "requires": {
             "item": "Core-Shell Seal-Breaker"
           },
-          "locationName": "the Red Tower of Nimari",
+          "locationName": "The Core-Casing",
           "stinger": "The Red Tower's light bends inward. The Apparition stops haunting and starts hunting."
         }
       ]
@@ -1445,7 +1445,7 @@
           "requires": {
             "item": "Long-Shadow Mark"
           },
-          "locationName": "Cradle of Dusk",
+          "locationName": "The Slack Flats",
           "stinger": "A shriek splits the Cradle. The Harpy folds her wings and drops."
         }
       ]
@@ -1518,7 +1518,7 @@
           "requires": {
             "item": "Yenna's Pump-Works Key"
           },
-          "locationName": "Samarran",
+          "locationName": "The Cistern Intake",
           "spawn": {
             "enemyName": "Bog Creeper",
             "count": 1,
@@ -1561,7 +1561,7 @@
           "requires": {
             "item": "Storm-Eye Bearing"
           },
-          "locationName": "Great Tartary Plains",
+          "locationName": "The Storm's Eye",
           "stinger": "The dust devils converge and take a shape with hands. The Fiend has chosen its ground."
         }
       ]
@@ -1625,7 +1625,7 @@
         },
         {
           "stageType": "favor",
-          "narration": "Del's route takes you past the Golem to the upper chamber, where the treatise sits exactly where the Builders dropped it — and a pair of Iron Spiders have nested in the abandoned gear, guarding it entirely by accident. They come off the gear the moment you reach for the page.",
+          "narration": "Del's route takes you up the Builders' scaffold, past the Golem's watch, to the top walk where the treatise sits exactly where the Builders dropped it — and a pair of Iron Spiders have nested in the abandoned gear, guarding it entirely by accident. They come off the gear the moment you reach for the page.",
           "arbiter": null,
           "checkKind": "boss",
           "grants": {
@@ -1634,7 +1634,7 @@
           "requires": {
             "item": "Del's Upper-Chamber Route"
           },
-          "locationName": "Thametan's Tower",
+          "locationName": "The Builders' Scaffold",
           "spawn": {
             "enemyName": "Iron Spider",
             "count": 2,
@@ -1677,7 +1677,7 @@
           "requires": {
             "item": "Core-Plate Timing"
           },
-          "locationName": "Thametan's Tower",
+          "locationName": "The Builders' Scaffold",
           "stinger": "Masonry grinds on masonry. The Warden steps out of the wall it was pretending to be."
         }
       ]
@@ -1759,7 +1759,7 @@
           "requires": {
             "item": "Reliquary Approach Mark"
           },
-          "locationName": "The Sunken Enclave",
+          "locationName": "The Flooded Reliquary",
           "stinger": "Wingbeat by wingbeat the air goes thick — the Moth settles its shadow over you."
         }
       ]
@@ -1841,7 +1841,7 @@
           "requires": {
             "item": "Thinned-Pack Tally"
           },
-          "locationName": "Yuldra-Tul",
+          "locationName": "The Tomb-Gate Rise",
           "stinger": "A howl rolls down from the tomb-gate — the Alpha calls the hunt on YOU."
         }
       ]
@@ -1923,7 +1923,7 @@
           "requires": {
             "item": "Main-Line Bearing"
           },
-          "locationName": "Voronov",
+          "locationName": "The Conduit Line",
           "stinger": "The heat doubles, then doubles again. The Salamander boils up out of the under-vault."
         }
       ]

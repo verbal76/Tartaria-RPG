@@ -119,10 +119,12 @@ describe('OTA-1599 — the grounds are real, adjacent, and open', () => {
       return stageLocationId(h.stages[stage] as never, huntAnchorId(h as never), resolvePosterLocation);
     };
     expect(groundOf('hunt_servants_doubter', 3)).toBe('raiders_ridge');
-    expect(groundOf('hunt_servants_doubter', 4)).toBe('raiders_ridge');
+    // (OTA-1601 supersede — combat separates: the apex crest and the roost each
+    // stand one further tile out, so no fight shares its predecessor's ground.)
+    expect(groundOf('hunt_servants_doubter', 4)).toBe('reavers_crest');
     expect(groundOf('hunt_mud_titan', 3)).toBe('vault_steps');
     expect(groundOf('hunt_mud_siren_drakova', 5)).toBe('drowned_quarter');
-    expect(groundOf('hunt_mud_siren_drakova', 6)).toBe('drowned_quarter');
+    expect(groundOf('hunt_mud_siren_drakova', 6)).toBe('sirens_roost');
   });
 
   it('⚠⚠ THE RATCHET, all three families: no fight-stage of any kind stands on any hub tile', () => {

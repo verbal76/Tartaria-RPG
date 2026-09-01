@@ -103,7 +103,12 @@ describe('OTA-1580 — the Sentinel Ward was never missing (a correction)', () =
     const chamber = raw.find((l) => l.id === 'etheric_chamber')!;
     const aliases = (chamber.aliases ?? []).map((a) => a.toLowerCase());
     expect(aliases).toContain('the sentinel ward');
-    expect(aliases).toContain('inner archive');
+    // ⚠ OTA-1601 supersede — "inner archive" WAS an alias here, and that fact
+    // is what named the new ground: The Inner Archive is now a real location
+    // one tile from the Ward (the apex fight moved onto it), so the chamber
+    // gave the name up — ota988 refuses a shared alias rather than guessing.
+    expect(aliases).not.toContain('inner archive');
+    expect(raw.some((l) => l.id === 'inner_archive' && l.name === 'The Inner Archive')).toBe(true);
     // …and no second location competes for the name, which is what a new tile
     // would have created (ota988 refuses a shared alias rather than guessing).
     const claimants = raw.filter((l) =>
@@ -119,9 +124,13 @@ describe('OTA-1580 — the Sentinel Ward was never missing (a correction)', () =
     const rows = (Array.isArray(raw) ? raw : (raw as { hunts: unknown[] }).hunts) as
       Array<{ title: string; stages: Array<{ locationName?: string; narration: string }> }>;
     const iron = rows.find((h) => h.title.includes('Iron Titan'))!;
+    // ⚠ OTA-1601 supersede — combat separates: the apex stage moved one tile
+    // to The Inner Archive (the place its own narration always named), so ONE
+    // stage keeps the Ward's name and the archive line lives at the new ground.
     const ward = iron.stages.filter((s) => s.locationName === 'the Sentinel Ward');
-    expect(ward.length).toBe(2);
-    expect(ward.map((s) => s.narration).join(' ')).toMatch(/inner archive/i);
+    expect(ward.length).toBe(1);
+    const archive = iron.stages.find((s) => s.locationName === 'The Inner Archive')!;
+    expect(archive.narration).toMatch(/inner archive/i);
   });
 
   it('⚠ the painted-landmark count is unchanged — 38, plus the OTA-1599 satellites', () => {

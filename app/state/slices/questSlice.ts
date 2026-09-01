@@ -324,6 +324,38 @@ export function resolveStageEscortClear(
           if (nextDef) {
             get().appendLog('world', nextDef.narration);
             if (nextDef.arbiter) get().appendLog('arbiter', nextDef.arbiter);
+            // ⚠⚠ OTA-1601 — THE DIRECTION AND THE ROUTE MOVED HERE from the
+            // spawn call. advanceHunt used to announce and route the next
+            // stage BEFORE the fight it had just stood up — and once fight-
+            // grounds went adjacent, the one-tile route completed instantly
+            // and dragged the player off the ground mid-spawn. A frozen stage
+            // advances HERE, when the last body drops — so this is where the
+            // player is told where the trail goes, and the road is set.
+            {
+              // eslint-disable-next-line @typescript-eslint/no-require-imports
+              const QS = require('../../engine/questStage') as typeof import('../../engine/questStage');
+              // eslint-disable-next-line @typescript-eslint/no-require-imports
+              const CM = require('../../engine/contractMarkers') as typeof import('../../engine/contractMarkers');
+              const anchor = escortRec.family === 'hunt'
+                ? CM.huntAnchorId(escortRec.def as never)
+                : CM.contractAnchorId(escortRec.def as never);
+              const clearedDef = escortRec.def.stages[escortRec.rec.stage];
+              const hereId = QS.stageLocationId(clearedDef as never, anchor, CM.resolvePosterLocation);
+              const nextId = QS.stageLocationId(nextDef as never, anchor, CM.resolvePosterLocation);
+              const movedGround = nextId !== hereId;
+              const dir = QS.nextStageDirection(nextDef as never, (nextDef as { locationName?: string }).locationName ?? null, movedGround);
+              if (dir) get().appendLog('system', dir);
+              const liveNow = get().player;
+              if (movedGround && liveNow && liveNow.currentLocationId !== nextId
+                  && liveNow.travelTarget?.locationId !== nextId) {
+                get().setTravelCourse(nextId);
+                if (get().player?.travelTarget?.locationId === nextId) {
+                  // eslint-disable-next-line @typescript-eslint/no-require-imports
+                  const { getLocationById } = require('../../engine/encounter') as typeof import('../../engine/encounter');
+                  get().appendLog('world', `Auto-routing to the next stage of ${escortRec.def.title}: ${getLocationById(nextId)?.name ?? nextId}.`);
+                }
+              }
+            }
           } else if (escortRec.family === 'storyline') {
             // ⚠⚠⚠ OTA-1583 — A CHAIN THAT ENDS ON A KILL STILL HAS TO SAY IT IS
             // OVER. `story_order_drowned_library` now closes on the Ooze, and the
@@ -1702,6 +1734,16 @@ export const createQuestSlice = (
     }
     get().appendLog('world', stageDef.narration);
     if (stageDef.arbiter) get().appendLog('arbiter', stageDef.arbiter);
+    // ⚠ OTA-1601 — computed HERE (the same expression as `freezeForKill` below)
+    // because the direction/route block needs the answer BEFORE the spawn runs.
+    let lastBossIdxEarly = -1;
+    for (let i = 0; i < hunt.stages.length; i++) {
+      if (hunt.stages[i]?.checkKind === 'boss') lastBossIdxEarly = i;
+    }
+    const willFreezeForKill = !peaceful && (
+      (stageDef.checkKind === 'boss' && record.stage === lastBossIdxEarly)
+      || !!stageDef.spawn
+    );
     // ⚠⚠ P19 — THE STAGE ACTUALLY HANDS YOU THE THING NOW. Owner: *"if it's calling for
     // you to investigate an area, find a certain object and take that object to the next
     // area, well then it has to give you the damn object."* The narration has always
@@ -1717,7 +1759,18 @@ export const createQuestSlice = (
       // stage. otherwise you have no idea where you're going."* Speaks only when there is
       // something to say — new ground, a person to find, or a thing to bring.
       const nextDef = hunt.stages[record.stage + 1];
-      if (nextDef) {
+      // ⚠⚠⚠ OTA-1601 — A STAGE THAT FREEZES FOR A KILL DOES NOT ANNOUNCE OR
+      // ROUTE THE NEXT ONE. This block used to run unconditionally, BEFORE the
+      // spawn below — harmless while chain routes were long (it only set a
+      // course), and a live defect the moment fight-grounds went adjacent: a
+      // one-tile setTravelCourse completes INSTANTLY, so the route dragged the
+      // player one tile off the ground mid-call and the ambush spawned at the
+      // NEXT stage's location (the gamut walker caught the golem's iron
+      // weavers standing up inside Thametan's Tower while the trace still said
+      // @builders_scaffold). The direction and the route belong to the moment
+      // the stage ADVANCES — for a frozen stage that is resolveStageEscortClear,
+      // when the last body drops.
+      if (nextDef && !willFreezeForKill) {
         const hereId = QS.stageLocationId(stageDef, CM.huntAnchorId(hunt), CM.resolvePosterLocation);
         const nextId = QS.stageLocationId(nextDef, CM.huntAnchorId(hunt), CM.resolvePosterLocation);
         const movedGround = nextId !== hereId;
@@ -1758,20 +1811,15 @@ export const createQuestSlice = (
     // and collect the full bounty without the fight (exploit sweep). Mid-hunt
     // boss stages (there are hunts with a boss beat before the apex) still
     // increment on spawn.
-    let lastBossIndex = -1;
-    for (let i = 0; i < hunt.stages.length; i++) {
-      if (hunt.stages[i]?.checkKind === 'boss') lastBossIndex = i;
-    }
     // ⚠⚠ OTA-1578 — AND AN ESCORT STAGE FREEZES TOO. It used to advance on the
     // SPAWN, so three raiders could be left standing and the hunt moved on
     // regardless. A stage that puts bodies in front of you is resolved by
     // dealing with them — the clear is handled where the last one dies.
     // ⚠ OTA-1581 — a PEACEFUL advance freezes for nothing: there is no fight to
     // wait on, which is the entire thing the persuade bought.
-    const freezeForKill = !peaceful && (
-      (stageDef.checkKind === 'boss' && record.stage === lastBossIndex)
-      || !!stageDef.spawn
-    );
+    // ⚠ OTA-1601 — one computation, made above the direction/route block; two
+    // copies of this expression is how the route gate and the freeze drift.
+    const freezeForKill = willFreezeForKill;
     // ⚠⚠⚠ OTA-1576 — THE STAGE GETS TO SAY WHAT IS ACTUALLY THERE. Every boss
     // stage used to spawn the hunt's ONE global `targetEnemyName`, which is
     // right for an `apex` and exactly backwards for a `false_summit` — a stage

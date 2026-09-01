@@ -45,7 +45,9 @@ describe('openContractMarkers', () => {
     // Stage 0 the reeve (Drakova) → stage 2 Old Mira (the Waystation) → apex the Mud Seas.
     expect(at(0)).toBe('drakova');
     expect(at(2)).toBe('monarch_waystation');
-    expect(at(6)).toBe('mud_seas');
+    // OTA-1601 supersede — combat separates: the apex stage stands on its
+    // own fight-ground one tile off the Mud Seas seat, and the pin walks there.
+    expect(at(6)).toBe('broken_steeple');
   });
 
   it('numbers follow the Contracts-screen order: hunts → faction quests → leads', () => {

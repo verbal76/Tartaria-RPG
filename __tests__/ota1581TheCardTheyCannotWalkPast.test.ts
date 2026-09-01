@@ -233,7 +233,7 @@ describe('OTA-1581 — the two engine holes the wiring exposed', () => {
     // Two callers: a persuade that landed (the fight is what the roll bought)
     // and TAKE in the aftermath (the bodies are already down — re-running the
     // spawn would stand them back up).
-    expect(QUEST).toContain('const freezeForKill = !peaceful && (');
+    expect(QUEST).toContain('const willFreezeForKill = !peaceful && ('); // OTA-1601: computed early so the route gate can read it
     expect(STORE).toContain("get().advanceHunt(armed.missionId, { peaceful: true });");
   });
 });

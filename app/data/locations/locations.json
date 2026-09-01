@@ -1367,8 +1367,7 @@
       "aetheric core",
       "power chamber",
       "sentinel ward",
-      "the sentinel ward",
-      "inner archive"
+      "the sentinel ward"
     ],
     "interactables": [
       "chamber",
@@ -2232,9 +2231,42 @@
     "danger": 2,
     "discoverable": true,
     "description": "A neutral-ground bazaar that does not advertise itself — four canvas stalls pitched in a wind-scoured hollow of the Sunken Middens, out past the frontier camps. Agents of every faction trade here under an unspoken truce; the place keeps no banner and no name on any map, only the rumor of one. Weapons, armor, food, and salvage change hands, and no questions are asked.",
-    "aliases": ["hidden market", "the hidden market", "market", "bazaar", "the middens market", "secret market", "question mark"],
-    "tags": ["settlement", "market", "neutral", "sunken_middens", "middens", "borderlands", "mud", "starter_friendly", "hidden"],
-    "interactables": ["stall", "canvas", "trader", "wares", "counter", "crate", "barrel", "lantern", "rope", "scale", "coin", "tarp", "mud", "silt"]
+    "aliases": [
+      "hidden market",
+      "the hidden market",
+      "market",
+      "bazaar",
+      "the middens market",
+      "secret market",
+      "question mark"
+    ],
+    "tags": [
+      "settlement",
+      "market",
+      "neutral",
+      "sunken_middens",
+      "middens",
+      "borderlands",
+      "mud",
+      "starter_friendly",
+      "hidden"
+    ],
+    "interactables": [
+      "stall",
+      "canvas",
+      "trader",
+      "wares",
+      "counter",
+      "crate",
+      "barrel",
+      "lantern",
+      "rope",
+      "scale",
+      "coin",
+      "tarp",
+      "mud",
+      "silt"
+    ]
   },
   {
     "id": "grand_spire_of_asgardar",
@@ -2406,9 +2438,7 @@
     "aliases": [
       "drowned quarter",
       "the drowned quarter of drakova",
-      "drowned quarter of drakova",
-      "the roost",
-      "siren's roost"
+      "drowned quarter of drakova"
     ],
     "interactables": [
       "water",
@@ -2421,6 +2451,457 @@
       "mooring post",
       "sunken bell",
       "roost"
+    ]
+  },
+  {
+    "id": "broken_steeple",
+    "name": "The Broken Steeple",
+    "type": "site",
+    "description": "A drowned cathedral's steeple standing out of the Mud Seas like a broken tooth — the one hard point in a horizon of slow water, and the perch the Bog Dragon coils to when it wants to be found.",
+    "danger": 5,
+    "discoverable": true,
+    "tags": [
+      "site",
+      "open",
+      "battleground"
+    ],
+    "aliases": [
+      "broken steeple"
+    ],
+    "interactables": [
+      "steeple",
+      "bell mount",
+      "mud swell",
+      "roost ledge",
+      "scale scrape",
+      "drowned rail",
+      "tin plaque",
+      "gull nest",
+      "wet rope",
+      "coil groove"
+    ]
+  },
+  {
+    "id": "sixth_landing",
+    "name": "The Sixth Landing",
+    "type": "site",
+    "description": "The sixth landing of the Endless Stair, where the old core-conduit pools heat under the stone. A natural chokepoint with a rigged rail and a long fall — the ground you pick when you mean to end something that climbs.",
+    "danger": 5,
+    "discoverable": true,
+    "tags": [
+      "site",
+      "open",
+      "battleground"
+    ],
+    "aliases": [
+      "sixth landing"
+    ],
+    "interactables": [
+      "stone crack",
+      "rail",
+      "conduit grate",
+      "vent fissure",
+      "stair edge",
+      "rock pile",
+      "anchor bolt",
+      "warm stone",
+      "lever",
+      "drop line"
+    ]
+  },
+  {
+    "id": "slack_flats",
+    "name": "The Slack Flats",
+    "type": "site",
+    "description": "Tidal flats below the Cradle of Dusk, bare and glistening at slack tide. Nothing to hide behind for anything that breaches — or for anyone standing there to meet it.",
+    "danger": 4,
+    "discoverable": true,
+    "tags": [
+      "site",
+      "open",
+      "battleground"
+    ],
+    "aliases": [
+      "slack flats"
+    ],
+    "interactables": [
+      "flat",
+      "tide line",
+      "breach pool",
+      "wave",
+      "stranded hull",
+      "marker stake",
+      "shell bed",
+      "wader track",
+      "mound",
+      "kelp rope"
+    ]
+  },
+  {
+    "id": "inner_archive",
+    "name": "The Inner Archive",
+    "type": "site",
+    "description": "The cold vault behind the Sentinel Ward, colder than the Ward outside, where the oldest records stand in racks taller than a titan's bow. Something ancient keeps its liturgy here, head down, listening.",
+    "danger": 5,
+    "discoverable": true,
+    "tags": [
+      "site",
+      "open",
+      "battleground"
+    ],
+    "aliases": [
+      "inner archive"
+    ],
+    "interactables": [
+      "archive rack",
+      "record spool",
+      "dust cloud",
+      "liturgy plate",
+      "floor plate",
+      "cooling vent",
+      "echo chamber",
+      "sealed case",
+      "reading stand",
+      "echo well"
+    ]
+  },
+  {
+    "id": "central_pillars",
+    "name": "The Central Pillars",
+    "type": "site",
+    "description": "The clearing among the central pillars of Zharak's Teeth — a mud-glass throne on one side, a steam-scalded roost above, and stone that carries every song and every scream to every ear at once.",
+    "danger": 4,
+    "discoverable": true,
+    "tags": [
+      "site",
+      "open",
+      "battleground"
+    ],
+    "aliases": [
+      "central pillars"
+    ],
+    "interactables": [
+      "pillar",
+      "mud-glass throne",
+      "roost ledge",
+      "vent fissure",
+      "echo chamber",
+      "burn mark",
+      "glass shard",
+      "echo shaft",
+      "clearing floor",
+      "pressure line"
+    ]
+  },
+  {
+    "id": "reavers_crest",
+    "name": "The Reaver's Crest",
+    "type": "site",
+    "description": "The high point of the ridge line east of the raider ground — the crest the spiral-signs all finally point at. Whoever holds it sees you the whole climb, and does not have to draw until you arrive.",
+    "danger": 3,
+    "discoverable": true,
+    "tags": [
+      "site",
+      "open",
+      "battleground"
+    ],
+    "aliases": [
+      "reavers crest",
+      "reaver's crest"
+    ],
+    "interactables": [
+      "crest",
+      "stone seat",
+      "marker",
+      "sign stone",
+      "watchtower",
+      "loose shale",
+      "banner stub",
+      "burn mark",
+      "bone tally",
+      "cut steps"
+    ]
+  },
+  {
+    "id": "deep_nave",
+    "name": "The Deep Nave",
+    "type": "site",
+    "description": "The flooded heart of the Sinking Cathedral, one span east of the tilting facade — black water over drowned pews, and a silence that something blind and furious treats as its own.",
+    "danger": 4,
+    "discoverable": true,
+    "tags": [
+      "site",
+      "open",
+      "battleground"
+    ],
+    "aliases": [
+      "deep nave"
+    ],
+    "interactables": [
+      "pew",
+      "altar stone",
+      "flood pool",
+      "candle rack",
+      "silt drift",
+      "inscription",
+      "charm hook",
+      "column base",
+      "dark water",
+      "offering bowl"
+    ]
+  },
+  {
+    "id": "builders_scaffold",
+    "name": "The Builders' Scaffold",
+    "type": "site",
+    "description": "The Builders' old works on the tower's flank — scaffold, hoists and a top walk that never got taken down. Everything that hunts the tower crosses it, and everything the tower guards can be goaded onto it.",
+    "danger": 4,
+    "discoverable": true,
+    "tags": [
+      "site",
+      "open",
+      "battleground"
+    ],
+    "aliases": [
+      "builders scaffold",
+      "builders' scaffold"
+    ],
+    "interactables": [
+      "scaffold",
+      "ladder",
+      "scrap pile",
+      "plank run",
+      "candle ring",
+      "tool crate",
+      "guy rope",
+      "counterweight",
+      "chalk line",
+      "ladder run"
+    ]
+  },
+  {
+    "id": "sirens_roost",
+    "name": "The Siren's Roost",
+    "type": "site",
+    "description": "The reed-choked heart of the drowned water east of the quarter, where the stolen voices come home to roost. The reeds move against the current here, and the drowned stand in the shallows like moored boats.",
+    "danger": 5,
+    "discoverable": true,
+    "tags": [
+      "site",
+      "open",
+      "battleground"
+    ],
+    "aliases": [
+      "sirens roost",
+      "siren's roost"
+    ],
+    "interactables": [
+      "reed",
+      "roost mound",
+      "kelp rope",
+      "still pool",
+      "drowned post",
+      "nest weave",
+      "raft scrape",
+      "bone float",
+      "wet rope"
+    ]
+  },
+  {
+    "id": "master_strand",
+    "name": "The Master-Strand",
+    "type": "site",
+    "description": "The anchor line of the great web, strung pillar-to-pillar one span east of the Obsidian Pillars. Every thread in the Weaver's work runs back to this one — and the Weaver feels every touch on it.",
+    "danger": 5,
+    "discoverable": true,
+    "tags": [
+      "site",
+      "open",
+      "battleground"
+    ],
+    "aliases": [
+      "master strand"
+    ],
+    "interactables": [
+      "glass shard",
+      "anchor knot",
+      "thread line",
+      "smear",
+      "husk bundle",
+      "tension post",
+      "snare",
+      "wrapped stone",
+      "broken chain"
+    ]
+  },
+  {
+    "id": "core_casing",
+    "name": "The Core-Casing",
+    "type": "site",
+    "description": "The cracked casing of the Red Tower's old core, standing in its own scorched yard below the tower. The seal on it holds a hundred lost voices, and the light bends wrong the closer you stand.",
+    "danger": 5,
+    "discoverable": true,
+    "tags": [
+      "site",
+      "open",
+      "battleground"
+    ],
+    "aliases": [
+      "core casing"
+    ],
+    "interactables": [
+      "header",
+      "seal plate",
+      "scorch ring",
+      "defense light",
+      "inscription",
+      "cable stub",
+      "warm crack",
+      "ash drift",
+      "yard stone",
+      "offering pile"
+    ]
+  },
+  {
+    "id": "cistern_intake",
+    "name": "The Cistern Intake",
+    "type": "site",
+    "description": "The pump-works and cistern intake east of Samarran's colonnade — the city's old waterworks, dark, dripping, and exactly the kind of throat something foul dens in.",
+    "danger": 4,
+    "discoverable": true,
+    "tags": [
+      "site",
+      "open",
+      "battleground"
+    ],
+    "aliases": [
+      "cistern intake"
+    ],
+    "interactables": [
+      "intake grate",
+      "conduit",
+      "cistern mouth",
+      "drip line",
+      "valve stem",
+      "foul pool",
+      "bone",
+      "access rung",
+      "sluice gate",
+      "water mark"
+    ]
+  },
+  {
+    "id": "storms_eye",
+    "name": "The Storm's Eye",
+    "type": "site",
+    "description": "A standing calm on the open plain where the dust storms wheel and never enter — a circle of still air the old charts mark and the wind respects. Anything made of storm must break its own shape to reach you here.",
+    "danger": 4,
+    "discoverable": true,
+    "tags": [
+      "site",
+      "open",
+      "battleground"
+    ],
+    "aliases": [
+      "storms eye",
+      "storm's eye"
+    ],
+    "interactables": [
+      "calm ring",
+      "dust wall",
+      "chart cairn",
+      "dust trail",
+      "rift",
+      "ash drift",
+      "anchor stone",
+      "quiet line",
+      "crater",
+      "old stake"
+    ]
+  },
+  {
+    "id": "flooded_reliquary",
+    "name": "The Flooded Reliquary",
+    "type": "site",
+    "description": "The enclave's drowned reliquary vault, wings of black water between the reliquary racks — wide enough for something the width of the vault to fill it, and to breed a city's wasting underneath.",
+    "danger": 5,
+    "discoverable": true,
+    "tags": [
+      "site",
+      "open",
+      "battleground"
+    ],
+    "aliases": [
+      "flooded reliquary"
+    ],
+    "interactables": [
+      "reliquary rack",
+      "black water",
+      "dust cloud",
+      "spore drift",
+      "relic case",
+      "broken chain",
+      "wading ledge",
+      "flood residue",
+      "vault rib",
+      "lantern hook"
+    ]
+  },
+  {
+    "id": "tomb_gate_rise",
+    "name": "The Tomb-Gate Rise",
+    "type": "site",
+    "description": "The bare rise below Yuldra-Tul's tomb-gate, where the mountain funnels every howl down onto open ground. The pack thins here — and the thing that leads it comes down last, all teeth and patience.",
+    "danger": 5,
+    "discoverable": true,
+    "tags": [
+      "site",
+      "open",
+      "battleground"
+    ],
+    "aliases": [
+      "tomb gate rise",
+      "tomb-gate rise"
+    ],
+    "interactables": [
+      "mound",
+      "echo shaft",
+      "gate shadow",
+      "claw rake",
+      "crypt",
+      "bone cache",
+      "scent post",
+      "loose shale",
+      "track line",
+      "watch rock"
+    ]
+  },
+  {
+    "id": "conduit_line",
+    "name": "The Conduit Line",
+    "type": "site",
+    "description": "The main heat conduit east of Voronov, running fat and white-hot along its trestles. The whole quarter's warmth cycles through this one line — kill anything coiled on it here, before it moves.",
+    "danger": 5,
+    "discoverable": true,
+    "tags": [
+      "site",
+      "open",
+      "battleground"
+    ],
+    "aliases": [
+      "conduit line"
+    ],
+    "interactables": [
+      "conduit",
+      "pillar",
+      "burn mark",
+      "coupling ring",
+      "scale shed",
+      "defense light",
+      "expansion joint",
+      "ash drift",
+      "gauge post",
+      "power vent"
     ]
   }
 ]

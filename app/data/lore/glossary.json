@@ -224,6 +224,86 @@
   ],
   "important_places": [
     {
+      "id": "broken_steeple",
+      "term": "The Broken Steeple",
+      "definition": "A drowned cathedral's steeple standing out of the Mud Seas like a broken tooth — the one hard point in a horizon of slow water, and the perch the Bog Dragon coils to when it wants to be found."
+    },
+    {
+      "id": "sixth_landing",
+      "term": "The Sixth Landing",
+      "definition": "The sixth landing of the Endless Stair, where the old core-conduit pools heat under the stone. A natural chokepoint with a rigged rail and a long fall — the ground you pick when you mean to end something that climbs."
+    },
+    {
+      "id": "slack_flats",
+      "term": "The Slack Flats",
+      "definition": "Tidal flats below the Cradle of Dusk, bare and glistening at slack tide. Nothing to hide behind for anything that breaches — or for anyone standing there to meet it."
+    },
+    {
+      "id": "inner_archive",
+      "term": "The Inner Archive",
+      "definition": "The cold vault behind the Sentinel Ward, colder than the Ward outside, where the oldest records stand in racks taller than a titan's bow. Something ancient keeps its liturgy here, head down, listening."
+    },
+    {
+      "id": "central_pillars",
+      "term": "The Central Pillars",
+      "definition": "The clearing among the central pillars of Zharak's Teeth — a mud-glass throne on one side, a steam-scalded roost above, and stone that carries every song and every scream to every ear at once."
+    },
+    {
+      "id": "reavers_crest",
+      "term": "The Reaver's Crest",
+      "definition": "The high point of the ridge line east of the raider ground — the crest the spiral-signs all finally point at. Whoever holds it sees you the whole climb, and does not have to draw until you arrive."
+    },
+    {
+      "id": "deep_nave",
+      "term": "The Deep Nave",
+      "definition": "The flooded heart of the Sinking Cathedral, one span east of the tilting facade — black water over drowned pews, and a silence that something blind and furious treats as its own."
+    },
+    {
+      "id": "builders_scaffold",
+      "term": "The Builders' Scaffold",
+      "definition": "The Builders' old works on the tower's flank — scaffold, hoists and a top walk that never got taken down. Everything that hunts the tower crosses it, and everything the tower guards can be goaded onto it."
+    },
+    {
+      "id": "sirens_roost",
+      "term": "The Siren's Roost",
+      "definition": "The reed-choked heart of the drowned water east of the quarter, where the stolen voices come home to roost. The reeds move against the current here, and the drowned stand in the shallows like moored boats."
+    },
+    {
+      "id": "master_strand",
+      "term": "The Master-Strand",
+      "definition": "The anchor line of the great web, strung pillar-to-pillar one span east of the Obsidian Pillars. Every thread in the Weaver's work runs back to this one — and the Weaver feels every touch on it."
+    },
+    {
+      "id": "core_casing",
+      "term": "The Core-Casing",
+      "definition": "The cracked casing of the Red Tower's old core, standing in its own scorched yard below the tower. The seal on it holds a hundred lost voices, and the light bends wrong the closer you stand."
+    },
+    {
+      "id": "cistern_intake",
+      "term": "The Cistern Intake",
+      "definition": "The pump-works and cistern intake east of Samarran's colonnade — the city's old waterworks, dark, dripping, and exactly the kind of throat something foul dens in."
+    },
+    {
+      "id": "storms_eye",
+      "term": "The Storm's Eye",
+      "definition": "A standing calm on the open plain where the dust storms wheel and never enter — a circle of still air the old charts mark and the wind respects. Anything made of storm must break its own shape to reach you here."
+    },
+    {
+      "id": "flooded_reliquary",
+      "term": "The Flooded Reliquary",
+      "definition": "The enclave's drowned reliquary vault, wings of black water between the reliquary racks — wide enough for something the width of the vault to fill it, and to breed a city's wasting underneath."
+    },
+    {
+      "id": "tomb_gate_rise",
+      "term": "The Tomb-Gate Rise",
+      "definition": "The bare rise below Yuldra-Tul's tomb-gate, where the mountain funnels every howl down onto open ground. The pack thins here — and the thing that leads it comes down last, all teeth and patience."
+    },
+    {
+      "id": "conduit_line",
+      "term": "The Conduit Line",
+      "definition": "The main heat conduit east of Voronov, running fat and white-hot along its trestles. The whole quarter's warmth cycles through this one line — kill anything coiled on it here, before it moves."
+    },
+    {
       "id": "raiders_ridge",
       "term": "Raider's Ridge",
       "definition": "A broken spine of scrub and stacked stone east of the Tartarian Outskirts, cut everywhere with raider sign — spiral-marks, ridge-signs, tallies. The border gangs stage and settle things here, past the reach of the outposts and their truce."

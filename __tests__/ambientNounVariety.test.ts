@@ -51,6 +51,7 @@ jest.mock('expo-updates', () => ({}));
 
 import { useGameStore } from '../app/state/gameStore';
 import { getRaces, getFactions } from '../app/engine/character';
+import { placedAt } from '../test-utils/placePlayer';
 
 describe('cardinal movement ambient-noun variety', () => {
   beforeAll(() => {
@@ -68,7 +69,12 @@ describe('cardinal movement ambient-noun variety', () => {
     store.getState().skipTutorial?.();
     // Leave the hub so we're in open wilderness — cardinal steps
     // then drive the new shuffle path.
-    store.setState((s) => (s.player ? { player: { ...s.player, hubRoomId: null } } : s));
+    // ⚠ OTA-1601 — placed on VERIFIED-OPEN silt (three south of the Plains
+    // seat; cells (40,16)…(41,18) hold no canon location). The old fixture
+    // walked from the faction start, and the world has grown named tiles
+    // beside the starts — a step that ARRIVES rebuilds the scene and replaces
+    // the synthetic pool this suite exists to watch.
+    store.setState((s) => (s.player ? { player: { ...s.player, hubRoomId: null, ...placedAt('great_tartary_plains', { dy: 3 }) } } : s));
 
     // Seed currentScene with a big ambient pool so the shuffle has
     // room to vary. Pool size matches Tartarian Outskirts (~36).
@@ -172,7 +178,8 @@ describe('cardinal movement ambient-noun variety', () => {
     const fac = getFactions()[0]!;
     await store.getState().startNewGame({ name: 'SmallPool', raceId: race.id, factionId: fac.id });
     store.getState().skipTutorial?.();
-    store.setState((s) => (s.player ? { player: { ...s.player, hubRoomId: null } } : s));
+    // ⚠ OTA-1601 — same verified-open placement as the walk above.
+    store.setState((s) => (s.player ? { player: { ...s.player, hubRoomId: null, ...placedAt('great_tartary_plains', { dy: 3 }) } } : s));
 
     const scene = store.getState().currentScene!;
     const smallPool = ['mud', 'silt', 'wagon', 'rubble'];

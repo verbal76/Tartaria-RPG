@@ -84,9 +84,9 @@ interface StandingStage {
   family: 'hunt' | 'mystery' | 'storyline';
   recId: string;
   title: string;
-  stages: ReadonlyArray<{ grants?: { item: string; quantity?: number } }>;
+  stages: ReadonlyArray<{ grants?: { item: string; quantity?: number }; checkKind?: string | null }>;
   stageIndex: number;
-  stage: { requires?: { item: string; quantity?: number }; spawn?: { enemyName: string; count?: number } };
+  stage: { requires?: { item: string; quantity?: number }; spawn?: { enemyName: string; count?: number }; checkKind?: string | null };
 }
 
 /** Every tracked contract whose CURRENT stage stands on the player's ground.
@@ -171,7 +171,25 @@ export function armSpawnStagesAtArrival(get: Get, _set: Set): void {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const QS = require('../engine/questStage') as typeof import('../engine/questStage');
   for (const s of standingStages(get)) {
-    if (s.family !== 'hunt' || !s.stage.spawn) continue;
+    if (s.family !== 'hunt') continue;
+    // ⚠⚠⚠ OTA-1601 — THE APEX FIRES AT ARRIVAL TOO. Owner, on the crest leg:
+    // "I autoroutes to the last stage of the mission again and nothing
+    // happened, I had to yell fight me again ... it should fire as soon as I
+    // step on the tile and I should be dropped right into the fight." All 18
+    // final boss stages carry no authored spawn, so the spawn-only arm walked
+    // right past them — the one fight in every hunt that only the typed verb
+    // could start. The FINAL boss is the exact set advanceHunt freezes for the
+    // kill (mid-hunt boss beats all carry spawns and already arm); firing it
+    // here mirrors that freeze rule, so a stage this arms never routes away
+    // mid-spawn. Same one-writer, same curtain: narration, scaled apex,
+    // stinger, freeze.
+    let lastBossIdx = -1;
+    for (let i = 0; i < s.stages.length; i++) {
+      if (s.stages[i]?.checkKind === 'boss') lastBossIdx = i;
+    }
+    const firesHere = !!s.stage.spawn
+      || (s.stage.checkKind === 'boss' && s.stageIndex === lastBossIdx);
+    if (!firesHere) continue;
     if (!QS.stageRequirementMet(s.stage as never, get().player?.inventory ?? [])) continue;
     // ⚠ A live hostile already on the tile keeps the door: stacking the pack
     // onto an ambient fight is a pile-on nothing authored. The verb path (and
