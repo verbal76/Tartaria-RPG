@@ -26604,6 +26604,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // kind + minimal uniqueStats; and when no dog can wear it the modal SAYS so
 // instead of hiding the button (B15: refusals speak).
 export const OTA_BUILD_ID = '2026-09-01-1603-the-vest-knows';
+// golem catch-up 2026-09-01: markerless publish of OTA-1603 - one dog-armor
+// predicate, the fifth catalog, the legacy vest heal; hal took the marker.
 // golem catch-up 2026-09-01: markerless publish of OTA-1602 - the beat card
 // for in-place stage closes, all three families; hal got the marker push.
 // golem catch-up 2026-09-01: markerless publish of OTA-1601 - combat
