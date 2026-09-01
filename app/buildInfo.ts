@@ -26587,6 +26587,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // completion (which celebrates itself) and never over a stinger (a fight
 // stood up = not this card).
 export const OTA_BUILD_ID = '2026-09-01-1602-the-beat-card';
+// golem catch-up 2026-09-01: markerless publish of OTA-1602 - the beat card
+// for in-place stage closes, all three families; hal got the marker push.
 // golem catch-up 2026-09-01: markerless publish of OTA-1601 - combat
 // separates + the apex fires at arrival; hal got it via the marker push.
 // golem catch-up 2026-09-01: markerless publish of OTA-1600 — 37 authored
