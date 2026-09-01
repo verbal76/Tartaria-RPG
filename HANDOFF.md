@@ -906,12 +906,17 @@ app/
                runExclusiveNativeMl; prevents Tensor-G5 SIGSEGVs)
   audio/       AudioManager / controller / settings
   components/  UI primitives; InventoryCategorize.ts, RecipesView.tsx,
-               FusionPickerModal.tsx, StatsPanel.tsx, InputBox.tsx
+               FusionPickerModal.tsx, StatsPanel.tsx, InputBox.tsx,
+               BrandedModal.tsx (the shared card — see its contract below),
+               MissionStatusCard.tsx (OTA-1615, the slate where you stand)
   data/        Authored JSON (items/weapons/armor/gear/dogGear/recipes/…)
   engine/      Pure logic — parser, crafting, itemFusion, equipment, worldMap
                (canonical grid + travel distance), durability, combat, …
   screens/     Exploration / Inventory / Crafting / Vendor / Character / Map / …
-  state/       gameStore.ts — Zustand, the spine (~28k lines)
+  state/       gameStore.ts — Zustand, the spine (~37k lines, shrink-only ratchet)
+               defeatCredit.ts — OTA-1612: everything the OBJECTIVES hear when a
+               target goes down (whisper chains, hunt completion, leads, the
+               room-clear record, the escort clear). BOTH win conditions call it.
   updates/     checkAndApplyOTA.ts
   voice/       TTSManager / PiperTTSManager (Kokoro) / TTSController
 buildInfo.ts   OTA_BUILD_ID marker (per line)
@@ -928,6 +933,29 @@ Key invariants worth knowing:
   real distance/movement.
 - **Fusion output rarity = number of DISTINCT material tags** (3 → Rare, 4+ →
   Legendary), NOT input rarity. Variety matters, not rarity.
+- **A subdued mark is a defeated mark (OTA-1612, 2026-09-01).** A fight has TWO
+  win conditions — `resolveEnemyDefeat` (kill) and `lootKnockedOutEnemy`
+  (knockout) — and both run `creditDefeatedTarget`. Mercy keeps its own economy
+  (the premium, the better-preserved kit); the kill keeps its own bookkeeping
+  (loot roll, corpse, kill milestone). Measured cost of the old split: the owner
+  subdued a Chart Runner, was told "Nobody left standing — the fight is yours",
+  and walked away without the chart folio the chain existed to recover. If you
+  add a third way to end a fight, it calls `creditDefeatedTarget` too.
+- **The enemy portrait may not do arithmetic of its own (OTA-1607/1608/1611).**
+  AC, ATK, DMG and the WEAK/RESIST line all read the same resolvers the swing
+  reads (`combatRules.enemyAC` / `enemyAttackBonus`, `reconciledDefenses`), and
+  `reconciledDefenses` applies `inured:` exactly as `combineDamageTypeMatch`
+  does. A card that computes its own answer tells the player about the card.
+- **`BrandedModal` is header-pinned / middle-scrolls / buttons-pinned, capped at
+  85% (OTA-1614).** Keep it that way when editing: before the cap, a long body
+  grew the card past the screen and carried its own buttons off it, while the
+  scrim ate every tap meant for the game underneath.
+- **`missionTrace.ts` has ONE reader with two audiences.** `missionTraceLines`
+  writes the `missions:` lines in every log; `missionStatusCards` feeds the
+  player-facing card (OTA-1615). Both take their values from the functions the
+  engine decides with — `stageLocationId` + `resolvePosterLocation`,
+  `stageRequirementMet`, `stageVerbAsk` — so the card and the log cannot tell
+  different stories.
 
 ## 8. Open issues / watch list (current)
 - **✅ ANSWERED (2026-08-07) — THE HEAVY SIMS JOB IS RED ON EVERY RECENT COMMIT, AND
@@ -1524,8 +1552,72 @@ Key invariants worth knowing:
 
 ## 9. Recent OTA highlights (latest sessions)
 
+### ⚠⚠⚠ THE 2026-09-01 RUN — OTA-1600 → 1616 (read this first if you are new)
+
+Latest golem-line stamp: **`2026-09-01-1615-the-mission-speaks-where-you-stand`**
+(`app/buildInfo.ts`). Both channels ship from this branch — a `[ota-hal]` marker
+in the commit TITLE publishes the HAL set, a markerless follow-up commit
+publishes golem; see §6.
+
+Every item below came from the owner playing and reporting, and each one names
+the sentence that produced it. The through-line of the whole run is one rule:
+**a surface that computes its own answer will eventually disagree with the
+engine, and the player is the one who finds out.**
+
+- **OTA-1601 combat separates / 1602 the beat card / 1605 one fight on the
+  field.** Hunt fight-stages moved onto authored open ground beside the hubs;
+  the apex now fires on ARRIVAL, not only on a typed verb. 1605 closed the
+  double-summon that gave: two doors (the attack matcher and the per-action
+  ground check) could both stand the same pack up.
+- **OTA-1606 the gate waits.** Arrival stopped auto-entering outposts — a hub
+  tile stays overland until ENTER OUTPOST. *"otherwise it's a tile."*
+- **OTA-1610 the flee is honored.** A paid escape sets `missionFleeHoldCell`;
+  `armSpawnStagesAtArrival` skips while the boots stay on that cell and clears
+  on any cell change. His log had three flees, each undone by the next
+  `investigate`. The typed fight-verb still summons on purpose.
+- **OTA-1607 / 1608 / 1611 — the portrait tells the truth.** 1607 canonicalised
+  the DMG type (`2D6 Psychic` displayed while the roll dealt aetheric); 1608
+  pointed AC/ATK at the roll's own resolvers and swept every mint; 1611 made
+  `reconciledDefenses` honor `inured:`, which is what let a card read `WEAK
+  Slashing` over a chip reading `Not Weak: Slashing`. 1611 also fixed the mint:
+  the profiler could write `inured:poison` and `resist:poison` on one body.
+- **OTA-1612 a subdued mark counts.** See the invariant in §7. The credit half
+  left gameStore for `app/state/defeatCredit.ts`; the escort clear's "still up"
+  now means CONSCIOUS, so a pack won by mercy can close its stage.
+- **OTA-1613 the giver hands it over.** Arriving at a whisper giver used to CALL
+  the payout — authored line into the feed as ambient narration, generic
+  completion card, record deleted, no tap. Arrival now arms stage `handback`;
+  the hand-over is a button in the SPEAK TO sheet (or a typed
+  `give <name> the <goods>`), and the return line and the take land as the
+  giver's turns in that conversation. The sheet holds the farewell after the
+  record dies. One machine, twenty-one chains.
+- **OTA-1614 / 1616 — the card gives its buttons back.** `BrandedModal` gained
+  the scroll contract in §7 after a coating picker printed one refusal sentence
+  per ineligible weapon and pushed its own buttons off the screen; 1616 groups
+  those refusals by REASON (names once, duplicates folded `×N`, tail capped).
+- **OTA-1615 the mission speaks where you stand.** MISSIONS opens a scrollable
+  status card instead of jumping to the Contracts tab: the beat owed and how
+  many there are, the next action in plain words, whether this is the ground,
+  what the pack still owes, and every beat with a mark on the current one. OPEN
+  CONTRACTS stays on the card.
+
+⚠ **Pins that quote source lines are the recurring tax on this kind of work.**
+1612/1613 alone superseded pins in ota1214, ota1222, ota1547, ota1548, ota1549
+and ota1578. Checked 2026-09-01 by reading each failure before touching it: all
+six broke on a line that MOVED (a call renamed, a clause split across two lines,
+a function relocated to `defeatCredit.ts`), and the rule each one guards was
+still true — the exception was ota1222's walker, which encoded the OLD return
+flow and was a genuine behaviour change to update, not a reword. Treat that
+split as the expected shape, not a licence to skip reading: when you supersede a
+pin, re-check the rule where it now lives and record the reason beside it.
+`check:quotedpins` ratchets the prose-shaped ones down.
+
+
 Full changelog per line: `git log -- app/buildInfo.ts` on that branch (pre-July
-history in `HANDOFF-ARCHIVE.md`). Latest per line: **HaL2001 `2026-08-12-1254`**,
+history in `HANDOFF-ARCHIVE.md`). ⚠ The per-line stamps below are a 2026-08-12
+snapshot and go stale every session — read `OTA_BUILD_ID` in `app/buildInfo.ts`
+for the live one (golem-line was `2026-09-01-1615-the-mission-speaks-where-you-stand`
+on 2026-09-01). Snapshot as of 2026-08-12: **HaL2001 `2026-08-12-1254`**,
 **golem-line `2026-08-12-1233`** (parity offset still HAL − 23 — every gameplay
 OTA ships to both in the same pass), **engine_Dev `2026-07-20-1177`** (engine
 skipped the whole 948–1004 run by design: all of it is Tartaria combat/content
@@ -1803,6 +1895,26 @@ either because the sample is thin or because the fix is a design call rather
 than a bug fix. They are here so a later log can promote them instead of
 rediscovering them.
 
+- **⚠⚠ THE BOOT KILL IS STILL THERE (measured again 2026-09-01).** Seven
+  `PROCESS KILLED — no JS ran` records across the owner's 2026-08-31/09-01 logs,
+  at `boot:qwen:deferred` and `native:cognition:done`, newest on stamp 1608. The
+  telemetry from OTA-1587 is doing its job; the cause is not closed. Tracked as
+  the standing #110 item.
+- **⚠ FREEZE-WATCH IS QUIET ON 1605+ (measured 2026-09-01).** The owner reported
+  lag and intermittent freezes on 2026-09-01 (stamp ~1604); the bundles after
+  the 1605 double-summon fix report *"Freeze watch: no stalls seen"* with worst
+  native queue wait 0.0s and no memory warnings. Earlier stalls (3.4–5.0s) sat
+  beside 8–12s native Qwen reads and inside the now-dead double-summon window.
+  If lag is reported again, start from the native queue, not from the JS clocks.
+- **⚠ REAVER / HUNT-BOSS SCALING vs THE CONTRACTS-POSTER TIER CARD.** Measured
+  and offered to the owner (cap the scaling, or make the card honest about it);
+  no decision yet, so nothing was tuned. The poster card is the one remaining
+  surface in the portrait family that can still drift from what you meet.
+- **⚠ THE PARSER READS LONG FREE-TEXT AS AN ATTACK.** Twice now a typed note to
+  the Arbiter ("phsycic damage from the enemy?") parsed as `intent=attack
+  conf=1.00`. The Arbiter's own catch-all does answer ("I'm not sure what you're
+  trying to tell me… phrase it as a verb"), so it is not silent — but a sentence
+  that is obviously a question should not reach the attack matcher at all.
 - **⚠⚠ PUNCHLIST P19 — THE `heavy sims` CI JOB IS RED ON EVERY COMMIT AND IT IS A
   STALE TEST, NOT A REGRESSION (2026-08-14). HELD AT OWNER'S DIRECTION** — *"put on
   the punchlist and hold on that."* Do not re-investigate from scratch; the
