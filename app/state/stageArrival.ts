@@ -160,7 +160,7 @@ export function healStageDebtsAtArrival(get: Get, set: Set, grantStageItems: Gra
 }
 
 /** Half 2 — a hunt spawn stage arms when the player stands on it, paid up. */
-export function armSpawnStagesAtArrival(get: Get, _set: Set): void {
+export function armSpawnStagesAtArrival(get: Get, set: Set): void {
   const player = get().player;
   // ⚠ Never inside a roof — these grounds are open country, and a pack spawned
   // into an outpost room would be OTA-1583's machinery pointed at furniture.
@@ -168,6 +168,22 @@ export function armSpawnStagesAtArrival(get: Get, _set: Set): void {
   // now runs per ACTION, and advanceHunt narrates every call, so a spawn that
   // could not land (nowhere to put enemies) would re-narrate forever.
   if (!player || player.hubRoomId || get().activeBuildingId || !get().currentScene) return;
+  // ⚠⚠⚠ OTA-1610 — THE FLEE IS HONORED. A successful escape holds this door
+  // while the boots stay on the fled cell (owner fled the Reaver, typed
+  // 'investigate', and the per-action arm walked him straight back into the
+  // fight the roll had just paid to leave). Any cell change clears the hold —
+  // leave and return, and the tile is the trigger again. The typed fight-verb
+  // goes through advanceHunt, not here, so deliberate re-engagement still works.
+  {
+    const hold = get().missionFleeHoldCell;
+    if (hold) {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { playerGridCell: pgc } = require('./playerGrid') as typeof import('./playerGrid');
+      const now = pgc(player);
+      if (now.x === hold.x && now.y === hold.y) return;
+      set(() => ({ missionFleeHoldCell: null }));
+    }
+  }
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const QS = require('../engine/questStage') as typeof import('../engine/questStage');
   for (const s of standingStages(get)) {

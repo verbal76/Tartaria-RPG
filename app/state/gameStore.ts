@@ -7267,6 +7267,8 @@ export interface GameStore {
    *  fight stood up) so the transition reads as a scene, not a scrolled line. */
   pendingMissionBeat: { title: string; line: string; next: string | null } | null;
   dismissMissionBeat: () => void;
+  /** OTA-1610 — a successful flee holds the ground trigger on the fled cell. */
+  missionFleeHoldCell: { x: number; y: number } | null;
   turnInHunt: (titleOrId: string, remote?: boolean) => void;
   acceptMystery: (titleOrId: string) => void;
   advanceMystery: (mysteryId: string) => void;
@@ -17005,28 +17007,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
         break;
       }
       case 'rest': {
-        // ⚠ OTA-1140 (pressure test) — YOU CANNOT CAMP IN FRONT OF SOMETHING
-        // TRYING TO KILL YOU. The exploit sweep typed "camp" mid-boss-fight and
-        // got the full 8-hour rest — +15% max HP, stamina to full — while the
-        // enemies standing in arm's reach never swung: this path never calls
-        // runEnemyGroupCounters, and its 22% ambush roll SETS range 'far',
-        // which disengages the melee pack already in the scene as a failure
-        // bonus. Eating a consumable stays a free action (OTA-619's deliberate
-        // design, locked by combatHealNoCounter) — the parser routes "eat X"
-        // here with resolvedItemId, and that branch below is untouched. It is
-        // the CAMP that ends: same shape as OTA-1016's honest wall-rest
-        // refusal, and the same reason.
+        // ⚠ OTA-1140 (pressure test) — you cannot CAMP in front of something
+        // trying to kill you (the sweep got a free 8-hour rest mid-boss-fight,
+        // no counters, range reset). Eating a consumable stays a free action
+        // (OTA-619, locked by combatHealNoCounter); only the camp ends.
         if (!parsed.resolvedItemId
             && (currentScene?.enemies.length ?? 0) > 0
             && (currentScene?.enemyHps ?? []).some((h, i) => h > 0 && !(currentScene?.enemyKnockedOut?.[i]))) {
-          // ⚠ OTA-1352 — REFUSALS ALWAYS SPEAK. Without skipDedup, the arbiter
-          // repeat-dedup (OTA-610) swallowed this line from the SECOND identical
-          // refusal on: a player mashing REST mid-fight got one answer and then
-          // dead silence — the exact "dead button" read the hold-back note
-          // (OTA-1349) exists to prevent. Found via B15: the movement sim wedged
-          // on this refusal and could not even SEE it refusing. A refusal is a
-          // direct answer to a player action, not ambient chatter — it must
-          // reach the player every single time.
+          // ⚠ OTA-1352 — refusals always speak: skipDedup, or the repeat-dedup
+          // swallowed every refusal after the first (the B15 "dead button").
           get().appendLog('arbiter', `The Arbiter does not look away from the fight. "Rest? Nothing here has agreed to that. Deal with what's in front of you, or put real ground between you first."`, { skipDedup: true });
           break;
         }
@@ -22660,6 +22649,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
               set((s) => (s.currentScene
                 ? { currentScene: { ...s.currentScene, ...FRESH_ENEMY_ARRAYS, enemies: [], enemyHps: [], activeEnemyIdx: 0, range: null } }
                 : s));
+              // ⚠⚠⚠ OTA-1610 — THE FLEE IS HONORED. Owner: "I fled the fight at
+              // the end of the hunt three times and it would just pop you on the
+              // tile. okay fine — and I typed investigate and ran right back into
+              // the fight." A paid escape stays on the tile (his call), but the
+              // OTA-1601 ground trigger holds until his boots LEAVE this cell —
+              // stepping off clears it, coming back re-arms, and the typed
+              // fight-verb still summons on purpose (stageArrival has the gate).
+              const fledPl = get().player;
+              if (fledPl) set({ missionFleeHoldCell: playerGridCell(fledPl) });
             }
             // ⚠⚠⚠ OTA-1459 — RUNNING COSTS SOMETHING NOW. See FLEE_STAMINA_COST.
             //

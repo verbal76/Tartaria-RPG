@@ -26680,7 +26680,19 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // decision input — and the detail popup carries "Strikes with: <name>". Null
 // for mints that stamp digits or nothing; every number on the card remains
 // the roll's own arithmetic (1608), untouched.
-export const OTA_BUILD_ID = '2026-09-01-1609-the-strike-keeps-its-name';
+//
+// ⚠⚠⚠ OTA-1610 — THE FLEE IS HONORED. Owner: "I fled the fight at the end of
+// the hunt of silence the doubter three times and it would just pop you on
+// the tile. okay fine — and I typed investigate and ran right back into the
+// fight." The escape roll PAID and the narration said he broke away — then
+// the OTA-1601 per-action ground trigger stood the Reaver right back up on
+// his next investigate. A successful flee now sets a hold on the fled CELL:
+// the arm stays down while his boots stay on it, any cell change clears it
+// (leave and return, and the tile is the trigger again), and the typed
+// fight-verb still summons on purpose — deliberate re-engagement is the
+// verb's job, not the investigate button's. Flee-in-place itself stays,
+// per his "okay fine".
+export const OTA_BUILD_ID = '2026-09-01-1610-the-flee-is-honored';
 // golem catch-up 2026-09-01: markerless publish of OTA-1609 - the STRIKES
 // flavor line on the portrait + popup. hal took the marker push.
 // golem catch-up 2026-09-01: markerless publish of OTA-1608 - the portrait

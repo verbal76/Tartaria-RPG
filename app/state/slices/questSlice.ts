@@ -133,6 +133,9 @@ export interface QuestSlice {
    *  fight stood up) raises its closing prose + next objective as a scene. */
   pendingMissionBeat: { title: string; line: string; next: string | null } | null;
   dismissMissionBeat: () => void;
+  /** OTA-1610 — a successful flee holds the ground trigger on the fled cell
+   *  until the boots actually leave it (any cell change clears it). */
+  missionFleeHoldCell: { x: number; y: number } | null;
   turnInHunt: (titleOrId: string, remote?: boolean) => void;
   acceptMystery: (titleOrId: string) => void;
   advanceMystery: (mysteryId: string) => void;
@@ -1712,6 +1715,7 @@ export const createQuestSlice = (
   dismissMissionBeat() {
     set(() => ({ pendingMissionBeat: null }));
   },
+  missionFleeHoldCell: null,
   advanceHunt(huntId, opts) {
     const peaceful = opts?.peaceful === true;
     const state = get();
