@@ -1,0 +1,238 @@
+{
+  "id": "483eee88a7a8410081196b268d4d535c",
+  "groupID": "7704763976",
+  "eventID": "483eee88a7a8410081196b268d4d535c",
+  "projectID": "4511945117532160",
+  "size": 18056,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-01-1604-the-vest-breaks-down #mtiqe9wwibm3 [inline 6/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-01-1604-the-vest-breaks-down",
+  "message": "player-log 2026-09-01-1604-the-vest-breaks-down #mtiqe9wwibm3 [inline 6/28]",
+  "title": "player-log 2026-09-01-1604-the-vest-breaks-down #mtiqe9wwibm3 [inline 6/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "6fe0fd4af3a54e4a9a6ecdecc37fe89a",
+      "span_id": "a01803d1db313ed7",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "[world] Your foot scrapes stone. Something stirs in the dark.\n[2026-09-01T01:44:36.417Z] [combat] Conspiracy Architects Patrol 3 \u2014 d20 \u2192 7 + ATK 8 = 15 vs your AC 23 \u2014 \u2717 MISS\n[2026-09-01T01:44:36.418Z] [combat] Conspiracy Architects Patrol 4 \u2014 d20 \u2192 18 + ATK 6 = 24 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n",
+      "[2026-09-01T01:44:36.420Z] [combat] Conspiracy Architects Patrol 2 \u2014 d20 \u2192 12 + ATK 7 = 19 vs your AC 23 \u2014 \u2717 MISS\n[2026-09-01T01:44:36.664Z] [combat] Conspiracy Architects Patrol 4 deals 5 bludgeoning damage. You have 31 HP remaining.\n[2026-09-01T01:44:37.824Z] [debug] ui: tap \"\ud83d\udd25\u2697 bone crossbow\"\n[2026-09-01T01:44:37.889Z] [player] attack with the off-hand bone crossbow\n",
+      "[2026-09-01T01:44:37.890Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=3 hooks=2\n[2026-09-01T01:44:37.892Z] [debug] attack: target=Conspiracy Architects Patrol 2 range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n",
+      "[2026-09-01T01:44:37.965Z] [world] Your searing acid-etched bone crossbow comes around in an arc; Conspiracy Architects Patrol 2 squares up to meet it.\n[2026-09-01T01:44:37.965Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T01:44:38.231Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (265ms)\n",
+      "[2026-09-01T01:44:47.962Z] [world] You seize the initiative. Conspiracy Architects Patrol 2 has no time to react.\n[2026-09-01T01:44:47.962Z] [combat] You \u2014 d20 \u2192 16 + DEX 24 + 2 (point blank) = 42 vs Conspiracy Architects Patrol 2 AC 11 \u2014 \u2713 HIT\n",
+      "[2026-09-01T01:44:47.964Z] [combat] Conspiracy Architects Patrol 2 folds under the searing acid-etched bone crossbow. 15 damage was enough. The room exhales.\n[2026-09-01T01:44:47.965Z] [reward] Conspiracy Architects Patrol 2 defeated. You recover Aether Residue \u00d72, Patched Cloth.\n",
+      "[2026-09-01T01:44:47.966Z] [reward] You strip the body: Bone Knife, Mud-Warden's Vest (+6 TC). The kit took the fight badly.\n[2026-09-01T01:44:47.967Z] [combat] 2 attackers remain. Conspiracy Architects Patrol 3 now in your sights.\n[2026-09-01T01:44:47.967Z] [system] Reclaimers Guild standing +1 (now 84)\n[2026-09-01T01:44:47.967Z] [reward] +6 TC pried from the dust.\n",
+      "[2026-09-01T01:44:48.029Z] [combat] Conspiracy Architects Patrol 3 \u2014 d20 \u2192 15 + ATK 8 = 23 vs your AC 23 \u2014 \u2713 HIT\n[2026-09-01T01:44:48.030Z] [combat] Conspiracy Architects Patrol 4 \u2014 d20 \u2192 14 + ATK 6 = 20 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-01T01:44:48.276Z] [combat] Conspiracy Architects Patrol 3 deals 5 slashing damage [armor \u221234%]. You have 26 HP remaining.\n",
+      "[2026-09-01T01:44:49.063Z] [debug] persist sizes(KB): total=241 player=52 wm=101[rooms=50 events=3 memos=0 npcs=4 defeated=1 tags=1 discovered=0] log=83 scene=5\n[2026-09-01T01:44:49.770Z] [debug] ui: tap \"dodge\"\n[2026-09-01T01:44:49.783Z] [player] dodge\n[2026-09-01T01:44:49.784Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=2 hooks=2\n",
+      "[2026-09-01T01:44:49.785Z] [world] You commit to the dodge. Slip Conspiracy Architects Patrol 3's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-01T01:44:49.841Z] [combat] Conspiracy Architects Patrol 4 \u2014 d20 \u2192 18 + ATK 6 = 24 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n",
+      "[2026-09-01T01:44:49.841Z] [combat] Dodge \u2014 d20 \u2192 7 + DEX 24 = 31 vs ATK 24. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-01T01:44:49.841Z] [world] You slip Conspiracy Architects Patrol 4's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n",
+      "[2026-09-01T01:44:49.843Z] [debug] ac-shift 23\u219226: race/base 10 + gear 20 + title 0 \u2192 trimmed 23 + status 3 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n",
+      "[2026-09-01T01:44:49.843Z] [combat] Conspiracy Architects Patrol 3 \u2014 d20 \u2192 15 + ATK 8 = 23 vs your AC 26 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-01T01:44:49.843Z] [debug] arbiter: template (reason=combat)\n[2026-09-01T01:44:49.843Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-01T01:44:49.844Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-01T01:44:50.072Z] [cognitive] neutral  (227ms)\n[2026-09-01T01:44:54.622Z] [debug] ui: tap \"\ud83d\udd25\u2697 bone crossbow\"\n[2026-09-01T01:44:54.626Z] [system] evasive \u2014 harder to hit fades.\n[2026-09-01T01:44:54.629Z] [world] An Aetheric arc finds you \u2014 copper taste, blue afterimage, and a bite of damage. (\u22123 HP)\n[2026-09-01T01:44:54.668Z] [player] attack with the off-hand bone crossbow\n",
+      "[2026-09-01T01:44:54.668Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=2 hooks=2\n[2026-09-01T01:44:54.669Z] [debug] attack: target=Conspiracy Architects Patrol 3 range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n",
+      "[2026-09-01T01:44:54.670Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-01T01:44:54.719Z] [world] You raise the searing acid-etched bone crossbow toward Conspiracy Architects Patrol 3. The room narrows around the both of you.\n[2026-09-01T01:44:54.719Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T01:44:54.938Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (217ms)\n",
+      "[2026-09-01T01:45:02.779Z] [world] Conspiracy Architects Patrol 3 moves first. The pressure is immediate.\n[2026-09-01T01:45:02.780Z] [debug] ac-shift 26\u219223: race/base 10 + gear 20 + title 0 \u2192 trimmed 23 + status 0 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n",
+      "[2026-09-01T01:45:02.781Z] [combat] Conspiracy Architects Patrol 3 \u2014 d20 \u2192 2 + ATK 8 = 10 vs your AC 23 \u2014 \u2717 MISS\n[2026-09-01T01:45:02.781Z] [combat] Conspiracy Architects Patrol 4 turns on Soot \u2014 d20 1 + ATK 6 = 7 vs Soot's AC 12 (vest +2) \u2014 \u2717 FUMBLE\n",
+      "[2026-09-01T01:45:02.781Z] [combat] You \u2014 d20 \u2192 7 + DEX 24 + 2 (point blank) perfect opening (2\u00d7 dice) = 33 vs Conspiracy Architects Patrol 3 AC 12 \u2014 \u2713 HIT\n[2026-09-01T01:45:02.783Z] [combat] Your blow with the searing acid-etched bone crossbow lands clean \u2014 19 damage. Conspiracy Architects Patrol 3 crumples in the dust. The Aetherstone settles.\n",
+      "[2026-09-01T01:45:02.784Z] [reward] Conspiracy Architects Patrol 3 defeated. You recover Patched Cloth \u00d73.\n[2026-09-01T01:45:02.785Z] [reward] You strip the body: Bone Knife, Mud-Bound Cloak (+6 TC). The kit took the fight badly.\n[2026-09-01T01:45:02.786Z] [combat] 1 attacker remains. Conspiracy Architects Patrol 4 now in your sights.\n",
+      "[2026-09-01T01:45:02.786Z] [system] Reclaimers Guild standing +1 (now 85)\n[2026-09-01T01:45:02.786Z] [reward] +10 TC pried from the dust.\n[2026-09-01T01:45:05.090Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n[2026-09-01T01:45:05.126Z] [player] attack with the auralite talon\n",
+      "[2026-09-01T01:45:05.127Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=1 hooks=2\n[2026-09-01T01:45:05.128Z] [debug] attack: target=Conspiracy Architects Patrol 4 range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n",
+      "[2026-09-01T01:45:05.180Z] [world] Your acid-etched corrupted auralite talon comes around in an arc; Conspiracy Architects Patrol 4 squares up to meet it.\n[2026-09-01T01:45:05.180Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T01:45:05.399Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (218ms)\n",
+      "[2026-09-01T01:45:08.765Z] [world] You seize the initiative. Conspiracy Architects Patrol 4 has no time to react.\n[2026-09-01T01:45:08.765Z] [combat] You \u2014 d20 \u2192 1 + INT 12 = 13 vs Conspiracy Architects Patrol 4 AC 10 \u2014 \u2717 FUMBLE\n[2026-09-01T01:45:08.766Z] [combat] Your strike with the acid-etched corrupted auralite talon glances off. Conspiracy Architects Patrol 4 seizes the opening.\n",
+      "[2026-09-01T01:45:08.766Z] [combat] Conspiracy Architects Patrol 4 turns on Soot \u2014 d20 2 + ATK 6 = 8 vs Soot's AC 12 (vest +2) \u2014 \u2717 MISS\n[2026-09-01T01:45:08.766Z] [arbiter] The Arbiter's hand drifts to nothing in particular. \"The Conspiracy Architects Patrol 4 will not tire before you do. Spend wisely.\"\n[2026-09-01T01:45:10.592Z] [debug] ui: tap \"dodge\"\n[2026-09-01T01:45:10.605Z] [player] dodge\n",
+      "[2026-09-01T01:45:10.605Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=2\n[2026-09-01T01:45:10.606Z] [world] You commit to the dodge. Slip Conspiracy Architects Patrol 4's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-01T01:45:10.671Z] [combat] Conspiracy Architects Patrol 4 \u2014 d20 \u2192 10 + ATK 6 = 16 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n[2026-09-01T01:45:10.671Z] [combat] Dodge \u2014 d20 \u2192 12 + DEX 24 = 36 vs ATK 16. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-01T01:45:10.672Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-09-01T01:45:10.672Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-01T01:45:10.672Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T01:45:10.900Z] [cognitive] neutral  (227ms)\n[2026-09-01T01:45:11.457Z] [debug] ui: tap \"\ud83d\udd25\u2697 bone crossbow\"\n[2026-09-01T01:45:11.498Z] [player] attack with the off-hand bone crossbow\n",
+      "[2026-09-01T01:45:11.498Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=1 hooks=2\n[2026-09-01T01:45:11.499Z] [debug] attack: target=Conspiracy Architects Patrol 4 range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n",
+      "[2026-09-01T01:45:11.501Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-01T01:45:11.584Z] [world] You raise the searing acid-etched bone crossbow toward Conspiracy Architects Patrol 4. The room narrows around the both of you.\n[2026-09-01T01:45:11.599Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T01:45:11.901Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (302ms)\n",
+      "[2026-09-01T01:45:20.023Z] [world] Conspiracy Architects Patrol 4 moves first. The pressure is immediate.\n[2026-09-01T01:45:20.023Z] [combat] Conspiracy Architects Patrol 4 turns on Soot \u2014 d20 8 + ATK 6 = 14 vs Soot's AC 12 (vest +2) \u2014 \u2713 HIT\n[2026-09-01T01:45:20.024Z] [combat] Soot takes 8. (7/15 HP left)\n",
+      "[2026-09-01T01:45:20.025Z] [combat] You \u2014 d20 \u2192 9 + DEX 24 + 2 (point blank) perfect opening (2\u00d7 dice) = 35 vs Conspiracy Architects Patrol 4 AC 10 \u2014 \u2713 HIT\n[2026-09-01T01:45:20.027Z] [combat] Piercing flares \u2014 +1 on hit.\n[2026-09-01T01:45:20.027Z] [combat] The killing blow with the searing acid-etched bone crossbow: 21. Conspiracy Architects Patrol 4 drops where it stood.\n",
+      "[2026-09-01T01:45:20.028Z] [reward] Conspiracy Architects Patrol 4 defeated. You recover Aether Residue, Patched Cloth, Architect Sigil.\n[2026-09-01T01:45:20.029Z] [reward] You strip the body: Bone Knife, Mud-Warden's Vest (+6 TC). The kit took the fight badly.\n[2026-09-01T01:45:20.029Z] [system] Reclaimers Guild standing +1 (now 86)\n[2026-09-01T01:45:20.030Z] [reward] +24 TC pried from the dust.\n",
+      "[2026-09-01T01:45:20.506Z] [debug] persist sizes(KB): total=242 player=53 wm=101[rooms=50 events=3 memos=0 npcs=4 defeated=1 tags=1 discovered=0] log=84 scene=4\n[2026-09-01T01:45:47.604Z] [debug] ui: tap \"missions\"\n[2026-09-01T01:46:19.619Z] [debug] appstate: active \u2192 background (was active for 964069ms)\n[2026-09-01T01:46:33.202Z] [debug] appstate: background \u2192 active (was background for 13584ms)\n",
+      "[2026-09-01T01:46:35.980Z] [debug] OTA session start: 2026-09-01-1598-the-fight-waits-outside-the-gate.\n[2026-09-01T01:46:35.981Z] [world] You step back into Tartarian Outskirts. The world waits for your move.\n[2026-09-01T01:46:35.981Z] [arbiter] The Arbiter meets your eyes. \"Welcome back, Cheddar Bob. The buried country is no place to walk alone.\"\n",
+      "[2026-09-01T01:46:36.341Z] [debug] \u2550\u2550\u2550 SESSION 2026-09-01T01:46:36.338Z \u00b7 build 2026-09-01-1598-the-fight-waits-outside-the-gate \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-09-01T01:46:36.341Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @tartarian_outskirts HERE needs=Raider's Ridge-Sign\u2713\n",
+      "[2026-09-01T01:46:36.341Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n[2026-09-01T01:46:36.342Z] [debug] missions: mystery:mystery_temporal_watch stage 0/4 [diplomacy] @reclaimer_stake npc=\"the Reclaimers Guild Speaker\" gives=Guild Eddy-Gauge PAUSED\n",
+      "[2026-09-01T01:46:36.343Z] [debug] missions: \u00b7 at=tartarian_outskirts\n[2026-09-01T01:46:36.343Z] [debug] boot: life bmthzc2ab32 started 2026-09-01T01:19:32.243Z \u00b7 FOLLOWED AN OTA APPLY 145ms ago via boot-front \u00b7 prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)\n",
+      "[2026-09-01T01:46:40.261Z] [debug] send-log: #mti0ay8get84 \u2014 DELIVERED (inline, no attachments): beacon out, 28/28 parts accepted (406388 chars) \u2014 flush said yes\n[2026-09-01T01:46:40.262Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mti0ay8get84 kept on disk, boots retry up to 5 sends total\n",
+      "[2026-09-01T01:46:46.450Z] [debug] persist sizes(KB): total=245 player=56 wm=101[rooms=50 events=3 memos=0 npcs=4 defeated=1 tags=1 discovered=0] log=85 scene=4\n[2026-09-01T01:46:50.667Z] [debug] appstate: active \u2192 background (was active for 17465ms)\n[2026-09-01T02:25:12.201Z] [debug] appstate: background \u2192 active (was background for 2301525ms)\n",
+      "[2026-09-01T02:25:16.125Z] [debug] ctx: RELEASED \u2014 live=0 (opened=1 released=1)\n[2026-09-01T02:25:16.204Z] [debug] appstate: active \u2192 background (was active for 4012ms)\n[2026-09-01T02:25:17.501Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a05ab6-3199-7d47-8414-ce65e1c2bb36\n[2026-09-01T02:25:17.501Z] [debug] ota: Checking\u2026\n",
+      "[2026-09-01T02:25:17.596Z] [debug] ota: Already up to date\n[2026-09-01T02:25:17.597Z] [debug] ota: boot check result = noUpdate\n[2026-09-01T02:25:17.643Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-09-01T02:25:17.644Z] [debug] voice: bundled idle\n[2026-09-01T02:25:17.948Z] [debug] send-log: bundle #mti0ay8get84 attempt 2/5 delivered to Sentry\n",
+      "[2026-09-01T02:32:19.223Z] [debug] OTA applied: 2026-09-01-1598-the-fight-waits-outside-the-gate \u2192 2026-09-01-1599-set-the-bone.\n[2026-09-01T02:32:19.224Z] [debug] OTA session start: 2026-09-01-1599-set-the-bone.\n[2026-09-01T02:32:19.224Z] [world] You step back into Tartarian Outskirts. The world waits for your move.\n",
+      "[2026-09-01T02:32:19.224Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. \"Welcome back, Cheddar Bob. The road kept your place.\"\n[2026-09-01T02:32:19.675Z] [debug] \u2550\u2550\u2550 SESSION 2026-09-01T02:32:19.673Z \u00b7 build 2026-09-01-1599-set-the-bone \u00b7 updated from 2026-09-01-1598-the-fight-waits-outside-the-gate \u00b7 previous entry moments earlier \u2550\u2550\u2550\n",
+      "[2026-09-01T02:32:19.676Z] [debug] missio"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-01-1604-the-vest-breaks-down #mtiqe9wwibm3 [inline 6/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtiqe9wwibm3"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-01-1604-the-vest-breaks-down"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "6"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-01-1604-the-vest-breaks-down"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-01T14:41:22.231999Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-01T14:41:22.211000Z",
+  "fingerprints": [
+    "97e2d707a688ebba13522d8bbf54506e"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1948373866,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-01T14:41:22.215000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-01-1604-the-vest-breaks-down",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-01-1604-the-vest-breaks-down",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-01-1604-the-vest-breaks-down",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-01-1604-the-vest-breaks-down)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "4aa99aac9ce84a218e0af49482204679",
+  "previousEventID": "368105b17c1d464498a9de8c06233415"
+}

@@ -1,0 +1,234 @@
+{
+  "id": "1d87dc6928d54892869ce3ecf9589b0d",
+  "groupID": "7704763976",
+  "eventID": "1d87dc6928d54892869ce3ecf9589b0d",
+  "projectID": "4511945117532160",
+  "size": 18045,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-01-1604-the-vest-breaks-down #mtis7hpm6ccs [inline 17/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-01-1604-the-vest-breaks-down",
+  "message": "player-log 2026-09-01-1604-the-vest-breaks-down #mtis7hpm6ccs [inline 17/28]",
+  "title": "player-log 2026-09-01-1604-the-vest-breaks-down #mtis7hpm6ccs [inline 17/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "6fe0fd4af3a54e4a9a6ecdecc37fe89a",
+      "span_id": "a01803d1db313ed7",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "till swings, but you're a harder mark for the moment.\n[2026-09-01T03:42:13.527Z] [debug] ac-shift 23\u219226: race/base 10 + gear 20 + title 0 \u2192 trimmed 23 + status 3 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n",
+      "[2026-09-01T03:42:13.527Z] [combat] Mud Monarchs Patrol 1 \u2014 d20 \u2192 3 + ATK 7 = 10 vs your AC 26 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-01T03:42:13.527Z] [combat] Mud Monarchs Patrol 3 and 1 other close the distance.\n[2026-09-01T03:42:13.528Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T03:42:13.754Z] [cognitive] neutral  (226ms)\n",
+      "[2026-09-01T03:42:14.186Z] [debug] \u26a0 FREEZE WATCH: LOGIC stalled while frames kept coming (js 3539ms \u00b7 frames 712ms). Something blocked the JS thread \u2014 look for a long synchronous run.\n[2026-09-01T03:42:14.402Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient after 10975ms \u2014 ambient:stale:combat-started\n[2026-09-01T03:42:14.402Z] [debug] arbiter: ambient stale:combat-started 12259ms\n",
+      "[2026-09-01T03:42:14.402Z] [debug] arbiter: ambient-empty reason=unknown raw=\"You, my companion, have traveled a long road, traversing through the ancient corridors of Tartaria. Your eyes have seen \"\n[2026-09-01T03:42:14.624Z] [cognitive] neutral  (11238ms)\n[2026-09-01T03:42:14.842Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n[2026-09-01T03:42:14.843Z] [system] evasive \u2014 harder to hit fades.\n",
+      "[2026-09-01T03:42:14.860Z] [player] attack with the auralite talon\n[2026-09-01T03:42:14.861Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=4 hooks=0\n[2026-09-01T03:42:14.865Z] [debug] attack: target=Mud Monarchs Patrol 1 range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n",
+      "[2026-09-01T03:42:14.867Z] [arbiter] Whisper Fog hangs between you. \"\u22121 to the swing \u2014 see what you can,\" the Arbiter says.\n[2026-09-01T03:42:14.867Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-09-01T03:42:14.868Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-09-01T03:42:14.941Z] [world] Your acid-etched corrupted auralite talon comes around in an arc; Mud Monarchs Patrol 1 squares up to meet it.\n[2026-09-01T03:42:14.942Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T03:42:15.306Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (363ms)\n",
+      "[2026-09-01T03:42:17.071Z] [debug] qwen\u23f1 investigate_lore ok 13334ms wait 10886ms read 1324ms/write 1107ms in 127t\u2192out 35t 10.4ms/t (164ch)\n[2026-09-01T03:42:19.217Z] [debug] freeze watch: recovered \u2014 painting again after 1172ms quiet.\n[2026-09-01T03:42:25.484Z] [world] Mud Monarchs Patrol 1 moves first. The pressure is immediate.\n",
+      "[2026-09-01T03:42:25.486Z] [debug] ac-shift 26\u219223: race/base 10 + gear 20 + title 0 \u2192 trimmed 23 + status 0 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n[2026-09-01T03:42:25.486Z] [combat] Mud Monarchs Patrol 2 \u2014 d20 \u2192 10 + ATK 8 = 18 vs your AC 23 \u2014 \u2717 MISS\n",
+      "[2026-09-01T03:42:25.487Z] [combat] Mud Monarchs Patrol 3 \u2014 d20 \u2192 15 + ATK 7 = 22 vs your AC 23 \u2014 \u2717 MISS\n[2026-09-01T03:42:25.489Z] [combat] Mud Monarchs Patrol 1 \u2014 d20 \u2192 4 + ATK 7 = 11 vs your AC 23 \u2014 \u2717 MISS\n[2026-09-01T03:42:25.489Z] [combat] Mud Monarchs Patrol 4 closes the distance.\n",
+      "[2026-09-01T03:42:25.489Z] [combat] You \u2014 d20 \u2192 8 + INT 11 \u2212 1 (Whisper Fog) perfect opening (2\u00d7 dice) = 18 vs Mud Monarchs Patrol 1 AC 11 \u2014 \u2713 HIT\n[2026-09-01T03:42:25.490Z] [combat] Mud Monarchs Patrol 1 shrugs off the aetheric. (resisted, \u00d70.5 for 12)\n",
+      "[2026-09-01T03:42:25.496Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Bone Crossbow \u2014 piercing will bite where aetheric won't.\"\n[2026-09-01T03:42:25.497Z] [combat] You crack the Mud Monarchs Patrol 1 with the Acid-Etched Corrupted Auralite Talon for 12 \u2014 the better part of their fight, gone in one blow. They crumple, out cold. (4/16 HP) Loot them before they come to.\n",
+      "[2026-09-01T03:42:25.497Z] [combat] Mud Monarchs Patrol 1 is out of it. Mud Monarchs Patrol 2 now in your sights.\n[2026-09-01T03:42:25.497Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 3 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n",
+      "[2026-09-01T03:42:25.497Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 1 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n[2026-09-01T03:42:26.862Z] [debug] ui: tap \"\ud83d\udd25\u2697 bone crossbow\"\n[2026-09-01T03:42:26.907Z] [player] attack with the off-hand bone crossbow\n",
+      "[2026-09-01T03:42:26.907Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=4 hooks=0\n[2026-09-01T03:42:26.908Z] [combat] Mud Monarchs Patrol 1 smokes \u2014 acid eats 3. (1/16 HP, 2 turns left)\n[2026-09-01T03:42:26.908Z] [combat] Mud Monarchs Patrol 1 blackens \u2014 corruption eats 1. (0/16 HP, 2 turns left)\n",
+      "[2026-09-01T03:42:26.909Z] [reward] Mud Monarchs Patrol 1 defeated. You recover Patched Cloth \u00d72.\n[2026-09-01T03:42:26.910Z] [reward] You strip the body: Bone Knife, Mud-Bound Cloak (+6 TC). The kit took the fight badly.\n[2026-09-01T03:42:26.910Z] [combat] 3 attackers remain. Mud Monarchs Patrol 2 now in your sights.\n",
+      "[2026-09-01T03:42:26.910Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-09-01T03:42:26.911Z] [reward] +10 TC pried from the dust.\n[2026-09-01T03:42:26.951Z] [debug] attack: target=Mud Monarchs Patrol 2 range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n",
+      "[2026-09-01T03:42:26.952Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-09-01T03:42:26.999Z] [world] You bring the searing acid-etched bone crossbow to bear on Mud Monarchs Patrol 2.\n[2026-09-01T03:42:26.999Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T03:42:27.239Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (239ms)\n",
+      "[2026-09-01T03:42:35.136Z] [world] Mud Monarchs Patrol 2 moves first. The pressure is immediate.\n[2026-09-01T03:42:35.138Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 7 + ATK 7 = 14 vs your AC 23 \u2014 \u2717 MISS\n[2026-09-01T03:42:35.140Z] [combat] Mud Monarchs Patrol 2 \u2014 d20 \u2192 14 + ATK 8 = 22 vs your AC 23 \u2014 \u2717 MISS\n",
+      "[2026-09-01T03:42:35.141Z] [combat] Mud Monarchs Patrol 3 \u2014 d20 \u2192 3 + ATK 7 = 10 vs your AC 23 \u2014 \u2717 MISS\n[2026-09-01T03:42:35.141Z] [combat] You \u2014 d20 \u2192 11 + DEX 24 \u2212 1 (Whisper Fog) = 34 vs Mud Monarchs Patrol 2 AC 12 \u2014 \u2713 HIT\n[2026-09-01T03:42:35.143Z] [combat] Piercing flares \u2014 +2 on hit.\n",
+      "[2026-09-01T03:42:35.143Z] [combat] The killing blow with the searing acid-etched bone crossbow: 18. Mud Monarchs Patrol 2 drops where it stood.\n[2026-09-01T03:42:35.146Z] [reward] Mud Monarchs Patrol 2 defeated. You recover Worn Tartarian Coin, Patched Cloth.\n[2026-09-01T03:42:35.149Z] [reward] You strip the body: Bone Knife, Mud-Warden's Vest (+6 TC). The kit took the fight badly.\n",
+      "[2026-09-01T03:42:35.149Z] [combat] 2 attackers remain. Mud Monarchs Patrol 3 now in your sights.\n[2026-09-01T03:42:35.149Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-09-01T03:42:35.150Z] [reward] +12 TC pried from the dust.\n[2026-09-01T03:42:37.434Z] [debug] ui: tap \"dodge\"\n[2026-09-01T03:42:37.446Z] [player] dodge\n",
+      "[2026-09-01T03:42:37.447Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=2 hooks=0\n[2026-09-01T03:42:37.448Z] [world] You commit to the dodge. Slip Mud Monarchs Patrol 3's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-01T03:42:37.509Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 6 + ATK 7 = 13 vs your AC 23 \u2014 \u2717 EVADED\n[2026-09-01T03:42:37.509Z] [combat] Dodge \u2014 d20 \u2192 3 + DEX 24 = 27 vs ATK 13. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n",
+      "[2026-09-01T03:42:37.509Z] [world] You slip Mud Monarchs Patrol 4's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n[2026-09-01T03:42:37.511Z] [debug] ac-shift 23\u219226: race/base 10 + gear 20 + title 0 \u2192 trimmed 23 + status 3 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Gr",
+      "eaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n[2026-09-01T03:42:37.511Z] [combat] Mud Monarchs Patrol 3 \u2014 d20 \u2192 6 + ATK 7 = 13 vs your AC 26 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-01T03:42:37.511Z] [debug] arbiter: template (reason=combat)\n[2026-09-01T03:42:37.512Z] [arbiter] \"That Mud Monarchs Patrol 3 is making the same mistake,\" the Arbiter says, almost bored. \"Capitalize.\"\n",
+      "[2026-09-01T03:42:37.512Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T03:42:37.738Z] [cognitive] neutral  (225ms)\n[2026-09-01T03:42:38.534Z] [debug] ui: tap \"approach\"\n[2026-09-01T03:42:38.539Z] [system] evasive \u2014 harder to hit fades.\n[2026-09-01T03:42:38.587Z] [player] approach Mud Monarchs Patrol 3\n",
+      "[2026-09-01T03:42:38.588Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud monarchs patrol 3 resolved=Mud Monarchs Patrol 3 range=mid enemies=2 hooks=0\n[2026-09-01T03:42:38.589Z] [debug] move: advance from range=mid enemies=2 weather=Whisper Fog cost=1 partial=0\n[2026-09-01T03:42:38.589Z] [debug] move: field advance target=Mud Monarchs Patrol 3 d 1.53->0.53 band mid->close\n",
+      "[2026-09-01T03:42:38.589Z] [world] You close the gap with the Mud Monarchs Patrol 3 and Mud Monarchs Patrol 4. (range: close / arm's reach)\n[2026-09-01T03:42:38.589Z] [world] The field shifts around you \u2014 Mud Monarchs Patrol 4 now close / arm's reach.\n",
+      "[2026-09-01T03:42:38.591Z] [debug] ac-shift 26\u219223: race/base 10 + gear 20 + title 0 \u2192 trimmed 23 + status 0 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n[2026-09-01T03:42:38.591Z] [combat] Mud Monarchs Patrol 3 \u2014 d20 \u2192 15 + ATK 7 = 22 vs your AC 23 \u2014 \u2717 MISS\n",
+      "[2026-09-01T03:42:38.592Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 17 + ATK 7 = 24 vs your AC 23 \u2014 \u2713 HIT\n[2026-09-01T03:42:38.857Z] [combat] Mud Monarchs Patrol 4 deals 8 bludgeoning damage. You have 17 HP remaining.\n[2026-09-01T03:42:39.081Z] [cognitive] SWIM \u00b7 RETREAT  (487ms)\n[2026-09-01T03:42:39.503Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n",
+      "[2026-09-01T03:42:39.504Z] [system] perfect opening fades.\n[2026-09-01T03:42:39.522Z] [player] attack with the auralite talon\n[2026-09-01T03:42:39.523Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=2 hooks=0\n",
+      "[2026-09-01T03:42:39.524Z] [debug] attack: target=Mud Monarchs Patrol 3 range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n[2026-09-01T03:42:39.525Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-09-01T03:42:39.525Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-09-01T03:42:39.570Z] [world] You raise the acid-etched corrupted auralite talon toward Mud Monarchs Patrol 3. The room narrows around the both of you.\n[2026-09-01T03:42:39.570Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T03:42:39.782Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (211ms)\n",
+      "[2026-09-01T03:42:40.518Z] [debug] persist sizes(KB): total=255 player=57 wm=107[rooms=50 events=4 memos=0 npcs=4 defeated=1 tags=1 discovered=0] log=87 scene=4\n[2026-09-01T03:42:48.452Z] [world] Mud Monarchs Patrol 3 moves first. The pressure is immediate.\n[2026-09-01T03:42:48.454Z] [combat] Mud Monarchs Patrol 3 \u2014 d20 \u2192 2 + ATK 7 = 9 vs your AC 23 \u2014 \u2717 MISS\n",
+      "[2026-09-01T03:42:48.456Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 13 + ATK 7 = 20 vs your AC 23 \u2014 \u2717 MISS\n[2026-09-01T03:42:48.456Z] [combat] You \u2014 d20 \u2192 13 + INT 11 \u2212 1 (Whisper Fog) perfect opening (2\u00d7 dice) = 23 vs Mud Monarchs Patrol 3 AC 11 \u2014 \u2713 HIT\n[2026-09-01T03:42:48.456Z] [combat] Mud Monarchs Patrol 3 shrugs off the aetheric. (resisted, \u00d70.5 for 10)\n",
+      "[2026-09-01T03:42:48.459Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Bone Crossbow \u2014 piercing will bite where aetheric won't.\"\n[2026-09-01T03:42:48.459Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter watches the aetheric skid off. \"Swap to the Bone\u2026\"\n",
+      "[2026-09-01T03:42:48.460Z] [combat] You crack the Mud Monarchs Patrol 3 with the Acid-Etched Corrupted Auralite Talon for 10 \u2014 the better part of their fight, gone in one blow. They crumple, out cold. (6/16 HP) Loot them before they come to.\n[2026-09-01T03:42:48.460Z] [combat] Mud Monarchs Patrol 3 is out of it. Mud Monarchs Patrol 4 now in your sights.\n",
+      "[2026-09-01T03:42:48.460Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 1 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n[2026-09-01T03:42:48.461Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 1 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n[2026-09-01T03:42:50.805Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n",
+      "[2026-09-01T03:42:50.809Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.\n[2026-09-01T03:42:50.837Z] [player] attack with the auralite talon\n[2026-09-01T03:42:50.838Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=2 hooks=0\n",
+      "[2026-09-01T03:42:50.838Z] [combat] Mud Monarchs Patrol 3 smokes \u2014 acid eats 1. (5/16 HP, 2 turns left)\n[2026-09-01T03:42:50.839Z] [combat] Mud Monarchs Patrol 3 blackens \u2014 corruption eats 1. (4/16 HP, 2 turns left)\n[2026-09-01T03:42:50.839Z] [debug] attack: target=Mud Monarchs Patrol 4 range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n",
+      "[2026-09-01T03:42:50.840Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-09-01T03:42:50.890Z] [world] You bring the acid-etched corrupted auralite talon to bear on Mud Monarchs Patrol 4.\n[2026-09-01T03:42:50.891Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T03:42:51.111Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (219ms)\n",
+      "[2026-09-01T03:42:59.358Z] [world] Mud Monarchs Patrol 4 moves first. The pressure is immediate.\n[2026-09-01T03:42:59.361Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 17 + ATK 7 = 24 vs your AC 23 \u2014 \u2713 HIT\n[2026-09-01T03:42:59.362Z] [combat] You \u2014 d20 \u2192 7 + INT 11 \u2212 1 (Whisper Fog) = 17 vs Mud Monarchs Patrol 4 AC 11 \u2014 \u2713 HIT\n",
+      "[2026-09-01T03:42:59.362Z] [combat] Mud Monarchs Patrol 4 shrugs off the aetheric. (resisted, \u00d70.5 for 12)\n[2026-09-01T03:42:59.365Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Bone Crossbow \u2014 piercing or bludgeoning will bite where aetheric won't.\"\n",
+      "[2026-09-01T03:42:59.366Z] [combat] You crack the Mud Monarchs Patrol 4 with the Acid-Etched Corrupted Auralite Talon for 12 \u2014 the better part of their fight, gone in one blow. They crumple, out cold. (5/17 HP) Loot them before they come to.\n[2026-09-01T03:42:59.367Z] [combat] Nobody left standing \u2014 the fight i"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-01-1604-the-vest-breaks-down #mtis7hpm6ccs [inline 17/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtis7hpm6ccs"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-01-1604-the-vest-breaks-down"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "17"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-01-1604-the-vest-breaks-down"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-01T14:47:47.941436Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-01T14:47:47.840000Z",
+  "fingerprints": [
+    "97e2d707a688ebba13522d8bbf54506e"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1948373866,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-01T14:41:22.215000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-01-1604-the-vest-breaks-down",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-01-1604-the-vest-breaks-down",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-01-1604-the-vest-breaks-down",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-01-1604-the-vest-breaks-down)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "37dc696333934d67b7f15cc06b55c4d4",
+  "previousEventID": "0cb53105c07d48d5b584e993ffd8b786"
+}

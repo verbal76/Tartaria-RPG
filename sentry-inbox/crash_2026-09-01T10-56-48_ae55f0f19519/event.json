@@ -1,0 +1,194 @@
+{
+  "id": "ae55f0f1951941338f2eb742e077cc8b",
+  "groupID": "7700061579",
+  "eventID": "ae55f0f1951941338f2eb742e077cc8b",
+  "projectID": "4511945117532160",
+  "size": 3270,
+  "entries": [
+    {
+      "data": {
+        "formatted": "Process died with no orderly exit while: (no action yet) \u2014 begun 5m before the last sign of life; treat the action label as stale, not as the killer"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-01-1602-the-beat-card",
+  "message": "Process died with no orderly exit while: (no action yet) \u2014 begun 5m before the last sign of life; treat the action label as stale, not as the killer",
+  "title": "Process died with no orderly exit while: (no action yet) \u2014 begun 5m before the last sign of life; treat the action label as stale, not as the killer",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "72db70f58a1e4167b99cb0f2b5d80e8f",
+      "span_id": "a8b1f8f6a995bee8",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "actionAgeMs": 287576,
+    "id": "1788260208050_native-death",
+    "lastAction": "(no action yet)",
+    "lastPhase": "native:cognition:done",
+    "lastPhaseAgeMs": 0,
+    "lastPhaseDetail": "q0",
+    "sinceBootMs": 287623,
+    "stack": "(none \u2014 the process died without one)"
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "Process died with no orderly exit while: (no action yet) \u2014 begun 5m before the last sign of life; treat the action label as stale, not as the killer"
+  },
+  "tags": [
+    {
+      "key": "build",
+      "value": "2026-09-01-1602-the-beat-card"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-01-1602-the-beat-card"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "native-death"
+    },
+    {
+      "key": "level",
+      "value": "fatal"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-01-1602-the-beat-card"
+    },
+    {
+      "key": "stage",
+      "value": "native:cognition:done"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    },
+    {
+      "key": "version",
+      "value": "4.32.11"
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-01T13:56:59.100000Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-01T10:56:48.050000Z",
+  "fingerprints": [
+    "28123d1e1fdb4dfb5fc06e893f9568a8"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1947963270,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-01T10:52:00.819000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-01-1602-the-beat-card",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-01-1602-the-beat-card",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-01-1602-the-beat-card",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-01-1602-the-beat-card)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": "e80d43f8ca674c4eb72f503557844342"
+}

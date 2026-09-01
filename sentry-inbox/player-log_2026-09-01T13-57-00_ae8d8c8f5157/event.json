@@ -1,0 +1,198 @@
+{
+  "id": "ae8d8c8f51574699912cbb8dcf36de66",
+  "groupID": "7704671926",
+  "eventID": "ae8d8c8f51574699912cbb8dcf36de66",
+  "projectID": "4511945117532160",
+  "size": 4173,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-01-1603-the-vest-knows #mti4rci02ab8 [inline 28/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-01-1603-the-vest-knows",
+  "message": "player-log 2026-09-01-1603-the-vest-knows #mti4rci02ab8 [inline 28/28]",
+  "title": "player-log 2026-09-01-1603-the-vest-knows #mti4rci02ab8 [inline 28/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "c5af1dc0255a4f2096150708ead138c7",
+      "span_id": "be83ad464887183b",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "     doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: boot:qwen:deferred \u00b7 5207ms into the action \u00b7 alive 0ms after it\n      launch: died 5302ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-08-31T22:46:39.841Z (305m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-31-1596-the-mark-catches-up-at-the-door \u00b7 stage native:voice:start\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:voice:start [q1] \u00b7 1865ms into the action \u00b7 alive 0ms after it\n      launch: died 1908ms into the process \u00b7 not an OTA-apply boot\n",
+      "      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\nCrash delivery: ON \u2014 reports go to Sentry when you crash.\nRuntime pressure\n  Memory warnings: none this session\n  Freeze watch: no stalls seen (JS clocks only \u2014 see the native queue below)\n  \u26a0 Worst logic stall: 3539ms\n",
+      "  \u26a0 Native queue: worst wait 10.9s \u00b7 1 job kind queued >3s \u00b7 worst 19.4ms/prompt-token \u00b7 16 generations thrown away (124.1s)\n     The JS thread was healthy and the native model queue was not. A stall the freeze watch above is structurally blind to.\n  App state trail: background \u2192 active \u2192 background \u2192 active \u2192 background \u2192 active\nModel contexts\n  Live now: 1\n",
+      "  Opened: 1 \u00b7 Released: 0 \u00b7 Peak live: 1\n  Narration engine: ready\n"
+    ],
+    "chunkChars": 1412
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-01-1603-the-vest-knows #mti4rci02ab8 [inline 28/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mti4rci02ab8"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-01-1603-the-vest-knows"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "28"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-01-1603-the-vest-knows"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "4"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-01T13:57:00.976621Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-01T13:57:00.799000Z",
+  "fingerprints": [
+    "56f032ca331df39681a8272b18a3be76"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1948281253,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-01T13:57:00.797000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-01-1603-the-vest-knows",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-01-1603-the-vest-knows",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-01-1603-the-vest-knows",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-01-1603-the-vest-knows)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "b23d5e1c7db748fcb1ed14e1bced4599",
+  "previousEventID": "ac960a3973ad4f24b58db89762f68735"
+}

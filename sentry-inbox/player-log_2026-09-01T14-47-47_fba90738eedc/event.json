@@ -1,0 +1,234 @@
+{
+  "id": "fba90738eedc4afe8885704950a76550",
+  "groupID": "7704763976",
+  "eventID": "fba90738eedc4afe8885704950a76550",
+  "projectID": "4511945117532160",
+  "size": 18060,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-01-1604-the-vest-breaks-down #mtis7hpm6ccs [inline 9/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-01-1604-the-vest-breaks-down",
+  "message": "player-log 2026-09-01-1604-the-vest-breaks-down #mtis7hpm6ccs [inline 9/28]",
+  "title": "player-log 2026-09-01-1604-the-vest-breaks-down #mtis7hpm6ccs [inline 9/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "6fe0fd4af3a54e4a9a6ecdecc37fe89a",
+      "span_id": "a01803d1db313ed7",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      " template (reason=combat)\n[2026-09-01T03:13:48.625Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-01T03:13:48.851Z] [cognitive] HIDE \u00b7 SEARCH \u00b7 RETREAT \u00b7 USE_ITEM \u00b7 REST  (224ms)\n[2026-09-01T03:13:50.511Z] [debug] ui: tap \"dodge\"\n[2026-09-01T03:13:50.525Z] [player] dodge\n",
+      "[2026-09-01T03:13:50.526Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=1\n[2026-09-01T03:13:50.527Z] [world] You commit to the dodge. Slip Aetheric Ghost's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-01T03:13:50.528Z] [combat] Aetheric Ghost blisters \u2014 clinging fire sears 3. (44/126 HP, 1 turn left)\n[2026-09-01T03:13:50.605Z] [combat] Aetheric Ghost \u2014 d20 \u2192 14 + ATK 5 = 19 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n[2026-09-01T03:13:50.605Z] [combat] Dodge \u2014 d20 \u2192 12 + DEX 24 = 36 vs ATK 19. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n",
+      "[2026-09-01T03:13:50.606Z] [debug] arbiter: template (reason=combat)\n[2026-09-01T03:13:50.606Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-01T03:13:50.607Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T03:13:50.836Z] [cognitive] neutral  (229ms)\n[2026-09-01T03:13:51.566Z] [debug] ui: tap \"\u2697\u2623 auralite talon \u2605\"\n",
+      "[2026-09-01T03:13:51.611Z] [player] attack with the auralite talon\n[2026-09-01T03:13:51.612Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=1 hooks=1\n[2026-09-01T03:13:51.613Z] [combat] Aetheric Ghost blisters \u2014 clinging fire sears 3. (41/126 HP, 0 turns left)\n",
+      "[2026-09-01T03:13:51.613Z] [combat] Aetheric Ghost shakes off the last of the fire \u2014 the Bone Crossbow has run its course.\n[2026-09-01T03:13:51.614Z] [debug] attack: target=Aetheric Ghost range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n[2026-09-01T03:13:51.616Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-09-01T03:13:51.676Z] [world] You commit forward with the acid-etched corrupted auralite talon. Aetheric Ghost watches your hands.\n[2026-09-01T03:13:51.677Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T03:13:51.896Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (218ms)\n[2026-09-01T03:14:00.199Z] [world] Aetheric Ghost moves first. The pressure is immediate.\n",
+      "[2026-09-01T03:14:00.205Z] [combat] Aetheric Ghost \u2014 d20 \u2192 1 + ATK 5 = 6 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 FUMBLE\n[2026-09-01T03:14:00.205Z] [combat] You \u2014 d20 \u2192 9 + INT 11 perfect opening (2\u00d7 dice) = 20 vs Aetheric Ghost AC 11 \u2014 \u2713 HIT\n[2026-09-01T03:14:00.205Z] [combat] The Acid-Etched coating fails to take on Aetheric Ghost.\n",
+      "[2026-09-01T03:14:00.205Z] [combat] Aetheric flares \u2014 +1 on hit (weak \u2014 bites deep!).\n[2026-09-01T03:14:00.206Z] [combat] Weakness exposed \u2014 Aetheric Ghost flinches. (aetheric \u00d71.5 for 25)\n[2026-09-01T03:14:00.207Z] [combat] Aetheric Ghost takes 25 with the acid-etched corrupted auralite talon. It reels: 16 left. Then it fights back.\n",
+      "[2026-09-01T03:14:00.208Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 1 corruption bites in and festers (3 turns). The rot deepens (3 stacks).\n[2026-09-01T03:14:00.208Z] [combat] Aetheric Ghost is left exposed \u2014 easier to hit.\n[2026-09-01T03:14:02.697Z] [debug] ui: tap \"\u2697\u2623 auralite talon \u2605\"\n[2026-09-01T03:14:02.748Z] [player] attack with the auralite talon\n",
+      "[2026-09-01T03:14:02.749Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=1 hooks=1\n[2026-09-01T03:14:02.749Z] [combat] Aetheric Ghost blackens \u2014 corruption eats 3. (13/126 HP, 2 turns left)\n",
+      "[2026-09-01T03:14:02.750Z] [debug] attack: target=Aetheric Ghost range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n[2026-09-01T03:14:02.811Z] [world] You bring the acid-etched corrupted auralite talon to bear on Aetheric Ghost.\n[2026-09-01T03:14:02.811Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-01T03:14:03.031Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (219ms)\n[2026-09-01T03:14:03.345Z] [debug] persist sizes(KB): total=233 player=54 wm=94[rooms=41 events=3 memos=0 npcs=4 defeated=1 tags=1 discovered=0] log=81 scene=4\n[2026-09-01T03:14:10.939Z] [world] You seize the initiative. Aetheric Ghost has no time to react.\n",
+      "[2026-09-01T03:14:10.940Z] [combat] You \u2014 d20 \u2192 8 + INT 11 = 19 vs Aetheric Ghost AC 10 \u2014 \u2713 HIT\n[2026-09-01T03:14:10.940Z] [combat] Aetheric flares \u2014 +4 on hit (weak \u2014 bites deep!).\n[2026-09-01T03:14:10.941Z] [combat] Weakness exposed \u2014 Aetheric Ghost flinches. (aetheric \u00d71.5 for 20)\n",
+      "[2026-09-01T03:14:10.942Z] [combat] Your blow with the acid-etched corrupted auralite talon lands clean \u2014 20 damage. Aetheric Ghost crumples in the dust. The Aetherstone settles.\n[2026-09-01T03:14:10.945Z] [reward] Aetheric Ghost defeated. You recover Spirit Cloth \u00d72, Aetheric Fragment.\n[2026-09-01T03:14:10.947Z] [reward] +12 TC pried from the dust.\n",
+      "[2026-09-01T03:14:14.377Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-09-01T03:14:16.699Z] [debug] ui: tap \"more \u25b8\"\n[2026-09-01T03:14:18.603Z] [debug] ui: tap \"inventory\"\n[2026-09-01T03:14:27.694Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 13146ms read 11906ms/write 1165ms in 787t\u2192out 33t 15.1ms/t HIT-CAP (161ch)\n",
+      "[2026-09-01T03:14:27.725Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 13146ms \u2014 intro-fill:action-opener\n[2026-09-01T03:14:27.725Z] [debug] homework: scene_intro \"Raider's Ridge\" \u2713 13349ms\n[2026-09-01T03:14:34.343Z] [debug] qwen\u23f1 item_synthesis_hw ok 4939ms read 3546ms/write 1360ms in 327t\u2192out 40t 10.8ms/t (162ch)\n",
+      "[2026-09-01T03:14:34.350Z] [debug] qwen\u23f1 \u2702 DISCARDED item_synthesis_hw after 4939ms \u2014 item_synth:rejected-by-clamp bad-kind=\"weapon_coating\"\n[2026-09-01T03:14:34.352Z] [debug] homework: item_desc \"Acid Flask\" \u2205 4955ms\n[2026-09-01T03:14:44.891Z] [reward] You work the acid flask into the Aether-Walker's Boots. It now turns aside acid damage \u2014 for good, until the piece is lost or destroyed.\n",
+      "[2026-09-01T03:14:54.224Z] [reward] You work the frost paste into the Architect's Sight Enhancer. It now turns aside cold damage \u2014 for good, until the piece is lost or destroyed.\n[2026-09-01T03:14:59.460Z] [debug] homework: intro-fill armed after 6000ms idle (strike 2/3)\n",
+      "[2026-09-01T03:15:05.557Z] [reward] You work the incendiary paste into the Reclaimer's Cloak. It now turns aside burn damage \u2014 for good, until the piece is lost or destroyed.\n[2026-09-01T03:15:11.735Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 12269ms read 10474ms/write 1749ms in 787t\u2192out 33t 13.3ms/t HIT-CAP (146ch)\n",
+      "[2026-09-01T03:15:11.750Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 12269ms \u2014 intro-fill:near-dup\n[2026-09-01T03:15:11.756Z] [debug] homework: scene_intro \"Raider's Ridge\" \u2205 12298ms\n[2026-09-01T03:15:21.663Z] [debug] qwen\u23f1 item_synthesis_hw ok 7213ms read 6455ms/write 733ms in 333t\u2192out 22t 19.4ms/t (94ch)\n",
+      "[2026-09-01T03:15:21.675Z] [debug] homework: item_desc \"Forgotten Seeker's Mask\" \u2713 7231ms\n[2026-09-01T03:15:27.620Z] [reward] You work the smoldering paste into the Mud-glass Scales. It now turns aside burn damage \u2014 for good, until the piece is lost or destroyed.\n",
+      "[2026-09-01T03:15:39.281Z] [reward] You work the frost paste into the Relic Hunter's Gauntlets. It now turns aside cold damage \u2014 for good, until the piece is lost or destroyed.\n[2026-09-01T03:15:44.510Z] [debug] homework: intro-fill armed after 6000ms idle (strike 3/3)\n",
+      "[2026-09-01T03:15:52.767Z] [reward] You work the acid flask into the Reclaimer's Cloak. It now turns aside acid damage \u2014 for good, until the piece is lost or destroyed.\n[2026-09-01T03:15:53.548Z] [debug] persist sizes(KB): total=233 player=53 wm=95[rooms=41 events=3 memos=0 npcs=4 defeated=1 tags=1 discovered=0] log=81 scene=3\n",
+      "[2026-09-01T03:16:00.344Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 15831ms read 12620ms/write 2365ms in 787t\u2192out 33t 16.0ms/t HIT-CAP (157ch)\n[2026-09-01T03:16:00.348Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 15831ms \u2014 intro-fill:near-dup\n[2026-09-01T03:16:00.348Z] [debug] homework: scene_intro \"Raider's Ridge\" \u2205 15840ms\n",
+      "[2026-09-01T03:16:09.589Z] [debug] qwen\u23f1 item_synthesis_hw ok 5025ms read 4082ms/write 907ms in 321t\u2192out 27t 12.7ms/t (119ch)\n[2026-09-01T03:16:09.597Z] [debug] homework: item_desc \"Energy Fragment\" \u2713 5045ms\n[2026-09-01T03:16:09.668Z] [reward] You work the acid flask into the Litany Greaves. It now turns aside acid damage \u2014 for good, until the piece is lost or destroyed.\n",
+      "[2026-09-01T03:16:15.352Z] [debug] ui: tap \"craft\"\n[2026-09-01T03:16:25.589Z] [debug] parser: intent=craft conf=1.00 verb=craft target=first aid kit resolved=- range=- enemies=0 hooks=1\n[2026-09-01T03:16:25.618Z] [debug] parser: intent=craft conf=1.00 verb=craft target=first aid kit resolved=First Aid Kit range=- enemies=0 hooks=1\n",
+      "[2026-09-01T03:16:25.641Z] [debug] arbiter: template (reason=intent-not-allowed:craft)\n[2026-09-01T03:16:25.641Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-01T03:16:25.642Z] [reward] \u2726 Crafted First Aid Kit \u00d72. The Arbiter watches you set the last piece.\n[2026-09-01T03:16:25.988Z] [cognitive] neutral  (394ms)\n[2026-09-01T03:16:25.998Z] [cognitive] neutral  (356ms)\n",
+      "[2026-09-01T03:16:28.614Z] [debug] parser: intent=craft conf=1.00 verb=craft target=forager stew resolved=- range=- enemies=0 hooks=1\n[2026-09-01T03:16:28.662Z] [debug] parser: intent=craft conf=1.00 verb=craft target=forager stew resolved=- range=- enemies=0 hooks=1\n[2026-09-01T03:16:28.684Z] [reward] \u2726 Crafted Forager's Stew \u00d72. The Arbiter watches you set the last piece.\n",
+      "[2026-09-01T03:16:29.020Z] [cognitive] neutral  (395ms)\n[2026-09-01T03:16:29.046Z] [cognitive] neutral  (360ms)\n[2026-09-01T03:16:37.194Z] [debug] qwen\u23f1 ambient ok 8184ms read 6884ms/write 1231ms in 363t\u2192out 31t 19.0ms/t HIT-CAP (153ch)\n[2026-09-01T03:16:37.203Z] [arbiter] You've traversed the treacherous terrain, each step a step towards mastery.\n",
+      "[2026-09-01T03:16:37.204Z] [debug] arbiter: ambient \u2713 8520ms\n[2026-09-01T03:16:37.204Z] [debug] arbiter: ambient-said \"You've traversed the treacherous terrain, each step a step towards mastery.\"\n[2026-09-01T03:16:47.528Z] [debug] parser: intent=craft conf=1.00 verb=craft target=mudstone resolved=Hardened Mudstone range=- enemies=0 hooks=1\n",
+      "[2026-09-01T03:16:47.556Z] [debug] parser: intent=craft conf=1.00 verb=craft target=mudstone resolved=Mudstone range=- enemies=0 hooks=1\n[2026-09-01T03:16:47.594Z] [debug] parser: intent=craft conf=1.00 verb=craft target=mudstone resolved=Mudstone range=- enemies=0 hooks=1\n",
+      "[2026-09-01T03:16:47.621Z] [debug] parser: intent=craft conf=1.00 verb=craft target=mudstone resolved=Mudstone range=- enemies=0 hooks=1\n[2026-09-01T03:16:47.638Z] [debug] arbiter: template (reason=intent-not-allowed:craft)\n[2026-09-01T03:16:47.638Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-09-01T03:16:47.641Z] [world] A Mud Monarchs patrol crosses your path in the open \u2014 and turns toward you.\n[2026-09-01T03:16:47.641Z] [arbiter] \"Mud Monarchs riders,\" the Arbiter says. \"They've marked you. No outrunning this one.\"\n[2026-09-01T03:16:47.651Z] [debug] parser: intent=craft conf=1.00 verb=craft target=mudstone resolved=Mudstone range=close enemies=4 hooks=1\n",
+      "[2026-09-01T03:16:47.667Z] [debug] arbiter: template (reason=combat)\n[2026-09-01T03:16:47.668Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-01T03:16:47.678Z] [debug] parser: intent=craft conf=1.00 verb=craft target=mudstone resolved=Mudstone range=close enemies=4 hooks=1\n[2026-09-01T03:16:47.694Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-09-01T03:16:47.694Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-01T03:16:47.694Z] [reward] \u2726 Crafted Mudstone \u00d76. The Arbiter watches you set the last piece.\n[2026-09-01T03:16:48.026Z] [cognitive] SEARCH \u00b7 USE_ITEM \u00b7 THROW  (493ms)\n[2026-09-01T03:16:48.044Z] [cognitive] SEARCH \u00b7 USE_ITEM \u00b7 THROW  (459ms)\n",
+      "[2026-09-01T03:16:48.048Z] [cognitive] SEARCH \u00b7 USE_ITEM \u00b7 THROW  (435ms)\n[2026-09-01T03:16:48.064Z] [cognitive] SEARCH \u00b7 USE_ITEM \u00b7 THROW  (423ms)\n[2026-09-01T03:16:48.074Z] [cognitive] SEARCH \u00b7 USE_ITEM \u00b7 THROW  (405ms)\n[2026-09-01T03:16:48.079Z] [cognitive] SEARCH \u00b7 USE_ITEM \u00b7 THROW  (384ms)\n",
+      "[2026-09-01T03:16:48.248Z] [debug] persist sizes(KB): total=236 player=52 wm=94[rooms=41 events=3 memos=0 npcs=4 defeated=1 tags=1 discovered=0] log=81 scene=7\n[2026-09-01T03:16:52.191Z] [debug] parser: intent=craft conf=1.00 verb=craft target=hardened mudstone resolved=Hardened Mudstone range=close enemies=4 hooks=1\n[2026-09-01T03:16:52.195Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-09-01T03:16:52.195Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-01T03:16:52.233Z] [debug] parser: intent=craft conf=1.00 verb=craft target=hardened mudstone resolved=Hardened Mudstone range=close enemies=4 hooks=1\n[2026-09-01T03:16:52.253Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-09-01T03:16:52.253Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-01T03:16:52.269Z] [debug] parser: intent=craft conf=1.00 verb=craft target=hardened mudstone resolved=Hardened Mudstone range=close enemies=4 hooks=1\n[2026-09-01T03:16:52.286Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-09-01T03:16:52.286Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-01T03:16:52.286Z] [reward] \u2726 Crafted Hardened Mudstone \u00d73. The Arbiter watches you set the last piece.\n[2026-09-01T03:16:52.612Z] [cognitive] SEARCH \u00b7 THROW \u00b7 USE_ITEM  (415ms)\n[2026-09-01T03:16:52.615Z] [cognitive] SEARCH \u00b7 THROW \u00b7 USE_ITEM  (361ms)\n",
+      "[2026-09-01T03:16:52.631Z] [cognitive] SEARCH \u00b7 THROW \u00b7 USE_ITEM  (344ms)\n[2026-09-01T03:16:55.873Z] [debug] parser: intent=craft conf=1.00 verb=craft target=mudstone resolved=Hardened Mudstone range=close enemies=4 hooks=1\n[2026-09-01T03:16:55.910Z] [debug] parser: intent=craft conf=1.00 verb=craft target=mudstone resolved=Mudstone range=close enemies=4 hooks=1\n",
+      "[2026-09-01T03:16:55.940Z] [arbiter] The Arbiter stops with his hand over your pack. \"Before I touch the Mudstone \u2014 3 pieces of this is Crucible stock: 3\u00d7 Mud Essence. Say the word and I'll set it aside instead.\"\n[2026-09-01T03:16:55.942Z] [debug] arbiter: template (reason=combat)\n[2026-09-01T03:16:55.942Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-09-01T03:16:55.943Z] [reward] \u2726 Crafted Mudstone \u00d71 of 7 \u2014 the materials ran out (or your pack did).\n[2026-09-01T03:16:56.257Z] [cognitive] SEARCH \u00b7 USE_ITEM \u00b7 THROW  (372ms)\n[2026-09-01T03:16:56.257Z] [cognitive] SEARCH \u00b7 USE_ITEM \u00b7 THROW  (314ms)\n[2026-09-01T03:16:57.976Z] [arbiter] The Arbiter sets it aside on the bench. \"\u2665 Held for the Crucible: Mud Essence \u00d74. I'll not touch it.\"\n",
+      "[2026-09-01T03:17:01.342Z] [player] craft Mudstone\n[2026-09-01T03:17:01.343Z] [debug] parser: intent=craft conf=1.00 verb=craft target=mud"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-01-1604-the-vest-breaks-down #mtis7hpm6ccs [inline 9/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtis7hpm6ccs"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-01-1604-the-vest-breaks-down"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "9"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-01-1604-the-vest-breaks-down"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-01T14:47:47.894470Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-01T14:47:47.839000Z",
+  "fingerprints": [
+    "97e2d707a688ebba13522d8bbf54506e"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1948373866,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-01T14:41:22.215000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-01-1604-the-vest-breaks-down",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-01-1604-the-vest-breaks-down",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-01-1604-the-vest-breaks-down",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-01-1604-the-vest-breaks-down)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": "f8bd358cd5734c9597b73f5e8cd7f9bb"
+}

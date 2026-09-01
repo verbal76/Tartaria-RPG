@@ -1,0 +1,233 @@
+{
+  "id": "589edb8fb95a4e74a957f7bac0925059",
+  "groupID": "7704671926",
+  "eventID": "589edb8fb95a4e74a957f7bac0925059",
+  "projectID": "4511945117532160",
+  "size": 18008,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-01-1603-the-vest-knows #mtiqe9wwibm3 [inline 25/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-01-1603-the-vest-knows",
+  "message": "player-log 2026-09-01-1603-the-vest-knows #mtiqe9wwibm3 [inline 25/28]",
+  "title": "player-log 2026-09-01-1603-the-vest-knows #mtiqe9wwibm3 [inline 25/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "c5af1dc0255a4f2096150708ead138c7",
+      "span_id": "be83ad464887183b",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "e passed: 6 min\n[2026-09-01T03:48:01.978Z] [cognitive] neutral  (245ms)\n[2026-09-01T03:48:02.592Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n[2026-09-01T03:48:02.616Z] [player] attack with the auralite talon\n[2026-09-01T03:48:02.617Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=1 hooks=2\n",
+      "[2026-09-01T03:48:02.617Z] [combat] Aether Serpent smokes \u2014 acid eats 2. (76/130 HP, 1 turn left)\n[2026-09-01T03:48:02.617Z] [combat] Aether Serpent blackens \u2014 corruption eats 3. (73/130 HP, 1 turn left)\n[2026-09-01T03:48:02.618Z] [debug] attack: target=Aether Serpent range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n",
+      "[2026-09-01T03:48:02.622Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-09-01T03:48:02.622Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-01T03:48:02.675Z] [world] You raise the acid-etched corrupted auralite talon toward Aether Serpent. The room narrows around the both of you.\n[2026-09-01T03:48:02.675Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-01T03:48:02.916Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (240ms)\n[2026-09-01T03:48:10.817Z] [world] You seize the initiative. Aether Serpent has no time to react.\n[2026-09-01T03:48:10.818Z] [combat] You \u2014 d20 \u2192 4 + INT 11 \u2212 1 (Whisper Fog) perfect opening (2\u00d7 dice) = 14 vs Aether Serpent AC 10 \u2014 \u2713 HIT\n",
+      "[2026-09-01T03:48:10.820Z] [combat] Clean hit with the acid-etched corrupted auralite talon for 17. Aether Serpent has 56 left and does not back away.\n[2026-09-01T03:48:10.820Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 3 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 2 total).\n",
+      "[2026-09-01T03:48:10.820Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 2 corruption bites in and festers (3 turns). The rot deepens (4 stacks).\n[2026-09-01T03:48:10.821Z] [combat] Aether Serpent turns on Soot \u2014 d20 13 + ATK 7 = 20 vs Soot's AC 13 (vest +3) \u2014 \u2713 HIT\n[2026-09-01T03:48:10.821Z] [combat] Soot takes 8. (0/15 HP left)\n",
+      "[2026-09-01T03:48:10.821Z] [arbiter] Soot drops under the Aether Serpent and drags herself clear of the fight. She is down \u2014 tend her within a day or she won't get back up.\n[2026-09-01T03:48:10.822Z] [arbiter] \"Remember who taught you to swing. Remember who taught them.\" the Arbiter says.\n[2026-09-01T03:48:14.462Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n",
+      "[2026-09-01T03:48:14.509Z] [player] attack with the auralite talon\n[2026-09-01T03:48:14.510Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=1 hooks=2\n[2026-09-01T03:48:14.511Z] [combat] Aether Serpent smokes \u2014 acid eats 3. (53/130 HP, 2 turns left)\n",
+      "[2026-09-01T03:48:14.511Z] [combat] Aether Serpent blackens \u2014 corruption eats 5. (48/130 HP, 2 turns left)\n[2026-09-01T03:48:14.512Z] [debug] attack: target=Aether Serpent range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n[2026-09-01T03:48:14.514Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n",
+      "[2026-09-01T03:48:14.570Z] [world] You raise the acid-etched corrupted auralite talon toward Aether Serpent. The room narrows around the both of you.\n[2026-09-01T03:48:14.570Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T03:48:14.811Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (240ms)\n",
+      "[2026-09-01T03:48:15.122Z] [debug] persist sizes(KB): total=248 player=61 wm=102[rooms=46 events=4 memos=0 npcs=4 defeated=1 tags=1 discovered=0] log=81 scene=4\n[2026-09-01T03:48:24.000Z] [world] Aether Serpent moves first. The pressure is immediate.\n[2026-09-01T03:48:24.002Z] [combat] Aether Serpent \u2014 d20 \u2192 1 + ATK 7 = 8 vs your AC 23 \u2014 \u2717 FUMBLE\n",
+      "[2026-09-01T03:48:24.002Z] [combat] You \u2014 d20 \u2192 15 + INT 11 \u2212 1 (Whisper Fog) = 25 vs Aether Serpent AC 9 \u2014 \u2713 HIT\n[2026-09-01T03:48:24.003Z] [combat] The Acid-Etched coating fails to take on Aether Serpent.\n[2026-09-01T03:48:24.003Z] [combat] Aetheric flares \u2014 +2 on hit.\n",
+      "[2026-09-01T03:48:24.004Z] [combat] Clean hit with the acid-etched corrupted auralite talon for 8. Aether Serpent has 40 left and does not back away.\n[2026-09-01T03:48:24.004Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 1 corruption bites in and festers (3 turns). The rot deepens (5 stacks).\n[2026-09-01T03:48:24.005Z] [combat] Aether Serpent is left exposed \u2014 easier to hit.\n",
+      "[2026-09-01T03:48:25.438Z] [debug] ui: tap \"inventory\"\n[2026-09-01T03:48:40.695Z] [world] You use 2\u00d7 Forager's Stew. +16 HP (36/41), +1 stamina.\n[2026-09-01T03:48:48.317Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.\n[2026-09-01T03:48:48.356Z] [player] feed dog Field Dressing\n",
+      "[2026-09-01T03:48:48.357Z] [world] You feed Soot the Field Dressing. She eats, slow and serious. (+10 HP, +20 loyalty)\n[2026-09-01T03:48:52.366Z] [debug] ui: tap \"dodge\"\n[2026-09-01T03:48:52.389Z] [player] dodge\n[2026-09-01T03:48:52.390Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=2\n",
+      "[2026-09-01T03:48:52.420Z] [world] You commit to the dodge. Slip Aether Serpent's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-01T03:48:52.421Z] [combat] Aether Serpent smokes \u2014 acid eats 3. (37/130 HP, 1 turn left)\n[2026-09-01T03:48:52.421Z] [combat] Aether Serpent blackens \u2014 corruption eats 5. (32/130 HP, 2 turns left)\n",
+      "[2026-09-01T03:48:52.494Z] [combat] Aether Serpent \u2014 d20 \u2192 3 + ATK 7 = 10 vs your AC 23 \u2014 \u2717 EVADED\n[2026-09-01T03:48:52.495Z] [combat] Dodge \u2014 d20 \u2192 4 + DEX 24 = 28 vs ATK 10. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-01T03:48:52.495Z] [debug] arbiter: template (reason=combat)\n[2026-09-01T03:48:52.495Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-09-01T03:48:52.496Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T03:48:52.746Z] [cognitive] neutral  (249ms)\n[2026-09-01T03:48:53.814Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n[2026-09-01T03:48:53.850Z] [player] attack with the auralite talon\n[2026-09-01T03:48:53.851Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=1 hooks=2\n",
+      "[2026-09-01T03:48:53.851Z] [combat] Aether Serpent smokes \u2014 acid eats 3. (29/130 HP, 0 turns left)\n[2026-09-01T03:48:53.852Z] [combat] Aether Serpent shakes off the last of the acid \u2014 the Auralite Talon has run its course.\n[2026-09-01T03:48:53.852Z] [combat] Aether Serpent blackens \u2014 corruption eats 5. (24/130 HP, 1 turn left)\n",
+      "[2026-09-01T03:48:53.852Z] [debug] attack: target=Aether Serpent range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n[2026-09-01T03:48:53.854Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-09-01T03:48:53.854Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-09-01T03:48:53.906Z] [world] Your acid-etched corrupted auralite talon comes around in an arc; Aether Serpent squares up to meet it.\n[2026-09-01T03:48:53.906Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T03:48:54.147Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (240ms)\n[2026-09-01T03:49:21.068Z] [world] Aether Serpent moves first. The pressure is immediate.\n",
+      "[2026-09-01T03:49:21.070Z] [combat] Aether Serpent \u2014 d20 \u2192 1 + ATK 7 = 8 vs your AC 23 \u2014 \u2717 FUMBLE\n[2026-09-01T03:49:21.070Z] [combat] You \u2014 d20 \u2192 5 + INT 11 \u2212 1 (Whisper Fog) perfect opening (2\u00d7 dice) = 15 vs Aether Serpent AC 9 \u2014 \u2713 HIT\n[2026-09-01T03:49:21.071Z] [combat] Aetheric flares \u2014 +4 on hit.\n",
+      "[2026-09-01T03:49:21.075Z] [combat] Your strike with the acid-etched corrupted auralite talon lands for 16. Aether Serpent staggers \u2014 8 HP remaining. It answers.\n[2026-09-01T03:49:21.076Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 1 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 3 total).\n",
+      "[2026-09-01T03:49:21.076Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 1 corruption bites in and festers (3 turns). The rot deepens (5 stacks).\n[2026-09-01T03:49:21.076Z] [combat] Aether Serpent is left exposed \u2014 easier to hit.\n[2026-09-01T03:49:43.153Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n[2026-09-01T03:49:43.193Z] [player] attack with the auralite talon\n",
+      "[2026-09-01T03:49:43.194Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=1 hooks=2\n[2026-09-01T03:49:43.194Z] [combat] Aether Serpent smokes \u2014 acid eats 1. (7/130 HP, 2 turns left)\n[2026-09-01T03:49:43.194Z] [combat] Aether Serpent blackens \u2014 corruption eats 5. (2/130 HP, 2 turns left)\n",
+      "[2026-09-01T03:49:43.195Z] [debug] attack: target=Aether Serpent range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n[2026-09-01T03:49:43.198Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-09-01T03:49:43.252Z] [world] You raise the acid-etched corrupted auralite talon toward Aether Serpent. The room narrows around the both of you.\n",
+      "[2026-09-01T03:49:43.252Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T03:49:43.487Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (234ms)\n[2026-09-01T03:49:43.787Z] [debug] persist sizes(KB): total=248 player=60 wm=103[rooms=46 events=4 memos=0 npcs=4 defeated=1 tags=1 discovered=0] log=82 scene=4\n",
+      "[2026-09-01T03:49:53.180Z] [world] Aether Serpent moves first. The pressure is immediate.\n[2026-09-01T03:49:53.181Z] [combat] Aether Serpent \u2014 d20 \u2192 19 + ATK 7 = 26 vs your AC 23 \u2014 \u2713 HIT\n[2026-09-01T03:49:53.181Z] [combat] You \u2014 d20 \u2192 4 + INT 11 \u2212 1 (Whisper Fog) = 14 vs Aether Serpent AC 8 \u2014 \u2713 HIT\n[2026-09-01T03:49:53.182Z] [combat] The Acid-Etched coating fails to take on Aether Serpent.\n",
+      "[2026-09-01T03:49:53.182Z] [combat] Aetheric flares \u2014 +3 on hit.\n[2026-09-01T03:49:53.182Z] [combat] Final strike with the acid-etched corrupted auralite talon for 12. Aether Serpent is still. The Aetherstone hums on, indifferent.\n[2026-09-01T03:49:53.183Z] [reward] Aether Serpent defeated. You recover Serpent Coil, Aetheric Fang.\n[2026-09-01T03:49:53.184Z] [reward] +24 TC pried from the dust.\n",
+      "[2026-09-01T03:49:53.396Z] [combat] Aether Serpent deals 5 electrical damage [title \u00bd]. You have 31 HP remaining.\n[2026-09-01T03:50:11.187Z] [debug] send-log: #mti4psjad013 \u2014 DELIVERED (inline, no attachments): beacon out, 28/28 parts accepted (406436 chars) \u2014 flush said yes\n",
+      "[2026-09-01T03:50:11.188Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mti4psjad013 kept on disk, boots retry up to 5 sends total\n[2026-09-01T03:50:15.473Z] [debug] ui: tap \"NORTH\"\n[2026-09-01T03:50:15.512Z] [player] go north\n[2026-09-01T03:50:15.512Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=2\n",
+      "[2026-09-01T03:50:15.519Z] [debug] spawn: gear=[Slick Mud, Shaman's Mud Helm] window=10 roster=new\n[2026-09-01T03:50:15.520Z] [world] You walk north through open silt. The compass tells you The Monarch's Waystation lies further north \u2014 2 tiles, about 5 hours of travel.\n[2026-09-01T03:50:15.522Z] [world] You catch the glint of something half-buried as your boot lands. You free it.\n",
+      "[2026-09-01T03:50:15.522Z] [reward] \u2726 Wild Carrot (Common).\n[2026-09-01T03:50:15.522Z] [world] The air over it has the same weight it had before.\n[2026-09-01T03:50:15.523Z] [system] \u23f3 Time passed: 15 min\n[2026-09-01T03:50:15.710Z] [cognitive] TRAVEL  (186ms)\n[2026-09-01T03:50:17.073Z] [debug] ui: tap \"NORTH\"\n[2026-09-01T03:50:17.088Z] [player] go north\n",
+      "[2026-09-01T03:50:17.088Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=2\n[2026-09-01T03:50:17.091Z] [world] You walk north. You arrive at The Monarch's Waystation.\n[2026-09-01T03:50:17.091Z] [debug] scene: loc=monarch_waystation hub=outpost_gate arrival=y opening=n passing=n\n",
+      "[2026-09-01T03:50:17.091Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @raiders_ridge needs=Raider's Ridge-Sign\u2713 PAUSED\n[2026-09-01T03:50:17.091Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n",
+      "[2026-09-01T03:50:17.092Z] [debug] missions: mystery:mystery_temporal_watch stage 0/4 [diplomacy] @reclaimer_stake npc=\"the Reclaimers Guild Speaker\" gives=Guild Eddy-Gauge PAUSED\n[2026-09-01T03:50:17.092Z] [debug] missions: \u00b7 at=monarch_waystation\n[2026-09-01T03:50:17.143Z] [debug] spawn: gear=[Bone Splitter Axe, Salvaged Bow, Mud-Warden's Vest] window=10 roster=new\n",
+      "[2026-09-01T03:50:17.145Z] [world] You've left The Architect's Blind and entered The Monarch's Waystation. The seneschal logs your name without asking it. The Monarchs' ledgers have their ways. It's dusk. Halem the Trader is the only soul in sight. east leads to Dynasty Border Post; west leads to Iskan-Veil. Nothing named to the north or south.\n",
+      "[2026-09-01T03:50:17.145Z] [world] You pass through the gate into Monarch Court \u2014 The Atrium. Polished mud-glass tiles and a carved Monarch sigil over the doorway. The seneschal nods you through without speaking \u2014 your business has already been logged elsewhere.\n[2026-09-01T03:50:17.146Z] [world] Paths: north to Standards \u00b7 south to First Landing. (Type 'leave outpost' to head into the wilds.)\n",
+      "[2026-09-01T03:50:17.146Z] [system] Weather effect \u2014 Silent Blizzard: -1 DEX \u00b7 -1 STR\n[2026-09-01T03:50:17.146Z] [world] Halem the Trader waves off the customer they were serving. \"Cheddar Bob's here. Give me a moment.\" The other one waits.\n[2026-09-01T03:50:17.146Z] [debug] arbiter: template (reason=outpost-room)\n",
+      "[2026-09-01T03:50:17.146Z] [arbiter] The Arbiter inhales the air of The Monarch's Waystation. \"Tartaria is louder here than it was an hour ago. Move carefully.\"\n[2026-09-01T03:50:17.154Z] [debug] arbiter: ambient held (he just spoke)\n[2026-09-01T03:50:17.154Z] [system] \u23f3 Time passed: 15 min\n[2026-09-01T03:50:17.306Z] [cognitive] TRAVEL  (151ms)\n[2026-09-01T03:50:20.105Z] [debug] ui: tap \"\ud83d\udeaa EXIT\"\n",
+      "[2026-09-01T03:50:20.135Z] [player] leave outpost\n[2026-09-01T03:50:20.136Z] [debug] parser: intent=travel conf=1.00 verb=leave target=outpost resolved=- range=- enemies=0 hooks=0\n[2026-09-01T03:50:20.138Z] [world] You walk back through the gate and out into the open ground. The outpost falls away behind you.\n",
+      "[2026-09-01T03:50:20.138Z] [debug] scene: loc=monarch_waystation hub=- arrival=n opening=n passing=n\n[2026-09-01T03:50:20.138Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @raiders_ridge needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-01T03:50:20.139Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n[2026-09-01T03:50:20.139Z] [debug] missions: mystery:mystery_temporal_watch stage 0/4 [diplomacy] @reclaimer_stake npc=\"the Reclaimers Guild Speaker\" gives=Guild Eddy-Gauge PAUSED\n",
+      "[2026-09-01T03:50:20.139Z] [debug] missions: \u00b7 at=monarch_waystation\n[2026-09-01T03:50:20.169Z] [world] Snow that absorbs all sound. Your fo"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-01-1603-the-vest-knows #mtiqe9wwibm3 [inline 25/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtiqe9wwibm3"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-01-1603-the-vest-knows"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "25"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-01-1603-the-vest-knows"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-01T13:57:05.370586Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-01T13:57:05.217000Z",
+  "fingerprints": [
+    "56f032ca331df39681a8272b18a3be76"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1948281253,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-01T13:57:00.797000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-01-1603-the-vest-knows",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-01-1603-the-vest-knows",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-01-1603-the-vest-knows",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-01-1603-the-vest-knows)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "6eba7eb8eac54686b9d296c7c51c97ae",
+  "previousEventID": "4f62b21fd257422cb8745a6da226f542"
+}
