@@ -1,0 +1,234 @@
+{
+  "id": "73bf7d5e5f8d409baed5bb46bbb0f2e7",
+  "groupID": "7705427321",
+  "eventID": "73bf7d5e5f8d409baed5bb46bbb0f2e7",
+  "projectID": "4511945117532160",
+  "size": 18052,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-01-1611-weak-and-not-weak #mtj4hpttgrw4 [inline 22/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-01-1611-weak-and-not-weak",
+  "message": "player-log 2026-09-01-1611-weak-and-not-weak #mtj4hpttgrw4 [inline 22/28]",
+  "title": "player-log 2026-09-01-1611-weak-and-not-weak #mtj4hpttgrw4 [inline 22/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "a36d2718243c4616a65961cc9166f018",
+      "span_id": "af03146f03f694fc",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "reavers_crest HERE needs=Raider's Ridge-Sign\u2713\n[2026-09-01T18:48:09.791Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n[2026-09-01T18:48:09.791Z] [debug] missions: mystery:mystery_temporal_watch stage 0/4 [diplomacy] @reclaimer_stake npc=\"the Reclaimers Guild Speaker\" gives=Guild Eddy-Gauge PAUSED\n",
+      "[2026-09-01T18:48:09.791Z] [debug] missions: \u00b7 at=reavers_crest travelTo=reavers_crest\n[2026-09-01T18:48:09.792Z] [world] \u25b8 Silence the Doubter: this is the place \u2014 finish it.\n[2026-09-01T18:48:09.828Z] [world] Time and the wasteland have worked this place over since you last passed through \u2014 there's something worth a second look again.\n",
+      "[2026-09-01T18:48:09.839Z] [world] A scout crouches at the treeline, reading the ground. They rise slow and easy, hands where you can see them. This is Vesna, a lone scout. (Try \"talk to Vesna\" \u2014 a fair word carries.)\n",
+      "[2026-09-01T18:48:09.843Z] [world] You've left The Monarch's Waystation and entered The Reaver's Crest. The crest gives you the whole borderland, and gives the whole borderland you. It's dawn. Nobody else is in sight. north leads to The Monarch's Waystation; east leads to Sinking Cathedral; west leads to Raider's Ridge. Nothing named to the south.\n",
+      "[2026-09-01T18:48:09.843Z] [world] You have been here. The shape of it comes back before the details do.\n[2026-09-01T18:48:09.846Z] [world] [The Reaver's Crest] north: The Monarch's Waystation (1 tile, 3 hours) \u00b7 east: Dynasty Border Post (4 tiles, 10 hours) \u00b7 south: Samarran (8 tiles, 20 hours) \u00b7 west: Raider's Ridge (1 tile, 3 hours)\n",
+      "[2026-09-01T18:48:09.848Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-01T18:48:09.848Z] [arbiter] \"Three things in this place would reward attention,\" the Arbiter says, without naming them. \"I would start with the one you cannot quite see.\"\n",
+      "[2026-09-01T18:48:09.856Z] [world] The Reaver is on the ridge the sign named, alone, watching you climb. He doesn't draw until you crest it. \"The Giants will rise,\" he says, almost gentle. \"You are a small thing to send against that.\" Then his blade comes up.\n[2026-09-01T18:48:09.856Z] [combat] Tartarian Reaver (hunted) closes the distance. The hunt comes to its end.\n",
+      "[2026-09-01T18:48:09.856Z] [combat] The Reaver rises on the ridge line: \"You climbed all this way to die tired. Come, then.\"\n[2026-09-01T18:48:16.610Z] [debug] ui: tap \"flee\"\n[2026-09-01T18:48:16.621Z] [player] flee\n[2026-09-01T18:48:16.621Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=mid enemies=1 hooks=0\n[2026-09-01T18:48:16.693Z] [system] \u23f3 Time passed: 15 min\n",
+      "[2026-09-01T18:48:16.946Z] [cognitive] FEAR \u00b7 RETREAT \u00b7 HIDE  (252ms)\n[2026-09-01T18:48:18.582Z] [debug] skillcheck: escape d20=19 DEX 23 = 42 vs Pursuit 31 \u2014 Tartarian Reaver (hunted) (d20 17 + SPD 14) \u2192 PASS\n",
+      "[2026-09-01T18:48:18.679Z] [debug] stats: STR14 DEX24 INT11 WIS13 CHA7 STE6 | gear: WIS+4,INT+2,DEX+14,STR+5,STE+2 | worn: main=Auralite Talon off=Bone Crossbow head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n",
+      "[2026-09-01T18:48:18.679Z] [debug] train: dexterity (escape check) \u2192 progress 92/100\n[2026-09-01T18:48:18.679Z] [world] You break away across the open ground. Behind you the thing you ran from gives up the chase.\n[2026-09-01T18:48:27.271Z] [world] A shard of mud-glass nicks you. Small wound, steady reminder. (\u22121 HP)\n[2026-09-01T18:48:27.286Z] [player] talk to Vesna\n",
+      "[2026-09-01T18:48:27.340Z] [world] Vesna studies you a moment. \"I might know a thing or two. Depends who's asking, and how.\"\n[2026-09-01T18:48:27.341Z] [world] You read them at a glance: reasonable. A fair word will move them; a threat will not.\n[2026-09-01T18:48:27.341Z] [world] Persuade Vesna for what they know, or intimidate them for what they carry?\n",
+      "[2026-09-01T18:48:31.080Z] [combat] You \u2014 persuade Vesna \u2192 d20 10 + CHA 7 = 17 vs DC 10 \u2014 \u2713\n[2026-09-01T18:48:31.080Z] [world] You find the words that cost Vesna nothing to give. They lower their guard and, after a beat, tell you what they know.\n",
+      "[2026-09-01T18:48:31.081Z] [reward] Vesna lowers their voice: \"a stash tucked under a collapsed overpass, off to the north.\" (a lead \u2014 you'll turn it up when you next cross fresh ground)\n[2026-09-01T18:48:37.703Z] [debug] ui: tap \"take / salvage\"\n[2026-09-01T18:48:39.291Z] [world] You break the cracked supply crate apart. Among the pieces, something worth keeping.\n",
+      "[2026-09-01T18:48:39.291Z] [world] You work the crest free of the stone. A faction's mark, whole \u2014 someone will pay standing to see it come home.\n[2026-09-01T18:48:39.291Z] [world] You break the salt-crusted lockbox apart. Among the pieces, something worth keeping.\n[2026-09-01T18:48:39.291Z] [world] You work the shattered buried reclaimer cache over. A part of it comes loose, intact.\n",
+      "[2026-09-01T18:48:39.292Z] [world] You break the shattered ruined skyscraper apart. Among the pieces, something worth keeping.\n[2026-09-01T18:48:39.292Z] [world] You strip the sign stone carefully. Something usable comes free in your hand.\n[2026-09-01T18:48:39.292Z] [world] You work the stone seat over. A part of it comes loose, intact.\n[2026-09-01T18:48:39.292Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-09-01T18:48:39.292Z] [reward]     \u2022 Aetheric Shard x2 (Uncommon)\n[2026-09-01T18:48:39.292Z] [reward]     \u2022 Reclaimer Sigil (Uncommon)\n[2026-09-01T18:48:39.293Z] [reward]     \u2022 Worn Tartarian Coin x5 (Common)\n[2026-09-01T18:48:39.293Z] [reward]     \u2022 Stick (Common)\n[2026-09-01T18:48:39.293Z] [reward]     \u2022 Mud Fragment x3 (Common)\n[2026-09-01T18:48:42.135Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-09-01T18:48:43.592Z] [player] investigate the ground\n[2026-09-01T18:48:43.593Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=0\n[2026-09-01T18:48:43.595Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-09-01T18:48:43.602Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-09-01T18:48:43.607Z] [world] The Reaver is on the ridge the sign named, alone, watching you climb. He doesn't draw until you crest it. \"The Giants will rise,\" he says, almost gentle. \"You are a small thing to send against that.\" Then his blade comes up.\n[2026-09-01T18:48:43.607Z] [combat] Tartarian Reaver (hunted) closes the distance. The hunt comes to its end.\n",
+      "[2026-09-01T18:48:43.607Z] [combat] The Reaver rises on the ridge line: \"You climbed all this way to die tired. Come, then.\"\n[2026-09-01T18:48:43.896Z] [cognitive] CLIMB  (292ms)\n[2026-09-01T18:48:44.747Z] [debug] persist sizes(KB): total=267 player=69 wm=111[rooms=52 events=4 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=84 scene=3\n[2026-09-01T18:48:49.155Z] [debug] ui: tap \"flee\"\n",
+      "[2026-09-01T18:48:49.165Z] [player] flee\n[2026-09-01T18:48:49.166Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=mid enemies=1 hooks=0\n[2026-09-01T18:48:49.236Z] [system] \u23f3 Time passed: 15 min\n[2026-09-01T18:48:49.480Z] [cognitive] FEAR \u00b7 RETREAT \u00b7 HIDE  (242ms)\n",
+      "[2026-09-01T18:48:51.367Z] [debug] skillcheck: escape d20=9 DEX 23 = 32 vs Pursuit 30 \u2014 Tartarian Reaver (hunted) (d20 16 + SPD 14) \u2192 PASS\n[2026-09-01T18:48:51.419Z] [debug] stats: STR14 DEX24 INT11 WIS13 CHA7 STE6 | gear: WIS+4,INT+2,DEX+14,STR+5,STE+2 | worn: main=Auralite Talon off=Bone Crossbow head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Gr",
+      "eaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n[2026-09-01T18:48:51.419Z] [debug] train: dexterity (escape check) \u2192 progress 94/100\n[2026-09-01T18:48:51.419Z] [world] You get your legs under you and go, and it does not follow far.\n[2026-09-01T18:48:54.456Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-09-01T18:48:55.884Z] [player] investigate puddle\n[2026-09-01T18:48:55.885Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=puddle resolved=puddle range=- enemies=0 hooks=0\n[2026-09-01T18:48:55.885Z] [world] You study the puddle. It bears no marks worth naming \u2014 no glyph, no fingerprint, no trace the Reclaimers would catalog.\n",
+      "[2026-09-01T18:48:55.886Z] [world] The Reaver is on the ridge the sign named, alone, watching you climb. He doesn't draw until you crest it. \"The Giants will rise,\" he says, almost gentle. \"You are a small thing to send against that.\" Then his blade comes up.\n[2026-09-01T18:48:55.887Z] [combat] Tartarian Reaver (hunted) closes the distance. The hunt comes to its end.\n",
+      "[2026-09-01T18:48:55.887Z] [combat] The Reaver rises on the ridge line: \"You climbed all this way to die tired. Come, then.\"\n[2026-09-01T18:48:56.156Z] [cognitive] SWIM  (269ms)\n[2026-09-01T19:14:40.940Z] [debug] ui: tap \"flee\"\n[2026-09-01T19:14:40.951Z] [player] flee\n[2026-09-01T19:14:40.956Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=mid enemies=1 hooks=0\n",
+      "[2026-09-01T19:14:41.026Z] [system] \u23f3 Time passed: 15 min\n[2026-09-01T19:14:42.874Z] [debug] skillcheck: escape d20=10 DEX 23 = 33 vs Pursuit 34 \u2014 Tartarian Reaver (hunted) (d20 20 + SPD 14) \u2192 FAIL\n[2026-09-01T19:14:42.962Z] [debug] stats: STR14 DEX24 INT11 WIS13 CHA7 STE6 | gear: WIS+4,INT+2,DEX+14,STR+5,STE+2 | worn: main=Auralite Talon off=Bone Crossbow head=Architect's Sight Enhancer chest=Mud",
+      "-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n[2026-09-01T19:14:42.966Z] [world] You break to run \u2014 and turning your back hands them the opening. Try 'dodge' to set a parry, 'attack' to commit, or another 'retreat' to break contact.\n",
+      "[2026-09-01T19:14:42.968Z] [combat] Tartarian Reaver (hunted) \u2014 d20 \u2192 19 + ATK 14 = 33 vs your AC 23 \u2014 \u2713 HIT\n[2026-09-01T19:14:42.968Z] [combat] Tartarian Reaver (hunted) presses the second strike \u2014 bosses do not yield the tempo.\n[2026-09-01T19:14:42.969Z] [combat] Tartarian Reaver (hunted) \u2014 d20 \u2192 4 + ATK 14 = 18 vs your AC 23 \u2014 \u2717 MISS\n",
+      "[2026-09-01T19:14:43.251Z] [combat] Tartarian Reaver (hunted) deals 4 bludgeoning damage [edge of reach \u2014 halved]. You have 34 HP remaining.\n[2026-09-01T19:14:43.251Z] [combat] Tartarian Reaver (hunted)'s strike leaves you bleeding.\n[2026-09-01T19:14:45.389Z] [debug] ui: tap \"flee\"\n[2026-09-01T19:14:45.400Z] [player] flee\n",
+      "[2026-09-01T19:14:45.401Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=mid enemies=1 hooks=0\n[2026-09-01T19:14:45.485Z] [system] \u23f3 Time passed: 15 min\n[2026-09-01T19:14:45.786Z] [debug] persist sizes(KB): total=268 player=69 wm=111[rooms=52 events=4 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=84 scene=3\n",
+      "[2026-09-01T19:14:47.241Z] [debug] skillcheck: escape d20=13 DEX 23 = 36 vs Pursuit 15 \u2014 Tartarian Reaver (hunted) (d20 1 + SPD 14) \u2192 PASS\n[2026-09-01T19:14:47.330Z] [debug] stats: STR14 DEX24 INT11 WIS13 CHA7 STE6 | gear: WIS+4,INT+2,DEX+14,STR+5,STE+2 | worn: main=Auralite Talon off=Bone Crossbow head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Gr",
+      "eaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n[2026-09-01T19:14:47.331Z] [debug] train: dexterity (escape check) \u2192 progress 96/100\n[2026-09-01T19:14:47.331Z] [world] Three long strides and the distance is yours to keep.\n",
+      "[2026-09-01T19:14:47.332Z] [arbiter] The Arbiter looks around. \"The crest gives you the whole borderland, and gives the whole borderland you.\"\n[2026-09-01T19:14:50.893Z] [debug] ui: tap \"missions\"\n[2026-09-01T19:14:52.189Z] [world] Deactivated Silence the Doubter. It stays on your slate but won't advance until you re-activate it.\n",
+      "[2026-09-01T19:15:01.417Z] [world] You set out toward Garrin's drafting board. Tap the travel row to press on; STOP to halt.\n[2026-09-01T19:15:01.445Z] [world] You walk west. You arrive at Raider's Ridge.\n[2026-09-01T19:15:01.445Z] [debug] scene: loc=raiders_ridge hub=- arrival=y opening=n passing=n\n",
+      "[2026-09-01T19:15:01.446Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n[2026-09-01T19:15:01.446Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n",
+      "[2026-09-01T19:15:01.446Z] [debug] missions: mystery:mystery_temporal_watch stage 0/4 [diplomacy] @reclaimer_stake npc=\"the Reclaimers Guild Speaker\" gives=Guild Eddy-Gauge PAUSED\n[2026-09-01T19:15:01.447Z] [debug] missions: \u00b7 at=raiders_ridge\n",
+      "[2026-09-01T19:15:01.469Z] [world] You've left The Reaver's Crest and entered Raider's Ridge. Wind combs the scrub sideways. Every third rock carries a mark somebody meant to be read. It's morning. A mud spider is already here. east leads to The Reaver's Crest; west leads to Tartarian Outskirts. Nothing named to the north or south.\n",
+      "[2026-09-01T19:15:01.469Z] [combat] Distance: mid-range. Auralite Talon \u2014 needs approach \u00b7 Bone Crossbow \u2713 in range.\n[2026-09-01T19:15:01.531Z] [world] Something about this ground is already familiar.\n[2026-09-01T19:15:01.531Z] [system] Weather effect \u2014 Aetheric Storm: +1 INT \u00b7 -1 WIS\n",
+      "[2026-09-01T19:15:01.534Z] [world] [Raider's Ridge] north: the Silt Thief (19 tiles, 2 days) \u00b7 east: The Reaver's Crest (1 tile, 3 hours) \u00b7 south: The Architect's Blind (3 tiles, 8 hours) \u00b7 west: Tartarian Outskirts (1 tile, 3 hours)\n[2026-09-01T19:15:01.534Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-09-01T19:15:01.534Z] [arbiter] \"Footwork over fury,\" the Arbiter says quietly. \"The mud spider is patient. Be patienter.\"\n[2026-09-01T19:15:05.678Z] [debug] ui: tap \"dodge\"\n[2026-09-01T19:15:05.694Z] [player] dodge\n[2026-09-01T19:15:05.695Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=1 hooks=0\n",
+      "[2026-09-01T19:15:05.696Z] [world] You commit to the dodge. Slip Mud Spider's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-01T19:15:05.763Z] [combat] Mud Spider \u2014 d20 \u2192 4 + ATK 7 = 11 vs your AC 23 \u2014 \u2717 EVADED\n",
+      "[2026-09-01T19:15:05.764Z] [combat] Dodge \u2014 d20 \u2192 15 + DEX 24 = 39 vs ATK 11. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-01T19:15:05.765Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T19:15:06.258Z] [cognitive] neutral  (493ms)\n[2026-09-01T19:15:06.663Z] [debug] ui: tap \"approach\"\n[2026-09-01T19:15:06.666Z] [system] bleeding fades.\n",
+      "[2026-09-01T19:15:06.700Z] [player] approach Mud Spider\n[2026-09-01T19:15:06.701Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud spider resolved=Mud Spider range=mid enemies=1 hooks=0\n[2026-09-01T19:15:06.702Z] [debug] move: advance from range=mid enemies=1 weather=Aetheric Storm cost=1 partial=0\n",
+      "[2026-09-01T19:15:06.702Z] [debug] move: field advance target=Mud Spider d 1.50->0.50 band mid->close\n[2026-09-01T19:15:06."
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-01-1611-weak-and-not-weak #mtj4hpttgrw4 [inline 22/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtj4hpttgrw4"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-01-1611-weak-and-not-weak"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "22"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-01-1611-weak-and-not-weak"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-01T20:31:40.249185Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-01T20:31:40.307000Z",
+  "fingerprints": [
+    "5f7823dbbd94baf04818dff434408c28"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1949080190,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-01T20:29:46.246000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-01-1611-weak-and-not-weak",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-01-1611-weak-and-not-weak",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-01-1611-weak-and-not-weak",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-01-1611-weak-and-not-weak)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "871b4061b23b4d61bf861d755d384c1f",
+  "previousEventID": "7267955fa5f64c86883587ba0b67f2a6"
+}

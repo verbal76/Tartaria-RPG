@@ -1,0 +1,185 @@
+{
+  "id": "8f095deca0fa4991b7330559d66d7761",
+  "groupID": "7705427482",
+  "eventID": "8f095deca0fa4991b7330559d66d7761",
+  "projectID": "4511945117532160",
+  "size": 2665,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log-beacon 2026-09-01-1611-weak-and-not-weak #mtj23y06dc8q"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-01-1611-weak-and-not-weak",
+  "message": "player-log-beacon 2026-09-01-1611-weak-and-not-weak #mtj23y06dc8q",
+  "title": "player-log-beacon 2026-09-01-1611-weak-and-not-weak #mtj23y06dc8q",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "a36d2718243c4616a65961cc9166f018",
+      "span_id": "af03146f03f694fc",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {},
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log-beacon 2026-09-01-1611-weak-and-not-weak #mtj23y06dc8q"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtj23y06dc8q"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-01-1611-weak-and-not-weak"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-beacon"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-01-1611-weak-and-not-weak"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-01T20:29:46.075886Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-01T20:29:46.244000Z",
+  "fingerprints": [
+    "920c4edb1dc29ca94edc9ec932f106ea"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1949080190,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-01T20:29:46.246000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-01-1611-weak-and-not-weak",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-01-1611-weak-and-not-weak",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-01-1611-weak-and-not-weak",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-01-1611-weak-and-not-weak)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "a5450dc212ac4a478fc7b09ee1f5815b",
+  "previousEventID": null
+}

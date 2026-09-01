@@ -1,0 +1,235 @@
+{
+  "id": "d0fdca3e09b04e4691564f820d14b1c0",
+  "groupID": "7705427321",
+  "eventID": "d0fdca3e09b04e4691564f820d14b1c0",
+  "projectID": "4511945117532160",
+  "size": 18031,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-01-1611-weak-and-not-weak #mtj4hpttgrw4 [inline 5/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-01-1611-weak-and-not-weak",
+  "message": "player-log 2026-09-01-1611-weak-and-not-weak #mtj4hpttgrw4 [inline 5/28]",
+  "title": "player-log 2026-09-01-1611-weak-and-not-weak #mtj4hpttgrw4 [inline 5/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "a36d2718243c4616a65961cc9166f018",
+      "span_id": "af03146f03f694fc",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      " Aetherbound Mask (Common) to Ret the Ash for 6 TC. (223 TC on hand)\n[2026-09-01T03:21:43.569Z] [reward] Sold Rough-Hewn Gauntlets (Common) to Ret the Ash for 6 TC. (229 TC on hand)\n[2026-09-01T03:21:43.609Z] [reward] Sold Diplomat's Mask of the Giants (Common) to Ret the Ash for 6 TC. (235 TC on hand)\n",
+      "[2026-09-01T03:21:43.649Z] [reward] Sold Bone Knife (Common) to Ret the Ash for 6 TC. (241 TC on hand)\n[2026-09-01T03:21:43.689Z] [reward] Sold Bone Knife (Common) to Ret the Ash for 6 TC. (247 TC on hand)\n[2026-09-01T03:21:43.728Z] [reward] Sold Mask of the Mud Stalker (Common) to Ret the Ash for 6 TC. (253 TC on hand)\n",
+      "[2026-09-01T03:21:43.767Z] [reward] Sold Reclaimer's Boots (Common) to Ret the Ash for 6 TC. (259 TC on hand)\n[2026-09-01T03:21:43.807Z] [reward] Sold Mud-Bound Cloak (Common) to Ret the Ash for 5 TC. (264 TC on hand)\n[2026-09-01T03:21:43.845Z] [reward] Sold Mud-Bound Cloak (Common) to Ret the Ash for 5 TC. (269 TC on hand)\n",
+      "[2026-09-01T03:21:43.884Z] [reward] Sold Mud-Bound Cloak (Common) to Ret the Ash for 5 TC. (274 TC on hand)\n[2026-09-01T03:21:43.922Z] [reward] Sold Mud-Bound Cloak (Common) to Ret the Ash for 5 TC. (279 TC on hand)\n[2026-09-01T03:21:56.056Z] [reward] Bought the Trauma Kit working for 200 TC. \u2726 Recipe learned (Rare)! Open Crafting to forge it \u2014 you'll still need the materials.\n",
+      "[2026-09-01T03:22:11.561Z] [reward] Bought 2\u00d7 Blue Cap Mushroom from Ret the Ash for 16 TC. (63 TC left)\n[2026-09-01T03:22:11.561Z] [reward] They don't charge a friend full price \u2014 2 TC stayed in your pouch.\n[2026-09-01T03:22:13.513Z] [reward] Bought 3\u00d7 Red Cap Mushroom from Ret the Ash for 18 TC. (45 TC left)\n[2026-09-01T03:22:27.590Z] [player] Ask why they trade out here\n",
+      "[2026-09-01T03:22:27.591Z] [world] \"Because out here I am the only shop in the world.\" The trader grins at their own arithmetic. \"In a settlement I am one stall among twenty. On this stretch of road I am civilization ITSELF for half a day's walk in both directions. The mark-up is not greed, it is geography.\" The grin softens a notch. \"Also \u2014 and do not spread this \u2014 somebody should be out here. Th",
+      "e road is long. A fire and a fair-enough price change what the road IS.\"\n[2026-09-01T03:22:27.595Z] [world] Ret the Ash talks to you while doing something else, which is its own kind of trust.\n[2026-09-01T03:22:27.841Z] [debug] persist sizes(KB): total=238 player=50 wm=101[rooms=45 events=4 memos=0 npcs=4 defeated=1 tags=1 discovered=0] log=84 scene=3\n",
+      "[2026-09-01T03:22:28.791Z] [debug] qwen\u23f1 flourish ok 2602ms read 2050ms/write 521ms in 173t\u2192out 15t 11.8ms/t (64ch)\n[2026-09-01T03:22:28.799Z] [debug] qwen\u23f1 stats \u2014 narration:scene_intro_fill n3 avg13.7s max15.8s read11.7s/write1.8s in787t\u2192out33t ms/tok 13.3-16.0 cap3 \u27023/41.2s | item_synthesis_hw n3 avg5.7s max7.2s read4.7s/write1.0s in327t\u2192out30t ms/tok 10.8-19.4 \u27021/4.9s | flourish n2 avg2.5s max",
+      "2.6s read2.0s/write0.5s in173t\u2192out15t ms/tok 11.0-11.8 \u27021/2.4s | ambient n1 avg8.2s max8.2s read6.9s/write1.2s in363t\u2192out31t ms/tok 19.0-19.0 cap1 | investigate_lore n1 avg2.6s max2.6s read1.4s/write1.1s in126t\u2192out31t ms/tok 10.9-10.9 || WASTED 5 calls / 48.6s\n[2026-09-01T03:22:28.957Z] [debug] qwen\u23f1 \u2702 DISCARDED flourish after 2602ms \u2014 flourish:empty\n",
+      "[2026-09-01T03:22:28.958Z] [debug] flourish: \u2205 2932ms\n[2026-09-01T03:22:38.593Z] [world] You let the conversation go and Ret the Ash gets back to it.\n[2026-09-01T03:22:42.561Z] [reward] Ret the Ash fires up a portable Crucible for you. (\u221225 TC)\n[2026-09-01T03:22:49.791Z] [world] You set your reserved pieces on the three pedestals. The Crucible takes them in.\n",
+      "[2026-09-01T03:22:49.793Z] [reward] \u2726 The Crucible forges an Uncommon piece of armor from your reserved pieces \u2014 and it's in your pack, still cooling.\n[2026-09-01T03:22:49.794Z] [world] The Crucible exhales slow. The shape is set, but the Aether hasn't named it yet \u2014 let it finish. You'll know it the moment it announces itself.\n",
+      "[2026-09-01T03:22:53.074Z] [system] The Crucible costs 25 TC to fire; you have 20.\n[2026-09-01T03:22:54.631Z] [debug] qwen\u23f1 forge_name ok 4665ms read 3767ms/write 877ms in 204t\u2192out 26t 18.5ms/t (113ch)\n[2026-09-01T03:22:54.799Z] [reward] \u2726 The forging finishes \u2014 the Aether names it Veil-Stitched Plate (Uncommon).\n",
+      "[2026-09-01T03:23:06.482Z] [debug] qwen\u23f1 item_synthesis_hw ok 6523ms read 5627ms/write 875ms in 324t\u2192out 24t 17.4ms/t (103ch)\n[2026-09-01T03:23:06.494Z] [debug] homework: item_desc \"Big Rock\" \u2713 6546ms\n[2026-09-01T03:23:25.521Z] [world] You strap the Vein-Threaded Cover onto Soot.\n",
+      "[2026-09-01T03:23:31.683Z] [debug] qwen\u23f1 item_synthesis_hw ok 1695ms read 316ms/write 1340ms in 323t\u2192out 39t 1.0ms/t (155ch)\n[2026-09-01T03:23:31.699Z] [debug] homework: item_desc \"Aetheric Shard\" \u2713 1721ms\n[2026-09-01T03:24:08.720Z] [debug] qwen\u23f1 item_synthesis_hw ok 8712ms read 348ms/write 8319ms in 322t\u2192out 39t 1.1ms/t (156ch)\n",
+      "[2026-09-01T03:24:08.732Z] [debug] homework: item_desc \"Bone Bolt\" \u2713 8738ms\n[2026-09-01T03:24:31.746Z] [debug] qwen\u23f1 item_synthesis_hw ok 1738ms read 299ms/write 836ms in 321t\u2192out 25t 0.9ms/t (109ch)\n[2026-09-01T03:24:31.752Z] [debug] homework: item_desc \"Aether Residue\" \u2713 1754ms\n[2026-09-01T03:24:36.264Z] [debug] appstate: active \u2192 background (was active for 671903ms)\n",
+      "[2026-09-01T03:25:46.757Z] [debug] appstate: background \u2192 active (was background for 70493ms)\n[2026-09-01T03:25:48.926Z] [debug] qwen\u23f1 item_synthesis_hw ok 1537ms read 427ms/write 1088ms in 324t\u2192out 29t 1.3ms/t (116ch)\n[2026-09-01T03:25:49.090Z] [debug] homework: item_desc \"Phantom Core\" \u2713 2325ms\n",
+      "[2026-09-01T03:25:53.997Z] [debug] persist sizes(KB): total=238 player=50 wm=101[rooms=45 events=4 memos=0 npcs=4 defeated=1 tags=1 discovered=0] log=84 scene=3\n[2026-09-01T03:26:13.446Z] [debug] ui: tap \"missions\"\n",
+      "[2026-09-01T03:26:17.213Z] [world] You set course for Raider's Ridge. 2 tiles \u2014 about 5 hours of travel, all in. You set off now \u2014 the ground ahead is new ground. Keep tapping \u2192 RAIDER'S RIDGE on the travel row to close the distance; STOP TRAVEL to halt.\n",
+      "[2026-09-01T03:26:17.222Z] [world] You walk west through open silt. The compass tells you Raider's Ridge lies further west \u2014 1 tile, about 3 hours of travel.\n[2026-09-01T03:26:17.224Z] [world] What you started here has not finished itself in your absence.\n[2026-09-01T03:26:19.495Z] [debug] ui: tap \"\u2192 RAIDER'S RIDGE\"\n",
+      "[2026-09-01T03:26:19.515Z] [world] You walk west through open silt. The compass points west into open ground.\n[2026-09-01T03:26:19.517Z] [world] The loose end is exactly as loose as you left it.\n[2026-09-01T03:26:21.792Z] [debug] homework: intro-fill armed after 17186ms idle\n[2026-09-01T03:26:29.938Z] [debug] kbbar: mounted bottom=355 raw=0 from=estimate winH=986 beat=-\n",
+      "[2026-09-01T03:26:30.312Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-09-01T03:26:32.913Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 10967ms read 9718ms/write 1206ms in 714t\u2192out 33t 13.6ms/t HIT-CAP (150ch)\n[2026-09-01T03:26:33.105Z] [debug] homework: scene_intro \"the Silt Thief\" \u2713 11316ms\n[2026-09-01T03:26:33.509Z] [player] fight me\n",
+      "[2026-09-01T03:26:33.511Z] [debug] parser: intent=attack conf=1.00 verb=fight target=- resolved=- range=- enemies=0 hooks=1\n[2026-09-01T03:26:33.514Z] [world] Nothing in arm's reach answers your blade. The motion echoes off Aetherstone.\n",
+      "[2026-09-01T03:26:33.693Z] [world] The Reaver is on the ridge the sign named, alone, watching you climb. He doesn't draw until you crest it. \"The Giants will rise,\" he says, almost gentle. \"You are a small thing to send against that.\" Then his blade comes up.\n[2026-09-01T03:26:33.694Z] [combat] Tartarian Reaver (hunted) closes the distance. The hunt comes to its end.\n",
+      "[2026-09-01T03:26:33.694Z] [combat] The Reaver rises on the ridge line: \"You climbed all this way to die tired. Come, then.\"\n[2026-09-01T03:26:34.116Z] [cognitive] AGGRESSION  (598ms)\n[2026-09-01T03:26:43.176Z] [debug] qwen\u23f1 ambient ok 9269ms read 2718ms/write 1969ms in 363t\u2192out 31t 7.5ms/t HIT-CAP (158ch)\n[2026-09-01T03:26:43.762Z] [debug] arbiter: ambient stale:combat-started\u2192banked 10246ms\n",
+      "[2026-09-01T03:26:43.762Z] [debug] arbiter: ambient-empty reason=near-duplicate-of-recent raw=\"You've traversed a landscape that had been silent, but now it's alive with stories of conquest and adventure. The terrai\"\n[2026-09-01T03:26:46.017Z] [debug] ui: tap \"flee\"\n[2026-09-01T03:26:46.029Z] [player] flee\n",
+      "[2026-09-01T03:26:46.029Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=mid enemies=1 hooks=1\n[2026-09-01T03:26:46.101Z] [system] \u23f3 Time passed: 15 min\n[2026-09-01T03:26:46.314Z] [cognitive] FEAR \u00b7 RETREAT \u00b7 HIDE  (212ms)\n[2026-09-01T03:26:47.821Z] [debug] skillcheck: escape d20=14 DEX 24 = 38 vs Pursuit 22 \u2014 Tartarian Reaver (hunted) (d20 8 + SPD 14) \u2192 PASS\n",
+      "[2026-09-01T03:26:47.891Z] [debug] stats: STR13 DEX24 INT11 WIS12 CHA5 STE6 | gear: WIS+4,INT+2,DEX+14,STR+5,STE+2 | worn: main=Auralite Talon off=Bone Crossbow head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n",
+      "[2026-09-01T03:26:47.891Z] [debug] train: dexterity (escape check) \u2192 progress 56/100\n[2026-09-01T03:26:47.892Z] [world] You break away across the open ground. Behind you the thing you ran from gives up the chase.\n[2026-09-01T03:26:55.752Z] [debug] send-log: #mti3vvn82rch \u2014 DELIVERED (inline, no attachments): beacon out, 28/28 parts accepted (406314 chars) \u2014 flush said yes\n",
+      "[2026-09-01T03:26:55.753Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mti3vvn82rch kept on disk, boots retry up to 5 sends total\n[2026-09-01T03:27:01.396Z] [debug] persist sizes(KB): total=239 player=50 wm=101[rooms=46 events=4 memos=0 npcs=4 defeated=1 tags=1 discovered=0] log=85 scene=3\n[2026-09-01T03:27:05.185Z] [debug] appstate: active \u2192 background (was active for 78427ms)\n",
+      "[2026-09-01T03:37:16.452Z] [debug] appstate: background \u2192 active (was background for 611261ms)\n[2026-09-01T03:37:16.469Z] [debug] homework: intro-fill armed after 16316ms idle\n[2026-09-01T03:37:17.992Z] [debug] OTA session start: 2026-09-01-1600-the-stinger.\n[2026-09-01T03:37:17.993Z] [world] You step back into Raider's Ridge. The world waits for your move.\n",
+      "[2026-09-01T03:37:17.994Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. \"Welcome back, Cheddar Bob. We've still got ground to cover, you and I.\"\n[2026-09-01T03:37:18.224Z] [debug] \u2550\u2550\u2550 SESSION 2026-09-01T03:37:18.220Z \u00b7 build 2026-09-01-1600-the-stinger \u00b7 previous entry moments earlier \u2550\u2550\u2550\n",
+      "[2026-09-01T03:37:18.225Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @raiders_ridge HERE needs=Raider's Ridge-Sign\u2713\n[2026-09-01T03:37:18.225Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n",
+      "[2026-09-01T03:37:18.225Z] [debug] missions: mystery:mystery_temporal_watch stage 0/4 [diplomacy] @reclaimer_stake npc=\"the Reclaimers Guild Speaker\" gives=Guild Eddy-Gauge PAUSED\n[2026-09-01T03:37:18.225Z] [debug] missions: \u00b7 at=raiders_ridge\n",
+      "[2026-09-01T03:37:18.226Z] [debug] boot: life bmti3abmbk9 started 2026-09-01T03:10:09.491Z \u00b7 FOLLOWED AN OTA APPLY 121ms ago via boot-front \u00b7 prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)\n[2026-09-01T03:37:20.235Z] [debug] ui: tap \"missions\"\n",
+      "[2026-09-01T03:37:24.518Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 7983ms read 7116ms/write 772ms in 711t\u2192out 24t 10.0ms/t (114ch)\n[2026-09-01T03:37:24.536Z] [debug] homework: scene_intro \"the Silt Thief\" \u2713 8069ms\n[2026-09-01T03:37:26.540Z] [world] Deactivated Silence the Doubter. It stays on your slate but won't advance until you re-activate it.\n",
+      "[2026-09-01T03:38:01.484Z] [debug] homework: intro-fill armed after 15049ms idle\n[2026-09-01T03:38:08.226Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 6735ms read/write unusable (native mis-reported 42598ms/1139ms \u2014 llama.rn split bug, not this call) in 732t\u2192out 33t HIT-CAP (163ch)\n",
+      "[2026-09-01T03:38:08.228Z] [debug] qwen\u23f1 stats \u2014 item_synthesis_hw n8 avg4.7s max8.7s read2.6s/write1.9s in324t\u2192out31t ms/tok 0.9-19.4 \u27021/4.9s | narration:scene_intro_fill n6 avg11.2s max15.8s read10.4s/write1.6s \u26a01unusable in753t\u2192out32t ms/tok 10.0-16.0 cap5 \u23f81 \u27023/41.2s | ambient n2 avg8.7s max9.3s read4.8s/write1.6s in363t\u2192out31t ms/tok 7.5-19.0 cap2 | flourish n2 avg2.5s max2.6s read2.0s/write0",
+      ".5s in173t\u2192out15t ms/tok 11.0-11.8 \u27022/5.0s | investigate_lore n1 avg2.6s max2.6s read1.4s/write1.1s in126t\u2192out31t ms/tok 10.9-10.9 | forge_name n1 avg4.7s max4.7s read3.8s/write0.9s in204t\u2192out26t ms/tok 18.5-18.5 || WASTED 6 calls / 51.2s\n[2026-09-01T03:38:08.233Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 6735ms \u2014 intro-fill:\u2205\n",
+      "[2026-09-01T03:38:08.234Z] [debug] homework: scene_intro \"Tartarian Outskirts\" \u2205 6751ms\n[2026-09-01T03:38:46.541Z] [debug] homework: intro-fill armed after 13944ms idle (strike 2/3)\n[2026-09-01T03:38:47.745Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 1200ms read 0ms/write 1132ms in 732t\u2192out 34t HIT-CAP (152ch)\n",
+      "[2026-09-01T03:38:47.752Z] [debug] homework: scene_intro \"Tartarian Outskirts\" \u2713 1211ms\n[2026-09-01T03:38:53.709Z] [system] You hold the board still. Whoever stands together right now is who your standing will carry to \u2014 take the contract on this reading.\n",
+      "[2026-09-01T03:39:00.179Z] [arbiter] \"A contract, then,\" the Arbiter says. \"The Forgotten Order want 6 of the Conspiracy Architects put down \u2014 anywhere you find them, though they'll be thick around The Architect's Blind. Setting your course there now.\"\n",
+      "[2026-09-01T03:39:00.189Z] [world] You set course for The Architect's Blind. 2 tiles \u2014 about 5 hours of travel, all in. You set off now \u2014 the ground ahead is new ground. Keep tapping \u2192 THE ARCHITECT'S BLIND on the travel row to close the distance; STOP TRAVEL to halt.\n[2026-09-01T03:39:00.194Z] [world] You walk west. You arrive at Tartarian Outskirts.\n",
+      "[2026-09-01T03:39:00.199Z] [debug] scene: loc=tartarian_outskirts hub=- arrival=y opening=n passing=y\n[2026-09-01T03:39:00.200Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @raiders_ridge needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-01T03:39:00.200Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n[2026-09-01T03:39:00.200Z] [debug] missions: mystery:mystery_temporal_watch stage 0/4 [diplomacy] @reclaimer_stake npc=\"the Reclaimers Guild Speaker\" gives=Guild Eddy-Gauge PAUSED\n",
+      "[2026-09-01T03:39:00.200Z] [debug] missions: \u00b7 at=tartarian_outskirts travelTo=architect_blind\n[2026-09-01T03:39:00.283Z] [world] You've left Raider's Ridge and entered Tartarian Outskirts. The borderlands. Where Tartaria thins, but does not stop. It's morning. Teska Nightweigh is the only soul in sight. east leads to Raider's Ridge; south leads to The Architect's Blind. Nothing named to the north",
+      " or west.\n[2026-09-01T03:39:00.283Z] [world] You have been here. The shape of"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-01-1611-weak-and-not-weak #mtj4hpttgrw4 [inline 5/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtj4hpttgrw4"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-01-1611-weak-and-not-weak"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "5"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-01-1611-weak-and-not-weak"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-01T20:31:40.127713Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-01T20:31:40.304000Z",
+  "fingerprints": [
+    "5f7823dbbd94baf04818dff434408c28"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1949080190,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-01T20:29:46.246000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-01-1611-weak-and-not-weak",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-01-1611-weak-and-not-weak",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-01-1611-weak-and-not-weak",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-01-1611-weak-and-not-weak)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "d3fb446e386d427f95550e018ac7dd65",
+  "previousEventID": "cedc4f73a6304037ba365970657339f4"
+}
