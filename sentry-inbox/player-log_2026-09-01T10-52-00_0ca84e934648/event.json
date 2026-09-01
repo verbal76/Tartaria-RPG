@@ -1,0 +1,185 @@
+{
+  "id": "0ca84e9346484a6c820e38e004438c28",
+  "groupID": "7704335810",
+  "eventID": "0ca84e9346484a6c820e38e004438c28",
+  "projectID": "4511945117532160",
+  "size": 2703,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log-beacon 2026-09-01-1602-the-beat-card #mti4rci02ab8"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-01-1602-the-beat-card",
+  "message": "player-log-beacon 2026-09-01-1602-the-beat-card #mti4rci02ab8",
+  "title": "player-log-beacon 2026-09-01-1602-the-beat-card #mti4rci02ab8",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db0c:41d2:ad2:ae51:4e84:c909",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "b2d03c7da1e34439ae314d781f4cea58",
+      "span_id": "82aced85ce9ead37",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {},
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log-beacon 2026-09-01-1602-the-beat-card #mti4rci02ab8"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mti4rci02ab8"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-01-1602-the-beat-card"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-beacon"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-01-1602-the-beat-card"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "3"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db0c:41d2:ad2:ae51:4e84:c909",
+      "query": "user.ip:\"2607:fb90:db0c:41d2:ad2:ae51:4e84:c909\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-01T10:51:58.600355Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-01T10:52:00.810000Z",
+  "fingerprints": [
+    "4dfdc2905999ae51f381b2a94eb6e42a"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1947963270,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-01T10:52:00.819000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-01-1602-the-beat-card",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-01-1602-the-beat-card",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-01-1602-the-beat-card",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-01-1602-the-beat-card)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": null
+}

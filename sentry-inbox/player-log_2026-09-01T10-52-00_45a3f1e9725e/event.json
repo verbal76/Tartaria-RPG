@@ -1,0 +1,238 @@
+{
+  "id": "45a3f1e9725e48688a2c84035d9f7ece",
+  "groupID": "7704335790",
+  "eventID": "45a3f1e9725e48688a2c84035d9f7ece",
+  "projectID": "4511945117532160",
+  "size": 18121,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-01-1602-the-beat-card #mti4rci02ab8 [inline 27/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-01-1602-the-beat-card",
+  "message": "player-log 2026-09-01-1602-the-beat-card #mti4rci02ab8 [inline 27/28]",
+  "title": "player-log 2026-09-01-1602-the-beat-card #mti4rci02ab8 [inline 27/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db0c:41d2:ad2:ae51:4e84:c909",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "b2d03c7da1e34439ae314d781f4cea58",
+      "span_id": "82aced85ce9ead37",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "5.143Z] [combat] Mud Monarchs Patrol 3 \u2014 d20 \u2192 16 + ATK 6 = 22 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-09-01T03:50:45.144Z] [combat] Mud Monarchs Patrol 4 closes the distance.\n[2026-09-01T03:50:45.144Z] [arbiter] \"The Sentinels did not invent violence. They only learned it well.\" the Arbiter says.\n",
+      "[2026-09-01T03:50:45.420Z] [combat] Mud Monarchs Patrol 3 deals 1 piercing damage [armor \u221235%] [edge of reach \u2014 halved]. You have 32 HP remaining.\n[2026-09-01T03:50:48.964Z] [debug] ui: tap \"\ud83d\udd25\u2697 bone crossbow\"\n[2026-09-01T03:50:49.011Z] [player] attack with the off-hand bone crossbow\n",
+      "[2026-09-01T03:50:49.012Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=3 hooks=1\n[2026-09-01T03:50:49.012Z] [debug] attack: target=Mud Monarchs Patrol 2 range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n",
+      "[2026-09-01T03:50:49.065Z] [world] You raise the searing acid-etched bone crossbow toward Mud Monarchs Patrol 2. The room narrows around the both of you.\n[2026-09-01T03:50:49.065Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T03:50:49.307Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (240ms)\n",
+      "[2026-09-01T03:50:49.594Z] [debug] persist sizes(KB): total=254 player=61 wm=104[rooms=47 events=4 memos=0 npcs=4 defeated=1 tags=1 discovered=0] log=84 scene=5\n[2026-09-01T03:50:57.283Z] [world] Mud Monarchs Patrol 2 moves first. The pressure is immediate.\n[2026-09-01T03:50:57.286Z] [combat] Mud Monarchs Patrol 2 \u2014 d20 \u2192 13 + ATK 6 = 19 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-01T03:50:57.287Z] [combat] Mud Monarchs Patrol 3 \u2014 d20 \u2192 10 + ATK 6 = 16 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-01T03:50:57.288Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 14 + ATK 6 = 20 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-01T03:50:57.288Z] [combat] You \u2014 d20 \u2192 14 + DEX 24 = 38 vs Mud Monarchs Patrol 2 AC 11 \u2014 \u2713 HIT\n",
+      "[2026-09-01T03:50:57.290Z] [combat] You crack the Mud Monarchs Patrol 2 with the Searing Acid-Etched Bone Crossbow for 14 \u2014 the better part of their fight, gone in one blow. They crumple, out cold. (4/18 HP) Loot them before they come to.\n[2026-09-01T03:50:57.290Z] [combat] Mud Monarchs Patrol 2 is out of it. Mud Monarchs Patrol 3 now in your sights.\n",
+      "[2026-09-01T03:50:57.291Z] [combat] Searing Acid-Etched Bone Crossbow \u2014 4 burn bites in and festers (3 turns).\n[2026-09-01T03:50:57.291Z] [combat] Searing Acid-Etched Bone Crossbow \u2014 2 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n",
+      "[2026-09-01T03:50:57.291Z] [arbiter] The Arbiter eyes the Mud Monarchs Patrol 3 without concern. \"It's bigger. Bigger falls harder.\"\n[2026-09-01T03:50:59.250Z] [debug] ui: tap \"approach\"\n[2026-09-01T03:50:59.296Z] [player] approach Mud Monarchs Patrol 3\n",
+      "[2026-09-01T03:50:59.297Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud monarchs patrol 3 resolved=Mud Monarchs Patrol 3 range=mid enemies=3 hooks=1\n[2026-09-01T03:50:59.298Z] [debug] move: advance from range=mid enemies=3 weather=Silent Blizzard cost=1 partial=0\n[2026-09-01T03:50:59.298Z] [debug] move: field advance target=Mud Monarchs Patrol 3 d 1.39->0.39 band mid->close\n",
+      "[2026-09-01T03:50:59.299Z] [world] You close the gap with the Mud Monarchs Patrol 3 and 2 others. (range: close / arm's reach)\n[2026-09-01T03:50:59.299Z] [world] The field shifts around you \u2014 Mud Monarchs Patrol 2 now close / arm's reach; Mud Monarchs Patrol 4 now close / arm's reach.\n",
+      "[2026-09-01T03:50:59.299Z] [combat] Mud Monarchs Patrol 2 blisters \u2014 clinging fire sears 4. (0/18 HP, 2 turns left)\n[2026-09-01T03:50:59.299Z] [combat] Mud Monarchs Patrol 2 smokes \u2014 acid eats 2. (0/18 HP, 2 turns left)\n[2026-09-01T03:50:59.300Z] [reward] Mud Monarchs Patrol 2 defeated. You recover Patched Cloth \u00d72, Worn Tartarian Coin.\n",
+      "[2026-09-01T03:50:59.301Z] [reward] You strip the body: Cudgel, Mud-Warden's Vest (+10 TC). The kit took the fight badly.\n[2026-09-01T03:50:59.301Z] [combat] 2 attackers remain. Mud Monarchs Patrol 3 now in your sights.\n[2026-09-01T03:50:59.301Z] [system] Forgotten Order standing +1 (now 39)\n[2026-09-01T03:50:59.302Z] [reward] +14 TC pried from the dust.\n",
+      "[2026-09-01T03:50:59.345Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 5 + ATK 6 = 11 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-01T03:50:59.346Z] [combat] Mud Monarchs Patrol 3 \u2014 d20 \u2192 12 + ATK 6 = 18 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-01T03:50:59.619Z] [cognitive] SWIM \u00b7 RETREAT  (271ms)\n",
+      "[2026-09-01T03:50:59.865Z] [reward] \u2726 The buried world relents \u2014 a Resurrection Gem at the 100-kill mark. (31 held)\n[2026-09-01T03:51:00.500Z] [debug] ui: tap \"dodge\"\n[2026-09-01T03:51:00.509Z] [player] dodge\n[2026-09-01T03:51:00.509Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=2 hooks=1\n",
+      "[2026-09-01T03:51:00.510Z] [world] You commit to the dodge. Slip Mud Monarchs Patrol 3's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-01T03:51:00.575Z] [combat] Mud Monarchs Patrol 3 \u2014 d20 \u2192 20 + ATK 6 = 26 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 CRITICAL HIT\n",
+      "[2026-09-01T03:51:00.575Z] [combat] Dodge \u2014 Mud Monarchs Patrol 3 rolls a NAT 20. No read beats a perfect strike; it lands through your dodge.\n[2026-09-01T03:51:00.577Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 20 + ATK 6 = 26 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 CRITICAL HIT\n[2026-09-01T03:51:00.577Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-09-01T03:51:00.578Z] [arbiter] \"A blade in these ruins is a small thing against a long history. Use it precisely.\" the Arbiter says.\n[2026-09-01T03:51:00.578Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T03:51:00.851Z] [combat] Mud Monarchs Patrol 3 deals 8 piercing damage [armor \u221235%]. You have 24 HP remaining.\n",
+      "[2026-09-01T03:51:00.851Z] [combat] Mud Monarchs Patrol 4 deals 15 bludgeoning damage. You have 9 HP remaining.\n[2026-09-01T03:51:01.086Z] [cognitive] neutral  (274ms)\n[2026-09-01T03:51:01.324Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n[2026-09-01T03:51:01.341Z] [player] attack with the auralite talon\n",
+      "[2026-09-01T03:51:01.342Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=2 hooks=1\n[2026-09-01T03:51:01.342Z] [debug] attack: target=Mud Monarchs Patrol 3 range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n",
+      "[2026-09-01T03:51:01.393Z] [world] You raise the acid-etched corrupted auralite talon toward Mud Monarchs Patrol 3. The room narrows around the both of you.\n[2026-09-01T03:51:01.393Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T03:51:01.628Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (234ms)\n",
+      "[2026-09-01T03:51:10.593Z] [world] You seize the initiative. Mud Monarchs Patrol 3 has no time to react.\n[2026-09-01T03:51:10.593Z] [combat] You \u2014 d20 \u2192 2 + INT 11 = 13 vs Mud Monarchs Patrol 3 AC 10 \u2014 \u2713 HIT\n[2026-09-01T03:51:10.594Z] [combat] Mud Monarchs Patrol 3 shrugs off the aetheric. (resisted, \u00d70.5 for 7)\n",
+      "[2026-09-01T03:51:10.596Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Bone Crossbow \u2014 piercing will bite where aetheric won't.\"\n[2026-09-01T03:51:10.597Z] [combat] Your strike with the acid-etched corrupted auralite talon lands for 7. Mud Monarchs Patrol 3 staggers \u2014 8 HP remaining. It answers.\n",
+      "[2026-09-01T03:51:10.598Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 2 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n[2026-09-01T03:51:10.598Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 1 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n",
+      "[2026-09-01T03:51:10.601Z] [combat] Mud Monarchs Patrol 3 \u2014 d20 \u2192 3 + ATK 6 = 9 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-01T03:51:10.603Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 20 + ATK 6 = 26 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 CRITICAL HIT\n[2026-09-01T03:51:10.888Z] [combat] Mud Monarchs Patrol 4 deals 12 bludgeoning damage. You fall.\n",
+      "[2026-09-01T03:51:10.888Z] [combat] Cheddar Bob does not rise. The ruins remember another.\n[2026-09-01T03:51:10.888Z] [system] Cheddar Bob has fallen. A Resurrection Gem from the title screen can bring them back.\n[2026-09-01T03:51:11.397Z] [system] You join the Fallen of Tartaria \u2014 10 names the buried world keeps now. Read the roll from the Lore Codex.\n",
+      "[2026-09-01T03:51:18.048Z] [debug] scene: loc=monarch_waystation hub=outpost_gate arrival=n opening=n passing=n\n[2026-09-01T03:51:18.048Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @raiders_ridge needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-01T03:51:18.049Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n[2026-09-01T03:51:18.049Z] [debug] missions: mystery:mystery_temporal_watch stage 0/4 [diplomacy] @reclaimer_stake npc=\"the Reclaimers Guild Speaker\" gives=Guild Eddy-Gauge PAUSED\n",
+      "[2026-09-01T03:51:18.049Z] [debug] missions: \u00b7 at=monarch_waystation\n[2026-09-01T03:51:18.116Z] [debug] spawn: gear=[Aetheric Warplate] window=10 roster=new\n[2026-09-01T03:51:18.117Z] [world] Monarch Court \u2014 The Atrium. Polished mud-glass tiles and a carved Monarch sigil over the doorway. The seneschal nods you through without speaking \u2014 your business has already been logged elsewhere.\n",
+      "[2026-09-01T03:51:18.118Z] [world] Paths: north to Standards \u00b7 south to First Landing. (Type 'leave outpost' to head into the wilds.)\n[2026-09-01T03:51:18.118Z] [world] Halem the Trader pushes the good stock to the front without being asked. \"Cheddar Bob. You know where everything is.\"\n",
+      "[2026-09-01T03:51:18.123Z] [reward] \u2726 Resurrection. Cheddar Bob returns to Tartaria, restored. The Aetherstone hums in recognition.\n[2026-09-01T03:51:22.064Z] [debug] homework: intro-fill armed after 10704ms idle\n\n=== END LOG \u00b7 399966 CHARS ===\n\nTartaria Realms\n\nDevice\n  Name: Pixel 10 Pro XL\n  Platform: android 37\n  Hermes: yes\n  Locale: en-US\n  Timezone: America/New_York\n",
+      "  Screen: window 443\u00d7986 / screen 443\u00d7986 @ 2.4375x density\n  Captured at: 2026-09-01T03:51:23.261Z\n\nInstall\n  App ID: com.hotatticgames.tartarprim\n  App version: 4.32.11\n  APK build version: 2.4.1\n  APK build: 293\n  AAB: (build 293)\n  OTA: (2026-09-01-1600-the-stinger)\n  Boot stage: qwen:done\n\nML runtime health\n  Status: active (no crashes detected)\n  Crash count: 0\n",
+      "  Last init attempt: 2026-09-01T03:10:20.259Z\n  Last init success: 2026-09-01T03:10:21.446Z\n  Crashes-before-disable threshold: 2\n  Qwen completion guard: clean (no completion crashes)\n  Qwen kernel variant: rnllama_v8_2_fp16_dotprod\n",
+      "  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k\n  Voice (TTS) guard: clean (no voice crashes on this build)\nSave-load health\n  Status: clean (no load-crash flags)\nLast JS crash\n",
+      "  Status: none recorded\nThis launch\n  Life: bmti3abmbk9 \u00b7 started 2026-09-01T03:10:09.491Z\n  Followed an OTA apply 121ms ago (boot-front)\n  The previous life released its model contexts before reloading (o0/r0/l0/p0/dn0)\nCrash ledger \u2014 10 recorded (newest last)\n  \u2022 2026-08-30T21:23:57.150Z (1827m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-30-1578-the-stage-says-who-is-there \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done [q0] \u00b7 535ms into the action \u00b7 alive 0ms after it\n  \u2022 2026-08-30T22:25:39.849Z (1766m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-30-1580-the-guy-who-was-never-there \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done [q0] \u00b7 329ms into the action \u00b7 alive 0ms after it\n  \u2022 2026-08-30T23:42:09.758Z (1689m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-30-1581-the-card-they-cannot-walk-past \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done [q0] \u00b7 414ms into the action \u00b7 alive 0ms after it\n  \u2022 2026-08-31T00:21:58.332Z (1649m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-30-1582-the-guy-who-gives-you-the-job \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done [q0] \u00b7 383ms into the action \u00b7 alive 0ms after it\n  \u2022 2026-08-31T03:45:02.432Z (1446m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-31-1586-the-slate-in-every-part \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done [q0] \u00b7 541ms into the action \u00b7 alive 0ms after it\n  \u2022 2026-08-31T12:34:47.772Z (917m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-31-1589-the-pin-comes-home \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done [q0] \u00b7 578ms into the action \u00b7 alive 0ms after it\n      launch: died 892ms into the process \u00b7 not an OTA-apply boot\n",
+      "      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-08-31T14:24:08.210Z (807m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-31-1592-the-events-say-which-build \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n",
+      "      last checkpoint: native:cognition:done [q0] \u00b7 508ms into the action \u00b7 alive 0ms after it\n      launch: died 859ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-08-31T17:38:34.699Z (613m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-31-1594-the-pinch-demands-the-lift \u00b7 stage boot:qwen:deferred\n",
+      "      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: boot:qwen:deferred \u00b7 893ms into the action \u00b7 alive 0ms after it\n      launch: died 941ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-08-31T22:14:31.073Z (337m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-31-1595-the-guide-and-the-ground-agree \u00b7 stage boot:qwen:deferred\n      Process died with no orderly exit while: (no action yet)\n "
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-01-1602-the-beat-card #mti4rci02ab8 [inline 27/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mti4rci02ab8"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-01-1602-the-beat-card"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "27"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-01-1602-the-beat-card"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "3"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db0c:41d2:ad2:ae51:4e84:c909",
+      "query": "user.ip:\"2607:fb90:db0c:41d2:ad2:ae51:4e84:c909\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-01T10:51:59.145915Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-01T10:52:00.819000Z",
+  "fingerprints": [
+    "fac9156a35a08473c1940ebd934ac254"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1947963270,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-01T10:52:00.819000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-01-1602-the-beat-card",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-01-1602-the-beat-card",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-01-1602-the-beat-card",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-01-1602-the-beat-card)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "4629935c1ccc4863b83c6e0598eccc16",
+  "previousEventID": "3a29e7d09e66434bbeed5b3a04ac109c"
+}
