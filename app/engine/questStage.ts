@@ -312,6 +312,41 @@ export function stageVerbAsk(
   return VERB_ASK[BOSS_IS_PAID_BY[family]] ?? null;
 }
 
+/** ⚠⚠⚠ OTA-1617 — THE ASK NAMES ITS OBJECT, NOT JUST ITS MANNER.
+ *
+ *  Owner, reading the mission card: *"temporal dispersion watch, next step is go
+ *  quietly. to where?"* — and he was right to ask. Every phrase in `VERB_ASK`
+ *  above names the CHECK and nothing else: "go quietly", "search this ground",
+ *  "work the aether". They tell a player how the dice will be rolled, never what
+ *  they are there to come away with. On that stage the answer was already in the
+ *  data — it grants the Temporal Distortion Watch off a body in the eddy — and
+ *  the card simply never said so.
+ *
+ *  ⚠⚠ NOTHING NEW IS AUTHORED. The object comes off the stage's own bindings:
+ *  who is standing there, what stands up, and what it hands over. Seven manner
+ *  phrases stay exactly as they were — this composes around them, so a stage
+ *  with no bindings still reads as it did.
+ *
+ *  ⚠ `stageVerbAsk` is untouched and stays the arrival line's phrasing: that
+ *  line already appends its own "— find X" and "(you still need Y)" clauses, and
+ *  composing twice would say everything twice. */
+export function stageObjectiveAsk(
+  family: MissionFamily,
+  stage: (StageBinding & { checkKind?: string | null }) | { checkKind?: string | null } | null | undefined,
+): string | null {
+  const base = stageVerbAsk(family, stage as { checkKind?: string | null } | null | undefined);
+  if (!base) return null;
+  const b = stage as StageBinding | null | undefined;
+  let out = base;
+  if (b?.npcName) out += ` with ${b.npcName}`;
+  if (b?.spawn?.enemyName) {
+    const n = b.spawn.count ?? 1;
+    out += ` — ${n > 1 ? `${n} × ` : ''}${b.spawn.enemyName}`;
+  }
+  if (b?.grants?.item) out += ` — come away with the ${b.grants.item}`;
+  return out;
+}
+
 /** Where a stage happens: its own location if it names one, else the contract's anchor.
  *  ⚠ The resolver is passed in rather than imported, so this module stays free of the
  *  atlas and can be unit-tested on its own. */

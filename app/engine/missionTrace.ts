@@ -40,7 +40,7 @@ import { findStorylineById } from './factionStorylines';
 import { findFactionQuestById, type FactionQuestDef } from './factionQuests';
 import { huntAnchorId, contractAnchorId, resolvePosterLocation } from './contractMarkers';
 import {
-  stageLocationId, stageRequirementMet, stageVerbAsk, payingIntent, type MissionFamily,
+  stageLocationId, stageRequirementMet, stageVerbAsk, stageObjectiveAsk, payingIntent, type MissionFamily,
 } from './questStage';
 
 type Rec = { id: string; stage: number; tracked?: boolean };
@@ -297,8 +297,12 @@ export interface MissionStatusCard {
   /** The next action, plain: "investigate the ground". Empty when the beat
    *  advances on its own and promising an action would be a lie. */
   ask: string;
-  /** Where that beat happens, by NAME, and whether the boots are on it. */
+  /** Where that beat happens, by NAME, and whether the boots are on it.
+   *  ⚠ OTA-1617 — `whereId` rides along so the card can SET COURSE without
+   *  looking the place up a second way; a second lookup is how a button comes to
+   *  route somewhere the line above it does not name. */
   where: string;
+  whereId: string;
   here: boolean;
   npcName: string | null;
   needs: { item: string; held: boolean } | null;
@@ -331,7 +335,7 @@ function statusCard(
   const st = stages[rec.stage];
   const steps: MissionStatusStep[] = stages.map((s, i) => ({
     no: i + 1,
-    ask: stageVerbAsk(family, s) || 'it moves on its own',
+    ask: stageObjectiveAsk(family, s as never) || 'it moves on its own',
     state: i < rec.stage ? 'done' : i === rec.stage ? 'current' : 'ahead',
   }));
   const where = st ? stageLocationId(st, anchor ?? '', resolvePosterLocation) : '';
@@ -343,8 +347,12 @@ function statusCard(
     stageTotal: stages.length,
     tracked: rec.tracked !== false,
     ready: rec.stage >= stages.length,
-    ask: st ? (stageVerbAsk(family, st) || '') : '',
+    // ⚠ OTA-1617 — the ask NAMES ITS OBJECT now ("go quietly — come away with
+    // the Temporal Distortion Watch"), because "go quietly" alone told the owner
+    // how the dice roll and never what he was there for.
+    ask: st ? (stageObjectiveAsk(family, st as never) || '') : '',
     where: locationNameById(where),
+    whereId: where || '',
     here: !!where && where === player.currentLocationId,
     npcName: st?.npcName ?? null,
     needs: st?.requires

@@ -78,7 +78,9 @@ jest.mock('expo-speech-recognition', () => ({}));
 // top of HANDOFF §8, per the owner's instruction.
 
 import { bossSwingsTwice, enemyDamageDisplay, enemyDamageCompact } from '../app/engine/combatRules';
-import { blockAt } from '../test-utils/srcBlock';
+// ⚠ OTA-1617 — blockAt is gone from this suite: it is a BRACE-aware source
+// helper, and the HANDOFF pin below only ever matched incidental punctuation.
+// See the note at that pin for the window that replaced it.
 
 // ⚠⚠ OTA-1404 — COMBAT RESOLUTION MOVED OUT OF gameStore INTO ITS OWN LEAF, and
 // the pins below follow the code to its new address rather than reading both
@@ -208,7 +210,17 @@ describe('OTA-1141 — the standing tuning list exists where the owner asked', (
     const h = read('HANDOFF.md');
     expect(h).toContain('STANDING TUNING LIST');
     const at = h.indexOf('STANDING TUNING LIST');
-    const win = blockAt(h, 'STANDING TUNING LIST').toLowerCase();
+    // ⚠ OTA-1617 — REPINNED, AND THE WINDOW IS TIGHTER THAN IT WAS. `blockAt`
+    // is BRACE-AWARE: it is a source helper, and on a Markdown file it only
+    // ever worked by finding some incidental `{…}` in the prose downstream.
+    // Growing §9 by ~6 KB on 2026-09-01 pushed that accident out of reach and
+    // the helper threw — a pin that was measuring punctuation, not the list.
+    // The list is a single top-level bullet, so its own span is the honest
+    // window: anchor → the next column-0 bullet (~4 KB, vs the ~29 KB the
+    // helper was reaching across).
+    const listEnd = h.indexOf('\n- **', at);
+    expect(listEnd).toBeGreaterThan(at);
+    const win = h.slice(at, listEnd).toLowerCase();
     for (const item of ['59', 'acid', 'dog soak', 'DEX']) {
       expect(win).toContain(item.toLowerCase());
     }

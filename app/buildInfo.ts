@@ -26749,7 +26749,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // mark on the current one. MISSIONS opens it instead of jumping tabs; OPEN
 // CONTRACTS is on the card, so nothing was taken away. It computes nothing of
 // its own — a status card that works out its own answer describes the card.
-export const OTA_BUILD_ID = '2026-09-01-1615-the-mission-speaks-where-you-stand';
+// ⚠⚠⚠ OTA-1617 — THE ASK NAMES ITS OBJECT, AND THE WALK IS ON THE ROW. Owner,
+// reading the new card: "temporal dispersion watch, next step is go quietly. to
+// where?" — and "autoroute... should be on there too, listed in the mission it's
+// for. I still had to go back to the open missions button to hit autoroute. the
+// new way it works should be a lightly functional cheat sheet." The GROUND was
+// right (that stage names The Buried Cities and the card printed it); what was
+// missing was what he was going there FOR, because every VERB_ASK phrase names
+// the check and nothing else. stageObjectiveAsk composes the object off the
+// stage's own bindings — npc, spawn, grants — so the beat now reads "go quietly
+// — come away with the Temporal Distortion Watch". No new prose was authored.
+// And SET COURSE moved onto the mission it belongs to, through the same two
+// actions Contracts uses (hub confirm, else set outright): a cheat sheet you
+// have to leave in order to act on is a reference card.
+export const OTA_BUILD_ID = '2026-09-01-1617-the-ask-names-its-object';
 // golem catch-up 2026-09-01: markerless publish of OTA-1614 + 1615 + 1616 - the
 // card keeps its buttons, the mission card, the grouped refusals. hal took the marker.
 // golem catch-up 2026-09-01: markerless publish of OTA-1608 - the portrait

@@ -33,6 +33,26 @@ export function MissionStatusCard({
 }) {
   const player = useGameStore((s) => s.player);
   const cards = useMemo(() => missionStatusCards(player), [player]);
+  // ⚠⚠⚠ OTA-1617 — AUTOROUTE LIVES ON THE MISSION IT BELONGS TO. Owner: *"the
+  // missions tab is great, but autoroute if the mission is available it should
+  // be on there too, listed in the mission it's for. I still had to go back to
+  // the open missions button to hit autoroute. the new way it works should be a
+  // lightly functional cheat sheet."* A cheat sheet you have to leave to act on
+  // is a reference card, not a cheat sheet.
+  // ⚠ Same two actions the Contracts screen's SET COURSE uses, in the same
+  // order: inside an outpost the global confirm asks before walking you out
+  // (OTA-035), otherwise the course is set outright. Routing through a second
+  // path is how a button comes to send you somewhere Contracts would refuse.
+  const setTravelCourse = useGameStore((s) => s.setTravelCourse);
+  const requestTravelConfirm = useGameStore((s) => s.requestTravelConfirm);
+  const setScreen = useGameStore((s) => s.setScreen);
+
+  const routeTo = (id: string, name: string) => {
+    onClose();
+    if (player?.hubRoomId) requestTravelConfirm(id, name);
+    else setTravelCourse(id);
+    setScreen('exploration');
+  };
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
@@ -81,6 +101,18 @@ export function MissionStatusCard({
                             ? `Carrying: ${c.needs.item} ✓`
                             : `You still need: ${c.needs.item}`}
                         </Text>
+                      ) : null}
+                      {/* ⚠⚠ OTA-1617 — the walk, on the row that wants it. */}
+                      {!c.here && c.whereId ? (
+                        <TouchableOpacity
+                          style={styles.routeBtn}
+                          onPress={() => routeTo(c.whereId, c.where)}
+                          activeOpacity={0.7}
+                          accessibilityRole="button"
+                          accessibilityLabel={`Set course to ${c.where} for ${c.title}`}
+                        >
+                          <Text style={styles.routeBtnText}>▸ SET COURSE TO {c.where.toUpperCase()}</Text>
+                        </TouchableOpacity>
                       ) : null}
                     </>
                   )}
@@ -160,6 +192,11 @@ const styles = StyleSheet.create({
   detail: { color: '#a2977b', fontSize: 12, lineHeight: 18, marginTop: 2 },
   needHeld: { color: '#7fb069', fontSize: 12, lineHeight: 18, marginTop: 2 },
   needShort: { color: '#c96a6a', fontSize: 12, lineHeight: 18, marginTop: 2 },
+  routeBtn: {
+    marginTop: 8, borderWidth: 1, borderColor: '#c9a86a', borderRadius: 3,
+    paddingVertical: 8, paddingHorizontal: 10, alignSelf: 'flex-start',
+  },
+  routeBtnText: { color: '#c9a86a', fontSize: 11, letterSpacing: 1, fontWeight: '700' },
   steps: { marginTop: 8 },
   step: { color: '#6f6656', fontSize: 11, lineHeight: 17 },
   stepDone: { color: '#5c6b52' },

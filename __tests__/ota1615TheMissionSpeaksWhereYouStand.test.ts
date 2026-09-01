@@ -17,7 +17,7 @@
 
 import { missionStatusCards, missionTraceLines } from '../app/engine/missionTrace';
 import { HUNTS, findHuntById } from '../app/engine/hunts';
-import { stageVerbAsk, stageLocationId } from '../app/engine/questStage';
+import { stageObjectiveAsk, stageLocationId } from '../app/engine/questStage';
 import { huntAnchorId, resolvePosterLocation } from '../app/engine/contractMarkers';
 import { placedAt } from '../test-utils/placePlayer';
 import { readFileSync } from 'fs';
@@ -49,7 +49,11 @@ describe('OTA-1615 — the mission status card reader', () => {
     const [card] = missionStatusCards(playerWith(DOUBTER, stage, where!));
     expect(card).toBeTruthy();
     // What to do next, and whether this is the place — the whole of his ask.
-    expect(card!.ask).toBe(stageVerbAsk('hunt', st as never) || '');
+    // ⚠ OTA-1617 superseded the source: the card composes the OBJECT onto the
+    // manner phrase now ("go quietly — come away with the …"), because "go
+    // quietly" alone told him how the dice roll and never what he was there
+    // for. Same claim, pointed at the function the card actually calls.
+    expect(card!.ask).toBe(stageObjectiveAsk('hunt', st as never) || '');
     expect(card!.here).toBe(true);
     expect(card!.stageNo).toBe(stage + 1);
     expect(card!.stageTotal).toBe(def.stages.length);
