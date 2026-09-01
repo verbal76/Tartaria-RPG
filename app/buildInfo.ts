@@ -26522,7 +26522,21 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // so the same verb pays right outside. spawnStageEscort gets a belt (never
 // writes bodies indoors), and the arrival slate on a hub-tile fight stage adds
 // "Outside the walls - the outpost holds its truce."
-export const OTA_BUILD_ID = '2026-09-01-1598-the-fight-waits-outside-the-gate';
+// OTA-1599 - SET THE BONE. Owner, on 1598's truce guard: "you put a Band-Aid
+// on a broken leg instead of setting the bone ... have the destination be the
+// tile beside it ... make all of these missions have nothing to do with an
+// outpost or any other inside place that would involve combat." So the DATA
+// moves: three authored battle-grounds, each ONE TILE from the outpost whose
+// story it serves, where the prose already put the fighting - Raider's Ridge
+// (north of the Tartarian Outskirts; the stage item was already the Raider's
+// RIDGE-Sign), The Vault Steps (west of the Giant Vault; the tube comes up on
+// the hoist-chain and you never pass the doors), The Drowned Quarter (east of
+// Drakova, on the water where the Siren fights were written). The five hunt
+// fight-stages retarget there; auto-route lands on open ground and the 1597
+// cell trigger starts the fight - no gate, no truce line, no LEAVE OUTPOST
+// detour. The 1598 guard stays as the belt; the ota1598 sweep pin flips to
+// the empty-list ratchet: no fight-stage on a hub tile, ever again.
+export const OTA_BUILD_ID = '2026-09-01-1599-set-the-bone';
 // golem catch-up 2026-09-01: markerless publish of OTA-1598 — a hunt stage
 // that draws blades refuses under a roof and points at the door; the escort
 // writer never puts bodies indoors; the arrival slate on a hub-tile fight

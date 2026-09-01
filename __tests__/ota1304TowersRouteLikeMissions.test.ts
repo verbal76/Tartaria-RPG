@@ -155,10 +155,22 @@ describe('OTA-1304 — a beacon tower routes like every other mission', () => {
     useGameStore.getState().routeGreatClimb(climb.id);
     expect(useGameStore.getState().player!.travelTarget?.locationId ?? null).toBe(climb.locationId);
 
-    useGameStore.getState().travelTo(climb.locationId);
-    const t0 = Date.now();
-    while (useGameStore.getState().player!.currentLocationId !== climb.locationId && Date.now() - t0 < 6000) {
-      await new Promise((r) => setTimeout(r, 15));
+    // ⚠ OTA-1599 — quiet the ambient spawners for the arrival (rolls here are
+    // `Math.random() < p`). This test asserts the tower noun on a CLEAN arrival;
+    // OTA-912 deliberately withholds the climb noun while hostiles stand ("deal
+    // with this first, then look up"), so an unlucky danger-5 encounter roll
+    // failed the assertion for a reason the test never meant to check. It
+    // passed on dice luck until OTA-1599's content shifted the RNG sequence.
+    const realRandom = Math.random;
+    Math.random = () => 0.99;
+    try {
+      useGameStore.getState().travelTo(climb.locationId);
+      const t0 = Date.now();
+      while (useGameStore.getState().player!.currentLocationId !== climb.locationId && Date.now() - t0 < 6000) {
+        await new Promise((r) => setTimeout(r, 15));
+      }
+    } finally {
+      Math.random = realRandom;
     }
     expect(useGameStore.getState().player!.currentLocationId).toBe(climb.locationId);
 

@@ -17,7 +17,7 @@
 // spire became its own tile, but the climb stayed anchored on the CITY. Nothing would have
 // thrown — the ★ CLIMB chip would simply have drawn itself in the middle of Asgardar, two
 // tiles from any tower, and the tower's own tile would have offered nothing to climb.
-import { LOCATION_ATLAS_COORDS } from '../app/engine/atlasCoords';
+import { LOCATION_ATLAS_COORDS, SATELLITE_ATLAS_COORDS } from '../app/engine/atlasCoords';
 import { LOCATION_TO_MACRO } from '../app/engine/worldLadder';
 import { GREAT_CLIMBS, greatClimbForLocation } from '../app/engine/greatClimbs';
 import locationsData from '../app/data/locations/locations.json';
@@ -47,7 +47,12 @@ describe('OTA-1334 — the Black Reach and the separated spires', () => {
     // 36 before this pass, 38 after — which is also exactly the landmark count the map
     // spec hands the artist. Those two numbers agreeing is not a coincidence and should
     // not be allowed to drift apart quietly.
-    expect(LOCS.length).toBe(38);
+    // ⚠ OTA-1599 — the artist's number is STILL 38: the new battle-grounds are
+    // unpainted satellites in their own table, counted separately so neither
+    // number can quietly absorb the other. (The painted TABLE is 37 — the
+    // Hidden Market has always been the 38th, carried on the hidden record.)
+    expect(Object.keys(LOCATION_ATLAS_COORDS).length).toBe(37);
+    expect(LOCS.length).toBe(38 + Object.keys(SATELLITE_ATLAS_COORDS).length);
   });
 
   it('⚠⚠ the Black Reach is the southernmost point, directly under the Mud Flood Nexus', () => {

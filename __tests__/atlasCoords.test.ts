@@ -172,7 +172,12 @@ describe('OTA 051 — atlas coordinate calibration', () => {
     // rather than silently degrade the map.
     it('all 21 locations are depicted', () => {
       const depicted = depictedLocationIds().length;
-      expect(depicted).toBe(LOCATIONS.length);
+      // OTA-1599 — the satellite battle-grounds are deliberately UNPAINTED
+      // (SATELLITE_ATLAS_COORDS); depiction coverage measures landmarks only.
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { SATELLITE_ATLAS_COORDS } = require('../app/engine/atlasCoords') as typeof import('../app/engine/atlasCoords');
+      const landmarks = LOCATIONS.filter((l) => !(l.id in SATELLITE_ATLAS_COORDS));
+      expect(depicted).toBe(landmarks.length);
       expect(depicted).toBeGreaterThanOrEqual(21);
     });
 

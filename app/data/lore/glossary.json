@@ -224,6 +224,21 @@
   ],
   "important_places": [
     {
+      "id": "raiders_ridge",
+      "term": "Raider's Ridge",
+      "definition": "A broken spine of scrub and stacked stone east of the Tartarian Outskirts, cut everywhere with raider sign — spiral-marks, ridge-signs, tallies. The border gangs stage and settle things here, past the reach of the outposts and their truce."
+    },
+    {
+      "id": "vault_steps",
+      "term": "The Vault Steps",
+      "definition": "The long broken stair climbing to the Giant Vault's sealed doors. The mud on the landings has trembled since the Titan began to walk, and what its footfalls woke does not sleep inside the Vault — it waits out on the steps."
+    },
+    {
+      "id": "drowned_quarter",
+      "term": "The Drowned Quarter",
+      "definition": "Drakova's flooded eastern district, outside the sealed core. Streets passable only by pole-raft, roofs at the waterline, and reed-choked shallows where the Mud Siren keeps its roost — the drowned it has taken still work the water for it."
+    },
+    {
       "id": "asgardar",
       "term": "Asgardar",
       "definition": "The ancient capital city of Tartaria, home to the Grand Spire of Asgardar, a towering structure on the city's outskirts that once channeled Aetheric Power from cosmic sources into the city's energy grid."

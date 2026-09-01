@@ -124,9 +124,16 @@ describe('OTA-1580 — the Sentinel Ward was never missing (a correction)', () =
     expect(ward.map((s) => s.narration).join(' ')).toMatch(/inner archive/i);
   });
 
-  it('⚠ the location count is unchanged — 38, the number the map spec hands the artist', () => {
+  it('⚠ the painted-landmark count is unchanged — 38, plus the OTA-1599 satellites', () => {
+    // 38 is the number the map spec hands the artist, and it still is. The
+    // OTA-1599 battle-grounds are unpainted satellites in SATELLITE_ATLAS_COORDS.
     const raw = JSON.parse(src('app/data/locations/locations.json')) as unknown[];
-    expect(raw.length).toBe(38);
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const AC = require('../app/engine/atlasCoords') as typeof import('../app/engine/atlasCoords');
+    // (The painted TABLE is 37 — the Hidden Market has always been the 38th
+    // location, carried on the hidden record instead of the atlas table.)
+    expect(Object.keys(AC.LOCATION_ATLAS_COORDS).length).toBe(37);
+    expect(raw.length).toBe(38 + Object.keys(AC.SATELLITE_ATLAS_COORDS).length);
   });
 });
 

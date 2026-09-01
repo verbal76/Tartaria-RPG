@@ -10,7 +10,7 @@
 
 import locationsData from '../data/locations/locations.json';
 import type { Location } from './types';
-import { LOCATION_ATLAS_COORDS, OUTPOST_ATLAS_COORD } from './atlasCoords';
+import { LOCATION_ATLAS_COORDS, OUTPOST_ATLAS_COORD, SATELLITE_ATLAS_COORDS } from './atlasCoords';
 import { HIDDEN_LOCATIONS } from './hiddenLocations';
 
 export type Direction = 'north' | 'east' | 'south' | 'west';
@@ -205,7 +205,8 @@ export function generateWorldMap(characterSeed: string, startingLocationId: stri
     // canonical grid placement so the market sits where it's drawn (near the
     // frontier camps), not flung to the id-hash fallback ring.
     const hid = HIDDEN_LOCATIONS[loc.id];
-    const locAtlas = LOCATION_ATLAS_COORDS[loc.id] ?? (hid ? { fx: hid.fx, fy: hid.fy } : undefined);
+    const locAtlas = LOCATION_ATLAS_COORDS[loc.id] ?? SATELLITE_ATLAS_COORDS[loc.id]
+      ?? (hid ? { fx: hid.fx, fy: hid.fy } : undefined);
     let baseX: number;
     let baseY: number;
     if (locAtlas) {
@@ -241,6 +242,10 @@ let _canonCache: Record<string, { x: number; y: number }> | null = null;
 function atlasFractionFor(id: string): { fx: number; fy: number } | null {
   const a = LOCATION_ATLAS_COORDS[id];
   if (a) return a;
+  // OTA-1599 — satellite battle-grounds place like any location but live in a
+  // separate table so the label/overlay readers keep seeing only painted art.
+  const s = SATELLITE_ATLAS_COORDS[id];
+  if (s) return s;
   const h = HIDDEN_LOCATIONS[id];
   if (h) return { fx: h.fx, fy: h.fy };
   return null;
@@ -551,6 +556,10 @@ export function senseDirection(
     const y = fromY + dy * i;
     if (x < 0 || x >= GRID_W || y < 0 || y >= GRID_H) return null;
     const tile = map.tiles[y]?.[x];
+    // ⚠ OTA-1599 — satellites are NOT skipped here. A first cut read past them
+    // to the landmark behind, and mapIntegrityAudit #4 caught the lie in 172
+    // places: the survey claimed "Drakova, 6 west" and the walk arrived at The
+    // Drowned Quarter first. The radar names what a walk actually reaches.
     if (tile?.locationName) return { name: tile.locationName, distance: i };
   }
   return null;

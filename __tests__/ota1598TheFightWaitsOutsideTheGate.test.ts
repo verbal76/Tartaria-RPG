@@ -128,10 +128,15 @@ describe('OTA-1598 — the truce holds, and the mission survives it', () => {
     expect(lines).toContain('LEAVE OUTPOST');
   });
 
-  it('⚠⚠⚠ and the TYPED VERB indoors gets the same answer — no advance, no apex in the gate room', async () => {
+  it('⚠⚠⚠ and the TYPED VERB in the outpost routes to the real ground — no advance, no apex in the gate room', async () => {
+    // ⚠ OTA-1599 SUPERSEDE — stage 3's ground is no longer this hub tile at all
+    // (the bone is set: it moved to Raider's Ridge, one tile north). So the verb
+    // typed in the outpost now draws the ground-mismatch routing line instead of
+    // the truce refusal — the truce guard behind it stays as the belt.
     seedDoubterAtStageThree({ indoors: true });
     await get().submitPlayerAction('attack');
-    await settle(() => get().gameLog.slice(-8).some((e) => e.text.includes(TRUCE)));
+    await settle(() => get().gameLog.slice(-8).some((e) => e.text.includes('points elsewhere')));
+    expect(get().gameLog.slice(-8).some((e) => e.text.includes('points elsewhere'))).toBe(true);
     expect(doubterStage()).toBe(3);
     expect((get().currentScene?.enemies ?? []).length).toBe(0);
   });
@@ -146,12 +151,11 @@ describe('OTA-1598 — the truce holds, and the mission survives it', () => {
     expect(doubterStage()).toBe(4); // frozen for the kill — the fight owns the advance
   });
 
-  it('⚠⚠ the arrival slate says WHERE the fight is allowed', () => {
-    seedDoubterAtStageThree({ indoors: true });
-    const lines = missionArrivalLines(get().player).join('\n');
-    expect(lines).toContain('Silence the Doubter');
-    expect(lines).toContain('Outside the walls');
-  });
+  // ⚠ OTA-1599 SUPERSEDE — the positive "Outside the walls" slate test is gone
+  // with the state that produced it: no hunt fight-stage stands on a hub tile
+  // any more (ota1599 holds that as the ratchet), so no live line can carry the
+  // clause. The clause code stays in missionTrace as the belt for any future
+  // spawn authored onto a hub ground.
 
   it('⚠ and open-country fight stages carry no such clause', () => {
     const p = get().player!;
@@ -170,10 +174,13 @@ describe('OTA-1598 — the truce holds, and the mission survives it', () => {
 });
 
 describe('OTA-1598 — the class, measured and guarded', () => {
-  it('⚠⚠ every hunt fight-stage standing on a hub tile is exactly the guarded kind', () => {
-    // The owner asked about ONE outpost. This is the whole list — every hunt
-    // stage that draws blades on ground where arrival walks you through a gate.
-    // If authoring adds one, it appears here and the truce guard already holds.
+  it('⚠⚠ NO hunt fight-stage stands on a hub tile — the bone is set (OTA-1599 ratchet)', () => {
+    // OTA-1598 measured five (mud_titan#3, servants_doubter#3+4,
+    // mud_siren_drakova#5+6). OTA-1599 moved every one onto authored open
+    // ground beside its outpost — owner: "make all of these missions have
+    // nothing to do with an outpost or any other inside place that would
+    // involve combat." This list stays EMPTY forever; a new authored fight on
+    // a hub tile lands here by name and fails the build.
     const onHubGround: string[] = [];
     for (const h of HUNTS) {
       (h.stages ?? []).forEach((st, i) => {
@@ -183,13 +190,7 @@ describe('OTA-1598 — the class, measured and guarded', () => {
         if (isHubLocation(ground)) onHubGround.push(`${h.id}#${i}[${st.checkKind}]@${ground}`);
       });
     }
-    expect(onHubGround).toEqual([
-      'hunt_mud_titan#3[boss]@giant_vault',
-      'hunt_servants_doubter#3[attack_provoke]@tartarian_outskirts',
-      'hunt_servants_doubter#4[boss]@tartarian_outskirts',
-      'hunt_mud_siren_drakova#5[attack_provoke]@drakova',
-      'hunt_mud_siren_drakova#6[boss]@drakova',
-    ]);
+    expect(onHubGround).toEqual([]);
   });
 
   it('⚠⚠ the guard sits at the one writer, ahead of the narration', () => {

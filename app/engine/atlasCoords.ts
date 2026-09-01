@@ -177,6 +177,33 @@ export const LOCATION_ATLAS_COORDS: Record<string, AtlasCoord> = {
   // the IDW player-dot interpolation that uses every entry in this table as an anchor.
 };
 
+// ⚠⚠⚠ OTA-1599 — SATELLITE BATTLE-GROUNDS, deliberately a SEPARATE table.
+//
+// Owner, on mission fights routed to outpost tiles: "make all of these missions
+// have nothing to do with an outpost or any other inside place that would
+// involve combat ... have the destination be the tile beside it." Each entry is
+// the open ground ONE TILE (an exact 1/SPREAD_X fx step, fx-ONLY so the rounded
+// delta to ANY re-center differs from its parent's by exactly one — fy steps
+// cannot be written exactly in decimal and broke arb29 symmetry) from the
+// outpost whose story it serves.
+//
+// A separate table because these places are unpainted by design: everything
+// that reads LOCATION_ATLAS_COORDS — the name-label solver, the MapScreen
+// overlays, the label-density measurement, the mapFraction anchors — must keep
+// seeing only the artist's landmarks. Satellites are placed on the grid and
+// routable (worldMap merges this table for placement + canonical cells), but
+// carry no painted silhouette, no name label, and the radar reads past them to
+// the landmark behind (senseDirection skips this set).
+export const SATELLITE_ATLAS_COORDS: Record<string, AtlasCoord> = {
+  // One tile EAST of tartarian_outskirts (26,12) — "the ridge the sign named".
+  raiders_ridge: { fx: 0.125, fy: 0.13 },
+  // One tile WEST of giant_vault (51,28), toward the Endless Stair — the open
+  // stair where the Mud Titan hunt's wraith ambush stands up.
+  vault_steps: { fx: 0.755, fy: 0.86 },
+  // One tile EAST of drakova (52,16), on the water — the Siren's reed shallows.
+  drowned_quarter: { fx: 0.775, fy: 0.318 },
+};
+
 /**
  * Look up the atlas coordinate for a location id.
  * Returns null when the location has no depicted icon on the atlas
@@ -184,7 +211,10 @@ export const LOCATION_ATLAS_COORDS: Record<string, AtlasCoord> = {
  */
 export function atlasCoordForLocation(locationId: string | null | undefined): AtlasCoord | null {
   if (!locationId) return null;
-  return LOCATION_ATLAS_COORDS[locationId] ?? null;
+  // OTA-1599 — the general id→coord lookup answers for satellites too (routing,
+  // markers, placement all ask here). Only the TABLE enumerators — the label
+  // solver, the density measurement, the painted overlays — stay landmark-only.
+  return LOCATION_ATLAS_COORDS[locationId] ?? SATELLITE_ATLAS_COORDS[locationId] ?? null;
 }
 
 /**

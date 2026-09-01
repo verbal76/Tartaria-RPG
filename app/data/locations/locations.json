@@ -2322,5 +2322,105 @@
       "rusted piton",
       "echo shaft"
     ]
+  },
+  {
+    "id": "raiders_ridge",
+    "name": "Raider's Ridge",
+    "type": "region",
+    "description": "A broken spine of scrub and stacked stone one hard walk east of the Tartarian Outskirts. Raider sign is cut into half the rocks — spiral-marks, ridge-signs, tallies — because this is where the border gangs stage, meet, and settle what the outposts will not allow inside their walls. Open ground, bad cover, and nobody to hear it.",
+    "danger": 3,
+    "discoverable": true,
+    "tags": [
+      "region",
+      "ridge",
+      "open",
+      "borderlands",
+      "raiders"
+    ],
+    "aliases": [
+      "raiders ridge",
+      "raider ridge",
+      "the raider's ridge",
+      "the ridge north of the outskirts"
+    ],
+    "interactables": [
+      "scrub",
+      "stacked stone",
+      "spiral-mark",
+      "ridge-sign",
+      "tally stone",
+      "cold firepit",
+      "lookout rock",
+      "cairn",
+      "boot-track",
+      "wind break",
+      "snare line",
+      "dropped blade"
+    ]
+  },
+  {
+    "id": "vault_steps",
+    "name": "The Vault Steps",
+    "type": "site",
+    "description": "The long broken stair and landing that climb to the Giant Vault's sealed doors, half-drowned in mud that has trembled for weeks. Whatever the Titan's footfalls woke below does not sleep inside the Vault — it waits out here, on the steps.",
+    "danger": 5,
+    "discoverable": true,
+    "tags": [
+      "site",
+      "giants",
+      "open",
+      "approach"
+    ],
+    "aliases": [
+      "vault steps",
+      "vault approach",
+      "vault landing",
+      "the steps of the vault"
+    ],
+    "interactables": [
+      "step",
+      "landing",
+      "mud",
+      "seal-plate slot",
+      "handrail stub",
+      "toppled statue",
+      "vibration crack",
+      "silt drift",
+      "bone shard",
+      "warning glyph"
+    ]
+  },
+  {
+    "id": "drowned_quarter",
+    "name": "The Drowned Quarter",
+    "type": "site",
+    "description": "Drakova's flooded eastern district, outside the sealed core — streets navigable only by pole-raft, roofs at the waterline, and a silence on the water that is not empty. The Siren's roost is somewhere in the reed-choked shallows, and the drowned it has taken still work for it.",
+    "danger": 5,
+    "discoverable": true,
+    "tags": [
+      "site",
+      "flooded",
+      "open",
+      "water"
+    ],
+    "aliases": [
+      "drowned quarter",
+      "the drowned quarter of drakova",
+      "drowned quarter of drakova",
+      "the roost",
+      "siren's roost"
+    ],
+    "interactables": [
+      "water",
+      "pole-raft",
+      "reed",
+      "roofline",
+      "waterline door",
+      "reed-mark",
+      "drowned hull",
+      "mooring post",
+      "sunken bell",
+      "roost"
+    ]
   }
 ]

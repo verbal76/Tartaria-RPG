@@ -170,7 +170,7 @@
         },
         {
           "stageType": "favor",
-          "narration": "The Vault's seals open to Karin's plate at the touch. As you pull the blueprint tube from its cradle a clutch of Mud Wraiths peels off the wall behind you — the Titan's vibration woke them weeks ago and nothing has come down here since to put them back to sleep.",
+          "narration": "Karin's plate warms the seal from the landing and the Vault gives the blueprint tube up on its hoist-chain — you never pass the doors. As you turn back down the steps a clutch of Mud Wraiths peels up out of the mud behind you: the Titan's vibration woke them weeks ago, and nothing has come up this stair since to put them back to sleep.",
           "arbiter": null,
           "checkKind": "boss",
           "grants": {
@@ -179,7 +179,7 @@
           "requires": {
             "item": "Karin's Archive Seal"
           },
-          "locationName": "The Giant Vault",
+          "locationName": "The Vault Steps",
           "spawn": {
             "enemyName": "Mud Wraith",
             "count": 3,
@@ -550,7 +550,7 @@
       "id": "hunt_servants_doubter",
       "title": "Silence the Doubter",
       "posterText": "The Servants of the Giants name a Reaver who walks the Outskirts speaking against the Giants' return. The Servants do not raise their hand against him — they ask a hand that isn't theirs to. 400 TC posted at any Servants shrine.",
-      "targetLocationName": "the Tartarian Outskirts (the Reaver's ridge camp)",
+      "targetLocationName": "Raider's Ridge (the Reaver's ridge camp)",
       "targetEnemyName": "Tartarian Reaver",
       "biomeTag": "outskirts",
       "templateKind": "bait_switch_5",
@@ -592,7 +592,7 @@
         },
         {
           "stageType": "investigation",
-          "narration": "You search the camp's debris. A boot-track heading due west, fresh. A Reaver's spiral-mark scratched into a flat stone — his next staging ground, named in raider sign, out on the Tartarian Outskirts ridge. You put the stone in your pack. He wanted the right kind of hunter to follow.",
+          "narration": "You search the camp's debris. A boot-track heading due west, fresh. A Reaver's spiral-mark scratched into a flat stone — his next staging ground, named in raider sign, out on Raider's Ridge east of the Outskirts. You put the stone in your pack. He wanted the right kind of hunter to follow.",
           "arbiter": null,
           "checkKind": "investigate",
           "grants": {
@@ -602,7 +602,7 @@
         },
         {
           "stageType": "gauntlet",
-          "narration": "North through scrub and broken stone, reading the spiral-marks off the rocks as you go. Two more raiders strike from cover at the half-mile mark. They aren't trying to stop you, only slow you — and one of them dies holding the sign for where the meeting is set.",
+          "narration": "East through scrub and broken stone, reading the spiral-marks off the rocks as you go. Two more raiders strike from cover at the half-mile mark. They aren't trying to stop you, only slow you — and one of them dies holding the sign for where the meeting is set.",
           "arbiter": null,
           "checkKind": "attack_provoke",
           "grants": {
@@ -611,7 +611,7 @@
           "requires": {
             "item": "Reaver's Spiral-Mark Stone"
           },
-          "locationName": "Tartarian Outskirts"
+          "locationName": "Raider's Ridge"
         },
         {
           "stageType": "apex",
@@ -621,7 +621,7 @@
           "requires": {
             "item": "Raider's Ridge-Sign"
           },
-          "locationName": "Tartarian Outskirts"
+          "locationName": "Raider's Ridge"
         }
       ]
     },
@@ -1064,7 +1064,7 @@
           "requires": {
             "item": "Netter's Ear-Wax Seal"
           },
-          "locationName": "Drakova"
+          "locationName": "The Drowned Quarter"
         },
         {
           "stageType": "apex",
@@ -1074,7 +1074,7 @@
           "requires": {
             "item": "Reed-Throat Mark"
           },
-          "locationName": "Drakova"
+          "locationName": "The Drowned Quarter"
         }
       ]
     },
