@@ -19,14 +19,24 @@
 //
 // House palette per OTA-1043: a popup off the MissionCompleteModal palette
 // reads as a different game.
+//
+// ⚠⚠ OTA-1602 — THE BEAT CARD wears the same curtain. Owner: *"multistage
+// missions like the market heists either need a cutscene pop-up like the
+// fight announcements or a conversation card pop up in between stages to
+// separate and progress the mission."* A stage that closes on its own tile
+// has no travel leg, no arrival, no stinger — so the closing prose and the
+// next objective come up on this card with a CONTINUE button instead of
+// FIGHT (the `cta` prop), and the optional `next` line says where the story
+// goes. Same component, same palette: one curtain for the missions.
 import React from 'react';
 import { Modal, View, Text, Pressable, StyleSheet } from 'react-native';
 
 export function MissionStingerModal({
-  stinger, onClose,
+  stinger, onClose, cta = 'FIGHT',
 }: {
-  stinger: { title: string; line: string } | null;
+  stinger: { title: string; line: string; next?: string | null } | null;
   onClose: () => void;
+  cta?: string;
 }) {
   return (
     <Modal visible={!!stinger} transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent>
@@ -37,13 +47,14 @@ export function MissionStingerModal({
           </Text>
           <View style={styles.rule} />
           <Text style={styles.line}>{stinger?.line ?? ''}</Text>
+          {stinger?.next ? <Text style={styles.next}>{stinger.next}</Text> : null}
           <Pressable
             style={({ pressed }) => [styles.btn, pressed && styles.btnPressed]}
             onPress={onClose}
             accessibilityRole="button"
-            accessibilityLabel="Close and fight"
+            accessibilityLabel={cta === 'FIGHT' ? 'Close and fight' : 'Continue the mission'}
           >
-            <Text style={styles.btnText}>FIGHT</Text>
+            <Text style={styles.btnText}>{cta}</Text>
           </Pressable>
         </View>
       </View>
@@ -64,6 +75,8 @@ const styles = StyleSheet.create({
   rule: { height: 1, backgroundColor: '#6b5c3a', marginVertical: 14 },
   // The shout is the whole card — set large, with air, like a title card.
   line: { color: '#f0e6cc', fontSize: 18, lineHeight: 27 },
+  // OTA-1602 — the "what's next" footnote under a beat, quieter than the prose.
+  next: { color: '#c9a86a', fontSize: 13, lineHeight: 19, marginTop: 14 },
   btn: {
     alignSelf: 'flex-end', marginTop: 22, paddingVertical: 10, paddingHorizontal: 22,
     borderWidth: 1, borderColor: '#c9a86a', borderRadius: 4,

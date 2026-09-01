@@ -26573,7 +26573,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // stages carry no authored spawn, so the 1597 arrival arm walked past them;
 // it now also fires the final boss stage - the exact freeze-for-kill set -
 // so route in, boots on the cell: narration, apex, stinger, no verb.
-export const OTA_BUILD_ID = '2026-09-01-1601-combat-separates';
+//
+// ⚠⚠⚠ OTA-1602 — THE BEAT CARD. The other half of the same ruling: "multistage
+// missions like the market heists either need a cutscene pop-up like the
+// fight announcements or a conversation card pop up in between stages to
+// separate and progress the mission." Forty-seven stage transitions close on
+// their own tile with no fight stood up (5 hunt, 16 mystery, 26 storyline —
+// the Highest Bidder heist alone has four in a row at the hidden market);
+// each was one narration line scrolling past. Now every in-place, no-fight
+// close raises the mission-title card — the closing prose big, the next
+// objective under it, one CONTINUE — the OTA-1600 stinger's own curtain with
+// a different button. All three families, one writer each, never over a
+// completion (which celebrates itself) and never over a stinger (a fight
+// stood up = not this card).
+export const OTA_BUILD_ID = '2026-09-01-1602-the-beat-card';
 // golem catch-up 2026-09-01: markerless publish of OTA-1601 - combat
 // separates + the apex fires at arrival; hal got it via the marker push.
 // golem catch-up 2026-09-01: markerless publish of OTA-1600 — 37 authored

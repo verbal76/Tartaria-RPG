@@ -7247,13 +7247,9 @@ export interface GameStore {
    *  The five towers were listed in CONTRACTS as read-only cards with no route
    *  affordance at all, even though each one carries a known `locationId`. */
   routeGreatClimb: (climbId: string) => void;
-  /** ⚠ OTA-1361 — activate / deactivate a Great Climb, the same toggle every other
-   *  contract carries. `routedClimbId` has always BEEN the "tower you're running"
-   *  flag, but the only way to raise it was to set a course, and nothing could ever
-   *  lower it by hand — so a tower you'd abandoned in spirit stayed the mission you
-   *  were on. Activating pauses every other contract (single-active, across kinds);
-   *  deactivating clears the flag and leaves the tower on the slate. Omit `active`
-   *  to toggle. */
+  /** ⚠ OTA-1361 — activate / deactivate a Great Climb, the toggle every contract
+   *  carries: `routedClimbId` was only ever raised by setting a course and nothing
+   *  could lower it by hand. Activating pauses every other contract; omit to toggle. */
   setGreatClimbActive: (climbId: string, active?: boolean) => void;
   /** OTA-451 — read the outpost Mission Board: list the player faction's open
    *  postings in the feed with accept instructions. Fired by the board chip. */
@@ -7265,6 +7261,10 @@ export interface GameStore {
   /** OTA-1600 — the stinger popup: set when a fight-stage stands bodies up. */
   pendingMissionStinger: { title: string; line: string } | null;
   dismissMissionStinger: () => void;
+  /** OTA-1602 — the beat card: set when a stage closes in place (same tile, no
+   *  fight stood up) so the transition reads as a scene, not a scrolled line. */
+  pendingMissionBeat: { title: string; line: string; next: string | null } | null;
+  dismissMissionBeat: () => void;
   turnInHunt: (titleOrId: string, remote?: boolean) => void;
   acceptMystery: (titleOrId: string) => void;
   advanceMystery: (mysteryId: string) => void;

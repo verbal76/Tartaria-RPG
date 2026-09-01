@@ -380,6 +380,10 @@ export function ExplorationScreen() {
   // own condition still holds after dismiss, so nothing is lost, only ordered.
   const pendingMissionStinger = useGameStore((s) => s.pendingMissionStinger);
   const dismissMissionStinger = useGameStore((s) => s.dismissMissionStinger);
+  // OTA-1602 — the beat card: same curtain, CONTINUE instead of FIGHT. Raised
+  // when a stage closes on its own tile with no fight stood up.
+  const pendingMissionBeat = useGameStore((s) => s.pendingMissionBeat);
+  const dismissMissionBeat = useGameStore((s) => s.dismissMissionBeat);
   const combatPrimerOpen = liveEnemyCount > 0 && !pendingMissionStinger && !combatPrimerSeen && enemiesDefeatedEver === 0 && !hintsOff;
   // OTA 031 — climb-target picker. Opens to a chip list of every
   // climbable noun in the current scene; tapping one fires `climb
@@ -2880,6 +2884,11 @@ export function ExplorationScreen() {
           FIGHT button. Raised the moment advanceHunt stands bodies up; the line
           is already in the log, so dismissing loses nothing. */}
       <MissionStingerModal stinger={pendingMissionStinger} onClose={dismissMissionStinger} />
+
+      {/* ⚠ OTA-1602 — the beat card: a stage that closed in place gets its
+          closing prose and next objective as a scene, not a scrolled line.
+          Exclusive with the stinger by construction (no fight stood up). */}
+      <MissionStingerModal stinger={pendingMissionBeat} onClose={dismissMissionBeat} cta="CONTINUE" />
 
       {/* ⚠⚠ OTA-1233 — ONE PICKER. TakeModal + SalvageModal were two modals over the
           SAME `displayedAmbientNouns`, each with its own consumed-predicate — the

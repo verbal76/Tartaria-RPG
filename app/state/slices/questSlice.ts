@@ -129,6 +129,10 @@ export interface QuestSlice {
   /** OTA-1600 — the stinger popup state + its one dismiss. */
   pendingMissionStinger: { title: string; line: string } | null;
   dismissMissionStinger: () => void;
+  /** OTA-1602 — the beat card: a stage that closes in place (same tile, no
+   *  fight stood up) raises its closing prose + next objective as a scene. */
+  pendingMissionBeat: { title: string; line: string; next: string | null } | null;
+  dismissMissionBeat: () => void;
   turnInHunt: (titleOrId: string, remote?: boolean) => void;
   acceptMystery: (titleOrId: string) => void;
   advanceMystery: (mysteryId: string) => void;
@@ -1704,6 +1708,10 @@ export const createQuestSlice = (
   dismissMissionStinger() {
     set(() => ({ pendingMissionStinger: null }));
   },
+  pendingMissionBeat: null,
+  dismissMissionBeat() {
+    set(() => ({ pendingMissionBeat: null }));
+  },
   advanceHunt(huntId, opts) {
     const peaceful = opts?.peaceful === true;
     const state = get();
@@ -1744,6 +1752,10 @@ export const createQuestSlice = (
       (stageDef.checkKind === 'boss' && record.stage === lastBossIdxEarly)
       || !!stageDef.spawn
     );
+    // OTA-1602 — remembered from the direction block below: a next stage on
+    // THIS tile has no travel leg to separate it, so the close raises the
+    // beat card once the record moves (and only if no fight stood up).
+    let sameTileBeat: { line: string; next: string | null } | null = null;
     // ⚠⚠ P19 — THE STAGE ACTUALLY HANDS YOU THE THING NOW. Owner: *"if it's calling for
     // you to investigate an area, find a certain object and take that object to the next
     // area, well then it has to give you the damn object."* The narration has always
@@ -1776,6 +1788,7 @@ export const createQuestSlice = (
         const movedGround = nextId !== hereId;
         const dir = QS.nextStageDirection(nextDef, nextDef.locationName ?? null, movedGround);
         if (dir) get().appendLog('system', dir);
+        if (!movedGround) sameTileBeat = { line: stageDef.narration, next: dir ?? null };
         // ⚠⚠ P19 — AND IT ACTUALLY SETS THE COURSE. Owner: *"it didn't auto route me to
         // the next stage."* He was not exaggerating — `advanceMissionRoute` reads
         // `activeFactionQuests` and NOTHING ELSE, so hunts have never had a route chain
@@ -1912,6 +1925,17 @@ export const createQuestSlice = (
             }
           : s,
       );
+      // ⚠⚠⚠ OTA-1602 — THE BEAT CARD. Owner: "multistage missions like the
+      // market heists either need a cutscene pop-up like the fight
+      // announcements or a conversation card pop up in between stages to
+      // separate and progress the mission." A stage that closes IN PLACE has
+      // no travel leg, no arrival, no stinger — its close was one line
+      // scrolling past. The closing prose and the next objective go up as a
+      // card instead (and never over a completion, which celebrates itself).
+      const beat = sameTileBeat;
+      if (!stoodUp && beat && nextStage < hunt.stages.length) {
+        set(() => ({ pendingMissionBeat: { title: hunt.title, line: beat.line, next: beat.next } }));
+      }
     }
     void get().persist();
   },
@@ -2262,6 +2286,8 @@ export const createQuestSlice = (
     if (stageDef.arbiter) get().appendLog('arbiter', stageDef.arbiter);
     // ⚠⚠ P19 — the same three things the hunts got: hand over what the stage promised,
     // say where the next one is, and actually set the course.
+    // OTA-1602 — and the same beat card: a stage that closes on its own tile.
+    let sameTileBeatM: { line: string; next: string | null } | null = null;
     {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const QS = require('../../engine/questStage') as typeof import('../../engine/questStage');
@@ -2276,6 +2302,7 @@ export const createQuestSlice = (
         const moved = nextId !== hereId;
         const dir = QS.nextStageDirection(nextDef, nextDef.locationName ?? null, moved);
         if (dir) get().appendLog('system', dir);
+        if (!moved) sameTileBeatM = { line: stageDef.narration, next: dir ?? null };
         const liveNow = get().player;
         if (moved && liveNow && liveNow.currentLocationId !== nextId
             && liveNow.travelTarget?.locationId !== nextId) {
@@ -2325,6 +2352,13 @@ export const createQuestSlice = (
           }
         : s,
     );
+    // ⚠⚠ OTA-1602 — the beat card (see advanceHunt). Reaching here means no
+    // spawn stood up (spawnedM returned above), so an in-place close raises it
+    // whenever the mystery still has road left.
+    const beatM = sameTileBeatM;
+    if (beatM && nextStage < mystery.stages.length) {
+      set(() => ({ pendingMissionBeat: { title: mystery.title, line: beatM.line, next: beatM.next } }));
+    }
     if (nextStage >= mystery.stages.length) {
       get().appendLog(
         'reward',
@@ -2600,6 +2634,8 @@ export const createQuestSlice = (
     get().appendLog('world', stageDef.narration);
     if (stageDef.arbiter) get().appendLog('arbiter', stageDef.arbiter);
     // ⚠⚠ P19 — hand over what the stage promised, say where the next one is, set the course.
+    // OTA-1602 — and the same beat card: a chapter that closes on its own tile.
+    let sameTileBeatS: { line: string; next: string | null } | null = null;
     {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const QS = require('../../engine/questStage') as typeof import('../../engine/questStage');
@@ -2614,6 +2650,7 @@ export const createQuestSlice = (
         const moved = nextId !== hereId;
         const dir = QS.nextStageDirection(nextDef, nextDef.locationName ?? null, moved);
         if (dir) get().appendLog('system', dir);
+        if (!moved) sameTileBeatS = { line: stageDef.narration, next: dir ?? null };
         const liveNow = get().player;
         if (moved && liveNow && liveNow.currentLocationId !== nextId
             && liveNow.travelTarget?.locationId !== nextId) {
@@ -2654,6 +2691,12 @@ export const createQuestSlice = (
           }
         : s,
     );
+    // ⚠⚠ OTA-1602 — the beat card (see advanceHunt). No spawn stood up (the
+    // early return above), so an in-place close raises it mid-arc.
+    const beatS = sameTileBeatS;
+    if (beatS && nextStage < def.stages.length) {
+      set(() => ({ pendingMissionBeat: { title: def.title, line: beatS.line, next: beatS.next } }));
+    }
     if (nextStage >= def.stages.length) {
       get().appendLog(
         'reward',
