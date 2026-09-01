@@ -1,0 +1,185 @@
+{
+  "id": "83bfc801c5a4425e8698f29b5173d780",
+  "groupID": "7703391064",
+  "eventID": "83bfc801c5a4425e8698f29b5173d780",
+  "projectID": "4511945117532160",
+  "size": 2771,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log-beacon 2026-08-31-1596-the-mark-catches-up-at-the-door #mthtq6tw1hv7"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-08-31-1596-the-mark-catches-up-at-the-door",
+  "message": "player-log-beacon 2026-08-31-1596-the-mark-catches-up-at-the-door #mthtq6tw1hv7",
+  "title": "player-log-beacon 2026-08-31-1596-the-mark-catches-up-at-the-door #mthtq6tw1hv7",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "77b683aa0ab84de1adce13a736d409dd",
+      "span_id": "90adb68da4c8700b",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {},
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log-beacon 2026-08-31-1596-the-mark-catches-up-at-the-door #mthtq6tw1hv7"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mthtq6tw1hv7"
+    },
+    {
+      "key": "dist",
+      "value": "2026-08-31-1596-the-mark-catches-up-at-the-door"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-beacon"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "parts",
+      "value": "11"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-08-31-1596-the-mark-catches-up-at-the-door"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "3"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-31T22:51:04.330059Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-31T22:51:06.194000Z",
+  "fingerprints": [
+    "8acce4aa9600981ded80999433591e5f"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1947025169,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-08-31T22:46:38.155000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-08-31-1596-the-mark-catches-up-at-the-door",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-08-31-1596-the-mark-catches-up-at-the-door",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-08-31-1596-the-mark-catches-up-at-the-door",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-08-31-1596-the-mark-catches-up-at-the-door)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "ba3aaa0e041e4095b2842f82301393a1",
+  "previousEventID": "441d0e97631b4e92a7dab59b043bc1f2"
+}

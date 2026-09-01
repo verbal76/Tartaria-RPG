@@ -1,0 +1,283 @@
+{
+  "id": "39856b2bb9b04384b6e9158a48cdd67f",
+  "groupID": "7703385193",
+  "eventID": "39856b2bb9b04384b6e9158a48cdd67f",
+  "projectID": "4511945117532160",
+  "size": 17661,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-31-1595-the-guide-and-the-ground-agree #mthspfn82jjo [inline 3/11]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-08-31-1595-the-guide-and-the-ground-agree",
+  "message": "player-log 2026-08-31-1595-the-guide-and-the-ground-agree #mthspfn82jjo [inline 3/11]",
+  "title": "player-log 2026-08-31-1595-the-guide-and-the-ground-agree #mthspfn82jjo [inline 3/11]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "4a0663c48ad543718f0735b697d51a29",
+      "span_id": "a8266e2fb9c67b6a",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "t comes loose, intact.\n[2026-08-31T21:48:51.561Z] [reward] \u2726 Salvage haul:\n[2026-08-31T21:48:51.561Z] [reward]     \u2022 Bent Nail x3 (Common)\n[2026-08-31T21:48:51.561Z] [reward]     \u2022 Scrap Metal x2 (Common)\n[2026-08-31T21:48:51.562Z] [reward]     \u2022 Aether Crystal x3 (Common)\n[2026-08-31T21:48:53.054Z] [debug] ui: tap \"\u2192 GREAT TARTARY PLAINS\"\n",
+      "[2026-08-31T21:48:53.074Z] [debug] spawn: gear=[Echoing Steps Boots] window=10 roster=new\n[2026-08-31T21:48:53.079Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Zann of No Fixed Stall, fence. Tap the vendor banner to trade.\n",
+      "[2026-08-31T21:48:53.090Z] [world] Rare workings for sale: Aetherforged Mantle (200 TC), Aetherforged Treads (200 TC), Aetheric Analyzer Helm (200 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n[2026-08-31T21:48:53.091Z] [world] You walk east through open silt. The compass points east into open ground.\n",
+      "[2026-08-31T21:48:53.092Z] [world] The loose end is exactly as loose as you left it.\n[2026-08-31T21:48:54.188Z] [debug] ui: tap \"take / salvage\"\n[2026-08-31T21:48:54.658Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 9640ms read/write unusable (native mis-reported 509650ms/1066ms \u2014 llama.rn split bug, not this call) in 761t\u2192out 23t (87ch)\n",
+      "[2026-08-31T21:48:54.816Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 9640ms \u2014 intro-fill:\u2205\n[2026-08-31T21:48:54.817Z] [debug] homework: scene_intro \"Reclaimer's Stake\" \u2205 9959ms\n[2026-08-31T21:48:55.579Z] [world] The Echoing Steps Boots was half under something. It is not now.\n[2026-08-31T21:48:55.580Z] [reward] \u2726 Echoing Steps Boots (Common).\n",
+      "[2026-08-31T21:48:56.484Z] [world] You strip the banner carefully. Something usable comes free in your hand.\n[2026-08-31T21:48:56.485Z] [world] You salvage the barrel. The take is small but real.\n[2026-08-31T21:48:56.485Z] [world] You strip the firepit carefully. Something usable comes free in your hand.\n",
+      "[Filtered]",
+      "[2026-08-31T21:48:56.486Z] [world] You work the signpost apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n[2026-08-31T21:48:56.486Z] [reward] \u2726 Salvage haul:\n[2026-08-31T21:48:56.487Z] [reward]     \u2022 Aetheric Shard (Uncommon)\n[2026-08-31T21:48:56.487Z] [reward]     \u2022 Worn Tartarian Coin x8 (Common)\n",
+      "[2026-08-31T21:48:56.487Z] [reward]     \u2022 Mud Fragment x2 (Common)\n[2026-08-31T21:48:56.487Z] [reward]     \u2022 Moth-Eaten Felt Scrap (Common)\n[2026-08-31T21:48:56.488Z] [reward]     \u2022 Smooth Stone x2 (Common)\n[2026-08-31T21:48:56.488Z] [reward]     \u2022 Oil-Stained Sash (Common)\n[2026-08-31T21:49:01.309Z] [player] Ask why the stall is here\n",
+      "[2026-08-31T21:49:01.312Z] [world] \"Stall goes up where the ground is flat and comes down when it is not worth it,\" the trader says. \"That is the whole business plan.\"\n[2026-08-31T21:49:01.315Z] [world] Zann of No Fixed Stall keeps facing the way they were going, and talks to you sideways.\n[2026-08-31T21:49:02.789Z] [world] You let the conversation go and Zann of No Fixed Stall gets back to it.\n",
+      "[2026-08-31T21:49:02.967Z] [debug] qwen\u23f1 flourish ok 2972ms read 2108ms/write 740ms in 176t\u2192out 10t 12.0ms/t (34ch)\n[2026-08-31T21:49:03.106Z] [debug] qwen\u23f1 \u2702 DISCARDED flourish after 2972ms \u2014 flourish:stale-walked-away\n[2026-08-31T21:49:03.108Z] [debug] flourish: stale 3282ms\n",
+      "[2026-08-31T21:49:12.193Z] [reward] Sold Short Hunting Bow (Common) to Zann of No Fixed Stall for 15 TC. (1634 TC on hand)\n[2026-08-31T21:49:12.242Z] [reward] \u2726 You named your price and held it. +1 CHA (base 5, 4 as you stand).\n[2026-08-31T21:49:12.292Z] [reward] Sold Mud Sling (Common) to Zann of No Fixed Stall for 14 TC. (1648 TC on hand)\n",
+      "[2026-08-31T21:49:12.336Z] [reward] Sold Aetherium Spear (Common) to Zann of No Fixed Stall for 14 TC. (1662 TC on hand)\n[2026-08-31T21:49:12.379Z] [reward] Sold Iron Spear (Common) to Zann of No Fixed Stall for 14 TC. (1676 TC on hand)\n[2026-08-31T21:49:12.423Z] [reward] Sold Bone Sling (Common) to Zann of No Fixed Stall for 14 TC. (1690 TC on hand)\n",
+      "[2026-08-31T21:49:12.466Z] [reward] Sold Repeater Rifle (Common) to Zann of No Fixed Stall for 14 TC. (1704 TC on hand)\n[2026-08-31T21:49:12.508Z] [reward] Sold Mud Heater Sword (Common) to Zann of No Fixed Stall for 14 TC. (1718 TC on hand)\n[2026-08-31T21:49:12.551Z] [reward] Sold Bone Maul (Common) to Zann of No Fixed Stall for 14 TC. (1732 TC on hand)\n",
+      "[2026-08-31T21:49:12.594Z] [reward] Sold Aetheric Bolt Gun (Common) to Zann of No Fixed Stall for 13 TC. (1745 TC on hand)\n[2026-08-31T21:49:12.636Z] [reward] Sold Repeater Crossbow (Common) to Zann of No Fixed Stall for 13 TC. (1758 TC on hand)\n[2026-08-31T21:49:12.680Z] [reward] Sold Echoing Steps Boots (Common) to Zann of No Fixed Stall for 13 TC. (1771 TC on hand)\n",
+      "[2026-08-31T21:49:12.723Z] [reward] Sold Sentinel's Chestplate (Common) to Zann of No Fixed Stall for 10 TC. (1781 TC on hand)\n[2026-08-31T21:49:12.766Z] [reward] Sold Stone-Stride Greaves (Common) to Zann of No Fixed Stall for 8 TC. (1789 TC on hand)\n[2026-08-31T21:49:12.809Z] [reward] Sold Arcane Guardian's Chestpiece (Common) to Zann of No Fixed Stall for 8 TC. (1797 TC on hand)\n",
+      "[2026-08-31T21:49:12.851Z] [reward] Sold Golem-Born Guardian Mask (Common) to Zann of No Fixed Stall for 8 TC. (1805 TC on hand)\n[2026-08-31T21:49:12.894Z] [reward] Sold Wanderer's Footwraps (Common) to Zann of No Fixed Stall for 6 TC. (1811 TC on hand)\n[2026-08-31T21:49:12.936Z] [reward] Sold Architect's Field Jacket (Common) to Zann of No Fixed Stall for 6 TC. (1817 TC on hand)\n",
+      "[Filtered]",
+      "[2026-08-31T21:49:13.103Z] [reward] Sold Bone Knife (Common) to Zann of No Fixed Stall for 6 TC. (1841 TC on hand)\n[2026-08-31T21:49:13.145Z] [reward] Sold Bone Knife (Common) to Zann of No Fixed Stall for 6 TC. (1847 TC on hand)\n[2026-08-31T21:49:13.187Z] [reward] Sold Architect's Aether Gloves (Common) to Zann of No Fixed Stall for 6 TC. (1853 TC on hand)\n",
+      "[2026-08-31T21:49:13.228Z] [reward] Sold Salvager's Worn Gloves (Common) to Zann of No Fixed Stall for 6 TC. (1859 TC on hand)\n[2026-08-31T21:49:13.269Z] [reward] Sold Bone Knife (Common) to Zann of No Fixed Stall for 6 TC. (1865 TC on hand)\n[2026-08-31T21:49:13.310Z] [reward] Sold Bone Knife (Common) to Zann of No Fixed Stall for 6 TC. (1871 TC on hand)\n",
+      "[2026-08-31T21:49:13.350Z] [reward] Sold Wanderer's Outercoat (Common) to Zann of No Fixed Stall for 6 TC. (1877 TC on hand)\n[2026-08-31T21:49:13.391Z] [reward] Sold Mud-Bound Cloak (Common) to Zann of No Fixed Stall for 5 TC. (1882 TC on hand)\n[2026-08-31T21:49:13.431Z] [reward] Sold Mud-Warden's Vest (Common) to Zann of No Fixed Stall for 5 TC. (1887 TC on hand)\n",
+      "[2026-08-31T21:49:13.472Z] [reward] Sold Mud-Warden's Vest (Common) to Zann of No Fixed Stall for 5 TC. (1892 TC on hand)\n[2026-08-31T21:49:13.512Z] [reward] Sold Mud-Bound Cloak (Common) to Zann of No Fixed Stall for 5 TC. (1897 TC on hand)\n[2026-08-31T21:49:13.552Z] [reward] Sold Reclaimer's Salvage Vest (Common) to Zann of No Fixed Stall for 5 TC. (1902 TC on hand)\n",
+      "[2026-08-31T21:49:13.592Z] [reward] Sold Reclaimer's Salvage Vest (Common) to Zann of No Fixed Stall for 5 TC. (1907 TC on hand)\n[2026-08-31T21:49:13.631Z] [reward] Sold Reclaimer's Salvage Vest (Common) to Zann of No Fixed Stall for 5 TC. (1912 TC on hand)\n[2026-08-31T21:49:13.670Z] [reward] Sold Mud-Warden's Vest (Common) to Zann of No Fixed Stall for 5 TC. (1917 TC on hand)\n",
+      "[2026-08-31T21:49:13.709Z] [reward] Sold Cudgel (Common) to Zann of No Fixed Stall for 3 TC. (1920 TC on hand)\n[2026-08-31T21:49:13.748Z] [reward] Sold Cudgel (Common) to Zann of No Fixed Stall for 1 TC. (1921 TC on hand)\n[2026-08-31T21:49:13.787Z] [reward] Sold Cudgel (Common) to Zann of No Fixed Stall for 1 TC. (1922 TC on hand)\n",
+      "[2026-08-31T21:49:24.738Z] [reward] Bought the Aetheric Analyzer Helm working for 200 TC. \u2726 Recipe learned (Rare)! Open Crafting to forge it \u2014 you'll still need the materials.\n[2026-08-31T21:49:24.911Z] [debug] persist sizes(KB): total=171 player=43 wm=72[rooms=32 events=3 memos=0 npcs=3 defeated=1 tags=1 discovered=0] log=53 scene=4\n",
+      "[2026-08-31T21:49:26.367Z] [reward] Bought the Aetherforged Treads working for 200 TC. \u2726 Recipe learned (Rare)! Open Crafting to forge it \u2014 you'll still need the materials.\n[2026-08-31T21:49:28.015Z] [reward] Bought the Aetherforged Mantle working for 200 TC. \u2726 Recipe learned (Rare)! Open Crafting to forge it \u2014 you'll still need the materials.\n",
+      "[2026-08-31T21:49:29.891Z] [debug] homework: intro-fill armed after 6561ms idle (strike 3/3)\n[2026-08-31T21:49:40.792Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 10896ms read 9577ms/write 1259ms in 763t\u2192out 33t 12.6ms/t HIT-CAP (148ch)\n[2026-08-31T21:49:40.806Z] [debug] homework: scene_intro \"Reclaimer's Stake\" \u2713 10916ms\n",
+      "[2026-08-31T21:52:43.789Z] [reward] Zann of No Fixed Stall fires up a portable Crucible for you. (\u221225 TC)\n[2026-08-31T21:52:48.987Z] [world] You set your reserved pieces on the three pedestals. The Crucible takes them in.\n[2026-08-31T21:52:48.991Z] [reward] \u2726 The Crucible forges a Rare piece of dog armor from your reserved pieces \u2014 and it's in your pack, still cooling.\n",
+      "[2026-08-31T21:52:48.992Z] [world] The Crucible exhales slow. The shape is set, but the Aether hasn't named it yet \u2014 let it finish. You'll know it the moment it announces itself.\n[2026-08-31T21:52:51.983Z] [debug] ui: tap \"inventory\"\n[2026-08-31T21:52:54.022Z] [debug] qwen\u23f1 forge_name ok 4864ms read 2453ms/write 2354ms in 196t\u2192out 63t 12.5ms/t HIT-CAP (235ch)\n",
+      "[2026-08-31T21:52:54.028Z] [reward] \u2726 The forging finishes \u2014 the Aether names it Vein-Threaded Cover (Rare).\n[2026-08-31T21:52:56.406Z] [debug] persist sizes(KB): total=174 player=43 wm=72[rooms=32 events=3 memos=0 npcs=3 defeated=1 tags=1 discovered=0] log=55 scene=4\n[2026-08-31T21:53:00.014Z] [reward] Zann of No Fixed Stall fires up a portable Crucible for you. (\u221225 TC)\n",
+      "[2026-08-31T21:53:01.784Z] [debug] qwen\u23f1 item_synthesis_hw ok 6675ms read 4246ms/write 2372ms in 328t\u2192out 61t 12.9ms/t (258ch)\n[2026-08-31T21:53:01.933Z] [debug] homework: item_desc \"Aetheric Scanner\" \u2713 6831ms\n",
+      "[2026-08-31T21:53:35.822Z] [reward] \u2726 The Crucible drinks the five pieces and works an extra resist channel into the Architect's Sight Enhancer. It can now hold one more worked-in resist. (Its armor rating is unchanged.)\n[2026-08-31T21:53:37.828Z] [reward] Zann of No Fixed Stall fires up a portable Crucible for you. (\u221225 TC)\n",
+      "[2026-08-31T21:53:44.487Z] [reward] \u2726 The Crucible drinks the five pieces and works an extra resist channel into the Aether-Walker's Boots. It can now hold one more worked-in resist. (Its armor rating is unchanged.)\n[2026-08-31T21:53:47.013Z] [reward] Zann of No Fixed Stall fires up a portable Crucible for you. (\u221225 TC)\n",
+      "[2026-08-31T21:53:53.608Z] [reward] \u2726 The Crucible drinks the five pieces and works an extra resist channel into the Litany Greaves. It can now hold one more worked-in resist. (Its armor rating is unchanged.)\n[2026-08-31T21:53:55.343Z] [reward] Zann of No Fixed Stall fires up a portable Crucible for you. (\u221225 TC)\n",
+      "[2026-08-31T21:54:00.759Z] [reward] \u2726 The Crucible drinks the five pieces and works an extra resist channel into the Forgotten Protector's Plate. It can now hold one more worked-in resist. (Its armor rating is unchanged.)\n[2026-08-31T21:54:05.648Z] [debug] ui: tap \"inventory\"\n",
+      "[2026-08-31T21:54:10.054Z] [debug] persist sizes(KB): total=173 player=41 wm=72[rooms=32 events=3 memos=0 npcs=3 defeated=1 tags=1 discovered=0] log=57 scene=4\n[2026-08-31T21:54:13.232Z] [debug] ui: tap \"craft\"\n[2026-08-31T21:54:16.005Z] [world] You repair the Aether-Walker's Boots. Back to full. (spent: Patched Cloth x4)\n",
+      "[2026-08-31T21:54:16.787Z] [world] You repair the Architect's Sight Enhancer. Back to full. (spent: Patched Cloth x4)\n[2026-08-31T21:54:18.120Z] [world] You repair the Acid-Etched Auralite Talon. Back to full. (spent: Small Rock x2)\n[2026-08-31T21:54:18.852Z] [world] You repair the Searing Bone Crossbow. Back to full. (spent: Scrap Metal x6, Stick x2)\n",
+      "[2026-08-31T21:54:19.419Z] [world] You repair the Reclaimer's Cloak. Back to full. (spent: Patched Cloth x4)\n[2026-08-31T21:54:20.194Z] [arbiter] The Arbiter nods. \"Patched in: Spider Silk \u2192 Patched Cloth.\"\n[2026-08-31T21:54:20.207Z] [world] You repair the Forgotten Protector's Plate. Back to full. (spent: Scrap Metal x6, Patched Cloth x4)\n",
+      "[2026-08-31T21:54:21.580Z] [debug] voice\u23f1 gap 1385ms (wait 1ms + synth 1262ms, live) \"Patched in: Spider Silk to Patched Cloth\u2026\"\n[2026-08-31T21:54:25.422Z] [player] craft Acid Flask\n[2026-08-31T21:54:25.423Z] [debug] parser: intent=craft conf=1.00 verb=craft target=acid flask resolved=Acid Flask range=- enemies=0 hooks=2\n",
+      "[2026-08-31T21:54:25.427Z] [reward] \u2726 Crafted Acid Flask. The Arbiter watches you set the last piece.\n[2026-08-31T21:54:25.605Z] [debug] persist sizes(KB): total=174 player=41 wm=71[rooms=32 events=3 memos=0 npcs=3 defeated=1 tags=1 discovered=0] log=59 scene=4\n[2026-08-31T21:54:25.627Z] [cognitive] neutral  (198ms)\n",
+      "[2026-08-31T21:54:27.339Z] [reward] \u2726 The aether under your skin has its own pulse now \u2014 Corrupted. (all stats \u22121, prices bump)\n[2026-08-31T21:54:27.340Z] [world] Black rain runs down your collar. Something in you tightens that should not have.\n[2026-08-31T21:54:27.370Z] [player] craft Acid Flask\n",
+      "[2026-08-31T21:54:27.370Z] [debug] parser: intent=craft conf=1.00 verb=craft target=acid flask resolved=Acid Flask range=- enemies=0 hooks=2\n[2026-08-31T21:54:27.373Z] [reward] \u2726 Crafted Acid Flask. The Arbiter watches you set the last piece.\n[2026-08-31T21:54:27.375Z] [debug] arbiter: template (reason=intent-not-allowed:craft)\n",
+      "[2026-08-31T21:54:27.375Z] [arbiter] The Arbiter looks around. \"Claim-posts driven in rows, each one a bet against the mud. The Guild plays long odds on purpose.\"\n[2026-08-31T21:54:27.376Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-31T21:54:27.501Z] [cognitive] neutral  (124ms)\n[2026-08-31T21:54:29.367Z] [player] craft Corruption Tonic\n",
+      "[2026-08-31T21:54:29.368Z] [debug] parser: intent=craft conf=1.00 verb=craft target=corruption tonic resolved=- range=- enemies=0 hooks=2\n[2026-08-31T21:54:29.370Z] [reward] \u2726 Crafted Corruption Tonic. The Arbiter watches you set the last piece.\n[2026-08-31T21:54:29.501Z] [cognitive] neutral  (129ms)\n[2026-08-31T21:54:32.221Z] [player] craft Corruption Tonic\n",
+      "[2026-08-31T21:54:32.221Z] [debug] parser: intent=craft conf=1.00 verb=craft target=cor"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-31-1595-the-guide-and-the-ground-agree #mthspfn82jjo [inline 3/11]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mthspfn82jjo"
+    },
+    {
+      "key": "dist",
+      "value": "2026-08-31-1595-the-guide-and-the-ground-agree"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "3"
+    },
+    {
+      "key": "parts",
+      "value": "11"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-08-31-1595-the-guide-and-the-ground-agree"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-31T22:42:23.766992Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "17": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 380,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        },
+        "6": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 265,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-31T22:42:25.657000Z",
+  "fingerprints": [
+    "ece55df05c8feabf8c9866621151307e"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1947017514,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-08-31T22:42:25.657000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-08-31-1595-the-guide-and-the-ground-agree",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-08-31-1595-the-guide-and-the-ground-agree",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-08-31-1595-the-guide-and-the-ground-agree",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-08-31-1595-the-guide-and-the-ground-agree)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "53f9d3d8a3ed4e8199ae6803ca3af5f4",
+  "previousEventID": "367438ffc45f4a7bb72ca5a68d99a87f"
+}

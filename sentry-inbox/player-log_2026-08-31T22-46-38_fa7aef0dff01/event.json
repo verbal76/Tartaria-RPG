@@ -1,0 +1,220 @@
+{
+  "id": "fa7aef0dff0147feaceb568cc991642f",
+  "groupID": "7703391021",
+  "eventID": "fa7aef0dff0147feaceb568cc991642f",
+  "projectID": "4511945117532160",
+  "size": 12638,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-31-1596-the-mark-catches-up-at-the-door #mthtq6tw1hv7 [inline 11/11]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-08-31-1596-the-mark-catches-up-at-the-door",
+  "message": "player-log 2026-08-31-1596-the-mark-catches-up-at-the-door #mthtq6tw1hv7 [inline 11/11]",
+  "title": "player-log 2026-08-31-1596-the-mark-catches-up-at-the-door #mthtq6tw1hv7 [inline 11/11]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "bb9892564cef49b79b57997fceb8e298",
+      "span_id": "bdb24ac85595b5e6",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      " plainly. \"I'm not sure what you're trying to tell me. I'll keep your note in the log either way. If you mean to act, phrase it as a verb \u2014 'investigate the rubble', 'go east', 'attack the figure'.\"\n[2026-08-31T22:13:52.998Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter studies you, plainly. \"I'm not sure what you're \u2026\"\n",
+      "[2026-08-31T22:13:52.998Z] [debug] meta-comment guard: skipped intent parse (engine-vocabulary: \"spawned\") on 216-char input\n[2026-08-31T22:13:59.657Z] [debug] send-log: #mthspfn82jjo \u2014 DELIVERED (inline, no attachments): beacon out, 11/11 parts accepted (156583 chars) \u2014 flush said yes\n",
+      "[2026-08-31T22:13:59.660Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mthspfn82jjo kept on disk, boots retry up to 5 sends total\n[2026-08-31T22:14:03.581Z] [debug] persist sizes(KB): total=220 player=49 wm=88[rooms=47 events=3 memos=0 npcs=3 defeated=1 tags=1 discovered=0] log=80 scene=3\n",
+      "[2026-08-31T22:14:08.551Z] [debug] voice\u23f1 gap 4172ms (wait 0ms + synth 4148ms, live) \"Choose your character.\"\n[2026-08-31T22:14:11.108Z] [debug] voice\u23f1 gap 1847ms (wait 1ms + synth 822ms, live) \"Choose your character.\"\n[2026-08-31T22:14:11.307Z] [debug] ctx: RELEASED \u2014 live=0 (opened=1 released=1)\n",
+      "[2026-08-31T22:14:25.880Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a059db-4717-7b20-ad78-4af69ad6a57b\n[2026-08-31T22:14:25.880Z] [debug] ota: Checking\u2026\n[2026-08-31T22:14:25.933Z] [debug] ota: Already up to date\n[2026-08-31T22:14:25.933Z] [debug] ota: boot check result = noUpdate\n",
+      "[2026-08-31T22:14:25.956Z] [debug] send-log: bundle #mthspfn82jjo held \u2014 only 27s since the last try (a restart, not a chance); 4 left\n[2026-08-31T22:14:25.994Z] [debug] voice: engine=bundled tts=on voice=am_michael\n[2026-08-31T22:14:25.994Z] [debug] voice: bundled loading\n[2026-08-31T22:14:29.572Z] [debug] voice: bundled ready\n",
+      "[2026-08-31T22:14:30.653Z] [debug] voice\u23f1 gap 1029ms (wait 123ms + synth 893ms, live) \"Choose your character.\"\n[2026-08-31T22:42:25.566Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a059db-4717-7b20-ad78-4af69ad6a57b\n[2026-08-31T22:42:25.567Z] [debug] ota: Checking\u2026\n[2026-08-31T22:42:25.617Z] [debug] ota: Already up to date\n",
+      "[2026-08-31T22:42:25.617Z] [debug] ota: boot check result = noUpdate\n[2026-08-31T22:42:25.678Z] [debug] voice: engine=bundled tts=on voice=am_michael\n[2026-08-31T22:42:25.678Z] [debug] voice: bundled loading\n[2026-08-31T22:42:25.910Z] [debug] send-log: bundle #mthspfn82jjo attempt 2/5 delivered to Sentry\n[2026-08-31T22:42:29.470Z] [debug] voice: bundled ready\n",
+      "[2026-08-31T22:42:30.525Z] [debug] voice\u23f1 gap 971ms (wait 108ms + synth 861ms, live) \"Choose your character.\"\n[2026-08-31T22:42:32.975Z] [debug] OTA session start: 2026-08-31-1595-the-guide-and-the-ground-agree.\n[2026-08-31T22:42:32.976Z] [world] You step back into Great Tartary Plains. The world waits for your move.\n",
+      "[2026-08-31T22:42:32.976Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. \"Welcome back, Cheddar Bob. The road kept your place.\"\n\n=== END LOG \u00b7 153020 CHARS ===\n\nTartaria Realms\n\nDevice\n  Name: Pixel 10 Pro XL\n  Platform: android 37\n  Hermes: yes\n  Locale: en-US\n  Timezone: America/New_York\n  Screen: window 443\u00d7986 / screen 443\u00d7986 @ 2.4375x density\n",
+      "  Captured at: 2026-08-31T22:42:33.519Z\n\nInstall\n  App ID: com.hotatticgames.tartarprim\n  App version: 4.32.11\n  APK build version: 2.4.1\n  APK build: 293\n  AAB: (build 293)\n  OTA: (2026-08-31-1595-the-guide-and-the-ground-agree)\n  Boot stage: qwen:deferred\n\nML runtime health\n  Status: active (no crashes detected)\n  Crash count: 0\n  Last init attempt: 2026-08-31T22:42:25.821Z\n",
+      "  Last init success: 2026-08-31T22:42:30.893Z\n  Crashes-before-disable threshold: 2\n  Qwen completion guard: clean (no completion crashes)\n  Qwen kernel variant: rnllama_v8_2_fp16_dotprod\n  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6",
+      ".6.118-android15-8-g1831c2a45d9b-ab15739706-4k\n  Voice (TTS) guard: clean (no voice crashes on this build)\nSave-load health\n  Status: clean (no load-crash flags)\nLast JS crash\n  Status: none recorded\nThis launch\n  Life: bmthtq0jbhw \u00b7 started 2026-08-31T22:42:25.463Z\n  Cold start \u2014 this boot did not follow an OTA apply\nCrash ledger \u2014 10 recorded (newest last)\n",
+      "  \u2022 2026-08-30T18:43:29.524Z (1679m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-30-1571-the-slot-moves-on \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: action \"rest\"\n      doing: action \"rest\" \u00b7 room great_tartary_plains \u00b7 screen exploration\n      last checkpoint: native:cognition:done [q0] \u00b7 80822ms into the action \u00b7 alive 0ms after it\n",
+      "  \u2022 2026-08-30T21:23:57.150Z (1519m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-30-1578-the-stage-says-who-is-there \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done [q0] \u00b7 535ms into the action \u00b7 alive 0ms after it\n",
+      "  \u2022 2026-08-30T22:25:39.849Z (1457m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-30-1580-the-guy-who-was-never-there \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done [q0] \u00b7 329ms into the action \u00b7 alive 0ms after it\n",
+      "  \u2022 2026-08-30T23:42:09.758Z (1380m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-30-1581-the-card-they-cannot-walk-past \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done [q0] \u00b7 414ms into the action \u00b7 alive 0ms after it\n",
+      "  \u2022 2026-08-31T00:21:58.332Z (1341m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-30-1582-the-guy-who-gives-you-the-job \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done [q0] \u00b7 383ms into the action \u00b7 alive 0ms after it\n",
+      "  \u2022 2026-08-31T03:45:02.432Z (1138m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-31-1586-the-slate-in-every-part \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done [q0] \u00b7 541ms into the action \u00b7 alive 0ms after it\n",
+      "  \u2022 2026-08-31T12:34:47.772Z (608m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-31-1589-the-pin-comes-home \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done [q0] \u00b7 578ms into the action \u00b7 alive 0ms after it\n",
+      "      launch: died 892ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-08-31T14:24:08.210Z (498m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-31-1592-the-events-say-which-build \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n",
+      "      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done [q0] \u00b7 508ms into the action \u00b7 alive 0ms after it\n      launch: died 859ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-08-31T17:38:34.699Z (304m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-31-1594-the-pinch-demands-the-lift \u00b7 stage boot:qwen:deferred\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: boot:qwen:deferred \u00b7 893ms into the action \u00b7 alive 0ms after it\n      launch: died 941ms into the process \u00b7 not an OTA-apply boot\n",
+      "      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-08-31T22:14:31.073Z (28m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-31-1595-the-guide-and-the-ground-agree \u00b7 stage boot:qwen:deferred\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n",
+      "      last checkpoint: boot:qwen:deferred \u00b7 5207ms into the action \u00b7 alive 0ms after it\n      launch: died 5302ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\nCrash delivery: ON \u2014 reports go to Sentry when you crash.\nRuntime pressure\n  \u26a0\u26a0 LAST BOOT DIED MID-ACTION \u2014 no orderly exit was recorded.\n     Last thing the app did: (no action yet)\n",
+      "     Where: (unknown) on (unknown) screen\n     Last seen alive: 2026-08-31T22:14:31.073Z (28 min before this boot \u2014 the kill landed somewhere in that gap)\n     Last checkpoint reached: boot:qwen:deferred (+5207ms after it)\n     \u26a0 The disk log's tail is UNRELIABLE for that session \u2014 batched lines\n       die in memory when the JS thread wedges. Trust this line over it.\n",
+      "  Memory warnings: none this session\n  Freeze watch: no stalls seen (JS clocks only \u2014 see the native queue below)\n  Native queue: worst wait 0.0s \u00b7 0 job kinds queued >3s \u00b7 worst 0.0ms/prompt-token\n  App state trail: (none recorded)\nModel contexts\n  Live now: 0\n  Opened: 0 \u00b7 Released: 0 \u00b7 Peak live: 0\n  Narration engine: idle\n"
+    ],
+    "chunkChars": 9535
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-31-1596-the-mark-catches-up-at-the-door #mthtq6tw1hv7 [inline 11/11]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mthtq6tw1hv7"
+    },
+    {
+      "key": "dist",
+      "value": "2026-08-31-1596-the-mark-catches-up-at-the-door"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "11"
+    },
+    {
+      "key": "parts",
+      "value": "11"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-08-31-1596-the-mark-catches-up-at-the-door"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-31T22:46:36.323222Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-31T22:46:38.156000Z",
+  "fingerprints": [
+    "bc20a2851d968276b9d71edc1b5cbccb"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1947025169,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-08-31T22:46:38.155000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-08-31-1596-the-mark-catches-up-at-the-door",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-08-31-1596-the-mark-catches-up-at-the-door",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-08-31-1596-the-mark-catches-up-at-the-door",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-08-31-1596-the-mark-catches-up-at-the-door)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "5a18e25eff0b4720a6f87b248623285c",
+  "previousEventID": "d9794ab3401e40d6ba0d12501ab81f69"
+}

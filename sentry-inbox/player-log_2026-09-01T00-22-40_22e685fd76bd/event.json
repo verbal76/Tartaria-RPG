@@ -1,0 +1,255 @@
+{
+  "id": "22e685fd76bd47df9e0aeae72a8ff5d6",
+  "groupID": "7703506205",
+  "eventID": "22e685fd76bd47df9e0aeae72a8ff5d6",
+  "projectID": "4511945117532160",
+  "size": 17836,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-31-1597-the-tile-is-the-trigger #mthxaxji3kq3 [inline 5/22]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-08-31-1597-the-tile-is-the-trigger",
+  "message": "player-log 2026-08-31-1597-the-tile-is-the-trigger #mthxaxji3kq3 [inline 5/22]",
+  "title": "player-log 2026-08-31-1597-the-tile-is-the-trigger #mthxaxji3kq3 [inline 5/22]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "00abe10a994849faba85894bf4c17d3c",
+      "span_id": "8bc29c3221eefe59",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "d (budget \u2014 one per tile, 25s apart)\n[2026-08-31T21:55:40.736Z] [cognitive] neutral  (134ms)\n[2026-08-31T21:55:41.185Z] [debug] ui: tap \"\u2192 GREAT TARTARY PLAINS\"\n[2026-08-31T21:55:41.210Z] [debug] spawn: gear=[Sentinel's Repair Cap, Bone Knife, Mud Shell] window=10 roster=new\n[2026-08-31T21:55:41.212Z] [world] You walk east through open silt. The compass points east into open ground.\n",
+      "[2026-08-31T21:55:41.214Z] [world] It sits where it sat. Patient is the wrong word \u2014 it simply does not move.\n[2026-08-31T21:55:42.226Z] [debug] qwen\u23f1 investigate_lore ok 1501ms read 315ms/write 1134ms in 126t\u2192out 31t 2.5ms/t (142ch)\n[2026-08-31T21:55:42.495Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-31T21:55:43.607Z] [world] Whatever the Throwing Knife was lying against, it lets go without much argument.\n[2026-08-31T21:55:43.608Z] [reward] \u2726 Throwing Knife (Common).\n[2026-08-31T21:55:43.628Z] [world] The Mud Shell is heavier than it looks. Most things down here are.\n[2026-08-31T21:55:43.629Z] [reward] \u2726 Mud Shell (Common).\n",
+      "[2026-08-31T21:55:43.630Z] [world] The Sentinel's Repair Cap is lighter than it looks, which is its own kind of warning.\n[2026-08-31T21:55:43.630Z] [reward] \u2726 Sentinel's Repair Cap (Common).\n[2026-08-31T21:55:44.348Z] [world] The Scrap Metal is cold through your glove.\n[2026-08-31T21:55:44.349Z] [reward] \u2726 Scrap Metal (Common).\n",
+      "[2026-08-31T21:55:45.205Z] [world] You work the bedroll over. A part of it comes loose, intact.\n[2026-08-31T21:55:45.206Z] [world] You work the jagged ruined skyscraper apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n[2026-08-31T21:55:45.206Z] [world] You strip the shattered tartarian relay carefully. Something usable comes free in your hand.\n",
+      "[2026-08-31T21:55:45.207Z] [reward] \u2726 Salvage haul:\n[2026-08-31T21:55:45.207Z] [reward]     \u2022 Cloth Scrap (Common)\n[2026-08-31T21:55:45.208Z] [reward]     \u2022 Horn-Capped Dowel (Common)\n[2026-08-31T21:55:45.208Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-08-31T21:55:46.336Z] [debug] ui: tap \"investigate\"\n[2026-08-31T21:55:47.732Z] [player] investigate still pond\n",
+      "[2026-08-31T21:55:47.733Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=pond resolved=still pond range=- enemies=0 hooks=2\n[2026-08-31T21:55:47.735Z] [world] The still pond resists your reading. Not hostile \u2014 just closed. Some things in the buried world don't open for the curious.\n[2026-08-31T21:55:47.867Z] [cognitive] SWIM  (130ms)\n",
+      "[2026-08-31T21:55:48.805Z] [debug] ui: tap \"\u2192 GREAT TARTARY PLAINS\"\n[2026-08-31T21:55:48.833Z] [debug] spawn: gear=[Arcane Observer's Circlet] window=10 roster=new\n[2026-08-31T21:55:48.836Z] [combat] The aether under your skin draws something out \u2014 Jade Serpent forms from the haze.\n[2026-08-31T21:55:48.837Z] [world] You walk east through open silt. The compass points east into open ground.\n",
+      "[2026-08-31T21:55:48.837Z] [world] Your eye goes back to it before you decide to look.\n[2026-08-31T21:55:49.123Z] [debug] qwen\u23f1 investigate_lore ok 1152ms read 330ms/write 769ms in 127t\u2192out 21t 2.6ms/t (100ch)\n[2026-08-31T21:55:49.750Z] [debug] persist sizes(KB): total=200 player=41 wm=73[rooms=33 events=3 memos=0 npcs=3 defeated=1 tags=1 discovered=0] log=82 scene=3\n",
+      "[2026-08-31T21:55:51.820Z] [debug] ui: tap \"flee\"\n[2026-08-31T21:55:51.830Z] [player] flee\n[2026-08-31T21:55:51.831Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=mid enemies=1 hooks=2\n[2026-08-31T21:55:51.900Z] [system] \u23f3 Time passed: 15 min\n[2026-08-31T21:55:52.107Z] [cognitive] FEAR \u00b7 RETREAT \u00b7 HIDE  (205ms)\n",
+      "[2026-08-31T21:55:53.823Z] [debug] skillcheck: escape d20=13 DEX 23 = 36 vs Pursuit 18 \u2014 Jade Serpent (d20 9 + SPD 9) \u2192 PASS\n[2026-08-31T21:55:53.888Z] [debug] stats: STR10 DEX23 INT10 WIS10 CHA4 STE5 | gear: WIS+4,INT+2,DEX+15,STR+5,STE+2 | worn: main=Auralite Talon off=Bone Crossbow head=Architect's Sight Enhancer chest=Forgotten Protector's Plate hands=Relic Hunter's Gauntlets legs=Litany Greav",
+      "es feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n[2026-08-31T21:55:53.888Z] [debug] train: dexterity (escape check) \u2192 progress 20/100\n[2026-08-31T21:55:53.889Z] [world] You break away across the open ground. Behind you the thing you ran from gives up the chase.\n[2026-08-31T21:55:56.103Z] [debug] ui: tap \"\u2192 GREAT TARTARY PLAINS\"\n",
+      "[2026-08-31T21:55:56.108Z] [debug] spawn: gear=[Hardened Titan's Chestplate] window=10 roster=new\n[2026-08-31T21:55:56.109Z] [world] Someone is sitting on their pack at the edge of the path \u2014 no party, no fire, and a long way from anywhere. They stand when they see you.\n[2026-08-31T21:55:56.109Z] [system] Try \"talk to the traveler\" \u2014 they want something from you.\n",
+      "[2026-08-31T21:55:56.109Z] [world] You walk east through open silt. The compass points east into open ground.\n[2026-08-31T21:55:56.110Z] [world] You catch the same grey cloak in the corner of your eye for the third time today. The figure does not pretend not to be following. They want you to know they are there. When they finally close the distance their hand is already inside their coat. A Mud Mo",
+      "narch agent \u2014 Black Cloak division, the kind that does not arrest people because the Monarchs do not arrest people.\n[2026-08-31T21:55:56.111Z] [combat] Mud Monarch closes \u2014 Royal Slash ready, 3D6 damage on a hit. (range: close)\n[2026-08-31T21:55:56.116Z] [world] You had a question here. You still have it.\n[2026-08-31T21:55:58.211Z] [debug] ui: tap \"flee\"\n",
+      "[2026-08-31T21:55:58.217Z] [world] Black rain runs down your collar. Something in you tightens that should not have.\n[2026-08-31T21:55:58.222Z] [player] flee\n[2026-08-31T21:55:58.222Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=close enemies=1 hooks=3\n[2026-08-31T21:55:58.282Z] [system] \u23f3 Time passed: 15 min\n",
+      "[2026-08-31T21:55:58.472Z] [cognitive] FEAR \u00b7 RETREAT \u00b7 HIDE  (189ms)\n[2026-08-31T21:56:00.617Z] [debug] skillcheck: escape d20=1 DEX 23 = 24 vs Pursuit 12 \u2014 Mud Monarch (d20 5 + SPD 7) \u2192 PASS\n[2026-08-31T21:56:00.691Z] [debug] stats: STR10 DEX23 INT10 WIS10 CHA4 STE5 | gear: WIS+4,INT+2,DEX+15,STR+5,STE+2 | worn: main=Auralite Talon off=Bone Crossbow head=Architect's Sight Enhancer chest=Forgotte",
+      "n Protector's Plate hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n[2026-08-31T21:56:00.691Z] [debug] train: dexterity (escape check) \u2192 progress 22/100\n[2026-08-31T21:56:00.692Z] [world] You get your legs under you and go, and it does not follow far.\n",
+      "[2026-08-31T21:56:01.856Z] [debug] ui: tap \"take / salvage\"\n[2026-08-31T21:56:03.344Z] [world] The Hardened Titan's Chestplate fits the hand better than it has any right to.\n[2026-08-31T21:56:03.345Z] [reward] \u2726 Hardened Titan's Chestplate (Common).\n[2026-08-31T21:56:04.201Z] [world] You turn the Scrap Metal over once, then keep it.\n[2026-08-31T21:56:04.202Z] [reward] \u2726 Scrap Metal (Common).\n",
+      "[2026-08-31T21:56:05.121Z] [reward] \u2726 Found Verse Three \u2014 The Siren of Zharak's Teeth. (open Contracts \u2192 Collectibles to read)\n[2026-08-31T21:56:05.138Z] [world] You strip the jagged ruined skyscraper carefully. Something usable comes free in your hand.\n[2026-08-31T21:56:05.139Z] [world] You strip the marker carefully. Something usable comes free in your hand.\n",
+      "[Filtered]",
+      "[2026-08-31T21:56:05.141Z] [reward]     \u2022 Worn Tartarian Coin x2 (Common)\n[2026-08-31T21:56:05.141Z] [reward]     \u2022 Mud Fragment x3 (Common)\n[2026-08-31T21:56:05.142Z] [reward]     \u2022 Copper Wire Spool (Uncommon)\n[2026-08-31T21:56:06.626Z] [debug] ui: tap \"investigate\"\n[2026-08-31T21:56:08.081Z] [player] investigate the mud\n",
+      "[2026-08-31T21:56:08.082Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=mud range=- enemies=0 hooks=3\n[2026-08-31T21:56:08.083Z] [world] You inspect the mud. Whatever was here once, this is what remains.\n[2026-08-31T21:56:08.084Z] [world] A wild onion grows beside the mud, papery skin and all.\n[2026-08-31T21:56:08.084Z] [reward] \u2726 Wild Onion (Common).\n",
+      "[2026-08-31T21:56:08.087Z] [world] Mud Scanner reads flat. Nothing in the mud.\n[2026-08-31T21:56:08.088Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-31T21:56:08.088Z] [arbiter] The Arbiter looks around. \"Claim-posts driven in rows, each one a bet against the mud. The Guild plays long odds on purpose.\"\n",
+      "[2026-08-31T21:56:08.088Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter looks around. \"Claim-posts driven in rows, each \u2026\"\n[2026-08-31T21:56:08.088Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-31T21:56:08.226Z] [cognitive] SWIM  (137ms)\n",
+      "[2026-08-31T21:56:08.418Z] [debug] persist sizes(KB): total=206 player=42 wm=79[rooms=39 events=3 memos=0 npcs=3 defeated=1 tags=1 discovered=0] log=82 scene=3\n[2026-08-31T21:56:09.347Z] [player] investigate still pond\n[2026-08-31T21:56:09.348Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=pond resolved=still pond range=- enemies=0 hooks=3\n",
+      "[2026-08-31T21:56:09.350Z] [world] The still pond resists your reading. Not hostile \u2014 just closed. Some things in the buried world don't open for the curious.\n[2026-08-31T21:56:09.351Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-31T21:56:09.352Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-08-31T21:56:09.352Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-31T21:56:09.486Z] [cognitive] SWIM  (133ms)\n[2026-08-31T21:56:09.926Z] [debug] ui: tap \"\u2192 GREAT TARTARY PLAINS\"\n[2026-08-31T21:56:09.946Z] [debug] spawn: gear=[Mud-Treader's Greaves, Shaman's Mud Helm] window=10 roster=new\n",
+      "[2026-08-31T21:56:09.949Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Wysh Coincatcher, fence. Tap the vendor banner to trade.\n[2026-08-31T21:56:09.960Z] [world] Rare workings for sale: Sickening Light (200 TC), Stormcaller (200 TC), Titan's Iron Band (200 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or ",
+      "golem \u2014 just ask.\n[2026-08-31T21:56:09.961Z] [world] You walk east through open silt. The compass points east into open ground.\n[2026-08-31T21:56:09.964Z] [world] Some part of you has been keeping the place bookmarked.\n[2026-08-31T21:56:10.596Z] [debug] qwen\u23f1 investigate_lore ok 1001ms read 0ms/write 985ms in 127t\u2192out 26t (125ch)\n[2026-08-31T21:56:11.026Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-31T21:56:12.472Z] [world] The Mud-Treader's Greaves comes away clean.\n[2026-08-31T21:56:12.473Z] [reward] \u2726 Mud-Treader's Greaves (Common).\n[2026-08-31T21:56:12.492Z] [world] It takes two pulls. The Shaman's Mud Helm is yours on the second.\n[2026-08-31T21:56:12.492Z] [reward] \u2726 Shaman's Mud Helm (Common).\n[2026-08-31T21:56:13.284Z] [world] The Climbing Rope resists, then does not.\n",
+      "[2026-08-31T21:56:13.285Z] [reward] \u2726 Climbing Rope (Common).\n[2026-08-31T21:56:14.147Z] [world] You lever something loose from the bedroll \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n[2026-08-31T21:56:14.147Z] [world] You scavenge the crate thoroughly. One Bent Nail survives the sorting.\n[2026-08-31T21:56:14.148Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-08-31T21:56:14.148Z] [reward]     \u2022 Salvager's Tether Loop (Uncommon)\n[2026-08-31T21:56:14.148Z] [reward]     \u2022 Bent Nail (Common)\n[2026-08-31T21:56:16.927Z] [player] Ask why the stall is here\n[2026-08-31T21:56:16.929Z] [world] \"Stall goes up where the ground is flat and comes down when it is not worth it,\" the trader says. \"That is the whole business plan.\"\n",
+      "[2026-08-31T21:56:16.932Z] [world] Wysh Coincatcher looks at the road behind you before they answer anything at all.\n[2026-08-31T21:56:18.027Z] [world] You let the conversation go and Wysh Coincatcher gets back to it.\n[2026-08-31T21:56:18.811Z] [debug] qwen\u23f1 flourish ok 2823ms read 2184ms/write 618ms in 175t\u2192out 16t 12.5ms/t (61ch)\n",
+      "[2026-08-31T21:56:18.966Z] [debug] qwen\u23f1 \u2702 DISCARDED flourish after 2823ms \u2014 flourish:stale-walked-away\n[2026-08-31T21:56:18.966Z] [debug] flourish: stale 3138ms\n[2026-08-31T21:56:23.410Z] [reward] Sold Mud Darts (Common) to Wysh Coincatcher for 14 TC. (1245 TC on hand)\n[2026-08-31T21:56:23.458Z] [reward] Sold Throwing Knife (Common) to Wysh Coincatcher for 14 TC. (1259 TC on hand)\n",
+      "[2026-08-31T21:56:23.494Z] [reward] Sold Hardened Titan's Chestplate (Common) to Wysh Coincatcher for 10 TC. (1269 TC on hand)\n[2026-08-31T21:56:23.534Z] [reward] Sold Sentinel's Repair Cap (Common) to Wysh Coincatcher for 6 TC. (1275 TC on hand)\n[2026-08-31T21:56:23.569Z] [reward] Sold Mud-Treader's Greaves (Common) to Wysh Coincatcher for 6 TC. (1281 TC on hand)\n",
+      "[2026-08-31T21:56:23.604Z] [reward] Sold Shaman's Mud Helm (Common) to Wysh Coincatcher for 6 TC. (1287 TC on hand)\n[2026-08-31T21:56:25.425Z] [debug] persist sizes(KB): total=201 player=41 wm=75[rooms=33 events=3 memos=0 npcs=3 defeated=1 tags=1 discovered=0] log=81 scene=4\n",
+      "[2026-08-31T21:56:32.313Z] [reward] Bought the Titan's Iron Band working for 200 TC. \u2726 Recipe learned (Rare)! Open Crafting to forge it \u2014 you'll still need the materials.\n[2026-08-31T21:56:34.107Z] [reward] Bought the Stormcaller working for 200 TC. \u2726 Recipe learned (Rare)! Open Crafting to forge it \u2014 you'll still need the materials.\n",
+      "[2026-08-31T21:56:35.704Z] [reward] Bought the Sickening Light working for 200 TC. \u2726 Recipe learned (Rare)! Open Crafting to forge it \u2014 you'll still need the materials.\n[2026-08-31T21:56:39.170Z] [reward] Bought 3\u00d7 Trail Rations from Wysh Coincatcher for 24 TC (5 base + 15% corruption). (663 TC left)\n[2026-08-31T21:57:59.003Z] [debug] appstate: active \u2192 background (was active for 1181982ms)\n",
+      "[2026-08-31T21:57:59.333Z] [debug] appstate: background \u2192 active (was background for 330ms)\n[2026-08-31T21:58:35.686Z] [debug] appstate: active \u2192 background (was active for 36353ms)\n[2026-08-31T22:01:11.951Z] [debug] appstate: background \u2192 active (was background for 156265ms)\n",
+      "[2026-08-31T22:01:14.001Z] [debug] persist sizes(KB): total=201 player=41 wm=75[rooms=33 events=3 memos=0 npcs=3 defeated=1 tags=1 discovered=0] log=81 scene=4\n[2026-08-31T22:01:15.312Z] [debug] appstate: active \u2192 background (was active for 3361ms)\n[2026-08-31T22:01:43.465Z] [debug] appstate: background \u2192 active (was background for 28151ms)\n[2026-08-31T22:01:46.602Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-08-31T22:01:48.134Z] [player] investigate still pond\n[2026-08-31T22:01:48.137Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=pond resolved=still pond range=- enemies=0 hooks=3\n[2026-08-31T22:01:48.140Z] [world] The still pond resists your reading. Not hostile \u2014 just close"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-31-1597-the-tile-is-the-trigger #mthxaxji3kq3 [inline 5/22]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mthxaxji3kq3"
+    },
+    {
+      "key": "dist",
+      "value": "2026-08-31-1597-the-tile-is-the-trigger"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "5"
+    },
+    {
+      "key": "parts",
+      "value": "22"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-08-31-1597-the-tile-is-the-trigger"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-01T00:22:38.657245Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "20": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 338,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-01T00:22:40.227000Z",
+  "fingerprints": [
+    "19d6f357b4c9ee47ab81ae8539a6c03c"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1947146650,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-01T00:14:36.323000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-08-31-1597-the-tile-is-the-trigger",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-08-31-1597-the-tile-is-the-trigger",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-08-31-1597-the-tile-is-the-trigger",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-08-31-1597-the-tile-is-the-trigger)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "25058faf9546495e8791d97f7ab3c1af",
+  "previousEventID": "1c9b702b24ac45fd9b0903d1c82b19bc"
+}

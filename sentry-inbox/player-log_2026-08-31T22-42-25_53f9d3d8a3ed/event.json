@@ -1,0 +1,260 @@
+{
+  "id": "53f9d3d8a3ed4e8199ae6803ca3af5f4",
+  "groupID": "7703385193",
+  "eventID": "53f9d3d8a3ed4e8199ae6803ca3af5f4",
+  "projectID": "4511945117532160",
+  "size": 17904,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-31-1595-the-guide-and-the-ground-agree #mthspfn82jjo [inline 6/11]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-08-31-1595-the-guide-and-the-ground-agree",
+  "message": "player-log 2026-08-31-1595-the-guide-and-the-ground-agree #mthspfn82jjo [inline 6/11]",
+  "title": "player-log 2026-08-31-1595-the-guide-and-the-ground-agree #mthspfn82jjo [inline 6/11]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "4a0663c48ad543718f0735b697d51a29",
+      "span_id": "a8266e2fb9c67b6a",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "d. Some things in the buried world don't open for the curious.\n[2026-08-31T22:01:48.141Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-31T22:01:48.142Z] [arbiter] The Arbiter looks around. \"The tally-board lists marked ruins in grease-pencil: DUG, DIGGING, DEEP, LATER. 'Later' is doing heavy work.\"\n",
+      "[2026-08-31T22:01:48.142Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-31T22:01:49.389Z] [player] investigate ladder\n[2026-08-31T22:01:49.390Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ladder resolved=ladder range=- enemies=0 hooks=3\n[2026-08-31T22:01:49.391Z] [world] The ladder reads as ordinary, which down here is a small kind of relief. You leave it be.\n",
+      "[2026-08-31T22:01:49.392Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-31T22:01:50.034Z] [debug] ui: tap \"\u2192 GREAT TARTARY PLAINS\"\n[2026-08-31T22:01:50.054Z] [debug] spawn: gear=[Explorer's Worn Headgear, Aetheric Baton] window=10 roster=new\n",
+      "[2026-08-31T22:01:50.061Z] [world] You walk east through open silt. The compass tells you Zharak's Teeth lies further east \u2014 8 tiles, about 20 hours of travel.\n[2026-08-31T22:01:50.063Z] [world] Footsteps behind you the wrong way \u2014 too close, too fast. A Silt Thief peels out of a side passage, hand already in your line of sight where your coin-pouch hangs. They thought you'd sleep deeper than you ",
+      "did.\n[2026-08-31T22:01:50.065Z] [combat] Silt Thief closes \u2014 Quick Knife ready, 1D8 damage on a hit. (range: close)\n[2026-08-31T22:01:50.072Z] [world] You catch yourself checking, the way you check a pocket you already know is empty.\n[2026-08-31T22:01:52.178Z] [debug] ui: tap \"flee\"\n[2026-08-31T22:01:52.182Z] [player] flee\n",
+      "[2026-08-31T22:01:52.182Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=close enemies=1 hooks=3\n[2026-08-31T22:01:52.228Z] [system] \u23f3 Time passed: 15 min\n[2026-08-31T22:01:52.393Z] [debug] qwen\u23f1 investigate_lore ok 4127ms read 1830ms/write 2050ms in 127t\u2192out 19t 14.4ms/t (94ch)\n",
+      "[2026-08-31T22:01:53.820Z] [debug] qwen\u23f1 investigate_lore ok 4301ms wait 3144ms read 263ms/write 872ms in 126t\u2192out 28t 2.1ms/t (148ch)\n[2026-08-31T22:01:54.922Z] [debug] skillcheck: escape d20=18 DEX 23 = 41 vs Pursuit 9 \u2014 Silt Thief (d20 2 + SPD 7) \u2192 PASS\n",
+      "[2026-08-31T22:01:54.978Z] [debug] stats: STR10 DEX23 INT10 WIS10 CHA4 STE5 | gear: WIS+4,INT+2,DEX+15,STR+5,STE+2 | worn: main=Auralite Talon off=Bone Crossbow head=Architect's Sight Enhancer chest=Forgotten Protector's Plate hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n",
+      "[2026-08-31T22:01:54.979Z] [debug] train: dexterity (escape check) \u2192 progress 24/100\n[2026-08-31T22:01:54.979Z] [world] Three long strides and the distance is yours to keep.\n[2026-08-31T22:01:54.980Z] [arbiter] The Arbiter looks around. \"The winch rig groans all day. What comes up on the hook decides the evening's mood.\"\n[2026-08-31T22:01:55.870Z] [debug] ui: tap \"rest\"\n",
+      "[2026-08-31T22:01:55.879Z] [player] rest\n[2026-08-31T22:01:55.880Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=3\n[2026-08-31T22:01:55.881Z] [world] Soot turns twice, thinks about a third, and drops where she stands.\n[2026-08-31T22:01:55.881Z] [world] You rest for 8 hours. +6 HP, +8 stamina recovered. (Day 36, morning)\n",
+      "[2026-08-31T22:01:55.882Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-31T22:01:55.891Z] [debug] arbiter: template (reason=intent-not-allowed:rest)\n[2026-08-31T22:01:55.891Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T22:01:55.892Z] [system] \u23f3 Time passed: 8h\n[2026-08-31T22:01:56.011Z] [cognitive] REST  (118ms)\n",
+      "[2026-08-31T22:01:56.603Z] [debug] ui: tap \"rest\"\n[2026-08-31T22:01:56.615Z] [player] rest\n[2026-08-31T22:01:56.616Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=3\n[2026-08-31T22:01:56.617Z] [world] Soot paws the ground flat before trusting it, then folds down onto it.\n",
+      "[2026-08-31T22:01:56.617Z] [world] You rest for 8 hours. +6 HP, +6 stamina recovered. (Day 36, afternoon)\n[2026-08-31T22:01:56.617Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-31T22:01:56.618Z] [world] You wake briefly. The Aetheric haze has cleared enough that for a heartbeat you can see further than usual.\n[2026-08-31T22:01:56.626Z] [system] \u23f3 Time passed: 8h\n",
+      "[2026-08-31T22:01:56.741Z] [cognitive] REST  (114ms)\n[2026-08-31T22:01:57.031Z] [debug] persist sizes(KB): total=199 player=41 wm=74[rooms=34 events=3 memos=0 npcs=3 defeated=1 tags=1 discovered=0] log=81 scene=3\n[2026-08-31T22:01:58.021Z] [debug] ui: tap \"take / salvage\"\n[2026-08-31T22:01:59.091Z] [world] You brace a foot and the Aetheric Baton gives.\n",
+      "[2026-08-31T22:01:59.092Z] [reward] \u2726 Aetheric Baton (Common).\n[2026-08-31T22:01:59.107Z] [world] One good tug and the Explorer's Worn Headgear is out.\n[2026-08-31T22:01:59.107Z] [reward] \u2726 Explorer's Worn Headgear (Common).\n[2026-08-31T22:01:59.886Z] [world] You break the jagged ruined skyscraper apart. Among the pieces, something worth keeping.\n",
+      "[Filtered]",
+      "[2026-08-31T22:01:59.887Z] [reward] \u2726 Salvage haul:\n[2026-08-31T22:01:59.887Z] [reward]     \u2022 Bent Nail x4 (Common)\n[2026-08-31T22:01:59.887Z] [reward]     \u2022 Flint-and-Twine Bundle (Common)\n[2026-08-31T22:01:59.888Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-08-31T22:02:01.654Z] [debug] ui: tap \"\u2192 GREAT TARTARY PLAINS\"\n",
+      "[2026-08-31T22:02:01.665Z] [debug] spawn: gear=[Wanderer's Worn Gauntlets] window=10 roster=new\n[2026-08-31T22:02:01.666Z] [world] You walk east through open silt. The compass tells you Zharak's Teeth lies further east \u2014 7 tiles, about 18 hours of travel.\n[2026-08-31T22:02:01.667Z] [world] The thought you set down here is right where you set it down.\n",
+      "[2026-08-31T22:02:03.022Z] [debug] ui: tap \"take / salvage\"\n[2026-08-31T22:02:04.193Z] [world] The Wanderer's Worn Gauntlets leaves a shape behind it in the mud, filling slowly.\n[2026-08-31T22:02:04.194Z] [reward] \u2726 Wanderer's Worn Gauntlets (Common).\n[2026-08-31T22:02:05.206Z] [world] You work the anvil post over. A part of it comes loose, intact.\n",
+      "[2026-08-31T22:02:05.206Z] [world] The bedroll yields little of value, though a Bone Sliver ends up in your pack.\n[2026-08-31T22:02:05.207Z] [world] Tucked inside the cart: an oddment that matches no quartermaster's list. The kind of thing that fuses well.\n[2026-08-31T22:02:05.207Z] [world] You strip the shattered tartarian relay carefully. Something usable comes free in your hand.\n",
+      "[2026-08-31T22:02:05.207Z] [world] You strip the stone marker carefully. Something usable comes free in your hand.\n[2026-08-31T22:02:05.208Z] [reward] \u2726 Salvage haul:\n[2026-08-31T22:02:05.208Z] [reward]     \u2022 Scrap Metal x2 (Common)\n[2026-08-31T22:02:05.208Z] [reward]     \u2022 Bone Sliver (Common)\n[2026-08-31T22:02:05.208Z] [reward]     \u2022 Slate-Weighted Netting (Common)\n",
+      "[2026-08-31T22:02:05.208Z] [reward]     \u2022 Mud Fragment x2 (Common)\n[2026-08-31T22:02:06.690Z] [debug] ui: tap \"investigate\"\n[2026-08-31T22:02:08.070Z] [player] investigate the mud\n[2026-08-31T22:02:08.071Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=mud range=- enemies=0 hooks=3\n",
+      "[2026-08-31T22:02:08.073Z] [world] You crouch beside the mud. The silt has half-swallowed it.\n[2026-08-31T22:02:08.078Z] [world] A handful of wild grass-seed grain pulled from beside the mud. Chewable.\n[2026-08-31T22:02:08.078Z] [reward] \u2726 Wild Oats (Common).\n[2026-08-31T22:02:08.079Z] [world] Mud Scanner reads flat. Nothing in the mud.\n",
+      "[2026-08-31T22:02:08.080Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-31T22:02:08.080Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T22:02:08.080Z] [debug] arbiter: ambient held (he just spoke)\n",
+      "[2026-08-31T22:02:08.086Z] [world] A Mud Monarchs war party crests the rise \u2014 5 of them, blades already out. They've marked you for standing with the Forgotten Order.\n[2026-08-31T22:02:08.086Z] [arbiter] \"The Mud Monarchs do not forgive a friend of the Forgotten Order,\" the Arbiter murmurs. \"Stand, or run \u2014 but decide now.\"\n[2026-08-31T22:02:08.322Z] [cognitive] SWIM  (240ms)\n",
+      "[2026-08-31T22:02:10.390Z] [debug] ui: tap \"flee\"\n[2026-08-31T22:02:10.405Z] [player] flee\n[2026-08-31T22:02:10.406Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=close enemies=5 hooks=3\n[2026-08-31T22:02:10.454Z] [system] \u23f3 Time passed: 15 min\n[2026-08-31T22:02:10.639Z] [cognitive] FEAR \u00b7 RETREAT \u00b7 HIDE  (184ms)\n",
+      "[2026-08-31T22:02:12.318Z] [debug] skillcheck: escape d20=11 DEX 23 = 34 vs Pursuit 12 \u2014 Mud Monarchs Raider 1 (d20 3 + SPD 9) \u2192 PASS\n[2026-08-31T22:02:12.387Z] [debug] stats: STR10 DEX23 INT10 WIS10 CHA4 STE5 | gear: WIS+4,INT+2,DEX+15,STR+5,STE+2 | worn: main=Auralite Talon off=Bone Crossbow head=Architect's Sight Enhancer chest=Forgotten Protector's Plate hands=Relic Hunter's Gauntlets legs=Lit",
+      "any Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n[2026-08-31T22:02:12.387Z] [debug] train: dexterity (escape check) \u2192 progress 26/100\n[2026-08-31T22:02:12.387Z] [world] You turn and run and the running works.\n[2026-08-31T22:02:13.600Z] [debug] ui: tap \"\u2192 GREAT TARTARY PLAINS\"\n",
+      "[2026-08-31T22:02:13.604Z] [world] You walk east. You arrive at Obsidian Pillars.\n[2026-08-31T22:02:13.608Z] [debug] scene: loc=obsidian_pillars hub=- arrival=y opening=n passing=y\n[2026-08-31T22:02:13.608Z] [debug] missions: hunt:hunt_servants_doubter stage 1/5 [boss\u2192attack] @great_tartary_plains needs=Servants' Mark of Sanction\u2717MISSING spawn=Tartarian Raider\u00d73\n",
+      "[2026-08-31T22:02:13.608Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n[2026-08-31T22:02:13.608Z] [debug] missions: \u00b7 at=obsidian_pillars travelTo=great_tartary_plains\n[2026-08-31T22:02:13.641Z] [debug] spawn: gear=[Reclaimer's Salvage Vest, Bone Shortsword] window=10 roster=new\n",
+      "[2026-08-31T22:02:13.670Z] [world] Soot noses at the lingering scent and snorts. There's something there.\n[2026-08-31T22:02:13.672Z] [world] You've left Reclaimer's Stake and entered Obsidian Pillars. The Pillars hate machines. Bring nothing that ticks if you mean to leave with it. It's dusk. 3 Reclaimer Ambushers are already here. Open ground in every direction.\n",
+      "[2026-08-31T22:02:13.673Z] [combat] Distance: close / arm's reach. Auralite Talon \u2713 in range \u00b7 Bone Crossbow \u2713 in range.\n[2026-08-31T22:02:13.709Z] [arbiter] The Arbiter lowers their voice. \"You're carrying shadow with you \u2014 use it. Tap STEALTH before they close, and you can be on them before they know it. A clean opening strike, or slip past entirely.\"\n",
+      "[2026-08-31T22:02:13.710Z] [system] Weather effect \u2014 Eerie Calm: +1 WIS\n[2026-08-31T22:02:13.712Z] [world] [Obsidian Pillars] north: Builders' Survey Camp (6 tiles, 15 hours) \u00b7 east: Great Tartary Plains (7 tiles, 18 hours) \u00b7 south: Karok-Sa (12 tiles, 1 day, 6 hours) \u00b7 west: The Buried Cities (5 tiles, 13 hours)\n",
+      "[2026-08-31T22:02:13.712Z] [combat] 3 Reclaimer Ambushers close on you. Tap the right-side panel to cycle targets.\n[2026-08-31T22:02:13.712Z] [debug] arbiter: template (reason=combat)\n[2026-08-31T22:02:13.712Z] [arbiter] \"Footwork over fury,\" the Arbiter says quietly. \"The reclaimer ambusher is patient. Be patienter.\"\n",
+      "[2026-08-31T22:02:14.372Z] [debug] persist sizes(KB): total=218 player=42 wm=90[rooms=49 events=3 memos=0 npcs=3 defeated=1 tags=1 discovered=0] log=80 scene=6\n[2026-08-31T22:02:17.627Z] [debug] ui: tap \"dodge\"\n[2026-08-31T22:02:17.645Z] [player] dodge\n[2026-08-31T22:02:17.646Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=3 hooks=0\n",
+      "[2026-08-31T22:02:17.648Z] [world] You commit to the dodge. Slip Reclaimer Ambusher's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-08-31T22:02:17.706Z] [combat] Reclaimer Ambusher \u2014 d20 \u2192 10 + ATK 8 = 18 vs your AC 22 \u2014 \u2717 EVADED\n",
+      "[2026-08-31T22:02:17.706Z] [combat] Dodge \u2014 d20 \u2192 14 + DEX 23 = 37 vs ATK 18. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-08-31T22:02:17.706Z] [world] You slip Reclaimer Ambusher's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n",
+      "[2026-08-31T22:02:17.707Z] [combat] Reclaimer Ambusher turns on Soot \u2014 d20 10 + ATK 6 = 16 vs Soot's AC 12 (vest +2) \u2014 \u2713 HIT\n[2026-08-31T22:02:17.708Z] [combat] Soot takes 1. (14/15 HP left)\n[2026-08-31T22:02:17.708Z] [combat] Reclaimer Ambusher turns on Soot \u2014 d20 1 + ATK 6 = 7 vs Soot's AC 12 (vest +2) \u2014 \u2717 FUMBLE\n[2026-08-31T22:02:17.708Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-08-31T22:02:17.708Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T22:02:17.709Z] [system] \u23f3 Time passed: 6 min\n[2026-08-31T22:02:17.907Z] [cognitive] neutral  (197ms)\n[2026-08-31T22:02:19.227Z] [debug] ui: tap \"\u2697 auralite talon\"\n[2026-08-31T22:02:19.231Z] [system] evasive \u2014 harder to hit fades.\n[2026-08-31T22:02:19.269Z] [player] attack with the auralite talon\n",
+      "[2026-08-31T22:02:19.269Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=3 hooks=0\n[2026-08-31T22:02:19.270Z] [debug] attack: target=Reclaimer Ambusher range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n[2026-08-31T22:02:19.271Z] [debug] attack: status mods tired -1 \u00b7 perfect opening (2\u00d7 dice)\n",
+      "[2026-08-31T22:02:19.308Z] [world] You raise the acid-etched auralite talon toward Reclaimer Ambusher. The room narrows around the both of you.\n[2026-08-31T22:02:19.309Z] [system] \u23f3 Time passed: 6 min\n[2026-08-31T22:02:19.493Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (183ms)\n",
+      "[2026-08-31T22:02:27.736Z] [world] Reclaimer Ambusher moves first. The pressure is immediate.\n[2026-08-31T22:02:27.738Z] [combat] Reclaimer Ambusher \u2014 d20 \u2192 17 + ATK 8 = 25 vs your AC 22 \u2014 \u2713 HIT\n[2026-08-31T22:02:27.740Z] [combat] Reclaimer Ambusher turns on Soot \u2014 d20 11 + ATK 6 = 17 vs Soot's AC 12 (vest +2) \u2014 \u2713 HIT\n[2026-08-31T22:02:27.740Z] [combat] Soot takes 4. (10/15 HP left)\n",
+      "[2026-08-31T22:02:27.741Z] [combat] Reclaimer Ambusher \u2014 d20 \u2192 7 + ATK 6 = 13 vs your AC 22 \u2014 \u2717 MISS\n[2026-08-31T22:02:27.742Z] [combat] You \u2014 d20 \u2192 14 + INT 10 tired -1 perfect opening (2\u00d7 dice) = 23 vs Reclaimer Ambusher AC 10 \u2014 \u2713 HIT\n[2026-08-31T22:02:27.742Z] [combat] Aetheric flares \u2014 +4 on hit.\n[2026-08-31T22:02:27.742Z] [combat] Reclaimer Ambusher shrugs off "
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-31-1595-the-guide-and-the-ground-agree #mthspfn82jjo [inline 6/11]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mthspfn82jjo"
+    },
+    {
+      "key": "dist",
+      "value": "2026-08-31-1595-the-guide-and-the-ground-agree"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "6"
+    },
+    {
+      "key": "parts",
+      "value": "11"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-08-31-1595-the-guide-and-the-ground-agree"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-31T22:42:23.825313Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "15": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 355,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-31T22:42:25.658000Z",
+  "fingerprints": [
+    "ece55df05c8feabf8c9866621151307e"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1947017514,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-08-31T22:42:25.657000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-08-31-1595-the-guide-and-the-ground-agree",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-08-31-1595-the-guide-and-the-ground-agree",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-08-31-1595-the-guide-and-the-ground-agree",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-08-31-1595-the-guide-and-the-ground-agree)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "5b379fb53529425d8c9ca900d7be3b4f",
+  "previousEventID": "39856b2bb9b04384b6e9158a48cdd67f"
+}

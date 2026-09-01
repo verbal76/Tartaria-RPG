@@ -1,0 +1,194 @@
+{
+  "id": "7fce50a2dc2148f48e015d787d7a5677",
+  "groupID": "7703396482",
+  "eventID": "7fce50a2dc2148f48e015d787d7a5677",
+  "projectID": "4511945117532160",
+  "size": 3086,
+  "entries": [
+    {
+      "data": {
+        "formatted": "Process died with no orderly exit while: (no action yet)"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-08-31-1596-the-mark-catches-up-at-the-door",
+  "message": "Process died with no orderly exit while: (no action yet)",
+  "title": "Process died with no orderly exit while: (no action yet)",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "77b683aa0ab84de1adce13a736d409dd",
+      "span_id": "90adb68da4c8700b",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "actionAgeMs": 1865,
+    "id": "1788216399841_native-death",
+    "lastAction": "(no action yet)",
+    "lastPhase": "native:voice:start",
+    "lastPhaseAgeMs": 0,
+    "lastPhaseDetail": "q1",
+    "sinceBootMs": 1908,
+    "stack": "(none \u2014 the process died without one)"
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "Process died with no orderly exit while: (no action yet)"
+  },
+  "tags": [
+    {
+      "key": "build",
+      "value": "2026-08-31-1596-the-mark-catches-up-at-the-door"
+    },
+    {
+      "key": "dist",
+      "value": "2026-08-31-1596-the-mark-catches-up-at-the-door"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "native-death"
+    },
+    {
+      "key": "level",
+      "value": "fatal"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-08-31-1596-the-mark-catches-up-at-the-door"
+    },
+    {
+      "key": "stage",
+      "value": "native:voice:start"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    },
+    {
+      "key": "version",
+      "value": "4.32.11"
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-08-31T22:51:04.041216Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-08-31T22:46:39.841000Z",
+  "fingerprints": [
+    "32eabdb15fb7090fd4a8e3d174c9362d"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1947025169,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-08-31T22:46:38.155000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-08-31-1596-the-mark-catches-up-at-the-door",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-08-31-1596-the-mark-catches-up-at-the-door",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-08-31-1596-the-mark-catches-up-at-the-door",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-08-31-1596-the-mark-catches-up-at-the-door)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": null
+}

@@ -1,0 +1,237 @@
+{
+  "id": "2d0f452fb83741a2a2b60c4fbca4e49d",
+  "groupID": "7703506205",
+  "eventID": "2d0f452fb83741a2a2b60c4fbca4e49d",
+  "projectID": "4511945117532160",
+  "size": 18117,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-31-1597-the-tile-is-the-trigger #mthu1e73hwvg [inline 11/14]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-08-31-1597-the-tile-is-the-trigger",
+  "message": "player-log 2026-08-31-1597-the-tile-is-the-trigger #mthu1e73hwvg [inline 11/14]",
+  "title": "player-log 2026-08-31-1597-the-tile-is-the-trigger #mthu1e73hwvg [inline 11/14]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "00abe10a994849faba85894bf4c17d3c",
+      "span_id": "8bc29c3221eefe59",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      " plainly. \"I'm not sure what you're trying to tell me. I'll keep your note in the log either way. If you mean to act, phrase it as a verb \u2014 'investigate the rubble', 'go east', 'attack the figure'.\"\n[2026-08-31T22:13:52.998Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter studies you, plainly. \"I'm not sure what you're \u2026\"\n",
+      "[2026-08-31T22:13:52.998Z] [debug] meta-comment guard: skipped intent parse (engine-vocabulary: \"spawned\") on 216-char input\n[2026-08-31T22:13:59.657Z] [debug] send-log: #mthspfn82jjo \u2014 DELIVERED (inline, no attachments): beacon out, 11/11 parts accepted (156583 chars) \u2014 flush said yes\n",
+      "[2026-08-31T22:13:59.660Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mthspfn82jjo kept on disk, boots retry up to 5 sends total\n[2026-08-31T22:14:03.581Z] [debug] persist sizes(KB): total=220 player=49 wm=88[rooms=47 events=3 memos=0 npcs=3 defeated=1 tags=1 discovered=0] log=80 scene=3\n",
+      "[2026-08-31T22:14:08.551Z] [debug] voice\u23f1 gap 4172ms (wait 0ms + synth 4148ms, live) \"Choose your character.\"\n[2026-08-31T22:14:11.108Z] [debug] voice\u23f1 gap 1847ms (wait 1ms + synth 822ms, live) \"Choose your character.\"\n[2026-08-31T22:14:11.307Z] [debug] ctx: RELEASED \u2014 live=0 (opened=1 released=1)\n",
+      "[2026-08-31T22:14:25.880Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a059db-4717-7b20-ad78-4af69ad6a57b\n[2026-08-31T22:14:25.880Z] [debug] ota: Checking\u2026\n[2026-08-31T22:14:25.933Z] [debug] ota: Already up to date\n[2026-08-31T22:14:25.933Z] [debug] ota: boot check result = noUpdate\n",
+      "[2026-08-31T22:14:25.956Z] [debug] send-log: bundle #mthspfn82jjo held \u2014 only 27s since the last try (a restart, not a chance); 4 left\n[2026-08-31T22:14:25.994Z] [debug] voice: engine=bundled tts=on voice=am_michael\n[2026-08-31T22:14:25.994Z] [debug] voice: bundled loading\n[2026-08-31T22:14:29.572Z] [debug] voice: bundled ready\n",
+      "[2026-08-31T22:14:30.653Z] [debug] voice\u23f1 gap 1029ms (wait 123ms + synth 893ms, live) \"Choose your character.\"\n[2026-08-31T22:42:25.566Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a059db-4717-7b20-ad78-4af69ad6a57b\n[2026-08-31T22:42:25.567Z] [debug] ota: Checking\u2026\n[2026-08-31T22:42:25.617Z] [debug] ota: Already up to date\n",
+      "[2026-08-31T22:42:25.617Z] [debug] ota: boot check result = noUpdate\n[2026-08-31T22:42:25.678Z] [debug] voice: engine=bundled tts=on voice=am_michael\n[2026-08-31T22:42:25.678Z] [debug] voice: bundled loading\n[2026-08-31T22:42:25.910Z] [debug] send-log: bundle #mthspfn82jjo attempt 2/5 delivered to Sentry\n[2026-08-31T22:42:29.470Z] [debug] voice: bundled ready\n",
+      "[2026-08-31T22:42:30.525Z] [debug] voice\u23f1 gap 971ms (wait 108ms + synth 861ms, live) \"Choose your character.\"\n[2026-08-31T22:42:32.975Z] [debug] OTA session start: 2026-08-31-1595-the-guide-and-the-ground-agree.\n[2026-08-31T22:42:32.976Z] [world] You step back into Great Tartary Plains. The world waits for your move.\n",
+      "[2026-08-31T22:42:32.976Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. \"Welcome back, Cheddar Bob. The road kept your place.\"\n[2026-08-31T22:42:33.407Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-31T22:42:33.406Z \u00b7 build 2026-08-31-1595-the-guide-and-the-ground-agree \u00b7 previous entry moments earlier \u2550\u2550\u2550\n",
+      "[2026-08-31T22:42:33.407Z] [debug] missions: hunt:hunt_servants_doubter stage 1/5 [boss\u2192attack] @great_tartary_plains HERE needs=Servants' Mark of Sanction\u2717MISSING spawn=Tartarian Raider\u00d73\n[2026-08-31T22:42:33.407Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n",
+      "[2026-08-31T22:42:33.407Z] [debug] missions: \u00b7 at=great_tartary_plains\n[2026-08-31T22:42:33.407Z] [debug] boot: life bmthtq0jbhw started 2026-08-31T22:42:25.463Z \u00b7 not an OTA apply (no handoff on disk)\n[2026-08-31T22:42:33.827Z] [debug] send-log: crash on record (2026-08-31T22:14:31.073Z) \u2014 game log pushed automatically, delivered to Sentry, kept on disk as #mthtq6tw1hv7\n",
+      "[2026-08-31T22:43:59.776Z] [debug] ui: tap \"NORTH\"\n[2026-08-31T22:43:59.816Z] [player] go north\n[2026-08-31T22:43:59.817Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=1\n[2026-08-31T22:43:59.847Z] [debug] spawn: gear=[Mud-glass Scales] window=10 roster=new\n",
+      "[2026-08-31T22:43:59.847Z] [world] You walk north through open silt. The compass points north into open ground.\n[2026-08-31T22:43:59.848Z] [world] The thread you were following waits where you left it.\n[2026-08-31T22:43:59.848Z] [system] \u23f3 Time passed: 15 min\n[2026-08-31T22:44:00.841Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n",
+      "[2026-08-31T22:44:02.175Z] [debug] ui: tap \"\u25b2 Take & wear Mud-glass Scales \u2014 AC +3 over your +2\"\n[2026-08-31T22:44:02.182Z] [world] You take the Mud-glass Scales from where it lay.\n[2026-08-31T22:44:02.183Z] [reward] \u2726 Mud-glass Scales (Uncommon).\n[2026-08-31T22:44:02.194Z] [debug] take&wear: equipping \"Mud-glass Scales\" -> chest\n",
+      "[2026-08-31T22:44:02.252Z] [debug] stats: STR12 DEX23 INT11 WIS11 CHA4 STE6 | gear: WIS+4,INT+2,DEX+14,STR+5,STE+2 | worn: main=Auralite Talon off=Bone Crossbow head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n",
+      "[2026-08-31T22:44:05.376Z] [debug] ui: tap \"take / salvage\"\n[2026-08-31T22:44:06.946Z] [world] You break the buried structure apart. Among the pieces, something worth keeping.\n[2026-08-31T22:44:06.946Z] [world] You salvage the half-buried ruined skyscraper. The take is small but real.\n[2026-08-31T22:44:06.946Z] [world] You break the standing water apart. Among the pieces, something worth keeping.\n",
+      "[2026-08-31T22:44:06.947Z] [world] You strip the tracks carefully. Something usable comes free in your hand.\n[2026-08-31T22:44:06.947Z] [world] You salvage the trapper camp. The take is small but real.\n[2026-08-31T22:44:06.947Z] [world] You lever something loose from the wagon wheel \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n",
+      "[2026-08-31T22:44:06.947Z] [reward] \u2726 Salvage haul:\n[2026-08-31T22:44:06.948Z] [reward]     \u2022 Stick x5 (Common)\n[2026-08-31T22:44:06.948Z] [reward]     \u2022 Worn Tartarian Coin x2 (Common)\n[2026-08-31T22:44:06.948Z] [reward]     \u2022 Scrap Metal (Common)\n[2026-08-31T22:44:06.948Z] [reward]     \u2022 Tar-Black Lashing (Common)\n[2026-08-31T22:44:08.026Z] [debug] ui: tap \"use aetheric torch\"\n",
+      "[2026-08-31T22:44:08.055Z] [player] use Aetheric Torch\n[2026-08-31T22:44:08.056Z] [debug] parser: intent=use_relic conf=1.00 verb=use target=aetheric torch resolved=Aetheric Torch range=- enemies=0 hooks=1\n",
+      "[2026-08-31T22:44:08.057Z] [world] The Aetheric Torch's light thins against the cleaver and comes back tinged \u2014 the color of buried metal. Work the cleaver \u2014 investigate it and it will give up something rare.\n[2026-08-31T22:44:08.069Z] [system] \u23f3 Time passed: 15 min\n[2026-08-31T22:44:08.219Z] [cognitive] USE_ITEM \u00b7 THROW  (150ms)\n[2026-08-31T22:44:09.212Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-08-31T22:44:10.799Z] [player] investigate the ground\n[2026-08-31T22:44:10.799Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n[2026-08-31T22:44:10.804Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Aether Crystal (Common).\n[2026-08-31T22:44:10.809Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-08-31T22:44:10.960Z] [cognitive] CLIMB  (149ms)\n[2026-08-31T22:44:11.371Z] [debug] persist sizes(KB): total=215 player=54 wm=77[rooms=36 events=3 memos=0 npcs=3 defeated=1 tags=1 discovered=0] log=80 scene=4\n[2026-08-31T22:44:12.031Z] [world] An Aetheric arc finds you \u2014 copper taste, blue afterimage, and a bite of damage. (\u22122 HP)\n[2026-08-31T22:44:12.057Z] [player] investigate cleaver\n",
+      "[2026-08-31T22:44:12.058Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=cleaver resolved=Reclaimers Guild Geode-Cored Cleaver range=- enemies=0 hooks=1\n[2026-08-31T22:44:12.059Z] [debug] route: hook intercept (kind=thread, target=\"reclaimers guild geode-cored cleaver\") \u2014 original intent=investigate\n",
+      "[2026-08-31T22:44:12.059Z] [world] \u2605 STORY THREAD (step 1) \u2014 You pull the rubble aside. A draft of cold, old air, and a tight passage angling down into the dark.\n[2026-08-31T22:44:13.703Z] [world] \u2605\u2605 STORY THREAD COMPLETE \u2014 You wedge yourself into the gap. At the bottom \u2014 a small antechamber, half-flooded, with three sealed jars on a shelf. You take what you can carry.\n",
+      "[2026-08-31T22:44:13.703Z] [reward] \u2726 Trail Rations, Aether Residue, +12 TC.\n[2026-08-31T22:44:13.762Z] [reward] \u2726 The torch's mark pays out \u2014 Silt Heart (Rare)!\n[2026-08-31T22:44:17.146Z] [debug] ui: tap \"NORTH\"\n[2026-08-31T22:44:17.174Z] [player] go north\n[2026-08-31T22:44:17.175Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-31T22:44:17.180Z] [debug] spawn: gear=[Aetheric Baton, Plasma Cutter, Bone Splitter Axe] window=10 roster=new\n[2026-08-31T22:44:17.181Z] [world] A leaning outbuilding stands off the path here \u2014 weathered and quiet, a way in still clear. (Tap ENTER to step inside.)\n[2026-08-31T22:44:17.181Z] [world] You walk north through open silt. The compass points north into open ground.\n",
+      "[2026-08-31T22:44:17.186Z] [world] Movement low and fast \u2014 a Scrap Drone cuts across your path. You're closer than either of you wanted to be.\n[2026-08-31T22:44:17.187Z] [combat] Scrap Drone closes \u2014 Drill Arm ready, 2D6 damage on a hit. (range: close)\n[2026-08-31T22:44:17.193Z] [world] A faint smell of burning Aetherstone drifts from somewhere north.\n",
+      "[2026-08-31T22:44:17.194Z] [system] \u23f3 Time passed: 15 min\n[2026-08-31T22:44:17.431Z] [cognitive] TRAVEL  (236ms)\n[2026-08-31T22:44:20.397Z] [debug] ui: tap \"dodge\"\n[2026-08-31T22:44:20.410Z] [player] dodge\n[2026-08-31T22:44:20.411Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=2\n",
+      "[2026-08-31T22:44:20.411Z] [world] You commit to the dodge. Slip Scrap Drone's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-08-31T22:44:20.469Z] [combat] Scrap Drone \u2014 d20 \u2192 12 + ATK 3 = 15 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-08-31T22:44:20.470Z] [combat] Dodge \u2014 d20 \u2192 1 + DEX 23 = 24 vs ATK 15. \u2717 You misread it \u2014 no opening, and the blow lands as it normally would (armor still counts).\n[2026-08-31T22:44:20.470Z] [world] Your read is a beat off \u2014 no opening this time \u2014 but the swing goes wide on its own.\n[2026-08-31T22:44:20.471Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-31T22:44:20.684Z] [cognitive] neutral  (212ms)\n[2026-08-31T22:44:21.262Z] [debug] ui: tap \"\ud83d\udd25 bone crossbow\"\n[2026-08-31T22:44:21.311Z] [player] attack with the off-hand bone crossbow\n[2026-08-31T22:44:21.311Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=1 hooks=2\n",
+      "[2026-08-31T22:44:21.312Z] [debug] attack: target=Scrap Drone range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-08-31T22:44:21.357Z] [world] Your searing bone crossbow comes around in an arc; Scrap Drone squares up to meet it.\n[2026-08-31T22:44:21.358Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-31T22:44:21.569Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (210ms)\n[2026-08-31T22:44:27.856Z] [world] Scrap Drone moves first. The pressure is immediate.\n[2026-08-31T22:44:27.856Z] [combat] Scrap Drone turns on Soot \u2014 d20 15 + ATK 3 = 18 vs Soot's AC 12 (vest +2) \u2014 \u2713 HIT\n[2026-08-31T22:44:27.857Z] [combat] Soot takes 5. (10/15 HP left)\n",
+      "[2026-08-31T22:44:27.857Z] [combat] You \u2014 d20 \u2192 13 + DEX 23 + 2 (point blank) = 38 vs Scrap Drone AC 10 \u2014 \u2713 HIT\n[2026-08-31T22:44:27.858Z] [combat] Scrap Drone shrugs off the piercing. (resisted, \u00d70.5 for 7)\n[2026-08-31T22:44:27.860Z] [arbiter] The Arbiter watches the piercing skid off. \"Swap to the Flame of Aether \u2014 burn or electrical will bite where piercing won't.\"\n",
+      "[2026-08-31T22:44:27.861Z] [combat] Your strike with the searing bone crossbow lands for 7. Scrap Drone staggers \u2014 8 HP remaining. It answers.\n[2026-08-31T22:44:27.862Z] [combat] Searing Bone Crossbow \u2014 3 burn bites in and festers (3 turns).\n",
+      "[2026-08-31T22:44:27.862Z] [arbiter] The Arbiter watches the scrap drone. \"It is not the first thing here that decided to keep its distance, then changed its mind.\"\n[2026-08-31T22:44:30.232Z] [debug] ui: tap \"\u2697 auralite talon\"\n[2026-08-31T22:44:30.271Z] [player] attack with the auralite talon\n",
+      "[2026-08-31T22:44:30.272Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=1 hooks=2\n[2026-08-31T22:44:30.273Z] [combat] Scrap Drone blisters \u2014 clinging fire sears 3. (5/15 HP, 2 turns left)\n[2026-08-31T22:44:30.274Z] [debug] attack: target=Scrap Drone range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n",
+      "[2026-08-31T22:44:30.319Z] [world] You raise the acid-etched auralite talon toward Scrap Drone. The room narrows around the both of you.\n[2026-08-31T22:44:30.320Z] [system] \u23f3 Time passed: 6 min\n[2026-08-31T22:44:30.532Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (212ms)\n[2026-08-31T22:44:37.122Z] [world] You seize the initiative. Scrap Drone has no time to react.\n",
+      "[2026-08-31T22:44:37.123Z] [combat] You \u2014 d20 \u2192 5 + INT 12 = 17 vs Scrap Drone AC 10 \u2014 \u2713 HIT\n[2026-08-31T22:44:37.123Z] [combat] Aetheric flares \u2014 +4 on hit.\n[2026-08-31T22:44:37.124Z] [combat] Scrap Drone shrugs off the aetheric. (resisted, \u00d70.5 for 10)\n",
+      "[2026-08-31T22:44:37.126Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Flame of Aether \u2014 burn or electrical will bite where aetheric won't.\"\n[2026-08-31T22:44:37.127Z] [combat] Your blow with the acid-etched auralite talon lands clean \u2014 10 damage. Scrap Drone crumples in the dust. The Aetherstone settles.\n",
+      "[2026-08-31T22:44:37.128Z] [reward] Scrap Drone defeated. You recover Drone Processor, Riveted Leather Vest.\n[2026-08-31T22:44:37.129Z] [reward] +8 TC pried from the dust.\n[2026-08-31T22:44:38.599Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-08-31T22:44:38.825Z] [debug] ui: tap \"take / salvage\"\n[2026-08-31T22:44:40.059Z] [world] You pick up the Aetheric Baton.\n",
+      "[2026-08-31T22:44:40.059Z] [reward] \u2726 Aetheric Baton (Common).\n[2026-08-31T22:44:40.071Z] [world] You lift the Bone Splitter Axe clear.\n[2026-08-31T22:44:40.071Z] [reward] \u2726 Bone Splitter Axe (Common).\n[2026-08-31T22:44:40.072Z] [world] You get a hand under the Plasma Cutter and take it.\n[2026-08-31T22:44:40.072Z] [reward] \u2726 Plasma Cutter (Common).\n",
+      "[2026-08-31T22:44:40.340Z] [debug] persist sizes(KB): total=217 player=55 wm=78[rooms=36 events=3 memos=0 npcs=3 defeated=1 tags=1 discovered=0] log=80 scene=4\n[2026-08-31T22:44:40.944Z] [world] You claim the Scrap Metal.\n[2026-08-31T22:44:40.944Z] [reward] \u2726 Scrap Metal (Common).\n[2026-08-31T22:44:41.903Z] [rewar"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-31-1597-the-tile-is-the-trigger #mthu1e73hwvg [inline 11/14]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mthu1e73hwvg"
+    },
+    {
+      "key": "dist",
+      "value": "2026-08-31-1597-the-tile-is-the-trigger"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "11"
+    },
+    {
+      "key": "parts",
+      "value": "14"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-08-31-1597-the-tile-is-the-trigger"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-01T00:14:34.732895Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-01T00:14:36.322000Z",
+  "fingerprints": [
+    "19d6f357b4c9ee47ab81ae8539a6c03c"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1947146650,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-01T00:14:36.323000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-08-31-1597-the-tile-is-the-trigger",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-08-31-1597-the-tile-is-the-trigger",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-08-31-1597-the-tile-is-the-trigger",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-08-31-1597-the-tile-is-the-trigger)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "47ee3535e63e46ec93692a5a4c775afe",
+  "previousEventID": "206f68f11d6e462a8b8ceffbd9054cf9"
+}

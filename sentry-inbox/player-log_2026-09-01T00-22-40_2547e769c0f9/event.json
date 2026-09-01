@@ -1,0 +1,234 @@
+{
+  "id": "2547e769c0f94ccb9c5e94688f57b5f4",
+  "groupID": "7703506205",
+  "eventID": "2547e769c0f94ccb9c5e94688f57b5f4",
+  "projectID": "4511945117532160",
+  "size": 18072,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-31-1597-the-tile-is-the-trigger #mthxaxji3kq3 [inline 20/22]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-08-31-1597-the-tile-is-the-trigger",
+  "message": "player-log 2026-08-31-1597-the-tile-is-the-trigger #mthxaxji3kq3 [inline 20/22]",
+  "title": "player-log 2026-08-31-1597-the-tile-is-the-trigger #mthxaxji3kq3 [inline 20/22]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "00abe10a994849faba85894bf4c17d3c",
+      "span_id": "8bc29c3221eefe59",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "sable (native mis-reported 3286ms/1510ms \u2014 llama.rn split bug, not this call) in 365t\u2192out 31t HIT-CAP (140ch)\n[2026-09-01T00:20:24.207Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient after 4787ms \u2014 ambient:stale:combat-started\n[2026-09-01T00:20:24.208Z] [debug] arbiter: ambient stale:combat-started 5445ms\n",
+      "[2026-09-01T00:20:24.208Z] [debug] arbiter: ambient-empty reason=instruction-echo raw=\"Your read of them: You stand at the Triage Tent, the imposing structure of stone and brick, its weathered door whisperin\"\n[2026-09-01T00:20:24.705Z] [debug] ui: tap \"dodge\"\n[2026-09-01T00:20:24.708Z] [player] dodge\n",
+      "[2026-09-01T00:20:24.708Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=5 hooks=0\n[2026-09-01T00:20:24.709Z] [world] You commit to the dodge. Slip Mud Monarchs Raider 1's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-01T00:20:24.758Z] [combat] Mud Monarchs Raider 1 \u2014 d20 \u2192 10 + ATK 6 = 16 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n[2026-09-01T00:20:24.758Z] [combat] Dodge \u2014 d20 \u2192 13 + DEX 23 = 36 vs ATK 16. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n",
+      "[2026-09-01T00:20:24.759Z] [world] You slip Mud Monarchs Raider 1's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n[2026-09-01T00:20:24.760Z] [combat] Mud Monarchs Raider 2 turns on Soot \u2014 d20 12 + ATK 6 = 18 vs Soot's AC 12 (vest +2) \u2014 \u2713 HIT\n[2026-09-01T00:20:24.760Z] [combat] Soot takes 7. (3/15 HP left)\n",
+      "[2026-09-01T00:20:24.760Z] [combat] Mud Monarchs Raider 5 and 2 others close the distance.\n[2026-09-01T00:20:24.761Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T00:20:25.027Z] [cognitive] neutral  (266ms)\n[2026-09-01T00:20:26.471Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n[2026-09-01T00:20:26.477Z] [system] evasive \u2014 harder to hit fades.\n",
+      "[2026-09-01T00:20:26.521Z] [player] attack with the auralite talon\n[2026-09-01T00:20:26.522Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=5 hooks=0\n",
+      "[2026-09-01T00:20:26.523Z] [arbiter] The Arbiter keeps one eye on the fight. \"That is the right move for Silence the Doubter \u2014 but not with something on you. Put this down first.\"\n[2026-09-01T00:20:26.523Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter keeps one eye on the fight. \"That is the right m\u2026\"\n",
+      "[2026-09-01T00:20:26.523Z] [debug] attack: target=Mud Monarchs Raider 1 range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n[2026-09-01T00:20:26.525Z] [arbiter] Glass Hail hangs between you. \"\u22121 to the swing \u2014 see what you can,\" the Arbiter says.\n[2026-09-01T00:20:26.526Z] [debug] attack: visibility penalty \u22121 (Glass Hail)\n",
+      "[2026-09-01T00:20:26.526Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-01T00:20:26.575Z] [world] You commit forward with the acid-etched corrupted auralite talon. Mud Monarchs Raider 1 watches your hands.\n[2026-09-01T00:20:26.575Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T00:20:26.796Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (220ms)\n",
+      "[2026-09-01T00:20:35.103Z] [world] You seize the initiative. Mud Monarchs Raider 1 has no time to react.\n[2026-09-01T00:20:35.104Z] [combat] You \u2014 d20 \u2192 3 + INT 11 \u2212 1 (Glass Hail) perfect opening (2\u00d7 dice) = 13 vs Mud Monarchs Raider 1 AC 10 \u2014 \u2713 HIT\n[2026-09-01T00:20:35.104Z] [combat] Mud Monarchs Raider 1 shrugs off the aetheric. (resisted, \u00d70.5 for 10)\n",
+      "[2026-09-01T00:20:35.107Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Flame of Aether \u2014 burn will bite where aetheric won't.\"\n[2026-09-01T00:20:35.108Z] [combat] You crack the Mud Monarchs Raider 1 with the Acid-Etched Corrupted Auralite Talon for 10 \u2014 the better part of their fight, gone in one blow. They crumple, out cold. (2/12 HP) Loot them before they come to.\n",
+      "[2026-09-01T00:20:35.108Z] [combat] Mud Monarchs Raider 1 is out of it. Mud Monarchs Raider 2 now in your sights.\n[2026-09-01T00:20:35.109Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 2 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n",
+      "[2026-09-01T00:20:35.109Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 1 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n[2026-09-01T00:20:35.111Z] [combat] Mud Monarchs Raider 2 \u2014 d20 \u2192 14 + ATK 6 = 20 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-01T00:20:35.115Z] [combat] Mud Monarchs Raider 3 \u2014 d20 \u2192 16 + ATK 6 = 22 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-09-01T00:20:35.117Z] [combat] Mud Monarchs Raider 4 and 1 other close the distance.\n[2026-09-01T00:20:35.372Z] [combat] Mud Monarchs Raider 3 deals 1 slashing damage [edge of reach \u2014 halved]. You have 27 HP remaining.\n",
+      "[2026-09-01T00:20:37.176Z] [debug] ui: tap \"\ud83d\udd25\u2697 bone crossbow\"\n[2026-09-01T00:20:37.225Z] [player] attack with the off-hand bone crossbow\n[2026-09-01T00:20:37.226Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=5 hooks=0\n",
+      "[2026-09-01T00:20:37.227Z] [arbiter] The Arbiter keeps one eye on the fight. \"That is the right move for Silence the Doubter \u2014 but not with something on you. Put this down first.\"\n[2026-09-01T00:20:37.227Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter keeps one eye on the fight. \"That is the right m\u2026\"\n",
+      "[2026-09-01T00:20:37.227Z] [combat] Mud Monarchs Raider 1 smokes \u2014 acid eats 2. (0/12 HP, 2 turns left)\n[2026-09-01T00:20:37.227Z] [combat] Mud Monarchs Raider 1 blackens \u2014 corruption eats 1. (0/12 HP, 2 turns left)\n[2026-09-01T00:20:37.229Z] [reward] Mud Monarchs Raider 1 defeated. You recover Patched Cloth \u00d72, Mud Monarch Sigil.\n",
+      "[2026-09-01T00:20:37.230Z] [reward] You strip the body: Cudgel, Mud-Bound Cloak (+6 TC). The kit took the fight badly.\n[2026-09-01T00:20:37.230Z] [combat] 4 attackers remain. Mud Monarchs Raider 2 now in your sights.\n[2026-09-01T00:20:37.230Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n",
+      "[2026-09-01T00:20:37.231Z] [system] \u25b2 Forgotten Order now counts you TRUSTED \u2014 their counters take 10% off.\n[2026-09-01T00:20:37.231Z] [reward] +20 TC pried from the dust.\n[2026-09-01T00:20:37.276Z] [debug] attack: target=Mud Monarchs Raider 2 range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n",
+      "[2026-09-01T00:20:37.277Z] [debug] attack: visibility penalty \u22121 (Glass Hail)\n[2026-09-01T00:20:37.319Z] [world] You raise the searing acid-etched bone crossbow toward Mud Monarchs Raider 2. The room narrows around the both of you.\n[2026-09-01T00:20:37.319Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T00:20:37.562Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (242ms)\n",
+      "[2026-09-01T00:20:46.380Z] [world] You seize the initiative. Mud Monarchs Raider 2 has no time to react.\n[2026-09-01T00:20:46.380Z] [combat] You \u2014 d20 \u2192 10 + DEX 22 \u2212 1 (Glass Hail) = 31 vs Mud Monarchs Raider 2 AC 10 \u2014 \u2713 HIT\n[2026-09-01T00:20:46.384Z] [combat] Piercing flares \u2014 +2 on hit.\n",
+      "[2026-09-01T00:20:46.385Z] [combat] You crack the Mud Monarchs Raider 2 with the Searing Acid-Etched Bone Crossbow for 11 \u2014 the better part of their fight, gone in one blow. They crumple, out cold. (2/13 HP) Loot them before they come to.\n[2026-09-01T00:20:46.385Z] [combat] Mud Monarchs Raider 2 is out of it. Mud Monarchs Raider 3 now in your sights.\n",
+      "[2026-09-01T00:20:46.386Z] [combat] Searing Acid-Etched Bone Crossbow \u2014 2 burn bites in and festers (3 turns).\n[2026-09-01T00:20:46.386Z] [combat] Searing Acid-Etched Bone Crossbow \u2014 1 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n",
+      "[2026-09-01T00:20:46.388Z] [combat] Mud Monarchs Raider 3 \u2014 d20 \u2192 6 + ATK 6 = 12 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-01T00:20:46.390Z] [combat] Mud Monarchs Raider 4 \u2014 d20 \u2192 19 + ATK 6 = 25 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-09-01T00:20:46.391Z] [combat] Mud Monarchs Raider 5 turns on Soot \u2014 d20 18 + ATK 6 = 24 vs Soot's AC 12 (vest +2) \u2014 \u2713 HIT\n",
+      "[2026-09-01T00:20:46.391Z] [combat] Soot takes 8. (0/15 HP left)\n[2026-09-01T00:20:46.392Z] [arbiter] Soot drops under the Mud Monarchs Raider 5 and drags herself clear of the fight. She is down \u2014 tend her within a day or she won't get back up.\n[2026-09-01T00:20:46.645Z] [combat] Mud Monarchs Raider 4 deals 4 bludgeoning damage [edge of reach \u2014 halved]. You have 23 HP remaining.\n",
+      "[2026-09-01T00:20:49.730Z] [debug] ui: tap \"inventory\"\n[2026-09-01T00:20:50.393Z] [debug] persist sizes(KB): total=233 player=51 wm=90[rooms=45 events=3 memos=0 npcs=4 defeated=1 tags=1 discovered=0] log=86 scene=5\n[2026-09-01T00:21:00.005Z] [player] use First Aid Kit\n",
+      "[2026-09-01T00:21:00.006Z] [debug] parser: intent=use_relic conf=1.00 verb=use target=first aid kit resolved=Mud Monarchs Raider 2 range=mid enemies=4 hooks=0\n[2026-09-01T00:21:00.008Z] [world] You use one First Aid Kit. +17 HP (topped off), +7 stamina.\n[2026-09-01T00:21:00.018Z] [system] \u23f3 Time passed: 15 min\n[2026-09-01T00:21:01.215Z] [cognitive] neutral  (1196ms)\n",
+      "[2026-09-01T00:21:06.108Z] [player] feed dog First Aid Kit\n[2026-09-01T00:21:06.109Z] [world] You feed Soot the First Aid Kit. She eats, slow and serious. (+15 HP, +20 loyalty)\n[2026-09-01T00:21:10.961Z] [debug] ui: tap \"approach\"\n[2026-09-01T00:21:11.012Z] [player] approach Mud Monarchs Raider 3\n",
+      "[2026-09-01T00:21:11.014Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud monarchs raider 3 resolved=Mud Monarchs Raider 3 range=mid enemies=4 hooks=0\n[2026-09-01T00:21:11.015Z] [debug] move: advance from range=mid enemies=4 weather=Glass Hail cost=1 partial=0\n[2026-09-01T00:21:11.015Z] [debug] move: field advance target=Mud Monarchs Raider 3 d 1.48->0.48 band mid->close\n",
+      "[2026-09-01T00:21:11.015Z] [world] You close the gap with the Mud Monarchs Raider 3 and 3 others. (range: close / arm's reach)\n[2026-09-01T00:21:11.016Z] [world] The field shifts around you \u2014 Mud Monarchs Raider 2 now close / arm's reach; Mud Monarchs Raider 4 now close / arm's reach; Mud Monarchs Raider 5 now close / arm's reach.\n",
+      "[2026-09-01T00:21:11.016Z] [combat] Mud Monarchs Raider 2 blisters \u2014 clinging fire sears 2. (0/13 HP, 2 turns left)\n[2026-09-01T00:21:11.016Z] [combat] Mud Monarchs Raider 2 smokes \u2014 acid eats 1. (0/13 HP, 2 turns left)\n[2026-09-01T00:21:11.017Z] [reward] Mud Monarchs Raider 2 defeated. You recover Aether Residue \u00d72, Patched Cloth, Burlap Vest.\n",
+      "[2026-09-01T00:21:11.018Z] [reward] You strip the body: Bone Knife, Mud-Warden's Vest (+6 TC). The kit took the fight badly.\n[2026-09-01T00:21:11.019Z] [combat] 3 attackers remain. Mud Monarchs Raider 3 now in your sights.\n[2026-09-01T00:21:11.019Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-09-01T00:21:11.019Z] [reward] +8 TC pried from the dust.\n",
+      "[2026-09-01T00:21:11.067Z] [combat] Mud Monarchs Raider 3 \u2014 d20 \u2192 16 + ATK 6 = 22 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-09-01T00:21:11.068Z] [combat] Mud Monarchs Raider 4 \u2014 d20 \u2192 11 + ATK 6 = 17 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-01T00:21:11.069Z] [combat] Mud Monarchs Raider 5 \u2014 d20 \u2192 13 + ATK 6 = 19 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-01T00:21:11.070Z] [debug] arbiter: template (reason=combat)\n[2026-09-01T00:21:11.070Z] [arbiter] The Arbiter's hand drifts to nothing in particular. \"The Mud Monarchs Raider 3 will not tire before you do. Spend wisely.\"\n[2026-09-01T00:21:11.315Z] [combat] Mud Monarchs Raider 3 deals 4 slashing damage [armor \u221234%]. You have 36 HP remaining.\n",
+      "[2026-09-01T00:21:11.539Z] [cognitive] neutral  (467ms)\n[2026-09-01T00:21:12.360Z] [debug] ui: tap \"dodge\"\n[2026-09-01T00:21:12.373Z] [player] dodge\n[2026-09-01T00:21:12.374Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=3 hooks=0\n",
+      "[2026-09-01T00:21:12.375Z] [world] You commit to the dodge. Slip Mud Monarchs Raider 3's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-01T00:21:12.431Z] [combat] Mud Monarchs Raider 5 \u2014 d20 \u2192 8 + ATK 6 = 14 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n",
+      "[2026-09-01T00:21:12.431Z] [combat] Dodge \u2014 d20 \u2192 19 + DEX 23 = 42 vs ATK 14. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-01T00:21:12.431Z] [world] You slip Mud Monarchs Raider 5's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n",
+      "[2026-09-01T00:21:12.433Z] [debug] ac-shift 23\u219226: race/base 10 + gear 20 + title 0 \u2192 trimmed 23 + status 3 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n",
+      "[2026-09-01T00:21:12.433Z] [combat] Mud Monarchs Raider 3 \u2014 d20 \u2192 14 + ATK 6 = 20 vs your AC 26 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-01T00:21:12.434Z] [combat] Mud Monarchs Raider 4 \u2014 d20 \u2192 6 + ATK 6 = 12 vs your AC 26 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-01T00:21:12.435Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T00:21:12.661Z] [cognitive] neutral  (225ms)\n",
+      "[2026-09-01T00:21:13.377Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n[2026-09-01T00:21:13.379Z] [system] evasive \u2014 harder to hit fades.\n[2026-09-01T00:21:13.381Z] [world] A shard of mud-glass nicks you. Small wound, steady reminder. (\u22121 HP)\n[2026-09-01T00:21:13.411Z] [player] attack with the auralite talon\n",
+      "[2026-09-01T00:21:13.412Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=3 hooks=0\n[2026-09-01T00:21:13.412Z] [arbiter] The Arbiter keeps one eye on the fight. \"That is the right move for Silence the Doubter \u2014 but not with something on you. Put this down first.\"\n",
+      "[2026-09-01T00:21:13.412Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter keeps one eye on the fight. \"That is the right m\u2026\"\n[2026-09-01T00:21:13.413Z] [debug] attack: target=Mud Monarchs Raider 3 range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n[2026-09-01T00:21:13.414Z] [debug] attack: visibility penalty \u22121 (Glass Hail)\n",
+      "[2026-09-01T00:21:13.415Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-01T00:21:13.460Z] [world] You commit forward with the acid-etched corrupted auralite talon. Mud Monarchs Raider 3 watches your hands.\n[2026-09-01T00:21:13.461Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T00:21:13.676Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (214ms)\n",
+      "[2026-09-01T00:21:21.879Z] [world] You seize the initiative. Mud Monarchs Raider 3 has no time to react.\n[2026-09-01T00:21:21.880Z] [combat] You \u2014 d20 \u2192 12 + INT 11 \u2212 1 (Glass Hail) perfect opening (2\u00d7 dice) = 22 vs Mud Monarchs Raider 3 AC 10 \u2014 \u2713 HIT\n[2026-09-01T00:21:21.880Z] [combat] Mud Monarchs Raider 3 shrugs off the aetheri"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-31-1597-the-tile-is-the-trigger #mthxaxji3kq3 [inline 20/22]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mthxaxji3kq3"
+    },
+    {
+      "key": "dist",
+      "value": "2026-08-31-1597-the-tile-is-the-trigger"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "20"
+    },
+    {
+      "key": "parts",
+      "value": "22"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-08-31-1597-the-tile-is-the-trigger"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-01T00:22:38.883286Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-01T00:22:40.229000Z",
+  "fingerprints": [
+    "19d6f357b4c9ee47ab81ae8539a6c03c"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1947146650,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-01T00:14:36.323000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-08-31-1597-the-tile-is-the-trigger",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-08-31-1597-the-tile-is-the-trigger",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-08-31-1597-the-tile-is-the-trigger",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-08-31-1597-the-tile-is-the-trigger)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "2acb4f2ec26b41198c3be783b3147730",
+  "previousEventID": "25058faf9546495e8791d97f7ab3c1af"
+}

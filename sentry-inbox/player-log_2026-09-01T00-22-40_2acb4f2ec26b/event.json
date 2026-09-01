@@ -1,0 +1,236 @@
+{
+  "id": "2acb4f2ec26b41198c3be783b3147730",
+  "groupID": "7703506205",
+  "eventID": "2acb4f2ec26b41198c3be783b3147730",
+  "projectID": "4511945117532160",
+  "size": 18096,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-31-1597-the-tile-is-the-trigger #mthxaxji3kq3 [inline 18/22]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-08-31-1597-the-tile-is-the-trigger",
+  "message": "player-log 2026-08-31-1597-the-tile-is-the-trigger #mthxaxji3kq3 [inline 18/22]",
+  "title": "player-log 2026-08-31-1597-the-tile-is-the-trigger #mthxaxji3kq3 [inline 18/22]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "00abe10a994849faba85894bf4c17d3c",
+      "span_id": "8bc29c3221eefe59",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "ng, the way you check a pocket you already know is empty.\n[2026-09-01T00:18:26.600Z] [debug] ui: tap \"dodge\"\n[2026-09-01T00:18:26.617Z] [player] dodge\n[2026-09-01T00:18:26.618Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=1 hooks=3\n",
+      "[2026-09-01T00:18:26.620Z] [world] You commit to the dodge. Slip Drowned Aetherkin's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-01T00:18:26.620Z] [combat] Drowned Aetherkin turns on Soot \u2014 d20 10 + ATK 2 = 12 vs Soot's AC 12 (vest +2) \u2014 \u2713 HIT\n[2026-09-01T00:18:26.621Z] [combat] Soot takes 5. (10/15 HP left)\n",
+      "[2026-09-01T00:18:26.622Z] [debug] arbiter: template (reason=combat)\n[2026-09-01T00:18:26.623Z] [arbiter] The Arbiter does not look away from the drowned aetherkin. \"Decide quickly. It already has.\"\n[2026-09-01T00:18:26.624Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T00:18:26.852Z] [cognitive] neutral  (227ms)\n[2026-09-01T00:18:27.700Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n",
+      "[2026-09-01T00:18:27.706Z] [system] dodging (parry) fades.\n[2026-09-01T00:18:27.741Z] [player] attack with the auralite talon\n[2026-09-01T00:18:27.742Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=mid enemies=1 hooks=3\n",
+      "[2026-09-01T00:18:27.742Z] [arbiter] The Arbiter keeps one eye on the fight. \"That is the right move for Silence the Doubter \u2014 but not with something on you. Put this down first.\"\n[2026-09-01T00:18:27.743Z] [debug] attack: target=Drowned Aetherkin range=mid reach.bands=[close] reach.label=Auralite Talon bareHand=false\n",
+      "[2026-09-01T00:18:27.743Z] [arbiter] The Arbiter holds up a hand. \"Auralite Talon works at close / arm's reach range only \u2014 you're at mid-range. ADVANCE to close in (they'll answer the approach), or attack with something that reaches.\"\n[2026-09-01T00:18:27.745Z] [debug] arbiter: template (reason=combat)\n[2026-09-01T00:18:27.745Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-09-01T00:18:27.954Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (207ms)\n[2026-09-01T00:18:33.349Z] [debug] ui: tap \"\ud83d\udd25\u2697 bone crossbow\"\n[2026-09-01T00:18:33.399Z] [player] attack with the off-hand bone crossbow\n",
+      "[2026-09-01T00:18:33.400Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=1 hooks=3\n[2026-09-01T00:18:33.401Z] [debug] attack: target=Drowned Aetherkin range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n",
+      "[2026-09-01T00:18:33.444Z] [world] You raise the searing acid-etched bone crossbow toward Drowned Aetherkin. The room narrows around the both of you.\n[2026-09-01T00:18:33.446Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T00:18:33.640Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (194ms)\n[2026-09-01T00:18:41.996Z] [world] You seize the initiative. Drowned Aetherkin has no time to react.\n",
+      "[2026-09-01T00:18:41.996Z] [combat] You \u2014 d20 \u2192 12 + DEX 23 = 35 vs Drowned Aetherkin AC 8 \u2014 \u2713 HIT\n[2026-09-01T00:18:41.997Z] [combat] Piercing flares \u2014 +4 on hit.\n[2026-09-01T00:18:41.997Z] [combat] Drowned Aetherkin shrugs off the piercing. (resisted, \u00d70.5 for 16)\n",
+      "[2026-09-01T00:18:42.002Z] [arbiter] The Arbiter watches the piercing skid off. \"Swap to the Flame of Aether \u2014 burn will bite where piercing won't.\"\n[2026-09-01T00:18:42.003Z] [combat] Clean hit with the searing acid-etched bone crossbow for 16. Drowned Aetherkin has 29 left and does not back away.\n",
+      "[2026-09-01T00:18:42.004Z] [combat] Searing Acid-Etched Bone Crossbow \u2014 9 burn bites in and festers (3 turns).\n[2026-09-01T00:18:42.005Z] [combat] Searing Acid-Etched Bone Crossbow \u2014 1 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n",
+      "[2026-09-01T00:18:42.007Z] [combat] Drowned Aetherkin \u2014 d20 \u2192 16 + ATK 2 = 18 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-09-01T00:18:42.236Z] [combat] Drowned Aetherkin deals 2 aetheric damage [armor \u221234%, title \u00bd, plate \u22122, floor 30%]. You have 29 HP remaining.\n[2026-09-01T00:18:45.670Z] [debug] ui: tap \"dodge\"\n",
+      "[2026-09-01T00:18:45.678Z] [world] A silent bolt strikes near enough to singe your sleeve. (\u22121 HP)\n[2026-09-01T00:18:45.685Z] [player] dodge\n[2026-09-01T00:18:45.685Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=1 hooks=3\n",
+      "[2026-09-01T00:18:45.686Z] [world] You commit to the dodge. Slip Drowned Aetherkin's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-01T00:18:45.687Z] [combat] Drowned Aetherkin blisters \u2014 clinging fire sears 9. (20/45 HP, 2 turns left)\n",
+      "[2026-09-01T00:18:45.687Z] [combat] Drowned Aetherkin smokes \u2014 acid eats 1. (19/45 HP, 2 turns left)\n[2026-09-01T00:18:45.739Z] [combat] Drowned Aetherkin \u2014 d20 \u2192 5 + ATK 2 = 7 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n[2026-09-01T00:18:45.739Z] [combat] Dodge \u2014 d20 \u2192 6 + DEX 23 = 29 vs ATK 7. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n",
+      "[2026-09-01T00:18:45.740Z] [debug] arbiter: template (reason=combat)\n[2026-09-01T00:18:45.740Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-01T00:18:45.740Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T00:18:45.953Z] [cognitive] neutral  (211ms)\n[2026-09-01T00:18:46.968Z] [debug] ui: tap \"approach\"\n[2026-09-01T00:18:47.012Z] [player] approach Drowned Aetherkin\n",
+      "[2026-09-01T00:18:47.012Z] [debug] parser: intent=advance conf=1.00 verb=approach target=drowned aetherkin resolved=Drowned Aetherkin range=mid enemies=1 hooks=3\n[2026-09-01T00:18:47.013Z] [debug] move: advance from range=mid enemies=1 weather=Aether Lightning cost=1 partial=0\n[2026-09-01T00:18:47.014Z] [debug] move: field advance target=Drowned Aetherkin d 1.50->0.50 band mid->close\n",
+      "[2026-09-01T00:18:47.014Z] [world] You close the gap with Drowned Aetherkin. (range: close / arm's reach)\n[2026-09-01T00:18:47.014Z] [combat] Drowned Aetherkin blisters \u2014 clinging fire sears 9. (10/45 HP, 1 turn left)\n[2026-09-01T00:18:47.014Z] [combat] Drowned Aetherkin smokes \u2014 acid eats 1. (9/45 HP, 1 turn left)\n",
+      "[2026-09-01T00:18:47.015Z] [combat] Drowned Aetherkin \u2014 d20 \u2192 18 + ATK 2 = 20 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-09-01T00:18:47.016Z] [debug] arbiter: template (reason=combat)\n[2026-09-01T00:18:47.016Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-09-01T00:18:47.246Z] [combat] Drowned Aetherkin deals 3 aetheric damage [armor \u221234%, title \u00bd, plate \u22122, floor 30%]. You have 25 HP remaining.\n[2026-09-01T00:18:47.442Z] [cognitive] RETREAT \u00b7 REST \u00b7 HIDE \u00b7 SWIM \u00b7 SEARCH  (425ms)\n[2026-09-01T00:18:48.203Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n[2026-09-01T00:18:48.206Z] [system] perfect opening fades.\n",
+      "[2026-09-01T00:18:48.240Z] [player] attack with the auralite talon\n[2026-09-01T00:18:48.240Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=1 hooks=3\n",
+      "[2026-09-01T00:18:48.241Z] [arbiter] The Arbiter keeps one eye on the fight. \"That is the right move for Silence the Doubter \u2014 but not with something on you. Put this down first.\"\n[2026-09-01T00:18:48.241Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter keeps one eye on the fight. \"That is the right m\u2026\"\n",
+      "[2026-09-01T00:18:48.241Z] [combat] Drowned Aetherkin blisters \u2014 clinging fire sears 9. (0/45 HP, 0 turns left)\n[2026-09-01T00:18:48.241Z] [combat] Drowned Aetherkin shakes off the last of the fire \u2014 the Bone Crossbow has run its course.\n[2026-09-01T00:18:48.241Z] [combat] Drowned Aetherkin smokes \u2014 acid eats 1. (0/45 HP, 0 turns left)\n",
+      "[2026-09-01T00:18:48.241Z] [combat] Drowned Aetherkin shakes off the last of the acid \u2014 the Bone Crossbow has run its course.\n[2026-09-01T00:18:48.242Z] [reward] Drowned Aetherkin defeated. You recover Veil of Peace.\n[2026-09-01T00:18:48.243Z] [reward] \u2726 Hard-won spoils \u2014 Hardened Mudstone (Rare).\n",
+      "[2026-09-01T00:18:48.252Z] [reward] \u2726 Recipe recovered from the kill: Aether-Wing Cloak (Rare)! Open Crafting to forge it.\n[2026-09-01T00:18:48.252Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-09-01T00:18:48.252Z] [system] Word travels among those who keep the flood-dead sacred: you put one of the Aetherkin down.\n",
+      "[2026-09-01T00:18:48.252Z] [reward] +3 TC pried from the dust.\n[2026-09-01T00:18:51.637Z] [debug] ui: tap \"take / salvage\"\n[2026-09-01T00:18:52.880Z] [world] You lever something loose from the buried wagon \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n",
+      "[2026-09-01T00:18:52.881Z] [world] You break the standing water apart. Among the pieces, something worth keeping.\n[2026-09-01T00:18:52.881Z] [reward] \u2726 Salvage haul:\n[2026-09-01T00:18:52.881Z] [reward]     \u2022 Iron-Pinned Plank Shard (Uncommon)\n[2026-09-01T00:18:52.882Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-09-01T00:18:53.954Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-09-01T00:18:55.478Z] [player] investigate flood trench\n[2026-09-01T00:18:55.478Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=flood trench resolved=flood trench range=- enemies=0 hooks=3\n[2026-09-01T00:18:55.480Z] [world] You study the flood trench. It bears no marks worth naming \u2014 no glyph, no fingerprint, no trace the Reclaimers would catalog.\n",
+      "[2026-09-01T00:18:55.481Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-09-01T00:18:55.481Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-01T00:18:55.625Z] [cognitive] SEARCH \u00b7 TALK \u00b7 RETREAT \u00b7 SWIM  (137ms)\n",
+      "[2026-09-01T00:18:55.783Z] [debug] persist sizes(KB): total=232 player=51 wm=93[rooms=49 events=3 memos=0 npcs=4 defeated=1 tags=1 discovered=0] log=84 scene=4\n[2026-09-01T00:18:56.437Z] [debug] ui: tap \"\u2192 TARTARIAN OUTSKIRTS\"\n[2026-09-01T00:18:56.453Z] [world] Zann of No Fixed Stall sets down what they're holding. \"Didn't expect you today, Cheddar Bob.\"\n",
+      "[2026-09-01T00:18:56.453Z] [world] \"Been a while,\" Zann of No Fixed Stall says. \"Thought the mud had you.\"\n[2026-09-01T00:18:56.453Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Zann of No Fixed Stall, fence. Tap the vendor banner to trade.\n",
+      "[2026-09-01T00:18:56.461Z] [world] This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n[2026-09-01T00:18:56.462Z] [world] You walk west through open silt. The compass tells you The Architect's Blind lies further west \u2014 5 tiles, about 13 hours of travel.\n",
+      "[2026-09-01T00:18:56.465Z] [world] A body sits cross-legged in the silt, mud-glassed in place. The pose is patient. Whatever they were waiting for never arrived.\n[2026-09-01T00:18:56.465Z] [world] A locket on their chest holds a pre-flood photograph \u2014 a face you don't recognise, smiling at a sky that doesn't exist anymore.\n",
+      "[2026-09-01T00:18:56.467Z] [reward] \u2726 Found First Inscription \u2014 The Giant's Watch. (open Contracts \u2192 Collectibles to read)\n[2026-09-01T00:18:56.474Z] [world] The thought you set down here is right where you set it down.\n[2026-09-01T00:18:56.730Z] [player] investigate mud fissure\n",
+      "[2026-09-01T00:18:56.731Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud fissure resolved=mud fissure range=- enemies=0 hooks=3\n[2026-09-01T00:18:56.732Z] [world] You've already examined the mud fissure. There's nothing more to find here.\n[2026-09-01T00:18:56.912Z] [cognitive] SWIM  (179ms)\n[2026-09-01T00:18:57.963Z] [player] investigate flat\n",
+      "[2026-09-01T00:18:57.964Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=flat resolved=flat range=- enemies=0 hooks=3\n[2026-09-01T00:18:57.967Z] [world] You study the flat and find no answer. The silence here is patient; whatever it knew, it has decided to keep.\n",
+      "[2026-09-01T00:18:58.112Z] [debug] qwen\u23f1 investigate_lore ok 2500ms read/write unusable (native mis-reported 80055ms/1075ms \u2014 llama.rn split bug, not this call) in 127t\u2192out 31t (148ch)\n[2026-09-01T00:18:58.348Z] [debug] ui: tap \"take / salvage\"\n[2026-09-01T00:18:58.483Z] [cognitive] neutral  (514ms)\n",
+      "[2026-09-01T00:18:59.624Z] [debug] qwen\u23f1 investigate_lore ok 1512ms wait 371ms read 497ms/write 620ms in 126t\u2192out 20t 3.9ms/t (94ch)\n[2026-09-01T00:18:59.892Z] [world] You take the Climbing Rope from where it lay.\n[2026-09-01T00:18:59.893Z] [reward] \u2726 Climbing Rope (Common).\n[2026-09-01T00:19:00.749Z] [world] You work the buried wagon over. A part of it comes loose, intact.\n",
+      "[2026-09-01T00:19:00.750Z] [world] You break the standing water apart. Among the pieces, something worth keeping.\n[2026-09-01T00:19:00.751Z] [reward] \u2726 Salvage haul:\n[2026-09-01T00:19:00.751Z] [reward]     \u2022 Worn Tartarian Coin x3 (Common)\n[2026-09-01T00:19:00.752Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-09-01T00:19:02.673Z] [debug] ui: tap \"\u2192 TARTARIAN OUTSKIRTS\"\n",
+      "[2026-09-01T00:19:02.693Z] [world] You walk west through open silt. The compass tells you The Architect's Blind lies further west \u2014 4 tiles, about 10 hours of travel.\n[2026-09-01T00:19:02.694Z] [world] A service door at the base of the Red Tower, the kind that does not appear on any of the published floor plans. It opens. Inside: a stairwell descending into red light that has weight. You go down a",
+      " flight and stop counting. The walls hum at the same frequency as the Tower's Core, but quieter, the way a child hums a song they overheard.\n[2026-09-01T00:19:02.694Z] [world] On a service desk near the bottom, a notebook of Order observations of the Core. The last entry, written in the same hand but more loosely: 'It is not powering the Tower. The Tower is what stops it. We were the wrong builder",
+      "s.'\n[2026-09-01T00:19:02.695Z] [reward] \u2726 Recovered Crimson Core Fragment.\n[2026-09-01T00:19:02.696Z] [combat] Mud Spider steps out of the shadows of the place \u2014 Web Trap ready, 2D6 damage on a hit. The loot you found will leave with whoever walks out alive. (range: close)\n[2026-09-01T00:19:02.707Z] [world] Long enough has passed that it should have changed. It has not.\n",
+      "[2026-09-01T00:19:05.774Z] [debug] ui: tap \"dodge\"\n[2026-09-01T00:19:05.785Z] [player] dodge\n[2026-09-01T00:19:05.785Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=3\n",
+      "[2026-09-01T00:19:05.786Z] [world] You commit to the dodge. Slip Mud Spider's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-01T00:19:05.847Z] [combat] Mud Spider \u2014 d20 \u2192 2 + ATK 7 = 9 vs your AC 23 \u2014 \u2717 EVADED\n",
+      "[2026-09-01T00:19:05.847Z] [combat] Dodge \u2014 d20 \u2192 7 + DEX 23 = 30 vs ATK 9. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-01T00:19:05.847Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T00:19:06.060Z] [cognitive] neutral  (211ms)\n[2026-09-01T00:19:06.902Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n[2026-09-01T00:19:06.920Z] [player] attack with the auralite talon\n",
+      "[2026-09-01T00:19:06.920"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-31-1597-the-tile-is-the-trigger #mthxaxji3kq3 [inline 18/22]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mthxaxji3kq3"
+    },
+    {
+      "key": "dist",
+      "value": "2026-08-31-1597-the-tile-is-the-trigger"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "18"
+    },
+    {
+      "key": "parts",
+      "value": "22"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-08-31-1597-the-tile-is-the-trigger"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-01T00:22:38.872733Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-01T00:22:40.229000Z",
+  "fingerprints": [
+    "19d6f357b4c9ee47ab81ae8539a6c03c"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1947146650,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-01T00:14:36.323000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-08-31-1597-the-tile-is-the-trigger",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-08-31-1597-the-tile-is-the-trigger",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-08-31-1597-the-tile-is-the-trigger",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-08-31-1597-the-tile-is-the-trigger)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "366b4b595d544218aaf14862f65b9fa0",
+  "previousEventID": "2547e769c0f94ccb9c5e94688f57b5f4"
+}
