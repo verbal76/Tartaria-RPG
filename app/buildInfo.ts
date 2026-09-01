@@ -26681,6 +26681,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // for mints that stamp digits or nothing; every number on the card remains
 // the roll's own arithmetic (1608), untouched.
 export const OTA_BUILD_ID = '2026-09-01-1609-the-strike-keeps-its-name';
+// golem catch-up 2026-09-01: markerless publish of OTA-1609 - the STRIKES
+// flavor line on the portrait + popup. hal took the marker push.
 // golem catch-up 2026-09-01: markerless publish of OTA-1608 - the portrait
 // reads the roll's own resolvers; every mint swept. hal took the marker.
 // golem catch-up 2026-09-01: markerless publish of OTA-1607 - the portrait
