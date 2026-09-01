@@ -26705,8 +26705,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // outpost, not whether the boots are on its gate. The gate chip and the gate
 // verb now stand on the anchor tile, where a structure's ENTER never appears.
 export const OTA_BUILD_ID = '2026-09-01-1611-weak-and-not-weak';
-// golem catch-up 2026-09-01: markerless publish of OTA-1610 - the paid flee
-// holds the arrival trigger on the fled cell. hal took the marker push.
+// golem catch-up 2026-09-01: markerless publish of OTA-1611 - the portrait
+// honors its inured cancellations, and one door per tile. hal took the marker.
 // golem catch-up 2026-09-01: markerless publish of OTA-1608 - the portrait
 // reads the roll's own resolvers; every mint swept. hal took the marker.
 // golem catch-up 2026-09-01: markerless publish of OTA-1607 - the portrait
