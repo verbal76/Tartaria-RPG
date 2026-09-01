@@ -26537,6 +26537,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // detour. The 1598 guard stays as the belt; the ota1598 sweep pin flips to
 // the empty-list ratchet: no fight-stage on a hub tile, ever again.
 export const OTA_BUILD_ID = '2026-09-01-1599-set-the-bone';
+// golem catch-up 2026-09-01: markerless publish of OTA-1599 — the five hunt
+// fight-stages stand on authored open ground one tile beside their outposts
+// (Raider's Ridge, The Vault Steps, The Drowned Quarter), the Doubter's poster
+// points at the Ridge, and no fight-stage of any family sits on a hub tile.
 // golem catch-up 2026-09-01: markerless publish of OTA-1598 — a hunt stage
 // that draws blades refuses under a roof and points at the door; the escort
 // writer never puts bodies indoors; the arrival slate on a hub-tile fight
