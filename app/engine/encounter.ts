@@ -237,7 +237,21 @@ export function randomizeEnemyDefense(enemy: Enemy, rng: () => number = Math.ran
   const pool = thematicPoolFor(enemy.type);
   const pick = (arr: readonly string[]) => arr[Math.floor(rng() * arr.length)];
   const newWeak = pick(pool.weak) ?? 'slashing';
-  const softResist = pool.resist.length ? pick(pool.resist.filter((r) => r !== newWeak)) : undefined;
+  // ⚠⚠⚠ OTA-1611 — A TYPE CANNOT BE CANCELLED AND ARMOURED ON ONE BODY. The
+  // thematic pool and the type map do not always agree about a kind: an Aetheric
+  // Mutation is WEAK to poison in the type map and offers poison as a resist
+  // candidate in its pool. Drawing it stamped `resist:poison` beside the
+  // `inured:poison` the loop below writes, and the two readers then disagreed by
+  // construction — the roll walks the traits and meets `inured:` first (poison
+  // lands ordinary), while the card's reconcile saw the trait resist beat the
+  // type weakness and printed RESIST. Neither was wrong about its own input; the
+  // input was incoherent. Softening a type the kind is SOFT to is also the exact
+  // OTA-1093 inversion this function was rewritten to stop, so the candidates
+  // drop it. `pick` still consumes exactly one draw either way — the rng stream
+  // ota818 depends on is untouched, only the choice within it changes.
+  const map = enemyTypeDefenses(enemy.type);
+  const softCandidates = pool.resist.filter((r) => r !== newWeak && !map.weak.includes(r));
+  const softResist = pool.resist.length ? pick(softCandidates) : undefined;
   // Neutralize the type-map's DEFAULT weaknesses (bar the rolled one) so the old
   // fixed answer doesn't still work.
   //
@@ -253,7 +267,6 @@ export function randomizeEnemyDefense(enemy: Enemy, rng: () => number = Math.ran
   // hit NORMALLY, which is what neutralize was always supposed to mean. The
   // variety intent is untouched: one rolled weakness still stands out, and the
   // wall roll below still stacks REAL armour where the kind already had some.
-  const map = enemyTypeDefenses(enemy.type);
   for (const w of map.weak) {
     if (w !== newWeak && !traits.includes(`inured:${w}`)) traits.push(`inured:${w}`);
   }

@@ -96,6 +96,21 @@ export function traitDefenses(
   return { resists, weaknesses };
 }
 
+/** ⚠⚠⚠ OTA-1611 — THE TYPES THIS INDIVIDUAL IS INURED TO, in one place, because
+ *  `traitDefenses` above deliberately does not carry them and every reader that
+ *  wanted them forgot to ask. `inured:X` is a CANCELLATION of a kind-wide
+ *  weakness (see `traitDamageMultiplier` and `combineDamageTypeMatch`): the
+ *  swing lands ordinary, not soft, not armoured. Raw lowercase args — the
+ *  caller canonicalises both sides before comparing, the way the roll does. */
+export function inuredTypes(traits: readonly string[] | undefined): string[] {
+  const out: string[] = [];
+  for (const t of traits ?? []) {
+    const [key, arg] = t.split(':');
+    if (key === 'inured' && arg) out.push(arg.toLowerCase());
+  }
+  return out;
+}
+
 /** Damage-side resistance / vulnerability traits. Returns the multiplier
  *  applied to incoming damage of the given type. Stacks multiplicatively
  *  with other modifiers. */

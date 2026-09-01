@@ -3002,16 +3002,11 @@ export function acceptKeyword(title: string, taken?: Set<string>): string {
   return picked;
 }
 
-// ⚠⚠ OTA-1382 — UNIVERSALISED, NOT FLAGGED. This was HAL-only, and the reason
-// recorded there was sound at the time: HAL is the line with real tester saves
-// written before OTA-838's observed-weakness system existed, and golem had no
-// such saves to strand.
-//
-// It is shared now because that reasoning stopped being the whole story. The
-// About screen's IMPORT SAVE accepts an export "from this or another install",
-// so a pre-838 save can walk from HAL onto any other line — and on the lines
-// without this backfill it stays blank forever, which is precisely the defect
-// the backfill exists to prevent.
+// ⚠⚠ OTA-1382 — UNIVERSALISED, NOT FLAGGED. Written HAL-only (the line with real
+// tester saves predating OTA-838's observed-weakness system), it is shared now
+// because IMPORT SAVE accepts an export "from this or another install": a pre-838
+// save can walk from HAL onto any line, and without this backfill it stays blank
+// there forever — precisely the defect the backfill exists to prevent.
 //
 // ⚠ It is NOT a feature flag, because it does not need to be: the call site is
 // `wm.enemyIntel ?? backfill(...)`, so it fires only when a save carries no
@@ -3027,26 +3022,17 @@ export function backfillEnemyIntelFromDefeats(
   if (!defeatedNames || defeatedNames.length === 0) return out;
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const enemies = require('../data/enemies/enemies.json') as Array<{ name: string; type?: string; traits?: string[] }>;
+  // ⚠⚠ OTA-1611 — THE FOURTH COPY OF THE RECONCILE IS GONE. This carried its own
+  // transcription of the type-map/trait sum, which meant `inured:` was dropped
+  // here too and a fifth reader could be written tomorrow with the same hole.
+  // The card, the popup, the ★ and now this backfill all ask one function.
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { enemyTypeDefenses } = require('../engine/crafting') as typeof import('../engine/crafting');
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { traitDefenses } = require('../engine/enemyTraits') as typeof import('../engine/enemyTraits');
+  const { reconciledDefenses } = require('../engine/weaponGlyphs') as typeof import('../engine/weaponGlyphs');
   const byName = new Map(enemies.map((e) => [e.name.toLowerCase(), e]));
   for (const rawName of new Set(defeatedNames.map((n) => n.toLowerCase()))) {
     const e = byName.get(rawName);
     if (!e) continue;
-    const type = enemyTypeDefenses(e.type);
-    const trait = traitDefenses(e.traits);
-    const all = Array.from(new Set([...type.resist, ...type.weak, ...trait.resists, ...trait.weaknesses]));
-    const weak: string[] = [];
-    const resist: string[] = [];
-    for (const dt of all) {
-      const typeDir = type.weak.includes(dt) ? 1 : type.resist.includes(dt) ? -1 : 0;
-      const traitDir = trait.weaknesses.includes(dt) ? 1 : trait.resists.includes(dt) ? -1 : 0;
-      const dir = traitDir !== 0 ? traitDir : typeDir; // trait wins on a discord (mirrors defensesFor)
-      if (dir > 0) weak.push(dt);
-      else if (dir < 0) resist.push(dt);
-    }
+    const { weaknesses: weak, resists: resist } = reconciledDefenses(e as never);
     // ⚠ OTA-1528 — SAME KEY AS THE WRITER AND THE READER. This wrote the bare
     // lowercased name, which nothing looks up any more. The backfill's source is
     // enemies.json — AUTHORED traits, never a per-spawn roll — so the key it
@@ -12650,8 +12636,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // 'enter' still prefers a discovered structure; blades out bar the
         // gate (the OTA-1598 truce works both ways).
         const wantsOutpost = /\b(outpost|gate|gates|city|capital|settlement|walls|market)\b/i.test(trimmed);
-        if (enterShaped && !get().player?.hubRoomId && isHubLocation(get().player?.currentLocationId ?? null)
-            && (wantsOutpost || !here)) {
+        // ⚠⚠⚠ OTA-1611 — AND THE GATE STANDS ON ONE TILE, NOT OVER A WHOLE
+        // LOCATION. 1606 asked only whether the location IS an outpost, so the
+        // verb opened the gate from any tile of its local grid — the arrival
+        // teleport 1606 removed, wearing a verb. The door is on the anchor.
+        const atGate = (get().player?.mapX ?? WORLD_MAP_CENTER_X) === WORLD_MAP_CENTER_X
+          && (get().player?.mapY ?? WORLD_MAP_CENTER_Y) === WORLD_MAP_CENTER_Y;
+        const hubHere = !get().player?.hubRoomId && isHubLocation(get().player?.currentLocationId ?? null);
+        if (enterShaped && wantsOutpost && hubHere && !atGate) {
+          if (!_opts?.silent) get().appendLog('player', trimmed);
+          get().appendLog('arbiter', `The Arbiter nods back the way you came. "The gate's at the heart of ${get().currentScene?.location?.name ?? 'this place'} — you're out on its ground. Walk back to it and it opens."`);
+          return;
+        }
+        if (enterShaped && hubHere && atGate && (wantsOutpost || !here)) {
           if (!_opts?.silent) get().appendLog('player', trimmed);
           const scNow = get().currentScene;
           if ((scNow?.enemies ?? []).some((_, i) => (scNow?.enemyHps?.[i] ?? 0) > 0)) {

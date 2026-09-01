@@ -26692,7 +26692,19 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // fight-verb still summons on purpose — deliberate re-engagement is the
 // verb's job, not the investigate button's. Flee-in-place itself stays,
 // per his "okay fine".
-export const OTA_BUILD_ID = '2026-09-01-1610-the-flee-is-honored';
+// ⚠⚠⚠ OTA-1611 — WEAK AND NOT WEAK ON ONE CARD. Owner's portrait: `WEAK
+// Piercing, Slashing, Poison, Corruption` sitting over chips reading `Not Weak:
+// Slashing`, `Not Weak: Poison`, `Not Weak: Corruption`. "how can the enemy be
+// weak and not weak to the same things" — it cannot, and the roll always agreed
+// with the chips: `traitDefenses` never read `inured:`, so the shared reconcile
+// printed the kind's soft spots after this individual's had been cancelled. The
+// sum now applies the cancellation exactly as combineDamageTypeMatch does, and
+// the fourth hand-copy of that sum (the intel backfill) calls the one function.
+// ⚠⚠ AND ONE DOOR PER TILE. "why two enters?" — ENTER (a found structure) beside
+// ENTER OUTPOST, because 1606's predicate asked whether the LOCATION is an
+// outpost, not whether the boots are on its gate. The gate chip and the gate
+// verb now stand on the anchor tile, where a structure's ENTER never appears.
+export const OTA_BUILD_ID = '2026-09-01-1611-weak-and-not-weak';
 // golem catch-up 2026-09-01: markerless publish of OTA-1610 - the paid flee
 // holds the arrival trigger on the fled cell. hal took the marker push.
 // golem catch-up 2026-09-01: markerless publish of OTA-1608 - the portrait

@@ -36,7 +36,7 @@
 // character and reads faster than the word ever did.
 import type { InventoryItem, WeaponCoating, Enemy } from './types';
 import { canonicalDamageType } from './damageTypes';
-import { traitDefenses, enemyIntelKey } from './enemyTraits';
+import { traitDefenses, enemyIntelKey, inuredTypes } from './enemyTraits';
 import { enemyTypeDefenses } from './crafting';
 
 /** Wisdom that reads a non-boss's defenses on sight (OTA-818/819). Lives here
@@ -67,6 +67,18 @@ export const COATING_GLYPH: Record<WeaponCoating['kind'], string> = {
 export function reconciledDefenses(enemy: Enemy): { resists: string[]; weaknesses: string[] } {
   const type = enemyTypeDefenses(enemy.type);
   const trait = traitDefenses(enemy.traits);
+  // ⚠⚠⚠ OTA-1611 — AND THE CANCELLATIONS COUNT. Owner's portrait, one card:
+  // `WEAK Piercing, Slashing, Poison, Corruption` over chips reading `Not Weak:
+  // Slashing`, `Not Weak: Poison`, `Not Weak: Corruption`. Both halves came from
+  // the same spawn and only one of them was right. `traitDefenses` reads
+  // `resist:` and `vulnerable:` and drops `inured:` on the floor, so this sum —
+  // the one function the card, the popup and the ★ all share — printed the
+  // Human kind's four soft spots while three of them had been cancelled on this
+  // individual by `randomizeEnemyDefense`. The ROLL has always known: every swing
+  // goes through combineDamageTypeMatch, where an inured type lands ×1.0 ordinary.
+  // The card was sending him after a weakness that was not there — the OTA-1608
+  // class of lie, in the one cell 1608 did not sweep.
+  const inured = new Set(inuredTypes(enemy.traits).map((t) => canonicalDamageType(t)));
   const all = Array.from(new Set([...type.resist, ...type.weak, ...trait.resists, ...trait.weaknesses]));
   const resists: string[] = [];
   const weaknesses: string[] = [];
@@ -75,7 +87,10 @@ export function reconciledDefenses(enemy: Enemy): { resists: string[]; weaknesse
     const traitDir = trait.weaknesses.includes(dt) ? 1 : trait.resists.includes(dt) ? -1 : 0;
     // Discord → the per-enemy trait wins (matches combineDamageTypeMatch); else sum.
     const dir = typeDir !== 0 && traitDir !== 0 && typeDir !== traitDir ? traitDir : typeDir + traitDir;
-    if (dir > 0) weaknesses.push(dt);
+    // ⚠ Exactly combineDamageTypeMatch's rule: inured cancels a WEAKNESS and
+    // leaves a resistance alone — you cannot be "used to" something that was
+    // never soft, so a Construct keeps its plating.
+    if (dir > 0) { if (!inured.has(canonicalDamageType(dt))) weaknesses.push(dt); }
     else if (dir < 0) resists.push(dt);
   }
   return { resists, weaknesses };

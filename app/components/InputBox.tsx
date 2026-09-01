@@ -25,6 +25,7 @@ import { parseWeaponEffect, applyRangeNote } from '../engine/weaponEffects';
 import { itemIsHandThrownSpear } from '../engine/bandolierEligibility';
 import { useReduceMotion } from '../state/accessibility';
 import { hubRoomFor, hubSkinFactionFor, isLeaveHubCommand, roomIsExit, hubDefinesExitRoom, isHubLocation } from '../engine/hub';
+import { WORLD_MAP_CENTER_X, WORLD_MAP_CENTER_Y } from '../engine/worldMap';
 import { resolveDisplayWeaponByName } from '../engine/itemResolution';
 // OTA-1553 — the combat weapon label: coating glyphs, the name, and a ★ when
 // this weapon hits a weakness the player has actually discovered.
@@ -348,6 +349,9 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   // OTA-1186 — the room chips must read the SITE's names, not the player's, or the
   // exit labels disagree with the room the player is standing in.
   const hubLocationId = useGameStore((s) => s.player?.currentLocationId ?? null);
+  // OTA-1611 — the local-grid tile the boots are on, for the gate-chip anchor test.
+  const mapX = useGameStore((s) => s.player?.mapX ?? WORLD_MAP_CENTER_X);
+  const mapY = useGameStore((s) => s.player?.mapY ?? WORLD_MAP_CENTER_Y);
   const skinFactionId = hubSkinFactionFor(hubLocationId, factionId);
   // arb25 — enterable buildings: when inside one, the travel row shows the
   // building's rooms + EXIT instead of cardinals / faction-hub exits.
@@ -454,7 +458,17 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   // ⚠ OTA-1606 — standing OUTSIDE on a hub tile: arrival no longer walks
   // through the gate on its own (owner: "other wise it's a tile"), so the
   // gate needs a button. Submits the taught phrase, same as EXIT does.
-  const onHubTileOutside = !hubRoomId && !activeBuildingId && isHubLocation(hubLocationId);
+  // ⚠⚠⚠ OTA-1611 — AND THE GATE IS WHERE THE GATE IS. Owner's screenshot at
+  // Reclaimer's Stake: ENTER and ENTER OUTPOST side by side — "why two enters?"
+  // The 1606 predicate asked only whether the LOCATION is an outpost, and a
+  // location is a whole local grid, so the gate chip followed him onto every
+  // tile of it — including the tile where a found structure already offers its
+  // own ENTER. Two buttons, two different doors, no way to tell which. The
+  // outpost's door stands on the location's ANCHOR tile (the same tile
+  // `sceneBuilding` is suppressed on, which is why they could never overlap
+  // once this is right), so the chip stands there and nowhere else.
+  const onAnchorTile = mapX === WORLD_MAP_CENTER_X && mapY === WORLD_MAP_CENTER_Y;
+  const onHubTileOutside = !hubRoomId && !activeBuildingId && onAnchorTile && isHubLocation(hubLocationId);
   // ⚠⚠ OTA-1277 — MARK THE ROOMS YOU HAVE ALREADY WALKED. Owner, typed into the
   // game mid-session: *"I don't know if I've been to a room yet or not. maybe we
   // should put a little symbol in the room button if it's already been explored.
