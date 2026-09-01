@@ -1,0 +1,259 @@
+{
+  "id": "0ab023eab6bb47debf9193c469ef487a",
+  "groupID": "7703751891",
+  "eventID": "0ab023eab6bb47debf9193c469ef487a",
+  "projectID": "4511945117532160",
+  "size": 17719,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-01-1600-the-stinger #mti3vvn82rch [inline 1/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-01-1600-the-stinger",
+  "message": "player-log 2026-09-01-1600-the-stinger #mti3vvn82rch [inline 1/28]",
+  "title": "player-log 2026-09-01-1600-the-stinger #mti3vvn82rch [inline 1/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "8d836817861b4b5aa556d39a65a305d6",
+      "span_id": "8ffc27a5b5d47cae",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "=== TARTARIA LOG \u00b7 399922 CHARS \u00b7 BEGIN ===\n[2026-08-31T22:12:21.317Z] [system] \u23f3 Time passed: 8h\n[2026-08-31T22:12:21.528Z] [cognitive] REST  (210ms)\n[2026-08-31T22:12:21.953Z] [debug] persist sizes(KB): total=213 player=48 wm=77[rooms=36 events=3 memos=0 npcs=3 defeated=1 tags=1 discovered=0] log=79 scene=9\n[2026-08-31T22:12:22.957Z] [debug] ui: tap \"flee\"\n",
+      "[2026-08-31T22:12:22.965Z] [player] flee\n[2026-08-31T22:12:22.965Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=far enemies=1 hooks=3\n[2026-08-31T22:12:23.030Z] [system] \u23f3 Time passed: 15 min\n[2026-08-31T22:12:23.281Z] [cognitive] FEAR \u00b7 RETREAT \u00b7 HIDE  (250ms)\n",
+      "[2026-08-31T22:12:24.458Z] [debug] qwen\u23f1 ambient_fill preempted 2742ms read 0ms/write 0ms in 362t\u2192out 0t (0ch)\n[2026-08-31T22:12:24.680Z] [debug] arbiter: ambient-fill \u2205 3377ms\n[2026-08-31T22:12:24.680Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient_fill after 2742ms \u2014 ambient:fill-\u2205\n[2026-08-31T22:12:24.877Z] [debug] skillcheck: escape d20=18 DEX 23 = 41 vs Pursuit 7 \u2014 Aetheric Leech (d20 3 + SPD 4) \u2192 PASS\n",
+      "[2026-08-31T22:12:24.921Z] [debug] stats: STR12 DEX24 INT11 WIS11 CHA4 STE6 | gear: WIS+4,INT+2,DEX+15,STR+5,STE+2 | worn: main=Auralite Talon off=Bone Crossbow head=Architect's Sight Enhancer chest=Forgotten Protector's Plate hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n",
+      "[2026-08-31T22:12:24.921Z] [debug] train: dexterity (escape check) \u2192 progress 54/100\n[2026-08-31T22:12:24.921Z] [world] The chase lasts about as long as its appetite does.\n[2026-08-31T22:12:26.191Z] [debug] ui: tap \"\u2192 GREAT TARTARY PLAINS\"\n[2026-08-31T22:12:26.208Z] [debug] spawn: gear=[Mud-Seer's Hood, Echoing Steps Boots] window=10 roster=new\n",
+      "[2026-08-31T22:12:26.209Z] [arbiter] The Arbiter, walking with you: \"Tartaria was a continent once. A flood older than any honest map drowned it. We are crossing the top of it.\"\n[2026-08-31T22:12:26.210Z] [world] You walk east through open silt. The compass points east into open ground.\n[2026-08-31T22:12:26.211Z] [world] Time went somewhere. It did not come here.\n",
+      "[2026-08-31T22:12:27.177Z] [debug] ui: tap \"take / salvage\"\n[2026-08-31T22:12:28.420Z] [world] You get a hand under the Echoing Steps Boots and take it.\n[2026-08-31T22:12:28.420Z] [reward] \u2726 Echoing Steps Boots (Common).\n[2026-08-31T22:12:28.433Z] [world] You claim the Mud-Seer's Hood.\n[2026-08-31T22:12:28.433Z] [reward] \u2726 Mud-Seer's Hood (Common).\n",
+      "[Filtered]",
+      "[2026-08-31T22:12:29.289Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-08-31T22:12:30.610Z] [debug] ui: tap \"\u2192 GREAT TARTARY PLAINS\"\n[2026-08-31T22:12:30.635Z] [world] You walk north. You arrive at Great Tartary Plains.\n[2026-08-31T22:12:30.636Z] [debug] scene: loc=great_tartary_plains hub=- arrival=y opening=n passing=n\n",
+      "[2026-08-31T22:12:30.637Z] [debug] missions: hunt:hunt_servants_doubter stage 1/5 [boss\u2192attack] @great_tartary_plains HERE needs=Servants' Mark of Sanction\u2717MISSING spawn=Tartarian Raider\u00d73\n[2026-08-31T22:12:30.637Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n",
+      "[2026-08-31T22:12:30.638Z] [debug] missions: \u00b7 at=great_tartary_plains travelTo=great_tartary_plains\n[2026-08-31T22:12:30.638Z] [world] \u25b8 Silence the Doubter: this is the place \u2014 finish it (you still need Servants' Mark of Sanction).\n[2026-08-31T22:12:30.677Z] [world] Time and the wasteland have worked this place over since you last passed through \u2014 there's something worth a second look again.\n",
+      "[2026-08-31T22:12:30.699Z] [world] Soot noses at the half-seen prints and snorts. There's something there.\n[2026-08-31T22:12:30.701Z] [world] You've left Obsidian Pillars and entered Great Tartary Plains. The horizon refuses to settle. Aether moves under the grass like breath under a sheet. It's dusk. Nobody else is in sight. west leads to The Buried Cities. Nothing named to the north or east or s",
+      "outh.\n[2026-08-31T22:12:30.701Z] [world] You have been here. The shape of it comes back before the details do.\n[2026-08-31T22:12:30.702Z] [world] Still open from before: tartarian trap, titarian trap hit look.\n[2026-08-31T22:12:30.703Z] [system] Weather effect \u2014 Aetheric Storm: +1 INT \u00b7 -1 WIS\n",
+      "[2026-08-31T22:12:30.704Z] [world] [Great Tartary Plains] north: the Silt Thief (19 tiles, 2 days) \u00b7 east: Zharak's Teeth (4 tiles, 10 hours) \u00b7 south: Nimari (8 tiles, 20 hours) \u00b7 west: Builders' Survey Camp (5 tiles, 13 hours)\n[2026-08-31T22:12:30.705Z] [world] You think back to the cleaver from earlier \u2014 the salvage you pulled from it. Something here reminds you of it.\n",
+      "[2026-08-31T22:12:30.705Z] [debug] arbiter: template (reason=cooldown)\n[2026-08-31T22:12:30.705Z] [arbiter] The Arbiter eyes one corner of Great Tartary Plains. \"Begin there, if you must begin somewhere.\"\n[2026-08-31T22:12:31.777Z] [debug] ui: tap \"take / salvage\"\n[2026-08-31T22:12:33.142Z] [reward] \u2726 Found Oct 16 \u2014 The Siege of St. Petersburg. (open Contracts \u2192 Collectibles to read)\n",
+      "[2026-08-31T22:12:33.159Z] [world] You salvage the fossil rib. The take is small but real.\n[2026-08-31T22:12:33.159Z] [world] You work the half-buried ruined skyscraper over. A part of it comes loose, intact.\n[2026-08-31T22:12:33.160Z] [world] You work the lantern shard over. A part of it comes loose, intact.\n",
+      "[2026-08-31T22:12:33.160Z] [world] You work the salvage sack apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n[2026-08-31T22:12:33.160Z] [world] You break the standing water apart. Among the pieces, something worth keeping.\n",
+      "[2026-08-31T22:12:33.160Z] [world] Behind the trapper camp, where the floods didn't reach: a single page, in a hand you haven't read before.\n[2026-08-31T22:12:33.160Z] [world] You strip the wagon carefully. Something usable comes free in your hand.\n[2026-08-31T22:12:33.161Z] [world] You salvage the weathered crashed automaton chassis. The take is small but real.\n",
+      "[2026-08-31T22:12:33.161Z] [world] You salvage the weathered obsidian pillar. The take is small but real.\n[2026-08-31T22:12:33.161Z] [reward] \u2726 Salvage haul:\n[2026-08-31T22:12:33.161Z] [reward]     \u2022 Aether Crystal x2 (Common)\n[2026-08-31T22:12:33.161Z] [reward]     \u2022 Bent Nail (Common)\n[2026-08-31T22:12:33.162Z] [reward]     \u2022 Aether Dust (Common)\n",
+      "[2026-08-31T22:12:33.162Z] [reward]     \u2022 Warped Plank Offcut (Common)\n[2026-08-31T22:12:33.162Z] [reward]     \u2022 Scrap Metal (Common)\n[2026-08-31T22:12:33.162Z] [reward]     \u2022 Worn Tartarian Coin x3 (Common)\n[2026-08-31T22:12:33.162Z] [reward]     \u2022 Sentinel Core Plate (Uncommon)\n",
+      "[2026-08-31T22:12:33.796Z] [debug] persist sizes(KB): total=219 player=48 wm=88[rooms=47 events=3 memos=0 npcs=3 defeated=1 tags=1 discovered=0] log=79 scene=3\n[2026-08-31T22:12:34.295Z] [debug] ui: tap \"investigate\"\n[2026-08-31T22:12:35.789Z] [player] investigate the ground\n",
+      "[2026-08-31T22:12:35.790Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n[2026-08-31T22:12:35.793Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-08-31T22:12:35.804Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-31T22:12:35.804Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-08-31T22:12:35.953Z] [cognitive] CLIMB  (149ms)\n[2026-08-31T22:12:37.041Z] [player] investigate catwalk\n[2026-08-31T22:12:37.041Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=catwalk resolved=catwalk range=- enemies=0 hooks=1\n",
+      "[2026-08-31T22:12:37.043Z] [world] Among the rubble: a child's shoe, still laced. Beside it, a second shoe \u2014 the same size, but for the opposite foot of the same child. Tucked into the seam: a small rock.\n[2026-08-31T22:12:37.043Z] [reward] \u2726 Small Rock from the catwalk.\n[2026-08-31T22:12:37.213Z] [cognitive] TRAVEL  (168ms)\n",
+      "[2026-08-31T22:12:40.011Z] [debug] qwen\u23f1 investigate_lore ok 2813ms read/write unusable (native mis-reported 119472ms/1503ms \u2014 llama.rn split bug, not this call) in 127t\u2192out 49t (246ch)\n[2026-08-31T22:12:58.885Z] [debug] homework: intro-fill armed after 7829ms idle\n[2026-08-31T22:13:02.691Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=360 from=cached winH=986 beat=-\n",
+      "[2026-08-31T22:13:03.074Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-08-31T22:13:08.982Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 9940ms read 8747ms/write 1140ms in 731t\u2192out 33t 12.0ms/t HIT-CAP (178ch)\n[2026-08-31T22:13:09.140Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 9940ms \u2014 intro-fill:\u2205\n",
+      "[2026-08-31T22:13:09.140Z] [debug] homework: scene_intro \"Great Tartary Plains\" \u2205 10258ms\n[2026-08-31T22:13:14.492Z] [player] that description of finding the shoes. it seems awkward, and isn't my mission supposed to have a something here to pop up?\n",
+      "[2026-08-31T22:13:14.493Z] [arbiter] The Arbiter studies you, plainly. \"I'm not sure what you're trying to tell me. I'll keep your note in the log either way. If you mean to act, phrase it as a verb \u2014 'investigate the rubble', 'go east', 'attack the figure'.\"\n[2026-08-31T22:13:14.494Z] [debug] meta-comment guard: skipped intent parse (report-of-behaviour: \"supposed to\") on 122-char input\n",
+      "[2026-08-31T22:13:19.224Z] [debug] ui: tap \"look around you\"\n[2026-08-31T22:13:19.231Z] [player] look\n[2026-08-31T22:13:19.232Z] [debug] parser: intent=investigate conf=1.00 verb=look target=- resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-08-31T22:13:19.233Z] [world] You look around. You're in Buried Skyscraper \u2014 Upper Floors, in Great Tartary Plains. You see: snagged climbing cache, half-seen prints. The cleaver is unaddressed. Hazard active: Magnetic Distortion. Cardinal travel: north, east, south, west.\n",
+      "[2026-08-31T22:13:19.234Z] [arbiter] \u25b8 Still open \u2014 Travel south of the outpost. Hollis camps somewhere in tiles 2-3 south, in daylight (5 am to 5 pm).\n[2026-08-31T22:13:19.393Z] [cognitive] neutral  (157ms)\n[2026-08-31T22:13:26.176Z] [debug] ui: tap \"missions\"\n[2026-08-31T22:13:35.485Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=cached winH=986 beat=-\n",
+      "[2026-08-31T22:13:35.766Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-08-31T22:13:43.903Z] [debug] homework: intro-fill armed after 8340ms idle (strike 2/3)\n[2026-08-31T22:13:49.653Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 5622ms read 4454ms/write 1134ms in 754t\u2192out 33t 5.9ms/t (160ch)\n",
+      "[2026-08-31T22:13:49.793Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 5622ms \u2014 intro-fill:action-opener\n[2026-08-31T22:13:49.793Z] [debug] homework: scene_intro \"Great Tartary Plains\" \u2713 5891ms\n",
+      "[2026-08-31T22:13:52.997Z] [player] My mission says I'm here and it says after advance by defeating combat. first off it should say advance by winning in combat not defeat. that sounds like the opposite of what I want and nothing spawned here to combat\n",
+      "[2026-08-31T22:13:52.998Z] [arbiter] The Arbiter studies you, plainly. \"I'm not sure what you're trying to tell me. I'll keep your note in the log either way. If you mean to act, phrase it as a verb \u2014 'investigate the rubble', 'go east', 'attack the figure'.\"\n[2026-08-31T22:13:52.998Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter studies you, plainly. \"I'm not sure what you're \u2026\"\n",
+      "[2026-08-31T22:13:52.998Z] [debug] meta-comment guard: skipped intent parse (engine-vocabulary: \"spawned\") on 216-char input\n[2026-08-31T22:13:59.657Z] [debug] send-log: #mthspfn82jjo \u2014 DELIVERED (inline, no attachments): beacon out, 11/11 parts accepted (156583 chars) \u2014 flush said yes\n",
+      "[2026-08-31T22:13:59.660Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mthspfn82jjo kept on disk, boots retry up to 5 sends total\n[2026-08-31T22:14:03.581Z] [debug] persist sizes(KB): total=220 player=49 wm=88[rooms=47 events=3 memos=0 npcs=3 defeated=1 tags=1 discovered=0] log=80 scene=3\n",
+      "[2026-08-31T22:14:08.551Z] [debug] voice\u23f1 gap 4172ms (wait 0ms + synth 4148ms, live) \"Choose your character.\"\n[2026-08-31T22:14:11.108Z] [debug] voice\u23f1 gap 1847ms (wait 1ms + synth 822ms, live) \"Choose your character.\"\n[2026-08-31T22:14:11.307Z] [debug] ctx: RELEASED \u2014 live=0 (opened=1 released=1)\n",
+      "[2026-08-31T22:14:25.880Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a059db-4717-7b20-ad78-4af69ad6a57b\n[2026-08-31T22:14:25.880Z] [debug] ota: Checking\u2026\n[2026-08-31T22:14:25.933Z] [debug] ota: Already up to date\n[2026-08-31T22:14:25.933Z] [debug] ota: boot check result = noUpdate\n",
+      "[2026-08-31T22:14:25.956Z] [debug] send-log: bundle #mthspfn82jjo held \u2014 only 27s since the last try (a restart, not a chance); 4 left\n[2026-08-31T22:14:25.994Z] [debug] voice: engine=bundled tts=on voice=am_michael\n[2026-08-31T22:14:25.994Z] [debug] voice: bundled loading\n[2026-08-31T22:14:29.572Z] [debug] voice: bundled ready\n",
+      "[2026-08-31T22:14:30.653Z] [debug] voice\u23f1 gap 1029ms (wait 123ms + synth 893ms, live) \"Choose your character.\"\n[2026-08-31T22:42:25.566Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a059db-4717-7b20-ad78-4af69ad6a57b\n[2026-08-31T22:42:25.567Z] [debug] ota: Checking\u2026\n[2026-08-31T22:42:25.617Z] [debug] ota: Already up to date\n",
+      "[2026-08-31T22:42:25.617Z] [debug] ota: boot check result = noUpdate\n[2026-08-31T22:42:25.678Z] [debug] voice: engine=bundled tts=on voice=am_michael\n[2026-08-31T22:42:25.678Z] [debug] voice: bundled loading\n[2026-08-31T22:42:25.910Z] [debug] send-log: bundle #mthspfn82jjo attempt 2/5 delivered to Sentry\n[2026-08-31T22:42:29.470Z] [debug] voice: bundled ready\n",
+      "[2026-08-31T22:42:30.525Z] [debug] voice\u23f1 gap 971ms (wait 108ms + synth 861ms, live) \"Choose your character.\"\n[2026-08-31T22:42:32.975Z] [debug] OTA session start: 2026-08-31-1595-the-guide-and-the-ground-agree.\n[2026-08-31T22:42:32.976Z] [world] You step back into Great Tartary Plains. The world waits for your move.\n",
+      "[2026-08-31T22:42:32.976Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. \"Welcome back, Cheddar Bob. The road kept your place.\"\n[2026-08-31T22:42:33.407Z] [debug] \u2550\u2550\u2550 SESSION 2026-08-31T22:42:33.406Z \u00b7 build 2026-08-31-1595-the-guide-and-the-ground-agree \u00b7 previous entry moments earlier \u2550\u2550\u2550\n",
+      "[2026-08-31T22:42:33.407Z] [debug] missions: hunt:hunt_servants_doubter stage 1/5 [boss\u2192attack] @great_tartary_plains HERE needs=Servants' Mark of Sanction\u2717MISSING spawn=Tartarian Raider\u00d73\n[2026-08-31T22:42:33.407Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n",
+      "[2026-08-31T22:42:33.407Z] [debug] missions: \u00b7 at=great_tartary_plains\n[2026-08-31T22:42:33.407Z] [debug] boot:"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-01-1600-the-stinger #mti3vvn82rch [inline 1/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mti3vvn82rch"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-01-1600-the-stinger"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "1"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-01-1600-the-stinger"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-01T03:26:53.367754Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "7": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 379,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-01T03:26:55.246000Z",
+  "fingerprints": [
+    "8ee512cdab2b7ba73f1c5f34a59ee67c"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1947362041,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-01T03:10:09.672000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-01-1600-the-stinger",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-01-1600-the-stinger",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-01-1600-the-stinger",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-01-1600-the-stinger)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "15475906e8c2407d8d5829af48df727c",
+  "previousEventID": "046c1f03c4a74eb788d90755b05b2963"
+}

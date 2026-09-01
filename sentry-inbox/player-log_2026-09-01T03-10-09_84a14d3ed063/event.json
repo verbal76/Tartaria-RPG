@@ -1,0 +1,239 @@
+{
+  "id": "84a14d3ed06343dcb2e9d6e6d7e07a08",
+  "groupID": "7703732937",
+  "eventID": "84a14d3ed06343dcb2e9d6e6d7e07a08",
+  "projectID": "4511945117532160",
+  "size": 17991,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-01-1600-the-stinger #mti24czmehpi [inline 12/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-01-1600-the-stinger",
+  "message": "player-log 2026-09-01-1600-the-stinger #mti24czmehpi [inline 12/28]",
+  "title": "player-log 2026-09-01-1600-the-stinger #mti24czmehpi [inline 12/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "8d836817861b4b5aa556d39a65a305d6",
+      "span_id": "8ffc27a5b5d47cae",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      " Reaver long gone west. He did not run. He LEFT you something: three of his sworn, Tartarian Raiders jaw-marked in the old sign, standing up out of positions they took hours ago. They have been waiting for exactly the kind of hunter a shrine sends. There is no way past them and no one here to talk to. Put them down, and the trail he left is yours to read.\n",
+      "[2026-09-01T00:14:45.572Z] [arbiter] \"He spent three men to learn what you are,\" the Arbiter says. \"Answer the question.\"\n[2026-09-01T00:14:45.573Z] [combat] 3 Tartarian Raiders rise from the positions they were left in.\n[2026-09-01T00:14:52.718Z] [debug] ui: tap \"approach\"\n[2026-09-01T00:14:52.762Z] [player] approach Tartarian Raider\n",
+      "[2026-09-01T00:14:52.763Z] [debug] parser: intent=advance conf=1.00 verb=approach target=tartarian raider resolved=Tartarian Raider range=mid enemies=3 hooks=3\n[2026-09-01T00:14:52.766Z] [debug] move: advance from range=mid enemies=3 weather=Glass Hail cost=1 partial=0\n[2026-09-01T00:14:52.767Z] [debug] move: field advance target=Tartarian Raider d 1.50->0.50 band mid->close\n",
+      "[2026-09-01T00:14:52.767Z] [world] You close the gap with the 3 Tartarian Raiders. (range: close / arm's reach)\n[2026-09-01T00:14:52.767Z] [world] The field shifts around you \u2014 Tartarian Raider now far.\n[2026-09-01T00:14:52.772Z] [combat] Tartarian Raider \u2014 d20 \u2192 17 + ATK 5 = 22 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n",
+      "[2026-09-01T00:14:52.774Z] [combat] Tartarian Raider \u2014 d20 \u2192 7 + ATK 5 = 12 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-01T00:14:52.774Z] [combat] Tartarian Raider closes the distance.\n[2026-09-01T00:14:52.775Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-01T00:14:52.775Z] [arbiter] The Arbiter watches the blow land or fail. \"Both are answers.\"\n",
+      "[2026-09-01T00:14:53.006Z] [combat] Tartarian Raider deals 5 bludgeoning damage [plate \u22121]. You have 34 HP remaining.\n[2026-09-01T00:14:53.205Z] [cognitive] TRAVEL \u00b7 SEARCH  (428ms)\n[2026-09-01T00:14:54.496Z] [debug] ui: tap \"dodge\"\n[2026-09-01T00:14:54.498Z] [world] A shard of mud-glass nicks you. Small wound, steady reminder. (\u22121 HP)\n[2026-09-01T00:14:54.500Z] [player] dodge\n",
+      "[2026-09-01T00:14:54.500Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=3 hooks=3\n[2026-09-01T00:14:54.503Z] [world] You commit to the dodge. Slip Tartarian Raider's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-01T00:14:54.545Z] [combat] Tartarian Raider \u2014 d20 \u2192 14 + ATK 5 = 19 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n[2026-09-01T00:14:54.545Z] [combat] Dodge \u2014 d20 \u2192 16 + DEX 23 = 39 vs ATK 19. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n",
+      "[2026-09-01T00:14:54.545Z] [world] You slip Tartarian Raider's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n[2026-09-01T00:14:54.547Z] [combat] Tartarian Raider turns on Soot \u2014 d20 4 + ATK 5 = 9 vs Soot's AC 12 (vest +2) \u2014 \u2717 MISS\n",
+      "[2026-09-01T00:14:54.547Z] [combat] Tartarian Raider turns on Soot \u2014 d20 16 + ATK 5 = 21 vs Soot's AC 12 (vest +2) \u2014 \u2713 HIT\n[2026-09-01T00:14:54.547Z] [combat] Soot takes 5. (10/15 HP left)\n[2026-09-01T00:14:54.547Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-01T00:14:54.548Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-09-01T00:14:54.548Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T00:14:54.776Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-09-01T00:14:55.176Z] [cognitive] neutral  (627ms)\n[2026-09-01T00:14:55.372Z] [debug] ui: tap \"\u2697 auralite talon\"\n[2026-09-01T00:14:55.373Z] [system] evasive \u2014 harder to hit fades.\n[2026-09-01T00:14:55.391Z] [player] attack with the auralite talon\n",
+      "[2026-09-01T00:14:55.392Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=3 hooks=3\n[2026-09-01T00:14:55.393Z] [debug] attack: target=Tartarian Raider range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n",
+      "[2026-09-01T00:14:55.394Z] [arbiter] Glass Hail hangs between you. \"\u22121 to the swing \u2014 see what you can,\" the Arbiter says.\n[2026-09-01T00:14:55.394Z] [debug] attack: visibility penalty \u22121 (Glass Hail)\n[2026-09-01T00:14:55.394Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-09-01T00:14:55.437Z] [world] You commit forward with the acid-etched auralite talon. Tartarian Raider watches your hands.\n[2026-09-01T00:14:55.437Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T00:14:55.828Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (390ms)\n[2026-09-01T00:15:02.537Z] [world] You seize the initiative. Tartarian Raider has no time to react.\n",
+      "[2026-09-01T00:15:02.539Z] [combat] You \u2014 d20 \u2192 12 + INT 11 \u2212 1 (Glass Hail) perfect opening (2\u00d7 dice) = 22 vs Tartarian Raider AC 10 \u2014 \u2713 HIT\n[2026-09-01T00:15:02.543Z] [combat] Your strike with the acid-etched auralite talon lands for 15. Tartarian Raider staggers \u2014 21 HP remaining. It answers.\n",
+      "[2026-09-01T00:15:02.544Z] [combat] Acid-Etched Auralite Talon \u2014 1 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n[2026-09-01T00:15:02.545Z] [combat] Tartarian Raider \u2014 d20 \u2192 13 + ATK 5 = 18 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-01T00:15:02.547Z] [combat] Tartarian Raider \u2014 d20 \u2192 16 + ATK 5 = 21 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-09-01T00:15:02.549Z] [combat] Tartarian Raider \u2014 d20 \u2192 9 + ATK 5 = 14 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-01T00:15:02.549Z] [arbiter] \"Footwork over fury,\" the Arbiter says quietly. \"The tartarian raider is patient. Be patienter.\"\n",
+      "[2026-09-01T00:15:02.794Z] [combat] Tartarian Raider deals 3 bludgeoning damage [plate \u22121] [edge of reach \u2014 halved]. You have 30 HP remaining.\n[2026-09-01T00:15:04.438Z] [debug] ui: tap \"\ud83d\udd25 bone crossbow\"\n[2026-09-01T00:15:04.484Z] [player] attack with the off-hand bone crossbow\n",
+      "[2026-09-01T00:15:04.485Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=3 hooks=3\n[2026-09-01T00:15:04.485Z] [combat] Tartarian Raider smokes \u2014 acid eats 1. (20/36 HP, 2 turns left)\n",
+      "[2026-09-01T00:15:04.485Z] [debug] attack: target=Tartarian Raider range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-09-01T00:15:04.487Z] [debug] attack: visibility penalty \u22121 (Glass Hail)\n[2026-09-01T00:15:04.529Z] [world] You commit forward with the searing bone crossbow. Tartarian Raider watches your hands.\n",
+      "[2026-09-01T00:15:04.529Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T00:15:04.744Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (214ms)\n[2026-09-01T00:15:11.146Z] [world] You seize the initiative. Tartarian Raider has no time to react.\n[2026-09-01T00:15:11.146Z] [combat] You \u2014 d20 \u2192 6 + DEX 22 \u2212 1 (Glass Hail) + 2 (point blank) = 29 vs Tartarian Raider AC 9 \u2014 \u2713 HIT\n",
+      "[2026-09-01T00:15:11.148Z] [combat] Piercing flares \u2014 +4 on hit (weak \u2014 bites deep!).\n[2026-09-01T00:15:11.148Z] [combat] Weakness exposed \u2014 Tartarian Raider flinches. (piercing \u00d71.5 for 25)\n[2026-09-01T00:15:11.149Z] [combat] Tartarian Raider folds under the searing bone crossbow. 25 damage was enough. The room exhales.\n",
+      "[2026-09-01T00:15:11.150Z] [reward] Tartarian Raider defeated. You recover Worn Tartarian Coin \u00d72, Architect Sigil.\n[2026-09-01T00:15:11.151Z] [reward] You strip the body: Cudgel, Mud-Warden's Vest (+10 TC). The kit took the fight badly.\n[2026-09-01T00:15:11.151Z] [combat] 2 attackers remain. Tartarian Raider now in your sights.\n",
+      "[2026-09-01T00:15:11.151Z] [reward] \u2726 You feel hardier from your trials. +1 max HP (now 40). [71 enemies defeated]\n[2026-09-01T00:15:11.153Z] [reward] +14 TC pried from the dust.\n[2026-09-01T00:15:11.211Z] [combat] Tartarian Raider \u2014 d20 \u2192 19 + ATK 5 = 24 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n",
+      "[2026-09-01T00:15:11.212Z] [combat] Tartarian Raider \u2014 d20 \u2192 17 + ATK 5 = 22 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-09-01T00:15:11.439Z] [combat] Tartarian Raider deals 6 bludgeoning damage [plate \u22121] [edge of reach \u2014 halved]. You have 25 HP remaining.\n",
+      "[2026-09-01T00:15:11.439Z] [combat] Tartarian Raider deals 4 bludgeoning damage [plate \u22121] [edge of reach \u2014 halved]. You have 21 HP remaining.\n[2026-09-01T00:15:13.024Z] [debug] ui: tap \"dodge\"\n[2026-09-01T00:15:13.037Z] [player] dodge\n[2026-09-01T00:15:13.038Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=2 hooks=3\n",
+      "[2026-09-01T00:15:13.039Z] [world] You commit to the dodge. Slip Tartarian Raider's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-01T00:15:13.098Z] [combat] Tartarian Raider \u2014 d20 \u2192 15 + ATK 5 = 20 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n",
+      "[2026-09-01T00:15:13.098Z] [combat] Dodge \u2014 d20 \u2192 16 + DEX 23 = 39 vs ATK 20. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-01T00:15:13.098Z] [world] You slip Tartarian Raider's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n",
+      "[2026-09-01T00:15:13.100Z] [debug] ac-shift 23\u219226: race/base 10 + gear 20 + title 0 \u2192 trimmed 23 + status 3 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n[2026-09-01T00:15:13.100Z] [combat] Tartarian Raider \u2014 d20 \u2192 2 + ATK 5 = 7 vs your AC 26 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-01T00:15:13.101Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T00:15:13.318Z] [cognitive] neutral  (216ms)\n[2026-09-01T00:15:14.808Z] [debug] ui: tap \"\ud83d\udd25 bone crossbow \u2605\"\n[2026-09-01T00:15:14.812Z] [system] evasive \u2014 harder to hit fades.\n[2026-09-01T00:15:14.855Z] [player] attack with the off-hand bone crossbow\n",
+      "[2026-09-01T00:15:14.856Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=2 hooks=3\n[2026-09-01T00:15:14.857Z] [debug] attack: target=Tartarian Raider range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-09-01T00:15:14.858Z] [debug] attack: visibility penalty \u22121 (Glass Hail)\n",
+      "[2026-09-01T00:15:14.859Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-01T00:15:14.905Z] [world] You commit forward with the searing bone crossbow. Tartarian Raider watches your hands.\n[2026-09-01T00:15:14.906Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T00:15:15.108Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (202ms)\n",
+      "[2026-09-01T00:15:15.551Z] [debug] persist sizes(KB): total=217 player=51 wm=81[rooms=38 events=3 memos=0 npcs=3 defeated=1 tags=1 discovered=0] log=80 scene=5\n[2026-09-01T00:15:21.703Z] [world] You seize the initiative. Tartarian Raider has no time to react.\n",
+      "[2026-09-01T00:15:21.704Z] [combat] You \u2014 d20 \u2192 7 + DEX 22 \u2212 1 (Glass Hail) perfect opening (2\u00d7 dice) = 28 vs Tartarian Raider AC 10 \u2014 \u2713 HIT\n[2026-09-01T00:15:21.705Z] [combat] Weakness exposed \u2014 Tartarian Raider flinches. (piercing \u00d71.5 for 30)\n",
+      "[2026-09-01T00:15:21.706Z] [combat] You crack the Tartarian Raider with the Searing Bone Crossbow for 30 \u2014 the better part of their fight, gone in one blow. They crumple, out cold. (6/36 HP) Loot them before they come to.\n[2026-09-01T00:15:21.706Z] [combat] Tartarian Raider is out of it. Tartarian Raider now in your sights.\n",
+      "[2026-09-01T00:15:21.707Z] [combat] Searing Bone Crossbow \u2014 3 burn bites in and festers (3 turns).\n[2026-09-01T00:15:21.709Z] [debug] ac-shift 26\u219223: race/base 10 + gear 20 + title 0 \u2192 trimmed 23 + status 0 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n",
+      "[2026-09-01T00:15:21.709Z] [combat] Tartarian Raider \u2014 d20 \u2192 2 + ATK 5 = 7 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-01T00:15:23.727Z] [debug] ui: tap \"\ud83d\udd25 bone crossbow \u2605\"\n[2026-09-01T00:15:23.772Z] [player] attack with the off-hand bone crossbow\n",
+      "[2026-09-01T00:15:23.773Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=2 hooks=3\n[2026-09-01T00:15:23.773Z] [combat] Tartarian Raider blisters \u2014 clinging fire sears 3. (3/36 HP, 2 turns left)\n",
+      "[2026-09-01T00:15:23.774Z] [debug] attack: target=Tartarian Raider range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-09-01T00:15:23.775Z] [debug] attack: visibility penalty \u22121 (Glass Hail)\n[2026-09-01T00:15:23.817Z] [world] You commit forward with the searing bone crossbow. Tartarian Raider watches your hands.\n",
+      "[2026-09-01T00:15:23.817Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T00:15:24.023Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (205ms)\n[2026-09-01T00:15:30.486Z] [world] You seize the initiative. Tartarian Raider has no time to react.\n[2026-09-01T00:15:30.487Z] [combat] You \u2014 d20 \u2192 14 + DEX 22 \u2212 1 (Glass Hail) = 35 vs Tartarian Raider AC 10 \u2014 \u2713 HIT\n",
+      "[2026-09-01T00:15:30.487Z] [combat] Piercing flares \u2014 +3 on hit (weak \u2014 bites deep!).\n[2026-09-01T00:15:30.488Z] [combat] Weakness exposed \u2014 Tartarian Raider flinches. (piercing \u00d71.5 for 18)\n[2026-09-01T00:15:30.488Z] [combat] Tartarian Raider takes 18 with the searing bone crossbow. It reels: 18 left. Then it fights back.\n",
+      "[2026-09-01T00:15:30.488Z] [combat] Searing Bone Crossbow \u2014 4 burn bites in and festers (3 turns).\n[2026-09-01T00:15:30.489Z] [combat] Tartarian Raider \u2014 d20 \u2192 12 + ATK 5 = 17 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-01T00:15:32.846Z] [debug] ui: tap \"dodge\"\n[2026-09-01T00:15:32.859Z] [player] dodge\n",
+      "[2026-09-01T00:15:32.860Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=2 hooks=3\n[2026-09-01T00:15:32.861Z] [world] You commit to the dodge. Slip Tartarian Raider's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-01T00:15:32.861Z] [combat] Tartarian Raider blisters \u2014 clinging fire sears 3. (0/36 HP, 1 turn left)\n[2026-09-01T00:15:32.861Z] [combat] Tartarian Raider blisters \u2014 clinging fire sears 4. (14/36 HP, 2 turns left)\n[2026-09-01T00:15:32.863Z] [reward] Tartarian Raider defeated. You recover Worn Tartarian Coin, Patched Cloth \u00d72.\n",
+      "[2026-09-01T00:15:32.865Z] [reward] You strip the body: Cudgel, Mud-Warden's Vest (+10 TC). The kit took the fight badly.\n[2026-09-01T00:15:32.865Z] [combat] 1 attacker remains. Tartarian Raider now in your sights.\n[2026-09-01T00:15:32.865Z] [reward] +14 TC pried from the dust.\n",
+      "[2026-09-01T00:15:32.954Z] [combat] Tartarian Raider \u2014 d20 \u2192 15 + ATK 5 = 20 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n[2026-09-01T00:15:32.954Z] [combat] Dodge \u2014 d20 \u2192 20 + DEX 23 = 43 vs ATK 20. \u2713 You slip the arc \u2014 PERFECT OPENING (nex"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-01-1600-the-stinger #mti24czmehpi [inline 12/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mti24czmehpi"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-01-1600-the-stinger"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "12"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-01-1600-the-stinger"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-01T03:10:07.718612Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-01T03:10:09.670000Z",
+  "fingerprints": [
+    "92c3a1cb835bf1c5ef2ef3a686f41dbc"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1947362041,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-01T03:10:09.672000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-01-1600-the-stinger",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-01-1600-the-stinger",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-01-1600-the-stinger",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-01-1600-the-stinger)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "88653bd4bc3342b1a23facfc2fdd95fb",
+  "previousEventID": "848ae7a7e240471a9d9e760ac93e80f4"
+}

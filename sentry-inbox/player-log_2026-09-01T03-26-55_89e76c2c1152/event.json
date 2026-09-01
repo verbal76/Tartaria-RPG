@@ -1,0 +1,258 @@
+{
+  "id": "89e76c2c115249ca83e2b88b05e88f6e",
+  "groupID": "7703751891",
+  "eventID": "89e76c2c115249ca83e2b88b05e88f6e",
+  "projectID": "4511945117532160",
+  "size": 17717,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-01-1600-the-stinger #mti3vvn82rch [inline 10/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-01-1600-the-stinger",
+  "message": "player-log 2026-09-01-1600-the-stinger #mti3vvn82rch [inline 10/28]",
+  "title": "player-log 2026-09-01-1600-the-stinger #mti3vvn82rch [inline 10/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "8d836817861b4b5aa556d39a65a305d6",
+      "span_id": "8ffc27a5b5d47cae",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "[Filtered]",
+      "[2026-09-01T00:19:24.324Z] [reward]     \u2022 Aether Dust x2 (Common)\n[2026-09-01T00:19:24.324Z] [reward]     \u2022 Cracked Carapace Curl (Common)\n[2026-09-01T00:19:24.324Z] [reward]     \u2022 Bent Nail (Common)\n[2026-09-01T00:19:25.456Z] [debug] ui: tap \"investigate\"\n[2026-09-01T00:19:27.022Z] [player] investigate sludge pool\n",
+      "[2026-09-01T00:19:27.023Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=sludge pool resolved=sludge pool range=- enemies=0 hooks=3\n[2026-09-01T00:19:27.024Z] [world] You study the sludge pool. It bears no marks worth naming \u2014 no glyph, no fingerprint, no trace the Reclaimers would catalog.\n",
+      "[2026-09-01T00:19:27.025Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-09-01T00:19:27.025Z] [arbiter] The Arbiter looks around. \"Compasses turn here as if remembering an older north.\"\n[2026-09-01T00:19:27.169Z] [cognitive] neutral  (143ms)\n[2026-09-01T00:19:28.473Z] [debug] qwen\u23f1 investigate_lore ok 1313ms read 321ms/write 964ms in 128t\u2192out 31t 2.5ms/t (135ch)\n",
+      "[2026-09-01T00:19:29.024Z] [debug] ui: tap \"\u2192 TARTARIAN OUTSKIRTS\"\n[2026-09-01T00:19:29.042Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Sena Ropewalk, wandering trader. Tap the vendor banner to trade.\n",
+      "[2026-09-01T00:19:29.051Z] [world] Rare workings for sale: Titanforged Gauntlets (500 TC), Titanforged Greaves (500 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n",
+      "[2026-09-01T00:19:29.052Z] [world] You walk west through open silt. The compass tells you The Architect's Blind lies further west \u2014 2 tiles, about 5 hours of travel.\n[2026-09-01T00:19:29.053Z] [world] Whatever clock this place runs on, it has not ticked since you left.\n[2026-09-01T00:19:33.525Z] [player] Ask why the stall is here\n",
+      "[2026-09-01T00:19:33.527Z] [world] \"Stall goes up where the ground is flat and comes down when it is not worth it,\" the trader says. \"That is the whole business plan.\"\n[2026-09-01T00:19:33.529Z] [world] Sena Ropewalk keeps facing the way they were going, and talks to you sideways.\n[2026-09-01T00:19:34.391Z] [world] You let the conversation go and Sena Ropewalk gets back to it.\n",
+      "[2026-09-01T00:19:35.096Z] [debug] qwen\u23f1 flourish ok 2615ms read 1852ms/write 741ms in 177t\u2192out 23t 10.5ms/t (99ch)\n[2026-09-01T00:19:35.096Z] [debug] qwen\u23f1 stats \u2014 investigate_lore n4 avg2.3s max4.0s read0.4s/write0.8s \u26a02unusable in127t\u2192out29t ms/tok 2.5-3.9 wait0.5s | narration:scene_intro_fill n3 avg8.0s max10.1s \u26a03unusable in730t\u2192out11t cap1 \u23f82 \u27022/15.9s | ambient_fill n1 avg3.9s max3.9s \u26a01unus",
+      "able in365t\u2192out0t \u23f81 \u27021/3.9s | item_synthesis_hw n1 avg5.1s max5.1s read4.0s/write1.1s in331t\u2192out35t ms/tok 12.0-12.0 | flourish n1 avg2.6s max2.6s read1.9s/write0.7s in177t\u2192out23t ms/tok 10.5-10.5 || WASTED 3 calls / 19.8s\n[2026-09-01T00:19:35.260Z] [debug] qwen\u23f1 \u2702 DISCARDED flourish after 2615ms \u2014 flourish:empty\n[2026-09-01T00:19:35.260Z] [debug] flourish: \u2205 2916ms\n",
+      "[2026-09-01T00:19:39.929Z] [reward] Sold Cudgel (Common) to Sena Ropewalk for 5 TC. (138 TC on hand)\n[2026-09-01T00:19:39.978Z] [reward] Sold Mud-Warden's Vest (Common) to Sena Ropewalk for 5 TC. (143 TC on hand)\n[2026-09-01T00:19:40.019Z] [reward] Sold Cudgel (Common) to Sena Ropewalk for 5 TC. (148 TC on hand)\n",
+      "[2026-09-01T00:19:40.058Z] [reward] Sold Mud-Warden's Vest (Common) to Sena Ropewalk for 5 TC. (153 TC on hand)\n[2026-09-01T00:19:40.098Z] [reward] Sold Cudgel (Common) to Sena Ropewalk for 5 TC. (158 TC on hand)\n[2026-09-01T00:19:40.137Z] [reward] Sold Mud-Warden's Vest (Common) to Sena Ropewalk for 5 TC. (163 TC on hand)\n",
+      "[2026-09-01T00:19:41.545Z] [debug] homework: intro-fill armed after 9956ms idle (strike 2/3)\n[2026-09-01T00:19:46.642Z] [reward] Bought First Aid Kit from Sena Ropewalk for 16 TC. (147 TC left)\n[2026-09-01T00:19:50.574Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 9026ms read 8449ms/write 509ms in 734t\u2192out 15t 11.5ms/t (62ch)\n",
+      "[2026-09-01T00:19:50.578Z] [debug] homework: scene_intro \"Great Tartary Plains\" \u2713 9034ms\n[2026-09-01T00:19:52.820Z] [reward] Bought 4\u00d7 Forager's Stew from Sena Ropewalk for 44 TC. (103 TC left)\n[2026-09-01T00:19:53.034Z] [debug] persist sizes(KB): total=224 player=50 wm=83[rooms=38 events=3 memos=0 npcs=4 defeated=1 tags=1 discovered=0] log=86 scene=4\n",
+      "[2026-09-01T00:19:55.840Z] [reward] Bought Smoke-Cured Jerky Strip from Sena Ropewalk for 7 TC. (96 TC left)\n[2026-09-01T00:19:58.619Z] [reward] Bought 2\u00d7 Trail Rations from Sena Ropewalk for 12 TC. (84 TC left)\n[2026-09-01T00:20:01.555Z] [reward] Bought 3\u00d7 Wild Carrot from Sena Ropewalk for 9 TC. (75 TC left)\n[2026-09-01T00:20:05.069Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-09-01T00:20:06.292Z] [world] You lift the Iron Spear clear.\n[2026-09-01T00:20:06.293Z] [reward] \u2726 Iron Spear (Common).\n[2026-09-01T00:20:07.248Z] [world] You work the shimmering rift over. A part of it comes loose, intact.\n[2026-09-01T00:20:07.249Z] [world] You salvage the standing water. The take is small but real.\n[2026-09-01T00:20:07.249Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-09-01T00:20:07.249Z] [reward]     \u2022 Worn Tartarian Coin x2 (Common)\n[2026-09-01T00:20:07.250Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-09-01T00:20:08.984Z] [debug] ui: tap \"\u2192 TARTARIAN OUTSKIRTS\"\n[2026-09-01T00:20:09.001Z] [world] You walk west through open silt. The compass tells you The Architect's Blind lies further west \u2014 1 tile, about 3 hours of travel.\n",
+      "[2026-09-01T00:20:09.002Z] [world] Time went somewhere. It did not come here.\n[2026-09-01T00:20:10.034Z] [debug] ui: tap \"take / salvage\"\n[2026-09-01T00:20:11.167Z] [world] You break the bone tool apart. Among the pieces, something worth keeping.\n[2026-09-01T00:20:11.168Z] [world] You strip the buried structure carefully. Something usable comes free in your hand.\n",
+      "[2026-09-01T00:20:11.168Z] [world] You salvage the sphere. The take is small but real.\n[2026-09-01T00:20:11.168Z] [world] You salvage the standing water. The take is small but real.\n[2026-09-01T00:20:11.168Z] [reward] \u2726 Salvage haul:\n[2026-09-01T00:20:11.169Z] [reward]     \u2022 Worn Tartarian Coin x10 (Common)\n[2026-09-01T00:20:11.169Z] [reward]     \u2022 Cloth Scrap x2 (Common)\n",
+      "[2026-09-01T00:20:11.169Z] [reward]     \u2022 Aether Crystal x2 (Common)\n[2026-09-01T00:20:12.801Z] [debug] ui: tap \"\u2192 TARTARIAN OUTSKIRTS\"\n[2026-09-01T00:20:12.814Z] [world] You walk west. You arrive at The Architect's Blind.\n[2026-09-01T00:20:12.815Z] [debug] scene: loc=architect_blind hub=- arrival=y opening=n passing=y\n",
+      "[2026-09-01T00:20:12.815Z] [debug] missions: hunt:hunt_servants_doubter stage 3/5 [attack_provoke\u2192attack] @tartarian_outskirts needs=Reaver's Spiral-Mark Stone\u2713 gives=Raider's Ridge-Sign\n[2026-09-01T00:20:12.816Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n",
+      "[2026-09-01T00:20:12.816Z] [debug] missions: mystery:mystery_temporal_watch stage 0/4 [diplomacy] @reclaimer_stake npc=\"the Reclaimers Guild Speaker\" gives=Guild Eddy-Gauge PAUSED\n[2026-09-01T00:20:12.816Z] [debug] missions: \u00b7 at=architect_blind travelTo=tartarian_outskirts\n",
+      "[2026-09-01T00:20:12.838Z] [world] Time and the wasteland have worked this place over since you last passed through \u2014 there's something worth a second look again.\n[2026-09-01T00:20:12.856Z] [world] Soot noses at the buried bone and snorts. There's something there.\n",
+      "[2026-09-01T00:20:12.858Z] [world] You've left Great Tartary Plains and entered The Architect's Blind. From the road: a collapsed waystation, not worth a second look. The second look is the test. It's morning. Nobody else is in sight. north leads to Tartarian Outskirts; east leads to The Buried Cities. Nothing named to the south or west.\n",
+      "[2026-09-01T00:20:12.859Z] [world] You have been here. The shape of it comes back before the details do.\n[2026-09-01T00:20:12.859Z] [system] Weather effect \u2014 Glass Hail: -1 DEX\n[2026-09-01T00:20:12.861Z] [world] [The Architect's Blind] north: Tartarian Outskirts (2 tiles, 5 hours) \u00b7 east: Dynasty Border Post (7 tiles, 18 hours) \u00b7 south: Asgardar (14 tiles, 1 day, 11 hours) \u00b7 west: Reclaimer's Stak",
+      "e (3 tiles, 8 hours)\n[2026-09-01T00:20:13.951Z] [debug] ui: tap \"take / salvage\"\n[2026-09-01T00:20:15.375Z] [world] You work the buried bone over. A part of it comes loose, intact.\n[2026-09-01T00:20:15.376Z] [world] You strip the firepit carefully. Something usable comes free in your hand.\n",
+      "[2026-09-01T00:20:15.376Z] [world] You lever something loose from the half-buried wagon \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n[2026-09-01T00:20:15.376Z] [world] You salvage the lantern. The take is small but real.\n",
+      "[2026-09-01T00:20:15.377Z] [world] You strip the rusted fallen sentinel husk down. Mostly debris \u2014 but a Bent Nail comes loose at the bottom of the pile.\n[2026-09-01T00:20:15.377Z] [world] You strip the signpost carefully. Something usable comes free in your hand.\n[2026-09-01T00:20:15.377Z] [world] You salvage the standing water. The take is small but real.\n",
+      "[2026-09-01T00:20:15.377Z] [reward] \u2726 Salvage haul:\n[2026-09-01T00:20:15.378Z] [reward]     \u2022 Aether Dust (Common)\n[2026-09-01T00:20:15.378Z] [reward]     \u2022 Smooth Stone x4 (Common)\n[2026-09-01T00:20:15.378Z] [reward]     \u2022 Copper-Threaded Veil (Uncommon)\n[2026-09-01T00:20:15.378Z] [reward]     \u2022 Scrap Metal x2 (Common)\n[2026-09-01T00:20:15.379Z] [reward]     \u2022 Bent Nail (Common)\n",
+      "[2026-09-01T00:20:16.183Z] [debug] persist sizes(KB): total=230 player=50 wm=90[rooms=45 events=3 memos=0 npcs=4 defeated=1 tags=1 discovered=0] log=86 scene=2\n[2026-09-01T00:20:16.901Z] [debug] ui: tap \"investigate\"\n[2026-09-01T00:20:18.728Z] [world] A shard of mud-glass nicks you. Small wound, steady reminder. (\u22121 HP)\n[2026-09-01T00:20:18.744Z] [player] investigate the mud\n",
+      "[2026-09-01T00:20:18.745Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=0\n[2026-09-01T00:20:18.751Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Mud Essence (Uncommon).\n[2026-09-01T00:20:18.763Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-09-01T00:20:18.764Z] [arbiter] \"There's coin on the board for a willing blade,\" the Arbiter says. \"Read the World.\"\n[2026-09-01T00:20:18.770Z] [world] A Mud Monarchs war party crests the rise \u2014 5 of them, blades already out. They've marked you for standing with the Forgotten Order.\n",
+      "[2026-09-01T00:20:18.770Z] [arbiter] \"The Mud Monarchs do not forgive a friend of the Forgotten Order,\" the Arbiter murmurs. \"Stand, or run \u2014 but decide now.\"\n[2026-09-01T00:20:19.181Z] [debug] qwen\u23f1 narration:scene_intro preempted 6182ms read 5974ms/write 154ms in 791t\u2192out 4t 7.6ms/t (25ch)\n",
+      "[2026-09-01T00:20:19.420Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro after 6182ms \u2014 cancelled:player-acted-again\n[2026-09-01T00:20:19.647Z] [cognitive] SWIM  (883ms)\n[2026-09-01T00:20:23.956Z] [debug] qwen\u23f1 ambient ok 4787ms wait 479ms read/write unusable (native mis-reported 3286ms/1510ms \u2014 llama.rn split bug, not this call) in 365t\u2192out 31t HIT-CAP (140ch)\n",
+      "[2026-09-01T00:20:24.207Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient after 4787ms \u2014 ambient:stale:combat-started\n[2026-09-01T00:20:24.208Z] [debug] arbiter: ambient stale:combat-started 5445ms\n[2026-09-01T00:20:24.208Z] [debug] arbiter: ambient-empty reason=instruction-echo raw=\"Your read of them: You stand at the Triage Tent, the imposing structure of stone and brick, its weathered door whisperin\"\n",
+      "[2026-09-01T00:20:24.705Z] [debug] ui: tap \"dodge\"\n[2026-09-01T00:20:24.708Z] [player] dodge\n[2026-09-01T00:20:24.708Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=5 hooks=0\n",
+      "[2026-09-01T00:20:24.709Z] [world] You commit to the dodge. Slip Mud Monarchs Raider 1's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-01T00:20:24.758Z] [combat] Mud Monarchs Raider 1 \u2014 d20 \u2192 10 + ATK 6 = 16 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n",
+      "[2026-09-01T00:20:24.758Z] [combat] Dodge \u2014 d20 \u2192 13 + DEX 23 = 36 vs ATK 16. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-01T00:20:24.759Z] [world] You slip Mud Monarchs Raider 1's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n",
+      "[2026-09-01T00:20:24.760Z] [combat] Mud Monarchs Raider 2 turns on Soot \u2014 d20 12 + ATK 6 = 18 vs Soot's AC 12 (vest +2) \u2014 \u2713 HIT\n[2026-09-01T00:20:24.760Z] [combat] Soot takes 7. (3/15 HP left)\n[2026-09-01T00:20:24.760Z] [combat] Mud Monarchs Raider 5 and 2 others close the distance.\n[2026-09-01T00:20:24.761Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T00:20:25.027Z] [cognitive] neutral  (266ms)\n",
+      "[2026-09-01T00:20:26.471Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n[2026-09-01T00:20:26.477Z] [system] evasive \u2014 harder to hit fades.\n[2026-09-01T00:20:26.521Z] [player] attack with the auralite talon\n[2026-09-01T00:20:26.522Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=5 hooks=0\n",
+      "[2026-09-01T00:20:26.523Z] [arbiter] The Arbiter keeps one eye on the fight. \"That is the right move for Silence the Doubter \u2014 but not with something on you. Put this down first.\"\n[2026-09-01T00:20:26.523Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter keeps one eye on the fight. \"That is the right m\u2026\"\n",
+      "[2026-09-01T00:20:26.523Z] [debug] attack: target=Mud Monarchs Raider 1 range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n[2026-09-01T00:20:26.525Z] [arbiter] Glass Hail hangs between you. \"\u22121 to the swing \u2014 see what you can,\" the Arbiter says.\n[2026-09-01T00:20:26.526Z] [debug] attack: visibility penalty \u22121 (Glass Hail)\n",
+      "[2026-09-01T00:20:26.526Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-01T00:20:26.575Z] [world] You commit forward with the acid-etched corrupted auralite talon. Mud Monarchs Raider 1 watches your hands.\n[2026-09-01T00:20:26.575Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T00:20:26.796Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (220ms)\n",
+      "[2026-09-01T00:20:35.103Z] [world] You seize the initiative. Mud Monarchs Raider 1 has no time to react.\n[2026-09-01T00:20:35.104Z] [combat] You \u2014 d20 \u2192 3 + INT 11 \u2212 1 (Glass Hail) perfect opening (2\u00d7 dice) = 13 vs Mud Monarchs Raider 1 AC 10 \u2014 \u2713 HIT\n[2026-09-01T00:20:35.104Z] [combat] Mud Monarchs Raider 1 shrugs off the aetheric. (resisted, \u00d70.5 for 10)\n",
+      "[2026-09-01T00:20:35.107Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Flame of Aether \u2014 burn will bite where aetheric "
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-01-1600-the-stinger #mti3vvn82rch [inline 10/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mti3vvn82rch"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-01-1600-the-stinger"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "10"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-01-1600-the-stinger"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-01T03:26:53.416429Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "0": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 379,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-01T03:26:55.248000Z",
+  "fingerprints": [
+    "8ee512cdab2b7ba73f1c5f34a59ee67c"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1947362041,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-01T03:10:09.672000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-01-1600-the-stinger",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-01-1600-the-stinger",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-01-1600-the-stinger",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-01-1600-the-stinger)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "8f20ed48b12b414e90bcd48baaa05d69",
+  "previousEventID": "7941ec5bcee14c97bb62fa5315db3886"
+}

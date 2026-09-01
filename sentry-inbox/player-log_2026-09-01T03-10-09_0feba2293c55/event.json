@@ -1,0 +1,236 @@
+{
+  "id": "0feba2293c554895adc541a120a6ef19",
+  "groupID": "7703732937",
+  "eventID": "0feba2293c554895adc541a120a6ef19",
+  "projectID": "4511945117532160",
+  "size": 18032,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-01-1600-the-stinger #mti24czmehpi [inline 27/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-01-1600-the-stinger",
+  "message": "player-log 2026-09-01-1600-the-stinger #mti24czmehpi [inline 27/28]",
+  "title": "player-log 2026-09-01-1600-the-stinger #mti24czmehpi [inline 27/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "8d836817861b4b5aa556d39a65a305d6",
+      "span_id": "8ffc27a5b5d47cae",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "\u2014 d20 \u2192 15 + DEX 24 + 2 (point blank) stealthed +5 = 46 vs Mud Spider AC 9 \u2014 \u2713 HIT\n[2026-09-01T02:36:51.248Z] [combat] Piercing flares \u2014 +4 on hit.\n[2026-09-01T02:36:51.248Z] [combat] Mud Spider shrugs off the piercing. (resisted, \u00d70.25 for 10)\n",
+      "[2026-09-01T02:36:51.250Z] [arbiter] The Arbiter watches the piercing skid off. \"Swap to the Mud Armor \u2014 bludgeoning or aetheric will bite where piercing won't.\"\n[2026-09-01T02:36:51.251Z] [combat] The blow with the searing acid-etched bone crossbow finds purchase \u2014 10 damage, 1 HP standing. Mud Spider commits to the counter.\n",
+      "[2026-09-01T02:36:51.253Z] [combat] Searing Acid-Etched Bone Crossbow \u2014 1 burn bites in and festers (3 turns).\n[2026-09-01T02:36:51.253Z] [combat] Searing Acid-Etched Bone Crossbow \u2014 2 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n[2026-09-01T02:36:52.939Z] [debug] ui: tap \"punch\"\n[2026-09-01T02:36:52.947Z] [player] punch\n",
+      "[2026-09-01T02:36:52.948Z] [debug] parser: intent=attack conf=1.00 verb=punch target=- resolved=- range=close enemies=2 hooks=0\n[2026-09-01T02:36:52.949Z] [combat] Mud Spider blisters \u2014 clinging fire sears 1. (0/11 HP, 2 turns left)\n[2026-09-01T02:36:52.949Z] [combat] Mud Spider smokes \u2014 acid eats 2. (0/11 HP, 2 turns left)\n",
+      "[2026-09-01T02:36:52.951Z] [reward] Mud Spider defeated. You recover Spider Silk.\n[2026-09-01T02:36:52.952Z] [combat] 1 attacker remains. Mud Spider now in your sights.\n[2026-09-01T02:36:52.952Z] [reward] +10 TC pried from the dust.\n[2026-09-01T02:36:53.009Z] [arbiter] The Arbiter eyes your new pieces. \"You could make an Aether-Shard Spear now, if you wanted.\"\n",
+      "[2026-09-01T02:36:53.015Z] [debug] attack: target=Mud Spider range=mid reach.bands=[close] reach.label=Bare hands bareHand=true\n[2026-09-01T02:36:53.016Z] [arbiter] The Arbiter holds up a hand. \"Bare hands works at close / arm's reach range only \u2014 you're at mid-range. ADVANCE to close in (they'll answer the approach), or attack with something that reaches.\"\n",
+      "[2026-09-01T02:36:53.016Z] [debug] arbiter: template (reason=combat)\n[2026-09-01T02:36:53.016Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-01T02:36:53.482Z] [cognitive] AGGRESSION \u00b7 DISENGAGE  (465ms)\n[2026-09-01T02:36:56.056Z] [debug] ui: tap \"dodge\"\n[2026-09-01T02:36:56.060Z] [system] bleeding fades.\n[2026-09-01T02:36:56.070Z] [player] dodge\n",
+      "[2026-09-01T02:36:56.071Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=1 hooks=0\n[2026-09-01T02:36:56.072Z] [world] You commit to the dodge. Slip Mud Spider's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-01T02:36:56.073Z] [combat] Mud Spider strikes OUT OF THE VEIL \u2014 the blow comes from nowhere you were watching (+5).\n[2026-09-01T02:36:56.131Z] [combat] Mud Spider \u2014 d20 \u2192 12 + ATK 12 = 24 vs your AC 23 \u2014 \u2717 EVADED\n[2026-09-01T02:36:56.131Z] [combat] Dodge \u2014 d20 \u2192 11 + DEX 24 = 35 vs ATK 24. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n",
+      "[2026-09-01T02:36:56.131Z] [world] You slip Mud Spider's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n[2026-09-01T02:36:56.133Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T02:36:56.373Z] [cognitive] neutral  (239ms)\n[2026-09-01T02:36:57.223Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n",
+      "[2026-09-01T02:36:57.227Z] [system] evasive \u2014 harder to hit fades.\n[2026-09-01T02:36:57.262Z] [player] attack with the auralite talon\n[2026-09-01T02:36:57.263Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=mid enemies=1 hooks=0\n",
+      "[2026-09-01T02:36:57.264Z] [debug] attack: target=Mud Spider range=mid reach.bands=[close] reach.label=Auralite Talon bareHand=false\n[2026-09-01T02:36:57.264Z] [arbiter] The Arbiter holds up a hand. \"Auralite Talon works at close / arm's reach range only \u2014 you're at mid-range. ADVANCE to close in (they'll answer the approach), or attack with something that reaches.\"\n",
+      "[2026-09-01T02:36:57.499Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (234ms)\n[2026-09-01T02:36:58.621Z] [debug] ui: tap \"\ud83d\udd25\u2697 bone crossbow\"\n[2026-09-01T02:36:58.624Z] [system] perfect opening fades.\n[2026-09-01T02:36:58.668Z] [player] attack with the off-hand bone crossbow\n",
+      "[2026-09-01T02:36:58.668Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=1 hooks=0\n[2026-09-01T02:36:58.669Z] [debug] attack: target=Mud Spider range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-09-01T02:36:58.671Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-09-01T02:36:58.719Z] [world] You commit forward with the searing acid-etched bone crossbow. Mud Spider watches your hands.\n[2026-09-01T02:36:58.720Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T02:36:58.946Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (226ms)\n[2026-09-01T02:37:07.150Z] [world] Mud Spider moves first. The pressure is immediate.\n",
+      "[2026-09-01T02:37:07.152Z] [combat] Mud Spider \u2014 d20 \u2192 18 + ATK 5 = 23 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-09-01T02:37:07.153Z] [combat] You \u2014 d20 \u2192 7 + DEX 24 perfect opening (2\u00d7 dice) = 31 vs Mud Spider AC 9 \u2014 \u2713 HIT\n[2026-09-01T02:37:07.154Z] [combat] Mud Spider shrugs off the piercing. (resisted, \u00d70.25 for 7)\n",
+      "[2026-09-01T02:37:07.158Z] [combat] Clean hit with the searing acid-etched bone crossbow for 7. Mud Spider has 6 left and does not back away.\n[2026-09-01T02:37:07.159Z] [combat] Searing Acid-Etched Bone Crossbow \u2014 3 burn bites in and festers (3 turns).\n",
+      "[2026-09-01T02:37:07.160Z] [combat] Searing Acid-Etched Bone Crossbow \u2014 1 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n[2026-09-01T02:37:07.419Z] [combat] Mud Spider deals 3 piercing damage [armor \u221235%, plate \u22121] [edge of reach \u2014 halved]. You have 37 HP remaining.\n[2026-09-01T02:37:10.360Z] [debug] ui: tap \"\ud83d\udd25\u2697 bone crossbow\"\n",
+      "[2026-09-01T02:37:10.406Z] [player] attack with the off-hand bone crossbow\n[2026-09-01T02:37:10.407Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=1 hooks=0\n[2026-09-01T02:37:10.407Z] [combat] Mud Spider blisters \u2014 clinging fire sears 3. (3/13 HP, 2 turns left)\n",
+      "[2026-09-01T02:37:10.407Z] [combat] Mud Spider smokes \u2014 acid eats 1. (2/13 HP, 2 turns left)\n[2026-09-01T02:37:10.408Z] [debug] attack: target=Mud Spider range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-09-01T02:37:10.455Z] [world] You commit forward with the searing acid-etched bone crossbow. Mud Spider watches your hands.\n",
+      "[2026-09-01T02:37:10.455Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T02:37:10.677Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (221ms)\n[2026-09-01T02:37:18.443Z] [world] Mud Spider moves first. The pressure is immediate.\n[2026-09-01T02:37:18.445Z] [combat] Mud Spider \u2014 d20 \u2192 14 + ATK 5 = 19 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-01T02:37:18.445Z] [combat] You \u2014 d20 \u2192 17 + DEX 24 = 41 vs Mud Spider AC 8 \u2014 \u2713 HIT\n[2026-09-01T02:37:18.446Z] [combat] Piercing flares \u2014 +3 on hit.\n[2026-09-01T02:37:18.446Z] [combat] Mud Spider shrugs off the piercing. (resisted, \u00d70.25 for 10)\n[2026-09-01T02:37:18.447Z] [combat] The piercing has worn Mud Spider's guard through \u2014 it bites full from here.\n",
+      "[2026-09-01T02:37:18.449Z] [combat] Your blow with the searing acid-etched bone crossbow lands clean \u2014 10 damage. Mud Spider crumples in the dust. The Aetherstone settles.\n[2026-09-01T02:37:18.450Z] [reward] Mud Spider defeated. You recover Spider Silk.\n[2026-09-01T02:37:18.451Z] [reward] +9 TC pried from the dust.\n",
+      "[2026-09-01T02:37:18.915Z] [debug] persist sizes(KB): total=238 player=53 wm=97[rooms=45 events=3 memos=0 npcs=4 defeated=1 tags=1 discovered=0] log=85 scene=3\n[2026-09-01T02:37:22.118Z] [debug] homework: intro-fill armed after 10056ms idle\n[2026-09-01T02:37:22.632Z] [debug] ui: tap \"take / salvage\"\n[2026-09-01T02:37:24.298Z] [world] You take the Aetherbound Mask from where it lay.\n",
+      "[2026-09-01T02:37:24.299Z] [reward] \u2726 Aetherbound Mask (Common).\n[2026-09-01T02:37:24.307Z] [world] You pick up the Rough-Hewn Gauntlets.\n[2026-09-01T02:37:24.307Z] [reward] \u2726 Rough-Hewn Gauntlets (Common).\n[2026-09-01T02:37:25.507Z] [world] You work the cairn over. A part of it comes loose, intact.\n",
+      "[2026-09-01T02:37:25.508Z] [world] You strip the cracked crashed automaton chassis carefully. Something usable comes free in your hand.\n[2026-09-01T02:37:25.508Z] [world] You strip the cracked supply crate carefully. Something usable comes free in your hand.\n[2026-09-01T02:37:25.508Z] [world] You salvage the dropped blade. The take is small but real.\n",
+      "[2026-09-01T02:37:25.508Z] [world] You break the leaning obsidian pillar apart. Among the pieces, something worth keeping.\n[2026-09-01T02:37:25.508Z] [world] You salvage the rusted endless stair landing. The take is small but real.\n[2026-09-01T02:37:25.509Z] [world] You salvage the stacked stone. The take is small but real.\n",
+      "[2026-09-01T02:37:25.509Z] [world] You strip the zharak's teeth spire carefully. Something usable comes free in your hand.\n[2026-09-01T02:37:25.509Z] [reward] \u2726 Salvage haul:\n[2026-09-01T02:37:25.509Z] [reward]     \u2022 Smooth Stone x2 (Common)\n[2026-09-01T02:37:25.509Z] [reward]     \u2022 Scrap Metal x4 (Common)\n[2026-09-01T02:37:25.510Z] [reward]     \u2022 Worn Tartarian Coin x19 (Common)\n",
+      "[2026-09-01T02:37:25.510Z] [reward]     \u2022 Aether Dust (Common)\n[2026-09-01T02:37:28.302Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 6014ms read/write unusable (native mis-reported 155025ms/1096ms \u2014 llama.rn split bug, not this call) in 726t\u2192out 33t (148ch)\n[2026-09-01T02:37:28.472Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 6014ms \u2014 intro-fill:action-opener\n",
+      "[2026-09-01T02:37:28.472Z] [debug] homework: scene_intro \"the Silt Thief\" \u2713 6356ms\n\n=== END LOG \u00b7 399985 CHARS ===\n\nTartaria Realms\n\nDevice\n  Name: Pixel 10 Pro XL\n  Platform: android 37\n  Hermes: yes\n  Locale: en-US\n  Timezone: America/New_York\n  Screen: window 443\u00d7986 / screen 443\u00d7986 @ 2.4375x density\n  Captured at: 2026-09-01T02:37:31.592Z\n\nInstall\n  App ID: com.hotatticgames.tartarprim\n",
+      "  App version: 4.32.11\n  APK build version: 2.4.1\n  APK build: 293\n  AAB: (build 293)\n  OTA: (2026-09-01-1599-set-the-bone)\n  Boot stage: qwen:done\n\nML runtime health\n  Status: active (no crashes detected)\n  Crash count: 0\n  Last init attempt: 2026-09-01T02:32:41.647Z\n  Last init success: 2026-09-01T02:32:43.237Z\n  Crashes-before-disable threshold: 2\n",
+      "  Qwen completion guard: clean (no completion crashes)\n  Qwen kernel variant: rnllama_v8_2_fp16_dotprod\n  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k\n",
+      "  Voice (TTS) guard: clean (no voice crashes on this build)\nSave-load health\n  Status: clean (no load-crash flags)\nLast JS crash\n  Status: none recorded\nThis launch\n  Life: bmti1omepuw \u00b7 started 2026-09-01T02:25:17.425Z\n  Followed an OTA apply 1281ms ago (mid-session)\n  The previous life released its model contexts before reloading (o1/r1/l0/p1/dn0)\nCrash ledger \u2014 10 recorded (newest last)\n",
+      "  \u2022 2026-08-30T21:23:57.150Z (1754m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-30-1578-the-stage-says-who-is-there \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done [q0] \u00b7 535ms into the action \u00b7 alive 0ms after it\n",
+      "  \u2022 2026-08-30T22:25:39.849Z (1692m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-30-1580-the-guy-who-was-never-there \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done [q0] \u00b7 329ms into the action \u00b7 alive 0ms after it\n",
+      "  \u2022 2026-08-30T23:42:09.758Z (1615m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-30-1581-the-card-they-cannot-walk-past \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done [q0] \u00b7 414ms into the action \u00b7 alive 0ms after it\n",
+      "  \u2022 2026-08-31T00:21:58.332Z (1576m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-30-1582-the-guy-who-gives-you-the-job \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done [q0] \u00b7 383ms into the action \u00b7 alive 0ms after it\n",
+      "  \u2022 2026-08-31T03:45:02.432Z (1372m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-31-1586-the-slate-in-every-part \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done [q0] \u00b7 541ms into the action \u00b7 alive 0ms after it\n",
+      "  \u2022 2026-08-31T12:34:47.772Z (843m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-31-1589-the-pin-comes-home \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done [q0] \u00b7 578ms into the action \u00b7 alive 0ms after it\n",
+      "      launch: died 892ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-08-31T14:24:08.210Z (733m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-31-1592-the-events-say-which-build \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n",
+      "      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done [q0] \u00b7 508ms into the action \u00b7 alive 0ms after it\n      launch: died 859ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-08-31T17:38:34.699Z (539m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-31-1594-the-pinch-demands-the-lift \u00b7 stage boot:qwen:deferred\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: boot:qwen:deferred \u00b7 893ms into the action \u00b7 alive 0ms after it\n      launch: died 941ms into the process \u00b7 not an OTA-apply boot\n",
+      "      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-08-31T22:14:31.073Z (263m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-31-1595-the-guide-and-the-ground-agree \u00b7 stage boot:qwen:deferred\n      Process died with no orderly exit wh"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-01-1600-the-stinger #mti24czmehpi [inline 27/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mti24czmehpi"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-01-1600-the-stinger"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "27"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-01-1600-the-stinger"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-01T03:10:07.797217Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-01T03:10:09.672000Z",
+  "fingerprints": [
+    "92c3a1cb835bf1c5ef2ef3a686f41dbc"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1947362041,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-01T03:10:09.672000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-01-1600-the-stinger",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-01-1600-the-stinger",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-01-1600-the-stinger",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-01-1600-the-stinger)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "16256ca318b74046b3823ad711336808",
+  "previousEventID": "0b6153242688482e9906a2e8441dd523"
+}

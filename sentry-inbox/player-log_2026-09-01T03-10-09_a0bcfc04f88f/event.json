@@ -1,0 +1,238 @@
+{
+  "id": "a0bcfc04f88f471eac35498ff547daf1",
+  "groupID": "7703732937",
+  "eventID": "a0bcfc04f88f471eac35498ff547daf1",
+  "projectID": "4511945117532160",
+  "size": 17999,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-01-1600-the-stinger #mti24czmehpi [inline 25/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-01-1600-the-stinger",
+  "message": "player-log 2026-09-01-1600-the-stinger #mti24czmehpi [inline 25/28]",
+  "title": "player-log 2026-09-01-1600-the-stinger #mti24czmehpi [inline 25/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "8d836817861b4b5aa556d39a65a305d6",
+      "span_id": "8ffc27a5b5d47cae",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      ".\n[2026-09-01T02:33:14.539Z] [world] [Raider's Ridge] north: the Silt Thief (19 tiles, 2 days) \u00b7 east: The Monarch's Waystation (3 tiles, 8 hours) \u00b7 south: The Architect's Blind (2 tiles, 5 hours) \u00b7 west: Tartarian Outskirts (2 tiles, 5 hours)\n",
+      "[2026-09-01T02:33:14.539Z] [world] Nell of the Long Road, wandering trader, sits at a folding table at the edge of the ground, wares laid out neat. They beckon.\n[2026-09-01T02:33:14.540Z] [arbiter] The Arbiter inclines their head toward the newcomer. \"Nell of the Long Road, wandering trader. A stall thrown together from cart-boards and tarpaulin. Smells of stew and damp wool. The hawker watches th",
+      "e road with one eye and the merchandise with the other.\"\n[2026-09-01T02:33:14.544Z] [world] Rare workings for sale: Aetheric Vest (200 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n",
+      "[2026-09-01T02:33:14.548Z] [reward] \u2726 Resurrection. Cheddar Bob returns to Tartaria, restored. The Aetherstone hums in recognition.\n[2026-09-01T02:33:17.038Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-09-01T02:33:18.303Z] [debug] ui: tap \"missions\"\n",
+      "[2026-09-01T02:33:27.053Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 9888ms read 8736ms/write 1121ms in 787t\u2192out 33t 11.1ms/t HIT-CAP (142ch)\n[2026-09-01T02:33:27.076Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 9888ms \u2014 intro-fill:action-opener\n[2026-09-01T02:33:27.076Z] [debug] homework: scene_intro \"Raider's Ridge\" \u2713 10040ms\n",
+      "[2026-09-01T02:33:30.574Z] [player] Ask why the stall is here\n[2026-09-01T02:33:30.575Z] [world] \"Stall goes up where the ground is flat and comes down when it is not worth it,\" the trader says. \"That is the whole business plan.\"\n[2026-09-01T02:33:30.576Z] [world] Nell of the Long Road places you, roughly, and adjusts what they were about to say.\n",
+      "[2026-09-01T02:33:30.841Z] [debug] persist sizes(KB): total=241 player=55 wm=97[rooms=45 events=3 memos=0 npcs=4 defeated=1 tags=1 discovered=0] log=86 scene=3\n[2026-09-01T02:33:31.859Z] [world] You let the conversation go and Nell of the Long Road gets back to it.\n[2026-09-01T02:33:32.104Z] [debug] qwen\u23f1 flourish ok 2399ms read 1846ms/write 540ms in 177t\u2192out 18t 10.4ms/t (87ch)\n",
+      "[2026-09-01T02:33:32.250Z] [debug] qwen\u23f1 \u2702 DISCARDED flourish after 2399ms \u2014 flourish:empty\n[2026-09-01T02:33:32.251Z] [debug] flourish: \u2205 2706ms\n[2026-09-01T02:33:46.737Z] [reward] Sold Bone Knife (Common) to Nell of the Long Road for 6 TC. (153 TC on hand)\n[2026-09-01T02:33:46.788Z] [reward] Sold Bone Knife (Common) to Nell of the Long Road for 6 TC. (159 TC on hand)\n",
+      "[2026-09-01T02:33:46.831Z] [reward] Sold Bone Knife (Common) to Nell of the Long Road for 6 TC. (165 TC on hand)\n[2026-09-01T02:33:46.873Z] [reward] Sold Cudgel (Common) to Nell of the Long Road for 5 TC. (170 TC on hand)\n[2026-09-01T02:33:46.915Z] [reward] Sold Mud-Bound Cloak (Common) to Nell of the Long Road for 5 TC. (175 TC on hand)\n",
+      "[2026-09-01T02:33:46.957Z] [reward] Sold Mud-Warden's Vest (Common) to Nell of the Long Road for 5 TC. (180 TC on hand)\n[2026-09-01T02:33:46.999Z] [reward] Sold Mud-Bound Cloak (Common) to Nell of the Long Road for 5 TC. (185 TC on hand)\n[2026-09-01T02:33:47.041Z] [reward] Sold Mud-Warden's Vest (Common) to Nell of the Long Road for 5 TC. (190 TC on hand)\n",
+      "[2026-09-01T02:33:54.341Z] [reward] Bought 5\u00d7 Blueberries from Nell of the Long Road for 50 TC. (140 TC left)\n[2026-09-01T02:33:56.074Z] [reward] Bought Water Bottle from Nell of the Long Road for 9 TC. (131 TC left)\n[2026-09-01T02:33:57.727Z] [reward] Bought Wild Onion from Nell of the Long Road for 3 TC. (128 TC left)\n",
+      "[2026-09-01T02:34:01.991Z] [reward] Bought 7\u00d7 Patched Cloth from Nell of the Long Road for 49 TC. (79 TC left)\n[2026-09-01T02:34:06.911Z] [debug] homework: intro-fill armed after 6000ms idle (strike 2/3)\n[2026-09-01T02:34:08.268Z] [debug] ui: tap \"look around you\"\n[2026-09-01T02:34:08.272Z] [player] look\n",
+      "[2026-09-01T02:34:08.273Z] [debug] parser: intent=investigate conf=1.00 verb=look target=- resolved=- range=- enemies=0 hooks=0\n[2026-09-01T02:34:08.274Z] [world] You look around. You're in Raider's Ridge. You see: shallow pool, Rough-Hewn Gauntlets, Aetherbound Mask, cairn, stacked stone, spiral-mark, rusted endless stair landing, dropped blade, cracked supply crate, cracked crashed automaton cha",
+      "ssis, leaning obsidian pillar, salt-crusted gull roost, zharak's teeth spire. Nell of the Long Road is here. Cardinal travel: north, east, south, west.\n[2026-09-01T02:34:12.569Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 5513ms read 0ms/write 0ms in 795t\u2192out 0t (0ch)\n[2026-09-01T02:34:12.777Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 5513ms \u2014 intro-fill:\u2205\n",
+      "[2026-09-01T02:34:12.777Z] [debug] homework: scene_intro \"Raider's Ridge\" \u2205 5868ms\n[2026-09-01T02:34:12.907Z] [cognitive] neutral  (4631ms)\n[2026-09-01T02:34:17.493Z] [debug] kbbar: mounted bottom=355 raw=0 from=estimate winH=986 beat=-\n[2026-09-01T02:34:18.009Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=360 from=live winH=986 beat=-\n[2026-09-01T02:34:21.903Z] [player] fight me\n",
+      "[2026-09-01T02:34:21.904Z] [debug] parser: intent=attack conf=1.00 verb=fight target=- resolved=- range=- enemies=0 hooks=0\n[2026-09-01T02:34:21.905Z] [world] Nothing in arm's reach answers your blade. The motion echoes off Aetherstone.\n",
+      "[2026-09-01T02:34:22.071Z] [world] The Reaver is on the ridge the sign named, alone, watching you climb. He doesn't draw until you crest it. \"The Giants will rise,\" he says, almost gentle. \"You are a small thing to send against that.\" Then his blade comes up.\n[2026-09-01T02:34:22.072Z] [combat] Tartarian Reaver (hunted) closes the distance. The hunt comes to its end.\n",
+      "[2026-09-01T02:34:22.521Z] [cognitive] AGGRESSION  (613ms)\n[2026-09-01T02:34:22.783Z] [debug] persist sizes(KB): total=238 player=53 wm=97[rooms=45 events=3 memos=0 npcs=4 defeated=1 tags=1 discovered=0] log=86 scene=3\n",
+      "[2026-09-01T02:34:31.892Z] [debug] qwen\u23f1 ambient ok 9589ms read/write unusable (native mis-reported 18022ms/1704ms \u2014 llama.rn split bug, not this call) in 366t\u2192out 31t HIT-CAP (135ch)\n[2026-09-01T02:34:32.315Z] [debug] \u26a0 FREEZE WATCH: LOGIC stalled while frames kept coming (js 3426ms \u00b7 frames 211ms). Something blocked the JS thread \u2014 look for a long synchronous run.\n",
+      "[2026-09-01T02:34:32.530Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient after 9589ms \u2014 ambient:stale:combat-started\n[2026-09-01T02:34:32.531Z] [debug] arbiter: ambient stale:combat-started 10624ms\n[2026-09-01T02:34:32.531Z] [debug] arbiter: ambient-empty reason=action-opener raw=\"You look back at your journey, the old trails where you left a mark now crisscrossed with the remnants of your past. Eac\"\n",
+      "[2026-09-01T02:34:37.329Z] [debug] freeze watch: recovered \u2014 painting again after 211ms quiet.\n[2026-09-01T02:34:44.296Z] [debug] ui: tap \"approach\"\n[2026-09-01T02:34:44.303Z] [system] bleeding fades.\n[2026-09-01T02:34:44.364Z] [player] approach Tartarian Reaver (hunted)\n",
+      "[2026-09-01T02:34:44.365Z] [debug] parser: intent=advance conf=1.00 verb=approach target=tartarian reaver hunted resolved=Tartarian Reaver (hunted) range=mid enemies=1 hooks=0\n[2026-09-01T02:34:44.366Z] [debug] move: advance from range=mid enemies=1 weather=Eerie Calm cost=1 partial=0\n",
+      "[2026-09-01T02:34:44.367Z] [debug] move: field advance target=Tartarian Reaver (hunted) d 1.50->0.50 band mid->close\n[2026-09-01T02:34:44.367Z] [world] You close the gap with Tartarian Reaver (hunted). (range: close / arm's reach)\n[2026-09-01T02:34:44.368Z] [combat] Tartarian Reaver (hunted) \u2014 d20 \u2192 5 + ATK 14 = 19 vs your AC 23 \u2014 \u2717 MISS\n",
+      "[2026-09-01T02:34:44.368Z] [combat] Tartarian Reaver (hunted) presses the second strike \u2014 bosses do not yield the tempo.\n[2026-09-01T02:34:44.369Z] [combat] Tartarian Reaver (hunted) \u2014 d20 \u2192 20 + ATK 14 = 34 vs your AC 23 \u2014 \u2713 CRITICAL HIT\n[2026-09-01T02:34:44.623Z] [combat] Tartarian Reaver (hunted) deals 40 bludgeoning damage. You fall.\n",
+      "[2026-09-01T02:34:44.623Z] [combat] Tartarian Reaver (hunted)'s strike leaves you bleeding.\n[2026-09-01T02:34:44.623Z] [combat] Cheddar Bob falls in Raider's Ridge. The Aetherstone grows dim and does not lift.\n[2026-09-01T02:34:44.623Z] [system] Cheddar Bob has fallen. A Resurrection Gem from the title screen can bring them back.\n[2026-09-01T02:34:44.844Z] [cognitive] TRAVEL \u00b7 SEARCH  (472ms)\n",
+      "[2026-09-01T02:34:45.066Z] [system] You join the Fallen of Tartaria \u2014 8 names the buried world keeps now. Read the roll from the Lore Codex.\n[2026-09-01T02:34:51.032Z] [debug] scene: loc=raiders_ridge hub=- arrival=n opening=n passing=n\n[2026-09-01T02:34:51.033Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @raiders_ridge HERE needs=Raider's Ridge-Sign\u2713\n",
+      "[2026-09-01T02:34:51.033Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n[2026-09-01T02:34:51.033Z] [debug] missions: mystery:mystery_temporal_watch stage 0/4 [diplomacy] @reclaimer_stake npc=\"the Reclaimers Guild Speaker\" gives=Guild Eddy-Gauge PAUSED\n[2026-09-01T02:34:51.033Z] [debug] missions: \u00b7 at=raiders_ridge\n",
+      "[2026-09-01T02:34:51.036Z] [world] \u25b8 Silence the Doubter: this is the place \u2014 finish it.\n[2026-09-01T02:34:51.048Z] [world] Not even wind. The kind of stillness that means something is watching.\n\nYou are at Raider's Ridge. A broken spine of scrub and stacked stone one hard walk east of the Tartarian Outskirts. Raider sign is cut into half the rocks \u2014 spiral-marks, ridge-signs, tallies \u2014 because th",
+      "is is where the border gangs stage, meet, and settle what the outposts will not allow inside their walls. Open ground, bad cover, and nobody to hear it.\n\nHazard: Tartarian Trap. A pressure plate older than recorded history triggers. Walls shift, floor opens, energy lances strike.\n[2026-09-01T02:34:51.048Z] [world] Something about this ground is already familiar.\n",
+      "[2026-09-01T02:34:51.050Z] [world] [Raider's Ridge] north: the Silt Thief (19 tiles, 2 days) \u00b7 east: The Monarch's Waystation (3 tiles, 8 hours) \u00b7 south: The Architect's Blind (2 tiles, 5 hours) \u00b7 west: Tartarian Outskirts (2 tiles, 5 hours)\n[2026-09-01T02:34:51.057Z] [reward] \u2726 Resurrection. Cheddar Bob returns to Tartaria, restored. The Aetherstone hums in recognition.\n",
+      "[2026-09-01T02:34:51.973Z] [debug] homework: intro-fill armed after 6000ms idle (strike 3/3)\n[2026-09-01T02:34:53.149Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=360 from=cached winH=986 beat=-\n[2026-09-01T02:34:53.530Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-09-01T02:34:59.445Z] [player] fight me\n",
+      "[2026-09-01T02:34:59.446Z] [debug] parser: intent=attack conf=1.00 verb=fight target=- resolved=- range=- enemies=0 hooks=0\n[2026-09-01T02:34:59.447Z] [world] Nothing in arm's reach answers your blade. The motion echoes off Aetherstone.\n[2026-09-01T02:34:59.448Z] [debug] arbiter: template (reason=intent-not-allowed:attack)\n",
+      "[2026-09-01T02:34:59.448Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-01T02:34:59.656Z] [world] The Reaver is on the ridge the sign named, alone, watching you climb. He doesn't draw until you crest it. \"The Giants will rise,\" he says, almost gentle. \"You are a small thing to send against that.\" Then his blade comes up.\n",
+      "[2026-09-01T02:34:59.657Z] [combat] Tartarian Reaver (hunted) closes the distance. The hunt comes to its end.\n[2026-09-01T02:35:00.010Z] [cognitive] AGGRESSION  (209ms)\n[2026-09-01T02:35:00.870Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 8735ms read 0ms/write 0ms in 785t\u2192out 0t (0ch)\n",
+      "[2026-09-01T02:35:01.091Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 8735ms \u2014 intro-fill:\u2205\n[2026-09-01T02:35:01.092Z] [debug] homework: scene_intro \"Raider's Ridge\" \u2205 9121ms\n[2026-09-01T02:35:05.519Z] [debug] ui: tap \"step back\"\n[2026-09-01T02:35:05.540Z] [player] step back\n",
+      "[2026-09-01T02:35:05.540Z] [debug] parser: intent=retreat conf=1.00 verb=stepback target=- resolved=- range=mid enemies=1 hooks=0\n[2026-09-01T02:35:05.543Z] [debug] move: retreat from range=mid enemies=1 weather=Eerie Calm cost=1 partial=0\n[2026-09-01T02:35:05.543Z] [debug] move: field retreat target=Tartarian Reaver (hunted) d 1.50->2.50 band mid->far\n",
+      "[2026-09-01T02:35:05.544Z] [world] You pull back from Tartarian Reaver (hunted). (range: far)\n[2026-09-01T02:35:05.545Z] [debug] arbiter: template (reason=combat)\n[2026-09-01T02:35:05.545Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-01T02:35:05.796Z] [cognitive] neutral  (249ms)\n[2026-09-01T02:35:07.628Z] [debug] ui: tap \"dodge\"\n",
+      "[2026-09-01T02:35:07.633Z] [system] bleeding fades.\n[2026-09-01T02:35:07.645Z] [player] dodge\n[2026-09-01T02:35:07.646Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=far enemies=1 hooks=0\n",
+      "[2026-09-01T02:35:07.647Z] [world] You commit to the dodge. Slip Tartarian Reaver (hunted)'s swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-01T02:35:07.648Z] [combat] Tartarian Reaver (hunted) closes the distance.\n[2026-09-01T02:35:07.649Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-01T02:35:07.932Z] [cognitive] neutral  (282ms)\n[2026-09-01T02:35:08.544Z] [debug] ui: tap \"\ud83d\udd25\u2697 bone crossbow \u2605\"\n[2026-09-01T02:35:08.547Z] [system] dodging (parry) fades.\n[2026-09-01T02:35:08.589Z] [player] attack with the off-hand bone crossbow\n",
+      "[2026-09-01T02:35:08.590Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=1 hooks=0\n[2026-09-01T02:35:08.591Z] [debug] attack: target=Tartarian Reaver (hunted) range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n",
+      "[2026-09-01T02:35:08.638Z] [world] Your searing acid-etched bone crossbow comes around in an arc; Tartarian Reaver (hunted) squares up to meet it.\n[2026-09-01T02:35:08.639Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T02:35:08.862Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (218ms)\n",
+      "[2026-09-01T02:35:17.307Z] [debug] persist sizes(KB): total=238 player=53 wm=97[rooms=45 events=3 memos=0 npcs=4 defeated=1 tags=1 discovered=0] log=85 scene=3\n[2026-09-01T02:35:17.687Z] [world] Tartarian Reaver (hunted) moves first. The pressure is immediate.\n[2026-09-01T02:35:17.689Z] [combat] Tartarian Reaver (hunted) \u2014 d20 \u2192 10 + ATK 14 = 24 vs your AC 23 \u2014 \u2713 HIT\n",
+      "[2026-09-01T02:35:17.690Z] [combat] Tartarian Reaver (hunted) presses the second strike \u2014 bosses do not yield the tempo.\n[2026-09-01T02:35:17.691Z] [combat] Tartarian Reaver (hunted) \u2014 d20 \u2192 9 + ATK 14 = 23 vs your AC 23 \u2014 \u2713 HIT\n[2026-09-01T02:35:17.692Z] [combat] You \u2014 d20 \u2192 4 + DEX 24 = 28 vs Tartarian Reaver (hunted) AC 25 \u2014 \u2713 HIT\n",
+      "[2026-09-01T02:35:17.693Z] [combat] Weakness exposed \u2014 Tartarian Reaver (hunted) flinches. (piercing \u00d72.25 for 31)\n[2026-09-01T02:35:17.695Z] [combat] Your strike with the searing acid-etched bone crossbow lands for 31. Tartarian Reaver (hunted) staggers "
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-01-1600-the-stinger #mti24czmehpi [inline 25/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mti24czmehpi"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-01-1600-the-stinger"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "25"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-01-1600-the-stinger"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-01T03:10:07.785096Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-01T03:10:09.671000Z",
+  "fingerprints": [
+    "92c3a1cb835bf1c5ef2ef3a686f41dbc"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1947362041,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-01T03:10:09.672000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-01-1600-the-stinger",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-01-1600-the-stinger",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-01-1600-the-stinger",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-01-1600-the-stinger)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "b5000fa395e8434dbf9c216d3eff656e",
+  "previousEventID": "96a4b6d3e1b6471ea2f219e1db4c04af"
+}
