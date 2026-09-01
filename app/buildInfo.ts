@@ -26644,7 +26644,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // starts in the spawn room (the tutorial is unchanged), passing-through
 // stays outside as before, and blades out bar the gate — the OTA-1598 truce
 // works both ways. LEAVE OUTPOST is unchanged; the tile is a tile.
-export const OTA_BUILD_ID = '2026-09-01-1606-the-gate-waits';
+//
+// ⚠⚠⚠ OTA-1607 — THE CARD SAYS WHAT THE DICE ROLL. Owner: "the enemy portrait
+// card said 2d6 physcic under DMG that's why I typed that." The bestiary
+// authors flavor words ('2D6 Psychic') and the engine folds them through
+// DAMAGE_TYPE_ALIASES (psychic→aetheric) before a single point lands — so the
+// portrait promised a type no roll ever dealt. Seven enemies carried
+// 'psychic' (Mud Spirit, Mud Siren, Aetheric Harpy, Aetheric Ghost, +3), the
+// only non-canonical word in the bestiary. enemyDamageCompact now keeps the
+// dice and canonicalizes the word, so DMG, the DEALS line, and the combat
+// log's damage clauses all tell one story. A whole-bestiary ratchet holds it.
+export const OTA_BUILD_ID = '2026-09-01-1607-the-card-tells-the-type';
 // golem catch-up 2026-09-01: markerless publish of OTA-1606 - the gate
 // waits: hub tiles stay overland, ENTER OUTPOST opens them. hal took the
 // marker push.

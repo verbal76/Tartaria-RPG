@@ -3,6 +3,7 @@ import { rollDie } from './rng';
 import { findWeaponByName, type CatalogWeapon } from './crafting';
 import { effectiveStats } from './equipment';
 import { traitACBonus, enemyIsAerial } from './enemyTraits';
+import { parseDamageTypeKeyword } from './damageTypes';
 // ⚠ OTA-1562 — safe to import here: weaponEffects reaches only rng / enemyTraits
 // / types, none of which reach back into combatRules, so no cycle is created.
 import { parseWeaponEffect, armorIgnoreReduction } from './weaponEffects';
@@ -1095,7 +1096,18 @@ export function enemyDamageDisplay(enemy: { damage?: unknown; boss?: boolean; tr
  *  read `1d8+3` on its own card while the resolver rolled `1d8+3+1d6` twice.
  *  The long form above doesn't fit a stat chip, so the panel gets this. */
 export function enemyDamageCompact(enemy: { damage?: unknown; boss?: boolean; traits?: readonly string[] }): string {
-  const base = String(enemy.damage ?? '').trim() || '1d6';
+  const raw = String(enemy.damage ?? '').trim() || '1d6';
+  // ⚠⚠ OTA-1607 — THE CARD SAYS WHAT THE DICE ROLL. Owner: "the enemy
+  // portrait card said 2d6 physcic under DMG that's why I typed that." The
+  // bestiary authors flavor words ('2D6 Psychic') while the engine folds them
+  // through DAMAGE_TYPE_ALIASES (psychic→aetheric) before a single point
+  // lands — the portrait promised a type no roll ever dealt (7 enemies carry
+  // 'psychic'; it is the only non-canonical word in the bestiary). Keep the
+  // dice, canonicalize the word — DMG, the DEALS line and the combat log now
+  // all say the same thing.
+  const dice = raw.match(/\d+d\d+/i)?.[0]?.toLowerCase();
+  const canonType = parseDamageTypeKeyword(raw);
+  const base = dice && canonType ? `${dice} ${canonType}` : raw;
   if (!enemy.boss) return base;
   return bossSwingsTwice(enemy) ? `${base}+1d6 ×2` : `${base}+1d6`;
 }
