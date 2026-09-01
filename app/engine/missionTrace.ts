@@ -224,7 +224,21 @@ export function missionArrivalLines(player: PlayerCharacter | null | undefined):
     const owed = st.requires && !stageRequirementMet(st, player.inventory)
       ? ` (you still need ${st.requires.item})`
       : '';
-    out.push(`▸ ${def.title}: this is the place${who}${doThis}${owed}.`);
+    // ⚠ OTA-1598 — a fight-stage standing on a hub tile says WHERE the fight is
+    // allowed to happen. Arrival at a hub auto-enters the interior, so without
+    // this clause the slate says "force the issue" while the player is standing
+    // in the one place the truce forbids it (the owner asked, verbatim, whether
+    // that was killing the mission). Hunts draw blades on boss / attack_provoke
+    // / spawn stages; any family's authored spawn counts too.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { isHubLocation } = require('./hub') as typeof import('./hub');
+    const bladesHere = family === 'hunt'
+      ? (st.checkKind === 'boss' || st.checkKind === 'attack_provoke' || !!st.spawn)
+      : !!st.spawn;
+    const truce = bladesHere && isHubLocation(player.currentLocationId)
+      ? ' Outside the walls — the outpost holds its truce.'
+      : '';
+    out.push(`▸ ${def.title}: this is the place${who}${doThis}${owed}.${truce}`);
   };
   for (const rec of player.activeHunts ?? []) {
     const def = findHuntById(rec.id);

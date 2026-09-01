@@ -389,6 +389,12 @@ function spawnStageEscort(
   spawn: { enemyName: string; count?: number; ambush?: boolean } | null | undefined,
 ): boolean {
   if (!spawn) return false;
+  // ⚠ OTA-1598 belt — never write bodies into a hub room or a building
+  // interior. Every caller should already have refused at the door
+  // (advanceHunt's truce guard); a caller that forgets fails toward an empty
+  // room, never a fight inside the truce. A frozen spawn stage self-heals: the
+  // record did not advance, so the verb re-fires the spawn once outside.
+  if (get().player?.hubRoomId || get().activeBuildingId) return false;
   const escort = scaleHuntEscort(player, spawn.enemyName, deps.scalePowerOf(player), spawn.count ?? 1);
   if (!escort || escort.length === 0) return false;
   const ambush = spawn.ambush === true;
@@ -1670,6 +1676,23 @@ export const createQuestSlice = (
     if (!record || !hunt) return;
     const stageDef = hunt.stages[record.stage];
     if (!stageDef) return;
+    // ⚠⚠⚠ OTA-1598 — THE FIGHT WAITS OUTSIDE THE GATE. From the owner, standing
+    // in Reclaimers' Outpost with "force the issue" on the slate: "we have a
+    // rule against being attacked in an outpost ... is that killing the
+    // mission?" It nearly did the opposite: a boss stage advanced indoors
+    // spawns the scaled apex INTO the outpost room. Eleven hunt fight-stages
+    // stand on hub tiles (the sweep is pinned in ota1598), and arrival at a hub
+    // tile auto-enters the interior — so the roof is the DEFAULT place the verb
+    // lands. The truce holds both ways: a stage that draws blades (boss /
+    // attack_provoke / an authored spawn) refuses under a roof and points at
+    // the door. Stepping out keeps the boots on the same canon cell (OTA-1597),
+    // so the same verb pays honestly right outside. A peaceful advance passes —
+    // there is no fight in it, which is what the persuade bought.
+    const drawsBlades = stageDef.checkKind === 'boss' || stageDef.checkKind === 'attack_provoke' || !!stageDef.spawn;
+    if (!peaceful && drawsBlades && (player.hubRoomId || get().activeBuildingId)) {
+      get().appendLog('arbiter', `The Arbiter puts a hand out. "Not under this roof — the outpost holds its truce. Step out the gate (LEAVE OUTPOST) and force it there."`);
+      return;
+    }
     get().appendLog('world', stageDef.narration);
     if (stageDef.arbiter) get().appendLog('arbiter', stageDef.arbiter);
     // ⚠⚠ P19 — THE STAGE ACTUALLY HANDS YOU THE THING NOW. Owner: *"if it's calling for

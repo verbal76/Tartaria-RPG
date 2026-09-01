@@ -26509,7 +26509,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // load seam - every road onto the tile. Also: a wild tile's micro-site is its
 // own seeded pick or nothing, so a climbed interior label no longer follows
 // the player across open ground ("no I am not in the buried skyscraper").
-export const OTA_BUILD_ID = '2026-08-31-1597-the-tile-is-the-trigger';
+// OTA-1598 - THE FIGHT WAITS OUTSIDE THE GATE. On 1597 the Doubter finally
+// fired at the door and the hunt moved on - to stage 3 at Tartarian Outskirts,
+// a HUB TILE, where arrival walks you through the gate of an outpost and the
+// truce forbids combat. The owner saw the trap himself: "we have a rule
+// against being attacked in an outpost ... is that killing the mission?"
+// Nearly the opposite: the verb matcher ignores the roof, so an attack typed
+// inside would advance the stage and stand the scaled apex up IN the gate
+// room. Repair at the one writer (advanceHunt): a stage that draws blades
+// (boss / attack_provoke / authored spawn) refuses under a roof and points at
+// the door - stepping out keeps the boots on the same canon cell (OTA-1597),
+// so the same verb pays right outside. spawnStageEscort gets a belt (never
+// writes bodies indoors), and the arrival slate on a hub-tile fight stage adds
+// "Outside the walls - the outpost holds its truce."
+export const OTA_BUILD_ID = '2026-09-01-1598-the-fight-waits-outside-the-gate';
 // golem catch-up 2026-08-31: markerless publish of OTA-1597 — the standing
 // check is keyed on the stage's canon grid cell and runs from the per-action
 // catch-all, both continueTravel arrival clears, the setTravelCourse arrival,
