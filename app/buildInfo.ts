@@ -26632,6 +26632,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // where the ambient fight ended. His landing now plays: ambient scrap,
 // clear, the Reaver stands up with the curtain. No verb, no button needed.
 export const OTA_BUILD_ID = '2026-09-01-1605-one-fight-on-the-field';
+// golem catch-up 2026-09-01: markerless publish of OTA-1605 - one fight on
+// the field + the clear-field re-arm. hal took the marker push.
 // golem catch-up 2026-09-01: markerless publish of OTA-1604 - dog armor
 // scraps; the worn vest unbuckles first. hal took the marker push.
 // golem catch-up 2026-09-01: markerless publish of OTA-1603 - one dog-armor
