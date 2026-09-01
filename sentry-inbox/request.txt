@@ -45,3 +45,4 @@ pull 2026-09-01T03:57:17Z — owner: pull all logs
 pull 2026-09-01T06:05:00Z — owner: game very laggy, intermittent freezes that recover; typed notes in-game during play
 pull 2026-09-01T19:47:37Z — owner pushed a log after the 1610 ship; wants errors checked (card weak/not-weak + two-ENTER row reported same session)
 pull 2026-09-01T20:36:30Z — owner pushed the folio COMPLETION log (turn-in read as a generic mission complete; want the whole hand-back sequence)
+pull 2026-09-01T20:56:56Z — URGENT: owner softlocked on a mission tile — has the meter item in loot, cannot use it, cannot leave the tile
