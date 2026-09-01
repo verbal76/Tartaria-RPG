@@ -26566,7 +26566,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // 1600 stinger meet the player on fresh ground. Ratchet: no hunt fight-stage
 // on its predecessor's tile, ever again. (Single-site story arcs keep their
 // tiles per the same ruling; the between-stages beat card is the next OTA.)
+// AND THE APEX FIRES AT ARRIVAL - same OTA, from the crest-leg device test:
+// "I autoroutes to the last stage of the mission again and nothing happened,
+// I had to yell fight me again ... it should fire as soon as I step on the
+// tile and I should be dropped right into the fight." All 18 final boss
+// stages carry no authored spawn, so the 1597 arrival arm walked past them;
+// it now also fires the final boss stage - the exact freeze-for-kill set -
+// so route in, boots on the cell: narration, apex, stinger, no verb.
 export const OTA_BUILD_ID = '2026-09-01-1601-combat-separates';
+// golem catch-up 2026-09-01: markerless publish of OTA-1601 - combat
+// separates + the apex fires at arrival; hal got it via the marker push.
 // golem catch-up 2026-09-01: markerless publish of OTA-1600 — 37 authored
 // stinger shouts, the mission-title popup raised the moment a fight-stage
 // stands bodies up, and the peaceful flag finally reaching the boss scale.
