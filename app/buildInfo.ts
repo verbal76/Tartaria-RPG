@@ -26645,6 +26645,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // stays outside as before, and blades out bar the gate — the OTA-1598 truce
 // works both ways. LEAVE OUTPOST is unchanged; the tile is a tile.
 export const OTA_BUILD_ID = '2026-09-01-1606-the-gate-waits';
+// golem catch-up 2026-09-01: markerless publish of OTA-1606 - the gate
+// waits: hub tiles stay overland, ENTER OUTPOST opens them. hal took the
+// marker push.
 // golem catch-up 2026-09-01: markerless publish of OTA-1605 - one fight on
 // the field + the clear-field re-arm. hal took the marker push.
 // golem catch-up 2026-09-01: markerless publish of OTA-1604 - dog armor
