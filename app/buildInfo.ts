@@ -26655,6 +26655,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // dice and canonicalizes the word, so DMG, the DEALS line, and the combat
 // log's damage clauses all tell one story. A whole-bestiary ratchet holds it.
 export const OTA_BUILD_ID = '2026-09-01-1607-the-card-tells-the-type';
+// golem catch-up 2026-09-01: markerless publish of OTA-1607 - the portrait
+// card canonicalizes its damage type. hal took the marker push.
 // golem catch-up 2026-09-01: markerless publish of OTA-1606 - the gate
 // waits: hub tiles stay overland, ENTER OUTPOST opens them. hal took the
 // marker push.
