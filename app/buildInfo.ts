@@ -26704,7 +26704,30 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ENTER OUTPOST, because 1606's predicate asked whether the LOCATION is an
 // outpost, not whether the boots are on its gate. The gate chip and the gate
 // verb now stand on the anchor tile, where a structure's ENTER never appears.
-export const OTA_BUILD_ID = '2026-09-01-1611-weak-and-not-weak';
+// ⚠⚠⚠ OTA-1612 — A SUBDUED MARK IS A DEFEATED MARK. Owner, typed in-game:
+// "I killed the runner. I was supposed to get the folio as the loot I did not
+// and when I kill him and I get the folio it is supposed to auto route me back
+// to garrin." He had not killed the Chart Runner — 25 damage on a 26 HP body
+// knocked him cold, the game said "Nobody left standing — the fight is yours",
+// and the strip paid gear and coin. Every objective hook (whisper chains, hunt
+// completion, leads) lived inside resolveEnemyDefeat; lootKnockedOutEnemy is a
+// separate path that told none of them, so the folio stayed on a man who no
+// longer existed. Both win paths now call one creditDefeatedTarget. Mercy keeps
+// its own economy — the premium, the better kit — and loses nothing else. The
+// kill's own bookkeeping (loot roll, corpse, kill milestone) stays behind,
+// because those are about a death and a knockout is not one.
+// ⚠⚠⚠ OTA-1613 — THE GIVER HANDS IT OVER. Owner, on finishing the folio: "it
+// was anticlimactic, it just gave me the generic mission complete... I should
+// have talked to him again, and then given my award in the chat window from
+// him." Arriving on the giver's tile CALLED THE PAYOUT: his authored line went
+// into the world feed as ambient narration, two reward lines followed, the
+// generic card took the moment and the record was deleted — five seconds, no
+// tap. Arrival now ARMS the hand-over (stage 'handback', greeting seeded into
+// the transcript, nothing paid); handing it over is a button in the SPEAK TO
+// sheet or the typed phrase, and the return line and the take land as HIS turns
+// in that conversation. The sheet holds the farewell open after the record
+// dies, so the last words cannot be cut off. One machine, twenty-one chains.
+export const OTA_BUILD_ID = '2026-09-01-1613-the-giver-hands-it-over';
 // golem catch-up 2026-09-01: markerless publish of OTA-1611 - the portrait
 // honors its inured cancellations, and one door per tile. hal took the marker.
 // golem catch-up 2026-09-01: markerless publish of OTA-1608 - the portrait

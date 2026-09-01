@@ -45,6 +45,10 @@ const codeOnly = (s: string) =>
   s.split('\n').filter((l) => !l.trim().startsWith('//') && !l.trim().startsWith('*')).join('\n');
 
 const STORE = src('app', 'state', 'gameStore.ts');
+// ⚠ OTA-1612 moved the objective-credit half of the defeat path (the chain
+// death hook among it) out of gameStore so BOTH win conditions could call it —
+// a knockout credited nothing before. The hook is the same code in a new home.
+const CREDIT = src('app', 'state', 'defeatCredit.ts');
 
 const HUB_ROOM_IDS = (() => {
   const hub = JSON.parse(src('app', 'data', 'world', 'static_hub.json')) as unknown;
@@ -213,7 +217,12 @@ describe('OTA-1548 — copy and geometry are pinned together', () => {
     expect(activeHoursText([20, 4])).toBe(', after dark (8 pm to 4 am)');
     expect(activeHoursText([6, 18])).toBe(', in daylight (6 am to 6 pm)');
     expect(activeHoursText(undefined)).toBe('');
-    expect(pronounForms('they')).toEqual({ obj: 'them', subjCap: 'They', owes: 'owe' });
+    // ⚠ OTA-1613 added `subj` and `poss` — the hand-back beat writes sentences
+    // ABOUT the giver, and a table with only the object form would have made
+    // those lines build their own pronouns. The three 1548 pinned are unchanged.
+    expect(pronounForms('they')).toEqual({
+      obj: 'them', subj: 'they', subjCap: 'They', poss: 'their', owes: 'owe',
+    });
   });
 });
 
@@ -262,16 +271,24 @@ describe('OTA-1548 — Yulka is row one, byte-identical where it was pinned', ()
 
 describe('OTA-1548 — the machine dispatches by table, never by name', () => {
   it('⚠⚠⚠ the death hook pays any chain whose mark just died — no Silt Thief literal', () => {
-    const code = codeOnly(STORE);
+    const code = codeOnly(CREDIT);
     expect(code).toContain('ch.content.fetchEnemy === enemy.name');
     expect(code).not.toContain("if (enemy.name === 'Silt Thief')");
+    // ⚠ And it is reached from BOTH win conditions, which is the whole of 1612.
+    expect(codeOnly(STORE)).toContain('creditDefeatedTarget(get, set, player, enemy, activeIdx');
+    expect(codeOnly(STORE)).toContain('creditDefeatedTarget(get, set, player, enemy, idx');
   });
 
   it('⚠⚠⚠ the resolver, handlers and sheet action are chain-generic', () => {
     const code = codeOnly(STORE);
     expect(code).toContain('fireWhisperMeet(get, set, meet, meetChain);');
     expect(code).toContain('fireWhisperFetch(get, set, fetch, fetchChain);');
-    expect(code).toContain('fireWhisperReturn(get, set, ret, retChain);');
+    // ⚠ OTA-1613 — arrival now ARMS the hand-over instead of paying on the
+    // spot, so the return beat dispatches to armWhisperHandback. The rule 1548
+    // pinned is what is checked: every beat is dispatched by table with the
+    // chain passed in, and no giver's name appears in the resolver.
+    expect(code).toContain('return armWhisperHandback(get, set, ret, retChain);');
+    expect(code).toContain('fireWhisperReturn(get, set, w, chain);');
     expect(code).toContain('answerWhisper(choice) {');
     expect(code).not.toContain('fireYulka');
     expect(code).not.toContain('handleYulka');

@@ -338,6 +338,17 @@ describe('OTA-1222 — Texas Ranger on the Great Climbs and the whisper chains',
         : 0;
       const rewardBefore = qtyOf(rewardName);
       walkOffset(-dxToThief, -dyToThief);
+      // ⚠⚠⚠ OTA-1613 — ARRIVING NO LONGER PAYS. The giver stands up and waits;
+      // the hand-over is a deliberate beat (the sheet's button, or this typed
+      // phrase), and the walker does what a player now does. Owner: "I should
+      // have talked to him again, and then given my award in the chat window
+      // from him." Reaching him with the goods must arm that, and nothing else.
+      await settle(() => rec()?.stage === 'handback');
+      expect({ chain: chain.id, stage: rec()?.stage }).toEqual({ chain: chain.id, stage: 'handback' });
+      expect(store.getState().player!.tc).toBe(tcBefore); // not a coin, not yet
+      const farewell = store.getState().handBackWhisperGoods();
+      // ⚠ And the giver's own line comes back for the conversation to show.
+      expect(farewell.some((t) => t.who === 'them' && t.text === chain.content.returnLine)).toBe(true);
       await settle(() => (store.getState().player!.completedWhisperIds ?? []).includes(chain.id));
       expect(store.getState().player!.completedWhisperIds ?? []).toContain(chain.id);
       expect(rec()).toBeUndefined(); // off the slate — no lingering epilogue (arb120)

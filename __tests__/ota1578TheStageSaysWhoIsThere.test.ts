@@ -213,7 +213,13 @@ describe('OTA-1578 — the escort has to be dealt with, not walked away from', (
   it('⚠⚠⚠ THE LAST ONE DECIDES — killing raider 1 of 3 resolves nothing', () => {
     // Read from the LIVE scene rather than a spawn count, so a wandering third
     // party joining the fight can never resolve the stage on its own.
-    expect(QS).toContain("(e, i) => i !== activeIdx && e.name === enemy.name && (live!.enemyHps[i] ?? 0) > 0,");
+    // ⚠ OTA-1612 added the CONSCIOUS clause on a second line (a pack subdued
+    // rather than killed reaches here with live HP on every sleeping body, and
+    // without it a player who wins by mercy could never close the stage). The
+    // rule 1578 pinned is unchanged and is what is checked: the count comes off
+    // the LIVE scene, excludes the body being resolved, and matches by name.
+    expect(QS).toContain("(e, i) => i !== activeIdx && e.name === enemy.name && (live!.enemyHps[i] ?? 0) > 0");
+    expect(QS).toContain("&& !(live!.enemyKnockedOut?.[i] ?? false),");
     expect(QS).toContain('if (!stillUp) {');
   });
 

@@ -91,10 +91,16 @@ export function activeHoursText(hours?: [number, number]): string {
 }
 
 /** she→her/She owes; he→him/He owes; they→them/They owe. */
-export function pronounForms(p: ChainContent['pronoun']): { obj: string; subjCap: string; owes: string } {
-  if (p === 'she') return { obj: 'her', subjCap: 'She', owes: 'owes' };
-  if (p === 'he') return { obj: 'him', subjCap: 'He', owes: 'owes' };
-  return { obj: 'them', subjCap: 'They', owes: 'owe' };
+/** ⚠ OTA-1613 added `subj` and `poss` — the hand-back beat writes sentences
+ *  about the giver ("… before he sees you", "… in his hands"), and a table that
+ *  only carried the object form would have forced those two lines to build
+ *  their own pronouns, which is how a "they" chain comes to be called "it". */
+export function pronounForms(
+  p: ChainContent['pronoun'],
+): { obj: string; subj: string; subjCap: string; poss: string; owes: string } {
+  if (p === 'she') return { obj: 'her', subj: 'she', subjCap: 'She', poss: 'her', owes: 'owes' };
+  if (p === 'he') return { obj: 'him', subj: 'he', subjCap: 'He', poss: 'his', owes: 'owes' };
+  return { obj: 'them', subj: 'they', subjCap: 'They', poss: 'their', owes: 'owe' };
 }
 
 // ⚠⚠⚠ OTA-1542 — A RENDEZVOUS IS A PLACE, NOT A PAIR OF FRAME COORDINATES.

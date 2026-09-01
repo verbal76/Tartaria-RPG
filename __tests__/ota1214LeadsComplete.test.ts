@@ -83,11 +83,23 @@ describe('OTA-1214 — the audit: no lead verb without a trigger', () => {
     for (const arm of [
       'fireWhisperMeet(get, set, meet, meetChain);',
       'fireWhisperFetch(get, set, fetch, fetchChain);',
-      'fireWhisperReturn(get, set, ret, retChain);',
-      'ch.content.fetchEnemy === enemy.name',
+      // ⚠ OTA-1613 — the return arm ARMS the hand-over instead of paying on
+      // arrival (the giver now hands it to you in the conversation). The rule
+      // this audit enforces is unchanged: every chain beat has a dispatcher
+      // arm, so a chain that plants can always fire.
+      'return armWhisperHandback(get, set, ret, retChain);',
     ]) {
       expect(store).toContain(arm);
     }
+    // ⚠ OTA-1612 — the death hook (the arm that pays a chain whose mark just
+    // went down) moved to defeatCredit.ts so BOTH win conditions could call it:
+    // a KNOCKOUT credited nothing before, which cost the owner a chart folio
+    // off a man he had subdued rather than killed. Same arm, new home, and now
+    // reached from the kill path and the knockout path alike.
+    const credit = readFileSync(join(__dirname, '..', 'app', 'state', 'defeatCredit.ts'), 'utf8');
+    expect(credit).toContain('ch.content.fetchEnemy === enemy.name');
+    expect(store).toContain('creditDefeatedTarget(get, set, player, enemy, activeIdx');
+    expect(store).toContain('creditDefeatedTarget(get, set, player, enemy, idx');
   });
 });
 

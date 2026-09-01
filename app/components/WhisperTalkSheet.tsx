@@ -49,6 +49,7 @@ export function WhisperTalkSheet() {
   const whispers = useGameStore((s) => s.player?.activeWhispers);
   const enemies = useGameStore((s) => s.currentScene?.enemies?.length ?? 0);
   const answer = useGameStore((s) => s.answerWhisper);
+  const handBack = useGameStore((s) => s.handBackWhisperGoods);
   // OTA-1549 — the course is set from INSIDE the conversation. Owner: "from
   // that talking screen, we should be able to Auto route and accept from that
   // instead of typing … that button should be highlighted inside the talk
@@ -64,6 +65,15 @@ export function WhisperTalkSheet() {
   const cell = useMemo(() => (player ? playerGridCell(player) : null), [player]);
   const [open, setOpen] = useState(false);
   const scrollRef = useRef<ScrollView | null>(null);
+  // ⚠⚠⚠ OTA-1613 — THE GIVER GETS TO FINISH SPEAKING. Paying out removes the
+  // whisper record (arb120 closes a paid contract on the spot), which would
+  // unmount this sheet mid-sentence and hand the moment straight back to the
+  // generic completion card — the exact anticlimax this OTA is about. The
+  // closing turns are held here instead, so the conversation stays up with his
+  // line and the take in it until the player closes it themselves.
+  const [farewell, setFarewell] = useState<
+    { npcName: string; kicker: string; turns: { who: string; text: string }[] } | null
+  >(null);
 
   // The one whisper with a conversation on it, still live. done/ambush_armed
   // are the chain's terminal beats — the fire is cold, the bar goes away.
@@ -82,6 +92,46 @@ export function WhisperTalkSheet() {
   const wid = w?.id;
   React.useEffect(() => { setOpen(false); }, [wid]);
 
+  // ⚠ OTA-1613 — the farewell outlives the record, and only the player closes it.
+  if (farewell) {
+    return (
+      <Modal visible transparent animationType="slide" onRequestClose={() => setFarewell(null)}>
+        <View style={styles.backdrop}>
+          <View style={styles.sheet}>
+            <View style={styles.header}>
+              <View style={styles.headerText}>
+                <Text style={styles.kicker}>{farewell.kicker}</Text>
+                <Text style={styles.npcName}>{farewell.npcName}</Text>
+              </View>
+            </View>
+            <ScrollView style={styles.transcript} contentContainerStyle={styles.transcriptInner}>
+              {farewell.turns.map((t, i) => (
+                <Text
+                  key={`${i}-${t.who}`}
+                  style={[
+                    styles.transcriptLine,
+                    t.who === 'you' && styles.youLine,
+                    t.who === 'note' && styles.noteLine,
+                  ]}
+                >
+                  {t.text}
+                </Text>
+              ))}
+            </ScrollView>
+            <TouchableOpacity
+              style={styles.primaryBtn}
+              onPress={() => { setFarewell(null); setOpen(false); }}
+              activeOpacity={0.7}
+              accessibilityRole="button"
+              accessibilityLabel="Close"
+            >
+              <Text style={styles.primaryText}>CLOSE</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    );
+  }
   // Combat owns the controls; the bar yields (same rule as the wanderer card).
   if (!w || !chain || enemies > 0) return null;
 
@@ -89,10 +139,18 @@ export function WhisperTalkSheet() {
   const saidWord = pronounForms(c.pronoun).subjCap.toUpperCase();
   const waitingWord = c.pronoun === 'they' ? "they're waiting" : `${c.pronoun}'s waiting`;
   const deciding = w.stage === 'met_yulka';
+  // ⚠⚠ OTA-1613 — the goods are in hand and the giver is in front of you.
+  const handing = w.stage === 'handback';
+
+  const giveItBack = () => {
+    const turns = handBack();
+    if (turns.length) setFarewell({ npcName: c.npcName, kicker: c.kicker, turns });
+    else setOpen(false);
+  };
 
   const bar = (
     <TouchableOpacity
-      style={[styles.bar, deciding ? styles.barDeciding : styles.barQuiet]}
+      style={[styles.bar, deciding || handing ? styles.barDeciding : styles.barQuiet]}
       onPress={() => setOpen(true)}
       activeOpacity={0.7}
       accessibilityRole="button"
@@ -100,10 +158,14 @@ export function WhisperTalkSheet() {
         ? `Speak to ${c.npcName} — waiting on your answer`
         : `${c.npcName} — re-read what was said`}
     >
-      <Text style={[styles.barText, deciding ? styles.barTextDeciding : styles.barTextQuiet]}>
-        {deciding ? `▸ SPEAK TO ${c.npcName.toUpperCase()}` : `${c.npcName.toUpperCase()} — WHAT ${saidWord} SAID`}
+      <Text style={[styles.barText, deciding || handing ? styles.barTextDeciding : styles.barTextQuiet]}>
+        {deciding || handing ? `▸ SPEAK TO ${c.npcName.toUpperCase()}` : `${c.npcName.toUpperCase()} — WHAT ${saidWord} SAID`}
       </Text>
-      {deciding && <Text style={styles.barHintDeciding}>{waitingWord}</Text>}
+      {(deciding || handing) && (
+        <Text style={styles.barHintDeciding}>
+          {handing ? `${c.goodsShort} in hand` : waitingWord}
+        </Text>
+      )}
     </TouchableOpacity>
   );
 
@@ -200,7 +262,33 @@ export function WhisperTalkSheet() {
               </TouchableOpacity>
             )}
 
-            {deciding ? (
+            {handing ? (
+              <>
+                {/* ⚠⚠⚠ OTA-1613 — THE BEAT HE WAS MISSING. Owner: *"I should
+                    have talked to him again, and then given my award in the
+                    chat window from him."* Handing it over is a deliberate act
+                    with a button, not something arrival does to you, and the
+                    reply lands in this transcript rather than the world feed. */}
+                <TouchableOpacity
+                  style={styles.primaryBtn}
+                  onPress={giveItBack}
+                  activeOpacity={0.7}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Hand over ${c.goodsLong}`}
+                >
+                  <Text style={styles.primaryText}>HAND OVER {c.goodsShort.toUpperCase()}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.stepBackBtn}
+                  onPress={() => setOpen(false)}
+                  activeOpacity={0.7}
+                  accessibilityRole="button"
+                  accessibilityLabel="Step back — hand it over later"
+                >
+                  <Text style={styles.stepBackText}>step back — hand it over later</Text>
+                </TouchableOpacity>
+              </>
+            ) : deciding ? (
               <>
                 <TouchableOpacity
                   style={styles.primaryBtn}

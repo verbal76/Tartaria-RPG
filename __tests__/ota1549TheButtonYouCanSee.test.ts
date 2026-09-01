@@ -58,7 +58,13 @@ describe('OTA-1549 — the waiting bar is FILLED, like a weapon you can swing', 
   it('⚠⚠ the hint rides on the filled plate in dark ink — pale grey on gold is unreadable', () => {
     expect(SHEET).toContain('barHintDeciding');
     expect(SHEET).toContain("barHintDeciding: { color: '#4a3714'");
-    expect(SHEET).toContain('<Text style={styles.barHintDeciding}>{waitingWord}</Text>');
+    // ⚠ OTA-1613 SUPERSEDES THE EXACT LINE, NOT THE RULE. The hint plate now
+    // also serves the hand-back beat ("folio in hand"), so the deciding hint is
+    // one arm of a conditional instead of a bare element. What 1549 pinned —
+    // the hint rides the filled plate in dark ink, and says the waiting word
+    // while a decision is owed — is what is checked here.
+    expect(SHEET).toContain('styles.barHintDeciding');
+    expect(SHEET).toContain('{handing ? `${c.goodsShort} in hand` : waitingWord}');
   });
 
   it('⚠ the active label carries the same ▸ every other live control uses', () => {
@@ -92,10 +98,17 @@ describe('OTA-1549 — SET COURSE lives inside the talk box', () => {
     expect(SHEET).toContain('▸ SET COURSE TO {route.label.toUpperCase()}');
     // Not nested inside the `deciding` branch — after ACCEPT (which keeps the
     // sheet open) it must still be there, re-aimed at the mark.
+    // ⚠ OTA-1613 put the hand-back branch first in the same chain, so the
+    // decision arm is now `) : deciding ? (`. The rule is unchanged and is what
+    // is measured: the route button is rendered BEFORE the whole stage-branch
+    // chain, so no stage can nest it away.
     const routeAt = SHEET.indexOf('{route && !here && (');
-    const decidingAt = SHEET.indexOf('{deciding ? (');
+    const branchAt = Math.min(
+      ...[SHEET.indexOf('{handing ? ('), SHEET.indexOf('{deciding ? ('), SHEET.indexOf(') : deciding ? (')]
+        .filter((i) => i > -1),
+    );
     expect(routeAt).toBeGreaterThan(-1);
-    expect(decidingAt).toBeGreaterThan(routeAt);
+    expect(branchAt).toBeGreaterThan(routeAt);
   });
 
   it('⚠⚠ taking the course closes the sheet and puts the player back on the world screen', () => {

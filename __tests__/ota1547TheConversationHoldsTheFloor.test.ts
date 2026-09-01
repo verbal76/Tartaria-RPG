@@ -120,7 +120,13 @@ describe('OTA-1547 — the step machinery yields to a fired beat', () => {
     const fn = code.slice(code.indexOf('function resolveWhispersForTile'));
     const body = fn.slice(0, fn.indexOf('\nfunction '));
     expect(body).toContain('): boolean {');
-    expect((body.match(/return true;/g) ?? []).length).toBe(4);
+    // ⚠ OTA-1613 — the return beat now tail-returns its arming call
+    // (`return armWhisperHandback(...)`, itself boolean) instead of firing and
+    // then `return true;`, so one literal moved into a returned expression.
+    // The rule is unchanged and is what is measured: EVERY beat reports whether
+    // it fired, and only the quiet path falls through to false.
+    expect((body.match(/return true;/g) ?? []).length).toBe(3);
+    expect(body).toContain('return armWhisperHandback(get, set, ret, retChain);');
     expect(body.trimEnd().endsWith('return false;\n}')).toBe(true);
   });
 

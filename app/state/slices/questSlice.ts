@@ -261,9 +261,15 @@ export function resolveStageEscortClear(
       // have made both false-summit hunts unfinishable, which is a worse bug
       // than the one this OTA set out to fix. Keyed on INDEX, because three
       // raiders share a name and identity here is positional.
+      // ⚠ OTA-1612 — "STILL UP" MEANS CONSCIOUS, the same correction OTA-1089
+      // made to the combat loop. Now that a knockout credits objectives, a pack
+      // subdued rather than killed reaches here with live HP on every sleeping
+      // body — and without this clause the escort stage could never close for a
+      // player who wins by mercy, which is exactly the win 1612 legitimizes.
       const live = get().currentScene;
       const stillUp = (live?.enemies ?? []).some(
-        (e, i) => i !== activeIdx && e.name === enemy.name && (live!.enemyHps[i] ?? 0) > 0,
+        (e, i) => i !== activeIdx && e.name === enemy.name && (live!.enemyHps[i] ?? 0) > 0
+          && !(live!.enemyKnockedOut?.[i] ?? false),
       );
       if (!stillUp) {
         // ⚠⚠⚠ OTA-1581 — IF THE CARD SENT YOU INTO THIS FIGHT, THE CARD FINISHES

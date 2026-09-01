@@ -331,6 +331,7 @@ import type {
   RepairVerdict,
 } from '../engine/crucibleGuard';
 import { createQuestSlice, resolveStageEscortClear } from './slices/questSlice';
+import { creditDefeatedTarget } from './defeatCredit';
 import { createBoardSlice } from './slices/boardSlice';
 import { setLastBootBreadcrumb } from '../diagnostics/runtimePressure'; // OTA-1276
 import { makeEntry, persistEntry } from '../engine/gameLog';
@@ -676,7 +677,7 @@ import {
   aethericVulnerabilityMultiplier,
 } from '../engine/statusEffects';
 import { enemyDamageType as resolveEnemyDamageType, parseDamageTypeKeyword } from '../engine/damageTypes';
-import type { StatusEffect, MemorableEvent, WhisperRecord } from '../engine/types';
+import type { StatusEffect, MemorableEvent, WhisperRecord, WhisperTalkTurn } from '../engine/types';
 import {
   CHAINS,
   type ChainDef,
@@ -4474,6 +4475,13 @@ export function mergeRewardLines(existing: readonly string[], incoming: readonly
 type BossVictoryCapture = { name: string; flavor: string[]; rewards: string[] };
 let bossVictoryCapture: BossVictoryCapture | null = null;
 
+/** ⚠ OTA-1613 — the giver's last words, captured for the sheet. The payout
+ *  removes the whisper record (arb120: a paid contract must not linger in
+ *  Contracts), so the farewell turns cannot live on it. Same synchronous
+ *  window as bossVictoryCapture above: `handBackWhisperGoods` sets it, the
+ *  caller reads it on the next line, nothing persists. */
+let lastWhisperFarewell: WhisperTalkTurn[] = [];
+
 /** Called from appendLog on EVERY line. A no-op unless a boss defeat is being
  *  resolved right now. Rewards and story are split by channel; exact repeats are
  *  dropped so a line the feed deduped can't appear twice on the card. */
@@ -7322,6 +7330,12 @@ export interface GameStore {
    *  use, so the two paths cannot drift. OTA-1548 — chain-generic: acts on
    *  the first met-stage whisper of any chain. No-op when none is live. */
   answerWhisper: (choice: 'accept' | 'buy' | 'leave') => void;
+  /** ⚠⚠⚠ OTA-1613 — HAND THE GOODS BACK, IN PERSON. The payout that used to
+   *  fire off arrival now waits for this: the sheet's button, or the typed
+   *  phrase. Returns the giver's closing turns (his line and the take) so the
+   *  conversation can show them — the record is removed by the payout, so they
+   *  cannot be read back off it. Empty when there was nothing to hand over. */
+  handBackWhisperGoods: () => WhisperTalkTurn[];
   /** ⚠⚠⚠ OTA-1581 — THE MISSION CONVERSATION CARD'S BUTTONS. Every one of them
    *  routes through `applyChoice`, the single transition function, for the same
    *  reason `landControl` is the only way to grant a control (OTA-1572): the
@@ -13225,6 +13239,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
           get().appendLog('player', trimmed);
           handleWhisperLeave(get, set, mw, chain);
           void get().persist();
+          return;
+        }
+      }
+      // ⚠⚠ OTA-1613 — AND THE HAND-BACK IS TYPEABLE TOO. The sheet's button is
+      // the front door, but a player who types every other beat of this chain
+      // ("accept garrin", "buy from yulka") must not be forced into a menu to
+      // finish it. Same grammar, same per-chain names and goods noun.
+      for (const hw of (player.activeWhispers ?? []).filter((w) => w.stage === 'handback' && findChain(w.id))) {
+        const chain = findChain(hw.id)!;
+        const name = chain.content.npcName.toLowerCase();
+        const goods = chain.content.goodsShort.toLowerCase();
+        if (new RegExp(`^(give|hand|return)\\b.*\\b(${name}|${goods})\\b`).test(t)) {
+          get().handBackWhisperGoods();
           return;
         }
       }
@@ -24486,152 +24513,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // OTA-1035 — collect this fight's story + take into one card (bosses only).
     bossVictoryCapture = enemy.boss ? { name: enemy.name, flavor: [], rewards: [] } : null;
     const activeIdx = currentScene.activeEnemyIdx;
-    // Whisper-chain hook — a chain mark's death grants that chain's stolen
-    // goods and advances its whisper to the return stage.
-    // OTA-1548 — keyed by the chain table: any active fetch whose chain names
-    // this enemy as its mark pays out, so all twenty-one chains ride the one
-    // hook Yulka proved out.
-    {
-      const live = (player.activeWhispers ?? []).find((w) => {
-        const ch = findChain(w.id);
-        return ch && ch.content.fetchEnemy === enemy.name && w.stage === 'fetch_active';
-      });
-      const liveChain = live ? findChain(live.id) : undefined;
-      if (live && liveChain) {
-        const c = liveChain.content;
-        const stolen = makeStolenGoods(liveChain);
-        set((s) => (s.player ? {
-          player: {
-            ...s.player,
-            inventory: [...s.player.inventory, stolen],
-            activeWhispers: (s.player.activeWhispers ?? []).map((w) =>
-              w.id === live.id ? { ...w, stage: 'fetch_returned' } : w,
-            ),
-          },
-        } : s));
-        get().appendLog('world', c.recoverLine);
-        get().appendLog('reward', `✦ ${c.stolen.name} (${c.stolen.qty}).`);
-        // arb120 — the fetch is DONE the instant the goods are in hand (even
-        // off a random enemy of the mark's name, not just the planted one).
-        // Re-point an active auto-route off the now-pointless mark tile onto
-        // the giver's return tile, so the travel readout names the CURRENT
-        // objective instead of a stale "… N steps to the <mark>".
-        {
-          // OTA-1542 — absolute cell, so the return course survives any named
-          // arrival made while chasing the mark.
-          const yg = whisperTargetGrid(live);
-          set((s) => (s.player?.whisperCourse ? {
-            player: {
-              ...s.player,
-              whisperCourse: { gridX: yg.x, gridY: yg.y, label: c.returnRouteLabel },
-            },
-          } : s));
-          get().appendLog('world', `${c.goodsShort.charAt(0).toUpperCase()}${c.goodsShort.slice(1)} in hand. The thread pulls you back the way you came — ${c.npcName}'s owed.`);
-        }
-      }
-    }
-    // HANDOFF #15 — record the kill against the current room so re-entry
-    // narration can reference it ("you cleared this room before"). Pure
-    // bookkeeping; doesn't yet suppress respawns.
-    {
-      const roomKey = makeRoomKey(player.currentLocationId, currentScene.microMicroId, player.mapX, player.mapY, player.hubRoomId);
-      const rooms = worldMemory.visitedRooms ?? {};
-      const room = rooms[roomKey];
-      if (room) {
-        const cleared = Array.from(new Set([...(room.enemiesCleared ?? []), enemy.name]));
-        set((s) => ({
-          worldMemory: {
-            ...s.worldMemory,
-            visitedRooms: { ...(s.worldMemory.visitedRooms ?? {}), [roomKey]: { ...room, enemiesCleared: cleared } },
-          },
-        }));
-      }
-    }
-    // ⚠⚠ OTA-1583 — THE ESCORT CLEAR MOVED TO questSlice. It is 90 lines of
-    // CONTRACT-STAGE logic that happened to live in the combat path, and this
-    // file is under a shrink-only line ratchet for exactly that reason: the
-    // cheapest way past a ceiling is always to put code where it belongs rather
-    // than to raise the ceiling. Same behaviour, one call.
-    resolveStageEscortClear(get, set, player, enemy, activeIdx);
-
-    // Hunt-boss kill: if the slain enemy's name matches a target of an
-    // active hunt currently at its boss stage, advance the hunt one more
-    // beat (past the boss stage) so the player can turn it in.
-    const matchingHunt = (player.activeHunts ?? [])
-      .map((rec) => ({ rec, def: findHuntById(rec.id) }))
-      .find(({ rec, def }) => {
-        if (!def) return false;
-        // Boss enemy names are tagged " (hunted)" by scaleHuntBoss.
-        // OTA-426 — [audit fix #8] only the FINAL boss stage's kill completes the
-        // hunt. Several hunts (bog_dragon, mud_titan, sludge_behemoth, iron_titan,
-        // mud_siren_queen, servants_doubter) carry a MID-hunt `boss` stage that
-        // also spawns the (final) scaled target via scaleHuntBoss; killing it there
-        // used to stamp the hunt complete (the old `stage >= 0`) and skip the back
-        // half. advanceHunt spawns the boss AND increments the stage, so once the
-        // record has advanced PAST the last boss stage we're at the real apex.
-        // (OTA-011's `>= 0` only ever needed to clear stage-0 single-boss hunts —
-        // for those lastBoss is 0 and stage lands at 1, so they still complete.)
-        let lastBoss = -1;
-        for (let i = 0; i < def.stages.length; i++) {
-          if (def.stages[i]?.checkKind === 'boss') lastBoss = i;
-        }
-        // OTA-796 — >= not >: the final boss stage now FREEZES at lastBoss
-        // (advanceHunt no longer increments past it), so the kill AT lastBoss
-        // is what completes the hunt. Mid-hunt boss stages already advanced
-        // past their index, so this still won't fire early for them.
-        return enemy.name === `${def.targetEnemyName} (hunted)` && rec.stage >= lastBoss;
-      });
-    if (matchingHunt && matchingHunt.def) {
-      set((s) =>
-        s.player
-          ? {
-              player: {
-                ...s.player,
-                activeHunts: (s.player.activeHunts ?? []).map((h) =>
-                  h.id === matchingHunt.rec.id ? { ...h, stage: matchingHunt.def!.stages.length } : h,
-                ),
-              },
-            }
-          : s,
-      );
-      get().appendLog(
-        'reward',
-        `✦ ${matchingHunt.def.targetEnemyName} slain. Return to a posting agent to turn in "${matchingHunt.def.title}" for the bounty.`,
-      );
-    }
-    // OTA 011 — LEADS completion. Procedurally-generated quests
-    // (player.activeQuests) used to accumulate forever with no
-    // turn-in path; the LEADS section in Contracts displayed them
-    // but the engine never marked them done. Now: when the slain
-    // enemy's name matches an active lead's objective target AND
-    // the verb is kill-shaped, auto-complete the lead, grant the
-    // reward, and drop it from activeQuests.
-    const killVerbs = new Set(['kill', 'slay', 'defeat', 'hunt', 'retrieve']);
-    const matchingLeads = (player.activeQuests ?? []).filter(
-      (q) =>
-        (q.state === 'open' || q.state === 'in_progress') &&
-        q.tracked !== false && // DEACTIVATED (paused) leads don't auto-complete
-        killVerbs.has(q.objective.verb.toLowerCase()) &&
-        q.objective.target.toLowerCase().includes(enemy.name.toLowerCase().replace(/ \(hunted\)$/i, '')),
-    );
-    // OTA-1214 — kill-shaped verbs ALSO complete on any enemy defeated at the
-    // lead's own site: 'Silence a witness' settles when the fight at the marked
-    // place ends, whatever the combatant was called.
-    {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { LEAD_VERB_TRIGGERS: LVT } = require('../engine/questGenerator') as typeof import('../engine/questGenerator');
-      for (const q of player.activeQuests ?? []) {
-        if (q.state !== 'open' && q.state !== 'in_progress') continue;
-        if (q.tracked === false) continue;
-        if (q.location?.id !== player.currentLocationId) continue;
-        if (!LVT[q.objective.verb.toLowerCase()]?.onKillAtSite) continue;
-        if (matchingLeads.some((m) => m.id === q.id)) continue; // name path already has it
-        matchingLeads.push(q);
-      }
-    }
-    for (const lead of matchingLeads) {
-      resolveLeadCompletion(get, set, lead);
-    }
+    // ⚠⚠⚠ OTA-1612 — THE OBJECTIVES HEAR ABOUT IT HERE, and from the knockout
+    // path too. This was 146 lines inline; a subdued mark got none of it. See
+    // creditDefeatedTarget for the owner's folio and the rule it settles.
+    creditDefeatedTarget(get, set, player, enemy, activeIdx, { makeRoomKey, resolveLeadCompletion });
     // OTA 029 — multi-item loot drop. Playtester: "I defeated a
     // not-so-hard enemy harder than my level and all I got was one
     // piece of patched cloth. Should be 2-3 low-level items or 1
@@ -25570,6 +25455,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     const enemy = currentScene.enemies[idx];
     if (!enemy) return;
+    // ⚠⚠⚠ OTA-1612 — A SUBDUED MARK IS A DEFEATED MARK. The owner cracked the
+    // Chart Runner for 25 on a 26 HP body, was told "Nobody left standing — the
+    // fight is yours", stripped him, and walked away without the folio: this
+    // path paid gear and coin and never told the whisper chain, the hunt or the
+    // lead a thing. Credit runs BEFORE the splice, while the body is still in
+    // the scene for the escort clear to see, and before the strip below so a
+    // chain's stolen goods land ahead of the ordinary kit.
+    // ⚠ A vendor yields, they do not die (OTA-1056) — no contract credit off a
+    // beaten shopkeeper, the same rule the kill path opens with.
+    if (!(currentScene.vendorInFight && currentScene.vendorInFight.name === enemy.name)) {
+      creditDefeatedTarget(get, set, player, enemy, idx, { makeRoomKey, resolveLeadCompletion });
+    }
     // Damage proxy: the more you'd beaten them down, the rougher the kit.
     // Looted durability fraction tracks the enemy's remaining HP %, never
     // pristine (clamped 0.15–0.85). A barely-subdued foe yields better
@@ -26775,6 +26672,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
     else if (choice === 'buy') handleWhisperBuy(get, set, w, chain);
     else handleWhisperLeave(get, set, w, chain);
     void get().persist();
+  },
+
+  handBackWhisperGoods() {
+    const w = (get().player?.activeWhispers ?? []).find(
+      (x) => x.stage === 'handback' && findChain(x.id),
+    );
+    if (!w) return [];
+    const chain = findChain(w.id)!;
+    // The player's own turn goes in first, so the transcript reads as an
+    // exchange rather than a payout with a witness.
+    const handOver = `You put ${chain.content.goodsLong} in ${pronounForms(chain.content.pronoun).poss} hands.`;
+    get().appendLog('player', handOver);
+    lastWhisperFarewell = [];
+    fireWhisperReturn(get, set, w, chain);
+    void get().persist();
+    return [{ who: 'you' as const, text: handOver }, ...lastWhisperFarewell];
   },
 
   // ⚠⚠⚠ OTA-1581 — THE MISSION CONVERSATION CARD ANSWERS HERE, and this is the
@@ -31833,7 +31746,11 @@ export function bumpQuestsAccepted(
 // printing AFTER Yulka's whole introduction, because this resolver runs early
 // in the step and the open-ground filler prints near the end. A step that
 // landed on an encounter is narrated BY the encounter.
-function resolveWhispersForTile(
+/** ⚠ OTA-1613 — exported so a suite can put the boots on the giver's cell and
+ *  run the arrival beat directly. The step path is the only production caller;
+ *  a test that had to fake a whole cardinal move to reach it would be testing
+ *  the mover, not the beat. */
+export function resolveWhispersForTile(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   mapX: number,
@@ -31883,12 +31800,12 @@ function resolveWhispersForTile(
     return true;
   }
 
-  // 4) Return to the giver with the recovered goods.
+  // 4) Return to the giver with the recovered goods — the giver STANDS UP,
+  //    and the hand-over is a conversation. See armWhisperHandback.
   const ret = findReadyReturnWhisper(p.activeWhispers, pg.x, pg.y);
   const retChain = ret ? findChain(ret.id) : undefined;
   if (ret && retChain) {
-    fireWhisperReturn(get, set, ret, retChain);
-    return true;
+    return armWhisperHandback(get, set, ret, retChain);
   }
 
   // 5) Ambush armed by a recent completion. Fires on the NEXT
@@ -32119,6 +32036,69 @@ function fireWhisperFetch(
   } : s));
 }
 
+/** ⚠⚠⚠ OTA-1613 — THE GIVER HANDS IT OVER, AND YOU HAND IT BACK.
+ *
+ *  Owner, on finishing Garrin's folio: *"it was anticlimactic, it just gave me
+ *  the generic mission complete. like it was a normal story hook completion. I
+ *  should have talked to him again, and then given my award in the chat window
+ *  from him."*
+ *
+ *  ⚠⚠ AND THE GAME NEVER LET HIM. Arriving on the giver's tile CALLED THE
+ *  PAYOUT: `fireWhisperReturn` fired off the arrival dispatch, dropped the
+ *  return line into the world feed as ambient narration, printed two reward
+ *  lines, raised the generic completion card and deleted the record — all
+ *  before he could tap anything. The chain hired him face to face (the meet
+ *  beat seeds a transcript and points at the SPEAK TO bar) and paid him by
+ *  receipt. Garrin's authored line — the shaking hands, the brass compass
+ *  pushed across the board — scrolled past as scenery while a card that says
+ *  MISSION COMPLETE took the moment.
+ *
+ *  ⚠ So arrival now ARMS the hand-over instead of performing it: the record
+ *  moves to `handback`, the giver's greeting seeds the transcript, and the bar
+ *  says he is waiting. Nothing is paid. `handBackWhisperGoods` — the button in
+ *  the sheet, or the typed phrase — is what pays, and it speaks the return line
+ *  and the reward INTO the conversation, in his voice, where the player is
+ *  looking. One machine, twenty-one chains; every line it needs was already
+ *  authored. */
+function armWhisperHandback(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  whisper: WhisperRecord,
+  chain: ChainDef,
+): boolean {
+  const live = get().player;
+  if (!live) return false;
+  const c = chain.content;
+  // ⚠ Empty hands are still refused HERE rather than at the button: walking
+  // back without the goods is the anti-cheese case, and arming a hand-over the
+  // player cannot complete would put a dead button in front of them. The stage
+  // does not advance, so coming back with the goods arms it properly.
+  const carried = live.inventory.find((i) => i.name === c.stolen.name && i.quantity > 0);
+  if (!carried) {
+    get().appendLog('world', c.emptyHandsLine);
+    return true;
+  }
+  const pf = pronounForms(c.pronoun);
+  const greeting = `${c.npcName} sees ${c.goodsLong} in your hands before ${pf.subj} sees you.`;
+  get().appendLog('world', greeting);
+  get().appendLog(
+    'system',
+    `Hand it over from the SPEAK TO ${c.npcName.toUpperCase()} bar below — or type "give ${c.npcName.toLowerCase()} the ${c.goodsShort}".`,
+  );
+  set((s) => (s.player ? {
+    player: {
+      ...s.player,
+      activeWhispers: withTalkTurn(
+        (s.player.activeWhispers ?? []).map((w) =>
+          w.id === whisper.id ? { ...w, stage: 'handback' } : w,
+        ),
+        whisper.id, 'them', greeting,
+      ),
+    },
+  } : s));
+  return true;
+}
+
 function fireWhisperReturn(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
@@ -32162,6 +32142,20 @@ function fireWhisperReturn(
   get().appendLog('world', c.returnLine);
   if (c.reward.item) get().appendLog('reward', `✦ ${c.reward.item.name} × ${c.reward.item.qty}.`);
   if (c.reward.tc > 0) get().appendLog('reward', `+${c.reward.tc} TC.`);
+  // ⚠⚠ OTA-1613 — AND IT IS SAID TO HIS FACE. The same authored line and the
+  // same take, written into the conversation the player is looking at rather
+  // than only into a feed that scrolls. The record is removed above, so these
+  // turns are handed back to the caller (the sheet holds them until the player
+  // closes) — nothing new is persisted and Contracts still closes on payment.
+  const farewell: WhisperTalkTurn[] = [{ who: 'them', text: c.returnLine }];
+  {
+    const take = [
+      ...(c.reward.item ? [`${c.reward.item.name} × ${c.reward.item.qty}`] : []),
+      ...(c.reward.tc > 0 ? [`${c.reward.tc} TC`] : []),
+    ];
+    if (take.length) farewell.push({ who: 'note', text: `✦ ${take.join(' · ')}` });
+  }
+  lastWhisperFarewell = farewell;
   // arb120 — surface a completion popup so the payout doesn't scroll off behind
   // the next narration beat (player report: "I didn't even know I'd finished").
   set(() => ({
