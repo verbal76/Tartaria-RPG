@@ -26523,6 +26523,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // writes bodies indoors), and the arrival slate on a hub-tile fight stage adds
 // "Outside the walls - the outpost holds its truce."
 export const OTA_BUILD_ID = '2026-09-01-1598-the-fight-waits-outside-the-gate';
+// golem catch-up 2026-09-01: markerless publish of OTA-1598 — a hunt stage
+// that draws blades refuses under a roof and points at the door; the escort
+// writer never puts bodies indoors; the arrival slate on a hub-tile fight
+// stage says "Outside the walls — the outpost holds its truce."
 // golem catch-up 2026-08-31: markerless publish of OTA-1597 — the standing
 // check is keyed on the stage's canon grid cell and runs from the per-action
 // catch-all, both continueTravel arrival clears, the setTravelCourse arrival,
