@@ -1,0 +1,238 @@
+{
+  "id": "ffa33e3430774031b0cf99683a492b0d",
+  "groupID": "7704869643",
+  "eventID": "ffa33e3430774031b0cf99683a492b0d",
+  "projectID": "4511945117532160",
+  "size": 18095,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-01-1605-one-fight-on-the-field #mtis7hpm6ccs [inline 14/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-01-1605-one-fight-on-the-field",
+  "message": "player-log 2026-09-01-1605-one-fight-on-the-field #mtis7hpm6ccs [inline 14/28]",
+  "title": "player-log 2026-09-01-1605-one-fight-on-the-field #mtis7hpm6ccs [inline 14/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "7c5fc48df16a47d0a9fa7c8af35e0065",
+      "span_id": "856cfaa1949aeec7",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      " \u2022 Smooth Stone (Common)\n[2026-09-01T03:39:39.476Z] [reward]     \u2022 Worn Tartarian Coin (Common)\n[2026-09-01T03:39:51.549Z] [debug] homework: intro-fill armed after 12166ms idle\n[2026-09-01T03:40:16.320Z] [debug] ui: tap \"\u2193 FIRST LANDING\"\n[2026-09-01T03:40:16.346Z] [player] go south\n",
+      "[2026-09-01T03:40:16.347Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=0\n[2026-09-01T03:40:16.348Z] [world] You head on to the First Landing.\n[2026-09-01T03:40:16.351Z] [debug] scene: loc=architect_blind hub=buried_landing_one arrival=n opening=n passing=n\n",
+      "[2026-09-01T03:40:16.352Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @raiders_ridge needs=Raider's Ridge-Sign\u2713 PAUSED\n[2026-09-01T03:40:16.352Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n",
+      "[2026-09-01T03:40:16.352Z] [debug] missions: mystery:mystery_temporal_watch stage 0/4 [diplomacy] @reclaimer_stake npc=\"the Reclaimers Guild Speaker\" gives=Guild Eddy-Gauge PAUSED\n[2026-09-01T03:40:16.352Z] [debug] missions: \u00b7 at=architect_blind\n[2026-09-01T03:40:16.356Z] [debug] spawn: gear=[Architect's Aether Gloves, Minor Repair, Architect's Outer Mantle] window=10 roster=new\n",
+      "[2026-09-01T03:40:16.358Z] [world] Architect's Cell \u2014 First Landing. A wide platform of cracked Tartarian stone with a modern handrail bolted through it and a camera that may or may not be wired to anything. The stair behind you climbs north to reception; ahead it keeps dropping south, and the floor plan on the wall stops at this level.\n",
+      "[2026-09-01T03:40:16.358Z] [world] Paths: north to Reception \u00b7 south to Second Landing. (Type 'leave outpost' to head into the wilds.)\n[2026-09-01T03:40:16.358Z] [debug] arbiter: template (reason=outpost-room)\n[2026-09-01T03:40:16.359Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-01T03:40:16.621Z] [cognitive] neutral  (252ms)\n",
+      "[2026-09-01T03:40:17.671Z] [debug] ui: tap \"investigate\"\n[2026-09-01T03:40:19.208Z] [player] investigate the floor\n[2026-09-01T03:40:19.209Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=floor resolved=- range=- enemies=0 hooks=0\n[2026-09-01T03:40:19.211Z] [world] You scan the floor of the room. Whatever was dropped here was swept long ago.\n",
+      "[2026-09-01T03:40:19.354Z] [cognitive] neutral  (141ms)\n[2026-09-01T03:40:19.526Z] [debug] persist sizes(KB): total=242 player=53 wm=100[rooms=45 events=4 memos=0 npcs=4 defeated=1 tags=1 discovered=0] log=87 scene=2\n[2026-09-01T03:40:19.940Z] [debug] ui: tap \"take / salvage\"\n[2026-09-01T03:40:20.475Z] [player] investigate Architect's Aether Gloves\n",
+      "[2026-09-01T03:40:20.476Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=architect aether gloves resolved=Architect's Aether Gloves range=- enemies=0 hooks=0\n[2026-09-01T03:40:20.476Z] [world] You study the Architect's Aether Gloves. It bears no marks worth naming \u2014 no glyph, no fingerprint, no trace the Reclaimers would catalog.\n",
+      "[2026-09-01T03:40:20.628Z] [cognitive] SEARCH  (150ms)\n[2026-09-01T03:40:21.523Z] [world] You work the Minor Repair loose from where the mud had it.\n[2026-09-01T03:40:21.523Z] [reward] \u2726 Minor Repair (Common).\n[2026-09-01T03:40:21.536Z] [world] The Architect's Aether Gloves had settled into the ground. You unsettle it.\n[2026-09-01T03:40:21.536Z] [reward] \u2726 Architect's Aether Gloves (Common).\n",
+      "[2026-09-01T03:40:21.537Z] [world] Whatever the Architect's Outer Mantle was lying against, it lets go without much argument.\n[2026-09-01T03:40:21.538Z] [reward] \u2726 Architect's Outer Mantle (Common).\n[2026-09-01T03:40:21.737Z] [player] investigate Minor Repair\n",
+      "[2026-09-01T03:40:21.738Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=minor repair resolved=Minor Repair range=- enemies=0 hooks=0\n[2026-09-01T03:40:21.739Z] [world] You look the Minor Repair over. Nothing about it sings, nothing about it warns \u2014 Tartaria is full of things waiting to be remembered.\n",
+      "[2026-09-01T03:40:22.791Z] [debug] qwen\u23f1 investigate_lore ok 2174ms read 340ms/write 1785ms in 130t\u2192out 55t 2.6ms/t (265ch)\n[2026-09-01T03:40:23.051Z] [cognitive] neutral  (1310ms)\n[2026-09-01T03:40:23.198Z] [player] investigate Architect's Outer Mantle\n",
+      "[2026-09-01T03:40:23.198Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=architect outer mantle resolved=Architect's Outer Mantle range=- enemies=0 hooks=0\n[2026-09-01T03:40:23.199Z] [world] The Architect's Outer Mantle sits the way ordinary things sit. The Arbiter does not lean in. You move on.\n",
+      "[2026-09-01T03:40:23.379Z] [world] You work the lantern apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n[2026-09-01T03:40:23.379Z] [world] You strip the leaning engine chamber scaffolding carefully. Something usable comes free in your hand.\n",
+      "[2026-09-01T03:40:23.379Z] [world] You work the platform apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n[2026-09-01T03:40:23.379Z] [world] You work the stone over. A part of it comes loose, intact.\n[2026-09-01T03:40:23.380Z] [world] You work the stripped hidden weapon locker over. A part of it comes loose, intact.\n",
+      "[2026-09-01T03:40:23.380Z] [world] You break the stripped maintenance panel apart. Among the pieces, something worth keeping.\n[2026-09-01T03:40:23.380Z] [reward] \u2726 Salvage haul:\n[2026-09-01T03:40:23.380Z] [reward]     \u2022 Bent Shackle Pin (Common)\n[2026-09-01T03:40:23.380Z] [reward]     \u2022 Scrap Metal x5 (Common)\n[2026-09-01T03:40:23.381Z] [reward]     \u2022 Reed Shaft Cutting (Common)\n",
+      "[2026-09-01T03:40:23.381Z] [reward]     \u2022 Aetheric Shard (Uncommon)\n[2026-09-01T03:40:23.381Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-09-01T03:40:24.408Z] [debug] qwen\u23f1 investigate_lore ok 2510ms wait 1152ms read 426ms/write 778ms in 127t\u2192out 23t 3.4ms/t (118ch)\n[2026-09-01T03:40:24.551Z] [player] investigate platform\n",
+      "[2026-09-01T03:40:24.552Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=platform resolved=platform range=- enemies=0 hooks=0\n[2026-09-01T03:40:24.552Z] [world] You've already turned the platform over here. The salvage was the only thing of value.\n[2026-09-01T03:40:24.685Z] [cognitive] SEARCH \u00b7 TALK  (1483ms)\n[2026-09-01T03:40:24.808Z] [cognitive] neutral  (254ms)\n",
+      "[2026-09-01T03:40:25.879Z] [player] investigate corridor\n[2026-09-01T03:40:25.879Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=corridor resolved=corridor range=- enemies=0 hooks=0\n[2026-09-01T03:40:25.880Z] [world] The corridor reads as ordinary, which down here is a small kind of relief. You leave it be.\n",
+      "[2026-09-01T03:40:26.169Z] [debug] qwen\u23f1 investigate_lore ok 2828ms wait 1467ms read 335ms/write 1008ms in 130t\u2192out 30t 2.6ms/t (148ch)\n[2026-09-01T03:40:26.308Z] [cognitive] neutral  (426ms)\n[2026-09-01T03:40:26.987Z] [debug] ui: tap \"\u2193 SECOND LANDING\"\n[2026-09-01T03:40:27.012Z] [player] go south\n",
+      "[2026-09-01T03:40:27.012Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=0\n[2026-09-01T03:40:27.013Z] [world] You head on to the Second Landing.\n[2026-09-01T03:40:27.013Z] [debug] scene: loc=architect_blind hub=buried_landing_two arrival=n opening=n passing=n\n",
+      "[2026-09-01T03:40:27.014Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @raiders_ridge needs=Raider's Ridge-Sign\u2713 PAUSED\n[2026-09-01T03:40:27.014Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n",
+      "[2026-09-01T03:40:27.014Z] [debug] missions: mystery:mystery_temporal_watch stage 0/4 [diplomacy] @reclaimer_stake npc=\"the Reclaimers Guild Speaker\" gives=Guild Eddy-Gauge PAUSED\n[2026-09-01T03:40:27.014Z] [debug] missions: \u00b7 at=architect_blind\n",
+      "[2026-09-01T03:40:27.020Z] [world] Architect's Cell \u2014 Second Landing. Pumps west, records east, the cuts south, the stair back north. A laminated sign gives every direction a status code. The south corridor's code is not in the legend, and asking after it is itself a flag.\n",
+      "[2026-09-01T03:40:27.021Z] [world] Paths: north to First Landing \u00b7 south to Shallow Digs \u00b7 east to Storage Halls \u00b7 west to Pump Room. (Type 'leave outpost' to head into the wilds.)\n[2026-09-01T03:40:27.239Z] [cognitive] neutral  (209ms)\n[2026-09-01T03:40:28.821Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-09-01T03:40:30.261Z] [world] You strip the half-buried grand spire capacitor carefully. Something usable comes free in your hand.\n[2026-09-01T03:40:30.261Z] [world] You strip the lantern carefully. Something usable comes free in your hand.\n[2026-09-01T03:40:30.261Z] [world] You break the mud-glazed vault relic pedestal apart. Among the pieces, something worth keeping.\n",
+      "[2026-09-01T03:40:30.262Z] [world] You break the sign apart. Among the pieces, something worth keeping.\n[2026-09-01T03:40:30.262Z] [world] You strip the step carefully. Something usable comes free in your hand.\n[2026-09-01T03:40:30.262Z] [world] You strip the weathered royal display case carefully. Something usable comes free in your hand.\n[2026-09-01T03:40:30.263Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-09-01T03:40:30.263Z] [reward]     \u2022 Automaton Circuit (Common)\n[2026-09-01T03:40:30.263Z] [reward]     \u2022 Aether Dust (Common)\n[2026-09-01T03:40:30.264Z] [reward]     \u2022 Aetheric Shard (Uncommon)\n[2026-09-01T03:40:30.264Z] [reward]     \u2022 Scrap Metal x3 (Common)\n[2026-09-01T03:40:30.264Z] [reward]     \u2022 Worn Tartarian Coin x9 (Common)\n",
+      "[2026-09-01T03:40:31.737Z] [debug] persist sizes(KB): total=243 player=54 wm=100[rooms=45 events=4 memos=0 npcs=4 defeated=1 tags=1 discovered=0] log=87 scene=2\n[2026-09-01T03:40:32.976Z] [debug] ui: tap \"investigate\"\n[2026-09-01T03:40:35.107Z] [debug] qwen\u23f1 ambient ok 11767ms wait 2967ms read 4180ms/write 2344ms in 364t\u2192out 31t 11.5ms/t HIT-CAP (162ch)\n",
+      "[2026-09-01T03:40:35.488Z] [debug] arbiter: ambient stale:moved-room\u2192banked 12288ms\n[2026-09-01T03:40:35.489Z] [debug] arbiter: ambient-empty reason=near-duplicate-of-recent raw=\"The Architect's Blind, with its moss-covered surface and dusty shadows, seems to have long since been a place of silent \"\n[2026-09-01T03:40:36.485Z] [player] investigate the floor\n",
+      "[2026-09-01T03:40:36.486Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=floor resolved=- range=- enemies=0 hooks=0\n[2026-09-01T03:40:36.488Z] [world] You scan the floor. Something small catches the light, half-kicked under the boards.\n[2026-09-01T03:40:36.488Z] [reward] \u2726 Cloth Scrap.\n",
+      "[2026-09-01T03:40:36.489Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-09-01T03:40:36.492Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-01T03:40:36.493Z] [arbiter] \"There's coin on the board for a willing blade,\" the Arbiter says. \"Read the World.\"\n[2026-09-01T03:40:36.712Z] [cognitive] neutral  (218ms)\n",
+      "[2026-09-01T03:40:37.459Z] [debug] qwen\u23f1 investigate_lore ok 11428ms wait 9200ms read 1408ms/write 801ms in 126t\u2192out 21t 11.2ms/t (107ch)\n[2026-09-01T03:40:37.730Z] [player] investigate corridor\n[2026-09-01T03:40:37.731Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=corridor resolved=corridor range=- enemies=0 hooks=0\n",
+      "[2026-09-01T03:40:37.732Z] [world] The corridor reads as ordinary, which down here is a small kind of relief. You leave it be.\n[2026-09-01T03:40:37.876Z] [cognitive] neutral  (142ms)\n[2026-09-01T03:40:38.719Z] [debug] qwen\u23f1 investigate_lore ok 724ms read 0ms/write 705ms in 126t\u2192out 22t (100ch)\n",
+      "[2026-09-01T03:40:38.721Z] [debug] qwen\u23f1 stats \u2014 investigate_lore n9 avg3.5s max11.4s read0.7s/write1.1s in128t\u2192out29t ms/tok 2.5-11.2 wait1.7s | item_synthesis_hw n8 avg4.7s max8.7s read2.6s/write1.9s in324t\u2192out31t ms/tok 0.9-19.4 \u27021/4.9s | narration:scene_intro_fill n7 avg9.7s max15.8s read10.4s/write1.5s \u26a01unusable in750t\u2192out32t ms/tok 10.0-16.0 cap6 \u23f81 \u27024/48.0s | ambient n3 avg9.7s max11.8s re",
+      "ad4.6s/write1.8s in363t\u2192out31t ms/tok 7.5-19.0 cap3 wait1.1s | flourish n2 avg2.5s max2.6s read2.0s/write0.5s in173t\u2192out15t ms/tok 11.0-11.8 \u27022/5.0s | forge_name n1 avg4.7s max4.7s read3.8s/write0.9s in204t\u2192out26t ms/tok 18.5-18.5 || WASTED 7 calls / 57.9s\n[2026-09-01T03:40:38.999Z] [debug] ui: tap \"\u2193 SHALLOW DIGS\"\n[2026-09-01T03:40:39.010Z] [player] go south\n",
+      "[2026-09-01T03:40:39.010Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=0\n[2026-09-01T03:40:39.011Z] [world] You head on to the Shallow Digs.\n[2026-09-01T03:40:39.011Z] [debug] scene: loc=architect_blind hub=buried_shallow_digs arrival=n opening=n passing=n\n",
+      "[2026-09-01T03:40:39.011Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @raiders_ridge needs=Raider's Ridge-Sign\u2713 PAUSED\n[2026-09-01T03:40:39.011Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n",
+      "[2026-09-01T03:40:39.011Z] [debug] missions: mystery:mystery_temporal_watch stage 0/4 [diplomacy] @reclaimer_stake npc=\"the Reclaimers Guild Speaker\" gives=Guild Eddy-Gauge PAUSED\n[2026-09-01T03:40:39.011Z] [debug] missions: \u00b7 at=architect_blind\n[2026-09-01T03:40:39.014Z] [debug] spawn: gear=[Wanderer's Worn Gauntlets, Titan's Guard Mask] window=10 roster=new\n",
+      "[2026-09-01T03:40:39.015Z] [world] Architect's Cell \u2014 The Shallow Digs. An active excavation the Architects run and do not describe. Tarpaulins, rope ladders, work lights on a generator. The cuts open into mud-glass strata where the Aetheric pulse is loud enough to hear with your teeth, which appears on the paperwork as an environmental factor. The way out is north, the way you came.\n",
+      "[2026-09-01T03:40:39.015Z] [world] Paths: north to Second Landing. (Type 'leave outpost' to head into the wilds.)\n[2026-09-01T03:40:39.155Z] [cognitive] neutral  (132ms)\n[2026-09-01T03:40:40.225Z] [debug] ui: tap \"take / salvage\"\n[2026-09-01T03:40:42.630Z] [world] The Titan's Guard Mask is heavier than it looks. Most things down here are.\n",
+      "[2026-09-01T03:40:42.630Z] [reward] \u2726 Titan's Guard Mask (Common).\n[2026-09-01T03:40:42.649Z] [world] The Wanderer's Worn Gauntlets is lighter than it looks, which is its own kind of warning.\n[2026-09-01T03:40:42.649Z] [reward] \u2726 Wanderer's Worn Gauntlets (Common).\n[2026-09-01T03:40:43.468Z] [world] The Climbing Rope is cold through your glove.\n",
+      "[2026-09-01T03:40:43.468Z] [reward] \u2726 Climbing Rope (Common).\n[2026-09-01T03:40:44.511Z] [world] You work the broken vault relic pedestal over. A part of it comes loose, intact.\n[2026-09-01T03:40:44.511Z] [world] You work the half-buried engine chamber scaffolding over. A part of it comes loose, intact.\n[2026-09-01T03:40:44.511Z] [world] You salvage the mud-glass. The take is small but real.\n",
+      "[2026-09-01T03:40:44.512Z] [world] You strip the mud-glazed library archive console carefully. Something usable comes free in your hand.\n[2026-09-01T03:40:44.512Z] [world] You salvage the tarpaulin. The take is small but real.\n[2026-09-01T03:40:44.512Z] [reward] \u2726 Salvage "
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-01-1605-one-fight-on-the-field #mtis7hpm6ccs [inline 14/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtis7hpm6ccs"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-01-1605-one-fight-on-the-field"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "14"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-01-1605-one-fight-on-the-field"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-01T15:29:38.185134Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-01T15:29:38.154000Z",
+  "fingerprints": [
+    "371ed7350caa3a4f6c7183d256a33d30"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1948474416,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-01T15:29:38.155000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-01-1605-one-fight-on-the-field",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-01-1605-one-fight-on-the-field",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-01-1605-one-fight-on-the-field",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-01-1605-one-fight-on-the-field)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": "f3626e61142e4000a75a22fa1342b6d4"
+}

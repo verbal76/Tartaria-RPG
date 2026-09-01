@@ -1,0 +1,236 @@
+{
+  "id": "6d7eb2d5355e424997e7d16607214e2e",
+  "groupID": "7704869643",
+  "eventID": "6d7eb2d5355e424997e7d16607214e2e",
+  "projectID": "4511945117532160",
+  "size": 18078,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-01-1605-one-fight-on-the-field #mtis7hpm6ccs [inline 6/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-01-1605-one-fight-on-the-field",
+  "message": "player-log 2026-09-01-1605-one-fight-on-the-field #mtis7hpm6ccs [inline 6/28]",
+  "title": "player-log 2026-09-01-1605-one-fight-on-the-field #mtis7hpm6ccs [inline 6/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "7c5fc48df16a47d0a9fa7c8af35e0065",
+      "span_id": "856cfaa1949aeec7",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "k\n[2026-09-01T02:36:05.756Z] [debug] parser: intent=stealth conf=1.00 verb=sneak target=- resolved=- range=mid enemies=1 hooks=0\n[2026-09-01T02:36:05.817Z] [system] \u23f3 Time passed: 15 min\n[2026-09-01T02:36:06.058Z] [cognitive] DISENGAGE \u00b7 HIDE \u00b7 TAKE_COVER  (241ms)\n[2026-09-01T02:36:07.490Z] [debug] skillcheck: stealth d20=18 STE 6 + 1 (title: Shadow Diver) = 25 vs DC 12 \u2014 Hard \u2192 (resolved below)\n",
+      "[2026-09-01T02:36:07.567Z] [debug] stats: STR13 DEX24 INT11 WIS12 CHA5 STE6 | gear: WIS+4,INT+2,DEX+14,STR+5,STE+2 | worn: main=Auralite Talon off=Bone Crossbow head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n",
+      "[2026-09-01T02:36:07.567Z] [debug] train: stealth (stealth check) \u2192 progress 60/100\n[2026-09-01T02:36:07.567Z] [world] Dusk is with you \u2014 the silt eats sound after dark. (stealth +1, night)\n[2026-09-01T02:36:07.568Z] [world] You drop low and move quiet, closing on Tartarian Reaver (hunted) unseen across the open ground. (+5 next attack)\n",
+      "[2026-09-01T02:36:07.568Z] [debug] stealth: opener carried by the skill roll (25 vs DC 12 \u2014 Hard) \u2014 UNSEEN\n[2026-09-01T02:36:10.414Z] [debug] ui: tap \"dodge\"\n[2026-09-01T02:36:10.427Z] [player] dodge\n[2026-09-01T02:36:10.427Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=1 hooks=0\n",
+      "[2026-09-01T02:36:10.428Z] [world] You commit to the dodge. Slip Tartarian Reaver (hunted)'s swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-01T02:36:10.428Z] [combat] Tartarian Reaver (hunted) blisters \u2014 clinging fire sears 4. (246/333 HP, 2 turns left)\n",
+      "[2026-09-01T02:36:10.428Z] [combat] Tartarian Reaver (hunted) smokes \u2014 acid eats 1. (245/333 HP, 2 turns left)\n[2026-09-01T02:36:10.485Z] [combat] Tartarian Reaver (hunted) \u2014 d20 \u2192 20 + ATK 14 = 34 vs your AC 23 \u2014 \u2713 CRITICAL HIT\n[2026-09-01T02:36:10.485Z] [combat] Dodge \u2014 Tartarian Reaver (hunted) rolls a NAT 20. No read beats a perfect strike; it lands through your dodge.\n",
+      "[2026-09-01T02:36:10.486Z] [combat] Tartarian Reaver (hunted) presses the second strike \u2014 bosses do not yield the tempo.\n[2026-09-01T02:36:10.487Z] [combat] Tartarian Reaver (hunted) \u2014 d20 \u2192 10 + ATK 14 = 24 vs your AC 23 \u2014 \u2713 HIT\n[2026-09-01T02:36:10.488Z] [debug] arbiter: template (reason=combat)\n[2026-09-01T02:36:10.488Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-09-01T02:36:10.488Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T02:36:10.737Z] [combat] Tartarian Reaver (hunted) deals 17 bludgeoning damage [edge of reach \u2014 halved]. You have 10 HP remaining.\n[2026-09-01T02:36:10.738Z] [combat] Tartarian Reaver (hunted) deals 11 bludgeoning damage [edge of reach \u2014 halved]. You fall.\n",
+      "[2026-09-01T02:36:10.738Z] [combat] Tartarian Reaver (hunted)'s strike leaves you bleeding.\n[2026-09-01T02:36:10.738Z] [combat] The buried world claims Cheddar Bob. Tartaria keeps the body count.\n[2026-09-01T02:36:10.738Z] [system] Cheddar Bob has fallen. A Resurrection Gem from the title screen can bring them back.\n[2026-09-01T02:36:10.965Z] [cognitive] neutral  (251ms)\n",
+      "[2026-09-01T02:36:11.628Z] [system] You join the Fallen of Tartaria \u2014 9 names the buried world keeps now. Read the roll from the Lore Codex.\n[2026-09-01T02:36:31.973Z] [debug] scene: loc=raiders_ridge hub=- arrival=n opening=n passing=n\n[2026-09-01T02:36:31.974Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @raiders_ridge HERE needs=Raider's Ridge-Sign\u2713\n",
+      "[2026-09-01T02:36:31.974Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n[2026-09-01T02:36:31.974Z] [debug] missions: mystery:mystery_temporal_watch stage 0/4 [diplomacy] @reclaimer_stake npc=\"the Reclaimers Guild Speaker\" gives=Guild Eddy-Gauge PAUSED\n[2026-09-01T02:36:31.974Z] [debug] missions: \u00b7 at=raiders_ridge\n",
+      "[2026-09-01T02:36:31.976Z] [world] \u25b8 Silence the Doubter: this is the place \u2014 finish it.\n[2026-09-01T02:36:31.991Z] [world] Not even wind. The kind of stillness that means something is watching.\n\nYou are at Raider's Ridge. A broken spine of scrub and stacked stone one hard walk east of the Tartarian Outskirts. Raider sign is cut into half the rocks \u2014 spiral-marks, ridge-signs, tallies \u2014 because th",
+      "is is where the border gangs stage, meet, and settle what the outposts will not allow inside their walls. Open ground, bad cover, and nobody to hear it.\n\nHazard: Aetherstone Seal. Hardened Aether-mud, stronger than stone. No standard tool will pierce it.\n\nA Mud Spider (Mud Creature, Common) emerges. Its Web Trap can deal 2D6.\n\nAn Aetheric anomaly tightens the air to a held note.\n",
+      "[2026-09-01T02:36:31.991Z] [combat] Distance: close / arm's reach. Auralite Talon \u2713 in range \u00b7 Bone Crossbow \u2713 in range.\n[2026-09-01T02:36:32.037Z] [arbiter] The Arbiter lowers their voice. \"You're carrying shadow with you \u2014 use it. Tap STEALTH before they close, and you can be on them before they know it. A clean opening strike, or slip past entirely.\"\n",
+      "[2026-09-01T02:36:32.037Z] [world] You know this place. Not well, but you know it.\n[2026-09-01T02:36:32.039Z] [world] [Raider's Ridge] north: the Silt Thief (19 tiles, 2 days) \u00b7 east: The Monarch's Waystation (3 tiles, 8 hours) \u00b7 south: The Architect's Blind (2 tiles, 5 hours) \u00b7 west: Tartarian Outskirts (2 tiles, 5 hours)\n",
+      "[2026-09-01T02:36:32.039Z] [combat] 2 Mud Spiders close on you. Tap the right-side panel to cycle targets.\n[2026-09-01T02:36:32.039Z] [debug] arbiter: template (reason=combat)\n[2026-09-01T02:36:32.039Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-01T02:36:32.044Z] [reward] \u2726 Resurrection. Cheddar Bob returns to Tartaria, restored. The Aetherstone hums in recognition.\n",
+      "[2026-09-01T02:36:42.635Z] [debug] ui: tap \"\ud83d\udd25\u2697 bone crossbow\"\n[2026-09-01T02:36:42.642Z] [system] unseen \u2014 next strike +5 fades.\n[2026-09-01T02:36:42.693Z] [player] attack with the off-hand bone crossbow\n[2026-09-01T02:36:42.694Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=2 hooks=0\n",
+      "[2026-09-01T02:36:42.695Z] [debug] attack: target=Mud Spider range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-09-01T02:36:42.697Z] [debug] attack: status mods stealthed +5\n[2026-09-01T02:36:42.745Z] [world] You commit forward with the searing acid-etched bone crossbow. Mud Spider watches your hands.\n",
+      "[2026-09-01T02:36:42.745Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T02:36:42.960Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (213ms)\n[2026-09-01T02:36:47.378Z] [debug] persist sizes(KB): total=239 player=53 wm=97[rooms=45 events=3 memos=0 npcs=4 defeated=1 tags=1 discovered=0] log=86 scene=4\n[2026-09-01T02:36:51.244Z] [world] Mud Spider moves first. The pressure is immediate.\n",
+      "[2026-09-01T02:36:51.246Z] [combat] Mud Spider \u2014 d20 \u2192 9 + ATK 7 = 16 vs your AC 23 \u2014 \u2717 MISS\n[2026-09-01T02:36:51.247Z] [combat] The light around Mud Spider bends and declines to leave. It spends the beat VEILED \u2014 the next strike will come from somewhere you are not watching.\n[2026-09-01T02:36:51.247Z] [combat] You \u2014 d20 \u2192 15 + DEX 24 + 2 (point blank) stealthed +5 = 46 vs Mud Spider AC 9 \u2014 \u2713 HIT\n",
+      "[2026-09-01T02:36:51.248Z] [combat] Piercing flares \u2014 +4 on hit.\n[2026-09-01T02:36:51.248Z] [combat] Mud Spider shrugs off the piercing. (resisted, \u00d70.25 for 10)\n[2026-09-01T02:36:51.250Z] [arbiter] The Arbiter watches the piercing skid off. \"Swap to the Mud Armor \u2014 bludgeoning or aetheric will bite where piercing won't.\"\n",
+      "[2026-09-01T02:36:51.251Z] [combat] The blow with the searing acid-etched bone crossbow finds purchase \u2014 10 damage, 1 HP standing. Mud Spider commits to the counter.\n[2026-09-01T02:36:51.253Z] [combat] Searing Acid-Etched Bone Crossbow \u2014 1 burn bites in and festers (3 turns).\n",
+      "[2026-09-01T02:36:51.253Z] [combat] Searing Acid-Etched Bone Crossbow \u2014 2 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n[2026-09-01T02:36:52.939Z] [debug] ui: tap \"punch\"\n[2026-09-01T02:36:52.947Z] [player] punch\n[2026-09-01T02:36:52.948Z] [debug] parser: intent=attack conf=1.00 verb=punch target=- resolved=- range=close enemies=2 hooks=0\n",
+      "[2026-09-01T02:36:52.949Z] [combat] Mud Spider blisters \u2014 clinging fire sears 1. (0/11 HP, 2 turns left)\n[2026-09-01T02:36:52.949Z] [combat] Mud Spider smokes \u2014 acid eats 2. (0/11 HP, 2 turns left)\n[2026-09-01T02:36:52.951Z] [reward] Mud Spider defeated. You recover Spider Silk.\n[2026-09-01T02:36:52.952Z] [combat] 1 attacker remains. Mud Spider now in your sights.\n",
+      "[2026-09-01T02:36:52.952Z] [reward] +10 TC pried from the dust.\n[2026-09-01T02:36:53.009Z] [arbiter] The Arbiter eyes your new pieces. \"You could make an Aether-Shard Spear now, if you wanted.\"\n[2026-09-01T02:36:53.015Z] [debug] attack: target=Mud Spider range=mid reach.bands=[close] reach.label=Bare hands bareHand=true\n",
+      "[2026-09-01T02:36:53.016Z] [arbiter] The Arbiter holds up a hand. \"Bare hands works at close / arm's reach range only \u2014 you're at mid-range. ADVANCE to close in (they'll answer the approach), or attack with something that reaches.\"\n[2026-09-01T02:36:53.016Z] [debug] arbiter: template (reason=combat)\n[2026-09-01T02:36:53.016Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-09-01T02:36:53.482Z] [cognitive] AGGRESSION \u00b7 DISENGAGE  (465ms)\n[2026-09-01T02:36:56.056Z] [debug] ui: tap \"dodge\"\n[2026-09-01T02:36:56.060Z] [system] bleeding fades.\n[2026-09-01T02:36:56.070Z] [player] dodge\n[2026-09-01T02:36:56.071Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=1 hooks=0\n",
+      "[2026-09-01T02:36:56.072Z] [world] You commit to the dodge. Slip Mud Spider's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-01T02:36:56.073Z] [combat] Mud Spider strikes OUT OF THE VEIL \u2014 the blow comes from nowhere you were watching (+5).\n",
+      "[2026-09-01T02:36:56.131Z] [combat] Mud Spider \u2014 d20 \u2192 12 + ATK 12 = 24 vs your AC 23 \u2014 \u2717 EVADED\n[2026-09-01T02:36:56.131Z] [combat] Dodge \u2014 d20 \u2192 11 + DEX 24 = 35 vs ATK 24. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n",
+      "[2026-09-01T02:36:56.131Z] [world] You slip Mud Spider's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n[2026-09-01T02:36:56.133Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T02:36:56.373Z] [cognitive] neutral  (239ms)\n[2026-09-01T02:36:57.223Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n",
+      "[2026-09-01T02:36:57.227Z] [system] evasive \u2014 harder to hit fades.\n[2026-09-01T02:36:57.262Z] [player] attack with the auralite talon\n[2026-09-01T02:36:57.263Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=mid enemies=1 hooks=0\n",
+      "[2026-09-01T02:36:57.264Z] [debug] attack: target=Mud Spider range=mid reach.bands=[close] reach.label=Auralite Talon bareHand=false\n[2026-09-01T02:36:57.264Z] [arbiter] The Arbiter holds up a hand. \"Auralite Talon works at close / arm's reach range only \u2014 you're at mid-range. ADVANCE to close in (they'll answer the approach), or attack with something that reaches.\"\n",
+      "[2026-09-01T02:36:57.499Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (234ms)\n[2026-09-01T02:36:58.621Z] [debug] ui: tap \"\ud83d\udd25\u2697 bone crossbow\"\n[2026-09-01T02:36:58.624Z] [system] perfect opening fades.\n[2026-09-01T02:36:58.668Z] [player] attack with the off-hand bone crossbow\n",
+      "[2026-09-01T02:36:58.668Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=1 hooks=0\n[2026-09-01T02:36:58.669Z] [debug] attack: target=Mud Spider range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-09-01T02:36:58.671Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-09-01T02:36:58.719Z] [world] You commit forward with the searing acid-etched bone crossbow. Mud Spider watches your hands.\n[2026-09-01T02:36:58.720Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T02:36:58.946Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (226ms)\n[2026-09-01T02:37:07.150Z] [world] Mud Spider moves first. The pressure is immediate.\n",
+      "[2026-09-01T02:37:07.152Z] [combat] Mud Spider \u2014 d20 \u2192 18 + ATK 5 = 23 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-09-01T02:37:07.153Z] [combat] You \u2014 d20 \u2192 7 + DEX 24 perfect opening (2\u00d7 dice) = 31 vs Mud Spider AC 9 \u2014 \u2713 HIT\n[2026-09-01T02:37:07.154Z] [combat] Mud Spider shrugs off the piercing. (resisted, \u00d70.25 for 7)\n",
+      "[2026-09-01T02:37:07.158Z] [combat] Clean hit with the searing acid-etched bone crossbow for 7. Mud Spider has 6 left and does not back away.\n[2026-09-01T02:37:07.159Z] [combat] Searing Acid-Etched Bone Crossbow \u2014 3 burn bites in and festers (3 turns).\n",
+      "[2026-09-01T02:37:07.160Z] [combat] Searing Acid-Etched Bone Crossbow \u2014 1 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n[2026-09-01T02:37:07.419Z] [combat] Mud Spider deals 3 piercing damage [armor \u221235%, plate \u22121] [edge of reach \u2014 halved]. You have 37 HP remaining.\n[2026-09-01T02:37:10.360Z] [debug] ui: tap \"\ud83d\udd25\u2697 bone crossbow\"\n",
+      "[2026-09-01T02:37:10.406Z] [player] attack with the off-hand bone crossbow\n[2026-09-01T02:37:10.407Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=1 hooks=0\n[2026-09-01T02:37:10.407Z] [combat] Mud Spider blisters \u2014 clinging fire sears 3. (3/13 HP, 2 turns left)\n",
+      "[2026-09-01T02:37:10.407Z] [combat] Mud Spider smokes \u2014 acid eats 1. (2/13 HP, 2 turns left)\n[2026-09-01T02:37:10.408Z] [debug] attack: target=Mud Spider range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-09-01T02:37:10.455Z] [world] You commit forward with the searing acid-etched bone crossbow. Mud Spider watches your hands.\n",
+      "[2026-09-01T02:37:10.455Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T02:37:10.677Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (221ms)\n[2026-09-01T02:37:18.443Z] [world] Mud Spider moves first. The pressure is immediate.\n[2026-09-01T02:37:18.445Z] [combat] Mud Spider \u2014 d20 \u2192 14 + ATK 5 = 19 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-01T02:37:18.445Z] [combat] You \u2014 d20 \u2192 17 + DEX 24 = 41 vs Mud Spider AC 8 \u2014 \u2713 HIT\n[2026-09-01T02:37:18.446Z] [combat] Piercing flares \u2014 +3 on hit.\n[2026-09-01T02:37:18.446Z] [combat] Mud Spider shrugs off the piercing. (resisted, \u00d70.25 for 10)\n[2026-09-01T02:37:18.447Z] [combat] The piercing has worn Mud Spider's guard through \u2014 it bites full from here.\n",
+      "[2026-09-01T02:37:18.449Z] [combat] Your blow with the searing acid-etched bone crossbow lands clean \u2014 10 damage. Mud Spider crumples in the dust. The Aetherstone settles.\n[2026-09-01T02:37:18.450Z] [reward] Mud Spi"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-01-1605-one-fight-on-the-field #mtis7hpm6ccs [inline 6/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtis7hpm6ccs"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-01-1605-one-fight-on-the-field"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "6"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-01-1605-one-fight-on-the-field"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-01T15:29:38.146597Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-01T15:29:38.153000Z",
+  "fingerprints": [
+    "371ed7350caa3a4f6c7183d256a33d30"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1948474416,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-01T15:29:38.155000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-01-1605-one-fight-on-the-field",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-01-1605-one-fight-on-the-field",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-01-1605-one-fight-on-the-field",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-01-1605-one-fight-on-the-field)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "7b53457821b541d6ba8229b48967fad0",
+  "previousEventID": "63fb8d2d41e446ac9d65c7a75c24fbe7"
+}

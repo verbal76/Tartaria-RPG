@@ -1,0 +1,236 @@
+{
+  "id": "bd3dedb682a64bea83e6cd6b0545678c",
+  "groupID": "7704869643",
+  "eventID": "bd3dedb682a64bea83e6cd6b0545678c",
+  "projectID": "4511945117532160",
+  "size": 18120,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-01-1605-one-fight-on-the-field #mtis7hpm6ccs [inline 27/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-01-1605-one-fight-on-the-field",
+  "message": "player-log 2026-09-01-1605-one-fight-on-the-field #mtis7hpm6ccs [inline 27/28]",
+  "title": "player-log 2026-09-01-1605-one-fight-on-the-field #mtis7hpm6ccs [inline 27/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "7c5fc48df16a47d0a9fa7c8af35e0065",
+      "span_id": "856cfaa1949aeec7",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "14:46:24.610Z] [debug] attack: target=Tartarian Reaver (hunted) range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-09-01T14:46:24.611Z] [debug] attack: visibility penalty \u22121 (Ash Storm)\n[2026-09-01T14:46:24.611Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-09-01T14:46:24.662Z] [world] Your searing acid-etched bone crossbow comes around in an arc; Tartarian Reaver (hunted) squares up to meet it.\n[2026-09-01T14:46:24.663Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T14:46:24.906Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (242ms)\n[2026-09-01T14:46:33.171Z] [world] You seize the initiative. Tartarian Reaver (hunted) has no time to react.\n",
+      "[2026-09-01T14:46:33.171Z] [combat] You \u2014 d20 \u2192 2 + DEX 24 \u2212 1 (Ash Storm) perfect opening (2\u00d7 dice) = 25 vs Tartarian Reaver (hunted) AC 25 \u2014 \u2713 HIT\n[2026-09-01T14:46:33.175Z] [combat] Piercing flares \u2014 +2 on hit (weak \u2014 bites deep!).\n[2026-09-01T14:46:33.175Z] [combat] Weakness exposed \u2014 Tartarian Reaver (hunted) flinches. (piercing \u00d72.25 for 50)\n",
+      "[2026-09-01T14:46:33.176Z] [combat] Your strike with the searing acid-etched bone crossbow lands for 50. Tartarian Reaver (hunted) staggers \u2014 287 HP remaining. It answers.\n[2026-09-01T14:46:33.177Z] [combat] Searing Acid-Etched Bone Crossbow \u2014 3 burn bites in and festers (3 turns).\n",
+      "[2026-09-01T14:46:33.177Z] [combat] Searing Acid-Etched Bone Crossbow \u2014 2 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n[2026-09-01T14:46:33.180Z] [combat] Tartarian Reaver (hunted) \u2014 d20 \u2192 4 + ATK 14 = 18 vs your AC 23 \u2014 \u2717 MISS\n",
+      "[2026-09-01T14:46:33.181Z] [combat] Tartarian Reaver (hunted) gathers for the second strike \u2014 and the wound tells. STAGGERED: no second swing this round.\n[2026-09-01T14:46:34.944Z] [debug] ui: tap \"flee\"\n[2026-09-01T14:46:34.950Z] [player] flee\n[2026-09-01T14:46:34.951Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=mid enemies=1 hooks=0\n",
+      "[2026-09-01T14:46:35.021Z] [system] \u23f3 Time passed: 15 min\n[2026-09-01T14:46:35.279Z] [cognitive] FEAR \u00b7 RETREAT \u00b7 HIDE  (257ms)\n[2026-09-01T14:46:36.704Z] [debug] skillcheck: escape d20=12 DEX 24 = 36 vs Pursuit 19 \u2014 Tartarian Reaver (hunted) (d20 5 + SPD 14) \u2192 PASS\n",
+      "[2026-09-01T14:46:36.794Z] [debug] stats: STR13 DEX24 INT11 WIS12 CHA7 STE6 | gear: WIS+4,INT+2,DEX+14,STR+5,STE+2 | worn: main=Auralite Talon off=Bone Crossbow head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n",
+      "[2026-09-01T14:46:36.794Z] [debug] train: dexterity (escape check) \u2192 progress 86/100\n[2026-09-01T14:46:36.794Z] [world] You break away across the open ground. Behind you the thing you ran from gives up the chase.\n[2026-09-01T14:46:37.042Z] [debug] persist sizes(KB): total=266 player=68 wm=109[rooms=51 events=4 memos=1 npcs=4 defeated=1 tags=1 discovered=0] log=86 scene=2\n",
+      "[2026-09-01T14:46:39.132Z] [debug] ui: tap \"NORTH\"\n[2026-09-01T14:46:39.137Z] [system] bleeding fades.\n[2026-09-01T14:46:39.169Z] [player] go north\n[2026-09-01T14:46:39.170Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=0\n[2026-09-01T14:46:39.251Z] [reward] \u2726 The road teaches you. +1 WIS (base 8, 13 as you stand).\n",
+      "[2026-09-01T14:46:39.252Z] [world] You walk north. You arrive at The Monarch's Waystation.\n[2026-09-01T14:46:39.253Z] [debug] scene: loc=monarch_waystation hub=outpost_gate arrival=y opening=n passing=n\n[2026-09-01T14:46:39.253Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713\n",
+      "[2026-09-01T14:46:39.253Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n[2026-09-01T14:46:39.253Z] [debug] missions: mystery:mystery_temporal_watch stage 0/4 [diplomacy] @reclaimer_stake npc=\"the Reclaimers Guild Speaker\" gives=Guild Eddy-Gauge PAUSED\n",
+      "[2026-09-01T14:46:39.253Z] [debug] missions: \u00b7 at=monarch_waystation\n[2026-09-01T14:46:39.311Z] [world] You've left The Reaver's Crest and entered The Monarch's Waystation. The seneschal logs your name without asking it. The Monarchs' ledgers have their ways. It's pre-dawn dark. Halem the Trader is the only soul in sight. east leads to Dynasty Border Post; south leads to The Reaver's Crest; west l",
+      "eads to Iskan-Veil. Nothing named to the north.\n[2026-09-01T14:46:39.311Z] [world] You pass through the gate into Monarch Court \u2014 The Atrium. Polished mud-glass tiles and a carved Monarch sigil over the doorway. The seneschal nods you through without speaking \u2014 your business has already been logged elsewhere.\n",
+      "[2026-09-01T14:46:39.311Z] [world] You have been here. The shape of it comes back before the details do.\n[2026-09-01T14:46:39.311Z] [world] Paths: north to Standards \u00b7 south to First Landing. (Type 'leave outpost' to head into the wilds.)\n[2026-09-01T14:46:39.311Z] [system] Weather effect \u2014 Glass Hail: -1 DEX\n",
+      "[2026-09-01T14:46:39.312Z] [world] Halem the Trader looks up before you've finished crossing the room \u2014 already reaching for the pot, already smiling. \"Cheddar Bob. Sit. Tell me what kind of day it's been.\"\n[2026-09-01T14:46:39.312Z] [debug] arbiter: template (reason=outpost-room)\n",
+      "[2026-09-01T14:46:39.312Z] [arbiter] The Arbiter looks around. \"Silt-stiff banners crack in the wind like slow applause. The court has standards to keep, even here.\"\n[2026-09-01T14:46:39.318Z] [debug] arbiter: ambient held (he just spoke)\n[2026-09-01T14:46:39.318Z] [system] \u23f3 Time passed: 15 min\n[2026-09-01T14:46:39.485Z] [cognitive] TRAVEL  (165ms)\n",
+      "[2026-09-01T14:46:46.522Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=cached winH=986 beat=-\n[2026-09-01T14:46:46.839Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-09-01T14:46:52.454Z] [debug] homework: intro-fill armed after 13126ms idle\n",
+      "[2026-09-01T14:47:30.919Z] [player] also i shouldn't automatically enter an outpost because inland on that tile, there should be an enter outpost button, other wise it's a tile\n[2026-09-01T14:47:30.919Z] [arbiter] The Arbiter studies you, plainly. \"I'm not sure what you're trying to tell me. I'll keep your note in the log either way. If you mean to act, phrase it as a verb \u2014 'investigate the rubbl",
+      "e', 'go east', 'attack the figure'.\"\n[2026-09-01T14:47:30.920Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter studies you, plainly. \"I'm not sure what you're \u2026\"\n[2026-09-01T14:47:30.920Z] [debug] meta-comment guard: skipped intent parse (ui-vocabulary: \"button\") on 140-char input\n[2026-09-01T14:47:37.696Z] [debug] ui: tap \"\ud83d\udeaa EXIT\"\n[2026-09-01T14:47:37.701Z] [system] bleeding fades.\n",
+      "[2026-09-01T14:47:37.733Z] [player] leave outpost\n[2026-09-01T14:47:37.734Z] [debug] parser: intent=travel conf=1.00 verb=leave target=outpost resolved=- range=- enemies=0 hooks=0\n[2026-09-01T14:47:37.738Z] [world] You walk back through the gate and out into the open ground. The outpost falls away behind you.\n",
+      "[2026-09-01T14:47:37.738Z] [debug] scene: loc=monarch_waystation hub=- arrival=n opening=n passing=n\n[2026-09-01T14:47:37.738Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713\n[2026-09-01T14:47:37.738Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n",
+      "[2026-09-01T14:47:37.739Z] [debug] missions: mystery:mystery_temporal_watch stage 0/4 [diplomacy] @reclaimer_stake npc=\"the Reclaimers Guild Speaker\" gives=Guild Eddy-Gauge PAUSED\n[2026-09-01T14:47:37.739Z] [debug] missions: \u00b7 at=monarch_waystation\n[2026-09-01T14:47:37.816Z] [world] Crystalline shards rain down like a windowpane shattering in slow motion. Aetherstone hums where they strike.\n\n",
+      "You are at The Monarch's Waystation. A frontier toll-court of the Mud Monarchs, last ordered ground before the buried capitals. Banners hang stiff with silt; a seneschal logs every traveler who passes toward the deeper cities.\n\nHazard: Tartarian Trap. A pressure plate older than recorded history triggers. Walls shift, floor opens, energy lances strike.\n\n",
+      "An Aetheric anomaly tightens the air to a held note.\n[2026-09-01T14:47:37.816Z] [world] Something about this ground is already familiar.\n[2026-09-01T14:47:37.818Z] [world] [The Monarch's Waystation] north: the Silt Thief (19 tiles, 2 days) \u00b7 east: Dynasty Border Post (4 tiles, 10 hours) \u00b7 south: The Reaver's Crest (1 tile, 3 hours) \u00b7 west: Raider's Ridge (2 tiles, 5 hours)\n",
+      "[2026-09-01T14:47:37.818Z] [world] Ymer Tinpot places you as you come in. \"Cheddar Bob. What are you after?\"\n[2026-09-01T14:47:37.826Z] [system] \u23f3 Time passed: 1h\n[2026-09-01T14:47:38.095Z] [cognitive] RETREAT \u00b7 DISENGAGE \u00b7 HIDE  (268ms)\n[2026-09-01T14:47:44.263Z] [debug] qwen\u23f1 ambient ok 6029ms read 1463ms/write 1075ms in 365t\u2192out 31t 4.0ms/t HIT-CAP (145ch)\n",
+      "[2026-09-01T14:47:44.263Z] [debug] qwen\u23f1 stats \u2014 narration:scene_intro_fill n3 avg10.5s max11.9s read9.3s/write1.2s in750t\u2192out33t ms/tok 10.9-14.5 cap3 \u27022/19.6s | investigate_lore n3 avg2.2s max2.7s read1.3s/write1.3s in134t\u2192out39t ms/tok 10.0-10.0 | ambient n3 avg9.2s max11.1s read2.6s/write1.7s in365t\u2192out31t ms/tok 4.0-10.6 cap3 wait0.6s \u27021/11.1s | parse_fallback n1 avg4.6s max4.6s read4.2s/writ",
+      "e0.4s in388t\u2192out12t ms/tok 10.7-10.7 || WASTED 3 calls / 30.7s\n[2026-09-01T14:47:44.432Z] [debug] \u26a0 FREEZE WATCH: LOGIC stalled while frames kept coming (js 2141ms \u00b7 frames 29ms). Something blocked the JS thread \u2014 look for a long synchronous run.\n[2026-09-01T14:47:44.433Z] [arbiter] You've traveled far, both physically and mentally, but the borderlands are always a new place.\n",
+      "[2026-09-01T14:47:44.433Z] [debug] arbiter: ambient \u2713 6608ms\n[2026-09-01T14:47:44.433Z] [debug] arbiter: ambient-said \"You've traveled far, both physically and mentally, but the borderlands are always a new place.\"\n\n=== END LOG \u00b7 399948 CHARS ===\n\nTartaria Realms\n\nDevice\n  Name: Pixel 10 Pro XL\n  Platform: android 37\n  Hermes: yes\n  Locale: en-US\n  Timezone: America/New_York\n",
+      "  Screen: window 443\u00d7986 / screen 443\u00d7986 @ 2.4375x density\n  Captured at: 2026-09-01T14:47:47.676Z\n\nInstall\n  App ID: com.hotatticgames.tartarprim\n  App version: 4.32.11\n  APK build version: 2.4.1\n  APK build: 293\n  AAB: (build 293)\n  OTA: (2026-09-01-1604-the-vest-breaks-down)\n  Boot stage: qwen:done\n\nML runtime health\n  Status: active (no crashes detected)\n  Crash count: 0\n",
+      "  Last init attempt: 2026-09-01T14:41:32.150Z\n  Last init success: 2026-09-01T14:41:33.341Z\n  Crashes-before-disable threshold: 2\n  Qwen completion guard: clean (no completion crashes)\n  Qwen kernel variant: rnllama_v8_2_fp16_dotprod\n",
+      "  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k\n  Voice (TTS) guard: clean (no voice crashes on this build)\nSave-load health\n  Status: clean (no load-crash flags)\nLast JS crash\n",
+      "  Status: none recorded\nThis launch\n  Life: bmtirz8038m \u00b7 started 2026-09-01T14:41:21.987Z\n  Followed an OTA apply 198ms ago (mid-session)\n  The previous life released its model contexts before reloading (o0/r0/l0/p0/dn0)\nCrash ledger \u2014 10 recorded (newest last)\n  \u2022 2026-08-30T23:42:09.758Z (2346m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-30-1581-the-card-they-cannot-walk-past \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done [q0] \u00b7 414ms into the action \u00b7 alive 0ms after it\n  \u2022 2026-08-31T00:21:58.332Z (2306m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-30-1582-the-guy-who-gives-you-the-job \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done [q0] \u00b7 383ms into the action \u00b7 alive 0ms after it\n  \u2022 2026-08-31T03:45:02.432Z (2103m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-31-1586-the-slate-in-every-part \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done [q0] \u00b7 541ms into the action \u00b7 alive 0ms after it\n  \u2022 2026-08-31T12:34:47.772Z (1573m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-31-1589-the-pin-comes-home \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done [q0] \u00b7 578ms into the action \u00b7 alive 0ms after it\n      launch: died 892ms into the process \u00b7 not an OTA-apply boot\n",
+      "      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-08-31T14:24:08.210Z (1464m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-31-1592-the-events-say-which-build \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n",
+      "      last checkpoint: native:cognition:done [q0] \u00b7 508ms into the action \u00b7 alive 0ms after it\n      launch: died 859ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-08-31T17:38:34.699Z (1269m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-31-1594-the-pinch-demands-the-lift \u00b7 stage boot:qwen:deferred\n",
+      "      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: boot:qwen:deferred \u00b7 893ms into the action \u00b7 alive 0ms after it\n      launch: died 941ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-08-31T22:14:31.073Z (993m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-31-1595-the-guide-and-the-ground-agree \u00b7 stage boot:qwen:deferred\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: boot:qwen:deferred \u00b7 5207ms into the action \u00b7 alive 0ms after it\n      launch: died 5302ms into the process \u00b7 not an OTA-apply boot\n",
+      "      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-08-31T22:46:39.841Z (961m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-31-1596-the-mark-catches-up-at-the-door \u00b7 stage native:voice:start\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n",
+      "      last checkpoint: native:voice:start [q1] \u00b7 1865ms into the action \u00b7 alive 0ms after it\n      launch: died 1908ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-01-1605-one-fight-on-the-field #mtis7hpm6ccs [inline 27/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtis7hpm6ccs"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-01-1605-one-fight-on-the-field"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "27"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-01-1605-one-fight-on-the-field"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-01T15:29:38.245747Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-01T15:29:38.155000Z",
+  "fingerprints": [
+    "371ed7350caa3a4f6c7183d256a33d30"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1948474416,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-01T15:29:38.155000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-01-1605-one-fight-on-the-field",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-01-1605-one-fight-on-the-field",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-01-1605-one-fight-on-the-field",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-01-1605-one-fight-on-the-field)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "c628e3e4f20b4825afc5e7f7ffae036e",
+  "previousEventID": "ba1e537c8d894e0ea499d67dcd919db6"
+}

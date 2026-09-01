@@ -1,0 +1,238 @@
+{
+  "id": "f3a3472fd7c44481b8be01d92fe6569e",
+  "groupID": "7705041616",
+  "eventID": "f3a3472fd7c44481b8be01d92fe6569e",
+  "projectID": "4511945117532160",
+  "size": 18115,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-01-1608-one-card-one-arithmetic #mtis7hpm6ccs [inline 26/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-01-1608-one-card-one-arithmetic",
+  "message": "player-log 2026-09-01-1608-one-card-one-arithmetic #mtis7hpm6ccs [inline 26/28]",
+  "title": "player-log 2026-09-01-1608-one-card-one-arithmetic #mtis7hpm6ccs [inline 26/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "56c5326f7e2c479b8b7e1f33cf9ce933",
+      "span_id": "9898c43a58aaf7d9",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "er to hit fades.\n[2026-09-01T14:43:07.877Z] [player] attack with the off-hand bone crossbow\n[2026-09-01T14:43:07.877Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=2 hooks=0\n[2026-09-01T14:43:07.878Z] [debug] attack: target=Swamp Crab range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n",
+      "[2026-09-01T14:43:07.879Z] [arbiter] Ash Storm hangs between you. \"\u22121 to the swing \u2014 see what you can,\" the Arbiter says.\n[2026-09-01T14:43:07.879Z] [debug] attack: visibility penalty \u22121 (Ash Storm)\n[2026-09-01T14:43:07.879Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-09-01T14:43:07.931Z] [world] Your searing acid-etched bone crossbow comes around in an arc; Swamp Crab squares up to meet it.\n[2026-09-01T14:43:07.932Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T14:43:08.408Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (475ms)\n[2026-09-01T14:43:20.508Z] [world] You seize the initiative. Swamp Crab has no time to react.\n",
+      "[2026-09-01T14:43:20.508Z] [combat] You \u2014 d20 \u2192 20 + DEX 24 \u2212 1 (Ash Storm) + 2 (point blank) perfect opening (2\u00d7 dice) = 45 vs Swamp Crab AC 9 \u2014 \u2713 CRITICAL HIT\n[2026-09-01T14:43:20.510Z] [combat] Piercing flares \u2014 +3 on hit.\n[2026-09-01T14:43:20.510Z] [combat] Swamp Crab shrugs off the piercing. (resisted, \u00d70.5 for 21)\n",
+      "[2026-09-01T14:43:20.513Z] [arbiter] The Arbiter watches the piercing skid off. \"Swap to the Mud Armor \u2014 bludgeoning or slashing will bite where piercing won't.\"\n[2026-09-01T14:43:20.515Z] [combat] Swamp Crab folds under the searing acid-etched bone crossbow. 21 damage was enough. The room exhales.\n[2026-09-01T14:43:20.516Z] [reward] Swamp Crab defeated. You recover Swamp Shell \u00d72.\n",
+      "[2026-09-01T14:43:20.516Z] [combat] 1 attacker remains. Mud Spirit now in your sights.\n[2026-09-01T14:43:20.517Z] [reward] +5 TC pried from the dust.\n[2026-09-01T14:43:20.564Z] [debug] ac-shift 26\u219223: race/base 10 + gear 20 + title 0 \u2192 trimmed 23 + status 0 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots c",
+      "loak=Reclaimer's Cloak\n[2026-09-01T14:43:20.564Z] [combat] Mud Spirit \u2014 d20 \u2192 2 + ATK 5 = 7 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-01T14:43:20.565Z] [arbiter] The Arbiter watches the mud spirit. \"It is not the first thing here that decided to keep its distance, then changed its mind.\"\n[2026-09-01T14:43:24.370Z] [debug] ui: tap \"approach\"\n",
+      "[2026-09-01T14:43:24.419Z] [player] approach Mud Spirit\n[2026-09-01T14:43:24.420Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud spirit resolved=Mud Spirit range=mid enemies=1 hooks=0\n[2026-09-01T14:43:24.422Z] [debug] move: advance from range=mid enemies=1 weather=Ash Storm cost=1 partial=0\n",
+      "[2026-09-01T14:43:24.422Z] [debug] move: field advance target=Mud Spirit d 1.79->0.79 band mid->close\n[2026-09-01T14:43:24.422Z] [world] You close the gap with Mud Spirit. (range: close / arm's reach)\n[2026-09-01T14:43:24.424Z] [combat] Mud Spirit \u2014 d20 \u2192 20 + ATK 5 = 25 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 CRITICAL HIT\n",
+      "[2026-09-01T14:43:24.712Z] [combat] Mud Spirit deals 5 aetheric damage [armor \u221234%, title \u00bd, plate \u22121, floor 30%]. You have 36 HP remaining.\n[2026-09-01T14:43:24.966Z] [cognitive] SWIM \u00b7 SEARCH  (539ms)\n[2026-09-01T14:43:26.434Z] [debug] ui: tap \"dodge\"\n[2026-09-01T14:43:26.446Z] [player] dodge\n",
+      "[2026-09-01T14:43:26.447Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=0\n[2026-09-01T14:43:26.448Z] [world] You commit to the dodge. Slip Mud Spirit's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-01T14:43:26.515Z] [combat] Mud Spirit \u2014 d20 \u2192 13 + ATK 5 = 18 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n[2026-09-01T14:43:26.515Z] [combat] Dodge \u2014 d20 \u2192 20 + DEX 24 = 44 vs ATK 18. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-01T14:43:26.516Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-09-01T14:43:26.516Z] [arbiter] \"Footwork over fury,\" the Arbiter says quietly. \"The mud spirit is patient. Be patienter.\"\n[2026-09-01T14:43:26.516Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T14:43:26.772Z] [cognitive] neutral  (255ms)\n[2026-09-01T14:43:27.652Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n[2026-09-01T14:43:27.691Z] [player] attack with the auralite talon\n",
+      "[2026-09-01T14:43:27.692Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=1 hooks=0\n[2026-09-01T14:43:27.692Z] [debug] attack: target=Mud Spirit range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n[2026-09-01T14:43:27.694Z] [debug] attack: visibility penalty \u22121 (Ash Storm)\n",
+      "[2026-09-01T14:43:27.694Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-01T14:43:27.748Z] [world] Your acid-etched corrupted auralite talon comes around in an arc; Mud Spirit squares up to meet it.\n[2026-09-01T14:43:27.749Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T14:43:28.003Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (253ms)\n",
+      "[2026-09-01T14:43:36.295Z] [world] You seize the initiative. Mud Spirit has no time to react.\n[2026-09-01T14:43:36.296Z] [combat] You \u2014 d20 \u2192 8 + INT 11 \u2212 1 (Ash Storm) perfect opening (2\u00d7 dice) = 18 vs Mud Spirit AC 10 \u2014 \u2713 HIT\n[2026-09-01T14:43:36.296Z] [combat] Aetheric flares \u2014 +3 on hit (weak \u2014 bites deep!).\n",
+      "[2026-09-01T14:43:36.296Z] [combat] Weakness exposed \u2014 Mud Spirit flinches. (aetheric \u00d71.5 for 26)\n[2026-09-01T14:43:36.298Z] [combat] Clean hit with the acid-etched corrupted auralite talon for 26. Mud Spirit has 13 left and does not back away.\n",
+      "[2026-09-01T14:43:36.298Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 4 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n[2026-09-01T14:43:36.299Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 1 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n",
+      "[2026-09-01T14:43:36.299Z] [combat] Mud Spirit is left exposed \u2014 easier to hit.\n[2026-09-01T14:43:36.301Z] [combat] Mud Spirit \u2014 d20 \u2192 20 + ATK 5 = 25 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 CRITICAL HIT\n[2026-09-01T14:43:36.600Z] [combat] Mud Spirit deals 5 aetheric damage [armor \u221234%, title \u00bd, plate \u22121, floor 30%]. You have 31 HP remaining.\n",
+      "[2026-09-01T14:43:38.870Z] [debug] kbbar: mounted bottom=355 raw=0 from=estimate winH=986 beat=-\n[2026-09-01T14:43:39.415Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=408 from=live winH=986 beat=-\n[2026-09-01T14:43:52.219Z] [player] phsycic damage from the enemy?\n[2026-09-01T14:43:52.220Z] [debug] parser: intent=unknown conf=0.10 verb=- target=- resolved=- range=close enemies=1 hooks=0\n",
+      "[2026-09-01T14:43:52.220Z] [debug] parse-fallback: handing \"phsycic damage from the enemy?\" to qwen\n[2026-09-01T14:43:52.220Z] [system] The Arbiter considers your words\u2026\n[2026-09-01T14:43:54.034Z] [debug] ui: tap \"\u2697\u2623 auralite talon \u2605\"\n[2026-09-01T14:43:54.043Z] [world] The ash burns your throat. The breath you spend on this action costs more than usual.\n",
+      "[2026-09-01T14:43:54.073Z] [player] attack with the auralite talon\n[2026-09-01T14:43:54.074Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=1 hooks=0\n[2026-09-01T14:43:54.075Z] [combat] Mud Spirit smokes \u2014 acid eats 4. (9/39 HP, 2 turns left)\n",
+      "[2026-09-01T14:43:54.075Z] [combat] Mud Spirit blackens \u2014 corruption eats 1. (8/39 HP, 2 turns left)\n[2026-09-01T14:43:54.076Z] [debug] attack: target=Mud Spirit range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n[2026-09-01T14:43:54.079Z] [debug] attack: visibility penalty \u22121 (Ash Storm)\n",
+      "[2026-09-01T14:43:54.156Z] [world] You bring the acid-etched corrupted auralite talon to bear on Mud Spirit.\n[2026-09-01T14:43:54.156Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T14:43:54.546Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (388ms)\n[2026-09-01T14:43:57.296Z] [debug] qwen\u23f1 parse_fallback ok 4560ms read 4159ms/write 384ms in 388t\u2192out 12t 10.7ms/t (38ch)\n",
+      "[2026-09-01T14:43:57.576Z] [debug] parse-fallback: qwen \u2192 intent=attack target=\"phsycic\" rephrase=\"attack the phsycic\"\n[2026-09-01T14:44:03.373Z] [world] You seize the initiative. Mud Spirit has no time to react.\n[2026-09-01T14:44:03.374Z] [combat] You \u2014 d20 \u2192 16 + INT 11 \u2212 1 (Ash Storm) = 26 vs Mud Spirit AC 7 \u2014 \u2713 HIT\n",
+      "[2026-09-01T14:44:03.374Z] [combat] Aetheric flares \u2014 +2 on hit (weak \u2014 bites deep!).\n[2026-09-01T14:44:03.374Z] [combat] Weakness exposed \u2014 Mud Spirit flinches. (aetheric \u00d71.5 for 22)\n[2026-09-01T14:44:03.375Z] [combat] Final strike with the acid-etched corrupted auralite talon for 22. Mud Spirit is still. The Aetherstone hums on, indifferent.\n",
+      "[2026-09-01T14:44:03.377Z] [reward] Mud Spirit defeated. You recover Mud Essence \u00d72, Spirit Residue.\n[2026-09-01T14:44:03.378Z] [reward] \u2726 You feel hardier from your trials. +1 max HP (now 42). [102 enemies defeated]\n[2026-09-01T14:44:03.378Z] [reward] +18 TC pried from the dust.\n",
+      "[2026-09-01T14:44:03.675Z] [debug] persist sizes(KB): total=265 player=68 wm=110[rooms=51 events=4 memos=1 npcs=4 defeated=1 tags=1 discovered=0] log=85 scene=2\n[2026-09-01T14:44:07.263Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-09-01T14:44:17.102Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 9671ms read 8308ms/write 1327ms in 763t\u2192out 33t 10.9ms/t HIT-CAP (152ch)\n",
+      "[2026-09-01T14:44:17.286Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 9671ms \u2014 intro-fill:\u2205\n[2026-09-01T14:44:17.286Z] [debug] homework: scene_intro \"The Reaver's Crest\" \u2205 10024ms\n[2026-09-01T14:44:25.322Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=408 from=cached winH=986 beat=-\n",
+      "[2026-09-01T14:44:25.653Z] [debug] kbbar: mounted bottom=359.79486083984375 raw=360 from=live winH=986 beat=-\n[2026-09-01T14:44:28.880Z] [player] fight me\n[2026-09-01T14:44:28.881Z] [debug] parser: intent=attack conf=1.00 verb=fight target=- resolved=- range=- enemies=0 hooks=0\n[2026-09-01T14:44:28.883Z] [world] Nothing in arm's reach answers your blade. The motion echoes off Aetherstone.\n",
+      "[2026-09-01T14:44:28.884Z] [debug] arbiter: template (reason=intent-not-allowed:attack)\n[2026-09-01T14:44:28.884Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-01T14:44:28.890Z] [world] The Reaver is on the ridge the sign named, alone, watching you climb. He doesn't draw until you crest it. \"The Giants will rise,\" he says, almost gentle. \"You are a small thing to send a",
+      "gainst that.\" Then his blade comes up.\n[2026-09-01T14:44:28.891Z] [combat] Tartarian Reaver (hunted) closes the distance. The hunt comes to its end.\n[2026-09-01T14:44:28.891Z] [combat] The Reaver rises on the ridge line: \"You climbed all this way to die tired. Come, then.\"\n",
+      "[2026-09-01T14:44:29.173Z] [world] The Reaver is on the ridge the sign named, alone, watching you climb. He doesn't draw until you crest it. \"The Giants will rise,\" he says, almost gentle. \"You are a small thing to send against that.\" Then his blade comes up.\n[2026-09-01T14:44:29.174Z] [combat] Tartarian Reaver (hunted) closes the distance. The hunt comes to its end.\n",
+      "[2026-09-01T14:44:29.174Z] [combat] The Reaver rises on the ridge line: \"You climbed all this way to die tired. Come, then.\"\n[2026-09-01T14:44:29.695Z] [cognitive] AGGRESSION  (805ms)\n[2026-09-01T14:44:40.547Z] [debug] qwen\u23f1 ambient ok 11107ms wait 254ms read 2538ms/write 1853ms in 365t\u2192out 31t 7.0ms/t HIT-CAP (121ch)\n",
+      "[2026-09-01T14:44:41.042Z] [debug] \u26a0 FREEZE WATCH: LOGIC stalled while frames kept coming (js 5038ms \u00b7 frames 1964ms). Something blocked the JS thread \u2014 look for a long synchronous run.\n[2026-09-01T14:44:41.546Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient after 11107ms \u2014 ambient:stale:combat-started\n[2026-09-01T14:44:41.547Z] [debug] arbiter: ambient stale:combat-started 12660ms\n",
+      "[2026-09-01T14:44:41.547Z] [debug] arbiter: ambient-empty reason=unknown raw=\"You reflect, \"From the shadows of time, you have ascended to the peaks of your past, and now, in The Reaver's Crest, you\"\n[2026-09-01T14:44:42.048Z] [debug] kbbar: mounted bottom=359.79486083984375 raw=360 from=cached winH=986 beat=-\n",
+      "[2026-09-01T14:44:42.551Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-09-01T14:44:46.073Z] [debug] freeze watch: recovered \u2014 painting again after 1964ms quiet.\n",
+      "[2026-09-01T14:46:16.965Z] [player] again I had to yell fight me, no popup when I landed, just a fight that was not the hint fight. also nothing button. I needs one or the other to start these types of fights. did the regular enemy spawn kill the mission kick-off? all spawns of any sort except the hunt enemy should be banned on the mission tile of the mission is active.\n",
+      "[2026-09-01T14:46:16.966Z] [arbiter] The Arbiter studies you, plainly. \"I'm not sure what you're trying to tell me. I'll keep your note in the log either way. If you mean to act, phrase it as a verb \u2014 'investigate the rubble', 'go east', 'attack the figure'.\"\n[2026-09-01T14:46:16.967Z] [debug] meta-comment guard: skipped intent parse (ui-vocabulary: \"popup\") on 336-char input\n",
+      "[2026-09-01T14:46:23.723Z] [debug] ui: tap \"dodge\"\n[2026-09-01T14:46:23.735Z] [player] dodge\n[2026-09-01T14:46:23.735Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=1 hooks=0\n",
+      "[2026-09-01T14:46:23.736Z] [world] You commit to the dodge. Slip Tartarian Reaver (hunted)'s swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-01T14:46:23.810Z] [combat] Tartarian Reaver (hunted) \u2014 d20 \u2192 4 + ATK 14 = 18 vs your AC 23 \u2014 \u2717 EVADED\n",
+      "[2026-09-01T14:46:23.810Z] [combat] Dodge \u2014 d20 \u2192 4 + DEX 24 = 28 vs ATK 18. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-01T14:46:23.811Z] [combat] Tartarian Reaver (hunted) presses the second strike \u2014 bosses do not yield the tempo.\n[2026-09-01T14:46:23.812Z] [combat] Tartarian Reaver (hunted) \u2014 d20 \u2192 14 + ATK 14 = 28 vs your AC 23 \u2014 \u2713 HIT\n",
+      "[2026-09-01T14:46:23.813Z] [debug] arbiter: template (reason=combat)\n[2026-09-01T14:46:23.813Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-01T14:46:23.813Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T14:46:24.097Z] [combat] Tartarian Reaver (hunted) deals 11 bludgeoning damage [edge of reach \u2014 halved]. You have 21 HP remaining.\n",
+      "[2026-09-01T14:46:24.097Z] [combat] Tartarian Reaver (hunted)'s strike leaves you bleeding.\n[2026-09-01T14:46:24.341Z] [cognitive] neutral  (284ms)\n[2026-09-01T14:46:24.587Z] [debug] ui: tap \"\ud83d\udd25\u2697 bone crossbow \u2605\"\n[2026-09-01T14:46:24.609Z] [player] attack with the off-hand bone crossbow\n",
+      "[2026-09-01T14:46:24.609Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=1 hooks=0\n[2026-09-01T"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-01-1608-one-card-one-arithmetic #mtis7hpm6ccs [inline 26/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtis7hpm6ccs"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-01-1608-one-card-one-arithmetic"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "26"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-01-1608-one-card-one-arithmetic"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "3"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-01T16:57:38.621723Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-01T16:57:38.504000Z",
+  "fingerprints": [
+    "96d2c90796bc2bdd368f2da8f0f4528c"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1948657316,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-01T16:57:38.502000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-01-1608-one-card-one-arithmetic",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-01-1608-one-card-one-arithmetic",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-01-1608-one-card-one-arithmetic",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-01-1608-one-card-one-arithmetic)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": "e79e12e95bc64695bb4f1af291063b6e"
+}
