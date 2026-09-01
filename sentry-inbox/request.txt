@@ -43,3 +43,4 @@ pull 2026-09-01T02:41:45Z — owner fought the apex Reaver three times, pushed t
 pull 2026-09-01T03:37:20Z — owner: auto-routed onto final-stage tile, arrival fired nothing, had to yell 'fight me' before stinger played
 pull 2026-09-01T03:57:17Z — owner: pull all logs
 pull 2026-09-01T06:05:00Z — owner: game very laggy, intermittent freezes that recover; typed notes in-game during play
+pull 2026-09-01T19:47:37Z — owner pushed a log after the 1610 ship; wants errors checked (card weak/not-weak + two-ENTER row reported same session)
