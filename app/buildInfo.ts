@@ -26551,6 +26551,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // because the boss scale never read `peaceful`. The first-fight primer holds
 // back while the stinger is up, so two cards never land on one beat.
 export const OTA_BUILD_ID = '2026-09-01-1600-the-stinger';
+// golem catch-up 2026-09-01: markerless publish of OTA-1600 — 37 authored
+// stinger shouts, the mission-title popup raised the moment a fight-stage
+// stands bodies up, and the peaceful flag finally reaching the boss scale.
 // golem catch-up 2026-09-01: markerless publish of OTA-1599 — the five hunt
 // fight-stages stand on authored open ground one tile beside their outposts
 // (Raider's Ridge, The Vault Steps, The Drowned Quarter), the Doubter's poster
