@@ -26763,8 +26763,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // actions Contracts uses (hub confirm, else set outright): a cheat sheet you
 // have to leave in order to act on is a reference card.
 export const OTA_BUILD_ID = '2026-09-01-1617-the-ask-names-its-object';
-// golem catch-up 2026-09-01: markerless publish of OTA-1614 + 1615 + 1616 - the
-// card keeps its buttons, the mission card, the grouped refusals. hal took the marker.
+// golem catch-up 2026-09-01: markerless publish of OTA-1617 - the ask names its
+// object, and SET COURSE moved onto the mission row. hal took the marker push.
 // golem catch-up 2026-09-01: markerless publish of OTA-1608 - the portrait
 // reads the roll's own resolvers; every mint swept. hal took the marker.
 // golem catch-up 2026-09-01: markerless publish of OTA-1607 - the portrait
