@@ -40,3 +40,4 @@ pull 2026-08-31T22:15:39Z — owner pushed a log: Silence the Doubter stage 2, g
 pull 2026-09-01T00:23:29Z — owner pushed a new log after OTA-1597 review; he thinks he may see the issue
 pull 2026-09-01T01:48:13Z — owner pushed a new log (post-1598 era)
 pull 2026-09-01T02:41:45Z — owner fought the apex Reaver three times, pushed the log
+pull 2026-09-01T03:37:20Z — owner: auto-routed onto final-stage tile, arrival fired nothing, had to yell 'fight me' before stinger played
