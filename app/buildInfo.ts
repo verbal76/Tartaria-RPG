@@ -26728,8 +26728,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // in that conversation. The sheet holds the farewell open after the record
 // dies, so the last words cannot be cut off. One machine, twenty-one chains.
 export const OTA_BUILD_ID = '2026-09-01-1613-the-giver-hands-it-over';
-// golem catch-up 2026-09-01: markerless publish of OTA-1611 - the portrait
-// honors its inured cancellations, and one door per tile. hal took the marker.
+// golem catch-up 2026-09-01: markerless publish of OTA-1612 + OTA-1613 - a
+// subdued mark counts, and the giver hands it over. hal took the marker push.
 // golem catch-up 2026-09-01: markerless publish of OTA-1608 - the portrait
 // reads the roll's own resolvers; every mint swept. hal took the marker.
 // golem catch-up 2026-09-01: markerless publish of OTA-1607 - the portrait
