@@ -33,12 +33,17 @@ describe('OTA-1607 — the card tells the type the dice actually roll', () => {
     expect(enemyDamageCompact({ damage: '2D6 Psychic' })).toBe('2d6 aetheric');
     expect(enemyDamageCompact({ damage: '1d8 Frost' })).toBe('1d8 cold');
     expect(enemyDamageCompact({ damage: '2d8 Slashing' })).toBe('2d8 slashing');
-    expect(enemyDamageCompact({ damage: '1d6' })).toBe('1d6');
-    expect(enemyDamageCompact({ damage: '' })).toBe('1d6');
+    // ⚠ OTA-1608 supersede — a dice-only string now carries the INFERRED type
+    // (the same one the rolls use), so no card in the game is typeless.
+    expect(enemyDamageCompact({ damage: '1d6' })).toMatch(/^1d6 \w+$/);
+    expect(enemyDamageCompact({ damage: '' })).toMatch(/^1d6 \w+$/);
   });
 
   it('⚠⚠ the boss suffixes ride the corrected base', () => {
-    expect(enemyDamageCompact({ damage: '2d6 Psychic', boss: true })).toMatch(/^2d6 aetheric\+1d6/);
+    // ⚠ OTA-1608 supersede — boss riders glue to the dice; the type lands last.
+    const bossCard = enemyDamageCompact({ damage: '2d6 Psychic', boss: true });
+    expect(bossCard).toMatch(/^2d6\+1d6/);
+    expect(bossCard).toMatch(/aetheric$/);
   });
 
   it('⚠⚠⚠ THE RATCHET — no card in the whole bestiary renders an alias word, and every typed card agrees with its rolls', () => {

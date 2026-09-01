@@ -120,16 +120,18 @@ describe('OTA-1139 audit №1 — the Power gauge reads the ONE AC', () => {
 
 describe('OTA-1139 audit №2 — the enemy panel tells the boss truth in chip width', () => {
   it('a boss chip carries the +1d6 and the ×2', () => {
-    expect(enemyDamageCompact({ damage: '1d8+3', boss: true })).toBe('1d8+3+1d6 ×2');
+    // ⚠ OTA-1608 supersede — every card now carries the damage TYPE at the
+    // end (the same inference the rolls use); the numeric claim is unchanged.
+    expect(enemyDamageCompact({ damage: '1d8+3', boss: true })).toMatch(/^1d8\+3\+1d6 ×2 \w+$/);
   });
 
   it('an ordinary enemy chip is untouched', () => {
-    expect(enemyDamageCompact({ damage: '2d6' })).toBe('2d6');
-    expect(enemyDamageCompact({ damage: '1d4+1', boss: false })).toBe('1d4+1');
+    expect(enemyDamageCompact({ damage: '2d6' })).toMatch(/^2d6 \w+$/);
+    expect(enemyDamageCompact({ damage: '1d4+1', boss: false })).toMatch(/^1d4\+1 \w+$/);
   });
 
   it('missing notation falls back rather than printing undefined', () => {
-    expect(enemyDamageCompact({})).toBe('1d6');
+    expect(enemyDamageCompact({})).toMatch(/^1d6 \w+$/);
   });
 
   it('⚠ both panel sites route through it — no raw e.damage remains', () => {

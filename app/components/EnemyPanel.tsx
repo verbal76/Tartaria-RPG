@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { enemyDamageCompact } from '../engine/combatRules';
+import { enemyDamageCompact, enemyAC, enemyAttackBonus } from '../engine/combatRules';
 import {
   View,
   Text,
@@ -412,17 +412,16 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, pl
   );
 }
 
-// arb146 — format an enemy into the full-detail popup body. Mirrors EnemyCard's
-// AC/attack math so the popup agrees with the portrait, and adds everything the
-// cramped corner can't fit: full trait descriptions + all active effects.
+// arb146 — format an enemy into the full-detail popup body: everything the
+// cramped corner can't fit — full trait descriptions + all active effects.
+// ⚠ OTA-1608 — no more mirrored math: this was the THIRD hand copy of the AC
+// formula and read parseInt(enemy.attack) — a move NAME on every bestiary row
+// — where the rolls compute abilityPoint + trait bonus. The card, this popup,
+// and the d20 lines now all ask the roll's own resolvers.
 function enemyDetailBody(view: EnemyView, canRead: boolean, observed?: { weak: string[]; resist: string[] }): string {
   const e = view.enemy;
-  const apMatch = String(e.abilityPoint ?? '').match(/\d+/);
-  const apNum = apMatch ? parseInt(apMatch[0], 10) : NaN;
-  const baseAc = isNaN(apNum) ? 8 : Math.max(5, Math.min(18, 5 + apNum));
-  const ac = Math.max(1, baseAc + traitACBonus(e.traits) + (e.boss ? 6 : 0));
-  const attackNum = parseInt(String(e.attack), 10);
-  const atkLabel = Number.isFinite(attackNum) ? `+${attackNum}` : String(e.attack);
+  const ac = enemyAC(e);
+  const atkLabel = `+${enemyAttackBonus(e)}`;
   const defenses = defensesFor(e);
   const dealsType = enemyDamageType(e);
   const lines: string[] = [];
@@ -493,16 +492,13 @@ function EnemyCard({ view, cardWidth, hpBarWidth, canRead, observed, playerPower
   // combat uses to hit: pull the number out of "Strength 4" (parseInt got NaN →
   // the panel showed a flat AC 5 and never added the boss +6). NaN falls back to
   // 8 like combat, and bosses get the same +6 wall.
-  const apMatch = String(view.enemy.abilityPoint ?? '').match(/\d+/);
-  const apNum = apMatch ? parseInt(apMatch[0], 10) : NaN;
-  const baseAc = isNaN(apNum) ? 8 : Math.max(5, Math.min(18, 5 + apNum));
-  const ac = Math.max(1, baseAc + traitACBonus(view.enemy.traits) + (view.enemy.boss ? 6 : 0));
+  // ⚠ OTA-1608 — the roll's own resolver, not a hand copy (see enemyDetailBody).
+  const ac = enemyAC(view.enemy);
   // OTA-1527 — the chips this card is allowed to print. Gated on the SAME
   // condition as the RESIST/WEAK block below, because the row sits directly
   // under it and was answering what that block declined to say.
   const chips = portraitTraitChips(view.enemy.traits, view.enemy.boss || canRead);
-  const attackNum = parseInt(String(view.enemy.attack), 10);
-  const atkLabel = Number.isFinite(attackNum) ? `+${attackNum}` : String(view.enemy.attack);
+  const atkLabel = `+${enemyAttackBonus(view.enemy)}`; // OTA-1608 — what the d20 line will say
   const hpPct = Math.max(0, Math.min(1, view.currentHp / Math.max(1, view.enemy.hp)));
   const hpColor = hpPct > 0.5 ? '#9ec96a' : hpPct > 0.2 ? '#c9a86a' : '#e07a5f';
   // Range indicator. Engine doesn't track per-enemy positioning yet —

@@ -60,7 +60,7 @@ import { addResurrectionGems, recordFallen, recordFallenSeed, characterSeedOf } 
 import { buildDeathScene, daysBelow } from '../engine/deathScene';
 import { rollDie, rollFromNotation, pick } from '../engine/rng';
 import { findArmorByName, findWeaponByName, findDogGearByName, applyDamageTypeModifier, applyArmorResistance, armorResistances, fusedArmorResistances, type ArmorSlotResist } from '../engine/crafting';
-import { reachClassFor, bossSwingsTwice } from '../engine/combatRules';
+import { reachClassFor, bossSwingsTwice, enemyAttackBonus } from '../engine/combatRules';
 import { parseWeaponEffect, applyRangeNote } from '../engine/weaponEffects';
 import { reachBandsFor, RANGE_ORDER, RANGE_LABELS } from '../engine/types';
 // ⚠ OTA-1506 — the bullseye (per-enemy bearing + distance). See the FIELD
@@ -937,7 +937,7 @@ export function applyEnemyCounterToDog(
   const player = get().player;
   const dog = player?.dog;
   if (!player || !dog || dog.status !== 'with_player' || dog.hp <= 0) return;
-  const atkBonus = parseEnemyAP(enemy) + traitAttackBonus(enemy.traits);
+  const atkBonus = enemyAttackBonus(enemy); // OTA-1608 — one derivation, card included
   const atkRoll = rollDie(20);
   const atkTotal = atkRoll + atkBonus;
   const dexMod = Math.floor((dog.stats.dexterity - 10) / 2);
@@ -1773,8 +1773,9 @@ function applyEnemyCounter(
 
   // 2026-05-25 — same fix as enemyTotal above. attack is a name, not
   // a number; derive bonus from abilityPoint.
-  const baseAtk = parseEnemyAP(enemy);
-  const traitAtk = traitAttackBonus(enemy.traits);
+  // OTA-1608 — one derivation (the portrait card reads the same function);
+  // trait bonus is folded in.
+  const baseAtk = enemyAttackBonus(enemy);
   // Ambush bonus — one-shot +2 on the FIRST counter this enemy makes
   // in the scene (~16 enemies in data/enemies/enemies.json declare
   // 'ambush_strike'; previously the trait was exported but never
@@ -1812,7 +1813,7 @@ function applyEnemyCounter(
     get().appendLog('combat', `${enemy.name} strikes OUT OF THE VEIL — the blow comes from nowhere you were watching (+5).`);
     return 5;
   })();
-  const atkBonus = baseAtk + traitAtk + ambushBonus + veiledBonus;
+  const atkBonus = baseAtk + ambushBonus + veiledBonus;
   // HANDOFF #14 — true advantage/disadvantage for defensive status
   // effects. When the player has cover/dodge/block active, the enemy's
   // attack rolls 2d20 and takes the LOWER (disadvantage on attacker).

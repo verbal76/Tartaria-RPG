@@ -2,8 +2,8 @@ import type { RollStep, PlayerCharacter, Enemy, Stats, StatusEffect, WeaponReach
 import { rollDie } from './rng';
 import { findWeaponByName, type CatalogWeapon } from './crafting';
 import { effectiveStats } from './equipment';
-import { traitACBonus, enemyIsAerial } from './enemyTraits';
-import { parseDamageTypeKeyword } from './damageTypes';
+import { traitACBonus, traitAttackBonus, enemyIsAerial } from './enemyTraits';
+import { parseDamageTypeKeyword, enemyDamageType } from './damageTypes';
 // ⚠ OTA-1562 — safe to import here: weaponEffects reaches only rng / enemyTraits
 // / types, none of which reach back into combatRules, so no cycle is created.
 import { parseWeaponEffect, armorIgnoreReduction } from './weaponEffects';
@@ -513,6 +513,19 @@ export function enemyAC(enemy: Enemy): number {
   // and bonus damage downstream, bosses become "find another way" walls.
   const bossBonus = enemy.boss ? 6 : 0;
   return Math.max(1, base + traitACBonus(enemy.traits) + bossBonus);
+}
+
+// ⚠⚠ OTA-1608 — THE ONE ATTACK-BONUS DERIVATION. The portrait card used to
+// print parseInt(enemy.attack) — a MOVE NAME for every bestiary row ("Spirit
+// Touch") — while every roll computed abilityPoint + trait bonus. Two sources
+// for one number is the OTA-1545 lesson all over again (the debug spawn line
+// drifted the same way); now the rolls and the card both ask here. The
+// situational adds (ambush, veiled strike) stay at the roll site — they are
+// moments, not stats, and the card must not promise them.
+export function enemyAttackBonus(enemy: Pick<Enemy, 'abilityPoint' | 'traits'>): number {
+  const apMatch = String(enemy.abilityPoint ?? '').match(/\d+/);
+  const ap = apMatch ? parseInt(apMatch[0], 10) : 3; // parseEnemyAP's fallback
+  return ap + traitAttackBonus(enemy.traits);
 }
 
 // Rulebook: Common 1d6 / Uncommon 2d6 / Rare 1d10+1d6 / Legendary 2d10
@@ -1105,9 +1118,23 @@ export function enemyDamageCompact(enemy: { damage?: unknown; boss?: boolean; tr
   // 'psychic'; it is the only non-canonical word in the bestiary). Keep the
   // dice, canonicalize the word — DMG, the DEALS line and the combat log now
   // all say the same thing.
-  const dice = raw.match(/\d+d\d+/i)?.[0]?.toLowerCase();
-  const canonType = parseDamageTypeKeyword(raw);
-  const base = dice && canonType ? `${dice} ${canonType}` : raw;
-  if (!enemy.boss) return base;
-  return bossSwingsTwice(enemy) ? `${base}+1d6 ×2` : `${base}+1d6`;
+  // ⚠ OTA-1608 — and the 119 dice-only rows ("1D8", no word at all) say their
+  // type too: the SAME inference the damage clause rolls with (attack-verb /
+  // species tables), so every card in the game reads "dice type" and the type
+  // is always the one the dice will deal. The WHOLE numeric expression
+  // survives — a Guardian's "1d8+3" keeps its rider (the first cut of this
+  // dropped it, minting exactly the lie this OTA hunts; ota1141's tuning pins
+  // caught it) — every 'd' is lowercased, any authored type word (alias or
+  // canonical) is lifted out, and the canonical type lands at the end, after
+  // the boss riders, so "+1d6 ×2" stays glued to the dice it modifies.
+  const hasDice = /\d+[dD]\d+/.test(raw);
+  const canonType = parseDamageTypeKeyword(raw)
+    ?? (hasDice ? enemyDamageType(enemy as never) : null);
+  const numeric = raw
+    .replace(/[A-Za-z]+/g, (w) => (/^d$/i.test(w) ? 'd' : (parseDamageTypeKeyword(w) ? '' : w)))
+    .replace(/\s+/g, ' ')
+    .trim();
+  let out = hasDice && numeric ? numeric : raw;
+  if (enemy.boss) out = bossSwingsTwice(enemy) ? `${out}+1d6 ×2` : `${out}+1d6`;
+  return hasDice && canonType ? `${out} ${canonType}` : out;
 }

@@ -133,10 +133,12 @@ describe('OTA-1141 — ⚠ the second swing is a tier privilege now', () => {
   it('⚠ THE CARDS KEEP TELLING THE TRUTH — a gated Guardian does not advertise ×2', () => {
     // This whole week was surfaces lying about boss damage. The gate must not
     // mint a new lie in the opposite direction.
-    expect(enemyDamageDisplay(gated(1))).toBe('1d8+3+1d6 damage on a hit');
-    expect(enemyDamageCompact(gated(1))).toBe('1d8+3+1d6');
+    // ⚠ OTA-1608 supersede — the type word rides at the end now; the ×2 truth
+    // this test exists for is unchanged.
+    expect(enemyDamageDisplay(gated(1))).toMatch(/^1d8\+3\+1d6( \w+)? damage on a hit$/);
+    expect(enemyDamageCompact(gated(1))).toMatch(/^1d8\+3\+1d6 \w+$/);
     expect(enemyDamageDisplay(gated(3))).toContain('twice per round');
-    expect(enemyDamageCompact(gated(3))).toBe('1d8+3+1d6 ×2');
+    expect(enemyDamageCompact(gated(3))).toMatch(/^1d8\+3\+1d6 ×2 \w+$/);
   });
 });
 

@@ -26654,7 +26654,23 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // only non-canonical word in the bestiary. enemyDamageCompact now keeps the
 // dice and canonicalizes the word, so DMG, the DEALS line, and the combat
 // log's damage clauses all tell one story. A whole-bestiary ratchet holds it.
-export const OTA_BUILD_ID = '2026-09-01-1607-the-card-tells-the-type';
+//
+// ⚠⚠⚠ OTA-1608 — ONE CARD, ONE ARITHMETIC. The owner's audit question: "you
+// went through all enemies in the game to ensure nothing in the enemy
+// portraits, no matter where it is pulled from, can hallucinate?" The honest
+// answer was no — 1607 proved one cell. The sweep found the class twice more:
+// the portrait card and its popup each kept a HAND COPY of the AC formula
+// (the third and fourth copies; OTA-1545 already buried one in the debug
+// line), and the ATK cell printed parseInt(enemy.attack) — a move NAME on
+// every bestiary row — while every d20 line computes abilityPoint + trait
+// bonus. Now enemyAC and the new enemyAttackBonus are THE resolvers: the
+// rolls call them, the card calls them, the popup calls them. RESIST/WEAK
+// already rode the shared reconcile (weaponGlyphs), DEALS already rode
+// enemyDamageType, DMG was 1607. The ota1608 sweep drives every mint — all
+// bestiary rows, all 18 scaled hunt bosses, scaled escorts, the nine Core
+// Guardians, and a fallen-hero revenant — and asserts every number the card
+// prints is the number the dice will use.
+export const OTA_BUILD_ID = '2026-09-01-1608-one-card-one-arithmetic';
 // golem catch-up 2026-09-01: markerless publish of OTA-1607 - the portrait
 // card canonicalizes its damage type. hal took the marker push.
 // golem catch-up 2026-09-01: markerless publish of OTA-1606 - the gate
