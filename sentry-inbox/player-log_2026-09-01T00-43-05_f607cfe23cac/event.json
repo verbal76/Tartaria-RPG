@@ -1,0 +1,237 @@
+{
+  "id": "f607cfe23cac45b5b2d708da3dca7eeb",
+  "groupID": "7703506205",
+  "eventID": "f607cfe23cac45b5b2d708da3dca7eeb",
+  "projectID": "4511945117532160",
+  "size": 18087,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-31-1597-the-tile-is-the-trigger #mthxaxji3kq3 [inline 17/22]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-08-31-1597-the-tile-is-the-trigger",
+  "message": "player-log 2026-08-31-1597-the-tile-is-the-trigger #mthxaxji3kq3 [inline 17/22]",
+  "title": "player-log 2026-08-31-1597-the-tile-is-the-trigger #mthxaxji3kq3 [inline 17/22]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "4a52cbbc2153493bb6be83411de13272",
+      "span_id": "8141b7f974c37737",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      ".\n[2026-09-01T00:15:50.591Z] [world] Auto-routing to the next stage of Silence the Doubter: Tartarian Outskirts.\n[2026-09-01T00:15:51.064Z] [debug] persist sizes(KB): total=217 player=52 wm=80[rooms=38 events=3 memos=0 npcs=3 defeated=1 tags=1 discovered=0] log=81 scene=4\n[2026-09-01T00:15:52.154Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 5730ms read 0ms/write 0ms in 740t\u2192out 0t (0ch)\n",
+      "[2026-09-01T00:15:52.320Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 5730ms \u2014 intro-fill:\u2205\n[2026-09-01T00:15:52.320Z] [debug] homework: scene_intro \"Great Tartary Plains\" \u2205 6051ms\n[2026-09-01T00:15:52.442Z] [cognitive] SWIM  (2105ms)\n[2026-09-01T00:15:54.450Z] [debug] ui: tap \"\u2192 TARTARIAN OUTSKIRTS\"\n",
+      "[2026-09-01T00:15:54.463Z] [world] You walk west through open silt. The compass tells you The Buried Cities lies further west \u2014 5 tiles, about 13 hours of travel.\n[2026-09-01T00:15:54.464Z] [world] A pre-flood postal way-station, the kind the Empire put at every crossroads to receive letters and rotate couriers. The hitching posts are still here. So are the letters \u2014 five canvas sacks of undeliver",
+      "ed mail, sealed and stacked behind the counter the day the flood came. The seals are still intact. The names on the envelopes are still legible.\n[2026-09-01T00:15:54.464Z] [world] The pile of letters is addressed in a dozen hands, and one name near the top you have heard on a quest poster \u2014 a Reclaimer who is alive today, more or less. Someone meant these to arrive. Nobody has carried them in a hu",
+      "ndred years.\n[2026-09-01T00:15:54.465Z] [reward] \u2726 Recovered Sealed Tartarian Letter.\n[2026-09-01T00:15:54.473Z] [world] What you started here has not finished itself in your absence.\n[2026-09-01T00:15:54.755Z] [debug] qwen\u23f1 investigate_lore ok 3985ms wait 1673ms read/write unusable (native mis-reported 7268ms/1020ms \u2014 llama.rn split bug, not this call) in 128t\u2192out 32t (136ch)\n",
+      "[2026-09-01T00:15:55.811Z] [debug] ui: tap \"\u2192 TARTARIAN OUTSKIRTS\"\n[2026-09-01T00:15:55.831Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Halda Roadsworn, wandering trader. Tap the vendor banner to trade.\n[2026-09-01T00:15:55.842Z] [world] This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n",
+      "[2026-09-01T00:15:55.843Z] [world] You walk west through open silt. The compass tells you The Buried Cities lies further west \u2014 4 tiles, about 10 hours of travel.\n[2026-09-01T00:15:55.843Z] [world] The loose end is exactly as loose as you left it.\n[2026-09-01T00:15:57.029Z] [debug] ui: tap \"rest\"\n[2026-09-01T00:15:57.038Z] [player] rest\n",
+      "[2026-09-01T00:15:57.039Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=3\n[2026-09-01T00:15:57.041Z] [world] Soot circles three times and curls beside you. Her breathing slows to yours.\n[2026-09-01T00:15:57.041Z] [world] You rest for 8 hours. +6 HP, +3 stamina recovered. (Day 40, night)\n",
+      "[2026-09-01T00:15:57.045Z] [arbiter] The Arbiter goes still. \"It watched you sleep from the treeline and made up its mind about you.\"\n[2026-09-01T00:15:57.045Z] [world] A Mud Imp rises out of the silt where you took it for a ridge. The rest is over.\n[2026-09-01T00:15:57.046Z] [debug] enemy: Mud Imp hp=15 ac=8 atk=Sneak Attack dmg=1D6 rarity=Common ap=3\n",
+      "[2026-09-01T00:15:57.057Z] [system] \u23f3 Time passed: 8h\n[2026-09-01T00:15:57.296Z] [cognitive] REST  (237ms)\n[2026-09-01T00:16:00.203Z] [debug] ui: tap \"flee\"\n[2026-09-01T00:16:00.209Z] [player] flee\n[2026-09-01T00:16:00.210Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=far enemies=1 hooks=3\n[2026-09-01T00:16:00.290Z] [system] \u23f3 Time passed: 15 min\n",
+      "[2026-09-01T00:16:01.213Z] [debug] qwen\u23f1 ambient_fill preempted 3925ms read 0ms/write 0ms in 365t\u2192out 0t (0ch)\n[2026-09-01T00:16:01.433Z] [debug] arbiter: ambient-fill \u2205 4391ms\n[2026-09-01T00:16:01.433Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient_fill after 3925ms \u2014 ambient:fill-\u2205\n[2026-09-01T00:16:01.641Z] [cognitive] FEAR \u00b7 RETREAT \u00b7 HIDE  (1350ms)\n",
+      "[2026-09-01T00:16:01.940Z] [debug] skillcheck: escape d20=6 DEX 23 = 29 vs Pursuit 25 \u2014 Mud Imp (d20 20 + SPD 5) \u2192 PASS\n[2026-09-01T00:16:01.993Z] [debug] stats: STR12 DEX23 INT11 WIS12 CHA4 STE6 | gear: WIS+4,INT+2,DEX+14,STR+5,STE+2 | worn: main=Auralite Talon off=Bone Crossbow head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-W",
+      "alker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n[2026-09-01T00:16:01.994Z] [debug] train: dexterity (escape check) \u2192 progress 82/100\n[2026-09-01T00:16:01.994Z] [world] You break away across the open ground. Behind you the thing you ran from gives up the chase.\n[2026-09-01T00:16:03.637Z] [debug] ui: tap \"\u2192 TARTARIAN OUTSKIRTS\"\n",
+      "[2026-09-01T00:16:03.653Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Grum the Fence, fence. Tap the vendor banner to trade.\n[2026-09-01T00:16:03.664Z] [world] Rare workings for sale: Half-Life Pulse (500 TC), Heart of the Aetherstorm (500 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.",
+      "\n[2026-09-01T00:16:03.664Z] [world] You walk west through open silt. The compass tells you The Buried Cities lies further west \u2014 3 tiles, about 8 hours of travel.\n[2026-09-01T00:16:03.666Z] [world] A robed walker, alone, slow, head down. Order grey, deeper at the cuffs. Their staff is plain but the rune-glass at its tip is not. They stop at a polite distance and wait to be acknowledged. They are w",
+      "illing to talk if you want to talk. They are also willing to keep walking.\n[2026-09-01T00:16:03.666Z] [arbiter] 'If you are going to the Pillars, eat before you arrive. If you are going to the Cathedral, eat after. If you are going to Drakova, do not eat at all. Good road to you.'\n[2026-09-01T00:16:03.666Z] [world] When the pilgrim is past you, you notice the staff has left no mark in the mud.\n",
+      "[2026-09-01T00:16:03.677Z] [world] Whatever you turned over here is still turned over.\n[2026-09-01T00:16:05.005Z] [debug] ui: tap \"\u2192 TARTARIAN OUTSKIRTS\"\n[2026-09-01T00:16:05.078Z] [reward] \u2726 Your bearing reads. +1 CHA (base 6, 5 as you stand).\n",
+      "[2026-09-01T00:16:05.080Z] [world] You walk west through open silt. The compass tells you The Buried Cities lies further west \u2014 2 tiles, about 5 hours of travel.\n[2026-09-01T00:16:05.080Z] [world] The seal over Drakova thins here. You walk into a Lost Capital plaza the mud has not been allowed to enter. The crowd that was crossing it the day the flood came is still crossing \u2014 gestures held mid-str",
+      "ide, a cart in the act of turning, a child paused on the lip of a fountain. They are not aware of you. The air around them does not move.\n[2026-09-01T00:16:05.081Z] [world] A pocket watch in the gutter, the second hand still ticking. The face reads the hour the flood came. Each tick advances the second hand by a second, but the hour does not change.\n",
+      "[2026-09-01T00:16:05.081Z] [reward] \u2726 Recovered Tartarian Map Fragment.\n[2026-09-01T00:16:05.082Z] [combat] Aetheric Ooze steps out of the shadows of the place \u2014 Acidic Dissolve ready, 1D10 damage on a hit. The loot you found will leave with whoever walks out alive. (range: close)\n",
+      "[2026-09-01T00:16:05.082Z] [world] Parked \u2014 you're already running a contract. Activate it in Contracts \u2192 Mysteries when you're ready.\n[2026-09-01T00:16:05.082Z] [reward] \u2726 Mystery added to your slate \u2014 Temporal Distortion Watch.\n",
+      "[2026-09-01T00:16:05.082Z] [arbiter] The Arbiter watches you read it. \"That mystery is on your slate. Open Contracts \u2192 Mysteries for the trail. Tap ABANDON there if you'd rather not chase it.\"\n[2026-09-01T00:16:05.087Z] [world] It sits where it sat. Patient is the wrong word \u2014 it simply does not move.\n[2026-09-01T00:16:07.989Z] [debug] ui: tap \"inventory\"\n",
+      "[2026-09-01T00:16:38.523Z] [debug] persist sizes(KB): total=221 player=52 wm=81[rooms=38 events=3 memos=0 npcs=4 defeated=1 tags=1 discovered=0] log=83 scene=4\n[2026-09-01T00:16:40.520Z] [debug] ui: tap \"flee\"\n[2026-09-01T00:16:40.528Z] [player] flee\n[2026-09-01T00:16:40.529Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=close enemies=1 hooks=3\n",
+      "[2026-09-01T00:16:40.588Z] [system] \u23f3 Time passed: 15 min\n[2026-09-01T00:16:40.791Z] [cognitive] FEAR \u00b7 RETREAT \u00b7 HIDE  (202ms)\n[2026-09-01T00:16:42.528Z] [debug] skillcheck: escape d20=8 DEX 23 = 31 vs Pursuit 19 \u2014 Aetheric Ooze (d20 16 + SPD 3) \u2192 PASS\n",
+      "[2026-09-01T00:16:42.570Z] [debug] stats: STR12 DEX23 INT11 WIS12 CHA5 STE6 | gear: WIS+4,INT+2,DEX+14,STR+5,STE+2 | worn: main=Auralite Talon off=Bone Crossbow head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n",
+      "[2026-09-01T00:16:42.570Z] [debug] train: dexterity (escape check) \u2192 progress 84/100\n[2026-09-01T00:16:42.570Z] [world] You get your legs under you and go, and it does not follow far.\n[2026-09-01T00:16:44.119Z] [debug] ui: tap \"\u2192 TARTARIAN OUTSKIRTS\"\n",
+      "[2026-09-01T00:16:44.141Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Pell the Slow, wandering trader. Tap the vendor banner to trade.\n[2026-09-01T00:16:44.147Z] [world] Rare workings for sale: Half-Life Pulse (500 TC), Heart of the Aetherstorm (500 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014",
+      " just ask.\n[2026-09-01T00:16:44.148Z] [world] You walk west through open silt. The compass tells you The Buried Cities lies further west \u2014 1 tile, about 3 hours of travel.\n[2026-09-01T00:16:44.149Z] [world] Your eye goes back to it before you decide to look.\n[2026-09-01T00:16:45.439Z] [reward] Pell the Slow fires up a portable Crucible for you. (\u221225 TC)\n",
+      "[2026-09-01T00:16:51.378Z] [debug] homework: intro-fill armed after 6000ms idle (strike 2/3)\n[2026-09-01T00:16:58.893Z] [reward] \u2726 The Crucible drinks the five pieces and works a second coating channel into the Bone Crossbow. It can now hold TWO coatings at once \u2014 both bite on every landing hit. (Its damage and edge are unchanged.)\n",
+      "[2026-09-01T00:16:59.568Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 8020ms read/write unusable (native mis-reported 61139ms/1104ms \u2014 llama.rn split bug, not this call) in 725t\u2192out 33t HIT-CAP (166ch)\n[2026-09-01T00:16:59.709Z] [debug] homework: scene_intro \"Great Tartary Plains\" \u2713 8333ms\n[2026-09-01T00:17:01.278Z] [reward] Pell the Slow fires up a portable Crucible for you. (\u221225 TC)\n",
+      "[2026-09-01T00:17:16.518Z] [reward] \u2726 The Crucible drinks the five pieces and works a second coating channel into the Auralite Talon. It can now hold TWO coatings at once \u2014 both bite on every landing hit. (Its damage and edge are unchanged.)\n[2026-09-01T00:17:19.624Z] [debug] ui: tap \"more \u25b8\"\n[2026-09-01T00:17:20.707Z] [debug] ui: tap \"inventory\"\n",
+      "[2026-09-01T00:17:32.503Z] [debug] qwen\u23f1 item_synthesis_hw ok 5120ms read 3969ms/write 1133ms in 331t\u2192out 35t 12.0ms/t (161ch)\n[2026-09-01T00:17:32.517Z] [debug] homework: item_desc \"Pulse Scanner\" \u2713 5158ms\n",
+      "[2026-09-01T00:17:33.483Z] [reward] You work the acid flask into the weapon's second channel \u2014 it now carries TWO coatings. Now wielding the Searing Acid-Etched Bone Crossbow; both bite on every landing hit (1d4 burn + 1d4 acid).\n[2026-09-01T00:17:36.807Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-09-01T00:17:46.248Z] [player] use Corruption Tonic\n",
+      "[2026-09-01T00:17:46.249Z] [debug] parser: intent=use_relic conf=1.00 verb=use target=corruption tonic resolved=Corruption Tonic range=- enemies=0 hooks=3\n[2026-09-01T00:17:46.250Z] [world] You use one Corruption Tonic. +3 HP, -5 corruption.\n[2026-09-01T00:17:46.257Z] [system] \u23f3 Time passed: 15 min\n",
+      "[2026-09-01T00:17:46.961Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 10146ms read 0ms/write 0ms in 725t\u2192out 0t (0ch)\n[2026-09-01T00:17:47.528Z] [cognitive] neutral  (1271ms)\n[2026-09-01T00:17:47.532Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 10146ms \u2014 intro-fill:\u2205\n[2026-09-01T00:17:47.532Z] [debug] homework: scene_intro \"Great Tartary Plains\" \u2205 10725ms\n",
+      "[2026-09-01T00:17:54.260Z] [reward] You work the corruption tonic into the weapon's second channel \u2014 it now carries TWO coatings. Now wielding the Acid-Etched Corrupted Auralite Talon; both bite on every landing hit (1d4 acid + 1d4 corruption).\n",
+      "[2026-09-01T00:17:54.887Z] [debug] persist sizes(KB): total=221 player=50 wm=82[rooms=38 events=3 memos=0 npcs=4 defeated=1 tags=1 discovered=0] log=84 scene=4\n[2026-09-01T00:17:58.479Z] [debug] ui: tap \"craft\"\n[2026-09-01T00:18:04.064Z] [world] You repair the Acid-Etched Corrupted Auralite Talon. Back to full. (spent: Small Rock x2)\n",
+      "[2026-09-01T00:18:05.765Z] [world] You repair the Searing Acid-Etched Bone Crossbow. Back to full. (spent: Scrap Metal x6, Stick x2)\n[2026-09-01T00:18:06.950Z] [world] You repair the Mud-glass Scales. Back to full. (spent: Patched Cloth x4)\n[2026-09-01T00:18:07.797Z] [world] You repair the Reclaimer's Cloak. Back to full. (spent: Patched Cloth x4)\n",
+      "[2026-09-01T00:18:08.667Z] [world] You repair the Relic Hunter's Gauntlets. Back to full. (spent: Patched Cloth x4)\n[2026-09-01T00:18:14.613Z] [debug] ui: tap \"missions\"\n[2026-09-01T00:18:18.008Z] [world] You set course for Tartarian Outskirts. 10 tiles \u2014 about 1 day, 1 hour of travel, all in. You set off now \u2014 the ground ahead is new ground. Keep tapping \u2192 TARTARIAN OUTSKIRTS on the travel row to",
+      " close the distance; STOP TRAVEL to halt.\n[2026-09-01T00:18:18.020Z] [world] You walk west through open silt. The compass tells you The Architect's Blind lies further west \u2014 8 tiles, about 20 hours of travel.\n[2026-09-01T00:18:18.021Z] [world] You had a question here. You still have it.\n",
+      "[2026-09-01T00:18:18.302Z] [debug] persist sizes(KB): total=221 player=50 wm=82[rooms=38 events=3 memos=0 npcs=4 defeated=1 tags=1 discovered=0] log=84 scene=4\n[2026-09-01T00:18:19.382Z] [debug] ui: tap \"\u2192 TARTARIAN OUTSKIRTS\"\n[2026-09-01T00:18:19.399Z] [world] You walk west through open silt. The compass tells you The Architect's Blind lies further west \u2014 7 tiles, about 18 hours of travel.\n",
+      "[2026-09-01T00:18:19.400Z] [world] A figure trudges toward you across the silt \u2014 staff, mud-cloak, eyes that have been further than yours.\n[2026-09-01T00:18:19.401Z] [arbiter] \"The Aether's loud tonight. I'd rest if I were you.\"\n[2026-09-01T00:18:19.401Z] [reward] \u2726 Recovered Trail Rations.\n[2026-09-01T00:18:19.411Z] [world] Some part of you has been keeping the place bookmarked.\n",
+      "[2026-09-01T00:18:20.365Z] [debug] ui: tap \"\u2192 TARTARIAN OUTSKIRTS\"\n[2026-09-01T00:18:20.382Z] [combat] The aether under your skin draws something out \u2014 Drowned Aetherkin forms from the haze.\n[2026-09-01T00:18:20.382Z] [world] You walk west through open silt. The compass tells you The Architect's Blind lies further west \u2014 6 tiles, about 15 hours of travel.\n",
+      "[2026-09-01T00:18:20.383Z] [world] You catch yourself checki"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-31-1597-the-tile-is-the-trigger #mthxaxji3kq3 [inline 17/22]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mthxaxji3kq3"
+    },
+    {
+      "key": "dist",
+      "value": "2026-08-31-1597-the-tile-is-the-trigger"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "17"
+    },
+    {
+      "key": "parts",
+      "value": "22"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-08-31-1597-the-tile-is-the-trigger"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-01T00:43:03.578896Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-01T00:43:05.345000Z",
+  "fingerprints": [
+    "19d6f357b4c9ee47ab81ae8539a6c03c"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1947146650,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-01T00:14:36.323000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-08-31-1597-the-tile-is-the-trigger",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-08-31-1597-the-tile-is-the-trigger",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-08-31-1597-the-tile-is-the-trigger",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-08-31-1597-the-tile-is-the-trigger)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "f9257f8583e74683b4b0880890c168d4",
+  "previousEventID": "f31af507b14d425692cc85f64394cf4f"
+}

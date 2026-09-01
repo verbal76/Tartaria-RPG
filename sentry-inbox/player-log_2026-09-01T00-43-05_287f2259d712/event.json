@@ -1,0 +1,237 @@
+{
+  "id": "287f2259d71242f1b3bfbf129271a722",
+  "groupID": "7703506205",
+  "eventID": "287f2259d71242f1b3bfbf129271a722",
+  "projectID": "4511945117532160",
+  "size": 18092,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-08-31-1597-the-tile-is-the-trigger #mthxaxji3kq3 [inline 4/22]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-08-31-1597-the-tile-is-the-trigger",
+  "message": "player-log 2026-08-31-1597-the-tile-is-the-trigger #mthxaxji3kq3 [inline 4/22]",
+  "title": "player-log 2026-08-31-1597-the-tile-is-the-trigger #mthxaxji3kq3 [inline 4/22]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "4a52cbbc2153493bb6be83411de13272",
+      "span_id": "8141b7f974c37737",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "ruption tonic resolved=Corruption Tonic range=- enemies=0 hooks=2\n[2026-08-31T21:54:32.223Z] [reward] \u2726 Crafted Corruption Tonic. The Arbiter watches you set the last piece.\n[2026-08-31T21:54:32.332Z] [cognitive] neutral  (108ms)\n[2026-08-31T21:54:33.973Z] [player] craft Frost Paste\n",
+      "[2026-08-31T21:54:33.974Z] [debug] parser: intent=craft conf=1.00 verb=craft target=frost paste resolved=Frost Paste range=- enemies=0 hooks=2\n[2026-08-31T21:54:33.977Z] [reward] \u2726 Crafted Frost Paste. The Arbiter watches you set the last piece.\n[2026-08-31T21:54:33.978Z] [debug] arbiter: template (reason=intent-not-allowed:craft)\n",
+      "[2026-08-31T21:54:33.978Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T21:54:34.122Z] [cognitive] neutral  (142ms)\n[2026-08-31T21:54:35.592Z] [player] craft Frost Paste\n[2026-08-31T21:54:35.593Z] [debug] parser: intent=craft conf=1.00 verb=craft target=frost paste resolved=Frost Paste range=- enemies=0 hooks=2\n",
+      "[2026-08-31T21:54:35.596Z] [reward] \u2726 Crafted Frost Paste. The Arbiter watches you set the last piece.\n[2026-08-31T21:54:35.600Z] [debug] arbiter: template (reason=intent-not-allowed:craft)\n[2026-08-31T21:54:35.600Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T21:54:35.725Z] [cognitive] neutral  (123ms)\n[2026-08-31T21:54:37.485Z] [player] craft Incendiary Paste\n",
+      "[2026-08-31T21:54:37.486Z] [debug] parser: intent=craft conf=1.00 verb=craft target=incendiary paste resolved=- range=- enemies=0 hooks=2\n[2026-08-31T21:54:37.488Z] [reward] \u2726 Crafted Incendiary Paste. The Arbiter watches you set the last piece.\n[2026-08-31T21:54:37.489Z] [debug] arbiter: template (reason=intent-not-allowed:craft)\n",
+      "[2026-08-31T21:54:37.489Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T21:54:37.489Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-31T21:54:37.614Z] [cognitive] neutral  (124ms)\n[2026-08-31T21:54:39.381Z] [world] Black rain runs down your collar. Something in you tightens that should not have.\n[2026-08-31T21:54:39.431Z] [player] craft Searing Paste\n",
+      "[2026-08-31T21:54:39.432Z] [debug] parser: intent=craft conf=1.00 verb=craft target=searing paste resolved=- range=- enemies=0 hooks=2\n[2026-08-31T21:54:39.434Z] [reward] \u2726 Crafted Searing Paste. The Arbiter watches you set the last piece.\n[2026-08-31T21:54:39.434Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-31T21:54:39.571Z] [cognitive] neutral  (135ms)\n",
+      "[2026-08-31T21:54:41.127Z] [player] craft Searing Paste\n[2026-08-31T21:54:41.127Z] [debug] parser: intent=craft conf=1.00 verb=craft target=searing paste resolved=Searing Paste range=- enemies=0 hooks=2\n[2026-08-31T21:54:41.130Z] [reward] \u2726 Crafted Searing Paste. The Arbiter watches you set the last piece.\n[2026-08-31T21:54:41.131Z] [debug] arbiter: ambient held (he just spoke)\n",
+      "[2026-08-31T21:54:41.257Z] [cognitive] neutral  (125ms)\n[2026-08-31T21:54:44.435Z] [player] craft Smoldering Paste\n[2026-08-31T21:54:44.436Z] [debug] parser: intent=craft conf=1.00 verb=craft target=smoldering paste resolved=- range=- enemies=0 hooks=2\n[2026-08-31T21:54:44.438Z] [reward] \u2726 Crafted Smoldering Paste. The Arbiter watches you set the last piece.\n",
+      "[2026-08-31T21:54:44.575Z] [cognitive] neutral  (135ms)\n[2026-08-31T21:54:47.624Z] [debug] parser: intent=craft conf=1.00 verb=craft target=acid flask resolved=Acid Flask range=- enemies=0 hooks=2\n[2026-08-31T21:54:47.656Z] [debug] parser: intent=craft conf=1.00 verb=craft target=acid flask resolved=Acid Flask range=- enemies=0 hooks=2\n",
+      "[2026-08-31T21:54:47.683Z] [debug] parser: intent=craft conf=1.00 verb=craft target=acid flask resolved=Acid Flask range=- enemies=0 hooks=2\n[2026-08-31T21:54:47.705Z] [debug] parser: intent=craft conf=1.00 verb=craft target=acid flask resolved=Acid Flask range=- enemies=0 hooks=2\n",
+      "[2026-08-31T21:54:47.724Z] [debug] parser: intent=craft conf=1.00 verb=craft target=acid flask resolved=Acid Flask range=- enemies=0 hooks=2\n[2026-08-31T21:54:47.743Z] [debug] parser: intent=craft conf=1.00 verb=craft target=acid flask resolved=Acid Flask range=- enemies=0 hooks=2\n",
+      "[2026-08-31T21:54:47.762Z] [debug] parser: intent=craft conf=1.00 verb=craft target=acid flask resolved=Acid Flask range=- enemies=0 hooks=2\n[2026-08-31T21:54:47.771Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-31T21:54:47.781Z] [debug] parser: intent=craft conf=1.00 verb=craft target=acid flask resolved=Acid Flask range=- enemies=0 hooks=2\n",
+      "[2026-08-31T21:54:47.790Z] [debug] arbiter: template (reason=intent-not-allowed:craft)\n[2026-08-31T21:54:47.790Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T21:54:47.800Z] [debug] parser: intent=craft conf=1.00 verb=craft target=acid flask resolved=Acid Flask range=- enemies=0 hooks=2\n[2026-08-31T21:54:47.809Z] [debug] arbiter: ambient held (he just spoke)\n",
+      "[2026-08-31T21:54:47.819Z] [debug] parser: intent=craft conf=1.00 verb=craft target=acid flask resolved=Acid Flask range=- enemies=0 hooks=2\n[2026-08-31T21:54:47.838Z] [debug] parser: intent=craft conf=1.00 verb=craft target=acid flask resolved=Acid Flask range=- enemies=0 hooks=2\n[2026-08-31T21:54:47.848Z] [debug] arbiter: template (reason=intent-not-allowed:craft)\n",
+      "[2026-08-31T21:54:47.848Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T21:54:47.848Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-31T21:54:47.858Z] [debug] parser: intent=craft conf=1.00 verb=craft target=acid flask resolved=Acid Flask range=- enemies=0 hooks=2\n[2026-08-31T21:54:47.868Z] [debug] arbiter: template (reason=intent-not-allowed:craft)\n",
+      "[2026-08-31T21:54:47.868Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T21:54:47.878Z] [debug] parser: intent=craft conf=1.00 verb=craft target=acid flask resolved=Acid Flask range=- enemies=0 hooks=2\n[2026-08-31T21:54:47.887Z] [debug] arbiter: template (reason=intent-not-allowed:craft)\n",
+      "[2026-08-31T21:54:47.887Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T21:54:47.888Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-31T21:54:47.888Z] [world] Black rain runs down your collar. Something in you tightens that should not have.\n",
+      "[2026-08-31T21:54:47.898Z] [debug] parser: intent=craft conf=1.00 verb=craft target=acid flask resolved=Acid Flask range=- enemies=0 hooks=2\n[2026-08-31T21:54:47.907Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-31T21:54:47.917Z] [debug] parser: intent=craft conf=1.00 verb=craft target=acid flask resolved=Acid Flask range=- enemies=0 hooks=2\n",
+      "[2026-08-31T21:54:47.926Z] [debug] arbiter: template (reason=intent-not-allowed:craft)\n[2026-08-31T21:54:47.926Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T21:54:47.926Z] [debug] arbiter: ambient held (he just spoke)\n[2026-08-31T21:54:47.936Z] [debug] parser: intent=craft conf=1.00 verb=craft target=acid flask resolved=Acid Flask range=- enemies=0 hooks=2\n",
+      "[2026-08-31T21:54:47.946Z] [debug] arbiter: template (reason=intent-not-allowed:craft)\n[2026-08-31T21:54:47.946Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T21:54:47.946Z] [reward] \u2726 Crafted Acid Flask \u00d716. The Arbiter watches you set the last piece.\n[2026-08-31T21:54:48.060Z] [cognitive] neutral  (420ms)\n[2026-08-31T21:54:48.060Z] [cognitive] neutral  (378ms)\n",
+      "[2026-08-31T21:54:48.060Z] [cognitive] neutral  (356ms)\n[2026-08-31T21:54:48.061Z] [cognitive] neutral  (337ms)\n[2026-08-31T21:54:48.061Z] [cognitive] neutral  (318ms)\n[2026-08-31T21:54:48.061Z] [cognitive] neutral  (300ms)\n[2026-08-31T21:54:48.061Z] [cognitive] neutral  (281ms)\n[2026-08-31T21:54:48.061Z] [cognitive] neutral  (263ms)\n[2026-08-31T21:54:48.061Z] [cognitive] neutral  (244ms)\n",
+      "[2026-08-31T21:54:48.061Z] [cognitive] neutral  (226ms)\n[2026-08-31T21:54:48.061Z] [cognitive] neutral  (207ms)\n[2026-08-31T21:54:48.062Z] [cognitive] neutral  (188ms)\n[2026-08-31T21:54:48.062Z] [cognitive] neutral  (169ms)\n[2026-08-31T21:54:48.062Z] [cognitive] neutral  (150ms)\n[2026-08-31T21:54:48.062Z] [cognitive] neutral  (132ms)\n[2026-08-31T21:54:48.062Z] [cognitive] neutral  (113ms)\n",
+      "[2026-08-31T21:54:48.106Z] [debug] persist sizes(KB): total=184 player=41 wm=71[rooms=32 events=3 memos=0 npcs=3 defeated=1 tags=1 discovered=0] log=68 scene=4\n[2026-08-31T21:54:54.402Z] [debug] parser: intent=craft conf=1.00 verb=craft target=first aid kit resolved=- range=- enemies=0 hooks=2\n",
+      "[2026-08-31T21:54:54.414Z] [arbiter] The Arbiter stops with his hand over your pack. \"Before I touch the First Aid Kit \u2014 1 piece of this is Crucible stock: Coarse Canvas Patch. Say the word and I'll set it aside instead.\"\n[2026-08-31T21:54:54.468Z] [cognitive] neutral  (51ms)\n",
+      "[2026-08-31T21:54:57.385Z] [debug] voice\u23f1 gap 2970ms (wait 12ms + synth 2917ms, live) \"Before I touch thuh First Aid Kit, 1 pie\u2026\"\n[2026-08-31T21:54:59.635Z] [player] craft First Aid Kit\n[2026-08-31T21:54:59.636Z] [debug] parser: intent=craft conf=1.00 verb=craft target=first aid kit resolved=- range=- enemies=0 hooks=2\n",
+      "[2026-08-31T21:54:59.648Z] [arbiter] The Arbiter nods. \"Stripped for parts: Coarse Canvas Patch \u2192 Patched Cloth.\"\n[2026-08-31T21:54:59.659Z] [reward] \u2726 Crafted First Aid Kit. The Arbiter watches you set the last piece.\n[2026-08-31T21:54:59.770Z] [cognitive] neutral  (110ms)\n",
+      "[2026-08-31T21:55:04.785Z] [debug] voice\u23f1 gap 5136ms (wait 0ms + synth 1812ms, live) \"Stripped for parts: Coarse Canvas Patch \u2026\"\n[2026-08-31T21:55:05.163Z] [player] craft First Aid Kit\n[2026-08-31T21:55:05.164Z] [debug] parser: intent=craft conf=1.00 verb=craft target=first aid kit resolved=First Aid Kit range=- enemies=0 hooks=2\n",
+      "[2026-08-31T21:55:05.191Z] [arbiter] \"Crafting First Aid Kit would strip Cloth Scrap \u2192 Patched Cloth from your pack \u2014 confirm in the prompt to proceed, or it stays unmade.\"\n[2026-08-31T21:55:05.236Z] [cognitive] neutral  (43ms)\n[2026-08-31T21:55:06.065Z] [world] Black rain runs down your collar. Something in you tightens that should not have.\n",
+      "[2026-08-31T21:55:06.099Z] [player] craft First Aid Kit\n[2026-08-31T21:55:06.100Z] [debug] parser: intent=craft conf=1.00 verb=craft target=first aid kit resolved=First Aid Kit range=- enemies=0 hooks=2\n[2026-08-31T21:55:06.129Z] [arbiter] The Arbiter nods. \"Stripped for parts: Cloth Scrap \u2192 Patched Cloth.\"\n",
+      "[2026-08-31T21:55:06.143Z] [reward] \u2726 Crafted First Aid Kit. The Arbiter watches you set the last piece.\n[2026-08-31T21:55:06.256Z] [cognitive] neutral  (111ms)\n[2026-08-31T21:55:12.051Z] [debug] voice\u23f1 gap 6859ms (wait 0ms + synth 3999ms, live) \"Crafting First Aid Kit would strip Cloth\u2026\"\n[2026-08-31T21:55:31.482Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-08-31T21:55:32.929Z] [player] investigate the mud\n[2026-08-31T21:55:32.930Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=mud range=- enemies=0 hooks=2\n[2026-08-31T21:55:32.933Z] [world] You inspect the mud. Whatever was here once, this is what remains.\n",
+      "[2026-08-31T21:55:32.935Z] [world] A thin film of Aether residue clings where your hand brushed the mud. You vial it.\n[2026-08-31T21:55:32.935Z] [reward] \u2726 Aether Residue (Common).\n[2026-08-31T21:55:32.936Z] [world] Mud Scanner reads flat. Nothing in the mud.\n[2026-08-31T21:55:32.938Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n",
+      "[2026-08-31T21:55:32.938Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T21:55:33.098Z] [cognitive] SWIM  (158ms)\n[2026-08-31T21:55:34.083Z] [debug] ui: tap \"\u2192 GREAT TARTARY PLAINS\"\n[2026-08-31T21:55:34.109Z] [debug] spawn: gear=[Mud Darts] window=10 roster=new\n",
+      "[2026-08-31T21:55:34.111Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Onda Blackpalm, fence. Tap the vendor banner to trade.\n[2026-08-31T21:55:34.121Z] [world] Rare workings for sale: Elder Golem Sledge (500 TC), Ember Storm (200 TC), Fallout Bloom (200 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or gol",
+      "em \u2014 just ask.\n[2026-08-31T21:55:34.122Z] [world] You walk east through open silt. The compass points east into open ground.\n[2026-08-31T21:55:34.123Z] [reward] Following the lead \u2014 a buried footlocker at the old crossroads, off to the north \u2014 you turn up the cache: 34 TC + Scrap Metal.\n[2026-08-31T21:55:34.124Z] [world] Whatever you turned over here is still turned over.\n",
+      "[2026-08-31T21:55:34.295Z] [player] investigate still pond\n[2026-08-31T21:55:34.295Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=pond resolved=still pond range=- enemies=0 hooks=2\n[2026-08-31T21:55:34.296Z] [world] The still pond resists your reading. Not hostile \u2014 just closed. Some things in the buried world don't open for the curious.\n",
+      "[2026-08-31T21:55:34.297Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-31T21:55:34.297Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T21:55:34.423Z] [cognitive] SWIM  (125ms)\n[2026-08-31T21:55:34.680Z] [debug] persist sizes(KB): total=204 player=40 wm=78[rooms=39 events=3 memos=0 npcs=3 defeated=1 tags=1 discovered=0] log=82 scene=4\n",
+      "[2026-08-31T21:55:35.486Z] [debug] ui: tap \"take / salvage\"\n[2026-08-31T21:55:36.554Z] [world] You work the Mud Darts loose from where the mud had it.\n[2026-08-31T21:55:36.554Z] [reward] \u2726 Mud Darts (Common).\n[2026-08-31T21:55:37.010Z] [debug] qwen\u23f1 investigate_lore ok 2469ms read 1597ms/write 846ms in 127t\u2192out 24t 12.6ms/t (106ch)\n",
+      "[2026-08-31T21:55:37.011Z] [debug] qwen\u23f1 stats \u2014 narration:scene_intro_fill n5 avg6.4s max10.9s read9.6s/write1.3s \u26a03unusable in749t\u2192out24t ms/tok 12.6-12.6 cap2 \u23f81 \u27023/19.8s | ambient_fill n1 avg8.3s max8.3s \u26a01unusable in362t\u2192out0t wait5.2s \u23f81 \u27021/8.3s | flourish n1 avg3.0s max3.0s read2.1s/write0.7s in176t\u2192out10t ms/tok 12.0-12.0 \u27021/3.0s | forge_name n1 avg4.9s max4.9s read2.5s/write2.4s in196t\u2192ou",
+      "t63t ms/tok 12.5-12.5 cap1 | item_synthesis_hw n1 avg6.7s max6.7s read4.2s/write2.4s in328t\u2192out61t ms/tok 12.9-12.9 | investigate_lore n1 avg2.5s max2.5s read1.6s/write0.8s in127t\u2192out24t ms/tok 12.6-12.6 || WASTED 5 calls / 31.1s\n[2026-08-31T21:55:37.377Z] [world] The Scrap Metal had settled into the ground. You unsettle it.\n[2026-08-31T21:55:37.378Z] [reward] \u2726 Scrap Metal (Common).\n",
+      "[2026-08-31T21:55:38.119Z] [world] You work the jagged ruined skyscraper over. A part of it comes loose, intact.\n[2026-08-31T21:55:38.119Z] [reward] \u2726 Salvage haul:\n[2026-08-31T21:55:38.119Z] [reward]     \u2022 Bent Nail x2 (Common)\n[2026-08-31T21:55:39.168Z] [debug] ui: tap \"investigate\"\n[2026-08-31T21:55:40.598Z] [player] investigate footprint\n",
+      "[2026-08-31T21:55:40.598Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=footprint resolved=footprint range=- enemies=0 hooks=2\n[2026-08-31T21:55:40.599Z] [world] The footprint sits the way ordinary things sit. The Arbiter does not lean in. You move on.\n[2026-08-31T21:55:40.599Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n",
+      "[2026-08-31T21:55:40.600Z] [debug] arbiter: flavor hel"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-08-31-1597-the-tile-is-the-trigger #mthxaxji3kq3 [inline 4/22]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mthxaxji3kq3"
+    },
+    {
+      "key": "dist",
+      "value": "2026-08-31-1597-the-tile-is-the-trigger"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "4"
+    },
+    {
+      "key": "parts",
+      "value": "22"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-08-31-1597-the-tile-is-the-trigger"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-01T00:43:03.496113Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-01T00:43:05.342000Z",
+  "fingerprints": [
+    "19d6f357b4c9ee47ab81ae8539a6c03c"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1947146650,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-01T00:14:36.323000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-08-31-1597-the-tile-is-the-trigger",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-08-31-1597-the-tile-is-the-trigger",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-08-31-1597-the-tile-is-the-trigger",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-08-31-1597-the-tile-is-the-trigger)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "2c7575e8b7384650af6d3ece12528a52",
+  "previousEventID": "26e670929c06462eb5379776ae4bfb9c"
+}

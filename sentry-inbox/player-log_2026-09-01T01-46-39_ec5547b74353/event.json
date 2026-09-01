@@ -1,0 +1,233 @@
+{
+  "id": "ec5547b74353419dae9327b028d49236",
+  "groupID": "7703598751",
+  "eventID": "ec5547b74353419dae9327b028d49236",
+  "projectID": "4511945117532160",
+  "size": 18121,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-01-1598-the-fight-waits-outside-the-gate #mti0ay8get84 [inline 16/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-01-1598-the-fight-waits-outside-the-gate",
+  "message": "player-log 2026-09-01-1598-the-fight-waits-outside-the-gate #mti0ay8get84 [inline 16/28]",
+  "title": "player-log 2026-09-01-1598-the-fight-waits-outside-the-gate #mti0ay8get84 [inline 16/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "ec937420021a4a989c493af49da282db",
+      "span_id": "a7d51be8a1a63b1d",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "arian Raider is out of it. Tartarian Raider now in your sights.\n[2026-09-01T00:15:21.707Z] [combat] Searing Bone Crossbow \u2014 3 burn bites in and festers (3 turns).\n[2026-09-01T00:15:21.709Z] [debug] ac-shift 26\u219223: race/base 10 + gear 20 + title 0 \u2192 trimmed 23 + status 0 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Wal",
+      "ker's Boots cloak=Reclaimer's Cloak\n[2026-09-01T00:15:21.709Z] [combat] Tartarian Raider \u2014 d20 \u2192 2 + ATK 5 = 7 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-01T00:15:23.727Z] [debug] ui: tap \"\ud83d\udd25 bone crossbow \u2605\"\n[2026-09-01T00:15:23.772Z] [player] attack with the off-hand bone crossbow\n",
+      "[2026-09-01T00:15:23.773Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=2 hooks=3\n[2026-09-01T00:15:23.773Z] [combat] Tartarian Raider blisters \u2014 clinging fire sears 3. (3/36 HP, 2 turns left)\n",
+      "[2026-09-01T00:15:23.774Z] [debug] attack: target=Tartarian Raider range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-09-01T00:15:23.775Z] [debug] attack: visibility penalty \u22121 (Glass Hail)\n[2026-09-01T00:15:23.817Z] [world] You commit forward with the searing bone crossbow. Tartarian Raider watches your hands.\n",
+      "[2026-09-01T00:15:23.817Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T00:15:24.023Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (205ms)\n[2026-09-01T00:15:30.486Z] [world] You seize the initiative. Tartarian Raider has no time to react.\n[2026-09-01T00:15:30.487Z] [combat] You \u2014 d20 \u2192 14 + DEX 22 \u2212 1 (Glass Hail) = 35 vs Tartarian Raider AC 10 \u2014 \u2713 HIT\n",
+      "[2026-09-01T00:15:30.487Z] [combat] Piercing flares \u2014 +3 on hit (weak \u2014 bites deep!).\n[2026-09-01T00:15:30.488Z] [combat] Weakness exposed \u2014 Tartarian Raider flinches. (piercing \u00d71.5 for 18)\n[2026-09-01T00:15:30.488Z] [combat] Tartarian Raider takes 18 with the searing bone crossbow. It reels: 18 left. Then it fights back.\n",
+      "[2026-09-01T00:15:30.488Z] [combat] Searing Bone Crossbow \u2014 4 burn bites in and festers (3 turns).\n[2026-09-01T00:15:30.489Z] [combat] Tartarian Raider \u2014 d20 \u2192 12 + ATK 5 = 17 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-01T00:15:32.846Z] [debug] ui: tap \"dodge\"\n[2026-09-01T00:15:32.859Z] [player] dodge\n",
+      "[2026-09-01T00:15:32.860Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=2 hooks=3\n[2026-09-01T00:15:32.861Z] [world] You commit to the dodge. Slip Tartarian Raider's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-01T00:15:32.861Z] [combat] Tartarian Raider blisters \u2014 clinging fire sears 3. (0/36 HP, 1 turn left)\n[2026-09-01T00:15:32.861Z] [combat] Tartarian Raider blisters \u2014 clinging fire sears 4. (14/36 HP, 2 turns left)\n[2026-09-01T00:15:32.863Z] [reward] Tartarian Raider defeated. You recover Worn Tartarian Coin, Patched Cloth \u00d72.\n",
+      "[2026-09-01T00:15:32.865Z] [reward] You strip the body: Cudgel, Mud-Warden's Vest (+10 TC). The kit took the fight badly.\n[2026-09-01T00:15:32.865Z] [combat] 1 attacker remains. Tartarian Raider now in your sights.\n[2026-09-01T00:15:32.865Z] [reward] +14 TC pried from the dust.\n",
+      "[2026-09-01T00:15:32.954Z] [combat] Tartarian Raider \u2014 d20 \u2192 15 + ATK 5 = 20 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n[2026-09-01T00:15:32.954Z] [combat] Dodge \u2014 d20 \u2192 20 + DEX 23 = 43 vs ATK 20. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-01T00:15:32.955Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T00:15:33.184Z] [cognitive] neutral  (228ms)\n",
+      "[2026-09-01T00:15:33.947Z] [debug] ui: tap \"\ud83d\udd25 bone crossbow \u2605\"\n[2026-09-01T00:15:33.951Z] [world] A shard of mud-glass nicks you. Small wound, steady reminder. (\u22121 HP)\n[2026-09-01T00:15:33.989Z] [player] attack with the off-hand bone crossbow\n[2026-09-01T00:15:33.989Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=1 hooks=3\n",
+      "[2026-09-01T00:15:33.990Z] [combat] Tartarian Raider blisters \u2014 clinging fire sears 4. (10/36 HP, 1 turn left)\n[2026-09-01T00:15:33.990Z] [debug] attack: target=Tartarian Raider range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-09-01T00:15:33.991Z] [debug] attack: visibility penalty \u22121 (Glass Hail)\n",
+      "[2026-09-01T00:15:33.992Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-01T00:15:34.036Z] [world] You raise the searing bone crossbow toward Tartarian Raider. The room narrows around the both of you.\n[2026-09-01T00:15:34.036Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T00:15:34.237Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (200ms)\n",
+      "[2026-09-01T00:15:41.607Z] [world] Tartarian Raider moves first. The pressure is immediate.\n[2026-09-01T00:15:41.608Z] [combat] Tartarian Raider turns on Soot \u2014 d20 13 + ATK 5 = 18 vs Soot's AC 12 (vest +2) \u2014 \u2713 HIT\n[2026-09-01T00:15:41.608Z] [combat] Soot takes 3. (7/15 HP left)\n",
+      "[2026-09-01T00:15:41.608Z] [combat] You \u2014 d20 \u2192 2 + DEX 22 \u2212 1 (Glass Hail) perfect opening (2\u00d7 dice) = 23 vs Tartarian Raider AC 10 \u2014 \u2713 HIT\n[2026-09-01T00:15:41.609Z] [combat] Piercing flares \u2014 +3 on hit (weak \u2014 bites deep!).\n[2026-09-01T00:15:41.610Z] [combat] Weakness exposed \u2014 Tartarian Raider flinches. (piercing \u00d71.5 for 29)\n",
+      "[2026-09-01T00:15:41.610Z] [combat] The killing blow with the searing bone crossbow: 29. Tartarian Raider drops where it stood.\n[2026-09-01T00:15:41.611Z] [reward] \u2726 The last of them is down. \"Silence the Doubter\" moves on.\n",
+      "[2026-09-01T00:15:41.612Z] [world] You search the camp's debris. A boot-track heading due west, fresh. A Reaver's spiral-mark scratched into a flat stone \u2014 his next staging ground, named in raider sign, out on the Tartarian Outskirts ridge. You put the stone in your pack. He wanted the right kind of hunter to follow.\n",
+      "[2026-09-01T00:15:41.626Z] [reward] Tartarian Raider defeated. You recover Worn Tartarian Coin, Patched Cloth.\n[2026-09-01T00:15:41.628Z] [reward] You strip the body: Cudgel, Mud-Warden's Vest (+10 TC). The kit took the fight badly.\n[2026-09-01T00:15:41.628Z] [reward] +10 TC pried from the dust.\n[2026-09-01T00:15:46.271Z] [debug] homework: intro-fill armed after 6000ms idle\n",
+      "[2026-09-01T00:15:48.626Z] [debug] ui: tap \"investigate\"\n[2026-09-01T00:15:50.331Z] [player] investigate mud fissure\n[2026-09-01T00:15:50.332Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud fissure resolved=mud fissure range=- enemies=0 hooks=3\n",
+      "[2026-09-01T00:15:50.335Z] [world] You study the mud fissure and find no answer. The silence here is patient; whatever it knew, it has decided to keep.\n[2026-09-01T00:15:50.546Z] [world] You search the camp's debris. A boot-track heading due west, fresh. A Reaver's spiral-mark scratched into a flat stone \u2014 his next staging ground, named in raider sign, out on the Tartarian Outskirts ridge. You put",
+      " the stone in your pack. He wanted the right kind of hunter to follow.\n[2026-09-01T00:15:50.547Z] [reward] \u2726 Reaver's Spiral-Mark Stone \u2014 mission item.\n[2026-09-01T00:15:50.548Z] [system] \u25b8 Next: Tartarian Outskirts \u00b7 bring Reaver's Spiral-Mark Stone.\n",
+      "[2026-09-01T00:15:50.550Z] [world] You set course for Tartarian Outskirts. 16 tiles \u2014 about 1 day, 16 hours of travel, all in. You set off now \u2014 the ground ahead is new ground. Keep tapping \u2192 TARTARIAN OUTSKIRTS on the travel row to close the distance; STOP TRAVEL to halt.\n",
+      "[2026-09-01T00:15:50.590Z] [world] You walk west through open silt. The compass tells you The Buried Cities lies further west \u2014 6 tiles, about 15 hours of travel.\n[2026-09-01T00:15:50.590Z] [world] The thread you were following waits where you left it.\n[2026-09-01T00:15:50.591Z] [world] Auto-routing to the next stage of Silence the Doubter: Tartarian Outskirts.\n",
+      "[2026-09-01T00:15:51.064Z] [debug] persist sizes(KB): total=217 player=52 wm=80[rooms=38 events=3 memos=0 npcs=3 defeated=1 tags=1 discovered=0] log=81 scene=4\n[2026-09-01T00:15:52.154Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 5730ms read 0ms/write 0ms in 740t\u2192out 0t (0ch)\n[2026-09-01T00:15:52.320Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 5730ms \u2014 intro-fill:\u2205\n",
+      "[2026-09-01T00:15:52.320Z] [debug] homework: scene_intro \"Great Tartary Plains\" \u2205 6051ms\n[2026-09-01T00:15:52.442Z] [cognitive] SWIM  (2105ms)\n[2026-09-01T00:15:54.450Z] [debug] ui: tap \"\u2192 TARTARIAN OUTSKIRTS\"\n[2026-09-01T00:15:54.463Z] [world] You walk west through open silt. The compass tells you The Buried Cities lies further west \u2014 5 tiles, about 13 hours of travel.\n",
+      "[2026-09-01T00:15:54.464Z] [world] A pre-flood postal way-station, the kind the Empire put at every crossroads to receive letters and rotate couriers. The hitching posts are still here. So are the letters \u2014 five canvas sacks of undelivered mail, sealed and stacked behind the counter the day the flood came. The seals are still intact. The names on the envelopes are still legible.\n",
+      "[2026-09-01T00:15:54.464Z] [world] The pile of letters is addressed in a dozen hands, and one name near the top you have heard on a quest poster \u2014 a Reclaimer who is alive today, more or less. Someone meant these to arrive. Nobody has carried them in a hundred years.\n[2026-09-01T00:15:54.465Z] [reward] \u2726 Recovered Sealed Tartarian Letter.\n",
+      "[2026-09-01T00:15:54.473Z] [world] What you started here has not finished itself in your absence.\n[2026-09-01T00:15:54.755Z] [debug] qwen\u23f1 investigate_lore ok 3985ms wait 1673ms read/write unusable (native mis-reported 7268ms/1020ms \u2014 llama.rn split bug, not this call) in 128t\u2192out 32t (136ch)\n[2026-09-01T00:15:55.811Z] [debug] ui: tap \"\u2192 TARTARIAN OUTSKIRTS\"\n",
+      "[2026-09-01T00:15:55.831Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Halda Roadsworn, wandering trader. Tap the vendor banner to trade.\n[2026-09-01T00:15:55.842Z] [world] This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n",
+      "[2026-09-01T00:15:55.843Z] [world] You walk west through open silt. The compass tells you The Buried Cities lies further west \u2014 4 tiles, about 10 hours of travel.\n[2026-09-01T00:15:55.843Z] [world] The loose end is exactly as loose as you left it.\n[2026-09-01T00:15:57.029Z] [debug] ui: tap \"rest\"\n[2026-09-01T00:15:57.038Z] [player] rest\n",
+      "[2026-09-01T00:15:57.039Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=3\n[2026-09-01T00:15:57.041Z] [world] Soot circles three times and curls beside you. Her breathing slows to yours.\n[2026-09-01T00:15:57.041Z] [world] You rest for 8 hours. +6 HP, +3 stamina recovered. (Day 40, night)\n",
+      "[2026-09-01T00:15:57.045Z] [arbiter] The Arbiter goes still. \"It watched you sleep from the treeline and made up its mind about you.\"\n[2026-09-01T00:15:57.045Z] [world] A Mud Imp rises out of the silt where you took it for a ridge. The rest is over.\n[2026-09-01T00:15:57.046Z] [debug] enemy: Mud Imp hp=15 ac=8 atk=Sneak Attack dmg=1D6 rarity=Common ap=3\n",
+      "[2026-09-01T00:15:57.057Z] [system] \u23f3 Time passed: 8h\n[2026-09-01T00:15:57.296Z] [cognitive] REST  (237ms)\n[2026-09-01T00:16:00.203Z] [debug] ui: tap \"flee\"\n[2026-09-01T00:16:00.209Z] [player] flee\n[2026-09-01T00:16:00.210Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=far enemies=1 hooks=3\n[2026-09-01T00:16:00.290Z] [system] \u23f3 Time passed: 15 min\n",
+      "[2026-09-01T00:16:01.213Z] [debug] qwen\u23f1 ambient_fill preempted 3925ms read 0ms/write 0ms in 365t\u2192out 0t (0ch)\n[2026-09-01T00:16:01.433Z] [debug] arbiter: ambient-fill \u2205 4391ms\n[2026-09-01T00:16:01.433Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient_fill after 3925ms \u2014 ambient:fill-\u2205\n[2026-09-01T00:16:01.641Z] [cognitive] FEAR \u00b7 RETREAT \u00b7 HIDE  (1350ms)\n",
+      "[2026-09-01T00:16:01.940Z] [debug] skillcheck: escape d20=6 DEX 23 = 29 vs Pursuit 25 \u2014 Mud Imp (d20 20 + SPD 5) \u2192 PASS\n[2026-09-01T00:16:01.993Z] [debug] stats: STR12 DEX23 INT11 WIS12 CHA4 STE6 | gear: WIS+4,INT+2,DEX+14,STR+5,STE+2 | worn: main=Auralite Talon off=Bone Crossbow head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-W",
+      "alker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n[2026-09-01T00:16:01.994Z] [debug] train: dexterity (escape check) \u2192 progress 82/100\n[2026-09-01T00:16:01.994Z] [world] You break away across the open ground. Behind you the thing you ran from gives up the chase.\n[2026-09-01T00:16:03.637Z] [debug] ui: tap \"\u2192 TARTARIAN OUTSKIRTS\"\n",
+      "[2026-09-01T00:16:03.653Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Grum the Fence, fence. Tap the vendor banner to trade.\n[2026-09-01T00:16:03.664Z] [world] Rare workings for sale: Half-Life Pulse (500 TC), Heart of the Aetherstorm (500 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.",
+      "\n[2026-09-01T00:16:03.664Z] [world] You walk west through open silt. The compass tells you The Buried Cities lies further west \u2014 3 tiles, about 8 hours of travel.\n[2026-09-01T00:16:03.666Z] [world] A robed walker, alone, slow, head down. Order grey, deeper at the cuffs. Their staff is plain but the rune-glass at its tip is not. They stop at a polite distance and wait to be acknowledged. They are w",
+      "illing to talk if you want to talk. They are also willing to keep walking.\n[2026-09-01T00:16:03.666Z] [arbiter] 'If you are going to the Pillars, eat before you arrive. If you are going to the Cathedral, eat after. If you are going to Drakova, do not eat at all. Good road to you.'\n[2026-09-01T00:16:03.666Z] [world] When the pilgrim is past you, you notice the staff has left no mark in the mud.\n",
+      "[2026-09-01T00:16:03.677Z] [world] Whatever you turned over here is still turned over.\n[2026-09-01T00:16:05.005Z] [debug] ui: tap \"\u2192 TARTARIAN OUTSKIRTS\"\n[2026-09-01T00:16:05.078Z] [reward] \u2726 Your bearing reads. +1 CHA (base 6, 5 as you stand).\n",
+      "[2026-09-01T00:16:05.080Z] [world] You walk west through open silt. The compass tells you The Buried Cities lies further west \u2014 2 tiles, about 5 hours of travel.\n[2026-09-01T00:16:05.080Z] [world] The seal over Drakova thins here. You walk into a Lost Capital plaza the mud has not been allowed to enter. The crowd that was crossing it the day the flood came is still crossing \u2014 gestures held mid-str",
+      "ide, a cart in the act of turning, a child paused on the lip of a fountain. They are not aware of you. The air around them does not move.\n[2026-09-01T00:16:05.081Z] [world] A pocket watch in the gutter, the second hand still ticking. The face reads the hour the flood came. Each tick advances the second hand by a second, but the hour does not change.\n",
+      "[2026-09-01T00:16:05.081Z] [reward] \u2726 Recovered Tartarian Map Fragment.\n[2026-09-01T00:16:05.082Z] [combat] Aetheric Ooze steps out of the shadows of the place \u2014 Acidic Dissolve ready, 1D10 damage on a hit. The loot you found will leave with whoever walks out alive. (range: close)\n[2026-09-0"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-01-1598-the-fight-waits-outside-the-gate #mti0ay8get84 [inline 16/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mti0ay8get84"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-01-1598-the-fight-waits-outside-the-gate"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "16"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-01-1598-the-fight-waits-outside-the-gate"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-01T01:46:38.080900Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-01T01:46:39.973000Z",
+  "fingerprints": [
+    "5568d5b21006f1376d89fca945ab5709"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1947228507,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-01T01:19:32.444000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-01-1598-the-fight-waits-outside-the-gate",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-01-1598-the-fight-waits-outside-the-gate",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-01-1598-the-fight-waits-outside-the-gate",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-01-1598-the-fight-waits-outside-the-gate)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "ec97691abafd4363b9b43253c4536750",
+  "previousEventID": "e29d711d7c9846ac8070c3ba9b5beeae"
+}
