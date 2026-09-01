@@ -1,0 +1,260 @@
+{
+  "id": "f0e2f11e64fc424cbb02db5596e9522e",
+  "groupID": "7703681244",
+  "eventID": "f0e2f11e64fc424cbb02db5596e9522e",
+  "projectID": "4511945117532160",
+  "size": 17740,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-01-1599-set-the-bone #mti0ay8get84 [inline 9/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-01-1599-set-the-bone",
+  "message": "player-log 2026-09-01-1599-set-the-bone #mti0ay8get84 [inline 9/28]",
+  "title": "player-log 2026-09-01-1599-set-the-bone #mti0ay8get84 [inline 9/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "ba3f56e20bf640d39b7af552926fafdb",
+      "span_id": "8ff249df116becfe",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "Conspiracy Architects Raider 1 AC 11 \u2014 \u2713 HIT\n[2026-08-31T22:11:41.779Z] [combat] Conspiracy Architects Raider 1 shrugs off the aetheric. (resisted, \u00d70.5 for 6)\n[2026-08-31T22:11:41.782Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Reclaimers Guild Geode-Cored Cleaver \u2014 slashing will bite where aetheric won't.\"\n",
+      "[2026-08-31T22:11:41.783Z] [combat] Your strike with the acid-etched auralite talon lands for 6. Conspiracy Architects Raider 1 staggers \u2014 8 HP remaining. It answers.\n[2026-08-31T22:11:41.783Z] [combat] Acid-Etched Auralite Talon \u2014 1 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n",
+      "[2026-08-31T22:11:41.785Z] [debug] ac-shift 25\u219222: race/base 10 + gear 18 + title 0 \u2192 trimmed 22 + status 0 | worn: head=Architect's Sight Enhancer chest=Forgotten Protector's Plate hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n[2026-08-31T22:11:41.785Z] [combat] Conspiracy Architects Raider 2 \u2014 d20 \u2192 13 + ATK 6 = 19 vs your AC 22 \u2014 \u2717 MISS\n",
+      "[2026-08-31T22:11:41.786Z] [combat] Conspiracy Architects Raider 3 \u2014 d20 \u2192 13 + ATK 7 = 20 vs your AC 22 \u2014 \u2717 MISS\n[2026-08-31T22:11:41.787Z] [combat] Conspiracy Architects Raider 1 \u2014 d20 \u2192 17 + ATK 7 = 24 vs your AC 22 \u2014 \u2713 HIT\n[2026-08-31T22:11:41.788Z] [combat] Conspiracy Architects Raider 4 and 1 other close the distance.\n",
+      "[2026-08-31T22:11:42.030Z] [combat] Conspiracy Architects Raider 1 deals 1 slashing damage [armor \u221257%]. You have 38 HP remaining.\n[2026-08-31T22:11:42.030Z] [combat] That's your slashing resist working \u2014 the armor drank most of that hit (1 of 2 got through).\n[2026-08-31T22:11:44.653Z] [debug] ui: tap \"\ud83d\udd25 bone crossbow\"\n[2026-08-31T22:11:44.709Z] [player] attack with the off-hand bone crossbow\n",
+      "[2026-08-31T22:11:44.710Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=5 hooks=2\n[2026-08-31T22:11:44.711Z] [combat] Conspiracy Architects Raider 1 smokes \u2014 acid eats 1. (7/14 HP, 2 turns left)\n",
+      "[2026-08-31T22:11:44.712Z] [debug] attack: target=Conspiracy Architects Raider 1 range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-08-31T22:11:44.714Z] [debug] attack: visibility penalty \u22121 (Glass Hail)\n[2026-08-31T22:11:44.760Z] [world] You bring the searing bone crossbow to bear on Conspiracy Architects Raider 1.\n",
+      "[2026-08-31T22:11:44.760Z] [system] \u23f3 Time passed: 6 min\n[2026-08-31T22:11:44.964Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (203ms)\n[2026-08-31T22:11:51.623Z] [world] You seize the initiative. Conspiracy Architects Raider 1 has no time to react.\n",
+      "[2026-08-31T22:11:51.623Z] [combat] You \u2014 d20 \u2192 12 + DEX 23 \u2212 1 (Glass Hail) + 2 (point blank) = 36 vs Conspiracy Architects Raider 1 AC 10 \u2014 \u2713 HIT\n[2026-08-31T22:11:51.624Z] [combat] Piercing flares \u2014 +4 on hit.\n[2026-08-31T22:11:51.625Z] [combat] Conspiracy Architects Raider 1 folds under the searing bone crossbow. 15 damage was enough. The room exhales.\n",
+      "[2026-08-31T22:11:51.626Z] [reward] Conspiracy Architects Raider 1 defeated. You recover Patched Cloth, Aether Residue.\n[2026-08-31T22:11:51.627Z] [reward] You strip the body: Bone Knife, Mud-Warden's Vest (+6 TC). The kit took the fight badly.\n[2026-08-31T22:11:51.627Z] [combat] 4 attackers remain. Conspiracy Architects Raider 2 now in your sights.\n",
+      "[2026-08-31T22:11:51.628Z] [system] Reclaimers Guild standing +1 (now 77)\n[2026-08-31T22:11:51.632Z] [reward] +12 TC pried from the dust.\n[2026-08-31T22:11:51.673Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 17 + ATK 10 = 27 vs your AC 22 \u2014 \u2713 HIT\n[2026-08-31T22:11:51.674Z] [combat] Conspiracy Architects Raider 2 turns on Soot \u2014 d20 13 + ATK 6 = 19 vs Soot's AC 12 (vest +2) \u2014 \u2713 HIT\n",
+      "[2026-08-31T22:11:51.674Z] [combat] Soot takes 6. (9/15 HP left)\n[2026-08-31T22:11:51.675Z] [combat] Conspiracy Architects Raider 3 \u2014 d20 \u2192 10 + ATK 7 = 17 vs your AC 22 \u2014 \u2717 MISS\n[2026-08-31T22:11:51.676Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 3 + ATK 7 = 10 vs your AC 22 \u2014 \u2717 MISS\n",
+      "[2026-08-31T22:11:51.905Z] [combat] Conspiracy Architects Raider 5 deals 1 slashing damage [armor \u221257%] [edge of reach \u2014 halved]. You have 37 HP remaining.\n[2026-08-31T22:11:51.906Z] [combat] Conspiracy Architects Raider 5's strike leaves you bleeding.\n[2026-08-31T22:11:55.948Z] [debug] ui: tap \"inventory\"\n[2026-08-31T22:11:59.683Z] [debug] ui: tap \"flee\"\n[2026-08-31T22:11:59.689Z] [player] flee\n",
+      "[2026-08-31T22:11:59.690Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=mid enemies=4 hooks=2\n[2026-08-31T22:11:59.750Z] [system] \u23f3 Time passed: 15 min\n[2026-08-31T22:11:59.951Z] [cognitive] FEAR \u00b7 RETREAT \u00b7 HIDE  (201ms)\n[2026-08-31T22:12:01.488Z] [debug] skillcheck: escape d20=18 DEX 23 = 41 vs Pursuit 25 \u2014 Conspiracy Architects Raider 5 (d20 16 + SPD 9) \u2192 PASS\n",
+      "[2026-08-31T22:12:01.556Z] [debug] stats: STR12 DEX24 INT11 WIS11 CHA4 STE6 | gear: WIS+4,INT+2,DEX+15,STR+5,STE+2 | worn: main=Auralite Talon off=Bone Crossbow head=Architect's Sight Enhancer chest=Forgotten Protector's Plate hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n",
+      "[2026-08-31T22:12:01.556Z] [debug] train: dexterity (escape check) \u2192 progress 52/100\n[2026-08-31T22:12:01.556Z] [world] Something decides you are not worth the ground it would have to give up.\n[2026-08-31T22:12:01.759Z] [debug] persist sizes(KB): total=211 player=47 wm=77[rooms=36 events=3 memos=0 npcs=3 defeated=1 tags=1 discovered=0] log=80 scene=8\n",
+      "[2026-08-31T22:12:03.253Z] [debug] ui: tap \"investigate\"\n[2026-08-31T22:12:04.829Z] [player] investigate fungus\n[2026-08-31T22:12:04.830Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=fungus resolved=Bioluminescent Fungus range=- enemies=0 hooks=2\n",
+      "[2026-08-31T22:12:04.830Z] [debug] route: hook intercept (kind=bioluminescent_path, target=\"bioluminescent fungus\") \u2014 original intent=investigate\n[2026-08-31T22:12:04.830Z] [world] \u2605 STORY THREAD (step 1) \u2014 You follow the fungi. The trail leads down through a slumped wall into a low chamber \u2014 a True Tartarian way-station, currently unstaffed, but lived-in.\n",
+      "[2026-08-31T22:12:06.143Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-08-31T22:12:06.144Z] [world] \u2605\u2605 STORY THREAD COMPLETE \u2014 A bowl of mud-stew, still warm. A folded cot. A sigil scratched into the doorway \u2014 passage granted. You take only what is offered, and leave.\n[2026-08-31T22:12:06.145Z] [reward] \u2726 Trail Rations, Mud Essence.\n",
+      "[2026-08-31T22:12:06.146Z] [reward] \u2726 For your persistence \u2014 Hardened Mudstone (Rare).\n[2026-08-31T22:12:06.146Z] [arbiter] \"You showed restraint,\" the Arbiter says. \"They will know.\"\n[2026-08-31T22:12:10.054Z] [debug] ui: tap \"\u2192 GREAT TARTARY PLAINS\"\n[2026-08-31T22:12:10.080Z] [debug] spawn: gear=[Architect's Grip, Mud Shortsword] window=10 roster=new\n",
+      "[2026-08-31T22:12:10.081Z] [world] You walk east through open silt. The compass tells you Zharak's Teeth lies further east \u2014 3 tiles, about 8 hours of travel.\n[2026-08-31T22:12:10.082Z] [world] A glint of metal \u2014 too small to name yet \u2014 lies in the rubble.\n[2026-08-31T22:12:11.053Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-31T22:12:12.091Z] [world] The Mud Shortsword goes into the pack by feel. You have done this a great many times.\n[2026-08-31T22:12:12.092Z] [reward] \u2726 Mud Shortsword (Common).\n[2026-08-31T22:12:12.114Z] [world] You take the Architect's Grip from where it lay.\n[2026-08-31T22:12:12.114Z] [reward] \u2726 Architect's Grip (Common).\n",
+      "[2026-08-31T22:12:12.991Z] [world] You work the folded map over. A part of it comes loose, intact.\n[2026-08-31T22:12:12.991Z] [world] You lever something loose from the spyglass \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n[2026-08-31T22:12:12.991Z] [reward] \u2726 Salvage haul:\n[2026-08-31T22:12:12.991Z] [reward]     \u2022 Aether Dust (Common)\n",
+      "[2026-08-31T22:12:12.992Z] [reward]     \u2022 Horn-Capped Dowel (Common)\n[2026-08-31T22:12:13.859Z] [debug] homework: intro-fill armed after 8030ms idle (strike 3/3)\n[2026-08-31T22:12:14.070Z] [debug] ui: tap \"investigate\"\n[2026-08-31T22:12:15.573Z] [system] bleeding fades.\n[2026-08-31T22:12:15.577Z] [world] A shard of mud-glass nicks you. Small wound, steady reminder. (\u22121 HP)\n",
+      "[2026-08-31T22:12:15.601Z] [player] investigate the ground\n[2026-08-31T22:12:15.602Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=3\n[2026-08-31T22:12:15.606Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Big Rock (Common).\n",
+      "[2026-08-31T22:12:15.616Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-31T22:12:15.617Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T22:12:15.617Z] [system] \u23f3 Time passed: 24 min\n[2026-08-31T22:12:15.816Z] [cognitive] CLIMB  (198ms)\n[2026-08-31T22:12:16.789Z] [debug] ui: tap \"\u2192 GREAT TARTARY PLAINS\"\n",
+      "[2026-08-31T22:12:16.800Z] [debug] spawn: gear=[Lost Seeker's Gloves, Architect's Aether Gloves] window=10 roster=new\n[2026-08-31T22:12:16.801Z] [world] You walk north through open silt. The compass points north into open ground.\n[2026-08-31T22:12:16.801Z] [world] Whatever clock this place runs on, it has not ticked since you left.\n[2026-08-31T22:12:17.789Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-31T22:12:18.994Z] [world] You strip the folded map carefully. Something usable comes free in your hand.\n[2026-08-31T22:12:18.994Z] [world] You break the spyglass apart. Among the pieces, something worth keeping.\n[2026-08-31T22:12:18.994Z] [reward] \u2726 Salvage haul:\n[2026-08-31T22:12:18.995Z] [reward]     \u2022 Worn Tartarian Coin x5 (Common)\n",
+      "[2026-08-31T22:12:18.995Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-08-31T22:12:19.132Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 5136ms read 0ms/write 0ms in 733t\u2192out 0t (0ch)\n[2026-08-31T22:12:19.243Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 5136ms \u2014 intro-fill:\u2205\n[2026-08-31T22:12:19.244Z] [debug] homework: scene_intro \"Obsidian Pillars\" \u2205 5386ms\n",
+      "[2026-08-31T22:12:19.862Z] [world] You pick up the Architect's Aether Gloves.\n[2026-08-31T22:12:19.863Z] [reward] \u2726 Architect's Aether Gloves (Common).\n[2026-08-31T22:12:19.877Z] [world] You lift the Lost Seeker's Gloves clear.\n[2026-08-31T22:12:19.877Z] [reward] \u2726 Lost Seeker's Gloves (Common).\n[2026-08-31T22:12:21.290Z] [debug] ui: tap \"rest\"\n[2026-08-31T22:12:21.298Z] [player] rest\n",
+      "[2026-08-31T22:12:21.299Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=3\n[2026-08-31T22:12:21.301Z] [world] You listen for her breathing and lose it in the wind, which means she is asleep.\n[2026-08-31T22:12:21.302Z] [world] You rest for 8 hours. +3 HP, +8 stamina, \u22122 corruption recovered. (Day 38, afternoon)\n",
+      "[2026-08-31T22:12:21.306Z] [arbiter] The Arbiter goes still. \"You weren't alone. Something circled while you were out \u2014 and it stopped circling.\"\n[2026-08-31T22:12:21.307Z] [world] An Aetheric Leech is already inside the reach of your fire. The rest is over.\n[2026-08-31T22:12:21.307Z] [debug] enemy: Aetheric Leech hp=17 ac=9 atk=Energy Drain dmg=1D10 Aetheric rarity=Common ap=4\n",
+      "[2026-08-31T22:12:21.316Z] [debug] arbiter: template (reason=busy)\n[2026-08-31T22:12:21.317Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T22:12:21.317Z] [system] \u23f3 Time passed: 8h\n[2026-08-31T22:12:21.528Z] [cognitive] REST  (210ms)\n",
+      "[2026-08-31T22:12:21.953Z] [debug] persist sizes(KB): total=213 player=48 wm=77[rooms=36 events=3 memos=0 npcs=3 defeated=1 tags=1 discovered=0] log=79 scene=9\n[2026-08-31T22:12:22.957Z] [debug] ui: tap \"flee\"\n[2026-08-31T22:12:22.965Z] [player] flee\n[2026-08-31T22:12:22.965Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=far enemies=1 hooks=3\n",
+      "[2026-08-31T22:12:23.030Z] [system] \u23f3 Time passed: 15 min\n[2026-08-31T22:12:23.281Z] [cognitive] FEAR \u00b7 RETREAT \u00b7 HIDE  (250ms)\n[2026-08-31T22:12:24.458Z] [debug] qwen\u23f1 ambient_fill preempted 2742ms read 0ms/write 0ms in 362t\u2192out 0t (0ch)\n[2026-08-31T22:12:24.680Z] [debug] arbiter: ambient-fill \u2205 3377ms\n",
+      "[2026-08-31T22:12:24.680Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient_fill after 2742ms \u2014 ambient:fill-\u2205\n[2026-08-31T22:12:24.877Z] [debug] skillcheck: escape d20=18 DEX 23 = 41 vs Pursuit 7 \u2014 Aetheric Leech (d20 3 + SPD 4) \u2192 PASS\n",
+      "[2026-08-31T22:12:24.921Z] [debug] stats: STR12 DEX24 INT11 WIS11 CHA4 STE6 | gear: WIS+4,INT+2,DEX+15,STR+5,STE+2 | worn: main=Auralite Talon off=Bone Crossbow head=Architect's Sight Enhancer chest=Forgotten Protector's Plate hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n",
+      "[2026-08-31T22:12:24.921Z] [debug] train: dexterity (escape check) \u2192 progress 54/100\n[2026-08-31T22:12:24.921Z] [world] The chase lasts about as long as its appetite does.\n[2026-08-31T22:12:26.191Z] [debug] ui: tap \"\u2192 GREAT TARTARY PLAINS\"\n[2026-08-31T22:12:26.208Z] [debug] spawn: gear=[Mud-Seer's Hood, Echoing Steps Boots] window=10 roster=new\n",
+      "[2026-08-31T22:12:26.209Z] [arbiter] The Arbiter, walking with you: \"Tartaria was a continent once. A flood older than any honest map drowned it. We are crossing the top of it.\"\n[2026-08-31T22:12:26.210Z] [world] You walk east through open silt. The compass points east into open ground.\n[2026-08-31T22:12:26.211Z] [world] Time went somewhere. It did not come here.\n",
+      "[2026-08-31T22:12:27.177Z] [debug] ui: tap \"take / salvage\"\n[2026-08-31T22:12:28.420Z] [world] You get a hand under the Echoing Steps Boots and take it.\n[2026-08-31T22:12:28.420Z] [reward] \u2726 Echoing Steps Boots (Common).\n[2026-08-31T22:12:28.433Z] [world] You claim the Mud-Seer's Hood.\n[2026-08-31T22:12:28.433Z] [reward] \u2726 Mud-Seer's Hood (Common).\n",
+      "[Filtered]",
+      "[2026-08-31T22:12:29.289Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-08-31T22:12:30.610Z] [debug] ui: tap \"\u2192 GREAT TARTARY PLAINS\"\n[2026-08-31T22:12:30.635Z] [world] You walk north. You arrive at Great Tartary Plains.\n[2026-08-31T22:12:30.636Z] [debug] scene: loc=great_tartary_plains hub=- arrival=y opening=n passing=n\n",
+      "[2026-08-31T22:12:30.637Z] [debug] missions: hunt:hunt_servants_doubter stage 1/5 [boss\u2192attack] @great_tartary_plains HERE needs=Servants' Mark of Sanction\u2717MISSING spawn=Tartarian Raider\u00d73\n[2026-08-31T22:12:30.637Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n[2026-08-31T22:12:30.638Z] [debug] mission"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-01-1599-set-the-bone #mti0ay8get84 [inline 9/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mti0ay8get84"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-01-1599-set-the-bone"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "9"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-01-1599-set-the-bone"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-01T02:25:15.707451Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "40": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 379,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-01T02:25:17.648000Z",
+  "fingerprints": [
+    "b6c71e03f6c7cf39b649d83b5cee2dd3"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1947310149,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-01T02:25:17.647000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-01-1599-set-the-bone",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-01-1599-set-the-bone",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-01-1599-set-the-bone",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-01-1599-set-the-bone)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "fd948604133c4fceb8c0145e0f403198",
+  "previousEventID": "f0b3fe4095f143948d4c8aea84167330"
+}

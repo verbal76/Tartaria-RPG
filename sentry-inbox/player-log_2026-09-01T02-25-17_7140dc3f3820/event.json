@@ -1,0 +1,239 @@
+{
+  "id": "7140dc3f382045619fa154f647ce1b3d",
+  "groupID": "7703681244",
+  "eventID": "7140dc3f382045619fa154f647ce1b3d",
+  "projectID": "4511945117532160",
+  "size": 18025,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-01-1599-set-the-bone #mti0ay8get84 [inline 25/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-01-1599-set-the-bone",
+  "message": "player-log 2026-09-01-1599-set-the-bone #mti0ay8get84 [inline 25/28]",
+  "title": "player-log 2026-09-01-1599-set-the-bone #mti0ay8get84 [inline 25/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "ba3f56e20bf640d39b7af552926fafdb",
+      "span_id": "8ff249df116becfe",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "40:53.527Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T01:40:54.536Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 8308ms read 0ms/write 0ms in 715t\u2192out 0t (0ch)\n[2026-09-01T01:40:54.774Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 8308ms \u2014 intro-fill:\u2205\n[2026-09-01T01:40:54.775Z] [debug] homework: scene_intro \"the Silt Thief\" \u2205 8805ms\n",
+      "[2026-09-01T01:40:54.993Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (1465ms)\n[2026-09-01T01:41:02.951Z] [world] You seize the initiative. Mud-Wracked Aetherkin has no time to react.\n[2026-09-01T01:41:02.951Z] [combat] You \u2014 d20 \u2192 13 + DEX 24 = 37 vs Mud-Wracked Aetherkin AC 10 \u2014 \u2713 HIT\n",
+      "[2026-09-01T01:41:02.952Z] [combat] Mud-Wracked Aetherkin shrugs off the piercing. (resisted, \u00d70.5 for 13)\n[2026-09-01T01:41:02.955Z] [arbiter] The Arbiter watches the piercing skid off. \"Swap to the Flame of Aether \u2014 burn will bite where piercing won't.\"\n",
+      "[2026-09-01T01:41:02.959Z] [combat] Clean hit with the searing acid-etched bone crossbow for 13. Mud-Wracked Aetherkin has 86 left and does not back away.\n[2026-09-01T01:41:02.960Z] [combat] Searing Acid-Etched Bone Crossbow \u2014 9 burn bites in and festers (3 turns).\n",
+      "[2026-09-01T01:41:02.960Z] [combat] Searing Acid-Etched Bone Crossbow \u2014 1 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n[2026-09-01T01:41:02.961Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 7 + ATK 4 = 11 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-01T01:41:04.958Z] [debug] ui: tap \"approach\"\n",
+      "[2026-09-01T01:41:04.966Z] [world] An Aetheric arc finds you \u2014 copper taste, blue afterimage, and a bite of damage. (\u22122 HP)\n[2026-09-01T01:41:05.013Z] [player] approach Mud-Wracked Aetherkin\n[2026-09-01T01:41:05.014Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud wracked aetherkin resolved=Mud-Wracked Aetherkin range=mid enemies=1 hooks=2\n",
+      "[2026-09-01T01:41:05.015Z] [debug] move: advance from range=mid enemies=1 weather=Aetheric Storm cost=1 partial=0\n[2026-09-01T01:41:05.015Z] [debug] move: field advance target=Mud-Wracked Aetherkin d 1.50->0.50 band mid->close\n[2026-09-01T01:41:05.015Z] [world] You close the gap with Mud-Wracked Aetherkin. (range: close / arm's reach)\n",
+      "[2026-09-01T01:41:05.015Z] [combat] Mud-Wracked Aetherkin blisters \u2014 clinging fire sears 9. (77/99 HP, 2 turns left)\n[2026-09-01T01:41:05.015Z] [combat] Mud-Wracked Aetherkin smokes \u2014 acid eats 1. (76/99 HP, 2 turns left)\n[2026-09-01T01:41:05.016Z] [combat] Mud-Wracked Aetherkin turns on Soot \u2014 d20 4 + ATK 4 = 8 vs Soot's AC 12 (vest +2) \u2014 \u2717 MISS\n",
+      "[2026-09-01T01:41:05.248Z] [cognitive] SWIM \u00b7 RETREAT \u00b7 REST \u00b7 SEARCH  (231ms)\n[2026-09-01T01:41:07.296Z] [debug] ui: tap \"dodge\"\n[2026-09-01T01:41:07.313Z] [player] dodge\n[2026-09-01T01:41:07.314Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=2\n",
+      "[2026-09-01T01:41:07.316Z] [world] You commit to the dodge. Slip Mud-Wracked Aetherkin's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-01T01:41:07.316Z] [combat] Mud-Wracked Aetherkin blisters \u2014 clinging fire sears 9. (67/99 HP, 1 turn left)\n",
+      "[2026-09-01T01:41:07.316Z] [combat] Mud-Wracked Aetherkin smokes \u2014 acid eats 1. (66/99 HP, 1 turn left)\n[2026-09-01T01:41:07.385Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 1 + ATK 4 = 5 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n[2026-09-01T01:41:07.386Z] [combat] Dodge \u2014 Mud-Wracked Aetherkin overcommits past you. \u2713 Free opening (next strike \u00d72 dice).\n",
+      "[2026-09-01T01:41:07.387Z] [debug] arbiter: template (reason=combat)\n[2026-09-01T01:41:07.387Z] [arbiter] \"Footwork over fury,\" the Arbiter says quietly. \"The mud-wracked aetherkin is patient. Be patienter.\"\n[2026-09-01T01:41:07.387Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T01:41:07.613Z] [cognitive] neutral  (225ms)\n[2026-09-01T01:41:08.428Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n",
+      "[2026-09-01T01:41:08.470Z] [player] attack with the auralite talon\n[2026-09-01T01:41:08.471Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=1 hooks=2\n",
+      "[2026-09-01T01:41:08.472Z] [arbiter] The Arbiter keeps one eye on the fight. \"That is the right move for Silence the Doubter \u2014 but not with something on you. Put this down first.\"\n[2026-09-01T01:41:08.472Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter keeps one eye on the fight. \"That is the right m\u2026\"\n",
+      "[2026-09-01T01:41:08.472Z] [combat] Mud-Wracked Aetherkin blisters \u2014 clinging fire sears 9. (57/99 HP, 0 turns left)\n[2026-09-01T01:41:08.472Z] [combat] Mud-Wracked Aetherkin shakes off the last of the fire \u2014 the Bone Crossbow has run its course.\n[2026-09-01T01:41:08.472Z] [combat] Mud-Wracked Aetherkin smokes \u2014 acid eats 1. (56/99 HP, 0 turns left)\n",
+      "[2026-09-01T01:41:08.472Z] [combat] Mud-Wracked Aetherkin shakes off the last of the acid \u2014 the Bone Crossbow has run its course.\n[2026-09-01T01:41:08.473Z] [debug] attack: target=Mud-Wracked Aetherkin range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n[2026-09-01T01:41:08.475Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-09-01T01:41:08.582Z] [world] You commit forward with the acid-etched corrupted auralite talon. Mud-Wracked Aetherkin watches your hands.\n[2026-09-01T01:41:08.614Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T01:41:09.000Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (385ms)\n",
+      "[2026-09-01T01:41:16.618Z] [world] Mud-Wracked Aetherkin moves first. The pressure is immediate.\n[2026-09-01T01:41:16.620Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 2 + ATK 4 = 6 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-01T01:41:16.620Z] [combat] You \u2014 d20 \u2192 7 + INT 12 perfect opening (2\u00d7 dice) = 19 vs Mud-Wracked Aetherkin AC 10 \u2014 \u2713 HIT\n",
+      "[2026-09-01T01:41:16.620Z] [combat] The Corrupted coating fails to take on Mud-Wracked Aetherkin.\n[2026-09-01T01:41:16.621Z] [combat] Mud-Wracked Aetherkin shrugs off the aetheric. (resisted, \u00d70.5 for 11)\n[2026-09-01T01:41:16.623Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Flame of Aether \u2014 burn will bite where aetheric won't.\"\n",
+      "[2026-09-01T01:41:16.624Z] [combat] Your strike with the acid-etched corrupted auralite talon lands for 11. Mud-Wracked Aetherkin staggers \u2014 45 HP remaining. It answers.\n[2026-09-01T01:41:16.624Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 2 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n",
+      "[2026-09-01T01:41:16.624Z] [arbiter] The Arbiter does not look away from the mud-wracked aetherkin. \"Decide quickly. It already has.\"\n[2026-09-01T01:41:20.224Z] [debug] ui: tap \"inventory\"\n[2026-09-01T01:41:31.149Z] [player] use First Aid Kit\n[2026-09-01T01:41:31.150Z] [debug] parser: intent=use_relic conf=1.00 verb=use target=first aid kit resolved=First Aid Kit range=close enemies=1 hooks=2\n",
+      "[2026-09-01T01:41:31.153Z] [world] You use one First Aid Kit. +23 HP (topped off), +1 stamina.\n[2026-09-01T01:41:31.163Z] [system] \u23f3 Time passed: 15 min\n[2026-09-01T01:41:32.343Z] [cognitive] neutral  (1180ms)\n[2026-09-01T01:41:33.275Z] [debug] persist sizes(KB): total=241 player=51 wm=100[rooms=49 events=3 memos=0 npcs=4 defeated=1 tags=1 discovered=0] log=85 scene=5\n",
+      "[2026-09-01T01:41:35.062Z] [debug] ui: tap \"dodge\"\n[2026-09-01T01:41:35.076Z] [player] dodge\n[2026-09-01T01:41:35.076Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=2\n",
+      "[2026-09-01T01:41:35.077Z] [world] You commit to the dodge. Slip Mud-Wracked Aetherkin's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-01T01:41:35.078Z] [combat] Mud-Wracked Aetherkin smokes \u2014 acid eats 2. (43/99 HP, 2 turns left)\n",
+      "[2026-09-01T01:41:35.136Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 10 + ATK 4 = 14 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n[2026-09-01T01:41:35.136Z] [combat] Dodge \u2014 d20 \u2192 6 + DEX 24 = 30 vs ATK 14. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-01T01:41:35.137Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T01:41:35.361Z] [cognitive] neutral  (223ms)\n",
+      "[2026-09-01T01:41:36.230Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n[2026-09-01T01:41:36.269Z] [player] attack with the auralite talon\n[2026-09-01T01:41:36.269Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=1 hooks=2\n",
+      "[2026-09-01T01:41:36.270Z] [arbiter] The Arbiter keeps one eye on the fight. \"That is the right move for Silence the Doubter \u2014 but not with something on you. Put this down first.\"\n[2026-09-01T01:41:36.270Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter keeps one eye on the fight. \"That is the right m\u2026\"\n",
+      "[2026-09-01T01:41:36.270Z] [combat] Mud-Wracked Aetherkin smokes \u2014 acid eats 2. (41/99 HP, 1 turn left)\n[2026-09-01T01:41:36.271Z] [debug] attack: target=Mud-Wracked Aetherkin range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n[2026-09-01T01:41:36.273Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-09-01T01:41:36.318Z] [world] You raise the acid-etched corrupted auralite talon toward Mud-Wracked Aetherkin. The room narrows around the both of you.\n[2026-09-01T01:41:36.318Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T01:41:36.532Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (213ms)\n",
+      "[2026-09-01T01:41:45.037Z] [world] Mud-Wracked Aetherkin moves first. The pressure is immediate.\n[2026-09-01T01:41:45.039Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 10 + ATK 4 = 14 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-01T01:41:45.039Z] [combat] You \u2014 d20 \u2192 10 + INT 12 perfect opening (2\u00d7 dice) = 22 vs Mud-Wracked Aetherkin AC 9 \u2014 \u2713 HIT\n",
+      "[2026-09-01T01:41:45.040Z] [combat] The Corrupted coating fails to take on Mud-Wracked Aetherkin.\n[2026-09-01T01:41:45.040Z] [combat] Aetheric flares \u2014 +3 on hit.\n[2026-09-01T01:41:45.040Z] [combat] Mud-Wracked Aetherkin shrugs off the aetheric. (resisted, \u00d70.5 for 14)\n[2026-09-01T01:41:45.093Z] [reward] \u2726 The work hones you. +1 STR (base 8, 13 as you stand).\n",
+      "[2026-09-01T01:41:45.094Z] [combat] The blow with the acid-etched corrupted auralite talon finds purchase \u2014 14 damage, 27 HP standing. Mud-Wracked Aetherkin commits to the counter.\n[2026-09-01T01:41:45.094Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 4 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 2 total).\n",
+      "[2026-09-01T01:41:45.094Z] [combat] Mud-Wracked Aetherkin is left exposed \u2014 easier to hit.\n[2026-09-01T01:41:49.544Z] [debug] ui: tap \"\ud83d\udd25\u2697 bone crossbow\"\n[2026-09-01T01:41:49.599Z] [player] attack with the off-hand bone crossbow\n[2026-09-01T01:41:49.599Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=1 hooks=2\n",
+      "[2026-09-01T01:41:49.601Z] [arbiter] The Arbiter keeps one eye on the fight. \"That is the right move for Silence the Doubter \u2014 but not with something on you. Put this down first.\"\n[2026-09-01T01:41:49.601Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter keeps one eye on the fight. \"That is the right m\u2026\"\n",
+      "[2026-09-01T01:41:49.601Z] [combat] Mud-Wracked Aetherkin smokes \u2014 acid eats 4. (23/99 HP, 2 turns left)\n[2026-09-01T01:41:49.602Z] [debug] attack: target=Mud-Wracked Aetherkin range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n",
+      "[2026-09-01T01:41:49.651Z] [world] You raise the searing acid-etched bone crossbow toward Mud-Wracked Aetherkin. The room narrows around the both of you.\n[2026-09-01T01:41:49.651Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T01:41:49.860Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (208ms)\n",
+      "[2026-09-01T01:41:59.752Z] [world] You seize the initiative. Mud-Wracked Aetherkin has no time to react.\n[2026-09-01T01:41:59.753Z] [combat] You \u2014 d20 \u2192 10 + DEX 24 + 2 (point blank) = 36 vs Mud-Wracked Aetherkin AC 7 \u2014 \u2713 HIT\n[2026-09-01T01:41:59.754Z] [combat] Piercing flares \u2014 +4 on hit.\n[2026-09-01T01:41:59.754Z] [combat] Mud-Wracked Aetherkin shrugs off the piercing. (resisted, \u00d70.5 for 18)\n",
+      "[2026-09-01T01:41:59.757Z] [combat] Clean hit with the searing acid-etched bone crossbow for 18. Mud-Wracked Aetherkin has 5 left and does not back away.\n[2026-09-01T01:41:59.757Z] [combat] Searing Acid-Etched Bone Crossbow \u2014 7 burn bites in and festers (3 turns).\n",
+      "[2026-09-01T01:41:59.758Z] [combat] Searing Acid-Etched Bone Crossbow \u2014 2 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 3 total).\n[2026-09-01T01:41:59.759Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 9 + ATK 4 = 13 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-01T01:42:02.882Z] [debug] ui: tap \"\ud83d\udd25\u2697 bone crossbow\"\n",
+      "[2026-09-01T01:42:02.938Z] [player] attack with the off-hand bone crossbow\n[2026-09-01T01:42:02.938Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=1 hooks=2\n",
+      "[2026-09-01T01:42:02.939Z] [arbiter] The Arbiter keeps one eye on the fight. \"That is the right move for Silence the Doubter \u2014 but not with something on you. Put this down first.\"\n[2026-09-01T01:42:02.940Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter keeps one eye on the fight. \"That is the right m\u2026\"\n",
+      "[2026-09-01T01:42:02.940Z] [combat] Mud-Wracked Aetherkin blisters \u2014 clinging fire sears 7. (0/99 HP, 2 turns left)\n[2026-09-01T01:42:02.940Z] [combat] Mud-Wracked Aetherkin smokes \u2014 acid eats 2. (0/99 HP, 2 turns left)\n[2026-09-01T01:42:02.942Z] [reward] Mud-Wracked Aetherkin defeated. You recover Aether Mud \u00d73.\n",
+      "[2026-09-01T01:42:02.943Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-09-01T01:42:02.944Z] [system] Word travels among those who keep the flood-dead sacred: you put one of the Aetherkin down.\n[2026-09-01T01:42:02.944Z] [reward] +22 TC pried from the dust.\n[2026-09-01T01:42:10.906Z] [debug] homework: intro-fill armed after 7364ms idle (strike 2/3)\n",
+      "[2026-09-01T01:42:11.381Z] [debug] ui: tap \"missions\"\n[2026-09-01T01:42:17.652Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 6589ms read/write unusable (native mis-reported 90266ms/1107ms \u2014 llama.rn split bug, not this call) in 756t\u2192out 33t HIT-CAP (139ch)\n[2026-09-01T01:42:17.660Z] [debug] homework: scene_intro \"The Architect's Blind\" \u2713 6756ms\n",
+      "[2026-09-01T01:42:21.655Z] [debug] kbbar: mounted bottom=359.79486083984375 raw=360 from=cached winH=986 beat=-\n[2026-09-01T01:42:22.145Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=360 from=live winH=986 beat=-\n[2026-09-01T01:42:35.491Z] [debug] persist sizes(KB): total=238 player=51 wm=101[rooms=49 events=3 memos=0 npcs=4 defeated=1 tags=1 discovered=0] log=82 scene=4\n",
+      "[2026-09-01T01:42:48.486Z] [player] just routed back, had a fight and still didn't progress\n[2026-09-01T01:42:48.486Z] [debug] parser: inten"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-01-1599-set-the-bone #mti0ay8get84 [inline 25/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mti0ay8get84"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-01-1599-set-the-bone"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "25"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-01-1599-set-the-bone"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-01T02:25:15.791455Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-01T02:25:17.652000Z",
+  "fingerprints": [
+    "b6c71e03f6c7cf39b649d83b5cee2dd3"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1947310149,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-01T02:25:17.647000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-01-1599-set-the-bone",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-01-1599-set-the-bone",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-01-1599-set-the-bone",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-01-1599-set-the-bone)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "753a6179bcce462cb67f075327a85fbc",
+  "previousEventID": "66d1cf5b4eee49b6b5c4303a22601c26"
+}

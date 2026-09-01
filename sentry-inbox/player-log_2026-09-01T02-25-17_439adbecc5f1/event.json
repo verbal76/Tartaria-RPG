@@ -1,0 +1,282 @@
+{
+  "id": "439adbecc5f142a78ae754e2c9edc7d5",
+  "groupID": "7703681244",
+  "eventID": "439adbecc5f142a78ae754e2c9edc7d5",
+  "projectID": "4511945117532160",
+  "size": 17514,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-01-1599-set-the-bone #mti0ay8get84 [inline 2/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-01-1599-set-the-bone",
+  "message": "player-log 2026-09-01-1599-set-the-bone #mti0ay8get84 [inline 2/28]",
+  "title": "player-log 2026-09-01-1599-set-the-bone #mti0ay8get84 [inline 2/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "ba3f56e20bf640d39b7af552926fafdb",
+      "span_id": "8ff249df116becfe",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "ar,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-08-31T21:47:45.391Z] [world] You raise the searing bone crossbow toward Conspiracy Architects Raider 3. The room narrows around the both of you.\n[2026-08-31T21:47:45.391Z] [system] \u23f3 Time passed: 6 min\n[2026-08-31T21:47:45.693Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (301ms)\n",
+      "[2026-08-31T21:47:54.427Z] [world] Conspiracy Architects Raider 3 moves first. The pressure is immediate.\n[2026-08-31T21:47:54.429Z] [combat] Conspiracy Architects Raider 3 \u2014 d20 \u2192 8 + ATK 7 = 15 vs your AC 22 \u2014 \u2717 MISS\n[2026-08-31T21:47:54.431Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 19 + ATK 7 = 26 vs your AC 22 \u2014 \u2713 HIT\n",
+      "[2026-08-31T21:47:54.436Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 18 + ATK 7 = 25 vs your AC 22 \u2014 \u2713 HIT\n[2026-08-31T21:47:54.437Z] [combat] You \u2014 d20 \u2192 9 + DEX 24 = 33 vs Conspiracy Architects Raider 3 AC 11 \u2014 \u2713 HIT\n[2026-08-31T21:47:54.438Z] [combat] Piercing flares \u2014 +4 on hit.\n",
+      "[2026-08-31T21:47:54.439Z] [combat] Final strike with the searing bone crossbow for 15. Conspiracy Architects Raider 3 is still. The Aetherstone hums on, indifferent.\n[2026-08-31T21:47:54.440Z] [reward] Conspiracy Architects Raider 3 defeated. You recover Scrap Metal \u00d73.\n[2026-08-31T21:47:54.441Z] [reward] You strip the body: Cudgel, Reclaimer's Salvage Vest (+6 TC). The kit took the fight badly.\n",
+      "[2026-08-31T21:47:54.441Z] [combat] 2 attackers remain. Conspiracy Architects Raider 4 now in your sights.\n[2026-08-31T21:47:54.442Z] [system] Reclaimers Guild standing +1 (now 75)\n[2026-08-31T21:47:54.442Z] [reward] +10 TC pried from the dust.\n",
+      "[2026-08-31T21:47:54.486Z] [arbiter] The Arbiter watches the Conspiracy Architects Raider 4. \"It is not the first thing here that decided to keep its distance, then changed its mind.\"\n[2026-08-31T21:47:54.730Z] [combat] Conspiracy Architects Raider 4 deals 3 bludgeoning damage [edge of reach \u2014 halved]. You have 24 HP remaining.\n",
+      "[2026-08-31T21:47:54.730Z] [combat] Conspiracy Architects Raider 5 deals 3 bludgeoning damage [edge of reach \u2014 halved]. You have 21 HP remaining.\n[2026-08-31T21:47:57.947Z] [debug] voice\u23f1 gap 3461ms (wait 0ms + synth 2997ms, live) \"It is not thuh first thing here that dec\u2026\"\n[2026-08-31T21:48:01.161Z] [debug] ui: tap \"\ud83d\udd25 bone crossbow\"\n",
+      "[2026-08-31T21:48:01.220Z] [player] attack with the off-hand bone crossbow\n[2026-08-31T21:48:01.221Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=distant enemies=3 hooks=2\n",
+      "[2026-08-31T21:48:01.222Z] [debug] attack: target=Conspiracy Architects Raider 4 range=distant reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-08-31T21:48:01.281Z] [world] You raise the searing bone crossbow toward Conspiracy Architects Raider 4. The room narrows around the both of you.\n[2026-08-31T21:48:01.283Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-31T21:48:01.490Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (206ms)\n[2026-08-31T21:48:21.709Z] [world] You seize the initiative. Conspiracy Architects Raider 4 has no time to react.\n[2026-08-31T21:48:21.709Z] [combat] You \u2014 d20 \u2192 14 + DEX 24 = 38 vs Conspiracy Architects Raider 4 AC 11 \u2014 \u2713 HIT\n[2026-08-31T21:48:21.710Z] [combat] Piercing flares \u2014 +1 on hit.\n",
+      "[2026-08-31T21:48:21.711Z] [combat] You crack the Conspiracy Architects Raider 4 with the Searing Bone Crossbow for 8 \u2014 the better part of their fight, gone in one blow. They crumple, out cold. (3/11 HP) Loot them before they come to.\n[2026-08-31T21:48:21.712Z] [combat] Conspiracy Architects Raider 4 is out of it. Conspiracy Architects Raider 5 now in your sights.\n",
+      "[2026-08-31T21:48:21.712Z] [combat] Searing Bone Crossbow \u2014 2 burn bites in and festers (3 turns).\n[2026-08-31T21:48:21.714Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 1 + ATK 7 = 8 vs your AC 22 \u2014 \u2717 FUMBLE\n[2026-08-31T21:48:36.584Z] [debug] ui: tap \"\ud83d\udd25 bone crossbow \u2605\"\n[2026-08-31T21:48:36.646Z] [player] attack with the off-hand bone crossbow\n",
+      "[2026-08-31T21:48:36.646Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=distant enemies=3 hooks=2\n[2026-08-31T21:48:36.647Z] [combat] Conspiracy Architects Raider 4 blisters \u2014 clinging fire sears 2. (1/11 HP, 2 turns left)\n",
+      "[2026-08-31T21:48:36.648Z] [debug] attack: target=Conspiracy Architects Raider 5 range=distant reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-08-31T21:48:36.704Z] [world] Your searing bone crossbow comes around in an arc; Conspiracy Architects Raider 5 squares up to meet it.\n[2026-08-31T21:48:36.705Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-31T21:48:36.919Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (213ms)\n[2026-08-31T21:48:43.411Z] [world] You seize the initiative. Conspiracy Architects Raider 5 has no time to react.\n[2026-08-31T21:48:43.412Z] [combat] You \u2014 d20 \u2192 5 + DEX 24 = 29 vs Conspiracy Architects Raider 5 AC 11 \u2014 \u2713 HIT\n[2026-08-31T21:48:43.413Z] [combat] Piercing flares \u2014 +3 on hit (weak \u2014 bites deep!).\n",
+      "[2026-08-31T21:48:43.414Z] [combat] Weakness exposed \u2014 Conspiracy Architects Raider 5 flinches. (piercing \u00d72.25 for 21)\n[2026-08-31T21:48:43.415Z] [combat] Conspiracy Architects Raider 5 folds under the searing bone crossbow. 21 damage was enough. The room exhales.\n[2026-08-31T21:48:43.416Z] [reward] Conspiracy Architects Raider 5 defeated. You recover Bone Bolt \u00d72, Patched Cloth.\n",
+      "[2026-08-31T21:48:43.417Z] [reward] You strip the body: Bone Crossbow, Reclaimer's Salvage Vest (+8 TC). The kit took the fight badly.\n[2026-08-31T21:48:43.417Z] [combat] Nobody left standing \u2014 the fight is yours. You strip the sleepers where they lie.\n",
+      "[2026-08-31T21:48:43.418Z] [reward] You strip the unconscious Conspiracy Architects Raider 4 \u2014 Bone Crossbow, Reclaimer's Salvage Vest, Bone Bolt, Patched Cloth, +22 TC. The gear's seen better days (worn from the fight).\n",
+      "[2026-08-31T21:48:43.427Z] [reward] You strip the unconscious Conspiracy Architects Raider 1 \u2014 Bone Knife, Mud-Warden's Vest, Patched Cloth, Aether Residue, +26 TC. The gear's seen better days (worn from the fight).\n[2026-08-31T21:48:43.427Z] [system] Reclaimers Guild standing +1 (now 76)\n[2026-08-31T21:48:43.428Z] [reward] +20 TC pried from the dust.\n",
+      "[2026-08-31T21:48:43.469Z] [system] \u23f3 Time passed: 12 min\n[2026-08-31T21:48:44.072Z] [debug] persist sizes(KB): total=167 player=53 wm=70[rooms=32 events=3 memos=0 npcs=2 defeated=1 tags=1 discovered=0] log=41 scene=3\n[2026-08-31T21:48:44.860Z] [debug] homework: intro-fill armed after 6000ms idle (strike 2/3)\n[2026-08-31T21:48:48.072Z] [debug] ui: tap \"\u2192 GREAT TARTARY PLAINS\"\n",
+      "[2026-08-31T21:48:48.087Z] [debug] spawn: gear=[Bone Maul, Wanderer's Outercoat] window=10 roster=new\n[2026-08-31T21:48:48.088Z] [world] You walk east through open silt. The compass points east into open ground.\n[2026-08-31T21:48:48.090Z] [world] What you started here has not finished itself in your absence.\n[2026-08-31T21:48:49.603Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-31T21:48:50.687Z] [world] You claim the Bone Maul.\n[2026-08-31T21:48:50.687Z] [reward] \u2726 Bone Maul (Common).\n[2026-08-31T21:48:50.704Z] [world] The Wanderer's Outercoat comes up out of the silt with a small sucking protest.\n[2026-08-31T21:48:50.704Z] [reward] \u2726 Wanderer's Outercoat (Common).\n",
+      "[2026-08-31T21:48:51.560Z] [world] You strip the anvil post carefully. Something usable comes free in your hand.\n[2026-08-31T21:48:51.560Z] [world] You strip the cart carefully. Something usable comes free in your hand.\n[2026-08-31T21:48:51.561Z] [world] You strip the crate carefully. Something usable comes free in your hand.\n",
+      "[2026-08-31T21:48:51.561Z] [world] You work the shattered tartarian relay over. A part of it comes loose, intact.\n[2026-08-31T21:48:51.561Z] [reward] \u2726 Salvage haul:\n[2026-08-31T21:48:51.561Z] [reward]     \u2022 Bent Nail x3 (Common)\n[2026-08-31T21:48:51.561Z] [reward]     \u2022 Scrap Metal x2 (Common)\n[2026-08-31T21:48:51.562Z] [reward]     \u2022 Aether Crystal x3 (Common)\n",
+      "[2026-08-31T21:48:53.054Z] [debug] ui: tap \"\u2192 GREAT TARTARY PLAINS\"\n[2026-08-31T21:48:53.074Z] [debug] spawn: gear=[Echoing Steps Boots] window=10 roster=new\n[2026-08-31T21:48:53.079Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Zann of No Fixed Stall, fence. Tap the vendor banner to trade.\n",
+      "[2026-08-31T21:48:53.090Z] [world] Rare workings for sale: Aetherforged Mantle (200 TC), Aetherforged Treads (200 TC), Aetheric Analyzer Helm (200 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n[2026-08-31T21:48:53.091Z] [world] You walk east through open silt. The compass points east into open ground.\n",
+      "[2026-08-31T21:48:53.092Z] [world] The loose end is exactly as loose as you left it.\n[2026-08-31T21:48:54.188Z] [debug] ui: tap \"take / salvage\"\n[2026-08-31T21:48:54.658Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 9640ms read/write unusable (native mis-reported 509650ms/1066ms \u2014 llama.rn split bug, not this call) in 761t\u2192out 23t (87ch)\n",
+      "[2026-08-31T21:48:54.816Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 9640ms \u2014 intro-fill:\u2205\n[2026-08-31T21:48:54.817Z] [debug] homework: scene_intro \"Reclaimer's Stake\" \u2205 9959ms\n[2026-08-31T21:48:55.579Z] [world] The Echoing Steps Boots was half under something. It is not now.\n[2026-08-31T21:48:55.580Z] [reward] \u2726 Echoing Steps Boots (Common).\n",
+      "[2026-08-31T21:48:56.484Z] [world] You strip the banner carefully. Something usable comes free in your hand.\n[2026-08-31T21:48:56.485Z] [world] You salvage the barrel. The take is small but real.\n[2026-08-31T21:48:56.485Z] [world] You strip the firepit carefully. Something usable comes free in your hand.\n",
+      "[Filtered]",
+      "[2026-08-31T21:48:56.486Z] [world] You work the signpost apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n[2026-08-31T21:48:56.486Z] [reward] \u2726 Salvage haul:\n[2026-08-31T21:48:56.487Z] [reward]     \u2022 Aetheric Shard (Uncommon)\n[2026-08-31T21:48:56.487Z] [reward]     \u2022 Worn Tartarian Coin x8 (Common)\n",
+      "[2026-08-31T21:48:56.487Z] [reward]     \u2022 Mud Fragment x2 (Common)\n[2026-08-31T21:48:56.487Z] [reward]     \u2022 Moth-Eaten Felt Scrap (Common)\n[2026-08-31T21:48:56.488Z] [reward]     \u2022 Smooth Stone x2 (Common)\n[2026-08-31T21:48:56.488Z] [reward]     \u2022 Oil-Stained Sash (Common)\n[2026-08-31T21:49:01.309Z] [player] Ask why the stall is here\n",
+      "[2026-08-31T21:49:01.312Z] [world] \"Stall goes up where the ground is flat and comes down when it is not worth it,\" the trader says. \"That is the whole business plan.\"\n[2026-08-31T21:49:01.315Z] [world] Zann of No Fixed Stall keeps facing the way they were going, and talks to you sideways.\n[2026-08-31T21:49:02.789Z] [world] You let the conversation go and Zann of No Fixed Stall gets back to it.\n",
+      "[2026-08-31T21:49:02.967Z] [debug] qwen\u23f1 flourish ok 2972ms read 2108ms/write 740ms in 176t\u2192out 10t 12.0ms/t (34ch)\n[2026-08-31T21:49:03.106Z] [debug] qwen\u23f1 \u2702 DISCARDED flourish after 2972ms \u2014 flourish:stale-walked-away\n[2026-08-31T21:49:03.108Z] [debug] flourish: stale 3282ms\n",
+      "[2026-08-31T21:49:12.193Z] [reward] Sold Short Hunting Bow (Common) to Zann of No Fixed Stall for 15 TC. (1634 TC on hand)\n[2026-08-31T21:49:12.242Z] [reward] \u2726 You named your price and held it. +1 CHA (base 5, 4 as you stand).\n[2026-08-31T21:49:12.292Z] [reward] Sold Mud Sling (Common) to Zann of No Fixed Stall for 14 TC. (1648 TC on hand)\n",
+      "[2026-08-31T21:49:12.336Z] [reward] Sold Aetherium Spear (Common) to Zann of No Fixed Stall for 14 TC. (1662 TC on hand)\n[2026-08-31T21:49:12.379Z] [reward] Sold Iron Spear (Common) to Zann of No Fixed Stall for 14 TC. (1676 TC on hand)\n[2026-08-31T21:49:12.423Z] [reward] Sold Bone Sling (Common) to Zann of No Fixed Stall for 14 TC. (1690 TC on hand)\n",
+      "[2026-08-31T21:49:12.466Z] [reward] Sold Repeater Rifle (Common) to Zann of No Fixed Stall for 14 TC. (1704 TC on hand)\n[2026-08-31T21:49:12.508Z] [reward] Sold Mud Heater Sword (Common) to Zann of No Fixed Stall for 14 TC. (1718 TC on hand)\n[2026-08-31T21:49:12.551Z] [reward] Sold Bone Maul (Common) to Zann of No Fixed Stall for 14 TC. (1732 TC on hand)\n",
+      "[2026-08-31T21:49:12.594Z] [reward] Sold Aetheric Bolt Gun (Common) to Zann of No Fixed Stall for 13 TC. (1745 TC on hand)\n[2026-08-31T21:49:12.636Z] [reward] Sold Repeater Crossbow (Common) to Zann of No Fixed Stall for 13 TC. (1758 TC on hand)\n[2026-08-31T21:49:12.680Z] [reward] Sold Echoing Steps Boots (Common) to Zann of No Fixed Stall for 13 TC. (1771 TC on hand)\n",
+      "[2026-08-31T21:49:12.723Z] [reward] Sold Sentinel's Chestplate (Common) to Zann of No Fixed Stall for 10 TC. (1781 TC on hand)\n[2026-08-31T21:49:12.766Z] [reward] Sold Stone-Stride Greaves (Common) to Zann of No Fixed Stall for 8 TC. (1789 TC on hand)\n[2026-08-31T21:49:12.809Z] [reward] Sold Arcane Guardian's Chestpiece (Common) to Zann of No Fixed Stall for 8 TC. (1797 TC on hand)\n",
+      "[2026-08-31T21:49:12.851Z] [reward] Sold Golem-Born Guardian Mask (Common) to Zann of No Fixed Stall for 8 TC. (1805 TC on hand)\n[2026-08-31T21:49:12.894Z] [reward] Sold Wanderer's Footwraps (Common) to Zann of No Fixed Stall for 6 TC. (1811 TC on hand)\n[2026-08-31T21:49:12.936Z] [reward] Sold Architect's Field Jacket (Common) to Zann of No Fixed Stall for 6 TC. (1817 TC on hand)\n",
+      "[Filtered]",
+      "[2026-08-31T21:49:13.103Z] [reward] Sold Bone Knife (Common) to Zann of No Fixed Stall for 6 TC. (1841 TC on hand)\n[2026-08-31T21:49:13.145Z] [reward] Sold Bone Knife (Common) to Zann of No Fixed Stall for 6 TC. (1847 TC on hand)\n[2026-08-31T21:49:13.187Z] [reward] Sold Architect's Aether Gloves (Common) to Zann of No Fixed Stall for 6 TC. (1853 TC on hand)\n",
+      "[2026-08-31T21:49:13.228Z] [reward] Sold Salvager's Worn Gloves (Common) to Zann of No Fixed Stall for 6 TC. (1859 TC on hand)\n[2026-08-31T21:49:13.269Z] [reward] Sold Bone Knife (Common) to Zann of No Fixed Stall for 6 TC. (1865 TC on hand)\n[2026-08-31T21:49:13.310Z] [reward] Sold Bone Knife (Common) to Zann of No Fixed Stall for 6 TC. (1871 TC on hand)\n",
+      "[2026-08-31T21:49:13.350Z] [reward] Sold Wanderer's Outercoat (Common) to Zann of No Fixed Stall for 6 TC. (1877 TC on hand)\n[2026-08-31T21:49:13.391Z] [reward] Sold Mud-Bound Cloak (Common) to Zann of No Fixed Stall for 5 TC. (1882 TC on hand)\n[2026-08-31T21:49:13.431Z] [reward] Sold Mud-Warden's Vest (Common) to Zann of No Fixed Stall for 5 TC. (1887 TC on hand)\n[2026-08-3"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-01-1599-set-the-bone #mti0ay8get84 [inline 2/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mti0ay8get84"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-01-1599-set-the-bone"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "2"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-01-1599-set-the-bone"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-01T02:25:15.665794Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "29": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 265,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        },
+        "40": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 380,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-01T02:25:17.647000Z",
+  "fingerprints": [
+    "b6c71e03f6c7cf39b649d83b5cee2dd3"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1947310149,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-01T02:25:17.647000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-01-1599-set-the-bone",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-01-1599-set-the-bone",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-01-1599-set-the-bone",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-01-1599-set-the-bone)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "49498ccf883945208eb589172af830d5",
+  "previousEventID": "43299ee2bfee4ad0a9f8606204a0578f"
+}

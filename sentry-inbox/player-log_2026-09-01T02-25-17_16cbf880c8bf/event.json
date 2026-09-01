@@ -1,0 +1,237 @@
+{
+  "id": "16cbf880c8bf42a4ad839ce72bd43994",
+  "groupID": "7703681244",
+  "eventID": "16cbf880c8bf42a4ad839ce72bd43994",
+  "projectID": "4511945117532160",
+  "size": 18014,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-01-1599-set-the-bone #mti0ay8get84 [inline 7/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-01-1599-set-the-bone",
+  "message": "player-log 2026-09-01-1599-set-the-bone #mti0ay8get84 [inline 7/28]",
+  "title": "player-log 2026-09-01-1599-set-the-bone #mti0ay8get84 [inline 7/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "ba3f56e20bf640d39b7af552926fafdb",
+      "span_id": "8ff249df116becfe",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      ":52.658Z] [world] Tucked inside the rusted hatch: an oddment that matches no quartermaster's list. The kind of thing that fuses well.\n[2026-08-31T22:09:52.658Z] [world] You strip the signal relay carefully. Something usable comes free in your hand.\n[2026-08-31T22:09:52.658Z] [world] The spatial crack yields little of value, though a Cloth Scrap ends up in your pack.\n",
+      "[2026-08-31T22:09:52.658Z] [world] You break the tilting engine chamber scaffolding apart. Among the pieces, something worth keeping.\n[2026-08-31T22:09:52.659Z] [reward] \u2726 Salvage haul:\n[2026-08-31T22:09:52.659Z] [reward]     \u2022 Scrap Metal x5 (Common)\n[2026-08-31T22:09:52.659Z] [reward]     \u2022 Aetheric Shard (Uncommon)\n[2026-08-31T22:09:52.662Z] [reward]     \u2022 Aether Dust (Common)\n",
+      "[2026-08-31T22:09:52.662Z] [reward]     \u2022 Worn Tartarian Coin x2 (Common)\n[2026-08-31T22:09:52.662Z] [reward]     \u2022 Aether Crystal x2 (Common)\n[2026-08-31T22:09:52.662Z] [reward]     \u2022 River-Worn Pebble Set (Common)\n[2026-08-31T22:09:52.662Z] [reward]     \u2022 Automaton Circuit x2 (Common)\n[2026-08-31T22:09:52.663Z] [reward]     \u2022 Cloth Scrap (Common)\n",
+      "[2026-08-31T22:09:54.354Z] [debug] ui: tap \"investigate\"\n[2026-08-31T22:09:55.969Z] [player] investigate the ground\n[2026-08-31T22:09:55.972Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=0\n[2026-08-31T22:09:55.984Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Red Cap Mushroom (Common).\n",
+      "[2026-08-31T22:09:55.994Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-31T22:09:55.995Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T22:09:55.996Z] [system] \u23f3 Time passed: 24 min\n[2026-08-31T22:09:56.402Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 6889ms read 0ms/write 0ms in 737t\u2192out 0t (0ch)\n",
+      "[2026-08-31T22:09:56.525Z] [debug] persist sizes(KB): total=219 player=44 wm=90[rooms=50 events=3 memos=0 npcs=3 defeated=1 tags=1 discovered=0] log=80 scene=4\n[2026-08-31T22:09:56.641Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 6889ms \u2014 intro-fill:\u2205\n[2026-08-31T22:09:56.641Z] [debug] homework: scene_intro \"Obsidian Pillars\" \u2205 7598ms\n",
+      "[2026-08-31T22:09:57.686Z] [debug] ui: tap \"rest\"\n[2026-08-31T22:09:57.696Z] [player] rest\n[2026-08-31T22:09:57.697Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0\n[2026-08-31T22:09:57.698Z] [world] Soot tests three spots and settles on the one nearest your boot.\n",
+      "[2026-08-31T22:09:57.699Z] [world] You rest for 8 hours. +1 HP, +8 stamina, \u22124 corruption recovered. (Day 37, morning)\n[2026-08-31T22:09:57.702Z] [arbiter] The Arbiter goes still. \"It watched you sleep from the treeline and made up its mind about you.\"\n[2026-08-31T22:09:57.702Z] [world] A Page Tearer is already inside the reach of your fire. The rest is over.\n",
+      "[2026-08-31T22:09:57.703Z] [debug] enemy: Page Tearer hp=29 ac=9 atk=Book Clout dmg=1D6 rarity=Uncommon ap=4\n[2026-08-31T22:09:57.711Z] [debug] arbiter: template (reason=combat)\n[2026-08-31T22:09:57.712Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T22:09:57.712Z] [system] \u23f3 Time passed: 8h\n",
+      "[2026-08-31T22:10:05.753Z] [debug] qwen\u23f1 ambient ok 9574ms wait 337ms read/write unusable (native mis-reported 9789ms/1098ms \u2014 llama.rn split bug, not this call) in 365t\u2192out 31t HIT-CAP (149ch)\n[2026-08-31T22:10:06.128Z] [debug] ui: tap \"flee\"\n[2026-08-31T22:10:06.130Z] [player] flee\n",
+      "[2026-08-31T22:10:06.130Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=far enemies=1 hooks=0\n[2026-08-31T22:10:06.171Z] [system] \u23f3 Time passed: 15 min\n[2026-08-31T22:10:06.177Z] [debug] ui: tap \"flee\"\n",
+      "[2026-08-31T22:10:06.357Z] [debug] \u26a0 FREEZE WATCH: LOGIC stalled while frames kept coming (js 2185ms \u00b7 frames 228ms). Something blocked the JS thread \u2014 look for a long synchronous run.\n[2026-08-31T22:10:06.531Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient after 9574ms \u2014 ambient:stale:combat-started\n[2026-08-31T22:10:06.532Z] [debug] arbiter: ambient stale:combat-started 10537ms\n",
+      "[2026-08-31T22:10:06.532Z] [debug] arbiter: ambient-empty reason=unknown raw=\"Your journey has taken you through the Obsidian Pillars, where the air is thick with the scent of obsidian and the light\"\n[2026-08-31T22:10:08.563Z] [debug] skillcheck: escape d20=14 DEX 23 = 37 vs Pursuit 9 \u2014 Page Tearer (d20 5 + SPD 4) \u2192 PASS\n",
+      "[2026-08-31T22:10:08.640Z] [debug] stats: STR10 DEX23 INT10 WIS10 CHA4 STE5 | gear: WIS+4,INT+2,DEX+15,STR+5,STE+2 | worn: main=Auralite Talon off=Bone Crossbow head=Architect's Sight Enhancer chest=Forgotten Protector's Plate hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n",
+      "[2026-08-31T22:10:08.640Z] [debug] train: dexterity (escape check) \u2192 progress 36/100\n[2026-08-31T22:10:08.640Z] [world] You take the gap while there is a gap to take.\n[2026-08-31T22:10:10.190Z] [debug] ui: tap \"climb\"\n[2026-08-31T22:10:11.374Z] [debug] freeze watch: recovered \u2014 painting again after 812ms quiet.\n[2026-08-31T22:10:11.942Z] [player] climb pillar\n",
+      "[2026-08-31T22:10:11.943Z] [debug] parser: intent=climb conf=1.00 verb=climb target=pillar resolved=pillar range=- enemies=0 hooks=0\n[2026-08-31T22:10:11.992Z] [world] You loop your Reclaimer's Rope around the pillar and walk the line. Tier 1/3 cleared.\n[2026-08-31T22:10:11.993Z] [world] You reach the first hold of the pillar (tier 1/3). Higher still to go.\n",
+      "[2026-08-31T22:10:11.993Z] [world] Soot eyes the pillar, then settles at its base. She is not built for the climb.\n[2026-08-31T22:10:11.993Z] [world] Plinth sets its stone feet at the base of pillar and will climb no further \u2014 the construct holds the ground while you go up alone.\n[2026-08-31T22:10:11.994Z] [system] \u23f3 Time passed: 30 min\n",
+      "[2026-08-31T22:10:12.142Z] [cognitive] CLIMB \u00b7 SEARCH  (147ms)\n[2026-08-31T22:10:12.890Z] [debug] ui: tap \"climb up (1/3)\"\n[2026-08-31T22:10:12.901Z] [player] climb pillar\n[2026-08-31T22:10:12.902Z] [debug] parser: intent=climb conf=1.00 verb=climb target=pillar resolved=pillar range=- enemies=0 hooks=0\n",
+      "[2026-08-31T22:10:12.941Z] [world] You loop your Reclaimer's Rope around the pillar and walk the line. Tier 2/3 cleared.\n[2026-08-31T22:10:12.978Z] [reward] \u2726 The haul wears in. +1 STR (base 7, 11 as you stand).\n[2026-08-31T22:10:12.978Z] [world] You reach the last stretch of the pillar (tier 2/3). Higher still to go.\n",
+      "[2026-08-31T22:10:12.978Z] [world] A line of wind-torn prayer flags snaps just over your head, knotted to a rusted cleat.\n[2026-08-31T22:10:12.979Z] [system] \u23f3 Time passed: 30 min\n[2026-08-31T22:10:13.115Z] [cognitive] CLIMB \u00b7 SEARCH  (135ms)\n[2026-08-31T22:10:13.741Z] [debug] ui: tap \"climb up (2/3)\"\n[2026-08-31T22:10:13.771Z] [player] climb pillar\n",
+      "[2026-08-31T22:10:13.772Z] [debug] parser: intent=climb conf=1.00 verb=climb target=pillar resolved=pillar range=- enemies=0 hooks=0\n[2026-08-31T22:10:13.818Z] [world] You loop your Reclaimer's Rope around the pillar and walk the line. Tier 3/3 cleared.\n[2026-08-31T22:10:13.819Z] [world] You reach the top of the pillar (tier 3/3). The view changes; the room reads differently from here.\n",
+      "[2026-08-31T22:10:13.822Z] [world] A scout in faded leathers turns from the horizon as you crest. \"Took you long enough. I saw something on the wind worth telling. Hear me out, and it costs you nothing \u2014 not yet.\"\n[2026-08-31T22:10:13.823Z] [system] \u23f3 Time passed: 30 min\n[2026-08-31T22:10:13.961Z] [cognitive] CLIMB \u00b7 SEARCH  (137ms)\n[2026-08-31T22:10:15.258Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-08-31T22:10:16.699Z] [player] investigate spyglass\n[2026-08-31T22:10:16.700Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=spyglass resolved=spyglass range=- enemies=0 hooks=1\n[2026-08-31T22:10:16.700Z] [world] You look the spyglass over. Nothing about it sings, nothing about it warns \u2014 Tartaria is full of things waiting to be remembered.\n",
+      "[2026-08-31T22:10:16.828Z] [cognitive] neutral  (125ms)\n[2026-08-31T22:10:17.959Z] [player] investigate folded map\n[2026-08-31T22:10:17.960Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=folded map resolved=folded map range=- enemies=0 hooks=1\n",
+      "[2026-08-31T22:10:17.961Z] [world] The chalkboard has a child's name carved over and over: ANNA. The chalk dust on the floor is fresh. There is no chalk in the room.\n[2026-08-31T22:10:17.963Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-31T22:10:17.963Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-08-31T22:10:18.959Z] [debug] qwen\u23f1 investigate_lore ok 2137ms read 1249ms/write 859ms in 127t\u2192out 28t 9.8ms/t (120ch)\n[2026-08-31T22:10:19.199Z] [cognitive] neutral  (1235ms)\n[2026-08-31T22:10:19.318Z] [player] investigate scout\n[2026-08-31T22:10:19.318Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=scout resolved=scout range=- enemies=0 hooks=1\n",
+      "[2026-08-31T22:10:19.319Z] [debug] route: hook intercept (kind=thread, target=\"scout\") \u2014 original intent=investigate\n[2026-08-31T22:10:19.319Z] [world] \u2605 STORY THREAD (step 1) \u2014 You pull the rubble aside. A draft of cold, old air, and a tight passage angling down into the dark.\n",
+      "[2026-08-31T22:10:19.490Z] [debug] persist sizes(KB): total=225 player=44 wm=93[rooms=51 events=3 memos=0 npcs=3 defeated=1 tags=1 discovered=0] log=80 scene=7\n[2026-08-31T22:10:20.601Z] [world] \u2605\u2605 STORY THREAD COMPLETE \u2014 You wedge yourself into the gap. At the bottom \u2014 a small antechamber, half-flooded, with three sealed jars on a shelf. You take what you can carry.\n",
+      "[2026-08-31T22:10:20.601Z] [reward] \u2726 Trail Rations, Aether Residue, +12 TC.\n[2026-08-31T22:10:20.601Z] [reward] \u2726 For your persistence \u2014 Mud Essence (Uncommon).\n[2026-08-31T22:10:20.611Z] [reward] \u2726 Recipe uncovered: Sentinel Cleaver (Rare)! Open Crafting to forge it.\n[2026-08-31T22:10:20.759Z] [player] investigate wind-faded leathers\n",
+      "[2026-08-31T22:10:20.759Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=wind faded leathers resolved=wind-faded leathers range=- enemies=0 hooks=1\n[2026-08-31T22:10:20.760Z] [world] You've already followed the thread of the wind-faded leathers. Whatever it had for you is in your pack \u2014 or wasn't there to begin with.\n",
+      "[2026-08-31T22:10:20.761Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-08-31T22:10:20.761Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T22:10:22.352Z] [debug] qwen\u23f1 investigate_lore ok 4224ms wait 1071ms read 351ms/write 2784ms in 127t\u2192out 28t 2.8ms/t (133ch)\n",
+      "[2026-08-31T22:10:22.358Z] [debug] qwen\u23f1 stats \u2014 investigate_lore n8 avg2.6s max4.3s read0.8s/write1.3s in127t\u2192out26t ms/tok 2.1-14.4 wait0.5s | narration:scene_intro_fill n6 avg6.5s max10.9s read9.6s/write1.3s \u26a04unusable in747t\u2192out20t ms/tok 12.6-12.6 cap2 \u23f82 \u27024/26.7s | flourish n2 avg2.9s max3.0s read2.1s/write0.7s in176t\u2192out13t ms/tok 12.0-12.5 \u27022/5.8s | ambient_fill n1 avg8.3s max8.3s \u26a01unusab",
+      "le in362t\u2192out0t wait5.2s \u23f81 \u27021/8.3s | forge_name n1 avg4.9s max4.9s read2.5s/write2.4s in196t\u2192out63t ms/tok 12.5-12.5 cap1 | item_synthesis_hw n1 avg6.7s max6.7s read4.2s/write2.4s in328t\u2192out61t ms/tok 12.9-12.9 | ambient n1 avg9.6s max9.6s \u26a01unusable in365t\u2192out31t cap1 \u27021/9.6s || WASTED 8 calls / 50.4s\n[2026-08-31T22:10:22.521Z] [cognitive] neutral  (1759ms)\n",
+      "[2026-08-31T22:10:35.655Z] [debug] ui: tap \"take / salvage\"\n[2026-08-31T22:10:36.889Z] [world] You work the folded map over. A part of it comes loose, intact.\n[2026-08-31T22:10:36.889Z] [world] You salvage the spyglass. The take is small but real.\n[2026-08-31T22:10:36.889Z] [reward] \u2726 Salvage haul:\n[2026-08-31T22:10:36.890Z] [reward]     \u2022 Worn Tartarian Coin x4 (Common)\n",
+      "[2026-08-31T22:10:36.890Z] [reward]     \u2022 Aether Dust (Common)\n[2026-08-31T22:10:38.741Z] [debug] ui: tap \"\u2192 GREAT TARTARY PLAINS\"\n[2026-08-31T22:10:38.757Z] [debug] spawn: gear=[Aether-Runner Greaves, Golem-Born Guardian Mask, Minor Repair] window=10 roster=new\n[2026-08-31T22:10:38.759Z] [world] You walk east through open silt. The compass points east into open ground.\n",
+      "[2026-08-31T22:10:38.760Z] [world] A line of pale-blue fungus blooms across the ground ahead \u2014 the True Tartarians grow this where they walk often.\n[2026-08-31T22:10:38.889Z] [debug] homework: intro-fill armed after 8080ms idle (strike 2/3)\n[2026-08-31T22:10:39.706Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-31T22:10:41.009Z] [world] The Minor Repair goes in your pack. Its outline stays in the silt a while.\n[2026-08-31T22:10:41.010Z] [reward] \u2726 Minor Repair (Common).\n[2026-08-31T22:10:41.034Z] [world] You crouch, take the Aether-Runner Greaves, and are moving again before you have straightened up.\n[2026-08-31T22:10:41.035Z] [reward] \u2726 Aether-Runner Greaves (Common).\n",
+      "[2026-08-31T22:10:41.036Z] [world] You do not think about it. The Golem-Born Guardian Mask is simply in your hand now.\n[2026-08-31T22:10:41.036Z] [reward] \u2726 Golem-Born Guardian Mask (Common).\n[2026-08-31T22:10:41.955Z] [world] You salvage the folded map. The take is small but real.\n",
+      "[2026-08-31T22:10:41.955Z] [world] You lever something loose from the spyglass \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n[2026-08-31T22:10:41.956Z] [reward] \u2726 Salvage haul:\n[2026-08-31T22:10:41.956Z] [reward]     \u2022 Aether Dust (Common)\n[2026-08-31T22:10:41.956Z] [reward]     \u2022 Clouded Lens Blank (Common)\n",
+      "[2026-08-31T22:10:43.307Z] [debug] ui: tap \"investigate\"\n[2026-08-31T22:10:44.723Z] [player] investigate the ground\n[2026-08-31T22:10:44.724Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2\n[2026-08-31T22:10:44.726Z] [world] Something shifted while you were turned away \u2014 a Mud Wasp breaks cover, fast and low. (range: close)\n",
+      "[2026-08-31T22:10:44.726Z] [combat] Mud Wasp \u2014 Poison Sting ready, 1D6 damage on a hit.\n[2026-08-31T22:10:44.727Z] [debug] enemy: Mud Wasp hp=10 ac=8 atk=Poison Sting dmg=1D6 rarity=Common ap=3\n[2026-08-31T22:10:44.727Z] [debug] arbiter: template (reason=combat)\n[2026-08-31T22:10:44.727Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-08-31T22:10:45.186Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 6186ms read 0ms/write 0ms in 728t\u2192out 0t (0ch)\n[2026-08-31T22:10:45.374Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 6186ms \u2014 intro-fill:\u2205\n[2026-08-31T22:10:45.374Z] [debug] homework: scene_intro \"Obsidian Pillars\" \u2205 6485ms\n[2026-08-31T22:10:45.571Z] [cognitive] CLIMB  (842ms)\n",
+      "[2026-08-31T22:10:48.126Z] [debug] ui: tap \"approach\"\n[2026-08-31T22:10:48.157Z] [player] approach Mud Wasp\n[2026-08-31T22:10:48.158Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud wasp resolved=Mud Wasp range=mid enemies=1 hooks=2\n[2026-08-31T22:10:48.165Z] [debug] move: advance from range=mid enemies=1 weather=Eerie Calm cost=1 partial=0\n",
+      "[2026-08-31T22:10:48.165Z] [debug] move: field advance target=Mud Wasp d 1.50->0.50"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-01-1599-set-the-bone #mti0ay8get84 [inline 7/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mti0ay8get84"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-01-1599-set-the-bone"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "7"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-01-1599-set-the-bone"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-01T02:25:15.707465Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-01T02:25:17.648000Z",
+  "fingerprints": [
+    "b6c71e03f6c7cf39b649d83b5cee2dd3"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1947310149,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-01T02:25:17.647000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-01-1599-set-the-bone",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-01-1599-set-the-bone",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-01-1599-set-the-bone",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-01-1599-set-the-bone)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "1a98538c5fbc4fcab4d1f44cda918f16",
+  "previousEventID": "0a667838b513447faf93fb2c10d93d63"
+}

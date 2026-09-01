@@ -1,0 +1,238 @@
+{
+  "id": "61888d43db894f4491b0081f831305b0",
+  "groupID": "7703681244",
+  "eventID": "61888d43db894f4491b0081f831305b0",
+  "projectID": "4511945117532160",
+  "size": 18030,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-01-1599-set-the-bone #mti0ay8get84 [inline 22/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-01-1599-set-the-bone",
+  "message": "player-log 2026-09-01-1599-set-the-bone #mti0ay8get84 [inline 22/28]",
+  "title": "player-log 2026-09-01-1599-set-the-bone #mti0ay8get84 [inline 22/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "ba3f56e20bf640d39b7af552926fafdb",
+      "span_id": "8ff249df116becfe",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      ".885Z] [debug] ui: tap \"more \u25b8\"\n[2026-09-01T00:43:15.352Z] [debug] ui: tap \"missions\"\n[2026-09-01T00:43:43.612Z] [debug] ui: tap \"\ud83d\udeaa EXIT\"\n[2026-09-01T00:43:43.655Z] [player] leave outpost\n[2026-09-01T00:43:43.657Z] [debug] parser: intent=travel conf=1.00 verb=leave target=outpost resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-09-01T00:43:43.659Z] [world] You walk back through the gate and out into the open ground. The outpost falls away behind you.\n[2026-09-01T00:43:43.659Z] [debug] scene: loc=tartarian_outskirts hub=- arrival=n opening=n passing=n\n",
+      "[2026-09-01T00:43:43.659Z] [debug] missions: hunt:hunt_servants_doubter stage 3/5 [attack_provoke\u2192attack] @tartarian_outskirts HERE needs=Reaver's Spiral-Mark Stone\u2713 gives=Raider's Ridge-Sign\n[2026-09-01T00:43:43.662Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n",
+      "[2026-09-01T00:43:43.662Z] [debug] missions: mystery:mystery_temporal_watch stage 0/4 [diplomacy] @reclaimer_stake npc=\"the Reclaimers Guild Speaker\" gives=Guild Eddy-Gauge PAUSED\n[2026-09-01T00:43:43.662Z] [debug] missions: \u00b7 at=tartarian_outskirts\n[2026-09-01T00:43:43.663Z] [world] \u25b8 Silence the Doubter: this is the place \u2014 force the issue.\n",
+      "[2026-09-01T00:43:43.746Z] [debug] spawn: gear=[Reclaimer's Salvage Cap, Lost Scholar's Robe] window=10 roster=new\n[2026-09-01T00:43:43.764Z] [world] Snow that absorbs all sound. Your footsteps make no noise. Your screams make less.\n\nYou are at Tartarian Outskirts. Borderlands around buried cities. Littered with traps, dormant defenses, and clues. A reasonable place for a new expedition to die.\n\n",
+      "Hazard: Magnetic Distortion. Compasses spin. Iron-cored gear stops working. The ground tugs at every buckle and bracket.\n[2026-09-01T00:43:43.769Z] [world] [Tartarian Outskirts] north: the Silt Thief (19 tiles, 2 days) \u00b7 east: The Monarch's Waystation (3 tiles, 8 hours) \u00b7 south: The Architect's Blind (2 tiles, 5 hours) \u00b7 west: Reclaimer's Stake (3 tiles, 8 hours)\n",
+      "[2026-09-01T00:43:43.770Z] [world] Teska Nightweigh grins. \"Cheddar Bob. Sit a minute. The road's been generous or it hasn't \u2014 which is it?\"\n[2026-09-01T00:43:43.770Z] [world] Teska Nightweigh looks you over. \"It's been a long stretch, Cheddar Bob. I'd started asking after you.\"\n[2026-09-01T00:43:43.780Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-09-01T00:43:43.780Z] [arbiter] \"The outpost,\" the Arbiter says. \"Tell me what you mean to do with it.\"\n[2026-09-01T00:43:43.780Z] [system] \u23f3 Time passed: 1h\n[2026-09-01T00:43:43.929Z] [cognitive] RETREAT \u00b7 DISENGAGE \u00b7 HIDE  (148ms)\n[2026-09-01T00:43:44.725Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-09-01T00:43:46.981Z] [debug] ui: tap \"missions\"\n",
+      "[2026-09-01T00:43:50.317Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-09-01T00:44:01.320Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 10995ms read 9824ms/write 1127ms in 741t\u2192out 33t 13.3ms/t HIT-CAP (153ch)\n[2026-09-01T00:44:01.348Z] [debug] homework: scene_intro \"Tartarian Outskirts\" \u2713 11033ms\n",
+      "[2026-09-01T00:44:27.413Z] [debug] appstate: active \u2192 background (was active for 42536ms)\n[2026-09-01T01:19:30.983Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a05a26-ff84-7237-af58-fe8c8a8bdbaa\n[2026-09-01T01:19:30.984Z] [debug] ota: Checking\u2026\n[2026-09-01T01:19:32.009Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n",
+      "[2026-09-01T01:19:32.096Z] [debug] ota: Saving progress\u2026\n[2026-09-01T01:19:32.097Z] [debug] ota: Restarting to apply\u2026\n[2026-09-01T01:19:32.285Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a05a72-72cb-74c1-b5e4-e0ff4a916a6e\n[2026-09-01T01:19:32.285Z] [debug] ota: Checking\u2026\n[2026-09-01T01:19:32.389Z] [debug] ota: Already up to date\n",
+      "[2026-09-01T01:19:32.389Z] [debug] ota: boot check result = noUpdate\n[2026-09-01T01:19:32.432Z] [debug] voice: engine=bundled tts=on voice=am_michael\n[2026-09-01T01:19:32.433Z] [debug] voice: bundled loading\n[2026-09-01T01:19:32.712Z] [debug] send-log: bundle #mthxaxji3kq3 attempt 3/5 delivered to Sentry\n[2026-09-01T01:19:35.905Z] [debug] voice: bundled ready\n",
+      "[2026-09-01T01:19:36.904Z] [debug] voice\u23f1 gap 935ms (wait 86ms + synth 831ms, live) \"Choose your character.\"\n[2026-09-01T01:21:29.256Z] [debug] OTA applied: 2026-08-31-1597-the-tile-is-the-trigger \u2192 2026-09-01-1598-the-fight-waits-outside-the-gate.\n[2026-09-01T01:21:29.257Z] [debug] OTA session start: 2026-09-01-1598-the-fight-waits-outside-the-gate.\n",
+      "[2026-09-01T01:21:29.257Z] [world] You step back into Tartarian Outskirts. The world waits for your move.\n[2026-09-01T01:21:29.257Z] [arbiter] The Arbiter sets the quiet aside. \"Welcome back, Cheddar Bob. I kept watch while you were gone.\"\n",
+      "[2026-09-01T01:21:29.624Z] [debug] \u2550\u2550\u2550 SESSION 2026-09-01T01:21:29.618Z \u00b7 build 2026-09-01-1598-the-fight-waits-outside-the-gate \u00b7 updated from 2026-08-31-1597-the-tile-is-the-trigger \u00b7 previous entry moments earlier \u2550\u2550\u2550\n",
+      "[2026-09-01T01:21:29.625Z] [debug] missions: hunt:hunt_servants_doubter stage 3/5 [attack_provoke\u2192attack] @tartarian_outskirts HERE needs=Reaver's Spiral-Mark Stone\u2713 gives=Raider's Ridge-Sign\n[2026-09-01T01:21:29.626Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n",
+      "[2026-09-01T01:21:29.626Z] [debug] missions: mystery:mystery_temporal_watch stage 0/4 [diplomacy] @reclaimer_stake npc=\"the Reclaimers Guild Speaker\" gives=Guild Eddy-Gauge PAUSED\n[2026-09-01T01:21:29.626Z] [debug] missions: \u00b7 at=tartarian_outskirts\n",
+      "[2026-09-01T01:21:29.626Z] [debug] boot: life bmthzc2ab32 started 2026-09-01T01:19:32.243Z \u00b7 FOLLOWED AN OTA APPLY 145ms ago via boot-front \u00b7 prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)\n[2026-09-01T01:21:32.301Z] [debug] ui: tap \"more \u25b8\"\n[2026-09-01T01:21:35.203Z] [debug] ui: tap \"missions\"\n",
+      "[2026-09-01T01:29:15.344Z] [world] Deactivated the whisper. It stays on your slate but drops off your reminders until you re-activate it.\n[2026-09-01T01:30:14.355Z] [debug] ui: tap \"look around you\"\n[2026-09-01T01:30:14.371Z] [player] look\n[2026-09-01T01:30:14.377Z] [debug] parser: intent=investigate conf=1.00 verb=look target=- resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-09-01T01:30:14.378Z] [world] You look around. You're in Black Market Bazaar, in Tartarian Outskirts. You see: puddle, Reclaimer's Salvage Cap, Lost Scholar's Robe, detector, warning slate, crate, cracked submerged giant statue, defense lever, rusted blade, wagon, stall, wind-torn prayer flags, half-buried obsidian pillar. Teska Nightweigh is here. Hazard active: Magnetic Distortion. Cardinal",
+      " travel: north, east, south, west.\n[2026-09-01T01:30:14.379Z] [world] A figure stands ahead, perfectly still \u2014 until you realise the mud-glass froze them mid-step, generations ago.\n[2026-09-01T01:30:14.381Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-01T01:30:14.381Z] [arbiter] The Arbiter looks around. \"The borderlands. Where Tartaria thins, but does not stop.\"\n",
+      "[2026-09-01T01:30:14.551Z] [cognitive] neutral  (167ms)\n[2026-09-01T01:30:15.389Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-09-01T01:30:25.305Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-09-01T01:30:36.606Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 11147ms read 9713ms/write 1379ms in 733t\u2192out 33t 13.3ms/t HIT-CAP (170ch)\n",
+      "[2026-09-01T01:30:36.744Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 11147ms \u2014 intro-fill:action-opener\n[2026-09-01T01:30:36.744Z] [debug] homework: scene_intro \"Tartarian Outskirts\" \u2713 11442ms\n[2026-09-01T01:30:50.430Z] [reward] Sold Iron Spear (Common) to Teska Nightweigh for 15 TC. (200 TC on hand)\n",
+      "[2026-09-01T01:30:50.484Z] [reward] Sold Bone Knife (Common) to Teska Nightweigh for 6 TC. (206 TC on hand)\n[2026-09-01T01:30:50.525Z] [reward] Sold Bone Knife (Common) to Teska Nightweigh for 6 TC. (212 TC on hand)\n[2026-09-01T01:30:50.565Z] [reward] Sold Bone Knife (Common) to Teska Nightweigh for 6 TC. (218 TC on hand)\n",
+      "[2026-09-01T01:30:50.605Z] [reward] Sold Cudgel (Common) to Teska Nightweigh for 5 TC. (223 TC on hand)\n[2026-09-01T01:30:50.645Z] [reward] Sold Mud-Bound Cloak (Common) to Teska Nightweigh for 5 TC. (228 TC on hand)\n[2026-09-01T01:30:50.685Z] [reward] Sold Mud-Warden's Vest (Common) to Teska Nightweigh for 5 TC. (233 TC on hand)\n",
+      "[2026-09-01T01:30:50.726Z] [reward] Sold Reclaimer's Salvage Vest (Common) to Teska Nightweigh for 5 TC. (238 TC on hand)\n[2026-09-01T01:30:50.766Z] [reward] Sold Cudgel (Common) to Teska Nightweigh for 5 TC. (243 TC on hand)\n[2026-09-01T01:30:50.806Z] [reward] Sold Reclaimer's Salvage Vest (Common) to Teska Nightweigh for 5 TC. (248 TC on hand)\n",
+      "[2026-09-01T01:30:50.846Z] [reward] Sold Reclaimer's Salvage Vest (Common) to Teska Nightweigh for 5 TC. (253 TC on hand)\n[2026-09-01T01:30:52.193Z] [debug] persist sizes(KB): total=240 player=51 wm=98[rooms=48 events=3 memos=0 npcs=4 defeated=1 tags=1 discovered=0] log=88 scene=4\n[2026-09-01T01:30:58.825Z] [reward] Bought 2\u00d7 Blue Cap Mushroom from Teska Nightweigh for 16 TC. (237 TC left)\n",
+      "[2026-09-01T01:30:58.825Z] [reward] They don't charge a friend full price \u2014 2 TC stayed in your pouch.\n[2026-09-01T01:31:02.621Z] [reward] Bought Pry Bar from Teska Nightweigh for 32 TC. (205 TC left)\n[2026-09-01T01:31:02.622Z] [reward] They don't charge a friend full price \u2014 2 TC stayed in your pouch.\n",
+      "[2026-09-01T01:31:07.233Z] [reward] Bought 3\u00d7 Aether Crystal from Teska Nightweigh for 54 TC. (151 TC left)\n[2026-09-01T01:31:07.233Z] [reward] They don't charge a friend full price \u2014 3 TC stayed in your pouch.\n[2026-09-01T01:31:10.346Z] [debug] homework: intro-fill armed after 6000ms idle (strike 2/3)\n",
+      "[2026-09-01T01:31:14.393Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 4040ms read 2475ms/write 1116ms in 733t\u2192out 33t 3.4ms/t HIT-CAP (171ch)\n[2026-09-01T01:31:14.401Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 4040ms \u2014 intro-fill:action-opener\n[2026-09-01T01:31:14.402Z] [debug] homework: scene_intro \"Tartarian Outskirts\" \u2713 4057ms\n",
+      "[2026-09-01T01:31:36.309Z] [reward] Sold Riveted Leather Vest (Uncommon) to Teska Nightweigh for 14 TC. (165 TC on hand)\n[2026-09-01T01:31:40.244Z] [reward] Sold Burlap Vest (Common) to Teska Nightweigh for 5 TC. (170 TC on hand)\n[2026-09-01T01:31:50.188Z] [reward] Bought Mud Kukri from Teska Nightweigh for 160 TC. (10 TC left)\n",
+      "[2026-09-01T01:31:50.188Z] [reward] They don't charge a friend full price \u2014 9 TC stayed in your pouch.\n[2026-09-01T01:31:55.388Z] [debug] homework: intro-fill armed after 6000ms idle (strike 3/3)\n[2026-09-01T01:31:57.717Z] [system] The Crucible costs 25 TC to fire; you have 10.\n",
+      "[2026-09-01T01:31:58.540Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 2986ms read 1819ms/write 1131ms in 733t\u2192out 33t 2.5ms/t HIT-CAP (165ch)\n[2026-09-01T01:31:58.707Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 2986ms \u2014 intro-fill:action-opener\n[2026-09-01T01:31:58.708Z] [debug] homework: scene_intro \"Tartarian Outskirts\" \u2713 3322ms\n",
+      "[2026-09-01T01:31:59.737Z] [system] The Crucible costs 25 TC to fire; you have 10.\n[2026-09-01T01:32:25.450Z] [debug] ui: tap \"take / salvage\"\n[2026-09-01T01:32:26.944Z] [world] You take the Rusted Blade from where it lay.\n[2026-09-01T01:32:26.945Z] [reward] \u2726 Rusted Blade (Common).\n[2026-09-01T01:32:26.962Z] [world] You pick up the Lost Scholar's Robe.\n",
+      "[2026-09-01T01:32:26.962Z] [reward] \u2726 Lost Scholar's Robe (Common).\n[2026-09-01T01:32:26.964Z] [world] You lift the Reclaimer's Salvage Cap clear.\n[2026-09-01T01:32:26.964Z] [reward] \u2726 Reclaimer's Salvage Cap (Common).\n[2026-09-01T01:32:27.419Z] [debug] persist sizes(KB): total=241 player=52 wm=98[rooms=48 events=3 memos=0 npcs=4 defeated=1 tags=1 discovered=0] log=87 scene=3\n",
+      "[2026-09-01T01:32:28.257Z] [reward] \u2726 Found Hurried Note \u2014 The Awakened Heir. (open Contracts \u2192 Collectibles to read)\n[2026-09-01T01:32:28.265Z] [world] You strip the crate carefully. Something usable comes free in your hand.\n[2026-09-01T01:32:28.265Z] [world] You salvage the defense lever. The take is small but real.\n",
+      "[2026-09-01T01:32:28.265Z] [world] You strip the detector carefully. Something usable comes free in your hand.\n[2026-09-01T01:32:28.265Z] [world] You scavenge the half-buried obsidian pillar thoroughly. One Cloth Scrap survives the sorting.\n[2026-09-01T01:32:28.266Z] [world] You strip the stall carefully. Something usable comes free in your hand.\n",
+      "[2026-09-01T01:32:28.266Z] [world] You lever something loose from the wagon \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n[2026-09-01T01:32:28.266Z] [world] Wedged into the warning slate, half-hidden by the dust: a sealed letter. You pocket it carefully.\n[2026-09-01T01:32:28.266Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-09-01T01:32:28.266Z] [reward]     \u2022 Aether Crystal x2 (Common)\n[2026-09-01T01:32:28.267Z] [reward]     \u2022 Scrap Metal x3 (Common)\n[2026-09-01T01:32:28.267Z] [reward]     \u2022 Cloth Scrap (Common)\n[2026-09-01T01:32:28.267Z] [reward]     \u2022 Mud Fragment (Common)\n[2026-09-01T01:32:28.267Z] [reward]     \u2022 Mortar-Bound Cobble (Common)\n",
+      "[2026-09-01T01:32:31.005Z] [player] investigate cracked submerged giant statue\n[2026-09-01T01:32:31.005Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=cracked submerged giant statue resolved=cracked submerged giant statue range=- enemies=0 hooks=1\n",
+      "[2026-09-01T01:32:31.006Z] [debug] route: hook intercept (kind=frozen_statue, target=\"cracked submerged giant statue\") \u2014 original intent=investigate\n[2026-09-01T01:32:31.006Z] [world] \u2605 STORY THREAD (step 1) \u2014 You circle the figure. A Tartarian functionary by the cut of their robes, perfectly preserved inside a casing of Aetheric mud-glass \u2014 even their satchel still hangs from the shoulder.\n",
+      "[2026-09-01T01:32:38.513Z] [debug] ui: tap \"investigate\"\n[2026-09-01T01:32:40.325Z] [player] investigate the mud\n[2026-09-01T01:32:40.325Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=mud range=- enemies=0 hooks=1\n[2026-09-01T01:32:40.326Z] [world] You look closer at the mud. Mud-glazed, undisturbed for a long while.\n",
+      "[2026-09-01T01:32:40.327Z] [world] A thin film of Aether residue clings where your hand brushed the mud. You vial it.\n[2026-09-01T01:32:40.327Z] [reward] \u2726 Aether Residue (Common).\n[2026-09-01T01:32:40.328Z] [world] Mud Scanner ticks \u2014 buried trace in the mud.\n[2026-09-01T01:32:40.329Z] [reward] \u2726 Aetheric Sludge x2 (Common).\n[2026-09-01T01:32:40.497Z] [cognitive] SWIM  (166ms)\n",
+      "[2026-09-01T01:32:41.554Z] [debug] ui: tap \"take / salvage\"\n[2026-09-01T01:32:41.689Z] [player] investigate puddle\n[2026-09-01T01:32:41.689Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=puddle resolved=puddle range=- enemies=0 hooks=1\n",
+      "[2026-09-01T01:32:41.690Z] [world] You study the puddle. It bears no marks worth naming \u2014 no glyph, no fingerprint, no trace the Reclaimers would catalog.\n[2026-09-01T01:32:41.690Z] [debug] arbiter: template (reas"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-01-1599-set-the-bone #mti0ay8get84 [inline 22/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mti0ay8get84"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-01-1599-set-the-bone"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "22"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-01-1599-set-the-bone"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-01T02:25:15.785783Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-01T02:25:17.650000Z",
+  "fingerprints": [
+    "b6c71e03f6c7cf39b649d83b5cee2dd3"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1947310149,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-01T02:25:17.647000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-01-1599-set-the-bone",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-01-1599-set-the-bone",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-01-1599-set-the-bone",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-01-1599-set-the-bone)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "66d1cf5b4eee49b6b5c4303a22601c26",
+  "previousEventID": "52aa6bd5030a472b91da574db72ddf7d"
+}

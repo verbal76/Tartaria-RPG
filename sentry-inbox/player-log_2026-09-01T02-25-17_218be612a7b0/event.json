@@ -1,0 +1,236 @@
+{
+  "id": "218be612a7b04bb4abe2abe8883305e4",
+  "groupID": "7703681244",
+  "eventID": "218be612a7b04bb4abe2abe8883305e4",
+  "projectID": "4511945117532160",
+  "size": 18020,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-01-1599-set-the-bone #mti0ay8get84 [inline 8/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-01-1599-set-the-bone",
+  "message": "player-log 2026-09-01-1599-set-the-bone #mti0ay8get84 [inline 8/28]",
+  "title": "player-log 2026-09-01-1599-set-the-bone #mti0ay8get84 [inline 8/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "ba3f56e20bf640d39b7af552926fafdb",
+      "span_id": "8ff249df116becfe",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      " band mid->close\n[2026-08-31T22:10:48.165Z] [world] You close the gap with Mud Wasp. (range: close / arm's reach)\n[2026-08-31T22:10:48.166Z] [combat] Mud Wasp \u2014 d20 \u2192 18 + ATK 4 = 22 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-08-31T22:10:48.168Z] [debug] arbiter: template (reason=combat)\n[2026-08-31T22:10:48.168Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-08-31T22:10:48.385Z] [combat] Mud Wasp deals 1 poison damage [armor \u221225%, Aetherbound \u22122, plate \u22121]. You have 39 HP remaining.\n[2026-08-31T22:10:48.567Z] [cognitive] SWIM  (398ms)\n[2026-08-31T22:10:49.293Z] [debug] ui: tap \"dodge\"\n[2026-08-31T22:10:49.301Z] [player] dodge\n",
+      "[2026-08-31T22:10:49.301Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=2\n[2026-08-31T22:10:49.302Z] [world] You commit to the dodge. Slip Mud Wasp's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-08-31T22:10:49.372Z] [combat] Mud Wasp \u2014 d20 \u2192 17 + ATK 4 = 21 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n[2026-08-31T22:10:49.372Z] [combat] Dodge \u2014 d20 \u2192 2 + DEX 23 = 25 vs ATK 21. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-08-31T22:10:49.373Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-08-31T22:10:49.374Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T22:10:49.374Z] [system] \u23f3 Time passed: 6 min\n[2026-08-31T22:10:49.564Z] [cognitive] neutral  (189ms)\n[2026-08-31T22:10:50.328Z] [debug] ui: tap \"\u2697 auralite talon\"\n[2026-08-31T22:10:50.363Z] [player] attack with the auralite talon\n",
+      "[2026-08-31T22:10:50.363Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=1 hooks=2\n[2026-08-31T22:10:50.365Z] [debug] attack: target=Mud Wasp range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n[2026-08-31T22:10:50.367Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-08-31T22:10:50.411Z] [world] You raise the acid-etched auralite talon toward Mud Wasp. The room narrows around the both of you.\n[2026-08-31T22:10:50.411Z] [system] \u23f3 Time passed: 6 min\n[2026-08-31T22:10:50.592Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (180ms)\n[2026-08-31T22:10:58.144Z] [world] Mud Wasp moves first. The pressure is immediate.\n",
+      "[2026-08-31T22:10:58.146Z] [combat] Mud Wasp \u2014 d20 \u2192 13 + ATK 4 = 17 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-31T22:10:58.146Z] [combat] You \u2014 d20 \u2192 16 + INT 10 perfect opening (2\u00d7 dice) = 26 vs Mud Wasp AC 8 \u2014 \u2713 HIT\n[2026-08-31T22:10:58.146Z] [combat] Aetheric flares \u2014 +4 on hit.\n",
+      "[2026-08-31T22:10:58.153Z] [combat] Mud Wasp folds under the acid-etched auralite talon. 24 damage was enough. The room exhales.\n[2026-08-31T22:10:58.154Z] [reward] Mud Wasp defeated. You recover Aether Residue, Riveted Leather Vest.\n[2026-08-31T22:10:58.156Z] [reward] +3 TC pried from the dust.\n",
+      "[2026-08-31T22:10:58.199Z] [arbiter] The Arbiter looks around. \"Walk between two Pillars and your compass forgets you for a moment. Sometimes a long moment.\"\n[2026-08-31T22:10:58.400Z] [debug] persist sizes(KB): total=209 player=45 wm=76[rooms=35 events=3 memos=0 npcs=3 defeated=1 tags=1 discovered=0] log=79 scene=8\n[2026-08-31T22:11:00.064Z] [debug] ui: tap \"\u2192 GREAT TARTARY PLAINS\"\n",
+      "[2026-08-31T22:11:00.077Z] [debug] spawn: gear=[Seer's Veil of the Aether, Vine Grasp] window=10 roster=new\n[2026-08-31T22:11:00.079Z] [combat] The aether under your skin draws something out \u2014 Aetheric Banshee forms from the haze.\n[2026-08-31T22:11:00.079Z] [world] You walk east through open silt. The compass points east into open ground.\n",
+      "[2026-08-31T22:11:00.079Z] [world] Long enough has passed that it should have changed. It has not.\n[2026-08-31T22:11:02.798Z] [debug] ui: tap \"flee\"\n[2026-08-31T22:11:02.809Z] [player] flee\n[2026-08-31T22:11:02.810Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=mid enemies=1 hooks=2\n[2026-08-31T22:11:02.868Z] [system] \u23f3 Time passed: 15 min\n",
+      "[2026-08-31T22:11:03.054Z] [cognitive] FEAR \u00b7 RETREAT \u00b7 HIDE  (185ms)\n[2026-08-31T22:11:04.693Z] [debug] skillcheck: escape d20=2 DEX 23 = 25 vs Pursuit 22 \u2014 Aetheric Banshee (d20 12 + SPD 10) \u2192 PASS\n[2026-08-31T22:11:04.769Z] [debug] stats: STR11 DEX23 INT10 WIS10 CHA4 STE5 | gear: WIS+4,INT+2,DEX+15,STR+5,STE+2 | worn: main=Auralite Talon off=Bone Crossbow head=Architect's Sight Enhancer chest=F",
+      "orgotten Protector's Plate hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n[2026-08-31T22:11:04.770Z] [debug] train: dexterity (escape check) \u2192 progress 46/100\n[2026-08-31T22:11:04.770Z] [world] It follows to the edge of whatever it calls its own, and no further.\n",
+      "[2026-08-31T22:11:06.515Z] [debug] ui: tap \"take / salvage\"\n[2026-08-31T22:11:07.452Z] [world] Old habit: see it, take it, keep walking. The Vine Grasp is yours.\n[2026-08-31T22:11:07.453Z] [reward] \u2726 Vine Grasp (Common).\n[2026-08-31T22:11:07.474Z] [world] You take the Seer's Veil of the Aether the way you take everything out here \u2014 quickly, and without ceremony.\n",
+      "[2026-08-31T22:11:07.474Z] [reward] \u2726 Seer's Veil of the Aether (Common).\n[2026-08-31T22:11:08.256Z] [world] You break the folded map apart. Among the pieces, something worth keeping.\n[2026-08-31T22:11:08.257Z] [world] You work the spyglass over. A part of it comes loose, intact.\n[2026-08-31T22:11:08.257Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-08-31T22:11:08.257Z] [reward]     \u2022 Worn Tartarian Coin x4 (Common)\n[2026-08-31T22:11:08.258Z] [reward]     \u2022 Scrap Metal x2 (Common)\n[2026-08-31T22:11:09.466Z] [debug] ui: tap \"investigate\"\n[2026-08-31T22:11:10.813Z] [player] investigate the ground\n[2026-08-31T22:11:10.814Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2\n",
+      "[2026-08-31T22:11:10.818Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Aetheric Dust (Uncommon).\n[2026-08-31T22:11:10.824Z] [system] \u23f3 Time passed: 24 min\n[2026-08-31T22:11:10.961Z] [cognitive] CLIMB  (135ms)\n[2026-08-31T22:11:12.066Z] [debug] ui: tap \"rest\"\n[2026-08-31T22:11:12.075Z] [player] rest\n",
+      "[2026-08-31T22:11:12.076Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=2\n[2026-08-31T22:11:12.077Z] [world] Soot does the old circle \u2014 some instinct about grass that has not been grass in a thousand years.\n[2026-08-31T22:11:12.078Z] [reward] \u2726 The aether dims \u2014 back to Tainted.\n",
+      "[2026-08-31T22:11:12.078Z] [world] You rest for 8 hours. +8 stamina, \u22124 corruption recovered. (Day 37, evening)\n[2026-08-31T22:11:12.093Z] [system] \u23f3 Time passed: 8h\n[2026-08-31T22:11:12.219Z] [cognitive] REST  (121ms)\n[2026-08-31T22:11:12.543Z] [debug] persist sizes(KB): total=209 player=46 wm=76[rooms=35 events=3 memos=0 npcs=3 defeated=1 tags=1 discovered=0] log=79 scene=8\n",
+      "[2026-08-31T22:11:12.896Z] [debug] ui: tap \"rest\"\n[2026-08-31T22:11:12.898Z] [player] rest\n[2026-08-31T22:11:12.898Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=2\n[2026-08-31T22:11:12.899Z] [world] Her ribs rise and fall and slow until you cannot hear them.\n",
+      "[2026-08-31T22:11:12.899Z] [world] You rest for 8 hours. +6 stamina, \u22122 corruption recovered. (Day 38, night)\n[2026-08-31T22:11:12.899Z] [arbiter] The Arbiter goes still. \"There are prints in the silt that were not there when you lay down. They come in and they do not go out.\"\n",
+      "[2026-08-31T22:11:12.900Z] [world] A Mud-Wracked Aetherkin comes out of the open ground at a walk, in no particular hurry. The rest is over.\n[2026-08-31T22:11:12.900Z] [debug] enemy: Mud-Wracked Aetherkin hp=99 ac=10 atk=Silt-Heavy Grasp dmg=2D8 Aetheric rarity=Uncommon ap=5\n[2026-08-31T22:11:12.908Z] [system] \u23f3 Time passed: 8h\n[2026-08-31T22:11:13.106Z] [cognitive] REST  (197ms)\n",
+      "[2026-08-31T22:11:19.191Z] [debug] ui: tap \"flee\"\n[2026-08-31T22:11:19.194Z] [player] flee\n[2026-08-31T22:11:19.194Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=far enemies=1 hooks=2\n[2026-08-31T22:11:19.232Z] [system] \u23f3 Time passed: 15 min\n[2026-08-31T22:11:19.415Z] [cognitive] FEAR \u00b7 RETREAT \u00b7 HIDE  (182ms)\n",
+      "[2026-08-31T22:11:21.098Z] [debug] skillcheck: escape d20=5 DEX 24 = 29 vs Pursuit 10 \u2014 Mud-Wracked Aetherkin (d20 8 + SPD 2) \u2192 PASS\n[2026-08-31T22:11:21.171Z] [debug] stats: STR12 DEX24 INT11 WIS11 CHA4 STE6 | gear: WIS+4,INT+2,DEX+15,STR+5,STE+2 | worn: main=Auralite Talon off=Bone Crossbow head=Architect's Sight Enhancer chest=Forgotten Protector's Plate hands=Relic Hunter's Gauntlets legs=Lita",
+      "ny Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n[2026-08-31T22:11:21.171Z] [debug] train: dexterity (escape check) \u2192 progress 48/100\n[2026-08-31T22:11:21.171Z] [world] The sound behind you falls off, then stops, then does not start again.\n[2026-08-31T22:11:22.772Z] [debug] ui: tap \"\u2192 GREAT TARTARY PLAINS\"\n",
+      "[2026-08-31T22:11:22.789Z] [debug] spawn: gear=[Mud-Encrusted Armor] window=10 roster=new\n[2026-08-31T22:11:22.790Z] [world] You walk north through open silt. The compass points north into open ground.\n[2026-08-31T22:11:22.791Z] [world] The hours you spent elsewhere did nothing to this.\n[2026-08-31T22:11:23.903Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-08-31T22:11:24.924Z] [world] You pocket the Mud-Encrusted Armor and check the horizon, in that order.\n[2026-08-31T22:11:24.925Z] [reward] \u2726 Mud-Encrusted Armor (Common).\n[2026-08-31T22:11:25.996Z] [world] You strip the folded map carefully. Something usable comes free in your hand.\n[2026-08-31T22:11:25.997Z] [world] You work the spyglass over. A part of it comes loose, intact.\n",
+      "[2026-08-31T22:11:25.997Z] [reward] \u2726 Salvage haul:\n[2026-08-31T22:11:25.998Z] [reward]     \u2022 Worn Tartarian Coin x3 (Common)\n[2026-08-31T22:11:25.998Z] [reward]     \u2022 Aether Dust x2 (Common)\n[2026-08-31T22:11:27.004Z] [debug] ui: tap \"investigate\"\n[2026-08-31T22:11:28.362Z] [player] investigate the ground\n",
+      "[2026-08-31T22:11:28.363Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2\n[2026-08-31T22:11:28.367Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Wild Carrot (Common).\n[2026-08-31T22:11:28.378Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n",
+      "[2026-08-31T22:11:28.378Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T22:11:28.378Z] [system] \u23f3 Time passed: 24 min\n[2026-08-31T22:11:28.380Z] [world] A Conspiracy Architects war party crests the rise \u2014 5 of them, blades already out. They've marked you for standing with the Forgotten Order.\n",
+      "[2026-08-31T22:11:28.380Z] [arbiter] \"The Conspiracy Architects do not forgive a friend of the Forgotten Order,\" the Arbiter murmurs. \"Stand, or run \u2014 but decide now.\"\n[2026-08-31T22:11:28.615Z] [cognitive] CLIMB  (236ms)\n[2026-08-31T22:11:29.089Z] [debug] ui: tap \"punch\"\n[2026-08-31T22:11:29.090Z] [world] A shard of mud-glass nicks you. Small wound, steady reminder. (\u22121 HP)\n",
+      "[2026-08-31T22:11:29.091Z] [player] punch\n[2026-08-31T22:11:29.091Z] [debug] parser: intent=attack conf=1.00 verb=punch target=- resolved=- range=close enemies=5 hooks=2\n[2026-08-31T22:11:29.092Z] [debug] attack: target=Conspiracy Architects Raider 1 range=close reach.bands=[close] reach.label=Bare hands bareHand=true\n",
+      "[2026-08-31T22:11:29.092Z] [arbiter] Glass Hail hangs between you. \"\u22121 to the swing \u2014 see what you can,\" the Arbiter says.\n[2026-08-31T22:11:29.093Z] [debug] attack: visibility penalty \u22121 (Glass Hail)\n[2026-08-31T22:11:29.134Z] [world] You close on Conspiracy Architects Raider 1. The room narrows around the both of you.\n[2026-08-31T22:11:29.135Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-08-31T22:11:29.331Z] [cognitive] AGGRESSION \u00b7 DISENGAGE  (196ms)\n[2026-08-31T22:11:30.006Z] [debug] persist sizes(KB): total=213 player=46 wm=77[rooms=36 events=3 memos=0 npcs=3 defeated=1 tags=1 discovered=0] log=79 scene=11\n[2026-08-31T22:11:32.041Z] [system] Action cancelled.\n[2026-08-31T22:11:33.540Z] [debug] ui: tap \"dodge\"\n[2026-08-31T22:11:33.550Z] [player] dodge\n",
+      "[2026-08-31T22:11:33.552Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=5 hooks=2\n[2026-08-31T22:11:33.553Z] [world] You commit to the dodge. Slip Conspiracy Architects Raider 1's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-08-31T22:11:33.610Z] [combat] Conspiracy Architects Raider 1 \u2014 d20 \u2192 5 + ATK 7 = 12 vs your AC 22 \u2014 \u2717 EVADED\n[2026-08-31T22:11:33.610Z] [combat] Dodge \u2014 d20 \u2192 2 + DEX 24 = 26 vs ATK 12. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n",
+      "[2026-08-31T22:11:33.610Z] [world] You slip Conspiracy Architects Raider 1's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n[2026-08-31T22:11:33.612Z] [debug] ac-shift 22\u219225: race/base 10 + gear 18 + title 0 \u2192 trimmed 22 + status 3 | worn: head=Architect's Sight Enhancer chest=Forgotten Protector's Plate hands=Relic Hunter's Gaun",
+      "tlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n[2026-08-31T22:11:33.612Z] [combat] Conspiracy Architects Raider 2 \u2014 d20 \u2192 2 + ATK 6 = 8 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-08-31T22:11:33.612Z] [combat] Conspiracy Architects Raider 3 and 2 others close the distance.\n[2026-08-31T22:11:33.613Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-08-31T22:11:33.613Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-08-31T22:11:33.613Z] [system] \u23f3 Time passed: 6 min\n[2026-08-31T22:11:33.824Z] [cognitive] neutral  (210ms)\n[2026-08-31T22:11:34.507Z] [debug] ui: tap \"\u2697 auralite talon\"\n[2026-08-31T22:11:34.511Z] [system] evasive \u2014 harder to hit fades.\n[2026-08-31T22:11:34.549Z] [player] attack with the auralite talon\n",
+      "[2026-08-31T22:11:34.550Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=5 hooks=2\n[2026-08-31T22:11:34.551Z] [debug] attack: target=Conspiracy Architects Raider 1 range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n[2026-08-31T22:11:34.553Z] [debug] attack: visibility penalty \u22121 (Glass Hail)\n",
+      "[2026-08-31T22:11:34.554Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-08-31T22:11:34.597Z] [world] You bring the acid-etched auralite talon to bear on Conspiracy Architects Raider 1.\n[2026-08-31T22:11:34.597Z] [system] \u23f3 Time passed: 6 min\n[2026-08-31T22:11:34.795Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (197ms)\n",
+      "[2026-08-31T22:11:41.778Z] [world] You seize the initiative. Conspiracy Architects Raider 1 has no time to react.\n[2026-08-31T22:11:41.779Z] [combat] You \u2014 d20 \u2192 7 + INT 11 \u2212 1 (Glass Hail) perfect opening (2\u00d7 dice) = 17 vs "
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-01-1599-set-the-bone #mti0ay8get84 [inline 8/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mti0ay8get84"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-01-1599-set-the-bone"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "8"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-01-1599-set-the-bone"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-01T02:25:15.703308Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-01T02:25:17.648000Z",
+  "fingerprints": [
+    "b6c71e03f6c7cf39b649d83b5cee2dd3"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1947310149,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-01T02:25:17.647000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-01-1599-set-the-bone",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-01-1599-set-the-bone",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-01-1599-set-the-bone",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-01-1599-set-the-bone)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "43299ee2bfee4ad0a9f8606204a0578f",
+  "previousEventID": "1c18f798b5dc42739907bb36bd625b42"
+}
