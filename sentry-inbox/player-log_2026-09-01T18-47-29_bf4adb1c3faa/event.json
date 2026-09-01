@@ -1,0 +1,232 @@
+{
+  "id": "bf4adb1c3faa4d4084ed1609f18b6311",
+  "groupID": "7705210551",
+  "eventID": "bf4adb1c3faa4d4084ed1609f18b6311",
+  "projectID": "4511945117532160",
+  "size": 18157,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-01-1609-the-strike-keeps-its-name #mtj0rqoi6phs [inline 27/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-01-1609-the-strike-keeps-its-name",
+  "message": "player-log 2026-09-01-1609-the-strike-keeps-its-name #mtj0rqoi6phs [inline 27/28]",
+  "title": "player-log 2026-09-01-1609-the-strike-keeps-its-name #mtj0rqoi6phs [inline 27/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "428a8832da1b45388cc1d5fbf09a2dbc",
+      "span_id": "977e57595f1cc960",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      ".895Z] [debug] ota: boot check result = applied\n[2026-09-01T15:29:38.017Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a05d92-a0d6-7a09-ae8f-5854996016ca\n[2026-09-01T15:29:38.017Z] [debug] ota: Checking\u2026\n[2026-09-01T15:29:38.107Z] [debug] ota: Already up to date\n[2026-09-01T15:29:38.108Z] [debug] ota: boot check result = noUpdate\n",
+      "[2026-09-01T15:29:38.169Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-09-01T15:29:38.169Z] [debug] voice: bundled idle\n[2026-09-01T15:29:38.362Z] [debug] send-log: bundle #mtis7hpm6ccs attempt 2/5 delivered to Sentry\n[2026-09-01T15:29:42.458Z] [debug] OTA applied: 2026-09-01-1604-the-vest-breaks-down \u2192 2026-09-01-1605-one-fight-on-the-field.\n",
+      "[2026-09-01T15:29:42.458Z] [debug] OTA session start: 2026-09-01-1605-one-fight-on-the-field.\n[2026-09-01T15:29:42.458Z] [world] You step back into The Monarch's Waystation. The world waits for your move.\n[2026-09-01T15:29:42.458Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. \"Welcome back, Cheddar Bob. We've still got ground to cover, you and I.\"\n",
+      "[2026-09-01T15:29:42.784Z] [debug] \u2550\u2550\u2550 SESSION 2026-09-01T15:29:42.781Z \u00b7 build 2026-09-01-1605-one-fight-on-the-field \u00b7 updated from 2026-09-01-1604-the-vest-breaks-down \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-09-01T15:29:42.784Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713\n",
+      "[2026-09-01T15:29:42.785Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n[2026-09-01T15:29:42.785Z] [debug] missions: mystery:mystery_temporal_watch stage 0/4 [diplomacy] @reclaimer_stake npc=\"the Reclaimers Guild Speaker\" gives=Guild Eddy-Gauge PAUSED\n",
+      "[2026-09-01T15:29:42.785Z] [debug] missions: \u00b7 at=monarch_waystation\n[2026-09-01T15:29:42.785Z] [debug] boot: life bmtitpak5hm started 2026-09-01T15:29:37.973Z \u00b7 FOLLOWED AN OTA APPLY 142ms ago via boot-front \u00b7 prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)\n[2026-09-01T15:29:44.499Z] [debug] ui: tap \"rest\"\n[2026-09-01T15:29:44.508Z] [player] rest\n",
+      "[2026-09-01T15:29:44.508Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0\n[2026-09-01T15:29:44.510Z] [world] Soot circles three times and curls beside you. Her breathing slows to yours.\n[2026-09-01T15:29:44.510Z] [world] You rest for 8 hours. +7 HP, +5 stamina, \u22122 corruption recovered. (Day 43, afternoon)\n",
+      "[2026-09-01T15:29:44.522Z] [system] \u23f3 Time passed: 8h\n[2026-09-01T15:29:44.686Z] [cognitive] REST  (162ms)\n[2026-09-01T15:29:45.232Z] [debug] ui: tap \"rest\"\n[2026-09-01T15:29:45.240Z] [player] rest\n[2026-09-01T15:29:45.240Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-09-01T15:29:45.242Z] [world] Soot turns twice, thinks about a third, and drops where she stands.\n[2026-09-01T15:29:45.243Z] [world] You rest for 8 hours. +7 HP, \u22122 corruption recovered. (Day 43, evening)\n[2026-09-01T15:29:45.254Z] [system] \u23f3 Time passed: 8h\n[2026-09-01T15:29:45.409Z] [cognitive] REST  (154ms)\n[2026-09-01T15:29:46.250Z] [debug] ui: tap \"rest\"\n",
+      "[2026-09-01T15:29:46.257Z] [player] rest\n[2026-09-01T15:29:46.258Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0\n[2026-09-01T15:29:46.262Z] [world] Soot paws the ground flat before trusting it, then folds down onto it.\n[2026-09-01T15:29:46.263Z] [world] You rest for 8 hours. +6 HP, \u22122 corruption recovered. (Day 44, night)\n",
+      "[2026-09-01T15:29:46.275Z] [system] \u23f3 Time passed: 8h\n[2026-09-01T15:29:46.280Z] [arbiter] \"The Forgotten Order contract on the Conspiracy Architects has lapsed,\" the Arbiter says. \"You were too slow. The offer's off the board.\"\n[2026-09-01T15:29:46.423Z] [cognitive] REST  (147ms)\n[2026-09-01T15:29:47.120Z] [debug] ui: tap \"rest\"\n[2026-09-01T15:29:47.130Z] [player] rest\n",
+      "[2026-09-01T15:29:47.131Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0\n[2026-09-01T15:29:47.132Z] [world] Soot tests three spots and settles on the one nearest your boot.\n[2026-09-01T15:29:47.133Z] [world] You rest for 8 hours. \u22122 corruption recovered. (Day 44, afternoon)\n[2026-09-01T15:29:47.145Z] [system] \u23f3 Time passed: 8h\n",
+      "[2026-09-01T15:29:47.300Z] [cognitive] REST  (154ms)\n[2026-09-01T15:29:48.083Z] [debug] ui: tap \"rest\"\n[2026-09-01T15:29:48.090Z] [world] A shard of mud-glass nicks you. Small wound, steady reminder. (\u22121 HP)\n[2026-09-01T15:29:48.094Z] [player] rest\n[2026-09-01T15:29:48.095Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-09-01T15:29:48.096Z] [world] Soot does the old circle \u2014 some instinct about grass that has not been grass in a thousand years.\n[2026-09-01T15:29:48.097Z] [world] You rest for 8 hours. \u22122 corruption recovered. (Day 44, evening)\n[2026-09-01T15:29:48.099Z] [world] You roll up your bedroll and find a small object beneath it \u2014 a gift from the ground, in the buried country's way.\n",
+      "[2026-09-01T15:29:48.099Z] [reward] \u2726 Wild Oats (Common).\n[2026-09-01T15:29:48.108Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-01T15:29:48.109Z] [arbiter] The Arbiter looks around. \"The seneschal logs your name without asking it. The Monarchs' ledgers have their ways.\"\n",
+      "[2026-09-01T15:29:48.109Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter looks around. \"The seneschal logs your name with\u2026\"\n[2026-09-01T15:29:48.109Z] [system] \u23f3 Time passed: 8h\n[2026-09-01T15:29:48.289Z] [cognitive] REST  (179ms)\n",
+      "[2026-09-01T15:29:48.721Z] [debug] persist sizes(KB): total=267 player=69 wm=110[rooms=52 events=4 memos=1 npcs=4 defeated=1 tags=1 discovered=0] log=85 scene=3\n[2026-09-01T15:29:48.950Z] [debug] ui: tap \"rest\"\n[2026-09-01T15:29:48.956Z] [player] rest\n[2026-09-01T15:29:48.957Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-09-01T15:29:48.959Z] [world] Her ribs rise and fall and slow until you cannot hear them.\n[2026-09-01T15:29:48.959Z] [world] You rest for 8 hours. \u22122 corruption recovered. (Day 45, night)\n[2026-09-01T15:29:48.960Z] [debug] arbiter: ambient held (he just spoke)\n[2026-09-01T15:29:48.962Z] [arbiter] The Arbiter goes still. \"It watched you sleep from the treeline and made up its mind about you.\"\n",
+      "[2026-09-01T15:29:48.963Z] [world] A Quiver Rat crosses the last of the open and does not stop coming. The rest is over.\n[2026-09-01T15:29:48.963Z] [debug] enemy: Quiver Rat hp=26 ac=10 atk=Bolt Jab dmg=1D6 rarity=Uncommon ap=5\n[2026-09-01T15:29:48.972Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-01T15:29:48.972Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-09-01T15:29:48.973Z] [system] \u23f3 Time passed: 8h\n[2026-09-01T15:29:49.256Z] [cognitive] REST  (282ms)\n[2026-09-01T15:29:49.968Z] [debug] ui: tap \"dodge\"\n[2026-09-01T15:29:49.972Z] [world] A shard of mud-glass nicks you. Small wound, steady reminder. (\u22121 HP)\n[2026-09-01T15:29:49.978Z] [player] dodge\n",
+      "[2026-09-01T15:29:49.978Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=far enemies=1 hooks=0\n[2026-09-01T15:29:49.979Z] [world] You commit to the dodge. Slip Quiver Rat's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-01T15:29:49.980Z] [combat] Quiver Rat turns on Soot \u2014 d20 15 + ATK 6 = 21 vs Soot's AC 13 (vest +3) \u2014 \u2713 HIT\n[2026-09-01T15:29:49.981Z] [combat] Soot takes 3. (12/15 HP left)\n[2026-09-01T15:29:49.982Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-01T15:29:49.982Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-09-01T15:29:49.983Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T15:29:50.490Z] [cognitive] neutral  (506ms)\n[2026-09-01T16:57:38.340Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a05de5-fbfc-7da4-a73a-0c34cb713684\n[2026-09-01T16:57:38.340Z] [debug] ota: Checking\u2026\n[2026-09-01T16:57:38.454Z] [debug] ota: Already up to date\n",
+      "[2026-09-01T16:57:38.455Z] [debug] ota: boot check result = noUpdate\n[2026-09-01T16:57:38.526Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-09-01T16:57:38.527Z] [debug] voice: bundled idle\n[2026-09-01T16:57:38.810Z] [debug] send-log: bundle #mtis7hpm6ccs attempt 3/5 delivered to Sentry\n",
+      "[2026-09-01T16:57:44.222Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a05de5-fbfc-7da4-a73a-0c34cb713684\n[2026-09-01T16:57:44.222Z] [debug] ota: Checking\u2026\n[2026-09-01T16:57:44.293Z] [debug] ota: Already up to date\n[2026-09-01T16:57:44.293Z] [debug] ota: boot check result = noUpdate\n",
+      "[2026-09-01T16:57:44.322Z] [debug] send-log: bundle #mtis7hpm6ccs held \u2014 only 6s since the last try (a restart, not a chance); 2 left\n[2026-09-01T16:57:44.325Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-09-01T16:57:44.325Z] [debug] voice: bundled idle\n",
+      "[2026-09-01T18:24:21.258Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a05df4-55a7-7fa2-894b-19a21b068c20\n[2026-09-01T18:24:21.258Z] [debug] ota: Checking\u2026\n[2026-09-01T18:24:21.359Z] [debug] ota: Already up to date\n[2026-09-01T18:24:21.360Z] [debug] ota: boot check result = noUpdate\n[2026-09-01T18:24:21.433Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-09-01T18:24:21.433Z] [debug] voice: bundled idle\n[2026-09-01T18:24:21.699Z] [debug] send-log: bundle #mtis7hpm6ccs attempt 4/5 delivered to Sentry\n[2026-09-01T18:47:28.635Z] [debug] OTA applied: 2026-09-01-1608-one-card-one-arithmetic \u2192 2026-09-01-1609-the-strike-keeps-its-name.\n[2026-09-01T18:47:28.635Z] [debug] OTA session start: 2026-09-01-1609-the-strike-keeps-its-name.\n",
+      "[2026-09-01T18:47:28.635Z] [world] You step back into The Monarch's Waystation. The world waits for your move.\n[2026-09-01T18:47:28.635Z] [arbiter] The Arbiter meets your eyes. \"Welcome back, Cheddar Bob. The buried country is no place to walk alone.\"\n\n=== END LOG \u00b7 399973 CHARS ===\n\nTartaria Realms\n\nDevice\n  Name: Pixel 10 Pro XL\n  Platform: android 37\n  Hermes: yes\n  Locale: en-US\n",
+      "  Timezone: America/New_York\n  Screen: window 443\u00d7986 / screen 443\u00d7986 @ 2.4375x density\n  Captured at: 2026-09-01T18:47:29.369Z\n\nInstall\n  App ID: com.hotatticgames.tartarprim\n  App version: 4.32.11\n  APK build version: 2.4.1\n  APK build: 293\n  AAB: (build 293)\n  OTA: (2026-09-01-1609-the-strike-keeps-its-name)\n  Boot stage: qwen:deferred\n\nML runtime health\n  Status: active (no crashes detected)\n",
+      "  Crash count: 0\n  Last init attempt: 2026-09-01T18:24:21.458Z\n  Last init success: 2026-09-01T18:24:22.028Z\n  Crashes-before-disable threshold: 2\n  Qwen completion guard: auto-disabled after 1 completion crashes (template narration in use; auto-retry in 2 boots)\n  Qwen kernel variant: rnllama_v8_2_fp16_dotprod\n",
+      "  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k\n  Voice (TTS) guard: clean (no voice crashes on this build)\nSave-load health\n  Status: clean (no load-crash flags)\nLast JS crash\n",
+      "  Status: none recorded\nThis launch\n  Life: bmtizxzgk5b \u00b7 started 2026-09-01T18:24:21.188Z\n  Followed an OTA apply 216ms ago (mid-session)\n  The previous life released its model contexts before reloading (o0/r0/l0/p0/dn0)\nCrash ledger \u2014 10 recorded (newest last)\n  \u2022 2026-08-31T00:21:58.332Z (2546m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-30-1582-the-guy-who-gives-you-the-job \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done [q0] \u00b7 383ms into the action \u00b7 alive 0ms after it\n  \u2022 2026-08-31T03:45:02.432Z (2342m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-31-1586-the-slate-in-every-part \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done [q0] \u00b7 541ms into the action \u00b7 alive 0ms after it\n  \u2022 2026-08-31T12:34:47.772Z (1813m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-31-1589-the-pin-comes-home \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done [q0] \u00b7 578ms into the action \u00b7 alive 0ms after it\n      launch: died 892ms into the process \u00b7 not an OTA-apply boot\n",
+      "      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-08-31T14:24:08.210Z (1703m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-31-1592-the-events-say-which-build \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n",
+      "      last checkpoint: native:cognition:done [q0] \u00b7 508ms into the action \u00b7 alive 0ms after it\n      launch: died 859ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-08-31T17:38:34.699Z (1509m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-31-1594-the-pinch-demands-the-lift \u00b7 stage boot:qwen:deferred\n",
+      "      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: boot:qwen:deferred \u00b7 893ms into the action \u00b7 alive 0ms after it\n      launch: died 941ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-08-31T22:14:31.073Z (1233m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-31-1595-the-guide-and-the-ground-agree \u00b7 stage boot:qwen:deferred\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: boot:qwen:deferred \u00b7 5207ms into the action \u00b7 alive 0ms after it\n      launch: died 5302ms into the process \u00b7 not an OTA-apply boot\n",
+      "      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-08-31T22:46:39.841Z (1201m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-31-1596-the-mark-catches-up-at-the-door \u00b7 stage native:voice:start\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n",
+      "      last checkpoint: native:voice:start [q1] \u00b7 1865ms into the action \u00b7 alive 0ms after it\n      launch: died 1908ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-01T10:12:02.195Z (515m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-01-1601-combat-separates \u00b7 stage boot:qwen:deferred\n",
+      "      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n "
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-01-1609-the-strike-keeps-its-name #mtj0rqoi6phs [inline 27/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtj0rqoi6phs"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-01-1609-the-strike-keeps-its-name"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "27"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-01-1609-the-strike-keeps-its-name"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-01T18:47:29.768468Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-01T18:47:29.745000Z",
+  "fingerprints": [
+    "302b61b827eba3146eaeffb5e3cf54f5"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1948826700,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-01T18:24:21.415000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-01-1609-the-strike-keeps-its-name",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-01-1609-the-strike-keeps-its-name",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-01-1609-the-strike-keeps-its-name",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-01-1609-the-strike-keeps-its-name)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "cbe5bebcd54b4f2882b26b78a0802179",
+  "previousEventID": "b809200a34334cf99bd2aa2f16f51e9f"
+}

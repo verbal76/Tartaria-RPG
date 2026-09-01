@@ -1,0 +1,278 @@
+{
+  "id": "05830851f58848f29949656b9139a368",
+  "groupID": "7705210551",
+  "eventID": "05830851f58848f29949656b9139a368",
+  "projectID": "4511945117532160",
+  "size": 17520,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-01-1609-the-strike-keeps-its-name #mtj23y06dc8q [inline 24/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-01-1609-the-strike-keeps-its-name",
+  "message": "player-log 2026-09-01-1609-the-strike-keeps-its-name #mtj23y06dc8q [inline 24/28]",
+  "title": "player-log 2026-09-01-1609-the-strike-keeps-its-name #mtj23y06dc8q [inline 24/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "428a8832da1b45388cc1d5fbf09a2dbc",
+      "span_id": "977e57595f1cc960",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "er taste, blue afterimage, and a bite of damage. (\u22122 HP)\n[2026-09-01T19:15:07.836Z] [player] attack with the auralite talon\n[2026-09-01T19:15:07.837Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=1 hooks=0\n",
+      "[2026-09-01T19:15:07.838Z] [debug] attack: target=Mud Spider range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n[2026-09-01T19:15:07.840Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-01T19:15:07.896Z] [world] You raise the acid-etched corrupted auralite talon toward Mud Spider. The room narrows around the both of you.\n",
+      "[2026-09-01T19:15:07.896Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T19:15:08.142Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (245ms)\n[2026-09-01T19:15:16.058Z] [world] Mud Spider moves first. The pressure is immediate.\n[2026-09-01T19:15:16.061Z] [combat] Mud Spider \u2014 d20 \u2192 3 + ATK 5 = 8 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-01T19:15:16.061Z] [combat] You \u2014 d20 \u2192 11 + INT 12 perfect opening (2\u00d7 dice) = 23 vs Mud Spider AC 9 \u2014 \u2713 HIT\n[2026-09-01T19:15:16.062Z] [combat] The killing blow with the acid-etched corrupted auralite talon: 20. Mud Spider drops where it stood.\n[2026-09-01T19:15:16.063Z] [reward] Mud Spider defeated. You recover Spider Silk \u00d72.\n",
+      "[2026-09-01T19:15:16.064Z] [reward] +6 TC pried from the dust.\n[2026-09-01T19:15:16.574Z] [debug] persist sizes(KB): total=265 player=69 wm=109[rooms=50 events=4 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=85 scene=2\n[2026-09-01T19:15:19.957Z] [debug] ui: tap \"\u2192 GARRIN'S DRAFTING BOARD\"\n[2026-09-01T19:15:19.970Z] [world] You walk west. You arrive at Tartarian Outskirts.\n",
+      "[2026-09-01T19:15:19.971Z] [debug] scene: loc=tartarian_outskirts hub=- arrival=y opening=n passing=n\n[2026-09-01T19:15:19.972Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-01T19:15:19.972Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n[2026-09-01T19:15:19.972Z] [debug] missions: mystery:mystery_temporal_watch stage 0/4 [diplomacy] @reclaimer_stake npc=\"the Reclaimers Guild Speaker\" gives=Guild Eddy-Gauge PAUSED\n",
+      "[2026-09-01T19:15:19.973Z] [debug] missions: \u00b7 at=tartarian_outskirts\n[2026-09-01T19:15:20.054Z] [world] Time and the wasteland have worked this place over since you last passed through \u2014 there's something worth a second look again.\n[2026-09-01T19:15:20.070Z] [world] Soot noses at the blood-spotted cloth and snorts. There's something there.\n",
+      "[2026-09-01T19:15:20.073Z] [world] You've left Raider's Ridge and entered Tartarian Outskirts. The borderlands. Where Tartaria thins, but does not stop. It's morning. Dral Hollowpocket is the only soul in sight. east leads to Raider's Ridge; south leads to The Architect's Blind. Nothing named to the north or west.\n",
+      "[2026-09-01T19:15:20.073Z] [world] The gate of Reclaimers' Outpost stands before you \u2014 their ground, not yet their halls. (Tap ENTER OUTPOST to step inside.)\n[2026-09-01T19:15:20.073Z] [world] You know this place. Not well, but you know it.\n[2026-09-01T19:15:20.074Z] [system] Weather effect \u2014 Iron Fog: -1 DEX\n",
+      "[2026-09-01T19:15:20.076Z] [world] [Tartarian Outskirts] north: the Silt Thief (19 tiles, 2 days) \u00b7 east: Raider's Ridge (1 tile, 3 hours) \u00b7 south: The Architect's Blind (2 tiles, 5 hours) \u00b7 west: Reclaimer's Stake (3 tiles, 8 hours)\n[2026-09-01T19:15:20.076Z] [world] Dral Hollowpocket, fence, sits at a folding table at the edge of the ground, wares laid out neat. They beckon.\n",
+      "[2026-09-01T19:15:20.076Z] [arbiter] The Arbiter inclines their head toward the newcomer. \"Dral Hollowpocket, fence. A figure under a hood, leaned against a half-broken cart. Doesn't make eye contact. The merchandise is suspiciously cheap. The hand under the cloak doesn't move.\"\n",
+      "[2026-09-01T19:15:20.081Z] [world] Rare workings for sale: Titanforged Cuirass (500 TC), Titanforged Gauntlets (500 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n[2026-09-01T19:15:20.081Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-09-01T19:15:20.081Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-01T19:15:21.809Z] [debug] ui: tap \"take / salvage\"\n[2026-09-01T19:15:23.313Z] [world] You take the Rusted Blade from where it lay.\n[2026-09-01T19:15:23.314Z] [reward] \u2726 Rusted Blade (Common).\n",
+      "[Filtered]",
+      "[2026-09-01T19:15:24.165Z] [world] You lever something loose from the defense lever \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n[2026-09-01T19:15:24.165Z] [world] You strip the detector carefully. Something usable comes free in your hand.\n[2026-09-01T19:15:24.166Z] [world] You work the half-buried obsidian pillar over. A part of it comes loose, intact.\n",
+      "[Filtered]",
+      "[2026-09-01T19:15:24.168Z] [reward] \u2726 Salvage haul:\n[2026-09-01T19:15:24.168Z] [reward]     \u2022 Driftwood Sliver (Common)\n[2026-09-01T19:15:24.168Z] [reward]     \u2022 Bent Nail x3 (Common)\n[2026-09-01T19:15:24.168Z] [reward]     \u2022 Aether Crystal x2 (Common)\n[2026-09-01T19:15:24.169Z] [reward]     \u2022 Warped Plank Offcut (Common)\n[2026-09-01T19:15:24.169Z] [reward]     \u2022 Worn Tartarian Coin x6 (Common)\n",
+      "[2026-09-01T19:15:24.169Z] [reward]     \u2022 Smooth Stone x2 (Common)\n[2026-09-01T19:15:24.169Z] [reward]     \u2022 Moth-Eaten Felt Scrap (Common)\n[2026-09-01T19:15:24.169Z] [reward]     \u2022 Aether Dust x2 (Common)\n[2026-09-01T19:15:26.894Z] [debug] ui: tap \"inventory\"\n[2026-09-01T19:15:34.111Z] [reward] Dral Hollowpocket fires up a portable Crucible for you. (\u221225 TC)\n",
+      "[2026-09-01T19:15:45.742Z] [reward] \u2726 The Crucible drinks the five pieces and works an extra resist channel into the Vein-Threaded Cover. It can now hold one more worked-in resist. (Its armor rating is unchanged.)\n[2026-09-01T19:15:46.190Z] [debug] persist sizes(KB): total=276 player=70 wm=117[rooms=57 events=4 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=85 scene=3\n",
+      "[2026-09-01T19:15:48.407Z] [reward] Dral Hollowpocket fires up a portable Crucible for you. (\u221225 TC)\n[2026-09-01T19:15:56.304Z] [world] You set your reserved pieces on the three pedestals. The Crucible takes them in.\n[2026-09-01T19:15:56.307Z] [reward] \u2726 The Crucible forges a Rare RANGED weapon from your reserved pieces \u2014 and it's in your pack, still cooling.\n",
+      "[2026-09-01T19:15:56.307Z] [world] The Crucible exhales slow. The shape is set, but the Aether hasn't named it yet \u2014 let it finish. You'll know it the moment it announces itself.\n[2026-09-01T19:15:56.318Z] [reward] \u2726 The forging finishes \u2014 the Aether names it Choir-Bound Launcher (Rare).\n[2026-09-01T19:16:20.692Z] [player] Ask why the stall is here\n",
+      "[2026-09-01T19:16:20.694Z] [world] \"Stall goes up where the ground is flat and comes down when it is not worth it,\" the trader says. \"That is the whole business plan.\"\n[2026-09-01T19:16:20.697Z] [world] Dral Hollowpocket looks at the road behind you before they answer anything at all.\n[2026-09-01T19:16:22.710Z] [world] You let the conversation go and Dral Hollowpocket gets back to it.\n",
+      "[2026-09-01T19:16:34.951Z] [reward] Sold Tartarian Claw Knife (Common) to Dral Hollowpocket for 15 TC. (267 TC on hand)\n[2026-09-01T19:16:35.011Z] [reward] Sold Mud Throwing Knife (Common) to Dral Hollowpocket for 15 TC. (282 TC on hand)\n[2026-09-01T19:16:35.060Z] [reward] Sold Rusted Blade (Common) to Dral Hollowpocket for 15 TC. (297 TC on hand)\n",
+      "[2026-09-01T19:16:35.109Z] [reward] Sold Mud Long Axe (Common) to Dral Hollowpocket for 14 TC. (311 TC on hand)\n[2026-09-01T19:16:35.159Z] [reward] Sold Throwing Knife (Common) to Dral Hollowpocket for 14 TC. (325 TC on hand)\n[2026-09-01T19:16:35.209Z] [reward] Sold Bone Maul (Common) to Dral Hollowpocket for 13 TC. (338 TC on hand)\n",
+      "[2026-09-01T19:16:35.258Z] [reward] Sold Sentinel's Chestplate (Common) to Dral Hollowpocket for 10 TC. (348 TC on hand)\n[2026-09-01T19:16:35.307Z] [reward] Sold Titan's Guard Mask (Common) to Dral Hollowpocket for 8 TC. (356 TC on hand)\n[2026-09-01T19:16:35.356Z] [reward] Sold Golem-Born Guardian Mask (Common) to Dral Hollowpocket for 8 TC. (364 TC on hand)\n",
+      "[2026-09-01T19:16:35.405Z] [reward] Sold Stone Seeker's Brow Guard (Common) to Dral Hollowpocket for 8 TC. (372 TC on hand)\n[2026-09-01T19:16:35.456Z] [reward] Sold Titan's Forehead Guard (Common) to Dral Hollowpocket for 8 TC. (380 TC on hand)\n[2026-09-01T19:16:35.504Z] [reward] Sold Architect's Mantle (Common) to Dral Hollowpocket for 8 TC. (388 TC on hand)\n",
+      "[2026-09-01T19:16:35.552Z] [reward] Sold Reclaimer's Salvage Cap (Common) to Dral Hollowpocket for 6 TC. (394 TC on hand)\n[2026-09-01T19:16:35.601Z] [reward] Sold Architect's Aether Gloves (Common) to Dral Hollowpocket for 6 TC. (400 TC on hand)\n[2026-09-01T19:16:35.650Z] [reward] Sold Architect's Outer Mantle (Common) to Dral Hollowpocket for 6 TC. (406 TC on hand)\n",
+      "[2026-09-01T19:16:35.698Z] [reward] Sold Wanderer's Worn Gauntlets (Common) to Dral Hollowpocket for 6 TC. (412 TC on hand)\n[2026-09-01T19:16:35.746Z] [reward] Sold Wanderer's Swiftstride Greaves (Common) to Dral Hollowpocket for 6 TC. (418 TC on hand)\n[2026-09-01T19:16:35.793Z] [reward] Sold Bone Knife (Common) to Dral Hollowpocket for 6 TC. (424 TC on hand)\n",
+      "[2026-09-01T19:16:35.840Z] [reward] Sold Bone Knife (Common) to Dral Hollowpocket for 6 TC. (430 TC on hand)\n[2026-09-01T19:16:35.887Z] [reward] Sold Aether-Runner Greaves (Common) to Dral Hollowpocket for 6 TC. (436 TC on hand)\n[2026-09-01T19:16:35.934Z] [reward] Sold Bone Knife (Common) to Dral Hollowpocket for 6 TC. (442 TC on hand)\n",
+      "[2026-09-01T19:16:35.981Z] [reward] Sold Reclaimer's Salvage Cap (Common) to Dral Hollowpocket for 6 TC. (448 TC on hand)\n[2026-09-01T19:16:36.028Z] [reward] Sold Reclaimer's Gloves (Common) to Dral Hollowpocket for 6 TC. (454 TC on hand)\n[2026-09-01T19:16:36.074Z] [reward] Sold Seer's Veil of the Aether (Common) to Dral Hollowpocket for 6 TC. (460 TC on hand)\n",
+      "[2026-09-01T19:16:36.121Z] [reward] Sold Aetheric Helm of Command (Common) to Dral Hollowpocket for 6 TC. (466 TC on hand)\n[2026-09-01T19:16:36.167Z] [reward] Sold Wanderer's Swiftstride Greaves (Common) to Dral Hollowpocket for 6 TC. (472 TC on hand)\n[2026-09-01T19:16:36.213Z] [reward] Sold Bone Knife (Common) to Dral Hollowpocket for 6 TC. (478 TC on hand)\n",
+      "[2026-09-01T19:16:36.259Z] [reward] Sold Mud-Bound Cloak (Common) to Dral Hollowpocket for 5 TC. (483 TC on hand)\n[2026-09-01T19:16:36.304Z] [reward] Sold Mud-Warden's Vest (Common) to Dral Hollowpocket for 5 TC. (488 TC on hand)\n[2026-09-01T19:16:36.349Z] [reward] Sold Cudgel (Common) to Dral Hollowpocket for 5 TC. (493 TC on hand)\n",
+      "[2026-09-01T19:16:36.395Z] [reward] Sold Mud-Warden's Vest (Common) to Dral Hollowpocket for 5 TC. (498 TC on hand)\n[2026-09-01T19:16:36.439Z] [reward] Sold Cudgel (Common) to Dral Hollowpocket for 5 TC. (503 TC on hand)\n[2026-09-01T19:16:36.484Z] [reward] Sold Mud-Warden's Vest (Common) to Dral Hollowpocket for 5 TC. (508 TC on hand)\n",
+      "[2026-09-01T19:16:36.529Z] [reward] Sold Reclaimer's Salvage Vest (Common) to Dral Hollowpocket for 5 TC. (513 TC on hand)\n[2026-09-01T19:16:36.574Z] [reward] Sold Mud-Warden's Vest (Common) to Dral Hollowpocket for 5 TC. (518 TC on hand)\n[2026-09-01T19:16:36.619Z] [reward] Sold Cudgel (Common) to Dral Hollowpocket for 5 TC. (523 TC on hand)\n",
+      "[2026-09-01T19:16:36.664Z] [reward] Sold Mud-Warden's Vest (Common) to Dral Hollowpocket for 5 TC. (528 TC on hand)\n[2026-09-01T19:16:36.708Z] [reward] Sold Cudgel (Common) to Dral Hollowpocket for 5 TC. (533 TC on hand)\n[2026-09-01T19:16:36.752Z] [reward] Sold Mud-Warden's Vest (Common) to Dral Hollowpocket for 5 TC. (538 TC on hand)\n",
+      "[2026-09-01T19:16:36.796Z] [reward] Sold Cudgel (Common) to Dral Hollowpocket for 5 TC. (543 TC on hand)\n[2026-09-01T19:16:36.840Z] [reward] Sold Mud-Warden's Vest (Common) to Dral Hollowpocket for 5 TC. (548 TC on hand)\n[2026-09-01T19:16:36.884Z] [reward] Sold Cudgel (Common) to Dral Hollowpocket for 5 TC. (553 TC on hand)\n",
+      "[2026-09-01T19:16:36.928Z] [reward] Sold Mud-Warden's Vest (Common) to Dral Hollowpocket for 5 TC. (558 TC on hand)\n[2026-09-01T19:16:36.972Z] [reward] Sold Mud-Warden's Vest (Common) to Dral Hollowpocket for 5 TC. (563 TC on hand)\n[2026-09-01T19:16:48.168Z] [reward] Bought Skyreacher Map 2 of 5 \u2014 Asgardar Spire from Dral Hollowpocket for 139 TC. (424 TC left)\n",
+      "[2026-09-01T19:16:48.468Z] [debug] persist sizes(KB): total=262 player=55 wm=118[rooms=57 events=4 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=85 scene=3\n[2026-09-01T19:16:53.131Z] [reward] Bought 5\u00d7 Red Cap Mushroom from Dral Hollowpocket for 40 TC. (384 TC left)\n[2026-09-01T19:16:53.131Z] [reward] They don't charge a friend full price \u2014 5 TC stayed in your pouch.\n",
+      "[2026-09-01T19:16:54.874Z] [reward] Bought 3\u00d7 Blue Cap Mushroom from Dral Hollowpocket for 12 TC. (372 TC left)\n[2026-09-01T19:16:54.874Z] [reward] They don't charge a friend full price \u2014 3 TC stayed in your pouch.\n[2026-09-01T19:17:08.045Z] [player] Ask how far they range\n",
+      "[2026-09-01T19:17:08.048Z] [world] \"I do this stretch and one other.\" They gesture vaguely. \"Any more and you are travelling, not trading. Travelling is how you lose stock.\"\n[2026-09-01T19:17:08.052Z] [world] Dral Hollowpocket keeps facing the way they were going, and talks to you sideways.\n[2026-09-01T19:17:08.777Z] [player] Ask why they trade out here\n",
+      "[2026-09-01T19:17:08.778Z] [world] \"Because out here I am the only shop in the world.\" The trader grins at their own arithmetic. \"In a settlement I am one stall among twenty. On this stretch of road I am civilization ITSELF for half a day's walk in both directions. The mark-up is not greed, it is geography.\" The grin softens a notch. \"Also \u2014 and do not spread this \u2014 somebody should be out here. Th",
+      "e road is long. A fire and a fair-enough price change what the road IS.\"\n[2026-09-01T19:17:08.788Z] [world] Dral Hollowpocket looks at the road behind you before they answer anything at all.\n[2026-09-01T19:17:16.646Z] [world] You let the conversation go and Dral Hollowpocket gets back to it.\n[2026-09-01T19:17:21.365Z] [debug] ui: tap \"\u2192 GARRIN'S DRAFTING BOARD\"\n",
+      "[2026-09-01T19:17:21.383Z] [debug] spawn: gear=[Salvager's"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-01-1609-the-strike-keeps-its-name #mtj23y06dc8q [inline 24/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtj23y06dc8q"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-01-1609-the-strike-keeps-its-name"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "24"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-01-1609-the-strike-keeps-its-name"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-01T19:24:58.581982Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "14": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 370,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        },
+        "16": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 360,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-01T19:24:58.492000Z",
+  "fingerprints": [
+    "302b61b827eba3146eaeffb5e3cf54f5"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1948826700,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-01T18:24:21.415000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-01-1609-the-strike-keeps-its-name",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-01-1609-the-strike-keeps-its-name",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-01-1609-the-strike-keeps-its-name",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-01-1609-the-strike-keeps-its-name)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "0ab46169034d41429bc712ebcb6d55ce",
+  "previousEventID": "d918c1606e1f4380abea3dab4c47004a"
+}

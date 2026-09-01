@@ -1,0 +1,237 @@
+{
+  "id": "c20f7e087160470998706cdcec195c76",
+  "groupID": "7705210551",
+  "eventID": "c20f7e087160470998706cdcec195c76",
+  "projectID": "4511945117532160",
+  "size": 18091,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-01-1609-the-strike-keeps-its-name #mtis7hpm6ccs [inline 11/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-01-1609-the-strike-keeps-its-name",
+  "message": "player-log 2026-09-01-1609-the-strike-keeps-its-name #mtis7hpm6ccs [inline 11/28]",
+  "title": "player-log 2026-09-01-1609-the-strike-keeps-its-name #mtis7hpm6ccs [inline 11/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "428a8832da1b45388cc1d5fbf09a2dbc",
+      "span_id": "977e57595f1cc960",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "rns).\n[2026-09-01T03:19:09.353Z] [combat] Searing Acid-Etched Bone Crossbow \u2014 1 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n[2026-09-01T03:19:13.772Z] [debug] ui: tap \"\ud83d\udd25\u2697 bone crossbow\"\n[2026-09-01T03:19:13.830Z] [player] attack with the off-hand bone crossbow\n",
+      "[2026-09-01T03:19:13.830Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=3 hooks=1\n[2026-09-01T03:19:13.831Z] [combat] Mud Monarchs Patrol 2 blisters \u2014 clinging fire sears 2. (11/26 HP, 2 turns left)\n[2026-09-01T03:19:13.831Z] [combat] Mud Monarchs Patrol 2 smokes \u2014 acid eats 1. (10/26 HP, 2 turns left)\n",
+      "[2026-09-01T03:19:13.834Z] [debug] attack: target=Mud Monarchs Patrol 2 range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-09-01T03:19:13.891Z] [world] You bring the searing acid-etched bone crossbow to bear on Mud Monarchs Patrol 2.\n[2026-09-01T03:19:13.892Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-01T03:19:14.120Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (227ms)\n[2026-09-01T03:19:22.686Z] [world] Mud Monarchs Patrol 2 moves first. The pressure is immediate.\n[2026-09-01T03:19:22.688Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 16 + ATK 8 = 24 vs your AC 23 \u2014 \u2713 HIT\n[2026-09-01T03:19:22.690Z] [combat] Mud Monarchs Patrol 2 \u2014 d20 \u2192 19 + ATK 9 = 28 vs your AC 23 \u2014 \u2713 HIT\n",
+      "[2026-09-01T03:19:22.692Z] [combat] Mud Monarchs Patrol 3 \u2014 d20 \u2192 17 + ATK 8 = 25 vs your AC 23 \u2014 \u2713 HIT\n[2026-09-01T03:19:22.693Z] [combat] You \u2014 d20 \u2192 7 + DEX 24 = 31 vs Mud Monarchs Patrol 2 AC 12 \u2014 \u2713 HIT\n[2026-09-01T03:19:22.694Z] [combat] The killing blow with the searing acid-etched bone crossbow: 12. Mud Monarchs Patrol 2 drops where it stood.\n",
+      "[2026-09-01T03:19:22.697Z] [reward] Mud Monarchs Patrol 2 defeated. You recover Patched Cloth, Aetheric Shard \u00d72, Mud Monarch Sigil.\n[2026-09-01T03:19:22.698Z] [reward] You strip the body: Bone Knife, Mud-Bound Cloak (+14 TC). The kit took the fight badly.\n[2026-09-01T03:19:22.698Z] [combat] 2 attackers remain. Mud Monarchs Patrol 3 now in your sights.\n",
+      "[2026-09-01T03:19:22.699Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-09-01T03:19:22.699Z] [reward] +24 TC pried from the dust.\n[2026-09-01T03:19:23.003Z] [combat] Mud Monarchs Patrol 4 deals 3 slashing damage [armor \u221234%] [edge of reach \u2014 halved]. You have 32 HP remaining.\n",
+      "[2026-09-01T03:19:23.003Z] [combat] Mud Monarchs Patrol 4's strike leaves you bleeding.\n[2026-09-01T03:19:23.004Z] [combat] Mud Monarchs Patrol 2 deals 4 slashing damage [armor \u221234%] [edge of reach \u2014 halved]. You have 28 HP remaining.\n[2026-09-01T03:19:23.004Z] [combat] Mud Monarchs Patrol 3 deals 2 slashing damage [armor \u221234%] [edge of reach \u2014 halved]. You have 26 HP remaining.\n",
+      "[2026-09-01T03:19:23.004Z] [combat] Mud Monarchs Patrol 3's strike leaves you poisoned.\n[2026-09-01T03:19:23.559Z] [debug] persist sizes(KB): total=236 player=53 wm=94[rooms=41 events=4 memos=0 npcs=4 defeated=1 tags=1 discovered=0] log=83 scene=5\n[2026-09-01T03:19:26.756Z] [debug] ui: tap \"dodge\"\n[2026-09-01T03:19:26.772Z] [player] dodge\n",
+      "[2026-09-01T03:19:26.773Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=2 hooks=1\n[2026-09-01T03:19:26.774Z] [world] You commit to the dodge. Slip Mud Monarchs Patrol 3's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-01T03:19:26.850Z] [combat] Mud Monarchs Patrol 3 \u2014 d20 \u2192 11 + ATK 8 = 19 vs your AC 23 \u2014 \u2717 EVADED\n[2026-09-01T03:19:26.850Z] [combat] Dodge \u2014 d20 \u2192 14 + DEX 24 = 38 vs ATK 19. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n",
+      "[2026-09-01T03:19:26.851Z] [world] You slip Mud Monarchs Patrol 3's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n[2026-09-01T03:19:26.852Z] [debug] ac-shift 23\u219226: race/base 10 + gear 20 + title 0 \u2192 trimmed 23 + status 3 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Gr",
+      "eaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n[2026-09-01T03:19:26.852Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 14 + ATK 8 = 22 vs your AC 26 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-01T03:19:26.853Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T03:19:27.092Z] [cognitive] neutral  (238ms)\n[2026-09-01T03:19:32.923Z] [debug] ui: tap \"\ud83d\udd25\u2697 bone crossbow\"\n",
+      "[2026-09-01T03:19:32.926Z] [system] evasive \u2014 harder to hit fades.\n[2026-09-01T03:19:32.980Z] [player] attack with the off-hand bone crossbow\n[2026-09-01T03:19:32.981Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=2 hooks=1\n",
+      "[2026-09-01T03:19:32.982Z] [debug] attack: target=Mud Monarchs Patrol 3 range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-09-01T03:19:32.984Z] [debug] attack: status mods poisoned -2 \u00b7 perfect opening (2\u00d7 dice)\n[2026-09-01T03:19:33.043Z] [world] You bring the searing acid-etched bone crossbow to bear on Mud Monarchs Patrol 3.\n",
+      "[2026-09-01T03:19:33.044Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T03:19:33.273Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (228ms)\n[2026-09-01T03:19:41.495Z] [world] Mud Monarchs Patrol 3 moves first. The pressure is immediate.\n",
+      "[2026-09-01T03:19:41.497Z] [debug] ac-shift 26\u219223: race/base 10 + gear 20 + title 0 \u2192 trimmed 23 + status 0 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n[2026-09-01T03:19:41.497Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 6 + ATK 8 = 14 vs your AC 23 \u2014 \u2717 MISS\n",
+      "[2026-09-01T03:19:41.501Z] [combat] Mud Monarchs Patrol 3 \u2014 d20 \u2192 18 + ATK 8 = 26 vs your AC 23 \u2014 \u2713 HIT\n[2026-09-01T03:19:41.502Z] [combat] You \u2014 d20 \u2192 18 + DEX 24 poisoned -2 perfect opening (2\u00d7 dice) = 40 vs Mud Monarchs Patrol 3 AC 12 \u2014 \u2713 HIT\n",
+      "[2026-09-01T03:19:41.504Z] [combat] You crack the Mud Monarchs Patrol 3 with the Searing Acid-Etched Bone Crossbow for 15 \u2014 nearly the whole of their fight, gone in one blow. They crumple, out cold. (1/16 HP) Loot them before they come to.\n[2026-09-01T03:19:41.504Z] [combat] Mud Monarchs Patrol 3 is out of it. Mud Monarchs Patrol 4 now in your sights.\n",
+      "[2026-09-01T03:19:41.504Z] [combat] Searing Acid-Etched Bone Crossbow \u2014 2 burn bites in and festers (3 turns).\n[2026-09-01T03:19:41.505Z] [combat] Searing Acid-Etched Bone Crossbow \u2014 1 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n",
+      "[2026-09-01T03:19:41.774Z] [combat] Mud Monarchs Patrol 3 deals 3 slashing damage [armor \u221234%] [edge of reach \u2014 halved]. You have 23 HP remaining.\n[2026-09-01T03:19:41.774Z] [combat] Mud Monarchs Patrol 3's strike leaves you bleeding.\n[2026-09-01T03:19:45.241Z] [debug] ui: tap \"\ud83d\udd25\u2697 bone crossbow\"\n[2026-09-01T03:19:45.245Z] [system] poisoned fades.\n",
+      "[2026-09-01T03:19:45.297Z] [player] attack with the off-hand bone crossbow\n[2026-09-01T03:19:45.298Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=2 hooks=1\n[2026-09-01T03:19:45.298Z] [combat] Mud Monarchs Patrol 3 blisters \u2014 clinging fire sears 2. (0/16 HP, 2 turns left)\n",
+      "[2026-09-01T03:19:45.299Z] [combat] Mud Monarchs Patrol 3 smokes \u2014 acid eats 1. (0/16 HP, 2 turns left)\n[2026-09-01T03:19:45.300Z] [reward] Mud Monarchs Patrol 3 defeated. You recover Patched Cloth, Aether Residue.\n",
+      "[2026-09-01T03:19:45.300Z] [world] You crouch for the blade \u2014 the Hollow Edge, the black mark of the Forgotten Order's enforcers, its steel weeping a faint corruption that fogs the air. But the grip is wrong. It's honed: razored along the inner curve so the handle itself is a second blade, and only one of its edges is meant for the enemy. Take it up untrained and you flay your own palm to the bone",
+      ". Only a hand that knows the Order's hold \u2014 that two-finger grip they teach behind sealed doors \u2014 can carry it. You leave it where it fell.\n[2026-09-01T03:19:45.302Z] [reward] You strip the body: Mud-Bound Cloak (+15 TC). The kit took the fight badly.\n[2026-09-01T03:19:45.302Z] [combat] 1 attacker remains. Mud Monarchs Patrol 4 now in your sights.\n",
+      "[2026-09-01T03:19:45.302Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-09-01T03:19:45.303Z] [reward] +27 TC pried from the dust.\n[2026-09-01T03:19:45.343Z] [debug] attack: target=Mud Monarchs Patrol 4 range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n",
+      "[2026-09-01T03:19:45.344Z] [debug] attack: status mods poisoned -2\n[2026-09-01T03:19:45.390Z] [world] Your searing acid-etched bone crossbow comes around in an arc; Mud Monarchs Patrol 4 squares up to meet it.\n[2026-09-01T03:19:45.390Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T03:19:45.638Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (247ms)\n",
+      "[2026-09-01T03:19:53.780Z] [world] You seize the initiative. Mud Monarchs Patrol 4 has no time to react.\n[2026-09-01T03:19:53.780Z] [combat] You \u2014 d20 \u2192 14 + DEX 24 poisoned -2 = 36 vs Mud Monarchs Patrol 4 AC 12 \u2014 \u2713 HIT\n[2026-09-01T03:19:53.782Z] [combat] Mud Monarchs Patrol 4 takes 8 with the searing acid-etched bone crossbow. It reels: 14 left. Then it fights back.\n",
+      "[2026-09-01T03:19:53.782Z] [combat] Searing Acid-Etched Bone Crossbow \u2014 2 burn bites in and festers (3 turns).\n[2026-09-01T03:19:53.783Z] [combat] Searing Acid-Etched Bone Crossbow \u2014 2 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n[2026-09-01T03:19:53.784Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 12 + ATK 8 = 20 vs your AC 23 \u2014 \u2717 MISS\n",
+      "[2026-09-01T03:19:56.412Z] [debug] ui: tap \"\ud83d\udd25\u2697 bone crossbow\"\n[2026-09-01T03:19:56.469Z] [player] attack with the off-hand bone crossbow\n[2026-09-01T03:19:56.470Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=1 hooks=1\n",
+      "[2026-09-01T03:19:56.471Z] [combat] Mud Monarchs Patrol 4 blisters \u2014 clinging fire sears 2. (12/22 HP, 2 turns left)\n[2026-09-01T03:19:56.471Z] [combat] Mud Monarchs Patrol 4 smokes \u2014 acid eats 2. (10/22 HP, 2 turns left)\n[2026-09-01T03:19:56.472Z] [debug] attack: target=Mud Monarchs Patrol 4 range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n",
+      "[2026-09-01T03:19:56.531Z] [world] Your searing acid-etched bone crossbow comes around in an arc; Mud Monarchs Patrol 4 squares up to meet it.\n[2026-09-01T03:19:56.531Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T03:19:56.760Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (228ms)\n[2026-09-01T03:20:05.176Z] [world] You seize the initiative. Mud Monarchs Patrol 4 has no time to react.\n",
+      "[2026-09-01T03:20:05.177Z] [combat] You \u2014 d20 \u2192 11 + DEX 24 = 35 vs Mud Monarchs Patrol 4 AC 11 \u2014 \u2713 HIT\n[2026-09-01T03:20:05.178Z] [combat] Piercing flares \u2014 +2 on hit.\n[2026-09-01T03:20:05.179Z] [combat] Your blow with the searing acid-etched bone crossbow lands clean \u2014 13 damage. Mud Monarchs Patrol 4 crumples in the dust. The Aetherstone settles.\n",
+      "[2026-09-01T03:20:05.180Z] [reward] Mud Monarchs Patrol 4 defeated. You recover Aetheric Shard \u00d72, Patched Cloth, Mud Monarch Sigil.\n[2026-09-01T03:20:05.182Z] [reward] You strip the body: Bone Knife, Mud-Bound Cloak (+14 TC). The kit took the fight badly.\n[2026-09-01T03:20:05.182Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n",
+      "[2026-09-01T03:20:05.183Z] [reward] +21 TC pried from the dust.\n[2026-09-01T03:20:05.546Z] [debug] persist sizes(KB): total=236 player=54 wm=95[rooms=41 events=4 memos=0 npcs=4 defeated=1 tags=1 discovered=0] log=84 scene=4\n[2026-09-01T03:20:22.050Z] [debug] qwen\u23f1 flourish ok 2400ms read 1905ms/write 484ms in 173t\u2192out 14t 11.0ms/t (58ch)\n",
+      "[2026-09-01T03:20:22.218Z] [debug] qwen\u23f1 \u2702 DISCARDED flourish after 2400ms \u2014 flourish:empty\n[2026-09-01T03:20:22.218Z] [debug] flourish: \u2205 2751ms\n[2026-09-01T03:20:22.533Z] [player] Ask how far they range\n[2026-09-01T03:20:22.534Z] [world] \"I do this stretch and one other.\" They gesture vaguely. \"Any more and you are travelling, not trading. Travelling is how you lose stock.\"\n",
+      "[2026-09-01T03:20:22.535Z] [world] Ret the Ash has stopped checking where your hands are.\n[2026-09-01T03:20:23.584Z] [world] You let the conversation go and Ret the Ash gets back to it.\n[2026-09-01T03:20:26.613Z] [reward] Ret the Ash fires up a portable Crucible for you. (\u221225 TC)\n",
+      "[2026-09-01T03:20:41.497Z] [reward] \u2726 The Crucible drinks the five pieces and works an extra resist channel into the Mud-glass Scales. It can now hold one more worked-in resist. (Its armor rating is unchanged.)\n[2026-09-01T03:20:44.107Z] [debug] ui: tap \"take / salvage\"\n[2026-09-01T03:20:45.626Z] [world] You pick up the Mask of the Mud Stalker.\n",
+      "[2026-09-01T03:20:45.627Z] [reward] \u2726 Mask of the Mud Stalker (Common).\n[2026-09-01T03:20:45.651Z] [world] You lift the Reclaimer's Boots clear.\n[2026-09-01T03:20:45.652Z] [reward] \u2726 Reclaimer's Boots (Common).\n[2026-09-01T03:20:46.919Z] [world] You strip the boot-track carefully. Something usable comes free in your hand.\n",
+      "[2026-09-01T03:20:46.920Z] [world] You strip the ridge-sign carefully. Something usable comes free in your hand.\n[2026-09-01T03:20:46.920Z] [world] You work the stacked stone apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n[2026-09-01T03:20:46.921Z] [reward] \u2726 Salvage haul:\n[2026-09-01T03:20:46.921Z] [reward]     \u2022 Bent Nail x2 (Common)\n",
+      "[2026-09-01T03:20:46.921Z] [reward]     \u2022 Worn Tartarian Coin (Common)\n[2026-09-01T03:20:46.922Z] [reward]     \u2022 Horn-Capped Dowel (Common)\n[2026-09-01T03:20:48.778Z] [debug] ui: tap \"investigate\"\n[2026-09-01T03:20:50.221Z] [system] bleeding fades.\n[2026-09-01T03:20:50.240Z] [player] investigate the ground\n",
+      "[2026-09-01T03:20:50.243Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n[2026-09-01T03:20:50.248Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Aether Residue (Common).\n[2026-09-01T03:20:50.253Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n",
+      "[2026-09-01T03:20:50.254Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-01T03:20:50.255Z] [system] \u23f3 Time passed: 24 min\n[2026-09-01T03:20:50.413Z] [cognitive] CLIMB  (158ms)\n[2026-09-01T03:20:51.425Z] [reward] Ret the Ash fires up a portable Crucible for you. (\u221225 TC)\n[2026-09-01T03:20:51.622Z] [player] investigate shallow pool\n",
+      "[2026-09-01T03:20:51.623Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=shallow pool resolved=shallow pool range=- enemies=0 hooks=1\n[2026-09-01T03:20:51.624Z] [world] You look the shallow pool over. Nothing about it sings, nothing about it warns \u2014 Tartaria is full of things waiting to be remembered.\n[2026-09-01T03:20:51.625Z] [d"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-01-1609-the-strike-keeps-its-name #mtis7hpm6ccs [inline 11/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtis7hpm6ccs"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-01-1609-the-strike-keeps-its-name"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "11"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-01-1609-the-strike-keeps-its-name"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "4"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-01T18:24:21.391000Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-01T18:24:21.416000Z",
+  "fingerprints": [
+    "302b61b827eba3146eaeffb5e3cf54f5"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1948826700,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-01T18:24:21.415000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-01-1609-the-strike-keeps-its-name",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-01-1609-the-strike-keeps-its-name",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-01-1609-the-strike-keeps-its-name",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-01-1609-the-strike-keeps-its-name)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "c40e331d10b143f383c7b9ec293d1c0b",
+  "previousEventID": "b1c472d75d924c73bff725883f68d08e"
+}

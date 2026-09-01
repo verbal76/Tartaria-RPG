@@ -1,0 +1,232 @@
+{
+  "id": "daf03a2a5150493c9246c262f9d734cf",
+  "groupID": "7705210551",
+  "eventID": "daf03a2a5150493c9246c262f9d734cf",
+  "projectID": "4511945117532160",
+  "size": 18109,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-01-1609-the-strike-keeps-its-name #mtj23y06dc8q [inline 21/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-01-1609-the-strike-keeps-its-name",
+  "message": "player-log 2026-09-01-1609-the-strike-keeps-its-name #mtj23y06dc8q [inline 21/28]",
+  "title": "player-log 2026-09-01-1609-the-strike-keeps-its-name #mtj23y06dc8q [inline 21/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "428a8832da1b45388cc1d5fbf09a2dbc",
+      "span_id": "977e57595f1cc960",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      " (3 turns).\n[2026-09-01T14:46:33.177Z] [combat] Searing Acid-Etched Bone Crossbow \u2014 2 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n[2026-09-01T14:46:33.180Z] [combat] Tartarian Reaver (hunted) \u2014 d20 \u2192 4 + ATK 14 = 18 vs your AC 23 \u2014 \u2717 MISS\n",
+      "[2026-09-01T14:46:33.181Z] [combat] Tartarian Reaver (hunted) gathers for the second strike \u2014 and the wound tells. STAGGERED: no second swing this round.\n[2026-09-01T14:46:34.944Z] [debug] ui: tap \"flee\"\n[2026-09-01T14:46:34.950Z] [player] flee\n[2026-09-01T14:46:34.951Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=mid enemies=1 hooks=0\n",
+      "[2026-09-01T14:46:35.021Z] [system] \u23f3 Time passed: 15 min\n[2026-09-01T14:46:35.279Z] [cognitive] FEAR \u00b7 RETREAT \u00b7 HIDE  (257ms)\n[2026-09-01T14:46:36.704Z] [debug] skillcheck: escape d20=12 DEX 24 = 36 vs Pursuit 19 \u2014 Tartarian Reaver (hunted) (d20 5 + SPD 14) \u2192 PASS\n",
+      "[2026-09-01T14:46:36.794Z] [debug] stats: STR13 DEX24 INT11 WIS12 CHA7 STE6 | gear: WIS+4,INT+2,DEX+14,STR+5,STE+2 | worn: main=Auralite Talon off=Bone Crossbow head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n",
+      "[2026-09-01T14:46:36.794Z] [debug] train: dexterity (escape check) \u2192 progress 86/100\n[2026-09-01T14:46:36.794Z] [world] You break away across the open ground. Behind you the thing you ran from gives up the chase.\n[2026-09-01T14:46:37.042Z] [debug] persist sizes(KB): total=266 player=68 wm=109[rooms=51 events=4 memos=1 npcs=4 defeated=1 tags=1 discovered=0] log=86 scene=2\n",
+      "[2026-09-01T14:46:39.132Z] [debug] ui: tap \"NORTH\"\n[2026-09-01T14:46:39.137Z] [system] bleeding fades.\n[2026-09-01T14:46:39.169Z] [player] go north\n[2026-09-01T14:46:39.170Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=0\n[2026-09-01T14:46:39.251Z] [reward] \u2726 The road teaches you. +1 WIS (base 8, 13 as you stand).\n",
+      "[2026-09-01T14:46:39.252Z] [world] You walk north. You arrive at The Monarch's Waystation.\n[2026-09-01T14:46:39.253Z] [debug] scene: loc=monarch_waystation hub=outpost_gate arrival=y opening=n passing=n\n[2026-09-01T14:46:39.253Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713\n",
+      "[2026-09-01T14:46:39.253Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n[2026-09-01T14:46:39.253Z] [debug] missions: mystery:mystery_temporal_watch stage 0/4 [diplomacy] @reclaimer_stake npc=\"the Reclaimers Guild Speaker\" gives=Guild Eddy-Gauge PAUSED\n",
+      "[2026-09-01T14:46:39.253Z] [debug] missions: \u00b7 at=monarch_waystation\n[2026-09-01T14:46:39.311Z] [world] You've left The Reaver's Crest and entered The Monarch's Waystation. The seneschal logs your name without asking it. The Monarchs' ledgers have their ways. It's pre-dawn dark. Halem the Trader is the only soul in sight. east leads to Dynasty Border Post; south leads to The Reaver's Crest; west l",
+      "eads to Iskan-Veil. Nothing named to the north.\n[2026-09-01T14:46:39.311Z] [world] You pass through the gate into Monarch Court \u2014 The Atrium. Polished mud-glass tiles and a carved Monarch sigil over the doorway. The seneschal nods you through without speaking \u2014 your business has already been logged elsewhere.\n",
+      "[2026-09-01T14:46:39.311Z] [world] You have been here. The shape of it comes back before the details do.\n[2026-09-01T14:46:39.311Z] [world] Paths: north to Standards \u00b7 south to First Landing. (Type 'leave outpost' to head into the wilds.)\n[2026-09-01T14:46:39.311Z] [system] Weather effect \u2014 Glass Hail: -1 DEX\n",
+      "[2026-09-01T14:46:39.312Z] [world] Halem the Trader looks up before you've finished crossing the room \u2014 already reaching for the pot, already smiling. \"Cheddar Bob. Sit. Tell me what kind of day it's been.\"\n[2026-09-01T14:46:39.312Z] [debug] arbiter: template (reason=outpost-room)\n",
+      "[2026-09-01T14:46:39.312Z] [arbiter] The Arbiter looks around. \"Silt-stiff banners crack in the wind like slow applause. The court has standards to keep, even here.\"\n[2026-09-01T14:46:39.318Z] [debug] arbiter: ambient held (he just spoke)\n[2026-09-01T14:46:39.318Z] [system] \u23f3 Time passed: 15 min\n[2026-09-01T14:46:39.485Z] [cognitive] TRAVEL  (165ms)\n",
+      "[2026-09-01T14:46:46.522Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=cached winH=986 beat=-\n[2026-09-01T14:46:46.839Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-09-01T14:46:52.454Z] [debug] homework: intro-fill armed after 13126ms idle\n",
+      "[2026-09-01T14:47:30.919Z] [player] also i shouldn't automatically enter an outpost because inland on that tile, there should be an enter outpost button, other wise it's a tile\n[2026-09-01T14:47:30.919Z] [arbiter] The Arbiter studies you, plainly. \"I'm not sure what you're trying to tell me. I'll keep your note in the log either way. If you mean to act, phrase it as a verb \u2014 'investigate the rubbl",
+      "e', 'go east', 'attack the figure'.\"\n[2026-09-01T14:47:30.920Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter studies you, plainly. \"I'm not sure what you're \u2026\"\n[2026-09-01T14:47:30.920Z] [debug] meta-comment guard: skipped intent parse (ui-vocabulary: \"button\") on 140-char input\n[2026-09-01T14:47:37.696Z] [debug] ui: tap \"\ud83d\udeaa EXIT\"\n[2026-09-01T14:47:37.701Z] [system] bleeding fades.\n",
+      "[2026-09-01T14:47:37.733Z] [player] leave outpost\n[2026-09-01T14:47:37.734Z] [debug] parser: intent=travel conf=1.00 verb=leave target=outpost resolved=- range=- enemies=0 hooks=0\n[2026-09-01T14:47:37.738Z] [world] You walk back through the gate and out into the open ground. The outpost falls away behind you.\n",
+      "[2026-09-01T14:47:37.738Z] [debug] scene: loc=monarch_waystation hub=- arrival=n opening=n passing=n\n[2026-09-01T14:47:37.738Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713\n[2026-09-01T14:47:37.738Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n",
+      "[2026-09-01T14:47:37.739Z] [debug] missions: mystery:mystery_temporal_watch stage 0/4 [diplomacy] @reclaimer_stake npc=\"the Reclaimers Guild Speaker\" gives=Guild Eddy-Gauge PAUSED\n[2026-09-01T14:47:37.739Z] [debug] missions: \u00b7 at=monarch_waystation\n[2026-09-01T14:47:37.816Z] [world] Crystalline shards rain down like a windowpane shattering in slow motion. Aetherstone hums where they strike.\n\n",
+      "You are at The Monarch's Waystation. A frontier toll-court of the Mud Monarchs, last ordered ground before the buried capitals. Banners hang stiff with silt; a seneschal logs every traveler who passes toward the deeper cities.\n\nHazard: Tartarian Trap. A pressure plate older than recorded history triggers. Walls shift, floor opens, energy lances strike.\n\n",
+      "An Aetheric anomaly tightens the air to a held note.\n[2026-09-01T14:47:37.816Z] [world] Something about this ground is already familiar.\n[2026-09-01T14:47:37.818Z] [world] [The Monarch's Waystation] north: the Silt Thief (19 tiles, 2 days) \u00b7 east: Dynasty Border Post (4 tiles, 10 hours) \u00b7 south: The Reaver's Crest (1 tile, 3 hours) \u00b7 west: Raider's Ridge (2 tiles, 5 hours)\n",
+      "[2026-09-01T14:47:37.818Z] [world] Ymer Tinpot places you as you come in. \"Cheddar Bob. What are you after?\"\n[2026-09-01T14:47:37.826Z] [system] \u23f3 Time passed: 1h\n[2026-09-01T14:47:38.095Z] [cognitive] RETREAT \u00b7 DISENGAGE \u00b7 HIDE  (268ms)\n[2026-09-01T14:47:44.263Z] [debug] qwen\u23f1 ambient ok 6029ms read 1463ms/write 1075ms in 365t\u2192out 31t 4.0ms/t HIT-CAP (145ch)\n",
+      "[2026-09-01T14:47:44.263Z] [debug] qwen\u23f1 stats \u2014 narration:scene_intro_fill n3 avg10.5s max11.9s read9.3s/write1.2s in750t\u2192out33t ms/tok 10.9-14.5 cap3 \u27022/19.6s | investigate_lore n3 avg2.2s max2.7s read1.3s/write1.3s in134t\u2192out39t ms/tok 10.0-10.0 | ambient n3 avg9.2s max11.1s read2.6s/write1.7s in365t\u2192out31t ms/tok 4.0-10.6 cap3 wait0.6s \u27021/11.1s | parse_fallback n1 avg4.6s max4.6s read4.2s/writ",
+      "e0.4s in388t\u2192out12t ms/tok 10.7-10.7 || WASTED 3 calls / 30.7s\n[2026-09-01T14:47:44.432Z] [debug] \u26a0 FREEZE WATCH: LOGIC stalled while frames kept coming (js 2141ms \u00b7 frames 29ms). Something blocked the JS thread \u2014 look for a long synchronous run.\n[2026-09-01T14:47:44.433Z] [arbiter] You've traveled far, both physically and mentally, but the borderlands are always a new place.\n",
+      "[2026-09-01T14:47:44.433Z] [debug] arbiter: ambient \u2713 6608ms\n[2026-09-01T14:47:44.433Z] [debug] arbiter: ambient-said \"You've traveled far, both physically and mentally, but the borderlands are always a new place.\"\n[2026-09-01T14:47:48.114Z] [debug] send-log: #mtis7hpm6ccs \u2014 DELIVERED (inline, no attachments): beacon out, 28/28 parts accepted (406673 chars) \u2014 flush said yes\n",
+      "[2026-09-01T14:47:48.116Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mtis7hpm6ccs kept on disk, boots retry up to 5 sends total\n[2026-09-01T14:47:49.447Z] [debug] freeze watch: recovered \u2014 painting again after 1964ms quiet.\n[2026-09-01T14:47:52.467Z] [debug] homework: intro-fill armed after 13126ms idle\n",
+      "[2026-09-01T14:47:53.977Z] [debug] persist sizes(KB): total=268 player=68 wm=111[rooms=52 events=4 memos=1 npcs=4 defeated=1 tags=1 discovered=0] log=86 scene=3\n[2026-09-01T15:29:36.604Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a05d59-4c13-746d-b20e-bc20bf077c7e\n[2026-09-01T15:29:36.604Z] [debug] ota: Checking\u2026\n",
+      "[2026-09-01T15:29:37.736Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-09-01T15:29:37.829Z] [debug] ota: Saving progress\u2026\n[2026-09-01T15:29:37.830Z] [debug] ota: Restarting to apply\u2026\n[2026-09-01T15:29:37.895Z] [debug] ota: boot check result = applied\n",
+      "[2026-09-01T15:29:38.017Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a05d92-a0d6-7a09-ae8f-5854996016ca\n[2026-09-01T15:29:38.017Z] [debug] ota: Checking\u2026\n[2026-09-01T15:29:38.107Z] [debug] ota: Already up to date\n[2026-09-01T15:29:38.108Z] [debug] ota: boot check result = noUpdate\n[2026-09-01T15:29:38.169Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-09-01T15:29:38.169Z] [debug] voice: bundled idle\n[2026-09-01T15:29:38.362Z] [debug] send-log: bundle #mtis7hpm6ccs attempt 2/5 delivered to Sentry\n[2026-09-01T15:29:42.458Z] [debug] OTA applied: 2026-09-01-1604-the-vest-breaks-down \u2192 2026-09-01-1605-one-fight-on-the-field.\n[2026-09-01T15:29:42.458Z] [debug] OTA session start: 2026-09-01-1605-one-fight-on-the-field.\n",
+      "[2026-09-01T15:29:42.458Z] [world] You step back into The Monarch's Waystation. The world waits for your move.\n[2026-09-01T15:29:42.458Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. \"Welcome back, Cheddar Bob. We've still got ground to cover, you and I.\"\n",
+      "[2026-09-01T15:29:42.784Z] [debug] \u2550\u2550\u2550 SESSION 2026-09-01T15:29:42.781Z \u00b7 build 2026-09-01-1605-one-fight-on-the-field \u00b7 updated from 2026-09-01-1604-the-vest-breaks-down \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-09-01T15:29:42.784Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713\n",
+      "[2026-09-01T15:29:42.785Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n[2026-09-01T15:29:42.785Z] [debug] missions: mystery:mystery_temporal_watch stage 0/4 [diplomacy] @reclaimer_stake npc=\"the Reclaimers Guild Speaker\" gives=Guild Eddy-Gauge PAUSED\n",
+      "[2026-09-01T15:29:42.785Z] [debug] missions: \u00b7 at=monarch_waystation\n[2026-09-01T15:29:42.785Z] [debug] boot: life bmtitpak5hm started 2026-09-01T15:29:37.973Z \u00b7 FOLLOWED AN OTA APPLY 142ms ago via boot-front \u00b7 prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)\n[2026-09-01T15:29:44.499Z] [debug] ui: tap \"rest\"\n[2026-09-01T15:29:44.508Z] [player] rest\n",
+      "[2026-09-01T15:29:44.508Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0\n[2026-09-01T15:29:44.510Z] [world] Soot circles three times and curls beside you. Her breathing slows to yours.\n[2026-09-01T15:29:44.510Z] [world] You rest for 8 hours. +7 HP, +5 stamina, \u22122 corruption recovered. (Day 43, afternoon)\n",
+      "[2026-09-01T15:29:44.522Z] [system] \u23f3 Time passed: 8h\n[2026-09-01T15:29:44.686Z] [cognitive] REST  (162ms)\n[2026-09-01T15:29:45.232Z] [debug] ui: tap \"rest\"\n[2026-09-01T15:29:45.240Z] [player] rest\n[2026-09-01T15:29:45.240Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-09-01T15:29:45.242Z] [world] Soot turns twice, thinks about a third, and drops where she stands.\n[2026-09-01T15:29:45.243Z] [world] You rest for 8 hours. +7 HP, \u22122 corruption recovered. (Day 43, evening)\n[2026-09-01T15:29:45.254Z] [system] \u23f3 Time passed: 8h\n[2026-09-01T15:29:45.409Z] [cognitive] REST  (154ms)\n[2026-09-01T15:29:46.250Z] [debug] ui: tap \"rest\"\n",
+      "[2026-09-01T15:29:46.257Z] [player] rest\n[2026-09-01T15:29:46.258Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0\n[2026-09-01T15:29:46.262Z] [world] Soot paws the ground flat before trusting it, then folds down onto it.\n[2026-09-01T15:29:46.263Z] [world] You rest for 8 hours. +6 HP, \u22122 corruption recovered. (Day 44, night)\n",
+      "[2026-09-01T15:29:46.275Z] [system] \u23f3 Time passed: 8h\n[2026-09-01T15:29:46.280Z] [arbiter] \"The Forgotten Order contract on the Conspiracy Architects has lapsed,\" the Arbiter says. \"You were too slow. The offer's off the board.\"\n[2026-09-01T15:29:46.423Z] [cognitive] REST  (147ms)\n[2026-09-01T15:29:47.120Z] [debug] ui: tap \"rest\"\n[2026-09-01T15:29:47.130Z] [player] rest\n",
+      "[2026-09-01T15:29:47.131Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0\n[2026-09-01T15:29:47.132Z] [world] Soot tests three spots and settles on the one nearest your boot.\n[2026-09-01T15:29:47.133Z] [world] You rest for 8 hours. \u22122 corruption recovered. (Day 44, afternoon)\n[2026-09-01T15:29:47.145Z] [system] \u23f3 Time passed: 8h\n",
+      "[2026-09-01T15:29:47.300Z] [cognitive] REST  (154ms)\n[2026-09-01T15:29:48.083Z] [debug] ui: tap \"rest\"\n[2026-09-01T15:29:48.090Z] [world] A shard of mud-glass nicks you. Small wound, steady reminder. (\u22121 HP)\n[2026-09-01T15:29:48.094Z] [player] rest\n[2026-09-01T15:29:48.095Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-09-01T15:29:48.096Z] [world] Soot does the old circle \u2014 some instinct about grass that has not been grass in a thousand years.\n[2026-09-01T15:29:48.097Z] [world] You rest for 8 hours. \u22122 corruption recovered. (Day 44, evening)\n[2026-09-01T15:29:48.099Z] [world] You roll up your bedroll and find a small object beneath it \u2014 a gift from the ground, in the buried country's way.\n",
+      "[2026-09-01T15:29:48.099Z] [reward] \u2726 Wild Oats (Common).\n[2026-09-01T15:29:48.108Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-01T15:29:48.109Z] [arbiter] The Arbiter looks around. \"The se"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-01-1609-the-strike-keeps-its-name #mtj23y06dc8q [inline 21/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtj23y06dc8q"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-01-1609-the-strike-keeps-its-name"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "21"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-01-1609-the-strike-keeps-its-name"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-01T19:24:58.570584Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-01T19:24:58.492000Z",
+  "fingerprints": [
+    "302b61b827eba3146eaeffb5e3cf54f5"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1948826700,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-01T18:24:21.415000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-01-1609-the-strike-keeps-its-name",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-01-1609-the-strike-keeps-its-name",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-01-1609-the-strike-keeps-its-name",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-01-1609-the-strike-keeps-its-name)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "dc7738a6d8c446f793f05d01e86cdf20",
+  "previousEventID": "c4e693f476f543ccaf4e8364340a95dd"
+}

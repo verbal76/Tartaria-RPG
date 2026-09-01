@@ -1,0 +1,257 @@
+{
+  "id": "2584bf4e6e5a4768a0ef74489766ef43",
+  "groupID": "7705210551",
+  "eventID": "2584bf4e6e5a4768a0ef74489766ef43",
+  "projectID": "4511945117532160",
+  "size": 17834,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-01-1609-the-strike-keeps-its-name #mtj23y06dc8q [inline 19/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-01-1609-the-strike-keeps-its-name",
+  "message": "player-log 2026-09-01-1609-the-strike-keeps-its-name #mtj23y06dc8q [inline 19/28]",
+  "title": "player-log 2026-09-01-1609-the-strike-keeps-its-name #mtj23y06dc8q [inline 19/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "428a8832da1b45388cc1d5fbf09a2dbc",
+      "span_id": "977e57595f1cc960",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "s\"\n[2026-09-01T14:41:42.095Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-09-01T14:41:47.619Z] [world] Re-activated Silence the Doubter. It's back in play.\n[2026-09-01T14:41:50.283Z] [world] You set course for The Reaver's Crest. 4 tiles \u2014 about 10 hours of travel, all in. You set off now \u2014 the ground ahead is new ground. Keep tapping \u2192 THE REAVER'S CREST on the travel row to close ",
+      "the distance; STOP TRAVEL to halt.\n[2026-09-01T14:41:50.293Z] [world] You walk west through open silt. The compass tells you Reclaimer's Stake lies further west \u2014 5 tiles, about 13 hours of travel.\n[2026-09-01T14:41:50.293Z] [world] A glint of metal \u2014 too small to name yet \u2014 lies in the rubble.\n",
+      "[2026-09-01T14:41:52.023Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 9922ms read 8768ms/write 1104ms in 744t\u2192out 33t 11.8ms/t HIT-CAP (163ch)\n[2026-09-01T14:41:52.199Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 9922ms \u2014 intro-fill:\u2205\n[2026-09-01T14:41:52.199Z] [debug] homework: scene_intro \"The Monarch's Waystation\" \u2205 10106ms\n",
+      "[2026-09-01T14:41:53.922Z] [debug] ui: tap \"take / salvage\"\n[2026-09-01T14:41:55.049Z] [world] You take the Aetheric Spark from where it lay.\n[2026-09-01T14:41:55.050Z] [reward] \u2726 Aetheric Spark (Common).\n[2026-09-01T14:41:55.060Z] [world] You pick up the Architect's Mantle.\n[2026-09-01T14:41:55.061Z] [reward] \u2726 Architect's Mantle (Common).\n",
+      "[2026-09-01T14:41:55.062Z] [world] You lift the Reclaimer's Salvage Cap clear.\n[2026-09-01T14:41:55.062Z] [reward] \u2726 Reclaimer's Salvage Cap (Common).\n[2026-09-01T14:41:56.069Z] [world] You work the cold spring over. A part of it comes loose, intact.\n[2026-09-01T14:41:56.069Z] [world] You break the crate apart. Among the pieces, something worth keeping.\n",
+      "[Filtered]",
+      "[2026-09-01T14:41:56.071Z] [reward]     \u2022 Worn Tartarian Coin x15 (Common)\n[2026-09-01T14:41:56.071Z] [reward]     \u2022 Cracked Carapace Curl (Common)\n[2026-09-01T14:41:57.726Z] [player] investigate rubble\n[2026-09-01T14:41:57.727Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=rubble resolved=rubble range=- enemies=0 hooks=1\n",
+      "[2026-09-01T14:41:57.727Z] [debug] route: hook intercept (kind=glint, target=\"rubble\") \u2014 original intent=investigate\n[2026-09-01T14:41:57.728Z] [world] \u2605 STORY THREAD (step 1) \u2014 You pick the metal out of the rubble. A pendant \u2014 Tartarian make, hammered thin, etched with a faction crest.\n[2026-09-01T14:41:57.728Z] [reward] \u2726 Forgotten Order Sigil.\n",
+      "[2026-09-01T14:41:59.173Z] [world] \u2605\u2605 STORY THREAD COMPLETE \u2014 You turn the pendant over. Whoever wore it last bled out clutching it \u2014 a faint rust-brown line still runs along the inside of the chain.\n[2026-09-01T14:41:59.175Z] [reward] \u2726 For your persistence \u2014 Sentinel Core Plate (Uncommon).\n",
+      "[2026-09-01T14:41:59.176Z] [arbiter] \"That crest is the Forgotten Order's,\" the Arbiter says. \"Carry it to their people and lay it down. They honor the ones who bring their dead home.\"\n[2026-09-01T14:42:02.691Z] [debug] ui: tap \"investigate\"\n[2026-09-01T14:42:04.268Z] [player] investigate the mud\n",
+      "[2026-09-01T14:42:04.268Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=tilting petrified mud wave range=- enemies=0 hooks=1\n[2026-09-01T14:42:04.270Z] [world] You look the tilting petrified mud wave over where it sits. Nothing about it sings, nothing about it warns \u2014 Tartaria is full of things waiting to be remembered.\n",
+      "[2026-09-01T14:42:04.420Z] [cognitive] SWIM  (149ms)\n[2026-09-01T14:42:04.614Z] [debug] persist sizes(KB): total=267 player=67 wm=112[rooms=54 events=4 memos=1 npcs=4 defeated=1 tags=1 discovered=0] log=86 scene=3\n[2026-09-01T14:42:04.988Z] [debug] ui: tap \"\u2192 THE REAVER'S CREST\"\n[2026-09-01T14:42:05.005Z] [debug] spawn: gear=[Seer's Veil of the Aether, Reclaimer's Gloves] window=10 roster=new\n",
+      "[2026-09-01T14:42:05.008Z] [world] You walk west through open silt. The compass tells you Reclaimer's Stake lies further west \u2014 4 tiles, about 10 hours of travel.\n[2026-09-01T14:42:05.008Z] [world] A green lantern hangs at the mouth of a culvert \u2014 the Mud Dwellers mark their hidden markets with that exact green.\n[2026-09-01T14:42:06.089Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-09-01T14:42:07.070Z] [debug] qwen\u23f1 investigate_lore ok 2660ms read 1344ms/write 1281ms in 134t\u2192out 38t 10.0ms/t (157ch)\n[2026-09-01T14:42:07.497Z] [world] You salvage the banner. The take is small but real.\n[2026-09-01T14:42:07.497Z] [world] You break the cart apart. Among the pieces, something worth keeping.\n",
+      "[2026-09-01T14:42:07.498Z] [world] You work the cold spring over. A part of it comes loose, intact.\n[2026-09-01T14:42:07.498Z] [world] You work the crate over. A part of it comes loose, intact.\n[2026-09-01T14:42:07.498Z] [world] You salvage the marker. The take is small but real.\n[2026-09-01T14:42:07.499Z] [world] Already worked over: stone marker.\n",
+      "[2026-09-01T14:42:07.499Z] [reward] \u2726 Salvage haul:\n[2026-09-01T14:42:07.499Z] [reward]     \u2022 Worn Tartarian Coin x6 (Common)\n[2026-09-01T14:42:07.500Z] [reward]     \u2022 Scrap Metal x5 (Common)\n[2026-09-01T14:42:07.500Z] [reward]     \u2022 Aether Crystal x2 (Common)\n[2026-09-01T14:42:08.625Z] [world] You get a hand under the Reclaimer's Gloves and take it.\n",
+      "[2026-09-01T14:42:08.626Z] [reward] \u2726 Reclaimer's Gloves (Common).\n[2026-09-01T14:42:08.644Z] [world] You claim the Seer's Veil of the Aether.\n[2026-09-01T14:42:08.644Z] [reward] \u2726 Seer's Veil of the Aether (Common).\n[2026-09-01T14:42:09.940Z] [debug] ui: tap \"investigate\"\n[2026-09-01T14:42:11.453Z] [player] investigate the mud\n",
+      "[2026-09-01T14:42:11.454Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=tilting petrified mud wave range=- enemies=0 hooks=2\n[2026-09-01T14:42:11.456Z] [world] You look the tilting petrified mud wave over where it sits. Nothing about it sings, nothing about it warns \u2014 Tartaria is full of things waiting to be remembered.\n",
+      "[2026-09-01T14:42:11.606Z] [cognitive] SWIM  (148ms)\n[2026-09-01T14:42:12.791Z] [debug] ui: tap \"\u2192 THE REAVER'S CREST\"\n[2026-09-01T14:42:12.805Z] [debug] spawn: gear=[Aetheric Helm of Command, Wanderer's Swiftstride Greaves, Bone Knife] window=10 roster=new\n",
+      "[2026-09-01T14:42:12.806Z] [world] You walk west through open silt. The compass tells you Reclaimer's Stake lies further west \u2014 3 tiles, about 8 hours of travel.\n[2026-09-01T14:42:12.808Z] [world] Something nudges your boot. The silt grudgingly gives it up.\n[2026-09-01T14:42:12.809Z] [reward] \u2726 Bent Nail (Common).\n",
+      "[2026-09-01T14:42:12.809Z] [world] The thread you were following waits where you left it.\n[2026-09-01T14:42:12.999Z] [debug] qwen\u23f1 investigate_lore ok 1267ms read 0ms/write 1230ms in 134t\u2192out 38t (183ch)\n[2026-09-01T14:42:13.975Z] [debug] ui: tap \"take / salvage\"\n[2026-09-01T14:42:15.011Z] [world] The Throwing Knife comes up out of the silt with a small sucking protest.\n",
+      "[2026-09-01T14:42:15.012Z] [reward] \u2726 Throwing Knife (Common).\n[2026-09-01T14:42:15.027Z] [world] The Aetheric Helm of Command was half under something. It is not now.\n[2026-09-01T14:42:15.028Z] [reward] \u2726 Aetheric Helm of Command (Common).\n[2026-09-01T14:42:15.029Z] [world] You work the Wanderer's Swiftstride Greaves loose from where the mud had it.\n",
+      "[2026-09-01T14:42:15.029Z] [reward] \u2726 Wanderer's Swiftstride Greaves (Common).\n[2026-09-01T14:42:15.880Z] [world] You strip the cold spring carefully. Something usable comes free in your hand.\n[2026-09-01T14:42:15.881Z] [world] Slim pickings on the marker. You pocket a Bone Sliver on the way out.\n",
+      "[2026-09-01T14:42:15.881Z] [world] You strip the tent carefully. Something usable comes free in your hand.\n[2026-09-01T14:42:15.881Z] [reward] \u2726 Salvage haul:\n[2026-09-01T14:42:15.881Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-09-01T14:42:15.882Z] [reward]     \u2022 Bone Sliver (Common)\n[2026-09-01T14:42:15.882Z] [reward]     \u2022 Spider Silk (Common)\n",
+      "[2026-09-01T14:42:17.417Z] [debug] ui: tap \"investigate\"\n[2026-09-01T14:42:20.634Z] [debug] ui: tap \"investigate\"\n[2026-09-01T14:42:22.116Z] [debug] qwen\u23f1 ambient ok 10381ms wait 1398ms read 3870ms/write 2061ms in 365t\u2192out 31t 10.6ms/t HIT-CAP (144ch)\n[2026-09-01T14:42:22.259Z] [player] investigate the mud\n",
+      "[2026-09-01T14:42:22.261Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=tilting petrified mud wave range=- enemies=0 hooks=2\n[2026-09-01T14:42:22.263Z] [world] You look the tilting petrified mud wave over where it sits. Nothing about it sings, nothing about it warns \u2014 Tartaria is full of things waiting to be remembered.\n",
+      "[2026-09-01T14:42:22.264Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-09-01T14:42:22.264Z] [arbiter] The Arbiter looks around. \"The seneschal logs your name without asking it. The Monarchs' ledgers have their ways.\"\n[2026-09-01T14:42:22.411Z] [cognitive] SWIM  (145ms)\n[2026-09-01T14:42:22.823Z] [debug] arbiter: ambient stale:moved-scene\u2192banked 11366ms\n",
+      "[2026-09-01T14:42:22.824Z] [debug] arbiter: ambient-empty reason=near-duplicate-of-recent raw=\"You've traversed the Borderlands, the very land you call home. Your journey has seen you step out of the shadows of the \"\n[2026-09-01T14:42:25.617Z] [debug] qwen\u23f1 investigate_lore ok 2659ms read 1337ms/write 1303ms in 134t\u2192out 41t 10.0ms/t (167ch)\n",
+      "[2026-09-01T14:42:32.147Z] [debug] homework: intro-fill armed after 6000ms idle (strike 2/3)\n[2026-09-01T14:42:42.510Z] [debug] ui: tap \"investigate\"\n[2026-09-01T14:42:44.219Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 11910ms read 10781ms/write 1087ms in 742t\u2192out 33t 14.5ms/t HIT-CAP (157ch)\n[2026-09-01T14:42:44.375Z] [debug] homework: scene_intro \"The Monarch's Waystation\" \u2713 12229ms\n",
+      "[2026-09-01T14:42:52.370Z] [debug] ui: tap \"\u2192 THE REAVER'S CREST\"\n[2026-09-01T14:42:52.382Z] [world] You walk north. You arrive at The Reaver's Crest.\n[2026-09-01T14:42:52.382Z] [debug] scene: loc=reavers_crest hub=- arrival=y opening=n passing=n\n[2026-09-01T14:42:52.383Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest HERE needs=Raider's Ridge-Sign\u2713\n",
+      "[2026-09-01T14:42:52.383Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n[2026-09-01T14:42:52.383Z] [debug] missions: mystery:mystery_temporal_watch stage 0/4 [diplomacy] @reclaimer_stake npc=\"the Reclaimers Guild Speaker\" gives=Guild Eddy-Gauge PAUSED\n",
+      "[2026-09-01T14:42:52.383Z] [debug] missions: \u00b7 at=reavers_crest travelTo=reavers_crest\n[2026-09-01T14:42:52.384Z] [world] \u25b8 Silence the Doubter: this is the place \u2014 finish it.\n[2026-09-01T14:42:52.398Z] [world] You've left The Monarch's Waystation and entered The Reaver's Crest. The crest gives you the whole borderland, and gives the whole borderland you. It's pre-dawn dark. A swamp crab and a mud",
+      " spirit are already here. north leads to The Monarch's Waystation; east leads to Sinking Cathedral; west leads to Raider's Ridge. Nothing named to the south.\n[2026-09-01T14:42:52.407Z] [combat] Distance: close / arm's reach. Auralite Talon \u2713 in range \u00b7 Bone Crossbow \u2713 in range.\n",
+      "[2026-09-01T14:42:52.461Z] [arbiter] The Arbiter lowers their voice. \"You're carrying shadow with you \u2014 use it. Tap STEALTH before they close, and you can be on them before they know it. A clean opening strike, or slip past entirely.\"\n[2026-09-01T14:42:52.462Z] [system] Weather effect \u2014 Ash Storm: -1 STR\n",
+      "[2026-09-01T14:42:52.464Z] [world] [The Reaver's Crest] north: The Monarch's Waystation (1 tile, 3 hours) \u00b7 east: Dynasty Border Post (4 tiles, 10 hours) \u00b7 south: Samarran (8 tiles, 20 hours) \u00b7 west: Raider's Ridge (1 tile, 3 hours)\n[2026-09-01T14:42:52.464Z] [combat] A Swamp Crab and a Mud Spirit close on you. Tap the right-side panel to cycle targets.\n",
+      "[2026-09-01T14:42:53.142Z] [debug] persist sizes(KB): total=266 player=68 wm=109[rooms=51 events=4 memos=1 npcs=4 defeated=1 tags=1 discovered=0] log=86 scene=3\n[2026-09-01T14:43:06.970Z] [debug] ui: tap \"dodge\"\n[2026-09-01T14:43:06.987Z] [player] dodge\n[2026-09-01T14:43:06.988Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=2 hooks=0\n",
+      "[2026-09-01T14:43:06.989Z] [world] You commit to the dodge. Slip Swamp Crab's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-01T14:43:07.055Z] [combat] Mud Spirit \u2014 d20 \u2192 16 + ATK 5 = 21 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n",
+      "[2026-09-01T14:43:07.056Z] [combat] Dodge \u2014 d20 \u2192 12 + DEX 24 = 36 vs ATK 21. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-01T14:43:07.056Z] [world] You slip Mud Spirit's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n",
+      "[2026-09-01T14:43:07.058Z] [debug] ac-shift 23\u219226: race/base 10 + gear 20 + title 0 \u2192 trimmed 23 + status 3 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n[2026-09-01T14:43:07.058Z] [combat] Swamp Crab \u2014 d20 \u2192 2 + ATK 1 = 3 vs your AC 26 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-01T14:43:07.058Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T14:43:07.325Z] [cognitive] neutral  (265ms)\n[2026-09-01T14:43:07.852Z] [debug] ui: tap \"\ud83d\udd25\u2697 bone crossbow\"\n[2026-09-01T14:43:07.854Z] [system] evasive \u2014 harder to hit fades.\n[2026-09-01T14:43:07.877Z] [player] attack with the off-hand bone crossbow\n",
+      "[2026-09-01T14:43:07.877Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=2 hooks=0\n[2026-09-01T14:43:07.878Z] [debug] attack: target=Swamp Crab range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n",
+      "[2026-09-01T14:43:07.879Z] [arbiter] Ash Storm hangs between you. \"\u22121 to the swing \u2014 see what you can,\" the Arbiter says.\n[2026-09-01T14:43:07.879Z] [debug] attack: visibility penalty \u22121 (Ash Storm)\n[2026-09-01T14:43:07.879Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-09-01T14:43:07.931Z] [world] Your searing acid-etched bone crossbow comes around in an arc; Swamp Crab squares up to meet it.\n[2026-09-01T14:43:07.932Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T14:43:08.408Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (475ms)\n[2026-09-01T14:43:20.508Z] [world] You seize the initiative. Swamp Crab has no time to react.\n",
+      "[2026-09-01T14:43:20.508Z] [combat] You \u2014 d20 \u2192 20 + DEX 24 \u2212 1 (Ash Storm) + 2 (point blank) perfect opening (2\u00d7 dice) = 45 vs Swamp Crab AC 9 \u2014 \u2713 CRITICAL HIT\n[2026-09-01T14:43:20.510Z] [combat] Piercing flares \u2014 +3 on hit.\n[2026-09-01T14:43:20.510Z] [combat] Swamp Crab shrugs "
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-01-1609-the-strike-keeps-its-name #mtj23y06dc8q [inline 19/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtj23y06dc8q"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-01-1609-the-strike-keeps-its-name"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "19"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-01-1609-the-strike-keeps-its-name"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-01T19:24:58.560770Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "5": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 380,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-01T19:24:58.491000Z",
+  "fingerprints": [
+    "302b61b827eba3146eaeffb5e3cf54f5"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1948826700,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-01T18:24:21.415000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-01-1609-the-strike-keeps-its-name",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-01-1609-the-strike-keeps-its-name",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-01-1609-the-strike-keeps-its-name",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-01-1609-the-strike-keeps-its-name)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "2f84bd9961b147bba5759046f3ade73e",
+  "previousEventID": "25256db97a4541fda8364dae336b1604"
+}

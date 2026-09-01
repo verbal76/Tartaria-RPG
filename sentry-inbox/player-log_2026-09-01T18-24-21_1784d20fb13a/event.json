@@ -1,0 +1,238 @@
+{
+  "id": "1784d20fb13a4c998c07b4043e94453b",
+  "groupID": "7705210551",
+  "eventID": "1784d20fb13a4c998c07b4043e94453b",
+  "projectID": "4511945117532160",
+  "size": 18118,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-01-1609-the-strike-keeps-its-name #mtis7hpm6ccs [inline 24/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-01-1609-the-strike-keeps-its-name",
+  "message": "player-log 2026-09-01-1609-the-strike-keeps-its-name #mtis7hpm6ccs [inline 24/28]",
+  "title": "player-log 2026-09-01-1609-the-strike-keeps-its-name #mtis7hpm6ccs [inline 24/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "428a8832da1b45388cc1d5fbf09a2dbc",
+      "span_id": "977e57595f1cc960",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "u \u2014 Mud Monarchs Patrol 2 now close / arm's reach; Mud Monarchs Patrol 4 now close / arm's reach.\n[2026-09-01T03:50:59.299Z] [combat] Mud Monarchs Patrol 2 blisters \u2014 clinging fire sears 4. (0/18 HP, 2 turns left)\n[2026-09-01T03:50:59.299Z] [combat] Mud Monarchs Patrol 2 smokes \u2014 acid eats 2. (0/18 HP, 2 turns left)\n",
+      "[2026-09-01T03:50:59.300Z] [reward] Mud Monarchs Patrol 2 defeated. You recover Patched Cloth \u00d72, Worn Tartarian Coin.\n[2026-09-01T03:50:59.301Z] [reward] You strip the body: Cudgel, Mud-Warden's Vest (+10 TC). The kit took the fight badly.\n[2026-09-01T03:50:59.301Z] [combat] 2 attackers remain. Mud Monarchs Patrol 3 now in your sights.\n",
+      "[2026-09-01T03:50:59.301Z] [system] Forgotten Order standing +1 (now 39)\n[2026-09-01T03:50:59.302Z] [reward] +14 TC pried from the dust.\n[2026-09-01T03:50:59.345Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 5 + ATK 6 = 11 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-01T03:50:59.346Z] [combat] Mud Monarchs Patrol 3 \u2014 d20 \u2192 12 + ATK 6 = 18 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-01T03:50:59.619Z] [cognitive] SWIM \u00b7 RETREAT  (271ms)\n[2026-09-01T03:50:59.865Z] [reward] \u2726 The buried world relents \u2014 a Resurrection Gem at the 100-kill mark. (31 held)\n[2026-09-01T03:51:00.500Z] [debug] ui: tap \"dodge\"\n",
+      "[2026-09-01T03:51:00.509Z] [player] dodge\n[2026-09-01T03:51:00.509Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=2 hooks=1\n[2026-09-01T03:51:00.510Z] [world] You commit to the dodge. Slip Mud Monarchs Patrol 3's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-01T03:51:00.575Z] [combat] Mud Monarchs Patrol 3 \u2014 d20 \u2192 20 + ATK 6 = 26 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 CRITICAL HIT\n[2026-09-01T03:51:00.575Z] [combat] Dodge \u2014 Mud Monarchs Patrol 3 rolls a NAT 20. No read beats a perfect strike; it lands through your dodge.\n",
+      "[2026-09-01T03:51:00.577Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 20 + ATK 6 = 26 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 CRITICAL HIT\n[2026-09-01T03:51:00.577Z] [debug] arbiter: template (reason=combat)\n[2026-09-01T03:51:00.578Z] [arbiter] \"A blade in these ruins is a small thing against a long history. Use it precisely.\" the Arbiter says.\n",
+      "[2026-09-01T03:51:00.578Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T03:51:00.851Z] [combat] Mud Monarchs Patrol 3 deals 8 piercing damage [armor \u221235%]. You have 24 HP remaining.\n[2026-09-01T03:51:00.851Z] [combat] Mud Monarchs Patrol 4 deals 15 bludgeoning damage. You have 9 HP remaining.\n[2026-09-01T03:51:01.086Z] [cognitive] neutral  (274ms)\n",
+      "[2026-09-01T03:51:01.324Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n[2026-09-01T03:51:01.341Z] [player] attack with the auralite talon\n[2026-09-01T03:51:01.342Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=2 hooks=1\n",
+      "[2026-09-01T03:51:01.342Z] [debug] attack: target=Mud Monarchs Patrol 3 range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n[2026-09-01T03:51:01.393Z] [world] You raise the acid-etched corrupted auralite talon toward Mud Monarchs Patrol 3. The room narrows around the both of you.\n[2026-09-01T03:51:01.393Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-01T03:51:01.628Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (234ms)\n[2026-09-01T03:51:10.593Z] [world] You seize the initiative. Mud Monarchs Patrol 3 has no time to react.\n[2026-09-01T03:51:10.593Z] [combat] You \u2014 d20 \u2192 2 + INT 11 = 13 vs Mud Monarchs Patrol 3 AC 10 \u2014 \u2713 HIT\n",
+      "[2026-09-01T03:51:10.594Z] [combat] Mud Monarchs Patrol 3 shrugs off the aetheric. (resisted, \u00d70.5 for 7)\n[2026-09-01T03:51:10.596Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Bone Crossbow \u2014 piercing will bite where aetheric won't.\"\n",
+      "[2026-09-01T03:51:10.597Z] [combat] Your strike with the acid-etched corrupted auralite talon lands for 7. Mud Monarchs Patrol 3 staggers \u2014 8 HP remaining. It answers.\n[2026-09-01T03:51:10.598Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 2 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n",
+      "[2026-09-01T03:51:10.598Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 1 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n[2026-09-01T03:51:10.601Z] [combat] Mud Monarchs Patrol 3 \u2014 d20 \u2192 3 + ATK 6 = 9 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-01T03:51:10.603Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 20 + ATK 6 = 26 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 CRITICAL HIT\n[2026-09-01T03:51:10.888Z] [combat] Mud Monarchs Patrol 4 deals 12 bludgeoning damage. You fall.\n[2026-09-01T03:51:10.888Z] [combat] Cheddar Bob does not rise. The ruins remember another.\n",
+      "[2026-09-01T03:51:10.888Z] [system] Cheddar Bob has fallen. A Resurrection Gem from the title screen can bring them back.\n[2026-09-01T03:51:11.397Z] [system] You join the Fallen of Tartaria \u2014 10 names the buried world keeps now. Read the roll from the Lore Codex.\n[2026-09-01T03:51:18.048Z] [debug] scene: loc=monarch_waystation hub=outpost_gate arrival=n opening=n passing=n\n",
+      "[2026-09-01T03:51:18.048Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @raiders_ridge needs=Raider's Ridge-Sign\u2713 PAUSED\n[2026-09-01T03:51:18.049Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n",
+      "[2026-09-01T03:51:18.049Z] [debug] missions: mystery:mystery_temporal_watch stage 0/4 [diplomacy] @reclaimer_stake npc=\"the Reclaimers Guild Speaker\" gives=Guild Eddy-Gauge PAUSED\n[2026-09-01T03:51:18.049Z] [debug] missions: \u00b7 at=monarch_waystation\n[2026-09-01T03:51:18.116Z] [debug] spawn: gear=[Aetheric Warplate] window=10 roster=new\n",
+      "[2026-09-01T03:51:18.117Z] [world] Monarch Court \u2014 The Atrium. Polished mud-glass tiles and a carved Monarch sigil over the doorway. The seneschal nods you through without speaking \u2014 your business has already been logged elsewhere.\n[2026-09-01T03:51:18.118Z] [world] Paths: north to Standards \u00b7 south to First Landing. (Type 'leave outpost' to head into the wilds.)\n",
+      "[2026-09-01T03:51:18.118Z] [world] Halem the Trader pushes the good stock to the front without being asked. \"Cheddar Bob. You know where everything is.\"\n[2026-09-01T03:51:18.123Z] [reward] \u2726 Resurrection. Cheddar Bob returns to Tartaria, restored. The Aetherstone hums in recognition.\n[2026-09-01T03:51:22.064Z] [debug] homework: intro-fill armed after 10704ms idle\n",
+      "[2026-09-01T03:51:23.791Z] [debug] send-log: #mti4rci02ab8 \u2014 DELIVERED (inline, no attachments): beacon out, 28/28 parts accepted (406412 chars) \u2014 flush said yes\n[2026-09-01T03:51:23.800Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mti4rci02ab8 kept on disk, boots retry up to 5 sends total\n",
+      "[2026-09-01T03:51:27.495Z] [debug] persist sizes(KB): total=260 player=66 wm=107[rooms=50 events=4 memos=0 npcs=4 defeated=1 tags=1 discovered=0] log=85 scene=2\n[2026-09-01T03:51:31.112Z] [debug] appstate: active \u2192 background (was active for 854667ms)\n[2026-09-01T10:12:00.283Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a05ad9-aeeb-727e-9d92-0cb954c58f8e\n",
+      "[2026-09-01T10:12:00.286Z] [debug] ota: Checking\u2026\n[2026-09-01T10:12:01.216Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-09-01T10:12:01.271Z] [debug] ota: Saving progress\u2026\n[2026-09-01T10:12:01.271Z] [debug] ota: Restarting to apply\u2026\n[2026-09-01T10:12:01.341Z] [debug] ota: boot check result = applied\n",
+      "[2026-09-01T10:12:01.491Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a05b1f-7928-78c6-88a4-143c922722cd\n[2026-09-01T10:12:01.491Z] [debug] ota: Checking\u2026\n[2026-09-01T10:12:01.584Z] [debug] ota: Already up to date\n[2026-09-01T10:12:01.585Z] [debug] ota: boot check result = noUpdate\n[2026-09-01T10:12:01.655Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-09-01T10:12:01.655Z] [debug] voice: bundled idle\n[2026-09-01T10:12:01.953Z] [debug] send-log: bundle #mti4rci02ab8 attempt 2/5 delivered to Sentry\n[2026-09-01T10:51:58.408Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a05b1f-7928-78c6-88a4-143c922722cd\n[2026-09-01T10:51:58.408Z] [debug] ota: Checking\u2026\n",
+      "[2026-09-01T10:52:00.072Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-09-01T10:52:00.187Z] [debug] ota: Saving progress\u2026\n[2026-09-01T10:52:00.188Z] [debug] ota: Restarting to apply\u2026\n[2026-09-01T10:52:00.278Z] [debug] ota: boot check result = applied\n",
+      "[2026-09-01T10:52:00.505Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a05c8e-377a-7912-bbc8-d0273b9be34b\n[2026-09-01T10:52:00.505Z] [debug] ota: Checking\u2026\n[2026-09-01T10:52:00.729Z] [debug] ota: Already up to date\n[2026-09-01T10:52:00.730Z] [debug] ota: boot check result = noUpdate\n[2026-09-01T10:52:00.849Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-09-01T10:52:00.849Z] [debug] voice: bundled idle\n[2026-09-01T10:52:01.560Z] [debug] send-log: bundle #mti4rci02ab8 attempt 3/5 delivered to Sentry\n[2026-09-01T13:56:59.015Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a05c8e-377a-7912-bbc8-d0273b9be34b\n[2026-09-01T13:56:59.015Z] [debug] ota: Checking\u2026\n",
+      "[2026-09-01T13:57:00.294Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-09-01T13:57:00.401Z] [debug] ota: Saving progress\u2026\n[2026-09-01T13:57:00.402Z] [debug] ota: Restarting to apply\u2026\n[2026-09-01T13:57:00.629Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a05cba-0b3e-7788-8319-cb9e3bef05a1\n[2026-09-01T13:57:00.629Z] [debug] ota: Checking\u2026\n",
+      "[2026-09-01T13:57:00.732Z] [debug] ota: Already up to date\n[2026-09-01T13:57:00.732Z] [debug] ota: boot check result = noUpdate\n[2026-09-01T13:57:00.815Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-09-01T13:57:00.815Z] [debug] voice: bundled idle\n[2026-09-01T13:57:01.052Z] [debug] send-log: bundle #mti4rci02ab8 attempt 4/5 delivered to Sentry\n",
+      "[2026-09-01T13:57:04.446Z] [debug] OTA applied: 2026-09-01-1602-the-beat-card \u2192 2026-09-01-1603-the-vest-knows.\n[2026-09-01T13:57:04.446Z] [debug] OTA session start: 2026-09-01-1603-the-vest-knows.\n[2026-09-01T13:57:04.447Z] [world] You step back into The Monarch's Waystation. The world waits for your move.\n",
+      "[2026-09-01T13:57:04.447Z] [world] Word reaches you: a roadside trader changed routes while you were elsewhere. The next time you cross the right tile, look for a stall you didn't see before.\n[2026-09-01T13:57:04.450Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. \"Welcome back, Cheddar Bob. We've still got ground to cover, you and I. The waste did not sleep while you were ",
+      "gone \u2014 blood was spilled and ground changed hands. Read the World for the account.\"\n[2026-09-01T13:57:04.788Z] [debug] \u2550\u2550\u2550 SESSION 2026-09-01T13:57:04.786Z \u00b7 build 2026-09-01-1603-the-vest-knows \u00b7 updated from 2026-09-01-1602-the-beat-card \u00b7 previous entry moments earlier \u2550\u2550\u2550\n",
+      "[2026-09-01T13:57:04.789Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n[2026-09-01T13:57:04.789Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n",
+      "[2026-09-01T13:57:04.789Z] [debug] missions: mystery:mystery_temporal_watch stage 0/4 [diplomacy] @reclaimer_stake npc=\"the Reclaimers Guild Speaker\" gives=Guild Eddy-Gauge PAUSED\n[2026-09-01T13:57:04.789Z] [debug] missions: \u00b7 at=monarch_waystation\n",
+      "[2026-09-01T13:57:04.789Z] [debug] boot: life bmtiqe6g5zs started 2026-09-01T13:57:00.581Z \u00b7 FOLLOWED AN OTA APPLY 179ms ago via boot-front \u00b7 prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)\n[2026-09-01T13:57:05.469Z] [debug] send-log: crash on record (2026-09-01T10:56:48.050Z) \u2014 game log pushed automatically, delivered to Sentry, kept on disk as #mtiqe9wwibm3\n",
+      "[2026-09-01T13:57:10.272Z] [debug] ui: tap \"more \u25b8\"\n[2026-09-01T13:57:11.155Z] [debug] ui: tap \"inventory\"\n[2026-09-01T14:41:16.767Z] [debug] persist sizes(KB): total=261 player=66 wm=107[rooms=50 events=4 memos=0 npcs=4 defeated=1 tags=1 discovered=0] log=85 scene=2\n",
+      "[2026-09-01T14:41:22.054Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a05d59-4c13-746d-b20e-bc20bf077c7e\n[2026-09-01T14:41:22.055Z] [debug] ota: Checking\u2026\n[2026-09-01T14:41:22.167Z] [debug] ota: Already up to date\n[2026-09-01T14:41:22.167Z] [debug] ota: boot check result = noUpdate\n[2026-09-01T14:41:22.281Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-09-01T14:41:22.281Z] [debug] voice: bundled idle\n[2026-09-01T14:41:22.450Z] [debug] send-log: bundle #mtiqe9wwibm3 attempt 2/5 delivered to Sentry\n[2026-09-01T14:41:26.567Z] [debug] OTA applied: 2026-09-01-1603-the-vest-knows \u2192 2026-09-01-1604-the-vest-breaks-down.\n[2026-09-01T14:41:26.567Z] [debug] OTA session start: 2026-09-01-1604-the-vest-breaks-down.\n",
+      "[2026-09-01T14:41:26.567Z] [world] You step back into The Monarch's Waystation. The world waits for your move.\n[2026-09-01T14:41:26.567Z] [arbiter] The Arbiter sets the quiet aside. \"Welcome back, Cheddar Bob. I kept watch while you were gone.\"\n",
+      "[2026-09-01T14:41:26.868Z] [debug] \u2550\u2550\u2550 SESSION 2026-09-01T14:41:26.866Z \u00b7 build 2026-09-01-1604-the-vest-breaks-down \u00b7 updated from 2026-09-01-1603-the-vest-knows \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-09-01T14:41:26.869Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-01T14:41:26.869Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n[2026-09-01T14:41:26.869Z] [debug] missions: mystery:mystery_temporal_watch stage 0/4 [diplomacy] @reclaimer_stake npc=\"the Reclaimers Guild Speaker\" gives=Guild Eddy-Gauge PAUSED\n",
+      "[2026-09-01T14:41:26.870Z] [debug] missions: \u00b7 at=monarch_waystation\n[2026-09-01T14:41:26.870Z] [debug] boot: life bmtirz8038m started 2026-09-01T14:41:21.987Z \u00b7 FOLLOWED AN OTA APPLY 198ms ago via mid-session \u00b7 prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)\n[2026-09-01T14:41:32.146Z] [debug] ui: tap \"\ud83d\udeaa EXIT\"\n[2026-09-01T14:41:32.193Z] [player] leave outpost\n",
+      "[2026-09-01T14:41:32.194Z] [debug] parser: intent=travel conf=1.00 verb=leave target=outpost resolved=- range=- enemies=0 hooks=0\n[2026-09-01T14:41:32.195Z] [world] You walk back through the gate and out into the open ground. The outpost falls away behind you.\n[2026-09-01T14:41:32.195Z] [debug] scene: loc=monarch_waystation hub=- arrival=n opening=n passing=n\n",
+      "[2026-09-01T14:41:32.196Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n[2026-09-01T14:41:32.196Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-01-1609-the-strike-keeps-its-name #mtis7hpm6ccs [inline 24/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtis7hpm6ccs"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-01-1609-the-strike-keeps-its-name"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "24"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-01-1609-the-strike-keeps-its-name"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "4"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-01T18:24:21.452708Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-01T18:24:21.419000Z",
+  "fingerprints": [
+    "302b61b827eba3146eaeffb5e3cf54f5"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1948826700,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-01T18:24:21.415000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-01-1609-the-strike-keeps-its-name",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-01-1609-the-strike-keeps-its-name",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-01-1609-the-strike-keeps-its-name",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-01-1609-the-strike-keeps-its-name)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "1e25725f10f94a109a5b0d3ede922f8c",
+  "previousEventID": "1748689d725248058ae82e9cfd49cb9e"
+}
