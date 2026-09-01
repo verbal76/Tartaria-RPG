@@ -26603,7 +26603,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // legacy fused vests from their own forge noun (the OTA-955 pattern) with
 // kind + minimal uniqueStats; and when no dog can wear it the modal SAYS so
 // instead of hiding the button (B15: refusals speak).
-export const OTA_BUILD_ID = '2026-09-01-1603-the-vest-knows';
+//
+// ⚠⚠⚠ OTA-1604 — THE VEST BREAKS DOWN. Owner, on the 1603 report's finding
+// that scrap refused dog armor: "make them all scrappable." canScrap admitted
+// weapon/armor/relic while scrapOutputFor has always routed dog_armor as
+// armor-like — the door and the table disagreed. dog_armor joins the gate
+// (canonical kind + tag). And the dog's back becomes a real slot to the
+// scrap flow: OTA-058's auto-unequip walked every player slot and never the
+// vest, and dogVestAcBonus resolves catalog vests by NAME with no inventory
+// check — so scrapping the worn vest would have left the dog wearing a ghost
+// vest with permanent AC (the OTA-796 shape, one saddle over). The worn vest
+// now unbuckles out loud before it breaks down.
+export const OTA_BUILD_ID = '2026-09-01-1604-the-vest-breaks-down';
 // golem catch-up 2026-09-01: markerless publish of OTA-1603 - one dog-armor
 // predicate, the fifth catalog, the legacy vest heal; hal took the marker.
 // golem catch-up 2026-09-01: markerless publish of OTA-1602 - the beat card

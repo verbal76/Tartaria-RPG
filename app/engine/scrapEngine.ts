@@ -33,15 +33,20 @@ export function canScrap(item: InventoryItem): boolean {
   if ((require('./questItems') as typeof import('./questItems')).isQuestLockedItem(item)) return false;
   // OTA-1000 — canonical kind: the load heal is upgrade-only, so a demoted piece
   // (relic->misc Climbing Rope) kept its old action set forever.
+  // ⚠ OTA-1604 — dog_armor joins. Owner: "make them all scrappable." The gate
+  // refused vests while scrapOutputFor twenty lines down has ALWAYS known how
+  // to break one down (isArmorLike includes dog_armor) — the door and the
+  // table disagreed, and before OTA-1603 a kind-drifted vest could even slip
+  // through as 'relic' while a correct one couldn't.
   const scrapKind = canonicalItemKind(item);
-  if (scrapKind === 'weapon' || scrapKind === 'armor' || scrapKind === 'relic') return true;
+  if (scrapKind === 'weapon' || scrapKind === 'armor' || scrapKind === 'relic' || scrapKind === 'dog_armor') return true;
   // OTA-742 — a weapon/armor bought from a vendor could mint as kind 'misc'
   // (buyFromVendor mis-stamp, fixed there + healed on load). Treat anything
   // TAGGED as gear as scrappable too, so an already-bought Rust Dagger / Bone
   // Shiv scraps immediately instead of only after the next reload.
   {
     const t = canonicalItemTags(item);
-    if (t.includes('weapon') || t.includes('armor')) return true;
+    if (t.includes('weapon') || t.includes('armor') || t.includes('dog_armor')) return true;
   }
   // Some gear (compass, torch, rope) carries useful base materials —
   // allow scrap as long as the item isn't a raw commodity.

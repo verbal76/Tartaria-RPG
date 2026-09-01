@@ -37,6 +37,7 @@ import { lookupCraftedItem, findArmorByName, findWeaponByName, applyArmorResista
 import { trainStat } from '../../engine/statTraining';
 import { validSlotsForItem, SLOT_LABEL, SLOT_ID_KEY, effectiveStats, gearHpBonus, resolveEquippedItem } from '../../engine/equipment';
 import { canScrap, scrapOutputFor, repairCostMaterials, scrapSuccessChance, scrapHasSecondChance, pickScrapFailureLine } from '../../engine/scrapEngine';
+import { wornDogVestInstanceId } from '../../engine/dogCompanion';
 import { stampDurability } from '../../engine/durability';
 import type { EquipSlot, PlayerEquipped } from '../../engine/types';
 import { ARMOR, findCatalogItem } from '../../engine/crafting';
@@ -925,6 +926,19 @@ export const createInventorySlice = (
           return { player: { ...s.player, equipped: newEq, hpMax: newMax, hp: hpAfterMaxChange(s.player.hp, hpDelta, newMax) } };
         });
       }
+    }
+    // ⚠⚠ OTA-1604 — the DOG'S BACK IS A SLOT TOO. OTA-058's auto-unequip walks
+    // every player slot and never the vest: scrapping the worn vest would
+    // destroy the row and leave dog.equipped pointing at it — and
+    // dogVestAcBonus resolves CATALOG vests by name with no inventory check,
+    // so the dog would keep the AC of a vest that no longer exists (the
+    // OTA-796 ghost-gear shape, one saddle over). Unbuckle first, out loud.
+    if (wornDogVestInstanceId(player) === item.id) {
+      const dogName = player.dog?.name ?? 'your dog';
+      set((s) => (s.player?.dog
+        ? { player: { ...s.player, dog: { ...s.player.dog, equipped: { vest: null, vestId: null } } } }
+        : s));
+      get().appendLog('world', `You unbuckle the ${item.name} from ${dogName} before breaking it down.`);
     }
     // OTA 23-014 — salvage now rolls for success. Base 70% + INT/DEX
     // modifiers. The item is CONSUMED on failure either way; the
