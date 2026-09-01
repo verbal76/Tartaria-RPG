@@ -26586,7 +26586,24 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // a different button. All three families, one writer each, never over a
 // completion (which celebrates itself) and never over a stinger (a fight
 // stood up = not this card).
-export const OTA_BUILD_ID = '2026-09-01-1602-the-beat-card';
+//
+// ⚠⚠⚠ OTA-1603 — THE VEST KNOWS WHAT IT IS. Owner: "I have a piece of dog
+// armor called woven stride and the only option I have is use or drop."
+// 'Woven Stride' is a Crucible dog-vest forge name ('Stride' lives only in
+// the dog_armor noun pool) — but the game held FOUR different answers to "is
+// this dog armor?": the pack section used the broadest test, the Equip-on-dog
+// button demanded kind/uniqueStats exactly, the gold stripe and [fits dog]
+// chip demanded raw kind alone. A legacy forge with drifted kind (pre-OTA-688
+// forges carry no uniqueStats, and OTA-1001's catalog kind-heal deliberately
+// skips fused items) filed under DOG ARMOR with no dog affordance anywhere.
+// Fixes: ONE predicate (dogCompanion.itemIsDogArmor) feeds the button, the
+// stripe, the chip, the worn resolver, the dog-AC fallback and the upgrade
+// picker; findCatalogItem learns the FIFTH catalog (DOG_GEAR) so canonical
+// readers stop calling catalog vests 'misc'; a load-time heal re-stamps
+// legacy fused vests from their own forge noun (the OTA-955 pattern) with
+// kind + minimal uniqueStats; and when no dog can wear it the modal SAYS so
+// instead of hiding the button (B15: refusals speak).
+export const OTA_BUILD_ID = '2026-09-01-1603-the-vest-knows';
 // golem catch-up 2026-09-01: markerless publish of OTA-1602 - the beat card
 // for in-place stage closes, all three families; hal got the marker push.
 // golem catch-up 2026-09-01: markerless publish of OTA-1601 - combat

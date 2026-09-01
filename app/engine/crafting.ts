@@ -284,7 +284,7 @@ export function resolveLootItem(rawName: string, enemyRarity?: Rarity): {
  *  to decide: grant a real item, or redirect to salvage. */
 export function findCatalogItem(name: string, opts?: { aliases?: boolean }): {
   name: string;
-  kind: 'weapon' | 'armor' | 'consumable' | 'relic' | 'misc';
+  kind: 'weapon' | 'armor' | 'consumable' | 'relic' | 'misc' | 'dog_armor';
   rarity: Rarity;
   tags: string[];
   baseDurability?: number;
@@ -322,6 +322,14 @@ export function findCatalogItem(name: string, opts?: { aliases?: boolean }): {
   // redirecting through the "scene feature" fallback.
   const exp = EXPLORATION.find((x) => x.name.toLowerCase() === q);
   if (exp) return { name: exp.name, kind: 'relic', rarity: exp.rarity, tags: exp.tags };
+  // ⚠ OTA-1603 — the FIFTH catalog. This resolver fed canonicalItemKind and
+  // every canonical reader while never once knowing dog gear existed, so a
+  // catalog vest whose stored kind drifted canonicalised to 'misc' forever —
+  // the "decision sites must never trust item.kind alone" rule pointed at a
+  // resolver with a blind spot. lookupCraftedItem always knew (crafting had
+  // to); the canonical reader now agrees with it.
+  const dgc = DOG_GEAR.find((x) => x.name.toLowerCase() === q);
+  if (dgc) return { name: dgc.name, kind: 'dog_armor', rarity: dgc.rarity, tags: dgc.tags, baseDurability: dgc.baseDurability ?? DEFAULT_DURABILITY };
   return null;
 }
 

@@ -28,7 +28,7 @@ import { computeInventoryDelta, type InventoryDelta } from '../components/invent
 import { SearchSortBar, type SortDirection } from '../components/SearchSortBar';
 import { FirstTimeHint } from '../components/FirstTimeHint';
 import { consumeVerb } from '../engine/consumeVerb';
-import { wornDogVestInstanceId } from '../engine/dogCompanion';
+import { itemIsDogArmor, wornDogVestInstanceId } from '../engine/dogCompanion';
 import { activeFetchItemNames } from '../engine/factionQuests';
 import { isGolemRepairPart, isGolemSubstitutePart, isGolemWeapon, golemRepairHeal, golemSubstituteHeal } from '../engine/golems';
 import { healBatchCount, HEAL_BATCH_NOTE } from '../engine/healBatch';
@@ -957,8 +957,13 @@ export function InventoryScreen() {
     const dogActive = !!player?.dog
       && player.dog.status !== 'abandoned'
       && player.dog.status !== 'dead';
-    const pendingIsDogArmor = pending.item.kind === 'dog_armor'
-      || pending.item.uniqueStats?.kind === 'dog_armor';
+    // ⚠⚠⚠ OTA-1603 — the ONE predicate (dogCompanion.itemIsDogArmor), not raw
+    // kind. Owner: "I have a piece of dog armor called Woven Stride and the
+    // only option I have is use or drop." His vest is a legacy Crucible forge
+    // whose stored kind drifted — the categorizer filed it under DOG ARMOR by
+    // its broader test while this button demanded kind === 'dog_armor' exactly,
+    // so the section header said what the item was and no affordance agreed.
+    const pendingIsDogArmor = itemIsDogArmor(pending.item);
     // OTA-956 — the details modal now SAYS when this exact vest is the one the
     // dog is wearing, and offers to take it off — before this, every vest
     // read the same "Equip on dog", so you couldn't tell them apart here.
@@ -1012,6 +1017,30 @@ export function InventoryScreen() {
           closeModal();
         },
         tone: 'primary',
+      });
+    } else if (pendingIsDogArmor) {
+      // ⚠ OTA-1603 — no active dog. The affordance never silently vanishes
+      // (B15: refusals always speak): the vest still says who it's for and why
+      // it can't be worn right now, instead of reading as an inert trinket.
+      const dogRef = player?.dog;
+      buttons.push({
+        label: !dogRef
+          ? 'Dog armor — no dog walks beside you yet'
+          : dogRef.status === 'dead'
+            ? `Dog armor — ${dogRef.name} is gone`
+            : `Dog armor — ${dogRef.name} isn't with you`,
+        onPress: () => {
+          useGameStore.getState().appendLog(
+            'arbiter',
+            !dogRef
+              ? `The Arbiter turns the ${pending.item.name} over. "Made for a dog's back. Find one to walk with, and this will fit."`
+              : dogRef.status === 'dead'
+                ? `The Arbiter sets the ${pending.item.name} down gently. "It was made for a friend. Keep it, or let it go — your call."`
+                : `The Arbiter nods at the ${pending.item.name}. "It goes on ${dogRef.name}, when you're together again."`,
+          );
+          closeModal();
+        },
+        tone: 'neutral',
       });
     }
     if (dogActive && isConsumable) {
@@ -1568,7 +1597,9 @@ export function InventoryScreen() {
   const golemForStripe = player.golem;
   const golemActiveForStripe = !!golemForStripe && golemForStripe.hp > 0;
   const companionStripeColor = (item: InventoryItem): string | null => {
-    if (dogActiveForStripe && (item.kind === 'consumable' || item.kind === 'dog_armor')) {
+    // OTA-1603 — the one predicate for the vest half; raw kind was a third,
+    // narrower test that left drifted-kind vests without their gold stripe.
+    if (dogActiveForStripe && (item.kind === 'consumable' || itemIsDogArmor(item))) {
       return COMPANION_STRIPE_DOG;
     }
     if (golemActiveForStripe && golemForStripe) {
@@ -2370,7 +2401,7 @@ function ItemRow({
   // dogTreat in their catalog effect (or tagged with 'dog_treat' /
   // 'treat' on the inventory item itself for items dropped before
   // the catalog row existed).
-  const fitsDog = item.kind === 'dog_armor';
+  const fitsDog = itemIsDogArmor(item); // OTA-1603 — the one predicate, not raw kind
   const isTreat = (item.tags ?? []).includes('dog_treat') || (() => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { findGearByName } = require('../engine/crafting');

@@ -30,6 +30,7 @@ import {
   applyDogPronouns,
   trainDogStat,
   dogHpGainClause,
+  healLegacyDogVest,
   type RescueScenarioId,
   type RescueScenario,
 } from '../engine/dogCompanion';
@@ -3453,6 +3454,10 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
     // description onto the saved instance in place. Idempotent on
     // already-restamped items (the merge only fills gaps).
     item = restampInventoryItem(item);
+    // ⚠ OTA-1603 — a legacy Crucible dog vest whose kind drifted (pre-OTA-688
+    // forges carry no uniqueStats; OTA-1001 above deliberately skips fused items)
+    // gets its kind + minimal uniqueStats back from its own forge noun.
+    item = healLegacyDogVest(item);
     // OTA-677 — heal temper bloat: a non-weapon/armor tool (Climbing Rope, Pry Bar)
     // stamped BEFORE the temper gate carries an inflated random durability max
     // (a 150-rope at ~270). Reset it to the catalog base so existing saves correct
@@ -3468,14 +3473,9 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
     // fused-tag backfill AND the fused-name migration below for the tagged set, so
     // "Atalan's Trident" keeps its name and doesn't read as a Crucible fusion.
     const isGuardianReward = (item.tags ?? []).some((t) => t.toLowerCase() === 'core_guardian_set');
-    // OTA-830 — make a Core Guardian drop granted BEFORE OTA-828 usable. Those saves
-    // stored the weapon/armor with NO uniqueStats (the builder didn't stamp it yet),
-    // so getEquippedWeapon resolved them barehanded and aggregateArmor gave 0 AC —
-    // "Atalan's Trident can't be used." (A name that happens to contain a catalog word
-    // like "Halberd" worked by accident via findWeaponByName's fuzzy match; a
-    // "Trident" / "Rosary" / "Tuning Fork" did not.) Backfill uniqueStats from the
-    // canonical set entry, matched by name, BEFORE the fused-tag backfill below (which
-    // still skips Guardian gear via !isGuardianReward).
+    // OTA-830 — a Core Guardian drop granted BEFORE OTA-828 has NO uniqueStats
+    // (the builder didn't stamp yet): resolved barehanded / 0 AC. Backfill from
+    // the canonical set entry by name, BEFORE the fused-tag backfill below.
     if (isGuardianReward && !item.uniqueStats) {
       const gStats = (require('../engine/coreGuardians') as typeof import('../engine/coreGuardians')).guardianGearUniqueStats(item);
       if (gStats) item = { ...item, uniqueStats: gStats };

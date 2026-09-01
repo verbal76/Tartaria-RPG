@@ -361,17 +361,95 @@ export function createDogCompanion(args: {
   };
 }
 
+// ⚠⚠⚠ OTA-1603 — ONE predicate for "is this dog armor?", because the game had
+// FOUR, and the owner walked into the crack between them. His report: "I have
+// a piece of dog armor called Woven Stride and the only option I have is use
+// or drop." 'Woven' + 'Stride' is a Crucible dog-vest name (the noun 'Stride'
+// exists ONLY in the dog_armor forge pool), so the item IS dog armor — but the
+// Equip-on-dog button demanded item.kind === 'dog_armor' or uniqueStats.kind,
+// the gold stripe and the [fits dog] chip demanded RAW kind alone, and the
+// categorizer answered with a broader test than all of them (canonical kind OR
+// tag OR catalog name). A legacy forge whose stored kind drifted (or that
+// predates uniqueStats stamping, pre-OTA-688) files under "Dog Armor" in the
+// pack and gets NO dog affordance in the modal. OTA-956 fixed this exact
+// class for the worn-vest badge and stopped there; this predicate is the
+// finish: every decision site asks here.
+export function itemIsDogArmor(item: {
+  name: string;
+  kind?: string;
+  tags?: readonly string[];
+  uniqueStats?: { kind?: string } | null;
+}): boolean {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const C = require('./crafting') as typeof import('./crafting');
+  if (C.canonicalItemKind(item as never) === 'dog_armor') return true;
+  return C.canonicalItemTags(item as never).includes('dog_armor');
+}
+
+/** ⚠⚠ OTA-1603 — nouns that appear ONLY in the Crucible's dog_armor suffix
+ *  pool (itemFusion.ts): never in the armor pool, the armor slot-noun pools,
+ *  or any weapon noun list. A fused item ending in one of these could only
+ *  ever have been forged as a dog vest. 'Vigil' and 'Harness' are deliberately
+ *  absent — the armor pools share them. ota1603's ratchet holds the claim. */
+export const UNAMBIGUOUS_DOG_VEST_NOUNS: readonly string[] = [
+  'Wrap', 'Pattern', 'Stride', 'Coat', 'Barding', 'Hide', 'Saddle', 'Collar', 'Vest', 'Cover',
+];
+
+/** ⚠⚠⚠ OTA-1603 — the load-time heal for the owner's exact item: a legacy
+ *  Crucible dog vest whose stored kind drifted before stamping was reliable
+ *  (pre-OTA-688 forges carry no uniqueStats at all, and OTA-1001 keeps the
+ *  fused set OUT of the catalog kind-heal on purpose — so nothing else ever
+ *  corrects them). Keyed the OTA-955 way, inferred from the forge's own name:
+ *  a 'fused'-tagged item, absent from every catalog, whose final noun lives
+ *  only in the dog_armor forge pool, gets its kind set and (when missing) a
+ *  minimal uniqueStats so the vest actually protects — acBonus by rarity,
+ *  inside the fusion clamps. Idempotent; touches nothing already correct,
+ *  nothing catalogued, and nothing whose uniqueStats says otherwise. */
+export function healLegacyDogVest<T extends {
+  name: string;
+  kind?: string;
+  tags?: readonly string[];
+  rarity?: Rarity;
+  durability?: { current: number; max: number };
+  uniqueStats?: { kind?: string } | null;
+}>(item: T): T {
+  if (item.kind === 'dog_armor') return item; // already right
+  if (item.uniqueStats?.kind) {
+    // uniqueStats is instance-authoritative (OTA-999): correct the outer kind
+    // to match it when they disagree, and never override what it declares.
+    return item.uniqueStats.kind === 'dog_armor' ? { ...item, kind: 'dog_armor' } : item;
+  }
+  if (!(item.tags ?? []).some((t) => t.toLowerCase() === 'fused')) return item;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const C = require('./crafting') as typeof import('./crafting');
+  if (C.findCatalogItem(item.name, { aliases: false })) return item;
+  const lastWord = item.name.trim().split(/\s+/).pop() ?? '';
+  if (!UNAMBIGUOUS_DOG_VEST_NOUNS.includes(lastWord)) return item;
+  const rarity: Rarity = item.rarity ?? 'Rare';
+  const acBonus = rarity === 'Legendary' ? 4 : rarity === 'Rare' ? 3 : 2;
+  return {
+    ...item,
+    kind: 'dog_armor',
+    uniqueStats: {
+      kind: 'dog_armor',
+      rarity,
+      durability: item.durability ? { ...item.durability } : { current: 30, max: 30 },
+      acBonus,
+    },
+  };
+}
+
 // OTA-956 — the ONE way to answer "which inventory instance is the vest the dog
 // is wearing?". Owner: "dog vests don't show which one is equipped in the
 // inventory." The screen used to re-derive this ad hoc: the badge required
 // item.kind === 'dog_armor' exactly (fused/odd-kind vests fell through the
 // name fallback) and the slot label compared by NAME (broken the moment a
 // still-cooling Crucible vest got renamed by the settle). Resolution order:
-// exact instance id, then name match on anything that IS dog armor by kind
-// OR by uniqueStats.kind. Returns null when no dog / nothing worn / vest gone.
+// exact instance id, then name match on anything that IS dog armor (the
+// OTA-1603 predicate). Returns null when no dog / nothing worn / vest gone.
 export function wornDogVestInstanceId(player: {
   dog?: { status?: string; equipped?: { vest?: string | null; vestId?: string | null } } | null;
-  inventory?: ReadonlyArray<{ id: string; name: string; kind?: string; quantity?: number; uniqueStats?: { kind?: string } }>;
+  inventory?: ReadonlyArray<{ id: string; name: string; kind?: string; quantity?: number; tags?: readonly string[]; uniqueStats?: { kind?: string } }>;
 }): string | null {
   const dog = player.dog;
   if (!dog || dog.status === 'dead' || dog.status === 'abandoned') return null;
@@ -383,9 +461,7 @@ export function wornDogVestInstanceId(player: {
     if (byId) return byId.id;
   }
   if (!vestName) return null;
-  const isDogArmor = (it: { kind?: string; uniqueStats?: { kind?: string } }): boolean =>
-    it.kind === 'dog_armor' || it.uniqueStats?.kind === 'dog_armor';
-  const byName = inv.find((it) => isDogArmor(it) && it.name === vestName && (it.quantity ?? 1) > 0);
+  const byName = inv.find((it) => itemIsDogArmor(it) && it.name === vestName && (it.quantity ?? 1) > 0);
   return byName?.id ?? null;
 }
 

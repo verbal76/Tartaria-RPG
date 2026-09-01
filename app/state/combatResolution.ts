@@ -54,7 +54,7 @@
  * combat family.
  */
 import type { PlayerCharacter, Enemy, CombatRange, StatusEffect } from '../engine/types';
-import { applyDogPronouns, trainDogStat, dogHpGainClause } from '../engine/dogCompanion';
+import { applyDogPronouns, trainDogStat, dogHpGainClause, itemIsDogArmor } from '../engine/dogCompanion';
 import { profileOf, scaledSwingCap } from '../engine/pressure';
 import { addResurrectionGems, recordFallen, recordFallenSeed, characterSeedOf } from '../engine/saveSystem';
 import { buildDeathScene, daysBelow } from '../engine/deathScene';
@@ -919,7 +919,9 @@ export function dogVestAcBonus(player: PlayerCharacter): number {
   // EXACT worn instance by id (so the right fused copy's bonus applies when you own
   // two same-named vests), falling back to first-by-name for legacy saves.
   const inst = (eq?.vestId ? player.inventory.find((i) => i.id === eq.vestId) : undefined)
-    ?? player.inventory.find((i) => i.kind === 'dog_armor' && i.name === name);
+    // OTA-1603 — the one predicate, not raw kind: a legacy vest whose stored
+    // kind drifted still pays its AC on the dog.
+    ?? player.inventory.find((i) => itemIsDogArmor(i) && i.name === name);
   return inst?.uniqueStats?.acBonus ?? 0;
 }
 

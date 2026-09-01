@@ -10,6 +10,7 @@ import { canonicalItemTags } from '../engine/crafting';
 import { eligibleInputs, fusionMaterialTags, visibleFusionInputs, crucibleUpgradeVerdict, isWeaponRow, type CrucibleUpgradeKind } from '../engine/itemFusion';
 import { coatedDisplayName } from '../engine/weaponCoating';
 import { wornInstanceIds, equippedInstanceIds } from '../engine/equipment';
+import { itemIsDogArmor } from '../engine/dogCompanion';
 import type { InventoryItem } from '../engine/types';
 
 const MIN_PICK = 3;
@@ -51,8 +52,10 @@ export function FusionPickerModal() {
   // and the store's refusal come from one place, and every candidate now carries
   // the REASON when it can't be upgraded (see the empty-section copy below).
   const isArmorPiece = (i: InventoryItem) =>
-    i.kind === 'armor' || i.kind === 'dog_armor'
-    || i.uniqueStats?.kind === 'armor' || i.uniqueStats?.kind === 'dog_armor';
+    i.kind === 'armor' || i.uniqueStats?.kind === 'armor'
+    // OTA-1603 — the one dog-armor predicate, so a legacy vest whose stored
+    // kind drifted still shows up as an upgrade target.
+    || itemIsDogArmor(i);
   // OTA-1028 — the upgrade target list, grouped + badged (owner: "listed as all
   // armor that can be upgraded, then all weapons. and it should say which are
   // equipped. I want to be able to upgrade what I am wearing"). Worn pieces
