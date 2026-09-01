@@ -26614,7 +26614,24 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // check — so scrapping the worn vest would have left the dog wearing a ghost
 // vest with permanent AC (the OTA-796 shape, one saddle over). The worn vest
 // now unbuckles out loud before it breaks down.
-export const OTA_BUILD_ID = '2026-09-01-1604-the-vest-breaks-down';
+//
+// ⚠⚠⚠ OTA-1605 — ONE FIGHT ON THE FIELD, AND THE FIELD RE-ARMS WHEN IT
+// CLEARS. From the owner's crest log on 1604: he landed on the apex ground,
+// an AMBIENT pack (Swamp Crab + Mud Spirit) spawned with the arrival scene,
+// the OTA-1597 arm correctly held the boss back behind its live-hostiles
+// guard — and then nothing ever re-checked, because the arm runs per ACTION
+// and killing the last crab is not an action. "No popup when I landed, just
+// a fight that was not the hint fight." Then his 'fight me' ran advanceHunt
+// through TWO doors in one action (attack matcher + per-action ground check)
+// and the full curtain printed twice, 283ms apart, the second summon handing
+// the boss a fresh HP bar — with a 5s JS stall sitting in that exact window.
+// Fixes: (1) a stage that freezes for a kill is a silent no-op while ANY
+// live hostile holds the field — kills the double summon AND the mid-fight
+// boss HP reset; (2) resolveEnemyDefeat runs checkStandingGround when the
+// last body drops, so the mission fight (and its stinger) rises exactly
+// where the ambient fight ended. His landing now plays: ambient scrap,
+// clear, the Reaver stands up with the curtain. No verb, no button needed.
+export const OTA_BUILD_ID = '2026-09-01-1605-one-fight-on-the-field';
 // golem catch-up 2026-09-01: markerless publish of OTA-1604 - dog armor
 // scraps; the worn vest unbuckles first. hal took the marker push.
 // golem catch-up 2026-09-01: markerless publish of OTA-1603 - one dog-armor

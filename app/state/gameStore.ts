@@ -24754,14 +24754,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // stacks, ambush flags) so they don't drift onto the wrong enemy.
     const dropAt = <T>(arr: T[] | undefined): T[] | undefined =>
       arr ? arr.filter((_, i) => i !== activeIdx) : undefined;
-    // OTA-458 — functional set. This used to be a plain set({ player: { ...player } })
-    // built from the `player` snapshot captured at the TOP of resolveEnemyDefeat
-    // (before the Silt-Thief disc grant ran its own earlier set). That stale spread
-    // CLOBBERED the disc grant — the stolen Aetheric Discs were added then wiped, and
-    // the yulka_discs whisper reverted from 'fetch_returned' back to 'fetch_active'
-    // (the player "defeated the silt thief but didn't get the discs"). Reading from
-    // the live state (s.player / s.worldMemory) preserves any earlier mutation —
-    // discs, whisper advance — and starts the loot reduce from the current inventory.
+    // OTA-458 — functional set: a stale top-of-function `player` spread used to
+    // clobber earlier sets (the Silt-Thief disc grant vanished). Read live state
+    // so every earlier mutation survives into the loot reduce.
     set((s) => {
       const base = s.player ?? player;
       return {
@@ -24781,13 +24776,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // free one handed to whoever slid into the vacated slot.
           enemyStaggered: dropAt(currentScene.enemyStaggered),
           activeEnemyIdx: nextActiveIdx,
-          // ⚠ OTA-1507 — RE-DERIVED FOR THE PROMOTED TARGET, from the owner's
-          // first live 1506 log: the acid flask dropped Raider 1 (close), the
-          // sights moved to Raider 2 (standing at HIS mid ring), and this line
-          // carried the corpse's 'close' forward — the attack gate then told
-          // the truth ('mid') while the parser debug and every legacy reader
-          // still said 'close'. One kill, two answers. The band now follows
-          // the sights the moment they move.
+          // ⚠ OTA-1507 — re-derived for the promoted target: the band used to
+          // carry the corpse's ring forward while the sights had already moved
+          // (one kill, two answers). The band follows the sights.
           range: stillFighting
             ? (derivedSceneRange({ ...currentScene, enemies: remainingEnemies, activeEnemyIdx: nextActiveIdx })
               ?? currentScene.range)
@@ -24972,13 +24963,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (isMechanical) recordTitleProgress(get, set, { sentinelsDefeated: 1 });
     }
     if (stillFighting) {
-      // arb-fix (narration audit) — during a DOT / AoE sweep, resolveEnemyDefeat runs once
-      // per corpse and remainingEnemies still holds the not-yet-resolved dead, so this line
-      // used to fire for each corpse ("2 attackers remain. Mud Wasp now in your sights." ×3)
-      // — spam AND factually wrong (those are bodies being looted this same beat). Only
-      // announce when a LIVE enemy (hp > 0) actually remains, and count / name the living.
-      // OTA-1089 — a KO'd sleeper is not an attacker: exclude it from the
-      // count and never point the sights line at an unconscious body.
+      // arb-fix (narration audit) — announce only LIVE remainders (a DOT sweep
+      // resolves once per corpse; dead-but-unresolved bodies are not attackers).
+      // OTA-1089 — nor is a KO'd sleeper: never point the sights line at one.
       const liveRemaining = remainingEnemies.filter(
         (_, i) => (remainingHps[i] ?? 0) > 0 && !(remainingKOFlags[i] ?? false),
       );
@@ -25558,6 +25545,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const cap = bossVictoryCapture;
       bossVictoryCapture = null;
       get().raiseBossVictoryNotice(cap.name, cap.flavor, cap.rewards);
+    }
+    // ⚠⚠⚠ OTA-1605 — THE CLEAR-FIELD RE-ARM. Owner, landing on the crest:
+    // "no popup when I landed, just a fight that was not the hint fight." The
+    // arrival scene had spawned an ambient pack, so the OTA-1597 arm correctly
+    // held the apex back — and then nothing re-checked: the arm runs per
+    // ACTION, and killing the last crab is not an action. The moment the field
+    // actually clears, the ground gets one more look, so the mission fight
+    // (and its stinger) rises exactly where the ambient fight ended.
+    if (!stillFighting) {
+      checkStandingGround(get, set, grantStageItems);
     }
     void get().persist();
   },

@@ -1740,10 +1740,10 @@ export const createQuestSlice = (
       get().appendLog('arbiter', `The Arbiter puts a hand out. "Not under this roof — the outpost holds its truce. Step out the gate (LEAVE OUTPOST) and force it there."`);
       return;
     }
-    get().appendLog('world', stageDef.narration);
-    if (stageDef.arbiter) get().appendLog('arbiter', stageDef.arbiter);
     // ⚠ OTA-1601 — computed HERE (the same expression as `freezeForKill` below)
-    // because the direction/route block needs the answer BEFORE the spawn runs.
+    // because the direction/route block needs the answer BEFORE the spawn runs
+    // — and, since OTA-1605, because the one-fight guard needs it BEFORE the
+    // narration prints.
     let lastBossIdxEarly = -1;
     for (let i = 0; i < hunt.stages.length; i++) {
       if (hunt.stages[i]?.checkKind === 'boss') lastBossIdxEarly = i;
@@ -1752,6 +1752,23 @@ export const createQuestSlice = (
       (stageDef.checkKind === 'boss' && record.stage === lastBossIdxEarly)
       || !!stageDef.spawn
     );
+    // ⚠⚠⚠ OTA-1605 — ONE FIGHT ON THE FIELD. From the owner's crest log: 'fight
+    // me' on the apex ground ran advanceHunt through TWO doors in one action
+    // (the attack matcher and the per-action ground check), and the full
+    // curtain — narration, 'closes the distance', stinger — printed twice
+    // 283ms apart, with the second summon handing the boss a fresh HP bar.
+    // The arm has always guarded on live hostiles; the verb door never needed
+    // to until OTA-1601 opened the second door. A stage that freezes for a
+    // kill is a no-op while ANY live hostile holds the field: if it's the
+    // boss, the fight is already on; if it's an ambient pack, the clear-field
+    // re-arm (combatResolution → checkStandingGround) raises the curtain the
+    // moment the last body drops. Silent by design — you're already fighting.
+    if (willFreezeForKill) {
+      const sc = get().currentScene;
+      if ((sc?.enemies ?? []).some((_, i) => (sc?.enemyHps?.[i] ?? 0) > 0)) return;
+    }
+    get().appendLog('world', stageDef.narration);
+    if (stageDef.arbiter) get().appendLog('arbiter', stageDef.arbiter);
     // OTA-1602 — remembered from the direction block below: a next stage on
     // THIS tile has no travel leg to separate it, so the close raises the
     // beat card once the record moves (and only if no fight stood up).
