@@ -198,9 +198,9 @@
   /organizations/hot-attic-games-llc/issues/7705211038/events/?full=false
     1 page(s), 3 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7705427321/events/?full=false
-    1 page(s), 56 rows — COMPLETE — ended short of a full page
+    1 page(s), 84 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7705427482/events/?full=false
-    1 page(s), 2 rows — COMPLETE — ended short of a full page
+    1 page(s), 3 rows — COMPLETE — ended short of a full page
   /projects/hot-attic-games-llc/tartaria/events/?full=false
     1 page(s), 100 rows — SUSPECT — ended on a full page of 100 with no next cursor; this endpoint caps rather than paginates
   /projects/hot-attic-games-llc/tartaria/issues/?query=&statsPeriod=
@@ -271,3 +271,4 @@
     mtj0rqoi6phs: 3 redactions, 1121 chars
     mtj23y06dc8q: 10 redactions, 3702 chars
     mtj4hpttgrw4: 6 redactions, 2227 chars
+    mtj5akkbvhf2: 9 redactions, 3291 chars

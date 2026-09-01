@@ -1,0 +1,258 @@
+{
+  "id": "4e2f7f175844447b9e48afa5b3185808",
+  "groupID": "7705427321",
+  "eventID": "4e2f7f175844447b9e48afa5b3185808",
+  "projectID": "4511945117532160",
+  "size": 17777,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-01-1611-weak-and-not-weak #mtj5akkbvhf2 [inline 11/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-01-1611-weak-and-not-weak",
+  "message": "player-log 2026-09-01-1611-weak-and-not-weak #mtj5akkbvhf2 [inline 11/28]",
+  "title": "player-log 2026-09-01-1611-weak-and-not-weak #mtj5akkbvhf2 [inline 11/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "a36d2718243c4616a65961cc9166f018",
+      "span_id": "af03146f03f694fc",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      " update can take a minute)\n[2026-09-01T10:12:01.271Z] [debug] ota: Saving progress\u2026\n[2026-09-01T10:12:01.271Z] [debug] ota: Restarting to apply\u2026\n[2026-09-01T10:12:01.341Z] [debug] ota: boot check result = applied\n[2026-09-01T10:12:01.491Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a05b1f-7928-78c6-88a4-143c922722cd\n[2026-09-01T10:12:01.491Z] [debug] ota: Checking\u2026\n",
+      "[2026-09-01T10:12:01.584Z] [debug] ota: Already up to date\n[2026-09-01T10:12:01.585Z] [debug] ota: boot check result = noUpdate\n[2026-09-01T10:12:01.655Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-09-01T10:12:01.655Z] [debug] voice: bundled idle\n[2026-09-01T10:12:01.953Z] [debug] send-log: bundle #mti4rci02ab8 attempt 2/5 delivered to Sentry\n",
+      "[2026-09-01T10:51:58.408Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a05b1f-7928-78c6-88a4-143c922722cd\n[2026-09-01T10:51:58.408Z] [debug] ota: Checking\u2026\n[2026-09-01T10:52:00.072Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-09-01T10:52:00.187Z] [debug] ota: Saving progress\u2026\n[2026-09-01T10:52:00.188Z] [debug] ota: Restarting to apply\u2026\n",
+      "[2026-09-01T10:52:00.278Z] [debug] ota: boot check result = applied\n[2026-09-01T10:52:00.505Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a05c8e-377a-7912-bbc8-d0273b9be34b\n[2026-09-01T10:52:00.505Z] [debug] ota: Checking\u2026\n[2026-09-01T10:52:00.729Z] [debug] ota: Already up to date\n[2026-09-01T10:52:00.730Z] [debug] ota: boot check result = noUpdate\n",
+      "[2026-09-01T10:52:00.849Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-09-01T10:52:00.849Z] [debug] voice: bundled idle\n[2026-09-01T10:52:01.560Z] [debug] send-log: bundle #mti4rci02ab8 attempt 3/5 delivered to Sentry\n[2026-09-01T13:56:59.015Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a05c8e-377a-7912-bbc8-d0273b9be34b\n",
+      "[2026-09-01T13:56:59.015Z] [debug] ota: Checking\u2026\n[2026-09-01T13:57:00.294Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-09-01T13:57:00.401Z] [debug] ota: Saving progress\u2026\n[2026-09-01T13:57:00.402Z] [debug] ota: Restarting to apply\u2026\n[2026-09-01T13:57:00.629Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a05cba-0b3e-7788-8319-cb9e3bef05a1\n",
+      "[2026-09-01T13:57:00.629Z] [debug] ota: Checking\u2026\n[2026-09-01T13:57:00.732Z] [debug] ota: Already up to date\n[2026-09-01T13:57:00.732Z] [debug] ota: boot check result = noUpdate\n[2026-09-01T13:57:00.815Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-09-01T13:57:00.815Z] [debug] voice: bundled idle\n",
+      "[2026-09-01T13:57:01.052Z] [debug] send-log: bundle #mti4rci02ab8 attempt 4/5 delivered to Sentry\n[2026-09-01T13:57:04.446Z] [debug] OTA applied: 2026-09-01-1602-the-beat-card \u2192 2026-09-01-1603-the-vest-knows.\n[2026-09-01T13:57:04.446Z] [debug] OTA session start: 2026-09-01-1603-the-vest-knows.\n",
+      "[2026-09-01T13:57:04.447Z] [world] You step back into The Monarch's Waystation. The world waits for your move.\n[2026-09-01T13:57:04.447Z] [world] Word reaches you: a roadside trader changed routes while you were elsewhere. The next time you cross the right tile, look for a stall you didn't see before.\n",
+      "[2026-09-01T13:57:04.450Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. \"Welcome back, Cheddar Bob. We've still got ground to cover, you and I. The waste did not sleep while you were gone \u2014 blood was spilled and ground changed hands. Read the World for the account.\"\n",
+      "[2026-09-01T13:57:04.788Z] [debug] \u2550\u2550\u2550 SESSION 2026-09-01T13:57:04.786Z \u00b7 build 2026-09-01-1603-the-vest-knows \u00b7 updated from 2026-09-01-1602-the-beat-card \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-09-01T13:57:04.789Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-01T13:57:04.789Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n[2026-09-01T13:57:04.789Z] [debug] missions: mystery:mystery_temporal_watch stage 0/4 [diplomacy] @reclaimer_stake npc=\"the Reclaimers Guild Speaker\" gives=Guild Eddy-Gauge PAUSED\n",
+      "[2026-09-01T13:57:04.789Z] [debug] missions: \u00b7 at=monarch_waystation\n[2026-09-01T13:57:04.789Z] [debug] boot: life bmtiqe6g5zs started 2026-09-01T13:57:00.581Z \u00b7 FOLLOWED AN OTA APPLY 179ms ago via boot-front \u00b7 prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)\n",
+      "[2026-09-01T13:57:05.469Z] [debug] send-log: crash on record (2026-09-01T10:56:48.050Z) \u2014 game log pushed automatically, delivered to Sentry, kept on disk as #mtiqe9wwibm3\n[2026-09-01T13:57:10.272Z] [debug] ui: tap \"more \u25b8\"\n[2026-09-01T13:57:11.155Z] [debug] ui: tap \"inventory\"\n",
+      "[2026-09-01T14:41:16.767Z] [debug] persist sizes(KB): total=261 player=66 wm=107[rooms=50 events=4 memos=0 npcs=4 defeated=1 tags=1 discovered=0] log=85 scene=2\n[2026-09-01T14:41:22.054Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a05d59-4c13-746d-b20e-bc20bf077c7e\n[2026-09-01T14:41:22.055Z] [debug] ota: Checking\u2026\n",
+      "[2026-09-01T14:41:22.167Z] [debug] ota: Already up to date\n[2026-09-01T14:41:22.167Z] [debug] ota: boot check result = noUpdate\n[2026-09-01T14:41:22.281Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-09-01T14:41:22.281Z] [debug] voice: bundled idle\n[2026-09-01T14:41:22.450Z] [debug] send-log: bundle #mtiqe9wwibm3 attempt 2/5 delivered to Sentry\n",
+      "[2026-09-01T14:41:26.567Z] [debug] OTA applied: 2026-09-01-1603-the-vest-knows \u2192 2026-09-01-1604-the-vest-breaks-down.\n[2026-09-01T14:41:26.567Z] [debug] OTA session start: 2026-09-01-1604-the-vest-breaks-down.\n[2026-09-01T14:41:26.567Z] [world] You step back into The Monarch's Waystation. The world waits for your move.\n",
+      "[2026-09-01T14:41:26.567Z] [arbiter] The Arbiter sets the quiet aside. \"Welcome back, Cheddar Bob. I kept watch while you were gone.\"\n[2026-09-01T14:41:26.868Z] [debug] \u2550\u2550\u2550 SESSION 2026-09-01T14:41:26.866Z \u00b7 build 2026-09-01-1604-the-vest-breaks-down \u00b7 updated from 2026-09-01-1603-the-vest-knows \u00b7 previous entry moments earlier \u2550\u2550\u2550\n",
+      "[2026-09-01T14:41:26.869Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n[2026-09-01T14:41:26.869Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n",
+      "[2026-09-01T14:41:26.869Z] [debug] missions: mystery:mystery_temporal_watch stage 0/4 [diplomacy] @reclaimer_stake npc=\"the Reclaimers Guild Speaker\" gives=Guild Eddy-Gauge PAUSED\n[2026-09-01T14:41:26.870Z] [debug] missions: \u00b7 at=monarch_waystation\n",
+      "[2026-09-01T14:41:26.870Z] [debug] boot: life bmtirz8038m started 2026-09-01T14:41:21.987Z \u00b7 FOLLOWED AN OTA APPLY 198ms ago via mid-session \u00b7 prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)\n[2026-09-01T14:41:32.146Z] [debug] ui: tap \"\ud83d\udeaa EXIT\"\n[2026-09-01T14:41:32.193Z] [player] leave outpost\n",
+      "[2026-09-01T14:41:32.194Z] [debug] parser: intent=travel conf=1.00 verb=leave target=outpost resolved=- range=- enemies=0 hooks=0\n[2026-09-01T14:41:32.195Z] [world] You walk back through the gate and out into the open ground. The outpost falls away behind you.\n[2026-09-01T14:41:32.195Z] [debug] scene: loc=monarch_waystation hub=- arrival=n opening=n passing=n\n",
+      "[2026-09-01T14:41:32.196Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n[2026-09-01T14:41:32.196Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n",
+      "[2026-09-01T14:41:32.196Z] [debug] missions: mystery:mystery_temporal_watch stage 0/4 [diplomacy] @reclaimer_stake npc=\"the Reclaimers Guild Speaker\" gives=Guild Eddy-Gauge PAUSED\n[2026-09-01T14:41:32.196Z] [debug] missions: \u00b7 at=monarch_waystation\n[2026-09-01T14:41:32.242Z] [world] Snow that absorbs all sound. Your footsteps make no noise. Your screams make less.\n\n",
+      "You are at The Monarch's Waystation. A frontier toll-court of the Mud Monarchs, last ordered ground before the buried capitals. Banners hang stiff with silt; a seneschal logs every traveler who passes toward the deeper cities.\n\nHazard: Temporal Loop. You walk the same corridor and find yourself walking it again. The Aetheric field has caught the moment in a fold.\n",
+      "[2026-09-01T14:41:32.245Z] [world] [Dynasty Border Post Outskirts] north: Dynasty Border Post (3 tiles, 8 hours) \u00b7 east: The Buried Cities (5 tiles, 13 hours) \u00b7 south: The Sunken Enclave (4 tiles, 10 hours) \u00b7 west: The Reaver's Crest (4 tiles, 10 hours)\n[2026-09-01T14:41:32.251Z] [system] \u23f3 Time passed: 1h\n[2026-09-01T14:41:32.409Z] [cognitive] RETREAT \u00b7 DISENGAGE \u00b7 HIDE  (156ms)\n",
+      "[2026-09-01T14:41:33.180Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-09-01T14:41:33.797Z] [debug] ui: tap \"more \u25b8\"\n[2026-09-01T14:41:36.099Z] [debug] ui: tap \"missions\"\n[2026-09-01T14:41:42.095Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-09-01T14:41:47.619Z] [world] Re-activated Silence the Doubter. It's back in play.\n",
+      "[2026-09-01T14:41:50.283Z] [world] You set course for The Reaver's Crest. 4 tiles \u2014 about 10 hours of travel, all in. You set off now \u2014 the ground ahead is new ground. Keep tapping \u2192 THE REAVER'S CREST on the travel row to close the distance; STOP TRAVEL to halt.\n",
+      "[2026-09-01T14:41:50.293Z] [world] You walk west through open silt. The compass tells you Reclaimer's Stake lies further west \u2014 5 tiles, about 13 hours of travel.\n[2026-09-01T14:41:50.293Z] [world] A glint of metal \u2014 too small to name yet \u2014 lies in the rubble.\n",
+      "[2026-09-01T14:41:52.023Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 9922ms read 8768ms/write 1104ms in 744t\u2192out 33t 11.8ms/t HIT-CAP (163ch)\n[2026-09-01T14:41:52.199Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 9922ms \u2014 intro-fill:\u2205\n[2026-09-01T14:41:52.199Z] [debug] homework: scene_intro \"The Monarch's Waystation\" \u2205 10106ms\n",
+      "[2026-09-01T14:41:53.922Z] [debug] ui: tap \"take / salvage\"\n[2026-09-01T14:41:55.049Z] [world] You take the Aetheric Spark from where it lay.\n[2026-09-01T14:41:55.050Z] [reward] \u2726 Aetheric Spark (Common).\n[2026-09-01T14:41:55.060Z] [world] You pick up the Architect's Mantle.\n[2026-09-01T14:41:55.061Z] [reward] \u2726 Architect's Mantle (Common).\n",
+      "[2026-09-01T14:41:55.062Z] [world] You lift the Reclaimer's Salvage Cap clear.\n[2026-09-01T14:41:55.062Z] [reward] \u2726 Reclaimer's Salvage Cap (Common).\n[2026-09-01T14:41:56.069Z] [world] You work the cold spring over. A part of it comes loose, intact.\n[2026-09-01T14:41:56.069Z] [world] You break the crate apart. Among the pieces, something worth keeping.\n",
+      "[Filtered]",
+      "[2026-09-01T14:41:56.071Z] [reward]     \u2022 Worn Tartarian Coin x15 (Common)\n[2026-09-01T14:41:56.071Z] [reward]     \u2022 Cracked Carapace Curl (Common)\n[2026-09-01T14:41:57.726Z] [player] investigate rubble\n[2026-09-01T14:41:57.727Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=rubble resolved=rubble range=- enemies=0 hooks=1\n",
+      "[2026-09-01T14:41:57.727Z] [debug] route: hook intercept (kind=glint, target=\"rubble\") \u2014 original intent=investigate\n[2026-09-01T14:41:57.728Z] [world] \u2605 STORY THREAD (step 1) \u2014 You pick the metal out of the rubble. A pendant \u2014 Tartarian make, hammered thin, etched with a faction crest.\n[2026-09-01T14:41:57.728Z] [reward] \u2726 Forgotten Order Sigil.\n",
+      "[2026-09-01T14:41:59.173Z] [world] \u2605\u2605 STORY THREAD COMPLETE \u2014 You turn the pendant over. Whoever wore it last bled out clutching it \u2014 a faint rust-brown line still runs along the inside of the chain.\n[2026-09-01T14:41:59.175Z] [reward] \u2726 For your persistence \u2014 Sentinel Core Plate (Uncommon).\n",
+      "[2026-09-01T14:41:59.176Z] [arbiter] \"That crest is the Forgotten Order's,\" the Arbiter says. \"Carry it to their people and lay it down. They honor the ones who bring their dead home.\"\n[2026-09-01T14:42:02.691Z] [debug] ui: tap \"investigate\"\n[2026-09-01T14:42:04.268Z] [player] investigate the mud\n",
+      "[2026-09-01T14:42:04.268Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=tilting petrified mud wave range=- enemies=0 hooks=1\n[2026-09-01T14:42:04.270Z] [world] You look the tilting petrified mud wave over where it sits. Nothing about it sings, nothing about it warns \u2014 Tartaria is full of things waiting to be remembered.\n",
+      "[2026-09-01T14:42:04.420Z] [cognitive] SWIM  (149ms)\n[2026-09-01T14:42:04.614Z] [debug] persist sizes(KB): total=267 player=67 wm=112[rooms=54 events=4 memos=1 npcs=4 defeated=1 tags=1 discovered=0] log=86 scene=3\n[2026-09-01T14:42:04.988Z] [debug] ui: tap \"\u2192 THE REAVER'S CREST\"\n[2026-09-01T14:42:05.005Z] [debug] spawn: gear=[Seer's Veil of the Aether, Reclaimer's Gloves] window=10 roster=new\n",
+      "[2026-09-01T14:42:05.008Z] [world] You walk west through open silt. The compass tells you Reclaimer's Stake lies further west \u2014 4 tiles, about 10 hours of travel.\n[2026-09-01T14:42:05.008Z] [world] A green lantern hangs at the mouth of a culvert \u2014 the Mud Dwellers mark their hidden markets with that exact green.\n[2026-09-01T14:42:06.089Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-09-01T14:42:07.070Z] [debug] qwen\u23f1 investigate_lore ok 2660ms read 1344ms/write 1281ms in 134t\u2192out 38t 10.0ms/t (157ch)\n[2026-09-01T14:42:07.497Z] [world] You salvage the banner. The take is small but real.\n[2026-09-01T14:42:07.497Z] [world] You break the cart apart. Among the pieces, something worth keeping.\n",
+      "[2026-09-01T14:42:07.498Z] [world] You work the cold spring over. A part of it comes loose, intact.\n[2026-09-01T14:42:07.498Z] [world] You work the crate over. A part of it comes loose, intact.\n[2026-09-01T14:42:07.498Z] [world] You salvage the marker. The take is small but real.\n[2026-09-01T14:42:07.499Z] [world] Already worked over: stone marker.\n",
+      "[2026-09-01T14:42:07.499Z] [reward] \u2726 Salvage haul:\n[2026-09-01T14:42:07.499Z] [reward]     \u2022 Worn Tartarian Coin x6 (Common)\n[2026-09-01T14:42:07.500Z] [reward]     \u2022 Scrap Metal x5 (Common)\n[2026-09-01T14:42:07.500Z] [reward]     \u2022 Aether Crystal x2 (Common)\n[2026-09-01T14:42:08.625Z] [world] You get a hand under the Reclaimer's Gloves and take it.\n",
+      "[2026-09-01T14:42:08.626Z] [reward] \u2726 Reclaimer's Gloves (Common).\n[2026-09-01T14:42:08.644Z] [world] You claim the Seer's Veil of the Aether.\n[2026-09-01T14:42:08.644Z] [reward] \u2726 Seer's Veil of the Aether (Common).\n[2026-09-01T14:42:09.940Z] [debug] ui: tap \"investigate\"\n[2026-09-01T14:42:11.453Z] [player] investigate the mud\n",
+      "[2026-09-01T14:42:11.454Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=tilting petrified mud wave range=- enemies=0"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-01-1611-weak-and-not-weak #mtj5akkbvhf2 [inline 11/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtj5akkbvhf2"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-01-1611-weak-and-not-weak"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "11"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-01-1611-weak-and-not-weak"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-01T20:54:06.407445Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "32": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 380,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-01T20:54:06.511000Z",
+  "fingerprints": [
+    "5f7823dbbd94baf04818dff434408c28"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1949080190,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-01T20:29:46.246000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-01-1611-weak-and-not-weak",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-01-1611-weak-and-not-weak",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-01-1611-weak-and-not-weak",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-01-1611-weak-and-not-weak)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "56027dd07d9341fbbd3d214982341aeb",
+  "previousEventID": "4aa23116692b4e59865a4298ceb9ad15"
+}
