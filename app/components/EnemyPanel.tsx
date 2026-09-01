@@ -150,6 +150,18 @@ export function pageIndexForOffset(offsetX: number, cardWidth: number, count: nu
 // changed; `defensesFor` is now the local name for the shared one.
 const defensesFor = reconciledDefenses;
 
+/** ⚠ OTA-1609 — the ATTACK NAME survives, out of the arithmetic's way. Owner,
+ *  after 1608 moved the ATK cell to the real bonus: "I like the attack name,
+ *  let's add that somewhere in the enemy portrait so it's known but not in
+ *  the way." The bestiary's `attack` is a move name ("Spirit Touch"); it now
+ *  rides the defs block as a quiet flavor line instead of masquerading as a
+ *  number. Null when the field is empty or numeric (some mints stamp digits). */
+function enemyAttackName(e: { attack?: unknown }): string | null {
+  const name = String(e.attack ?? '').trim();
+  if (!name || /^\+?\d+$/.test(name)) return null;
+  return name;
+}
+
 // OTA-798 — a WISDOM ≥ this reads an enemy's (randomized) weaknesses off the portrait
 // up front; below it you must discover them by landing hits (the combat log's
 // "Weakness exposed" line is the feedback). Matches the parley WIS_REVEAL_THRESHOLD, so
@@ -444,6 +456,8 @@ function enemyDetailBody(view: EnemyView, canRead: boolean, observed?: { weak: s
   lines.push(`HP ${view.currentHp}/${e.hp}     AC ${ac}`);
   // OTA-1139 (audit) — a boss's real per-round output, not the notation third of it.
   lines.push(`Attack ${atkLabel}     Damage ${enemyDamageCompact(e)}${dealsType ? ` (${cap(dealsType)})` : ''}`);
+  // OTA-1609 — the move name rides along in the roomy popup too.
+  if (enemyAttackName(e)) lines.push(`Strikes with: ${enemyAttackName(e)}`);
   // OTA-818/819 — a non-boss enemy's (randomized) defenses are WIS-gated: read them up
   // front only with enough Wisdom, else discover by hitting. OTA-799 — the read is
   // DIEGETIC: narrate what you notice, with the damage type in parens.
@@ -658,6 +672,13 @@ function EnemyCard({ view, cardWidth, hpBarWidth, canRead, observed, playerPower
           <Text style={styles.defDeals}>DEALS </Text>
           <Text style={styles.defVal}>{cap(dealsType)}</Text>
         </Text>
+        {/* ⚠ OTA-1609 — the move's NAME, quiet, under the numbers it flavors. */}
+        {!!enemyAttackName(view.enemy) && (
+          <Text style={styles.defLine} numberOfLines={1}>
+            <Text style={styles.defStrikes}>STRIKES </Text>
+            <Text style={styles.defVal}>{enemyAttackName(view.enemy)}</Text>
+          </Text>
+        )}
       </View>
       {/* OTA-401 — active coating/DOT statuses on this enemy + turns left.
           One badge per status: "POISON · 3t · 4/turn". Lets the player
@@ -785,6 +806,9 @@ const styles = StyleSheet.create({
   // it's neither good nor bad for the player, just "what's coming at you."
   defDeals: { color: '#d9a566', fontWeight: '700', fontSize: 9, letterSpacing: 1 },
   defVal: { color: '#c9b89a', fontSize: 10 },
+  // OTA-1609 — the STRIKES label sits a shade dimmer than DEALS: flavor, not a
+  // decision input, so it must never outshout the numbers above it.
+  defStrikes: { color: '#8f8570', fontWeight: '700', fontSize: 9, letterSpacing: 1 },
   statusCol: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 },
   statusBadge: {
     fontSize: 9,

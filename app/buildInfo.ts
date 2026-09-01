@@ -26670,7 +26670,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // bestiary rows, all 18 scaled hunt bosses, scaled escorts, the nine Core
 // Guardians, and a fallen-hero revenant — and asserts every number the card
 // prints is the number the dice will use.
-export const OTA_BUILD_ID = '2026-09-01-1608-one-card-one-arithmetic';
+//
+// ⚠⚠⚠ OTA-1609 — THE STRIKE KEEPS ITS NAME. Owner, after 1608 moved the ATK
+// cell from parseInt(attack) to the real roll bonus: "I like the attack name,
+// let's add that somewhere in the enemy portrait so it's known but not in the
+// way." The bestiary's authored move names ("Spirit Touch") were flavor
+// masquerading as a stat; now they ride the defs block as a dim STRIKES line
+// under DEALS — a shade quieter than the amber, flavor never outshouting a
+// decision input — and the detail popup carries "Strikes with: <name>". Null
+// for mints that stamp digits or nothing; every number on the card remains
+// the roll's own arithmetic (1608), untouched.
+export const OTA_BUILD_ID = '2026-09-01-1609-the-strike-keeps-its-name';
 // golem catch-up 2026-09-01: markerless publish of OTA-1608 - the portrait
 // reads the roll's own resolvers; every mint swept. hal took the marker.
 // golem catch-up 2026-09-01: markerless publish of OTA-1607 - the portrait
