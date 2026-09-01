@@ -26671,6 +26671,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Guardians, and a fallen-hero revenant — and asserts every number the card
 // prints is the number the dice will use.
 export const OTA_BUILD_ID = '2026-09-01-1608-one-card-one-arithmetic';
+// golem catch-up 2026-09-01: markerless publish of OTA-1608 - the portrait
+// reads the roll's own resolvers; every mint swept. hal took the marker.
 // golem catch-up 2026-09-01: markerless publish of OTA-1607 - the portrait
 // card canonicalizes its damage type. hal took the marker push.
 // golem catch-up 2026-09-01: markerless publish of OTA-1606 - the gate
