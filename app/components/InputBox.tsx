@@ -24,7 +24,7 @@ import { itemIsShield, findWeaponByName } from '../engine/crafting';
 import { parseWeaponEffect, applyRangeNote } from '../engine/weaponEffects';
 import { itemIsHandThrownSpear } from '../engine/bandolierEligibility';
 import { useReduceMotion } from '../state/accessibility';
-import { hubRoomFor, hubSkinFactionFor, isLeaveHubCommand, roomIsExit, hubDefinesExitRoom } from '../engine/hub';
+import { hubRoomFor, hubSkinFactionFor, isLeaveHubCommand, roomIsExit, hubDefinesExitRoom, isHubLocation } from '../engine/hub';
 import { resolveDisplayWeaponByName } from '../engine/itemResolution';
 // OTA-1553 — the combat weapon label: coating glyphs, the name, and a ★ when
 // this weapon hits a weakness the player has actually discovered.
@@ -451,6 +451,10 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   // its existing thing; only the chip LABEL changes. Outside a hub
   // the row renders cardinals as before.
   const hubRoom = useMemo(() => (hubRoomId ? hubRoomFor(hubRoomId, skinFactionId) : null), [hubRoomId, skinFactionId]);
+  // ⚠ OTA-1606 — standing OUTSIDE on a hub tile: arrival no longer walks
+  // through the gate on its own (owner: "other wise it's a tile"), so the
+  // gate needs a button. Submits the taught phrase, same as EXIT does.
+  const onHubTileOutside = !hubRoomId && !activeBuildingId && isHubLocation(hubLocationId);
   // ⚠⚠ OTA-1277 — MARK THE ROOMS YOU HAVE ALREADY WALKED. Owner, typed into the
   // game mid-session: *"I don't know if I've been to a room yet or not. maybe we
   // should put a little symbol in the room button if it's already been explored.
@@ -687,6 +691,9 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
               {sceneBuilding ? (
                 <TravelBtn label="ENTER" onPress={() => enterBuilding(sceneBuilding)} />
               ) : null}
+              {onHubTileOutside ? (
+                <TravelBtn label="ENTER OUTPOST" onPress={() => onSubmit('enter outpost')} blocked={tutLock} />
+              ) : null}
               <TravelBtn label={`→ ${travelTargetName.toUpperCase()}`} destination spent={noStamina} onPress={onContinueTravel ?? (() => {})} />
               <TravelBtn label="STOP TRAVEL" onPress={onStopTravel ?? (() => {})} />
               {typeof movesLeft === 'number' && movesLeft >= 0 ? (
@@ -722,6 +729,9 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             // the outpost `tutLock` is false and this costs nothing.
             <>
               <TravelBtn label="ENTER" onPress={() => enterBuilding(sceneBuilding)} blocked={tutLock} />
+              {onHubTileOutside ? (
+                <TravelBtn label="ENTER OUTPOST" onPress={() => onSubmit('enter outpost')} blocked={tutLock} />
+              ) : null}
               <TravelBtn label="NORTH" onPress={() => onSubmit('go north')} blocked={tutLock} spent={noStamina} />
               <TravelBtn label="SOUTH" onPress={() => onSubmit('go south')} blocked={tutLock} spent={noStamina} />
               <TravelBtn label="EAST" onPress={() => onSubmit('go east')} blocked={tutLock} spent={noStamina} />
@@ -729,6 +739,9 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             </>
           ) : (
             <>
+              {onHubTileOutside ? (
+                <TravelBtn label="ENTER OUTPOST" onPress={() => onSubmit('enter outpost')} blocked={tutLock} />
+              ) : null}
               <TravelBtn label="NORTH" onPress={() => onSubmit('go north')} blocked={tutLock} spent={noStamina} />
               <TravelBtn label="SOUTH" onPress={() => onSubmit('go south')} blocked={tutLock} spent={noStamina} />
               <TravelBtn label="EAST" onPress={() => onSubmit('go east')} blocked={tutLock} spent={noStamina} />

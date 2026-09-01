@@ -101,12 +101,18 @@ describe('OTA-970 — playtest truth batch', () => {
     }));
     store.getState().beginScene({ arrivalFromName: "The Architect's Blind" });
     await new Promise((r) => setTimeout(r, 10));
-    // appendLog merges same-channel world lines landing within 500ms into one
-    // entry, so search the JOINED text, not per-entry.
-    const joined = store.getState().gameLog.map((e) => e.text).join('\n');
-    // lastIndexOf: the BOOT scene at the faction hub prints its own Paths line;
-    // the arrival's instances are the final ones.
-    const gateAt = joined.lastIndexOf('You pass through the gate into');
+    // ⚠ OTA-1606 supersede — THE GATE WAITS. Arrival no longer walks through
+    // the gate (owner: "other wise it's a tile"), so #112's original ordering
+    // claim now spans TWO beats: the arrival names the gate and stays outside;
+    // the explicit entry narrates the walk-through BEFORE the room Paths line
+    // — which is the referent rule #112 exists to hold.
+    expect(store.getState().player!.hubRoomId ?? null).toBeNull();
+    let joined = store.getState().gameLog.map((e) => e.text).join('\n');
+    expect(joined.lastIndexOf('(Tap ENTER OUTPOST to step inside.)')).toBeGreaterThanOrEqual(0);
+    await store.getState().submitPlayerAction('enter outpost');
+    await new Promise((r) => setTimeout(r, 10));
+    joined = store.getState().gameLog.map((e) => e.text).join('\n');
+    const gateAt = joined.lastIndexOf('cross to the gate and step through');
     const pathsAt = joined.lastIndexOf('Paths: ');
     expect(gateAt).toBeGreaterThanOrEqual(0);
     expect(pathsAt).toBeGreaterThanOrEqual(0);

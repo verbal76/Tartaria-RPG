@@ -119,7 +119,10 @@ describe('OTA-1410 — hung off the ONE door in, not the six doors out', () => {
     // mistake this session has already paid for three times (the sprint gate, the
     // timing guard, the equip inference).
     expect(STORE).toContain(
-      'const freshOutpostVisit = inHub && !hubRoomId && !opts?.skipHubEntry && !passingThrough;',
+      'const freshOutpostVisit = inHub && !hubRoomId && !opts?.skipHubEntry && !passingThrough'
+      // ⚠ OTA-1606 — the door now also demands INTENT (isOpening or enterHub):
+      // the gate waits for a tap. Still the one door; the reset still rides it.
+    ,
     );
     expect(STORE).toContain('const fresh = freshOutpostVisit || wm.hubVisitedFor !== location.id;');
     // The set is written with its owner, always — a set with no owner is the bug.

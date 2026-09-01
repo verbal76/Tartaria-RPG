@@ -7109,6 +7109,7 @@ export interface GameStore {
     microMicroId?: string;
     isOpening?: boolean;
     skipHubEntry?: boolean;
+    enterHub?: boolean;
     /** Set by travelTo when the player just crossed a location boundary.
      *  Drives a single consolidated arrival flavor line in place of the
      *  multi-paragraph default scene narration, per playtest spec:
@@ -7126,6 +7127,7 @@ export interface GameStore {
     microMicroId?: string;
     isOpening?: boolean;
     skipHubEntry?: boolean;
+    enterHub?: boolean;
     arrivalFromName?: string;
   }) => void;
   /**
@@ -9549,6 +9551,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     microMicroId?: string;
     isOpening?: boolean;
     skipHubEntry?: boolean;
+    enterHub?: boolean;
     arrivalFromName?: string;
   }) {
     // ⚠⚠ OTA-1405 — THE SPRINT DETECTOR HAD ONE FEED AND SCENES HAVE SEVERAL
@@ -9604,6 +9607,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     microMicroId?: string;
     isOpening?: boolean;
     skipHubEntry?: boolean;
+    enterHub?: boolean;
     arrivalFromName?: string;
   }) {
     const { player, worldMemory } = get();
@@ -9647,39 +9651,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (vend && vend !== tileNow) set({ vendorChipDismissedKey: null });
     }
     const hazard = pickHazardForLocation(location);
-    // HANDOFF #15b — hub mode. When player is at the hub location AND
-    // has a hubRoomId set (or default to entry), render the hub room
-    // instead of the procedural scene. Disables encounters; pulls
-    // vendor from the room's anchorNpc. Player is in their camp.
+    // HANDOFF #15b — hub mode: at the hub location with a hubRoomId set, render
+    // the hub room instead of the procedural scene (no encounters; vendor from
+    // the room's anchorNpc).
     const inHub = isHubLocation(location.id);
     let hubRoomId = player.hubRoomId ?? null;
-    // Skip auto-entry when the caller is intentionally leaving the
-    // hub. Without this flag, "leave outpost" would clear hubRoomId
-    // then immediately re-enter the gate on the very next beginScene
-    // call (the player's currentLocationId is still the hub's macro
-    // location). QA sim caught this — `leave outpost` printed the
-    // exit narration but the player stayed locked in the hub graph.
-    //
-    // 2026-05-25 — also skip auto-entry when the player is
-    // PASSING THROUGH this location en route to a different
-    // travelTarget. Playtester report: "if I keep traveling to the
-    // mud Seas why does it keep telling me I am in the reception
-    // of a structure." The auto-enter was dropping them into the
-    // hub's Reception room every time they crossed The Buried
-    // Cities. The player can still explicitly enter the outpost by
-    // typing 'enter outpost' (or whatever the hub-room verb is) once
-    // they actually arrive at their destination.
+    // skipHubEntry: the caller is deliberately LEAVING (without it, 'leave
+    // outpost' re-entered on the next beginScene); passing through stays outside.
     const passingThrough = !!player.travelTarget
       && player.travelTarget.locationId !== player.currentLocationId;
     // ⚠⚠ OTA-1410 — THIS IS THE MOMENT AN OUTPOST VISIT BEGINS, and it is the
-    // only one. `inHub && !hubRoomId` means the player was outside and is now
-    // through the gate — however they got here, by travel or by walking back in
-    // from the tile they just left. Six different places null `hubRoomId` on the
-    // way OUT; there is exactly one place that fills it on the way IN, so the
-    // per-visit reset below hangs off this and nothing has to be threaded
-    // through the exits. (Threading it through six doors is the mistake this
-    // session has now fixed three times.)
-    const freshOutpostVisit = inHub && !hubRoomId && !opts?.skipHubEntry && !passingThrough;
+    // only one: six places null `hubRoomId` on the way out, exactly one fills
+    // it on the way in, and the per-visit reset hangs off it.
+    // ⚠⚠⚠ OTA-1606 — AND IT NO LONGER OPENS ON ITS OWN. Owner: "i shouldn't
+    // automatically enter an outpost because i land on that tile, there should
+    // be an enter outpost button, other wise it's a tile." Arrival at a hub
+    // tile now stays OVERLAND; the gate opens only for the opening scene (the
+    // tutorial starts in the spawn room, unchanged) or an explicit entry —
+    // the ENTER OUTPOST chip / typed 'enter outpost' passes enterHub.
+    const freshOutpostVisit = inHub && !hubRoomId && !opts?.skipHubEntry && !passingThrough
+      && (!!opts?.isOpening || !!opts?.enterHub);
     if (freshOutpostVisit) {
       hubRoomId = hubEntryRoomId();
       set((s) => (s.player ? { player: { ...s.player, hubRoomId } } : s));
@@ -11367,6 +11358,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
           'world',
           `You pass through the gate into ${hubDisplayNameFor(player.currentLocationId, player.factionId)} — ${hubRoom.name}. ${hubRoom.description}`,
         );
+      } else if (inHub && !passingThrough) {
+        // ⚠ OTA-1606 — the tile is a tile: the gate waits for a tap, and says so.
+        get().appendLog(
+          'world',
+          `The gate of ${hubDisplayNameFor(player.currentLocationId, player.factionId)} stands before you — their ground, not yet their halls. (Tap ENTER OUTPOST to step inside.)`,
+        );
       }
     } else {
       get().appendLog('world', sceneText);
@@ -12640,14 +12637,31 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // Otherwise fall through — take / search / look operate on the room's
         // interactables via the normal parser (which logs the player line).
       } else {
-        // arb36 — ENTER the structure standing on THIS tile, if one was
-        // discovered here (scene.sceneBuilding). Accepts "enter", "enter the
-        // shed", "go in/inside", "step into the house", "head inside" — the
-        // specific name is irrelevant; you enter whatever you stumbled on.
-        // Replaces the old dev "enter <name>" teleport into any template:
-        // buildings are now reached only by finding them in the world.
+        // arb36 — ENTER the structure standing on THIS tile (sceneBuilding).
+        // "enter", "go inside", "step into the house" — the name is irrelevant.
         const here = get().currentScene?.sceneBuilding ?? null;
-        if (here && /^(?:enter|go\s+in(?:to|side)?|step\s+in(?:to|side)?|head\s+in(?:side)?|walk\s+in(?:side)?)\b/i.test(trimmed)) {
+        const enterShaped = /^(?:enter|go\s+in(?:to|side)?|step\s+in(?:to|side)?|head\s+in(?:side)?|walk\s+in(?:side)?)\b/i.test(trimmed);
+        // ⚠⚠⚠ OTA-1606 — THE GATE OPENS ON A TAP, NOT ON ARRIVAL. Standing
+        // outside on a hub tile, 'enter outpost' (the chip's submit) or any
+        // enter-shaped phrase naming the place walks you through the gate —
+        // the entry that used to fire silently on every arrival. A bare
+        // 'enter' still prefers a discovered structure; blades out bar the
+        // gate (the OTA-1598 truce works both ways).
+        const wantsOutpost = /\b(outpost|gate|gates|city|capital|settlement|walls|market)\b/i.test(trimmed);
+        if (enterShaped && !get().player?.hubRoomId && isHubLocation(get().player?.currentLocationId ?? null)
+            && (wantsOutpost || !here)) {
+          if (!_opts?.silent) get().appendLog('player', trimmed);
+          const scNow = get().currentScene;
+          if ((scNow?.enemies ?? []).some((_, i) => (scNow?.enemyHps?.[i] ?? 0) > 0)) {
+            get().appendLog('arbiter', `The Arbiter angles between you and the gate. "Not with blades out — the outpost holds its truce. Settle this first."`);
+            return;
+          }
+          get().appendLog('world', `You cross to the gate and step through.`);
+          get().beginScene({ enterHub: true });
+          void get().persist();
+          return;
+        }
+        if (here && enterShaped) {
           if (!_opts?.silent) get().appendLog('player', trimmed);
           get().enterBuilding(here);
           return;
@@ -17678,21 +17692,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         break;
       }
       case 'travel': {
-        // ⚠⚠ OTA-1301 — "LEAVE OUTPOST" WHEN THERE IS NO OUTPOST TO LEAVE.
-        // Owner's 4.29.206 log, standing on open mud-flats two tiles outside
-        // the gate: he typed `leave outpost` and the game answered "You walk.
-        // Tartaria walks beside you." and charged him AN HOUR. Reproduced here:
-        // hoursElapsed 1.75 → 2.75 for a command with no referent.
-        //
-        // ⚠ This is OTA-1269's bug wearing the other face. There, the phrase was
-        // unrecognised and fell through to a targetless wander (+1h, floorboard
-        // search). Here the phrase is the TAUGHT one — the outpost itself prints
-        // "(Type 'leave outpost' to head into the wilds.)" — and it still falls
-        // through to a targetless wander, because the leave-hub predicates are
-        // only ever consulted to decide whether to SKIP the interior handler.
-        // Nothing ever asked whether the player was in a hub at all.
-        //
-        // A door you are already through is not a door. Refuse, and cost nothing.
+        // ⚠⚠ OTA-1301 — "LEAVE OUTPOST" WHEN THERE IS NO OUTPOST TO LEAVE:
+        // typed outside, it used to fall through to a targetless wander and
+        // charge an hour. A door you are already through is not a door —
+        // refuse, and cost nothing.
         if (!player.hubRoomId && !get().activeBuildingId &&
             (isLeaveHubCommand(trimmed) || isBareExitCommand(trimmed))) {
           get().appendLog(

@@ -26631,7 +26631,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // last body drops, so the mission fight (and its stinger) rises exactly
 // where the ambient fight ended. His landing now plays: ambient scrap,
 // clear, the Reaver stands up with the curtain. No verb, no button needed.
-export const OTA_BUILD_ID = '2026-09-01-1605-one-fight-on-the-field';
+//
+// ⚠⚠⚠ OTA-1606 — THE GATE WAITS. Owner, typed in the field: "i shouldn't
+// automatically enter an outpost because i land on that tile, there should
+// be an enter outpost button, other wise it's a tile." Since HANDOFF #15b,
+// arriving on any hub tile walked the player through the gate unasked (the
+// one auto-enter door OTA-1410 consolidated). Now arrival stays OVERLAND:
+// the arrival line says the gate stands before you, an ENTER OUTPOST chip
+// rides the travel row (all three outdoor states, mid-course included, the
+// OTA-621 pattern), and 'enter outpost' / 'enter the gates' / a bare 'enter'
+// with no discovered structure walks you through. The opening scene still
+// starts in the spawn room (the tutorial is unchanged), passing-through
+// stays outside as before, and blades out bar the gate — the OTA-1598 truce
+// works both ways. LEAVE OUTPOST is unchanged; the tile is a tile.
+export const OTA_BUILD_ID = '2026-09-01-1606-the-gate-waits';
 // golem catch-up 2026-09-01: markerless publish of OTA-1605 - one fight on
 // the field + the clear-field re-arm. hal took the marker push.
 // golem catch-up 2026-09-01: markerless publish of OTA-1604 - dog armor
