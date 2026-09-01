@@ -26750,8 +26750,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // CONTRACTS is on the card, so nothing was taken away. It computes nothing of
 // its own — a status card that works out its own answer describes the card.
 export const OTA_BUILD_ID = '2026-09-01-1615-the-mission-speaks-where-you-stand';
-// golem catch-up 2026-09-01: markerless publish of OTA-1612 + OTA-1613 - a
-// subdued mark counts, and the giver hands it over. hal took the marker push.
+// golem catch-up 2026-09-01: markerless publish of OTA-1614 + 1615 + 1616 - the
+// card keeps its buttons, the mission card, the grouped refusals. hal took the marker.
 // golem catch-up 2026-09-01: markerless publish of OTA-1608 - the portrait
 // reads the roll's own resolvers; every mint swept. hal took the marker.
 // golem catch-up 2026-09-01: markerless publish of OTA-1607 - the portrait
