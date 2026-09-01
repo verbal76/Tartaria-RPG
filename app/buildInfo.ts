@@ -26615,6 +26615,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // vest with permanent AC (the OTA-796 shape, one saddle over). The worn vest
 // now unbuckles out loud before it breaks down.
 export const OTA_BUILD_ID = '2026-09-01-1604-the-vest-breaks-down';
+// golem catch-up 2026-09-01: markerless publish of OTA-1604 - dog armor
+// scraps; the worn vest unbuckles first. hal took the marker push.
 // golem catch-up 2026-09-01: markerless publish of OTA-1603 - one dog-armor
 // predicate, the fifth catalog, the legacy vest heal; hal took the marker.
 // golem catch-up 2026-09-01: markerless publish of OTA-1602 - the beat card
