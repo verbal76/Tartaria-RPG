@@ -1418,9 +1418,31 @@ export function InventoryScreen() {
       // EVERYTHING, ALLOW ONE. Here the excluded weapons live in the body rather
       // than as dead buttons — a row that refuses on tap would be the OTA-1405
       // failure again, one layer down.
-      const refused = (player.inventory ?? [])
-        .filter((i: InventoryItem) => i.kind === 'weapon' && !isCoatableItem(i))
-        .map((i: InventoryItem) => `• ${i.name}${wornIds.has(i.id) ? ' (equipped)' : ''} — ${coatingRefusalFor(i)}`);
+      // ⚠⚠⚠ OTA-1616 — ONE LINE PER RULE, NOT ONE PER WEAPON. OTA-1407 was right
+      // that an absence reads as a bug and the exclusions must be named; it was
+      // wrong about the grain. It printed the full refusal sentence for every
+      // ineligible INSTANCE, so the owner's nine rune-casters produced nine
+      // copies of the same sentence above the weapons he came to choose —
+      // *"what's all the gibberish above the red writing?"*. It is one rule
+      // three times over, and it should read like one: the reason once, the
+      // weapons that share it named after it, duplicates folded with ×N.
+      const byReason = new Map<string, string[]>();
+      for (const i of (player.inventory ?? []) as InventoryItem[]) {
+        if (i.kind !== 'weapon' || isCoatableItem(i)) continue;
+        const why = String(coatingRefusalFor(i) ?? 'cannot take a coating');
+        const label = `${i.name}${wornIds.has(i.id) ? ' (equipped)' : ''}`;
+        byReason.set(why, [...(byReason.get(why) ?? []), label]);
+      }
+      const refused = [...byReason.entries()].map(([why, names]) => {
+        const counts = new Map<string, number>();
+        for (const n of names) counts.set(n, (counts.get(n) ?? 0) + 1);
+        const listed = [...counts.entries()].map(([n, q]) => (q > 1 ? `${n} ×${q}` : n));
+        // ⚠ A pack full of one kind must not re-create the wall it replaced.
+        const shown = listed.slice(0, 6).join(', ')
+          + (listed.length > 6 ? `, and ${listed.length - 6} more` : '');
+        return `• ${names.length > 1 ? `${names.length} weapons` : listed[0]} — ${why}`
+          + (names.length > 1 ? `: ${shown}` : '');
+      });
       const refusedNote = refused.length
         ? `\n\nNot on the list:\n${refused.join('\n')}`
         : '';

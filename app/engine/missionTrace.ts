@@ -254,3 +254,128 @@ export function missionArrivalLines(player: PlayerCharacter | null | undefined):
   }
   return out;
 }
+
+/* ──────────────────────────────────────────────────────────────────────────
+ * ⚠⚠⚠ OTA-1615 — THE SAME READER, POINTED AT THE PLAYER.
+ *
+ * Owner: *"the hint was investigate to advance in the missions and it's getting
+ * annoying jumping back into the missions tab every time. I want to check to
+ * see what I have to do next. is there a way to call the mission that I'm in
+ * into a pop-up to see its status while I'm on the exploration screen? happy to
+ * just scroll through the mission and where I'm at."*
+ *
+ * Everything he goes to the Contracts tab for is already computed above — the
+ * stage he is owed and how many there are, the VERB that stage wants, the
+ * ground it happens on and whether he is standing on it, what it needs in the
+ * pack and whether he has it, tracked or paused. It has been written into every
+ * log since OTA-1586, for me. This is the same reader, shaped for him.
+ *
+ * ⚠⚠ IT COMPUTES NOTHING OF ITS OWN. Every value comes from the functions the
+ * engine decides with (`stageLocationId` with `resolvePosterLocation`,
+ * `stageRequirementMet` against the real pack, `stageVerbAsk` for the ask), for
+ * the reason the file header already gives: a status card that works out its
+ * own answer tells the player about the card.
+ * ────────────────────────────────────────────────────────────────────────── */
+
+export interface MissionStatusStep {
+  no: number;
+  /** What that beat asks for, in the player's words. */
+  ask: string;
+  state: 'done' | 'current' | 'ahead';
+}
+
+export interface MissionStatusCard {
+  family: string;
+  id: string;
+  title: string;
+  /** 1-based for reading; `stageTotal` is the count of authored beats. */
+  stageNo: number;
+  stageTotal: number;
+  tracked: boolean;
+  /** Past the last beat — the work is done and wants a counter. */
+  ready: boolean;
+  /** The next action, plain: "investigate the ground". Empty when the beat
+   *  advances on its own and promising an action would be a lie. */
+  ask: string;
+  /** Where that beat happens, by NAME, and whether the boots are on it. */
+  where: string;
+  here: boolean;
+  npcName: string | null;
+  needs: { item: string; held: boolean } | null;
+  steps: MissionStatusStep[];
+}
+
+let _nameById: Map<string, string> | null = null;
+function locationNameById(id: string | null | undefined): string {
+  if (!id) return '';
+  if (!_nameById) {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const raw = require('../data/locations/locations.json') as unknown as
+      | { locations: Array<{ id: string; name: string }> }
+      | Array<{ id: string; name: string }>;
+    const list = Array.isArray(raw) ? raw : raw.locations;
+    _nameById = new Map(list.map((l) => [l.id, l.name]));
+  }
+  return _nameById.get(id) ?? id;
+}
+
+function statusCard(
+  family: MissionFamily,
+  rec: Rec,
+  def: { id: string; title: string; stages?: StageLike[] } | null,
+  anchor: string | undefined,
+  player: PlayerCharacter,
+): MissionStatusCard | null {
+  if (!def) return null;
+  const stages = def.stages ?? [];
+  const st = stages[rec.stage];
+  const steps: MissionStatusStep[] = stages.map((s, i) => ({
+    no: i + 1,
+    ask: stageVerbAsk(family, s) || 'it moves on its own',
+    state: i < rec.stage ? 'done' : i === rec.stage ? 'current' : 'ahead',
+  }));
+  const where = st ? stageLocationId(st, anchor ?? '', resolvePosterLocation) : '';
+  return {
+    family,
+    id: def.id,
+    title: def.title,
+    stageNo: Math.min(rec.stage + 1, Math.max(stages.length, 1)),
+    stageTotal: stages.length,
+    tracked: rec.tracked !== false,
+    ready: rec.stage >= stages.length,
+    ask: st ? (stageVerbAsk(family, st) || '') : '',
+    where: locationNameById(where),
+    here: !!where && where === player.currentLocationId,
+    npcName: st?.npcName ?? null,
+    needs: st?.requires
+      ? { item: st.requires.item, held: stageRequirementMet(st, player.inventory) }
+      : null,
+    steps,
+  };
+}
+
+/** Every live contract, tracked first and the one you are standing on ahead of
+ *  the rest — the card opens on the mission the player is most likely asking
+ *  about. A paused contract still appears, because a paused contract explains a
+ *  dead tile better than any other single fact (the trace's own lesson). */
+export function missionStatusCards(player: PlayerCharacter | null | undefined): MissionStatusCard[] {
+  if (!player) return [];
+  const out: MissionStatusCard[] = [];
+  for (const rec of player.activeHunts ?? []) {
+    const def = findHuntById(rec.id);
+    const c = statusCard('hunt', rec, def, def ? huntAnchorId(def) : undefined, player);
+    if (c) out.push(c);
+  }
+  for (const rec of player.activeMysteries ?? []) {
+    const def = findMysteryById(rec.id);
+    const c = statusCard('mystery', rec, def, def ? contractAnchorId(def) : undefined, player);
+    if (c) out.push(c);
+  }
+  for (const rec of player.activeStorylines ?? []) {
+    const def = findStorylineById(rec.id);
+    const c = statusCard('storyline', rec, def, def ? contractAnchorId(def) : undefined, player);
+    if (c) out.push(c);
+  }
+  const rank = (c: MissionStatusCard) => (c.here ? 0 : 1) + (c.tracked ? 0 : 2);
+  return out.sort((a, b) => rank(a) - rank(b));
+}

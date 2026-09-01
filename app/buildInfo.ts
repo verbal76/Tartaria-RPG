@@ -26727,7 +26727,29 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // sheet or the typed phrase, and the return line and the take land as HIS turns
 // in that conversation. The sheet holds the farewell open after the record
 // dies, so the last words cannot be cut off. One machine, twenty-one chains.
-export const OTA_BUILD_ID = '2026-09-01-1613-the-giver-hands-it-over';
+// ⚠⚠⚠ OTA-1614 + OTA-1616 — A MODAL THAT CANNOT BE ANSWERED. Owner, of the
+// coating picker: "what's all the gibberish above the red writing?" Nine copies
+// of one refusal sentence — one per ineligible weapon — sat above the weapons
+// he had opened the card to choose. Two defects stacked: the note was written
+// per INSTANCE instead of per RULE (1616 groups by reason, folds duplicates
+// with xN, caps the tail), and the card had no height cap and no scrolling, so
+// a long body carried its own buttons off-screen with a scrim underneath eating
+// every tap meant for the game (1614 pins the header and the buttons, scrolls
+// the middle, caps the card at 85% so the tap-outside escape always survives).
+// The card fix is structural: every caller inherits it, including later ones.
+// ⚠⚠⚠ OTA-1615 — THE MISSION SPEAKS WHERE YOU STAND. Owner: "it's getting
+// annoying jumping back into the missions tab every time. I want to check to
+// see what I have to do next... a pop-up to see its status while I'm on the
+// exploration screen? happy to just scroll through the mission and where I'm
+// at." Everything he walked to the Contracts tab for has been computed on every
+// arrival since OTA-1586 — and written into the LOG, for me. missionStatusCards
+// is that same reader shaped for him: the beat he is owed and how many there
+// are, the next action in plain words, the ground it happens on and whether he
+// is standing on it, what the pack still owes, and every beat of the job with a
+// mark on the current one. MISSIONS opens it instead of jumping tabs; OPEN
+// CONTRACTS is on the card, so nothing was taken away. It computes nothing of
+// its own — a status card that works out its own answer describes the card.
+export const OTA_BUILD_ID = '2026-09-01-1615-the-mission-speaks-where-you-stand';
 // golem catch-up 2026-09-01: markerless publish of OTA-1612 + OTA-1613 - a
 // subdued mark counts, and the giver hands it over. hal took the marker push.
 // golem catch-up 2026-09-01: markerless publish of OTA-1608 - the portrait

@@ -10,6 +10,7 @@ import {
   Pressable,
   TextInput,
   KeyboardAvoidingView,
+  ScrollView,
 } from 'react-native';
 import type { ItemPreview } from './itemPreview';
 import { NumberStepper } from './NumberStepper';
@@ -77,14 +78,30 @@ export function BrandedModal({
   inline,
   onRequestClose,
 }: Props) {
-  // Card content shared by the native-Modal path and the inline-overlay path.
-  const cardChildren = (
-    <>
+  // ⚠⚠⚠ OTA-1614 — THE CARD MUST ALWAYS BE ABLE TO GIVE THE BUTTONS BACK.
+  //
+  // The card had no height limit and no scrolling: the body was a plain <Text>
+  // with the button row after it, so a long body simply grew the card past the
+  // bottom of the screen and took its own controls with it. The owner caught it
+  // live — the coating picker's "Not on the list" note printed one full sentence
+  // per ineligible weapon, nine rune-casters deep ("what's all the gibberish
+  // above the red writing?"), pushing the weapons he came to choose off the
+  // display. A modal that cannot be answered is a softlock wearing a dialog: the
+  // scrim it draws eats every tap behind it, so the game underneath is gone too.
+  //
+  // ⚠⚠ SO THE SHAPE IS FIXED, NOT THE ONE CALLER. Header pinned at the top so
+  // you always know what is asking; the middle scrolls; the buttons pinned
+  // below the scroll where they can never be pushed away. The card is capped at
+  // 85% of the screen so the scrim — and the tap-outside escape — always stays
+  // reachable. Every caller inherits it, including ones written later.
+  const cardHeader = (
       <View style={styles.headerRow}>
         <Text style={styles.title} accessibilityRole="header">{title.toUpperCase()}</Text>
         <View style={styles.ruleLine} />
       </View>
-
+  );
+  const cardBody = (
+    <>
       {itemPreview ? (
         <View style={styles.itemBlock}>
           <View style={styles.itemHead}>
@@ -139,7 +156,9 @@ export function BrandedModal({
           </View>
         </View>
       ) : null}
-
+    </>
+  );
+  const cardButtons = (
       <View style={styles.buttonRow}>
         {buttons.map((b) => (
           <Pressable
@@ -156,6 +175,21 @@ export function BrandedModal({
           </Pressable>
         ))}
       </View>
+  );
+  // ⚠ The scroll view takes `flexShrink` so it yields to the pinned rows rather
+  // than the other way round — without it the buttons are what gets squeezed,
+  // which is the bug this OTA exists to remove.
+  const cardChildren = (
+    <>
+      {cardHeader}
+      <ScrollView
+        style={styles.scrollArea}
+        contentContainerStyle={styles.scrollInner}
+        keyboardShouldPersistTaps="handled"
+      >
+        {cardBody}
+      </ScrollView>
+      {cardButtons}
     </>
   );
   // arb73 — inline overlay path: skip the native <Modal> entirely (iPad can
@@ -242,6 +276,9 @@ const styles = StyleSheet.create({
   card: {
     width: '100%',
     maxWidth: 380,
+    // OTA-1614 — never taller than the screen, so the scrim (and the
+    // tap-outside escape) always stays reachable.
+    maxHeight: '85%',
     backgroundColor: '#13110f',
     borderColor: '#c9a86a',
     borderWidth: 1,
@@ -249,6 +286,9 @@ const styles = StyleSheet.create({
     padding: 14,
   },
   headerRow: { marginBottom: 8 },
+  // OTA-1614 — the middle scrolls; shrink rather than push the buttons off.
+  scrollArea: { flexShrink: 1, flexGrow: 0 },
+  scrollInner: { paddingBottom: 2 },
   title: {
     color: '#c9a86a',
     fontSize: 14,
