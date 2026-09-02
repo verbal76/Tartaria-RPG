@@ -26915,6 +26915,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // names a scene chip is the chip's — the stage matcher stays out; the scanner
 // refusal speaks every tap; every investigate logs what it did to the chip.
 export const OTA_BUILD_ID = '2026-09-02-1630-the-chip-is-not-the-mission';
+// golem catch-up 2026-09-02: markerless publish of OTA-1630 - a named chip's
+// investigate is never claimed by a stage's "Not here". hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-02-1629-the-sleep-keeps-the-hour';
 // golem catch-up 2026-09-02: markerless publish of OTA-1629 - sleep / rest to a
 // named hour or span. hal took the marker.
