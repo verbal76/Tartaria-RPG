@@ -982,6 +982,16 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             {hasTorch && (
               <QuickBtn label={`use ${torchLabel ?? 'torch'}`} onPress={onOpenTorch} tone={hasTorch && torchReady ? 'ready' : undefined} blocked={tutLock} />
             )}
+            {/* ⚠⚠⚠ OTA-1618 — MISSIONS IS A PRIMARY ACTION NOW, BESIDE MORE.
+                Owner: *"can we have the mission button always there? Just set it
+                right next to the more button. That way, we don't gotta hit more
+                to get it."* It opens the whole slate (OTA-1615/1618) — the
+                single most-asked question in his sessions, "what am I doing and
+                am I in the right place" — and it was costing a tray tap first.
+                Same reasoning that lifted USE TORCH out one row above. It sits
+                BEFORE the tray toggle so its place on the row does not move when
+                the tray opens. */}
+            <QuickBtn label="missions" onPress={onOpenMissions} blocked={tutLock} />
             {/* MORE ▾ tray toggle — reveals the menus + rarer actions. Hidden
                 during the tutorial, where the tray is force-shown so the beats
                 can point at every control. */}
@@ -996,7 +1006,9 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 <QuickBtn label="pickpocket" onPress={onOpenPickpocket} blocked={approachBlocked || !!pickpocketBlocked} tone={pickpocketPossible ? 'ready' : undefined} />
                 <QuickBtn label="craft" onPress={onOpenCrafting} blocked={tutLock} />
                 <QuickBtn label="inventory" onPress={onOpenInventory} blocked={tutLock} />
-                <QuickBtn label="missions" onPress={onOpenMissions} blocked={tutLock} />
+                {/* ⚠ OTA-1618 — MISSIONS left this tray for the primary row above.
+                    Two copies would put the same button twice on one line the
+                    moment the tray opens. */}
                 {/* OTA-788 — no TRADE button: stepping into a stall opens its wares
                     (and tapping the stall tab you're in re-opens them). FUSE stays —
                     the free Crucible has no other in-market affordance. */}

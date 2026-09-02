@@ -33,12 +33,21 @@
 // `stageRequirementMet` against the real pack. A diagnostic that computes its
 // own answer tells you about the diagnostic.
 
-import type { PlayerCharacter } from './types';
+import type { PlayerCharacter, Quest, WhisperRecord } from './types';
 import { findHuntById } from './hunts';
 import { findMysteryById } from './mysteries';
 import { findStorylineById } from './factionStorylines';
 import { findFactionQuestById, type FactionQuestDef } from './factionQuests';
 import { huntAnchorId, contractAnchorId, resolvePosterLocation } from './contractMarkers';
+// ⚠ OTA-1618 — the four families the status card was missing. Each import is the
+// SAME function that family's Contracts section called, so the card and the tab
+// cannot answer the same question two ways.
+import { missionTurnInReady } from './missionReady';
+import { missionObjectiveLocationId } from './missionRouting';
+import { startingLocationForFaction } from './character';
+import { bountyKey, bountyHoursLeft, type FactionBounty } from './factionBounty';
+import { describeWhisperStage, describeWhisperTitle, whisperRouteTarget } from './whispers';
+import { playerGridCell } from '../state/playerGrid';
 import {
   stageLocationId, stageRequirementMet, stageVerbAsk, stageObjectiveAsk, payingIntent, type MissionFamily,
 } from './questStage';
@@ -284,8 +293,57 @@ export interface MissionStatusStep {
   state: 'done' | 'current' | 'ahead';
 }
 
+/* ⚠⚠⚠ OTA-1618 — THE SLATE IS THE WHOLE SLATE.
+ *
+ * Owner: *"at this point i like the missions button better than having it take
+ * me to the tab. can we just take the tab and put it on that button so when I
+ * hit the button it scrolls everything it's just right there and can we have it
+ * so that the active mission is always on top?"* — and: *"that would completely
+ * remove the contract tab and just make it the missions button instead so it
+ * would have everything on there. cuz that's immediate you hit the button it
+ * pops up. you hit your thing you close it. you're done."*
+ *
+ * ⚠⚠ THREE FAMILIES WAS NOT "EVERYTHING". OTA-1615 shipped the card reading
+ * hunts, mysteries and storylines — and the four families it left behind are
+ * exactly the ones the trace itself had to be taught (OTA-1594: the one contract
+ * he was ACTUALLY RUNNING never appeared in any line). A slate that omits a
+ * family sends him back to the tab for the one contract that is live, which is
+ * the trip this whole card exists to end. Faction contracts, bounties, whispers
+ * and leads join it here.
+ *
+ * ⚠ AND THE ACTIONS COME WITH IT. A cheat sheet you have to LEAVE in order to
+ * act on is a reference card (OTA-1617's own lesson, one door further out). Each
+ * row carries the SAME store actions the Contracts screen calls, named by the
+ * reader so the component cannot invent a second answer about what a family
+ * allows: a whisper has no hand-in, a lead is discarded rather than abandoned, a
+ * bounty is neither paused nor dropped.
+ */
+
+/** Where a row's SET COURSE sends you, in the frame that family routes in.
+ *  ⚠ Three frames, because the engine has three: hunts/bounties/leads course to
+ *  a LOCATION, whispers to an absolute GRID CELL (OTA-1542), faction contracts
+ *  through `routeMission` so the objective→turn-in chain is kept. A component
+ *  that flattened these into one would route a whisper to a location id that
+ *  does not exist. */
+export type MissionStatusRoute =
+  | { kind: 'location'; id: string; name: string }
+  | { kind: 'cell'; x: number; y: number; label: string }
+  | { kind: 'mission'; id: string; name: string };
+
+/** The kind string `setContractActive` wants for this row, or null when the
+ *  family has no pause (a bounty runs on a deadline; parking it means nothing). */
+export type MissionPauseKind =
+  'hunt' | 'mystery' | 'storyline' | 'faction_quest' | 'whisper' | 'lead';
+/** The kind `abandonContract` wants, or null when the family drops another way. */
+export type MissionAbandonKind =
+  'hunt' | 'mystery' | 'storyline' | 'faction_quest' | 'whisper';
+/** The kind `completeContractFromUI` wants — set only while the work is DONE. */
+export type MissionTurnInKind = 'hunt' | 'mystery' | 'storyline' | 'faction_quest';
+
 export interface MissionStatusCard {
   family: string;
+  /** The word the row wears, so seven families read as seven kinds of work. */
+  kindLabel: string;
   id: string;
   title: string;
   /** 1-based for reading; `stageTotal` is the count of authored beats. */
@@ -307,6 +365,17 @@ export interface MissionStatusCard {
   npcName: string | null;
   needs: { item: string; held: boolean } | null;
   steps: MissionStatusStep[];
+  /** ⚠ OTA-1618 — the one line this family says that no other family says: a
+   *  bounty's tally and clock, a whisper's next step, a lead's complication.
+   *  Null on the stage families, whose `ask` and `steps` already carry it. */
+  note: string | null;
+  /** ⚠ OTA-1618 — where SET COURSE goes, in that family's own frame. */
+  route: MissionStatusRoute | null;
+  pauseKind: MissionPauseKind | null;
+  abandonKind: MissionAbandonKind | null;
+  /** Leads are DISCARDED (`discardLead`), never abandoned — a different action. */
+  discardable: boolean;
+  turnInKind: MissionTurnInKind | null;
 }
 
 let _nameById: Map<string, string> | null = null;
@@ -321,6 +390,22 @@ function locationNameById(id: string | null | undefined): string {
     _nameById = new Map(list.map((l) => [l.id, l.name]));
   }
   return _nameById.get(id) ?? id;
+}
+
+const KIND_LABEL: Record<string, string> = {
+  hunt: 'HUNT',
+  mystery: 'MYSTERY',
+  storyline: 'STORYLINE',
+  faction: 'FACTION CONTRACT',
+  bounty: 'BOUNTY',
+  whisper: 'WHISPER',
+  lead: 'LEAD',
+};
+
+/** A location route, named — or null when the id resolves to nothing to walk to. */
+function toLocation(id: string | null | undefined): MissionStatusRoute | null {
+  if (!id) return null;
+  return { kind: 'location', id, name: locationNameById(id) };
 }
 
 function statusCard(
@@ -359,13 +444,199 @@ function statusCard(
       ? { item: st.requires.item, held: stageRequirementMet(st, player.inventory) }
       : null,
     steps,
+    // ⚠ OTA-1618 — this family's whole story is already in `ask` and `steps`;
+    // a note here would be the second opinion the header forbids.
+    note: null,
+    kindLabel: KIND_LABEL[family] ?? family.toUpperCase(),
+    route: where && where !== player.currentLocationId ? toLocation(where) : null,
+    pauseKind: family,
+    abandonKind: family,
+    discardable: false,
+    // The ONE definition of "ready to hand in" (OTA-1152/missionReady), so a row
+    // can never offer a hand-in the store refuses.
+    turnInKind: missionTurnInReady({ kind: family, stage: rec.stage, stageCount: stages.length })
+      ? family
+      : null,
   };
 }
 
-/** Every live contract, tracked first and the one you are standing on ahead of
- *  the rest — the card opens on the mission the player is most likely asking
- *  about. A paused contract still appears, because a paused contract explains a
- *  dead tile better than any other single fact (the trace's own lesson). */
+/* ── OTA-1618 — the four families the card was missing ──────────────────────
+ * Each one answers the SAME questions in the SAME shape, using the engine
+ * functions its own screen section used: `missionTurnInReady` for readiness,
+ * `missionObjectiveLocationId` + `startingLocationForFaction` for a contract's
+ * ground, `whisperRouteTarget`/`describeWhisperStage` for a whisper's, the
+ * bounty record's own target for a bounty's. Nothing here computes a place or a
+ * readiness of its own. */
+
+function factionCard(rec: Rec, player: PlayerCharacter): MissionStatusCard | null {
+  const def = findFactionQuestById(rec.id);
+  if (!def) return null;
+  const stages = def.stages ?? [];
+  const countItem = (name: string) =>
+    (player.inventory ?? [])
+      .filter((it) => it.name.toLowerCase() === name.toLowerCase())
+      .reduce((n, it) => n + (it.quantity ?? 1), 0);
+  const ready = missionTurnInReady({ kind: 'faction_quest', def, stage: rec.stage, countItem });
+  // ⚠ The same swap the Contracts card makes (OTA-1152): en route the ground is
+  // the OBJECTIVE, done it is the faction's own hall, which is the pay window.
+  const home = startingLocationForFaction(def.factionId);
+  const where = ready ? home : (missionObjectiveLocationId(def) ?? home);
+  const here = !!where && where === player.currentLocationId;
+  const st = stages[rec.stage];
+  return {
+    family: 'faction',
+    kindLabel: KIND_LABEL.faction!,
+    id: def.id,
+    title: def.title,
+    stageNo: Math.min(rec.stage + 1, Math.max(stages.length, 1)),
+    stageTotal: stages.length,
+    tracked: rec.tracked !== false,
+    ready,
+    // ⚠ A faction stage is a TALLY beat (narration + advanceOn), not a grounded
+    // check — so the ask is the stage's own narration, never a verb phrase
+    // invented for it. Fetch and legacy contracts state their objective instead.
+    ask: st?.narration ?? (def.fetch ? `bring back ${def.fetch.quantity} × ${def.fetch.itemName}` : def.objective ?? ''),
+    where: locationNameById(where),
+    whereId: where ?? '',
+    here,
+    npcName: null,
+    // ⚠ A gather contract's whole question is "how many more?", so the line
+    // carries the tally as well as the name — one line, both halves, and the
+    // colour of it already says whether the pack is short.
+    needs: def.fetch
+      ? {
+          item: `${def.fetch.quantity} × ${def.fetch.itemName} (${countItem(def.fetch.itemName)} in the pack)`,
+          held: countItem(def.fetch.itemName) >= def.fetch.quantity,
+        }
+      : null,
+    steps: stages.map((s, i) => ({
+      no: i + 1,
+      ask: s.narration ?? 'it moves on its own',
+      state: i < rec.stage ? 'done' : i === rec.stage ? 'current' : 'ahead',
+    })),
+    // ⚠ The purse gate, and only while it is live — it holds the FINAL advance,
+    // so a player two stages out does not need to read about it (OTA-1594).
+    note: def.tcThreshold && rec.stage === stages.length - 1
+      ? `Purse: ${player.tc ?? 0} of ${def.tcThreshold} TC.`
+      : null,
+    // ⚠ `routeMission`, not a bare course: this family's route CHAINS to the
+    // turn-in once the work lands, and coursing to the id by hand drops that.
+    route: !here && where ? { kind: 'mission', id: def.id, name: locationNameById(where) } : null,
+    pauseKind: 'faction_quest',
+    abandonKind: 'faction_quest',
+    discardable: false,
+    turnInKind: ready ? 'faction_quest' : null,
+  };
+}
+
+function bountyCard(b: FactionBounty, player: PlayerCharacter): MissionStatusCard {
+  const left = bountyHoursLeft(b, player.hoursElapsed ?? 0);
+  const clock = Number.isFinite(left)
+    ? (left <= 0 ? '⏳ LAPSED' : `⏳ ${Math.ceil(left)}h left`)
+    : 'no deadline';
+  const here = b.targetLocationId === player.currentLocationId;
+  return {
+    family: 'bounty',
+    kindLabel: KIND_LABEL.bounty!,
+    id: bountyKey(b),
+    title: `${b.giverName} bounty`,
+    stageNo: Math.min(b.progress + 1, b.count),
+    stageTotal: b.count,
+    tracked: true,
+    ready: b.progress >= b.count,
+    ask: `put down ${b.count} of the ${b.targetName}`,
+    where: b.targetLocationName,
+    whereId: b.targetLocationId,
+    here,
+    npcName: null,
+    needs: null,
+    steps: [],
+    note: `${b.progress}/${b.count} put down · pays ${b.rewardTc} TC + ${b.giverName} standing · ${clock}`,
+    route: here ? null : toLocation(b.targetLocationId),
+    // ⚠ A bounty runs on a DEADLINE and is turned in at the giver's counter.
+    // Parking one would stop nothing and dropping one is not a thing the store
+    // does, so the row offers neither rather than offering a button that lies.
+    pauseKind: null,
+    abandonKind: null,
+    discardable: false,
+    turnInKind: null,
+  };
+}
+
+function whisperCard(w: WhisperRecord, player: PlayerCharacter): MissionStatusCard {
+  const grid = playerGridCell(player);
+  const target = whisperRouteTarget(w);
+  const here = !!target && grid.x === target.gridX && grid.y === target.gridY;
+  return {
+    family: 'whisper',
+    kindLabel: KIND_LABEL.whisper!,
+    id: w.id,
+    title: describeWhisperTitle(w),
+    stageNo: 1,
+    stageTotal: 1,
+    tracked: w.tracked !== false,
+    ready: false,
+    // ⚠ The whisper's own stage line, from the same describer the tab prints —
+    // and given the player's live cell, so it states the TRUE remaining walk
+    // (OTA-1595) rather than the authored offset from where it was planted.
+    ask: describeWhisperStage(w, grid),
+    where: target?.label ?? '',
+    whereId: '',
+    here,
+    npcName: null,
+    needs: null,
+    steps: [],
+    note: 'Rumour — no contract, no faction rep.',
+    route: target && !here
+      ? { kind: 'cell', x: target.gridX, y: target.gridY, label: target.label }
+      : null,
+    pauseKind: 'whisper',
+    abandonKind: 'whisper',
+    discardable: false,
+    turnInKind: null,
+  };
+}
+
+function leadCard(q: Quest, player: PlayerCharacter): MissionStatusCard {
+  const where = q.location?.id ?? '';
+  return {
+    family: 'lead',
+    kindLabel: KIND_LABEL.lead!,
+    id: q.id,
+    title: `${q.objective.verb.charAt(0).toUpperCase()}${q.objective.verb.slice(1)} ${q.objective.target}`,
+    stageNo: 1,
+    stageTotal: 1,
+    tracked: q.tracked !== false,
+    ready: false,
+    ask: `${q.objective.verb} ${q.objective.target}`,
+    where: q.location?.name ?? '',
+    whereId: where,
+    here: !!where && where === player.currentLocationId,
+    npcName: null,
+    needs: null,
+    steps: [],
+    // ⚠ The complication is the only thing a lead knows that its title doesn't,
+    // and it is the half that decides whether the walk is worth it.
+    note: q.complication?.text ?? null,
+    route: where && where !== player.currentLocationId ? toLocation(where) : null,
+    pauseKind: 'lead',
+    // A lead pays on the kill with no turn-in, so it is DISCARDED, not abandoned.
+    abandonKind: null,
+    discardable: true,
+    turnInKind: null,
+  };
+}
+
+/** ⚠⚠ OTA-1618 — EVERY LIVE COMMITMENT, ACTIVE ONE FIRST.
+ *
+ *  Owner: *"can we have it so that the active mission is always on top?"* Only
+ *  ONE stage-run may be tracked at a time (OTA-972), so "the active one" is a
+ *  single, well-defined row — and it now outranks everything, including a paused
+ *  contract the player happens to be standing on. Underneath that, the ground
+ *  you are on breaks the tie, then the order the families are read in.
+ *
+ *  A paused contract still appears, because a paused contract explains a dead
+ *  tile better than any other single fact (the trace's own lesson). */
 export function missionStatusCards(player: PlayerCharacter | null | undefined): MissionStatusCard[] {
   if (!player) return [];
   const out: MissionStatusCard[] = [];
@@ -384,6 +655,21 @@ export function missionStatusCards(player: PlayerCharacter | null | undefined): 
     const c = statusCard('storyline', rec, def, def ? contractAnchorId(def) : undefined, player);
     if (c) out.push(c);
   }
-  const rank = (c: MissionStatusCard) => (c.here ? 0 : 1) + (c.tracked ? 0 : 2);
+  for (const rec of player.activeFactionQuests ?? []) {
+    const c = factionCard(rec, player);
+    if (c) out.push(c);
+  }
+  // OTA-862 — the migrated list, falling back to the legacy single slot, exactly
+  // as the Contracts screen reads it.
+  const bounties = (player.activeBounties && player.activeBounties.length > 0)
+    ? player.activeBounties
+    : player.activeBounty ? [player.activeBounty] : [];
+  for (const b of bounties) out.push(bountyCard(b, player));
+  for (const w of player.activeWhispers ?? []) out.push(whisperCard(w, player));
+  for (const q of player.activeQuests ?? []) {
+    if (q.state === 'open' || q.state === 'in_progress') out.push(leadCard(q, player));
+  }
+  // ⚠ TRACKED OUTRANKS EVERYTHING (his ask), then the ground under the boots.
+  const rank = (c: MissionStatusCard) => (c.tracked ? 0 : 2) + (c.here ? 0 : 1);
   return out.sort((a, b) => rank(a) - rank(b));
 }

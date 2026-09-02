@@ -26762,7 +26762,28 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // And SET COURSE moved onto the mission it belongs to, through the same two
 // actions Contracts uses (hub confirm, else set outright): a cheat sheet you
 // have to leave in order to act on is a reference card.
-export const OTA_BUILD_ID = '2026-09-01-1617-the-ask-names-its-object';
+// ⚠⚠⚠ OTA-1618 — THE SLATE IS THE WHOLE SLATE, AND IT IS ALWAYS IN REACH.
+// Owner, in three messages: "can we just take the tab and put it on that button
+// so when I hit the button it scrolls everything it's just right there and can
+// we have it so that the active mission is always on top?" — "can we have the
+// mission button always there? Just set it right next to the more button. That
+// way, we don't gotta hit more to get it." — "that would completely remove the
+// contract tab and just make it the missions button instead so it would have
+// everything on there. you hit the button it pops up. you hit your thing you
+// close it. you're done." THREE FAMILIES WAS NEVER EVERYTHING: the card read
+// hunts, mysteries and storylines, and the four it skipped are the same four the
+// trace had to be taught one at a time (OTA-1594 — the contract he was actually
+// running never appeared in a line of the log). Faction contracts, bounties,
+// whispers and leads join it, each answering in its own terms through its own
+// engine: routeMission keeps a contract's turn-in leg, a whisper courses to an
+// absolute CELL, a lead is discarded rather than abandoned, a bounty carries its
+// tally and its clock and offers neither pause nor drop because the store has
+// neither. THE TAB'S ACTIONS CAME WITH THEM — SET ACTIVE / PAUSE, HAND IT IN,
+// ABANDON / DISCARD, beside 1617's SET COURSE — and what a row may offer is
+// decided by the reader, never by the component. The active contract sorts above
+// everything, the ground under the boots breaks the tie, and MISSIONS left the
+// MORE tray for the primary row.
+export const OTA_BUILD_ID = '2026-09-02-1618-the-slate-is-the-whole-slate';
 // golem catch-up 2026-09-01: markerless publish of OTA-1617 - the ask names its
 // object, and SET COURSE moved onto the mission row. hal took the marker push.
 // golem catch-up 2026-09-01: markerless publish of OTA-1608 - the portrait

@@ -163,7 +163,9 @@ describe('OTA-1615 — the button and the card are wired', () => {
   });
 
   it('⚠ the card computes nothing of its own — it renders the engine\'s answer', () => {
-    expect(CARD).toContain("import { missionStatusCards } from '../engine/missionTrace';");
+    // ⚠ OTA-1618 added the card MODEL to the same import (the row handlers take
+    // one), which moved the line. Same import, same single source.
+    expect(CARD).toContain("import { missionStatusCards, type MissionStatusCard as CardModel } from '../engine/missionTrace';");
     // No second opinion about where a stage happens or what it asks for.
     expect(CARD).not.toContain('stageLocationId');
     expect(CARD).not.toContain('payingIntent');

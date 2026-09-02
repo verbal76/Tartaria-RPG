@@ -87,8 +87,15 @@ describe('OTA-1617 — the walk is on the row it belongs to', () => {
   const CARD = src('app', 'components', 'MissionStatusCard.tsx');
 
   it('⚠⚠⚠ SET COURSE sits inside the mission, not behind OPEN CONTRACTS', () => {
-    expect(CARD).toContain('▸ SET COURSE TO {c.where.toUpperCase()}');
-    expect(CARD).toContain('onPress={() => routeTo(c.whereId, c.where)}');
+    // ⚠ OTA-1618 SUPERSEDED THE EXPRESSIONS, NOT THE CLAIM. The card carries
+    // four more families now, and two of them do not course to a location id at
+    // all — a whisper routes to an absolute GRID CELL and a faction contract
+    // through `routeMission` so its turn-in leg is kept. The row therefore reads
+    // the engine's `route`, and `takeRoute` dispatches on which frame it is in.
+    // Same button, same place, same guarantee that it is on the mission's row.
+    expect(CARD).toContain("▸ SET COURSE TO {(c.where || 'IT').toUpperCase()}");
+    expect(CARD).toContain('onPress={() => takeRoute(c)}');
+    expect(CARD).toContain("if (r.kind === 'location') { routeTo(r.id, r.name); return; }");
   });
 
   it('⚠⚠ it uses the SAME two actions the Contracts screen uses, in the same order', () => {
@@ -104,7 +111,14 @@ describe('OTA-1617 — the walk is on the row it belongs to', () => {
 
   it('⚠⚠ the button is absent where it would be a lie', () => {
     // Standing on the ground, or a beat whose ground has no id to walk to.
-    expect(CARD).toContain('{!c.here && c.whereId ? (');
+    // ⚠ OTA-1618 — the same two refusals, moved into the reader: `route` is null
+    // exactly when the player is already there or there is nothing to walk to,
+    // for EVERY family, instead of each row re-deriving it. The component asks
+    // one question now.
+    expect(CARD).toContain('{c.route ? (');
+    const TRACE = src('app', 'engine', 'missionTrace.ts');
+    expect(TRACE).toContain("route: where && where !== player.currentLocationId ? toLocation(where) : null,");
+    expect(TRACE).toContain('route: here ? null : toLocation(b.targetLocationId),');
   });
 
   it('⚠ the id it routes to is the id the line above it names', () => {
