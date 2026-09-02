@@ -26851,6 +26851,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // that plays every mission from the surfaces — Halem's gate, SET COURSE, the
 // arrival line's own words typed back, the cards, the hand-in.
 export const OTA_BUILD_ID = '2026-09-02-1622-it-pops-up-in-your-face';
+// golem catch-up 2026-09-02: markerless publish of OTA-1622 - a card on every
+// stage close in all four families + the player-shaped walker. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-02-1621-the-ask-is-a-command';
 // golem catch-up 2026-09-02: markerless publish of OTA-1621 - every ask and
 // label parses to the intent that pays the stage. hal took the marker.
