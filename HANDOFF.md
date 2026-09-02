@@ -1560,9 +1560,9 @@ Key invariants worth knowing:
 
 ## 9. Recent OTA highlights (latest sessions)
 
-### ⚠⚠⚠ THE 2026-09-02 RUN — OTA-1617 → 1629 (read this first if you are new)
+### ⚠⚠⚠ THE 2026-09-02 RUN — OTA-1617 → 1630 (read this first if you are new)
 
-Latest golem-line stamp: **`2026-09-02-1629-the-sleep-keeps-the-hour`**
+Latest golem-line stamp: **`2026-09-02-1630-the-chip-is-not-the-mission`**
 (`app/buildInfo.ts`). Both channels ship from this branch — a `[ota-hal]` marker
 in the commit TITLE publishes the HAL set, a markerless follow-up commit
 publishes golem; see §6.
@@ -1674,6 +1674,24 @@ what it ACCEPTS, and a data walker skips the saying.
   after the sleep so the camp wakes in place. A bare `rest` is unchanged.
   ⚠ "for 3 hours" is a duration, not three o'clock — the first cut got that
   wrong and the suite caught it.
+- **OTA-1630 the chip is not the mission.** Owner's open list #1: *"investigate
+  still hangs on Mud and never closes the lit button."* His 01:41 log:
+  "investigate the mud" resolved to the Aether Mud chip and the tracked Bog
+  Dragon hunt's investigate stage claimed it ("Not here … points elsewhere");
+  reproduced: the second tap was silent (the Not-here line and the scanner
+  refusal both dedup) and the chip stayed lit; on the anchor the same tap
+  resolved to a different chip and moved the hunt (that half is BY DESIGN —
+  OTA-1215: on the anchor a chip burst pays the investigate stage once).
+  `advanceStagesOnIntent` takes `parsed.resolvedNoun`; when it names a scene
+  ambient noun the three "Not here" claims (hunt / mystery / storyline) stay
+  silent and the chip's own investigate runs; the scanner refusal is
+  `skipDedup`; every investigate writes a debug
+  line (`investigate: "X" refused — needs a mud scanner` / `marked searched` /
+  `marked flavor-exhausted`) so the next device log names the path. ⚠ The
+  lit chip itself did not reproduce in JS in any of the three consumption
+  ledgers (searched / flavor-exhausted / the lore table's `consumed`); if it
+  recurs, the new debug lines beside the parser line are the evidence.
+  Owner's #2 (MAX craft) is OTA-1631, #3 (SET COURSE walks a tile) is OTA-1632.
 
 ⚠ **Two position vocabularies, still.** `stageArrival.ts` (heal / arm /
 `checkStandingGround`) keys on the canon grid CELL; the verb matchers and

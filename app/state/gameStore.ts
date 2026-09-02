@@ -1000,10 +1000,18 @@ function advanceStagesOnIntent(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   intent: Intent,
+  resolvedNoun?: string | null,
 ): boolean {
   const player = get().player;
   const currentScene = get().currentScene;
   if (!player || !currentScene) return false;
+  // ⚠⚠⚠ OTA-1630 — THE CHIP IS NOT THE MISSION. Owner's log: "investigate the mud"
+  // resolved to the Aether Mud chip, and a tracked hunt whose stage pays on
+  // `investigate` claimed it AWAY from its ground — "Not here. The Bog Dragon
+  // points elsewhere" — so the chip was never touched and stayed lit. A verb that
+  // NAMES a scene noun is aimed at that noun; the "Not here" claim below stays out
+  // of it. ⚠ ON the anchor a chip burst still pays the stage once (OTA-1215).
+  const namesChip = !!resolvedNoun && (currentScene.ambientNouns ?? []).some((n) => n.toLowerCase() === resolvedNoun.toLowerCase());
   const inCombat = (currentScene.enemies?.length ?? 0) > 0;
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { huntAnchorId } = require('../engine/contractMarkers') as typeof import('../engine/contractMarkers');
@@ -1087,7 +1095,7 @@ function advanceStagesOnIntent(
           try { get().advanceHunt(huntMatch.rec.id); } finally { stageAdvancesInFlight.delete(flightKey); }
         });
       }
-    } else if (!inCombat) {
+    } else if (!inCombat && !namesChip) {
       // The verb matched, the ground didn't — say so instead of the old silence.
       // Throttled: skip if the same line is already in the recent log.
       const line = `The Arbiter taps the slate. "Not here. ${huntMatch.def.title} points elsewhere — set a course from Contracts and do it there."`;
@@ -1140,7 +1148,7 @@ function advanceStagesOnIntent(
     if (player.currentLocationId !== ground) {
       const line = `The Arbiter taps the slate. "Not here. ${mysteryMatch.def.title} points elsewhere — set a course from Contracts and do it there."`;
       const recent = get().gameLog.slice(-30).some((e) => e.text === line);
-      if (!recent) get().appendLog('arbiter', line);
+      if (!recent && !namesChip) get().appendLog('arbiter', line);
       return false; // nothing granted — the generic beat may still play
     }
     // ⚠ Same heal-then-refuse the hunts got: a record already in flight when this shipped
@@ -1193,7 +1201,7 @@ function advanceStagesOnIntent(
     if (player.currentLocationId !== ground) {
       const line = `The Arbiter taps the slate. "Not here. ${storyMatch.def.title} points elsewhere — set a course from Contracts and do it there."`;
       const recent = get().gameLog.slice(-30).some((e) => e.text === line);
-      if (!recent) get().appendLog('arbiter', line);
+      if (!recent && !namesChip) get().appendLog('arbiter', line);
       return false; // nothing granted — the generic beat may still play
     }
     // ⚠ Heal-then-refuse, and the heal HANDS OVER AND STOPS — granting mid-action races
@@ -14175,7 +14183,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // healed item used to vanish one log line after its receipt printed — and how the
     // generic INVESTIGATE beat burned the tile's once-only search on an action whose
     // meaning was already spent. "Go again" costs the player one tap, on clean state.
-    if (advanceStagesOnIntent(get, set, parsed.intent)) {
+    if (advanceStagesOnIntent(get, set, parsed.intent, parsed.resolvedNoun)) {
       set((sLive) => (sLive.player ? { player: advanceTime(sLive.player, 0.1) } : sLive));
       void get().persist();
       return;
@@ -16025,7 +16033,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
             const { playerHasScannerEquipped: hasScanner } = require('../engine/equipment');
             const req = searchRequirementFor(ambient);
             if (req && !hasScanner(player, req.scannerBias)) {
-              get().appendLog('arbiter', `The Arbiter shakes their head. "${req.hint}"`);
+              // ⚠ OTA-1630 — skipDedup: the second tap used to be silent (the owner's log).
+              get().appendLog('arbiter', `The Arbiter shakes their head. "${req.hint}"`, { skipDedup: true });
+              get().appendLog('debug', `investigate: "${ambient}" refused — needs a ${req.scannerBias} scanner`);
               break;
             }
             const narrateResult = narrateAmbientFind(get, set, currentScene, ambient);
@@ -16170,6 +16180,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   },
                 };
               });
+              get().appendLog('debug', `investigate: "${ambient}" marked searched`);
             } else {
               // 2026-05-25 [POLISH-3] — flavor-only outcome (no item /
               // no XP / no hook produced). Mark the noun as flavor-
@@ -16201,6 +16212,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   },
                 };
               });
+              get().appendLog('debug', `investigate: "${ambient}" marked flavor-exhausted`);
             }
             break;
           }

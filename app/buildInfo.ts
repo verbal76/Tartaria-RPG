@@ -26907,7 +26907,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // one reader of a named span for wait AND rest: the clock wins over the
 // eight and over the refusal, the sleep still camps (ambush, heal, recovery)
 // and then looks at the ground again so the camp wakes in place.
-export const OTA_BUILD_ID = '2026-09-02-1629-the-sleep-keeps-the-hour';
+// ⚠⚠⚠ OTA-1630 — THE CHIP IS NOT THE MISSION. Owner: "investigate still hangs
+// on Mud and never closes the lit button." His log: "investigate the mud"
+// resolved to the Aether Mud chip and the tracked Bog Dragon hunt's
+// investigate stage claimed it ("Not here … points elsewhere"); the second
+// tap was silent (two deduped refusals); the chip stayed lit. A verb that
+// names a scene chip is the chip's — the stage matcher stays out; the scanner
+// refusal speaks every tap; every investigate logs what it did to the chip.
+export const OTA_BUILD_ID = '2026-09-02-1630-the-chip-is-not-the-mission';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-02-1629-the-sleep-keeps-the-hour';
 // golem catch-up 2026-09-02: markerless publish of OTA-1629 - sleep / rest to a
 // named hour or span. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-02-1628-the-whisper-beats-pop-up-too';
