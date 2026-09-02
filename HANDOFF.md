@@ -1556,9 +1556,9 @@ Key invariants worth knowing:
 
 ## 9. Recent OTA highlights (latest sessions)
 
-### ⚠⚠⚠ THE 2026-09-02 RUN — OTA-1617 → 1625 (read this first if you are new)
+### ⚠⚠⚠ THE 2026-09-02 RUN — OTA-1617 → 1626 (read this first if you are new)
 
-Latest golem-line stamp: **`2026-09-02-1625-the-subdual-pays-the-slate`**
+Latest golem-line stamp: **`2026-09-02-1626-the-word-is-the-direction`**
 (`app/buildInfo.ts`). Both channels ship from this branch — a `[ota-hal]` marker
 in the commit TITLE publishes the HAL set, a markerless follow-up commit
 publishes golem; see §6.
@@ -1627,6 +1627,16 @@ what it ACCEPTS, and a data walker skips the saying.
   exemption). Walker: rests before EXIT (a travel costs stamina) and
   recognises the OTA-617 auto hand-in when the nearest hub is the contract's
   own faction gate (the "Contract Turned In" card pays on arrival).
+- **OTA-1626 the word is the direction.** The walker's fifth family (the 21
+  whisper chains: overheard in an outpost room, followed from the WHISPERS
+  panel line — camp, answer, mark, hand-over) broke three taps in: the gate
+  room prints "Paths: north to Standards", it typed "north", and the parser's
+  bare-direction shortcut knew only the letter codes (unknown at 0.10). The
+  opposite hole beside it: "n" parsed to travel north but `resolveHubTravel`
+  got the raw letter, matched nothing, and the overland step walked the
+  player out of the building. Parser table carries the eight words;
+  `hub.hubTravelText` hands the resolver the parsed direction.
+  `PLAYER_WALKER_ONLY=whisper` (or `whisper:<chainId>`) runs the family.
 
 ⚠ **Two position vocabularies, still.** `stageArrival.ts` (heal / arm /
 `checkStandingGround`) keys on the canon grid CELL; the verb matchers and

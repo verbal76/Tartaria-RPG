@@ -1262,9 +1262,14 @@ export function parseInput(raw: string, context: ParseContext = {}): ParsedInput
   // entire input is one of the codes.
   if (tokens.length === 1) {
     const tok = tokens[0]!;
+    // ⚠ OTA-1626 — and the WORDS. The room prints "Paths: north to Standards";
+    // the player typed "north" and got the soft refusal, because only the
+    // letter codes were here. The word is the direction, same as its letter.
     const cardinalMap: Record<string, string> = {
       n: 'north', s: 'south', e: 'east', w: 'west',
       ne: 'northeast', nw: 'northwest', se: 'southeast', sw: 'southwest',
+      north: 'north', south: 'south', east: 'east', west: 'west',
+      northeast: 'northeast', northwest: 'northwest', southeast: 'southeast', southwest: 'southwest',
     };
     const expanded = cardinalMap[tok];
     if (expanded) {

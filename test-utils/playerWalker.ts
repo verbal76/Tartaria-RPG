@@ -998,7 +998,9 @@ class WhisperWalker extends Walker {
   rec(): WhisperRecord | undefined {
     return (get().player?.activeWhispers ?? []).find((w) => w.id === this.chain.id);
   }
-  stageName(): string { return this.rec()?.stage ?? (get().player?.completedWhisperIds ?? []).includes(this.chain.id) ? 'done' : '-'; }
+  stageName(): string {
+    return this.rec()?.stage ?? ((get().player?.completedWhisperIds ?? []).includes(this.chain.id) ? 'done' : '-');
+  }
   onGrid(x: number, y: number): boolean {
     const g = playerGridCell(get().player!);
     return g.x === x && g.y === y;
@@ -1148,10 +1150,14 @@ class WhisperWalker extends Walker {
       const hour = Math.floor((get().player?.hoursElapsed ?? 0) % 24);
       const r = this.rec()!;
       if (!isHourInWindow(hour, r.activeFromHour, r.activeToHour)) {
-        // The panel says who works when; a player rests and looks again.
-        this.tap('REST'); await this.type('rest');
-        if (this.enemiesUp() > 0 && !(await this.fightOut('resting at the camp'))) return done();
+        // "This is X's spot — but the camp is cold. X works here <hours>.
+        // Wait for the hour and look again." A player waits.
+        const toDark = r.activeFromHour != null && r.activeFromHour >= 12;
+        const cmd = r.activeFromHour == null ? 'wait' : toDark ? 'wait until dark' : 'wait until morning';
+        this.tap(cmd.toUpperCase()); await this.type(cmd);
+        if (this.enemiesUp() > 0 && !(await this.fightOut('waiting at the camp'))) return done();
         this.topUp();
+        if (this.rec()?.stage === 'met_yulka') break;
         continue;
       }
       await this.stepOffAndBack();

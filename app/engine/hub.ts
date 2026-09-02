@@ -607,6 +607,18 @@ export function matchHubRoomName(
   return null;
 }
 
+/** ⚠ OTA-1626 — what the interior resolver reads. resolveHubTravel matches the
+ *  TEXT against cardinals and room names, so a parse that already turned "n"
+ *  into north has to hand the word over, or the letter matches nothing, the
+ *  interior move resolves to null, and the overland step walks the player out
+ *  of the building ("You walk north past the gate" — from the Strongroom).
+ *  Anything that is not a plain cardinal travel goes through as typed, so room
+ *  names keep matching exactly as before. */
+export function hubTravelText(parsed: { intent: string; target?: string | null }, rawInput: string): string {
+  const t = parsed.target?.toLowerCase();
+  return parsed.intent === 'travel' && t && (DIRECTIONS as readonly string[]).includes(t) ? t : rawInput;
+}
+
 /** True when the input is asking to leave the hub entirely. */
 export function isLeaveHubCommand(rawInput: string): boolean {
   return /\b(leave|exit)\s+(the\s+)?(outpost|hub|camp|reclaimers'?)\b/i.test(rawInput) ||

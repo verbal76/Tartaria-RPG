@@ -26877,7 +26877,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the faction slate's 'kill' trigger still fired from the kill path only.
 // lootKnockedOutEnemy now fires it beside creditDefeatedTarget, same
 // factionNeutralFight guard, same vendor exemption.
-export const OTA_BUILD_ID = '2026-09-02-1625-the-subdual-pays-the-slate';
+// ⚠⚠⚠ OTA-1626 — THE WORD IS THE DIRECTION. The walker's first whisper chain,
+// three taps in: the gate room prints "Paths: north to Standards", it typed
+// "north" and got the soft refusal — the bare-direction shortcut knew only
+// the letter codes. And "n" inside an outpost parsed to travel north but the
+// interior resolver was handed the raw letter, matched nothing, and the
+// overland step walked the player out of the building. The parser table
+// carries the eight words; hub.hubTravelText hands the resolver the parsed
+// direction; gameStore's one interior-move site uses it.
+export const OTA_BUILD_ID = '2026-09-02-1626-the-word-is-the-direction';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-02-1625-the-subdual-pays-the-slate';
 // golem catch-up 2026-09-02: markerless publish of OTA-1625 - a knockout
 // advances faction quests like a kill. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-02-1624-the-refusal-speaks-for-every-family';

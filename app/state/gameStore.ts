@@ -479,7 +479,7 @@ import {
   hubSkinFactionFor,
   hubOwnerFaction,
   findHubRoom,
-  resolveHubTravel,
+  resolveHubTravel, hubTravelText,
   isLeaveHubCommand,
   isBareExitCommand,
   matchHubRoomName,
@@ -17741,7 +17741,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // typed attempts on the owner's device before the taught phrase landed.
         if (player.hubRoomId && !isLeaveHubCommand(trimmed) && !isBareExitCommand(trimmed)) {
           const skin = hubSkinFactionFor(player.currentLocationId, player.factionId);
-          const interiorMove = resolveHubTravel(player.hubRoomId, trimmed,
+          // ⚠ OTA-1626 — the PARSED direction, never the raw letter ("n" resolved nothing and walked out).
+          const interiorMove = resolveHubTravel(player.hubRoomId, hubTravelText(parsed, trimmed),
             // ⚠ OTA-1274 — match the names the player is actually reading.
             skin);
           // ⚠⚠ OTA-1279 — A NAMED ROOM THAT IS NOT ONE STEP AWAY IS A REFUSAL,
