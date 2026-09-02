@@ -26944,6 +26944,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // "even crafting repopulates loot": measured NOT so — the roster was rolled at
 // arrival, the fight hid the quick row, the craft came 2 s after the kill.
 export const OTA_BUILD_ID = '2026-09-02-1634-the-aside-yields';
+// golem catch-up 2026-09-02: markerless publish of OTA-1634 - the live aside is
+// homework; the stall line names the crumb and the native lane. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-02-1633-a-batch-is-one-action';
 // golem catch-up 2026-09-02: markerless publish of OTA-1633 - craft N is one
 // engine action with one reward line. hal took the marker.
