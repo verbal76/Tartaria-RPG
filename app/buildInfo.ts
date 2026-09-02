@@ -26869,7 +26869,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // something mid-swing, nothing said. One reader (missionTrace.stalledInCombat)
 // names the first tracked contract of any family whose stage is paid by the
 // typed verb; gameStore's hunt-only copy is gone.
-export const OTA_BUILD_ID = '2026-09-02-1624-the-refusal-speaks-for-every-family';
+// ⚠⚠⚠ OTA-1625 — THE SUBDUAL PAYS THE SLATE. Found by the player-shaped walker
+// three times in one pass over the faction quests: the last human on the
+// ground knocked out cold, "Nobody left standing — the fight is yours", the
+// strip paid, and the stage ("Destroy the rogue constructs") did not move.
+// OTA-1612 made a subdued mark a defeated mark for whispers, hunts and leads;
+// the faction slate's 'kill' trigger still fired from the kill path only.
+// lootKnockedOutEnemy now fires it beside creditDefeatedTarget, same
+// factionNeutralFight guard, same vendor exemption.
+export const OTA_BUILD_ID = '2026-09-02-1625-the-subdual-pays-the-slate';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-02-1624-the-refusal-speaks-for-every-family';
 // golem catch-up 2026-09-02: markerless publish of OTA-1624 - the mid-fight
 // refusal names mystery and storyline stages too. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-02-1623-the-gerund-is-the-verb';

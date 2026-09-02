@@ -52,7 +52,7 @@ jest.mock('expo-updates', () => ({}));
 
 import { useGameStore } from '../app/state/gameStore';
 import { getRaces, getFactions } from '../app/engine/character';
-import { ALL_MISSIONS, ALL_FACTION_QUESTS, playMission, playFactionQuest, formatReport, type WalkReport } from '../test-utils/playerWalker';
+import { ALL_MISSIONS, ALL_FACTION_QUESTS, ALL_WHISPER_CHAINS, playMission, playFactionQuest, playWhisperChain, formatReport, type WalkReport } from '../test-utils/playerWalker';
 import { appendFileSync } from 'node:fs';
 
 jest.setTimeout(900000);
@@ -116,6 +116,20 @@ const picked = ALL_MISSIONS.filter(({ family, def }) => {
   for (const def of pickedFq) {
     it(`faction:${def.id} — ${def.title}`, async () => {
       const r = await playFactionQuest(def);
+      reports.push(r);
+      const text = formatReport(r);
+      if (REPORT) appendFileSync(REPORT, `${text}\n\n`);
+      process.stdout.write(`${text}\n`);
+      expect(r.breaks).toEqual([]);
+    });
+  }
+
+  // The fifth family: the 21 whisper chains, overheard in an outpost room and
+  // followed from the WHISPERS panel line — camp, answer, mark, hand-over.
+  const pickedWh = ALL_WHISPER_CHAINS.filter((c) => !ONLY || ONLY === 'whisper' || ONLY === `whisper:${c.id}`);
+  for (const chain of pickedWh) {
+    it(`whisper:${chain.id} — ${chain.title}`, async () => {
+      const r = await playWhisperChain(chain);
       reports.push(r);
       const text = formatReport(r);
       if (REPORT) appendFileSync(REPORT, `${text}\n\n`);

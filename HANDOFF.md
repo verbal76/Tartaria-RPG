@@ -1556,9 +1556,9 @@ Key invariants worth knowing:
 
 ## 9. Recent OTA highlights (latest sessions)
 
-### ⚠⚠⚠ THE 2026-09-02 RUN — OTA-1617 → 1623 (read this first if you are new)
+### ⚠⚠⚠ THE 2026-09-02 RUN — OTA-1617 → 1625 (read this first if you are new)
 
-Latest golem-line stamp: **`2026-09-02-1623-the-gerund-is-the-verb`**
+Latest golem-line stamp: **`2026-09-02-1625-the-subdual-pays-the-slate`**
 (`app/buildInfo.ts`). Both channels ship from this branch — a `[ota-hal]` marker
 in the commit TITLE publishes the HAL set, a markerless follow-up commit
 publishes golem; see §6.
@@ -1613,13 +1613,26 @@ what it ACCEPTS, and a data walker skips the saying.
   form of an EXACT table verb is that verb at distance 0; nothing fuzzy
   loosened. ota1623 holds every ask and label to confidence ≥ 0.5 — the half
   ota1621 never measured.
+- **OTA-1624 the refusal speaks for every family.** The `!inCombat` gate on
+  stage verbs had a voice only on the hunt branch; `missionTrace.stalledInCombat`
+  now names the first tracked contract of any family whose stage the typed verb
+  pays, and gameStore's hunt-only copy is gone.
+- **OTA-1625 the subdual pays the slate.** The walker's first pass over the 18
+  staged faction quests broke three of them the same way: the last human on
+  the ground knocked out cold, "Nobody left standing", the strip paid, and
+  the kill-gated stage did not move. OTA-1612 had made a subdued mark a
+  defeated mark for whispers/hunts/leads; the faction `'kill'` trigger still
+  fired from the kill path only. `lootKnockedOutEnemy` fires it beside
+  `creditDefeatedTarget` now (same `factionNeutralFight` guard, same vendor
+  exemption). Walker: rests before EXIT (a travel costs stamina) and
+  recognises the OTA-617 auto hand-in when the nearest hub is the contract's
+  own faction gate (the "Contract Turned In" card pays on arrival).
 
 ⚠ **Two position vocabularies, still.** `stageArrival.ts` (heal / arm /
 `checkStandingGround`) keys on the canon grid CELL; the verb matchers and
 `missionArrivalLines` key on `currentLocationId === ground` (location-wide).
-Filed as OTA-1625. Also open: OTA-1624 (a mystery/storyline verb typed in
-combat is silent; hunts say "not with something on you"), OTA-1626 (bulk craft
-runs the whole action tail per unit).
+Filed as OTA-1627. Also open: OTA-1626 (bulk craft runs the whole action tail
+per unit).
 
 ### ⚠⚠⚠ THE 2026-09-01 RUN — OTA-1600 → 1616 (the day before)
 

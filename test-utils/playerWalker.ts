@@ -47,7 +47,9 @@ import { openContractMarkers } from '../app/engine/contractMarkers';
 import { armedEncounter } from '../app/engine/missionEncounterArm';
 import { choicesFor, freshEncounter } from '../app/engine/missionEncounter';
 import { stageVerbLabel, type MissionFamily } from '../app/engine/questStage';
-import { hubLocationIds } from '../app/engine/hub';
+import { hubLocationIds, hubFirstStepToward, findHubRoom } from '../app/engine/hub';
+import { CHAINS, describeWhisperStage, whisperRouteTarget, pickTargetTile, isHourInWindow, type ChainDef } from '../app/engine/whispers';
+import type { WhisperRecord } from '../app/engine/types';
 import { canonicalCellOf, canonicalDistanceFromGrid } from '../app/engine/worldMap';
 import { playerGridCell } from '../app/state/playerGrid';
 import { CONTRACT_BROKER_VENDOR_ID } from '../app/engine/contractBroker';
@@ -68,7 +70,7 @@ export interface StageNote {
 }
 
 export interface WalkReport {
-  family: WalkFamily | 'faction';
+  family: WalkFamily | 'faction' | 'whisper';
   id: string;
   title: string;
   outcome: 'complete' | 'broken';
@@ -349,7 +351,9 @@ class Walker {
     if (get().player?.hubRoomId) {
       // Already inside (the opening leaves a new character standing in the
       // gate room, and the opening scene seats nobody at the gate). A player
-      // steps out and back in — EXIT, then ENTER OUTPOST.
+      // steps out and back in — EXIT, then ENTER OUTPOST. Leaving is a
+      // travel and travel costs stamina; a player would rest first.
+      this.restByFiat();
       this.tap('EXIT');
       await this.type('leave outpost');
       if (get().player?.hubRoomId) {
@@ -378,7 +382,10 @@ class Walker {
     while (this.enemiesUp() > 0) {
       rounds += 1;
       if (rounds > 90) {
-        this.breaks.push(`fight ${why} would not end after 90 rounds (${this.enemiesUp()} still up). last lines:\n${this.lastLines(4)}`);
+        // Raw log with the debug channel: the `move:` lines say what the
+        // approach did (intermittent on the catalogue pass, clean solo).
+        const raw = get().gameLog.slice(-14).map((e) => `[${e.channel}] ${e.text.split('\n')[0]}`).join('\n');
+        this.breaks.push(`fight ${why} would not end after 90 rounds (${this.enemiesUp()} still up). range=${get().currentScene?.range} raw log:\n${raw}`);
         return false;
       }
       if (rounds > 60 && !coup) {
@@ -408,10 +415,16 @@ class Walker {
       // to close in"): a player taps APPROACH on that one. Second catalogue
       // pass: ninety refused swings at a Mud Elemental Spawn nobody approached.
       if (this.feedSince(before).some((l) => /ADVANCE to close in|need to close/i.test(l))) {
-        const live = get().currentScene!;
-        const target = live.enemies[live.activeEnemyIdx]?.name ?? live.enemies[0]?.name ?? '';
-        this.tap(`approach ${target}`);
-        await this.type(`approach ${target}`);
+        // Under heavy weather one approach is a partial step (runMoveCombatRange
+        // ticks toward a cost); a player keeps tapping until the gap closes.
+        for (let k = 0; k < 3; k++) {
+          const live = get().currentScene!;
+          const target = live.enemies[live.activeEnemyIdx]?.name ?? live.enemies[0]?.name ?? '';
+          const m = this.feedMark();
+          this.tap(`approach ${target}`);
+          await this.type(`approach ${target}`);
+          if (this.feedSince(m).some((l) => /close the gap|already at close/i.test(l))) break;
+        }
       }
     }
     this.dismissCards();
@@ -933,7 +946,16 @@ class FactionWalker extends Walker {
     }
     // Hand in at Halem's gate — the broker takes any faction's work.
     const hub = this.nearestHub();
+    const tcBeforeWalk = get().player!.tc ?? 0;
     if (!(await this.walkTo(hub, 'to hand it in'))) return done();
+    if (!this.fqRecord()) {
+      // The hub is this faction's own ground: arriving at the gate hands the
+      // contract in by itself (OTA-617), with its "Contract Turned In" card.
+      // A player sees the card and is paid; nothing left to type.
+      if ((get().player!.tc ?? 0) <= tcBeforeWalk) this.breaks.push(`the contract left the slate on arrival at ${hub} and the purse did not move`);
+      this.dismissCards();
+      return done();
+    }
     if (!(await this.enterOutpost())) return done();
     const tc0 = get().player!.tc ?? 0;
     const mark = this.feedMark();
@@ -954,6 +976,250 @@ export async function playFactionQuest(def: FactionQuestLike): Promise<WalkRepor
   const r = await w.playFq();
   r.family = 'hunt';
   (r as { family: string }).family = 'faction';
+  if (process.env.PLAYER_WALKER_FEED === '1') r.feed = [...w.feed()];
+  return r;
+}
+
+// ── THE FIFTH FAMILY: whisper chains ───────────────────────────────────────
+// A whisper is overheard in an outpost room (the plant), followed by SET
+// COURSE to a camp, answered from the SPEAK TO bar, chased to a mark's tile,
+// fought, carried back and handed over. The player's surface for every leg is
+// the WHISPERS panel line (describeWhisperStage) and its SET COURSE button.
+
+export const ALL_WHISPER_CHAINS: ChainDef[] = [...CHAINS];
+
+class WhisperWalker extends Walker {
+  readonly chain: ChainDef;
+  constructor(chain: ChainDef) {
+    super('hunt', { id: chain.id, title: chain.title, factionId: null, stages: [] });
+    this.chain = chain;
+  }
+
+  rec(): WhisperRecord | undefined {
+    return (get().player?.activeWhispers ?? []).find((w) => w.id === this.chain.id);
+  }
+  stageName(): string { return this.rec()?.stage ?? (get().player?.completedWhisperIds ?? []).includes(this.chain.id) ? 'done' : '-'; }
+  onGrid(x: number, y: number): boolean {
+    const g = playerGridCell(get().player!);
+    return g.x === x && g.y === y;
+  }
+  /** The WHISPERS panel line for this chain, as the Contracts screen prints it. */
+  panelLine(): string | null {
+    const r = this.rec();
+    return r ? describeWhisperStage(r, playerGridCell(get().player!)) : null;
+  }
+
+  /** The whisper cards: the return raises "Contract Turned In"-style completion. */
+  dismissWhisperCards(): string[] {
+    const said: string[] = [];
+    const st = get();
+    if (st.pendingWhisperComplete) {
+      const c = st.pendingWhisperComplete;
+      said.push(`[CONTINUE card] ${c.title}: ${c.lines.join(' / ')}${c.rewards?.length ? ` ✦ ${c.rewards.join(', ')}` : ''}`);
+      this.tap('CONTINUE');
+      st.dismissWhisperComplete();
+    }
+    said.push(...this.dismissCards());
+    return said;
+  }
+
+  /** Inside the outpost, walk room to room to the plant room, typing the cardinal. */
+  async walkRooms(roomId: string): Promise<boolean> {
+    for (let i = 0; i < 14; i++) {
+      const here = get().player?.hubRoomId;
+      if (!here) { this.breaks.push(`lost the outpost interior on the way to ${roomId}`); return false; }
+      if (here === roomId) return true;
+      const next = hubFirstStepToward(here, roomId);
+      const room = findHubRoom(here);
+      const dir = next && room ? (['north', 'south', 'east', 'west'] as const).find((d) => room.exits[d] === next) : undefined;
+      if (!next || !dir) { this.breaks.push(`no door from ${here} toward ${roomId}`); return false; }
+      this.tap(dir.toUpperCase());
+      await this.type(dir);
+      if (get().player?.hubRoomId !== next) {
+        this.breaks.push(`typed "${dir}" in ${here} and did not reach ${next}. last lines:\n${this.lastLines(4)}`);
+        return false;
+      }
+    }
+    this.breaks.push(`fourteen room steps did not reach ${roomId}`);
+    return false;
+  }
+
+  /** Hear the rumour: stand in the plant room until it is said. Leave and
+   *  come back up to eight times (the plant is a roll on entering); after
+   *  that the walker plants it by fiat from the room, the game's own shape. */
+  async hear(): Promise<boolean> {
+    const room = this.chain.plantLocations[0]!;
+    const hub = this.nearestHub();
+    if (!(await this.walkTo(hub, 'to hear the rumour'))) return false;
+    if (!(await this.enterOutpost())) return false;
+    if (!(await this.walkRooms(room))) return false;
+    for (let i = 0; i < 8 && !this.rec(); i++) {
+      // Step out to the neighbouring room and back in — a fresh entry, a fresh roll.
+      const here = findHubRoom(room);
+      const dir = here ? (['north', 'south', 'east', 'west'] as const).find((d) => here.exits[d]) : undefined;
+      if (!dir) break;
+      const back = ({ north: 'south', south: 'north', east: 'west', west: 'east' } as const)[dir];
+      this.tap(dir.toUpperCase()); await this.type(dir);
+      this.tap(back.toUpperCase()); await this.type(back);
+      if (get().player?.hubRoomId !== room) { this.breaks.push(`stepping ${dir} and ${back} did not return to ${room}`); return false; }
+    }
+    if (!this.rec()) {
+      this.allowances.add(`rumour planted by fiat in ${room} (the entry roll is ${this.chain.plantChance})`);
+      const p = get().player!;
+      const px = p.mapX ?? 0, py = p.mapY ?? 0;
+      const tile = pickTargetTile(this.chain, px, py);
+      const g = playerGridCell(p);
+      const whisper: WhisperRecord = {
+        id: this.chain.id, stage: 'planted', plantedAtHour: p.hoursElapsed ?? 0,
+        targetMapX: tile.x, targetMapY: tile.y,
+        targetGridX: g.x + (tile.x - px), targetGridY: g.y + (tile.y - py),
+        targetLocationId: p.currentLocationId,
+        activeFromHour: this.chain.activeHours?.[0], activeToHour: this.chain.activeHours?.[1],
+      };
+      store.setState({ player: { ...p, activeWhispers: [...(p.activeWhispers ?? []), whisper] } as never });
+    }
+    return true;
+  }
+
+  /** SET COURSE on the WHISPERS row, then → DESTINATION until the boots are on the tile. */
+  async walkCourse(why: string): Promise<boolean> {
+    const r = this.rec();
+    const tgt = r ? whisperRouteTarget(r) : null;
+    if (!tgt) { this.breaks.push(`SET COURSE (${why}) offered no tile at stage ${this.stageName()}`); return false; }
+    if (this.onGrid(tgt.gridX, tgt.gridY)) return true;
+    this.tap(`SET COURSE (${tgt.label})`);
+    get().setWhisperCourse(tgt.gridX, tgt.gridY, tgt.label);
+    await tick();
+    for (let guard = 0; guard < 240; guard++) {
+      if (this.onGrid(tgt.gridX, tgt.gridY)) return true;
+      if (this.enemiesUp() > 0) { if (!(await this.fightOut('on the road'))) return false; continue; }
+      this.dismissWhisperCards();
+      this.restByFiat();
+      if (!get().player?.whisperCourse) {
+        this.tap(`SET COURSE again (${tgt.label})`);
+        get().setWhisperCourse(tgt.gridX, tgt.gridY, tgt.label);
+        await tick();
+        if (!get().player?.whisperCourse && !this.onGrid(tgt.gridX, tgt.gridY)) {
+          this.breaks.push(`SET COURSE (${why}) set no course. last lines:\n${this.lastLines(4)}`);
+          return false;
+        }
+        continue;
+      }
+      this.tap('→ DESTINATION');
+      get().continueWhisperCourse();
+      await tick();
+      this.drainRolls();
+    }
+    this.breaks.push(`course (${why}) did not arrive in 240 taps`);
+    return false;
+  }
+
+  /** Off the tile and back on — the arrival is what the chain hears. */
+  async stepOffAndBack(): Promise<void> {
+    this.tap('NORTH'); await this.type('north');
+    if (this.enemiesUp() > 0) await this.fightOut('stepping off');
+    this.tap('SOUTH'); await this.type('south');
+    if (this.enemiesUp() > 0) await this.fightOut('stepping back');
+  }
+
+  note(stage: number, typed: string | null, via: StageNote['via'], cards: string[], mark: number): void {
+    this.stages.push({
+      stage, ground: this.stageName(), arrivalLine: this.panelLine(), typed, via,
+      closeCard: cards.length ? cards.join(' || ') : null, closeFeed: this.feedSince(mark).slice(-6),
+    });
+  }
+
+  async playWhisper(): Promise<WalkReport> {
+    const c = this.chain.content;
+    const done = (): WalkReport => ({
+      family: 'whisper', id: this.chain.id, title: this.chain.title,
+      outcome: this.breaks.length ? 'broken' : 'complete',
+      breaks: this.breaks, allowances: [...this.allowances], stages: this.stages, taps: this.taps,
+    });
+    // 1. The rumour.
+    let mark = this.feedMark();
+    if (!(await this.hear())) return done();
+    this.note(0, null, 'none', this.dismissWhisperCards(), mark);
+    if (this.rec()?.stage !== 'planted') { this.breaks.push(`heard the rumour and the panel reads stage ${this.stageName()}`); return done(); }
+    // 2. The camp.
+    mark = this.feedMark();
+    if (!(await this.walkCourse('to the camp'))) return done();
+    for (let waits = 0; this.rec()?.stage === 'planted' && waits < 6; waits++) {
+      const hour = Math.floor((get().player?.hoursElapsed ?? 0) % 24);
+      const r = this.rec()!;
+      if (!isHourInWindow(hour, r.activeFromHour, r.activeToHour)) {
+        // The panel says who works when; a player rests and looks again.
+        this.tap('REST'); await this.type('rest');
+        if (this.enemiesUp() > 0 && !(await this.fightOut('resting at the camp'))) return done();
+        this.topUp();
+        continue;
+      }
+      await this.stepOffAndBack();
+    }
+    if (this.rec()?.stage !== 'met_yulka') {
+      this.breaks.push(`stood on ${c.npcName}'s tile in hours and the camp did not wake (stage ${this.stageName()}). feed since:\n${this.feedSince(mark).slice(-6).map((l) => `  | ${l}`).join('\n')}`);
+      return done();
+    }
+    this.note(1, null, 'none', this.dismissWhisperCards(), mark);
+    // 3. The answer — the panel says "take the job"; the typed form the meet line offers.
+    mark = this.feedMark();
+    const acceptCmd = `accept ${c.npcName.toLowerCase()}`;
+    this.tap(`SPEAK TO ${c.npcName.toUpperCase()} → take the job`);
+    await this.type(acceptCmd);
+    if (this.rec()?.stage !== 'fetch_in_progress') {
+      this.breaks.push(`typed "${acceptCmd}" at the meet and the chain did not take it (stage ${this.stageName()}). feed since:\n${this.feedSince(mark).slice(-6).map((l) => `  | ${l}`).join('\n')}`);
+      return done();
+    }
+    this.note(2, acceptCmd, 'typed', this.dismissWhisperCards(), mark);
+    // 4. The mark.
+    mark = this.feedMark();
+    if (!(await this.walkCourse(`to ${c.markNoun}`))) return done();
+    if (this.enemiesUp() === 0 && this.rec()?.stage !== 'fetch_active') await this.stepOffAndBack();
+    if (this.enemiesUp() === 0) {
+      this.breaks.push(`on ${c.markNoun}'s tile and nobody stood up (stage ${this.stageName()}). feed since:\n${this.feedSince(mark).slice(-6).map((l) => `  | ${l}`).join('\n')}`);
+      return done();
+    }
+    if (!(await this.fightOut(`with the ${c.fetchEnemy}`))) return done();
+    const holds = (get().player?.inventory ?? []).some((i) => i.name === c.stolen.name && i.quantity > 0);
+    if (this.rec()?.stage !== 'fetch_returned' || !holds) {
+      this.breaks.push(`put the ${c.fetchEnemy} down and ${holds ? 'the chain did not move' : `the ${c.goodsShort} did not come off the body`} (stage ${this.stageName()}). feed since:\n${this.feedSince(mark).slice(-8).map((l) => `  | ${l}`).join('\n')}`);
+      return done();
+    }
+    this.note(3, null, 'fight', this.dismissWhisperCards(), mark);
+    // 5. The return and the hand-over.
+    mark = this.feedMark();
+    if (!(await this.walkCourse(`back to ${c.npcName}`))) return done();
+    if (this.rec()?.stage !== 'handback') await this.stepOffAndBack();
+    if (this.rec()?.stage !== 'handback') {
+      this.breaks.push(`back on ${c.npcName}'s tile with the ${c.goodsShort} and nothing waited (stage ${this.stageName()}). feed since:\n${this.feedSince(mark).slice(-6).map((l) => `  | ${l}`).join('\n')}`);
+      return done();
+    }
+    const tc0 = get().player!.tc ?? 0;
+    const giveCmd = `give ${c.npcName.toLowerCase()} the ${c.goodsShort.toLowerCase()}`;
+    this.tap(`SPEAK TO ${c.npcName.toUpperCase()} → hand it over`);
+    await this.type(giveCmd);
+    const completed = (get().player?.completedWhisperIds ?? []).includes(this.chain.id);
+    if (!completed || this.rec()) {
+      this.breaks.push(`typed "${giveCmd}" and the chain did not close (stage ${this.stageName()}). feed since:\n${this.feedSince(mark).slice(-6).map((l) => `  | ${l}`).join('\n')}`);
+      return done();
+    }
+    const paid = (get().player!.tc ?? 0) > tc0
+      || (c.reward.item ? (get().player?.inventory ?? []).some((i) => i.name === c.reward.item!.name) : false);
+    if (!paid) this.breaks.push('handed the goods over and nothing was paid');
+    const cards = this.dismissWhisperCards();
+    if (!cards.length) this.breaks.push('the chain closed and no card came up (it has to pop up in your face)');
+    this.note(4, giveCmd, 'typed', cards, mark);
+    return done();
+  }
+}
+
+export async function playWhisperChain(chain: ChainDef): Promise<WalkReport> {
+  resetForMission();
+  const p = get().player!;
+  store.setState({ player: { ...p, activeWhispers: [], completedWhisperIds: [], whisperCourse: null } as never, pendingWhisperComplete: null });
+  const w = new WhisperWalker(chain);
+  w.allowances.add('HP 600 / STR 20 / DEX 20 / standing 100 with every faction');
+  const r = await w.playWhisper();
   if (process.env.PLAYER_WALKER_FEED === '1') r.feed = [...w.feed()];
   return r;
 }

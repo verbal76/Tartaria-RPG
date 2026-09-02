@@ -25461,6 +25461,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // beaten shopkeeper, the same rule the kill path opens with.
     if (!(currentScene.vendorInFight && currentScene.vendorInFight.name === enemy.name)) {
       creditDefeatedTarget(get, set, player, enemy, idx, { makeRoomKey, resolveLeadCompletion });
+      // ⚠ OTA-1625 — and the faction slate is a contract too. Only the kill path
+      // fired this trigger; a subdual paid every other family and skipped this one.
+      if (!enemy.factionNeutralFight) { advanceActiveFactionQuests(get, set, 'kill'); advanceMissionRoute(get, set); }
     }
     // Damage proxy: the more you'd beaten them down, the rougher the kit.
     // Looted durability fraction tracks the enemy's remaining HP %, never
