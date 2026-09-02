@@ -1,0 +1,233 @@
+{
+  "id": "13467ac8c9f04b63b6e9dc2475119779",
+  "groupID": "7705840850",
+  "eventID": "13467ac8c9f04b63b6e9dc2475119779",
+  "projectID": "4511945117532160",
+  "size": 18165,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-02-1618-the-slate-is-the-whole-slate #mtjfp13vhzw3 [inline 6/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-02-1618-the-slate-is-the-whole-slate",
+  "message": "player-log 2026-09-02-1618-the-slate-is-the-whole-slate #mtjfp13vhzw3 [inline 6/28]",
+  "title": "player-log 2026-09-02-1618-the-slate-is-the-whole-slate #mtjfp13vhzw3 [inline 6/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "c4c85a741bd94703ace0c249ba030a22",
+      "span_id": "8a7dc862659550ff",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "716Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-01T20:45:15.740Z] [debug] parser: intent=craft conf=1.00 verb=craft target=field dressing resolved=Field Dressing range=- enemies=0 hooks=2\n[2026-09-01T20:45:15.761Z] [arbiter] \"Crafting Field Dressing would strip Cloth Scrap \u2192 Patched Cloth from your pack \u2014 confirm in the prompt to proceed, or it stays unmade.\"\n",
+      "[2026-09-01T20:45:15.762Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-01T20:45:15.762Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-01T20:45:15.762Z] [reward] \u2726 Crafted Field Dressing \u00d71 of 7 \u2014 the materials ran out (or your pack did).\n[2026-09-01T20:45:15.852Z] [cognitive] neutral  (135ms)\n[2026-09-01T20:45:15.861Z] [cognitive] neutral  (99ms)\n",
+      "[2026-09-01T20:45:15.983Z] [debug] persist sizes(KB): total=263 player=56 wm=119[rooms=57 events=4 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=84 scene=3\n[2026-09-01T20:45:17.746Z] [player] craft Field Dressing\n[2026-09-01T20:45:17.747Z] [debug] parser: intent=craft conf=1.00 verb=craft target=field dressing resolved=Field Dressing range=- enemies=0 hooks=2\n",
+      "[2026-09-01T20:45:17.764Z] [arbiter] The Arbiter nods. \"Stripped for parts: Cloth Scrap \u2192 Patched Cloth.\"\n[2026-09-01T20:45:17.771Z] [reward] \u2726 Crafted Field Dressing. The Arbiter watches you set the last piece.\n[2026-09-01T20:45:17.867Z] [cognitive] neutral  (95ms)\n[2026-09-01T20:45:20.138Z] [player] craft Field Dressing\n",
+      "[2026-09-01T20:45:20.139Z] [debug] parser: intent=craft conf=1.00 verb=craft target=field dressing resolved=Field Dressing range=- enemies=0 hooks=2\n[2026-09-01T20:45:20.157Z] [arbiter] \"Crafting Field Dressing would strip Cloth Scrap \u2192 Patched Cloth from your pack \u2014 confirm in the prompt to proceed, or it stays unmade.\"\n",
+      "[2026-09-01T20:45:20.157Z] [debug] dedup: suppressed arbiter repeat \u2014 \"\"Crafting Field Dressing would strip Cloth Scrap \u2192 Patched C\u2026\"\n[2026-09-01T20:45:20.187Z] [cognitive] neutral  (28ms)\n[2026-09-01T20:45:21.365Z] [player] craft Field Dressing\n[2026-09-01T20:45:21.365Z] [debug] parser: intent=craft conf=1.00 verb=craft target=field dressing resolved=Field Dressing range=- enemies=0 hooks=2\n",
+      "[2026-09-01T20:45:21.381Z] [arbiter] The Arbiter nods. \"Stripped for parts: Cloth Scrap \u2192 Patched Cloth.\"\n[2026-09-01T20:45:21.381Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Stripped for parts: Cloth Scrap \u2192 Patched\u2026\"\n[2026-09-01T20:45:21.389Z] [reward] \u2726 Crafted Field Dressing. The Arbiter watches you set the last piece.\n",
+      "[2026-09-01T20:45:21.483Z] [cognitive] neutral  (93ms)\n[2026-09-01T20:45:24.984Z] [debug] parser: intent=craft conf=1.00 verb=craft target=first aid kit resolved=- range=- enemies=0 hooks=2\n[2026-09-01T20:45:24.998Z] [arbiter] \"Crafting First Aid Kit would strip Cloth Scrap \u2192 Patched Cloth from your pack \u2014 confirm in the prompt to proceed, or it stays unmade.\"\n",
+      "[2026-09-01T20:45:24.998Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-01T20:45:24.999Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-01T20:45:25.030Z] [cognitive] neutral  (30ms)\n[2026-09-01T20:45:26.209Z] [world] A shard of mud-glass nicks you. Small wound, steady reminder. (\u22121 HP)\n[2026-09-01T20:45:26.263Z] [player] craft First Aid Kit\n",
+      "[2026-09-01T20:45:26.263Z] [debug] parser: intent=craft conf=1.00 verb=craft target=first aid kit resolved=- range=- enemies=0 hooks=2\n[2026-09-01T20:45:26.278Z] [arbiter] The Arbiter nods. \"Stripped for parts: Cloth Scrap \u2192 Patched Cloth.\"\n[2026-09-01T20:45:26.278Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Stripped for parts: Cloth Scrap \u2192 Patched\u2026\"\n",
+      "[2026-09-01T20:45:26.285Z] [reward] \u2726 Crafted First Aid Kit. The Arbiter watches you set the last piece.\n[2026-09-01T20:45:26.380Z] [cognitive] neutral  (95ms)\n[2026-09-01T20:45:30.372Z] [debug] parser: intent=craft conf=1.00 verb=craft target=trauma kit resolved=- range=- enemies=0 hooks=2\n",
+      "[2026-09-01T20:45:30.390Z] [arbiter] \"Crafting Trauma Kit would strip Cloth Scrap \u2192 Patched Cloth from your pack \u2014 confirm in the prompt to proceed, or it stays unmade.\"\n[2026-09-01T20:45:30.430Z] [cognitive] neutral  (38ms)\n[2026-09-01T20:45:33.993Z] [player] craft Trauma Kit\n",
+      "[2026-09-01T20:45:33.994Z] [debug] parser: intent=craft conf=1.00 verb=craft target=trauma kit resolved=- range=- enemies=0 hooks=2\n[2026-09-01T20:45:34.010Z] [arbiter] The Arbiter nods. \"Stripped for parts: Cloth Scrap \u2192 Patched Cloth.\"\n[2026-09-01T20:45:34.010Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Stripped for parts: Cloth Scrap \u2192 Patched\u2026\"\n",
+      "[2026-09-01T20:45:34.018Z] [reward] \u2726 Crafted Trauma Kit. The Arbiter watches you set the last piece.\n[2026-09-01T20:45:34.019Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-01T20:45:34.019Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-01T20:45:34.118Z] [cognitive] neutral  (98ms)\n",
+      "[2026-09-01T20:45:37.528Z] [debug] parser: intent=craft conf=1.00 verb=craft target=trauma kit resolved=Trauma Kit range=- enemies=0 hooks=2\n[2026-09-01T20:45:37.544Z] [arbiter] \"Crafting Trauma Kit would strip Cloth Scrap \u2192 Patched Cloth from your pack \u2014 confirm in the prompt to proceed, or it stays unmade.\"\n",
+      "[2026-09-01T20:45:37.544Z] [debug] dedup: suppressed arbiter repeat \u2014 \"\"Crafting Trauma Kit would strip Cloth Scrap \u2192 Patched Cloth\u2026\"\n[2026-09-01T20:45:37.574Z] [cognitive] neutral  (29ms)\n[2026-09-01T20:45:37.685Z] [debug] persist sizes(KB): total=263 player=56 wm=119[rooms=57 events=4 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=84 scene=3\n",
+      "[2026-09-01T20:45:38.526Z] [player] craft Trauma Kit\n[2026-09-01T20:45:38.527Z] [debug] parser: intent=craft conf=1.00 verb=craft target=trauma kit resolved=Trauma Kit range=- enemies=0 hooks=2\n[2026-09-01T20:45:38.546Z] [arbiter] The Arbiter nods. \"Stripped for parts: Cloth Scrap \u2192 Patched Cloth.\"\n",
+      "[2026-09-01T20:45:38.546Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Stripped for parts: Cloth Scrap \u2192 Patched\u2026\"\n[2026-09-01T20:45:38.554Z] [reward] \u2726 Crafted Trauma Kit. The Arbiter watches you set the last piece.\n[2026-09-01T20:45:38.555Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-09-01T20:45:38.555Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-01T20:45:38.658Z] [cognitive] neutral  (102ms)\n[2026-09-01T20:45:41.326Z] [debug] parser: intent=craft conf=1.00 verb=craft target=first aid kit resolved=First Aid Kit range=- enemies=0 hooks=2\n",
+      "[2026-09-01T20:45:41.347Z] [arbiter] \"Crafting First Aid Kit would strip Cloth Scrap \u2192 Patched Cloth from your pack \u2014 confirm in the prompt to proceed, or it stays unmade.\"\n[2026-09-01T20:45:41.347Z] [debug] dedup: suppressed arbiter repeat \u2014 \"\"Crafting First Aid Kit would strip Cloth Scrap \u2192 Patched Cl\u2026\"\n[2026-09-01T20:45:41.347Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-09-01T20:45:41.347Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-01T20:45:41.381Z] [cognitive] neutral  (33ms)\n[2026-09-01T20:45:43.479Z] [player] craft First Aid Kit\n[2026-09-01T20:45:43.480Z] [debug] parser: intent=craft conf=1.00 verb=craft target=first aid kit resolved=First Aid Kit range=- enemies=0 hooks=2\n",
+      "[2026-09-01T20:45:43.496Z] [arbiter] The Arbiter nods. \"Stripped for parts: Cloth Scrap \u2192 Patched Cloth.\"\n[2026-09-01T20:45:43.497Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Stripped for parts: Cloth Scrap \u2192 Patched\u2026\"\n[2026-09-01T20:45:43.503Z] [reward] \u2726 Crafted First Aid Kit. The Arbiter watches you set the last piece.\n",
+      "[2026-09-01T20:45:43.503Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-01T20:45:43.503Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-01T20:45:43.599Z] [cognitive] neutral  (94ms)\n[2026-09-01T20:45:46.194Z] [debug] parser: intent=craft conf=1.00 verb=craft target=field dressing resolved=Field Dressing range=- enemies=0 hooks=2\n",
+      "[2026-09-01T20:45:46.213Z] [arbiter] \"Crafting Field Dressing would strip Cloth Scrap \u2192 Patched Cloth from your pack \u2014 confirm in the prompt to proceed, or it stays unmade.\"\n[2026-09-01T20:45:46.213Z] [debug] dedup: suppressed arbiter repeat \u2014 \"\"Crafting Field Dressing would strip Cloth Scrap \u2192 Patched C\u2026\"\n[2026-09-01T20:45:46.213Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-09-01T20:45:46.213Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-01T20:45:46.243Z] [cognitive] neutral  (28ms)\n[2026-09-01T20:45:47.624Z] [world] A shard of mud-glass nicks you. Small wound, steady reminder. (\u22121 HP)\n[2026-09-01T20:45:47.658Z] [player] craft Field Dressing\n",
+      "[2026-09-01T20:45:47.659Z] [debug] parser: intent=craft conf=1.00 verb=craft target=field dressing resolved=Field Dressing range=- enemies=0 hooks=2\n[2026-09-01T20:45:47.677Z] [arbiter] The Arbiter nods. \"Stripped for parts: Cloth Scrap \u2192 Patched Cloth.\"\n[2026-09-01T20:45:47.677Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Stripped for parts: Cloth Scrap \u2192 Patched\u2026\"\n",
+      "[2026-09-01T20:45:47.686Z] [reward] \u2726 Crafted Field Dressing. The Arbiter watches you set the last piece.\n[2026-09-01T20:45:47.687Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-01T20:45:47.687Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-01T20:45:47.805Z] [cognitive] neutral  (116ms)\n[2026-09-01T20:45:50.125Z] [player] craft Trauma Kit\n",
+      "[2026-09-01T20:45:50.125Z] [debug] parser: intent=craft conf=1.00 verb=craft target=trauma kit resolved=Trauma Kit range=- enemies=0 hooks=2\n[2026-09-01T20:45:50.142Z] [arbiter] \"Crafting Trauma Kit would strip Cloth Scrap \u2192 Patched Cloth from your pack \u2014 confirm in the prompt to proceed, or it stays unmade.\"\n",
+      "[2026-09-01T20:45:50.143Z] [debug] dedup: suppressed arbiter repeat \u2014 \"\"Crafting Trauma Kit would strip Cloth Scrap \u2192 Patched Cloth\u2026\"\n[2026-09-01T20:45:50.143Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-01T20:45:50.143Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-01T20:45:50.177Z] [cognitive] neutral  (33ms)\n",
+      "[2026-09-01T20:45:51.735Z] [player] craft Trauma Kit\n[2026-09-01T20:45:51.740Z] [debug] parser: intent=craft conf=1.00 verb=craft target=trauma kit resolved=Trauma Kit range=- enemies=0 hooks=2\n[2026-09-01T20:45:51.768Z] [arbiter] The Arbiter nods. \"Stripped for parts: Cloth Scrap \u2192 Patched Cloth.\"\n",
+      "[2026-09-01T20:45:51.768Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Stripped for parts: Cloth Scrap \u2192 Patched\u2026\"\n[2026-09-01T20:45:51.779Z] [reward] \u2726 Crafted Trauma Kit. The Arbiter watches you set the last piece.\n[2026-09-01T20:45:51.780Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-09-01T20:45:51.780Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-01T20:45:51.892Z] [cognitive] neutral  (110ms)\n[2026-09-01T20:46:01.697Z] [player] summon crystal golem\n[2026-09-01T20:46:01.697Z] [debug] parser: intent=cast conf=1.00 verb=summon target=crystal golem resolved=Golem Leather Gloves range=- enemies=0 hooks=2\n",
+      "[2026-09-01T20:46:01.751Z] [reward] Aether Golem Constructor \u2014 d20 18 + INT 10 = 28 vs DC 22 \u2014 \u2713 SUMMONED\n[2026-09-01T20:46:01.752Z] [world] (2\u00d7 Aether Crystal + 1\u00d7 Aetheric Cloth + 1\u00d7 Aetheric Shard consumed.)\n",
+      "[2026-09-01T20:46:01.752Z] [world] Aetherstone lifts out of the ground and folds into a shape that walks. Crystal Golem stands ready beside you. Your mastery shapes it stronger than most. (HP 68/68, 1d20 piercing)\n[2026-09-01T20:46:01.752Z] [arbiter] The Arbiter studies the standing shape. \"You gave it life. You might as well give it a name.\"\n",
+      "[2026-09-01T20:46:01.753Z] [system] \u23f3 Time passed: 30 min\n[2026-09-01T20:46:01.948Z] [cognitive] USE_ITEM  (194ms)\n[2026-09-01T20:46:08.359Z] [world] Rampart. The name takes hold in the Aetherstone.\n[2026-09-01T20:46:08.361Z] [arbiter] The Arbiter nods. \"Rampart, then.\"\n",
+      "[2026-09-01T20:46:08.788Z] [debug] persist sizes(KB): total=262 player=56 wm=119[rooms=57 events=4 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=84 scene=3\n[2026-09-01T20:46:26.096Z] [player] fuse\n[2026-09-01T20:46:31.293Z] [debug] ui: tap \"craft\"\n[2026-09-01T20:46:52.212Z] [player] craft Crude Golem Greatsword\n",
+      "[2026-09-01T20:46:52.212Z] [debug] parser: intent=craft conf=1.00 verb=craft target=crude golem greatsword resolved=- range=- enemies=0 hooks=2\n[2026-09-01T20:46:52.214Z] [reward] \u2726 Crafted Crude Golem Greatsword. The Arbiter watches you set the last piece.\n[2026-09-01T20:46:52.214Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-09-01T20:46:52.214Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-01T20:46:52.314Z] [cognitive] neutral  (98ms)\n[2026-09-01T20:46:54.490Z] [player] craft Crude Golem Pike\n[2026-09-01T20:46:54.491Z] [debug] parser: intent=craft conf=1.00 verb=craft target=crude golem pike resolved=- range=- enemies=0 hooks=2\n",
+      "[2026-09-01T20:46:54.493Z] [reward] \u2726 Crafted Crude Golem Pike. The Arbiter watches you set the last piece.\n[2026-09-01T20:46:54.609Z] [cognitive] neutral  (109ms)\n[2026-09-01T20:46:56.647Z] [player] craft Crude Golem Sledge\n[2026-09-01T20:46:56.648Z] [debug] parser: intent=craft conf=1.00 verb=craft target=crude golem sledge resolved=- range=- enemies=0 hooks=2\n",
+      "[2026-09-01T20:46:56.650Z] [reward] \u2726 Crafted Crude Golem Sledge. The Arbiter watches you set the last piece.\n[2026-09-01T20:46:56.760Z] [cognitive] neutral  (108ms)\n[2026-09-01T20:47:07.805Z] [debug] ui: tap \"inventory\"\n[2026-09-01T20:47:21.333Z] [player] arm golem with Crude Golem Sledge\n[2026-09-01T20:47:21.333Z] [player] arm golem with Crude Golem Sledge\n",
+      "[2026-09-01T20:47:21.334Z] [world] Rampart takes up the Crude Golem Sledge. It settles into the construct's grip like it was cast for it.\n[2026-09-01T20:47:23.113Z] [debug] persist sizes(KB): total=263 player=57 wm=119[rooms=57 events=4 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=84 scene=3\n",
+      "[2026-09-01T20:47:28.254Z] [world] A shard of mud-glass nicks you. Small wound, steady reminder. (\u22121 HP)\n[2026-09-01T20:47:28.310Z] [player] arm golem with Crude Golem Greatsword\n[2026-09-01T20:47:28.311Z] [player] arm golem with Crude Golem Greatsword\n[2026-09-01T20:47:28.311Z] [world] Rampart takes up the Crude Golem Greatsword. It settles into the construct's grip like it was cast for it.\n",
+      "[2026-09-01T20:47:33.086Z] [player] arm golem with Crude Golem Sledge\n[2026-09-01T20:47:33.086Z] [player] arm golem with Crude Golem Sledge\n[2026-09-01T20:47:33.087Z] [world] Rampart takes up the Crude Golem Sledge. It settles into the construct's grip like it was cast for it.\n[2026-09-01T20:47:44.489Z] [debug] ui: tap \"\u2192 THE BURIED CITIES\"\n",
+      "[2026-09-01T20:47:44.519Z] [debug] spawn: gear=[Mud-Bound Cloak] window=10 roster=new\n[2026-09-01T20:47:44.521Z] [world] You walk east through open silt. The compass tells you The Buried Cities lies further east \u2014 5 tiles, about 13 hours of travel.\n[2026-09-01T20:47:44.522Z] [world] A young Reclaimer kneels at the edge of the road, hands cupped around something"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-02-1618-the-slate-is-the-whole-slate #mtjfp13vhzw3 [inline 6/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtjfp13vhzw3"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-02-1618-the-slate-is-the-whole-slate"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "6"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-02-1618-the-slate-is-the-whole-slate"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-02T01:45:17.044925Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-02T01:45:17.299000Z",
+  "fingerprints": [
+    "0c290479c292bd9bc58184463257d603"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1949526399,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-02T01:16:35.756000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-02-1618-the-slate-is-the-whole-slate",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-02-1618-the-slate-is-the-whole-slate",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-02-1618-the-slate-is-the-whole-slate",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-02-1618-the-slate-is-the-whole-slate)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "3193e07bb3a5481ebabb05f37be9441d",
+  "previousEventID": "0923a6308a084649bd7b84c1df427175"
+}

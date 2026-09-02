@@ -1,0 +1,281 @@
+{
+  "id": "e6ac0a98504041178db22a16f5e0454c",
+  "groupID": "7705840850",
+  "eventID": "e6ac0a98504041178db22a16f5e0454c",
+  "projectID": "4511945117532160",
+  "size": 17558,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-02-1618-the-slate-is-the-whole-slate #mtjdbf20sc0c [inline 15/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-02-1618-the-slate-is-the-whole-slate",
+  "message": "player-log 2026-09-02-1618-the-slate-is-the-whole-slate #mtjdbf20sc0c [inline 15/28]",
+  "title": "player-log 2026-09-02-1618-the-slate-is-the-whole-slate #mtjdbf20sc0c [inline 15/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "c4c85a741bd94703ace0c249ba030a22",
+      "span_id": "8a7dc862659550ff",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "Runner blisters \u2014 clinging fire sears 1. (25/26 HP, 2 turns left)\n[2026-09-01T20:30:35.955Z] [combat] Chart Runner smokes \u2014 acid eats 2. (23/26 HP, 2 turns left)\n[2026-09-01T20:30:35.957Z] [combat] Chart Runner \u2014 d20 \u2192 14 + ATK 9 = 23 vs your AC 23 \u2014 \u2713 HIT\n[2026-09-01T20:30:36.236Z] [combat] Chart Runner deals 2 slashing damage [armor \u221234%]. You have 24 HP remaining.\n",
+      "[2026-09-01T20:30:36.475Z] [cognitive] neutral  (515ms)\n[2026-09-01T20:30:36.702Z] [debug] ui: tap \"dodge\"\n[2026-09-01T20:30:36.707Z] [player] dodge\n[2026-09-01T20:30:36.708Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=2\n",
+      "[2026-09-01T20:30:36.708Z] [world] You commit to the dodge. Slip Chart Runner's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-01T20:30:36.708Z] [combat] Chart Runner blisters \u2014 clinging fire sears 1. (22/26 HP, 1 turn left)\n[2026-09-01T20:30:36.708Z] [combat] Chart Runner smokes \u2014 acid eats 2. (20/26 HP, 1 turn left)\n",
+      "[2026-09-01T20:30:36.755Z] [combat] Chart Runner \u2014 d20 \u2192 7 + ATK 7 = 14 vs your AC 23 \u2014 \u2717 EVADED\n[2026-09-01T20:30:36.755Z] [combat] Dodge \u2014 d20 \u2192 2 + DEX 25 = 27 vs ATK 14. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-01T20:30:36.757Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T20:30:37.232Z] [cognitive] neutral  (475ms)\n",
+      "[2026-09-01T20:30:42.132Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n[2026-09-01T20:30:42.142Z] [world] Black rain runs down your collar. Something in you tightens that should not have.\n[2026-09-01T20:30:42.183Z] [player] attack with the auralite talon\n",
+      "[2026-09-01T20:30:42.185Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=1 hooks=2\n[2026-09-01T20:30:42.186Z] [combat] Chart Runner blisters \u2014 clinging fire sears 1. (19/26 HP, 0 turns left)\n[2026-09-01T20:30:42.186Z] [combat] Chart Runner shakes off the last of the fire \u2014 the Bone Crossbow has run its course.\n",
+      "[2026-09-01T20:30:42.186Z] [combat] Chart Runner smokes \u2014 acid eats 2. (17/26 HP, 0 turns left)\n[2026-09-01T20:30:42.187Z] [combat] Chart Runner shakes off the last of the acid \u2014 the Bone Crossbow has run its course.\n[2026-09-01T20:30:42.188Z] [debug] attack: target=Chart Runner range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n",
+      "[2026-09-01T20:30:42.191Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-01T20:30:42.244Z] [world] You bring the acid-etched corrupted auralite talon to bear on Chart Runner.\n[2026-09-01T20:30:42.244Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T20:30:42.487Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (242ms)\n",
+      "[2026-09-01T20:31:11.994Z] [world] Chart Runner moves first. The pressure is immediate.\n[2026-09-01T20:31:11.996Z] [combat] Chart Runner \u2014 d20 \u2192 4 + ATK 7 = 11 vs your AC 23 \u2014 \u2717 MISS\n[2026-09-01T20:31:11.996Z] [combat] You \u2014 d20 \u2192 14 + INT 11 perfect opening (2\u00d7 dice) = 25 vs Chart Runner AC 11 \u2014 \u2713 HIT\n[2026-09-01T20:31:11.997Z] [combat] Aetheric flares \u2014 +3 on hit.\n",
+      "[2026-09-01T20:31:11.998Z] [combat] Chart Runner folds under the acid-etched corrupted auralite talon. 17 damage was enough. The room exhales.\n[2026-09-01T20:31:11.998Z] [world] The Chart Runner falls and the folio comes free of him. Inside, the north fords in a steady hand, two years of miles, dry and whole. Garrin's memory, on paper.\n[2026-09-01T20:31:11.998Z] [reward] \u2726 Stolen Chart Folio (1).\n",
+      "[2026-09-01T20:31:11.998Z] [world] Folio in hand. The thread pulls you back the way you came \u2014 Garrin's owed.\n[2026-09-01T20:31:12.000Z] [reward] Chart Runner defeated. You recover Patched Cloth \u00d73.\n[2026-09-01T20:31:12.001Z] [reward] You strip the body: Bone Knife, Mud-Bound Cloak (+6 TC). The kit took the fight badly.\n[2026-09-01T20:31:12.002Z] [reward] +6 TC pried from the dust.\n",
+      "[2026-09-01T20:31:12.468Z] [debug] persist sizes(KB): total=259 player=62 wm=110[rooms=49 events=4 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=84 scene=3\n[2026-09-01T20:31:23.939Z] [world] You set out toward Garrin (return the folio). Tap the travel row to press on; STOP to halt.\n",
+      "[2026-09-01T20:31:23.961Z] [world] A silent muster stands off the path here \u2014 weathered and quiet, a way in still clear. (You\u2019re on a route \u2014 type ENTER to step inside, or keep traveling.)\n[2026-09-01T20:31:23.962Z] [world] You walk south through open silt. The compass points south into open ground.\n[2026-09-01T20:31:23.962Z] [world] What you started here has not finished itself in your absence.\n",
+      "[2026-09-01T20:31:26.085Z] [debug] ui: tap \"\u2192 GARRIN (RETURN THE FOLIO)\"\n[2026-09-01T20:31:26.101Z] [world] You walk south through open silt. The compass points south into open ground.\n[2026-09-01T20:31:26.101Z] [world] The loose end is exactly as loose as you left it.\n[2026-09-01T20:31:28.420Z] [debug] ui: tap \"\u2192 GARRIN (RETURN THE FOLIO)\"\n",
+      "[2026-09-01T20:31:28.432Z] [world] Garrin unties the folio with shaking hands and turns every leaf. \"All of it.\" He pushes a brass compass across the board. \"Drew every chart in that folio by this needle. It pulls truer than I do now. Take it, and this.\" Coin follows.\n[2026-09-01T20:31:28.433Z] [reward] \u2726 Tartarian Navigator's Compass \u00d7 1.\n[2026-09-01T20:31:28.433Z] [reward] +20 TC.\n",
+      "[2026-09-01T20:31:28.434Z] [world] Whatever you turned over here is still turned over.\n[2026-09-01T20:31:40.580Z] [debug] send-log: #mtj4hpttgrw4 \u2014 DELIVERED (inline, no attachments): beacon out, 28/28 parts accepted (406635 chars) \u2014 flush said yes\n[2026-09-01T20:31:40.582Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mtj4hpttgrw4 kept on disk, boots retry up to 5 sends total\n",
+      "[2026-09-01T20:36:31.996Z] [debug] ui: tap \"take / salvage\"\n[2026-09-01T20:36:33.376Z] [world] You take the Sparkstrike from where it lay.\n[2026-09-01T20:36:33.376Z] [reward] \u2726 Sparkstrike (Common).\n[2026-09-01T20:36:34.237Z] [world] You salvage the cart. The take is small but real.\n[2026-09-01T20:36:34.238Z] [world] You strip the marker carefully. Something usable comes free in your hand.\n",
+      "[2026-09-01T20:36:34.239Z] [world] You salvage the signpost. The take is small but real.\n[2026-09-01T20:36:34.239Z] [world] You strip the standing water down. Mostly debris \u2014 but a Cloth Scrap comes loose at the bottom of the pile.\n[2026-09-01T20:36:34.241Z] [reward] \u2726 Salvage haul:\n[2026-09-01T20:36:34.242Z] [reward]     \u2022 Scrap Metal x3 (Common)\n",
+      "[2026-09-01T20:36:34.242Z] [reward]     \u2022 Worn Tartarian Coin x3 (Common)\n[2026-09-01T20:36:34.242Z] [reward]     \u2022 Cloth Scrap (Common)\n[2026-09-01T20:36:35.426Z] [debug] ui: tap \"investigate\"\n[2026-09-01T20:36:37.077Z] [player] investigate the mud\n[2026-09-01T20:36:37.078Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=mud range=- enemies=0 hooks=2\n",
+      "[2026-09-01T20:36:37.079Z] [world] You inspect the mud. Whatever was here once, this is what remains.\n[2026-09-01T20:36:37.080Z] [world] A strip of dried meat falls free of the mud. Smoke-cured, still good.\n[2026-09-01T20:36:37.080Z] [reward] \u2726 Smoke-Cured Jerky Strip (Common).\n[2026-09-01T20:36:37.081Z] [world] Mud Scanner reads flat. Nothing in the mud.\n",
+      "[2026-09-01T20:36:37.082Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-01T20:36:37.082Z] [arbiter] The Arbiter looks around. \"The tally-board lists marked ruins in grease-pencil: DUG, DIGGING, DEEP, LATER. 'Later' is doing heavy work.\"\n[2026-09-01T20:36:37.082Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter looks around. \"The tally-board lists marked ruin\u2026\"\n",
+      "[2026-09-01T20:36:37.082Z] [debug] arbiter: ambient held (he just spoke)\n[2026-09-01T20:36:37.269Z] [cognitive] SWIM  (186ms)\n[2026-09-01T20:36:38.143Z] [debug] ui: tap \"missions\"\n[2026-09-01T20:36:38.269Z] [debug] persist sizes(KB): total=263 player=61 wm=116[rooms=55 events=4 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=84 scene=3\n[2026-09-01T20:36:38.323Z] [player] investigate mud\n",
+      "[2026-09-01T20:36:38.323Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=mud range=- enemies=0 hooks=2\n[2026-09-01T20:36:38.324Z] [world] You've already worked the mud over here. Nothing more to find.\n[2026-09-01T20:36:38.359Z] [cognitive] SWIM  (33ms)\n[2026-09-01T20:37:16.009Z] [world] Re-activated Temporal Distortion Watch. It's back in play.\n",
+      "[2026-09-01T20:37:18.867Z] [world] You set course for Reclaimer's Stake. 2 tiles \u2014 about 5 hours of travel, all in. You set off now \u2014 the ground ahead is new ground. Keep tapping \u2192 RECLAIMER'S STAKE on the travel row to close the distance; STOP TRAVEL to halt.\n",
+      "[2026-09-01T20:37:18.878Z] [world] You walk east through open silt. The compass tells you The Architect's Blind lies further east \u2014 2 tiles, about 5 hours of travel.\n[2026-09-01T20:37:18.881Z] [world] The wind shifts a crust of mud aside ahead of you. Underneath, a small object.\n[2026-09-01T20:37:18.881Z] [reward] \u2726 Aether Dust (Common).\n",
+      "[2026-09-01T20:37:18.882Z] [world] It sits where it sat. Patient is the wrong word \u2014 it simply does not move.\n[2026-09-01T20:38:07.792Z] [world] The Speaker spreads the contract and lends you a Guild eddy-gauge. \"Watch \u2014 Tartarian make, hexagonal face, three dials. Counts the way local Aetheric time bends. They turn up on the dead: anyone caught in an eddy got theirs fossilised with them. Read the",
+      " Buried Cities with the gauge and find a body worth unstrapping.\"\n[2026-09-01T20:38:07.792Z] [reward] \u2726 Guild Eddy-Gauge \u2014 mission item.\n[2026-09-01T20:38:07.793Z] [system] \u25b8 Next: The Buried Cities \u00b7 bring Guild Eddy-Gauge.\n",
+      "[2026-09-01T20:38:07.795Z] [world] You set course for The Buried Cities. 10 tiles \u2014 about 1 day, 1 hour of travel, all in. You set off now \u2014 the ground ahead is new ground. Keep tapping \u2192 THE BURIED CITIES on the travel row to close the distance; STOP TRAVEL to halt.\n[2026-09-01T20:38:07.799Z] [debug] spawn: gear=[Arcane Sprinter's Boots, Aetheric Helm of Command] window=10 roster=new\n",
+      "[2026-09-01T20:38:07.800Z] [world] You walk east through open silt. The compass tells you The Architect's Blind lies further east \u2014 1 tile, about 3 hours of travel.\n[2026-09-01T20:38:07.800Z] [world] Your eye goes back to it before you decide to look.\n[2026-09-01T20:38:07.800Z] [world] Auto-routing to the next stage of Temporal Distortion Watch: The Buried Cities.\n",
+      "[2026-09-01T20:38:10.272Z] [debug] ui: tap \"\u2192 THE BURIED CITIES\"\n[2026-09-01T20:38:10.301Z] [debug] spawn: gear=[Plasma Dagger, Crude Golem Greatsword, Architect's Mask of Vision] window=10 roster=new\n[2026-09-01T20:38:10.303Z] [world] You walk east through open silt. The compass tells you The Buried Cities lies further east \u2014 8 tiles, about 20 hours of travel.\n",
+      "[2026-09-01T20:38:10.304Z] [world] You had a question here. You still have it.\n[2026-09-01T20:38:11.355Z] [debug] ui: tap \"take / salvage\"\n[2026-09-01T20:38:12.458Z] [world] You pick up the Crude Golem Greatsword.\n[2026-09-01T20:38:12.459Z] [reward] \u2726 Crude Golem Greatsword (Common).\n[2026-09-01T20:38:12.473Z] [world] You lift the Plasma Dagger clear.\n",
+      "[2026-09-01T20:38:12.473Z] [reward] \u2726 Plasma Dagger (Common).\n[2026-09-01T20:38:12.475Z] [world] You get a hand under the Architect's Mask of Vision and take it.\n[2026-09-01T20:38:12.475Z] [reward] \u2726 Architect's Mask of Vision (Common).\n[2026-09-01T20:38:13.506Z] [world] You work the banner over. A part of it comes loose, intact.\n",
+      "[Filtered]",
+      "[2026-09-01T20:38:13.507Z] [reward] \u2726 Salvage haul:\n[2026-09-01T20:38:13.507Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-09-01T20:38:13.508Z] [reward]     \u2022 Worn Tartarian Coin x3 (Common)\n[2026-09-01T20:38:13.508Z] [reward]     \u2022 Salvager's Tether Loop (Uncommon)\n[2026-09-01T20:38:14.688Z] [debug] ui: tap \"investigate\"\n[2026-09-01T20:38:16.117Z] [player] investigate the mud\n",
+      "[2026-09-01T20:38:16.118Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=mud range=- enemies=0 hooks=2\n[2026-09-01T20:38:16.118Z] [arbiter] The Arbiter taps the slate. \"Not here. Temporal Distortion Watch points elsewhere \u2014 set a course from Contracts and do it there.\"\n",
+      "[Filtered]",
+      "[2026-09-01T20:38:16.121Z] [reward] \u2726 Aether Dust (Common).\n[2026-09-01T20:38:16.122Z] [world] Mud Scanner ticks \u2014 buried trace in the mud.\n[2026-09-01T20:38:16.123Z] [reward] \u2726 Mud Essence (Uncommon).\n[2026-09-01T20:38:16.123Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-09-01T20:38:16.123Z] [arbiter] The Arbiter looks around. \"The winch rig groans all day. What comes up on the hook decides the evening's mood.\"\n[2026-09-01T20:38:16.290Z] [cognitive] SWIM  (165ms)\n[2026-09-01T20:38:16.477Z] [debug] persist sizes(KB): total=267 player=62 wm=117[rooms=56 events=4 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=85 scene=3\n",
+      "[2026-09-01T20:38:19.480Z] [debug] ui: tap \"climb\"\n[2026-09-01T20:38:20.979Z] [player] climb ladder\n[2026-09-01T20:38:20.979Z] [debug] parser: intent=climb conf=1.00 verb=climb target=ladder resolved=ladder range=- enemies=0 hooks=2\n[2026-09-01T20:38:21.032Z] [world] You loop your Reclaimer's Rope around the ladder and walk the line. Tier 1/2 cleared.\n",
+      "[2026-09-01T20:38:21.032Z] [world] You reach the first hold of the ladder (tier 1/2). Higher still to go.\n[2026-09-01T20:38:21.033Z] [system] \u23f3 Time passed: 30 min\n[2026-09-01T20:38:21.036Z] [world] A Conspiracy Architects patrol crosses your path in the open \u2014 and turns toward you.\n",
+      "[2026-09-01T20:38:21.036Z] [arbiter] \"Conspiracy Architects riders,\" the Arbiter says. \"They've marked you. No outrunning this one.\"\n[2026-09-01T20:38:21.352Z] [cognitive] CLIMB  (318ms)\n[2026-09-01T20:38:25.417Z] [debug] ui: tap \"approach\"\n[2026-09-01T20:38:25.494Z] [player] approach Conspiracy Architects Patrol 1\n",
+      "[2026-09-01T20:38:25.494Z] [debug] parser: intent=advance conf=1.00 verb=approach target=conspiracy architects patrol 1 resolved=Conspiracy Architects Patrol 1 range=close enemies=4 hooks=2\n[2026-09-01T20:38:25.498Z] [debug] move: advance from range=close enemies=4 weather=Glass Hail cost=1 partial=0\n",
+      "[2026-09-01T20:38:25.499Z] [debug] move: field advance target=Conspiracy Architects Patrol 1 d 0.46->0.35 band close->close\n[2026-09-01T20:38:25.499Z] [world] You close the gap with the Conspiracy Architects Patrol 1 and 3 others. (range: close / arm's reach)\n[2026-09-01T20:3"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-02-1618-the-slate-is-the-whole-slate #mtjdbf20sc0c [inline 15/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtjdbf20sc0c"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-02-1618-the-slate-is-the-whole-slate"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "15"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-02-1618-the-slate-is-the-whole-slate"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-02T01:16:35.965236Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "32": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 361,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        },
+        "35": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 400,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-02T01:16:35.755000Z",
+  "fingerprints": [
+    "0c290479c292bd9bc58184463257d603"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1949526399,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-02T01:16:35.756000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-02-1618-the-slate-is-the-whole-slate",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-02-1618-the-slate-is-the-whole-slate",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-02-1618-the-slate-is-the-whole-slate",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-02-1618-the-slate-is-the-whole-slate)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "fb41d8cb77d74450ab8882c9ab904778",
+  "previousEventID": "e4c083561c3046d5bde36c58fd0b8212"
+}

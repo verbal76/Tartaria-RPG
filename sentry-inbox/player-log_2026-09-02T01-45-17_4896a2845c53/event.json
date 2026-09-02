@@ -1,0 +1,235 @@
+{
+  "id": "4896a2845c53450baf37748d5e15dd6a",
+  "groupID": "7705840850",
+  "eventID": "4896a2845c53450baf37748d5e15dd6a",
+  "projectID": "4511945117532160",
+  "size": 18093,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-02-1618-the-slate-is-the-whole-slate #mtjfp13vhzw3 [inline 4/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-02-1618-the-slate-is-the-whole-slate",
+  "message": "player-log 2026-09-02-1618-the-slate-is-the-whole-slate #mtjfp13vhzw3 [inline 4/28]",
+  "title": "player-log 2026-09-02-1618-the-slate-is-the-whole-slate #mtjfp13vhzw3 [inline 4/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "c4c85a741bd94703ace0c249ba030a22",
+      "span_id": "8a7dc862659550ff",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "Z] [reward] +14 TC pried from the dust.\n[2026-09-01T20:38:58.428Z] [debug] attack: target=Conspiracy Architects Patrol 2 range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-09-01T20:38:58.429Z] [debug] attack: visibility penalty \u22121 (Glass Hail)\n",
+      "[2026-09-01T20:38:58.479Z] [world] You commit forward with the searing acid-etched bone crossbow. Conspiracy Architects Patrol 2 watches your hands.\n[2026-09-01T20:38:58.480Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T20:38:58.970Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (264ms)\n",
+      "[2026-09-01T20:38:59.590Z] [debug] persist sizes(KB): total=270 player=62 wm=118[rooms=56 events=4 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=85 scene=5\n[2026-09-01T20:39:10.529Z] [world] You seize the initiative. Conspiracy Architects Patrol 2 has no time to react.\n",
+      "[2026-09-01T20:39:10.529Z] [combat] You \u2014 d20 \u2192 6 + DEX 24 \u2212 1 (Glass Hail) = 29 vs Conspiracy Architects Patrol 2 AC 11 \u2014 \u2713 HIT\n[2026-09-01T20:39:10.530Z] [combat] Piercing flares \u2014 +2 on hit.\n[2026-09-01T20:39:10.531Z] [combat] You crack the Conspiracy Architects Patrol 2 with the Searing Acid-Etched Bone Crossbow for 11 \u2014 the better part of their fight, gone in one blow. They crumple, out cold.",
+      " (7/18 HP) Loot them before they come to.\n[2026-09-01T20:39:10.531Z] [combat] Conspiracy Architects Patrol 2 is out of it. Conspiracy Architects Patrol 3 now in your sights.\n[2026-09-01T20:39:10.531Z] [combat] Searing Acid-Etched Bone Crossbow \u2014 1 burn bites in and festers (3 turns).\n",
+      "[2026-09-01T20:39:10.532Z] [combat] Searing Acid-Etched Bone Crossbow \u2014 1 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n[2026-09-01T20:39:10.533Z] [combat] Conspiracy Architects Patrol 3 \u2014 d20 \u2192 11 + ATK 7 = 18 vs your AC 23 \u2014 \u2717 MISS\n",
+      "[2026-09-01T20:39:10.533Z] [world] Below, Conspiracy Architects Patrol 4 circles the base \u2014 it cannot reach you up here.\n[2026-09-01T20:39:10.821Z] [combat] Your Bone Crossbow shatters from wear. It is gone. A twist of Scrap Metal comes free in your hand.\n[2026-09-01T20:39:10.821Z] [reward] \u2726 Scrap Metal (Common).\n[2026-09-01T20:39:17.652Z] [debug] ui: tap \"loot\"\n",
+      "[2026-09-01T20:39:17.657Z] [reward] You strip the unconscious Conspiracy Architects Patrol 2 \u2014 Cudgel, Reclaimer's Salvage Vest, Scrap Metal, Aether Residue, +16 TC. The gear's seen better days (worn from the fight).\n[2026-09-01T20:39:17.657Z] [combat] 2 still standing. Conspiracy Architects Patrol 3 now in your sights.\n[2026-09-01T20:39:28.639Z] [debug] ui: tap \"inventory\"\n",
+      "[2026-09-01T20:39:47.167Z] [debug] ui: tap \"inventory\"\n[2026-09-01T20:40:02.006Z] [debug] stats: STR13 DEX23 INT11 WIS13 CHA7 STE7 | gear: WIS+4,INT+2,DEX+12,STR+4,STE+2 | worn: main=Aetheric Spark head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guil",
+      "d Band\n[2026-09-01T20:40:09.411Z] [debug] stats: STR13 DEX23 INT11 WIS13 CHA7 STE7 | gear: WIS+4,INT+2,DEX+12,STR+4,STE+2 | worn: main=Auralite Talon head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n",
+      "[2026-09-01T20:40:14.411Z] [debug] stats: STR13 DEX23 INT12 WIS13 CHA7 STE7 | gear: WIS+4,INT+3,DEX+12,STR+4,STE+2 | worn: main=Auralite Talon off=Aetheric Spark head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n",
+      "[2026-09-01T20:40:17.477Z] [debug] persist sizes(KB): total=269 player=62 wm=118[rooms=56 events=4 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=85 scene=4\n[2026-09-01T20:40:18.545Z] [debug] ui: tap \"aetheric spark\"\n[2026-09-01T20:40:18.599Z] [player] attack with the off-hand aetheric spark\n",
+      "[2026-09-01T20:40:18.600Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand aetheric spark resolved=Aetheric Spark range=far enemies=2 hooks=2\n[2026-09-01T20:40:18.601Z] [debug] attack: target=Conspiracy Architects Patrol 4 range=mid reach.bands=[distant,far,mid,close] reach.label=Aetheric Spark bareHand=false\n",
+      "[2026-09-01T20:40:18.602Z] [debug] attack: visibility penalty \u22121 (Glass Hail)\n[2026-09-01T20:40:18.656Z] [world] Your aetheric spark comes around in an arc; Conspiracy Architects Patrol 4 squares up to meet it.\n[2026-09-01T20:40:18.656Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T20:40:18.907Z] [cognitive] RETREAT \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 USE_ITEM  (247ms)\n",
+      "[2026-09-01T20:40:26.108Z] [world] Conspiracy Architects Patrol 4 moves first. The pressure is immediate.\n[2026-09-01T20:40:26.110Z] [combat] Conspiracy Architects Patrol 3 \u2014 d20 \u2192 10 + ATK 7 = 17 vs your AC 23 \u2014 \u2717 MISS\n[2026-09-01T20:40:26.110Z] [world] Below, Conspiracy Architects Patrol 4 circles the base \u2014 it cannot reach you up here.\n",
+      "[2026-09-01T20:40:26.110Z] [combat] You \u2014 d20 \u2192 17 + INT 12 \u2212 1 (Glass Hail) = 28 vs Conspiracy Architects Patrol 4 AC 11 \u2014 \u2713 HIT\n[2026-09-01T20:40:26.112Z] [combat] Conspiracy Architects Patrol 4 shrugs off the aetheric. (resisted, \u00d70.5 for 3)\n",
+      "[2026-09-01T20:40:26.115Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Reclaimers Guild Geode-Cored Cleaver \u2014 slashing will bite where aetheric won't.\"\n[2026-09-01T20:40:26.116Z] [combat] Your strike with the aetheric spark lands for 3. Conspiracy Architects Patrol 4 staggers \u2014 14 HP remaining. It answers.\n[2026-09-01T20:40:36.444Z] [debug] ui: tap \"flee\"\n",
+      "[2026-09-01T20:40:36.452Z] [player] flee\n[2026-09-01T20:40:36.452Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=far enemies=2 hooks=2\n[2026-09-01T20:40:36.541Z] [system] \u23f3 Time passed: 15 min\n[2026-09-01T20:40:36.795Z] [cognitive] FEAR \u00b7 RETREAT \u00b7 HIDE  (253ms)\n",
+      "[2026-09-01T20:40:38.244Z] [debug] skillcheck: escape d20=7 DEX 22 = 29 vs Pursuit 10 \u2014 Conspiracy Architects Patrol 3 (d20 2 + SPD 8) \u2192 PASS\n[2026-09-01T20:40:38.332Z] [debug] stats: STR13 DEX23 INT12 WIS13 CHA7 STE7 | gear: WIS+4,INT+3,DEX+12,STR+4,STE+2 | worn: main=Auralite Talon off=Aetheric Spark head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litan",
+      "y Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n[2026-09-01T20:40:38.333Z] [debug] train: dexterity (escape check) \u2192 progress 20/100\n[2026-09-01T20:40:38.333Z] [world] You kick off the ladder and take the wall in one desperate line \u2014 1 tier at double burn (-2 stamina).\n",
+      "[2026-09-01T20:40:38.333Z] [world] You hit the ground moving. Whatever was up there keeps the height.\n[2026-09-01T20:40:43.311Z] [debug] ui: tap \"\u2192 THE BURIED CITIES\"\n[2026-09-01T20:40:43.350Z] [debug] spawn: gear=[Rusted Blade, Salvaged Bow] window=10 roster=new\n",
+      "[2026-09-01T20:40:43.353Z] [world] The flat silt heaves, and a hand breaks the surface, then an arm, then a face caked grey with a thousand years of it.\n[2026-09-01T20:40:43.353Z] [arbiter] You've heard of these on the road: the Aetherkin, the ones the mud drowned and the Aether raised back up.\n",
+      "[2026-09-01T20:40:43.353Z] [world] In life it was a machinist, one hand fused half-around a wrench that rusted into the bone \u2014 the mud takes faces first, so the rest is a guess and a kindness. Something you stirred woke the Aetherstone that held them; now they're awake and out.\n",
+      "[2026-09-01T20:40:43.353Z] [world] It doesn't lunge. It cringes back, arms up over its face \u2014 remembering, dimly, that living things once meant harm. It will only fight if you make it.\n[2026-09-01T20:40:43.354Z] [world] You walk east through open silt. The compass tells you The Buried Cities lies further east \u2014 7 tiles, about 18 hours of travel.\n",
+      "[2026-09-01T20:40:43.354Z] [world] Some part of you has been keeping the place bookmarked.\n[2026-09-01T20:40:46.529Z] [debug] ui: tap \"flee\"\n[2026-09-01T20:40:46.541Z] [player] flee\n[2026-09-01T20:40:46.542Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=mid enemies=1 hooks=2\n[2026-09-01T20:40:46.622Z] [system] \u23f3 Time passed: 15 min\n",
+      "[2026-09-01T20:40:46.865Z] [cognitive] FEAR \u00b7 RETREAT \u00b7 HIDE  (242ms)\n[2026-09-01T20:40:48.615Z] [debug] skillcheck: escape d20=12 DEX 22 = 34 vs Pursuit 15 \u2014 Mud-Wracked Aetherkin (d20 13 + SPD 2) \u2192 PASS\n",
+      "[2026-09-01T20:40:48.704Z] [debug] stats: STR13 DEX23 INT12 WIS13 CHA7 STE7 | gear: WIS+4,INT+3,DEX+12,STR+4,STE+2 | worn: main=Auralite Talon off=Aetheric Spark head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n",
+      "[2026-09-01T20:40:48.705Z] [debug] train: dexterity (escape check) \u2192 progress 22/100\n[2026-09-01T20:40:48.705Z] [world] You break away across the open ground. Behind you the thing you ran from gives up the chase.\n[2026-09-01T20:40:49.997Z] [debug] ui: tap \"\u2192 THE BURIED CITIES\"\n",
+      "[2026-09-01T20:40:50.018Z] [debug] spawn: gear=[Aether-Runner Greaves, Golem Leather Gloves, Giant Bone Longbow] window=10 roster=new\n[2026-09-01T20:40:50.021Z] [world] Nell of the Long Road sets down what they're holding. \"Didn't expect you today, Cheddar Bob.\"\n[2026-09-01T20:40:50.021Z] [world] \"Been a while,\" Nell of the Long Road says. \"Thought the mud had you.\"\n",
+      "[2026-09-01T20:40:50.021Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Nell of the Long Road, wandering trader. Tap the vendor banner to trade.\n[2026-09-01T20:40:50.033Z] [world] Rare workings for sale: Aetheric Vest (200 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n",
+      "[2026-09-01T20:40:50.034Z] [world] You walk east through open silt. The compass tells you The Buried Cities lies further east \u2014 6 tiles, about 15 hours of travel.\n[2026-09-01T20:40:50.038Z] [world] A small low door at the base of one of the Obsidian Pillars, polished smooth by centuries of magnetic wind. Inside, the observatory's main chamber: a great brass armillary the size of a wagon, still tur",
+      "ning slowly under its own weight, charting skies that no longer exist as charted. The air bends compass needles and turns pocket watches into ornaments. A pre-flood Sentinel-class drone still patrols the inner ring, its servos starved but functional.\n",
+      "[2026-09-01T20:40:50.038Z] [world] A logbook on the central desk records, in careful hand: 'Day 1,847 since the surface stopped answering. The sky charts still match. We have stopped checking.'\n[2026-09-01T20:40:50.039Z] [reward] \u2726 Recovered Aether Crystal.\n",
+      "[2026-09-01T20:40:50.040Z] [combat] Scrap Drone steps out of the shadows of the place \u2014 Drill Arm ready, 2D6 damage on a hit. The loot you found will leave with whoever walks out alive. (range: close)\n[2026-09-01T20:40:50.040Z] [world] Parked \u2014 you're already running a contract. Activate it in Contracts \u2192 Mysteries when you're ready.\n",
+      "[2026-09-01T20:40:50.040Z] [reward] \u2726 Mystery added to your slate \u2014 Shifting Obsidian Orb.\n[2026-09-01T20:40:50.041Z] [arbiter] The Arbiter watches you read it. \"That mystery is on your slate. Open Contracts \u2192 Mysteries for the trail. Tap ABANDON there if you'd rather not chase it.\"\n",
+      "[2026-09-01T20:40:50.048Z] [world] You catch yourself checking, the way you check a pocket you already know is empty.\n[2026-09-01T20:40:54.298Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n[2026-09-01T20:40:54.338Z] [player] attack with the auralite talon\n",
+      "[2026-09-01T20:40:54.339Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=1 hooks=2\n[2026-09-01T20:40:54.340Z] [debug] attack: target=Scrap Drone range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n[2026-09-01T20:40:54.341Z] [debug] attack: visibility penalty \u22121 (Glass Hail)\n",
+      "[2026-09-01T20:40:54.395Z] [world] Your acid-etched corrupted auralite talon comes around in an arc; Scrap Drone squares up to meet it.\n[2026-09-01T20:40:54.396Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T20:40:54.640Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (244ms)\n",
+      "[2026-09-01T20:40:57.785Z] [debug] persist sizes(KB): total=266 player=62 wm=112[rooms=50 events=4 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=87 scene=4\n[2026-09-01T20:41:02.845Z] [world] You seize the initiative. Scrap Drone has no time to react.\n[2026-09-01T20:41:02.846Z] [combat] You \u2014 d20 \u2192 18 + INT 12 \u2212 1 (Glass Hail) = 29 vs Scrap Drone AC 10 \u2014 \u2713 HIT\n",
+      "[2026-09-01T20:41:02.846Z] [combat] The Corrupted coating fails to take on Scrap Drone.\n[2026-09-01T20:41:02.846Z] [combat] Scrap Drone shrugs off the aetheric. (resisted, \u00d70.5 for 6)\n[2026-09-01T20:41:02.850Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Flame of Aether \u2014 burn or electrical will bite where aetheric won't.\"\n",
+      "[2026-09-01T20:41:02.851Z] [combat] Your strike with the acid-etched corrupted auralite talon lands for 6. Scrap Drone staggers \u2014 9 HP remaining. It answers.\n[2026-09-01T20:41:02.851Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 3 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n",
+      "[2026-09-01T20:41:02.853Z] [combat] Scrap Drone \u2014 d20 \u2192 8 + ATK 3 = 11 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-01T20:41:07.596Z] [debug] ui: tap \"aetheric spark\"\n[2026-09-01T20:41:07.602Z] [world] A shard of mud-glass nicks you. Small wound, steady reminder. (\u22121 HP)\n[2026-09-01T20:41:07.643Z] [player] attack with the off-hand aetheric spark\n",
+      "[2026-09-01T20:41:07.644Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand aetheric spark resolved=Aetheric Spark range=close enemies=1 hooks=2\n[2026-09-01T20:41:07.644Z] [combat] Scrap Drone smokes \u2014 acid eats 3. (6/15 HP, 2 turns left)\n",
+      "[2026-09-01T20:41:07.645Z] [debug] attack: target=Scrap Drone range=close reach.bands=[distant,far,mid,close] reach.label=Aetheric Spark bareHand=false\n[2026-09-01T20:41:07.648Z] [debug] attack: visibility penalty \u22121 (Glass Hail)\n[2026-09-01T20:41:07.699Z] [world] You raise the aetheric spark toward Scrap Drone. The room narrows around the both of you.\n",
+      "[2026-09-01T20:41:07.700Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T20:41:07.952Z] [cognitive] RETREAT \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 USE_ITEM  (252ms)\n[2026-09-01T20:41:12.785Z] [world] You seize the initiative. Scrap Drone has no time to react.\n[2026-09-01T20:41:12.786Z] [combat] You \u2014 d20 \u2192 9 + INT 12 \u2212 1 (Glass Hail) + 2 (point blank) = 22 vs Scrap Drone AC 9 \u2014 \u2713 HIT\n",
+      "[2026-09-01T20:41:12.788Z] [combat] Scrap Drone shrugs off the aetheric. (resisted, \u00d70.5 for 2)\n[2026-09-01T20:41:12.791Z] [combat] Scrap Drone takes 2 with the aetheric spark. It reels: 4 left. Then it fights back.\n[2026-09-01T20:41:12.793Z] [combat] Scrap Drone \u2014 d20 \u2192 14 + ATK 3 = 17 vs your AC 23 (needs nat 16+ \u2014 AC capped)"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-02-1618-the-slate-is-the-whole-slate #mtjfp13vhzw3 [inline 4/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtjfp13vhzw3"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-02-1618-the-slate-is-the-whole-slate"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "4"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-02-1618-the-slate-is-the-whole-slate"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-02T01:45:17.008331Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-02T01:45:17.299000Z",
+  "fingerprints": [
+    "0c290479c292bd9bc58184463257d603"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1949526399,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-02T01:16:35.756000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-02-1618-the-slate-is-the-whole-slate",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-02-1618-the-slate-is-the-whole-slate",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-02-1618-the-slate-is-the-whole-slate",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-02-1618-the-slate-is-the-whole-slate)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "4f40da32b7b54ceaabc2a5c915234dcb",
+  "previousEventID": "45579aac4401427f99f57243673e1cc0"
+}

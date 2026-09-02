@@ -1,0 +1,239 @@
+{
+  "id": "d4d04226c44541efb498d7389e52b767",
+  "groupID": "7705840850",
+  "eventID": "d4d04226c44541efb498d7389e52b767",
+  "projectID": "4511945117532160",
+  "size": 18123,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-02-1618-the-slate-is-the-whole-slate #mtjdbf20sc0c [inline 4/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-02-1618-the-slate-is-the-whole-slate",
+  "message": "player-log 2026-09-02-1618-the-slate-is-the-whole-slate #mtjdbf20sc0c [inline 4/28]",
+  "title": "player-log 2026-09-02-1618-the-slate-is-the-whole-slate #mtjdbf20sc0c [inline 4/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "c4c85a741bd94703ace0c249ba030a22",
+      "span_id": "8a7dc862659550ff",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "948Z] [player] go south\n[2026-09-01T03:50:26.949Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=1\n[2026-09-01T03:50:26.955Z] [debug] spawn: gear=[Architect's Mantle, Aetheric Spark, Reclaimer's Salvage Cap] window=10 roster=new\n[2026-09-01T03:50:26.956Z] [world] Ymer Tinpot sets down what they're holding. \"Didn't expect you today, Cheddar Bob.\"\n",
+      "[2026-09-01T03:50:26.957Z] [world] \"Been a while,\" Ymer Tinpot says. \"Thought the mud had you.\"\n[2026-09-01T03:50:26.957Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Ymer Tinpot, wandering trader. Tap the vendor banner to trade.\n",
+      "[2026-09-01T03:50:26.963Z] [world] Rare workings for sale: Lich-Heart Pendant (200 TC), Many-Colored Tonic (200 TC), Mire Stave (200 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n",
+      "[2026-09-01T03:50:26.964Z] [world] A storm shed stands off the path here \u2014 weathered and quiet, a way in still clear. (Tap ENTER to step inside.)\n[2026-09-01T03:50:26.965Z] [world] You walk south through open silt. The compass points south into open ground.\n[2026-09-01T03:50:26.966Z] [world] Whatever the wind has done out there, it has not come in here.\n",
+      "[2026-09-01T03:50:26.967Z] [debug] arbiter: template (reason=cooldown)\n[2026-09-01T03:50:26.967Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-01T03:50:26.967Z] [system] \u23f3 Time passed: 15 min\n[2026-09-01T03:50:27.227Z] [cognitive] neutral  (258ms)\n[2026-09-01T03:50:29.793Z] [debug] ui: tap \"EAST\"\n[2026-09-01T03:50:29.832Z] [player] go east\n",
+      "[2026-09-01T03:50:29.833Z] [debug] parser: intent=travel conf=1.00 verb=go target=east resolved=- range=- enemies=0 hooks=1\n[2026-09-01T03:50:29.840Z] [debug] spawn: gear=[Mud-Encrusted Armor, Compact Energy Blade] window=10 roster=new\n[2026-09-01T03:50:29.841Z] [world] You walk east through open silt. The compass points east into open ground.\n",
+      "[2026-09-01T03:50:29.842Z] [world] Nothing about the place has anything to add.\n[2026-09-01T03:50:29.842Z] [system] \u23f3 Time passed: 15 min\n[2026-09-01T03:50:29.844Z] [world] A Mud Monarchs patrol crosses your path in the open \u2014 and turns toward you.\n[2026-09-01T03:50:29.844Z] [arbiter] \"Mud Monarchs riders,\" the Arbiter says. \"They've marked you. No outrunning this one.\"\n",
+      "[2026-09-01T03:50:30.126Z] [cognitive] neutral  (283ms)\n[2026-09-01T03:50:33.262Z] [debug] ui: tap \"dodge\"\n[2026-09-01T03:50:33.274Z] [player] dodge\n[2026-09-01T03:50:33.275Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=4 hooks=1\n",
+      "[2026-09-01T03:50:33.276Z] [world] You commit to the dodge. Slip Mud Monarchs Patrol 1's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-01T03:50:33.342Z] [combat] Mud Monarchs Patrol 1 \u2014 d20 \u2192 7 + ATK 7 = 14 vs your AC 23 \u2014 \u2717 EVADED\n",
+      "[2026-09-01T03:50:33.342Z] [combat] Dodge \u2014 d20 \u2192 15 + DEX 24 = 39 vs ATK 14. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-01T03:50:33.342Z] [world] You slip Mud Monarchs Patrol 1's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n",
+      "[2026-09-01T03:50:33.344Z] [debug] ac-shift 23\u219226: race/base 10 + gear 20 + title 0 \u2192 trimmed 23 + status 3 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n",
+      "[2026-09-01T03:50:33.344Z] [combat] Mud Monarchs Patrol 2 \u2014 d20 \u2192 15 + ATK 8 = 23 vs your AC 26 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-01T03:50:33.344Z] [combat] Mud Monarchs Patrol 3 and 1 other close the distance.\n[2026-09-01T03:50:33.345Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T03:50:33.596Z] [cognitive] neutral  (250ms)\n[2026-09-01T03:50:36.577Z] [debug] ui: tap \"\ud83d\udd25\u2697 bone crossbow\"\n",
+      "[2026-09-01T03:50:36.581Z] [system] evasive \u2014 harder to hit fades.\n[2026-09-01T03:50:36.625Z] [player] attack with the off-hand bone crossbow\n[2026-09-01T03:50:36.626Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=4 hooks=1\n",
+      "[2026-09-01T03:50:36.627Z] [debug] attack: target=Mud Monarchs Patrol 1 range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-09-01T03:50:36.628Z] [debug] attack: status mods tired -1 \u00b7 perfect opening (2\u00d7 dice)\n",
+      "[2026-09-01T03:50:36.680Z] [world] You raise the searing acid-etched bone crossbow toward Mud Monarchs Patrol 1. The room narrows around the both of you.\n[2026-09-01T03:50:36.681Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T03:50:36.925Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (244ms)\n",
+      "[2026-09-01T03:50:45.087Z] [world] You seize the initiative. Mud Monarchs Patrol 1 has no time to react.\n[2026-09-01T03:50:45.087Z] [combat] You \u2014 d20 \u2192 15 + DEX 24 + 2 (point blank) tired -1 perfect opening (2\u00d7 dice) = 40 vs Mud Monarchs Patrol 1 AC 11 \u2014 \u2713 HIT\n",
+      "[2026-09-01T03:50:45.089Z] [combat] Your blow with the searing acid-etched bone crossbow lands clean \u2014 18 damage. Mud Monarchs Patrol 1 crumples in the dust. The Aetherstone settles.\n[2026-09-01T03:50:45.090Z] [reward] Mud Monarchs Patrol 1 defeated. You recover Patched Cloth, Scrap Metal, Mud Monarch Sigil.\n",
+      "[2026-09-01T03:50:45.094Z] [reward] You strip the body: Cudgel, Mud-Warden's Vest (+6 TC). The kit took the fight badly.\n[2026-09-01T03:50:45.094Z] [combat] 3 attackers remain. Mud Monarchs Patrol 2 now in your sights.\n[2026-09-01T03:50:45.094Z] [system] Forgotten Order standing +1 (now 38)\n[2026-09-01T03:50:45.095Z] [reward] +18 TC pried from the dust.\n",
+      "[2026-09-01T03:50:45.142Z] [debug] ac-shift 26\u219223: race/base 10 + gear 20 + title 0 \u2192 trimmed 23 + status 0 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n",
+      "[2026-09-01T03:50:45.142Z] [combat] Mud Monarchs Patrol 2 \u2014 d20 \u2192 11 + ATK 6 = 17 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-01T03:50:45.143Z] [combat] Mud Monarchs Patrol 3 \u2014 d20 \u2192 16 + ATK 6 = 22 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-09-01T03:50:45.144Z] [combat] Mud Monarchs Patrol 4 closes the distance.\n",
+      "[2026-09-01T03:50:45.144Z] [arbiter] \"The Sentinels did not invent violence. They only learned it well.\" the Arbiter says.\n[2026-09-01T03:50:45.420Z] [combat] Mud Monarchs Patrol 3 deals 1 piercing damage [armor \u221235%] [edge of reach \u2014 halved]. You have 32 HP remaining.\n[2026-09-01T03:50:48.964Z] [debug] ui: tap \"\ud83d\udd25\u2697 bone crossbow\"\n",
+      "[2026-09-01T03:50:49.011Z] [player] attack with the off-hand bone crossbow\n[2026-09-01T03:50:49.012Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=3 hooks=1\n[2026-09-01T03:50:49.012Z] [debug] attack: target=Mud Monarchs Patrol 2 range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n",
+      "[2026-09-01T03:50:49.065Z] [world] You raise the searing acid-etched bone crossbow toward Mud Monarchs Patrol 2. The room narrows around the both of you.\n[2026-09-01T03:50:49.065Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T03:50:49.307Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (240ms)\n",
+      "[2026-09-01T03:50:49.594Z] [debug] persist sizes(KB): total=254 player=61 wm=104[rooms=47 events=4 memos=0 npcs=4 defeated=1 tags=1 discovered=0] log=84 scene=5\n[2026-09-01T03:50:57.283Z] [world] Mud Monarchs Patrol 2 moves first. The pressure is immediate.\n[2026-09-01T03:50:57.286Z] [combat] Mud Monarchs Patrol 2 \u2014 d20 \u2192 13 + ATK 6 = 19 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-01T03:50:57.287Z] [combat] Mud Monarchs Patrol 3 \u2014 d20 \u2192 10 + ATK 6 = 16 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-01T03:50:57.288Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 14 + ATK 6 = 20 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-01T03:50:57.288Z] [combat] You \u2014 d20 \u2192 14 + DEX 24 = 38 vs Mud Monarchs Patrol 2 AC 11 \u2014 \u2713 HIT\n",
+      "[2026-09-01T03:50:57.290Z] [combat] You crack the Mud Monarchs Patrol 2 with the Searing Acid-Etched Bone Crossbow for 14 \u2014 the better part of their fight, gone in one blow. They crumple, out cold. (4/18 HP) Loot them before they come to.\n[2026-09-01T03:50:57.290Z] [combat] Mud Monarchs Patrol 2 is out of it. Mud Monarchs Patrol 3 now in your sights.\n",
+      "[2026-09-01T03:50:57.291Z] [combat] Searing Acid-Etched Bone Crossbow \u2014 4 burn bites in and festers (3 turns).\n[2026-09-01T03:50:57.291Z] [combat] Searing Acid-Etched Bone Crossbow \u2014 2 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n",
+      "[2026-09-01T03:50:57.291Z] [arbiter] The Arbiter eyes the Mud Monarchs Patrol 3 without concern. \"It's bigger. Bigger falls harder.\"\n[2026-09-01T03:50:59.250Z] [debug] ui: tap \"approach\"\n[2026-09-01T03:50:59.296Z] [player] approach Mud Monarchs Patrol 3\n",
+      "[2026-09-01T03:50:59.297Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud monarchs patrol 3 resolved=Mud Monarchs Patrol 3 range=mid enemies=3 hooks=1\n[2026-09-01T03:50:59.298Z] [debug] move: advance from range=mid enemies=3 weather=Silent Blizzard cost=1 partial=0\n[2026-09-01T03:50:59.298Z] [debug] move: field advance target=Mud Monarchs Patrol 3 d 1.39->0.39 band mid->close\n",
+      "[2026-09-01T03:50:59.299Z] [world] You close the gap with the Mud Monarchs Patrol 3 and 2 others. (range: close / arm's reach)\n[2026-09-01T03:50:59.299Z] [world] The field shifts around you \u2014 Mud Monarchs Patrol 2 now close / arm's reach; Mud Monarchs Patrol 4 now close / arm's reach.\n",
+      "[2026-09-01T03:50:59.299Z] [combat] Mud Monarchs Patrol 2 blisters \u2014 clinging fire sears 4. (0/18 HP, 2 turns left)\n[2026-09-01T03:50:59.299Z] [combat] Mud Monarchs Patrol 2 smokes \u2014 acid eats 2. (0/18 HP, 2 turns left)\n[2026-09-01T03:50:59.300Z] [reward] Mud Monarchs Patrol 2 defeated. You recover Patched Cloth \u00d72, Worn Tartarian Coin.\n",
+      "[2026-09-01T03:50:59.301Z] [reward] You strip the body: Cudgel, Mud-Warden's Vest (+10 TC). The kit took the fight badly.\n[2026-09-01T03:50:59.301Z] [combat] 2 attackers remain. Mud Monarchs Patrol 3 now in your sights.\n[2026-09-01T03:50:59.301Z] [system] Forgotten Order standing +1 (now 39)\n[2026-09-01T03:50:59.302Z] [reward] +14 TC pried from the dust.\n",
+      "[2026-09-01T03:50:59.345Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 5 + ATK 6 = 11 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-01T03:50:59.346Z] [combat] Mud Monarchs Patrol 3 \u2014 d20 \u2192 12 + ATK 6 = 18 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-01T03:50:59.619Z] [cognitive] SWIM \u00b7 RETREAT  (271ms)\n",
+      "[2026-09-01T03:50:59.865Z] [reward] \u2726 The buried world relents \u2014 a Resurrection Gem at the 100-kill mark. (31 held)\n[2026-09-01T03:51:00.500Z] [debug] ui: tap \"dodge\"\n[2026-09-01T03:51:00.509Z] [player] dodge\n[2026-09-01T03:51:00.509Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=2 hooks=1\n",
+      "[2026-09-01T03:51:00.510Z] [world] You commit to the dodge. Slip Mud Monarchs Patrol 3's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-01T03:51:00.575Z] [combat] Mud Monarchs Patrol 3 \u2014 d20 \u2192 20 + ATK 6 = 26 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 CRITICAL HIT\n",
+      "[2026-09-01T03:51:00.575Z] [combat] Dodge \u2014 Mud Monarchs Patrol 3 rolls a NAT 20. No read beats a perfect strike; it lands through your dodge.\n[2026-09-01T03:51:00.577Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 20 + ATK 6 = 26 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 CRITICAL HIT\n[2026-09-01T03:51:00.577Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-09-01T03:51:00.578Z] [arbiter] \"A blade in these ruins is a small thing against a long history. Use it precisely.\" the Arbiter says.\n[2026-09-01T03:51:00.578Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T03:51:00.851Z] [combat] Mud Monarchs Patrol 3 deals 8 piercing damage [armor \u221235%]. You have 24 HP remaining.\n",
+      "[2026-09-01T03:51:00.851Z] [combat] Mud Monarchs Patrol 4 deals 15 bludgeoning damage. You have 9 HP remaining.\n[2026-09-01T03:51:01.086Z] [cognitive] neutral  (274ms)\n[2026-09-01T03:51:01.324Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n[2026-09-01T03:51:01.341Z] [player] attack with the auralite talon\n",
+      "[2026-09-01T03:51:01.342Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=2 hooks=1\n[2026-09-01T03:51:01.342Z] [debug] attack: target=Mud Monarchs Patrol 3 range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n",
+      "[2026-09-01T03:51:01.393Z] [world] You raise the acid-etched corrupted auralite talon toward Mud Monarchs Patrol 3. The room narrows around the both of you.\n[2026-09-01T03:51:01.393Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T03:51:01.628Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (234ms)\n",
+      "[2026-09-01T03:51:10.593Z] [world] You seize the initiative. Mud Monarchs Patrol 3 has no time to react.\n[2026-09-01T03:51:10.593Z] [combat] You \u2014 d20 \u2192 2 + INT 11 = 13 vs Mud Monarchs Patrol 3 AC 10 \u2014 \u2713 HIT\n[2026-09-01T03:51:10.594Z] [combat] Mud Monarchs Patrol 3 shrugs off the aetheric. (resisted, \u00d70.5 for 7)\n",
+      "[2026-09-01T03:51:10.596Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Bone Crossbow \u2014 piercing will bite where aetheric won't.\"\n[2026-09-01T03:51:10.597Z] [combat] Your strike with the acid-etched corrupted auralite talon lands for 7. Mud Monarchs Patrol 3 staggers \u2014 8 HP remaining. It answers.\n",
+      "[2026-09-01T03:51:10.598Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 2 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n[2026-09-01T03:51:10.598Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 1 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n",
+      "[2026-09-01T03:51:10.601Z] [combat] Mud Monarchs Patrol 3 \u2014 d20 \u2192 3 + ATK 6 = 9 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-01T03:51:10.603Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 20 + ATK 6 = 26 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 CRITICAL HIT\n[2026-09-01T03:51:10.888Z] [combat] Mud Monarchs Patrol 4 deals 12 bludgeoning damage. You fall.\n",
+      "[2026-09-01T03:51:10.888Z] [combat] Cheddar Bob does not rise. The ruins remember another.\n[2026-09-01T03:51:10.888Z] [system] Cheddar Bob has fallen. A Resurrection Gem from the title screen can bring them back.\n[2026-09-01T03:51:11.397Z] [system] You join the Fallen of Tartaria \u2014 10 names the buried world keeps now. Read the roll from the Lore Codex.\n",
+      "[2026-09-01T03:51:18.048Z] [debug] scene: loc=monarch_waystation hub=outpost_gate arrival=n opening=n passing=n\n[2026-09-01T03:51:18.048Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @raiders_ridge needs=Raider's Ridge-Sign\u2713 PAUSED\n[2026-09-01T03:51:18.049Z] [debug] missions: hunt:hunt_bog_dragon st"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-02-1618-the-slate-is-the-whole-slate #mtjdbf20sc0c [inline 4/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtjdbf20sc0c"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-02-1618-the-slate-is-the-whole-slate"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "4"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-02-1618-the-slate-is-the-whole-slate"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-02T01:16:35.696000Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-02T01:16:35.751000Z",
+  "fingerprints": [
+    "0c290479c292bd9bc58184463257d603"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1949526399,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-02T01:16:35.756000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-02-1618-the-slate-is-the-whole-slate",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-02-1618-the-slate-is-the-whole-slate",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-02-1618-the-slate-is-the-whole-slate",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-02-1618-the-slate-is-the-whole-slate)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "d83928d4bd2f43d8b06fd5d6d49f4bb8",
+  "previousEventID": "d4291abb4bd745d5a5c7f471348e429d"
+}

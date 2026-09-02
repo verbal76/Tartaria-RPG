@@ -1,0 +1,256 @@
+{
+  "id": "c9c32405bfde43e789b3b39e7c21a3a7",
+  "groupID": "7705840850",
+  "eventID": "c9c32405bfde43e789b3b39e7c21a3a7",
+  "projectID": "4511945117532160",
+  "size": 17924,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-02-1618-the-slate-is-the-whole-slate #mtjfp13vhzw3 [inline 22/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-02-1618-the-slate-is-the-whole-slate",
+  "message": "player-log 2026-09-02-1618-the-slate-is-the-whole-slate #mtjfp13vhzw3 [inline 22/28]",
+  "title": "player-log 2026-09-02-1618-the-slate-is-the-whole-slate #mtjfp13vhzw3 [inline 22/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "c4c85a741bd94703ace0c249ba030a22",
+      "span_id": "8a7dc862659550ff",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "struct lies half-toppled in the mud, one arm still flexing weakly, its core dim but unbroken.\n[2026-09-02T01:34:53.649Z] [debug] ui: tap \"take / salvage\"\n[2026-09-02T01:34:53.649Z] [debug] ui: tap \"take / salvage\"\n[2026-09-02T01:34:57.165Z] [debug] qwen\u23f1 ambient ok 8193ms read 2529ms/write 2920ms in 365t\u2192out 31t 6.9ms/t HIT-CAP (146ch)\n",
+      "[2026-09-02T01:34:57.165Z] [debug] qwen\u23f1 stats \u2014 narration:scene_intro_fill n10 avg5.7s max9.0s read5.5s/write1.0s \u26a04unusable in737t\u2192out21t ms/tok 4.3-10.7 cap6 \u23f83 \u27027/35.1s | investigate_lore n6 avg2.9s max5.5s read0.3s/write1.2s \u26a03unusable in127t\u2192out37t ms/tok 2.3-2.4 wait0.7s | narration:scene_intro n2 avg10.8s max12.6s read7.7s/write3.1s in779t\u2192out17t ms/tok 8.2-11.6 cap1 \u23f81 \u27022/21.6s | narratio",
+      "n:travel n1 avg14.0s max14.0s read7.3s/write2.7s in854t\u2192out33t ms/tok 8.5-8.5 cap1 | ambient n1 avg8.2s max8.2s read2.5s/write2.9s in365t\u2192out31t ms/tok 6.9-6.9 cap1 || WASTED 9 calls / 56.7s\n[2026-09-02T01:34:57.334Z] [world] Tucked inside the blood-spotted cloth: an oddment that matches no quartermaster's list. The kind of thing that fuses well.\n",
+      "[Filtered]",
+      "[2026-09-02T01:34:57.334Z] [world] You scavenge the shattered fallen sentinel husk thoroughly. One Bent Nail survives the sorting.\n[2026-09-02T01:34:57.335Z] [world] You break the tin plaque apart. Among the pieces, something worth keeping.\n[2026-09-02T01:34:57.335Z] [reward] \u2726 Salvage haul:\n[2026-09-02T01:34:57.335Z] [reward]     \u2022 Amber Droplet (Uncommon)\n",
+      "[2026-09-02T01:34:57.335Z] [reward]     \u2022 Reed Shaft Cutting (Common)\n[2026-09-02T01:34:57.335Z] [reward]     \u2022 Smooth Stone x2 (Common)\n[2026-09-02T01:34:57.335Z] [reward]     \u2022 Bent Nail (Common)\n[2026-09-02T01:34:57.335Z] [reward]     \u2022 Mud Fragment x2 (Common)\n[2026-09-02T01:34:57.538Z] [debug] arbiter: ambient stale:log-moved-on\u2192banked 8931ms\n",
+      "[2026-09-02T01:34:57.539Z] [debug] arbiter: ambient-empty reason=near-duplicate-of-recent raw=\"You've walked through the shadowed alleys of The Broken Steeple, its worn stone walls whispering tales of generations go\"\n[2026-09-02T01:34:58.720Z] [world] You do not think about it. The Arcane Sprinter's Boots is simply in your hand now.\n",
+      "[2026-09-02T01:34:58.721Z] [reward] \u2726 Arcane Sprinter's Boots (Common).\n[2026-09-02T01:34:58.738Z] [world] Old habit: see it, take it, keep walking. The Stone-Stride Greaves is yours.\n[2026-09-02T01:34:58.739Z] [reward] \u2726 Stone-Stride Greaves (Common).\n[2026-09-02T01:35:00.184Z] [debug] ui: tap \"investigate\"\n[2026-09-02T01:35:02.129Z] [player] investigate the ground\n",
+      "[2026-09-02T01:35:02.130Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n[2026-09-02T01:35:02.133Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Drone Core (Uncommon).\n[2026-09-02T01:35:02.142Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n",
+      "[2026-09-02T01:35:02.142Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-02T01:35:02.142Z] [system] \u23f3 Time passed: 24 min\n[2026-09-02T01:35:02.332Z] [cognitive] CLIMB  (188ms)\n[2026-09-02T01:35:02.565Z] [debug] persist sizes(KB): total=277 player=68 wm=125[rooms=60 events=5 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=81 scene=2\n",
+      "[2026-09-02T01:35:03.802Z] [debug] ui: tap \"\u2192 DRAKOVA\"\n[2026-09-02T01:35:03.820Z] [debug] spawn: gear=[Scrap-Forged Breastplate] window=10 roster=new\n[2026-09-02T01:35:03.822Z] [world] The flat silt heaves, and a hand breaks the surface, then an arm, then a face caked grey with a thousand years of it.\n",
+      "[2026-09-02T01:35:03.822Z] [arbiter] These are the Aetherkin the roadside traders whisper about \u2014 the flood-dead the Aether would not let rest.\n[2026-09-02T01:35:03.823Z] [world] In life it was a bell-ringer, shoulders rounded from a rope pulled ten thousand times \u2014 the set of the jaw is close enough to a portrait you saw once in a flooded hall. They surfaced out of the flat mud like a held breath",
+      " finally, terribly let go.\n[2026-09-02T01:35:03.823Z] [world] There's no hunger in it, only fright. It shrinks from your step, then squares up on trembling legs \u2014 it will defend itself, and nothing more.\n[2026-09-02T01:35:03.824Z] [world] You walk east through open silt. The compass points east into open ground.\n",
+      "[2026-09-02T01:35:03.824Z] [world] Dust has settled on it and settled evenly. Nothing disturbed it.\n[2026-09-02T01:35:07.103Z] [debug] ui: tap \"flee\"\n[2026-09-02T01:35:07.122Z] [player] flee\n[2026-09-02T01:35:07.123Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=mid enemies=1 hooks=1\n[2026-09-02T01:35:07.199Z] [system] \u23f3 Time passed: 15 min\n",
+      "[2026-09-02T01:35:07.475Z] [cognitive] FEAR \u00b7 RETREAT \u00b7 HIDE  (276ms)\n[2026-09-02T01:35:09.179Z] [debug] skillcheck: escape d20=5 DEX 23 = 28 vs Pursuit 20 \u2014 Mud-Wracked Aetherkin (d20 18 + SPD 2) \u2192 PASS\n",
+      "[2026-09-02T01:35:09.281Z] [debug] stats: STR14 DEX23 INT12 WIS14 CHA8 STE7 | gear: WIS+4,INT+3,DEX+12,STR+4,STE+2 | worn: main=Auralite Talon off=Choir-Bound Launcher head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n",
+      "[2026-09-02T01:35:09.281Z] [debug] train: dexterity (escape check) \u2192 progress 48/100\n[2026-09-02T01:35:09.281Z] [world] You turn and run and the running works.\n[2026-09-02T01:35:09.283Z] [arbiter] The Arbiter looks around. \"The bell is long gone. The mount it hung from still swings, slow, in no wind at all.\"\n[2026-09-02T01:35:11.538Z] [debug] ui: tap \"\u2192 DRAKOVA\"\n",
+      "[2026-09-02T01:35:11.555Z] [world] You walk south. You arrive at Drakova.\n[2026-09-02T01:35:11.556Z] [debug] scene: loc=drakova hub=- arrival=y opening=n passing=n\n[2026-09-02T01:35:11.557Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-02T01:35:11.557Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova HERE npc=\"the Drakovan reeve\" gives=Reeve's Brass Token\n[2026-09-02T01:35:11.557Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n",
+      "[2026-09-02T01:35:11.558Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n[2026-09-02T01:35:11.558Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n",
+      "[2026-09-02T01:35:11.558Z] [debug] missions: \u00b7 at=drakova travelTo=drakova\n[2026-09-02T01:35:11.558Z] [world] \u25b8 The Bog Dragon of Old Drakova: this is the place \u2014 find the Drakovan reeve \u2014 talk it through.\n[2026-09-02T01:35:11.652Z] [debug] spawn: gear=[Sparkstrike, Sentinel's Mobile Greaves, Mud Shell] window=10 roster=new\n",
+      "[2026-09-02T01:35:11.673Z] [arbiter] The Arbiter takes you in. \"Drakova is lethal country. The things that wake here pull above your weight. 43 HP carries you through Varakush (danger 1). 1/9 Cores recovered. Visit the remaining Lost Capitals. Or move on until you've got your legs under you.\"\n",
+      "[2026-09-02T01:35:11.675Z] [world] Mercy noses at the blood-spotted cloth and snorts. There's something there.\n[2026-09-02T01:35:11.677Z] [world] You've left The Broken Steeple and entered Drakova. A Lost Capital. Lost means sealed, not destroyed. There is a difference. It's afternoon. Thalan is the only soul in sight. east leads to The Drowned Quarter. Nothing named to the north or south or west.",
+      "\n[2026-09-02T01:35:11.677Z] [world] The gate of Drakova stands before you \u2014 their ground, not yet their halls. (Tap ENTER OUTPOST to step inside.)\n[2026-09-02T01:35:11.680Z] [world] [Drakova] north: The Broken Steeple (3 tiles, 8 hours) \u00b7 east: The Drowned Quarter (1 tile, 3 hours) \u00b7 south: The Vault Steps (12 tiles, 1 day, 6 hours) \u00b7 west: Mud Seas (4 tiles, 10 hours)\n",
+      "[2026-09-02T01:35:11.680Z] [world] A figure crests the rise \u2014 Thalan, the Wanderer, pack heavy across the shoulders. They set down to trade.\n[2026-09-02T01:35:11.680Z] [arbiter] The Arbiter inclines their head toward the newcomer. \"Thalan, the Wanderer. Friendly and talkative, Thalan walks the roadside outposts with a horse and a limited pack. Trades common weapons and tools, sometimes coin advice",
+      ".\"\n[2026-09-02T01:35:11.685Z] [world] Rare workings for sale: Ember Storm (200 TC), Fallout Bloom (200 TC), Founder's Edge (500 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n",
+      "[2026-09-02T01:35:11.692Z] [world] Drakova you reach by going down \u2014 a throat of hardened Aetherstone mud sealed over a city that never saw the sky again. Your lantern light dies three feet out. The dark here is old, and it is full, and it does not like being looked at.\n",
+      "[2026-09-02T01:35:11.692Z] [arbiter] (Reclaimer route \u2014 to recover the Drakova Core, SALVAGE something here. The Aetheric housing comes loose under the right trowel.)\n[2026-09-02T01:35:23.454Z] [debug] homework: intro-fill armed after 7130ms idle\n[2026-09-02T01:35:31.588Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 7908ms read 6716ms/write 1147ms in 743t\u2192out 33t 9.0ms/t HIT-CAP (168ch)\n",
+      "[2026-09-02T01:35:31.803Z] [debug] homework: scene_intro \"Drakova\" \u2713 8353ms\n[2026-09-02T01:35:42.403Z] [world] The Drakovan reeve closes the bounty book and pushes a stamped brass token across it. \"I don't know where it roosts. Old Mira does \u2014 she keeps a holding out at the Monarch's Waystation, and she lost half her cattle to it. Show her this token and she'll talk. Go by way of the Cradle of Dus",
+      "k; that's where the last wing-shadow was called in.\"\n[2026-09-02T01:35:42.403Z] [arbiter] \"Posters in this country mean someone is desperate or someone has died,\" the Arbiter says. \"Read the room before you sign.\"\n[2026-09-02T01:35:42.404Z] [reward] \u2726 Reeve's Brass Token \u2014 mission item.\n[2026-09-02T01:35:42.404Z] [system] \u25b8 Next: Cradle of Dusk.\n",
+      "[2026-09-02T01:35:42.407Z] [world] You set course for Cradle of Dusk. 8 tiles \u2014 about 20 hours of travel, all in. You set off now \u2014 the ground ahead is new ground. Keep tapping \u2192 CRADLE OF DUSK on the travel row to close the distance; STOP TRAVEL to halt.\n[2026-09-02T01:35:42.410Z] [debug] spawn: gear=[Arcane Guardian's Chestpiece, Iron Buckler, Bone Sling] window=10 roster=new\n",
+      "[2026-09-02T01:35:42.411Z] [world] You walk west through open silt. The compass points west into open ground.\n[2026-09-02T01:35:42.412Z] [world] The wind shifts a crust of mud aside ahead of you. Underneath, a small object.\n[2026-09-02T01:35:42.412Z] [reward] \u2726 Wild Onion (Common).\n[2026-09-02T01:35:42.412Z] [world] A handprint pressed into Aetherstone dust, recent enough to still hold shape.\n",
+      "[2026-09-02T01:35:42.412Z] [world] Auto-routing to the next stage of The Bog Dragon of Old Drakova: Cradle of Dusk.\n[2026-09-02T01:35:48.049Z] [debug] ui: tap \"take / salvage\"\n[2026-09-02T01:35:49.173Z] [world] You take the Bone Sling the way you take everything out here \u2014 quickly, and without ceremony.\n[2026-09-02T01:35:49.174Z] [reward] \u2726 Bone Sling (Common).\n",
+      "[2026-09-02T01:35:49.193Z] [world] You pocket the Iron Buckler and check the horizon, in that order.\n[2026-09-02T01:35:49.193Z] [reward] \u2726 Iron Buckler (Common).\n[2026-09-02T01:35:49.195Z] [world] The Arcane Guardian's Chestpiece goes into the pack by feel. You have done this a great many times.\n[2026-09-02T01:35:49.195Z] [reward] \u2726 Arcane Guardian's Chestpiece (Common).\n",
+      "[2026-09-02T01:35:50.281Z] [world] You strip the broken railgun carefully. Something usable comes free in your hand.\n[2026-09-02T01:35:50.282Z] [world] Tucked inside the cracked visor: an oddment that matches no quartermaster's list. The kind of thing that fuses well.\n[2026-09-02T01:35:50.282Z] [world] You break the pillar apart. Among the pieces, something worth keeping.\n",
+      "[2026-09-02T01:35:50.282Z] [world] You salvage the potion. The take is small but real.\n[2026-09-02T01:35:50.283Z] [reward] \u2726 Salvage haul:\n[2026-09-02T01:35:50.283Z] [reward]     \u2022 Scrap Metal (Common)\n[2026-09-02T01:35:50.283Z] [reward]     \u2022 Cracked Carapace Curl (Common)\n[2026-09-02T01:35:50.284Z] [reward]     \u2022 Worn Tartarian Coin x4 (Common)\n",
+      "[2026-09-02T01:35:50.284Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-09-02T01:35:50.716Z] [debug] persist sizes(KB): total=282 player=69 wm=126[rooms=61 events=5 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=83 scene=3\n[2026-09-02T01:35:52.353Z] [debug] ui: tap \"investigate\"\n[2026-09-02T01:35:54.141Z] [world] A silent bolt strikes near enough to singe your sleeve. (\u22123 HP)\n",
+      "[2026-09-02T01:35:54.164Z] [player] investigate the ground\n[2026-09-02T01:35:54.165Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n[2026-09-02T01:35:54.165Z] [arbiter] The Arbiter taps the slate. \"Not here. The Bog Dragon of Old Drakova points elsewhere \u2014 set a course from Contracts and do it there.\"\n",
+      "[2026-09-02T01:35:54.169Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Small Rock (Common).\n[2026-09-02T01:35:54.177Z] [system] \u23f3 Time passed: 24 min\n[2026-09-02T01:35:54.369Z] [cognitive] CLIMB  (191ms)\n[2026-09-02T01:35:56.300Z] [debug] ui: tap \"craft\"\n[2026-09-02T01:35:59.164Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n",
+      "[2026-09-02T01:35:59.177Z] [world] You repair the Architect's Sight Enhancer. Back to full. (spent: Patched Cloth x4)\n[2026-09-02T01:35:59.199Z] [world] You repair the Acid-Etched Corrupted Auralite Talon. Back to full. (spent: Small Rock x2)\n[2026-09-02T01:35:59.215Z] [arbiter] The Arbiter nods. \"Patched in: Smooth Stone \u2192 Small Rock.\"\n",
+      "[2026-09-02T01:35:59.217Z] [world] You repair the Choir-Bound Launcher. Back to full. (spent: Small Rock x2)\n[2026-09-02T01:35:59.230Z] [arbiter] The Arbiter eyes the Reclaimer's Cloak. \"Short on stock: Patched Cloth 4 short. Gather, then return.\"\n[2026-09-02T01:36:08.491Z] [debug] homework: intro-fill armed after 7381ms idle\n",
+      "[2026-09-02T01:36:14.200Z] [debug] parser: intent=craft conf=1.00 verb=craft target=corruption tonic resolved=- range=- enemies=0 hooks=1\n[2026-09-02T01:36:14.236Z] [debug] parser: intent=craft conf=1.00 verb=craft target=corruption tonic resolved=Corruption Tonic range=- enemies=0 hooks=1\n",
+      "[2026-09-02T01:36:14.267Z] [debug] parser: intent=craft conf=1.00 verb=craft target=corruption tonic resolved=Corruption Tonic range=- enemies=0 hooks=1\n[2026-09-02T01:36:14.296Z] [debug] parser: intent=craft conf=1.00 verb=craft target=corruption tonic resolved=Corruption Tonic range=- enemies=0 hooks=1\n[2026-09-02T01:36:14.312Z] [world] A Conspiracy Architects war party crests the rise"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-02-1618-the-slate-is-the-whole-slate #mtjfp13vhzw3 [inline 22/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtjfp13vhzw3"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-02-1618-the-slate-is-the-whole-slate"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "22"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-02-1618-the-slate-is-the-whole-slate"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-02T01:45:17.148496Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "3": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 289,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-02T01:45:17.305000Z",
+  "fingerprints": [
+    "0c290479c292bd9bc58184463257d603"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1949526399,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-02T01:16:35.756000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-02-1618-the-slate-is-the-whole-slate",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-02-1618-the-slate-is-the-whole-slate",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-02-1618-the-slate-is-the-whole-slate",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-02-1618-the-slate-is-the-whole-slate)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "cecaa196a3784cb1bb55c5712dcd4df1",
+  "previousEventID": "c17be714a90d44d691940c58e30da1b2"
+}

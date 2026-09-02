@@ -1,0 +1,263 @@
+{
+  "id": "fb41d8cb77d74450ab8882c9ab904778",
+  "groupID": "7705840850",
+  "eventID": "fb41d8cb77d74450ab8882c9ab904778",
+  "projectID": "4511945117532160",
+  "size": 17902,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-02-1618-the-slate-is-the-whole-slate #mtjdbf20sc0c [inline 26/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-02-1618-the-slate-is-the-whole-slate",
+  "message": "player-log 2026-09-02-1618-the-slate-is-the-whole-slate #mtjdbf20sc0c [inline 26/28]",
+  "title": "player-log 2026-09-02-1618-the-slate-is-the-whole-slate #mtjdbf20sc0c [inline 26/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "c4c85a741bd94703ace0c249ba030a22",
+      "span_id": "8a7dc862659550ff",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      " enemies=2 hooks=1\n[2026-09-02T00:36:12.170Z] [world] You commit to the dodge. Slip Mud Monarchs Raider 4's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-02T00:36:12.302Z] [combat] Mud Monarchs Raider 4 \u2014 d20 \u2192 11 + ATK 8 = 19 vs your AC 23 \u2014 \u2717 EVADED\n",
+      "[2026-09-02T00:36:12.302Z] [combat] Dodge \u2014 d20 \u2192 8 + DEX 23 = 31 vs ATK 19. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-02T00:36:12.302Z] [world] You slip Mud Monarchs Raider 4's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n",
+      "[2026-09-02T00:36:12.304Z] [debug] ac-shift 23\u219226: race/base 10 + gear 20 + title 0 \u2192 trimmed 23 + status 3 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n",
+      "[2026-09-02T00:36:12.304Z] [combat] Mud Monarchs Raider 5 \u2014 d20 \u2192 4 + ATK 7 = 11 vs your AC 26 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-02T00:36:12.305Z] [system] \u23f3 Time passed: 6 min\n[2026-09-02T00:36:12.707Z] [cognitive] neutral  (401ms)\n[2026-09-02T00:36:13.770Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n[2026-09-02T00:36:13.780Z] [system] bleeding fades.\n",
+      "[2026-09-02T00:36:13.783Z] [system] evasive \u2014 harder to hit fades.\n[2026-09-02T00:36:13.885Z] [player] attack with the auralite talon\n[2026-09-02T00:36:13.886Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=2 hooks=1\n",
+      "[2026-09-02T00:36:13.889Z] [debug] attack: target=Mud Monarchs Raider 4 range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n[2026-09-02T00:36:13.892Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-02T00:36:13.983Z] [world] You raise the acid-etched corrupted auralite talon toward Mud Monarchs Raider 4. The room narrows around the both of you.\n",
+      "[2026-09-02T00:36:13.984Z] [system] \u23f3 Time passed: 6 min\n[2026-09-02T00:36:14.376Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (391ms)\n[2026-09-02T00:36:24.452Z] [world] Mud Monarchs Raider 4 moves first. The pressure is immediate.\n",
+      "[2026-09-02T00:36:24.456Z] [debug] ac-shift 26\u219223: race/base 10 + gear 20 + title 0 \u2192 trimmed 23 + status 0 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n[2026-09-02T00:36:24.457Z] [combat] Mud Monarchs Raider 5 \u2014 d20 \u2192 12 + ATK 7 = 19 vs your AC 23 \u2014 \u2717 MISS\n",
+      "[2026-09-02T00:36:24.459Z] [combat] Mud Monarchs Raider 4 \u2014 d20 \u2192 19 + ATK 8 = 27 vs your AC 23 \u2014 \u2713 HIT\n[2026-09-02T00:36:24.916Z] [combat] Mud Monarchs Raider 4 deals 5 slashing damage [armor \u221234%]. You fall.\n[2026-09-02T00:36:24.917Z] [combat] Mud Monarchs Raider 4's strike leaves you bleeding.\n",
+      "[2026-09-02T00:36:24.917Z] [combat] The buried world claims Cheddar Bob. Tartaria keeps the body count.\n[2026-09-02T00:36:24.917Z] [system] Cheddar Bob has fallen. A Resurrection Gem from the title screen can bring them back.\n[2026-09-02T00:36:24.918Z] [combat] Soot falls beside you. The buried world claims them too.\n",
+      "[2026-09-02T00:36:26.112Z] [system] You join the Fallen of Tartaria \u2014 11 names the buried world keeps now. Read the roll from the Lore Codex.\n[2026-09-02T00:36:33.242Z] [debug] scene: loc=buried_cities hub=- arrival=n opening=n passing=n\n[2026-09-02T00:36:33.247Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-02T00:36:33.247Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n[2026-09-02T00:36:33.247Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n",
+      "[2026-09-02T00:36:33.248Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities HERE needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch\n[2026-09-02T00:36:33.248Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n",
+      "[2026-09-02T00:36:33.248Z] [debug] missions: \u00b7 at=buried_cities\n[2026-09-02T00:36:33.257Z] [world] \u25b8 Temporal Distortion Watch: this is the place \u2014 go quietly.\n[2026-09-02T00:36:33.411Z] [world] Blue and violet lightning crackles across the horizon, flashing through the sky in unnatural colors \u2014 the Etheric fields the Overload buried still discharging where the old grid shorts against itself. Elec",
+      "[Filtered]",
+      "A Reclaimer Ambusher (Human, Uncommon) emerges. Its Crossbow Volley can deal 1D6.\n\nMud sirens have sung here within the last day. The air still carries the shape.\n[2026-09-02T00:36:33.412Z] [combat] Distance: mid-range. Auralite Talon \u2014 needs approach \u00b7 Choir-Bound Launcher \u2014 needs approach.\n[2026-09-02T00:36:33.491Z] [world] Something about this ground is already familiar.\n",
+      "[2026-09-02T00:36:33.492Z] [system] Weather effect \u2014 Aetheric Storm: +1 INT \u00b7 -1 WIS\n[2026-09-02T00:36:33.496Z] [world] [The Buried Cities] north: Tartarian Pilgrim Camp (3 tiles, 8 hours) \u00b7 east: Sinking Cathedral (4 tiles, 10 hours) \u00b7 south: The Cistern Intake (5 tiles, 13 hours) \u00b7 west: Dynasty Border Post (6 tiles, 15 hours)\n",
+      "[2026-09-02T00:36:33.504Z] [reward] \u2726 Resurrection. Cheddar Bob returns to Tartaria, restored. The Aetherstone hums in recognition.\n[2026-09-02T00:36:45.479Z] [debug] ui: tap \"approach\"\n[2026-09-02T00:36:45.589Z] [player] approach Reclaimer Ambusher\n",
+      "[2026-09-02T00:36:45.591Z] [debug] parser: intent=advance conf=1.00 verb=approach target=reclaimer ambusher resolved=Reclaimer Ambusher range=mid enemies=1 hooks=0\n[2026-09-02T00:36:45.593Z] [debug] move: advance from range=mid enemies=1 weather=Aetheric Storm cost=1 partial=0\n[2026-09-02T00:36:45.594Z] [debug] move: field advance target=Reclaimer Ambusher d 1.50->0.50 band mid->close\n",
+      "[2026-09-02T00:36:45.594Z] [world] You close the gap with Reclaimer Ambusher. (range: close / arm's reach)\n[2026-09-02T00:36:45.596Z] [combat] Reclaimer Ambusher \u2014 d20 \u2192 16 + ATK 8 = 24 vs your AC 23 \u2014 \u2713 HIT\n[2026-09-02T00:36:45.598Z] [debug] arbiter: template (reason=combat)\n[2026-09-02T00:36:45.598Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-09-02T00:36:46.037Z] [combat] Reclaimer Ambusher deals 6 bludgeoning damage. You have 37 HP remaining.\n[2026-09-02T00:36:46.421Z] [cognitive] RETREAT \u00b7 THROW  (821ms)\n[2026-09-02T00:36:46.905Z] [debug] persist sizes(KB): total=293 player=67 wm=136[rooms=73 events=5 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=84 scene=5\n[2026-09-02T00:36:47.675Z] [debug] ui: tap \"dodge\"\n",
+      "[2026-09-02T00:36:47.680Z] [player] dodge\n[2026-09-02T00:36:47.680Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=0\n[2026-09-02T00:36:47.681Z] [world] You commit to the dodge. Slip Reclaimer Ambusher's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-02T00:36:47.763Z] [combat] Reclaimer Ambusher \u2014 d20 \u2192 10 + ATK 6 = 16 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n[2026-09-02T00:36:47.763Z] [combat] Dodge \u2014 d20 \u2192 3 + DEX 23 = 26 vs ATK 16. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-02T00:36:47.765Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-09-02T00:36:47.765Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-02T00:36:47.766Z] [system] \u23f3 Time passed: 6 min\n[2026-09-02T00:36:48.158Z] [cognitive] neutral  (391ms)\n[2026-09-02T00:36:49.403Z] [debug] ui: tap \"choir-bound launcher\"\n[2026-09-02T00:36:49.407Z] [system] bleeding fades.\n",
+      "[2026-09-02T00:36:49.481Z] [player] attack with the off-hand choir-bound launcher\n[2026-09-02T00:36:49.482Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=close enemies=1 hooks=0\n",
+      "[2026-09-02T00:36:49.483Z] [debug] attack: target=Reclaimer Ambusher range=close reach.bands=[distant,far,mid,close] reach.label=Choir-Bound Launcher bareHand=false\n[2026-09-02T00:36:49.485Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-02T00:36:49.601Z] [world] You raise the choir-bound launcher toward Reclaimer Ambusher. The room narrows around the both of you.\n",
+      "[2026-09-02T00:36:49.602Z] [system] \u23f3 Time passed: 6 min\n[2026-09-02T00:36:50.075Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 TAKE_COVER  (472ms)\n[2026-09-02T00:36:56.225Z] [world] Reclaimer Ambusher moves first. The pressure is immediate.\n[2026-09-02T00:36:56.228Z] [combat] Reclaimer Ambusher \u2014 d20 \u2192 3 + ATK 6 = 9 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-02T00:36:56.229Z] [combat] You \u2014 d20 \u2192 19 + INT 13 + 2 (point blank) perfect opening (2\u00d7 dice) = 34 vs Reclaimer Ambusher AC 10 \u2014 \u2713 HIT\n[2026-09-02T00:36:56.232Z] [combat] Reclaimer Ambusher shrugs off the aetheric. (resisted, \u00d70.5 for 9)\n",
+      "[2026-09-02T00:36:56.236Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Mud Armor \u2014 bludgeoning or slashing will bite where aetheric won't.\"\n[2026-09-02T00:36:56.236Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter watches the aetheric skid off. \"Swap to the Mud \u2026\"\n",
+      "[2026-09-02T00:36:56.237Z] [combat] Your strike with the choir-bound launcher lands for 9. Reclaimer Ambusher staggers \u2014 17 HP remaining. It answers.\n[2026-09-02T00:37:00.124Z] [debug] ui: tap \"choir-bound launcher\"\n[2026-09-02T00:37:00.133Z] [world] An Aetheric arc finds you \u2014 copper taste, blue afterimage, and a bite of damage. (\u22124 HP)\n",
+      "[2026-09-02T00:37:00.219Z] [player] attack with the off-hand choir-bound launcher\n[2026-09-02T00:37:00.220Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=close enemies=1 hooks=0\n",
+      "[2026-09-02T00:37:00.222Z] [debug] attack: target=Reclaimer Ambusher range=close reach.bands=[distant,far,mid,close] reach.label=Choir-Bound Launcher bareHand=false\n[2026-09-02T00:37:00.308Z] [world] You commit forward with the choir-bound launcher. Reclaimer Ambusher watches your hands.\n[2026-09-02T00:37:00.309Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-02T00:37:00.777Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 TAKE_COVER  (467ms)\n[2026-09-02T00:37:04.185Z] [world] You seize the initiative. Reclaimer Ambusher has no time to react.\n[2026-09-02T00:37:04.186Z] [combat] You \u2014 d20 \u2192 1 + INT 13 + 2 (point blank) = 16 vs Reclaimer Ambusher AC 10 \u2014 \u2717 FUMBLE\n",
+      "[2026-09-02T00:37:04.186Z] [combat] The choir-bound launcher cuts air. Reclaimer Ambusher answers immediately.\n[2026-09-02T00:37:04.189Z] [combat] Reclaimer Ambusher \u2014 d20 \u2192 7 + ATK 6 = 13 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-02T00:37:06.141Z] [debug] ui: tap \"dodge\"\n[2026-09-02T00:37:06.164Z] [player] dodge\n",
+      "[2026-09-02T00:37:06.166Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=0\n[2026-09-02T00:37:06.168Z] [world] You commit to the dodge. Slip Reclaimer Ambusher's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-02T00:37:06.293Z] [combat] Reclaimer Ambusher \u2014 d20 \u2192 12 + ATK 6 = 18 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n[2026-09-02T00:37:06.293Z] [combat] Dodge \u2014 d20 \u2192 15 + DEX 23 = 38 vs ATK 18. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-02T00:37:06.296Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-09-02T00:37:06.296Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-02T00:37:06.297Z] [system] \u23f3 Time passed: 6 min\n[2026-09-02T00:37:06.695Z] [cognitive] neutral  (396ms)\n[2026-09-02T00:37:10.296Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n[2026-09-02T00:37:10.440Z] [player] attack with the auralite talon\n",
+      "[2026-09-02T00:37:10.441Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=1 hooks=0\n[2026-09-02T00:37:10.446Z] [debug] attack: target=Reclaimer Ambusher range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n[2026-09-02T00:37:10.449Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-09-02T00:37:10.541Z] [world] Your acid-etched corrupted auralite talon comes around in an arc; Reclaimer Ambusher squares up to meet it.\n[2026-09-02T00:37:10.542Z] [system] \u23f3 Time passed: 6 min\n[2026-09-02T00:37:10.924Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (380ms)\n",
+      "[2026-09-02T00:37:20.204Z] [world] Reclaimer Ambusher moves first. The pressure is immediate.\n[2026-09-02T00:37:20.209Z] [combat] Reclaimer Ambusher \u2014 d20 \u2192 8 + ATK 6 = 14 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-02T00:37:20.209Z] [combat] You \u2014 d20 \u2192 18 + INT 13 perfect opening (2\u00d7 dice) = 31 vs Reclaimer Ambusher AC 10 \u2014 \u2713 HIT\n",
+      "[2026-09-02T00:37:20.210Z] [combat] Reclaimer Ambusher shrugs off the aetheric. (resisted, \u00d70.5 for 11)\n[2026-09-02T00:37:20.218Z] [combat] Clean hit with the acid-etched corrupted auralite talon for 11. Reclaimer Ambusher has 6 left and does not back away.\n",
+      "[2026-09-02T00:37:20.218Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 4 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n[2026-09-02T00:37:20.219Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 1 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n[2026-09-02T00:37:23.447Z] [debug] ui: tap \"choir-bound launcher\"\n",
+      "[2026-09-02T00:37:23.489Z] [player] attack with the off-hand choir-bound launcher\n[2026-09-02T00:37:23.490Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=close enemies=1 hooks=0\n[2026-09-02T00:37:23.490Z] [combat] Reclaimer Ambusher smokes \u2014 acid eats 4. (2/26 HP, 2 turns left)\n",
+      "[2026-09-02T00:37:23.490Z] [combat] Reclaimer Ambusher blackens \u2014 corruption eats 1. (1/26 HP, 2 turns left)\n[2026-09-02T00:37:23.491Z] [debug] attack: target=Reclaimer Ambusher range=close reach.bands=[distant,far,mid,close] reach.label=Choir-Bound Launcher bareHand=false\n",
+      "[2026-09-02T00:37:23.576Z] [world] Your choir-bound launcher comes around in an arc; Reclaimer Ambusher squares up to meet it.\n[2026-09-02T00:37:23.577Z] [system] \u23f3 Time passed: 6 min\n[2026-09-02T00:37:23.962Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 TAKE_COVER  (384ms)\n",
+      "[2026-09-02T00:37:24.415Z] [debug] persist sizes(KB): total=294 player=67 wm=137[rooms=73 events=5 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=85 scene=5\n[2"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-02-1618-the-slate-is-the-whole-slate #mtjdbf20sc0c [inline 26/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtjdbf20sc0c"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-02-1618-the-slate-is-the-whole-slate"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "26"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-02-1618-the-slate-is-the-whole-slate"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-02T01:16:36.091000Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "14": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 328,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-02T01:16:35.757000Z",
+  "fingerprints": [
+    "0c290479c292bd9bc58184463257d603"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1949526399,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-02T01:16:35.756000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-02-1618-the-slate-is-the-whole-slate",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-02-1618-the-slate-is-the-whole-slate",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-02-1618-the-slate-is-the-whole-slate",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-02-1618-the-slate-is-the-whole-slate)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "0923a6308a084649bd7b84c1df427175",
+  "previousEventID": "e6ac0a98504041178db22a16f5e0454c"
+}

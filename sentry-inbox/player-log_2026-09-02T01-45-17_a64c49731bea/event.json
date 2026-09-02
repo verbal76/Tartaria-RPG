@@ -1,0 +1,235 @@
+{
+  "id": "a64c49731bea471686804b78669dda19",
+  "groupID": "7705840850",
+  "eventID": "a64c49731bea471686804b78669dda19",
+  "projectID": "4511945117532160",
+  "size": 18125,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-02-1618-the-slate-is-the-whole-slate #mtjfp13vhzw3 [inline 1/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-02-1618-the-slate-is-the-whole-slate",
+  "message": "player-log 2026-09-02-1618-the-slate-is-the-whole-slate #mtjfp13vhzw3 [inline 1/28]",
+  "title": "player-log 2026-09-02-1618-the-slate-is-the-whole-slate #mtjfp13vhzw3 [inline 1/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "c4c85a741bd94703ace0c249ba030a22",
+      "span_id": "8a7dc862659550ff",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "=== TARTARIA LOG \u00b7 399841 CHARS \u00b7 BEGIN ===\n[2026-09-01T19:18:54.801Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 1 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n[2026-09-01T19:18:54.801Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-01T19:18:59.020Z] [debug] persist sizes(KB): total=265 player=58 wm=118[rooms=58 events=4 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=85 scene=4\n[2026-09-01T19:20:55.407Z] [debug] ui: tap \"\u2192 GARRIN'S DRAFTING BOARD\"\n[2026-09-01T19:20:55.423Z] [debug] spawn: gear=[Sentinel's Mobile Greaves, Force Wave] window=10 roster=new\n",
+      "[2026-09-01T19:20:55.425Z] [world] You walk west through open silt. The compass points west into open ground.\n[2026-09-01T19:20:55.433Z] [world] The thread you were following waits where you left it.\n[2026-09-01T19:20:56.572Z] [debug] ui: tap \"\u2192 GARRIN'S DRAFTING BOARD\"\n[2026-09-01T19:20:56.584Z] [world] You walk south. You arrive at Reclaimer's Stake.\n",
+      "[2026-09-01T19:20:56.586Z] [debug] scene: loc=reclaimer_stake hub=- arrival=y opening=n passing=n\n[2026-09-01T19:20:56.587Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n[2026-09-01T19:20:56.587Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n",
+      "[2026-09-01T19:20:56.588Z] [debug] missions: mystery:mystery_temporal_watch stage 0/4 [diplomacy] @reclaimer_stake HERE npc=\"the Reclaimers Guild Speaker\" gives=Guild Eddy-Gauge PAUSED\n[2026-09-01T19:20:56.588Z] [debug] missions: \u00b7 at=reclaimer_stake\n",
+      "[2026-09-01T19:20:56.609Z] [world] Time and the wasteland have worked this place over since you last passed through \u2014 there's something worth a second look again.\n[2026-09-01T19:20:56.630Z] [world] You've left Tartarian Outskirts and entered Reclaimer's Stake. Claim-posts driven in rows, each one a bet against the mud. The Guild plays long odds on purpose. It's afternoon. Nobody else is in sight. ",
+      "north leads to Iskan-Veil. Nothing named to the east or south or west.\n[2026-09-01T19:20:56.630Z] [world] The gate of Reclaimers' Outpost stands before you \u2014 their ground, not yet their halls. (Tap ENTER OUTPOST to step inside.)\n[2026-09-01T19:20:56.630Z] [world] The look of it lands a half-second before the memory does.\n[2026-09-01T19:20:56.631Z] [system] Weather effect \u2014 Black Rain: -1 CHA\n",
+      "[2026-09-01T19:20:56.633Z] [world] [Reclaimer's Stake] north: Iskan-Veil (2 tiles, 5 hours) \u00b7 east: The Architect's Blind (3 tiles, 8 hours) \u00b7 south: Asgardar (13 tiles, 1 day, 9 hours) \u00b7 west: open ground\n[2026-09-01T19:20:56.634Z] [world] You think back to the detector from earlier \u2014 the salvage you pulled from it. Something here reminds you of it.\n",
+      "[2026-09-01T19:20:56.634Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-01T19:20:56.634Z] [arbiter] The Arbiter looks around. \"Claim-posts driven in rows, each one a bet against the mud. The Guild plays long odds on purpose.\"\n[2026-09-01T19:20:57.506Z] [debug] ui: tap \"\u2192 GARRIN'S DRAFTING BOARD\"\n",
+      "[2026-09-01T19:20:57.524Z] [world] Onda Blackpalm glances up. \"You again.\" Not warm, not cold \u2014 noted.\n[2026-09-01T19:20:57.524Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Onda Blackpalm, fence. Tap the vendor banner to trade.\n",
+      "[2026-09-01T19:20:57.531Z] [world] Rare workings for sale: Elder Golem Sledge (500 TC), Ember Storm (200 TC), Fallout Bloom (200 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n[2026-09-01T19:20:57.532Z] [world] You walk west through open silt. The compass points west into open ground.\n",
+      "[2026-09-01T19:20:57.533Z] [reward] Following the lead \u2014 a stash tucked under a collapsed overpass, off to the north \u2014 you turn up the cache: 31 TC + Scrap Metal.\n[2026-09-01T19:20:57.533Z] [world] What you started here has not finished itself in your absence.\n[2026-09-01T19:20:59.106Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-09-01T19:21:00.369Z] [world] You salvage the broken obsidian pillar. The take is small but real.\n[2026-09-01T19:21:00.370Z] [world] You strip the posting carefully. Something usable comes free in your hand.\n[2026-09-01T19:21:00.370Z] [world] You break the standing water apart. Among the pieces, something worth keeping.\n",
+      "[2026-09-01T19:21:00.371Z] [world] You work the stone marker over. A part of it comes loose, intact.\n[2026-09-01T19:21:00.371Z] [world] You break the weathered aetheric drone shell apart. Among the pieces, something worth keeping.\n[2026-09-01T19:21:00.372Z] [reward] \u2726 Salvage haul:\n[2026-09-01T19:21:00.372Z] [reward]     \u2022 Worn Tartarian Coin x6 (Common)\n",
+      "[2026-09-01T19:21:00.372Z] [reward]     \u2022 Aether Crystal x2 (Common)\n[2026-09-01T19:21:00.372Z] [reward]     \u2022 Smooth Stone x3 (Common)\n[2026-09-01T19:21:00.373Z] [reward]     \u2022 Scrap Metal x3 (Common)\n[2026-09-01T19:21:01.556Z] [debug] ui: tap \"\u2192 GARRIN'S DRAFTING BOARD\"\n[2026-09-01T19:21:01.574Z] [debug] spawn: gear=[Sparkstrike] window=10 roster=new\n",
+      "[2026-09-01T19:21:01.575Z] [world] A drafting board stands on legs of scavenged pipe, weighted at each corner against the wind. A gaunt man draws a coastline from memory, slow and certain, like the land owes him the shape.\n",
+      "[2026-09-01T19:21:01.576Z] [arbiter] \"Garrin.\" He doesn't lift the pen. \"I map what's left. A runner took a folio of my field charts \u2014 the north fords, the sink lines, two years of miles \u2014 and went to ground north of here.\" The pen stops. \"I can't redraw what I can't re-walk, and my knees are done walking. Bring the folio back and I'll pay you in the one thing better than a map: the compass I drew",
+      " them with, and coin. I don't sell the originals. Ever.\"\n[2026-09-01T19:21:01.576Z] [system] Answer him from the SPEAK TO GARRIN bar below \u2014 or type \"accept garrin\" or \"leave garrin\".\n[2026-09-01T19:21:01.580Z] [world] A patch of luminous fungus grows in a low pocket of mud. Three colours: pale blue at the centre, copper-orange at the rim, deep violet under the wettest spots.\n",
+      "[2026-09-01T19:21:01.580Z] [world] Halem the Trader pays for fungi by the colour. Blue for clarity. Orange for fire. Violet for the dreaming road.\n[2026-09-01T19:21:01.581Z] [reward] \u2726 Recovered Bioluminescent Fungus.\n[2026-09-01T19:21:01.597Z] [world] The loose end is exactly as loose as you left it.\n[2026-09-01T19:21:38.268Z] [player] You take the job.\n",
+      "[2026-09-01T19:21:38.271Z] [arbiter] \"North. He camps low \u2014 look for ground with no birds over it.\" Garrin dips the pen. \"Miles come back or they don't. Bring my miles back.\"\n[2026-09-01T19:21:38.272Z] [system] \u25c8 Task taken \u2014 see WHISPERS in Contracts. SET COURSE walks you to the runner.\n",
+      "[2026-09-01T19:21:50.738Z] [world] You set out toward the Chart Runner. Tap the travel row to press on; STOP to halt.\n[2026-09-01T19:21:50.754Z] [world] You walk north through open silt. The compass points north into open ground.\n[2026-09-01T19:21:50.755Z] [world] Whatever you turned over here is still turned over.\n[2026-09-01T19:21:53.055Z] [debug] ui: tap \"\u2192 THE CHART RUNNER\"\n",
+      "[2026-09-01T19:21:53.070Z] [world] A silent muster stands off the path here \u2014 weathered and quiet, a way in still clear. (You\u2019re on a route \u2014 type ENTER to step inside, or keep traveling.)\n[2026-09-01T19:21:53.070Z] [world] You walk north through open silt. The compass points north into open ground.\n",
+      "[2026-09-01T19:21:53.072Z] [world] A line of three wagons, their axles buried, their canvas tops cracked open by the mud. The horses are gone \u2014 pulled free in a panic or eaten in one. The wagons themselves are intact. Whoever drove them packed for a long trip and made it nowhere.\n",
+      "[2026-09-01T19:21:53.072Z] [world] Pinned inside the lead wagon, a hand-drawn map. The destination is circled in red ink: Old Drakova. In the margin, in a different hand: 'the dragon is real. they were not exaggerating. turn back.'\n[2026-09-01T19:21:53.073Z] [reward] \u2726 Recovered Trail Rations x4.\n",
+      "[2026-09-01T19:21:53.083Z] [world] It sits where it sat. Patient is the wrong word \u2014 it simply does not move.\n[2026-09-01T19:21:54.271Z] [debug] ui: tap \"\u2192 THE CHART RUNNER\"\n[2026-09-01T19:21:54.278Z] [debug] spawn: gear=[Aetheric Spark] window=10 roster=new\n",
+      "[2026-09-01T19:21:54.278Z] [world] A lean figure bolts up from a dry wash, an oilskin folio strapped across his back like a shield. The Chart Runner looks for a road out, finds you on it, and draws steel instead.\n[2026-09-01T19:21:54.278Z] [combat] Chart Runner closes \u2014 Running Slash ready, 1D8 damage on a hit. (range: close)\n",
+      "[2026-09-01T19:21:54.279Z] [world] Your eye goes back to it before you decide to look.\n[2026-09-01T19:21:58.642Z] [debug] ui: tap \"dodge\"\n[2026-09-01T19:21:58.663Z] [player] dodge\n[2026-09-01T19:21:58.663Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=1 hooks=1\n",
+      "[2026-09-01T19:21:58.664Z] [world] You commit to the dodge. Slip Chart Runner's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-01T19:21:58.732Z] [combat] Chart Runner \u2014 d20 \u2192 8 + ATK 9 = 17 vs your AC 23 \u2014 \u2717 EVADED\n",
+      "[2026-09-01T19:21:58.733Z] [combat] Dodge \u2014 d20 \u2192 19 + DEX 25 = 44 vs ATK 17. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-01T19:21:58.736Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T19:21:58.987Z] [cognitive] neutral  (250ms)\n[2026-09-01T19:22:01.156Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n[2026-09-01T19:22:01.194Z] [player] attack with the auralite talon\n",
+      "[2026-09-01T19:22:01.195Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=mid enemies=1 hooks=1\n[2026-09-01T19:22:01.196Z] [debug] attack: target=Chart Runner range=mid reach.bands=[close] reach.label=Auralite Talon bareHand=false\n",
+      "[2026-09-01T19:22:01.196Z] [arbiter] The Arbiter holds up a hand. \"Auralite Talon works at close / arm's reach range only \u2014 you're at mid-range. ADVANCE to close in (they'll answer the approach), or attack with something that reaches.\"\n[2026-09-01T19:22:01.435Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (238ms)\n",
+      "[2026-09-01T19:22:01.706Z] [debug] persist sizes(KB): total=259 player=59 wm=110[rooms=49 events=4 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=87 scene=3\n[2026-09-01T19:22:03.440Z] [debug] ui: tap \"\ud83d\udd25\u2697 bone crossbow\"\n[2026-09-01T19:22:03.443Z] [system] perfect opening fades.\n[2026-09-01T19:22:03.485Z] [player] attack with the off-hand bone crossbow\n",
+      "[2026-09-01T19:22:03.485Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=1 hooks=1\n[2026-09-01T19:22:03.486Z] [debug] attack: target=Chart Runner range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-09-01T19:22:03.488Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-09-01T19:22:03.537Z] [world] Your searing acid-etched bone crossbow comes around in an arc; Chart Runner squares up to meet it.\n[2026-09-01T19:22:03.538Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T19:22:03.766Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (227ms)\n[2026-09-01T19:22:13.450Z] [world] You seize the initiative. Chart Runner has no time to react.\n",
+      "[2026-09-01T19:22:13.450Z] [combat] You \u2014 d20 \u2192 12 + DEX 25 perfect opening (2\u00d7 dice) = 37 vs Chart Runner AC 11 \u2014 \u2713 HIT\n[2026-09-01T19:22:13.452Z] [combat] Piercing flares \u2014 +1 on hit (weak \u2014 bites deep!).\n[2026-09-01T19:22:13.452Z] [combat] Weakness exposed \u2014 Chart Runner flinches. (piercing \u00d71.5 for 25)\n",
+      "[2026-09-01T19:22:13.454Z] [combat] You crack the Chart Runner with the Searing Acid-Etched Bone Crossbow for 25 \u2014 nearly the whole of their fight, gone in one blow. They crumple, out cold. (1/26 HP) Loot them before they come to.\n[2026-09-01T19:22:13.454Z] [combat] Nobody left standing \u2014 the fight is yours.\n",
+      "[2026-09-01T19:22:13.455Z] [reward] You strip the unconscious Chart Runner \u2014 Bone Knife, Mud-Bound Cloak, Patched Cloth, +22 TC. The gear's seen better days (worn from the fight).\n[2026-09-01T19:22:13.466Z] [combat] Searing Acid-Etched Bone Crossbow \u2014 1 burn bites in and festers (3 turns).\n",
+      "[2026-09-01T19:22:13.466Z] [combat] Searing Acid-Etched Bone Crossbow \u2014 2 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n[2026-09-01T19:22:13.466Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T19:22:27.894Z] [debug] kbbar: mounted bottom=355 raw=0 from=estimate winH=986 beat=-\n",
+      "[2026-09-01T19:22:28.207Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-09-01T19:22:33.517Z] [world] Black rain runs down your collar. Something in you tightens that should not have.\n[2026-09-01T19:22:33.560Z] [player] loot the chart runner\n",
+      "[2026-09-01T19:22:33.561Z] [debug] parser: intent=unknown conf=0.10 verb=- target=- resolved=- range=- enemies=0 hooks=1\n[2026-09-01T19:22:33.562Z] [arbiter] The Arbiter glances at your pack. \"Your horn-capped dowel is still there, if it suits the moment.\"\n[2026-09-01T19:22:33.562Z] [system] Try: look around \u00b7 search \u00b7 rest\n[2026-09-01T19:22:48.694Z] [player] search\n",
+      "[2026-09-01T19:22:48.694Z] [debug] parser: intent=investigate conf=1.00 verb=search target=- resolved=- range=- enemies=0 hooks=1\n[2026-09-01T19:22:48.697Z] [world] You look around. You're in Active Dig Trench, in Reclaimer's Stake. You see: Aetheric Spark, standing water, crate, stone marker, scrap pile, jagged submerged giant statue, banner, cart. The detector is unaddressed. Cardinal travel: no",
+      "rth, east, south, west. You're near an abandoned outpost \u2014 a way in stands clear. (Tap ENTER, or type 'enter', to step inside.)\n[2026-09-01T19:22:48.698Z] [arbiter] \u25b8 Still open \u2014 Defeat the Chart Runner and recover the chart folio \u2014 on the tile you are standing on. If the runner isn't there, step back onto that tile to draw them out again.\n[2026-09-01T19:22:48.878Z] [cognitive] neutral  (177ms)\n",
+      "[2026-09-01T19:22:50.901Z] [debug] ui: tap \"less \u25be\"\n[2026-09-01T19:23:23.001Z] [debug] ui: tap \"more \u25b8\"\n[2026-09-01T19:23:23.900Z] [debug] ui: tap \"missions\"\n[2026-09-01T19:23:40.407Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=cached winH=986 beat=-\n[2026-09-01T19:23:40.718Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n",
+      "[2026-09-01T19:23:46.029Z] [player] find the folio\n[2026-09-01T19:23:46.029Z] [debug] parser: intent=investigate conf=1.00 verb=find target=folio resolved=- range=- enemies=0 hooks=1\n[2026-09-01T19:23:46.031Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-09-01T19:23:46.031Z] [arbiter] The Arbiter looks around. \"The tally-board lists marked ruins in grease-pencil: DUG, DIGGING, DEEP, LATER. 'Later' is doing heavy work.\"\n[2026-09-01T19:23:46.032Z] [debug] arbiter: ambient held (he just spoke)\n[2026-09-01T19:23:46.343Z] [cognitive] neutral  (306ms)\n",
+      "[2026-09-01T19:23:46.801Z] [arbiter] The Arbiter tilts their head. \"I do not see a 'folio' here. Choose"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-02-1618-the-slate-is-the-whole-slate #mtjfp13vhzw3 [inline 1/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtjfp13vhzw3"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-02-1618-the-slate-is-the-whole-slate"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "1"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-02-1618-the-slate-is-the-whole-slate"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-02T01:45:17.028385Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-02T01:45:17.298000Z",
+  "fingerprints": [
+    "0c290479c292bd9bc58184463257d603"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1949526399,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-02T01:16:35.756000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-02-1618-the-slate-is-the-whole-slate",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-02-1618-the-slate-is-the-whole-slate",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-02-1618-the-slate-is-the-whole-slate",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-02-1618-the-slate-is-the-whole-slate)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "b265f8fcadf242d98e00b321171a2b29",
+  "previousEventID": "a4cc9e1d9594420d86c28e9b1bf6b2b8"
+}

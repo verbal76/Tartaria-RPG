@@ -1,0 +1,236 @@
+{
+  "id": "ac1fa374b53f46639a5fc2760a71d4ec",
+  "groupID": "7705840850",
+  "eventID": "ac1fa374b53f46639a5fc2760a71d4ec",
+  "projectID": "4511945117532160",
+  "size": 18130,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-02-1618-the-slate-is-the-whole-slate #mtjdbf20sc0c [inline 20/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-02-1618-the-slate-is-the-whole-slate",
+  "message": "player-log 2026-09-02-1618-the-slate-is-the-whole-slate #mtjdbf20sc0c [inline 20/28]",
+  "title": "player-log 2026-09-02-1618-the-slate-is-the-whole-slate #mtjdbf20sc0c [inline 20/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "c4c85a741bd94703ace0c249ba030a22",
+      "span_id": "8a7dc862659550ff",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      " You arrive at The Buried Cities.\n[2026-09-01T20:48:48.803Z] [debug] scene: loc=buried_cities hub=- arrival=y opening=n passing=n\n[2026-09-01T20:48:48.804Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-01T20:48:48.804Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n[2026-09-01T20:48:48.804Z] [debug] missions: mystery:mystery_temporal_watch stage 1/4 [investigate] @buried_cities HERE needs=Guild Eddy-Gauge\u2713 gives=Eddy-Zone Reading\n",
+      "[2026-09-01T20:48:48.804Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n[2026-09-01T20:48:48.805Z] [debug] missions: \u00b7 at=buried_cities travelTo=buried_cities\n[2026-09-01T20:48:48.805Z] [world] \u25b8 Temporal Distortion Watch: this is the place \u2014 search this ground.\n",
+      "[2026-09-01T20:48:48.856Z] [debug] spawn: gear=[Architect's Observer Visor, Titan's Trail Leggings] window=10 roster=new\n[2026-09-01T20:48:48.893Z] [arbiter] The Arbiter takes you in. \"The Buried Cities is lethal country. The things that wake here pull above your weight. 42 HP carries you through Varakush (danger 1). 1/9 Cores recovered. Visit the remaining Lost Capitals. Or move on until you've g",
+      "ot your legs under you.\"\n[2026-09-01T20:48:48.894Z] [world] Soot noses at the faint ozone and snorts. There's something there.\n[2026-09-01T20:48:48.897Z] [world] You've left Reclaimer's Stake and entered The Buried Cities. The buried cities sealed themselves under the same mud that killed them. There is no contradiction. It's dusk. A rust lurker and a mud wasp are already here. north leads to Tart",
+      "arian Pilgrim Camp; east leads to The Storm's Eye; west leads to The Architect's Blind. Nothing named to the south.\n[2026-09-01T20:48:48.897Z] [world] The gate of The Buried Cities stands before you \u2014 their ground, not yet their halls. (Tap ENTER OUTPOST to step inside.)\n[2026-09-01T20:48:48.897Z] [combat] Distance: close / arm's reach. Mud-Iron Greatblade \u2713 in range.\n",
+      "[2026-09-01T20:48:48.945Z] [arbiter] The Arbiter lowers their voice. \"You're carrying shadow with you \u2014 use it. Tap STEALTH before they close, and you can be on them before they know it. A clean opening strike, or slip past entirely.\"\n[2026-09-01T20:48:48.945Z] [system] Weather effect \u2014 Aether Lightning: +1 INT\n",
+      "[2026-09-01T20:48:48.948Z] [world] [The Buried Cities] north: Tartarian Pilgrim Camp (3 tiles, 8 hours) \u00b7 east: Sinking Cathedral (4 tiles, 10 hours) \u00b7 south: The Cistern Intake (5 tiles, 13 hours) \u00b7 west: Dynasty Border Post (6 tiles, 15 hours)\n[2026-09-01T20:48:48.948Z] [combat] A Rust Lurker and a Mud Wasp close on you. Tap the right-side panel to cycle targets.\n",
+      "[2026-09-01T20:48:57.469Z] [debug] ui: tap \"inventory\"\n[2026-09-01T20:49:09.349Z] [debug] persist sizes(KB): total=285 player=58 wm=135[rooms=73 events=4 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=85 scene=6\n[2026-09-01T20:49:13.944Z] [debug] ui: tap \"approach\"\n[2026-09-01T20:49:13.989Z] [player] approach Rust Lurker\n",
+      "[2026-09-01T20:49:13.990Z] [debug] parser: intent=advance conf=1.00 verb=approach target=rust lurker resolved=Rust Lurker range=close enemies=2 hooks=0\n[2026-09-01T20:49:13.991Z] [debug] move: advance from range=close enemies=2 weather=Aether Lightning cost=1 partial=0\n[2026-09-01T20:49:13.992Z] [debug] move: field advance target=Rust Lurker d 0.72->0.35 band close->close\n",
+      "[2026-09-01T20:49:13.992Z] [world] You close the gap with the Rust Lurker and Mud Wasp. (range: close / arm's reach)\n[2026-09-01T20:49:13.992Z] [combat] Rust Lurker goes still, half a beat out of step with the room. It holds a TEMPORAL SLIP instead of swinging \u2014 your next clean hit may find nothing.\n",
+      "[2026-09-01T20:49:13.993Z] [combat] Mud Wasp turns on Soot \u2014 d20 16 + ATK 4 = 20 vs Soot's AC 13 (vest +3) \u2014 \u2713 HIT\n[2026-09-01T20:49:13.993Z] [combat] Soot takes 3. (12/15 HP left)\n[2026-09-01T20:49:14.277Z] [cognitive] neutral  (282ms)\n[2026-09-01T20:49:15.127Z] [debug] ui: tap \"\u2744\u2697 mud-iron greatblade\"\n[2026-09-01T20:49:15.171Z] [player] attack with the mud-iron greatblade\n",
+      "[2026-09-01T20:49:15.172Z] [debug] parser: intent=attack conf=1.00 verb=attack target=mud iron greatblade resolved=Mud Wasp range=close enemies=2 hooks=0\n[2026-09-01T20:49:15.173Z] [debug] attack: target=Rust Lurker range=close reach.bands=[close] reach.label=Mud-Iron Greatblade bareHand=false\n",
+      "[2026-09-01T20:49:15.227Z] [world] Your frost-rimed acid-etched mud-iron greatblade comes around in an arc; Rust Lurker squares up to meet it.\n[2026-09-01T20:49:15.228Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T20:49:15.483Z] [cognitive] DISENGAGE \u00b7 ATTACK  (254ms)\n[2026-09-01T20:49:23.438Z] [world] You seize the initiative. Rust Lurker has no time to react.\n",
+      "[2026-09-01T20:49:23.438Z] [combat] You \u2014 d20 \u2192 15 + STR 16 = 31 vs Rust Lurker AC 9 \u2014 \u2717 SLIPPED\n[2026-09-01T20:49:23.439Z] [combat] Your blow lands where Rust Lurker WAS \u2014 it is a half-second past the spot, and the slip closes behind it, spent.\n[2026-09-01T20:49:23.440Z] [combat] Rust Lurker \u2014 d20 \u2192 7 + ATK 6 = 13 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-01T20:49:23.442Z] [combat] Mud Wasp \u2014 d20 \u2192 6 + ATK 4 = 10 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-01T20:49:35.785Z] [debug] ui: tap \"inventory\"\n[2026-09-01T20:49:48.774Z] [debug] stats: STR13 DEX23 INT11 WIS13 CHA7 STE7 | gear: WIS+4,INT+2,DEX+12,STR+4,STE+2 | worn: main=Auralite Talon head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntle",
+      "ts legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n[2026-09-01T20:50:02.426Z] [debug] stats: STR13 DEX23 INT12 WIS13 CHA7 STE7 | gear: WIS+4,INT+3,DEX+12,STR+4,STE+2 | worn: main=Auralite Talon off=Choir-Bound Launcher head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves ",
+      "feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n[2026-09-01T20:50:08.721Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n[2026-09-01T20:50:08.762Z] [player] attack with the auralite talon\n[2026-09-01T20:50:08.762Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=2 hooks=0\n",
+      "[2026-09-01T20:50:08.764Z] [debug] attack: target=Rust Lurker range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n[2026-09-01T20:50:08.822Z] [world] Your acid-etched corrupted auralite talon comes around in an arc; Rust Lurker squares up to meet it.\n[2026-09-01T20:50:08.822Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-01T20:50:09.068Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (245ms)\n[2026-09-01T20:50:17.158Z] [world] You seize the initiative. Rust Lurker has no time to react.\n[2026-09-01T20:50:17.158Z] [combat] You \u2014 d20 \u2192 11 + INT 13 = 24 vs Rust Lurker AC 11 \u2014 \u2713 HIT\n[2026-09-01T20:50:17.159Z] [combat] The Corrupted coating fails to take on Rust Lurker.\n",
+      "[2026-09-01T20:50:17.159Z] [combat] Rust Lurker shrugs off the aetheric. (resisted, \u00d70.5 for 3)\n[2026-09-01T20:50:17.165Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Mud Armor \u2014 bludgeoning or burn will bite where aetheric won't.\"\n",
+      "[2026-09-01T20:50:17.166Z] [combat] Your strike with the acid-etched corrupted auralite talon lands for 3. Rust Lurker staggers \u2014 34 HP remaining. It answers.\n[2026-09-01T20:50:17.166Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 1 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n",
+      "[2026-09-01T20:50:17.167Z] [combat] Mud Wasp turns on Soot \u2014 d20 3 + ATK 4 = 7 vs Soot's AC 13 (vest +3) \u2014 \u2717 MISS\n[2026-09-01T20:50:17.168Z] [combat] Rust Lurker \u2014 d20 \u2192 19 + ATK 4 = 23 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-09-01T20:50:17.491Z] [combat] Rust Lurker deals 2 slashing damage [armor \u221234%, plate \u22121]. You have 29 HP remaining.\n",
+      "[2026-09-01T20:50:17.813Z] [debug] persist sizes(KB): total=286 player=59 wm=135[rooms=73 events=4 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=86 scene=6\n[2026-09-01T20:50:19.242Z] [debug] ui: tap \"golem (68/68)\"\n[2026-09-01T20:50:19.252Z] [player] use golem\n[2026-09-01T20:50:19.252Z] [combat] Rampart attacks Rust Lurker \u2014 d20 12 + 3 = 15 vs AC 9 \u2014 \u2713 HIT\n",
+      "[2026-09-01T20:50:19.253Z] [combat] Rampart swings the Crude Golem Sledge \u2014 14 bludgeoning damage on Rust Lurker. (20 HP left)\n[2026-09-01T20:50:19.254Z] [combat] Rust Lurker retaliates \u2014 d20 8 + 4 hits Rampart for 3 (35% resisted). (65/68)\n[2026-09-01T20:50:19.270Z] [combat] Rust Lurker smokes \u2014 acid eats 1. (19/37 HP, 2 turns left)\n",
+      "[2026-09-01T20:50:19.272Z] [combat] Rust Lurker \u2014 d20 \u2192 2 + ATK 4 = 6 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-01T20:50:19.273Z] [combat] Mud Wasp \u2014 d20 \u2192 11 + ATK 4 = 15 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-01T20:50:21.035Z] [debug] ui: tap \"golem (65/68)\"\n[2026-09-01T20:50:21.041Z] [world] A silent bolt strikes near enough to singe your sleeve. (\u22122 HP)\n",
+      "[2026-09-01T20:50:21.044Z] [player] use golem\n[2026-09-01T20:50:21.044Z] [combat] Rampart attacks Rust Lurker \u2014 d20 15 + 3 = 18 vs AC 9 \u2014 \u2713 HIT\n[2026-09-01T20:50:21.045Z] [combat] Rampart swings the Crude Golem Sledge \u2014 18 bludgeoning damage on Rust Lurker. (1 HP left)\n[2026-09-01T20:50:21.046Z] [combat] Rust Lurker retaliates \u2014 d20 14 + 4 hits Rampart for 5 (35% resisted). (60/68)\n",
+      "[2026-09-01T20:50:21.059Z] [combat] Rust Lurker smokes \u2014 acid eats 1. (0/37 HP, 1 turn left)\n[2026-09-01T20:50:21.061Z] [reward] Rust Lurker defeated. You recover Scrap Metal, Rusted Parts, Blank Runecaster Casing (Uncommon).\n[2026-09-01T20:50:21.062Z] [combat] 1 attacker remains. Mud Wasp now in your sights.\n",
+      "[2026-09-01T20:50:21.062Z] [reward] \u2726 You feel hardier from your trials. +1 max HP (now 43). [111 enemies defeated]\n[2026-09-01T20:50:21.063Z] [reward] +10 TC pried from the dust.\n[2026-09-01T20:50:21.099Z] [arbiter] The Arbiter eyes your new pieces. \"You could make a Stone Fist now, if you wanted.\"\n",
+      "[2026-09-01T20:50:21.100Z] [combat] Mud Wasp \u2014 d20 \u2192 7 + ATK 4 = 11 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-01T20:50:21.393Z] [reward] \u2726 A Resurrection Gem flickers from the dust \u2014 gathered to your stash. (31 held)\n[2026-09-01T20:50:23.218Z] [debug] ui: tap \"choir-bound launcher\"\n[2026-09-01T20:50:23.271Z] [player] attack with the off-hand choir-bound launcher\n",
+      "[2026-09-01T20:50:23.272Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=mid enemies=1 hooks=0\n[2026-09-01T20:50:23.273Z] [debug] attack: target=Mud Wasp range=mid reach.bands=[distant,far,mid,close] reach.label=Choir-Bound Launcher bareHand=false\n",
+      "[2026-09-01T20:50:23.325Z] [world] You raise the choir-bound launcher toward Mud Wasp. The room narrows around the both of you.\n[2026-09-01T20:50:23.327Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T20:50:23.585Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 TAKE_COVER  (258ms)\n[2026-09-01T20:50:28.420Z] [world] You seize the initiative. Mud Wasp has no time to react.\n",
+      "[2026-09-01T20:50:28.420Z] [combat] You \u2014 d20 \u2192 4 + INT 13 = 17 vs Mud Wasp AC 8 \u2014 \u2713 HIT\n[2026-09-01T20:50:28.421Z] [combat] Mud Wasp shrugs off the aetheric. (resisted, \u00d70.5 for 2)\n[2026-09-01T20:50:28.425Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Mud Armor \u2014 bludgeoning or slashing will bite where aetheric won't.\"\n",
+      "[2026-09-01T20:50:28.427Z] [combat] Clean hit with the choir-bound launcher for 2. Mud Wasp has 5 left and does not back away.\n[2026-09-01T20:50:28.427Z] [combat] Mud Wasp turns on Soot \u2014 d20 12 + ATK 4 = 16 vs Soot's AC 13 (vest +3) \u2014 \u2713 HIT\n[2026-09-01T20:50:28.428Z] [combat] Soot takes 4. (8/15 HP left)\n[2026-09-01T20:50:30.934Z] [debug] ui: tap \"golem (60/68)\"\n",
+      "[2026-09-01T20:50:30.935Z] [player] use golem\n[2026-09-01T20:50:30.935Z] [combat] Rampart attacks Mud Wasp \u2014 d20 18 + 3 = 21 vs AC 8 \u2014 \u2713 HIT\n[2026-09-01T20:50:30.935Z] [combat] Rampart swings the Crude Golem Sledge \u2014 11 bludgeoning damage on Mud Wasp. (0 HP left)\n[2026-09-01T20:50:30.935Z] [world] Mud Wasp crumbles under Rampart's assault.\n",
+      "[2026-09-01T20:50:30.936Z] [reward] Mud Wasp defeated. You recover Aether Residue.\n[2026-09-01T20:50:30.936Z] [reward] +8 TC pried from the dust.\n[2026-09-01T20:50:40.831Z] [debug] ui: tap \"take / salvage\"\n[2026-09-01T20:50:42.151Z] [world] The Architect's Observer Visor is cold through your glove.\n[2026-09-01T20:50:42.152Z] [reward] \u2726 Architect's Observer Visor (Common).\n",
+      "[2026-09-01T20:50:42.172Z] [world] The Titan's Trail Leggings fits the hand better than it has any right to.\n[2026-09-01T20:50:42.172Z] [reward] \u2726 Titan's Trail Leggings (Common).\n[2026-09-01T20:50:42.812Z] [debug] persist sizes(KB): total=284 player=59 wm=136[rooms=73 events=4 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=84 scene=5\n",
+      "[2026-09-01T20:50:43.222Z] [reward] \u2726 Found Letter from Grandmother \u2014 The Awakened Heir. (open Contracts \u2192 Collectibles to read)\n[2026-09-01T20:50:43.235Z] [world] Tucked inside the bone tool: an oddment that matches no quartermaster's list. The kind of thing that fuses well.\n[2026-09-01T20:50:43.235Z] [world] You strip the broken lantern carefully. Something usable comes free in your hand.\n",
+      "[2026-09-01T20:50:43.235Z] [world] You salvage the cave moss. The take is small but real.\n[2026-09-01T20:50:43.236Z] [world] Tucked inside the dust lantern: an oddment that matches no quartermaster's list. The kind of thing that fuses well.\n",
+      "[2026-09-01T20:50:43.236Z] [world] Tucked inside the jagged buried market row rooftop: an oddment that matches no quartermaster's list. The kind of thing that fuses well.\n[2026-09-01T20:50:43.236Z] [world] You salvage the mask. The take is small but real.\n[2026-09-01T20:50:43.236Z] [world] You crack the rusted chain open. A page slides out \u2014 paper somehow dry, ink somehow still legible.\n",
+      "[2026-09-01T20:50:43.237Z] [reward] \u2726 Salvage haul:\n[2026-09-01T20:50:43.237Z] [reward]     \u2022 Obsidian Chip (Common)\n[2026-09-01T20:50:43.237Z] [reward]     \u2022 Aether Dust (Common)\n[2026-09-01T20:50:43.237Z] [reward]     \u2022 Stick x3 (Common)\n[2026-09-01T20:50:43.237Z] [reward]     \u2022 Charred Twig Bundle (Common)\n[2026-09-01T20:50:43.238Z] [reward]     \u2022 Copper Wire Spool (Uncommon)\n",
+      "[2026-09-01T20:50:43.238Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-09-01T20:50:57.820Z] [debug] ui: tap \"missions\"\n[2026-09-01T20:51:11.461Z] [debug] kbbar: mounted bottom=359.79486083984375 raw=360 from=cached winH=986 beat=-\n[2026-09-01T20:51:11.800Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-09-01T20:51:16.416Z] [player] use the watch\n",
+      "[2026-09-01T20:51:16.416Z] [debug] parser: intent=use_relic conf=1.00 verb=use target=watch resolved=- range=- enemies=0 hooks=0\n[2026-09-01T20:51:16.477Z] [system] \u23f3 Time passed: 15 min\n["
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-02-1618-the-slate-is-the-whole-slate #mtjdbf20sc0c [inline 20/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtjdbf20sc0c"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-02-1618-the-slate-is-the-whole-slate"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "20"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-02-1618-the-slate-is-the-whole-slate"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-02T01:16:36.011176Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-02T01:16:35.756000Z",
+  "fingerprints": [
+    "0c290479c292bd9bc58184463257d603"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1949526399,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-02T01:16:35.756000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-02-1618-the-slate-is-the-whole-slate",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-02-1618-the-slate-is-the-whole-slate",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-02-1618-the-slate-is-the-whole-slate",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-02-1618-the-slate-is-the-whole-slate)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "c463b0b5fa1947fea9fda41361ebcf36",
+  "previousEventID": "a6ad4f18cad145caa1cb1c5e3c1e5d84"
+}
