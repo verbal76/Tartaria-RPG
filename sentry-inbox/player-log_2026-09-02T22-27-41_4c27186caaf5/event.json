@@ -1,0 +1,234 @@
+{
+  "id": "4c27186caaf543039b724a40470a2284",
+  "groupID": "7708305622",
+  "eventID": "4c27186caaf543039b724a40470a2284",
+  "projectID": "4511945117532160",
+  "size": 18080,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-02-1632-set-course-stays-put #mtko2rkyvz6m [inline 23/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-02-1632-set-course-stays-put",
+  "message": "player-log 2026-09-02-1632-set-course-stays-put #mtko2rkyvz6m [inline 23/28]",
+  "title": "player-log 2026-09-02-1632-set-course-stays-put #mtko2rkyvz6m [inline 23/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "8beb9ef928ad43d3978fe7a7a6cc3c60",
+      "span_id": "8e2feaac9c01ddf8",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-02T01:36:17.605Z] [debug] parser: intent=craft conf=1.00 verb=craft target=acid flask resolved=Acid Flask range=close enemies=5 hooks=1\n[2026-09-02T01:36:17.618Z] [debug] arbiter: template (reason=combat)\n[2026-09-02T01:36:17.619Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-09-02T01:36:17.629Z] [debug] parser: intent=craft conf=1.00 verb=craft target=acid flask resolved=Acid Flask range=close enemies=5 hooks=1\n[2026-09-02T01:36:17.653Z] [debug] parser: intent=craft conf=1.00 verb=craft target=acid flask resolved=Acid Flask range=close enemies=5 hooks=1\n",
+      "[2026-09-02T01:36:17.676Z] [debug] parser: intent=craft conf=1.00 verb=craft target=acid flask resolved=Acid Flask range=close enemies=5 hooks=1\n[2026-09-02T01:36:17.689Z] [debug] arbiter: template (reason=combat)\n[2026-09-02T01:36:17.689Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-09-02T01:36:17.700Z] [debug] parser: intent=craft conf=1.00 verb=craft target=acid flask resolved=Acid Flask range=close enemies=5 hooks=1\n[2026-09-02T01:36:17.715Z] [world] A silent bolt strikes near enough to singe your sleeve. (\u22121 HP)\n[2026-09-02T01:36:17.725Z] [debug] parser: intent=craft conf=1.00 verb=craft target=acid flask resolved=Acid Flask range=close enemies=5 hooks=1\n",
+      "[2026-09-02T01:36:17.738Z] [debug] arbiter: template (reason=combat)\n[2026-09-02T01:36:17.739Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-02T01:36:17.749Z] [debug] parser: intent=craft conf=1.00 verb=craft target=acid flask resolved=Acid Flask range=close enemies=5 hooks=1\n[2026-09-02T01:36:17.762Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-09-02T01:36:17.762Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-02T01:36:17.773Z] [debug] parser: intent=craft conf=1.00 verb=craft target=acid flask resolved=Acid Flask range=close enemies=5 hooks=1\n[2026-09-02T01:36:17.787Z] [debug] arbiter: template (reason=combat)\n[2026-09-02T01:36:17.787Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-09-02T01:36:17.797Z] [debug] parser: intent=craft conf=1.00 verb=craft target=acid flask resolved=Acid Flask range=close enemies=5 hooks=1\n[2026-09-02T01:36:17.821Z] [debug] parser: intent=craft conf=1.00 verb=craft target=acid flask resolved=Acid Flask range=close enemies=5 hooks=1\n",
+      "[2026-09-02T01:36:17.835Z] [arbiter] \"Crafting Acid Flask would strip Bent Nail \u2192 Scrap Metal from your pack \u2014 confirm in the prompt to proceed, or it stays unmade.\"\n[2026-09-02T01:36:17.835Z] [debug] arbiter: template (reason=combat)\n[2026-09-02T01:36:17.835Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-09-02T01:36:17.835Z] [reward] \u2726 Crafted Acid Flask \u00d718 of 20 \u2014 the materials ran out (or your pack did).\n[2026-09-02T01:36:17.922Z] [cognitive] neutral  (535ms)\n[2026-09-02T01:36:17.937Z] [cognitive] neutral  (516ms)\n[2026-09-02T01:36:17.949Z] [cognitive] neutral  (502ms)\n[2026-09-02T01:36:17.961Z] [cognitive] neutral  (489ms)\n[2026-09-02T01:36:17.973Z] [cognitive] neutral  (477ms)\n",
+      "[2026-09-02T01:36:17.981Z] [cognitive] neutral  (460ms)\n[2026-09-02T01:36:17.988Z] [cognitive] neutral  (441ms)\n[2026-09-02T01:36:18.000Z] [cognitive] neutral  (428ms)\n[2026-09-02T01:36:18.007Z] [cognitive] neutral  (411ms)\n[2026-09-02T01:36:18.019Z] [cognitive] neutral  (399ms)\n[2026-09-02T01:36:18.056Z] [cognitive] neutral  (412ms)\n[2026-09-02T01:36:18.065Z] [cognitive] neutral  (398ms)\n",
+      "[2026-09-02T01:36:18.081Z] [cognitive] neutral  (391ms)\n[2026-09-02T01:36:18.092Z] [cognitive] neutral  (377ms)\n[2026-09-02T01:36:18.105Z] [cognitive] neutral  (366ms)\n[2026-09-02T01:36:18.115Z] [cognitive] neutral  (351ms)\n[2026-09-02T01:36:18.127Z] [cognitive] neutral  (338ms)\n[2026-09-02T01:36:18.142Z] [cognitive] neutral  (329ms)\n[2026-09-02T01:36:18.176Z] [cognitive] neutral  (339ms)\n",
+      "[2026-09-02T01:36:18.256Z] [debug] persist sizes(KB): total=285 player=69 wm=126[rooms=61 events=5 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=83 scene=7\n[2026-09-02T01:36:19.574Z] [player] craft Acid Flask\n[2026-09-02T01:36:19.575Z] [debug] parser: intent=craft conf=1.00 verb=craft target=acid flask resolved=Acid Flask range=close enemies=5 hooks=1\n",
+      "[2026-09-02T01:36:19.581Z] [arbiter] The Arbiter nods. \"Stripped for parts: Bent Nail \u2192 Scrap Metal.\"\n[2026-09-02T01:36:19.583Z] [reward] \u2726 Crafted Acid Flask. The Arbiter watches you set the last piece.\n[2026-09-02T01:36:19.584Z] [debug] arbiter: template (reason=combat)\n[2026-09-02T01:36:19.584Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-09-02T01:36:19.680Z] [cognitive] neutral  (95ms)\n[2026-09-02T01:36:23.324Z] [world] A silent bolt strikes near enough to singe your sleeve. (\u22122 HP)\n[2026-09-02T01:36:23.355Z] [debug] parser: intent=craft conf=1.00 verb=craft target=frost paste resolved=Frost Paste range=close enemies=5 hooks=1\n",
+      "[2026-09-02T01:36:23.389Z] [debug] parser: intent=craft conf=1.00 verb=craft target=frost paste resolved=Frost Paste range=close enemies=5 hooks=1\n[2026-09-02T01:36:23.406Z] [debug] arbiter: template (reason=combat)\n[2026-09-02T01:36:23.406Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-09-02T01:36:23.406Z] [reward] \u2726 Crafted Frost Paste \u00d72. The Arbiter watches you set the last piece.\n[2026-09-02T01:36:23.506Z] [cognitive] neutral  (146ms)\n[2026-09-02T01:36:23.510Z] [cognitive] neutral  (103ms)\n[2026-09-02T01:36:26.853Z] [debug] parser: intent=craft conf=1.00 verb=craft target=incendiary paste resolved=- range=close enemies=5 hooks=1\n",
+      "[2026-09-02T01:36:26.856Z] [debug] arbiter: template (reason=combat)\n[2026-09-02T01:36:26.856Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-02T01:36:26.883Z] [debug] parser: intent=craft conf=1.00 verb=craft target=incendiary paste resolved=Incendiary Paste range=close enemies=5 hooks=1\n",
+      "[2026-09-02T01:36:26.915Z] [debug] parser: intent=craft conf=1.00 verb=craft target=incendiary paste resolved=Incendiary Paste range=close enemies=5 hooks=1\n[2026-09-02T01:36:26.929Z] [debug] arbiter: template (reason=combat)\n[2026-09-02T01:36:26.929Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-09-02T01:36:26.945Z] [debug] parser: intent=craft conf=1.00 verb=craft target=incendiary paste resolved=Incendiary Paste range=close enemies=5 hooks=1\n[2026-09-02T01:36:26.958Z] [debug] arbiter: template (reason=combat)\n[2026-09-02T01:36:26.958Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-09-02T01:36:26.975Z] [debug] parser: intent=craft conf=1.00 verb=craft target=incendiary paste resolved=Incendiary Paste range=close enemies=5 hooks=1\n[2026-09-02T01:36:26.988Z] [debug] arbiter: template (reason=combat)\n[2026-09-02T01:36:26.988Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-09-02T01:36:26.988Z] [reward] \u2726 Crafted Incendiary Paste \u00d75. The Arbiter watches you set the last piece.\n[2026-09-02T01:36:27.088Z] [cognitive] neutral  (230ms)\n[2026-09-02T01:36:27.094Z] [cognitive] neutral  (194ms)\n[2026-09-02T01:36:27.104Z] [cognitive] neutral  (174ms)\n[2026-09-02T01:36:27.117Z] [cognitive] neutral  (157ms)\n[2026-09-02T01:36:27.129Z] [cognitive] neutral  (139ms)\n",
+      "[2026-09-02T01:36:33.408Z] [player] summon crystal golem\n[2026-09-02T01:36:33.408Z] [debug] parser: intent=cast conf=1.00 verb=summon target=crystal golem resolved=- range=close enemies=5 hooks=1\n[2026-09-02T01:36:33.469Z] [reward] Aether Golem Constructor \u2014 d20 18 + INT 13 = 31 vs DC 22 \u2014 \u2713 SUMMONED\n",
+      "[2026-09-02T01:36:33.470Z] [world] (2\u00d7 Aether Crystal + 1\u00d7 Aetheric Cloth + 1\u00d7 Aetheric Shard consumed.)\n[2026-09-02T01:36:33.470Z] [world] Aetherstone lifts out of the ground and folds into a shape that walks. Crystal Golem stands ready beside you. Your mastery shapes it stronger than most. (HP 68/68, 1d20 piercing)\n",
+      "[2026-09-02T01:36:33.471Z] [arbiter] The Arbiter studies the standing shape. \"You gave it life. You might as well give it a name.\"\n[2026-09-02T01:36:33.471Z] [debug] arbiter: template (reason=combat)\n[2026-09-02T01:36:33.471Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-02T01:36:33.472Z] [system] \u23f3 Time passed: 30 min\n",
+      "[2026-09-02T01:36:33.832Z] [cognitive] USE_ITEM  (359ms)\n[2026-09-02T01:36:39.795Z] [world] Ashwright. The name takes hold in the Aetherstone.\n[2026-09-02T01:36:39.797Z] [arbiter] The Arbiter nods. \"Ashwright, then.\"\n[2026-09-02T01:36:43.228Z] [debug] ui: tap \"inventory\"\n",
+      "[2026-09-02T01:37:16.581Z] [debug] persist sizes(KB): total=285 player=69 wm=126[rooms=61 events=5 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=83 scene=7\n[2026-09-02T01:37:21.060Z] [debug] ui: tap \"flee\"\n[2026-09-02T01:37:21.073Z] [world] A silent bolt strikes near enough to singe your sleeve. (\u22122 HP)\n[2026-09-02T01:37:21.076Z] [player] flee\n",
+      "[2026-09-02T01:37:21.077Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=close enemies=5 hooks=1\n[2026-09-02T01:37:21.149Z] [system] \u23f3 Time passed: 15 min\n[2026-09-02T01:37:21.427Z] [cognitive] FEAR \u00b7 RETREAT \u00b7 HIDE  (276ms)\n[2026-09-02T01:37:22.839Z] [debug] skillcheck: escape d20=1 DEX 23 = 24 vs Pursuit 12 \u2014 Conspiracy Architects Raider 5 (d20 3 + SPD 9) \u2192 PASS\n",
+      "[2026-09-02T01:37:22.932Z] [debug] stats: STR14 DEX23 INT12 WIS14 CHA8 STE7 | gear: WIS+4,INT+3,DEX+12,STR+4,STE+2 | worn: main=Auralite Talon off=Choir-Bound Launcher head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n",
+      "[2026-09-02T01:37:22.932Z] [debug] train: dexterity (escape check) \u2192 progress 50/100\n[2026-09-02T01:37:22.933Z] [world] You take the gap while there is a gap to take.\n[2026-09-02T01:37:25.546Z] [debug] ui: tap \"craft\"\n[2026-09-02T01:37:28.575Z] [debug] homework: intro-fill armed after 7386ms idle (strike 2/3)\n",
+      "[2026-09-02T01:37:33.008Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 4430ms read/write unusable (native mis-reported 83350ms/1120ms \u2014 llama.rn split bug, not this call) in 744t\u2192out 33t HIT-CAP (152ch)\n[2026-09-02T01:37:33.016Z] [debug] homework: scene_intro \"Drakova\" \u2713 4443ms\n[2026-09-02T01:37:36.474Z] [player] craft Crude Golem Greatsword\n",
+      "[2026-09-02T01:37:36.474Z] [debug] parser: intent=craft conf=1.00 verb=craft target=crude golem greatsword resolved=- range=- enemies=0 hooks=1\n[2026-09-02T01:37:36.477Z] [arbiter] \"Crafting Crude Golem Greatsword would strip 4\u00d7 Bent Nail \u2192 Scrap Metal from your pack \u2014 confirm in the prompt to proceed, or it stays unmade.\"\n[2026-09-02T01:37:36.508Z] [cognitive] neutral  (28ms)\n",
+      "[2026-09-02T01:37:38.052Z] [player] craft Crude Golem Greatsword\n[2026-09-02T01:37:38.053Z] [debug] parser: intent=craft conf=1.00 verb=craft target=crude golem greatsword resolved=- range=- enemies=0 hooks=1\n[2026-09-02T01:37:38.059Z] [arbiter] The Arbiter nods. \"Stripped for parts: 4\u00d7 Bent Nail \u2192 Scrap Metal.\"\n",
+      "[2026-09-02T01:37:38.061Z] [reward] \u2726 Crafted Crude Golem Greatsword. The Arbiter watches you set the last piece.\n[2026-09-02T01:37:38.062Z] [debug] arbiter: template (reason=intent-not-allowed:craft)\n[2026-09-02T01:37:38.062Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-02T01:37:38.203Z] [cognitive] neutral  (139ms)\n",
+      "[2026-09-02T01:37:40.089Z] [debug] qwen\u23f1 ambient ok 3593ms read 2505ms/write 1042ms in 365t\u2192out 31t 6.9ms/t HIT-CAP (147ch)\n[2026-09-02T01:37:40.094Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient after 3593ms \u2014 ambient:\u2205\n[2026-09-02T01:37:40.094Z] [debug] arbiter: ambient \u2205 3617ms\n",
+      "[2026-09-02T01:37:40.096Z] [debug] arbiter: ambient-empty reason=unknown raw=\"Your heart, once a beacon of hope, now leans towards the distant horizon, a testament to the paths you have taken. The E\"\n[2026-09-02T01:37:42.321Z] [debug] ui: tap \"inventory\"\n[2026-09-02T01:37:54.135Z] [player] arm golem with Crude Golem Greatsword\n",
+      "[2026-09-02T01:37:54.136Z] [player] arm golem with Crude Golem Greatsword\n[2026-09-02T01:37:54.136Z] [world] Ashwright takes up the Crude Golem Greatsword. It settles into the construct's grip like it was cast for it.\n[2026-09-02T01:37:54.831Z] [debug] qwen\u23f1 item_synthesis_hw preempted 5825ms read 4274ms/write 752ms in 327t\u2192out 24t 13.1ms/t (107ch)\n",
+      "[2026-09-02T01:37:55.487Z] [debug] qwen\u23f1 \u2702 DISCARDED item_synthesis_hw after 5825ms \u2014 item_synth:unparseable (107ch) raw=\"{\"kind\":\"weapon_coating\",\"description\":\"A thick, blackened flask with a sharp edge.\",\"extraTags\":[\"acid\"],\"\"\n[2026-09-02T01:37:55.488Z] [debug] homework: item_desc \"Acid Flask\" \u2205 6496ms\n",
+      "[2026-09-02T01:37:57.177Z] [debug] persist sizes(KB): total=282 player=69 wm=126[rooms=61 events=5 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=83 scene=3\n[2026-09-02T01:38:00.775Z] [debug] ui: tap \"\u2192 CRADLE OF DUSK\"\n[2026-09-02T01:38:00.787Z] [debug] spawn: gear=[Mud Heater Sword] window=10 roster=new\n",
+      "[2026-09-02T01:38:00.789Z] [world] The flat silt heaves, and a hand breaks the surface, then an arm, then a face caked grey with a thousand years of it.\n[2026-09-02T01:38:00.789Z] [arbiter] These are the Aetherkin the roadside traders whisper about \u2014 the flood-dead the Aether would not let rest.\n",
+      "[2026-09-02T01:38:00.789Z] [world] In life it was a machinist, one hand fused half-around a wrench that rusted into the bone \u2014 you find yourself wanting to know their name, and knowing you never will. Something you stirred woke the Aetherstone that held them; now they're awake and out.\n",
+      "[2026-09-02T01:38:00.789Z] [world] There's no hunger in it, only fright. It shrinks from your step, then squares up on trembling legs \u2014 it will defend itself, and nothing more.\n[2026-09-02T01:38:00.789Z] [world] You walk west through open silt. The compass points west into open ground.\n[2026-09-02T01:38:00.790Z] [world] The damp has been at it and got no further than it had.\n",
+      "[2026-09-02T01:38:05.114Z] [debug] ui: tap \"golem (68/68)\"\n[2026-09-02T01:38:05.124Z] [player] use golem\n[2026-09-02T01:38:05.125Z] [combat] Ashwright attacks Mud-Wracked Aetherkin \u2014 d20 17 + 3 = 20 vs AC 10 \u2014 \u2713 HIT\n[2026-09-02T01:38:05.126Z] [combat] Ashwright swings the Crude Golem Greatsword \u2014 7 slashing damage on Mud-Wracked Aetherkin. (98 HP left)\n",
+      "[2026-09-02T01:38:05.127Z] [combat] Mud-Wracked Aetherkin retaliates \u2014 d20 19 + 5 hits Ashwright for 7 (35% resisted). (61/68)\n[2026-09-02T01:38:05.149Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 13 + ATK 4 = 17 vs your AC 24 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-02T01:38:06.477Z] [debug] ui: tap \"golem (61/68)\"\n[2026-09-02T01:38:06.481Z] [player] use golem\n",
+      "[2026-09-02T01:38:06.481Z] [combat] Ashwright attacks Mud-Wracked Aetherkin \u2014 d20 19 + 3 = 22 vs AC 10 \u2014 \u2713 HIT\n[2026-09-02T01:38:06.482Z] [combat] Ashwright swings the Crude Golem Greatsword \u2014 6 slashing damage on Mud-Wracked Aetherkin. (92 HP left)\n[2026-09-02T01:38:06.483Z] [combat] Mud-Wracked Aetherkin swings at Ashwright and misses.\n",
+      "[2026-09-02T01:38:06.501Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 17 + ATK 4 = 21 vs yo"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-02-1632-set-course-stays-put #mtko2rkyvz6m [inline 23/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtko2rkyvz6m"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-02-1632-set-course-stays-put"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "23"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-02-1632-set-course-stays-put"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-02T22:27:43.112688Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-02T22:27:41.391000Z",
+  "fingerprints": [
+    "ab45a453459a07b939e0ca489ed21f45"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1951642568,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-02T22:12:29.555000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-02-1632-set-course-stays-put",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-02-1632-set-course-stays-put",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-02-1632-set-course-stays-put",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-02-1632-set-course-stays-put)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "4e64f1c80b3a418dbb81df1c9908193b",
+  "previousEventID": "3f4687f01f5f4032adc614b17b835959"
+}

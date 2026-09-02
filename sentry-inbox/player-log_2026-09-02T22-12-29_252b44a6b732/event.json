@@ -1,0 +1,237 @@
+{
+  "id": "252b44a6b7324da48b54836b793c4b8d",
+  "groupID": "7708305622",
+  "eventID": "252b44a6b7324da48b54836b793c4b8d",
+  "projectID": "4511945117532160",
+  "size": 18091,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-02-1632-set-course-stays-put #mtjfp13vhzw3 [inline 19/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-02-1632-set-course-stays-put",
+  "message": "player-log 2026-09-02-1632-set-course-stays-put #mtjfp13vhzw3 [inline 19/28]",
+  "title": "player-log 2026-09-02-1632-set-course-stays-put #mtjfp13vhzw3 [inline 19/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "8beb9ef928ad43d3978fe7a7a6cc3c60",
+      "span_id": "8e2feaac9c01ddf8",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      " tap \"investigate\"\n[2026-09-02T01:31:49.975Z] [player] investigate the ground\n[2026-09-02T01:31:49.975Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n[2026-09-02T01:31:49.982Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Small Rock (Common).\n",
+      "[2026-09-02T01:31:49.988Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-09-02T01:31:49.989Z] [arbiter] The Arbiter looks around. \"A buried city's name is heavier than the city itself. Speak names sparingly.\"\n[2026-09-02T01:31:49.989Z] [system] \u23f3 Time passed: 24 min\n[2026-09-02T01:31:50.163Z] [cognitive] CLIMB  (173ms)\n",
+      "[2026-09-02T01:31:51.255Z] [player] investigate puddle\n[2026-09-02T01:31:51.256Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=puddle resolved=puddle range=- enemies=0 hooks=1\n[2026-09-02T01:31:51.260Z] [world] You study the puddle. It bears no marks worth naming \u2014 no glyph, no fingerprint, no trace the Reclaimers would catalog.\n",
+      "[2026-09-02T01:31:51.440Z] [cognitive] SWIM  (171ms)\n[2026-09-02T01:31:52.372Z] [debug] ui: tap \"\u2192 DRAKOVA\"\n[2026-09-02T01:31:52.398Z] [debug] spawn: gear=[Short Hunting Bow] window=10 roster=new\n[2026-09-02T01:31:52.400Z] [world] You walk east through open silt. The compass tells you Mud Seas lies further east \u2014 5 tiles, about 13 hours of travel.\n",
+      "[2026-09-02T01:31:52.401Z] [world] Your hands remember the shape of what you were doing before your head does.\n[2026-09-02T01:31:52.676Z] [player] investigate fuel cell\n[2026-09-02T01:31:52.677Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=fuel cell resolved=fuel cell range=- enemies=0 hooks=1\n",
+      "[2026-09-02T01:31:52.679Z] [world] The metal is cold and unresponsive. A faint Aetheric hum, fading, says the mechanism was alive within the last decade.\n[2026-09-02T01:31:52.843Z] [debug] qwen\u23f1 investigate_lore ok 1262ms read 0ms/write 1046ms in 127t\u2192out 34t (144ch)\n[2026-09-02T01:31:53.150Z] [cognitive] neutral  (469ms)\n",
+      "[2026-09-02T01:31:54.634Z] [debug] qwen\u23f1 investigate_lore ok 1642ms read 311ms/write 1158ms in 127t\u2192out 37t 2.4ms/t (178ch)\n[2026-09-02T01:31:54.941Z] [debug] ui: tap \"take / salvage\"\n[2026-09-02T01:31:56.631Z] [reward] \u2726 Found Scavenger's Note \u2014 added later \u2014 The Family in the Mud. (open Contracts \u2192 Collectibles to read)\n",
+      "[2026-09-02T01:31:56.632Z] [reward] \u2726 The Family in the Mud's story is complete \u2014 every fragment recovered.\n[2026-09-02T01:31:56.648Z] [world] You break the burial cloth apart. Among the pieces, something worth keeping.\n[2026-09-02T01:31:56.648Z] [world] You work the cave fungus over. A part of it comes loose, intact.\n",
+      "[2026-09-02T01:31:56.649Z] [world] You salvage the coin. The take is small but real.\n[2026-09-02T01:31:56.649Z] [world] You salvage the fungus bloom. The take is small but real.\n[2026-09-02T01:31:56.649Z] [world] Wedged into the gate, half-hidden by the dust: a sealed letter. You pocket it carefully.\n",
+      "[2026-09-02T01:31:56.649Z] [world] You work the horn apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n[2026-09-02T01:31:56.650Z] [reward] \u2726 Salvage haul:\n[2026-09-02T01:31:56.650Z] [reward]     \u2022 Worn Tartarian Coin x6 (Common)\n[2026-09-02T01:31:56.650Z] [reward]     \u2022 Stick x2 (Common)\n[2026-09-02T01:31:56.650Z] [reward]     \u2022 Bent Nail (Common)\n",
+      "[2026-09-02T01:31:56.651Z] [reward]     \u2022 Driftwood Sliver (Common)\n[2026-09-02T01:32:04.077Z] [world] The Short Hunting Bow is lighter than it looks, which is its own kind of warning.\n[2026-09-02T01:32:04.078Z] [reward] \u2726 Short Hunting Bow (Common).\n[2026-09-02T01:32:05.973Z] [debug] ui: tap \"investigate\"\n[2026-09-02T01:32:07.330Z] [player] investigate the ground\n",
+      "[2026-09-02T01:32:07.331Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n[2026-09-02T01:32:07.335Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Stick (Common).\n[2026-09-02T01:32:07.343Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n",
+      "[2026-09-02T01:32:07.343Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-02T01:32:07.343Z] [system] \u23f3 Time passed: 24 min\n[2026-09-02T01:32:07.521Z] [cognitive] CLIMB  (177ms)\n[2026-09-02T01:32:08.564Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.\n[2026-09-02T01:32:08.590Z] [player] investigate puddle\n",
+      "[2026-09-02T01:32:08.591Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=puddle resolved=puddle range=- enemies=0 hooks=1\n[2026-09-02T01:32:08.596Z] [world] You study the puddle. It bears no marks worth naming \u2014 no glyph, no fingerprint, no trace the Reclaimers would catalog.\n[2026-09-02T01:32:08.770Z] [cognitive] SWIM  (172ms)\n",
+      "[2026-09-02T01:32:08.997Z] [debug] persist sizes(KB): total=296 player=64 wm=145[rooms=81 events=5 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=82 scene=5\n[2026-09-02T01:32:09.339Z] [debug] ui: tap \"rest\"\n[2026-09-02T01:32:09.343Z] [player] rest\n[2026-09-02T01:32:09.343Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-09-02T01:32:09.344Z] [world] You rest for 8 hours. +7 stamina recovered. (Day 50, night)\n[2026-09-02T01:32:09.344Z] [debug] arbiter: ambient held (he just spoke)\n[2026-09-02T01:32:09.358Z] [debug] arbiter: template (reason=intent-not-allowed:rest)\n[2026-09-02T01:32:09.359Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-09-02T01:32:09.359Z] [debug] arbiter: ambient held (he just spoke)\n[2026-09-02T01:32:09.360Z] [system] \u23f3 Time passed: 8h\n[2026-09-02T01:32:09.551Z] [cognitive] REST  (190ms)\n[2026-09-02T01:32:10.572Z] [debug] ui: tap \"\u2192 DRAKOVA\"\n[2026-09-02T01:32:10.589Z] [debug] spawn: gear=[Bone Shiv (Stealth), Mud-Iron Cleaver, Explorer's Worn Headgear] window=10 roster=new\n",
+      "[2026-09-02T01:32:10.591Z] [world] Dral Hollowpocket grins. \"Cheddar Bob. Sit a minute. The road's been generous or it hasn't \u2014 which is it?\"\n[2026-09-02T01:32:10.592Z] [world] Dral Hollowpocket looks you over. \"It's been a long stretch, Cheddar Bob. I'd started asking after you.\"\n",
+      "[2026-09-02T01:32:10.592Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Dral Hollowpocket, fence. Tap the vendor banner to trade.\n[2026-09-02T01:32:10.599Z] [world] Rare workings for sale: Titanforged Cuirass (500 TC), Titanforged Gauntlets (500 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ",
+      "ask.\n[2026-09-02T01:32:10.600Z] [world] You walk east through open silt. The compass tells you Mud Seas lies further east \u2014 4 tiles, about 10 hours of travel.\n[2026-09-02T01:32:10.601Z] [world] A pool of standing water, perfectly circular, in a depression that has no inlet and no outlet. The water is the colour of Aether at dusk and the surface does not move. Looking down into it, you see yourself",
+      " \u2014 but not the version of you standing on this bank. The version you are looking at is older. They look up. You back away. They do not.\n[2026-09-02T01:32:10.601Z] [world] When you turn to leave, the surface of the pool ripples once. Not from a stone. From the inside.\n[2026-09-02T01:32:10.602Z] [reward] \u2726 Recovered Aether Dust x3.\n",
+      "[2026-09-02T01:32:10.612Z] [world] You are standing the way you stood last time, without meaning to.\n[2026-09-02T01:32:10.799Z] [debug] qwen\u23f1 investigate_lore ok 1886ms read 298ms/write 1347ms in 127t\u2192out 34t 2.3ms/t (157ch)\n[2026-09-02T01:32:11.891Z] [debug] ui: tap \"take / salvage\"\n[2026-09-02T01:32:12.858Z] [world] The Bone Shiv (Stealth) is cold through your glove.\n",
+      "[2026-09-02T01:32:12.859Z] [reward] \u2726 Bone Shiv (Stealth) (Common).\n[2026-09-02T01:32:12.876Z] [world] The Mud-Iron Cleaver fits the hand better than it has any right to.\n[2026-09-02T01:32:12.876Z] [reward] \u2726 Mud-Iron Cleaver (Common).\n[2026-09-02T01:32:12.878Z] [world] You turn the Explorer's Worn Headgear over once, then keep it.\n",
+      "[2026-09-02T01:32:12.878Z] [reward] \u2726 Explorer's Worn Headgear (Common).\n[2026-09-02T01:32:14.037Z] [world] You work the bioluminescent patch over. A part of it comes loose, intact.\n[2026-09-02T01:32:14.038Z] [world] You salvage the broken shovel. The take is small but real.\n[2026-09-02T01:32:14.038Z] [reward] \u2726 Salvage haul:\n[2026-09-02T01:32:14.038Z] [reward]     \u2022 Mud Fragment x2 (Common)\n",
+      "[2026-09-02T01:32:14.040Z] [reward]     \u2022 Cloth Scrap (Common)\n[2026-09-02T01:32:15.257Z] [debug] ui: tap \"investigate\"\n[2026-09-02T01:32:16.619Z] [player] investigate the ground\n[2026-09-02T01:32:16.619Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-09-02T01:32:16.624Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Small Rock (Common).\n[2026-09-02T01:32:16.632Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-09-02T01:32:16.632Z] [arbiter] The Arbiter looks around. \"The buried cities sealed themselves under the same mud that killed them. There is no contradiction.\"\n",
+      "[2026-09-02T01:32:16.632Z] [system] \u23f3 Time passed: 24 min\n[2026-09-02T01:32:16.809Z] [cognitive] CLIMB  (176ms)\n[2026-09-02T01:32:17.626Z] [debug] ui: tap \"\u2192 DRAKOVA\"\n[2026-09-02T01:32:17.649Z] [debug] spawn: gear=[Lost Seeker's Gloves, Mud Mauler] window=10 roster=new\n[2026-09-02T01:32:17.651Z] [combat] The aether under your skin draws something out \u2014 Crystalline Entity forms from the haze.\n",
+      "[2026-09-02T01:32:17.651Z] [world] You walk east through open silt. The compass tells you Mud Seas lies further east \u2014 3 tiles, about 8 hours of travel.\n[2026-09-02T01:32:17.651Z] [world] Something in your shoulders drops back into the same set.\n[2026-09-02T01:32:20.376Z] [debug] ui: tap \"dodge\"\n[2026-09-02T01:32:20.390Z] [player] dodge\n",
+      "[2026-09-02T01:32:20.391Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=1 hooks=1\n[2026-09-02T01:32:20.392Z] [world] You commit to the dodge. Slip Crystalline Entity's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-02T01:32:20.459Z] [combat] Crystalline Entity \u2014 d20 \u2192 10 + ATK 6 = 16 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n[2026-09-02T01:32:20.459Z] [combat] Dodge \u2014 d20 \u2192 5 + DEX 23 = 28 vs ATK 16. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-02T01:32:20.460Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-09-02T01:32:20.460Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-02T01:32:20.461Z] [system] \u23f3 Time passed: 6 min\n[2026-09-02T01:32:20.727Z] [cognitive] neutral  (266ms)\n[2026-09-02T01:32:21.760Z] [debug] ui: tap \"choir-bound launcher\"\n[2026-09-02T01:32:21.812Z] [player] attack with the off-hand choir-bound launcher\n",
+      "[2026-09-02T01:32:21.812Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=mid enemies=1 hooks=1\n[2026-09-02T01:32:21.813Z] [debug] attack: target=Crystalline Entity range=mid reach.bands=[distant,far,mid,close] reach.label=Choir-Bound Launcher bareHand=false\n",
+      "[2026-09-02T01:32:21.814Z] [arbiter] Whisper Fog hangs between you. \"\u22121 to the swing \u2014 see what you can,\" the Arbiter says.\n[2026-09-02T01:32:21.814Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-09-02T01:32:21.815Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-09-02T01:32:21.875Z] [world] You raise the choir-bound launcher toward Crystalline Entity. The room narrows around the both of you.\n[2026-09-02T01:32:21.875Z] [system] \u23f3 Time passed: 6 min\n[2026-09-02T01:32:22.136Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 TAKE_COVER  (260ms)\n",
+      "[2026-09-02T01:32:22.449Z] [debug] persist sizes(KB): total=273 player=65 wm=122[rooms=58 events=5 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=81 scene=5\n[2026-09-02T01:32:27.513Z] [world] Crystalline Entity moves first. The pressure is immediate.\n[2026-09-02T01:32:27.515Z] [combat] Crystalline Entity \u2014 d20 \u2192 20 + ATK 6 = 26 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 CRITICAL HIT\n",
+      "[2026-09-02T01:32:27.516Z] [combat] You \u2014 d20 \u2192 10 + INT 12 \u2212 1 (Whisper Fog) perfect opening (2\u00d7 dice) = 21 vs Crystalline Entity AC 14 \u2014 \u2713 HIT\n[2026-09-02T01:32:27.517Z] [combat] Crystalline Entity shrugs off the aetheric. (resisted, \u00d70.5 for 7)\n",
+      "[2026-09-02T01:32:27.520Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Mud Armor \u2014 bludgeoning or slashing will bite where aetheric won't.\"\n[2026-09-02T01:32:27.520Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter watches the aetheric skid off. \"Swap to the Mud \u2026\"\n",
+      "[2026-09-02T01:32:27.521Z] [combat] Clean hit with the choir-bound launcher for 7. Crystalline Entity has 127 left and does not back away.\n[2026-09-02T01:32:27.831Z] [combat] Crystalline Entity deals 12 bludgeoning damage [edge of reach \u2014 halved]. You have 31 HP remaining.\n[2026-09-02T01:32:30.128Z] [debug] ui: tap \"flee\"\n[2026-09-02T01:32:30.135Z] [player] flee\n",
+      "[2026-09-02T01:32:30.135Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=mid enemies=1 hooks=1\n[2026-09-02T01:32:30.208Z] [system] \u23f3 Time passed: 15 min\n[2026-09-02T01:32:30.467Z] [cognitive] FEAR \u00b7 RETREAT \u00b7 HIDE  (258ms)\n[2026-09-02T01:32:32.248Z] [debug] skillcheck: escape d20=18 DEX 23 = 41 vs Pursuit 7 \u2014 Crystalline Entity (d20 3 + SPD 4) \u2192 PASS\n",
+      "[2026-09-02T01:32:32.333Z] [debug] stats: STR14 DEX23 INT12 WIS14 CHA8 STE7 | gear: WIS+4,INT+3,DEX+12,STR+4,STE+2 | worn: main=Auralite Talon off=Choir-Bound Launcher head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n",
+      "[2026-09-02T01:32:32.333Z] [debug] train: dexterity (escape check) \u2192 progress 46/100\n[2026-09-02T01:32:32.333Z] [world] Three long strides and the distance is yours to keep.\n[2026-09-02T01:32:33.980Z] [debug] ui: tap \"\u2192 DRAKOVA\"\n[2026-09-02T01:32:33.996Z] [debug] spawn: gear=[Reclaimer's Salvage Vest, Mud Shortsword] window=10 roster=new\n",
+      "[2026-09-02T01:32:33.997Z] [world] You walk east through open silt. The compass tells you Mud Seas lies further east \u2014 2 tiles, about 5 hours of travel.\n[2026-09-02T01:32:33.998Z] [world] Your feet have taken you to the same three paces of ground.\n[2026-09-02T01:32:35.297Z] [debug] ui: tap \"take / salvage\"\n[2026-09-02T01:32:36.252Z] [world] The Mud Shortsword comes away clean.\n",
+      "[2026-09-02T01:32:36.253Z] [reward] \u2726 Mud Shortsword (Common).\n[2026-09-02T01:32:36.271Z] [world] It takes two pulls. The Reclaimer's Salvage Vest is yours on the second.\n[2026-09-02T01:32:36.271Z] [reward] \u2726 Reclaimer's Salvage Vest (Common).\n[2026-09-02T01:32:37.413Z] [world] You work the dweller torch over. A part of it comes loose, intact.\n",
+      "[2026-09-02T01:32:37.413Z] [world] You work the filter over. A part of it comes loose, intact.\n[2026-09-02T01:32:37.414Z] [world] You break t"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-02-1632-set-course-stays-put #mtjfp13vhzw3 [inline 19/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtjfp13vhzw3"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-02-1632-set-course-stays-put"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "19"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-02-1632-set-course-stays-put"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "3"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-02T22:12:28.961189Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-02T22:12:29.557000Z",
+  "fingerprints": [
+    "ab45a453459a07b939e0ca489ed21f45"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1951642568,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-02T22:12:29.555000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-02-1632-set-course-stays-put",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-02-1632-set-course-stays-put",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-02-1632-set-course-stays-put",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-02-1632-set-course-stays-put)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "25df5bedf5384a8f83b799a048441be7",
+  "previousEventID": "2264e685837d42f9ab5d99846a61a819"
+}

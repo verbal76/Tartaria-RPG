@@ -1,0 +1,237 @@
+{
+  "id": "1d63ddb1bf4544fcaaa438666de538ff",
+  "groupID": "7708305622",
+  "eventID": "1d63ddb1bf4544fcaaa438666de538ff",
+  "projectID": "4511945117532160",
+  "size": 18090,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-02-1632-set-course-stays-put #mtjfp13vhzw3 [inline 5/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-02-1632-set-course-stays-put",
+  "message": "player-log 2026-09-02-1632-set-course-stays-put #mtjfp13vhzw3 [inline 5/28]",
+  "title": "player-log 2026-09-02-1632-set-course-stays-put #mtjfp13vhzw3 [inline 5/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "8beb9ef928ad43d3978fe7a7a6cc3c60",
+      "span_id": "8e2feaac9c01ddf8",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      " \u2014 \u2717 MISS\n[2026-09-01T20:41:13.346Z] [debug] ui: tap \"approach\"\n[2026-09-01T20:41:13.377Z] [player] approach Scrap Drone\n[2026-09-01T20:41:13.378Z] [debug] parser: intent=advance conf=1.00 verb=approach target=scrap drone resolved=Scrap Drone range=close enemies=1 hooks=2\n[2026-09-01T20:41:13.381Z] [debug] move: advance from range=close enemies=1 weather=Glass Hail cost=1 partial=0\n",
+      "[2026-09-01T20:41:13.381Z] [debug] move: field advance target=Scrap Drone d 0.50->0.35 band close->close\n[2026-09-01T20:41:13.382Z] [world] You close the gap with Scrap Drone. (range: close / arm's reach)\n[2026-09-01T20:41:13.384Z] [combat] Scrap Drone smokes \u2014 acid eats 3. (1/15 HP, 1 turn left)\n",
+      "[2026-09-01T20:41:13.385Z] [combat] Scrap Drone \u2014 d20 \u2192 12 + ATK 3 = 15 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-01T20:41:13.386Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-01T20:41:13.386Z] [arbiter] \"Footwork over fury,\" the Arbiter says quietly. \"The scrap drone is patient. Be patienter.\"\n[2026-09-01T20:41:13.675Z] [cognitive] neutral  (288ms)\n",
+      "[2026-09-01T20:41:14.913Z] [debug] ui: tap \"punch\"\n[2026-09-01T20:41:14.921Z] [player] punch\n[2026-09-01T20:41:14.921Z] [debug] parser: intent=attack conf=1.00 verb=punch target=- resolved=- range=close enemies=1 hooks=2\n[2026-09-01T20:41:14.922Z] [combat] Scrap Drone smokes \u2014 acid eats 3. (0/15 HP, 0 turns left)\n",
+      "[2026-09-01T20:41:14.923Z] [combat] Scrap Drone shakes off the last of the acid \u2014 the Auralite Talon has run its course.\n[2026-09-01T20:41:14.925Z] [reward] Scrap Drone defeated. You recover Drone Processor \u00d72.\n[2026-09-01T20:41:14.928Z] [reward] +12 TC pried from the dust.\n[2026-09-01T20:41:17.248Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-09-01T20:41:18.949Z] [world] You claim the Giant Bone Longbow.\n[2026-09-01T20:41:18.950Z] [reward] \u2726 Giant Bone Longbow (Common).\n[2026-09-01T20:41:18.966Z] [world] The Aether-Runner Greaves comes up out of the silt with a small sucking protest.\n[2026-09-01T20:41:18.966Z] [reward] \u2726 Aether-Runner Greaves (Common).\n",
+      "[2026-09-01T20:41:18.968Z] [world] The Golem Leather Gloves was half under something. It is not now.\n[2026-09-01T20:41:18.968Z] [reward] \u2726 Golem Leather Gloves (Common).\n[2026-09-01T20:41:19.935Z] [world] You salvage the barrel. The take is small but real.\n[2026-09-01T20:41:19.936Z] [world] You salvage the marker. The take is small but real.\n",
+      "[2026-09-01T20:41:19.936Z] [world] You strip the standing water carefully. Something usable comes free in your hand.\n[2026-09-01T20:41:19.936Z] [reward] \u2726 Salvage haul:\n[2026-09-01T20:41:19.937Z] [reward]     \u2022 Scrap Metal x2 (Common)\n[2026-09-01T20:41:19.937Z] [reward]     \u2022 Smooth Stone x3 (Common)\n[2026-09-01T20:41:22.848Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-09-01T20:41:24.324Z] [player] investigate the mud\n[2026-09-01T20:41:24.324Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=mud range=- enemies=0 hooks=2\n[2026-09-01T20:41:24.325Z] [arbiter] The Arbiter taps the slate. \"Not here. Temporal Distortion Watch points elsewhere \u2014 set a course from Contracts and do it there.\"\n",
+      "[2026-09-01T20:41:24.325Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter taps the slate. \"Not here. Temporal Distortion W\u2026\"\n[2026-09-01T20:41:24.326Z] [world] You crouch beside the mud. The silt has half-swallowed it.\n[2026-09-01T20:41:24.327Z] [world] A sealed first aid kit, slipped behind the mud and forgotten. Bandages, salve, a single dose.\n",
+      "[2026-09-01T20:41:24.327Z] [reward] \u2726 First Aid Kit (Uncommon).\n[2026-09-01T20:41:24.328Z] [world] Mud Scanner ticks \u2014 buried trace in the mud.\n[2026-09-01T20:41:24.328Z] [reward] \u2726 Mud Fragment (Common).\n[2026-09-01T20:41:24.510Z] [cognitive] SWIM  (180ms)\n[2026-09-01T20:41:25.580Z] [player] investigate pit\n",
+      "[2026-09-01T20:41:25.580Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=pit resolved=pit range=- enemies=0 hooks=2\n[2026-09-01T20:41:25.581Z] [arbiter] The Arbiter taps the slate. \"Not here. Temporal Distortion Watch points elsewhere \u2014 set a course from Contracts and do it there.\"\n",
+      "[2026-09-01T20:41:25.581Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter taps the slate. \"Not here. Temporal Distortion W\u2026\"\n[2026-09-01T20:41:25.581Z] [world] You take the measure of the pit. The Aetheric haze does not gather; the dust does not stir. Just a thing, in a place.\n[2026-09-01T20:41:25.789Z] [cognitive] neutral  (206ms)\n",
+      "[2026-09-01T20:41:26.146Z] [debug] persist sizes(KB): total=270 player=63 wm=118[rooms=57 events=4 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=85 scene=4\n[2026-09-01T20:41:27.707Z] [player] Ask how far they range\n[2026-09-01T20:41:27.707Z] [world] \"I do this stretch and one other.\" They gesture vaguely. \"Any more and you are travelling, not trading. Travelling is how you lose stock.\"\n",
+      "[2026-09-01T20:41:27.708Z] [world] Nell of the Long Road lets the sentence run longer than they would for a stranger.\n[2026-09-01T20:41:28.817Z] [world] You let the conversation go and Nell of the Long Road gets back to it.\n[2026-09-01T20:41:40.853Z] [reward] Bought Skyreacher Map 3 of 5 \u2014 Obsidian Monolith from Nell of the Long Road for 132 TC. (510 TC left)\n",
+      "[2026-09-01T20:41:47.886Z] [reward] Sold Plasma Dagger (Common) to Nell of the Long Road for 14 TC. (524 TC on hand)\n[2026-09-01T20:41:47.944Z] [reward] Sold Giant Bone Longbow (Common) to Nell of the Long Road for 14 TC. (538 TC on hand)\n[2026-09-01T20:41:47.994Z] [reward] Sold Golem Leather Gloves (Common) to Nell of the Long Road for 13 TC. (551 TC on hand)\n",
+      "[2026-09-01T20:41:48.042Z] [reward] Sold Salvager's Trench Coat (Common) to Nell of the Long Road for 6 TC. (557 TC on hand)\n[2026-09-01T20:41:48.090Z] [reward] Sold Salvager's Worn Boots (Common) to Nell of the Long Road for 6 TC. (563 TC on hand)\n[2026-09-01T20:41:48.138Z] [reward] Sold Bone Knife (Common) to Nell of the Long Road for 6 TC. (569 TC on hand)\n",
+      "[2026-09-01T20:41:48.186Z] [reward] Sold Bone Knife (Common) to Nell of the Long Road for 6 TC. (575 TC on hand)\n[2026-09-01T20:41:48.234Z] [reward] Sold Bone Knife (Common) to Nell of the Long Road for 6 TC. (581 TC on hand)\n[2026-09-01T20:41:48.283Z] [reward] Sold Cudgel (Common) to Nell of the Long Road for 6 TC. (587 TC on hand)\n",
+      "[2026-09-01T20:41:48.331Z] [reward] Sold Bone Knife (Common) to Nell of the Long Road for 6 TC. (593 TC on hand)\n[2026-09-01T20:41:48.378Z] [reward] Sold Bone Knife (Common) to Nell of the Long Road for 6 TC. (599 TC on hand)\n[2026-09-01T20:41:48.426Z] [reward] Sold Architect's Mask of Vision (Common) to Nell of the Long Road for 6 TC. (605 TC on hand)\n",
+      "[2026-09-01T20:41:48.473Z] [reward] Sold Bone Knife (Common) to Nell of the Long Road for 6 TC. (611 TC on hand)\n[2026-09-01T20:41:48.521Z] [reward] Sold Aether-Runner Greaves (Common) to Nell of the Long Road for 6 TC. (617 TC on hand)\n[2026-09-01T20:41:48.568Z] [reward] Sold Mud-Warden's Vest (Common) to Nell of the Long Road for 5 TC. (622 TC on hand)\n",
+      "[2026-09-01T20:41:48.614Z] [reward] Sold Mud-Warden's Vest (Common) to Nell of the Long Road for 5 TC. (627 TC on hand)\n[2026-09-01T20:41:48.661Z] [reward] Sold Mud-Bound Cloak (Common) to Nell of the Long Road for 5 TC. (632 TC on hand)\n[2026-09-01T20:41:48.708Z] [reward] Sold Mud-Warden's Vest (Common) to Nell of the Long Road for 5 TC. (637 TC on hand)\n",
+      "[2026-09-01T20:41:48.754Z] [reward] Sold Mud-Bound Cloak (Common) to Nell of the Long Road for 5 TC. (642 TC on hand)\n[2026-09-01T20:41:48.800Z] [reward] Sold Mud-Bound Cloak (Common) to Nell of the Long Road for 5 TC. (647 TC on hand)\n[2026-09-01T20:41:48.847Z] [reward] Sold Crude Golem Greatsword (Common) to Nell of the Long Road for 5 TC. (652 TC on hand)\n",
+      "[2026-09-01T20:41:48.893Z] [reward] Sold Mud-Bound Cloak (Common) to Nell of the Long Road for 5 TC. (657 TC on hand)\n[2026-09-01T20:41:48.939Z] [reward] Sold Cudgel (Common) to Nell of the Long Road for 5 TC. (662 TC on hand)\n[2026-09-01T20:41:48.985Z] [reward] Sold Reclaimer's Salvage Vest (Common) to Nell of the Long Road for 5 TC. (667 TC on hand)\n",
+      "[2026-09-01T20:42:12.011Z] [reward] Bought Mud-Iron Greatblade from Nell of the Long Road for 479 TC. (188 TC left)\n[2026-09-01T20:42:12.011Z] [reward] They don't charge a friend full price \u2014 26 TC stayed in your pouch.\n[2026-09-01T20:42:15.129Z] [world] You set the Aetheric Spark aside to free your hands for the Mud-Iron Greatblade.\n",
+      "[2026-09-01T20:42:15.211Z] [debug] stats: STR16 DEX23 INT10 WIS13 CHA7 STE7 | gear: WIS+4,INT+1,DEX+12,STR+7,STE+2 | worn: main=Mud-Iron Greatblade head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n",
+      "[2026-09-01T20:42:20.170Z] [reward] Bought Firewood from Nell of the Long Road for 3 TC. (185 TC left)\n[2026-09-01T20:42:25.724Z] [reward] Bought 4\u00d7 Wild Lettuce from Nell of the Long Road for 12 TC. (173 TC left)\n[2026-09-01T20:42:27.466Z] [debug] persist sizes(KB): total=263 player=57 wm=118[rooms=57 events=4 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=84 scene=3\n",
+      "[2026-09-01T20:42:27.662Z] [reward] Bought 3\u00d7 Trail Rations from Nell of the Long Road for 24 TC. (149 TC left)\n[2026-09-01T20:42:27.662Z] [reward] They don't charge a friend full price \u2014 3 TC stayed in your pouch.\n[2026-09-01T20:42:29.709Z] [reward] Bought 3\u00d7 Wild Carrot from Nell of the Long Road for 9 TC. (140 TC left)\n",
+      "[2026-09-01T20:42:35.657Z] [reward] Nell of the Long Road fires up a portable Crucible for you. (\u221225 TC)\n[2026-09-01T20:42:38.609Z] [debug] ui: tap \"inventory\"\n[2026-09-01T20:42:45.081Z] [player] fuse\n",
+      "[2026-09-01T20:43:17.968Z] [reward] \u2726 The Crucible drinks the five pieces and works a second coating channel into the Mud-Iron Greatblade. It can now hold TWO coatings at once \u2014 both bite on every landing hit. (Its damage and edge are unchanged.)\n[2026-09-01T20:43:20.474Z] [reward] Nell of the Long Road fires up a portable Crucible for you. (\u221225 TC)\n",
+      "[2026-09-01T20:43:45.811Z] [player] Ask why they trade out here\n[2026-09-01T20:43:45.812Z] [world] \"Because out here I am the only shop in the world.\" The trader grins at their own arithmetic. \"In a settlement I am one stall among twenty. On this stretch of road I am civilization ITSELF for half a day's walk in both directions. The mark-up is not greed, it is geography.\" The grin softens a notch. ",
+      "\"Also \u2014 and do not spread this \u2014 somebody should be out here. The road is long. A fire and a fair-enough price change what the road IS.\"\n[2026-09-01T20:43:45.812Z] [world] Nell of the Long Road looks at the road behind you before they answer anything at all.\n[2026-09-01T20:43:46.840Z] [world] You let the conversation go and Nell of the Long Road gets back to it.\n",
+      "[2026-09-01T20:43:49.025Z] [debug] ui: tap \"inventory\"\n[2026-09-01T20:43:49.655Z] [debug] persist sizes(KB): total=264 player=57 wm=120[rooms=57 events=4 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=84 scene=3\n[2026-09-01T20:44:00.363Z] [reward] You work the frost paste along the weapon. Now wielding the Frost-Rimed Mud-Iron Greatblade \u2014 1d6 cold on every landing hit.\n",
+      "[2026-09-01T20:44:08.102Z] [reward] You work the acid flask into the weapon's second channel \u2014 it now carries TWO coatings. Now wielding the Frost-Rimed Acid-Etched Mud-Iron Greatblade; both bite on every landing hit (1d6 cold + 1d4 acid).\n[2026-09-01T20:45:01.259Z] [debug] ui: tap \"craft\"\n",
+      "[2026-09-01T20:45:03.299Z] [world] You repair the Aether-Walker's Boots. Back to full. (spent: Patched Cloth x4)\n[2026-09-01T20:45:03.332Z] [world] You repair the Architect's Sight Enhancer. Back to full. (spent: Patched Cloth x4)\n[2026-09-01T20:45:03.348Z] [world] You repair the Mud-glass Scales. Back to full. (spent: Patched Cloth x4)\n",
+      "[2026-09-01T20:45:03.358Z] [world] You repair the Reclaimer's Cloak. Back to full. (spent: Patched Cloth x4)\n[2026-09-01T20:45:03.368Z] [world] You repair the Relic Hunter's Gauntlets. Back to full. (spent: Patched Cloth x4)\n[2026-09-01T20:45:03.377Z] [world] You repair the Aetheric Spark. Back to full. (spent: Scrap Metal x4, Stick x2)\n",
+      "[2026-09-01T20:45:03.389Z] [arbiter] The Arbiter nods. \"Patched in: Big Rock \u2192 Small Rock.\"\n[2026-09-01T20:45:03.391Z] [world] You repair the Acid-Etched Corrupted Auralite Talon. Back to full. (spent: Small Rock x2)\n[2026-09-01T20:45:03.400Z] [world] You repair the Bone Crossbow. Back to full. (spent: Scrap Metal x6, Stick x2)\n",
+      "[2026-09-01T20:45:03.408Z] [world] You repair the Bone Crossbow. Back to full. (spent: Scrap Metal x6, Stick x2)\n[2026-09-01T20:45:03.417Z] [world] You repair the Bone Crossbow. Back to full. (spent: Scrap Metal x6, Stick x2)\n[2026-09-01T20:45:03.425Z] [arbiter] The Arbiter eyes the Bone Crossbow. \"Short on stock: Stick 1 short. Gather, then return.\"\n",
+      "[2026-09-01T20:45:03.425Z] [arbiter] The Arbiter eyes the Bone Crossbow. \"Short on stock: Stick 1 short. Gather, then return.\"\n[2026-09-01T20:45:03.425Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter eyes the Bone Crossbow. \"Short on stock: Stick 1\u2026\"\n[2026-09-01T20:45:03.425Z] [arbiter] The Arbiter eyes the Bone Crossbow. \"Short on stock: Stick 1 short. Gather, then return.\"\n",
+      "[2026-09-01T20:45:03.425Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter eyes the Bone Crossbow. \"Short on stock: Stick 1\u2026\"\n[2026-09-01T20:45:03.426Z] [arbiter] The Arbiter eyes the Bone Crossbow. \"Short on stock: Stick 1 short. Gather, then return.\"\n[2026-09-01T20:45:03.426Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter eyes the Bone Crossbow. \"Short on stock: Stick 1\u2026\"\n",
+      "[2026-09-01T20:45:03.426Z] [world] You repair the Forgotten Protector's Plate. Back to full. (spent: Scrap Metal x6, Patched Cloth x4)\n[2026-09-01T20:45:03.434Z] [world] You repair the Reclaimer's Rope. Back to full. (spent: Patched Cloth x4)\n[2026-09-01T20:45:03.442Z] [world] You repair the Reclaimer's Rope. Back to full. (spent: Patched Cloth x4)\n",
+      "[2026-09-01T20:45:03.454Z] [arbiter] The Arbiter nods. \"Patched in: 2\u00d7 Big Rock \u2192 Small Rock.\"\n[2026-09-01T20:45:03.456Z] [world] You repair the Smoldering Reclaimers Guild Geode-Cored Cleaver. Back to full. (spent: Small Rock x2)\n[2026-09-01T20:45:13.007Z] [player] craft Aether-Purge Tonic\n",
+      "[2026-09-01T20:45:13.009Z] [debug] parser: intent=craft conf=1.00 verb=craft target=aether purge tonic resolved=- range=- enemies=0 hooks=2\n[2026-09-01T20:45:13.012Z] [reward] \u2726 Crafted Aether-Purge Tonic. The Arbiter watches you set the last piece.\n[2026-09-01T20:45:13.012Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-09-01T20:45:13.012Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-01T20:45:13.141Z] [cognitive] RETREAT  (128ms)\n[2026-09-01T20:45:15.656Z] [world] A shard of mud-glass nicks you. Small wound, steady reminder. (\u22121 HP)\n[2026-09-01T20:45:15.709Z] [debug] parser: intent=craft conf=1.00 verb=craft target=field dressing resolved=- range=- enemies=0 hooks=2\n",
+      "[2026-09-01T20:45:15.715Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-01T20:45:15."
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-02-1632-set-course-stays-put #mtjfp13vhzw3 [inline 5/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtjfp13vhzw3"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-02-1632-set-course-stays-put"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "5"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-02-1632-set-course-stays-put"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "3"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-02T22:12:28.708205Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-02T22:12:29.554000Z",
+  "fingerprints": [
+    "ab45a453459a07b939e0ca489ed21f45"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1951642568,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-02T22:12:29.555000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-02-1632-set-course-stays-put",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-02-1632-set-course-stays-put",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-02-1632-set-course-stays-put",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-02-1632-set-course-stays-put)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "209c5d4d37a348609e4e67c8d8c03f42",
+  "previousEventID": "1c31401398784ac2a949774cd7679674"
+}

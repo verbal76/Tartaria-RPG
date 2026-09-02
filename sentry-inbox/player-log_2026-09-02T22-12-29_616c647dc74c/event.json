@@ -1,0 +1,237 @@
+{
+  "id": "616c647dc74c4b13ae7f6d982f06a0ee",
+  "groupID": "7708305622",
+  "eventID": "616c647dc74c4b13ae7f6d982f06a0ee",
+  "projectID": "4511945117532160",
+  "size": 18085,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-02-1632-set-course-stays-put #mtjfp13vhzw3 [inline 21/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-02-1632-set-course-stays-put",
+  "message": "player-log 2026-09-02-1632-set-course-stays-put #mtjfp13vhzw3 [inline 21/28]",
+  "title": "player-log 2026-09-02-1632-set-course-stays-put #mtjfp13vhzw3 [inline 21/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "8beb9ef928ad43d3978fe7a7a6cc3c60",
+      "span_id": "8e2feaac9c01ddf8",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "[world] You work the barnacle chain over. A part of it comes loose, intact.\n[2026-09-02T01:33:35.567Z] [reward] \u2726 Salvage haul:\n[2026-09-02T01:33:35.567Z] [reward]     \u2022 Scrap Metal x3 (Common)\n[2026-09-02T01:33:36.016Z] [debug] persist sizes(KB): total=285 player=67 wm=133[rooms=69 events=5 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=82 scene=3\n",
+      "[2026-09-02T01:33:36.642Z] [debug] ui: tap \"STOP TRAVEL\"\n[2026-09-02T01:33:36.643Z] [world] You set the course aside. Cardinal direction is yours again.\n[2026-09-02T01:33:39.644Z] [debug] ui: tap \"missions\"\n",
+      "[2026-09-02T01:33:41.821Z] [world] You set course for Drakova. 4 tiles \u2014 about 10 hours of travel, all in. You set off now \u2014 the ground ahead is new ground. Keep tapping \u2192 DRAKOVA on the travel row to close the distance; STOP TRAVEL to halt.\n[2026-09-02T01:33:41.829Z] [world] You walk east. You arrive at The Broken Steeple.\n",
+      "[2026-09-02T01:33:41.830Z] [reward] \u2726 The road has built you up. +1 max stamina (now 18). [5 travels completed]\n[2026-09-02T01:33:41.831Z] [debug] scene: loc=broken_steeple hub=- arrival=y opening=n passing=y\n[2026-09-02T01:33:41.832Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-02T01:33:41.832Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token\n[2026-09-02T01:33:41.832Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n",
+      "[2026-09-02T01:33:41.832Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n[2026-09-02T01:33:41.833Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n",
+      "[2026-09-02T01:33:41.833Z] [debug] missions: \u00b7 at=broken_steeple travelTo=drakova\n[2026-09-02T01:33:41.839Z] [debug] spawn: gear=[Tartarian Bone Knife] window=10 roster=new\n[2026-09-02T01:33:41.847Z] [arbiter] The Arbiter takes you in. \"The Broken Steeple is lethal country. The things that wake here pull above your weight. 43 HP carries you through Varakush (danger 1). 1/9 Cores recovered. Visit t",
+      "he remaining Lost Capitals. Or move on until you've got your legs under you.\"\n[2026-09-02T01:33:41.848Z] [world] Mercy noses at the blood-spotted cloth and snorts. There's something there.\n[2026-09-02T01:33:41.853Z] [world] You've left Mud Seas and entered The Broken Steeple. The steeple leans a degree it did not lean an hour ago. Or you have been watching too long. It's morning. Nobody else is in",
+      " sight. west leads to Mud Seas. Nothing named to the north or east or south.\n[2026-09-02T01:33:41.853Z] [system] Weather effect \u2014 Aether Lightning: +1 INT\n[2026-09-02T01:33:41.856Z] [world] [The Broken Steeple] north: Revivalist Field Camp (4 tiles, 10 hours) \u00b7 east: The Drowned Quarter (4 tiles, 10 hours) \u00b7 south: Drakova (3 tiles, 8 hours) \u00b7 west: Mud Seas (1 tile, 3 hours)\n",
+      "[2026-09-02T01:33:44.094Z] [debug] ui: tap \"take / salvage\"\n[2026-09-02T01:33:45.445Z] [world] You crouch, take the Tartarian Bone Knife, and are moving again before you have straightened up.\n[2026-09-02T01:33:45.446Z] [reward] \u2726 Tartarian Bone Knife (Common).\n",
+      "[2026-09-02T01:33:46.487Z] [world] You lever something loose from the bell mount \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n[2026-09-02T01:33:46.487Z] [world] You lever something loose from the blood-spotted cloth \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n",
+      "[2026-09-02T01:33:46.488Z] [world] You strip the broken ruined skyscraper carefully. Something usable comes free in your hand.\n[2026-09-02T01:33:46.488Z] [world] You salvage the gull nest. The take is small but real.\n[2026-09-02T01:33:46.488Z] [world] You strip the leaning submerged giant statue carefully. Something usable comes free in your hand.\n",
+      "[2026-09-02T01:33:46.488Z] [world] You strip the rusted exoframe carefully. Something usable comes free in your hand.\n[2026-09-02T01:33:46.489Z] [world] You strip the shattered fallen sentinel husk carefully. Something usable comes free in your hand.\n[2026-09-02T01:33:46.489Z] [world] You salvage the shattered tartarian relay. The take is small but real.\n",
+      "[2026-09-02T01:33:46.489Z] [world] You strip the tin plaque carefully. Something usable comes free in your hand.\n[2026-09-02T01:33:46.489Z] [reward] \u2726 Salvage haul:\n[2026-09-02T01:33:46.490Z] [reward]     \u2022 River-Worn Pebble Set (Common)\n[2026-09-02T01:33:46.490Z] [reward]     \u2022 Faded Ribbon Coil (Common)\n[2026-09-02T01:33:46.490Z] [reward]     \u2022 Cloth Scrap x2 (Common)\n",
+      "[2026-09-02T01:33:46.490Z] [reward]     \u2022 Mud Fragment (Common)\n[2026-09-02T01:33:46.491Z] [reward]     \u2022 Scrap Metal x2 (Common)\n[2026-09-02T01:33:46.491Z] [reward]     \u2022 Aether Crystal x3 (Common)\n[2026-09-02T01:33:46.491Z] [reward]     \u2022 Sentinel Core Plate (Uncommon)\n[2026-09-02T01:33:46.491Z] [reward]     \u2022 Aetheric Shard (Uncommon)\n[2026-09-02T01:33:50.194Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-09-02T01:33:50.194Z] [debug] ui: tap \"investigate\"\n[2026-09-02T01:33:50.857Z] [debug] ui: tap \"investigate\"\n[2026-09-02T01:33:54.590Z] [debug] qwen\u23f1 narration:scene_intro ok 12552ms read 6474ms/write 3103ms in 786t\u2192out 33t 8.2ms/t HIT-CAP (142ch)\n[2026-09-02T01:33:54.768Z] [player] investigate the ground\n",
+      "[2026-09-02T01:33:54.769Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=0\n[2026-09-02T01:33:54.769Z] [world] Something shifted while you were turned away \u2014 an Aetheric Leech breaks cover, fast and low. (range: close)\n[2026-09-02T01:33:54.770Z] [combat] Aetheric Leech \u2014 Energy Drain ready, 1D10 Aetheric damage on a hit.\n",
+      "[2026-09-02T01:33:54.770Z] [debug] enemy: Aetheric Leech hp=16 ac=9 atk=Energy Drain dmg=1D10 Aetheric rarity=Common ap=4\n[2026-09-02T01:33:54.770Z] [debug] arbiter: template (reason=combat)\n[2026-09-02T01:33:54.770Z] [arbiter] The Arbiter looks around. \"The steeple leans a degree it did not lean an hour ago. Or you have been watching too long.\"\n",
+      "[2026-09-02T01:33:55.071Z] [cognitive] CLIMB  (300ms)\n[2026-09-02T01:33:55.627Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro after 12552ms \u2014 cancelled:player-acted-again\n[2026-09-02T01:33:58.119Z] [debug] ui: tap \"approach\"\n[2026-09-02T01:33:58.165Z] [player] approach Aetheric Leech\n",
+      "[2026-09-02T01:33:58.166Z] [debug] parser: intent=advance conf=1.00 verb=approach target=aetheric leech resolved=Aetheric Leech range=mid enemies=1 hooks=0\n[2026-09-02T01:33:58.167Z] [debug] move: advance from range=mid enemies=1 weather=Aether Lightning cost=1 partial=0\n[2026-09-02T01:33:58.167Z] [debug] move: field advance target=Aetheric Leech d 1.50->0.50 band mid->close\n",
+      "[2026-09-02T01:33:58.167Z] [world] You close the gap with Aetheric Leech. (range: close / arm's reach)\n[2026-09-02T01:33:58.169Z] [combat] Aetheric Leech \u2014 d20 \u2192 18 + ATK 4 = 22 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-09-02T01:33:58.170Z] [debug] arbiter: template (reason=combat)\n[2026-09-02T01:33:58.170Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-09-02T01:33:58.485Z] [combat] Aetheric Leech deals 1 aetheric damage [armor \u221234%, title \u00bd, plate \u22121]. You have 30 HP remaining.\n[2026-09-02T01:33:58.486Z] [combat] Aetheric Leech's strike leaves you bleeding.\n[2026-09-02T01:33:59.035Z] [cognitive] USE_ITEM \u00b7 RETREAT  (864ms)\n[2026-09-02T01:33:59.311Z] [debug] ui: tap \"dodge\"\n[2026-09-02T01:33:59.314Z] [player] dodge\n",
+      "[2026-09-02T01:33:59.314Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=0\n[2026-09-02T01:33:59.314Z] [world] You commit to the dodge. Slip Aetheric Leech's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-02T01:33:59.314Z] [combat] Aetheric Leech turns on Mercy \u2014 d20 8 + ATK 4 = 12 vs Mercy's AC 10 \u2014 \u2713 HIT\n[2026-09-02T01:33:59.315Z] [combat] Mercy takes 6. (9/15 HP left)\n[2026-09-02T01:33:59.315Z] [debug] arbiter: template (reason=combat)\n[2026-09-02T01:33:59.315Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-02T01:33:59.315Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-02T01:33:59.590Z] [cognitive] neutral  (271ms)\n[2026-09-02T01:34:01.401Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n[2026-09-02T01:34:01.403Z] [system] dodging (parry) fades.\n[2026-09-02T01:34:01.435Z] [player] attack with the auralite talon\n[2026-09-02T01:34:01.436Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=1 hooks=0\n",
+      "[2026-09-02T01:34:01.436Z] [debug] attack: target=Aetheric Leech range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n[2026-09-02T01:34:01.499Z] [world] Your acid-etched corrupted auralite talon comes around in an arc; Aetheric Leech squares up to meet it.\n[2026-09-02T01:34:01.500Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-02T01:34:01.767Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (266ms)\n[2026-09-02T01:34:10.284Z] [world] You seize the initiative. Aetheric Leech has no time to react.\n[2026-09-02T01:34:10.284Z] [combat] You \u2014 d20 \u2192 15 + INT 13 = 28 vs Aetheric Leech AC 9 \u2014 \u2713 HIT\n[2026-09-02T01:34:10.285Z] [combat] The Acid-Etched coating fails to take on Aetheric Leech.\n",
+      "[2026-09-02T01:34:10.285Z] [combat] Aetheric Leech shrugs off the aetheric. (resisted, \u00d70.5 for 6)\n[2026-09-02T01:34:10.288Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Mud Armor \u2014 bludgeoning or burn will bite where aetheric won't.\"\n",
+      "[2026-09-02T01:34:10.289Z] [combat] Aetheric Leech takes 6 with the acid-etched corrupted auralite talon. It reels: 10 left. Then it fights back.\n[2026-09-02T01:34:10.289Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 2 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n",
+      "[2026-09-02T01:34:10.292Z] [combat] Aetheric Leech \u2014 d20 \u2192 15 + ATK 4 = 19 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-02T01:34:13.798Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n[2026-09-02T01:34:13.803Z] [system] bleeding fades.\n[2026-09-02T01:34:13.841Z] [player] attack with the auralite talon\n",
+      "[2026-09-02T01:34:13.842Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=1 hooks=0\n[2026-09-02T01:34:13.842Z] [combat] Aetheric Leech blackens \u2014 corruption eats 2. (8/16 HP, 2 turns left)\n[2026-09-02T01:34:13.843Z] [debug] attack: target=Aetheric Leech range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n",
+      "[2026-09-02T01:34:13.904Z] [world] You raise the acid-etched corrupted auralite talon toward Aetheric Leech. The room narrows around the both of you.\n[2026-09-02T01:34:13.905Z] [system] \u23f3 Time passed: 6 min\n[2026-09-02T01:34:14.179Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (273ms)\n",
+      "[2026-09-02T01:34:14.762Z] [debug] persist sizes(KB): total=279 player=68 wm=127[rooms=63 events=5 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=81 scene=2\n[2026-09-02T01:34:23.769Z] [world] Aetheric Leech moves first. The pressure is immediate.\n[2026-09-02T01:34:23.771Z] [combat] Aetheric Leech \u2014 d20 \u2192 12 + ATK 4 = 16 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-02T01:34:23.771Z] [combat] You \u2014 d20 \u2192 12 + INT 13 = 25 vs Aetheric Leech AC 9 \u2014 \u2713 HIT\n[2026-09-02T01:34:23.772Z] [combat] The Acid-Etched coating fails to take on Aetheric Leech.\n[2026-09-02T01:34:23.772Z] [combat] Aetheric Leech shrugs off the aetheric. (resisted, \u00d70.5 for 3)\n",
+      "[2026-09-02T01:34:23.780Z] [combat] Aetheric Leech takes 3 with the acid-etched corrupted auralite talon. It reels: 5 left. Then it fights back.\n[2026-09-02T01:34:23.781Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 1 corruption bites in and festers (3 turns). The rot deepens (2 stacks).\n[2026-09-02T01:34:25.662Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n",
+      "[2026-09-02T01:34:25.705Z] [player] attack with the auralite talon\n[2026-09-02T01:34:25.706Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=1 hooks=0\n[2026-09-02T01:34:25.707Z] [combat] Aetheric Leech blackens \u2014 corruption eats 2. (3/16 HP, 2 turns left)\n",
+      "[2026-09-02T01:34:25.709Z] [debug] attack: target=Aetheric Leech range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n[2026-09-02T01:34:25.772Z] [world] You bring the acid-etched corrupted auralite talon to bear on Aetheric Leech.\n[2026-09-02T01:34:25.773Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-02T01:34:26.048Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (274ms)\n[2026-09-02T01:34:34.437Z] [world] You seize the initiative. Aetheric Leech has no time to react.\n[2026-09-02T01:34:34.437Z] [combat] You \u2014 d20 \u2192 7 + INT 13 = 20 vs Aetheric Leech AC 9 \u2014 \u2713 HIT\n[2026-09-02T01:34:34.438Z] [combat] The Acid-Etched coating fails to take on Aetheric Leech.\n",
+      "[2026-09-02T01:34:34.438Z] [combat] Aetheric flares \u2014 +3 on hit.\n[2026-09-02T01:34:34.438Z] [combat] Aetheric Leech shrugs off the aetheric. (resisted, \u00d70.5 for 7)\n[2026-09-02T01:34:34.439Z] [combat] The aetheric has worn Aetheric Leech's guard through \u2014 it bites full from here.\n",
+      "[2026-09-02T01:34:34.440Z] [combat] Your blow with the acid-etched corrupted auralite talon lands clean \u2014 7 damage. Aetheric Leech crumples in the dust. The Aetherstone settles.\n[2026-09-02T01:34:34.440Z] [reward] Aetheric Leech defeated. You recover Aetheric Blood.\n[2026-09-02T01:34:34.441Z] [reward] +2 TC pried from the dust.\n[2026-09-02T01:34:37.495Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-09-02T01:34:37.729Z] [debug] ui: tap \"investigate\"\n[2026-09-02T01:34:38.370Z] [debug] homework: intro-fill armed after 7024ms idle\n[2026-09-02T01:34:45.049Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 6471ms read 5268ms/write 1170ms in 766t\u2192out 33t 6.9ms/t HIT-CAP (137ch)\n[2026-09-02T01:34:45.255Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 6471ms \u2014 intro-fill:\u2205\n",
+      "[2026-09-02T01:34:45.255Z] [debug] homework: scene_intro \"The Broken Steeple\" \u2205 6887ms\n[2026-09-02T01:34:48.604Z] [player] investigate the ground\n[2026-09-02T01:34:48.604Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=0\n[2026-09-02T01:34:48.606Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n",
+      "[2026-09-02T01:34:48.608Z] [system] \u23f3 Time passed: 24 min\n[2026-09-02T01:34:48.813Z] [cognitive] CLIMB  (204ms)\n[2026-09-02T01:34:50.919Z] [debug] ui: tap \"\u2192 DRAKOVA\"\n[2026-09-02T01:34:50.936Z] [debug] spawn: gear=[Stone-Stride Greaves, Arcane Sprinter's Boots] window=10 roster=new\n[2026-09-02T01:34:50.937Z] [world] You walk south through open silt. The compass points south into open ground.\n",
+      "[2026-09-02T01:34:50.938Z] [world] An Aetheric con"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-02-1632-set-course-stays-put #mtjfp13vhzw3 [inline 21/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtjfp13vhzw3"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-02-1632-set-course-stays-put"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "21"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-02-1632-set-course-stays-put"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "3"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-02T22:12:28.979728Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-02T22:12:29.557000Z",
+  "fingerprints": [
+    "ab45a453459a07b939e0ca489ed21f45"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1951642568,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-02T22:12:29.555000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-02-1632-set-course-stays-put",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-02-1632-set-course-stays-put",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-02-1632-set-course-stays-put",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-02-1632-set-course-stays-put)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "62ad769804024b20bd22e598eb4550e6",
+  "previousEventID": "5d8fe98996d04393a28b47872205b6be"
+}

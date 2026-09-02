@@ -1,0 +1,257 @@
+{
+  "id": "754ac66ad3874ca28d96a303e198a474",
+  "groupID": "7708305622",
+  "eventID": "754ac66ad3874ca28d96a303e198a474",
+  "projectID": "4511945117532160",
+  "size": 17884,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-02-1632-set-course-stays-put #mtko2rkyvz6m [inline 10/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-02-1632-set-course-stays-put",
+  "message": "player-log 2026-09-02-1632-set-course-stays-put #mtko2rkyvz6m [inline 10/28]",
+  "title": "player-log 2026-09-02-1632-set-course-stays-put #mtko2rkyvz6m [inline 10/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "8beb9ef928ad43d3978fe7a7a6cc3c60",
+      "span_id": "8e2feaac9c01ddf8",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "nted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-09-01T23:11:38.000Z] [player] address the eddy\n[2026-09-01T23:11:38.001Z] [debug] parser: intent=diplomacy conf=1.00 verb=address target=eddy resolved=eddy range=- enemies=0 hooks=1\n[2026-09-01T23:11:38.002Z] [debug] route: hook intercept (kind=temporal_eddy, target=\"eddy\") \u2014 original intent=diplomacy\n",
+      "[2026-09-01T23:11:38.002Z] [world] \u2605 STORY THREAD (step 1) \u2014 You step into the shimmer. Your shadow falls in three directions at once, then snaps back.\n[2026-09-01T23:11:40.189Z] [world] \u2605\u2605 STORY THREAD COMPLETE \u2014 Hours pass in what felt like a step \u2014 and a single clear thought lands in your head that wasn't there before. A name and a place. The eddy paid in directions.\n",
+      "[2026-09-01T23:11:40.190Z] [reward] \u2726 a name and a place: mud titan.\n[2026-09-01T23:11:40.192Z] [arbiter] \"The Aetheric eddies sometimes pay in knowledge instead of coin,\" the Arbiter says. \"Check your contracts board \u2014 the eddy added one.\"\n[2026-09-01T23:11:52.809Z] [debug] ui: tap \"more \u25b8\"\n[2026-09-01T23:11:53.960Z] [debug] ui: tap \"missions\"\n",
+      "[2026-09-01T23:12:09.706Z] [debug] homework: intro-fill armed after 6000ms idle (strike 2/3)\n[2026-09-01T23:12:14.711Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 4821ms read/write unusable (native mis-reported 53862ms/1070ms \u2014 llama.rn split bug, not this call) in 723t\u2192out 33t HIT-CAP (140ch)\n[2026-09-01T23:12:14.885Z] [debug] homework: scene_intro \"The Buried Cities\" \u2713 5180ms\n",
+      "[2026-09-01T23:12:26.371Z] [debug] appstate: active \u2192 background (was active for 76935ms)\n[2026-09-01T23:12:59.210Z] [debug] appstate: background \u2192 active (was background for 32839ms)\n[2026-09-01T23:12:59.415Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-09-01T23:13:00.919Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 1199ms read 0ms/write 1160ms in 723t\u2192out 34t HIT-CAP (157ch)\n",
+      "[2026-09-01T23:13:01.094Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 1199ms \u2014 intro-fill:action-opener\n[2026-09-01T23:13:01.094Z] [debug] homework: scene_intro \"The Buried Cities\" \u2713 1679ms\n[2026-09-01T23:13:03.623Z] [debug] ui: tap \"missions\"\n",
+      "[2026-09-01T23:13:04.922Z] [debug] persist sizes(KB): total=267 player=65 wm=115[rooms=53 events=4 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=82 scene=5\n[2026-09-01T23:13:10.570Z] [world] You set course for The Buried Cities. 3 tiles \u2014 about 8 hours of travel, all in. You set off now \u2014 the ground ahead is new ground. Keep tapping \u2192 THE BURIED CITIES on the travel row to close the distance;",
+      " STOP TRAVEL to halt.\n[2026-09-01T23:13:10.581Z] [world] You walk south through open silt. The compass tells you The Buried Cities lies further south \u2014 2 tiles, about 5 hours of travel.\n[2026-09-01T23:13:10.582Z] [world] A glint of metal \u2014 too small to name yet \u2014 lies in the rubble.\n[2026-09-01T23:13:16.480Z] [debug] appstate: active \u2192 background (was active for 17270ms)\n",
+      "[2026-09-01T23:21:21.620Z] [debug] appstate: background \u2192 active (was background for 485140ms)\n[2026-09-01T23:21:21.941Z] [debug] homework: intro-fill armed after 6000ms idle (strike 2/3)\n[2026-09-01T23:21:27.650Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 5414ms read 3131ms/write 2258ms in 726t\u2192out 33t 4.3ms/t HIT-CAP (140ch)\n",
+      "[2026-09-01T23:21:27.654Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 5414ms \u2014 intro-fill:\u2205\n[2026-09-01T23:21:27.655Z] [debug] homework: scene_intro \"The Buried Cities\" \u2205 5714ms\n[2026-09-01T23:22:11.683Z] [debug] homework: intro-fill armed after 6000ms idle (strike 3/3)\n",
+      "[2026-09-01T23:22:12.858Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 1171ms read 0ms/write 1136ms in 726t\u2192out 34t HIT-CAP (147ch)\n[2026-09-01T23:22:12.878Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 1171ms \u2014 intro-fill:action-opener\n[2026-09-01T23:22:12.878Z] [debug] homework: scene_intro \"The Buried Cities\" \u2713 1199ms\n",
+      "[2026-09-01T23:22:21.850Z] [debug] appstate: active \u2192 background (was active for 60230ms)\n[2026-09-01T23:22:39.117Z] [debug] appstate: background \u2192 active (was background for 17267ms)\n[2026-09-01T23:22:46.931Z] [debug] persist sizes(KB): total=268 player=65 wm=116[rooms=53 events=4 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=82 scene=5\n",
+      "[2026-09-01T23:22:55.333Z] [debug] appstate: active \u2192 background (was active for 16215ms)\n[2026-09-01T23:24:55.048Z] [debug] appstate: background \u2192 active (was background for 119711ms)\n[2026-09-01T23:25:00.975Z] [debug] appstate: active \u2192 background (was active for 5932ms)\n[2026-09-01T23:25:59.984Z] [debug] appstate: background \u2192 active (was background for 59003ms)\n",
+      "[2026-09-01T23:26:14.889Z] [debug] appstate: active \u2192 background (was active for 14911ms)\n[2026-09-01T23:26:33.538Z] [debug] appstate: background \u2192 active (was background for 18649ms)\n[2026-09-01T23:26:42.847Z] [debug] appstate: active \u2192 background (was active for 9308ms)\n[2026-09-01T23:28:46.902Z] [debug] appstate: background \u2192 active (was background for 124049ms)\n",
+      "[2026-09-01T23:28:47.020Z] [debug] persist sizes(KB): total=268 player=65 wm=116[rooms=53 events=4 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=82 scene=5\n[2026-09-01T23:30:22.432Z] [debug] appstate: active \u2192 background (was active for 95537ms)\n[2026-09-01T23:32:45.469Z] [debug] appstate: background \u2192 active (was background for 143032ms)\n",
+      "[2026-09-01T23:37:48.623Z] [debug] appstate: active \u2192 background (was active for 303158ms)\n[2026-09-01T23:39:11.225Z] [debug] appstate: background \u2192 active (was background for 82603ms)\n[2026-09-01T23:39:11.289Z] [debug] persist sizes(KB): total=268 player=65 wm=116[rooms=53 events=4 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=82 scene=5\n",
+      "[2026-09-01T23:39:14.946Z] [debug] appstate: active \u2192 background (was active for 3721ms)\n[2026-09-01T23:45:35.027Z] [debug] appstate: background \u2192 active (was background for 380081ms)\n[2026-09-01T23:45:41.389Z] [debug] appstate: active \u2192 background (was active for 6361ms)\n[2026-09-01T23:48:25.401Z] [debug] appstate: background \u2192 active (was background for 164012ms)\n",
+      "[2026-09-01T23:48:28.850Z] [debug] ctx: RELEASED \u2014 live=0 (opened=1 released=1)\n[2026-09-01T23:48:29.102Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a05f5e-a973-79c5-a0b6-7e6d70174af8\n[2026-09-01T23:48:29.102Z] [debug] ota: Checking\u2026\n[2026-09-01T23:48:29.214Z] [debug] ota: Already up to date\n[2026-09-01T23:48:29.215Z] [debug] ota: boot check result = noUpdate\n",
+      "[2026-09-01T23:48:29.291Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-09-01T23:48:29.291Z] [debug] voice: bundled idle\n[2026-09-01T23:48:30.439Z] [debug] send-log: bundle #mtj5akkbvhf2 attempt 3/5 delivered to Sentry\n[2026-09-02T00:28:32.530Z] [debug] OTA applied: 2026-09-01-1615-the-mission-speaks-where-you-stand \u2192 2026-09-01-1617-the-ask-names-its-object.\n",
+      "[2026-09-02T00:28:32.531Z] [debug] OTA session start: 2026-09-01-1617-the-ask-names-its-object.\n[2026-09-02T00:28:32.532Z] [world] You step back into The Buried Cities. The world waits for your move.\n[2026-09-02T00:28:32.532Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. \"Welcome back, Cheddar Bob. The road kept your place.\"\n",
+      "[2026-09-02T00:28:33.460Z] [debug] \u2550\u2550\u2550 SESSION 2026-09-02T00:28:33.454Z \u00b7 build 2026-09-01-1617-the-ask-names-its-object \u00b7 updated from 2026-09-01-1615-the-mission-speaks-where-you-stand \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-09-02T00:28:33.461Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-02T00:28:33.463Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n[2026-09-02T00:28:33.463Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n",
+      "[2026-09-02T00:28:33.463Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities HERE needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch\n[2026-09-02T00:28:33.463Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n",
+      "[2026-09-02T00:28:33.464Z] [debug] missions: \u00b7 at=buried_cities travelTo=buried_cities\n[2026-09-02T00:28:33.464Z] [debug] boot: life bmtjbitiwor started 2026-09-01T23:48:29.048Z \u00b7 FOLLOWED AN OTA APPLY 182ms ago via mid-session \u00b7 prev ctx o1/r1/l0/p1/dn0 (previous life released its contexts first)\n[2026-09-02T00:28:35.481Z] [debug] ui: tap \"more \u25b8\"\n",
+      "[2026-09-02T00:28:36.635Z] [debug] ui: tap \"missions\"\n[2026-09-02T00:29:04.975Z] [world] You set course for Drakova. 22 tiles \u2014 about 2 days, 7 hours of travel, all in. You set off now \u2014 the ground ahead is new ground. Keep tapping \u2192 DRAKOVA on the travel row to close the distance; STOP TRAVEL to halt.\n",
+      "[2026-09-02T00:29:05.043Z] [debug] spawn: gear=[Aether-Walker's Cape, Diplomat's Mask of the Giants, Stone Spear] window=10 roster=new\n[2026-09-02T00:29:05.050Z] [world] You walk east through open silt. The compass tells you Sinking Cathedral lies further east \u2014 1 tile, about 3 hours of travel.\n[2026-09-02T00:29:05.053Z] [world] The thread you were following waits where you left it.\n",
+      "[2026-09-02T00:30:26.296Z] [debug] ui: tap \"less \u25be\"\n[2026-09-02T00:31:16.025Z] [debug] ui: tap \"\u2192 DRAKOVA\"\n[2026-09-02T00:31:16.109Z] [world] You walk east. You arrive at Sinking Cathedral.\n[2026-09-02T00:31:16.113Z] [world] The Sinking Cathedral groans as the ground swallows it. (EXAMINE THE CATHEDRAL to see what it needs \u2014 free \u2014 then STABILIZE THE CATHEDRAL for your one attempt.)\n",
+      "[2026-09-02T00:31:16.115Z] [debug] scene: loc=sinking_cathedral hub=- arrival=y opening=n passing=y\n[2026-09-02T00:31:16.117Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n[2026-09-02T00:31:16.118Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n",
+      "[2026-09-02T00:31:16.119Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n[2026-09-02T00:31:16.120Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch\n",
+      "[2026-09-02T00:31:16.121Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n[2026-09-02T00:31:16.122Z] [debug] missions: \u00b7 at=sinking_cathedral travelTo=drakova\n[2026-09-02T00:31:16.203Z] [debug] spawn: gear=[Flame of Aether] window=10 roster=new\n",
+      "[2026-09-02T00:31:16.275Z] [arbiter] The Arbiter watches the horizon a moment. \"Ask me about the flood sometime \u2014 why the water rose, and what it left buried.\"\n[2026-09-02T00:31:16.276Z] [arbiter] The Arbiter takes you in. \"Sinking Cathedral is lethal country. The things that wake here pull above your weight. 43 HP carries you through Varakush (danger 1). 1/9 Cores recovered. Visit the remaining L",
+      "ost Capitals. Or move on until you've got your legs under you.\"\n[2026-09-02T00:31:16.279Z] [world] Soot noses at the iron-flake stain and snorts. There's something there.\n[2026-09-02T00:31:16.294Z] [world] You've left The Buried Cities and entered Sinking Cathedral. Only the steeple remains above the mud, and the steeple is leaning toward the listener. It's dawn. Nobody else is in sight. east lead",
+      "s to The Deep Nave; west leads to The Reaver's Crest. Nothing named to the north or south.\n[2026-09-02T00:31:16.295Z] [system] Weather effect \u2014 Black Rain: -1 CHA\n[2026-09-02T00:31:16.307Z] [world] [Sinking Cathedral] north: Garrin (return the folio) (17 tiles, 1 day, 19 hours) \u00b7 east: The Deep Nave (1 tile, 3 hours) \u00b7 south: Obsidian Pillars (6 tiles, 15 hours) \u00b7 west: Tartarian Pilgrim Camp (3 t",
+      "iles, 8 hours)\n[2026-09-02T00:31:17.240Z] [debug] ui: tap \"take / salvage\"\n[2026-09-02T00:31:18.782Z] [world] You take the Flame of Aether from where it lay.\n[2026-09-02T00:31:18.784Z] [reward] \u2726 Flame of Aether (Common).\n[2026-09-02T00:31:19.939Z] [reward] \u2726 Found Letter to the Council \u2014 Elior Zalmar. (open Contracts \u2192 Collectibles to read)\n",
+      "[2026-09-02T00:31:19.957Z] [world] Slim pickings on the anchor. You pocket a Smooth Stone on the way out.\n[2026-09-02T00:31:19.957Z] [world] You break the dust-buried forgotten order reliquary apart. Among the pieces, something worth keeping.\n",
+      "[2026-09-02T00:31:19.957Z] [world] You lever something loose from the hull \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n[2026-09-02T00:31:19.958Z] [world] Slim pickings on the hymnal. You pocket a Stick on the way out.\n[2026-09-02T00:31:19.958Z] [world] You salvage the monstrance. The take is small but real.\n",
+      "[Filtered]",
+      "[2026-09-02T00:31:19.959Z] [world] You break the stripped maintenance panel down. Among the pieces, a fragment of someone's writing \u2014 held against the world by stubbornness alone.\n[2026-09-02T00:31:19.960Z] [reward] \u2726 Salvage haul:\n[2026-09-02T00:31:19.960Z] [reward]     \u2022 Smooth Stone (Common)\n[2026-09-02T00:31:19.961Z] [reward]     \u2022 Aether Crystal x2 (Common)\n",
+      "[2026-09-02T00:31:19.961Z] [reward]     \u2022 Split Slate Piece (Common)\n[2026-09-02T00:31:19.961Z] [reward]     \u2022 Stick x2 (Common)\n[2026-09-02T00:31:19.961Z] [reward]     \u2022 Chipped Phial Neck (Common)\n[2026-09-02T00:31:21.015Z] [debug] persist sizes(KB): total=278 player=66 wm=126[rooms=63 events=4 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=83 scene=3\n",
+      "[2026-09-02T00:31:22.041Z] [debug] ui: tap \"more \u25b8\"\n[2026-09-02T00:31:23.075Z] [debug] ui: tap \"missions\"\n[2026-09-02T00:31:31.338Z] [debug] ui: tap \"missions\"\n[2026-09-02T00:32:36.969Z] [debug] ui: tap \"missions\"\n",
+      "[2026-09-02T00:32:42.240Z] [world] You set course for The Monarch's Waystation. 9 tiles \u2014 about 23 hours of travel, all in. Tap the \u2192 THE MONARCH'S WAYSTATION button on the travel row to press on; STOP TRAVEL to halt.\n",
+      "[2026-09-02T00:32:42.241Z] [arbiter] The Arbiter nods at the road ahead. \"The course to The Monarch's Waystation is set \u2014 but you're spent. Rest, then tap \u2192 THE MONARCH'S WAYSTATION on the travel row to set out.\"\n[2026-09-02T00:32:53.748Z] [debug] ui: tap \"missions\"\n",
+      "[2026-09-02T00:33:02.435Z] [world] You set course for The Buried Cities. 4 tiles \u2014 about 10 hours of travel, all in. Tap the \u2192 THE BURIED CITIES button on the travel row to press on; STOP TRAVEL to halt.\n",
+      "[2026-09-02T00:33:02.436Z] [arbiter] The Arbiter nods at the road ahead. \"The course to The Buried Cities is set \u2014 but you're spent. Rest, then tap \u2192 THE BURIED CITIES on the travel row to set out.\"\n[2026-09-02T00:33:05.885Z] [debug] ui: tap \"rest\"\n[2026-09-02T0"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-02-1632-set-course-stays-put #mtko2rkyvz6m [inline 10/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtko2rkyvz6m"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-02-1632-set-course-stays-put"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "10"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-02-1632-set-course-stays-put"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-02T22:27:42.857889Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "36": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 291,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-02T22:27:41.390000Z",
+  "fingerprints": [
+    "ab45a453459a07b939e0ca489ed21f45"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1951642568,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-02T22:12:29.555000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-02-1632-set-course-stays-put",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-02-1632-set-course-stays-put",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-02-1632-set-course-stays-put",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-02-1632-set-course-stays-put)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "9728321214d042bfbe14d9eb2a794730",
+  "previousEventID": "5dddd82fb1054fefb438883ea1fe814b"
+}
