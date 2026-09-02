@@ -839,6 +839,12 @@ export function stampLiveBreadcrumb(crumb: LiveBreadcrumb): void {
   } catch { /* never let instrumentation break the game */ }
 }
 
+/** ⚠ OTA-1634 — the live crumb, read in place. The freeze watch samples it every
+ *  tick so a stall line can say which checkpoint the app was at before the JS
+ *  clock went quiet and which it had reached when the clock came back — the
+ *  same testimony the dying breath gives a dead process, for a live one. */
+export function peekLiveBreadcrumb(): LiveBreadcrumb | null { return _lastLiveCrumb; }
+
 // ⚠⚠ OTA-1356 — THE DYING BREATH LEARNS PHASES. The 2026-08-17 freeze receipt
 // proved this crumb's limit: it said `action "go west"` and nothing more, which
 // cannot tell "died processing that action" from "died half a minute later in

@@ -1560,9 +1560,9 @@ Key invariants worth knowing:
 
 ## 9. Recent OTA highlights (latest sessions)
 
-### ⚠⚠⚠ THE 2026-09-02 RUN — OTA-1617 → 1633 (read this first if you are new)
+### ⚠⚠⚠ THE 2026-09-02 RUN — OTA-1617 → 1634 (read this first if you are new)
 
-Latest golem-line stamp: **`2026-09-02-1633-a-batch-is-one-action`**
+Latest golem-line stamp: **`2026-09-02-1634-the-aside-yields`**
 (`app/buildInfo.ts`). Both channels ship from this branch — a `[ota-hal]` marker
 in the commit TITLE publishes the HAL set, a markerless follow-up commit
 publishes golem; see §6.
@@ -1743,6 +1743,26 @@ what it ACCEPTS, and a data walker skips the saying.
   (confirmCraftSubstitution / resolveCrucibleGuard re-dispatch with it).
   `craftBatchQuiet` is gone. ota1633 pins one engine action for 22 clubs, the
   "×5 of 22" short line, the single craft unchanged, and the wiring.
+- **OTA-1634 the aside yields.** Owner's 22:42 log, typed: *"lag is back"* and
+  *"even crafting repopulates loot on a tile."* The crafting one is NOT a
+  repopulation: the roster was rolled once at arrival 22:37:02 (`spawn: gear=`
+  has one emitter, gameStore ~32406), the slug fight hid the quick row, the
+  craft came 2 s after the kill, and TAKE / SALVAGE at 22:37:45 took exactly
+  that roster. The lag: a 22.3 s LIVE ambient aside (LLM priority, no hook)
+  held the one native lock while five classifier calls waited 23-24 s and the
+  investigate lore waited 24.1 s of 27.0 s; the aside came back stale. Fix:
+  `maybeGenerateAmbientArbiter` passes `homework: true` for the live path too
+  (below the voice; cut by `preemptHomeworkForPlayer` on any action and by
+  any higher enqueue) and a cut aside is discarded (`ambient:preempted`,
+  checked before the stale test; the fill path keeps OTA-1258's exemption).
+  ota1123's "live aside is not homework" pin is reversed. Instrument: the
+  freeze-watch stall line appends `stallContextLine(before, now, ml, t)` —
+  the crumb at the previous tick vs detection (`peekLiveBreadcrumb`, new in
+  saveSystem), the action, and `nativeMlSnapshot()` (running lane + queue,
+  new in nativeMlLock). ⚠ The two JS stalls (8.0 s at 22:35:13, 3.0 s at
+  22:38:39) both sat inside a Qwen generation (OTA-1472 saw the same shape);
+  cause still unmeasured — the next stall line is the evidence. Attack →
+  resolution of ~7 s is dice pacing (3 auto-resolved steps), not lag.
 
 ⚠ **Two position vocabularies, still.** `stageArrival.ts` (heal / arm /
 `checkStandingGround`) keys on the canon grid CELL; the verb matchers and

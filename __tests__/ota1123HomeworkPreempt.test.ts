@@ -274,20 +274,20 @@ describe('OTA-1123 — the wiring, and the first homework job', () => {
     // work nobody asked for, so it IS homework.
     const store = src('app/state/gameStore.ts') + '\n' + src('app/ai/narration.ts')
       + '\n' + src('app/state/slices/bootSlice.ts');
-    expect(store).toContain("job: opts?.bankOnly ? 'ambient_fill' : 'ambient', homework: !!opts?.bankOnly },");
+    // ⚠ OTA-1634 — the fill AND the live aside are homework now; the job label
+    // still tells them apart in the telemetry.
+    expect(store).toContain("job: opts?.bankOnly ? 'ambient_fill' : 'ambient', homework: true },");
   });
 
-  it('⚠ the LIVE ambient path is not homework — the player is owed that line', () => {
-    // The distinction is the whole safety property: a line the player is
-    // waiting on must never be interruptible.
-    const store = src('app/state/gameStore.ts') + '\n' + src('app/ai/narration.ts')
-      + '\n' + src('app/state/slices/bootSlice.ts');
-    expect(store).toContain('homework: !!opts?.bankOnly');
-    // RETARGETED BY OTA-1126 — `{ homework: true }` now legitimately appears in
-    // the store: the item-description slot passes it explicitly. The property
-    // this guards is about the AMBIENT path, so it is asserted there rather
-    // than by a file-wide absence that any new slot would trip.
-    const amb = store.slice(store.indexOf('async function maybeGenerateAmbientArbiter('));
-    expect(amb.slice(0, 4000)).not.toContain('homework: true');
+  it('⚠ OTA-1634 REVERSED THIS — the LIVE aside yields too', () => {
+    // OTA-1123's rule was "the player is owed that line". The owner's
+    // 2026-09-02 log priced it: a 22.3 s live aside held the native lock while
+    // five classifier calls waited 23-24 s and a lore reply waited 24 s, and the
+    // aside came back stale anyway. A 35%-chance musing kicked off AFTER the
+    // action resolved is not a line anyone is waiting on. See ota1634.
+    const amb = src('app/ai/narration.ts');
+    const fn = amb.slice(amb.indexOf('async function maybeGenerateAmbientArbiter('));
+    expect(fn.slice(0, 6000)).toContain('homework: true');
+    expect(fn).toContain("noteQwenDiscarded('ambient:preempted')");
   });
 });

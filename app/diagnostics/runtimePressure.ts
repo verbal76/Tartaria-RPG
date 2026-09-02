@@ -84,6 +84,40 @@ export function freezeVerdictLine(v: FreezeVerdict, jsGapMs: number, frameGapMs:
   }
 }
 
+/** ⚠⚠⚠ OTA-1634 — THE STALL LINE LEARNS WHAT THE APP WAS DOING.
+ *
+ *  The owner's 2026-09-02 log: `LOGIC stalled … js 8025ms` at 22:35:13 and
+ *  `js 3043ms` at 22:38:39, and the line said only "look for a long synchronous
+ *  run". Both stalls sat inside a Qwen generation (an ambient aside of 22.3 s
+ *  and one of 9.9 s), which OTA-1472 had already seen once — a 3150 ms gap
+ *  tracking an 8.2 s fill to within 50 ms — and nothing on the line could say so.
+ *
+ *  The live breadcrumb already names the last checkpoint an action or a
+ *  background job reached (OTA-1356), and the one native-ML lock knows what was
+ *  running underneath (OTA-1546). So the watch samples the crumb every tick and,
+ *  on the stall edge, prints the checkpoint it was at BEFORE the clock went
+ *  quiet, the one it had reached when the clock came back, the action in
+ *  flight, and the native lane with its queue depth. A stall that reads
+ *  `before: engine-done → now: native:llm:done · native: llm running · q3` is a
+ *  different fact from one that reads `parsed:attack → parsed:attack · native:
+ *  idle`, and until now the two printed the same sentence. */
+export interface StallCrumb { phase?: string; phaseAt?: number; what?: string }
+export function stallContextLine(
+  before: StallCrumb | null,
+  now: StallCrumb | null,
+  ml: { running: boolean; lane: string; queued: number },
+  at: number,
+): string {
+  const age = (c: StallCrumb | null): string =>
+    c?.phaseAt ? `+${Math.max(0, Math.round(at - c.phaseAt))}ms` : '?';
+  const ph = (c: StallCrumb | null): string => (c ? `${c.phase ?? '(no phase)'} ${age(c)}` : '(no crumb)');
+  const native = ml.running
+    ? `${ml.lane} running · q${ml.queued}`
+    : ml.queued > 0 ? `idle · q${ml.queued}` : 'idle';
+  const doing = now?.what ?? before?.what ?? '(no action yet)';
+  return `crumb before: ${ph(before)} → now: ${ph(now)} · doing: ${doing} · native: ${native}`;
+}
+
 export interface MemoryWarningContext {
   /** Where the engine was when the OS complained — the reload storm is the suspect. */
   qwenStatus?: string;

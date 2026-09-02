@@ -26933,7 +26933,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (opts.craftCount): guards once, sized to what the pack pays for; cost and
 // result applied N times inside the one action; one reward line that says how
 // many and why if short; the confirm prompts carry the count.
-export const OTA_BUILD_ID = '2026-09-02-1633-a-batch-is-one-action';
+// ⚠⚠⚠ OTA-1634 — THE ASIDE YIELDS. Owner: "lag is back." His log: a 22.3 s
+// live ambient aside (LLM priority, uninterruptible) held the one native lock
+// while five classifier calls waited 23-24 s and a lore reply waited 24 s —
+// then the aside was stale. The live aside is homework now (cut by the player
+// acting, by cognition, by the voice) and a cut aside is discarded. And the
+// freeze-watch stall line names the crumb before/after the quiet stretch plus
+// the native lane and queue, so the night's two JS stalls (8.0 s, 3.0 s, both
+// inside a generation) will say what they sat in next time.
+// "even crafting repopulates loot": measured NOT so — the roster was rolled at
+// arrival, the fight hid the quick row, the craft came 2 s after the kill.
+export const OTA_BUILD_ID = '2026-09-02-1634-the-aside-yields';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-02-1633-a-batch-is-one-action';
 // golem catch-up 2026-09-02: markerless publish of OTA-1633 - craft N is one
 // engine action with one reward line. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-02-1632-set-course-stays-put';

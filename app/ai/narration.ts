@@ -57,7 +57,7 @@ import { sentenceNamesOffCanonEntity, buildEntityAllowList, normalizeEntity } fr
 import { getLocationById } from '../engine/encounter';
 import { QWEN_ALLOWED_INTENTS } from '../engine/narrativeGenerator';
 import { pick, chance } from '../engine/rng';
-import { noteQwenDiscarded } from './generation/qwenTelemetry';
+import { noteQwenDiscarded, lastQwenCallPreempted } from './generation/qwenTelemetry';
 import { buildLlmContext, buildSystemPrompt, type SceneSlice } from '../engine/contextInjector';
 import { findMicroMicroAnywhere } from '../engine/worldLadder';
 import { isRepetitiveArbiterLine } from '../engine/arbiterDedup';
@@ -1365,8 +1365,21 @@ export async function maybeGenerateAmbientArbiter(
       // right one: a rest-window fill is by definition work nobody asked for.
       // As homework it queues below voice and is cut short the instant the
       // player acts, so filling the bank can never be the reason a tap waits.
-      // The live ambient path is NOT homework — the player is owed that line.
-      { maxNewTokens: 32, job: opts?.bankOnly ? 'ambient_fill' : 'ambient', homework: !!opts?.bankOnly },
+      //
+      // ⚠⚠⚠ OTA-1634 — AND SO IS THE LIVE ASIDE. OTA-1123 kept it at LLM
+      // priority ("the player is owed that line"); the owner's 2026-09-02 log
+      // priced that call. A 22.3 s live ambient held the one native lock while
+      // FIVE classifier calls waited behind it (23.5 s, 24.1 s, 10.2 s, 10.6 s,
+      // 11.0 s — the classifier normally answers in ~300 ms) and the lore for
+      // "investigate dust trail" waited 24.1 s of its 27.0 s — then the aside
+      // itself came back stale (combat had started) and went to the bank. The
+      // second live ambient of the night, 9.9 s, was discarded as stale too.
+      // Nobody is owed a line that will not be spoken: the aside is a 35%-chance
+      // musing kicked off AFTER the action resolved, decoupled from it by design
+      // (arb163). It yields like homework — below the voice, cut the instant the
+      // player acts or a real call arrives — and a cut aside is discarded below,
+      // because the thing that cut it is the thing that made it stale.
+      { maxNewTokens: 32, job: opts?.bankOnly ? 'ambient_fill' : 'ambient', homework: true },
     );
     // OTA-663 — off-canon entity guard (ambient path). A dropped line just stays
     // silent (ambient has no template fallback), which is the safe outcome.
@@ -1468,6 +1481,16 @@ export async function maybeGenerateAmbientArbiter(
       get().appendLog('debug',
         `arbiter: ambient-fill ${finalText ? `banked (${musingBank.length}/${MUSING_BANK_CAP})` : '∅'} ${Date.now() - t0}ms`);
       if (!finalText) noteQwenDiscarded('ambient:fill-∅');
+      return;
+    }
+    // ⚠ OTA-1634 — a CUT aside is a stale aside. The live path is homework now,
+    // so a player action, a classifier call or a voice line ends it early; the
+    // partial is not vetted for speech (it may end mid-word) and the world has
+    // already moved past the moment it was written for. The fill path above is
+    // exempt on purpose (OTA-1258: a preempted fill keeps its text for the bank).
+    if (lastQwenCallPreempted()) {
+      get().appendLog('debug', `arbiter: ambient cut short ${Date.now() - t0}ms — yielded to the player`);
+      noteQwenDiscarded('ambient:preempted');
       return;
     }
     const staleReason = ambientStaleReason(get, stamp);

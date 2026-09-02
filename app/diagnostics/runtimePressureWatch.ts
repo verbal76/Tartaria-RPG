@@ -50,10 +50,12 @@ import {
   freezeVerdict,
   freezeVerdictLine,
   memoryWarningLine,
+  stallContextLine,
   type FreezeVerdict,
   type PressureSnapshot,
 } from './runtimePressure';
-import { clearLiveBreadcrumb, stampBreadcrumbPhase, noteForegrounded } from '../engine/saveSystem';
+import { clearLiveBreadcrumb, stampBreadcrumbPhase, noteForegrounded, peekLiveBreadcrumb } from '../engine/saveSystem';
+import { nativeMlSnapshot } from '../ai/nativeMlLock';
 import { qwen } from '../ai/engines';
 import { nativePressure } from '../ai/generation/qwenTelemetry';
 import { APPROX_CONTEXT_MB, contextLedger } from '../ai/generation/contextLedger';
@@ -369,11 +371,16 @@ export function startRuntimePressureWatch(
 
   // Clock B — plain JS. Serviced by the JS thread alone. The PAIR is the discriminator;
   // neither clock on its own can tell a frozen screen from a wedged engine.
+  // ⚠ OTA-1634 — the crumb as it stood at the PREVIOUS tick. On a stall edge the
+  // pair (then, now) brackets the quiet stretch; see stallContextLine.
+  let crumbAtLastSample: ReturnType<typeof peekLiveBreadcrumb> = null;
   const sample = (): void => {
     const t = Date.now();
     const jsGap = t - rpLastJsAt - FREEZE_SAMPLE_MS;
     const frameGap = t - rpLastFrameAt;
     rpLastJsAt = t;
+    let crumbNow: ReturnType<typeof peekLiveBreadcrumb> = null;
+    try { crumbNow = peekLiveBreadcrumb(); } catch { /* an instrument never breaks the watch */ }
     // Only judge while the app is actually foregrounded — see the note above.
     if (rpAppState === 'active') {
       const v = freezeVerdict(Math.max(0, jsGap), frameGap);
@@ -383,12 +390,17 @@ export function startRuntimePressureWatch(
       // line every 5 seconds and bury the transition that actually matters.
       if (v !== 'ok' && v !== rpLastVerdict) {
         if (v === 'ui-stalled' || v === 'both-stalled') rpUiStalls += 1;
-        try { get().appendLog('debug', freezeVerdictLine(v, Math.max(0, jsGap), frameGap)); } catch { /* ignore */ }
+        try {
+          let ctx = '';
+          try { ctx = ` · ${stallContextLine(crumbAtLastSample, crumbNow, nativeMlSnapshot(), t)}`; } catch { /* ignore */ }
+          get().appendLog('debug', `${freezeVerdictLine(v, Math.max(0, jsGap), frameGap)}${ctx}`);
+        } catch { /* ignore */ }
       } else if (v === 'ok' && rpLastVerdict !== 'ok') {
         try { get().appendLog('debug', `freeze watch: recovered — painting again after ${Math.round(rpWorstFrameGapMs)}ms quiet.`); } catch { /* ignore */ }
       }
       rpLastVerdict = v;
     }
+    crumbAtLastSample = crumbNow;
     rpSampleTimer = setTimeout(sample, FREEZE_SAMPLE_MS);
   };
   rpSampleTimer = setTimeout(sample, FREEZE_SAMPLE_MS);

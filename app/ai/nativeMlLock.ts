@@ -256,15 +256,29 @@ let deferTimer: ReturnType<typeof setTimeout> | null = null;
 // different fact from a death on an idle queue. Lazy-required so this file
 // stays importable in isolation, and wrapped so a broken stamp can never
 // wedge the ML chain it is observing.
+/** The lane a priority names — the ledger's vocabulary, shared by the dying
+ *  breath (OTA-1546) and the freeze-watch line (OTA-1634). */
+function laneOf(priority: number): string {
+  return priority <= ML_PRIORITY_HOMEWORK ? 'homework'
+    : priority >= ML_PRIORITY_TEARDOWN ? 'teardown'
+    : priority >= ML_PRIORITY_VOICE ? 'voice'
+    : priority >= ML_PRIORITY_COGNITION ? 'cognition'
+    : 'llm';
+}
+
+/** ⚠ OTA-1634 — what the native side is doing RIGHT NOW, for the freeze-watch
+ *  line. The JS clocks can say the thread went quiet; only this lock knows
+ *  whether a model call was running underneath it, in which lane, and how many
+ *  were queued behind it. Cheap, synchronous, never throws. */
+export function nativeMlSnapshot(): { running: boolean; lane: string; queued: number } {
+  return { running, lane: running ? laneOf(runningPriority) : 'idle', queued: pending.length };
+}
+
 function stampNativePhase(tag: 'start' | 'done', priority: number, queued: number): void {
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { stampBreadcrumbPhase } = require('../engine/saveSystem') as typeof import('../engine/saveSystem');
-    const cls = priority <= ML_PRIORITY_HOMEWORK ? 'homework'
-      : priority >= ML_PRIORITY_TEARDOWN ? 'teardown'
-      : priority >= ML_PRIORITY_VOICE ? 'voice'
-      : priority >= ML_PRIORITY_COGNITION ? 'cognition'
-      : 'llm';
+    const cls = laneOf(priority);
     // ⚠⚠⚠ OTA-1567 — QUEUE DEPTH ON `done` TOO, and this is not a tidy-up. The
     // note above promises *"queue depth rides along — a death with q3 backed up
     // is a different fact from a death on an idle queue"* — but it was only ever
