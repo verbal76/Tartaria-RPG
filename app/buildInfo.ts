@@ -26914,7 +26914,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // tap was silent (two deduped refusals); the chip stayed lit. A verb that
 // names a scene chip is the chip's — the stage matcher stays out; the scanner
 // refusal speaks every tap; every investigate logs what it did to the chip.
-export const OTA_BUILD_ID = '2026-09-02-1630-the-chip-is-not-the-mission';
+// ⚠⚠⚠ OTA-1631 — MAX MEANS ALL OF IT. Owner: "whenever I hit Max … it makes
+// max and then still is lit, and I can usually still make 1 or two." Measured:
+// the count was already substitution-aware but capped at twenty, and the batch
+// clamped to its own hard-coded twenty. Thirty sticks: MAX said 20, made 20,
+// the button stayed lit over the ten it never offered. The bound is a runaway
+// rail, not a number to meet: MAX_CRAFT_BATCH = 99, read by count AND batch.
+export const OTA_BUILD_ID = '2026-09-02-1631-max-means-all-of-it';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-02-1630-the-chip-is-not-the-mission';
 // golem catch-up 2026-09-02: markerless publish of OTA-1630 - a named chip's
 // investigate is never claimed by a stage's "Not here". hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-02-1629-the-sleep-keeps-the-hour';

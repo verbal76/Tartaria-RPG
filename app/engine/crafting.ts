@@ -749,9 +749,12 @@ export function consumeIngredients(
  *  Simulates the real drain one craft at a time (substitution-aware, because
  *  consumeIngredientsList runs the same canonical-first / substitute-tag passes
  *  the craft does), so "MAX" is an honest number rather than a division that
- *  ignores which substitutes get eaten first. Capped so a pack full of scrap
- *  can't spin this into a long loop — nobody batches more than a stack anyway. */
-export const MAX_CRAFT_BATCH = 20;
+ *  ignores which substitutes get eaten first.
+ *  ⚠ OTA-1631 — MAX MEANS ALL OF IT. Owner: "when I hit Max it makes max and
+ *  is still lit, and I can usually still make 1 or two." The cap was 20 and his
+ *  pack paid for 22. The bound is a safety rail against a runaway loop, not a
+ *  number the player is meant to meet — 99, a stack and a half of anything. */
+export const MAX_CRAFT_BATCH = 99;
 export function maxCraftableCount(
   recipe: Recipe,
   inventory: readonly InventoryItem[],

@@ -1560,9 +1560,9 @@ Key invariants worth knowing:
 
 ## 9. Recent OTA highlights (latest sessions)
 
-### ⚠⚠⚠ THE 2026-09-02 RUN — OTA-1617 → 1630 (read this first if you are new)
+### ⚠⚠⚠ THE 2026-09-02 RUN — OTA-1617 → 1631 (read this first if you are new)
 
-Latest golem-line stamp: **`2026-09-02-1630-the-chip-is-not-the-mission`**
+Latest golem-line stamp: **`2026-09-02-1631-max-means-all-of-it`**
 (`app/buildInfo.ts`). Both channels ship from this branch — a `[ota-hal]` marker
 in the commit TITLE publishes the HAL set, a markerless follow-up commit
 publishes golem; see §6.
@@ -1692,6 +1692,19 @@ what it ACCEPTS, and a data walker skips the saying.
   ledgers (searched / flavor-exhausted / the lore table's `consumed`); if it
   recurs, the new debug lines beside the parser line are the evidence.
   Owner's #2 (MAX craft) is OTA-1631, #3 (SET COURSE walks a tile) is OTA-1632.
+- **OTA-1631 MAX means all of it.** Owner's open list #2: *"whenever I hit Max
+  … it makes max and then still is lit, and I look at it again and I can
+  usually still make 1 or two."* Measured against the engine, not guessed:
+  `maxCraftableCount` was already substitution-aware (it simulates the real
+  drain one craft at a time, breakdown alternates included) but CAPPED at
+  twenty (`MAX_CRAFT_BATCH = 20`), and `craftRecipeBatch` clamped to a
+  hard-coded 20 of its own. Thirty sticks: MAX said 20, made 20, the button
+  stayed lit over the ten it never offered — exactly "still make 1 or two".
+  The bound is a rail against a runaway loop, not a number the player meets:
+  `MAX_CRAFT_BATCH = 99` in `app/engine/crafting.ts`, and the batch clamp in
+  `craftingSlice.ts` reads the constant instead of its own copy. ota1631 pins
+  count(30 sticks) = 30, the cap at 99, a live batch of 22 Clubs leaving 0
+  sticks and a MAX of 0, and the one-bound wiring. ota983's cap pin → 99.
 
 ⚠ **Two position vocabularies, still.** `stageArrival.ts` (heal / arm /
 `checkStandingGround`) keys on the canon grid CELL; the verb matchers and

@@ -23,7 +23,7 @@ import type { InventoryItem } from '../../engine/types';
 import { qwen } from '../../ai/engines';
 import { SLOT_LABEL } from '../../engine/equipment';
 import { FACTIONS } from '../../engine/factions';
-import { canonicalItemTags } from '../../engine/crafting';
+import { canonicalItemTags, MAX_CRAFT_BATCH } from '../../engine/crafting';
 // ⚠ SHARED BY TWO SLICES AND NOTHING ELSE, so it moved DOWN rather than being
 // injected twice. It is a pure lookup over SLOT_ID_KEY, which app/engine/equipment.ts
 // already owns — so that is where it went, beside the table it indexes.
@@ -71,7 +71,7 @@ export const createCraftingSlice = (
   },
 
   craftRecipeBatch(recipeName, count) {
-    const want = Math.max(1, Math.min(Math.floor(count), 20));
+    const want = Math.max(1, Math.min(Math.floor(count), MAX_CRAFT_BATCH)); // OTA-1631 — the one bound
     if (want === 1) { get().submitPlayerAction(`craft ${recipeName}`); return 1; }
     // Quiet the per-craft reward line; ONE summary lands at the end. Same
     // deferred-narration shape salvageAllAmbient uses for `salvage all`.

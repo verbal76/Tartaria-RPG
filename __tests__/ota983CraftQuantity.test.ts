@@ -69,7 +69,8 @@ describe('OTA-983 — craft a count, stay in the menu', () => {
   it('MAX never runs away — the batch is capped', () => {
     const target = RECIPES.find((r) => r.ingredients.length > 0)!;
     expect(maxCraftableCount(target, stockFor(target.result, 500))).toBe(MAX_CRAFT_BATCH);
-    expect(MAX_CRAFT_BATCH).toBeLessThanOrEqual(20);
+    // ⚠ OTA-1631 — the bound is a safety rail (99), not the 20 a pack of 22 used to hit.
+    expect(MAX_CRAFT_BATCH).toBe(99);
   });
 
   it('a batch makes N, spends N, and says so ONCE', async () => {
