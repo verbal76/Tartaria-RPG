@@ -26934,6 +26934,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // result applied N times inside the one action; one reward line that says how
 // many and why if short; the confirm prompts carry the count.
 export const OTA_BUILD_ID = '2026-09-02-1633-a-batch-is-one-action';
+// golem catch-up 2026-09-02: markerless publish of OTA-1633 - craft N is one
+// engine action with one reward line. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-02-1632-set-course-stays-put';
 // golem catch-up 2026-09-02: markerless publish of OTA-1632 - SET COURSE plans,
 // the travel-row tap walks; no auto-step, no re-rolled tile. hal took the marker.
