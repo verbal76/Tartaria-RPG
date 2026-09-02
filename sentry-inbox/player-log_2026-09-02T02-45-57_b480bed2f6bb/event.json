@@ -1,0 +1,262 @@
+{
+  "id": "b480bed2f6bb4c44a4caff1d940c2c16",
+  "groupID": "7705962340",
+  "eventID": "b480bed2f6bb4c44a4caff1d940c2c16",
+  "projectID": "4511945117532160",
+  "size": 17896,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-02-1621-the-ask-is-a-command #mtjfp13vhzw3 [inline 11/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-02-1621-the-ask-is-a-command",
+  "message": "player-log 2026-09-02-1621-the-ask-is-a-command #mtjfp13vhzw3 [inline 11/28]",
+  "title": "player-log 2026-09-02-1621-the-ask-is-a-command #mtjfp13vhzw3 [inline 11/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "0e45604aac264b17b8255a63b5ad13f4",
+      "span_id": "92eb9c2f440daa0c",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "ft buried.\"\n[2026-09-02T00:31:16.276Z] [arbiter] The Arbiter takes you in. \"Sinking Cathedral is lethal country. The things that wake here pull above your weight. 43 HP carries you through Varakush (danger 1). 1/9 Cores recovered. Visit the remaining Lost Capitals. Or move on until you've got your legs under you.\"\n",
+      "[2026-09-02T00:31:16.279Z] [world] Soot noses at the iron-flake stain and snorts. There's something there.\n[2026-09-02T00:31:16.294Z] [world] You've left The Buried Cities and entered Sinking Cathedral. Only the steeple remains above the mud, and the steeple is leaning toward the listener. It's dawn. Nobody else is in sight. east leads to The Deep Nave; west leads to The Reaver's Crest. Nothing na",
+      "med to the north or south.\n[2026-09-02T00:31:16.295Z] [system] Weather effect \u2014 Black Rain: -1 CHA\n[2026-09-02T00:31:16.307Z] [world] [Sinking Cathedral] north: Garrin (return the folio) (17 tiles, 1 day, 19 hours) \u00b7 east: The Deep Nave (1 tile, 3 hours) \u00b7 south: Obsidian Pillars (6 tiles, 15 hours) \u00b7 west: Tartarian Pilgrim Camp (3 tiles, 8 hours)\n",
+      "[2026-09-02T00:31:17.240Z] [debug] ui: tap \"take / salvage\"\n[2026-09-02T00:31:18.782Z] [world] You take the Flame of Aether from where it lay.\n[2026-09-02T00:31:18.784Z] [reward] \u2726 Flame of Aether (Common).\n[2026-09-02T00:31:19.939Z] [reward] \u2726 Found Letter to the Council \u2014 Elior Zalmar. (open Contracts \u2192 Collectibles to read)\n",
+      "[2026-09-02T00:31:19.957Z] [world] Slim pickings on the anchor. You pocket a Smooth Stone on the way out.\n[2026-09-02T00:31:19.957Z] [world] You break the dust-buried forgotten order reliquary apart. Among the pieces, something worth keeping.\n",
+      "[2026-09-02T00:31:19.957Z] [world] You lever something loose from the hull \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n[2026-09-02T00:31:19.958Z] [world] Slim pickings on the hymnal. You pocket a Stick on the way out.\n[2026-09-02T00:31:19.958Z] [world] You salvage the monstrance. The take is small but real.\n",
+      "[Filtered]",
+      "[2026-09-02T00:31:19.959Z] [world] You break the stripped maintenance panel down. Among the pieces, a fragment of someone's writing \u2014 held against the world by stubbornness alone.\n[2026-09-02T00:31:19.960Z] [reward] \u2726 Salvage haul:\n[2026-09-02T00:31:19.960Z] [reward]     \u2022 Smooth Stone (Common)\n[2026-09-02T00:31:19.961Z] [reward]     \u2022 Aether Crystal x2 (Common)\n",
+      "[2026-09-02T00:31:19.961Z] [reward]     \u2022 Split Slate Piece (Common)\n[2026-09-02T00:31:19.961Z] [reward]     \u2022 Stick x2 (Common)\n[2026-09-02T00:31:19.961Z] [reward]     \u2022 Chipped Phial Neck (Common)\n[2026-09-02T00:31:21.015Z] [debug] persist sizes(KB): total=278 player=66 wm=126[rooms=63 events=4 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=83 scene=3\n",
+      "[2026-09-02T00:31:22.041Z] [debug] ui: tap \"more \u25b8\"\n[2026-09-02T00:31:23.075Z] [debug] ui: tap \"missions\"\n[2026-09-02T00:31:31.338Z] [debug] ui: tap \"missions\"\n[2026-09-02T00:32:36.969Z] [debug] ui: tap \"missions\"\n",
+      "[2026-09-02T00:32:42.240Z] [world] You set course for The Monarch's Waystation. 9 tiles \u2014 about 23 hours of travel, all in. Tap the \u2192 THE MONARCH'S WAYSTATION button on the travel row to press on; STOP TRAVEL to halt.\n",
+      "[2026-09-02T00:32:42.241Z] [arbiter] The Arbiter nods at the road ahead. \"The course to The Monarch's Waystation is set \u2014 but you're spent. Rest, then tap \u2192 THE MONARCH'S WAYSTATION on the travel row to set out.\"\n[2026-09-02T00:32:53.748Z] [debug] ui: tap \"missions\"\n",
+      "[2026-09-02T00:33:02.435Z] [world] You set course for The Buried Cities. 4 tiles \u2014 about 10 hours of travel, all in. Tap the \u2192 THE BURIED CITIES button on the travel row to press on; STOP TRAVEL to halt.\n",
+      "[2026-09-02T00:33:02.436Z] [arbiter] The Arbiter nods at the road ahead. \"The course to The Buried Cities is set \u2014 but you're spent. Rest, then tap \u2192 THE BURIED CITIES on the travel row to set out.\"\n[2026-09-02T00:33:05.885Z] [debug] ui: tap \"rest\"\n[2026-09-02T00:33:05.919Z] [player] rest\n",
+      "[2026-09-02T00:33:05.923Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0\n[2026-09-02T00:33:05.926Z] [world] Soot circles three times and curls beside you. Her breathing slows to yours.\n[2026-09-02T00:33:05.926Z] [world] You rest for 8 hours. +7 HP, +8 stamina recovered. (Day 47, afternoon)\n",
+      "[2026-09-02T00:33:05.930Z] [arbiter] The Arbiter goes still. \"The quiet you slept through was not the quiet of an empty place. It was something being patient.\"\n[2026-09-02T00:33:05.930Z] [world] A Bog Dragon is already inside the reach of your fire. The rest is over.\n[2026-09-02T00:33:05.930Z] [debug] enemy: Bog Dragon hp=282 ac=17 atk=Breath Attack dmg=4D10 rarity=Legendary ap=10\n",
+      "[2026-09-02T00:33:05.950Z] [system] \u23f3 Time passed: 8h\n[2026-09-02T00:33:06.794Z] [cognitive] REST  (843ms)\n[2026-09-02T00:33:07.836Z] [debug] persist sizes(KB): total=278 player=66 wm=126[rooms=64 events=4 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=83 scene=3\n[2026-09-02T00:33:08.546Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n",
+      "[2026-09-02T00:33:17.403Z] [debug] ui: tap \"flee\"\n[2026-09-02T00:33:17.407Z] [player] flee\n[2026-09-02T00:33:17.408Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=far enemies=1 hooks=0\n[2026-09-02T00:33:17.488Z] [system] \u23f3 Time passed: 15 min\n[2026-09-02T00:33:17.878Z] [cognitive] FEAR \u00b7 RETREAT \u00b7 HIDE  (389ms)\n",
+      "[2026-09-02T00:33:19.091Z] [debug] skillcheck: escape d20=10 DEX 23 = 33 vs Pursuit 17 \u2014 Bog Dragon (d20 7 + SPD 10) \u2192 PASS\n[2026-09-02T00:33:19.283Z] [debug] stats: STR13 DEX23 INT12 WIS13 CHA8 STE7 | gear: WIS+4,INT+3,DEX+12,STR+4,STE+2 | worn: main=Auralite Talon off=Choir-Bound Launcher head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves fe",
+      "et=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n[2026-09-02T00:33:19.284Z] [debug] train: dexterity (escape check) \u2192 progress 24/100\n[2026-09-02T00:33:19.284Z] [world] You break away across the open ground. Behind you the thing you ran from gives up the chase.\n[2026-09-02T00:33:21.034Z] [debug] ui: tap \"\u2192 THE BURIED CITIES\"\n",
+      "[2026-09-02T00:33:21.071Z] [debug] spawn: gear=[Mud-Seer's Hood, Titan's Forehead Guard] window=10 roster=new\n[2026-09-02T00:33:21.074Z] [world] You walk west through open silt. The compass tells you The Reaver's Crest lies further west \u2014 7 tiles, about 18 hours of travel.\n",
+      "[2026-09-02T00:33:21.088Z] [world] A green lantern hangs at the mouth of a culvert \u2014 the Mud Dwellers mark their hidden markets with that exact green.\n[2026-09-02T00:33:22.836Z] [debug] ui: tap \"\u2192 THE BURIED CITIES\"\n[2026-09-02T00:33:22.883Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Duvo Saltbeard, wandering trader. Tap the vendor banner to trade.\n",
+      "[2026-09-02T00:33:22.901Z] [world] This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n[2026-09-02T00:33:22.903Z] [world] You walk south through open silt. The compass points south into open ground.\n[2026-09-02T00:33:22.904Z] [world] What you started here has not finished itself in your absence.\n",
+      "[2026-09-02T00:33:24.691Z] [debug] ui: tap \"\u2192 THE BURIED CITIES\"\n[2026-09-02T00:33:24.772Z] [debug] spawn: gear=[Golem-Bound Cloak, Bone Splitter Axe] window=10 roster=new\n[2026-09-02T00:33:24.777Z] [world] You walk west through open silt. The compass points west into open ground.\n[2026-09-02T00:33:24.778Z] [world] The loose end is exactly as loose as you left it.\n",
+      "[2026-09-02T00:33:25.047Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-09-02T00:33:26.191Z] [debug] ui: tap \"\u2192 THE BURIED CITIES\"\n[2026-09-02T00:33:26.224Z] [world] You walk south. You arrive at The Buried Cities.\n[2026-09-02T00:33:26.228Z] [debug] scene: loc=buried_cities hub=- arrival=y opening=n passing=n\n",
+      "[2026-09-02T00:33:26.229Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n[2026-09-02T00:33:26.229Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n",
+      "[2026-09-02T00:33:26.230Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n[2026-09-02T00:33:26.230Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities HERE needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch\n",
+      "[2026-09-02T00:33:26.230Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n[2026-09-02T00:33:26.231Z] [debug] missions: \u00b7 at=buried_cities travelTo=buried_cities\n[2026-09-02T00:33:26.231Z] [world] \u25b8 Temporal Distortion Watch: this is the place \u2014 go quietly.\n",
+      "[2026-09-02T00:33:26.379Z] [world] You've left Sinking Cathedral and entered The Buried Cities. The buried cities sealed themselves under the same mud that killed them. There is no contradiction. It's dusk. Nobody else is in sight. north leads to Tartarian Pilgrim Camp; east leads to The Storm's Eye; west leads to The Architect's Blind. Nothing named to the south.\n",
+      "[2026-09-02T00:33:26.380Z] [world] The gate of The Buried Cities stands before you \u2014 their ground, not yet their halls. (Tap ENTER OUTPOST to step inside.)\n[2026-09-02T00:33:26.380Z] [world] You have been here. The shape of it comes back before the details do.\n[2026-09-02T00:33:26.380Z] [system] Weather effect \u2014 Aether Lightning: +1 INT\n",
+      "[2026-09-02T00:33:26.384Z] [world] [The Buried Cities] north: Tartarian Pilgrim Camp (3 tiles, 8 hours) \u00b7 east: Sinking Cathedral (4 tiles, 10 hours) \u00b7 south: The Cistern Intake (5 tiles, 13 hours) \u00b7 west: Dynasty Border Post (6 tiles, 15 hours)\n[2026-09-02T00:33:28.421Z] [debug] ui: tap \"rest\"\n[2026-09-02T00:33:28.428Z] [player] rest\n",
+      "[2026-09-02T00:33:28.429Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0\n[2026-09-02T00:33:28.431Z] [world] Soot turns twice, thinks about a third, and drops where she stands.\n[2026-09-02T00:33:28.431Z] [world] You rest for 8 hours. +6 HP, +8 stamina recovered. (Day 48, night)\n",
+      "[2026-09-02T00:33:28.435Z] [arbiter] The Arbiter goes still. \"It watched you sleep from the treeline and made up its mind about you.\"\n[2026-09-02T00:33:28.435Z] [world] A Mud Siren Queen crosses the last of the open and does not stop coming. The rest is over.\n[2026-09-02T00:33:28.436Z] [debug] enemy: Mud Siren Queen hp=387 ac=14 atk=Song of Despair dmg=4D6 Psychic rarity=Legendary ap=9\n",
+      "[2026-09-02T00:33:28.450Z] [system] \u23f3 Time passed: 8h\n[2026-09-02T00:33:28.873Z] [cognitive] REST  (422ms)\n[2026-09-02T00:33:31.439Z] [debug] ui: tap \"flee\"\n[2026-09-02T00:33:31.463Z] [player] flee\n[2026-09-02T00:33:31.465Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=far enemies=1 hooks=0\n[2026-09-02T00:33:31.617Z] [system] \u23f3 Time passed: 15 min\n",
+      "[2026-09-02T00:33:31.993Z] [cognitive] FEAR \u00b7 RETREAT \u00b7 HIDE  (375ms)\n[2026-09-02T00:33:33.973Z] [debug] skillcheck: escape d20=17 DEX 23 = 40 vs Pursuit 15 \u2014 Mud Siren Queen (d20 6 + SPD 9) \u2192 PASS\n[2026-09-02T00:33:34.107Z] [debug] stats: STR13 DEX23 INT12 WIS13 CHA8 STE7 | gear: WIS+4,INT+3,DEX+12,STR+4,STE+2 | worn: main=Auralite Talon off=Choir-Bound Launcher head=Architect's Sight Enhancer ch",
+      "est=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n[2026-09-02T00:33:34.107Z] [debug] train: dexterity (escape check) \u2192 progress 26/100\n[2026-09-02T00:33:34.108Z] [world] You get your legs under you and go, and it does not follow far.\n",
+      "[2026-09-02T00:33:34.109Z] [arbiter] The Arbiter looks around. \"The buried cities sealed themselves under the same mud that killed them. There is no contradiction.\"\n[2026-09-02T00:33:43.983Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=360 from=cached winH=986 beat=-\n",
+      "[2026-09-02T00:33:44.237Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 18753ms read 0ms/write 0ms in 724t\u2192out 0t (0ch)\n[2026-09-02T00:33:44.505Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 18753ms \u2014 intro-fill:\u2205\n[2026-09-02T00:33:44.505Z] [debug] homework: scene_intro \"Sinking Cathedral\" \u2205 19458ms\n",
+      "[2026-09-02T00:33:44.709Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-09-02T00:33:55.337Z] [debug] qwen\u23f1 ambient_fill ok 26078ms wait 15233ms read/write unusable (native mis-reported 27204ms/2587ms \u2014 llama.rn split bug, not this call) in 369t\u2192out 31t HIT-CAP (69ch)\n[2026-09-02T00:33:55.644Z] [debug] arbiter: ambient-fill \u2205 27211ms\n",
+      "[2026-09-02T00:33:55.645Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient_fill after 26078ms \u2014 ambient:fill-\u2205\n[2026-09-02T00:34:02.749Z] [player] so when I landed on this outpostile that has the inner Outpost button on something you pushed I think at like 1612 OTA it looks like that now kills an auto route if you're in one when you hit those tiles\n",
+      "[2026-09-02T00:34:02.751Z] [arbiter] The Arbiter studies you, plainly. \"I'm not sure what you're trying to tell me. I'll keep your note in the log either way. If you mean to act, phrase it as a verb \u2014 'investigate the rubble', 'go east', 'attack the figure'.\"\n[2026-09-02T00:34:02.752Z] [debug] meta-comment guard: skipped intent parse (engine-vocabulary: \"OTA\") on 203-char input\n",
+      "[2026-09-02T00:34:05.761Z] [debug] ui: tap \"missions\"\n[2026-09-02T00:34:07.295Z] [debug] persist sizes(KB): total=289 player=66 wm=135[rooms=73 events=4 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=84 scene=4\n[2026-09-02T00:34:14.943Z] [debug] homework: intro-fill armed after 6000ms idle\n",
+      "[2026-09-02T00:34:16.135Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=cached winH=986 beat=-\n[2026-09-02T00:34:16.643Z] [debug] kbbar: mounted bottom=359.79486083984375 raw=360 from=live winH=986 beat=-\n[2026-09-02T00:34:25.337Z] [debug] multi-clause: 3 parts\n[2026-09-02T00:34:25.368Z] [player] or maybe not\n",
+      "[2026-09-02T00:34:25.369Z] [debug] parser: intent=unknown conf=0.10 verb=- target=- resolved=- range=- enemies=0 hooks=0\n[2026-09-02T00:34:25.371Z] [arbiter] The Arbiter looks at the dark around you. \"The aetheric torch was made for moments like this.\"\n[2026-09-02T00:34:25.371Z] [system] Try: look around \u00b7 search \u00b7 rest\n",
+      "[2026-09-02T00:34:25.457Z] [player] it just said I had a bunch of towels to go and all of a sudden I'm here\n[2026-09-02T00:34:25.458Z] [debug] parser: intent=travel conf=1.00 verb=go target=sudden im resolved=- range=- enemies=0 hooks=0\n[2026-09-02T00:34:25.463Z] [world] After a while you set down on the next stretch of ground.  The way you came is not where it should be."
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-02-1621-the-ask-is-a-command #mtjfp13vhzw3 [inline 11/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtjfp13vhzw3"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-02-1621-the-ask-is-a-command"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "11"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-02-1621-the-ask-is-a-command"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-02T02:45:57.282000Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "6": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 291,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-02T02:45:57.537000Z",
+  "fingerprints": [
+    "498517985fa678450763f1ea802b25af"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1949636491,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-02T02:45:57.539000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-02-1621-the-ask-is-a-command",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-02-1621-the-ask-is-a-command",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-02-1621-the-ask-is-a-command",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-02-1621-the-ask-is-a-command)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "b9a2e4d06cc4450eafaa71dc4af4b2f8",
+  "previousEventID": "ae978cb8b4ea4dcaa03b4d3feb5040bd"
+}
