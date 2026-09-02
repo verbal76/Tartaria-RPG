@@ -136,38 +136,19 @@ describe('OTA-1615 — the mission status card reader', () => {
   });
 });
 
-describe('OTA-1615 — the button and the card are wired', () => {
-  const EXPL = src('app', 'screens', 'ExplorationScreen.tsx');
-  const CARD = src('app', 'components', 'MissionStatusCard.tsx');
-
-  it('⚠⚠⚠ MISSIONS OPENS THE CARD instead of jumping to the tab', () => {
-    expect(EXPL).toContain('setMissionCardOpen(true);');
-    expect(EXPL).toContain('<MissionStatusCard');
-  });
-
-  it('⚠⚠ the full screen is still one tap away — nothing was taken away', () => {
-    expect(CARD).toContain('OPEN CONTRACTS');
-    expect(EXPL).toContain("onOpenContracts={() => { setMissionCardOpen(false); setScreen('contracts'); }}");
-  });
-
-  it('⚠⚠ the card scrolls and keeps its buttons — OTA-1614\'s rule, applied here too', () => {
-    expect(CARD).toContain("maxHeight: '85%',");
-    expect(CARD).toContain('scroll: { flexShrink: 1, flexGrow: 0 },');
-    // Buttons after the scroll view, so a seven-beat hunt cannot push them off.
-    // ⚠ Measured on the tail AFTER the scroll closes — searching the whole file
-    // would match this component's own header prose, which is documentation and
-    // proves nothing about the layout.
-    const tail = CARD.slice(CARD.indexOf('</ScrollView>'));
-    expect(tail).toContain('OPEN CONTRACTS');
-    expect(tail).toContain('BACK TO THE WORLD');
-  });
-
-  it('⚠ the card computes nothing of its own — it renders the engine\'s answer', () => {
-    // ⚠ OTA-1618 added the card MODEL to the same import (the row handlers take
-    // one), which moved the line. Same import, same single source.
-    expect(CARD).toContain("import { missionStatusCards, type MissionStatusCard as CardModel } from '../engine/missionTrace';");
-    // No second opinion about where a stage happens or what it asks for.
-    expect(CARD).not.toContain('stageLocationId');
-    expect(CARD).not.toContain('payingIntent');
+// ⚠⚠⚠ OTA-1620 RETIRED THE CARD. The four component pins that stood here
+// ("MISSIONS opens the card", "OPEN CONTRACTS is one tap away", the scroll
+// contract, "computes nothing of its own") described a surface the owner
+// rejected after running it: *"what I wanted was an exact duplication of the
+// contracts screen on the missions button… I want the whole thing under the
+// missions button so I can hit it and be done."* MISSIONS opens ContractsScreen
+// itself now; ota1620TheWholeScreenBehindTheButton holds that. The reader above
+// (`missionStatusCards`) is kept and still held to the trace — no surface
+// renders it, which HANDOFF records as debt rather than this suite pretending
+// otherwise.
+describe('OTA-1615 — what the card was for, kept honest after its retirement', () => {
+  it('⚠ the exploration screen no longer mounts the card', () => {
+    const EXPL = src('app', 'screens', 'ExplorationScreen.tsx');
+    expect(EXPL).not.toContain('MissionStatusCard');
   });
 });

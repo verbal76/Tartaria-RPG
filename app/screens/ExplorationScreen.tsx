@@ -90,7 +90,6 @@ import { ParleySheet } from '../components/ParleySheet';
 import { PayoffSheet } from '../components/PayoffSheet';
 import { TalkSheet } from '../components/TalkSheet';
 import { WhisperTalkSheet } from '../components/WhisperTalkSheet';
-import { MissionStatusCard } from '../components/MissionStatusCard';
 import { MissionEncounterCard } from '../components/MissionEncounterCard';
 import { GiftModal } from '../components/GiftModal';
 import { hasTopicsFor } from '../engine/dialogue';
@@ -282,8 +281,6 @@ export function ExplorationScreen() {
   // quick-row button; submits `ask the arbiter about <input>` so
   // OTA-233's parser fallback fires the MiniLM lore lookup.
   const [askArbiterOpen, setAskArbiterOpen] = useState(false);
-  // OTA-1615 — the mission status card, opened from the MISSIONS quick button.
-  const [missionCardOpen, setMissionCardOpen] = useState(false);
   const [askArbiterInput, setAskArbiterInput] = useState('');
   const [salvageOpen, setSalvageOpen] = useState(false);
   // arb135 — Mission Board as a tappable screen (open postings + ACCEPT), not a text dump.
@@ -2063,12 +2060,6 @@ export function ExplorationScreen() {
           the other sheets for the slot itself; the component renders nothing
           unless a whisper encounter with a transcript is live. */}
       <WhisperTalkSheet />
-      {/* ⚠⚠⚠ OTA-1615 — the slate, where the player is standing. */}
-      <MissionStatusCard
-        visible={missionCardOpen}
-        onClose={() => setMissionCardOpen(false)}
-        onOpenContracts={() => { setMissionCardOpen(false); setScreen('contracts'); }}
-      />
 
       {/* ⚠⚠ OTA-1581 — the mission conversation card. It renders NOTHING unless
           the player is standing on the tile of a live stage that names a person,
@@ -2183,15 +2174,20 @@ export function ExplorationScreen() {
             pickpocketBlocked={!currentScene?.vendor && !currentScene?.wanderer && escortLeaderMarks.length === 0}
             pickpocketPossible={!!(currentScene?.vendor || currentScene?.wanderer) || escortLeaderMarks.length > 0}
             onOpenAskArbiter={() => setAskArbiterOpen(true)}
-            // ⚠⚠⚠ OTA-1615 — MISSIONS STOPS BEING A TAB JUMP. Owner: *"it's
-            // getting annoying jumping back into the missions tab every time. I
-            // want to check to see what I have to do next."* The card answers
-            // that where he is standing; OPEN CONTRACTS on it still reaches the
-            // full screen, so nothing is taken away.
+            // ⚠⚠⚠ OTA-1620 — MISSIONS OPENS THE CONTRACTS SCREEN ITSELF. Owner,
+            // after three OTAs of a summary card (1615/1617/1618): *"what I
+            // wanted was an exact duplication of the contracts screen on the
+            // missions button. I don't want the contract screen to be separate
+            // anymore. I want the whole thing under the missions button so I can
+            // hit it and be done… in the same style as the contracts tab so it
+            // looks the same."* The card was the wrong object; the screen he
+            // wanted already existed. This is the same door the objective chip
+            // and the Character card use — one screen, its own ← BACK, and the
+            // button sits on the primary row (OTA-1618) so it is always in reach.
             onOpenMissions={() => {
               Keyboard.dismiss();
               useGameStore.getState().maybeAdvanceTutorial('main_quest');
-              setMissionCardOpen(true);
+              setScreen('contracts');
             }}
             onOpenSalvage={() => { Keyboard.dismiss(); setSalvageOpen(true); }}
             // ⚠⚠ OTA-1263 — AN EMPTY ROOM ANSWERS IN THE FEED, NOT IN A CARD YOU

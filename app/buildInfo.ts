@@ -26800,7 +26800,23 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // was left out. OTA-1606 removed the auto-enter that had been masking it. One
 // clause, dropped in both places it appeared; arb118's first-arrival milestone
 // gate means out-and-back farms nothing.
-export const OTA_BUILD_ID = '2026-09-02-1619-the-gate-comes-back-when-you-do';
+// ⚠⚠⚠ OTA-1620 — THE WHOLE CONTRACTS SCREEN LIVES BEHIND MISSIONS. Owner, after
+// running 1618: "it only shows me six missions, so you're picking a subcategory
+// and saying that that's all the missions. what I wanted was an exact
+// duplication of the contracts screen on the missions button. I don't want the
+// contract screen to be separate anymore. I want the whole thing under the
+// missions button so I can hit it and be done" — "in the same style as the
+// contracts tab so it looks the same." The card was the wrong object: three
+// OTAs (1615/1617/1618) built a reader-shaped summary and kept adding to it,
+// and he never wanted a summary. The screen he wanted already existed —
+// ContractsScreen, every section, every button, its own ← BACK. MISSIONS now
+// opens it directly; the card, its state and its wiring are deleted; the button
+// keeps 1618's place on the primary row beside MORE. There was never a tab bar
+// — the "tab" was only the set of doors into this screen, and MISSIONS is now
+// the main one. missionStatusCards (the reader) stays as the trace's sibling;
+// no surface renders it — recorded in HANDOFF as debt.
+export const OTA_BUILD_ID = '2026-09-02-1620-the-whole-screen-behind-the-button';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-02-1619-the-gate-comes-back-when-you-do';
 // golem catch-up 2026-09-02: markerless publish of OTA-1619 - the step arrives on
 // the cell, not on a change of id; the gate comes back when you do. hal took the marker.
 // golem catch-up 2026-09-01: markerless publish of OTA-1617 - the ask names its

@@ -203,8 +203,16 @@ describe('OTA-1618 — each family answers in its own terms, from its own engine
   });
 });
 
-describe('OTA-1618 — the card is the door, and the door is always open', () => {
-  const CARD = src('app', 'components', 'MissionStatusCard.tsx');
+// ⚠⚠⚠ OTA-1620 RETIRED THE CARD. The owner ran this OTA and said: *"it only
+// shows me six missions, so you're picking a subcategory and saying that
+// that's all the missions. what I wanted was an exact duplication of the
+// contracts screen on the missions button."* The reader pins above stay (the
+// trace reads the same fields); the four component pins that stood here — the
+// row's store calls, the reader-decided buttons, the two-tap drop, the scroll
+// contract — described a surface that no longer exists and were removed rather
+// than left asserting on a deleted file. The button placement was the half of
+// this OTA he did want, and it is held below and again by ota1620.
+describe('OTA-1618 — the button is always in reach', () => {
   const INPUT = src('app', 'components', 'InputBox.tsx');
 
   it('⚠⚠⚠ MISSIONS IS OUT OF THE MORE TRAY AND ON THE ROW — exactly once', () => {
@@ -222,44 +230,10 @@ describe('OTA-1618 — the card is the door, and the door is always open', () =>
     expect(at).toBeLessThan(trayAt);
   });
 
-  it('⚠⚠⚠ every action on the row is the store call the Contracts screen made', () => {
-    for (const call of [
-      'const setContractActive = useGameStore((s) => s.setContractActive);',
-      'const abandonContract = useGameStore((s) => s.abandonContract);',
-      'const discardLead = useGameStore((s) => s.discardLead);',
-      'const completeContractFromUI = useGameStore((s) => s.completeContractFromUI);',
-      'const setWhisperCourse = useGameStore((s) => s.setWhisperCourse);',
-      'const routeMission = useGameStore((s) => s.routeMission);',
-    ]) expect(CARD).toContain(call);
+  it('⚠ the actions the card borrowed are still where he now taps them — on the Contracts screen', () => {
     const CONTRACTS = src('app', 'screens', 'ContractsScreen.tsx');
     for (const name of ['setContractActive', 'abandonContract', 'discardLead', 'completeContractFromUI']) {
       expect(CONTRACTS).toContain(name);
     }
-  });
-
-  it('⚠⚠⚠ a row offers only what the READER says that family allows', () => {
-    // The component asks the card, never the family name — which is how a
-    // whisper comes to show a HAND IT IN button that the store then refuses.
-    expect(CARD).toContain('{c.turnInKind ? (');
-    expect(CARD).toContain('{c.pauseKind ? (');
-    expect(CARD).toContain('{c.abandonKind || c.discardable ? (');
-    expect(CARD).not.toContain("c.family === 'bounty'");
-    expect(CARD).not.toContain("c.family === 'whisper'");
-  });
-
-  it('⚠⚠ THE DROP IS TWO TAPS — the only irreversible button on the sheet', () => {
-    // On the Contracts screen ABANDON sat behind a tap-to-expand. This sheet has
-    // no expansion, so the second tap is what stands between a scrolling thumb
-    // and a contract the player wanted.
-    expect(CARD).toContain("const [armedDrop, setArmedDrop] = useState<string | null>(null);");
-    expect(CARD).toContain('onPress={() => (armed ? dropRow(c) : setArmedDrop(rowKey))}');
-    expect(CARD).toContain("'TAP AGAIN TO CONFIRM'");
-  });
-
-  it('⚠⚠ the buttons still cannot be pushed off — OTA-1614\'s rule survives the new rows', () => {
-    expect(CARD).toContain("maxHeight: '85%',");
-    expect(CARD).toContain('scroll: { flexShrink: 1, flexGrow: 0 },');
-    const tail = CARD.slice(CARD.indexOf('</ScrollView>'));
-    expect(tail).toContain('BACK TO THE WORLD');
   });
 });

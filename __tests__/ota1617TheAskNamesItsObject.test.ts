@@ -83,39 +83,15 @@ describe('OTA-1617 — the ask names its object', () => {
   });
 });
 
-describe('OTA-1617 — the walk is on the row it belongs to', () => {
-  const CARD = src('app', 'components', 'MissionStatusCard.tsx');
-
-  it('⚠⚠⚠ SET COURSE sits inside the mission, not behind OPEN CONTRACTS', () => {
-    // ⚠ OTA-1618 SUPERSEDED THE EXPRESSIONS, NOT THE CLAIM. The card carries
-    // four more families now, and two of them do not course to a location id at
-    // all — a whisper routes to an absolute GRID CELL and a faction contract
-    // through `routeMission` so its turn-in leg is kept. The row therefore reads
-    // the engine's `route`, and `takeRoute` dispatches on which frame it is in.
-    // Same button, same place, same guarantee that it is on the mission's row.
-    expect(CARD).toContain("▸ SET COURSE TO {(c.where || 'IT').toUpperCase()}");
-    expect(CARD).toContain('onPress={() => takeRoute(c)}');
-    expect(CARD).toContain("if (r.kind === 'location') { routeTo(r.id, r.name); return; }");
-  });
-
-  it('⚠⚠ it uses the SAME two actions the Contracts screen uses, in the same order', () => {
-    // Inside an outpost the global confirm asks before walking you out
-    // (OTA-035); otherwise the course is set outright. A second routing path is
-    // how a button comes to send the player somewhere Contracts would refuse.
-    expect(CARD).toContain('if (player?.hubRoomId) requestTravelConfirm(id, name);');
-    expect(CARD).toContain('else setTravelCourse(id);');
-    const CONTRACTS = src('app', 'screens', 'ContractsScreen.tsx');
-    expect(CONTRACTS).toContain('requestTravelConfirm(id, name);');
-    expect(CONTRACTS).toContain('setTravelCourse(id);');
-  });
-
-  it('⚠⚠ the button is absent where it would be a lie', () => {
-    // Standing on the ground, or a beat whose ground has no id to walk to.
-    // ⚠ OTA-1618 — the same two refusals, moved into the reader: `route` is null
-    // exactly when the player is already there or there is nothing to walk to,
-    // for EVERY family, instead of each row re-deriving it. The component asks
-    // one question now.
-    expect(CARD).toContain('{c.route ? (');
+// ⚠⚠ OTA-1620 RETIRED THE CARD, and with it the three component pins that stood
+// here (SET COURSE on the row, the same two store actions, absent where it
+// would lie). The owner rejected the card outright — *"I don't want the
+// contract screen to be separate anymore"* — and the Contracts screen, which
+// already carried its own SET COURSE per card (OTA-1589), is what MISSIONS
+// opens now. The reader's routing fields are still held below, because the
+// trace and the log read them.
+describe('OTA-1617 — the destination on the row is the destination in the sentence', () => {
+  it('⚠⚠ the reader still refuses a route where it would be a lie', () => {
     const TRACE = src('app', 'engine', 'missionTrace.ts');
     expect(TRACE).toContain("route: where && where !== player.currentLocationId ? toLocation(where) : null,");
     expect(TRACE).toContain('route: here ? null : toLocation(b.targetLocationId),');
