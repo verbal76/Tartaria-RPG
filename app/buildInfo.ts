@@ -26850,7 +26850,19 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // player-shaped walker (test-utils/playerWalker.ts, __tests__/playerWalkerSim)
 // that plays every mission from the surfaces — Halem's gate, SET COURSE, the
 // arrival line's own words typed back, the cards, the hand-in.
-export const OTA_BUILD_ID = '2026-09-02-1622-it-pops-up-in-your-face';
+// ⚠⚠⚠ OTA-1623 — THE GERUND IS THE VERB. Found by the player-shaped walker on
+// its second catalogue pass, on the owner's own Temporal Watch stealth beat:
+// it typed the Contracts card's label "sneaking" on the right ground with the
+// pack in order and got an Arbiter tagline; the stage did not move. Measured:
+// "sneaking" reached STEALTH only by fuzzy distance (0.46), under the 0.5 gate
+// in submitPlayerAction, so it went to the Qwen fallback and never touched the
+// stage matcher — "sneak" at 1.00 paid the same stage. OTA-1621 held every
+// printed word to the INTENT and never to the confidence. Now an inflected form
+// of a known verb (-ing/-ed/-s, spelling undone, exact entries only) is that
+// verb at full confidence, and ota1623 holds every ask and label to the gate's
+// own number.
+export const OTA_BUILD_ID = '2026-09-02-1623-the-gerund-is-the-verb';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-02-1622-it-pops-up-in-your-face';
 // golem catch-up 2026-09-02: markerless publish of OTA-1622 - a card on every
 // stage close in all four families + the player-shaped walker. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-02-1621-the-ask-is-a-command';

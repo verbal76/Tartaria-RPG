@@ -908,12 +908,16 @@ app/
   components/  UI primitives; InventoryCategorize.ts, RecipesView.tsx,
                FusionPickerModal.tsx, StatsPanel.tsx, InputBox.tsx,
                BrandedModal.tsx (the shared card — see its contract below),
-               MissionStatusCard.tsx (OTA-1615, the slate where you stand)
+               MissionStingerModal.tsx (OTA-1600/1602/1622 — the one card every
+               mission close and stand-up goes through; see questSlice.raiseMissionClose)
   data/        Authored JSON (items/weapons/armor/gear/dogGear/recipes/…)
   engine/      Pure logic — parser, crafting, itemFusion, equipment, worldMap
                (canonical grid + travel distance), durability, combat, …
   screens/     Exploration / Inventory / Crafting / Vendor / Character / Map / …
   state/       gameStore.ts — Zustand, the spine (~37k lines, shrink-only ratchet)
+               slices/questSlice.ts — contracts in all four families; raiseMissionClose
+test-utils/    playerWalker.ts — the PLAYER-SHAPED walker (OTA-1622): plays every
+               mission from the surfaces; __tests__/playerWalkerSim runs it (PLAYER_WALKER=1)
                defeatCredit.ts — OTA-1612: everything the OBJECTIVES hear when a
                target goes down (whisper chains, hunt completion, leads, the
                room-clear record, the escort clear). BOTH win conditions call it.
@@ -1552,7 +1556,72 @@ Key invariants worth knowing:
 
 ## 9. Recent OTA highlights (latest sessions)
 
-### ⚠⚠⚠ THE 2026-09-01 RUN — OTA-1600 → 1616 (read this first if you are new)
+### ⚠⚠⚠ THE 2026-09-02 RUN — OTA-1617 → 1623 (read this first if you are new)
+
+Latest golem-line stamp: **`2026-09-02-1623-the-gerund-is-the-verb`**
+(`app/buildInfo.ts`). Both channels ship from this branch — a `[ota-hal]` marker
+in the commit TITLE publishes the HAL set, a markerless follow-up commit
+publishes golem; see §6.
+
+The day's turn: the owner said *"you walkers don't play it the way a human does
+so it can't seem to catch the plethora of broken mess"*, and he was right. Every
+mission walker before this day was DATA-SHAPED — it seeded the player onto the
+stage's cell, read the stage's bindings and typed the intent it already knew
+would pay. It never walked a tile, never read the arrival line, never typed the
+game's own words back at it. Every defect below is in what the game SAYS versus
+what it ACCEPTS, and a data walker skips the saying.
+
+- **THE PLAYER-SHAPED WALKER** (`test-utils/playerWalker.ts`,
+  `__tests__/playerWalkerSim.test.ts`, gated on `PLAYER_WALKER=1`; report with
+  `PLAYER_WALKER_REPORT=<file>`, whole feed with `PLAYER_WALKER_FEED=1`, one
+  mission with `PLAYER_WALKER_ONLY=family:id`). Reads only what the player sees
+  and does only what a thumb does: the posting at Halem's gate (open work) or a
+  Hidden Market stall (faction work — Halem POSTS only neutral work and takes
+  ANY hand-in, `isBrokerVendorId` is the stalls), SET COURSE + the travel-row
+  button tile by tile, fights what stands up, types the LOWEST "▸" line on the
+  screen on the ground, answers cards with their buttons, hands in at the gate.
+  Allowances (HP 600, standing 100, stamina by fiat, dice on 18, coup de grâce
+  past 60 rounds) print on every report. Every mission is one `it`; the report
+  is the work list. First pass: 0/50 clean. After 1622 + walker fixes the
+  second pass ran 16/18 clean. When the catalogue walks clean, drop the env
+  gate and let it join the heavy CI set (its name ends in Sim for that).
+- **OTA-1617 / 1618 / 1620 — MISSIONS.** 1617 made the ask name its object and
+  put SET COURSE on the row; 1618 built a status card and put MISSIONS on the
+  primary row; the owner rejected the card outright (*"I want the whole thing
+  under the missions button"*) and 1620 made MISSIONS open ContractsScreen
+  itself. `MissionStatusCard.tsx` is deleted; `missionStatusCards` in
+  `missionTrace.ts` is a reader nothing renders — DEBT, delete or use.
+- **OTA-1619 the gate comes back when you do.** `stepDirection` decided arrival
+  by "named cell's id ≠ currentLocationId"; that id STICKS while you walk a
+  location's open ground, so stepping back onto its own anchor was silent.
+  Arrival is the CELL (arb103's rule, finally applied to the step).
+- **OTA-1621 the ask is a command.** Five of seven `VERB_ASK` phrases and two
+  `VERB_LABEL`s did not parse to the intent that pays the stage ("go quietly" →
+  travel walked him off the tile). Every entry is a typable sentence now;
+  ota1621 holds the table to `parseInput`. `nextStageDirection` takes the
+  family and composes the next beat's word into "▸ Next: …".
+- **OTA-1622 it pops up in your face.** Owner's rule, verbatim in
+  `questSlice.raiseMissionClose`. ONE writer raises a card on EVERY close in all
+  four families (advance*, escort clear, apex kill, faction tick) with the
+  prose, what landed in the pack and the next word; FIGHT card when bodies
+  stood up; `missionCloseQueue` holds a second close instead of overwriting;
+  the dismiss is a logged tap. `pendingMissionBeat`/`pendingMissionStinger`
+  are `MissionCloseCard`s now.
+- **OTA-1623 the gerund is the verb.** "sneaking" (the card's own label)
+  parsed to stealth at 0.46 — under the 0.5 gate in `submitPlayerAction` — so
+  the stage matcher never saw it. `inflectionStems` in parser.ts: an inflected
+  form of an EXACT table verb is that verb at distance 0; nothing fuzzy
+  loosened. ota1623 holds every ask and label to confidence ≥ 0.5 — the half
+  ota1621 never measured.
+
+⚠ **Two position vocabularies, still.** `stageArrival.ts` (heal / arm /
+`checkStandingGround`) keys on the canon grid CELL; the verb matchers and
+`missionArrivalLines` key on `currentLocationId === ground` (location-wide).
+Filed as OTA-1625. Also open: OTA-1624 (a mystery/storyline verb typed in
+combat is silent; hunts say "not with something on you"), OTA-1626 (bulk craft
+runs the whole action tail per unit).
+
+### ⚠⚠⚠ THE 2026-09-01 RUN — OTA-1600 → 1616 (the day before)
 
 Latest golem-line stamp: **`2026-09-01-1615-the-mission-speaks-where-you-stand`**
 (`app/buildInfo.ts`). Both channels ship from this branch — a `[ota-hal]` marker

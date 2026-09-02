@@ -556,6 +556,38 @@ function collapseDrunkRuns(token: string): string {
   return collapsed;
 }
 
+/** ⚠⚠⚠ OTA-1623 — THE GERUND IS THE VERB. The player-shaped walker typed the
+ *  Contracts card's own label, "sneaking", on a stealth stage with the pack in
+ *  order — and the stage did not move. Measured: `sneaking` reached the stealth
+ *  intent only by FUZZY distance (levenshtein 3 → confidence 0.46), which sits
+ *  under the 0.5 gate in submitPlayerAction, so the input went to the Qwen
+ *  fallback / soft refusal and never touched the stage matcher. The same
+ *  distance rule makes "searching", "casting", "talking", "digging" all
+ *  low-confidence guesses at words the table knows perfectly well.
+ *
+ *  An inflected form of a KNOWN verb is that verb, at full confidence:
+ *  -ing / -ed / -ies / -es / -s stripped (with the doubled consonant and the
+ *  dropped -e undone), accepted only when the stripped form is an EXACT entry.
+ *  Nothing fuzzy is added — a misspelling still pays the distance it always did. */
+function inflectionStems(token: string): string[] {
+  const out: string[] = [];
+  const dedouble = (s: string) => (s.length >= 3 && s[s.length - 1] === s[s.length - 2] ? s.slice(0, -1) : null);
+  const push = (s: string | null) => { if (s && s.length >= 2 && !out.includes(s)) out.push(s); };
+  if (token.endsWith('ing') && token.length > 5) {
+    const base = token.slice(0, -3);
+    push(base); push(`${base}e`); push(dedouble(base));
+  }
+  if (token.endsWith('ied') && token.length > 4) push(`${token.slice(0, -3)}y`);
+  if (token.endsWith('ed') && token.length > 4) {
+    const base = token.slice(0, -2);
+    push(base); push(`${base}e`); push(dedouble(base));
+  }
+  if (token.endsWith('ies') && token.length > 4) push(`${token.slice(0, -3)}y`);
+  if (token.endsWith('es') && token.length > 3) push(token.slice(0, -2));
+  if (token.endsWith('s') && token.length > 3) push(token.slice(0, -1));
+  return out;
+}
+
 function bestVerbMatch(token: string): { intent: Exclude<Intent, 'unknown'>; verb: string; distance: number } | null {
   let best: { intent: Exclude<Intent, 'unknown'>; verb: string; distance: number } | null = null;
   for (const intent of ALL_INTENTS) {
@@ -564,6 +596,14 @@ function bestVerbMatch(token: string): { intent: Exclude<Intent, 'unknown'>; ver
       if (fuzzyEqual(token, verb)) {
         const d = levenshtein(token, verb);
         if (!best || d < best.distance) best = { intent, verb, distance: d };
+      }
+    }
+  }
+  // OTA-1623 — an inflected form of an exact table verb is that verb, distance 0.
+  if (!best || best.distance > 0) {
+    for (const stem of inflectionStems(token)) {
+      for (const intent of ALL_INTENTS) {
+        if (VERB_SYNONYMS_LOOKUP[intent].includes(stem)) return { intent, verb: stem, distance: 0 };
       }
     }
   }

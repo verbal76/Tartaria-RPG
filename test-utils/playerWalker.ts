@@ -400,7 +400,18 @@ class Walker {
         if (this.enemiesUp() === 0) break;
       }
       this.tap('attack');
+      const before = this.feedMark();
       await this.type('attack');
+      // The Arbiter's own instruction when the ACTIVE target is out of reach
+      // while the scene as a whole reads close ("you're at mid-range. ADVANCE
+      // to close in"): a player taps APPROACH on that one. Second catalogue
+      // pass: ninety refused swings at a Mud Elemental Spawn nobody approached.
+      if (this.feedSince(before).some((l) => /ADVANCE to close in|need to close/i.test(l))) {
+        const live = get().currentScene!;
+        const target = live.enemies[live.activeEnemyIdx]?.name ?? live.enemies[0]?.name ?? '';
+        this.tap(`approach ${target}`);
+        await this.type(`approach ${target}`);
+      }
     }
     this.dismissCards();
     return true;
@@ -415,11 +426,11 @@ class Walker {
   /** The line the feed printed when the boots landed on the mission's ground. */
   arrivalLine(sinceMark: number): string | null {
     const head = `▸ ${this.def.title}: this is the place`;
+    // ⚠ Only since the mark — a wider search re-read the PREVIOUS stage's
+    // arrival line on a same-ground beat and typed its verb back (the walker's
+    // own version of the owner's "doing what it says and nothing pays").
     const recent = this.feedSince(sinceMark);
-    const hit = [...recent].reverse().find((l) => l.startsWith(head));
-    if (hit) return hit;
-    const older = this.feed().slice(-40);
-    return [...older].reverse().find((l) => l.startsWith(head)) ?? null;
+    return [...recent].reverse().find((l) => l.startsWith(head)) ?? null;
   }
 
   /** What the arrival line told the player to DO, in the line's own words. */
@@ -593,8 +604,16 @@ class Walker {
     // landed here (a close's auto-route can land them before this stage even
     // starts, so the search reaches back to the previous close), else the
     // direction line the last close printed.
-    const line = this.arrivalLine(this.prevCloseMark);
-    const dir = this.directionLine(this.prevCloseMark);
+    // ⚠ Whichever "▸" line is LOWEST on the screen is the instruction — the
+    // second catalogue pass typed a stale arrival line's verb ("strike") on
+    // a same-ground beat whose close had printed "▸ search this ground"
+    // underneath it. A player reads the bottom of the feed; so does this.
+    let line = this.arrivalLine(this.prevCloseMark);
+    let dir = this.directionLine(this.prevCloseMark);
+    if (line && dir) {
+      const since = this.feedSince(this.prevCloseMark);
+      if (since.lastIndexOf(dir) > since.lastIndexOf(line)) line = null; else dir = null;
+    }
     note.arrivalLine = line ?? (dir ? `(direction) ${dir}` : null);
     let ask = line ? this.askFrom(line) : dir ? this.askFromDirection(dir) : null;
     if (!line && !dir) {
