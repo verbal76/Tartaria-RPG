@@ -26831,6 +26831,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // when a stage closes now carries the next beat's command word too, so the
 // moment one stage pays the player holds the word that opens the next.
 export const OTA_BUILD_ID = '2026-09-02-1621-the-ask-is-a-command';
+// golem catch-up 2026-09-02: markerless publish of OTA-1621 - every ask and
+// label parses to the intent that pays the stage. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-02-1620-the-whole-screen-behind-the-button';
 // golem catch-up 2026-09-02: markerless publish of OTA-1620 - MISSIONS opens the
 // Contracts screen itself; the status card is deleted. hal took the marker.
