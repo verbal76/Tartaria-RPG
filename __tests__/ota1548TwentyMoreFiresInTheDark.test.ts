@@ -281,13 +281,14 @@ describe('OTA-1548 — the machine dispatches by table, never by name', () => {
 
   it('⚠⚠⚠ the resolver, handlers and sheet action are chain-generic', () => {
     const code = codeOnly(STORE);
-    expect(code).toContain('fireWhisperMeet(get, set, meet, meetChain);');
+    // ⚠ OTA-1628 — the meet and the arm dispatch through WB() (whisperBeats.ts).
+    expect(code).toContain('WB().fireWhisperMeet(get, set, meet, meetChain);');
     expect(code).toContain('fireWhisperFetch(get, set, fetch, fetchChain);');
     // ⚠ OTA-1613 — arrival now ARMS the hand-over instead of paying on the
     // spot, so the return beat dispatches to armWhisperHandback. The rule 1548
     // pinned is what is checked: every beat is dispatched by table with the
     // chain passed in, and no giver's name appears in the resolver.
-    expect(code).toContain('return armWhisperHandback(get, set, ret, retChain);');
+    expect(code).toContain('return WB().armWhisperHandback(get, set, ret, retChain);');
     expect(code).toContain('fireWhisperReturn(get, set, w, chain);');
     expect(code).toContain('answerWhisper(choice) {');
     expect(code).not.toContain('fireYulka');

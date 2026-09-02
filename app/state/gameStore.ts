@@ -31759,6 +31759,9 @@ export function bumpQuestsAccepted(
  *  run the arrival beat directly. The step path is the only production caller;
  *  a test that had to fake a whole cardinal move to reach it would be testing
  *  the mover, not the beat. */
+// OTA-1628 — the meet and the hand-back arm live in whisperBeats.ts (and are cards).
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const WB = () => require('./whisperBeats') as typeof import('./whisperBeats');
 export function resolveWhispersForTile(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
@@ -31788,7 +31791,7 @@ export function resolveWhispersForTile(
   const meet = findReadyMeetWhisper(p.activeWhispers, hours, pg.x, pg.y);
   const meetChain = meet ? findChain(meet.id) : undefined;
   if (meet && meetChain) {
-    fireWhisperMeet(get, set, meet, meetChain);
+    WB().fireWhisperMeet(get, set, meet, meetChain);
     return true;
   }
   // ⚠ OTA-1595 — the RIGHT tile at the WRONG hour used to be silence ("so I'm
@@ -31815,7 +31818,7 @@ export function resolveWhispersForTile(
   const ret = findReadyReturnWhisper(p.activeWhispers, pg.x, pg.y);
   const retChain = ret ? findChain(ret.id) : undefined;
   if (ret && retChain) {
-    return armWhisperHandback(get, set, ret, retChain);
+    return WB().armWhisperHandback(get, set, ret, retChain);
   }
 
   // 5) Ambush armed by a recent completion. Fires on the NEXT
@@ -31828,60 +31831,6 @@ export function resolveWhispersForTile(
   return false;
 }
 
-function fireWhisperMeet(
-  get: () => GameStore,
-  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
-  whisper: WhisperRecord,
-  chain: ChainDef,
-): void {
-  const c = chain.content;
-  // The mark camps offset from the giver — randomise within the chain's range
-  // so two playthroughs have different chase coordinates. Stored on the
-  // whisper's ctx so the fetch step knows where to spawn the encounter.
-  // (The ctx field names keep their historical thief* spelling — every save
-  // and reader uses them.)
-  const [fxLo, fxHi] = c.fetchOffset.dxRange;
-  const [fyLo, fyHi] = c.fetchOffset.dyRange;
-  const thiefDx = fxLo + Math.floor(Math.random() * (fxHi - fxLo + 1));
-  const thiefDy = fyLo + Math.floor(Math.random() * (fyHi - fyLo + 1));
-  const thiefMapX = whisper.targetMapX + thiefDx;
-  const thiefMapY = whisper.targetMapY + thiefDy;
-  // OTA-1542 — the mark's tile is a place too; anchor it absolutely off the
-  // whisper's own (grid-first, exactly-falling-back) target cell.
-  const thiefG = whisperTargetGrid(whisper);
-  const thiefGridX = thiefG.x + thiefDx;
-  const thiefGridY = thiefG.y + thiefDy;
-  // OTA-1547 — the giver gets the vendor TREATMENT: sighting and voice stay
-  // in the feed (the record of truth), and the same lines seed the whisper's
-  // own per-instance transcript, which the SPEAK TO <NAME> sheet renders. The
-  // old three-command [system] burst is what buried Yulka — it stays one
-  // pointer, and the decisions stay buttons.
-  const sighting = c.sighting;
-  const pitch = c.pitch;
-  const name = c.npcName.toLowerCase();
-  const buyPhrase = c.buy ? `, "buy from ${name}",` : '';
-  get().appendLog('world', sighting);
-  get().appendLog('arbiter', pitch);
-  get().appendLog(
-    'system',
-    `Answer ${pronounForms(c.pronoun).obj} from the SPEAK TO ${c.npcName.toUpperCase()} bar below — or type "accept ${name}"${buyPhrase} or "leave ${name}".`,
-  );
-  set((s) => (s.player ? {
-    player: {
-      ...s.player,
-      activeWhispers: (s.player.activeWhispers ?? []).map((w) =>
-        w.id === whisper.id
-          ? {
-              ...w,
-              stage: 'met_yulka',
-              ctx: { ...(w.ctx ?? {}), thiefMapX, thiefMapY, thiefGridX, thiefGridY },
-              talk: [...(w.talk ?? []), { who: 'them' as const, text: sighting }, { who: 'them' as const, text: pitch }],
-            }
-          : w,
-      ),
-    },
-  } : s));
-}
 
 function handleWhisperAccept(
   get: () => GameStore,
@@ -32044,69 +31993,6 @@ function fireWhisperFetch(
       ),
     },
   } : s));
-}
-
-/** ⚠⚠⚠ OTA-1613 — THE GIVER HANDS IT OVER, AND YOU HAND IT BACK.
- *
- *  Owner, on finishing Garrin's folio: *"it was anticlimactic, it just gave me
- *  the generic mission complete. like it was a normal story hook completion. I
- *  should have talked to him again, and then given my award in the chat window
- *  from him."*
- *
- *  ⚠⚠ AND THE GAME NEVER LET HIM. Arriving on the giver's tile CALLED THE
- *  PAYOUT: `fireWhisperReturn` fired off the arrival dispatch, dropped the
- *  return line into the world feed as ambient narration, printed two reward
- *  lines, raised the generic completion card and deleted the record — all
- *  before he could tap anything. The chain hired him face to face (the meet
- *  beat seeds a transcript and points at the SPEAK TO bar) and paid him by
- *  receipt. Garrin's authored line — the shaking hands, the brass compass
- *  pushed across the board — scrolled past as scenery while a card that says
- *  MISSION COMPLETE took the moment.
- *
- *  ⚠ So arrival now ARMS the hand-over instead of performing it: the record
- *  moves to `handback`, the giver's greeting seeds the transcript, and the bar
- *  says he is waiting. Nothing is paid. `handBackWhisperGoods` — the button in
- *  the sheet, or the typed phrase — is what pays, and it speaks the return line
- *  and the reward INTO the conversation, in his voice, where the player is
- *  looking. One machine, twenty-one chains; every line it needs was already
- *  authored. */
-function armWhisperHandback(
-  get: () => GameStore,
-  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
-  whisper: WhisperRecord,
-  chain: ChainDef,
-): boolean {
-  const live = get().player;
-  if (!live) return false;
-  const c = chain.content;
-  // ⚠ Empty hands are still refused HERE rather than at the button: walking
-  // back without the goods is the anti-cheese case, and arming a hand-over the
-  // player cannot complete would put a dead button in front of them. The stage
-  // does not advance, so coming back with the goods arms it properly.
-  const carried = live.inventory.find((i) => i.name === c.stolen.name && i.quantity > 0);
-  if (!carried) {
-    get().appendLog('world', c.emptyHandsLine);
-    return true;
-  }
-  const pf = pronounForms(c.pronoun);
-  const greeting = `${c.npcName} sees ${c.goodsLong} in your hands before ${pf.subj} sees you.`;
-  get().appendLog('world', greeting);
-  get().appendLog(
-    'system',
-    `Hand it over from the SPEAK TO ${c.npcName.toUpperCase()} bar below — or type "give ${c.npcName.toLowerCase()} the ${c.goodsShort}".`,
-  );
-  set((s) => (s.player ? {
-    player: {
-      ...s.player,
-      activeWhispers: withTalkTurn(
-        (s.player.activeWhispers ?? []).map((w) =>
-          w.id === whisper.id ? { ...w, stage: 'handback' } : w,
-        ),
-        whisper.id, 'them', greeting,
-      ),
-    },
-  } : s));
-  return true;
 }
 
 function fireWhisperReturn(

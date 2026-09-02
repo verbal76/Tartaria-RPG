@@ -183,8 +183,10 @@ describe('OTA-1613 — the giver hands it over', () => {
   it('⚠ the wiring is pinned — arrival arms, the button pays, the sheet holds the farewell', () => {
     const GS = readFileSync(join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8');
     // Arrival routes to the ARM, not the payout.
-    expect(GS).toContain('return armWhisperHandback(get, set, ret, retChain);');
-    expect(GS).toContain("w.id === whisper.id ? { ...w, stage: 'handback' } : w,");
+    expect(GS).toContain('return WB().armWhisperHandback(get, set, ret, retChain);');
+    // ⚠ OTA-1628 — the arm's body lives in whisperBeats.ts now (and raises the card).
+    const WBS = readFileSync(join(__dirname, '..', 'app', 'state', 'whisperBeats.ts'), 'utf8');
+    expect(WBS).toContain("w.id === whisper.id ? { ...w, stage: 'handback' } : w,");
     // The payout is reachable only through the deliberate hand-over.
     expect(GS).toContain('handBackWhisperGoods() {');
     const SH = readFileSync(join(__dirname, '..', 'app', 'components', 'WhisperTalkSheet.tsx'), 'utf8');

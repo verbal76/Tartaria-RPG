@@ -81,13 +81,15 @@ describe('OTA-1214 — the audit: no lead verb without a trigger', () => {
         .toEqual({ id: chain.id, mark: true, goods: true });
     }
     for (const arm of [
-      'fireWhisperMeet(get, set, meet, meetChain);',
+      // ⚠ OTA-1628 — the meet and the arm live in whisperBeats.ts (they are cards
+      // now); the resolver reaches them through WB(). Same arm, same rule.
+      'WB().fireWhisperMeet(get, set, meet, meetChain);',
       'fireWhisperFetch(get, set, fetch, fetchChain);',
       // ⚠ OTA-1613 — the return arm ARMS the hand-over instead of paying on
       // arrival (the giver now hands it to you in the conversation). The rule
       // this audit enforces is unchanged: every chain beat has a dispatcher
       // arm, so a chain that plants can always fire.
-      'return armWhisperHandback(get, set, ret, retChain);',
+      'return WB().armWhisperHandback(get, set, ret, retChain);',
     ]) {
       expect(store).toContain(arm);
     }

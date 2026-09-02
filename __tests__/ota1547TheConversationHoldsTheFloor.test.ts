@@ -39,6 +39,8 @@ const codeOnly = (s: string) =>
   s.split('\n').filter((l) => !l.trim().startsWith('//') && !l.trim().startsWith('*')).join('\n');
 
 const STORE = src('app', 'state', 'gameStore.ts');
+// ⚠ OTA-1628 — the meet (and the hand-back arm) moved to whisperBeats.ts, where they are cards.
+const BEATS = src('app', 'state', 'whisperBeats.ts');
 const SHEET = src('app', 'components', 'WhisperTalkSheet.tsx');
 
 const rec = (over: Partial<WhisperRecord> = {}): WhisperRecord => ({
@@ -86,11 +88,12 @@ describe('OTA-1547 — the meet stops burying its own speaker', () => {
     // OTA-1548 — the pointer is templated off the chain content now; for
     // Yulka it renders the same 'Answer her from the SPEAK TO YULKA bar
     // below — or type "accept yulka", …' it always did.
-    expect(STORE).toContain('Answer ${pronounForms(c.pronoun).obj} from the SPEAK TO ${c.npcName.toUpperCase()} bar below');
+    expect(BEATS).toContain('Answer ${pronounForms(c.pronoun).obj} from the ${bar} bar below');
+    expect(BEATS).toContain('const bar = `SPEAK TO ${c.npcName.toUpperCase()}`;');
   });
 
   it('⚠⚠ the meet seeds the transcript with her sighting and her pitch', () => {
-    const code = codeOnly(STORE);
+    const code = codeOnly(BEATS);
     expect(code).toContain("{ who: 'them' as const, text: sighting }");
     expect(code).toContain("{ who: 'them' as const, text: pitch }");
   });
@@ -126,7 +129,7 @@ describe('OTA-1547 — the step machinery yields to a fired beat', () => {
     // The rule is unchanged and is what is measured: EVERY beat reports whether
     // it fired, and only the quiet path falls through to false.
     expect((body.match(/return true;/g) ?? []).length).toBe(3);
-    expect(body).toContain('return armWhisperHandback(get, set, ret, retChain);');
+    expect(body).toContain('return WB().armWhisperHandback(get, set, ret, retChain);');
     expect(body.trimEnd().endsWith('return false;\n}')).toBe(true);
   });
 

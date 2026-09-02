@@ -90,6 +90,19 @@ export function creditDefeatedTarget(
       } : s));
       get().appendLog('world', c.recoverLine);
       get().appendLog('reward', `✦ ${c.stolen.name} (${c.stolen.qty}).`);
+      // ⚠⚠⚠ OTA-1628 — THE RECOVERY IS A CLOSE, so it is a card: the goods on
+      // it as they landed in the pack, and the way back named. It used to be
+      // two feed lines under the loot of whatever fight this was.
+      {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { raiseMissionClose } = require('./slices/questSlice') as typeof import('./slices/questSlice');
+        raiseMissionClose(get, set, {
+          title: liveChain.title,
+          line: c.recoverLine,
+          next: `✦ Return to ${c.npcName} with ${c.goodsLong} — SET COURSE on the WHISPERS row walks you back.`,
+          granted: [`${c.stolen.name} × ${c.stolen.qty}`],
+        });
+      }
       // arb120 — the fetch is DONE the instant the goods are in hand (even
       // off a random enemy of the mark's name, not just the planted one).
       // Re-point an active auto-route off the now-pointless mark tile onto

@@ -920,6 +920,7 @@ app/
                target goes down (whisper chains, hunt completion, leads, the
                room-clear record, the escort clear). BOTH win conditions call it.
                waitVerb.ts — OTA-1627: `wait` passes the hours and re-checks the ground
+               whisperBeats.ts — OTA-1628: the whisper meet + hand-back arm (both cards)
 test-utils/    playerWalker.ts — the PLAYER-SHAPED walker (OTA-1622): plays every
                mission from the surfaces, five families (hunt / mystery / storyline /
                faction / whisper); __tests__/playerWalkerSim runs it (PLAYER_WALKER=1)
@@ -1558,9 +1559,9 @@ Key invariants worth knowing:
 
 ## 9. Recent OTA highlights (latest sessions)
 
-### ⚠⚠⚠ THE 2026-09-02 RUN — OTA-1617 → 1627 (read this first if you are new)
+### ⚠⚠⚠ THE 2026-09-02 RUN — OTA-1617 → 1628 (read this first if you are new)
 
-Latest golem-line stamp: **`2026-09-02-1627-the-hour-can-be-waited-for`**
+Latest golem-line stamp: **`2026-09-02-1628-the-whisper-beats-pop-up-too`**
 (`app/buildInfo.ts`). Both channels ship from this branch — a `[ota-hal]` marker
 in the commit TITLE publishes the HAL set, a markerless follow-up commit
 publishes golem; see §6.
@@ -1652,6 +1653,15 @@ what it ACCEPTS, and a data walker skips the saying.
   ratchet counts `split('\n').length` — one more — against `< 37000`: the
   first cut of this OTA failed it at exactly 37,000. Any gameStore addition
   has to take lines out first (OTA-1628 moves the whisper beats out).
+- **OTA-1628 the whisper beats pop up too.** The walker's first clean pass
+  over all 21 chains showed five stages and ONE card (the last hand-over).
+  The meet, the recovery (goods off the mark) and the hand-back arm raise
+  `raiseMissionClose` cards now — the first two from `app/state/whisperBeats.ts`
+  (`fireWhisperMeet` / `armWhisperHandback` moved out of gameStore, which is
+  at 36,883 lines after the move), the recovery from `defeatCredit` where the
+  goods are granted. The accept is answered inside the SPEAK TO sheet and
+  raises no card. The whisper walker asserts a card on the meet, the recovery,
+  the arm and the return.
 
 ⚠ **Two position vocabularies, still.** `stageArrival.ts` (heal / arm /
 `checkStandingGround`) keys on the canon grid CELL; the verb matchers and

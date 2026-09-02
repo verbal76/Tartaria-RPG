@@ -26892,7 +26892,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // app/state/waitVerb.ts: wait passes an hour, N hours, until dark or until
 // morning, then looks at the ground again where the player stands so the
 // camp wakes in place; refused in a fight; the cold-camp line names it.
-export const OTA_BUILD_ID = '2026-09-02-1627-the-hour-can-be-waited-for';
+// ⚠⚠⚠ OTA-1628 — THE WHISPER BEATS POP UP TOO. The walker's first clean pass
+// over all 21 chains: five stages, one card, on the last hand-over. The
+// giver at the camp, the mark down with the goods in your pack, the giver
+// waiting when you walk back — feed lines only. The owner's OTA-1622 rule
+// covers "a mission or a quest or whatever it is": the meet and the
+// hand-back arm raise the card from app/state/whisperBeats.ts (moved out of
+// gameStore, which was two lines under its ratchet), the recovery from
+// defeatCredit where the goods are granted.
+export const OTA_BUILD_ID = '2026-09-02-1628-the-whisper-beats-pop-up-too';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-02-1627-the-hour-can-be-waited-for';
 // golem catch-up 2026-09-02: markerless publish of OTA-1627 - wait passes the
 // hours and the cold camp wakes in place. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-02-1626-the-word-is-the-direction';
