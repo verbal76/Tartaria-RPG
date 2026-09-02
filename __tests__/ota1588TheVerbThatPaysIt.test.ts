@@ -76,10 +76,13 @@ describe('OTA-1588 — one answer to what pays a stage', () => {
     // being told to LOSE ("it should say advance by winning in combat not
     // defeat"). The pin moves with the ruling.
     expect(checkKindLabel('investigate')).toBe('investigate the area');
-    expect(checkKindLabel('stealth')).toBe('use stealth');
+    // ⚠ OTA-1621 superseded two more: 'use stealth' and 'use Aethercraft' both
+    // parsed as USE_RELIC when typed back. The table is now held to the parser
+    // (ota1621TheAskIsACommand); these pins only follow the ruling.
+    expect(checkKindLabel('stealth')).toBe('sneaking');
     expect(checkKindLabel('diplomacy')).toBe('talk it out');
     expect(checkKindLabel('escape')).toBe('escape / disengage');
-    expect(checkKindLabel('cast')).toBe('use Aethercraft');
+    expect(checkKindLabel('cast')).toBe('casting aether');
     expect(checkKindLabel('attack_provoke')).toBe('attack to provoke');
     expect(checkKindLabel('boss')).toBe('winning the fight');
     expect(checkKindLabel(null)).toBeNull();
@@ -119,9 +122,16 @@ describe('OTA-1588 — the measurement that made this urgent', () => {
     // A fix that made every boss quiet would be the same error mirrored.
     const huntBoss = HUNTS.flatMap((d) => d.stages).filter((s) => s.checkKind === 'boss');
     expect(huntBoss.length).toBeGreaterThan(0);
-    expect(stageVerbAsk('hunt', { checkKind: 'boss' })).toBe('finish it');
+    // ⚠ OTA-1621 superseded the word: "finish it" parsed as TURN_IN when typed
+    // back at the game. The claim here is that a hunt's boss asks for the
+    // ATTACK word — whatever the parser-held table says that word is.
+    expect(stageVerbAsk('hunt', { checkKind: 'boss' })).toBe(stageVerbAsk('hunt', { checkKind: 'attack' }));
+    expect(stageVerbAsk('hunt', { checkKind: 'boss' })).toBe('strike');
   });
 });
+
+/** The hunt's own boss word — the one a mystery or storyline must never say. */
+const HUNT_BOSS_WORD = stageVerbAsk('hunt', { checkKind: 'boss' })!;
 
 describe('OTA-1588 — the arrival line stops lying', () => {
   it('⚠⚠⚠ A MYSTERY\'S LAST BEAT ASKS THE PLAYER TO SEARCH, NOT TO FIGHT', () => {
@@ -135,7 +145,7 @@ describe('OTA-1588 — the arrival line stops lying', () => {
       activeMysteries: [{ id: d.id, stage: idx }],
     } as Partial<PlayerCharacter>)).join('\n');
     expect(line).toContain('search this ground');
-    expect(line).not.toContain('finish it');
+    expect(line).not.toContain(HUNT_BOSS_WORD);
   });
 
   it('⚠⚠⚠ AND A STORYLINE\'S ASKS THEM TO TALK', () => {
@@ -147,10 +157,10 @@ describe('OTA-1588 — the arrival line stops lying', () => {
       activeStorylines: [{ id: d.id, stage: idx }],
     } as Partial<PlayerCharacter>)).join('\n');
     expect(line).toContain('talk it through');
-    expect(line).not.toContain('finish it');
+    expect(line).not.toContain(HUNT_BOSS_WORD);
   });
 
-  it('⚠⚠ every mystery and storyline boss beat, swept — none of them says "finish it"', () => {
+  it('⚠⚠ every mystery and storyline boss beat, swept — none of them says the hunt\'s word', () => {
     // The single-case tests above name the bug; this one proves it is gone
     // everywhere, which is what "reaudit ALL missions" asks for.
     const said: string[] = [];
@@ -158,14 +168,14 @@ describe('OTA-1588 — the arrival line stops lying', () => {
       d.stages.forEach((s, i) => {
         if (s.checkKind !== 'boss') return;
         const ask = stageVerbAsk('mystery', s);
-        if (ask === 'finish it') said.push(`${d.id}#${i}`);
+        if (ask === HUNT_BOSS_WORD) said.push(`${d.id}#${i}`);
       });
     }
     for (const d of STORYLINES) {
       d.stages.forEach((s, i) => {
         if (s.checkKind !== 'boss') return;
         const ask = stageVerbAsk('storyline', s);
-        if (ask === 'finish it') said.push(`${d.id}#${i}`);
+        if (ask === HUNT_BOSS_WORD) said.push(`${d.id}#${i}`);
       });
     }
     expect(said).toEqual([]);

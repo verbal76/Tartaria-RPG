@@ -356,7 +356,7 @@ export function resolveStageEscortClear(
               const hereId = QS.stageLocationId(clearedDef as never, anchor, CM.resolvePosterLocation);
               const nextId = QS.stageLocationId(nextDef as never, anchor, CM.resolvePosterLocation);
               const movedGround = nextId !== hereId;
-              const dir = QS.nextStageDirection(nextDef as never, (nextDef as { locationName?: string }).locationName ?? null, movedGround);
+              const dir = QS.nextStageDirection(nextDef as never, (nextDef as { locationName?: string }).locationName ?? null, movedGround, escortRec.family);
               if (dir) get().appendLog('system', dir);
               const liveNow = get().player;
               if (movedGround && liveNow && liveNow.currentLocationId !== nextId
@@ -1813,7 +1813,9 @@ export const createQuestSlice = (
         const hereId = QS.stageLocationId(stageDef, CM.huntAnchorId(hunt), CM.resolvePosterLocation);
         const nextId = QS.stageLocationId(nextDef, CM.huntAnchorId(hunt), CM.resolvePosterLocation);
         const movedGround = nextId !== hereId;
-        const dir = QS.nextStageDirection(nextDef, nextDef.locationName ?? null, movedGround);
+        // ⚠ OTA-1621 — the family rides along so the line carries the command
+        // word for the next beat, not only its ground and its item.
+        const dir = QS.nextStageDirection(nextDef, nextDef.locationName ?? null, movedGround, 'hunt');
         if (dir) get().appendLog('system', dir);
         if (!movedGround) sameTileBeat = { line: stageDef.narration, next: dir ?? null };
         // ⚠⚠ P19 — AND IT ACTUALLY SETS THE COURSE. Owner: *"it didn't auto route me to
@@ -2327,7 +2329,7 @@ export const createQuestSlice = (
         const hereId = QS.stageLocationId(stageDef, anchor, CM.resolvePosterLocation);
         const nextId = QS.stageLocationId(nextDef, anchor, CM.resolvePosterLocation);
         const moved = nextId !== hereId;
-        const dir = QS.nextStageDirection(nextDef, nextDef.locationName ?? null, moved);
+        const dir = QS.nextStageDirection(nextDef, nextDef.locationName ?? null, moved, 'mystery');
         if (dir) get().appendLog('system', dir);
         if (!moved) sameTileBeatM = { line: stageDef.narration, next: dir ?? null };
         const liveNow = get().player;
@@ -2675,7 +2677,7 @@ export const createQuestSlice = (
         const hereId = QS.stageLocationId(stageDef, anchor, CM.resolvePosterLocation);
         const nextId = QS.stageLocationId(nextDef, anchor, CM.resolvePosterLocation);
         const moved = nextId !== hereId;
-        const dir = QS.nextStageDirection(nextDef, nextDef.locationName ?? null, moved);
+        const dir = QS.nextStageDirection(nextDef, nextDef.locationName ?? null, moved, 'storyline');
         if (dir) get().appendLog('system', dir);
         if (!moved) sameTileBeatS = { line: stageDef.narration, next: dir ?? null };
         const liveNow = get().player;

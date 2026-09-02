@@ -267,10 +267,15 @@ export function payingIntent(
  *  writing deliberately makes. */
 const VERB_LABEL: Record<string, string> = {
   investigate: 'investigate the area',
-  stealth: 'use stealth',
+  // ⚠ OTA-1621 — were 'use stealth' / 'use Aethercraft'. Measured with the real
+  // parser, both read as USE_RELIC ("use" is the relic verb; "stealth" became
+  // its target). A label a player will type back must parse to the intent that
+  // pays the stage — ota1621TheAskIsACommand holds every entry of this table
+  // and VERB_ASK below to that with parseInput, never with a string pin.
+  stealth: 'sneaking',
   diplomacy: 'talk it out',
   escape: 'escape / disengage',
-  cast: 'use Aethercraft',
+  cast: 'casting aether',
   attack_provoke: 'attack to provoke',
   // ⚠ OTA-1596 — was 'defeat in combat', which rendered as "Advance by defeat
   // in combat" — the owner read it as being told to LOSE: *"it should say
@@ -291,15 +296,31 @@ export function stageVerbLabel(
 
 /** The arrival line's second-person phrasing — "this is the place — <ask>". Same
  *  table, different register: one is a UI label, one is spoken to a player
- *  standing on the ground. Both resolve `boss` through the same family map. */
+ *  standing on the ground. Both resolve `boss` through the same family map.
+ *
+ *  ⚠⚠⚠ OTA-1621 — THE ASK IS A COMMAND. Owner, on the Temporal Watch stage:
+ *  *"I'm doing what it says to do and it's not giving me anything."* His log:
+ *
+ *      [player] go quietly
+ *      [debug]  parser: intent=travel conf=1.00 verb=go target=quietly
+ *      [world]  You walk. Tartaria walks beside you.
+ *
+ *  He typed the game's own words back at it and the parser read "go" as
+ *  walking. Measured before touching anything, FIVE of these seven phrases had
+ *  the defect: "go quietly" → travel, "work the aether" → unknown, "break away"
+ *  → ATTACK, "force the issue" → unknown, "finish it" → turn_in. Every phrase
+ *  here is a sentence the player will type, so its verb must parse to the
+ *  intent `payingIntent` names for the stage — and OTA-1617's composed object
+ *  ("sneak — come away with the Brass Key") must still parse the same, which
+ *  it does: the parser takes the first verb and treats the rest as a target. */
 const VERB_ASK: Record<string, string> = {
   investigate: 'search this ground',
-  stealth: 'go quietly',
+  stealth: 'sneak',
   diplomacy: 'talk it through',
-  cast: 'work the aether',
-  escape: 'break away',
-  attack_provoke: 'force the issue',
-  attack: 'finish it',
+  cast: 'cast aether',
+  escape: 'flee',
+  attack_provoke: 'provoke it',
+  attack: 'strike',
 };
 
 export function stageVerbAsk(
@@ -360,16 +381,28 @@ export function stageLocationId(
 
 /** ⚠ THE LINE THAT WAS MISSING ENTIRELY: after a stage advances, say where the next one
  *  is and what it wants. Returns null when the next stage is on the same ground and asks
- *  for nothing — no line is better than a line that says "carry on". */
+ *  for nothing — no line is better than a line that says "carry on".
+ *
+ *  ⚠⚠ OTA-1621 — AND WHAT IT WANTS INCLUDES THE VERB. This line said the place, the
+ *  person and the item, and never the action: "▸ Next: The Buried Cities." on a beat
+ *  that is paid by sneaking. With a `family` the composed ask (OTA-1617's, with the
+ *  command word) rides in the same sentence, so the moment one stage closes the
+ *  player holds the word that opens the next. The ask already names the npc when
+ *  there is one ("talk it through with Garrin"), so `find …` yields to it; a
+ *  verbless beat with a person still says `find`. Callers without a family read
+ *  exactly as before. */
 export function nextStageDirection(
   next: StageBinding | undefined,
   nextLocationName: string | null,
   movedGround: boolean,
+  family?: MissionFamily,
 ): string | null {
   if (!next) return null;
   const bits: string[] = [];
   if (movedGround && nextLocationName) bits.push(`Next: ${nextLocationName}`);
-  if (next.npcName) bits.push(`find ${next.npcName}`);
+  const ask = family ? stageObjectiveAsk(family, next as StageBinding & { checkKind?: string | null }) : null;
+  if (ask) bits.push(ask);
+  else if (next.npcName) bits.push(`find ${next.npcName}`);
   if (next.requires) {
     const q = next.requires.quantity ?? 1;
     bits.push(`bring ${q > 1 ? `${q}× ` : ''}${next.requires.item}`);

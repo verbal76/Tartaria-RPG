@@ -26815,7 +26815,23 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // — the "tab" was only the set of doors into this screen, and MISSIONS is now
 // the main one. missionStatusCards (the reader) stays as the trace's sibling;
 // no surface renders it — recorded in HANDOFF as debt.
-export const OTA_BUILD_ID = '2026-09-02-1620-the-whole-screen-behind-the-button';
+// ⚠⚠⚠ OTA-1621 — THE ASK IS A COMMAND. Owner, on stage 4 of the Temporal Watch:
+// "it's taking me across a couple of different tiles and they all still say I'm
+// standing on it and I'm doing what it says to do and it's not giving me
+// anything." His log: `[player] go quietly` → `parser: intent=travel verb=go
+// target=quietly` → "You walk." He typed the game's own words back at it and
+// the parser read "go" as walking. Measured with the real parser before touching
+// anything: FIVE of the seven ask phrases did this ("go quietly" → travel,
+// "work the aether" → unknown, "break away" → ATTACK, "force the issue" →
+// unknown, "finish it" → turn_in) and two of the seven "Advance by …" labels
+// ("use stealth" / "use Aethercraft" → use_relic). Every phrase is now a
+// sentence that parses to the intent that pays the stage — sneak, cast aether,
+// flee, provoke it, strike; sneaking, casting aether — and the suite holds the
+// whole table to parseInput rather than to a string. The "▸ Next:" line printed
+// when a stage closes now carries the next beat's command word too, so the
+// moment one stage pays the player holds the word that opens the next.
+export const OTA_BUILD_ID = '2026-09-02-1621-the-ask-is-a-command';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-02-1620-the-whole-screen-behind-the-button';
 // golem catch-up 2026-09-02: markerless publish of OTA-1620 - MISSIONS opens the
 // Contracts screen itself; the status card is deleted. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-02-1619-the-gate-comes-back-when-you-do';

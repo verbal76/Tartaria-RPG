@@ -14,6 +14,12 @@
 // grants the Temporal Distortion Watch off a body in the eddy — and nothing
 // read them. And a cheat sheet you have to LEAVE in order to act on is a
 // reference card: SET COURSE now sits on the mission it belongs to.
+//
+// ⚠⚠ OTA-1621 SUPERSEDED THE MANNER WORDS. "go quietly" — the phrase every pin
+// below was written against — parsed as TRAVEL when he typed it back, and
+// walked him off the tile. The manner table is now held to the parser
+// (ota1621TheAskIsACommand); the pins here keep their claim — the OBJECT
+// composes onto the manner phrase — and follow the ruling on the word.
 
 import { missionStatusCards } from '../app/engine/missionTrace';
 import { stageObjectiveAsk, stageVerbAsk } from '../app/engine/questStage';
@@ -35,7 +41,7 @@ function withMystery(id: string, stage: number, at = 'tartarian_outskirts') {
 describe('OTA-1617 — the ask names its object', () => {
   it('⚠⚠⚠ HIS QUESTION, ANSWERED: "go quietly" says what you come away with', () => {
     const [card] = missionStatusCards(withMystery(WATCH, 2));
-    expect(card!.ask).toBe('go quietly — come away with the Temporal Distortion Watch');
+    expect(card!.ask).toBe('sneak — come away with the Temporal Distortion Watch');
     // The ground was never the missing half — it was right before this OTA.
     expect(card!.where).toBe('The Buried Cities');
   });
@@ -45,7 +51,7 @@ describe('OTA-1617 — the ask names its object', () => {
     expect(card!.steps.map((s) => s.ask)).toEqual([
       'talk it through with the Reclaimers Guild Speaker — come away with the Guild Eddy-Gauge',
       'search this ground — come away with the Eddy-Zone Reading',
-      'go quietly — come away with the Temporal Distortion Watch',
+      'sneak — come away with the Temporal Distortion Watch',
       'search this ground with the Reclaimers Guild Speaker',
     ]);
   });
@@ -53,27 +59,27 @@ describe('OTA-1617 — the ask names its object', () => {
   it('⚠⚠ the object comes off the stage BINDINGS — no new prose was authored', () => {
     // npc, spawn and grants, each in its place; the seven manner phrases are
     // untouched underneath.
-    expect(stageObjectiveAsk('hunt', { checkKind: 'stealth' } as never)).toBe('go quietly');
+    expect(stageObjectiveAsk('hunt', { checkKind: 'stealth' } as never)).toBe('sneak');
     expect(stageObjectiveAsk('hunt', {
       checkKind: 'stealth', grants: { item: 'Brass Key' },
-    } as never)).toBe('go quietly — come away with the Brass Key');
+    } as never)).toBe('sneak — come away with the Brass Key');
     expect(stageObjectiveAsk('hunt', {
       checkKind: 'diplomacy', npcName: 'Garrin',
     } as never)).toBe('talk it through with Garrin');
     expect(stageObjectiveAsk('hunt', {
       checkKind: 'attack_provoke', spawn: { enemyName: 'Reaver', count: 3 },
-    } as never)).toBe('force the issue — 3 × Reaver');
+    } as never)).toBe('provoke it — 3 × Reaver');
     // A count of one does not read as "1 ×".
     expect(stageObjectiveAsk('hunt', {
       checkKind: 'attack_provoke', spawn: { enemyName: 'Reaver' },
-    } as never)).toBe('force the issue — Reaver');
+    } as never)).toBe('provoke it — Reaver');
   });
 
   it('⚠ the arrival line keeps the bare manner phrase — it composes its own clauses', () => {
     // stageVerbAsk is unchanged, deliberately: missionArrivalLines already
     // appends "— find X" and "(you still need Y)", and composing twice would
     // say everything twice on the one line the player reads while standing there.
-    expect(stageVerbAsk('hunt', { checkKind: 'stealth' } as never)).toBe('go quietly');
+    expect(stageVerbAsk('hunt', { checkKind: 'stealth' } as never)).toBe('sneak');
     expect(stageVerbAsk('mystery', { checkKind: 'investigate' } as never)).toBe('search this ground');
   });
 
