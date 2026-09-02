@@ -923,7 +923,8 @@ app/
                whisperBeats.ts — OTA-1628: the whisper meet + hand-back arm (both cards)
 test-utils/    playerWalker.ts — the PLAYER-SHAPED walker (OTA-1622): plays every
                mission from the surfaces, five families (hunt / mystery / storyline /
-               faction / whisper); __tests__/playerWalkerSim runs it (PLAYER_WALKER=1)
+               faction / whisper); __tests__/playerWalkerSim runs it in the heavy CI
+               set (a gate since 2026-09-02; PLAYER_WALKER=0 skips it)
   updates/     checkAndApplyOTA.ts
   voice/       TTSManager / PiperTTSManager (Kokoro) / TTSController
 buildInfo.ts   OTA_BUILD_ID marker (per line)
@@ -1575,9 +1576,11 @@ game's own words back at it. Every defect below is in what the game SAYS versus
 what it ACCEPTS, and a data walker skips the saying.
 
 - **THE PLAYER-SHAPED WALKER** (`test-utils/playerWalker.ts`,
-  `__tests__/playerWalkerSim.test.ts`, gated on `PLAYER_WALKER=1`; report with
+  `__tests__/playerWalkerSim.test.ts` — A GATE in the heavy CI set since the
+  whole catalogue walked clean after OTA-1628: 50 missions, 18 faction quests,
+  21 whisper chains, five families; `PLAYER_WALKER=0` skips it, report with
   `PLAYER_WALKER_REPORT=<file>`, whole feed with `PLAYER_WALKER_FEED=1`, one
-  mission with `PLAYER_WALKER_ONLY=family:id`). Reads only what the player sees
+  mission with `PLAYER_WALKER_ONLY=family:id` or a family name). Reads only what the player sees
   and does only what a thumb does: the posting at Halem's gate (open work) or a
   Hidden Market stall (faction work — Halem POSTS only neutral work and takes
   ANY hand-in, `isBrokerVendorId` is the stalls), SET COURSE + the travel-row

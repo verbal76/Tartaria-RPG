@@ -39,16 +39,22 @@ jest.mock('expo-updates', () => ({}));
 // line's own words typed back, cards answered with their buttons, the hand-in
 // at the gate.
 //
-// ⚠ THIS IS A REPORT, NOT A GATE — yet. Run it on purpose:
+// ⚠ THIS IS A GATE NOW. The catalogue walked clean on 2026-09-02 after
+// OTA-1625 → 1628 (50 missions, 18 faction quests, 21 whisper chains), so the
+// env gate came off and the suite runs in the heavy CI set (reported, single
+// worker — its name ends in Sim for that reason). Run it by hand the same way:
 //
-//     PLAYER_WALKER=1 npx jest __tests__/playerWalkerSim.test.ts
-//     PLAYER_WALKER=1 PLAYER_WALKER_ONLY=hunt:hunt_servants_doubter npx jest …
+//     npx jest __tests__/playerWalkerSim.test.ts
+//     PLAYER_WALKER_ONLY=hunt:hunt_servants_doubter npx jest …   (one mission)
+//     PLAYER_WALKER_ONLY=faction | whisper | mystery | storyline   (one family)
 //     PLAYER_WALKER_REPORT=/path/to/report.txt   (appends one block per mission)
+//     PLAYER_WALKER_FEED=1                        (the whole feed on every report)
+//     PLAYER_WALKER=0                             (skip it)
 //
 // Every mission is one `it`; it fails with the list of breaks the player would
-// have hit, in the player's terms. As breaks become OTAs the list shrinks; when
-// it is empty for the whole catalogue this suite loses the env gate and joins
-// the heavy CI set (its name ends in Sim for that reason).
+// have hit, in the player's terms. A break here is an OTA, not a flake — the
+// one intermittent seen so far (a mid-range approach that would not close on
+// a road fight) prints the raw log with the debug channel so it can be read.
 
 import { useGameStore } from '../app/state/gameStore';
 import { getRaces, getFactions } from '../app/engine/character';
@@ -57,7 +63,7 @@ import { appendFileSync } from 'node:fs';
 
 jest.setTimeout(900000);
 
-const ON = process.env.PLAYER_WALKER === '1';
+const ON = process.env.PLAYER_WALKER !== '0';
 const ONLY = process.env.PLAYER_WALKER_ONLY; // "family:id" or a family name
 const REPORT = process.env.PLAYER_WALKER_REPORT;
 
