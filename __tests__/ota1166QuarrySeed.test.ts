@@ -195,12 +195,15 @@ describe('OTA-1166 — seeding on arrival', () => {
 });
 
 describe('OTA-1166 — it is wired everywhere a player can arrive', () => {
-  it('⚠ THREE CALL SITES, AND THE REDUNDANCY IS THE POINT', () => {
-    // The two travel-arrival hooks only cover AUTOROUTED arrivals; a player walking the
+  it('⚠ TWO CALL SITES, AND THE REDUNDANCY IS THE POINT', () => {
+    // The travel-arrival hook only covers AUTOROUTED arrivals; a player walking the
     // last tiles with typed cardinals would reach the outpost and find nothing. The
     // per-action catch-all closes that. One-shot makes the overlap free.
+    // ⚠ OTA-1632 — three became two: setTravelCourse no longer takes a first step
+    // itself, so its own arrival hook went with the step. continueTravel's and the
+    // per-action catch-all remain.
     const calls = STORE.match(/maybeSeedQuarry\(get, set\)/g) ?? [];
-    expect(calls.length).toBe(3);
+    expect(calls.length).toBe(2);
   });
 
   it('nothing new engages them — they use the ordinary patrol machinery', () => {

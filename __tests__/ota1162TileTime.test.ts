@@ -43,18 +43,21 @@ describe('OTA-1162 — a tile costs one thing, however you ask for it', () => {
     // parens a negated-class match silently walks past. That is how the first draft of
     // this test counted 2 of 5 and 4 of 7 and called it a finding.
     expect(STORE).not.toMatch(/advanceTime\(spendTravelStamina\(player\), 1\)\);\s*\n\s*get\(\)\.stepDirection/);
+    // ⚠ OTA-1632 — five became four: setTravelCourse no longer takes a first step
+    // itself (and so no longer charges one). The tap on the travel row is the step.
     const tiled = STORE.match(/advanceTime\(spend\w+\(.*?\), TILE_HOURS\)/g) ?? [];
-    expect(tiled.length).toBe(5);
+    expect(tiled.length).toBe(4);
   });
 
   it('every stepDirection caller pays through the constant', () => {
-    // ⚠ ALL FIVE, and the count is the assertion. Crossing a tile is defined by the
-    // stepDirection that follows the charge, so any new caller that appears without a
-    // TILE_HOURS charge in front of it fails here — which is the whole guarantee.
+    // ⚠ ALL FOUR (five before OTA-1632 removed the set-course auto-step), and the
+    // count is the assertion. Crossing a tile is defined by the stepDirection that
+    // follows the charge, so any new caller that appears without a TILE_HOURS charge
+    // in front of it fails here — which is the whole guarantee.
     const calls = STORE.match(/get\(\)\.stepDirection\(/g) ?? [];
-    expect(calls.length).toBe(5);
+    expect(calls.length).toBe(4);
     let idx = 0;
-    for (let n = 0; n < 5; n++) {
+    for (let n = 0; n < 4; n++) {
       idx = STORE.indexOf('get().stepDirection(', idx);
       expect(idx).toBeGreaterThan(-1);
       expect(STORE.slice(Math.max(0, idx - 400), idx)).toContain('TILE_HOURS');

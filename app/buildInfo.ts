@@ -26920,7 +26920,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // clamped to its own hard-coded twenty. Thirty sticks: MAX said 20, made 20,
 // the button stayed lit over the ten it never offered. The bound is a runaway
 // rail, not a number to meet: MAX_CRAFT_BATCH = 99, read by count AND batch.
-export const OTA_BUILD_ID = '2026-09-02-1631-max-means-all-of-it';
+// ⚠⚠⚠ OTA-1632 — SET COURSE STAYS PUT. Owner: "whenever I auto route to a
+// location, whatever tile I'm standing in … repopulates all of the loot under
+// the take salvage button and under investigate." Third report. Measured:
+// setTravelCourse took the first step itself (OTA 053); the new tile rolled
+// its own gear and chips; OTA-1469 had reworded the banner and kept the step.
+// The step is gone — SET COURSE plans, → DESTINATION walks; the clock, the
+// stamina and the scene under the buttons are untouched by the tap.
+export const OTA_BUILD_ID = '2026-09-02-1632-set-course-stays-put';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-02-1631-max-means-all-of-it';
 // golem catch-up 2026-09-02: markerless publish of OTA-1631 - MAX offers all
 // the pack can pay for (cap 99, one bound). hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-02-1630-the-chip-is-not-the-mission';

@@ -206,7 +206,11 @@ describe('OTA-1599 — his hunt, replayed on the set bone', () => {
     expect(doubterStage()).toBe(4);
     expect((get().player?.inventory ?? []).some((i) => i.name === "Raider's Ridge-Sign")).toBe(true);
     expect(get().gameLog.slice(-12).some((e) => e.text.includes('outpost holds its truce'))).toBe(false);
-    await get().submitPlayerAction('attack');
+    // ⚠ OTA-1632 — the close set the road to the crest but did not walk it
+    // (setTravelCourse no longer steps by itself). One tap on → DESTINATION
+    // lands on the apex ground, and arrival there stands the Reaver up.
+    expect(get().player?.travelTarget?.locationId).toBe('reavers_crest');
+    await get().continueTravel();
     await settle(() => (get().currentScene?.enemies ?? []).length > 0);
     expect((get().currentScene?.enemies ?? []).length).toBeGreaterThanOrEqual(1);
     expect(doubterStage()).toBe(4); // frozen for the kill

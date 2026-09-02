@@ -186,15 +186,19 @@ describe('OTA-1601 — his hunt, walked over the seam', () => {
     } : s));
   }
 
-  it('⚠⚠⚠ closing the gauntlet WALKS you the one tile up to the Reaver\'s Crest — and the Reaver is WAITING', async () => {
-    // A one-tile chain route completes instantly: setTravelCourse's first step
-    // lands on the target and arrives. So closing stage 3 does not leave a
-    // pending course — it delivers the player to the crest, arrival and all,
-    // and arrival on the apex ground IS the summons: no "fight me", no button.
+  it('⚠⚠⚠ closing the gauntlet SETS THE ROAD one tile up to the Reaver\'s Crest — one tap, and the Reaver is WAITING', async () => {
+    // ⚠ OTA-1632 — setTravelCourse no longer takes the first step itself, so a
+    // one-tile chain route is no longer instant: closing stage 3 leaves the
+    // course SET (travel row lit, player still on the ridge) and the tap on
+    // → DESTINATION lands on the crest. Arrival on the apex ground IS the
+    // summons: no "fight me", no second button.
     seedDoubter(3, 'raiders_ridge');
     get().advanceHunt('hunt_servants_doubter'); // stage 3 closes in prose
     const rec = (get().player?.activeHunts ?? []).find((h) => h.id === 'hunt_servants_doubter');
     expect(rec?.stage).toBe(4);
+    expect(get().player?.currentLocationId).toBe('raiders_ridge');
+    expect(get().player?.travelTarget?.locationId).toBe('reavers_crest');
+    await get().continueTravel(); // → REAVER'S CREST
     expect(get().player?.currentLocationId).toBe('reavers_crest');
     expect(get().player?.travelTarget ?? null).toBeNull();
     await settle(() => (get().currentScene?.enemies ?? []).length > 0);

@@ -1560,9 +1560,9 @@ Key invariants worth knowing:
 
 ## 9. Recent OTA highlights (latest sessions)
 
-### ⚠⚠⚠ THE 2026-09-02 RUN — OTA-1617 → 1631 (read this first if you are new)
+### ⚠⚠⚠ THE 2026-09-02 RUN — OTA-1617 → 1632 (read this first if you are new)
 
-Latest golem-line stamp: **`2026-09-02-1631-max-means-all-of-it`**
+Latest golem-line stamp: **`2026-09-02-1632-set-course-stays-put`**
 (`app/buildInfo.ts`). Both channels ship from this branch — a `[ota-hal]` marker
 in the commit TITLE publishes the HAL set, a markerless follow-up commit
 publishes golem; see §6.
@@ -1705,6 +1705,28 @@ what it ACCEPTS, and a data walker skips the saying.
   `craftingSlice.ts` reads the constant instead of its own copy. ota1631 pins
   count(30 sticks) = 30, the cap at 99, a live batch of 22 Clubs leaving 0
   sticks and a MAX of 0, and the one-bound wiring. ota983's cap pin → 99.
+- **OTA-1632 SET COURSE stays put.** Owner's open list #3: *"whenever I auto
+  route to a location, whatever tile I'm standing in when I auto route
+  automatically repopulates all of the loot under the take salvage button and
+  under investigate."* Third report (2026-08-23: "it refreshes whatever tile I
+  am on with new items"; OTA-1469 reworded the banner and KEPT the step).
+  Root cause: `setTravelCourse` took the first step itself (OTA 053, "so the
+  player sees motion now") — one tile over, the new tile rolled its own gear
+  roster and ambient chips. ⚠ A true sentence about an unwanted move is still
+  an unwanted move. The `willStep` / `stepDirection(firstDir)` tail is GONE:
+  SET COURSE plans (travel row lights, honest distance, clock / stamina /
+  scene object untouched); → DESTINATION on the travel row is the only step.
+  The banner has one arm ("Tap the → X button on the travel row to press on");
+  the depleted rest line (OTA-615) and the tutorial pick_city branch are
+  unchanged; mission chains and the bounty board still set the course through
+  the same door, they just no longer move the player as a side effect. ⚠ That
+  includes a ONE-TILE chain route (OTA-1601's gauntlet → crest): it used to
+  complete instantly; now the close leaves the course set and the tap lands.
+  ota1601 / ota1599 tap → DESTINATION once; ota1166 (2 quarry call sites) and
+  ota1162 (4 stepDirection callers) count one fewer.
+  ota1632 pins it live (same cell / scene ref / chips / clock / stamina after
+  the tap; → DESTINATION moves one tile onto new ground; spent player keeps
+  the route). ota1469's pins are rewritten to hold the one-arm banner.
 
 ⚠ **Two position vocabularies, still.** `stageArrival.ts` (heal / arm /
 `checkStandingGround`) keys on the canon grid CELL; the verb matchers and
