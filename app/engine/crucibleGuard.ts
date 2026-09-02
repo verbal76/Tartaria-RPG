@@ -107,6 +107,9 @@ export interface CrucibleGuardPrompt {
   queue: string[];
   /** Craft only: the recipe to re-dispatch on 'spend'. */
   recipeResult?: string;
+  /** OTA-1633 — craft only: how many the batch was for, so 'spend' finishes the
+   *  batch the guard was raised for rather than one piece of it. */
+  craftCount?: number;
   atRisk: CrucibleAtRisk[];
   /** Instance ids already blessed for spending earlier in this same run, so a
    *  ten-piece REPAIR ALL asks about each stack at most once. */

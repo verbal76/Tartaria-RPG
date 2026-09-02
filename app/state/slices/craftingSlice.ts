@@ -72,41 +72,19 @@ export const createCraftingSlice = (
 
   craftRecipeBatch(recipeName, count) {
     const want = Math.max(1, Math.min(Math.floor(count), MAX_CRAFT_BATCH)); // OTA-1631 — the one bound
-    if (want === 1) { get().submitPlayerAction(`craft ${recipeName}`); return 1; }
-    // Quiet the per-craft reward line; ONE summary lands at the end. Same
-    // deferred-narration shape salvageAllAmbient uses for `salvage all`.
-    set({ craftBatchQuiet: true });
-    let made = 0;
-    try {
-      for (let i = 0; i < want; i += 1) {
-        // OTA-989 — count the RESULT, not the whole pack. The old total-quantity
-        // delta was a proxy that LIES when a recipe consumes as much as it
-        // produces (the Club: 1 Stick -> 1 Club, net zero), reading a
-        // successful craft as a refusal — one silent club, made === 0, no
-        // summary. A success always raises the result's own count by one.
-        const countResult = () => (get().player?.inventory ?? [])
-          .filter((it) => it.name === recipeName)
-          .reduce((n, it) => n + (it.quantity ?? 0), 0);
-        const before = countResult();
-        get().submitPlayerAction(`craft ${recipeName}`, { silent: true });
-        // The substitution-confirm prompt owns the flow from here — stop rather
-        // than firing more crafts behind a modal the player hasn't answered.
-        if (get().craftSubstitutionPrompt) break;
-        if (countResult() <= before) break; // refused / pack full / out of materials
-        made += 1;
-      }
-    } finally {
-      set({ craftBatchQuiet: false });
-    }
-    if (made > 0) {
-      get().appendLog(
-        'reward',
-        made === want
-          ? `✦ Crafted ${recipeName} ×${made}. The Arbiter watches you set the last piece.`
-          : `✦ Crafted ${recipeName} ×${made} of ${want} — the materials ran out (or your pack did).`,
-      );
-    }
-    return made;
+    // ⚠⚠⚠ OTA-1633 — A BATCH IS ONE ACTION. This used to loop `craft X` want
+    // times behind a quiet flag: N parser passes, N Arbiter remarks, N cognitive
+    // evals, N persists, N ambush rolls, for one tap of the thumb. Now the count
+    // rides the action: the craft case sizes it to what the pack can pay for,
+    // runs its guards ONCE, applies the recipe that many times, and speaks one
+    // reward line. The confirm prompts carry the count, so a "yes" finishes the
+    // batch. OTA-989 — count the RESULT, not the whole pack (the Club nets zero).
+    const countResult = () => (get().player?.inventory ?? [])
+      .filter((it) => it.name === recipeName)
+      .reduce((n, it) => n + (it.quantity ?? 0), 0);
+    const before = countResult();
+    get().submitPlayerAction(`craft ${recipeName}`, { craftCount: want });
+    return Math.max(0, countResult() - before);
   },
 
   async fuseAtCrucible() {

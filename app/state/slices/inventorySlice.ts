@@ -1245,7 +1245,8 @@ export const createInventorySlice = (
       // list and took a yes, so the generic "strip these for parts?" prompt must
       // not fire a second time for the same craft.
       set({ crucibleGuardAllowedFor: prompt.recipeResult, craftSubConfirmedFor: prompt.recipeResult });
-      get().craftRecipe(prompt.recipeResult);
+      // OTA-1633 — the whole batch the guard was raised for, not one piece of it.
+      get().craftRecipeBatch(prompt.recipeResult, prompt.craftCount ?? 1);
       return;
     }
     get().repairInventoryItems(prompt.queue, { allowIds: allow });

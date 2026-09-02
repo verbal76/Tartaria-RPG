@@ -26927,7 +26927,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // its own gear and chips; OTA-1469 had reworded the banner and kept the step.
 // The step is gone — SET COURSE plans, → DESTINATION walks; the clock, the
 // stamina and the scene under the buttons are untouched by the tap.
-export const OTA_BUILD_ID = '2026-09-02-1632-set-course-stays-put';
+// ⚠⚠⚠ OTA-1633 — A BATCH IS ONE ACTION. craftRecipeBatch looped `craft X` N
+// times behind a quiet flag: N parses, N Arbiter remarks, N cognitive evals,
+// N persists, N ambush rolls for one tap. The count rides the action now
+// (opts.craftCount): guards once, sized to what the pack pays for; cost and
+// result applied N times inside the one action; one reward line that says how
+// many and why if short; the confirm prompts carry the count.
+export const OTA_BUILD_ID = '2026-09-02-1633-a-batch-is-one-action';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-02-1632-set-course-stays-put';
 // golem catch-up 2026-09-02: markerless publish of OTA-1632 - SET COURSE plans,
 // the travel-row tap walks; no auto-step, no re-rolled tile. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-02-1631-max-means-all-of-it';

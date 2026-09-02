@@ -1560,9 +1560,9 @@ Key invariants worth knowing:
 
 ## 9. Recent OTA highlights (latest sessions)
 
-### ⚠⚠⚠ THE 2026-09-02 RUN — OTA-1617 → 1632 (read this first if you are new)
+### ⚠⚠⚠ THE 2026-09-02 RUN — OTA-1617 → 1633 (read this first if you are new)
 
-Latest golem-line stamp: **`2026-09-02-1632-set-course-stays-put`**
+Latest golem-line stamp: **`2026-09-02-1633-a-batch-is-one-action`**
 (`app/buildInfo.ts`). Both channels ship from this branch — a `[ota-hal]` marker
 in the commit TITLE publishes the HAL set, a markerless follow-up commit
 publishes golem; see §6.
@@ -1727,6 +1727,22 @@ what it ACCEPTS, and a data walker skips the saying.
   ota1632 pins it live (same cell / scene ref / chips / clock / stamina after
   the tap; → DESTINATION moves one tile onto new ground; spent player keeps
   the route). ota1469's pins are rewritten to hold the one-arm banner.
+- **OTA-1633 a batch is one action.** Owner: *"let's work on this one after my
+  three."* `craftRecipeBatch` looped `submitPlayerAction('craft X', { silent })`
+  N times behind `craftBatchQuiet` — N parser passes, N Arbiter remarks queued,
+  N cognitive evals, N persists, N patrol-ambush rolls, N ground checks for one
+  tap. Now the count rides the action: `submitPlayerAction(text, { craftCount })`.
+  The craft case runs its guards ONCE (unlock / INT / cores / missing list /
+  Crucible guard / substitution confirm), sized to
+  `min(want, maxCraftableCount)` so the guard and the confirm describe the real
+  drain (`batchIngredients` = quantities × craftN), then applies cost + result
+  craftN times reading the LIVE inventory each unit, stopping on the pack cap.
+  One reward line: `✦ Crafted X ×N.` or `×made of want — the materials ran out
+  / your pack is full`. `craftSubstitutionPrompt.count` and
+  `CrucibleGuardPrompt.craftCount` carry the count so "yes" finishes the batch
+  (confirmCraftSubstitution / resolveCrucibleGuard re-dispatch with it).
+  `craftBatchQuiet` is gone. ota1633 pins one engine action for 22 clubs, the
+  "×5 of 22" short line, the single craft unchanged, and the wiring.
 
 ⚠ **Two position vocabularies, still.** `stageArrival.ts` (heal / arm /
 `checkStandingGround`) keys on the canon grid CELL; the verb matchers and

@@ -444,7 +444,9 @@ import {
   findRecipeByResult,
   consumeIngredients,
   missingIngredients,
-  previewCraftSubstitutions,
+  previewSubstitutionsList,
+  maxCraftableCount,
+  MAX_CRAFT_BATCH,
   lookupCraftedItem,
   RECIPES,
   findArmorByName,
@@ -7148,7 +7150,7 @@ export interface GameStore {
    * lets the outer submit own the bookkeeping while the inner
    * submit performs the actual state change.
    */
-  submitPlayerAction: (text: string, _opts?: { skipPreChecks?: boolean; silent?: boolean }) => void;
+  submitPlayerAction: (text: string, _opts?: { skipPreChecks?: boolean; silent?: boolean; craftCount?: number }) => void;
   resolveRollStep: (values: number[]) => void;
   cancelPendingRolls: () => void;
   // OTA-957 — a bandolier throw transiently equips the throwable to the off hand
@@ -7598,9 +7600,6 @@ export interface GameStore {
    *  weapon / armor / dog vest, clamps the response, mints the fused
    *  InventoryItem in place. */
   fuseAtCrucible: () => Promise<void>;
-  /** OTA-983 — set while craftRecipeBatch runs so the per-craft reward line stays
-   *  quiet and the batch can emit a single aggregated one instead. */
-  craftBatchQuiet: boolean;
   fusionPickerOpen: boolean;
   pendingFusionSelection: { itemIds: string[]; kind: 'weapon' | 'armor' | 'dog_armor'; catalystId?: string } | null;
   /** OTA-983 — the Crucible refused, and says why. Rendered by FusionBlockedModal,
@@ -7740,7 +7739,7 @@ export interface GameStore {
    *  (a misc/inferred item standing in for a named ingredient via its tags),
    *  ask before stripping them instead of silently eating them. `subsList` is
    *  the pre-formatted "2× Brass Sextant → Scrap Metal, …" summary. */
-  craftSubstitutionPrompt: { recipeResult: string; subsList: string } | null;
+  craftSubstitutionPrompt: { recipeResult: string; subsList: string; count?: number } | null;
   /** One-shot latch: set by confirmCraftSubstitution so the re-dispatched
    *  craft skips the prompt and proceeds. Cleared the moment it's consumed. */
   craftSubConfirmedFor: string | null;
@@ -8139,7 +8138,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
   weaponResistStreak: null,
   combatCues: null,
   aetherStatPickerOpen: false,
-  craftBatchQuiet: false,
   fusionPickerOpen: false,
   missionCompleteNotice: null,
   contractsNotice: null,
@@ -21735,6 +21733,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
           break;
         }
+        // ⚠⚠⚠ OTA-1633 — A BATCH IS ONE ACTION. craftRecipeBatch used to loop this
+        // whole verb N times behind a quiet flag — N parses, N Arbiter remarks, N
+        // cognitive evals, N persists, N ambush rolls. Now the count rides the
+        // action (_opts.craftCount); the guards below run ONCE for the batch,
+        // sized to what the pack can actually pay for (so the Crucible guard and
+        // the substitution confirm describe the REAL drain, not an impossible
+        // one); and the cost + result are applied craftN times inside this one
+        // action, with one reward line at the end.
+        const craftWant = Math.max(1, Math.min(Math.floor(_opts?.craftCount ?? 1), MAX_CRAFT_BATCH));
+        const craftN = craftWant === 1 ? 1 : Math.max(1, maxCraftableCount(recipe, player.inventory, craftWant));
+        const batchIngredients = recipe.ingredients.map((ing) => ({ name: ing.name, quantity: ing.quantity * craftN }));
         // OTA-193 — narrate any substitutions so the player understands
         // why their "Brass Sextant" disappeared in service of a craft.
         // ⚠⚠⚠ OTA-1552 — THE CRUCIBLE GUARD ON THE CRAFT DOOR. Craft already had
@@ -21755,15 +21764,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
         } else {
           // eslint-disable-next-line @typescript-eslint/no-require-imports
           const guard = require('../engine/crucibleGuard') as typeof import('../engine/crucibleGuard');
-          const atRisk = guard.crucibleAtRisk(recipe.ingredients, player.inventory);
+          const atRisk = guard.crucibleAtRisk(batchIngredients, player.inventory);
           if (atRisk.length > 0) {
-            get().appendLog('arbiter', guard.crucibleWarningLine(atRisk, `the ${recipe.result}`));
+            get().appendLog('arbiter', guard.crucibleWarningLine(atRisk, craftN > 1 ? `${craftN}× ${recipe.result}` : `the ${recipe.result}`));
             set({
               crucibleGuardPrompt: {
                 action: 'craft',
                 label: recipe.result,
                 queue: [],
                 recipeResult: recipe.result,
+                craftCount: craftN,
                 atRisk,
                 allow: [],
               },
@@ -21771,7 +21781,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             break;
           }
         }
-        const subs = previewCraftSubstitutions(recipe, player.inventory);
+        const subs = previewSubstitutionsList(batchIngredients, player.inventory);
         if (subs.length > 0) {
           const list = subs.map((s) =>
             s.quantity > 1
@@ -21787,19 +21797,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
             set({ craftSubConfirmedFor: null });
             get().appendLog('arbiter', `The Arbiter nods. "Stripped for parts: ${list}."`);
           } else {
-            set({ craftSubstitutionPrompt: { recipeResult: recipe.result, subsList: list } });
+            set({ craftSubstitutionPrompt: { recipeResult: recipe.result, subsList: list, count: craftN } });
             // arb137 — also speak it in the feed so the craft is never a SILENT
             // no-op. A tester typed `craft X` ~15 times getting nothing back,
             // because this only set the modal flag (which they didn't see). The
             // log line makes clear the craft is waiting on a confirm.
             get().appendLog(
               'arbiter',
-              `"Crafting ${recipe.result} would strip ${list} from your pack — confirm in the prompt to proceed, or it stays unmade."`,
+              `"Crafting ${craftN > 1 ? `${craftN}× ` : ''}${recipe.result} would strip ${list} from your pack — confirm in the prompt to proceed, or it stays unmade."`,
             );
             break;
           }
         }
-        const remaining = consumeIngredients(player.inventory, recipe);
         const catEntry = lookupCraftedItem(recipe.result);
         // ⚠ OTA-1339 — DOG ARMOR IS BUILT FOR *YOUR* DOG, AND THE NAME SAYS SO. Owner, after
         // typing "Skinwalker" as his dog's breed: *"when we make the dog armor how about we
@@ -21813,23 +21822,39 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const craftedName = dogBreed
           ? `${dogBreed.charAt(0).toUpperCase()}${dogBreed.slice(1)} ${recipe.result}`
           : recipe.result;
-        const crafted: InventoryItem = stampDurability({
-          id: freshInstanceId('crafted'),
-          name: craftedName,
-          kind: catEntry.kind === 'weapon' ? 'weapon' : catEntry.kind === 'armor' ? 'armor' : catEntry.kind,
-          rarity: catEntry.rarity,
-          quantity: 1,
-          tags: catEntry.tags,
-          // arb119 — mark provenance so scrapping this back yields only token
-          // mats (closes the craft→scrap→sell money pump); looted copies of the
-          // same item are unflagged and still scrap in full.
-          selfCrafted: true,
-        });
-        // Refuse the craft if the result can't fit (per-name cap). The
-        // ingredients have not been consumed yet at this point — fail
-        // before we spend materials the player can't store the output of.
-        const craftGrant = grantItem(remaining, crafted);
-        if (craftGrant.accepted <= 0) {
+        // OTA-1633 — the cost and the result, craftN times, inside this one action.
+        // Each unit reads the LIVE inventory (the previous unit changed it) and
+        // mints its own instance (durability, provenance). Stops on the first
+        // refusal: the pack's per-name cap, or materials the sizing did not see.
+        let craftMade = 0;
+        let craftStop: 'pack' | 'materials' | null = null;
+        for (let i = 0; i < craftN; i += 1) {
+          const inv = get().player?.inventory ?? [];
+          if (i > 0 && missingIngredients(recipe, inv).length > 0) { craftStop = 'materials'; break; }
+          const remaining = consumeIngredients(inv, recipe);
+          const crafted: InventoryItem = stampDurability({
+            id: freshInstanceId('crafted'),
+            name: craftedName,
+            kind: catEntry.kind === 'weapon' ? 'weapon' : catEntry.kind === 'armor' ? 'armor' : catEntry.kind,
+            rarity: catEntry.rarity,
+            quantity: 1,
+            tags: catEntry.tags,
+            // arb119 — mark provenance so scrapping this back yields only token
+            // mats (closes the craft→scrap→sell money pump); looted copies of the
+            // same item are unflagged and still scrap in full.
+            selfCrafted: true,
+          });
+          // Refuse the unit if the result can't fit (per-name cap). The
+          // ingredients have not been consumed yet at this point — fail
+          // before we spend materials the player can't store the output of.
+          const craftGrant = grantItem(remaining, crafted);
+          if (craftGrant.accepted <= 0) { craftStop = 'pack'; break; }
+          set((s) => ({
+            player: s.player ? { ...s.player, inventory: craftGrant.inventory } : s.player,
+          }));
+          craftMade += 1;
+        }
+        if (craftMade === 0) {
           get().appendLog(
             'arbiter',
             `The Arbiter raises a brow. "Your pack already holds the limit on ${recipe.result.toLowerCase()}. Free a slot first."`,
@@ -21837,13 +21862,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
           break;
         }
-        set((s) => ({
-          player: s.player ? { ...s.player, inventory: craftGrant.inventory } : s.player,
-        }));
-        // OTA-983 — a batch emits ONE summary line at the end instead of N of these.
-        if (!get().craftBatchQuiet) {
-          get().appendLog('reward', `✦ Crafted ${craftedName}. The Arbiter watches you set the last piece.`);
-        }
+        // One reward line for the whole batch (OTA-983), and it says why if short.
+        get().appendLog(
+          'reward',
+          craftWant === 1
+            ? `✦ Crafted ${craftedName}. The Arbiter watches you set the last piece.`
+            : craftMade === craftWant
+              ? `✦ Crafted ${craftedName} ×${craftMade}. The Arbiter watches you set the last piece.`
+              : `✦ Crafted ${craftedName} ×${craftMade} of ${craftWant} — ${craftStop === 'pack' ? 'your pack is full' : 'the materials ran out'}.`,
+        );
         break;
       }
     }
@@ -29787,7 +29814,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const prompt = get().craftSubstitutionPrompt;
     if (!prompt) return;
     set({ craftSubstitutionPrompt: null, craftSubConfirmedFor: prompt.recipeResult });
-    get().submitPlayerAction(`craft ${prompt.recipeResult}`);
+    // OTA-1633 — the whole batch the prompt was raised for, not one piece of it.
+    get().submitPlayerAction(`craft ${prompt.recipeResult}`, { craftCount: prompt.count ?? 1 });
   },
   // Dismiss without crafting — the substitutes stay in the pack.
   cancelCraftSubstitution() {
