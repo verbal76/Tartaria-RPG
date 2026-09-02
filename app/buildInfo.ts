@@ -26908,6 +26908,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // eight and over the refusal, the sleep still camps (ambush, heal, recovery)
 // and then looks at the ground again so the camp wakes in place.
 export const OTA_BUILD_ID = '2026-09-02-1629-the-sleep-keeps-the-hour';
+// golem catch-up 2026-09-02: markerless publish of OTA-1629 - sleep / rest to a
+// named hour or span. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-02-1628-the-whisper-beats-pop-up-too';
 // golem catch-up 2026-09-02: markerless publish of OTA-1628 - the whisper
 // meet, recovery and hand-back arm are cards. hal took the marker.
