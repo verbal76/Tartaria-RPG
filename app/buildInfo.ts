@@ -26886,6 +26886,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // carries the eight words; hub.hubTravelText hands the resolver the parsed
 // direction; gameStore's one interior-move site uses it.
 export const OTA_BUILD_ID = '2026-09-02-1626-the-word-is-the-direction';
+// golem catch-up 2026-09-02: markerless publish of OTA-1626 - bare direction
+// words parse; "n" inside an outpost moves rooms. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-02-1625-the-subdual-pays-the-slate';
 // golem catch-up 2026-09-02: markerless publish of OTA-1625 - a knockout
 // advances faction quests like a kill. hal took the marker.
