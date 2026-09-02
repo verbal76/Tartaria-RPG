@@ -1,0 +1,237 @@
+{
+  "id": "c7807fca5f3645f6b86c02057f46642f",
+  "groupID": "7705716671",
+  "eventID": "c7807fca5f3645f6b86c02057f46642f",
+  "projectID": "4511945117532160",
+  "size": 18192,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-01-1617-the-ask-names-its-object #mtj5akkbvhf2 [inline 15/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-01-1617-the-ask-names-its-object",
+  "message": "player-log 2026-09-01-1617-the-ask-names-its-object #mtj5akkbvhf2 [inline 15/28]",
+  "title": "player-log 2026-09-01-1617-the-ask-names-its-object #mtj5akkbvhf2 [inline 15/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db0c:41d2:ad2:ae51:4e84:c909",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "b3acf481730e41feba8b17fd75062a33",
+      "span_id": "a028e29ed6ba33ae",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "Quiver Rat\n[2026-09-01T18:47:32.161Z] [debug] parser: intent=advance conf=1.00 verb=approach target=quiver rat resolved=Quiver Rat range=far enemies=1 hooks=0\n[2026-09-01T18:47:32.165Z] [debug] move: advance from range=far enemies=1 weather=Glass Hail cost=1 partial=0\n[2026-09-01T18:47:32.165Z] [debug] move: field advance target=Quiver Rat d 2.50->1.50 band far->mid\n",
+      "[2026-09-01T18:47:32.165Z] [world] You close the gap with Quiver Rat. (range: mid-range)\n[2026-09-01T18:47:32.166Z] [combat] Quiver Rat \u2014 d20 \u2192 13 + ATK 6 = 19 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-01T18:47:32.972Z] [debug] ui: tap \"approach\"\n[2026-09-01T18:47:33.006Z] [player] approach Quiver Rat\n",
+      "[2026-09-01T18:47:33.007Z] [debug] parser: intent=advance conf=1.00 verb=approach target=quiver rat resolved=Quiver Rat range=mid enemies=1 hooks=0\n[2026-09-01T18:47:33.009Z] [debug] move: advance from range=mid enemies=1 weather=Glass Hail cost=1 partial=0\n[2026-09-01T18:47:33.010Z] [debug] move: field advance target=Quiver Rat d 1.50->0.50 band mid->close\n",
+      "[2026-09-01T18:47:33.010Z] [world] You close the gap with Quiver Rat. (range: close / arm's reach)\n[2026-09-01T18:47:33.013Z] [combat] Quiver Rat \u2014 d20 \u2192 20 + ATK 6 = 26 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 CRITICAL HIT\n[2026-09-01T18:47:33.293Z] [combat] Quiver Rat deals 3 piercing damage [armor \u221235%]. You have 38 HP remaining.\n[2026-09-01T18:47:34.774Z] [debug] ui: tap \"dodge\"\n",
+      "[2026-09-01T18:47:34.785Z] [player] dodge\n[2026-09-01T18:47:34.785Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=0\n[2026-09-01T18:47:34.786Z] [world] You commit to the dodge. Slip Quiver Rat's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-01T18:47:34.857Z] [combat] Quiver Rat \u2014 d20 \u2192 1 + ATK 6 = 7 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n[2026-09-01T18:47:34.857Z] [combat] Dodge \u2014 Quiver Rat overcommits past you. \u2713 Free opening (next strike \u00d72 dice).\n[2026-09-01T18:47:34.859Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T18:47:35.656Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n",
+      "[2026-09-01T18:47:35.694Z] [player] attack with the auralite talon\n[2026-09-01T18:47:35.695Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=1 hooks=0\n[2026-09-01T18:47:35.696Z] [debug] attack: target=Quiver Rat range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n",
+      "[2026-09-01T18:47:35.697Z] [arbiter] Glass Hail hangs between you. \"\u22121 to the swing \u2014 see what you can,\" the Arbiter says.\n[2026-09-01T18:47:35.697Z] [debug] attack: visibility penalty \u22121 (Glass Hail)\n[2026-09-01T18:47:35.698Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-09-01T18:47:35.756Z] [world] Your acid-etched corrupted auralite talon comes around in an arc; Quiver Rat squares up to meet it.\n[2026-09-01T18:47:35.757Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T18:47:36.012Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (255ms)\n[2026-09-01T18:47:43.702Z] [world] Quiver Rat moves first. The pressure is immediate.\n",
+      "[2026-09-01T18:47:43.704Z] [combat] Quiver Rat \u2014 d20 \u2192 8 + ATK 6 = 14 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-01T18:47:43.705Z] [combat] You \u2014 d20 \u2192 10 + INT 11 \u2212 1 (Glass Hail) perfect opening (2\u00d7 dice) = 20 vs Quiver Rat AC 10 \u2014 \u2713 HIT\n[2026-09-01T18:47:43.705Z] [combat] Quiver Rat shrugs off the aetheric. (resisted, \u00d70.5 for 13)\n",
+      "[2026-09-01T18:47:43.708Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Bone Crossbow \u2014 piercing will bite where aetheric won't.\"\n[2026-09-01T18:47:43.772Z] [reward] \u2726 The work hones you. +1 STR (base 9, 14 as you stand).\n[2026-09-01T18:47:43.773Z] [combat] Clean hit with the acid-etched corrupted auralite talon for 13. Quiver Rat has 13 left and does not back away.\n",
+      "[2026-09-01T18:47:43.773Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 4 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n[2026-09-01T18:47:43.773Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 2 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n",
+      "[2026-09-01T18:47:43.773Z] [arbiter] The Arbiter watches the quiver rat. \"It is not the first thing here that decided to keep its distance, then changed its mind.\"\n[2026-09-01T18:47:45.809Z] [debug] ui: tap \"\ud83d\udd25\u2697 bone crossbow\"\n[2026-09-01T18:47:45.853Z] [player] attack with the off-hand bone crossbow\n",
+      "[2026-09-01T18:47:45.853Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=1 hooks=0\n[2026-09-01T18:47:45.854Z] [combat] Quiver Rat smokes \u2014 acid eats 4. (9/26 HP, 2 turns left)\n[2026-09-01T18:47:45.854Z] [combat] Quiver Rat blackens \u2014 corruption eats 2. (7/26 HP, 2 turns left)\n",
+      "[2026-09-01T18:47:45.855Z] [debug] attack: target=Quiver Rat range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-09-01T18:47:45.856Z] [debug] attack: visibility penalty \u22121 (Glass Hail)\n[2026-09-01T18:47:45.911Z] [world] You commit forward with the searing acid-etched bone crossbow. Quiver Rat watches your hands.\n",
+      "[2026-09-01T18:47:45.911Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T18:47:46.161Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (248ms)\n[2026-09-01T18:47:54.170Z] [world] You seize the initiative. Quiver Rat has no time to react.\n[2026-09-01T18:47:54.171Z] [combat] You \u2014 d20 \u2192 4 + DEX 23 \u2212 1 (Glass Hail) + 2 (point blank) = 28 vs Quiver Rat AC 9 \u2014 \u2713 HIT\n",
+      "[2026-09-01T18:47:54.172Z] [combat] Piercing flares \u2014 +3 on hit (weak \u2014 bites deep!).\n[2026-09-01T18:47:54.173Z] [combat] Weakness exposed \u2014 Quiver Rat flinches. (piercing \u00d72.25 for 28)\n[2026-09-01T18:47:54.174Z] [combat] Quiver Rat folds under the searing acid-etched bone crossbow. 28 damage was enough. The room exhales.\n",
+      "[2026-09-01T18:47:54.175Z] [reward] Quiver Rat defeated. You recover Bone Bolt \u00d72.\n[2026-09-01T18:47:54.176Z] [reward] You strip the body: Bone Knife, Mud-Warden's Vest (+6 TC). The kit took the fight badly.\n[2026-09-01T18:47:54.176Z] [reward] +12 TC pried from the dust.\n",
+      "[2026-09-01T18:47:54.227Z] [arbiter] The Arbiter looks around. \"The seneschal logs your name without asking it. The Monarchs' ledgers have their ways.\"\n[2026-09-01T18:47:58.111Z] [debug] persist sizes(KB): total=266 player=69 wm=111[rooms=52 events=4 memos=1 npcs=4 defeated=1 tags=1 discovered=0] log=83 scene=3\n",
+      "[2026-09-01T18:48:02.779Z] [debug] OTA session start: 2026-09-01-1609-the-strike-keeps-its-name.\n[2026-09-01T18:48:02.779Z] [world] You step back into The Monarch's Waystation. The world waits for your move.\n[2026-09-01T18:48:02.779Z] [arbiter] The Arbiter meets your eyes. \"Welcome back, Cheddar Bob. The buried country is no place to walk alone.\"\n",
+      "[2026-09-01T18:48:03.428Z] [debug] \u2550\u2550\u2550 SESSION 2026-09-01T18:48:03.425Z \u00b7 build 2026-09-01-1609-the-strike-keeps-its-name \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-09-01T18:48:03.429Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713\n",
+      "[2026-09-01T18:48:03.429Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n[2026-09-01T18:48:03.430Z] [debug] missions: mystery:mystery_temporal_watch stage 0/4 [diplomacy] @reclaimer_stake npc=\"the Reclaimers Guild Speaker\" gives=Guild Eddy-Gauge PAUSED\n",
+      "[2026-09-01T18:48:03.430Z] [debug] missions: \u00b7 at=monarch_waystation\n[2026-09-01T18:48:03.430Z] [debug] boot: life bmtizxzgk5b started 2026-09-01T18:24:21.188Z \u00b7 FOLLOWED AN OTA APPLY 216ms ago via mid-session \u00b7 prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)\n[2026-09-01T18:48:04.640Z] [debug] ui: tap \"more \u25b8\"\n[2026-09-01T18:48:05.458Z] [debug] ui: tap \"missions\"\n",
+      "[2026-09-01T18:48:09.782Z] [world] You set course for The Reaver's Crest. 1 tile \u2014 about 3 hours of travel, all in. You set off now \u2014 the ground ahead is new ground. Keep tapping \u2192 THE REAVER'S CREST on the travel row to close the distance; STOP TRAVEL to halt.\n[2026-09-01T18:48:09.789Z] [world] You walk south. You arrive at The Reaver's Crest.\n",
+      "[2026-09-01T18:48:09.790Z] [debug] scene: loc=reavers_crest hub=- arrival=y opening=n passing=n\n[2026-09-01T18:48:09.790Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest HERE needs=Raider's Ridge-Sign\u2713\n[2026-09-01T18:48:09.791Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n",
+      "[2026-09-01T18:48:09.791Z] [debug] missions: mystery:mystery_temporal_watch stage 0/4 [diplomacy] @reclaimer_stake npc=\"the Reclaimers Guild Speaker\" gives=Guild Eddy-Gauge PAUSED\n[2026-09-01T18:48:09.791Z] [debug] missions: \u00b7 at=reavers_crest travelTo=reavers_crest\n[2026-09-01T18:48:09.792Z] [world] \u25b8 Silence the Doubter: this is the place \u2014 finish it.\n",
+      "[2026-09-01T18:48:09.828Z] [world] Time and the wasteland have worked this place over since you last passed through \u2014 there's something worth a second look again.\n[2026-09-01T18:48:09.839Z] [world] A scout crouches at the treeline, reading the ground. They rise slow and easy, hands where you can see them. This is Vesna, a lone scout. (Try \"talk to Vesna\" \u2014 a fair word carries.)\n",
+      "[2026-09-01T18:48:09.843Z] [world] You've left The Monarch's Waystation and entered The Reaver's Crest. The crest gives you the whole borderland, and gives the whole borderland you. It's dawn. Nobody else is in sight. north leads to The Monarch's Waystation; east leads to Sinking Cathedral; west leads to Raider's Ridge. Nothing named to the south.\n",
+      "[2026-09-01T18:48:09.843Z] [world] You have been here. The shape of it comes back before the details do.\n[2026-09-01T18:48:09.846Z] [world] [The Reaver's Crest] north: The Monarch's Waystation (1 tile, 3 hours) \u00b7 east: Dynasty Border Post (4 tiles, 10 hours) \u00b7 south: Samarran (8 tiles, 20 hours) \u00b7 west: Raider's Ridge (1 tile, 3 hours)\n",
+      "[2026-09-01T18:48:09.848Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-01T18:48:09.848Z] [arbiter] \"Three things in this place would reward attention,\" the Arbiter says, without naming them. \"I would start with the one you cannot quite see.\"\n",
+      "[2026-09-01T18:48:09.856Z] [world] The Reaver is on the ridge the sign named, alone, watching you climb. He doesn't draw until you crest it. \"The Giants will rise,\" he says, almost gentle. \"You are a small thing to send against that.\" Then his blade comes up.\n[2026-09-01T18:48:09.856Z] [combat] Tartarian Reaver (hunted) closes the distance. The hunt comes to its end.\n",
+      "[2026-09-01T18:48:09.856Z] [combat] The Reaver rises on the ridge line: \"You climbed all this way to die tired. Come, then.\"\n[2026-09-01T18:48:16.610Z] [debug] ui: tap \"flee\"\n[2026-09-01T18:48:16.621Z] [player] flee\n[2026-09-01T18:48:16.621Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=mid enemies=1 hooks=0\n[2026-09-01T18:48:16.693Z] [system] \u23f3 Time passed: 15 min\n",
+      "[2026-09-01T18:48:16.946Z] [cognitive] FEAR \u00b7 RETREAT \u00b7 HIDE  (252ms)\n[2026-09-01T18:48:18.582Z] [debug] skillcheck: escape d20=19 DEX 23 = 42 vs Pursuit 31 \u2014 Tartarian Reaver (hunted) (d20 17 + SPD 14) \u2192 PASS\n",
+      "[2026-09-01T18:48:18.679Z] [debug] stats: STR14 DEX24 INT11 WIS13 CHA7 STE6 | gear: WIS+4,INT+2,DEX+14,STR+5,STE+2 | worn: main=Auralite Talon off=Bone Crossbow head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n",
+      "[2026-09-01T18:48:18.679Z] [debug] train: dexterity (escape check) \u2192 progress 92/100\n[2026-09-01T18:48:18.679Z] [world] You break away across the open ground. Behind you the thing you ran from gives up the chase.\n[2026-09-01T18:48:27.271Z] [world] A shard of mud-glass nicks you. Small wound, steady reminder. (\u22121 HP)\n[2026-09-01T18:48:27.286Z] [player] talk to Vesna\n",
+      "[2026-09-01T18:48:27.340Z] [world] Vesna studies you a moment. \"I might know a thing or two. Depends who's asking, and how.\"\n[2026-09-01T18:48:27.341Z] [world] You read them at a glance: reasonable. A fair word will move them; a threat will not.\n[2026-09-01T18:48:27.341Z] [world] Persuade Vesna for what they know, or intimidate them for what they carry?\n",
+      "[2026-09-01T18:48:31.080Z] [combat] You \u2014 persuade Vesna \u2192 d20 10 + CHA 7 = 17 vs DC 10 \u2014 \u2713\n[2026-09-01T18:48:31.080Z] [world] You find the words that cost Vesna nothing to give. They lower their guard and, after a beat, tell you what they know.\n",
+      "[2026-09-01T18:48:31.081Z] [reward] Vesna lowers their voice: \"a stash tucked under a collapsed overpass, off to the north.\" (a lead \u2014 you'll turn it up when you next cross fresh ground)\n[2026-09-01T18:48:37.703Z] [debug] ui: tap \"take / salvage\"\n[2026-09-01T18:48:39.291Z] [world] You break the cracked supply crate apart. Among the pieces, something worth keeping.\n",
+      "[2026-09-01T18:48:39.291Z] [world] You work the crest free of the stone. A faction's mark, whole \u2014 someone will pay standing to see it come home.\n[2026-09-01T18:48:39.291Z] [world] You break the salt-crusted lockbox apart. Among the pieces, something worth keeping.\n[2026-09-01T18:48:39.291Z] [world] You work the shattered buried reclaimer cache over. A part of it comes loose, intact.\n",
+      "[2026-09-01T18:48:39.292Z] [world] You break the shattered ruined skyscraper apart. Among the pieces, something worth keeping.\n[2026-09-01T18:48:39.292Z] [world] You strip the sign stone carefully. Something usable comes free in your hand.\n[2026-09-01T18:48:39.292Z] [world] You work the stone seat over. A part of it comes loose, intact.\n[2026-09-01T18:48:39.292Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-09-01T18:48:39.292Z] [reward]     \u2022 Aetheric Shard x2 (Uncommon)\n[2026-09-01T18:48:39.292Z] [reward]     \u2022 Reclaimer Sigil (Uncommon)\n[2026-09-01T18:48:39.293Z] [reward]     \u2022 Worn Tartarian Coin x5 (Common)\n[2026-09-01T18:48:39.293Z] [reward]     \u2022 Stick (Common)\n[2026-09-01T18:48:39.293Z] [reward]     \u2022 Mud Fragment x3 (Common)\n[2026-09-01T18:48:42.135Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-09-01T18:48:43.592Z] [player] investigate the ground\n[2026-09-01T18:48:43.593Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=0\n[2026-09-01T18:48:43.595Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-09-01T18:48:43.602Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-09-01T18:48:43.607Z] [world] The Reaver is on the ridge the sign named, alone, watching you climb. He doesn't draw until you crest it. \"The Giants will rise,\" he says, almost gentle. \"You are a small thing to send against that.\" Then his blade comes up.\n[2026-09-01T18:48:43.607Z] [combat] Tartarian Reaver (hunted) closes the distance. The hunt comes to its end.\n",
+      "[2026-09-01T18:48:43.607Z] [combat] The Reaver rises on the ridge line: \"You climbed all th"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-01-1617-the-ask-names-its-object #mtj5akkbvhf2 [inline 15/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtj5akkbvhf2"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-01-1617-the-ask-names-its-object"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "15"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-01-1617-the-ask-names-its-object"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "3"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db0c:41d2:ad2:ae51:4e84:c909",
+      "query": "user.ip:\"2607:fb90:db0c:41d2:ad2:ae51:4e84:c909\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-01T23:48:29.585720Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-01T23:48:29.270000Z",
+  "fingerprints": [
+    "f6cefe95e1576122e424a8ff00612ea3"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1949410857,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-01T23:48:29.270000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-01-1617-the-ask-names-its-object",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-01-1617-the-ask-names-its-object",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-01-1617-the-ask-names-its-object",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-01-1617-the-ask-names-its-object)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "cdb72df7f92b4820a39e3f869e5e0722",
+  "previousEventID": "c3aa0dff25ba4b828ae5de6c9ffaa970"
+}

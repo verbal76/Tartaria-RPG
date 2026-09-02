@@ -5,14 +5,6 @@
     1 page(s), 29 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7700061579/events/?full=false
     1 page(s), 13 rows — COMPLETE — ended short of a full page
-  /organizations/hot-attic-games-llc/issues/7700123343/events/?full=false
-    1 page(s), 23 rows — COMPLETE — ended short of a full page
-  /organizations/hot-attic-games-llc/issues/7700149815/events/?full=false
-    1 page(s), 46 rows — COMPLETE — ended short of a full page
-  /organizations/hot-attic-games-llc/issues/7700149823/events/?full=false
-    1 page(s), 2 rows — COMPLETE — ended short of a full page
-  /organizations/hot-attic-games-llc/issues/7700159767/events/?full=false
-    1 page(s), 1 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7700163529/events/?full=false
     1 page(s), 48 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7700163564/events/?full=false
@@ -201,6 +193,14 @@
     1 page(s), 84 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7705427482/events/?full=false
     1 page(s), 3 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7705664046/events/?full=false
+    1 page(s), 28 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7705664064/events/?full=false
+    1 page(s), 1 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7705716671/events/?full=false
+    1 page(s), 56 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7705716747/events/?full=false
+    1 page(s), 2 rows — COMPLETE — ended short of a full page
   /projects/hot-attic-games-llc/tartaria/events/?full=false
     1 page(s), 100 rows — SUSPECT — ended on a full page of 100 with no next cursor; this endpoint caps rather than paginates
   /projects/hot-attic-games-llc/tartaria/issues/?query=&statsPeriod=
@@ -271,4 +271,5 @@
     mtj0rqoi6phs: 3 redactions, 1121 chars
     mtj23y06dc8q: 10 redactions, 3702 chars
     mtj4hpttgrw4: 6 redactions, 2227 chars
-    mtj5akkbvhf2: 9 redactions, 3291 chars
+    mtj5akkbvhf2: 27 redactions, 9873 chars
+    mtjdbf20sc0c: 9 redactions, 3164 chars

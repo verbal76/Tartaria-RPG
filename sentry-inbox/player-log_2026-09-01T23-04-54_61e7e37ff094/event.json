@@ -1,0 +1,262 @@
+{
+  "id": "61e7e37ff09447db8188fa743448b4c9",
+  "groupID": "7705664046",
+  "eventID": "61e7e37ff09447db8188fa743448b4c9",
+  "projectID": "4511945117532160",
+  "size": 18048,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-01-1615-the-mission-speaks-where-you-stand #mtj5akkbvhf2 [inline 6/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-01-1615-the-mission-speaks-where-you-stand",
+  "message": "player-log 2026-09-01-1615-the-mission-speaks-where-you-stand #mtj5akkbvhf2 [inline 6/28]",
+  "title": "player-log 2026-09-01-1615-the-mission-speaks-where-you-stand #mtj5akkbvhf2 [inline 6/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db0c:41d2:ad2:ae51:4e84:c909",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "ba934da8d6f74a64b775be8cae09ed1d",
+      "span_id": "929d244029cb32f8",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "orth into open ground.\n[2026-09-01T03:45:47.748Z] [world] Whatever clock this place runs on, it has not ticked since you left.\n[2026-09-01T03:45:47.749Z] [system] \u23f3 Time passed: 15 min\n[2026-09-01T03:45:47.897Z] [cognitive] TRAVEL  (147ms)\n",
+      "[2026-09-01T03:45:48.110Z] [debug] persist sizes(KB): total=247 player=59 wm=102[rooms=46 events=4 memos=0 npcs=4 defeated=1 tags=1 discovered=0] log=84 scene=3\n[2026-09-01T03:45:49.161Z] [debug] ui: tap \"rest\"\n[2026-09-01T03:45:49.172Z] [player] rest\n[2026-09-01T03:45:49.172Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=2\n",
+      "[2026-09-01T03:45:49.174Z] [world] Soot circles three times and curls beside you. Her breathing slows to yours.\n[2026-09-01T03:45:49.175Z] [world] You rest for 8 hours. +8 stamina recovered. (Day 42, afternoon)\n[2026-09-01T03:45:49.175Z] [debug] arbiter: ambient held (he just spoke)\n[2026-09-01T03:45:49.187Z] [debug] arbiter: template (reason=intent-not-allowed:rest)\n",
+      "[2026-09-01T03:45:49.187Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-01T03:45:49.188Z] [debug] arbiter: ambient held (he just spoke)\n[2026-09-01T03:45:49.188Z] [system] \u23f3 Time passed: 8h\n[2026-09-01T03:45:49.340Z] [cognitive] REST  (151ms)\n[2026-09-01T03:45:50.111Z] [debug] ui: tap \"take / salvage\"\n",
+      "[Filtered]",
+      "[2026-09-01T03:45:51.658Z] [world] You lever something loose from the weathered toppled obelisk fragment \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n[2026-09-01T03:45:51.659Z] [reward] \u2726 Salvage haul:\n[2026-09-01T03:45:51.659Z] [reward]     \u2022 Stiffened Leather Offcut (Uncommon)\n[2026-09-01T03:45:51.659Z] [reward]     \u2022 Aether Dust x2 (Common)\n",
+      "[2026-09-01T03:45:51.660Z] [reward]     \u2022 Bent Nail x2 (Common)\n[2026-09-01T03:45:51.660Z] [reward]     \u2022 Slate-Weighted Netting (Common)\n[2026-09-01T03:45:52.762Z] [debug] ui: tap \"investigate\"\n[2026-09-01T03:45:54.324Z] [player] investigate the mud\n[2026-09-01T03:45:54.324Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=2\n",
+      "[2026-09-01T03:45:54.329Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Big Rock (Common).\n[2026-09-01T03:45:54.337Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-09-01T03:45:54.337Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-01T03:45:54.337Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-09-01T03:45:54.495Z] [cognitive] SWIM  (157ms)\n[2026-09-01T03:45:55.445Z] [debug] ui: tap \"EAST\"\n[2026-09-01T03:45:55.475Z] [player] go east\n[2026-09-01T03:45:55.476Z] [debug] parser: intent=travel conf=1.00 verb=go target=east resolved=- range=- enemies=0 hooks=2\n",
+      "[2026-09-01T03:45:55.481Z] [world] You walk east through open silt. The compass tells you The Buried Cities lies further east \u2014 8 tiles, about 20 hours of travel.\n[2026-09-01T03:45:55.481Z] [world] Time went somewhere. It did not come here.\n[2026-09-01T03:45:55.482Z] [system] \u23f3 Time passed: 15 min\n[2026-09-01T03:45:55.665Z] [cognitive] neutral  (181ms)\n",
+      "[2026-09-01T03:45:57.678Z] [debug] ui: tap \"take / salvage\"\n[2026-09-01T03:45:58.933Z] [world] You strip the bedroll down. Mostly debris \u2014 but a Stick comes loose at the bottom of the pile.\n[2026-09-01T03:45:58.933Z] [world] You work the cart over. A part of it comes loose, intact.\n[2026-09-01T03:45:58.934Z] [world] You strip the table carefully. Something usable comes free in your hand.\n",
+      "[2026-09-01T03:45:58.934Z] [world] Tucked inside the trapdoor: an oddment that matches no quartermaster's list. The kind of thing that fuses well.\n[2026-09-01T03:45:58.934Z] [world] You work the zharak's teeth spire apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n[2026-09-01T03:45:58.934Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-09-01T03:45:58.934Z] [reward]     \u2022 Stick (Common)\n[2026-09-01T03:45:58.934Z] [reward]     \u2022 Worn Tartarian Coin x4 (Common)\n[2026-09-01T03:45:58.935Z] [reward]     \u2022 Cloth Scrap (Common)\n[2026-09-01T03:45:58.935Z] [reward]     \u2022 Horn-Capped Dowel (Common)\n[2026-09-01T03:45:58.935Z] [reward]     \u2022 Coiled Snare Thread (Common)\n[2026-09-01T03:46:00.079Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-09-01T03:46:01.413Z] [player] investigate the mud\n[2026-09-01T03:46:01.414Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=Aether Mud range=- enemies=0 hooks=2\n[2026-09-01T03:46:01.417Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Mudstone (Rare).\n[2026-09-01T03:46:01.425Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-09-01T03:46:01.584Z] [cognitive] SWIM  (158ms)\n[2026-09-01T03:46:02.683Z] [player] investigate cellar\n[2026-09-01T03:46:02.687Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=cellar resolved=cellar range=- enemies=0 hooks=2\n",
+      "[2026-09-01T03:46:02.688Z] [world] You take the measure of the cellar. The Aetheric haze does not gather; the dust does not stir. Just a thing, in a place.\n[2026-09-01T03:46:02.690Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-09-01T03:46:02.690Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-01T03:46:02.869Z] [cognitive] neutral  (177ms)\n",
+      "[2026-09-01T03:46:03.044Z] [debug] persist sizes(KB): total=253 player=59 wm=107[rooms=52 events=4 memos=0 npcs=4 defeated=1 tags=1 discovered=0] log=83 scene=3\n[2026-09-01T03:46:03.928Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.\n[2026-09-01T03:46:03.959Z] [player] investigate architect blind\n",
+      "[2026-09-01T03:46:03.960Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=architect blind resolved=architect blind range=- enemies=0 hooks=2\n[2026-09-01T03:46:03.961Z] [world] The architect blind reads as ordinary, which in Tartaria is a small kind of relief. You leave it be.\n",
+      "[2026-09-01T03:46:03.964Z] [world] A Mud Monarchs patrol crosses your path in the open \u2014 and turns toward you.\n[2026-09-01T03:46:03.964Z] [arbiter] \"Mud Monarchs riders,\" the Arbiter says. \"They've marked you. No outrunning this one.\"\n[2026-09-01T03:46:03.964Z] [debug] dedup: suppressed arbiter repeat \u2014 \"\"Mud Monarchs riders,\" the Arbiter says. \"They've marked you\u2026\"\n",
+      "[2026-09-01T03:46:04.231Z] [debug] qwen\u23f1 investigate_lore ok 1384ms read 299ms/write 782ms in 126t\u2192out 25t 2.4ms/t (121ch)\n[2026-09-01T03:46:04.724Z] [cognitive] neutral  (760ms)\n[2026-09-01T03:46:06.237Z] [debug] qwen\u23f1 investigate_lore ok 1765ms wait 252ms read 697ms/write 801ms in 127t\u2192out 26t 5.5ms/t (126ch)\n[2026-09-01T03:46:07.480Z] [debug] ui: tap \"dodge\"\n",
+      "[2026-09-01T03:46:07.493Z] [player] dodge\n[2026-09-01T03:46:07.493Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=4 hooks=2\n[2026-09-01T03:46:07.494Z] [world] You commit to the dodge. Slip Mud Monarchs Patrol 1's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-01T03:46:07.495Z] [combat] Mud Monarchs Patrol 1 smokes \u2014 acid eats 4. (8/12 HP, 2 turns left)\n[2026-09-01T03:46:07.495Z] [combat] Mud Monarchs Patrol 1 blackens \u2014 corruption eats 2. (6/12 HP, 2 turns left)\n[2026-09-01T03:46:07.560Z] [combat] Mud Monarchs Patrol 1 \u2014 d20 \u2192 13 + ATK 9 = 22 vs your AC 23 \u2014 \u2717 EVADED\n",
+      "[2026-09-01T03:46:07.560Z] [combat] Dodge \u2014 d20 \u2192 6 + DEX 24 = 30 vs ATK 22. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-01T03:46:07.560Z] [world] You slip Mud Monarchs Patrol 1's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n",
+      "[2026-09-01T03:46:07.561Z] [combat] Mud Monarchs Patrol 2 turns on Soot \u2014 d20 4 + ATK 7 = 11 vs Soot's AC 13 (vest +3) \u2014 \u2717 MISS\n[2026-09-01T03:46:07.561Z] [combat] Mud Monarchs Patrol 3 and 1 other close the distance.\n[2026-09-01T03:46:07.561Z] [debug] arbiter: template (reason=combat)\n[2026-09-01T03:46:07.562Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-09-01T03:46:07.562Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T03:46:07.815Z] [cognitive] neutral  (252ms)\n[2026-09-01T03:46:08.765Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n[2026-09-01T03:46:08.769Z] [system] evasive \u2014 harder to hit fades.\n[2026-09-01T03:46:08.807Z] [player] attack with the auralite talon\n",
+      "[2026-09-01T03:46:08.808Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=4 hooks=2\n[2026-09-01T03:46:08.808Z] [combat] Mud Monarchs Patrol 1 smokes \u2014 acid eats 4. (2/12 HP, 1 turn left)\n[2026-09-01T03:46:08.808Z] [combat] Mud Monarchs Patrol 1 blackens \u2014 corruption eats 2. (0/12 HP, 1 turn left)\n",
+      "[2026-09-01T03:46:08.811Z] [reward] Mud Monarchs Patrol 1 defeated. You recover Patched Cloth \u00d72.\n[2026-09-01T03:46:08.812Z] [reward] You strip the body: Bone Crossbow, Reclaimer's Salvage Vest (+8 TC). The kit took the fight badly.\n[2026-09-01T03:46:08.813Z] [combat] 3 attackers remain. Mud Monarchs Patrol 2 now in your sights.\n",
+      "[2026-09-01T03:46:08.813Z] [system] Forgotten Order standing +1 (now 36)\n[2026-09-01T03:46:08.813Z] [reward] +16 TC pried from the dust.\n[2026-09-01T03:46:08.856Z] [debug] attack: target=Mud Monarchs Patrol 2 range=mid reach.bands=[close] reach.label=Auralite Talon bareHand=false\n",
+      "[2026-09-01T03:46:08.857Z] [arbiter] The Arbiter holds up a hand. \"Auralite Talon works at close / arm's reach range only \u2014 you're at mid-range. ADVANCE to close in (they'll answer the approach), or attack with something that reaches.\"\n[2026-09-01T03:46:09.129Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (271ms)\n",
+      "[2026-09-01T03:46:12.633Z] [debug] ui: tap \"\ud83d\udd25\u2697 bone crossbow\"\n[2026-09-01T03:46:12.637Z] [system] perfect opening fades.\n[2026-09-01T03:46:12.680Z] [player] attack with the off-hand bone crossbow\n[2026-09-01T03:46:12.681Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=mid enemies=3 hooks=2\n",
+      "[2026-09-01T03:46:12.682Z] [debug] attack: target=Mud Monarchs Patrol 2 range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-09-01T03:46:12.683Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-09-01T03:46:12.683Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-09-01T03:46:12.733Z] [world] You commit forward with the searing acid-etched bone crossbow. Mud Monarchs Patrol 2 watches your hands.\n[2026-09-01T03:46:12.733Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T03:46:12.972Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (238ms)\n[2026-09-01T03:46:21.581Z] [world] Mud Monarchs Patrol 2 moves first. The pressure is immediate.\n",
+      "[2026-09-01T03:46:21.583Z] [combat] Mud Monarchs Patrol 3 \u2014 d20 \u2192 17 + ATK 8 = 25 vs your AC 23 \u2014 \u2713 HIT\n[2026-09-01T03:46:21.585Z] [combat] Mud Monarchs Patrol 2 \u2014 d20 \u2192 1 + ATK 9 = 10 vs your AC 23 \u2014 \u2717 FUMBLE\n[2026-09-01T03:46:21.586Z] [combat] Mud Monarchs Patrol 4 closes the distance.\n",
+      "[2026-09-01T03:46:21.586Z] [combat] You \u2014 d20 \u2192 19 + DEX 24 \u2212 1 (Whisper Fog) perfect opening (2\u00d7 dice) = 42 vs Mud Monarchs Patrol 2 AC 11 \u2014 \u2713 HIT\n[2026-09-01T03:46:21.588Z] [combat] Piercing flares \u2014 +3 on hit (weak \u2014 bites deep!).\n[2026-09-01T03:46:21.589Z] [combat] Weakness exposed \u2014 Mud Monarchs Patrol 2 flinches. (piercing \u00d72.25 for 32)\n",
+      "[2026-09-01T03:46:21.590Z] [combat] Mud Monarchs Patrol 2 folds under the searing acid-etched bone crossbow. 32 damage was enough. The room exhales.\n[2026-09-01T03:46:21.591Z] [reward] Mud Monarchs Patrol 2 defeated. You recover Aether Residue, Patched Cloth, Mud Monarch Sigil.\n",
+      "[2026-09-01T03:46:21.592Z] [reward] You strip the body: Bone Knife, Mud-Warden's Vest (+6 TC). The kit took the fight badly.\n[2026-09-01T03:46:21.592Z] [combat] 2 attackers remain. Mud Monarchs Patrol 3 now in your sights.\n[2026-09-01T03:46:21.592Z] [system] Forgotten Order standing +1 (now 37)\n[2026-09-01T03:46:21.593Z] [reward] +12 TC pried from the dust.\n",
+      "[2026-09-01T03:46:21.906Z] [combat] Mud Monarchs Patrol 3 deals 3 bludgeoning damage [edge of reach \u2014 halved]. You have 38 HP remaining.\n[2026-09-01T03:46:23.838Z] [debug] ui: tap \"approach\"\n[2026-09-01T03:46:23.888Z] [player] approach Mud Monarchs Patrol 3\n",
+      "[2026-09-01T03:46:23.888Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud monarchs patrol 3 resolved=Mud Monarchs Patrol 3 range=mid enemies=2 hooks=2\n[2026-09-01T03:46:23.890Z] [debug] move: advance from range=mid enemies=2 weather=Whisper Fog cost=1 partial=0\n[2026-09-01T03:46:23.893Z] [debug] move: field advance target=Mud Monarchs Patrol 3 d 1.77->0.77 band mid->close\n",
+      "[2026-09-01T03:46:23.893Z] [world] You close the gap with the Mud Monarchs Patrol 3 and Mud Monarchs Patrol 4. (range: close / arm's reach)\n[2026-09-01T03:46:23.893Z] [world] The field shifts around you \u2014 Mud Monarchs Patrol 4 now close / arm's reach.\n[2026-09-01T03:46:23.893Z] [combat] Mud Monarchs Patrol 4 turns on Soot \u2014 d20 5 + ATK 7 = 12 vs Soot's AC 13 (vest +3) \u2014 \u2717 MISS\n",
+      "[2026-09-01T03:46:23.894Z] [combat] Mud Monarchs Patrol 3 \u2014 d20 \u2192 10 + ATK 6 = 16 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-01T03:46:23.895Z] [debug] arbiter: template (reason=combat)\n[2026-09-01T03:46:23.895Z] [arbiter] \"Don't tell me what the Mud Monarchs Patrol 3 is,\" the Arbiter says, eyes flat. \"Show me what it was.\"\n",
+      "[2026-09-01T03:46:24.144Z] [cognitive] SWIM \u00b7 RETREAT  (247ms)\n[2026-09-01T03:46:25.122Z] [debug] ui: tap \"dodge\"\n[2026-09-01T03:46:25.133Z] [player] dodge\n[2026-09-01T03:46:25.134Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=2 hooks=2\n",
+      "[2026-09-01T03:46:25.135Z] [world] You commit to the dodge. Slip Mud Monarchs Patrol 3's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-01T03:46:25.206Z] [combat] Mud Monarchs Patrol 3 \u2014 d20 \u2192 4 + ATK 6 = 10 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n",
+      "[2026-09-01T03:46:25.206Z] [combat] Dodge \u2014 d20 \u2192 17 + DEX 24 = 41 vs ATK 10. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-01T03:46:25.206Z] [world] You slip Mud Monarchs Patrol 3's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n",
+      "[2026-09-01T03:46:25.208Z] [debug] ac-shift 23\u219226: race/base 10 + gear 20 + title 0 \u2192 trimmed 23 + status 3 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n",
+      "[2026-09-01T03:46:25.208Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 19 + ATK 7 = 26 vs your AC 26 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HI"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-01-1615-the-mission-speaks-where-you-stand #mtj5akkbvhf2 [inline 6/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtj5akkbvhf2"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-01-1615-the-mission-speaks-where-you-stand"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "6"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-01-1615-the-mission-speaks-where-you-stand"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db0c:41d2:ad2:ae51:4e84:c909",
+      "query": "user.ip:\"2607:fb90:db0c:41d2:ad2:ae51:4e84:c909\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-01T23:04:54.271000Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "4": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 325,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-01T23:04:54.238000Z",
+  "fingerprints": [
+    "07323043cc76e3eacca43581ca137638"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1949345416,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-01T23:04:54.240000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-01-1615-the-mission-speaks-where-you-stand",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-01-1615-the-mission-speaks-where-you-stand",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-01-1615-the-mission-speaks-where-you-stand",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-01-1615-the-mission-speaks-where-you-stand)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "634cdee04f7042578d5b2e49966259f8",
+  "previousEventID": "58db90fbec31468688c26ec9fa7eb2dd"
+}
