@@ -26907,20 +26907,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const dx = dir === 'east' ? 1 : dir === 'west' ? -1 : 0;
     const dy = dir === 'south' ? 1 : dir === 'north' ? -1 : 0;
     const newGrid = clampGridCell(prevGrid.x + dx, prevGrid.y + dy);
-    // Arrival = the new cell IS a named location's fixed canon cell (and it isn't
-    // the location we already stand on). Resolved against the canon table, never
-    // the re-centered visual map — so the cell that reads "Drakova" is always the
-    // same cell. EXCLUDE grid-event markers (whisper/contract "?"/"X" objectives,
-    // which are canonized at their tile but are NOT places you "arrive at" as a
-    // scene) — those are flipped to 'done' by resolveGridEventAt below instead.
+    // Arrival = the new cell IS a named location's fixed canon cell. Resolved
+    // against the canon table, never the re-centered visual map — so the cell
+    // that reads "Drakova" is always the same cell. EXCLUDE grid-event markers
+    // (whisper/contract "?"/"X" objectives, which are canonized at their tile but
+    // are NOT places you "arrive at" as a scene) — those are flipped to 'done' by
+    // resolveGridEventAt below instead.
+    // ⚠⚠⚠ OTA-1619 — the id no longer gates this. `currentLocationId` STICKS while
+    // you walk a location's open ground, so stepping BACK onto its own anchor cell
+    // compared equal and produced no arrival: no line, no scene, no gate, no
+    // ENTER OUTPOST — the owner's "kills an auto route when you hit those tiles"
+    // and "I can't leave the tile". arb103 taught both course paths that arrival
+    // is the CELL; the step, which every course walks on, had been left out.
     const canonHere = canonicalLocationAtCell(newGrid.x, newGrid.y);
     const isGridEventMarker = !!canonHere
       && (get().worldMemory?.canonLocations ?? []).some(
         (e) => e.id === canonHere.locationId && !!e.marker,
       );
-    const arrival = canonHere && canonHere.locationId !== player.currentLocationId && !isGridEventMarker
-      ? canonHere
-      : null;
+    const arrival = canonHere && !isGridEventMarker ? canonHere : null;
     // Derive the re-centered VISUAL coordinate (mapX/mapY) for the thematic map +
     // surveys + per-tile micro state. `step` keeps the old shape so the unchanged
     // visual-frame code below works as-is; only `landedOn` and the distance math
@@ -27183,9 +27187,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set((s) => (s.currentScene
       ? { currentScene: { ...s.currentScene, vendor: null, elevatedOn: null } }
       : s));
-    if (step.landedOn && step.landedOn.locationId !== player.currentLocationId) {
+    // ⚠ OTA-1619 — same-id re-entry announces and rebuilds too (this gate repeated
+    // the id test above). travelTo re-snaps to the cell already under the boots,
+    // and arb118 keys the milestone on a FIRST arrival, so out-and-back farms nothing.
+    if (step.landedOn) {
       get().appendLog('world', `You walk ${dir}. You arrive at ${step.landedOn.locationName}.`);
       get().travelTo(step.landedOn.locationId);
+      // ⚠ OTA-1619 — a whisper tile can sit ON an anchor cell (ota1222's censer thief);
+      // this return skipped the tail's resolver. Post-travelTo mapX/mapY is that frame.
+      const lp = get().player;
+      if (lp) resolveWhispersForTile(get, set, lp.mapX ?? step.x, lp.mapY ?? step.y);
       return;
     }
     // ⚠⚠ OTA-1301 — THE GEAR STAYS ON THE TILE YOU LEFT.

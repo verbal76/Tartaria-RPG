@@ -26783,7 +26783,24 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // decided by the reader, never by the component. The active contract sorts above
 // everything, the ground under the boots breaks the tie, and MISSIONS left the
 // MORE tray for the primary row.
-export const OTA_BUILD_ID = '2026-09-02-1618-the-slate-is-the-whole-slate';
+// ⚠⚠⚠ OTA-1619 — THE GATE COMES BACK WHEN YOU DO. Owner: "there's definitely
+// something going on with travel now" — and, typed into the feed himself: "when
+// I landed on this outpost tile that has the inner Outpost button… it looks like
+// that now kills an auto route if you're in one when you hit those tiles." His
+// 00:38 log: course to The Buried Cities, 2 tiles, stepped to 1, stepped onto the
+// cell — and the feed said "The Storm's Eye lies further east — 6 tiles", the
+// reading FROM the Buried Cities cell. No arrival line, no scene, no gate, no
+// ENTER OUTPOST; the mission anchored there never spoke. Last night's "I can't
+// leave the tile" was the same silence. ROOT CAUSE: stepDirection decided you
+// had arrived only when the named cell's id DIFFERED from currentLocationId —
+// but that id sticks while you walk a location's open ground, so stepping back
+// onto its own anchor compared equal and everything hanging off landedOn went
+// quiet. arb103 had written this exact lesson down ("arrival is the CELL, not
+// the id") and fixed both course paths; the step, which every course walks on,
+// was left out. OTA-1606 removed the auto-enter that had been masking it. One
+// clause, dropped in both places it appeared; arb118's first-arrival milestone
+// gate means out-and-back farms nothing.
+export const OTA_BUILD_ID = '2026-09-02-1619-the-gate-comes-back-when-you-do';
 // golem catch-up 2026-09-01: markerless publish of OTA-1617 - the ask names its
 // object, and SET COURSE moved onto the mission row. hal took the marker push.
 // golem catch-up 2026-09-01: markerless publish of OTA-1608 - the portrait

@@ -35,6 +35,9 @@ jest.mock('expo-file-system', () => ({
   EncodingType: { UTF8: 'utf8', Base64: 'base64' },
 }));
 jest.mock('expo-speech', () => ({ speak: jest.fn(), stop: jest.fn(), isSpeakingAsync: jest.fn(async () => false) }));
+// OTA-1619 — the cardinal audit places its walk on measured open ground.
+import { canonicalCellOf, canonicalLocationAtCell } from '../app/engine/worldMap';
+import { placedAt } from '../test-utils/placePlayer';
 jest.mock('expo-av', () => ({
   Audio: {
     setAudioModeAsync: jest.fn(),
@@ -246,6 +249,29 @@ describe('Uniqueness Audit — Tartaria Realms content pools', () => {
     // <dir>." pattern. Stepping cardinal-only avoids landing on a new
     // location (which short-circuits with "You walk <dir>. You arrive
     // at ...") for the audit's main pool measurement.
+    //
+    // ⚠ OTA-1619 — START ON OPEN GROUND, AND PROVE IT. The N/E/S/W square
+    // below returns to its origin every fourth step, and the origin used to be
+    // the spawn location's own anchor cell. That was silent only because
+    // arrival was gated on a CHANGE of location id (the defect 1619 removed);
+    // now stepping back onto a named cell is an arrival, so one direction in
+    // four printed no filler and the pool read 48/100 — three pools of 16
+    // instead of four (baseline on 07a8976e: 64/100). This audit measures the
+    // FILLER pool, so the square is moved onto ground where all four cells are
+    // unnamed — checked here rather than assumed. (The first offset tried, +3/+3,
+    // landed the lap on Obsidian Pillars; this one was found by scanning the
+    // canon table for a square with no name on any of its four cells.)
+    {
+      const p = store.getState().player!;
+      const base = canonicalCellOf('buried_cities');
+      const ox = base.x - 2;
+      const oy = base.y - 3;
+      const square: Array<[number, number]> = [[ox, oy], [ox, oy - 1], [ox + 1, oy - 1], [ox + 1, oy]];
+      for (const [cx, cy] of square) expect(canonicalLocationAtCell(cx, cy)).toBeNull();
+      store.setState({
+        player: { ...p, ...placedAt('buried_cities', { dx: -2, dy: -3 }) } as never,
+      });
+    }
     const captured: string[] = [];
     const origAppend = store.getState().appendLog;
     store.setState({
