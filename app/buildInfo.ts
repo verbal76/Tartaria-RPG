@@ -26801,6 +26801,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // clause, dropped in both places it appeared; arb118's first-arrival milestone
 // gate means out-and-back farms nothing.
 export const OTA_BUILD_ID = '2026-09-02-1619-the-gate-comes-back-when-you-do';
+// golem catch-up 2026-09-02: markerless publish of OTA-1619 - the step arrives on
+// the cell, not on a change of id; the gate comes back when you do. hal took the marker.
 // golem catch-up 2026-09-01: markerless publish of OTA-1617 - the ask names its
 // object, and SET COURSE moved onto the mission row. hal took the marker push.
 // golem catch-up 2026-09-01: markerless publish of OTA-1608 - the portrait
