@@ -26928,6 +26928,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // The step is gone — SET COURSE plans, → DESTINATION walks; the clock, the
 // stamina and the scene under the buttons are untouched by the tap.
 export const OTA_BUILD_ID = '2026-09-02-1632-set-course-stays-put';
+// golem catch-up 2026-09-02: markerless publish of OTA-1632 - SET COURSE plans,
+// the travel-row tap walks; no auto-step, no re-rolled tile. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-02-1631-max-means-all-of-it';
 // golem catch-up 2026-09-02: markerless publish of OTA-1631 - MAX offers all
 // the pack can pay for (cap 99, one bound). hal took the marker.
