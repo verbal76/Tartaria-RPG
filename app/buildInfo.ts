@@ -26901,6 +26901,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // gameStore, which was two lines under its ratchet), the recovery from
 // defeatCredit where the goods are granted.
 export const OTA_BUILD_ID = '2026-09-02-1628-the-whisper-beats-pop-up-too';
+// golem catch-up 2026-09-02: markerless publish of OTA-1628 - the whisper
+// meet, recovery and hand-back arm are cards. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-02-1627-the-hour-can-be-waited-for';
 // golem catch-up 2026-09-02: markerless publish of OTA-1627 - wait passes the
 // hours and the cold camp wakes in place. hal took the marker.
