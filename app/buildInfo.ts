@@ -26862,6 +26862,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // verb at full confidence, and ota1623 holds every ask and label to the gate's
 // own number.
 export const OTA_BUILD_ID = '2026-09-02-1623-the-gerund-is-the-verb';
+// golem catch-up 2026-09-02: markerless publish of OTA-1623 - inflected verbs
+// parse at full confidence; every ask/label held to the gate. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-02-1622-it-pops-up-in-your-face';
 // golem catch-up 2026-09-02: markerless publish of OTA-1622 - a card on every
 // stage close in all four families + the player-shaped walker. hal took the marker.
