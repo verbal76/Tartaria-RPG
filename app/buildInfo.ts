@@ -26893,6 +26893,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // morning, then looks at the ground again where the player stands so the
 // camp wakes in place; refused in a fight; the cold-camp line names it.
 export const OTA_BUILD_ID = '2026-09-02-1627-the-hour-can-be-waited-for';
+// golem catch-up 2026-09-02: markerless publish of OTA-1627 - wait passes the
+// hours and the cold camp wakes in place. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-02-1626-the-word-is-the-direction';
 // golem catch-up 2026-09-02: markerless publish of OTA-1626 - bare direction
 // words parse; "n" inside an outpost moves rooms. hal took the marker.
