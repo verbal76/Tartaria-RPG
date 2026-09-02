@@ -26816,6 +26816,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the main one. missionStatusCards (the reader) stays as the trace's sibling;
 // no surface renders it — recorded in HANDOFF as debt.
 export const OTA_BUILD_ID = '2026-09-02-1620-the-whole-screen-behind-the-button';
+// golem catch-up 2026-09-02: markerless publish of OTA-1620 - MISSIONS opens the
+// Contracts screen itself; the status card is deleted. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-02-1619-the-gate-comes-back-when-you-do';
 // golem catch-up 2026-09-02: markerless publish of OTA-1619 - the step arrives on
 // the cell, not on a change of id; the gate comes back when you do. hal took the marker.
