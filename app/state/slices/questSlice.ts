@@ -126,13 +126,18 @@ export interface QuestSlice {
    *  advances exactly as it would have; only the spawn and the freeze-for-kill
    *  are skipped. Absent/false is the old behaviour, unchanged. */
   advanceHunt: (huntId: string, opts?: { peaceful?: boolean }) => void;
-  /** OTA-1600 — the stinger popup state + its one dismiss. */
-  pendingMissionStinger: { title: string; line: string } | null;
+  /** OTA-1600 — the stinger popup state + its one dismiss.
+   *  ⚠ OTA-1622 — carries the close's freight too (`next`, `granted`) when a
+   *  fight stood up on a stage that also closed. */
+  pendingMissionStinger: MissionCloseCard | null;
   dismissMissionStinger: () => void;
-  /** OTA-1602 — the beat card: a stage that closes in place (same tile, no
-   *  fight stood up) raises its closing prose + next objective as a scene. */
-  pendingMissionBeat: { title: string; line: string; next: string | null } | null;
+  /** OTA-1602 — the beat card. ⚠⚠⚠ OTA-1622 — EVERY close raises it now, not
+   *  only the same-tile, no-fight, not-last ones: see `raiseMissionClose`. */
+  pendingMissionBeat: MissionCloseCard | null;
   dismissMissionBeat: () => void;
+  /** OTA-1622 — a close that lands while a card is already up WAITS here
+   *  instead of overwriting it; CONTINUE brings the next one forward. */
+  missionCloseQueue: MissionCloseCard[];
   /** OTA-1610 — a successful flee holds the ground trigger on the fled cell
    *  until the boots actually leave it (any cell change clears it). */
   missionFleeHoldCell: { x: number; y: number } | null;
@@ -334,6 +339,9 @@ export function resolveStageEscortClear(
             : st));
           const nextDef = escortRec.def.stages[nextStage];
           get().appendLog('reward', `✦ The last of them is down. "${escortRec.def.title}" moves on.`);
+          // OTA-1622 — the direction the block below composes rides onto the
+          // close card raised after it.
+          let clearNext: string | null = null;
           if (nextDef) {
             get().appendLog('world', nextDef.narration);
             if (nextDef.arbiter) get().appendLog('arbiter', nextDef.arbiter);
@@ -358,6 +366,7 @@ export function resolveStageEscortClear(
               const movedGround = nextId !== hereId;
               const dir = QS.nextStageDirection(nextDef as never, (nextDef as { locationName?: string }).locationName ?? null, movedGround, escortRec.family);
               if (dir) get().appendLog('system', dir);
+              clearNext = dir ?? null;
               const liveNow = get().player;
               if (movedGround && liveNow && liveNow.currentLocationId !== nextId
                   && liveNow.travelTarget?.locationId !== nextId) {
@@ -381,12 +390,112 @@ export function resolveStageEscortClear(
               'reward',
               `✦ Storyline complete in the field — ${escortRec.def.title}. Return to a posting agent to turn it in.`,
             );
+          } else if (escortRec.family === 'mystery') {
+            // ⚠ OTA-1622 — a mystery ending on a kill said NOTHING here (only
+            // the storyline branch above had a line). Same defect, same fix.
+            get().appendLog(
+              'reward',
+              `✦ "${escortRec.def.title}" is done in the field. Return to a posting agent to turn it in.`,
+            );
           }
+          // ⚠⚠⚠ OTA-1622 — THE CLEAR IS A CLOSE, so it is a card: over the field
+          // it just cleared, with the next beat's prose and command word.
+          raiseMissionClose(get, set, {
+            title: escortRec.def.title,
+            line: `The last of them is down.${nextDef ? `\n\n${nextDef.narration}` : ''}`,
+            next: nextDef
+              ? clearNext
+              : escortRec.family === 'storyline'
+                ? `✦ Storyline complete in the field — ${escortRec.def.title}. Return to a posting agent to turn it in.`
+                : `✦ "${escortRec.def.title}" is done in the field. Return to a posting agent to turn it in.`,
+            granted: [],
+          });
           void get().persist();
         }
       }
     }
   }
+}
+
+/** ⚠⚠⚠ OTA-1622 — THE CARD EVERY CLOSE RAISES. */
+export interface MissionCloseCard {
+  title: string;
+  /** The closing prose (or the stinger line when a fight stood up). */
+  line: string;
+  /** "▸ Next: … · <ask> · bring …" — or the turn-in line on a final close. */
+  next: string | null;
+  /** What the close put in the pack — the thing the owner never knew he had. */
+  granted: string[];
+}
+
+/**
+ * ⚠⚠⚠ OTA-1622 — EVERY STAGE CLOSE POPS UP IN YOUR FACE. Owner's rule, verbatim:
+ * *"every time you should finish a segment of a mission or a quest or whatever
+ * it is. it shouldn't be quiet. it shouldn't be able to be buried in the log
+ * feed. it should pop up on your face. you should know that you did the thing
+ * so you can just move on. I spent so much time on that scaled never even
+ * knowing that I had it even if it would have spawned a fight and we
+ * interrupted the fight with the pop-up out of disfleed and left and moved on
+ * with the mission."*
+ *
+ * THE MEASUREMENT. His 01:43:31 log: the scale stage of the Bog Dragon hunt
+ * closed — narration, "✦ … — mission item.", "▸ Next: …" — three lines that a
+ * Gutter Rat ambush on the same action pushed up the feed before he looked. He
+ * went on typing the closed stage's verb for twenty minutes. OTA-1602's beat
+ * card existed and did not fire: it was gated three ways (same tile only, no
+ * fight stood up, not the last stage). A close that MOVED the ground was
+ * feed-only ("the travel leg is the separator" — it was not; the ambush was).
+ * The escort clear, the apex kill, every final stage and the whole faction
+ * family were feed-only too. The player-shaped walker's very first hunt
+ * reported "closed with NO card" on all five stages.
+ *
+ * ⚠⚠ ONE WRITER. Every path that moves a record forward calls this; nothing
+ * else sets `pendingMissionBeat`/`pendingMissionStinger` (ota1622 pins the
+ * count). A `fight` card goes up as the stinger (FIGHT button, over the field);
+ * everything else is a CONTINUE card. A second close while one is up WAITS in
+ * `missionCloseQueue` — a card that overwrites a card is a buried card. The
+ * feed keeps every line it printed before; the card is in addition, and the
+ * raise is logged so a device log can prove it went up.
+ */
+export function raiseMissionClose(
+  get: () => GameStore,
+  // ⚠ The function form only — gameStore's helpers and defeatCredit carry a
+  // narrower setter than the slice's SetState, and this writer needs no more.
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  card: MissionCloseCard & { fight?: boolean },
+): void {
+  const { fight, ...rest } = card;
+  get().appendLog('debug', `mission card: "${card.title}" · ${fight ? 'fight' : 'close'}${card.next ? ` · ${card.next}` : ''}${card.granted.length ? ` · got ${card.granted.join(', ')}` : ''}`);
+  if (fight) {
+    set(() => ({ pendingMissionStinger: rest }));
+    return;
+  }
+  if (get().pendingMissionBeat) {
+    set((s) => ({ missionCloseQueue: [...(s.missionCloseQueue ?? []), rest] }));
+    return;
+  }
+  set(() => ({ pendingMissionBeat: rest }));
+}
+
+/** The grants in `stages[from, to)` that are actually in the pack now — what
+ *  the close card lists. Pack-checked, like `grantStageItems`, so a receipt
+ *  never names a thing that did not arrive. */
+export function grantedNames(
+  get: () => GameStore,
+  stages: ReadonlyArray<{ grants?: { item: string; quantity?: number } }>,
+  from: number,
+  to: number,
+): string[] {
+  const inv = get().player?.inventory ?? [];
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const QS = require('../../engine/questStage') as typeof import('../../engine/questStage');
+  const out: string[] = [];
+  for (let i = Math.max(0, from); i < Math.min(to, stages.length); i++) {
+    const g = stages[i]?.grants;
+    if (!g) continue;
+    if (QS.countInPack(inv, g.item) >= (g.quantity ?? 1)) out.push(g.item);
+  }
+  return out;
 }
 
 /**
@@ -1715,11 +1824,19 @@ export const createQuestSlice = (
 
   pendingMissionStinger: null,
   dismissMissionStinger() {
+    // ⚠ OTA-1622 — the tap is logged, so a device log can prove the card was
+    // seen (MissionEncounterCard never logged its taps; that gap cost a day).
+    get().appendLog('debug', 'ui: tap "mission card · FIGHT"');
     set(() => ({ pendingMissionStinger: null }));
   },
   pendingMissionBeat: null,
+  missionCloseQueue: [],
   dismissMissionBeat() {
-    set(() => ({ pendingMissionBeat: null }));
+    get().appendLog('debug', 'ui: tap "mission card · CONTINUE"');
+    set((s) => {
+      const [head, ...rest] = s.missionCloseQueue ?? [];
+      return { pendingMissionBeat: head ?? null, missionCloseQueue: rest };
+    });
   },
   missionFleeHoldCell: null,
   advanceHunt(huntId, opts) {
@@ -1779,10 +1896,11 @@ export const createQuestSlice = (
     }
     get().appendLog('world', stageDef.narration);
     if (stageDef.arbiter) get().appendLog('arbiter', stageDef.arbiter);
-    // OTA-1602 — remembered from the direction block below: a next stage on
-    // THIS tile has no travel leg to separate it, so the close raises the
-    // beat card once the record moves (and only if no fight stood up).
-    let sameTileBeat: { line: string; next: string | null } | null = null;
+    // ⚠⚠⚠ OTA-1622 — remembered from the direction block below for the close
+    // card: the "▸ Next" line and what the close handed over. (OTA-1602 kept
+    // these only for a same-tile close; the owner's rule is EVERY close.)
+    let closeNext: string | null = null;
+    let grantedNow: string[] = [];
     // ⚠⚠ P19 — THE STAGE ACTUALLY HANDS YOU THE THING NOW. Owner: *"if it's calling for
     // you to investigate an area, find a certain object and take that object to the next
     // area, well then it has to give you the damn object."* The narration has always
@@ -1794,6 +1912,7 @@ export const createQuestSlice = (
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const CM = require('../../engine/contractMarkers') as typeof import('../../engine/contractMarkers');
       deps.grantStageItems(get, set, hunt.title, hunt.stages, record.stage, record.stage + 1);
+      grantedNow = grantedNames(get, hunt.stages, record.stage, record.stage + 1);
       // ⚠ AND IT SAYS WHERE THE NEXT ONE IS. *"each stage has to direct you to the next
       // stage. otherwise you have no idea where you're going."* Speaks only when there is
       // something to say — new ground, a person to find, or a thing to bring.
@@ -1817,7 +1936,7 @@ export const createQuestSlice = (
         // word for the next beat, not only its ground and its item.
         const dir = QS.nextStageDirection(nextDef, nextDef.locationName ?? null, movedGround, 'hunt');
         if (dir) get().appendLog('system', dir);
-        if (!movedGround) sameTileBeat = { line: stageDef.narration, next: dir ?? null };
+        closeNext = dir ?? null;
         // ⚠⚠ P19 — AND IT ACTUALLY SETS THE COURSE. Owner: *"it didn't auto route me to
         // the next stage."* He was not exaggerating — `advanceMissionRoute` reads
         // `activeFactionQuests` and NOTHING ELSE, so hunts have never had a route chain
@@ -1925,9 +2044,19 @@ export const createQuestSlice = (
     // up as a modal with the mission title, and into the log so the record
     // keeps it. One writer, so the verb path, the card door, and the arrival
     // arm all get the same curtain.
-    if (stoodUp && stageDef.stinger) {
-      get().appendLog('combat', stageDef.stinger);
-      set(() => ({ pendingMissionStinger: { title: hunt.title, line: stageDef.stinger! } }));
+    // ⚠⚠ OTA-1622 — the FIGHT card carries the close's freight too: if this
+    // stage also CLOSED (a mid-chain boss that does not freeze), the next
+    // beat's word rides on it; a frozen stage shows what the close handed
+    // over and holds the next until the last body drops.
+    if (stoodUp) {
+      if (stageDef.stinger) get().appendLog('combat', stageDef.stinger);
+      raiseMissionClose(get, set, {
+        title: hunt.title,
+        line: stageDef.stinger ?? stageDef.narration,
+        next: freezeForKill ? null : closeNext,
+        granted: grantedNow,
+        fight: true,
+      });
     }
     if (!freezeForKill) {
       // ⚠ OTA-1219 — auto-consume pure-narration (checkKind: null) stages, the
@@ -1957,13 +2086,19 @@ export const createQuestSlice = (
       // ⚠⚠⚠ OTA-1602 — THE BEAT CARD. Owner: "multistage missions like the
       // market heists either need a cutscene pop-up like the fight
       // announcements or a conversation card pop up in between stages to
-      // separate and progress the mission." A stage that closes IN PLACE has
-      // no travel leg, no arrival, no stinger — its close was one line
-      // scrolling past. The closing prose and the next objective go up as a
-      // card instead (and never over a completion, which celebrates itself).
-      const beat = sameTileBeat;
-      if (!stoodUp && beat && nextStage < hunt.stages.length) {
-        set(() => ({ pendingMissionBeat: { title: hunt.title, line: beat.line, next: beat.next } }));
+      // separate and progress the mission."
+      // ⚠⚠⚠ OTA-1622 — ON EVERY CLOSE, not only in place, and on the last one
+      // too ("completion celebrates itself" was a feed line under the loot).
+      // A stood-up stage already raised its FIGHT card above.
+      if (!stoodUp) {
+        raiseMissionClose(get, set, {
+          title: hunt.title,
+          line: stageDef.narration,
+          next: nextStage >= hunt.stages.length
+            ? `✦ Return to a posting agent to turn in "${hunt.title}".`
+            : closeNext,
+          granted: grantedNow,
+        });
       }
     }
     void get().persist();
@@ -2315,14 +2450,16 @@ export const createQuestSlice = (
     if (stageDef.arbiter) get().appendLog('arbiter', stageDef.arbiter);
     // ⚠⚠ P19 — the same three things the hunts got: hand over what the stage promised,
     // say where the next one is, and actually set the course.
-    // OTA-1602 — and the same beat card: a stage that closes on its own tile.
-    let sameTileBeatM: { line: string; next: string | null } | null = null;
+    // OTA-1602 — and the same beat card. OTA-1622 — on EVERY close (see advanceHunt).
+    let closeNextM: string | null = null;
+    let grantedM: string[] = [];
     {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const QS = require('../../engine/questStage') as typeof import('../../engine/questStage');
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const CM = require('../../engine/contractMarkers') as typeof import('../../engine/contractMarkers');
       deps.grantStageItems(get, set, mystery.title, mystery.stages, record.stage, record.stage + 1);
+      grantedM = grantedNames(get, mystery.stages, record.stage, record.stage + 1);
       const nextDef = mystery.stages[record.stage + 1];
       if (nextDef) {
         const anchor = CM.contractAnchorId(mystery);
@@ -2331,7 +2468,7 @@ export const createQuestSlice = (
         const moved = nextId !== hereId;
         const dir = QS.nextStageDirection(nextDef, nextDef.locationName ?? null, moved, 'mystery');
         if (dir) get().appendLog('system', dir);
-        if (!moved) sameTileBeatM = { line: stageDef.narration, next: dir ?? null };
+        closeNextM = dir ?? null;
         const liveNow = get().player;
         if (moved && liveNow && liveNow.currentLocationId !== nextId
             && liveNow.travelTarget?.locationId !== nextId) {
@@ -2351,7 +2488,16 @@ export const createQuestSlice = (
     // and the conversation card's FIGHT branch behave identically in all three
     // families.
     const spawnedM = spawnStageEscort(get, set, deps, player, stageDef.spawn);
-    if (spawnedM) { void get().persist(); return; }
+    if (spawnedM) {
+      // ⚠ OTA-1622 — a mystery that stands bodies up gets the FIGHT card too;
+      // it had no stinger and its stand-up was two feed lines.
+      raiseMissionClose(get, set, {
+        title: mystery.title, line: (stageDef as { stinger?: string }).stinger ?? stageDef.narration,
+        next: null, granted: grantedM, fight: true,
+      });
+      void get().persist();
+      return;
+    }
     // Final stage is the "synthesis" — the player has the trophy in hand
     // (narratively); advance the stage past the end so turn-in unlocks.
     let nextStage = record.stage + 1;
@@ -2381,19 +2527,15 @@ export const createQuestSlice = (
           }
         : s,
     );
-    // ⚠⚠ OTA-1602 — the beat card (see advanceHunt). Reaching here means no
-    // spawn stood up (spawnedM returned above), so an in-place close raises it
-    // whenever the mystery still has road left.
-    const beatM = sameTileBeatM;
-    if (beatM && nextStage < mystery.stages.length) {
-      set(() => ({ pendingMissionBeat: { title: mystery.title, line: beatM.line, next: beatM.next } }));
-    }
-    if (nextStage >= mystery.stages.length) {
-      get().appendLog(
-        'reward',
-        `✦ ${mystery.trophyName} recovered. Return to a posting agent to turn in "${mystery.title}".`,
-      );
-    }
+    // ⚠⚠ OTA-1602 — the beat card (see advanceHunt). OTA-1622 — every close,
+    // the last one included: the "recovered" line rides the card as its next.
+    const doneM = nextStage >= mystery.stages.length;
+    const recoveredM = `✦ ${mystery.trophyName} recovered. Return to a posting agent to turn in "${mystery.title}".`;
+    if (doneM) get().appendLog('reward', recoveredM);
+    raiseMissionClose(get, set, {
+      title: mystery.title, line: stageDef.narration,
+      next: doneM ? recoveredM : closeNextM, granted: grantedM,
+    });
     void get().persist();
   },
 
@@ -2663,14 +2805,16 @@ export const createQuestSlice = (
     get().appendLog('world', stageDef.narration);
     if (stageDef.arbiter) get().appendLog('arbiter', stageDef.arbiter);
     // ⚠⚠ P19 — hand over what the stage promised, say where the next one is, set the course.
-    // OTA-1602 — and the same beat card: a chapter that closes on its own tile.
-    let sameTileBeatS: { line: string; next: string | null } | null = null;
+    // OTA-1602 — and the same beat card. OTA-1622 — on EVERY close (see advanceHunt).
+    let closeNextS: string | null = null;
+    let grantedS: string[] = [];
     {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const QS = require('../../engine/questStage') as typeof import('../../engine/questStage');
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const CM = require('../../engine/contractMarkers') as typeof import('../../engine/contractMarkers');
       deps.grantStageItems(get, set, def.title, def.stages, record.stage, record.stage + 1);
+      grantedS = grantedNames(get, def.stages, record.stage, record.stage + 1);
       const nextDef = def.stages[record.stage + 1];
       if (nextDef) {
         const anchor = CM.contractAnchorId(def);
@@ -2679,7 +2823,7 @@ export const createQuestSlice = (
         const moved = nextId !== hereId;
         const dir = QS.nextStageDirection(nextDef, nextDef.locationName ?? null, moved, 'storyline');
         if (dir) get().appendLog('system', dir);
-        if (!moved) sameTileBeatS = { line: stageDef.narration, next: dir ?? null };
+        closeNextS = dir ?? null;
         const liveNow = get().player;
         if (moved && liveNow && liveNow.currentLocationId !== nextId
             && liveNow.travelTarget?.locationId !== nextId) {
@@ -2695,7 +2839,16 @@ export const createQuestSlice = (
     // ⚠⚠⚠ OTA-1583 — see the mystery path above and spawnStageEscort's note. A
     // storyline stage that authors a `spawn` now stands it up, and the chapter
     // holds until it is cleared.
-    if (spawnStageEscort(get, set, deps, player, stageDef.spawn)) { void get().persist(); return; }
+    if (spawnStageEscort(get, set, deps, player, stageDef.spawn)) {
+      // ⚠ OTA-1622 — the FIGHT card for a storyline stand-up (the Ooze on the
+      // stair had none).
+      raiseMissionClose(get, set, {
+        title: def.title, line: (stageDef as { stinger?: string }).stinger ?? stageDef.narration,
+        next: null, granted: grantedS, fight: true,
+      });
+      void get().persist();
+      return;
+    }
     let nextStage = record.stage + 1;
     // OTA-871 — auto-consume trailing pure-narration (checkKind: null) epilogue stages so a
     // storyline authored with a denouement after its final action doesn't hang one stage
@@ -2720,18 +2873,15 @@ export const createQuestSlice = (
           }
         : s,
     );
-    // ⚠⚠ OTA-1602 — the beat card (see advanceHunt). No spawn stood up (the
-    // early return above), so an in-place close raises it mid-arc.
-    const beatS = sameTileBeatS;
-    if (beatS && nextStage < def.stages.length) {
-      set(() => ({ pendingMissionBeat: { title: def.title, line: beatS.line, next: beatS.next } }));
-    }
-    if (nextStage >= def.stages.length) {
-      get().appendLog(
-        'reward',
-        `✦ Storyline complete in the field — ${def.title}. Return to a posting agent to turn it in.`,
-      );
-    }
+    // ⚠⚠ OTA-1602 — the beat card (see advanceHunt). OTA-1622 — every close,
+    // the last one included.
+    const doneS = nextStage >= def.stages.length;
+    const completeS = `✦ Storyline complete in the field — ${def.title}. Return to a posting agent to turn it in.`;
+    if (doneS) get().appendLog('reward', completeS);
+    raiseMissionClose(get, set, {
+      title: def.title, line: stageDef.narration,
+      next: doneS ? completeS : closeNextS, granted: grantedS,
+    });
     void get().persist();
   },
 

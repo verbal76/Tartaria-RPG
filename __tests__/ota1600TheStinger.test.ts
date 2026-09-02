@@ -169,7 +169,12 @@ describe('OTA-1600 — every stage that stands bodies up carries a line, and no 
 
   it('⚠ the one writer sets it only when something actually stood up', () => {
     const QSL = readFileSync(join(__dirname, '..', 'app', 'state', 'slices', 'questSlice.ts'), 'utf8');
-    expect(QSL).toContain('if (stoodUp && stageDef.stinger) {');
+    // ⚠ OTA-1622 superseded the line: the FIGHT card is raised through
+    // `raiseMissionClose` whenever bodies stood up (the authored stinger when
+    // there is one, the stage's prose otherwise), and it now carries the
+    // close's freight. The gate is still `stoodUp` and nothing else.
+    expect(QSL).toContain('if (stoodUp) {\n      if (stageDef.stinger) get().appendLog(\'combat\', stageDef.stinger);');
+    expect(QSL).toContain('fight: true,');
     // And the modal is story, not a tip: the component has no hints gate.
     const MODAL = readFileSync(join(__dirname, '..', 'app', 'components', 'MissionStingerModal.tsx'), 'utf8');
     expect(MODAL).not.toContain('setHintsDisabled');

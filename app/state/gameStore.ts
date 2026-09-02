@@ -330,7 +330,7 @@ import type {
   RepairOpts,
   RepairVerdict,
 } from '../engine/crucibleGuard';
-import { createQuestSlice, resolveStageEscortClear } from './slices/questSlice';
+import { createQuestSlice, resolveStageEscortClear, type MissionCloseCard } from './slices/questSlice';
 import { creditDefeatedTarget } from './defeatCredit';
 import { createBoardSlice } from './slices/boardSlice';
 import { setLastBootBreadcrumb } from '../diagnostics/runtimePressure'; // OTA-1276
@@ -7254,13 +7254,13 @@ export interface GameStore {
   /** ⚠ OTA-1581 — `peaceful` skips the spawn and the freeze-for-kill; see the
    *  questSlice declaration for why the mission card needs both. */
   advanceHunt: (huntId: string, opts?: { peaceful?: boolean }) => void;
-  /** OTA-1600 — the stinger popup: set when a fight-stage stands bodies up. */
-  pendingMissionStinger: { title: string; line: string } | null;
+  /** OTA-1600 stinger / OTA-1602 beat card. OTA-1622 — both carry the close's freight and
+   *  are raised on EVERY close by the one writer `raiseMissionClose` (questSlice); queued. */
+  pendingMissionStinger: MissionCloseCard | null;
   dismissMissionStinger: () => void;
-  /** OTA-1602 — the beat card: set when a stage closes in place (same tile, no
-   *  fight stood up) so the transition reads as a scene, not a scrolled line. */
-  pendingMissionBeat: { title: string; line: string; next: string | null } | null;
+  pendingMissionBeat: MissionCloseCard | null;
   dismissMissionBeat: () => void;
+  missionCloseQueue: MissionCloseCard[];
   /** OTA-1610 — a successful flee holds the ground trigger on the fled cell. */
   missionFleeHoldCell: { x: number; y: number } | null;
   turnInHunt: (titleOrId: string, remote?: boolean) => void;
@@ -31338,18 +31338,18 @@ function advanceActiveFactionQuests(
     // index (nextStage), narrate it. Otherwise the quest is now ready
     // for turn-in (no more stages to play).
     const justPlayed = def.stages[nextStage];
+    const bringWord = `Bring word to any ${def.factionId.replace(/_/g, ' ')} agent.`;
     if (justPlayed) {
       get().appendLog('world', justPlayed.narration);
       if (justPlayed.arbiter) get().appendLog('arbiter', justPlayed.arbiter);
     } else {
-      // Crossed past the last stage — quest is turn-in-ready. Surface
-      // a one-line nudge so the player knows where to take it.
-      const fname = def.factionId.replace(/_/g, ' ');
-      get().appendLog(
-        'arbiter',
-        `The Arbiter glances at you. "${def.title} is done. Bring word to any ${fname} agent."`,
-      );
+      get().appendLog('arbiter', `The Arbiter glances at you. "${def.title} is done. ${bringWord}"`);
     }
+    // ⚠⚠⚠ OTA-1622 — the fourth family gets the close card too (questSlice.raiseMissionClose).
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    (require('./slices/questSlice') as typeof import('./slices/questSlice')).raiseMissionClose(get, set, justPlayed
+      ? { title: def.title, line: justPlayed.narration, next: null, granted: [] }
+      : { title: def.title, line: `${def.title} is done.`, next: bringWord, granted: [] });
     return { ...rec, stage: nextStage };
   });
   if (!mutated) return;

@@ -31,10 +31,13 @@
 import React from 'react';
 import { Modal, View, Text, Pressable, StyleSheet } from 'react-native';
 
+// ⚠⚠⚠ OTA-1622 — EVERY CLOSE COMES THROUGH HERE NOW, and the card carries what
+// the close handed over (`granted`) above the next line. Owner: *"I spent so
+// much time on that scaled never even knowing that I had it."*
 export function MissionStingerModal({
   stinger, onClose, cta = 'FIGHT',
 }: {
-  stinger: { title: string; line: string; next?: string | null } | null;
+  stinger: { title: string; line: string; next?: string | null; granted?: string[] } | null;
   onClose: () => void;
   cta?: string;
 }) {
@@ -47,6 +50,9 @@ export function MissionStingerModal({
           </Text>
           <View style={styles.rule} />
           <Text style={styles.line}>{stinger?.line ?? ''}</Text>
+          {stinger?.granted?.length
+            ? stinger.granted.map((g) => <Text key={g} style={styles.granted}>✦ {g} — in your pack.</Text>)
+            : null}
           {stinger?.next ? <Text style={styles.next}>{stinger.next}</Text> : null}
           <Pressable
             style={({ pressed }) => [styles.btn, pressed && styles.btnPressed]}
@@ -77,6 +83,8 @@ const styles = StyleSheet.create({
   line: { color: '#f0e6cc', fontSize: 18, lineHeight: 27 },
   // OTA-1602 — the "what's next" footnote under a beat, quieter than the prose.
   next: { color: '#c9a86a', fontSize: 13, lineHeight: 19, marginTop: 14 },
+  // OTA-1622 — the receipt: what this close put in the pack.
+  granted: { color: '#e6d7a8', fontSize: 14, lineHeight: 20, marginTop: 12 },
   btn: {
     alignSelf: 'flex-end', marginTop: 22, paddingVertical: 10, paddingHorizontal: 22,
     borderWidth: 1, borderColor: '#c9a86a', borderRadius: 4,

@@ -26830,7 +26830,28 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // whole table to parseInput rather than to a string. The "▸ Next:" line printed
 // when a stage closes now carries the next beat's command word too, so the
 // moment one stage pays the player holds the word that opens the next.
-export const OTA_BUILD_ID = '2026-09-02-1621-the-ask-is-a-command';
+// ⚠⚠⚠ OTA-1622 — IT POPS UP IN YOUR FACE. Owner's rule, verbatim: "every time
+// you should finish a segment of a mission or a quest or whatever it is. it
+// shouldn't be quiet. it shouldn't be able to be buried in the log feed. it
+// should pop up on your face. you should know that you did the thing so you
+// can just move on. I spent so much time on that scaled never even knowing
+// that I had it even if it would have spawned a fight and we interrupted the
+// fight with the pop-up." His 01:43:31 log: the scale stage closed in three
+// feed lines that a same-action Gutter Rat ambush pushed off the screen, and
+// he typed the closed stage's verb for twenty minutes. OTA-1602's card was
+// gated three ways (same tile, no fight, not last); every other close — moved
+// ground, escort clear, apex kill, final stage, the whole faction family —
+// was feed-only. The player-shaped walker's first hunt reported "closed with
+// NO card" on all five stages. Now ONE writer (raiseMissionClose) raises a
+// card on every close in all four families: the closing prose, what the close
+// put in your pack, and the next beat's word (OTA-1621) — a FIGHT card over
+// the field when bodies stood up, CONTINUE otherwise; a second close waits in
+// a queue instead of overwriting; the dismiss is a logged tap. Also new: the
+// player-shaped walker (test-utils/playerWalker.ts, __tests__/playerWalkerSim)
+// that plays every mission from the surfaces — Halem's gate, SET COURSE, the
+// arrival line's own words typed back, the cards, the hand-in.
+export const OTA_BUILD_ID = '2026-09-02-1622-it-pops-up-in-your-face';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-02-1621-the-ask-is-a-command';
 // golem catch-up 2026-09-02: markerless publish of OTA-1621 - every ask and
 // label parses to the intent that pays the stage. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-02-1620-the-whole-screen-behind-the-button';

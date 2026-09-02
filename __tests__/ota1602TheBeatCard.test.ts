@@ -137,7 +137,11 @@ describe('OTA-1602 — the beat card rises where a stage closes in place', () =>
     expect(get().pendingMissionBeat?.line).toBe(def.stages[1]!.narration);
   });
 
-  it('⚠⚠ a close that MOVES the ground raises no card — the travel leg is the separator', () => {
+  it('⚠⚠ a close that MOVES the ground raises the card too — OTA-1622 overruled "the travel leg is the separator"', () => {
+    // This pin used to say "raises no card". The owner's scale stage proved
+    // the travel leg is exactly where the feed buries a close (a same-action
+    // ambush pushed it off the screen); his rule is EVERY close. The card now
+    // carries the "▸ Next" line so the leg starts with the word in hand.
     const def = findHuntById('hunt_servants_doubter')!;
     seed('great_tartary_plains', {
       activeHunts: [{ id: def.id, stage: 2, tracked: true }],
@@ -149,7 +153,8 @@ describe('OTA-1602 — the beat card rises where a stage closes in place', () =>
     get().advanceHunt(def.id);
     const rec = (get().player?.activeHunts ?? []).find((r) => r.id === def.id);
     expect(rec?.stage).toBe(3);
-    expect(get().pendingMissionBeat).toBeNull();
+    expect(get().pendingMissionBeat?.title).toBe(def.title);
+    expect(get().pendingMissionBeat?.next).toContain('Next:');
   });
 
   it('⚠⚠ a close that stands a fight up gets the STINGER, never the beat', () => {
@@ -167,20 +172,20 @@ describe('OTA-1602 — the beat card rises where a stage closes in place', () =>
     expect(get().pendingMissionBeat).toBeNull();
   });
 
-  it('⚠⚠ a close that COMPLETES the mission (through a null epilogue) raises no card — completion celebrates itself', () => {
-    // story_dynasty_blood_aetherborn #4 closes on its own tile and the only
-    // stage after it is a null epilogue, consumed in the same call: the arc is
-    // done, the turn-in line prints, and no CONTINUE card sits over it.
+  it('⚠⚠ a close that COMPLETES the mission (through a null epilogue) raises the card with the turn-in line — OTA-1622 overruled "completion celebrates itself"', () => {
+    // "Celebrates itself" was one reward line in the feed. The owner's rule
+    // is that the LAST close is the one he most needs in his face.
     const def = findStorylineById('story_dynasty_blood_aetherborn')!;
     seed('dynasty_border_post', { activeStorylines: [{ id: def.id, stage: 4, tracked: true }] });
     get().advanceStoryline(def.id);
     const rec = (get().player?.activeStorylines ?? []).find((r) => r.id === def.id);
     expect(rec?.stage).toBe(def.stages.length);
-    expect(get().pendingMissionBeat).toBeNull();
+    expect(get().pendingMissionBeat?.title).toBe(def.title);
+    expect(get().pendingMissionBeat?.next).toContain('Storyline complete in the field');
   });
 
   it('⚠ CONTINUE dismisses it', () => {
-    set(() => ({ pendingMissionBeat: { title: 'T', line: 'L', next: null } }));
+    set(() => ({ pendingMissionBeat: { title: 'T', line: 'L', next: null, granted: [] } }));
     get().dismissMissionBeat();
     expect(get().pendingMissionBeat).toBeNull();
   });
@@ -192,9 +197,13 @@ describe('OTA-1602 — the wiring is pinned', () => {
   const MODAL = readFileSync(join(__dirname, '..', 'app', 'components', 'MissionStingerModal.tsx'), 'utf8');
 
   it('⚠⚠ all three families write the card — hunt, mystery, storyline', () => {
-    expect(QSL).toContain('pendingMissionBeat: { title: hunt.title, line: beat.line, next: beat.next }');
-    expect(QSL).toContain('pendingMissionBeat: { title: mystery.title, line: beatM.line, next: beatM.next }');
-    expect(QSL).toContain('pendingMissionBeat: { title: def.title, line: beatS.line, next: beatS.next }');
+    // ⚠ OTA-1622 superseded the three literal writes: one writer now
+    // (`raiseMissionClose`), called from every close path. The claim is the
+    // same — every family raises it — and ota1622 pins the single writer.
+    expect(QSL).toContain('raiseMissionClose(get, set, {\n          title: hunt.title,');
+    expect(QSL).toContain('raiseMissionClose(get, set, {\n      title: mystery.title, line: stageDef.narration,');
+    expect(QSL).toContain('raiseMissionClose(get, set, {\n      title: def.title, line: stageDef.narration,');
+    expect(QSL.match(/raiseMissionClose\(get, set, \{/g)!.length).toBeGreaterThanOrEqual(7);
   });
 
   it('⚠⚠ the screen renders the beat through the same curtain, CONTINUE for FIGHT', () => {

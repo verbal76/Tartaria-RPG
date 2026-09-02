@@ -166,6 +166,16 @@ export function creditDefeatedTarget(
       'reward',
       `✦ ${matchingHunt.def.targetEnemyName} slain. Return to a posting agent to turn in "${matchingHunt.def.title}" for the bounty.`,
     );
+    // ⚠⚠⚠ OTA-1622 — THE APEX KILL IS A CLOSE, so it is a card — not a reward
+    // line under the loot lines.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { raiseMissionClose } = require('./slices/questSlice') as typeof import('./slices/questSlice');
+    raiseMissionClose(get, set, {
+      title: matchingHunt.def.title,
+      line: `${matchingHunt.def.targetEnemyName} slain.`,
+      next: `✦ Return to a posting agent to turn in "${matchingHunt.def.title}" for the bounty.`,
+      granted: [],
+    });
   }
   // OTA 011 — LEADS completion. When the downed enemy's name matches an active
   // lead's objective target AND the verb is kill-shaped, auto-complete the
