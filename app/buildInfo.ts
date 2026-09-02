@@ -26885,7 +26885,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // overland step walked the player out of the building. The parser table
 // carries the eight words; hub.hubTravelText hands the resolver the parsed
 // direction; gameStore's one interior-move site uses it.
-export const OTA_BUILD_ID = '2026-09-02-1626-the-word-is-the-direction';
+// ⚠⚠⚠ OTA-1627 — THE HOUR CAN BE WAITED FOR. The walker on three whisper
+// chains: stood on the cold camp, was told "Wait for the hour and look
+// again", and had no verb that passed an hour — rest refuses at full wind
+// ("Save the hours"), wait printed a line and moved the clock by nothing.
+// app/state/waitVerb.ts: wait passes an hour, N hours, until dark or until
+// morning, then looks at the ground again where the player stands so the
+// camp wakes in place; refused in a fight; the cold-camp line names it.
+export const OTA_BUILD_ID = '2026-09-02-1627-the-hour-can-be-waited-for';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-02-1626-the-word-is-the-direction';
 // golem catch-up 2026-09-02: markerless publish of OTA-1626 - bare direction
 // words parse; "n" inside an outpost moves rooms. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-02-1625-the-subdual-pays-the-slate';

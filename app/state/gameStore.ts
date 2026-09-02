@@ -17741,7 +17741,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // typed attempts on the owner's device before the taught phrase landed.
         if (player.hubRoomId && !isLeaveHubCommand(trimmed) && !isBareExitCommand(trimmed)) {
           const skin = hubSkinFactionFor(player.currentLocationId, player.factionId);
-          // ⚠ OTA-1626 — the PARSED direction, never the raw letter ("n" resolved nothing and walked out).
           const interiorMove = resolveHubTravel(player.hubRoomId, hubTravelText(parsed, trimmed),
             // ⚠ OTA-1274 — match the names the player is actually reading.
             skin);
@@ -18187,7 +18186,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         break;
       }
       case 'wait':
-        get().appendLog('world', 'You hold still. Tartaria holds still longer.');
+        (require('./waitVerb') as typeof import('./waitVerb')).runWait(get, set, trimmed);
         break;
       case 'inventory':
         get().setScreen('inventory');
@@ -31799,7 +31798,8 @@ export function resolveWhispersForTile(
   const coldChain = cold ? findChain(cold.id) : undefined;
   if (cold && coldChain) {
     const who = coldChain.content.npcName;
-    get().appendLog('world', `This is ${who}'s spot — but the camp is cold. ${who} works here${activeHoursText(coldChain.activeHours)}. Wait for the hour and look again.`);
+    const h0 = coldChain.activeHours?.[0] ?? 6, hint = `wait until ${h0 % 12 || 12} ${h0 < 12 ? 'am' : 'pm'}`;
+    get().appendLog('world', `This is ${who}'s spot — but the camp is cold. ${who} works here${activeHoursText(coldChain.activeHours)}. Wait for the hour — type '${hint}' — and look again.`);
   }
 
   // 3) Fetch combat — player arrived at the mark's tile.

@@ -1151,9 +1151,10 @@ class WhisperWalker extends Walker {
       const r = this.rec()!;
       if (!isHourInWindow(hour, r.activeFromHour, r.activeToHour)) {
         // "This is X's spot — but the camp is cold. X works here <hours>.
-        // Wait for the hour and look again." A player waits.
-        const toDark = r.activeFromHour != null && r.activeFromHour >= 12;
-        const cmd = r.activeFromHour == null ? 'wait' : toDark ? 'wait until dark' : 'wait until morning';
+        // Wait for the hour — type 'wait until 7 am' — and look again." A
+        // player types the verb the line names.
+        const cold = this.feedSince(mark).filter((l) => /the camp is cold/.test(l)).pop() ?? '';
+        const cmd = cold.match(/type '([^']+)'/)?.[1] ?? 'wait';
         this.tap(cmd.toUpperCase()); await this.type(cmd);
         if (this.enemiesUp() > 0 && !(await this.fightOut('waiting at the camp'))) return done();
         this.topUp();
@@ -1166,7 +1167,9 @@ class WhisperWalker extends Walker {
       this.breaks.push(`stood on ${c.npcName}'s tile in hours and the camp did not wake (stage ${this.stageName()}). feed since:\n${this.feedSince(mark).slice(-6).map((l) => `  | ${l}`).join('\n')}`);
       return done();
     }
-    this.note(1, null, 'none', this.dismissWhisperCards(), mark);
+    const meetCards = this.dismissWhisperCards();
+    if (!meetCards.length) this.breaks.push(`met ${c.npcName} at the camp and no card came up (it has to pop up in your face)`);
+    this.note(1, null, 'none', meetCards, mark);
     // 3. The answer — the panel says "take the job"; the typed form the meet line offers.
     mark = this.feedMark();
     const acceptCmd = `accept ${c.npcName.toLowerCase()}`;
@@ -1185,13 +1188,16 @@ class WhisperWalker extends Walker {
       this.breaks.push(`on ${c.markNoun}'s tile and nobody stood up (stage ${this.stageName()}). feed since:\n${this.feedSince(mark).slice(-6).map((l) => `  | ${l}`).join('\n')}`);
       return done();
     }
+    const cardsBeforeFight = this.cardsSeen.length;
     if (!(await this.fightOut(`with the ${c.fetchEnemy}`))) return done();
-    const holds = (get().player?.inventory ?? []).some((i) => i.name === c.stolen.name && i.quantity > 0);
+    const holds =(get().player?.inventory ?? []).some((i) => i.name === c.stolen.name && i.quantity > 0);
     if (this.rec()?.stage !== 'fetch_returned' || !holds) {
       this.breaks.push(`put the ${c.fetchEnemy} down and ${holds ? 'the chain did not move' : `the ${c.goodsShort} did not come off the body`} (stage ${this.stageName()}). feed since:\n${this.feedSince(mark).slice(-8).map((l) => `  | ${l}`).join('\n')}`);
       return done();
     }
-    this.note(3, null, 'fight', this.dismissWhisperCards(), mark);
+    const recoverCards = this.cardsSeen.slice(cardsBeforeFight).concat(this.dismissWhisperCards());
+    if (!recoverCards.some((s) => /CONTINUE card/.test(s))) this.breaks.push(`recovered the ${c.goodsShort} off the ${c.fetchEnemy} and no card came up (it has to pop up in your face)`);
+    this.note(3, null, 'fight', recoverCards, mark);
     // 5. The return and the hand-over.
     mark = this.feedMark();
     if (!(await this.walkCourse(`back to ${c.npcName}`))) return done();
@@ -1200,6 +1206,8 @@ class WhisperWalker extends Walker {
       this.breaks.push(`back on ${c.npcName}'s tile with the ${c.goodsShort} and nothing waited (stage ${this.stageName()}). feed since:\n${this.feedSince(mark).slice(-6).map((l) => `  | ${l}`).join('\n')}`);
       return done();
     }
+    const armCards = this.dismissWhisperCards();
+    if (!armCards.length) this.breaks.push(`${c.npcName} saw the ${c.goodsShort} and no card came up (it has to pop up in your face)`);
     const tc0 = get().player!.tc ?? 0;
     const giveCmd = `give ${c.npcName.toLowerCase()} the ${c.goodsShort.toLowerCase()}`;
     this.tap(`SPEAK TO ${c.npcName.toUpperCase()} → hand it over`);

@@ -916,11 +916,13 @@ app/
   screens/     Exploration / Inventory / Crafting / Vendor / Character / Map / …
   state/       gameStore.ts — Zustand, the spine (~37k lines, shrink-only ratchet)
                slices/questSlice.ts — contracts in all four families; raiseMissionClose
-test-utils/    playerWalker.ts — the PLAYER-SHAPED walker (OTA-1622): plays every
-               mission from the surfaces; __tests__/playerWalkerSim runs it (PLAYER_WALKER=1)
                defeatCredit.ts — OTA-1612: everything the OBJECTIVES hear when a
                target goes down (whisper chains, hunt completion, leads, the
                room-clear record, the escort clear). BOTH win conditions call it.
+               waitVerb.ts — OTA-1627: `wait` passes the hours and re-checks the ground
+test-utils/    playerWalker.ts — the PLAYER-SHAPED walker (OTA-1622): plays every
+               mission from the surfaces, five families (hunt / mystery / storyline /
+               faction / whisper); __tests__/playerWalkerSim runs it (PLAYER_WALKER=1)
   updates/     checkAndApplyOTA.ts
   voice/       TTSManager / PiperTTSManager (Kokoro) / TTSController
 buildInfo.ts   OTA_BUILD_ID marker (per line)
@@ -1556,9 +1558,9 @@ Key invariants worth knowing:
 
 ## 9. Recent OTA highlights (latest sessions)
 
-### ⚠⚠⚠ THE 2026-09-02 RUN — OTA-1617 → 1626 (read this first if you are new)
+### ⚠⚠⚠ THE 2026-09-02 RUN — OTA-1617 → 1627 (read this first if you are new)
 
-Latest golem-line stamp: **`2026-09-02-1626-the-word-is-the-direction`**
+Latest golem-line stamp: **`2026-09-02-1627-the-hour-can-be-waited-for`**
 (`app/buildInfo.ts`). Both channels ship from this branch — a `[ota-hal]` marker
 in the commit TITLE publishes the HAL set, a markerless follow-up commit
 publishes golem; see §6.
@@ -1637,6 +1639,19 @@ what it ACCEPTS, and a data walker skips the saying.
   player out of the building. Parser table carries the eight words;
   `hub.hubTravelText` hands the resolver the parsed direction.
   `PLAYER_WALKER_ONLY=whisper` (or `whisper:<chainId>`) runs the family.
+- **OTA-1627 the hour can be waited for.** Whisper pass 18/21: the three
+  breaks were cold camps (Petra, Dazak, Imogen). The game said "Wait for the
+  hour and look again"; `rest` refused at full wind ("Save the hours") and
+  `wait` printed a line and moved the clock by nothing. `app/state/waitVerb.ts`:
+  `wait` passes an hour / N hours / until dark / until morning / until 7 am,
+  then runs `resolveWhispersForTile` in place so the camp wakes without a
+  step; refused in a fight; the cold-camp line names the exact hour ("type
+  'wait until 7 am'" — "morning" lands at six and Dazak's 7 am camp was still
+  cold). gameStore's `case 'wait'`
+  delegates. ⚠ gameStore is at 36,997 lines by `wc -l`, and the ota1400
+  ratchet counts `split('\n').length` — one more — against `< 37000`: the
+  first cut of this OTA failed it at exactly 37,000. Any gameStore addition
+  has to take lines out first (OTA-1628 moves the whisper beats out).
 
 ⚠ **Two position vocabularies, still.** `stageArrival.ts` (heal / arm /
 `checkStandingGround`) keys on the canon grid CELL; the verb matchers and
