@@ -26870,6 +26870,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // names the first tracked contract of any family whose stage is paid by the
 // typed verb; gameStore's hunt-only copy is gone.
 export const OTA_BUILD_ID = '2026-09-02-1624-the-refusal-speaks-for-every-family';
+// golem catch-up 2026-09-02: markerless publish of OTA-1624 - the mid-fight
+// refusal names mystery and storyline stages too. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-02-1623-the-gerund-is-the-verb';
 // golem catch-up 2026-09-02: markerless publish of OTA-1623 - inflected verbs
 // parse at full confidence; every ask/label held to the gate. hal took the marker.
