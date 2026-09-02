@@ -1560,9 +1560,9 @@ Key invariants worth knowing:
 
 ## 9. Recent OTA highlights (latest sessions)
 
-### ⚠⚠⚠ THE 2026-09-02 RUN — OTA-1617 → 1628 (read this first if you are new)
+### ⚠⚠⚠ THE 2026-09-02 RUN — OTA-1617 → 1629 (read this first if you are new)
 
-Latest golem-line stamp: **`2026-09-02-1628-the-whisper-beats-pop-up-too`**
+Latest golem-line stamp: **`2026-09-02-1629-the-sleep-keeps-the-hour`**
 (`app/buildInfo.ts`). Both channels ship from this branch — a `[ota-hal]` marker
 in the commit TITLE publishes the HAL set, a markerless follow-up commit
 publishes golem; see §6.
@@ -1665,6 +1665,15 @@ what it ACCEPTS, and a data walker skips the saying.
   goods are granted. The accept is answered inside the SPEAK TO sheet and
   raises no card. The whisper walker asserts a card on the meet, the recovery,
   the arm and the return.
+- **OTA-1629 the sleep keeps the hour.** Owner: *"can we type wait until
+  'exact time' or sleep until 'exact time'"*. Wait already could (1627);
+  "sleep until 7 am" / "rest until dark" / "sleep for 3 hours" went to the
+  fixed eight-hour camp and were refused at full wind. `waitVerb.clockSpan` is
+  the ONE reader of a named span for wait and rest: the rest case reads it
+  before the full-wind refusal, uses it for `hours`, and re-checks the ground
+  after the sleep so the camp wakes in place. A bare `rest` is unchanged.
+  ⚠ "for 3 hours" is a duration, not three o'clock — the first cut got that
+  wrong and the suite caught it.
 
 ⚠ **Two position vocabularies, still.** `stageArrival.ts` (heal / arm /
 `checkStandingGround`) keys on the canon grid CELL; the verb matchers and

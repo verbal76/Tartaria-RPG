@@ -26,12 +26,18 @@ export function formatHour(h: number): string {
   return `${n % 12 || 12} ${n < 12 ? 'am' : 'pm'}`;
 }
 
-/** How long "wait …" asks for, from the typed line and the current hour of day. */
-export function waitSpan(raw: string, hourOfDay: number): { hours: number; label: string } {
+/** ⚠ OTA-1629 — the span a line NAMES, or null when it names none. "until 7
+ *  am" / "till 19" / "until dark" / "until morning" / "for 3 hours". Shared
+ *  by `wait` (which defaults to an hour) and `rest` / `sleep` (which default
+ *  to the eight-hour camp): the owner asked for "sleep until <exact time>",
+ *  and the clock has to win over the verb's own default. */
+export function clockSpan(raw: string, hourOfDay: number): { hours: number; label: string } | null {
   const t = raw.toLowerCase();
   const until = (h: number): number => ((h - hourOfDay + 24) % 24) || 24;
-  // "wait until 7 am" / "until 8 pm" / "until 19" — the hour the cold-camp line names.
-  const clock = t.match(/\b(?:until|till|to|for)\s+(\d{1,2})(?::00)?\s*(am|pm)?\b/);
+  // "wait until 7 am" / "until 8 pm" / "until 19" — the hour the cold-camp line
+  // names. ⚠ "for 3 hours" is a DURATION and falls to the hours match below;
+  // the first cut read it as three o'clock.
+  const clock = t.match(/\b(?:until|till|to)\s+(\d{1,2})(?::00)?\s*(am|pm)?\b/);
   if (clock) {
     let h = parseInt(clock[1]!, 10) % 24;
     if (clock[2] === 'pm' && h < 12) h += 12;
@@ -45,7 +51,12 @@ export function waitSpan(raw: string, hourOfDay: number): { hours: number; label
     const n = Math.max(1, Math.min(24, parseInt(m[1]!, 10)));
     return { hours: n, label: n === 1 ? 'an hour' : `${n} hours` };
   }
-  return { hours: 1, label: 'an hour' };
+  return null;
+}
+
+/** How long "wait …" asks for, from the typed line and the current hour of day. */
+export function waitSpan(raw: string, hourOfDay: number): { hours: number; label: string } {
+  return clockSpan(raw, hourOfDay) ?? { hours: 1, label: 'an hour' };
 }
 
 /** The verb, as the store runs it: pass the hours, then look at the ground again. */

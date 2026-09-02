@@ -127,7 +127,9 @@ describe('OTA-1167 — two lines that were lying about the clock', () => {
     expect(STORE).toContain("Type 'rest' to recover (8h)");
     expect(STORE).not.toContain('recover (≈4h)');
     // Pin it against the code that decides, so the text cannot drift off again.
-    expect(STORE).toContain('const hours = 8;');
+    // ⚠ OTA-1629 — a rest that NAMES its hours ("sleep until 7 am", "rest for 3
+    // hours") takes them; the default is still the eight the refusal line quotes.
+    expect(STORE).toContain('const hours = named?.hours ?? 8;');
   });
 
   it('⚠ THE COURSE BANNER CALLED EVERY TILE "A DAY"', () => {

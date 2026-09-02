@@ -17301,8 +17301,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // could drive it negative. Nothing shrinks the cap now, so this only
           // ever reads 0 — kept as a floor rather than tightened to ===, since
           // a defensive comparison costs nothing and a wrong one costs a rest.)
+          // ⚠ OTA-1629 — "sleep until 7 am" / "rest for 3 hours": when the line names the
+          // hours, the clock wins over the eight-hour camp and over the full-wind refusal.
+          const named = WV().clockSpan(trimmed, Math.floor((player.hoursElapsed ?? 0) % 24));
           const nothingToRest =
-            stamRoom <= 0 && (player.corruption ?? 0) === 0 && !dogToRecall
+            !named && stamRoom <= 0 && (player.corruption ?? 0) === 0 && !dogToRecall
             // OTA-978 — #120: rest heals now, so open wounds are a reason to sleep.
             && player.hp >= player.hpMax;
           if (nothingToRest) {
@@ -17355,7 +17358,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const restAmbushBase = restSacred(restLoc) ? 0 : restInSafeZone ? 0.08 : 0.22;
           const restAmbushChance = restAmbushBase * rateMultRest(player.hoursElapsed);
           const restAmbush = Math.random() < restAmbushChance;
-          const hours = 8;
+          const hours = named?.hours ?? 8;
           // arb37 — rest grants NO HP. Stamina only: ~1/hr, up to 8.
           // OTA-978 — #120: rest heals again, LIGHT — ~15% of max HP for a full sleep,
     // mirroring how escorts already mend on rest. The old no-HP rule (arb37 /
@@ -17697,6 +17700,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
           void get().persist();
         }
+        // ⚠ OTA-1629 — a sleep to a named hour looks at the ground again where you lie (the camp wakes in place).
+        if (WV().clockSpan(trimmed, 0) && get().player) resolveWhispersForTile(get, set, get().player!.mapX ?? 0, get().player!.mapY ?? 0);
         break;
       }
       case 'travel': {
@@ -31762,6 +31767,8 @@ export function bumpQuestsAccepted(
 // OTA-1628 — the meet and the hand-back arm live in whisperBeats.ts (and are cards).
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const WB = () => require('./whisperBeats') as typeof import('./whisperBeats');
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const WV = () => require('./waitVerb') as typeof import('./waitVerb');
 export function resolveWhispersForTile(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,

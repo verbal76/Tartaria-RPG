@@ -26900,7 +26900,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // hand-back arm raise the card from app/state/whisperBeats.ts (moved out of
 // gameStore, which was two lines under its ratchet), the recovery from
 // defeatCredit where the goods are granted.
-export const OTA_BUILD_ID = '2026-09-02-1628-the-whisper-beats-pop-up-too';
+// ⚠⚠⚠ OTA-1629 — THE SLEEP KEEPS THE HOUR. Owner: "can we type wait until
+// 'exact time' or sleep until 'exact time'". Wait already could; "sleep until
+// 7 am" / "rest until dark" / "sleep for 3 hours" went to the fixed
+// eight-hour camp and were refused at full wind. waitVerb.clockSpan is the
+// one reader of a named span for wait AND rest: the clock wins over the
+// eight and over the refusal, the sleep still camps (ambush, heal, recovery)
+// and then looks at the ground again so the camp wakes in place.
+export const OTA_BUILD_ID = '2026-09-02-1629-the-sleep-keeps-the-hour';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-02-1628-the-whisper-beats-pop-up-too';
 // golem catch-up 2026-09-02: markerless publish of OTA-1628 - the whisper
 // meet, recovery and hand-back arm are cards. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-02-1627-the-hour-can-be-waited-for';
