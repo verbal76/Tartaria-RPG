@@ -1101,17 +1101,12 @@ function advanceStagesOnIntent(
     // danger-4/5 anchor the player performs the RIGHT action, something is mid-swing at
     // them, and nothing happens with no explanation at all. It is the correct rule — you
     // cannot study a room while it is trying to kill you — but it has to say so.
-    const stalled = (player.activeHunts ?? [])
-      .map((rec) => ({ rec, def: findHuntById(rec.id) }))
-      .find(({ rec, def }) => {
-        if (!def || rec.tracked === false) return false;
-        const next = def.stages[rec.stage];
-        if (!next || next.checkKind === null || next.checkKind === 'boss') return false;
-        if (next.checkKind === 'escape') return false; // fleeing IS combat
-        return next.checkKind === intent || (next.checkKind === 'attack_provoke' && intent === 'attack');
-      });
-    if (stalled?.def) {
-      const line = `The Arbiter keeps one eye on the fight. "That is the right move for ${stalled.def.title} — but not with something on you. Put this down first."`;
+    // ⚠ OTA-1624 — and it speaks for EVERY family now (the mystery and storyline
+    // branches below were silent in combat). One reader: missionTrace.stalledInCombat.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const stalled = (require('../engine/missionTrace') as typeof import('../engine/missionTrace')).stalledInCombat(player, intent);
+    if (stalled) {
+      const line = `The Arbiter keeps one eye on the fight. "That is the right move for ${stalled.title} — but not with something on you. Put this down first."`;
       const recent = get().gameLog.slice(-30).some((e) => e.text === line);
       if (!recent) get().appendLog('arbiter', line);
     }

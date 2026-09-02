@@ -52,7 +52,7 @@ jest.mock('expo-updates', () => ({}));
 
 import { useGameStore } from '../app/state/gameStore';
 import { getRaces, getFactions } from '../app/engine/character';
-import { ALL_MISSIONS, playMission, formatReport, type WalkReport } from '../test-utils/playerWalker';
+import { ALL_MISSIONS, ALL_FACTION_QUESTS, playMission, playFactionQuest, formatReport, type WalkReport } from '../test-utils/playerWalker';
 import { appendFileSync } from 'node:fs';
 
 jest.setTimeout(900000);
@@ -103,6 +103,19 @@ const picked = ALL_MISSIONS.filter(({ family, def }) => {
   for (const { family, def } of picked) {
     it(`${family}:${def.id} — ${def.title}`, async () => {
       const r = await playMission(family, def);
+      reports.push(r);
+      const text = formatReport(r);
+      if (REPORT) appendFileSync(REPORT, `${text}\n\n`);
+      process.stdout.write(`${text}\n`);
+      expect(r.breaks).toEqual([]);
+    });
+  }
+
+  // The fourth family: the 18 staged faction quests, played by their objective sentence.
+  const pickedFq = ALL_FACTION_QUESTS.filter((q) => !ONLY || ONLY === 'faction' || ONLY === `faction:${q.id}`);
+  for (const def of pickedFq) {
+    it(`faction:${def.id} — ${def.title}`, async () => {
+      const r = await playFactionQuest(def);
       reports.push(r);
       const text = formatReport(r);
       if (REPORT) appendFileSync(REPORT, `${text}\n\n`);

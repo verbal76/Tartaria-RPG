@@ -42,6 +42,7 @@ import { HUNTS, findHuntById, checkKindLabel } from '../app/engine/hunts';
 import { MYSTERIES, findMysteryById } from '../app/engine/mysteries';
 import { STORYLINES, findStorylineById } from '../app/engine/factionStorylines';
 import { FACTIONS } from '../app/engine/factions';
+import { FACTION_QUESTS } from '../app/engine/factionQuests';
 import { openContractMarkers } from '../app/engine/contractMarkers';
 import { armedEncounter } from '../app/engine/missionEncounterArm';
 import { choicesFor, freshEncounter } from '../app/engine/missionEncounter';
@@ -67,7 +68,7 @@ export interface StageNote {
 }
 
 export interface WalkReport {
-  family: WalkFamily;
+  family: WalkFamily | 'faction';
   id: string;
   title: string;
   outcome: 'complete' | 'broken';
@@ -532,17 +533,13 @@ class Walker {
     this.prevCloseMark = mark;
     if (get().activeBuildingId) { this.tap('EXIT (the market)'); get().exitBuilding(); await tick(); }
     if (rec.tracked === false) {
+      // The Contracts screen's ACTIVATE button — the same store action it calls.
       this.tap('ACTIVATE');
-      const p = get().player!;
-      const bump = <T extends { id: string; tracked?: boolean }>(l: T[] | undefined) => (l ?? []).map((r) => (r.id === this.def.id ? { ...r, tracked: true } : r));
-      store.setState({
-        player: {
-          ...p,
-          activeHunts: this.family === 'hunt' ? bump(p.activeHunts) : p.activeHunts,
-          activeMysteries: this.family === 'mystery' ? bump(p.activeMysteries) : p.activeMysteries,
-          activeStorylines: this.family === 'storyline' ? bump(p.activeStorylines) : p.activeStorylines,
-        } as never,
-      });
+      get().setContractActive(this.family, this.def.id, true);
+      if (this.record()?.tracked === false) {
+        this.breaks.push(`ACTIVATE on "${this.def.title}" left it paused. last lines:\n${this.lastLines(3)}`);
+        return false;
+      }
     }
     return true;
   }
@@ -759,6 +756,204 @@ export async function playMission(family: WalkFamily, def: MissionLike): Promise
   const w = new Walker(family, def);
   w.allowances.add('HP 600 / STR 20 / DEX 20 / standing 100 with every faction');
   const r = await w.play();
+  if (process.env.PLAYER_WALKER_FEED === '1') r.feed = [...w.feed()];
+  return r;
+}
+
+// ── THE FOURTH FAMILY: faction quests ──────────────────────────────────────
+// Staged faction quests are counters ("Defeat 3 enemies", "Travel 5 times",
+// "Steal successfully from any vendor", "Reach 100 TC"). The player reads the
+// OBJECTIVE on the Contracts card and does that thing in the world; the game
+// ticks a stage on each deed. The walker reads the same sentence.
+
+export interface FactionQuestLike {
+  id: string;
+  title: string;
+  factionId: string;
+  objective: string;
+  targetLocationName?: string;
+  tcThreshold?: number;
+  stages?: ReadonlyArray<{ narration: string; advanceOn?: string }>;
+}
+
+export const ALL_FACTION_QUESTS: FactionQuestLike[] = (FACTION_QUESTS as unknown as FactionQuestLike[])
+  .filter((q) => (q.stages?.length ?? 0) > 0);
+
+type Deed = 'kill' | 'travel' | 'steal' | 'any';
+
+/** What the objective sentence asks for, read the way a player reads it. */
+export function deedFromObjective(objective: string): Deed {
+  const o = objective.toLowerCase();
+  if (/\b(defeat|destroy|eliminate|clear|break|drive off|cut through|scatter|recover|kill|slay|hunt)\b/.test(o)) return 'kill';
+  if (/\b(steal|pinch|lift|pickpocket)\b/.test(o)) return 'steal';
+  if (/\b(travel|discover|reach the|go to|journey)\b/.test(o)) return 'travel';
+  return 'any';
+}
+
+class FactionWalker extends Walker {
+  readonly fq: FactionQuestLike;
+  constructor(def: FactionQuestLike) {
+    super('hunt', { id: def.id, title: def.title, factionId: def.factionId, stages: [] });
+    this.fq = def;
+  }
+
+  fqRecord(): { id: string; stage: number; tracked?: boolean } | undefined {
+    return (get().player?.activeFactionQuests ?? []).find((r) => r.id === this.fq.id);
+  }
+  fqStage(): number { return this.fqRecord()?.stage ?? -1; }
+  fqTotal(): number { return this.fq.stages?.length ?? 0; }
+
+  async acceptFq(): Promise<boolean> {
+    if (!(await this.acceptAtMarket())) return false;
+    this.tap(`ACCEPT "${this.fq.title}"`);
+    const mark = this.feedMark();
+    get().acceptFactionQuest(this.fq.title);
+    await tick();
+    if (!this.fqRecord()) {
+      this.breaks.push(`ACCEPT at the Hidden Market stall refused. feed:\n${this.feedSince(mark).map((l) => `  | ${l}`).join('\n')}`);
+      return false;
+    }
+    this.prevCloseMark = mark;
+    if (get().activeBuildingId) { this.tap('EXIT (the market)'); get().exitBuilding(); await tick(); }
+    if (this.fqRecord()?.tracked === false) {
+      this.tap('ACTIVATE');
+      get().setContractActive('faction_quest', this.fq.id, true);
+      if (this.fqRecord()?.tracked === false) { this.breaks.push(`ACTIVATE on "${this.fq.title}" left it paused`); return false; }
+    }
+    return true;
+  }
+
+  /** Walk open ground until something stands up, then put it down. */
+  async findAFight(): Promise<boolean> {
+    // Fresh ground each step — a tile rolls its encounter once, so a square
+    // walk re-treads rolled tiles (the first smoke walked 38 tiles in a box).
+    // Fifteen tiles a leg, turning; and out of any building the road put us in.
+    const dirs = ['north', 'east', 'south', 'west'];
+    for (let i = 0; i < 80; i++) {
+      if (this.enemiesUp() > 0) return this.fightOut('for the contract');
+      this.dismissCards();
+      this.restByFiat();
+      if (get().player?.hubRoomId) { this.tap('EXIT'); await this.type('leave outpost'); }
+      if (get().activeBuildingId) { this.tap('EXIT (building)'); get().exitBuilding(); await tick(); }
+      const d = dirs[Math.floor(i / 15) % 4]!;
+      this.tap(d.toUpperCase());
+      await this.type(`go ${d}`);
+    }
+    this.breaks.push('walked eighty tiles looking for a fight and nothing stood up');
+    return false;
+  }
+
+  /** One named tile away and back is one "travel" — the game counts arrivals. */
+  async travelOnce(): Promise<boolean> {
+    const p = get().player!;
+    const g = playerGridCell(p);
+    // A named location other than the one under the boots, nearest first.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { allKnownLocations } = require('../app/engine/worldMap') as typeof import('../app/engine/worldMap');
+    const ids: readonly string[] = allKnownLocations().map((l) => l.id);
+    const best = ids
+      .filter((id) => !this.onCell(id))
+      .map((id) => ({ id, d: canonicalDistanceFromGrid(g.x, g.y, id) }))
+      .sort((a, b) => a.d - b.d)[0];
+    if (!best) { this.breaks.push('no named location to travel to'); return false; }
+    return this.walkTo(best.id, 'for the contract (a travel)');
+  }
+
+  async doDeed(deed: Deed, s: number): Promise<boolean> {
+    switch (deed) {
+      case 'kill': return this.findAFight();
+      case 'travel': {
+        // The final travel of a destination quest has to land at the named place.
+        const last = s === this.fqTotal() - 1;
+        if (last && this.fq.targetLocationName) {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const { resolvePosterLocation } = require('../app/engine/contractMarkers') as typeof import('../app/engine/contractMarkers');
+          const dest = resolvePosterLocation(this.fq.targetLocationName);
+          if (dest) return this.walkTo(dest, `to ${this.fq.targetLocationName} (the objective names it)`);
+        }
+        return this.travelOnce();
+      }
+      case 'steal': {
+        // The PICKPOCKET chip on a vendor — Halem at the nearest gate.
+        this.allowances.add('STE 20 for the pinch');
+        const p = get().player!;
+        store.setState({ player: { ...p, stats: { ...p.stats, stealth: 20 } } as never });
+        const hub = this.nearestHub();
+        if (!(await this.walkTo(hub, 'to a gate to find a vendor to pinch'))) return false;
+        if (!(await this.enterOutpost())) return false;
+        const mark = get().currentScene?.vendor?.name ?? '';
+        for (let tries = 0; tries < 4; tries++) {
+          this.tap(`pickpocket ${mark}`);
+          get().pickpocketPerson(mark);
+          await tick();
+          this.drainRolls();
+          if (this.enemiesUp() > 0 && !(await this.fightOut('caught with a hand in a pocket'))) return false;
+          if (this.fqStage() > s) return true;
+          if (!get().currentScene?.vendor) break;
+        }
+        this.breaks.push(`pickpocketing ${mark} four times did not tick the contract. last lines:\n${this.lastLines(5)}`);
+        return false;
+      }
+      default:
+        // "any" is any of the three DEEDS (kill / travel / steal), not any
+        // action — the quest machine only hears those three. A travel is the
+        // cheapest of them.
+        return this.travelOnce();
+    }
+  }
+
+  async playFq(): Promise<WalkReport> {
+    const done = (): WalkReport => ({
+      family: 'hunt', id: this.fq.id, title: this.fq.title,
+      outcome: this.breaks.length === 0 ? 'complete' : 'broken',
+      breaks: this.breaks, allowances: [...this.allowances], stages: this.stages, taps: this.taps,
+    });
+    if (!(await this.acceptFq())) return done();
+    const deed = deedFromObjective(this.fq.objective);
+    let guard = 0;
+    while (this.fqStage() < this.fqTotal()) {
+      const s = this.fqStage();
+      if (guard++ > this.fqTotal() * 3 + 4) { this.breaks.push(`did not converge — stuck at stage ${s} of ${this.fqTotal()} (deed: ${deed})`); return done(); }
+      const note: StageNote = { stage: s, ground: get().player?.currentLocationId ?? '', arrivalLine: `(objective) ${this.fq.objective}`, typed: deed, via: 'typed', closeCard: null, closeFeed: [] };
+      this.stages.push(note);
+      const cardsBefore = this.cardsSeen.length;
+      const mark = this.feedMark();
+      if (this.fq.tcThreshold && s === this.fqTotal() - 1 && (get().player?.tc ?? 0) < this.fq.tcThreshold) {
+        this.allowances.add(`purse set to ${this.fq.tcThreshold} TC for the wealth gate`);
+        store.setState({ player: { ...get().player!, tc: this.fq.tcThreshold } as never });
+      }
+      if (!(await this.doDeed(deed, s))) return done();
+      await settle(() => this.fqStage() > s, 1500);
+      if (this.fqStage() <= s) {
+        // A counter that did not tick on the deed the sentence asked for.
+        this.breaks.push(`stage ${s}: did "${deed}" as the objective ("${this.fq.objective}") asks and the contract did not move. feed since:\n${this.feedSince(mark).slice(-8).map((l) => `  | ${l}`).join('\n')}`);
+        return done();
+      }
+      this.afterClose(s, note, mark, cardsBefore);
+    }
+    // Hand in at Halem's gate — the broker takes any faction's work.
+    const hub = this.nearestHub();
+    if (!(await this.walkTo(hub, 'to hand it in'))) return done();
+    if (!(await this.enterOutpost())) return done();
+    const tc0 = get().player!.tc ?? 0;
+    const mark = this.feedMark();
+    this.tap(`TURN IN "${this.fq.title}"`);
+    get().turnInFactionQuest(this.fq.id);
+    await settle(() => !this.fqRecord(), 2000);
+    if (this.fqRecord()) this.breaks.push(`TURN IN at Halem's gate (${hub}) refused. feed:\n${this.feedSince(mark).map((l) => `  | ${l}`).join('\n')}`);
+    else if ((get().player!.tc ?? 0) <= tc0) this.breaks.push('handed in and the purse did not move');
+    this.dismissCards();
+    return done();
+  }
+}
+
+export async function playFactionQuest(def: FactionQuestLike): Promise<WalkReport> {
+  resetForMission();
+  const w = new FactionWalker(def);
+  w.allowances.add('HP 600 / STR 20 / DEX 20 / standing 100 with every faction');
+  const r = await w.playFq();
+  r.family = 'hunt';
+  (r as { family: string }).family = 'faction';
   if (process.env.PLAYER_WALKER_FEED === '1') r.feed = [...w.feed()];
   return r;
 }

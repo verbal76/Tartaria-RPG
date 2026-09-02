@@ -192,6 +192,39 @@ export function missionTraceLines(player: PlayerCharacter | null | undefined): s
  * survives in the feed after the card is answered, which is what the whole
  * OTA-1530/1547 burial lesson says a player needs.
  */
+/** ⚠⚠⚠ OTA-1624 — THE REFUSAL SPEAKS FOR EVERY FAMILY. The matchers gate every
+ *  non-fight stage verb on `!inCombat` (the OTA-1217 rule: you cannot study a
+ *  room while it is trying to kill you). P19 gave the HUNT branch a voice for
+ *  that gate — "not with something on you" — and the mystery and storyline
+ *  branches stayed silent: the player performs the right action on the right
+ *  ground with something mid-swing at them, and nothing at all is said.
+ *  Measured in the owner's 09-02 log audit. One reader now names the first
+ *  tracked contract, any family, whose CURRENT stage is paid by `intent` and
+ *  would be refused for the fight. Hunts keep their two exclusions: the boss
+ *  (a fight is the point) and escape (fleeing IS combat). */
+export function stalledInCombat(
+  player: PlayerCharacter | null | undefined,
+  intent: string,
+): { family: MissionFamily; title: string } | null {
+  if (!player) return null;
+  const consider = (family: MissionFamily, recs: Rec[] | undefined, find: (id: string) => { title: string; stages?: StageLike[] } | null): { family: MissionFamily; title: string } | null => {
+    for (const rec of recs ?? []) {
+      if (rec.tracked === false) continue;
+      const def = find(rec.id);
+      const next = def?.stages?.[rec.stage];
+      if (!def || !next || next.checkKind === null) continue;
+      // A hunt's apex IS the fight; fleeing IS combat — neither is a stall.
+      if (family === 'hunt' && next.checkKind === 'boss') continue;
+      if (family === 'hunt' && next.checkKind === 'escape') continue;
+      if (payingIntent(family, next) === intent) return { family, title: def.title };
+    }
+    return null;
+  };
+  return consider('hunt', player.activeHunts, findHuntById)
+    ?? consider('mystery', player.activeMysteries, findMysteryById)
+    ?? consider('storyline', player.activeStorylines, findStorylineById);
+}
+
 export function missionArrivalLines(player: PlayerCharacter | null | undefined): string[] {
   if (!player?.currentLocationId) return [];
   const out: string[] = [];

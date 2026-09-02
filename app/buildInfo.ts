@@ -26861,7 +26861,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // of a known verb (-ing/-ed/-s, spelling undone, exact entries only) is that
 // verb at full confidence, and ota1623 holds every ask and label to the gate's
 // own number.
-export const OTA_BUILD_ID = '2026-09-02-1623-the-gerund-is-the-verb';
+// ⚠⚠⚠ OTA-1624 — THE REFUSAL SPEAKS FOR EVERY FAMILY. From the owner's 09-02 log
+// audit: every non-fight stage verb is gated on !inCombat (OTA-1217 — you
+// cannot study a room while it is trying to kill you), and P19 gave the HUNT
+// branch a voice for that gate ("not with something on you") while the
+// mystery and storyline branches stayed silent: right verb, right ground,
+// something mid-swing, nothing said. One reader (missionTrace.stalledInCombat)
+// names the first tracked contract of any family whose stage is paid by the
+// typed verb; gameStore's hunt-only copy is gone.
+export const OTA_BUILD_ID = '2026-09-02-1624-the-refusal-speaks-for-every-family';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-02-1623-the-gerund-is-the-verb';
 // golem catch-up 2026-09-02: markerless publish of OTA-1623 - inflected verbs
 // parse at full confidence; every ask/label held to the gate. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-02-1622-it-pops-up-in-your-face';
