@@ -27135,6 +27135,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the expanded panels print AC + durability + a condition word instead of a bare
 // name. One module, companionGear.ts, knows where companion gear lives.
 export const OTA_BUILD_ID = '2026-09-03-1650-companion-gear-is-real-gear';
+// golem catch-up 2026-09-03: markerless publish of OTA-1650 - the companions'
+// gear becomes real gear: the dog's vest is durable at last (dogGear.json's
+// baseDurability had never been read), both pieces warn three points before they
+// go, the crafting bench can reach the golem's hand, and ⚔ / 🛡 sit beside the
+// companion names. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-03-1649-what-a-ring-is-for';
 // golem catch-up 2026-09-03: markerless publish of OTA-1649 - the accessory
 // overhaul. The resist list fifteen accessories carried and combat never saw is
