@@ -670,7 +670,7 @@
         "Compact Aetheric Forge",
         "Builder's Aethercraft Hammer",
         "Sentinel's Warplate",
-        "Flame of Aether"
+        "Flame of Aether Wand"
       ],
       "dislikesTags": [
         "cold",
@@ -888,7 +888,7 @@
         "Arcane Sprinter's Boots",
         "Aetherforged Treads",
         "King's Speed Boots",
-        "Gale Binder",
+        "Gale Binder Wand",
         "Aether Wing"
       ],
       "likesTags": [
@@ -902,7 +902,7 @@
       "likesItems": [
         "Aether-Walker's Cape",
         "Aether-Wing Cloak",
-        "Lightfoot Dash",
+        "Lightfoot Dash Wand",
         "Harpy Feather"
       ],
       "dislikesTags": [
@@ -1070,7 +1070,7 @@
         "Frost Maul",
         "Frost Paste",
         "Rime Draught",
-        "Frostbind",
+        "Frostbind Rod",
         "Ice Vein",
         "Frostbite"
       ],

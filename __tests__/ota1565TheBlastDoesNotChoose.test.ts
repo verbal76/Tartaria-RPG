@@ -56,9 +56,9 @@ describe('OTA-1565 — nine weapons stop hitting exactly one thing', () => {
     // is usually the real ceiling, not the catalog.
     const found = WEAPONS.filter((w) => parseWeaponEffect(w.effect)?.splash).map((w) => w.name).sort();
     expect(found).toEqual([
-      'Aetheric Storm',
+      'Aetheric Storm Scepter',
       'Aetheric Sword of Storms',
-      'Fallout Bloom',
+      'Fallout Bloom Stave',
       'Giant Warblade',
       'Magna-Cannon',
       'Mud Army War Hammer',
@@ -129,7 +129,7 @@ describe('OTA-1565 — nine weapons stop hitting exactly one thing', () => {
       .toBeUndefined();
     // Ember Storm's blast comes packaged with burning terrain this slice cannot
     // lay down, so the weapon waits rather than getting half of itself.
-    expect(splashOf('Ember Storm')).toBeUndefined();
+    expect(splashOf('Ember Storm Stave')).toBeUndefined();
   });
 
   it('⚠⚠⚠ …but the DICE may sit in a neighbouring clause, and are still found', () => {

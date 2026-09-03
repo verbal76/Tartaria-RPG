@@ -41,7 +41,7 @@ const row = (name: string, over: Partial<InventoryItem> = {}) => ({
 describe('OTA-1570 — SELL ALL COMMON no longer eats the Crucible’s entry ticket', () => {
   it('⚠⚠⚠ THE TWO HE ACTUALLY LOST ARE SPARED', () => {
     // Earthshaker and Mud Shell, by name, off his own receipt.
-    const plan = planCommonGearSale([row('Earthshaker'), row('Mud Shell')]);
+    const plan = planCommonGearSale([row('Earthshaker Wand'), row('Mud Shell Wand')]);
     expect(plan.rows).toEqual([]);
     expect(plan.count).toBe(0);
   });
@@ -52,7 +52,7 @@ describe('OTA-1570 — SELL ALL COMMON no longer eats the Crucible’s entry tic
     // reason `isGearItem` keys on the catalog rather than the instance.
     expect(planCommonGearSale([row('Void Edge', { kind: 'runecaster' })]).rows).toEqual([]);
     expect(planCommonGearSale([row('Cudgel', { tags: ['weapon', 'runecaster'] })]).rows).toEqual([]);
-    expect(planCommonGearSale([row('Earthshaker', { kind: 'weapon', tags: [] })]).rows).toEqual([]);
+    expect(planCommonGearSale([row('Earthshaker Wand', { kind: 'weapon', tags: [] })]).rows).toEqual([]);
   });
 
   it('⚠⚠ ORDINARY COMMON GEAR IS STILL SWEPT — the button still works', () => {

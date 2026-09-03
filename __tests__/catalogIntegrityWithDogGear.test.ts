@@ -225,7 +225,7 @@ describe('OTA-124 pre-ship — catalog integrity with dog gear + treats', () => 
     });
 
     // OTA-134 — fixed. The runecaster "Aetheric Shield" was renamed to
-    // "Aetheric Ward" in weapons.json line 228. The melee shield keeps
+    // "Aetheric Ward Rod" in weapons.json line 228. The melee shield keeps
     // its name. findWeaponByName now resolves both rows distinctly.
     test('no duplicate names WITHIN any single catalog file', () => {
       const buckets: Array<{ source: string; items: { name: string }[] }> = [

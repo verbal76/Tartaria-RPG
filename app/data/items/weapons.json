@@ -521,7 +521,7 @@
       "effect": "Ignores armor. What the Founders drew a line through stayed cut."
     },
     {
-      "name": "Crown of Verdict",
+      "name": "Scepter of Verdict",
       "weaponKind": "runecaster",
       "damageType": "radiation",
       "damageDice": "2d10",
@@ -4585,7 +4585,7 @@
       "description": "Heavy plasma artillery. Two-person carry, one-person fire."
     },
     {
-      "name": "Aetheric Spark",
+      "name": "Aetheric Spark Wand",
       "weaponKind": "runecaster",
       "damageType": "aetheric",
       "damageDice": "1d6",
@@ -4605,7 +4605,7 @@
       "description": "A pocket-sized runecaster that snaps Aetheric sparks at the touch."
     },
     {
-      "name": "Mud Grip",
+      "name": "Mud Grip Wand",
       "weaponKind": "runecaster",
       "damageType": "bludgeoning",
       "damageDice": "1d6",
@@ -4626,7 +4626,7 @@
       "description": "Squat clay runecaster — when squeezed, a target's feet sink into reaching mud."
     },
     {
-      "name": "Lightfoot Dash",
+      "name": "Lightfoot Dash Wand",
       "weaponKind": "runecaster",
       "damageType": "aetheric",
       "damageDice": "1d6",
@@ -4647,7 +4647,7 @@
       "description": "Wind-carved runecaster. Quickens the foot, blurs the step."
     },
     {
-      "name": "Dust Cloud",
+      "name": "Dust Cloud Wand",
       "weaponKind": "runecaster",
       "damageType": "bludgeoning",
       "damageDice": "1d6",
@@ -4668,7 +4668,7 @@
       "description": "Powdered-clay runecaster. Throws a screen of dust at the snap."
     },
     {
-      "name": "Aetheric Touch",
+      "name": "Aetheric Touch Wand",
       "weaponKind": "runecaster",
       "damageType": "aetheric",
       "damageDice": "1d6",
@@ -4689,7 +4689,7 @@
       "description": "A warm runecaster — knits small wounds when pressed to skin."
     },
     {
-      "name": "Mud Spray",
+      "name": "Mud Spray Wand",
       "weaponKind": "runecaster",
       "damageType": "bludgeoning",
       "damageDice": "1d6",
@@ -4709,7 +4709,7 @@
       "description": "Mud-filled spray runecaster. Aim, squeeze, blind."
     },
     {
-      "name": "Slick Mud",
+      "name": "Slick Mud Wand",
       "weaponKind": "runecaster",
       "damageType": "bludgeoning",
       "damageDice": "1d6",
@@ -4730,7 +4730,7 @@
       "description": "Greased-clay runecaster. Turns stone into something footing can't trust."
     },
     {
-      "name": "Minor Repair",
+      "name": "Minor Repair Wand",
       "weaponKind": "runecaster",
       "damageType": "aetheric",
       "damageDice": "1d6",
@@ -4751,7 +4751,7 @@
       "description": "A patchwork runecaster — bends Aether toward broken metal."
     },
     {
-      "name": "Vine Grasp",
+      "name": "Vine Grasp Wand",
       "weaponKind": "runecaster",
       "damageType": "piercing",
       "damageDice": "1d6",
@@ -4772,7 +4772,7 @@
       "description": "Twisted root-bound runecaster. Calls vines up through silt."
     },
     {
-      "name": "Mud Shell",
+      "name": "Mud Shell Wand",
       "weaponKind": "runecaster",
       "damageType": "bludgeoning",
       "damageDice": "1d6",
@@ -4793,7 +4793,7 @@
       "description": "A dome-shaped runecaster. Calls a mud shell up around the wielder."
     },
     {
-      "name": "Tangle Roots",
+      "name": "Tangle Roots Rod",
       "weaponKind": "runecaster",
       "damageType": "piercing",
       "damageDice": "1d8",
@@ -4814,7 +4814,7 @@
       "description": "Heavy root-shaped runecaster. Spreads tendrils through silt floors."
     },
     {
-      "name": "Aetheric Disrupt",
+      "name": "Aetheric Disrupt Rod",
       "weaponKind": "runecaster",
       "damageType": "aetheric",
       "damageDice": "1d8",
@@ -4835,7 +4835,7 @@
       "description": "Cracked-crystal runecaster. Severs the Aether-thread of nearby effects."
     },
     {
-      "name": "Mud Blast",
+      "name": "Mud Blast Rod",
       "weaponKind": "runecaster",
       "damageType": "bludgeoning",
       "damageDice": "2d6",
@@ -4855,7 +4855,7 @@
       "description": "Pressurized mud-cartridge runecaster. Punches like a small cannon."
     },
     {
-      "name": "Barrier of Aether",
+      "name": "Barrier of Aether Rod",
       "weaponKind": "runecaster",
       "damageType": "aetheric",
       "damageDice": "1d8",
@@ -4896,7 +4896,7 @@
       "description": "Slim runecaster that forms and fires a mud spike."
     },
     {
-      "name": "Slow Aether",
+      "name": "Slow Aether Rod",
       "weaponKind": "runecaster",
       "damageType": "aetheric",
       "damageDice": "1d8",
@@ -4917,7 +4917,7 @@
       "description": "Aether-glass runecaster. Bends time around the target."
     },
     {
-      "name": "Mud Armor",
+      "name": "Mud Armor Rod",
       "weaponKind": "runecaster",
       "damageType": "bludgeoning",
       "damageDice": "1d8",
@@ -4938,7 +4938,7 @@
       "description": "Wide flat runecaster. Plates the wielder in living mud."
     },
     {
-      "name": "Aetheric Push",
+      "name": "Aetheric Push Rod",
       "weaponKind": "runecaster",
       "damageType": "aetheric",
       "damageDice": "1d8",
@@ -4958,7 +4958,7 @@
       "description": "Force-runecaster shaped like a palm. Hits without contact."
     },
     {
-      "name": "Aetheric Wave",
+      "name": "Aetheric Wave Rod",
       "weaponKind": "runecaster",
       "damageType": "aetheric",
       "damageDice": "2d6",
@@ -4979,7 +4979,7 @@
       "description": "Wave-front runecaster. Cracks the air outward from the caster."
     },
     {
-      "name": "Aetheric Ward",
+      "name": "Aetheric Ward Rod",
       "weaponKind": "runecaster",
       "damageType": "aetheric",
       "damageDice": "1d8",
@@ -5000,7 +5000,7 @@
       "description": "A small disk-runecaster. Hovers between caster and harm. Renamed from Aetheric Shield in OTA-134 — the melee Aetheric Shield is a different item."
     },
     {
-      "name": "Mud Torrent",
+      "name": "Mud Torrent Rod",
       "weaponKind": "runecaster",
       "damageType": "bludgeoning",
       "damageDice": "1d8",
@@ -5020,7 +5020,7 @@
       "description": "Heavy slosh-shaped runecaster. Calls a wave of silt at the target."
     },
     {
-      "name": "Earthquake Ripple",
+      "name": "Earthquake Ripple Stave",
       "weaponKind": "runecaster",
       "damageType": "bludgeoning",
       "damageDice": "2d8",
@@ -5041,7 +5041,7 @@
       "description": "Stone-bowl runecaster. Sends low tremors through the floor."
     },
     {
-      "name": "Mud Forge",
+      "name": "Mud Forge Stave",
       "weaponKind": "runecaster",
       "damageType": "bludgeoning",
       "damageDice": "1d10",
@@ -5062,7 +5062,7 @@
       "description": "Anvil-shaped runecaster. Calls a brief mud-iron blade into a free hand."
     },
     {
-      "name": "Aetheric Shackle",
+      "name": "Aetheric Shackle Stave",
       "weaponKind": "runecaster",
       "damageType": "aetheric",
       "damageDice": "1d10",
@@ -5083,7 +5083,7 @@
       "description": "Knot-shaped runecaster. Loops Aether-chain around the target."
     },
     {
-      "name": "Aetheric Armor",
+      "name": "Aetheric Armor Stave",
       "weaponKind": "runecaster",
       "damageType": "aetheric",
       "damageDice": "1d10",
@@ -5104,7 +5104,7 @@
       "description": "Lattice runecaster. Plates the caster in unseen force."
     },
     {
-      "name": "Mud Wave",
+      "name": "Mud Wave Stave",
       "weaponKind": "runecaster",
       "damageType": "bludgeoning",
       "damageDice": "2d8",
@@ -5125,7 +5125,7 @@
       "description": "Surge-runecaster. Calls a wall of mud through the room."
     },
     {
-      "name": "Aetheric Pillar",
+      "name": "Aetheric Pillar Stave",
       "weaponKind": "runecaster",
       "damageType": "aetheric",
       "damageDice": "2d8",
@@ -5145,7 +5145,7 @@
       "description": "Column-shaped runecaster. Drives a force-pillar up through a target."
     },
     {
-      "name": "Mud Golem Creation",
+      "name": "Mud Golem Creation Stave",
       "weaponKind": "runecaster",
       "damageType": "bludgeoning",
       "damageDice": "2d8",
@@ -5166,7 +5166,7 @@
       "description": "Heart-shaped runecaster. Hardens a heap of silt into a moving guardian."
     },
     {
-      "name": "Aetheric Collapse",
+      "name": "Aetheric Collapse Stave",
       "weaponKind": "runecaster",
       "damageType": "aetheric",
       "damageDice": "2d8",
@@ -5187,7 +5187,7 @@
       "description": "Cracked-key runecaster. Pulls overhead structure down with a word."
     },
     {
-      "name": "Mud Guard",
+      "name": "Mud Guard Stave",
       "weaponKind": "runecaster",
       "damageType": "bludgeoning",
       "damageDice": "1d10",
@@ -5208,7 +5208,7 @@
       "description": "Twin-runecaster. Plates an ally in living mud at range."
     },
     {
-      "name": "Displace Aether",
+      "name": "Displace Aether Scepter",
       "weaponKind": "runecaster",
       "damageType": "aetheric",
       "damageDice": "1d10",
@@ -5230,7 +5230,7 @@
       "description": "Spiral-runecaster. Pulls the caster sideways through the Veil."
     },
     {
-      "name": "Aetheric Storm",
+      "name": "Aetheric Storm Scepter",
       "weaponKind": "runecaster",
       "damageType": "electrical",
       "damageDice": "2d10",
@@ -5252,7 +5252,7 @@
       "description": "Storm-glass runecaster. Calls a private Aether storm to the field."
     },
     {
-      "name": "Mud Emperor's Curse",
+      "name": "Mud Emperor's Curse Scepter",
       "weaponKind": "runecaster",
       "damageType": "poison",
       "damageDice": "2d10",
@@ -5273,7 +5273,7 @@
       "description": "Royal-tier runecaster. The Mud Emperor's curse, sealed in clay."
     },
     {
-      "name": "Shatter Aether",
+      "name": "Shatter Aether Scepter",
       "weaponKind": "runecaster",
       "damageType": "aetheric",
       "damageDice": "1d10",
@@ -5294,7 +5294,7 @@
       "description": "Fracture-runecaster. Snaps Aether-binding outright."
     },
     {
-      "name": "Mud Army",
+      "name": "Mud Army Scepter",
       "weaponKind": "runecaster",
       "damageType": "bludgeoning",
       "damageDice": "2d8",
@@ -5384,7 +5384,7 @@
       "effect": "Ignores light armor; the weight does the rest."
     },
     {
-      "name": "Flame of Aether",
+      "name": "Flame of Aether Wand",
       "weaponKind": "runecaster",
       "damageType": "burn",
       "damageDice": "1d6",
@@ -5406,7 +5406,7 @@
       "description": "Flame of Aether. A pocket-sized runecaster that breathes a thumb of orange flame on a held tap."
     },
     {
-      "name": "Gale Binder",
+      "name": "Gale Binder Wand",
       "weaponKind": "runecaster",
       "damageType": "force",
       "damageDice": "1d6",
@@ -5428,7 +5428,7 @@
       "description": "Gale Binder. A whistle-shaped runecaster — a thin Aetheric gust answers each pulse, hard enough to shove."
     },
     {
-      "name": "Sparkstrike",
+      "name": "Sparkstrike Wand",
       "weaponKind": "runecaster",
       "damageType": "electrical",
       "damageDice": "1d6",
@@ -5450,7 +5450,7 @@
       "description": "Sparkstrike. A short bronze rod with a single arc-channel. Drops the target's jaw for a beat after the hit."
     },
     {
-      "name": "Earthshaker",
+      "name": "Earthshaker Wand",
       "weaponKind": "runecaster",
       "damageType": "bludgeoning",
       "damageDice": "1d6",
@@ -5471,7 +5471,7 @@
       "description": "Earthshaker. A flat slab-runecaster — sends a ground ripple at the feet of whatever you point it at."
     },
     {
-      "name": "Force Wave",
+      "name": "Force Wave Wand",
       "weaponKind": "runecaster",
       "damageType": "force",
       "damageDice": "1d6",
@@ -5493,7 +5493,7 @@
       "description": "Force Wave. A palm-shaped runecaster. Hits without contact and shoves with the strike."
     },
     {
-      "name": "Frostbind",
+      "name": "Frostbind Rod",
       "weaponKind": "runecaster",
       "damageType": "cold",
       "damageDice": "1d6",
@@ -5538,7 +5538,7 @@
       "description": "Frost Maul. A heavy warhammer forged from rime-iron, its head sheathed in never-melting frost. Every swing lands a shock of cold."
     },
     {
-      "name": "Dark Blight",
+      "name": "Dark Blight Rod",
       "weaponKind": "runecaster",
       "damageType": "poison",
       "damageDice": "2d6",
@@ -5581,7 +5581,7 @@
       "description": "Stone Fist. A clenched-fist runecaster of carved mud-iron. A boulder-sized punch at range."
     },
     {
-      "name": "Ether Bolt",
+      "name": "Ether Bolt Rod",
       "weaponKind": "runecaster",
       "damageType": "electrical",
       "damageDice": "2d6",
@@ -5603,7 +5603,7 @@
       "description": "Ether Bolt. A finger-thick crystal stylus — chains blue lightning through hostile circuitry."
     },
     {
-      "name": "Void Pulse",
+      "name": "Void Pulse Rod",
       "weaponKind": "runecaster",
       "damageType": "aetheric",
       "damageDice": "2d6",
@@ -5625,7 +5625,7 @@
       "description": "Void Pulse. A negative-space runecaster — fires a hole in the air that nearby matter falls toward."
     },
     {
-      "name": "Shadow Caller",
+      "name": "Shadow Caller Stave",
       "weaponKind": "runecaster",
       "damageType": "aetheric",
       "damageDice": "2d8",
@@ -5647,7 +5647,7 @@
       "description": "Shadow Caller. A black-glass runecaster. The strike lands, then you aren't where you were."
     },
     {
-      "name": "Ember Storm",
+      "name": "Ember Storm Stave",
       "weaponKind": "runecaster",
       "damageType": "burn",
       "damageDice": "2d8",
@@ -5670,7 +5670,7 @@
       "description": "Ember Storm. A ribbed cylinder runecaster — exhales a fan of embers, leaves the floor glowing."
     },
     {
-      "name": "Stormcaller",
+      "name": "Stormcaller Stave",
       "weaponKind": "runecaster",
       "damageType": "electrical",
       "damageDice": "2d8",
@@ -5692,7 +5692,7 @@
       "description": "Stormcaller. A bronze trident-runecaster. Calls a private squall onto whatever it's pointed at."
     },
     {
-      "name": "Wrath of Titans",
+      "name": "Wrath of Titans Scepter",
       "weaponKind": "runecaster",
       "damageType": "bludgeoning",
       "damageDice": "2d20",
@@ -5715,7 +5715,7 @@
       "description": "Wrath of Titans. A Mud Emperor-grade runecaster, cast around a Behemoth heart. The whole room reacts when it fires."
     },
     {
-      "name": "Phoenix Rebirth",
+      "name": "Phoenix Rebirth Scepter",
       "weaponKind": "runecaster",
       "damageType": "burn",
       "damageDice": "2d20",
@@ -6210,7 +6210,7 @@
       "description": "Rime Spike. A stubby blue-white caster that breathes a needle of cold. It does not kill quickly. It makes a thing slow, and slow is what kills it."
     },
     {
-      "name": "Hoarfrost Ward",
+      "name": "Hoarfrost Ward Stave",
       "weaponKind": "runecaster",
       "damageType": "cold",
       "damageDice": "1d8",
@@ -6234,7 +6234,7 @@
       "description": "Hoarfrost Ward. Frost grown outward in plates until it stands off the body — it takes the blow and shatters, and you walk out of the shards."
     },
     {
-      "name": "Killing Frost",
+      "name": "Killing Frost Stave",
       "weaponKind": "runecaster",
       "damageType": "cold",
       "damageDice": "2d8",
@@ -6257,7 +6257,7 @@
       "description": "Killing Frost. The cold that comes off it is not weather. Metal goes brittle, mud goes to stone, and whatever was moving stops being able to."
     },
     {
-      "name": "Winter's Verdict",
+      "name": "Winter's Verdict Scepter",
       "weaponKind": "runecaster",
       "damageType": "cold",
       "damageDice": "2d10",
@@ -6281,7 +6281,7 @@
       "description": "Winter's Verdict. Pre-Flood judgment work. It does not argue with what it is pointed at; it simply decides the matter is closed and the cold agrees."
     },
     {
-      "name": "Glowrot",
+      "name": "Glowrot Rod",
       "weaponKind": "runecaster",
       "damageType": "radiation",
       "damageDice": "1d8",
@@ -6303,7 +6303,7 @@
       "description": "Glowrot. A cracked lens over a seed of something that has not stopped burning since before the water came. Point it and the light does the rest."
     },
     {
-      "name": "Sickening Light",
+      "name": "Sickening Light Stave",
       "weaponKind": "runecaster",
       "damageType": "radiation",
       "damageDice": "2d6",
@@ -6326,7 +6326,7 @@
       "description": "Sickening Light. A dull amber pulse that does nothing you can see, until the thing you aimed it at starts swinging like it is tired."
     },
     {
-      "name": "Fallout Bloom",
+      "name": "Fallout Bloom Stave",
       "weaponKind": "runecaster",
       "damageType": "radiation",
       "damageDice": "2d6",
@@ -6349,7 +6349,7 @@
       "description": "Fallout Bloom. It opens like a flower and it does not care whose side anyone is on. Reclaimers who carry one learn to throw it and step back."
     },
     {
-      "name": "Half-Life Pulse",
+      "name": "Half-Life Pulse Scepter",
       "weaponKind": "runecaster",
       "damageType": "radiation",
       "damageDice": "2d10",

@@ -90,7 +90,7 @@ describe('OTA-694 — investigate flavor never treats architecture as handheld',
 describe('OTA-694 — item-use nudge requires a whole-word overlap', () => {
   it('"disturb the aetherkin" does not suggest "use flame of aether"', () => {
     const parsed = parseInput('disturb the aetherkin', {
-      inventory: [{ id: 'r1', name: 'Flame of Aether', kind: 'relic', quantity: 1, tags: [] }] as any,
+      inventory: [{ id: 'r1', name: 'Flame of Aether Wand', kind: 'relic', quantity: 1, tags: [] }] as any,
     });
     const sugg = (parsed.suggestions ?? []).join(' | ').toLowerCase();
     expect(sugg).not.toMatch(/use flame of aether/);

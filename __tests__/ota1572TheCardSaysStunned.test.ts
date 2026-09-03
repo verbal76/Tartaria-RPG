@@ -45,7 +45,7 @@ describe('OTA-1572 — the parser reads what the cards actually say', () => {
   it('⚠⚠⚠ SPARKSTRIKE, THE COMMON THAT WOULD HAVE ENDED EVERY DUEL', () => {
     // "1d6 lightning; 1-round stun on a hit." Unconditional, on a Common. This
     // is the weapon the brace exists for.
-    expect(ctlOf('Sparkstrike')).toEqual({
+    expect(ctlOf('Sparkstrike Wand')).toEqual({
       kind: 'stunned', rounds: 1, trigger: 'always', chance: undefined, threshold: undefined,
     });
   });
@@ -59,7 +59,7 @@ describe('OTA-1572 — the parser reads what the cards actually say', () => {
     expect(ctlOf('Mud Shortsword')?.chance).toBe(0.5);
     expect(ctlOf('Bone Cleaver')?.trigger).toBe('chance');         // "even/odd reroll"
     expect(ctlOf('Gravity Hammer')?.trigger).toBe('chance');       // "to confirm"
-    expect(ctlOf('Slick Mud')?.trigger).toBe('chance');            // "DEX save or fall"
+    expect(ctlOf('Slick Mud Wand')?.trigger).toBe('chance');            // "DEX save or fall"
     // ⚠ "even = stun for 3 turns" — my first draft read this as unconditional
     // and handed a Legendary a permanent 3-round stun. It is a coin flip.
     expect(ctlOf('Energy Pike')?.trigger).toBe('chance');
@@ -71,9 +71,9 @@ describe('OTA-1572 — the parser reads what the cards actually say', () => {
     // Frost Maul "seizes machinery and staggers the living". Read without the
     // restriction, a Rare melee weapon paralyses everything it touches — both a
     // lie about the card and the strongest weapon in the game by a distance.
-    expect(ctlOf('Killing Frost')?.kind).toBe('paralyzed');
-    expect(ctlOf('Killing Frost')?.restrictedTo).toBe('construct');
-    expect(ctlOf('Killing Frost')?.fallback).toBeUndefined();
+    expect(ctlOf('Killing Frost Stave')?.kind).toBe('paralyzed');
+    expect(ctlOf('Killing Frost Stave')?.restrictedTo).toBe('construct');
+    expect(ctlOf('Killing Frost Stave')?.fallback).toBeUndefined();
     // Frost Maul names what everyone else gets, so everyone else gets it.
     expect(ctlOf('Frost Maul')?.restrictedTo).toBe('construct');
     expect(ctlOf('Frost Maul')?.fallback).toBe('slowed');
@@ -83,22 +83,22 @@ describe('OTA-1572 — the parser reads what the cards actually say', () => {
     // Every one of these is a real string from weapons.json, and not one of them
     // uses the word its condition is named after. This is the ceiling that has
     // been the real limit in all three previous slices.
-    expect(ctlOf('Mud Grip')?.kind).toBe('restrained');       // "Immobilizes"
-    expect(ctlOf('Vine Grasp')?.kind).toBe('restrained');     // "vines to entangle"
+    expect(ctlOf('Mud Grip Wand')?.kind).toBe('restrained');       // "Immobilizes"
+    expect(ctlOf('Vine Grasp Wand')?.kind).toBe('restrained');     // "vines to entangle"
     expect(ctlOf('Rime Spike')?.kind).toBe('slowed');         // "strikes late"
-    expect(ctlOf('Sickening Light')?.kind).toBe('slowed');    // "the target sickens"
-    expect(ctlOf('Force Wave')?.kind).toBe('knockback');      // "10 ft knockback"
+    expect(ctlOf('Sickening Light Stave')?.kind).toBe('slowed');    // "the target sickens"
+    expect(ctlOf('Force Wave Wand')?.kind).toBe('knockback');      // "10 ft knockback"
     expect(ctlOf('Shockwave Buckler')?.kind).toBe('knockback'); // "push enemies to far"
-    expect(ctlOf('Earthshaker')?.kind).toBe('prone');         // "knocks the target prone"
+    expect(ctlOf('Earthshaker Wand')?.kind).toBe('prone');         // "knocks the target prone"
   });
 
   it('⚠⚠ durations come off the card, and "Instantaneous" is still one round', () => {
-    expect(ctlOf('Tangle Roots')?.rounds).toBe(5);
-    expect(ctlOf('Aetheric Shackle')?.rounds).toBe(3);
-    expect(ctlOf('Mud Spray')?.rounds).toBe(2);
+    expect(ctlOf('Tangle Roots Rod')?.rounds).toBe(5);
+    expect(ctlOf('Aetheric Shackle Stave')?.rounds).toBe(3);
+    expect(ctlOf('Mud Spray Wand')?.rounds).toBe(2);
     // A zero-round control would read on the card as a promise and do nothing —
     // the exact defect this whole program exists to close.
-    expect(ctlOf('Mud Wave')?.rounds).toBe(1);
+    expect(ctlOf('Mud Wave Stave')?.rounds).toBe(1);
     for (const w of catalog) {
       const c = parseWeaponEffect(w.effect)?.onHitControl;
       if (c) expect(c.rounds).toBeGreaterThanOrEqual(1);
@@ -108,7 +108,7 @@ describe('OTA-1572 — the parser reads what the cards actually say', () => {
   it('⚠⚠ a weapon that promises two controls gets the more severe, never both', () => {
     // Wrath of Titans: "massive AoE stun + knockback". Two controls off one
     // swing is a lock however it is spelled.
-    const c = ctlOf('Wrath of Titans');
+    const c = ctlOf('Wrath of Titans Scepter');
     expect(c?.kind).toBe('stunned');
     expect(Object.keys(c ?? {})).not.toContain('second');
   });
@@ -137,7 +137,7 @@ describe('OTA-1572 — the parser reads what the cards actually say', () => {
 describe('OTA-1572 — the anti-lock guard, which is half the feature', () => {
   const stun: OnHitControl = { kind: 'stunned', rounds: 1, trigger: 'always' };
   const land = (brace: number) =>
-    landControl({ control: stun, sourceName: 'Sparkstrike', braceRounds: brace, restrictionMet: true, triggered: true });
+    landControl({ control: stun, sourceName: 'Sparkstrike Wand', braceRounds: brace, restrictionMet: true, triggered: true });
 
   it('⚠⚠⚠ SPARKSTRIKE CANNOT CHAIN — the 844-stuns/run shape, pointed the other way', () => {
     // Round 1: the stun lands and grants the brace.
@@ -169,7 +169,7 @@ describe('OTA-1572 — the anti-lock guard, which is half the feature', () => {
     let brace = 0;
     let freeRounds = 0;
     for (let round = 0; round < 10; round++) {
-      const r = landControl({ control: stun, sourceName: 'Sparkstrike', braceRounds: brace, restrictionMet: true, triggered: true });
+      const r = landControl({ control: stun, sourceName: 'Sparkstrike Wand', braceRounds: brace, restrictionMet: true, triggered: true });
       if (r) { control = r.control; brace = r.braceRounds; }
       if (!isSkipControl(control)) freeRounds++;
       const t = tickControl(control, brace);
@@ -196,7 +196,7 @@ describe('OTA-1572 — the anti-lock guard, which is half the feature', () => {
   it('⚠⚠ the machine restriction is honoured, and the fallback is what the card promises', () => {
     const frost: OnHitControl = { kind: 'paralyzed', rounds: 1, trigger: 'always', restrictedTo: 'construct' };
     // A person is not a machine: Killing Frost names no fallback, so nothing lands.
-    expect(landControl({ control: frost, sourceName: 'Killing Frost', braceRounds: 0, restrictionMet: false, triggered: true })).toBeNull();
+    expect(landControl({ control: frost, sourceName: 'Killing Frost Stave', braceRounds: 0, restrictionMet: false, triggered: true })).toBeNull();
     // Frost Maul names one, so the living get staggered instead of paralysed.
     const maul: OnHitControl = { ...frost, fallback: 'slowed' };
     const r = landControl({ control: maul, sourceName: 'Frost Maul', braceRounds: 0, restrictionMet: false, triggered: true });

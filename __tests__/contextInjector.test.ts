@@ -41,7 +41,7 @@ function makeLocation(over: Partial<Location> = {}): Location {
 function makeWeather(over: Partial<WeatherEntry> = {}): WeatherEntry {
   return {
     id: 'aetheric_storm',
-    name: 'Aetheric Storm',
+    name: 'Aetheric Storm Scepter',
     description: 'Violet lightning sketches across the sky.',
     visibility: 1,
     travelPenalty: 1,
@@ -133,7 +133,7 @@ describe('buildLlmContext', () => {
       room_name: 'Asgardar',
     });
     expect(ctx.environmental_description).toContain('skeletal capital');
-    expect(ctx.environmental_description).toContain('Aetheric Storm');
+    expect(ctx.environmental_description).toContain('Aetheric Storm Scepter');
     expect(ctx.environmental_description).toContain('Pulsing Mud');
     expect(ctx.active_entities).toContain('Mud Golem');
     expect(ctx.active_entities).toContain('10/22 HP'); // wounded
@@ -528,7 +528,7 @@ describe('buildLlmContext with ladder override', () => {
     expect(ctx.current_biome).toBe('The Silt Wastes');
     expect(ctx.room_name).toBe('Buried Skyscraper — Upper Floors');
     expect(ctx.environmental_description).toContain('Wind moans through a glass-toothed atrium');
-    expect(ctx.environmental_description).toContain('Aetheric Storm'); // weather still folded in
+    expect(ctx.environmental_description).toContain('Aetheric Storm Scepter'); // weather still folded in
     expect(ctx.available_exits).toBe('down the stairwell, out the window');
   });
 

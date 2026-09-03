@@ -171,7 +171,7 @@ describe('OTA-1060 — who they are decides what it is worth', () => {
     // does dislike forage, so it can no longer stand for "no opinion". The claim
     // under test is the PRICE FALLBACK, so the fixture has to be something he has
     // no view on at all: a runecaster is outside a two-hander merchant's trade.
-    expect(reactionFor('drakos_mercenary', { name: 'Aetheric Ward', tags: ['runecaster', 'spell'], worth: 200 })).toBe('liked');
+    expect(reactionFor('drakos_mercenary', { name: 'Aetheric Ward Rod', tags: ['runecaster', 'spell'], worth: 200 })).toBe('liked');
   });
 
   it('a person with no authored preferences still reacts sensibly', () => {

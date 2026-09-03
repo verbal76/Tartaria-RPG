@@ -113,33 +113,33 @@ describe('OTA-1616 — the grouping arithmetic, run', () => {
 
   it('⚠⚠⚠ HIS NINE LINES BECOME ONE', () => {
     const out = group([
-      { name: 'Flame of Aether', why: RUNE }, { name: 'Mud Shell', why: RUNE },
-      { name: 'Minor Repair', why: RUNE }, { name: 'Vine Grasp', why: RUNE },
-      { name: 'Mud Spear (Runecaster)', why: RUNE }, { name: 'Minor Repair', why: RUNE },
-      { name: 'Aetheric Spark', why: RUNE }, { name: 'Aetheric Spark', why: RUNE },
-      { name: 'Sparkstrike', why: RUNE },
+      { name: 'Flame of Aether Wand', why: RUNE }, { name: 'Mud Shell Wand', why: RUNE },
+      { name: 'Minor Repair Wand', why: RUNE }, { name: 'Vine Grasp Wand', why: RUNE },
+      { name: 'Mud Spear (Runecaster)', why: RUNE }, { name: 'Minor Repair Wand', why: RUNE },
+      { name: 'Aetheric Spark Wand', why: RUNE }, { name: 'Aetheric Spark Wand', why: RUNE },
+      { name: 'Sparkstrike Wand', why: RUNE },
     ]);
     expect(out.length).toBe(1);
     expect(out[0]).toContain('9 weapons');
     expect(out[0]).toContain(RUNE);
     // Duplicates folded, and the tail capped rather than spilling.
-    expect(out[0]).toContain('Minor Repair ×2');
-    expect(out[0]).toContain('Aetheric Spark ×2');
+    expect(out[0]).toContain('Minor Repair Wand ×2');
+    expect(out[0]).toContain('Aetheric Spark Wand ×2');
     expect(out[0]).toContain('and 1 more');
     // The whole thing is one line — the wall is gone.
     expect(String(out[0]).split('\n').length).toBe(1);
   });
 
   it('⚠⚠ a lone weapon still reads as a sentence about that weapon', () => {
-    const out = group([{ name: 'Force Wave', why: RUNE, worn: true }]);
-    expect(out).toEqual([`• Force Wave (equipped) — ${RUNE}`]);
+    const out = group([{ name: 'Force Wave Wand', why: RUNE, worn: true }]);
+    expect(out).toEqual([`• Force Wave Wand (equipped) — ${RUNE}`]);
   });
 
   it('⚠ different reasons stay different lines — the grouping is by rule, not a lump', () => {
     const BEAM = 'an energy weapon fires nothing solid to carry the coating';
     const out = group([
-      { name: 'Flame of Aether', why: RUNE },
-      { name: 'Sparkstrike', why: RUNE },
+      { name: 'Flame of Aether Wand', why: RUNE },
+      { name: 'Sparkstrike Wand', why: RUNE },
       { name: 'Lance', why: BEAM },
     ]);
     expect(out.length).toBe(2);

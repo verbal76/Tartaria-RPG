@@ -162,7 +162,7 @@ describe('OTA-1556 — the two things that were NOT bugs stay as they are', () =
   it('⚠⚠⚠ Earthshaker is a RUNE-CASTER in the catalog — the refusal is the rule, not a defect', () => {
     const weapons = JSON.parse(src('app/data/items/weapons.json')) as unknown;
     const rows = (Array.isArray(weapons) ? weapons : (weapons as { weapons?: unknown[] }).weapons ?? []) as Array<Record<string, unknown>>;
-    const earth = rows.find((w) => String(w.name) === 'Earthshaker');
+    const earth = rows.find((w) => String(w.name) === 'Earthshaker Wand');
     expect(earth).toBeDefined();
     expect(earth!.weaponKind).toBe('runecaster');
     // Its own description says so, which is why this is content and not an

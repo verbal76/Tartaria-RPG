@@ -1012,7 +1012,7 @@
       ]
     },
     {
-      "result": "Flame of Aether",
+      "result": "Flame of Aether Wand",
       "intRequirement": 11,
       "ingredients": [
         {
@@ -1030,7 +1030,7 @@
       ]
     },
     {
-      "result": "Gale Binder",
+      "result": "Gale Binder Wand",
       "ingredients": [
         {
           "name": "Blank Runecaster Casing (Common)",
@@ -1048,7 +1048,7 @@
       "intRequirement": 11
     },
     {
-      "result": "Sparkstrike",
+      "result": "Sparkstrike Wand",
       "ingredients": [
         {
           "name": "Blank Runecaster Casing (Common)",
@@ -1066,7 +1066,7 @@
       "intRequirement": 11
     },
     {
-      "result": "Earthshaker",
+      "result": "Earthshaker Wand",
       "ingredients": [
         {
           "name": "Blank Runecaster Casing (Common)",
@@ -1084,7 +1084,7 @@
       "intRequirement": 11
     },
     {
-      "result": "Force Wave",
+      "result": "Force Wave Wand",
       "ingredients": [
         {
           "name": "Blank Runecaster Casing (Common)",
@@ -1102,7 +1102,7 @@
       "intRequirement": 11
     },
     {
-      "result": "Dark Blight",
+      "result": "Dark Blight Rod",
       "ingredients": [
         {
           "name": "Blank Runecaster Casing (Uncommon)",
@@ -1138,7 +1138,7 @@
       "intRequirement": 11
     },
     {
-      "result": "Ether Bolt",
+      "result": "Ether Bolt Rod",
       "ingredients": [
         {
           "name": "Blank Runecaster Casing (Uncommon)",
@@ -1156,7 +1156,7 @@
       "intRequirement": 11
     },
     {
-      "result": "Void Pulse",
+      "result": "Void Pulse Rod",
       "ingredients": [
         {
           "name": "Blank Runecaster Casing (Uncommon)",
@@ -1174,7 +1174,7 @@
       "intRequirement": 11
     },
     {
-      "result": "Shadow Caller",
+      "result": "Shadow Caller Stave",
       "ingredients": [
         {
           "name": "Blank Runecaster Casing (Rare)",
@@ -1192,7 +1192,7 @@
       "intRequirement": 11
     },
     {
-      "result": "Ember Storm",
+      "result": "Ember Storm Stave",
       "ingredients": [
         {
           "name": "Blank Runecaster Casing (Rare)",
@@ -1210,7 +1210,7 @@
       "intRequirement": 11
     },
     {
-      "result": "Stormcaller",
+      "result": "Stormcaller Stave",
       "ingredients": [
         {
           "name": "Blank Runecaster Casing (Rare)",
@@ -1228,7 +1228,7 @@
       "intRequirement": 11
     },
     {
-      "result": "Wrath of Titans",
+      "result": "Wrath of Titans Scepter",
       "ingredients": [
         {
           "name": "Blank Runecaster Casing (Legendary)",
@@ -1246,7 +1246,7 @@
       "intRequirement": 11
     },
     {
-      "result": "Phoenix Rebirth",
+      "result": "Phoenix Rebirth Scepter",
       "ingredients": [
         {
           "name": "Blank Runecaster Casing (Legendary)",
@@ -2176,7 +2176,7 @@
       ]
     },
     {
-      "result": "Frostbind",
+      "result": "Frostbind Rod",
       "ingredients": [
         {
           "name": "Blank Runecaster Casing (Uncommon)",
@@ -2210,7 +2210,7 @@
       ]
     },
     {
-      "result": "Hoarfrost Ward",
+      "result": "Hoarfrost Ward Stave",
       "ingredients": [
         {
           "name": "Blank Runecaster Casing (Rare)",
@@ -2227,7 +2227,7 @@
       ]
     },
     {
-      "result": "Killing Frost",
+      "result": "Killing Frost Stave",
       "ingredients": [
         {
           "name": "Blank Runecaster Casing (Rare)",
@@ -2244,7 +2244,7 @@
       ]
     },
     {
-      "result": "Winter's Verdict",
+      "result": "Winter's Verdict Scepter",
       "ingredients": [
         {
           "name": "Blank Runecaster Casing (Legendary)",
@@ -2261,7 +2261,7 @@
       ]
     },
     {
-      "result": "Glowrot",
+      "result": "Glowrot Rod",
       "ingredients": [
         {
           "name": "Blank Runecaster Casing (Uncommon)",
@@ -2278,7 +2278,7 @@
       ]
     },
     {
-      "result": "Sickening Light",
+      "result": "Sickening Light Stave",
       "ingredients": [
         {
           "name": "Blank Runecaster Casing (Rare)",
@@ -2295,7 +2295,7 @@
       ]
     },
     {
-      "result": "Fallout Bloom",
+      "result": "Fallout Bloom Stave",
       "ingredients": [
         {
           "name": "Blank Runecaster Casing (Rare)",
@@ -2312,7 +2312,7 @@
       ]
     },
     {
-      "result": "Half-Life Pulse",
+      "result": "Half-Life Pulse Scepter",
       "ingredients": [
         {
           "name": "Blank Runecaster Casing (Legendary)",

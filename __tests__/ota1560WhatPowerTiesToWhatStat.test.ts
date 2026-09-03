@@ -67,28 +67,28 @@ describe("OTA-1560 — the owner's own example, which set the rule", () => {
     // Both are bludgeoning. A damage-type-first mapping put them on STRENGTH,
     // which is exactly backwards: they are the terrain and the cover a quiet
     // character plays around. This single case is why ROLE comes first.
-    expect(statOf('Slick Mud')).toBe('stealth');
-    expect(statOf('Dust Cloud')).toBe('stealth');
-    expect(byName('Slick Mud').damageType).toBe('bludgeoning');
-    expect(byName('Dust Cloud').damageType).toBe('bludgeoning');
+    expect(statOf('Slick Mud Wand')).toBe('stealth');
+    expect(statOf('Dust Cloud Wand')).toBe('stealth');
+    expect(byName('Slick Mud Wand').damageType).toBe('bludgeoning');
+    expect(byName('Dust Cloud Wand').damageType).toBe('bludgeoning');
   });
 
   it('⚠⚠⚠ ROLE BEATS DAMAGE TYPE wherever the role is a playstyle', () => {
-    expect(statOf('Mud Shell')).toBe('strength');           // ward, bludgeoning
-    expect(statOf('Aetheric Ward')).toBe('strength');       // ward, aetheric — same job, same stat
-    expect(statOf('Aetheric Shackle')).toBe('dexterity');   // restrain, aetheric
-    expect(statOf('Mud Golem Creation')).toBe('charisma');  // summon, bludgeoning
-    expect(statOf('Aetheric Touch')).toBe('wisdom');        // healing
-    expect(statOf('Ember Storm')).toBe('intelligence');     // aoe, burn
+    expect(statOf('Mud Shell Wand')).toBe('strength');           // ward, bludgeoning
+    expect(statOf('Aetheric Ward Rod')).toBe('strength');       // ward, aetheric — same job, same stat
+    expect(statOf('Aetheric Shackle Stave')).toBe('dexterity');   // restrain, aetheric
+    expect(statOf('Mud Golem Creation Stave')).toBe('charisma');  // summon, bludgeoning
+    expect(statOf('Aetheric Touch Wand')).toBe('wisdom');        // healing
+    expect(statOf('Ember Storm Stave')).toBe('intelligence');     // aoe, burn
   });
 
   it('⚠⚠ A PLAIN STRIKE has no playstyle, so its ELEMENT decides', () => {
     expect(statOf('Stone Fist')).toBe('strength');      // bludgeoning
-    expect(statOf('Sparkstrike')).toBe('dexterity');    // electrical
+    expect(statOf('Sparkstrike Wand')).toBe('dexterity');    // electrical
     expect(statOf('Pyric Wand')).toBe('charisma');      // burn
     expect(statOf('Mire Stave')).toBe('stealth');       // poison
-    expect(statOf('Frostbind')).toBe('wisdom');         // cold
-    expect(statOf('Aetheric Spark')).toBe('intelligence');
+    expect(statOf('Frostbind Rod')).toBe('wisdom');         // cold
+    expect(statOf('Aetheric Spark Wand')).toBe('intelligence');
   });
 
   it('⚠⚠⚠ SCHOOL CHANGES NOTHING — two spells doing the same job give the same result', () => {
@@ -115,11 +115,11 @@ describe('OTA-1560 — the INT/WIS split he asked for by name', () => {
   it('⚠⚠⚠ the UNMAKING spells reward WISDOM; the ones that push things stay INT', () => {
     // Not a quota — it is what the spells are. Disrupt severs a thread, Displace
     // moves a thing out of true, the Void trio takes something away.
-    for (const n of ['Aetheric Disrupt', 'Displace Aether', 'Void Pulse', 'Shadow Caller', 'Void Edge']) {
+    for (const n of ['Aetheric Disrupt Rod', 'Displace Aether Scepter', 'Void Pulse Rod', 'Shadow Caller Stave', 'Void Edge']) {
       expect(statOf(n)).toBe('wisdom');
       expect(byName(n).tags).toContain('unmaking');
     }
-    for (const n of ['Aetheric Spark', 'Aetheric Push', 'Aetheric Pillar', 'Shatter Aether', 'Force Wave', 'Gale Binder']) {
+    for (const n of ['Aetheric Spark Wand', 'Aetheric Push Rod', 'Aetheric Pillar Stave', 'Shatter Aether Scepter', 'Force Wave Wand', 'Gale Binder Wand']) {
       expect(statOf(n)).toBe('intelligence');
       expect(byName(n).tags ?? []).not.toContain('unmaking');
     }
@@ -174,8 +174,8 @@ describe('OTA-1560 — the frost and radiation he asked for', () => {
     // state, and a dead end at the bench for anyone who read the tag.
     const recipes = asRows(read('app/data/items/recipes.json')) as unknown as Array<{ result: string; ingredients: Array<{ name: string; quantity: number }> }>;
     const made = new Set(recipes.map((r) => r.result));
-    for (const n of ['Frostbind', 'Rime Spike', 'Hoarfrost Ward', 'Killing Frost',
-      "Winter's Verdict", 'Glowrot', 'Sickening Light', 'Fallout Bloom', 'Half-Life Pulse']) {
+    for (const n of ['Frostbind Rod', 'Rime Spike', 'Hoarfrost Ward Stave', 'Killing Frost Stave',
+      "Winter's Verdict Scepter", 'Glowrot Rod', 'Sickening Light Stave', 'Fallout Bloom Stave', 'Half-Life Pulse Scepter']) {
       expect(made.has(n)).toBe(true);
     }
     // …and every ingredient they ask for actually exists.

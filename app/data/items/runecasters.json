@@ -1,6 +1,6 @@
 [
   {
-    "name": "Flame of Aether",
+    "name": "Flame of Aether Wand",
     "rarity": "Common",
     "shellLevel": "Common",
     "ingredients": [
@@ -25,7 +25,7 @@
     ]
   },
   {
-    "name": "Gale Binder",
+    "name": "Gale Binder Wand",
     "rarity": "Common",
     "shellLevel": "Common",
     "ingredients": [
@@ -50,7 +50,7 @@
     ]
   },
   {
-    "name": "Sparkstrike",
+    "name": "Sparkstrike Wand",
     "rarity": "Common",
     "shellLevel": "Common",
     "ingredients": [
@@ -75,7 +75,7 @@
     ]
   },
   {
-    "name": "Earthshaker",
+    "name": "Earthshaker Wand",
     "rarity": "Common",
     "shellLevel": "Common",
     "ingredients": [
@@ -225,7 +225,7 @@
     ]
   },
   {
-    "name": "Force Wave",
+    "name": "Force Wave Wand",
     "rarity": "Common",
     "shellLevel": "Common",
     "ingredients": [
@@ -250,7 +250,7 @@
     ]
   },
   {
-    "name": "Dark Blight",
+    "name": "Dark Blight Rod",
     "rarity": "Uncommon",
     "shellLevel": "Uncommon",
     "ingredients": [
@@ -325,7 +325,7 @@
     ]
   },
   {
-    "name": "Ether Bolt",
+    "name": "Ether Bolt Rod",
     "rarity": "Uncommon",
     "shellLevel": "Uncommon",
     "ingredients": [
@@ -500,7 +500,7 @@
     ]
   },
   {
-    "name": "Void Pulse",
+    "name": "Void Pulse Rod",
     "rarity": "Uncommon",
     "shellLevel": "Uncommon",
     "ingredients": [
@@ -750,7 +750,7 @@
     ]
   },
   {
-    "name": "Shadow Caller",
+    "name": "Shadow Caller Stave",
     "rarity": "Rare",
     "shellLevel": "Rare",
     "ingredients": [
@@ -775,7 +775,7 @@
     ]
   },
   {
-    "name": "Ember Storm",
+    "name": "Ember Storm Stave",
     "rarity": "Rare",
     "shellLevel": "Rare",
     "ingredients": [
@@ -875,7 +875,7 @@
     ]
   },
   {
-    "name": "Stormcaller",
+    "name": "Stormcaller Stave",
     "rarity": "Rare",
     "shellLevel": "Rare",
     "ingredients": [
@@ -1000,7 +1000,7 @@
     ]
   },
   {
-    "name": "Wrath of Titans",
+    "name": "Wrath of Titans Scepter",
     "rarity": "Legendary",
     "shellLevel": "Legendary",
     "ingredients": [
@@ -1025,7 +1025,7 @@
     ]
   },
   {
-    "name": "Phoenix Rebirth",
+    "name": "Phoenix Rebirth Scepter",
     "rarity": "Legendary",
     "shellLevel": "Legendary",
     "ingredients": [

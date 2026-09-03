@@ -26981,7 +26981,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // reader, and no surface printed any of it (no dog-gear preview branch; the
 // snapshot printed AC only for fused pieces). Dog-gear preview, the two readers
 // wired (bite STR, nose INT, hit-reflect), and the snapshot carries stat lines.
-export const OTA_BUILD_ID = '2026-09-03-1640-the-vest-says-what-it-does';
+// ⚠⚠⚠ OTA-1641 — A WEAPON IS NAMED LIKE A WEAPON. Owner: "why do I have a
+// weapon called a minor repair? that's stupid … let's get a rule in place where
+// the weapon names actually need to sound like weapon names." 284 weapons, 56
+// named for what they DO (every rune-caster + the Crown of Verdict). Each is
+// now the rune's OBJECT by rarity — Wand / Rod / Stave / Scepter — and the
+// Crown is the Scepter of Verdict. The rule is a gate (check:weaponnames, the
+// 18th) with a self-test; every retired name is a LEGACY_ITEM_RENAMES entry.
+export const OTA_BUILD_ID = '2026-09-03-1641-a-weapon-is-named-like-a-weapon';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-03-1640-the-vest-says-what-it-does';
 // golem catch-up 2026-09-03: markerless publish of OTA-1640 - dog-gear preview,
 // vest STR/INT/bite-back wired, snapshot stat lines. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-03-1639-every-ingredient-exists';

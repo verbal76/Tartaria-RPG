@@ -52,18 +52,18 @@ const caster = (name: string, over: Partial<InventoryItem> = {}): InventoryItem 
 
 describe('OTA-1561 — the Crucible finally takes a rune-caster', () => {
   it('⚠⚠⚠ EARTHSHAKER IS UPGRADEABLE — the piece he was refused twice', () => {
-    const v = crucibleUpgradeVerdict(caster('Earthshaker'));
+    const v = crucibleUpgradeVerdict(caster('Earthshaker Wand'));
     expect(v.kind).toBe('runecaster');
     expect(v.blocked).toBeNull();
   });
 
   it('⚠⚠⚠ …and it is no longer told it has no edge, because that was never the point', () => {
-    const v = crucibleUpgradeVerdict(caster('Earthshaker'));
+    const v = crucibleUpgradeVerdict(caster('Earthshaker Wand'));
     expect(v.blocked ?? '').not.toContain('no edge');
   });
 
   it('⚠⚠⚠ A FULL CASTER IS REFUSED BY ITS OWN LIMIT, and says the number', () => {
-    const full = crucibleUpgradeVerdict(caster('Earthshaker', { runePassives: 2 }));
+    const full = crucibleUpgradeVerdict(caster('Earthshaker Wand', { runePassives: 2 }));
     expect(full.kind).toBe('runecaster');
     expect(full.blocked).toContain('2');
     // A Legendary still has room at 2 — the cap is what differs, not the rule.

@@ -51,7 +51,7 @@ describe('OTA-742 — the Qwen namer rejects echoed / low-quality names', () => 
 
   it('rejects a bare "<theme> Armor" name', async () => {
     const r = await synthesizeFusionNameViaQwen(dogStats, inputs, ['organic'],
-      mockQwen('{"name":"Aetheric Armor","description":"A humming vest."}'));
+      mockQwen('{"name":"Aetheric Armor Stave","description":"A humming vest."}'));
     expect(r).toBeNull();
   });
 

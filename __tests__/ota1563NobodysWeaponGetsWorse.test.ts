@@ -132,7 +132,7 @@ describe('OTA-1563 — seven weapons were promising it in verbs nobody read', ()
     expect(scopeOf('Energy Blade')).toBe('nonmagical');        // bare "cuts"
     expect(scopeOf('Laser Blade')).toBe('nonmagical');         // "cuts through metal"
     expect(scopeOf('Aether Lance')).toBe('shields');           // "disrupts"
-    expect(scopeOf("Winter's Verdict")).toBe('all');           // "carries through"
+    expect(scopeOf("Winter's Verdict Scepter")).toBe('all');           // "carries through"
     expect(scopeOf('Bone Siege Crossbow')).toBe('nonmagical'); // "pierces"
   });
 

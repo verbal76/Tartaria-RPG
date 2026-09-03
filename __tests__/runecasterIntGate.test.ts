@@ -89,7 +89,7 @@ describe('OTA-170 — INT-to-craft gate on runecaster recipes', () => {
     const invBefore = useGameStore.getState().player!.inventory.length;
     useGameStore.getState().submitPlayerAction('craft Flame of Aether');
     const player = useGameStore.getState().player!;
-    const hasFlame = player.inventory.some((i) => i.name === 'Flame of Aether');
+    const hasFlame = player.inventory.some((i) => i.name === 'Flame of Aether Wand' /* OTA-1641 */);
     expect(hasFlame).toBe(false);
     // Inventory unchanged (no ingredient consumption either).
     expect(player.inventory.length).toBe(invBefore);
@@ -102,7 +102,7 @@ describe('OTA-170 — INT-to-craft gate on runecaster recipes', () => {
     await bootstrap(11);
     useGameStore.getState().submitPlayerAction('craft Flame of Aether');
     const player = useGameStore.getState().player!;
-    const hasFlame = player.inventory.some((i) => i.name === 'Flame of Aether');
+    const hasFlame = player.inventory.some((i) => i.name === 'Flame of Aether Wand' /* OTA-1641 */);
     expect(hasFlame).toBe(true);
   });
 
@@ -110,7 +110,7 @@ describe('OTA-170 — INT-to-craft gate on runecaster recipes', () => {
     await bootstrap(15);
     useGameStore.getState().submitPlayerAction('craft Flame of Aether');
     const player = useGameStore.getState().player!;
-    const hasFlame = player.inventory.some((i) => i.name === 'Flame of Aether');
+    const hasFlame = player.inventory.some((i) => i.name === 'Flame of Aether Wand' /* OTA-1641 */);
     expect(hasFlame).toBe(true);
   });
 

@@ -1560,9 +1560,9 @@ Key invariants worth knowing:
 
 ## 9. Recent OTA highlights (latest sessions)
 
-### ⚠⚠⚠ THE 2026-09-02 RUN — OTA-1617 → 1640 (read this first if you are new)
+### ⚠⚠⚠ THE 2026-09-02 RUN — OTA-1617 → 1641 (read this first if you are new)
 
-Latest golem-line stamp: **`2026-09-03-1640-the-vest-says-what-it-does`**
+Latest golem-line stamp: **`2026-09-03-1641-a-weapon-is-named-like-a-weapon`**
 (`app/buildInfo.ts`). Both channels ship from this branch — a `[ota-hal]` marker
 in the commit TITLE publishes the HAL set, a markerless follow-up commit
 publishes golem; see §6.
@@ -1849,6 +1849,23 @@ what it ACCEPTS, and a data walker skips the saying.
   vest INT, every hit on the dog returns the vest's aetheric to the attacker
   (a kill routes through resolveEnemyDefeat); snapshot rows for armour /
   vests / accessories carry the row's stat line. ota1640 pins all of it.
+- **OTA-1641 a weapon is named like a weapon.** Owner: *"why do I have a
+  weapon called a minor repair? that's stupid … let's get a rule in place
+  where the weapon names actually need to sound like weapon names."*
+  Measured: 284 rows in `weapons.json`, 56 named for what they DO — every
+  rune-caster ("Minor Repair", "Force Wave", "Slick Mud", "Mud Army") and the
+  Crown of Verdict. **The rule is the 18th gate, `check:weaponnames`**
+  (`scripts/check-weapon-names.mjs`, self-tested): every weapons.json name
+  must carry a weapon noun, whole or as a compound tail (Oathspear,
+  Thornblade, Bolt-Caster). The 56 are renamed to the rune's OBJECT by rarity
+  — Wand (Common) / Rod (Uncommon) / Stave (Rare) / Scepter (Legendary);
+  Crown of Verdict → Scepter of Verdict — in weapons.json, runecasters.json,
+  recipes.json results, gift_prefs; every retired name is a
+  `LEGACY_ITEM_RENAMES` entry (pack, hands, knownRecipes migrate on load).
+  Side effect: the "Aetheric Armor" fused-armour/runecaster name collision
+  (OTA-15xx) is gone — the weapon is "Aetheric Armor Stave". 15 suites
+  repointed; ota1641 pins the gate, the tiers, the migration and the recipes.
+  ⚠ Add `check:weaponnames` to any gate list you keep: it is 18 now.
 
 ✓ **One position vocabulary now (OTA-1637).** The doors, the arrival line, the
 trace, the card, the conversation arm and the verb matchers all run

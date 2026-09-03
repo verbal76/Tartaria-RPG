@@ -417,7 +417,7 @@ describe('OTA-704 — Qwen fusion name is sanitized against generic / cross-kind
   const reply = (name: string) => JSON.stringify({ name, description: 'A ward of humming aether-plate.' });
 
   it('rejects "Aetheric Armor" (a real runecaster WEAPON) for an armor forge → falls back', async () => {
-    const q = new MockQwen(true, reply('Aetheric Armor'));
+    const q = new MockQwen(true, reply('Aetheric Armor Stave' /* OTA-1641: the runecaster weapon's name now */));
     expect(await synthesizeFusionNameViaQwen(armorStats, inputs, ['aether', 'metal'], q)).toBeNull();
   });
 
@@ -441,29 +441,29 @@ describe('OTA-706 — one-time rename of collided fused item names', () => {
   } as InventoryItem);
 
   it('detects a fused armor named like a catalog WEAPON as a cross-kind collision', () => {
-    expect(fusedNameCollidesCrossKind(fusedArmor('a1', 'Aetheric Armor'))).toBe(true);   // catalog runecaster weapon
+    expect(fusedNameCollidesCrossKind(fusedArmor('a1', 'Aetheric Armor Stave' /* OTA-1641: the runecaster weapon's name now */))).toBe(true);   // catalog runecaster weapon
     expect(fusedNameCollidesCrossKind(fusedArmor('a2', 'Resonant Aegis'))).toBe(false);  // not a catalog name
   });
 
   it('deterministicFusedName is stable per id, distinct across ids, and never collides', () => {
-    const n1 = deterministicFusedName(fusedArmor('a1', 'Aetheric Armor'));
-    const n1again = deterministicFusedName(fusedArmor('a1', 'Aetheric Armor'));
-    const n2 = deterministicFusedName(fusedArmor('a2', 'Aetheric Armor'));
+    const n1 = deterministicFusedName(fusedArmor('a1', 'Aetheric Armor Stave' /* OTA-1641: the runecaster weapon's name now */));
+    const n1again = deterministicFusedName(fusedArmor('a1', 'Aetheric Armor Stave' /* OTA-1641: the runecaster weapon's name now */));
+    const n2 = deterministicFusedName(fusedArmor('a2', 'Aetheric Armor Stave' /* OTA-1641: the runecaster weapon's name now */));
     expect(n1).toBe(n1again);                 // stable across loads
-    expect(n1).not.toBe('Aetheric Armor');    // no longer the colliding name
+    expect(n1).not.toBe('Aetheric Armor Stave' /* OTA-1641: the runecaster weapon's name now */);    // no longer the colliding name
     expect(n1).not.toBe(n2);                  // two forged pieces get DIFFERENT names
     expect(fusedNameCollidesCrossKind({ ...fusedArmor('a1', n1), name: n1 })).toBe(false); // the new name is clean
   });
 
   it('migrateFusedName renames a collider and is idempotent on a clean name', () => {
-    const migrated = migrateFusedName(fusedArmor('a1', 'Aetheric Armor'));
-    expect(migrated.name).not.toBe('Aetheric Armor');
+    const migrated = migrateFusedName(fusedArmor('a1', 'Aetheric Armor Stave' /* OTA-1641: the runecaster weapon's name now */));
+    expect(migrated.name).not.toBe('Aetheric Armor Stave' /* OTA-1641: the runecaster weapon's name now */);
     // second pass over the already-migrated item is a no-op (same reference back)
     expect(migrateFusedName(migrated)).toBe(migrated);
   });
 
   it('leaves a non-fused item untouched even if its name is a catalog weapon', () => {
-    const plain = { id: 'p', name: 'Aetheric Armor', kind: 'armor', quantity: 1, tags: [] } as InventoryItem;
+    const plain = { id: 'p', name: 'Aetheric Armor Stave' /* OTA-1641: the runecaster weapon's name now */, kind: 'armor', quantity: 1, tags: [] } as InventoryItem;
     expect(migrateFusedName(plain)).toBe(plain);
   });
 });
