@@ -124,6 +124,23 @@ const WEATHER_RESIST_ELEMENT: Record<string, string> = {
   // (wetness is not an element), and psychic fog stays uncounterable BY DESIGN — some
   // weather you can only endure.
   tainted: 'corruption',
+  // ⚠⚠⚠ OTA-1652 — THE BIGGEST GAP THE RESIST AUDIT FOUND. `aetheric` is the
+  // most-resisted type in the game — EIGHTY-FIVE pieces of gear name it — and
+  // TWO storms are tagged `aetheric` (Aetheric Storm, Aether Lightning), and the
+  // tag was never mapped here. So a player in full aether-warded plate stood in
+  // an Aetheric Storm and ate the whole thing: the tick, the reposition cost,
+  // the attack penalty and the stat drain. The 'lightning' tag on those two
+  // storms let an ELECTRICAL resist cancel them while an AETHERIC one could not,
+  // which is precisely backwards for a storm named after the aether.
+  aetheric: 'aetheric',
+  // ⚠⚠ OTA-1652 — and `ash` answers to `radiation`, which gives that type its
+  // only reason to exist on a defensive piece. Measured: three accessories
+  // resist radiation and NOTHING dealt it — no enemy, no weather. Five weapons
+  // deal it, so the type was live on offence and dead on defence. Ash Storm is
+  // the fallout of a burned aetheric world; lead-lined kit is exactly what you
+  // wear in it. One mapping, and three dead cards become the reason you survive
+  // a storm — rather than retyping three items players may already own.
+  ash: 'radiation',
 };
 
 /** OTA-934 — does the player's armour resist list counter this weather's element? ANY mapped

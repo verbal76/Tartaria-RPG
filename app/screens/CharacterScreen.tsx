@@ -25,6 +25,7 @@ import type { Faction, Race, PlayerCharacter, Stats } from '../engine/types';
 import { effectiveStatsBreakdown, resolveEquippedItem, type StatBreakdown } from '../engine/equipment';
 // OTA-1650 — companion gear, read off the one module that knows where it lives.
 import { dogVestInstance, durabilityLabel, gearCondition, conditionColor } from '../engine/companionGear';
+import { RING_SLOTS } from '../engine/equipment';   // OTA-1652 — all four fingers on the sheet
 // OTA-1066 — Phase 4 difficulty, and the only place it can be eased.
 import {
   PRESET_TIERS, PRESSURE_PROFILES, pressureOf, canChangeTo,
@@ -80,7 +81,12 @@ const SLOT_LABEL: Record<string, string> = {
   feet: 'Feet',
   cloak: 'Cloak',
   amulet: 'Amulet',
-  ring: 'Ring',
+  // ⚠⚠ OTA-1652 — ALL FOUR FINGERS. This map listed ONE ring, so a player
+  // wearing four saw one on their own character sheet — OTA-1648 opened the
+  // other three slots and this screen was never told. Built from RING_SLOTS
+  // rather than typed out, which is the OTA-1648 rule: a fifth ring is one edit
+  // and no reader can fall behind the type again.
+  ...Object.fromEntries(RING_SLOTS.map((slot, i) => [slot, i === 0 ? 'Ring' : `Ring ${i + 1}`])),
 };
 
 export function CharacterScreen() {

@@ -27150,7 +27150,26 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // says so in words. The reach resolver and view model are untouched: this moved a
 // view, not a rule. Every builder behind a removed row went with it, and the
 // orphaned style blocks with them.
-export const OTA_BUILD_ID = '2026-09-03-1651-the-cards-give-the-page-back';
+// OTA-1652 — NO RESIST WITHOUT A SOURCE. Owner: "what does resists degradation
+// do?" Nothing — 0 of 135 enemies and 0 of 301 weapons dealt it and no weather
+// countered it, while three accessories warded against it and said so on their
+// cards (two of them mine from OTA-1649, which is how the question got asked).
+// The audit found four holes, each fixed at its root: degradation FOLDS INTO acid
+// (an alias, not a rename — corrosion IS acid, and it closes the mirror hole
+// where 3 enemies corrode you and nothing resisted it); ash weather answers to
+// radiation, so 3 radiation pieces earn their keep instead of being retyped out
+// from under players who own them; and `aetheric` joins WEATHER_RESIST_ELEMENT —
+// 85 pieces resist aetheric and two storms are TAGGED aetheric, and only an
+// ELECTRICAL resist cancelled them, which is backwards. ⚠ The audit is a SUITE,
+// not a 19th CLI gate: to know what an enemy deals, a gate would have to
+// re-implement enemyDamageType by scraping regexes out of TypeScript — the exact
+// drift that let degradation sit dead. The suite imports the real resolver. Also:
+// the resist card line names what its percentage reduces (it read "−6% each" and
+// was reasonably taken for a durability buff), and the character sheet shows all
+// four ring slots, built from RING_SLOTS — OTA-1648 opened three more fingers and
+// this screen was never told.
+export const OTA_BUILD_ID = '2026-09-03-1652-no-resist-without-a-source';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-03-1651-the-cards-give-the-page-back';
 // golem catch-up 2026-09-03: markerless publish of OTA-1651 - the gold Equipped
 // block and faction standing come off the character card; the bestiary flavour
 // line and the per-hand reach row move off the combat card into the tap-for-info

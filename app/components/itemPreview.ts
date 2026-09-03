@@ -454,7 +454,15 @@ function previewAccessory(x: CatalogAccessory, kind: 'Amulet' | 'Ring'): ItemPre
   const ae = accessoryEffects();
   if (x.resistances.length > 0) {
     const pct = Math.round(ae.accessoryResistWeight(kind === 'Ring' ? 'ring' : 'amulet', x.rarity) * 100);
-    stats.push(`Resists ${x.resistances.join(', ')} (−${pct}% each, stacks with armour)`);
+    // ⚠⚠⚠ OTA-1652 — SAY WHAT THE PERCENTAGE REDUCES. This read "Resists
+    // degradation (−6% each, stacks with armour)" and the owner reasonably took
+    // it for a DURABILITY buff: *"the ring that I have on is -6% then it slows
+    // down the wear and tear of your items by 6% each and it says stackable with
+    // armor."* A bare −6% beside a word doesn't say −6% of what, and because
+    // degradation was a type nothing dealt, nothing in play ever contradicted the
+    // reading. The type is live now (it folds into acid) and the line names its
+    // object.
+    stats.push(`Resists ${x.resistances.join(', ')}: −${pct}% incoming damage of each, on top of armour`);
   }
   if (x.coatedBoost?.kind) {
     stats.push(`${x.coatedBoost.kind} coatings bite +${Math.round(ae.COATED_BOOST_PCT[x.rarity] * 100)}%`);

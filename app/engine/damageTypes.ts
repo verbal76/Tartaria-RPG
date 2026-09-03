@@ -53,6 +53,23 @@ export const DAMAGE_TYPE_ALIASES: Record<string, string> = {
   // OTA-874 — acid / corruption synonyms.
   corrosive: 'acid',
   caustic: 'acid',
+  // ⚠⚠⚠ OTA-1652 — `degradation` FOLDS INTO `acid`, AND THAT IS THE WHOLE FIX
+  // FOR A TYPE NOTHING DEALT. Measured: 0 of 135 enemies and 0 of 301 weapons
+  // dealt degradation, and no weather tag countered it — while THREE accessories
+  // resisted it and printed that on their cards. The mirror-image hole sat right
+  // beside it: three enemies DO deal `acid` and nothing in the game resisted it.
+  //
+  // Corrosion IS acid — the shield table authored in OTA-1647 already lumps
+  // "corrosion / corrosive / degradation / rust / acid" into one clause, so the
+  // catalog's own intent was always that these are the same thing. Aliasing here
+  // makes that true everywhere at once: three dead accessories become live, acid
+  // gains the counter it never had, and every shield with a corrosion clause
+  // starts firing against the enemies that corrode you.
+  //
+  // ⚠ AN ALIAS, NOT A RENAME. `degradation` stays a legal authored word — the
+  // catalogs, the fusion prompt and existing saves all use it — it simply
+  // resolves to `acid` in every consumer of the weakness math.
+  degradation: 'acid',
   blight: 'corruption',
   hollowing: 'corruption',
 };
