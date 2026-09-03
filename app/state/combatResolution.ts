@@ -61,7 +61,7 @@ import { buildDeathScene, daysBelow } from '../engine/deathScene';
 import { rollDie, rollFromNotation, pick } from '../engine/rng';
 import { findArmorByName, findWeaponByName, findDogGearByName, applyDamageTypeModifier, applyArmorResistance, armorResistances, fusedArmorResistances, type ArmorSlotResist } from '../engine/crafting';
 import { reachClassFor, bossSwingsTwice, enemyAttackBonus } from '../engine/combatRules';
-import { parseWeaponEffect, applyRangeNote } from '../engine/weaponEffects';
+import { parseWeaponEffect, applyRangeNote, shieldAcVersus } from '../engine/weaponEffects';
 import { reachBandsFor, RANGE_ORDER, RANGE_LABELS } from '../engine/types';
 // ⚠ OTA-1506 — the bullseye (per-enemy bearing + distance). See the FIELD
 // helpers below activeEnemy for how the legacy shared band is derived from it.
@@ -72,7 +72,7 @@ import {
 import { ACID_SHRED_DECAY_PER_ROUND, COATING_DOT_TURNS } from '../engine/weaponCoating';
 import { effectiveAC } from '../engine/raceMechanics';
 import { trainStat } from '../engine/statTraining';
-import { ARMOR_SLOTS, effectiveStats, aggregateEquippedStatBonuses, resolveEquippedItem, trimStandingAc, equippedGearAc } from '../engine/equipment';
+import { ARMOR_SLOTS, effectiveStats, aggregateEquippedStatBonuses, resolveEquippedItem, trimStandingAc, equippedGearAc, heldShieldAc } from '../engine/equipment';
 import { itemIsThrowable } from '../engine/bandolierEligibility';
 import { findFactionQuestById } from '../engine/factionQuests';
 import { weatherRepositionCost } from '../engine/weatherEffects';
@@ -784,7 +784,10 @@ function takeStagger(
 // cannot drift again.
 export function aggregateArmor(player: PlayerCharacter): { acBonus: number; resistances: string[]; resistSlots: ArmorSlotResist[] } {
   const gearAc = equippedGearAc(player);
-  const acBonus = gearAc.worn + gearAc.accessories;
+  // ⚠ OTA-1645 — the held shield's flat AC joins the stack HERE, which is the
+  // resolver's source, at the same moment `standingAc` picks it up for the
+  // sheet. One addition in `equippedGearAc`, two readers, no drift.
+  const acBonus = gearAc.worn + gearAc.accessories + gearAc.shield;
   const resistances: string[] = [];
   // arb119 — keep each resistance tagged with the SLOT it came from, so combat
   // can weight the diminishing stack (chest counts most, cloak least). The flat
@@ -858,6 +861,9 @@ export function effectiveACBreakdown(
   const gearAc = equippedGearAc(player);
   const armor = gearAc.worn;
   const accessories = gearAc.accessories;
+  // OTA-1645 — named on its own chip, for the same reason armour and jewellery
+  // are: a player reading "shield +4" can check the card against the number.
+  const shield = gearAc.shield;
   // ruins-defense title (Protector / Warden): +AC inside a constructed environment.
   let titleRuinsAc = 0;
   // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -872,6 +878,7 @@ export function effectiveACBreakdown(
   if (raceCtxDelta !== 0) sources.push({ label: 'race context', delta: raceCtxDelta });
   if (armor !== 0) sources.push({ label: 'armor', delta: armor });
   if (accessories !== 0) sources.push({ label: 'accessories', delta: accessories });
+  if (shield !== 0) sources.push({ label: 'shield', delta: shield });
   if (titleRuinsAc !== 0) sources.push({ label: 'title (ruins)', delta: titleRuinsAc });
   if (statusAdj !== 0) sources.push({ label: 'stance/cover', delta: statusAdj });
   // ⚠ OTA-1140 (pressure test) — THE TRIM, WHICH THIS BREAKDOWN SKIPPED. The
@@ -882,7 +889,7 @@ export function effectiveACBreakdown(
   // surface OTA-836 built specifically to explain the number. The trim is now
   // applied identically and NAMED as a source when it bites, so the chips
   // still sum to the total the player reads.
-  const standingRaw = base + raceCtxDelta + armor + accessories + titleRuinsAc;
+  const standingRaw = base + raceCtxDelta + armor + accessories + shield + titleRuinsAc;
   const trimDelta = trimStandingAc(standingRaw) - standingRaw;
   if (trimDelta !== 0) sources.push({ label: 'bulk trim', delta: trimDelta });
   const total = Math.max(1, trimStandingAc(standingRaw) + statusAdj);
@@ -1919,7 +1926,24 @@ function applyEnemyCounter(
   // so a fully-fused build is strong but not untouchable; tactical status/cover mods (dodge,
   // cover, ward) apply on top of the trimmed base at full value.
   const acFromGear = trimStandingAc(racialAC + armorPieces.acBonus + titleRuinsAc);
-  const effectiveAc = Math.max(1, acFromGear + statusAcAdjustment(player.statusEffects));
+  // ⚠⚠ OTA-1645 — THE SHIELD'S CONDITIONAL HALF, SPENT WHERE IT CAN BE. Two
+  // shields scope their cover to a damage type — the Mud Heater Shield's "+2 AC
+  // vs fire damage" and the Aetheric Shield's "+2 AC vs energy damage" — and the
+  // gear stack cannot hold either, because `equippedGearAc` has no enemy in
+  // view. This is the first line in the game that does, so it is spent here.
+  //
+  // ⚠ It lands OUTSIDE `trimStandingAc`, deliberately, and the reason is the
+  // same one status and cover mods are outside it: the trim exists to stop a
+  // fully-fused STANDING build becoming untouchable, and a bonus that applies to
+  // one damage type in a fight the player did not choose is not standing AC. A
+  // fire-turning shield should be worth its full 2 in the one fight it was
+  // bought for.
+  const held = heldShieldAc(player);
+  const shieldVs = shieldAcVersus(
+    held.vs ? { vs: held.vs } : null,
+    resolveEnemyDamageType(enemy),
+  );
+  const effectiveAc = Math.max(1, acFromGear + shieldVs + statusAcAdjustment(player.statusEffects));
   // ⚠ OTA-1124 — THE AC LEDGER. Two device logs in a row show the owner's AC
   // dropping from 16 to 10 with no line saying why — the second time with a
   // ~2m40s inventory gap in the middle, which is enough room for anything. The

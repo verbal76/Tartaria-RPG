@@ -262,6 +262,80 @@ export interface ParsedWeaponEffect {
   onHitControl?: OnHitControl;
   /** OTA-1574 — how this weapon answers the sky. */
   weather?: WeatherNote;
+  /** OTA-1645 — the AC a held shield adds. See ShieldAc. */
+  shieldAc?: ShieldAc;
+}
+
+/**
+ * ⚠⚠⚠ OTA-1645 (slice 4b) — SEVEN SHIELDS PRINT "+N AC" AND NOT ONE POINT OF IT
+ * EVER REACHED THE NUMBER AN ENEMY ROLLS AGAINST.
+ *
+ * Measured, not assumed: a probe equipping a Titan Shield ("+4 AC", 8 defense,
+ * the most expensive shield in the game) read `standingAc = 10` — identical to
+ * an empty off-hand — while a chest piece in the control read 13. The cause is
+ * structural rather than arithmetic: `equippedGearAc` walks ARMOR_SLOTS
+ * (head / chest / hands / legs / feet / cloak) and shields are WEAPONS that
+ * equip to a hand, so no AC reader in the game has ever had them in view.
+ *
+ * ⚠⚠ WHAT THE SHIELDS DID HAVE is a `defense` number feeding the BLOCK roll and
+ * a `statBonuses` HP grant — both live, both working. That is exactly why this
+ * went unnoticed for so long: a shield was doing two of the three things on its
+ * card, so it never read as broken, only as underwhelming.
+ *
+ * ⚠ THE TEMPORAL ONE IS DELIBERATELY NOT PARSED. The Aetheric Shield-Hammer's
+ * "+2 AC for 1 round AFTER A HIT" is a status write on the player's own attack
+ * path, not a passive the gear stack can hold — and reading it here would hand
+ * a two-handed hammer a permanent +2 it never promised. It waits for 4c with
+ * the rest of the timed effects.
+ */
+export interface ShieldAc {
+  /** "+3 AC" — on for as long as the shield is held. */
+  flat?: number;
+  /**
+   * "+2 AC vs fire damage" / "+2 AC vs energy damage" — worth nothing against
+   * anything else. Carried apart from `flat` because the gear stack has no
+   * enemy in view; only the resolver, which knows the incoming damage type,
+   * can spend it.
+   */
+  vs?: { amount: number; types: readonly string[] };
+}
+
+/** What the catalog's defensive adjectives mean in damage-type terms. Taken
+ *  from the two strings that exist rather than invented: "fire" and "energy". */
+const SHIELD_VS_TYPES: ReadonlyArray<readonly [RegExp, readonly string[]]> = [
+  [/\bfire\b|\bflame\b|\bburn\b/, ['burn']],
+  // "Energy" in this world is the aether and what it drives — the Aetheric
+  // Shield's own description is "Deflects energy attacks", and the three types
+  // a player would name are the three listed here.
+  [/\benergy\b|\baetheric\b|\baether\b/, ['aetheric', 'electrical', 'burn']],
+  [/\bcold\b|\bfrost\b/, ['cold']],
+  [/\bphysical\b/, ['slashing', 'piercing', 'bludgeoning']],
+];
+
+function shieldAcFrom(text: string): ShieldAc | null {
+  const out: ShieldAc = {};
+  let touched = false;
+  for (const clause of text.split(/[.;]/)) {
+    const m = clause.match(/\+\s*(\d+)\s*ac\b/);
+    if (!m) continue;
+    const amount = parseInt(m[1]!, 10);
+    if (!Number.isFinite(amount) || amount <= 0) continue;
+    // ⚠ A TIMED OR EARNED AC IS NOT A HELD ONE. "for 1 round", "after a hit",
+    // "on a max roll" all describe something that switches on and off; the gear
+    // stack can only hold what is true while the thing is simply in your hand.
+    if (/\bfor\s+\d+\s+rounds?\b|\bafter\s+a\s+hit\b|\bmax\b|\bon\s+a\s+block\b/.test(clause)) continue;
+    if (/\bvs\.?\b|\bversus\b|\bagainst\b/.test(clause)) {
+      for (const [re, types] of SHIELD_VS_TYPES) {
+        if (re.test(clause)) { out.vs = { amount, types }; touched = true; break; }
+      }
+      continue;
+    }
+    // Two unconditional clauses on one line would be an authoring error; take
+    // the largest rather than the last so the card cannot read low by accident.
+    out.flat = Math.max(out.flat ?? 0, amount);
+    touched = true;
+  }
+  return touched ? out : null;
 }
 
 /**
@@ -1141,7 +1215,27 @@ export function parseWeaponEffect(effect: string | undefined | null): ParsedWeap
   if (riders.flat) { out.flatRider = riders.flat; touched = true; }
   if (riders.dot) { out.riderDot = riders.dot; touched = true; }
 
+  // OTA-1645 (slice 4b) — the AC a held shield adds.
+  const sac = shieldAcFrom(text);
+  if (sac) { out.shieldAc = sac; touched = true; }
+
   return touched ? out : null;
+}
+
+/**
+ * ⚠⚠ OTA-1645 — THE AC A SHIELD ADDS AGAINST *THIS* BLOW. `flat` is spent by the
+ * gear stack, which has no enemy in view; this is the other half, and only the
+ * resolver can call it because only the resolver knows what is coming in.
+ * Returns 0 when the shield's clause does not name the incoming type, which is
+ * the honest answer for a fire-turning shield meeting a sword.
+ */
+export function shieldAcVersus(
+  ac: ShieldAc | null | undefined,
+  incomingDamageType: string | null | undefined,
+): number {
+  if (!ac?.vs || !incomingDamageType) return 0;
+  const t = incomingDamageType.toLowerCase();
+  return ac.vs.types.includes(t) ? ac.vs.amount : 0;
 }
 
 /** True if the parsed condition matches the given enemy. Used at

@@ -34,7 +34,7 @@ const item = (over: Partial<InventoryItem>): InventoryItem => ({
 
 // Pick real catalog names so the verdict is exercised through the same lookup the
 // game uses, not through a hand-built fixture that could drift from the data.
-const catalogWeapons = (weaponsData as { weapons: { name: string; weaponKind: string; damageType: string }[] }).weapons;
+const catalogWeapons = (weaponsData as { weapons: { name: string; weaponKind: string; damageType: string; tags?: string[] }[] }).weapons;
 const coatableName = catalogWeapons.find((w) => w.weaponKind === 'melee' && w.damageType === 'slashing')!.name;
 // ⚠⚠ OTA-1561 — RETARGETED, NOT RELAXED. This used to pick a RUNE-CASTER as the
 // "energy weapon that can never take a channel", and that was true right up until
@@ -132,7 +132,7 @@ describe('OTA-1094 #1 — the Crucible says WHY a weapon cannot be upgraded', ()
     expect(blocked.filter((w) => w.weaponKind === 'melee').map((w) => w.name)).toEqual([]);
     expect(
       blocked
-        .filter((w) => (w.tags ?? []).some((t) => t === 'thrown' || t === 'sling'))
+        .filter((w) => (w.tags ?? []).some((t: string) => t === 'thrown' || t === 'sling'))
         .map((w) => w.name),
     ).toEqual([]);
   });

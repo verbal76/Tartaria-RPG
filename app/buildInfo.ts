@@ -27027,7 +27027,24 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // real boundary, since OTA-1561 gave them Crucible passives instead. The old
 // melee refusal line ("<electrical> does its work without a surface to paint")
 // is deleted; it was unreachable and it was the sentence that read as a bug.
-export const OTA_BUILD_ID = '2026-09-03-1644-a-coating-rides-the-weapon';
+// ⚠⚠⚠ OTA-1645 (slice 4b) — THE SHIELD'S AC IS REAL. Seven shields print "+N AC"
+// and not one point of it ever reached the number an enemy rolls against.
+// Measured first: a Titan Shield ("+4 AC", the priciest in the game) in the
+// off-hand read standingAc 10 — the same as an empty hand — while a chest piece
+// control read 13. Structural, not arithmetic: `equippedGearAc` walks
+// ARMOR_SLOTS (head/chest/hands/legs/feet/cloak) and a shield is a WEAPON that
+// equips to a hand, so no AC reader has ever had one in view. Their `defense`
+// (BLOCK roll) and HP grant both worked, which is why it read as underwhelming
+// rather than broken. The term goes in `equippedGearAc` and NOWHERE else, since
+// aggregateArmor (resolver) and standingAc (sheet) both call it — OTA-1133/1135's
+// one-answer-everywhere. Five unconditional shields now pay +2/+3/+4/+3/+3; the
+// two TYPED ones (Mud Heater "+2 AC vs fire", Aetheric "+2 AC vs energy") are
+// carried apart and spent at the resolver, the only line that knows what is
+// coming in, outside the bulk trim. ⚠ The Shield-Hammer's "+2 AC FOR 1 ROUND
+// after a hit" is deliberately refused — a timed status is not a held passive,
+// and reading it would hand a two-handed hammer a permanent +2. It waits for 4c.
+export const OTA_BUILD_ID = '2026-09-03-1645-the-shield-ac-is-real';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-03-1644-a-coating-rides-the-weapon';
 // golem catch-up 2026-09-03: markerless publish of OTA-1644 - the coating gate
 // reads physical form instead of damage type, so the owner's Magnetic Axe (and
 // 57 other melee weapons, and 7 thrown ones) can finally be painted; a beam and

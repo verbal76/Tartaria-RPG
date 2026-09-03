@@ -715,7 +715,9 @@ export function trimStandingAc(rawAc: number, knee = 16, rate = 0.5): number {
 export function standingAc(player: PlayerCharacter | null | undefined): number {
   if (!player) return 10;
   const gear = equippedGearAc(player);
-  return trimStandingAc((player.ac ?? 10) + gear.worn + gear.accessories);
+  // OTA-1645 — the held shield joins the stack the sheet reads, so the panel and
+  // the fight cannot disagree about what a Titan Shield is worth.
+  return trimStandingAc((player.ac ?? 10) + gear.worn + gear.accessories + gear.shield);
 }
 
 /** ⚠ OTA-1135 — THE GEAR STACK, ONCE, WITH THE JEWELLERY IN IT.
@@ -750,8 +752,8 @@ export function standingAc(player: PlayerCharacter | null | undefined): number {
  *  from, which is the whole reason this took three reports to find. */
 export function equippedGearAc(
   player: PlayerCharacter | null | undefined,
-): { worn: number; accessories: number } {
-  if (!player) return { worn: 0, accessories: 0 };
+): { worn: number; accessories: number; shield: number } {
+  if (!player) return { worn: 0, accessories: 0, shield: 0 };
   const eq = player.equipped ?? {};
   let worn = 0;
   for (const slot of ARMOR_SLOTS) {
@@ -786,7 +788,57 @@ export function equippedGearAc(
     if (!ringName) continue;
     accessories += findRingByName(ringName)?.acBonus ?? 0;
   }
-  return { worn, accessories };
+  return { worn, accessories, shield: heldShieldAc(player).flat };
+}
+
+/**
+ * ⚠⚠⚠ OTA-1645 (slice 4b) — THE THIRD COMPONENT, AND THE REASON IT WAS MISSING.
+ *
+ * `ARMOR_SLOTS` is head / chest / hands / legs / feet / cloak. A shield is a
+ * WEAPON — it lives in weapons.json and equips to a hand — so the loop above
+ * has never had one in view, and seven shields printing "+2 AC" … "+4 AC"
+ * contributed exactly nothing to the number an enemy rolls against. Measured
+ * before writing a line of this: a Titan Shield ("+4 AC") in the off-hand read
+ * `standingAc = 10`, the same as an empty hand, while a chest piece read 13.
+ *
+ * ⚠⚠ IT GOES HERE AND NOWHERE ELSE. `aggregateArmor` (the resolver's source)
+ * and `standingAc` (the panel's) both call `equippedGearAc`, which is the whole
+ * point of OTA-1133/1135 — one answer, everywhere. Adding a shield term at any
+ * call site instead would put the sheet and the fight back out of step, which is
+ * the exact bug those two OTAs were written to end.
+ *
+ * ⚠ BOTH HANDS ARE READ even though OTA-1509 routes shields to the OFF arm only
+ * (`validSlotsForItem` returns `['off']` for anything `itemIsShield`). Reading
+ * `main` too costs one lookup and means a legacy save that predates that rule —
+ * or any later loadout change — cannot silently drop a shield's AC. It is a
+ * belt-and-braces read, not a claim that main-hand shields exist today.
+ *
+ * ⚠ THE BEST, NOT THE SUM. You can only put one shield between yourself and a
+ * blow, so two would still be one shield's worth of cover.
+ */
+export function heldShieldAc(
+  player: PlayerCharacter | null | undefined,
+): { flat: number; vs: { amount: number; types: readonly string[] } | null; name: string | null } {
+  const none = { flat: 0, vs: null, name: null };
+  if (!player) return none;
+  const eq = player.equipped ?? {};
+  let best = none as { flat: number; vs: { amount: number; types: readonly string[] } | null; name: string | null };
+  for (const held of [eq.main, eq.off]) {
+    if (!held) continue;
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { findWeaponByName } = require('./crafting') as typeof import('./crafting');
+    const row = findWeaponByName(held);
+    if (!row) continue;
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { parseWeaponEffect } = require('./weaponEffects') as typeof import('./weaponEffects');
+    const sac = parseWeaponEffect(row.effect)?.shieldAc;
+    if (!sac) continue;
+    const flat = sac.flat ?? 0;
+    if (flat > best.flat || (best.name === null && (flat > 0 || sac.vs))) {
+      best = { flat, vs: sac.vs ?? null, name: row.name };
+    }
+  }
+  return best;
 }
 
 export function armorHpBonus(name: string | null | undefined): number {

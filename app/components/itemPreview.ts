@@ -287,6 +287,17 @@ function previewWeapon(w: CatalogWeapon): ItemPreview {
       : 'Pierces armour',
     );
   }
+  // ⚠⚠ OTA-1645 — AND WHAT A SHIELD IS WORTH TO YOUR OWN AC, which the card has
+  // printed since the catalog was written and the game never delivered. Phrased
+  // as the rule the AC step now applies, for the same reason the pierce line
+  // above is: the card and the number on the sheet have to be checkable against
+  // each other. The `vs` half says its type out loud, because "+2 AC" and "+2 AC
+  // against fire only" are very different purchases.
+  if (parsedRules?.shieldAc) {
+    const sa = parsedRules.shieldAc;
+    if (sa.flat) stats.push(`AC +${sa.flat} while held`);
+    if (sa.vs) stats.push(`AC +${sa.vs.amount} against ${sa.vs.types.join(' / ')} damage`);
+  }
   // ⚠⚠ OTA-1564 — AND WHAT IT DOES WHEN THE DICE COME UP PERFECT, plus the cost
   // it charges for the privilege. A repeater's volume and a firearm's overheat
   // are the two halves of the same buying decision, so they belong on the same

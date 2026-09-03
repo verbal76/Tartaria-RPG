@@ -182,10 +182,13 @@ describe('OTA-1135 — ⚠ the panel could not see the rings', () => {
   });
 
   it('a missing or empty player answers zero rather than throwing', () => {
-    expect(equippedGearAc(null)).toEqual({ worn: 0, accessories: 0 });
-    expect(equippedGearAc(undefined)).toEqual({ worn: 0, accessories: 0 });
+    // ⚠ OTA-1645 added a THIRD component, `shield` — a held shield's flat AC.
+    // The shape widened; the guarantee did not: an absent or bare player still
+    // answers zero on every component instead of throwing.
+    expect(equippedGearAc(null)).toEqual({ worn: 0, accessories: 0, shield: 0 });
+    expect(equippedGearAc(undefined)).toEqual({ worn: 0, accessories: 0, shield: 0 });
     expect(equippedGearAc({ ac: 10, inventory: [], equipped: {} } as unknown as PlayerCharacter))
-      .toEqual({ worn: 0, accessories: 0 });
+      .toEqual({ worn: 0, accessories: 0, shield: 0 });
   });
 });
 
@@ -261,7 +264,12 @@ describe('OTA-1135 — ⚠ there is ONE implementation, and the resolver calls i
     const body = COMBAT_SRC.slice(from, to);
     expect(from).toBeGreaterThan(0);
     expect(body).toContain('const gearAc = equippedGearAc(player);');
-    expect(body).toContain('const acBonus = gearAc.worn + gearAc.accessories;');
+    // ⚠ OTA-1645 — the sum gained `+ gearAc.shield`. The pin follows it rather
+    // than being loosened: what this test defends is that every term comes OUT
+    // of equippedGearAc and none is computed here, so naming the exact sum is
+    // still the assertion. If a future term is derived locally instead of read
+    // off `gearAc`, this line stops matching and the drift is caught.
+    expect(body).toContain('const acBonus = gearAc.worn + gearAc.accessories + gearAc.shield;');
     // No accumulation of its own left anywhere inside it.
     expect(body).not.toContain('acBonus +=');
   });
@@ -287,7 +295,9 @@ describe('OTA-1135 — ⚠ there is ONE implementation, and the resolver calls i
     const from = EQUIP.indexOf('export function standingAc(');
     const body = EQUIP.slice(from, EQUIP.indexOf('export function equippedGearAc('));
     expect(body).toContain('equippedGearAc(player)');
-    expect(body).toContain('trimStandingAc((player.ac ?? 10) + gear.worn + gear.accessories)');
+    // ⚠ OTA-1645 — `+ gear.shield` joined the sum. Same reasoning as the
+    // aggregateArmor pin above: every term is read off the one helper.
+    expect(body).toContain('trimStandingAc((player.ac ?? 10) + gear.worn + gear.accessories + gear.shield)');
     // The old inline ARMOR_SLOTS walk must not survive alongside the call.
     expect(body).not.toContain('for (const slot of ARMOR_SLOTS)');
   });
@@ -307,7 +317,11 @@ describe('OTA-1135 — ⚠ the card names which gear, so this is visible next ti
     // RETARGETED BY OTA-1140 (pressure test) — the breakdown now applies the
     // OTA-947 trim exactly as the resolver does (it had been skipping it, so
     // the expanded card over-read a heavy build). Both terms still counted:
-    expect(body).toContain('base + raceCtxDelta + armor + accessories + titleRuinsAc');
+    // ⚠ OTA-1645 — `shield` is the third gear term and joins the subtotal. The
+    // test's own name is the reason the pin is updated rather than relaxed:
+    // splitting a label must not drop a term, so every chip the card can show
+    // has to appear in the sum the total is built from.
+    expect(body).toContain('base + raceCtxDelta + armor + accessories + shield + titleRuinsAc');
     expect(body).toContain('trimStandingAc(standingRaw) + statusAdj');
   });
 
