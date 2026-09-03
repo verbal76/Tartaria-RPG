@@ -59,8 +59,14 @@ const CATALOG_SHIELDS = (weaponsJson as { weapons: Array<{ name: string; tags?: 
   .filter((w) => (w.tags ?? []).some((t) => t.toLowerCase() === 'shield'));
 
 describe('OTA-1509 — one predicate says what a shield is', () => {
-  it('⚠⚠⚠ ALL FIFTEEN CATALOG SHIELDS ANSWER TRUE — the ten named shields AND the five bucklers a name-match would have missed', () => {
-    expect(CATALOG_SHIELDS.length).toBe(15);
+  it('⚠⚠⚠ EVERY CATALOG SHIELD ANSWERS TRUE — the named shields AND the bucklers a name-match would have missed', () => {
+    // ⚠ OTA-1647 — 15 → 28. The craftable line added 13 rows (targes, pavises,
+    // aegises and more bucklers), which is exactly the case this predicate was
+    // written for: `itemIsShield` reads the TAG, so a "Splinter Pavise" and an
+    // "Aegis of the Deep Cold" answer true without anyone teaching it a name.
+    // The count stays exact rather than becoming a floor — it is a ratchet, and
+    // a silent drop from 28 to 27 should still fail loudly.
+    expect(CATALOG_SHIELDS.length).toBe(28);
     for (const w of CATALOG_SHIELDS) {
       expect({ name: w.name, shield: itemIsShield(inst(w.name)) }).toEqual({ name: w.name, shield: true });
       expect({ name: w.name, cat: categorizeItem(inst(w.name)) }).toEqual({ name: w.name, cat: 'shield' });

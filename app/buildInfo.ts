@@ -27064,7 +27064,26 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // authored with real baseDurability (60/90/130/180 by rarity) in the same OTA:
 // at the default 25 a shield eating every blow would shatter six times faster
 // than the set it protects — the OTA-959 failure re-made on one item.
-export const OTA_BUILD_ID = '2026-09-03-1646-the-shield-goes-first';
+// ⚠⚠⚠ OTA-1647 — A SHIELD BUILD IS A BUILD YOU CAN MAKE. Owner: "better shields
+// should have better durability and we need recipes for at least 20 shields in
+// all rarities and buff bonus levels and specific resists to make a build
+// viable, and they should be able to take coatings." Measured first: TWO of the
+// four were already done — durability by OTA-1646 (150/200/265/350, derived from
+// his own logs) and coatings by OTA-1644 (15/15 coatable, 0 refused, the moment
+// the gate stopped reading damage type). The two that were NOT: ZERO of 139
+// recipes made a shield, so the category was loot-only and no build could be
+// planned around it; and resist coverage was two types of eleven (fire, and the
+// broad "energy" triple). This OTA authors the line: 13 new shields (28 total),
+// 28 recipes, and a typed answer for every damage type a shield can meet —
+// burn / cold / poison / electrical / aetheric / radiation / degradation /
+// slashing / piercing / bludgeoning, each craftable rather than loot-only.
+// Ladder: flat +1/+2/+3/+4 by rarity, typed +2/+3/+4/+5, so specialising always
+// beats the general case. SHIELD_VS_TYPES widened from 4 clauses to 12; ⚠ the
+// broad `energy` is tested BEFORE `aetheric` or every narrow shield would
+// silently widen into a general one. 'targe', 'aegis' and 'pavise' joined
+// WEAPON_NOUNS with self-tests — they are shields; the gate had not been told.
+export const OTA_BUILD_ID = '2026-09-03-1647-a-shield-build-you-can-make';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-03-1646-the-shield-goes-first';
 // golem catch-up 2026-09-03: markerless publish of OTA-1646 - the shield answers
 // an incoming blow first (dodge/stealth roll to come around it), takes the
 // coating splash halved or turned aside, and spends its own durability instead

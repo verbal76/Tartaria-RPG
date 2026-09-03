@@ -2327,6 +2327,482 @@
           "quantity": 1
         }
       ]
+    },
+    {
+      "result": "Scrap Targe",
+      "ingredients": [
+        {
+          "name": "Scrap Metal",
+          "quantity": 3
+        },
+        {
+          "name": "Bent Nail",
+          "quantity": 2
+        },
+        {
+          "name": "Cloth Scrap",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Bog-Hide Buckler",
+      "ingredients": [
+        {
+          "name": "Boar Hide",
+          "quantity": 2
+        },
+        {
+          "name": "Mud Poison",
+          "quantity": 1
+        },
+        {
+          "name": "Patched Cloth",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Iron Buckler",
+      "ingredients": [
+        {
+          "name": "Scrap Metal",
+          "quantity": 2
+        },
+        {
+          "name": "Small Rock",
+          "quantity": 1
+        },
+        {
+          "name": "Bent Nail",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "result": "Mud Buckler",
+      "ingredients": [
+        {
+          "name": "Aether Mud",
+          "quantity": 2
+        },
+        {
+          "name": "Mud Fragment",
+          "quantity": 2
+        },
+        {
+          "name": "Cloth Scrap",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Mud Heater Shield",
+      "ingredients": [
+        {
+          "name": "Mud Fragment",
+          "quantity": 2
+        },
+        {
+          "name": "Firewood",
+          "quantity": 1
+        },
+        {
+          "name": "Scrap Metal",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Rimeplate Shield",
+      "ingredients": [
+        {
+          "name": "Aetherstone Fragment",
+          "quantity": 1
+        },
+        {
+          "name": "Silt Core",
+          "quantity": 1
+        },
+        {
+          "name": "Stalker Hide",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Cinder Targe",
+      "ingredients": [
+        {
+          "name": "Fire Essence",
+          "quantity": 1
+        },
+        {
+          "name": "Salamander Scale",
+          "quantity": 1
+        },
+        {
+          "name": "Rusted Parts",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Grounded Buckler",
+      "ingredients": [
+        {
+          "name": "Energy Fragment",
+          "quantity": 1
+        },
+        {
+          "name": "Rusted Parts",
+          "quantity": 2
+        },
+        {
+          "name": "Iron Fangs",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Splinter Pavise",
+      "ingredients": [
+        {
+          "name": "Scarab Shell",
+          "quantity": 2
+        },
+        {
+          "name": "Alpha Fur",
+          "quantity": 1
+        },
+        {
+          "name": "Iron Fangs",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Bone Round Shield",
+      "ingredients": [
+        {
+          "name": "Aether Fang",
+          "quantity": 1
+        },
+        {
+          "name": "Scarab Shell",
+          "quantity": 1
+        },
+        {
+          "name": "Stalker Hide",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Aetheric Shield",
+      "ingredients": [
+        {
+          "name": "Aether Gem",
+          "quantity": 1
+        },
+        {
+          "name": "Energy Fragment",
+          "quantity": 1
+        },
+        {
+          "name": "Aetheric Shard",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Giant Bone Shield",
+      "ingredients": [
+        {
+          "name": "Scarab Shell",
+          "quantity": 2
+        },
+        {
+          "name": "Aether Fang",
+          "quantity": 1
+        },
+        {
+          "name": "Stalker Hide",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Mud Spiked Shield",
+      "ingredients": [
+        {
+          "name": "Mud Essence",
+          "quantity": 1
+        },
+        {
+          "name": "Iron Fangs",
+          "quantity": 2
+        },
+        {
+          "name": "Rusted Parts",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Plasma Shield",
+      "ingredients": [
+        {
+          "name": "Fire Essence",
+          "quantity": 1
+        },
+        {
+          "name": "Energy Fragment",
+          "quantity": 1
+        },
+        {
+          "name": "Drone Core",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Shockwave Buckler",
+      "ingredients": [
+        {
+          "name": "Tornado Core",
+          "quantity": 1
+        },
+        {
+          "name": "Energy Fragment",
+          "quantity": 1
+        },
+        {
+          "name": "Rusted Parts",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Leadlined Pavise",
+      "ingredients": [
+        {
+          "name": "Hardened Mudstone",
+          "quantity": 1
+        },
+        {
+          "name": "Gears",
+          "quantity": 1
+        },
+        {
+          "name": "Golem Fragment",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Aether-Damped Shield",
+      "ingredients": [
+        {
+          "name": "Aetheric Cloth",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Veil",
+          "quantity": 1
+        },
+        {
+          "name": "Aetheric Gem",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Anvil Shield",
+      "ingredients": [
+        {
+          "name": "Mudstone",
+          "quantity": 1
+        },
+        {
+          "name": "Golem Core",
+          "quantity": 1
+        },
+        {
+          "name": "Gear Box",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Rustbreaker Shield",
+      "ingredients": [
+        {
+          "name": "Clockwork Core",
+          "quantity": 1
+        },
+        {
+          "name": "Gears",
+          "quantity": 2
+        },
+        {
+          "name": "Drake Scale",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Graviton Shield",
+      "ingredients": [
+        {
+          "name": "Crystal Core",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Engine",
+          "quantity": 1
+        },
+        {
+          "name": "Golem Fragment",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Plasma Buckler",
+      "ingredients": [
+        {
+          "name": "Crystal Core",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Shard",
+          "quantity": 1
+        },
+        {
+          "name": "Gears",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Titan Shield",
+      "ingredients": [
+        {
+          "name": "Beast Fang",
+          "quantity": 1
+        },
+        {
+          "name": "Hardened Mudstone",
+          "quantity": 2
+        },
+        {
+          "name": "Golem Core",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Aegis of the Deep Cold",
+      "ingredients": [
+        {
+          "name": "Leviathan Scale",
+          "quantity": 1
+        },
+        {
+          "name": "Aetherstone Heart",
+          "quantity": 1
+        },
+        {
+          "name": "Obsidian Shard",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Sunward Aegis",
+      "ingredients": [
+        {
+          "name": "Phoenix Feather",
+          "quantity": 1
+        },
+        {
+          "name": "Aetheric Alloy",
+          "quantity": 1
+        },
+        {
+          "name": "Elemental Core",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Warden's Aegis",
+      "ingredients": [
+        {
+          "name": "Aetheric Alloy",
+          "quantity": 1
+        },
+        {
+          "name": "Sentinel Core",
+          "quantity": 1
+        },
+        {
+          "name": "Behemoth Horn",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Mud Royal Shield",
+      "ingredients": [
+        {
+          "name": "Mud Relic",
+          "quantity": 1
+        },
+        {
+          "name": "Hardened Aether Mud",
+          "quantity": 1
+        },
+        {
+          "name": "Mud-Iron Heart",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Plasma Energy Shield",
+      "ingredients": [
+        {
+          "name": "Aetheric Battery",
+          "quantity": 1
+        },
+        {
+          "name": "Elemental Core",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Core",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Mud Emperor's Buckler",
+      "ingredients": [
+        {
+          "name": "Monarch Crown",
+          "quantity": 1
+        },
+        {
+          "name": "Mud-Iron Heart",
+          "quantity": 1
+        },
+        {
+          "name": "Hardened Aether Mud",
+          "quantity": 1
+        }
+      ]
     }
   ]
 }

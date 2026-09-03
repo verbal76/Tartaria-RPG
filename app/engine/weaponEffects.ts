@@ -302,14 +302,32 @@ export interface ShieldAc {
 
 /** What the catalog's defensive adjectives mean in damage-type terms. Taken
  *  from the two strings that exist rather than invented: "fire" and "energy". */
+/**
+ * ⚠⚠ OTA-1647 — WIDENED TO EVERY DAMAGE TYPE A SHIELD CAN ANSWER, because the
+ * craftable line needs one shield per threat for a defensive build to mean
+ * anything. Owner: *"specific resists to make a build viable."*
+ *
+ * ⚠ ORDER IS LOAD-BEARING. `energy` is tested BEFORE `aetheric`, because the
+ * broad clause ("+2 AC vs energy damage", the Aetheric Shield since OTA-1645)
+ * covers three types while a shield built against the aether alone covers one.
+ * Reversing them would silently widen every narrow shield into a general one.
+ */
 const SHIELD_VS_TYPES: ReadonlyArray<readonly [RegExp, readonly string[]]> = [
-  [/\bfire\b|\bflame\b|\bburn\b/, ['burn']],
-  // "Energy" in this world is the aether and what it drives — the Aetheric
-  // Shield's own description is "Deflects energy attacks", and the three types
-  // a player would name are the three listed here.
-  [/\benergy\b|\baetheric\b|\baether\b/, ['aetheric', 'electrical', 'burn']],
-  [/\bcold\b|\bfrost\b/, ['cold']],
+  // The broad clause first — see the order note above.
+  [/\benergy\b/, ['aetheric', 'electrical', 'burn']],
   [/\bphysical\b/, ['slashing', 'piercing', 'bludgeoning']],
+  [/\bfire\b|\bflame\b|\bburn\b|\bheat\b/, ['burn']],
+  [/\bcold\b|\bfrost\b|\brime\b|\bice\b/, ['cold']],
+  [/\bshock\b|\belectric\w*\b|\blightning\b/, ['electrical']],
+  [/\bpoison\w*\b|\bvenom\w*\b|\btoxin\w*\b/, ['poison']],
+  [/\bradiation\b|\bfallout\b|\birradiat\w*\b/, ['radiation']],
+  [/\bcorrosion\b|\bcorrosive\b|\bdegradation\b|\brust\b|\bacid\b/, ['degradation']],
+  [/\bslashing\b/, ['slashing']],
+  [/\bpiercing\b/, ['piercing']],
+  [/\bbludgeoning\b|\bblunt\b/, ['bludgeoning']],
+  // Narrower than `energy`, and last of the aether words so the broad clause
+  // above always wins when both appear.
+  [/\baetheric\b|\baether\b/, ['aetheric']],
 ];
 
 function shieldAcFrom(text: string): ShieldAc | null {

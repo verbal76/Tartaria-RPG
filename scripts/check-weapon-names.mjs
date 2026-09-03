@@ -54,7 +54,7 @@ export const WEAPON_NOUNS = [
   // rune-caster forms (OTA-1641 — the rune's object: wand / rod / stave / scepter)
   'wand', 'rod', 'scepter', 'sceptre',
   // shields and off-hand implements sit in weapons.json too
-  'shield', 'buckler', 'brand', 'chain', 'needle', 'spike', 'claw', 'talon', 'fang', 'tooth', 'teeth',
+  'shield', 'buckler', 'targe', 'aegis', 'pavise', 'brand', 'chain', 'needle', 'spike', 'claw', 'talon', 'fang', 'tooth', 'teeth',
   'horn', 'tusk', 'quill', 'beak', 'saw', 'drill', 'piston', 'ram',
 ];
 
@@ -79,6 +79,12 @@ const SELF_TEST = [
   ['Dynasty Oathspear', true],
   ['Mud Thornblade', true],
   ['Choir-Bound Launcher', true],
+  // OTA-1647 — the craftable shield line's own nouns. A targe, a pavise and an
+  // aegis are all shields; the gate simply had not been told.
+  ['Scrap Targe', true],
+  ['Splinter Pavise', true],
+  ["Warden's Aegis", true],
+  ['Aegis of the Deep Cold', true],
   ['Aetheric Railgun', true],
   ["Mud Emperor's Buckler", true],
   ['Order Letter-Opener', true],

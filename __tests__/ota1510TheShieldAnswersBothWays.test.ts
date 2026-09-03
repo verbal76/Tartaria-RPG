@@ -191,11 +191,14 @@ describe('OTA-1510 — SHIELD BASH, the offense', () => {
     expect(w?.stat).toBe('dexterity');
   });
 
-  it('⚠⚠ no shield row is a dead fist — all 15 carry authored bash dice', () => {
+  it('⚠⚠ no shield row is a dead fist — all 28 carry authored bash dice', () => {
     const { WEAPONS, itemIsShield } = require('../app/engine/crafting');
     const shields = WEAPONS.filter((w: { name: string; tags?: string[] }) =>
       itemIsShield({ name: w.name, tags: w.tags ?? [] }));
-    expect(shields.length).toBe(15);
+    // ⚠ OTA-1647 — 15 → 28 with the craftable line. Every new row carries
+    // authored bash dice by construction (1d4/1d6/1d8/1d10 by rarity), so the
+    // claim this test makes — no shield row is a dead fist — is unchanged.
+    expect(shields.length).toBe(28);
     for (const s of shields) {
       expect(s.damageDice).toMatch(/^\d+d\d+$/);
       expect(s.damageType).toBeTruthy();

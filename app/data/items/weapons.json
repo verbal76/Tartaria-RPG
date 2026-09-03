@@ -6476,6 +6476,373 @@
       ],
       "effect": "2d8 aetheric; the struck target bleeds 1 corruption a round for 3 rounds.",
       "description": "Necromancer Staff. A length of lich-bone capped with a skull that is not quite empty. A power weapon: it casts what it remembers."
+    },
+    {
+      "name": "Scrap Targe",
+      "weaponKind": "melee",
+      "damageType": "bludgeoning",
+      "damageDice": "1d4",
+      "stat": "dexterity",
+      "statRequirement": 3,
+      "rarity": "Common",
+      "style": "shield",
+      "faction": "unknowing_masses",
+      "tc": 60,
+      "defense": 5,
+      "tags": [
+        "weapon",
+        "shield",
+        "dual_wield",
+        "unknowing_masses"
+      ],
+      "effect": "+1 AC; +2 AC against slashing damage. Grants +10 HP.",
+      "description": "Hammered plate off a wreck, edges rolled over a bar. It has stopped a knife before.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 10
+        }
+      ],
+      "baseDurability": 150
+    },
+    {
+      "name": "Bog-Hide Buckler",
+      "weaponKind": "melee",
+      "damageType": "bludgeoning",
+      "damageDice": "1d4",
+      "stat": "dexterity",
+      "statRequirement": 3,
+      "rarity": "Common",
+      "style": "shield",
+      "faction": "mud_dwellers",
+      "tc": 60,
+      "defense": 5,
+      "tags": [
+        "weapon",
+        "shield",
+        "dual_wield",
+        "mud_dwellers"
+      ],
+      "effect": "+1 AC; +2 AC against poison damage. Grants +10 HP.",
+      "description": "Layered bog hide, cured until the venom beads and runs off instead of soaking in.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 10
+        }
+      ],
+      "baseDurability": 150
+    },
+    {
+      "name": "Rimeplate Shield",
+      "weaponKind": "melee",
+      "damageType": "bludgeoning",
+      "damageDice": "1d6",
+      "stat": "dexterity",
+      "statRequirement": 6,
+      "rarity": "Uncommon",
+      "style": "shield",
+      "faction": "mud_dwellers",
+      "tc": 160,
+      "defense": 6,
+      "tags": [
+        "weapon",
+        "shield",
+        "dual_wield",
+        "mud_dwellers"
+      ],
+      "effect": "+2 AC; +3 AC against cold damage. Grants +20 HP.",
+      "description": "Mud-iron faced with pale rime-glass. Cold slides off it rather than settling.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 20
+        }
+      ],
+      "baseDurability": 200
+    },
+    {
+      "name": "Cinder Targe",
+      "weaponKind": "melee",
+      "damageType": "bludgeoning",
+      "damageDice": "1d6",
+      "stat": "dexterity",
+      "statRequirement": 6,
+      "rarity": "Uncommon",
+      "style": "shield",
+      "faction": "unknowing_masses",
+      "tc": 160,
+      "defense": 6,
+      "tags": [
+        "weapon",
+        "shield",
+        "dual_wield",
+        "unknowing_masses"
+      ],
+      "effect": "+2 AC; +3 AC against fire damage. Grants +20 HP.",
+      "description": "Ash-tempered facing over green hide. Made for standing in front of a burn.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 20
+        }
+      ],
+      "baseDurability": 200
+    },
+    {
+      "name": "Grounded Buckler",
+      "weaponKind": "melee",
+      "damageType": "bludgeoning",
+      "damageDice": "1d6",
+      "stat": "dexterity",
+      "statRequirement": 6,
+      "rarity": "Uncommon",
+      "style": "shield",
+      "faction": "unknowing_masses",
+      "tc": 160,
+      "defense": 6,
+      "tags": [
+        "weapon",
+        "shield",
+        "dual_wield",
+        "unknowing_masses"
+      ],
+      "effect": "+2 AC; +3 AC against shock damage. Grants +20 HP.",
+      "description": "Copper braid runs from boss to rim and out to a trailing earth-tail.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 20
+        }
+      ],
+      "baseDurability": 200
+    },
+    {
+      "name": "Splinter Pavise",
+      "weaponKind": "melee",
+      "damageType": "bludgeoning",
+      "damageDice": "1d6",
+      "stat": "dexterity",
+      "statRequirement": 6,
+      "rarity": "Uncommon",
+      "style": "shield",
+      "faction": "giants",
+      "tc": 160,
+      "defense": 6,
+      "tags": [
+        "weapon",
+        "shield",
+        "dual_wield",
+        "giants"
+      ],
+      "effect": "+2 AC; +3 AC against piercing damage. Grants +20 HP.",
+      "description": "A standing board of laminated bone. Points bury in it and stop.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 20
+        }
+      ],
+      "baseDurability": 200
+    },
+    {
+      "name": "Leadlined Pavise",
+      "weaponKind": "melee",
+      "damageType": "bludgeoning",
+      "damageDice": "1d8",
+      "stat": "dexterity",
+      "statRequirement": 9,
+      "rarity": "Rare",
+      "style": "shield",
+      "faction": "tartarian_revivalists",
+      "tc": 340,
+      "defense": 7,
+      "tags": [
+        "weapon",
+        "shield",
+        "dual_wield",
+        "tartarian_revivalists"
+      ],
+      "effect": "+3 AC; +4 AC against radiation damage. Grants +30 HP.",
+      "description": "A salvage board lined with rolled lead. Heavy, and the counter goes quiet behind it.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 30
+        }
+      ],
+      "baseDurability": 265
+    },
+    {
+      "name": "Aether-Damped Shield",
+      "weaponKind": "melee",
+      "damageType": "bludgeoning",
+      "damageDice": "1d8",
+      "stat": "dexterity",
+      "statRequirement": 9,
+      "rarity": "Rare",
+      "style": "shield",
+      "faction": "aetheric",
+      "tc": 340,
+      "defense": 7,
+      "tags": [
+        "weapon",
+        "shield",
+        "dual_wield",
+        "aetheric"
+      ],
+      "effect": "+3 AC; +4 AC against aetheric damage. Grants +30 HP.",
+      "description": "Damping lattice woven through the face. The Veil goes flat where it presses.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 30
+        }
+      ],
+      "baseDurability": 265
+    },
+    {
+      "name": "Anvil Shield",
+      "weaponKind": "melee",
+      "damageType": "bludgeoning",
+      "damageDice": "1d8",
+      "stat": "dexterity",
+      "statRequirement": 9,
+      "rarity": "Rare",
+      "style": "shield",
+      "faction": "stone_builders",
+      "tc": 340,
+      "defense": 7,
+      "tags": [
+        "weapon",
+        "shield",
+        "dual_wield",
+        "stone_builders"
+      ],
+      "effect": "+3 AC; +4 AC against bludgeoning damage. Grants +30 HP.",
+      "description": "A builder's shield with an anvil core. It does not fold, it rings.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 30
+        }
+      ],
+      "baseDurability": 265
+    },
+    {
+      "name": "Rustbreaker Shield",
+      "weaponKind": "melee",
+      "damageType": "bludgeoning",
+      "damageDice": "1d8",
+      "stat": "dexterity",
+      "statRequirement": 9,
+      "rarity": "Rare",
+      "style": "shield",
+      "faction": "tartarian_revivalists",
+      "tc": 340,
+      "defense": 7,
+      "tags": [
+        "weapon",
+        "shield",
+        "dual_wield",
+        "tartarian_revivalists"
+      ],
+      "effect": "+3 AC; +4 AC against corrosion damage. Grants +30 HP.",
+      "description": "Sealed and re-sealed against the corrosion that eats everything else out here.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 30
+        }
+      ],
+      "baseDurability": 265
+    },
+    {
+      "name": "Aegis of the Deep Cold",
+      "weaponKind": "melee",
+      "damageType": "bludgeoning",
+      "damageDice": "1d10",
+      "stat": "dexterity",
+      "statRequirement": 11,
+      "rarity": "Legendary",
+      "style": "shield",
+      "faction": "mud_dwellers",
+      "tc": 900,
+      "defense": 8,
+      "tags": [
+        "weapon",
+        "shield",
+        "dual_wield",
+        "mud_dwellers",
+        "legendary"
+      ],
+      "effect": "+4 AC; +5 AC against cold damage. Grants +45 HP.",
+      "description": "A monarch's aegis of blue rime. The air in front of it never quite thaws.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 45
+        }
+      ],
+      "baseDurability": 350
+    },
+    {
+      "name": "Sunward Aegis",
+      "weaponKind": "melee",
+      "damageType": "bludgeoning",
+      "damageDice": "1d10",
+      "stat": "dexterity",
+      "statRequirement": 11,
+      "rarity": "Legendary",
+      "style": "shield",
+      "faction": "stone_builders",
+      "tc": 900,
+      "defense": 8,
+      "tags": [
+        "weapon",
+        "shield",
+        "dual_wield",
+        "stone_builders",
+        "legendary"
+      ],
+      "effect": "+4 AC; +5 AC against fire damage. Grants +45 HP.",
+      "description": "Gold-faced and mirror-bright. It throws the fire back the way it came.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 45
+        }
+      ],
+      "baseDurability": 350
+    },
+    {
+      "name": "Warden's Aegis",
+      "weaponKind": "melee",
+      "damageType": "bludgeoning",
+      "damageDice": "1d10",
+      "stat": "dexterity",
+      "statRequirement": 11,
+      "rarity": "Legendary",
+      "style": "shield",
+      "faction": "forgotten_order",
+      "tc": 900,
+      "defense": 8,
+      "tags": [
+        "weapon",
+        "shield",
+        "dual_wield",
+        "forgotten_order",
+        "legendary"
+      ],
+      "effect": "+4 AC; +5 AC against physical damage. Grants +45 HP.",
+      "description": "The Order's standing wall. Steel, bone and oath, in that order.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 45
+        }
+      ],
+      "baseDurability": 350
     }
   ]
 }
