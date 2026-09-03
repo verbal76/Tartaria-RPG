@@ -49,3 +49,4 @@ pull 2026-09-01T20:56:56Z — URGENT: owner softlocked on a mission tile — has
 pull 2026-09-02T00:00:00Z — owner: "there's definitely something going on with travel now" — pushed a fresh log right after the 1617 ship. Fetch it. Prior open thread from 2026-09-01T20:56 is the same area (could not leave the mission tile), so pull everything since 20:54.
 pull 2026-09-02T02:05:00Z — owner: "pull the newest log, maybe 3 minutes old" (on 1618; Temporal Watch stage-2 confusion + travel)
 pull 2026-09-03T00:05:00Z — owner: "new log pushed, examine all new content" (on 1632/1634; the last bundle read ended 2026-09-02T22:41:39Z — everything after that is new)
+pull 2026-09-03T14:40:00Z — owner: "did we fix the issue with me not being able to coat my magnetic axe? I sent a log." Fetch everything since 2026-09-03T01:16Z. Looking for the coat-weapon picker on the Magnetic Axe (Rare, electrical, axe): whether the refusal line printed and what it said.
