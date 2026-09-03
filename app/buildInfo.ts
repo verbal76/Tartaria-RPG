@@ -27229,6 +27229,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // defenceless, Wisdom 12 discloses what the gate withheld, and no enemy shape a
 // save can hold makes the popup throw.
 export const OTA_BUILD_ID = '2026-09-03-1655-the-card-is-asked';
+// golem catch-up 2026-09-03: markerless publish of OTA-1655 - the card is asked,
+// not read. The 24-hour audit scored all twenty OTAs by HOW they prove
+// themselves; nineteen carry real behavioural proof and OTA-1651 was the outlier
+// at 1 of 23 assertions, proving a card the player actually looks at only by
+// reading component source. enemyDetailBody was already pure, so one export buys
+// thirteen real questions: the flavour above the HP line measured on the rendered
+// lines, both hands in words that survive stripping the dot, no blank gap or
+// "undefined" on a flavourless foe, an unreadable enemy that SAYS so, the Wisdom
+// gate disclosing what it withheld, and no save-holdable enemy shape that throws.
+// hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-03-1654-the-save-catches-up';
 // golem catch-up 2026-09-03: markerless publish of OTA-1654 - the save catches
 // up to the catalog. The EFFECTS were never stale (an accessory's powers and
