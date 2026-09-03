@@ -35,7 +35,7 @@ import { pick, chance } from '../../engine/rng';
 import { grantItem } from '../../engine/inventory';
 import { lookupCraftedItem, findArmorByName, findWeaponByName, applyArmorResistance } from '../../engine/crafting';
 import { trainStat } from '../../engine/statTraining';
-import { validSlotsForItem, SLOT_LABEL, SLOT_ID_KEY, effectiveStats, gearHpBonus, resolveEquippedItem } from '../../engine/equipment';
+import { validSlotsForItem, SLOT_LABEL, SLOT_ID_KEY, effectiveStats, gearHpBonus, resolveEquippedItem, RING_SLOTS, RING_ID_KEYS } from '../../engine/equipment';
 import { canScrap, scrapOutputFor, repairCostMaterials, scrapSuccessChance, scrapHasSecondChance, pickScrapFailureLine } from '../../engine/scrapEngine';
 import { wornDogVestInstanceId } from '../../engine/dogCompanion';
 import { stampDurability } from '../../engine/durability';
@@ -263,11 +263,13 @@ export const createInventorySlice = (
     let writeSlot: string = slot;
     let writeIdKey: string = SLOT_ID_KEY[slot];
     if (slot === 'ring') {
+      // ⚠ OTA-1648 — walks RING_SLOTS instead of an if-chain, so the fourth
+      // finger (and any future one) is served without touching this branch.
       const eq = player.equipped ?? {};
-      if (!eq.ring) { writeSlot = 'ring'; writeIdKey = 'ringId'; }
-      else if (!eq.ring2) { writeSlot = 'ring2'; writeIdKey = 'ring2Id'; }
-      else if (!eq.ring3) { writeSlot = 'ring3'; writeIdKey = 'ring3Id'; }
-      else { writeSlot = 'ring'; writeIdKey = 'ringId'; } // all full → overwrite first
+      const freeIdx = RING_SLOTS.findIndex((k) => !eq[k]);
+      const idx = freeIdx >= 0 ? freeIdx : 0; // all full → displace the first
+      writeSlot = RING_SLOTS[idx]!;
+      writeIdKey = RING_ID_KEYS[idx]!;
     }
     // Capture what was already in this slot so the swap is visible.
     // Playtest: player equipped a locket, then a compass to the same Amulet
@@ -522,7 +524,7 @@ export const createInventorySlice = (
     // Equipped items can't be dropped without unequipping first —
     // would otherwise leave the player wielding a phantom blade.
     const eq = player.equipped ?? {};
-    const equippedSlots = ['main', 'off', 'head', 'chest', 'hands', 'legs', 'feet', 'cloak', 'amulet', 'ring', 'ring2', 'ring3'] as const;
+    const equippedSlots = ['main', 'off', 'head', 'chest', 'hands', 'legs', 'feet', 'cloak', 'amulet', ...RING_SLOTS] as const;
     const isEquipped = equippedSlots.some((slot) => eq[slot] === item.name);
     if (isEquipped) {
       get().appendLog('arbiter', `The Arbiter taps your hand. "Unequip the ${item.name} first — you can't drop what you're wielding."`);
@@ -915,7 +917,7 @@ export const createInventorySlice = (
     // ring2 / ring3 have no EquipSlot entry, so unequipSlot can't address them —
     // clear the pointer inline and strip the ring's HP bonus (mirror of
     // unequipSlot's bake-out) when the scrapped instance sits there.
-    for (const [nameKey, idKey] of [['ring2', 'ring2Id'], ['ring3', 'ring3Id']] as const) {
+    for (const [nameKey, idKey] of RING_SLOTS.slice(1).map((k, i) => [k, RING_ID_KEYS[i + 1]!] as const)) {
       if (eq[idKey] === item.id) {
         const ringName = eq[nameKey];
         const hpDelta = -gearHpBonus(ringName);

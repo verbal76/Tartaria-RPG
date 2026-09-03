@@ -305,6 +305,37 @@ export const SLOT_LABEL: Record<EquipSlot, string> = {
 /** Slots that hold armor pieces (used to aggregate AC + resistances). */
 export const ARMOR_SLOTS: readonly EquipSlot[] = ['head', 'chest', 'hands', 'legs', 'feet', 'cloak'];
 
+/**
+ * ⚠⚠⚠ OTA-1648 — EVERY RING SLOT, IN ONE PLACE. Owner: *"we need to be able to
+ * wear up to four rings at a time."*
+ *
+ * Adding the fourth to `PlayerEquipped` was one line. The other THIRTY were the
+ * work: `['ring', 'ring2', 'ring3']` had been written out by hand across 13
+ * files — the stat sum, the AC sum, the HP breakdown, the fallen ledger, the
+ * revenant loot priority, two fuse-protection id lists, the vendor repair list,
+ * the drop guard, the equip router, the inventory screen's worn-marker, dedupe
+ * and full-slot test. Every one had to agree, and a single missed list is a ring
+ * that is worn but not counted, or counted but not droppable.
+ *
+ * ⚠ `ring` KEEPS ITS UNNUMBERED NAME. It is the legacy first slot and it is in
+ * every save on every device; renaming it to `ring1` for tidiness would orphan
+ * the ring every existing player is wearing. The ugly name is the compatible
+ * one.
+ *
+ * ⚠ ORDER IS THE FILL ORDER. The equip router walks this list and takes the
+ * first empty slot, so a new ring goes on the next free finger rather than
+ * overwriting; only when all four are full does it displace the first.
+ */
+export const RING_SLOTS = ['ring', 'ring2', 'ring3', 'ring4'] as const;
+export type RingSlot = typeof RING_SLOTS[number];
+
+/** The instance-id key beside each ring slot, in the same order. */
+export const RING_ID_KEYS = ['ringId', 'ring2Id', 'ring3Id', 'ring4Id'] as const;
+export type RingIdKey = typeof RING_ID_KEYS[number];
+
+/** How many rings a player may wear at once. Read it; never hard-code 4. */
+export const MAX_RINGS = RING_SLOTS.length;
+
 /** Map an equip slot to its corresponding `*Id` key on PlayerEquipped.
  *  When set, the id key identifies the exact inventory instance bound
  *  to that slot (important when the player holds two of the same item). */
@@ -364,7 +395,7 @@ export function equippedInstanceIds(player: PlayerCharacter): Set<string> {
     if (it) ids.add(it.id);
   }
   // ring2 / ring3 are id-only extra ring slots (no name field / SLOT_ID_KEY entry).
-  for (const idKey of ['ring2Id', 'ring3Id'] as const) {
+  for (const idKey of RING_ID_KEYS.slice(1)) {
     const id = eq[idKey];
     if (id) ids.add(id);
   }
@@ -576,7 +607,7 @@ export function aggregateEquippedStatBonuses(player: PlayerCharacter): Partial<S
   }
   // OTA-239 — three concurrent ring slots. Each ring's statBonus
   // stacks; future ring catalog can author per-slot synergies later.
-  for (const ringName of [eq.ring, eq.ring2, eq.ring3]) {
+  for (const ringName of RING_SLOTS.map((k) => eq[k])) {
     if (!ringName) continue;
     const r = findRingByName(ringName);
     if (r?.statBonus) add(r.statBonus.stat, r.statBonus.amount);
@@ -784,7 +815,7 @@ export function equippedGearAc(
   // buy immunity.
   let accessories = 0;
   if (eq.amulet) accessories += findAmuletByName(eq.amulet)?.acBonus ?? 0;
-  for (const ringName of [eq.ring, eq.ring2, eq.ring3]) {
+  for (const ringName of RING_SLOTS.map((k) => eq[k])) {
     if (!ringName) continue;
     accessories += findRingByName(ringName)?.acBonus ?? 0;
   }

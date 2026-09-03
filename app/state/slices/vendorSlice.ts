@@ -45,7 +45,7 @@ import { lookupCraftedItem, RECIPES, findDogGearByName, type Recipe } from '../.
 import { trainStat } from '../../engine/statTraining';
 import { sellPriceFor, isUnsellable, applySellCaps } from '../../engine/sellPrice';
 import { vendorPriceMod } from '../../engine/factionRapport';
-import { SLOT_LABEL, effectiveStats, equippedInstanceIds } from '../../engine/equipment';
+import { SLOT_LABEL, effectiveStats, equippedInstanceIds, RING_ID_KEYS } from '../../engine/equipment';
 import { canScrap } from '../../engine/scrapEngine';
 import { stampDurability, repairCost, repairItem } from '../../engine/durability';
 import { WEAPONS, ARMOR, GEAR, MATERIALS, AMULETS, RINGS } from '../../engine/crafting';
@@ -706,7 +706,7 @@ export const createVendorSlice = (
     // for a fuse the gate would refuse.
     const eqForVendorFuse = player.equipped ?? {};
     const vendorEquippedIds = new Set(
-      [eqForVendorFuse.mainId, eqForVendorFuse.offId, eqForVendorFuse.headId, eqForVendorFuse.chestId, eqForVendorFuse.handsId, eqForVendorFuse.legsId, eqForVendorFuse.feetId, eqForVendorFuse.cloakId, eqForVendorFuse.amuletId, eqForVendorFuse.ringId, eqForVendorFuse.ring2Id, eqForVendorFuse.ring3Id].filter(Boolean) as string[],
+      [eqForVendorFuse.mainId, eqForVendorFuse.offId, eqForVendorFuse.headId, eqForVendorFuse.chestId, eqForVendorFuse.handsId, eqForVendorFuse.legsId, eqForVendorFuse.feetId, eqForVendorFuse.cloakId, eqForVendorFuse.amuletId, ...RING_ID_KEYS.map((k) => eqForVendorFuse[k])].filter(Boolean) as string[],
     );
     const vendorCatalyst = fusion.findFactionCatalyst(player.inventory, vendorEquippedIds) as ReturnType<typeof import('../../engine/itemFusion').findFactionCatalyst>;
     const gate = fusion.gateFusion(player.inventory, vendorCatalyst) as ReturnType<typeof import('../../engine/itemFusion').gateFusion>;
@@ -784,7 +784,7 @@ export const createVendorSlice = (
     }
     const eqRep = player.equipped ?? {};
     const equippedRepairIds = new Set(
-      [eqRep.mainId, eqRep.offId, eqRep.headId, eqRep.chestId, eqRep.handsId, eqRep.legsId, eqRep.feetId, eqRep.cloakId, eqRep.amuletId, eqRep.ringId, eqRep.ring2Id, eqRep.ring3Id].filter(Boolean) as string[],
+      [eqRep.mainId, eqRep.offId, eqRep.headId, eqRep.chestId, eqRep.handsId, eqRep.legsId, eqRep.feetId, eqRep.cloakId, eqRep.amuletId, ...RING_ID_KEYS.map((k) => eqRep[k])].filter(Boolean) as string[],
     );
     const item = damagedMatches.find((i) => equippedRepairIds.has(i.id))
       ?? damagedMatches.slice().sort((a, b) =>

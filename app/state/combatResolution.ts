@@ -72,7 +72,7 @@ import {
 import { ACID_SHRED_DECAY_PER_ROUND, COATING_DOT_TURNS } from '../engine/weaponCoating';
 import { effectiveAC } from '../engine/raceMechanics';
 import { trainStat } from '../engine/statTraining';
-import { ARMOR_SLOTS, effectiveStats, aggregateEquippedStatBonuses, resolveEquippedItem, trimStandingAc, equippedGearAc, heldShieldAc } from '../engine/equipment';
+import { ARMOR_SLOTS, effectiveStats, aggregateEquippedStatBonuses, resolveEquippedItem, trimStandingAc, equippedGearAc, heldShieldAc, RING_SLOTS } from '../engine/equipment';
 import { itemIsThrowable } from '../engine/bandolierEligibility';
 import { findFactionQuestById } from '../engine/factionQuests';
 import { weatherRepositionCost } from '../engine/weatherEffects';
@@ -2820,7 +2820,7 @@ export function handlePlayerDeath(
       // OTA-975 — the kit they died in, for the Hollowed revenant they may yet
       // become (slot display names; the *Id fields are instance ids, skipped).
       gearNames: (() => {
-        const slotPrio = ['main', 'off', 'chest', 'head', 'legs', 'feet', 'amulet', 'ring', 'ring2', 'ring3'];
+        const slotPrio = ['main', 'off', 'chest', 'head', 'legs', 'feet', 'amulet', ...RING_SLOTS];
         return Array.from(new Set(Object.entries((player.equipped ?? {}) as Record<string, string | undefined>)
           .filter(([k, v]) => !!v && !k.endsWith('Id'))
           .sort(([a], [b]) => {

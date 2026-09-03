@@ -27082,7 +27082,22 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // broad `energy` is tested BEFORE `aetheric` or every narrow shield would
 // silently widen into a general one. 'targe', 'aegis' and 'pavise' joined
 // WEAPON_NOUNS with self-tests — they are shields; the gate had not been told.
-export const OTA_BUILD_ID = '2026-09-03-1647-a-shield-build-you-can-make';
+// ⚠⚠⚠ OTA-1648 — A FOURTH RING, AND THE LIST THAT MADE IT A 30-SITE EDIT.
+// Owner: "we need to be able to wear up to four rings at a time." Adding
+// `ring4` to PlayerEquipped was ONE line. The other thirty were the work: the
+// literal ['ring','ring2','ring3'] had been written out by hand across 13 files
+// — the stat sum, the AC sum, hpBreakdown, the fallen ledger, the revenant loot
+// priority, two fuse-protection id lists, the vendor repair list, the drop
+// guard, the equip router, and four sites in InventoryScreen. Every one had to
+// agree, and a single missed list is a ring worn but not counted, counted but
+// not droppable, or greyed out while the equip router would happily fill it. So
+// the list moved to RING_SLOTS / RING_ID_KEYS / MAX_RINGS in equipment.ts and
+// all 30 sites read it; ota1648 ratchets that no file writes it by hand again,
+// exempting only the declaration itself. ⚠ `ring` KEEPS its unnumbered name —
+// renaming it to ring1 for tidiness would orphan the ring every existing player
+// is wearing. No migration: a save with no ring4 reads as an empty finger.
+export const OTA_BUILD_ID = '2026-09-03-1648-a-fourth-ring';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-03-1647-a-shield-build-you-can-make';
 // golem catch-up 2026-09-03: markerless publish of OTA-1647 - 13 new shields
 // (28 total) and 28 recipes so every shield in the game is craftable, one typed
 // answer per damage type, flat +1..+4 / typed +2..+5 by rarity; targe / aegis /

@@ -514,7 +514,7 @@ import {
 // OTA-1254 — the cudgel beat readies the cudgel through the SAME comparison the
 // loot picker's ★ uses, rather than its own hand-rolled guess. See grantTutorialItem.
 import { isUpgradeOverEquipped, upgradeEquipSlot } from '../engine/gatherSort';
-import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, effectiveStats, gearHpBonus, aggregateEquippedStatBonuses, aggregateEquippedRegen, resolveEquippedItem, equippedInstanceIds, trimStandingAc, standingAc, equippedGearAc, statNowClause } from '../engine/equipment';
+import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, RING_ID_KEYS, SLOT_ID_KEY, effectiveStats, gearHpBonus, aggregateEquippedStatBonuses, aggregateEquippedRegen, resolveEquippedItem, equippedInstanceIds, trimStandingAc, standingAc, equippedGearAc, statNowClause, RING_SLOTS } from '../engine/equipment';
 // ⚠ OTA-1404 — `statNowClause` MOVED to engine/equipment.ts, next to the
 // `effectiveStats` it reads, because the combat resolver needs it too and a leaf
 // may never import a value from this file. It is re-exported below rather than
@@ -3554,11 +3554,13 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
     cloak: eq.cloak,
     lens: eq.lens,
     amulet: eq.amulet,
-    ring: eq.ring,
-    // OTA-239 — three concurrent ring slots. Legacy saves with only
-    // `ring` keep it; ring2/ring3 default to undefined.
-    ring2: eq.ring2,
-    ring3: eq.ring3,
+    // OTA-239 — concurrent ring slots. Legacy saves with only `ring` keep it;
+    // the numbered ones default to undefined.
+    // ⚠⚠ OTA-1648 — SPREAD FROM `RING_SLOTS`, not written out. A save from before
+    // the fourth finger simply has no ring4, which reads as an empty slot —
+    // nothing to migrate. Spreading means the next ring needs no edit here, and
+    // the backfill can never fall a slot behind the type.
+    ...Object.fromEntries(RING_SLOTS.map((k) => [k, eq[k]])),
     mainId: eq.mainId ?? findFirstId(eq.main ?? eq.weaponName),
     offId: eq.offId ?? findFirstId(eq.off),
     headId: eq.headId ?? findFirstId(eq.head),
@@ -3569,9 +3571,11 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
     cloakId: eq.cloakId ?? findFirstId(eq.cloak),
     lensId: eq.lensId ?? findFirstId(eq.lens),
     amuletId: eq.amuletId ?? findFirstId(eq.amulet),
-    ringId: eq.ringId ?? findFirstId(eq.ring),
-    ring2Id: eq.ring2Id ?? findFirstId(eq.ring2),
-    ring3Id: eq.ring3Id ?? findFirstId(eq.ring3),
+    // ⚠ OTA-1648 — the id keys pair positionally with RING_SLOTS, so each one
+    // still falls back to a first-id lookup on its own slot's name.
+    ...Object.fromEntries(
+      RING_ID_KEYS.map((idKey, i) => [idKey, eq[idKey] ?? findFirstId(eq[RING_SLOTS[i]!])]),
+    ),
     // OTA-239 — Tool Pouch. Empty array on legacy saves; the player
     // explicitly stows items into it via the `stow <item>` verb or
     // the InventoryScreen TOOL POUCH section.
@@ -5176,7 +5180,7 @@ export function debugLoadout(player: PlayerCharacter): string {
   const es = effectiveStats(player);
   const eqb = aggregateEquippedStatBonuses(player) as Record<string, number>;
   const eq = (player.equipped ?? {}) as Record<string, string | undefined>;
-  const worn = (['main', 'off', 'head', 'chest', 'hands', 'legs', 'feet', 'cloak', 'amulet', 'ring', 'ring2', 'ring3'] as const)
+  const worn = (['main', 'off', 'head', 'chest', 'hands', 'legs', 'feet', 'cloak', 'amulet', ...RING_SLOTS] as const)
     .filter((s) => eq[s])
     .map((s) => `${s}=${eq[s]}`)
     .join(' ');

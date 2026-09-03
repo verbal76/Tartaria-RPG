@@ -21,7 +21,7 @@
 import { anOrA } from '../../engine/grammar';
 import type { InventoryItem } from '../../engine/types';
 import { qwen } from '../../ai/engines';
-import { SLOT_LABEL } from '../../engine/equipment';
+import { SLOT_LABEL, RING_ID_KEYS } from '../../engine/equipment';
 import { FACTIONS } from '../../engine/factions';
 import { canonicalItemTags, MAX_CRAFT_BATCH } from '../../engine/crafting';
 // ⚠ SHARED BY TWO SLICES AND NOTHING ELSE, so it moved DOWN rather than being
@@ -121,7 +121,7 @@ export const createCraftingSlice = (
     // reserved faction item = a faction fusion.
     const eqForFuse = player.equipped ?? {};
     const equippedIdSet = new Set(
-      [eqForFuse.mainId, eqForFuse.offId, eqForFuse.headId, eqForFuse.chestId, eqForFuse.handsId, eqForFuse.legsId, eqForFuse.feetId, eqForFuse.cloakId, eqForFuse.amuletId, eqForFuse.ringId, eqForFuse.ring2Id, eqForFuse.ring3Id].filter(Boolean) as string[],
+      [eqForFuse.mainId, eqForFuse.offId, eqForFuse.headId, eqForFuse.chestId, eqForFuse.handsId, eqForFuse.legsId, eqForFuse.feetId, eqForFuse.cloakId, eqForFuse.amuletId, ...RING_ID_KEYS.map((k) => eqForFuse[k])].filter(Boolean) as string[],
     );
     const preCatalyst = fusion.findFactionCatalyst(player.inventory, equippedIdSet) as ReturnType<typeof import('../../engine/itemFusion').findFactionCatalyst>;
     const gate = fusion.gateFusion(player.inventory, preCatalyst) as ReturnType<typeof import('../../engine/itemFusion').gateFusion>;

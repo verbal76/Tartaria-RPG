@@ -12,6 +12,7 @@ import type {
 import type { ChatMessage } from '../ai/generation/QwenGenerativeEngine';
 import type { MacroLocation, MicroLocation, MicroMicroLocation } from './worldLadder';
 import { describeTraits } from './enemyTraits';
+import { RING_SLOTS } from './equipment';
 import { buildCanonFactsParagraph } from './canonFacts';
 import { standingAc } from './equipment';
 
@@ -642,7 +643,7 @@ export function stringifyInventory(
 function collectEquippedNames(equipped: PlayerEquipped | undefined): Set<string> {
   const out = new Set<string>();
   if (!equipped) return out;
-  const slots: (keyof PlayerEquipped)[] = ['main', 'off', 'head', 'chest', 'hands', 'legs', 'feet', 'cloak', 'amulet', 'ring', 'ring2', 'ring3'];
+  const slots: (keyof PlayerEquipped)[] = ['main', 'off', 'head', 'chest', 'hands', 'legs', 'feet', 'cloak', 'amulet', ...RING_SLOTS];
   for (const slot of slots) {
     const name = equipped[slot];
     if (typeof name === 'string' && name) out.add(name);

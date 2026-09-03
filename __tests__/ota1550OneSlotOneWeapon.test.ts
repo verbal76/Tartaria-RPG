@@ -23,6 +23,7 @@
  * simply the one that never got it.
  */
 import { readFileSync } from 'fs';
+import { RING_SLOTS } from '../app/engine/equipment';
 import { join } from 'path';
 
 const src = (...p: string[]): string => readFileSync(join(__dirname, '..', ...p), 'utf8');
@@ -104,8 +105,13 @@ describe('OTA-1550 — the wiring', () => {
       expect({ slot, present: block.includes(`['${slot}', player.equipped?.${slot},`) })
         .toEqual({ slot, present: true });
     }
-    // All three ring slots fold to the one 'ring' label.
-    expect((block.match(/\['ring', player\.equipped\?\.ring/g) ?? []).length).toBe(3);
+    // ⚠ OTA-1648 — EVERY ring slot folds to the one 'ring' label, and the row is
+    // now generated from RING_SLOTS rather than written out three times. Pinning
+    // the generator (and that it walks the full list) is the assertion that
+    // survives a fourth finger; counting literals only ever pinned the old three.
+    expect(block).toContain('...RING_SLOTS.map(');
+    expect(block).toContain("'ring', player.equipped?.[k]");
+    expect(RING_SLOTS.length).toBeGreaterThanOrEqual(4);
   });
 
   it('⚠ it is built AFTER `eq`, or the render throws before the screen mounts', () => {

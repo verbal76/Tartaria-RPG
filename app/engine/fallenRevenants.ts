@@ -8,6 +8,7 @@
 // the Fallen memorial marks them "put to rest".
 import type { Enemy, FallenGearPiece, InventoryItem } from './types';
 import type { FallenHero } from './saveSystem';
+import { RING_SLOTS } from './equipment';
 
 function hashSeed(s: string): number {
   let h = 2166136261;
@@ -234,7 +235,7 @@ export function buildFallenGearSnapshot(p: {
 }): FallenGearPiece[] {
   const eq = (p.equipped ?? {}) as Record<string, string | undefined>;
   const inv = p.inventory ?? [];
-  const slotPrio = ['main', 'off', 'chest', 'head', 'legs', 'feet', 'amulet', 'ring', 'ring2', 'ring3'];
+  const slotPrio = ['main', 'off', 'chest', 'head', 'legs', 'feet', 'amulet', ...RING_SLOTS];
   const out: FallenGearPiece[] = [];
   const slots = Object.keys(eq)
     .filter((k) => !!eq[k] && !k.endsWith('Id'))

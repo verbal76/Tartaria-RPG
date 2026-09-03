@@ -10,7 +10,7 @@ import {
   groupInventoryByCategory,
 } from '../components/InventoryCategorize';
 import type { InventoryItem, EquipSlot, PlayerCharacter } from '../engine/types';
-import { validSlotsForItem, SLOT_LABEL, wornInstanceIds, byWornFirst, planGroupEquip } from '../engine/equipment';
+import { validSlotsForItem, SLOT_LABEL, wornInstanceIds, byWornFirst, planGroupEquip, RING_SLOTS, RING_ID_KEYS } from '../engine/equipment';
 import { canScrap } from '../engine/scrapEngine';
 import { findWeaponByName, isFusedInventoryItem } from '../engine/crafting';
 import { resolveDisplayWeapon } from '../engine/itemResolution';
@@ -432,12 +432,11 @@ export function InventoryScreen() {
     ['cloak', player.equipped?.cloak],
     ['amulet', player.equipped?.amulet],
     ['ring', player.equipped?.ring],
-    // OTA-239 — three concurrent ring slots. ring2/ring3 share the
-    // 'ring' EquipSlot identifier in the type union but write to
-    // different equipped.* fields; for display dedupe purposes any
-    // ring slot counts as 'ring'.
-    ['ring', player.equipped?.ring2],
-    ['ring', player.equipped?.ring3],
+    // OTA-239 — concurrent ring slots. The numbered ones share the 'ring'
+    // EquipSlot identifier in the type union but write to different equipped.*
+    // fields; for display dedupe purposes any ring slot counts as 'ring'.
+    // ⚠ OTA-1648 — reads RING_SLOTS, so the fourth finger is deduped too.
+    ...RING_SLOTS.slice(1).map((k): [EquipSlot, string | undefined] => ['ring', player.equipped?.[k]]),
   ];
   for (const [slot, name] of allSlotPairs) {
     if (!name) continue;
@@ -455,9 +454,9 @@ export function InventoryScreen() {
   const idSlots: (string | undefined)[] = [
     eq.mainId, eq.offId, eq.headId, eq.chestId, eq.handsId,
     eq.legsId, eq.feetId, eq.cloakId, eq.amuletId, eq.ringId,
-    // OTA-239 — ring2 / ring3 instance ids participate in the
-    // EQUIPPED badge dedupe.
-    eq.ring2Id, eq.ring3Id,
+    // OTA-239 — the extra ring instance ids participate in the EQUIPPED badge
+    // dedupe. ⚠ OTA-1648 — from RING_ID_KEYS, so a fourth ring is not missed.
+    ...RING_ID_KEYS.slice(1).map((k) => eq[k]),
   ];
   for (const id of idSlots) {
     if (id) equippedItemIds.add(id);
@@ -498,7 +497,7 @@ export function InventoryScreen() {
     [eq.mainId, 'main'], [eq.offId, 'off'], [eq.headId, 'head'],
     [eq.chestId, 'chest'], [eq.handsId, 'hands'], [eq.legsId, 'legs'],
     [eq.feetId, 'feet'], [eq.cloakId, 'cloak'], [eq.amuletId, 'amulet'],
-    [eq.ringId, 'ring'], [eq.ring2Id, 'ring'], [eq.ring3Id, 'ring'],
+    ...RING_ID_KEYS.map((k): [string | undefined, EquipSlot] => [eq[k], 'ring']),
   ];
   for (const [id, slot] of idSlotPairs) {
     if (!id) continue;
@@ -534,9 +533,7 @@ export function InventoryScreen() {
     ['feet', player.equipped?.feet, eq.feetId],
     ['cloak', player.equipped?.cloak, eq.cloakId],
     ['amulet', player.equipped?.amulet, eq.amuletId],
-    ['ring', player.equipped?.ring, eq.ringId],
-    ['ring', player.equipped?.ring2, eq.ring2Id],
-    ['ring', player.equipped?.ring3, eq.ring3Id],
+    ...RING_SLOTS.map((k, i): [EquipSlot, string | undefined, string | undefined] => ['ring', player.equipped?.[k], eq[RING_ID_KEYS[i]!]]),
   ];
   for (const [slot, name, id] of nameIdSlotTriples) {
     if (!name || id) continue; // an id-bearing slot is settled — never by name
@@ -618,10 +615,12 @@ export function InventoryScreen() {
 
 
   // OTHER inventory item that competes for that slot gets a red ✗ (you'd
-  // have to unequip first). Rings have three physical slots, so a ring only
-  // counts as blocked when all three are worn.
+  // have to unequip first). Rings have several physical slots, so a ring only
+  // counts as blocked when every one of them is worn.
   const slotIsFull = (slot: EquipSlot): boolean => {
-    if (slot === 'ring') return !!(eq.ring && eq.ring2 && eq.ring3);
+    // ⚠ OTA-1648 — MAX_RINGS, never a literal: a hard-coded 3 here would grey
+    // out the fourth finger the equip router is perfectly willing to fill.
+    if (slot === 'ring') return RING_SLOTS.every((k) => !!eq[k]);
     const worn = (eq as Record<string, unknown>)[slot];
     return typeof worn === 'string' && worn.length > 0;
   };

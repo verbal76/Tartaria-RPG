@@ -41,6 +41,7 @@
 import type { FallenHero } from './saveSystem';
 import type { FallenGearPiece, Rarity } from './types';
 import { FUSION_CLAMPS } from './itemFusion';
+import { RING_SLOTS } from './equipment';
 import gearData from '../data/items/gear.json';
 
 // ---- caps ------------------------------------------------------------------
@@ -136,7 +137,7 @@ const RARITIES: readonly Rarity[] = ['Common', 'Uncommon', 'Rare', 'Legendary'];
 const KINDS = ['weapon', 'armor', 'relic', 'consumable', 'misc', 'runecaster', 'dog_armor'] as const;
 type ItemKind = (typeof KINDS)[number];
 const BASE_STATS = ['strength', 'dexterity', 'intelligence', 'wisdom', 'charisma', 'stealth'] as const;
-const GEAR_SLOTS = ['main', 'off', 'head', 'chest', 'legs', 'feet', 'amulet', 'ring', 'ring2', 'ring3', 'dog', 'relic', ''] as const;
+const GEAR_SLOTS = ['main', 'off', 'head', 'chest', 'legs', 'feet', 'amulet', ...RING_SLOTS, 'dog', 'relic', ''] as const;
 
 /** ⚠ Tags that grant a LOCK, not a look. A foreign piece arriving tagged
  *  `quest` would land in the save as view-only — unsellable, undroppable, and

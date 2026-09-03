@@ -889,13 +889,22 @@ export interface PlayerEquipped {
    *  one is worn in this dedicated slot (was: active merely by being carried). */
   lens?: string;
   amulet?: string;
-  /** OTA-239 — three concurrent ring slots. `ring` is the legacy first
-   *  slot (kept for back-compat); `ring2` and `ring3` are the new
-   *  additions. effectiveStatsBreakdown sums all three. Equip flow
-   *  fills the first empty slot in order. */
+  /** OTA-239 — concurrent ring slots. `ring` is the legacy first slot (kept
+   *  for back-compat); the numbered ones are additions. Equip flow fills the
+   *  first empty slot in order.
+   *
+   *  ⚠⚠ OTA-1648 — A FOURTH, and the slot list moved to `RING_SLOTS` in
+   *  equipment.ts. Owner: *"we need to be able to wear up to four rings at a
+   *  time."* Adding `ring4` here was one line; the other THIRTY were the
+   *  problem — the list `['ring', 'ring2', 'ring3']` was written out by hand in
+   *  13 files (stat sums, HP breakdown, the fallen ledger, two fuse-protection
+   *  id lists, the drop guard, the inventory screen…). Every one of them had to
+   *  agree or a ring would be worn and not counted, or counted and not
+   *  droppable. They now all read the constant, so a fifth ring is one edit. */
   ring?: string;
   ring2?: string;
   ring3?: string;
+  ring4?: string;
 
   /** Per-slot instance id (matches InventoryItem.id). When set, the
    *  durability-wear path and InventoryScreen dedupe shim use this
@@ -915,6 +924,7 @@ export interface PlayerEquipped {
   ringId?: string;
   ring2Id?: string;
   ring3Id?: string;
+  ring4Id?: string;
 
   /** OTA-239 — Tool Pouch. Carries up to 3 ready-to-use tool items
    *  (Aetheric Torch, Aetheric Vision Lens, etc.) outside the

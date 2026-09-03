@@ -75,7 +75,7 @@ import { questionMarkerNumbers } from '../engine/questionMarkers';
 import { climbHeightFor, isClimbCleared, reachableWhileElevated } from '../engine/climbHeight';
 import { findCatalogItem, itemIsShield } from '../engine/crafting'; // itemIsShield: OTA-1523 shield hint
 import { isOversized } from '../engine/portability';
-import { effectiveStats, playerHasScannerEquipped } from '../engine/equipment';
+import { effectiveStats, playerHasScannerEquipped, RING_ID_KEYS } from '../engine/equipment';
 import { searchRequirementFor, inventoryHasGate } from '../engine/itemEffect';
 import { enemyIsAerial } from '../engine/enemyTraits';
 import { findGearByName, findMaterialByName, findExplorationItemByName } from '../engine/crafting';
@@ -1942,7 +1942,7 @@ export function ExplorationScreen() {
         // it). So the banner reads "ready" exactly when the fuse will succeed.
         const eqF = player.equipped ?? {};
         const bannerEquippedIds = new Set(
-          [eqF.mainId, eqF.offId, eqF.headId, eqF.chestId, eqF.handsId, eqF.legsId, eqF.feetId, eqF.cloakId, eqF.amuletId, eqF.ringId, eqF.ring2Id, eqF.ring3Id].filter(Boolean) as string[],
+          [eqF.mainId, eqF.offId, eqF.headId, eqF.chestId, eqF.handsId, eqF.legsId, eqF.feetId, eqF.cloakId, eqF.amuletId, ...RING_ID_KEYS.map((k) => eqF[k])].filter(Boolean) as string[],
         );
         const bannerCatalyst = findFactionCatalyst(player.inventory ?? [], bannerEquippedIds);
         const gate = gateFusion(player.inventory ?? [], bannerCatalyst);

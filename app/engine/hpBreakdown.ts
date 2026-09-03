@@ -22,7 +22,7 @@
 // be added to this file at the same time.
 
 import type { PlayerCharacter, WorldMemory } from './types';
-import { gearHpBonus } from './equipment';
+import { gearHpBonus, RING_SLOTS } from './equipment';
 
 /** +1 max HP per this many DISTINCT enemy types beaten.
  *  ⚠ Lives here, not in gameStore, so the sheet can explain the number using the
@@ -35,7 +35,7 @@ export const MILESTONE_KILL_STEP = 3;
  *  hander's HP bonus goes through the same path as a chestplate's. */
 const HP_BEARING_SLOTS = [
   'main', 'off', 'head', 'chest', 'hands', 'legs', 'feet', 'cloak',
-  'lens', 'amulet', 'ring', 'ring2', 'ring3',
+  'lens', 'amulet', ...RING_SLOTS,
 ] as const;
 
 export interface HpBreakdown {
