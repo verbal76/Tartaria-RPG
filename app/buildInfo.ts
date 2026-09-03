@@ -27065,6 +27065,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // at the default 25 a shield eating every blow would shatter six times faster
 // than the set it protects — the OTA-959 failure re-made on one item.
 export const OTA_BUILD_ID = '2026-09-03-1646-the-shield-goes-first';
+// golem catch-up 2026-09-03: markerless publish of OTA-1646 - the shield answers
+// an incoming blow first (dodge/stealth roll to come around it), takes the
+// coating splash halved or turned aside, and spends its own durability instead
+// of your armour; 15 shield rows given a derived 150/200/265/350 ladder. Base
+// damage is untouched. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-03-1645-the-shield-ac-is-real';
 // golem catch-up 2026-09-03: markerless publish of OTA-1645 - seven shields'
 // printed "+N AC" reaches the number an enemy rolls against for the first time
