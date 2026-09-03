@@ -26,6 +26,8 @@
 import type { PlayerCharacter, InventoryItem, EquipSlot } from '../engine/types';
 import { SLOT_ID_KEY } from '../engine/equipment';
 import { wearItemByName, wearItemById } from '../engine/durability';
+// OTA-1653 — the ring that slows the wear on everything you have on.
+import { wearWardPct as accessoryWearWardPct, wearIsWarded } from '../engine/accessoryEffects';
 import { mergeOrPushItem } from '../engine/inventory';
 import type { GameStore } from './gameStore';
 
@@ -53,6 +55,24 @@ export function wearEquippedItem(
       boundId = eq[idKey];
       break;
     }
+  }
+  // ⚠⚠⚠ OTA-1653 — THE WEAR WARD GETS ASKED FIRST, AND ONCE. Owner: *"I kind of
+  // like those two items… that it slows down the durability decline of your
+  // gear… that's a pretty cool buff right?"* It is; it also did not exist — he
+  // was reading OTA-1649's resist percentage as a durability buff. It exists now,
+  // and this is the single place every piece of the player's own kit loses a
+  // point: combat blows, digging tools, the lot. One gate, so a warded player's
+  // gear cannot be warded on one path and not another.
+  //
+  // ⚠ A CHANCE TO SKIP THE POINT, not a fraction of it — durability is an integer
+  // and there is no 0.85 of a chip. See wearWardPct.
+  const ward = accessoryWearWardPct(player);
+  if (wearIsWarded(ward)) {
+    // Silent to the player: a line on every warded chip would drown the combat
+    // log, and the ring's card states the percentage. It goes to `debug` so the
+    // log bundle can still prove the ward is firing when he asks.
+    get().appendLog('debug', `wear ward: ${itemName} keeps its point (${Math.round(ward * 100)}%)`);
+    return player;
   }
   const result = boundId
     ? wearItemById(player.inventory, boundId)

@@ -467,6 +467,12 @@ function previewAccessory(x: CatalogAccessory, kind: 'Amulet' | 'Ring'): ItemPre
   if (x.coatedBoost?.kind) {
     stats.push(`${x.coatedBoost.kind} coatings bite +${Math.round(ae.COATED_BOOST_PCT[x.rarity] * 100)}%`);
   }
+  if (x.wearWard) {
+    // ⚠ OTA-1653 — say it plainly, and say what it covers. This is the buff the
+    // owner invented by misreading the resist line; the copy that replaces it
+    // must not be misreadable in turn.
+    stats.push(`Everything you wear or wield lasts ${Math.round(ae.WEAR_WARD_PCT[x.rarity] * 100)}% longer`);
+  }
   if (x.stealthDamage) {
     stats.push(`Strikes from stealth deal +${Math.round(ae.STEALTH_DAMAGE_PCT[x.rarity] * 100)}%`);
   }

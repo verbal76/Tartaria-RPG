@@ -174,6 +174,10 @@ export interface CatalogAccessory {
   /** A once-per-encounter discharge that reaches every living enemy standing in
    *  the named bands. Damage from BURST_DAMAGE[rarity]. */
   burst?: { damageType: string; bands: string[] };
+  /** OTA-1653 — slows the wear on everything the wearer has on. Percentage from
+   *  WEAR_WARD_PCT[rarity]; see `wearWardPct` for why it is a per-point chance
+   *  and not a fractional decrement. */
+  wearWard?: boolean;
 }
 
 export interface RecipeIngredient {

@@ -2825,16 +2825,16 @@
       "result": "Tin Ward Ring",
       "ingredients": [
         {
+          "name": "Hardened Mudstone",
+          "quantity": 1
+        },
+        {
           "name": "Scrap Metal",
           "quantity": 2
         },
         {
           "name": "Aether Residue",
           "quantity": 1
-        },
-        {
-          "name": "Bent Nail",
-          "quantity": 2
         }
       ]
     },

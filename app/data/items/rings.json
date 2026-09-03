@@ -332,19 +332,20 @@
     },
     {
       "name": "Tin Ward Ring",
-      "rarity": "Common",
+      "rarity": "Rare",
       "resistances": [
-        "degradation"
+        "acid"
       ],
-      "baseDurability": 25,
-      "tcBuy": 30,
-      "tcSell": 12,
+      "baseDurability": 40,
+      "tcBuy": 200,
+      "tcSell": 80,
       "tags": [
         "ring",
         "crafted",
         "defensive"
       ],
-      "description": "A band of cheap tin worked with a rust-eating salt. It will not stop a blade, but the creeping degradation of the buried country slides off it."
+      "description": "A band of tin and rust-eating salt, worn smooth by a scavenger who never replaced a strap in his life. Corrosion slides off it — and off everything else you have on.",
+      "wearWard": true
     },
     {
       "name": "Scribe's Signet",

@@ -103,6 +103,27 @@ export const STEALTH_DAMAGE_PCT: Readonly<Record<Rarity, number>> = {
   Common: 0.20, Uncommon: 0.35, Rare: 0.50, Legendary: 0.60,
 };
 
+/** ⚠⚠⚠ OTA-1653 — THE WEAR WARD. Owner: *"I kind of like those two items… that
+ *  it slows down the durability decline of your gear… that's a pretty cool buff
+ *  right?"*
+ *
+ *  It is, and it did not exist — he was reading OTA-1649's resist line ("−6%
+ *  each, stacks with armour") as a durability buff, which is a better idea than
+ *  the thing it actually described. So it is one now.
+ *
+ *  ⚠ THE PERCENTAGE IS A CHANCE TO SKIP A WEAR POINT, not a fraction taken off
+ *  one. Durability is an INTEGER that moves one point at a time — there is no
+ *  such thing as 0.85 of a chip — so the only honest way to spend 15% is to make
+ *  15% of the chips not happen. Over a hundred swings that is the same fifteen
+ *  points a fractional reading would have saved, and unlike a fractional
+ *  decrement it cannot silently round to zero on every single hit.
+ *
+ *  Common starts at 6% because that is the number already printed on the Tin
+ *  Ward Ring's card, and it is the number he read. */
+export const WEAR_WARD_PCT: Readonly<Record<Rarity, number>> = {
+  Common: 0.06, Uncommon: 0.10, Rare: 0.15, Legendary: 0.25,
+};
+
 /** Flat damage a once-per-encounter discharge deals to every living enemy in
  *  its bands. The owner's example — *"50 frost damage to anything in 2 rings of
  *  range once per combat encounter"* — is the Legendary step. */
@@ -128,7 +149,7 @@ export function accessoryFamilies(row: CatalogAccessory): AccessoryFamily[] {
   const fams: AccessoryFamily[] = [];
   if (accessoryStatBonuses(row).length > 0 || (row.acBonus ?? 0) > 0) fams.push('stat');
   if ((row.resistances ?? []).length > 0) fams.push('resist');
-  if (row.coatedBoost || row.stealthDamage || row.burst) fams.push('special');
+  if (row.coatedBoost || row.stealthDamage || row.burst || row.wearWard) fams.push('special');
   return fams;
 }
 
@@ -177,10 +198,13 @@ export interface AccessoryPowers {
   stealthPct: number;
   /** Every discharge the wearer is carrying. */
   bursts: AccessoryBurst[];
+  /** Best wear ward on the body, as a fraction (0.15 = a 15% chance that any
+   *  given wear point simply does not land). */
+  wearWardPct: number;
 }
 
 const EMPTY_POWERS = (): AccessoryPowers => ({
-  resistSlots: [], resistances: [], coated: {}, stealthPct: 0, bursts: [],
+  resistSlots: [], resistances: [], coated: {}, stealthPct: 0, bursts: [], wearWardPct: 0,
 });
 
 function canonBands(bands: readonly string[] | undefined): CombatRange[] {
@@ -229,6 +253,13 @@ export function equippedAccessoryPowers(player: PlayerCharacter | null | undefin
     if (row.stealthDamage) {
       // Best, for the same reason.
       out.stealthPct = Math.max(out.stealthPct, STEALTH_DAMAGE_PCT[row.rarity]);
+    }
+    if (row.wearWard) {
+      // ⚠ BEST, NOT SUM — and here it matters more than anywhere else. Wear
+      // wards multiply against the same event, so summing four of them would
+      // reach 100% and make a build's gear literally immortal. The best one wins
+      // and the ceiling stays where the ladder put it.
+      out.wearWardPct = Math.max(out.wearWardPct, WEAR_WARD_PCT[row.rarity]);
     }
     if (row.burst?.damageType) {
       const bands = canonBands(row.burst.bands);
@@ -363,4 +394,31 @@ export function boostedBy(value: number, pct: number): number {
  *  status would miss the exact swing the ring was bought for. */
 export function applyStealthDamage(damage: number, pct: number): number {
   return boostedBy(damage, pct);
+}
+
+/** The chance that a single point of wear does not land, from whatever the
+ *  wearer has on. 0 when nothing wards. ⚠ Never reaches 1: the ladder tops out
+ *  at a quarter and the powers take the BEST ward rather than summing them, so
+ *  gear always dies eventually — a ward that made it immortal would quietly
+ *  delete the whole repair economy the Crucible is built on. */
+export function wearWardPct(player: PlayerCharacter | null | undefined): number {
+  return equippedAccessoryPowers(player).wearWardPct;
+}
+
+/** True when this wear point is turned aside. `roll` is injectable so the
+ *  behaviour can be exercised without hoping on RNG.
+ *
+ *  ⚠⚠⚠ THE UNWARDED CASE MUST NOT TOUCH Math.random(), AND THE FIRST DRAFT DID.
+ *  It was written `wearIsWarded(pct, roll = Math.random())` — and a default
+ *  parameter is evaluated on EVERY call, guard or no guard. So a player wearing
+ *  no ward at all burned one draw per wear event, which shifts the whole RNG
+ *  stream: every initiative, hit, crit and loot roll after any piece of gear
+ *  chipped came out different. ota1017 caught it — a volley that must kill the
+ *  player stopped killing them — and it would have been a silent, global change
+ *  to how the game rolls for everyone.
+ *
+ *  The early return is therefore load-bearing, not a micro-optimisation. */
+export function wearIsWarded(pct: number, roll?: number): boolean {
+  if (pct <= 0) return false;
+  return (roll ?? Math.random()) < pct;
 }

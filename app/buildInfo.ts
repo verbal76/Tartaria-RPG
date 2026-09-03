@@ -27168,7 +27168,24 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // was reasonably taken for a durability buff), and the character sheet shows all
 // four ring slots, built from RING_SLOTS — OTA-1648 opened three more fingers and
 // this screen was never told.
-export const OTA_BUILD_ID = '2026-09-03-1652-no-resist-without-a-source';
+// OTA-1653 — THE WEAR WARD. Owner: "I kind of like those two items… that it slows
+// down the durability decline of your gear… that's a pretty cool buff right?" ⚠ HE
+// WAS DESCRIBING A BUFF THAT DID NOT EXIST: what he read was OTA-1649's resist
+// line ("−6% each, stacks with armour"), which meant −6% of incoming DEGRADATION
+// damage — a type OTA-1652 then proved nothing in the game dealt. His reading is
+// the better item, so it is real now, on the ring he was wearing. ⚠ THE PERCENTAGE
+// IS A CHANCE TO SKIP A WEAR POINT, not a fraction of one: durability is an integer
+// and there is no 0.85 of a chip, so a fractional decrement would round to a full
+// point every time and do nothing. 6/10/15/25% by rarity, BEST not sum (four
+// Legendary wards summed would be 100% and gear would never die, deleting the
+// repair economy). The Tin Ward Ring had to move Common→Rare to carry it, because
+// OTA-1649's ladder forbids a SPECIAL below Rare — the ladder working, not being
+// worked around; its recipe gained a Rare anchor drawn from a name recipes already
+// used, so the Crucible's fodder pool is untouched. One gate in gearWear, asked
+// BEFORE the point is spent, so every path a player's kit wears down is warded
+// identically.
+export const OTA_BUILD_ID = '2026-09-03-1653-the-wear-ward';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-03-1652-no-resist-without-a-source';
 // golem catch-up 2026-09-03: markerless publish of OTA-1652 - the resist audit.
 // degradation folds into acid (closing the mirror hole where enemies corroded you
 // and nothing resisted it), ash weather gives radiation gear a reason to exist,
