@@ -96,6 +96,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # ⚠ Task #109 — the Sentry release step at the bottom walks git
+          # history to hand the release its commits. A depth-1 checkout has
+          # one commit to offer. 200 is enough for the gap between two OTAs
+          # many times over, and far cheaper than the full history.
+          fetch-depth: 200
 
       # ⚠ The line is resolved in its own step because a push can now select one
       # too, via a commit marker. Keeping the resolution visible and separate is
@@ -322,3 +328,101 @@ jobs:
           fi
           echo ""
           echo "✓ OTA complete for line '$TARTARIA_LINE' — $PUBLISHED target(s)."
+
+      # ⚠⚠ TASK #109 — THE SENTRY RELEASE GETS ITS COMMITS.
+      #
+      # OTA-1592 shipped the client half: every event carries
+      # `release: tartaria@<version>+<ota-stamp>` and `dist: <stamp>`, and
+      # Sentry auto-creates the release record from the first event that names
+      # it. Measured on the 2026-09-03 inbox sync: that record exists and has
+      # `commitCount: 0`. So the repo link in Sentry has nothing to walk —
+      # suspect commits, "resolve in next release" and the regression marker
+      # all stay dark. This step is the other half: it names the release
+      # before the first event does and hands it the commits since the last.
+      #
+      # ⚠ BEST-EFFORT, ALWAYS. The bundle above is already live when this
+      # runs; a Sentry hiccup must never turn a delivered OTA into a red run.
+      # Every failure is a ::warning that names the cause, so the run log says
+      # what to fix instead of hiding it.
+      #
+      # ⚠ TOKEN. Prefers SENTRY_AUTH_TOKEN — a token with `project:releases`
+      # and `org:read`. Falls back to SENTRY_READ_TOKEN, the inbox relay's
+      # read-scoped token; if that one lacks `project:releases` Sentry answers
+      # 403 and the warning below says so by name. Nothing here needs the
+      # token to read events.
+      #
+      # ⚠ Same stamp, two lines. A hal publish and its golem catch-up name the
+      # SAME release (the stamp is the release, not the channel); `releases new`
+      # is idempotent and set-commits simply re-sets. The deploy record is what
+      # tells them apart — one per environment (hal / golem).
+      - name: Sentry — name the release and hand it the commits
+        if: steps.line.outputs.line == 'golem' || steps.line.outputs.line == 'hal'
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_READ_TOKEN: ${{ secrets.SENTRY_READ_TOKEN }}
+          SENTRY_ORG: hot-attic-games-llc
+          SENTRY_PROJECT: tartaria
+          TARTARIA_LINE: ${{ steps.line.outputs.line }}
+        run: |
+          set -uo pipefail
+          if [ -n "$SENTRY_AUTH_TOKEN" ]; then
+            WHICH="SENTRY_AUTH_TOKEN"
+          elif [ -n "$SENTRY_READ_TOKEN" ]; then
+            WHICH="SENTRY_READ_TOKEN (fallback — the relay's read token)"
+            export SENTRY_AUTH_TOKEN="$SENTRY_READ_TOKEN"
+          else
+            echo "::warning::Sentry release skipped — neither SENTRY_AUTH_TOKEN nor SENTRY_READ_TOKEN is set in the repo secrets."
+            exit 0
+          fi
+
+          # ⚠ The release string is built EXACTLY as sentryTransport.ts builds
+          # it, from the same two constants, so the record this step creates is
+          # the one the device's events will name. `^export` skips the
+          # `// SUPERSEDED:` history lines beneath the live stamp.
+          VERSION=$(sed -n "s/^export const DISPLAY_VERSION = '\([^']*\)';.*/\1/p" app/buildInfo.ts | head -1)
+          STAMP=$(sed -n "s/^export const OTA_BUILD_ID = '\([^']*\)';.*/\1/p" app/buildInfo.ts | head -1)
+          if [ -z "$VERSION" ] || [ -z "$STAMP" ]; then
+            echo "::warning::Sentry release skipped — could not read DISPLAY_VERSION / OTA_BUILD_ID from app/buildInfo.ts."
+            exit 0
+          fi
+          RELEASE="tartaria@${VERSION}+${STAMP}"
+          CLI=node_modules/.bin/sentry-cli
+          echo "=== Sentry release ==="
+          echo "Release:     $RELEASE"
+          echo "Org/project: $SENTRY_ORG / $SENTRY_PROJECT"
+          echo "Token:       $WHICH"
+          echo "Environment: $TARTARIA_LINE"
+          echo "======================"
+
+          SCOPE_HINT="If the output above says 403 / forbidden, the token ($WHICH) lacks the project:releases scope — add a repo secret SENTRY_AUTH_TOKEN carrying it."
+
+          if ! "$CLI" releases new "$RELEASE"; then
+            echo "::warning::Sentry 'releases new $RELEASE' failed. $SCOPE_HINT"
+            exit 0
+          fi
+          echo "  ✓ releases new"
+
+          # --auto walks the commits between the previous release's last commit
+          # and HEAD through the repo Sentry has linked; it needs that link and
+          # a history deep enough to hold the previous commit (checkout depth
+          # 200 above; --ignore-missing falls back to the last 20 when the gap
+          # is wider). --local sets the commits straight from git with no link
+          # at all, so the release still shows its commits if the integration
+          # is missing — suspect-commit attribution then waits on the link.
+          if "$CLI" releases set-commits "$RELEASE" --auto --ignore-missing; then
+            echo "  ✓ set-commits --auto"
+          else
+            echo "::warning::set-commits --auto failed (no repository linked in Sentry, or history too shallow) — falling back to --local. $SCOPE_HINT"
+            if "$CLI" releases set-commits "$RELEASE" --local --ignore-missing; then
+              echo "  ✓ set-commits --local"
+            else
+              echo "::warning::set-commits --local failed too — the release exists but carries no commits this run."
+            fi
+          fi
+
+          "$CLI" releases finalize "$RELEASE" \
+            && echo "  ✓ releases finalize" \
+            || echo "::warning::releases finalize failed — the release stays 'open'; harmless, events still attach."
+          "$CLI" releases deploys "$RELEASE" new -e "$TARTARIA_LINE" \
+            && echo "  ✓ deploy recorded for environment '$TARTARIA_LINE'" \
+            || echo "::warning::deploy record failed for '$TARTARIA_LINE' — the release still exists; only the per-line deploy marker is missing."
