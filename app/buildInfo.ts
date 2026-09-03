@@ -27083,6 +27083,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // silently widen into a general one. 'targe', 'aegis' and 'pavise' joined
 // WEAPON_NOUNS with self-tests — they are shields; the gate had not been told.
 export const OTA_BUILD_ID = '2026-09-03-1647-a-shield-build-you-can-make';
+// golem catch-up 2026-09-03: markerless publish of OTA-1647 - 13 new shields
+// (28 total) and 28 recipes so every shield in the game is craftable, one typed
+// answer per damage type, flat +1..+4 / typed +2..+5 by rarity; targe / aegis /
+// pavise taught to the naming gate. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-03-1646-the-shield-goes-first';
 // golem catch-up 2026-09-03: markerless publish of OTA-1646 - the shield answers
 // an incoming blow first (dodge/stealth roll to come around it), takes the
