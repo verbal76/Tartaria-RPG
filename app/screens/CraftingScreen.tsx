@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { repairCostMaterials } from '../engine/scrapEngine';
+// OTA-1650 — the golem's weapon lives outside the pack; the repair list needs it.
+import { offInventoryRepairables } from '../engine/companionGear';
 import { missingIngredientsList, consumeIngredientsList, craftableRecipeCounts } from '../engine/crafting';
 import { RecipesView } from '../components/RecipesView';
 import { CraftRefusalModal } from '../components/CraftRefusalModal';
@@ -373,10 +375,20 @@ export function CraftingScreen() {
     // OTA-1094 — resolve worn instances ONCE per inventory change (it walks every
     // equip slot), then stamp `worn` on each row.
     const worn = wornInstanceIds(player);
-    return player.inventory
+    const fromPack = player.inventory
       .filter((i) => i.durability && i.durability.current < i.durability.max)
       .map((i) => evaluateRepair(i, [...player.inventory], worn));
-  }, [player?.inventory, player?.equipped, player?.dog?.equipped]);
+    // ⚠⚠ OTA-1650 — AND THE PIECES THAT ARE NOT IN THE PACK. The dog's vest is
+    // already above (it lives in the inventory with `vestId` pointing at it),
+    // but the golem's weapon is held on `player.golem.weapon` — outside the
+    // inventory entirely — so this list has never once shown it and there was no
+    // way in the game to mend one. `offInventoryRepairables` returns exactly the
+    // damaged companion pieces this filter cannot see, and nothing that would
+    // duplicate a row already in it.
+    const offPack = offInventoryRepairables(player)
+      .map((r) => ({ ...evaluateRepair(r.item, [...player.inventory], worn), worn: true }));
+    return [...fromPack, ...offPack];
+  }, [player?.inventory, player?.equipped, player?.dog?.equipped, player?.golem?.weapon]);
 
   // OTA-087 — filter + sort the repair list. Search matches
   // the item NAME substring; sort axis selectable.

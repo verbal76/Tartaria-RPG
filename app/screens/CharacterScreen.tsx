@@ -8,7 +8,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 // ⚠ OTA-1404 — combat resolution moved out of gameStore into its own leaf.
-import { effectiveACBreakdown, playerArmorResistKinds } from '../state/combatResolution';
+import { effectiveACBreakdown, playerArmorResistKinds, dogVestAcBonus } from '../state/combatResolution';
 import { FirstTimeHint } from '../components/FirstTimeHint';
 // OTA-1434 — who you are, at the top of the sheet.
 import { CharacterPortrait } from '../components/CharacterPortrait';
@@ -23,6 +23,8 @@ import { JOIN_THRESHOLD, BUY_REP_TC_PER_STANDING } from '../engine/factions';
 import { standingTierLabel, STANDING_KNOWN, STANDING_TRUSTED, STANDING_HONORED } from '../engine/factionRapport';
 import type { Faction, Race, PlayerCharacter, Stats } from '../engine/types';
 import { effectiveStatsBreakdown, resolveEquippedItem, type StatBreakdown } from '../engine/equipment';
+// OTA-1650 — companion gear, read off the one module that knows where it lives.
+import { dogVestInstance, durabilityLabel, gearCondition, conditionColor } from '../engine/companionGear';
 // OTA-1066 — Phase 4 difficulty, and the only place it can be eased.
 import {
   PRESET_TIERS, PRESSURE_PROFILES, pressureOf, canChangeTo,
@@ -759,6 +761,10 @@ export function CharacterScreen() {
           const hpColorDog = hpPctDog > 0.5 ? '#9ec96a' : hpPctDog > 0.25 ? '#c9a86a' : '#e07a5f';
           const loyaltyColor = loyaltyPct > 0.5 ? '#9ec96a' : loyaltyPct > 0.3 ? '#c9a86a' : '#e07a5f';
           const vestName = dog.equipped?.vest;
+          // OTA-1650 — the worn INSTANCE (bound by id), its AC, and its condition.
+          const vestInst = dogVestInstance(player);
+          const vestAc = dogVestAcBonus(player);
+          const vestWear = durabilityLabel(vestInst?.durability);
           // Render stat progress as a fractional 20-segment bar (mirrors player).
           const statProgressBar = (stat: 'strength' | 'dexterity' | 'intelligence') => {
             const pct = Math.max(0, Math.min(1, (dog.statProgress?.[stat] ?? 0) / 100));
@@ -806,12 +812,26 @@ export function CharacterScreen() {
                     </View>
                   </View>
                 ))}
+                {/* ⚠⚠ OTA-1650 — THE VEST SAYS WHAT IT IS AND HOW LONG IT HAS.
+                    Owner: *"it needs to show weapons and armor equipped on your
+                    companions… i dont know when thiewr weapon breaks."* This row
+                    printed a bare name: no AC, no durability, and until this OTA
+                    a vest HAD no durability — dogGear.json's baseDurability was
+                    never read by `lookupBaseDurability`. Both halves are here
+                    now, off the same helpers the compact panel and the repair
+                    bench read. */}
                 <View style={styles.slotRow}>
                   <Text style={styles.slotLabel}>Vest</Text>
                   <View style={styles.slotBody}>
                     <Text style={vestName ? styles.slotName : styles.slotEmpty}>
                       {vestName ?? '—'}
+                      {vestAc > 0 ? `  AC +${vestAc}` : ''}
                     </Text>
+                    {vestWear ? (
+                      <Text style={[styles.slotWear, { color: conditionColor(gearCondition(vestInst?.durability)) }]}>
+                        {vestWear}
+                      </Text>
+                    ) : null}
                   </View>
                 </View>
                 <Text style={styles.contractTap}>tap to call ›</Text>
@@ -831,6 +851,8 @@ export function CharacterScreen() {
           const gStats = golem.stats ?? { power: 0, resilience: 0 };
           const gProg = golem.statProgress ?? { power: 0, resilience: 0 };
           const typeLabel = golem.kind.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+          // OTA-1650 — how much life the wielded weapon has left, in words.
+          const armWear = durabilityLabel(golem.weapon?.durability);
           // arb121 — name the EXACT repair parts so "feed it the parts it's made
           // of" is discoverable. A golem heals only from its own fuel items, so a
           // pack full of other aether loot reads as unusable until you know which.
@@ -877,9 +899,19 @@ export function CharacterScreen() {
                   <View style={styles.slotBody}>
                     <Text style={golem.weapon ? styles.slotName : styles.slotEmpty}>
                       {golem.weapon
-                        ? `${golem.weapon.coating ? `${golem.weapon.coating.label ?? golem.weapon.coating.kind} ` : ''}${golem.weapon.name}${golem.weapon.durability ? ` (${golem.weapon.durability.current}/${golem.weapon.durability.max})` : ''}`
+                        ? `${golem.weapon.coating ? `${golem.weapon.coating.label ?? golem.weapon.coating.kind} ` : ''}${golem.weapon.name}`
                         : '—'}
                     </Text>
+                    {/* ⚠ OTA-1650 — the bare `(12/28)` this row used to print is
+                        a number you have to interpret; `12/28 · failing` is the
+                        answer to the owner's actual question. Same ladder and
+                        same colour as the vest below and the glyph on the
+                        compact panel. */}
+                    {armWear ? (
+                      <Text style={[styles.slotWear, { color: conditionColor(gearCondition(golem.weapon?.durability)) }]}>
+                        {armWear}
+                      </Text>
+                    ) : null}
                   </View>
                 </View>
                 <Text style={styles.subline}>
@@ -1341,6 +1373,9 @@ const styles = StyleSheet.create({
   slotBody: { flex: 1 },
   slotEmpty: { color: '#3a342c', fontSize: 12 },
   slotName: { color: '#e6d8b3', fontSize: 13, fontWeight: '700' },
+  // OTA-1650 — the durability readout under a companion's gear name. Coloured
+  // by condition at the call site (sound / worn / failing).
+  slotWear: { fontSize: 11, marginTop: 1 },
   slotMeta: { color: '#9ec96a', fontSize: 10, marginTop: 2 },
 
   effectRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 4 },

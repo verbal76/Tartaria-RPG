@@ -74,6 +74,9 @@ import { effectiveAC } from '../engine/raceMechanics';
 import { trainStat } from '../engine/statTraining';
 import { ARMOR_SLOTS, effectiveStats, aggregateEquippedStatBonuses, resolveEquippedItem, trimStandingAc, equippedGearAc, heldShieldAc, RING_SLOTS } from '../engine/equipment';
 import { equippedAccessoryPowers } from '../engine/accessoryEffects';
+// OTA-1650 — the dog's vest is durable now; this knows where it lives.
+import { dogVestInstance, COMPANION_FRAY_AT } from '../engine/companionGear';
+import { wearItemById } from '../engine/durability';
 import { itemIsThrowable } from '../engine/bandolierEligibility';
 import { findFactionQuestById } from '../engine/factionQuests';
 import { weatherRepositionCost } from '../engine/weatherEffects';
@@ -1052,6 +1055,40 @@ export function applyEnemyCounterToDog(
     'combat',
     `${dog.name} takes ${dmg}. (${trained ? trained.dog.hp : newHp}/${trained ? trained.dog.hpMax : dog.hpMax} HP left)`,
   );
+  // ⚠⚠⚠ OTA-1650 — THE VEST TAKES THE HIT IT JUST SOFTENED. It has added its AC
+  // to the dog's dodge since OTA-120 and has never cost a point for it, because
+  // `lookupBaseDurability` never walked the dog-gear catalog — so no vest was
+  // ever durable and there was nothing to wear. It is durable now, so it wears
+  // here: one point per LANDED blow, the same rate the player's own armour pays,
+  // on the same event (a hit that connects — a miss chips nothing).
+  //
+  // ⚠ IT WEARS AS AN ORDINARY INVENTORY ITEM, by its bound id. The vest lives in
+  // the pack with `vestId` pointing at it, so `wearItemById` and the whole
+  // break/repair machinery apply unchanged. What does NOT apply is
+  // `wearEquippedItem`: that walks the PLAYER's slots to find the bound
+  // instance, and the dog is not a player slot.
+  const vestInst = dogVestInstance(player);
+  if (vestInst?.durability) {
+    const wear = wearItemById(player.inventory, vestInst.id);
+    set((s) => (s.player ? { player: { ...s.player, inventory: wear.inventory } } : s));
+    if (wear.broken) {
+      // ⚠ The vest is gone, so the dog is not wearing it any more. Clearing both
+      // the name AND the id matters: a later pickup of the same-named vest must
+      // not resurrect the slot through a stale mapping (OTA-696's rule).
+      set((s) => (s.player?.dog
+        ? { player: { ...s.player, dog: { ...s.player.dog, equipped: { vest: null, vestId: null } } } }
+        : s));
+      get().appendLog('world', `${vestInst.name} comes apart on ${dog.name}'s back and falls away. ${dog.name} is unarmoured.`);
+    } else {
+      const now = wear.inventory.find((i) => i.id === vestInst.id);
+      if (now?.durability && now.durability.current === COMPANION_FRAY_AT) {
+        // The same warning the player's own gear got in OTA-959, and for the
+        // same reason: the first thing you should hear about a piece of armour
+        // is not that it is already gone.
+        get().appendLog('system', `⚠ ${dog.name}'s ${now.name} is coming apart — a few more hits will finish it. Mend it at the bench or lose it.`);
+      }
+    }
+  }
   // ⚠ OTA-1640 — THE VEST BITES BACK. The Aetheric Padded Vest's
   // `reflectsCorruption` was a "future hook" that never fired; now every hit
   // that lands on the dog returns that much aetheric to the attacker, and a

@@ -4,6 +4,7 @@ import {
   findArmorByName,
   findAmuletByName,
   findRingByName,
+  findDogGearByName,
   findExplorationItemByName,
   GEAR,
 } from './crafting';
@@ -49,6 +50,20 @@ function lookupBaseDurability(name: string): number | null {
   if (am) return am.baseDurability ?? DEFAULT_DURABILITY;
   const r = findRingByName(name);
   if (r) return r.baseDurability ?? DEFAULT_DURABILITY;
+  // ⚠⚠⚠ OTA-1650 — THE DOG'S VEST WAS NEVER DURABLE, AND THE CATALOG ALWAYS
+  // SAID IT SHOULD BE. Every row in dogGear.json declares a `baseDurability`
+  // (18 / 24 / 28 / 34); this walk covered weapons, armour, amulets, rings, gear
+  // and exploration and never dog gear. So no vest instance was ever stamped,
+  // nothing could wear one, and the owner's *"we should be able to repair the
+  // dogs armor"* had nothing to repair — four authored numbers the game had
+  // never once read. Measured, not assumed; pinned in ota1650.
+  //
+  // ⚠ A vest's `kind` is 'dog_armor', not 'armor', so `stampDurability` gives it
+  // a FIXED max = base rather than a tempered roll. That is the right side of
+  // that gate: a companion's ONLY armour slot should not arrive at 40% of its
+  // printed value because a hidden roll went badly.
+  const dg = findDogGearByName(name);
+  if (dg) return dg.baseDurability ?? DEFAULT_DURABILITY;
   // GEAR catalog entries typed as 'relic' (Aetheric Torch, Aetheric
   // Locket, Aetheric Compass, etc.) were previously skipped — the
   // 'every relic has durability' invariant broke for them. Stress

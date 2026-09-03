@@ -10,6 +10,15 @@ import { playerPowerScore, powerMatchup } from '../engine/powerRating';
 import { formatEffectSummary } from '../engine/statusEffects';
 import { findFactionQuestById } from '../engine/factionQuests';
 import { livingEscortPools } from '../engine/escort';
+// ⚠ OTA-1650 — the two glyphs the owner asked for by name: "a small weapon
+// symbol next to the golem if they are armed, and a small shiled next to the
+// dogs name if it has on armor". Both read the same helpers the character
+// panel and the repair bench read, so the compact row can never disagree with
+// the expanded one about whether a companion is kitted.
+import {
+  GOLEM_ARMED_GLYPH, DOG_ARMORED_GLYPH, golemIsArmed, dogIsArmored,
+  golemWeapon, dogVestInstance, gearCondition,
+} from '../engine/companionGear';
 import { useReduceMotion } from '../state/accessibility';
 
 // OTA-214 — Aetheric Vision Lens active indicator. Pure presence
@@ -245,6 +254,16 @@ export function StatsPanel({ player, enemyPower }: Props) {
   // character box."
   const golemShows = !!player.golem && player.golem.hp > 0;
 
+  // ⚠⚠ OTA-1650 — ARMED / ARMOURED, AND WHETHER IT IS ABOUT TO GO. The glyph
+  // answers the owner's question ("so we know if they are armed or not"); the
+  // COLOUR answers the one right behind it ("i dont know when thiewr weapon
+  // breaks"). A failing piece turns the glyph red on the row he is already
+  // looking at, so the warning is not something you have to go and find.
+  const golemArmed = golemIsArmed(player);
+  const dogArmored = dogIsArmored(player);
+  const golemWeaponFailing = gearCondition(golemWeapon(player)?.durability) === 'failing';
+  const dogVestFailing = gearCondition(dogVestInstance(player)?.durability) === 'failing';
+
   // OTA-915 — a downed dog (benched at 0 HP, bleed-out clock running) shows a live
   // "⏳ Nh — feed to save" countdown by its name instead of the plain HP, so the 24h
   // window is impossible to miss. Healthy/climb-benched dogs keep the normal HP readout.
@@ -285,8 +304,13 @@ export function StatsPanel({ player, enemyPower }: Props) {
                 {player.dog.name} ⏳ {dogHoursLeft}h — feed to save
               </Text>
             ) : (
-              <Text style={styles.dogName} numberOfLines={1}>
+              <Text
+                style={styles.dogName}
+                numberOfLines={1}
+                accessibilityLabel={`${player.dog.name}, ${player.dog.hp} of ${player.dog.hpMax} HP${dogArmored ? `, wearing ${dogVestInstance(player)?.name ?? 'a vest'}` : ', no vest'}`}
+              >
                 {player.dog.name} ({player.dog.hp}/{player.dog.hpMax})
+                {dogArmored ? <Text style={dogVestFailing ? styles.gearGlyphFailing : styles.gearGlyph}> {DOG_ARMORED_GLYPH}</Text> : null}
               </Text>
             )
           ) : null}
@@ -294,8 +318,13 @@ export function StatsPanel({ player, enemyPower }: Props) {
       </View>
       {golemShows && player.golem ? (
         <View style={styles.golemRow}>
-          <Text style={styles.golemName} numberOfLines={1}>
+          <Text
+            style={styles.golemName}
+            numberOfLines={1}
+            accessibilityLabel={`${player.golem.name}, ${player.golem.hp} of ${player.golem.hpMax} HP${golemArmed ? `, wielding ${golemWeapon(player)?.name ?? 'a weapon'}` : ', unarmed'}`}
+          >
             {player.golem.name} ({player.golem.hp}/{player.golem.hpMax})
+            {golemArmed ? <Text style={golemWeaponFailing ? styles.gearGlyphFailing : styles.gearGlyph}> {GOLEM_ARMED_GLYPH}</Text> : null}
           </Text>
         </View>
       ) : null}
@@ -431,6 +460,12 @@ const styles = StyleSheet.create({
   // companion vs the dog's warm-gold.
   golemRow: { flexDirection: 'row', justifyContent: 'flex-end' },
   golemName: { color: '#9888a8', fontSize: 12, fontWeight: '600', maxWidth: 200 },
+  // OTA-1650 — the armed / armoured glyph beside a companion's name. Amber while
+  // the piece is sound or merely worn; the failing tint is the SAME red the HP
+  // bars use at their lowest band, so "about to break" reads the way "about to
+  // die" already does on this panel.
+  gearGlyph: { color: '#c9a86a', fontSize: 11 },
+  gearGlyphFailing: { color: '#e07a5f', fontSize: 11 },
   subline: { color: '#a2977b', fontSize: 10, marginBottom: 2 },
   equipped: { color: '#c9a86a', fontSize: 9, marginTop: 3, letterSpacing: 0.5 },
   effects: { color: '#e07a5f', fontSize: 9, marginTop: 2, letterSpacing: 0.5 },

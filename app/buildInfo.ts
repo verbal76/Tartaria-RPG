@@ -27116,7 +27116,26 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // COMMON amulets sitting in players' packs. 16 new accessories (48 total), a recipe
 // for every one of them incl. the Aetheric Diadem (205 recipes), and one shipped
 // recipe repaired that let a Rare be built out of Uncommon scrap.
-export const OTA_BUILD_ID = '2026-09-03-1649-what-a-ring-is-for';
+// OTA-1650 — THE COMPANIONS' GEAR IS REAL GEAR. Owner: "it needs to show weapons
+// and armor equipped on your companions… a small symbol next to the golems name…
+// i dont know when thiewr weapon breaks. and we should be able to repair the dogs
+// armor, and the golems weapons when we craft." ⚠ THREE ROOT CAUSES, all measured
+// first: (1) the dog's vest was never DURABLE — lookupBaseDurability walked
+// weapons/armour/amulets/rings/gear/exploration and never dogGear.json, so four
+// authored baseDurability values (18/24/28/32) had never been read, nothing wore a
+// vest, and "repair the dogs armor" had nothing to repair; (2) the golem's weapon
+// wore a point a swing and then simply shattered — the player's own gear has warned
+// at 3 points since OTA-959 and the golem's never did, which IS "i dont know when
+// their weapon breaks"; (3) it could not be mended by ANY path, because armGolem
+// moves the instance OUT of player.inventory onto player.golem.weapon and both the
+// bench's repair list and repairWithVendor walk the inventory. Now: vests are
+// durable and wear on landed blows, both pieces warn at the same 3-point mark the
+// player's do, the bench reaches the golem's hand and writes the mended instance
+// home, ⚔ / 🛡 sit beside the companion names (red when the piece is failing), and
+// the expanded panels print AC + durability + a condition word instead of a bare
+// name. One module, companionGear.ts, knows where companion gear lives.
+export const OTA_BUILD_ID = '2026-09-03-1650-companion-gear-is-real-gear';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-03-1649-what-a-ring-is-for';
 // golem catch-up 2026-09-03: markerless publish of OTA-1649 - the accessory
 // overhaul. The resist list fifteen accessories carried and combat never saw is
 // live; three new effect families (coating boost, from-stealth multiplier,

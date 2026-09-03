@@ -518,9 +518,10 @@ import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, RING_ID_KEYS, SLOT_ID_KEY, 
 // OTA-1649 — the jewellery's live effects: coating boost, stealth multiplier, discharge.
 import {
   equippedAccessoryPowers, planBursts as planAccessoryBursts, applyBursts as applyAccessoryBursts,
-  boostedBy as accessoryBoostedBy,
-  coatedBoostPct as accessoryCoatedBoostPct, applyStealthDamage as applyAccessoryStealthDamage,
+  boostedBy as accessoryBoostedBy, coatedBoostPct as accessoryCoatedBoostPct,
+  applyStealthDamage as applyAccessoryStealthDamage,
 } from '../engine/accessoryEffects';
+import { wearGolemWeapon } from '../engine/companionGear';   // OTA-1650
 // ⚠ OTA-1404 — `statNowClause` MOVED to engine/equipment.ts, next to the
 // `effectiveStats` it reads, because the combat resolver needs it too and a leaf
 // may never import a value from this file. It is re-exported below rather than
@@ -34732,16 +34733,11 @@ function handleGolemCommand(
     );
     // OTA-478 — wear the wielded weapon on each connecting strike; it breaks like
     // any weapon and the golem reverts to its innate attack.
-    if (workingGolem.weapon?.durability) {
-      const dur = workingGolem.weapon.durability;
-      const newCur = dur.current - 1;
-      if (newCur <= 0) {
-        get().appendLog('world', `The ${workingGolem.weapon.name} shatters in ${golem.name}'s grip — back to bare fists.`);
-        workingGolem = { ...workingGolem, weapon: null };
-      } else {
-        workingGolem = { ...workingGolem, weapon: { ...workingGolem.weapon, durability: { ...dur, current: newCur } } };
-      }
-    }
+    // ⚠ OTA-1650 — a point per landed strike, a WARNING before it goes, then the
+    // shatter. The rule lives in wearGolemWeapon, beside COMPANION_FRAY_AT.
+    const gWear = wearGolemWeapon(workingGolem);
+    workingGolem = gWear.golem;
+    for (const l of gWear.logs) get().appendLog(l.channel, l.text);
     if (newEnemyHp <= 0) {
       // OTA-449 — route the COMPANION killing blow through resolveEnemyDefeat,
       // the SAME path a player kill uses, so loot / TC / Core-Guardian Core +

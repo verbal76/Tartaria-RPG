@@ -37,6 +37,7 @@ import { lookupCraftedItem, findArmorByName, findWeaponByName, applyArmorResista
 import { trainStat } from '../../engine/statTraining';
 import { validSlotsForItem, SLOT_LABEL, SLOT_ID_KEY, effectiveStats, gearHpBonus, resolveEquippedItem, RING_SLOTS, RING_ID_KEYS } from '../../engine/equipment';
 import { canScrap, scrapOutputFor, repairCostMaterials, scrapSuccessChance, scrapHasSecondChance, pickScrapFailureLine } from '../../engine/scrapEngine';
+import { findCompanionGearById } from '../../engine/companionGear';
 import { wornDogVestInstanceId } from '../../engine/dogCompanion';
 import { stampDurability } from '../../engine/durability';
 import type { EquipSlot, PlayerEquipped } from '../../engine/types';
@@ -1060,7 +1061,19 @@ export const createInventorySlice = (
   repairInventoryItem(itemId, opts) {
     const player = get().player;
     if (!player) return 'refused';
-    const item = player.inventory.find((i) => i.id === itemId);
+    // ⚠⚠⚠ OTA-1650 — THE BENCH CAN REACH THE GOLEM'S HAND NOW. Owner: *"we
+    // should be able to repair the dogs armor, and the golems weapons when we
+    // craft."* The dog's vest was always here — it sits in the pack with
+    // `vestId` pointing at it — but the GOLEM's weapon is not: `armGolem` moves
+    // the instance OUT of `player.inventory` and onto `player.golem.weapon`.
+    // This lookup and the vendor's both walked the inventory, so a golem weapon
+    // was, on every line in the game, unrepairable: it wore a point a swing and
+    // then it was gone. `companionHome` is set when the piece was found outside
+    // the pack, and the write-back at the bottom uses it to put the mended
+    // instance back where it actually lives.
+    const offPack = findCompanionGearById(player, itemId);
+    const item = player.inventory.find((i) => i.id === itemId) ?? offPack?.item;
+    const companionHome = offPack?.home ?? null;
     if (!item) {
       get().appendLog('arbiter', `The Arbiter glances at your pack. "I don't see that piece on you anymore."`);
       return 'refused';
@@ -1155,6 +1168,20 @@ export const createInventorySlice = (
           ? { ...i, durability: { ...i.durability, current: i.durability.max } }
           : i,
       );
+      // ⚠ OTA-1650 — a piece mended out of the pack goes home to the companion
+      // that was holding it, not into the pack. The materials still come from
+      // the pack (the map above already spent them), so both halves of the
+      // transaction land in one write.
+      if (companionHome === 'golem' && s.player.golem?.weapon?.durability) {
+        const w = s.player.golem.weapon;
+        return {
+          player: {
+            ...s.player,
+            inventory: newInventory,
+            golem: { ...s.player.golem, weapon: { ...w, durability: { ...w.durability!, current: w.durability!.max } } },
+          },
+        };
+      }
       return { player: { ...s.player, inventory: newInventory } };
     });
     const costSummary = cost.map((c) => c.quantity > 1 ? `${c.name} x${c.quantity}` : c.name).join(', ');
