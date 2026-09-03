@@ -26976,6 +26976,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // was synthesised at pickup as "A reclaimer's find". It has a row now, and
 // ota1639 keeps the audit: every ingredient authored, every one obtainable.
 export const OTA_BUILD_ID = '2026-09-03-1639-every-ingredient-exists';
+// golem catch-up 2026-09-03: markerless publish of OTA-1639 - Leech Mucus gets
+// its catalog row; ota1639 keeps the recipe-ingredient audit. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-03-1638-the-star-goes-last';
 // golem catch-up 2026-09-03: markerless publish of OTA-1638 - the star last,
 // the em space outside the dark cell, the WEAPON GLYPHS key on the About tab.
