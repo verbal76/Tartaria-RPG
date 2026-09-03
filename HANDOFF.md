@@ -1560,9 +1560,9 @@ Key invariants worth knowing:
 
 ## 9. Recent OTA highlights (latest sessions)
 
-### ⚠⚠⚠ THE 2026-09-02 RUN — OTA-1617 → 1636 (read this first if you are new)
+### ⚠⚠⚠ THE 2026-09-02 RUN — OTA-1617 → 1637 (read this first if you are new)
 
-Latest golem-line stamp: **`2026-09-03-1636-the-base-reads-on-the-right`**
+Latest golem-line stamp: **`2026-09-03-1637-this-is-the-place-means-the-cell`**
 (`app/buildInfo.ts`). Both channels ship from this branch — a `[ota-hal]` marker
 in the commit TITLE publishes the HAL set, a markerless follow-up commit
 publishes golem; see §6.
@@ -1792,12 +1792,26 @@ what it ACCEPTS, and a data walker skips the saying.
   (`baseGlyph` prop, both hands). The flat label (tap breadcrumb) carries the
   same four pieces: `🔥☣ choir-bound launcher ★ ✦`. ota1553 / ota1568 pins
   updated; ota1636 pins the row, aliases, coverage, wiring.
+- **OTA-1637 this is the place means the cell.** Task #148, measured on device:
+  the arrival doors (`stageArrival.ts`) keyed on the canon grid CELL since
+  OTA-1597 while `missionArrivalLines`, the trace's HERE, the status card,
+  `armedEncounter` and the three verb matchers (+ `stageAwaitsIntentHere`)
+  compared `currentLocationId === ground` — location-wide. A tile off the
+  anchor: feed said HERE, verb PAID, nothing armed. `standingAt.ts` grows
+  `tilesFromLocation` / `offGroundText` ("2 tiles west") / `wrongGroundLine`
+  ("Close. X wants the ground 2 tiles west of here — step onto it and go
+  again." on the named place; the old "Not here … set a course" elsewhere).
+  Every reader runs `standingAtLocation` now; off-cell the arrival line says
+  `▸ X: the ground is 2 tiles west of here — step onto it.`, the trace prints
+  `@id OFF-CELL(2 tiles west)`, the card carries `offGround` and offers the
+  route. ota1630's anchor test filled its tank (it was standing a tile north
+  with "south" refused and paying anyway); ota1617 route pin follows; ota1637
+  pins arithmetic, sentences, four readers on/off/away, wiring.
 
-⚠ **Two position vocabularies, still.** `stageArrival.ts` (heal / arm /
-`checkStandingGround`) keys on the canon grid CELL; the verb matchers and
-`missionArrivalLines` key on `currentLocationId === ground` (location-wide).
-Filed as OTA-1627. Also open: OTA-1626 (bulk craft runs the whole action tail
-per unit).
+✓ **One position vocabulary now (OTA-1637).** The doors, the arrival line, the
+trace, the card, the conversation arm and the verb matchers all run
+`standingAtLocation` (canon grid CELL). The bulk-craft item shipped as
+OTA-1631/1633.
 
 ### ⚠⚠⚠ THE 2026-09-01 RUN — OTA-1600 → 1616 (the day before)
 

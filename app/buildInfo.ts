@@ -26956,7 +26956,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // it's not mixed in." `🔥☣ launcher ★ ✦`: coats left, name, star, the weapon's
 // own damage type LAST — one glyph per canonical type, coat families reuse the
 // coat glyph, painted as its own coloured node behind an em space.
-export const OTA_BUILD_ID = '2026-09-03-1636-the-base-reads-on-the-right';
+// ⚠⚠⚠ OTA-1637 — THIS IS THE PLACE MEANS THE CELL. The arrival doors keyed on
+// the canon grid cell (OTA-1597); the arrival line, the trace's HERE, the
+// status card, the conversation card's arm and all three verb matchers keyed
+// on currentLocationId — the whole named place — so a tile off the anchor the
+// feed said HERE, the verb PAID, and nothing armed. One cell test everywhere
+// now; off the cell every reader says "2 tiles west" instead of HERE.
+export const OTA_BUILD_ID = '2026-09-03-1637-this-is-the-place-means-the-cell';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-03-1636-the-base-reads-on-the-right';
 // golem catch-up 2026-09-03: markerless publish of OTA-1636 - the base reads
 // on the right: coats left, name, star, the weapon's own damage glyph LAST.
 // hal took the marker.

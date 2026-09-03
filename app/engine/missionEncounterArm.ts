@@ -26,6 +26,7 @@ import { findMysteryById } from './mysteries';
 import { findStorylineById } from './factionStorylines';
 import { huntAnchorId, contractAnchorId, resolvePosterLocation } from './contractMarkers';
 import { stageLocationId, stageRequirementMet, payingIntent, type MissionFamily } from './questStage';
+import { standingAtLocation } from './standingAt';
 import { personFor, stakesForStage, stageHasFight, type MissionPerson } from './missionRoles';
 import type { PersuadeStakes } from './missionEncounter';
 
@@ -96,7 +97,8 @@ function build(
     | undefined;
   if (!stage?.npcName) return null;
   const where = stageLocationId(stage, anchorId, resolvePosterLocation);
-  if (where !== player.currentLocationId) return null;
+  // ⚠ OTA-1637 — the card arms on the CELL, like every other arrival door.
+  if (!standingAtLocation(player, where)) return null;
   const person = personFor(stage.npcName, player.roleKills);
   if (!person) return null;
   const met = stageRequirementMet(stage, player.inventory);

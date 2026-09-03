@@ -48,6 +48,8 @@ import { startingLocationForFaction } from './character';
 import { bountyKey, bountyHoursLeft, type FactionBounty } from './factionBounty';
 import { describeWhisperStage, describeWhisperTitle, whisperRouteTarget } from './whispers';
 import { playerGridCell } from '../state/playerGrid';
+// ⚠ OTA-1637 — "here" is the CELL, the same test the arrival doors run.
+import { standingAtLocation, offGroundText } from './standingAt';
 import {
   stageLocationId, stageRequirementMet, stageVerbAsk, stageObjectiveAsk, payingIntent, type MissionFamily,
 } from './questStage';
@@ -82,7 +84,12 @@ function line(
     return `${family}:${rec.id} stage ${rec.stage}/${total} — ALL STAGES DONE, ready to turn in${paused}`;
   }
   const where = stageLocationId(st, anchor ?? '', resolvePosterLocation);
-  const here = where === player.currentLocationId ? ' HERE' : '';
+  // ⚠ OTA-1637 — HERE is the cell. On the named place but off its cell the
+  // trace says so, because that is exactly the state the owner reported as
+  // "every tile says I'm standing on it".
+  const here = standingAtLocation(player, where)
+    ? ' HERE'
+    : where === player.currentLocationId ? ` OFF-CELL(${offGroundText(player, where)})` : '';
   // ⚠⚠ OTA-1588 — BOTH HALVES, because they differ and a log reader needs to see
   // which. `[boss→investigate]` says at a glance that the beat is LABELLED as the
   // chain's last confrontation and PAID by searching — the exact mismatch that
@@ -256,7 +263,15 @@ export function missionArrivalLines(player: PlayerCharacter | null | undefined):
       }
       return;
     }
-    if (stageLocationId(st, anchor ?? '', resolvePosterLocation) !== player.currentLocationId) return;
+    const ground = stageLocationId(st, anchor ?? '', resolvePosterLocation);
+    if (!standingAtLocation(player, ground)) {
+      // ⚠⚠ OTA-1637 — THIS LINE MEANS THE CELL NOW, like the doors it announces.
+      // On the named place but off its cell it says how far instead of HERE, so
+      // the feed never promises a verb the ground will not pay.
+      const off = player.currentLocationId === ground ? offGroundText(player, ground) : '';
+      if (off) out.push(`▸ ${def.title}: the ground is ${off} of here — step onto it.`);
+      return;
+    }
     const who = st.npcName ? ` — find ${st.npcName}` : '';
     const ask = stageVerbAsk(family, st);
     // ⚠ A verbless beat advances on its own, so promising an action would be the
@@ -395,6 +410,9 @@ export interface MissionStatusCard {
   where: string;
   whereId: string;
   here: boolean;
+  /** ⚠ OTA-1637 — on the named place but OFF its cell: "2 tiles east". '' when
+   *  `here`, and '' when the place itself is elsewhere (then `route` speaks). */
+  offGround?: string;
   npcName: string | null;
   needs: { item: string; held: boolean } | null;
   steps: MissionStatusStep[];
@@ -471,7 +489,8 @@ function statusCard(
     ask: st ? (stageObjectiveAsk(family, st as never) || '') : '',
     where: locationNameById(where),
     whereId: where || '',
-    here: !!where && where === player.currentLocationId,
+    here: !!where && standingAtLocation(player, where),
+    offGround: where && where === player.currentLocationId ? offGroundText(player, where) : '',
     npcName: st?.npcName ?? null,
     needs: st?.requires
       ? { item: st.requires.item, held: stageRequirementMet(st, player.inventory) }
@@ -481,7 +500,7 @@ function statusCard(
     // a note here would be the second opinion the header forbids.
     note: null,
     kindLabel: KIND_LABEL[family] ?? family.toUpperCase(),
-    route: where && where !== player.currentLocationId ? toLocation(where) : null,
+    route: where && !standingAtLocation(player, where) ? toLocation(where) : null,
     pauseKind: family,
     abandonKind: family,
     discardable: false,
@@ -644,14 +663,15 @@ function leadCard(q: Quest, player: PlayerCharacter): MissionStatusCard {
     ask: `${q.objective.verb} ${q.objective.target}`,
     where: q.location?.name ?? '',
     whereId: where,
-    here: !!where && where === player.currentLocationId,
+    here: !!where && standingAtLocation(player, where),
+    offGround: where && where === player.currentLocationId ? offGroundText(player, where) : '',
     npcName: null,
     needs: null,
     steps: [],
     // ⚠ The complication is the only thing a lead knows that its title doesn't,
     // and it is the half that decides whether the walk is worth it.
     note: q.complication?.text ?? null,
-    route: where && where !== player.currentLocationId ? toLocation(where) : null,
+    route: where && !standingAtLocation(player, where) ? toLocation(where) : null,
     pauseKind: 'lead',
     // A lead pays on the kill with no turn-in, so it is DISCARDED, not abandoned.
     abandonKind: null,

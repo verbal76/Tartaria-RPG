@@ -55,6 +55,68 @@ export function standingAtLocation(
 }
 
 // ---------------------------------------------------------------------------
+// ⚠⚠⚠ OTA-1637 — "THIS IS THE PLACE" MUST MEAN THE CELL.
+// ---------------------------------------------------------------------------
+//
+// Measured on the owner's device: the arrival doors (stageArrival — heal the
+// debts, arm the spawn, checkStandingGround) have keyed on the canon grid CELL
+// since OTA-1597, on his own spec: "it is coordinate based … you need to know
+// that I stepped on that tile." But the arrival LINE ("▸ X: this is the place —
+// provoke it"), the trace's HERE, the status card's `here`, the conversation
+// card's arm and all three verb matchers still compared `currentLocationId`
+// against the stage ground — the whole named place. So one tile off the anchor
+// the feed said HERE, the card said HERE, a typed verb PAID — and nothing armed,
+// because nothing was standing on the cell. He read it as "every tile says I'm
+// standing on it", and for the verb it was true.
+//
+// ONE vocabulary now: the cell is the ground, everywhere the player can see it.
+// Off the cell but on the named place, every reader says how far and which
+// way instead of HERE — and `offGroundText` is the one sentence they all say.
+
+/** Grid offset from the player's cell to a location's canon cell: Manhattan
+ *  `tiles`, and the dominant-axis compass word (`null` on the cell). The
+ *  north/south/east/west mapping is stepDirection's (north = y−1). */
+export function tilesFromLocation(
+  player: PlayerCharacter | null | undefined,
+  locationId: string | null | undefined,
+): { tiles: number; dir: 'north' | 'south' | 'east' | 'west' | null } {
+  if (!player || !locationId) return { tiles: 0, dir: null };
+  const here = playerGridCell(player);
+  const there = canonicalCellOf(locationId);
+  const dx = there.x - here.x;
+  const dy = there.y - here.y;
+  const tiles = Math.abs(dx) + Math.abs(dy);
+  if (tiles === 0) return { tiles: 0, dir: null };
+  const dir = Math.abs(dx) >= Math.abs(dy) ? (dx > 0 ? 'east' : 'west') : (dy > 0 ? 'south' : 'north');
+  return { tiles, dir };
+}
+
+/** "2 tiles east" / "1 tile north" — '' when standing on the cell. The one
+ *  spelling every off-cell reader uses (OTA-1637). */
+export function offGroundText(
+  player: PlayerCharacter | null | undefined,
+  locationId: string | null | undefined,
+): string {
+  const { tiles, dir } = tilesFromLocation(player, locationId);
+  if (!tiles || !dir) return '';
+  return `${tiles} tile${tiles === 1 ? '' : 's'} ${dir}`;
+}
+
+/** The verb matchers' refusal when the ground does not match (OTA-1637). On the
+ *  named place but off its cell, it says how far and which way instead of
+ *  sending the player back to Contracts for a course to where they already are. */
+export function wrongGroundLine(
+  player: PlayerCharacter | null | undefined,
+  groundId: string,
+  title: string,
+): string {
+  const off = player?.currentLocationId === groundId ? offGroundText(player, groundId) : '';
+  return off
+    ? `The Arbiter taps the slate. "Close. ${title} wants the ground ${off} of here — step onto it and go again."`
+    : `The Arbiter taps the slate. "Not here. ${title} points elsewhere — set a course from Contracts and do it there."`;
+}
+
+// ---------------------------------------------------------------------------
 // OTA-1480 — AND THE FOURTH READER, WHICH ASKED THE SAME QUESTION IN A SECOND
 // COORDINATE SYSTEM, IN THREE PLACES.
 // ---------------------------------------------------------------------------

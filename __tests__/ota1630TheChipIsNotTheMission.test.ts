@@ -128,7 +128,11 @@ describe('OTA-1630 — the chip is not the mission', () => {
 
   it('the stage\'s own ask still pays the stage on its anchor — "search this ground" names no chip', async () => {
     await seedOwnersGround();
-    store.setState({ player: { ...get().player!, ...placedAt('cradle_of_dusk'), hubRoomId: null } as never });
+    // ⚠ OTA-1637 — with a full tank, so the step back SOUTH actually lands. The
+    // earlier tests drained the stamina; "south" was refused and the player stood
+    // one tile north of the anchor while `currentLocationId` still said Cradle.
+    // The verb paid anyway — the exact location-wide defect OTA-1637 closes.
+    store.setState({ player: { ...get().player!, ...placedAt('cradle_of_dusk'), hubRoomId: null, stamina: 100 } as never });
     await get().submitPlayerAction('north');
     await get().submitPlayerAction('south');
     await new Promise((r) => setTimeout(r, 200));

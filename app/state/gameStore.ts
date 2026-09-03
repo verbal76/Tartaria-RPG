@@ -530,7 +530,7 @@ import { MILESTONE_KILL_STEP } from '../engine/hpBreakdown';
 // Arbiter came to call the Mud Seas danger 2.
 import { playerDangerCap, dangerWarningLine } from '../engine/dangerTier';
 // OTA-1480 — "am I really at the place my record names", once, for all four readers.
-import { stationedAtNamedLocation } from '../engine/standingAt';
+import { stationedAtNamedLocation, standingAtLocation, wrongGroundLine } from '../engine/standingAt';
 // ⚠ Static, not the lazy `require` used elsewhere for this module: mainQuest
 // imports nothing but types, so there is no cycle to dodge and a real import
 // gets the signature checked.
@@ -954,8 +954,7 @@ function stageAwaitsIntentHere(get: () => GameStore, intent: Intent): boolean {
   const QS = require('../engine/questStage') as typeof import('../engine/questStage');
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const CM = require('../engine/contractMarkers') as typeof import('../engine/contractMarkers');
-  const here = player.currentLocationId;
-
+  // ⚠ OTA-1637 — "here" is the CELL, the same test the arrival doors run.
   const wants = (stage: { checkKind: string | null } | undefined, family: MissionFamily): boolean =>
     QS.payingIntent(family, stage) === intent;
 
@@ -964,21 +963,21 @@ function stageAwaitsIntentHere(get: () => GameStore, intent: Intent): boolean {
     const def = findHuntById(rec.id);
     const stage = def?.stages[rec.stage];
     if (!def || !wants(stage, 'hunt')) continue;
-    if (QS.stageLocationId(stage, CM.huntAnchorId(def), CM.resolvePosterLocation) === here) return true;
+    if (standingAtLocation(player, QS.stageLocationId(stage, CM.huntAnchorId(def), CM.resolvePosterLocation))) return true;
   }
   for (const rec of player.activeMysteries ?? []) {
     if (rec.tracked === false) continue;
     const def = findMysteryById(rec.id);
     const stage = def?.stages[rec.stage];
     if (!def || !wants(stage, 'mystery')) continue;
-    if (QS.stageLocationId(stage, CM.contractAnchorId(def), CM.resolvePosterLocation) === here) return true;
+    if (standingAtLocation(player, QS.stageLocationId(stage, CM.contractAnchorId(def), CM.resolvePosterLocation))) return true;
   }
   for (const rec of player.activeStorylines ?? []) {
     if (rec.tracked === false) continue;
     const def = findStorylineById(rec.id);
     const stage = def?.stages[rec.stage];
     if (!def || !wants(stage, 'storyline')) continue;
-    if (QS.stageLocationId(stage, CM.contractAnchorId(def), CM.resolvePosterLocation) === here) return true;
+    if (standingAtLocation(player, QS.stageLocationId(stage, CM.contractAnchorId(def), CM.resolvePosterLocation))) return true;
   }
   return false;
 }
@@ -1053,7 +1052,8 @@ function advanceStagesOnIntent(
     // contract anchor, which is the old behaviour and the default.
     const stageDefNow = huntMatch.def.stages[huntMatch.rec.stage];
     const anchor = QS.stageLocationId(stageDefNow, huntAnchorId(huntMatch.def), resolvePosterLocation);
-    if (player.currentLocationId === anchor) {
+    // ⚠ OTA-1637 — the verb pays on the CELL, the same test the arrival doors run.
+    if (standingAtLocation(player, anchor)) {
       // ⚠⚠ AND THE PACK IS CHECKED BEFORE THE VERB COUNTS. Owner: *"the next stage spoke
       // about giving the book to his sister. who's sister? and what book?"* A stage that
       // asks for a thing now REFUSES until you hold it, and the refusal names the thing —
@@ -1100,7 +1100,7 @@ function advanceStagesOnIntent(
     } else if (!inCombat && !namesChip) {
       // The verb matched, the ground didn't — say so instead of the old silence.
       // Throttled: skip if the same line is already in the recent log.
-      const line = `The Arbiter taps the slate. "Not here. ${huntMatch.def.title} points elsewhere — set a course from Contracts and do it there."`;
+      const line = wrongGroundLine(player, anchor, huntMatch.def.title);
       const recent = get().gameLog.slice(-30).some((e) => e.text === line);
       if (!recent) get().appendLog('arbiter', line);
     }
@@ -1147,8 +1147,8 @@ function advanceStagesOnIntent(
     // engine never asked you to go there, and 26 of 36 named locations went unvisited.
     const stageNow = mysteryMatch.def.stages[mysteryMatch.rec.stage];
     const ground = QS.stageLocationId(stageNow, CM.contractAnchorId(mysteryMatch.def), CM.resolvePosterLocation);
-    if (player.currentLocationId !== ground) {
-      const line = `The Arbiter taps the slate. "Not here. ${mysteryMatch.def.title} points elsewhere — set a course from Contracts and do it there."`;
+    if (!standingAtLocation(player, ground)) {
+      const line = wrongGroundLine(player, ground, mysteryMatch.def.title);
       const recent = get().gameLog.slice(-30).some((e) => e.text === line);
       if (!recent && !namesChip) get().appendLog('arbiter', line);
       return false; // nothing granted — the generic beat may still play
@@ -1200,8 +1200,8 @@ function advanceStagesOnIntent(
     // journey — which made the gap the widest here of anywhere.
     const stageNow = storyMatch.def.stages[storyMatch.rec.stage];
     const ground = QS.stageLocationId(stageNow, CM.contractAnchorId(storyMatch.def), CM.resolvePosterLocation);
-    if (player.currentLocationId !== ground) {
-      const line = `The Arbiter taps the slate. "Not here. ${storyMatch.def.title} points elsewhere — set a course from Contracts and do it there."`;
+    if (!standingAtLocation(player, ground)) {
+      const line = wrongGroundLine(player, ground, storyMatch.def.title);
       const recent = get().gameLog.slice(-30).some((e) => e.text === line);
       if (!recent && !namesChip) get().appendLog('arbiter', line);
       return false; // nothing granted — the generic beat may still play

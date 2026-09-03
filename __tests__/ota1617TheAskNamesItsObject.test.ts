@@ -99,7 +99,8 @@ describe('OTA-1617 — the ask names its object', () => {
 describe('OTA-1617 — the destination on the row is the destination in the sentence', () => {
   it('⚠⚠ the reader still refuses a route where it would be a lie', () => {
     const TRACE = src('app', 'engine', 'missionTrace.ts');
-    expect(TRACE).toContain("route: where && where !== player.currentLocationId ? toLocation(where) : null,");
+    // OTA-1637 — "here" became the cell, so the refusal is now the cell test too.
+    expect(TRACE).toContain('route: where && !standingAtLocation(player, where) ? toLocation(where) : null,');
     expect(TRACE).toContain('route: here ? null : toLocation(b.targetLocationId),');
   });
 
