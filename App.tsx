@@ -16,6 +16,7 @@ import {
   markMLInitAttempted,
   markMLInitSucceeded,
   clearInFlightBreadcrumbs,
+  qwenGateReason, // OTA-1635 — the skip branches say why, in the log
 } from './app/diagnostics/mlHealth';
 import { clearLiveBreadcrumb } from './app/engine/saveSystem'; // OTA-1276
 import { TitleScreen } from './app/screens/TitleScreen';
@@ -575,6 +576,8 @@ export default function App() {
                 if (!shouldAttemptQwen()) {
                   setStage('qwen:skipped');
                   useGameStore.setState({ qwenStatus: 'skipped' });
+                  // OTA-1635 — the log says why the Arbiter is on templates.
+                  try { useGameStore.getState().appendLog('debug', `qwen: SKIPPED this session — ${qwenGateReason()}`); } catch { /* ignore */ }
                   return;
                 }
                 setStage('qwen:start');
@@ -630,6 +633,8 @@ export default function App() {
                 // eslint-disable-next-line no-console
                 console.warn('mlHealth: Qwen disabled (completion-crash guard). Template narration this session.');
                 setStage('qwen:skipped');
+                // OTA-1635 — and say so where the owner can read it.
+                try { useGameStore.getState().appendLog('debug', `qwen: SKIPPED this session — ${qwenGateReason()}`); } catch { /* ignore */ }
                 return;
               }
               setStage('qwen:start');
@@ -685,7 +690,11 @@ export default function App() {
             // OTA-1493 — and defer to the first action on this path too.
             setStage('qwen:deferred');
             armQwenWarm(() => {
-              if (!shouldAttemptQwen()) { setStage('qwen:skipped'); return; }
+              if (!shouldAttemptQwen()) {
+                setStage('qwen:skipped');
+                try { useGameStore.getState().appendLog('debug', `qwen: SKIPPED this session — ${qwenGateReason()}`); } catch { /* ignore */ } // OTA-1635
+                return;
+              }
               void bootQwen().catch((err) => {
                 // eslint-disable-next-line no-console
                 console.warn('bootQwen failed:', err);

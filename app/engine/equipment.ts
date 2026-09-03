@@ -21,6 +21,12 @@ const NEVER_EQUIPPABLE_TAGS = new Set([
   'recipe', 'lore', 'collectable', 'collectible',
   // things kept rather than used
   'keepsake', 'currency', 'trophy',
+  // ⚠ OTA-1635 — things EATEN. Owner: "honey glazed knuckles shouldn't be
+  // equippable." The Honey-Glazed Knuckle (gear.json, kind consumable, tags
+  // food/treat/dog_treat) fell through every catalog lookup to the hands regex
+  // below — `knuckle` — and offered EQUIP (Hands). Zero weapons or armour carry
+  // any of these tags (checked against every catalog file when this shipped).
+  'food', 'treat', 'dog_treat',
 ]);
 
 export function validSlotsForItem(item: InventoryItem): EquipSlot[] {
@@ -115,6 +121,15 @@ export function validSlotsForItem(item: InventoryItem): EquipSlot[] {
   if (exp?.effect?.kind === 'gate' && exp.effect.unlocks === 'detect_aether') {
     return ['lens'];
   }
+  // ⚠ OTA-1635 — AND NOTHING YOU EAT OR DRINK HAS A SLOT. Every lookup below
+  // this line can be fooled by a name: findArmorByName / findRingByName match
+  // fuzzily (OTA-1408's own finding) and the name fallbacks at the bottom are
+  // deliberately generous ("anything that LOOKS equippable should BE
+  // equippable"). A consumable whose name carries a gear token (Honey-Glazed
+  // KNUCKLE) walked through all of them and came back wearable. Kind is what the
+  // item SAYS it is; the throwable, scanner and lens cases that legitimately
+  // equip a consumable-shaped thing were answered above this line, on purpose.
+  if (canonicalItemKind(item) === 'consumable') return [];
   // arb102 / OTA-911 — `wardrobe`-tagged worn gear that isn't catalog armor
   // (the Hardened Climbing Strap) equips in the LEGS slot: it's a harness rigged
   // around the hips and thighs, so it displaces leg armor while worn. (Was the

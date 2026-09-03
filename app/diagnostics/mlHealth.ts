@@ -496,6 +496,23 @@ export async function recordQwenRuntime(variant: string, diag: string): Promise<
  * Arbiter uses template narration), OR if the broad ML guard is disabled.
  * Independent of the classifier / Kokoro, which use a different native lib.
  */
+/** ⚠ OTA-1635 — WHY the gate answered as it did, in one line for the log. The
+ *  owner's 2026-09-03 session ran fifty minutes on template narration and the
+ *  log carried no qwen line at all: the boot path's skip branches only
+ *  console.warn, which never reaches the device log. Same three tests as
+ *  shouldAttemptQwen, in the same order, spelled out. */
+export function qwenGateReason(): string {
+  if (!cached) return 'health not loaded yet';
+  if (cached.qwenDisabledByCrash) {
+    return `completion-crash guard tripped (${cached.qwenCompletionCrashCount} crash${cached.qwenCompletionCrashCount === 1 ? '' : 'es'} inside a Qwen completion)`;
+  }
+  if (cached.lastSuccessAt) return `ok — ML has loaded on this install (last ${cached.lastSuccessAt})`;
+  if (cached.disabledByCrash) {
+    return `never loaded on this install and the general boot guard is disabled (${cached.crashCount} boot crash${cached.crashCount === 1 ? '' : 'es'})`;
+  }
+  return 'ok — never loaded on this install, general boot guard open';
+}
+
 export function shouldAttemptQwen(): boolean {
   // Qwen's OWN reliable failure signal — a breadcrumb wrapped tight around the
   // completion call — is the hard gate. (0 for the reporting device.)

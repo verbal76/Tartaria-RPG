@@ -331,6 +331,14 @@ export function ExplorationScreen() {
   const setVendorChipDismissedKey = useGameStore((s) => s.setVendorChipDismissedKey);
   const vendorChipDismissed = !!vendorDismissedKey && vendorDismissedKey === chipViewKey;
   const [takeOpen, setTakeOpen] = useState(false);
+  // ⚠ OTA-1635 — tell the store while a picker is up, so a card that arrives
+  // from outside this screen (the wanderer introduction, App.tsx) waits for the
+  // player to finish instead of landing on top of the list they are reading.
+  // Cleared on unmount so a screen change can never leave the flag stuck.
+  useEffect(() => {
+    useGameStore.setState({ explorationPickerOpen: searchOpen || takeOpen });
+    return () => { useGameStore.setState({ explorationPickerOpen: false }); };
+  }, [searchOpen, takeOpen]);
   // ⚠⚠ OTA-1238 — THE ONE THING THAT CLOSES IT WITHOUT THE PLAYER ASKING.
   //
   // Now that the picker survives a selection (owner: *"the top hat should stay

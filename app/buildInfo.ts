@@ -26943,7 +26943,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // inside a generation) will say what they sat in next time.
 // "even crafting repopulates loot": measured NOT so — the roster was rolled at
 // arrival, the fight hid the quick row, the craft came 2 s after the kill.
-export const OTA_BUILD_ID = '2026-09-02-1634-the-aside-yields';
+// ⚠⚠⚠ OTA-1635 — THREE FROM THE LOG. (1) Food is never gear: the Honey-Glazed
+// Knuckle (kind consumable) reached the hands name-regex and offered EQUIP —
+// a consumable has no slot, and food/treat/dog_treat are never-equippable.
+// (2) The wanderer card waits for the picker: it popped over the TAKE / SALVAGE
+// list ("they kind of overlapped") — explorationPickerOpen + screen gate.
+// (3) The engine says why it is silent: fifty minutes of template narration
+// and no qwen line — every skip branch logs its reason, the load logs its
+// start, a load unsettled after 90 s logs once.
+export const OTA_BUILD_ID = '2026-09-03-1635-three-from-the-log';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-02-1634-the-aside-yields';
 // golem catch-up 2026-09-02: markerless publish of OTA-1634 - the live aside is
 // homework; the stall line names the crumb and the native lane. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-02-1633-a-batch-is-one-action';

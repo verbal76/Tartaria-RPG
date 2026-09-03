@@ -7740,6 +7740,11 @@ export interface GameStore {
    *  ask before stripping them instead of silently eating them. `subsList` is
    *  the pre-formatted "2× Brass Sextant → Scrap Metal, …" summary. */
   craftSubstitutionPrompt: { recipeResult: string; subsList: string; count?: number } | null;
+  /** ⚠ OTA-1635 — an exploration picker (INVESTIGATE / TAKE-SALVAGE) is on
+   *  screen. Owner: the wanderer card popped over the salvage picker and the
+   *  two conversations "kind of overlapped each other". The card reads this and
+   *  waits its turn; the screen writes it from the pickers' own open state. */
+  explorationPickerOpen: boolean;
   /** One-shot latch: set by confirmCraftSubstitution so the re-dispatched
    *  craft skips the prompt and proceeds. Cleared the moment it's consumed. */
   craftSubConfirmedFor: string | null;
@@ -8097,6 +8102,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   // or craft that is genuinely about to spend forge-grade material.
   crucibleGuardPrompt: null,
   crucibleGuardAllowedFor: null,
+  explorationPickerOpen: false, // OTA-1635
   discoveryReveal: null,
   dismissDiscoveryReveal() {
     set({ discoveryReveal: null });

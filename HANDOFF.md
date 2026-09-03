@@ -1560,9 +1560,9 @@ Key invariants worth knowing:
 
 ## 9. Recent OTA highlights (latest sessions)
 
-### ⚠⚠⚠ THE 2026-09-02 RUN — OTA-1617 → 1634 (read this first if you are new)
+### ⚠⚠⚠ THE 2026-09-02 RUN — OTA-1617 → 1635 (read this first if you are new)
 
-Latest golem-line stamp: **`2026-09-02-1634-the-aside-yields`**
+Latest golem-line stamp: **`2026-09-03-1635-three-from-the-log`**
 (`app/buildInfo.ts`). Both channels ship from this branch — a `[ota-hal]` marker
 in the commit TITLE publishes the HAL set, a markerless follow-up commit
 publishes golem; see §6.
@@ -1763,6 +1763,25 @@ what it ACCEPTS, and a data walker skips the saying.
   22:38:39) both sat inside a Qwen generation (OTA-1472 saw the same shape);
   cause still unmeasured — the next stall line is the evidence. Attack →
   resolution of ~7 s is dice pacing (3 auto-resolved steps), not lag.
+- **OTA-1635 three from the log** (the 00:49 bundle, build 1634). (1) *"honey
+  glazed knuckles shouldn't be equippable"* — `validSlotsForItem` hands regex
+  (`knuckle`) caught a kind-consumable gear.json item; now
+  `canonicalItemKind === 'consumable'` → `[]` before the name fallbacks and
+  food / treat / dog_treat are in NEVER_EQUIPPABLE_TAGS. (2) *"the pop-up for
+  Nix came up … they kind of overlapped"* — `WandererEncounterModal` (App.tsx,
+  global) armed while the TAKE / SALVAGE picker was open; ExplorationScreen
+  now writes `explorationPickerOpen` (searchOpen || takeOpen, cleared on
+  unmount) and the card arms only when it is false and
+  `currentScreen === 'exploration'`. (3) Qwen never loaded that session
+  (`template (reason=qwen-not-ready)` ×50 min, trailer `Opened: 0`) and the
+  log had NO qwen line: `bootQwen` now logs `qwen: loading (was …)` on entry
+  and a one-shot `still downloading/loading after 90s` stall line;
+  App.tsx's three `!shouldAttemptQwen()` branches log `qwen: SKIPPED this
+  session — ${qwenGateReason()}` (new in mlHealth). ⚠ Cause of that silent
+  session is still UNKNOWN — the next log will say skipped / hung / never
+  released. Coatings question answered from the log (they applied; "shrugs
+  off the aetheric" is the base type); no change. The 22:42:22 death (build
+  1633, 1 s in, `boot:qwen:deferred`, plain boot) is another #110 sample.
 
 ⚠ **Two position vocabularies, still.** `stageArrival.ts` (heal / arm /
 `checkStandingGround`) keys on the canon grid CELL; the verb matchers and

@@ -45,6 +45,17 @@ export function WandererEncounterModal() {
   const wanderer = useGameStore((s) => s.currentScene?.wanderer);
   const enemies = useGameStore((s) => s.currentScene?.enemies?.length ?? 0);
   const notice = useGameStore((s) => s.missionCompleteNotice);
+  // ⚠ OTA-1635 — THE CARD WAITS ITS TURN. Owner, 00:07: *"I hit investigate and
+  // right after that the pop-up for Nix came up. so then I had to do my
+  // investigate and then when that closed then the next conversation came up.
+  // they kind of overlapped each other."* His log: arrival 00:07:17.97, TAKE /
+  // SALVAGE picker open at :19.39, this card (1200 ms dwell) at ~:19.2 on top of
+  // it, "talk to Nix" at :22 while the picker was still up, the salvage haul
+  // printing at :25 under the parley. So: not while a picker is up, and not on
+  // any screen but the one the stranger is standing on. When the picker closes
+  // the dwell starts fresh and the card arrives after the haul has printed.
+  const pickerOpen = useGameStore((s) => s.explorationPickerOpen);
+  const screen = useGameStore((s) => s.currentScreen);
   const submit = useGameStore((s) => s.submitPlayerAction);
   const hintsOff = useHintsDisabled();
   // Per-wanderer acknowledgement. Keyed on the id, so the card is offered once
@@ -53,7 +64,8 @@ export function WandererEncounterModal() {
   const [seenId, setSeenId] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
 
-  const armed = !!wanderer && wanderer.id !== seenId && enemies === 0 && !notice;
+  const armed = !!wanderer && wanderer.id !== seenId && enemies === 0 && !notice
+    && !pickerOpen && screen === 'exploration';
   useEffect(() => {
     if (!armed) {
       setReady(false);

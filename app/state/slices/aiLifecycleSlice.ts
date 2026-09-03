@@ -67,6 +67,12 @@ export interface AiLifecycleSliceDeps {
   startRuntimePressureWatch: (get: () => GameStore, set: SetState) => void;
 }
 
+/** ⚠ OTA-1635 — a Qwen load still in `downloading` / `loading` this long after
+ *  bootQwen began writes ONE stall line to the log. Generous: a cold load on a
+ *  Tensor G5 is ~20-30 s; a session that is still loading at a minute and a
+ *  half is the shape that left the 2026-09-03 log with no qwen line at all. */
+const QWEN_LOAD_STALL_MS = 90_000;
+
 export const createAiLifecycleSlice = (
   set: SetState,
   get: () => GameStore,
@@ -112,6 +118,24 @@ export const createAiLifecycleSlice = (
     const current = get().qwenStatus;
     if (current !== 'idle' && current !== 'failed') return;
     set({ qwenStatus: 'downloading', qwenFraction: 0, qwenError: null });
+    // ⚠⚠ OTA-1635 — SAY THAT THE LOAD STARTED, AND SAY IF IT NEVER ENDS. The
+    // owner's 2026-09-03 session ran fifty minutes on template narration —
+    // every Arbiter line `template (reason=qwen-not-ready)`, the trailer
+    // `Model contexts Opened: 0 · Narration engine: idle` — and the log carried
+    // NOT ONE qwen line. This function logs a failure and a cancellation and
+    // nothing else, and the boot path's skip branches only console.warn. So the
+    // log could not say whether the warm was skipped, started and hung, or
+    // never released. Now the start is a line, and a load that has not settled
+    // ninety seconds later is a line too — once, with the status it is stuck in.
+    try { get().appendLog('debug', `qwen: loading (was ${current}) — the Arbiter speaks templates until it is ready`); } catch { /* ignore */ }
+    const stallTimer = setTimeout(() => {
+      const st = get().qwenStatus;
+      if (st === 'downloading' || st === 'loading') {
+        try {
+          get().appendLog('debug', `qwen: ⚠ still ${st} after ${QWEN_LOAD_STALL_MS / 1000}s (fraction ${Math.round((get().qwenFraction ?? 0) * 100)}%) — the load has not settled; the Arbiter is still on templates`);
+        } catch { /* ignore */ }
+      }
+    }, QWEN_LOAD_STALL_MS);
     try {
       await qwen.initialize({
         onProgress: (status, fraction) => {
@@ -171,6 +195,7 @@ export const createAiLifecycleSlice = (
       // fix: it means llama.rn is not in the installed build.
       try { get().appendLog('debug', `qwen: LOAD THREW — ${message}`); } catch { /* ignore */ }
     }
+    clearTimeout(stallTimer); // OTA-1635 — settled one way or the other; the line is only for a load that never does
     // OTA-223 — start the background dormancy watchdog after the
     // first successful boot. The watchdog polls every 60s; if Qwen
     // is dormant (status==='ready' but the native runtime is gone,
