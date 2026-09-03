@@ -1,0 +1,193 @@
+{
+  "id": "9ac0cbc38f1d43e38845b0926d4dc4fe",
+  "groupID": "7703017060",
+  "eventID": "9ac0cbc38f1d43e38845b0926d4dc4fe",
+  "projectID": "4511945117532160",
+  "size": 3002,
+  "entries": [
+    {
+      "data": {
+        "formatted": "Process died with no orderly exit while: (no action yet)"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-02-1633-a-batch-is-one-action",
+  "message": "Process died with no orderly exit while: (no action yet)",
+  "title": "Process died with no orderly exit while: (no action yet)",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "3e9714f7288a416499d6aad236c6addb",
+      "span_id": "a3b116d929f3771f",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "actionAgeMs": 957,
+    "id": "1788388942972_native-death",
+    "lastAction": "(no action yet)",
+    "lastPhase": "boot:qwen:deferred",
+    "lastPhaseAgeMs": 0,
+    "sinceBootMs": 1031,
+    "stack": "(none \u2014 the process died without one)"
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "Process died with no orderly exit while: (no action yet)"
+  },
+  "tags": [
+    {
+      "key": "build",
+      "value": "2026-09-02-1633-a-batch-is-one-action"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-02-1633-a-batch-is-one-action"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "native-death"
+    },
+    {
+      "key": "level",
+      "value": "fatal"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-02-1633-a-batch-is-one-action"
+    },
+    {
+      "key": "stage",
+      "value": "boot:qwen:deferred"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    },
+    {
+      "key": "version",
+      "value": "4.32.11"
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-02T23:32:33.136072Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-02T22:42:22.972000Z",
+  "fingerprints": [
+    "ded7ba861a46476d883cdebd335596a0"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1951764249,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-02T23:32:34.101000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-02-1633-a-batch-is-one-action",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-02-1633-a-batch-is-one-action",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-02-1633-a-batch-is-one-action",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-02-1633-a-batch-is-one-action)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": "531076fb5c4e4ae5b4773a0db335c057"
+}

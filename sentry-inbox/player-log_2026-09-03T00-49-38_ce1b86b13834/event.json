@@ -1,0 +1,233 @@
+{
+  "id": "ce1b86b138344827a800b2aa0293d380",
+  "groupID": "7708462105",
+  "eventID": "ce1b86b138344827a800b2aa0293d380",
+  "projectID": "4511945117532160",
+  "size": 18035,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-02-1634-the-aside-yields #mtkt5bixx0qy [inline 4/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-02-1634-the-aside-yields",
+  "message": "player-log 2026-09-02-1634-the-aside-yields #mtkt5bixx0qy [inline 4/28]",
+  "title": "player-log 2026-09-02-1634-the-aside-yields #mtkt5bixx0qy [inline 4/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "f94496531ea14f0b83cffba1544512dd",
+      "span_id": "bc6c018144b40558",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      " on a folding chair, a velvet cloth across his knees. On the cloth: a single feather, gold at the spine, deeper gold at the edge. 'Aetheric Phoenix Feather,' he says when he sees you looking. 'Family heirloom. Forty TC and it's yours. I'll be honest with you \u2014 I need to eat tonight.' The feather hums. Faintly. In a tone you do not quite trust.\n",
+      "[2026-09-02T22:36:53.966Z] [arbiter] 'I won't insult you with stories. I will tell you the price came down because of how I came by it. Thirty TC. Final.'\n[2026-09-02T22:36:53.967Z] [world] If you buy the feather, your gear will start showing wear faster than the road accounts for. A Forgotten Order scholar in the next town might explain why, for a fee. The Reclaimers in every town will buy it bac",
+      "k at a loss.\n[2026-09-02T22:36:53.980Z] [world] Your eye goes back to it before you decide to look.\n[2026-09-02T22:36:54.990Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-09-02T22:36:55.006Z] [debug] spawn: gear=[Aetherbound Mask] window=10 roster=new\n",
+      "[2026-09-02T22:36:55.007Z] [world] You walk west through open silt. The compass tells you The Buried Cities lies further west \u2014 3 tiles, about 8 hours of travel.\n[2026-09-02T22:36:55.008Z] [world] You had a question here. You still have it.\n[2026-09-02T22:36:55.806Z] [debug] ui: tap \"take / salvage\"\n[2026-09-02T22:36:56.896Z] [world] You work the Aetherbound Mask loose from where the mud had it.\n",
+      "[2026-09-02T22:36:56.897Z] [reward] \u2726 Aetherbound Mask (Common).\n[2026-09-02T22:36:57.937Z] [world] You break the chart cairn apart. Among the pieces, something worth keeping.\n[2026-09-02T22:36:57.937Z] [world] You work the cold spring over. A part of it comes loose, intact.\n[2026-09-02T22:36:57.937Z] [world] You work the half-buried submerged giant statue over. A part of it comes loose, intact.\n",
+      "[2026-09-02T22:36:57.938Z] [world] You strip the old stake carefully. Something usable comes free in your hand.\n[2026-09-02T22:36:57.938Z] [reward] \u2726 Salvage haul:\n[2026-09-02T22:36:57.938Z] [reward]     \u2022 Mud Fragment (Common)\n[2026-09-02T22:36:57.938Z] [reward]     \u2022 Scrap Metal x2 (Common)\n[2026-09-02T22:36:57.939Z] [reward]     \u2022 Bent Nail x2 (Common)\n",
+      "[2026-09-02T22:36:57.939Z] [reward]     \u2022 Aether Dust x2 (Common)\n[2026-09-02T22:37:00.490Z] [debug] ui: tap \"investigate\"\n[2026-09-02T22:37:02.170Z] [player] investigate the ground\n[2026-09-02T22:37:02.170Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-09-02T22:37:02.174Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Stick (Common).\n[2026-09-02T22:37:02.181Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-09-02T22:37:02.181Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-02T22:37:02.182Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-09-02T22:37:02.394Z] [cognitive] CLIMB  (211ms)\n[2026-09-02T22:37:02.907Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-09-02T22:37:02.920Z] [debug] spawn: gear=[Mud Claymore, Traveler's Cloak, Golem-Born Guardian Mask] window=10 roster=new\n",
+      "[2026-09-02T22:37:02.921Z] [world] You walk west through open silt. The compass tells you The Buried Cities lies further west \u2014 2 tiles, about 5 hours of travel.\n[2026-09-02T22:37:02.922Z] [world] Movement low and fast \u2014 an Aetheric Slug cuts across your path. You're closer than either of you wanted to be.\n",
+      "[2026-09-02T22:37:02.923Z] [combat] Aetheric Slug closes \u2014 Acid Trail ready, 1D6 damage on a hit. (range: close)\n[2026-09-02T22:37:02.932Z] [world] Some part of you has been keeping the place bookmarked.\n[2026-09-02T22:37:06.600Z] [debug] ui: tap \"dodge\"\n[2026-09-02T22:37:06.612Z] [player] dodge\n",
+      "[2026-09-02T22:37:06.613Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=1\n[2026-09-02T22:37:06.614Z] [world] You commit to the dodge. Slip Aetheric Slug's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-02T22:37:06.614Z] [combat] Aetheric Slug turns on Mercy \u2014 d20 3 + ATK 2 = 5 vs Mercy's AC 10 \u2014 \u2717 MISS\n[2026-09-02T22:37:06.615Z] [debug] arbiter: template (reason=combat)\n[2026-09-02T22:37:06.615Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-02T22:37:06.616Z] [system] \u23f3 Time passed: 6 min\n[2026-09-02T22:37:06.955Z] [cognitive] neutral  (339ms)\n",
+      "[2026-09-02T22:37:07.934Z] [debug] ui: tap \"\ud83d\udd25 choir-bound launcher\"\n[2026-09-02T22:37:07.938Z] [system] dodging (parry) fades.\n[2026-09-02T22:37:07.942Z] [world] A shard of mud-glass nicks you. Small wound, steady reminder. (\u22121 HP)\n[2026-09-02T22:37:07.985Z] [player] attack with the off-hand choir-bound launcher\n",
+      "[2026-09-02T22:37:07.985Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=close enemies=1 hooks=1\n[2026-09-02T22:37:07.986Z] [debug] attack: target=Aetheric Slug range=close reach.bands=[distant,far,mid,close] reach.label=Choir-Bound Launcher bareHand=false\n",
+      "[2026-09-02T22:37:07.987Z] [debug] attack: visibility penalty \u22121 (Glass Hail)\n[2026-09-02T22:37:08.056Z] [world] You raise the searing choir-bound launcher toward Aetheric Slug. The room narrows around the both of you.\n[2026-09-02T22:37:08.056Z] [system] \u23f3 Time passed: 6 min\n[2026-09-02T22:37:08.370Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 TAKE_COVER  (313ms)\n",
+      "[2026-09-02T22:37:15.977Z] [world] You seize the initiative. Aetheric Slug has no time to react.\n[2026-09-02T22:37:15.977Z] [combat] You \u2014 d20 \u2192 18 + INT 12 \u2212 1 (Glass Hail) + 2 (point blank) = 31 vs Aetheric Slug AC 8 \u2014 \u2713 HIT\n[2026-09-02T22:37:15.978Z] [combat] Aetheric Slug shrugs off the aetheric. (resisted, \u00d70.5 for 6)\n",
+      "[2026-09-02T22:37:15.980Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Mud Armor \u2014 bludgeoning or burn will bite where aetheric won't.\"\n[2026-09-02T22:37:15.981Z] [combat] Clean hit with the searing choir-bound launcher for 6. Aetheric Slug has 6 left and does not back away.\n",
+      "[2026-09-02T22:37:15.982Z] [combat] Searing Choir-Bound Launcher \u2014 2 burn bites in and festers (3 turns).\n[2026-09-02T22:37:15.983Z] [combat] Aetheric Slug \u2014 d20 \u2192 2 + ATK 2 = 4 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-02T22:37:15.983Z] [arbiter] The Arbiter's hand drifts to nothing in particular. \"The aetheric slug will not tire before you do. Spend wisely.\"\n",
+      "[2026-09-02T22:37:16.345Z] [combat] Aetheric Slug regenerates 1 HP (7/12).\n[2026-09-02T22:37:18.089Z] [debug] persist sizes(KB): total=301 player=82 wm=133[rooms=65 events=5 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=82 scene=3\n[2026-09-02T22:37:18.529Z] [debug] ui: tap \"\ud83d\udd25 choir-bound launcher\"\n[2026-09-02T22:37:18.578Z] [player] attack with the off-hand choir-bound launcher\n",
+      "[2026-09-02T22:37:18.579Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=close enemies=1 hooks=1\n[2026-09-02T22:37:18.580Z] [combat] Aetheric Slug blisters \u2014 clinging fire sears 2. (5/12 HP, 2 turns left)\n",
+      "[2026-09-02T22:37:18.581Z] [debug] attack: target=Aetheric Slug range=close reach.bands=[distant,far,mid,close] reach.label=Choir-Bound Launcher bareHand=false\n[2026-09-02T22:37:18.582Z] [debug] attack: visibility penalty \u22121 (Glass Hail)\n[2026-09-02T22:37:18.650Z] [world] You raise the searing choir-bound launcher toward Aetheric Slug. The room narrows around the both of you.\n",
+      "[2026-09-02T22:37:18.651Z] [system] \u23f3 Time passed: 6 min\n[2026-09-02T22:37:18.969Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 TAKE_COVER  (317ms)\n[2026-09-02T22:37:25.791Z] [world] Aetheric Slug moves first. The pressure is immediate.\n[2026-09-02T22:37:25.793Z] [combat] Aetheric Slug \u2014 d20 \u2192 8 + ATK 2 = 10 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-02T22:37:25.793Z] [combat] You \u2014 d20 \u2192 3 + INT 12 \u2212 1 (Glass Hail) + 2 (point blank) = 16 vs Aetheric Slug AC 8 \u2014 \u2713 HIT\n[2026-09-02T22:37:25.793Z] [combat] Aetheric Slug shrugs off the aetheric. (resisted, \u00d70.5 for 11)\n[2026-09-02T22:37:25.797Z] [combat] Aetheric Slug folds under the searing choir-bound launcher. 11 damage was enough. The room exhales.\n",
+      "[2026-09-02T22:37:25.798Z] [reward] Aetheric Slug defeated. You recover Slug Slime, Aether Residue.\n[2026-09-02T22:37:25.798Z] [reward] +6 TC pried from the dust.\n[2026-09-02T22:37:26.070Z] [combat] Aetheric Slug regenerates 1 HP (6/12).\n[2026-09-02T22:37:27.905Z] [debug] ui: tap \"more \u25b8\"\n[2026-09-02T22:37:29.780Z] [debug] ui: tap \"craft\"\n",
+      "[2026-09-02T22:37:32.653Z] [world] You repair the Aether-Walker's Boots. Back to full. (spent: Patched Cloth x4)\n[2026-09-02T22:37:32.703Z] [arbiter] The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\"\n[2026-09-02T22:37:32.706Z] [world] You repair the Acid-Etched Corrupted Auralite Talon. Back to full. (spent: Small Rock x2)\n",
+      "[2026-09-02T22:37:32.727Z] [arbiter] The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\"\n[2026-09-02T22:37:32.727Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\u2026\"\n[2026-09-02T22:37:32.729Z] [world] You repair the Searing Choir-Bound Launcher. Back to full. (spent: Small Rock x2)\n",
+      "[2026-09-02T22:37:32.746Z] [world] You repair the Mud-glass Scales. Back to full. (spent: Patched Cloth x4)\n[2026-09-02T22:37:32.771Z] [arbiter] The Arbiter stops with his hand over your pack. \"Before I touch the Reclaimer's Cloak \u2014 2 pieces of this is Crucible stock: Waxed Yarn Bundle, Faded Ribbon Coil. Say the word and I'll set it aside instead.\"\n",
+      "[2026-09-02T22:37:36.447Z] [arbiter] The Arbiter sets it aside on the bench. \"\u2665 Held for the Crucible: Waxed Yarn Bundle, Faded Ribbon Coil \u00d73. I'll not touch it.\"\n[2026-09-02T22:37:37.580Z] [debug] homework: intro-fill armed after 14086ms idle\n",
+      "[2026-09-02T22:37:38.319Z] [arbiter] The Arbiter stops with his hand over your pack. \"Before I touch the Reclaimer's Cloak \u2014 2 pieces of this is Crucible stock: Mud Cloth, Aetheric Blood. Say the word and I'll set it aside instead.\"\n[2026-09-02T22:37:39.556Z] [arbiter] The Arbiter nods. \"Patched in: Mud Cloth \u2192 Patched Cloth, Aetheric Blood \u2192 Patched Cloth.\"\n",
+      "[2026-09-02T22:37:39.573Z] [world] You repair the Reclaimer's Cloak. Back to full. (spent: Patched Cloth x4)\n[2026-09-02T22:37:40.941Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n[2026-09-02T22:37:40.963Z] [world] You repair the Relic Hunter's Gauntlets. Back to full. (spent: Patched Cloth x4)\n",
+      "[2026-09-02T22:37:44.377Z] [debug] persist sizes(KB): total=300 player=82 wm=133[rooms=65 events=5 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=83 scene=2\n[2026-09-02T22:37:45.362Z] [debug] ui: tap \"take / salvage\"\n[2026-09-02T22:37:46.677Z] [world] The Mud Claymore had settled into the ground. You unsettle it.\n[2026-09-02T22:37:46.678Z] [reward] \u2726 Mud Claymore (Common).\n",
+      "[2026-09-02T22:37:46.697Z] [world] Whatever the Golem-Born Guardian Mask was lying against, it lets go without much argument.\n[2026-09-02T22:37:46.698Z] [reward] \u2726 Golem-Born Guardian Mask (Common).\n[2026-09-02T22:37:46.699Z] [world] The Traveler's Cloak is heavier than it looks. Most things down here are.\n[2026-09-02T22:37:46.699Z] [reward] \u2726 Traveler's Cloak (Common).\n",
+      "[2026-09-02T22:37:47.855Z] [world] You break the cold spring apart. Among the pieces, something worth keeping.\n[2026-09-02T22:37:47.855Z] [world] You salvage the half-buried wagon. The take is small but real.\n[2026-09-02T22:37:47.855Z] [world] You break the old stake apart. Among the pieces, something worth keeping.\n",
+      "[2026-09-02T22:37:47.855Z] [world] You work the shattered buried market row rooftop over. A part of it comes loose, intact.\n[2026-09-02T22:37:47.856Z] [reward] \u2726 Salvage haul:\n[2026-09-02T22:37:47.856Z] [reward]     \u2022 Scrap Metal (Common)\n[2026-09-02T22:37:47.856Z] [reward]     \u2022 Worn Tartarian Coin x9 (Common)\n[2026-09-02T22:37:47.856Z] [reward]     \u2022 Bent Nail x3 (Common)\n",
+      "[2026-09-02T22:37:48.202Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 10615ms read 9435ms/write 1117ms in 761t\u2192out 33t 12.4ms/t HIT-CAP (156ch)\n[2026-09-02T22:37:48.610Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 10615ms \u2014 intro-fill:action-opener\n[2026-09-02T22:37:48.611Z] [debug] homework: scene_intro \"The Storm's Eye\" \u2713 11034ms\n",
+      "[2026-09-02T22:37:49.676Z] [debug] ui: tap \"investigate\"\n[2026-09-02T22:37:51.289Z] [player] investigate the ground\n[2026-09-02T22:37:51.289Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n[2026-09-02T22:37:51.290Z] [world] Something shifted while you were turned away \u2014 a Gutter Rat breaks cover, fast and low. (range: close)\n",
+      "[2026-09-02T22:37:51.290Z] [combat] Gutter Rat \u2014 Bite ready, 1D6 damage on a hit.\n[2026-09-02T22:37:51.290Z] [debug] enemy: Gutter Rat hp=8 ac=7 atk=Bite dmg=1D6 rarity=Common ap=2\n[2026-09-02T22:37:51.649Z] [cognitive] CLIMB  (358ms)\n[2026-09-02T22:37:52.745Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=cached winH=986 beat=-\n",
+      "[2026-09-02T22:37:53.494Z] [debug] kbbar: mounted bottom=359.79486083984375 raw=360 from=live winH=986 beat=-\n[2026-09-02T22:38:06.693Z] [player] even crafting repopulates loot on a tile\n[2026-09-02T22:38:06.694Z] [debug] parser: intent=craft conf=1.00 verb=craft target=repopulates loot tile resolved=- range=mid enemies=1 hooks=1\n",
+      "[2026-09-02T22:38:06.700Z] [debug] arbiter: template (reason=combat)\n[2026-09-02T22:38:06.700Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-02T22:38:07.366Z] [cognitive] neutral  (664ms)\n[2026-09-02T22:38:08.779Z] [arbiter] The Arbiter shakes their head. \"I do not know that recipe. Try 'craft' alone \u2014 I will tell you what your pack can become.\"\n",
+      "[2026-09-02T22:38:09.494Z] [debug] ui: tap \"flee\"\n[2026-09-02T22:38:09.503Z] [player] flee\n[2026-09-02T22:38:09.504Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=mid enemies=1 hooks=1\n[2026-09-02T22:38:09.590Z] [system] \u23f3 Time passed: 15 min\n[2026-09-02T22:38:09.894Z] [cognitive] FEAR \u00b7 RETREAT \u00b7 HIDE  (304ms)\n",
+      "[2026-09-02T22:38:11.941Z] [debug] skillcheck: escape d20=20 DEX 22 = 42 vs Pursuit 23 \u2014 Gutter Rat (d20 19 + SPD 4) \u2192 PASS\n[2026-09-02T22:38:12.006Z] [debug] stats: STR16 DEX23 INT12 WIS14 CHA10 STE7 | gear: WIS+4,INT+3,DEX+12,STR+5,STE+2 | worn: main=Auralite Talon off=Choir-Bound Launcher head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves f",
+      "eet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n[2026-09-02T22:38:12.007Z] [debug] train: dexterity (escape check) \u2192 progress 66/100\n[2026-09-02T22:38:12.007Z] [world] You get your legs under you and go, and it does not follow far.\n[2026-09-02T22:38:14.060Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n",
+      "[2026-09-02T22:38:14.080Z] [debug] spawn: gear=[Architect's Aetheric Boots, Seer's Veil of the Aether, Architect's Grip] window=10 roster=new\n[2026-09-02T22:38:14.08"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-02-1634-the-aside-yields #mtkt5bixx0qy [inline 4/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtkt5bixx0qy"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-02-1634-the-aside-yields"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "4"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-02-1634-the-aside-yields"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-03T00:49:37.593337Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-03T00:49:38.478000Z",
+  "fingerprints": [
+    "5aded2c019dbb942ee2fb78521913f1f"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1951802238,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-02T23:57:57.073000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-02-1634-the-aside-yields",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-02-1634-the-aside-yields",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-02-1634-the-aside-yields",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-02-1634-the-aside-yields)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "dacc340c124e4eb7a222f2e4f9411cfc",
+  "previousEventID": "c5fecb733dd647a88e1a7362b29bb2fb"
+}

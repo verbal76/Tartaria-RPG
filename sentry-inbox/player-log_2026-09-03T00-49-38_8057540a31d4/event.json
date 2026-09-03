@@ -1,0 +1,297 @@
+{
+  "id": "8057540a31d440fea88b56c43e9b2fb5",
+  "groupID": "7708462105",
+  "eventID": "8057540a31d440fea88b56c43e9b2fb5",
+  "projectID": "4511945117532160",
+  "size": 17170,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-02-1634-the-aside-yields #mtkt5bixx0qy [inline 23/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-02-1634-the-aside-yields",
+  "message": "player-log 2026-09-02-1634-the-aside-yields #mtkt5bixx0qy [inline 23/28]",
+  "title": "player-log 2026-09-02-1634-the-aside-yields #mtkt5bixx0qy [inline 23/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "f94496531ea14f0b83cffba1544512dd",
+      "span_id": "bc6c018144b40558",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "range=- enemies=0 hooks=3\n[2026-09-03T00:38:20.551Z] [reward] \u2726 Crafted Amulet of the Silt Warden. The Arbiter watches you set the last piece.\n[2026-09-03T00:38:20.551Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-03T00:38:20.551Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T00:38:20.661Z] [cognitive] USE_ITEM \u00b7 SEARCH  (109ms)\n",
+      "[2026-09-03T00:38:42.408Z] [player] craft Corruption Tonic\n[2026-09-03T00:38:42.409Z] [debug] parser: intent=craft conf=1.00 verb=craft target=corruption tonic resolved=Corruption Tonic range=- enemies=0 hooks=3\n[2026-09-03T00:38:42.549Z] [reward] \u2726 Crafted Corruption Tonic \u00d74. The Arbiter watches you set the last piece.\n[2026-09-03T00:38:42.653Z] [cognitive] neutral  (103ms)\n",
+      "[2026-09-03T00:38:51.562Z] [player] craft Frost Paste\n[2026-09-03T00:38:51.563Z] [debug] parser: intent=craft conf=1.00 verb=craft target=frost paste resolved=Frost Paste range=- enemies=0 hooks=3\n[2026-09-03T00:38:51.877Z] [reward] \u2726 Crafted Frost Paste \u00d79. The Arbiter watches you set the last piece.\n[2026-09-03T00:38:51.877Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-09-03T00:38:51.877Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T00:38:51.976Z] [cognitive] neutral  (98ms)\n[2026-09-03T00:38:55.094Z] [player] craft Incendiary Paste\n[2026-09-03T00:38:55.094Z] [debug] parser: intent=craft conf=1.00 verb=craft target=incendiary paste resolved=Incendiary Paste range=- enemies=0 hooks=3\n",
+      "[2026-09-03T00:38:55.097Z] [reward] \u2726 Crafted Incendiary Paste. The Arbiter watches you set the last piece.\n[2026-09-03T00:38:55.220Z] [cognitive] neutral  (122ms)\n[2026-09-03T00:39:01.229Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n[2026-09-03T00:39:01.248Z] [debug] spawn: gear=[Bonebreaker Mace] window=10 roster=new\n",
+      "[2026-09-03T00:39:01.249Z] [world] You walk east through open silt. The compass points east into open ground.\n[2026-09-03T00:39:01.251Z] [world] Your shadow falls across a glimmer in the ground. You stoop to lift it.\n[2026-09-03T00:39:01.251Z] [reward] \u2726 Aether Residue (Common).\n",
+      "[2026-09-03T00:39:01.252Z] [world] An Aetheric construct lies half-toppled in the mud, one arm still flexing weakly, its core dim but unbroken.\n[2026-09-03T00:39:02.931Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T00:39:04.217Z] [world] The Bonebreaker Mace is heavier than it looks. Most things down here are.\n[2026-09-03T00:39:04.218Z] [reward] \u2726 Bonebreaker Mace (Common).\n",
+      "[2026-09-03T00:39:05.294Z] [world] You strip the abandoned skiff carefully. Something usable comes free in your hand.\n[2026-09-03T00:39:05.294Z] [world] You break the anemone bloom apart. Among the pieces, something worth keeping.\n[2026-09-03T00:39:05.294Z] [world] You break the broken net apart. Among the pieces, something worth keeping.\n",
+      "[2026-09-03T00:39:05.295Z] [world] You salvage the hermit crab. The take is small but real.\n[2026-09-03T00:39:05.295Z] [world] You strip the seaweed mass down. Mostly debris \u2014 but a Smooth Stone comes loose at the bottom of the pile.\n[2026-09-03T00:39:05.297Z] [world] You work the standing water over. A part of it comes loose, intact.\n",
+      "[Filtered]",
+      "[2026-09-03T00:39:05.297Z] [reward]     \u2022 Smooth Stone (Common)\n[2026-09-03T00:39:05.297Z] [reward]     \u2022 Dried Tendon Coil (Common)\n[2026-09-03T00:39:06.646Z] [debug] ui: tap \"investigate\"\n[2026-09-03T00:39:08.437Z] [player] investigate the ground\n[2026-09-03T00:39:08.438Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=4\n",
+      "[2026-09-03T00:39:08.441Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Wild Onion (Common).\n[2026-09-03T00:39:08.442Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-03T00:39:08.442Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T00:39:08.442Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T00:39:08.642Z] [cognitive] CLIMB  (199ms)\n",
+      "[2026-09-03T00:39:08.882Z] [debug] persist sizes(KB): total=302 player=72 wm=145[rooms=76 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=82 scene=4\n[2026-09-03T00:39:09.865Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n[2026-09-03T00:39:09.882Z] [debug] spawn: gear=[Shaman's Warden Gloves, Aetheric Touch, Architect's Outer Mantle] window=10 roster=new\n",
+      "[2026-09-03T00:39:09.884Z] [world] You walk south through open silt. The compass points south into open ground.\n[2026-09-03T00:39:09.885Z] [world] Dust has settled on it and settled evenly. Nothing disturbed it.\n[2026-09-03T00:39:14.024Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T00:39:15.093Z] [world] The Aetheric Touch is lighter than it looks, which is its own kind of warning.\n",
+      "[2026-09-03T00:39:15.093Z] [reward] \u2726 Aetheric Touch (Common).\n[2026-09-03T00:39:15.112Z] [world] The Architect's Outer Mantle is cold through your glove.\n[2026-09-03T00:39:15.112Z] [reward] \u2726 Architect's Outer Mantle (Common).\n[2026-09-03T00:39:15.113Z] [world] The Shaman's Warden Gloves fits the hand better than it has any right to.\n",
+      "[Filtered]",
+      "[Filtered]",
+      "[2026-09-03T00:39:16.125Z] [reward] \u2726 Salvage haul:\n[2026-09-03T00:39:16.126Z] [reward]     \u2022 Yellowed Tusk Stub (Common)\n[2026-09-03T00:39:16.126Z] [reward]     \u2022 Bone Sliver (Common)\n[2026-09-03T00:39:16.126Z] [reward]     \u2022 Obsidian Chip (Common)\n[2026-09-03T00:39:16.126Z] [reward]     \u2022 Worn Tartarian Coin (Common)\n[2026-09-03T00:39:16.126Z] [reward]     \u2022 Knotted Sinew Braid (Common)\n",
+      "[2026-09-03T00:39:27.480Z] [debug] ui: tap \"investigate\"\n[2026-09-03T00:39:32.561Z] [world] A silent bolt strikes near enough to singe your sleeve. (\u22121 HP)\n[2026-09-03T00:39:32.585Z] [player] investigate the ground\n[2026-09-03T00:39:32.585Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=4\n",
+      "[2026-09-03T00:39:32.589Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Wild Oats (Common).\n[2026-09-03T00:39:32.598Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T00:39:32.796Z] [cognitive] CLIMB  (197ms)\n[2026-09-03T00:39:34.032Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n[2026-09-03T00:39:34.056Z] [debug] spawn: gear=[Reclaimer's Cloak, Salvager's Trench Coat] window=10 roster=new\n",
+      "[2026-09-03T00:39:34.058Z] [world] Riska Panhandle grins. \"Cheddar Bob. Sit a minute. The road's been generous or it hasn't \u2014 which is it?\"\n[2026-09-03T00:39:34.058Z] [world] Riska Panhandle looks you over. \"It's been a long stretch, Cheddar Bob. I'd started asking after you.\"\n",
+      "[2026-09-03T00:39:34.059Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Riska Panhandle, wandering trader. Tap the vendor banner to trade.\n[2026-09-03T00:39:34.067Z] [world] This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n",
+      "[2026-09-03T00:39:34.068Z] [world] You walk east through open silt. The compass points east into open ground.\n[2026-09-03T00:39:34.069Z] [world] The damp has been at it and got no further than it had.\n[2026-09-03T00:39:35.113Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T00:39:38.896Z] [world] You work the nest over. A part of it comes loose, intact.\n",
+      "[2026-09-03T00:39:38.896Z] [world] You break the sea-glass shard apart. Among the pieces, something worth keeping.\n[2026-09-03T00:39:38.896Z] [world] You break the standing water apart. Among the pieces, something worth keeping.\n[2026-09-03T00:39:38.897Z] [world] You lever something loose from the tide line \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n",
+      "[2026-09-03T00:39:38.897Z] [reward] \u2726 Salvage haul:\n[2026-09-03T00:39:38.897Z] [reward]     \u2022 Bone Sliver (Common)\n[2026-09-03T00:39:38.898Z] [reward]     \u2022 Worn Tartarian Coin x6 (Common)\n[2026-09-03T00:39:38.898Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-09-03T00:39:38.898Z] [reward]     \u2022 Charred Twig Bundle (Common)\n[2026-09-03T00:39:40.299Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-09-03T00:39:41.847Z] [player] investigate the ground\n[2026-09-03T00:39:41.847Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=4\n[2026-09-03T00:39:41.850Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Patched Cloth (Common).\n[2026-09-03T00:39:41.862Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-09-03T00:39:41.862Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T00:39:41.862Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T00:39:42.075Z] [cognitive] CLIMB  (211ms)\n[2026-09-03T00:39:54.914Z] [debug] persist sizes(KB): total=303 player=73 wm=144[rooms=76 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=82 scene=4\n",
+      "[2026-09-03T00:39:58.851Z] [reward] Bought 4\u00d7 Wild Lettuce from Riska Panhandle for 16 TC. (3007 TC left)\n[2026-09-03T00:40:04.129Z] [reward] Bought 2\u00d7 Wild Onion from Riska Panhandle for 6 TC. (3001 TC left)\n[2026-09-03T00:40:06.180Z] [reward] Bought 5\u00d7 Smoke-Cured Jerky Strip from Riska Panhandle for 40 TC. (2961 TC left)\n[2026-09-03T00:40:09.850Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n",
+      "[2026-09-03T00:40:09.877Z] [debug] spawn: gear=[Mud Darts, Dust Cloud] window=10 roster=new\n[2026-09-03T00:40:09.879Z] [world] You walk south through open silt. The compass tells you The Vault Steps lies further south \u2014 3 tiles, about 8 hours of travel.\n[2026-09-03T00:40:09.879Z] [world] Whatever the wind has done out there, it has not come in here.\n",
+      "[2026-09-03T00:40:10.954Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T00:40:12.473Z] [world] You turn the Dust Cloud over once, then keep it.\n[2026-09-03T00:40:12.475Z] [reward] \u2726 Dust Cloud (Common).\n[2026-09-03T00:40:15.453Z] [world] You salvage the anemone bloom. The take is small but real.\n",
+      "[2026-09-03T00:40:15.453Z] [world] Tucked inside the fisher's net: an oddment that matches no quartermaster's list. The kind of thing that fuses well.\n[2026-09-03T00:40:15.453Z] [world] You break the fisherman's lantern apart. Among the pieces, something worth keeping.\n[2026-09-03T00:40:15.454Z] [world] You salvage the sea-glass shard. The take is small but real.\n",
+      "[2026-09-03T00:40:15.454Z] [world] You break the standing water apart. Among the pieces, something worth keeping.\n[2026-09-03T00:40:15.454Z] [world] You salvage the tide line. The take is small but real.\n[2026-09-03T00:40:15.455Z] [reward] \u2726 Salvage haul:\n[2026-09-03T00:40:15.455Z] [reward]     \u2022 Spider Silk x2 (Common)\n[2026-09-03T00:40:15.455Z] [reward]     \u2022 Web-Silk Wadding (Common)\n",
+      "[2026-09-03T00:40:15.455Z] [reward]     \u2022 Aetheric Torch (Common)\n[2026-09-03T00:40:15.456Z] [reward]     \u2022 Scrap Metal x3 (Common)\n[2026-09-03T00:40:15.456Z] [reward]     \u2022 Mud Fragment x3 (Common)\n[2026-09-03T00:40:15.456Z] [reward]     \u2022 Cloth Scrap x2 (Common)\n[2026-09-03T00:40:21.768Z] [debug] ui: tap \"rest\"\n[2026-09-03T00:40:21.777Z] [player] rest\n",
+      "[2026-09-03T00:40:21.777Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=4\n[2026-09-03T00:40:21.779Z] [world] Mercy turns twice, thinks about a third, and drops where she stands.\n[2026-09-03T00:40:21.780Z] [world] You rest for 8 hours. +8 HP, +8 stamina recovered. (Day 57, evening)\n[2026-09-03T00:40:21.793Z] [system] \u23f3 Time passed: 8h\n",
+      "[2026-09-03T00:40:21.980Z] [cognitive] REST  (187ms)\n[2026-09-03T00:40:22.719Z] [debug] ui: tap \"investigate\"\n[2026-09-03T00:40:24.189Z] [player] investigate the ground\n[2026-09-03T00:40:24.190Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=4\n",
+      "[2026-09-03T00:40:24.194Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Wild Carrot (Common).\n[2026-09-03T00:40:24.202Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T00:40:24.407Z] [cognitive] CLIMB  (204ms)\n[2026-09-03T00:40:24.829Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n[2026-09-03T00:40:24.835Z] [debug] spawn: gear=[Cloak of the Mud Shaman] window=10 roster=new\n",
+      "[2026-09-03T00:40:24.836Z] [world] Duvo Saltbeard glances up. \"You again.\" Not warm, not cold \u2014 noted.\n[2026-09-03T00:40:24.836Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Duvo Saltbeard, wandering trader. Tap the vendor banner to trade.\n[2026-09-03T00:40:24.843Z] [world] This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n",
+      "[2026-09-03T00:40:24.843Z] [world] You walk east through open silt. The compass points east into open ground.\n[2026-09-03T00:40:24.844Z] [world] Nothing about the place has anything to add.\n[2026-09-03T00:40:25.080Z] [debug] persist sizes(KB): total=304 player=73 wm=145[rooms=76 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=82 scene=4\n",
+      "[2026-09-03T00:40:25.988Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T00:40:27.154Z] [world] You strip the anemone bloom down. Mostly debris \u2014 but a Cloth Scrap comes loose at the bottom of the pile.\n[2026-09-03T00:40:27.155Z] [world] You work the broken net apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n",
+      "[2026-09-03T00:40:27.155Z] [world] You scavenge the crab claw thoroughly. One Smooth Stone survives the sorting.\n[2026-09-03T00:40:27.155Z] [world] You break the hermit crab apart. Among the pieces, something worth keeping.\n[2026-09-03T00:40:27.156Z] [world] You work the rock over. A part of it comes loose, intact.\n",
+      "[2026-09-03T00:40:27.156Z] [world] You salvage the sea-glass shard. The take is small but real.\n[2026-09-03T00:40:27.156Z] [world] You break the standing water apart. Among the pieces, something worth keeping.\n[2026-09-03T00:40:27.156Z] [reward] \u2726 Salvage haul:\n[2026-09-03T00:40:27.157Z] [reward]     \u2022 Cloth Scrap (Common)\n[2026-09-03T00:40:27.157Z] [reward]     \u2022 Corroded Hinge Set (Common)\n",
+      "[2026-09-03T00:40:27.157Z] [reward]     \u2022 Smooth Stone x3 (Common)\n[2026-09-03T00:40:27.157Z] [reward]     \u2022 Aether Crystal x2 (Common)\n[2026-09-03T00:40:27.158Z] [reward]     \u2022 Scrap Metal x2 (Common)\n[2026-09-03T00:40:28.554Z] [debug] ui: tap \"i"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-02-1634-the-aside-yields #mtkt5bixx0qy [inline 23/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtkt5bixx0qy"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-02-1634-the-aside-yields"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "23"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-02-1634-the-aside-yields"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-03T00:49:37.750881Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "15": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 325,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        },
+        "16": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 385,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        },
+        "9": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 397,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-03T00:49:38.484000Z",
+  "fingerprints": [
+    "5aded2c019dbb942ee2fb78521913f1f"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1951802238,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-02T23:57:57.073000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-02-1634-the-aside-yields",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-02-1634-the-aside-yields",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-02-1634-the-aside-yields",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-02-1634-the-aside-yields)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "887a7eeb1e62431d9e6599ebd1f62c78",
+  "previousEventID": "73b7c64842e34291a51e395577926623"
+}

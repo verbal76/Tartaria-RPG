@@ -1,0 +1,258 @@
+{
+  "id": "46edd5da738c4d169933581a675356a5",
+  "groupID": "7708462105",
+  "eventID": "46edd5da738c4d169933581a675356a5",
+  "projectID": "4511945117532160",
+  "size": 17771,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-02-1634-the-aside-yields #mtkrb966ae71 [inline 18/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-02-1634-the-aside-yields",
+  "message": "player-log 2026-09-02-1634-the-aside-yields #mtkrb966ae71 [inline 18/28]",
+  "title": "player-log 2026-09-02-1634-the-aside-yields #mtkrb966ae71 [inline 18/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "f94496531ea14f0b83cffba1544512dd",
+      "span_id": "bc6c018144b40558",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      ":46.010Z] [reward] \u2726 Salvage haul:\n[2026-09-02T01:41:46.010Z] [reward]     \u2022 Bone Sliver (Common)\n[2026-09-02T01:41:46.010Z] [reward]     \u2022 Bent Nail x4 (Common)\n[2026-09-02T01:41:46.010Z] [reward]     \u2022 Aether Crystal x2 (Common)\n[2026-09-02T01:41:49.455Z] [player] investigate Flame of Aether\n",
+      "[2026-09-02T01:41:49.456Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=flame aether resolved=Flame of Aether range=- enemies=0 hooks=1\n[2026-09-02T01:41:49.456Z] [debug] route: hook intercept (kind=pulsing_mud, target=\"flame of aether\") \u2014 original intent=investigate\n",
+      "[2026-09-02T01:41:49.457Z] [world] \u2605 STORY THREAD (step 1) \u2014 You step toward the glow. The mud is warm against your boot \u2014 an Aetherstone deposit, surface-thin but real.\n[2026-09-02T01:42:03.220Z] [reward] Bought 4\u00d7 Blue Cap Mushroom from Teska Nightweigh for 24 TC. (290 TC left)\n[2026-09-02T01:42:03.221Z] [reward] They don't charge a friend full price \u2014 4 TC stayed in your pouch.\n",
+      "[2026-09-02T01:42:05.521Z] [reward] Bought 3\u00d7 Red Cap Mushroom from Teska Nightweigh for 24 TC. (266 TC left)\n[2026-09-02T01:42:08.812Z] [debug] homework: intro-fill armed after 6765ms idle (strike 2/3)\n[2026-09-02T01:42:19.728Z] [debug] persist sizes(KB): total=283 player=70 wm=128[rooms=62 events=5 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=82 scene=3\n",
+      "[2026-09-02T01:42:20.894Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 12077ms read 10902ms/write 1104ms in 788t\u2192out 33t 13.8ms/t HIT-CAP (162ch)\n[2026-09-02T01:42:20.898Z] [debug] homework: scene_intro \"The Hidden Market\" \u2713 12088ms\n[2026-09-02T01:42:33.699Z] [reward] Sold Bone Crossbow (Uncommon) to Teska Nightweigh for 33 TC. (299 TC on hand)\n",
+      "[2026-09-02T01:42:33.767Z] [reward] Sold Bone Crossbow (Uncommon) to Teska Nightweigh for 33 TC. (332 TC on hand)\n[2026-09-02T01:42:33.824Z] [reward] Sold Bone Crossbow (Uncommon) to Teska Nightweigh for 33 TC. (365 TC on hand)\n[2026-09-02T01:42:33.882Z] [reward] Sold Bone Crossbow (Uncommon) to Teska Nightweigh for 33 TC. (398 TC on hand)\n",
+      "[2026-09-02T01:42:41.096Z] [reward] Bought Magnetic Axe from Teska Nightweigh for 378 TC. (20 TC left)\n[2026-09-02T01:42:41.096Z] [reward] They don't charge a friend full price \u2014 20 TC stayed in your pouch.\n[2026-09-02T01:42:45.436Z] [debug] ui: tap \"\u2192 CRADLE OF DUSK\"\n[2026-09-02T01:42:45.460Z] [debug] spawn: gear=[Architect's Outer Mantle, Magnetized Rod, Mud Long Axe] window=10 roster=new\n",
+      "[2026-09-02T01:42:45.461Z] [world] You walk west through open silt. The compass points west into open ground.\n[2026-09-02T01:42:45.462Z] [world] A Reclaimer dig site, abandoned mid-excavation. The shoring is still up. The ladder still works. A cot at the rim has a half-eaten meal on it. The hole goes down twenty feet and ends in a stone floor that was not supposed to be there. The Reclaimers found",
+      " something. They did not come back up to write the report.\n[2026-09-02T01:42:45.462Z] [world] A last entry in a Reclaimer's careful hand, on a page pinned under a rock: 'The stone is warm. The stone is breathing. We are going back down. If we do not return, please tell the Guild that we found it, and that it is awake.'\n[2026-09-02T01:42:45.463Z] [reward] \u2726 Recovered Trail Rations x2.\n",
+      "[2026-09-02T01:42:45.475Z] [world] Nothing about the place has anything to add.\n[2026-09-02T01:42:46.784Z] [debug] ui: tap \"take / salvage\"\n[2026-09-02T01:42:47.853Z] [world] You work the Magnetized Rod loose from where the mud had it.\n[2026-09-02T01:42:47.854Z] [reward] \u2726 Magnetized Rod (Common).\n",
+      "[Filtered]",
+      "[2026-09-02T01:42:48.988Z] [world] You lever something loose from the wares \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n[2026-09-02T01:42:48.989Z] [reward] \u2726 Salvage haul:\n[2026-09-02T01:42:48.989Z] [reward]     \u2022 Hollow Quill Sheaf (Uncommon)\n[2026-09-02T01:42:48.989Z] [reward]     \u2022 Charred Twig Bundle (Common)\n",
+      "[2026-09-02T01:42:51.237Z] [player] investigate weathered aether-tether grapple point\n[2026-09-02T01:42:51.238Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=weathered aether tether grapple point resolved=weathered aether-tether grapple point range=- enemies=0 hooks=1\n",
+      "[2026-09-02T01:42:51.238Z] [debug] route: hook intercept (kind=pulsing_mud, target=\"weathered aether-tether grapple point\") \u2014 original intent=investigate\n[2026-09-02T01:42:51.240Z] [world] \u2605\u2605 STORY THREAD COMPLETE \u2014 You pry the deposit out of the silt. A few good shards, dense and humming, plus a thumb-sized core.\n",
+      "[2026-09-02T01:42:51.242Z] [reward] \u2726 Aetheric Shard, Aetheric Shard, Aether Crystal.\n[2026-09-02T01:42:55.438Z] [debug] ui: tap \"investigate\"\n[2026-09-02T01:42:58.887Z] [debug] homework: intro-fill armed after 7320ms idle\n[2026-09-02T01:42:59.903Z] [debug] ui: tap \"take / salvage\"\n[2026-09-02T01:42:59.906Z] [world] Nothing here to take or pry apart. The room is picked clean.\n",
+      "[2026-09-02T01:43:01.571Z] [debug] ui: tap \"\u2192 CRADLE OF DUSK\"\n[2026-09-02T01:43:01.593Z] [world] You walk north. You arrive at Cradle of Dusk.\n[2026-09-02T01:43:01.594Z] [debug] scene: loc=cradle_of_dusk hub=- arrival=y opening=n passing=n\n[2026-09-02T01:43:01.595Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-02T01:43:01.595Z] [debug] missions: hunt:hunt_bog_dragon stage 1/7 [investigate] @cradle_of_dusk HERE gives=Obsidian-Edged Scale\n[2026-09-02T01:43:01.595Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n",
+      "[2026-09-02T01:43:01.595Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n[2026-09-02T01:43:01.596Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n",
+      "[2026-09-02T01:43:01.596Z] [debug] missions: \u00b7 at=cradle_of_dusk travelTo=cradle_of_dusk\n[2026-09-02T01:43:01.596Z] [world] \u25b8 The Bog Dragon of Old Drakova: this is the place \u2014 search this ground.\n[2026-09-02T01:43:01.723Z] [debug] spawn: gear=[Rail Saber] window=10 roster=new\n",
+      "[2026-09-02T01:43:01.751Z] [arbiter] The Arbiter takes you in. \"Cradle of Dusk is lethal country. The things that wake here pull above your weight. 43 HP carries you through Varakush (danger 1). 1/9 Cores recovered. Visit the remaining Lost Capitals. Or move on until you've got your legs under you.\"\n",
+      "[2026-09-02T01:43:01.756Z] [world] You've left The Hidden Market and entered Cradle of Dusk. The sky here is bruised with old Aether. It glows at hours that are not dusk. It's dawn. Ovik the Patient is the only soul in sight. east leads to The Slack Flats. Nothing named to the north or south or west.\n[2026-09-02T01:43:01.757Z] [system] Weather effect \u2014 Whisper Fog: -1 WIS\n",
+      "[2026-09-02T01:43:01.761Z] [world] [Cradle of Dusk] north: Garrin (return the folio) (17 tiles, 1 day, 19 hours) \u00b7 east: The Slack Flats (1 tile, 3 hours) \u00b7 south: The Parley Ground (5 tiles, 13 hours) \u00b7 west: Giant-Watch Shrine (5 tiles, 13 hours)\n",
+      "[2026-09-02T01:43:01.761Z] [world] A figure crests the rise \u2014 Ovik the Patient, wandering trader, pack heavy across the shoulders. They set down to trade.\n[2026-09-02T01:43:01.761Z] [arbiter] The Arbiter inclines their head toward the newcomer. \"Ovik the Patient, wandering trader. A stall thrown together from cart-boards and tarpaulin. Smells of stew and damp wool. The hawker watches the road with",
+      " one eye and the merchandise with the other.\"\n[2026-09-02T01:43:01.768Z] [world] Rare workings for sale: Aether-Seeker's Hood (200 TC), Aetherforged Gauntlets (200 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n",
+      "[2026-09-02T01:43:02.110Z] [debug] persist sizes(KB): total=295 player=70 wm=139[rooms=73 events=5 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=83 scene=3\n[2026-09-02T01:43:02.548Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 3505ms read 0ms/write 0ms in 796t\u2192out 0t (0ch)\n[2026-09-02T01:43:02.713Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 3505ms \u2014 intro-fill:\u2205\n",
+      "[2026-09-02T01:43:02.713Z] [debug] homework: scene_intro \"The Hidden Market\" \u2205 3826ms\n[2026-09-02T01:43:20.376Z] [debug] ui: tap \"missions\"\n[2026-09-02T01:43:31.030Z] [debug] ui: tap \"look around you\"\n[2026-09-02T01:43:31.033Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.\n[2026-09-02T01:43:31.034Z] [player] look\n",
+      "[2026-09-02T01:43:31.035Z] [debug] parser: intent=investigate conf=1.00 verb=look target=- resolved=- range=- enemies=0 hooks=0\n[2026-09-02T01:43:31.036Z] [world] Something shifted while you were turned away \u2014 a Gutter Rat breaks cover, fast and low. (range: close)\n[2026-09-02T01:43:31.036Z] [combat] Gutter Rat \u2014 Bite ready, 1D6 damage on a hit.\n",
+      "[2026-09-02T01:43:31.036Z] [debug] enemy: Gutter Rat hp=8 ac=7 atk=Bite dmg=1D6 rarity=Common ap=2\n[2026-09-02T01:43:31.348Z] [world] Out in the Cradle of Dusk a wing-shadow crosses you, and over the next rise you find what it left: a goat torn open, three obsidian-edged scales steaming in the silt. You work one free. It is heavier than it looks and still warm. The Dragon knows there are eyes here",
+      " now.\n[2026-09-02T01:43:31.349Z] [reward] \u2726 Obsidian-Edged Scale \u2014 mission item.\n[2026-09-02T01:43:31.349Z] [system] \u25b8 Next: The Monarch's Waystation \u00b7 find Old Mira \u00b7 bring Reeve's Brass Token.\n[2026-09-02T01:43:31.351Z] [world] You set course for The Monarch's Waystation. 21 tiles \u2014 about 2 days, 5 hours of travel, all in. You set off now \u2014 the ground ahead is new ground. Keep tapping \u2192 THE MONA",
+      "RCH'S WAYSTATION on the travel row to close the distance; STOP TRAVEL to halt.\n[2026-09-02T01:43:31.355Z] [debug] spawn: gear=[Sentinel's Mobile Greaves, Arcane Sprinter's Boots] window=10 roster=new\n[2026-09-02T01:43:31.355Z] [world] You walk west through open silt. The compass points west into open ground.\n",
+      "[2026-09-02T01:43:31.356Z] [world] Half a Tartarian spire juts from the mud like the bone of a long-dead beast, the top three storeys still defiant.\n[2026-09-02T01:43:31.356Z] [world] Auto-routing to the next stage of The Bog Dragon of Old Drakova: The Monarch's Waystation.\n[2026-09-02T01:43:31.682Z] [cognitive] neutral  (319ms)\n[2026-09-02T01:43:47.466Z] [debug] ui: tap \"approach\"\n",
+      "[2026-09-02T01:43:47.507Z] [player] approach Gutter Rat\n[2026-09-02T01:43:47.507Z] [debug] parser: intent=advance conf=1.00 verb=approach target=gutter rat resolved=Gutter Rat range=mid enemies=1 hooks=1\n[2026-09-02T01:43:47.509Z] [debug] move: advance from range=mid enemies=1 weather=Whisper Fog cost=1 partial=0\n",
+      "[2026-09-02T01:43:47.509Z] [debug] move: field advance target=Gutter Rat d 1.50->0.50 band mid->close\n[2026-09-02T01:43:47.509Z] [world] You close the gap with Gutter Rat. (range: close / arm's reach)\n[2026-09-02T01:43:47.511Z] [combat] Gutter Rat \u2014 d20 \u2192 1 + ATK 3 = 4 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 FUMBLE\n[2026-09-02T01:43:47.834Z] [cognitive] neutral  (322ms)\n",
+      "[2026-09-02T01:43:49.146Z] [debug] ui: tap \"dodge\"\n[2026-09-02T01:43:49.148Z] [player] dodge\n[2026-09-02T01:43:49.149Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=1\n",
+      "[2026-09-02T01:43:49.149Z] [world] You commit to the dodge. Slip Gutter Rat's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-02T01:43:49.211Z] [combat] Gutter Rat \u2014 d20 \u2192 5 + ATK 3 = 8 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n",
+      "[2026-09-02T01:43:49.211Z] [combat] Dodge \u2014 d20 \u2192 8 + DEX 23 = 31 vs ATK 8. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-02T01:43:49.213Z] [debug] arbiter: template (reason=combat)\n[2026-09-02T01:43:49.213Z] [arbiter] The Arbiter eyes the gutter rat without concern. \"It's bigger. Bigger falls harder.\"\n[2026-09-02T01:43:49.214Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-02T01:43:49.517Z] [cognitive] neutral  (302ms)\n[2026-09-02T01:43:50.636Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n[2026-09-02T01:43:50.654Z] [player] attack with the auralite talon\n[2026-09-02T01:43:50.654Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=1 hooks=1\n",
+      "[2026-09-02T01:43:50.655Z] [debug] attack: target=Gutter Rat range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n[2026-09-02T01:43:50.656Z] [arbiter] Whisper Fog hangs between you. \"\u22121 to the swing \u2014 see what you can,\" the Arbiter says.\n[2026-09-02T01:43:50.656Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n",
+      "[2026-09-02T01:43:50.657Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-02T01:43:50.719Z] [world] You bring the acid-etched corrupted auralite talon to bear on Gutter Rat.\n[2026-09-02T01:43:50.719Z] [system] \u23f3 Time passed: 6 min\n[2026-09-02T01:43:51.013Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (293ms)\n",
+      "[2026-09-02T01:43:59.957Z] [world] You seize the initiative. Gutter Rat has no time to react.\n[2026-09-02T01:43:59.957Z] [combat] You \u2014 d20 \u2192 15 + INT 12 \u2212 1 (Whisper Fog) perfect opening (2\u00d7 dice) = 26 vs Gutter Rat AC 7 \u2014 \u2713 HIT\n[2026-09-02T01:43:59.958Z] [combat] Gutter Rat folds under the acid-etched corrupted auralite talon. 14 damage was enough. The room exhales.\n",
+      "[2026-09-02T01:43:59.959Z] [reward] Gutter Rat defeated. You recover Rat Fur.\n[2026-09-02T01:43:59.960Z] [reward] +9 TC pried from the dust.\n[2026-09-02T01:44:00.014Z] [arbiter] The Arbiter eyes your new pieces. \"You could make a Reclaimer's Boots now, if you wanted.\"\n[2026-09-02T01:44:03.925Z] [debug] homework: intro-fill armed after 7138ms idle\n",
+      "[2026-09-02T01:44:06.221Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=360 from=cached winH=986 beat=-\n[2026-09-02T01:44:06.756Z] [debug] kbbar: mounted bottom=359.79486083984375 raw=360 from=live winH=986 beat=-\n",
+      "[2026-09-02T01:44:11.003Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 6890ms read/write unusable (native mis-reported 70307ms/1620ms \u2014 llama.rn split bug, not this call) in 747t\u2192out 33t HIT-CAP (169ch)\n",
+      "[2026-09-02T01:44:11.011Z] [debug] qwen\u23f1 stats \u2014 narration:scene_intro_fill n17 avg5.8s max12.1s read6.5s/write1.0s \u26a09unusable in748t\u2192out20t ms/tok 4.3-13.8 cap10 \u23f86 \u270210/45.0s | investigate_lore n7 avg2.8s max5.5s read0.3s/write1.2s \u26a04unusable in127t\u2192out35t ms/tok 2.3-2.4 wait0.6s | narration:scene_intro n2 avg10.8s max12.6s read7.7s/write3.1s in779t\u2192out17t ms/tok 8.2-11.6 cap1 \u23f81 \u27022/21.6s | ambie",
+      "nt n2 avg5.9s max8.2s read2.5s/write2.0s in365t\u2192out31t ms/tok 6.9-6.9"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-02-1634-the-aside-yields #mtkrb966ae71 [inline 18/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtkrb966ae71"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-02-1634-the-aside-yields"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "18"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-02-1634-the-aside-yields"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-02T23:58:16.515982Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "10": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 349,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-02T23:58:17.145000Z",
+  "fingerprints": [
+    "5aded2c019dbb942ee2fb78521913f1f"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1951802238,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-02T23:57:57.073000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-02-1634-the-aside-yields",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-02-1634-the-aside-yields",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-02-1634-the-aside-yields",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-02-1634-the-aside-yields)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "4a36374c08074bd28c6a040c6a495e17",
+  "previousEventID": "41f27dfb244a4ae5b6c2920ec0454106"
+}

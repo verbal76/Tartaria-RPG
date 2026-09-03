@@ -5,30 +5,6 @@
     1 page(s), 29 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7700061579/events/?full=false
     1 page(s), 13 rows — COMPLETE — ended short of a full page
-  /organizations/hot-attic-games-llc/issues/7700192579/events/?full=false
-    1 page(s), 24 rows — COMPLETE — ended short of a full page
-  /organizations/hot-attic-games-llc/issues/7700192590/events/?full=false
-    1 page(s), 1 rows — COMPLETE — ended short of a full page
-  /organizations/hot-attic-games-llc/issues/7700192718/events/?full=false
-    1 page(s), 48 rows — COMPLETE — ended short of a full page
-  /organizations/hot-attic-games-llc/issues/7700192755/events/?full=false
-    1 page(s), 2 rows — COMPLETE — ended short of a full page
-  /organizations/hot-attic-games-llc/issues/7700255477/events/?full=false
-    1 page(s), 24 rows — COMPLETE — ended short of a full page
-  /organizations/hot-attic-games-llc/issues/7700255485/events/?full=false
-    1 page(s), 1 rows — COMPLETE — ended short of a full page
-  /organizations/hot-attic-games-llc/issues/7700501608/events/?full=false
-    1 page(s), 24 rows — COMPLETE — ended short of a full page
-  /organizations/hot-attic-games-llc/issues/7700501673/events/?full=false
-    1 page(s), 1 rows — COMPLETE — ended short of a full page
-  /organizations/hot-attic-games-llc/issues/7700501708/events/?full=false
-    1 page(s), 56 rows — COMPLETE — ended short of a full page
-  /organizations/hot-attic-games-llc/issues/7700501756/events/?full=false
-    1 page(s), 2 rows — COMPLETE — ended short of a full page
-  /organizations/hot-attic-games-llc/issues/7700523236/events/?full=false
-    1 page(s), 28 rows — COMPLETE — ended short of a full page
-  /organizations/hot-attic-games-llc/issues/7700523265/events/?full=false
-    1 page(s), 1 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7700811178/events/?full=false
     1 page(s), 84 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7700811242/events/?full=false
@@ -106,7 +82,7 @@
   /organizations/hot-attic-games-llc/issues/7702880414/events/?full=false
     1 page(s), 2 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7703017060/events/?full=false
-    1 page(s), 4 rows — COMPLETE — ended short of a full page
+    1 page(s), 6 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7703230798/events/?full=false
     1 page(s), 24 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7703231218/events/?full=false
@@ -201,6 +177,30 @@
     1 page(s), 56 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7705840879/events/?full=false
     1 page(s), 2 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7705962340/events/?full=false
+    1 page(s), 28 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7705962367/events/?full=false
+    1 page(s), 1 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7708305622/events/?full=false
+    1 page(s), 56 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7708305685/events/?full=false
+    1 page(s), 2 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7708353446/events/?full=false
+    1 page(s), 28 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7708353482/events/?full=false
+    1 page(s), 1 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7708427167/events/?full=false
+    1 page(s), 28 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7708427247/events/?full=false
+    1 page(s), 1 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7708461709/events/?full=false
+    1 page(s), 24 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7708461818/events/?full=false
+    1 page(s), 0 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7708462105/events/?full=false
+    1 page(s), 47 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7708462336/events/?full=false
+    1 page(s), 2 rows — COMPLETE — ended short of a full page
   /projects/hot-attic-games-llc/tartaria/events/?full=false
     1 page(s), 100 rows — SUSPECT — ended on a full page of 100 with no next cursor; this endpoint caps rather than paginates
   /projects/hot-attic-games-llc/tartaria/issues/?query=&statsPeriod=
@@ -208,6 +208,7 @@
   ⚠⚠ AT LEAST ONE LISTING IS NOT PROVEN COMPLETE. Any MISSING parts below are UNPROVEN — they may simply be unread. DO NOT conclude the device failed, and DO NOT ask for another send on this basis.
   incomplete bundles:
     mtaxtx2bzl8l: 5/27 parts
+    mtkrb966ae71: 19/28 parts
   scrub cost per bundle:
     mtavnjvdw4u4: 4 redactions, 60000 chars
     mtavou0hiube: 1 redactions, 9994 chars
@@ -273,4 +274,8 @@
     mtj4hpttgrw4: 6 redactions, 2227 chars
     mtj5akkbvhf2: 27 redactions, 9873 chars
     mtjdbf20sc0c: 18 redactions, 6328 chars
-    mtjfp13vhzw3: 11 redactions, 3845 chars
+    mtjfp13vhzw3: 33 redactions, 11535 chars
+    mtko2rkyvz6m: 11 redactions, 3640 chars
+    mtkoldfngwnk: 26 redactions, 8252 chars
+    mtkrb966ae71: 6 redactions, 2070 chars
+    mtkt5bixx0qy: 12 redactions, 3944 chars

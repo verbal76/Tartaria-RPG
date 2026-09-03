@@ -1,0 +1,235 @@
+{
+  "id": "f1bc29be77c14ab49880be93c4fb774d",
+  "groupID": "7708461709",
+  "eventID": "f1bc29be77c14ab49880be93c4fb774d",
+  "projectID": "4511945117532160",
+  "size": 18084,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-02-1634-the-aside-yields #mtkoldfngwnk [inline 27/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-02-1634-the-aside-yields",
+  "message": "player-log 2026-09-02-1634-the-aside-yields #mtkoldfngwnk [inline 27/28]",
+  "title": "player-log 2026-09-02-1634-the-aside-yields #mtkoldfngwnk [inline 27/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "f94496531ea14f0b83cffba1544512dd",
+      "span_id": "bc6c018144b40558",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "ork the shattered endless stair landing apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n[2026-09-02T22:40:30.866Z] [world] You work the tilting obsidian pillar apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n[2026-09-02T22:40:30.866Z] [reward] \u2726 Salvage haul:\n[2026-09-02T22:40:30.866Z] [reward]     \u2022 Aether Dust (Common)\n",
+      "[2026-09-02T22:40:30.867Z] [reward]     \u2022 Scrap Metal x2 (Common)\n[2026-09-02T22:40:30.867Z] [reward]     \u2022 Stick (Common)\n[2026-09-02T22:40:30.867Z] [reward]     \u2022 Copper Wire Spool (Uncommon)\n[2026-09-02T22:40:30.867Z] [reward]     \u2022 Obsidian Chip (Common)\n[2026-09-02T22:40:30.867Z] [reward]     \u2022 Salt-Cured Dowel (Common)\n",
+      "[2026-09-02T22:40:32.210Z] [debug] persist sizes(KB): total=314 player=88 wm=142[rooms=74 events=5 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=83 scene=2\n[2026-09-02T22:40:38.910Z] [debug] ui: tap \"rest\"\n[2026-09-02T22:40:38.914Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.\n[2026-09-02T22:40:38.917Z] [player] rest\n",
+      "[2026-09-02T22:40:38.917Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0\n[2026-09-02T22:40:38.918Z] [world] Mercy does the old circle \u2014 some instinct about grass that has not been grass in a thousand years.\n[2026-09-02T22:40:38.918Z] [world] You rest for 8 hours. +8 stamina recovered. (Day 54, night)\n",
+      "[2026-09-02T22:40:38.933Z] [debug] arbiter: template (reason=busy)\n[2026-09-02T22:40:38.933Z] [arbiter] The Arbiter looks around. \"The seneschal logs your name without asking it. The Monarchs' ledgers have their ways.\"\n[2026-09-02T22:40:38.934Z] [system] \u23f3 Time passed: 8h\n[2026-09-02T22:40:39.195Z] [cognitive] REST  (260ms)\n[2026-09-02T22:40:40.156Z] [debug] ui: tap \"rest\"\n",
+      "[2026-09-02T22:40:40.160Z] [player] rest\n[2026-09-02T22:40:40.160Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0\n[2026-09-02T22:40:40.161Z] [world] Her ribs rise and fall and slow until you cannot hear them.\n[2026-09-02T22:40:40.161Z] [world] You rest for 8 hours. +8 stamina recovered. (Day 54, morning)\n",
+      "[2026-09-02T22:40:40.162Z] [debug] arbiter: ambient held (he just spoke)\n[2026-09-02T22:40:40.171Z] [system] \u23f3 Time passed: 8h\n[2026-09-02T22:40:40.172Z] [arbiter] \"There's coin on the board for a willing blade,\" the Arbiter says. \"Read the World.\"\n[2026-09-02T22:40:40.172Z] [debug] dedup: suppressed arbiter repeat \u2014 \"\"There's coin on the board for a willing blade,\" the Arbiter\u2026\"\n",
+      "[2026-09-02T22:40:40.178Z] [world] A Conspiracy Architects patrol crosses your path in the open \u2014 and turns toward you.\n[2026-09-02T22:40:40.178Z] [arbiter] \"Conspiracy Architects riders,\" the Arbiter says. \"They've marked you. No outrunning this one.\"\n[2026-09-02T22:40:40.762Z] [cognitive] REST  (590ms)\n[2026-09-02T22:40:41.853Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n",
+      "[2026-09-02T22:40:41.883Z] [player] attack with the auralite talon\n[2026-09-02T22:40:41.884Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=4 hooks=0\n[2026-09-02T22:40:41.885Z] [debug] attack: target=Conspiracy Architects Patrol 1 range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n",
+      "[2026-09-02T22:40:41.887Z] [arbiter] Whisper Fog hangs between you. \"\u22121 to the swing \u2014 see what you can,\" the Arbiter says.\n[2026-09-02T22:40:41.887Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-09-02T22:40:42.004Z] [world] You commit forward with the acid-etched corrupted auralite talon. Conspiracy Architects Patrol 1 watches your hands.\n",
+      "[2026-09-02T22:40:42.005Z] [system] \u23f3 Time passed: 6 min\n[2026-09-02T22:40:42.867Z] [debug] qwen\u23f1 ambient_fill preempted 3454ms read 0ms/write 0ms in 359t\u2192out 0t (0ch)\n[2026-09-02T22:40:43.259Z] [debug] arbiter: ambient-fill \u2205 4340ms\n[2026-09-02T22:40:43.259Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient_fill after 3454ms \u2014 ambient:fill-\u2205\n",
+      "[2026-09-02T22:40:43.660Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (1654ms)\n[2026-09-02T22:41:10.234Z] [world] You seize the initiative. Conspiracy Architects Patrol 1 has no time to react.\n[2026-09-02T22:41:10.234Z] [combat] You \u2014 d20 \u2192 10 + INT 12 \u2212 1 (Whisper Fog) = 21 vs Conspiracy Architects Patrol 1 AC 10 \u2014 \u2713 HIT\n",
+      "[2026-09-02T22:41:10.235Z] [combat] Aetheric flares \u2014 +2 on hit.\n[2026-09-02T22:41:10.235Z] [combat] Conspiracy Architects Patrol 1 shrugs off the aetheric. (resisted, \u00d70.5 for 11)\n[2026-09-02T22:41:10.239Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Reclaimers Guild Geode-Cored Cleaver \u2014 slashing will bite where aetheric won't.\"\n",
+      "[2026-09-02T22:41:10.240Z] [combat] You crack the Conspiracy Architects Patrol 1 with the Acid-Etched Corrupted Auralite Talon for 11 \u2014 the better part of their fight, gone in one blow. They crumple, out cold. (7/18 HP) Loot them before they come to.\n[2026-09-02T22:41:10.240Z] [combat] Conspiracy Architects Patrol 1 is out of it. Conspiracy Architects Patrol 2 now in your sights.\n",
+      "[2026-09-02T22:41:10.241Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 2 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n[2026-09-02T22:41:10.241Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 2 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n",
+      "[2026-09-02T22:41:10.241Z] [combat] Conspiracy Architects Patrol 1 is left exposed \u2014 easier to hit.\n[2026-09-02T22:41:10.243Z] [combat] Conspiracy Architects Patrol 2 \u2014 d20 \u2192 4 + ATK 5 = 9 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-02T22:41:10.243Z] [combat] Conspiracy Architects Patrol 4 and 1 other close the distance.\n[2026-09-02T22:41:12.265Z] [debug] ui: tap \"flee\"\n",
+      "[2026-09-02T22:41:12.272Z] [player] flee\n[2026-09-02T22:41:12.273Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=mid enemies=4 hooks=0\n[2026-09-02T22:41:12.368Z] [system] \u23f3 Time passed: 15 min\n[2026-09-02T22:41:12.742Z] [cognitive] FEAR \u00b7 RETREAT \u00b7 HIDE  (373ms)\n",
+      "[2026-09-02T22:41:14.490Z] [debug] skillcheck: escape d20=10 DEX 23 = 33 vs Pursuit 12 \u2014 Conspiracy Architects Patrol 4 (d20 3 + SPD 9) \u2192 PASS\n[2026-09-02T22:41:14.599Z] [debug] stats: STR16 DEX23 INT12 WIS14 CHA10 STE7 | gear: WIS+4,INT+3,DEX+12,STR+5,STE+2 | worn: main=Auralite Talon off=Choir-Bound Launcher head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets le",
+      "gs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n[2026-09-02T22:41:14.600Z] [debug] train: dexterity (escape check) \u2192 progress 74/100\n[2026-09-02T22:41:14.600Z] [world] It follows to the edge of whatever it calls its own, and no further.\n",
+      "[2026-09-02T22:41:14.601Z] [arbiter] The Arbiter looks around. \"Silt-stiff banners crack in the wind like slow applause. The court has standards to keep, even here.\"\n[2026-09-02T22:41:21.660Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n[2026-09-02T22:41:21.681Z] [world] You walk east through open silt. The compass tells you Dynasty Border Post lies further east \u2014 3 tiles, about 8 hours of travel.\n",
+      "[2026-09-02T22:41:21.682Z] [world] Boot impressions press deep into the silt, heading toward the rise.\n[2026-09-02T22:41:24.660Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n[2026-09-02T22:41:24.680Z] [world] You walk east through open silt. The compass tells you Dynasty Border Post lies further east \u2014 2 tiles, about 5 hours of travel.\n",
+      "[2026-09-02T22:41:24.681Z] [world] Something in your shoulders drops back into the same set.\n[2026-09-02T22:41:25.679Z] [debug] ui: tap \"take / salvage\"\n[2026-09-02T22:41:27.257Z] [world] You work the banner over. A part of it comes loose, intact.\n[2026-09-02T22:41:27.257Z] [world] You work the bedroll over. A part of it comes loose, intact.\n",
+      "[2026-09-02T22:41:27.257Z] [world] You work the shattered endless stair landing over. A part of it comes loose, intact.\n[2026-09-02T22:41:27.258Z] [world] Tucked inside the shattered tartarian relay: an oddment that matches no quartermaster's list. The kind of thing that fuses well.\n[2026-09-02T22:41:27.258Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-09-02T22:41:27.258Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-09-02T22:41:27.258Z] [reward]     \u2022 Cloth Scrap x3 (Common)\n[2026-09-02T22:41:27.259Z] [reward]     \u2022 Stick (Common)\n[2026-09-02T22:41:27.259Z] [reward]     \u2022 Stiffened Leather Offcut (Uncommon)\n[2026-09-02T22:41:28.001Z] [debug] homework: intro-fill armed after 13581ms idle\n",
+      "[2026-09-02T22:41:33.478Z] [debug] ui: tap \"investigate\"\n[2026-09-02T22:41:35.124Z] [player] investigate faint musk\n[2026-09-02T22:41:35.125Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=faint musk resolved=faint musk range=- enemies=0 hooks=1\n",
+      "[2026-09-02T22:41:35.126Z] [world] You give the faint musk your full attention. It returns the gesture by being exactly what it appears to be.\n[2026-09-02T22:41:35.127Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-09-02T22:41:35.128Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-09-02T22:41:36.050Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 7864ms read 0ms/write 0ms in 743t\u2192out 0t (0ch)\n[2026-09-02T22:41:36.265Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 7864ms \u2014 intro-fill:\u2205\n[2026-09-02T22:41:36.266Z] [debug] homework: scene_intro \"The Monarch's Waystation\" \u2205 8265ms\n[2026-09-02T22:41:36.484Z] [cognitive] neutral  (1355ms)\n",
+      "[2026-09-02T22:41:36.732Z] [debug] persist sizes(KB): total=315 player=88 wm=141[rooms=74 events=5 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=83 scene=2\n[2026-09-02T22:41:39.049Z] [debug] qwen\u23f1 investigate_lore ok 3602ms wait 1038ms read/write unusable (native mis-reported 58511ms/1099ms \u2014 llama.rn split bug, not this call) in 130t\u2192out 34t (143ch)\n\n=== END LOG \u00b7 399847 CHARS ===\n\n",
+      "Tartaria Realms\n\nDevice\n  Name: Pixel 10 Pro XL\n  Platform: android 37\n  Hermes: yes\n  Locale: en-US\n  Timezone: America/New_York\n  Screen: window 443\u00d7986 / screen 443\u00d7986 @ 2.4375x density\n  Captured at: 2026-09-02T22:42:09.177Z\n\nInstall\n  App ID: com.hotatticgames.tartarprim\n  App version: 4.32.11\n  APK build version: 2.4.1\n  APK build: 293\n  AAB: (build 293)\n",
+      "  OTA: (2026-09-02-1632-set-course-stays-put)\n  Boot stage: qwen:done\n\nML runtime health\n  Status: active (no crashes detected)\n  Crash count: 0\n  Last init attempt: 2026-09-02T22:28:18.603Z\n  Last init success: 2026-09-02T22:28:19.892Z\n  Crashes-before-disable threshold: 2\n  Qwen completion guard: clean (no completion crashes)\n  Qwen kernel variant: rnllama_v8_2_fp16_dotprod\n",
+      "  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k\n  Voice (TTS) guard: clean (no voice crashes on this build)\nSave-load health\n  Status: clean (no load-crash flags)\nLast JS crash\n",
+      "  Status: none recorded\nThis launch\n  Life: bmtknj7xntb \u00b7 started 2026-09-02T22:12:29.291Z\n  Followed an OTA apply 147ms ago (boot-front)\n  The previous life released its model contexts before reloading (o0/r0/l0/p0/dn0)\nCrash ledger \u2014 10 recorded (newest last)\n  \u2022 2026-08-31T03:45:02.432Z (4017m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-31-1586-the-slate-in-every-part \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done [q0] \u00b7 541ms into the action \u00b7 alive 0ms after it\n  \u2022 2026-08-31T12:34:47.772Z (3487m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-31-1589-the-pin-comes-home \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done [q0] \u00b7 578ms into the action \u00b7 alive 0ms after it\n      launch: died 892ms into the process \u00b7 not an OTA-apply boot\n",
+      "      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-08-31T14:24:08.210Z (3378m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-31-1592-the-events-say-which-build \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n",
+      "      last checkpoint: native:cognition:done [q0] \u00b7 508ms into the action \u00b7 alive 0ms after it\n      launch: died 859ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-08-31T17:38:34.699Z (3184m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-31-1594-the-pinch-demands-the-lift \u00b7 stage boot:qwen:deferred\n",
+      "      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: boot:qwen:deferred \u00b7 893ms into the action \u00b7 alive 0ms after it\n      launch: died 941ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-08-31T22:14:31.073Z (2908m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-31-1595-the-guide-and-the-ground-agree \u00b7 stage boot:qwen:deferred\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: boot:qwen:deferred \u00b7 5207ms into the action \u00b7 alive 0ms after it\n      launch: died 5302ms into the process \u00b7 not an OTA-apply boot\n",
+      "      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-08-31T22:46:39.841Z (2875m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-31-1596-the-mark-catches-up-at-the-door \u00b7 stage native:voice:start\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n",
+      "      last checkpoint: native:voice:start [q1] \u00b7 1865ms into the action \u00b7 alive 0ms after it\n      launch: died 1908ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-01T10:12:02.195Z (2190m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-01-1601-combat-separates \u00b7 stage boot:qwen:deferred\n",
+      "      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: boot:qwen:deferred \u00b7 717ms into the action \u00b7 alive 0ms after it\n      launch: died 752ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-01T10:56:48.050Z (2145m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-09-01-1602-the-beat-card \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet) \u2014 begun 5m before the last sign of life; treat the action label as stale, not as the killer\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n  "
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-02-1634-the-aside-yields #mtkoldfngwnk [inline 27/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtkoldfngwnk"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-02-1634-the-aside-yields"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "27"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-02-1634-the-aside-yields"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "3"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-02T23:57:56.411000Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-02T23:57:57.080000Z",
+  "fingerprints": [
+    "30d1e97c8c0a39b36c2c4f1be2612fd0"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1951802238,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-02T23:57:57.073000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-02-1634-the-aside-yields",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-02-1634-the-aside-yields",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-02-1634-the-aside-yields",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-02-1634-the-aside-yields)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": "dfd927ae90704635adeb1d0ec8d69a9b"
+}

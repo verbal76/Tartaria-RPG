@@ -1,0 +1,261 @@
+{
+  "id": "47661513ec32469cb5ee463eeeb72e08",
+  "groupID": "7708461709",
+  "eventID": "47661513ec32469cb5ee463eeeb72e08",
+  "projectID": "4511945117532160",
+  "size": 17804,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-02-1634-the-aside-yields #mtkoldfngwnk [inline 12/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-02-1634-the-aside-yields",
+  "message": "player-log 2026-09-02-1634-the-aside-yields #mtkoldfngwnk [inline 12/28]",
+  "title": "player-log 2026-09-02-1634-the-aside-yields #mtkoldfngwnk [inline 12/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "f94496531ea14f0b83cffba1544512dd",
+      "span_id": "bc6c018144b40558",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      " (budget \u2014 one per tile, 25s apart)\n[2026-09-02T01:32:40.188Z] [system] \u23f3 Time passed: 24 min\n[2026-09-02T01:32:40.502Z] [cognitive] CLIMB  (313ms)\n[2026-09-02T01:32:41.050Z] [debug] ui: tap \"\u2192 DRAKOVA\"\n[2026-09-02T01:32:41.059Z] [debug] spawn: gear=[Sentinel's Overcoat, Aetherbound Mask, Architect's Mantle] window=10 roster=new\n",
+      "[2026-09-02T01:32:41.061Z] [world] Bek Whisperlot glances up. \"You again.\" Not warm, not cold \u2014 noted.\n[2026-09-02T01:32:41.061Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Bek Whisperlot, fence. Tap the vendor banner to trade.\n",
+      "[2026-09-02T01:32:41.067Z] [world] Rare workings for sale: Golem Sledge (200 TC), Gravity Pike (500 TC), Half-Life Pulse (500 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n",
+      "[2026-09-02T01:32:41.068Z] [world] You walk east through open silt. The compass tells you Mud Seas lies further east \u2014 1 tile, about 3 hours of travel.\n[2026-09-02T01:32:41.068Z] [world] The air over it has the same weight it had before.\n[2026-09-02T01:32:41.416Z] [player] investigate puddle\n",
+      "[2026-09-02T01:32:41.417Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=puddle resolved=puddle range=- enemies=0 hooks=1\n[2026-09-02T01:32:41.420Z] [world] You study the puddle. It bears no marks worth naming \u2014 no glyph, no fingerprint, no trace the Reclaimers would catalog.\n[2026-09-02T01:32:41.677Z] [cognitive] SWIM  (253ms)\n",
+      "[2026-09-02T01:32:42.248Z] [debug] ui: tap \"take / salvage\"\n[2026-09-02T01:32:43.471Z] [world] The Aetherbound Mask resists, then does not.\n[2026-09-02T01:32:43.472Z] [reward] \u2726 Aetherbound Mask (Common).\n[2026-09-02T01:32:43.493Z] [world] You brace a foot and the Architect's Mantle gives.\n[2026-09-02T01:32:43.493Z] [reward] \u2726 Architect's Mantle (Common).\n",
+      "[2026-09-02T01:32:43.495Z] [world] One good tug and the Sentinel's Overcoat is out.\n[2026-09-02T01:32:43.495Z] [reward] \u2726 Sentinel's Overcoat (Common).\n[2026-09-02T01:32:43.871Z] [debug] persist sizes(KB): total=298 player=65 wm=146[rooms=82 events=5 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=81 scene=6\n",
+      "[2026-09-02T01:32:44.480Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 6048ms read 0ms/write 0ms in 743t\u2192out 0t (0ch)\n[2026-09-02T01:32:44.641Z] [reward] \u2726 Found First Tablet \u2014 a prayer \u2014 The Tunneler. (open Contracts \u2192 Collectibles to read)\n[2026-09-02T01:32:44.642Z] [world] You work the dust altar over. A part of it comes loose, intact.\n",
+      "[2026-09-02T01:32:44.642Z] [world] Something papery rustles as you strip the moss. You pull free a journal leaf.\n[2026-09-02T01:32:44.642Z] [world] You break the root cluster apart. Among the pieces, something worth keeping.\n[2026-09-02T01:32:44.643Z] [reward] \u2726 Salvage haul:\n[2026-09-02T01:32:44.643Z] [reward]     \u2022 Aether Crystal (Common)\n",
+      "[2026-09-02T01:32:44.643Z] [reward]     \u2022 Bone Sliver x2 (Common)\n[2026-09-02T01:32:44.831Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 6048ms \u2014 intro-fill:\u2205\n[2026-09-02T01:32:44.832Z] [debug] homework: scene_intro \"The Slack Flats\" \u2205 6565ms\n[2026-09-02T01:32:46.332Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-09-02T01:32:47.403Z] [debug] qwen\u23f1 investigate_lore ok 5467ms wait 2701ms read/write unusable (native mis-reported 7541ms/1388ms \u2014 llama.rn split bug, not this call) in 127t\u2192out 44t (188ch)\n[2026-09-02T01:32:48.028Z] [player] investigate the ground\n[2026-09-02T01:32:48.029Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-09-02T01:32:48.033Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Mud Fragment (Common).\n[2026-09-02T01:32:48.040Z] [system] \u23f3 Time passed: 24 min\n[2026-09-02T01:32:48.223Z] [cognitive] CLIMB  (183ms)\n[2026-09-02T01:32:48.850Z] [debug] ui: tap \"\u2192 DRAKOVA\"\n[2026-09-02T01:32:48.865Z] [world] You walk east. You arrive at Mud Seas.\n",
+      "[2026-09-02T01:32:48.866Z] [debug] scene: loc=mud_seas hub=- arrival=y opening=n passing=y\n[2026-09-02T01:32:48.867Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n[2026-09-02T01:32:48.867Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token\n",
+      "[2026-09-02T01:32:48.867Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n[2026-09-02T01:32:48.867Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n",
+      "[2026-09-02T01:32:48.868Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n[2026-09-02T01:32:48.868Z] [debug] missions: \u00b7 at=mud_seas travelTo=drakova\n[2026-09-02T01:32:48.894Z] [debug] spawn: gear=[Stonebreaker's Cloak, Bonebreaker Mace, Relic Hunter's Veil] window=10 roster=new\n",
+      "[2026-09-02T01:32:48.914Z] [arbiter] The Arbiter takes you in. \"Mud Seas is lethal country. The things that wake here pull above your weight. 43 HP carries you through Varakush (danger 1). 1/9 Cores recovered. Visit the remaining Lost Capitals. Or move on until you've got your legs under you.\"\n",
+      "[2026-09-02T01:32:48.918Z] [world] You've left The Buried Cities and entered Mud Seas. The Mud Seas are not sea, and not mud, and not still. It's morning. Nobody else is in sight. north leads to Revivalist Field Camp; east leads to The Broken Steeple. Nothing named to the south or west.\n[2026-09-02T01:32:48.918Z] [system] Weather effect \u2014 Black Rain: -1 CHA\n",
+      "[2026-09-02T01:32:48.920Z] [world] [Mud Seas] north: Revivalist Field Camp (3 tiles, 8 hours) \u00b7 east: The Broken Steeple (1 tile, 3 hours) \u00b7 south: The Conduit Line (14 tiles, 1 day, 11 hours) \u00b7 west: The Hidden Market (3 tiles, 8 hours)\n[2026-09-02T01:32:49.454Z] [player] investigate drain channel\n",
+      "[2026-09-02T01:32:49.455Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=drain channel resolved=- range=- enemies=0 hooks=0\n[2026-09-02T01:32:50.217Z] [debug] ui: tap \"take / salvage\"\n[2026-09-02T01:32:51.836Z] [world] The Bonebreaker Mace leaves a shape behind it in the mud, filling slowly.\n[2026-09-02T01:32:51.837Z] [reward] \u2726 Bonebreaker Mace (Common).\n",
+      "[2026-09-02T01:32:51.850Z] [world] Where the Relic Hunter's Veil was, the ground is a shade darker.\n[2026-09-02T01:32:51.850Z] [reward] \u2726 Relic Hunter's Veil (Uncommon).\n[2026-09-02T01:32:51.852Z] [world] You take the Stonebreaker's Cloak. The hollow it came out of starts closing.\n[2026-09-02T01:32:51.852Z] [reward] \u2726 Stonebreaker's Cloak (Common).\n",
+      "[2026-09-02T01:32:52.957Z] [world] The Iron Spear goes in your pack. Its outline stays in the silt a while.\n[2026-09-02T01:32:52.957Z] [reward] \u2726 Iron Spear (Common).\n[2026-09-02T01:32:53.358Z] [debug] persist sizes(KB): total=283 player=67 wm=132[rooms=68 events=5 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=81 scene=3\n",
+      "[Filtered]",
+      "[2026-09-02T01:32:54.199Z] [world] You strip the siren nest carefully. Something usable comes free in your hand.\n[2026-09-02T01:32:54.200Z] [reward] \u2726 Salvage haul:\n[2026-09-02T01:32:54.200Z] [reward]     \u2022 Aetheric Cloth (Uncommon)\n[2026-09-02T01:32:54.200Z] [reward]     \u2022 Scrap Metal x2 (Common)\n[2026-09-02T01:32:54.200Z] [reward]     \u2022 Faded Ribbon Coil (Common)\n",
+      "[2026-09-02T01:32:54.200Z] [reward]     \u2022 Worn Tartarian Coin (Common)\n[2026-09-02T01:32:56.505Z] [player] investigate barnacle chain\n[2026-09-02T01:32:56.507Z] [dog_quest] You come up on the barnacle chain, and past it the slag-floor opens out. The Reclaimer Deserter is there, working a chain that ends in a dog's collar. Reclaimer Deserter sees you. \"Walk on. This one's not yours.\"\n",
+      "[2026-09-02T01:32:58.103Z] [debug] qwen\u23f1 narration:scene_intro preempted 9001ms read 8949ms/write 0ms in 772t\u2192out 0t 11.6ms/t (3ch)\n[2026-09-02T01:32:58.392Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro after 9001ms \u2014 cancelled:player-acted-again\n[2026-09-02T01:32:58.684Z] [cognitive] neutral  (9224ms)\n",
+      "[2026-09-02T01:32:59.335Z] [arbiter] The Arbiter tilts their head. \"I do not see a 'drain channel' here. Choose words carefully \u2014 try: rain pool, water, mud, wreck, shore, pier.\"\n[2026-09-02T01:33:03.165Z] [debug] ui: tap \"dodge\"\n[2026-09-02T01:33:03.178Z] [player] dodge\n[2026-09-02T01:33:03.179Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=1 hooks=0\n",
+      "[2026-09-02T01:33:03.180Z] [world] You commit to the dodge. Slip Reclaimer Deserter's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-02T01:33:03.275Z] [combat] Reclaimer Deserter \u2014 d20 \u2192 20 + ATK 4 = 24 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 CRITICAL HIT\n",
+      "[2026-09-02T01:33:03.275Z] [combat] Dodge \u2014 Reclaimer Deserter rolls a NAT 20. No read beats a perfect strike; it lands through your dodge.\n[2026-09-02T01:33:03.276Z] [system] \u23f3 Time passed: 6 min\n[2026-09-02T01:33:03.586Z] [combat] Reclaimer Deserter deals 4 bludgeoning damage [plate \u22121] [edge of reach \u2014 halved]. You have 30 HP remaining.\n[2026-09-02T01:33:03.854Z] [cognitive] neutral  (310ms)\n",
+      "[2026-09-02T01:33:05.213Z] [debug] ui: tap \"approach\"\n[2026-09-02T01:33:05.263Z] [player] approach Reclaimer Deserter\n[2026-09-02T01:33:05.264Z] [debug] parser: intent=advance conf=1.00 verb=approach target=reclaimer deserter resolved=Reclaimer Deserter range=mid enemies=1 hooks=0\n[2026-09-02T01:33:05.265Z] [debug] move: advance from range=mid enemies=1 weather=Black Rain cost=1 partial=0\n",
+      "[2026-09-02T01:33:05.266Z] [debug] move: field advance target=Reclaimer Deserter d 1.50->0.50 band mid->close\n[2026-09-02T01:33:05.266Z] [world] You close the gap with Reclaimer Deserter. (range: close / arm's reach)\n[2026-09-02T01:33:05.267Z] [combat] Reclaimer Deserter \u2014 d20 \u2192 9 + ATK 4 = 13 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-02T01:33:05.569Z] [cognitive] RETREAT  (300ms)\n[2026-09-02T01:33:06.605Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n[2026-09-02T01:33:06.606Z] [world] Black rain runs down your collar. Something in you tightens that should not have.\n[2026-09-02T01:33:06.624Z] [player] attack with the auralite talon\n",
+      "[2026-09-02T01:33:06.624Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=1 hooks=0\n[2026-09-02T01:33:06.625Z] [debug] attack: target=Reclaimer Deserter range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n",
+      "[2026-09-02T01:33:06.680Z] [world] You raise the acid-etched corrupted auralite talon toward Reclaimer Deserter. The room narrows around the both of you.\n[2026-09-02T01:33:06.681Z] [system] \u23f3 Time passed: 6 min\n[2026-09-02T01:33:06.944Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (262ms)\n",
+      "[2026-09-02T01:33:15.935Z] [world] You seize the initiative. Reclaimer Deserter has no time to react.\n[2026-09-02T01:33:15.935Z] [combat] You \u2014 d20 \u2192 13 + INT 12 = 25 vs Reclaimer Deserter AC 9 \u2014 \u2713 HIT\n[2026-09-02T01:33:15.937Z] [combat] Clean hit with the acid-etched corrupted auralite talon for 12. Reclaimer Deserter has 2 left and does not back away.\n",
+      "[2026-09-02T01:33:15.937Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 1 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n[2026-09-02T01:33:15.941Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 2 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n",
+      "[2026-09-02T01:33:15.943Z] [combat] Reclaimer Deserter \u2014 d20 \u2192 8 + ATK 4 = 12 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-02T01:33:15.944Z] [arbiter] \"Footwork over fury,\" the Arbiter says quietly. \"The reclaimer deserter is patient. Be patienter.\"\n[2026-09-02T01:33:20.153Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n[2026-09-02T01:33:20.190Z] [player] attack with the auralite talon\n",
+      "[2026-09-02T01:33:20.190Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=1 hooks=0\n[2026-09-02T01:33:20.191Z] [combat] Reclaimer Deserter smokes \u2014 acid eats 1. (1/14 HP, 2 turns left)\n[2026-09-02T01:33:20.191Z] [combat] Reclaimer Deserter blackens \u2014 corruption eats 2. (0/14 HP, 2 turns left)\n",
+      "[2026-09-02T01:33:20.193Z] [reward] Reclaimer Deserter defeated. You recover Mud Cloth, Hardtack, Scrap Metal.\n[2026-09-02T01:33:20.194Z] [dog_quest] The Reclaimer deserter falls into the slag. The dog is still chained, watching you with the wary level look of an animal that has read its odds. They were keeping the dog illegally. No faction reckoning falls on you for this.\n",
+      "[2026-09-02T01:33:20.195Z] [reward] +18 TC pried from the dust.\n[2026-09-02T01:33:28.296Z] [debug] homework: intro-fill armed after 6910ms idle\n[2026-09-02T01:33:29.788Z] [world] A Dog. Mercy. The name settles on the dog like a coat.\n[2026-09-02T01:33:29.789Z] [world] Mercy circles three times and curls beside you. Her breathing slows to yours.\n",
+      "[2026-09-02T01:33:29.789Z] [dog_quest] The Arbiter studies the new pair. \"Mercy, then. The chain is off. The road is open.\"\n[2026-09-02T01:33:34.090Z] [debug] ui: tap \"take / salvage\"\n[2026-09-02T01:33:34.847Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 6344ms read/write unusable (native mis-reported 35657ms/1109ms \u2014 llama.rn split bug, not this call) in 742t\u2192out 33t HIT-CAP (155ch)\n",
+      "[2026-09-02T01:33:35.043Z] [debug] homework: scene_intro \"Mud Seas\" \u2713 6749ms\n[2026-09-02T01:33:35.566Z] [world] You work the barnacle chain over. A part of it comes loose, intact.\n[2026-09-02T01:33:35.567Z] [reward] \u2726 Salvage haul:\n[2026-09-02T01:33:35.567Z] [reward]     \u2022 Scrap Metal x3 (Common)\n",
+      "[2026-09-02T01:33:36.016Z] [debug] persist sizes(KB): total=285 player=67 wm=133[rooms=69 events=5 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=82 scene=3\n[2026-09-02T01:33:36.642Z] [debug] ui: tap \"STOP TRAVEL\"\n[2026-09-02T01:33:36.643Z] [world] You set the course aside. Cardinal direction is yours again.\n[2026-09-02T01:33:39.644Z] [debug] ui: tap \"missions\"\n",
+      "[2026-09-02T01:33:41.821Z] [world] You set course for Drakova. 4 tiles \u2014 about 10 hours of travel, all in. You set off now \u2014 the ground ahead is new ground. Keep tapping \u2192 DRAKOVA on the travel row to close the distance; STOP TRAVEL to halt.\n[2026-09-02T01:33:41.829Z] [world] You walk east. You arrive at The Broken Steeple.\n",
+      "[2026-09-02T01:33:41.830Z] [reward] \u2726 The road has built you up. +1 max stamina (now 18). [5 travels completed]\n[2026-09-02T01:33:41.831Z] [debug] scene: loc=broken_steeple hub=- arrival=y opening=n passing=y\n"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-02-1634-the-aside-yields #mtkoldfngwnk [inline 12/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtkoldfngwnk"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-02-1634-the-aside-yields"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "12"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-02-1634-the-aside-yields"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "3"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-02T23:57:56.302086Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "21": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 352,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-02T23:57:57.074000Z",
+  "fingerprints": [
+    "30d1e97c8c0a39b36c2c4f1be2612fd0"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1951802238,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-02T23:57:57.073000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-02-1634-the-aside-yields",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-02-1634-the-aside-yields",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-02-1634-the-aside-yields",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-02-1634-the-aside-yields)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "4dd061206b704161b49dfb48f6c22af5",
+  "previousEventID": "3e79045b65fa448ba9f18bddcc8f9b00"
+}

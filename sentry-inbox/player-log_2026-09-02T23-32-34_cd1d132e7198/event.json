@@ -1,0 +1,238 @@
+{
+  "id": "cd1d132e71984b4693900e5cdf671ddc",
+  "groupID": "7708427167",
+  "eventID": "cd1d132e71984b4693900e5cdf671ddc",
+  "projectID": "4511945117532160",
+  "size": 18084,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-02-1633-a-batch-is-one-action #mtkoldfngwnk [inline 1/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-02-1633-a-batch-is-one-action",
+  "message": "player-log 2026-09-02-1633-a-batch-is-one-action #mtkoldfngwnk [inline 1/28]",
+  "title": "player-log 2026-09-02-1633-a-batch-is-one-action #mtkoldfngwnk [inline 1/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "3e9714f7288a416499d6aad236c6addb",
+      "span_id": "a3b116d929f3771f",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "=== TARTARIA LOG \u00b7 399847 CHARS \u00b7 BEGIN ===\n[2026-09-01T20:53:05.750Z] [reward] \u2726 Found Final Letter \u2014 The Awakened Heir. (open Contracts \u2192 Collectibles to read)\n[2026-09-01T20:53:05.760Z] [combat] Scrap Drone steps out of the shadows of the place \u2014 Drill Arm ready, 2D6 damage on a hit. The loot you found will leave with whoever walks out alive. (range: close)\n",
+      "[2026-09-01T20:53:05.760Z] [world] Parked \u2014 you're already running a contract. Activate it in Contracts \u2192 Hunts when you're ready.\n[2026-09-01T20:53:05.760Z] [reward] \u2726 Hunt added to your slate \u2014 The Mud Titan of the Endless Stair (target: Mud Titan).\n",
+      "[2026-09-01T20:53:05.760Z] [arbiter] The Arbiter holds up a hand. \"That hunt is on your slate now. Open Contracts \u2192 Hunts to read the steps. Tap ABANDON there if you don't want it.\"\n[2026-09-01T20:53:05.760Z] [world] Something in your shoulders drops back into the same set.\n[2026-09-01T20:53:05.761Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-09-01T20:53:05.761Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-01T20:53:05.761Z] [system] \u23f3 Time passed: 15 min\n[2026-09-01T20:53:06.042Z] [cognitive] TRAVEL  (280ms)\n[2026-09-01T20:53:07.759Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n[2026-09-01T20:53:07.797Z] [player] attack with the auralite talon\n",
+      "[2026-09-01T20:53:07.797Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=1 hooks=1\n[2026-09-01T20:53:07.799Z] [debug] attack: target=Scrap Drone range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n[2026-09-01T20:53:07.802Z] [debug] attack: status mods tired -1\n",
+      "[2026-09-01T20:53:07.856Z] [world] You raise the acid-etched corrupted auralite talon toward Scrap Drone. The room narrows around the both of you.\n[2026-09-01T20:53:07.856Z] [system] \u23f3 Time passed: 6 min\n[2026-09-01T20:53:08.114Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (257ms)\n",
+      "[2026-09-01T20:53:18.669Z] [world] You seize the initiative. Scrap Drone has no time to react.\n[2026-09-01T20:53:18.670Z] [combat] You \u2014 d20 \u2192 9 + INT 12 tired -1 = 20 vs Scrap Drone AC 10 \u2014 \u2713 HIT\n[2026-09-01T20:53:18.670Z] [combat] The Corrupted coating fails to take on Scrap Drone.\n[2026-09-01T20:53:18.671Z] [combat] Scrap Drone shrugs off the aetheric. (resisted, \u00d70.5 for 6)\n",
+      "[2026-09-01T20:53:18.674Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Flame of Aether \u2014 burn or electrical will bite where aetheric won't.\"\n[2026-09-01T20:53:18.676Z] [combat] The blow with the acid-etched corrupted auralite talon finds purchase \u2014 6 damage, 9 HP standing. Scrap Drone commits to the counter.\n",
+      "[2026-09-01T20:53:18.676Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 4 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n[2026-09-01T20:53:18.676Z] [combat] Scrap Drone turns on Soot \u2014 d20 12 + ATK 3 = 15 vs Soot's AC 13 (vest +3) \u2014 \u2713 HIT\n[2026-09-01T20:53:18.677Z] [combat] Soot takes 4. (4/15 HP left)\n",
+      "[2026-09-01T20:53:19.049Z] [debug] persist sizes(KB): total=264 player=60 wm=116[rooms=53 events=4 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=83 scene=5\n[2026-09-01T20:53:24.263Z] [debug] ui: tap \"approach\"\n[2026-09-01T20:53:24.302Z] [player] approach Scrap Drone\n",
+      "[2026-09-01T20:53:24.303Z] [debug] parser: intent=advance conf=1.00 verb=approach target=scrap drone resolved=Scrap Drone range=close enemies=1 hooks=1\n[2026-09-01T20:53:24.306Z] [debug] move: advance from range=close enemies=1 weather=Black Rain cost=1 partial=0\n[2026-09-01T20:53:24.306Z] [debug] move: field advance target=Scrap Drone d 0.50->0.35 band close->close\n",
+      "[2026-09-01T20:53:24.306Z] [world] You close the gap with Scrap Drone. (range: close / arm's reach)\n[2026-09-01T20:53:24.307Z] [combat] Scrap Drone smokes \u2014 acid eats 4. (5/15 HP, 2 turns left)\n[2026-09-01T20:53:24.308Z] [combat] Scrap Drone \u2014 d20 \u2192 6 + ATK 3 = 9 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-01T20:53:24.309Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-09-01T20:53:24.309Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-01T20:53:24.585Z] [cognitive] neutral  (274ms)\n[2026-09-01T20:53:37.264Z] [debug] ui: tap \"golem (60/68)\"\n[2026-09-01T20:53:37.271Z] [player] use golem\n[2026-09-01T20:53:37.271Z] [combat] Rampart attacks Scrap Drone \u2014 d20 8 + 3 = 11 vs AC 8 \u2014 \u2713 HIT\n",
+      "[2026-09-01T20:53:37.273Z] [arbiter] The Arbiter studies you a long moment. \"You have earned a name to carry: Golem Whisperer. Passive: golems you summon come out tougher (+30% HP, one larger attack die).\"\n[2026-09-01T20:53:37.274Z] [combat] Rampart swings the Crude Golem Sledge \u2014 14 bludgeoning damage on Scrap Drone. (0 HP left)\n",
+      "[2026-09-01T20:53:37.275Z] [world] Scrap Drone crumbles under Rampart's assault.\n[2026-09-01T20:53:37.278Z] [reward] Scrap Drone defeated. You recover Aetheric Cog \u00d72.\n[2026-09-01T20:53:37.280Z] [reward] +8 TC pried from the dust.\n[2026-09-01T20:53:46.642Z] [debug] ui: tap \"take / salvage\"\n[2026-09-01T20:53:48.277Z] [world] You turn the Mud-Bound Cloak over once, then keep it.\n",
+      "[2026-09-01T20:53:48.277Z] [reward] \u2726 Mud-Bound Cloak (Common).\n[2026-09-01T20:53:48.297Z] [world] The Mud-Sealer Gauntlets comes away clean.\n[2026-09-01T20:53:48.297Z] [reward] \u2726 Mud-Sealer Gauntlets (Common).\n[2026-09-01T20:53:49.390Z] [world] You work the bone charm over. A part of it comes loose, intact.\n",
+      "[2026-09-01T20:53:49.391Z] [world] You work the dust altar apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n[2026-09-01T20:53:49.391Z] [world] You break the echo stone apart. Among the pieces, something worth keeping.\n[2026-09-01T20:53:49.391Z] [world] You work the rotten sack over. A part of it comes loose, intact.\n",
+      "[2026-09-01T20:53:49.392Z] [world] You strip the water basin carefully. Something usable comes free in your hand.\n[2026-09-01T20:53:49.392Z] [reward] \u2726 Salvage haul:\n[2026-09-01T20:53:49.392Z] [reward]     \u2022 Aether Dust x4 (Common)\n[2026-09-01T20:53:49.392Z] [reward]     \u2022 Flint Core Nodule (Common)\n[2026-09-01T20:53:49.393Z] [reward]     \u2022 Worn Tartarian Coin x4 (Common)\n",
+      "[2026-09-01T20:53:49.393Z] [reward]     \u2022 Stick (Common)\n[2026-09-01T20:54:06.769Z] [debug] send-log: #mtj5akkbvhf2 \u2014 DELIVERED (inline, no attachments): beacon out, 28/28 parts accepted (406650 chars) \u2014 flush said yes\n[2026-09-01T20:54:06.770Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mtj5akkbvhf2 kept on disk, boots retry up to 5 sends total\n",
+      "[2026-09-01T20:56:21.775Z] [debug] persist sizes(KB): total=264 player=61 wm=115[rooms=53 events=4 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=83 scene=5\n[2026-09-01T21:19:04.673Z] [debug] OTA session start: 2026-09-01-1611-weak-and-not-weak.\n[2026-09-01T21:19:04.673Z] [world] You step back into The Buried Cities. The world waits for your move.\n",
+      "[2026-09-01T21:19:04.673Z] [arbiter] The Arbiter meets your eyes. \"Welcome back, Cheddar Bob. The buried country is no place to walk alone.\"\n[2026-09-01T21:19:04.930Z] [debug] \u2550\u2550\u2550 SESSION 2026-09-01T21:19:04.927Z \u00b7 build 2026-09-01-1611-weak-and-not-weak \u00b7 previous entry moments earlier \u2550\u2550\u2550\n",
+      "[2026-09-01T21:19:04.930Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n[2026-09-01T21:19:04.931Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n",
+      "[2026-09-01T21:19:04.931Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n[2026-09-01T21:19:04.932Z] [debug] missions: mystery:mystery_temporal_watch stage 1/4 [investigate] @buried_cities HERE needs=Guild Eddy-Gauge\u2713 gives=Eddy-Zone Reading\n",
+      "[2026-09-01T21:19:04.932Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n[2026-09-01T21:19:04.932Z] [debug] missions: \u00b7 at=buried_cities\n",
+      "[2026-09-01T21:19:04.932Z] [debug] boot: life bmtj4f9nfqp started 2026-09-01T20:29:46.011Z \u00b7 FOLLOWED AN OTA APPLY 232ms ago via mid-session \u00b7 prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)\n[2026-09-01T21:19:06.976Z] [debug] ui: tap \"missions\"\n[2026-09-01T21:19:20.261Z] [debug] ui: tap \"look around you\"\n[2026-09-01T21:19:20.273Z] [player] look\n",
+      "[2026-09-01T21:19:20.274Z] [debug] parser: intent=investigate conf=1.00 verb=look target=- resolved=- range=- enemies=0 hooks=1\n[2026-09-01T21:19:20.276Z] [world] You look around. You're in Collapsed Residential Home, in The Buried Cities. You see: puddle. The eddy is unaddressed. Hazard active: Temporal Loop. Cardinal travel: north, east, south, west.\n",
+      "[2026-09-01T21:19:20.447Z] [world] You walk the Buried Cities with the gauge and it starts to stutter \u2014 a temporal eddy, and the gauge draws you a map of its edge. You mark the reading down. Somewhere inside that line, everything that died is still dying slowly.\n[2026-09-01T21:19:20.448Z] [reward] \u2726 Eddy-Zone Reading \u2014 mission item.\n[2026-09-01T21:19:20.448Z] [system] \u25b8 bring Eddy-Zone Reading.\n",
+      "[2026-09-01T21:19:20.796Z] [cognitive] neutral  (518ms)\n[2026-09-01T21:19:34.199Z] [debug] ui: tap \"missions\"\n[2026-09-01T21:19:48.561Z] [world] You set course for The Buried Cities. 2 tiles \u2014 about 5 hours of travel, all in. You set off now \u2014 the ground ahead is new ground. Keep tapping \u2192 THE BURIED CITIES on the travel row to close the distance; STOP TRAVEL to halt.\n",
+      "[2026-09-01T21:19:48.572Z] [world] You walk east through open silt. The compass points east into open ground.\n[2026-09-01T21:19:48.572Z] [world] Your feet have taken you to the same three paces of ground.\n[2026-09-01T21:19:48.884Z] [debug] persist sizes(KB): total=268 player=65 wm=115[rooms=53 events=4 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=83 scene=5\n",
+      "[2026-09-01T21:31:50.811Z] [debug] ui: tap \"missions\"\n[2026-09-01T21:34:40.273Z] [debug] persist sizes(KB): total=269 player=65 wm=115[rooms=53 events=4 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=83 scene=5\n[2026-09-01T23:04:50.716Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a05e93-f67f-7a52-895b-9e53c31d1e02\n",
+      "[2026-09-01T23:04:50.717Z] [debug] ota: Checking\u2026\n[2026-09-01T23:04:53.302Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-09-01T23:04:53.464Z] [debug] ota: Saving progress\u2026\n[2026-09-01T23:04:53.465Z] [debug] ota: Restarting to apply\u2026\n[2026-09-01T23:04:53.770Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a05f35-6fd5-7dfa-8bca-8483aeffbfba\n",
+      "[2026-09-01T23:04:53.770Z] [debug] ota: Checking\u2026\n[2026-09-01T23:04:54.158Z] [debug] ota: Already up to date\n[2026-09-01T23:04:54.159Z] [debug] ota: boot check result = noUpdate\n[2026-09-01T23:04:54.266Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-09-01T23:04:54.266Z] [debug] voice: bundled idle\n",
+      "[2026-09-01T23:04:55.056Z] [debug] send-log: bundle #mtj5akkbvhf2 attempt 2/5 delivered to Sentry\n[2026-09-01T23:10:52.275Z] [debug] OTA applied: 2026-09-01-1611-weak-and-not-weak \u2192 2026-09-01-1615-the-mission-speaks-where-you-stand.\n[2026-09-01T23:10:52.275Z] [debug] OTA session start: 2026-09-01-1615-the-mission-speaks-where-you-stand.\n",
+      "[2026-09-01T23:10:52.275Z] [world] You step back into The Buried Cities. The world waits for your move.\n[2026-09-01T23:10:52.275Z] [arbiter] The Arbiter meets your eyes. \"Welcome back, Cheddar Bob. The buried country is no place to walk alone.\"\n",
+      "[2026-09-01T23:10:52.791Z] [debug] \u2550\u2550\u2550 SESSION 2026-09-01T23:10:52.788Z \u00b7 build 2026-09-01-1615-the-mission-speaks-where-you-stand \u00b7 updated from 2026-09-01-1611-weak-and-not-weak \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-09-01T23:10:52.792Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-01T23:10:52.792Z] [debug] missions: hunt:hunt_bog_dragon stage 0/7 [diplomacy] @drakova npc=\"the Drakovan reeve\" gives=Reeve's Brass Token PAUSED\n[2026-09-01T23:10:52.792Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n",
+      "[2026-09-01T23:10:52.793Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities HERE needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch\n[2026-09-01T23:10:52.793Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n",
+      "[2026-09-01T23:10:52.793Z] [debug] missions: \u00b7 at=buried_cities travelTo=buried_cities\n[2026-09-01T23:10:52.793Z] [debug] boot: life bmtj9yrifx1 started 2026-09-01T23:04:53.703Z \u00b7 FOLLOWED AN OTA APPLY 238ms ago via boot-front \u00b7 prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)\n[2026-09-01T23:10:56.968Z] [debug] ui: tap \"\u2192 THE BURIED CITIES\"\n",
+      "[2026-09-01T23:10:57.023Z] [world] You walk north through open silt. The compass tells you Tartarian Pilgrim Camp lies further north \u2014 3 tiles, about 8 hours of travel.\n[2026-09-01T23:10:57.024Z] [world] The thread you were following waits where you left it.\n[2026-09-01T23:11:07.921Z] [debug] ui: tap \"NORTH\"\n",
+      "[2026-09-01T23:11:07.931Z] [world] Black rain runs down your collar. Something in you tightens that should not have.\n[2026-09-01T23:11:07.961Z] [player] go north\n[2026-09-01T23:11:07.962Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-09-01T23:11:07.974Z] [world] You walk north through open silt. The compass tells you Tartarian Pilgrim Camp lies further north \u2014 2 tiles, about 5 hours of travel.\n[2026-09-01T23:11:07.974Z] [world] What you started here has not finished itself in your absence.\n[2026-09-01T23:11:07.975Z] [system] \u23f3 Time passed: 15 min\n[2026-09-01T23:11:08.292Z] [cognitive] TRAVEL  (316ms)\n",
+      "[2026-09-01T23:11:09.263Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-09-01T23:11:09.454Z] [debug] ui: tap \"NORTH\"\n[2026-09-01T23:11:09.475Z] [player] go north\n[2026-09-01T23:11:09.476Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-09-01T23:11:09.480Z] [debug] spawn: gear=[Order Letter-Opener, Crude Golem Sledge] window=10 roster=new\n[2026-09-01T23:11:09.481Z] [world] You walk north through open silt. The compass tells you Tartarian Pilgrim Camp lies further north \u2014 1 tile, about 3 hours of travel.\n",
+      "[2026-09-01T23:11:09.481Z] [world] Pre-flood transport, gutted and tipped onto its side. The destination scroll above the driver's seat still reads 'OUTER LINE \u2014 DRAKOVA.' Inside, a duffel bag sits propped against the back wheel-well. A note pinned to the bag.\n",
+      "[2026-09-01T23:11:09.481Z] [world] Note reads: 'If you find this, keep walking east. Three days, look for the standing stone \u2014 the one with the chip on its crown. There's something buried at its base. I nev"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-02-1633-a-batch-is-one-action #mtkoldfngwnk [inline 1/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtkoldfngwnk"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-02-1633-a-batch-is-one-action"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "1"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-02-1633-a-batch-is-one-action"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-02T23:32:33.146751Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-02T23:32:34.100000Z",
+  "fingerprints": [
+    "0e2af6e4afdb47e1b2c25685aca10930"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1951764249,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-02T23:32:34.101000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-02-1633-a-batch-is-one-action",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-02-1633-a-batch-is-one-action",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-02-1633-a-batch-is-one-action",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-02-1633-a-batch-is-one-action)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "cf81c62783a34de88c47fe5a70d759cd",
+  "previousEventID": "cbf4117a9648464f84a63ddab3d15b16"
+}

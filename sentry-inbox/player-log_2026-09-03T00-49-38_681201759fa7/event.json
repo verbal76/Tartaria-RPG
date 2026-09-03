@@ -1,0 +1,256 @@
+{
+  "id": "681201759fa7491db79f75cf5604d071",
+  "groupID": "7708462105",
+  "eventID": "681201759fa7491db79f75cf5604d071",
+  "projectID": "4511945117532160",
+  "size": 17761,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-02-1634-the-aside-yields #mtkt5bixx0qy [inline 10/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-02-1634-the-aside-yields",
+  "message": "player-log 2026-09-02-1634-the-aside-yields #mtkt5bixx0qy [inline 10/28]",
+  "title": "player-log 2026-09-02-1634-the-aside-yields #mtkt5bixx0qy [inline 10/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "f94496531ea14f0b83cffba1544512dd",
+      "span_id": "bc6c018144b40558",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "e Boy's Locket spawn=Mud Wraith\u00d71 AMBUSH\n[2026-09-03T00:01:38.182Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n[2026-09-03T00:01:38.182Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n",
+      "[2026-09-03T00:01:38.183Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n[2026-09-03T00:01:38.183Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n",
+      "[2026-09-03T00:01:38.183Z] [debug] missions: \u00b7 at=builders_survey_camp travelTo=mud_flood_nexus\n[2026-09-03T00:01:38.292Z] [world] You've left Tartarian Pilgrim Camp and entered Builders' Survey Camp. Theodolite stakes march to the edge of the ruin-field and stop, like a sentence that thought better of itself. It's dawn. Zann of No Fixed Stall is the only soul in sight. east leads to Giant-Watch S",
+      "hrine; south leads to The Master-Strand; west leads to Tartarian Pilgrim Camp. Nothing named to the north.\n[2026-09-03T00:01:38.292Z] [world] You know this place. Not well, but you know it.\n[2026-09-03T00:01:38.292Z] [system] Weather effect \u2014 Ash Storm: -1 STR\n",
+      "[2026-09-03T00:01:38.295Z] [world] [Builders' Survey Camp] north: Garrin (return the folio) (17 tiles, 1 day, 19 hours) \u00b7 east: The Storm's Eye (4 tiles, 10 hours) \u00b7 south: The Master-Strand (5 tiles, 13 hours) \u00b7 west: The Deep Nave (2 tiles, 5 hours)\n[2026-09-03T00:01:38.295Z] [world] You think back to the firepit from earlier \u2014 the salvage you pulled from it. Something here reminds you of it.\n",
+      "[2026-09-03T00:01:38.295Z] [world] Zann of No Fixed Stall places you as you come in. \"Cheddar Bob. What are you after?\"\n[2026-09-03T00:01:38.295Z] [world] \"Been a while,\" Zann of No Fixed Stall says. \"Thought the mud had you.\"\n[2026-09-03T00:01:38.295Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-09-03T00:01:38.296Z] [arbiter] \"Three things in this place would reward attention,\" the Arbiter says, without naming them. \"I would start with the one you cannot quite see.\"\n[2026-09-03T00:01:40.804Z] [debug] ui: tap \"craft\"\n[2026-09-03T00:02:02.837Z] [player] craft Mudstone\n",
+      "[2026-09-03T00:02:02.838Z] [debug] parser: intent=craft conf=1.00 verb=craft target=mudstone resolved=Mudstone range=- enemies=0 hooks=1\n[2026-09-03T00:02:03.035Z] [arbiter] The Arbiter stops with his hand over your pack. \"Before I touch 10\u00d7 Mudstone \u2014 2 pieces of this is Crucible stock: 2\u00d7 Mud Essence. Say the word and I'll set it aside instead.\"\n",
+      "[2026-09-03T00:02:03.109Z] [cognitive] SEARCH \u00b7 USE_ITEM \u00b7 THROW  (72ms)\n[2026-09-03T00:02:06.275Z] [player] craft Mudstone\n[2026-09-03T00:02:06.276Z] [debug] parser: intent=craft conf=1.00 verb=craft target=mudstone resolved=Mudstone range=- enemies=0 hooks=1\n[2026-09-03T00:02:06.476Z] [arbiter] The Arbiter nods. \"Stripped for parts: 2\u00d7 Mud Essence \u2192 Mud Fragment.\"\n",
+      "[2026-09-03T00:02:06.636Z] [reward] \u2726 Crafted Mudstone \u00d710. The Arbiter watches you set the last piece.\n[2026-09-03T00:02:06.636Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-03T00:02:06.636Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T00:02:06.948Z] [cognitive] SEARCH \u00b7 USE_ITEM \u00b7 THROW  (310ms)\n",
+      "[2026-09-03T00:02:09.600Z] [debug] persist sizes(KB): total=319 player=92 wm=140[rooms=73 events=5 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=84 scene=2\n[2026-09-03T00:02:10.769Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T00:02:11.961Z] [world] Tucked inside the signpost: an oddment that matches no quartermaster's list. The kind of thing that fuses well.\n",
+      "[2026-09-03T00:02:11.961Z] [reward] \u2726 Salvage haul:\n[2026-09-03T00:02:11.962Z] [reward]     \u2022 Web-Silk Wadding (Common)\n[2026-09-03T00:02:13.406Z] [debug] ui: tap \"investigate\"\n[2026-09-03T00:02:14.943Z] [player] investigate firepit\n[2026-09-03T00:02:14.943Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=firepit resolved=firepit range=- enemies=0 hooks=1\n",
+      "[2026-09-03T00:02:14.946Z] [debug] route: hook intercept (kind=thread, target=\"firepit\") \u2014 original intent=investigate\n[2026-09-03T00:02:14.946Z] [world] \u2605 STORY THREAD (step 1) \u2014 You pull the rubble aside. A draft of cold, old air, and a tight passage angling down into the dark.\n",
+      "[2026-09-03T00:02:18.680Z] [world] \u2605\u2605 STORY THREAD COMPLETE \u2014 You wedge yourself into the gap. At the bottom \u2014 a small antechamber, half-flooded, with three sealed jars on a shelf. You take what you can carry.\n[2026-09-03T00:02:18.681Z] [reward] \u2726 Trail Rations, Aether Residue, +12 TC.\n[2026-09-03T00:02:23.908Z] [player] Ask how far they range\n",
+      "[2026-09-03T00:02:23.910Z] [world] \"I do this stretch and one other.\" They gesture vaguely. \"Any more and you are travelling, not trading. Travelling is how you lose stock.\"\n[2026-09-03T00:02:23.911Z] [world] Zann of No Fixed Stall looks at the road behind you before they answer anything at all.\n",
+      "[2026-09-03T00:02:24.790Z] [world] You let the conversation go and Zann of No Fixed Stall gets back to it.\n[2026-09-03T00:02:30.696Z] [reward] Bought 5\u00d7 Aetheric Shard from Zann of No Fixed Stall for 140 TC. (16 TC left)\n[2026-09-03T00:02:34.569Z] [reward] Bought 2\u00d7 Red Cap Mushroom from Zann of No Fixed Stall for 12 TC. (4 TC left)\n",
+      "[2026-09-03T00:02:41.442Z] [reward] Sold Mud-fist Wraps (Common) to Zann of No Fixed Stall for 15 TC. (19 TC on hand)\n[2026-09-03T00:02:41.526Z] [reward] Sold Mud Darts (Common) to Zann of No Fixed Stall for 15 TC. (34 TC on hand)\n[2026-09-03T00:02:41.602Z] [reward] Sold Plasma Thrower (Common) to Zann of No Fixed Stall for 15 TC. (49 TC on hand)\n",
+      "[2026-09-03T00:02:41.677Z] [reward] Sold Bone Shiv (Stealth) (Common) to Zann of No Fixed Stall for 15 TC. (64 TC on hand)\n[2026-09-03T00:02:41.752Z] [reward] Sold Bonebreaker Mace (Common) to Zann of No Fixed Stall for 15 TC. (79 TC on hand)\n[2026-09-03T00:02:41.827Z] [reward] Sold Iron Spear (Common) to Zann of No Fixed Stall for 15 TC. (94 TC on hand)\n",
+      "[2026-09-03T00:02:41.903Z] [reward] Sold Bone Sling (Common) to Zann of No Fixed Stall for 15 TC. (109 TC on hand)\n[2026-09-03T00:02:41.978Z] [reward] Sold Rusted Blade (Common) to Zann of No Fixed Stall for 15 TC. (124 TC on hand)\n[2026-09-03T00:02:42.053Z] [reward] Sold Mud Harpoon (Common) to Zann of No Fixed Stall for 15 TC. (139 TC on hand)\n",
+      "[2026-09-03T00:02:42.129Z] [reward] Sold Mud Claymore (Common) to Zann of No Fixed Stall for 15 TC. (154 TC on hand)\n[2026-09-03T00:02:42.205Z] [reward] Sold Tartarian Hand Spear (Common) to Zann of No Fixed Stall for 15 TC. (169 TC on hand)\n[2026-09-03T00:02:42.280Z] [reward] Sold Short Hunting Bow (Common) to Zann of No Fixed Stall for 14 TC. (183 TC on hand)\n",
+      "[2026-09-03T00:02:42.355Z] [reward] Sold Mud-Iron Cleaver (Common) to Zann of No Fixed Stall for 14 TC. (197 TC on hand)\n[2026-09-03T00:02:42.430Z] [reward] Sold Mud Shortsword (Common) to Zann of No Fixed Stall for 14 TC. (211 TC on hand)\n[2026-09-03T00:02:42.506Z] [reward] Sold Tartarian Bone Knife (Common) to Zann of No Fixed Stall for 14 TC. (225 TC on hand)\n",
+      "[2026-09-03T00:02:42.581Z] [reward] Sold Magnetized Rod (Common) to Zann of No Fixed Stall for 14 TC. (239 TC on hand)\n[2026-09-03T00:02:42.656Z] [reward] Sold Echoing Steps Boots (Common) to Zann of No Fixed Stall for 14 TC. (253 TC on hand)\n[2026-09-03T00:02:42.730Z] [reward] Sold Bone Shiv (Common) to Zann of No Fixed Stall for 14 TC. (267 TC on hand)\n",
+      "[2026-09-03T00:02:42.804Z] [reward] Sold Tartarian Hand Axe (Common) to Zann of No Fixed Stall for 14 TC. (281 TC on hand)\n[2026-09-03T00:02:42.877Z] [reward] Sold Compact Laser Pistol (Ranged) (Common) to Zann of No Fixed Stall for 14 TC. (295 TC on hand)\n[2026-09-03T00:02:42.951Z] [reward] Sold Plasma Cutter (Common) to Zann of No Fixed Stall for 13 TC. (308 TC on hand)\n",
+      "[2026-09-03T00:02:43.025Z] [reward] Sold Iron Buckler (Common) to Zann of No Fixed Stall for 13 TC. (321 TC on hand)\n[2026-09-03T00:02:43.099Z] [reward] Sold Tartarian Claw Knife (Common) to Zann of No Fixed Stall for 13 TC. (334 TC on hand)\n[2026-09-03T00:02:43.172Z] [reward] Sold Aetheric Pike (Common) to Zann of No Fixed Stall for 13 TC. (347 TC on hand)\n",
+      "[2026-09-03T00:02:43.245Z] [reward] Sold Mud-Iron Cleaver (Common) to Zann of No Fixed Stall for 13 TC. (360 TC on hand)\n[2026-09-03T00:02:43.318Z] [reward] Sold Titan's Forehead Guard (Common) to Zann of No Fixed Stall for 8 TC. (368 TC on hand)\n[2026-09-03T00:02:43.391Z] [reward] Sold Golem-Guardian's Greaves (Common) to Zann of No Fixed Stall for 8 TC. (376 TC on hand)\n",
+      "[2026-09-03T00:02:43.464Z] [reward] Sold Reclaimer's Salvage Vest (Common) to Zann of No Fixed Stall for 8 TC. (384 TC on hand)\n[2026-09-03T00:02:43.537Z] [reward] Sold Architect's Mantle (Common) to Zann of No Fixed Stall for 8 TC. (392 TC on hand)\n[2026-09-03T00:02:43.609Z] [reward] Sold Stone-Stride Greaves (Common) to Zann of No Fixed Stall for 8 TC. (400 TC on hand)\n",
+      "[2026-09-03T00:02:43.682Z] [reward] Sold Arcane Guardian's Chestpiece (Common) to Zann of No Fixed Stall for 8 TC. (408 TC on hand)\n[2026-09-03T00:02:43.755Z] [reward] Sold Architect's Mantle (Common) to Zann of No Fixed Stall for 8 TC. (416 TC on hand)\n[2026-09-03T00:02:43.827Z] [reward] Sold Golem-Born Guardian Mask (Common) to Zann of No Fixed Stall for 8 TC. (424 TC on hand)\n",
+      "[2026-09-03T00:02:43.899Z] [reward] Sold Architect's Observer Visor (Common) to Zann of No Fixed Stall for 6 TC. (430 TC on hand)\n[2026-09-03T00:02:43.970Z] [reward] Sold Shaman's Mud Helm (Common) to Zann of No Fixed Stall for 6 TC. (436 TC on hand)\n[2026-09-03T00:02:44.042Z] [reward] Sold Sentinel's Mobile Greaves (Common) to Zann of No Fixed Stall for 6 TC. (442 TC on hand)\n",
+      "[2026-09-03T00:02:44.119Z] [reward] Sold Arcane Weaver's Grip (Common) to Zann of No Fixed Stall for 6 TC. (448 TC on hand)\n[2026-09-03T00:02:44.192Z] [reward] Sold Explorer's Worn Headgear (Common) to Zann of No Fixed Stall for 6 TC. (454 TC on hand)\n[2026-09-03T00:02:44.263Z] [reward] Sold Aetherbound Mask (Common) to Zann of No Fixed Stall for 6 TC. (460 TC on hand)\n",
+      "[2026-09-03T00:02:44.335Z] [reward] Sold Sentinel's Overcoat (Common) to Zann of No Fixed Stall for 6 TC. (466 TC on hand)\n[2026-09-03T00:02:44.407Z] [reward] Sold Stonebreaker's Cloak (Common) to Zann of No Fixed Stall for 6 TC. (472 TC on hand)\n[2026-09-03T00:02:44.478Z] [reward] Sold Arcane Sprinter's Boots (Common) to Zann of No Fixed Stall for 6 TC. (478 TC on hand)\n",
+      "[2026-09-03T00:02:44.549Z] [reward] Sold Rough Hewn Mask (Common) to Zann of No Fixed Stall for 6 TC. (484 TC on hand)\n[2026-09-03T00:02:44.619Z] [reward] Sold Architect's Outer Mantle (Common) to Zann of No Fixed Stall for 6 TC. (490 TC on hand)\n[2026-09-03T00:02:44.689Z] [reward] Sold Arcane Sprinter's Boots (Common) to Zann of No Fixed Stall for 6 TC. (496 TC on hand)\n",
+      "[2026-09-03T00:02:44.759Z] [reward] Sold Sentinel's Mobile Greaves (Common) to Zann of No Fixed Stall for 6 TC. (502 TC on hand)\n[2026-09-03T00:02:44.829Z] [reward] Sold Mud-Bound Cloak (Common) to Zann of No Fixed Stall for 6 TC. (508 TC on hand)\n[2026-09-03T00:02:44.898Z] [reward] Sold Bone Knife (Common) to Zann of No Fixed Stall for 6 TC. (514 TC on hand)\n",
+      "[2026-09-03T00:02:44.967Z] [reward] Sold Bone Knife (Common) to Zann of No Fixed Stall for 6 TC. (520 TC on hand)\n[2026-09-03T00:02:45.036Z] [reward] Sold Bone Knife (Common) to Zann of No Fixed Stall for 6 TC. (526 TC on hand)\n[2026-09-03T00:02:45.105Z] [reward] Sold Bone Knife (Common) to Zann of No Fixed Stall for 6 TC. (532 TC on hand)\n",
+      "[2026-09-03T00:02:45.174Z] [reward] Sold Aetherbound Mask (Common) to Zann of No Fixed Stall for 6 TC. (538 TC on hand)\n[2026-09-03T00:02:45.243Z] [reward] Sold Traveler's Cloak (Common) to Zann of No Fixed Stall for 6 TC. (544 TC on hand)\n[2026-09-03T00:02:45.312Z] [reward] Sold Architect's Aetheric Boots (Common) to Zann of No Fixed Stall for 6 TC. (550 TC on hand)\n",
+      "[2026-09-03T00:02:45.380Z] [reward] Sold Architect's Grip (Common) to Zann of No Fixed Stall for 6 TC. (556 TC on hand)\n[2026-09-03T00:02:45.448Z] [reward] Sold Seer's Veil of the Aether (Common) to Zann of No Fixed Stall for 6 TC. (562 TC on hand)\n[2026-09-03T00:02:45.516Z] [reward] Sold Salvager's Worn Greaves (Common) to Zann of No Fixed Stall for 6 TC. (568 TC on hand)\n",
+      "[2026-09-03T00:02:45.584Z] [reward] Sold Aetheric Helm of Insight (Common) to Zann of No Fixed Stall for 6 TC. (574 TC on hand)\n[2026-09-03T00:02:45.652Z] [reward] Sold Diplomat's Mask of the Giants (Common) to Zann of No Fixed Stall for 6 TC. (580 TC on hand)\n[2026-09-03T00:02:45.719Z] [reward] Sold Crude Golem Pike (Common) to Zann of No Fixed Stall for 5 TC. (585 TC on hand)\n",
+      "[2026-09-03T00:02:45.786Z] [reward] Sold Mud-Bound Cloak (Common) to Zann of No Fixed Stall for 5 TC. (590 TC on hand)\n[2026-09-03T00:02:45.853Z] [reward] Sold Mud-Warden's Vest (Common) to Zann of No Fixed Stall for 5 TC. (595 TC on hand)\n[2026-09-03T00:02:45.921Z] [reward] Sold Reclaimer's Salvage Vest (Common) to Zann of No Fixed Stall for 5 TC. (600 TC on hand)\n",
+      "[2026-09-03T00:02:45.987Z] [reward] Sold Reclaimer's Salvage Vest (Common) to Zann of No Fixed Stall for 5 TC. (605 TC on hand)\n[2026-09-03T00:02:46.052Z] [reward] Sold Mud-Bound Cloak (Common) to Zann of No Fixed Stall for 5 TC. (610 TC on hand)\n[2026-09-03T00:02:46.117Z] [reward] Sold Crude Golem Pike (Common) to Zann of No Fixed Stall for 5 TC. (615 TC on hand)\n",
+      "[2026-09-03T00:02:46.182Z] [reward] Sold Cudgel (Common) to Zann of No Fixed Stall for 2 TC. (617 TC on hand)\n[2026-09-03T00:02:46.246Z] [reward] Sold Cudgel (Common) to Zann of No Fixed Stall for 1 TC. (618 TC on hand)\n[2026-09-03T00:02:50.429Z] [debug] persist sizes(KB): total=297 player=69 wm=141[rooms=73 events=5 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=85 scene=2\n",
+      "[2026-09-03T00:02:52.427Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n[2026-09-03T00:02:52.454Z] [world] You walk east through open silt. The compass tells you Giant-Watch Shrine lies further east \u2014 5 tiles, about 13 hours of travel.\n[2026-09-03T00:02:52.455Z] [world] Far to the east, an Architectural Sentinel paces a ruined wall \u2014 patrol pattern, by the book, never deviating.\n",
+      "[2026-09-03T00:02:54.010Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T00:02:55.381Z] [world] You work the banner apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n[2026-09-03T00:02:55.382Z] [world] You salvage the lamp. The take is small but real.\n",
+      "[Filtered]",
+      "[2026-09-03T00:02:55.383Z] [reward]     \u2022 Horn-Capped Dowel (Common)\n[2026-09-03T00:02:55.384Z"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-02-1634-the-aside-yields #mtkt5bixx0qy [inline 10/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtkt5bixx0qy"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-02-1634-the-aside-yields"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "10"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-02-1634-the-aside-yields"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-03T00:49:37.676519Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "41": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 347,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-03T00:49:38.482000Z",
+  "fingerprints": [
+    "5aded2c019dbb942ee2fb78521913f1f"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1951802238,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-02T23:57:57.073000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-02-1634-the-aside-yields",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-02-1634-the-aside-yields",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-02-1634-the-aside-yields",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-02-1634-the-aside-yields)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "73b7c64842e34291a51e395577926623",
+  "previousEventID": "64ee5ac3dc344229ac94f597ae94d271"
+}

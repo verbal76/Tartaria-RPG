@@ -1,0 +1,238 @@
+{
+  "id": "816d1a33b23a42b693e2bc35425845a7",
+  "groupID": "7708427167",
+  "eventID": "816d1a33b23a42b693e2bc35425845a7",
+  "projectID": "4511945117532160",
+  "size": 18092,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-02-1633-a-batch-is-one-action #mtkoldfngwnk [inline 16/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-02-1633-a-batch-is-one-action",
+  "message": "player-log 2026-09-02-1633-a-batch-is-one-action #mtkoldfngwnk [inline 16/28]",
+  "title": "player-log 2026-09-02-1633-a-batch-is-one-action #mtkoldfngwnk [inline 16/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "3e9714f7288a416499d6aad236c6addb",
+      "span_id": "a3b116d929f3771f",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "09-02T01:37:54.136Z] [player] arm golem with Crude Golem Greatsword\n[2026-09-02T01:37:54.136Z] [world] Ashwright takes up the Crude Golem Greatsword. It settles into the construct's grip like it was cast for it.\n[2026-09-02T01:37:54.831Z] [debug] qwen\u23f1 item_synthesis_hw preempted 5825ms read 4274ms/write 752ms in 327t\u2192out 24t 13.1ms/t (107ch)\n",
+      "[2026-09-02T01:37:55.487Z] [debug] qwen\u23f1 \u2702 DISCARDED item_synthesis_hw after 5825ms \u2014 item_synth:unparseable (107ch) raw=\"{\"kind\":\"weapon_coating\",\"description\":\"A thick, blackened flask with a sharp edge.\",\"extraTags\":[\"acid\"],\"\"\n[2026-09-02T01:37:55.488Z] [debug] homework: item_desc \"Acid Flask\" \u2205 6496ms\n",
+      "[2026-09-02T01:37:57.177Z] [debug] persist sizes(KB): total=282 player=69 wm=126[rooms=61 events=5 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=83 scene=3\n[2026-09-02T01:38:00.775Z] [debug] ui: tap \"\u2192 CRADLE OF DUSK\"\n[2026-09-02T01:38:00.787Z] [debug] spawn: gear=[Mud Heater Sword] window=10 roster=new\n",
+      "[2026-09-02T01:38:00.789Z] [world] The flat silt heaves, and a hand breaks the surface, then an arm, then a face caked grey with a thousand years of it.\n[2026-09-02T01:38:00.789Z] [arbiter] These are the Aetherkin the roadside traders whisper about \u2014 the flood-dead the Aether would not let rest.\n",
+      "[2026-09-02T01:38:00.789Z] [world] In life it was a machinist, one hand fused half-around a wrench that rusted into the bone \u2014 you find yourself wanting to know their name, and knowing you never will. Something you stirred woke the Aetherstone that held them; now they're awake and out.\n",
+      "[2026-09-02T01:38:00.789Z] [world] There's no hunger in it, only fright. It shrinks from your step, then squares up on trembling legs \u2014 it will defend itself, and nothing more.\n[2026-09-02T01:38:00.789Z] [world] You walk west through open silt. The compass points west into open ground.\n[2026-09-02T01:38:00.790Z] [world] The damp has been at it and got no further than it had.\n",
+      "[2026-09-02T01:38:05.114Z] [debug] ui: tap \"golem (68/68)\"\n[2026-09-02T01:38:05.124Z] [player] use golem\n[2026-09-02T01:38:05.125Z] [combat] Ashwright attacks Mud-Wracked Aetherkin \u2014 d20 17 + 3 = 20 vs AC 10 \u2014 \u2713 HIT\n[2026-09-02T01:38:05.126Z] [combat] Ashwright swings the Crude Golem Greatsword \u2014 7 slashing damage on Mud-Wracked Aetherkin. (98 HP left)\n",
+      "[2026-09-02T01:38:05.127Z] [combat] Mud-Wracked Aetherkin retaliates \u2014 d20 19 + 5 hits Ashwright for 7 (35% resisted). (61/68)\n[2026-09-02T01:38:05.149Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 13 + ATK 4 = 17 vs your AC 24 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-02T01:38:06.477Z] [debug] ui: tap \"golem (61/68)\"\n[2026-09-02T01:38:06.481Z] [player] use golem\n",
+      "[2026-09-02T01:38:06.481Z] [combat] Ashwright attacks Mud-Wracked Aetherkin \u2014 d20 19 + 3 = 22 vs AC 10 \u2014 \u2713 HIT\n[2026-09-02T01:38:06.482Z] [combat] Ashwright swings the Crude Golem Greatsword \u2014 6 slashing damage on Mud-Wracked Aetherkin. (92 HP left)\n[2026-09-02T01:38:06.483Z] [combat] Mud-Wracked Aetherkin swings at Ashwright and misses.\n",
+      "[2026-09-02T01:38:06.501Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 17 + ATK 4 = 21 vs your AC 24 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-09-02T01:38:06.817Z] [combat] Mud-Wracked Aetherkin deals 3 aetheric damage [armor \u221234%, title \u00bd, plate \u22122, floor 30%] +1 electrical [Mud-glass Scales took it]. You have 20 HP remaining.\n[2026-09-02T01:38:07.675Z] [debug] ui: tap \"golem (61/68)\"\n",
+      "[2026-09-02T01:38:07.676Z] [player] use golem\n[2026-09-02T01:38:07.676Z] [combat] Ashwright attacks Mud-Wracked Aetherkin \u2014 d20 5 + 3 = 8 vs AC 10 \u2014 \u2717 MISS\n[2026-09-02T01:38:07.677Z] [world] Ashwright's strike sails wide of Mud-Wracked Aetherkin.\n[2026-09-02T01:38:07.677Z] [combat] Mud-Wracked Aetherkin retaliates \u2014 d20 17 + 5 hits Ashwright for 5 (35% resisted). (56/68)\n",
+      "[2026-09-02T01:38:07.678Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 2 + ATK 4 = 6 vs your AC 24 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-02T01:38:09.094Z] [debug] ui: tap \"golem (56/68)\"\n[2026-09-02T01:38:09.102Z] [player] use golem\n[2026-09-02T01:38:09.103Z] [combat] Ashwright attacks Mud-Wracked Aetherkin \u2014 d20 5 + 3 = 8 vs AC 10 \u2014 \u2717 MISS\n",
+      "[2026-09-02T01:38:09.103Z] [world] Ashwright's strike sails wide of Mud-Wracked Aetherkin.\n[2026-09-02T01:38:09.104Z] [combat] Mud-Wracked Aetherkin retaliates \u2014 d20 14 + 5 hits Ashwright for 5 (35% resisted). (51/68)\n[2026-09-02T01:38:09.122Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 13 + ATK 4 = 17 vs your AC 24 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-02T01:38:11.345Z] [debug] ui: tap \"approach\"\n[2026-09-02T01:38:11.408Z] [player] approach Mud-Wracked Aetherkin\n[2026-09-02T01:38:11.408Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud wracked aetherkin resolved=Mud-Wracked Aetherkin range=mid enemies=1 hooks=1\n",
+      "[2026-09-02T01:38:11.409Z] [debug] move: advance from range=mid enemies=1 weather=Aether Lightning cost=1 partial=0\n[2026-09-02T01:38:11.410Z] [debug] move: field advance target=Mud-Wracked Aetherkin d 1.50->0.50 band mid->close\n[2026-09-02T01:38:11.410Z] [world] You close the gap with Mud-Wracked Aetherkin. (range: close / arm's reach)\n",
+      "[2026-09-02T01:38:11.411Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 18 + ATK 4 = 22 vs your AC 24 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-09-02T01:38:11.729Z] [combat] Mud-Wracked Aetherkin deals 10 aetheric damage [armor \u221234%, title \u00bd, plate \u22122, floor 30%] +2 electrical [Mud-glass Scales took it]. You have 10 HP remaining.\n",
+      "[2026-09-02T01:38:12.003Z] [cognitive] SWIM \u00b7 RETREAT \u00b7 REST \u00b7 SEARCH  (588ms)\n[2026-09-02T01:38:14.615Z] [debug] ui: tap \"dodge\"\n[2026-09-02T01:38:14.628Z] [player] dodge\n[2026-09-02T01:38:14.629Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=1\n",
+      "[2026-09-02T01:38:14.630Z] [world] You commit to the dodge. Slip Mud-Wracked Aetherkin's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-02T01:38:14.715Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 3 + ATK 4 = 7 vs your AC 24 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n",
+      "[2026-09-02T01:38:14.715Z] [combat] Dodge \u2014 d20 \u2192 16 + DEX 23 = 39 vs ATK 7. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-02T01:38:14.716Z] [debug] arbiter: template (reason=combat)\n[2026-09-02T01:38:14.716Z] [arbiter] \"The Sentinels did not invent violence. They only learned it well.\" the Arbiter says.\n[2026-09-02T01:38:14.717Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-02T01:38:14.999Z] [cognitive] neutral  (281ms)\n[2026-09-02T01:38:15.601Z] [debug] persist sizes(KB): total=283 player=69 wm=126[rooms=61 events=5 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=83 scene=4\n[2026-09-02T01:38:17.200Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n[2026-09-02T01:38:17.242Z] [player] attack with the auralite talon\n",
+      "[2026-09-02T01:38:17.243Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=1 hooks=1\n[2026-09-02T01:38:17.244Z] [debug] attack: target=Mud-Wracked Aetherkin range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n[2026-09-02T01:38:17.245Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-09-02T01:38:17.305Z] [world] You bring the acid-etched corrupted auralite talon to bear on Mud-Wracked Aetherkin.\n[2026-09-02T01:38:17.306Z] [system] \u23f3 Time passed: 6 min\n[2026-09-02T01:38:17.577Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (270ms)\n[2026-09-02T01:38:28.015Z] [world] You seize the initiative. Mud-Wracked Aetherkin has no time to react.\n",
+      "[2026-09-02T01:38:28.016Z] [combat] You \u2014 d20 \u2192 17 + INT 13 perfect opening (2\u00d7 dice) = 30 vs Mud-Wracked Aetherkin AC 10 \u2014 \u2713 HIT\n[2026-09-02T01:38:28.016Z] [combat] Aetheric flares \u2014 +1 on hit (weak \u2014 bites deep!).\n[2026-09-02T01:38:28.016Z] [combat] Weakness exposed \u2014 Mud-Wracked Aetherkin flinches. (aetheric \u00d71.5 for 30)\n",
+      "[2026-09-02T01:38:28.018Z] [combat] Clean hit with the acid-etched corrupted auralite talon for 30. Mud-Wracked Aetherkin has 62 left and does not back away.\n[2026-09-02T01:38:28.018Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 2 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n",
+      "[2026-09-02T01:38:28.019Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 1 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n[2026-09-02T01:38:28.019Z] [combat] Mud-Wracked Aetherkin is left exposed \u2014 easier to hit.\n[2026-09-02T01:38:28.024Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 20 + ATK 4 = 24 vs your AC 24 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 CRITICAL HIT\n",
+      "[2026-09-02T01:38:28.347Z] [combat] Mud-Wracked Aetherkin deals 5 aetheric damage [armor \u221234%, title \u00bd, plate \u22122, floor 30%] +1 electrical [Mud-glass Scales took it]. You have 5 HP remaining.\n[2026-09-02T01:38:32.919Z] [debug] ui: tap \"\u2697\u2623 auralite talon \u2605\"\n[2026-09-02T01:38:32.926Z] [world] A silent bolt strikes near enough to singe your sleeve. (\u22121 HP)\n",
+      "[2026-09-02T01:38:32.959Z] [player] attack with the auralite talon\n[2026-09-02T01:38:32.960Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=1 hooks=1\n[2026-09-02T01:38:32.961Z] [combat] Mud-Wracked Aetherkin smokes \u2014 acid eats 2. (60/105 HP, 2 turns left)\n",
+      "[2026-09-02T01:38:32.961Z] [combat] Mud-Wracked Aetherkin blackens \u2014 corruption eats 1. (59/105 HP, 2 turns left)\n[2026-09-02T01:38:32.962Z] [debug] attack: target=Mud-Wracked Aetherkin range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n",
+      "[2026-09-02T01:38:33.025Z] [world] Your acid-etched corrupted auralite talon comes around in an arc; Mud-Wracked Aetherkin squares up to meet it.\n[2026-09-02T01:38:33.025Z] [system] \u23f3 Time passed: 6 min\n[2026-09-02T01:38:33.304Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (277ms)\n",
+      "[2026-09-02T01:38:44.929Z] [world] You seize the initiative. Mud-Wracked Aetherkin has no time to react.\n[2026-09-02T01:38:44.929Z] [combat] You \u2014 d20 \u2192 2 + INT 13 = 15 vs Mud-Wracked Aetherkin AC 7 \u2014 \u2713 HIT\n[2026-09-02T01:38:44.929Z] [combat] The Corrupted coating fails to take on Mud-Wracked Aetherkin.\n[2026-09-02T01:38:44.930Z] [combat] Aetheric flares \u2014 +2 on hit (weak \u2014 bites deep!).\n",
+      "[2026-09-02T01:38:44.930Z] [combat] Weakness exposed \u2014 Mud-Wracked Aetherkin flinches. (aetheric \u00d71.5 for 15)\n[2026-09-02T01:38:44.932Z] [combat] Clean hit with the acid-etched corrupted auralite talon for 15. Mud-Wracked Aetherkin has 44 left and does not back away.\n",
+      "[2026-09-02T01:38:44.932Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 1 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 3 total).\n[2026-09-02T01:38:44.932Z] [combat] Mud-Wracked Aetherkin is left exposed \u2014 easier to hit.\n",
+      "[2026-09-02T01:38:44.934Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 12 + ATK 4 = 16 vs your AC 24 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-02T01:38:47.483Z] [debug] ui: tap \"inventory\"\n[2026-09-02T01:39:03.085Z] [player] use Aether-Purge Tonic\n",
+      "[2026-09-02T01:39:03.085Z] [debug] parser: intent=use_relic conf=1.00 verb=use target=aether purge tonic resolved=Mud-Wracked Aetherkin range=close enemies=1 hooks=1\n[2026-09-02T01:39:03.086Z] [world] You use one Aether-Purge Tonic. -8 corruption.\n[2026-09-02T01:39:03.096Z] [system] \u23f3 Time passed: 15 min\n[2026-09-02T01:39:03.755Z] [reward] \u2726 Clean. The hum of the Aether is no longer your own.\n",
+      "[2026-09-02T01:39:04.372Z] [cognitive] neutral  (1275ms)\n[2026-09-02T01:39:13.165Z] [player] feed dog Forager's Stew\n[2026-09-02T01:39:13.166Z] [world] You feed Mercy the Forager's Stew. She eats, slow and serious. (+6 HP, +20 loyalty)\n[2026-09-02T01:39:18.873Z] [world] You use 2\u00d7 Forager's Stew. +16 HP (20/43).\n",
+      "[2026-09-02T01:39:21.814Z] [debug] persist sizes(KB): total=283 player=68 wm=127[rooms=61 events=5 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=84 scene=4\n[2026-09-02T01:39:26.793Z] [player] use Hollow-Cleanse Decoction\n",
+      "[2026-09-02T01:39:26.793Z] [debug] parser: intent=use_relic conf=1.00 verb=use target=hollow cleanse decoction resolved=Hollow-Cleanse Decoction range=close enemies=1 hooks=1\n[2026-09-02T01:39:26.794Z] [world] You use one Hollow-Cleanse Decoction. +3 HP, -9 corruption.\n[2026-09-02T01:39:26.809Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-09-02T01:39:26.809Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-02T01:39:26.809Z] [system] \u23f3 Time passed: 15 min\n[2026-09-02T01:39:28.034Z] [cognitive] neutral  (1224ms)\n[2026-09-02T01:39:48.484Z] [world] You use 2\u00d7 Field Dressing. +20 HP (43/43).\n[2026-09-02T01:39:57.546Z] [debug] ui: tap \"inventory\"\n",
+      "[2026-09-02T01:40:10.018Z] [reward] You work the searing paste along the weapon. Now wielding the Searing Choir-Bound Launcher \u2014 1d4 burn on every landing hit.\n[2026-09-02T01:40:29.465Z] [debug] ui: tap \"\ud83d\udd25 choir-bound launcher \u2605\"\n[2026-09-02T01:40:29.529Z] [player] attack with the off-hand choir-bound launcher\n",
+      "[2026-09-02T01:40:29.530Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=close enemies=1 hooks=1\n[2026-09-02T01:40:29.530Z] [combat] Mud-Wracked Aetherkin blackens \u2014 corruption eats 1. (43/105 HP, 1 turn left)\n[2026-09-02T01:40:29.531Z] [combat] Mud-Wracked Aetherkin smokes \u2014 acid eats 1. (42/105 HP, 2 turns left)\n",
+      "[2026-09-02T01:40:29.531Z] [debug] attack: target=Mud-Wracked Aetherkin range=close reach.bands=[distant,far,mid,close] reach.label=Choir-Bound Launcher bareHand=false\n[2026-09-02T01:40:29.594Z] [world] Your searing choir-bound launcher comes around in an arc; Mud-Wracked Aetherkin squares up to meet it.\n[2026-09-02T01:40:29.595Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-02T01:40:29.869Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 TAKE_COVER  (274ms)\n[2026-09-02T01:40:36.619Z] [world] You seize the initiative. Mud-Wracked Aetherkin has no time to react.\n[2026-09-02T01:40:36.619Z] [combat] You \u2014 d20 \u2192 9 + INT 13 + 2 (point blank) = 24 vs Mud-Wracked Aetherkin AC 7 \u2014 \u2713 HIT\n[2026-09-02T01:40:36.619Z] [combat] Aetheric flares \u2014 +4 on hit (weak \u2014 bites deep!).\n",
+      "[2026-09-02T01:40:36.619Z] [combat] Weakness exposed \u2014 Mud-Wracked Aetherkin flinches. (aetheric \u00d71.5 for 17)\n[2026-09-02T01:40:36.625Z] [combat] Clean hit with the searing choir-bound launcher for 17. Mud-Wracked Aetherkin has 25 left and does not back away.\n[2026-09-02T01:40:36.625Z] [combat] Searing Choir-Bound Launcher \u2014 2 burn bites in and festers (3 turns).\n",
+      "[2026-09-02T01:40:36.626Z] [combat] Mud-Wracked Aetherkin is left exposed \u2014 easier to hit.\n[2026-09-02T01:40:36.627Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 6 + ATK 4 = 10 vs your AC 24 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-02T01:40:37.707Z] [debug] ui: tap \"\u2697\u2623 auralite talon \u2605\"\n[2026-09-02T01:40:37.745Z] [player] attack with the auralite talon\n",
+      "[2026-09-02T01:40:37.746Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=1 hooks=1\n[2026-09-02T01:40:37.746Z] [combat]"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-02-1633-a-batch-is-one-action #mtkoldfngwnk [inline 16/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtkoldfngwnk"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-02-1633-a-batch-is-one-action"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "16"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-02-1633-a-batch-is-one-action"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-02T23:32:33.363743Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-02T23:32:34.102000Z",
+  "fingerprints": [
+    "0e2af6e4afdb47e1b2c25685aca10930"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1951764249,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-02T23:32:34.101000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-02-1633-a-batch-is-one-action",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-02-1633-a-batch-is-one-action",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-02-1633-a-batch-is-one-action",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-02-1633-a-batch-is-one-action)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "92539247c631401988786c173f4fa7ce",
+  "previousEventID": "81388505b690443fa2b642ece9b80199"
+}

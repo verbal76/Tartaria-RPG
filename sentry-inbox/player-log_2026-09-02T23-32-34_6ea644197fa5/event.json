@@ -1,0 +1,238 @@
+{
+  "id": "6ea644197fa54e1e8570ab5423fedf6a",
+  "groupID": "7708427167",
+  "eventID": "6ea644197fa54e1e8570ab5423fedf6a",
+  "projectID": "4511945117532160",
+  "size": 18064,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-02-1633-a-batch-is-one-action #mtkoldfngwnk [inline 22/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-02-1633-a-batch-is-one-action",
+  "message": "player-log 2026-09-02-1633-a-batch-is-one-action #mtkoldfngwnk [inline 22/28]",
+  "title": "player-log 2026-09-02-1633-a-batch-is-one-action #mtkoldfngwnk [inline 22/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "3e9714f7288a416499d6aad236c6addb",
+      "span_id": "a3b116d929f3771f",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "attack: target=Mud Monarchs Raider 2 range=mid reach.bands=[distant,far,mid,close] reach.label=Choir-Bound Launcher bareHand=false\n[2026-09-02T22:35:35.273Z] [debug] attack: visibility penalty \u22121 (Glass Hail)\n[2026-09-02T22:35:35.356Z] [world] You commit forward with the searing choir-bound launcher. Mud Monarchs Raider 2 watches your hands.\n",
+      "[2026-09-02T22:35:35.357Z] [system] \u23f3 Time passed: 6 min\n[2026-09-02T22:35:35.760Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 TAKE_COVER  (402ms)\n[2026-09-02T22:35:42.875Z] [world] You seize the initiative. Mud Monarchs Raider 2 has no time to react.\n[2026-09-02T22:35:42.876Z] [combat] You \u2014 d20 \u2192 18 + INT 12 \u2212 1 (Glass Hail) = 29 vs Mud Monarchs Raider 2 AC 10 \u2014 \u2713 HIT\n",
+      "[2026-09-02T22:35:42.876Z] [combat] Mud Monarchs Raider 2 shrugs off the aetheric. (resisted, \u00d70.5 for 8)\n[2026-09-02T22:35:42.879Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Mud Darts \u2014 poison will bite where aetheric won't.\"\n",
+      "[2026-09-02T22:35:42.880Z] [combat] You crack the Mud Monarchs Raider 2 with the Searing Choir-Bound Launcher for 8 \u2014 half their fight, gone in one blow. They crumple, out cold. (6/14 HP) Loot them before they come to.\n[2026-09-02T22:35:42.882Z] [combat] Mud Monarchs Raider 2 is out of it. Mud Monarchs Raider 3 now in your sights.\n",
+      "[2026-09-02T22:35:42.883Z] [combat] Searing Choir-Bound Launcher \u2014 4 burn bites in and festers (3 turns).\n[2026-09-02T22:35:42.884Z] [combat] Mud Monarchs Raider 5 \u2014 d20 \u2192 13 + ATK 7 = 20 vs your AC 23 \u2014 \u2717 MISS\n[2026-09-02T22:35:42.885Z] [combat] Mud Monarchs Raider 3 \u2014 d20 \u2192 17 + ATK 6 = 23 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n",
+      "[2026-09-02T22:35:42.887Z] [combat] Mud Monarchs Raider 4 \u2014 d20 \u2192 10 + ATK 6 = 16 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-02T22:35:42.887Z] [arbiter] \"Footwork over fury,\" the Arbiter says quietly. \"The Mud Monarchs Raider 3 is patient. Be patienter.\"\n",
+      "[2026-09-02T22:35:43.308Z] [combat] Mud Monarchs Raider 3 deals 3 piercing damage [armor \u221235%] [edge of reach \u2014 halved]. You have 40 HP remaining.\n[2026-09-02T22:35:45.595Z] [debug] ui: tap \"dodge\"\n[2026-09-02T22:35:45.599Z] [world] A shard of mud-glass nicks you. Small wound, steady reminder. (\u22121 HP)\n[2026-09-02T22:35:45.606Z] [player] dodge\n",
+      "[2026-09-02T22:35:45.607Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=5 hooks=1\n[2026-09-02T22:35:45.608Z] [world] You commit to the dodge. Slip Mud Monarchs Raider 3's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-02T22:35:45.608Z] [combat] Mud Monarchs Raider 1 blisters \u2014 clinging fire sears 2. (0/14 HP, 1 turn left)\n[2026-09-02T22:35:45.608Z] [combat] Mud Monarchs Raider 2 blisters \u2014 clinging fire sears 4. (2/14 HP, 2 turns left)\n[2026-09-02T22:35:45.610Z] [reward] Mud Monarchs Raider 1 defeated. You recover Patched Cloth \u00d72.\n",
+      "[2026-09-02T22:35:45.612Z] [reward] You strip the body: Bone Knife, Mud-Bound Cloak (+6 TC). The kit took the fight badly.\n[2026-09-02T22:35:45.612Z] [combat] 3 attackers remain. Mud Monarchs Raider 3 now in your sights.\n[2026-09-02T22:35:45.613Z] [system] Forgotten Order standing +1 (now 43)\n[2026-09-02T22:35:45.613Z] [reward] +12 TC pried from the dust.\n",
+      "[2026-09-02T22:35:45.771Z] [combat] Mud Monarchs Raider 5 \u2014 d20 \u2192 8 + ATK 7 = 15 vs your AC 23 \u2014 \u2717 EVADED\n[2026-09-02T22:35:45.771Z] [combat] Dodge \u2014 d20 \u2192 18 + DEX 23 = 41 vs ATK 15. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n",
+      "[2026-09-02T22:35:45.771Z] [world] You slip Mud Monarchs Raider 5's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n[2026-09-02T22:35:45.773Z] [combat] Mud Monarchs Raider 3 turns on Mercy \u2014 d20 11 + ATK 6 = 17 vs Mercy's AC 10 \u2014 \u2713 HIT\n[2026-09-02T22:35:45.773Z] [combat] Mercy takes 4. (3/15 HP left)\n",
+      "[2026-09-02T22:35:45.774Z] [debug] ac-shift 23\u219226: race/base 10 + gear 20 + title 0 \u2192 trimmed 23 + status 3 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n",
+      "[2026-09-02T22:35:45.774Z] [combat] Mud Monarchs Raider 4 \u2014 d20 \u2192 3 + ATK 6 = 9 vs your AC 26 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-02T22:35:45.775Z] [debug] arbiter: template (reason=combat)\n[2026-09-02T22:35:45.775Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-02T22:35:45.775Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-02T22:35:46.200Z] [cognitive] neutral  (424ms)\n[2026-09-02T22:35:47.435Z] [debug] persist sizes(KB): total=305 player=80 wm=136[rooms=69 events=5 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=83 scene=5\n[2026-09-02T22:35:48.557Z] [debug] ui: tap \"\ud83d\udd25 choir-bound launcher\"\n[2026-09-02T22:35:48.557Z] [system] evasive \u2014 harder to hit fades.\n",
+      "[2026-09-02T22:35:48.592Z] [player] attack with the off-hand choir-bound launcher\n[2026-09-02T22:35:48.593Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=mid enemies=4 hooks=1\n[2026-09-02T22:35:48.593Z] [combat] Mud Monarchs Raider 2 blisters \u2014 clinging fire sears 4. (0/14 HP, 1 turn left)\n",
+      "[2026-09-02T22:35:48.594Z] [reward] Mud Monarchs Raider 2 defeated. You recover Patched Cloth \u00d73, Aetheric Padded Vest.\n[2026-09-02T22:35:48.595Z] [reward] You strip the body: Cudgel, Mud-Warden's Vest (+6 TC). The kit took the fight badly.\n[2026-09-02T22:35:48.595Z] [combat] 3 attackers remain. Mud Monarchs Raider 3 now in your sights.\n",
+      "[2026-09-02T22:35:48.596Z] [system] Forgotten Order standing +1 (now 44)\n[2026-09-02T22:35:48.596Z] [reward] +14 TC pried from the dust.\n[2026-09-02T22:35:48.629Z] [debug] attack: target=Mud Monarchs Raider 3 range=mid reach.bands=[distant,far,mid,close] reach.label=Choir-Bound Launcher bareHand=false\n[2026-09-02T22:35:48.630Z] [debug] attack: visibility penalty \u22121 (Glass Hail)\n",
+      "[2026-09-02T22:35:48.631Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-02T22:35:48.706Z] [world] You bring the searing choir-bound launcher to bear on Mud Monarchs Raider 3.\n[2026-09-02T22:35:48.706Z] [system] \u23f3 Time passed: 6 min\n[2026-09-02T22:35:49.121Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 TAKE_COVER  (413ms)\n",
+      "[2026-09-02T22:35:56.668Z] [world] You seize the initiative. Mud Monarchs Raider 3 has no time to react.\n[2026-09-02T22:35:56.668Z] [combat] You \u2014 d20 \u2192 19 + INT 12 \u2212 1 (Glass Hail) perfect opening (2\u00d7 dice) = 30 vs Mud Monarchs Raider 3 AC 10 \u2014 \u2713 HIT\n[2026-09-02T22:35:56.670Z] [combat] Mud Monarchs Raider 3 shrugs off the aetheric. (resisted, \u00d70.5 for 11)\n",
+      "[2026-09-02T22:35:56.674Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Reclaimers Guild Geode-Cored Cleaver \u2014 slashing will bite where aetheric won't.\"\n[2026-09-02T22:35:56.675Z] [combat] You crack the Mud Monarchs Raider 3 with the Searing Choir-Bound Launcher for 11 \u2014 the better part of their fight, gone in one blow. They crumple, out cold. (4/15 HP) Loot them before they c",
+      "ome to.\n[2026-09-02T22:35:56.675Z] [combat] Mud Monarchs Raider 3 is out of it. Mud Monarchs Raider 4 now in your sights.\n[2026-09-02T22:35:56.675Z] [combat] Searing Choir-Bound Launcher \u2014 3 burn bites in and festers (3 turns).\n",
+      "[2026-09-02T22:35:56.677Z] [debug] ac-shift 26\u219223: race/base 10 + gear 20 + title 0 \u2192 trimmed 23 + status 0 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n[2026-09-02T22:35:56.677Z] [combat] Mud Monarchs Raider 5 \u2014 d20 \u2192 5 + ATK 7 = 12 vs your AC 23 \u2014 \u2717 MISS\n",
+      "[2026-09-02T22:35:56.680Z] [combat] Mud Monarchs Raider 4 \u2014 d20 \u2192 18 + ATK 6 = 24 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-09-02T22:35:57.086Z] [combat] Mud Monarchs Raider 4 deals 1 slashing damage [armor \u221234%] [edge of reach \u2014 halved]. You have 38 HP remaining.\n[2026-09-02T22:35:59.843Z] [debug] ui: tap \"\ud83d\udd25 choir-bound launcher\"\n",
+      "[2026-09-02T22:35:59.873Z] [player] attack with the off-hand choir-bound launcher\n[2026-09-02T22:35:59.873Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=mid enemies=3 hooks=1\n[2026-09-02T22:35:59.874Z] [combat] Mud Monarchs Raider 3 blisters \u2014 clinging fire sears 3. (1/15 HP, 2 turns left)\n",
+      "[2026-09-02T22:35:59.874Z] [debug] attack: target=Mud Monarchs Raider 4 range=mid reach.bands=[distant,far,mid,close] reach.label=Choir-Bound Launcher bareHand=false\n[2026-09-02T22:35:59.875Z] [debug] attack: visibility penalty \u22121 (Glass Hail)\n[2026-09-02T22:35:59.948Z] [world] Your searing choir-bound launcher comes around in an arc; Mud Monarchs Raider 4 squares up to meet it.\n",
+      "[2026-09-02T22:35:59.949Z] [system] \u23f3 Time passed: 6 min\n[2026-09-02T22:36:00.301Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 TAKE_COVER  (352ms)\n[2026-09-02T22:36:07.063Z] [world] Mud Monarchs Raider 4 moves first. The pressure is immediate.\n[2026-09-02T22:36:07.066Z] [combat] Mud Monarchs Raider 5 \u2014 d20 \u2192 16 + ATK 7 = 23 vs your AC 23 \u2014 \u2713 HIT\n",
+      "[2026-09-02T22:36:07.071Z] [combat] Mud Monarchs Raider 4 \u2014 d20 \u2192 10 + ATK 6 = 16 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-02T22:36:07.071Z] [combat] You \u2014 d20 \u2192 4 + INT 12 \u2212 1 (Glass Hail) = 15 vs Mud Monarchs Raider 4 AC 10 \u2014 \u2713 HIT\n[2026-09-02T22:36:07.072Z] [combat] Mud Monarchs Raider 4 shrugs off the aetheric. (resisted, \u00d70.5 for 6)\n",
+      "[2026-09-02T22:36:07.075Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Reclaimers Guild Geode-Cored Cleaver \u2014 slashing will bite where aetheric won't.\"\n[2026-09-02T22:36:07.075Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter watches the aetheric skid off. \"Swap to the Recl\u2026\"\n",
+      "[2026-09-02T22:36:07.075Z] [combat] The blow with the searing choir-bound launcher finds purchase \u2014 6 damage, 8 HP standing. Mud Monarchs Raider 4 commits to the counter.\n[2026-09-02T22:36:07.075Z] [combat] Searing Choir-Bound Launcher \u2014 1 burn bites in and festers (3 turns).\n",
+      "[2026-09-02T22:36:07.438Z] [combat] Mud Monarchs Raider 5 deals 2 slashing damage [armor \u221234%] [edge of reach \u2014 halved]. You have 36 HP remaining.\n[2026-09-02T22:36:08.267Z] [debug] ui: tap \"stealth\"\n[2026-09-02T22:36:08.274Z] [player] sneak\n[2026-09-02T22:36:08.275Z] [debug] parser: intent=stealth conf=1.00 verb=sneak target=- resolved=- range=mid enemies=3 hooks=1\n",
+      "[2026-09-02T22:36:08.359Z] [system] \u23f3 Time passed: 15 min\n[2026-09-02T22:36:08.688Z] [cognitive] DISENGAGE \u00b7 HIDE \u00b7 TAKE_COVER  (328ms)\n[2026-09-02T22:36:10.105Z] [debug] skillcheck: stealth d20=8 STE 7 + 1 (title: Shadow Diver) = 16 vs DC 12 \u2014 Hard \u2192 (resolved below)\n",
+      "[2026-09-02T22:36:10.196Z] [debug] stats: STR16 DEX23 INT12 WIS14 CHA10 STE7 | gear: WIS+4,INT+3,DEX+12,STR+5,STE+2 | worn: main=Auralite Talon off=Choir-Bound Launcher head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n",
+      "[2026-09-02T22:36:10.196Z] [debug] train: stealth (stealth check) \u2192 progress 50/100\n[2026-09-02T22:36:10.196Z] [world] Dusk is with you \u2014 the silt eats sound after dark. (stealth +1, night)\n[2026-09-02T22:36:10.197Z] [world] You drop low and move quiet, closing on Mud Monarchs Raider 4 unseen across the open ground. (+5 next attack)\n",
+      "[2026-09-02T22:36:10.197Z] [debug] stealth: opener carried by the skill roll (16 vs DC 12 \u2014 Hard) \u2014 UNSEEN\n[2026-09-02T22:36:10.197Z] [arbiter] The Arbiter looks around. \"Inside the eye the grass stands straight up, unbent, as if wind were only a rumor.\"\n[2026-09-02T22:36:12.334Z] [debug] ui: tap \"\ud83d\udd25 choir-bound launcher\"\n",
+      "[2026-09-02T22:36:12.387Z] [player] attack with the off-hand choir-bound launcher\n[2026-09-02T22:36:12.388Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=mid enemies=3 hooks=1\n[2026-09-02T22:36:12.388Z] [combat] Mud Monarchs Raider 3 blisters \u2014 clinging fire sears 3. (0/15 HP, 1 turn left)\n",
+      "[2026-09-02T22:36:12.388Z] [combat] Mud Monarchs Raider 4 blisters \u2014 clinging fire sears 1. (7/14 HP, 2 turns left)\n[2026-09-02T22:36:12.389Z] [reward] Mud Monarchs Raider 3 defeated. You recover Patched Cloth \u00d72, Scrap Metal.\n[2026-09-02T22:36:12.390Z] [reward] You strip the body: Bone Knife, Reclaimer's Salvage Vest (+6 TC). The kit took the fight badly.\n",
+      "[2026-09-02T22:36:12.390Z] [combat] 2 attackers remain. Mud Monarchs Raider 4 now in your sights.\n[2026-09-02T22:36:12.391Z] [system] Forgotten Order standing +1 (now 45)\n[2026-09-02T22:36:12.391Z] [reward] +12 TC pried from the dust.\n",
+      "[2026-09-02T22:36:12.443Z] [debug] attack: target=Mud Monarchs Raider 4 range=mid reach.bands=[distant,far,mid,close] reach.label=Choir-Bound Launcher bareHand=false\n[2026-09-02T22:36:12.444Z] [debug] attack: visibility penalty \u22121 (Glass Hail)\n[2026-09-02T22:36:12.444Z] [debug] attack: status mods stealthed +5\n",
+      "[2026-09-02T22:36:12.510Z] [world] You commit forward with the searing choir-bound launcher. Mud Monarchs Raider 4 watches your hands.\n[2026-09-02T22:36:12.510Z] [system] \u23f3 Time passed: 6 min\n[2026-09-02T22:36:12.857Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 TAKE_COVER  (345ms)\n[2026-09-02T22:36:19.584Z] [world] Mud Monarchs Raider 4 moves first. The pressure is immediate.\n",
+      "[2026-09-02T22:36:19.587Z] [combat] Mud Monarchs Raider 4 \u2014 d20 \u2192 4 + ATK 6 = 10 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-02T22:36:19.589Z] [combat] Mud Monarchs Raider 5 \u2014 d20 \u2192 9 + ATK 7 = 16 vs your AC 23 \u2014 \u2717 MISS\n[2026-09-02T22:36:19.589Z] [combat] You \u2014 d20 \u2192 17 + INT 12 \u2212 1 (Glass Hail) stealthed +5 = 33 vs Mud Monarchs Raider 4 AC 10 \u2014 \u2713 HIT\n",
+      "[2026-09-02T22:36:19.589Z] [combat] Mud Monarchs Raider 4 shrugs off the aetheric. (resisted, \u00d70.5 for 7)\n[2026-09-02T22:36:19.597Z] [combat] Final strike with the searing choir-bound launcher for 7. Mud Monarchs Raider 4 is still. The Aetherstone hums on, indifferent.\n[2026-09-02T22:36:19.598Z] [reward] Mud Monarchs Raider 4 defeated. You recover Aether Residue \u00d72.\n",
+      "[2026-09-02T22:36:19.599Z] [reward] You strip the body: Bone Knife, Reclaimer's Salvage Vest (+6 TC). The kit took the fight badly.\n[2026-09-02T22:36:19.600Z] [combat] 1 attacker remains. Mud Monarchs Raider 5 now in your sights.\n[2026-09-02T22:36:19.600Z] [system] Forgotten Order standing +1 (now 46)\n[2026-09-02T22:36:19.600Z] [reward] +18 TC pried from the dust.\n",
+      "[2026-09-02T22:36:20.104Z] [debug] persist sizes(KB): total=305 player=82 wm=137[rooms=69 events=5 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=83 scene=3\n[2026-09-02T22:36:21.996Z] [debug] ui: tap \"\ud83d\udd25 choir-bound launcher\"\n[2026-09-02T22:36:22.059Z] [player] attack with the off-hand choir-bound launcher\n",
+      "[2026-09-02T22:36:22.060Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=mid enemies=1 hooks=1\n[2026-09-02T22:36:22.062Z] [debug] attack: target=Mud Mona"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-02-1633-a-batch-is-one-action #mtkoldfngwnk [inline 22/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtkoldfngwnk"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-02-1633-a-batch-is-one-action"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "22"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-02-1633-a-batch-is-one-action"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-02T23:32:33.419876Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-02T23:32:34.104000Z",
+  "fingerprints": [
+    "0e2af6e4afdb47e1b2c25685aca10930"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1951764249,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-02T23:32:34.101000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-02-1633-a-batch-is-one-action",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-02-1633-a-batch-is-one-action",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-02-1633-a-batch-is-one-action",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-02-1633-a-batch-is-one-action)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "81388505b690443fa2b642ece9b80199",
+  "previousEventID": "6baef3cea028467a9fc7ac345dcd7875"
+}

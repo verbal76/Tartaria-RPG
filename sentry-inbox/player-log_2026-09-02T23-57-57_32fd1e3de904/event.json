@@ -1,0 +1,237 @@
+{
+  "id": "32fd1e3de904484f99f532f9ea052155",
+  "groupID": "7708461709",
+  "eventID": "32fd1e3de904484f99f532f9ea052155",
+  "projectID": "4511945117532160",
+  "size": 18018,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-02-1634-the-aside-yields #mtkoldfngwnk [inline 4/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-02-1634-the-aside-yields",
+  "message": "player-log 2026-09-02-1634-the-aside-yields #mtkoldfngwnk [inline 4/28]",
+  "title": "player-log 2026-09-02-1634-the-aside-yields #mtkoldfngwnk [inline 4/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "f94496531ea14f0b83cffba1544512dd",
+      "span_id": "bc6c018144b40558",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "debug] ui: tap \"dodge\"\n[2026-09-02T00:34:33.499Z] [player] dodge\n[2026-09-02T00:34:33.500Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=5 hooks=1\n[2026-09-02T00:34:33.502Z] [world] You commit to the dodge. Slip Mud Monarchs Raider 1's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-02T00:34:33.503Z] [combat] Mud Monarchs Raider 2 turns on Soot \u2014 d20 11 + ATK 6 = 17 vs Soot's AC 13 (vest +3) \u2014 \u2713 HIT\n[2026-09-02T00:34:33.511Z] [combat] Soot takes 6. (9/15 HP left)\n[2026-09-02T00:34:33.630Z] [combat] Mud Monarchs Raider 1 \u2014 d20 \u2192 5 + ATK 9 = 14 vs your AC 23 \u2014 \u2717 EVADED\n",
+      "[2026-09-02T00:34:33.631Z] [combat] Dodge \u2014 d20 \u2192 2 + DEX 23 = 25 vs ATK 14. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-02T00:34:33.631Z] [world] You slip Mud Monarchs Raider 1's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n",
+      "[2026-09-02T00:34:33.634Z] [combat] Mud Monarchs Raider 3 and 2 others close the distance.\n[2026-09-02T00:34:33.634Z] [debug] arbiter: template (reason=combat)\n[2026-09-02T00:34:33.634Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-02T00:34:33.635Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-02T00:34:34.047Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 18811ms read 0ms/write 0ms in 767t\u2192out 0t (0ch)\n[2026-09-02T00:34:34.812Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 18811ms \u2014 intro-fill:\u2205\n[2026-09-02T00:34:34.812Z] [debug] homework: scene_intro \"The Buried Cities\" \u2205 19874ms\n[2026-09-02T00:34:35.207Z] [cognitive] neutral  (9741ms)\n",
+      "[2026-09-02T00:34:35.596Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n[2026-09-02T00:34:35.598Z] [system] evasive \u2014 harder to hit fades.\n[2026-09-02T00:34:35.626Z] [player] attack with the auralite talon\n[2026-09-02T00:34:35.627Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=5 hooks=1\n",
+      "[2026-09-02T00:34:35.628Z] [debug] attack: target=Mud Monarchs Raider 1 range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n[2026-09-02T00:34:35.630Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-02T00:34:35.714Z] [world] You commit forward with the acid-etched corrupted auralite talon. Mud Monarchs Raider 1 watches your hands.\n",
+      "[2026-09-02T00:34:35.714Z] [system] \u23f3 Time passed: 6 min\n[2026-09-02T00:34:36.473Z] [cognitive] neutral  (10964ms)\n[2026-09-02T00:34:37.228Z] [cognitive] neutral  (3592ms)\n[2026-09-02T00:34:37.613Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (1897ms)\n[2026-09-02T00:34:47.418Z] [world] You seize the initiative. Mud Monarchs Raider 1 has no time to react.\n",
+      "[2026-09-02T00:34:47.418Z] [combat] You \u2014 d20 \u2192 12 + INT 13 perfect opening (2\u00d7 dice) = 25 vs Mud Monarchs Raider 1 AC 11 \u2014 \u2713 HIT\n[2026-09-02T00:34:47.419Z] [combat] Mud Monarchs Raider 1 shrugs off the aetheric. (resisted, \u00d70.5 for 10)\n[2026-09-02T00:34:47.422Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Bone Crossbow \u2014 piercing will bite where aetheric won't.\"\n",
+      "[2026-09-02T00:34:47.423Z] [combat] You crack the Mud Monarchs Raider 1 with the Acid-Etched Corrupted Auralite Talon for 10 \u2014 the better part of their fight, gone in one blow. They crumple, out cold. (4/14 HP) Loot them before they come to.\n[2026-09-02T00:34:47.423Z] [combat] Mud Monarchs Raider 1 is out of it. Mud Monarchs Raider 2 now in your sights.\n",
+      "[2026-09-02T00:34:47.423Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 1 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n[2026-09-02T00:34:47.424Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 2 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n",
+      "[2026-09-02T00:34:47.425Z] [combat] Mud Monarchs Raider 3 \u2014 d20 \u2192 17 + ATK 9 = 26 vs your AC 23 \u2014 \u2713 HIT\n[2026-09-02T00:34:47.428Z] [combat] Mud Monarchs Raider 2 \u2014 d20 \u2192 12 + ATK 6 = 18 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-02T00:34:47.428Z] [combat] Mud Monarchs Raider 4 and 1 other close the distance.\n",
+      "[2026-09-02T00:34:47.874Z] [combat] Mud Monarchs Raider 3 deals 4 bludgeoning damage [edge of reach \u2014 halved]. You have 38 HP remaining.\n[2026-09-02T00:34:50.675Z] [debug] ui: tap \"choir-bound launcher\"\n[2026-09-02T00:34:50.752Z] [player] attack with the off-hand choir-bound launcher\n",
+      "[2026-09-02T00:34:50.756Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=mid enemies=5 hooks=1\n[2026-09-02T00:34:50.758Z] [combat] Mud Monarchs Raider 1 smokes \u2014 acid eats 1. (3/14 HP, 2 turns left)\n[2026-09-02T00:34:50.759Z] [combat] Mud Monarchs Raider 1 blackens \u2014 corruption eats 2. (1/14 HP, 2 turns left)\n",
+      "[2026-09-02T00:34:50.762Z] [debug] attack: target=Mud Monarchs Raider 2 range=mid reach.bands=[distant,far,mid,close] reach.label=Choir-Bound Launcher bareHand=false\n[2026-09-02T00:34:50.879Z] [world] You raise the choir-bound launcher toward Mud Monarchs Raider 2. The room narrows around the both of you.\n[2026-09-02T00:34:50.880Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-02T00:34:51.345Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 TAKE_COVER  (462ms)\n[2026-09-02T00:34:58.938Z] [world] You seize the initiative. Mud Monarchs Raider 2 has no time to react.\n[2026-09-02T00:34:58.939Z] [combat] You \u2014 d20 \u2192 2 + INT 13 = 15 vs Mud Monarchs Raider 2 AC 10 \u2014 \u2713 HIT\n[2026-09-02T00:34:58.940Z] [combat] Mud Monarchs Raider 2 shrugs off the aetheric. (resisted, \u00d70.5 for 3)\n",
+      "[2026-09-02T00:34:58.949Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Bone Crossbow \u2014 piercing will bite where aetheric won't.\"\n[2026-09-02T00:34:58.949Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter watches the aetheric skid off. \"Swap to the Bone\u2026\"\n",
+      "[2026-09-02T00:34:58.950Z] [combat] The blow with the choir-bound launcher finds purchase \u2014 3 damage, 11 HP standing. Mud Monarchs Raider 2 commits to the counter.\n[2026-09-02T00:34:58.952Z] [combat] Mud Monarchs Raider 3 \u2014 d20 \u2192 8 + ATK 7 = 15 vs your AC 23 \u2014 \u2717 MISS\n[2026-09-02T00:34:58.954Z] [combat] Mud Monarchs Raider 4 \u2014 d20 \u2192 6 + ATK 10 = 16 vs your AC 23 \u2014 \u2717 MISS\n",
+      "[2026-09-02T00:34:58.956Z] [combat] Mud Monarchs Raider 5 \u2014 d20 \u2192 7 + ATK 9 = 16 vs your AC 23 \u2014 \u2717 MISS\n[2026-09-02T00:34:58.957Z] [combat] Mud Monarchs Raider 2 presses in behind the others, waiting for an opening.\n[2026-09-02T00:34:59.794Z] [debug] ui: tap \"approach\"\n[2026-09-02T00:34:59.834Z] [player] approach Mud Monarchs Raider 2\n",
+      "[2026-09-02T00:34:59.835Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud monarchs raider 2 resolved=Mud Monarchs Raider 2 range=mid enemies=5 hooks=1\n[2026-09-02T00:34:59.839Z] [debug] move: advance from range=mid enemies=5 weather=Aether Lightning cost=1 partial=0\n[2026-09-02T00:34:59.839Z] [debug] move: field advance target=Mud Monarchs Raider 2 d 1.70->0.70 band mid->close\n",
+      "[2026-09-02T00:34:59.839Z] [world] You close the gap with the Mud Monarchs Raider 2 and 4 others. (range: close / arm's reach)\n[2026-09-02T00:34:59.839Z] [world] The field shifts around you \u2014 Mud Monarchs Raider 3 now close / arm's reach; Mud Monarchs Raider 4 now close / arm's reach; Mud Monarchs Raider 5 now close / arm's reach.\n",
+      "[2026-09-02T00:34:59.840Z] [combat] Mud Monarchs Raider 1 smokes \u2014 acid eats 1. (0/14 HP, 1 turn left)\n[2026-09-02T00:34:59.840Z] [combat] Mud Monarchs Raider 1 blackens \u2014 corruption eats 2. (0/14 HP, 1 turn left)\n[2026-09-02T00:34:59.841Z] [reward] Mud Monarchs Raider 1 defeated. You recover Aether Residue \u00d72, Mud Monarch Sigil.\n",
+      "[2026-09-02T00:34:59.843Z] [reward] You strip the body: Bone Knife, Mud-Warden's Vest (+6 TC). The kit took the fight badly.\n[2026-09-02T00:34:59.843Z] [combat] 4 attackers remain. Mud Monarchs Raider 2 now in your sights.\n[2026-09-02T00:34:59.843Z] [system] Forgotten Order standing +1 (now 40)\n[2026-09-02T00:34:59.844Z] [reward] +14 TC pried from the dust.\n",
+      "[2026-09-02T00:34:59.893Z] [combat] Mud Monarchs Raider 2 \u2014 d20 \u2192 3 + ATK 6 = 9 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-02T00:34:59.894Z] [combat] Mud Monarchs Raider 3 \u2014 d20 \u2192 8 + ATK 7 = 15 vs your AC 23 \u2014 \u2717 MISS\n[2026-09-02T00:34:59.896Z] [combat] Mud Monarchs Raider 4 \u2014 d20 \u2192 15 + ATK 8 = 23 vs your AC 23 \u2014 \u2713 HIT\n",
+      "[2026-09-02T00:34:59.897Z] [combat] Mud Monarchs Raider 5 presses in behind the others, waiting for an opening.\n[2026-09-02T00:34:59.897Z] [debug] arbiter: template (reason=combat)\n[2026-09-02T00:34:59.898Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-02T00:35:00.354Z] [combat] Mud Monarchs Raider 4 deals 3 slashing damage [armor \u221234%]. You have 35 HP remaining.\n",
+      "[2026-09-02T00:35:00.354Z] [combat] Mud Monarchs Raider 4's strike leaves you bleeding.\n[2026-09-02T00:35:01.161Z] [cognitive] SWIM  (1261ms)\n[2026-09-02T00:35:02.249Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n[2026-09-02T00:35:02.313Z] [player] attack with the auralite talon\n",
+      "[2026-09-02T00:35:02.314Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=4 hooks=1\n[2026-09-02T00:35:02.316Z] [debug] attack: target=Mud Monarchs Raider 2 range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n",
+      "[2026-09-02T00:35:02.405Z] [world] You bring the acid-etched corrupted auralite talon to bear on Mud Monarchs Raider 2.\n[2026-09-02T00:35:02.406Z] [system] \u23f3 Time passed: 6 min\n[2026-09-02T00:35:02.891Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (484ms)\n",
+      "[2026-09-02T00:35:03.385Z] [debug] persist sizes(KB): total=292 player=66 wm=136[rooms=73 events=4 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=83 scene=7\n[2026-09-02T00:35:12.330Z] [world] You seize the initiative. Mud Monarchs Raider 2 has no time to react.\n[2026-09-02T00:35:12.332Z] [combat] You \u2014 d20 \u2192 2 + INT 13 = 15 vs Mud Monarchs Raider 2 AC 10 \u2014 \u2717 DODGED\n",
+      "[2026-09-02T00:35:12.332Z] [combat] Mud Monarchs Raider 2 reads the swing and twists clear \u2014 the blow finds nothing. (dodged, quick)\n[2026-09-02T00:35:12.336Z] [combat] Mud Monarchs Raider 4 \u2014 d20 \u2192 1 + ATK 8 = 9 vs your AC 23 \u2014 \u2717 FUMBLE\n[2026-09-02T00:35:12.339Z] [combat] Mud Monarchs Raider 5 \u2014 d20 \u2192 8 + ATK 7 = 15 vs your AC 23 \u2014 \u2717 MISS\n",
+      "[2026-09-02T00:35:12.342Z] [combat] Mud Monarchs Raider 2 \u2014 d20 \u2192 19 + ATK 6 = 25 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-09-02T00:35:12.348Z] [combat] Mud Monarchs Raider 3 presses in behind the others, waiting for an opening.\n[2026-09-02T00:35:12.804Z] [combat] Mud Monarchs Raider 2 deals 3 bludgeoning damage. You have 32 HP remaining.\n",
+      "[2026-09-02T00:35:15.102Z] [debug] ui: tap \"dodge\"\n[2026-09-02T00:35:15.144Z] [player] dodge\n[2026-09-02T00:35:15.145Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=4 hooks=1\n",
+      "[2026-09-02T00:35:15.149Z] [world] You commit to the dodge. Slip Mud Monarchs Raider 2's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-02T00:35:15.151Z] [combat] Mud Monarchs Raider 2 turns on Soot \u2014 d20 19 + ATK 6 = 25 vs Soot's AC 13 (vest +3) \u2014 \u2713 HIT\n[2026-09-02T00:35:15.153Z] [combat] Soot takes 5. (4/15 HP left)\n",
+      "[2026-09-02T00:35:15.279Z] [combat] Mud Monarchs Raider 3 \u2014 d20 \u2192 13 + ATK 7 = 20 vs your AC 23 \u2014 \u2717 EVADED\n[2026-09-02T00:35:15.279Z] [combat] Dodge \u2014 d20 \u2192 3 + DEX 23 = 26 vs ATK 20. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n",
+      "[2026-09-02T00:35:15.279Z] [world] You slip Mud Monarchs Raider 3's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n[2026-09-02T00:35:15.282Z] [debug] ac-shift 23\u219226: race/base 10 + gear 20 + title 0 \u2192 trimmed 23 + status 3 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Gr",
+      "eaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n[2026-09-02T00:35:15.283Z] [combat] Mud Monarchs Raider 4 \u2014 d20 \u2192 18 + ATK 8 = 26 vs your AC 26 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-09-02T00:35:15.285Z] [combat] Mud Monarchs Raider 5 \u2014 d20 \u2192 12 + ATK 7 = 19 vs your AC 26 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-02T00:35:15.285Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-02T00:35:15.726Z] [combat] Mud Monarchs Raider 4 deals 2 slashing damage [armor \u221234%, plate \u22121]. You have 30 HP remaining.\n[2026-09-02T00:35:16.109Z] [cognitive] neutral  (441ms)\n[2026-09-02T00:35:16.883Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n[2026-09-02T00:35:16.884Z] [system] bleeding fades.\n[2026-09-02T00:35:16.884Z] [system] evasive \u2014 harder to hit fades.\n",
+      "[2026-09-02T00:35:16.915Z] [player] attack with the auralite talon\n[2026-09-02T00:35:16.916Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=4 hooks=1\n[2026-09-02T00:35:16.917Z] [debug] attack: target=Mud Monarchs Raider 2 range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n",
+      "[2026-09-02T00:35:16.919Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-02T00:35:16.998Z] [world] You commit forward with the acid-etched corrupted auralite talon. Mud Monarchs Raider 2 watches your hands.\n[2026-09-02T00:35:16.999Z] [system] \u23f3 Time passed: 6 min\n[2026-09-02T00:35:17.382Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (382ms)\n",
+      "[2026-09-02T00:35:28.757Z] [world] Mud Monarchs Raider 2 moves first. The pressure is immediate.\n[2026-09-02T00:35:28.759Z] [combat] Mud Monarchs Raider 4 turns on Soot \u2014 d20 14 + ATK 8 = 22 vs Soot's AC 13 (vest +3) \u2014 \u2713 HIT\n[2026-09-02T00:35:28.760Z] [combat] Soot takes 7. (0/15 HP left)\n",
+      "[2026-09-02T00:35:28.761Z] [arbiter] Soot drops under the Mud Monarchs Raider 4 and drags herself clear of the fight. She is down \u2014 tend her within a day or she won't get back up.\n[2026-09-02T00:35:28.765Z] [debug] ac-shift 26\u219223: race/base 10 + gear 20 + title 0 \u2192 trimmed 23 + status 0 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greave",
+      "s feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n[2026-09-02T00:35:28.765Z] [combat] Mud Monarchs Raider 5 \u2014 d20 \u2192 18 + ATK 7 = 25 vs your AC 23 \u2014 \u2713 HIT\n[2026-09-02T00:35:28.769Z] [combat] Mud Monarchs Raider 2 \u2014 d20 \u2192 16 + ATK 6 = 22 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-09-02T00:35:28.773Z] [combat] Mud Monarchs Raider 3 \u2014 d20 \u2192 18 + ATK 7 = 25 vs your AC 23 \u2014 \u2713 HIT\n",
+      "[2026-09-02T00:35:28.779Z] [combat] You \u2014 d20 \u2192 19 + INT 13 perfect opening (2\u00d7 dice) = 32 vs Mud Monarchs Raider 2 AC 10 \u2014 \u2713 HIT\n[2026-09-02T00:35:28.779Z] [combat] Mud Monarchs Raider 2 shrugs off the aetheric. (resisted, \u00d70.5 for 12)\n[2026-09-02T00:35:28.785Z] [combat] The killing blow with the acid-etched corrupted auralite talon: 12. Mud Monarchs Raider 2 drops where it stood.\n",
+      "[2026-09-02T00:35:28.786Z] [reward] Mud "
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-02-1634-the-aside-yields #mtkoldfngwnk [inline 4/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtkoldfngwnk"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-02-1634-the-aside-yields"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "4"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-02-1634-the-aside-yields"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "3"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-02T23:57:56.188000Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-02T23:57:57.067000Z",
+  "fingerprints": [
+    "30d1e97c8c0a39b36c2c4f1be2612fd0"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1951802238,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-02T23:57:57.073000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-02-1634-the-aside-yields",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-02-1634-the-aside-yields",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-02-1634-the-aside-yields",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-02-1634-the-aside-yields)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "3e79045b65fa448ba9f18bddcc8f9b00",
+  "previousEventID": "239b1732eac741feab1b5f5c49b4db1a"
+}

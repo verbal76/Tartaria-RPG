@@ -1,0 +1,237 @@
+{
+  "id": "83eb34312160461880a818724523120e",
+  "groupID": "7708461709",
+  "eventID": "83eb34312160461880a818724523120e",
+  "projectID": "4511945117532160",
+  "size": 18044,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-02-1634-the-aside-yields #mtkoldfngwnk [inline 21/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-02-1634-the-aside-yields",
+  "message": "player-log 2026-09-02-1634-the-aside-yields #mtkoldfngwnk [inline 21/28]",
+  "title": "player-log 2026-09-02-1634-the-aside-yields #mtkoldfngwnk [inline 21/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "f94496531ea14f0b83cffba1544512dd",
+      "span_id": "bc6c018144b40558",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "\u2014 bludgeoning will bite where aetheric won't.\"\n[2026-09-02T22:34:37.320Z] [combat] Final strike with the searing choir-bound launcher for 12. Aetherbat is still. The Aetherstone hums on, indifferent.\n[2026-09-02T22:34:37.322Z] [reward] Aetherbat defeated. You recover Aether Wing.\n[2026-09-02T22:34:37.323Z] [combat] 1 attacker remains. Aetheric Slug now in your sights.\n",
+      "[2026-09-02T22:34:37.323Z] [reward] +7 TC pried from the dust.\n[2026-09-02T22:34:42.066Z] [debug] ui: tap \"\ud83d\udd25 choir-bound launcher\"\n[2026-09-02T22:34:42.128Z] [player] attack with the off-hand choir-bound launcher\n[2026-09-02T22:34:42.129Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=mid enemies=1 hooks=0\n",
+      "[2026-09-02T22:34:42.131Z] [debug] attack: target=Aetheric Slug range=mid reach.bands=[distant,far,mid,close] reach.label=Choir-Bound Launcher bareHand=false\n[2026-09-02T22:34:42.280Z] [world] You raise the searing choir-bound launcher toward Aetheric Slug. The room narrows around the both of you.\n[2026-09-02T22:34:42.281Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-02T22:34:42.975Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 TAKE_COVER  (692ms)\n[2026-09-02T22:34:50.831Z] [world] You seize the initiative. Aetheric Slug has no time to react.\n[2026-09-02T22:34:50.831Z] [combat] You \u2014 d20 \u2192 17 + INT 13 = 30 vs Aetheric Slug AC 8 \u2014 \u2713 HIT\n[2026-09-02T22:34:50.831Z] [combat] Aetheric flares \u2014 +2 on hit.\n",
+      "[2026-09-02T22:34:50.832Z] [combat] Aetheric Slug shrugs off the aetheric. (resisted, \u00d70.5 for 9)\n[2026-09-02T22:34:50.836Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Mud Armor \u2014 bludgeoning or burn will bite where aetheric won't.\"\n[2026-09-02T22:34:50.838Z] [combat] The killing blow with the searing choir-bound launcher: 9. Aetheric Slug drops where it stood.\n",
+      "[2026-09-02T22:34:50.839Z] [reward] Aetheric Slug defeated. You recover Slug Slime.\n[2026-09-02T22:34:50.840Z] [reward] +10 TC pried from the dust.\n[2026-09-02T22:34:50.942Z] [arbiter] The Arbiter looks around. \"The horizon refuses to settle. Aether moves under the grass like breath under a sheet.\"\n[2026-09-02T22:34:52.526Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n",
+      "[2026-09-02T22:34:52.544Z] [world] You walk west. You arrive at The Storm's Eye.\n[2026-09-02T22:34:52.545Z] [debug] scene: loc=storms_eye hub=- arrival=y opening=n passing=y\n[2026-09-02T22:34:52.545Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-02T22:34:52.546Z] [debug] missions: hunt:hunt_bog_dragon stage 2/7 [diplomacy] @monarch_waystation npc=\"Old Mira\" needs=Reeve's Brass Token\u2713 gives=Mira's Shrine-Map\n[2026-09-02T22:34:52.546Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n",
+      "[2026-09-02T22:34:52.546Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n[2026-09-02T22:34:52.546Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n",
+      "[2026-09-02T22:34:52.547Z] [debug] missions: \u00b7 at=storms_eye travelTo=monarch_waystation\n[2026-09-02T22:34:52.555Z] [debug] spawn: gear=[Crude Golem Pike, Echoing Steps Boots] window=10 roster=new\n[2026-09-02T22:34:52.569Z] [arbiter] The Arbiter takes you in. \"The Storm's Eye is lethal country. The things that wake here pull above your weight. 43 HP carries you through Varakush (danger 1). 1/9 Cor",
+      "es recovered. Visit the remaining Lost Capitals. Or move on until you've got your legs under you.\"\n[2026-09-02T22:34:52.576Z] [world] You've left Great Tartary Plains and entered The Storm's Eye. The calm has an edge you can stand on: dust wall on one side of your boot, stillness on the other. It's midday. Nobody else is in sight. east leads to Great Tartary Plains; west leads to The Buried Cities",
+      ". Nothing named to the north or south.\n[2026-09-02T22:34:52.577Z] [system] Weather effect \u2014 Glass Hail: -1 DEX\n[2026-09-02T22:34:52.580Z] [world] [The Storm's Eye] north: Garrin (return the folio) (17 tiles, 1 day, 19 hours) \u00b7 east: Great Tartary Plains (1 tile, 3 hours) \u00b7 south: The Master-Strand (5 tiles, 13 hours) \u00b7 west: Builders' Survey Camp (4 tiles, 10 hours)\n",
+      "[2026-09-02T22:34:52.580Z] [world] You think back to the hull from earlier \u2014 the salvage you pulled from it. Something here reminds you of it.\n[2026-09-02T22:34:53.738Z] [debug] ui: tap \"take / salvage\"\n[2026-09-02T22:34:55.057Z] [world] The Crude Golem Pike comes up out of the silt with a small sucking protest.\n[2026-09-02T22:34:55.058Z] [reward] \u2726 Crude Golem Pike (Common).\n",
+      "[2026-09-02T22:34:55.076Z] [world] The Echoing Steps Boots was half under something. It is not now.\n[2026-09-02T22:34:55.076Z] [reward] \u2726 Echoing Steps Boots (Common).\n[2026-09-02T22:34:55.938Z] [debug] persist sizes(KB): total=301 player=79 wm=136[rooms=68 events=5 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=83 scene=2\n",
+      "[2026-09-02T22:34:56.307Z] [world] You break the chart cairn apart. Among the pieces, something worth keeping.\n[2026-09-02T22:34:56.308Z] [world] You break the cold spring apart. Among the pieces, something worth keeping.\n[2026-09-02T22:34:56.308Z] [world] You break the cracked aetheric drone shell apart. Among the pieces, something worth keeping.\n",
+      "[2026-09-02T22:34:56.308Z] [world] You salvage the half-buried submerged giant statue. The take is small but real.\n[2026-09-02T22:34:56.308Z] [world] You strip the half-buried wagon carefully. Something usable comes free in your hand.\n[2026-09-02T22:34:56.308Z] [world] You strip the shattered buried market row rooftop carefully. Something usable comes free in your hand.\n",
+      "[2026-09-02T22:34:56.309Z] [world] You break the shattered toppled obelisk fragment apart. Among the pieces, something worth keeping.\n[2026-09-02T22:34:56.309Z] [reward] \u2726 Salvage haul:\n[2026-09-02T22:34:56.309Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-09-02T22:34:56.309Z] [reward]     \u2022 Worn Tartarian Coin x2 (Common)\n[2026-09-02T22:34:56.309Z] [reward]     \u2022 Automaton Circuit x2 (Common)\n",
+      "[2026-09-02T22:34:56.310Z] [reward]     \u2022 Cloth Scrap (Common)\n[2026-09-02T22:34:56.310Z] [reward]     \u2022 Scrap Metal x2 (Common)\n[2026-09-02T22:34:56.310Z] [reward]     \u2022 Bent Nail (Common)\n[2026-09-02T22:34:56.310Z] [reward]     \u2022 Aether Dust x2 (Common)\n[2026-09-02T22:34:58.090Z] [debug] ui: tap \"investigate\"\n[2026-09-02T22:34:59.927Z] [player] investigate the ground\n",
+      "[2026-09-02T22:34:59.928Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n[2026-09-02T22:34:59.938Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Big Rock (Common).\n[2026-09-02T22:34:59.950Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-09-02T22:34:59.962Z] [reward] \u2726 The miles have done their work \u2014 you carry the road better than you did. +1 max stamina (now 19). [200 on the odometer]\n[2026-09-02T22:35:00.327Z] [cognitive] CLIMB  (375ms)\n",
+      "[2026-09-02T22:35:01.063Z] [debug] qwen\u23f1 narration:scene_intro preempted 8125ms read/write unusable (native mis-reported 39976ms/266ms \u2014 llama.rn split bug, not this call) in 777t\u2192out 7t (35ch)\n[2026-09-02T22:35:01.378Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro after 8125ms \u2014 cancelled:player-acted-again\n",
+      "[2026-09-02T22:35:01.686Z] [world] A shard of mud-glass nicks you. Small wound, steady reminder. (\u22121 HP)\n[2026-09-02T22:35:01.713Z] [player] investigate dust trail\n[2026-09-02T22:35:01.714Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=dust trail resolved=dust trail range=- enemies=0 hooks=1\n",
+      "[2026-09-02T22:35:01.715Z] [world] You look the dust trail over where it sits. Nothing about it sings, nothing about it warns \u2014 Tartaria is full of things waiting to be remembered.\n[2026-09-02T22:35:02.025Z] [debug] ui: tap \"rest\"\n[2026-09-02T22:35:02.028Z] [player] rest\n[2026-09-02T22:35:02.028Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-09-02T22:35:02.029Z] [world] Mercy circles three times and curls beside you. Her breathing slows to yours.\n[2026-09-02T22:35:02.029Z] [world] You rest for 8 hours. +1 HP, +8 stamina, \u22121 corruption recovered. (Day 51, evening)\n[2026-09-02T22:35:02.030Z] [debug] arbiter: template (reason=intent-not-allowed:rest)\n",
+      "[2026-09-02T22:35:02.030Z] [arbiter] The Arbiter looks around. \"The calm has an edge you can stand on: dust wall on one side of your boot, stillness on the other.\"\n[2026-09-02T22:35:02.031Z] [system] \u23f3 Time passed: 8h\n[2026-09-02T22:35:02.036Z] [world] A Mud Monarchs war party crests the rise \u2014 5 of them, blades already out. They've marked you for standing with the Forgotten Order.\n",
+      "[2026-09-02T22:35:02.037Z] [arbiter] \"The Mud Monarchs do not forgive a friend of the Forgotten Order,\" the Arbiter murmurs. \"Stand, or run \u2014 but decide now.\"\n[2026-09-02T22:35:13.665Z] [debug] \u26a0 FREEZE WATCH: LOGIC stalled while frames kept coming (js 8025ms \u00b7 frames 521ms). Something blocked the JS thread \u2014 look for a long synchronous run.\n[2026-09-02T22:35:16.653Z] [debug] ui: tap \"dodge\"\n",
+      "[2026-09-02T22:35:16.658Z] [player] dodge\n[2026-09-02T22:35:16.658Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=5 hooks=1\n[2026-09-02T22:35:16.658Z] [world] You commit to the dodge. Slip Mud Monarchs Raider 1's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-02T22:35:16.659Z] [combat] Mud Monarchs Raider 1 turns on Mercy \u2014 d20 7 + ATK 8 = 15 vs Mercy's AC 10 \u2014 \u2713 HIT\n[2026-09-02T22:35:16.659Z] [combat] Mercy takes 6. (9/15 HP left)\n[2026-09-02T22:35:16.764Z] [combat] Mud Monarchs Raider 2 \u2014 d20 \u2192 10 + ATK 6 = 16 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n",
+      "[2026-09-02T22:35:16.764Z] [combat] Dodge \u2014 d20 \u2192 10 + DEX 23 = 33 vs ATK 16. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-02T22:35:16.764Z] [world] You slip Mud Monarchs Raider 2's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n",
+      "[2026-09-02T22:35:16.766Z] [combat] Mud Monarchs Raider 4 and 2 others close the distance.\n[2026-09-02T22:35:16.767Z] [system] \u23f3 Time passed: 6 min\n[2026-09-02T22:35:16.769Z] [debug] ui: tap \"dodge\"\n[2026-09-02T22:35:16.769Z] [system] evasive \u2014 harder to hit fades.\n[2026-09-02T22:35:16.773Z] [player] dodge\n",
+      "[2026-09-02T22:35:16.773Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=5 hooks=1\n[2026-09-02T22:35:16.774Z] [world] You're still recovering your footing \u2014 2 more beats before you can set for another dodge.\n[2026-09-02T22:35:16.775Z] [debug] ui: tap \"dodge\"\n[2026-09-02T22:35:16.776Z] [system] perfect opening fades.\n",
+      "[2026-09-02T22:35:16.779Z] [player] dodge\n[2026-09-02T22:35:16.779Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=5 hooks=1\n[2026-09-02T22:35:16.780Z] [world] You're still recovering your footing \u2014 1 more beat before you can set for another dodge.\n[2026-09-02T22:35:16.781Z] [debug] ui: tap \"\ud83d\udd25 choir-bound launcher\"\n",
+      "[2026-09-02T22:35:16.823Z] [player] attack with the off-hand choir-bound launcher\n[2026-09-02T22:35:16.824Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=close enemies=5 hooks=1\n",
+      "[2026-09-02T22:35:16.825Z] [debug] attack: target=Mud Monarchs Raider 1 range=close reach.bands=[distant,far,mid,close] reach.label=Choir-Bound Launcher bareHand=false\n[2026-09-02T22:35:16.827Z] [arbiter] Glass Hail hangs between you. \"\u22121 to the swing \u2014 see what you can,\" the Arbiter says.\n[2026-09-02T22:35:16.827Z] [debug] attack: visibility penalty \u22121 (Glass Hail)\n",
+      "[2026-09-02T22:35:16.930Z] [world] You raise the searing choir-bound launcher toward Mud Monarchs Raider 1. The room narrows around the both of you.\n[2026-09-02T22:35:16.930Z] [system] \u23f3 Time passed: 6 min\n[2026-09-02T22:35:17.429Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 TAKE_COVER  (497ms)\n",
+      "[2026-09-02T22:35:22.951Z] [debug] qwen\u23f1 ambient ok 22327ms wait 752ms read 3793ms/write 1542ms in 364t\u2192out 31t 10.4ms/t HIT-CAP (152ch)\n[2026-09-02T22:35:24.336Z] [debug] arbiter: ambient stale:combat-started\u2192banked 24387ms\n",
+      "[2026-09-02T22:35:24.337Z] [debug] arbiter: ambient-empty reason=near-duplicate-of-recent raw=\"You reflect, \"Your journey has seen you step through the elements, yet you remain steadfast and active. The storm's eye \"\n[2026-09-02T22:35:25.256Z] [cognitive] SEARCH  (23538ms)\n[2026-09-02T22:35:26.121Z] [cognitive] REST  (24088ms)\n[2026-09-02T22:35:26.977Z] [cognitive] neutral  (10209ms)\n",
+      "[2026-09-02T22:35:27.393Z] [cognitive] neutral  (10617ms)\n[2026-09-02T22:35:27.810Z] [cognitive] neutral  (11028ms)\n[2026-09-02T22:35:29.348Z] [debug] freeze watch: recovered \u2014 painting again after 1096ms quiet.\n[2026-09-02T22:35:30.670Z] [debug] qwen\u23f1 investigate_lore ok 26960ms wait 24099ms read 1540ms/write 1291ms in 127t\u2192out 37t 12.1ms/t (179ch)\n",
+      "[2026-09-02T22:35:32.963Z] [world] You seize the initiative. Mud Monarchs Raider 1 has no time to react.\n[2026-09-02T22:35:32.963Z] [combat] You \u2014 d20 \u2192 20 + INT 12 \u2212 1 (Glass Hail) + 2 (point blank) = 33 vs Mud Monarchs Raider 1 AC 12 \u2014 \u2713 CRITICAL HIT\n[2026-09-02T22:35:32.964Z] [combat] Mud Monarchs Raider 1 shrugs off the aetheric. (resisted, \u00d70.5 for 10)\n",
+      "[2026-09-02T22:35:32.967Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Flame of Aether \u2014 burn will bite where aetheric won't.\"\n[2026-09-02T22:35:32.969Z] [combat] You crack the Mud Monarchs Raider 1 with the Searing Choir-Bound Launcher for 10 \u2014 the better part of their fight, gone in one blow. They crumple, out cold. (4/14 HP) Loot them before they come to.\n",
+      "[2026-09-02T22:35:32.969Z] [combat] Mud Monarchs Raider 1 is out of it. Mud Monarchs Raider 2 now in your sights.\n[2026-09-02T22:35:32.970Z] [combat] Searing Choir-Bound Launcher \u2014 2 burn bites in and festers (3 turns).\n[2026-09-02T22:35:32.971Z] [combat] Mud Monarchs Raider 2 turns on Mercy \u2014 d20 4 + ATK 6 = 10 vs Mercy's AC 10 \u2014 \u2713 HIT\n",
+      "[2026-09-02T22:35:32.971Z] [combat] Mercy takes 2. (7/15 HP left)\n[2026-09-02T22:35:32.973Z] [combat] Mud Monarchs Raider 3 \u2014 d20 \u2192 9 + ATK 6 = 15 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-02T22:35:32.973Z] [combat] Mud Monarchs Raider 4 and 1 other close the distance.\n[2026-09-02T22:35:35.217Z] [debug] ui: tap \"\ud83d\udd25 choir-bound launcher\"\n",
+      "[2026-09-02T22:35:35.269Z] [player] attack with the off-hand choir-bound launcher\n[2026-09-02T22:35:35.270Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=mid enemies=5 hooks=1\n[2026-09-02T22:35:35.271Z] [combat] Mud Monarchs Raider 1 blisters \u2014 clinging fire sears 2. (2/14 HP, 2 turns left)\n",
+      "[2026-09-02T22:35:35.271Z] [debug] "
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-02-1634-the-aside-yields #mtkoldfngwnk [inline 21/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtkoldfngwnk"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-02-1634-the-aside-yields"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "21"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-02-1634-the-aside-yields"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "3"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-02T23:57:56.536000Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-02T23:57:57.078000Z",
+  "fingerprints": [
+    "30d1e97c8c0a39b36c2c4f1be2612fd0"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1951802238,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-02T23:57:57.073000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-02-1634-the-aside-yields",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-02-1634-the-aside-yields",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-02-1634-the-aside-yields",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-02-1634-the-aside-yields)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "942ac9f85cc348e6804767c54260abba",
+  "previousEventID": "7f06f2beab0b4faba86cf8aeb59c5205"
+}
