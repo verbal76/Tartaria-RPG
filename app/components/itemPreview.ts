@@ -297,6 +297,23 @@ function previewWeapon(w: CatalogWeapon): ItemPreview {
   if (parsedRules?.maxRollFloor) {
     stats.push(`Rolls of ${parsedRules.maxRollFloor}+ count as a max roll`);
   }
+  // ⚠⚠ OTA-1643 (slice 4a) — SAY THE RIDER AS A RULE, not only as the sentence
+  // the catalog wrote. Eight weapons promise bonus damage on every hit and three
+  // promise poison that lasts; until this OTA none of them paid, so a line here
+  // is the only way a player can tell the difference between the version that
+  // did nothing and the version that does. Phrased as the arithmetic the swing
+  // applies, matching how armour-ignore and the max-roll payload read above.
+  if (parsedRules?.flatRider) {
+    const r = parsedRules.flatRider;
+    const amount = r.dice ?? String(r.flat ?? 0);
+    stats.push(`Every hit: +${amount}${r.type ? ` ${r.type}` : ''} damage`);
+  }
+  if (parsedRules?.riderDot) {
+    const d = parsedRules.riderDot;
+    const gate = d.threshold !== undefined ? `On rolls of ${d.threshold}+: ` : 'On hit: ';
+    const who = d.restrictedTo ? ` — ${d.restrictedTo.replace('_', ' ')} targets only` : '';
+    stats.push(`${gate}${d.dice} ${d.type}/turn for ${d.rounds} turn${d.rounds === 1 ? '' : 's'}${who}`);
+  }
   if (parsedRules?.onMaxRoll) {
     const m = parsedRules.onMaxRoll;
     const parts: string[] = [];

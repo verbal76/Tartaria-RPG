@@ -1560,9 +1560,9 @@ Key invariants worth knowing:
 
 ## 9. Recent OTA highlights (latest sessions)
 
-### ⚠⚠⚠ THE 2026-09-02 RUN — OTA-1617 → 1642 (read this first if you are new)
+### ⚠⚠⚠ THE 2026-09-02 RUN — OTA-1617 → 1643 (read this first if you are new)
 
-Latest golem-line stamp: **`2026-09-03-1642-every-drop-has-a-name-in-the-book`**
+Latest golem-line stamp: **`2026-09-03-1643-the-dice-riders-pay`**
 (`app/buildInfo.ts`). Both channels ship from this branch — a `[ota-hal]` marker
 in the commit TITLE publishes the HAL set, a markerless follow-up commit
 publishes golem; see §6.
@@ -1879,6 +1879,38 @@ what it ACCEPTS, and a data walker skips the saying.
   inferred fungus snack. `inferGear` no longer fires for any enemy drop;
   ota1642 keeps the audit (every enemy loot name resolves to a catalog row)
   and pins the Crucible door on a dropped instance. Snapshot refreshed.
+
+- **OTA-1643 the dice riders pay (slice 4a — task #98, unit 1 of 3).** The
+  slice-4 tail, re-measured on the current catalog: 303 effect strings, 164
+  parsed, 139 not. Thirty of the unread ones carried a `+N` / `+NdN` DAMAGE
+  promise — the simplest sentence in the column and the one nothing could see.
+  A Legendary Energy Hammer said *"+1d6 shock damage"* and never rolled it.
+  Two families land, both riding machinery that already existed:
+  `flatRider` (bonus damage owed on EVERY hit, no condition — 9 weapons, read
+  through the same `rollEffectBonusDamage` as the conditioned bonus so one
+  reader settles both) and `riderDot` (a rider the card gives a SPAN, seeded
+  into the Combat-Parity `typed_dot` the damage-type proc already used, keyed
+  by the WEAPON so it never clobbers the type proc's DOT — 3 weapons).
+  ⚠ The rule that splits them is the card's own words: **a stated duration
+  festers, no duration lands now.** Four new `BonusCondition`s, each backed by
+  real rows in `enemies.json` (a condition that matches nothing is the defect,
+  not the fix — see `structure`, false since the day it was added): `armored`
+  47/135, `unarmored` 88/135, `natural_armor` 26 (armour the creature GREW —
+  a machine and a man in plate have armour and neither has a hide), `burnable`
+  39. The bonus regex gained a second, STRICTER flat pass requiring the literal
+  word `damage`, so *"+1 damage to tech"* is read and the shields' *"+2 AC vs
+  energy damage"* can never be read as bonus damage. Three cards reworded
+  because nothing in the game could satisfy them: Mud Heater Sword (zero cold
+  creatures exist), Mud Sling (glass is not an enemy), Giant Bone Knuckles
+  (a barehanded weapon always reaches arm's length). ota1643 pins the wins,
+  every boundary, and an audit naming the 4 rows still owed to units 4b/4c.
+  ⚠⚠ **The plus sign is the whole test.** A rider reader without it claimed 73
+  weapons instead of 19: every rune-caster restates its own base dice in the
+  effect column (all 45 would have doubled, a Legendary scepter going 2d20 →
+  4d20), and the shields count dice they TAKE AWAY. Verified 2026-09-03 by
+  running both drafts over the catalog. This is the opposite of the lesson
+  slices 1c and 2 taught — there the parser's verb list was the ceiling; here
+  widening it was the bug.
 
 ✓ **One position vocabulary now (OTA-1637).** The doors, the arrival line, the
 trace, the card, the conversation arm and the verb matchers all run

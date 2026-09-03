@@ -632,6 +632,8 @@ import {
   parseWeaponEffect, rollEffectBonusDamage, effectConditionMatches,
   // OTA-1564 (slice 1b) — the max-roll trigger and its payloads.
   damageRollIsMax, rollMaxRollBonus, maxRollShredAmount,
+  // OTA-1643 (slice 4a) — the weapon's own festering rider.
+  rollRiderDot,
 } from '../engine/weaponEffects';
 import { rollThrowDamage, weightLabel, itemWeight } from '../engine/itemWeight';
 import { extractAmbientNouns, matchAmbientNoun } from '../engine/ambientNouns';
@@ -23603,6 +23605,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
         }
       }
+      // ⚠⚠⚠ OTA-1643 (slice 4a) — THE WEAPON'S OWN FESTERING RIDER. Three mud
+      // blades promise poison that LASTS — "+1d6 poison over 2 turns" — and the
+      // `typed_dot` status they need has existed since Combat-Parity II, seeded
+      // only ever by the damage-type proc above. The card's own line was read by
+      // nothing.
+      //
+      // ⚠⚠ IT IS A SECOND, SEPARATE DOT — not a bigger version of the proc's.
+      // Staging it into `typedDot` would have it overwrite (or be overwritten
+      // by) the probabilistic type flare depending on which fired, so a
+      // guaranteed promise would silently swap places with a 45% one. Its own
+      // variable, its own source name, its own log line.
+      let riderDot: { dmgPerTurn: number; rounds: number; type: string } | null = null;
+      if (parsedEffect?.riderDot) {
+        riderDot = rollRiderDot(
+          parsedEffect,
+          enemy,
+          // ⚠ "on rolls of 15+" through the SAME reader slice 2 uses for its
+          // control gates — never a second local answer to "did the dice come
+          // up big" (OTA-1564's finding, and it cost a session).
+          damageRollIsMax(damage, parsedEffect.riderDot.threshold),
+        );
+      }
       const prevHp = currentScene.enemyHps[activeIdx] ?? enemy.hp;
       // ⚠ OTA-1140 (pressure test) — prevHp must be LIVE, not the function-entry
       // snapshot: a lost-initiative volley can mutate enemyHps before this line
@@ -24250,8 +24274,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (coatingProc2) applyCoatingProc(coatingProc2);
         // engine_Dev (Combat-Parity II) — seed the typed DOT + "exposed" AC shred (reuses the acid
         // enemyArmorShred lever; capped). Only runs if the proc above staged one.
-        if (typedDot || typedShred > 0) {
+        if (typedDot || typedShred > 0 || riderDot) {
           const td = typedDot; const ts = typedShred;
+          // ⚠ OTA-1643 — the rider is keyed by the WEAPON that carries it, not by
+          // its damage type, so re-hitting with the same blade refreshes its own
+          // poison and never clobbers (or is clobbered by) the type proc's DOT
+          // sitting on the same body under the type's name.
+          const rd = riderDot
+            ? { ...riderDot, source: equipped?.name ?? `${riderDot.type} rider` }
+            : null;
           set((s) => {
             if (!s.currentScene) return s;
             const n = s.currentScene.enemies.length;
@@ -24260,6 +24291,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (td) {
               const list = (statuses[activeIdx] ?? []).filter((st) => !(st.kind === 'typed_dot' && st.sourceName === td.source));
               list.push({ kind: 'typed_dot', turnsRemaining: td.rounds, dmgPerTurn: td.dmgPerTurn, sourceName: td.source });
+              statuses[activeIdx] = list;
+            }
+            if (rd) {
+              const list = (statuses[activeIdx] ?? []).filter((st) => !(st.kind === 'typed_dot' && st.sourceName === rd.source));
+              list.push({ kind: 'typed_dot', turnsRemaining: rd.rounds, dmgPerTurn: rd.dmgPerTurn, sourceName: rd.source });
               statuses[activeIdx] = list;
             }
             let shred = s.currentScene.enemyArmorShred;
@@ -24273,6 +24309,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
             return { currentScene: next };
           });
           if (typedDot) get().appendLog('combat', `${typedDot.source.charAt(0).toUpperCase()}${typedDot.source.slice(1)} sets in — ${typedDot.dmgPerTurn}/turn for ${typedDot.rounds} turn${typedDot.rounds === 1 ? '' : 's'}.`, { combatOutcome: 'player_dmg' });
+          // ⚠ OTA-1643 — the rider names the WEAPON, because that is the promise
+          // the player bought. "Poison sets in" already belongs to the type proc,
+          // and two identical lines for two different mechanics is how a player
+          // concludes the card does nothing.
+          if (rd) {
+            get().appendLog(
+              'combat',
+              `The ${rd.source}'s ${rd.type} takes hold — ${rd.dmgPerTurn}/turn for ${rd.rounds} turn${rd.rounds === 1 ? '' : 's'}.`,
+              { combatOutcome: 'player_dmg' },
+            );
+          }
           if (typedShred > 0) get().appendLog('combat', `${enemy.name} is left exposed — easier to hit.`, { combatOutcome: 'player_dmg' });
         }
         // After the player's strike, every still-living enemy that ISN'T

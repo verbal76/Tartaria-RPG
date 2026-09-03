@@ -26996,7 +26996,23 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (Titan / Knight / Golem Armor, Lich Robe), Crab Meat as food. Every material
 // carries 'loot' so the Crucible keeps its fodder (OTA-737); ota1642 keeps the
 // audit: no enemy loot name may be synthesised at pickup again.
-export const OTA_BUILD_ID = '2026-09-03-1642-every-drop-has-a-name-in-the-book';
+// ⚠⚠⚠ OTA-1643 — THE DICE RIDERS PAY (slice 4a, task #98 unit 1 of 3). Slice 4's
+// measurement found 30 weapons carrying a "+N"/"+NdN" DAMAGE promise that no
+// code read — the simplest sentence in the effect column, and the one nothing
+// could see. A Legendary Energy Hammer said "+1d6 shock damage" and never once
+// rolled it. Two families land: `flatRider` (bonus damage owed on every hit, no
+// condition) and `riderDot` (a rider the card gives a SPAN, seeded through the
+// Combat-Parity typed_dot the type proc already used). The rule that splits them
+// is the card's own words — a stated duration festers, no duration lands now.
+// Four new conditions, each backed by real rows in enemies.json: armored (47),
+// unarmored (88), natural_armor (26 — grown, not bolted on), burnable (39).
+// Three cards reworded because nothing in the game could satisfy them (no cold
+// creature exists; glass is not an enemy; a barehanded weapon always reaches
+// arm's length). ⚠ The plus sign is the whole test: a reader without it claimed
+// 73 weapons, doubling every rune-caster's base dice and reading the shields'
+// defensive numbers as attack riders.
+export const OTA_BUILD_ID = '2026-09-03-1643-the-dice-riders-pay';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-03-1642-every-drop-has-a-name-in-the-book';
 // golem catch-up 2026-09-03: markerless publish of OTA-1642 - the 98 enemy loot
 // names authored (86 materials, 4 weapons, 4 armours, Crab Meat), loot by
 // identity keeps the Crucible fed, ota1642 keeps the audit. hal took the marker.

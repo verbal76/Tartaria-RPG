@@ -2378,7 +2378,7 @@
         "barehanded",
         "giants"
       ],
-      "effect": "+1d6 to arm's-reach targets. Grants +10 HP.",
+      "effect": "+1d6 bludgeoning damage on every landed blow. Grants +10 HP.",
       "description": "Heavy bone knuckles fitted to a clenched fist.",
       "statBonuses": [
         {
@@ -3019,7 +3019,7 @@
         "blade",
         "mud_dwellers"
       ],
-      "effect": "+1d6 against cold creatures.",
+      "effect": "+1d6 burn damage against fire-vulnerable creatures.",
       "description": "Mud-iron sword with a heated core. Stays warm in the cold."
     },
     {
@@ -3936,7 +3936,7 @@
         "thrown",
         "mud_dwellers"
       ],
-      "effect": "+1d6 against glass or fragile objects.",
+      "effect": "+1d6 against unarmored enemies.",
       "description": "Mud-leather sling. Throws lead, glass, or anything heavy."
     },
     {

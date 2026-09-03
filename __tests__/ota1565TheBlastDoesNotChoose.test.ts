@@ -102,21 +102,26 @@ describe('OTA-1565 — nine weapons stop hitting exactly one thing', () => {
     expect(parseWeaponEffect('2d8 damage to all enemies; knocks prone.')?.splash).toBeUndefined();
   });
 
-  it('⚠⚠ "+1d6 to arm\'s-reach TARGETS" is a conditional bonus, not a blast', () => {
+  it('⚠⚠ the Giant Bone Knuckles\' bonus is never a blast — and slice 4a paid it', () => {
     // The Giant Bone Knuckles' line is the shape of "+1d6 against constructs" —
     // a bonus against something you are ALREADY hitting. Matching it as a blast
-    // would turn one effect into two.
+    // would turn one effect into two, and THAT half of this test is unchanged.
     //
-    // ⚠ AND IT IS STILL UNREAD, which this test records rather than fixes: the
-    // clause parser matches the "+1d6 to X" shape but `conditionFromTarget` has
-    // no entry for "arm's-reach targets", so the bonus resolves to nothing. That
-    // is a POSITIONAL condition — a whole family the condition table does not
-    // model — and it belongs to slice 4's audit of the one-off tail, not here.
-    // Pinned so the finding cannot be lost between slices.
+    // ⚠⚠ THE OTHER HALF IS NOW CLOSED, and the handoff between slices worked
+    // exactly as intended. This test used to end by asserting the card still
+    // read *"+1d6 to arm's-reach targets"* — a POSITIONAL condition the table
+    // did not model, so the bonus resolved to nothing — and it said in as many
+    // words that the finding belonged to slice 4's audit of the one-off tail.
+    // OTA-1643 got there: on a weapon that has never reached further than arm's
+    // length, that clause is ALWAYS true written as though it were sometimes
+    // false, so the card was reworded and the promise now pays as an
+    // unconditional rider. The pin is REPOINTED rather than deleted, because
+    // what it guards is still live: this must be a rider, never a blast.
     const knuckles = parseWeaponEffect(row('Giant Bone Knuckles').effect);
     expect(knuckles?.splash).toBeUndefined();
     expect(knuckles?.bonuses).toBeUndefined();
-    expect(row('Giant Bone Knuckles').effect).toContain("+1d6 to arm's-reach targets");
+    expect(row('Giant Bone Knuckles').effect).not.toContain("arm's-reach targets");
+    expect(knuckles?.flatRider?.dice).toBe('1d6');
   });
 
   it('⚠⚠⚠ A RIDER ANYWHERE ON THE LINE DEFERS THE WHOLE WEAPON', () => {

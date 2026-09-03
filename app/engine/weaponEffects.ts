@@ -21,7 +21,7 @@
 // nothing matches — caller falls through.
 
 import { rollFromNotation } from './rng';
-import { enemyIsAerial, armorACPortions, PLATE_TRAIT_AC } from './enemyTraits';
+import { enemyIsAerial, armorACPortions, traitDefenses, PLATE_TRAIT_AC } from './enemyTraits';
 import { reachBandsFor } from './types';
 import type { CombatRange, Enemy, Stats } from './types';
 
@@ -35,7 +35,17 @@ export type BonusCondition =
   | 'magical'
   | 'darkness'
   | 'aetheric'
-  | 'aerial';
+  | 'aerial'
+  // ── OTA-1643 (slice 4a) ───────────────────────────────────────────────────
+  /** "against armored enemies" — the enemy's traits put AC on it. */
+  | 'armored'
+  /** "to unarmored enemies" — no plate, no raised field. */
+  | 'unarmored'
+  /** "against natural armor" — a carapace or hide rather than bolted plate,
+   *  which is why a knife finds seams in it and a machine gives none. */
+  | 'natural_armor'
+  /** "against fire-vulnerable creatures" — the `vulnerable:burn` trait. */
+  | 'burnable';
 
 /**
  * ⚠⚠⚠ OTA-1562 — THE EFFECT COLUMN WAS MOSTLY DECORATION. An audit of all 284
@@ -166,9 +176,67 @@ export interface OverheatSpec {
   explodeDice?: string;
 }
 
+/**
+ * ⚠⚠⚠ OTA-1643 (slice 4a) — THE RIDER THAT ASKS NOTHING. Six weapons promise
+ * bonus damage with no condition on it at all — Plasma Knife *"+1d6 plasma
+ * damage on hit"*, Energy Hammer and Heavy Rail Axe *"+1d6 shock damage"* — and
+ * the reader has only ever known how to roll a bonus that was CONDITIONED on the
+ * target. So the simplest promise in the catalog was the one nothing could read,
+ * and a Legendary hammer swung for its printed dice and nothing more.
+ *
+ * ⚠⚠ IT IS NOT THE WEAPON'S DAMAGE TYPE PROC. `BUILTIN_DT_COMBAT` already rolls
+ * a small typed flare at ~45% on a landed hit; this is the weapon's own line,
+ * guaranteed, and the two are separate facts about the same swing. Folding one
+ * into the other would make a card that says "+1d6" pay out less than half the
+ * time and there would be no way for a player to tell.
+ */
+export interface FlatRider {
+  /** "+1d6 plasma damage" — rolled on every landed hit. */
+  dice?: string;
+  /** "+1 damage" with no dice. */
+  flat?: number;
+  /** The damage word the card itself uses, for the log line only. The swing's
+   *  resistance math is settled by the WEAPON's damageType, never by this. */
+  type?: string;
+}
+
+/**
+ * ⚠⚠⚠ OTA-1643 — AND THE RIDER THAT KEEPS WORKING. Three mud blades promise
+ * poison that lasts — *"+1d6 poison over 2 turns"*, *"1d6 poison damage over 2
+ * turns on rolls of 15+"* — and `enemyStatuses` has held a `typed_dot` kind
+ * since Combat-Parity II, seeded by the damage-type proc. What was never wired
+ * is a DOT the WEAPON'S OWN LINE asks for.
+ *
+ * ⚠⚠ THE RULE THAT SPLITS THIS FROM `FlatRider`, and it is the card's own words:
+ * A STATED DURATION MAKES IT A DOT; NO DURATION MAKES IT IMMEDIATE. Bone
+ * Thornblade's *"+1d6 poison damage on hit"* names no span, so it lands now;
+ * Mud Venom Blade's *"over 2 turns"* names one, so it festers. Guessing either
+ * way from the damage type instead would have turned four cards into two
+ * different lies.
+ */
+export interface RiderDot {
+  dice: string;
+  rounds: number;
+  /** poison / burn / radiation — the type the card names. */
+  type: string;
+  /** Set when the card scopes the DOT ("to unarmored enemies for 2 rounds"). */
+  restrictedTo?: BonusCondition;
+  /** Natural-roll floor ("on rolls of 15+"). */
+  threshold?: number;
+}
+
 export interface ParsedWeaponEffect {
-  /** Every "+NdN against X" clause on the weapon, each stacking additively. */
-  bonuses?: Array<{ dice: string; condition: BonusCondition }>;
+  /**
+   * Every "+NdN against X" clause on the weapon, each stacking additively.
+   * ⚠ OTA-1643 — `flat` is the sibling of `dice`, for the three weapons that
+   * promise a whole number instead ("+4 damage against creatures with natural
+   * armor"). Exactly one of the two is ever set on an entry.
+   */
+  bonuses?: Array<{ dice?: string; flat?: number; condition: BonusCondition }>;
+  /** OTA-1643 — bonus damage owed on every hit, with no condition attached. */
+  flatRider?: FlatRider;
+  /** OTA-1643 — a rider the card gives a duration, so it festers instead. */
+  riderDot?: RiderDot;
   onHitBleed?: boolean;
   onHitBurn?: boolean;
   /** OTA-1562 — "short range" / "long range" / "at any range". */
@@ -768,8 +836,33 @@ export function armorIgnoreReduction(
 
 /** Map the free-text target phrase to a structured condition, or null. */
 function conditionFromTarget(tgt: string): BonusCondition | null {
+  // ⚠⚠⚠ OTA-1643 — THE ARMOUR FAMILY IS TESTED FIRST, AND IN THIS ORDER, for two
+  // reasons that both bit during the build:
+  //
+  //   1. "unarmored" CONTAINS "armored". A naive /armored/ test claims the Mud
+  //      Thornblade's *"to unarmored enemies"* and inverts the weapon — a poison
+  //      meant for bare flesh biting only the things wearing plate.
+  //   2. "creatures with natural armor" ALREADY matched the `animal` test below
+  //      (`creature.*natural`), so the Tartarian Claw Knife's seam-finder was
+  //      being scored against a beast check. Natural armour and a beast are not
+  //      the same set — the Swamp Crab is both, a Mud Golem only the first — and
+  //      the knife's line is about the CARAPACE.
+  if (/unarmou?red|no armou?r|without armou?r/.test(tgt)) return 'unarmored';
+  if (/natural\s+armou?r|hide|carapace|scale[ds]?\b/.test(tgt)) return 'natural_armor';
+  // "fire-vulnerable creatures" / "creatures that fear fire" — the
+  // `vulnerable:burn` trait, which 39 of the 135 enemies carry.
+  if (/fire-?vulnerable|vulnerable\s+to\s+fire|fears?\s+fire|flammable/.test(tgt)) return 'burnable';
   if (/large/.test(tgt)) return 'large';
   if (/construct/.test(tgt)) return 'construct';
+  // ⚠⚠⚠ OTA-1643 — `armored` SITS BETWEEN `construct` AND `structure`, and both
+  // neighbours are load-bearing. The Tartarian Longbow says *"+1d6 to constructs
+  // or armor"*: an armour test placed first claims that phrase and the weapon
+  // silently stops caring about constructs, which is the half of its line that
+  // already worked. The Tartarian Great Knife says *"+1d6 to armor or
+  // structures"*, where the opposite is true — `structure` matches no enemy in
+  // this schema, so letting it win leaves the clause as dead as it has always
+  // been, while the armour reading is the real half of the sentence.
+  if (/armou?red|armou?r\b/.test(tgt)) return 'armored';
   if (/structure|building|vehicle/.test(tgt)) return 'structure';
   // aerial BEFORE mechanical so "airborne / aerial / flying" targets route to
   // the flyer match (drones are both — the aerial bonus is the point).
@@ -779,8 +872,143 @@ function conditionFromTarget(tgt: string): BonusCondition | null {
   if (/shield|shielded|energy-shield/.test(tgt)) return 'shielded';
   if (/magic|magical|supernatural/.test(tgt)) return 'magical';
   if (/dark|darkness/.test(tgt)) return 'darkness';
-  if (/aetheric|aether/.test(tgt)) return 'aetheric';
+  // ⚠ OTA-1643 — "energy-based enemies" is the Aetheric Cross-Saber's phrase for
+  // what this world calls aether. There is no separate "energy" creature family
+  // in enemies.json and inventing a condition that matches nothing would leave
+  // the card exactly as dead as it was.
+  if (/aetheric|aether|energy-?based/.test(tgt)) return 'aetheric';
   return null;
+}
+
+/**
+ * ⚠⚠⚠ OTA-1643 — WHY THE FLAT FORM NEEDS ITS OWN, STRICTER PATTERN. The dice
+ * form can afford to be loose about the word "damage" because `NdN` is already
+ * unmistakably a damage roll. A bare number is not: the shields say *"+2 AC vs
+ * energy damage"*, and a pattern permissive enough to read "+1 damage to tech"
+ * reads that as "+2 bonus damage versus energy" — turning a defensive clause
+ * into an offensive one on eight items. Requiring the literal word `damage`
+ * immediately after the number is what keeps the two apart, and it is why this
+ * is a second pass rather than one alternation with an optional group.
+ */
+const BONUS_DICE_RE =
+  /\+\s*(\d+d\d+)(?:\s+\w+)?\s+(?:damage\s+)?(?:against|to|vs\.?|versus)\s+([^.;,]+)/g;
+const BONUS_FLAT_RE =
+  /\+\s*(\d+)\s+damage\s+(?:against|to|vs\.?|versus)\s+([^.;,]+)/g;
+
+/** The damage word a rider clause names, if it names one. */
+// ⚠ `energy` earns its place off the audit at the bottom of ota1643: the Laser
+// Sword's *"+1d6 energy; ignores non-magical armor"* names a type in a word the
+// first draft's list did not have, so the rider was refused for want of the
+// literal string "damage" and the weapon kept only the half of its line that
+// was already working. The audit exists to catch exactly that.
+const RIDER_TYPE_WORDS =
+  'plasma|shock|electrical|energy|poison|venom|burn|burning|fire|radiation|cold|frost|aetheric|acid|necrotic|force|void|bludgeoning|slashing|piercing';
+const RIDER_TYPE_RE = new RegExp(`\\b(${RIDER_TYPE_WORDS})\\b`);
+
+/**
+ * ⚠⚠⚠ OTA-1643 — THE PLUS SIGN IS THE WHOLE TEST, AND THE FIRST DRAFT WITHOUT IT
+ * WAS A DISASTER WORTH RECORDING. A reader that took any `NdN … damage` clause
+ * as a rider claimed 73 weapons instead of the eight that have one, because of
+ * two families that write dice for entirely different reasons:
+ *
+ *   • EVERY RUNE-CASTER RESTATES ITS OWN BASE DICE in the effect column —
+ *     Flame of Aether *"1d6 fire; chance to ignite"*, Killing Frost *"2d8
+ *     cold; deep enough to seize a Construct's joints"*. Read as riders, all
+ *     45 of them would have doubled their damage, and a Legendary scepter
+ *     would have gone from 2d20 to 4d20 on a change that was supposed to fix
+ *     three mud blades.
+ *   • THE SHIELDS COUNT DICE THEY TAKE AWAY, not dice they deal: Graviton
+ *     Shield *"+1d6 environmental damage reduction"*, Mud Shell *"blocks 1d6
+ *     damage"*. A defensive number read as an attack rider is the sign error
+ *     that flatters a weapon most.
+ *
+ * A rider is an ADDITION and the catalog writes additions with a `+`. Requiring
+ * it is what separates *"+1d6 plasma damage on hit"* from *"1d6 fire"*, and no
+ * amount of verb-list widening does the same job — which is the opposite of the
+ * lesson slices 1c and 2 taught, and the reason it is spelled out here.
+ */
+const RIDER_PLUS_DICE_RE = new RegExp(String.raw`\+\s*(\d+d\d+)`);
+
+/**
+ * ⚠⚠ WHAT DISQUALIFIES A CLAUSE EVEN WITH THE PLUS. Every one of these is a
+ * family that already has its own reader, and a rider that also claimed them
+ * would pay the same promise twice — the exact double-count the earlier slices
+ * were careful to avoid. `reduc\w*` / `block\w*` / `absorb\w*` / `deflect\w*`
+ * are the DEFENSIVE verbs: those clauses count damage the item stops.
+ */
+const RIDER_DEFERRED_RE =
+  /\bac\b|\bmax\b|\brolls?\s+of\s+\d+|\bbleed\b|\bsplash\b|\baoe\b|\ball\s+(?:in|enemies)\b|\beverything\b|\bnearby\b|\bself\s+damage\b|\bparry\b|\breduc\w*|\bblock\w*|\babsorb\w*|\bdeflect\w*|\breflect\w*|\bstun\b|\bignor\w*|\bbypass\w*/;
+
+/** True when the clause aims its bonus at something — those are `bonuses`. */
+const RIDER_HAS_TARGET_RE = /\b(?:against|vs\.?|versus|to)\s+\S/;
+
+/**
+ * ⚠⚠⚠ OTA-1643 — THE DOT SHAPE IS ANCHORED, because a span in a clause does not
+ * mean the DICE last that long. Four rune-casters put a duration on a CONTROL
+ * effect sitting beside their damage — Frost Shock *"1d10, deals both frost and
+ * lightning damage, stuns target for 1 round"*, Eternal Flame *"2d20, deals fire
+ * damage, and the enemy is blinded for 2 rounds"* — and a loose "has dice, has a
+ * span" reader turned every one of them into a per-turn damage engine ticking its
+ * full base dice.
+ *
+ * So the span has to be attached to the DAMAGE by grammar, not by proximity:
+ * dice, then optionally the type word, then optionally "damage", then optionally
+ * who it is aimed at, then the span — with nothing else in between. A comma after
+ * the dice is enough to break it, which is exactly what those four have.
+ */
+const RIDER_DOT_RE = new RegExp(
+  String.raw`\+?\s*(\d+d\d+)\s+(?:(${RIDER_TYPE_WORDS})\s+)?(?:damage\s+)?`
+  + String.raw`(?:(?:against|to|vs\.?|versus)\s+([^,;.]+?)\s+)?(?:for|over)\s+(\d+)\s+(?:rounds?|turns?)`,
+);
+
+/**
+ * ⚠⚠ READ THE RIDER OFF ONE CLAUSE. `"+1d6 poison damage to unarmored enemies
+ * for 2 rounds."` is a single clause carrying all three facts (amount, who, how
+ * long); `"+1d6 plasma damage on hit."` carries one. Splitting on `.`/`;` first
+ * is what lets the Giant Bone Sword's `"+1d6 against armored enemies"` stay a
+ * conditioned bonus while its neighbours become riders.
+ */
+function ridersFrom(
+  text: string,
+): { flat: FlatRider | null; dot: RiderDot | null; dotClause: string | null } {
+  let flat: FlatRider | null = null;
+  let dot: RiderDot | null = null;
+  let dotClause: string | null = null;
+  for (const clause of text.split(/[.;]/)) {
+    // ⚠ The DOT is tried FIRST and on its own terms — it does NOT require the
+    // plus, because the Mud Venom Blade's *"1d6 poison damage over 2 turns on
+    // rolls of 15+"* has none and is still plainly an addition: the blade's own
+    // dice are 2d6. The anchored shape is what makes that safe to accept.
+    const d = clause.match(RIDER_DOT_RE);
+    if (d && !dot) {
+      const rounds = Math.min(5, Math.max(1, parseInt(d[4]!, 10)));
+      const type = d[2];
+      // ⚠ A DOT WITH NO NAMED TYPE IS NOT A DOT THIS SLICE CAN SEED — the
+      // `typed_dot` status is keyed by type, and a nameless one would tick with
+      // no way to say in the log what is killing the thing.
+      if (type && Number.isFinite(rounds)) {
+        const cond = d[3] ? conditionFromTarget(d[3].trim()) : null;
+        const thr = clause.match(/\brolls?\s+of\s+(\d+)\s*\+/);
+        dot = {
+          dice: d[1]!, rounds, type,
+          ...(cond ? { restrictedTo: cond } : {}),
+          ...(thr ? { threshold: parseInt(thr[1]!, 10) } : {}),
+        };
+        dotClause = clause;
+        continue;
+      }
+    }
+    if (RIDER_DEFERRED_RE.test(clause)) continue;
+    const dice = clause.match(RIDER_PLUS_DICE_RE);
+    if (!dice) continue;
+    if (!/\bdamage\b/.test(clause) && !RIDER_TYPE_RE.test(clause)) continue;
+    // Nothing is being aimed at, or it would be `bonuses` — reading it here too
+    // would pay the same clause twice.
+    if (RIDER_HAS_TARGET_RE.test(clause)) continue;
+    const type = clause.match(RIDER_TYPE_RE)?.[1];
+    if (!flat) flat = { dice: dice[1]!, ...(type ? { type } : {}) };
+  }
+  return { flat, dot, dotClause };
 }
 
 export function parseWeaponEffect(effect: string | undefined | null): ParsedWeaponEffect | null {
@@ -793,13 +1021,40 @@ export function parseWeaponEffect(effect: string | undefined | null): ParsedWeap
   // clause. The optional middle group allows a damage-type adjective between
   // the dice and "damage"/"against": "+1d4 aetheric damage against …",
   // "+2d6 burn against …", "+1d6 to large creatures".
-  const re = /\+\s*(\d+d\d+)(?:\s+\w+)?\s+(?:damage\s+)?(?:against|to|vs\.?|versus)\s+([^.;,]+)/g;
-  const bonuses: Array<{ dice: string; condition: BonusCondition }> = [];
+  /**
+   * ⚠⚠⚠ OTA-1643 — THE RIDERS ARE READ BEFORE THE BONUSES, AND ONLY SO THE
+   * BONUS PASS CAN BE TOLD WHAT NOT TO TAKE. The Mud Thornblade's whole line is
+   * ONE clause — *"+1d6 poison damage to unarmored enemies for 2 rounds."* — and
+   * it satisfies both readers: an aimed `+NdN against X` bonus AND a scoped DOT.
+   * Left alone, the blade collected 1d6 immediately and 1d6 a turn for two turns
+   * off a card that promises the second thing only, which is the double-count
+   * every slice before this one went out of its way to avoid.
+   *
+   * The clause that became a DOT is therefore withheld from the bonus passes.
+   * ⚠ Whichever reader is asked FIRST has to be the narrower one, and the DOT
+   * is: it needs the anchored duration shape, so it cannot mistake a plain
+   * conditioned bonus for itself in the other direction.
+   */
+  const riders = ridersFrom(text);
+  const bonusText = riders.dotClause
+    ? text.split(/[.;]/).filter((c) => c !== riders.dotClause).join('. ')
+    : text;
+
+  const re = new RegExp(BONUS_DICE_RE.source, 'g');
+  const bonuses: Array<{ dice?: string; flat?: number; condition: BonusCondition }> = [];
   let m: RegExpExecArray | null;
-  while ((m = re.exec(text)) !== null) {
+  while ((m = re.exec(bonusText)) !== null) {
     const dice = m[1]!;
     const condition = conditionFromTarget(m[2]!.trim());
     if (condition) bonuses.push({ dice, condition });
+  }
+  // ⚠ OTA-1643 — the FLAT pass, second and stricter. Three weapons say "+4
+  // damage against creatures with natural armor" / "+1 damage to tech" and the
+  // dice-only reader above found nothing on any of them.
+  const flatRe = new RegExp(BONUS_FLAT_RE.source, 'g');
+  while ((m = flatRe.exec(bonusText)) !== null) {
+    const condition = conditionFromTarget(m[2]!.trim());
+    if (condition) bonuses.push({ flat: parseInt(m[1]!, 10), condition });
   }
   if (bonuses.length > 0) {
     out.bonuses = bonuses;
@@ -882,6 +1137,10 @@ export function parseWeaponEffect(effect: string | undefined | null): ParsedWeap
   const wx = weatherFrom(text);
   if (wx) { out.weather = wx; touched = true; }
 
+  // ── OTA-1643 (slice 4a) — the riders, computed at the top of this function ─
+  if (riders.flat) { out.flatRider = riders.flat; touched = true; }
+  if (riders.dot) { out.riderDot = riders.dot; touched = true; }
+
   return touched ? out : null;
 }
 
@@ -917,23 +1176,89 @@ export function effectConditionMatches(
       return /aetheric|aether|aetherkin/.test(sig);
     case 'aerial':
       return enemyIsAerial(enemy);
+    // ── OTA-1643 (slice 4a) ─────────────────────────────────────────────────
+    // ⚠⚠ THE ARMOUR TESTS READ `armorACPortions`, NOT THE TRAIT LIST DIRECTLY,
+    // so "armoured" means exactly what the AC step means by it. `weak_armor` is
+    // deliberately NOT armour here for the same reason it is excluded there: it
+    // is a negative modifier, and a thing whose armour is a liability is not the
+    // thing a plate-splitter was built for.
+    case 'armored': {
+      const { plate, field } = armorACPortions(enemy.traits);
+      return plate + field > 0;
+    }
+    case 'unarmored': {
+      const { plate, field } = armorACPortions(enemy.traits);
+      return plate + field === 0;
+    }
+    case 'natural_armor': {
+      // Armour the creature GREW. A bolted-together machine and a man in a
+      // breastplate both have armour and neither has a hide, which is the whole
+      // distinction a seam-finding knife trades on.
+      const { plate, field } = armorACPortions(enemy.traits);
+      if (plate + field === 0) return false;
+      return !/automation|mechanism|mech-construct|construct|human/.test(type);
+    }
+    case 'burnable':
+      return traitDefenses(enemy.traits).weaknesses.includes('burn');
     default:
       return false;
   }
 }
 
-/** Roll the bonus damage for EVERY matching clause and sum them. Returns 0
- *  when no bonus applies. */
+/** Roll the bonus damage for EVERY matching clause and sum them, plus any
+ *  unconditional rider. Returns 0 when nothing is owed.
+ *
+ *  ⚠ OTA-1643 — ONE READER, extended rather than joined by a second. The
+ *  conditioned bonus and the unconditional rider are different sentences on the
+ *  card but the same arithmetic on the swing, and two call sites is how they
+ *  end up disagreeing about whether a resist applies to them. */
 export function rollEffectBonusDamage(
   effect: ParsedWeaponEffect | null,
   enemy: Enemy,
 ): number {
-  if (!effect?.bonuses) return 0;
+  if (!effect) return 0;
   let total = 0;
-  for (const b of effect.bonuses) {
-    if (effectConditionMatches(b.condition, enemy)) total += rollFromNotation(b.dice);
+  for (const b of effect.bonuses ?? []) {
+    if (!effectConditionMatches(b.condition, enemy)) continue;
+    if (b.dice) total += rollFromNotation(b.dice);
+    if (b.flat) total += b.flat;
+  }
+  const rider = effect.flatRider;
+  if (rider) {
+    if (rider.dice) total += rollFromNotation(rider.dice);
+    if (rider.flat) total += rider.flat;
   }
   return total;
+}
+
+/**
+ * ⚠⚠ OTA-1643 — DOES THE FESTERING RIDER LAND ON THIS SWING? Two facts decide
+ * it: who was hit (a scoped DOT skips the wrong body) and whether the card's own
+ * gate opened. Returned as the seeded DOT rather than a boolean so the amount is
+ * rolled exactly once, at the place the decision is made.
+ *
+ * ⚠⚠⚠ `thresholdMet` IS PASSED IN RATHER THAN COMPUTED HERE, and that is the
+ * whole point of the parameter. Mud Venom Blade's *"on rolls of 15+"* is the
+ * same sentence slice 2 already reads for its control effects, and OTA-1564's
+ * finding was that twenty-six local copies of "did the dice come up big" is how
+ * two of them end up disagreeing. `damageRollIsMax(damage, threshold)` is the
+ * one reader; this function must not grow a second one.
+ */
+export function rollRiderDot(
+  effect: ParsedWeaponEffect | null,
+  enemy: Enemy,
+  thresholdMet?: boolean,
+): { dmgPerTurn: number; rounds: number; type: string } | null {
+  const dot = effect?.riderDot;
+  if (!dot) return null;
+  if (dot.restrictedTo && !effectConditionMatches(dot.restrictedTo, enemy)) return null;
+  // ⚠ An unproven gate is a no-op, never a free pass. A caller that forgets to
+  // pass the answer gets the weapon it had before this OTA, which is the safe
+  // direction to fail in.
+  if (dot.threshold !== undefined && thresholdMet !== true) return null;
+  const rolled = rollFromNotation(dot.dice);
+  if (rolled <= 0) return null;
+  return { dmgPerTurn: rolled, rounds: dot.rounds, type: dot.type };
 }
 
 /**
