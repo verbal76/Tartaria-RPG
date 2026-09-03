@@ -26975,7 +26975,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ingredient — Leech Mucus, base of the Poison Vial — had no catalog row and
 // was synthesised at pickup as "A reclaimer's find". It has a row now, and
 // ota1639 keeps the audit: every ingredient authored, every one obtainable.
-export const OTA_BUILD_ID = '2026-09-03-1639-every-ingredient-exists';
+// ⚠⚠⚠ OTA-1640 — THE VEST SAYS WHAT IT DOES. Owner: "why do all My different
+// rarity dog armors all have the same stats." They ladder AC 1/2/3/4 and combat
+// paid the AC — but the Rare's bite-back and the Legendary's +1 STR had no
+// reader, and no surface printed any of it (no dog-gear preview branch; the
+// snapshot printed AC only for fused pieces). Dog-gear preview, the two readers
+// wired (bite STR, nose INT, hit-reflect), and the snapshot carries stat lines.
+export const OTA_BUILD_ID = '2026-09-03-1640-the-vest-says-what-it-does';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-03-1639-every-ingredient-exists';
 // golem catch-up 2026-09-03: markerless publish of OTA-1639 - Leech Mucus gets
 // its catalog row; ota1639 keeps the recipe-ingredient audit. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-03-1638-the-star-goes-last';

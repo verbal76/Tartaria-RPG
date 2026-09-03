@@ -238,6 +238,7 @@ import {
   playerBuildScore, playerIsDownNotDead, playerWeaponReach, RANGE_LABEL,
   recordEnemyIntel, runEnemyGroupCounters, runMoveCombatRange, runSurvivorVolley,
   staggerEnemy, sweepDeadEnemies, tickEnemyDotsAndMaybeEndFight,
+  dogVestStatBonus, // OTA-1640
 } from './combatResolution';
 // ⚠ OTA-1404 — gear wear moved DOWN because combat AND digging both wear gear,
 // so neither could own it. See gearWear.ts.
@@ -11098,7 +11099,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (hiddenPool.length > 0) {
             const dog = livePlayer.dog;
             const roll = rollDie(20);
-            const total = roll + dog.stats.intelligence;
+            // OTA-1640 — a vest that sharpens the nose counts here too.
+            const total = roll + dog.stats.intelligence + dogVestStatBonus(livePlayer, 'intelligence');
             const success = total >= 12;
             if (success) {
               const hidden = hiddenPool[Math.floor(Math.random() * hiddenPool.length)]!;
@@ -35112,7 +35114,12 @@ function handleDogCombat(
   if (kind === 'dog_bite') {
     const ac = Math.max(5, Math.min(18, 5 + parseEnemyAP(target)));
     const roll = rollDie(20);
-    const total = roll + dog.stats.strength;
+    // ⚠ OTA-1640 — the worn vest's stat bonus finally reaches the bite (the
+    // Reclaimer Pattern Vest's +1 STR had no reader). One helper, same source
+    // the item card prints from.
+    const vestStr = dogVestStatBonus(get().player!, 'strength');
+    const biteStr = dog.stats.strength + vestStr;
+    const total = roll + biteStr;
     const nat20 = roll === 20;
     const nat1 = roll === 1;
     const hit = nat20 || (!nat1 && total >= ac);
@@ -35123,10 +35130,10 @@ function handleDogCombat(
     // Aethercraft-summon-roll fix.
     get().appendLog(
       hit ? 'reward' : 'combat',
-      `${dog.name} lunges at ${target.name} — d20 ${roll} + STR ${dog.stats.strength} = ${total} vs AC ${ac} — ${hit ? (nat20 ? '✓ NAT 20' : '✓ HIT') : '✗ MISS'}`,
+      `${dog.name} lunges at ${target.name} — d20 ${roll} + STR ${biteStr}${vestStr ? ` (vest +${vestStr})` : ''} = ${total} vs AC ${ac} — ${hit ? (nat20 ? '✓ NAT 20' : '✓ HIT') : '✗ MISS'}`,
     );
     if (hit) {
-      let dmg = rollDie(6) + Math.floor(dog.stats.strength / 2);
+      let dmg = rollDie(6) + Math.floor(biteStr / 2);
       if (nat20) dmg *= 2;
       // Combat-Parity (companion) — the dog's bite is PIERCING. It was flat/typeless before, so a
       // pierce-resistant enemy soaked nothing and a pierce-weak one took no extra. Now honor the

@@ -925,6 +925,35 @@ export function dogVestAcBonus(player: PlayerCharacter): number {
   return inst?.uniqueStats?.acBonus ?? 0;
 }
 
+// ⚠⚠⚠ OTA-1640 — THE VEST DOES WHAT ITS CARD SAYS. Owner: *"there's no use of
+// having a legendary if it's got the same stats as a common or a rare."*
+// Measured: dogGear.json ladders AC 1/2/3/4 and the AC was paid (above) — but
+// the Rare vest's `reflectsCorruption` and the Legendary's `statBonus` (+1 STR)
+// were data with NO reader anywhere in the engine: the dog's bite read
+// `dog.stats.strength` raw, and nothing bit back. Two of four rungs on the
+// ladder were decoration. These are their readers; the item card prints from
+// the same fields, so it can never promise what combat will not pay.
+
+/** The worn vest's bonus to one of the dog's three stats (catalog vests only;
+ *  a fused vest carries AC, not a stat). 0 when none. */
+export function dogVestStatBonus(
+  player: PlayerCharacter,
+  stat: 'strength' | 'dexterity' | 'intelligence',
+): number {
+  const name = player.dog?.equipped?.vest;
+  if (!name) return 0;
+  const catalog = findDogGearByName(name);
+  return catalog?.statBonus?.stat === stat ? catalog.statBonus.amount : 0;
+}
+
+/** Aetheric damage the worn vest returns to whatever lands a hit on the dog.
+ *  0 when the vest has no bite. */
+export function dogVestReflect(player: PlayerCharacter): number {
+  const name = player.dog?.equipped?.vest;
+  if (!name) return 0;
+  return findDogGearByName(name)?.reflectsCorruption ?? 0;
+}
+
 /** One enemy spends its swing on the dog. Mirrors applyEnemyCounter's roll but
  *  against the dog's own AC (10 + DEX mod + vest), with the enemy's damage
  *  notation. A hit to 0 benches the dog and stamps downedAtHour so tickDogStatus
@@ -998,6 +1027,29 @@ export function applyEnemyCounterToDog(
     'combat',
     `${dog.name} takes ${dmg}. (${trained ? trained.dog.hp : newHp}/${trained ? trained.dog.hpMax : dog.hpMax} HP left)`,
   );
+  // ⚠ OTA-1640 — THE VEST BITES BACK. The Aetheric Padded Vest's
+  // `reflectsCorruption` was a "future hook" that never fired; now every hit
+  // that lands on the dog returns that much aetheric to the attacker, and a
+  // kill by it goes through resolveEnemyDefeat exactly as the dog's own bite does.
+  const reflect = dogVestReflect(player);
+  if (reflect > 0) {
+    const scene = get().currentScene;
+    const idx = scene ? scene.enemies.findIndex((e) => e === enemy) : -1;
+    const at = idx >= 0 ? idx : (scene ? scene.enemies.findIndex((e, i) => e.name === enemy.name && (scene.enemyHps[i] ?? 0) > 0) : -1);
+    if (scene && at >= 0) {
+      const before = scene.enemyHps[at] ?? 0;
+      const after = Math.max(0, before - reflect);
+      set((s) => (s.currentScene
+        ? { currentScene: { ...s.currentScene, enemyHps: s.currentScene.enemyHps.map((hp, i) => (i === at ? after : hp)) } }
+        : s));
+      get().appendLog('reward', `${dog.name}'s vest hums and gives it back — ${enemy.name} takes ${reflect} aetheric. (${after} HP left)`);
+      if (before > 0 && after <= 0) {
+        get().appendLog('world', `${enemy.name} drops, undone by what it took from ${dog.name}.`);
+        set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, activeEnemyIdx: at } } : s));
+        get().resolveEnemyDefeat();
+      }
+    }
+  }
   if (trained?.leveled) {
     get().appendLog(
       'reward',

@@ -28,6 +28,8 @@ import {
   findMaterialByName,
 } from '../engine/crafting';
 import { canScrap, repairCostMaterials } from '../engine/scrapEngine';
+// OTA-1640 — the row's own stat line, so the paste shows what the screen shows.
+import { getItemPreviewForInstance } from '../components/itemPreview';
 import { validSlotsForItem } from '../engine/equipment';
 import { resolveItemEffect } from '../engine/itemEffect';
 
@@ -120,6 +122,20 @@ function lineFor(item: InventoryItem, equippedSlots: ReadonlyMap<string, string>
     if (u.acBonus !== undefined) meta.push(`AC+${u.acBonus}`);
     if (u.resistance) meta.push(`resist:${u.resistance}`);
     meta.push('unique');
+  } else {
+    // ⚠ OTA-1640 — THE CATALOG STATS, TOO. The owner pasted this snapshot and
+    // read three dog vests of three rarities as "the same stats", because this
+    // line printed AC only for a fused piece. Every armour, vest and accessory
+    // now carries the same stat line the inventory row draws (AC / resists /
+    // stat bonuses / regen), so a paste can never again hide a ladder.
+    try {
+      const extra = getItemPreviewForInstance(item).stats.filter(
+        (s) => !s.startsWith('Damage:') && !s.startsWith('Durability:') && !s.startsWith('Tags:') && !s.startsWith('Scales with'),
+      );
+      if (extra.length > 0 && (item.kind === 'armor' || item.kind === 'dog_armor' || item.kind === 'relic')) {
+        meta.push(extra.join(' · '));
+      }
+    } catch { /* tolerate catalog miss */ }
   }
   if (item.tags && item.tags.length > 0) {
     // Keep tag list short so the line stays readable.

@@ -1560,9 +1560,9 @@ Key invariants worth knowing:
 
 ## 9. Recent OTA highlights (latest sessions)
 
-### ⚠⚠⚠ THE 2026-09-02 RUN — OTA-1617 → 1639 (read this first if you are new)
+### ⚠⚠⚠ THE 2026-09-02 RUN — OTA-1617 → 1640 (read this first if you are new)
 
-Latest golem-line stamp: **`2026-09-03-1639-every-ingredient-exists`**
+Latest golem-line stamp: **`2026-09-03-1640-the-vest-says-what-it-does`**
 (`app/buildInfo.ts`). Both channels ship from this branch — a `[ota-hal]` marker
 in the commit TITLE publishes the HAL set, a markerless follow-up commit
 publishes golem; see §6.
@@ -1837,6 +1837,18 @@ what it ACCEPTS, and a data walker skips the saying.
   task #165: **98 enemy loot names** have no catalog row at all (Aetheric
   Blood, Boar Hide, Ogre Club, Titan Armor …) — obtainable but inferred; the
   owner's call whether to author or alias them.
+- **OTA-1640 the vest says what it does.** Owner (02:24 inventory paste):
+  *"why do all My different rarity dog armors all have the same stats."*
+  Measured: `dogGear.json` ladders AC 1/2/3/4 and `dogVestAcBonus` paid it,
+  but `reflectsCorruption` (Rare) and `statBonus` +1 STR (Legendary) had NO
+  reader, and `getItemPreview` had no dog-gear branch — every vest fell to
+  `inferArmor` and printed the same guessed line; the snapshot printed AC
+  only for fused pieces. Fix: `previewDogGear` ("AC +3 (dog)", "STR +1
+  (dog)", "Bites back: 1 aetheric …"); `dogVestStatBonus` / `dogVestReflect`
+  in combatResolution — bite adds vest STR (logged "(vest +1)"), nose adds
+  vest INT, every hit on the dog returns the vest's aetheric to the attacker
+  (a kill routes through resolveEnemyDefeat); snapshot rows for armour /
+  vests / accessories carry the row's stat line. ota1640 pins all of it.
 
 ✓ **One position vocabulary now (OTA-1637).** The doors, the arrival line, the
 trace, the card, the conversation arm and the verb matchers all run

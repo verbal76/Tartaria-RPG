@@ -6,6 +6,7 @@ import {
   GEAR,
   EXPLORATION,
   MATERIALS,
+  DOG_GEAR,
   armorResistances,
   fusedArmorResistances,
   type CatalogWeapon,
@@ -13,6 +14,7 @@ import {
   type CatalogAccessory,
   type CatalogGear,
   type CatalogMaterial,
+  type CatalogDogGear,
 } from '../engine/crafting';
 import {
   inferWeapon,
@@ -206,6 +208,18 @@ export function getItemPreview(itemName: string): ItemPreview {
   const m = MATERIALS.find((x) => x.name.toLowerCase() === lower);
   if (m) return previewMaterial(m);
 
+  // ⚠⚠⚠ OTA-1640 — THE FIFTH CATALOG, AGAIN. Owner: *"why do all My different
+  // rarity dog armors all have the same stats. there's no use of having a
+  // legendary if it's got the same stats as a common or a rare."* They do NOT
+  // have the same stats — dogGear.json ladders AC 1/2/3/4 and combat pays it
+  // (dogVestAcBonus) — but this resolver never knew dog gear existed, so a
+  // Burlap Vest and an Aetheric Padded Vest both fell through to inferArmor
+  // ("vest" → chest) and printed the SAME guessed line. The card lied by
+  // omission on every rarity. OTA-1603 fixed the same blind spot in
+  // findCatalogItem; this is the preview's copy of it.
+  const dg = DOG_GEAR.find((x) => x.name.toLowerCase() === lower);
+  if (dg) return previewDogGear(dg);
+
   // No catalog entry — infer stats from the item name so the modal
   // shows real numbers instead of "No record." Inferred items are
   // flagged (description prefix) so the player knows the stats are
@@ -366,6 +380,19 @@ function previewArmor(a: CatalogArmor): ItemPreview {
   if (regen) stats.push(regen);
   if (a.baseDurability !== undefined) stats.push(`Durability: ${a.baseDurability}`);
   return { name: a.name, kindLabel: `${slotLabel} Armor`, slot: a.slot, rarity: a.rarity, description: a.description, stats };
+}
+
+/** OTA-1640 — a dog vest's card says what the vest does for the DOG, in the same
+ *  grammar the player's armour uses, and only what combat actually pays:
+ *  `dogVestAcBonus` (AC), `dogVestStatBonus` (the stat), `dogVestReflect` (the
+ *  bite-back). A line here with no reader in combat would be the OTA-1611 lie. */
+function previewDogGear(d: CatalogDogGear): ItemPreview {
+  const stats: string[] = [`AC +${d.acBonus} (dog)`];
+  if (d.statBonus) stats.push(`${d.statBonus.stat.toUpperCase().slice(0, 3)} +${d.statBonus.amount} (dog)`);
+  if (d.reflectsCorruption) stats.push(`Bites back: ${d.reflectsCorruption} aetheric to whatever hits the dog`);
+  if (d.faction) stats.push(`Faction: ${d.faction}`);
+  if (d.baseDurability !== undefined) stats.push(`Durability: ${d.baseDurability}`);
+  return { name: d.name, kindLabel: 'Dog Vest', rarity: d.rarity, description: d.description, stats };
 }
 
 /** OTA-1160 — ONE spelling of the regen line, so the row, the preview and the fused
