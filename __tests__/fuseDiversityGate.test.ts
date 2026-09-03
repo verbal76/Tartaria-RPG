@@ -21,10 +21,13 @@ describe('fuse crucible — material-tag diversity', () => {
 
   it("the player's reserved aether/improvised loot now satisfies the 3-tag gate", () => {
     // Exactly the persisted tags from the playtest inventory (no `organic` on them).
+    // ⚠ OTA-1639 — Leech Mucus got a catalog row (it is a recipe ingredient), and
+    // cataloged items do not fuse (OTA-194), so the third input is Shrike Claw:
+    // still inferred, still a soft creature-part the name reads as organic.
     const g = gateFusion([
       mk('Aetheric Blood', ['loot', 'improvised', 'aether']),
       mk('Aether Feather', ['loot', 'improvised', 'aether']),
-      mk('Leech Mucus', ['loot', 'improvised']),
+      mk('Shrike Claw', ['loot', 'improvised']),
     ]);
     expect(g.ok).toBe(true);
     expect(g.tagProfile.sort()).toEqual(['aether', 'improvised', 'organic']);
@@ -52,10 +55,10 @@ describe('fuse crucible — material-tag diversity', () => {
     const g = gateFusion([
       k('Aetheric Moss', 'consumable', ['loot', 'aether']),           // material reagent → counts
       k('Aetheric Blood', 'misc', ['loot', 'improvised', 'aether']),
-      k('Leech Mucus', 'misc', ['loot', 'improvised']),
+      k('Shrike Claw', 'misc', ['loot', 'improvised']), // OTA-1639 — was Leech Mucus, cataloged now
       k('Aether-Distilled Spirit', 'consumable', ['alcohol', 'aether', 'drink']), // real drink → excluded
     ]);
-    expect(g.inputs.map((i) => i.name).sort()).toEqual(['Aetheric Blood', 'Aetheric Moss', 'Leech Mucus']);
+    expect(g.inputs.map((i) => i.name).sort()).toEqual(['Aetheric Blood', 'Aetheric Moss', 'Shrike Claw']);
     expect(g.ok).toBe(true);
   });
 });

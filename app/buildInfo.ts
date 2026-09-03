@@ -26968,7 +26968,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // boxes around the glyphs". `🔥☣ launcher ✦ ★`; the em space before the base
 // glyph now sits outside the dark cell; a WEAPON GLYPHS card on the About tab
 // reads the live tables and explains the star.
-export const OTA_BUILD_ID = '2026-09-03-1638-the-star-goes-last';
+// ⚠⚠⚠ OTA-1639 — EVERY INGREDIENT EXISTS. Owner: "is an aetherstone heart a
+// material in the list? run a full audit of all the crafting recipes in the
+// game and make sure all of the materials exist." 139 recipes, 60 ingredients:
+// Aetherstone Heart is a Legendary material (the Aetheric Lich's core); one
+// ingredient — Leech Mucus, base of the Poison Vial — had no catalog row and
+// was synthesised at pickup as "A reclaimer's find". It has a row now, and
+// ota1639 keeps the audit: every ingredient authored, every one obtainable.
+export const OTA_BUILD_ID = '2026-09-03-1639-every-ingredient-exists';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-03-1638-the-star-goes-last';
 // golem catch-up 2026-09-03: markerless publish of OTA-1638 - the star last,
 // the em space outside the dark cell, the WEAPON GLYPHS key on the About tab.
 // hal took the marker.

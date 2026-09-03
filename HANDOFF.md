@@ -1560,9 +1560,9 @@ Key invariants worth knowing:
 
 ## 9. Recent OTA highlights (latest sessions)
 
-### ⚠⚠⚠ THE 2026-09-02 RUN — OTA-1617 → 1638 (read this first if you are new)
+### ⚠⚠⚠ THE 2026-09-02 RUN — OTA-1617 → 1639 (read this first if you are new)
 
-Latest golem-line stamp: **`2026-09-03-1638-the-star-goes-last`**
+Latest golem-line stamp: **`2026-09-03-1639-every-ingredient-exists`**
 (`app/buildInfo.ts`). Both channels ship from this branch — a `[ota-hal]` marker
 in the commit TITLE publishes the HAL set, a markerless follow-up commit
 publishes golem; see §6.
@@ -1821,6 +1821,22 @@ what it ACCEPTS, and a data walker skips the saying.
   live glyph + colour tables, rendered on the About tab above the dedication.
   ota1553 / ota1568 / ota1636 pins repointed; ota1638 pins order, parts, the
   spacer, the key's coverage and the star text.
+- **OTA-1639 every ingredient exists.** Owner: *"is an aetherstone heart a
+  material in the list? run a full audit of all the crafting recipes in the
+  game and make sure all of the materials exist."* Audit of `recipes.json`:
+  139 recipes, 60 distinct ingredients. Aetherstone Heart IS a material
+  (Legendary, `materials.json`, the Aetheric Lich's loot + `bonusDrops`). 59/60
+  had a catalog row; **Leech Mucus** (Poison Vial base, Aetheric Leech loot)
+  did not — it was synthesised at pickup by `inferGear` as "A reclaimer's
+  find". Row added (Common, organic/alchemy/poison) — which also means it no
+  longer fuses (cataloged items don't, OTA-194); fuseDiversityGate fixtures
+  moved to Shrike Claw. Every ingredient has a source (enemy loot / forage /
+  dig / container loot / bonus pool / starter kit / recipe). ota1639 keeps
+  the audit as a suite; `catalog-names.snapshot.json` refreshed (was 12
+  names stale). Side finding, filed as
+  task #165: **98 enemy loot names** have no catalog row at all (Aetheric
+  Blood, Boar Hide, Ogre Club, Titan Armor …) — obtainable but inferred; the
+  owner's call whether to author or alias them.
 
 ✓ **One position vocabulary now (OTA-1637).** The doors, the arrival line, the
 trace, the card, the conversation arm and the verb matchers all run
