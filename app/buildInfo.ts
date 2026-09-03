@@ -27185,6 +27185,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // BEFORE the point is spent, so every path a player's kit wears down is warded
 // identically.
 export const OTA_BUILD_ID = '2026-09-03-1653-the-wear-ward';
+// golem catch-up 2026-09-03: markerless publish of OTA-1653 - the wear ward, a
+// buff the owner invented by misreading a resist line and which turned out to be
+// the better item. 6/10/15/25% by rarity, best-not-sum, a chance to skip a wear
+// point rather than a fraction of one; the Tin Ward Ring moved Common->Rare to
+// carry it because the ladder forbids a special below Rare. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-03-1652-no-resist-without-a-source';
 // golem catch-up 2026-09-03: markerless publish of OTA-1652 - the resist audit.
 // degradation folds into acid (closing the mirror hole where enemies corroded you
