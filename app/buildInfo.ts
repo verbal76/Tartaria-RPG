@@ -27117,6 +27117,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // for every one of them incl. the Aetheric Diadem (205 recipes), and one shipped
 // recipe repaired that let a Rare be built out of Uncommon scrap.
 export const OTA_BUILD_ID = '2026-09-03-1649-what-a-ring-is-for';
+// golem catch-up 2026-09-03: markerless publish of OTA-1649 - the accessory
+// overhaul. The resist list fifteen accessories carried and combat never saw is
+// live; three new effect families (coating boost, from-stealth multiplier,
+// once-per-fight discharge) ride rarity ladders rather than hand-typed numbers;
+// 16 new rings and amulets and a recipe for all 48, the Aetheric Diadem
+// included. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-03-1648-a-fourth-ring';
 // golem catch-up 2026-09-03: markerless publish of OTA-1648 - a fourth ring slot,
 // and the hand-written ['ring','ring2','ring3'] list retired from 13 files into
