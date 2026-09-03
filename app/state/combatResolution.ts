@@ -2382,26 +2382,61 @@ function applyEnemyCounter(
     // ⚠ The OTA-959 wear roll below is deliberately left alone: it is a
     // separate, tuned distribution (uniform over WORN slots so wear always
     // lands), and folding the two would silently re-weight armour durability.
+    // ⚠⚠⚠ OTA-1646 — WHERE THE BLOW LANDS IS ASKED ONCE, AND THE SHIELD ANSWERS
+    // FIRST. Owner: "we need all incoming hits to hit the shield first, that is
+    // its intended use." One roll now serves BOTH consumers below — the coating
+    // splash and the durability wear — because they are the same question, and
+    // asking twice let a blow splash the chest while chipping the boots.
+    const heldShield = heldShieldAc(player);
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const ecLanding = require('../engine/enemyCoating') as typeof import('../engine/enemyCoating');
+    const landing = ecLanding.rollBlowLanding(
+      { hasShield: !!heldShield.name, traits: enemy.traits },
+      Math.random,
+    );
     let coatingClause = '';
     let coatingAilment: string | null = null;
     let coatingCorruption = 0;
     if (enemy.coating) {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const ec = require('../engine/enemyCoating') as typeof import('../engine/enemyCoating');
-      const struck = ec.rollHitLocation(Math.random);
-      const wornName = player.equipped?.[struck];
+      const struck = landing.slot;
+      const wornName = struck ? player.equipped?.[struck] : undefined;
       const raw = Math.max(1, rollFromNotation(enemy.coating.dice) || 1);
       // The struck piece's OWN resists — read from the same resistSlots the
       // aggregate is built from, filtered to the one slot that took the blow.
-      const pieceResists = armorPieces.resistSlots
-        .filter((r) => r.slot === struck)
-        .map((r) => String(r.type).toLowerCase());
+      const pieceResists = struck
+        ? armorPieces.resistSlots
+          .filter((r) => r.slot === struck)
+          .map((r) => String(r.type).toLowerCase())
+        : [];
       const resistedHere = pieceResists.includes(String(enemy.coating.kind).toLowerCase());
-      const coatDmg = resistedHere ? Math.max(1, Math.ceil(raw / 2)) : raw;
+      let coatDmg = 0;
+      if (landing.on === 'shield') {
+        // ⚠⚠ OTA-1646 — THE SHIELD KEEPS IT OFF YOUR SKIN. A coating that lands
+        // on a slab of mud-iron is halved: it is on the shield, not in you.
+        // And a shield whose card names that very damage type turns it away
+        // outright — the Mud Heater Shield ("+2 AC vs fire") really does answer
+        // a burning blade, which is the first time either typed shield has been
+        // worth its clause against a coating.
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const wev = require('../engine/weaponEffects') as typeof import('../engine/weaponEffects');
+        const turned = wev.shieldAcVersus(
+          heldShield.vs ? { vs: heldShield.vs } : null,
+          String(enemy.coating.kind),
+        ) > 0;
+        coatDmg = turned ? 0 : Math.max(1, Math.ceil(raw / 2));
+        dmg += coatDmg;
+        coatingClause = turned
+          ? ` [${heldShield.name} turns the ${enemy.coating.kind} aside]`
+          : ` +${coatDmg} ${enemy.coating.kind} [${heldShield.name} took it, halved]`;
+      } else {
+      coatDmg = resistedHere ? Math.max(1, Math.ceil(raw / 2)) : raw;
       dmg += coatDmg;
       coatingClause = wornName
-        ? ` +${coatDmg} ${enemy.coating.kind} [${wornName} took it${resistedHere ? `, ${enemy.coating.kind}-resistant, halved` : ''}]`
-        : ` +${coatDmg} ${enemy.coating.kind} [caught you where you wear nothing]`;
+        ? ` +${coatDmg} ${enemy.coating.kind} [${wornName} took it${resistedHere ? `, ${enemy.coating.kind}-resistant, halved` : ''}${landing.wentAround ? ', around the shield' : ''}]`
+        : ` +${coatDmg} ${enemy.coating.kind} [caught you where you wear nothing${landing.wentAround ? ', around the shield' : ''}]`;
+      }
       coatingAilment = ec.ailmentForCoating(enemy.coating.kind);
       // ⚠⚠ A corruption-coated blade raises the METER, so the corruption vial
       // he drinks subtracts from the same number. Symmetry is the whole point
@@ -2415,16 +2450,56 @@ function applyEnemyCounter(
     // shattered in ~10 minutes, AC 24 -> 17). One blow lands somewhere; that
     // piece takes the wear — so MORE armor now means the set lasts LONGER,
     // instead of dying faster the better-equipped you are.
+    // ⚠⚠⚠ OTA-1646 — AND THE SHIELD TAKES THE WEAR IT JUST TOOK THE BLOW FOR.
+    // This is the half that makes "the shield goes first" mean something to a
+    // player rather than only to the log: while a shield is up, your ARMOUR
+    // stops chipping. The shield spends itself instead, which is what a shield
+    // is for, and it is why the 15 shield rows are authored with real
+    // baseDurability in this same OTA — at the default 25 a shield eating every
+    // blow would shatter six times faster than the set it is protecting, which
+    // is precisely the OTA-959 failure ("a 5-piece set spent 5 durability per
+    // blow") re-made on one item.
+    //
+    // ⚠⚠ THE LADDER, DERIVED RATHER THAN GUESSED — owner: "maybe 150 durability?
+    // use mathematical reasoning. make it a useful piece of equipment but can
+    // still be broken." Measured off his own 2026-09-02/03 bundles: 1402 blows
+    // landed on the player across 92 fight segments — median 11 a fight, mean
+    // 15.2. Before this OTA wear spread uniformly over ~6 worn slots, so a
+    // 25-durability piece survived 25 x 6 = 150 BLOWS OF EXPOSURE. That is the
+    // parity point, and it is his number: a Common shield at 150 is exactly as
+    // durable in practice as a piece of his armour used to be. Bypass returns
+    // ~11% of blows to the body across his enemy mix, so D durability absorbs
+    // D / 0.89 blows: Common 150 -> ~169 blows (~15 fights), Uncommon 200 ->
+    // ~225 (~20), Rare 265 -> ~298 (~27), Legendary 350 -> ~393 (~36). Useful,
+    // repairable, and still breakable — a Legendary is an heirloom you maintain,
+    // not an infinite one.
+    //
+    // ⚠ AND THE SHIELD DOES NOT TOUCH BASE DAMAGE — owner: "base damage always
+    // hit." It never enters this arithmetic: `dmg` is already resolved above by
+    // AC, resists and the type table. What the shield changes is WHERE the blow
+    // lands, which is the coating splash and the wear. Stopping the hit outright
+    // is what AC (OTA-1645) and the BLOCK action (OTA-1510) are for.
+    //
+    // ⚠ `landing` is the SAME roll the coating splash read. One blow lands in
+    // one place; asking twice let a blade splash the chest and chip the boots.
     const wornSlots = ARMOR_SLOTS.filter((s) => !!player.equipped?.[s]);
-    const wornSlotHit = wornSlots.length > 0
-      ? wornSlots[Math.floor(Math.random() * wornSlots.length)]!
-      : null;
+    const shieldTookIt = landing.on === 'shield' ? heldShield.name : null;
+    const wornSlotHit = shieldTookIt
+      ? null
+      : wornSlots.length > 0
+        ? wornSlots[Math.floor(Math.random() * wornSlots.length)]!
+        : null;
 
     let killed = false;
     set((s) => {
       if (!s.player) return {};
       let nextPlayer = s.player;
-      if (wornSlotHit) {
+      if (shieldTookIt) {
+        // The shield is held, not worn, so it is named directly rather than
+        // resolved through an armour slot — `wearEquippedItem` matches the
+        // bound instance across every slot including the hands.
+        nextPlayer = wearEquippedItem(nextPlayer, shieldTookIt, get);
+      } else if (wornSlotHit) {
         const name = nextPlayer.equipped?.[wornSlotHit];
         if (name) nextPlayer = wearEquippedItem(nextPlayer, name, get);
       }

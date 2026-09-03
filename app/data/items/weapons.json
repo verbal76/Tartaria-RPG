@@ -1731,7 +1731,8 @@
           "stat": "hp",
           "amount": 10
         }
-      ]
+      ],
+      "baseDurability": 150
     },
     {
       "name": "Bone Knife",
@@ -1865,7 +1866,8 @@
           "stat": "hp",
           "amount": 10
         }
-      ]
+      ],
+      "baseDurability": 150
     },
     {
       "name": "Plasma Dagger",
@@ -1972,7 +1974,8 @@
           "stat": "hp",
           "amount": 15
         }
-      ]
+      ],
+      "baseDurability": 150
     },
     {
       "name": "Aetheric Dagger",
@@ -2020,7 +2023,8 @@
           "stat": "hp",
           "amount": 20
         }
-      ]
+      ],
+      "baseDurability": 200
     },
     {
       "name": "High-Frequency Dagger",
@@ -2069,7 +2073,8 @@
           "stat": "hp",
           "amount": 20
         }
-      ]
+      ],
+      "baseDurability": 200
     },
     {
       "name": "Mud Spiked Shield",
@@ -2096,7 +2101,8 @@
           "stat": "hp",
           "amount": 15
         }
-      ]
+      ],
+      "baseDurability": 200
     },
     {
       "name": "Plasma Shield",
@@ -2123,7 +2129,8 @@
           "stat": "hp",
           "amount": 20
         }
-      ]
+      ],
+      "baseDurability": 200
     },
     {
       "name": "Bone Scimitar",
@@ -2237,7 +2244,8 @@
           "stat": "hp",
           "amount": 25
         }
-      ]
+      ],
+      "baseDurability": 200
     },
     {
       "name": "Plasma Handgun",
@@ -2308,7 +2316,8 @@
           "stat": "hp",
           "amount": 15
         }
-      ]
+      ],
+      "baseDurability": 200
     },
     {
       "name": "Aetheric Plasma Blade",
@@ -2357,7 +2366,8 @@
           "stat": "hp",
           "amount": 30
         }
-      ]
+      ],
+      "baseDurability": 265
     },
     {
       "name": "Giant Bone Knuckles",
@@ -2434,7 +2444,8 @@
           "stat": "hp",
           "amount": 20
         }
-      ]
+      ],
+      "baseDurability": 265
     },
     {
       "name": "Mud Thornblade",
@@ -2549,7 +2560,8 @@
           "stat": "hp",
           "amount": 35
         }
-      ]
+      ],
+      "baseDurability": 265
     },
     {
       "name": "Mud Venom Blade",
@@ -2668,7 +2680,8 @@
           "stat": "hp",
           "amount": 50
         }
-      ]
+      ],
+      "baseDurability": 350
     },
     {
       "name": "Graviton Gauntlet",
@@ -2742,7 +2755,8 @@
           "stat": "hp",
           "amount": 30
         }
-      ]
+      ],
+      "baseDurability": 350
     },
     {
       "name": "Aetheric Arm Blade",
@@ -2792,7 +2806,8 @@
           "stat": "hp",
           "amount": 40
         }
-      ]
+      ],
+      "baseDurability": 350
     },
     {
       "name": "Plasma Cutter Knife",

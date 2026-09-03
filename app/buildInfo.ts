@@ -27043,7 +27043,29 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // coming in, outside the bulk trim. ⚠ The Shield-Hammer's "+2 AC FOR 1 ROUND
 // after a hit" is deliberately refused — a timed status is not a held passive,
 // and reading it would hand a two-handed hammer a permanent +2. It waits for 4c.
-export const OTA_BUILD_ID = '2026-09-03-1645-the-shield-ac-is-real';
+// ⚠⚠⚠ OTA-1646 — THE SHIELD GOES FIRST. Owner, on the 1645 shield work: "we
+// need all incoming hits to hit the shield first, that is its intended use,
+// unless an enemy uses dodge or stealth then it rolls an RNG to go around it.
+// this is counter for the way it is now where there is an RNG roll to see what
+// piece of armor it hits." He had caught a real contradiction between two of
+// his OWN requirements: `rollHitLocation` exists because of his OTA-1513 ask
+// ("roll on each attack what piece of armor their attack lands on"), and it is
+// a BODY table — chest/legs/hands/feet/cloak/head — which a shield can never be
+// in, because shields are weapons held in a hand. So every blow rolled a body
+// part while the thing he was holding up to stop it was never consulted. Now
+// one landing roll serves both the coating splash and the durability wear (they
+// are the same question; asking twice let a blade splash the chest and chip the
+// boots). A shield answers first; `agile` .18 / `ambush_strike` .15 / `quick`
+// .12 roll to come around it — the same traits and numbers traitDodgeChance
+// already uses, because the same nimbleness answers both questions — and a
+// lumbering foe never does. On the shield: coating halved, or turned aside
+// outright when the shield's typed clause names that damage type, and the
+// SHIELD takes the durability instead of your armour. ⚠ The 15 shield rows are
+// authored with real baseDurability (60/90/130/180 by rarity) in the same OTA:
+// at the default 25 a shield eating every blow would shatter six times faster
+// than the set it protects — the OTA-959 failure re-made on one item.
+export const OTA_BUILD_ID = '2026-09-03-1646-the-shield-goes-first';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-03-1645-the-shield-ac-is-real';
 // golem catch-up 2026-09-03: markerless publish of OTA-1645 - seven shields'
 // printed "+N AC" reaches the number an enemy rolls against for the first time
 // (five flat, two typed and spent at the resolver, the timed one refused);

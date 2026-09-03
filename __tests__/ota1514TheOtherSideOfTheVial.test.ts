@@ -211,10 +211,20 @@ describe('OTA-1513 — the wiring (source claims)', () => {
   });
 
   it('⚠⚠⚠ ONE piece answers it — the struck slot only, not the aggregate stack', () => {
-    expect(COMBAT).toContain('const struck = ec.rollHitLocation(Math.random);');
+    // ⚠⚠ OTA-1646 — THE SOURCE OF `struck` MOVED; WHAT IT MEANS DID NOT. The
+    // location is now decided ONCE by `rollBlowLanding`, which asks the shield
+    // first and falls through to this same weighted body table when there is no
+    // shield or the attacker went around it. `struck` is still exactly one slot
+    // (or null, when the shield itself took the blow), and the resist filter
+    // below still reads that one slot — which is the whole claim this test makes.
+    expect(COMBAT).toContain('const landing = ecLanding.rollBlowLanding(');
+    expect(COMBAT).toContain('const struck = landing.slot;');
     expect(COMBAT).toContain(".filter((r) => r.slot === struck)");
     expect(COMBAT).toContain('const resistedHere = pieceResists.includes(String(enemy.coating.kind).toLowerCase());');
-    expect(COMBAT).toContain('const coatDmg = resistedHere ? Math.max(1, Math.ceil(raw / 2)) : raw;');
+    expect(COMBAT).toContain('coatDmg = resistedHere ? Math.max(1, Math.ceil(raw / 2)) : raw;');
+    // ⚠ And the aggregate stack is STILL not what answers — the thing this test
+    // was written to prevent. No path reads armorPieces.resistances here.
+    expect(COMBAT).not.toContain('armorPieces.resistances.includes(String(enemy.coating.kind)');
   });
 
   it('⚠⚠ the log NAMES the piece — he has to be able to see his coatings working', () => {

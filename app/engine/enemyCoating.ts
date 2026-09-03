@@ -162,6 +162,75 @@ export function rollHitLocation(roll01: () => number): EquipSlot {
 export const HIT_LOCATION_WEIGHTS = HIT_LOCATION_TABLE;
 
 /**
+ * ⚠⚠⚠ OTA-1646 — THE SHIELD IS THE FIRST THING THE BLOW MEETS. Owner, on the
+ * OTA-1645 shield work: *"I would imagine that we need all incoming hits to hit
+ * the shield first, that is its intended use, unless an enemy uses dodge or
+ * stealth then it rolls an RNG to go around it. this is counter for the way it
+ * is now where there is an RNG roll to see what piece of armor it hits."*
+ *
+ * He is right that the two rules contradicted each other. `rollHitLocation`
+ * above was written for HIS OWN earlier requirement — *"it will have to roll on
+ * each attack what piece of armor their attack lands on"* — and it is a BODY
+ * table: chest, legs, hands, feet, cloak, head. A shield is not in it and could
+ * not be, because shields are weapons held in a hand rather than armour slots.
+ * So the game rolled a body location for every blow while the thing the player
+ * was holding up to stop it was never consulted.
+ *
+ * ⚠⚠ THE BODY TABLE IS NOT REPLACED, IT IS DEMOTED TO SECOND. A shield answers
+ * first; when the blow gets past it — or when there is no shield up — the
+ * weighted body roll decides where it lands, exactly as before. Nothing changes
+ * for a player carrying no shield, which is most of the early game.
+ *
+ * ⚠ WHO GETS AROUND IT, in the catalog's own trait words rather than invented
+ * ones: `agile` (18 enemies) and `quick` (53) are the dodgers — the same two
+ * traits at the same numbers `traitDodgeChance` already uses for a foe slipping
+ * the PLAYER's blade, because the same nimbleness answers both questions.
+ * `ambush_strike` (40) is the stealth half: it comes at you from where the
+ * shield is not. A lumbering foe never goes around a raised shield, and that is
+ * the whole trade — a shield is worth most against exactly the enemies that a
+ * dodge stat does nothing about.
+ */
+const SHIELD_BYPASS: ReadonlyArray<readonly [string, number]> = [
+  ['agile', 0.18],
+  ['ambush_strike', 0.15],
+  ['quick', 0.12],
+];
+
+export function shieldBypassChance(traits: readonly string[] | undefined): number {
+  if (!traits) return 0;
+  // The BEST of them, never the sum — two ways of being slippery is still one
+  // attacker going around one shield.
+  let chance = 0;
+  for (const t of traits) {
+    for (const [trait, n] of SHIELD_BYPASS) if (t === trait) chance = Math.max(chance, n);
+  }
+  return chance;
+}
+
+/** Where an incoming blow actually landed. */
+export type BlowLanding =
+  | { on: 'shield'; slot: null; wentAround: false }
+  /** Past the shield, or no shield up: the OTA-1513 body table answers. */
+  | { on: 'body'; slot: EquipSlot; wentAround: boolean };
+
+export function rollBlowLanding(
+  opts: { hasShield: boolean; traits?: readonly string[] },
+  roll01: () => number,
+): BlowLanding {
+  if (!opts.hasShield) {
+    return { on: 'body', slot: rollHitLocation(roll01), wentAround: false };
+  }
+  const bypass = shieldBypassChance(opts.traits);
+  // ⚠ The bypass roll is spent FIRST and only when there is something to bypass,
+  // so the body roll that follows is drawn fresh. Rolling the location first and
+  // re-rolling on a bypass would quietly bias the table.
+  if (bypass > 0 && roll01() < bypass) {
+    return { on: 'body', slot: rollHitLocation(roll01), wentAround: true };
+  }
+  return { on: 'shield', slot: null, wentAround: false };
+}
+
+/**
  * ⚠⚠ THE AILMENT A KIND LEAVES BEHIND — and it is the SAME status the player
  * already knows from the other side of the vial. `chilled` is the precedent
  * OTA-831 set and even wrote the drink-cure into its own type comment
