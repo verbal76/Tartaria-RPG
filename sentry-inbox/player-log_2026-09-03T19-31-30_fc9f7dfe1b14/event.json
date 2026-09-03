@@ -1,0 +1,278 @@
+{
+  "id": "fc9f7dfe1b1449908b88a271e85052ba",
+  "groupID": "7710315814",
+  "eventID": "fc9f7dfe1b1449908b88a271e85052ba",
+  "projectID": "4511945117532160",
+  "size": 18032,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-03-1648-a-fourth-ring #mtlp91n0yrsc [inline 4/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-03-1648-a-fourth-ring",
+  "message": "player-log 2026-09-03-1648-a-fourth-ring #mtlp91n0yrsc [inline 4/28]",
+  "title": "player-log 2026-09-03-1648-a-fourth-ring #mtlp91n0yrsc [inline 4/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "959bd1d2a5004d0cadb5ac1f8c1cf164",
+      "span_id": "84390dcf6476593f",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "8 vs DC 12 \u2014 Hard \u2192 (resolved below)\n[2026-09-03T00:06:21.031Z] [debug] stats: STR16 DEX23 INT12 WIS15 CHA10 STE7 | gear: WIS+4,INT+3,DEX+12,STR+5,STE+2 | worn: main=Auralite Talon off=Choir-Bound Launcher head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Fin",
+      "ger Guild Band\n[2026-09-03T00:06:21.031Z] [debug] train: stealth (stealth check) \u2192 progress 74/100\n[2026-09-03T00:06:21.031Z] [world] The daylight leaves you little cover. (stealth \u22121, day)\n[2026-09-03T00:06:21.032Z] [world] You drop low and move quiet, closing on Scrap Drone unseen across the open ground. (+5 next attack)\n",
+      "[2026-09-03T00:06:21.032Z] [debug] stealth: opener carried by the skill roll (18 vs DC 12 \u2014 Hard) \u2014 UNSEEN\n[2026-09-03T00:06:23.288Z] [debug] ui: tap \"\ud83d\udd25\u2623 choir-bound launcher\"\n[2026-09-03T00:06:23.339Z] [player] attack with the off-hand choir-bound launcher\n",
+      "[2026-09-03T00:06:23.340Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=mid enemies=1 hooks=0\n[2026-09-03T00:06:23.341Z] [combat] Scrap Drone blisters \u2014 clinging fire sears 6. (2/17 HP, 2 turns left)\n",
+      "[2026-09-03T00:06:23.345Z] [debug] attack: target=Scrap Drone range=mid reach.bands=[distant,far,mid,close] reach.label=Choir-Bound Launcher bareHand=false\n[2026-09-03T00:06:23.346Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-09-03T00:06:23.346Z] [debug] attack: status mods stealthed +5\n",
+      "[2026-09-03T00:06:23.412Z] [world] You bring the searing corrupted choir-bound launcher to bear on Scrap Drone.\n[2026-09-03T00:06:23.413Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T00:06:23.707Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 TAKE_COVER  (293ms)\n[2026-09-03T00:06:33.154Z] [world] Scrap Drone moves first. The pressure is immediate.\n",
+      "[2026-09-03T00:06:33.156Z] [combat] Scrap Drone \u2014 d20 \u2192 17 + ATK 4 = 21 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-09-03T00:06:33.157Z] [combat] You \u2014 d20 \u2192 6 + INT 12 \u2212 1 (Whisper Fog) stealthed +5 = 22 vs Scrap Drone AC 14 \u2014 \u2713 HIT\n[2026-09-03T00:06:33.158Z] [combat] The Corrupted coating fails to take on Scrap Drone.\n",
+      "[2026-09-03T00:06:33.158Z] [combat] Scrap Drone shrugs off the aetheric. (resisted, \u00d70.5 for 5)\n[2026-09-03T00:06:33.166Z] [combat] The killing blow with the searing corrupted choir-bound launcher: 5. Scrap Drone drops where it stood.\n[2026-09-03T00:06:33.167Z] [reward] Scrap Drone defeated. You recover Aetheric Cog \u00d72.\n[2026-09-03T00:06:33.168Z] [reward] +5 TC pried from the dust.\n",
+      "[2026-09-03T00:06:33.229Z] [arbiter] The Arbiter looks around. \"The calm has an edge you can stand on: dust wall on one side of your boot, stillness on the other.\"\n[2026-09-03T00:06:33.424Z] [combat] Scrap Drone deals 4 bludgeoning damage [plate \u22121] [edge of reach \u2014 halved]. You have 32 HP remaining.\n",
+      "[2026-09-03T00:06:33.667Z] [debug] persist sizes(KB): total=295 player=73 wm=139[rooms=71 events=5 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=82 scene=2\n[2026-09-03T00:06:37.393Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T00:06:38.732Z] [world] Tucked inside the quiet line: an oddment that matches no quartermaster's list. The kind of thing that fuses well.\n",
+      "[2026-09-03T00:06:38.732Z] [reward] \u2726 Salvage haul:\n[2026-09-03T00:06:38.733Z] [reward]     \u2022 Bone-Handled Rivet (Uncommon)\n[2026-09-03T00:06:39.893Z] [debug] ui: tap \"investigate\"\n[2026-09-03T00:06:41.507Z] [player] investigate ash drift\n[2026-09-03T00:06:41.508Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ash drift resolved=ash drift range=- enemies=0 hooks=0\n",
+      "[2026-09-03T00:06:41.508Z] [world] The ash drift sits the way ordinary things sit. The Arbiter does not lean in. You move on.\n[2026-09-03T00:06:41.509Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-03T00:06:41.509Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T00:06:41.692Z] [cognitive] THROW \u00b7 SEARCH  (182ms)\n",
+      "[2026-09-03T00:06:42.261Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n[2026-09-03T00:06:42.280Z] [world] You walk east. You arrive at Great Tartary Plains.\n[2026-09-03T00:06:42.281Z] [debug] scene: loc=great_tartary_plains hub=- arrival=y opening=n passing=y\n[2026-09-03T00:06:42.282Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-03T00:06:42.282Z] [debug] missions: hunt:hunt_bog_dragon stage 3/7 [boss\u2192attack] @mud_flood_nexus needs=Mira's Shrine-Map\u2713 gives=The Boy's Locket spawn=Mud Wraith\u00d71 AMBUSH\n[2026-09-03T00:06:42.282Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n",
+      "[2026-09-03T00:06:42.283Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n[2026-09-03T00:06:42.283Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n",
+      "[2026-09-03T00:06:42.283Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n[2026-09-03T00:06:42.283Z] [debug] missions: \u00b7 at=great_tartary_plains travelTo=mud_flood_nexus\n",
+      "[2026-09-03T00:06:42.313Z] [world] Time and the wasteland have worked this place over since you last passed through \u2014 there's something worth a second look again.\n[2026-09-03T00:06:42.338Z] [world] You've left The Storm's Eye and entered Great Tartary Plains. The horizon refuses to settle. Aether moves under the grass like breath under a sheet. It's afternoon. Nobody else is in sight. west leads t",
+      "o The Storm's Eye. Nothing named to the north or east or south.\n[2026-09-03T00:06:42.338Z] [world] You have stood on this exact patch of ground before.\n[2026-09-03T00:06:42.338Z] [world] Still open from before: tartarian trap, titarian trap hit look.\n[2026-09-03T00:06:42.338Z] [system] Weather effect \u2014 Black Rain: -1 CHA\n",
+      "[2026-09-03T00:06:42.341Z] [world] [Great Tartary Plains] north: Garrin (return the folio) (17 tiles, 1 day, 19 hours) \u00b7 east: Zharak's Teeth (4 tiles, 10 hours) \u00b7 south: Nimari (8 tiles, 20 hours) \u00b7 west: The Storm's Eye (1 tile, 3 hours)\n[2026-09-03T00:06:46.630Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n",
+      "[2026-09-03T00:06:46.655Z] [world] You walk south through open silt. The compass points south into open ground.\n[2026-09-03T00:06:46.656Z] [world] An Aetheric construct lies half-toppled in the mud, one arm still flexing weakly, its core dim but unbroken.\n[2026-09-03T00:06:48.180Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-09-03T00:06:49.343Z] [world] You salvage the glass. The take is small but real.\n[2026-09-03T00:06:49.344Z] [world] You break the standing water apart. Among the pieces, something worth keeping.\n[2026-09-03T00:06:49.344Z] [world] You scavenge the survey tripod thoroughly. One Smooth Stone survives the sorting.\n[2026-09-03T00:06:49.345Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-09-03T00:06:49.345Z] [reward]     \u2022 Smooth Stone x4 (Common)\n[2026-09-03T00:06:50.370Z] [world] The Iron Spear was half under something. It is not now.\n[2026-09-03T00:06:50.370Z] [reward] \u2726 Iron Spear (Common).\n[2026-09-03T00:06:51.580Z] [debug] ui: tap \"investigate\"\n[2026-09-03T00:06:53.182Z] [player] investigate the ground\n",
+      "[2026-09-03T00:06:53.183Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n[2026-09-03T00:06:53.187Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Aetheric Shard (Uncommon).\n[2026-09-03T00:06:53.196Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-09-03T00:06:53.196Z] [arbiter] The Arbiter looks around. \"The horizon refuses to settle. Aether moves under the grass like breath under a sheet.\"\n[2026-09-03T00:06:53.196Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T00:06:53.410Z] [cognitive] CLIMB  (212ms)\n[2026-09-03T00:06:54.331Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n",
+      "[2026-09-03T00:06:54.354Z] [debug] spawn: gear=[Lost Seeker's Gloves, Aetheric Helm of Command] window=10 roster=new\n[2026-09-03T00:06:54.355Z] [world] You walk east through open silt. The compass points east into open ground.\n[2026-09-03T00:06:54.356Z] [world] Your eye goes back to it before you decide to look.\n[2026-09-03T00:06:54.556Z] [player] investigate wave\n",
+      "[2026-09-03T00:06:54.556Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=wave resolved=wave range=- enemies=0 hooks=1\n[2026-09-03T00:06:54.558Z] [world] You study the wave and find no answer. The silence here is patient; whatever it knew, it has decided to keep.\n[2026-09-03T00:06:54.558Z] [debug] arbiter: ambient held (he just spoke)\n",
+      "[2026-09-03T00:06:54.764Z] [cognitive] neutral  (204ms)\n[2026-09-03T00:06:55.004Z] [debug] persist sizes(KB): total=307 player=73 wm=148[rooms=81 events=5 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=82 scene=3\n[2026-09-03T00:06:55.665Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T00:06:57.055Z] [world] You salvage the overturned wagon. The take is small but real.\n",
+      "[2026-09-03T00:06:57.055Z] [world] You lever something loose from the standing water \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n[2026-09-03T00:06:57.055Z] [world] You break the tracks apart. Among the pieces, something worth keeping.\n[2026-09-03T00:06:57.055Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-09-03T00:06:57.055Z] [reward]     \u2022 Worn Tartarian Coin x7 (Common)\n[2026-09-03T00:06:57.055Z] [reward]     \u2022 Mortar-Bound Cobble (Common)\n[2026-09-03T00:06:57.055Z] [reward]     \u2022 Stick x2 (Common)\n[2026-09-03T00:06:57.971Z] [world] You work the Aetheric Helm of Command loose from where the mud had it.\n[2026-09-03T00:06:57.972Z] [reward] \u2726 Aetheric Helm of Command (Common).\n",
+      "[2026-09-03T00:06:57.991Z] [world] The Lost Seeker's Gloves had settled into the ground. You unsettle it.\n[2026-09-03T00:06:57.991Z] [reward] \u2726 Lost Seeker's Gloves (Common).\n[2026-09-03T00:06:59.399Z] [debug] ui: tap \"investigate\"\n[2026-09-03T00:07:01.041Z] [player] investigate the ground\n",
+      "[2026-09-03T00:07:01.041Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n[2026-09-03T00:07:01.045Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Firewood (Common).\n[2026-09-03T00:07:01.054Z] [debug] arbiter: ambient held (he just spoke)\n[2026-09-03T00:07:01.055Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-09-03T00:07:01.255Z] [cognitive] CLIMB  (199ms)\n[2026-09-03T00:07:01.657Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n[2026-09-03T00:07:01.666Z] [debug] spawn: gear=[Titan's Guard Mask, Sentinel's Greaves, Wanderer's Face of Shadows] window=10 roster=new\n",
+      "[2026-09-03T00:07:01.666Z] [world] You walk south through open silt. The compass tells you Nimari lies further south \u2014 5 tiles, about 13 hours of travel.\n[2026-09-03T00:07:01.667Z] [world] You had a question here. You still have it.\n[2026-09-03T00:07:02.286Z] [player] investigate rift\n",
+      "[2026-09-03T00:07:02.286Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=rift resolved=rift range=- enemies=0 hooks=1\n[2026-09-03T00:07:02.288Z] [world] The rift resists your reading. Not hostile \u2014 just closed. Some things in the buried world don't open for the curious.\n[2026-09-03T00:07:02.486Z] [cognitive] neutral  (196ms)\n",
+      "[2026-09-03T00:07:02.671Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T00:07:04.561Z] [player] investigate weathered crashed automaton chassis\n[2026-09-03T00:07:04.561Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=weathered crashed automaton chassis resolved=weathered crashed automaton chassis range=- enemies=0 hooks=1\n",
+      "[2026-09-03T00:07:04.562Z] [debug] route: hook intercept (kind=wreck_construct, target=\"weathered crashed automaton chassis\") \u2014 original intent=investigate\n[2026-09-03T00:07:04.562Z] [world] \u2605 STORY THREAD (step 1) \u2014 You crouch over the construct. Its arm still moves, but the core flickers \u2014 a few more hours, then nothing. Salvage now or never.\n",
+      "[2026-09-03T00:07:05.942Z] [system] Reclaimers Guild standing +1 (now 97)\n[2026-09-03T00:07:05.943Z] [world] \u2605\u2605 STORY THREAD COMPLETE \u2014 You pry the core free and strip the workable plating. A Reclaimer would weep at this haul.\n[2026-09-03T00:07:05.943Z] [reward] \u2726 Drone Core, Scrap Metal, Scrap Metal.\n[2026-09-03T00:07:05.944Z] [reward] \u2726 For your persistence \u2014 Aether Shard (Rare).\n",
+      "[2026-09-03T00:07:05.956Z] [reward] \u2726 Recipe uncovered: Crown of the Deep (Legendary)! Open Crafting to forge it.\n[2026-09-03T00:07:08.486Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T00:07:09.759Z] [world] Whatever the Sentinel's Greaves was lying against, it lets go without much argument.\n[2026-09-03T00:07:09.761Z] [reward] \u2726 Sentinel's Greaves (Common).\n",
+      "[2026-09-03T00:07:09.783Z] [world] The Titan's Guard Mask is heavier than it looks. Most things down here are.\n[2026-09-03T00:07:09.783Z] [reward] \u2726 Titan's Guard Mask (Common).\n[2026-09-03T00:07:09.785Z] [world] The Wanderer's Face of Shadows is lighter than it looks, which is its own kind of warning.\n[2026-09-03T00:07:09.785Z] [reward] \u2726 Wanderer's Face of Shadows (Common).\n",
+      "[2026-09-03T00:07:10.334Z] [debug] persist sizes(KB): total=310 player=75 wm=149[rooms=81 events=5 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=82 scene=3\n[2026-09-03T00:07:10.993Z] [world] You salvage the pillar. The take is small but real.\n",
+      "[2026-09-03T00:07:10.993Z] [world] You lever something loose from the standing water \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n[2026-09-03T00:07:10.993Z] [reward] \u2726 Salvage haul:\n[2026-09-03T00:07:10.993Z] [reward]     \u2022 Worn Tartarian Coin x5 (Common)\n[2026-09-03T00:07:10.993Z] [reward]     \u2022 Fractured Geode Half (Common)\n",
+      "[2026-09-03T00:07:12.552Z] [debug] ui: tap \"investigate\"\n[2026-09-03T00:07:14.193Z] [player] investigate the ground\n[2026-09-03T00:07:14.193Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n[2026-09-03T00:07:14.196Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n",
+      "[2026-09-03T00:07:14.205Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-03T00:07:14.205Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T00:07:14.206Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T00:07:14.411Z] [cognitive] CLIMB  (204ms)\n[2026-09-03T00:07:17.437Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-09-03T00:07:17.439Z] [world] Nothing here to take or pry apart. The room is picked clean.\n[2026-09-03T00:07:17.954Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n[2026-09-03T00:07:17.972Z] [world] You walk east. You arrive at Zharak's Teeth.\n[2026-09-03T00:07:17.973Z] [debug] scene: loc=zharaks_teeth hub=- arrival=y opening=n passing=y\n[2026-09-03T00:07:17.974Z] [debug] missions: hunt:hun"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-03-1648-a-fourth-ring #mtlp91n0yrsc [inline 4/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtlp91n0yrsc"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-03-1648-a-fourth-ring"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "4"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-03-1648-a-fourth-ring"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "3"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-03T19:31:29.213000Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-03T19:31:30.626000Z",
+  "fingerprints": [
+    "b0876e12203239ebfc1b3d24e93a51cc"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1953701416,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-03T18:40:32.674127Z",
+    "dateReleased": "2026-09-03T18:41:34.528915Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "97b7577ba7f888fe0d0c511cfb8b461c3339a818",
+      "message": "[ota-hal] OTA-1648: a fourth ring, and the list that made it a 30-site edit\n\nOwner: \"we need to be able to wear up to four rings at a time.\"\n\nAdding `ring4` to PlayerEquipped was ONE line. The other thirty were the\nwork, and they are why this is an OTA rather than a one-liner: the literal\n`['ring', 'ring2', 'ring3']` had been written out BY HAND across 13 files\n\u2014 the stat sum, the AC sum, hpBreakdown, the fallen ledger, the revenant\nloot priority, two fuse-protection id lists, the vendor repair list, the\ndrop guard, the equip router, and four separate sites in InventoryScreen.\n\nEvery one of them had to agree. A single missed list is a ring that is\nworn but not counted, or counted but not droppable, or greyed out in the\nUI while the equip router is perfectly willing to fill it. So the list\nmoved to `RING_SLOTS` / `RING_ID_KEYS` / `MAX_RINGS` in equipment.ts and\nall 30 sites read it. A fifth ring is now one edit.\n\n  \u2022 The equip router walks RING_SLOTS and takes the first empty slot, so a\n    new ring goes on the next free finger; only when all four are full\n    does it displace the first. The if-chain it replaces would have needed\n    a new branch per ring.\n  \u2022 InventoryScreen's \"slot is full\" test reads RING_SLOTS rather than a\n    literal 3 \u2014 a hard-coded count there would grey out the fourth finger\n    the router would happily fill.\n  \u2022 The backfill spreads from the constants instead of naming each field,\n    so it can never fall a slot behind the type.\n  \u2022 ota1648 ratchets that no file writes the list by hand again, exempting\n    only the declaration itself \u2014 by NAME, not by file, so a stray\n    hand-written list elsewhere in equipment.ts is still caught.\n\n\u26a0 `ring` KEEPS ITS UNNUMBERED NAME. It is the legacy first slot and it is\nin every save on every device; renaming it to `ring1` for tidiness would\norphan the ring every existing player is currently wearing. The ugly name\nis the compatible one. No migration is needed either way: a save written\nbefore this simply has no ring4, which reads as an empty finger.\n\nMeasured after wiring, not assumed: four AC rings worn read\n`accessories: 4` and standing AC 14 against a bare 10, and one ring reads\n1 \u2014 so the fourth is counted, not merely wearable.\n\nTwo source pins repointed, both correct consequences rather than noise:\nota991 pinned the death-kit `slotPrio` literal (now spread from\nRING_SLOTS; its claim \u2014 weapons and armour lead, jewellery trails \u2014 is\nunchanged and still pinned), and ota1550 counted three `['ring',\nplayer.equipped?.ring\u2026` literals in the triples block. That count only\never pinned the old three; it now pins the GENERATOR and that it walks the\nfull list, which is the assertion that survives a fourth finger.\n\nGates: all 18 green by exit code. Full suite green \u2014 1111 suites /\n11435 tests, 0 failures.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-03T18:38:01Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-03-1648-a-fourth-ring",
+          "shortVersion": "tartaria@4.32.11+2026-09-03-1648-a-fourth-ring",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-03T18:41:34.528915Z",
+          "dateCreated": "2026-09-03T18:40:32.674127Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155279429",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-03T18:41:34.796005Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-03-1648-a-fourth-ring",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-03-1648-a-fourth-ring",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-03-1648-a-fourth-ring",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-03-1648-a-fourth-ring)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": "f7ae8c91988540f28d661c9093e72a20"
+}

@@ -1,0 +1,277 @@
+{
+  "id": "ab0d994f72184a0cab20b4f2fbe27289",
+  "groupID": "7710022647",
+  "eventID": "ab0d994f72184a0cab20b4f2fbe27289",
+  "projectID": "4511945117532160",
+  "size": 18091,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-03-1645-the-shield-ac-is-real #mtlp91n0yrsc [inline 5/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-03-1645-the-shield-ac-is-real",
+  "message": "player-log 2026-09-03-1645-the-shield-ac-is-real #mtlp91n0yrsc [inline 5/28]",
+  "title": "player-log 2026-09-03-1645-the-shield-ac-is-real #mtlp91n0yrsc [inline 5/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "2e63ba9f42c841e8bf02dcedab51c1ff",
+      "span_id": "bf2d52a5bb03b42b",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "t_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n[2026-09-03T00:07:17.974Z] [debug] missions: hunt:hunt_bog_dragon stage 3/7 [boss\u2192attack] @mud_flood_nexus needs=Mira's Shrine-Map\u2713 gives=The Boy's Locket spawn=Mud Wraith\u00d71 AMBUSH\n",
+      "[2026-09-03T00:07:17.974Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n[2026-09-03T00:07:17.975Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n",
+      "[2026-09-03T00:07:17.975Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n[2026-09-03T00:07:17.975Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n",
+      "[2026-09-03T00:07:17.975Z] [debug] missions: \u00b7 at=zharaks_teeth travelTo=mud_flood_nexus\n[2026-09-03T00:07:17.998Z] [debug] spawn: gear=[Sentinel's Repair Cap, Mud Grip] window=10 roster=new\n[2026-09-03T00:07:18.014Z] [world] A tinker sits amid a clatter of half-mended gear, squinting at a broken mechanism. They wave you over without looking up. This is Nix, a wandering tinker. (Try \"talk to Nix\" ",
+      "\u2014 a fair word carries.)\n[2026-09-03T00:07:18.017Z] [world] You've left Great Tartary Plains and entered Zharak's Teeth. Spires like a jawbone in shallow water. The water is shallow only at first. It's dusk. Nobody else is in sight. east leads to The Central Pillars; south leads to Red Tower of Nimari. Nothing named to the north or west.\n",
+      "[2026-09-03T00:07:18.018Z] [system] Weather effect \u2014 Aether Lightning: +1 INT\n[2026-09-03T00:07:18.020Z] [world] [Zharak's Teeth] north: Giant-Watch Shrine (6 tiles, 15 hours) \u00b7 east: The Central Pillars (1 tile, 3 hours) \u00b7 south: Nimari (6 tiles, 15 hours) \u00b7 west: Great Tartary Plains (4 tiles, 10 hours)\n[2026-09-03T00:07:18.020Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-09-03T00:07:18.020Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T00:07:19.386Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T00:07:22.151Z] [player] talk to Nix\n[2026-09-03T00:07:22.241Z] [world] Nix smiles without warmth. \"Everyone wants something. Question is what it's worth to you \u2014 and whether I like how you ask.\"\n",
+      "[2026-09-03T00:07:22.242Z] [world] You read them at a glance: greedy and craven. They'll only fold to a threat \u2014 kindness is wasted.\n[2026-09-03T00:07:22.242Z] [world] Persuade Nix for what they know, or intimidate them for what they carry?\n[2026-09-03T00:07:25.107Z] [world] The Mud Grip is cold through your glove.\n[2026-09-03T00:07:25.107Z] [reward] \u2726 Mud Grip (Common).\n",
+      "[2026-09-03T00:07:25.126Z] [world] The Sentinel's Repair Cap fits the hand better than it has any right to.\n[2026-09-03T00:07:25.126Z] [reward] \u2726 Sentinel's Repair Cap (Common).\n[2026-09-03T00:07:26.325Z] [world] You work the barnacle ridge over. A part of it comes loose, intact.\n[2026-09-03T00:07:26.325Z] [world] You salvage the coral shelf. The take is small but real.\n",
+      "[2026-09-03T00:07:26.326Z] [world] You strip the hull carefully. Something usable comes free in your hand.\n[2026-09-03T00:07:26.326Z] [world] You break the rock apart. Among the pieces, something worth keeping.\n[2026-09-03T00:07:26.326Z] [world] You break the salt-crusted royal display case apart. Among the pieces, something worth keeping.\n",
+      "[2026-09-03T00:07:26.326Z] [world] Tucked inside the seaweed mass: an oddment that matches no quartermaster's list. The kind of thing that fuses well.\n[2026-09-03T00:07:26.327Z] [world] You strip the siren shell carefully. Something usable comes free in your hand.\n[2026-09-03T00:07:26.327Z] [world] You strip the standing water carefully. Something usable comes free in your hand.\n",
+      "[2026-09-03T00:07:26.327Z] [reward] \u2726 Salvage haul:\n[2026-09-03T00:07:26.327Z] [reward]     \u2022 Smooth Stone x2 (Common)\n[2026-09-03T00:07:26.328Z] [reward]     \u2022 Worn Tartarian Coin x14 (Common)\n[2026-09-03T00:07:26.328Z] [reward]     \u2022 Scrap Metal x2 (Common)\n[2026-09-03T00:07:26.328Z] [reward]     \u2022 Aetheric Shard (Uncommon)\n[2026-09-03T00:07:26.328Z] [reward]     \u2022 Tar-Black Lashing (Common)\n",
+      "[2026-09-03T00:07:26.329Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-09-03T00:07:34.479Z] [combat] You \u2014 intimidate Nix \u2192 d20 14 + CHA 10 = 24 vs DC 11 \u2014 \u2713\n[2026-09-03T00:07:34.480Z] [world] You put steel in it and mean it. Nix weighs you, weighs the odds, and gives up what they're carrying rather than what's left of their luck.\n",
+      "[2026-09-03T00:07:34.480Z] [reward] You shake it loose from Nix: 24 TC, Scrap Metal.\n[2026-09-03T00:07:34.480Z] [system] Word spreads that you strong-armed one of theirs. (\u22126 standing with the Eternal Dynasty)\n[2026-09-03T00:07:34.480Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n",
+      "[2026-09-03T00:07:34.480Z] [system] \u25b2 Forgotten Order now counts you HONORED \u2014 their counters take 15% off.\n[2026-09-03T00:07:34.776Z] [debug] persist sizes(KB): total=308 player=75 wm=147[rooms=79 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=82 scene=3\n[2026-09-03T00:07:40.547Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=cached winH=986 beat=-\n",
+      "[2026-09-03T00:07:40.953Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-09-03T00:07:56.730Z] [player] so I hit investigate and right after that the pop-up for Nick's came up. so then I had to do my investigate and then when that closed then the next conversation came up. they kind of overlapped each other so let's see what we can do about that\n",
+      "[2026-09-03T00:07:56.730Z] [arbiter] The Arbiter studies you, plainly. \"I'm not sure what you're trying to tell me. I'll keep your note in the log either way. If you mean to act, phrase it as a verb \u2014 'investigate the rubble', 'go east', 'attack the figure'.\"\n[2026-09-03T00:07:56.731Z] [debug] meta-comment guard: skipped intent parse (ui-vocabulary: \"pop-up\") on 243-char input\n",
+      "[2026-09-03T00:08:00.671Z] [debug] ui: tap \"investigate\"\n[2026-09-03T00:08:02.232Z] [player] investigate the ground\n[2026-09-03T00:08:02.232Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=0\n[2026-09-03T00:08:02.236Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Aetheric Shard (Uncommon).\n",
+      "[2026-09-03T00:08:02.243Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T00:08:02.452Z] [cognitive] CLIMB  (207ms)\n[2026-09-03T00:08:02.955Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n[2026-09-03T00:08:02.969Z] [debug] spawn: gear=[Mud-Sealer Gauntlets, Sentinel's Overcoat, Mud-Treader's Greaves] window=10 roster=new\n",
+      "[2026-09-03T00:08:02.970Z] [world] You walk south through open silt. The compass tells you Red Tower of Nimari lies further south \u2014 6 tiles, about 15 hours of travel.\n[2026-09-03T00:08:02.972Z] [world] Someone in a long black coat is two ridges back, matching your pace. They have been there for a while.\n[2026-09-03T00:27:02.279Z] [debug] OTA session start: 2026-09-02-1634-the-aside-yields.\n",
+      "[2026-09-03T00:27:02.279Z] [world] You step back into Zharak's Teeth. The world waits for your move.\n[2026-09-03T00:27:02.279Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. \"Welcome back, Cheddar Bob. We've still got ground to cover, you and I.\"\n",
+      "[2026-09-03T00:27:02.582Z] [debug] \u2550\u2550\u2550 SESSION 2026-09-03T00:27:02.579Z \u00b7 build 2026-09-02-1634-the-aside-yields \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-09-03T00:27:02.583Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-03T00:27:02.584Z] [debug] missions: hunt:hunt_bog_dragon stage 3/7 [boss\u2192attack] @mud_flood_nexus needs=Mira's Shrine-Map\u2713 gives=The Boy's Locket spawn=Mud Wraith\u00d71 AMBUSH\n[2026-09-03T00:27:02.584Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n",
+      "[2026-09-03T00:27:02.584Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n[2026-09-03T00:27:02.584Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n",
+      "[2026-09-03T00:27:02.584Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n[2026-09-03T00:27:02.585Z] [debug] missions: \u00b7 at=zharaks_teeth travelTo=mud_flood_nexus\n",
+      "[2026-09-03T00:27:02.585Z] [debug] boot: life bmtkrau75kr started 2026-09-02T23:57:56.705Z \u00b7 FOLLOWED AN OTA APPLY 315ms ago via boot-front \u00b7 prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)\n[2026-09-03T00:27:04.307Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T00:27:05.469Z] [world] You turn the Mud-Sealer Gauntlets over once, then keep it.\n",
+      "[2026-09-03T00:27:05.470Z] [reward] \u2726 Mud-Sealer Gauntlets (Common).\n[2026-09-03T00:27:05.489Z] [world] The Mud-Treader's Greaves comes away clean.\n[2026-09-03T00:27:05.490Z] [reward] \u2726 Mud-Treader's Greaves (Common).\n[2026-09-03T00:27:05.491Z] [world] It takes two pulls. The Sentinel's Overcoat is yours on the second.\n[2026-09-03T00:27:05.491Z] [reward] \u2726 Sentinel's Overcoat (Common).\n",
+      "[2026-09-03T00:27:06.035Z] [debug] persist sizes(KB): total=304 player=79 wm=139[rooms=71 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=83 scene=3\n[2026-09-03T00:27:06.523Z] [world] You work the barnacle ridge over. A part of it comes loose, intact.\n[2026-09-03T00:27:06.524Z] [world] You break the fisher's net apart. Among the pieces, something worth keeping.\n",
+      "[2026-09-03T00:27:06.524Z] [world] You strip the rusted royal vault pedestal carefully. Something usable comes free in your hand.\n[2026-09-03T00:27:06.524Z] [world] You strip the shedding carefully. Something usable comes free in your hand.\n[2026-09-03T00:27:06.524Z] [world] You strip the standing water carefully. Something usable comes free in your hand.\n",
+      "[2026-09-03T00:27:06.525Z] [reward] \u2726 Salvage haul:\n[2026-09-03T00:27:06.525Z] [reward]     \u2022 Smooth Stone x3 (Common)\n[2026-09-03T00:27:06.525Z] [reward]     \u2022 Stick (Common)\n[2026-09-03T00:27:06.525Z] [reward]     \u2022 Worn Tartarian Coin x5 (Common)\n[2026-09-03T00:27:06.525Z] [reward]     \u2022 Spider Silk x2 (Common)\n[2026-09-03T00:27:07.892Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-09-03T00:27:09.696Z] [world] A silent bolt strikes near enough to singe your sleeve. (\u22123 HP)\n[2026-09-03T00:27:09.717Z] [player] investigate the ground\n[2026-09-03T00:27:09.718Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-09-03T00:27:09.724Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Aether Crystal (Common).\n[2026-09-03T00:27:09.731Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-03T00:27:09.731Z] [arbiter] The Arbiter looks around. \"Spires like a jawbone in shallow water. The water is shallow only at first.\"\n[2026-09-03T00:27:09.732Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-09-03T00:27:09.934Z] [cognitive] CLIMB  (201ms)\n[2026-09-03T00:27:11.075Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n[2026-09-03T00:27:11.106Z] [debug] spawn: gear=[Sparkstrike, Mud-Bound Cloak] window=10 roster=new\n[2026-09-03T00:27:11.108Z] [world] You walk east through open silt. The compass tells you Drakova lies further east \u2014 8 tiles, about 20 hours of travel.\n",
+      "[2026-09-03T00:27:11.109Z] [world] Some part of you has been keeping the place bookmarked.\n[2026-09-03T00:27:12.157Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T00:27:13.643Z] [world] You work the coral shelf over. A part of it comes loose, intact.\n[2026-09-03T00:27:13.643Z] [world] You salvage the salted line. The take is small but real.\n",
+      "[2026-09-03T00:27:13.644Z] [world] You work the sea fungus patch over. A part of it comes loose, intact.\n[2026-09-03T00:27:13.647Z] [world] You work the shell apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n[2026-09-03T00:27:13.647Z] [world] You break the standing water apart. Among the pieces, something worth keeping.\n",
+      "[2026-09-03T00:27:13.648Z] [world] You break the whale bone apart. Among the pieces, something worth keeping.\n[2026-09-03T00:27:13.648Z] [reward] \u2726 Salvage haul:\n[2026-09-03T00:27:13.648Z] [reward]     \u2022 Aether Dust x2 (Common)\n[2026-09-03T00:27:13.648Z] [reward]     \u2022 Cloth Scrap (Common)\n[2026-09-03T00:27:13.649Z] [reward]     \u2022 Spider Silk x2 (Common)\n",
+      "[2026-09-03T00:27:13.649Z] [reward]     \u2022 Copper-Threaded Veil (Uncommon)\n[2026-09-03T00:27:13.649Z] [reward]     \u2022 Smooth Stone (Common)\n[2026-09-03T00:27:13.649Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-09-03T00:27:14.744Z] [world] The Sparkstrike resists, then does not.\n[2026-09-03T00:27:14.744Z] [reward] \u2726 Sparkstrike (Common).\n",
+      "[2026-09-03T00:27:16.188Z] [player] investigate Mud-Bound Cloak\n[2026-09-03T00:27:16.189Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud bound cloak resolved=Mud-Bound Cloak range=- enemies=0 hooks=1\n[2026-09-03T00:27:16.189Z] [debug] route: hook intercept (kind=black_cloak, target=\"mud-bound cloak\") \u2014 original intent=investigate\n",
+      "[2026-09-03T00:27:16.189Z] [world] \u2605 STORY THREAD (step 1) \u2014 You double back through a fold in the ground. The Black Cloak passes you, scanning the path you should have been on, and does not see you.\n[2026-09-03T00:27:16.190Z] [arbiter] \"Mud Monarch enforcement,\" the Arbiter says quietly. \"Do not let them see what you carry.\"\n",
+      "[2026-09-03T00:27:18.564Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-09-03T00:27:18.565Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n",
+      "[2026-09-03T00:27:18.566Z] [world] \u2605\u2605 STORY THREAD COMPLETE \u2014 When the Cloak is past, you check what they dropped \u2014 a sealed dispatch slip, smudged with Aetheric ink. Worth something, to the right buyer.\n[2026-09-03T00:27:18.567Z] [reward] \u2726 Aether Residue.\n[2026-09-03T00:27:18.568Z] [reward] \u2726 For your persistence \u2014 Mud Essence (Uncommon).\n[2026-09-03T00:27:23.971Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-09-03T00:27:25.529Z] [player] investigate the ground\n[2026-09-03T00:27:25.529Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n[2026-09-03T00:27:25.533Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-09-03T00:27:25.541Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-09-03T00:27:25.541Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T00:27:25.541Z] [debug] arbiter: ambient held (he just spoke)\n[2026-09-03T00:27:25.542Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T00:27:25.747Z] [cognitive] CLIMB  (204ms)\n[2"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-03-1645-the-shield-ac-is-real #mtlp91n0yrsc [inline 5/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtlp91n0yrsc"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-03-1645-the-shield-ac-is-real"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "5"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-03-1645-the-shield-ac-is-real"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-03T16:54:06.113266Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-03T16:54:07.458000Z",
+  "fingerprints": [
+    "312d26476c290054de5ec330ce75d58d"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1953462747,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-03T16:49:05.542485Z",
+    "dateReleased": "2026-09-03T16:50:38.876816Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "5d97e9c2978f74410965c829930b77ed9fbfb461",
+      "message": "[ota-hal] OTA-1645 (slice 4b): the shield's AC is real\n\nSeven shields print \"+N AC\" on the card. Not one point of it has ever\nreached the number an enemy rolls against.\n\nMeasured before a line was written. A probe equipping the Titan Shield\n\u2014 \"+4 AC\", 8 defense, the priciest shield in the game \u2014 read\n`standingAc = 10`, identical to an empty off-hand, while a chest piece in\nthe control read 13. The cause is structural rather than arithmetic:\n`equippedGearAc` walks ARMOR_SLOTS (head / chest / hands / legs / feet /\ncloak) and a shield is a WEAPON that equips to a hand, so no AC reader in\nthe game has ever had one in view.\n\nWhat the shields DID have is a `defense` number feeding the BLOCK roll and\na `statBonuses` HP grant, both live and both working. That is why this\nsurvived so long: a shield was doing two of the three things on its card,\nso it read as underwhelming rather than broken.\n\nThe term goes in `equippedGearAc` and NOWHERE else, because\n`aggregateArmor` (the resolver's source) and `standingAc` (the sheet's)\nboth call it. That is the whole point of OTA-1133/1135 \u2014 one answer,\neverywhere \u2014 and adding a shield term at either call site would put the\npanel and the fight back out of step, which is the defect those two OTAs\nwere written to end. The DEFENCE card gains its own `shield +N` chip\nbeside armour and accessories, and the item card says \"AC +4 while held\".\n\n  \u2022 Five unconditional shields now pay what they print: Bone Round +2,\n    Giant Bone +3, Titan +4, Mud Royal +3, Mud Emperor's Buckler +3.\n  \u2022 The two TYPED ones are carried apart in `shieldAc.vs` and spent at the\n    resolver \u2014 the only line that knows the incoming damage type. Mud\n    Heater \"+2 AC vs fire\" answers burn; Aetheric Shield \"+2 AC vs energy\"\n    answers aetheric / electrical / burn, which is what its own\n    description (\"Deflects energy attacks\") means. Deliberately outside\n    `trimStandingAc`: the trim exists to stop a fully-fused STANDING build\n    becoming untouchable, and cover that applies to one damage type in a\n    fight you did not choose is not standing AC.\n  \u2022 \u26a0 The Aetheric Shield-Hammer's \"+2 AC FOR 1 ROUND after a hit\" is\n    REFUSED by the parser. A timed status is not a held passive, and\n    reading it here would hand a two-handed hammer a permanent +2 it never\n    promised. ota1645 pins that refusal by name; it waits for 4c.\n\nThree test repoints, all of them guards firing correctly rather than\nnoise, and each updated to follow the change rather than be loosened:\n\n  \u2022 ota1135 pins the SOURCE TEXT of `aggregateArmor` and `standingAc` to\n    prove neither re-derives AC. Both sums gained `+ gear.shield`, so the\n    pins name the new sums \u2014 the assertion is that every term is read off\n    the one helper, and a term computed locally would still break them.\n  \u2022 ota1135's empty-player shape now expects the third component at zero.\n  \u2022 ota1094's `catalogWeapons` fixture needed a `tags?: string[]` field\n    and one explicit param type. \u26a0 Those two typecheck errors were mine\n    from OTA-1644: I edited that suite in response to a jest failure AFTER\n    running the gates, and pushed without re-gating. The ratchet caught it\n    here (203 > baseline 201) rather than in CI. Re-gated clean.\n\nGates: all 18 green by exit code. Full suite green \u2014 1108 suites /\n11401 tests, 0 failures.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-03T16:46:46Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-03-1645-the-shield-ac-is-real",
+          "shortVersion": "tartaria@4.32.11+2026-09-03-1645-the-shield-ac-is-real",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-03T16:50:38.876816Z",
+          "dateCreated": "2026-09-03T16:49:05.542485Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155240916",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-03T16:50:39.373224Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-03-1645-the-shield-ac-is-real",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-03-1645-the-shield-ac-is-real",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-03-1645-the-shield-ac-is-real",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-03-1645-the-shield-ac-is-real)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "b7beb3f5127d4918813af06aa1dd61e4",
+  "previousEventID": "a0f4594d624c4e7280f54c3e87f122ab"
+}

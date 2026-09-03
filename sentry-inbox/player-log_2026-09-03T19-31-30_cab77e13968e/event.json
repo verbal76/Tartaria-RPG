@@ -1,0 +1,279 @@
+{
+  "id": "cab77e13968e4f37bb4ec94ea36fc019",
+  "groupID": "7710315814",
+  "eventID": "cab77e13968e4f37bb4ec94ea36fc019",
+  "projectID": "4511945117532160",
+  "size": 18045,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-03-1648-a-fourth-ring #mtlp91n0yrsc [inline 27/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-03-1648-a-fourth-ring",
+  "message": "player-log 2026-09-03-1648-a-fourth-ring #mtlp91n0yrsc [inline 27/28]",
+  "title": "player-log 2026-09-03-1648-a-fourth-ring #mtlp91n0yrsc [inline 27/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "959bd1d2a5004d0cadb5ac1f8c1cf164",
+      "span_id": "84390dcf6476593f",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "e to.\n[2026-09-03T14:40:04.706Z] [combat] Conspiracy Architects Raider 4 is out of it. Conspiracy Architects Raider 5 now in your sights.\n[2026-09-03T14:40:04.706Z] [combat] Corrupted Reclaimers Guild Shroud-Spun Slinger \u2014 2 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n[2026-09-03T14:40:04.706Z] [combat] Conspiracy Architects Raider 4 is left exposed \u2014 easier to hit.\n",
+      "[2026-09-03T14:40:04.708Z] [debug] ac-shift 25\u219222: race/base 10 + gear 18 + title 0 \u2192 trimmed 22 + status 0 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n[2026-09-03T14:40:04.708Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 12 + ATK 7 = 19 vs your AC 22 \u2014 \u2717 MISS\n",
+      "[2026-09-03T14:40:10.202Z] [debug] ui: tap \"\u2623 shroud-spun slinger \u2692\"\n[2026-09-03T14:40:10.265Z] [player] attack with the off-hand reclaimers guild shroud-spun slinger\n[2026-09-03T14:40:10.266Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand reclaimers guild shroud spun slinger resolved=Reclaimers Guild Shroud-Spun Slinger range=close enemies=3 hooks=1\n",
+      "[2026-09-03T14:40:10.266Z] [combat] Conspiracy Architects Raider 4 blackens \u2014 corruption eats 2. (0/15 HP, 2 turns left)\n[2026-09-03T14:40:10.267Z] [reward] Conspiracy Architects Raider 4 defeated. You recover Patched Cloth \u00d72.\n[2026-09-03T14:40:10.270Z] [reward] You strip the body: Cudgel, Mud-Bound Cloak (+6 TC). The kit took the fight badly.\n",
+      "[2026-09-03T14:40:10.270Z] [combat] 1 attacker remains. Conspiracy Architects Raider 5 now in your sights.\n[2026-09-03T14:40:10.270Z] [reward] +22 TC pried from the dust.\n[2026-09-03T14:40:10.324Z] [debug] attack: target=Conspiracy Architects Raider 5 range=close reach.bands=[distant,far,mid,close] reach.label=Reclaimers Guild Shroud-Spun Slinger bareHand=false\n",
+      "[2026-09-03T14:40:10.398Z] [world] You commit forward with the corrupted reclaimers guild shroud-spun slinger. Conspiracy Architects Raider 5 watches your hands.\n[2026-09-03T14:40:10.398Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T14:40:10.763Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 USE_ITEM  (363ms)\n",
+      "[2026-09-03T14:40:19.677Z] [world] You seize the initiative. Conspiracy Architects Raider 5 has no time to react.\n[2026-09-03T14:40:19.678Z] [combat] You \u2014 d20 \u2192 5 + DEX 21 + 2 (point blank) = 28 vs Conspiracy Architects Raider 5 AC 11 \u2014 \u2713 HIT\n",
+      "[2026-09-03T14:40:19.681Z] [combat] Conspiracy Architects Raider 5 takes 7 with the corrupted reclaimers guild shroud-spun slinger. It reels: 12 left. Then it fights back.\n[2026-09-03T14:40:19.681Z] [combat] Corrupted Reclaimers Guild Shroud-Spun Slinger \u2014 4 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n",
+      "[2026-09-03T14:40:19.683Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 1 + ATK 7 = 8 vs your AC 22 \u2014 \u2717 FUMBLE\n[2026-09-03T14:40:22.638Z] [debug] ui: tap \"dodge\"\n[2026-09-03T14:40:22.651Z] [player] dodge\n[2026-09-03T14:40:22.652Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=2 hooks=1\n",
+      "[2026-09-03T14:40:22.653Z] [world] You commit to the dodge. Slip Conspiracy Architects Raider 5's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-03T14:40:22.654Z] [combat] Conspiracy Architects Raider 5 blackens \u2014 corruption eats 4. (8/19 HP, 2 turns left)\n",
+      "[2026-09-03T14:40:22.746Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 5 + ATK 7 = 12 vs your AC 22 \u2014 \u2717 EVADED\n[2026-09-03T14:40:22.746Z] [combat] Dodge \u2014 d20 \u2192 10 + DEX 21 = 31 vs ATK 12. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n",
+      "[2026-09-03T14:40:22.746Z] [world] You slip Conspiracy Architects Raider 5's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n[2026-09-03T14:40:22.747Z] [debug] arbiter: template (reason=combat)\n[2026-09-03T14:40:22.747Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-09-03T14:40:22.747Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T14:40:23.100Z] [cognitive] neutral  (352ms)\n[2026-09-03T14:40:23.766Z] [debug] ui: tap \"\u2623 shroud-spun slinger \u2692\"\n[2026-09-03T14:40:23.767Z] [system] evasive \u2014 harder to hit fades.\n[2026-09-03T14:40:23.808Z] [player] attack with the off-hand reclaimers guild shroud-spun slinger\n",
+      "[2026-09-03T14:40:23.808Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand reclaimers guild shroud spun slinger resolved=Reclaimers Guild Shroud-Spun Slinger range=close enemies=2 hooks=1\n[2026-09-03T14:40:23.809Z] [combat] Conspiracy Architects Raider 5 blackens \u2014 corruption eats 4. (4/19 HP, 1 turn left)\n",
+      "[2026-09-03T14:40:23.809Z] [debug] attack: target=Conspiracy Architects Raider 5 range=close reach.bands=[distant,far,mid,close] reach.label=Reclaimers Guild Shroud-Spun Slinger bareHand=false\n[2026-09-03T14:40:23.811Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-09-03T14:40:23.883Z] [world] Your corrupted reclaimers guild shroud-spun slinger comes around in an arc; Conspiracy Architects Raider 5 squares up to meet it.\n[2026-09-03T14:40:23.884Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T14:40:24.219Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 USE_ITEM  (335ms)\n",
+      "[2026-09-03T14:40:32.627Z] [world] You seize the initiative. Conspiracy Architects Raider 5 has no time to react.\n[2026-09-03T14:40:32.628Z] [combat] You \u2014 d20 \u2192 16 + DEX 21 + 2 (point blank) perfect opening (2\u00d7 dice) = 39 vs Conspiracy Architects Raider 5 AC 11 \u2014 \u2713 HIT\n",
+      "[2026-09-03T14:40:32.628Z] [combat] The killing blow with the corrupted reclaimers guild shroud-spun slinger: 14. Conspiracy Architects Raider 5 drops where it stood.\n[2026-09-03T14:40:32.629Z] [reward] Conspiracy Architects Raider 5 defeated. You recover Aether Residue \u00d72, Scrap Metal, Aetheric Padded Vest, Architect Sigil.\n",
+      "[2026-09-03T14:40:32.630Z] [reward] You strip the body: Cudgel, Reclaimer's Salvage Vest (+6 TC). The kit took the fight badly.\n[2026-09-03T14:40:32.631Z] [combat] Nobody left standing \u2014 the fight is yours. You strip the sleepers where they lie.\n",
+      "[2026-09-03T14:40:32.632Z] [reward] You strip the unconscious Conspiracy Architects Raider 1 \u2014 Cudgel, Mud-Warden's Vest, Patched Cloth, Worn Tartarian Coin, +30 TC. The gear's seen better days (worn from the fight).\n[2026-09-03T14:40:32.641Z] [reward] +16 TC pried from the dust.\n",
+      "[2026-09-03T14:40:32.687Z] [arbiter] The Arbiter looks around. \"This is the room where the disaster was managed, or could have been.\"\n[2026-09-03T14:40:32.687Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T14:41:26.284Z] [debug] persist sizes(KB): total=323 player=80 wm=154[rooms=84 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=85 scene=4\n",
+      "[2026-09-03T14:41:30.756Z] [debug] send-log: #mtlmv3v5hg6u \u2014 DELIVERED (inline, no attachments): beacon out, 28/28 parts accepted (407435 chars) \u2014 flush said yes\n[2026-09-03T14:41:30.757Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mtlmv3v5hg6u kept on disk, boots retry up to 5 sends total\n",
+      "[2026-09-03T15:48:11.026Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a065c0-bf22-74d7-b448-49e4c56cee88\n[2026-09-03T15:48:11.026Z] [debug] ota: Checking\u2026\n[2026-09-03T15:48:11.988Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-09-03T15:48:12.064Z] [debug] ota: Saving progress\u2026\n[2026-09-03T15:48:12.065Z] [debug] ota: Restarting to apply\u2026\n",
+      "[2026-09-03T15:48:12.241Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a067d5-fa6c-7846-8795-12be2fefd5f0\n[2026-09-03T15:48:12.241Z] [debug] ota: Checking\u2026\n[2026-09-03T15:48:12.344Z] [debug] ota: Already up to date\n[2026-09-03T15:48:12.344Z] [debug] ota: boot check result = noUpdate\n[2026-09-03T15:48:12.420Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-09-03T15:48:12.420Z] [debug] voice: bundled idle\n[2026-09-03T15:48:12.645Z] [debug] send-log: bundle #mtlmv3v5hg6u attempt 2/5 delivered to Sentry\n[2026-09-03T15:48:15.946Z] [debug] OTA applied: 2026-09-03-1642-every-drop-has-a-name-in-the-book \u2192 2026-09-03-1643-the-dice-riders-pay.\n[2026-09-03T15:48:15.946Z] [debug] OTA session start: 2026-09-03-1643-the-dice-riders-pay.\n",
+      "[2026-09-03T15:48:15.946Z] [world] You step back into Mud Flood Nexus. The world waits for your move.\n[2026-09-03T15:48:15.946Z] [arbiter] The Arbiter looks up as you return. \"Welcome back, Cheddar Bob. I wondered when you'd take up the thread again.\"\n",
+      "[2026-09-03T15:48:16.361Z] [debug] \u2550\u2550\u2550 SESSION 2026-09-03T15:48:16.357Z \u00b7 build 2026-09-03-1643-the-dice-riders-pay \u00b7 updated from 2026-09-03-1642-every-drop-has-a-name-in-the-book \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-09-03T15:48:16.362Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-03T15:48:16.363Z] [debug] missions: hunt:hunt_bog_dragon stage 4/7 [diplomacy] @monarch_waystation npc=\"Old Mira\" needs=The Boy's Locket\u2713 gives=Eshren's Name-Token\n[2026-09-03T15:48:16.363Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n",
+      "[2026-09-03T15:48:16.363Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n[2026-09-03T15:48:16.363Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n",
+      "[2026-09-03T15:48:16.363Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n[2026-09-03T15:48:16.363Z] [debug] missions: \u00b7 at=mud_flood_nexus travelTo=monarch_waystation\n",
+      "[2026-09-03T15:48:16.364Z] [debug] boot: life bmtlp8vmrvw started 2026-09-03T15:48:12.195Z \u00b7 FOLLOWED AN OTA APPLY 130ms ago via boot-front \u00b7 prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)\n\n=== END LOG \u00b7 399943 CHARS ===\n\nTartaria Realms\n\nDevice\n  Name: Pixel 10 Pro XL\n  Platform: android 37\n  Hermes: yes\n  Locale: en-US\n  Timezone: America/New_York\n",
+      "  Screen: window 443\u00d7986 / screen 443\u00d7986 @ 2.4375x density\n  Captured at: 2026-09-03T15:48:19.776Z\n\nInstall\n  App ID: com.hotatticgames.tartarprim\n  App version: 4.32.11\n  APK build version: 2.4.1\n  APK build: 293\n  AAB: (build 293)\n  OTA: (2026-09-03-1643-the-dice-riders-pay)\n  Boot stage: qwen:deferred\n\nML runtime health\n  Status: active (no crashes detected)\n  Crash count: 0\n",
+      "  Last init attempt: 2026-09-03T15:48:12.464Z\n  Last init success: 2026-09-03T15:48:13.071Z\n  Crashes-before-disable threshold: 2\n  Qwen completion guard: clean (no completion crashes)\n  Qwen kernel variant: rnllama_v8_2_fp16_dotprod\n",
+      "  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k\n  Voice (TTS) guard: clean (no voice crashes on this build)\nSave-load health\n  Status: clean (no load-crash flags)\nLast JS crash\n",
+      "  Status: none recorded\nThis launch\n  Life: bmtlp8vmrvw \u00b7 started 2026-09-03T15:48:12.195Z\n  Followed an OTA apply 130ms ago (boot-front)\n  The previous life released its model contexts before reloading (o0/r0/l0/p0/dn0)\nCrash ledger \u2014 10 recorded (newest last)\n  \u2022 2026-08-31T22:14:31.073Z (3934m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-31-1595-the-guide-and-the-ground-agree \u00b7 stage boot:qwen:deferred\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: boot:qwen:deferred \u00b7 5207ms into the action \u00b7 alive 0ms after it\n      launch: died 5302ms into the process \u00b7 not an OTA-apply boot\n",
+      "      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-08-31T22:46:39.841Z (3902m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-31-1596-the-mark-catches-up-at-the-door \u00b7 stage native:voice:start\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n",
+      "      last checkpoint: native:voice:start [q1] \u00b7 1865ms into the action \u00b7 alive 0ms after it\n      launch: died 1908ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-01T10:12:02.195Z (3216m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-01-1601-combat-separates \u00b7 stage boot:qwen:deferred\n",
+      "      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: boot:qwen:deferred \u00b7 717ms into the action \u00b7 alive 0ms after it\n      launch: died 752ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-01T10:56:48.050Z (3172m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-09-01-1602-the-beat-card \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet) \u2014 begun 5m before the last sign of life; treat the action label as stale, not as the killer\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done [q0] \u00b7 287576ms into the action \u00b7 alive 0ms after it\n",
+      "      launch: died 287623ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-01T16:57:39.191Z (2811m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-01-1608-one-card-one-arithmetic \u00b7 stage boot:qwen:deferred\n      Process died with no orderly exit while: (no action yet)\n",
+      "      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: boot:qwen:deferred \u00b7 866ms into the action \u00b7 alive 0ms after it\n      launch: died 910ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-02T02:45:58.234Z (2222m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-09-02-1621-the-ask-is-a-command \u00b7 stage boot:qwen:deferred\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: boot:qwen:deferred \u00b7 930ms into the action \u00b7 alive 0ms after it\n      launch: died 965ms into the process \u00b7 not an OTA-apply boot\n",
+      "      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-02T22:42:22.972Z (1026m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-02-1633-a-batch-is-one-action \u00b7 stage boot:qwen:deferred\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n",
+      "      last checkpoint: boot:qwen:deferred \u00b7 957ms into the action \u00b7 alive 0ms after it\n      launch: died 1031ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-03T00:49:33.538Z (899m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n "
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-03-1648-a-fourth-ring #mtlp91n0yrsc [inline 27/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtlp91n0yrsc"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-03-1648-a-fourth-ring"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "27"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-03-1648-a-fourth-ring"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "3"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-03T19:31:29.321951Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-03T19:31:30.631000Z",
+  "fingerprints": [
+    "b0876e12203239ebfc1b3d24e93a51cc"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1953701416,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-03T18:40:32.674127Z",
+    "dateReleased": "2026-09-03T18:41:34.528915Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "97b7577ba7f888fe0d0c511cfb8b461c3339a818",
+      "message": "[ota-hal] OTA-1648: a fourth ring, and the list that made it a 30-site edit\n\nOwner: \"we need to be able to wear up to four rings at a time.\"\n\nAdding `ring4` to PlayerEquipped was ONE line. The other thirty were the\nwork, and they are why this is an OTA rather than a one-liner: the literal\n`['ring', 'ring2', 'ring3']` had been written out BY HAND across 13 files\n\u2014 the stat sum, the AC sum, hpBreakdown, the fallen ledger, the revenant\nloot priority, two fuse-protection id lists, the vendor repair list, the\ndrop guard, the equip router, and four separate sites in InventoryScreen.\n\nEvery one of them had to agree. A single missed list is a ring that is\nworn but not counted, or counted but not droppable, or greyed out in the\nUI while the equip router is perfectly willing to fill it. So the list\nmoved to `RING_SLOTS` / `RING_ID_KEYS` / `MAX_RINGS` in equipment.ts and\nall 30 sites read it. A fifth ring is now one edit.\n\n  \u2022 The equip router walks RING_SLOTS and takes the first empty slot, so a\n    new ring goes on the next free finger; only when all four are full\n    does it displace the first. The if-chain it replaces would have needed\n    a new branch per ring.\n  \u2022 InventoryScreen's \"slot is full\" test reads RING_SLOTS rather than a\n    literal 3 \u2014 a hard-coded count there would grey out the fourth finger\n    the router would happily fill.\n  \u2022 The backfill spreads from the constants instead of naming each field,\n    so it can never fall a slot behind the type.\n  \u2022 ota1648 ratchets that no file writes the list by hand again, exempting\n    only the declaration itself \u2014 by NAME, not by file, so a stray\n    hand-written list elsewhere in equipment.ts is still caught.\n\n\u26a0 `ring` KEEPS ITS UNNUMBERED NAME. It is the legacy first slot and it is\nin every save on every device; renaming it to `ring1` for tidiness would\norphan the ring every existing player is currently wearing. The ugly name\nis the compatible one. No migration is needed either way: a save written\nbefore this simply has no ring4, which reads as an empty finger.\n\nMeasured after wiring, not assumed: four AC rings worn read\n`accessories: 4` and standing AC 14 against a bare 10, and one ring reads\n1 \u2014 so the fourth is counted, not merely wearable.\n\nTwo source pins repointed, both correct consequences rather than noise:\nota991 pinned the death-kit `slotPrio` literal (now spread from\nRING_SLOTS; its claim \u2014 weapons and armour lead, jewellery trails \u2014 is\nunchanged and still pinned), and ota1550 counted three `['ring',\nplayer.equipped?.ring\u2026` literals in the triples block. That count only\never pinned the old three; it now pins the GENERATOR and that it walks the\nfull list, which is the assertion that survives a fourth finger.\n\nGates: all 18 green by exit code. Full suite green \u2014 1111 suites /\n11435 tests, 0 failures.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-03T18:38:01Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-03-1648-a-fourth-ring",
+          "shortVersion": "tartaria@4.32.11+2026-09-03-1648-a-fourth-ring",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-03T18:41:34.528915Z",
+          "dateCreated": "2026-09-03T18:40:32.674127Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155279429",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-03T18:41:34.796005Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-03-1648-a-fourth-ring",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-03-1648-a-fourth-ring",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-03-1648-a-fourth-ring",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-03-1648-a-fourth-ring)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "cb0ef405c8014b62ae7d65e008178785",
+  "previousEventID": "c8116b2060614f3a96eef750c53ab63d"
+}

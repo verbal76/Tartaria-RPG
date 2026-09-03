@@ -1,0 +1,344 @@
+{
+  "id": "86d62110276544e5a398a07a07fdcc2e",
+  "groupID": "7710315814",
+  "eventID": "86d62110276544e5a398a07a07fdcc2e",
+  "projectID": "4511945117532160",
+  "size": 17426,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-03-1648-a-fourth-ring #mtlp91n0yrsc [inline 12/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-03-1648-a-fourth-ring",
+  "message": "player-log 2026-09-03-1648-a-fourth-ring #mtlp91n0yrsc [inline 12/28]",
+  "title": "player-log 2026-09-03-1648-a-fourth-ring #mtlp91n0yrsc [inline 12/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "959bd1d2a5004d0cadb5ac1f8c1cf164",
+      "span_id": "84390dcf6476593f",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "other close the distance.\n[2026-09-03T00:37:01.983Z] [combat] You \u2014 d20 \u2192 12 + INT 13 perfect opening (2\u00d7 dice) = 25 vs Conspiracy Architects Raider 1 AC 13 \u2014 \u2713 HIT\n[2026-09-03T00:37:01.984Z] [combat] Conspiracy Architects Raider 1 shrugs off the aetheric. (resisted, \u00d70.5 for 11)\n",
+      "[2026-09-03T00:37:01.988Z] [combat] The blow with the acid-etched corrupted auralite talon finds purchase \u2014 11 damage, 14 HP standing. Conspiracy Architects Raider 1 commits to the counter.\n[2026-09-03T00:37:01.989Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 1 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n",
+      "[2026-09-03T00:37:01.989Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 1 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n[2026-09-03T00:37:06.528Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n[2026-09-03T00:37:06.564Z] [player] attack with the auralite talon\n",
+      "[2026-09-03T00:37:06.565Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=5 hooks=3\n[2026-09-03T00:37:06.566Z] [combat] Conspiracy Architects Raider 1 smokes \u2014 acid eats 1. (13/25 HP, 2 turns left)\n[2026-09-03T00:37:06.566Z] [combat] Conspiracy Architects Raider 1 blackens \u2014 corruption eats 1. (12/25 HP, 2 turns left)\n",
+      "[2026-09-03T00:37:06.567Z] [debug] attack: target=Conspiracy Architects Raider 1 range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n[2026-09-03T00:37:06.640Z] [world] You commit forward with the acid-etched corrupted auralite talon. Conspiracy Architects Raider 1 watches your hands.\n[2026-09-03T00:37:06.641Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-03T00:37:06.957Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (316ms)\n[2026-09-03T00:37:15.828Z] [world] You seize the initiative. Conspiracy Architects Raider 1 has no time to react.\n[2026-09-03T00:37:15.828Z] [combat] You \u2014 d20 \u2192 14 + INT 13 = 27 vs Conspiracy Architects Raider 1 AC 12 \u2014 \u2713 HIT\n",
+      "[2026-09-03T00:37:15.829Z] [combat] Conspiracy Architects Raider 1 shrugs off the aetheric. (resisted, \u00d70.5 for 10)\n[2026-09-03T00:37:15.832Z] [combat] The aetheric has worn Conspiracy Architects Raider 1's guard through \u2014 it bites full from here.\n",
+      "[2026-09-03T00:37:15.833Z] [combat] Clean hit with the acid-etched corrupted auralite talon for 10. Conspiracy Architects Raider 1 has 2 left and does not back away.\n[2026-09-03T00:37:15.833Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 4 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 2 total).\n",
+      "[2026-09-03T00:37:15.834Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 1 corruption bites in and festers (3 turns). The rot deepens (2 stacks).\n[2026-09-03T00:37:15.835Z] [combat] Conspiracy Architects Raider 2 \u2014 d20 \u2192 19 + ATK 8 = 27 vs your AC 22 \u2014 \u2713 HIT\n[2026-09-03T00:37:15.838Z] [combat] Conspiracy Architects Raider 3 \u2014 d20 \u2192 9 + ATK 8 = 17 vs your AC 22 \u2014 \u2717 MISS\n",
+      "[2026-09-03T00:37:15.839Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 3 + ATK 10 = 13 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T00:37:15.840Z] [combat] Conspiracy Architects Raider 5 and 1 other press in behind their own pack, waiting for an opening.\n[2026-09-03T00:37:16.211Z] [combat] Conspiracy Architects Raider 2 deals 2 slashing damage [edge of reach \u2014 halved]. You have 20 HP remaining.\n",
+      "[2026-09-03T00:37:16.212Z] [combat] Conspiracy Architects Raider 2's strike leaves you bleeding.\n[2026-09-03T00:37:18.299Z] [debug] ui: tap \"flee\"\n[2026-09-03T00:37:18.307Z] [player] flee\n[2026-09-03T00:37:18.308Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=close enemies=5 hooks=3\n[2026-09-03T00:37:18.392Z] [system] \u23f3 Time passed: 15 min\n",
+      "[2026-09-03T00:37:18.706Z] [cognitive] FEAR \u00b7 RETREAT \u00b7 HIDE  (312ms)\n[2026-09-03T00:37:19.126Z] [debug] persist sizes(KB): total=307 player=73 wm=143[rooms=75 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=82 scene=9\n[2026-09-03T00:37:20.890Z] [debug] skillcheck: escape d20=4 DEX 19 = 23 vs Pursuit 16 \u2014 Conspiracy Architects Raider 1 (d20 6 + SPD 10) \u2192 PASS\n",
+      "[2026-09-03T00:37:20.991Z] [debug] stats: STR16 DEX19 INT12 WIS15 CHA11 STE7 | gear: WIS+4,INT+3,STR+5,DEX+8,STE+2 | worn: main=Auralite Talon off=Choir-Bound Launcher head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n",
+      "[2026-09-03T00:37:20.992Z] [debug] train: dexterity (escape check) \u2192 progress 96/100\n[2026-09-03T00:37:20.992Z] [world] You take the gap while there is a gap to take.\n[2026-09-03T00:37:26.294Z] [debug] ui: tap \"craft\"\n[2026-09-03T00:37:28.549Z] [world] You repair the Aether-Walker's Boots. Back to full. (spent: Patched Cloth x4)\n",
+      "[2026-09-03T00:37:28.608Z] [world] You repair the Architect's Sight Enhancer. Back to full. (spent: Patched Cloth x4)\n[2026-09-03T00:37:28.628Z] [world] You repair the Acid-Etched Corrupted Auralite Talon. Back to full. (spent: Small Rock x2)\n[2026-09-03T00:37:28.650Z] [arbiter] The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\"\n",
+      "[2026-09-03T00:37:28.652Z] [world] You repair the Searing Corrupted Choir-Bound Launcher. Back to full. (spent: Small Rock x2)\n[2026-09-03T00:37:28.671Z] [world] You repair the Mud-glass Scales. Back to full. (spent: Patched Cloth x4)\n",
+      "[2026-09-03T00:37:28.693Z] [arbiter] The Arbiter stops with his hand over your pack. \"Before I touch the Reclaimer's Cloak \u2014 3 pieces of this is Crucible stock: 3\u00d7 Horn-Capped Dowel. Say the word and I'll set it aside instead.\"\n[2026-09-03T00:37:32.488Z] [arbiter] The Arbiter nods. \"Patched in: 3\u00d7 Horn-Capped Dowel \u2192 Patched Cloth.\"\n",
+      "[2026-09-03T00:37:32.500Z] [world] You repair the Reclaimer's Cloak. Back to full. (spent: Patched Cloth x4)\n[2026-09-03T00:37:32.561Z] [arbiter] The Arbiter nods. \"Patched in: 2\u00d7 Horn-Capped Dowel \u2192 Patched Cloth, 2\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n[2026-09-03T00:37:32.573Z] [world] You repair the Titan's Gauntlets. Back to full. (spent: Patched Cloth x4)\n",
+      "[2026-09-03T00:37:32.613Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n[2026-09-03T00:37:32.624Z] [world] You repair the Relic Hunter's Gauntlets. Back to full. (spent: Patched Cloth x4)\n[2026-09-03T00:37:39.440Z] [player] craft Trauma Kit\n",
+      "[2026-09-03T00:37:39.441Z] [debug] parser: intent=craft conf=1.00 verb=craft target=trauma kit resolved=Trauma Kit range=- enemies=0 hooks=3\n[2026-09-03T00:37:39.742Z] [arbiter] \"Crafting 9\u00d7 Trauma Kit would strip 9\u00d7 Cloth Scrap \u2192 Patched Cloth from your pack \u2014 confirm in the prompt to proceed, or it stays unmade.\"\n[2026-09-03T00:37:39.742Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-09-03T00:37:39.743Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T00:37:39.781Z] [cognitive] neutral  (37ms)\n[2026-09-03T00:37:40.914Z] [system] bleeding fades.\n[2026-09-03T00:37:40.936Z] [player] craft Trauma Kit\n[2026-09-03T00:37:40.936Z] [debug] parser: intent=craft conf=1.00 verb=craft target=trauma kit resolved=Trauma Kit range=- enemies=0 hooks=3\n",
+      "[2026-09-03T00:37:41.234Z] [arbiter] The Arbiter nods. \"Stripped for parts: 9\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n[2026-09-03T00:37:41.476Z] [reward] \u2726 Crafted Trauma Kit \u00d79. The Arbiter watches you set the last piece.\n[2026-09-03T00:37:41.574Z] [cognitive] neutral  (97ms)\n[2026-09-03T00:37:44.784Z] [player] craft Field Dressing\n",
+      "[2026-09-03T00:37:44.784Z] [debug] parser: intent=craft conf=1.00 verb=craft target=field dressing resolved=Field Dressing range=- enemies=0 hooks=3\n[2026-09-03T00:37:44.881Z] [arbiter] \"Crafting 2\u00d7 Field Dressing would strip 2\u00d7 Cloth Scrap \u2192 Patched Cloth from your pack \u2014 confirm in the prompt to proceed, or it stays unmade.\"\n[2026-09-03T00:37:44.917Z] [cognitive] neutral  (33ms)\n",
+      "[2026-09-03T00:37:45.017Z] [debug] persist sizes(KB): total=302 player=72 wm=144[rooms=75 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=82 scene=4\n[2026-09-03T00:37:46.000Z] [player] craft Field Dressing\n[2026-09-03T00:37:46.001Z] [debug] parser: intent=craft conf=1.00 verb=craft target=field dressing resolved=Field Dressing range=- enemies=0 hooks=3\n",
+      "[2026-09-03T00:37:46.099Z] [arbiter] The Arbiter nods. \"Stripped for parts: 2\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n[2026-09-03T00:37:46.140Z] [reward] \u2726 Crafted Field Dressing \u00d72. The Arbiter watches you set the last piece.\n[2026-09-03T00:37:46.237Z] [cognitive] neutral  (96ms)\n[2026-09-03T00:38:09.901Z] [world] A silent bolt strikes near enough to singe your sleeve. (\u22121 HP)\n",
+      "[2026-09-03T00:38:09.935Z] [player] craft Aether-Shard Ring\n[2026-09-03T00:38:09.936Z] [debug] parser: intent=craft conf=1.00 verb=craft target=aether shard ring resolved=Aether Shard range=- enemies=0 hooks=3\n[2026-09-03T00:38:09.938Z] [reward] \u2726 Crafted Aether-Shard Ring. The Arbiter watches you set the last piece.\n[2026-09-03T00:38:10.061Z] [cognitive] USE_ITEM  (121ms)\n",
+      "[2026-09-03T00:38:20.544Z] [player] craft Amulet of the Silt Warden\n[2026-09-03T00:38:20.545Z] [debug] parser: intent=craft conf=1.00 verb=craft target=amulet silt warden resolved=- range=- enemies=0 hooks=3\n[2026-09-03T00:38:20.551Z] [reward] \u2726 Crafted Amulet of the Silt Warden. The Arbiter watches you set the last piece.\n",
+      "[2026-09-03T00:38:20.551Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-03T00:38:20.551Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T00:38:20.661Z] [cognitive] USE_ITEM \u00b7 SEARCH  (109ms)\n[2026-09-03T00:38:42.408Z] [player] craft Corruption Tonic\n",
+      "[2026-09-03T00:38:42.409Z] [debug] parser: intent=craft conf=1.00 verb=craft target=corruption tonic resolved=Corruption Tonic range=- enemies=0 hooks=3\n[2026-09-03T00:38:42.549Z] [reward] \u2726 Crafted Corruption Tonic \u00d74. The Arbiter watches you set the last piece.\n[2026-09-03T00:38:42.653Z] [cognitive] neutral  (103ms)\n[2026-09-03T00:38:51.562Z] [player] craft Frost Paste\n",
+      "[2026-09-03T00:38:51.563Z] [debug] parser: intent=craft conf=1.00 verb=craft target=frost paste resolved=Frost Paste range=- enemies=0 hooks=3\n[2026-09-03T00:38:51.877Z] [reward] \u2726 Crafted Frost Paste \u00d79. The Arbiter watches you set the last piece.\n[2026-09-03T00:38:51.877Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-09-03T00:38:51.877Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T00:38:51.976Z] [cognitive] neutral  (98ms)\n[2026-09-03T00:38:55.094Z] [player] craft Incendiary Paste\n[2026-09-03T00:38:55.094Z] [debug] parser: intent=craft conf=1.00 verb=craft target=incendiary paste resolved=Incendiary Paste range=- enemies=0 hooks=3\n",
+      "[2026-09-03T00:38:55.097Z] [reward] \u2726 Crafted Incendiary Paste. The Arbiter watches you set the last piece.\n[2026-09-03T00:38:55.220Z] [cognitive] neutral  (122ms)\n[2026-09-03T00:39:01.229Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n[2026-09-03T00:39:01.248Z] [debug] spawn: gear=[Bonebreaker Mace] window=10 roster=new\n",
+      "[2026-09-03T00:39:01.249Z] [world] You walk east through open silt. The compass points east into open ground.\n[2026-09-03T00:39:01.251Z] [world] Your shadow falls across a glimmer in the ground. You stoop to lift it.\n[2026-09-03T00:39:01.251Z] [reward] \u2726 Aether Residue (Common).\n",
+      "[2026-09-03T00:39:01.252Z] [world] An Aetheric construct lies half-toppled in the mud, one arm still flexing weakly, its core dim but unbroken.\n[2026-09-03T00:39:02.931Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T00:39:04.217Z] [world] The Bonebreaker Mace is heavier than it looks. Most things down here are.\n[2026-09-03T00:39:04.218Z] [reward] \u2726 Bonebreaker Mace (Common).\n",
+      "[2026-09-03T00:39:05.294Z] [world] You strip the abandoned skiff carefully. Something usable comes free in your hand.\n[2026-09-03T00:39:05.294Z] [world] You break the anemone bloom apart. Among the pieces, something worth keeping.\n[2026-09-03T00:39:05.294Z] [world] You break the broken net apart. Among the pieces, something worth keeping.\n",
+      "[2026-09-03T00:39:05.295Z] [world] You salvage the hermit crab. The take is small but real.\n[2026-09-03T00:39:05.295Z] [world] You strip the seaweed mass down. Mostly debris \u2014 but a Smooth Stone comes loose at the bottom of the pile.\n[2026-09-03T00:39:05.297Z] [world] You work the standing water over. A part of it comes loose, intact.\n",
+      "[Filtered]",
+      "[2026-09-03T00:39:05.297Z] [reward]     \u2022 Smooth Stone (Common)\n[2026-09-03T00:39:05.297Z] [reward]     \u2022 Dried Tendon Coil (Common)\n[2026-09-03T00:39:06.646Z] [debug] ui: tap \"investigate\"\n[2026-09-03T00:39:08.437Z] [player] investigate the ground\n[2026-09-03T00:39:08.438Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=4\n",
+      "[2026-09-03T00:39:08.441Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Wild Onion (Common).\n[2026-09-03T00:39:08.442Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-03T00:39:08.442Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T00:39:08.442Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T00:39:08.642Z] [cognitive] CLIMB  (199ms)\n",
+      "[2026-09-03T00:39:08.882Z] [debug] persist sizes(KB): total=302 player=72 wm=145[rooms=76 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=82 scene=4\n[2026-09-03T00:39:09.865Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n[2026-09-03T00:39:09.882Z] [debug] spawn: gear=[Shaman's Warden Gloves, Aetheric Touch, Architect's Outer Mantle] window=10 roster=new\n",
+      "[2026-09-03T00:39:09.884Z] [world] You walk south through open silt. The compass points south into open ground.\n[2026-09-03T00:39:09.885Z] [world] Dust has settled on it and settled evenly. Nothing disturbed it.\n[2026-09-03T00:39:14.024Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T00:39:15.093Z] [world] The Aetheric Touch is lighter than it looks, which is its own kind of warning.\n",
+      "[2026-09-03T00:39:15.093Z] [reward] \u2726 Aetheric Touch (Common).\n[2026-09-03T00:39:15.112Z] [world] The Architect's Outer Mantle is cold through your glove.\n[2026-09-03T00:39:15.112Z] [reward] \u2726 Architect's Outer Mantle (Common).\n[2026-09-03T00:39:15.113Z] [world] The Shaman's Warden Gloves fits the hand better than it has any right to.\n",
+      "[Filtered]",
+      "[Filtered]"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-03-1648-a-fourth-ring #mtlp91n0yrsc [inline 12/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtlp91n0yrsc"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-03-1648-a-fourth-ring"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "12"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-03-1648-a-fourth-ring"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "3"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-03T19:31:29.261000Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "36": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 397,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        },
+        "42": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 325,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        },
+        "43": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 114,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-03T19:31:30.628000Z",
+  "fingerprints": [
+    "b0876e12203239ebfc1b3d24e93a51cc"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1953701416,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-03T18:40:32.674127Z",
+    "dateReleased": "2026-09-03T18:41:34.528915Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "97b7577ba7f888fe0d0c511cfb8b461c3339a818",
+      "message": "[ota-hal] OTA-1648: a fourth ring, and the list that made it a 30-site edit\n\nOwner: \"we need to be able to wear up to four rings at a time.\"\n\nAdding `ring4` to PlayerEquipped was ONE line. The other thirty were the\nwork, and they are why this is an OTA rather than a one-liner: the literal\n`['ring', 'ring2', 'ring3']` had been written out BY HAND across 13 files\n\u2014 the stat sum, the AC sum, hpBreakdown, the fallen ledger, the revenant\nloot priority, two fuse-protection id lists, the vendor repair list, the\ndrop guard, the equip router, and four separate sites in InventoryScreen.\n\nEvery one of them had to agree. A single missed list is a ring that is\nworn but not counted, or counted but not droppable, or greyed out in the\nUI while the equip router is perfectly willing to fill it. So the list\nmoved to `RING_SLOTS` / `RING_ID_KEYS` / `MAX_RINGS` in equipment.ts and\nall 30 sites read it. A fifth ring is now one edit.\n\n  \u2022 The equip router walks RING_SLOTS and takes the first empty slot, so a\n    new ring goes on the next free finger; only when all four are full\n    does it displace the first. The if-chain it replaces would have needed\n    a new branch per ring.\n  \u2022 InventoryScreen's \"slot is full\" test reads RING_SLOTS rather than a\n    literal 3 \u2014 a hard-coded count there would grey out the fourth finger\n    the router would happily fill.\n  \u2022 The backfill spreads from the constants instead of naming each field,\n    so it can never fall a slot behind the type.\n  \u2022 ota1648 ratchets that no file writes the list by hand again, exempting\n    only the declaration itself \u2014 by NAME, not by file, so a stray\n    hand-written list elsewhere in equipment.ts is still caught.\n\n\u26a0 `ring` KEEPS ITS UNNUMBERED NAME. It is the legacy first slot and it is\nin every save on every device; renaming it to `ring1` for tidiness would\norphan the ring every existing player is currently wearing. The ugly name\nis the compatible one. No migration is needed either way: a save written\nbefore this simply has no ring4, which reads as an empty finger.\n\nMeasured after wiring, not assumed: four AC rings worn read\n`accessories: 4` and standing AC 14 against a bare 10, and one ring reads\n1 \u2014 so the fourth is counted, not merely wearable.\n\nTwo source pins repointed, both correct consequences rather than noise:\nota991 pinned the death-kit `slotPrio` literal (now spread from\nRING_SLOTS; its claim \u2014 weapons and armour lead, jewellery trails \u2014 is\nunchanged and still pinned), and ota1550 counted three `['ring',\nplayer.equipped?.ring\u2026` literals in the triples block. That count only\never pinned the old three; it now pins the GENERATOR and that it walks the\nfull list, which is the assertion that survives a fourth finger.\n\nGates: all 18 green by exit code. Full suite green \u2014 1111 suites /\n11435 tests, 0 failures.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-03T18:38:01Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-03-1648-a-fourth-ring",
+          "shortVersion": "tartaria@4.32.11+2026-09-03-1648-a-fourth-ring",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-03T18:41:34.528915Z",
+          "dateCreated": "2026-09-03T18:40:32.674127Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155279429",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-03T18:41:34.796005Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-03-1648-a-fourth-ring",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-03-1648-a-fourth-ring",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-03-1648-a-fourth-ring",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-03-1648-a-fourth-ring)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "9f9a5d2891aa40558d185e8efc201044",
+  "previousEventID": "84e954863faa43bfbeaa76d784fcb03a"
+}

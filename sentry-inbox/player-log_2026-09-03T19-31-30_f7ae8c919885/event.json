@@ -1,0 +1,279 @@
+{
+  "id": "f7ae8c91988540f28d661c9093e72a20",
+  "groupID": "7710315814",
+  "eventID": "f7ae8c91988540f28d661c9093e72a20",
+  "projectID": "4511945117532160",
+  "size": 18004,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-03-1648-a-fourth-ring #mtlp91n0yrsc [inline 19/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-03-1648-a-fourth-ring",
+  "message": "player-log 2026-09-03-1648-a-fourth-ring #mtlp91n0yrsc [inline 19/28]",
+  "title": "player-log 2026-09-03-1648-a-fourth-ring #mtlp91n0yrsc [inline 19/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "959bd1d2a5004d0cadb5ac1f8c1cf164",
+      "span_id": "84390dcf6476593f",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "6Z] [reward]     \u2022 Aether Dust x5 (Common)\n[2026-09-03T02:08:37.946Z] [reward]     \u2022 Scrap Metal x3 (Common)\n[2026-09-03T02:08:37.946Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-09-03T02:08:37.947Z] [reward]     \u2022 Worn Tartarian Coin x4 (Common)\n[2026-09-03T02:08:39.114Z] [world] The Plasma Dagger comes up out of the silt with a small sucking protest.\n",
+      "[2026-09-03T02:08:39.114Z] [reward] \u2726 Plasma Dagger (Common).\n[2026-09-03T02:08:40.611Z] [debug] ui: tap \"investigate\"\n[2026-09-03T02:08:42.222Z] [player] investigate the ground\n[2026-09-03T02:08:42.222Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-09-03T02:08:42.228Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Aetheric Shard (Uncommon).\n[2026-09-03T02:08:42.236Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T02:08:42.452Z] [cognitive] CLIMB  (214ms)\n[2026-09-03T02:08:43.497Z] [player] investigate maintenance rail\n",
+      "[2026-09-03T02:08:43.498Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=maintenance rail resolved=maintenance rail range=- enemies=0 hooks=1\n[2026-09-03T02:08:43.500Z] [world] The maintenance rail keeps its silence, and it isn't going anywhere for you to press it. The Arbiter does not lean in. You move on.\n",
+      "[2026-09-03T02:08:43.501Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-03T02:08:43.501Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T02:08:43.504Z] [world] A Conspiracy Architects war party crests the rise \u2014 5 of them, blades already out. They've marked you for standing with the Forgotten Order.\n",
+      "[2026-09-03T02:08:43.504Z] [arbiter] \"The Conspiracy Architects do not forgive a friend of the Forgotten Order,\" the Arbiter murmurs. \"Stand, or run \u2014 but decide now.\"\n[2026-09-03T02:08:43.923Z] [cognitive] neutral  (420ms)\n[2026-09-03T02:09:42.524Z] [debug] ui: tap \"dodge\"\n[2026-09-03T02:09:42.539Z] [player] dodge\n",
+      "[2026-09-03T02:09:42.540Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=5 hooks=1\n[2026-09-03T02:09:42.542Z] [world] You commit to the dodge. Slip Conspiracy Architects Raider 1's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-03T02:09:42.639Z] [combat] Conspiracy Architects Raider 1 \u2014 d20 \u2192 18 + ATK 10 = 28 vs your AC 22 \u2014 \u2717 EVADED\n[2026-09-03T02:09:42.639Z] [combat] Dodge \u2014 d20 \u2192 8 + DEX 20 = 28 vs ATK 28. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n",
+      "[2026-09-03T02:09:42.641Z] [world] You slip Conspiracy Architects Raider 1's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n[2026-09-03T02:09:42.643Z] [debug] ac-shift 22\u219225: race/base 10 + gear 18 + title 0 \u2192 trimmed 22 + status 3 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany ",
+      "Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n[2026-09-03T02:09:42.644Z] [combat] Conspiracy Architects Raider 2 \u2014 d20 \u2192 19 + ATK 7 = 26 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-09-03T02:09:42.645Z] [combat] Conspiracy Architects Raider 5 and 2 others close the distance.\n[2026-09-03T02:09:42.645Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-09-03T02:09:42.645Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T02:09:42.645Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T02:09:43.032Z] [combat] Conspiracy Architects Raider 2 deals 4 bludgeoning damage [plate \u22121] [edge of reach \u2014 halved]. You have 38 HP remaining.\n[2026-09-03T02:09:43.364Z] [cognitive] neutral  (387ms)\n",
+      "[2026-09-03T02:09:44.029Z] [debug] ui: tap \"\u2697\u2623 auralite talon \u2726\"\n[2026-09-03T02:09:44.029Z] [system] evasive \u2014 harder to hit fades.\n[2026-09-03T02:09:44.048Z] [player] attack with the auralite talon\n[2026-09-03T02:09:44.048Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=5 hooks=1\n",
+      "[2026-09-03T02:09:44.050Z] [debug] attack: target=Conspiracy Architects Raider 1 range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n[2026-09-03T02:09:44.052Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-03T02:09:44.121Z] [world] You commit forward with the acid-etched corrupted auralite talon. Conspiracy Architects Raider 1 watches your hands.\n",
+      "[2026-09-03T02:09:44.122Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T02:09:44.451Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (329ms)\n[2026-09-03T02:09:53.569Z] [world] Conspiracy Architects Raider 1 moves first. The pressure is immediate.\n",
+      "[2026-09-03T02:09:53.572Z] [debug] ac-shift 25\u219222: race/base 10 + gear 18 + title 0 \u2192 trimmed 22 + status 0 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n[2026-09-03T02:09:53.573Z] [combat] Conspiracy Architects Raider 1 \u2014 d20 \u2192 2 + ATK 8 = 10 vs your AC 22 \u2014 \u2717 MISS\n",
+      "[2026-09-03T02:09:53.574Z] [combat] Conspiracy Architects Raider 2 \u2014 d20 \u2192 13 + ATK 7 = 20 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T02:09:53.576Z] [combat] Conspiracy Architects Raider 3 \u2014 d20 \u2192 8 + ATK 7 = 15 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T02:09:53.577Z] [combat] Conspiracy Architects Raider 5 and 1 other close the distance.\n",
+      "[2026-09-03T02:09:53.577Z] [combat] You \u2014 d20 \u2192 13 + INT 12 perfect opening (2\u00d7 dice) = 25 vs Conspiracy Architects Raider 1 AC 12 \u2014 \u2713 HIT\n[2026-09-03T02:09:53.577Z] [combat] Conspiracy Architects Raider 1 shrugs off the aetheric. (resisted, \u00d70.5 for 9)\n",
+      "[2026-09-03T02:09:53.581Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Reclaimers Guild Geode-Cored Cleaver \u2014 slashing will bite where aetheric won't.\"\n[2026-09-03T02:09:53.582Z] [combat] You crack the Conspiracy Architects Raider 1 with the Acid-Etched Corrupted Auralite Talon for 9 \u2014 half their fight, gone in one blow. They crumple, out cold. (7/16 HP) Loot them before they",
+      " come to.\n[2026-09-03T02:09:53.583Z] [combat] Conspiracy Architects Raider 1 is out of it. Conspiracy Architects Raider 2 now in your sights.\n[2026-09-03T02:09:53.583Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 1 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n",
+      "[2026-09-03T02:09:53.583Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 1 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n[2026-09-03T02:09:54.060Z] [debug] persist sizes(KB): total=336 player=82 wm=163[rooms=93 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=84 scene=7\n[2026-09-03T02:09:55.804Z] [debug] ui: tap \"\ud83d\udd25\u2623 choir-bound launcher \u2726\"\n",
+      "[2026-09-03T02:09:55.852Z] [player] attack with the off-hand choir-bound launcher\n[2026-09-03T02:09:55.853Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=mid enemies=5 hooks=1\n[2026-09-03T02:09:55.853Z] [combat] Conspiracy Architects Raider 1 smokes \u2014 acid eats 1. (6/16 HP, 2 turns left)\n",
+      "[2026-09-03T02:09:55.853Z] [combat] Conspiracy Architects Raider 1 blackens \u2014 corruption eats 1. (5/16 HP, 2 turns left)\n[2026-09-03T02:09:55.854Z] [debug] attack: target=Conspiracy Architects Raider 2 range=mid reach.bands=[distant,far,mid,close] reach.label=Choir-Bound Launcher bareHand=false\n",
+      "[2026-09-03T02:09:55.937Z] [world] You bring the searing corrupted choir-bound launcher to bear on Conspiracy Architects Raider 2.\n[2026-09-03T02:09:55.937Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T02:09:56.284Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 TAKE_COVER  (345ms)\n[2026-09-03T02:10:05.703Z] [world] Conspiracy Architects Raider 2 moves first. The pressure is immediate.\n",
+      "[2026-09-03T02:10:05.705Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 2 + ATK 7 = 9 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T02:10:05.706Z] [combat] Conspiracy Architects Raider 2 \u2014 d20 \u2192 10 + ATK 7 = 17 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T02:10:05.709Z] [combat] Conspiracy Architects Raider 3 \u2014 d20 \u2192 6 + ATK 7 = 13 vs your AC 22 \u2014 \u2717 MISS\n",
+      "[2026-09-03T02:10:05.710Z] [combat] Conspiracy Architects Raider 4 presses in behind the others, waiting for an opening.\n[2026-09-03T02:10:05.710Z] [combat] You \u2014 d20 \u2192 3 + INT 12 = 15 vs Conspiracy Architects Raider 2 AC 11 \u2014 \u2713 HIT\n[2026-09-03T02:10:05.710Z] [combat] Aetheric flares \u2014 +1 on hit.\n",
+      "[2026-09-03T02:10:05.711Z] [combat] Conspiracy Architects Raider 2 shrugs off the aetheric. (resisted, \u00d70.5 for 8)\n[2026-09-03T02:10:05.714Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Giant-Watch Greatspear \u2014 piercing will bite where aetheric won't.\"\n",
+      "[2026-09-03T02:10:05.715Z] [combat] Clean hit with the searing corrupted choir-bound launcher for 8. Conspiracy Architects Raider 2 has 9 left and does not back away.\n[2026-09-03T02:10:05.715Z] [combat] Searing Corrupted Choir-Bound Launcher \u2014 4 burn bites in and festers (3 turns).\n",
+      "[2026-09-03T02:10:05.715Z] [combat] Searing Corrupted Choir-Bound Launcher \u2014 1 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n[2026-09-03T02:10:05.716Z] [combat] Conspiracy Architects Raider 2 is left exposed \u2014 easier to hit.\n[2026-09-03T02:10:09.332Z] [debug] ui: tap \"inventory\"\n",
+      "[2026-09-03T02:11:05.114Z] [debug] stats: STR18 DEX20 INT11 WIS15 CHA11 STE8 | gear: WIS+4,INT+2,STR+6,DEX+8,STE+2 | worn: main=Magnetic Axe off=Choir-Bound Launcher head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n",
+      "[2026-09-03T02:11:15.067Z] [debug] ui: tap \"approach\"\n[2026-09-03T02:11:15.147Z] [player] approach Conspiracy Architects Raider 2\n[2026-09-03T02:11:15.147Z] [debug] parser: intent=advance conf=1.00 verb=approach target=conspiracy architects raider 2 resolved=Conspiracy Architects Raider 2 range=mid enemies=5 hooks=1\n",
+      "[2026-09-03T02:11:15.150Z] [debug] move: advance from range=mid enemies=5 weather=Black Rain cost=1 partial=0\n[2026-09-03T02:11:15.150Z] [debug] move: field advance target=Conspiracy Architects Raider 2 d 1.47->0.47 band mid->close\n[2026-09-03T02:11:15.150Z] [world] You close the gap with the Conspiracy Architects Raider 2 and 4 others. (range: close / arm's reach)\n",
+      "[2026-09-03T02:11:15.150Z] [world] The field shifts around you \u2014 Conspiracy Architects Raider 3 now close / arm's reach; Conspiracy Architects Raider 4 now close / arm's reach; Conspiracy Architects Raider 5 now close / arm's reach.\n[2026-09-03T02:11:15.151Z] [combat] Conspiracy Architects Raider 1 smokes \u2014 acid eats 1. (4/16 HP, 1 turn left)\n",
+      "[2026-09-03T02:11:15.151Z] [combat] Conspiracy Architects Raider 1 blackens \u2014 corruption eats 1. (3/16 HP, 1 turn left)\n[2026-09-03T02:11:15.151Z] [combat] Conspiracy Architects Raider 2 blisters \u2014 clinging fire sears 4. (5/17 HP, 2 turns left)\n[2026-09-03T02:11:15.151Z] [combat] Conspiracy Architects Raider 2 blackens \u2014 corruption eats 1. (4/17 HP, 2 turns left)\n",
+      "[2026-09-03T02:11:15.152Z] [combat] Conspiracy Architects Raider 2 \u2014 d20 \u2192 7 + ATK 7 = 14 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T02:11:15.153Z] [combat] Conspiracy Architects Raider 3 \u2014 d20 \u2192 6 + ATK 7 = 13 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T02:11:15.154Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 16 + ATK 9 = 25 vs your AC 22 \u2014 \u2713 HIT\n",
+      "[2026-09-03T02:11:15.155Z] [combat] Conspiracy Architects Raider 5 presses in behind the others, waiting for an opening.\n[2026-09-03T02:11:15.155Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-03T02:11:15.156Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-09-03T02:11:15.537Z] [combat] Conspiracy Architects Raider 4 deals 6 slashing damage [armor \u221225%]. You have 32 HP remaining.\n[2026-09-03T02:11:16.231Z] [cognitive] neutral  (1074ms)\n[2026-09-03T02:11:16.561Z] [debug] ui: tap \"dodge\"\n[2026-09-03T02:11:16.565Z] [player] dodge\n",
+      "[2026-09-03T02:11:16.565Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=5 hooks=1\n[2026-09-03T02:11:16.565Z] [world] You commit to the dodge. Slip Conspiracy Architects Raider 2's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-03T02:11:16.566Z] [combat] Conspiracy Architects Raider 1 smokes \u2014 acid eats 1. (2/16 HP, 0 turns left)\n[2026-09-03T02:11:16.566Z] [combat] Conspiracy Architects Raider 1 shakes off the last of the acid \u2014 the Auralite Talon has run its course.\n[2026-09-03T02:11:16.566Z] [combat] Conspiracy Architects Raider 1 blackens \u2014 corruption eats 1. (1/16 HP, 0 turns left)\n",
+      "[2026-09-03T02:11:16.566Z] [combat] Conspiracy Architects Raider 1 shakes off the last of the corruption \u2014 the Auralite Talon has run its course.\n[2026-09-03T02:11:16.566Z] [combat] Conspiracy Architects Raider 2 blisters \u2014 clinging fire sears 4. (0/17 HP, 1 turn left)\n[2026-09-03T02:11:16.566Z] [combat] Conspiracy Architects Raider 2 blackens \u2014 corruption eats 1. (0/17 HP, 1 turn left)\n",
+      "[2026-09-03T02:11:16.567Z] [reward] Conspiracy Architects Raider 2 defeated. You recover Patched Cloth \u00d72.\n[2026-09-03T02:11:16.568Z] [reward] You strip the body: Cudgel, Mud-Warden's Vest (+6 TC). The kit took the fight badly.\n[2026-09-03T02:11:16.568Z] [combat] 3 attackers remain. Conspiracy Architects Raider 3 now in your sights.\n[2026-09-03T02:11:16.568Z] [reward] +8 TC pried from the dust.\n",
+      "[2026-09-03T02:11:16.693Z] [combat] Conspiracy Architects Raider 3 \u2014 d20 \u2192 17 + ATK 7 = 24 vs your AC 22 \u2014 \u2713 HIT\n[2026-09-03T02:11:16.693Z] [combat] Dodge \u2014 d20 \u2192 2 + DEX 20 = 22 vs ATK 24. \u2717 You misread it \u2014 no opening, and the blow lands as it normally would (armor still counts).\n",
+      "[2026-09-03T02:11:16.693Z] [world] Your read is a beat off \u2014 you fail to make the opening, and the swing lands the way it always meant to.\n[2026-09-03T02:11:16.695Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 1 + ATK 7 = 8 vs your AC 22 \u2014 \u2717 FUMBLE\n[2026-09-03T02:11:16.696Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 12 + ATK 7 = 19 vs your AC 22 \u2014 \u2717 MISS\n",
+      "[2026-09-03T02:11:16.696Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T02:11:17.078Z] [combat] Conspiracy Architects Raider 3 deals 12 bludgeoning damage. You have 20 HP remaining.\n[2026-09-03T02:11:17.408Z] [cognitive] neutral  (382ms)\n[2026-09-03T02:11:17.770Z] [debug] ui: tap \"magnetic axe \u26a1\"\n[2026-09-03T02:11:17.789Z] [player] attack with the magnetic axe\n",
+      "[2026-09-03T02:11:17.789Z] [debug] parser: intent=attack conf=1.00 verb=attack target=magnetic axe resolved=Magnetic Axe range=close enemies=4 hooks=1\n[2026-09-03T02:11:17.790Z] [debug] attack: target=Conspiracy Architects Raider 3 range=close reach.bands=[close] reach.label=Magnetic Axe bareHand=false\n",
+      "[2026-09-03T02:11:17.865Z] [world] You bring the magnetic axe to bear on Conspiracy Architects Raider 3.\n[2026-09-03T02:11:17.865Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T02:11:18.212Z] [cognitive] AGGRE"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-03-1648-a-fourth-ring #mtlp91n0yrsc [inline 19/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtlp91n0yrsc"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-03-1648-a-fourth-ring"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "19"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-03-1648-a-fourth-ring"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "3"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-03T19:31:29.284240Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-03T19:31:30.629000Z",
+  "fingerprints": [
+    "b0876e12203239ebfc1b3d24e93a51cc"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1953701416,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-03T18:40:32.674127Z",
+    "dateReleased": "2026-09-03T18:41:34.528915Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "97b7577ba7f888fe0d0c511cfb8b461c3339a818",
+      "message": "[ota-hal] OTA-1648: a fourth ring, and the list that made it a 30-site edit\n\nOwner: \"we need to be able to wear up to four rings at a time.\"\n\nAdding `ring4` to PlayerEquipped was ONE line. The other thirty were the\nwork, and they are why this is an OTA rather than a one-liner: the literal\n`['ring', 'ring2', 'ring3']` had been written out BY HAND across 13 files\n\u2014 the stat sum, the AC sum, hpBreakdown, the fallen ledger, the revenant\nloot priority, two fuse-protection id lists, the vendor repair list, the\ndrop guard, the equip router, and four separate sites in InventoryScreen.\n\nEvery one of them had to agree. A single missed list is a ring that is\nworn but not counted, or counted but not droppable, or greyed out in the\nUI while the equip router is perfectly willing to fill it. So the list\nmoved to `RING_SLOTS` / `RING_ID_KEYS` / `MAX_RINGS` in equipment.ts and\nall 30 sites read it. A fifth ring is now one edit.\n\n  \u2022 The equip router walks RING_SLOTS and takes the first empty slot, so a\n    new ring goes on the next free finger; only when all four are full\n    does it displace the first. The if-chain it replaces would have needed\n    a new branch per ring.\n  \u2022 InventoryScreen's \"slot is full\" test reads RING_SLOTS rather than a\n    literal 3 \u2014 a hard-coded count there would grey out the fourth finger\n    the router would happily fill.\n  \u2022 The backfill spreads from the constants instead of naming each field,\n    so it can never fall a slot behind the type.\n  \u2022 ota1648 ratchets that no file writes the list by hand again, exempting\n    only the declaration itself \u2014 by NAME, not by file, so a stray\n    hand-written list elsewhere in equipment.ts is still caught.\n\n\u26a0 `ring` KEEPS ITS UNNUMBERED NAME. It is the legacy first slot and it is\nin every save on every device; renaming it to `ring1` for tidiness would\norphan the ring every existing player is currently wearing. The ugly name\nis the compatible one. No migration is needed either way: a save written\nbefore this simply has no ring4, which reads as an empty finger.\n\nMeasured after wiring, not assumed: four AC rings worn read\n`accessories: 4` and standing AC 14 against a bare 10, and one ring reads\n1 \u2014 so the fourth is counted, not merely wearable.\n\nTwo source pins repointed, both correct consequences rather than noise:\nota991 pinned the death-kit `slotPrio` literal (now spread from\nRING_SLOTS; its claim \u2014 weapons and armour lead, jewellery trails \u2014 is\nunchanged and still pinned), and ota1550 counted three `['ring',\nplayer.equipped?.ring\u2026` literals in the triples block. That count only\never pinned the old three; it now pins the GENERATOR and that it walks the\nfull list, which is the assertion that survives a fourth finger.\n\nGates: all 18 green by exit code. Full suite green \u2014 1111 suites /\n11435 tests, 0 failures.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-03T18:38:01Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-03-1648-a-fourth-ring",
+          "shortVersion": "tartaria@4.32.11+2026-09-03-1648-a-fourth-ring",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-03T18:41:34.528915Z",
+          "dateCreated": "2026-09-03T18:40:32.674127Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155279429",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-03T18:41:34.796005Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-03-1648-a-fourth-ring",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-03-1648-a-fourth-ring",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-03-1648-a-fourth-ring",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-03-1648-a-fourth-ring)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "fc9f7dfe1b1449908b88a271e85052ba",
+  "previousEventID": "edb0da0535e54eb680a4f1279ed67b9a"
+}

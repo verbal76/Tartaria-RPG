@@ -1,0 +1,279 @@
+{
+  "id": "8769a9be95a8420eb90279605eacc151",
+  "groupID": "7710022647",
+  "eventID": "8769a9be95a8420eb90279605eacc151",
+  "projectID": "4511945117532160",
+  "size": 18134,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-03-1645-the-shield-ac-is-real #mtlp91n0yrsc [inline 21/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-03-1645-the-shield-ac-is-real",
+  "message": "player-log 2026-09-03-1645-the-shield-ac-is-real #mtlp91n0yrsc [inline 21/28]",
+  "title": "player-log 2026-09-03-1645-the-shield-ac-is-real #mtlp91n0yrsc [inline 21/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "2e63ba9f42c841e8bf02dcedab51c1ff",
+      "span_id": "bf2d52a5bb03b42b",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "ks=1\n[2026-09-03T02:14:43.644Z] [reward] \u2726 Crafted Crude Golem Greatsword. The Arbiter watches you set the last piece.\n[2026-09-03T02:14:43.647Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-03T02:14:43.648Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-09-03T02:14:43.648Z] [arbiter] \"There's coin on the board for a willing blade,\" the Arbiter says. \"Read the World.\"\n[2026-09-03T02:14:44.122Z] [cognitive] neutral  (473ms)\n[2026-09-03T02:14:46.035Z] [player] craft Crude Golem Pike\n[2026-09-03T02:14:46.036Z] [debug] parser: intent=craft conf=1.00 verb=craft target=crude golem pike resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-09-03T02:14:46.037Z] [reward] \u2726 Crafted Crude Golem Pike. The Arbiter watches you set the last piece.\n[2026-09-03T02:14:46.038Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-03T02:14:46.038Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T02:14:46.514Z] [cognitive] neutral  (474ms)\n",
+      "[2026-09-03T02:14:46.594Z] [debug] persist sizes(KB): total=335 player=85 wm=163[rooms=93 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=84 scene=4\n[2026-09-03T02:14:48.218Z] [player] craft Crude Golem Sledge\n[2026-09-03T02:14:48.219Z] [debug] parser: intent=craft conf=1.00 verb=craft target=crude golem sledge resolved=sludge vent range=- enemies=0 hooks=1\n",
+      "[2026-09-03T02:14:48.220Z] [reward] \u2726 Crafted Crude Golem Sledge. The Arbiter watches you set the last piece.\n[2026-09-03T02:14:48.709Z] [cognitive] neutral  (488ms)\n[2026-09-03T02:14:53.396Z] [world] You repair the Aether-Walker's Boots. Back to full. (spent: Patched Cloth x4)\n[2026-09-03T02:14:53.449Z] [world] You repair the Architect's Sight Enhancer. Back to full. (spent: Patched Cloth x4)\n",
+      "[2026-09-03T02:14:53.473Z] [arbiter] The Arbiter nods. \"Patched in: Smooth Stone \u2192 Small Rock.\"\n[2026-09-03T02:14:53.475Z] [world] You repair the Searing Corrupted Choir-Bound Launcher. Back to full. (spent: Small Rock x2)\n[2026-09-03T02:14:53.495Z] [world] You repair the Magnetic Axe. Back to full. (spent: Scrap Metal x8, Stick x4)\n",
+      "[2026-09-03T02:14:53.535Z] [arbiter] The Arbiter nods. \"Patched in: 3\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n[2026-09-03T02:14:53.546Z] [world] You repair the Reclaimer's Cloak. Back to full. (spent: Patched Cloth x4)\n[2026-09-03T02:14:53.586Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n",
+      "[2026-09-03T02:14:53.598Z] [world] You repair the Titan's Gauntlets. Back to full. (spent: Patched Cloth x4)\n[2026-09-03T02:14:53.620Z] [arbiter] The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\"\n[2026-09-03T02:14:53.622Z] [world] You repair the Acid-Etched Corrupted Auralite Talon. Back to full. (spent: Small Rock x2)\n",
+      "[2026-09-03T02:14:53.641Z] [world] You repair the Bone Knife. Back to full. (spent: Scrap Metal x4, Stick x2)\n[2026-09-03T02:14:53.660Z] [world] You repair the Bone Knife. Back to full. (spent: Scrap Metal x4, Stick x2)\n[2026-09-03T02:14:53.679Z] [world] You repair the Poisoned Bone Knife. Back to full. (spent: Scrap Metal x4, Stick x2)\n",
+      "[2026-09-03T02:14:53.697Z] [world] You repair the Bone Knife. Back to full. (spent: Scrap Metal x4, Stick x2)\n[2026-09-03T02:14:53.719Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Smooth Stone \u2192 Small Rock.\"\n[2026-09-03T02:14:53.721Z] [world] You repair the Cudgel. Back to full. (spent: Small Rock x4, Stick x2)\n",
+      "[2026-09-03T02:14:53.742Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Smooth Stone \u2192 Small Rock.\"\n[2026-09-03T02:14:53.742Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Patched in: 4\u00d7 Smooth Stone \u2192 Small Rock.\u2026\"\n[2026-09-03T02:14:53.744Z] [world] You repair the Cudgel. Back to full. (spent: Small Rock x4, Stick x2)\n",
+      "[2026-09-03T02:14:53.783Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n[2026-09-03T02:14:53.783Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Patched in: 4\u00d7 Cloth Scrap \u2192 Patched Clot\u2026\"\n[2026-09-03T02:14:53.795Z] [world] You repair the Mud-Bound Cloak. Back to full. (spent: Patched Cloth x4)\n",
+      "[2026-09-03T02:14:53.835Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n[2026-09-03T02:14:53.835Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Patched in: 4\u00d7 Cloth Scrap \u2192 Patched Clot\u2026\"\n[2026-09-03T02:14:53.846Z] [world] You repair the Mud-Warden's Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n",
+      "[2026-09-03T02:14:53.877Z] [arbiter] The Arbiter stops with his hand over your pack. \"Before I touch the Mud-Warden's Vest \u2014 3 pieces of this is Crucible stock: 2\u00d7 Hollow Quill Sheaf, Rat Fur. Say the word and I'll set it aside instead.\"\n",
+      "[2026-09-03T02:14:56.392Z] [arbiter] The Arbiter nods. \"Patched in: 2\u00d7 Hollow Quill Sheaf \u2192 Patched Cloth, Obsidian-Edged Scale \u2192 Patched Cloth, Rat Fur \u2192 Patched Cloth.\"\n[2026-09-03T02:14:56.408Z] [world] You repair the Mud-Warden's Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n",
+      "[2026-09-03T02:14:56.449Z] [arbiter] The Arbiter stops with his hand over your pack. \"Before I touch the Mud-Warden's Vest \u2014 4 pieces of this is Crucible stock: 4\u00d7 Knotted Sinew Braid. Say the word and I'll set it aside instead.\"\n[2026-09-03T02:14:57.622Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Knotted Sinew Braid \u2192 Patched Cloth.\"\n",
+      "[2026-09-03T02:14:57.639Z] [world] You repair the Mud-Warden's Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n[2026-09-03T02:14:57.680Z] [arbiter] The Arbiter stops with his hand over your pack. \"Before I touch the Mud-Warden's Vest \u2014 3 pieces of this is Crucible stock: 2\u00d7 Tar-Black Lashing, Slug Slime. Say the word and I'll set it aside instead.\"\n",
+      "[2026-09-03T02:14:58.650Z] [arbiter] The Arbiter nods. \"Patched in: 2\u00d7 Tar-Black Lashing \u2192 Patched Cloth, Aether Wing \u2192 Patched Cloth, Slug Slime \u2192 Patched Cloth.\"\n[2026-09-03T02:14:58.668Z] [world] You repair the Mud-Warden's Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n",
+      "[2026-09-03T02:14:58.711Z] [arbiter] The Arbiter stops with his hand over your pack. \"Before I touch the Mud-Warden's Vest \u2014 3 pieces of this is Crucible stock: 3\u00d7 Web-Silk Wadding. Say the word and I'll set it aside instead.\"\n[2026-09-03T02:14:59.487Z] [arbiter] The Arbiter nods. \"Patched in: Slug Slime \u2192 Patched Cloth, 3\u00d7 Web-Silk Wadding \u2192 Patched Cloth.\"\n",
+      "[2026-09-03T02:14:59.505Z] [world] You repair the Mud-Warden's Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n[2026-09-03T02:15:06.008Z] [player] craft First Aid Kit\n[2026-09-03T02:15:06.009Z] [debug] parser: intent=craft conf=1.00 verb=craft target=first aid kit resolved=First Aid Kit range=- enemies=0 hooks=1\n",
+      "[2026-09-03T02:15:06.313Z] [arbiter] The Arbiter stops with his hand over your pack. \"Before I touch 9\u00d7 First Aid Kit \u2014 9 pieces of this is Crucible stock: 2\u00d7 Bone-Handled Rivet, Flint-and-Twine Bundle, 2\u00d7 Leech Mucus, Dried Tendon Coil, 2\u00d7 Beetle-Chitin Flake, Slate-Weighted Netting. Say the word and I'll set it aside instead.\"\n[2026-09-03T02:15:06.358Z] [cognitive] neutral  (43ms)\n",
+      "[2026-09-03T02:15:10.950Z] [arbiter] The Arbiter sets it aside on the bench. \"\u2665 Held for the Crucible: Bone-Handled Rivet \u00d72, Flint-and-Twine Bundle, Leech Mucus \u00d72, Dried Tendon Coil, Beetle-Chitin Flake \u00d72, Slate-Weighted Netting. I'll not touch it.\"\n",
+      "[2026-09-03T02:15:15.944Z] [debug] persist sizes(KB): total=335 player=83 wm=164[rooms=93 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=85 scene=4\n[2026-09-03T02:15:19.726Z] [debug] ui: tap \"inventory\"\n[2026-09-03T02:15:30.077Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-09-03T02:15:30.100Z] [debug] spawn: gear=[Shaman's Warden Gloves, Titan's Vest] window=10 roster=new\n",
+      "[2026-09-03T02:15:30.102Z] [world] You walk west through open silt. The compass points west into open ground.\n[2026-09-03T02:15:30.102Z] [world] It sits where it sat. Patient is the wrong word \u2014 it simply does not move.\n[2026-09-03T02:15:31.680Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T02:15:32.902Z] [world] The Titan's Vest was half under something. It is not now.\n",
+      "[2026-09-03T02:15:32.903Z] [reward] \u2726 Titan's Vest (Common).\n[2026-09-03T02:15:33.798Z] [world] You work the Shaman's Warden Gloves loose from where the mud had it.\n[2026-09-03T02:15:33.798Z] [reward] \u2726 Shaman's Warden Gloves (Common).\n[2026-09-03T02:15:34.774Z] [world] You salvage the cold spring. The take is small but real.\n",
+      "[2026-09-03T02:15:34.775Z] [world] You work the console over. A part of it comes loose, intact.\n[2026-09-03T02:15:34.775Z] [world] Tucked inside the flood conduit: an oddment that matches no quartermaster's list. The kind of thing that fuses well.\n[2026-09-03T02:15:34.775Z] [world] You strip the flood map carefully. Something usable comes free in your hand.\n",
+      "[2026-09-03T02:15:34.776Z] [reward] \u2726 Salvage haul:\n[2026-09-03T02:15:34.776Z] [reward]     \u2022 Aether Dust x4 (Common)\n[2026-09-03T02:15:34.776Z] [reward]     \u2022 Salvager's Tether Loop (Uncommon)\n[2026-09-03T02:15:34.777Z] [reward]     \u2022 Worn Tartarian Coin x5 (Common)\n[2026-09-03T02:15:36.180Z] [debug] ui: tap \"investigate\"\n[2026-09-03T02:15:37.828Z] [player] investigate the ground\n",
+      "[2026-09-03T02:15:37.828Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n[2026-09-03T02:15:37.834Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Stick (Common).\n[2026-09-03T02:15:37.842Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T02:15:38.057Z] [cognitive] CLIMB  (214ms)\n",
+      "[2026-09-03T02:15:38.557Z] [debug] persist sizes(KB): total=323 player=84 wm=151[rooms=81 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=84 scene=4\n[2026-09-03T02:15:39.913Z] [debug] ui: tap \"ENTER\"\n[2026-09-03T02:15:39.916Z] [world] You step inside the silent muster, into the great hall.\n",
+      "[2026-09-03T02:15:39.917Z] [world] A long hall under a sagging roof. Trestle tables run its length, a central fire pit sits cold, and banners hang gone to rags.\n[2026-09-03T02:15:41.681Z] [debug] ui: tap \"\u2190 Armory\"\n[2026-09-03T02:15:41.683Z] [world] You step into the armory.\n",
+      "[2026-09-03T02:15:41.683Z] [world] Weapon racks, mostly stripped bare. A whetstone, a barrel of broken hafts, and a weapons chest with a stubborn lock.\n[2026-09-03T02:15:42.966Z] [debug] ui: tap \"investigate\"\n[2026-09-03T02:15:44.639Z] [player] investigate the ground\n",
+      "[2026-09-03T02:15:44.639Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=0\n[2026-09-03T02:15:44.642Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Big Rock (Common).\n[2026-09-03T02:15:44.652Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T02:15:44.868Z] [cognitive] CLIMB  (215ms)\n",
+      "[2026-09-03T02:15:45.414Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T02:15:46.012Z] [player] investigate rack\n[2026-09-03T02:15:46.012Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=rack resolved=rack range=- enemies=0 hooks=0\n[2026-09-03T02:15:46.013Z] [world] Empty hooks and dust marks where things used to rest. The shelf remembers what was taken; you do not.\n",
+      "[2026-09-03T02:15:46.207Z] [cognitive] neutral  (193ms)\n[2026-09-03T02:15:46.630Z] [world] You work the barrel over. A part of it comes loose, intact.\n[2026-09-03T02:15:46.630Z] [world] You scavenge the chest thoroughly. One Bone Sliver survives the sorting.\n[2026-09-03T02:15:46.630Z] [world] You work the rack over. A part of it comes loose, intact.\n",
+      "[2026-09-03T02:15:46.630Z] [world] You strip the whetstone carefully. Something usable comes free in your hand.\n[2026-09-03T02:15:46.630Z] [reward] \u2726 Salvage haul:\n[2026-09-03T02:15:46.630Z] [reward]     \u2022 Aether Dust x2 (Common)\n[2026-09-03T02:15:46.630Z] [reward]     \u2022 Bone Sliver (Common)\n[2026-09-03T02:15:46.630Z] [reward]     \u2022 Cloth Scrap x2 (Common)\n",
+      "[2026-09-03T02:15:46.631Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-09-03T02:15:47.283Z] [player] investigate whetstone\n[2026-09-03T02:15:47.284Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=whetstone resolved=whetstone range=- enemies=0 hooks=0\n[2026-09-03T02:15:47.284Z] [world] You've already turned the whetstone over here. The salvage was the only thing of value.\n",
+      "[2026-09-03T02:15:47.652Z] [cognitive] SEARCH \u00b7 USE_ITEM \u00b7 THROW  (367ms)\n[2026-09-03T02:15:48.050Z] [debug] ui: tap \"\u2192 Hall \u2713\"\n[2026-09-03T02:15:48.051Z] [world] You step into the great hall.\n[2026-09-03T02:15:48.051Z] [world] A long hall under a sagging roof. Trestle tables run its length, a central fire pit sits cold, and banners hang gone to rags.\n",
+      "[2026-09-03T02:15:48.523Z] [player] investigate barrel\n[2026-09-03T02:15:48.524Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=barrel resolved=- range=- enemies=0 hooks=0\n[2026-09-03T02:15:48.524Z] [world] Something shifted while you were turned away \u2014 a Mud Wasp breaks cover, fast and low. (range: close)\n",
+      "[2026-09-03T02:15:48.525Z] [combat] Mud Wasp \u2014 Poison Sting ready, 1D6 damage on a hit.\n[2026-09-03T02:15:48.525Z] [debug] enemy: Mud Wasp hp=10 ac=8 atk=Poison Sting dmg=1D6 rarity=Common ap=3\n[2026-09-03T02:15:48.876Z] [cognitive] neutral  (349ms)\n[2026-09-03T02:15:49.194Z] [debug] ui: tap \"golem (33/68)\"\n[2026-09-03T02:15:49.195Z] [player] use golem\n",
+      "[2026-09-03T02:15:49.195Z] [combat] Ashwright attacks Mud Wasp \u2014 d20 18 + 3 = 21 vs AC 8 \u2014 \u2713 HIT\n[2026-09-03T02:15:49.195Z] [combat] Ashwright swings the Crude Golem Greatsword \u2014 13 slashing damage on Mud Wasp. (0 HP left)\n[2026-09-03T02:15:49.195Z] [world] Mud Wasp crumbles under Ashwright's assault.\n[2026-09-03T02:15:49.196Z] [reward] Mud Wasp defeated. You recover Aether Residue \u00d72.\n",
+      "[2026-09-03T02:15:49.197Z] [reward] +5 TC pried from the dust.\n[2026-09-03T02:15:55.084Z] [debug] ui: tap \"investigate\"\n[2026-09-03T02:15:57.066Z] [player] investigate the ground\n[2026-09-03T02:15:57.066Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-09-03T02:15:57.072Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Violet Cap Mushroom (Uncommon).\n[2026-09-03T02:15:57.080Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T02:15:57.296Z] [cognitive] CLIMB  (215ms)\n[2026-09-03T02:15:57.808Z] [debug] persist sizes(KB): total=321 player=84 wm=151[rooms=81 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=83 scene=2\n",
+      "[2026-09-03T02:15:57.985Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T02:15:58.450Z] [player] investigate table\n[2026-09-03T02:15:58.450Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=table resolved=table range=- enemies=0 hooks=0\n",
+      "[2026-09-03T02:15:58.451Z] [world] You run your hands over the worn surface. Faint indentations \u2014 the shape of past use \u2014 refuse to tell their story.\n[2026-09-03T02:15:58.652Z] [cognitive] neutral  (200ms)\n[2026-09-03T02:15:59.049Z] [world] You lever something loose from the banner \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n",
+      "[2026-09-03T02:15:59.049Z] [world]"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-03-1645-the-shield-ac-is-real #mtlp91n0yrsc [inline 21/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtlp91n0yrsc"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-03-1645-the-shield-ac-is-real"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "21"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-03-1645-the-shield-ac-is-real"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-03T16:54:06.181575Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-03T16:54:07.460000Z",
+  "fingerprints": [
+    "312d26476c290054de5ec330ce75d58d"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1953462747,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-03T16:49:05.542485Z",
+    "dateReleased": "2026-09-03T16:50:38.876816Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "5d97e9c2978f74410965c829930b77ed9fbfb461",
+      "message": "[ota-hal] OTA-1645 (slice 4b): the shield's AC is real\n\nSeven shields print \"+N AC\" on the card. Not one point of it has ever\nreached the number an enemy rolls against.\n\nMeasured before a line was written. A probe equipping the Titan Shield\n\u2014 \"+4 AC\", 8 defense, the priciest shield in the game \u2014 read\n`standingAc = 10`, identical to an empty off-hand, while a chest piece in\nthe control read 13. The cause is structural rather than arithmetic:\n`equippedGearAc` walks ARMOR_SLOTS (head / chest / hands / legs / feet /\ncloak) and a shield is a WEAPON that equips to a hand, so no AC reader in\nthe game has ever had one in view.\n\nWhat the shields DID have is a `defense` number feeding the BLOCK roll and\na `statBonuses` HP grant, both live and both working. That is why this\nsurvived so long: a shield was doing two of the three things on its card,\nso it read as underwhelming rather than broken.\n\nThe term goes in `equippedGearAc` and NOWHERE else, because\n`aggregateArmor` (the resolver's source) and `standingAc` (the sheet's)\nboth call it. That is the whole point of OTA-1133/1135 \u2014 one answer,\neverywhere \u2014 and adding a shield term at either call site would put the\npanel and the fight back out of step, which is the defect those two OTAs\nwere written to end. The DEFENCE card gains its own `shield +N` chip\nbeside armour and accessories, and the item card says \"AC +4 while held\".\n\n  \u2022 Five unconditional shields now pay what they print: Bone Round +2,\n    Giant Bone +3, Titan +4, Mud Royal +3, Mud Emperor's Buckler +3.\n  \u2022 The two TYPED ones are carried apart in `shieldAc.vs` and spent at the\n    resolver \u2014 the only line that knows the incoming damage type. Mud\n    Heater \"+2 AC vs fire\" answers burn; Aetheric Shield \"+2 AC vs energy\"\n    answers aetheric / electrical / burn, which is what its own\n    description (\"Deflects energy attacks\") means. Deliberately outside\n    `trimStandingAc`: the trim exists to stop a fully-fused STANDING build\n    becoming untouchable, and cover that applies to one damage type in a\n    fight you did not choose is not standing AC.\n  \u2022 \u26a0 The Aetheric Shield-Hammer's \"+2 AC FOR 1 ROUND after a hit\" is\n    REFUSED by the parser. A timed status is not a held passive, and\n    reading it here would hand a two-handed hammer a permanent +2 it never\n    promised. ota1645 pins that refusal by name; it waits for 4c.\n\nThree test repoints, all of them guards firing correctly rather than\nnoise, and each updated to follow the change rather than be loosened:\n\n  \u2022 ota1135 pins the SOURCE TEXT of `aggregateArmor` and `standingAc` to\n    prove neither re-derives AC. Both sums gained `+ gear.shield`, so the\n    pins name the new sums \u2014 the assertion is that every term is read off\n    the one helper, and a term computed locally would still break them.\n  \u2022 ota1135's empty-player shape now expects the third component at zero.\n  \u2022 ota1094's `catalogWeapons` fixture needed a `tags?: string[]` field\n    and one explicit param type. \u26a0 Those two typecheck errors were mine\n    from OTA-1644: I edited that suite in response to a jest failure AFTER\n    running the gates, and pushed without re-gating. The ratchet caught it\n    here (203 > baseline 201) rather than in CI. Re-gated clean.\n\nGates: all 18 green by exit code. Full suite green \u2014 1108 suites /\n11401 tests, 0 failures.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-03T16:46:46Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-03-1645-the-shield-ac-is-real",
+          "shortVersion": "tartaria@4.32.11+2026-09-03-1645-the-shield-ac-is-real",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-03T16:50:38.876816Z",
+          "dateCreated": "2026-09-03T16:49:05.542485Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155240916",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-03T16:50:39.373224Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-03-1645-the-shield-ac-is-real",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-03-1645-the-shield-ac-is-real",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-03-1645-the-shield-ac-is-real",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-03-1645-the-shield-ac-is-real)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "880ed12e16b34934963998be3b4aa3db",
+  "previousEventID": "83dae07c62f64fcb8b6eac084e007ab3"
+}

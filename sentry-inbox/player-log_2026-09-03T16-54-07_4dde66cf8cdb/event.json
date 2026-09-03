@@ -1,0 +1,278 @@
+{
+  "id": "4dde66cf8cdb419c952bba7efbdd537d",
+  "groupID": "7710022647",
+  "eventID": "4dde66cf8cdb419c952bba7efbdd537d",
+  "projectID": "4511945117532160",
+  "size": 18066,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-03-1645-the-shield-ac-is-real #mtlp91n0yrsc [inline 25/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-03-1645-the-shield-ac-is-real",
+  "message": "player-log 2026-09-03-1645-the-shield-ac-is-real #mtlp91n0yrsc [inline 25/28]",
+  "title": "player-log 2026-09-03-1645-the-shield-ac-is-real #mtlp91n0yrsc [inline 25/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "2e63ba9f42c841e8bf02dcedab51c1ff",
+      "span_id": "bf2d52a5bb03b42b",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "-09-03T14:36:48.822Z] [world] You salvage the mask. The take is small but real.\n[2026-09-03T14:36:48.822Z] [world] You work the panel over. A part of it comes loose, intact.\n[2026-09-03T14:36:48.822Z] [world] You work the resonance coil over. A part of it comes loose, intact.\n[2026-09-03T14:36:48.822Z] [world] You break the rusted ladder apart. Among the pieces, something worth keeping.\n",
+      "[2026-09-03T14:36:48.823Z] [reward] \u2726 Salvage haul:\n[2026-09-03T14:36:48.823Z] [reward]     \u2022 Worn Tartarian Coin x3 (Common)\n[2026-09-03T14:36:48.823Z] [reward]     \u2022 Smooth Stone x2 (Common)\n[2026-09-03T14:36:48.823Z] [reward]     \u2022 Aetheric Shard x2 (Uncommon)\n[2026-09-03T14:36:48.823Z] [reward]     \u2022 Bent Nail x3 (Common)\n[2026-09-03T14:36:48.824Z] [reward]     \u2022 Automaton Circuit (Common)\n",
+      "[2026-09-03T14:36:50.043Z] [world] The Golem-Guardian's Greaves is heavier than it looks. Most things down here are.\n[2026-09-03T14:36:50.043Z] [reward] \u2726 Golem-Guardian's Greaves (Common).\n[2026-09-03T14:36:51.703Z] [debug] ui: tap \"investigate\"\n[2026-09-03T14:36:52.536Z] [debug] freeze watch: recovered \u2014 painting again after 4132ms quiet.\n",
+      "[2026-09-03T14:36:53.501Z] [player] investigate the ground\n[2026-09-03T14:36:53.502Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n[2026-09-03T14:36:53.514Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Aetheric Pelt (Rare).\n[2026-09-03T14:36:53.526Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-09-03T14:36:53.532Z] [world] A Conspiracy Architects war party crests the rise \u2014 5 of them, blades already out. They've marked you for standing with the Forgotten Order.\n[2026-09-03T14:36:53.536Z] [arbiter] \"The Conspiracy Architects do not forgive a friend of the Forgotten Order,\" the Arbiter murmurs. \"Stand, or run \u2014 but decide now.\"\n[2026-09-03T14:36:53.950Z] [cognitive] CLIMB  (424ms)\n",
+      "[2026-09-03T14:36:54.739Z] [debug] ui: tap \"\u2623 shroud-spun slinger \u2692\"\n[2026-09-03T14:36:54.787Z] [player] attack with the off-hand reclaimers guild shroud-spun slinger\n[2026-09-03T14:36:54.787Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand reclaimers guild shroud spun slinger resolved=Reclaimers Guild Shroud-Spun Slinger range=close enemies=5 hooks=1\n",
+      "[2026-09-03T14:36:54.788Z] [debug] attack: target=Conspiracy Architects Raider 1 range=close reach.bands=[distant,far,mid,close] reach.label=Reclaimers Guild Shroud-Spun Slinger bareHand=false\n[2026-09-03T14:36:54.790Z] [debug] attack: status mods tired -1\n",
+      "[2026-09-03T14:36:54.867Z] [world] You raise the corrupted reclaimers guild shroud-spun slinger toward Conspiracy Architects Raider 1. The room narrows around the both of you.\n[2026-09-03T14:36:54.867Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T14:36:55.236Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 USE_ITEM  (367ms)\n",
+      "[2026-09-03T14:36:56.041Z] [debug] persist sizes(KB): total=323 player=78 wm=153[rooms=83 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=84 scene=7\n[2026-09-03T14:36:57.204Z] [system] Action cancelled.\n[2026-09-03T14:37:04.007Z] [debug] ui: tap \"inventory\"\n",
+      "[2026-09-03T14:37:55.416Z] [reward] You work the acid flask along the weapon. Now wielding the Acid-Etched Bonebreaker Mace \u2014 1d4 acid on every landing hit.\n[2026-09-03T14:38:01.539Z] [debug] kbbar: mounted bottom=355 raw=0 from=estimate winH=986 beat=-\n[2026-09-03T14:38:02.257Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n",
+      "[2026-09-03T14:38:25.617Z] [player] why can't I coat my equipped magnetic axe?\n[2026-09-03T14:38:25.618Z] [debug] parser: intent=unknown conf=0.00 verb=- target=- resolved=- range=close enemies=5 hooks=1\n[2026-09-03T14:38:25.618Z] [debug] parse-fallback: handing \"why can't I coat my equipped magnetic axe?\" to qwen\n[2026-09-03T14:38:25.618Z] [system] The Arbiter considers your words\u2026\n",
+      "[2026-09-03T14:38:28.216Z] [debug] ui: tap \"dodge\"\n[2026-09-03T14:38:28.229Z] [player] dodge\n[2026-09-03T14:38:28.230Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=5 hooks=1\n",
+      "[2026-09-03T14:38:28.231Z] [world] You commit to the dodge. Slip Conspiracy Architects Raider 1's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-03T14:38:28.346Z] [combat] Conspiracy Architects Raider 2 \u2014 d20 \u2192 13 + ATK 6 = 19 vs your AC 22 \u2014 \u2717 EVADED\n",
+      "[2026-09-03T14:38:28.346Z] [combat] Dodge \u2014 d20 \u2192 17 + DEX 21 = 38 vs ATK 19. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-03T14:38:28.346Z] [world] You slip Conspiracy Architects Raider 2's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n",
+      "[2026-09-03T14:38:28.349Z] [debug] ac-shift 22\u219225: race/base 10 + gear 18 + title 0 \u2192 trimmed 22 + status 3 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n",
+      "[2026-09-03T14:38:28.349Z] [combat] Conspiracy Architects Raider 1 \u2014 d20 \u2192 10 + ATK 8 = 18 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-03T14:38:28.349Z] [combat] Conspiracy Architects Raider 3 and 2 others close the distance.\n[2026-09-03T14:38:28.350Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-09-03T14:38:28.350Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T14:38:28.351Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T14:38:30.486Z] [debug] ui: tap \"\u2623 shroud-spun slinger \u2692\"\n[2026-09-03T14:38:30.488Z] [system] evasive \u2014 harder to hit fades.\n[2026-09-03T14:38:30.560Z] [player] attack with the off-hand reclaimers guild shroud-spun slinger\n",
+      "[2026-09-03T14:38:30.561Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand reclaimers guild shroud spun slinger resolved=Reclaimers Guild Shroud-Spun Slinger range=close enemies=5 hooks=1\n[2026-09-03T14:38:30.562Z] [debug] attack: target=Conspiracy Architects Raider 1 range=close reach.bands=[distant,far,mid,close] reach.label=Reclaimers Guild Shroud-Spun Slinger bareHand=false\n",
+      "[2026-09-03T14:38:30.565Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-03T14:38:30.674Z] [world] Your corrupted reclaimers guild shroud-spun slinger comes around in an arc; Conspiracy Architects Raider 1 squares up to meet it.\n[2026-09-03T14:38:30.675Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T14:38:31.178Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 USE_ITEM  (502ms)\n",
+      "[2026-09-03T14:38:35.892Z] [world] Conspiracy Architects Raider 1 moves first. The pressure is immediate.\n[2026-09-03T14:38:35.894Z] [debug] ac-shift 25\u219222: race/base 10 + gear 18 + title 0 \u2192 trimmed 22 + status 0 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n",
+      "[2026-09-03T14:38:35.895Z] [combat] Conspiracy Architects Raider 1 \u2014 d20 \u2192 13 + ATK 6 = 19 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T14:38:35.897Z] [combat] Conspiracy Architects Raider 2 \u2014 d20 \u2192 10 + ATK 6 = 16 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T14:38:35.899Z] [combat] Conspiracy Architects Raider 3 \u2014 d20 \u2192 9 + ATK 6 = 15 vs your AC 22 \u2014 \u2717 MISS\n",
+      "[2026-09-03T14:38:35.900Z] [combat] Conspiracy Architects Raider 5 and 1 other close the distance.\n[2026-09-03T14:38:35.900Z] [combat] You \u2014 d20 \u2192 1 + DEX 21 + 2 (point blank) perfect opening (2\u00d7 dice) = 24 vs Conspiracy Architects Raider 1 AC 11 \u2014 \u2717 FUMBLE\n",
+      "[2026-09-03T14:38:35.900Z] [combat] Conspiracy Architects Raider 1 reads the motion and slips it \u2014 the corrupted reclaimers guild shroud-spun slinger carves only air. The counter is already coming.\n[2026-09-03T14:38:35.901Z] [arbiter] The Arbiter watches the Conspiracy Architects Raider 1. \"It is not the first thing here that decided to keep its distance, then changed its mind.\"\n",
+      "[2026-09-03T14:38:36.308Z] [debug] qwen\u23f1 parse_fallback ok 10338ms read 9912ms/write 348ms in 717t\u2192out 9t 13.8ms/t (34ch)\n[2026-09-03T14:38:36.308Z] [debug] qwen\u23f1 stats \u2014 narration:scene_intro_fill n4 avg8.8s max10.2s read8.6s/write1.1s \u26a01unusable in719t\u2192out25t ms/tok 11.4-12.2 cap3 \u23f81 \u27022/15.8s | forge_name n2 avg4.6s max5.4s read2.3s/write1.3s \u26a01unusable in208t\u2192out46t ms/tok 11.1-11.1 | item_synt",
+      "hesis_hw n2 avg4.8s max5.0s read3.8s/write1.0s in327t\u2192out28t ms/tok 11.3-11.9 \u27021/4.5s | ambient n1 avg9.5s max9.5s read2.6s/write1.4s in365t\u2192out31t ms/tok 7.1-7.1 cap1 \u27021/9.5s | parse_fallback n1 avg10.3s max10.3s read9.9s/write0.3s in717t\u2192out9t ms/tok 13.8-13.8 || WASTED 4 calls / 29.8s\n[2026-09-03T14:38:37.062Z] [debug] parse-fallback: qwen \u2192 intent=equip target=\"coat\" rephrase=\"equip the coat\"\n",
+      "[2026-09-03T14:38:37.080Z] [player] equip the coat\n[2026-09-03T14:38:37.081Z] [debug] parser: intent=equip conf=1.00 verb=equip target=coat resolved=coat range=close enemies=5 hooks=1\n[2026-09-03T14:38:37.081Z] [arbiter] The Arbiter glances at your pack. \"I do not see any coat on you.\"\n[2026-09-03T14:38:37.082Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-09-03T14:38:37.082Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T14:38:37.455Z] [cognitive] neutral  (9103ms)\n[2026-09-03T14:38:37.829Z] [cognitive] neutral  (745ms)\n[2026-09-03T14:38:45.073Z] [debug] ui: tap \"dodge\"\n[2026-09-03T14:38:45.086Z] [player] dodge\n",
+      "[2026-09-03T14:38:45.087Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=5 hooks=1\n[2026-09-03T14:38:45.088Z] [world] You commit to the dodge. Slip Conspiracy Architects Raider 1's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-03T14:38:45.174Z] [combat] Conspiracy Architects Raider 2 \u2014 d20 \u2192 16 + ATK 6 = 22 vs your AC 22 \u2014 \u2717 EVADED\n[2026-09-03T14:38:45.174Z] [combat] Dodge \u2014 d20 \u2192 10 + DEX 21 = 31 vs ATK 22. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n",
+      "[2026-09-03T14:38:45.175Z] [world] You slip Conspiracy Architects Raider 2's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n[2026-09-03T14:38:45.176Z] [debug] ac-shift 22\u219225: race/base 10 + gear 18 + title 0 \u2192 trimmed 22 + status 3 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany ",
+      "Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n[2026-09-03T14:38:45.176Z] [combat] Conspiracy Architects Raider 3 \u2014 d20 \u2192 12 + ATK 6 = 18 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-03T14:38:45.177Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 9 + ATK 6 = 15 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-03T14:38:45.177Z] [combat] Conspiracy Architects Raider 5 and 1 other press in behind their own pack, waiting for an opening.\n[2026-09-03T14:38:45.178Z] [debug] arbiter: template (reason=combat)\n[2026-09-03T14:38:45.178Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T14:38:45.178Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-03T14:38:45.524Z] [cognitive] neutral  (345ms)\n[2026-09-03T14:38:46.556Z] [debug] ui: tap \"\u2623 shroud-spun slinger \u2692\"\n[2026-09-03T14:38:46.561Z] [system] evasive \u2014 harder to hit fades.\n[2026-09-03T14:38:46.624Z] [player] attack with the off-hand reclaimers guild shroud-spun slinger\n",
+      "[2026-09-03T14:38:46.625Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand reclaimers guild shroud spun slinger resolved=Reclaimers Guild Shroud-Spun Slinger range=close enemies=5 hooks=1\n[2026-09-03T14:38:46.626Z] [debug] attack: target=Conspiracy Architects Raider 1 range=close reach.bands=[distant,far,mid,close] reach.label=Reclaimers Guild Shroud-Spun Slinger bareHand=false\n",
+      "[2026-09-03T14:38:46.627Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-03T14:38:46.700Z] [world] You bring the corrupted reclaimers guild shroud-spun slinger to bear on Conspiracy Architects Raider 1.\n[2026-09-03T14:38:46.701Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T14:38:47.038Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 USE_ITEM  (336ms)\n",
+      "[2026-09-03T14:38:48.083Z] [debug] persist sizes(KB): total=323 player=78 wm=154[rooms=83 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=84 scene=7\n[2026-09-03T14:38:55.024Z] [world] Conspiracy Architects Raider 1 moves first. The pressure is immediate.\n",
+      "[2026-09-03T14:38:55.025Z] [debug] ac-shift 25\u219222: race/base 10 + gear 18 + title 0 \u2192 trimmed 22 + status 0 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n[2026-09-03T14:38:55.026Z] [combat] Conspiracy Architects Raider 3 \u2014 d20 \u2192 11 + ATK 6 = 17 vs your AC 22 \u2014 \u2717 MISS\n",
+      "[2026-09-03T14:38:55.027Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 18 + ATK 6 = 24 vs your AC 22 \u2014 \u2713 HIT\n[2026-09-03T14:38:55.029Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 4 + ATK 7 = 11 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T14:38:55.029Z] [combat] Conspiracy Architects Raider 1 and 1 other press in behind their own pack, waiting for an opening.\n",
+      "[2026-09-03T14:38:55.029Z] [combat] You \u2014 d20 \u2192 19 + DEX 21 + 2 (point blank) perfect opening (2\u00d7 dice) = 42 vs Conspiracy Architects Raider 1 AC 11 \u2014 \u2713 HIT\n[2026-09-03T14:38:55.030Z] [combat] You crack the Conspiracy Architects Raider 1 with the Corrupted Reclaimers Guild Shroud-Spun Slinger for 12 \u2014 the better part of their fight, gone in one blow. They crumple, out cold. (7/19 HP) Loot them bef",
+      "ore they come to.\n[2026-09-03T14:38:55.030Z] [combat] Conspiracy Architects Raider 1 is out of it. Conspiracy Architects Raider 2 now in your sights.\n[2026-09-03T14:38:55.031Z] [combat] Corrupted Reclaimers Guild Shroud-Spun Slinger \u2014 1 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n",
+      "[2026-09-03T14:38:55.418Z] [combat] Conspiracy Architects Raider 4 deals 2 bludgeoning damage [edge of reach \u2014 halved]. You have 29 HP remaining.\n[2026-09-03T14:39:00.477Z] [debug] ui: tap \"\u2623 shroud-spun slinger \u2692\"\n[2026-09-03T14:39:00.549Z] [player] attack with the off-hand reclaimers guild shroud-spun slinger\n",
+      "[2026-09-03T14:39:00.550Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand reclaimers guild shroud spun slinger resolved=Reclaimers Guild Shroud-Spun Slinger range=mid enemies=5 hooks=1\n[2026-09-03T14:39:00.550Z] [combat] Conspiracy Architects Raider 1 blackens \u2014 corruption eats 1. (6/19 HP, 2 turns left)\n",
+      "[2026-09-03T14:39:00.551Z] [debug] attack: target=Conspiracy Architects Raider 2 range=mid reach.bands=[distant,far,mid,close] reach.label=Reclaimers Guild Shroud-Spun Slinger bareHand=false\n[2026-09-03T14:39:00.655Z] [world] You commit forward with the corrupted reclaimers guild shroud-spun slinger. Conspiracy Architects Raider 2 watches your hands.\n",
+      "[2026-09-03T14:39:00.656Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T14:39:00.989Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 USE_ITEM  (333ms)\n[2026-09-03T14:39:04.870Z] [world] You seize the initiative. Conspiracy Architects Raider 2 has no time to react.\n[2026-09-03T14:39:04.870Z] [combat] You \u2014 d"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-03-1645-the-shield-ac-is-real #mtlp91n0yrsc [inline 25/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtlp91n0yrsc"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-03-1645-the-shield-ac-is-real"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "25"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-03-1645-the-shield-ac-is-real"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-03T16:54:06.198000Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-03T16:54:07.461000Z",
+  "fingerprints": [
+    "312d26476c290054de5ec330ce75d58d"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1953462747,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-03T16:49:05.542485Z",
+    "dateReleased": "2026-09-03T16:50:38.876816Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "5d97e9c2978f74410965c829930b77ed9fbfb461",
+      "message": "[ota-hal] OTA-1645 (slice 4b): the shield's AC is real\n\nSeven shields print \"+N AC\" on the card. Not one point of it has ever\nreached the number an enemy rolls against.\n\nMeasured before a line was written. A probe equipping the Titan Shield\n\u2014 \"+4 AC\", 8 defense, the priciest shield in the game \u2014 read\n`standingAc = 10`, identical to an empty off-hand, while a chest piece in\nthe control read 13. The cause is structural rather than arithmetic:\n`equippedGearAc` walks ARMOR_SLOTS (head / chest / hands / legs / feet /\ncloak) and a shield is a WEAPON that equips to a hand, so no AC reader in\nthe game has ever had one in view.\n\nWhat the shields DID have is a `defense` number feeding the BLOCK roll and\na `statBonuses` HP grant, both live and both working. That is why this\nsurvived so long: a shield was doing two of the three things on its card,\nso it read as underwhelming rather than broken.\n\nThe term goes in `equippedGearAc` and NOWHERE else, because\n`aggregateArmor` (the resolver's source) and `standingAc` (the sheet's)\nboth call it. That is the whole point of OTA-1133/1135 \u2014 one answer,\neverywhere \u2014 and adding a shield term at either call site would put the\npanel and the fight back out of step, which is the defect those two OTAs\nwere written to end. The DEFENCE card gains its own `shield +N` chip\nbeside armour and accessories, and the item card says \"AC +4 while held\".\n\n  \u2022 Five unconditional shields now pay what they print: Bone Round +2,\n    Giant Bone +3, Titan +4, Mud Royal +3, Mud Emperor's Buckler +3.\n  \u2022 The two TYPED ones are carried apart in `shieldAc.vs` and spent at the\n    resolver \u2014 the only line that knows the incoming damage type. Mud\n    Heater \"+2 AC vs fire\" answers burn; Aetheric Shield \"+2 AC vs energy\"\n    answers aetheric / electrical / burn, which is what its own\n    description (\"Deflects energy attacks\") means. Deliberately outside\n    `trimStandingAc`: the trim exists to stop a fully-fused STANDING build\n    becoming untouchable, and cover that applies to one damage type in a\n    fight you did not choose is not standing AC.\n  \u2022 \u26a0 The Aetheric Shield-Hammer's \"+2 AC FOR 1 ROUND after a hit\" is\n    REFUSED by the parser. A timed status is not a held passive, and\n    reading it here would hand a two-handed hammer a permanent +2 it never\n    promised. ota1645 pins that refusal by name; it waits for 4c.\n\nThree test repoints, all of them guards firing correctly rather than\nnoise, and each updated to follow the change rather than be loosened:\n\n  \u2022 ota1135 pins the SOURCE TEXT of `aggregateArmor` and `standingAc` to\n    prove neither re-derives AC. Both sums gained `+ gear.shield`, so the\n    pins name the new sums \u2014 the assertion is that every term is read off\n    the one helper, and a term computed locally would still break them.\n  \u2022 ota1135's empty-player shape now expects the third component at zero.\n  \u2022 ota1094's `catalogWeapons` fixture needed a `tags?: string[]` field\n    and one explicit param type. \u26a0 Those two typecheck errors were mine\n    from OTA-1644: I edited that suite in response to a jest failure AFTER\n    running the gates, and pushed without re-gating. The ratchet caught it\n    here (203 > baseline 201) rather than in CI. Re-gated clean.\n\nGates: all 18 green by exit code. Full suite green \u2014 1108 suites /\n11401 tests, 0 failures.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-03T16:46:46Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-03-1645-the-shield-ac-is-real",
+          "shortVersion": "tartaria@4.32.11+2026-09-03-1645-the-shield-ac-is-real",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-03T16:50:38.876816Z",
+          "dateCreated": "2026-09-03T16:49:05.542485Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155240916",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-03T16:50:39.373224Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-03-1645-the-shield-ac-is-real",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-03-1645-the-shield-ac-is-real",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-03-1645-the-shield-ac-is-real",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-03-1645-the-shield-ac-is-real)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "53f0e1a145dc4535ac8ea0f5680f83cf",
+  "previousEventID": "4bd17a2a63a747bab1f9229dd73f83f2"
+}

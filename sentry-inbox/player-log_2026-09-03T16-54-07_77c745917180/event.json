@@ -1,0 +1,343 @@
+{
+  "id": "77c7459171804bfd84e0ee620c5a771f",
+  "groupID": "7710022647",
+  "eventID": "77c7459171804bfd84e0ee620c5a771f",
+  "projectID": "4511945117532160",
+  "size": 17365,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-03-1645-the-shield-ac-is-real #mtlp91n0yrsc [inline 13/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-03-1645-the-shield-ac-is-real",
+  "message": "player-log 2026-09-03-1645-the-shield-ac-is-real #mtlp91n0yrsc [inline 13/28]",
+  "title": "player-log 2026-09-03-1645-the-shield-ac-is-real #mtlp91n0yrsc [inline 13/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "2e63ba9f42c841e8bf02dcedab51c1ff",
+      "span_id": "bf2d52a5bb03b42b",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "[Filtered]",
+      "[2026-09-03T00:39:16.126Z] [reward]     \u2022 Bone Sliver (Common)\n[2026-09-03T00:39:16.126Z] [reward]     \u2022 Obsidian Chip (Common)\n[2026-09-03T00:39:16.126Z] [reward]     \u2022 Worn Tartarian Coin (Common)\n[2026-09-03T00:39:16.126Z] [reward]     \u2022 Knotted Sinew Braid (Common)\n[2026-09-03T00:39:27.480Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-09-03T00:39:32.561Z] [world] A silent bolt strikes near enough to singe your sleeve. (\u22121 HP)\n[2026-09-03T00:39:32.585Z] [player] investigate the ground\n[2026-09-03T00:39:32.585Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=4\n",
+      "[2026-09-03T00:39:32.589Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Wild Oats (Common).\n[2026-09-03T00:39:32.598Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T00:39:32.796Z] [cognitive] CLIMB  (197ms)\n[2026-09-03T00:39:34.032Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n[2026-09-03T00:39:34.056Z] [debug] spawn: gear=[Reclaimer's Cloak, Salvager's Trench Coat] window=10 roster=new\n",
+      "[2026-09-03T00:39:34.058Z] [world] Riska Panhandle grins. \"Cheddar Bob. Sit a minute. The road's been generous or it hasn't \u2014 which is it?\"\n[2026-09-03T00:39:34.058Z] [world] Riska Panhandle looks you over. \"It's been a long stretch, Cheddar Bob. I'd started asking after you.\"\n",
+      "[2026-09-03T00:39:34.059Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Riska Panhandle, wandering trader. Tap the vendor banner to trade.\n[2026-09-03T00:39:34.067Z] [world] This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n",
+      "[2026-09-03T00:39:34.068Z] [world] You walk east through open silt. The compass points east into open ground.\n[2026-09-03T00:39:34.069Z] [world] The damp has been at it and got no further than it had.\n[2026-09-03T00:39:35.113Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T00:39:38.896Z] [world] You work the nest over. A part of it comes loose, intact.\n",
+      "[2026-09-03T00:39:38.896Z] [world] You break the sea-glass shard apart. Among the pieces, something worth keeping.\n[2026-09-03T00:39:38.896Z] [world] You break the standing water apart. Among the pieces, something worth keeping.\n[2026-09-03T00:39:38.897Z] [world] You lever something loose from the tide line \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n",
+      "[2026-09-03T00:39:38.897Z] [reward] \u2726 Salvage haul:\n[2026-09-03T00:39:38.897Z] [reward]     \u2022 Bone Sliver (Common)\n[2026-09-03T00:39:38.898Z] [reward]     \u2022 Worn Tartarian Coin x6 (Common)\n[2026-09-03T00:39:38.898Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-09-03T00:39:38.898Z] [reward]     \u2022 Charred Twig Bundle (Common)\n[2026-09-03T00:39:40.299Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-09-03T00:39:41.847Z] [player] investigate the ground\n[2026-09-03T00:39:41.847Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=4\n[2026-09-03T00:39:41.850Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Patched Cloth (Common).\n[2026-09-03T00:39:41.862Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-09-03T00:39:41.862Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T00:39:41.862Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T00:39:42.075Z] [cognitive] CLIMB  (211ms)\n[2026-09-03T00:39:54.914Z] [debug] persist sizes(KB): total=303 player=73 wm=144[rooms=76 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=82 scene=4\n",
+      "[2026-09-03T00:39:58.851Z] [reward] Bought 4\u00d7 Wild Lettuce from Riska Panhandle for 16 TC. (3007 TC left)\n[2026-09-03T00:40:04.129Z] [reward] Bought 2\u00d7 Wild Onion from Riska Panhandle for 6 TC. (3001 TC left)\n[2026-09-03T00:40:06.180Z] [reward] Bought 5\u00d7 Smoke-Cured Jerky Strip from Riska Panhandle for 40 TC. (2961 TC left)\n[2026-09-03T00:40:09.850Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n",
+      "[2026-09-03T00:40:09.877Z] [debug] spawn: gear=[Mud Darts, Dust Cloud] window=10 roster=new\n[2026-09-03T00:40:09.879Z] [world] You walk south through open silt. The compass tells you The Vault Steps lies further south \u2014 3 tiles, about 8 hours of travel.\n[2026-09-03T00:40:09.879Z] [world] Whatever the wind has done out there, it has not come in here.\n",
+      "[2026-09-03T00:40:10.954Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T00:40:12.473Z] [world] You turn the Dust Cloud over once, then keep it.\n[2026-09-03T00:40:12.475Z] [reward] \u2726 Dust Cloud (Common).\n[2026-09-03T00:40:15.453Z] [world] You salvage the anemone bloom. The take is small but real.\n",
+      "[2026-09-03T00:40:15.453Z] [world] Tucked inside the fisher's net: an oddment that matches no quartermaster's list. The kind of thing that fuses well.\n[2026-09-03T00:40:15.453Z] [world] You break the fisherman's lantern apart. Among the pieces, something worth keeping.\n[2026-09-03T00:40:15.454Z] [world] You salvage the sea-glass shard. The take is small but real.\n",
+      "[2026-09-03T00:40:15.454Z] [world] You break the standing water apart. Among the pieces, something worth keeping.\n[2026-09-03T00:40:15.454Z] [world] You salvage the tide line. The take is small but real.\n[2026-09-03T00:40:15.455Z] [reward] \u2726 Salvage haul:\n[2026-09-03T00:40:15.455Z] [reward]     \u2022 Spider Silk x2 (Common)\n[2026-09-03T00:40:15.455Z] [reward]     \u2022 Web-Silk Wadding (Common)\n",
+      "[2026-09-03T00:40:15.455Z] [reward]     \u2022 Aetheric Torch (Common)\n[2026-09-03T00:40:15.456Z] [reward]     \u2022 Scrap Metal x3 (Common)\n[2026-09-03T00:40:15.456Z] [reward]     \u2022 Mud Fragment x3 (Common)\n[2026-09-03T00:40:15.456Z] [reward]     \u2022 Cloth Scrap x2 (Common)\n[2026-09-03T00:40:21.768Z] [debug] ui: tap \"rest\"\n[2026-09-03T00:40:21.777Z] [player] rest\n",
+      "[2026-09-03T00:40:21.777Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=4\n[2026-09-03T00:40:21.779Z] [world] Mercy turns twice, thinks about a third, and drops where she stands.\n[2026-09-03T00:40:21.780Z] [world] You rest for 8 hours. +8 HP, +8 stamina recovered. (Day 57, evening)\n[2026-09-03T00:40:21.793Z] [system] \u23f3 Time passed: 8h\n",
+      "[2026-09-03T00:40:21.980Z] [cognitive] REST  (187ms)\n[2026-09-03T00:40:22.719Z] [debug] ui: tap \"investigate\"\n[2026-09-03T00:40:24.189Z] [player] investigate the ground\n[2026-09-03T00:40:24.190Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=4\n",
+      "[2026-09-03T00:40:24.194Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Wild Carrot (Common).\n[2026-09-03T00:40:24.202Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T00:40:24.407Z] [cognitive] CLIMB  (204ms)\n[2026-09-03T00:40:24.829Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n[2026-09-03T00:40:24.835Z] [debug] spawn: gear=[Cloak of the Mud Shaman] window=10 roster=new\n",
+      "[2026-09-03T00:40:24.836Z] [world] Duvo Saltbeard glances up. \"You again.\" Not warm, not cold \u2014 noted.\n[2026-09-03T00:40:24.836Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Duvo Saltbeard, wandering trader. Tap the vendor banner to trade.\n[2026-09-03T00:40:24.843Z] [world] This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n",
+      "[2026-09-03T00:40:24.843Z] [world] You walk east through open silt. The compass points east into open ground.\n[2026-09-03T00:40:24.844Z] [world] Nothing about the place has anything to add.\n[2026-09-03T00:40:25.080Z] [debug] persist sizes(KB): total=304 player=73 wm=145[rooms=76 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=82 scene=4\n",
+      "[2026-09-03T00:40:25.988Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T00:40:27.154Z] [world] You strip the anemone bloom down. Mostly debris \u2014 but a Cloth Scrap comes loose at the bottom of the pile.\n[2026-09-03T00:40:27.155Z] [world] You work the broken net apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n",
+      "[2026-09-03T00:40:27.155Z] [world] You scavenge the crab claw thoroughly. One Smooth Stone survives the sorting.\n[2026-09-03T00:40:27.155Z] [world] You break the hermit crab apart. Among the pieces, something worth keeping.\n[2026-09-03T00:40:27.156Z] [world] You work the rock over. A part of it comes loose, intact.\n",
+      "[2026-09-03T00:40:27.156Z] [world] You salvage the sea-glass shard. The take is small but real.\n[2026-09-03T00:40:27.156Z] [world] You break the standing water apart. Among the pieces, something worth keeping.\n[2026-09-03T00:40:27.156Z] [reward] \u2726 Salvage haul:\n[2026-09-03T00:40:27.157Z] [reward]     \u2022 Cloth Scrap (Common)\n[2026-09-03T00:40:27.157Z] [reward]     \u2022 Corroded Hinge Set (Common)\n",
+      "[2026-09-03T00:40:27.157Z] [reward]     \u2022 Smooth Stone x3 (Common)\n[2026-09-03T00:40:27.157Z] [reward]     \u2022 Aether Crystal x2 (Common)\n[2026-09-03T00:40:27.158Z] [reward]     \u2022 Scrap Metal x2 (Common)\n[2026-09-03T00:40:28.554Z] [debug] ui: tap \"investigate\"\n[2026-09-03T00:40:33.416Z] [player] investigate the ground\n",
+      "[2026-09-03T00:40:33.416Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=4\n[2026-09-03T00:40:33.420Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Big Rock (Common).\n[2026-09-03T00:40:33.430Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-09-03T00:40:33.431Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T00:40:33.431Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T00:40:33.431Z] [arbiter] \"There's coin on the board for a willing blade,\" the Arbiter says. \"Read the World.\"\n[2026-09-03T00:40:33.647Z] [cognitive] CLIMB  (215ms)\n[2026-09-03T00:40:36.439Z] [player] Ask why the stall is here\n",
+      "[2026-09-03T00:40:36.441Z] [world] \"Stall goes up where the ground is flat and comes down when it is not worth it,\" the trader says. \"That is the whole business plan.\"\n[2026-09-03T00:40:36.442Z] [world] Duvo Saltbeard places you, roughly, and adjusts what they were about to say.\n[2026-09-03T00:40:44.102Z] [world] You let the conversation go and Duvo Saltbeard gets back to it.\n",
+      "[Filtered]",
+      "[2026-09-03T00:40:47.842Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Riska Panhandle, wandering trader. Tap the vendor banner to trade.\n[2026-09-03T00:40:47.849Z] [world] This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n",
+      "[2026-09-03T00:40:47.850Z] [world] You walk south through open silt. The compass tells you The Giant Vault lies further south \u2014 2 tiles, about 5 hours of travel.\n[2026-09-03T00:40:47.850Z] [world] The quiet here is the specific quiet of a thing left half-done.\n[2026-09-03T00:40:48.837Z] [debug] ui: tap \"take / salvage\"\n",
+      "[Filtered]",
+      "[2026-09-03T00:40:51.056Z] [world] You lever something loose from the fish hook \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n[2026-09-03T00:40:51.056Z] [world] You strip the lobster trap carefully. Something usable comes free in your hand.\n[2026-09-03T00:40:51.056Z] [world] You salvage the oyster bed. The take is small but real.\n",
+      "[2026-09-03T00:40:51.056Z] [world] You salvage the rock. The take is small but real.\n[2026-09-03T00:40:51.057Z] [world] You work the standing water over. A part of it comes loose, intact.\n[2026-09-03T00:40:51.057Z] [world] You strip the whale bone carefully. Something usable comes free in your hand.\n[2026-09-03T00:40:51.057Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-09-03T00:40:51.057Z] [reward]     \u2022 Scrap Metal x5 (Common)\n[2026-09-03T00:40:51.058Z] [reward]     \u2022 Split Slate Piece (Common)\n[2026-09-03T00:40:51.058Z] [reward]     \u2022 Aether Dust x3 (Common)\n[2026-09-03T00:40:51.058Z] [reward]     \u2022 Stick x2 (Common)\n[2026-09-03T00:40:51.058Z] [reward]     \u2022 Smooth Stone x2 (Common)\n[2026-09-03T00:40:52.470Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-09-03T00:40:53.980Z] [player] investigate the ground\n[2026-09-03T00:40:53.980Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=4\n[2026-09-03T00:40:53.983Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-09-03T00:40:53.992Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-09-03T00:40:54.209Z] [cognitive] CLIMB  (216ms)\n[2026-09-03T00:40:55.403Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n[2026-09-03T00:40:55.423Z] [debug] spawn: gear=[Reclaimer's Boots] window=10 roster=new\n[2026-09-03T00:40:55.425Z] [world] You walk east through open silt. The compass points east into open ground.\n[2026-09-03T00:40:55.425Z] [world] No one came. Nothing spoke. It simply kept.\n",
+      "[2026-09-03T00:40:57.120Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T00:40:58.281Z] [world] It takes two pulls. The Reclaimer's Boots is yours on the second.\n[2026-09-03T00:40:58.282Z] [reward] \u2726 Reclaimer's Boots (Common).\n[2026-09-03T00:40:58.636Z] [debug] persist sizes(KB): total=306 player=74 wm=146[rooms=77 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=82 scene=4\n",
+      "[2026-09-03T00:40:59.156Z] [world] You work the anemone bloom over. A part of it comes loose, intact.\n[2026-09-03T00:40:59.157Z] [world] You work the coral shelf over. A part of it comes loose, intact.\n[2026-09-03T00:40:59.157Z] [world] You work the fish hook over. A part of it comes loose, intact.\n",
+      "[2026-09-03T00:40:59.157Z] [world] You break the fisherman's lantern apart. Among the pieces, something worth keeping.\n[2026-09-03T00:40:59.157Z] [world] You work the standing water over. A part of it comes loose, intact.\n[2026-09-03T00:40:59.158Z] [world] You work the tackle box apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n",
+      "[2026-09-03T00:40:59.158Z] [world] You strip the whale bone carefully. Something usable comes free in your hand.\n[2026-09-03T00:40:59.158Z] [reward] \u2726 Salvage haul:\n[2026-09-03T00:40:59.158Z] [reward]     \u2022 Mud Fragment x2 (Common)\n[2026-09-03T00:40:59.159Z] [reward]     \u2022 Worn Tartarian Coin x13 (Common)\n[2026-09-03T00:40:59.159Z] [reward]     \u2022 Scrap Metal x2 (Common)\n",
+      "[2026-09-03T00:40:59.159Z] [reward]     \u2022 Aether Dust (Common)\n[2026-09-03T00:40:59.159Z] [reward]     \u2022 Smooth Stone x3 (Common)\n[2026-09-03T00:40:59.159Z] [reward]     \u2022 Copper Wire Sp"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-03-1645-the-shield-ac-is-real #mtlp91n0yrsc [inline 13/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtlp91n0yrsc"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-03-1645-the-shield-ac-is-real"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "13"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-03-1645-the-shield-ac-is-real"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-03T16:54:06.148000Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "0": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 393,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        },
+        "29": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 329,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        },
+        "32": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 263,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-03T16:54:07.459000Z",
+  "fingerprints": [
+    "312d26476c290054de5ec330ce75d58d"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1953462747,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-03T16:49:05.542485Z",
+    "dateReleased": "2026-09-03T16:50:38.876816Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "5d97e9c2978f74410965c829930b77ed9fbfb461",
+      "message": "[ota-hal] OTA-1645 (slice 4b): the shield's AC is real\n\nSeven shields print \"+N AC\" on the card. Not one point of it has ever\nreached the number an enemy rolls against.\n\nMeasured before a line was written. A probe equipping the Titan Shield\n\u2014 \"+4 AC\", 8 defense, the priciest shield in the game \u2014 read\n`standingAc = 10`, identical to an empty off-hand, while a chest piece in\nthe control read 13. The cause is structural rather than arithmetic:\n`equippedGearAc` walks ARMOR_SLOTS (head / chest / hands / legs / feet /\ncloak) and a shield is a WEAPON that equips to a hand, so no AC reader in\nthe game has ever had one in view.\n\nWhat the shields DID have is a `defense` number feeding the BLOCK roll and\na `statBonuses` HP grant, both live and both working. That is why this\nsurvived so long: a shield was doing two of the three things on its card,\nso it read as underwhelming rather than broken.\n\nThe term goes in `equippedGearAc` and NOWHERE else, because\n`aggregateArmor` (the resolver's source) and `standingAc` (the sheet's)\nboth call it. That is the whole point of OTA-1133/1135 \u2014 one answer,\neverywhere \u2014 and adding a shield term at either call site would put the\npanel and the fight back out of step, which is the defect those two OTAs\nwere written to end. The DEFENCE card gains its own `shield +N` chip\nbeside armour and accessories, and the item card says \"AC +4 while held\".\n\n  \u2022 Five unconditional shields now pay what they print: Bone Round +2,\n    Giant Bone +3, Titan +4, Mud Royal +3, Mud Emperor's Buckler +3.\n  \u2022 The two TYPED ones are carried apart in `shieldAc.vs` and spent at the\n    resolver \u2014 the only line that knows the incoming damage type. Mud\n    Heater \"+2 AC vs fire\" answers burn; Aetheric Shield \"+2 AC vs energy\"\n    answers aetheric / electrical / burn, which is what its own\n    description (\"Deflects energy attacks\") means. Deliberately outside\n    `trimStandingAc`: the trim exists to stop a fully-fused STANDING build\n    becoming untouchable, and cover that applies to one damage type in a\n    fight you did not choose is not standing AC.\n  \u2022 \u26a0 The Aetheric Shield-Hammer's \"+2 AC FOR 1 ROUND after a hit\" is\n    REFUSED by the parser. A timed status is not a held passive, and\n    reading it here would hand a two-handed hammer a permanent +2 it never\n    promised. ota1645 pins that refusal by name; it waits for 4c.\n\nThree test repoints, all of them guards firing correctly rather than\nnoise, and each updated to follow the change rather than be loosened:\n\n  \u2022 ota1135 pins the SOURCE TEXT of `aggregateArmor` and `standingAc` to\n    prove neither re-derives AC. Both sums gained `+ gear.shield`, so the\n    pins name the new sums \u2014 the assertion is that every term is read off\n    the one helper, and a term computed locally would still break them.\n  \u2022 ota1135's empty-player shape now expects the third component at zero.\n  \u2022 ota1094's `catalogWeapons` fixture needed a `tags?: string[]` field\n    and one explicit param type. \u26a0 Those two typecheck errors were mine\n    from OTA-1644: I edited that suite in response to a jest failure AFTER\n    running the gates, and pushed without re-gating. The ratchet caught it\n    here (203 > baseline 201) rather than in CI. Re-gated clean.\n\nGates: all 18 green by exit code. Full suite green \u2014 1108 suites /\n11401 tests, 0 failures.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-03T16:46:46Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-03-1645-the-shield-ac-is-real",
+          "shortVersion": "tartaria@4.32.11+2026-09-03-1645-the-shield-ac-is-real",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-03T16:50:38.876816Z",
+          "dateCreated": "2026-09-03T16:49:05.542485Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155240916",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-03T16:50:39.373224Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-03-1645-the-shield-ac-is-real",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-03-1645-the-shield-ac-is-real",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-03-1645-the-shield-ac-is-real",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-03-1645-the-shield-ac-is-real)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "79b97c328218430598e178344c0f7687",
+  "previousEventID": "755a33e7cacb41b888b1c1d60535ce1d"
+}

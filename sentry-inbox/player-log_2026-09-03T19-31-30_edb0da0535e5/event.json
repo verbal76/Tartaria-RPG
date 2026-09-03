@@ -1,0 +1,300 @@
+{
+  "id": "edb0da0535e54eb680a4f1279ed67b9a",
+  "groupID": "7710315814",
+  "eventID": "edb0da0535e54eb680a4f1279ed67b9a",
+  "projectID": "4511945117532160",
+  "size": 17782,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-03-1648-a-fourth-ring #mtlp91n0yrsc [inline 22/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-03-1648-a-fourth-ring",
+  "message": "player-log 2026-09-03-1648-a-fourth-ring #mtlp91n0yrsc [inline 22/28]",
+  "title": "player-log 2026-09-03-1648-a-fourth-ring #mtlp91n0yrsc [inline 22/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "959bd1d2a5004d0cadb5ac1f8c1cf164",
+      "span_id": "84390dcf6476593f",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "[Filtered]",
+      "[2026-09-03T02:15:59.050Z] [reward] \u2726 Salvage haul:\n[2026-09-03T02:15:59.050Z] [reward]     \u2022 Fractured Geode Half (Common)\n[2026-09-03T02:15:59.050Z] [reward]     \u2022 Corroded Hinge Set (Common)\n[2026-09-03T02:15:59.051Z] [reward]     \u2022 Horn-Capped Dowel (Common)\n[2026-09-03T02:15:59.051Z] [reward]     \u2022 Bent Nail (Common)\n[2026-09-03T02:15:59.854Z] [player] investigate fire pit\n",
+      "[2026-09-03T02:15:59.854Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=fire pit resolved=fire pit range=- enemies=0 hooks=0\n[2026-09-03T02:15:59.857Z] [world] The fire pit is empty now \u2014 you took the salvage on your first pass.\n[2026-09-03T02:16:00.049Z] [cognitive] neutral  (191ms)\n[2026-09-03T02:16:00.567Z] [debug] ui: tap \"\u2192 Cellar\"\n",
+      "[2026-09-03T02:16:00.570Z] [world] You step into the cellar.\n[2026-09-03T02:16:00.570Z] [world] Cool dark under the stone. Casks line the walls; a few have not been tapped. Crates molder in the corner.\n[2026-09-03T02:16:01.090Z] [player] investigate banner\n[2026-09-03T02:16:01.090Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=banner resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-09-03T02:16:01.298Z] [cognitive] neutral  (205ms)\n[2026-09-03T02:16:01.502Z] [arbiter] The Arbiter tilts their head. \"I do not see a 'banner' here. Choose words carefully \u2014 try: cask, crate, shelf.\"\n[2026-09-03T02:16:01.935Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T02:16:02.401Z] [player] investigate bench\n",
+      "[2026-09-03T02:16:02.402Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=bench resolved=- range=- enemies=0 hooks=0\n[2026-09-03T02:16:02.597Z] [arbiter] The Arbiter tilts their head. \"I do not see a 'bench' here. Choose words carefully \u2014 try: cask, crate, shelf.\"\n[2026-09-03T02:16:02.777Z] [cognitive] neutral  (373ms)\n",
+      "[2026-09-03T02:16:03.110Z] [world] You break the crate apart. Among the pieces, something worth keeping.\n[2026-09-03T02:16:03.111Z] [world] You work the shelf over. A part of it comes loose, intact.\n[2026-09-03T02:16:03.112Z] [reward] \u2726 Salvage haul:\n[2026-09-03T02:16:03.112Z] [reward]     \u2022 Worn Tartarian Coin x9 (Common)\n[2026-09-03T02:16:03.112Z] [reward]     \u2022 Aether Crystal (Common)\n",
+      "[2026-09-03T02:16:04.968Z] [debug] ui: tap \"investigate\"\n[2026-09-03T02:16:06.497Z] [player] investigate the ground\n[2026-09-03T02:16:06.497Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=0\n[2026-09-03T02:16:06.499Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n",
+      "[2026-09-03T02:16:06.507Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-03T02:16:06.507Z] [arbiter] The Arbiter looks around. \"The Nexus has waited centuries to be addressed. It will answer.\"\n[2026-09-03T02:16:06.507Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T02:16:06.720Z] [cognitive] CLIMB  (212ms)\n[2026-09-03T02:16:07.385Z] [debug] ui: tap \"\u2199 Vault\"\n",
+      "[2026-09-03T02:16:07.388Z] [world] You step into the vault.\n[2026-09-03T02:16:07.388Z] [world] An iron door stands ajar. Strongboxes line the floor, most pried open long ago, one still sealed.\n[2026-09-03T02:16:07.739Z] [player] investigate cask\n[2026-09-03T02:16:07.739Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=cask resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-09-03T02:16:07.936Z] [cognitive] neutral  (194ms)\n[2026-09-03T02:16:08.136Z] [arbiter] The Arbiter tilts their head. \"I do not see a 'cask' here. Choose words carefully \u2014 try: strongbox, iron door, lockbox.\"\n[2026-09-03T02:16:08.552Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T02:16:09.732Z] [world] You strip the iron door carefully. Something usable comes free in your hand.\n",
+      "[2026-09-03T02:16:09.732Z] [world] You work the lockbox over. A part of it comes loose, intact.\n[2026-09-03T02:16:09.733Z] [world] You work the strongbox over. A part of it comes loose, intact.\n[2026-09-03T02:16:09.733Z] [reward] \u2726 Salvage haul:\n[2026-09-03T02:16:09.734Z] [reward]     \u2022 Cloth Scrap x2 (Common)\n[2026-09-03T02:16:09.734Z] [reward]     \u2022 Worn Tartarian Coin x5 (Common)\n",
+      "[2026-09-03T02:16:09.734Z] [reward]     \u2022 Scrap Metal (Common)\n[2026-09-03T02:16:10.421Z] [debug] persist sizes(KB): total=320 player=85 wm=151[rooms=82 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=82 scene=2\n[2026-09-03T02:16:11.053Z] [debug] ui: tap \"investigate\"\n[2026-09-03T02:16:12.600Z] [player] investigate the ground\n",
+      "[2026-09-03T02:16:12.600Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=0\n[2026-09-03T02:16:12.602Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-09-03T02:16:12.612Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T02:16:12.826Z] [cognitive] CLIMB  (213ms)\n",
+      "[2026-09-03T02:16:13.589Z] [debug] ui: tap \"\u2191 Hall \u2713\"\n[2026-09-03T02:16:13.594Z] [world] You step into the great hall.\n[2026-09-03T02:16:13.596Z] [world] A long hall under a sagging roof. Trestle tables run its length, a central fire pit sits cold, and banners hang gone to rags.\n[2026-09-03T02:16:14.506Z] [debug] ui: tap \"\ud83d\udeaa EXIT\"\n",
+      "[2026-09-03T02:16:14.508Z] [world] You step back outside, leaving abandoned outpost behind.\n[2026-09-03T02:16:16.872Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-09-03T02:16:16.894Z] [debug] spawn: gear=[Architect's Mantle] window=10 roster=new\n[2026-09-03T02:16:16.896Z] [world] Bersk Cartwright sets down what they're holding. \"Didn't expect you today, Cheddar Bob.\"\n",
+      "[2026-09-03T02:16:16.896Z] [world] \"Been a while,\" Bersk Cartwright says. \"Thought the mud had you.\"\n[2026-09-03T02:16:16.897Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Bersk Cartwright, wandering trader. Tap the vendor banner to trade.\n",
+      "[2026-09-03T02:16:16.904Z] [world] Rare workings for sale: Winter's Verdict (500 TC), Wrath of Titans (500 TC), Aether Bolt-Caster (200 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n[2026-09-03T02:16:16.905Z] [world] You walk west through open silt. The compass points west into open ground.\n",
+      "[2026-09-03T02:16:16.905Z] [world] Your eye goes back to it before you decide to look.\n[2026-09-03T02:16:20.522Z] [player] Ask how far they range\n[2026-09-03T02:16:20.523Z] [world] \"I do this stretch and one other.\" They gesture vaguely. \"Any more and you are travelling, not trading. Travelling is how you lose stock.\"\n",
+      "[2026-09-03T02:16:20.524Z] [world] Bersk Cartwright keeps facing the way they were going, and talks to you sideways.\n[2026-09-03T02:16:22.781Z] [world] You let the conversation go and Bersk Cartwright gets back to it.\n[2026-09-03T02:16:36.364Z] [reward] Bought the Winter's Verdict working for 500 TC. \u2726 Recipe learned (Legendary)! Open Crafting to forge it \u2014 you'll still need the materials.\n",
+      "[2026-09-03T02:16:46.512Z] [reward] Bought the Wrath of Titans working for 500 TC. \u2726 Recipe learned (Legendary)! Open Crafting to forge it \u2014 you'll still need the materials.\n[2026-09-03T02:16:48.935Z] [reward] Bought the Aether Bolt-Caster working for 200 TC. \u2726 Recipe learned (Rare)! Open Crafting to forge it \u2014 you'll still need the materials.\n",
+      "[2026-09-03T02:16:53.309Z] [reward] Bought 5\u00d7 Wild Oats from Bersk Cartwright for 15 TC. (1935 TC left)\n[2026-09-03T02:16:55.240Z] [reward] Bought Water Bottle from Bersk Cartwright for 5 TC. (1930 TC left)\n[2026-09-03T02:16:57.112Z] [reward] Bought 2\u00d7 Wild Lettuce from Bersk Cartwright for 8 TC. (1922 TC left)\n",
+      "[2026-09-03T02:16:57.335Z] [debug] persist sizes(KB): total=322 player=85 wm=151[rooms=82 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=82 scene=4\n[2026-09-03T02:16:59.716Z] [reward] Bought 2\u00d7 Trail Rations from Bersk Cartwright for 14 TC. (1908 TC left)\n[2026-09-03T02:17:03.598Z] [debug] ui: tap \"craft\"\n[2026-09-03T02:17:12.142Z] [player] craft Forager's Stew\n",
+      "[2026-09-03T02:17:12.142Z] [debug] parser: intent=craft conf=1.00 verb=craft target=forager stew resolved=- range=- enemies=0 hooks=1\n[2026-09-03T02:17:12.149Z] [reward] \u2726 Crafted Forager's Stew. The Arbiter watches you set the last piece.\n[2026-09-03T02:17:12.241Z] [cognitive] neutral  (89ms)\n[2026-09-03T02:17:14.982Z] [player] craft First Aid Kit\n",
+      "[2026-09-03T02:17:14.983Z] [debug] parser: intent=craft conf=1.00 verb=craft target=first aid kit resolved=First Aid Kit range=- enemies=0 hooks=1\n[2026-09-03T02:17:15.076Z] [arbiter] \"Crafting 4\u00d7 First Aid Kit would strip 4\u00d7 Cloth Scrap \u2192 Patched Cloth from your pack \u2014 confirm in the prompt to proceed, or it stays unmade.\"\n",
+      "[2026-09-03T02:17:15.076Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-03T02:17:15.076Z] [arbiter] The Arbiter looks around. \"Restoration and ruin sit on the same dial. The dial does not label them.\"\n[2026-09-03T02:17:15.103Z] [cognitive] neutral  (26ms)\n[2026-09-03T02:17:17.475Z] [arbiter] The Arbiter sets the schematic down. \"Left them be, then. Your pieces stay in your pack.\"\n",
+      "[2026-09-03T02:17:19.313Z] [player] craft First Aid Kit\n[2026-09-03T02:17:19.314Z] [debug] parser: intent=craft conf=1.00 verb=craft target=first aid kit resolved=First Aid Kit range=- enemies=0 hooks=1\n[2026-09-03T02:17:19.347Z] [arbiter] \"Crafting First Aid Kit would strip Cloth Scrap \u2192 Patched Cloth from your pack \u2014 confirm in the prompt to proceed, or it stays unmade.\"\n",
+      "[2026-09-03T02:17:19.347Z] [debug] arbiter: ambient held (he just spoke)\n[2026-09-03T02:17:19.376Z] [cognitive] neutral  (27ms)\n[2026-09-03T02:17:21.040Z] [player] craft First Aid Kit\n[2026-09-03T02:17:21.041Z] [debug] parser: intent=craft conf=1.00 verb=craft target=first aid kit resolved=First Aid Kit range=- enemies=0 hooks=1\n",
+      "[2026-09-03T02:17:21.070Z] [arbiter] The Arbiter nods. \"Stripped for parts: Cloth Scrap \u2192 Patched Cloth.\"\n[2026-09-03T02:17:21.080Z] [reward] \u2726 Crafted First Aid Kit. The Arbiter watches you set the last piece.\n[2026-09-03T02:17:21.081Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-03T02:17:21.081Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-09-03T02:17:21.081Z] [debug] arbiter: ambient held (he just spoke)\n[2026-09-03T02:17:21.154Z] [cognitive] neutral  (72ms)\n[2026-09-03T02:17:29.106Z] [player] shape stone\n[2026-09-03T02:17:29.107Z] [debug] parser: intent=cast conf=1.00 verb=shape target=stone resolved=Smooth Stone range=- enemies=0 hooks=1\n",
+      "[2026-09-03T02:17:29.190Z] [reward] Aetherstone Manipulation \u2014 d20 9 + INT 11 = 20 vs DC 15 \u2014 \u2713 SHAPED\n[2026-09-03T02:17:29.190Z] [world] (1 Aether Residue consumed.)\n[2026-09-03T02:17:29.259Z] [reward] \u2726 The aether teaches you. +1 INT (base 10, 12 as you stand).\n[2026-09-03T02:17:29.260Z] [world] You shape the Aetherstone but have no Small Rock to bind it to. The shape dissipates.\n",
+      "[2026-09-03T02:17:29.260Z] [system] \u23f3 Time passed: 30 min\n[2026-09-03T02:17:29.729Z] [cognitive] neutral  (468ms)\n[2026-09-03T02:17:30.465Z] [debug] persist sizes(KB): total=323 player=85 wm=152[rooms=82 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=82 scene=4\n[2026-09-03T02:17:34.670Z] [reward] Bersk Cartwright fires up a portable Crucible for you. (\u221225 TC)\n",
+      "[2026-09-03T02:17:40.407Z] [debug] ui: tap \"craft\"\n[2026-09-03T02:19:53.559Z] [player] fuse\n[2026-09-03T02:20:03.481Z] [reward] \u2726 The Crucible drinks the five pieces and works an extra resist channel into the Titan's Gauntlets. It can now hold one more worked-in resist. (Its armor rating is unchanged.)\n",
+      "[2026-09-03T02:20:05.466Z] [reward] Bersk Cartwright fires up a portable Crucible for you. (\u221225 TC)\n[2026-09-03T02:20:50.902Z] [world] You set your reserved pieces on the three pedestals. The Crucible takes them in.\n[2026-09-03T02:20:50.906Z] [reward] \u2726 The Crucible forges a Rare piece of armor from your reserved pieces \u2014 and it's in your pack, still cooling.\n",
+      "[2026-09-03T02:20:50.907Z] [world] The Crucible exhales slow. The shape is set, but the Aether hasn't named it yet \u2014 let it finish. You'll know it the moment it announces itself.\n[2026-09-03T02:20:50.920Z] [reward] \u2726 The forging finishes \u2014 the Aether names it Lumenforged Stompers (Rare).\n[2026-09-03T02:21:17.034Z] [world] You break the Mud-Bound Cloak down. \u2726 Recovered: Patched Cloth x2.\n",
+      "[2026-09-03T02:21:21.593Z] [debug] persist sizes(KB): total=324 player=85 wm=152[rooms=82 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=83 scene=4\n[2026-09-03T02:21:25.901Z] [world] You break the Architect's Outer Mantle down. \u2726 Recovered: Patched Cloth x2.\n[2026-09-03T02:22:18.309Z] [world] You break the Wanderer's Footwraps down. \u2726 Recovered: Patched Cloth x2.\n",
+      "[2026-09-03T02:22:18.387Z] [world] You break the Reclaimer's Boots down. \u2726 Recovered: Patched Cloth x2.\n[2026-09-03T02:22:18.455Z] [world] You break the Wanderer's Worn Gauntlets down. \u2726 Recovered: Patched Cloth x2.\n[2026-09-03T02:22:18.523Z] [world] The first pass on the Shaman's Warden Gloves crumbles in your hands \u2014 but your training kicks in. You stop, breathe, change angle, and try again.\n",
+      "[2026-09-03T02:22:18.524Z] [world] You break the Shaman's Warden Gloves down. \u2726 Recovered: Patched Cloth x2.\n[2026-09-03T02:22:18.593Z] [world] You break the Rough-Hewn Chestplate down. \u2726 Recovered: Scrap Metal x2, Patched Cloth x2.\n[2026-09-03T02:22:18.660Z] [world] You break the Mud-Warden's Vest down. \u2726 Recovered: Scrap Metal x2, Patched Cloth x2.\n",
+      "[2026-09-03T02:22:18.729Z] [world] You break the Mud-Warden's Vest down. \u2726 Recovered: Scrap Metal x2, Patched Cloth x2.\n[2026-09-03T02:22:18.797Z] [world] You break the Mud-Warden's Vest down. \u2726 Recovered: Scrap Metal x2, Patched Cloth x2.\n[2026-09-03T02:22:18.864Z] [world] You break the Mud-Warden's Vest down. \u2726 Recovered: Scrap Metal x2, Patched Cloth x2.\n",
+      "[2026-09-03T02:22:18.932Z] [world] You break the Mud-Warden's Vest down. \u2726 Recovered: Scrap Metal x2, Patched Cloth x2.\n[2026-09-03T02:22:18.999Z] [world] You break the Titan's Forehead Guard down. \u2726 Recovered: Patched Cloth x2.\n[2026-09-03T02:22:19.065Z] [world] You break the Thought-Crafter's Headpiece down. \u2726 Recovered: Patched Cloth x2.\n",
+      "[2026-09-03T02:22:19.132Z] [world] You break the Relic Hunter's Veil down. \u2726 Recovered: Patched Cloth x2.\n[2026-09-03T02:23:57.489Z] [world] You break the Vine Grasp down. \u2726 Recovered: Scrap Metal x2, Stick.\n[2026-09-03T02:23:57.570Z] [world] You break the Sparkstrike down. \u2726 Recovered: Scrap Metal x2, Stick.\n",
+      "[2026-09-03T02:23:57.637Z] [world] You break the Short Hunting Bow down. \u2726 Recovered: Scrap Metal x2, Stick.\n[2026-09-03T02:23:57.703Z] [world] You break the Mud Shell down. \u2726 Recovered: Scrap Metal x2, Stick.\n[2026-09-03T02:23:57.769Z] [world] You break the Mud Shell down. \u2726 Recovered: Scrap Metal x2, Stick.\n[2026-09-03T02:23:57.836Z] [w"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-03-1648-a-fourth-ring #mtlp91n0yrsc [inline 22/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtlp91n0yrsc"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-03-1648-a-fourth-ring"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "22"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-03-1648-a-fourth-ring"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "3"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-03T19:31:29.302414Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "0": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 361,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-03T19:31:30.630000Z",
+  "fingerprints": [
+    "b0876e12203239ebfc1b3d24e93a51cc"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1953701416,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-03T18:40:32.674127Z",
+    "dateReleased": "2026-09-03T18:41:34.528915Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "97b7577ba7f888fe0d0c511cfb8b461c3339a818",
+      "message": "[ota-hal] OTA-1648: a fourth ring, and the list that made it a 30-site edit\n\nOwner: \"we need to be able to wear up to four rings at a time.\"\n\nAdding `ring4` to PlayerEquipped was ONE line. The other thirty were the\nwork, and they are why this is an OTA rather than a one-liner: the literal\n`['ring', 'ring2', 'ring3']` had been written out BY HAND across 13 files\n\u2014 the stat sum, the AC sum, hpBreakdown, the fallen ledger, the revenant\nloot priority, two fuse-protection id lists, the vendor repair list, the\ndrop guard, the equip router, and four separate sites in InventoryScreen.\n\nEvery one of them had to agree. A single missed list is a ring that is\nworn but not counted, or counted but not droppable, or greyed out in the\nUI while the equip router is perfectly willing to fill it. So the list\nmoved to `RING_SLOTS` / `RING_ID_KEYS` / `MAX_RINGS` in equipment.ts and\nall 30 sites read it. A fifth ring is now one edit.\n\n  \u2022 The equip router walks RING_SLOTS and takes the first empty slot, so a\n    new ring goes on the next free finger; only when all four are full\n    does it displace the first. The if-chain it replaces would have needed\n    a new branch per ring.\n  \u2022 InventoryScreen's \"slot is full\" test reads RING_SLOTS rather than a\n    literal 3 \u2014 a hard-coded count there would grey out the fourth finger\n    the router would happily fill.\n  \u2022 The backfill spreads from the constants instead of naming each field,\n    so it can never fall a slot behind the type.\n  \u2022 ota1648 ratchets that no file writes the list by hand again, exempting\n    only the declaration itself \u2014 by NAME, not by file, so a stray\n    hand-written list elsewhere in equipment.ts is still caught.\n\n\u26a0 `ring` KEEPS ITS UNNUMBERED NAME. It is the legacy first slot and it is\nin every save on every device; renaming it to `ring1` for tidiness would\norphan the ring every existing player is currently wearing. The ugly name\nis the compatible one. No migration is needed either way: a save written\nbefore this simply has no ring4, which reads as an empty finger.\n\nMeasured after wiring, not assumed: four AC rings worn read\n`accessories: 4` and standing AC 14 against a bare 10, and one ring reads\n1 \u2014 so the fourth is counted, not merely wearable.\n\nTwo source pins repointed, both correct consequences rather than noise:\nota991 pinned the death-kit `slotPrio` literal (now spread from\nRING_SLOTS; its claim \u2014 weapons and armour lead, jewellery trails \u2014 is\nunchanged and still pinned), and ota1550 counted three `['ring',\nplayer.equipped?.ring\u2026` literals in the triples block. That count only\never pinned the old three; it now pins the GENERATOR and that it walks the\nfull list, which is the assertion that survives a fourth finger.\n\nGates: all 18 green by exit code. Full suite green \u2014 1111 suites /\n11435 tests, 0 failures.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-03T18:38:01Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-03-1648-a-fourth-ring",
+          "shortVersion": "tartaria@4.32.11+2026-09-03-1648-a-fourth-ring",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-03T18:41:34.528915Z",
+          "dateCreated": "2026-09-03T18:40:32.674127Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155279429",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-03T18:41:34.796005Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-03-1648-a-fourth-ring",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-03-1648-a-fourth-ring",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-03-1648-a-fourth-ring",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-03-1648-a-fourth-ring)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "f7ae8c91988540f28d661c9093e72a20",
+  "previousEventID": "e09e0164c3654f7c8eea7e007d4de714"
+}

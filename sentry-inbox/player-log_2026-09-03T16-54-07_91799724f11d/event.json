@@ -1,0 +1,279 @@
+{
+  "id": "91799724f11d41bb836fd0804298c780",
+  "groupID": "7710022647",
+  "eventID": "91799724f11d41bb836fd0804298c780",
+  "projectID": "4511945117532160",
+  "size": 18073,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-03-1645-the-shield-ac-is-real #mtlp91n0yrsc [inline 11/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-03-1645-the-shield-ac-is-real",
+  "message": "player-log 2026-09-03-1645-the-shield-ac-is-real #mtlp91n0yrsc [inline 11/28]",
+  "title": "player-log 2026-09-03-1645-the-shield-ac-is-real #mtlp91n0yrsc [inline 11/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "2e63ba9f42c841e8bf02dcedab51c1ff",
+      "span_id": "bf2d52a5bb03b42b",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "itan's Guard Mask (Common) to Ilva Sidelong for 8 TC. (1009 TC on hand)\n[2026-09-03T00:35:32.293Z] [reward] Sold Architect's Grip (Common) to Ilva Sidelong for 6 TC. (1015 TC on hand)\n[2026-09-03T00:35:32.363Z] [reward] Sold Reclaimer's Boots (Common) to Ilva Sidelong for 6 TC. (1021 TC on hand)\n",
+      "[2026-09-03T00:35:32.433Z] [reward] Sold Bone Knife (Common) to Ilva Sidelong for 6 TC. (1027 TC on hand)\n[2026-09-03T00:35:32.502Z] [reward] Sold Aetheric Helm of Command (Common) to Ilva Sidelong for 6 TC. (1033 TC on hand)\n[2026-09-03T00:35:32.572Z] [reward] Sold Lost Seeker's Gloves (Common) to Ilva Sidelong for 6 TC. (1039 TC on hand)\n",
+      "[2026-09-03T00:35:32.641Z] [reward] Sold Sentinel's Greaves (Common) to Ilva Sidelong for 6 TC. (1045 TC on hand)\n[2026-09-03T00:35:32.711Z] [reward] Sold Wanderer's Face of Shadows (Common) to Ilva Sidelong for 6 TC. (1051 TC on hand)\n[2026-09-03T00:35:32.780Z] [reward] Sold Sentinel's Repair Cap (Common) to Ilva Sidelong for 6 TC. (1057 TC on hand)\n",
+      "[2026-09-03T00:35:32.849Z] [reward] Sold Mud-Treader's Greaves (Common) to Ilva Sidelong for 6 TC. (1063 TC on hand)\n[2026-09-03T00:35:32.920Z] [reward] Sold Sentinel's Overcoat (Common) to Ilva Sidelong for 6 TC. (1069 TC on hand)\n[2026-09-03T00:35:32.988Z] [reward] Sold Aether-Weaver's Mantle (Common) to Ilva Sidelong for 6 TC. (1075 TC on hand)\n",
+      "[2026-09-03T00:35:33.056Z] [reward] Sold Forgotten Leggings (Common) to Ilva Sidelong for 6 TC. (1081 TC on hand)\n[2026-09-03T00:35:33.124Z] [reward] Sold Bone Knife (Common) to Ilva Sidelong for 6 TC. (1087 TC on hand)\n[2026-09-03T00:35:33.191Z] [reward] Sold Bone Knife (Common) to Ilva Sidelong for 6 TC. (1093 TC on hand)\n",
+      "[2026-09-03T00:35:33.259Z] [reward] Sold Aetheric Scout Greaves (Common) to Ilva Sidelong for 6 TC. (1099 TC on hand)\n[2026-09-03T00:35:33.326Z] [reward] Sold Explorer's Worn Headgear (Common) to Ilva Sidelong for 6 TC. (1105 TC on hand)\n[2026-09-03T00:35:33.394Z] [reward] Sold Architect's Observer Visor (Common) to Ilva Sidelong for 6 TC. (1111 TC on hand)\n",
+      "[2026-09-03T00:35:33.462Z] [reward] Sold Mud-Stalker Leggings (Common) to Ilva Sidelong for 6 TC. (1117 TC on hand)\n[2026-09-03T00:35:33.529Z] [reward] Sold Thought-Crafter's Headpiece (Common) to Ilva Sidelong for 6 TC. (1123 TC on hand)\n[2026-09-03T00:35:33.597Z] [reward] Sold Reclaimer's Mask (Common) to Ilva Sidelong for 6 TC. (1129 TC on hand)\n",
+      "[2026-09-03T00:35:33.664Z] [reward] Sold Reclaimer's Trousers (Common) to Ilva Sidelong for 6 TC. (1135 TC on hand)\n[2026-09-03T00:35:33.731Z] [reward] Sold Cudgel (Common) to Ilva Sidelong for 5 TC. (1140 TC on hand)\n[2026-09-03T00:35:33.799Z] [reward] Sold Reclaimer's Salvage Vest (Common) to Ilva Sidelong for 5 TC. (1145 TC on hand)\n",
+      "[2026-09-03T00:35:33.865Z] [reward] Sold Cudgel (Common) to Ilva Sidelong for 5 TC. (1150 TC on hand)\n[2026-09-03T00:35:33.933Z] [reward] Sold Reclaimer's Salvage Vest (Common) to Ilva Sidelong for 5 TC. (1155 TC on hand)\n[2026-09-03T00:35:34.000Z] [reward] Sold Cudgel (Common) to Ilva Sidelong for 5 TC. (1160 TC on hand)\n",
+      "[2026-09-03T00:35:34.067Z] [reward] Sold Mud-Bound Cloak (Common) to Ilva Sidelong for 5 TC. (1165 TC on hand)\n[2026-09-03T00:35:34.132Z] [reward] Sold Mud-Bound Cloak (Common) to Ilva Sidelong for 5 TC. (1170 TC on hand)\n[2026-09-03T00:35:34.199Z] [reward] Sold Cudgel (Common) to Ilva Sidelong for 5 TC. (1175 TC on hand)\n",
+      "[2026-09-03T00:35:34.264Z] [reward] Sold Mud-Warden's Vest (Common) to Ilva Sidelong for 5 TC. (1180 TC on hand)\n[2026-09-03T00:35:34.330Z] [reward] Sold Cudgel (Common) to Ilva Sidelong for 5 TC. (1185 TC on hand)\n[2026-09-03T00:35:34.396Z] [reward] Sold Reclaimer's Salvage Vest (Common) to Ilva Sidelong for 5 TC. (1190 TC on hand)\n",
+      "[2026-09-03T00:35:34.459Z] [reward] Sold Cudgel (Common) to Ilva Sidelong for 5 TC. (1195 TC on hand)\n[2026-09-03T00:35:34.524Z] [reward] Sold Mud-Warden's Vest (Common) to Ilva Sidelong for 5 TC. (1200 TC on hand)\n[2026-09-03T00:35:34.591Z] [reward] Sold Mud-Warden's Vest (Common) to Ilva Sidelong for 5 TC. (1205 TC on hand)\n",
+      "[2026-09-03T00:35:34.655Z] [reward] Sold Reclaimer's Salvage Vest (Common) to Ilva Sidelong for 5 TC. (1210 TC on hand)\n[2026-09-03T00:35:34.720Z] [reward] Sold Cudgel (Common) to Ilva Sidelong for 5 TC. (1215 TC on hand)\n[2026-09-03T00:35:34.785Z] [reward] Sold Mud-Bound Cloak (Common) to Ilva Sidelong for 5 TC. (1220 TC on hand)\n",
+      "[2026-09-03T00:35:34.850Z] [reward] Sold Rust Dagger (Common) to Ilva Sidelong for 4 TC. (1224 TC on hand)\n[2026-09-03T00:35:52.653Z] [reward] Sold 481\u00d7 Worn Tartarian Coin (Common) to Ilva Sidelong for 2405 TC (5 TC each). (3629 TC on hand)\n",
+      "[2026-09-03T00:36:00.017Z] [reward] Bought the Mire Stave working for 200 TC. \u2726 Recipe learned (Rare)! Open Crafting to forge it \u2014 you'll still need the materials.\n[2026-09-03T00:36:01.894Z] [reward] Bought the Many-Colored Tonic working for 200 TC. \u2726 Recipe learned (Rare)! Open Crafting to forge it \u2014 you'll still need the materials.\n",
+      "[2026-09-03T00:36:03.975Z] [reward] Bought the Lich-Heart Pendant working for 200 TC. \u2726 Recipe learned (Rare)! Open Crafting to forge it \u2014 you'll still need the materials.\n[2026-09-03T00:36:04.208Z] [debug] persist sizes(KB): total=302 player=72 wm=144[rooms=75 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=82 scene=4\n",
+      "[2026-09-03T00:36:10.460Z] [reward] Bought Red Cap Mushroom from Ilva Sidelong for 6 TC. (3023 TC left)\n[2026-09-03T00:36:10.460Z] [reward] They don't charge a friend full price \u2014 1 TC stayed in your pouch.\n[2026-09-03T00:36:16.374Z] [debug] ui: tap \"investigate\"\n[2026-09-03T00:36:17.934Z] [player] investigate the ground\n",
+      "[2026-09-03T00:36:17.934Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=3\n[2026-09-03T00:36:17.937Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-09-03T00:36:17.949Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T00:36:18.156Z] [cognitive] CLIMB  (206ms)\n",
+      "[2026-09-03T00:36:18.589Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n[2026-09-03T00:36:18.596Z] [debug] spawn: gear=[Titan's Gauntlets, Titan's Guard Mask, Mud Buckler] window=10 roster=new\n[2026-09-03T00:36:18.597Z] [world] The flat silt heaves, and a hand breaks the surface, then an arm, then a face caked grey with a thousand years of it.\n",
+      "[2026-09-03T00:36:18.597Z] [arbiter] You've heard of these on the road: the Aetherkin, the ones the mud drowned and the Aether raised back up.\n[2026-09-03T00:36:18.598Z] [debug] dedup: suppressed arbiter repeat \u2014 \"You've heard of these on the road: the Aetherkin, the ones t\u2026\"\n",
+      "[2026-09-03T00:36:18.598Z] [world] In life it was a machinist, one hand fused half-around a wrench that rusted into the bone \u2014 the mud takes faces first, so the rest is a guess and a kindness. Something you stirred woke the Aetherstone that held them; now they're awake and out.\n",
+      "[2026-09-03T00:36:18.598Z] [world] It flinches from you and puts its back to the wall, hands raised \u2014 not a hunter, just something frightened that has forgotten everything except how to be afraid.\n[2026-09-03T00:36:18.598Z] [world] You walk south through open silt. The compass tells you The Conduit Line lies further south \u2014 4 tiles, about 10 hours of travel.\n",
+      "[2026-09-03T00:36:18.598Z] [world] The air over it has the same weight it had before.\n[2026-09-03T00:36:21.894Z] [debug] ui: tap \"flee\"\n[2026-09-03T00:36:21.907Z] [player] flee\n[2026-09-03T00:36:21.908Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=mid enemies=1 hooks=3\n[2026-09-03T00:36:22.002Z] [system] \u23f3 Time passed: 15 min\n",
+      "[2026-09-03T00:36:22.304Z] [cognitive] FEAR \u00b7 RETREAT \u00b7 HIDE  (301ms)\n[2026-09-03T00:36:24.079Z] [debug] skillcheck: escape d20=18 DEX 19 = 37 vs Pursuit 6 \u2014 Mud-Wracked Aetherkin (d20 4 + SPD 2) \u2192 PASS\n",
+      "[2026-09-03T00:36:24.173Z] [debug] stats: STR14 DEX19 INT12 WIS15 CHA11 STE7 | gear: WIS+4,INT+3,DEX+8,STR+3,STE+2 | worn: main=Auralite Talon off=Choir-Bound Launcher head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Honey-Glazed Knuckle legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n",
+      "[2026-09-03T00:36:24.174Z] [debug] train: dexterity (escape check) \u2192 progress 94/100\n[2026-09-03T00:36:24.174Z] [world] You turn and run and the running works.\n[2026-09-03T00:36:27.226Z] [debug] ui: tap \"\u2605 Take & wear Titan's Gauntlets \u2014 your hands slot is bare\"\n[2026-09-03T00:36:27.233Z] [world] The Titan's Gauntlets had settled into the ground. You unsettle it.\n",
+      "[2026-09-03T00:36:27.233Z] [reward] \u2726 Titan's Gauntlets (Common).\n[2026-09-03T00:36:27.254Z] [debug] take&wear: equipping \"Titan's Gauntlets\" -> hands\n[2026-09-03T00:36:27.344Z] [debug] stats: STR16 DEX19 INT12 WIS15 CHA11 STE7 | gear: WIS+4,INT+3,STR+5,DEX+8,STE+2 | worn: main=Auralite Talon off=Choir-Bound Launcher head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets le",
+      "gs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n[2026-09-03T00:36:29.762Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T00:36:31.864Z] [world] Whatever the Titan's Guard Mask was lying against, it lets go without much argument.\n[2026-09-03T00:36:31.865Z] [reward] \u2726 Titan's Guard Mask (Common).\n",
+      "[2026-09-03T00:36:32.187Z] [debug] persist sizes(KB): total=302 player=73 wm=143[rooms=75 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=82 scene=4\n[2026-09-03T00:36:33.229Z] [world] You break the abandoned skiff apart. Among the pieces, something worth keeping.\n[2026-09-03T00:36:33.229Z] [world] You break the bell apart. Among the pieces, something worth keeping.\n",
+      "[2026-09-03T00:36:33.230Z] [world] You break the mooring post apart. Among the pieces, something worth keeping.\n[2026-09-03T00:36:33.230Z] [world] You salvage the standing water. The take is small but real.\n[2026-09-03T00:36:33.230Z] [reward] \u2726 Salvage haul:\n[2026-09-03T00:36:33.230Z] [reward]     \u2022 Aetheric Cloth (Uncommon)\n[2026-09-03T00:36:33.231Z] [reward]     \u2022 Bent Nail x2 (Common)\n",
+      "[2026-09-03T00:36:33.231Z] [reward]     \u2022 Worn Tartarian Coin (Common)\n[2026-09-03T00:36:33.231Z] [reward]     \u2022 Smooth Stone x2 (Common)\n[2026-09-03T00:36:39.417Z] [player] investigate Mud Buckler\n[2026-09-03T00:36:39.418Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud buckler resolved=Mud Buckler range=- enemies=0 hooks=3\n",
+      "[2026-09-03T00:36:39.418Z] [debug] route: hook intercept (kind=pulsing_mud, target=\"mud buckler\") \u2014 original intent=investigate\n[2026-09-03T00:36:39.418Z] [world] \u2605 STORY THREAD (step 1) \u2014 You step toward the glow. The mud is warm against your boot \u2014 an Aetherstone deposit, surface-thin but real.\n",
+      "[2026-09-03T00:36:40.673Z] [world] \u2605\u2605 STORY THREAD COMPLETE \u2014 You pry the deposit out of the silt. A few good shards, dense and humming, plus a thumb-sized core.\n[2026-09-03T00:36:40.674Z] [reward] \u2726 Aetheric Shard, Aetheric Shard, Aether Crystal.\n[2026-09-03T00:36:44.174Z] [debug] ui: tap \"investigate\"\n[2026-09-03T00:36:45.757Z] [player] investigate the ground\n",
+      "[2026-09-03T00:36:45.757Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=3\n[2026-09-03T00:36:45.763Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Small Rock (Common).\n[2026-09-03T00:36:45.771Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-09-03T00:36:45.774Z] [world] A Conspiracy Architects war party crests the rise \u2014 5 of them, blades already out. They've marked you for standing with the Forgotten Order.\n[2026-09-03T00:36:45.774Z] [arbiter] \"The Conspiracy Architects do not forgive a friend of the Forgotten Order,\" the Arbiter murmurs. \"Stand, or run \u2014 but decide now.\"\n[2026-09-03T00:36:46.137Z] [cognitive] CLIMB  (365ms)\n",
+      "[2026-09-03T00:36:51.758Z] [debug] ui: tap \"dodge\"\n[2026-09-03T00:36:51.764Z] [world] A silent bolt strikes near enough to singe your sleeve. (\u22123 HP)\n[2026-09-03T00:36:51.772Z] [player] dodge\n[2026-09-03T00:36:51.772Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=5 hooks=3\n",
+      "[2026-09-03T00:36:51.773Z] [world] You commit to the dodge. Slip Conspiracy Architects Raider 1's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-03T00:36:51.855Z] [combat] Conspiracy Architects Raider 1 \u2014 d20 \u2192 12 + ATK 11 = 23 vs your AC 22 \u2014 \u2717 EVADED\n",
+      "[2026-09-03T00:36:51.855Z] [combat] Dodge \u2014 d20 \u2192 5 + DEX 19 = 24 vs ATK 23. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-03T00:36:51.855Z] [world] You slip Conspiracy Architects Raider 1's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n",
+      "[2026-09-03T00:36:51.856Z] [debug] ac-shift 22\u219225: race/base 10 + gear 18 + title 0 \u2192 trimmed 22 + status 3 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n[2026-09-03T00:36:51.857Z] [combat] Conspiracy Architects Raider 2 \u2014 d20 \u2192 9 + ATK 10 = 19 vs your AC 25 \u2014 \u2717 MISS\n",
+      "[2026-09-03T00:36:51.857Z] [combat] Conspiracy Architects Raider 4 and 2 others close the distance.\n[2026-09-03T00:36:51.858Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T00:36:52.184Z] [cognitive] neutral  (326ms)\n[2026-09-03T00:36:52.874Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n[2026-09-03T00:36:52.876Z] [system] evasive \u2014 harder to hit fades.\n",
+      "[2026-09-03T00:36:52.896Z] [player] attack with the auralite talon\n[2026-09-03T00:36:52.896Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=5 hooks=3\n[2026-09-03T00:36:52.897Z] [debug] attack: target=Conspiracy Architects Raider 1 range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n",
+      "[2026-09-03T00:36:52.898Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-03T00:36:52.967Z] [world] You bring the acid-etched corrupted auralite talon to bear on Conspiracy Architects Raider 1.\n[2026-09-03T00:36:52.967Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T00:36:53.282Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (314ms)\n",
+      "[2026-09-03T00:37:01.976Z] [world] Conspiracy Architects Raider 1 moves first. The pressure is immediate.\n[2026-09-03T00:37:01.979Z] [debug] ac-shift 25\u219222: race/base 10 + gear 18 + title 0 \u2192 trimmed 22 + status 0 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n",
+      "[2026-09-03T00:37:01.979Z] [combat] Conspiracy Architects Raider 1 \u2014 d20 \u2192 2 + ATK 9 = 11 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T00:37:01.981Z] [combat] Conspiracy Architects Raider 2 \u2014 d20 \u2192 2 + ATK 8 = 10 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T00:37:01.983Z] [combat] Conspiracy Architects Raider 3 \u2014 d20 \u2192 2 + ATK 10 = 12 vs your AC 22 \u2014 \u2717 MISS\n",
+      "[2026-09-03T00:37:01.983Z] [combat] Conspiracy Architects Raider 5 and 1 "
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-03-1645-the-shield-ac-is-real #mtlp91n0yrsc [inline 11/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtlp91n0yrsc"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-03-1645-the-shield-ac-is-real"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "11"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-03-1645-the-shield-ac-is-real"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-03T16:54:06.137542Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-03T16:54:07.459000Z",
+  "fingerprints": [
+    "312d26476c290054de5ec330ce75d58d"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1953462747,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-03T16:49:05.542485Z",
+    "dateReleased": "2026-09-03T16:50:38.876816Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "5d97e9c2978f74410965c829930b77ed9fbfb461",
+      "message": "[ota-hal] OTA-1645 (slice 4b): the shield's AC is real\n\nSeven shields print \"+N AC\" on the card. Not one point of it has ever\nreached the number an enemy rolls against.\n\nMeasured before a line was written. A probe equipping the Titan Shield\n\u2014 \"+4 AC\", 8 defense, the priciest shield in the game \u2014 read\n`standingAc = 10`, identical to an empty off-hand, while a chest piece in\nthe control read 13. The cause is structural rather than arithmetic:\n`equippedGearAc` walks ARMOR_SLOTS (head / chest / hands / legs / feet /\ncloak) and a shield is a WEAPON that equips to a hand, so no AC reader in\nthe game has ever had one in view.\n\nWhat the shields DID have is a `defense` number feeding the BLOCK roll and\na `statBonuses` HP grant, both live and both working. That is why this\nsurvived so long: a shield was doing two of the three things on its card,\nso it read as underwhelming rather than broken.\n\nThe term goes in `equippedGearAc` and NOWHERE else, because\n`aggregateArmor` (the resolver's source) and `standingAc` (the sheet's)\nboth call it. That is the whole point of OTA-1133/1135 \u2014 one answer,\neverywhere \u2014 and adding a shield term at either call site would put the\npanel and the fight back out of step, which is the defect those two OTAs\nwere written to end. The DEFENCE card gains its own `shield +N` chip\nbeside armour and accessories, and the item card says \"AC +4 while held\".\n\n  \u2022 Five unconditional shields now pay what they print: Bone Round +2,\n    Giant Bone +3, Titan +4, Mud Royal +3, Mud Emperor's Buckler +3.\n  \u2022 The two TYPED ones are carried apart in `shieldAc.vs` and spent at the\n    resolver \u2014 the only line that knows the incoming damage type. Mud\n    Heater \"+2 AC vs fire\" answers burn; Aetheric Shield \"+2 AC vs energy\"\n    answers aetheric / electrical / burn, which is what its own\n    description (\"Deflects energy attacks\") means. Deliberately outside\n    `trimStandingAc`: the trim exists to stop a fully-fused STANDING build\n    becoming untouchable, and cover that applies to one damage type in a\n    fight you did not choose is not standing AC.\n  \u2022 \u26a0 The Aetheric Shield-Hammer's \"+2 AC FOR 1 ROUND after a hit\" is\n    REFUSED by the parser. A timed status is not a held passive, and\n    reading it here would hand a two-handed hammer a permanent +2 it never\n    promised. ota1645 pins that refusal by name; it waits for 4c.\n\nThree test repoints, all of them guards firing correctly rather than\nnoise, and each updated to follow the change rather than be loosened:\n\n  \u2022 ota1135 pins the SOURCE TEXT of `aggregateArmor` and `standingAc` to\n    prove neither re-derives AC. Both sums gained `+ gear.shield`, so the\n    pins name the new sums \u2014 the assertion is that every term is read off\n    the one helper, and a term computed locally would still break them.\n  \u2022 ota1135's empty-player shape now expects the third component at zero.\n  \u2022 ota1094's `catalogWeapons` fixture needed a `tags?: string[]` field\n    and one explicit param type. \u26a0 Those two typecheck errors were mine\n    from OTA-1644: I edited that suite in response to a jest failure AFTER\n    running the gates, and pushed without re-gating. The ratchet caught it\n    here (203 > baseline 201) rather than in CI. Re-gated clean.\n\nGates: all 18 green by exit code. Full suite green \u2014 1108 suites /\n11401 tests, 0 failures.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-03T16:46:46Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-03-1645-the-shield-ac-is-real",
+          "shortVersion": "tartaria@4.32.11+2026-09-03-1645-the-shield-ac-is-real",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-03T16:50:38.876816Z",
+          "dateCreated": "2026-09-03T16:49:05.542485Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155240916",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-03T16:50:39.373224Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-03-1645-the-shield-ac-is-real",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-03-1645-the-shield-ac-is-real",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-03-1645-the-shield-ac-is-real",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-03-1645-the-shield-ac-is-real)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "93a26344128d4f968662a78ac054a148",
+  "previousEventID": "880ed12e16b34934963998be3b4aa3db"
+}
