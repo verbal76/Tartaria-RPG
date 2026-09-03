@@ -27000,6 +27000,9 @@ export const OTA_BUILD_ID = '2026-09-03-1642-every-drop-has-a-name-in-the-book';
 // golem catch-up 2026-09-03: markerless publish of OTA-1642 - the 98 enemy loot
 // names authored (86 materials, 4 weapons, 4 armours, Crab Meat), loot by
 // identity keeps the Crucible fed, ota1642 keeps the audit. hal took the marker.
+// golem republish 2026-09-03 (task #109): same OTA-1642 bundle, pushed only so the
+// publisher's new Sentry release step runs once and the log measures whether
+// SENTRY_READ_TOKEN already carries project:releases. No app change.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-03-1641-a-weapon-is-named-like-a-weapon';
 // golem catch-up 2026-09-03: markerless publish of OTA-1641 - the 56 rune-casters
 // named as Wand / Rod / Stave / Scepter, check:weaponnames the 18th gate, every
