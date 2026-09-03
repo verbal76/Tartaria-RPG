@@ -27028,6 +27028,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // melee refusal line ("<electrical> does its work without a surface to paint")
 // is deleted; it was unreachable and it was the sentence that read as a bug.
 export const OTA_BUILD_ID = '2026-09-03-1644-a-coating-rides-the-weapon';
+// golem catch-up 2026-09-03: markerless publish of OTA-1644 - the coating gate
+// reads physical form instead of damage type, so the owner's Magnetic Axe (and
+// 57 other melee weapons, and 7 thrown ones) can finally be painted; a beam and
+// a rune-caster still refuse. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-03-1643-the-dice-riders-pay';
 // golem catch-up 2026-09-03: markerless publish of OTA-1643 - the 30 unread
 // "+N"/"+NdN" damage promises now pay (flatRider on every hit, riderDot when the
