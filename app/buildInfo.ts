@@ -27097,6 +27097,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // renaming it to ring1 for tidiness would orphan the ring every existing player
 // is wearing. No migration: a save with no ring4 reads as an empty finger.
 export const OTA_BUILD_ID = '2026-09-03-1648-a-fourth-ring';
+// golem catch-up 2026-09-03: markerless publish of OTA-1648 - a fourth ring slot,
+// and the hand-written ['ring','ring2','ring3'] list retired from 13 files into
+// RING_SLOTS / RING_ID_KEYS / MAX_RINGS so every reader agrees and a fifth ring
+// is one edit. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-03-1647-a-shield-build-you-can-make';
 // golem catch-up 2026-09-03: markerless publish of OTA-1647 - 13 new shields
 // (28 total) and 28 recipes so every shield in the game is craftable, one typed
