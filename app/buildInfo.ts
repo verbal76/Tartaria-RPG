@@ -27169,6 +27169,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // four ring slots, built from RING_SLOTS — OTA-1648 opened three more fingers and
 // this screen was never told.
 export const OTA_BUILD_ID = '2026-09-03-1652-no-resist-without-a-source';
+// golem catch-up 2026-09-03: markerless publish of OTA-1652 - the resist audit.
+// degradation folds into acid (closing the mirror hole where enemies corroded you
+// and nothing resisted it), ash weather gives radiation gear a reason to exist,
+// and an aetheric resist finally cancels the two storms tagged aetheric. The
+// resist card line says what its percentage reduces; the sheet shows all four
+// rings. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-03-1651-the-cards-give-the-page-back';
 // golem catch-up 2026-09-03: markerless publish of OTA-1651 - the gold Equipped
 // block and faction standing come off the character card; the bestiary flavour
