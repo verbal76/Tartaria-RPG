@@ -27210,6 +27210,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // an untouched 25/25 loads 40/40, a chipped 18/25 loads 33/40, instead of a
 // freshly-promoted ring reading pre-worn forever.
 export const OTA_BUILD_ID = '2026-09-03-1654-the-save-catches-up';
+// golem catch-up 2026-09-03: markerless publish of OTA-1654 - the save catches
+// up to the catalog. The EFFECTS were never stale (an accessory's powers and
+// every ladder magnitude resolve from the catalog row by name), but the rarity
+// STAMPED on the instance never healed, and the readers OTA-999 never converted
+// kept printing and grading off it - inventory word and colour, RARITY sort, and
+// the Crucible's output tier. resealCatalogRarity persists what
+// canonicalItemRarity already answers; the forge takes the BETTER of stamp and
+// canon so a promotion is caught without confiscating a tier; a promoted
+// durability ceiling carries the damage across instead of clamping; and the
+// whole per-item load chain moved out of gameStore into healSavedItem. hal took
+// the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-03-1653-the-wear-ward';
 // golem catch-up 2026-09-03: markerless publish of OTA-1653 - the wear ward, a
 // buff the owner invented by misreading a resist line and which turned out to be
