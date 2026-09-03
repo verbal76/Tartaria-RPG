@@ -27044,6 +27044,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // after a hit" is deliberately refused — a timed status is not a held passive,
 // and reading it would hand a two-handed hammer a permanent +2. It waits for 4c.
 export const OTA_BUILD_ID = '2026-09-03-1645-the-shield-ac-is-real';
+// golem catch-up 2026-09-03: markerless publish of OTA-1645 - seven shields'
+// printed "+N AC" reaches the number an enemy rolls against for the first time
+// (five flat, two typed and spent at the resolver, the timed one refused);
+// equippedGearAc gains the third component so sheet and fight cannot drift.
+// hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-03-1644-a-coating-rides-the-weapon';
 // golem catch-up 2026-09-03: markerless publish of OTA-1644 - the coating gate
 // reads physical form instead of damage type, so the owner's Magnetic Axe (and
