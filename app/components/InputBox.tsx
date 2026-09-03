@@ -803,14 +803,14 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 const raw = resolveDisplayWeaponByName(equippedMain, inventory)?.damageType ?? null;
                 const label = combatWeaponLabel(equippedMain, equippedMainItem, raw, activeEnemyKnownWeak ?? []);
                 const parts = combatWeaponLabelParts(equippedMain, equippedMainItem, raw, activeEnemyKnownWeak ?? []);
-                return <QuickBtn label={label} glyphs={parts.glyphs} glyphText={parts.text} baseGlyph={parts.base} onPress={() => onSubmit(`attack with the ${equippedMain.toLowerCase()}`)} tone={mainT} outOfRange={mainT === 'needs-approach'} />;
+                return <QuickBtn label={label} glyphs={parts.glyphs} glyphText={parts.text} baseGlyph={parts.base} star={parts.star} onPress={() => onSubmit(`attack with the ${equippedMain.toLowerCase()}`)} tone={mainT} outOfRange={mainT === 'needs-approach'} />;
               })() : null}
               {equippedOff ? (() => {
                 const offT = weaponTone(reachPlayer, 'off', range, groundedFoesBelow);
                 const raw = resolveDisplayWeaponByName(equippedOff, inventory)?.damageType ?? null;
                 const label = combatWeaponLabel(equippedOff, equippedOffItem, raw, activeEnemyKnownWeak ?? []);
                 const parts = combatWeaponLabelParts(equippedOff, equippedOffItem, raw, activeEnemyKnownWeak ?? []);
-                return <QuickBtn label={label} glyphs={parts.glyphs} glyphText={parts.text} baseGlyph={parts.base} onPress={() => onSubmit(`attack with the off-hand ${equippedOff.toLowerCase()}`)} tone={offT} outOfRange={offT === 'needs-approach'} />;
+                return <QuickBtn label={label} glyphs={parts.glyphs} glyphText={parts.text} baseGlyph={parts.base} star={parts.star} onPress={() => onSubmit(`attack with the off-hand ${equippedOff.toLowerCase()}`)} tone={offT} outOfRange={offT === 'needs-approach'} />;
               })() : null}
             </View>
 
@@ -1177,6 +1177,7 @@ function QuickBtn({
   glyphs,
   glyphText,
   baseGlyph,
+  star,
 }: {
   label: string;
   onPress: () => void;
@@ -1205,6 +1206,8 @@ function QuickBtn({
   /** ⚠ OTA-1636 — the weapon's own damage type, painted LAST and apart from
    *  the coats. Owner: "all the way to the right so it's not mixed in." */
   baseGlyph?: BaseGlyphPart | null;
+  /** OTA-1638 — the discovery star, painted LAST, after the base glyph. */
+  star?: boolean;
 }) {
   const resolvedTone: QuickBtnTone | undefined = blocked
     ? undefined
@@ -1313,15 +1316,28 @@ function QuickBtn({
           ))}
           <Text>{`${glyphs && glyphs.length > 0 ? ' ' : ''}${glyphText ?? ''}`.toUpperCase()}</Text>
           {baseGlyph ? (
-            <Text style={[styles.coatGlyph, { color: BASE_GLYPH_COLOR[baseGlyph.kind] ?? '#ffffff' }]}>
-              {/* ⚠ OTA-1636 — the weapon's OWN damage type, painted LAST and set
-                  off by an em space so it can never be read as a third coat.
-                  Owner: "all the way to the right so it's not mixed in." Same
-                  halo as the coat cells (OTA-1568), its own colour, and — as
-                  with the coats — added HERE and never to `label`. */}
-              {`\u2003${baseGlyph.ch}\u200a`}
-            </Text>
+            <>
+              {/* ⚠ OTA-1638 — THE SPACER LIVES OUTSIDE THE CELL. The em space that
+                  sets the base glyph off from the name used to sit INSIDE the dark
+                  cell, so the cell stretched across the gap and read as a black
+                  box on the sage chip (owner: "why the weird black boxes around
+                  the glyphs"). Unstyled here, the gap is just a gap; the glyph
+                  gets the same hair-space cell the coats get. */}
+              <Text>{'\u2003'}</Text>
+              <Text style={[styles.coatGlyph, { color: BASE_GLYPH_COLOR[baseGlyph.kind] ?? '#ffffff' }]}>
+                {/* ⚠ OTA-1636 — the weapon's OWN damage type, painted after the
+                    name so it can never be read as a third coat. Owner: "all the
+                    way to the right so it's not mixed in." Same halo as the coat
+                    cells (OTA-1568), its own colour, and — as with the coats —
+                    added HERE and never to `label`. */}
+                {`\u200a${baseGlyph.ch}\u200a`}
+              </Text>
+            </>
           ) : null}
+          {/* \u26a0 OTA-1638 \u2014 the discovery star, all the way to the right, after the
+              base glyph. Owner: "put the discovery star all the way to the right."
+              Plain text in the button's own colour: it is a verdict, not a type. */}
+          {star ? <Text>{' ★'}</Text> : null}
         </Text>
       ) : (
         <Text style={textStyle}>{label.toUpperCase()}</Text>

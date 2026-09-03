@@ -18,6 +18,7 @@ import {
   type DisplaySettings,
 } from '../ui/displaySettings';
 import { LoreCodexBody } from '../components/LoreCodexBody';
+import { WeaponGlyphKey } from '../components/WeaponGlyphKey'; // OTA-1638
 import { useHintsDisabled, setHintsDisabled, resetAllFirstTimeHints } from '../components/useFirstTimeHint';
 import { useAutosaveDisabled, setAutosaveDisabled } from '../ui/autosave';
 import { useUiScale, setUiScale, UI_SCALES, displayScaleSupported, type UiScale } from '../ui/displayScale'; // OTA-1227
@@ -1665,6 +1666,9 @@ export function AboutScreen() {
           {ownerTools && ownerTaps > 0 && (
             <Text style={styles.mono}>OWNER TOOLS UNLOCKED — SEND LOG is under SESSION → REPORTING</Text>
           )}
+          {/* OTA-1638 — the weapon glyph key and what the discovery star means,
+              read from the same tables the combat buttons paint from. */}
+          <WeaponGlyphKey />
           <View style={styles.dedication}>
             <Text style={styles.dedicationRule}>· · ·</Text>
             <Text style={styles.dedicationBody}>

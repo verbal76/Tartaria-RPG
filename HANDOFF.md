@@ -1560,9 +1560,9 @@ Key invariants worth knowing:
 
 ## 9. Recent OTA highlights (latest sessions)
 
-### ⚠⚠⚠ THE 2026-09-02 RUN — OTA-1617 → 1637 (read this first if you are new)
+### ⚠⚠⚠ THE 2026-09-02 RUN — OTA-1617 → 1638 (read this first if you are new)
 
-Latest golem-line stamp: **`2026-09-03-1637-this-is-the-place-means-the-cell`**
+Latest golem-line stamp: **`2026-09-03-1638-the-star-goes-last`**
 (`app/buildInfo.ts`). Both channels ship from this branch — a `[ota-hal]` marker
 in the commit TITLE publishes the HAL set, a markerless follow-up commit
 publishes golem; see §6.
@@ -1807,6 +1807,20 @@ what it ACCEPTS, and a data walker skips the saying.
   route. ota1630's anchor test filled its tank (it was standing a tile north
   with "south" refused and paying anyway); ota1617 route pin follows; ota1637
   pins arithmetic, sentences, four readers on/off/away, wiring.
+- **OTA-1638 the star goes last + the key on the About screen.** Owner: *"put
+  this glyph key in the About screen and explain the discovery star"*, *"put the
+  discovery star all the way to the right"*, *"why the weird black boxes around
+  the glyphs"*. Row is `🔥☣ launcher ✦ ★`: `combatWeaponLabel` appends the star
+  after the base glyph; `combatWeaponLabelParts` returns `star: boolean` and a
+  bare `text`; InputBox paints `{' ★'}` after the base node (`star` prop, both
+  hands). The black box: the em space sat INSIDE the base glyph's dark cell
+  (OTA-1569's halo cell), so the cell stretched across the gap — the spacer is
+  an unstyled node now and the base glyph gets the hair-space cell the coats
+  get. New `components/WeaponGlyphKey.tsx` (BASE_KEY_ORDER / BASE_TYPE_MEANING /
+  COAT_KEY_ORDER / COAT_MEANING / STAR_EXPLAINED / GLYPH_KEY_EXAMPLE) reads the
+  live glyph + colour tables, rendered on the About tab above the dedication.
+  ota1553 / ota1568 / ota1636 pins repointed; ota1638 pins order, parts, the
+  spacer, the key's coverage and the star text.
 
 ✓ **One position vocabulary now (OTA-1637).** The doors, the arrival line, the
 trace, the card, the conversation arm and the verb matchers all run

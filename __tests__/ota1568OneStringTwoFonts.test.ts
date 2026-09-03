@@ -77,7 +77,7 @@ describe('OTA-1568 — the split says exactly what the flat label says', () => {
       // ⚠ OTA-1636 — the base glyph is the fourth piece, last, after the star.
       const rebuilt = (parts.glyphs.length > 0
         ? `${parts.glyphs.map((g) => g.ch).join('')} ${parts.text}`
-        : parts.text) + (parts.base ? ` ${parts.base.ch}` : '');
+        : parts.text) + (parts.base ? ` ${parts.base.ch}` : '') + (parts.star ? ' ★' : ''); // OTA-1636 base, OTA-1638 star last
       expect({ name, rebuilt }).toEqual({ name, rebuilt: flat });
     }
   });
@@ -131,7 +131,9 @@ describe('OTA-1568 — the split says exactly what the flat label says', () => {
   it('⚠ the weakness star rides the TEXT, never a glyph', () => {
     // The star is not a coating and must not pick up a coating colour.
     const parts = combatWeaponLabelParts('Bone Crossbow', coated('burn'), 'piercing', ['burn']);
-    expect(parts.text).toBe('bone crossbow ★');
+    // OTA-1638 — the star is its own piece now, painted after the base glyph.
+    expect(parts.text).toBe('bone crossbow');
+    expect(parts.star).toBe(true);
     expect(parts.glyphs.map((g) => g.ch).join('')).not.toContain('★');
   });
 });

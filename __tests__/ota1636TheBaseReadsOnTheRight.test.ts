@@ -36,7 +36,7 @@ jest.mock('expo-updates', () => ({}));
 // we do the coatings"* — and, correcting the first draft of the ask: *"all the
 // way to the right so it's not mixed in."*
 //
-// So the row is `🔥☣ launcher ★ ✦`. Coating glyphs on the left (OTA-1553's
+// So the row is `🔥☣ launcher ✦ ★` (OTA-1638 moved the star past the base). Coating glyphs on the left (OTA-1553's
 // order), the name, the discovery star, and LAST the weapon's own damage type —
 // one glyph per canonical type, set off by an em space in the painted label so
 // it can never be read as a third coat. The flat string is still the tap
@@ -58,9 +58,9 @@ const coated = (a: string, b?: string) => ({
 } as unknown as Pick<InventoryItem, 'coating' | 'coating2'>);
 
 describe('OTA-1636 — his launcher, exactly', () => {
-  it('⚠⚠⚠ `🔥☣ choir-bound launcher ★ ✦` — coats left, star, base type LAST', () => {
+  it('⚠⚠⚠ `🔥☣ choir-bound launcher ✦ ★` — coats left, base type, star LAST (OTA-1638)', () => {
     expect(combatWeaponLabel('Choir-Bound Launcher', coated('burn', 'corruption'), 'aetheric', ['aetheric']))
-      .toBe('🔥☣ choir-bound launcher ★ ✦');
+      .toBe('🔥☣ choir-bound launcher ✦ ★');
     expect(combatWeaponLabel('Choir-Bound Launcher', coated('burn', 'corruption'), 'aetheric', []))
       .toBe('🔥☣ choir-bound launcher ✦');
   });
@@ -78,7 +78,7 @@ describe('OTA-1636 — his launcher, exactly', () => {
       const starred = combatWeaponLabel(name, item, raw, [canonicalDamageType(raw)]);
       const g = baseDamageGlyph(raw);
       expect({ name, ends: label.endsWith(` ${g}`) }).toEqual({ name, ends: true });
-      expect({ name, ends: starred.endsWith(` ★ ${g}`) }).toEqual({ name, ends: true });
+      expect({ name, ends: starred.endsWith(` ${g} ★`) }).toEqual({ name, ends: true });
       // and no coat glyph sits to the right of the name
       const coatGlyphs = Object.values(COATING_GLYPH);
       const afterName = label.slice(label.toLowerCase().indexOf(name.split(' ').slice(-2).join(' ').toLowerCase()));
@@ -144,12 +144,16 @@ describe('OTA-1636 — the wiring', () => {
 
   it('⚠⚠ an em space, not a hair space, sets it apart from the name', () => {
     // U+2003 before the glyph in the painted node; the flat label keeps a plain space.
-    expect(BOX).toContain('{`\\u2003${baseGlyph.ch}\\u200a`}');
+    // OTA-1638 — the em space is its own unstyled node, OUTSIDE the dark cell,
+    // so the cell no longer stretches across the gap (his "weird black boxes").
+    expect(BOX).toContain("<Text>{'\\u2003'}</Text>");
+    expect(BOX).toContain('{`\\u200a${baseGlyph.ch}\\u200a`}');
+    expect(BOX).not.toContain('{`\\u2003${baseGlyph.ch}');
   });
 
   it('⚠ the flat label and the parts still agree — the breadcrumb is one string', () => {
     const parts = combatWeaponLabelParts('Choir-Bound Launcher', coated('burn', 'corruption'), 'aetheric', ['aetheric']);
-    const rebuilt = `${parts.glyphs.map((g) => g.ch).join('')} ${parts.text} ${parts.base!.ch}`;
+    const rebuilt = `${parts.glyphs.map((g) => g.ch).join('')} ${parts.text} ${parts.base!.ch}${parts.star ? ' ★' : ''}`;
     expect(rebuilt).toBe(combatWeaponLabel('Choir-Bound Launcher', coated('burn', 'corruption'), 'aetheric', ['aetheric']));
   });
 });

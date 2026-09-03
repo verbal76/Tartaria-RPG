@@ -248,10 +248,12 @@ export function combatWeaponLabel(
     ? ' ★'
     : '';
   const head = glyphs ? `${glyphs} ` : '';
-  // OTA-1636 — the base type, last, after the star.
+  // OTA-1636 — the base type after the name. OTA-1638 — and the star LAST,
+  // all the way to the right: `🔥☣ launcher ✦ ★`. Owner: "put the discovery
+  // star all the way to the right."
   const base = baseDamageGlyph(rawDamageType);
   const tail = base ? ` ${base}` : '';
-  return `${head}${shortWeaponName(name).toLowerCase()}${star}${tail}`;
+  return `${head}${shortWeaponName(name).toLowerCase()}${tail}${star}`;
 }
 
 /**
@@ -343,16 +345,17 @@ export function combatWeaponLabelParts(
   item: Pick<InventoryItem, 'coating' | 'coating2'> | null | undefined,
   rawDamageType: string | null | undefined,
   knownWeaknesses: readonly string[],
-): { glyphs: CoatingGlyphPart[]; text: string; base: BaseGlyphPart | null } {
+): { glyphs: CoatingGlyphPart[]; text: string; base: BaseGlyphPart | null; star: boolean } {
   const kinds = coatingKinds(item);
-  const star = weaponHitsKnownWeakness(weaponStrikeTypes(item, rawDamageType), knownWeaknesses)
-    ? ' ★'
-    : '';
+  const star = weaponHitsKnownWeakness(weaponStrikeTypes(item, rawDamageType), knownWeaknesses);
   const baseCh = baseDamageGlyph(rawDamageType);
   return {
     glyphs: kinds.map((k) => ({ ch: COATING_GLYPH[k] ?? '', kind: k })).filter((g) => g.ch !== ''),
-    text: `${shortWeaponName(name).toLowerCase()}${star}`,
+    // OTA-1638 — the name alone; the star is its own piece now, painted after
+    // the base glyph so it sits all the way to the right.
+    text: shortWeaponName(name).toLowerCase(),
     // OTA-1636 — the right-hand glyph, styled on its own like the coats.
     base: baseCh ? { ch: baseCh, kind: canonicalDamageType(rawDamageType) } : null,
+    star,
   };
 }

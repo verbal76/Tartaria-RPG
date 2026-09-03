@@ -26962,7 +26962,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // on currentLocationId — the whole named place — so a tile off the anchor the
 // feed said HERE, the verb PAID, and nothing armed. One cell test everywhere
 // now; off the cell every reader says "2 tiles west" instead of HERE.
-export const OTA_BUILD_ID = '2026-09-03-1637-this-is-the-place-means-the-cell';
+// ⚠⚠⚠ OTA-1638 — THE STAR GOES LAST, AND THE KEY IS ON THE ABOUT SCREEN. Owner:
+// "put this glyph key in the About screen and explain the discovery star" …
+// "put the discovery star all the way to the right" … "why the weird black
+// boxes around the glyphs". `🔥☣ launcher ✦ ★`; the em space before the base
+// glyph now sits outside the dark cell; a WEAPON GLYPHS card on the About tab
+// reads the live tables and explains the star.
+export const OTA_BUILD_ID = '2026-09-03-1638-the-star-goes-last';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-03-1637-this-is-the-place-means-the-cell';
 // golem catch-up 2026-09-03: markerless publish of OTA-1637 - one cell test for
 // the arrival line, the trace, the card, the arm and the verb matchers; off the
 // cell every reader says how far and which way. hal took the marker.
