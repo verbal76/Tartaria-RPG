@@ -26982,6 +26982,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // snapshot printed AC only for fused pieces). Dog-gear preview, the two readers
 // wired (bite STR, nose INT, hit-reflect), and the snapshot carries stat lines.
 export const OTA_BUILD_ID = '2026-09-03-1640-the-vest-says-what-it-does';
+// golem catch-up 2026-09-03: markerless publish of OTA-1640 - dog-gear preview,
+// vest STR/INT/bite-back wired, snapshot stat lines. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-03-1639-every-ingredient-exists';
 // golem catch-up 2026-09-03: markerless publish of OTA-1639 - Leech Mucus gets
 // its catalog row; ota1639 keeps the recipe-ingredient audit. hal took the marker.
