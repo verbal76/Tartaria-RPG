@@ -26997,6 +26997,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // carries 'loot' so the Crucible keeps its fodder (OTA-737); ota1642 keeps the
 // audit: no enemy loot name may be synthesised at pickup again.
 export const OTA_BUILD_ID = '2026-09-03-1642-every-drop-has-a-name-in-the-book';
+// golem catch-up 2026-09-03: markerless publish of OTA-1642 - the 98 enemy loot
+// names authored (86 materials, 4 weapons, 4 armours, Crab Meat), loot by
+// identity keeps the Crucible fed, ota1642 keeps the audit. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-03-1641-a-weapon-is-named-like-a-weapon';
 // golem catch-up 2026-09-03: markerless publish of OTA-1641 - the 56 rune-casters
 // named as Wand / Rod / Stave / Scepter, check:weaponnames the 18th gate, every
