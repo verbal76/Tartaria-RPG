@@ -27012,6 +27012,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // 73 weapons, doubling every rune-caster's base dice and reading the shields'
 // defensive numbers as attack riders.
 export const OTA_BUILD_ID = '2026-09-03-1643-the-dice-riders-pay';
+// golem catch-up 2026-09-03: markerless publish of OTA-1643 - the 30 unread
+// "+N"/"+NdN" damage promises now pay (flatRider on every hit, riderDot when the
+// card names a span), 4 conditions backed by real enemies, 3 impossible cards
+// reworded. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-03-1642-every-drop-has-a-name-in-the-book';
 // golem catch-up 2026-09-03: markerless publish of OTA-1642 - the 98 enemy loot
 // names authored (86 materials, 4 weapons, 4 armours, Crab Meat), loot by
