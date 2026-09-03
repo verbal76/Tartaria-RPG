@@ -1,0 +1,1006 @@
+{
+ "Aether Acid": {
+  "enemies": [
+   [
+    "Aetheric Worm",
+    "Common",
+    "Aetheric Mutation",
+    false
+   ]
+  ]
+ },
+ "Aether Axe": {
+  "enemies": [
+   [
+    "Aetheric Minotaur",
+    "Legendary",
+    "Aetheric Mutation",
+    false
+   ]
+  ]
+ },
+ "Aether Engine": {
+  "enemies": [
+   [
+    "Steam Walker",
+    "Rare",
+    "Mechanism",
+    false
+   ]
+  ]
+ },
+ "Aether Fang": {
+  "enemies": [
+   [
+    "Mud Hound Alpha",
+    "Uncommon",
+    "Animal",
+    false
+   ]
+  ]
+ },
+ "Aether Feather": {
+  "enemies": [
+   [
+    "Aetheric Shrike",
+    "Uncommon",
+    "Aetheric Creature",
+    false
+   ]
+  ]
+ },
+ "Aether Fur": {
+  "enemies": [
+   [
+    "Aetheric Beast",
+    "Rare",
+    "Aetheric Creature",
+    false
+   ]
+  ]
+ },
+ "Aether Gem": {
+  "enemies": [
+   [
+    "Aetheric Scarab",
+    "Uncommon",
+    "Aetheric Creature",
+    false
+   ]
+  ]
+ },
+ "Aether Poison": {
+  "enemies": [
+   [
+    "Jade Serpent",
+    "Rare",
+    "Aetheric Mutation",
+    false
+   ]
+  ]
+ },
+ "Aether Skull": {
+  "enemies": [
+   [
+    "Mud Lich",
+    "Legendary",
+    "Mud Creature",
+    false
+   ]
+  ]
+ },
+ "Aether Veil": {
+  "enemies": [
+   [
+    "Shifting Phantom",
+    "Rare",
+    "Aetheric Mutation",
+    false
+   ]
+  ]
+ },
+ "Aether Venom": {
+  "enemies": [
+   [
+    "Aetheric Spider",
+    "Common",
+    "Aetheric Creature",
+    false
+   ]
+  ]
+ },
+ "Aetheric Alloy": {
+  "enemies": [
+   [
+    "Metal Hydra",
+    "Legendary",
+    "Automation",
+    false
+   ]
+  ]
+ },
+ "Aetheric Battery": {
+  "enemies": [
+   [
+    "Storm Walker",
+    "Legendary",
+    "Mechanism",
+    false
+   ]
+  ]
+ },
+ "Aetheric Blood": {
+  "enemies": [
+   [
+    "Aetheric Leech",
+    "Common",
+    "Aetheric Mutation",
+    false
+   ]
+  ]
+ },
+ "Aetheric Breath": {
+  "enemies": [
+   [
+    "Bog Dragon",
+    "Legendary",
+    "Aetheric Creature",
+    false
+   ]
+  ]
+ },
+ "Aetheric Cog": {
+  "enemies": [
+   [
+    "Scrap Drone",
+    "Common",
+    "Automation",
+    false
+   ]
+  ]
+ },
+ "Aetheric Crystal": {
+  "enemies": [
+   [
+    "Aetheric Cyclops",
+    "Rare",
+    "Aetheric Mutation",
+    false
+   ]
+  ]
+ },
+ "Aetheric Fragment": {
+  "enemies": [
+   [
+    "Aetheric Ghost",
+    "Rare",
+    "Aetheric Creature",
+    false
+   ]
+  ]
+ },
+ "Aetheric Hair": {
+  "enemies": [
+   [
+    "Aetheric Banshee",
+    "Rare",
+    "Aetheric Creature",
+    false
+   ]
+  ]
+ },
+ "Aetheric Key": {
+  "enemies": [
+   [
+    "Stone Warden",
+    "Rare",
+    "Mechanism",
+    false
+   ]
+  ]
+ },
+ "Aetheric Moss": {
+  "enemies": [
+   [
+    "Bog Creeper",
+    "Uncommon",
+    "Mud Creature",
+    false
+   ]
+  ]
+ },
+ "Aetheric Mud Fragment": {
+  "enemies": [
+   [
+    "Mud Lurker",
+    "Uncommon",
+    "Mud Creature",
+    false
+   ]
+  ]
+ },
+ "Aetheric Residue": {
+  "enemies": [
+   [
+    "Aetheric Slug",
+    "Common",
+    "Aetheric Mutation",
+    false
+   ]
+  ]
+ },
+ "Aetheric Scroll": {
+  "enemies": [
+   [
+    "Aetheric Necromancer",
+    "Legendary",
+    "Aetheric Mutation",
+    false
+   ]
+  ]
+ },
+ "Aetheric Slime": {
+  "enemies": [
+   [
+    "Silt Horror",
+    "Rare",
+    "Mud Creature",
+    false
+   ]
+  ]
+ },
+ "Aetheric Teeth": {
+  "enemies": [
+   [
+    "Bog Hound",
+    "Common",
+    "Animal",
+    false
+   ]
+  ]
+ },
+ "Aetheric Thread": {
+  "enemies": [
+   [
+    "Flesh Weaver",
+    "Rare",
+    "Aetheric Mutation",
+    false
+   ]
+  ]
+ },
+ "Aetherstone Fragment": {
+  "enemies": [
+   [
+    "Aetherkin",
+    "Rare",
+    "Aetheric Undead",
+    false
+   ],
+   [
+    "Drowned Aetherkin",
+    "Common",
+    "Aetheric Undead",
+    false
+   ],
+   [
+    "Mud-Wracked Aetherkin",
+    "Uncommon",
+    "Aetheric Undead",
+    false
+   ]
+  ]
+ },
+ "Aetherwing": {
+  "enemies": [
+   [
+    "Aetherbat",
+    "Common",
+    "Aetheric Creature",
+    false
+   ]
+  ]
+ },
+ "Alpha Fur": {
+  "enemies": [
+   [
+    "Mud Hound Alpha",
+    "Uncommon",
+    "Animal",
+    false
+   ]
+  ]
+ },
+ "Ancient Relic": {
+  "enemies": [
+   [
+    "Aether Golem",
+    "Legendary",
+    "Aetheric Creature",
+    false
+   ]
+  ]
+ },
+ "Banshee Wail": {
+  "enemies": [
+   [
+    "Aetheric Banshee",
+    "Rare",
+    "Aetheric Creature",
+    false
+   ]
+  ]
+ },
+ "Basilisk Eye": {
+  "enemies": [
+   [
+    "Rock Basilisk",
+    "Rare",
+    "Mud Creature",
+    false
+   ]
+  ]
+ },
+ "Behemoth Horn": {
+  "enemies": [
+   [
+    "Sludge Behemoth",
+    "Legendary",
+    "Mud Creature",
+    false
+   ]
+  ]
+ },
+ "Boar Hide": {
+  "enemies": [
+   [
+    "Mud Boar",
+    "Common",
+    "Animal",
+    false
+   ]
+  ]
+ },
+ "Chimera Claw": {
+  "enemies": [
+   [
+    "Aetheric Chimera",
+    "Legendary",
+    "Aetheric Mutation",
+    false
+   ]
+  ]
+ },
+ "Chimera Horn": {
+  "enemies": [
+   [
+    "Stone Chimera",
+    "Legendary",
+    "Mud Creature",
+    false
+   ]
+  ]
+ },
+ "Crab Meat": {
+  "enemies": [
+   [
+    "Swamp Crab",
+    "Common",
+    "Animal",
+    false
+   ]
+  ]
+ },
+ "Creeper Vine": {
+  "enemies": [
+   [
+    "Bog Creeper",
+    "Uncommon",
+    "Mud Creature",
+    false
+   ]
+  ]
+ },
+ "Crystalline Echo": {
+  "enemies": [
+   [
+    "Aetherbat",
+    "Common",
+    "Aetheric Creature",
+    false
+   ]
+  ]
+ },
+ "Cyclops Eye": {
+  "enemies": [
+   [
+    "Mud Cyclops",
+    "Rare",
+    "Mud Creature",
+    false
+   ],
+   [
+    "Aetheric Cyclops",
+    "Rare",
+    "Aetheric Mutation",
+    false
+   ]
+  ]
+ },
+ "Drone Processor": {
+  "enemies": [
+   [
+    "Scrap Drone",
+    "Common",
+    "Automation",
+    false
+   ]
+  ]
+ },
+ "Fire Essence": {
+  "enemies": [
+   [
+    "Aetheric Salamander",
+    "Uncommon",
+    "Aetheric Creature",
+    false
+   ]
+  ]
+ },
+ "Flesh Shard": {
+  "enemies": [
+   [
+    "Flesh Weaver",
+    "Rare",
+    "Aetheric Mutation",
+    false
+   ]
+  ]
+ },
+ "Fragmented Aether": {
+  "enemies": [
+   [
+    "Aetheric Hound",
+    "Rare",
+    "Aetheric Mutation",
+    false
+   ]
+  ]
+ },
+ "Gargoyle Wing": {
+  "enemies": [
+   [
+    "Aetheric Gargoyle",
+    "Rare",
+    "Aetheric Mutation",
+    false
+   ]
+  ]
+ },
+ "Gear Box": {
+  "enemies": [
+   [
+    "Steel Hound",
+    "Rare",
+    "Automation",
+    false
+   ]
+  ]
+ },
+ "Gears": {
+  "enemies": [
+   [
+    "Steam Walker",
+    "Rare",
+    "Mechanism",
+    false
+   ]
+  ]
+ },
+ "Ghostly Remnant": {
+  "enemies": [
+   [
+    "Aetheric Apparition",
+    "Rare",
+    "Aetheric Creature",
+    false
+   ]
+  ]
+ },
+ "Giant's Club": {
+  "enemies": [
+   [
+    "Mud Giant",
+    "Legendary",
+    "Mud Creature",
+    false
+   ]
+  ]
+ },
+ "Golem Armor": {
+  "enemies": [
+   [
+    "Golem Knight",
+    "Rare",
+    "Automation",
+    false
+   ]
+  ]
+ },
+ "Golem Fragment": {
+  "enemies": [
+   [
+    "Steam Golem",
+    "Rare",
+    "Automation",
+    false
+   ]
+  ]
+ },
+ "Guardian Key": {
+  "enemies": [
+   [
+    "Silt Guardian",
+    "Rare",
+    "Mud Creature",
+    false
+   ]
+  ]
+ },
+ "Hardened Aether Mud": {
+  "enemies": [
+   [
+    "Mud Elemental",
+    "Legendary",
+    "Mud Creature",
+    false
+   ]
+  ]
+ },
+ "Horror Tendril": {
+  "enemies": [
+   [
+    "Silt Horror",
+    "Rare",
+    "Mud Creature",
+    false
+   ],
+   [
+    "Aetheric Horror",
+    "Legendary",
+    "Aetheric Mutation",
+    false
+   ]
+  ]
+ },
+ "Hound Fur": {
+  "enemies": [
+   [
+    "Bog Hound",
+    "Common",
+    "Animal",
+    false
+   ]
+  ]
+ },
+ "Hound Processor": {
+  "enemies": [
+   [
+    "Steel Hound",
+    "Rare",
+    "Automation",
+    false
+   ]
+  ]
+ },
+ "Imp Horn": {
+  "enemies": [
+   [
+    "Mud Imp",
+    "Common",
+    "Mud Creature",
+    false
+   ]
+  ]
+ },
+ "Knight Armor": {
+  "enemies": [
+   [
+    "Clockwork Knight",
+    "Rare",
+    "Automation",
+    false
+   ]
+  ]
+ },
+ "Lich Robe": {
+  "enemies": [
+   [
+    "Mud Lich",
+    "Legendary",
+    "Mud Creature",
+    false
+   ]
+  ]
+ },
+ "Lion Mane": {
+  "enemies": [
+   [
+    "Aetheric Lion",
+    "Rare",
+    "Aetheric Creature",
+    false
+   ]
+  ]
+ },
+ "Minor Relic": {
+  "enemies": [
+   [
+    "Mudling",
+    "Common",
+    "Mud Creature",
+    false
+   ]
+  ]
+ },
+ "Minotaur Horn": {
+  "enemies": [
+   [
+    "Aetheric Minotaur",
+    "Legendary",
+    "Aetheric Mutation",
+    false
+   ]
+  ]
+ },
+ "Monarch Crown": {
+  "enemies": [
+   [
+    "Mud Monarch",
+    "Legendary",
+    "Aetheric Mutation",
+    false
+   ]
+  ]
+ },
+ "Moth Wing": {
+  "enemies": [
+   [
+    "Plague Moth",
+    "Uncommon",
+    "Animal",
+    false
+   ]
+  ]
+ },
+ "Mud Poison": {
+  "enemies": [
+   [
+    "Mud Spider",
+    "Common",
+    "Mud Creature",
+    false
+   ]
+  ]
+ },
+ "Mud Relic": {
+  "enemies": [
+   [
+    "Mud Demon",
+    "Legendary",
+    "Mud Creature",
+    false
+   ]
+  ]
+ },
+ "Mud Remains": {
+  "enemies": [
+   [
+    "Mud Wraith",
+    "Rare",
+    "Mud Creature",
+    false
+   ]
+  ]
+ },
+ "Necromancer Staff": {
+  "enemies": [
+   [
+    "Aetheric Necromancer",
+    "Legendary",
+    "Aetheric Mutation",
+    false
+   ]
+  ]
+ },
+ "Obsidian Shard": {
+  "enemies": [
+   [
+    "Obsidian Sentinel",
+    "Legendary",
+    "Mechanism",
+    false
+   ]
+  ]
+ },
+ "Ogre Club": {
+  "enemies": [
+   [
+    "Mud Ogre",
+    "Rare",
+    "Mud Creature",
+    false
+   ]
+  ]
+ },
+ "Ooze Residue": {
+  "enemies": [
+   [
+    "Aetheric Ooze",
+    "Common",
+    "Aetheric Mutation",
+    false
+   ]
+  ]
+ },
+ "Poison Dust": {
+  "enemies": [
+   [
+    "Plague Moth",
+    "Uncommon",
+    "Animal",
+    false
+   ]
+  ]
+ },
+ "Raven Feather": {
+  "enemies": [
+   [
+    "Aetheric Raven",
+    "Common",
+    "Aetheric Creature",
+    false
+   ]
+  ]
+ },
+ "Relic Key": {
+  "enemies": [
+   [
+    "Mud Lurker",
+    "Uncommon",
+    "Mud Creature",
+    false
+   ]
+  ]
+ },
+ "Relic Shard": {
+  "enemies": [
+   [
+    "Architectural Sentinel",
+    "Legendary",
+    "Automation",
+    false
+   ]
+  ]
+ },
+ "Rusted Parts": {
+  "enemies": [
+   [
+    "Rust Lurker",
+    "Uncommon",
+    "Automation",
+    false
+   ]
+  ]
+ },
+ "Salamander Scale": {
+  "enemies": [
+   [
+    "Aetheric Salamander",
+    "Uncommon",
+    "Aetheric Creature",
+    false
+   ]
+  ]
+ },
+ "Scarab Shell": {
+  "enemies": [
+   [
+    "Aetheric Scarab",
+    "Uncommon",
+    "Aetheric Creature",
+    false
+   ]
+  ]
+ },
+ "Sentinel Gears": {
+  "enemies": [
+   [
+    "Mech Sentinel",
+    "Legendary",
+    "Automation",
+    false
+   ]
+  ]
+ },
+ "Serpent Coil": {
+  "enemies": [
+   [
+    "Aether Serpent",
+    "Rare",
+    "Aetheric Mutation",
+    false
+   ]
+  ]
+ },
+ "Serpent Gear": {
+  "enemies": [
+   [
+    "Clockwork Serpent",
+    "Rare",
+    "Automation",
+    false
+   ]
+  ]
+ },
+ "Shrike Claw": {
+  "enemies": [
+   [
+    "Aetheric Shrike",
+    "Uncommon",
+    "Aetheric Creature",
+    false
+   ]
+  ]
+ },
+ "Silt Core": {
+  "enemies": [
+   [
+    "Silt Stalker",
+    "Uncommon",
+    "Mud Creature",
+    false
+   ]
+  ]
+ },
+ "Slug Slime": {
+  "enemies": [
+   [
+    "Aetheric Slug",
+    "Common",
+    "Aetheric Mutation",
+    false
+   ]
+  ]
+ },
+ "Spider Legs": {
+  "enemies": [
+   [
+    "Steam Spider",
+    "Rare",
+    "Automation",
+    false
+   ]
+  ]
+ },
+ "Spirit Cloth": {
+  "enemies": [
+   [
+    "Aetheric Ghost",
+    "Rare",
+    "Aetheric Creature",
+    false
+   ]
+  ]
+ },
+ "Spirit Residue": {
+  "enemies": [
+   [
+    "Mud Spirit",
+    "Uncommon",
+    "Mud Creature",
+    false
+   ]
+  ]
+ },
+ "Stalker Hide": {
+  "enemies": [
+   [
+    "Silt Stalker",
+    "Uncommon",
+    "Mud Creature",
+    false
+   ]
+  ]
+ },
+ "Stone Fragment": {
+  "enemies": [
+   [
+    "Rock Basilisk",
+    "Rare",
+    "Mud Creature",
+    false
+   ]
+  ]
+ },
+ "Strider Leg": {
+  "enemies": [
+   [
+    "Mud Strider",
+    "Common",
+    "Mud Creature",
+    false
+   ]
+  ]
+ },
+ "Swamp Shell": {
+  "enemies": [
+   [
+    "Swamp Crab",
+    "Common",
+    "Animal",
+    false
+   ]
+  ]
+ },
+ "Titan Armor": {
+  "enemies": [
+   [
+    "Iron Titan",
+    "Legendary",
+    "Automation",
+    false
+   ]
+  ]
+ },
+ "Tornado Core": {
+  "enemies": [
+   [
+    "Dust Fiend",
+    "Uncommon",
+    "Aetheric Creature",
+    false
+   ]
+  ]
+ },
+ "Tortoise Shell": {
+  "enemies": [
+   [
+    "Mud Tortoise",
+    "Common",
+    "Mud Creature",
+    false
+   ]
+  ]
+ },
+ "Warden Stone": {
+  "enemies": [
+   [
+    "Stone Warden",
+    "Rare",
+    "Mechanism",
+    false
+   ]
+  ]
+ },
+ "Wasp Venom": {
+  "enemies": [
+   [
+    "Mud Wasp",
+    "Common",
+    "Animal",
+    false
+   ]
+  ]
+ },
+ "Worm Mucus": {
+  "enemies": [
+   [
+    "Aetheric Worm",
+    "Common",
+    "Aetheric Mutation",
+    false
+   ]
+  ]
+ }
+}

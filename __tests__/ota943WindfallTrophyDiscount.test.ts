@@ -39,7 +39,7 @@ describe('OTA-943 — no sub-Legendary enemy drops a Legendary material (windfal
 describe('OTA-943 — trophy sell discount (half a real material of the same rarity)', () => {
   it('a Legendary trophy sells for half of a plain Legendary misc', () => {
     const plain = sellPriceFor(mk({ name: 'Plain Part' }), null);
-    const trophy = sellPriceFor(mk({ name: 'Horror Tendril', tags: ['trophy'] }), null);
+    const trophy = sellPriceFor(mk({ name: 'Unknown Tendril', tags: ['trophy'] }), null); // OTA-1642: Horror Tendril is an authored Rare material now
     expect(trophy).toBeLessThan(plain);
     expect(trophy).toBeGreaterThanOrEqual(Math.floor(plain / 2) - 1);
     expect(trophy).toBeLessThanOrEqual(Math.ceil(plain / 2) + 1);

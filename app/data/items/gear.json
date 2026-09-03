@@ -1349,6 +1349,22 @@
         "total": 5
       },
       "description": "One of five giant-drawn maps to the Aether-collector towers — the sky-antennas of the grid that drowned the world. This one plots the route to the Great Fang of Zharak and opens its great climb. Use it from your pack to fix the way and unlock the ascent (5 of 5). Four more maps are out there, sold by roadside traders who don't know what they're holding."
+    },
+    {
+      "name": "Crab Meat",
+      "kind": "consumable",
+      "rarity": "Common",
+      "tags": [
+        "food",
+        "meat",
+        "foraged"
+      ],
+      "effect": {
+        "kind": "consumable",
+        "healHP": 4,
+        "restoreStamina": 2
+      },
+      "description": "Crab Meat. Swamp crab, cracked out of the shell. Sweet if you cook it, survivable if you don't. +4 HP, +2 stamina."
     }
   ]
 }

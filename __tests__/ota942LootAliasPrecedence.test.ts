@@ -17,7 +17,9 @@ describe('OTA-942 — exact catalog names always win over pickup aliases', () =>
     const r = resolveLootItem('Obsidian Shard', 'Legendary' as never);
     expect(r.name).toBe('Obsidian Shard');
     expect(r.rarity).toBe('Legendary');
-    expect(r.tags).toEqual(['trophy']);
+    // OTA-1642 — Obsidian Shard is an authored Legendary material now, not a synthesised trophy.
+    expect(r.tags).not.toContain('trophy');
+    expect(r.tags).toContain('stone');
   });
 
   it('the loot-name synonym list still heals the provable splits', () => {

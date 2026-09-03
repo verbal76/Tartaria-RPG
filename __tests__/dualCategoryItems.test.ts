@@ -23,7 +23,7 @@ describe('dual-category items (weapon + material)', () => {
   });
 
   it('a plain catalog weapon name is weapon-only', () => {
-    expect(categoriesForItem(mk('Shrike Claw', []))).toEqual(['weapon']);
+    expect(categoriesForItem(mk('Bone Knife', []))).toEqual(['weapon']); // OTA-1642: Shrike Claw is an authored material now
   });
 
   it('grouping lists the SAME item object (same id + quantity) in both sections — not double the count', () => {

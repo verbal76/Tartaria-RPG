@@ -6370,6 +6370,97 @@
       ],
       "effect": "2d10 radiation; the decay keeps going long after the pulse ends.",
       "description": "Half-Life Pulse. Whatever powers it has been dying for ten thousand years and is not finished. Neither is what it points at."
+    },
+    {
+      "name": "Aether Axe",
+      "weaponKind": "melee",
+      "damageType": "aetheric",
+      "damageDice": "2d8",
+      "stat": "strength",
+      "statRequirement": 6,
+      "rarity": "Legendary",
+      "style": "two_handed",
+      "tc": 420,
+      "defense": 2,
+      "baseDurability": 40,
+      "tags": [
+        "weapon",
+        "melee",
+        "two_handed",
+        "axe",
+        "aetheric",
+        "loot",
+        "legendary"
+      ],
+      "description": "Aether Axe. The minotaur's own weapon, a head of aetherstone on a haft of black horn. It swings itself a little, once you let it."
+    },
+    {
+      "name": "Giant's Club",
+      "weaponKind": "melee",
+      "damageType": "bludgeoning",
+      "damageDice": "2d10",
+      "stat": "strength",
+      "statRequirement": 7,
+      "rarity": "Legendary",
+      "style": "two_handed",
+      "tc": 360,
+      "defense": 3,
+      "baseDurability": 45,
+      "tags": [
+        "weapon",
+        "melee",
+        "two_handed",
+        "club",
+        "giants",
+        "loot",
+        "legendary"
+      ],
+      "description": "Giant's Club. A whole young tree, bark still on, worn smooth where a Mud Giant held it. Two hands, and a wide stance."
+    },
+    {
+      "name": "Ogre Club",
+      "weaponKind": "melee",
+      "damageType": "bludgeoning",
+      "damageDice": "2d6",
+      "stat": "strength",
+      "statRequirement": 5,
+      "rarity": "Rare",
+      "style": "two_handed",
+      "tc": 140,
+      "defense": 2,
+      "baseDurability": 30,
+      "tags": [
+        "weapon",
+        "melee",
+        "two_handed",
+        "club",
+        "loot"
+      ],
+      "description": "Ogre Club. Knotted bog-oak studded with whatever the ogre found sharp. Ugly, heavy, and it works."
+    },
+    {
+      "name": "Necromancer Staff",
+      "weaponKind": "runecaster",
+      "damageType": "aetheric",
+      "damageDice": "2d8",
+      "stat": "intelligence",
+      "statRequirement": 6,
+      "rarity": "Legendary",
+      "style": "runecaster",
+      "tc": 400,
+      "defense": 1,
+      "baseDurability": 36,
+      "tags": [
+        "weapon",
+        "runecaster",
+        "rune_power",
+        "aetheric",
+        "unmaking",
+        "loot",
+        "legendary"
+      ],
+      "effect": "2d8 aetheric; the struck target bleeds 1 corruption a round for 3 rounds.",
+      "description": "Necromancer Staff. A length of lich-bone capped with a skull that is not quite empty. A power weapon: it casts what it remembers."
     }
   ]
 }

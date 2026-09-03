@@ -9893,6 +9893,105 @@
         "collect_only"
       ],
       "description": "Skyreacher Gauntlets. Storm-proof grips jammed into the summit cleft of the Great Fang of Zharak, the hands of the Skyreacher set. Cannot be forged or bought."
+    },
+    {
+      "name": "Titan Armor",
+      "slot": "chest",
+      "acBonus": 5,
+      "resistances": [
+        "bludgeoning"
+      ],
+      "rarity": "Legendary",
+      "dexReq": 3,
+      "tcBuy": 500,
+      "tcSell": 180,
+      "baseDurability": 60,
+      "tags": [
+        "armor",
+        "chest",
+        "plate",
+        "automation",
+        "loot",
+        "legendary"
+      ],
+      "description": "Titan Armor. An Iron Titan's chest-plating, cut down to fit a body a tenth its size. Nothing blunt gets through it; nothing quick gets out of it."
+    },
+    {
+      "name": "Knight Armor",
+      "slot": "chest",
+      "acBonus": 4,
+      "resistances": [
+        "slashing"
+      ],
+      "rarity": "Rare",
+      "dexReq": 2,
+      "tcBuy": 220,
+      "tcSell": 80,
+      "baseDurability": 48,
+      "tags": [
+        "armor",
+        "chest",
+        "plate",
+        "automation",
+        "loot"
+      ],
+      "description": "Knight Armor. Clockwork knight's plate, fluted and oiled, with the mainspring housing hammered flat. Turns an edge."
+    },
+    {
+      "name": "Golem Armor",
+      "slot": "chest",
+      "acBonus": 4,
+      "resistances": [
+        "bludgeoning"
+      ],
+      "rarity": "Rare",
+      "dexReq": 3,
+      "tcBuy": 210,
+      "tcSell": 75,
+      "baseDurability": 52,
+      "tags": [
+        "armor",
+        "chest",
+        "plate",
+        "automation",
+        "stone",
+        "loot"
+      ],
+      "description": "Golem Armor. Golem Knight plating, stone over iron, still warm from the furnace that drove it. Heavy as a wall."
+    },
+    {
+      "name": "Lich Robe",
+      "slot": "cloak",
+      "acBonus": 2,
+      "resistances": [
+        "aetheric",
+        "cold"
+      ],
+      "rarity": "Legendary",
+      "dexReq": 1,
+      "statBonus": {
+        "stat": "intelligence",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "intelligence",
+          "amount": 1
+        }
+      ],
+      "tcBuy": 380,
+      "tcSell": 140,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "cloak",
+        "outer",
+        "cloth",
+        "aether",
+        "loot",
+        "legendary"
+      ],
+      "description": "Lich Robe. The Mud Lich's vestment, grave-cold and threaded with something that glows when you think. Sharpens the mind; chills the rest."
     }
   ]
 }

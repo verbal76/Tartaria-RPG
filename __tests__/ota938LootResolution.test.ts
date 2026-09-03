@@ -30,7 +30,7 @@ describe('OTA-938 resolveLootItem', () => {
   });
 
   it("an unknown trophy prices at the ENEMY'S rarity, tagged 'trophy'", () => {
-    const r = resolveLootItem('Aether Fang', 'Legendary' as never);
+    const r = resolveLootItem('Totally Unknown Fang', 'Legendary' as never); // OTA-1642: Aether Fang is authored now
     expect(r.rarity).toBe('Legendary');
     expect(r.tags).toEqual(['trophy']);
     expect(r.kind).toBe('misc');

@@ -247,7 +247,13 @@ export function visibleFusionInputs(
 const FORGE_LOOT_BLOCK_TAGS = /throwable|keepsake|quest|sigil|currency|relic/i;
 export function isForgeableLootReagent(item: { name: string; kind?: string; tags?: readonly string[] }): boolean {
   const tags = (item.tags ?? []).map((t) => t.toLowerCase());
-  if (!tags.includes('loot')) return false;
+  // ⚠ OTA-1642 — an AUTHORED loot row is loot BY IDENTITY. The 86 enemy-drop
+  // materials authored that OTA carry `loot` in their catalog tags, because the
+  // whole point of authoring them was to keep them fodder; a copy that reached
+  // the pack without the drop path's provenance stamp (a gift, a quest grant, an
+  // old save) must not fall out of the Crucible for it. The instance stamp still
+  // opts in a copy of any row; the catalog tag opts in the row.
+  if (!tags.includes('loot') && !canonicalItemTags(item).includes('loot')) return false;
   if (FUSION_EQUIP_KINDS.includes(item.kind ?? '')) return false;
   // OTA-999 — the BLOCKLISTS read canonical tags: a stale sigil/vial/quest core
   // read as reservable junk and applyFusion CONSUMED it. ('loot' above stays

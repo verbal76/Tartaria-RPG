@@ -39,7 +39,8 @@ describe('Diagnostic — isInferredItem on catalog items', () => {
   });
 
   it('isInferredItem("Tortoise Shell") returns true (NOT in catalog)', () => {
-    expect(isInferredItem('Tortoise Shell')).toBe(true);
+    expect(isInferredItem('Tortoise Shell')).toBe(false); // OTA-1642: authored now
+    expect(isInferredItem('Totally Unknown Thing')).toBe(true);
   });
 
   it('isInferredItem("Aetheric Shard") returns false (in MATERIALS via container_loot)', () => {

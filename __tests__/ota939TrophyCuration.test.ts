@@ -42,7 +42,7 @@ describe('OTA-939 — provable synonym aliases', () => {
   });
 
   it('a merely word-sharing name still (correctly) stays a trophy', () => {
-    const r = resolveLootItem('Aether Fang', 'Uncommon' as never);
+    const r = resolveLootItem('Totally Unknown Fang', 'Uncommon' as never); // OTA-1642: Aether Fang is authored now
     expect(r.tags).toEqual(['trophy']);
   });
 });

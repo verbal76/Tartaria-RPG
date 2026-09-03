@@ -1560,9 +1560,9 @@ Key invariants worth knowing:
 
 ## 9. Recent OTA highlights (latest sessions)
 
-### ⚠⚠⚠ THE 2026-09-02 RUN — OTA-1617 → 1641 (read this first if you are new)
+### ⚠⚠⚠ THE 2026-09-02 RUN — OTA-1617 → 1642 (read this first if you are new)
 
-Latest golem-line stamp: **`2026-09-03-1641-a-weapon-is-named-like-a-weapon`**
+Latest golem-line stamp: **`2026-09-03-1642-every-drop-has-a-name-in-the-book`**
 (`app/buildInfo.ts`). Both channels ship from this branch — a `[ota-hal]` marker
 in the commit TITLE publishes the HAL set, a markerless follow-up commit
 publishes golem; see §6.
@@ -1866,6 +1866,19 @@ what it ACCEPTS, and a data walker skips the saying.
   (OTA-15xx) is gone — the weapon is "Aetheric Armor Stave". 15 suites
   repointed; ota1641 pins the gate, the tiers, the migration and the recipes.
   ⚠ Add `check:weaponnames` to any gate list you keep: it is 18 now.
+- **OTA-1642 every drop has a name in the book.** Owner, on the OTA-1639 side
+  finding: *"author them."* The 98 enemy loot names with no catalog row are
+  authored: 3 were already alias-healed (Aetherwing / Aetheric Residue /
+  Aetheric Crystal → the Aether- rows, OTA-938/939) and stay so; 86 new
+  `materials.json` rows (rarity from the dropping enemy, honest
+  material tags, every one stamped `loot` so the OTA-737 Crucible door stays
+  open — cataloged 'loot' reagents that feed no recipe are still fodder), 4
+  weapons (Aether Axe, Giant's Club, Ogre Club, Necromancer Staff — all pass
+  check:weaponnames), 4 armours (Titan / Knight / Golem Armor, Lich Robe),
+  Crab Meat as a `gear.json` food. Aetheric Moss is a material now, not an
+  inferred fungus snack. `inferGear` no longer fires for any enemy drop;
+  ota1642 keeps the audit (every enemy loot name resolves to a catalog row)
+  and pins the Crucible door on a dropped instance. Snapshot refreshed.
 
 ✓ **One position vocabulary now (OTA-1637).** The doors, the arrival line, the
 trace, the card, the conversation arm and the verb matchers all run

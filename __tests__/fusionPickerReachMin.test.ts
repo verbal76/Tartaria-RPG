@@ -22,7 +22,7 @@ const pool: InventoryItem[] = [
   mk('Aetheric Cog', ['loot', 'improvised', 'aether', 'metal'], 2),
   mk('Aetheric Residue', ['loot', 'improvised', 'aether']),
   mk('Aetheric Teeth', ['loot', 'improvised', 'aether', 'organic']),
-  mk('Crab Meat', ['loot', 'organic']),
+  // OTA-1642 — Crab Meat is authored FOOD now (edible → never fodder); it left the pool.
   mk('Hound Fur', ['loot', 'organic']),
   mk('Imp Horn', ['loot', 'organic']),
   mk('Leech Mucus', ['loot', 'organic']),
@@ -40,7 +40,7 @@ describe('fusion picker reachability (OTA-682)', () => {
   it('greedy 2-pick that saturates all materials still leaves a selectable filler', () => {
     const scraps = eligibleInputs(pool);
     // Cog (metal+improvised+aether) + one organic = all 4 materials in 2 picks.
-    const picked = ['Aetheric Cog', 'Crab Meat'];
+    const picked = ['Aetheric Cog', 'Swamp Shell' /* OTA-1642: was Crab Meat */];
     const visible = visibleFusionInputs(scraps, picked, MIN_PICK);
     const selectable = visible.filter((it) => !picked.includes(it.id));
     // Pre-fix this was 0 → hard deadlock. Now at least one filler is revealed.
@@ -51,7 +51,7 @@ describe('fusion picker reachability (OTA-682)', () => {
 
   it('a completed 3-pick spans >= 3 materials, so the confirm gate passes', () => {
     const scraps = eligibleInputs(pool);
-    const picked = ['Aetheric Cog', 'Crab Meat'];
+    const picked = ['Aetheric Cog', 'Swamp Shell' /* OTA-1642: was Crab Meat */];
     const filler = visibleFusionInputs(scraps, picked, MIN_PICK).find((it) => !picked.includes(it.id))!;
     const finalPick = [...picked, filler.id];
     const chosen = scraps.filter((s) => finalPick.includes(s.id));
@@ -61,7 +61,7 @@ describe('fusion picker reachability (OTA-682)', () => {
 
   it('still declutters in the normal case — one organic pick hides pure-organic dupes', () => {
     const scraps = eligibleInputs(pool);
-    const visible = visibleFusionInputs(scraps, ['Crab Meat'], MIN_PICK);
+    const visible = visibleFusionInputs(scraps, ['Swamp Shell' /* OTA-1642: was Crab Meat */], MIN_PICK);
     // Fresh material-adding items remain (the Cog, aether/improvised pieces), so no
     // filler is force-revealed; the redundant pure-organic dupes are hidden.
     expect(visible.some((it) => it.id === 'Hound Fur')).toBe(false);

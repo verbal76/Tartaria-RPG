@@ -26988,7 +26988,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // now the rune's OBJECT by rarity — Wand / Rod / Stave / Scepter — and the
 // Crown is the Scepter of Verdict. The rule is a gate (check:weaponnames, the
 // 18th) with a self-test; every retired name is a LEGACY_ITEM_RENAMES entry.
-export const OTA_BUILD_ID = '2026-09-03-1641-a-weapon-is-named-like-a-weapon';
+// ⚠⚠⚠ OTA-1642 — EVERY DROP HAS A NAME IN THE BOOK. Owner: "author them." The
+// 98 enemy loot names with no catalog row (found by the OTA-1639 audit) are
+// authored: 86 materials with rarity from the dropper and honest tags (3 more
+// were already alias-healed to Aether- rows and stay so), 4
+// weapons (Aether Axe, Giant's Club, Ogre Club, Necromancer Staff), 4 armours
+// (Titan / Knight / Golem Armor, Lich Robe), Crab Meat as food. Every material
+// carries 'loot' so the Crucible keeps its fodder (OTA-737); ota1642 keeps the
+// audit: no enemy loot name may be synthesised at pickup again.
+export const OTA_BUILD_ID = '2026-09-03-1642-every-drop-has-a-name-in-the-book';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-03-1641-a-weapon-is-named-like-a-weapon';
 // golem catch-up 2026-09-03: markerless publish of OTA-1641 - the 56 rune-casters
 // named as Wand / Rod / Stave / Scepter, check:weaponnames the 18th gate, every
 // retired name a migration. hal took the marker.
