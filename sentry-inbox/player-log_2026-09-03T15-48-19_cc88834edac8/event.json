@@ -1,0 +1,275 @@
+{
+  "id": "cc88834edac841b29ec437723d863570",
+  "groupID": "7709891197",
+  "eventID": "cc88834edac841b29ec437723d863570",
+  "projectID": "4511945117532160",
+  "size": 18015,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-03-1643-the-dice-riders-pay #mtlp91n0yrsc [inline 7/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-03-1643-the-dice-riders-pay",
+  "message": "player-log 2026-09-03-1643-the-dice-riders-pay #mtlp91n0yrsc [inline 7/28]",
+  "title": "player-log 2026-09-03-1643-the-dice-riders-pay #mtlp91n0yrsc [inline 7/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "508d083bcd634f7dabb7567a2c58f09b",
+      "span_id": "83b9818bb7c2ba30",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "lved=- range=mid enemies=5 hooks=2\n[2026-09-03T00:29:01.422Z] [world] You commit to the dodge. Slip Conspiracy Architects Raider 2's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-03T00:29:01.423Z] [combat] Conspiracy Architects Raider 1 smokes \u2014 acid eats 4. (0/17 HP, 1 turn left)\n",
+      "[2026-09-03T00:29:01.423Z] [combat] Conspiracy Architects Raider 1 blackens \u2014 corruption eats 1. (0/17 HP, 1 turn left)\n[2026-09-03T00:29:01.423Z] [combat] Conspiracy Architects Raider 2 blisters \u2014 clinging fire sears 2. (9/18 HP, 2 turns left)\n[2026-09-03T00:29:01.424Z] [combat] Conspiracy Architects Raider 2 blackens \u2014 corruption eats 1. (8/18 HP, 2 turns left)\n",
+      "[2026-09-03T00:29:01.425Z] [reward] Conspiracy Architects Raider 1 defeated. You recover Aether Residue \u00d73, Burlap Vest.\n[2026-09-03T00:29:01.427Z] [reward] You strip the body: Cudgel, Reclaimer's Salvage Vest (+10 TC). The kit took the fight badly.\n[2026-09-03T00:29:01.427Z] [combat] 4 attackers remain. Conspiracy Architects Raider 2 now in your sights.\n",
+      "[2026-09-03T00:29:01.427Z] [system] Reclaimers Guild standing +1 (now 99)\n[2026-09-03T00:29:01.428Z] [reward] +8 TC pried from the dust.\n[2026-09-03T00:29:01.560Z] [combat] Conspiracy Architects Raider 3 \u2014 d20 \u2192 11 + ATK 7 = 18 vs your AC 23 \u2014 \u2717 EVADED\n[2026-09-03T00:29:01.560Z] [combat] Dodge \u2014 d20 \u2192 17 + DEX 23 = 40 vs ATK 18. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n",
+      "[2026-09-03T00:29:01.560Z] [world] You slip Conspiracy Architects Raider 3's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n[2026-09-03T00:29:01.562Z] [debug] ac-shift 23\u219226: race/base 10 + gear 20 + title 0 \u2192 trimmed 23 + status 3 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=",
+      "Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n[2026-09-03T00:29:01.562Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 7 + ATK 6 = 13 vs your AC 26 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-03T00:29:01.563Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 8 + ATK 7 = 15 vs your AC 26 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-03T00:29:01.563Z] [combat] Conspiracy Architects Raider 2 presses in behind the others, waiting for an opening.\n[2026-09-03T00:29:01.564Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-03T00:29:01.564Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T00:29:01.564Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-03T00:29:01.940Z] [cognitive] neutral  (375ms)\n[2026-09-03T00:29:03.029Z] [debug] ui: tap \"\ud83d\udd25\u2623 choir-bound launcher\"\n[2026-09-03T00:29:03.031Z] [system] evasive \u2014 harder to hit fades.\n[2026-09-03T00:29:03.063Z] [player] attack with the off-hand choir-bound launcher\n",
+      "[2026-09-03T00:29:03.063Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=mid enemies=4 hooks=2\n[2026-09-03T00:29:03.064Z] [combat] Conspiracy Architects Raider 2 blisters \u2014 clinging fire sears 2. (6/18 HP, 1 turn left)\n",
+      "[2026-09-03T00:29:03.064Z] [combat] Conspiracy Architects Raider 2 blackens \u2014 corruption eats 1. (5/18 HP, 1 turn left)\n[2026-09-03T00:29:03.065Z] [debug] attack: target=Conspiracy Architects Raider 2 range=mid reach.bands=[distant,far,mid,close] reach.label=Choir-Bound Launcher bareHand=false\n[2026-09-03T00:29:03.066Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-09-03T00:29:03.137Z] [world] Your searing corrupted choir-bound launcher comes around in an arc; Conspiracy Architects Raider 2 squares up to meet it.\n[2026-09-03T00:29:03.137Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T00:29:03.456Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 TAKE_COVER  (318ms)\n",
+      "[2026-09-03T00:29:03.818Z] [debug] persist sizes(KB): total=309 player=81 wm=140[rooms=72 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=81 scene=6\n[2026-09-03T00:29:30.716Z] [world] Conspiracy Architects Raider 2 moves first. The pressure is immediate.\n",
+      "[2026-09-03T00:29:30.721Z] [debug] ac-shift 26\u219223: race/base 10 + gear 20 + title 0 \u2192 trimmed 23 + status 0 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n",
+      "[2026-09-03T00:29:30.721Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 1 + ATK 6 = 7 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 FUMBLE\n[2026-09-03T00:29:30.723Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 19 + ATK 7 = 26 vs your AC 23 \u2014 \u2713 HIT\n[2026-09-03T00:29:30.725Z] [combat] Conspiracy Architects Raider 2 \u2014 d20 \u2192 6 + ATK 6 = 12 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-03T00:29:30.725Z] [combat] Conspiracy Architects Raider 3 presses in behind the others, waiting for an opening.\n[2026-09-03T00:29:30.726Z] [combat] You \u2014 d20 \u2192 3 + INT 13 perfect opening (2\u00d7 dice) = 16 vs Conspiracy Architects Raider 2 AC 11 \u2014 \u2713 HIT\n[2026-09-03T00:29:30.726Z] [combat] Conspiracy Architects Raider 2 shrugs off the aetheric. (resisted, \u00d70.5 for 6)\n",
+      "[2026-09-03T00:29:30.730Z] [combat] Your blow with the searing corrupted choir-bound launcher lands clean \u2014 6 damage. Conspiracy Architects Raider 2 crumples in the dust. The Aetherstone settles.\n[2026-09-03T00:29:30.730Z] [reward] Conspiracy Architects Raider 2 defeated. You recover Patched Cloth \u00d72, Architect Sigil.\n",
+      "[2026-09-03T00:29:30.732Z] [reward] You strip the body: Cudgel, Mud-Warden's Vest (+10 TC). The kit took the fight badly.\n[2026-09-03T00:29:30.732Z] [combat] 3 attackers remain. Conspiracy Architects Raider 3 now in your sights.\n[2026-09-03T00:29:30.732Z] [system] Reclaimers Guild standing +1 (now 100)\n[2026-09-03T00:29:30.733Z] [reward] +12 TC pried from the dust.\n",
+      "[2026-09-03T00:29:31.160Z] [combat] Conspiracy Architects Raider 5 deals 5 bludgeoning damage [edge of reach \u2014 halved]. You have 30 HP remaining.\n[2026-09-03T00:29:48.908Z] [debug] ui: tap \"\ud83d\udd25\u2623 choir-bound launcher\"\n[2026-09-03T00:29:48.913Z] [system] bleeding fades.\n[2026-09-03T00:29:48.965Z] [player] attack with the off-hand choir-bound launcher\n",
+      "[2026-09-03T00:29:48.965Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=mid enemies=3 hooks=2\n[2026-09-03T00:29:48.966Z] [debug] attack: target=Conspiracy Architects Raider 3 range=mid reach.bands=[distant,far,mid,close] reach.label=Choir-Bound Launcher bareHand=false\n",
+      "[2026-09-03T00:29:49.039Z] [world] You bring the searing corrupted choir-bound launcher to bear on Conspiracy Architects Raider 3.\n[2026-09-03T00:29:49.040Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T00:29:49.360Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 TAKE_COVER  (319ms)\n[2026-09-03T00:30:01.784Z] [world] You seize the initiative. Conspiracy Architects Raider 3 has no time to react.\n",
+      "[2026-09-03T00:30:01.785Z] [combat] You \u2014 d20 \u2192 10 + INT 13 = 23 vs Conspiracy Architects Raider 3 AC 11 \u2014 \u2713 HIT\n[2026-09-03T00:30:01.785Z] [combat] Conspiracy Architects Raider 3 shrugs off the aetheric. (resisted, \u00d70.5 for 10)\n[2026-09-03T00:30:01.789Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Mud Venom Blade \u2014 poison will bite where aetheric won't.\"\n",
+      "[2026-09-03T00:30:01.790Z] [combat] You crack the Conspiracy Architects Raider 3 with the Searing Corrupted Choir-Bound Launcher for 10 \u2014 the better part of their fight, gone in one blow. They crumple, out cold. (4/14 HP) Loot them before they come to.\n[2026-09-03T00:30:01.790Z] [combat] Conspiracy Architects Raider 3 is out of it. Conspiracy Architects Raider 4 now in your sights.\n",
+      "[2026-09-03T00:30:01.790Z] [combat] Searing Corrupted Choir-Bound Launcher \u2014 4 burn bites in and festers (3 turns).\n[2026-09-03T00:30:01.794Z] [combat] Searing Corrupted Choir-Bound Launcher \u2014 2 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n",
+      "[2026-09-03T00:30:01.796Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 7 + ATK 6 = 13 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-03T00:30:01.798Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 14 + ATK 7 = 21 vs your AC 23 \u2014 \u2717 MISS\n[2026-09-03T00:30:05.147Z] [debug] ui: tap \"dodge\"\n[2026-09-03T00:30:05.159Z] [player] dodge\n",
+      "[2026-09-03T00:30:05.160Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=3 hooks=2\n[2026-09-03T00:30:05.161Z] [world] You commit to the dodge. Slip Conspiracy Architects Raider 4's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-03T00:30:05.161Z] [combat] Conspiracy Architects Raider 3 blisters \u2014 clinging fire sears 4. (0/14 HP, 2 turns left)\n[2026-09-03T00:30:05.162Z] [combat] Conspiracy Architects Raider 3 blackens \u2014 corruption eats 2. (0/14 HP, 2 turns left)\n[2026-09-03T00:30:05.164Z] [reward] Conspiracy Architects Raider 3 defeated. You recover Aether Residue, Patched Cloth \u00d72.\n",
+      "[2026-09-03T00:30:05.165Z] [reward] You strip the body: Bone Knife, Mud-Warden's Vest (+6 TC). The kit took the fight badly.\n[2026-09-03T00:30:05.166Z] [combat] 2 attackers remain. Conspiracy Architects Raider 4 now in your sights.\n[2026-09-03T00:30:05.170Z] [reward] +20 TC pried from the dust.\n",
+      "[2026-09-03T00:30:05.311Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 2 + ATK 7 = 9 vs your AC 23 \u2014 \u2717 EVADED\n[2026-09-03T00:30:05.312Z] [combat] Dodge \u2014 d20 \u2192 10 + DEX 23 = 33 vs ATK 9. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n",
+      "[2026-09-03T00:30:05.312Z] [world] You slip Conspiracy Architects Raider 5's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n[2026-09-03T00:30:05.314Z] [debug] ac-shift 23\u219226: race/base 10 + gear 20 + title 0 \u2192 trimmed 23 + status 3 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=",
+      "Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n[2026-09-03T00:30:05.314Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 19 + ATK 6 = 25 vs your AC 26 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-09-03T00:30:05.315Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-03T00:30:05.674Z] [combat] Conspiracy Architects Raider 4 deals 1 slashing damage [armor \u221234%, plate \u22122] [edge of reach \u2014 halved]. You have 29 HP remaining.\n[2026-09-03T00:30:05.992Z] [cognitive] neutral  (360ms)\n[2026-09-03T00:30:07.196Z] [debug] ui: tap \"\ud83d\udd25\u2623 choir-bound launcher\"\n[2026-09-03T00:30:07.198Z] [system] evasive \u2014 harder to hit fades.\n",
+      "[2026-09-03T00:30:07.250Z] [player] attack with the off-hand choir-bound launcher\n[2026-09-03T00:30:07.251Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=mid enemies=2 hooks=2\n",
+      "[2026-09-03T00:30:07.252Z] [debug] attack: target=Conspiracy Architects Raider 4 range=mid reach.bands=[distant,far,mid,close] reach.label=Choir-Bound Launcher bareHand=false\n[2026-09-03T00:30:07.254Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-03T00:30:07.329Z] [world] You bring the searing corrupted choir-bound launcher to bear on Conspiracy Architects Raider 4.\n",
+      "[2026-09-03T00:30:07.329Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T00:30:07.651Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 TAKE_COVER  (321ms)\n[2026-09-03T00:30:18.155Z] [world] Conspiracy Architects Raider 4 moves first. The pressure is immediate.\n",
+      "[2026-09-03T00:30:18.158Z] [debug] ac-shift 26\u219223: race/base 10 + gear 20 + title 0 \u2192 trimmed 23 + status 0 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n[2026-09-03T00:30:18.158Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 10 + ATK 7 = 17 vs your AC 23 \u2014 \u2717 MISS\n",
+      "[2026-09-03T00:30:18.159Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 15 + ATK 6 = 21 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-03T00:30:18.160Z] [combat] You \u2014 d20 \u2192 17 + INT 13 perfect opening (2\u00d7 dice) = 30 vs Conspiracy Architects Raider 4 AC 10 \u2014 \u2713 HIT\n[2026-09-03T00:30:18.160Z] [combat] Conspiracy Architects Raider 4 shrugs off the aetheric. (resisted, \u00d70.5 for 10)\n",
+      "[2026-09-03T00:30:18.176Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Reclaimers Guild Geode-Cored Cleaver \u2014 slashing will bite where aetheric won't.\"\n[2026-09-03T00:30:18.176Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter watches the aetheric skid off. \"Swap to the Recl\u2026\"\n",
+      "[2026-09-03T00:30:18.177Z] [combat] You crack the Conspiracy Architects Raider 4 with the Searing Corrupted Choir-Bound Launcher for 10 \u2014 the better part of their fight, gone in one blow. They crumple, out cold. (4/14 HP) Loot them before they come to.\n[2026-09-03T00:30:18.178Z] [combat] Conspiracy Architects Raider 4 is out of it. Conspiracy Architects Raider 5 now in your sights.\n",
+      "[2026-09-03T00:30:18.178Z] [combat] Searing Corrupted Choir-Bound Launcher \u2014 1 burn bites in and festers (3 turns).\n[2026-09-03T00:30:18.178Z] [combat] Searing Corrupted Choir-Bound Launcher \u2014 2 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n",
+      "[2026-09-03T00:30:18.676Z] [debug] persist sizes(KB): total=311 player=82 wm=141[rooms=72 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=83 scene=5\n[2026-09-03T00:30:20.885Z] [debug] ui: tap \"approach\"\n[2026-09-03T00:30:20.892Z] [world] A silent bolt strikes near enough to singe your sleeve. (\u22123 HP)\n[2026-09-03T00:30:20.949Z] [player] approach Conspiracy Architects Raider 5\n",
+      "[2026-09-03T00:30:20.949Z] [debug] parser: intent=advance conf=1.00 verb=approach target=conspiracy architects raider 5 resolved=Conspiracy Architects Raider 5 range=mid enemies=2 hooks=2\n[2026-09-03T00:30:20.950Z] [debug] move: advance from range=mid enemies=2 weather=Aether Lightning cost=1 partial=0\n",
+      "[2026-09-03T00:30:20.951Z] [debug] move: field advance target=Conspiracy Architects Raider 5 d 1.65->0.65 band mid->close\n[2026-09-03T00:30:20.951Z] [world] You close the gap with the Conspiracy Architects Raider 5 and Conspiracy Architects Raider 4. (range: close / arm's reach)\n",
+      "[2026-09-03T00:30:20.951Z] [world] The field shifts around you \u2014 Conspiracy Architects Raider 4 now close / arm's reach.\n[2026-09-03T00:30:20.951Z] [combat] Conspiracy Architects Raider 4 blisters \u2014 clinging fire sears 1. (3/14 HP, 2 turns left)\n[2026-09-03T00:30:20.951Z] [combat] Conspiracy Architects Raider 4 blackens \u2014 corruption eats 2. (1/14 HP, 2 turns left)\n",
+      "[2026-09-03T00:30:20.953Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 14 + ATK 7 = 21 vs your AC 23 \u2014 \u2717 MISS\n[2026-09-03T00:30:20.953Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-03T00:30:20.953Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T00:30:21.308Z] [cognitive] RETREAT  (354ms)\n",
+      "[2026-09-03T00:30:22.946Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n[2026-09-03T00:30:22.964Z] [player] attack with the auralite talon\n[2026-09-03T00:30:"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-03-1643-the-dice-riders-pay #mtlp91n0yrsc [inline 7/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtlp91n0yrsc"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-03-1643-the-dice-riders-pay"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "7"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-03-1643-the-dice-riders-pay"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-03T15:48:18.678510Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-03T15:48:19.999000Z",
+  "fingerprints": [
+    "b9b9048656bce5f73f430f6884d9ebbd"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1953258873,
+    "commitCount": 1,
+    "data": {},
+    "dateCreated": "2026-09-03T15:14:29.448755Z",
+    "dateReleased": "2026-09-03T15:16:44.109628Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "2ee64e2afe43c23ec02c8d3422ea72912177db1a",
+      "message": "[ota-hal] OTA-1643: the dice riders pay\n\nSlice 4, unit 1 of 3 (task #98). Re-measured the effect tail on the\ncurrent catalog: 303 strings, 164 parsed, 139 read by nothing. Thirty of\nthe unread ones carry a `+N` or `+NdN` DAMAGE promise \u2014 the simplest\nsentence in the whole column, and the one no code could see. A Legendary\nEnergy Hammer said \"+1d6 shock damage\" and swung for its printed 2d10 and\nnothing more, every time, for the life of the game.\n\nTwo families land, both on machinery that already existed:\n\n  \u2022 flatRider \u2014 bonus damage owed on EVERY hit, no condition attached (9\n    weapons). It goes through the same rollEffectBonusDamage as the\n    conditioned bonus rather than beside it: two sentences on the card,\n    one arithmetic on the swing, and two call sites is how they end up\n    disagreeing about whether a resist applies.\n  \u2022 riderDot \u2014 a rider the card gives a SPAN (3 weapons), seeded into the\n    Combat-Parity `typed_dot` the damage-type proc has used since it\n    shipped. Keyed by the WEAPON, not by the type, so a guaranteed promise\n    never swaps places with the 45% type flare sitting on the same body.\n\nThe rule that splits them is the card's own words: a stated duration\nfesters, no duration lands now. Guessing from the damage type instead\nwould have turned four cards into two different lies.\n\nFour new conditions, each backed by real rows in enemies.json \u2014 a\ncondition that matches nothing is the defect, not the fix, which is what\n`structure` has been since the day it was added: armored (47/135),\nunarmored (88/135), natural_armor (26 \u2014 armour the creature GREW; a\nmachine and a man in plate both have armour and neither has a hide),\nburnable (39, the vulnerable:burn roster). The conditioned-bonus regex\ngained a second, stricter FLAT pass requiring the literal word \"damage\",\nso \"+1 damage to tech\" is finally read while the shields' \"+2 AC vs energy\ndamage\" can never be read as bonus damage.\n\nThree cards reworded, because nothing in the game can satisfy them: Mud\nHeater Sword (measured \u2014 zero enemies resist or fear cold, so \"+1d6\nagainst cold creatures\" could never once fire; now fire-vulnerable, which\n39 can), Mud Sling (glass is not an enemy; now unarmoured), Giant Bone\nKnuckles (\"arm's-reach targets\" is always true for a barehanded weapon \u2014\na condition written as though it were sometimes false).\n\n\u26a0 The plus sign is the whole test, and the first draft without it was\nworth recording: it claimed 73 weapons instead of 19. Every rune-caster\nrestates its own base dice in the effect column, so all 45 would have\ndoubled \u2014 a Legendary scepter going 2d20 \u2192 4d20 on a change meant for\nthree mud blades \u2014 and the shields count dice they TAKE AWAY, which is\nthe sign error that flatters a weapon most. Widening the verb list was\nthe bug here, which is the opposite of what slices 1c and 2 taught.\n\nThe card now says both riders as rules, since until this OTA neither paid\nand a line is the only way to tell the two versions apart.\n\nota1643 (36 tests) pins the wins, every boundary the reader must not\ncross, that each new condition is reachable by a real enemy, and an audit\nover the whole catalog naming the four rows still owed to units 4b (the\neight shield +AC promises) and 4c (the exotic reword pass) \u2014 named, so a\nNEWLY authored dead promise fails instead of shipping.\n\nGates: all 18 green by exit code. Full suite green.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-03T15:11:46Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-03-1643-the-dice-riders-pay",
+          "shortVersion": "tartaria@4.32.11+2026-09-03-1643-the-dice-riders-pay",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-03T15:16:44.109628Z",
+          "dateCreated": "2026-09-03T15:14:29.448755Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155207912",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-03T15:16:44.380480Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-03-1643-the-dice-riders-pay",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-03-1643-the-dice-riders-pay",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-03-1643-the-dice-riders-pay",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-03-1643-the-dice-riders-pay)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "e60d8040286d4882a7b76c58d8c74a87",
+  "previousEventID": "824e785f7f814d12b055a53a54b7b612"
+}

@@ -1,0 +1,274 @@
+{
+  "id": "668d0ab845cc409fa31d9fa90d4b5c9f",
+  "groupID": "7709458959",
+  "eventID": "668d0ab845cc409fa31d9fa90d4b5c9f",
+  "projectID": "4511945117532160",
+  "size": 18159,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-03-1642-every-drop-has-a-name-in-the-book #mtlmv3v5hg6u [inline 23/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-03-1642-every-drop-has-a-name-in-the-book",
+  "message": "player-log 2026-09-03-1642-every-drop-has-a-name-in-the-book #mtlmv3v5hg6u [inline 23/28]",
+  "title": "player-log 2026-09-03-1642-every-drop-has-a-name-in-the-book #mtlmv3v5hg6u [inline 23/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "623fc14c3f634bdd98d2130db9530d16",
+      "span_id": "9bc5f01fafc21928",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "ne more worked-in resist. (Its armor rating is unchanged.)\n[2026-09-03T02:20:05.466Z] [reward] Bersk Cartwright fires up a portable Crucible for you. (\u221225 TC)\n[2026-09-03T02:20:50.902Z] [world] You set your reserved pieces on the three pedestals. The Crucible takes them in.\n",
+      "[2026-09-03T02:20:50.906Z] [reward] \u2726 The Crucible forges a Rare piece of armor from your reserved pieces \u2014 and it's in your pack, still cooling.\n[2026-09-03T02:20:50.907Z] [world] The Crucible exhales slow. The shape is set, but the Aether hasn't named it yet \u2014 let it finish. You'll know it the moment it announces itself.\n",
+      "[2026-09-03T02:20:50.920Z] [reward] \u2726 The forging finishes \u2014 the Aether names it Lumenforged Stompers (Rare).\n[2026-09-03T02:21:17.034Z] [world] You break the Mud-Bound Cloak down. \u2726 Recovered: Patched Cloth x2.\n[2026-09-03T02:21:21.593Z] [debug] persist sizes(KB): total=324 player=85 wm=152[rooms=82 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=83 scene=4\n",
+      "[2026-09-03T02:21:25.901Z] [world] You break the Architect's Outer Mantle down. \u2726 Recovered: Patched Cloth x2.\n[2026-09-03T02:22:18.309Z] [world] You break the Wanderer's Footwraps down. \u2726 Recovered: Patched Cloth x2.\n[2026-09-03T02:22:18.387Z] [world] You break the Reclaimer's Boots down. \u2726 Recovered: Patched Cloth x2.\n",
+      "[2026-09-03T02:22:18.455Z] [world] You break the Wanderer's Worn Gauntlets down. \u2726 Recovered: Patched Cloth x2.\n[2026-09-03T02:22:18.523Z] [world] The first pass on the Shaman's Warden Gloves crumbles in your hands \u2014 but your training kicks in. You stop, breathe, change angle, and try again.\n",
+      "[2026-09-03T02:22:18.524Z] [world] You break the Shaman's Warden Gloves down. \u2726 Recovered: Patched Cloth x2.\n[2026-09-03T02:22:18.593Z] [world] You break the Rough-Hewn Chestplate down. \u2726 Recovered: Scrap Metal x2, Patched Cloth x2.\n[2026-09-03T02:22:18.660Z] [world] You break the Mud-Warden's Vest down. \u2726 Recovered: Scrap Metal x2, Patched Cloth x2.\n",
+      "[2026-09-03T02:22:18.729Z] [world] You break the Mud-Warden's Vest down. \u2726 Recovered: Scrap Metal x2, Patched Cloth x2.\n[2026-09-03T02:22:18.797Z] [world] You break the Mud-Warden's Vest down. \u2726 Recovered: Scrap Metal x2, Patched Cloth x2.\n[2026-09-03T02:22:18.864Z] [world] You break the Mud-Warden's Vest down. \u2726 Recovered: Scrap Metal x2, Patched Cloth x2.\n",
+      "[2026-09-03T02:22:18.932Z] [world] You break the Mud-Warden's Vest down. \u2726 Recovered: Scrap Metal x2, Patched Cloth x2.\n[2026-09-03T02:22:18.999Z] [world] You break the Titan's Forehead Guard down. \u2726 Recovered: Patched Cloth x2.\n[2026-09-03T02:22:19.065Z] [world] You break the Thought-Crafter's Headpiece down. \u2726 Recovered: Patched Cloth x2.\n",
+      "[2026-09-03T02:22:19.132Z] [world] You break the Relic Hunter's Veil down. \u2726 Recovered: Patched Cloth x2.\n[2026-09-03T02:23:57.489Z] [world] You break the Vine Grasp down. \u2726 Recovered: Scrap Metal x2, Stick.\n[2026-09-03T02:23:57.570Z] [world] You break the Sparkstrike down. \u2726 Recovered: Scrap Metal x2, Stick.\n",
+      "[2026-09-03T02:23:57.637Z] [world] You break the Short Hunting Bow down. \u2726 Recovered: Scrap Metal x2, Stick.\n[2026-09-03T02:23:57.703Z] [world] You break the Mud Shell down. \u2726 Recovered: Scrap Metal x2, Stick.\n[2026-09-03T02:23:57.769Z] [world] You break the Mud Shell down. \u2726 Recovered: Scrap Metal x2, Stick.\n",
+      "[2026-09-03T02:23:57.836Z] [world] You break the Mud Kukri down. \u2726 Recovered: Scrap Metal x3, Stick.\n[2026-09-03T02:23:57.902Z] [world] You break the Mud Grip down. \u2726 Recovered: Scrap Metal x2, Stick.\n[2026-09-03T02:23:57.968Z] [world] You break the Mud Grip down. \u2726 Recovered: Scrap Metal x2, Stick.\n",
+      "[2026-09-03T02:23:58.033Z] [world] You break the Minor Repair down. \u2726 Recovered: Scrap Metal x2, Stick.\n[2026-09-03T02:23:58.097Z] [world] You break the Minor Repair down. \u2726 Recovered: Scrap Metal x2, Stick.\n[2026-09-03T02:23:58.161Z] [world] You break the Minor Repair down. \u2726 Recovered: Scrap Metal x2, Stick.\n",
+      "[2026-09-03T02:23:58.227Z] [world] You break the Flame of Aether down. \u2726 Recovered: Scrap Metal x2, Stick.\n[2026-09-03T02:23:58.291Z] [world] You break the Flame of Aether down. \u2726 Recovered: Scrap Metal x2, Stick.\n[2026-09-03T02:23:58.355Z] [world] You break the Dust Cloud down. \u2726 Recovered: Scrap Metal x2, Stick.\n",
+      "[2026-09-03T02:23:58.421Z] [world] You break the Dust Cloud down. \u2726 Recovered: Scrap Metal x2, Stick.\n[2026-09-03T02:23:58.486Z] [world] You break the Dust Cloud down. \u2726 Recovered: Scrap Metal x2, Stick.\n[2026-09-03T02:23:58.550Z] [world] The first pass on the Bone Knife crumbles in your hands \u2014 but your training kicks in. You stop, breathe, change angle, and try again.\n",
+      "[2026-09-03T02:23:58.551Z] [world] You break the Bone Knife down. \u2726 Recovered: Scrap Metal x2, Stick.\n[2026-09-03T02:23:58.615Z] [world] The first pass on the Bone Knife crumbles in your hands \u2014 but your training kicks in. You stop, breathe, change angle, and try again.\n[2026-09-03T02:23:58.615Z] [world] You break the Bone Knife down. \u2726 Recovered: Scrap Metal x2, Stick.\n",
+      "[2026-09-03T02:23:58.678Z] [world] You break the Bone Crossbow down. \u2726 Recovered: Scrap Metal x3, Stick.\n[2026-09-03T02:23:58.743Z] [world] You break the Bone Crossbow down. \u2726 Recovered: Scrap Metal x3, Stick.\n[2026-09-03T02:23:58.807Z] [world] You break the Bone Crossbow down. \u2726 Recovered: Scrap Metal x3, Stick.\n[2026-09-03T02:24:03.765Z] [debug] ui: tap \"craft\"\n",
+      "[2026-09-03T02:24:33.712Z] [debug] persist sizes(KB): total=315 player=74 wm=152[rooms=82 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=85 scene=4\n[2026-09-03T02:52:06.371Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a06529-54f6-79a2-a784-b8dcbd6b56d0\n[2026-09-03T02:52:06.371Z] [debug] ota: Checking\u2026\n",
+      "[2026-09-03T02:52:06.580Z] [debug] ota: Already up to date\n[2026-09-03T02:52:06.580Z] [debug] ota: boot check result = noUpdate\n[2026-09-03T02:52:06.697Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-09-03T02:52:06.697Z] [debug] voice: bundled idle\n[2026-09-03T02:52:07.236Z] [debug] send-log: bundle #mtkvtzmb9qii attempt 2/5 delivered to Sentry\n",
+      "[2026-09-03T02:52:11.537Z] [debug] OTA applied: 2026-09-03-1637-this-is-the-place-means-the-cell \u2192 2026-09-03-1639-every-ingredient-exists.\n[2026-09-03T02:52:11.537Z] [debug] OTA session start: 2026-09-03-1639-every-ingredient-exists.\n[2026-09-03T02:52:11.537Z] [world] You step back into Mud Flood Nexus. The world waits for your move.\n",
+      "[2026-09-03T02:52:11.537Z] [arbiter] The Arbiter looks up as you return. \"Welcome back, Cheddar Bob. I wondered when you'd take up the thread again.\"\n[2026-09-03T02:52:11.915Z] [debug] \u2550\u2550\u2550 SESSION 2026-09-03T02:52:11.912Z \u00b7 build 2026-09-03-1639-every-ingredient-exists \u00b7 updated from 2026-09-03-1637-this-is-the-place-means-the-cell \u00b7 previous entry moments earlier \u2550\u2550\u2550\n",
+      "[2026-09-03T02:52:11.916Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n[2026-09-03T02:52:11.916Z] [debug] missions: hunt:hunt_bog_dragon stage 4/7 [diplomacy] @monarch_waystation npc=\"Old Mira\" needs=The Boy's Locket\u2713 gives=Eshren's Name-Token\n",
+      "[2026-09-03T02:52:11.916Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n[2026-09-03T02:52:11.916Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n",
+      "[2026-09-03T02:52:11.916Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n[2026-09-03T02:52:11.916Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n",
+      "[2026-09-03T02:52:11.916Z] [debug] missions: \u00b7 at=mud_flood_nexus travelTo=monarch_waystation\n[2026-09-03T02:52:11.917Z] [debug] boot: life bmtkxit5tca started 2026-09-03T02:52:06.305Z \u00b7 FOLLOWED AN OTA APPLY 276ms ago via mid-session \u00b7 prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)\n[2026-09-03T02:52:16.304Z] [debug] ui: tap \"more \u25b8\"\n",
+      "[2026-09-03T02:52:18.788Z] [debug] ui: tap \"craft\"\n[2026-09-03T02:52:27.511Z] [debug] kbbar: mounted bottom=355 raw=0 from=estimate winH=986 beat=-\n[2026-09-03T02:52:27.937Z] [debug] kbbar: mounted bottom=359.79486083984375 raw=360 from=live winH=986 beat=-\n[2026-09-03T12:09:56.264Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a06529-54f6-79a2-a784-b8dcbd6b56d0\n",
+      "[2026-09-03T12:09:56.264Z] [debug] ota: Checking\u2026\n[2026-09-03T12:09:59.683Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-09-03T12:09:59.774Z] [debug] ota: Saving progress\u2026\n[2026-09-03T12:09:59.775Z] [debug] ota: Restarting to apply\u2026\n[2026-09-03T12:09:59.856Z] [debug] ota: boot check result = applied\n",
+      "[2026-09-03T12:10:00.040Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a065c0-bf22-74d7-b448-49e4c56cee88\n[2026-09-03T12:10:00.040Z] [debug] ota: Checking\u2026\n[2026-09-03T12:10:00.145Z] [debug] ota: Already up to date\n[2026-09-03T12:10:00.145Z] [debug] ota: boot check result = noUpdate\n[2026-09-03T12:10:00.231Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-09-03T12:10:00.231Z] [debug] voice: bundled idle\n[2026-09-03T12:10:00.734Z] [debug] send-log: bundle #mtkvtzmb9qii attempt 3/5 delivered to Sentry\n[2026-09-03T12:10:04.652Z] [debug] OTA applied: 2026-09-03-1639-every-ingredient-exists \u2192 2026-09-03-1642-every-drop-has-a-name-in-the-book.\n[2026-09-03T12:10:04.652Z] [debug] OTA session start: 2026-09-03-1642-every-drop-has-a-name-in-the-book.\n",
+      "[2026-09-03T12:10:04.653Z] [world] You step back into Mud Flood Nexus. The world waits for your move.\n[2026-09-03T12:10:04.653Z] [world] Mud Monarch heralds left a sigil-mark on a stone you don't remember being marked. The faction is paying attention.\n",
+      "[2026-09-03T12:10:04.656Z] [arbiter] The Arbiter meets your eyes. \"Welcome back, Cheddar Bob. The buried country is no place to walk alone. The waste did not sleep while you were gone \u2014 blood was spilled and ground changed hands. Read the World for the account.\"\n",
+      "[2026-09-03T12:10:05.082Z] [debug] \u2550\u2550\u2550 SESSION 2026-09-03T12:10:05.079Z \u00b7 build 2026-09-03-1642-every-drop-has-a-name-in-the-book \u00b7 updated from 2026-09-03-1639-every-ingredient-exists \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-09-03T12:10:05.086Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-03T12:10:05.086Z] [debug] missions: hunt:hunt_bog_dragon stage 4/7 [diplomacy] @monarch_waystation npc=\"Old Mira\" needs=The Boy's Locket\u2713 gives=Eshren's Name-Token\n[2026-09-03T12:10:05.086Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n",
+      "[2026-09-03T12:10:05.086Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n[2026-09-03T12:10:05.087Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n",
+      "[2026-09-03T12:10:05.087Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n[2026-09-03T12:10:05.087Z] [debug] missions: \u00b7 at=mud_flood_nexus travelTo=monarch_waystation\n",
+      "[2026-09-03T12:10:05.087Z] [debug] boot: life bmtlhg9lun7 started 2026-09-03T12:09:59.970Z \u00b7 FOLLOWED AN OTA APPLY 194ms ago via boot-front \u00b7 prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)\n[2026-09-03T12:10:06.287Z] [debug] send-log: crash on record (2026-09-03T02:52:27.753Z) \u2014 game log pushed automatically, delivered to Sentry, kept on disk as #mtlhgdw29v8x\n",
+      "[2026-09-03T12:10:11.756Z] [debug] ui: tap \"more \u25b8\"\n[2026-09-03T12:10:12.788Z] [debug] ui: tap \"inventory\"\n[2026-09-03T14:32:53.033Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a065c0-bf22-74d7-b448-49e4c56cee88\n[2026-09-03T14:32:53.033Z] [debug] ota: Checking\u2026\n[2026-09-03T14:32:53.103Z] [debug] ota: Already up to date\n",
+      "[2026-09-03T14:32:53.105Z] [debug] ota: boot check result = noUpdate\n[2026-09-03T14:32:53.173Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-09-03T14:32:53.173Z] [debug] voice: bundled idle\n[2026-09-03T14:32:53.408Z] [debug] send-log: bundle #mtlhgdw29v8x attempt 2/5 delivered to Sentry\n",
+      "[2026-09-03T14:32:58.376Z] [debug] OTA session start: 2026-09-03-1642-every-drop-has-a-name-in-the-book.\n[2026-09-03T14:32:58.376Z] [world] You step back into Mud Flood Nexus. The world waits for your move.\n[2026-09-03T14:32:58.376Z] [arbiter] The Arbiter looks up as you return. \"Welcome back, Cheddar Bob. I wondered when you'd take up the thread again.\"\n",
+      "[2026-09-03T14:32:59.179Z] [debug] \u2550\u2550\u2550 SESSION 2026-09-03T14:32:59.177Z \u00b7 build 2026-09-03-1642-every-drop-has-a-name-in-the-book \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-09-03T14:32:59.180Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-03T14:32:59.180Z] [debug] missions: hunt:hunt_bog_dragon stage 4/7 [diplomacy] @monarch_waystation npc=\"Old Mira\" needs=The Boy's Locket\u2713 gives=Eshren's Name-Token\n[2026-09-03T14:32:59.180Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n",
+      "[2026-09-03T14:32:59.180Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n[2026-09-03T14:32:59.180Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n",
+      "[2026-09-03T14:32:59.180Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n[2026-09-03T14:32:59.180Z] [debug] missions: \u00b7 at=mud_flood_nexus travelTo=monarch_waystation\n[2026-09-03T14:32:59.180Z] [debug] boot: life bmtlmk0hfaq started 2026-09-03T14:32:52.851Z \u00b7 not an OTA apply (no handoff on disk)\n",
+      "[2026-09-03T14:32:59.824Z] [debug] send-log: crash on record (2026-09-03T12:10:12.789Z) \u2014 game log pushed automatically, delivered to Sentry, kept on disk as #mtlmk5mtn69a\n[2026-09-03T14:33:02.474Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T14:33:03.860Z] [world] You take the Architect's Mantle from where it lay.\n[2026-09-03T14:33:03.860Z] [reward] \u2726 Architect's Mantle (Common).\n",
+      "[2026-09-03T14:33:04.758Z] [world] You strip the cold spring carefully. Something usable comes free in your hand.\n[2026-09-03T14:33:04.758Z] [world] You break the mud crack apart. Among the pieces, something worth keeping.\n[2026-09-03T14:33:04.758Z] [world] You strip the pump housing carefully. Something usable comes free in your hand.\n[2026-09-03T14:33:04.759Z] "
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-03-1642-every-drop-has-a-name-in-the-book #mtlmv3v5hg6u [inline 23/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtlmv3v5hg6u"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-03-1642-every-drop-has-a-name-in-the-book"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "23"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-03-1642-every-drop-has-a-name-in-the-book"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-03T14:41:29.305661Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-03T14:41:30.470000Z",
+  "fingerprints": [
+    "8641a52080b8535475cb5d6753a9c9a3"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1952890889,
+    "commitCount": 20,
+    "data": {},
+    "dateCreated": "2026-09-03T12:10:00.204000Z",
+    "dateReleased": "2026-09-03T14:02:00.424207Z",
+    "deployCount": 1,
+    "ref": null,
+    "lastCommit": {
+      "id": "1fc5ac79d97859fb19c740742255089af058654c",
+      "message": "golem republish of OTA-1642 to exercise the Sentry release step (task #109)\n\nSame bundle as c72cdbec \u2014 no app change, one note beside the stamp. The\nActions dispatch is not reachable from this session (403 on the dispatch\nendpoint), and the new Sentry step only runs inside a publish, so this\nmarkerless golem push is the measurement: the run log will say whether\nSENTRY_READ_TOKEN already carries project:releases or a SENTRY_AUTH_TOKEN\nsecret is needed.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-03T13:59:43Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-03-1642-every-drop-has-a-name-in-the-book",
+          "shortVersion": "tartaria@4.32.11+2026-09-03-1642-every-drop-has-a-name-in-the-book",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-03T14:02:00.424207Z",
+          "dateCreated": "2026-09-03T12:10:00.204000Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155183521",
+      "environment": "golem",
+      "dateStarted": null,
+      "dateFinished": "2026-09-03T14:02:00.682876Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-03-1642-every-drop-has-a-name-in-the-book",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-03-1642-every-drop-has-a-name-in-the-book",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-03-1642-every-drop-has-a-name-in-the-book",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-03-1642-every-drop-has-a-name-in-the-book)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "6f1f2d0f6bcc4e948b3b89daead93980",
+  "previousEventID": "64f4b0bf394f410db1cdbebcb315809a"
+}

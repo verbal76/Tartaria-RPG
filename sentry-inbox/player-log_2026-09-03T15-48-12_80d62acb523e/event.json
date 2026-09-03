@@ -1,0 +1,278 @@
+{
+  "id": "80d62acb523e496499a889087af9a044",
+  "groupID": "7709891197",
+  "eventID": "80d62acb523e496499a889087af9a044",
+  "projectID": "4511945117532160",
+  "size": 18067,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-03-1643-the-dice-riders-pay #mtlmv3v5hg6u [inline 16/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-03-1643-the-dice-riders-pay",
+  "message": "player-log 2026-09-03-1643-the-dice-riders-pay #mtlmv3v5hg6u [inline 16/28]",
+  "title": "player-log 2026-09-03-1643-the-dice-riders-pay #mtlmv3v5hg6u [inline 16/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "508d083bcd634f7dabb7567a2c58f09b",
+      "span_id": "83b9818bb7c2ba30",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      " last of the corruption \u2014 the Choir-Bound Launcher has run its course.\n[2026-09-03T00:43:10.507Z] [debug] attack: target=Spore Skimmer range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n[2026-09-03T00:43:10.591Z] [world] Your acid-etched corrupted auralite talon comes around in an arc; Spore Skimmer squares up to meet it.\n",
+      "[2026-09-03T00:43:10.591Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T00:43:10.919Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (327ms)\n[2026-09-03T00:43:20.351Z] [world] Spore Skimmer moves first. The pressure is immediate.\n[2026-09-03T00:43:20.354Z] [combat] Spore Skimmer \u2014 d20 \u2192 4 + ATK 5 = 9 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-03T00:43:20.354Z] [combat] You \u2014 d20 \u2192 7 + INT 12 = 19 vs Spore Skimmer AC 9 \u2014 \u2713 HIT\n[2026-09-03T00:43:20.354Z] [combat] Spore Skimmer shrugs off the aetheric. (resisted, \u00d70.5 for 12)\n[2026-09-03T00:43:20.358Z] [combat] The killing blow with the acid-etched corrupted auralite talon: 12. Spore Skimmer drops where it stood.\n",
+      "[2026-09-03T00:43:20.359Z] [reward] Spore Skimmer defeated. You recover Aether Residue, Patched Cloth, Burlap Vest.\n[2026-09-03T00:43:20.361Z] [reward] You strip the body: Bone Knife, Mud-Warden's Vest (+6 TC). The kit took the fight badly.\n[2026-09-03T00:43:20.361Z] [reward] +20 TC pried from the dust.\n",
+      "[2026-09-03T00:43:20.424Z] [world] Mira's map takes you down through the Nexus to where the flood-works pool. The shrine is silt-glass and old prayer. You find the boy where he fell \u2014 and the Mud Wraith that has been feeding on what is left of him comes off the body fast, before your hand is anywhere near the locket.\n[2026-09-03T00:43:20.425Z] [reward] \u2726 The Boy's Locket \u2014 mission item.\n",
+      "[2026-09-03T00:43:20.425Z] [combat] Mud Wraith is on you before you have the room to turn.\n[2026-09-03T00:43:20.426Z] [combat] Mud Wraith turns on Mercy \u2014 d20 14 + ATK 7 = 21 vs Mercy's AC 10 \u2014 \u2713 HIT\n[2026-09-03T00:43:20.426Z] [combat] Mercy takes 12. (1/15 HP left)\n[2026-09-03T00:43:20.426Z] [combat] Something the Dragon drowned is still on watch \u2014 and it has seen you.\n",
+      "[2026-09-03T00:43:20.426Z] [debug] mission card: \"The Bog Dragon of Old Drakova\" \u00b7 fight \u00b7 got The Boy's Locket\n[2026-09-03T00:43:21.549Z] [debug] persist sizes(KB): total=323 player=76 wm=159[rooms=90 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=83 scene=4\n[2026-09-03T00:43:25.564Z] [debug] ui: tap \"mission card \u00b7 FIGHT\"\n[2026-09-03T00:43:33.209Z] [debug] ui: tap \"dodge\"\n",
+      "[2026-09-03T00:43:33.214Z] [system] ambushed fades.\n[2026-09-03T00:43:33.227Z] [player] dodge\n[2026-09-03T00:43:33.228Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=0\n",
+      "[2026-09-03T00:43:33.229Z] [world] You commit to the dodge. Slip Mud Wraith's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-03T00:43:33.316Z] [combat] Mud Wraith \u2014 d20 \u2192 12 + ATK 7 = 19 vs your AC 22 \u2014 \u2717 EVADED\n",
+      "[2026-09-03T00:43:33.317Z] [combat] Dodge \u2014 d20 \u2192 16 + DEX 20 = 36 vs ATK 19. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-03T00:43:33.318Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-03T00:43:33.318Z] [arbiter] \"That mud wraith is making the same mistake,\" the Arbiter says, almost bored. \"Capitalize.\"\n",
+      "[2026-09-03T00:43:33.319Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T00:43:33.659Z] [cognitive] neutral  (340ms)\n[2026-09-03T00:43:38.358Z] [debug] ui: tap \"\ud83d\udd25\u2623 choir-bound launcher\"\n[2026-09-03T00:43:38.390Z] [player] attack with the off-hand choir-bound launcher\n",
+      "[2026-09-03T00:43:38.390Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=close enemies=1 hooks=0\n[2026-09-03T00:43:38.391Z] [debug] attack: target=Mud Wraith range=close reach.bands=[distant,far,mid,close] reach.label=Choir-Bound Launcher bareHand=false\n",
+      "[2026-09-03T00:43:38.392Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-03T00:43:38.463Z] [world] Your searing corrupted choir-bound launcher comes around in an arc; Mud Wraith squares up to meet it.\n[2026-09-03T00:43:38.463Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T00:43:38.788Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 TAKE_COVER  (324ms)\n",
+      "[2026-09-03T00:43:47.822Z] [world] You seize the initiative. Mud Wraith has no time to react.\n[2026-09-03T00:43:47.822Z] [combat] You \u2014 d20 \u2192 14 + INT 12 + 2 (point blank) perfect opening (2\u00d7 dice) = 28 vs Mud Wraith AC 13 \u2014 \u2713 HIT\n[2026-09-03T00:43:47.823Z] [combat] Aetheric flares \u2014 +1 on hit (weak \u2014 bites deep!).\n",
+      "[2026-09-03T00:43:47.824Z] [combat] Weakness exposed \u2014 Mud Wraith flinches. (aetheric \u00d71.5 for 36)\n[2026-09-03T00:43:47.897Z] [reward] \u2726 The work hones you. +1 STR (base 12, 17 as you stand).\n[2026-09-03T00:43:47.898Z] [combat] Clean hit with the searing corrupted choir-bound launcher for 36. Mud Wraith has 93 left and does not back away.\n",
+      "[2026-09-03T00:43:47.898Z] [combat] Searing Corrupted Choir-Bound Launcher \u2014 6 burn bites in and festers (3 turns).\n[2026-09-03T00:43:47.898Z] [combat] Searing Corrupted Choir-Bound Launcher \u2014 2 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n[2026-09-03T00:43:47.898Z] [combat] Mud Wraith is left exposed \u2014 easier to hit.\n",
+      "[2026-09-03T00:43:47.899Z] [combat] Mud Wraith \u2014 d20 \u2192 8 + ATK 7 = 15 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T00:43:50.064Z] [debug] ui: tap \"inventory\"\n[2026-09-03T00:44:06.805Z] [world] You feed Mercy 2\u00d7 Trail Rations. +12 HP (13/15), +loyalty.\n[2026-09-03T00:44:15.963Z] [player] use Trail Rations\n",
+      "[2026-09-03T00:44:15.963Z] [debug] parser: intent=use_relic conf=1.00 verb=use target=trail rations resolved=Trail Rations range=close enemies=1 hooks=0\n[2026-09-03T00:44:15.964Z] [world] You use one Trail Rations. HP already full, +1 stamina.\n[2026-09-03T00:44:15.975Z] [system] \u23f3 Time passed: 15 min\n[2026-09-03T00:44:17.736Z] [cognitive] neutral  (1759ms)\n",
+      "[2026-09-03T00:44:26.312Z] [debug] persist sizes(KB): total=322 player=76 wm=160[rooms=90 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=82 scene=4\n[2026-09-03T00:46:34.059Z] [debug] ui: tap \"\ud83d\udd25\u2623 choir-bound launcher \u2605\"\n[2026-09-03T00:46:34.113Z] [player] attack with the off-hand choir-bound launcher\n",
+      "[2026-09-03T00:46:34.113Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=close enemies=1 hooks=0\n[2026-09-03T00:46:34.114Z] [combat] Mud Wraith blisters \u2014 clinging fire sears 6. (87/129 HP, 2 turns left)\n[2026-09-03T00:46:34.114Z] [combat] Mud Wraith blackens \u2014 corruption eats 2. (85/129 HP, 2 turns left)\n",
+      "[2026-09-03T00:46:34.115Z] [debug] attack: target=Mud Wraith range=close reach.bands=[distant,far,mid,close] reach.label=Choir-Bound Launcher bareHand=false\n[2026-09-03T00:46:34.189Z] [world] You raise the searing corrupted choir-bound launcher toward Mud Wraith. The room narrows around the both of you.\n[2026-09-03T00:46:34.190Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-03T00:46:34.522Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 TAKE_COVER  (332ms)\n[2026-09-03T00:46:46.549Z] [world] You seize the initiative. Mud Wraith has no time to react.\n[2026-09-03T00:46:46.549Z] [combat] You \u2014 d20 \u2192 18 + INT 12 + 2 (point blank) = 32 vs Mud Wraith AC 12 \u2014 \u2713 HIT\n[2026-09-03T00:46:46.549Z] [combat] Weakness exposed \u2014 Mud Wraith flinches. (aetheric \u00d71.5 for 12)\n",
+      "[2026-09-03T00:46:46.551Z] [combat] The blow with the searing corrupted choir-bound launcher finds purchase \u2014 12 damage, 73 HP standing. Mud Wraith commits to the counter.\n[2026-09-03T00:46:46.551Z] [combat] Searing Corrupted Choir-Bound Launcher \u2014 3 burn bites in and festers (3 turns).\n",
+      "[2026-09-03T00:46:46.551Z] [combat] Searing Corrupted Choir-Bound Launcher \u2014 1 corruption bites in and festers (3 turns). The rot deepens (2 stacks).\n[2026-09-03T00:46:46.553Z] [combat] Mud Wraith \u2014 d20 \u2192 18 + ATK 7 = 25 vs your AC 22 \u2014 \u2713 HIT\n[2026-09-03T00:46:46.928Z] [combat] Mud Wraith deals 4 aetheric damage [armor \u221234%, title \u00bd, floor 30%]. You have 45 HP remaining.\n",
+      "[2026-09-03T00:47:10.040Z] [debug] ui: tap \"step back\"\n[2026-09-03T00:47:10.062Z] [player] step back\n[2026-09-03T00:47:10.063Z] [debug] parser: intent=retreat conf=1.00 verb=stepback target=- resolved=- range=close enemies=1 hooks=0\n[2026-09-03T00:47:10.064Z] [debug] move: retreat from range=close enemies=1 weather=Black Rain cost=1 partial=0\n",
+      "[2026-09-03T00:47:10.065Z] [debug] move: field retreat target=Mud Wraith d 0.50->1.50 band close->mid\n[2026-09-03T00:47:10.065Z] [world] You pull back from Mud Wraith. (range: mid-range)\n[2026-09-03T00:47:10.065Z] [combat] Mud Wraith blisters \u2014 clinging fire sears 3. (70/129 HP, 2 turns left)\n[2026-09-03T00:47:10.066Z] [combat] Mud Wraith blackens \u2014 corruption eats 2. (68/129 HP, 2 turns left)\n",
+      "[2026-09-03T00:47:10.068Z] [combat] Mud Wraith \u2014 d20 \u2192 18 + ATK 7 = 25 vs your AC 22 \u2014 \u2713 HIT\n[2026-09-03T00:47:10.069Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-03T00:47:10.070Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T00:47:10.453Z] [combat] Mud Wraith deals 2 aetheric damage [armor \u221234%, title \u00bd, floor 30%]. You have 43 HP remaining.\n",
+      "[2026-09-03T00:47:10.779Z] [cognitive] neutral  (708ms)\n[2026-09-03T00:47:15.673Z] [debug] ui: tap \"\ud83d\udd25\u2623 choir-bound launcher \u2605\"\n[2026-09-03T00:47:15.729Z] [player] attack with the off-hand choir-bound launcher\n[2026-09-03T00:47:15.730Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=mid enemies=1 hooks=0\n",
+      "[2026-09-03T00:47:15.730Z] [combat] Mud Wraith blisters \u2014 clinging fire sears 3. (65/129 HP, 1 turn left)\n[2026-09-03T00:47:15.730Z] [combat] Mud Wraith blackens \u2014 corruption eats 2. (63/129 HP, 1 turn left)\n[2026-09-03T00:47:15.731Z] [debug] attack: target=Mud Wraith range=mid reach.bands=[distant,far,mid,close] reach.label=Choir-Bound Launcher bareHand=false\n",
+      "[2026-09-03T00:47:15.803Z] [world] Your searing corrupted choir-bound launcher comes around in an arc; Mud Wraith squares up to meet it.\n[2026-09-03T00:47:15.803Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T00:47:16.132Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 TAKE_COVER  (327ms)\n[2026-09-03T00:47:26.852Z] [world] You seize the initiative. Mud Wraith has no time to react.\n",
+      "[2026-09-03T00:47:26.853Z] [combat] You \u2014 d20 \u2192 11 + INT 12 = 23 vs Mud Wraith AC 13 \u2014 \u2713 HIT\n[2026-09-03T00:47:26.853Z] [combat] Aetheric flares \u2014 +1 on hit (weak \u2014 bites deep!).\n[2026-09-03T00:47:26.853Z] [combat] Weakness exposed \u2014 Mud Wraith flinches. (aetheric \u00d71.5 for 18)\n",
+      "[2026-09-03T00:47:26.856Z] [combat] Your strike with the searing corrupted choir-bound launcher lands for 18. Mud Wraith staggers \u2014 45 HP remaining. It answers.\n[2026-09-03T00:47:26.857Z] [combat] Searing Corrupted Choir-Bound Launcher \u2014 3 burn bites in and festers (3 turns).\n",
+      "[2026-09-03T00:47:26.857Z] [combat] Searing Corrupted Choir-Bound Launcher \u2014 2 corruption bites in and festers (3 turns). The rot deepens (3 stacks).\n[2026-09-03T00:47:26.857Z] [combat] Mud Wraith is left exposed \u2014 easier to hit.\n[2026-09-03T00:47:26.858Z] [combat] Mud Wraith turns on Mercy \u2014 d20 4 + ATK 7 = 11 vs Mercy's AC 10 \u2014 \u2713 HIT\n",
+      "[2026-09-03T00:47:26.858Z] [combat] Mercy takes 13. (0/15 HP left)\n[2026-09-03T00:47:26.858Z] [arbiter] Mercy drops under the Mud Wraith and drags herself clear of the fight. She is down \u2014 tend her within a day or she won't get back up.\n[2026-09-03T00:47:26.859Z] [arbiter] \"Either you walk away or it does,\" the Arbiter says. \"I'm not particular.\"\n",
+      "[2026-09-03T00:47:29.877Z] [debug] ui: tap \"\u2697\u2623 auralite talon \u2605\"\n[2026-09-03T00:47:29.917Z] [player] attack with the auralite talon\n[2026-09-03T00:47:29.917Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=mid enemies=1 hooks=0\n[2026-09-03T00:47:29.918Z] [combat] Mud Wraith blisters \u2014 clinging fire sears 3. (42/129 HP, 2 turns left)\n",
+      "[2026-09-03T00:47:29.918Z] [combat] Mud Wraith blackens \u2014 corruption eats 4. (38/129 HP, 2 turns left)\n[2026-09-03T00:47:29.921Z] [debug] attack: target=Mud Wraith range=mid reach.bands=[close] reach.label=Auralite Talon bareHand=false\n",
+      "[2026-09-03T00:47:29.936Z] [arbiter] The Arbiter holds up a hand. \"Auralite Talon works at close / arm's reach range only \u2014 you're at mid-range. ADVANCE to close in (they'll answer the approach), or attack with something that reaches.\"\n[2026-09-03T00:47:30.292Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (354ms)\n",
+      "[2026-09-03T00:47:37.458Z] [debug] ui: tap \"\u2726 bandolier (5)\"\n[2026-09-03T00:47:41.726Z] [reward] You hurl the Acid Flask. It bursts across Mud Wraith \u2014 12 acid (4/turn \u00d7 3). (26 HP left)\n[2026-09-03T00:47:41.727Z] [combat] Mud Wraith blisters \u2014 clinging fire sears 3. (23/129 HP, 1 turn left)\n[2026-09-03T00:47:41.728Z] [combat] Mud Wraith blackens \u2014 corruption eats 4. (19/129 HP, 1 turn left)\n",
+      "[2026-09-03T00:47:41.739Z] [combat] Mud Wraith \u2014 d20 \u2192 10 + ATK 7 = 17 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T00:47:51.467Z] [debug] ui: tap \"golem (51/68)\"\n[2026-09-03T00:47:51.474Z] [player] use golem\n[2026-09-03T00:47:51.480Z] [combat] Ashwright attacks Mud Wraith \u2014 d20 12 + 3 = 15 vs AC 12 \u2014 \u2713 HIT\n",
+      "[2026-09-03T00:47:51.481Z] [combat] Ashwright swings the Crude Golem Greatsword \u2014 6 slashing damage on Mud Wraith. (13 HP left)\n[2026-09-03T00:47:51.481Z] [combat] Mud Wraith retaliates \u2014 d20 20 + 7 (NAT 20) hits Ashwright for 12 (35% resisted). (39/68)\n[2026-09-03T00:47:51.494Z] [combat] Mud Wraith blisters \u2014 clinging fire sears 3. (10/129 HP, 0 turns left)\n",
+      "[2026-09-03T00:47:51.494Z] [combat] Mud Wraith shakes off the last of the fire \u2014 the Choir-Bound Launcher has run its course.\n[2026-09-03T00:47:51.494Z] [combat] Mud Wraith blackens \u2014 corruption eats 4. (6/129 HP, 0 turns left)\n[2026-09-03T00:47:51.495Z] [combat] Mud Wraith shakes off the last of the corruption \u2014 the Choir-Bound Launcher has run its course.\n",
+      "[2026-09-03T00:47:51.496Z] [combat] Mud Wraith \u2014 d20 \u2192 15 + ATK 7 = 22 vs your AC 22 \u2014 \u2713 HIT\n[2026-09-03T00:47:51.875Z] [combat] Mud Wraith deals 5 aetheric damage [armor \u221234%, title \u00bd, floor 30%]. You have 38 HP remaining.\n[2026-09-03T00:47:52.275Z] [debug] persist sizes(KB): total=322 player=76 wm=160[rooms=90 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=82 scene=4\n",
+      "[2026-09-03T00:47:55.987Z] [debug] ui: tap \"\ud83d\udd25\u2623 choir-bound launcher \u2605\"\n[2026-09-03T00:47:56.045Z] [player] attack with the off-hand choir-bound launcher\n[2026-09-03T00:47:56.045Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=mid enemies=1 hooks=0\n",
+      "[2026-09-03T00:47:56.046Z] [debug] attack: target=Mud Wraith range=mid reach.bands=[distant,far,mid,close] reach.label=Choir-Bound Launcher bareHand=false\n[2026-09-03T00:47:56.118Z] [world] You commit forward with the searing corrupted choir-bound launcher. Mud Wraith watches your hands.\n[2026-09-03T00:47:56.118Z]"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-03-1643-the-dice-riders-pay #mtlmv3v5hg6u [inline 16/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtlmv3v5hg6u"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-03-1643-the-dice-riders-pay"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "16"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-03-1643-the-dice-riders-pay"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-03T15:48:11.142946Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-03T15:48:12.404000Z",
+  "fingerprints": [
+    "b9b9048656bce5f73f430f6884d9ebbd"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1953258873,
+    "commitCount": 1,
+    "data": {},
+    "dateCreated": "2026-09-03T15:14:29.448755Z",
+    "dateReleased": "2026-09-03T15:16:44.109628Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "2ee64e2afe43c23ec02c8d3422ea72912177db1a",
+      "message": "[ota-hal] OTA-1643: the dice riders pay\n\nSlice 4, unit 1 of 3 (task #98). Re-measured the effect tail on the\ncurrent catalog: 303 strings, 164 parsed, 139 read by nothing. Thirty of\nthe unread ones carry a `+N` or `+NdN` DAMAGE promise \u2014 the simplest\nsentence in the whole column, and the one no code could see. A Legendary\nEnergy Hammer said \"+1d6 shock damage\" and swung for its printed 2d10 and\nnothing more, every time, for the life of the game.\n\nTwo families land, both on machinery that already existed:\n\n  \u2022 flatRider \u2014 bonus damage owed on EVERY hit, no condition attached (9\n    weapons). It goes through the same rollEffectBonusDamage as the\n    conditioned bonus rather than beside it: two sentences on the card,\n    one arithmetic on the swing, and two call sites is how they end up\n    disagreeing about whether a resist applies.\n  \u2022 riderDot \u2014 a rider the card gives a SPAN (3 weapons), seeded into the\n    Combat-Parity `typed_dot` the damage-type proc has used since it\n    shipped. Keyed by the WEAPON, not by the type, so a guaranteed promise\n    never swaps places with the 45% type flare sitting on the same body.\n\nThe rule that splits them is the card's own words: a stated duration\nfesters, no duration lands now. Guessing from the damage type instead\nwould have turned four cards into two different lies.\n\nFour new conditions, each backed by real rows in enemies.json \u2014 a\ncondition that matches nothing is the defect, not the fix, which is what\n`structure` has been since the day it was added: armored (47/135),\nunarmored (88/135), natural_armor (26 \u2014 armour the creature GREW; a\nmachine and a man in plate both have armour and neither has a hide),\nburnable (39, the vulnerable:burn roster). The conditioned-bonus regex\ngained a second, stricter FLAT pass requiring the literal word \"damage\",\nso \"+1 damage to tech\" is finally read while the shields' \"+2 AC vs energy\ndamage\" can never be read as bonus damage.\n\nThree cards reworded, because nothing in the game can satisfy them: Mud\nHeater Sword (measured \u2014 zero enemies resist or fear cold, so \"+1d6\nagainst cold creatures\" could never once fire; now fire-vulnerable, which\n39 can), Mud Sling (glass is not an enemy; now unarmoured), Giant Bone\nKnuckles (\"arm's-reach targets\" is always true for a barehanded weapon \u2014\na condition written as though it were sometimes false).\n\n\u26a0 The plus sign is the whole test, and the first draft without it was\nworth recording: it claimed 73 weapons instead of 19. Every rune-caster\nrestates its own base dice in the effect column, so all 45 would have\ndoubled \u2014 a Legendary scepter going 2d20 \u2192 4d20 on a change meant for\nthree mud blades \u2014 and the shields count dice they TAKE AWAY, which is\nthe sign error that flatters a weapon most. Widening the verb list was\nthe bug here, which is the opposite of what slices 1c and 2 taught.\n\nThe card now says both riders as rules, since until this OTA neither paid\nand a line is the only way to tell the two versions apart.\n\nota1643 (36 tests) pins the wins, every boundary the reader must not\ncross, that each new condition is reachable by a real enemy, and an audit\nover the whole catalog naming the four rows still owed to units 4b (the\neight shield +AC promises) and 4c (the exotic reword pass) \u2014 named, so a\nNEWLY authored dead promise fails instead of shipping.\n\nGates: all 18 green by exit code. Full suite green.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-03T15:11:46Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-03-1643-the-dice-riders-pay",
+          "shortVersion": "tartaria@4.32.11+2026-09-03-1643-the-dice-riders-pay",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-03T15:16:44.109628Z",
+          "dateCreated": "2026-09-03T15:14:29.448755Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155207912",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-03T15:16:44.380480Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-03-1643-the-dice-riders-pay",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-03-1643-the-dice-riders-pay",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-03-1643-the-dice-riders-pay",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-03-1643-the-dice-riders-pay)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "831688d60a824c6a89f8c18b0e20d6b0",
+  "previousEventID": "6e79ef7d971b4c46bc44aa2095be9918"
+}

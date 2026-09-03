@@ -1,0 +1,275 @@
+{
+  "id": "9b9b41adc3004babaa8f93f1e8d208a1",
+  "groupID": "7709458959",
+  "eventID": "9b9b41adc3004babaa8f93f1e8d208a1",
+  "projectID": "4511945117532160",
+  "size": 18201,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-03-1642-every-drop-has-a-name-in-the-book #mtlmv3v5hg6u [inline 21/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-03-1642-every-drop-has-a-name-in-the-book",
+  "message": "player-log 2026-09-03-1642-every-drop-has-a-name-in-the-book #mtlmv3v5hg6u [inline 21/28]",
+  "title": "player-log 2026-09-03-1642-every-drop-has-a-name-in-the-book #mtlmv3v5hg6u [inline 21/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "623fc14c3f634bdd98d2130db9530d16",
+      "span_id": "9bc5f01fafc21928",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "09-03T02:14:04.470Z] [system] bleeding fades.\n[2026-09-03T02:14:04.479Z] [player] dodge\n[2026-09-03T02:14:04.480Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=2 hooks=1\n",
+      "[2026-09-03T02:14:04.481Z] [world] You commit to the dodge. Slip Conspiracy Architects Raider 5's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-03T02:14:04.569Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 20 + ATK 7 = 27 vs your AC 22 \u2014 \u2713 CRITICAL HIT\n",
+      "[2026-09-03T02:14:04.569Z] [combat] Dodge \u2014 Conspiracy Architects Raider 5 rolls a NAT 20. No read beats a perfect strike; it lands through your dodge.\n[2026-09-03T02:14:04.570Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T02:14:04.948Z] [combat] Conspiracy Architects Raider 5 deals 7 slashing damage [armor \u221225%]. You have 24 HP remaining.\n[2026-09-03T02:14:05.278Z] [cognitive] neutral  (378ms)\n",
+      "[2026-09-03T02:14:05.610Z] [debug] ui: tap \"magnetic axe \u26a1\"\n[2026-09-03T02:14:05.628Z] [player] attack with the magnetic axe\n[2026-09-03T02:14:05.628Z] [debug] parser: intent=attack conf=1.00 verb=attack target=magnetic axe resolved=Magnetic Axe range=close enemies=2 hooks=1\n",
+      "[2026-09-03T02:14:05.629Z] [debug] attack: target=Conspiracy Architects Raider 5 range=close reach.bands=[close] reach.label=Magnetic Axe bareHand=false\n[2026-09-03T02:14:05.706Z] [world] Your magnetic axe comes around in an arc; Conspiracy Architects Raider 5 squares up to meet it.\n[2026-09-03T02:14:05.706Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-03T02:14:06.035Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 THROW \u00b7 DISENGAGE  (328ms)\n[2026-09-03T02:14:27.324Z] [world] Conspiracy Architects Raider 5 moves first. The pressure is immediate.\n[2026-09-03T02:14:27.327Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 3 + ATK 7 = 10 vs your AC 22 \u2014 \u2717 MISS\n",
+      "[2026-09-03T02:14:27.327Z] [combat] You \u2014 d20 \u2192 10 + STR 18 = 28 vs Conspiracy Architects Raider 5 AC 11 \u2014 \u2713 HIT\n[2026-09-03T02:14:27.329Z] [combat] Electrical flares \u2014 +3 on hit.\n[2026-09-03T02:14:27.330Z] [combat] You crack the Conspiracy Architects Raider 5 with the Magnetic Axe for 14 \u2014 the better part of their fight, gone in one blow. They crumple, out cold. (4/18 HP) Loot them before they co",
+      "me to.\n[2026-09-03T02:14:27.333Z] [combat] Nobody left standing \u2014 the fight is yours. You take your time and strip the sleepers where they lie.\n[2026-09-03T02:14:27.335Z] [reward] You strip the unconscious Conspiracy Architects Raider 5 \u2014 Bone Knife, Mud-Bound Cloak, Patched Cloth, +18 TC. The gear's seen better days (worn from the fight).\n",
+      "[2026-09-03T02:14:27.347Z] [reward] You strip the unconscious Conspiracy Architects Raider 1 \u2014 Bone Knife, Mud-Warden's Vest, Patched Cloth, Worn Tartarian Coin, +28 TC. The gear's seen better days (worn from the fight).\n[2026-09-03T02:14:27.347Z] [combat] Conspiracy Architects Raider 5 is left exposed \u2014 easier to hit.\n[2026-09-03T02:14:27.347Z] [system] \u23f3 Time passed: 12 min\n",
+      "[2026-09-03T02:14:32.660Z] [debug] ui: tap \"more \u25b8\"\n[2026-09-03T02:14:33.628Z] [debug] ui: tap \"craft\"\n[2026-09-03T02:14:43.642Z] [player] craft Crude Golem Greatsword\n[2026-09-03T02:14:43.643Z] [debug] parser: intent=craft conf=1.00 verb=craft target=crude golem greatsword resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-09-03T02:14:43.644Z] [reward] \u2726 Crafted Crude Golem Greatsword. The Arbiter watches you set the last piece.\n[2026-09-03T02:14:43.647Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-03T02:14:43.648Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-09-03T02:14:43.648Z] [arbiter] \"There's coin on the board for a willing blade,\" the Arbiter says. \"Read the World.\"\n[2026-09-03T02:14:44.122Z] [cognitive] neutral  (473ms)\n[2026-09-03T02:14:46.035Z] [player] craft Crude Golem Pike\n[2026-09-03T02:14:46.036Z] [debug] parser: intent=craft conf=1.00 verb=craft target=crude golem pike resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-09-03T02:14:46.037Z] [reward] \u2726 Crafted Crude Golem Pike. The Arbiter watches you set the last piece.\n[2026-09-03T02:14:46.038Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-03T02:14:46.038Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T02:14:46.514Z] [cognitive] neutral  (474ms)\n",
+      "[2026-09-03T02:14:46.594Z] [debug] persist sizes(KB): total=335 player=85 wm=163[rooms=93 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=84 scene=4\n[2026-09-03T02:14:48.218Z] [player] craft Crude Golem Sledge\n[2026-09-03T02:14:48.219Z] [debug] parser: intent=craft conf=1.00 verb=craft target=crude golem sledge resolved=sludge vent range=- enemies=0 hooks=1\n",
+      "[2026-09-03T02:14:48.220Z] [reward] \u2726 Crafted Crude Golem Sledge. The Arbiter watches you set the last piece.\n[2026-09-03T02:14:48.709Z] [cognitive] neutral  (488ms)\n[2026-09-03T02:14:53.396Z] [world] You repair the Aether-Walker's Boots. Back to full. (spent: Patched Cloth x4)\n[2026-09-03T02:14:53.449Z] [world] You repair the Architect's Sight Enhancer. Back to full. (spent: Patched Cloth x4)\n",
+      "[2026-09-03T02:14:53.473Z] [arbiter] The Arbiter nods. \"Patched in: Smooth Stone \u2192 Small Rock.\"\n[2026-09-03T02:14:53.475Z] [world] You repair the Searing Corrupted Choir-Bound Launcher. Back to full. (spent: Small Rock x2)\n[2026-09-03T02:14:53.495Z] [world] You repair the Magnetic Axe. Back to full. (spent: Scrap Metal x8, Stick x4)\n",
+      "[2026-09-03T02:14:53.535Z] [arbiter] The Arbiter nods. \"Patched in: 3\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n[2026-09-03T02:14:53.546Z] [world] You repair the Reclaimer's Cloak. Back to full. (spent: Patched Cloth x4)\n[2026-09-03T02:14:53.586Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n",
+      "[2026-09-03T02:14:53.598Z] [world] You repair the Titan's Gauntlets. Back to full. (spent: Patched Cloth x4)\n[2026-09-03T02:14:53.620Z] [arbiter] The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\"\n[2026-09-03T02:14:53.622Z] [world] You repair the Acid-Etched Corrupted Auralite Talon. Back to full. (spent: Small Rock x2)\n",
+      "[2026-09-03T02:14:53.641Z] [world] You repair the Bone Knife. Back to full. (spent: Scrap Metal x4, Stick x2)\n[2026-09-03T02:14:53.660Z] [world] You repair the Bone Knife. Back to full. (spent: Scrap Metal x4, Stick x2)\n[2026-09-03T02:14:53.679Z] [world] You repair the Poisoned Bone Knife. Back to full. (spent: Scrap Metal x4, Stick x2)\n",
+      "[2026-09-03T02:14:53.697Z] [world] You repair the Bone Knife. Back to full. (spent: Scrap Metal x4, Stick x2)\n[2026-09-03T02:14:53.719Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Smooth Stone \u2192 Small Rock.\"\n[2026-09-03T02:14:53.721Z] [world] You repair the Cudgel. Back to full. (spent: Small Rock x4, Stick x2)\n",
+      "[2026-09-03T02:14:53.742Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Smooth Stone \u2192 Small Rock.\"\n[2026-09-03T02:14:53.742Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Patched in: 4\u00d7 Smooth Stone \u2192 Small Rock.\u2026\"\n[2026-09-03T02:14:53.744Z] [world] You repair the Cudgel. Back to full. (spent: Small Rock x4, Stick x2)\n",
+      "[2026-09-03T02:14:53.783Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n[2026-09-03T02:14:53.783Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Patched in: 4\u00d7 Cloth Scrap \u2192 Patched Clot\u2026\"\n[2026-09-03T02:14:53.795Z] [world] You repair the Mud-Bound Cloak. Back to full. (spent: Patched Cloth x4)\n",
+      "[2026-09-03T02:14:53.835Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n[2026-09-03T02:14:53.835Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Patched in: 4\u00d7 Cloth Scrap \u2192 Patched Clot\u2026\"\n[2026-09-03T02:14:53.846Z] [world] You repair the Mud-Warden's Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n",
+      "[2026-09-03T02:14:53.877Z] [arbiter] The Arbiter stops with his hand over your pack. \"Before I touch the Mud-Warden's Vest \u2014 3 pieces of this is Crucible stock: 2\u00d7 Hollow Quill Sheaf, Rat Fur. Say the word and I'll set it aside instead.\"\n",
+      "[2026-09-03T02:14:56.392Z] [arbiter] The Arbiter nods. \"Patched in: 2\u00d7 Hollow Quill Sheaf \u2192 Patched Cloth, Obsidian-Edged Scale \u2192 Patched Cloth, Rat Fur \u2192 Patched Cloth.\"\n[2026-09-03T02:14:56.408Z] [world] You repair the Mud-Warden's Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n",
+      "[2026-09-03T02:14:56.449Z] [arbiter] The Arbiter stops with his hand over your pack. \"Before I touch the Mud-Warden's Vest \u2014 4 pieces of this is Crucible stock: 4\u00d7 Knotted Sinew Braid. Say the word and I'll set it aside instead.\"\n[2026-09-03T02:14:57.622Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Knotted Sinew Braid \u2192 Patched Cloth.\"\n",
+      "[2026-09-03T02:14:57.639Z] [world] You repair the Mud-Warden's Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n[2026-09-03T02:14:57.680Z] [arbiter] The Arbiter stops with his hand over your pack. \"Before I touch the Mud-Warden's Vest \u2014 3 pieces of this is Crucible stock: 2\u00d7 Tar-Black Lashing, Slug Slime. Say the word and I'll set it aside instead.\"\n",
+      "[2026-09-03T02:14:58.650Z] [arbiter] The Arbiter nods. \"Patched in: 2\u00d7 Tar-Black Lashing \u2192 Patched Cloth, Aether Wing \u2192 Patched Cloth, Slug Slime \u2192 Patched Cloth.\"\n[2026-09-03T02:14:58.668Z] [world] You repair the Mud-Warden's Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n",
+      "[2026-09-03T02:14:58.711Z] [arbiter] The Arbiter stops with his hand over your pack. \"Before I touch the Mud-Warden's Vest \u2014 3 pieces of this is Crucible stock: 3\u00d7 Web-Silk Wadding. Say the word and I'll set it aside instead.\"\n[2026-09-03T02:14:59.487Z] [arbiter] The Arbiter nods. \"Patched in: Slug Slime \u2192 Patched Cloth, 3\u00d7 Web-Silk Wadding \u2192 Patched Cloth.\"\n",
+      "[2026-09-03T02:14:59.505Z] [world] You repair the Mud-Warden's Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n[2026-09-03T02:15:06.008Z] [player] craft First Aid Kit\n[2026-09-03T02:15:06.009Z] [debug] parser: intent=craft conf=1.00 verb=craft target=first aid kit resolved=First Aid Kit range=- enemies=0 hooks=1\n",
+      "[2026-09-03T02:15:06.313Z] [arbiter] The Arbiter stops with his hand over your pack. \"Before I touch 9\u00d7 First Aid Kit \u2014 9 pieces of this is Crucible stock: 2\u00d7 Bone-Handled Rivet, Flint-and-Twine Bundle, 2\u00d7 Leech Mucus, Dried Tendon Coil, 2\u00d7 Beetle-Chitin Flake, Slate-Weighted Netting. Say the word and I'll set it aside instead.\"\n[2026-09-03T02:15:06.358Z] [cognitive] neutral  (43ms)\n",
+      "[2026-09-03T02:15:10.950Z] [arbiter] The Arbiter sets it aside on the bench. \"\u2665 Held for the Crucible: Bone-Handled Rivet \u00d72, Flint-and-Twine Bundle, Leech Mucus \u00d72, Dried Tendon Coil, Beetle-Chitin Flake \u00d72, Slate-Weighted Netting. I'll not touch it.\"\n",
+      "[2026-09-03T02:15:15.944Z] [debug] persist sizes(KB): total=335 player=83 wm=164[rooms=93 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=85 scene=4\n[2026-09-03T02:15:19.726Z] [debug] ui: tap \"inventory\"\n[2026-09-03T02:15:30.077Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-09-03T02:15:30.100Z] [debug] spawn: gear=[Shaman's Warden Gloves, Titan's Vest] window=10 roster=new\n",
+      "[2026-09-03T02:15:30.102Z] [world] You walk west through open silt. The compass points west into open ground.\n[2026-09-03T02:15:30.102Z] [world] It sits where it sat. Patient is the wrong word \u2014 it simply does not move.\n[2026-09-03T02:15:31.680Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T02:15:32.902Z] [world] The Titan's Vest was half under something. It is not now.\n",
+      "[2026-09-03T02:15:32.903Z] [reward] \u2726 Titan's Vest (Common).\n[2026-09-03T02:15:33.798Z] [world] You work the Shaman's Warden Gloves loose from where the mud had it.\n[2026-09-03T02:15:33.798Z] [reward] \u2726 Shaman's Warden Gloves (Common).\n[2026-09-03T02:15:34.774Z] [world] You salvage the cold spring. The take is small but real.\n",
+      "[2026-09-03T02:15:34.775Z] [world] You work the console over. A part of it comes loose, intact.\n[2026-09-03T02:15:34.775Z] [world] Tucked inside the flood conduit: an oddment that matches no quartermaster's list. The kind of thing that fuses well.\n[2026-09-03T02:15:34.775Z] [world] You strip the flood map carefully. Something usable comes free in your hand.\n",
+      "[2026-09-03T02:15:34.776Z] [reward] \u2726 Salvage haul:\n[2026-09-03T02:15:34.776Z] [reward]     \u2022 Aether Dust x4 (Common)\n[2026-09-03T02:15:34.776Z] [reward]     \u2022 Salvager's Tether Loop (Uncommon)\n[2026-09-03T02:15:34.777Z] [reward]     \u2022 Worn Tartarian Coin x5 (Common)\n[2026-09-03T02:15:36.180Z] [debug] ui: tap \"investigate\"\n[2026-09-03T02:15:37.828Z] [player] investigate the ground\n",
+      "[2026-09-03T02:15:37.828Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n[2026-09-03T02:15:37.834Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Stick (Common).\n[2026-09-03T02:15:37.842Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T02:15:38.057Z] [cognitive] CLIMB  (214ms)\n",
+      "[2026-09-03T02:15:38.557Z] [debug] persist sizes(KB): total=323 player=84 wm=151[rooms=81 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=84 scene=4\n[2026-09-03T02:15:39.913Z] [debug] ui: tap \"ENTER\"\n[2026-09-03T02:15:39.916Z] [world] You step inside the silent muster, into the great hall.\n",
+      "[2026-09-03T02:15:39.917Z] [world] A long hall under a sagging roof. Trestle tables run its length, a central fire pit sits cold, and banners hang gone to rags.\n[2026-09-03T02:15:41.681Z] [debug] ui: tap \"\u2190 Armory\"\n[2026-09-03T02:15:41.683Z] [world] You step into the armory.\n",
+      "[2026-09-03T02:15:41.683Z] [world] Weapon racks, mostly stripped bare. A whetstone, a barrel of broken hafts, and a weapons chest with a stubborn lock.\n[2026-09-03T02:15:42.966Z] [debug] ui: tap \"investigate\"\n[2026-09-03T02:15:44.639Z] [player] investigate the ground\n",
+      "[2026-09-03T02:15:44.639Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=0\n[2026-09-03T02:15:44.642Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Big Rock (Common).\n[2026-09-03T02:15:44.652Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T02:15:44.868Z] [cognitive] CLIMB  (215ms)\n",
+      "[2026-09-03T02:15:45.414Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T02:15:46.012Z] [player] investigate rack\n[2026-09-03T02:15:46.012Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=rack resolved=rack range=- enemies=0 hooks=0\n[2026-09-03T02:15:46.013Z] [world] Empty hooks and dust marks where things used to rest. The shelf remembers what was taken; you do not.\n",
+      "[2026-09-03T02:15:46.207Z] [cognitive] neutral  (193ms)\n[2026-09-03T02:15:46.630Z] [world] You work the barrel over. A part of it comes loose, intact.\n[2026-09-03T02:15:46.630Z] [world] You scavenge the chest thoroughly. One Bone Sliver survives the sorting.\n[2026-09-03T02:15:46.630Z] [world] You work the rack over. A part of it comes loose, intact.\n",
+      "[2026-09-03T02:15:46.630Z] [world] You strip the whetstone carefully. Something usable comes free in your hand.\n[2026-09-03T02:15:46.630Z] [reward] \u2726 Salvage haul:\n[2026-09-03T02:15:46.630Z] [reward]     \u2022 Aether Dust x2 (Common)\n[2026-09-03T02:15:46.630Z] [reward"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-03-1642-every-drop-has-a-name-in-the-book #mtlmv3v5hg6u [inline 21/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtlmv3v5hg6u"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-03-1642-every-drop-has-a-name-in-the-book"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "21"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-03-1642-every-drop-has-a-name-in-the-book"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-03T14:41:29.298187Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-03T14:41:30.470000Z",
+  "fingerprints": [
+    "8641a52080b8535475cb5d6753a9c9a3"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1952890889,
+    "commitCount": 20,
+    "data": {},
+    "dateCreated": "2026-09-03T12:10:00.204000Z",
+    "dateReleased": "2026-09-03T14:02:00.424207Z",
+    "deployCount": 1,
+    "ref": null,
+    "lastCommit": {
+      "id": "1fc5ac79d97859fb19c740742255089af058654c",
+      "message": "golem republish of OTA-1642 to exercise the Sentry release step (task #109)\n\nSame bundle as c72cdbec \u2014 no app change, one note beside the stamp. The\nActions dispatch is not reachable from this session (403 on the dispatch\nendpoint), and the new Sentry step only runs inside a publish, so this\nmarkerless golem push is the measurement: the run log will say whether\nSENTRY_READ_TOKEN already carries project:releases or a SENTRY_AUTH_TOKEN\nsecret is needed.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-03T13:59:43Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-03-1642-every-drop-has-a-name-in-the-book",
+          "shortVersion": "tartaria@4.32.11+2026-09-03-1642-every-drop-has-a-name-in-the-book",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-03T14:02:00.424207Z",
+          "dateCreated": "2026-09-03T12:10:00.204000Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155183521",
+      "environment": "golem",
+      "dateStarted": null,
+      "dateFinished": "2026-09-03T14:02:00.682876Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-03-1642-every-drop-has-a-name-in-the-book",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-03-1642-every-drop-has-a-name-in-the-book",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-03-1642-every-drop-has-a-name-in-the-book",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-03-1642-every-drop-has-a-name-in-the-book)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "b6cb6adc03294b368dfcadf753f8c4bc",
+  "previousEventID": "887ff7861c364816ac1f79ec5429f6a2"
+}

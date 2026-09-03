@@ -1,0 +1,222 @@
+{
+  "id": "b81e1f8026a649de97e5c2df4125094f",
+  "groupID": "7709891349",
+  "eventID": "b81e1f8026a649de97e5c2df4125094f",
+  "projectID": "4511945117532160",
+  "size": 2661,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log-beacon 2026-09-03-1643-the-dice-riders-pay #mtlp91n0yrsc"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-03-1643-the-dice-riders-pay",
+  "message": "player-log-beacon 2026-09-03-1643-the-dice-riders-pay #mtlp91n0yrsc",
+  "title": "player-log-beacon 2026-09-03-1643-the-dice-riders-pay #mtlp91n0yrsc",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "508d083bcd634f7dabb7567a2c58f09b",
+      "span_id": "83b9818bb7c2ba30",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {},
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log-beacon 2026-09-03-1643-the-dice-riders-pay #mtlp91n0yrsc"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtlp91n0yrsc"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-03-1643-the-dice-riders-pay"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-beacon"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-03-1643-the-dice-riders-pay"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-03T15:48:18.651412Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-03T15:48:19.995000Z",
+  "fingerprints": [
+    "b81b0e56115001015eb8d1638fd9132f"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1953258873,
+    "commitCount": 1,
+    "data": {},
+    "dateCreated": "2026-09-03T15:14:29.448755Z",
+    "dateReleased": "2026-09-03T15:16:44.109628Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "2ee64e2afe43c23ec02c8d3422ea72912177db1a",
+      "message": "[ota-hal] OTA-1643: the dice riders pay\n\nSlice 4, unit 1 of 3 (task #98). Re-measured the effect tail on the\ncurrent catalog: 303 strings, 164 parsed, 139 read by nothing. Thirty of\nthe unread ones carry a `+N` or `+NdN` DAMAGE promise \u2014 the simplest\nsentence in the whole column, and the one no code could see. A Legendary\nEnergy Hammer said \"+1d6 shock damage\" and swung for its printed 2d10 and\nnothing more, every time, for the life of the game.\n\nTwo families land, both on machinery that already existed:\n\n  \u2022 flatRider \u2014 bonus damage owed on EVERY hit, no condition attached (9\n    weapons). It goes through the same rollEffectBonusDamage as the\n    conditioned bonus rather than beside it: two sentences on the card,\n    one arithmetic on the swing, and two call sites is how they end up\n    disagreeing about whether a resist applies.\n  \u2022 riderDot \u2014 a rider the card gives a SPAN (3 weapons), seeded into the\n    Combat-Parity `typed_dot` the damage-type proc has used since it\n    shipped. Keyed by the WEAPON, not by the type, so a guaranteed promise\n    never swaps places with the 45% type flare sitting on the same body.\n\nThe rule that splits them is the card's own words: a stated duration\nfesters, no duration lands now. Guessing from the damage type instead\nwould have turned four cards into two different lies.\n\nFour new conditions, each backed by real rows in enemies.json \u2014 a\ncondition that matches nothing is the defect, not the fix, which is what\n`structure` has been since the day it was added: armored (47/135),\nunarmored (88/135), natural_armor (26 \u2014 armour the creature GREW; a\nmachine and a man in plate both have armour and neither has a hide),\nburnable (39, the vulnerable:burn roster). The conditioned-bonus regex\ngained a second, stricter FLAT pass requiring the literal word \"damage\",\nso \"+1 damage to tech\" is finally read while the shields' \"+2 AC vs energy\ndamage\" can never be read as bonus damage.\n\nThree cards reworded, because nothing in the game can satisfy them: Mud\nHeater Sword (measured \u2014 zero enemies resist or fear cold, so \"+1d6\nagainst cold creatures\" could never once fire; now fire-vulnerable, which\n39 can), Mud Sling (glass is not an enemy; now unarmoured), Giant Bone\nKnuckles (\"arm's-reach targets\" is always true for a barehanded weapon \u2014\na condition written as though it were sometimes false).\n\n\u26a0 The plus sign is the whole test, and the first draft without it was\nworth recording: it claimed 73 weapons instead of 19. Every rune-caster\nrestates its own base dice in the effect column, so all 45 would have\ndoubled \u2014 a Legendary scepter going 2d20 \u2192 4d20 on a change meant for\nthree mud blades \u2014 and the shields count dice they TAKE AWAY, which is\nthe sign error that flatters a weapon most. Widening the verb list was\nthe bug here, which is the opposite of what slices 1c and 2 taught.\n\nThe card now says both riders as rules, since until this OTA neither paid\nand a line is the only way to tell the two versions apart.\n\nota1643 (36 tests) pins the wins, every boundary the reader must not\ncross, that each new condition is reachable by a real enemy, and an audit\nover the whole catalog naming the four rows still owed to units 4b (the\neight shield +AC promises) and 4c (the exotic reword pass) \u2014 named, so a\nNEWLY authored dead promise fails instead of shipping.\n\nGates: all 18 green by exit code. Full suite green.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-03T15:11:46Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-03-1643-the-dice-riders-pay",
+          "shortVersion": "tartaria@4.32.11+2026-09-03-1643-the-dice-riders-pay",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-03T15:16:44.109628Z",
+          "dateCreated": "2026-09-03T15:14:29.448755Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155207912",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-03T15:16:44.380480Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-03-1643-the-dice-riders-pay",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-03-1643-the-dice-riders-pay",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-03-1643-the-dice-riders-pay",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-03-1643-the-dice-riders-pay)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": "2b98edcb4e0541d79e01b15603284dbc"
+}

@@ -1,0 +1,298 @@
+{
+  "id": "e09f7e8e84f149bbada8477670e9128b",
+  "groupID": "7709891197",
+  "eventID": "e09f7e8e84f149bbada8477670e9128b",
+  "projectID": "4511945117532160",
+  "size": 17877,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-03-1643-the-dice-riders-pay #mtlp91n0yrsc [inline 10/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-03-1643-the-dice-riders-pay",
+  "message": "player-log 2026-09-03-1643-the-dice-riders-pay #mtlp91n0yrsc [inline 10/28]",
+  "title": "player-log 2026-09-03-1643-the-dice-riders-pay #mtlp91n0yrsc [inline 10/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "508d083bcd634f7dabb7567a2c58f09b",
+      "span_id": "83b9818bb7c2ba30",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "\n[2026-09-03T00:34:30.192Z] [world] Bersk Cartwright nods once. \"Cheddar Bob. Come look \u2014 a few things moved since you were last through.\"\n[2026-09-03T00:34:30.192Z] [world] \"Been a while,\" Bersk Cartwright says. \"Thought the mud had you.\"\n",
+      "[2026-09-03T00:34:30.192Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Bersk Cartwright, wandering trader. Tap the vendor banner to trade.\n[2026-09-03T00:34:30.202Z] [world] Rare workings for sale: Winter's Verdict (500 TC), Wrath of Titans (500 TC), Aether Bolt-Caster (200 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches ",
+      "up a hurt dog or golem \u2014 just ask.\n[2026-09-03T00:34:30.202Z] [world] You walk south through open silt. The compass points south into open ground.\n[2026-09-03T00:34:30.203Z] [world] You are standing the way you stood last time, without meaning to.\n[2026-09-03T00:34:38.250Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-09-03T00:34:39.438Z] [world] You take the Architect's Observer Visor from where it lay.\n[2026-09-03T00:34:39.439Z] [reward] \u2726 Architect's Observer Visor (Common).\n[2026-09-03T00:34:39.459Z] [world] You pick up the Mud-Stalker Leggings.\n[2026-09-03T00:34:39.459Z] [reward] \u2726 Mud-Stalker Leggings (Common).\n[2026-09-03T00:34:39.460Z] [world] You lift the Thought-Crafter's Headpiece clear.\n",
+      "[2026-09-03T00:34:39.460Z] [reward] \u2726 Thought-Crafter's Headpiece (Common).\n[2026-09-03T00:34:40.446Z] [world] You work the hermit crab over. A part of it comes loose, intact.\n[2026-09-03T00:34:40.446Z] [world] You salvage the standing water. The take is small but real.\n",
+      "[2026-09-03T00:34:40.447Z] [world] You lever something loose from the tackle box \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n[2026-09-03T00:34:40.447Z] [reward] \u2726 Salvage haul:\n[2026-09-03T00:34:40.447Z] [reward]     \u2022 Bone Sliver x2 (Common)\n[2026-09-03T00:34:40.448Z] [reward]     \u2022 Mud Fragment x3 (Common)\n",
+      "[2026-09-03T00:34:40.448Z] [reward]     \u2022 Flint Core Nodule (Common)\n[2026-09-03T00:34:41.885Z] [debug] ui: tap \"investigate\"\n[2026-09-03T00:34:43.439Z] [system] bleeding fades.\n[2026-09-03T00:34:43.460Z] [player] investigate the ground\n[2026-09-03T00:34:43.461Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2\n",
+      "[2026-09-03T00:34:43.463Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-09-03T00:34:43.475Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-03T00:34:43.475Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T00:34:43.476Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-09-03T00:34:43.479Z] [reward] \u2726 The miles have done their work \u2014 you carry the road better than you did. +1 max stamina (now 20). [240 on the odometer]\n[2026-09-03T00:34:43.704Z] [cognitive] CLIMB  (227ms)\n[2026-09-03T00:34:50.589Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n[2026-09-03T00:34:50.610Z] [debug] spawn: gear=[Rust Dagger, Reclaimer's Mask, Reclaimer's Trousers] window=10 roster=new\n",
+      "[2026-09-03T00:34:50.617Z] [world] The flat silt heaves, and a hand breaks the surface, then an arm, then a face caked grey with a thousand years of it.\n[2026-09-03T00:34:50.617Z] [arbiter] The traders were right. Aetherkin. Some kneel to them; some burn them where they stand.\n",
+      "[2026-09-03T00:34:50.617Z] [world] In life it was a machinist, one hand fused half-around a wrench that rusted into the bone \u2014 you find yourself wanting to know their name, and knowing you never will. The ground gave them back without warning \u2014 one moment mud, the next a person who should be dead.\n",
+      "[2026-09-03T00:34:50.618Z] [world] There's no hunger in it, only fright. It shrinks from your step, then squares up on trembling legs \u2014 it will defend itself, and nothing more.\n[2026-09-03T00:34:50.618Z] [world] You walk east through open silt. The compass points east into open ground.\n[2026-09-03T00:34:50.618Z] [world] Something in your shoulders drops back into the same set.\n",
+      "[2026-09-03T00:34:52.806Z] [debug] ui: tap \"approach\"\n[2026-09-03T00:34:52.814Z] [world] A silent bolt strikes near enough to singe your sleeve. (\u22122 HP)\n[2026-09-03T00:34:52.864Z] [player] approach Mud-Wracked Aetherkin\n[2026-09-03T00:34:52.865Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud wracked aetherkin resolved=Mud-Wracked Aetherkin range=mid enemies=1 hooks=2\n",
+      "[2026-09-03T00:34:52.866Z] [debug] move: advance from range=mid enemies=1 weather=Aether Lightning cost=1 partial=0\n[2026-09-03T00:34:52.867Z] [debug] move: field advance target=Mud-Wracked Aetherkin d 1.50->0.50 band mid->close\n[2026-09-03T00:34:52.867Z] [world] You close the gap with Mud-Wracked Aetherkin. (range: close / arm's reach)\n",
+      "[2026-09-03T00:34:52.867Z] [combat] The light around Mud-Wracked Aetherkin bends and declines to leave. It spends the beat VEILED \u2014 the next strike will come from somewhere you are not watching.\n[2026-09-03T00:34:53.213Z] [cognitive] SWIM \u00b7 RETREAT \u00b7 REST \u00b7 SEARCH  (345ms)\n[2026-09-03T00:34:54.389Z] [debug] ui: tap \"flee\"\n[2026-09-03T00:34:54.398Z] [player] flee\n",
+      "[2026-09-03T00:34:54.399Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=close enemies=1 hooks=2\n[2026-09-03T00:34:54.490Z] [system] \u23f3 Time passed: 15 min\n[2026-09-03T00:34:54.820Z] [cognitive] FEAR \u00b7 RETREAT \u00b7 HIDE  (330ms)\n",
+      "[2026-09-03T00:34:55.234Z] [debug] persist sizes(KB): total=316 player=85 wm=142[rooms=74 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=84 scene=4\n[2026-09-03T00:34:56.593Z] [debug] skillcheck: escape d20=20 DEX 19 = 39 vs Pursuit 14 \u2014 Mud-Wracked Aetherkin (d20 12 + SPD 2) \u2192 PASS\n",
+      "[2026-09-03T00:34:56.700Z] [debug] stats: STR14 DEX19 INT12 WIS15 CHA11 STE7 | gear: WIS+4,INT+3,DEX+8,STR+3,STE+2 | worn: main=Auralite Talon off=Choir-Bound Launcher head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Honey-Glazed Knuckle legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n",
+      "[2026-09-03T00:34:56.700Z] [debug] train: dexterity (escape check) \u2192 progress 92/100\n[2026-09-03T00:34:56.700Z] [world] Three long strides and the distance is yours to keep.\n[2026-09-03T00:34:58.240Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T00:34:59.486Z] [world] You get a hand under the Rust Dagger and take it.\n[2026-09-03T00:34:59.486Z] [reward] \u2726 Rust Dagger (Common).\n",
+      "[2026-09-03T00:34:59.502Z] [world] You claim the Reclaimer's Mask.\n[2026-09-03T00:34:59.502Z] [reward] \u2726 Reclaimer's Mask (Common).\n[2026-09-03T00:34:59.503Z] [world] The Reclaimer's Trousers comes up out of the silt with a small sucking protest.\n[2026-09-03T00:34:59.503Z] [reward] \u2726 Reclaimer's Trousers (Common).\n",
+      "[2026-09-03T00:35:00.389Z] [world] You strip the fisher's net carefully. Something usable comes free in your hand.\n[2026-09-03T00:35:00.389Z] [world] Slim pickings on the hermit crab. You pocket a Smooth Stone on the way out.\n[2026-09-03T00:35:00.390Z] [world] You work the salt crust over. A part of it comes loose, intact.\n",
+      "[2026-09-03T00:35:00.390Z] [world] You break the standing water apart. Among the pieces, something worth keeping.\n[2026-09-03T00:35:00.390Z] [world] You strip the tide line carefully. Something usable comes free in your hand.\n[2026-09-03T00:35:00.390Z] [reward] \u2726 Salvage haul:\n[2026-09-03T00:35:00.391Z] [reward]     \u2022 Cloth Scrap x6 (Common)\n",
+      "[2026-09-03T00:35:00.391Z] [reward]     \u2022 Smooth Stone x3 (Common)\n[2026-09-03T00:35:00.391Z] [reward]     \u2022 Bent Nail (Common)\n[2026-09-03T00:35:01.774Z] [debug] ui: tap \"investigate\"\n[2026-09-03T00:35:03.827Z] [player] investigate the ground\n[2026-09-03T00:35:03.828Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2\n",
+      "[2026-09-03T00:35:03.832Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Blueberries (Uncommon).\n[2026-09-03T00:35:03.841Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-03T00:35:03.841Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T00:35:03.841Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T00:35:04.058Z] [cognitive] CLIMB  (216ms)\n",
+      "[2026-09-03T00:35:05.793Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n[2026-09-03T00:35:05.822Z] [debug] spawn: gear=[Stone Seeker's Brow Guard, Mud Shell] window=10 roster=new\n[2026-09-03T00:35:05.823Z] [arbiter] The Arbiter, walking with you: \"Tartaria was a continent once. A flood older than any honest map drowned it. We are crossing the top of it.\"\n",
+      "[2026-09-03T00:35:05.824Z] [world] You walk south through open silt. The compass tells you Voronov lies further south \u2014 5 tiles, about 13 hours of travel.\n[2026-09-03T00:35:05.825Z] [world] Your feet have taken you to the same three paces of ground.\n[2026-09-03T00:35:07.077Z] [debug] ui: tap \"take / salvage\"\n",
+      "[Filtered]",
+      "[2026-09-03T00:35:08.434Z] [world] You break the fisher's net apart. Among the pieces, something worth keeping.\n[2026-09-03T00:35:08.434Z] [world] You strip the rusted royal vault pedestal carefully. Something usable comes free in your hand.\n[2026-09-03T00:35:08.434Z] [world] You break the siren shell apart. Among the pieces, something worth keeping.\n",
+      "[2026-09-03T00:35:08.434Z] [world] You salvage the standing water. The take is small but real.\n[2026-09-03T00:35:08.435Z] [reward] \u2726 Salvage haul:\n[2026-09-03T00:35:08.435Z] [reward]     \u2022 Horn-Capped Dowel (Common)\n[2026-09-03T00:35:08.435Z] [reward]     \u2022 Moth-Eaten Felt Scrap (Common)\n[2026-09-03T00:35:08.435Z] [reward]     \u2022 Aetheric Cloth (Uncommon)\n",
+      "[2026-09-03T00:35:08.436Z] [reward]     \u2022 Worn Tartarian Coin x6 (Common)\n[2026-09-03T00:35:08.436Z] [reward]     \u2022 Scrap Metal x3 (Common)\n[2026-09-03T00:35:09.481Z] [world] The Mud Shell was half under something. It is not now.\n[2026-09-03T00:35:09.482Z] [reward] \u2726 Mud Shell (Common).\n[2026-09-03T00:35:11.594Z] [player] investigate Stone Seeker's Brow Guard\n",
+      "[2026-09-03T00:35:11.594Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=stone seeker brow guard resolved=Stone Seeker's Brow Guard range=- enemies=0 hooks=2\n[2026-09-03T00:35:11.595Z] [debug] route: hook intercept (kind=obelisk, target=\"stone seeker's brow guard\") \u2014 original intent=investigate\n",
+      "[2026-09-03T00:35:11.595Z] [world] You've seen one of these before \u2014 the same lead, already copied into your memory. Nothing new here.\n[2026-09-03T00:35:14.854Z] [debug] ui: tap \"investigate\"\n[2026-09-03T00:35:16.481Z] [player] investigate the ground\n[2026-09-03T00:35:16.481Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2\n",
+      "[2026-09-03T00:35:16.490Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Wild Chicken (Rare).\n[2026-09-03T00:35:16.498Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T00:35:16.718Z] [cognitive] CLIMB  (220ms)\n[2026-09-03T00:35:17.143Z] [debug] persist sizes(KB): total=316 player=87 wm=142[rooms=75 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=83 scene=3\n",
+      "[2026-09-03T00:35:17.938Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n[2026-09-03T00:35:17.985Z] [debug] spawn: gear=[Repeater Crossbow] window=10 roster=new\n[2026-09-03T00:35:17.987Z] [world] Ilva Sidelong grins. \"Cheddar Bob. Sit a minute. The road's been generous or it hasn't \u2014 which is it?\"\n",
+      "[2026-09-03T00:35:17.988Z] [world] Ilva Sidelong looks you over. \"It's been a long stretch, Cheddar Bob. I'd started asking after you.\"\n[2026-09-03T00:35:17.988Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Ilva Sidelong, fence. Tap the vendor banner to trade.\n",
+      "[2026-09-03T00:35:17.998Z] [world] Rare workings for sale: Lich-Heart Pendant (200 TC), Many-Colored Tonic (200 TC), Mire Stave (200 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n[2026-09-03T00:35:17.999Z] [world] You walk east through open silt. The compass points east into open ground.\n",
+      "[2026-09-03T00:35:18.000Z] [world] A patch of mud just off the path pulses with a faint blue glow, in time with nothing you can hear.\n[2026-09-03T00:35:20.742Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T00:35:22.108Z] [world] You strip the abandoned skiff carefully. Something usable comes free in your hand.\n",
+      "[2026-09-03T00:35:22.108Z] [world] You break the oyster bed apart. Among the pieces, something worth keeping.\n[2026-09-03T00:35:22.108Z] [world] You work the salt crust over. A part of it comes loose, intact.\n[2026-09-03T00:35:22.108Z] [world] You break the seaweed mass apart. Among the pieces, something worth keeping.\n",
+      "[2026-09-03T00:35:22.109Z] [world] You work the standing water over. A part of it comes loose, intact.\n[2026-09-03T00:35:22.109Z] [world] You work the tackle box apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n[2026-09-03T00:35:22.109Z] [reward] \u2726 Salvage haul:\n[2026-09-03T00:35:22.109Z] [reward]     \u2022 Aetheric Cloth (Uncommon)\n",
+      "[2026-09-03T00:35:22.110Z] [reward]     \u2022 Bone Sliver (Common)\n[2026-09-03T00:35:22.110Z] [reward]     \u2022 Stick (Common)\n[2026-09-03T00:35:22.110Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-09-03T00:35:22.110Z] [reward]     \u2022 Mud Fragment (Common)\n[2026-09-03T00:35:22.110Z] [reward]     \u2022 Bone-Handled Rivet (Uncommon)\n",
+      "[2026-09-03T00:35:23.159Z] [world] You work the Repeater Crossbow loose from where the mud had it.\n[2026-09-03T00:35:23.160Z] [reward] \u2726 Repeater Crossbow (Common).\n[2026-09-03T00:35:31.431Z] [reward] Sold Bone Maul (Common) to Ilva Sidelong for 14 TC. (881 TC on hand)\n[2026-09-03T00:35:31.511Z] [reward] Sold Tartarian Hand Spear (Common) to Ilva Sidelong for 14 TC. (895 TC on hand)\n",
+      "[2026-09-03T00:35:31.583Z] [reward] Sold Repeater Crossbow (Common) to Ilva Sidelong for 14 TC. (909 TC on hand)\n[2026-09-03T00:35:31.655Z] [reward] Sold Iron Spear (Common) to Ilva Sidelong for 13 TC. (922 TC on hand)\n[2026-09-03T00:35:31.727Z] [reward] Sold Mud Shortsword (Common) to Ilva Sidelong for 13 TC. (935 TC on hand)\n",
+      "[2026-09-03T00:35:31.798Z] [reward] Sold Mud Throwing Knife (Common) to Ilva Sidelong for 12 TC. (947 TC on hand)\n[2026-09-03T00:35:31.868Z] [reward] Sold Mud-Sealer Gauntlets (Common) to Ilva Sidelong for 12 TC. (959 TC on hand)\n[2026-09-03T00:35:31.939Z] [reward] Sold Mud Claymore (Common) to Ilva Sidelong for 12 TC. (971 TC on hand)\n",
+      "[2026-09-03T00:35:32.010Z] [reward] Sold Mud Darts (Common) to Ilva Sidelong for 12 TC. (983 TC on hand)\n[2026-09-03T00:35:32.081Z] [reward] Sold Golem-Bound Armor (Common) to Ilva Sidelong for 10 TC. (993 TC on hand)\n[2026-09-03T00:35:32.152Z] [reward] Sold Stone Seeker's Brow Guard (Common) to Ilva Sidelong for 8 TC. (1001 TC on hand)\n[2026-09-03T00:35:32.222Z] [reward] Sold T"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-03-1643-the-dice-riders-pay #mtlp91n0yrsc [inline 10/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtlp91n0yrsc"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-03-1643-the-dice-riders-pay"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "10"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-03-1643-the-dice-riders-pay"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-03T15:48:18.686101Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "26": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 289,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-03T15:48:20Z",
+  "fingerprints": [
+    "b9b9048656bce5f73f430f6884d9ebbd"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1953258873,
+    "commitCount": 1,
+    "data": {},
+    "dateCreated": "2026-09-03T15:14:29.448755Z",
+    "dateReleased": "2026-09-03T15:16:44.109628Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "2ee64e2afe43c23ec02c8d3422ea72912177db1a",
+      "message": "[ota-hal] OTA-1643: the dice riders pay\n\nSlice 4, unit 1 of 3 (task #98). Re-measured the effect tail on the\ncurrent catalog: 303 strings, 164 parsed, 139 read by nothing. Thirty of\nthe unread ones carry a `+N` or `+NdN` DAMAGE promise \u2014 the simplest\nsentence in the whole column, and the one no code could see. A Legendary\nEnergy Hammer said \"+1d6 shock damage\" and swung for its printed 2d10 and\nnothing more, every time, for the life of the game.\n\nTwo families land, both on machinery that already existed:\n\n  \u2022 flatRider \u2014 bonus damage owed on EVERY hit, no condition attached (9\n    weapons). It goes through the same rollEffectBonusDamage as the\n    conditioned bonus rather than beside it: two sentences on the card,\n    one arithmetic on the swing, and two call sites is how they end up\n    disagreeing about whether a resist applies.\n  \u2022 riderDot \u2014 a rider the card gives a SPAN (3 weapons), seeded into the\n    Combat-Parity `typed_dot` the damage-type proc has used since it\n    shipped. Keyed by the WEAPON, not by the type, so a guaranteed promise\n    never swaps places with the 45% type flare sitting on the same body.\n\nThe rule that splits them is the card's own words: a stated duration\nfesters, no duration lands now. Guessing from the damage type instead\nwould have turned four cards into two different lies.\n\nFour new conditions, each backed by real rows in enemies.json \u2014 a\ncondition that matches nothing is the defect, not the fix, which is what\n`structure` has been since the day it was added: armored (47/135),\nunarmored (88/135), natural_armor (26 \u2014 armour the creature GREW; a\nmachine and a man in plate both have armour and neither has a hide),\nburnable (39, the vulnerable:burn roster). The conditioned-bonus regex\ngained a second, stricter FLAT pass requiring the literal word \"damage\",\nso \"+1 damage to tech\" is finally read while the shields' \"+2 AC vs energy\ndamage\" can never be read as bonus damage.\n\nThree cards reworded, because nothing in the game can satisfy them: Mud\nHeater Sword (measured \u2014 zero enemies resist or fear cold, so \"+1d6\nagainst cold creatures\" could never once fire; now fire-vulnerable, which\n39 can), Mud Sling (glass is not an enemy; now unarmoured), Giant Bone\nKnuckles (\"arm's-reach targets\" is always true for a barehanded weapon \u2014\na condition written as though it were sometimes false).\n\n\u26a0 The plus sign is the whole test, and the first draft without it was\nworth recording: it claimed 73 weapons instead of 19. Every rune-caster\nrestates its own base dice in the effect column, so all 45 would have\ndoubled \u2014 a Legendary scepter going 2d20 \u2192 4d20 on a change meant for\nthree mud blades \u2014 and the shields count dice they TAKE AWAY, which is\nthe sign error that flatters a weapon most. Widening the verb list was\nthe bug here, which is the opposite of what slices 1c and 2 taught.\n\nThe card now says both riders as rules, since until this OTA neither paid\nand a line is the only way to tell the two versions apart.\n\nota1643 (36 tests) pins the wins, every boundary the reader must not\ncross, that each new condition is reachable by a real enemy, and an audit\nover the whole catalog naming the four rows still owed to units 4b (the\neight shield +AC promises) and 4c (the exotic reword pass) \u2014 named, so a\nNEWLY authored dead promise fails instead of shipping.\n\nGates: all 18 green by exit code. Full suite green.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-03T15:11:46Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-03-1643-the-dice-riders-pay",
+          "shortVersion": "tartaria@4.32.11+2026-09-03-1643-the-dice-riders-pay",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-03T15:16:44.109628Z",
+          "dateCreated": "2026-09-03T15:14:29.448755Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155207912",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-03T15:16:44.380480Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-03-1643-the-dice-riders-pay",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-03-1643-the-dice-riders-pay",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-03-1643-the-dice-riders-pay",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-03-1643-the-dice-riders-pay)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "e390ffd8443b4d3dadc0a7a68b9b43dd",
+  "previousEventID": "c939e41aed1d478b8a9e764d26d82ec7"
+}

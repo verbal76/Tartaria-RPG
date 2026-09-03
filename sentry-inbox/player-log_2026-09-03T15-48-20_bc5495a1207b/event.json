@@ -1,0 +1,273 @@
+{
+  "id": "bc5495a1207b4ca480430e464485e804",
+  "groupID": "7709891197",
+  "eventID": "bc5495a1207b4ca480430e464485e804",
+  "projectID": "4511945117532160",
+  "size": 18053,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-03-1643-the-dice-riders-pay #mtlp91n0yrsc [inline 18/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-03-1643-the-dice-riders-pay",
+  "message": "player-log 2026-09-03-1643-the-dice-riders-pay #mtlp91n0yrsc [inline 18/28]",
+  "title": "player-log 2026-09-03-1643-the-dice-riders-pay #mtlp91n0yrsc [inline 18/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "508d083bcd634f7dabb7567a2c58f09b",
+      "span_id": "83b9818bb7c2ba30",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "2026-09-03T02:06:20.708Z] [cognitive] neutral  (662ms)\n[2026-09-03T02:06:21.347Z] [debug] ui: tap \"\u2697\u2623 auralite talon \u2605 \u2726\"\n[2026-09-03T02:06:21.367Z] [player] attack with the auralite talon\n[2026-09-03T02:06:21.367Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=1 hooks=1\n",
+      "[2026-09-03T02:06:21.368Z] [combat] Mud-Wracked Aetherkin blisters \u2014 clinging fire sears 9. (70/116 HP, 0 turns left)\n[2026-09-03T02:06:21.368Z] [combat] Mud-Wracked Aetherkin shakes off the last of the fire \u2014 the Choir-Bound Launcher has run its course.\n",
+      "[2026-09-03T02:06:21.368Z] [debug] attack: target=Mud-Wracked Aetherkin range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n[2026-09-03T02:06:21.369Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-03T02:06:21.439Z] [world] You commit forward with the acid-etched corrupted auralite talon. Mud-Wracked Aetherkin watches your hands.\n",
+      "[2026-09-03T02:06:21.440Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T02:06:21.769Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (329ms)\n[2026-09-03T02:06:30.028Z] [world] You seize the initiative. Mud-Wracked Aetherkin has no time to react.\n",
+      "[2026-09-03T02:06:30.029Z] [combat] You \u2014 d20 \u2192 2 + INT 12 perfect opening (2\u00d7 dice) = 14 vs Mud-Wracked Aetherkin AC 11 \u2014 \u2713 HIT\n[2026-09-03T02:06:30.029Z] [combat] Weakness exposed \u2014 Mud-Wracked Aetherkin flinches. (aetheric \u00d71.5 for 22)\n[2026-09-03T02:06:30.031Z] [combat] Mud-Wracked Aetherkin takes 22 with the acid-etched corrupted auralite talon. It reels: 48 left. Then it fights back.\n",
+      "[2026-09-03T02:06:30.031Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 4 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n[2026-09-03T02:06:30.032Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 1 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n",
+      "[2026-09-03T02:06:30.034Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 12 + ATK 5 = 17 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-03T02:06:30.034Z] [arbiter] The Arbiter watches the mud-wracked aetherkin. \"It is not the first thing here that decided to keep its distance, then changed its mind.\"\n[2026-09-03T02:06:33.968Z] [debug] ui: tap \"\ud83d\udd25\u2623 choir-bound launcher \u2605 \u2726\"\n",
+      "[2026-09-03T02:06:34.019Z] [player] attack with the off-hand choir-bound launcher\n[2026-09-03T02:06:34.020Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=close enemies=1 hooks=1\n[2026-09-03T02:06:34.020Z] [combat] Mud-Wracked Aetherkin smokes \u2014 acid eats 4. (44/116 HP, 2 turns left)\n",
+      "[2026-09-03T02:06:34.021Z] [combat] Mud-Wracked Aetherkin blackens \u2014 corruption eats 1. (43/116 HP, 2 turns left)\n[2026-09-03T02:06:34.021Z] [debug] attack: target=Mud-Wracked Aetherkin range=close reach.bands=[distant,far,mid,close] reach.label=Choir-Bound Launcher bareHand=false\n",
+      "[2026-09-03T02:06:34.093Z] [world] You raise the searing corrupted choir-bound launcher toward Mud-Wracked Aetherkin. The room narrows around the both of you.\n[2026-09-03T02:06:34.093Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T02:06:34.430Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 TAKE_COVER  (336ms)\n[2026-09-03T02:06:43.070Z] [world] Mud-Wracked Aetherkin moves first. The pressure is immediate.\n",
+      "[2026-09-03T02:06:43.072Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 7 + ATK 5 = 12 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-03T02:06:43.072Z] [combat] You \u2014 d20 \u2192 17 + INT 12 + 2 (point blank) = 31 vs Mud-Wracked Aetherkin AC 10 \u2014 \u2713 HIT\n[2026-09-03T02:06:43.072Z] [combat] The Corrupted coating fails to take on Mud-Wracked Aetherkin.\n",
+      "[2026-09-03T02:06:43.073Z] [combat] Weakness exposed \u2014 Mud-Wracked Aetherkin flinches. (aetheric \u00d71.5 for 11)\n[2026-09-03T02:06:43.074Z] [combat] Your strike with the searing corrupted choir-bound launcher lands for 11. Mud-Wracked Aetherkin staggers \u2014 32 HP remaining. It answers.\n[2026-09-03T02:06:43.075Z] [combat] Searing Corrupted Choir-Bound Launcher \u2014 5 burn bites in and festers (3 turns).\n",
+      "[2026-09-03T02:06:45.253Z] [debug] ui: tap \"dodge\"\n[2026-09-03T02:06:45.265Z] [player] dodge\n[2026-09-03T02:06:45.265Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=1\n",
+      "[2026-09-03T02:06:45.266Z] [world] You commit to the dodge. Slip Mud-Wracked Aetherkin's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-03T02:06:45.266Z] [combat] Mud-Wracked Aetherkin smokes \u2014 acid eats 4. (28/116 HP, 1 turn left)\n",
+      "[2026-09-03T02:06:45.267Z] [combat] Mud-Wracked Aetherkin blackens \u2014 corruption eats 1. (27/116 HP, 1 turn left)\n[2026-09-03T02:06:45.267Z] [combat] Mud-Wracked Aetherkin blisters \u2014 clinging fire sears 5. (22/116 HP, 2 turns left)\n[2026-09-03T02:06:45.358Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 13 + ATK 5 = 18 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n",
+      "[2026-09-03T02:06:45.359Z] [combat] Dodge \u2014 d20 \u2192 13 + DEX 20 = 33 vs ATK 18. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-03T02:06:45.359Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-03T02:06:45.359Z] [arbiter] \"Footwork over fury,\" the Arbiter says quietly. \"The mud-wracked aetherkin is patient. Be patienter.\"\n",
+      "[2026-09-03T02:06:45.360Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T02:06:45.693Z] [cognitive] neutral  (333ms)\n[2026-09-03T02:06:46.603Z] [debug] ui: tap \"\u2697\u2623 auralite talon \u2605 \u2726\"\n[2026-09-03T02:06:46.641Z] [player] attack with the auralite talon\n",
+      "[2026-09-03T02:06:46.642Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=1 hooks=1\n[2026-09-03T02:06:46.650Z] [combat] Mud-Wracked Aetherkin smokes \u2014 acid eats 4. (18/116 HP, 0 turns left)\n[2026-09-03T02:06:46.652Z] [combat] Mud-Wracked Aetherkin shakes off the last of the acid \u2014 the Auralite Talon has run its course.\n",
+      "[2026-09-03T02:06:46.656Z] [combat] Mud-Wracked Aetherkin blackens \u2014 corruption eats 1. (17/116 HP, 0 turns left)\n[2026-09-03T02:06:46.657Z] [combat] Mud-Wracked Aetherkin shakes off the last of the corruption \u2014 the Auralite Talon has run its course.\n[2026-09-03T02:06:46.657Z] [combat] Mud-Wracked Aetherkin blisters \u2014 clinging fire sears 5. (12/116 HP, 1 turn left)\n",
+      "[2026-09-03T02:06:46.658Z] [debug] attack: target=Mud-Wracked Aetherkin range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n[2026-09-03T02:06:46.660Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-03T02:06:46.742Z] [world] Your acid-etched corrupted auralite talon comes around in an arc; Mud-Wracked Aetherkin squares up to meet it.\n",
+      "[2026-09-03T02:06:46.743Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T02:06:47.076Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (332ms)\n[2026-09-03T02:06:56.085Z] [world] Mud-Wracked Aetherkin moves first. The pressure is immediate.\n[2026-09-03T02:06:56.088Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 4 + ATK 5 = 9 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-03T02:06:56.088Z] [combat] You \u2014 d20 \u2192 8 + INT 12 perfect opening (2\u00d7 dice) = 20 vs Mud-Wracked Aetherkin AC 11 \u2014 \u2713 HIT\n[2026-09-03T02:06:56.088Z] [combat] The Corrupted coating fails to take on Mud-Wracked Aetherkin.\n[2026-09-03T02:06:56.089Z] [combat] Aetheric flares \u2014 +1 on hit (weak \u2014 bites deep!).\n",
+      "[2026-09-03T02:06:56.089Z] [combat] Weakness exposed \u2014 Mud-Wracked Aetherkin flinches. (aetheric \u00d71.5 for 26)\n[2026-09-03T02:06:56.090Z] [combat] The killing blow with the acid-etched corrupted auralite talon: 26. Mud-Wracked Aetherkin drops where it stood.\n[2026-09-03T02:06:56.091Z] [reward] Mud-Wracked Aetherkin defeated. You recover Aetherstone Fragment \u00d72, Aether Mud.\n",
+      "[2026-09-03T02:06:56.093Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-09-03T02:06:56.095Z] [system] \u25bc Eternal Dynasty turns HOSTILE \u2014 their patrols hunt you on their own ground now, and their counters mark you up.\n",
+      "[2026-09-03T02:06:56.096Z] [system] \u25bc Tartarian Revivalists turns HOSTILE \u2014 their patrols hunt you on their own ground now, and their counters mark you up.\n[2026-09-03T02:06:56.096Z] [system] Word travels among those who keep the flood-dead sacred: you put one of the Aetherkin down.\n[2026-09-03T02:06:56.096Z] [reward] +20 TC pried from the dust.\n",
+      "[2026-09-03T02:06:57.977Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=360 from=cached winH=986 beat=-\n[2026-09-03T02:06:58.417Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-09-03T02:07:00.254Z] [debug] persist sizes(KB): total=319 player=81 wm=149[rooms=79 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=85 scene=4\n",
+      "[2026-09-03T02:08:17.571Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-09-03T02:08:17.596Z] [debug] spawn: gear=[Bone Throwing Axe, Mud-fist Wraps, Short Hunting Bow] window=10 roster=new\n[2026-09-03T02:08:17.599Z] [world] Marlow Quicksleeve glances up. \"You again.\" Not warm, not cold \u2014 noted.\n",
+      "[2026-09-03T02:08:17.601Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Marlow Quicksleeve, fence. Tap the vendor banner to trade.\n[2026-09-03T02:08:17.611Z] [world] Rare workings for sale: Plague Vial (200 TC), Reclaimer's Aegis Pendant (200 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask",
+      ".\n[2026-09-03T02:08:17.613Z] [arbiter] The Arbiter, walking with you: \"Tartaria was a continent once. A flood older than any honest map drowned it. We are crossing the top of it.\"\n[2026-09-03T02:08:17.614Z] [world] You walk west through open silt. The compass points west into open ground.\n[2026-09-03T02:08:17.615Z] [world] What you started here has not finished itself in your absence.\n",
+      "[2026-09-03T02:08:19.153Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T02:08:20.424Z] [world] You pick up the Bone Throwing Axe.\n[2026-09-03T02:08:20.424Z] [reward] \u2726 Bone Throwing Axe (Common).\n[2026-09-03T02:08:20.444Z] [world] You lift the Mud-fist Wraps clear.\n[2026-09-03T02:08:20.444Z] [reward] \u2726 Mud-fist Wraps (Common).\n",
+      "[2026-09-03T02:08:20.446Z] [world] You get a hand under the Short Hunting Bow and take it.\n[2026-09-03T02:08:20.446Z] [reward] \u2726 Short Hunting Bow (Common).\n[2026-09-03T02:08:21.458Z] [world] You strip the blueprint carefully. Something usable comes free in your hand.\n[2026-09-03T02:08:21.459Z] [world] You break the cold spring apart. Among the pieces, something worth keeping.\n",
+      "[2026-09-03T02:08:21.459Z] [world] You break the drain hatch apart. Among the pieces, something worth keeping.\n[2026-09-03T02:08:21.459Z] [world] You break the rusted chain apart. Among the pieces, something worth keeping.\n[2026-09-03T02:08:21.460Z] [reward] \u2726 Salvage haul:\n[2026-09-03T02:08:21.460Z] [reward]     \u2022 Worn Tartarian Coin x13 (Common)\n",
+      "[2026-09-03T02:08:21.460Z] [reward]     \u2022 Scrap Metal x2 (Common)\n[2026-09-03T02:08:21.461Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-09-03T02:08:22.939Z] [debug] ui: tap \"investigate\"\n[2026-09-03T02:08:24.664Z] [player] investigate the ground\n[2026-09-03T02:08:24.664Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-09-03T02:08:24.668Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Stick (Common).\n[2026-09-03T02:08:24.677Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T02:08:24.897Z] [cognitive] CLIMB  (219ms)\n[2026-09-03T02:08:26.475Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-09-03T02:08:26.495Z] [debug] spawn: gear=[Wanderer's Worn Gauntlets] window=10 roster=new\n",
+      "[2026-09-03T02:08:26.497Z] [world] You walk west through open silt. The compass points west into open ground.\n[2026-09-03T02:08:26.497Z] [world] The loose end is exactly as loose as you left it.\n[2026-09-03T02:08:27.908Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T02:08:29.343Z] [world] You salvage the broken glass. The take is small but real.\n",
+      "[2026-09-03T02:08:29.344Z] [world] You break the cold spring apart. Among the pieces, something worth keeping.\n[2026-09-03T02:08:29.344Z] [world] You work the observation hatch over. A part of it comes loose, intact.\n[2026-09-03T02:08:29.344Z] [world] You salvage the pipe. The take is small but real.\n",
+      "[2026-09-03T02:08:29.345Z] [world] You break the shrine apart. Among the pieces, something worth keeping.\n[2026-09-03T02:08:29.345Z] [world] You work the stabilizer over. A part of it comes loose, intact.\n[2026-09-03T02:08:29.345Z] [reward] \u2726 Salvage haul:\n[2026-09-03T02:08:29.346Z] [reward]     \u2022 Smooth Stone (Common)\n[2026-09-03T02:08:29.346Z] [reward]     \u2022 Scrap Metal x3 (Common)\n",
+      "[2026-09-03T02:08:29.346Z] [reward]     \u2022 Bent Nail x5 (Common)\n[2026-09-03T02:08:29.346Z] [reward]     \u2022 Worn Tartarian Coin x6 (Common)\n[2026-09-03T02:08:30.329Z] [world] You claim the Wanderer's Worn Gauntlets.\n[2026-09-03T02:08:30.329Z] [reward] \u2726 Wanderer's Worn Gauntlets (Common).\n[2026-09-03T02:08:31.976Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-09-03T02:08:33.507Z] [player] investigate the ground\n[2026-09-03T02:08:33.507Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n[2026-09-03T02:08:33.512Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Wild Grapes (Uncommon).\n[2026-09-03T02:08:33.520Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-09-03T02:08:33.521Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T02:08:33.521Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T02:08:33.739Z] [cognitive] CLIMB  (217ms)\n[2026-09-03T02:08:34.443Z] [debug] persist sizes(KB): total=320 player=82 wm=150[rooms=80 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=84 scene=4\n",
+      "[2026-09-03T02:08:35.477Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-09-03T02:08:35.497Z] [debug] spawn: gear=[Plasma Dagger] window=10 roster=new\n[2026-09-03T02:08:35.498Z] [world] You walk west through open silt. The compass points west into open ground.\n[2026-09-03T02:08:35.499Z] [world] Whatever you turned over here is still turned over.\n",
+      "[2026-09-03T02:08:36.576Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T02:08:37.942Z] [world] You strip the battery housing carefully. Something usable comes free in your hand.\n[2026-09-03T02:08:37.942Z] [world] You break the cold spring apart. Among the pieces, something worth keeping.\n[2026-09-03T02:08:37.942Z] [world] You salvage the cooling pipe. The take is small but real.\n",
+      "[2026-09-03T02:08:37.942Z] [world] You break the gear assembly apart. Among the pieces, something worth keeping.\n[2026-09-03T02:08:37.945Z] [world] You salvage the rusted ladder. The take is small but real.\n[2026-09-03T02:08:37.946Z] [world] You salvage the shrine. The take is small but real.\n[2026-09-03T02:08:37.946Z] [reward] \u2726 Salvage haul:\n[2026-09-03T02:08:37.94"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-03-1643-the-dice-riders-pay #mtlp91n0yrsc [inline 18/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtlp91n0yrsc"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-03-1643-the-dice-riders-pay"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "18"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-03-1643-the-dice-riders-pay"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-03T15:48:18.730994Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-03T15:48:20.001000Z",
+  "fingerprints": [
+    "b9b9048656bce5f73f430f6884d9ebbd"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1953258873,
+    "commitCount": 1,
+    "data": {},
+    "dateCreated": "2026-09-03T15:14:29.448755Z",
+    "dateReleased": "2026-09-03T15:16:44.109628Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "2ee64e2afe43c23ec02c8d3422ea72912177db1a",
+      "message": "[ota-hal] OTA-1643: the dice riders pay\n\nSlice 4, unit 1 of 3 (task #98). Re-measured the effect tail on the\ncurrent catalog: 303 strings, 164 parsed, 139 read by nothing. Thirty of\nthe unread ones carry a `+N` or `+NdN` DAMAGE promise \u2014 the simplest\nsentence in the whole column, and the one no code could see. A Legendary\nEnergy Hammer said \"+1d6 shock damage\" and swung for its printed 2d10 and\nnothing more, every time, for the life of the game.\n\nTwo families land, both on machinery that already existed:\n\n  \u2022 flatRider \u2014 bonus damage owed on EVERY hit, no condition attached (9\n    weapons). It goes through the same rollEffectBonusDamage as the\n    conditioned bonus rather than beside it: two sentences on the card,\n    one arithmetic on the swing, and two call sites is how they end up\n    disagreeing about whether a resist applies.\n  \u2022 riderDot \u2014 a rider the card gives a SPAN (3 weapons), seeded into the\n    Combat-Parity `typed_dot` the damage-type proc has used since it\n    shipped. Keyed by the WEAPON, not by the type, so a guaranteed promise\n    never swaps places with the 45% type flare sitting on the same body.\n\nThe rule that splits them is the card's own words: a stated duration\nfesters, no duration lands now. Guessing from the damage type instead\nwould have turned four cards into two different lies.\n\nFour new conditions, each backed by real rows in enemies.json \u2014 a\ncondition that matches nothing is the defect, not the fix, which is what\n`structure` has been since the day it was added: armored (47/135),\nunarmored (88/135), natural_armor (26 \u2014 armour the creature GREW; a\nmachine and a man in plate both have armour and neither has a hide),\nburnable (39, the vulnerable:burn roster). The conditioned-bonus regex\ngained a second, stricter FLAT pass requiring the literal word \"damage\",\nso \"+1 damage to tech\" is finally read while the shields' \"+2 AC vs energy\ndamage\" can never be read as bonus damage.\n\nThree cards reworded, because nothing in the game can satisfy them: Mud\nHeater Sword (measured \u2014 zero enemies resist or fear cold, so \"+1d6\nagainst cold creatures\" could never once fire; now fire-vulnerable, which\n39 can), Mud Sling (glass is not an enemy; now unarmoured), Giant Bone\nKnuckles (\"arm's-reach targets\" is always true for a barehanded weapon \u2014\na condition written as though it were sometimes false).\n\n\u26a0 The plus sign is the whole test, and the first draft without it was\nworth recording: it claimed 73 weapons instead of 19. Every rune-caster\nrestates its own base dice in the effect column, so all 45 would have\ndoubled \u2014 a Legendary scepter going 2d20 \u2192 4d20 on a change meant for\nthree mud blades \u2014 and the shields count dice they TAKE AWAY, which is\nthe sign error that flatters a weapon most. Widening the verb list was\nthe bug here, which is the opposite of what slices 1c and 2 taught.\n\nThe card now says both riders as rules, since until this OTA neither paid\nand a line is the only way to tell the two versions apart.\n\nota1643 (36 tests) pins the wins, every boundary the reader must not\ncross, that each new condition is reachable by a real enemy, and an audit\nover the whole catalog naming the four rows still owed to units 4b (the\neight shield +AC promises) and 4c (the exotic reword pass) \u2014 named, so a\nNEWLY authored dead promise fails instead of shipping.\n\nGates: all 18 green by exit code. Full suite green.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-03T15:11:46Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-03-1643-the-dice-riders-pay",
+          "shortVersion": "tartaria@4.32.11+2026-09-03-1643-the-dice-riders-pay",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-03T15:16:44.109628Z",
+          "dateCreated": "2026-09-03T15:14:29.448755Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155207912",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-03T15:16:44.380480Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-03-1643-the-dice-riders-pay",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-03-1643-the-dice-riders-pay",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-03-1643-the-dice-riders-pay",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-03-1643-the-dice-riders-pay)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "c939e41aed1d478b8a9e764d26d82ec7",
+  "previousEventID": "bbb60f963f7844a1a923d2336ea6f49e"
+}
