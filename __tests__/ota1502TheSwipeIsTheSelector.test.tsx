@@ -101,33 +101,52 @@ describe('OTA-1502 — both hands report against the enemy on screen', () => {
 });
 
 describe('OTA-1502 — the card speaks the marks without stealing a taught one', () => {
+  // ⚠⚠⚠ OTA-1651 REPOINTED THE NEXT THREE, AND THE CLAIM DID NOT CHANGE.
+  // The owner asked for the hands OFF the combat card — he read two bare weapon
+  // names on an ENEMY's card as a stray reference to his own axe, which is
+  // exactly what they looked like. The row moved WHOLE into `enemyDetailBody`
+  // (the tap-for-info popup); `view.hands` and the reach resolver behind it are
+  // untouched, and the four tests above still pin them. What these three pin is
+  // the PRESENTATION, so they follow it to its new home rather than being
+  // deleted — the assertions about ▲/▼ and the screen reader are as load-bearing
+  // in a popup as they were on a card.
   it('⚠⚠⚠ NOT ▲/▼ — those were taught in the tutorial as BETTER/WORSE gear', () => {
     // OTA-1499/1500 spent a whole tutorial beat teaching ▲ = beats what you
     // carry and ▼ = loses to it. Reusing them for "this hand reaches" would
     // overload a glyph the player was explicitly taught to read another way.
-    const i = PANEL.indexOf('{!!view.hands?.length && (');
+    const i = PANEL.indexOf('if (view.hands?.length) {');
     expect(i).toBeGreaterThan(-1);
-    const body = PANEL.slice(i, PANEL.indexOf('OTA-897', i));
+    const body = PANEL.slice(i, PANEL.indexOf('}', PANEL.indexOf('lines.push(`${h.inRange', i)) + 200);
     expect(body).toContain("h.inRange ? '●' : '○'");
-    // Comments stripped first — same rule as OTA-1497's same-tick scan. The
-    // source comment NAMES ▲/▼ to explain why they are not used here, and a
-    // scan that cannot tell documentation from code would forbid saying so.
     const code = body.replace(/\{?\/\*[\s\S]*?\*\/\}?/g, '').replace(/^\s*\/\/.*$/gm, '');
     expect(code).not.toMatch(/[▲▼]/);
   });
 
-  it('⚠⚠ green means reachable, and it is the SAME green the pickers use', () => {
-    expect(PANEL).toMatch(/handIn: \{ color: '#9ec96a' \}/);
-    // The unreachable hand is muted, not alarm-red: it is information, not a
-    // warning — the red on this screen belongs to threat.
-    expect(PANEL).toMatch(/handOut: \{ color: '#7a7263' \}/);
+  it('⚠⚠ the styles went with the row they styled', () => {
+    // ⚠ THE GREEN IS GONE BECAUSE THE ROW IS. A style block that outlives its
+    // component is how "still styled, therefore still shown" survives a
+    // refactor — and this test would have kept passing on dead code, which is
+    // worse than failing. The popup is plain text: the reach lines carry their
+    // meaning in WORDS now, which the test below pins.
+    expect(PANEL).not.toMatch(/handIn: \{ color:/);
+    expect(PANEL).not.toMatch(/handOut: \{ color:/);
+    expect(PANEL).not.toMatch(/flavorLine: \{ color:/);
   });
 
   it('⚠ the screen reader is told which hand and whether it reaches', () => {
-    const i = PANEL.indexOf('{!!view.hands?.length && (');
-    const body = PANEL.slice(i, PANEL.indexOf('OTA-897', i));
-    expect(body).toMatch(/accessibilityLabel=\{`\$\{h\.slot === 'main' \? 'Main hand' : 'Off hand'\}/);
-    expect(body).toContain("h.inRange ? 'in range' : 'out of range'");
+    // ⚠ BETTER THAN THE LABEL IT REPLACES. The card needed an
+    // accessibilityLabel because "● Magnetic Axe" is unreadable aloud; the
+    // popup body IS the text, so the words are the label.
+    const i = PANEL.indexOf('if (view.hands?.length) {');
+    const body = PANEL.slice(i, i + 500);
+    expect(body).toContain("h.slot === 'main' ? 'Main hand' : 'Off hand'");
+    expect(body).toContain("h.inRange ? 'reaches this one' : 'cannot reach from here'");
+  });
+
+  it('⚠ and the combat card no longer draws either of them', () => {
+    // The owner's actual ask: shorter cards, more room for the narration block.
+    expect(PANEL).not.toContain('{!!view.hands?.length && (');
+    expect(PANEL).not.toContain('style={styles.flavorLine}');
   });
 
   it('⚠ the view model carries the hands per enemy, ready for per-enemy range', () => {

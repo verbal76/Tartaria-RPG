@@ -27134,7 +27134,24 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // home, ⚔ / 🛡 sit beside the companion names (red when the piece is failing), and
 // the expanded panels print AC + durability + a condition word instead of a bare
 // name. One module, companionGear.ts, knows where companion gear lives.
-export const OTA_BUILD_ID = '2026-09-03-1650-companion-gear-is-real-gear';
+// OTA-1651 — THE CARDS GIVE THE PAGE BACK. Owner, with a screenshot: "we can
+// remove all of the gold writing telling me what's equipped… remove the faction
+// standing… for the enemy portrait remove the weapon reference on top… we don't
+// need the flavor text, this is a fight, move the flavor text to the expanded
+// enemy card. that should shorten both cards enough to give some room back to the
+// main text block." ⚠ TWO THINGS COME OFF and TWO MOVE, and the difference is the
+// design: the four-line gold Equipped block and Faction standing are reference
+// material with a full sheet one tap away, so they go; the bestiary flavour line
+// (OTA-897) and the per-hand reach row (OTA-1502) are answers he asked for
+// earlier, so they move WHOLE into enemyDetailBody rather than being deleted. He
+// guessed right that "Magnetic Axe" was his own axe — those two lines were his
+// main and off hands, ● = reaches this foe, and a bare weapon name on an ENEMY's
+// card reads as the enemy's, which is exactly why it confused him; in the popup it
+// says so in words. The reach resolver and view model are untouched: this moved a
+// view, not a rule. Every builder behind a removed row went with it, and the
+// orphaned style blocks with them.
+export const OTA_BUILD_ID = '2026-09-03-1651-the-cards-give-the-page-back';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-03-1650-companion-gear-is-real-gear';
 // golem catch-up 2026-09-03: markerless publish of OTA-1650 - the companions'
 // gear becomes real gear: the dog's vest is durable at last (dogGear.json's
 // baseDurability had never been read), both pieces warn three points before they

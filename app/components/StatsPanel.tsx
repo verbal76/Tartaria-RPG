@@ -134,7 +134,6 @@ const HP_PULSE_COLOR = 'rgb(220, 64, 52)';
 
 export function StatsPanel({ player, enemyPower }: Props) {
   const race = (racesData as { id: string; name: string }[]).find((r) => r.id === player.raceId);
-  const factionStanding = player.factionStanding.find((f) => f.factionId === player.factionId)?.standing ?? 0;
   // OTA-632 — HP fraction drives the card tint + HP-number colour.
   const hpFrac = player.hpMax > 0 ? player.hp / player.hpMax : 1;
 
@@ -219,26 +218,12 @@ export function StatsPanel({ player, enemyPower }: Props) {
     return undefined;
   }, [pwrRating]);
 
-  // Compose a single-line summary of every filled slot so the panel
-  // stays compact even with eight slots tracked.
-  // OTA-406 — show a weapon's COATED name in the equipped summary (resolved by
-  // the slot id so two same-named weapons, one coated, are told apart). Armor
-  // slots can't be coated, so they stay as the plain name.
-  const coatedSlotName = (slotName: string, id: string | null | undefined): string => {
-    if (!id) return slotName;
-    const inst = player.inventory?.find((i) => i.id === id);
-    return inst ? coatedDisplayName(inst) : slotName;
-  };
-  const slotParts: string[] = [];
-  if (player.equipped?.main) slotParts.push(`R: ${coatedSlotName(player.equipped.main, player.equipped.mainId)}`);
-  if (player.equipped?.off) slotParts.push(`L: ${coatedSlotName(player.equipped.off, player.equipped.offId)}`);
-  if (player.equipped?.head) slotParts.push(`Hd: ${player.equipped.head}`);
-  if (player.equipped?.chest) slotParts.push(`Ch: ${player.equipped.chest}`);
-  if (player.equipped?.legs) slotParts.push(`Lg: ${player.equipped.legs}`);
-  if (player.equipped?.feet) slotParts.push(`Ft: ${player.equipped.feet}`);
-  if (player.equipped?.amulet) slotParts.push(`Aml: ${player.equipped.amulet}`);
-  if (player.equipped?.ring) slotParts.push(`Rg: ${player.equipped.ring}`);
-  const equippedLabel = slotParts.length > 0 ? slotParts.join(' · ') : 'nothing';
+  // ⚠ OTA-1651 — THE SLOT SUMMARY WENT WITH ITS ROW. It composed
+  // "R: … · L: … · Hd: … · Ch: …" for the gold block this card no longer draws,
+  // and it also only ever listed EIGHT of the eleven slots (no cloak, no hands,
+  // no rings past the first — a fourth ring arrived in OTA-1648 and this line
+  // could never have shown it). The full sheet lists every slot correctly, and
+  // it is one tap away.
 
   // OTA-145 — dog name displays on the same row as the player name,
   // right-aligned to the panel edge, when a dog is active. Hidden for
@@ -361,9 +346,14 @@ export function StatsPanel({ player, enemyPower }: Props) {
         <Stat label="WIS" value={formatStat(player.stats.wisdom, eff.wisdom)} />
         <Stat label="CHA" value={formatStat(player.stats.charisma, eff.charisma)} />
       </View>
-      <Text style={styles.equipped} numberOfLines={4} ellipsizeMode="tail">
-        Equipped: {equippedLabel}
-      </Text>
+      {/* ⚠⚠ OTA-1651 — THE EQUIPPED BLOCK IS GONE FROM THIS CARD. Owner, with
+          a screenshot: *"we can remove all of the gold writing telling me
+          what's equipped… that should shorten both cards enough to give some
+          room back to the main text block in the center of the exploration
+          screen."* It ran to four wrapped lines of "R: … · L: … · Hd: … · Ch: …"
+          on a card the player passes through, and every word of it is on the
+          full sheet one tap away (`tap for full sheet ›`, right below) and on
+          the weapon buttons at the bottom of the very same screen. */}
       {player.statusEffects && player.statusEffects.length > 0 && (
         <Text style={styles.effects} numberOfLines={1}>
           Effects: {formatEffectSummary(player.statusEffects)}
@@ -385,7 +375,8 @@ export function StatsPanel({ player, enemyPower }: Props) {
           </Text>
         );
       })()}
-      <Text style={styles.subline}>Faction standing: {factionStanding}</Text>
+      {/* OTA-1651 — faction standing went with it, for the same reason and to
+          the same place: it is a number you consult, not one you fight by. */}
       {/* OTA 040 — affordance for the new Player Sheet screen. Tap
           handler lives on the parent TouchableOpacity in
           ExplorationScreen.tsx; this is the visual cue. */}

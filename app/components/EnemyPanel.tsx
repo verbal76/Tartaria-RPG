@@ -453,11 +453,34 @@ function enemyDetailBody(view: EnemyView, canRead: boolean, observed?: { weak: s
     lines.push(`Threat: ${says}`);
   }
   lines.push('');
+  // ⚠⚠ OTA-1651 — THE FLAVOUR LINE LIVES HERE NOW. Owner: *"we don't need the
+  // flavor text, this is a fight, move the flavor text to the expanded enemy
+  // card."* He is right about the combat card — three italic lines of bestiary
+  // voice between the range chip and the HP bar is reading material in the
+  // middle of a swing. It is not right to DELETE it (OTA-897 put it there so a
+  // foe reads as a described creature), so it comes here, above the numbers,
+  // where the player has opened the card precisely to look at the thing.
+  if (e.flavor) {
+    lines.push(e.flavor);
+    lines.push('');
+  }
   lines.push(`HP ${view.currentHp}/${e.hp}     AC ${ac}`);
   // OTA-1139 (audit) — a boss's real per-round output, not the notation third of it.
   lines.push(`Attack ${atkLabel}     Damage ${enemyDamageCompact(e)}${dealsType ? ` (${cap(dealsType)})` : ''}`);
   // OTA-1609 — the move name rides along in the roomy popup too.
   if (enemyAttackName(e)) lines.push(`Strikes with: ${enemyAttackName(e)}`);
+  // ⚠⚠ OTA-1651 — AND YOUR OWN HANDS, spelled out. On the combat card this was
+  // two bare weapon names with a lit or unlit dot, and the owner read them as a
+  // stray reference to his own axe on an ENEMY's card — which is exactly what
+  // they looked like. The information is real (OTA-1502: the off hand was the
+  // half of his loadout that was mute), so it moves here and says what it means
+  // in words instead of relying on a dot to carry it.
+  if (view.hands?.length) {
+    lines.push('');
+    for (const h of view.hands) {
+      lines.push(`${h.inRange ? '●' : '○'} ${h.slot === 'main' ? 'Main hand' : 'Off hand'}: ${h.label} — ${h.inRange ? 'reaches this one' : 'cannot reach from here'}`);
+    }
+  }
   // OTA-818/819 — a non-boss enemy's (randomized) defenses are WIS-gated: read them up
   // front only with enough Wisdom, else discover by hitting. OTA-799 — the read is
   // DIEGETIC: narrate what you notice, with the damage type in parens.
@@ -580,32 +603,25 @@ function EnemyCard({ view, cardWidth, hpBarWidth, canRead, observed, playerPower
             : inRange ? 'IN RANGE' : 'OUT OF RANGE'}
         </Text>
       </View>
-      {/* ⚠⚠ OTA-1502 — THE HANDS, PER ENEMY. Green = that hand reaches THIS
-          foe from where you stand; red = it cannot. Swiping the pager until
-          both read green is how the owner asked to find the man he can hit
-          without walking into anyone else's reach. */}
-      {!!view.hands?.length && (
-        <View style={styles.handsRow}>
-          {view.hands.map((h) => (
-            <Text
-              key={h.slot}
-              style={[styles.hand, h.inRange ? styles.handIn : styles.handOut]}
-              numberOfLines={1}
-              accessibilityLabel={`${h.slot === 'main' ? 'Main hand' : 'Off hand'} ${h.label}, ${h.inRange ? 'in range' : 'out of range'}`}
-            >
-              {/* ⚠ NOT ▲/▼ — OTA-1499/1500 spent a tutorial beat teaching those
-                  as BETTER/WORSE than your equipped gear. A lit/unlit dot says
-                  "this hand can reach" without borrowing a taught meaning. */}
-              {h.inRange ? '●' : '○'} {h.label}
-            </Text>
-          ))}
-        </View>
-      )}
-      {/* OTA-897 (SA-5) — the bestiary voice line also greets you on the combat
-          card, so a foe reads as a described creature, not a bare stat block. */}
-      {!!view.enemy.flavor && (
-        <Text style={styles.flavorLine} numberOfLines={3}>{view.enemy.flavor}</Text>
-      )}
+      {/* ⚠⚠⚠ OTA-1651 — THE HANDS ROW AND THE FLAVOUR LINE MOVED TO THE POPUP.
+          Owner, with a screenshot: *"remove the weapon reference on top, I guess
+          that is referencing my axe? if so it doesn't need to be there… and we
+          don't need the flavor text, this is a fight, move the flavor text to
+          the expanded enemy card. that should shorten both cards enough to give
+          some room back to the main text block."*
+
+          ⚠ THE HANDS ROW WAS NOT DECORATION and it is not deleted — it is
+          OTA-1502, the answer to *"the off hand is the half of my loadout that
+          was mute"*: ● = that hand reaches THIS foe, ○ = it cannot. He read it
+          as a stray reference to his own axe, which is fair — a bare weapon
+          name on an ENEMY card reads as the enemy's. It moves to
+          `enemyDetailBody` whole, where it has room to say what it means. The
+          `MID-RANGE · OUT` chip above still answers range at the card level,
+          which is what a swing actually gates on.
+
+          ⚠ AND `view.hands` STAYS ON THE VIEW MODEL, computed exactly as it was.
+          Nothing about the reach resolver changes; only where its answer is
+          drawn. */}
       <View style={[styles.hpBarBg, { width: hpBarWidth }]}>
         {/* OTA-081 — numeric pixel width (was percent string): RN sometimes
             skipped the layout pass when only the percent changed, leaving the
@@ -775,14 +791,15 @@ const styles = StyleSheet.create({
   // OTA-1502 — per-hand reach row. Green shares the picker's "this is good for
   // you" green (#9ec96a); the unreachable hand goes muted rather than alarm-red,
   // because an out-of-reach weapon is information, not a warning.
-  handsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 3 },
-  hand: { fontSize: 9, letterSpacing: 0.5 },
-  handIn: { color: '#9ec96a' },
-  handOut: { color: '#7a7263' },
+  // ⚠ OTA-1651 — handsRow / hand / handIn / handOut went with the row they
+  // styled. The popup is plain text, so the reach lines carry their meaning in
+  // words now rather than in a green. Left as a comment rather than silently
+  // deleted: a style block that outlives its component is how a "still styled,
+  // therefore still shown" assumption survives a refactor.
   subline: { color: '#a2977b', fontSize: 11, flexShrink: 1 },
   // OTA-897 (SA-5) — the enemy card's voice line: readable italic prose, set
   // above the stat grid.
-  flavorLine: { color: '#b8a982', fontSize: 11, lineHeight: 15, fontStyle: 'italic', marginBottom: 6 },
+  // OTA-1651 — flavorLine likewise: the bestiary voice is popup text now.
   hpBarBg: {
     height: 6,
     backgroundColor: '#1a1714',
