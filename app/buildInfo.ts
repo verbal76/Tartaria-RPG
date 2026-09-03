@@ -27151,6 +27151,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // view, not a rule. Every builder behind a removed row went with it, and the
 // orphaned style blocks with them.
 export const OTA_BUILD_ID = '2026-09-03-1651-the-cards-give-the-page-back';
+// golem catch-up 2026-09-03: markerless publish of OTA-1651 - the gold Equipped
+// block and faction standing come off the character card; the bestiary flavour
+// line and the per-hand reach row move off the combat card into the tap-for-info
+// popup. Both cards shorten; the narration block gets the room back. hal took the
+// marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-03-1650-companion-gear-is-real-gear';
 // golem catch-up 2026-09-03: markerless publish of OTA-1650 - the companions'
 // gear becomes real gear: the dog's vest is durable at last (dogGear.json's
