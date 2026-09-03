@@ -26952,6 +26952,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // and no qwen line — every skip branch logs its reason, the load logs its
 // start, a load unsettled after 90 s logs once.
 export const OTA_BUILD_ID = '2026-09-03-1635-three-from-the-log';
+// golem catch-up 2026-09-03: markerless publish of OTA-1635 - food is never
+// gear, the wanderer card waits for the picker, qwen says why it is silent.
+// hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-02-1634-the-aside-yields';
 // golem catch-up 2026-09-02: markerless publish of OTA-1634 - the live aside is
 // homework; the stall line names the crumb and the native lane. hal took the marker.
