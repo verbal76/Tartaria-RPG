@@ -1,0 +1,257 @@
+{
+  "id": "db39cd66d7fc45d082b885a6a927affd",
+  "groupID": "7708650401",
+  "eventID": "db39cd66d7fc45d082b885a6a927affd",
+  "projectID": "4511945117532160",
+  "size": 17977,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-03-1637-this-is-the-place-means-the-cell #mtkvtzmb9qii [inline 25/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-03-1637-this-is-the-place-means-the-cell",
+  "message": "player-log 2026-09-03-1637-this-is-the-place-means-the-cell #mtkvtzmb9qii [inline 25/28]",
+  "title": "player-log 2026-09-03-1637-this-is-the-place-means-the-cell #mtkvtzmb9qii [inline 25/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:dba5:7266:ad2:ae57:4fda:d815",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "e67f995006b74fdaba977e8f659dcba8",
+      "span_id": "b48155f15da73e97",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "ence. Tap the vendor banner to trade.\n[2026-09-03T00:41:47.460Z] [world] This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n[2026-09-03T00:41:47.460Z] [arbiter] The Arbiter, half to themselves: \"The Aether you breathe out here is the same Aether the pre-flood engineers stored. Most of it is theirs, leaking back.\"\n",
+      "[2026-09-03T00:41:47.461Z] [world] You walk east through open silt. The compass tells you Aetheric Chamber lies further east \u2014 1 tile, about 3 hours of travel.\n[2026-09-03T00:41:47.461Z] [world] A crystal embedded in a half-broken pillar whispers \u2014 actual words, almost \u2014 when you pass within arm's reach.\n[2026-09-03T00:41:50.042Z] [debug] ui: tap \"take / salvage\"\n",
+      "[Filtered]",
+      "[2026-09-03T00:41:51.330Z] [world] You strip the kelp drift carefully. Something usable comes free in your hand.\n[2026-09-03T00:41:51.330Z] [world] You break the shell apart. Among the pieces, something worth keeping.\n[2026-09-03T00:41:51.331Z] [world] You work the standing water apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n",
+      "[2026-09-03T00:41:51.331Z] [reward] \u2726 Salvage haul:\n[2026-09-03T00:41:51.331Z] [reward]     \u2022 Slate-Weighted Netting (Common)\n[2026-09-03T00:41:51.331Z] [reward]     \u2022 Spider Silk x3 (Common)\n[2026-09-03T00:41:51.332Z] [reward]     \u2022 Aetheric Cloth (Rare)\n[2026-09-03T00:41:51.332Z] [reward]     \u2022 Bone Sliver (Common)\n[2026-09-03T00:41:51.332Z] [reward]     \u2022 Beetle-Chitin Flake (Common)\n",
+      "[2026-09-03T00:41:52.395Z] [world] Where the Tartarian Hand Axe was, the ground is a shade darker.\n[2026-09-03T00:41:52.395Z] [reward] \u2726 Tartarian Hand Axe (Common).\n[2026-09-03T00:41:53.674Z] [debug] ui: tap \"investigate\"\n[2026-09-03T00:41:55.230Z] [player] investigate the ground\n",
+      "[2026-09-03T00:41:55.230Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=5\n[2026-09-03T00:41:55.233Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-09-03T00:41:55.240Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T00:41:55.456Z] [cognitive] CLIMB  (215ms)\n",
+      "[2026-09-03T00:41:59.268Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n[2026-09-03T00:41:59.289Z] [world] You walk south. You arrive at Mud Flood Nexus.\n[2026-09-03T00:41:59.290Z] [debug] scene: loc=mud_flood_nexus hub=- arrival=y opening=n passing=n\n[2026-09-03T00:41:59.291Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-03T00:41:59.291Z] [debug] missions: hunt:hunt_bog_dragon stage 3/7 [boss\u2192attack] @mud_flood_nexus HERE needs=Mira's Shrine-Map\u2713 gives=The Boy's Locket spawn=Mud Wraith\u00d71 AMBUSH\n[2026-09-03T00:41:59.291Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n",
+      "[2026-09-03T00:41:59.291Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n[2026-09-03T00:41:59.292Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n",
+      "[2026-09-03T00:41:59.292Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n[2026-09-03T00:41:59.292Z] [debug] missions: \u00b7 at=mud_flood_nexus travelTo=mud_flood_nexus\n[2026-09-03T00:41:59.293Z] [world] \u25b8 The Bog Dragon of Old Drakova: this is the place \u2014 strike.\n",
+      "[2026-09-03T00:41:59.328Z] [debug] spawn: gear=[Titan's Forehead Guard, Aetheric Rod, Bonebreaker Mace] window=10 roster=new\n[2026-09-03T00:41:59.362Z] [arbiter] The Arbiter takes you in. \"Mud Flood Nexus is lethal country. The things that wake here pull above your weight. 48 HP carries you through Varakush (danger 1). 1/9 Cores recovered. Visit the remaining Lost Capitals. Or move on until you've",
+      " got your legs under you.\"\n[2026-09-03T00:41:59.364Z] [world] Mercy noses at the blood-spotted cloth and snorts. There's something there.\n[2026-09-03T00:41:59.368Z] [world] You've left Zharak's Teeth and entered Mud Flood Nexus. This is the room where the disaster was managed, or could have been. It's dawn. An aetheric ooze and a spore skimmer are already here. south leads to The Black Reach. Noth",
+      "ing named to the north or east or west.\n[2026-09-03T00:41:59.369Z] [combat] Distance: close / arm's reach. Auralite Talon \u2713 in range \u00b7 Choir-Bound Launcher \u2713 in range.\n[2026-09-03T00:41:59.441Z] [arbiter] The Arbiter lowers their voice. \"You're carrying shadow with you \u2014 use it. Tap STEALTH before they close, and you can be on them before they know it. A clean opening strike, or slip past entirely",
+      ".\"\n[2026-09-03T00:41:59.442Z] [system] Weather effect \u2014 Black Rain: -1 CHA\n[2026-09-03T00:41:59.444Z] [world] [Mud Flood Nexus] north: Ostragar (9 tiles, 23 hours) \u00b7 east: Aetheric Chamber (3 tiles, 8 hours) \u00b7 south: The Black Reach (1 tile, 3 hours) \u00b7 west: The Giant Vault (3 tiles, 8 hours)\n",
+      "[2026-09-03T00:41:59.444Z] [combat] An Aetheric Ooze and a Spore Skimmer close on you. Tap the right-side panel to cycle targets.\n[2026-09-03T00:42:13.104Z] [debug] ui: tap \"stealth\"\n[2026-09-03T00:42:13.111Z] [player] sneak\n[2026-09-03T00:42:13.112Z] [debug] parser: intent=stealth conf=1.00 verb=sneak target=- resolved=- range=close enemies=2 hooks=0\n",
+      "[2026-09-03T00:42:13.203Z] [system] \u23f3 Time passed: 15 min\n[2026-09-03T00:42:13.528Z] [cognitive] DISENGAGE \u00b7 HIDE \u00b7 TAKE_COVER  (324ms)\n[2026-09-03T00:42:18.683Z] [debug] skillcheck: stealth d20=10 STE 7 + 1 (title: Shadow Diver) = 18 vs DC 12 \u2014 Hard \u2192 (resolved below)\n",
+      "[2026-09-03T00:42:18.791Z] [debug] stats: STR16 DEX19 INT12 WIS15 CHA11 STE7 | gear: WIS+4,INT+3,STR+5,DEX+8,STE+2 | worn: main=Auralite Talon off=Choir-Bound Launcher head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n",
+      "[2026-09-03T00:42:18.791Z] [debug] train: stealth (stealth check) \u2192 progress 89/100\n[2026-09-03T00:42:18.791Z] [world] The daylight leaves you little cover. (stealth \u22121, day)\n[2026-09-03T00:42:18.792Z] [world] You fling a fistful of grit into Aetheric Ooze's eyes and slip their line of sight. Half-blind, they swing at where you were. (+5 next attack)\n",
+      "[2026-09-03T00:42:18.792Z] [debug] stealth: reset WIN init 19 vs 13 (dust, +5 1r)\n[2026-09-03T00:42:18.792Z] [combat] Spore Skimmer turns on Mercy \u2014 d20 4 + ATK 5 = 9 vs Mercy's AC 10 \u2014 \u2717 MISS\n[2026-09-03T00:42:18.793Z] [combat] Aetheric Ooze \u2014 d20 \u2192 8 + ATK 3 = 11 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-03T00:42:21.325Z] [debug] ui: tap \"dodge\"\n",
+      "[2026-09-03T00:42:21.329Z] [system] unseen \u2014 next strike +5 fades.\n[2026-09-03T00:42:21.338Z] [player] dodge\n[2026-09-03T00:42:21.338Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=2 hooks=0\n",
+      "[2026-09-03T00:42:21.339Z] [world] You commit to the dodge. Slip Aetheric Ooze's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-03T00:42:21.426Z] [combat] Aetheric Ooze \u2014 d20 \u2192 7 + ATK 3 = 10 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n",
+      "[2026-09-03T00:42:21.426Z] [combat] Dodge \u2014 d20 \u2192 3 + DEX 19 = 22 vs ATK 10. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-03T00:42:21.427Z] [world] You slip Aetheric Ooze's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n",
+      "[2026-09-03T00:42:21.494Z] [reward] \u2726 Reflex like water. +1 DEX (base 11, 20 as you stand).\n[2026-09-03T00:42:21.496Z] [combat] Spore Skimmer turns on Mercy \u2014 d20 10 + ATK 5 = 15 vs Mercy's AC 10 \u2014 \u2713 HIT\n[2026-09-03T00:42:21.496Z] [combat] Mercy takes 2. (13/15 HP left)\n[2026-09-03T00:42:21.496Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T00:42:21.835Z] [cognitive] neutral  (338ms)\n",
+      "[2026-09-03T00:42:22.567Z] [debug] persist sizes(KB): total=323 player=75 wm=159[rooms=90 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=83 scene=4\n[2026-09-03T00:42:22.895Z] [debug] ui: tap \"\ud83d\udd25\u2623 choir-bound launcher\"\n[2026-09-03T00:42:22.895Z] [system] evasive \u2014 harder to hit fades.\n[2026-09-03T00:42:22.922Z] [player] attack with the off-hand choir-bound launcher\n",
+      "[2026-09-03T00:42:22.923Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=close enemies=2 hooks=0\n[2026-09-03T00:42:22.924Z] [debug] attack: target=Aetheric Ooze range=close reach.bands=[distant,far,mid,close] reach.label=Choir-Bound Launcher bareHand=false\n",
+      "[2026-09-03T00:42:22.925Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-03T00:42:22.991Z] [world] You commit forward with the searing corrupted choir-bound launcher. Aetheric Ooze watches your hands.\n[2026-09-03T00:42:22.991Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T00:42:23.314Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 TAKE_COVER  (322ms)\n",
+      "[2026-09-03T00:42:37.656Z] [world] Aetheric Ooze moves first. The pressure is immediate.\n[2026-09-03T00:42:37.658Z] [combat] Spore Skimmer \u2014 d20 \u2192 6 + ATK 5 = 11 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-03T00:42:37.658Z] [combat] Aetheric Ooze turns on Mercy \u2014 d20 5 + ATK 3 = 8 vs Mercy's AC 10 \u2014 \u2717 MISS\n",
+      "[2026-09-03T00:42:37.658Z] [combat] You \u2014 d20 \u2192 11 + INT 12 + 2 (point blank) perfect opening (2\u00d7 dice) = 25 vs Aetheric Ooze AC 8 \u2014 \u2713 HIT\n[2026-09-03T00:42:37.659Z] [combat] Aetheric Ooze shrugs off the aetheric. (resisted, \u00d70.5 for 12)\n[2026-09-03T00:42:37.664Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Flame of Aether \u2014 burn will bite where aetheric won't.\"\n",
+      "[2026-09-03T00:42:37.666Z] [combat] Your blow with the searing corrupted choir-bound launcher lands clean \u2014 12 damage. Aetheric Ooze crumples in the dust. The Aetherstone settles.\n[2026-09-03T00:42:37.667Z] [reward] Aetheric Ooze defeated. You recover Ooze Residue, Aether Crystal.\n[2026-09-03T00:42:37.667Z] [combat] 1 attacker remains. Spore Skimmer now in your sights.\n",
+      "[2026-09-03T00:42:37.668Z] [reward] \u2726 You feel hardier from your trials. +1 max HP (now 49). [142 enemies defeated]\n[2026-09-03T00:42:37.668Z] [reward] +5 TC pried from the dust.\n[2026-09-03T00:42:37.732Z] [arbiter] The Arbiter does not look up. \"Hit it before it hits you. That's the entire trick.\"\n[2026-09-03T00:42:40.614Z] [debug] ui: tap \"\ud83d\udd25\u2623 choir-bound launcher\"\n",
+      "[2026-09-03T00:42:40.664Z] [player] attack with the off-hand choir-bound launcher\n[2026-09-03T00:42:40.664Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=mid enemies=1 hooks=0\n",
+      "[2026-09-03T00:42:40.665Z] [debug] attack: target=Spore Skimmer range=mid reach.bands=[distant,far,mid,close] reach.label=Choir-Bound Launcher bareHand=false\n[2026-09-03T00:42:40.737Z] [world] You commit forward with the searing corrupted choir-bound launcher. Spore Skimmer watches your hands.\n[2026-09-03T00:42:40.738Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-03T00:42:41.057Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 TAKE_COVER  (318ms)\n[2026-09-03T00:42:51.236Z] [world] Spore Skimmer moves first. The pressure is immediate.\n[2026-09-03T00:42:51.238Z] [combat] Spore Skimmer \u2014 d20 \u2192 12 + ATK 5 = 17 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-03T00:42:51.238Z] [combat] You \u2014 d20 \u2192 11 + INT 12 = 23 vs Spore Skimmer AC 9 \u2014 \u2713 HIT\n",
+      "[2026-09-03T00:42:51.239Z] [combat] Spore Skimmer shrugs off the aetheric. (resisted, \u00d70.5 for 7)\n[2026-09-03T00:42:51.242Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Reclaimers Guild Geode-Cored Cleaver \u2014 slashing will bite where aetheric won't.\"\n",
+      "[2026-09-03T00:42:51.243Z] [combat] The blow with the searing corrupted choir-bound launcher finds purchase \u2014 7 damage, 12 HP standing. Spore Skimmer commits to the counter.\n[2026-09-03T00:42:51.245Z] [combat] Searing Corrupted Choir-Bound Launcher \u2014 1 burn bites in and festers (3 turns).\n",
+      "[2026-09-03T00:42:51.245Z] [combat] Searing Corrupted Choir-Bound Launcher \u2014 2 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n[2026-09-03T00:42:53.209Z] [debug] ui: tap \"approach\"\n[2026-09-03T00:42:53.254Z] [player] approach Spore Skimmer\n",
+      "[2026-09-03T00:42:53.255Z] [debug] parser: intent=advance conf=1.00 verb=approach target=spore skimmer resolved=Spore Skimmer range=mid enemies=1 hooks=0\n[2026-09-03T00:42:53.256Z] [debug] move: advance from range=mid enemies=1 weather=Black Rain cost=1 partial=0\n[2026-09-03T00:42:53.256Z] [debug] move: field advance target=Spore Skimmer d 1.58->0.58 band mid->close\n",
+      "[2026-09-03T00:42:53.256Z] [world] You close the gap with Spore Skimmer. (range: close / arm's reach)\n[2026-09-03T00:42:53.257Z] [combat] Spore Skimmer blisters \u2014 clinging fire sears 1. (11/19 HP, 2 turns left)\n[2026-09-03T00:42:53.257Z] [combat] Spore Skimmer blackens \u2014 corruption eats 2. (9/19 HP, 2 turns left)\n",
+      "[2026-09-03T00:42:53.258Z] [combat] Spore Skimmer \u2014 d20 \u2192 1 + ATK 5 = 6 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 FUMBLE\n[2026-09-03T00:42:53.922Z] [cognitive] neutral  (663ms)\n[2026-09-03T00:42:54.493Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n[2026-09-03T00:42:54.535Z] [player] attack with the auralite talon\n",
+      "[2026-09-03T00:42:54.535Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=1 hooks=0\n[2026-09-03T00:42:54.536Z] [combat] Spore Skimmer blisters \u2014 clinging fire sears 1. (8/19 HP, 1 turn left)\n[2026-09-03T00:42:54.536Z] [combat] Spore Skimmer blackens \u2014 corruption eats 2. (6/19 HP, 1 turn left)\n",
+      "[2026-09-03T00:42:54.537Z] [debug] attack: target=Spore Skimmer range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n[2026-09-03T00:42:54.610Z] [world] You raise the acid-etched corrupted auralite talon toward Spore Skimmer. The room narrows around the both of you.\n[2026-09-03T00:42:54.610Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-03T00:42:54.944Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (333ms)\n[2026-09-03T00:43:06.743Z] [world] Spore Skimmer moves first. The pressure is immediate.\n[2026-09-03T00:43:06.746Z] [combat] Spore Skimmer \u2014 d20 \u2192 3 + ATK 5 = 8 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-03T00:43:06.746Z] [combat] You \u2014 d20 \u2192 4 + INT 12 = 16 vs Spore Skimmer AC 9 \u2014 \u2717 DODGED\n[2026-09-03T00:43:06.747Z] [combat] Spore Skimmer reads the swing and twists clear \u2014 the blow finds nothing. (dodged, quick)\n[2026-09-03T00:43:10.457Z] "
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-03-1637-this-is-the-place-means-the-cell #mtkvtzmb9qii [inline 25/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtkvtzmb9qii"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-03-1637-this-is-the-place-means-the-cell"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "25"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-03-1637-this-is-the-place-means-the-cell"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:dba5:7266:ad2:ae57:4fda:d815",
+      "query": "user.ip:\"2607:fb90:dba5:7266:ad2:ae57:4fda:d815\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-03T02:04:48.186302Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "2": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 345,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-03T02:04:48.846000Z",
+  "fingerprints": [
+    "a5a75f781487c92f817999f7b65ac5e5"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1951991718,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-03T02:04:43.258000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-03-1637-this-is-the-place-means-the-cell",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-03-1637-this-is-the-place-means-the-cell",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-03-1637-this-is-the-place-means-the-cell",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-03-1637-this-is-the-place-means-the-cell)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "df6d25d04aa84adb82090a88d7b0ca55",
+  "previousEventID": "d004d644af554dfc93f5183d46702666"
+}

@@ -1,0 +1,257 @@
+{
+  "id": "6f7609c155824f5e90b4d33b06f15ece",
+  "groupID": "7708650401",
+  "eventID": "6f7609c155824f5e90b4d33b06f15ece",
+  "projectID": "4511945117532160",
+  "size": 18052,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-03-1637-this-is-the-place-means-the-cell #mtkvtzmb9qii [inline 20/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-03-1637-this-is-the-place-means-the-cell",
+  "message": "player-log 2026-09-03-1637-this-is-the-place-means-the-cell #mtkvtzmb9qii [inline 20/28]",
+  "title": "player-log 2026-09-03-1637-this-is-the-place-means-the-cell #mtkvtzmb9qii [inline 20/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:dba5:7266:ad2:ae57:4fda:d815",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "e67f995006b74fdaba977e8f659dcba8",
+      "span_id": "b48155f15da73e97",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      ". The pressure is immediate.\n[2026-09-03T00:34:05.384Z] [combat] Aetheric Leech \u2014 d20 \u2192 20 + ATK 4 = 24 vs your AC 21 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 CRITICAL HIT\n[2026-09-03T00:34:05.389Z] [combat] You \u2014 d20 \u2192 8 + INT 13 = 21 vs Aetheric Leech AC 9 \u2014 \u2713 HIT\n[2026-09-03T00:34:05.390Z] [combat] The Acid-Etched coating fails to take on Aetheric Leech.\n",
+      "[2026-09-03T00:34:05.390Z] [combat] Aetheric flares \u2014 +4 on hit.\n[2026-09-03T00:34:05.391Z] [combat] Aetheric Leech shrugs off the aetheric. (resisted, \u00d70.5 for 9)\n[2026-09-03T00:34:05.394Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Mud Armor \u2014 bludgeoning or burn will bite where aetheric won't.\"\n",
+      "[2026-09-03T00:34:05.397Z] [combat] Clean hit with the acid-etched corrupted auralite talon for 9. Aetheric Leech has 7 left and does not back away.\n[2026-09-03T00:34:05.397Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 2 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n[2026-09-03T00:34:05.398Z] [combat] Aetheric Leech is left exposed \u2014 easier to hit.\n",
+      "[2026-09-03T00:34:05.764Z] [combat] Aetheric Leech deals 3 aetheric damage [armor \u221234%, title \u00bd, floor 30%]. You have 17 HP remaining.\n[2026-09-03T00:34:05.764Z] [combat] Aetheric Leech's strike leaves you bleeding.\n[2026-09-03T00:34:08.912Z] [debug] ui: tap \"\ud83d\udd25\u2623 choir-bound launcher\"\n[2026-09-03T00:34:08.966Z] [player] attack with the off-hand choir-bound launcher\n",
+      "[2026-09-03T00:34:08.966Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=close enemies=1 hooks=2\n[2026-09-03T00:34:08.967Z] [combat] Aetheric Leech blackens \u2014 corruption eats 2. (5/16 HP, 2 turns left)\n",
+      "[2026-09-03T00:34:08.968Z] [debug] attack: target=Aetheric Leech range=close reach.bands=[distant,far,mid,close] reach.label=Choir-Bound Launcher bareHand=false\n[2026-09-03T00:34:09.046Z] [world] You raise the searing corrupted choir-bound launcher toward Aetheric Leech. The room narrows around the both of you.\n[2026-09-03T00:34:09.047Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-03T00:34:09.374Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 TAKE_COVER  (326ms)\n[2026-09-03T00:34:21.979Z] [world] Aetheric Leech moves first. The pressure is immediate.\n[2026-09-03T00:34:21.982Z] [combat] Aetheric Leech \u2014 d20 \u2192 6 + ATK 4 = 10 vs your AC 21 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-03T00:34:21.983Z] [combat] You \u2014 d20 \u2192 19 + INT 13 + 2 (point blank) = 34 vs Aetheric Leech AC 8 \u2014 \u2713 HIT\n[2026-09-03T00:34:21.983Z] [combat] Aetheric Leech shrugs off the aetheric. (resisted, \u00d70.5 for 12)\n[2026-09-03T00:34:21.986Z] [combat] Your blow with the searing corrupted choir-bound launcher lands clean \u2014 12 damage. Aetheric Leech crumples in the dust. The Aetherstone settles.\n",
+      "[2026-09-03T00:34:21.987Z] [reward] Aetheric Leech defeated. You recover Leech Mucus \u00d72, Riveted Leather Vest.\n[2026-09-03T00:34:21.988Z] [reward] +10 TC pried from the dust.\n[2026-09-03T00:34:22.605Z] [debug] persist sizes(KB): total=313 player=85 wm=142[rooms=74 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=83 scene=3\n[2026-09-03T00:34:24.619Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-09-03T00:34:26.186Z] [player] investigate the ground\n[2026-09-03T00:34:26.186Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2\n[2026-09-03T00:34:26.190Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Wild Onion (Common).\n[2026-09-03T00:34:26.199Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-09-03T00:34:26.199Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T00:34:26.199Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T00:34:26.414Z] [cognitive] CLIMB  (214ms)\n[2026-09-03T00:34:30.156Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n",
+      "[2026-09-03T00:34:30.190Z] [debug] spawn: gear=[Architect's Observer Visor, Mud-Stalker Leggings, Thought-Crafter's Headpiece] window=10 roster=new\n[2026-09-03T00:34:30.192Z] [world] Bersk Cartwright nods once. \"Cheddar Bob. Come look \u2014 a few things moved since you were last through.\"\n[2026-09-03T00:34:30.192Z] [world] \"Been a while,\" Bersk Cartwright says. \"Thought the mud had you.\"\n",
+      "[2026-09-03T00:34:30.192Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Bersk Cartwright, wandering trader. Tap the vendor banner to trade.\n[2026-09-03T00:34:30.202Z] [world] Rare workings for sale: Winter's Verdict (500 TC), Wrath of Titans (500 TC), Aether Bolt-Caster (200 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches ",
+      "up a hurt dog or golem \u2014 just ask.\n[2026-09-03T00:34:30.202Z] [world] You walk south through open silt. The compass points south into open ground.\n[2026-09-03T00:34:30.203Z] [world] You are standing the way you stood last time, without meaning to.\n[2026-09-03T00:34:38.250Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-09-03T00:34:39.438Z] [world] You take the Architect's Observer Visor from where it lay.\n[2026-09-03T00:34:39.439Z] [reward] \u2726 Architect's Observer Visor (Common).\n[2026-09-03T00:34:39.459Z] [world] You pick up the Mud-Stalker Leggings.\n[2026-09-03T00:34:39.459Z] [reward] \u2726 Mud-Stalker Leggings (Common).\n[2026-09-03T00:34:39.460Z] [world] You lift the Thought-Crafter's Headpiece clear.\n",
+      "[2026-09-03T00:34:39.460Z] [reward] \u2726 Thought-Crafter's Headpiece (Common).\n[2026-09-03T00:34:40.446Z] [world] You work the hermit crab over. A part of it comes loose, intact.\n[2026-09-03T00:34:40.446Z] [world] You salvage the standing water. The take is small but real.\n",
+      "[2026-09-03T00:34:40.447Z] [world] You lever something loose from the tackle box \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n[2026-09-03T00:34:40.447Z] [reward] \u2726 Salvage haul:\n[2026-09-03T00:34:40.447Z] [reward]     \u2022 Bone Sliver x2 (Common)\n[2026-09-03T00:34:40.448Z] [reward]     \u2022 Mud Fragment x3 (Common)\n",
+      "[2026-09-03T00:34:40.448Z] [reward]     \u2022 Flint Core Nodule (Common)\n[2026-09-03T00:34:41.885Z] [debug] ui: tap \"investigate\"\n[2026-09-03T00:34:43.439Z] [system] bleeding fades.\n[2026-09-03T00:34:43.460Z] [player] investigate the ground\n[2026-09-03T00:34:43.461Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2\n",
+      "[2026-09-03T00:34:43.463Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-09-03T00:34:43.475Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-03T00:34:43.475Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T00:34:43.476Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-09-03T00:34:43.479Z] [reward] \u2726 The miles have done their work \u2014 you carry the road better than you did. +1 max stamina (now 20). [240 on the odometer]\n[2026-09-03T00:34:43.704Z] [cognitive] CLIMB  (227ms)\n[2026-09-03T00:34:50.589Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n[2026-09-03T00:34:50.610Z] [debug] spawn: gear=[Rust Dagger, Reclaimer's Mask, Reclaimer's Trousers] window=10 roster=new\n",
+      "[2026-09-03T00:34:50.617Z] [world] The flat silt heaves, and a hand breaks the surface, then an arm, then a face caked grey with a thousand years of it.\n[2026-09-03T00:34:50.617Z] [arbiter] The traders were right. Aetherkin. Some kneel to them; some burn them where they stand.\n",
+      "[2026-09-03T00:34:50.617Z] [world] In life it was a machinist, one hand fused half-around a wrench that rusted into the bone \u2014 you find yourself wanting to know their name, and knowing you never will. The ground gave them back without warning \u2014 one moment mud, the next a person who should be dead.\n",
+      "[2026-09-03T00:34:50.618Z] [world] There's no hunger in it, only fright. It shrinks from your step, then squares up on trembling legs \u2014 it will defend itself, and nothing more.\n[2026-09-03T00:34:50.618Z] [world] You walk east through open silt. The compass points east into open ground.\n[2026-09-03T00:34:50.618Z] [world] Something in your shoulders drops back into the same set.\n",
+      "[2026-09-03T00:34:52.806Z] [debug] ui: tap \"approach\"\n[2026-09-03T00:34:52.814Z] [world] A silent bolt strikes near enough to singe your sleeve. (\u22122 HP)\n[2026-09-03T00:34:52.864Z] [player] approach Mud-Wracked Aetherkin\n[2026-09-03T00:34:52.865Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud wracked aetherkin resolved=Mud-Wracked Aetherkin range=mid enemies=1 hooks=2\n",
+      "[2026-09-03T00:34:52.866Z] [debug] move: advance from range=mid enemies=1 weather=Aether Lightning cost=1 partial=0\n[2026-09-03T00:34:52.867Z] [debug] move: field advance target=Mud-Wracked Aetherkin d 1.50->0.50 band mid->close\n[2026-09-03T00:34:52.867Z] [world] You close the gap with Mud-Wracked Aetherkin. (range: close / arm's reach)\n",
+      "[2026-09-03T00:34:52.867Z] [combat] The light around Mud-Wracked Aetherkin bends and declines to leave. It spends the beat VEILED \u2014 the next strike will come from somewhere you are not watching.\n[2026-09-03T00:34:53.213Z] [cognitive] SWIM \u00b7 RETREAT \u00b7 REST \u00b7 SEARCH  (345ms)\n[2026-09-03T00:34:54.389Z] [debug] ui: tap \"flee\"\n[2026-09-03T00:34:54.398Z] [player] flee\n",
+      "[2026-09-03T00:34:54.399Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=close enemies=1 hooks=2\n[2026-09-03T00:34:54.490Z] [system] \u23f3 Time passed: 15 min\n[2026-09-03T00:34:54.820Z] [cognitive] FEAR \u00b7 RETREAT \u00b7 HIDE  (330ms)\n",
+      "[2026-09-03T00:34:55.234Z] [debug] persist sizes(KB): total=316 player=85 wm=142[rooms=74 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=84 scene=4\n[2026-09-03T00:34:56.593Z] [debug] skillcheck: escape d20=20 DEX 19 = 39 vs Pursuit 14 \u2014 Mud-Wracked Aetherkin (d20 12 + SPD 2) \u2192 PASS\n",
+      "[2026-09-03T00:34:56.700Z] [debug] stats: STR14 DEX19 INT12 WIS15 CHA11 STE7 | gear: WIS+4,INT+3,DEX+8,STR+3,STE+2 | worn: main=Auralite Talon off=Choir-Bound Launcher head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Honey-Glazed Knuckle legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n",
+      "[2026-09-03T00:34:56.700Z] [debug] train: dexterity (escape check) \u2192 progress 92/100\n[2026-09-03T00:34:56.700Z] [world] Three long strides and the distance is yours to keep.\n[2026-09-03T00:34:58.240Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T00:34:59.486Z] [world] You get a hand under the Rust Dagger and take it.\n[2026-09-03T00:34:59.486Z] [reward] \u2726 Rust Dagger (Common).\n",
+      "[2026-09-03T00:34:59.502Z] [world] You claim the Reclaimer's Mask.\n[2026-09-03T00:34:59.502Z] [reward] \u2726 Reclaimer's Mask (Common).\n[2026-09-03T00:34:59.503Z] [world] The Reclaimer's Trousers comes up out of the silt with a small sucking protest.\n[2026-09-03T00:34:59.503Z] [reward] \u2726 Reclaimer's Trousers (Common).\n",
+      "[2026-09-03T00:35:00.389Z] [world] You strip the fisher's net carefully. Something usable comes free in your hand.\n[2026-09-03T00:35:00.389Z] [world] Slim pickings on the hermit crab. You pocket a Smooth Stone on the way out.\n[2026-09-03T00:35:00.390Z] [world] You work the salt crust over. A part of it comes loose, intact.\n",
+      "[2026-09-03T00:35:00.390Z] [world] You break the standing water apart. Among the pieces, something worth keeping.\n[2026-09-03T00:35:00.390Z] [world] You strip the tide line carefully. Something usable comes free in your hand.\n[2026-09-03T00:35:00.390Z] [reward] \u2726 Salvage haul:\n[2026-09-03T00:35:00.391Z] [reward]     \u2022 Cloth Scrap x6 (Common)\n",
+      "[2026-09-03T00:35:00.391Z] [reward]     \u2022 Smooth Stone x3 (Common)\n[2026-09-03T00:35:00.391Z] [reward]     \u2022 Bent Nail (Common)\n[2026-09-03T00:35:01.774Z] [debug] ui: tap \"investigate\"\n[2026-09-03T00:35:03.827Z] [player] investigate the ground\n[2026-09-03T00:35:03.828Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2\n",
+      "[2026-09-03T00:35:03.832Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Blueberries (Uncommon).\n[2026-09-03T00:35:03.841Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-03T00:35:03.841Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T00:35:03.841Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T00:35:04.058Z] [cognitive] CLIMB  (216ms)\n",
+      "[2026-09-03T00:35:05.793Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n[2026-09-03T00:35:05.822Z] [debug] spawn: gear=[Stone Seeker's Brow Guard, Mud Shell] window=10 roster=new\n[2026-09-03T00:35:05.823Z] [arbiter] The Arbiter, walking with you: \"Tartaria was a continent once. A flood older than any honest map drowned it. We are crossing the top of it.\"\n",
+      "[2026-09-03T00:35:05.824Z] [world] You walk south through open silt. The compass tells you Voronov lies further south \u2014 5 tiles, about 13 hours of travel.\n[2026-09-03T00:35:05.825Z] [world] Your feet have taken you to the same three paces of ground.\n[2026-09-03T00:35:07.077Z] [debug] ui: tap \"take / salvage\"\n",
+      "[Filtered]",
+      "[2026-09-03T00:35:08.434Z] [world] You break the fisher's net apart. Among the pieces, something worth keeping.\n[2026-09-03T00:35:08.434Z] [world] You strip the rusted royal vault pedestal carefully. Something usable comes free in your hand.\n[2026-09-03T00:35:08.434Z] [world] You break the siren shell apart. Among the pieces, something worth keeping.\n",
+      "[2026-09-03T00:35:08.434Z] [world] You salvage the standing water. The take is small but real.\n[2026-09-03T00:35:08.435Z] [reward] \u2726 Salvage haul:\n[2026-09-03T00:35:08.435Z] [reward]     \u2022 Horn-Capped Dowel (Common)\n[2026-09-03T00:35:08.435Z] [reward]     \u2022 Moth-Eaten Felt Scrap (Common)\n[2026-09-03T00:35:08.435Z] [reward]     \u2022 Aetheric Cloth (Uncommon)\n",
+      "[2026-09-03T00:35:08.436Z] [reward]     \u2022 Worn Tartarian Coin x6 (Common)\n[2026-09-03T00:35:08.436Z] [reward]     \u2022 Scrap Metal x3 (Common)\n[2026-09-03T00:35:09.481Z] [world] The Mud Shell was half under something. It is not now.\n[2026-09-03T00:35:09.482Z] [reward] \u2726 Mud Shell (Common).\n[2026-09-03T00:35:11.594Z] [player] investigate Stone Seeker's Brow Guard\n",
+      "[2026-09-03T00:35:11.594Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=stone seeker brow guard resolved=Stone Seeker's Brow Guard range=- enemies=0 hooks=2\n[2026-09-03T00:35:11.595Z] [debug] route: hook intercept (kind=obelisk, target=\"stone seeker's brow guard\") \u2014 original intent=investigate\n",
+      "[2026-09-03T00:35:11.595Z] [world] You've seen one of these before \u2014 the same lead, already copied into your memory. Nothing new here.\n[2026-09-03T00:35:14.854Z] [debug] ui: tap \"investigate\"\n[2026-09-03T00:35:16.481Z] [player] investigate the ground\n[2026-09-03T00:35:16.481Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2\n",
+      "[2026-09-03T00:35:16.490Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Wild Chicken (Rare).\n[2026-09-03T00:35:16.498"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-03-1637-this-is-the-place-means-the-cell #mtkvtzmb9qii [inline 20/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtkvtzmb9qii"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-03-1637-this-is-the-place-means-the-cell"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "20"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-03-1637-this-is-the-place-means-the-cell"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:dba5:7266:ad2:ae57:4fda:d815",
+      "query": "user.ip:\"2607:fb90:dba5:7266:ad2:ae57:4fda:d815\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-03T02:04:48.141850Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "37": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 289,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-03T02:04:48.845000Z",
+  "fingerprints": [
+    "a5a75f781487c92f817999f7b65ac5e5"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1951991718,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-03T02:04:43.258000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-03-1637-this-is-the-place-means-the-cell",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-03-1637-this-is-the-place-means-the-cell",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-03-1637-this-is-the-place-means-the-cell",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-03-1637-this-is-the-place-means-the-cell)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "70111f3b25d5466097a2f3e369045cf1",
+  "previousEventID": "5f60c76ad61043e89aa5ddd614425b14"
+}

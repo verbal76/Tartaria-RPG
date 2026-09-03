@@ -1,0 +1,236 @@
+{
+  "id": "8af93f368cfe433b8bd9d46697208918",
+  "groupID": "7708650265",
+  "eventID": "8af93f368cfe433b8bd9d46697208918",
+  "projectID": "4511945117532160",
+  "size": 18293,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-03-1637-this-is-the-place-means-the-cell #mtkt5bixx0qy [inline 27/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-03-1637-this-is-the-place-means-the-cell",
+  "message": "player-log 2026-09-03-1637-this-is-the-place-means-the-cell #mtkt5bixx0qy [inline 27/28]",
+  "title": "player-log 2026-09-03-1637-this-is-the-place-means-the-cell #mtkt5bixx0qy [inline 27/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:dba5:7266:ad2:ae57:4fda:d815",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "e67f995006b74fdaba977e8f659dcba8",
+      "span_id": "b48155f15da73e97",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "026-09-03T00:47:30.292Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (354ms)\n[2026-09-03T00:47:37.458Z] [debug] ui: tap \"\u2726 bandolier (5)\"\n[2026-09-03T00:47:41.726Z] [reward] You hurl the Acid Flask. It bursts across Mud Wraith \u2014 12 acid (4/turn \u00d7 3). (26 HP left)\n",
+      "[2026-09-03T00:47:41.727Z] [combat] Mud Wraith blisters \u2014 clinging fire sears 3. (23/129 HP, 1 turn left)\n[2026-09-03T00:47:41.728Z] [combat] Mud Wraith blackens \u2014 corruption eats 4. (19/129 HP, 1 turn left)\n[2026-09-03T00:47:41.739Z] [combat] Mud Wraith \u2014 d20 \u2192 10 + ATK 7 = 17 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T00:47:51.467Z] [debug] ui: tap \"golem (51/68)\"\n",
+      "[2026-09-03T00:47:51.474Z] [player] use golem\n[2026-09-03T00:47:51.480Z] [combat] Ashwright attacks Mud Wraith \u2014 d20 12 + 3 = 15 vs AC 12 \u2014 \u2713 HIT\n[2026-09-03T00:47:51.481Z] [combat] Ashwright swings the Crude Golem Greatsword \u2014 6 slashing damage on Mud Wraith. (13 HP left)\n[2026-09-03T00:47:51.481Z] [combat] Mud Wraith retaliates \u2014 d20 20 + 7 (NAT 20) hits Ashwright for 12 (35% resisted). (39/68)\n",
+      "[2026-09-03T00:47:51.494Z] [combat] Mud Wraith blisters \u2014 clinging fire sears 3. (10/129 HP, 0 turns left)\n[2026-09-03T00:47:51.494Z] [combat] Mud Wraith shakes off the last of the fire \u2014 the Choir-Bound Launcher has run its course.\n[2026-09-03T00:47:51.494Z] [combat] Mud Wraith blackens \u2014 corruption eats 4. (6/129 HP, 0 turns left)\n",
+      "[2026-09-03T00:47:51.495Z] [combat] Mud Wraith shakes off the last of the corruption \u2014 the Choir-Bound Launcher has run its course.\n[2026-09-03T00:47:51.496Z] [combat] Mud Wraith \u2014 d20 \u2192 15 + ATK 7 = 22 vs your AC 22 \u2014 \u2713 HIT\n[2026-09-03T00:47:51.875Z] [combat] Mud Wraith deals 5 aetheric damage [armor \u221234%, title \u00bd, floor 30%]. You have 38 HP remaining.\n",
+      "[2026-09-03T00:47:52.275Z] [debug] persist sizes(KB): total=322 player=76 wm=160[rooms=90 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=82 scene=4\n[2026-09-03T00:47:55.987Z] [debug] ui: tap \"\ud83d\udd25\u2623 choir-bound launcher \u2605\"\n[2026-09-03T00:47:56.045Z] [player] attack with the off-hand choir-bound launcher\n",
+      "[2026-09-03T00:47:56.045Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=mid enemies=1 hooks=0\n[2026-09-03T00:47:56.046Z] [debug] attack: target=Mud Wraith range=mid reach.bands=[distant,far,mid,close] reach.label=Choir-Bound Launcher bareHand=false\n",
+      "[2026-09-03T00:47:56.118Z] [world] You commit forward with the searing corrupted choir-bound launcher. Mud Wraith watches your hands.\n[2026-09-03T00:47:56.118Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T00:47:56.451Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 TAKE_COVER  (332ms)\n[2026-09-03T00:48:07.784Z] [world] Mud Wraith moves first. The pressure is immediate.\n",
+      "[2026-09-03T00:48:07.786Z] [combat] Mud Wraith \u2014 d20 \u2192 11 + ATK 7 = 18 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T00:48:07.787Z] [combat] You \u2014 d20 \u2192 2 + INT 12 = 14 vs Mud Wraith AC 13 \u2014 \u2713 HIT\n[2026-09-03T00:48:07.787Z] [combat] Aetheric flares \u2014 +3 on hit (weak \u2014 bites deep!).\n[2026-09-03T00:48:07.787Z] [combat] Weakness exposed \u2014 Mud Wraith flinches. (aetheric \u00d71.5 for 16)\n",
+      "[2026-09-03T00:48:07.788Z] [combat] Final strike with the searing corrupted choir-bound launcher for 16. Mud Wraith is still. The Aetherstone hums on, indifferent.\n[2026-09-03T00:48:07.789Z] [reward] \u2726 The last of them is down. \"The Bog Dragon of Old Drakova\" moves on.\n",
+      "[2026-09-03T00:48:07.789Z] [world] Mira reads the locket without crying. On the inside lid, scratched in a child's hand, is a name: ESHREN. \"He named it,\" she says. \"He thought naming it would make it leave us alone.\" She scratches the name onto a slip of tin and folds your fingers around it. \"Cathedral steeple. Out in the Mud Seas. Go now.\"\n",
+      "[2026-09-03T00:48:07.789Z] [arbiter] \"A true name binds a thing for one breath,\" the Arbiter says. \"One word, one moment. Don't waste either.\"\n[2026-09-03T00:48:07.790Z] [system] \u25b8 Next: The Monarch's Waystation \u00b7 talk it through with Old Mira \u2014 come away with the Eshren's Name-Token \u00b7 bring The Boy's Locket.\n",
+      "[2026-09-03T00:48:07.795Z] [world] You set course for The Monarch's Waystation. 46 tiles \u2014 about 4 days, 19 hours of travel, all in. Tap the \u2192 THE MONARCH'S WAYSTATION button on the travel row to press on; STOP TRAVEL to halt.\n[2026-09-03T00:48:07.795Z] [world] Auto-routing to the next stage of The Bog Dragon of Old Drakova: The Monarch's Waystation.\n",
+      "[2026-09-03T00:48:07.795Z] [debug] mission card: \"The Bog Dragon of Old Drakova\" \u00b7 close \u00b7 \u25b8 Next: The Monarch's Waystation \u00b7 talk it through with Old Mira \u2014 come away with the Eshren's Name-Token \u00b7 bring The Boy's Locket.\n[2026-09-03T00:48:07.808Z] [reward] Mud Wraith defeated. You recover Mud Remains, Wraith Essence \u00d72.\n",
+      "[2026-09-03T00:48:07.812Z] [reward] \u2726 Hard-won spoils \u2014 Aetheric Dust (Uncommon).\n[2026-09-03T00:48:07.824Z] [reward] \u2726 Recipe recovered from the kill: Titanforged Greaves (Legendary)! Open Crafting to forge it.\n[2026-09-03T00:48:07.824Z] [reward] +21 TC pried from the dust.\n",
+      "[2026-09-03T00:48:07.882Z] [arbiter] The Arbiter looks around. \"This is the room where the disaster was managed, or could have been.\"\n[2026-09-03T00:48:14.907Z] [debug] ui: tap \"mission card \u00b7 CONTINUE\"\n[2026-09-03T00:48:25.768Z] [debug] ui: tap \"craft\"\n[2026-09-03T00:48:30.053Z] [debug] ui: tap \"inventory\"\n[2026-09-03T00:48:39.481Z] [player] feed dog Trail Rations\n",
+      "[2026-09-03T00:48:39.482Z] [world] You feed Mercy the Trail Rations. She eats, slow and serious. (+6 HP, +20 loyalty)\n[2026-09-03T00:48:49.942Z] [debug] ui: tap \"inventory\"\n[2026-09-03T00:48:50.968Z] [debug] persist sizes(KB): total=322 player=76 wm=160[rooms=90 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=82 scene=3\n[2026-09-03T00:48:54.572Z] [debug] ui: tap \"missions\"\n",
+      "[2026-09-03T00:49:24.182Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T00:49:25.409Z] [world] You take the Aetheric Rod. The hollow it came out of starts closing.\n[2026-09-03T00:49:25.409Z] [reward] \u2726 Aetheric Rod (Common).\n[2026-09-03T00:49:25.429Z] [world] The Bonebreaker Mace goes in your pack. Its outline stays in the silt a while.\n",
+      "[2026-09-03T00:49:25.429Z] [reward] \u2726 Bonebreaker Mace (Common).\n[2026-09-03T00:49:25.431Z] [world] You crouch, take the Titan's Forehead Guard, and are moving again before you have straightened up.\n[2026-09-03T00:49:25.431Z] [reward] \u2726 Titan's Forehead Guard (Common).\n[2026-09-03T00:49:26.537Z] [world] You strip the archive carefully. Something usable comes free in your hand.\n",
+      "[2026-09-03T00:49:26.537Z] [world] You break the battery housing apart. Among the pieces, something worth keeping.\n[2026-09-03T00:49:26.537Z] [world] You break the blood-spotted cloth apart. Among the pieces, something worth keeping.\n[2026-09-03T00:49:26.537Z] [world] Slim pickings on the broken glass. You pocket a Stick on the way out.\n",
+      "[2026-09-03T00:49:26.538Z] [world] You work the cold spring apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n[2026-09-03T00:49:26.538Z] [world] You break the console apart. Among the pieces, something worth keeping.\n[2026-09-03T00:49:26.538Z] [world] You strip the relay conduit carefully. Something usable comes free in your hand.\n",
+      "[2026-09-03T00:49:26.538Z] [world] You strip the sensor carefully. Something usable comes free in your hand.\n[2026-09-03T00:49:26.539Z] [world] You break the shattered aether-tether grapple point apart. Among the pieces, something worth keeping.\n[2026-09-03T00:49:26.539Z] [world] You salvage the skeleton. The take is small but real.\n[2026-09-03T00:49:26.539Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-09-03T00:49:26.539Z] [reward]     \u2022 Worn Tartarian Coin x12 (Common)\n[2026-09-03T00:49:26.539Z] [reward]     \u2022 Aether Dust x4 (Common)\n[2026-09-03T00:49:26.540Z] [reward]     \u2022 Cloth Scrap x3 (Common)\n[2026-09-03T00:49:26.540Z] [reward]     \u2022 Stick (Common)\n[2026-09-03T00:49:26.540Z] [reward]     \u2022 Faded Ribbon Coil (Common)\n[2026-09-03T00:49:26.540Z] [reward]     \u2022 Aether Crystal (Common)\n",
+      "[2026-09-03T00:49:26.540Z] [reward]     \u2022 Bent Nail x6 (Common)\n[2026-09-03T00:49:33.306Z] [debug] OTA session start: 2026-09-02-1634-the-aside-yields.\n[2026-09-03T00:49:33.306Z] [world] You step back into Mud Flood Nexus. The world waits for your move.\n[2026-09-03T00:49:33.306Z] [arbiter] The Arbiter sets the quiet aside. \"Welcome back, Cheddar Bob. I kept watch while you were gone.\"\n",
+      "[2026-09-03T00:49:33.580Z] [debug] \u2550\u2550\u2550 SESSION 2026-09-03T00:49:33.578Z \u00b7 build 2026-09-02-1634-the-aside-yields \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-09-03T00:49:33.581Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-03T00:49:33.581Z] [debug] missions: hunt:hunt_bog_dragon stage 4/7 [diplomacy] @monarch_waystation npc=\"Old Mira\" needs=The Boy's Locket\u2713 gives=Eshren's Name-Token\n[2026-09-03T00:49:33.582Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n",
+      "[2026-09-03T00:49:33.582Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n[2026-09-03T00:49:33.582Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n",
+      "[2026-09-03T00:49:33.582Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n[2026-09-03T00:49:33.582Z] [debug] missions: \u00b7 at=mud_flood_nexus travelTo=monarch_waystation\n",
+      "[2026-09-03T00:49:33.582Z] [debug] boot: life bmtkrau75kr started 2026-09-02T23:57:56.705Z \u00b7 FOLLOWED AN OTA APPLY 315ms ago via boot-front \u00b7 prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)\n[2026-09-03T00:49:36.336Z] [debug] persist sizes(KB): total=328 player=81 wm=161[rooms=91 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=83 scene=3\n\n",
+      "=== END LOG \u00b7 399936 CHARS ===\n\nTartaria Realms\n\nDevice\n  Name: Pixel 10 Pro XL\n  Platform: android 37\n  Hermes: yes\n  Locale: en-US\n  Timezone: America/New_York\n  Screen: window 443\u00d7986 / screen 443\u00d7986 @ 2.4375x density\n  Captured at: 2026-09-03T00:49:38.276Z\n\nInstall\n  App ID: com.hotatticgames.tartarprim\n  App version: 4.32.11\n  APK build version: 2.4.1\n  APK build: 293\n  AAB: (build 293)\n",
+      "  OTA: (2026-09-02-1634-the-aside-yields)\n  Boot stage: qwen:skipped\n\nML runtime health\n  Status: active (no crashes detected)\n  Crash count: 0\n  Last init attempt: 2026-09-02T23:57:57.153Z\n  Last init success: 2026-09-02T23:57:58.071Z\n  Crashes-before-disable threshold: 2\n  Qwen completion guard: auto-disabled after 1 completion crashes (template narration in use; auto-retry in 3 boots)\n",
+      "  Qwen kernel variant: rnllama_v8_2_fp16_dotprod\n  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k\n  Voice (TTS) guard: clean (no voice crashes on this build)\nSave-load health\n",
+      "  Status: clean (no load-crash flags)\nLast JS crash\n  Status: none recorded\nThis launch\n  Life: bmtkrau75kr \u00b7 started 2026-09-02T23:57:56.705Z\n  Followed an OTA apply 315ms ago (boot-front)\n  The previous life released its model contexts before reloading (o0/r0/l0/p0/dn0)\nCrash ledger \u2014 10 recorded (newest last)\n  \u2022 2026-08-31T12:34:47.772Z (3615m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-31-1589-the-pin-comes-home \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done [q0] \u00b7 578ms into the action \u00b7 alive 0ms after it\n      launch: died 892ms into the process \u00b7 not an OTA-apply boot\n",
+      "      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-08-31T14:24:08.210Z (3506m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-31-1592-the-events-say-which-build \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n",
+      "      last checkpoint: native:cognition:done [q0] \u00b7 508ms into the action \u00b7 alive 0ms after it\n      launch: died 859ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-08-31T17:38:34.699Z (3311m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-31-1594-the-pinch-demands-the-lift \u00b7 stage boot:qwen:deferred\n",
+      "      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: boot:qwen:deferred \u00b7 893ms into the action \u00b7 alive 0ms after it\n      launch: died 941ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-08-31T22:14:31.073Z (3035m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-08-31-1595-the-guide-and-the-ground-agree \u00b7 stage boot:qwen:deferred\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: boot:qwen:deferred \u00b7 5207ms into the action \u00b7 alive 0ms after it\n      launch: died 5302ms into the process \u00b7 not an OTA-apply boot\n",
+      "      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-08-31T22:46:39.841Z (3003m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-08-31-1596-the-mark-catches-up-at-the-door \u00b7 stage native:voice:start\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n",
+      "      last checkpoint: native:voice:start [q1] \u00b7 1865ms into the action \u00b7 alive 0ms after it\n      launch: died 1908ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-01T10:12:02.195Z (2318m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-01-1601-combat-separates \u00b7 stage boot:qwen:deferred\n",
+      "      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: boot:qwen:deferred \u00b7 717ms into the action \u00b7 alive 0ms after it\n      launch: died 752ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-01T10:56:48.050Z (2273m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-09-01-1602-the-beat-card \u00b7 stage native:cognition:done\n      Process died with no orderly exit while: (no action yet) \u2014 begun 5m before the last sign of life; treat the action label as stale, not as the killer\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: native:cognition:done [q0] \u00b7 287576ms into the action \u00b7 alive 0ms after it\n",
+      "      launch: died 287623ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-03-1637-this-is-the-place-means-the-cell #mtkt5bixx0qy [inline 27/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtkt5bixx0qy"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-03-1637-this-is-the-place-means-the-cell"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "27"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-03-1637-this-is-the-place-means-the-cell"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:dba5:7266:ad2:ae57:4fda:d815",
+      "query": "user.ip:\"2607:fb90:dba5:7266:ad2:ae57:4fda:d815\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-03T02:04:42.666218Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-03T02:04:43.259000Z",
+  "fingerprints": [
+    "3337d973d503771e4a638bb8bb1d28eb"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1951991718,
+    "commitCount": 0,
+    "data": {},
+    "dateCreated": "2026-09-03T02:04:43.258000Z",
+    "dateReleased": null,
+    "deployCount": 0,
+    "ref": null,
+    "lastCommit": null,
+    "lastDeploy": null,
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-03-1637-this-is-the-place-means-the-cell",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-03-1637-this-is-the-place-means-the-cell",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-03-1637-this-is-the-place-means-the-cell",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-03-1637-this-is-the-place-means-the-cell)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.24.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "a3592533d88f405c9fb2ed3c9e6bea0b",
+  "previousEventID": "8ae315ac408c4bbea41454b0060670a2"
+}
