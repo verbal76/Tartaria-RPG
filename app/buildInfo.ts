@@ -26969,6 +26969,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // glyph now sits outside the dark cell; a WEAPON GLYPHS card on the About tab
 // reads the live tables and explains the star.
 export const OTA_BUILD_ID = '2026-09-03-1638-the-star-goes-last';
+// golem catch-up 2026-09-03: markerless publish of OTA-1638 - the star last,
+// the em space outside the dark cell, the WEAPON GLYPHS key on the About tab.
+// hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-03-1637-this-is-the-place-means-the-cell';
 // golem catch-up 2026-09-03: markerless publish of OTA-1637 - one cell test for
 // the arrival line, the trace, the card, the arm and the verb matchers; off the
