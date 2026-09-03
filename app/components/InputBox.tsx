@@ -33,6 +33,7 @@ import {
   combatWeaponLabel,
   // OTA-1568 — the glyphs get their own styled nodes; see COATING_GLYPH_COLOR.
   combatWeaponLabelParts, COATING_GLYPH_COLOR, type CoatingGlyphPart,
+  BASE_GLYPH_COLOR, type BaseGlyphPart, // OTA-1636 — the base type, far right
 } from '../engine/weaponGlyphs';
 import { reachBandsFor, reachFiresDown } from '../engine/types';
 // ⚠ OTA-1423 — the three Arbiter refusals below name the dog, so they also
@@ -802,14 +803,14 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 const raw = resolveDisplayWeaponByName(equippedMain, inventory)?.damageType ?? null;
                 const label = combatWeaponLabel(equippedMain, equippedMainItem, raw, activeEnemyKnownWeak ?? []);
                 const parts = combatWeaponLabelParts(equippedMain, equippedMainItem, raw, activeEnemyKnownWeak ?? []);
-                return <QuickBtn label={label} glyphs={parts.glyphs} glyphText={parts.text} onPress={() => onSubmit(`attack with the ${equippedMain.toLowerCase()}`)} tone={mainT} outOfRange={mainT === 'needs-approach'} />;
+                return <QuickBtn label={label} glyphs={parts.glyphs} glyphText={parts.text} baseGlyph={parts.base} onPress={() => onSubmit(`attack with the ${equippedMain.toLowerCase()}`)} tone={mainT} outOfRange={mainT === 'needs-approach'} />;
               })() : null}
               {equippedOff ? (() => {
                 const offT = weaponTone(reachPlayer, 'off', range, groundedFoesBelow);
                 const raw = resolveDisplayWeaponByName(equippedOff, inventory)?.damageType ?? null;
                 const label = combatWeaponLabel(equippedOff, equippedOffItem, raw, activeEnemyKnownWeak ?? []);
                 const parts = combatWeaponLabelParts(equippedOff, equippedOffItem, raw, activeEnemyKnownWeak ?? []);
-                return <QuickBtn label={label} glyphs={parts.glyphs} glyphText={parts.text} onPress={() => onSubmit(`attack with the off-hand ${equippedOff.toLowerCase()}`)} tone={offT} outOfRange={offT === 'needs-approach'} />;
+                return <QuickBtn label={label} glyphs={parts.glyphs} glyphText={parts.text} baseGlyph={parts.base} onPress={() => onSubmit(`attack with the off-hand ${equippedOff.toLowerCase()}`)} tone={offT} outOfRange={offT === 'needs-approach'} />;
               })() : null}
             </View>
 
@@ -1175,6 +1176,7 @@ function QuickBtn({
   cooldownFill,
   glyphs,
   glyphText,
+  baseGlyph,
 }: {
   label: string;
   onPress: () => void;
@@ -1200,6 +1202,9 @@ function QuickBtn({
    *  the same label. `label` itself is untouched and still the breadcrumb. */
   glyphs?: readonly CoatingGlyphPart[];
   glyphText?: string;
+  /** ⚠ OTA-1636 — the weapon's own damage type, painted LAST and apart from
+   *  the coats. Owner: "all the way to the right so it's not mixed in." */
+  baseGlyph?: BaseGlyphPart | null;
 }) {
   const resolvedTone: QuickBtnTone | undefined = blocked
     ? undefined
@@ -1294,9 +1299,9 @@ function QuickBtn({
           breadcrumb (logUiTap, above) and the screen-reader label, and OTA-1172
           is on record that the breadcrumb is forensic evidence. This only
           changes how the same characters are PAINTED. */}
-      {glyphs && glyphs.length > 0 ? (
+      {(glyphs && glyphs.length > 0) || baseGlyph ? (
         <Text style={textStyle}>
-          {glyphs.map((g, i) => (
+          {(glyphs ?? []).map((g, i) => (
             <Text key={`${g.kind}${i}`} style={[styles.coatGlyph, { color: COATING_GLYPH_COLOR[g.kind] }]}>
               {/* ⚠ OTA-1569 — hair spaces pad the dark cell. Inline Text takes no
                   padding in React Native, and a cell clamped to the glyph's exact
@@ -1306,7 +1311,17 @@ function QuickBtn({
               {`\u200a${g.ch}\u200a`}
             </Text>
           ))}
-          <Text>{` ${glyphText ?? ''}`.toUpperCase()}</Text>
+          <Text>{`${glyphs && glyphs.length > 0 ? ' ' : ''}${glyphText ?? ''}`.toUpperCase()}</Text>
+          {baseGlyph ? (
+            <Text style={[styles.coatGlyph, { color: BASE_GLYPH_COLOR[baseGlyph.kind] ?? '#ffffff' }]}>
+              {/* ⚠ OTA-1636 — the weapon's OWN damage type, painted LAST and set
+                  off by an em space so it can never be read as a third coat.
+                  Owner: "all the way to the right so it's not mixed in." Same
+                  halo as the coat cells (OTA-1568), its own colour, and — as
+                  with the coats — added HERE and never to `label`. */}
+              {`\u2003${baseGlyph.ch}\u200a`}
+            </Text>
+          ) : null}
         </Text>
       ) : (
         <Text style={textStyle}>{label.toUpperCase()}</Text>

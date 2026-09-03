@@ -1560,9 +1560,9 @@ Key invariants worth knowing:
 
 ## 9. Recent OTA highlights (latest sessions)
 
-### ⚠⚠⚠ THE 2026-09-02 RUN — OTA-1617 → 1635 (read this first if you are new)
+### ⚠⚠⚠ THE 2026-09-02 RUN — OTA-1617 → 1636 (read this first if you are new)
 
-Latest golem-line stamp: **`2026-09-03-1635-three-from-the-log`**
+Latest golem-line stamp: **`2026-09-03-1636-the-base-reads-on-the-right`**
 (`app/buildInfo.ts`). Both channels ship from this branch — a `[ota-hal]` marker
 in the commit TITLE publishes the HAL set, a markerless follow-up commit
 publishes golem; see §6.
@@ -1782,6 +1782,16 @@ what it ACCEPTS, and a data walker skips the saying.
   released. Coatings question answered from the log (they applied; "shrugs
   off the aetheric" is the base type); no change. The 22:42:22 death (build
   1633, 1 s in, `boot:qwen:deferred`, plain boot) is another #110 sample.
+- **OTA-1636 the base reads on the right.** Owner: *"identify a weapons base
+  damage in the buttons like we do the coatings … all the way to the right so
+  it's not mixed in."* `weaponGlyphs.ts`: `BASE_DAMAGE_GLYPH` (one per
+  canonical type: ⚒ ⚔ ▲ ✦ ☢ ⚙ ✱ + the six coat glyphs reused), `BASE_GLYPH_COLOR`,
+  `baseDamageGlyph(raw)`; `combatWeaponLabel` appends ` <glyph>` after the
+  star; `combatWeaponLabelParts` returns `base: { ch, kind } | null`. InputBox
+  paints it as its own haloed node after the text behind an em space
+  (`baseGlyph` prop, both hands). The flat label (tap breadcrumb) carries the
+  same four pieces: `🔥☣ choir-bound launcher ★ ✦`. ota1553 / ota1568 pins
+  updated; ota1636 pins the row, aliases, coverage, wiring.
 
 ⚠ **Two position vocabularies, still.** `stageArrival.ts` (heal / arm /
 `checkStandingGround`) keys on the canon grid CELL; the verb matchers and

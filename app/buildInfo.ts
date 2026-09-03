@@ -26951,7 +26951,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (3) The engine says why it is silent: fifty minutes of template narration
 // and no qwen line — every skip branch logs its reason, the load logs its
 // start, a load unsettled after 90 s logs once.
-export const OTA_BUILD_ID = '2026-09-03-1635-three-from-the-log';
+// ⚠⚠⚠ OTA-1636 — THE BASE READS ON THE RIGHT. Owner: "identify a weapons base
+// damage in the buttons like we do the coatings … all the way to the right so
+// it's not mixed in." `🔥☣ launcher ★ ✦`: coats left, name, star, the weapon's
+// own damage type LAST — one glyph per canonical type, coat families reuse the
+// coat glyph, painted as its own coloured node behind an em space.
+export const OTA_BUILD_ID = '2026-09-03-1636-the-base-reads-on-the-right';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-03-1635-three-from-the-log';
 // golem catch-up 2026-09-03: markerless publish of OTA-1635 - food is never
 // gear, the wanderer card waits for the picker, qwen says why it is silent.
 // hal took the marker.

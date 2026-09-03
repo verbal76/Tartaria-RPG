@@ -55,6 +55,40 @@ export const COATING_GLYPH: Record<WeaponCoating['kind'], string> = {
   electrical: '⚡',
 };
 
+/**
+ * ⚠⚠⚠ OTA-1636 — THE BASE READS ON THE RIGHT. Owner: *"we need a way to
+ * identify a weapons base damage in the buttons like we do the coatings"* —
+ * and then, correcting himself: *"all the way to the right so it's not mixed
+ * in."* So the row is now `🔥☣ launcher ★ ✦`: coatings on the left, the name,
+ * the star, and the weapon's OWN damage type last, set off by an em space so
+ * it cannot be read as a third coat. One glyph per canonical damage type; the
+ * six that are also coating families reuse the coating glyph on purpose — fire
+ * is fire whether it is painted on or built in.
+ */
+export const BASE_DAMAGE_GLYPH: Record<string, string> = {
+  bludgeoning: '⚒',
+  slashing: '⚔',
+  piercing: '▲',
+  aetheric: '✦',
+  burn: '🔥',
+  cold: '❄',
+  poison: '☠',
+  acid: '⚗',
+  corruption: '☣',
+  electrical: '⚡',
+  radiation: '☢',
+  degradation: '⚙',
+  stun: '✱',
+};
+
+/** The base glyph for a raw damage type, canonicalised (frost → cold, force →
+ *  aetheric, psychic → aetheric). `''` when the type is unknown or absent, so a
+ *  weapon the catalog has not typed prints no false symbol. */
+export function baseDamageGlyph(rawDamageType: string | null | undefined): string {
+  if (!rawDamageType) return '';
+  return BASE_DAMAGE_GLYPH[canonicalDamageType(rawDamageType)] ?? '';
+}
+
 /** ⚠ MOVED, NOT REWRITTEN — this is EnemyPanel's `defensesFor`, byte for byte in
  *  its arithmetic, now shared.
  *
@@ -214,7 +248,10 @@ export function combatWeaponLabel(
     ? ' ★'
     : '';
   const head = glyphs ? `${glyphs} ` : '';
-  return `${head}${shortWeaponName(name).toLowerCase()}${star}`;
+  // OTA-1636 — the base type, last, after the star.
+  const base = baseDamageGlyph(rawDamageType);
+  const tail = base ? ` ${base}` : '';
+  return `${head}${shortWeaponName(name).toLowerCase()}${star}${tail}`;
 }
 
 /**
@@ -269,6 +306,30 @@ export const COATING_GLYPH_COLOR: Record<WeaponCoating['kind'], string> = {
 /** One glyph and the coating it came from, so a caller can style it per kind. */
 export interface CoatingGlyphPart { ch: string; kind: WeaponCoating['kind'] }
 
+/** OTA-1636 — the base-type glyph and its canonical type, so the right-hand
+ *  glyph can carry a colour of its own the way the coats do. */
+export interface BaseGlyphPart { ch: string; kind: string }
+
+/** ⚠ OTA-1636 — colours for the base glyphs that are not also coatings. The
+ *  coating families reuse COATING_GLYPH_COLOR so fire is one colour wherever it
+ *  appears. Same two mechanisms as OTA-1568: the halo reaches the colour emoji,
+ *  the colour reaches the monochrome text glyphs. */
+export const BASE_GLYPH_COLOR: Record<string, string> = {
+  bludgeoning: '#d6c3a0',  // stone and bone
+  slashing: '#e4e4e4',     // steel
+  piercing: '#f0d275',     // brass point
+  aetheric: '#a9c8ff',     // pale aether
+  radiation: '#b6ff5e',    // hazard green
+  degradation: '#b8a690',  // rust dust
+  stun: '#ffd166',         // flash
+  burn: COATING_GLYPH_COLOR.burn,
+  cold: COATING_GLYPH_COLOR.cold,
+  poison: COATING_GLYPH_COLOR.poison,
+  acid: COATING_GLYPH_COLOR.acid,
+  corruption: COATING_GLYPH_COLOR.corruption,
+  electrical: COATING_GLYPH_COLOR.electrical,
+};
+
 /**
  * ⚠⚠ THE SAME LABEL, SPLIT SO IT CAN BE STYLED — never a second opinion about
  * what it says. `combatWeaponLabel` above stays the single source of the flat
@@ -282,13 +343,16 @@ export function combatWeaponLabelParts(
   item: Pick<InventoryItem, 'coating' | 'coating2'> | null | undefined,
   rawDamageType: string | null | undefined,
   knownWeaknesses: readonly string[],
-): { glyphs: CoatingGlyphPart[]; text: string } {
+): { glyphs: CoatingGlyphPart[]; text: string; base: BaseGlyphPart | null } {
   const kinds = coatingKinds(item);
   const star = weaponHitsKnownWeakness(weaponStrikeTypes(item, rawDamageType), knownWeaknesses)
     ? ' ★'
     : '';
+  const baseCh = baseDamageGlyph(rawDamageType);
   return {
     glyphs: kinds.map((k) => ({ ch: COATING_GLYPH[k] ?? '', kind: k })).filter((g) => g.ch !== ''),
     text: `${shortWeaponName(name).toLowerCase()}${star}`,
+    // OTA-1636 — the right-hand glyph, styled on its own like the coats.
+    base: baseCh ? { ch: baseCh, kind: canonicalDamageType(rawDamageType) } : null,
   };
 }

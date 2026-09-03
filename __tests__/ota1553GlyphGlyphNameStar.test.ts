@@ -73,25 +73,25 @@ describe("OTA-1553 — the owner's cudgel", () => {
     // came first.
     expect(coatingKinds(CUDGEL)).toEqual(['burn', 'cold']);
     expect(coatingGlyphs(CUDGEL)).toBe('🔥❄');
-    expect(combatWeaponLabel('Cudgel', CUDGEL, 'bludgeoning', [])).toBe('🔥❄ cudgel');
+    expect(combatWeaponLabel('Cudgel', CUDGEL, 'bludgeoning', [])).toBe('🔥❄ cudgel ⚒');
   });
 
   it('⚠⚠⚠ THE STAR: weak to the FIRE earns it', () => {
-    expect(combatWeaponLabel('Cudgel', CUDGEL, 'bludgeoning', ['burn'])).toBe('🔥❄ cudgel ★');
+    expect(combatWeaponLabel('Cudgel', CUDGEL, 'bludgeoning', ['burn'])).toBe('🔥❄ cudgel ★ ⚒');
   });
 
   it('⚠⚠⚠ …weak to the FROST earns it', () => {
-    expect(combatWeaponLabel('Cudgel', CUDGEL, 'bludgeoning', ['cold'])).toBe('🔥❄ cudgel ★');
+    expect(combatWeaponLabel('Cudgel', CUDGEL, 'bludgeoning', ['cold'])).toBe('🔥❄ cudgel ★ ⚒');
   });
 
   it('⚠⚠⚠ …and weak to the BLUDGEONING earns it too — the raw damage counts', () => {
     // The half that is easy to forget, and the half he named explicitly. A
     // coated cudgel is still a cudgel.
-    expect(combatWeaponLabel('Cudgel', CUDGEL, 'bludgeoning', ['bludgeoning'])).toBe('🔥❄ cudgel ★');
+    expect(combatWeaponLabel('Cudgel', CUDGEL, 'bludgeoning', ['bludgeoning'])).toBe('🔥❄ cudgel ★ ⚒');
   });
 
   it('⚠⚠ weak to something ELSE gets no star', () => {
-    expect(combatWeaponLabel('Cudgel', CUDGEL, 'bludgeoning', ['acid', 'aetheric'])).toBe('🔥❄ cudgel');
+    expect(combatWeaponLabel('Cudgel', CUDGEL, 'bludgeoning', ['acid', 'aetheric'])).toBe('🔥❄ cudgel ⚒');
   });
 
   it('⚠⚠ NOTHING KNOWN → NO STAR, which is the important half', () => {
@@ -101,9 +101,11 @@ describe("OTA-1553 — the owner's cudgel", () => {
     expect(combatWeaponLabel('Cudgel', CUDGEL, 'bludgeoning', [])).not.toContain('★');
   });
 
-  it('⚠ a bare weapon is just its name — no glyphs, no leading space', () => {
-    expect(combatWeaponLabel('Cudgel', BARE, 'bludgeoning', [])).toBe('cudgel');
-    expect(combatWeaponLabel('Cudgel', BARE, 'bludgeoning', ['bludgeoning'])).toBe('cudgel ★');
+  it('⚠ a bare weapon is its name and its base type — no coat glyphs, no leading space', () => {
+    // ⚠ OTA-1636 — the base type now rides the far right of every label.
+    expect(combatWeaponLabel('Cudgel', BARE, 'bludgeoning', [])).toBe('cudgel ⚒');
+    expect(combatWeaponLabel('Cudgel', BARE, 'bludgeoning', ['bludgeoning'])).toBe('cudgel ★ ⚒');
+    // no raw type known → no base glyph, no false symbol
     expect(combatWeaponLabel('Cudgel', null, null, ['bludgeoning'])).toBe('cudgel');
   });
 
@@ -111,7 +113,7 @@ describe("OTA-1553 — the owner's cudgel", () => {
     expect(shortWeaponName('Rusty Iron Battle Shortbow')).toBe('Battle Shortbow');
     expect(shortWeaponName('Pocket Knife')).toBe('Pocket Knife');
     expect(combatWeaponLabel('Rusty Iron Battle Shortbow', CUDGEL, 'piercing', ['cold']))
-      .toBe('🔥❄ battle shortbow ★');
+      .toBe('🔥❄ battle shortbow ★ ▲');
   });
 
   it('⚠⚠ NO DICE ANYWHERE IN THE LABEL — he ruled that out in as many words', () => {
@@ -171,13 +173,13 @@ describe('OTA-1553 — the star obeys discovery, exactly as the card does', () =
   it('⚠⚠⚠ a low-Wisdom player who has learned nothing knows nothing — no star', () => {
     expect(knownEnemyWeaknesses(foe(), { playerWisdom: 8 })).toEqual([]);
     expect(combatWeaponLabel('Cudgel', CUDGEL, 'bludgeoning', knownEnemyWeaknesses(foe(), { playerWisdom: 8 })))
-      .toBe('🔥❄ cudgel');
+      .toBe('🔥❄ cudgel ⚒');
   });
 
   it('⚠⚠⚠ Wisdom 12 reads it on sight — the star lights', () => {
     const known = knownEnemyWeaknesses(foe(), { playerWisdom: WEAKNESS_READ_WIS });
     expect(known).toContain('burn');
-    expect(combatWeaponLabel('Cudgel', CUDGEL, 'bludgeoning', known)).toBe('🔥❄ cudgel ★');
+    expect(combatWeaponLabel('Cudgel', CUDGEL, 'bludgeoning', known)).toBe('🔥❄ cudgel ★ ⚒');
   });
 
   it('⚠⚠⚠ a BOSS is always readable, whatever the Wisdom', () => {
@@ -190,7 +192,7 @@ describe('OTA-1553 — the star obeys discovery, exactly as the card does', () =
     const key = require('../app/engine/enemyTraits').enemyIntelKey(e.name, e.traits) as string;
     const known = knownEnemyWeaknesses(e, { playerWisdom: 6, intel: { [key]: { weak: ['burn'], resist: [] } } });
     expect(known).toContain('burn');
-    expect(combatWeaponLabel('Cudgel', CUDGEL, 'bludgeoning', known)).toBe('🔥❄ cudgel ★');
+    expect(combatWeaponLabel('Cudgel', CUDGEL, 'bludgeoning', known)).toBe('🔥❄ cudgel ★ ⚒');
   });
 
   it('⚠⚠⚠ the `witholdIntel` dial switches the free read OFF, and the star goes with it', () => {

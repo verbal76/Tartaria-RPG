@@ -74,9 +74,10 @@ describe('OTA-1568 — the split says exactly what the flat label says', () => {
     for (const [name, item, raw, weak] of cases) {
       const flat = combatWeaponLabel(name, item, raw, weak);
       const parts = combatWeaponLabelParts(name, item, raw, weak);
-      const rebuilt = parts.glyphs.length > 0
+      // ⚠ OTA-1636 — the base glyph is the fourth piece, last, after the star.
+      const rebuilt = (parts.glyphs.length > 0
         ? `${parts.glyphs.map((g) => g.ch).join('')} ${parts.text}`
-        : parts.text;
+        : parts.text) + (parts.base ? ` ${parts.base.ch}` : '');
       expect({ name, rebuilt }).toEqual({ name, rebuilt: flat });
     }
   });
@@ -166,7 +167,9 @@ describe('OTA-1568 — the wiring', () => {
     // it must take the untouched path. This is what makes the OTA cheap to roll
     // back: the change is confined to weapon chips that carry a coating.
     expect(INPUT).toContain('<Text style={textStyle}>{label.toUpperCase()}</Text>');
-    expect(INPUT).toContain('{glyphs && glyphs.length > 0 ? (');
+    // OTA-1636: a base-typed weapon with no coats takes the painted path too,
+    // so the guard now reads `(glyphs && glyphs.length > 0) || baseGlyph`.
+    expect(INPUT).toContain('{(glyphs && glyphs.length > 0) || baseGlyph ? (');
   });
 
   it('⚠ both hands are wired, not just the main', () => {
