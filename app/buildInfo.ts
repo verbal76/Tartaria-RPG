@@ -27209,7 +27209,27 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the ring) and the damage IS real, so carry the same points of damage across —
 // an untouched 25/25 loads 40/40, a chipped 18/25 loads 33/40, instead of a
 // freshly-promoted ring reading pre-worn forever.
-export const OTA_BUILD_ID = '2026-09-03-1654-the-save-catches-up';
+// OTA-1655 — THE CARD IS ASKED, NOT READ. Owner: *"make sure they all work."* So
+// every one of the twenty OTAs shipped in the last 24 hours was scored by HOW it
+// proves itself — assertions that CALL the code and check the answer, versus
+// assertions that read the source file and look for a string. Nineteen carry real
+// behavioural proof (10 to 73 live assertions each). ⚠ OTA-1651 is the outlier at
+// 1 of 23, and it is the one that MOVED WHAT THE PLAYER SEES: the enemy's flavour
+// line and the player's own hands off the combat card and into the popup. A source
+// pin cannot tell a working card from a broken one — rename a local and it goes red
+// on correct code; route the same text through another helper and it stays green on
+// a card that lost the line. Two of its pins even compared `.indexOf` of two SOURCE
+// strings to assert the ORDER the flavour prints in, which is the order two calls
+// appear in the file, not the order the lines come out. `enemyDetailBody` was
+// already pure — an EnemyView in, text out, no hooks, no state — so the whole fix
+// was one export, and ota1655 now asks the card: the flavour is present and above
+// the HP line MEASURED ON THE RENDERED LINES, both hands are named in words that
+// survive stripping the dot, a flavourless enemy leaves no blank gap or
+// "undefined", an unreadable foe SAYS it is unreadable instead of looking
+// defenceless, Wisdom 12 discloses what the gate withheld, and no enemy shape a
+// save can hold makes the popup throw.
+export const OTA_BUILD_ID = '2026-09-03-1655-the-card-is-asked';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-03-1654-the-save-catches-up';
 // golem catch-up 2026-09-03: markerless publish of OTA-1654 - the save catches
 // up to the catalog. The EFFECTS were never stale (an accessory's powers and
 // every ladder magnitude resolve from the catalog row by name), but the rarity

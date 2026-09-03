@@ -430,7 +430,17 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, pl
 // formula and read parseInt(enemy.attack) — a move NAME on every bestiary row
 // — where the rolls compute abilityPoint + trait bonus. The card, this popup,
 // and the d20 lines now all ask the roll's own resolvers.
-function enemyDetailBody(view: EnemyView, canRead: boolean, observed?: { weak: string[]; resist: string[] }): string {
+// ⚠⚠ OTA-1655 — EXPORTED SO THE PROMISE CAN BE ASKED INSTEAD OF READ.
+// OTA-1651 moved the enemy's flavour line and the player's own hands OFF the
+// combat card and INTO this popup. An audit of the last twenty OTAs measured how
+// each is proven and found this one the single outlier: 22 of its 23 assertions
+// were `expect(SOURCE).toContain(…)` string pins on this file. Those pin the
+// CODE, not the OUTCOME — rename a local or route the same text through another
+// helper and the suite goes red on a working card, or green on a broken one.
+// The builder was already pure (an EnemyView in, a block of text out — no hooks,
+// no state, no rendering); it was module-local only because nothing had needed
+// it yet, so exporting it costs nothing and buys a real assertion.
+export function enemyDetailBody(view: EnemyView, canRead: boolean, observed?: { weak: string[]; resist: string[] }): string {
   const e = view.enemy;
   const ac = enemyAC(e);
   const atkLabel = `+${enemyAttackBonus(e)}`;
