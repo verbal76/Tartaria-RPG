@@ -21,24 +21,53 @@
 import type { InventoryItem, WeaponCoating } from './types';
 import { canonicalItemTags, findWeaponByName } from './crafting';
 
-/** True iff a weapon by this name can carry a coating. Resolves the
- *  weapon via the same catalog/inference path combat uses, then
- *  gates on weaponKind + damageType: any PHYSICAL melee weapon
- *  (slashing / piercing / bludgeoning) or a projectile ranged weapon
- *  (piercing) qualifies. Returns false for non-weapons, aetheric/energy
- *  melee, and energy ranged (electrical / aetheric / burn / radiation). */
+/**
+ * ⚠⚠⚠ OTA-1644 — THE GATE ASKED ABOUT DAMAGE TYPE WHERE IT MEANT PHYSICAL FORM,
+ * and a proxy that wrong refuses a steel axe head.
+ *
+ * From the owner, playing 4.32.11: *"I can't coat my magnetic axe."* He was
+ * right, and the reason was a category error thirteen OTAs deep. The rule's own
+ * comment has always said what it is FOR — *"coatings need a blade, a point or a
+ * hammer-face"* — but it tested `damageType`, and the Magnetic Axe is a Rare
+ * `electrical` weapon. So the axe was refused for having a magnetised core,
+ * while its head is exactly the steel wedge the sentence describes.
+ *
+ * ⚠⚠ IT WAS NEVER ONE WEAPON. The measurement: **58 of 159 melee weapons** were
+ * refused on damage type, and 44 of them carry an explicit `blade` / `axe` /
+ * `knife` / `hammer` / `spear` / `polearm` tag — Plasma Executioner's Axe, Laser
+ * Sword, Heavy Plasma Hammer, Aetheric Deathblade, and the five VENOM BLADES
+ * (Mud Venom Blade, Mud Thornblade, Bone Thornblade, Mud Royal Blade) whose
+ * entire identity is a substance smeared on an edge. A poison blade that cannot
+ * take poison is the clearest possible statement that the proxy was wrong.
+ *
+ * ⚠⚠ AND THE RANGED HALF HAD THE MIRROR BUG. `piercing` stood in for "the thing
+ * that arrives is solid", which is true of an arrow and false of a THROWN
+ * weapon that is itself the projectile: the Bone Throwing Axe (slashing), both
+ * slings (bludgeoning), Mud Darts (poison), the Aetheric Throwing Disk. You
+ * throw the object you coated. Seven of them, refused for the damage they do on
+ * arrival rather than for what arrives.
+ *
+ * ⚠ WHAT STILL REFUSES, because these are real and not proxies:
+ *   • rune-casters — a shaped force has no surface, and since OTA-1561 they take
+ *     Crucible PASSIVES instead, so this is a design boundary, not an oversight.
+ *   • a launcher that fires no solid round — a plasma rifle, a blaster, a
+ *     railgun. The beam carries nothing, and coating the emitter coats nothing.
+ *     A bow or a bolt-caster still qualifies: the arrow is the surface.
+ */
+const THROWN_TAGS: ReadonlySet<string> = new Set(['thrown', 'sling']);
+
 export function isCoatableWeapon(name: string): boolean {
   const w = findWeaponByName(name);
   if (!w) return false;
   if (w.weaponKind === 'runecaster') return false;
-  if (w.weaponKind === 'melee') {
-    // OTA-492 — all physical melee, bludgeoning included (per the player).
-    return w.damageType === 'slashing'
-      || w.damageType === 'piercing'
-      || w.damageType === 'bludgeoning';
-  }
-  // ranged — only physical projectiles (a point that carries the
-  // substance). Energy casters fire no edge to coat.
+  // ⚠ A MELEE WEAPON IS A SOLID OBJECT YOU STRIKE WITH — every one of them, by
+  // the OTA-1641 naming rule that requires each to be named for a real weapon
+  // noun. There is no melee entry in the catalog whose striking surface is
+  // immaterial, so there is nothing left here for a damage-type test to decide.
+  if (w.weaponKind === 'melee') return true;
+  // Thrown weapons ARE the projectile: whatever you paint on lands on the enemy.
+  if ((w.tags ?? []).some((t) => THROWN_TAGS.has(t))) return true;
+  // Launchers — only ones that send a solid point downrange.
   return w.damageType === 'piercing';
 }
 
@@ -101,10 +130,11 @@ export function coatingRefusalFor(
   if (w.weaponKind === 'runecaster') {
     return 'a rune-caster shapes raw force — there is no edge or point for the coating to ride';
   }
-  if (w.weaponKind === 'melee') {
-    return `${w.damageType} does its work without a surface to paint — coatings need a blade, a point or a hammer-face`;
-  }
-  return 'an energy weapon fires nothing solid to carry the coating — a bolt or an arrow can, a beam cannot';
+  // ⚠ OTA-1644 — THE MELEE BRANCH IS GONE, because there is no longer a melee
+  // weapon this function can be reached for. It used to answer "<electrical>
+  // does its work without a surface to paint" about a steel axe head, which is
+  // the sentence that sent the owner looking for a bug in the picker.
+  return 'this one fires a beam rather than throwing something solid — a bolt, an arrow or a thrown weapon carries a coating, a beam has nothing to carry it';
 }
 
 /** The player-facing name for an item, prefixed with the coating

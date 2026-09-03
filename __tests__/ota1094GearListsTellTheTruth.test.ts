@@ -104,13 +104,37 @@ describe('OTA-1094 #1 — the Crucible says WHY a weapon cannot be upgraded', ()
     }
   });
 
-  it('the WEAPONS heading has real content to explain — a large slice of the catalog can never take a channel', () => {
+  it('the WEAPONS heading has real content to explain — a slice of the catalog can never take a channel', () => {
     // This is the fact behind the report. If it ever drops to zero the honesty
     // layer is dead weight; if it is non-trivial the layer is load-bearing.
+    //
+    // ⚠⚠ OTA-1644 — THE BAR MOVED 50 → 25, AND MOST OF THE OLD COUNT WAS THE BUG.
+    // `crucibleUpgradeVerdict` routes through `isCoatableItem`, so every weapon
+    // the coating gate wrongly refused ALSO arrived here as "can never take a
+    // channel". That gate tested `damageType` as a proxy for physical form and
+    // turned away 58 melee weapons with real edges — a steel axe head with a
+    // magnetised core — plus 7 thrown weapons that ARE their own projectile.
+    //
+    // What is left is the honest set, and it is exactly what the OTA-1561
+    // comment in itemFusion.ts already described: the energy LAUNCHERS (plasma
+    // rifles, blasters, railguns), which have no channel of any kind because
+    // nothing solid leaves them. 30 of them today. The layer is still
+    // load-bearing; it is no longer inflated by weapons that should have been
+    // upgradeable all along.
     const blocked = catalogWeapons.filter(
       (w) => crucibleUpgradeVerdict(item({ name: w.name, kind: 'weapon' })).kind === null,
     );
-    expect(blocked.length).toBeGreaterThan(50);
+    expect(blocked.length).toBeGreaterThan(25);
+    // ⚠ And the blocked set must be BEAMS ONLY. If a melee weapon or a thrown
+    // weapon ever lands back in here, the OTA-1644 gate has regressed — which is
+    // the assertion that makes lowering the bar safe rather than a test weakened
+    // until it passed.
+    expect(blocked.filter((w) => w.weaponKind === 'melee').map((w) => w.name)).toEqual([]);
+    expect(
+      blocked
+        .filter((w) => (w.tags ?? []).some((t) => t === 'thrown' || t === 'sling'))
+        .map((w) => w.name),
+    ).toEqual([]);
   });
 
   it('isWeaponRow files catalog weapons under WEAPONS even with no kind field', () => {

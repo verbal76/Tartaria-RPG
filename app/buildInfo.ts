@@ -27011,7 +27011,24 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // arm's length). ⚠ The plus sign is the whole test: a reader without it claimed
 // 73 weapons, doubling every rune-caster's base dice and reading the shields'
 // defensive numbers as attack riders.
-export const OTA_BUILD_ID = '2026-09-03-1643-the-dice-riders-pay';
+// ⚠⚠⚠ OTA-1644 — A COATING RIDES THE WEAPON, NOT THE DAMAGE TYPE. Owner, on
+// 4.32.11: "I can't coat my magnetic axe." He was right, and the cause was a
+// proxy standing since OTA-360: `isCoatableWeapon` gated melee on damageType ∈
+// {slashing, piercing, bludgeoning} as a stand-in for "has a surface to paint".
+// The Magnetic Axe is a Rare `electrical` weapon with an `axe` tag and a steel
+// head — refused for its magnetised core. Measured: 58 of 159 melee weapons
+// refused, 44 with an explicit blade/axe/knife/hammer/spear tag, INCLUDING the
+// five venom blades whose whole identity is a substance on an edge. The ranged
+// half had the mirror bug: `piercing` stood in for "what arrives is solid",
+// true of an arrow, false of a THROWN weapon that IS the projectile (Bone
+// Throwing Axe, both slings, Mud Darts, Throwing Disk, Plasma Spear). Now:
+// every melee weapon takes a coating, every thrown weapon takes a coating, a
+// launcher still needs a solid round, and a rune-caster still refuses — the one
+// real boundary, since OTA-1561 gave them Crucible passives instead. The old
+// melee refusal line ("<electrical> does its work without a surface to paint")
+// is deleted; it was unreachable and it was the sentence that read as a bug.
+export const OTA_BUILD_ID = '2026-09-03-1644-a-coating-rides-the-weapon';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-03-1643-the-dice-riders-pay';
 // golem catch-up 2026-09-03: markerless publish of OTA-1643 - the 30 unread
 // "+N"/"+NdN" damage promises now pay (flatRider on every hit, riderDot when the
 // card names a span), 4 conditions backed by real enemies, 3 impossible cards
