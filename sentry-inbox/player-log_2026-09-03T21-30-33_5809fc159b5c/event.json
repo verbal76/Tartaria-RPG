@@ -1,0 +1,278 @@
+{
+  "id": "5809fc159b5c419aaffb56d8bb159fdb",
+  "groupID": "7710441096",
+  "eventID": "5809fc159b5c419aaffb56d8bb159fdb",
+  "projectID": "4511945117532160",
+  "size": 18077,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-03-1649-what-a-ring-is-for #mtlzxhu9g966 [inline 20/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-03-1649-what-a-ring-is-for",
+  "message": "player-log 2026-09-03-1649-what-a-ring-is-for #mtlzxhu9g966 [inline 20/28]",
+  "title": "player-log 2026-09-03-1649-what-a-ring-is-for #mtlzxhu9g966 [inline 20/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "80c6dc8ccfa842bca86ac60ce9101d84",
+      "span_id": "b732faaf30e15d11",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "2Z] [debug] ui: tap \"magnetic axe \u26a1\"\n[2026-09-03T02:12:41.235Z] [system] evasive \u2014 harder to hit fades.\n[2026-09-03T02:12:41.270Z] [player] attack with the magnetic axe\n[2026-09-03T02:12:41.271Z] [debug] parser: intent=attack conf=1.00 verb=attack target=magnetic axe resolved=Magnetic Axe range=close enemies=4 hooks=1\n",
+      "[2026-09-03T02:12:41.272Z] [debug] attack: target=Conspiracy Architects Raider 3 range=close reach.bands=[close] reach.label=Magnetic Axe bareHand=false\n[2026-09-03T02:12:41.274Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-03T02:12:41.355Z] [world] You raise the magnetic axe toward Conspiracy Architects Raider 3. The room narrows around the both of you.\n",
+      "[2026-09-03T02:12:41.356Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T02:12:47.052Z] [world] You seize the initiative. Conspiracy Architects Raider 3 has no time to react.\n[2026-09-03T02:12:47.052Z] [combat] You \u2014 d20 \u2192 18 + STR 18 perfect opening (2\u00d7 dice) = 36 vs Conspiracy Architects Raider 3 AC 11 \u2014 \u2713 HIT\n",
+      "[2026-09-03T02:12:47.054Z] [combat] Conspiracy Architects Raider 3 folds under the magnetic axe. 13 damage was enough. The room exhales.\n[2026-09-03T02:12:47.055Z] [reward] Conspiracy Architects Raider 3 defeated. You recover Patched Cloth \u00d72, Architect Sigil.\n[2026-09-03T02:12:47.056Z] [reward] You strip the body: Cudgel, Mud-Warden's Vest (+6 TC). The kit took the fight badly.\n",
+      "[2026-09-03T02:12:47.056Z] [combat] 2 attackers remain. Conspiracy Architects Raider 4 now in your sights.\n[2026-09-03T02:12:47.056Z] [reward] +22 TC pried from the dust.\n[2026-09-03T02:12:47.121Z] [debug] ac-shift 25\u219222: race/base 10 + gear 18 + title 0 \u2192 trimmed 22 + status 0 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Wa",
+      "lker's Boots cloak=Reclaimer's Cloak\n[2026-09-03T02:12:47.121Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 18 + ATK 7 = 25 vs your AC 22 \u2014 \u2713 HIT\n[2026-09-03T02:12:47.122Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 9 + ATK 7 = 16 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T02:12:47.519Z] [combat] Conspiracy Architects Raider 5 deals 2 slashing damage. You have 43 HP remaining.\n",
+      "[2026-09-03T02:12:47.519Z] [combat] Conspiracy Architects Raider 5's strike leaves you bleeding.\n[2026-09-03T02:12:53.652Z] [debug] ui: tap \"golem (39/68)\"\n[2026-09-03T02:12:53.654Z] [player] use golem\n[2026-09-03T02:12:53.655Z] [combat] Ashwright attacks Conspiracy Architects Raider 4 \u2014 d20 6 + 3 = 9 vs AC 11 \u2014 \u2717 MISS\n",
+      "[2026-09-03T02:12:53.655Z] [world] Ashwright's strike sails wide of Conspiracy Architects Raider 4.\n[2026-09-03T02:12:53.655Z] [combat] Conspiracy Architects Raider 4 retaliates \u2014 d20 14 + 6 hits Ashwright for 3 (35% resisted). (36/68)\n[2026-09-03T02:12:53.667Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 6 + ATK 7 = 13 vs your AC 22 \u2014 \u2717 MISS\n",
+      "[2026-09-03T02:12:53.669Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 17 + ATK 7 = 24 vs your AC 22 \u2014 \u2713 HIT\n[2026-09-03T02:12:54.050Z] [combat] Conspiracy Architects Raider 5 deals 1 slashing damage. You have 42 HP remaining.\n[2026-09-03T02:12:54.050Z] [combat] Conspiracy Architects Raider 5's strike leaves you bleeding.\n",
+      "[2026-09-03T02:12:54.479Z] [debug] persist sizes(KB): total=336 player=83 wm=163[rooms=93 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=84 scene=6\n[2026-09-03T02:12:57.069Z] [debug] ui: tap \"golem (36/68)\"\n[2026-09-03T02:12:57.079Z] [player] use golem\n[2026-09-03T02:12:57.080Z] [combat] Ashwright attacks Conspiracy Architects Raider 4 \u2014 d20 12 + 3 = 15 vs AC 11 \u2014 \u2713 HIT\n",
+      "[2026-09-03T02:12:57.081Z] [combat] Ashwright swings the Crude Golem Greatsword \u2014 10 slashing damage on Conspiracy Architects Raider 4. (6 HP left)\n[2026-09-03T02:12:57.081Z] [combat] Conspiracy Architects Raider 4 retaliates \u2014 d20 5 + 6 hits Ashwright for 1 (35% resisted). (35/68)\n[2026-09-03T02:12:57.100Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 15 + ATK 7 = 22 vs your AC 22 \u2014 \u2713 HIT\n",
+      "[2026-09-03T02:12:57.106Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 15 + ATK 7 = 22 vs your AC 22 \u2014 \u2713 HIT\n[2026-09-03T02:12:57.494Z] [combat] Conspiracy Architects Raider 5 deals 3 slashing damage [armor \u221225%]. You have 39 HP remaining.\n[2026-09-03T02:12:57.494Z] [combat] Conspiracy Architects Raider 5's strike leaves you bleeding.\n",
+      "[2026-09-03T02:12:57.494Z] [combat] Conspiracy Architects Raider 4 deals 3 slashing damage [armor \u221225%]. You have 36 HP remaining.\n[2026-09-03T02:12:57.494Z] [combat] Conspiracy Architects Raider 4's strike leaves you bleeding.\n[2026-09-03T02:13:00.052Z] [debug] ui: tap \"golem (35/68)\"\n[2026-09-03T02:13:00.059Z] [player] use golem\n",
+      "[2026-09-03T02:13:00.060Z] [combat] Ashwright attacks Conspiracy Architects Raider 4 \u2014 d20 3 + 3 = 6 vs AC 11 \u2014 \u2717 MISS\n[2026-09-03T02:13:00.060Z] [world] Ashwright's strike sails wide of Conspiracy Architects Raider 4.\n[2026-09-03T02:13:00.060Z] [combat] Conspiracy Architects Raider 4 retaliates \u2014 d20 8 + 6 hits Ashwright for 2 (35% resisted). (33/68)\n",
+      "[2026-09-03T02:13:00.077Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 1 + ATK 7 = 8 vs your AC 22 \u2014 \u2717 FUMBLE\n[2026-09-03T02:13:00.079Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 10 + ATK 7 = 17 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T02:13:37.326Z] [debug] ui: tap \"inventory\"\n[2026-09-03T02:13:53.698Z] [debug] ui: tap \"magnetic axe \u26a1\"\n",
+      "[2026-09-03T02:13:53.716Z] [player] attack with the magnetic axe\n[2026-09-03T02:13:53.717Z] [debug] parser: intent=attack conf=1.00 verb=attack target=magnetic axe resolved=Magnetic Axe range=close enemies=3 hooks=1\n[2026-09-03T02:13:53.718Z] [debug] attack: target=Conspiracy Architects Raider 4 range=close reach.bands=[close] reach.label=Magnetic Axe bareHand=false\n",
+      "[2026-09-03T02:13:53.793Z] [world] Your magnetic axe comes around in an arc; Conspiracy Architects Raider 4 squares up to meet it.\n[2026-09-03T02:13:53.793Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T02:13:54.125Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 THROW \u00b7 DISENGAGE  (331ms)\n",
+      "[2026-09-03T02:13:54.533Z] [debug] persist sizes(KB): total=336 player=83 wm=163[rooms=93 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=84 scene=6\n[2026-09-03T02:13:59.693Z] [world] Conspiracy Architects Raider 4 moves first. The pressure is immediate.\n[2026-09-03T02:13:59.695Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 14 + ATK 7 = 21 vs your AC 22 \u2014 \u2717 MISS\n",
+      "[2026-09-03T02:13:59.696Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 15 + ATK 7 = 22 vs your AC 22 \u2014 \u2713 HIT\n[2026-09-03T02:13:59.696Z] [combat] You \u2014 d20 \u2192 8 + STR 18 = 26 vs Conspiracy Architects Raider 4 AC 11 \u2014 \u2713 HIT\n[2026-09-03T02:13:59.700Z] [combat] Your blow with the magnetic axe lands clean \u2014 9 damage. Conspiracy Architects Raider 4 crumples in the dust. The Aetherstone settles.\n",
+      "[2026-09-03T02:13:59.700Z] [reward] Conspiracy Architects Raider 4 defeated. You recover Aether Residue, Patched Cloth.\n[2026-09-03T02:13:59.701Z] [reward] You strip the body: Bone Knife, Mud-Warden's Vest (+6 TC). The kit took the fight badly.\n[2026-09-03T02:13:59.701Z] [combat] 1 attacker remains. Conspiracy Architects Raider 5 now in your sights.\n",
+      "[2026-09-03T02:13:59.701Z] [reward] +18 TC pried from the dust.\n[2026-09-03T02:14:00.140Z] [combat] Conspiracy Architects Raider 5 deals 5 slashing damage [armor \u221225%]. You have 31 HP remaining.\n[2026-09-03T02:14:04.467Z] [debug] ui: tap \"dodge\"\n[2026-09-03T02:14:04.470Z] [system] bleeding fades.\n[2026-09-03T02:14:04.479Z] [player] dodge\n",
+      "[2026-09-03T02:14:04.480Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=2 hooks=1\n[2026-09-03T02:14:04.481Z] [world] You commit to the dodge. Slip Conspiracy Architects Raider 5's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-03T02:14:04.569Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 20 + ATK 7 = 27 vs your AC 22 \u2014 \u2713 CRITICAL HIT\n[2026-09-03T02:14:04.569Z] [combat] Dodge \u2014 Conspiracy Architects Raider 5 rolls a NAT 20. No read beats a perfect strike; it lands through your dodge.\n[2026-09-03T02:14:04.570Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-03T02:14:04.948Z] [combat] Conspiracy Architects Raider 5 deals 7 slashing damage [armor \u221225%]. You have 24 HP remaining.\n[2026-09-03T02:14:05.278Z] [cognitive] neutral  (378ms)\n[2026-09-03T02:14:05.610Z] [debug] ui: tap \"magnetic axe \u26a1\"\n[2026-09-03T02:14:05.628Z] [player] attack with the magnetic axe\n",
+      "[2026-09-03T02:14:05.628Z] [debug] parser: intent=attack conf=1.00 verb=attack target=magnetic axe resolved=Magnetic Axe range=close enemies=2 hooks=1\n[2026-09-03T02:14:05.629Z] [debug] attack: target=Conspiracy Architects Raider 5 range=close reach.bands=[close] reach.label=Magnetic Axe bareHand=false\n",
+      "[2026-09-03T02:14:05.706Z] [world] Your magnetic axe comes around in an arc; Conspiracy Architects Raider 5 squares up to meet it.\n[2026-09-03T02:14:05.706Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T02:14:06.035Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 THROW \u00b7 DISENGAGE  (328ms)\n[2026-09-03T02:14:27.324Z] [world] Conspiracy Architects Raider 5 moves first. The pressure is immediate.\n",
+      "[2026-09-03T02:14:27.327Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 3 + ATK 7 = 10 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T02:14:27.327Z] [combat] You \u2014 d20 \u2192 10 + STR 18 = 28 vs Conspiracy Architects Raider 5 AC 11 \u2014 \u2713 HIT\n[2026-09-03T02:14:27.329Z] [combat] Electrical flares \u2014 +3 on hit.\n",
+      "[2026-09-03T02:14:27.330Z] [combat] You crack the Conspiracy Architects Raider 5 with the Magnetic Axe for 14 \u2014 the better part of their fight, gone in one blow. They crumple, out cold. (4/18 HP) Loot them before they come to.\n[2026-09-03T02:14:27.333Z] [combat] Nobody left standing \u2014 the fight is yours. You take your time and strip the sleepers where they lie.\n",
+      "[2026-09-03T02:14:27.335Z] [reward] You strip the unconscious Conspiracy Architects Raider 5 \u2014 Bone Knife, Mud-Bound Cloak, Patched Cloth, +18 TC. The gear's seen better days (worn from the fight).\n[2026-09-03T02:14:27.347Z] [reward] You strip the unconscious Conspiracy Architects Raider 1 \u2014 Bone Knife, Mud-Warden's Vest, Patched Cloth, Worn Tartarian Coin, +28 TC. The gear's seen better days (wor",
+      "n from the fight).\n[2026-09-03T02:14:27.347Z] [combat] Conspiracy Architects Raider 5 is left exposed \u2014 easier to hit.\n[2026-09-03T02:14:27.347Z] [system] \u23f3 Time passed: 12 min\n[2026-09-03T02:14:32.660Z] [debug] ui: tap \"more \u25b8\"\n[2026-09-03T02:14:33.628Z] [debug] ui: tap \"craft\"\n[2026-09-03T02:14:43.642Z] [player] craft Crude Golem Greatsword\n",
+      "[2026-09-03T02:14:43.643Z] [debug] parser: intent=craft conf=1.00 verb=craft target=crude golem greatsword resolved=- range=- enemies=0 hooks=1\n[2026-09-03T02:14:43.644Z] [reward] \u2726 Crafted Crude Golem Greatsword. The Arbiter watches you set the last piece.\n[2026-09-03T02:14:43.647Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-09-03T02:14:43.648Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T02:14:43.648Z] [arbiter] \"There's coin on the board for a willing blade,\" the Arbiter says. \"Read the World.\"\n[2026-09-03T02:14:44.122Z] [cognitive] neutral  (473ms)\n[2026-09-03T02:14:46.035Z] [player] craft Crude Golem Pike\n",
+      "[2026-09-03T02:14:46.036Z] [debug] parser: intent=craft conf=1.00 verb=craft target=crude golem pike resolved=- range=- enemies=0 hooks=1\n[2026-09-03T02:14:46.037Z] [reward] \u2726 Crafted Crude Golem Pike. The Arbiter watches you set the last piece.\n[2026-09-03T02:14:46.038Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-09-03T02:14:46.038Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T02:14:46.514Z] [cognitive] neutral  (474ms)\n[2026-09-03T02:14:46.594Z] [debug] persist sizes(KB): total=335 player=85 wm=163[rooms=93 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=84 scene=4\n[2026-09-03T02:14:48.218Z] [player] craft Crude Golem Sledge\n",
+      "[2026-09-03T02:14:48.219Z] [debug] parser: intent=craft conf=1.00 verb=craft target=crude golem sledge resolved=sludge vent range=- enemies=0 hooks=1\n[2026-09-03T02:14:48.220Z] [reward] \u2726 Crafted Crude Golem Sledge. The Arbiter watches you set the last piece.\n[2026-09-03T02:14:48.709Z] [cognitive] neutral  (488ms)\n",
+      "[2026-09-03T02:14:53.396Z] [world] You repair the Aether-Walker's Boots. Back to full. (spent: Patched Cloth x4)\n[2026-09-03T02:14:53.449Z] [world] You repair the Architect's Sight Enhancer. Back to full. (spent: Patched Cloth x4)\n[2026-09-03T02:14:53.473Z] [arbiter] The Arbiter nods. \"Patched in: Smooth Stone \u2192 Small Rock.\"\n",
+      "[2026-09-03T02:14:53.475Z] [world] You repair the Searing Corrupted Choir-Bound Launcher. Back to full. (spent: Small Rock x2)\n[2026-09-03T02:14:53.495Z] [world] You repair the Magnetic Axe. Back to full. (spent: Scrap Metal x8, Stick x4)\n[2026-09-03T02:14:53.535Z] [arbiter] The Arbiter nods. \"Patched in: 3\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n",
+      "[2026-09-03T02:14:53.546Z] [world] You repair the Reclaimer's Cloak. Back to full. (spent: Patched Cloth x4)\n[2026-09-03T02:14:53.586Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n[2026-09-03T02:14:53.598Z] [world] You repair the Titan's Gauntlets. Back to full. (spent: Patched Cloth x4)\n",
+      "[2026-09-03T02:14:53.620Z] [arbiter] The Arbiter nods. \"Patched in: 2\u00d7 Smooth Stone \u2192 Small Rock.\"\n[2026-09-03T02:14:53.622Z] [world] You repair the Acid-Etched Corrupted Auralite Talon. Back to full. (spent: Small Rock x2)\n[2026-09-03T02:14:53.641Z] [world] You repair the Bone Knife. Back to full. (spent: Scrap Metal x4, Stick x2)\n",
+      "[2026-09-03T02:14:53.660Z] [world] You repair the Bone Knife. Back to full. (spent: Scrap Metal x4, Stick x2)\n[2026-09-03T02:14:53.679Z] [world] You repair the Poisoned Bone Knife. Back to full. (spent: Scrap Metal x4, Stick x2)\n[2026-09-03T02:14:53.697Z] [world] You repair the Bone Knife. Back to full. (spent: Scrap Metal x4, Stick x2)\n",
+      "[2026-09-03T02:14:53.719Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Smooth Stone \u2192 Small Rock.\"\n[2026-09-03T02:14:53.721Z] [world] You repair the Cudgel. Back to full. (spent: Small Rock x4, Stick x2)\n[2026-09-03T02:14:53.742Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Smooth Stone \u2192 Small Rock.\"\n",
+      "[2026-09-03T02:14:53.742Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Patched in: 4\u00d7 Smooth Stone \u2192 Small Rock.\u2026\"\n[2026-09-03T02:14:53.744Z] [world] You repair the Cudgel. Back to full. (spent: Small Rock x4, Stick x2)\n[2026-09-03T02:14:53.783Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n",
+      "[2026-09-03T02:14:53.783Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Patched in: 4\u00d7 Cloth Scrap \u2192 Patched Clot\u2026\"\n[2026-09-03T02:14:53.795Z] [world] You repair the Mud-Bound Cloak. Back to full. (spent: Patched Cloth x4)\n[2026-09-03T02:14:53.835Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n",
+      "[2026-09-03T02:14:53.835Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Patched in: 4\u00d7 Cloth Scrap \u2192 Patched Clot\u2026\"\n[2026-09-03T02:14:53.846Z] [world] You repair the "
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-03-1649-what-a-ring-is-for #mtlzxhu9g966 [inline 20/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtlzxhu9g966"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-03-1649-what-a-ring-is-for"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "20"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-03-1649-what-a-ring-is-for"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "3"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-03T21:30:32.484482Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-03T21:30:33.885000Z",
+  "fingerprints": [
+    "1b960547e4e555cc81721671e25adbb9"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1953857096,
+    "commitCount": 3,
+    "data": {},
+    "dateCreated": "2026-09-03T20:00:12.950036Z",
+    "dateReleased": "2026-09-03T20:00:42.063795Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "3f3f31e984f1edd9efaa4a21fcab9d9e29400d28",
+      "message": "[ota-hal] OTA-1649: what a ring is for\n\nOwner: \"do the ring and amulet recipes, and give the diadem a route. again\nbetter effects with rarity and ingredient quality. they should give\ncombinations of stat buffs, moderate resists and let's get some special\nAOE effects... each ring doesn't need to have all three things. the\ncombinations of 1, 2 or three things should scale with rarity.\"\n\n\u26a0 WHAT THE MEASUREMENT FOUND FIRST, before a line was written. Fifteen of\nthe thirty-two shipped accessories carry a `resistances` list. The item\ncard prints it \u2014 \"Resists: aetheric\" \u2014 and combat has NEVER SEEN ONE.\naggregateArmor's resist walk covered ARMOR_SLOTS only, so a Legendary\naetheric amulet arrived at the damage math as `[]` with a mitigation\nfraction of 0. Probed before any change; that probe is now the first test\nin ota1649 so the field cannot go quiet again.\n\nSo \"moderate resists\" was not a new feature. It was a dead field, and\nwiring it is the spine of this OTA.\n\n  \u2022 The jewellery joins the EXISTING armour stack \u2014 same multiplicative\n    diminishing returns, same MAX_ARMOR_RESIST ceiling \u2014 through a new\n    optional per-entry `weight` on ArmorSlotResist. Armour never sets it\n    (a chest is a chest whatever it is made of); jewellery always does,\n    because a ring's worth against a type is its RARITY, not which finger\n    it sits on. Every pre-existing caller is bit-identical.\n  \u2022 An amulet outweighs a ring at equal rarity \u2014 one neck, four fingers \u2014\n    and neither out-armours a breastplate. His \"50% of incoming fire\" is\n    measured, not asserted: a Legendary amulet + a Legendary ring + a Rare\n    ring = 0.497. Three slots given to one element buys half. One\n    Legendary ring alone buys a fifth.\n\nTHREE NEW EFFECT FAMILIES, wired and pinned:\n\n  \u2022 A COATING BOOST. His fire ring, exactly: a Rare burn ring is +25% on\n    burn coatings and nothing else. Applied to the rolled coating bonus\n    only (a bare blade gets nothing) and AFTER the weakness multiplier, so\n    a resistant hide cannot halve the ring's share as well.\n  \u2022 A STEALTH MULTIPLIER. Legendary = his +60%. It multiplies the whole\n    strike, and it does NOT check the weapon: the dice-doubling backstab\n    is a rogue's privilege, this is not, or it would be a second rogue tax\n    on an item a heavy build might want. \u26a0 The flag rides the DAMAGE STEP:\n    `stealthed` is stripped by consumeOnResolve the instant the attack\n    step resolves and pendingRolls is nulled before concludeRolls runs, so\n    a damage-time read of the player would miss the exact swing the ring\n    was bought for. combatRules stamps `fromStealth` at build time.\n  \u2022 A ONCE-PER-ENCOUNTER DISCHARGE. His frost ring: 50 cold across two\n    rings of range. It fires on the first swing of the fight \u2014 there is no\n    free action in this combat loop to hang a trigger on, and committing\n    to the fight is the honest trigger. Not the weapon splash: that is\n    keyed to the TARGET's band, this to the WEARER's. All discharges are\n    planned off one lineup and applied in one write, so the first ring's\n    kill cannot hide a body from the second. A burst that catches nobody\n    is still spent \u2014 refunding it would make a ring strictly better than a\n    splash, which pays the same price.\n\n\u26a0\u26a0 THE ROW PICKS THE FLAVOUR, THE LADDER PICKS THE NUMBER. Not one catalog\nrow carries a magnitude. A ring says \"I boost burn coatings\"; how much is\nCOATED_BOOST_PCT[rarity]. That is what makes \"better effects with rarity\"\na property of the system rather than a promise about forty-four\nhand-typed numbers \u2014 a row cannot sit off the ladder, and a rebalance is\none table edit.\n\n\u26a0 THE LADDER'S GATE IS THE SPECIAL, NOT A FAMILY COUNT, and the first\ndraft got that wrong. An exact count per rarity failed against the shipped\ncatalog on contact: five accessories \u2014 two of them COMMON \u2014 already\ncarried two families, and holding the line would have meant deleting a\nresist off items sitting in players' packs right now. So the rule moved to\nwhere the owner's sentence actually points. Common and Uncommon never\ncarry a special; Rare may; Legendary must, and carries all three. Every\nband is still strictly better than the one below on MAGNITUDE too, on all\nfive tables, so a two-family Uncommon never out-values a two-family Rare.\nThe rule needed no removals at all: the seven rows it found off-ladder\nwere each missing something, and each gained it.\n\nTHE ROUTES. 16 new accessories (48 total) and a recipe for every ring and\namulet in the game \u2014 205 recipes. The Aetheric Diadem was the only\ngenuinely unobtainable item in the catalog (no recipe, no loot table, no\nvendor, no quest) and now has one. Ingredient quality is mechanical: every\naccessory recipe must carry at least one ingredient of the result's own\nrarity or higher, so a Legendary cannot be reached from scrap. One shipped\nrecipe failed that and was repaired rather than grandfathered \u2014\nReclaimer's Aegis Pendant is Rare and asked for Scrap Metal / Aetheric\nShard / Spider Silk.\n\n\u26a0\u26a0\u26a0 THE MISTAKE I MADE AND HAD TO UNDO, kept as a rule. The first draft of\nthose 38 recipes reached for whatever material fitted the flavour and\nclaimed 22 fresh names \u2014 Aetheric Blood, Spirit Residue, Warden Stone,\nAetheric Cog and eighteen more. `isRecipeIngredientName` bars any recipe\ningredient from the Crucible, so every one of them silently LEFT the\nfusion fodder pool, and seven shipped fusion suites went red. They were\nright; the Crucible had genuinely lost its fodder. The fix was not to\nrepoint them. Every recipe was re-authored out of the 96 names recipes\nalready used, so the fodder pool after this OTA is bit-identical to the\none before it \u2014 measured, `newly claimed: []`. ota1649 pins it, so the\nnext accessory recipe reaching for a fresh material has to answer for the\nCrucible first. A second pin catches the other thing that pass produced: a\nblind substitution left seven recipes naming one ingredient twice.\n\nThe line ratchet did its job too. This walked gameStore through the 37,000\ncap (ota1400), which is what the cap is for. The discharge's targeting and\napplication moved out to `planBursts` / `applyBursts` in accessoryEffects,\nwhere they are pure and testable rather than reachable only through a live\ncombat turn. gameStore lands at 36,996.\n\nThe item card now names numbers instead of a bare \"Resists: aetheric\",\nreading the same tables combat reads so the two cannot drift, and a\ndischarge card admits on its face that it is once per fight.\n\nGates: all 18 green by exit code. Full suite green.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-03T19:57:15Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-03-1649-what-a-ring-is-for",
+          "shortVersion": "tartaria@4.32.11+2026-09-03-1649-what-a-ring-is-for",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-03T20:00:42.063795Z",
+          "dateCreated": "2026-09-03T20:00:12.950036Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155305262",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-03T20:00:43.872258Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-03-1649-what-a-ring-is-for",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-03-1649-what-a-ring-is-for",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-03-1649-what-a-ring-is-for",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-03-1649-what-a-ring-is-for)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "581c339cf31c4917935d9cda548bed87",
+  "previousEventID": "3b4f2cf01e8249dca36daba45904a465"
+}

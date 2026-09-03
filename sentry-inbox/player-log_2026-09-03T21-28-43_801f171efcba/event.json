@@ -1,0 +1,302 @@
+{
+  "id": "801f171efcba46d0827c312db7c49802",
+  "groupID": "7710441096",
+  "eventID": "801f171efcba46d0827c312db7c49802",
+  "projectID": "4511945117532160",
+  "size": 17873,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-03-1649-what-a-ring-is-for #mtlzxhu9g966 [inline 10/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-03-1649-what-a-ring-is-for",
+  "message": "player-log 2026-09-03-1649-what-a-ring-is-for #mtlzxhu9g966 [inline 10/28]",
+  "title": "player-log 2026-09-03-1649-what-a-ring-is-for #mtlzxhu9g966 [inline 10/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "724b24aba9e1435d9e6f11060c615d07",
+      "span_id": "b81df11a841cbb9e",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "Wracked Aetherkin range=mid enemies=1 hooks=2\n[2026-09-03T00:34:52.866Z] [debug] move: advance from range=mid enemies=1 weather=Aether Lightning cost=1 partial=0\n[2026-09-03T00:34:52.867Z] [debug] move: field advance target=Mud-Wracked Aetherkin d 1.50->0.50 band mid->close\n[2026-09-03T00:34:52.867Z] [world] You close the gap with Mud-Wracked Aetherkin. (range: close / arm's reach)\n",
+      "[2026-09-03T00:34:52.867Z] [combat] The light around Mud-Wracked Aetherkin bends and declines to leave. It spends the beat VEILED \u2014 the next strike will come from somewhere you are not watching.\n[2026-09-03T00:34:53.213Z] [cognitive] SWIM \u00b7 RETREAT \u00b7 REST \u00b7 SEARCH  (345ms)\n[2026-09-03T00:34:54.389Z] [debug] ui: tap \"flee\"\n[2026-09-03T00:34:54.398Z] [player] flee\n",
+      "[2026-09-03T00:34:54.399Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=close enemies=1 hooks=2\n[2026-09-03T00:34:54.490Z] [system] \u23f3 Time passed: 15 min\n[2026-09-03T00:34:54.820Z] [cognitive] FEAR \u00b7 RETREAT \u00b7 HIDE  (330ms)\n",
+      "[2026-09-03T00:34:55.234Z] [debug] persist sizes(KB): total=316 player=85 wm=142[rooms=74 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=84 scene=4\n[2026-09-03T00:34:56.593Z] [debug] skillcheck: escape d20=20 DEX 19 = 39 vs Pursuit 14 \u2014 Mud-Wracked Aetherkin (d20 12 + SPD 2) \u2192 PASS\n",
+      "[2026-09-03T00:34:56.700Z] [debug] stats: STR14 DEX19 INT12 WIS15 CHA11 STE7 | gear: WIS+4,INT+3,DEX+8,STR+3,STE+2 | worn: main=Auralite Talon off=Choir-Bound Launcher head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Honey-Glazed Knuckle legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n",
+      "[2026-09-03T00:34:56.700Z] [debug] train: dexterity (escape check) \u2192 progress 92/100\n[2026-09-03T00:34:56.700Z] [world] Three long strides and the distance is yours to keep.\n[2026-09-03T00:34:58.240Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T00:34:59.486Z] [world] You get a hand under the Rust Dagger and take it.\n[2026-09-03T00:34:59.486Z] [reward] \u2726 Rust Dagger (Common).\n",
+      "[2026-09-03T00:34:59.502Z] [world] You claim the Reclaimer's Mask.\n[2026-09-03T00:34:59.502Z] [reward] \u2726 Reclaimer's Mask (Common).\n[2026-09-03T00:34:59.503Z] [world] The Reclaimer's Trousers comes up out of the silt with a small sucking protest.\n[2026-09-03T00:34:59.503Z] [reward] \u2726 Reclaimer's Trousers (Common).\n",
+      "[2026-09-03T00:35:00.389Z] [world] You strip the fisher's net carefully. Something usable comes free in your hand.\n[2026-09-03T00:35:00.389Z] [world] Slim pickings on the hermit crab. You pocket a Smooth Stone on the way out.\n[2026-09-03T00:35:00.390Z] [world] You work the salt crust over. A part of it comes loose, intact.\n",
+      "[2026-09-03T00:35:00.390Z] [world] You break the standing water apart. Among the pieces, something worth keeping.\n[2026-09-03T00:35:00.390Z] [world] You strip the tide line carefully. Something usable comes free in your hand.\n[2026-09-03T00:35:00.390Z] [reward] \u2726 Salvage haul:\n[2026-09-03T00:35:00.391Z] [reward]     \u2022 Cloth Scrap x6 (Common)\n",
+      "[2026-09-03T00:35:00.391Z] [reward]     \u2022 Smooth Stone x3 (Common)\n[2026-09-03T00:35:00.391Z] [reward]     \u2022 Bent Nail (Common)\n[2026-09-03T00:35:01.774Z] [debug] ui: tap \"investigate\"\n[2026-09-03T00:35:03.827Z] [player] investigate the ground\n[2026-09-03T00:35:03.828Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2\n",
+      "[2026-09-03T00:35:03.832Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Blueberries (Uncommon).\n[2026-09-03T00:35:03.841Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-03T00:35:03.841Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T00:35:03.841Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T00:35:04.058Z] [cognitive] CLIMB  (216ms)\n",
+      "[2026-09-03T00:35:05.793Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n[2026-09-03T00:35:05.822Z] [debug] spawn: gear=[Stone Seeker's Brow Guard, Mud Shell] window=10 roster=new\n[2026-09-03T00:35:05.823Z] [arbiter] The Arbiter, walking with you: \"Tartaria was a continent once. A flood older than any honest map drowned it. We are crossing the top of it.\"\n",
+      "[2026-09-03T00:35:05.824Z] [world] You walk south through open silt. The compass tells you Voronov lies further south \u2014 5 tiles, about 13 hours of travel.\n[2026-09-03T00:35:05.825Z] [world] Your feet have taken you to the same three paces of ground.\n[2026-09-03T00:35:07.077Z] [debug] ui: tap \"take / salvage\"\n",
+      "[Filtered]",
+      "[2026-09-03T00:35:08.434Z] [world] You break the fisher's net apart. Among the pieces, something worth keeping.\n[2026-09-03T00:35:08.434Z] [world] You strip the rusted royal vault pedestal carefully. Something usable comes free in your hand.\n[2026-09-03T00:35:08.434Z] [world] You break the siren shell apart. Among the pieces, something worth keeping.\n",
+      "[2026-09-03T00:35:08.434Z] [world] You salvage the standing water. The take is small but real.\n[2026-09-03T00:35:08.435Z] [reward] \u2726 Salvage haul:\n[2026-09-03T00:35:08.435Z] [reward]     \u2022 Horn-Capped Dowel (Common)\n[2026-09-03T00:35:08.435Z] [reward]     \u2022 Moth-Eaten Felt Scrap (Common)\n[2026-09-03T00:35:08.435Z] [reward]     \u2022 Aetheric Cloth (Uncommon)\n",
+      "[2026-09-03T00:35:08.436Z] [reward]     \u2022 Worn Tartarian Coin x6 (Common)\n[2026-09-03T00:35:08.436Z] [reward]     \u2022 Scrap Metal x3 (Common)\n[2026-09-03T00:35:09.481Z] [world] The Mud Shell was half under something. It is not now.\n[2026-09-03T00:35:09.482Z] [reward] \u2726 Mud Shell (Common).\n[2026-09-03T00:35:11.594Z] [player] investigate Stone Seeker's Brow Guard\n",
+      "[2026-09-03T00:35:11.594Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=stone seeker brow guard resolved=Stone Seeker's Brow Guard range=- enemies=0 hooks=2\n[2026-09-03T00:35:11.595Z] [debug] route: hook intercept (kind=obelisk, target=\"stone seeker's brow guard\") \u2014 original intent=investigate\n",
+      "[2026-09-03T00:35:11.595Z] [world] You've seen one of these before \u2014 the same lead, already copied into your memory. Nothing new here.\n[2026-09-03T00:35:14.854Z] [debug] ui: tap \"investigate\"\n[2026-09-03T00:35:16.481Z] [player] investigate the ground\n[2026-09-03T00:35:16.481Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2\n",
+      "[2026-09-03T00:35:16.490Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Wild Chicken (Rare).\n[2026-09-03T00:35:16.498Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T00:35:16.718Z] [cognitive] CLIMB  (220ms)\n[2026-09-03T00:35:17.143Z] [debug] persist sizes(KB): total=316 player=87 wm=142[rooms=75 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=83 scene=3\n",
+      "[2026-09-03T00:35:17.938Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n[2026-09-03T00:35:17.985Z] [debug] spawn: gear=[Repeater Crossbow] window=10 roster=new\n[2026-09-03T00:35:17.987Z] [world] Ilva Sidelong grins. \"Cheddar Bob. Sit a minute. The road's been generous or it hasn't \u2014 which is it?\"\n",
+      "[2026-09-03T00:35:17.988Z] [world] Ilva Sidelong looks you over. \"It's been a long stretch, Cheddar Bob. I'd started asking after you.\"\n[2026-09-03T00:35:17.988Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Ilva Sidelong, fence. Tap the vendor banner to trade.\n",
+      "[2026-09-03T00:35:17.998Z] [world] Rare workings for sale: Lich-Heart Pendant (200 TC), Many-Colored Tonic (200 TC), Mire Stave (200 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n[2026-09-03T00:35:17.999Z] [world] You walk east through open silt. The compass points east into open ground.\n",
+      "[2026-09-03T00:35:18.000Z] [world] A patch of mud just off the path pulses with a faint blue glow, in time with nothing you can hear.\n[2026-09-03T00:35:20.742Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T00:35:22.108Z] [world] You strip the abandoned skiff carefully. Something usable comes free in your hand.\n",
+      "[2026-09-03T00:35:22.108Z] [world] You break the oyster bed apart. Among the pieces, something worth keeping.\n[2026-09-03T00:35:22.108Z] [world] You work the salt crust over. A part of it comes loose, intact.\n[2026-09-03T00:35:22.108Z] [world] You break the seaweed mass apart. Among the pieces, something worth keeping.\n",
+      "[2026-09-03T00:35:22.109Z] [world] You work the standing water over. A part of it comes loose, intact.\n[2026-09-03T00:35:22.109Z] [world] You work the tackle box apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n[2026-09-03T00:35:22.109Z] [reward] \u2726 Salvage haul:\n[2026-09-03T00:35:22.109Z] [reward]     \u2022 Aetheric Cloth (Uncommon)\n",
+      "[2026-09-03T00:35:22.110Z] [reward]     \u2022 Bone Sliver (Common)\n[2026-09-03T00:35:22.110Z] [reward]     \u2022 Stick (Common)\n[2026-09-03T00:35:22.110Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-09-03T00:35:22.110Z] [reward]     \u2022 Mud Fragment (Common)\n[2026-09-03T00:35:22.110Z] [reward]     \u2022 Bone-Handled Rivet (Uncommon)\n",
+      "[2026-09-03T00:35:23.159Z] [world] You work the Repeater Crossbow loose from where the mud had it.\n[2026-09-03T00:35:23.160Z] [reward] \u2726 Repeater Crossbow (Common).\n[2026-09-03T00:35:31.431Z] [reward] Sold Bone Maul (Common) to Ilva Sidelong for 14 TC. (881 TC on hand)\n[2026-09-03T00:35:31.511Z] [reward] Sold Tartarian Hand Spear (Common) to Ilva Sidelong for 14 TC. (895 TC on hand)\n",
+      "[2026-09-03T00:35:31.583Z] [reward] Sold Repeater Crossbow (Common) to Ilva Sidelong for 14 TC. (909 TC on hand)\n[2026-09-03T00:35:31.655Z] [reward] Sold Iron Spear (Common) to Ilva Sidelong for 13 TC. (922 TC on hand)\n[2026-09-03T00:35:31.727Z] [reward] Sold Mud Shortsword (Common) to Ilva Sidelong for 13 TC. (935 TC on hand)\n",
+      "[2026-09-03T00:35:31.798Z] [reward] Sold Mud Throwing Knife (Common) to Ilva Sidelong for 12 TC. (947 TC on hand)\n[2026-09-03T00:35:31.868Z] [reward] Sold Mud-Sealer Gauntlets (Common) to Ilva Sidelong for 12 TC. (959 TC on hand)\n[2026-09-03T00:35:31.939Z] [reward] Sold Mud Claymore (Common) to Ilva Sidelong for 12 TC. (971 TC on hand)\n",
+      "[2026-09-03T00:35:32.010Z] [reward] Sold Mud Darts (Common) to Ilva Sidelong for 12 TC. (983 TC on hand)\n[2026-09-03T00:35:32.081Z] [reward] Sold Golem-Bound Armor (Common) to Ilva Sidelong for 10 TC. (993 TC on hand)\n[2026-09-03T00:35:32.152Z] [reward] Sold Stone Seeker's Brow Guard (Common) to Ilva Sidelong for 8 TC. (1001 TC on hand)\n",
+      "[2026-09-03T00:35:32.222Z] [reward] Sold Titan's Guard Mask (Common) to Ilva Sidelong for 8 TC. (1009 TC on hand)\n[2026-09-03T00:35:32.293Z] [reward] Sold Architect's Grip (Common) to Ilva Sidelong for 6 TC. (1015 TC on hand)\n[2026-09-03T00:35:32.363Z] [reward] Sold Reclaimer's Boots (Common) to Ilva Sidelong for 6 TC. (1021 TC on hand)\n",
+      "[2026-09-03T00:35:32.433Z] [reward] Sold Bone Knife (Common) to Ilva Sidelong for 6 TC. (1027 TC on hand)\n[2026-09-03T00:35:32.502Z] [reward] Sold Aetheric Helm of Command (Common) to Ilva Sidelong for 6 TC. (1033 TC on hand)\n[2026-09-03T00:35:32.572Z] [reward] Sold Lost Seeker's Gloves (Common) to Ilva Sidelong for 6 TC. (1039 TC on hand)\n",
+      "[2026-09-03T00:35:32.641Z] [reward] Sold Sentinel's Greaves (Common) to Ilva Sidelong for 6 TC. (1045 TC on hand)\n[2026-09-03T00:35:32.711Z] [reward] Sold Wanderer's Face of Shadows (Common) to Ilva Sidelong for 6 TC. (1051 TC on hand)\n[2026-09-03T00:35:32.780Z] [reward] Sold Sentinel's Repair Cap (Common) to Ilva Sidelong for 6 TC. (1057 TC on hand)\n",
+      "[2026-09-03T00:35:32.849Z] [reward] Sold Mud-Treader's Greaves (Common) to Ilva Sidelong for 6 TC. (1063 TC on hand)\n[2026-09-03T00:35:32.920Z] [reward] Sold Sentinel's Overcoat (Common) to Ilva Sidelong for 6 TC. (1069 TC on hand)\n[2026-09-03T00:35:32.988Z] [reward] Sold Aether-Weaver's Mantle (Common) to Ilva Sidelong for 6 TC. (1075 TC on hand)\n",
+      "[2026-09-03T00:35:33.056Z] [reward] Sold Forgotten Leggings (Common) to Ilva Sidelong for 6 TC. (1081 TC on hand)\n[2026-09-03T00:35:33.124Z] [reward] Sold Bone Knife (Common) to Ilva Sidelong for 6 TC. (1087 TC on hand)\n[2026-09-03T00:35:33.191Z] [reward] Sold Bone Knife (Common) to Ilva Sidelong for 6 TC. (1093 TC on hand)\n",
+      "[2026-09-03T00:35:33.259Z] [reward] Sold Aetheric Scout Greaves (Common) to Ilva Sidelong for 6 TC. (1099 TC on hand)\n[2026-09-03T00:35:33.326Z] [reward] Sold Explorer's Worn Headgear (Common) to Ilva Sidelong for 6 TC. (1105 TC on hand)\n[2026-09-03T00:35:33.394Z] [reward] Sold Architect's Observer Visor (Common) to Ilva Sidelong for 6 TC. (1111 TC on hand)\n",
+      "[2026-09-03T00:35:33.462Z] [reward] Sold Mud-Stalker Leggings (Common) to Ilva Sidelong for 6 TC. (1117 TC on hand)\n[2026-09-03T00:35:33.529Z] [reward] Sold Thought-Crafter's Headpiece (Common) to Ilva Sidelong for 6 TC. (1123 TC on hand)\n[2026-09-03T00:35:33.597Z] [reward] Sold Reclaimer's Mask (Common) to Ilva Sidelong for 6 TC. (1129 TC on hand)\n",
+      "[2026-09-03T00:35:33.664Z] [reward] Sold Reclaimer's Trousers (Common) to Ilva Sidelong for 6 TC. (1135 TC on hand)\n[2026-09-03T00:35:33.731Z] [reward] Sold Cudgel (Common) to Ilva Sidelong for 5 TC. (1140 TC on hand)\n[2026-09-03T00:35:33.799Z] [reward] Sold Reclaimer's Salvage Vest (Common) to Ilva Sidelong for 5 TC. (1145 TC on hand)\n",
+      "[2026-09-03T00:35:33.865Z] [reward] Sold Cudgel (Common) to Ilva Sidelong for 5 TC. (1150 TC on hand)\n[2026-09-03T00:35:33.933Z] [reward] Sold Reclaimer's Salvage Vest (Common) to Ilva Sidelong for 5 TC. (1155 TC on hand)\n[2026-09-03T00:35:34.000Z] [reward] Sold Cudgel (Common) to Ilva Sidelong for 5 TC. (1160 TC on hand)\n",
+      "[2026-09-03T00:35:34.067Z] [reward] Sold Mud-Bound Cloak (Common) to Ilva Sidelong for 5 TC. (1165 TC on hand)\n[2026-09-03T00:35:34.132Z] [reward] Sold Mud-Bound Cloak (Common) to Ilva Sidelong for 5 TC. (1170 TC on hand)\n[2026-09-03T00:35:34.199Z] [reward] Sold Cudgel (Common) to Ilva Sidelong for 5 TC. (1175 TC on hand)\n",
+      "[2026-09-03T00:35:34.264Z] [reward] Sold Mud-Warden's Vest (Common) to Ilva Sidelong for 5 TC. (1180 TC on hand)\n[2026-09-03T00:35:34.330Z] [reward] Sold Cudgel (Common) to Ilva Sidelong for 5 TC. (1185 TC on hand)\n[2026-09-03T00:35:34.396Z] [reward] Sold Reclaimer's Salvage Vest (Common) to Ilva Sidelong for 5 TC. (1190 TC on hand)\n",
+      "[2026-09-03T00:35:34.459Z] [reward] Sold Cudgel (Common) to Ilva Sidelong for 5 TC. (1195 TC on hand)\n[2026-09-03T00:35:34.524Z] [reward] Sold Mud-Warden's Vest (Common) to Ilva Sidelong for 5 TC. (1200 TC on hand)\n[2026-09-03T00:35:34.591Z] [reward] Sold Mud-Warden's Vest (Common) to Ilva Sidelong for 5 TC. (1205 TC on hand)\n",
+      "[2026-09-03T00:35:34.655Z] [reward] Sold Reclaimer's Salvage Vest (Common) to Ilva Sidelong for 5 TC. (1210 TC on hand)\n[2026-09-03T00:35:34.720Z] [reward] Sold Cudgel (Common) to Ilva Sidelong for 5 TC. (1215 TC on hand)\n[2026-09-03T00:35:34.785Z] [reward] Sold Mud-Bound Cloak (Common) to Ilva Sidelong for 5 TC. (1220 TC on hand)"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-03-1649-what-a-ring-is-for #mtlzxhu9g966 [inline 10/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtlzxhu9g966"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-03-1649-what-a-ring-is-for"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "10"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-03-1649-what-a-ring-is-for"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-03T21:28:42.253219Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "13": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 289,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-03T21:28:43.658000Z",
+  "fingerprints": [
+    "1b960547e4e555cc81721671e25adbb9"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1953857096,
+    "commitCount": 3,
+    "data": {},
+    "dateCreated": "2026-09-03T20:00:12.950036Z",
+    "dateReleased": "2026-09-03T20:00:42.063795Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "3f3f31e984f1edd9efaa4a21fcab9d9e29400d28",
+      "message": "[ota-hal] OTA-1649: what a ring is for\n\nOwner: \"do the ring and amulet recipes, and give the diadem a route. again\nbetter effects with rarity and ingredient quality. they should give\ncombinations of stat buffs, moderate resists and let's get some special\nAOE effects... each ring doesn't need to have all three things. the\ncombinations of 1, 2 or three things should scale with rarity.\"\n\n\u26a0 WHAT THE MEASUREMENT FOUND FIRST, before a line was written. Fifteen of\nthe thirty-two shipped accessories carry a `resistances` list. The item\ncard prints it \u2014 \"Resists: aetheric\" \u2014 and combat has NEVER SEEN ONE.\naggregateArmor's resist walk covered ARMOR_SLOTS only, so a Legendary\naetheric amulet arrived at the damage math as `[]` with a mitigation\nfraction of 0. Probed before any change; that probe is now the first test\nin ota1649 so the field cannot go quiet again.\n\nSo \"moderate resists\" was not a new feature. It was a dead field, and\nwiring it is the spine of this OTA.\n\n  \u2022 The jewellery joins the EXISTING armour stack \u2014 same multiplicative\n    diminishing returns, same MAX_ARMOR_RESIST ceiling \u2014 through a new\n    optional per-entry `weight` on ArmorSlotResist. Armour never sets it\n    (a chest is a chest whatever it is made of); jewellery always does,\n    because a ring's worth against a type is its RARITY, not which finger\n    it sits on. Every pre-existing caller is bit-identical.\n  \u2022 An amulet outweighs a ring at equal rarity \u2014 one neck, four fingers \u2014\n    and neither out-armours a breastplate. His \"50% of incoming fire\" is\n    measured, not asserted: a Legendary amulet + a Legendary ring + a Rare\n    ring = 0.497. Three slots given to one element buys half. One\n    Legendary ring alone buys a fifth.\n\nTHREE NEW EFFECT FAMILIES, wired and pinned:\n\n  \u2022 A COATING BOOST. His fire ring, exactly: a Rare burn ring is +25% on\n    burn coatings and nothing else. Applied to the rolled coating bonus\n    only (a bare blade gets nothing) and AFTER the weakness multiplier, so\n    a resistant hide cannot halve the ring's share as well.\n  \u2022 A STEALTH MULTIPLIER. Legendary = his +60%. It multiplies the whole\n    strike, and it does NOT check the weapon: the dice-doubling backstab\n    is a rogue's privilege, this is not, or it would be a second rogue tax\n    on an item a heavy build might want. \u26a0 The flag rides the DAMAGE STEP:\n    `stealthed` is stripped by consumeOnResolve the instant the attack\n    step resolves and pendingRolls is nulled before concludeRolls runs, so\n    a damage-time read of the player would miss the exact swing the ring\n    was bought for. combatRules stamps `fromStealth` at build time.\n  \u2022 A ONCE-PER-ENCOUNTER DISCHARGE. His frost ring: 50 cold across two\n    rings of range. It fires on the first swing of the fight \u2014 there is no\n    free action in this combat loop to hang a trigger on, and committing\n    to the fight is the honest trigger. Not the weapon splash: that is\n    keyed to the TARGET's band, this to the WEARER's. All discharges are\n    planned off one lineup and applied in one write, so the first ring's\n    kill cannot hide a body from the second. A burst that catches nobody\n    is still spent \u2014 refunding it would make a ring strictly better than a\n    splash, which pays the same price.\n\n\u26a0\u26a0 THE ROW PICKS THE FLAVOUR, THE LADDER PICKS THE NUMBER. Not one catalog\nrow carries a magnitude. A ring says \"I boost burn coatings\"; how much is\nCOATED_BOOST_PCT[rarity]. That is what makes \"better effects with rarity\"\na property of the system rather than a promise about forty-four\nhand-typed numbers \u2014 a row cannot sit off the ladder, and a rebalance is\none table edit.\n\n\u26a0 THE LADDER'S GATE IS THE SPECIAL, NOT A FAMILY COUNT, and the first\ndraft got that wrong. An exact count per rarity failed against the shipped\ncatalog on contact: five accessories \u2014 two of them COMMON \u2014 already\ncarried two families, and holding the line would have meant deleting a\nresist off items sitting in players' packs right now. So the rule moved to\nwhere the owner's sentence actually points. Common and Uncommon never\ncarry a special; Rare may; Legendary must, and carries all three. Every\nband is still strictly better than the one below on MAGNITUDE too, on all\nfive tables, so a two-family Uncommon never out-values a two-family Rare.\nThe rule needed no removals at all: the seven rows it found off-ladder\nwere each missing something, and each gained it.\n\nTHE ROUTES. 16 new accessories (48 total) and a recipe for every ring and\namulet in the game \u2014 205 recipes. The Aetheric Diadem was the only\ngenuinely unobtainable item in the catalog (no recipe, no loot table, no\nvendor, no quest) and now has one. Ingredient quality is mechanical: every\naccessory recipe must carry at least one ingredient of the result's own\nrarity or higher, so a Legendary cannot be reached from scrap. One shipped\nrecipe failed that and was repaired rather than grandfathered \u2014\nReclaimer's Aegis Pendant is Rare and asked for Scrap Metal / Aetheric\nShard / Spider Silk.\n\n\u26a0\u26a0\u26a0 THE MISTAKE I MADE AND HAD TO UNDO, kept as a rule. The first draft of\nthose 38 recipes reached for whatever material fitted the flavour and\nclaimed 22 fresh names \u2014 Aetheric Blood, Spirit Residue, Warden Stone,\nAetheric Cog and eighteen more. `isRecipeIngredientName` bars any recipe\ningredient from the Crucible, so every one of them silently LEFT the\nfusion fodder pool, and seven shipped fusion suites went red. They were\nright; the Crucible had genuinely lost its fodder. The fix was not to\nrepoint them. Every recipe was re-authored out of the 96 names recipes\nalready used, so the fodder pool after this OTA is bit-identical to the\none before it \u2014 measured, `newly claimed: []`. ota1649 pins it, so the\nnext accessory recipe reaching for a fresh material has to answer for the\nCrucible first. A second pin catches the other thing that pass produced: a\nblind substitution left seven recipes naming one ingredient twice.\n\nThe line ratchet did its job too. This walked gameStore through the 37,000\ncap (ota1400), which is what the cap is for. The discharge's targeting and\napplication moved out to `planBursts` / `applyBursts` in accessoryEffects,\nwhere they are pure and testable rather than reachable only through a live\ncombat turn. gameStore lands at 36,996.\n\nThe item card now names numbers instead of a bare \"Resists: aetheric\",\nreading the same tables combat reads so the two cannot drift, and a\ndischarge card admits on its face that it is once per fight.\n\nGates: all 18 green by exit code. Full suite green.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-03T19:57:15Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-03-1649-what-a-ring-is-for",
+          "shortVersion": "tartaria@4.32.11+2026-09-03-1649-what-a-ring-is-for",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-03T20:00:42.063795Z",
+          "dateCreated": "2026-09-03T20:00:12.950036Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155305262",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-03T20:00:43.872258Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-03-1649-what-a-ring-is-for",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-03-1649-what-a-ring-is-for",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-03-1649-what-a-ring-is-for",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-03-1649-what-a-ring-is-for)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "880f534a964446d88ff600c8d48d8f00",
+  "previousEventID": "7e271c35fa2d4e27be68a914fa2244d1"
+}

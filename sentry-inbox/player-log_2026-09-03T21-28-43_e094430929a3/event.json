@@ -1,0 +1,303 @@
+{
+  "id": "e094430929a3471487f1e2cc869f15f1",
+  "groupID": "7710441096",
+  "eventID": "e094430929a3471487f1e2cc869f15f1",
+  "projectID": "4511945117532160",
+  "size": 17801,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-03-1649-what-a-ring-is-for #mtlzxhu9g966 [inline 17/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-03-1649-what-a-ring-is-for",
+  "message": "player-log 2026-09-03-1649-what-a-ring-is-for #mtlzxhu9g966 [inline 17/28]",
+  "title": "player-log 2026-09-03-1649-what-a-ring-is-for #mtlzxhu9g966 [inline 17/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "724b24aba9e1435d9e6f11060c615d07",
+      "span_id": "b81df11a841cbb9e",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "ed by the SDK \u2014 bundle #mtkt5bixx0qy kept on disk, boots retry up to 5 sends total\n[2026-09-03T02:04:41.759Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a0648b-3311-768e-a326-38dbb615b795\n[2026-09-03T02:04:41.760Z] [debug] ota: Checking\u2026\n[2026-09-03T02:04:42.804Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n",
+      "[2026-09-03T02:04:42.908Z] [debug] ota: Saving progress\u2026\n[2026-09-03T02:04:42.909Z] [debug] ota: Restarting to apply\u2026\n[2026-09-03T02:04:43.110Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a064fd-03c0-7037-bc8f-10b7e367a2e2\n[2026-09-03T02:04:43.110Z] [debug] ota: Checking\u2026\n[2026-09-03T02:04:43.196Z] [debug] ota: Already up to date\n",
+      "[2026-09-03T02:04:43.196Z] [debug] ota: boot check result = noUpdate\n[2026-09-03T02:04:43.282Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-09-03T02:04:43.282Z] [debug] voice: bundled idle\n[2026-09-03T02:04:43.734Z] [debug] send-log: bundle #mtkt5bixx0qy attempt 2/5 delivered to Sentry\n",
+      "[2026-09-03T02:04:47.878Z] [debug] OTA applied: 2026-09-02-1634-the-aside-yields \u2192 2026-09-03-1637-this-is-the-place-means-the-cell.\n[2026-09-03T02:04:47.878Z] [debug] OTA session start: 2026-09-03-1637-this-is-the-place-means-the-cell.\n[2026-09-03T02:04:47.878Z] [world] You step back into Mud Flood Nexus. The world waits for your move.\n",
+      "[2026-09-03T02:04:47.878Z] [arbiter] The Arbiter sets the quiet aside. \"Welcome back, Cheddar Bob. I kept watch while you were gone.\"\n[2026-09-03T02:04:48.311Z] [debug] \u2550\u2550\u2550 SESSION 2026-09-03T02:04:48.309Z \u00b7 build 2026-09-03-1637-this-is-the-place-means-the-cell \u00b7 updated from 2026-09-02-1634-the-aside-yields \u00b7 previous entry moments earlier \u2550\u2550\u2550\n",
+      "[2026-09-03T02:04:48.312Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n[2026-09-03T02:04:48.312Z] [debug] missions: hunt:hunt_bog_dragon stage 4/7 [diplomacy] @monarch_waystation npc=\"Old Mira\" needs=The Boy's Locket\u2713 gives=Eshren's Name-Token\n",
+      "[2026-09-03T02:04:48.312Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n[2026-09-03T02:04:48.312Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n",
+      "[2026-09-03T02:04:48.312Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n[2026-09-03T02:04:48.313Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n",
+      "[2026-09-03T02:04:48.313Z] [debug] missions: \u00b7 at=mud_flood_nexus travelTo=monarch_waystation\n[2026-09-03T02:04:48.313Z] [debug] boot: life bmtkvtvakmw started 2026-09-03T02:04:43.052Z \u00b7 FOLLOWED AN OTA APPLY 142ms ago via boot-front \u00b7 prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)\n",
+      "[2026-09-03T02:04:49.320Z] [debug] send-log: crash on record (2026-09-03T00:49:33.538Z) \u2014 game log pushed automatically, delivered to Sentry, kept on disk as #mtkvtzmb9qii\n[2026-09-03T02:04:51.020Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-09-03T02:04:51.070Z] [debug] spawn: gear=[Bone Shiv (Stealth)] window=10 roster=new\n",
+      "[2026-09-03T02:04:51.071Z] [world] You walk west through open silt. The compass points west into open ground.\n[2026-09-03T02:04:51.072Z] [world] Someone in a long black coat is two ridges back, matching your pace. They have been there for a while.\n[2026-09-03T02:04:52.387Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T02:04:53.964Z] [world] You take the Bone Shiv (Stealth) from where it lay.\n",
+      "[Filtered]",
+      "[2026-09-03T02:04:55.106Z] [world] You break the gauge apart. Among the pieces, something worth keeping.\n[2026-09-03T02:04:55.106Z] [world] You work the gear assembly over. A part of it comes loose, intact.\n[2026-09-03T02:04:55.106Z] [world] You work the reactor hum over. A part of it comes loose, intact.\n[2026-09-03T02:04:55.107Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-09-03T02:04:55.107Z] [reward]     \u2022 Knotted Sinew Braid (Common)\n[2026-09-03T02:04:55.107Z] [reward]     \u2022 Salt-Cured Dowel (Common)\n[2026-09-03T02:04:55.108Z] [reward]     \u2022 Bent Nail (Common)\n[2026-09-03T02:04:55.108Z] [reward]     \u2022 Automaton Circuit (Common)\n[2026-09-03T02:04:55.108Z] [reward]     \u2022 Scrap Metal x3 (Common)\n[2026-09-03T02:04:56.872Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-09-03T02:04:58.664Z] [debug] qwen: SKIPPED this session \u2014 completion-crash guard tripped (1 crash inside a Qwen completion)\n[2026-09-03T02:04:58.688Z] [player] investigate the ground\n[2026-09-03T02:04:58.688Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-09-03T02:04:58.693Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Big Rock (Common).\n[2026-09-03T02:04:58.701Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T02:04:59.087Z] [cognitive] CLIMB  (385ms)\n[2026-09-03T02:04:59.607Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n",
+      "[2026-09-03T02:04:59.620Z] [debug] spawn: gear=[Architect's Mask of Vision, Plasma Cutter, Mud Long Axe] window=10 roster=new\n[2026-09-03T02:04:59.622Z] [world] The flat silt heaves, and a hand breaks the surface, then an arm, then a face caked grey with a thousand years of it.\n",
+      "[2026-09-03T02:04:59.622Z] [arbiter] This is one of the Aetherkin, then \u2014 not a story after all. The dead of old Tartaria, still walking because the Aether in them never stopped.\n[2026-09-03T02:04:59.622Z] [world] In life it was a soldier of an army nobody remembers losing \u2014 they could be anyone's \u2014 a neighbour, a stranger, the person you'd have been. The ground gave them back without warning \u2014 on",
+      "e moment mud, the next a person who should be dead.\n[2026-09-03T02:04:59.622Z] [world] It doesn't lunge. It cringes back, arms up over its face \u2014 remembering, dimly, that living things once meant harm. It will only fight if you make it.\n[2026-09-03T02:04:59.623Z] [world] You walk west through open silt. The compass points west into open ground.\n",
+      "[2026-09-03T02:04:59.623Z] [world] The thread you were following waits where you left it.\n[2026-09-03T02:06:03.789Z] [debug] ui: tap \"\ud83d\udd25\u2623 choir-bound launcher \u2605 \u2726\"\n[2026-09-03T02:06:03.840Z] [player] attack with the off-hand choir-bound launcher\n",
+      "[2026-09-03T02:06:03.841Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=mid enemies=1 hooks=1\n[2026-09-03T02:06:03.842Z] [debug] attack: target=Mud-Wracked Aetherkin range=mid reach.bands=[distant,far,mid,close] reach.label=Choir-Bound Launcher bareHand=false\n[2026-09-03T02:06:03.843Z] [debug] attack: status mods tired -1\n",
+      "[2026-09-03T02:06:03.915Z] [world] You raise the searing corrupted choir-bound launcher toward Mud-Wracked Aetherkin. The room narrows around the both of you.\n[2026-09-03T02:06:03.916Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T02:06:12.263Z] [world] You seize the initiative. Mud-Wracked Aetherkin has no time to react.\n",
+      "[2026-09-03T02:06:12.264Z] [combat] You \u2014 d20 \u2192 8 + INT 12 tired -1 = 19 vs Mud-Wracked Aetherkin AC 11 \u2014 \u2713 HIT\n[2026-09-03T02:06:12.264Z] [combat] The Corrupted coating fails to take on Mud-Wracked Aetherkin.\n[2026-09-03T02:06:12.265Z] [combat] Aetheric flares \u2014 +1 on hit (weak \u2014 bites deep!).\n",
+      "[2026-09-03T02:06:12.265Z] [combat] Weakness exposed \u2014 Mud-Wracked Aetherkin flinches. (aetheric \u00d71.5 for 19)\n[2026-09-03T02:06:12.266Z] [combat] Mud-Wracked Aetherkin takes 19 with the searing corrupted choir-bound launcher. It reels: 97 left. Then it fights back.\n[2026-09-03T02:06:12.267Z] [combat] Searing Corrupted Choir-Bound Launcher \u2014 9 burn bites in and festers (3 turns).\n",
+      "[2026-09-03T02:06:12.267Z] [combat] Mud-Wracked Aetherkin is left exposed \u2014 easier to hit.\n[2026-09-03T02:06:12.268Z] [combat] The light around Mud-Wracked Aetherkin bends and declines to leave. It spends the beat VEILED \u2014 the next strike will come from somewhere you are not watching.\n[2026-09-03T02:06:18.780Z] [debug] ui: tap \"approach\"\n",
+      "[2026-09-03T02:06:18.837Z] [player] approach Mud-Wracked Aetherkin\n[2026-09-03T02:06:18.837Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud wracked aetherkin resolved=Mud-Wracked Aetherkin range=mid enemies=1 hooks=1\n[2026-09-03T02:06:18.840Z] [debug] move: advance from range=mid enemies=1 weather=Black Rain cost=1 partial=0\n",
+      "[2026-09-03T02:06:18.840Z] [debug] move: field advance target=Mud-Wracked Aetherkin d 1.50->0.50 band mid->close\n[2026-09-03T02:06:18.841Z] [world] You close the gap with Mud-Wracked Aetherkin. (range: close / arm's reach)\n[2026-09-03T02:06:18.841Z] [combat] Mud-Wracked Aetherkin blisters \u2014 clinging fire sears 9. (88/116 HP, 2 turns left)\n",
+      "[2026-09-03T02:06:18.841Z] [combat] Mud-Wracked Aetherkin strikes OUT OF THE VEIL \u2014 the blow comes from nowhere you were watching (+5).\n[2026-09-03T02:06:18.843Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 11 + ATK 10 = 21 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T02:06:19.195Z] [cognitive] SWIM \u00b7 RETREAT \u00b7 REST \u00b7 SEARCH  (349ms)\n",
+      "[2026-09-03T02:06:19.578Z] [debug] persist sizes(KB): total=318 player=81 wm=149[rooms=79 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=83 scene=4\n[2026-09-03T02:06:19.901Z] [debug] ui: tap \"dodge\"\n[2026-09-03T02:06:19.904Z] [player] dodge\n[2026-09-03T02:06:19.904Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=1\n",
+      "[2026-09-03T02:06:19.905Z] [world] You commit to the dodge. Slip Mud-Wracked Aetherkin's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-03T02:06:19.905Z] [combat] Mud-Wracked Aetherkin blisters \u2014 clinging fire sears 9. (79/116 HP, 1 turn left)\n",
+      "[2026-09-03T02:06:19.975Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 12 + ATK 5 = 17 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n[2026-09-03T02:06:19.975Z] [combat] Dodge \u2014 d20 \u2192 3 + DEX 20 = 23 vs ATK 17. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-03T02:06:20.045Z] [reward] \u2726 The shadows move with you. +1 STE (base 6, 8 as you stand).\n",
+      "[2026-09-03T02:06:20.046Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T02:06:20.708Z] [cognitive] neutral  (662ms)\n[2026-09-03T02:06:21.347Z] [debug] ui: tap \"\u2697\u2623 auralite talon \u2605 \u2726\"\n[2026-09-03T02:06:21.367Z] [player] attack with the auralite talon\n",
+      "[2026-09-03T02:06:21.367Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=1 hooks=1\n[2026-09-03T02:06:21.368Z] [combat] Mud-Wracked Aetherkin blisters \u2014 clinging fire sears 9. (70/116 HP, 0 turns left)\n",
+      "[2026-09-03T02:06:21.368Z] [combat] Mud-Wracked Aetherkin shakes off the last of the fire \u2014 the Choir-Bound Launcher has run its course.\n[2026-09-03T02:06:21.368Z] [debug] attack: target=Mud-Wracked Aetherkin range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n[2026-09-03T02:06:21.369Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-09-03T02:06:21.439Z] [world] You commit forward with the acid-etched corrupted auralite talon. Mud-Wracked Aetherkin watches your hands.\n[2026-09-03T02:06:21.440Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T02:06:21.769Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (329ms)\n",
+      "[2026-09-03T02:06:30.028Z] [world] You seize the initiative. Mud-Wracked Aetherkin has no time to react.\n[2026-09-03T02:06:30.029Z] [combat] You \u2014 d20 \u2192 2 + INT 12 perfect opening (2\u00d7 dice) = 14 vs Mud-Wracked Aetherkin AC 11 \u2014 \u2713 HIT\n[2026-09-03T02:06:30.029Z] [combat] Weakness exposed \u2014 Mud-Wracked Aetherkin flinches. (aetheric \u00d71.5 for 22)\n",
+      "[2026-09-03T02:06:30.031Z] [combat] Mud-Wracked Aetherkin takes 22 with the acid-etched corrupted auralite talon. It reels: 48 left. Then it fights back.\n[2026-09-03T02:06:30.031Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 4 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n",
+      "[2026-09-03T02:06:30.032Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 1 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n[2026-09-03T02:06:30.034Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 12 + ATK 5 = 17 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-03T02:06:30.034Z] [arbiter] The Arbiter watches the mud-wracked aetherkin. \"It is not the first thing here that decided to keep its distance, then changed its mind.\"\n[2026-09-03T02:06:33.968Z] [debug] ui: tap \"\ud83d\udd25\u2623 choir-bound launcher \u2605 \u2726\"\n[2026-09-03T02:06:34.019Z] [player] attack with the off-hand choir-bound launcher\n",
+      "[2026-09-03T02:06:34.020Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=close enemies=1 hooks=1\n[2026-09-03T02:06:34.020Z] [combat] Mud-Wracked Aetherkin smokes \u2014 acid eats 4. (44/116 HP, 2 turns left)\n[2026-09-03T02:06:34.021Z] [combat] Mud-Wracked Aetherkin blackens \u2014 corruption eats 1. (43/116 HP, 2 turns left)\n",
+      "[2026-09-03T02:06:34.021Z] [debug] attack: target=Mud-Wracked Aetherkin range=close reach.bands=[distant,far,mid,close] reach.label=Choir-Bound Launcher bareHand=false\n[2026-09-03T02:06:34.093Z] [world] You raise the searing corrupted choir-bound launcher toward Mud-Wracked Aetherkin. The room narrows around the both of you.\n[2026-09-03T02:06:34.093Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-03T02:06:34.430Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 TAKE_COVER  (336ms)\n[2026-09-03T02:06:43.070Z] [world] Mud-Wracked Aetherkin moves first. The pressure is immediate.\n[2026-09-03T02:06:43.072Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 7 + ATK 5 = 12 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-03T02:06:43.072Z] [combat] You \u2014 d20 \u2192 17 + INT 12 + 2 (point blank) = 31 vs Mud-Wracked Aetherkin AC 10 \u2014 \u2713 HIT\n[2026-09-03T02:06:43.072Z] [combat] The Corrupted coating fails to take on Mud-Wracked Aetherkin.\n[2026-09-03T02:06:43.073Z] [combat] Weakness exposed \u2014 Mud-Wracked Aetherkin flinches. (aetheric \u00d71.5 for 11)\n",
+      "[2026-09-03T02:06:43.074Z] [combat] Your strike with the searing corrupted choir-bound launcher lands for 11. Mud-Wracked Aetherkin staggers \u2014 32 HP remaining. It answers.\n[2026-09-03T02:06:43.075Z] [combat] Searing Corrupted Choir-Bound Launcher \u2014 5 burn bites in and festers (3 turns).\n[2026-09-03T02:06:45.253Z] [debug] ui: tap \"dodge\"\n[2026-09-03T02:06:45.265Z] [player] dodge\n",
+      "[2026-09-03T02:06:45.265Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=1\n[2026-0"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-03-1649-what-a-ring-is-for #mtlzxhu9g966 [inline 17/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtlzxhu9g966"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-03-1649-what-a-ring-is-for"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "17"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-03-1649-what-a-ring-is-for"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-03T21:28:42.275330Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "11": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 357,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-03T21:28:43.660000Z",
+  "fingerprints": [
+    "1b960547e4e555cc81721671e25adbb9"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1953857096,
+    "commitCount": 3,
+    "data": {},
+    "dateCreated": "2026-09-03T20:00:12.950036Z",
+    "dateReleased": "2026-09-03T20:00:42.063795Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "3f3f31e984f1edd9efaa4a21fcab9d9e29400d28",
+      "message": "[ota-hal] OTA-1649: what a ring is for\n\nOwner: \"do the ring and amulet recipes, and give the diadem a route. again\nbetter effects with rarity and ingredient quality. they should give\ncombinations of stat buffs, moderate resists and let's get some special\nAOE effects... each ring doesn't need to have all three things. the\ncombinations of 1, 2 or three things should scale with rarity.\"\n\n\u26a0 WHAT THE MEASUREMENT FOUND FIRST, before a line was written. Fifteen of\nthe thirty-two shipped accessories carry a `resistances` list. The item\ncard prints it \u2014 \"Resists: aetheric\" \u2014 and combat has NEVER SEEN ONE.\naggregateArmor's resist walk covered ARMOR_SLOTS only, so a Legendary\naetheric amulet arrived at the damage math as `[]` with a mitigation\nfraction of 0. Probed before any change; that probe is now the first test\nin ota1649 so the field cannot go quiet again.\n\nSo \"moderate resists\" was not a new feature. It was a dead field, and\nwiring it is the spine of this OTA.\n\n  \u2022 The jewellery joins the EXISTING armour stack \u2014 same multiplicative\n    diminishing returns, same MAX_ARMOR_RESIST ceiling \u2014 through a new\n    optional per-entry `weight` on ArmorSlotResist. Armour never sets it\n    (a chest is a chest whatever it is made of); jewellery always does,\n    because a ring's worth against a type is its RARITY, not which finger\n    it sits on. Every pre-existing caller is bit-identical.\n  \u2022 An amulet outweighs a ring at equal rarity \u2014 one neck, four fingers \u2014\n    and neither out-armours a breastplate. His \"50% of incoming fire\" is\n    measured, not asserted: a Legendary amulet + a Legendary ring + a Rare\n    ring = 0.497. Three slots given to one element buys half. One\n    Legendary ring alone buys a fifth.\n\nTHREE NEW EFFECT FAMILIES, wired and pinned:\n\n  \u2022 A COATING BOOST. His fire ring, exactly: a Rare burn ring is +25% on\n    burn coatings and nothing else. Applied to the rolled coating bonus\n    only (a bare blade gets nothing) and AFTER the weakness multiplier, so\n    a resistant hide cannot halve the ring's share as well.\n  \u2022 A STEALTH MULTIPLIER. Legendary = his +60%. It multiplies the whole\n    strike, and it does NOT check the weapon: the dice-doubling backstab\n    is a rogue's privilege, this is not, or it would be a second rogue tax\n    on an item a heavy build might want. \u26a0 The flag rides the DAMAGE STEP:\n    `stealthed` is stripped by consumeOnResolve the instant the attack\n    step resolves and pendingRolls is nulled before concludeRolls runs, so\n    a damage-time read of the player would miss the exact swing the ring\n    was bought for. combatRules stamps `fromStealth` at build time.\n  \u2022 A ONCE-PER-ENCOUNTER DISCHARGE. His frost ring: 50 cold across two\n    rings of range. It fires on the first swing of the fight \u2014 there is no\n    free action in this combat loop to hang a trigger on, and committing\n    to the fight is the honest trigger. Not the weapon splash: that is\n    keyed to the TARGET's band, this to the WEARER's. All discharges are\n    planned off one lineup and applied in one write, so the first ring's\n    kill cannot hide a body from the second. A burst that catches nobody\n    is still spent \u2014 refunding it would make a ring strictly better than a\n    splash, which pays the same price.\n\n\u26a0\u26a0 THE ROW PICKS THE FLAVOUR, THE LADDER PICKS THE NUMBER. Not one catalog\nrow carries a magnitude. A ring says \"I boost burn coatings\"; how much is\nCOATED_BOOST_PCT[rarity]. That is what makes \"better effects with rarity\"\na property of the system rather than a promise about forty-four\nhand-typed numbers \u2014 a row cannot sit off the ladder, and a rebalance is\none table edit.\n\n\u26a0 THE LADDER'S GATE IS THE SPECIAL, NOT A FAMILY COUNT, and the first\ndraft got that wrong. An exact count per rarity failed against the shipped\ncatalog on contact: five accessories \u2014 two of them COMMON \u2014 already\ncarried two families, and holding the line would have meant deleting a\nresist off items sitting in players' packs right now. So the rule moved to\nwhere the owner's sentence actually points. Common and Uncommon never\ncarry a special; Rare may; Legendary must, and carries all three. Every\nband is still strictly better than the one below on MAGNITUDE too, on all\nfive tables, so a two-family Uncommon never out-values a two-family Rare.\nThe rule needed no removals at all: the seven rows it found off-ladder\nwere each missing something, and each gained it.\n\nTHE ROUTES. 16 new accessories (48 total) and a recipe for every ring and\namulet in the game \u2014 205 recipes. The Aetheric Diadem was the only\ngenuinely unobtainable item in the catalog (no recipe, no loot table, no\nvendor, no quest) and now has one. Ingredient quality is mechanical: every\naccessory recipe must carry at least one ingredient of the result's own\nrarity or higher, so a Legendary cannot be reached from scrap. One shipped\nrecipe failed that and was repaired rather than grandfathered \u2014\nReclaimer's Aegis Pendant is Rare and asked for Scrap Metal / Aetheric\nShard / Spider Silk.\n\n\u26a0\u26a0\u26a0 THE MISTAKE I MADE AND HAD TO UNDO, kept as a rule. The first draft of\nthose 38 recipes reached for whatever material fitted the flavour and\nclaimed 22 fresh names \u2014 Aetheric Blood, Spirit Residue, Warden Stone,\nAetheric Cog and eighteen more. `isRecipeIngredientName` bars any recipe\ningredient from the Crucible, so every one of them silently LEFT the\nfusion fodder pool, and seven shipped fusion suites went red. They were\nright; the Crucible had genuinely lost its fodder. The fix was not to\nrepoint them. Every recipe was re-authored out of the 96 names recipes\nalready used, so the fodder pool after this OTA is bit-identical to the\none before it \u2014 measured, `newly claimed: []`. ota1649 pins it, so the\nnext accessory recipe reaching for a fresh material has to answer for the\nCrucible first. A second pin catches the other thing that pass produced: a\nblind substitution left seven recipes naming one ingredient twice.\n\nThe line ratchet did its job too. This walked gameStore through the 37,000\ncap (ota1400), which is what the cap is for. The discharge's targeting and\napplication moved out to `planBursts` / `applyBursts` in accessoryEffects,\nwhere they are pure and testable rather than reachable only through a live\ncombat turn. gameStore lands at 36,996.\n\nThe item card now names numbers instead of a bare \"Resists: aetheric\",\nreading the same tables combat reads so the two cannot drift, and a\ndischarge card admits on its face that it is once per fight.\n\nGates: all 18 green by exit code. Full suite green.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-03T19:57:15Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-03-1649-what-a-ring-is-for",
+          "shortVersion": "tartaria@4.32.11+2026-09-03-1649-what-a-ring-is-for",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-03T20:00:42.063795Z",
+          "dateCreated": "2026-09-03T20:00:12.950036Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155305262",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-03T20:00:43.872258Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-03-1649-what-a-ring-is-for",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-03-1649-what-a-ring-is-for",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-03-1649-what-a-ring-is-for",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-03-1649-what-a-ring-is-for)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "e130635f08d345dd9f0381c595e488dc",
+  "previousEventID": "deea6ebc8a354a199766cd63d2bb166f"
+}

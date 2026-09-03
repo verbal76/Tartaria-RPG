@@ -1,0 +1,279 @@
+{
+  "id": "a020523d8028440b8150651baf8d1d88",
+  "groupID": "7710441096",
+  "eventID": "a020523d8028440b8150651baf8d1d88",
+  "projectID": "4511945117532160",
+  "size": 18072,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-03-1649-what-a-ring-is-for #mtlzxhu9g966 [inline 3/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-03-1649-what-a-ring-is-for",
+  "message": "player-log 2026-09-03-1649-what-a-ring-is-for #mtlzxhu9g966 [inline 3/28]",
+  "title": "player-log 2026-09-03-1649-what-a-ring-is-for #mtlzxhu9g966 [inline 3/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "724b24aba9e1435d9e6f11060c615d07",
+      "span_id": "b81df11a841cbb9e",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "3T00:05:24.897Z] [combat] You \u2014 d20 \u2192 20 + INT 12 \u2212 1 (Ash Storm) perfect opening (2\u00d7 dice) = 31 vs Conspiracy Architects Raider 5 AC 11 \u2014 \u2713 CRITICAL HIT\n[2026-09-03T00:05:24.897Z] [combat] Conspiracy Architects Raider 5 shrugs off the aetheric. (resisted, \u00d70.5 for 21)\n",
+      "[2026-09-03T00:05:24.901Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Giant-Watch Greatspear \u2014 piercing will bite where aetheric won't.\"\n[2026-09-03T00:05:24.901Z] [combat] Conspiracy Architects Raider 5 folds under the acid-etched corrupted auralite talon. 21 damage was enough. The room exhales.\n",
+      "[2026-09-03T00:05:24.902Z] [reward] Conspiracy Architects Raider 5 defeated. You recover Scrap Metal \u00d72, Architect Sigil.\n[2026-09-03T00:05:24.904Z] [reward] You strip the body: Cudgel, Mud-Warden's Vest (+6 TC). The kit took the fight badly.\n[2026-09-03T00:05:24.904Z] [system] Reclaimers Guild standing +1 (now 96)\n[2026-09-03T00:05:24.904Z] [reward] +22 TC pried from the dust.\n",
+      "[2026-09-03T00:05:25.179Z] [combat] Conspiracy Architects Raider 5 deals 5 bludgeoning damage. You have 38 HP remaining.\n[2026-09-03T00:05:30.505Z] [debug] kbbar: mounted bottom=355 raw=0 from=estimate winH=986 beat=-\n[2026-09-03T00:05:30.869Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=360 from=live winH=986 beat=-\n",
+      "[2026-09-03T00:05:36.424Z] [world] The ash burns your throat. The breath you spend on this action costs more than usual.\n[2026-09-03T00:05:36.520Z] [player] why didn't none of my coatings take effector in this fight?\n[2026-09-03T00:05:36.521Z] [debug] parser: intent=ask conf=1.00 verb=why target=didnt none coatings take effector fight resolved=- range=- enemies=0 hooks=2\n",
+      "[2026-09-03T00:05:36.947Z] [cognitive] AIM  (422ms)\n[2026-09-03T00:05:37.868Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=360 from=cached winH=986 beat=-\n[2026-09-03T00:05:38.269Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-09-03T00:05:40.285Z] [player] drink\n",
+      "[2026-09-03T00:05:40.285Z] [debug] parser: intent=drink conf=1.00 verb=drink target=- resolved=- range=- enemies=0 hooks=2\n[2026-09-03T00:05:40.291Z] [world] You cup the water in your hands and drink. You weren't tired; mostly you were thirsty. (+1 corruption, 5 min)\n",
+      "[2026-09-03T00:05:40.291Z] [arbiter] The Arbiter watches you wipe your mouth. \"Raw water carries what the ground put in it. Fill a bottle next time \u2014 the filter takes the taint out.\"\n[2026-09-03T00:05:40.292Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-03T00:05:40.292Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-09-03T00:05:40.292Z] [system] \u23f3 Time passed: 5 min\n[2026-09-03T00:05:40.726Z] [cognitive] neutral  (433ms)\n[2026-09-03T00:05:42.100Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n[2026-09-03T00:05:42.118Z] [world] You walk east through open silt. The compass points east into open ground.\n[2026-09-03T00:05:42.120Z] [world] You catch the glint of something half-buried as your boot lands. You free it.\n",
+      "[2026-09-03T00:05:42.120Z] [reward] \u2726 Wild Onion (Common).\n[2026-09-03T00:05:42.121Z] [world] It sits where it sat. Patient is the wrong word \u2014 it simply does not move.\n[2026-09-03T00:05:43.099Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T00:05:44.205Z] [world] You claim the Scrap Metal.\n[2026-09-03T00:05:44.205Z] [reward] \u2726 Scrap Metal (Common).\n",
+      "[2026-09-03T00:05:45.086Z] [world] The Stone Seeker's Brow Guard comes up out of the silt with a small sucking protest.\n[2026-09-03T00:05:45.086Z] [reward] \u2726 Stone Seeker's Brow Guard (Common).\n[2026-09-03T00:05:46.054Z] [world] Slim pickings on the crate. You pocket a Cloth Scrap on the way out.\n",
+      "[2026-09-03T00:05:46.054Z] [world] You work the shattered ruined skyscraper over. A part of it comes loose, intact.\n[2026-09-03T00:05:46.054Z] [world] You work the tent over. A part of it comes loose, intact.\n[2026-09-03T00:05:46.055Z] [reward] \u2726 Salvage haul:\n[2026-09-03T00:05:46.055Z] [reward]     \u2022 Cloth Scrap x5 (Common)\n",
+      "[2026-09-03T00:05:47.057Z] [arbiter] The Arbiter is silent on that. The name does not surface in the lore.\n[2026-09-03T00:05:47.286Z] [debug] persist sizes(KB): total=295 player=73 wm=137[rooms=69 events=5 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=82 scene=3\n[2026-09-03T00:05:47.584Z] [debug] ui: tap \"investigate\"\n[2026-09-03T00:05:49.259Z] [player] investigate ladder\n",
+      "[2026-09-03T00:05:49.259Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ladder resolved=ladder range=- enemies=0 hooks=2\n[2026-09-03T00:05:49.260Z] [world] The ladder reads as ordinary, which down here is a small kind of relief. You leave it be.\n[2026-09-03T00:05:49.466Z] [cognitive] neutral  (204ms)\n[2026-09-03T00:05:50.119Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n",
+      "[2026-09-03T00:05:50.138Z] [world] You walk south. You arrive at The Storm's Eye.\n[2026-09-03T00:05:50.138Z] [debug] scene: loc=storms_eye hub=- arrival=y opening=n passing=y\n[2026-09-03T00:05:50.139Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-03T00:05:50.139Z] [debug] missions: hunt:hunt_bog_dragon stage 3/7 [boss\u2192attack] @mud_flood_nexus needs=Mira's Shrine-Map\u2713 gives=The Boy's Locket spawn=Mud Wraith\u00d71 AMBUSH\n[2026-09-03T00:05:50.140Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n",
+      "[2026-09-03T00:05:50.140Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n[2026-09-03T00:05:50.140Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n",
+      "[2026-09-03T00:05:50.141Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n[2026-09-03T00:05:50.141Z] [debug] missions: \u00b7 at=storms_eye travelTo=mud_flood_nexus\n",
+      "[2026-09-03T00:05:50.160Z] [world] You've left Builders' Survey Camp and entered The Storm's Eye. The calm has an edge you can stand on: dust wall on one side of your boot, stillness on the other. It's midday. A scrap drone is already here. east leads to Great Tartary Plains; west leads to The Buried Cities. Nothing named to the north or south.\n",
+      "[2026-09-03T00:05:50.160Z] [combat] Distance: mid-range. Auralite Talon \u2014 needs approach \u00b7 Choir-Bound Launcher \u2014 needs approach.\n[2026-09-03T00:05:50.237Z] [world] The look of it lands a half-second before the memory does.\n[2026-09-03T00:05:50.238Z] [system] Weather effect \u2014 Whisper Fog: -1 WIS\n",
+      "[2026-09-03T00:05:50.241Z] [world] [The Storm's Eye] north: Garrin (return the folio) (17 tiles, 1 day, 19 hours) \u00b7 east: Great Tartary Plains (1 tile, 3 hours) \u00b7 south: The Master-Strand (5 tiles, 13 hours) \u00b7 west: Builders' Survey Camp (4 tiles, 10 hours)\n[2026-09-03T00:05:50.241Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-09-03T00:05:50.241Z] [arbiter] \"You can take it, or you can leave it,\" the Arbiter says. \"It will remember either way.\"\n[2026-09-03T00:06:02.890Z] [debug] ui: tap \"dodge\"\n[2026-09-03T00:06:02.902Z] [player] dodge\n[2026-09-03T00:06:02.903Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=1 hooks=0\n",
+      "[2026-09-03T00:06:02.904Z] [world] You commit to the dodge. Slip Scrap Drone's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-03T00:06:02.905Z] [combat] Scrap Drone stops \u2014 and the air in front of it thickens, faintly bright. An AETHER SHIELD stands where its swing should have been (+3 AC).\n",
+      "[2026-09-03T00:06:02.906Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-03T00:06:02.906Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T00:06:02.907Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T00:06:03.236Z] [cognitive] neutral  (329ms)\n[2026-09-03T00:06:04.590Z] [debug] ui: tap \"\ud83d\udd25\u2623 choir-bound launcher\"\n",
+      "[2026-09-03T00:06:04.595Z] [system] dodging (parry) fades.\n[2026-09-03T00:06:04.641Z] [player] attack with the off-hand choir-bound launcher\n[2026-09-03T00:06:04.641Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=mid enemies=1 hooks=0\n",
+      "[2026-09-03T00:06:04.642Z] [debug] attack: target=Scrap Drone range=mid reach.bands=[distant,far,mid,close] reach.label=Choir-Bound Launcher bareHand=false\n[2026-09-03T00:06:04.644Z] [arbiter] Whisper Fog hangs between you. \"\u22121 to the swing \u2014 see what you can,\" the Arbiter says.\n[2026-09-03T00:06:04.644Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n",
+      "[2026-09-03T00:06:04.730Z] [world] You commit forward with the searing corrupted choir-bound launcher. Scrap Drone watches your hands.\n[2026-09-03T00:06:04.731Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T00:06:05.026Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 TAKE_COVER  (295ms)\n[2026-09-03T00:06:13.559Z] [world] You seize the initiative. Scrap Drone has no time to react.\n",
+      "[2026-09-03T00:06:13.559Z] [combat] You \u2014 d20 \u2192 5 + INT 12 \u2212 1 (Whisper Fog) = 16 vs Scrap Drone AC 14 \u2014 \u2713 HIT\n[2026-09-03T00:06:13.560Z] [combat] The Corrupted coating fails to take on Scrap Drone.\n[2026-09-03T00:06:13.560Z] [combat] Scrap Drone shrugs off the aetheric. (resisted, \u00d70.5 for 9)\n",
+      "[2026-09-03T00:06:13.563Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Mud Armor \u2014 bludgeoning or burn will bite where aetheric won't.\"\n[2026-09-03T00:06:13.565Z] [combat] Scrap Drone takes 9 with the searing corrupted choir-bound launcher. It reels: 8 left. Then it fights back.\n",
+      "[2026-09-03T00:06:13.565Z] [combat] Searing Corrupted Choir-Bound Launcher \u2014 6 burn bites in and festers (3 turns).\n[2026-09-03T00:06:13.566Z] [combat] Scrap Drone \u2014 d20 \u2192 17 + ATK 4 = 21 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-09-03T00:06:13.567Z] [arbiter] \"That one bleeds slow,\" the Arbiter says. \"Make the hit count.\"\n",
+      "[2026-09-03T00:06:13.929Z] [combat] Scrap Drone deals 4 bludgeoning damage [plate \u22121] [edge of reach \u2014 halved]. You have 36 HP remaining.\n[2026-09-03T00:06:18.653Z] [debug] ui: tap \"stealth\"\n[2026-09-03T00:06:18.659Z] [player] sneak\n[2026-09-03T00:06:18.660Z] [debug] parser: intent=stealth conf=1.00 verb=sneak target=- resolved=- range=mid enemies=1 hooks=0\n",
+      "[2026-09-03T00:06:18.745Z] [system] \u23f3 Time passed: 15 min\n[2026-09-03T00:06:19.036Z] [cognitive] DISENGAGE \u00b7 HIDE \u00b7 TAKE_COVER  (291ms)\n[2026-09-03T00:06:20.905Z] [debug] skillcheck: stealth d20=10 STE 7 + 1 (title: Shadow Diver) = 18 vs DC 12 \u2014 Hard \u2192 (resolved below)\n",
+      "[2026-09-03T00:06:21.031Z] [debug] stats: STR16 DEX23 INT12 WIS15 CHA10 STE7 | gear: WIS+4,INT+3,DEX+12,STR+5,STE+2 | worn: main=Auralite Talon off=Choir-Bound Launcher head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n",
+      "[2026-09-03T00:06:21.031Z] [debug] train: stealth (stealth check) \u2192 progress 74/100\n[2026-09-03T00:06:21.031Z] [world] The daylight leaves you little cover. (stealth \u22121, day)\n[2026-09-03T00:06:21.032Z] [world] You drop low and move quiet, closing on Scrap Drone unseen across the open ground. (+5 next attack)\n",
+      "[2026-09-03T00:06:21.032Z] [debug] stealth: opener carried by the skill roll (18 vs DC 12 \u2014 Hard) \u2014 UNSEEN\n[2026-09-03T00:06:23.288Z] [debug] ui: tap \"\ud83d\udd25\u2623 choir-bound launcher\"\n[2026-09-03T00:06:23.339Z] [player] attack with the off-hand choir-bound launcher\n",
+      "[2026-09-03T00:06:23.340Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=mid enemies=1 hooks=0\n[2026-09-03T00:06:23.341Z] [combat] Scrap Drone blisters \u2014 clinging fire sears 6. (2/17 HP, 2 turns left)\n",
+      "[2026-09-03T00:06:23.345Z] [debug] attack: target=Scrap Drone range=mid reach.bands=[distant,far,mid,close] reach.label=Choir-Bound Launcher bareHand=false\n[2026-09-03T00:06:23.346Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-09-03T00:06:23.346Z] [debug] attack: status mods stealthed +5\n",
+      "[2026-09-03T00:06:23.412Z] [world] You bring the searing corrupted choir-bound launcher to bear on Scrap Drone.\n[2026-09-03T00:06:23.413Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T00:06:23.707Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 TAKE_COVER  (293ms)\n[2026-09-03T00:06:33.154Z] [world] Scrap Drone moves first. The pressure is immediate.\n",
+      "[2026-09-03T00:06:33.156Z] [combat] Scrap Drone \u2014 d20 \u2192 17 + ATK 4 = 21 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-09-03T00:06:33.157Z] [combat] You \u2014 d20 \u2192 6 + INT 12 \u2212 1 (Whisper Fog) stealthed +5 = 22 vs Scrap Drone AC 14 \u2014 \u2713 HIT\n[2026-09-03T00:06:33.158Z] [combat] The Corrupted coating fails to take on Scrap Drone.\n",
+      "[2026-09-03T00:06:33.158Z] [combat] Scrap Drone shrugs off the aetheric. (resisted, \u00d70.5 for 5)\n[2026-09-03T00:06:33.166Z] [combat] The killing blow with the searing corrupted choir-bound launcher: 5. Scrap Drone drops where it stood.\n[2026-09-03T00:06:33.167Z] [reward] Scrap Drone defeated. You recover Aetheric Cog \u00d72.\n[2026-09-03T00:06:33.168Z] [reward] +5 TC pried from the dust.\n",
+      "[2026-09-03T00:06:33.229Z] [arbiter] The Arbiter looks around. \"The calm has an edge you can stand on: dust wall on one side of your boot, stillness on the other.\"\n[2026-09-03T00:06:33.424Z] [combat] Scrap Drone deals 4 bludgeoning damage [plate \u22121] [edge of reach \u2014 halved]. You have 32 HP remaining.\n",
+      "[2026-09-03T00:06:33.667Z] [debug] persist sizes(KB): total=295 player=73 wm=139[rooms=71 events=5 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=82 scene=2\n[2026-09-03T00:06:37.393Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T00:06:38.732Z] [world] Tucked inside the quiet line: an oddment that matches no quartermaster's list. The kind of thing that fuses well.\n",
+      "[2026-09-03T00:06:38.732Z] [reward] \u2726 Salvage haul:\n[2026-09-03T00:06:38.733Z] [reward]     \u2022 Bone-Handled Rivet (Uncommon)\n[2026-09-03T00:06:39.893Z] [debug] ui: tap \"investigate\"\n[2026-09-03T00:06:41.507Z] [player] investigate ash drift\n[2026-09-03T00:06:41.508Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ash drift resolved=ash drift range=- enemies=0 hooks=0\n",
+      "[2026-09-03T00:06:41.508Z] [world] The ash drift sits the way ordinary things sit. The Arbiter does not lean in. You move on.\n[2026-09-03T00:06:41.509Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-03T00:06:41.509Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T00:06:41.692Z] [cognitive] THROW \u00b7 SEARCH  (182ms)\n",
+      "[2026-09-03T00:06:42.261Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n[2026-09-03T00:06:42.280Z] [world] You walk east. You arrive at Great Tartary Plains.\n[2026-09-03T00:06:42.281Z] [debug] scene: loc=great_tartary_plains hub=- arrival=y opening=n passing=y\n[2026-09-03T00:06:42.282Z] [debug] missions: hunt:hunt_servants_d"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-03-1649-what-a-ring-is-for #mtlzxhu9g966 [inline 3/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtlzxhu9g966"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-03-1649-what-a-ring-is-for"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "3"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-03-1649-what-a-ring-is-for"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-03T21:28:42.203424Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-03T21:28:43.657000Z",
+  "fingerprints": [
+    "1b960547e4e555cc81721671e25adbb9"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1953857096,
+    "commitCount": 3,
+    "data": {},
+    "dateCreated": "2026-09-03T20:00:12.950036Z",
+    "dateReleased": "2026-09-03T20:00:42.063795Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "3f3f31e984f1edd9efaa4a21fcab9d9e29400d28",
+      "message": "[ota-hal] OTA-1649: what a ring is for\n\nOwner: \"do the ring and amulet recipes, and give the diadem a route. again\nbetter effects with rarity and ingredient quality. they should give\ncombinations of stat buffs, moderate resists and let's get some special\nAOE effects... each ring doesn't need to have all three things. the\ncombinations of 1, 2 or three things should scale with rarity.\"\n\n\u26a0 WHAT THE MEASUREMENT FOUND FIRST, before a line was written. Fifteen of\nthe thirty-two shipped accessories carry a `resistances` list. The item\ncard prints it \u2014 \"Resists: aetheric\" \u2014 and combat has NEVER SEEN ONE.\naggregateArmor's resist walk covered ARMOR_SLOTS only, so a Legendary\naetheric amulet arrived at the damage math as `[]` with a mitigation\nfraction of 0. Probed before any change; that probe is now the first test\nin ota1649 so the field cannot go quiet again.\n\nSo \"moderate resists\" was not a new feature. It was a dead field, and\nwiring it is the spine of this OTA.\n\n  \u2022 The jewellery joins the EXISTING armour stack \u2014 same multiplicative\n    diminishing returns, same MAX_ARMOR_RESIST ceiling \u2014 through a new\n    optional per-entry `weight` on ArmorSlotResist. Armour never sets it\n    (a chest is a chest whatever it is made of); jewellery always does,\n    because a ring's worth against a type is its RARITY, not which finger\n    it sits on. Every pre-existing caller is bit-identical.\n  \u2022 An amulet outweighs a ring at equal rarity \u2014 one neck, four fingers \u2014\n    and neither out-armours a breastplate. His \"50% of incoming fire\" is\n    measured, not asserted: a Legendary amulet + a Legendary ring + a Rare\n    ring = 0.497. Three slots given to one element buys half. One\n    Legendary ring alone buys a fifth.\n\nTHREE NEW EFFECT FAMILIES, wired and pinned:\n\n  \u2022 A COATING BOOST. His fire ring, exactly: a Rare burn ring is +25% on\n    burn coatings and nothing else. Applied to the rolled coating bonus\n    only (a bare blade gets nothing) and AFTER the weakness multiplier, so\n    a resistant hide cannot halve the ring's share as well.\n  \u2022 A STEALTH MULTIPLIER. Legendary = his +60%. It multiplies the whole\n    strike, and it does NOT check the weapon: the dice-doubling backstab\n    is a rogue's privilege, this is not, or it would be a second rogue tax\n    on an item a heavy build might want. \u26a0 The flag rides the DAMAGE STEP:\n    `stealthed` is stripped by consumeOnResolve the instant the attack\n    step resolves and pendingRolls is nulled before concludeRolls runs, so\n    a damage-time read of the player would miss the exact swing the ring\n    was bought for. combatRules stamps `fromStealth` at build time.\n  \u2022 A ONCE-PER-ENCOUNTER DISCHARGE. His frost ring: 50 cold across two\n    rings of range. It fires on the first swing of the fight \u2014 there is no\n    free action in this combat loop to hang a trigger on, and committing\n    to the fight is the honest trigger. Not the weapon splash: that is\n    keyed to the TARGET's band, this to the WEARER's. All discharges are\n    planned off one lineup and applied in one write, so the first ring's\n    kill cannot hide a body from the second. A burst that catches nobody\n    is still spent \u2014 refunding it would make a ring strictly better than a\n    splash, which pays the same price.\n\n\u26a0\u26a0 THE ROW PICKS THE FLAVOUR, THE LADDER PICKS THE NUMBER. Not one catalog\nrow carries a magnitude. A ring says \"I boost burn coatings\"; how much is\nCOATED_BOOST_PCT[rarity]. That is what makes \"better effects with rarity\"\na property of the system rather than a promise about forty-four\nhand-typed numbers \u2014 a row cannot sit off the ladder, and a rebalance is\none table edit.\n\n\u26a0 THE LADDER'S GATE IS THE SPECIAL, NOT A FAMILY COUNT, and the first\ndraft got that wrong. An exact count per rarity failed against the shipped\ncatalog on contact: five accessories \u2014 two of them COMMON \u2014 already\ncarried two families, and holding the line would have meant deleting a\nresist off items sitting in players' packs right now. So the rule moved to\nwhere the owner's sentence actually points. Common and Uncommon never\ncarry a special; Rare may; Legendary must, and carries all three. Every\nband is still strictly better than the one below on MAGNITUDE too, on all\nfive tables, so a two-family Uncommon never out-values a two-family Rare.\nThe rule needed no removals at all: the seven rows it found off-ladder\nwere each missing something, and each gained it.\n\nTHE ROUTES. 16 new accessories (48 total) and a recipe for every ring and\namulet in the game \u2014 205 recipes. The Aetheric Diadem was the only\ngenuinely unobtainable item in the catalog (no recipe, no loot table, no\nvendor, no quest) and now has one. Ingredient quality is mechanical: every\naccessory recipe must carry at least one ingredient of the result's own\nrarity or higher, so a Legendary cannot be reached from scrap. One shipped\nrecipe failed that and was repaired rather than grandfathered \u2014\nReclaimer's Aegis Pendant is Rare and asked for Scrap Metal / Aetheric\nShard / Spider Silk.\n\n\u26a0\u26a0\u26a0 THE MISTAKE I MADE AND HAD TO UNDO, kept as a rule. The first draft of\nthose 38 recipes reached for whatever material fitted the flavour and\nclaimed 22 fresh names \u2014 Aetheric Blood, Spirit Residue, Warden Stone,\nAetheric Cog and eighteen more. `isRecipeIngredientName` bars any recipe\ningredient from the Crucible, so every one of them silently LEFT the\nfusion fodder pool, and seven shipped fusion suites went red. They were\nright; the Crucible had genuinely lost its fodder. The fix was not to\nrepoint them. Every recipe was re-authored out of the 96 names recipes\nalready used, so the fodder pool after this OTA is bit-identical to the\none before it \u2014 measured, `newly claimed: []`. ota1649 pins it, so the\nnext accessory recipe reaching for a fresh material has to answer for the\nCrucible first. A second pin catches the other thing that pass produced: a\nblind substitution left seven recipes naming one ingredient twice.\n\nThe line ratchet did its job too. This walked gameStore through the 37,000\ncap (ota1400), which is what the cap is for. The discharge's targeting and\napplication moved out to `planBursts` / `applyBursts` in accessoryEffects,\nwhere they are pure and testable rather than reachable only through a live\ncombat turn. gameStore lands at 36,996.\n\nThe item card now names numbers instead of a bare \"Resists: aetheric\",\nreading the same tables combat reads so the two cannot drift, and a\ndischarge card admits on its face that it is once per fight.\n\nGates: all 18 green by exit code. Full suite green.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-03T19:57:15Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-03-1649-what-a-ring-is-for",
+          "shortVersion": "tartaria@4.32.11+2026-09-03-1649-what-a-ring-is-for",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-03T20:00:42.063795Z",
+          "dateCreated": "2026-09-03T20:00:12.950036Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155305262",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-03T20:00:43.872258Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-03-1649-what-a-ring-is-for",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-03-1649-what-a-ring-is-for",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-03-1649-what-a-ring-is-for",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-03-1649-what-a-ring-is-for)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "ae8b06fdd3d14549b21025aed2c051c4",
+  "previousEventID": "98ec8cbb4e254b1997fccf6bba1ef74f"
+}
