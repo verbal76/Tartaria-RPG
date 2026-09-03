@@ -515,6 +515,12 @@ import {
 // loot picker's ★ uses, rather than its own hand-rolled guess. See grantTutorialItem.
 import { isUpgradeOverEquipped, upgradeEquipSlot } from '../engine/gatherSort';
 import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, RING_ID_KEYS, SLOT_ID_KEY, effectiveStats, gearHpBonus, aggregateEquippedStatBonuses, aggregateEquippedRegen, resolveEquippedItem, equippedInstanceIds, trimStandingAc, standingAc, equippedGearAc, statNowClause, RING_SLOTS } from '../engine/equipment';
+// OTA-1649 — the jewellery's live effects: coating boost, stealth multiplier, discharge.
+import {
+  equippedAccessoryPowers, planBursts as planAccessoryBursts, applyBursts as applyAccessoryBursts,
+  boostedBy as accessoryBoostedBy,
+  coatedBoostPct as accessoryCoatedBoostPct, applyStealthDamage as applyAccessoryStealthDamage,
+} from '../engine/accessoryEffects';
 // ⚠ OTA-1404 — `statNowClause` MOVED to engine/equipment.ts, next to the
 // `effectiveStats` it reads, because the combat resolver needs it too and a leaf
 // may never import a value from this file. It is re-exported below rather than
@@ -7704,6 +7710,11 @@ export interface GameStore {
   /** arb-fix — ethericSurge title: enemy-lineup token marking the combat whose
    *  once-per-fight Aetheric surge has already fired. Re-arms when it changes. */
   surgeCombatToken: string | null;
+  /** ⚠ OTA-1649 — the same trick for accessory DISCHARGES: the lineup token of
+   *  the fight whose bursts fired, and which fired. Spent per-ACCESSORY, re-armed
+   *  per-ENCOUNTER; a changed token drops the list whole, so no charge leaks. */
+  accessoryBurstToken: string | null;
+  accessoryBurstsFired: string[];
   /** arb-fix — the ✦ race-ability picker (activatable once/day race powers). */
   raceAbilityPickerOpen: boolean;
   openRaceAbilityPicker: () => void;
@@ -8167,6 +8178,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   pendingFusionSelection: null,
   pendingAetherFoodId: null,
   surgeCombatToken: null,
+  accessoryBurstToken: null,
+  accessoryBurstsFired: [],
   raceAbilityPickerOpen: false,
   slotLoadError: null,
   crashedSlotIds: [],
@@ -23569,7 +23582,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 ),
               )
             : rawRolled;
-          return { kind: coating.kind, rolled, label: coating.label, source: coatInst!.name };
+          // ⚠ OTA-1649 — the ring that feeds the coating: the rolled COATING bonus
+          // only (a bare blade gets nothing), and AFTER the weakness multiplier so
+          // a resistant hide cannot halve the ring's share as well.
+          const boosted = accessoryBoostedBy(rolled, accessoryCoatedBoostPct(equippedAccessoryPowers(player), coating.kind));
+          return { kind: coating.kind, rolled: boosted, label: coating.label, source: coatInst!.name };
         };
         coatingProc = resolveCoatingProc(coatInst?.coating, 'coating');
         coatingProc2 = resolveCoatingProc(coatInst?.coating2, 'coating2');
@@ -23584,6 +23601,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
         if (coatingProc) dmg += coatingProc.rolled;
         if (coatingProc2) dmg += coatingProc2.rolled;
+      }
+      // ⚠ OTA-1649 — the thief's ring multiplies the WHOLE strike. `fromStealth`
+      // rides the STEP: the status is consumed before this runs. See
+      // applyStealthDamage for why neither of those is a detail.
+      if (damage?.fromStealth) {
+        const stealthPct = equippedAccessoryPowers(player).stealthPct;
+        const before = dmg;
+        dmg = applyAccessoryStealthDamage(dmg, stealthPct);
+        if (dmg > before) {
+          get().appendLog('combat', `Out of the blind side — ${Math.round(stealthPct * 100)}% more for ${dmg} (was ${before}).`);
+        }
       }
       if (surgeBonus > 0) {
         get().appendLog('combat', `✦ Aetheric surge — your awakened blood detonates for +${surgeBonus} on ${enemy.name}.`);
@@ -23639,6 +23667,33 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const livePrevHp = get().currentScene?.enemyHps[activeIdx] ?? prevHp;
       let newEnemyHp = livePrevHp - dmg;
 
+      // ⚠ OTA-1649 — THE DISCHARGE, on the first swing of the fight (there is no
+      // free action to hang a trigger on, and committing IS the honest trigger).
+      // Not the splash below: that is keyed to the TARGET's band, this to the
+      // WEARER's — which is what "2 rings of range" means. planBursts decides who
+      // it catches, all plans off one lineup; this applies them in one write.
+      const bursts = equippedAccessoryPowers(player).bursts;
+      const burstScene = bursts.length > 0 ? get().currentScene : null;
+      if (burstScene) {
+        const token = `${burstScene.enemies.map((e) => e.name).join(',')}#${burstScene.enemies.length}`;
+        const already = get().accessoryBurstToken === token ? get().accessoryBurstsFired : [];
+        const plans = planAccessoryBursts(bursts, {
+          enemies: burstScene.enemies,
+          hpOf: (i) => get().currentScene?.enemyHps[i] ?? 0,
+          knockedOut: (i) => Boolean(burstScene.enemyKnockedOut?.[i]),
+          bandOf: (i) => enemyBandOf(burstScene, i),
+        }, already);
+        for (const plan of plans) get().appendLog('combat', plan.line);
+        if (plans.length > 0) {
+          set((s) => (s.currentScene ? {
+            currentScene: { ...s.currentScene, enemyHps: applyAccessoryBursts(s.currentScene.enemyHps, plans) },
+            accessoryBurstToken: token,
+            accessoryBurstsFired: [...already, ...plans.map((p) => p.source)],
+          } : s));
+          // The active target may have been inside its own wearer's blast.
+          newEnemyHp = Math.min(newEnemyHp, get().currentScene?.enemyHps[activeIdx] ?? newEnemyHp);
+        }
+      }
       // ⚠⚠⚠ OTA-1565 (slice 1c) — THE BLAST. Nine weapons say the damage does
       // not stop at the thing you aimed at, and every one of them hit exactly
       // one enemy. This is the riskiest family in slice 1, held to last on

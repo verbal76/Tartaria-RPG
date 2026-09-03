@@ -124,7 +124,14 @@
         "boss",
         "legendary"
       ],
-      "description": "Lich Phylactery. A bone-clasped vial of cold Aetheric fluid — the half-soul the Lich could never quite finish hiding. Hums against the breastbone."
+      "description": "Lich Phylactery. A bone-clasped vial of cold Aetheric fluid — the half-soul the Lich could never quite finish hiding. Hums against the breastbone.",
+      "burst": {
+        "damageType": "aetheric",
+        "bands": [
+          "close",
+          "mid"
+        ]
+      }
     },
     {
       "name": "Bog-Heart Pearl",
@@ -144,7 +151,10 @@
         "boss",
         "legendary"
       ],
-      "description": "Bog-Heart Pearl. A black pearl pulled from the gullet of the Bog Wyrm, still warm. Holds the wyrm's tolerance for the venom it lived in."
+      "description": "Bog-Heart Pearl. A black pearl pulled from the gullet of the Bog Wyrm, still warm. Holds the wyrm's tolerance for the venom it lived in.",
+      "coatedBoost": {
+        "kind": "poison"
+      }
     },
     {
       "name": "Mud Gem Amulet",
@@ -207,7 +217,13 @@
         "legendary",
         "crafted"
       ],
-      "description": "Behemoth-Heart Talisman. A fist-sized chunk of Behemoth heart, dried and lacquered. Steadies the bearer's swing, slows their breath."
+      "description": "Behemoth-Heart Talisman. A fist-sized chunk of Behemoth heart, dried and lacquered. Steadies the bearer's swing, slows their breath.",
+      "burst": {
+        "damageType": "bludgeoning",
+        "bands": [
+          "close"
+        ]
+      }
     },
     {
       "name": "Amulet of the Silt Warden",
@@ -267,7 +283,145 @@
         "crafted",
         "defensive"
       ],
-      "description": "A boss-heart bound in copper and glass, forever mid-discharge. The storm inside sharpens the wearer's mind, sheaths them in a faint ward, and drinks the worst of aether and flame."
+      "description": "A boss-heart bound in copper and glass, forever mid-discharge. The storm inside sharpens the wearer's mind, sheaths them in a faint ward, and drinks the worst of aether and flame.",
+      "coatedBoost": {
+        "kind": "electrical"
+      }
+    },
+    {
+      "name": "Rustbane Charm",
+      "rarity": "Common",
+      "resistances": [
+        "degradation"
+      ],
+      "baseDurability": 30,
+      "tcBuy": 30,
+      "tcSell": 12,
+      "tags": [
+        "amulet",
+        "charm",
+        "crafted"
+      ],
+      "description": "A knot of oiled cloth and salt on a leather thong. Scavengers swear by it; the rot of the buried country keeps its distance."
+    },
+    {
+      "name": "Silt-Diver's Pendant",
+      "rarity": "Uncommon",
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 1
+      },
+      "resistances": [
+        "poison"
+      ],
+      "baseDurability": 35,
+      "tcBuy": 70,
+      "tcSell": 28,
+      "tags": [
+        "amulet",
+        "mud",
+        "crafted"
+      ],
+      "description": "Carved from a swamp-tortoise’s inner shell by divers who work the drowned levels. Light in the water, and the mud’s poison slides off it."
+    },
+    {
+      "name": "Emberheart Locket",
+      "rarity": "Rare",
+      "resistances": [
+        "burn"
+      ],
+      "coatedBoost": {
+        "kind": "burn"
+      },
+      "baseDurability": 40,
+      "tcBuy": 210,
+      "tcSell": 84,
+      "tags": [
+        "amulet",
+        "crafted",
+        "defensive",
+        "fire"
+      ],
+      "description": "A coal that has been burning inside a glass case for longer than anyone can account for. It keeps the heat off the wearer and lends it to the wearer’s edge."
+    },
+    {
+      "name": "Warden's Bulwark Pendant",
+      "rarity": "Rare",
+      "statBonus": {
+        "stat": "strength",
+        "amount": 1
+      },
+      "acBonus": 1,
+      "resistances": [
+        "slashing",
+        "piercing"
+      ],
+      "baseDurability": 45,
+      "tcBuy": 220,
+      "tcSell": 88,
+      "tags": [
+        "amulet",
+        "crafted",
+        "defensive"
+      ],
+      "description": "A gate-warden’s plate on a short chain, sized to sit flat over the sternum. It has stopped things. You can see where."
+    },
+    {
+      "name": "Amulet of the Cold Star",
+      "rarity": "Legendary",
+      "statBonus": {
+        "stat": "wisdom",
+        "amount": 2
+      },
+      "resistances": [
+        "cold"
+      ],
+      "burst": {
+        "damageType": "cold",
+        "bands": [
+          "close",
+          "mid",
+          "far"
+        ]
+      },
+      "baseDurability": 55,
+      "tcBuy": 380,
+      "tcSell": 152,
+      "tags": [
+        "amulet",
+        "crafted",
+        "legendary",
+        "aether"
+      ],
+      "description": "A shard of something that fell a long way and has not finished cooling. Once in a fight it remembers the fall, and the cold of it reaches further than a thrown spear."
+    },
+    {
+      "name": "Nightglass Pendant",
+      "rarity": "Legendary",
+      "statBonus": {
+        "stat": "stealth",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "resistances": [
+        "aetheric"
+      ],
+      "stealthDamage": true,
+      "baseDurability": 50,
+      "tcBuy": 350,
+      "tcSell": 140,
+      "tags": [
+        "amulet",
+        "crafted",
+        "legendary",
+        "shadow"
+      ],
+      "description": "Black glass with nothing behind it, not even a reflection. Wearing it, you are harder to find, and what you do when you are not found is worse."
     }
   ]
 }

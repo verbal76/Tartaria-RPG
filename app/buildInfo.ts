@@ -27096,7 +27096,28 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // exempting only the declaration itself. ⚠ `ring` KEEPS its unnumbered name —
 // renaming it to ring1 for tidiness would orphan the ring every existing player
 // is wearing. No migration: a save with no ring4 reads as an empty finger.
-export const OTA_BUILD_ID = '2026-09-03-1648-a-fourth-ring';
+// OTA-1649 — WHAT A RING IS FOR. Owner: "do the ring and amulet recipes, and give
+// the diadem a route… they should give combinations of stat buffs, moderate
+// resists and let's get some special AOE effects… the combinations of 1, 2 or
+// three things should scale with rarity." ⚠ THE DEFECT IT OPENED ON: fifteen of
+// the thirty-two shipped accessories carried a `resistances` list, the item card
+// printed it, and combat had never seen one — aggregateArmor's resist walk covered
+// ARMOR_SLOTS only, so a Legendary aetheric amulet arrived at the damage math as []
+// with a mitigation fraction of 0. Measured with a probe before a line changed; that
+// probe is now the first test in ota1649. The jewellery joins the EXISTING armour
+// stack (same diminishing returns, same 0.8 ceiling) through a per-entry weight,
+// because a ring's worth is its rarity, not which finger it sits on. Three new
+// effect families: a coating boost, a from-stealth damage multiplier (carried on the
+// damage step — `stealthed` is consumed before concludeRolls ever runs) and a
+// once-per-encounter discharge that fires on the first swing of the fight. ⚠ THE
+// ROW PICKS THE FLAVOUR, THE LADDER PICKS THE NUMBER: no catalog row carries a
+// magnitude, every amount comes from rarity. The ladder's gate is the SPECIAL, not a
+// family count — an exact-count rule would have meant deleting a resist off two
+// COMMON amulets sitting in players' packs. 16 new accessories (48 total), a recipe
+// for every one of them incl. the Aetheric Diadem (205 recipes), and one shipped
+// recipe repaired that let a Rare be built out of Uncommon scrap.
+export const OTA_BUILD_ID = '2026-09-03-1649-what-a-ring-is-for';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-03-1648-a-fourth-ring';
 // golem catch-up 2026-09-03: markerless publish of OTA-1648 - a fourth ring slot,
 // and the hand-written ['ring','ring2','ring3'] list retired from 13 files into
 // RING_SLOTS / RING_ID_KEYS / MAX_RINGS so every reader agrees and a fifth ring

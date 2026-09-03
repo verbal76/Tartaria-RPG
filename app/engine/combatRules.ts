@@ -692,8 +692,12 @@ export function buildCombatSteps(
   // plain SNEAK STRIKE, so heavy builds can still use the button, they just
   // don't get the multiplier. Peek only; the +5 consume happens in rollMods,
   // the same peek/consume split perfect_opening uses, so one swing gets both.
-  const backstab = (player.statusEffects ?? []).some((e) => e.kind === 'stealthed')
-    && equipped?.stat === 'dexterity';
+  // ⚠ OTA-1649 — the bare fact, WITHOUT the finesse-weapon gate. The thief's
+  // ring pays on any strike thrown from the blind side; only the dice-doubling
+  // below is a rogue's privilege. Split out rather than inlined twice so the two
+  // rules can never quietly become one.
+  const fromStealth = (player.statusEffects ?? []).some((e) => e.kind === 'stealthed');
+  const backstab = fromStealth && equipped?.stat === 'dexterity';
   // OTA-403 — manual weapon-coating damage roll. If the swinging weapon
   // instance carries a coating, append a 4th 'coating' step so the player
   // ROLLS the coating's bonus damage themselves (it was auto-rolled inside
@@ -821,6 +825,9 @@ export function buildCombatSteps(
           : '',
       ].filter(Boolean).join(' '),
       context: `damage dealt to ${enemy.name}${damageTypeNote}${perfectOpening ? ' — PERFECT OPENING (double dice)' : backstab ? ' — BACKSTAB (double dice)' : ''}${shotsPerRound > 1 ? ` — ${shotsPerRound}-SHOT VOLLEY` : ''}${swungEffect?.maxRollFloor ? ` — ${swungEffect.maxRollFloor}+ counts as max` : ''}`,
+      // ⚠ OTA-1649 — stamped HERE because `stealthed` is gone by the time this
+      // step's total is added up. See RollStep.fromStealth.
+      ...(fromStealth ? { fromStealth: true } : {}),
       // no target — always applies if the attack hit
     },
   ];

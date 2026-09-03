@@ -1903,6 +1903,15 @@ export interface RollStep {
    *  step doubles its dice (classic crit). Also set on natural-1
    *  to force a miss; the damage step is skipped. */
   critical?: boolean;
+  /** ⚠ OTA-1649 — set on the DAMAGE step when this swing was launched from
+   *  `stealthed`. It has to be CARRIED rather than re-read at damage time: the
+   *  status is a one-shot, stripped by `consumeOnResolve` the instant the
+   *  ATTACK step resolves, and `pendingRolls` (which holds that list) is nulled
+   *  before `concludeRolls` ever runs — so by the time damage is added up there
+   *  is nothing left on the player to read. Stamped at build time, while the
+   *  truth is still there. Read by the thief's-ring multiplier; the +5 to-hit
+   *  and the dice-doubling backstab are untouched by it. */
+  fromStealth?: boolean;
 }
 
 export interface PendingRollState {

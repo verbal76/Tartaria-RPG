@@ -22,7 +22,9 @@
         "stat": "charisma",
         "amount": 2
       },
-      "resistances": [],
+      "resistances": [
+        "poison"
+      ],
       "baseDurability": 40,
       "tags": [
         "ring",
@@ -295,7 +297,9 @@
         "amount": 1
       },
       "acBonus": 1,
-      "resistances": [],
+      "resistances": [
+        "bludgeoning"
+      ],
       "baseDurability": 45,
       "tags": [
         "ring",
@@ -323,7 +327,225 @@
         "crafted",
         "defensive"
       ],
-      "description": "Forged around a boss-heart core, it pulls the wearer along the buried country's hidden currents — never quite where a blow expects them to be."
+      "description": "Forged around a boss-heart core, it pulls the wearer along the buried country's hidden currents — never quite where a blow expects them to be.",
+      "stealthDamage": true
+    },
+    {
+      "name": "Tin Ward Ring",
+      "rarity": "Common",
+      "resistances": [
+        "degradation"
+      ],
+      "baseDurability": 25,
+      "tcBuy": 30,
+      "tcSell": 12,
+      "tags": [
+        "ring",
+        "crafted",
+        "defensive"
+      ],
+      "description": "A band of cheap tin worked with a rust-eating salt. It will not stop a blade, but the creeping degradation of the buried country slides off it."
+    },
+    {
+      "name": "Scribe's Signet",
+      "rarity": "Uncommon",
+      "statBonus": {
+        "stat": "intelligence",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "wisdom",
+          "amount": 1
+        }
+      ],
+      "resistances": [],
+      "baseDurability": 35,
+      "tcBuy": 70,
+      "tcSell": 28,
+      "tags": [
+        "ring",
+        "signet",
+        "scholarly",
+        "crafted"
+      ],
+      "description": "A copyist’s signet, the seal worn flat by a thousand pressings. Whoever wears it reads the buried country the way its clerks once did."
+    },
+    {
+      "name": "Ashfall Ring",
+      "rarity": "Uncommon",
+      "statBonus": {
+        "stat": "strength",
+        "amount": 1
+      },
+      "resistances": [
+        "radiation"
+      ],
+      "baseDurability": 35,
+      "tcBuy": 70,
+      "tcSell": 28,
+      "tags": [
+        "ring",
+        "crafted",
+        "defensive"
+      ],
+      "description": "Lead beads strung on a wire loop, from the crews who worked the hot ground. Heavy on the hand, and the glow does not reach through it."
+    },
+    {
+      "name": "Cinderward Ring",
+      "rarity": "Rare",
+      "resistances": [
+        "burn"
+      ],
+      "coatedBoost": {
+        "kind": "burn"
+      },
+      "baseDurability": 40,
+      "tcBuy": 200,
+      "tcSell": 80,
+      "tags": [
+        "ring",
+        "crafted",
+        "defensive",
+        "fire"
+      ],
+      "description": "A forge-master’s ring, the stone inside it still warm. It turns fire away from the hand that wears it and feeds any fire that hand is already carrying."
+    },
+    {
+      "name": "Sparkwright Band",
+      "rarity": "Rare",
+      "resistances": [
+        "electrical"
+      ],
+      "coatedBoost": {
+        "kind": "electrical"
+      },
+      "baseDurability": 40,
+      "tcBuy": 200,
+      "tcSell": 80,
+      "tags": [
+        "ring",
+        "crafted",
+        "defensive"
+      ],
+      "description": "Wound copper over a grounding pin. Current runs around the finger instead of through it, and whatever current you painted on your blade runs harder."
+    },
+    {
+      "name": "Venomwright Band",
+      "rarity": "Rare",
+      "resistances": [
+        "poison"
+      ],
+      "coatedBoost": {
+        "kind": "poison"
+      },
+      "baseDurability": 40,
+      "tcBuy": 200,
+      "tcSell": 80,
+      "tags": [
+        "ring",
+        "crafted"
+      ],
+      "description": "A poisoner’s working ring, the inner face pitted from decades of decanting. The trade teaches you both halves: what venom does, and what it does not do to you."
+    },
+    {
+      "name": "Cutpurse's Band",
+      "rarity": "Rare",
+      "statBonus": {
+        "stat": "stealth",
+        "amount": 1
+      },
+      "resistances": [],
+      "stealthDamage": true,
+      "baseDurability": 40,
+      "tcBuy": 200,
+      "tcSell": 80,
+      "tags": [
+        "ring",
+        "rogue",
+        "crafted"
+      ],
+      "description": "Flat, unpolished, nothing to catch a lantern. It teaches the hand where the seam in a man’s armour is before the eye has found it."
+    },
+    {
+      "name": "Thunderclap Ring",
+      "rarity": "Rare",
+      "statBonus": {
+        "stat": "strength",
+        "amount": 1
+      },
+      "resistances": [],
+      "burst": {
+        "damageType": "electrical",
+        "bands": [
+          "close"
+        ]
+      },
+      "baseDurability": 40,
+      "tcBuy": 210,
+      "tcSell": 84,
+      "tags": [
+        "ring",
+        "crafted",
+        "aether"
+      ],
+      "description": "A stormcatcher’s ring, holding one charge and no more. When the fighting starts it lets go of it, all at once, into everything within arm’s reach."
+    },
+    {
+      "name": "Ring of the Quiet Hand",
+      "rarity": "Legendary",
+      "statBonus": {
+        "stat": "stealth",
+        "amount": 2
+      },
+      "resistances": [
+        "slashing"
+      ],
+      "stealthDamage": true,
+      "baseDurability": 55,
+      "tcBuy": 340,
+      "tcSell": 136,
+      "tags": [
+        "ring",
+        "rogue",
+        "crafted",
+        "legendary"
+      ],
+      "description": "The guild made four of these and admits to none. The blow it guides does not land where the armour is; it lands where the man is."
+    },
+    {
+      "name": "Rimebinder's Ring",
+      "rarity": "Legendary",
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "intelligence",
+          "amount": 1
+        }
+      ],
+      "resistances": [
+        "cold"
+      ],
+      "burst": {
+        "damageType": "cold",
+        "bands": [
+          "close",
+          "mid"
+        ]
+      },
+      "baseDurability": 55,
+      "tcBuy": 360,
+      "tcSell": 144,
+      "tags": [
+        "ring",
+        "crafted",
+        "legendary",
+        "aether"
+      ],
+      "description": "A band of clouded ice that never melts and never warms the finger. Once a fight it lets the winter out, and everything standing near enough feels the whole of it."
     }
   ]
 }

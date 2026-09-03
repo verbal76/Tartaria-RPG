@@ -73,6 +73,7 @@ import { ACID_SHRED_DECAY_PER_ROUND, COATING_DOT_TURNS } from '../engine/weaponC
 import { effectiveAC } from '../engine/raceMechanics';
 import { trainStat } from '../engine/statTraining';
 import { ARMOR_SLOTS, effectiveStats, aggregateEquippedStatBonuses, resolveEquippedItem, trimStandingAc, equippedGearAc, heldShieldAc, RING_SLOTS } from '../engine/equipment';
+import { equippedAccessoryPowers } from '../engine/accessoryEffects';
 import { itemIsThrowable } from '../engine/bandolierEligibility';
 import { findFactionQuestById } from '../engine/factionQuests';
 import { weatherRepositionCost } from '../engine/weatherEffects';
@@ -834,6 +835,23 @@ export function aggregateArmor(player: PlayerCharacter): { acBonus: number; resi
   }
   // OTA-730's amulet + three-ring AC moved into `equippedGearAc` with the rest
   // of the gear stack (OTA-1135). It was the piece the panel could not see.
+  //
+  // ⚠⚠⚠ OTA-1649 — AND THE JEWELLERY'S RESISTS JOIN HERE, WHICH THEY NEVER DID.
+  // Fifteen accessories have shipped carrying a `resistances` list; the item
+  // card printed it as "Resists: aetheric"; this walk covered ARMOR_SLOTS only,
+  // so every one of them arrived at the damage math as an empty list and
+  // mitigated exactly nothing. Probed before the fix and pinned in ota1649: a
+  // Legendary aetheric amulet read `fraction(aetheric) = 0`.
+  //
+  // ⚠ THEY JOIN THE EXISTING STACK rather than getting a parallel one. Same
+  // multiplicative diminishing returns, same MAX_ARMOR_RESIST ceiling — so a
+  // full jewellery build never reaches immunity, and a resist ring is worth
+  // less on top of a resistant breastplate than it is worn alone, exactly like
+  // a second piece of armour. The per-entry `weight` is what makes that work: a
+  // ring's worth is its RARITY, not which finger it happens to sit on.
+  const jewels = equippedAccessoryPowers(player);
+  for (const r of jewels.resistances) resistances.push(r);
+  for (const s of jewels.resistSlots) resistSlots.push(s);
   return { acBonus, resistances, resistSlots };
 }
 

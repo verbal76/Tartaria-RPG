@@ -141,6 +141,13 @@ export interface CatalogAccessory {
    *  natural-20 enemy attack always hits regardless of AC, so no stack of these
    *  makes the player unhittable. */
   acBonus?: number;
+  /** ⚠⚠ OTA-1649 — THIS FIELD WAS DECORATIVE FOR ITS ENTIRE LIFE. Fifteen of the
+   *  thirty-two shipped accessories carry one, the item preview prints
+   *  "Resists: aetheric" off it, and combat never saw a single entry: the
+   *  `aggregateArmor` resist walk covered ARMOR_SLOTS only, so an amulet's list
+   *  reached the damage math as `[]` and its mitigation fraction as 0. Measured,
+   *  not assumed — see the ota1649 suite, which re-runs the probe. It is live
+   *  now, weighted by `accessoryResistWeight` (rarity × ring/amulet). */
   resistances: string[];
   baseDurability?: number;
   tags: string[];
@@ -150,6 +157,23 @@ export interface CatalogAccessory {
   // faction armory. Mirrors the weapon/armor faction_gear fields.
   faction?: string;
   tc?: number;
+  // ── OTA-1649 — the three effect families. ───────────────────────────────────
+  // ⚠ THE ROW PICKS THE FLAVOUR; THE RARITY LADDER PICKS THE NUMBER. None of
+  // these carries a magnitude, deliberately: `accessoryEffects.ts` derives every
+  // amount from `rarity`, so no row can ever sit off the ladder and a rebalance
+  // is one table edit rather than a sweep of forty-four JSON rows.
+  /** A SECOND (and third) stat buff beyond the primary `statBonus`. The primary
+   *  stays where it is — every existing reader and the item preview know it. */
+  statBonuses?: { stat: string; amount: number }[];
+  /** Boosts the wearer's weapon coatings of this kind (a burn ring makes fire
+   *  coatings bite harder). Percentage from COATED_BOOST_PCT[rarity]. */
+  coatedBoost?: { kind: string };
+  /** Multiplies damage dealt on a strike made from stealth. Percentage from
+   *  STEALTH_DAMAGE_PCT[rarity]. */
+  stealthDamage?: boolean;
+  /** A once-per-encounter discharge that reaches every living enemy standing in
+   *  the named bands. Damage from BURST_DAMAGE[rarity]. */
+  burst?: { damageType: string; bands: string[] };
 }
 
 export interface RecipeIngredient {
@@ -1171,6 +1195,12 @@ export interface ArmorSlotResist {
   type: string;
   /** Equip slot the resisting piece sits in (drives its weight). */
   slot: string;
+  /** ⚠ OTA-1649 — an EXPLICIT weight, overriding the slot table. Armour never
+   *  sets it: a chest is a chest whatever it is made of. Jewellery always does,
+   *  because a ring's worth against a damage type is its RARITY, not its finger
+   *  — the fourth finger is not weaker than the first. Left undefined the slot
+   *  table still decides, so every pre-existing caller is untouched. */
+  weight?: number;
 }
 
 /** Combined resistance fraction (0..MAX_ARMOR_RESIST) against `damageType`:
@@ -1185,10 +1215,12 @@ export function armorResistanceFraction(
   const dt = damageType.toLowerCase();
   let remaining = 1;
   const countedSlots = new Set<string>();
-  for (const { type, slot } of slotResists) {
+  for (const { type, slot, weight } of slotResists) {
     if (type.toLowerCase() !== dt || countedSlots.has(slot)) continue;
     countedSlots.add(slot);
-    remaining *= 1 - (ARMOR_SLOT_RESIST_WEIGHT[slot] ?? 0.1);
+    // OTA-1649 — an entry may carry its own weight (jewellery, weighted by
+    // rarity); without one the slot table decides, exactly as before.
+    remaining *= 1 - (weight ?? ARMOR_SLOT_RESIST_WEIGHT[slot] ?? 0.1);
   }
   return Math.min(MAX_ARMOR_RESIST, 1 - remaining);
 }

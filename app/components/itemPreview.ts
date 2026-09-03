@@ -442,9 +442,42 @@ function previewAccessory(x: CatalogAccessory, kind: 'Amulet' | 'Ring'): ItemPre
   const stats: string[] = [];
   if (x.acBonus) stats.push(`AC +${x.acBonus}`); // OTA-730 — defensive accessories
   if (x.statBonus) stats.push(`${x.statBonus.stat.toUpperCase().slice(0, 3)} +${x.statBonus.amount}`);
-  if (x.resistances.length > 0) stats.push(`Resists: ${x.resistances.join(', ')}`);
+  // OTA-1649 — a row may carry more than one stat now. The primary keeps its
+  // own line above; these are the extras, in the same shape.
+  for (const b of x.statBonuses ?? []) stats.push(`${b.stat.toUpperCase().slice(0, 3)} +${b.amount}`);
+  // ⚠⚠ OTA-1649 — THE RESIST LINE NOW NAMES A NUMBER. It read "Resists:
+  // aetheric" for the whole life of this catalog while the game charged nothing
+  // for it — the entries never reached the damage math at all. They do now, so
+  // the card states the mitigation the wearer actually gets. Reading the
+  // percentage off the SAME table combat reads is the point: the card cannot
+  // drift from the fight.
+  const ae = accessoryEffects();
+  if (x.resistances.length > 0) {
+    const pct = Math.round(ae.accessoryResistWeight(kind === 'Ring' ? 'ring' : 'amulet', x.rarity) * 100);
+    stats.push(`Resists ${x.resistances.join(', ')} (−${pct}% each, stacks with armour)`);
+  }
+  if (x.coatedBoost?.kind) {
+    stats.push(`${x.coatedBoost.kind} coatings bite +${Math.round(ae.COATED_BOOST_PCT[x.rarity] * 100)}%`);
+  }
+  if (x.stealthDamage) {
+    stats.push(`Strikes from stealth deal +${Math.round(ae.STEALTH_DAMAGE_PCT[x.rarity] * 100)}%`);
+  }
+  if (x.burst?.damageType) {
+    // ⚠ "ONCE PER FIGHT" GOES ON THE CARD. It is the entire cost of the effect,
+    // and a discharge that reads as repeatable is a card promising something the
+    // game will refuse on the second swing.
+    stats.push(`Discharges ${ae.BURST_DAMAGE[x.rarity]} ${x.burst.damageType} at ${x.burst.bands.join('/')} range — once per fight`);
+  }
   if (x.baseDurability !== undefined) stats.push(`Durability: ${x.baseDurability}`);
   return { name: x.name, kindLabel: kind, rarity: x.rarity, description: x.description, stats };
+}
+
+/** Lazy require — accessoryEffects reaches equipment.ts, and gameStore imports
+ *  this module, so a static import would close a cycle. Same pattern the heal
+ *  scaler below uses. */
+function accessoryEffects(): typeof import('../engine/accessoryEffects') {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  return require('../engine/accessoryEffects') as typeof import('../engine/accessoryEffects');
 }
 
 /** OTA-994 — the preview promises what USE will actually deliver: the #120-scaled

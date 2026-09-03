@@ -2145,16 +2145,16 @@
       "result": "Reclaimer's Aegis Pendant",
       "ingredients": [
         {
-          "name": "Scrap Metal",
-          "quantity": 2
+          "name": "Hardened Mudstone",
+          "quantity": 1
         },
         {
           "name": "Aetheric Shard",
           "quantity": 1
         },
         {
-          "name": "Spider Silk",
-          "quantity": 1
+          "name": "Scrap Metal",
+          "quantity": 2
         }
       ]
     },
@@ -2800,6 +2800,652 @@
         },
         {
           "name": "Hardened Aether Mud",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Rusted Band of Knowledge",
+      "ingredients": [
+        {
+          "name": "Scrap Metal",
+          "quantity": 2
+        },
+        {
+          "name": "Worn Tartarian Coin",
+          "quantity": 1
+        },
+        {
+          "name": "Cloth Scrap",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Tin Ward Ring",
+      "ingredients": [
+        {
+          "name": "Scrap Metal",
+          "quantity": 2
+        },
+        {
+          "name": "Aether Residue",
+          "quantity": 1
+        },
+        {
+          "name": "Bent Nail",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "result": "Golem Controller Ring",
+      "ingredients": [
+        {
+          "name": "Drone Core",
+          "quantity": 1
+        },
+        {
+          "name": "Automaton Circuit",
+          "quantity": 2
+        },
+        {
+          "name": "Scrap Metal",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Reclaimer's Quick Band",
+      "ingredients": [
+        {
+          "name": "Stalker Hide",
+          "quantity": 1
+        },
+        {
+          "name": "Spider Silk",
+          "quantity": 2
+        },
+        {
+          "name": "Scrap Metal",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Ring of Shadows",
+      "ingredients": [
+        {
+          "name": "Aetheric Dust",
+          "quantity": 1
+        },
+        {
+          "name": "Stalker Hide",
+          "quantity": 1
+        },
+        {
+          "name": "Cloth Scrap",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "result": "Titanhold Ring",
+      "ingredients": [
+        {
+          "name": "Iron Fangs",
+          "quantity": 1
+        },
+        {
+          "name": "Rusted Parts",
+          "quantity": 1
+        },
+        {
+          "name": "Big Rock",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Tartarian Oath-Band",
+      "ingredients": [
+        {
+          "name": "Aetherstone Fragment",
+          "quantity": 1
+        },
+        {
+          "name": "Scrap Metal",
+          "quantity": 2
+        },
+        {
+          "name": "Worn Tartarian Coin",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Light-Finger Guild Band",
+      "ingredients": [
+        {
+          "name": "Stalker Hide",
+          "quantity": 1
+        },
+        {
+          "name": "Rusted Parts",
+          "quantity": 1
+        },
+        {
+          "name": "Spider Silk",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Ring of Forgotten Lore",
+      "ingredients": [
+        {
+          "name": "Aetherstone Fragment",
+          "quantity": 1
+        },
+        {
+          "name": "Worn Tartarian Coin",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Dust",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "result": "Revivalist's Aether-Coil",
+      "ingredients": [
+        {
+          "name": "Energy Fragment",
+          "quantity": 1
+        },
+        {
+          "name": "Aetheric Dust",
+          "quantity": 1
+        },
+        {
+          "name": "Automaton Circuit",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "result": "Architect's Insight Ring",
+      "ingredients": [
+        {
+          "name": "Aetherstone Fragment",
+          "quantity": 1
+        },
+        {
+          "name": "Smooth Stone",
+          "quantity": 2
+        },
+        {
+          "name": "Aetheric Dust",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Monarch's Drowned Signet",
+      "ingredients": [
+        {
+          "name": "Silt Core",
+          "quantity": 1
+        },
+        {
+          "name": "Mud Fragment",
+          "quantity": 2
+        },
+        {
+          "name": "Aether Mud",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Aetherborn Signet",
+      "ingredients": [
+        {
+          "name": "Aether Gem",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Dust",
+          "quantity": 2
+        },
+        {
+          "name": "Patched Cloth",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Scribe's Signet",
+      "ingredients": [
+        {
+          "name": "Aetherstone Fragment",
+          "quantity": 1
+        },
+        {
+          "name": "Worn Tartarian Coin",
+          "quantity": 1
+        },
+        {
+          "name": "Patched Cloth",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Ashfall Ring",
+      "ingredients": [
+        {
+          "name": "Rusted Parts",
+          "quantity": 2
+        },
+        {
+          "name": "Scrap Metal",
+          "quantity": 2
+        },
+        {
+          "name": "Aether Crystal",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Mud Monarch Seal",
+      "ingredients": [
+        {
+          "name": "Mud Gem",
+          "quantity": 1
+        },
+        {
+          "name": "Mudstone",
+          "quantity": 1
+        },
+        {
+          "name": "Mud Poison",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "result": "Tartarian Stoneband",
+      "ingredients": [
+        {
+          "name": "Hardened Mudstone",
+          "quantity": 1
+        },
+        {
+          "name": "Mudstone",
+          "quantity": 1
+        },
+        {
+          "name": "Scrap Metal",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "result": "Cinderward Ring",
+      "ingredients": [
+        {
+          "name": "Drake Scale",
+          "quantity": 1
+        },
+        {
+          "name": "Fire Essence",
+          "quantity": 2
+        },
+        {
+          "name": "Scrap Metal",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Sparkwright Band",
+      "ingredients": [
+        {
+          "name": "Clockwork Core",
+          "quantity": 1
+        },
+        {
+          "name": "Energy Fragment",
+          "quantity": 2
+        },
+        {
+          "name": "Automaton Circuit",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Venomwright Band",
+      "ingredients": [
+        {
+          "name": "Beast Fang",
+          "quantity": 1
+        },
+        {
+          "name": "Viper Venom",
+          "quantity": 2
+        },
+        {
+          "name": "Mud Poison",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Cutpurse's Band",
+      "ingredients": [
+        {
+          "name": "Shadow Core",
+          "quantity": 1
+        },
+        {
+          "name": "Stalker Hide",
+          "quantity": 1
+        },
+        {
+          "name": "Spider Silk",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "result": "Thunderclap Ring",
+      "ingredients": [
+        {
+          "name": "Clockwork Core",
+          "quantity": 1
+        },
+        {
+          "name": "Tornado Core",
+          "quantity": 1
+        },
+        {
+          "name": "Energy Fragment",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Ring of the Quiet Hand",
+      "ingredients": [
+        {
+          "name": "Obsidian Shard",
+          "quantity": 1
+        },
+        {
+          "name": "Shadow Core",
+          "quantity": 1
+        },
+        {
+          "name": "Aetheric Cloth",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Rimebinder's Ring",
+      "ingredients": [
+        {
+          "name": "Elemental Core",
+          "quantity": 1
+        },
+        {
+          "name": "Leviathan Scale",
+          "quantity": 1
+        },
+        {
+          "name": "Aetheric Gem",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Minor Aetheric Amulet",
+      "ingredients": [
+        {
+          "name": "Aether Crystal",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Dust",
+          "quantity": 2
+        },
+        {
+          "name": "Cloth Scrap",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Whisperer's Charm",
+      "ingredients": [
+        {
+          "name": "Aether Wing",
+          "quantity": 2
+        },
+        {
+          "name": "Spider Silk",
+          "quantity": 1
+        },
+        {
+          "name": "Cloth Scrap",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Aetheric Locket",
+      "ingredients": [
+        {
+          "name": "Aether Crystal",
+          "quantity": 1
+        },
+        {
+          "name": "Scrap Metal",
+          "quantity": 2
+        },
+        {
+          "name": "Aether Residue",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Rustbane Charm",
+      "ingredients": [
+        {
+          "name": "Cloth Scrap",
+          "quantity": 2
+        },
+        {
+          "name": "Aether Residue",
+          "quantity": 1
+        },
+        {
+          "name": "Small Rock",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Mud Warden Amulet",
+      "ingredients": [
+        {
+          "name": "Mud Essence",
+          "quantity": 1
+        },
+        {
+          "name": "Viper Venom",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Mud",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Aetheric Diadem",
+      "ingredients": [
+        {
+          "name": "Aether Gem",
+          "quantity": 1
+        },
+        {
+          "name": "Aetheric Shard",
+          "quantity": 1
+        },
+        {
+          "name": "Aetheric Cloth",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Silt-Diver's Pendant",
+      "ingredients": [
+        {
+          "name": "Silt Core",
+          "quantity": 1
+        },
+        {
+          "name": "Boar Hide",
+          "quantity": 2
+        },
+        {
+          "name": "Viper Venom",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Lightstone Amulet",
+      "ingredients": [
+        {
+          "name": "Crystal Core",
+          "quantity": 1
+        },
+        {
+          "name": "Aetheric Gem",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Crystal",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "result": "Emberheart Locket",
+      "ingredients": [
+        {
+          "name": "Drake Scale",
+          "quantity": 1
+        },
+        {
+          "name": "Fire Essence",
+          "quantity": 2
+        },
+        {
+          "name": "Aetheric Cloth",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Warden's Bulwark Pendant",
+      "ingredients": [
+        {
+          "name": "Hardened Mudstone",
+          "quantity": 1
+        },
+        {
+          "name": "Drake Scale",
+          "quantity": 1
+        },
+        {
+          "name": "Scrap Metal",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "result": "Lich Phylactery",
+      "ingredients": [
+        {
+          "name": "Aetherstone Heart",
+          "quantity": 1
+        },
+        {
+          "name": "Aetheric Cloth",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Gem",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Bog-Heart Pearl",
+      "ingredients": [
+        {
+          "name": "Mud-Iron Heart",
+          "quantity": 1
+        },
+        {
+          "name": "Hardened Aether Mud",
+          "quantity": 1
+        },
+        {
+          "name": "Mud Poison",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "result": "Amulet of the Cold Star",
+      "ingredients": [
+        {
+          "name": "Aether Core",
+          "quantity": 1
+        },
+        {
+          "name": "Leviathan Scale",
+          "quantity": 1
+        },
+        {
+          "name": "Crystal Core",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Nightglass Pendant",
+      "ingredients": [
+        {
+          "name": "Obsidian Shard",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Veil",
+          "quantity": 1
+        },
+        {
+          "name": "Shadow Core",
           "quantity": 1
         }
       ]
