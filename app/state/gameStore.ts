@@ -572,7 +572,7 @@ import {
   pickScrapFailureLine,
 } from '../engine/scrapEngine';
 import { stampDurability, wearItemByName, wearItemById, repairCost, repairItem, resealUtilityDurability } from '../engine/durability';
-import { restampInventoryItem } from '../engine/itemBackfill';
+import { restampInventoryItem, resealCatalogRarity, healSavedItem } from '../engine/itemBackfill';
 import {
   type Hook,
   type HookEffect,
@@ -3356,7 +3356,9 @@ export function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
     }) };
   }
   if (out.golem?.weapon) {
-    out = { ...out, golem: { ...out.golem, weapon: restampInventoryItem(stampDurability(out.golem.weapon)) } };
+    // OTA-1654 — the golem's arm does NOT live in the inventory array, so the
+    // regrade is spelled out here or it is the one item left stale.
+    out = { ...out, golem: { ...out.golem, weapon: resealCatalogRarity(restampInventoryItem(stampDurability(out.golem.weapon))) } };
   }
   // OTA-1005 — GHOST EQUIP REFERENCES. bandolierIds / toolPouchIds index inventory
   // INSTANCES, but only THROW and UNRACK cleaned them — selling, scrapping,
@@ -3421,117 +3423,15 @@ function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
   // one-off items unknown to the catalog keep their declared kind).
   // After upgrade, re-run stampDurability so newly-relic items pick up
   // baseDurability they didn't qualify for under their old kind.
-  const inventory = (p.inventory ?? []).map((i) => {
-    // OTA-631 — settle any fused item still "materializing" when the app was last
-    // killed. After a process restart the background namer is gone and the fusion
-    // inputs are already consumed, so settle to the stashed deterministic name
-    // (formingName) rather than leaving a weapon stuck as "Cooling Crucible-Work".
-    if (i.materializing) {
-      i = {
-        ...i,
-        name: i.formingName ?? i.name,
-        description: i.formingDesc ?? i.description,
-        materializing: undefined,
-        formingName: undefined,
-        formingDesc: undefined,
-      };
-    }
-    let item = stampDurability(i);
-    const lookup = lookupCraftedItem(item.name);
-    // OTA-1001 — fused pieces are kind-authoritative (mirrors restampInventoryItem's
-    // guard): a fused ARMOR sharing a name with a catalog weapon row flipped to
-    // 'weapon' on every load.
-    if (!item.uniqueStats && !(item.tags ?? []).includes('fused') && lookup.kind !== 'misc' && item.kind !== lookup.kind) {
-      item = { ...item, kind: lookup.kind };
-      // Kind change can unlock durability tracking — re-stamp so the
-      // newly-eligible item picks up its baseDurability on this load.
-      item = stampDurability(item);
-    }
-    // OTA-191 — re-stamp synthesized fields (tags, description, scrap
-    // routing) onto every item. Items that were dropped / scavenged /
-    // bought BEFORE the upgraded itemDefaults.ts shipped carry empty
-    // tag lists and the bare "Field-inferred ... pending catalog
-    // backfill" description. Restamp pulls the now-richer synthesized
-    // row (or any cached Qwen overlay) and merges its tags + fresh
-    // description onto the saved instance in place. Idempotent on
-    // already-restamped items (the merge only fills gaps).
-    item = restampInventoryItem(item);
-    // ⚠ OTA-1603 — a legacy Crucible dog vest whose kind drifted (pre-OTA-688
-    // forges carry no uniqueStats; OTA-1001 above deliberately skips fused items)
-    // gets its kind + minimal uniqueStats back from its own forge noun.
-    item = healLegacyDogVest(item);
-    // OTA-677 — heal temper bloat: a non-weapon/armor tool (Climbing Rope, Pry Bar)
-    // stamped BEFORE the temper gate carries an inflated random durability max
-    // (a 150-rope at ~270). Reset it to the catalog base so existing saves correct
-    // themselves on load. No-op for weapons/armor and for already-correct items.
-    item = resealUtilityDurability(item);
-    // OTA-688 — mark older Crucible forges. applyFusion now stamps uniqueStats AND
-    // a 'fused' tag, but pieces forged before the tag existed carry uniqueStats
-    // without it. Backfill the tag on load so every crucible item is marked (the
-    // inventory ✶ badge + any fused-aware logic keys off it).
-    // OTA-808 — Core Guardian reward gear now ALSO carries uniqueStats (so it's a
-    // usable weapon/armor — see coreGuardians.ts), which breaks OTA-688's old
-    // "uniqueStats ⇒ fused" assumption. A Guardian drop is NOT a forge: skip the
-    // fused-tag backfill AND the fused-name migration below for the tagged set, so
-    // "Atalan's Trident" keeps its name and doesn't read as a Crucible fusion.
-    const isGuardianReward = (item.tags ?? []).some((t) => t.toLowerCase() === 'core_guardian_set');
-    // OTA-830 — a Core Guardian drop granted BEFORE OTA-828 has NO uniqueStats
-    // (the builder didn't stamp yet): resolved barehanded / 0 AC. Backfill from
-    // the canonical set entry by name, BEFORE the fused-tag backfill below.
-    if (isGuardianReward && !item.uniqueStats) {
-      const gStats = (require('../engine/coreGuardians') as typeof import('../engine/coreGuardians')).guardianGearUniqueStats(item);
-      if (gStats) item = { ...item, uniqueStats: gStats };
-    }
-    if (item.uniqueStats && !isGuardianReward && !(item.tags ?? []).some((t) => t.toLowerCase() === 'fused')) {
-      item = { ...item, tags: [...(item.tags ?? []), 'fused'] };
-    }
-    // OTA-955 — reach recheck for already-forged weapons (owner: "have it recheck
-    // and fix old saves as well"). Every fused weapon now carries an explicit
-    // reachClass; older forges get it inferred from their name on load — a
-    // legacy "Humming Bow" shoots from distance, a "Cairn Spear" reaches to
-    // mid, and a "Resonant Spike" is honestly close-quarters. Idempotent:
-    // items already stamped are skipped.
-    if (item.uniqueStats && !isGuardianReward && item.uniqueStats.kind === 'weapon' && !item.uniqueStats.reachClass) {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { inferReachFromName: irnSweep } = require('../engine/itemFusion') as typeof import('../engine/itemFusion');
-      item = { ...item, uniqueStats: { ...item.uniqueStats, reachClass: irnSweep(item.name) ?? 'melee' } };
-    }
-    // OTA-225 — repair the OTA-221 deterministic-synth name bug. A
-    // signed-shift bug produced fused items named "Resonant
-    // undefined" / "<Theme> undefined" before OTA-224 fixed the
-    // shift. Saves loaded post-OTA-224 still carry the broken name
-    // on the instance. Detect any uniqueStats-bearing item with a
-    // trailing "undefined" and rewrite the suffix from the item's
-    // id + uniqueStats.kind — same suffix pools as the synth.
-    if (item.uniqueStats && / undefined\b/i.test(item.name)) {
-      const suffixPool: Record<string, string[]> = {
-        weapon: ['Cleaver', 'Edge', 'Spike', 'Lash', 'Maul'],
-        armor: ['Brace', 'Vigil', 'Mantle', 'Shroud', 'Bulwark'],
-        dog_armor: ['Vigil', 'Wrap', 'Pattern', 'Stride'],
-      };
-      const pool = suffixPool[item.uniqueStats.kind] ?? suffixPool.weapon!;
-      // Deterministic pick from the item's id so the same item
-      // always gets the same suffix on every load.
-      let hash = 5381;
-      for (let i = 0; i < item.id.length; i++) {
-        hash = ((hash << 5) + hash + item.id.charCodeAt(i)) >>> 0;
-      }
-      const suffix = pool[hash % pool.length]!;
-      item = { ...item, name: item.name.replace(/\s*undefined\b/gi, ` ${suffix}`).trim() };
-    }
-    // OTA-706 — one-time rename for ALREADY-forged fused items whose stored name
-    // cross-kind-collides with a catalog row: a forged ARMOR named "Aetheric Armor"
-    // is ALSO an authored runecaster WEAPON, so it read as a weapon (1d10 line, wrong
-    // section) before OTA-704/705 sealed the resolution. Those fixes made the collision
-    // harmless, but the ugly/duplicate name persisted — re-mint a distinct, non-
-    // colliding deterministic name. Idempotent: a clean name is left alone next load.
-    if (item.uniqueStats && !isGuardianReward) {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { migrateFusedName } = require('../engine/itemFusion') as typeof import('../engine/itemFusion');
-      item = migrateFusedName(item);
-    }
-    return item;
-  });
+  // ⚠ OTA-1654 — ONE CALL. Every per-item repair a saved instance needs — the
+  // materialize settle, the kind reconcile, the tag/description restamp, the dog
+  // vest, the durability reseal, the catalog regrade, the Guardian and fused
+  // provenance, the reach recheck and the two legacy name repairs — is
+  // `healSavedItem` in itemBackfill.ts, in that order, with each step's reason
+  // beside it. It lived inline here as a hundred lines of stacked migrations
+  // purely because OTA-191's was written here first; nothing in it ever touched
+  // the store.
+  const inventory = (p.inventory ?? []).map(healSavedItem);
   // Backfill the per-slot instance ids. A pre-refactor save records only
   // the equipped name; we map each name to the first matching inventory
   // id so later wear / dedupe paths can point at a specific instance.

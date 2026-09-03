@@ -170,8 +170,17 @@ describe('OTA-1603 — the downstream sites all ask the one predicate', () => {
   });
 
   it('⚠⚠ the load chain heals, and the screen asks itemIsDogArmor everywhere', () => {
+    // ⚠ OTA-1654 — this used to pin the literal line inside gameStore's inventory
+    // walk. That whole per-item chain moved to `itemBackfill.healSavedItem`, and
+    // a source pin would only have to be moved again next time. Ask the BEHAVIOUR
+    // instead: a drifted legacy vest comes out of the load chain as dog armour.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { healSavedItem } = require('../app/engine/itemBackfill') as typeof import('../app/engine/itemBackfill');
+    const drifted = { ...wovenStride(), kind: 'armor' } as never as InventoryItem;
+    expect(healSavedItem(drifted).kind).toBe('dog_armor');
+    // …and the walk that runs it is still the one the loader calls.
     const GS = src('app/state/gameStore.ts');
-    expect(GS).toContain('item = healLegacyDogVest(item);');
+    expect(GS).toContain('const inventory = (p.inventory ?? []).map(healSavedItem);');
     const SCREEN = src('app/screens/InventoryScreen.tsx');
     expect(SCREEN).toContain('const pendingIsDogArmor = itemIsDogArmor(pending.item);');
     expect(SCREEN).toContain("(item.kind === 'consumable' || itemIsDogArmor(item))");

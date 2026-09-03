@@ -73,7 +73,19 @@ describe('OTA-1001 — the store-side cluster is canonical (source locks)', () =
     expect(COMBAT_SRC).toContain('=== wpName.toLowerCase() && itemIsThrowable(it)');
   });
   it('the fused-kind load heal is guarded and the CHA channel heal exists', () => {
-    expect(STORE).toContain("!item.uniqueStats && !(item.tags ?? []).includes('fused') && lookup.kind !== 'misc'");
+    // ⚠ OTA-1654 — the kind-reconcile guard moved with the rest of the per-item
+    // load chain into `itemBackfill.healSavedItem`. Pinning the source line again
+    // would just relocate the same brittleness, so ask what the guard is FOR: a
+    // fused ARMOR whose name collides with a catalog WEAPON row must not flip to
+    // 'weapon' on load. That is the OTA-1001 defect itself, stated as behaviour.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { healSavedItem } = require('../app/engine/itemBackfill') as typeof import('../app/engine/itemBackfill');
+    const fusedCollider = {
+      id: 'f_collide', name: 'Aetheric Armor', kind: 'armor', rarity: 'Rare', quantity: 1,
+      tags: ['fused'], uniqueStats: { kind: 'armor', rarity: 'Rare', acBonus: 3 },
+    } as never as Parameters<typeof healSavedItem>[0];
+    expect(healSavedItem(fusedCollider).kind).toBe('armor');
+    expect(STORE).toContain('const inventory = (p.inventory ?? []).map(healSavedItem);');
     expect(STORE).toContain("sb.map((b) => (b.stat === 'charisma' ? { ...b, stat: chaCat.stat! } : b))");
   });
 });

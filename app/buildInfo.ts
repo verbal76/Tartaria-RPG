@@ -27184,7 +27184,33 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // used, so the Crucible's fodder pool is untouched. One gate in gearWear, asked
 // BEFORE the point is spent, so every path a player's kit wears down is warded
 // identically.
-export const OTA_BUILD_ID = '2026-09-03-1653-the-wear-ward';
+// OTA-1654 — THE SAVE CATCHES UP TO THE CATALOG. Owner: "for all of the items
+// that I already had on, or in my inventory like those rings, fix the effect on
+// them in my save file and bump their rarity level." ⚠ MEASURED FIRST: THE
+// EFFECTS WERE NEVER STALE. An accessory's powers resolve from the catalog row by
+// name on every read, and every OTA-1649 ladder magnitude is indexed by
+// `row.rarity` — so his Tin Ward Ring started warding acid and shaving 15% off
+// his gear's wear the moment OTA-1653 landed, with nothing to migrate. What DID
+// drift is the rarity STAMPED ON THE INSTANCE at mint. OTA-999 taught the ECONOMY
+// to ignore that stamp (`canonicalItemRarity` — sell, scrap, repair, golem heal)
+// but never wrote the answer back, so every unconverted reader still read the
+// stale field: the inventory row PRINTED "Common" and coloured its stripe from
+// it, RARITY sort ranked from it, and ⚠ `fusionOutputRarity` GRADED THE CRUCIBLE'S
+// OUTPUT from it — feeding a since-promoted piece to the forge quietly bought a
+// worse item than the piece deserved. The sheet and the till disagreed about the
+// same object. `resealCatalogRarity` persists what `canonicalItemRarity` already
+// answers (ONE rule, not a second one), runs in the load chain beside the other
+// heals and on the golem's arm — the one piece of kit outside the inventory
+// array. Worn items need no pass of their own: a slot holds a name + an id into
+// that same inventory. The forge now asks the canon question too. ⚠ And
+// `resealUtilityDurability` learned that its two directions are different events:
+// when a max FALLS it is the OTA-677 temper bloat and the damage measured against
+// it was never real (clamp); when a max RISES it is a catalog promotion (25→40 on
+// the ring) and the damage IS real, so carry the same points of damage across —
+// an untouched 25/25 loads 40/40, a chipped 18/25 loads 33/40, instead of a
+// freshly-promoted ring reading pre-worn forever.
+export const OTA_BUILD_ID = '2026-09-03-1654-the-save-catches-up';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-03-1653-the-wear-ward';
 // golem catch-up 2026-09-03: markerless publish of OTA-1653 - the wear ward, a
 // buff the owner invented by misreading a resist line and which turned out to be
 // the better item. 6/10/15/25% by rarity, best-not-sum, a chance to skip a wear

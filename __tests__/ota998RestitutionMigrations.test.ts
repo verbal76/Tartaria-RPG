@@ -75,7 +75,10 @@ describe('OTA-998 — the load paths are wired', () => {
   it('backfillPlayer applies the renames FIRST and heals the golem armament', () => {
     expect(STORE).toContain('const pm = applyLegacyItemRenames(p);');
     expect(STORE).toContain('out = backfillPlayerInner(pm);');
-    expect(STORE).toContain('weapon: restampInventoryItem(stampDurability(out.golem.weapon))');
+    // OTA-1654 — the arm also takes the catalog regrade. It is the one piece of
+    // kit outside the inventory array, so it is spelled out here rather than
+    // reached by the `healSavedItem` walk.
+    expect(STORE).toContain('weapon: resealCatalogRarity(restampInventoryItem(stampDurability(out.golem.weapon)))');
   });
   it('resurrection loads MIGRATED world memory + resyncs canon locations (raw read gone)', () => {
     expect(SLOT).toContain('const revivedWorldMemory = deps.migrateLoadedWorldMemory(saved.worldMemory);');

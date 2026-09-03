@@ -22,7 +22,7 @@
 // refusal instead of crafting a degenerate item.
 
 import type { InventoryItem, Rarity, UniqueItemStats } from './types';
-import { canonicalItemTags, isInferredItem, isRecipeIngredientName, findWeaponByName, findArmorByName, WEAPONS } from './crafting';
+import { canonicalItemTags, canonicalItemRarity, isInferredItem, isRecipeIngredientName, findWeaponByName, findArmorByName, WEAPONS } from './crafting';
 import { inferGearTagPack } from './itemDefaults';
 // OTA-1086 — the salvage-curio catalog, so the forge can refuse to name its
 // product after stock salvage (see the input-echo rejection in the namer).
@@ -156,11 +156,32 @@ export function fusionOutputRarity(
   inputs: readonly InventoryItem[],
   tagProfile: readonly string[],
 ): Rarity {
+  // ⚠⚠ OTA-1654 - THE FORGE GRADES ON THE BETTER OF THE TWO, AND THE ASYMMETRY
+  // IS THE POINT. This read used `it.rarity` alone - the tier stamped on the
+  // instance the day it was minted - while the till, the scrapper and the repair
+  // bench had all moved to `canonicalItemRarity` back in OTA-999. So a piece the
+  // catalog has since PROMOTED (the Tin Ward Ring: Common under OTA-1649, Rare
+  // under OTA-1653) sold at its Rare price and then fed this fire as a Common,
+  // buying the player a worse item than the pieces they burned deserved.
+  //
+  // ⚠ BUT THE CANON READ ALONE WOULD BE A QUIET NERF, and the first draft of this
+  // OTA was exactly that: an instance stamped ABOVE its catalog row - a Rare
+  // Tortoise Shell in a pack where the row says Common - would have started
+  // forging one tier lower than it did yesterday. That is a tier CONFISCATED from
+  // a player who already holds it, in an OTA whose whole job was to stop a
+  // promotion being missed. So: MAX of the two.
+  //
+  // The shop is strict for a reason the forge does not share. Reading a stale
+  // stamp at the TILL is a faucet - it mints TC out of a catalog edit - so the
+  // economy must ask the catalog and only the catalog. The forge CONSUMES the
+  // piece: honouring the better number costs nothing the player was not already
+  // holding, and it can only ever move in the direction they already believed.
+  const rankOf = (r: Rarity | undefined): number => {
+    const at = FUSION_RARITY_LADDER.indexOf(r as (typeof FUSION_RARITY_LADDER)[number]);
+    return at < 0 ? 0 : at;
+  };
   const ranks = inputs
-    .map((it) => FUSION_RARITY_LADDER.indexOf(
-      (it.rarity ?? 'Common') as (typeof FUSION_RARITY_LADDER)[number],
-    ))
-    .map((at) => (at < 0 ? 0 : at))
+    .map((it) => Math.max(rankOf(it.rarity), rankOf(canonicalItemRarity(it))))
     .sort((a, b) => b - a);
   // The gate never admits fewer than 2 inputs, but a direct caller might; a
   // single-piece pack grades on the piece it has rather than throwing.

@@ -225,7 +225,24 @@ export function resealUtilityDurability(item: InventoryItem): InventoryItem {
   if (!item.durability || item.kind === 'weapon' || item.kind === 'armor') return item;
   const base = lookupBaseDurability(item.name);
   if (base == null || item.durability.max === base) return item;
-  return { ...item, durability: { max: base, current: Math.min(item.durability.current, base) } };
+  // ⚠ OTA-1654 — WHICH WAY THE MAX MOVED DECIDES WHAT TO KEEP, and the two
+  // directions are not the same event.
+  //
+  //   • The max FELL — the OTA-677 case this function was written for. A rope's
+  //     270 came from a temper roll that should never have applied, so it was
+  //     never a real ceiling, and the damage measured against it is not real
+  //     damage either. Clamp: keep the points the player actually has.
+  //   • The max ROSE — a CATALOG PROMOTION, which is new here: OTA-1653 took the
+  //     Tin Ward Ring's base from 25 to 40 when the ring became Rare. The extra
+  //     headroom is the item getting better, not the player's copy getting
+  //     chipped, so carry the SAME NUMBER OF POINTS OF DAMAGE across. An
+  //     untouched 25/25 loads as 40/40; a chipped 18/25 loads as 33/40. Clamping
+  //     here would have shown a freshly-promoted ring as pre-worn forever.
+  const { max: oldMax, current } = item.durability;
+  const next = base > oldMax
+    ? Math.min(base, current + (base - oldMax))
+    : Math.min(current, base);
+  return { ...item, durability: { max: base, current: Math.max(1, next) } };
 }
 
 // Reduce one inventory item's durability by `amount`. Matches by name; the
