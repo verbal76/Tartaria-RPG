@@ -26989,6 +26989,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Crown is the Scepter of Verdict. The rule is a gate (check:weaponnames, the
 // 18th) with a self-test; every retired name is a LEGACY_ITEM_RENAMES entry.
 export const OTA_BUILD_ID = '2026-09-03-1641-a-weapon-is-named-like-a-weapon';
+// golem catch-up 2026-09-03: markerless publish of OTA-1641 - the 56 rune-casters
+// named as Wand / Rod / Stave / Scepter, check:weaponnames the 18th gate, every
+// retired name a migration. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-03-1640-the-vest-says-what-it-does';
 // golem catch-up 2026-09-03: markerless publish of OTA-1640 - dog-gear preview,
 // vest STR/INT/bite-back wired, snapshot stat lines. hal took the marker.
