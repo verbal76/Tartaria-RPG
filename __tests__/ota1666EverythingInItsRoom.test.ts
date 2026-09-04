@@ -107,7 +107,10 @@ describe('OTA-1666 — ⚠⚠ the LORE tab is gone, and the codex kept its real 
     // The tab row is built from this literal array; 'lore' being absent from it
     // is the whole removal, and the union type below makes a stale
     // `tab === 'lore'` a compile error rather than dead JSX.
-    expect(ABOUT_CODE).toContain("['session', 'sfx', 'display', 'about', 'notices']");
+    // ⚠ OTA-1667 dropped 'about' from this row too (that tab folded into the
+    // notices page, which now carries the ABOUT label). The claim OTA-1666 makes
+    // is unchanged and is the one asserted here: 'lore' is not in the row.
+    expect(ABOUT_CODE).toContain("['session', 'sfx', 'display', 'notices']");
     expect(ABOUT_CODE).not.toContain("tab === 'lore'");
   });
 

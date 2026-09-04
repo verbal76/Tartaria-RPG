@@ -19,13 +19,57 @@ import { View, Text, StyleSheet } from 'react-native';
 import {
   BASE_DAMAGE_GLYPH, BASE_GLYPH_COLOR, COATING_GLYPH, COATING_GLYPH_COLOR,
 } from '../engine/weaponGlyphs';
+import { canonicalDamageType } from '../engine/damageTypes';
+import { WEAPONS } from '../engine/crafting';
 
-/** The base types in the order the key lists them: the seven a coating can
- *  never be, then the six that are also coating families. */
-export const BASE_KEY_ORDER = [
-  'bludgeoning', 'slashing', 'piercing', 'aetheric', 'radiation', 'degradation', 'stun',
-  'burn', 'cold', 'poison', 'acid', 'corruption', 'electrical',
+/** ⚠⚠⚠ OTA-1667 — THE KEY IS DERIVED FROM THE CATALOG NOW, NOT HAND-LISTED.
+ *
+ *  Owner: *"audit the glyphs list to see if all of those damage types exist in
+ *  game."* They did not. Measured across all 301 catalog weapons, run through
+ *  the SAME `baseDamageGlyph` path the buttons use:
+ *
+ *    ⚒ bludgeoning 65 · ▲ piercing 55 · ✦ aetheric 49 · ⚔ slashing 45
+ *    🔥 burn 45 · ⚡ electrical 22 · ☠ poison 9 · ❄ cold 6 · ☢ radiation 5
+ *    ⚙ degradation 0 · ✱ stun 0 · ⚗ acid 0 · ☣ corruption 0
+ *
+ *  FOUR OF THE THIRTEEN ROWS DESCRIBED DAMAGE NO WEAPON DEALS. And ⚙ was worse
+ *  than merely empty: OTA-1652 aliased `degradation → acid`, and
+ *  `baseDamageGlyph` canonicalises BEFORE the lookup — so even a weapon that
+ *  authored degradation would print ⚗, never ⚙. That row could not appear on a
+ *  button under any circumstances, and the key promised it anyway.
+ *
+ *  ⚠ ACID AND CORRUPTION ARE NOT MISSING FROM THE GAME — they are missing as a
+ *  weapon's OWN damage. Both are real coating families with real vials, and the
+ *  COATS section below lists them correctly. The defect was listing them a
+ *  second time under "own damage", where nothing can carry them.
+ *
+ *  ⚠⚠ SO THE FIX IS A DERIVATION, NOT A SHORTER HARD-CODED LIST. A list I prune
+ *  today goes stale the first time a weapon is authored with an acid base — the
+ *  key would then hide a glyph the buttons paint, which is the same class of lie
+ *  in the other direction. Reading the catalog means the key cannot be wrong in
+ *  either direction, ever, without a test being the thing that fails. */
+const KEY_PREFERENCE = [
+  'bludgeoning', 'slashing', 'piercing', 'aetheric', 'radiation', 'stun',
+  'burn', 'cold', 'poison', 'acid', 'corruption', 'degradation', 'electrical',
 ] as const;
+
+/** Every base damage type the weapon catalog can actually put on a button,
+ *  canonicalised exactly as `baseDamageGlyph` does, in KEY_PREFERENCE order
+ *  (anything the catalog gains that this file has never heard of lands at the
+ *  end rather than vanishing). */
+export function baseTypesInPlay(): string[] {
+  const seen = new Set<string>();
+  for (const w of WEAPONS) {
+    const c = canonicalDamageType((w as { damageType?: string }).damageType);
+    // A type with no glyph paints nothing on the button, so it has no row here.
+    if (c && BASE_DAMAGE_GLYPH[c]) seen.add(c);
+  }
+  const order = [...KEY_PREFERENCE] as string[];
+  return [...seen].sort((a, b) => {
+    const ia = order.indexOf(a); const ib = order.indexOf(b);
+    return (ia < 0 ? order.length : ia) - (ib < 0 ? order.length : ib);
+  });
+}
 
 export const BASE_TYPE_MEANING: Record<string, string> = {
   bludgeoning: 'blunt force — clubs, hammers, fists',
@@ -33,13 +77,16 @@ export const BASE_TYPE_MEANING: Record<string, string> = {
   piercing: 'points — arrows, bolts, spears',
   aetheric: 'aether — rune-casters and relic weapons (force and psychic count as aetheric)',
   radiation: 'rad-burn from old cores',
-  degradation: 'rust and rot — wears the target down',
   stun: 'concussion — stops the target',
   burn: 'fire',
   cold: 'frost (frost counts as cold)',
   poison: 'venom and toxins',
-  acid: 'corrosion',
-  corruption: 'blight',
+  // ⚠ Kept as meanings even though no weapon deals them as a BASE type today —
+  // they are live coating families, and if a weapon is ever authored with one,
+  // baseTypesInPlay() adds the row and it must already have words.
+  acid: 'corrosion — eats metal and constructs',
+  corruption: 'blight — rots the living',
+  degradation: 'rust and rot (counts as acid)',
   electrical: 'lightning and shock',
 };
 
@@ -87,7 +134,7 @@ export function WeaponGlyphKey() {
       <Text style={styles.exampleHint}>coats · name · own damage · star</Text>
 
       <Text style={styles.sub} accessibilityRole="header">OWN DAMAGE — after the name</Text>
-      {BASE_KEY_ORDER.map((k) => (
+      {baseTypesInPlay().map((k) => (
         <KeyRow
           key={k}
           glyph={BASE_DAMAGE_GLYPH[k] ?? '?'}

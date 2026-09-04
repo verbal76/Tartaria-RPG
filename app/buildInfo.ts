@@ -27509,7 +27509,37 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // `--- INVENTORY ---` block FIRST, and only then was the button removable). RUN /
 // REPORTING / AI / ADVANCED each answer one question now; Display size went to
 // the DISPLAY tab where it belongs.
-export const OTA_BUILD_ID = '2026-09-04-1666-everything-in-its-room';
+// OTA-1667 — THE KEY GOES WHERE THE PLAYER IS. Owner, three things at once:
+// *"the about tab, should that be there or should it just be wrapped up in the
+// log? it honestly doesn't mean anything to anyone but you and me. the weapon
+// glyphs section should be under the lore button that lives on the minimap not
+// in about, that should be easily player facing. also audit the glyphs list to
+// see if all of those damage types exist in game."*
+//
+// ⚠⚠⚠ THE AUDIT ANSWER IS NO — FOUR OF THIRTEEN DID NOT EXIST. Measured across
+// all 301 catalog weapons through the same `baseDamageGlyph` path the buttons
+// paint from: bludgeoning 65, piercing 55, aetheric 49, slashing 45, burn 45,
+// electrical 22, poison 9, cold 6, radiation 5 — and degradation 0, stun 0,
+// acid 0, corruption 0. ⚠⚠ ⚙ DEGRADATION WAS WORSE THAN EMPTY, IT WAS
+// UNREACHABLE BY CONSTRUCTION: OTA-1652 aliased degradation → acid and
+// baseDamageGlyph canonicalises BEFORE the glyph lookup, so that row could not
+// appear on a button under any circumstances and the key promised it for 29
+// OTAs. ⚠ Acid and corruption are not missing from the GAME — they are live
+// coating families with real vials, listed correctly in the COATS section; the
+// defect was listing them a second time as a weapon's own damage, which nothing
+// carries. ⚠⚠⚠ THE FIX IS A DERIVATION, NOT A SHORTER LIST: baseTypesInPlay()
+// reads the catalog, so an acid-based weapon authored tomorrow brings its row
+// back automatically and the key can never be wrong in either direction.
+//
+// The card itself moved to the LORE codex as a GLYPHS tab, third in the row
+// behind BEASTS and FALLEN — a key for symbols painted on combat buttons had no
+// business behind a gear icon under a build-id dump. And SETTINGS lost its ABOUT
+// tab: the build block already reaches me through every log export and every bug
+// report, so the tab was a third copy of it. The dedication, the seven-tap owner
+// ritual and the third-party notices are one page now, called ABOUT, with the
+// dedication leading instead of buried underneath diagnostics.
+export const OTA_BUILD_ID = '2026-09-04-1667-the-key-goes-where-the-player-is';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-04-1666-everything-in-its-room';
 // golem catch-up 2026-09-04: markerless publish of OTA-1666 - everything in its
 // room. The settings SESSION tab reorganised into RUN / REPORTING / AI /
 // ADVANCED, and the duplicate LORE tab deleted (it rendered the same

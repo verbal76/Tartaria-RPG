@@ -48,7 +48,7 @@ import {
   combatWeaponLabel, combatWeaponLabelParts,
 } from '../app/engine/weaponGlyphs';
 import {
-  BASE_KEY_ORDER, BASE_TYPE_MEANING, COAT_KEY_ORDER, COAT_MEANING, STAR_EXPLAINED, GLYPH_KEY_EXAMPLE,
+  baseTypesInPlay, BASE_TYPE_MEANING, COAT_KEY_ORDER, COAT_MEANING, STAR_EXPLAINED, GLYPH_KEY_EXAMPLE,
 } from '../app/components/WeaponGlyphKey';
 import type { InventoryItem } from '../app/engine/types';
 import { readFileSync } from 'fs';
@@ -95,10 +95,23 @@ describe('OTA-1638 — the star goes last', () => {
 });
 
 describe('OTA-1638 — the key on the About screen reads the live tables', () => {
-  it('⚠⚠⚠ every base type in the table is in the key, once, with a meaning', () => {
-    expect([...BASE_KEY_ORDER].sort()).toEqual(Object.keys(BASE_DAMAGE_GLYPH).sort());
-    expect(new Set(BASE_KEY_ORDER).size).toBe(BASE_KEY_ORDER.length);
-    for (const k of BASE_KEY_ORDER) {
+  it('⚠⚠⚠ every base type in the key has a glyph, a colour and a meaning', () => {
+    // ⚠ OTA-1667 REPOINTED THIS CLAIM, and the repointing is the whole story.
+    // It used to read `BASE_KEY_ORDER == every key of BASE_DAMAGE_GLYPH` — i.e.
+    // "the key lists the whole table" — which is what made the key advertise
+    // ⚙ DEGRADATION, ✱ STUN, ⚗ ACID and ☣ CORRUPTION as a weapon's own damage
+    // when ZERO of 301 catalog weapons deal any of them, and when `degradation`
+    // cannot even reach its glyph (OTA-1652 aliases it to acid, and
+    // baseDamageGlyph canonicalises before the lookup). The list is derived
+    // from the catalog now; the claim that survives is the one that was always
+    // the point — every row the key CAN show is fully furnished.
+    const order = baseTypesInPlay();
+    expect(order.length).toBeGreaterThan(0);
+    expect(new Set(order).size).toBe(order.length);
+    for (const k of order) {
+      expect(Object.keys(BASE_DAMAGE_GLYPH)).toContain(k);
+    }
+    for (const k of order) {
       expect({ k, meaning: (BASE_TYPE_MEANING[k] ?? '').length > 0, colour: !!BASE_GLYPH_COLOR[k] })
         .toEqual({ k, meaning: true, colour: true });
     }
@@ -132,12 +145,19 @@ describe('OTA-1638 — the key on the About screen reads the live tables', () =>
     expect(BASE_TYPE_MEANING.aetheric).toContain('force and psychic count as aetheric');
   });
 
-  it('⚠⚠ the card is on the About tab', () => {
-    const ABOUT = src('app/screens/AboutScreen.tsx');
-    expect(ABOUT).toContain("import { WeaponGlyphKey } from '../components/WeaponGlyphKey';");
-    const aboutTab = ABOUT.slice(ABOUT.indexOf("{tab === 'about' && ("));
-    expect(aboutTab.indexOf('<WeaponGlyphKey />')).toBeGreaterThan(0);
-    expect(aboutTab.indexOf('<WeaponGlyphKey />')).toBeLessThan(aboutTab.indexOf('styles.dedication'));
+  it('⚠⚠ the card is in the lore codex, not in Settings', () => {
+    // OTA-1667 — owner: the glyph key "should be under the lore button that
+    // lives on the minimap, not in about." Same component, player-facing door.
+    const CODEX = src('app/components/LoreCodexBody.tsx');
+    expect(CODEX).toContain("import { WeaponGlyphKey } from './WeaponGlyphKey';");
+    expect(CODEX).toContain("section === 'glyphs'");
+    // Comments only — the obituary in AboutScreen names the tag it removed, on
+    // purpose. Read the code.
+    const aboutCode = src('app/screens/AboutScreen.tsx')
+      .replace(/\{\/\*[\s\S]*?\*\/\}/g, '')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/^\s*\/\/.*$/gm, '');
+    expect(aboutCode).not.toContain('<WeaponGlyphKey />');
     const KEY = src('app/components/WeaponGlyphKey.tsx');
     // the glyphs and colours come from the engine, never a copy
     expect(KEY).toContain("} from '../engine/weaponGlyphs';");

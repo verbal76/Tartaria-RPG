@@ -88,7 +88,10 @@ describe('OTA-1365 — the lore tabs', () => {
 
   it('⚠ the order is declared once, so the row and the labels cannot drift apart', () => {
     const src = readFileSync(join(__dirname, '..', 'app', 'components', 'LoreCodexBody.tsx'), 'utf8');
-    expect(src).toContain("const TAB_ORDER: Section[] = ['bestiary', 'fallen', 'places', 'factions', 'races', 'lore', 'timeline'];");
+    // ⚠ OTA-1667 inserted GLYPHS third (the weapon key, moved out of Settings
+    // to the door the owner named). BEASTS and FALLEN keep the first two seats —
+    // his call at OTA-1365 — and the rest keep their relative order.
+    expect(src).toContain("const TAB_ORDER: Section[] = ['bestiary', 'fallen', 'glyphs', 'places', 'factions', 'races', 'lore', 'timeline'];");
     expect(src).toContain('{TAB_ORDER.map((s) => (');
     expect(src).toContain('{TAB_LABEL[s]}');
   });

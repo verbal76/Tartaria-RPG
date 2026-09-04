@@ -18,11 +18,15 @@ describe('OTA-996 — the codex tab row wraps; nothing hides off-screen', () => 
     // designed — it was just the order the tabs were built in. What must not
     // regress is that all seven are declared and rendered, since the bug behind
     // OTA-996 was FALLEN and LORE hidden past the right edge.
+    // ⚠ OTA-1667 raised the count 7 → 8: GLYPHS joined the row when the weapon
+    // key moved out of Settings. The lock still guards the same property — every
+    // declared tab is rendered — and raising it here is the deliberate act that
+    // proves nothing was DISPLACED to make room.
     const decl = SRC.slice(SRC.indexOf('const TAB_ORDER'), SRC.indexOf('];', SRC.indexOf('const TAB_ORDER')));
-    for (const section of ['races', 'factions', 'places', 'timeline', 'bestiary', 'lore', 'fallen']) {
+    for (const section of ['races', 'factions', 'places', 'timeline', 'bestiary', 'lore', 'fallen', 'glyphs']) {
       expect(decl).toContain(`'${section}'`);
     }
-    expect(decl.split(',')).toHaveLength(7);
+    expect(decl.split(',')).toHaveLength(8);
     // And the row renders exactly that list — no second hard-coded sequence.
     expect(SRC).toContain('{TAB_ORDER.map((s) => (');
     // (ota1365LoreTabs proves the rendered order by mounting the screen.)

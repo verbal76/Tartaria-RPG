@@ -21,7 +21,7 @@ import {
 // OTA-1666 — LoreCodexBody import dropped with the duplicate LORE tab. The
 // component itself is untouched; LoreScreen (the crest button's destination)
 // is now its only caller.
-import { WeaponGlyphKey } from '../components/WeaponGlyphKey'; // OTA-1638
+// OTA-1667 — WeaponGlyphKey import dropped: the key lives in the lore codex now.
 import { useHintsDisabled, setHintsDisabled, resetAllFirstTimeHints } from '../components/useFirstTimeHint';
 import { useAutosaveDisabled, setAutosaveDisabled } from '../ui/autosave';
 import { useUiScale, setUiScale, UI_SCALES, displayScaleSupported, type UiScale } from '../ui/displayScale'; // OTA-1227
@@ -117,7 +117,7 @@ export function AboutScreen() {
   // most-pressed action, so it's the default tab on open.
   // ⚠ OTA-1666 — 'lore' left this union, so a stale `tab === 'lore'` anywhere
   // in the file is now a COMPILE error rather than a tab nobody can reach.
-  const [tab, setTab] = useState<'session' | 'sfx' | 'display' | 'about' | 'notices'>('session');
+  const [tab, setTab] = useState<'session' | 'sfx' | 'display' | 'notices'>('session');
   // OTA-860 — global first-time-tips kill-switch (per-install, reactive).
   const hintsDisabled = useHintsDisabled();
   const autosaveDisabled = useAutosaveDisabled();
@@ -761,7 +761,7 @@ export function AboutScreen() {
           exploration screen (`setScreen('lore')` → LoreScreen) is the door the
           game is built around; this one only ever competed with it. */}
       <View style={styles.tabRow}>
-        {(['session', 'sfx', 'display', 'about', 'notices'] as const).map((id) => (
+        {(['session', 'sfx', 'display', 'notices'] as const).map((id) => (
           <TouchableOpacity
             key={id}
             onPress={() => setTab(id)}
@@ -776,7 +776,7 @@ export function AboutScreen() {
               adjustsFontSizeToFit
               minimumFontScale={0.7}
             >
-              {id.toUpperCase()}
+              {id === 'notices' ? 'ABOUT' : id.toUpperCase()}
             </Text>
           </TouchableOpacity>
         ))}
@@ -1676,34 +1676,49 @@ export function AboutScreen() {
             the exploration screen, and a second door into the same component
             from inside SETTINGS is what the owner called the duplicate. */}
 
-        {tab === 'about' && (
-        <>
-          <Text style={styles.mono} onPress={handleOwnerTap}>{info}</Text>
-          {/* OTA-1490 — a quiet countdown once the ritual is clearly deliberate,
-              and a pointer to where the unlocked tool actually lives. */}
-          {!ownerTools && ownerTaps >= 3 && (
-            <Text style={styles.mono}>{`${7 - ownerTaps} more taps to unlock owner tools`}</Text>
-          )}
-          {ownerTools && ownerTaps > 0 && (
-            <Text style={styles.mono}>OWNER TOOLS UNLOCKED — crash bundles now push themselves</Text>
-          )}
-          {/* OTA-1638 — the weapon glyph key and what the discovery star means,
-              read from the same tables the combat buttons paint from. */}
-          <WeaponGlyphKey />
+        {/* ⚠⚠⚠ OTA-1667 — THE ABOUT TAB IS GONE AS A TAB. Owner: *"the about
+            tab, should that be there or should it just be wrapped up in the log?
+            it honestly doesn't mean anything to anyone but you and me."* He is
+            right about the block, and the log is where it already lives — every
+            COPY LOG export and every REPORT A BUG carries
+            `buildBasicDeviceSummary()`, so this screen was a THIRD copy of a
+            thing that already reaches me two better ways. What is left of it —
+            the dedication, the notices, and the seven-tap owner ritual — is one
+            page now, and the tab is called ABOUT because that is what a player
+            looking for a dedication and a licence list would tap.
+
+            ⚠ THE DEDICATION LEADS. It is the one thing on this page written for
+            a person rather than for a diagnosis, and it was previously the LAST
+            thing under a build-id dump nobody scrolls past. */}
+        {tab === 'notices' && (
+        <View>
           <View style={styles.dedication}>
-            <Text style={styles.dedicationRule}>· · ·</Text>
             <Text style={styles.dedicationBody}>
               For my wife and my children — who put up with a man who was always on his
               phone, building this. You were the reason I kept going, and the reason I
               should have looked up more. Thank you for the patience I did not earn.
             </Text>
             <Text style={styles.dedicationSign}>— Verbal</Text>
+            <Text style={styles.dedicationRule}>· · ·</Text>
           </View>
-        </>
-        )}
-
-        {tab === 'notices' && (
-        <View>
+          {/* ⚠ THE SEVEN-TAP RITUAL SURVIVES, ON THE SAME BLOCK. OTA-1490 made
+              the owner unlock device-sticky and gave it this gesture because a
+              name-based unlock cannot reach an install whose roster carries
+              ordinary names. Both the owner's phones depend on it, so it moved
+              with the text it is bound to rather than being rebuilt elsewhere. */}
+          <Text style={styles.mono} onPress={handleOwnerTap}>{info}</Text>
+          {!ownerTools && ownerTaps >= 3 && (
+            <Text style={styles.mono}>{`${7 - ownerTaps} more taps to unlock owner tools`}</Text>
+          )}
+          {ownerTools && ownerTaps > 0 && (
+            <Text style={styles.mono}>OWNER TOOLS UNLOCKED — crash bundles now push themselves</Text>
+          )}
+          {/* ⚠⚠ OTA-1667 — <WeaponGlyphKey /> LEFT THIS SCREEN ENTIRELY. Owner:
+              *"the weapon glyphs section should be under the lore button that
+              lives on the minimap, not in about — that should be easily player
+              facing."* It is the GLYPHS tab of the codex now, third in the row.
+              A key for symbols painted on combat buttons had no business behind
+              a gear icon under a build-id dump. */}
           <Text style={styles.noticesPreamble}>{NOTICES_PREAMBLE}</Text>
           <Text style={styles.noticesVerified}>
             Last verified: {NOTICES_VERIFIED_AT}
@@ -1744,7 +1759,7 @@ export function AboutScreen() {
         )}
       </ScrollView>
 
-      {tab === 'about' && (
+      {tab === 'notices' && (
         <TouchableOpacity style={styles.copyBtn} onPress={handleCopy} activeOpacity={0.7} accessibilityRole="button">
           <Text style={styles.copyText}>{copied ? 'COPIED' : 'COPY ALL'}</Text>
         </TouchableOpacity>

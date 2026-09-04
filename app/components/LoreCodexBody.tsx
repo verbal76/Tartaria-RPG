@@ -23,6 +23,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, TextInput } from 'react-native';
 import { BrandedModal } from './BrandedModal';
+import { WeaponGlyphKey } from './WeaponGlyphKey'; // OTA-1667 - the key moved out of Settings
 import factionsData from '../data/factions/factions.json';
 import racesData from '../data/races/races.json';
 import locationsData from '../data/locations/locations.json';
@@ -50,7 +51,7 @@ import {
 // OTA-845 — the FALLEN tab: an install-wide, cross-character memorial. Every character
 // who dies is remembered here (saveSystem.loadFallen), so a run ending is never a clean
 // wipe — later characters (and the title screen, between runs) can read who came before.
-type Section = 'races' | 'factions' | 'places' | 'timeline' | 'bestiary' | 'lore' | 'fallen';
+type Section = 'races' | 'factions' | 'places' | 'timeline' | 'bestiary' | 'lore' | 'fallen' | 'glyphs';
 
 /** ⚠⚠ OTA-1365 — TAB ORDER IS A GAMEPLAY DECISION, NOT AN ALPHABET.
  *  Owner: *"they are not organized in a fashion where the most used one for
@@ -67,7 +68,17 @@ type Section = 'races' | 'factions' | 'places' | 'timeline' | 'bestiary' | 'lore
  *    · LORE      — the concepts bank: browsed, rarely consulted under pressure.
  *    · TIMELINE  — history. The one nobody opens mid-fight.
  *  The row WRAPS, so first in this array really is top-left. */
-const TAB_ORDER: Section[] = ['bestiary', 'fallen', 'places', 'factions', 'races', 'lore', 'timeline'];
+/** ⚠⚠ OTA-1667 — GLYPHS JOINS THE ROW, THIRD. Owner: *"the weapon glyphs
+ *  section should be under the lore button that lives on the minimap, not in
+ *  about — that should be easily player facing."* It was buried in
+ *  Settings → ABOUT, under a build-id dump, behind a gear icon, which is the
+ *  last place a player mid-fight would look for "what does ⚗ mean".
+ *
+ *  Third by the same rule the rest of this row follows — how often it is opened
+ *  WHILE PLAYING. It sits behind BEASTS and FALLEN and ahead of PLACES because
+ *  the question it answers ("what is that symbol on my weapon button") is asked
+ *  from inside a fight, which is exactly when crossing the row costs the most. */
+const TAB_ORDER: Section[] = ['bestiary', 'fallen', 'glyphs', 'places', 'factions', 'races', 'lore', 'timeline'];
 
 /** Capitalised, because a tab row in lower case reads as unfinished next to
  *  every other heading on the screen. `bestiary` shows as BEASTS — the word the
@@ -75,6 +86,7 @@ const TAB_ORDER: Section[] = ['bestiary', 'fallen', 'places', 'factions', 'races
 const TAB_LABEL: Record<Section, string> = {
   bestiary: 'BEASTS',
   fallen: 'FALLEN',
+  glyphs: 'GLYPHS',
   places: 'PLACES',
   factions: 'FACTIONS',
   races: 'RACES',
@@ -452,6 +464,14 @@ export function LoreCodexBody() {
               );
             })}
           </>
+        )}
+        {/* ⚠⚠ OTA-1667 — GLYPHS. The weapon-button key, moved here from
+            Settings → ABOUT. The card itself is unchanged and still reads the
+            live `weaponGlyphs` tables the combat buttons paint from; only its
+            address changed, from a diagnostics page to the codex a player
+            already opens from the minimap. */}
+        {section === 'glyphs' && (
+          <WeaponGlyphKey />
         )}
         {/* OTA-837 — LORE. Surfaces the concepts bank (172 entries) that was already
             in the files feeding the Arbiter's context but never shown to the player.
