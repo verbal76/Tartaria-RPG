@@ -85,6 +85,13 @@ export interface CatalogArmor {
   // more. Additive on top of the piece's AC / stat bonuses.
   staminaRegen?: number;
   hpRegen?: number;
+  /** ⚠ OTA-1671 — BITE-BACK. Damage this piece returns to whatever lands a hit
+   *  on you, in the ATTACKER'S OWN damage type (the dog vest's
+   *  `reflectsCorruption` is always aetheric; this is not). Summed across worn
+   *  pieces and capped by ARMOR_REFLECT_CAP. Absent on most of the catalog on
+   *  purpose — the owner asked for it "sprinkled in periodically", not laddered
+   *  onto everything. */
+  reflect?: number;
 }
 
 export interface CatalogGear {

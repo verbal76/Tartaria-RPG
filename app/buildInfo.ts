@@ -27598,7 +27598,34 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // whatever its name says, so power really is unchanged. RESULT: intelligence
 // 18.1%, strength 17.7%, dexterity 17.4%, hp 16.3%, wisdom 14.2%, charisma 9.0%,
 // stealth 7.3% - and saved gear follows its row, keeping the rolled amount.
-export const OTA_BUILD_ID = '2026-09-04-1670-the-name-says-the-stat';
+// OTA-1671 — THE ARMOUR BITES BACK, AND THE DOG SECTION STOPS REPEATING ITSELF.
+// Owner: *"the dog armor doesn't need to say fits dog, if it didn't it wouldn't
+// be sorted into the dog armor area"*, and *"I really like the bites back buff to
+// the dog armor, we need that implement across our armour catalogue. Not every
+// piece obviously but it can be sprinkled in periodically."*
+// ⚠⚠ THE DELETION IS MEASURED, and my first draft got the reason wrong. I wrote
+// that the chip's predicate was a strict subset of the section's; on paper it is
+// a subset in neither direction. So I swept them: across all 905 catalog names x
+// four stored kinds, itemIsDogArmor and categorizeItem agree 3620 of 3620 times
+// - on everything a player can hold, the chip repeated the heading above it. ⚠
+// The one shape that DOES differ is one where the chip was the liar: a fused
+// piece stamped uniqueStats.kind 'armor' but carrying a dog_armor tag got [fits
+// dog] while sitting, correctly (OTA-688), under ARMOR. Removing the chip removes
+// the only row label that could contradict its own section. ota1671 holds both.
+// ⚠⚠⚠ AND THE BITE-BACK IS NOT THE VEST'S BITE-BACK. The dog vest always returns
+// AETHERIC (OTA-1640); player armour returns the ATTACKER'S OWN damage type - his
+// call when I put the choice to him, so a fire-breather burns itself on your
+// plate instead of the field becoming a second quieter aetheric channel. ⚠ NOT
+// name-driven, and the reason is measured: exactly TWO of 297 names already say
+// they hurt to touch, so driving the sprinkle off names would have meant renaming
+// ~30 pieces he owns one OTA after moving all their stats. The rule is CONTACT
+// instead - chest/hands/legs, the armour you are INSIDE, never a cloak or a hood
+// - skewed to Rare/Legendary, one in two of the eligible pool: 31 of 297 (10.4%).
+// Summed across worn pieces and capped at 8, because six slots can carry it and
+// uncapped the optimal play against a fast swinger is to stop swinging back. It
+// fires only on damage that GOT THROUGH, and a kill by it resolves as a defeat.
+export const OTA_BUILD_ID = '2026-09-04-1671-the-armour-bites-back';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-04-1670-the-name-says-the-stat';
 // golem catch-up 2026-09-04: markerless publish of OTA-1670 - the name says the
 // stat. All 297 armour rows redistributed by what their NAME implies, after
 // measuring dexterity at 35.8% of 827 stat rolls (double the next stat, leading

@@ -2483,7 +2483,8 @@
         "mud_dwellers"
       ],
       "description": "Aether-Woven Mud Plate. Rare chest armor from the Mud Dwellers tradition.",
-      "hpRegen": 1
+      "hpRegen": 1,
+      "reflect": 2
     },
     {
       "name": "Armor of the Mud King",
@@ -3033,7 +3034,8 @@
         "architectural_sentinels"
       ],
       "description": "Aetheric Bulwark of the Sentinel. Legendary chest armor from the Architectural Sentinels tradition.",
-      "staminaRegen": 1
+      "staminaRegen": 1,
+      "reflect": 3
     },
     {
       "name": "Rough-Hewn Chestplate",
@@ -3508,7 +3510,8 @@
         "chest",
         "unknowing_masses"
       ],
-      "description": "Battlecoat of the Wanderer. Rare chest armor from the Unknowing Masses tradition."
+      "description": "Battlecoat of the Wanderer. Rare chest armor from the Unknowing Masses tradition.",
+      "reflect": 2
     },
     {
       "name": "Forgotten King's Warplate",
@@ -3546,7 +3549,8 @@
         "chest",
         "unknowing_masses"
       ],
-      "description": "Forgotten King's Warplate. Legendary chest armor from the Unknowing Masses tradition."
+      "description": "Forgotten King's Warplate. Legendary chest armor from the Unknowing Masses tradition.",
+      "reflect": 3
     },
     {
       "name": "Mud-Stalker Leggings",
@@ -3853,7 +3857,8 @@
         "tartarian_giants"
       ],
       "description": "Architect's Aether Legplates. Rare legs armor from the Tartarian Giants tradition.",
-      "staminaRegen": 1
+      "staminaRegen": 1,
+      "reflect": 2
     },
     {
       "name": "Legplates of the Crown Titan",
@@ -4020,7 +4025,8 @@
         "reclaimers"
       ],
       "description": "Explorer's Aetheric Legplates. Rare legs armor from the Reclaimers tradition.",
-      "hpRegen": 1
+      "hpRegen": 1,
+      "reflect": 2
     },
     {
       "name": "Forgotten Wanderer's Greaves",
@@ -4055,7 +4061,8 @@
         "reclaimers"
       ],
       "description": "Forgotten Wanderer's Greaves. Legendary legs armor from the Reclaimers tradition.",
-      "staminaRegen": 1
+      "staminaRegen": 1,
+      "reflect": 3
     },
     {
       "name": "Sentinel's Mobile Greaves",
@@ -4185,7 +4192,8 @@
         "architectural_sentinels",
         "stealth"
       ],
-      "description": "Sentinel's Agile Legplates. Rare legs armor from the Architectural Sentinels tradition."
+      "description": "Sentinel's Agile Legplates. Rare legs armor from the Architectural Sentinels tradition.",
+      "reflect": 2
     },
     {
       "name": "Greaves of the Sentinel King",
@@ -4368,7 +4376,8 @@
         "legs",
         "mud_golems"
       ],
-      "description": "Golem-Sentry's Legplates. Rare legs armor from the Mud Golems tradition."
+      "description": "Golem-Sentry's Legplates. Rare legs armor from the Mud Golems tradition.",
+      "reflect": 2
     },
     {
       "name": "Legplates of the Stone King",
@@ -4406,7 +4415,8 @@
         "legs",
         "mud_golems"
       ],
-      "description": "Legplates of the Stone King. Legendary legs armor from the Mud Golems tradition."
+      "description": "Legplates of the Stone King. Legendary legs armor from the Mud Golems tradition.",
+      "reflect": 3
     },
     {
       "name": "Aether-Runner Greaves",
@@ -4700,7 +4710,8 @@
         "legs",
         "unknowing_masses"
       ],
-      "description": "Forgotten Hero's Greaves. Rare legs armor from the Unknowing Masses tradition."
+      "description": "Forgotten Hero's Greaves. Rare legs armor from the Unknowing Masses tradition.",
+      "reflect": 2
     },
     {
       "name": "Legplates of the Lost King",
@@ -4900,7 +4911,8 @@
         "true_tartarians"
       ],
       "description": "Mud-glass Scales. Overlapping shards of fired Aetheric silica, lashed onto a leather backing. Deflects an arrow point as readily as a fist — the silica shatters loudly on a real hit, which has saved more True Tartarians than the armour itself.",
-      "staminaRegen": 2
+      "staminaRegen": 2,
+      "reflect": 1
     },
     {
       "name": "Runic Mantle",
@@ -7276,7 +7288,8 @@
         "hands",
         "mud_dwellers"
       ],
-      "description": "Mud-Claw Gloves. Common hands armor from the Mud Dwellers tradition."
+      "description": "Mud-Claw Gloves. Common hands armor from the Mud Dwellers tradition.",
+      "reflect": 1
     },
     {
       "name": "Shaman's Warden Gloves",
@@ -7375,7 +7388,8 @@
         "mud_dwellers"
       ],
       "description": "Aether-Warden's Gloves. Rare hands armor from the Mud Dwellers tradition.",
-      "staminaRegen": 1
+      "staminaRegen": 1,
+      "reflect": 2
     },
     {
       "name": "Gauntlets of the Mud King",
@@ -7547,7 +7561,8 @@
         "tartarian_giants"
       ],
       "description": "Aetheric King's Gauntlets. Rare hands armor from the Tartarian Giants tradition.",
-      "staminaRegen": 1
+      "staminaRegen": 1,
+      "reflect": 2
     },
     {
       "name": "Gauntlets of the Giant Lord",
@@ -7586,7 +7601,8 @@
         "tartarian_giants"
       ],
       "description": "Gauntlets of the Giant Lord. Legendary hands armor from the Tartarian Giants tradition.",
-      "staminaRegen": 1
+      "staminaRegen": 1,
+      "reflect": 3
     },
     {
       "name": "Reclaimer's Gloves",
@@ -7749,7 +7765,8 @@
         "hands",
         "reclaimers"
       ],
-      "description": "Gauntlets of the Relic Seeker. Legendary hands armor from the Reclaimers tradition."
+      "description": "Gauntlets of the Relic Seeker. Legendary hands armor from the Reclaimers tradition.",
+      "reflect": 3
     },
     {
       "name": "Sentinel's Gauntlets",
@@ -8103,7 +8120,8 @@
         "hands",
         "mud_golems"
       ],
-      "description": "Gauntlets of the Stone King. Legendary hands armor from the Mud Golems tradition."
+      "description": "Gauntlets of the Stone King. Legendary hands armor from the Mud Golems tradition.",
+      "reflect": 3
     },
     {
       "name": "Aetheric Gauntlets",
@@ -8234,7 +8252,8 @@
         "hands",
         "aetherborn"
       ],
-      "description": "King's Aether Gauntlets. Rare hands armor from the Aetherborn tradition."
+      "description": "King's Aether Gauntlets. Rare hands armor from the Aetherborn tradition.",
+      "reflect": 2
     },
     {
       "name": "Gauntlets of the Aether Lord",
@@ -8269,7 +8288,8 @@
         "aetherborn"
       ],
       "description": "Gauntlets of the Aether Lord. Legendary hands armor from the Aetherborn tradition.",
-      "staminaRegen": 1
+      "staminaRegen": 1,
+      "reflect": 3
     },
     {
       "name": "Lost Seeker's Gloves",
@@ -8397,7 +8417,8 @@
         "hands",
         "unknowing_masses"
       ],
-      "description": "Gauntlets of the Wanderer. Rare hands armor from the Unknowing Masses tradition."
+      "description": "Gauntlets of the Wanderer. Rare hands armor from the Unknowing Masses tradition.",
+      "reflect": 2
     },
     {
       "name": "Gauntlets of the Lost King",
@@ -8464,7 +8485,8 @@
         "aether",
         "rare"
       ],
-      "description": "Aetheric Vest. Aether-thread cloth bound to a shard lattice — turns aside blade and stray Aetheric current alike."
+      "description": "Aetheric Vest. Aether-thread cloth bound to a shard lattice — turns aside blade and stray Aetheric current alike.",
+      "reflect": 2
     },
     {
       "name": "Tyrant's Crown",
@@ -8623,7 +8645,8 @@
         "boss",
         "legendary"
       ],
-      "description": "Matriarch's Carapace. A back-plate cut from the Voidspawn Matriarch's brood-shell. Cooled to glass, it weeps a faint resin that knits its own cracks."
+      "description": "Matriarch's Carapace. A back-plate cut from the Voidspawn Matriarch's brood-shell. Cooled to glass, it weeps a faint resin that knits its own cracks.",
+      "reflect": 3
     },
     {
       "name": "Reaver's Pauldron",
@@ -8829,7 +8852,8 @@
         "crafted"
       ],
       "description": "Aether-Wing Cloak. Spider silk stretched over the membrane of an Aether-Wing moth. Catches gusts that aren't quite there; the wearer moves a half-beat lighter.",
-      "staminaRegen": 1
+      "staminaRegen": 1,
+      "reflect": 2
     },
     {
       "name": "Mudstone Bulwark",
@@ -8862,7 +8886,8 @@
       "statBonus": {
         "stat": "hp",
         "amount": 30
-      }
+      },
+      "reflect": 2
     },
     {
       "name": "Hollow Crown Circlet",
@@ -9449,7 +9474,8 @@
         "aetherforged",
         "crafted"
       ],
-      "description": "Aether-tempered plate greaves, forged light. Rare crafted leg armor."
+      "description": "Aether-tempered plate greaves, forged light. Rare crafted leg armor.",
+      "reflect": 2
     },
     {
       "name": "Aetherforged Gauntlets",
@@ -9483,7 +9509,8 @@
         "aetherforged",
         "crafted"
       ],
-      "description": "Aether-tempered gauntlets that grip like a vise. Rare crafted hand armor."
+      "description": "Aether-tempered gauntlets that grip like a vise. Rare crafted hand armor.",
+      "reflect": 2
     },
     {
       "name": "Aetherforged Treads",
@@ -9585,7 +9612,8 @@
         "titanforged",
         "crafted"
       ],
-      "description": "A cuirass hammered around a boss-heart core — it shrugs off what would fell a lesser frame. Legendary crafted chest armor."
+      "description": "A cuirass hammered around a boss-heart core — it shrugs off what would fell a lesser frame. Legendary crafted chest armor.",
+      "reflect": 3
     },
     {
       "name": "Titanforged Greaves",
@@ -9791,7 +9819,8 @@
         "legendary",
         "collect_only"
       ],
-      "description": "Skyreacher Cuirass. Giant-forged plate re-sized for a climber's back, the core of the Skyreacher set — collected only atop the Grand Spire of Asgardar. Cannot be forged or bought."
+      "description": "Skyreacher Cuirass. Giant-forged plate re-sized for a climber's back, the core of the Skyreacher set — collected only atop the Grand Spire of Asgardar. Cannot be forged or bought.",
+      "reflect": 3
     },
     {
       "name": "Skyreacher Mantle",
@@ -9914,7 +9943,8 @@
         "loot",
         "legendary"
       ],
-      "description": "Titan Armor. An Iron Titan's chest-plating, cut down to fit a body a tenth its size. Nothing blunt gets through it; nothing quick gets out of it."
+      "description": "Titan Armor. An Iron Titan's chest-plating, cut down to fit a body a tenth its size. Nothing blunt gets through it; nothing quick gets out of it.",
+      "reflect": 3
     },
     {
       "name": "Knight Armor",
@@ -9957,7 +9987,8 @@
         "stone",
         "loot"
       ],
-      "description": "Golem Armor. Golem Knight plating, stone over iron, still warm from the furnace that drove it. Heavy as a wall."
+      "description": "Golem Armor. Golem Knight plating, stone over iron, still warm from the furnace that drove it. Heavy as a wall.",
+      "reflect": 2
     },
     {
       "name": "Lich Robe",

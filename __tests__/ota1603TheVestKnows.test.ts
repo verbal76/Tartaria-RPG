@@ -184,7 +184,16 @@ describe('OTA-1603 — the downstream sites all ask the one predicate', () => {
     const SCREEN = src('app/screens/InventoryScreen.tsx');
     expect(SCREEN).toContain('const pendingIsDogArmor = itemIsDogArmor(pending.item);');
     expect(SCREEN).toContain("(item.kind === 'consumable' || itemIsDogArmor(item))");
-    expect(SCREEN).toContain('const fitsDog = itemIsDogArmor(item);');
+    // ⚠⚠ OTA-1671 — THE `[fits dog]` CHIP LINE THAT USED TO BE PINNED HERE IS
+    // GONE, on the owner's instruction ("if it didn't it wouldn't be sorted into
+    // the dog armor area"), so the pin moves to the fact it was protecting: the
+    // ROW-level answer to "is this dog gear" must still survive a kind drift.
+    // That answer is now the section heading alone, and `categorizeItem` gives
+    // it — stated as behaviour on the drifted vest rather than as a line of
+    // source, the same move OTA-1654 made two lines above.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { categorizeItem } = require('../app/components/InventoryCategorize') as typeof import('../app/components/InventoryCategorize');
+    expect(categorizeItem(healSavedItem(drifted))).toBe('dog_armor');
   });
 
   it('⚠⚠ no active dog ≠ no affordance — the modal says who the vest is for (B15: refusals speak)', () => {

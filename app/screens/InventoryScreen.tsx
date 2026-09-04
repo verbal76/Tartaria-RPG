@@ -2683,7 +2683,8 @@ function ItemRow({
   // dogTreat in their catalog effect (or tagged with 'dog_treat' /
   // 'treat' on the inventory item itself for items dropped before
   // the catalog row existed).
-  const fitsDog = itemIsDogArmor(item); // OTA-1603 — the one predicate, not raw kind
+  // OTA-1671 — `fitsDog` retired with the chip it fed; the DOG ARMOR section
+  // heading is the label now. itemIsDogArmor still has plenty of callers.
   const isTreat = (item.tags ?? []).includes('dog_treat') || (() => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { findGearByName } = require('../engine/crafting');
@@ -2800,7 +2801,19 @@ function ItemRow({
               player can see at a glance which pack items are pouched. */}
           {isPouched && <Text style={[styles.rowMeta, styles.rowPouch]}>[scanner pouch]</Text>}
           {isBandoliered && <Text style={[styles.rowMeta, styles.rowBandolier]}>[bandolier]</Text>}
-          {fitsDog && <Text style={[styles.rowMeta, styles.rowDogTag]}>[fits dog]</Text>}
+          {/* ⚠⚠ OTA-1671 — [fits dog] IS GONE. Owner: *"the dog armor doesn't need
+              to say fits dog, if it didn't it wouldn't be sorted into the dog
+              armor area."* He is right, and it is MEASURED rather than assumed:
+              the chip fired on `itemIsDogArmor`, the heading on `categorizeItem`,
+              and across all 905 catalog names × four stored kinds those two
+              answers agree 3620 out of 3620 times. On everything a player can
+              hold, the chip repeated the heading it was sitting under.
+              ⚠ The single shape where they DO differ is one where the chip was
+              the liar: a fused piece stamped `uniqueStats.kind: 'armor'` that
+              still carries a dog_armor tag got `[fits dog]` while sitting —
+              correctly, per OTA-688 — under ARMOR. Deleting the chip removes the
+              only row-level label that could contradict its own section.
+              ota1671 holds both facts. */}
           {isTreat && <Text style={[styles.rowMeta, styles.rowDogTag]}>[treat]</Text>}
           {/* OTA 028 — surface the weapon's damage dice next to
               durability so the player can compare swords at a

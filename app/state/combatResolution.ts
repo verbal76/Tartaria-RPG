@@ -72,7 +72,7 @@ import {
 import { ACID_SHRED_DECAY_PER_ROUND, COATING_DOT_TURNS } from '../engine/weaponCoating';
 import { effectiveAC } from '../engine/raceMechanics';
 import { trainStat } from '../engine/statTraining';
-import { ARMOR_SLOTS, effectiveStats, aggregateEquippedStatBonuses, resolveEquippedItem, trimStandingAc, equippedGearAc, heldShieldAc, RING_SLOTS } from '../engine/equipment';
+import { ARMOR_SLOTS, effectiveStats, aggregateEquippedStatBonuses, resolveEquippedItem, trimStandingAc, equippedGearAc, heldShieldAc, RING_SLOTS, aggregateEquippedReflect } from '../engine/equipment';
 import { equippedAccessoryPowers } from '../engine/accessoryEffects';
 // OTA-1650 — the dog's vest is durable now; this knows where it lives.
 import { dogVestInstance, COMPANION_FRAY_AT } from '../engine/companionGear';
@@ -2647,6 +2647,44 @@ function applyEnemyCounter(
     // protecting. Uses the final post-mitigation damage, so a clean parry
     // (dmg 0) shields them too.
     applyEscortDamage(get, set, dmg, enemy.name);
+
+    // ⚠⚠⚠ OTA-1671 — AND THE ARMOUR BITES BACK, IN THE ATTACKER'S OWN ELEMENT.
+    // Owner: *"I really like the bites back buff to the dog armor, we need that
+    // implemented across our armour catalogue. Not every piece obviously but it
+    // can be sprinkled in periodically."*
+    //
+    // ⚠ TYPED BY WHAT HIT YOU, which was his call when I put the choice to him.
+    // The dog vest (OTA-1640) always returns aetheric; player armour returns
+    // `enemyDamageType`, so a fire-breather burns itself on your spiked plate and
+    // a clawed thing cuts itself. One field means something different every
+    // encounter rather than being a second, quieter aetheric channel.
+    //
+    // ⚠⚠ IT FIRES ONLY WHEN THE HIT ACTUALLY GOT THROUGH (`dmg > 0`), the same
+    // post-mitigation rule the escort line above uses. A blow that was wholly
+    // parried or soaked did not sink into the spikes, and paying reflect on it
+    // would make a perfect defence also the best offence.
+    const reflectBack = dmg > 0 && !killed ? aggregateEquippedReflect(player) : 0;
+    if (reflectBack > 0) {
+      const sc = get().currentScene;
+      const ri = sc ? sc.enemies.findIndex((e) => e === enemy) : -1;
+      const rAt = ri >= 0 ? ri : (sc ? sc.enemies.findIndex((e, i) => e.name === enemy.name && (sc.enemyHps[i] ?? 0) > 0) : -1);
+      if (sc && rAt >= 0) {
+        const rBefore = sc.enemyHps[rAt] ?? 0;
+        const rAfter = Math.max(0, rBefore - reflectBack);
+        set((st) => (st.currentScene
+          ? { currentScene: { ...st.currentScene, enemyHps: st.currentScene.enemyHps.map((hp, i) => (i === rAt ? rAfter : hp)) } }
+          : st));
+        get().appendLog('combat', `Your armour turns the blow back — ${enemy.name} takes ${reflectBack} ${enemyDamageType}. (${rAfter} HP left)`);
+        // ⚠ A kill by reflect goes through resolveEnemyDefeat exactly as the dog
+        // vest's does (OTA-1640), so loot, credit and the mission slate all fire.
+        // An enemy that dies to your own armour is still an enemy you defeated.
+        if (rBefore > 0 && rAfter <= 0) {
+          get().appendLog('world', `${enemy.name} drops, undone by what it spent on you.`);
+          set((st) => (st.currentScene ? { currentScene: { ...st.currentScene, activeEnemyIdx: rAt } } : st));
+          get().resolveEnemyDefeat();
+        }
+      }
+    }
 
     // OTA-936 — LEGIBILITY CUES (once per encounter, after the damage line). A matched
     // resist that soaked >=40% earns one plain-language callout; an elemental hit that

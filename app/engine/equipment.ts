@@ -639,6 +639,34 @@ export const HP_REGEN_CAP = 2;
  *  piece (head / chest / legs / feet / hands / cloak), clamped to the caps.
  *  Returns whole-number amounts to add to the player's stamina / HP on each
  *  action. Weapons / amulets / rings don't carry regen. */
+/** ⚠⚠⚠ OTA-1671 — THE ARMOUR BITES BACK, AND IT BITES IN THE ATTACKER'S OWN
+ *  ELEMENT. Owner: *"I really like the bites back buff to the dog armor, we need
+ *  that implement across our armour catalogue. Not every piece obviously but it
+ *  can be sprinkled in periodically."*
+ *
+ *  ⚠ THE DOG VEST ALWAYS RETURNS AETHERIC (OTA-1640). Player armour returns the
+ *  damage type of whatever just hit you, which was the owner's call when I put
+ *  the choice to him — a fire-breather burns itself on your spiked plate, a
+ *  clawed thing cuts itself. It makes the same field mean something different on
+ *  every encounter instead of being a second, quieter aetheric channel.
+ *
+ *  ⚠⚠ SUMMED ACROSS WORN PIECES, THEN CAPPED. Six slots means a full thorn set
+ *  is reachable, and an uncapped sum would turn standing still into the optimal
+ *  strategy against anything that swings fast. The cap is the same shape as
+ *  HP_REGEN_CAP above and exists for the same reason. */
+export const ARMOR_REFLECT_CAP = 8;
+
+export function aggregateEquippedReflect(player: PlayerCharacter): number {
+  const eq = player.equipped ?? {};
+  let total = 0;
+  for (const slot of ARMOR_SLOTS) {
+    const name = eq[slot];
+    if (!name) continue;
+    total += Math.max(0, findArmorByName(name)?.reflect ?? 0);
+  }
+  return Math.min(ARMOR_REFLECT_CAP, total);
+}
+
 export function aggregateEquippedRegen(player: PlayerCharacter): { stamina: number; hp: number } {
   const eq = player.equipped ?? {};
   let stamina = 0;

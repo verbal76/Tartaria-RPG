@@ -505,6 +505,11 @@ function previewArmor(a: CatalogArmor): ItemPreview {
   // exactly the same.
   const regen = regenLine(a);
   if (regen) stats.push(regen);
+  // ⚠ OTA-1671 — the bite-back says WHAT it returns, and the answer is "whatever
+  // hit you". The dog vest's line names aetheric because that vest always
+  // returns aetheric; this one must not, or the card promises a type the engine
+  // will not pay (the OTA-1611 lie).
+  if (a.reflect) stats.push(`Bites back: ${a.reflect} damage to whatever hits you, in its own element`);
   if (a.baseDurability !== undefined) stats.push(`Durability: ${a.baseDurability}`);
   return {
     name: a.name, kindLabel: `${slotLabel} Armor`, slot: a.slot, rarity: a.rarity,
