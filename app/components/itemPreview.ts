@@ -15,6 +15,7 @@ import {
   type CatalogGear,
   type CatalogMaterial,
   type CatalogDogGear,
+  isRecipeIngredientName,
 } from '../engine/crafting';
 import {
   inferWeapon,
@@ -29,6 +30,9 @@ import { rangedClassLabel, reachClassFor } from '../engine/combatRules';
 // parser the combat gate reads so the card can never promise a band or a pierce
 // the swing then refuses.
 import { parseWeaponEffect, applyRangeNote } from '../engine/weaponEffects';
+// OTA-1668 — the same glyph the combat buttons paint and the codex GLYPHS tab
+// explains, so a shop row and a swing say the damage type the same way.
+import { baseDamageGlyph } from '../engine/weaponGlyphs';
 import { reachBandsFor, RANGE_LABELS } from '../engine/types';
 // OTA-1561 — what a rune-caster takes instead of a coating, and which stat it
 // will scale on, said on the item card rather than only at the Crucible.
@@ -44,6 +48,20 @@ export type ItemPreview = {
   description: string;
   /** Compact list of mechanical lines: "Damage: 2d6 (slashing)", "AC +2", etc. */
   stats: string[];
+  /** ⚠⚠ OTA-1668 — ONE LINE THAT SAYS WHAT IT IS AND WHAT IT DOES, for a row a
+   *  player is scanning rather than reading. Owner, about the vendor's WORKINGS
+   *  TO LEARN list: *"the things you buy need more than a name, they need to
+   *  tell you what they are and what they do on the button line. I understand
+   *  that if you tap on it you get the full detailed view but that's an extra
+   *  step. If I know it's an axe with electric base damage and it's a 2d10 then
+   *  it helps me choose faster."*
+   *
+   *  ⚠ It is BUILT here, not assembled by the caller out of `stats`. A caller
+   *  slicing `stats` would have to parse "Damage: 2d10 (electrical)" back into
+   *  its parts — and the first screen to get that regex slightly wrong prints a
+   *  weapon's durability where its damage should be. Each preview branch knows
+   *  its own facts, so each writes its own headline. */
+  headline: string;
   /** OTA-1038 — the equip slot for armor ('head' | 'chest' | 'legs' | 'cloak' |
    *  'feet' | 'hands'), absent for everything else. It was already baked into
    *  `kindLabel` as prose ("Hands Armor"), which meant any caller wanting to
@@ -124,6 +142,11 @@ export function getItemPreviewForInstance(item: {
       rarity: u.rarity,
       description: item.description ?? '',
       stats: withAddedResists(stats, item.addedResists),
+      headline: composeHeadline(
+        kindLabel,
+        damageClause(u.damageDice, u.damageType),
+        u.acBonus !== undefined ? `AC +${u.acBonus}` : null,
+      ),
     };
   }
 
@@ -163,7 +186,24 @@ export function getItemPreviewForInstance(item: {
     : catalogDur;
   if (durLine) stats.push(durLine);
 
-  return { ...base, stats: withAddedResists(stats, item.addedResists) };
+  // ⚠ OTA-1668 — THE HEADLINE FOLLOWS THE INSTANCE, NOT THE CATALOG. A plain
+  // `{...base}` would carry the catalog's AC onto a piece whose AC was ROLLED,
+  // so the row and the card would disagree about the same object — the OTA-1611
+  // defect in a new place. Rebuild it from the lines this instance actually has.
+  const finalStats = withAddedResists(stats, item.addedResists);
+  //
+  // ⚠ Splitting on ' · ' here is the exact inverse of composeHeadline's join —
+  // a separator this file owns — NOT a regex over prose. The damage clause is
+  // carried through UNTOUCHED rather than re-derived, because an instance never
+  // changes a weapon's dice or type; only AC and attribute perks are rolled.
+  const kept = base.headline.split(' · ')
+    .filter((seg) => !isAcLine(seg) && !isStatLine(seg));
+  const instAc = finalStats.find(isAcLine) ?? null;
+  const instStat = finalStats.find(isStatLine) ?? null;
+  const headline = instAc || instStat
+    ? composeHeadline(kept.join(' · '), instAc, instStat)
+    : base.headline;
+  return { ...base, stats: finalStats, headline };
 }
 
 // Resolve an item name to a previewable summary. Used by the buy / equip /
@@ -241,6 +281,58 @@ export function getItemPreview(itemName: string): ItemPreview {
   // Otherwise treat as inferred gear (consumable / light / rope /
   // generic) so we still surface a description.
   return previewGear(inferGear(itemName));
+}
+
+
+/** ⚠⚠ OTA-1668 — THE ROW LINE. Joins a kind with the one or two facts that
+ *  decide a purchase, skipping anything absent, so a row reads
+ *  `Melee Weapon · ⚔ 2d10 slashing · STR` rather than a name and a price.
+ *  Every branch of this file passes its OWN values in; nothing here parses a
+ *  `stats` string back apart, which is the mistake that would eventually print
+ *  a weapon's durability where its damage belongs. */
+function composeHeadline(kindLabel: string, ...bits: (string | null | undefined)[]): string {
+  return [kindLabel, ...bits].filter((b): b is string => !!b && b.length > 0).join(' · ');
+}
+
+/** The damage clause a weapon row shows: glyph, dice, type. The glyph is the
+ *  one the combat button paints (OTA-1636) and the codex GLYPHS tab explains
+ *  (OTA-1667), so the shop and the fight teach the same symbol. */
+function damageClause(dice: string | undefined, type: string | undefined): string | null {
+  if (!dice || !type) return null;
+  const g = baseDamageGlyph(type);
+  return `${g ? `${g} ` : ''}${dice} ${type.toLowerCase()}`;
+}
+
+
+/** ⚠⚠⚠ OTA-1668 — WHAT LOOT IS FOR, said on the item. Owner: *"we need to define
+ *  what loot is in the inventory. It's just there, but what is it for?"*
+ *
+ *  ⚠ IT ALREADY HAD A JOB AND NEVER SAID SO. `isForgeableLootReagent` has fed
+ *  'loot'-tagged drops to the Fusing Crucible since OTA-737, and OTA-1642
+ *  authored 86 enemy drops specifically to keep that hopper full. A player
+ *  reading their pack had no way to learn any of it, so 175 catalog materials
+ *  looked like the same undifferentiated pile.
+ *
+ *  ⚠⚠ AND THE ANSWER IS NOT ONE ANSWER — THE ENGINE ALREADY SPLITS THEM IN TWO,
+ *  which is the reason a blanket label would have been a lie. A drop used by any
+ *  recipe is DELIBERATELY excluded from the Crucible (`isRecipeIngredientName`
+ *  in isForgeableLootReagent) so fusing can never cannibalise crafting. So:
+ *    · named by a recipe  → a crafting ingredient, and the forge will not eat it
+ *    · loot-tagged, not   → Crucible fodder
+ *    · neither            → nothing claimed; it is worth what a vendor pays.
+ *  This reads the SAME predicates the bench enforces, so the label and the
+ *  refusal can never disagree. */
+export function lootPurposeLine(item: { name: string; kind?: string; tags?: readonly string[] }): string | null {
+  if (isRecipeIngredientName(item.name)) return 'crafting ingredient';
+  // Lazily required: itemFusion reaches equipment/crafting and this module is
+  // imported by the store, so a static import would close a cycle — the same
+  // reason accessoryEffects below is lazy.
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { isForgeableLootReagent } = require('../engine/itemFusion') as typeof import('../engine/itemFusion');
+    if (isForgeableLootReagent(item)) return 'Crucible fodder';
+  } catch { /* the label is a courtesy; never let it cost a row */ }
+  return null;
 }
 
 function previewWeapon(w: CatalogWeapon): ItemPreview {
@@ -381,7 +473,14 @@ function previewWeapon(w: CatalogWeapon): ItemPreview {
     stats.push(`Crucible: up to ${slots} passives, scaling with ${String(rs).slice(0, 3).toUpperCase()}`);
   }
   if (w.baseDurability !== undefined) stats.push(`Durability: ${w.baseDurability}`);
-  return { name: w.name, kindLabel, rarity: w.rarity, description: w.description, stats };
+  return {
+    name: w.name, kindLabel, rarity: w.rarity, description: w.description, stats,
+    headline: composeHeadline(
+      kindLabel,
+      damageClause(w.damageDice, w.damageType),
+      `${w.stat.toUpperCase().slice(0, 3)}`,
+    ),
+  };
 }
 
 function previewArmor(a: CatalogArmor): ItemPreview {
@@ -407,7 +506,15 @@ function previewArmor(a: CatalogArmor): ItemPreview {
   const regen = regenLine(a);
   if (regen) stats.push(regen);
   if (a.baseDurability !== undefined) stats.push(`Durability: ${a.baseDurability}`);
-  return { name: a.name, kindLabel: `${slotLabel} Armor`, slot: a.slot, rarity: a.rarity, description: a.description, stats };
+  return {
+    name: a.name, kindLabel: `${slotLabel} Armor`, slot: a.slot, rarity: a.rarity,
+    description: a.description, stats,
+    headline: composeHeadline(
+      `${slotLabel} Armor`,
+      `AC +${a.acBonus}`,
+      a.statBonus ? `${a.statBonus.stat.toUpperCase().slice(0, 3)} +${a.statBonus.amount}` : null,
+    ),
+  };
 }
 
 /** OTA-1640 — a dog vest's card says what the vest does for the DOG, in the same
@@ -420,7 +527,14 @@ function previewDogGear(d: CatalogDogGear): ItemPreview {
   if (d.reflectsCorruption) stats.push(`Bites back: ${d.reflectsCorruption} aetheric to whatever hits the dog`);
   if (d.faction) stats.push(`Faction: ${d.faction}`);
   if (d.baseDurability !== undefined) stats.push(`Durability: ${d.baseDurability}`);
-  return { name: d.name, kindLabel: 'Dog Vest', rarity: d.rarity, description: d.description, stats };
+  return {
+    name: d.name, kindLabel: 'Dog Vest', rarity: d.rarity, description: d.description, stats,
+    headline: composeHeadline(
+      'Dog Vest',
+      `AC +${d.acBonus}`,
+      d.reflectsCorruption ? 'bites back' : null,
+    ),
+  };
 }
 
 /** OTA-1160 — ONE spelling of the regen line, so the row, the preview and the fused
@@ -483,7 +597,12 @@ function previewAccessory(x: CatalogAccessory, kind: 'Amulet' | 'Ring'): ItemPre
     stats.push(`Discharges ${ae.BURST_DAMAGE[x.rarity]} ${x.burst.damageType} at ${x.burst.bands.join('/')} range — once per fight`);
   }
   if (x.baseDurability !== undefined) stats.push(`Durability: ${x.baseDurability}`);
-  return { name: x.name, kindLabel: kind, rarity: x.rarity, description: x.description, stats };
+  return {
+    name: x.name, kindLabel: kind, rarity: x.rarity, description: x.description, stats,
+    // An accessory's whole point is its one effect, and stats[0] IS that effect
+    // for every branch above — there is no dice/AC pair to name instead.
+    headline: composeHeadline(kind, stats[0] ?? null),
+  };
 }
 
 /** Lazy require — accessoryEffects reaches equipment.ts, and gameStore imports
@@ -574,7 +693,10 @@ function previewGear(g: CatalogGear): ItemPreview {
     stats.push('Restores: 2d6 HP (~7 avg)');
   }
   if (g.tags.length > 0) stats.push(`Tags: ${g.tags.slice(0, 4).join(', ')}`);
-  return { name: g.name, kindLabel, rarity: g.rarity, description: g.description, stats };
+  return {
+    name: g.name, kindLabel, rarity: g.rarity, description: g.description, stats,
+    headline: composeHeadline(kindLabel, stats.find((l) => l.startsWith('Restores:')) ?? null),
+  };
 }
 
 function previewMaterial(m: CatalogMaterial): ItemPreview {
@@ -584,5 +706,6 @@ function previewMaterial(m: CatalogMaterial): ItemPreview {
     rarity: m.rarity,
     description: m.description,
     stats: m.tags.length > 0 ? [`Tags: ${m.tags.slice(0, 4).join(', ')}`] : [],
+    headline: composeHeadline('Material', lootPurposeLine(m)),
   };
 }

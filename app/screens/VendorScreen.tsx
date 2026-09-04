@@ -4,7 +4,7 @@ import { useGameStore, vendorNpcId } from '../state/gameStore';
 import { FirstTimeHint } from '../components/FirstTimeHint';
 import { BrandedModal } from '../components/BrandedModal';
 import { VendorContractsModal } from '../components/VendorContractsModal';
-import { getItemPreview, getItemPreviewForInstance } from '../components/itemPreview';
+import { getItemPreview, getItemPreviewForInstance, lootPurposeLine } from '../components/itemPreview';
 import { validSlotsForItem, SLOT_LABEL, equippedInstanceIds, effectiveStats } from '../engine/equipment';
 import type { EquipSlot, InventoryItem } from '../engine/types';
 import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
@@ -829,6 +829,27 @@ export function VendorScreen() {
                             recipe{preview.rarity ? ` · ${preview.rarity}` : ''} · learn to craft
                           </Text>
                         </View>
+                        {/* ⚠⚠⚠ OTA-1668 — WHAT THE WORKING MAKES, on the row.
+                            Owner: *"at workings to learn at a vendor, the things
+                            you buy need more than a name, they need to tell you
+                            what they are and what they do on the button line. I
+                            understand that if you tap on it you get the full
+                            detailed view but that's an extra step. If I know
+                            it's an axe with electric base damage and it's a 2d10
+                            then it helps me choose faster."*
+
+                            ⚠ This list was the ONLY buy surface with no such
+                            line — the ordinary offer rows above have carried
+                            kind + stats for OTAs. A recipe row said the result's
+                            NAME, its price, and the word "recipe", so choosing
+                            between two workings meant tapping both and backing
+                            out of one. The headline comes from the same
+                            getItemPreview the confirm sheet reads, so the row
+                            and the sheet can never disagree, and the damage
+                            glyph is the one the combat button paints. */}
+                        {preview.headline ? (
+                          <Text style={styles.offerStats} numberOfLines={1}>{preview.headline}</Text>
+                        ) : null}
                       </TouchableOpacity>
                     </View>
                   );
@@ -954,8 +975,19 @@ export function VendorScreen() {
                       <Text style={styles.sellPrice}>+{price} TC{(() => { const t = priceArrow(price, base, 'sell'); return t ? <Text style={t.good ? styles.tickGood : styles.tickBad}> {t.glyph}</Text> : null; })()}</Text>
                     </View>
                     <View style={styles.offerSubHead}>
+                      {/* ⚠⚠ OTA-1668 — AND THE SELL ROW SAYS WHAT LOOT IS FOR.
+                          Owner: *"we need to define what loot is in the
+                          inventory. It's just there, but what is it for?"* The
+                          vendor list is exactly where that question gets asked
+                          and answered wrongly — the moment before you sell
+                          something the Crucible wanted. `lootPurposeLine` reads
+                          the same predicates the bench enforces, so a row
+                          promising "Crucible fodder" is one the forge will take,
+                          and a recipe ingredient says so rather than looking
+                          like the same anonymous pile. */}
                       <Text style={styles.offerKind} numberOfLines={1}>
                         {preview.kindLabel}{preview.rarity ? ` · ${preview.rarity}` : ''}
+                        {(() => { const lp = lootPurposeLine(item); return lp ? ` · ${lp}` : ''; })()}
                       </Text>
                       {item.durability && (
                         <Text style={styles.offerOwned}>

@@ -27538,7 +27538,28 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // report, so the tab was a third copy of it. The dedication, the seven-tap owner
 // ritual and the third-party notices are one page now, called ABOUT, with the
 // dedication leading instead of buried underneath diagnostics.
-export const OTA_BUILD_ID = '2026-09-04-1667-the-key-goes-where-the-player-is';
+// OTA-1668 — THE ROW SAYS WHAT IT IS AND WHAT IT DOES. Owner: *"at workings to
+// learn at a vendor, the things you buy need more than a name, they need to tell
+// you what they are and what they do on the button line… if I know it's an axe
+// with electric base damage and it's a 2d10 then it helps me choose faster."* He
+// named the one buy surface that had nothing: the ordinary offer rows have
+// carried kind + stats for many OTAs, while WORKINGS TO LEARN printed a name, a
+// price and the word "recipe", so comparing two workings meant opening both.
+// ⚠ THE HEADLINE IS BUILT AT THE SOURCE — each itemPreview branch writes its own
+// from values it already holds, rather than every caller regexing "Damage: 2d10
+// (electrical)" back apart, which is how a screen ends up printing durability
+// where damage belongs. The damage glyph is the one the combat button paints and
+// the codex GLYPHS tab explains, so the shop and the fight teach one symbol.
+// ⚠⚠⚠ AND LOOT FINALLY SAYS WHAT IT IS FOR (*"it's just there, but what is it
+// for?"*). It already had a job — isForgeableLootReagent has fed the Crucible
+// since OTA-737 and OTA-1642 authored 86 drops to keep it fed — and never said
+// so. But the answer is NOT one answer: a drop named by any recipe is
+// deliberately excluded from fusing so it cannot cannibalise crafting, so
+// lootPurposeLine reads those same two predicates and says "crafting ingredient"
+// or "Crucible fodder" or nothing at all. The label and the bench's refusal
+// cannot disagree.
+export const OTA_BUILD_ID = '2026-09-04-1668-the-row-says-what-it-does';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-04-1667-the-key-goes-where-the-player-is';
 // golem catch-up 2026-09-04: markerless publish of OTA-1667 - the key goes where
 // the player is. The WEAPON GLYPHS card moved from Settings to the lore codex as
 // a GLYPHS tab (third, behind BEASTS and FALLEN), the SETTINGS ABOUT tab folded
