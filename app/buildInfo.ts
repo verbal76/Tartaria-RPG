@@ -27280,6 +27280,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (a rack is one of three and exists to be glanceable, unlike a category), and the
 // COUNT STAYS ON THE HEADER WHEN FOLDED so the space saved costs no information.
 export const OTA_BUILD_ID = '2026-09-04-1657-the-healing-pouch';
+// golem catch-up 2026-09-04: markerless publish of OTA-1657 - the healing pouch,
+// and three racks that fold. Three pockets, each holding a whole STACK, so his
+// 5 kits / 3 rations / 10 berries fits; the tap calls useInventoryItem so a heal
+// from the pouch IS a heal from the pack; the button sits on the combat row AND
+// the exploration row because patching up on the road was half the ask; and the
+// scanner pouch, bandolier and healing pouch now fold through one shared
+// RackFrame in the same chevron grammar as the inventory categories, keeping the
+// loaded count on the header so folding costs no information. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-04-1656-the-blade-you-can-see';
 // golem catch-up 2026-09-04: markerless publish of OTA-1656 - the blade you can
 // see. Coatings were already on 24.3% of spawns and drawn NOWHERE, so the enemy
