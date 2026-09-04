@@ -27389,6 +27389,19 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // correctly and were repointed, ota1489 to the honesty half it was really
 // making and ota1490 to the no-tap bundle the sticky unlock now fronts.
 export const OTA_BUILD_ID = '2026-09-04-1661-anyone-testing-can-push-a-log';
+// golem catch-up 2026-09-04: markerless publish of OTA-1661 - anyone testing
+// can push a log. Owner: "anyone testing should be able to push a log." SEND LOG
+// was owner-gated on a sound privacy argument that had the effect of making
+// every tester outside a two-name list email a clipboard paste - which is what
+// both his daughters did tonight, from devices whose transport was already
+// working. So the POLICY moved rather than the promise being bent:
+// docs/PRIVACY.md gains a "Sending a log yourself" section naming the contents,
+// the two deliberate taps and the switch that disables it, plus a Children
+// paragraph saying a sent log includes what was typed. Consent is a real step -
+// one tap arms and explains, a second sends, leaving cancels. What did NOT open
+// is the OTA-1505 auto-bundle, which uploads the same payload with no tap: that
+// is collection, not consent, and a test asserts the two gates stay different.
+// hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-04-1660-both-daughters-can-push-a-log';
 // golem catch-up 2026-09-04: markerless publish of OTA-1660 - both daughters
 // can push a log. Owner asked why they couldn't; both girls then answered it
