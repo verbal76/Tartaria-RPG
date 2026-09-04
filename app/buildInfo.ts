@@ -27257,6 +27257,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // fingers of passive value for four openings; four copies of one ring is that
 // trade with the cost removed.
 export const OTA_BUILD_ID = '2026-09-04-1656-the-blade-you-can-see';
+// golem catch-up 2026-09-04: markerless publish of OTA-1656 - the blade you can
+// see. Coatings were already on 24.3% of spawns and drawn NOWHERE, so the enemy
+// card gets the glyph inline and the popup names the kind, the dice and what
+// answers it; then the rate moves to a roster-weighted 30.23% (8/20/33/47, boss
+// 60) with commons kept gentle. Dice up one step to restore what OTA-1646's
+// shield-halving took from the one mechanic that cannot be stacked out of
+// existence. SHIELD_BYPASS_FLOOR 10% so armour is never idle for a whole fight
+// (49% of the roster could not bypass at all). And one ring is one burst - four
+// farmed copies were 200 flat AoE on the opening tap. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-03-1655-the-card-is-asked';
 // golem catch-up 2026-09-03: markerless publish of OTA-1655 - the card is asked,
 // not read. The 24-hour audit scored all twenty OTAs by HOW they prove
