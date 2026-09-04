@@ -27692,6 +27692,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (b), a reload-boot killed by an orphaned native context. This is what tells
 // them apart. Measure the cause, or ship an instrument. This is the instrument.
 export const OTA_BUILD_ID = '2026-09-04-1674-the-dead-life-answers';
+// golem catch-up 2026-09-04: markerless publish of OTA-1674 - the dead life
+// answers for itself. Not the fix for #110; the instrument the previous one
+// turned out to be missing. OTA-1587's handoff is consumed on read by the life
+// that then DIES, so the next boot found none, computed afterOtaApply:false
+// about itself, and wrote that onto the dead life's record - a death record
+// could never say "yes", and "not an OTA-apply boot" on eight of ten was the
+// only value the field could take. The fact now rides the crumb, stamped by the
+// life it describes; undefined stays undefined and prints as "not known". Also:
+// non-fatal reclaims stop printing PROCESS KILLED and are counted apart in the
+// header; the launch block finally reaches Sentry. No boot-phase exemption -
+// this is what tells a splash force-close from a reload-boot OOM apart.
+// hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-04-1673-one-scanner-per-band';
 // golem catch-up 2026-09-04: markerless publish of OTA-1673 - one scanner per
 // band. A scanner you already carry is not buildable again, read off the
