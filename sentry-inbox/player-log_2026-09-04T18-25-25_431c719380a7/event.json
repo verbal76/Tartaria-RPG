@@ -1,0 +1,275 @@
+{
+  "id": "431c719380a74b6694806c36e79040fd",
+  "groupID": "7712386239",
+  "eventID": "431c719380a74b6694806c36e79040fd",
+  "projectID": "4511945117532160",
+  "size": 18173,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-04-1667-the-key-goes-where-the-player-is #mtnaawyn2pyt [inline 10/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1667-the-key-goes-where-the-player-is",
+  "message": "player-log 2026-09-04-1667-the-key-goes-where-the-player-is #mtnaawyn2pyt [inline 10/28]",
+  "title": "player-log 2026-09-04-1667-the-key-goes-where-the-player-is #mtnaawyn2pyt [inline 10/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "86ae1806afea4e0cb02be19e62f94e9c",
+      "span_id": "958387190fe27c30",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "xus\" \u2205 5939ms\n[2026-09-04T02:18:54.285Z] [debug] voice\u23f1 gap 1415ms (wait 299ms + synth 1112ms, live) \"Welcome to tar taireea.\"\n[2026-09-04T02:19:23.317Z] [debug] voice\u23f1 gap 794ms (wait 1ms + synth 778ms, live) \"Choose your character.\"\n[2026-09-04T02:19:26.052Z] [debug] appstate: active \u2192 background (was active for 113931ms)\n",
+      "[2026-09-04T02:37:49.347Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a06a25-33c7-7c0a-8a1c-ecd725129ac6\n[2026-09-04T02:37:49.347Z] [debug] ota: Checking\u2026\n[2026-09-04T02:37:57.280Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-09-04T02:37:57.377Z] [debug] ota: Saving progress\u2026\n[2026-09-04T02:37:57.378Z] [debug] ota: Restarting to apply\u2026\n",
+      "[2026-09-04T02:37:57.591Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a06a40-9d6d-7373-95fe-10842df169a4\n[2026-09-04T02:37:57.591Z] [debug] ota: Checking\u2026\n[2026-09-04T02:37:57.691Z] [debug] ota: Already up to date\n[2026-09-04T02:37:57.692Z] [debug] ota: boot check result = noUpdate\n",
+      "[2026-09-04T02:37:57.730Z] [debug] send-log: bundle #mtm6enrfz3iy spent all 5 attempts \u2014 cleared\n[2026-09-04T02:37:57.733Z] [debug] voice: engine=bundled tts=on voice=am_michael\n[2026-09-04T02:37:57.733Z] [debug] voice: bundled loading\n[2026-09-04T02:38:01.193Z] [debug] voice: bundled ready\n",
+      "[2026-09-04T02:38:02.205Z] [debug] voice\u23f1 gap 952ms (wait 117ms + synth 822ms, live) \"Choose your character.\"\n[2026-09-04T02:38:04.818Z] [debug] OTA applied: 2026-09-04-1659-the-is-not-in-the-lexicon \u2192 2026-09-04-1660-both-daughters-can-push-a-log.\n[2026-09-04T02:38:04.818Z] [debug] OTA session start: 2026-09-04-1660-both-daughters-can-push-a-log.\n",
+      "[2026-09-04T02:38:04.819Z] [world] You step back into Mud Flood Nexus. The world waits for your move.\n[2026-09-04T02:38:04.819Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. \"Welcome back, Cheddar Bob. The road kept your place.\"\n",
+      "[2026-09-04T02:38:05.235Z] [debug] \u2550\u2550\u2550 SESSION 2026-09-04T02:38:05.232Z \u00b7 build 2026-09-04-1660-both-daughters-can-push-a-log \u00b7 updated from 2026-09-04-1659-the-is-not-in-the-lexicon \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-09-04T02:38:05.236Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-04T02:38:05.236Z] [debug] missions: hunt:hunt_bog_dragon stage 4/7 [diplomacy] @monarch_waystation npc=\"Old Mira\" needs=The Boy's Locket\u2713 gives=Eshren's Name-Token\n[2026-09-04T02:38:05.236Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n",
+      "[2026-09-04T02:38:05.236Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n[2026-09-04T02:38:05.237Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n",
+      "[2026-09-04T02:38:05.237Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n[2026-09-04T02:38:05.237Z] [debug] missions: \u00b7 at=mud_flood_nexus travelTo=monarch_waystation\n",
+      "[2026-09-04T02:38:05.254Z] [debug] boot: life bmtmcggwxnk started 2026-09-04T02:37:57.537Z \u00b7 FOLLOWED AN OTA APPLY 159ms ago via boot-front \u00b7 prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)\n[2026-09-04T02:38:07.216Z] [debug] ui: tap \"take / salvage\"\n[2026-09-04T02:38:08.523Z] [world] You take the Aether Core from where it lay.\n",
+      "[2026-09-04T02:38:08.524Z] [reward] \u2726 Aether Core (Legendary).\n[2026-09-04T02:38:09.371Z] [world] You pick up the Bonebreaker Mace.\n[2026-09-04T02:38:09.372Z] [reward] \u2726 Bonebreaker Mace (Common).\n[2026-09-04T02:38:09.387Z] [world] You lift the Aetheric Helm of Insight clear.\n[2026-09-04T02:38:09.387Z] [reward] \u2726 Aetheric Helm of Insight (Common).\n",
+      "[2026-09-04T02:38:10.469Z] [world] You break the broken valve apart. Among the pieces, something worth keeping.\n[2026-09-04T02:38:10.470Z] [world] You strip the cold spring carefully. Something usable comes free in your hand.\n[2026-09-04T02:38:10.470Z] [world] You break the flood conduit apart. Among the pieces, something worth keeping.\n",
+      "[2026-09-04T02:38:10.470Z] [world] You break the signal spark apart. Among the pieces, something worth keeping.\n[2026-09-04T02:38:10.471Z] [world] You break the skeleton apart. Among the pieces, something worth keeping.\n[2026-09-04T02:38:10.471Z] [reward] \u2726 Salvage haul:\n[2026-09-04T02:38:10.471Z] [reward]     \u2022 Aether Crystal x3 (Common)\n",
+      "[2026-09-04T02:38:10.471Z] [reward]     \u2022 Aether Dust x5 (Common)\n[2026-09-04T02:38:10.472Z] [reward]     \u2022 Worn Tartarian Coin x3 (Common)\n[2026-09-04T02:38:13.084Z] [debug] ui: tap \"investigate\"\n[2026-09-04T02:38:14.748Z] [debug] qwen: loading (was idle) \u2014 the Arbiter speaks templates until it is ready\n[2026-09-04T02:38:14.773Z] [player] investigate the ground\n",
+      "[2026-09-04T02:38:14.775Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=3\n[2026-09-04T02:38:14.778Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-09-04T02:38:14.787Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-09-04T02:38:14.787Z] [arbiter] The Arbiter looks around. \"This is the room where the disaster was managed, or could have been.\"\n[2026-09-04T02:38:14.788Z] [system] \u23f3 Time passed: 24 min\n[2026-09-04T02:38:15.039Z] [cognitive] CLIMB  (251ms)\n[2026-09-04T02:38:16.107Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n",
+      "[2026-09-04T02:38:18.118Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-09-04T02:38:18.172Z] [debug] spawn: gear=[Plasma Thrower] window=10 roster=new\n[2026-09-04T02:38:18.173Z] [world] Ilva Sidelong pushes the good stock to the front without being asked. \"Cheddar Bob. You know where everything is.\"\n",
+      "[2026-09-04T02:38:18.174Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Ilva Sidelong, fence. Tap the vendor banner to trade.\n[2026-09-04T02:38:18.183Z] [world] Rare workings for sale: Ring of the Quiet Hand (500 TC), Rustbreaker Shield (200 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.",
+      "\n[2026-09-04T02:38:18.184Z] [world] You walk north through open silt. The compass tells you The Buried Cities lies further north \u2014 4 tiles, about 10 hours of travel.\n[2026-09-04T02:38:18.184Z] [world] The thread you were following waits where you left it.\n[2026-09-04T02:38:23.685Z] [player] Ask if there are fewer stalls\n",
+      "[2026-09-04T02:38:23.688Z] [world] \"There are fewer stalls than there were.\" Said while tidying something already tidy. \"Not because the trade dried up. Because the stretches got longer. Every year the distance between two safe places gets a little bigger and nobody announces it.\"\n",
+      "[2026-09-04T02:38:23.689Z] [world] Ilva Sidelong drops their voice, though there is nobody in here but the two of you.\n[2026-09-04T02:38:24.887Z] [debug] qwen\u23f1 flourish ok 2306ms read 1861ms/write 413ms in 175t\u2192out 14t 10.6ms/t (55ch)\n[2026-09-04T02:38:25.125Z] [debug] flourish: \u2713 2788ms\n[2026-09-04T02:38:25.332Z] [player] Ask what passes when nobody is watching\n",
+      "[2026-09-04T02:38:25.333Z] [world] The trader banks the fire down a little, which is what they do instead of lowering their voice. \"Night traffic. Not much, but steady \u2014 and night walkers fall in two kinds. The ones who stop at my fire are just late. The ones who pass a lit fire at a walking pace, no hail, no look \u2014\" a slow headshake \"\u2014 those I count. Four this season. All heading the same directi",
+      "on, all carrying nothing, all walking like the dark was daylight. I sell to everyone, but I did not call out to those, and I bank the fire earlier than I used to.\"\n[2026-09-04T02:38:25.333Z] [world] Ilva Sidelong is a fence, standing tall and determined.\n[2026-09-04T02:38:26.936Z] [world] You let the conversation go and Ilva Sidelong gets back to it.\n",
+      "[2026-09-04T02:38:27.818Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-09-04T02:38:32.392Z] [reward] Bought 2\u00d7 Trail Rations from Ilva Sidelong for 10 TC. (1717 TC left)\n[2026-09-04T02:38:32.746Z] [debug] persist sizes(KB): total=347 player=101 wm=162[rooms=90 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=79 scene=5\n",
+      "[2026-09-04T02:38:35.051Z] [reward] Bought 4\u00d7 Blue Cap Mushroom from Ilva Sidelong for 20 TC. (1697 TC left)\n[2026-09-04T02:38:37.338Z] [reward] Bought 5\u00d7 Red Cap Mushroom from Ilva Sidelong for 30 TC. (1667 TC left)\n[2026-09-04T02:38:37.338Z] [reward] They don't charge a friend full price \u2014 5 TC stayed in your pouch.\n",
+      "[2026-09-04T02:38:38.763Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 10730ms read 8684ms/write 2017ms in 731t\u2192out 33t 11.9ms/t HIT-CAP (157ch)\n[2026-09-04T02:38:38.790Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 10730ms \u2014 intro-fill:\u2205\n[2026-09-04T02:38:38.791Z] [debug] homework: scene_intro \"Mud Flood Nexus\" \u2205 10973ms\n",
+      "[2026-09-04T02:38:42.549Z] [reward] Bought the Ring of the Quiet Hand working for 500 TC. \u2726 Recipe learned (Legendary)! Open Crafting to forge it \u2014 you'll still need the materials.\n[2026-09-04T02:38:45.972Z] [reward] Bought the Rustbreaker Shield working for 200 TC. \u2726 Recipe learned (Rare)! Open Crafting to forge it \u2014 you'll still need the materials.\n",
+      "[2026-09-04T02:38:58.695Z] [debug] ui: tap \"take / salvage\"\n[2026-09-04T02:39:00.094Z] [world] You break the archive apart. Among the pieces, something worth keeping.\n[2026-09-04T02:39:00.094Z] [world] You work the cold spring apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n",
+      "[2026-09-04T02:39:00.095Z] [world] You break the cooling pipe apart. Among the pieces, something worth keeping.\n[2026-09-04T02:39:00.095Z] [world] You salvage the core stabilizer. The take is small but real.\n[2026-09-04T02:39:00.095Z] [world] You salvage the gauge. The take is small but real.\n[2026-09-04T02:39:00.096Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-09-04T02:39:00.096Z] [reward]     \u2022 Aether Dust (Common)\n[2026-09-04T02:39:00.096Z] [reward]     \u2022 Web-Silk Wadding (Common)\n[2026-09-04T02:39:00.096Z] [reward]     \u2022 Aether Crystal x2 (Common)\n[2026-09-04T02:39:00.097Z] [reward]     \u2022 Automaton Circuit x2 (Common)\n[2026-09-04T02:39:00.097Z] [reward]     \u2022 Bent Nail x3 (Common)\n",
+      "[2026-09-04T02:39:01.231Z] [world] You get a hand under the Plasma Thrower and take it.\n[2026-09-04T02:39:01.231Z] [reward] \u2726 Plasma Thrower (Common).\n[2026-09-04T02:39:02.995Z] [debug] ui: tap \"investigate\"\n[2026-09-04T02:39:04.813Z] [player] investigate the ground\n",
+      "[2026-09-04T02:39:04.814Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=3\n[2026-09-04T02:39:04.819Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Aether Residue (Common).\n[2026-09-04T02:39:04.828Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n",
+      "[2026-09-04T02:39:04.828Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-04T02:39:04.828Z] [system] \u23f3 Time passed: 24 min\n[2026-09-04T02:39:05.083Z] [cognitive] CLIMB  (253ms)\n[2026-09-04T02:39:06.094Z] [player] investigate steam burst\n",
+      "[2026-09-04T02:39:06.094Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=steam burst resolved=steam burst range=- enemies=0 hooks=3\n[2026-09-04T02:39:06.097Z] [world] You look the steam burst over. Nothing about it sings, nothing about it warns \u2014 Tartaria is full of things waiting to be remembered.\n[2026-09-04T02:39:06.361Z] [cognitive] neutral  (261ms)\n",
+      "[2026-09-04T02:39:06.641Z] [debug] persist sizes(KB): total=361 player=102 wm=175[rooms=103 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=79 scene=5\n[2026-09-04T02:39:09.028Z] [debug] qwen\u23f1 investigate_lore ok 2686ms read 1279ms/write 1370ms in 126t\u2192out 39t 10.2ms/t (175ch)\n",
+      "[2026-09-04T02:39:19.903Z] [debug] qwen\u23f1 ambient ok 13561ms wait 2899ms read 3892ms/write 1165ms in 359t\u2192out 31t 10.8ms/t HIT-CAP (155ch)\n[2026-09-04T02:39:20.366Z] [debug] \u26a0 FREEZE WATCH: LOGIC stalled while frames kept coming (js 3382ms \u00b7 frames 254ms). Something blocked the JS thread \u2014 look for a long synchronous run. \u00b7 crumb before: native:homework:start +11337ms \u2192 now: native:homework:done +4",
+      "63ms \u00b7 doing: action \"investigate steam burst\" \u00b7 native: idle\n[2026-09-04T02:39:20.367Z] [arbiter] You've traversed the winding streets of the old city, each step a step toward greater understanding and more resilience.\n[2026-09-04T02:39:20.367Z] [debug] arbiter: ambient \u2713 14269ms\n",
+      "[2026-09-04T02:39:20.367Z] [debug] arbiter: ambient-said \"You've traversed the winding streets of the old city, each step a step toward greater understanding and more resilience.\"\n[2026-09-04T02:39:22.674Z] [debug] homework: intro-fill armed after 6000ms idle (strike 2/3)\n",
+      "[2026-09-04T02:39:23.918Z] [debug] voice\u23f1 gap 5932ms (wait 0ms + synth 3552ms, live) \"You've traversed the winding streets of \u2026\"\n[2026-09-04T02:39:25.371Z] [debug] freeze watch: recovered \u2014 painting again after 254ms quiet.\n[2026-09-04T02:39:32.114Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 9431ms wait 1321ms read 6901ms/write 1174ms in 728t\u2192out 33t 9.5ms/t HIT-CAP (164ch)\n",
+      "[2026-09-04T02:39:32.124Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 9431ms \u2014 intro-fill:\u2205\n[2026-09-04T02:39:32.125Z] [debug] homework: scene_intro \"Mud Flood Nexus\" \u2205 9451ms\n[2026-09-04T02:39:41.272Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-09-04T02:39:41.305Z] [debug] spawn: gear=[Plasma Dagger, Mud-Seer's Hood, Rusted Blade] window=10 roster=new\n",
+      "[2026-09-04T02:39:41.312Z] [world] Wysh Coincatcher sets down what they're holding. \"Didn't expect you today, Cheddar Bob.\"\n[2026-09-04T02:39:41.312Z] [world] \"Been a while,\" Wysh Coincatcher says. \"Thought the mud had you.\"\n[2026-09-04T02:39:41.312Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Wysh Coincatcher, fence. Tap the vendor banner to trade.\n",
+      "[2026-09-04T02:39:41.334Z] [world] Rare workings for sale: Warden's Aegis (500 TC), Warden's Bulwark Pendant (200 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n",
+      "[2026-09-04T02:39:41.340Z] [world] You walk west through open silt. The compass tells you The Flooded Reliquary lies further west \u2014 1 tile, about 3 hours of travel.\n[2026-09-04T02:39:41.343Z] [world] What you started here has not finished itself in your absence.\n[2026-09-04T02:39:42.529Z] [debug] ui: tap \"take / salvage\"\n[2026-09-04T02:39:43.835Z] [world] You claim the Plasma Dagger.\n",
+      "[2026-09-04T02:39:43.836Z] [reward] \u2726 Plasma Dagger (Common).\n[2026-09-04T02:39:43.856Z] [world] The Rusted Blade comes up out of the silt with a small sucking protest.\n[2026-09-04T02:39:43.856Z] [reward] \u2726 Rusted Blade (Common).\n[2026-09-04T02:39:43.857Z] [world] The Mud-Seer's Hood w"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-04-1667-the-key-goes-where-the-player-is #mtnaawyn2pyt [inline 10/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtnaawyn2pyt"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1667-the-key-goes-where-the-player-is"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "10"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1667-the-key-goes-where-the-player-is"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T18:25:23.502310Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T18:25:25.514000Z",
+  "fingerprints": [
+    "5ac1b3658bc728e8b97d1704393c7b64"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1955885716,
+    "commitCount": 3,
+    "data": {},
+    "dateCreated": "2026-09-04T18:13:29.724780Z",
+    "dateReleased": "2026-09-04T18:14:31.270348Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "db7231c53271128a3a0226f390f97a59a74a9862",
+      "message": "[ota-hal] OTA-1667: the key goes where the player is\n\nOwner, three things in one message: \"the about tab, should that be there or\nshould it just be wrapped up in the log? it honestly doesn't mean anything to\nanyone but you and me. the weapon glyphs section should be under the lore button\nthat lives on the minimap not in about, that should be easily player facing.\nalso audit the glyphs list to see if all of those damage types exist in game.\"\n\n\u26a0\u26a0\u26a0 THE AUDIT ANSWER IS NO. FOUR OF THE THIRTEEN DID NOT EXIST.\n\nMeasured across all 301 catalog weapons, through the SAME baseDamageGlyph path\nthe combat buttons paint from:\n\n    \u2692 bludgeoning 65    \u25b2 piercing 55    \u2726 aetheric 49    \u2694 slashing 45\n    \ud83d\udd25 burn 45          \u26a1 electrical 22  \u2620 poison 9       \u2744 cold 6\n    \u2622 radiation 5\n    \u2699 degradation 0     \u2731 stun 0         \u2697 acid 0         \u2623 corruption 0\n\n\u26a0\u26a0 AND \u2699 WAS UNREACHABLE BY CONSTRUCTION, not merely unused. OTA-1652 aliased\n`degradation \u2192 acid`, and baseDamageGlyph canonicalises BEFORE the glyph lookup \u2014\nso even a weapon authored with degradation prints \u2697. That row could not appear\non a button under any circumstances, and the key has promised it for 29 OTAs.\n\n\u26a0 ACID AND CORRUPTION ARE NOT MISSING FROM THE GAME. They are missing as a\nweapon's OWN damage. Both are live coating families with real vials (burn 3,\nelectrical 3, poison 3, cold 2, corruption 2, acid 1) and the COATS section\nlisted them correctly all along. The defect was listing them a SECOND time under\n\"own damage\", where nothing can carry them.\n\n\u26a0\u26a0\u26a0 SO THE FIX IS A DERIVATION, NOT A SHORTER LIST \u2014 and that is the part worth\nkeeping. A list I prune by hand today is wrong again the first time somebody\nauthors an acid-based weapon: the key would then HIDE a glyph the buttons paint,\nthe same lie pointing the other way. `baseTypesInPlay()` reads the catalog, so\nboth directions are now impossible and ota1667 is what holds it there.\n\nTHE KEY MOVED. It is the GLYPHS tab of the lore codex, third in the row behind\nBEASTS and FALLEN \u2014 by the same rule OTA-1365 ordered that row with, how often\nit is opened WHILE PLAYING. \"What does \u2697 mean\" is asked from inside a fight,\nwhich is the worst possible moment to be told the answer is behind a gear icon,\nunder a build-id dump, in a settings screen. The card itself is unchanged and\nstill reads the live weaponGlyphs tables.\n\nTHE ABOUT TAB FOLDED AWAY, and he is right that the log already had it: every\nCOPY LOG export and every REPORT A BUG carries buildBasicDeviceSummary(), so the\ntab was a THIRD copy of a thing that already reaches me two better ways. Nothing\nwas lost \u2014 the dedication, the seven-tap owner ritual (OTA-1490; both your\nphones depend on it) and the third-party notices are one page now, called ABOUT,\nwith the dedication LEADING instead of buried under diagnostics where nobody\nscrolls. SETTINGS is down to four tabs: SESSION \u00b7 SFX \u00b7 DISPLAY \u00b7 ABOUT.\n\nGates: all 18 green by exit code. Full suite green.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T18:10:56Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1667-the-key-goes-where-the-player-is",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1667-the-key-goes-where-the-player-is",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T18:14:31.270348Z",
+          "dateCreated": "2026-09-04T18:13:29.724780Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155633698",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T18:14:31.584822Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1667-the-key-goes-where-the-player-is",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1667-the-key-goes-where-the-player-is",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1667-the-key-goes-where-the-player-is",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1667-the-key-goes-where-the-player-is)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "452ad5369d5e467ea9dd4f920f5ba20a",
+  "previousEventID": "29de70a510ea477fbf59437cb03e42d3"
+}

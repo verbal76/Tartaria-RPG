@@ -1,0 +1,298 @@
+{
+  "id": "d407d92f3d7e464f8bb7f11b05957410",
+  "groupID": "7712386239",
+  "eventID": "d407d92f3d7e464f8bb7f11b05957410",
+  "projectID": "4511945117532160",
+  "size": 17899,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-04-1667-the-key-goes-where-the-player-is #mtnaawyn2pyt [inline 12/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1667-the-key-goes-where-the-player-is",
+  "message": "player-log 2026-09-04-1667-the-key-goes-where-the-player-is #mtnaawyn2pyt [inline 12/28]",
+  "title": "player-log 2026-09-04-1667-the-key-goes-where-the-player-is #mtnaawyn2pyt [inline 12/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "86ae1806afea4e0cb02be19e62f94e9c",
+      "span_id": "958387190fe27c30",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      " \u2205 18213ms\n[2026-09-04T02:41:42.679Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient_fill after 15743ms \u2014 ambient:fill-\u2205\n[2026-09-04T02:41:43.080Z] [cognitive] neutral  (1226ms)\n[2026-09-04T02:41:43.998Z] [debug] ui: tap \"dodge\"\n[2026-09-04T02:41:44.001Z] [player] dodge\n[2026-09-04T02:41:44.002Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=1 hooks=3\n",
+      "[2026-09-04T02:41:44.002Z] [world] You commit to the dodge. Slip Mud Tortoise's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-04T02:41:44.101Z] [combat] Mud Tortoise \u2014 d20 \u2192 2 + ATK 5 = 7 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n",
+      "[2026-09-04T02:41:44.101Z] [combat] Dodge \u2014 d20 \u2192 18 + DEX 19 = 37 vs ATK 7. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-04T02:41:44.102Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T02:41:44.543Z] [cognitive] neutral  (440ms)\n[2026-09-04T02:41:46.430Z] [debug] freeze watch: recovered \u2014 painting again after 7846ms quiet.\n",
+      "[2026-09-04T02:41:47.103Z] [debug] ui: tap \"\u2623 shroud-spun slinger \u2692\"\n[2026-09-04T02:41:47.165Z] [player] attack with the off-hand reclaimers guild shroud-spun slinger\n[2026-09-04T02:41:47.166Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand reclaimers guild shroud spun slinger resolved=Reclaimers Guild Shroud-Spun Slinger range=mid enemies=1 hooks=3\n",
+      "[2026-09-04T02:41:47.168Z] [debug] attack: target=Mud Tortoise range=mid reach.bands=[distant,far,mid,close] reach.label=Reclaimers Guild Shroud-Spun Slinger bareHand=false\n[2026-09-04T02:41:47.170Z] [arbiter] Whisper Fog hangs between you. \"\u22121 to the swing \u2014 see what you can,\" the Arbiter says.\n[2026-09-04T02:41:47.170Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n",
+      "[2026-09-04T02:41:47.173Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-04T02:41:47.303Z] [world] You raise the corrupted reclaimers guild shroud-spun slinger toward Mud Tortoise. The room narrows around the both of you.\n[2026-09-04T02:41:47.303Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-04T02:41:48.080Z] [debug] voice\u23f1 gap 6231ms (wait 1ms + synth 5000ms, live) \"You, my companion, have traversed countl\u2026\"\n[2026-09-04T02:41:48.665Z] [cognitive] neutral  (6796ms)\n[2026-09-04T02:41:49.144Z] [cognitive] neutral  (7269ms)\n[2026-09-04T02:41:49.593Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 USE_ITEM  (2289ms)\n",
+      "[2026-09-04T02:42:02.436Z] [world] Mud Tortoise moves first. The pressure is immediate.\n[2026-09-04T02:42:02.439Z] [combat] Mud Tortoise \u2014 d20 \u2192 16 + ATK 5 = 21 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-09-04T02:42:02.440Z] [combat] You \u2014 d20 \u2192 9 + DEX 19 \u2212 1 (Whisper Fog) perfect opening (2\u00d7 dice) = 27 vs Mud Tortoise AC 13 \u2014 \u2713 HIT\n",
+      "[2026-09-04T02:42:02.440Z] [combat] Mud Tortoise shrugs off the bludgeoning. (resisted, \u00d70.5 for 9)\n[2026-09-04T02:42:02.444Z] [arbiter] The Arbiter watches the bludgeoning skid off. \"Swap to the Sparkstrike Wand \u2014 electrical will bite where bludgeoning won't.\"\n",
+      "[2026-09-04T02:42:02.445Z] [combat] Mud Tortoise takes 9 with the corrupted reclaimers guild shroud-spun slinger. It reels: 21 left. Then it fights back.\n[2026-09-04T02:42:02.445Z] [combat] Corrupted Reclaimers Guild Shroud-Spun Slinger \u2014 1 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n",
+      "[2026-09-04T02:42:02.445Z] [arbiter] \"Footwork over fury,\" the Arbiter says quietly. \"The mud tortoise is patient. Be patienter.\"\n[2026-09-04T02:42:02.888Z] [combat] Mud Tortoise deals 4 bludgeoning damage [edge of reach \u2014 halved]. You have 45 HP remaining.\n[2026-09-04T02:42:04.760Z] [debug] ui: tap \"golem (39/68)\"\n[2026-09-04T02:42:04.768Z] [player] use golem\n",
+      "[2026-09-04T02:42:04.769Z] [combat] Ashwright attacks Mud Tortoise \u2014 d20 2 + 3 = 5 vs AC 11 \u2014 \u2717 MISS\n[2026-09-04T02:42:04.769Z] [world] Ashwright's strike sails wide of Mud Tortoise.\n[2026-09-04T02:42:04.770Z] [combat] Mud Tortoise swings at Ashwright and misses.\n[2026-09-04T02:42:04.790Z] [combat] Mud Tortoise blackens \u2014 corruption eats 1. (20/30 HP, 2 turns left)\n",
+      "[2026-09-04T02:42:04.795Z] [combat] Mud Tortoise \u2014 d20 \u2192 1 + ATK 5 = 6 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 FUMBLE\n[2026-09-04T02:42:05.661Z] [debug] ui: tap \"golem (39/68)\"\n[2026-09-04T02:42:05.662Z] [player] use golem\n[2026-09-04T02:42:05.662Z] [combat] Ashwright attacks Mud Tortoise \u2014 d20 19 + 3 = 22 vs AC 11 \u2014 \u2713 HIT\n",
+      "[2026-09-04T02:42:05.663Z] [combat] Ashwright swings the Crude Golem Sledge \u2014 5 bludgeoning damage on Mud Tortoise. (15 HP left)\n[2026-09-04T02:42:05.663Z] [combat] Mud Tortoise retaliates \u2014 d20 19 + 6 hits Ashwright for 2 (35% resisted). (37/68)\n[2026-09-04T02:42:05.663Z] [combat] Mud Tortoise blackens \u2014 corruption eats 1. (14/30 HP, 1 turn left)\n",
+      "[2026-09-04T02:42:05.665Z] [combat] Mud Tortoise \u2014 d20 \u2192 3 + ATK 5 = 8 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-04T02:42:06.110Z] [debug] persist sizes(KB): total=352 player=105 wm=164[rooms=92 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=78 scene=5\n[2026-09-04T02:42:06.896Z] [debug] ui: tap \"golem (37/68)\"\n[2026-09-04T02:42:06.897Z] [player] use golem\n",
+      "[2026-09-04T02:42:06.898Z] [combat] Ashwright attacks Mud Tortoise \u2014 d20 11 + 3 = 14 vs AC 11 \u2014 \u2713 HIT\n[2026-09-04T02:42:06.898Z] [combat] Ashwright swings the Crude Golem Sledge \u2014 8 bludgeoning damage on Mud Tortoise. (6 HP left)\n[2026-09-04T02:42:06.898Z] [combat] Mud Tortoise retaliates \u2014 d20 17 + 6 hits Ashwright for 3 (35% resisted). (34/68)\n",
+      "[2026-09-04T02:42:06.898Z] [combat] Mud Tortoise blackens \u2014 corruption eats 1. (5/30 HP, 0 turns left)\n[2026-09-04T02:42:06.898Z] [combat] Mud Tortoise shakes off the last of the corruption \u2014 the Reclaimers Guild Shroud-Spun Slinger has run its course.\n[2026-09-04T02:42:06.900Z] [combat] Mud Tortoise \u2014 d20 \u2192 20 + ATK 5 = 25 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 CRITICAL HIT\n",
+      "[2026-09-04T02:42:07.331Z] [combat] Mud Tortoise deals 11 bludgeoning damage [edge of reach \u2014 halved]. You have 34 HP remaining.\n[2026-09-04T02:42:08.493Z] [debug] ui: tap \"golem (34/68)\"\n[2026-09-04T02:42:08.500Z] [player] use golem\n[2026-09-04T02:42:08.501Z] [combat] Ashwright attacks Mud Tortoise \u2014 d20 11 + 3 = 14 vs AC 11 \u2014 \u2713 HIT\n",
+      "[2026-09-04T02:42:08.502Z] [combat] Ashwright swings the Crude Golem Sledge \u2014 8 bludgeoning damage on Mud Tortoise. (0 HP left)\n[2026-09-04T02:42:08.502Z] [world] Mud Tortoise crumbles under Ashwright's assault.\n[2026-09-04T02:42:08.507Z] [reward] Mud Tortoise defeated. You recover Mud Fragment, Tortoise Shell.\n",
+      "[2026-09-04T02:42:08.509Z] [reward] \u2726 You feel hardier from your trials. +1 max HP (now 50). [171 enemies defeated]\n[2026-09-04T02:42:08.510Z] [reward] +8 TC pried from the dust.\n[2026-09-04T02:42:15.726Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-09-04T02:42:15.750Z] [debug] spawn: gear=[Aetheric Gauntlets] window=10 roster=new\n",
+      "[2026-09-04T02:42:15.752Z] [world] You walk north through open silt. The compass tells you Dynasty Border Post lies further north \u2014 4 tiles, about 10 hours of travel.\n[2026-09-04T02:42:15.753Z] [world] You had a question here. You still have it.\n[2026-09-04T02:42:17.495Z] [debug] ui: tap \"take / salvage\"\n[2026-09-04T02:42:18.821Z] [world] The Aetheric Gauntlets comes away clean.\n",
+      "[2026-09-04T02:42:18.823Z] [reward] \u2726 Aetheric Gauntlets (Common).\n[2026-09-04T02:42:19.943Z] [world] You strip the anchor carefully. Something usable comes free in your hand.\n[2026-09-04T02:42:19.944Z] [world] You salvage the blueprint. The take is small but real.\n",
+      "[2026-09-04T02:42:19.944Z] [world] You work the cold spring apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n[2026-09-04T02:42:19.944Z] [world] You work the mask over. A part of it comes loose, intact.\n",
+      "[2026-09-04T02:42:19.945Z] [world] You lever something loose from the skeleton \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n[2026-09-04T02:42:19.945Z] [reward] \u2726 Salvage haul:\n[2026-09-04T02:42:19.946Z] [reward]     \u2022 Scrap Metal x2 (Common)\n[2026-09-04T02:42:19.946Z] [reward]     \u2022 Worn Tartarian Coin x3 (Common)\n",
+      "[2026-09-04T02:42:19.946Z] [reward]     \u2022 Glass-Beaded Strap (Uncommon)\n[2026-09-04T02:42:19.947Z] [reward]     \u2022 Splintered Haft End (Common)\n[2026-09-04T02:42:21.695Z] [debug] ui: tap \"investigate\"\n[2026-09-04T02:42:23.517Z] [player] investigate the ground\n[2026-09-04T02:42:23.518Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=3\n",
+      "[2026-09-04T02:42:23.524Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Spider Silk (Common).\n[2026-09-04T02:42:23.532Z] [system] \u23f3 Time passed: 24 min\n[2026-09-04T02:42:23.791Z] [cognitive] CLIMB  (259ms)\n[2026-09-04T02:42:24.749Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.\n",
+      "[2026-09-04T02:42:24.784Z] [player] investigate oil stain\n[2026-09-04T02:42:24.785Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=oil stain resolved=oil stain range=- enemies=0 hooks=3\n[2026-09-04T02:42:24.787Z] [world] The oil stain sits the way ordinary things sit. The Arbiter does not lean in. You move on.\n",
+      "[2026-09-04T02:42:24.788Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-09-04T02:42:24.788Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-04T02:42:25.025Z] [cognitive] neutral  (234ms)\n[2026-09-04T02:42:26.049Z] [player] investigate wall\n",
+      "[2026-09-04T02:42:26.050Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=wall resolved=wall range=- enemies=0 hooks=3\n[2026-09-04T02:42:26.051Z] [world] The wall reads as ordinary, which down here is a small kind of relief. You leave it be.\n[2026-09-04T02:42:26.052Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n",
+      "[2026-09-04T02:42:26.052Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-04T02:42:26.463Z] [debug] persist sizes(KB): total=364 player=105 wm=177[rooms=105 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=78 scene=4\n[2026-09-04T02:42:27.585Z] [debug] qwen\u23f1 investigate_lore ok 2571ms read 1375ms/write 1030ms in 126t\u2192out 31t 10.9ms/t (155ch)\n",
+      "[2026-09-04T02:42:27.585Z] [debug] qwen\u23f1 stats \u2014 narration:scene_intro_fill n4 avg8.4s max10.7s read7.8s/write1.6s \u26a02unusable in735t\u2192out17t ms/tok 9.5-11.9 cap2 \u23f82 \u27024/33.5s | investigate_lore n3 avg3.1s max4.0s read1.3s/write1.2s \u26a01unusable in126t\u2192out33t ms/tok 10.2-10.9 wait0.6s | flourish n1 avg2.3s max2.3s read1.9s/write0.4s in175t\u2192out14t ms/tok 10.6-10.6 | ambient n1 avg13.6s max13.6s read3.9s",
+      "/write1.2s in359t\u2192out31t ms/tok 10.8-10.8 cap1 wait2.9s | ambient_fill n1 avg15.7s max15.7s \u26a01unusable in358t\u2192out31t cap1 \u27021/15.7s || WASTED 5 calls / 49.2s\n[2026-09-04T02:42:28.258Z] [cognitive] TAKE_COVER  (2204ms)\n[2026-09-04T02:42:29.855Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n",
+      "[2026-09-04T02:42:29.873Z] [debug] spawn: gear=[Plasma Cutter, Bone Splitter Axe, Mud Grinder Axe] window=10 roster=new\n[2026-09-04T02:42:29.874Z] [world] You walk west through open silt. The compass points west into open ground.\n[2026-09-04T02:42:29.875Z] [world] Some part of you has been keeping the place bookmarked.\n",
+      "[2026-09-04T02:42:30.363Z] [debug] qwen\u23f1 investigate_lore ok 3962ms wait 1856ms read 319ms/write 1764ms in 125t\u2192out 48t 2.6ms/t (209ch)\n[2026-09-04T02:42:31.472Z] [debug] ui: tap \"take / salvage\"\n[2026-09-04T02:42:32.977Z] [world] It takes two pulls. The Bone Splitter Axe is yours on the second.\n[2026-09-04T02:42:32.978Z] [reward] \u2726 Bone Splitter Axe (Common).\n",
+      "[2026-09-04T02:42:33.005Z] [world] The Mud Grinder Axe resists, then does not.\n[2026-09-04T02:42:33.006Z] [reward] \u2726 Mud Grinder Axe (Common).\n[2026-09-04T02:42:33.007Z] [world] You brace a foot and the Plasma Cutter gives.\n[2026-09-04T02:42:33.007Z] [reward] \u2726 Plasma Cutter (Common).\n[2026-09-04T02:42:34.184Z] [world] You work the cold spring over. A part of it comes loose, intact.\n",
+      "[2026-09-04T02:42:34.185Z] [world] You break the core stabilizer apart. Among the pieces, something worth keeping.\n[2026-09-04T02:42:34.185Z] [world] You strip the gauge carefully. Something usable comes free in your hand.\n[2026-09-04T02:42:34.185Z] [world] You salvage the rusted lever. The take is small but real.\n",
+      "[2026-09-04T02:42:34.186Z] [world] You work the signal spark over. A part of it comes loose, intact.\n[2026-09-04T02:42:34.186Z] [reward] \u2726 Salvage haul:\n[2026-09-04T02:42:34.186Z] [reward]     \u2022 Aether Dust x2 (Common)\n[2026-09-04T02:42:34.187Z] [reward]     \u2022 Automaton Circuit (Common)\n[2026-09-04T02:42:34.187Z] [reward]     \u2022 Worn Tartarian Coin x3 (Common)\n",
+      "[2026-09-04T02:42:34.187Z] [reward]     \u2022 Bent Nail x3 (Common)\n[2026-09-04T02:42:34.187Z] [reward]     \u2022 Scrap Metal x3 (Common)\n[2026-09-04T02:42:40.059Z] [debug] ui: tap \"investigate\"\n[2026-09-04T02:42:42.018Z] [player] investigate the ground\n[2026-09-04T02:42:42.019Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=3\n",
+      "[2026-09-04T02:42:42.026Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Wild Chicken (Rare).\n[2026-09-04T02:42:42.035Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-09-04T02:42:42.035Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-04T02:42:42.035Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-09-04T02:42:42.291Z] [cognitive] CLIMB  (255ms)\n[2026-09-04T02:42:47.977Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-09-04T02:42:47.994Z] [debug] spawn: gear=[Sentinel's Overcoat, Gale Binder Wand] window=10 roster=new\n[2026-09-04T02:42:47.996Z] [world] You walk north through open silt. The compass points north into open ground.\n",
+      "[2026-09-04T02:42:48.000Z] [world] You catch yourself checking, the way you check a pocket you already know is empty.\n[2026-09-04T02:42:49.441Z] [debug] ui: tap \"take / salvage\"\n[2026-09-04T02:42:50.964Z] [world] One good tug and the Gale Binder Wand is out.\n[2026-09-04T02:42:50.965Z] [reward] \u2726 Gale Binder Wand (Common).\n",
+      "[2026-09-04T02:42:50.987Z] [world] The Sentinel's Overcoat leaves a shape behind it in the mud, filling slowly.\n[2026-09-04T02:42:50.987Z] [reward] \u2726 Sentinel's Overcoat (Common).\n[2026-09-04T02:42:52.119Z] [world] You strip the battery housing down. Mostly debris \u2014 but a Cloth Scrap comes loose at the bottom of the pile.\n",
+      "[Filtered]",
+      "[2026-09-04T02:42:52.119Z] [world] You work the gravity valve over. A part of it comes loose, intact.\n[2026-09-04T02:42:52.119Z] [world] You work the rusted ladder over. A part of it comes loose, intact.\n[2026-09-04T02:42:52.120Z] [reward] \u2726 Salvage haul:\n"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-04-1667-the-key-goes-where-the-player-is #mtnaawyn2pyt [inline 12/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtnaawyn2pyt"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1667-the-key-goes-where-the-player-is"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "12"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1667-the-key-goes-where-the-player-is"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T18:25:23.523816Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "42": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 370,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T18:25:25.514000Z",
+  "fingerprints": [
+    "5ac1b3658bc728e8b97d1704393c7b64"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1955885716,
+    "commitCount": 3,
+    "data": {},
+    "dateCreated": "2026-09-04T18:13:29.724780Z",
+    "dateReleased": "2026-09-04T18:14:31.270348Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "db7231c53271128a3a0226f390f97a59a74a9862",
+      "message": "[ota-hal] OTA-1667: the key goes where the player is\n\nOwner, three things in one message: \"the about tab, should that be there or\nshould it just be wrapped up in the log? it honestly doesn't mean anything to\nanyone but you and me. the weapon glyphs section should be under the lore button\nthat lives on the minimap not in about, that should be easily player facing.\nalso audit the glyphs list to see if all of those damage types exist in game.\"\n\n\u26a0\u26a0\u26a0 THE AUDIT ANSWER IS NO. FOUR OF THE THIRTEEN DID NOT EXIST.\n\nMeasured across all 301 catalog weapons, through the SAME baseDamageGlyph path\nthe combat buttons paint from:\n\n    \u2692 bludgeoning 65    \u25b2 piercing 55    \u2726 aetheric 49    \u2694 slashing 45\n    \ud83d\udd25 burn 45          \u26a1 electrical 22  \u2620 poison 9       \u2744 cold 6\n    \u2622 radiation 5\n    \u2699 degradation 0     \u2731 stun 0         \u2697 acid 0         \u2623 corruption 0\n\n\u26a0\u26a0 AND \u2699 WAS UNREACHABLE BY CONSTRUCTION, not merely unused. OTA-1652 aliased\n`degradation \u2192 acid`, and baseDamageGlyph canonicalises BEFORE the glyph lookup \u2014\nso even a weapon authored with degradation prints \u2697. That row could not appear\non a button under any circumstances, and the key has promised it for 29 OTAs.\n\n\u26a0 ACID AND CORRUPTION ARE NOT MISSING FROM THE GAME. They are missing as a\nweapon's OWN damage. Both are live coating families with real vials (burn 3,\nelectrical 3, poison 3, cold 2, corruption 2, acid 1) and the COATS section\nlisted them correctly all along. The defect was listing them a SECOND time under\n\"own damage\", where nothing can carry them.\n\n\u26a0\u26a0\u26a0 SO THE FIX IS A DERIVATION, NOT A SHORTER LIST \u2014 and that is the part worth\nkeeping. A list I prune by hand today is wrong again the first time somebody\nauthors an acid-based weapon: the key would then HIDE a glyph the buttons paint,\nthe same lie pointing the other way. `baseTypesInPlay()` reads the catalog, so\nboth directions are now impossible and ota1667 is what holds it there.\n\nTHE KEY MOVED. It is the GLYPHS tab of the lore codex, third in the row behind\nBEASTS and FALLEN \u2014 by the same rule OTA-1365 ordered that row with, how often\nit is opened WHILE PLAYING. \"What does \u2697 mean\" is asked from inside a fight,\nwhich is the worst possible moment to be told the answer is behind a gear icon,\nunder a build-id dump, in a settings screen. The card itself is unchanged and\nstill reads the live weaponGlyphs tables.\n\nTHE ABOUT TAB FOLDED AWAY, and he is right that the log already had it: every\nCOPY LOG export and every REPORT A BUG carries buildBasicDeviceSummary(), so the\ntab was a THIRD copy of a thing that already reaches me two better ways. Nothing\nwas lost \u2014 the dedication, the seven-tap owner ritual (OTA-1490; both your\nphones depend on it) and the third-party notices are one page now, called ABOUT,\nwith the dedication LEADING instead of buried under diagnostics where nobody\nscrolls. SETTINGS is down to four tabs: SESSION \u00b7 SFX \u00b7 DISPLAY \u00b7 ABOUT.\n\nGates: all 18 green by exit code. Full suite green.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T18:10:56Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1667-the-key-goes-where-the-player-is",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1667-the-key-goes-where-the-player-is",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T18:14:31.270348Z",
+          "dateCreated": "2026-09-04T18:13:29.724780Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155633698",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T18:14:31.584822Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1667-the-key-goes-where-the-player-is",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1667-the-key-goes-where-the-player-is",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1667-the-key-goes-where-the-player-is",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1667-the-key-goes-where-the-player-is)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "efe4487a82a54f36b842555b82400696",
+  "previousEventID": "d37ff2307eab4af0a5c20742e6c32e20"
+}

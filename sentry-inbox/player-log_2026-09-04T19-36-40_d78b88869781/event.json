@@ -1,0 +1,278 @@
+{
+  "id": "d78b8886978145d381e9339c8fccd71d",
+  "groupID": "7712505207",
+  "eventID": "d78b8886978145d381e9339c8fccd71d",
+  "projectID": "4511945117532160",
+  "size": 18156,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-04-1669-the-gate-opens-for-the-tap #mtnaj1w6w78b [inline 2/4]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1669-the-gate-opens-for-the-tap",
+  "message": "player-log 2026-09-04-1669-the-gate-opens-for-the-tap #mtnaj1w6w78b [inline 2/4]",
+  "title": "player-log 2026-09-04-1669-the-gate-opens-for-the-tap #mtnaj1w6w78b [inline 2/4]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "82773bca92104ec6bf378aeb468dd60d",
+      "span_id": "b0dcea16dbb0e1a6",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "ns: equip:off, use(off), scrap, drop\n\nDog Armor (5)\n  \u25c6 Aetheric Padded Vest \u00d72 (Rare, dur 28/28, \u2665reserved, AC +3 (dog) \u00b7 Bites back: 1 aetheric to whatever hits the dog, [dog_armor,vest,aether,padded,loot])\n    actions: scrap, release-from-fusion, drop\n  \u25c6 Burlap Vest \u00d78 (dur 18/18, AC +1 (dog), [dog_armor,vest,burlap,loot,improvised])\n    actions: scrap, save-for-fusion, drop\n",
+      "  \u25c6 Dog Aetheric Padded Vest (Rare, dur 18/18, AC +3 \u00b7 Resists: aetheric, [dog_armor,vest,aether,padded,armor])\n    actions: scrap, save-for-fusion, drop\n  \u25c6 Riveted Leather Vest (Uncommon, dur 24/24, \u2665reserved, AC +2 (dog), [dog_armor,vest,leather,loot,cloth])\n    actions: scrap, release-from-fusion, drop\n  Vein-Threaded Cover (Rare, dur 35/35, AC+3, resist:poison, unique, [fused,unique,poison])\n",
+      "    actions: scrap, drop\n\nAmulets & Rings (11)\n  Aether-Shard Ring (Uncommon, dur 30/30, INT +1 \u00b7 Resists aetheric: \u221210% incoming damage of each, on top of armour, [ring,aether,crafted])\n    actions: equip:ring, use, scrap, drop\n  Aetheric Locket \u00d72 (dur 30/30, WIS +1 \u00b7 Resists aetheric: \u22129% incoming damage of each, on top of armour, [detection,amulet,relic])\n",
+      "    actions: equip:amulet, use, scrap, drop\n  Aetheric Locket (dur 30/30, WIS +1 \u00b7 Resists aetheric: \u22129% incoming damage of each, on top of armour, [amulet,relic,detection])\n    actions: equip:amulet, use, scrap, drop\n  Amulet of the Silt Warden (Rare, dur 40/40, equipped:amulet, WIS +2 \u00b7 Resists poison, corruption: \u221220% incoming damage of each, on top of armour, [amulet,mud,crafted])\n",
+      "    actions: unequip:amulet\n  Golem Controller Ring (Uncommon, dur 35/35, INT +1, [ring,construct])\n    actions: equip:ring, use, scrap, drop\n  Rustbane Charm (dur 30/30, Resists degradation: \u22129% incoming damage of each, on top of armour, [amulet,charm,crafted])\n    actions: equip:amulet, use, scrap, drop\n  Rusted Band of Knowledge (dur 25/25, INT +1, [ring,scholarly])\n",
+      "    actions: equip:ring, use, scrap, drop\n  Scribe's Signet \u00d72 (Uncommon, dur 35/35, INT +2 \u00b7 WIS +1, [ring,signet,scholarly,crafted])\n    actions: equip:ring, use, scrap, drop\n  Tartarian Oath-Band \u00d72 (Uncommon, dur 35/35, equipped:ring, STR +2, [ring,faction_gear,true_tartarians,oath])\n    actions: unequip:ring\n",
+      "  Tin Ward Ring \u00d72 (Rare, dur 40/40, Resists acid: \u221215% incoming damage of each, on top of armour \u00b7 Everything you wear or wield lasts 15% longer, [ring,crafted,defensive])\n    actions: equip:ring, use, scrap, drop\n  Tin Ward Ring (Rare, dur 40/40, Resists acid: \u221215% incoming damage of each, on top of armour \u00b7 Everything you wear or wield lasts 15% longer, [ring,crafted,defensive])\n",
+      "    actions: equip:ring, use, scrap, drop\n\nConsumables (20)\n  Bioluminescent Fungus (Uncommon, [food,foraged,mushroom,light,aether])\n    actions: use(eat), drop\n  Bioluminescent Fungus (Uncommon, [fungus,light,gear,food,foraged])\n    actions: use(eat), drop\n  Blue Aetheric Fungus ([fungus,blue,distillable,food,foraged])\n    actions: use(eat), drop\n  Blueberries \u00d77 (Uncommon, [food,foraged,fruit])\n",
+      "    actions: use(eat), drop\n  Field Dressing \u00d78 ([healing,crafted])\n    actions: use(eat), drop\n  First Aid Kit (Uncommon, [healing,crafted])\n    actions: use(apply), drop\n  Forager's Stew \u00d72 (Uncommon, [food,cooked,stew])\n    actions: use(eat), drop\n  Orange Sporecap ([food,foraged,mushroom,orange])\n    actions: use(eat), drop\n  Raspberries \u00d72 (Uncommon, [food,foraged,fruit])\n",
+      "    actions: use(eat), drop\n  Reclaimer's Mud-Beer \u00d72 ([alcohol,drink])\n    actions: use(drink), drop\n  Smoke-Cured Jerky Strip \u00d76 ([food,treat,dog_treat])\n    actions: use(eat), drop\n  Speckled Egg (Uncommon, [food,foraged,protein])\n    actions: use(eat), drop\n  Trail Rations \u00d725 ([food])\n    actions: use(eat), drop\n  Trauma Kit \u00d78 (Rare, [healing,crafted])\n    actions: use(eat), drop\n",
+      "  Wild Carrot \u00d718 ([food,foraged,vegetable])\n    actions: use(eat), drop\n  Wild Chicken \u00d72 (Rare, [food,foraged,meat])\n    actions: use(eat), drop\n  Wild Grapes \u00d73 (Uncommon, [food,foraged,fruit])\n    actions: use(eat), drop\n  Wild Lettuce \u00d711 ([food,foraged,leafy])\n    actions: use(eat), drop\n  Wild Oats \u00d722 ([food,foraged,grain])\n    actions: use(eat), drop\n",
+      "  Wild Onion \u00d718 ([food,foraged,vegetable])\n    actions: use(eat), drop\n\nCoatings (6)\n  Acid Flask \u00d742 (Uncommon, [potion,weapon_coating,acid,crafted])\n    actions: drop\n  Corruption Tonic \u00d713 (Uncommon, [potion,weapon_coating,corruption,crafted])\n    actions: use(apply), drop\n  Frost Paste \u00d712 (Uncommon, [potion,weapon_coating,cold,aether,crafted])\n    actions: use(eat), drop\n",
+      "  Incendiary Paste \u00d713 (Uncommon, [potion,weapon_coating,burn,aether,crafted])\n    actions: use(eat), drop\n  Searing Paste \u00d72 (Uncommon, [potion,weapon_coating,burn,aether,crafted])\n    actions: use(eat), drop\n  Smoldering Paste \u00d73 (Uncommon, [potion,weapon_coating,\n(pack listing trimmed at 12000 characters)\n\n--- CHARACTER LOG (newest first) ---\n",
+      "(Newest entry at top \u2014 showing the most recent 330 of 3653 entries; older trimmed to fit a single email paste)\n\n[2026-09-04T18:31:23.649Z] [debug] appstate: background \u2192 active (was background for 79374ms)\n[2026-09-04T18:30:04.269Z] [debug] appstate: active \u2192 background (was active for 70739ms)\n",
+      "[2026-09-04T18:29:39.319Z] [world] You repair the Titan's Gauntlets. Back to full. (spent: Patched Cloth x4)\n[2026-09-04T18:29:39.301Z] [arbiter] The Arbiter nods. \"Patched in: Aetheric Blood \u2192 Patched Cloth, Copper-Threaded Veil \u2192 Patched Cloth, Tar-Black Lashing \u2192 Patched Cloth, Cracked Carapace Curl \u2192 Patched Cloth.\"\n",
+      "[2026-09-04T18:29:37.936Z] [arbiter] The Arbiter stops with his hand over your pack. \"Before I touch the Titan's Gauntlets \u2014 4 pieces of this is Crucible stock: Aetheric Blood, Copper-Threaded Veil, Tar-Black Lashing, Cracked Carapace Curl. Say the word and I'll set it aside instead.\"\n",
+      "[2026-09-04T18:29:34.012Z] [world] You repair the Corrupted Resonant Reclaimers Guild Shroud-Spun Slinger. Back to full. (spent: Small Rock x2)\n[2026-09-04T18:29:32.888Z] [world] You repair the Reclaimer's Cloak. Back to full. (spent: Patched Cloth x4)\n[2026-09-04T18:29:32.870Z] [arbiter] The Arbiter nods. \"Patched in: 3\u00d7 Cloth Scrap \u2192 Patched Cloth, Tortoise Shell \u2192 Patched Cloth.\"\n",
+      "[2026-09-04T18:29:31.291Z] [arbiter] The Arbiter stops with his hand over your pack. \"Before I touch the Reclaimer's Cloak \u2014 1 piece of this is Crucible stock: Tortoise Shell. Say the word and I'll set it aside instead.\"\n[2026-09-04T18:29:30.278Z] [debug] persist sizes(KB): total=334 player=70 wm=175[rooms=100 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=87 scene=2\n",
+      "[2026-09-04T18:29:30.040Z] [world] You repair the Mud-glass Scales. Back to full. (spent: Patched Cloth x4)\n[2026-09-04T18:29:30.021Z] [arbiter] The Arbiter nods. \"Patched in: Frayed Rigging Twine \u2192 Patched Cloth, Tattered Gauze Roll \u2192 Patched Cloth, Web-Silk Wadding \u2192 Patched Cloth, Cloth Scrap \u2192 Patched Cloth.\"\n",
+      "[2026-09-04T18:29:28.575Z] [arbiter] The Arbiter stops with his hand over your pack. \"Before I touch the Mud-glass Scales \u2014 3 pieces of this is Crucible stock: Frayed Rigging Twine, Tattered Gauze Roll, Web-Silk Wadding. Say the word and I'll set it aside instead.\"\n[2026-09-04T18:29:27.325Z] [world] You repair the Crude Golem Sledge. Back to full. (spent: Scrap Metal x2)\n",
+      "[2026-09-04T18:29:25.722Z] [world] You repair the Architect's Sight Enhancer. Back to full. (spent: Patched Cloth x4)\n[2026-09-04T18:29:25.708Z] [arbiter] The Arbiter nods. \"Patched in: Eddy-Zone Reading \u2192 Patched Cloth, Stiffened Leather Offcut \u2192 Patched Cloth.\"\n",
+      "[2026-09-04T18:29:21.155Z] [arbiter] The Arbiter stops with his hand over your pack. \"Before I touch the Architect's Sight Enhancer \u2014 1 piece of this is Crucible stock: Stiffened Leather Offcut. Say the word and I'll set it aside instead.\"\n[2026-09-04T18:29:14.749Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient after 5088ms \u2014 ambient:preempted\n",
+      "[2026-09-04T18:29:14.749Z] [debug] arbiter: ambient cut short 5376ms \u2014 yielded to the player\n[2026-09-04T18:29:14.743Z] [cognitive] SEARCH \u00b7 TRAVEL \u00b7 USE_ITEM  (285ms)\n[2026-09-04T18:29:14.737Z] [debug] qwen\u23f1 ambient preempted 5088ms read 3095ms/write 1633ms in 366t\u2192out 16t 8.5ms/t (39ch)\n",
+      "[2026-09-04T18:29:14.456Z] [reward] \u2726 Crafted Tartarian Oath-Band. The Arbiter watches you set the last piece.\n[2026-09-04T18:29:14.453Z] [debug] parser: intent=craft conf=1.00 verb=craft target=tartarian oath band resolved=Tartarian Oath-Band range=- enemies=0 hooks=0\n[2026-09-04T18:29:14.453Z] [player] craft Tartarian Oath-Band\n[2026-09-04T18:29:09.657Z] [cognitive] neutral  (282ms)\n",
+      "[2026-09-04T18:29:09.372Z] [reward] \u2726 Crafted Scribe's Signet. The Arbiter watches you set the last piece.\n[2026-09-04T18:29:09.361Z] [debug] parser: intent=craft conf=1.00 verb=craft target=scribe signet resolved=- range=- enemies=0 hooks=0\n[2026-09-04T18:29:09.360Z] [player] craft Scribe's Signet\n",
+      "[2026-09-04T18:29:01.204Z] [reward] \u2726 Crafted Rusted Band of Knowledge. The Arbiter watches you set the last piece.\n[2026-09-04T18:29:01.195Z] [debug] parser: intent=craft conf=1.00 verb=craft target=rusted band knowledge resolved=- range=- enemies=0 hooks=0\n[2026-09-04T18:29:01.195Z] [player] craft Rusted Band of Knowledge\n",
+      "[2026-09-04T18:28:53.530Z] [debug] appstate: background \u2192 active (was background for 54840ms)\n[2026-09-04T18:27:58.691Z] [debug] appstate: active \u2192 background (was active for 132803ms)\n[2026-09-04T18:27:52.621Z] [cognitive] neutral  (279ms)\n[2026-09-04T18:27:52.340Z] [reward] \u2726 Crafted Golem Controller Ring. The Arbiter watches you set the last piece.\n",
+      "[2026-09-04T18:27:52.338Z] [debug] parser: intent=craft conf=1.00 verb=craft target=golem controller ring resolved=- range=- enemies=0 hooks=0\n[2026-09-04T18:27:52.338Z] [player] craft Golem Controller Ring\n[2026-09-04T18:27:40.599Z] [debug] homework: scene_intro \"Tartarian Pilgrim Camp\" \u2205 10359ms\n",
+      "[2026-09-04T18:27:40.598Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 10328ms \u2014 intro-fill:near-dup\n[2026-09-04T18:27:40.575Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 10328ms read/write unusable (native mis-reported 27614ms/3139ms \u2014 llama.rn split bug, not this call) in 753t\u2192out 33t HIT-CAP (146ch)\n",
+      "[2026-09-04T18:27:30.241Z] [debug] homework: intro-fill armed after 6000ms idle (strike 3/3)\n[2026-09-04T18:27:20.036Z] [debug] ui: tap \"craft\"\n[2026-09-04T18:27:18.851Z] [debug] ui: tap \"more \u25b8\"\n[2026-09-04T18:27:16.763Z] [debug] persist sizes(KB): total=335 player=71 wm=174[rooms=100 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=87 scene=2\n",
+      "[2026-09-04T18:27:16.302Z] [cognitive] SWIM  (202ms)\n[2026-09-04T18:27:16.099Z] [system] \u23f3 Time passed: 24 min\n[2026-09-04T18:27:16.091Z] [reward] You scrape at the silt with the sentinel cleaver. \u2726 Recovered Firewood (Common).\n[2026-09-04T18:27:16.088Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-09-04T18:27:16.087Z] [player] investigate the mud\n[2026-09-04T18:27:15.479Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient after 8159ms \u2014 ambient:preempted\n[2026-09-04T18:27:15.478Z] [debug] arbiter: ambient cut short 8567ms \u2014 yielded to the player\n[2026-09-04T18:27:15.271Z] [debug] qwen\u23f1 ambient preempted 8159ms wait 2685ms read 0ms/write 0ms in 366t\u2192out 0t (0ch)\n",
+      "[2026-09-04T18:27:14.457Z] [debug] ui: tap \"investigate\"\n[2026-09-04T18:27:11.108Z] [cognitive] SWIM  (286ms)\n[2026-09-04T18:27:10.820Z] [system] \u23f3 Time passed: 24 min\n[2026-09-04T18:27:10.808Z] [reward] You scrape at the silt with the sentinel cleaver. \u2726 Recovered Stick (Common).\n",
+      "[2026-09-04T18:27:10.803Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=- range=- enemies=0 hooks=0\n[2026-09-04T18:27:10.802Z] [player] investigate the mud\n[2026-09-04T18:27:09.635Z] [debug] qwen\u23f1 investigate_lore ok 2524ms read 1258ms/write 1128ms in 127t\u2192out 25t 9.9ms/t (127ch)\n[2026-09-04T18:27:08.564Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-09-04T18:27:07.125Z] [cognitive] neutral  (212ms)\n[2026-09-04T18:27:06.909Z] [world] The ladder reads as ordinary, which down here is a small kind of relief. You leave it be.\n[2026-09-04T18:27:06.907Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ladder resolved=ladder range=- enemies=0 hooks=0\n[2026-09-04T18:27:06.907Z] [player] investigate ladder\n",
+      "[2026-09-04T18:27:05.861Z] [cognitive] SWIM  (205ms)\n[2026-09-04T18:27:05.655Z] [system] \u23f3 Time passed: 24 min\n[2026-09-04T18:27:05.647Z] [reward] You scrape at the silt with the sentinel cleaver. \u2726 Recovered Scrap Metal (Common).\n[2026-09-04T18:27:05.642Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-09-04T18:27:05.642Z] [player] investigate the mud\n[2026-09-04T18:27:04.017Z] [debug] ui: tap \"investigate\"\n[2026-09-04T18:26:50.449Z] [reward] Bought 4\u00d7 Wild Onion from Vosk Barrowman for 28 TC. (421 TC left)\n[2026-09-04T18:26:50.014Z] [debug] homework: scene_intro \"Tartarian Pilgrim Camp\" \u2713 4825ms\n",
+      "[2026-09-04T18:26:50.014Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 4807ms \u2014 intro-fill:action-opener\n[2026-09-04T18:26:50.009Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 4807ms read 3684ms/write 1085ms in 754t\u2192out 33t 4.9ms/t HIT-CAP (149ch)\n",
+      "[2026-09-04T18:26:48.512Z] [debug] persist sizes(KB): total=337 player=71 wm=175[rooms=100 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=88 scene=2\n[2026-09-04T18:26:48.293Z] [reward] Bought 2\u00d7 Forager's Stew from Vosk Barrowman for 28 TC. (449 TC left)\n[2026-09-04T18:26:45.190Z] [debug] homework: intro-fill armed after 6000ms idle (strike 2/3)\n",
+      "[2026-09-04T18:26:36.329Z] [reward] Bought Patched Cloth from Vosk Barrowman for 6 TC. (477 TC left)\n[2026-09-04T18:26:31.798Z] [reward] Bought Skyreacher Map 4 of 5 \u2014 Thametan Tower from Vosk Barrowman for 157 TC. (483 TC left)\n[2026-09-04T18:26:16.534Z] [reward] Sold Crude Golem Pike (Common) to Vosk Barrowman for 5 TC. (640 TC on hand)\n",
+      "[2026-09-04T18:26:16.469Z] [reward] Sold Shaman's Warden Gloves (Common) to Vosk Barrowman for 6 TC. (635 TC on hand)\n[2026-09-04T18:26:16.396Z] [reward] Sold Titan's Trail Leggings (Common) to Vosk Barrowman for 8 TC. (629 TC on hand)\n[2026-09-04T18:26:11.789Z] [debug] homework: scene_intro \"Tartarian Pilgrim Camp\" \u2205 11667ms\n",
+      "[2026-09-04T18:26:11.789Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 11470ms \u2014 intro-fill:near-dup\n[2026-09-04T18:26:11.781Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 11470ms read 8273ms/write 2916ms in 754t\u2192out 33t 11.0ms/t HIT-CAP (150ch)\n[2026-09-04T18:26:00.124Z] [debug] homework: intro-fill armed after 6000ms idle\n",
+      "[2026-09-04T18:25:52.948Z] [world] Vosk Barrowman does not greet you. They watch your hands.\n[2026-09-04T18:25:52.948Z] [world] [Tartarian Pilgrim Camp] north: Garrin (return the folio) (17 tiles, 1 day, 19 hours) \u00b7 east: Sinking Cathedral (3 tiles, 8 hours) \u00b7 south: The Buried Cities (3 tiles, 8 hours) \u00b7 west: Dynasty Border Post (4 tiles, 10 hours)\n",
+      "[2026-09-04T18:25:52.945Z] [world] This ground has stopped being a place and started being a route. The bodies you le"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-04-1669-the-gate-opens-for-the-tap #mtnaj1w6w78b [inline 2/4]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtnaj1w6w78b"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1669-the-gate-opens-for-the-tap"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "2"
+    },
+    {
+      "key": "parts",
+      "value": "4"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1669-the-gate-opens-for-the-tap"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "3"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T19:36:37.967390Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T19:36:40.054000Z",
+  "fingerprints": [
+    "bb68fb18cdb58ec882636b5565ec7859"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1956010253,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-04T19:23:12.072684Z",
+    "dateReleased": "2026-09-04T19:24:40.421721Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "95665ccd03a451064cd82cda2938579ed334c83a",
+      "message": "[ota-hal] OTA-1669: the gate opens for the tap\n\nOwner: \"I still can't enter an outpost and I don't know if it's a legitimate\nreason. I've pushed a log that has that in there.\"\n\n\u26a0\u26a0\u26a0 IT WAS NOT A LEGITIMATE REASON, AND HIS LOG SAID SO IN FIVE LINES:\n\n    [17:41:38.939] ui: tap \"ENTER OUTPOST\"\n    [17:41:38.940] [player] enter outpost\n    [17:41:38.940] [world] You cross to the gate and step through.\n    [17:41:38.941] scene: loc=pilgrim_waycamp hub=- arrival=n opening=n passing=y\n    [17:41:38.970] [world] You are at Tartarian Pilgrim Camp \u2026   \u2190 still outside\n\nEight taps in thirteen seconds, because the line said it worked.\n\n\u26a0\u26a0 `passing=y` IS THE DIAGNOSIS. He had a course plotted to somewhere else (the\nmission trace on the very next line reads `travelTo=mud_seas`), so\n`passingThrough` was true and `freshOutpostVisit` \u2014 which required\n`!passingThrough` \u2014 went false. The gate never opened.\n\n\u26a0 THE GUARD WAS CORRECT WHEN WRITTEN AND WAS ORPHANED BY OTA-1606. It stopped a\nmulti-tile auto-travel dumping the player inside every outpost it crossed \u2014 back\nwhen ARRIVAL opened the gate by itself, which OTA-1606 removed on his own\ninstruction (\"i shouldn't automatically enter an outpost because i land on that\ntile, there should be an enter outpost button\"). From that commit the only doors\nare enterHub (chip / verb) and isOpening (tutorial), both already required on the\nsame line. So the guard protected nothing and blocked only the deliberate act it\nwas never aimed at. Having somewhere to be is not a reason you cannot walk\nthrough a door you are standing at \u2014 and the course survives the visit.\n\n\u26a0\u26a0\u26a0 THE SECOND HALF IS WHAT COST HIM THE EVENING. The verb printed its success\nline BEFORE calling beginScene and never checked. A player who reads a\nconfirmation and does not move does not conclude \"refused\" \u2014 he concludes the\nbutton is broken, and taps it again. That is the claims-success-without-checking\nclass, sitting on the one control that moves you between the two halves of the\ngame.\n\n\u26a0\u26a0 AND MY FIRST FIX WAS WRONG IN THE OTHER DIRECTION \u2014 ota970 #112 caught it.\nMoving the line to AFTER beginScene made it honest and put it after the room's\n\"Paths:\" listing, so the player would read the room they were standing in before\nbeing told they had walked through the door. The line now lives inside the\n`freshOutpostVisit` branch, gated on `enterHub`: it cannot outrun the entry (it\nis inside the branch that performs it) and cannot trail the scene (it is emitted\nbefore the scene body paints). The verb only speaks now to REFUSE, and the\nrefusal says plainly that this should have worked and asks for a bug report.\n\nThree pins were repointed, not deleted (ota1410's quoted predicate, and my own\nfirst-draft ordering claim), and the new fixture uses `placedAt` rather than\nhand-typed coordinates \u2014 the OTA-1484 rule, which the ratchet enforced on me.\n\nGates: all 18 green by exit code. Full suite green (1130 suites / 11,718 tests).\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T19:20:45Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1669-the-gate-opens-for-the-tap",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1669-the-gate-opens-for-the-tap",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T19:24:40.421721Z",
+          "dateCreated": "2026-09-04T19:23:12.072684Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155655870",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T19:24:40.675591Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1669-the-gate-opens-for-the-tap",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1669-the-gate-opens-for-the-tap",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1669-the-gate-opens-for-the-tap",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1669-the-gate-opens-for-the-tap)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "40778a740f8f499bb06976fb190def25",
+  "previousEventID": "ba8beadb8ce64d2bade2c47a76340c25"
+}

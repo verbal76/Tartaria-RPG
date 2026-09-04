@@ -1,0 +1,226 @@
+{
+  "id": "5f4b6f28067c4cdb8b16cbd99287a558",
+  "groupID": "7712469010",
+  "eventID": "5f4b6f28067c4cdb8b16cbd99287a558",
+  "projectID": "4511945117532160",
+  "size": 2720,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log-beacon 2026-09-04-1668-the-row-says-what-it-does #mtnaj1w6w78b"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1668-the-row-says-what-it-does",
+  "message": "player-log-beacon 2026-09-04-1668-the-row-says-what-it-does #mtnaj1w6w78b",
+  "title": "player-log-beacon 2026-09-04-1668-the-row-says-what-it-does #mtnaj1w6w78b",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "6d8b0f1359b04abe884dd2a01eb89ee7",
+      "span_id": "8a3e38bedf178299",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {},
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log-beacon 2026-09-04-1668-the-row-says-what-it-does #mtnaj1w6w78b"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtnaj1w6w78b"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1668-the-row-says-what-it-does"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-beacon"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "parts",
+      "value": "4"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1668-the-row-says-what-it-does"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T19:14:50.366385Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T19:14:52.425000Z",
+  "fingerprints": [
+    "812032fd94e747eda962489550576e8d"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1955935008,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-04T18:40:44.294692Z",
+    "dateReleased": "2026-09-04T18:42:15.646786Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "2ba93f935007c5a362f3ceb461c484bcea657a9c",
+      "message": "[ota-hal] OTA-1668: the row says what it is and what it does\n\nOwner: \"at workings to learn at a vendor, the things you buy need more than a\nname, they need to tell you what they are and what they do on the button line. I\nunderstand that if you tap on it you get the full detailed view but that's an\nextra step. If I know it's an axe with electric base damage and it's a 2d10 then\nit helps me choose faster.\"\n\n\u26a0\u26a0 HE NAMED THE ONE BUY SURFACE THAT HAD NOTHING, and he was precise about which.\nThe ordinary offer rows have carried `kindLabel \u00b7 rarity` plus a full stat line\nfor many OTAs. WORKINGS TO LEARN \u2014 the recipe list \u2014 printed the result's NAME,\nits price, and the literal word \"recipe\". Comparing two workings meant opening\nboth and backing out of one, every time.\n\n\u26a0 THE HEADLINE IS BUILT AT THE SOURCE, NOT PARSED AT THE ROW. Every branch of\nitemPreview writes its own from values it already holds. The tempting shortcut \u2014\nhave the caller slice stats[0] and regex \"Damage: 2d10 (electrical)\" back apart \u2014\nis how a screen eventually prints a weapon's durability where its damage belongs,\nand it would have had to be repeated at every surface wanting the line. The\ndamage glyph is the one the combat button paints (OTA-1636) and the codex GLYPHS\ntab explains (OTA-1667), so the shop and the fight teach one symbol.\n\n\u26a0 AND THE INSTANCE HEADLINE FOLLOWS THE INSTANCE. A plain spread would have\ncarried the CATALOG's AC onto a piece whose AC was rolled \u2014 the row and the card\ndisagreeing about the same object, which is the OTA-1611 defect in a new place.\n\n\u26a0\u26a0\u26a0 LOOT FINALLY SAYS WHAT IT IS FOR, folded in from the same message: \"we need\nto define what loot is in the inventory. It's just there, but what is it for?\"\n\nIt already had a job and never said so \u2014 isForgeableLootReagent has fed the\nFusing Crucible since OTA-737, and OTA-1642 authored 86 enemy drops specifically\nto keep that hopper full. \u26a0 BUT THE ANSWER IS NOT ONE ANSWER, and a blanket label\nwould have been a lie: a drop named by ANY recipe is deliberately excluded from\nthe Crucible so fusing can never cannibalise crafting. lootPurposeLine reads those\nsame two predicates, so it says \"crafting ingredient\", or \"Crucible fodder\", or \u2014\nfor the many things that are simply worth what a vendor pays \u2014 nothing at all.\nThe label and the bench's refusal cannot disagree. It renders on the vendor SELL\nrows, which is exactly where the question gets asked, one tap before you sell\nsomething the forge wanted.\n\nGates: all 18 green by exit code. Full suite green (1129 suites / 11,711 tests).\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T18:38:20Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1668-the-row-says-what-it-does",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1668-the-row-says-what-it-does",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T18:42:15.646786Z",
+          "dateCreated": "2026-09-04T18:40:44.294692Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155642392",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T18:42:15.820426Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1668-the-row-says-what-it-does",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1668-the-row-says-what-it-does",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1668-the-row-says-what-it-does",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1668-the-row-says-what-it-does)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": null
+}

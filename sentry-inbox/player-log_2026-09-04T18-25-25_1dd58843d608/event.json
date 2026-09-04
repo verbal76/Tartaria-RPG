@@ -1,0 +1,299 @@
+{
+  "id": "1dd58843d60848cabfb58cb02933c4b3",
+  "groupID": "7712386239",
+  "eventID": "1dd58843d60848cabfb58cb02933c4b3",
+  "projectID": "4511945117532160",
+  "size": 17918,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-04-1667-the-key-goes-where-the-player-is #mtnaawyn2pyt [inline 14/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1667-the-key-goes-where-the-player-is",
+  "message": "player-log 2026-09-04-1667-the-key-goes-where-the-player-is #mtnaawyn2pyt [inline 14/28]",
+  "title": "player-log 2026-09-04-1667-the-key-goes-where-the-player-is #mtnaawyn2pyt [inline 14/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "86ae1806afea4e0cb02be19e62f94e9c",
+      "span_id": "958387190fe27c30",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "ld Mud-Warden's Vest (Common) to Talla Mudfoot for 5 TC. (1938 TC on hand)\n[2026-09-04T02:43:26.105Z] [reward] Sold Cudgel (Common) to Talla Mudfoot for 5 TC. (1943 TC on hand)\n[2026-09-04T02:43:26.176Z] [reward] Sold Mud-Warden's Vest (Common) to Talla Mudfoot for 5 TC. (1948 TC on hand)\n",
+      "[2026-09-04T02:43:26.248Z] [reward] Sold Mud-Warden's Vest (Common) to Talla Mudfoot for 5 TC. (1953 TC on hand)\n[2026-09-04T02:43:26.814Z] [debug] \u26a0 FREEZE WATCH: LOGIC stalled while frames kept coming (js 7703ms \u00b7 frames 0ms). Something blocked the JS thread \u2014 look for a long synchronous run. \u00b7 crumb before: native:llm:done +18449ms \u2192 now: native:llm:done +18449ms \u00b7 doing: tap \"take / salvage\" \u00b7",
+      " native: idle\n[2026-09-04T02:43:31.818Z] [debug] freeze watch: recovered \u2014 painting again after 7846ms quiet.\n[2026-09-04T02:43:38.844Z] [reward] Bought the Titanforged Cuirass working for 500 TC. \u2726 Recipe learned (Legendary)! Open Crafting to forge it \u2014 you'll still need the materials.\n",
+      "[2026-09-04T02:43:41.548Z] [reward] Bought the Titan Shield working for 200 TC. \u2726 Recipe learned (Rare)! Open Crafting to forge it \u2014 you'll still need the materials.\n[2026-09-04T02:43:41.791Z] [debug] persist sizes(KB): total=323 player=75 wm=166[rooms=93 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=77 scene=5\n",
+      "[2026-09-04T02:43:46.537Z] [reward] Bought Energy Baton from Talla Mudfoot for 143 TC. (1110 TC left)\n[2026-09-04T02:43:46.537Z] [reward] They don't charge a friend full price \u2014 8 TC stayed in your pouch.\n[2026-09-04T02:43:54.520Z] [reward] Bought 4\u00d7 Wild Carrot from Talla Mudfoot for 12 TC. (1098 TC left)\n",
+      "[2026-09-04T02:43:56.919Z] [reward] Bought Smoke-Cured Jerky Strip from Talla Mudfoot for 6 TC. (1092 TC left)\n[2026-09-04T02:43:56.919Z] [reward] They don't charge a friend full price \u2014 1 TC stayed in your pouch.\n[2026-09-04T02:43:58.888Z] [reward] Bought First Aid Kit from Talla Mudfoot for 15 TC. (1077 TC left)\n",
+      "[2026-09-04T02:44:00.934Z] [reward] Bought 3\u00d7 Wild Oats from Talla Mudfoot for 12 TC. (1065 TC left)\n[2026-09-04T02:44:03.360Z] [reward] Bought 5\u00d7 Trail Rations from Talla Mudfoot for 40 TC. (1025 TC left)\n[2026-09-04T02:44:07.332Z] [debug] ui: tap \"more \u25b8\"\n[2026-09-04T02:44:09.364Z] [debug] ui: tap \"craft\"\n",
+      "[2026-09-04T02:44:11.919Z] [world] You repair the Aether-Walker's Boots. Back to full. (spent: Patched Cloth x4)\n[2026-09-04T02:44:11.977Z] [world] You repair the Architect's Sight Enhancer. Back to full. (spent: Patched Cloth x4)\n[2026-09-04T02:44:11.998Z] [world] You repair the Poisoned Bone Crossbow. Back to full. (spent: Scrap Metal x6, Stick x2)\n",
+      "[2026-09-04T02:44:12.018Z] [world] You repair the Crude Golem Sledge. Back to full. (spent: Scrap Metal x2)\n[2026-09-04T02:44:12.048Z] [arbiter] The Arbiter stops with his hand over your pack. \"Before I touch the Mud-glass Scales \u2014 2 pieces of this is Crucible stock: Horn-Capped Dowel, Glass-Beaded Strap. Say the word and I'll set it aside instead.\"\n",
+      "[2026-09-04T02:44:12.262Z] [debug] persist sizes(KB): total=323 player=75 wm=166[rooms=93 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=77 scene=5\n[2026-09-04T02:44:13.863Z] [arbiter] The Arbiter nods. \"Patched in: Horn-Capped Dowel \u2192 Patched Cloth, Glass-Beaded Strap \u2192 Patched Cloth.\"\n",
+      "[2026-09-04T02:44:13.878Z] [world] You repair the Mud-glass Scales. Back to full. (spent: Patched Cloth x4)\n[2026-09-04T02:44:13.927Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Glass-Beaded Strap \u2192 Patched Cloth.\"\n[2026-09-04T02:44:13.940Z] [world] You repair the Reclaimer's Cloak. Back to full. (spent: Patched Cloth x4)\n",
+      "[2026-09-04T02:44:13.957Z] [world] You repair the Corrupted Reclaimers Guild Shroud-Spun Slinger. Back to full. (spent: Small Rock x2)\n[2026-09-04T02:44:13.987Z] [arbiter] The Arbiter stops with his hand over your pack. \"Before I touch the Titan's Gauntlets \u2014 3 pieces of this is Crucible stock: Coarse Canvas Patch, Knotted Sinew Braid, Wasp Venom. Say the word and I'll set it aside instead.\"\n",
+      "[2026-09-04T02:44:15.385Z] [arbiter] The Arbiter nods. \"Patched in: Glass-Beaded Strap \u2192 Patched Cloth, Coarse Canvas Patch \u2192 Patched Cloth, Knotted Sinew Braid \u2192 Patched Cloth, Wasp Venom \u2192 Patched Cloth.\"\n[2026-09-04T02:44:15.403Z] [world] You repair the Titan's Gauntlets. Back to full. (spent: Patched Cloth x4)\n[2026-09-04T02:44:28.172Z] [player] craft Corruption Tonic\n",
+      "[2026-09-04T02:44:28.173Z] [debug] parser: intent=craft conf=1.00 verb=craft target=corruption tonic resolved=Corruption Tonic range=- enemies=0 hooks=3\n[2026-09-04T02:44:28.399Z] [reward] \u2726 Crafted Corruption Tonic \u00d77. The Arbiter watches you set the last piece.\n[2026-09-04T02:44:28.399Z] [debug] arbiter: template (reason=intent-not-allowed:craft)\n",
+      "[2026-09-04T02:44:28.399Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-04T02:44:28.503Z] [cognitive] neutral  (102ms)\n[2026-09-04T02:44:33.946Z] [player] craft Resonant Paste\n[2026-09-04T02:44:33.947Z] [debug] parser: intent=craft conf=1.00 verb=craft target=resonant paste resolved=- range=- enemies=0 hooks=3\n",
+      "[2026-09-04T02:44:33.949Z] [reward] \u2726 Crafted Resonant Paste. The Arbiter watches you set the last piece.\n[2026-09-04T02:44:34.076Z] [cognitive] neutral  (124ms)\n[2026-09-04T02:44:38.769Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.\n[2026-09-04T02:44:38.834Z] [player] craft Smoldering Paste\n",
+      "[2026-09-04T02:44:38.834Z] [debug] parser: intent=craft conf=1.00 verb=craft target=smoldering paste resolved=- range=- enemies=0 hooks=3\n[2026-09-04T02:44:38.923Z] [reward] \u2726 Crafted Smoldering Paste \u00d73. The Arbiter watches you set the last piece.\n[2026-09-04T02:44:39.026Z] [debug] qwen\u23f1 ambient preempted 4970ms read 3853ms/write 817ms in 363t\u2192out 25t 10.6ms/t (50ch)\n",
+      "[2026-09-04T02:44:39.046Z] [cognitive] neutral  (121ms)\n[2026-09-04T02:44:39.046Z] [debug] arbiter: ambient cut short 5096ms \u2014 yielded to the player\n[2026-09-04T02:44:39.046Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient after 4970ms \u2014 ambient:preempted\n[2026-09-04T02:44:57.201Z] [player] craft Tin Ward Ring\n",
+      "[2026-09-04T02:44:57.202Z] [debug] parser: intent=craft conf=1.00 verb=craft target=tin ward ring resolved=Tin Ward Ring range=- enemies=0 hooks=3\n[2026-09-04T02:44:57.205Z] [reward] \u2726 Crafted Tin Ward Ring. The Arbiter watches you set the last piece.\n[2026-09-04T02:44:57.206Z] [debug] arbiter: template (reason=intent-not-allowed:craft)\n",
+      "[2026-09-04T02:44:57.206Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-04T02:44:57.345Z] [cognitive] neutral  (138ms)\n[2026-09-04T02:45:05.034Z] [reward] Talla Mudfoot fires up a portable Crucible for you. (\u221225 TC)\n",
+      "[2026-09-04T02:45:24.569Z] [reward] \u2726 The Crucible drinks the five pieces and works a second coating channel into the Bone Crossbow. It can now hold TWO coatings at once \u2014 both bite on every landing hit. (Its damage and edge are unchanged.)\n",
+      "[2026-09-04T02:45:25.140Z] [debug] persist sizes(KB): total=321 player=73 wm=166[rooms=93 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=77 scene=5\n[2026-09-04T02:45:26.839Z] [reward] Talla Mudfoot fires up a portable Crucible for you. (\u221225 TC)\n",
+      "[2026-09-04T02:45:37.494Z] [reward] \u2726 The Crucible drinks the five pieces and works a second coating channel into the Reclaimers Guild Shroud-Spun Slinger. It can now hold TWO coatings at once \u2014 both bite on every landing hit. (Its damage and edge are unchanged.)\n[2026-09-04T02:45:52.118Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n",
+      "[2026-09-04T02:45:52.127Z] [world] Pell the Slow glances up. \"You again.\" Not warm, not cold \u2014 noted.\n[2026-09-04T02:45:52.127Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Pell the Slow, wandering trader. Tap the vendor banner to trade.\n",
+      "[2026-09-04T02:45:52.136Z] [world] Rare workings for sale: Cinderward Ring (200 TC), Cutpurse's Band (200 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n[2026-09-04T02:45:52.136Z] [world] You walk north through open silt. The compass points north into open ground.\n",
+      "[2026-09-04T02:45:52.137Z] [world] Long enough has passed that it should have changed. It has not.\n[2026-09-04T02:45:53.305Z] [debug] ui: tap \"take / salvage\"\n[2026-09-04T02:45:54.745Z] [world] Tucked inside the blueprint: an oddment that matches no quartermaster's list. The kind of thing that fuses well.\n",
+      "[2026-09-04T02:45:54.745Z] [world] You work the core apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n[2026-09-04T02:45:54.746Z] [world] You work the data slate apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n[2026-09-04T02:45:54.746Z] [world] You work the gauge over. A part of it comes loose, intact.\n",
+      "[2026-09-04T02:45:54.746Z] [world] You work the mask over. A part of it comes loose, intact.\n[2026-09-04T02:45:54.746Z] [world] You strip the shrine carefully. Something usable comes free in your hand.\n[2026-09-04T02:45:54.747Z] [reward] \u2726 Salvage haul:\n[2026-09-04T02:45:54.747Z] [reward]     \u2022 Moth-Eaten Felt Scrap (Common)\n[2026-09-04T02:45:54.747Z] [reward]     \u2022 Bent Shackle Pin (Common)\n",
+      "[2026-09-04T02:45:54.747Z] [reward]     \u2022 Obsidian Chip (Common)\n[2026-09-04T02:45:54.748Z] [reward]     \u2022 Scrap Metal (Common)\n[2026-09-04T02:45:54.748Z] [reward]     \u2022 Bent Nail x2 (Common)\n[2026-09-04T02:45:54.750Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-09-04T02:45:56.392Z] [debug] ui: tap \"investigate\"\n[2026-09-04T02:45:58.223Z] [player] investigate diagram\n",
+      "[2026-09-04T02:45:58.223Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=diagram resolved=diagram range=- enemies=0 hooks=3\n[2026-09-04T02:45:58.235Z] [world] You pore over the diagram. Faded diagrams, a materials list, a maker's shorthand \u2014 enough to reconstruct the working.\n",
+      "[2026-09-04T02:45:58.235Z] [reward] \u2726 Recipe learned: Voidspawn Bolt (Rare)! Open Crafting to forge it.\n[2026-09-04T02:45:58.245Z] [system] \u23f3 Time passed: 15 min\n[2026-09-04T02:45:58.438Z] [cognitive] neutral  (192ms)\n[2026-09-04T02:46:04.477Z] [debug] ui: tap \"craft\"\n[2026-09-04T02:46:18.015Z] [debug] ui: tap \"craft\"\n",
+      "[2026-09-04T02:46:18.197Z] [debug] persist sizes(KB): total=322 player=73 wm=167[rooms=93 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=77 scene=5\n[2026-09-04T02:46:30.365Z] [player] craft Void Pulse Rod\n[2026-09-04T02:46:30.365Z] [debug] parser: intent=craft conf=1.00 verb=craft target=void pulse rod resolved=- range=- enemies=0 hooks=3\n",
+      "[2026-09-04T02:46:30.443Z] [reward] \u2726 Crafted Void Pulse Rod. The Arbiter watches you set the last piece.\n[2026-09-04T02:46:30.444Z] [debug] arbiter: template (reason=intent-not-allowed:craft)\n[2026-09-04T02:46:30.444Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-04T02:46:30.566Z] [cognitive] THROW  (121ms)\n",
+      "[2026-09-04T02:46:39.189Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-09-04T02:46:39.216Z] [world] You walk west through open silt. The compass tells you The Architect's Blind lies further west \u2014 3 tiles, about 8 hours of travel.\n[2026-09-04T02:46:39.216Z] [world] The hours you spent elsewhere did nothing to this.\n[2026-09-04T02:46:41.074Z] [debug] ui: tap \"take / salvage\"\n",
+      "[Filtered]",
+      "[2026-09-04T02:46:42.597Z] [world] You strip the panel carefully. Something usable comes free in your hand.\n[2026-09-04T02:46:42.597Z] [world] You break the pipe apart. Among the pieces, something worth keeping.\n[2026-09-04T02:46:42.597Z] [world] You salvage the rusted ladder. The take is small but real.\n",
+      "[2026-09-04T02:46:42.597Z] [world] You work the signal spark over. A part of it comes loose, intact.\n[2026-09-04T02:46:42.598Z] [reward] \u2726 Salvage haul:\n[2026-09-04T02:46:42.598Z] [reward]     \u2022 Splintered Haft End (Common)\n[2026-09-04T02:46:42.598Z] [reward]     \u2022 Worn Tartarian Coin x5 (Common)\n[2026-09-04T02:46:42.598Z] [reward]     \u2022 Aether Crystal x3 (Common)\n",
+      "[2026-09-04T02:46:42.599Z] [reward]     \u2022 Automaton Circuit x2 (Common)\n[2026-09-04T02:46:42.599Z] [reward]     \u2022 Stick x2 (Common)\n[2026-09-04T02:46:42.599Z] [reward]     \u2022 Scrap Metal (Common)\n[2026-09-04T02:46:44.608Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-09-04T02:46:44.627Z] [world] You walk north through open silt. The compass points north into open ground.\n",
+      "[2026-09-04T02:46:44.628Z] [world] Whatever clock this place runs on, it has not ticked since you left.\n[2026-09-04T02:46:44.632Z] [world] A Mud Monarchs patrol works the ground near their outpost \u2014 4 of them \u2014 and spots you closing in. They move to cut you off.\n[2026-09-04T02:46:44.632Z] [arbiter] \"You're on Mud Monarchs ground now,\" the Arbiter says low. \"Their patrols don't ask why you came.\"\n",
+      "[2026-09-04T02:46:49.043Z] [debug] ui: tap \"inventory\"\n[2026-09-04T02:47:06.102Z] [reward] You work the corruption tonic into the weapon's second channel \u2014 it now carries TWO coatings. Now wielding the Poisoned Corrupted Bone Crossbow; both bite on every landing hit (1d6 poison + 1d4 corruption).\n",
+      "[2026-09-04T02:47:19.249Z] [reward] You work the resonant paste into the weapon's second channel \u2014 it now carries TWO coatings. Now wielding the Corrupted Resonant Reclaimers Guild Shroud-Spun Slinger; both bite on every landing hit (1d4 corruption + 1d4 electrical).\n[2026-09-04T02:47:23.957Z] [debug] ui: tap \"dodge\"\n[2026-09-04T02:47:23.970Z] [player] dodge\n",
+      "[2026-09-04T02:47:23.971Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=4 hooks=3\n[2026-09-04T02:47:23.972Z] [world] You commit to the dodge. Slip Mud Monarchs Patrol 1's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-04T02:47:24.056Z] [combat] Mud Monarchs Patrol 1 \u2014 d20 \u2192 5 + ATK 8 = 13 vs your AC 22 \u2014 \u2717 EVADED\n[2026-09-04T02:47:24.057Z] [combat] Dodge \u2014 d20 \u2192 14 + DEX 19 = 33 vs ATK 13. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n",
+      "[2026-09-04T02:47:24.059Z] [world] You slip Mud Monarchs Patrol 1's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n[2026-09-04T02:47:24.061Z] [debug] ac-shift 22\u219225: race/base 10 + gear 18 + title 0 \u2192 trimmed 22 + status 3 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves f",
+      "eet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n[2026-09-04T02:47:24.061Z] [combat] Mud Monarchs Patrol 2 \u2014 d20 \u2192 3 + ATK 10 = 13 vs your AC 25 \u2014 \u2717 MISS\n[2026-09-04T02:47:24.062Z] [combat] Mud Monarchs Patrol 4 and 1 other close the distance.\n[2026-09-04T02:47:24.062Z] [debug] arbiter: template (reason=combat)\n[2026-09-04T02:47:24.062Z] [debug] arbiter: "
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-04-1667-the-key-goes-where-the-player-is #mtnaawyn2pyt [inline 14/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtnaawyn2pyt"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1667-the-key-goes-where-the-player-is"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "14"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1667-the-key-goes-where-the-player-is"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T18:25:23.542690Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "34": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 340,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T18:25:25.514000Z",
+  "fingerprints": [
+    "5ac1b3658bc728e8b97d1704393c7b64"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1955885716,
+    "commitCount": 3,
+    "data": {},
+    "dateCreated": "2026-09-04T18:13:29.724780Z",
+    "dateReleased": "2026-09-04T18:14:31.270348Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "db7231c53271128a3a0226f390f97a59a74a9862",
+      "message": "[ota-hal] OTA-1667: the key goes where the player is\n\nOwner, three things in one message: \"the about tab, should that be there or\nshould it just be wrapped up in the log? it honestly doesn't mean anything to\nanyone but you and me. the weapon glyphs section should be under the lore button\nthat lives on the minimap not in about, that should be easily player facing.\nalso audit the glyphs list to see if all of those damage types exist in game.\"\n\n\u26a0\u26a0\u26a0 THE AUDIT ANSWER IS NO. FOUR OF THE THIRTEEN DID NOT EXIST.\n\nMeasured across all 301 catalog weapons, through the SAME baseDamageGlyph path\nthe combat buttons paint from:\n\n    \u2692 bludgeoning 65    \u25b2 piercing 55    \u2726 aetheric 49    \u2694 slashing 45\n    \ud83d\udd25 burn 45          \u26a1 electrical 22  \u2620 poison 9       \u2744 cold 6\n    \u2622 radiation 5\n    \u2699 degradation 0     \u2731 stun 0         \u2697 acid 0         \u2623 corruption 0\n\n\u26a0\u26a0 AND \u2699 WAS UNREACHABLE BY CONSTRUCTION, not merely unused. OTA-1652 aliased\n`degradation \u2192 acid`, and baseDamageGlyph canonicalises BEFORE the glyph lookup \u2014\nso even a weapon authored with degradation prints \u2697. That row could not appear\non a button under any circumstances, and the key has promised it for 29 OTAs.\n\n\u26a0 ACID AND CORRUPTION ARE NOT MISSING FROM THE GAME. They are missing as a\nweapon's OWN damage. Both are live coating families with real vials (burn 3,\nelectrical 3, poison 3, cold 2, corruption 2, acid 1) and the COATS section\nlisted them correctly all along. The defect was listing them a SECOND time under\n\"own damage\", where nothing can carry them.\n\n\u26a0\u26a0\u26a0 SO THE FIX IS A DERIVATION, NOT A SHORTER LIST \u2014 and that is the part worth\nkeeping. A list I prune by hand today is wrong again the first time somebody\nauthors an acid-based weapon: the key would then HIDE a glyph the buttons paint,\nthe same lie pointing the other way. `baseTypesInPlay()` reads the catalog, so\nboth directions are now impossible and ota1667 is what holds it there.\n\nTHE KEY MOVED. It is the GLYPHS tab of the lore codex, third in the row behind\nBEASTS and FALLEN \u2014 by the same rule OTA-1365 ordered that row with, how often\nit is opened WHILE PLAYING. \"What does \u2697 mean\" is asked from inside a fight,\nwhich is the worst possible moment to be told the answer is behind a gear icon,\nunder a build-id dump, in a settings screen. The card itself is unchanged and\nstill reads the live weaponGlyphs tables.\n\nTHE ABOUT TAB FOLDED AWAY, and he is right that the log already had it: every\nCOPY LOG export and every REPORT A BUG carries buildBasicDeviceSummary(), so the\ntab was a THIRD copy of a thing that already reaches me two better ways. Nothing\nwas lost \u2014 the dedication, the seven-tap owner ritual (OTA-1490; both your\nphones depend on it) and the third-party notices are one page now, called ABOUT,\nwith the dedication LEADING instead of buried under diagnostics where nobody\nscrolls. SETTINGS is down to four tabs: SESSION \u00b7 SFX \u00b7 DISPLAY \u00b7 ABOUT.\n\nGates: all 18 green by exit code. Full suite green.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T18:10:56Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1667-the-key-goes-where-the-player-is",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1667-the-key-goes-where-the-player-is",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T18:14:31.270348Z",
+          "dateCreated": "2026-09-04T18:13:29.724780Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155633698",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T18:14:31.584822Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1667-the-key-goes-where-the-player-is",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1667-the-key-goes-where-the-player-is",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1667-the-key-goes-where-the-player-is",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1667-the-key-goes-where-the-player-is)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "21a05f69795a4144a1dbb8ba4f0bb635",
+  "previousEventID": "1ac8189c243244b2af3afdb5bc956337"
+}

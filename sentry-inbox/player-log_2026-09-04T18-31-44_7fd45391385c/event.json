@@ -1,0 +1,299 @@
+{
+  "id": "7fd45391385c43bebe2945b040c53a26",
+  "groupID": "7712396118",
+  "eventID": "7fd45391385c43bebe2945b040c53a26",
+  "projectID": "4511945117532160",
+  "size": 17860,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-04-1667-the-key-goes-where-the-player-is #mtnaj1w6w78b [inline 4/4]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1667-the-key-goes-where-the-player-is",
+  "message": "player-log 2026-09-04-1667-the-key-goes-where-the-player-is #mtnaj1w6w78b [inline 4/4]",
+  "title": "player-log 2026-09-04-1667-the-key-goes-where-the-player-is #mtnaj1w6w78b [inline 4/4]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "86ae1806afea4e0cb02be19e62f94e9c",
+      "span_id": "958387190fe27c30",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "=0 hooks=0\n[2026-09-04T17:42:31.532Z] [player] investigate weathered bird nest\n[2026-09-04T17:42:30.460Z] [cognitive] SWIM  (199ms)\n[2026-09-04T17:42:30.260Z] [system] \u23f3 Time passed: 24 min\n[2026-09-04T17:42:30.251Z] [world] You scrape at the silt with the sentinel cleaver. Nothing of worth.\n",
+      "[2026-09-04T17:42:30.250Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=- range=- enemies=0 hooks=0\n[2026-09-04T17:42:30.249Z] [player] investigate the mud\n[2026-09-04T17:42:28.749Z] [debug] ui: tap \"investigate\"\n[2026-09-04T17:42:27.347Z] [reward]     \u2022 Bone-Handled Rivet (Uncommon)\n[2026-09-04T17:42:27.347Z] [reward]     \u2022 Stick x2 (Common)\n",
+      "[Filtered]",
+      "[2026-09-04T17:42:26.454Z] [world] You lift the Titan's Trail Leggings clear.\n[2026-09-04T17:42:26.453Z] [reward] \u2726 Shaman's Warden Gloves (Common).\n[2026-09-04T17:42:26.453Z] [world] You pick up the Shaman's Warden Gloves.\n[2026-09-04T17:42:26.434Z] [reward] \u2726 Crude Golem Pike (Common).\n[2026-09-04T17:42:26.433Z] [world] You take the Crude Golem Pike from where it lay.\n",
+      "[2026-09-04T17:42:25.383Z] [debug] ui: tap \"take / salvage\"\n[2026-09-04T17:42:23.272Z] [debug] meta-comment guard: skipped intent parse (report-of-behaviour: \"it won't let\") on 105-char input\n[2026-09-04T17:42:23.270Z] [arbiter] The Arbiter studies you, plainly. \"I'm not sure what you're trying to tell me. I'll keep your note in the log either way. If you mean to act, phrase it as a verb \u2014 'invest",
+      "igate the rubble', 'go east', 'attack the figure'.\"\n[2026-09-04T17:42:23.268Z] [player] I am trying to enter this outpost, but it won't let me, if there is a legit reason it should tell me why.\n[2026-09-04T17:42:03.353Z] [debug] homework: scene_intro \"Tartarian Pilgrim Camp\" \u2713 8868ms\n",
+      "[2026-09-04T17:42:03.158Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 8497ms read 7381ms/write 1089ms in 751t\u2192out 33t 9.8ms/t HIT-CAP (167ch)\n[2026-09-04T17:41:54.486Z] [debug] homework: intro-fill armed after 12714ms idle\n[2026-09-04T17:41:52.234Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n",
+      "[2026-09-04T17:41:51.835Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=360 from=cached winH=986 beat=-\n[2026-09-04T17:41:47.064Z] [debug] arbiter: qwen \u2713 13948ms (intent=scene_intro)\n[2026-09-04T17:41:47.062Z] [arbiter] You, the Arbiter, stood at the brazier, the air thick with the scent of decaying grass and the faint odors of damp earth.\n",
+      "[2026-09-04T17:41:46.718Z] [debug] qwen\u23f1 stats \u2014 narration:scene_intro_fill n3 avg10.2s max12.5s read8.6s/write5.2s \u26a01unusable in756t\u2192out22t ms/tok 11.3-11.3 cap2 \u23f81 \u27021/11.4s | ambient n2 avg4.4s max6.1s \u26a02unusable in365t\u2192out0t \u23f82 \u27022/8.9s | narration:scene_intro n2 avg11.0s max13.4s \u26a02unusable in779t\u2192out33t cap2 \u23f81 \u27021/8.7s | investigate_lore n2 avg4.2s max5.9s read1.5s/write0.8s in128t\u2192out24t ms/t",
+      "ok 11.2-11.5 wait1.9s | flourish n1 avg4.6s max4.6s read1.9s/write0.3s in175t\u2192out9t ms/tok 11.1-11.1 wait2.4s || WASTED 4 calls / 28.9s\n[2026-09-04T17:41:46.718Z] [debug] qwen\u23f1 narration:scene_intro ok 13417ms read/write unusable (native mis-reported 17409ms/1596ms \u2014 llama.rn split bug, not this call) in 776t\u2192out 33t HIT-CAP (137ch)\n",
+      "[2026-09-04T17:41:38.976Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-04T17:41:38.975Z] [debug] arbiter: template (reason=busy)\n[2026-09-04T17:41:38.975Z] [world] [Tartarian Pilgrim Camp] north: Garrin (return the folio) (17 tiles, 1 day, 19 hours) \u00b7 east: Sinking Cathedral (3 tiles, 8 hours) \u00b7 south: The Buried Cities (3 tiles, 8 hours) \u00b7 west: Dynasty Border Post (4",
+      " tiles, 10 hours)\n[2026-09-04T17:41:38.970Z] [world] Your feet do the thinking here. You are just along for it. The bodies you left are still here. Nothing has moved in to replace them.\nYou are at Tartarian Pilgrim Camp. A rest-camp of True Tartarian pilgrims on the frontier track, where the faithful gather before the long descent into the deep buried cities.\n",
+      "[2026-09-04T17:41:38.970Z] [world] Rain the color of old oil. It pools on Aetherstone and refuses to soak in.\n[2026-09-04T17:41:38.970Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter tilts their head toward you. \"You can just ask m\u2026\"\n",
+      "[2026-09-04T17:41:38.970Z] [arbiter] The Arbiter tilts their head toward you. \"You can just ask me things, you know \u2014 a faction, a place, a name you half-remember. I keep more than I offer.\"\n[2026-09-04T17:41:38.942Z] [debug] missions: \u00b7 at=pilgrim_waycamp travelTo=mud_seas\n",
+      "[2026-09-04T17:41:38.942Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n[2026-09-04T17:41:38.942Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n",
+      "[2026-09-04T17:41:38.942Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n[2026-09-04T17:41:38.942Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc=\"the Order envoy\" gives=Sealed Reliquary Box PAUSED\n",
+      "[2026-09-04T17:41:38.942Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n[2026-09-04T17:41:38.941Z] [debug] missions: hunt:hunt_bog_dragon stage 5/7 [attack_provoke\u2192attack] @mud_seas needs=Eshren's Name-Token\u2713 spawn=Mud Harpy\u00d73 AMBUSH\n",
+      "[2026-09-04T17:41:38.941Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n[2026-09-04T17:41:38.941Z] [debug] scene: loc=pilgrim_waycamp hub=- arrival=n opening=n passing=y\n[2026-09-04T17:41:38.940Z] [world] You cross to the gate and step through.\n[2026-09-04T17:41:38.940Z] [player] enter outpost\n",
+      "[2026-09-04T17:41:38.939Z] [debug] ui: tap \"ENTER OUTPOST\"\n[2026-09-04T17:41:38.372Z] [debug] persist sizes(KB): total=336 player=72 wm=174[rooms=99 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=88 scene=2\n[2026-09-04T17:41:38.018Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-04T17:41:38.018Z] [debug] arbiter: template (reason=busy)\n",
+      "[2026-09-04T17:41:38.016Z] [world] [Tartarian Pilgrim Camp] north: Garrin (return the folio) (17 tiles, 1 day, 19 hours) \u00b7 east: Sinking Cathedral (3 tiles, 8 hours) \u00b7 south: The Buried Cities (3 tiles, 8 hours) \u00b7 west: Dynasty Border Post (4 tiles, 10 hours)\n",
+      "[2026-09-04T17:41:38.009Z] [world] Familiar to the point of invisibility. The bodies you left are still here. Nothing has moved in to replace them.\nViolet threads briefly knit the air, then forget the pattern.\nHazard: Flooded Tunnel. Standing water laced with Aether residue. Things move beneath the surface.\n",
+      "You are at Tartarian Pilgrim Camp. A rest-camp of True Tartarian pilgrims on the frontier track, where the faithful gather before the long descent into the deep buried cities.\n[2026-09-04T17:41:38.009Z] [world] Rain the color of old oil. It pools on Aetherstone and refuses to soak in.\n",
+      "[2026-09-04T17:41:38.008Z] [arbiter] The Arbiter tilts their head toward you. \"You can just ask me things, you know \u2014 a faction, a place, a name you half-remember. I keep more than I offer.\"\n[2026-09-04T17:41:37.975Z] [debug] missions: \u00b7 at=pilgrim_waycamp travelTo=mud_seas\n",
+      "[2026-09-04T17:41:37.974Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n[2026-09-04T17:41:37.974Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n",
+      "[2026-09-04T17:41:37.974Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n[2026-09-04T17:41:37.973Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc=\"the Order envoy\" gives=Sealed Reliquary Box PAUSED\n",
+      "[2026-09-04T17:41:37.973Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n[2026-09-04T17:41:37.973Z] [debug] missions: hunt:hunt_bog_dragon stage 5/7 [attack_provoke\u2192attack] @mud_seas needs=Eshren's Name-Token\u2713 spawn=Mud Harpy\u00d73 AMBUSH\n",
+      "[2026-09-04T17:41:37.972Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n[2026-09-04T17:41:37.971Z] [debug] scene: loc=pilgrim_waycamp hub=- arrival=n opening=n passing=y\n[2026-09-04T17:41:37.971Z] [world] You cross to the gate and step through.\n[2026-09-04T17:41:37.971Z] [player] enter outpost\n",
+      "[2026-09-04T17:41:37.970Z] [debug] ui: tap \"ENTER OUTPOST\"\n[2026-09-04T17:41:36.910Z] [world] [Tartarian Pilgrim Camp] north: Garrin (return the folio) (17 tiles, 1 day, 19 hours) \u00b7 east: Sinking Cathedral (3 tiles, 8 hours) \u00b7 south: The Buried Cities (3 tiles, 8 hours) \u00b7 west: Dynasty Border Post (4 tiles, 10 hours)\n",
+      "[2026-09-04T17:41:36.906Z] [world] You stopped looking at this place some visits ago. The bodies you left are still here. Nothing has moved in to replace them.\nHazard: Aetheric Storm Burst. A localized burst of pure Aether discharge. Reality buckles for a moment.\n",
+      "You are at Tartarian Pilgrim Camp. A rest-camp of True Tartarian pilgrims on the frontier track, where the faithful gather before the long descent into the deep buried cities.\n[2026-09-04T17:41:36.906Z] [world] Rain the color of old oil. It pools on Aetherstone and refuses to soak in.\n[2026-09-04T17:41:36.873Z] [debug] missions: \u00b7 at=pilgrim_waycamp travelTo=mud_seas\n",
+      "[2026-09-04T17:41:36.873Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n[2026-09-04T17:41:36.873Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n",
+      "[2026-09-04T17:41:36.873Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n[2026-09-04T17:41:36.872Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc=\"the Order envoy\" gives=Sealed Reliquary Box PAUSED\n",
+      "[2026-09-04T17:41:36.872Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n[2026-09-04T17:41:36.872Z] [debug] missions: hunt:hunt_bog_dragon stage 5/7 [attack_provoke\u2192attack] @mud_seas needs=Eshren's Name-Token\u2713 spawn=Mud Harpy\u00d73 AMBUSH\n",
+      "[2026-09-04T17:41:36.872Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n[2026-09-04T17:41:36.871Z] [debug] scene: loc=pilgrim_waycamp hub=- arrival=n opening=n passing=y\n[2026-09-04T17:41:36.871Z] [world] You cross to the gate and step through.\n[2026-09-04T17:41:36.871Z] [player] enter outpost\n",
+      "[2026-09-04T17:41:36.870Z] [debug] ui: tap \"ENTER OUTPOST\"\n[2026-09-04T17:41:35.878Z] [world] [Tartarian Pilgrim Camp] north: Garrin (return the folio) (17 tiles, 1 day, 19 hours) \u00b7 east: Sinking Cathedral (3 tiles, 8 hours) \u00b7 south: The Buried Cities (3 tiles, 8 hours) \u00b7 west: Dynasty Border Post (4 tiles, 10 hours)\n",
+      "[2026-09-04T17:41:35.874Z] [world] You know this patch better than you ever meant to. The bodies you left are still here. Nothing has moved in to replace them.\nHazard: Temporal Loop. You walk the same corridor and find yourself walking it again. The Aetheric field has caught the moment in a fold.\n",
+      "You are at Tartarian Pilgrim Camp. A rest-camp of True Tartarian pilgrims on the frontier track, where the faithful gather before the long descent into the deep buried cities.\n[2026-09-04T17:41:35.873Z] [world] Rain the color of old oil. It pools on Aetherstone and refuses to soak in.\n[2026-09-04T17:41:35.845Z] [debug] missions: \u00b7 at=pilgrim_waycamp travelTo=mud_seas\n",
+      "[2026-09-04T17:41:35.845Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n[2026-09-04T17:41:35.845Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n",
+      "[2026-09-04T17:41:35.845Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n[2026-09-04T17:41:35.844Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc=\"the Order envoy\" gives=Sealed Reliquary Box PAUSED\n",
+      "[2026-09-04T17:41:35.844Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n[2026-09-04T17:41:35.844Z] [debug] missions: hunt:hunt_bog_dragon stage 5/7 [attack_provoke\u2192attack] @mud_seas needs=Eshren's Name-Token\u2713 spawn=Mud Harpy\u00d73 AMBUSH\n",
+      "[2026-09-04T17:41:35.844Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n[2026-09-04T17:41:35.843Z] [debug] scene: loc=pilgrim_waycamp hub=- arrival=n opening=n passing=y\n[2026-09-04T17:41:35.842Z] [world] You cross to the gate and step through.\n[2026-09-04T17:41:35.841Z] [player] enter outpost\n",
+      "[2026-09-04T17:41:35.837Z] [debug] ui: tap \"ENTER OUTPOST\"\n[2026-09-04T17:41:34.832Z] [world] [Tartarian Pilgrim Camp] north: Garrin (return the folio) (17 tiles, 1 day, 19 hours) \u00b7 east: Sinking Cathedral (3 tiles, 8 hours) \u00b7 south: The Buried Cities (3 tiles, 8 hours) \u00b7 west: Dynasty Border Post (4 tiles, 10 hours)\n",
+      "[2026-09-04T17:41:34.827Z] [world] This ground has stopped being a place and started being a route. The bodies you left are still here. Nothing has moved in to replace them.\nYou are at Tartarian Pilgrim Camp. A rest-camp of True Tartarian pilgrims on the frontier track, where the faithful gather before the long descent into the deep buried cities.\n",
+      "[2026-09-04T17:41:34.827Z] [world] Rain the color of old oil. It pools on Aetherstone and refuses to soak in.\n[2026-09-04T17:41:34.797Z] [debug] missions: \u00b7 at=pilgrim_waycamp travelTo=mud_seas\n[2026-09-04T17:41:34.797Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n",
+      "[2026-09-04T17:41:34.797Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n\n=== END REPORT ==="
+    ],
+    "chunkChars": 14992
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-04-1667-the-key-goes-where-the-player-is #mtnaj1w6w78b [inline 4/4]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtnaj1w6w78b"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1667-the-key-goes-where-the-player-is"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "4"
+    },
+    {
+      "key": "parts",
+      "value": "4"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1667-the-key-goes-where-the-player-is"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T18:31:42.998339Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "2": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 381,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T18:31:44.991000Z",
+  "fingerprints": [
+    "126d0faea7d02331b951005e7ebdbc39"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1955885716,
+    "commitCount": 3,
+    "data": {},
+    "dateCreated": "2026-09-04T18:13:29.724780Z",
+    "dateReleased": "2026-09-04T18:14:31.270348Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "db7231c53271128a3a0226f390f97a59a74a9862",
+      "message": "[ota-hal] OTA-1667: the key goes where the player is\n\nOwner, three things in one message: \"the about tab, should that be there or\nshould it just be wrapped up in the log? it honestly doesn't mean anything to\nanyone but you and me. the weapon glyphs section should be under the lore button\nthat lives on the minimap not in about, that should be easily player facing.\nalso audit the glyphs list to see if all of those damage types exist in game.\"\n\n\u26a0\u26a0\u26a0 THE AUDIT ANSWER IS NO. FOUR OF THE THIRTEEN DID NOT EXIST.\n\nMeasured across all 301 catalog weapons, through the SAME baseDamageGlyph path\nthe combat buttons paint from:\n\n    \u2692 bludgeoning 65    \u25b2 piercing 55    \u2726 aetheric 49    \u2694 slashing 45\n    \ud83d\udd25 burn 45          \u26a1 electrical 22  \u2620 poison 9       \u2744 cold 6\n    \u2622 radiation 5\n    \u2699 degradation 0     \u2731 stun 0         \u2697 acid 0         \u2623 corruption 0\n\n\u26a0\u26a0 AND \u2699 WAS UNREACHABLE BY CONSTRUCTION, not merely unused. OTA-1652 aliased\n`degradation \u2192 acid`, and baseDamageGlyph canonicalises BEFORE the glyph lookup \u2014\nso even a weapon authored with degradation prints \u2697. That row could not appear\non a button under any circumstances, and the key has promised it for 29 OTAs.\n\n\u26a0 ACID AND CORRUPTION ARE NOT MISSING FROM THE GAME. They are missing as a\nweapon's OWN damage. Both are live coating families with real vials (burn 3,\nelectrical 3, poison 3, cold 2, corruption 2, acid 1) and the COATS section\nlisted them correctly all along. The defect was listing them a SECOND time under\n\"own damage\", where nothing can carry them.\n\n\u26a0\u26a0\u26a0 SO THE FIX IS A DERIVATION, NOT A SHORTER LIST \u2014 and that is the part worth\nkeeping. A list I prune by hand today is wrong again the first time somebody\nauthors an acid-based weapon: the key would then HIDE a glyph the buttons paint,\nthe same lie pointing the other way. `baseTypesInPlay()` reads the catalog, so\nboth directions are now impossible and ota1667 is what holds it there.\n\nTHE KEY MOVED. It is the GLYPHS tab of the lore codex, third in the row behind\nBEASTS and FALLEN \u2014 by the same rule OTA-1365 ordered that row with, how often\nit is opened WHILE PLAYING. \"What does \u2697 mean\" is asked from inside a fight,\nwhich is the worst possible moment to be told the answer is behind a gear icon,\nunder a build-id dump, in a settings screen. The card itself is unchanged and\nstill reads the live weaponGlyphs tables.\n\nTHE ABOUT TAB FOLDED AWAY, and he is right that the log already had it: every\nCOPY LOG export and every REPORT A BUG carries buildBasicDeviceSummary(), so the\ntab was a THIRD copy of a thing that already reaches me two better ways. Nothing\nwas lost \u2014 the dedication, the seven-tap owner ritual (OTA-1490; both your\nphones depend on it) and the third-party notices are one page now, called ABOUT,\nwith the dedication LEADING instead of buried under diagnostics where nobody\nscrolls. SETTINGS is down to four tabs: SESSION \u00b7 SFX \u00b7 DISPLAY \u00b7 ABOUT.\n\nGates: all 18 green by exit code. Full suite green.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T18:10:56Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1667-the-key-goes-where-the-player-is",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1667-the-key-goes-where-the-player-is",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T18:14:31.270348Z",
+          "dateCreated": "2026-09-04T18:13:29.724780Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155633698",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T18:14:31.584822Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1667-the-key-goes-where-the-player-is",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1667-the-key-goes-where-the-player-is",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1667-the-key-goes-where-the-player-is",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1667-the-key-goes-where-the-player-is)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": "73868bd3003e47fd835df159472ba449"
+}

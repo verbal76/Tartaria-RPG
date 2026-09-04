@@ -1,0 +1,298 @@
+{
+  "id": "d37ff2307eab4af0a5c20742e6c32e20",
+  "groupID": "7712386239",
+  "eventID": "d37ff2307eab4af0a5c20742e6c32e20",
+  "projectID": "4511945117532160",
+  "size": 17869,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-04-1667-the-key-goes-where-the-player-is #mtnaawyn2pyt [inline 13/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1667-the-key-goes-where-the-player-is",
+  "message": "player-log 2026-09-04-1667-the-key-goes-where-the-player-is #mtnaawyn2pyt [inline 13/28]",
+  "title": "player-log 2026-09-04-1667-the-key-goes-where-the-player-is #mtnaawyn2pyt [inline 13/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "86ae1806afea4e0cb02be19e62f94e9c",
+      "span_id": "958387190fe27c30",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "[2026-09-04T02:42:52.120Z] [reward]     \u2022 Cloth Scrap (Common)\n[2026-09-04T02:42:52.120Z] [reward]     \u2022 Tin Valve Housing (Common)\n[2026-09-04T02:42:52.120Z] [reward]     \u2022 Automaton Circuit x2 (Common)\n[2026-09-04T02:42:52.120Z] [reward]     \u2022 Bent Nail (Common)\n[2026-09-04T02:42:52.120Z] [reward]     \u2022 Aether Crystal x2 (Common)\n[2026-09-04T02:42:52.120Z] [reward]     \u2022 Stick (Common)\n",
+      "[2026-09-04T02:42:53.744Z] [debug] ui: tap \"investigate\"\n[2026-09-04T02:42:55.664Z] [player] investigate the ground\n[2026-09-04T02:42:55.664Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=3\n[2026-09-04T02:42:55.669Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Stick (Common).\n",
+      "[2026-09-04T02:42:55.677Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-09-04T02:42:55.678Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-04T02:42:55.678Z] [system] \u23f3 Time passed: 24 min\n[2026-09-04T02:42:55.938Z] [cognitive] CLIMB  (259ms)\n",
+      "[2026-09-04T02:42:56.239Z] [debug] persist sizes(KB): total=354 player=107 wm=165[rooms=93 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=78 scene=5\n[2026-09-04T02:43:00.026Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-09-04T02:43:00.044Z] [debug] spawn: gear=[Mud Shortsword, Bone Knife] window=10 roster=new\n",
+      "[2026-09-04T02:43:00.046Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Talla Mudfoot, wandering trader. Tap the vendor banner to trade.\n[2026-09-04T02:43:00.061Z] [world] Rare workings for sale: Titan Shield (200 TC), Titanforged Cuirass (500 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just as",
+      "k.\n[2026-09-04T02:43:00.061Z] [world] You walk west through open silt. The compass points west into open ground.\n[2026-09-04T02:43:00.062Z] [world] The thought you set down here is right where you set it down.\n[2026-09-04T02:43:01.695Z] [debug] ui: tap \"take / salvage\"\n[2026-09-04T02:43:03.207Z] [world] You salvage the broken conduit. The take is small but real.\n",
+      "[2026-09-04T02:43:03.207Z] [world] You break the cold spring apart. Among the pieces, something worth keeping.\n[2026-09-04T02:43:03.207Z] [world] Slim pickings on the horn. You pocket a Bent Nail on the way out.\n[2026-09-04T02:43:03.208Z] [world] You break the stabilizer apart. Among the pieces, something worth keeping.\n[2026-09-04T02:43:03.208Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-09-04T02:43:03.208Z] [reward]     \u2022 Aether Crystal x3 (Common)\n[2026-09-04T02:43:03.208Z] [reward]     \u2022 Bent Nail x4 (Common)\n[2026-09-04T02:43:04.301Z] [world] Where the Throwing Knife was, the ground is a shade darker.\n[2026-09-04T02:43:04.301Z] [reward] \u2726 Throwing Knife (Common).\n[2026-09-04T02:43:04.322Z] [world] You take the Mud Shortsword. The hollow it came out of starts closing.\n",
+      "[2026-09-04T02:43:04.323Z] [reward] \u2726 Mud Shortsword (Common).\n[2026-09-04T02:43:07.210Z] [player] Ask why the stall is here\n[2026-09-04T02:43:07.211Z] [world] \"Stall goes up where the ground is flat and comes down when it is not worth it,\" the trader says. \"That is the whole business plan.\"\n",
+      "[2026-09-04T02:43:07.212Z] [world] Talla Mudfoot places you, roughly, and adjusts what they were about to say.\n[2026-09-04T02:43:08.361Z] [debug] qwen\u23f1 flourish ok 2135ms read 1842ms/write 279ms in 175t\u2192out 9t 10.5ms/t (36ch)\n[2026-09-04T02:43:08.623Z] [debug] qwen\u23f1 \u2702 DISCARDED flourish after 2135ms \u2014 flourish:empty\n[2026-09-04T02:43:08.624Z] [debug] flourish: \u2205 2646ms\n",
+      "[2026-09-04T02:43:08.843Z] [world] You let the conversation go and Talla Mudfoot gets back to it.\n[2026-09-04T02:43:17.929Z] [reward] Sold Bonebreaker Mace (Common) to Talla Mudfoot for 14 TC. (989 TC on hand)\n[2026-09-04T02:43:18.026Z] [reward] Sold Plasma Thrower (Common) to Talla Mudfoot for 14 TC. (1003 TC on hand)\n",
+      "[2026-09-04T02:43:18.114Z] [reward] Sold Bone Throwing Axe (Common) to Talla Mudfoot for 14 TC. (1017 TC on hand)\n[2026-09-04T02:43:18.202Z] [reward] Sold Bone Knife (Common) to Talla Mudfoot for 14 TC. (1031 TC on hand)\n[2026-09-04T02:43:18.289Z] [reward] Sold Bone Knife (Common) to Talla Mudfoot for 14 TC. (1045 TC on hand)\n",
+      "[2026-09-04T02:43:18.377Z] [reward] Sold Mud Heater Sword (Common) to Talla Mudfoot for 14 TC. (1059 TC on hand)\n[2026-09-04T02:43:18.463Z] [reward] Sold Bone Knife (Common) to Talla Mudfoot for 14 TC. (1073 TC on hand)\n[2026-09-04T02:43:18.550Z] [reward] Sold Bone Knife (Common) to Talla Mudfoot for 14 TC. (1087 TC on hand)\n",
+      "[2026-09-04T02:43:18.636Z] [reward] Sold Bone Knife (Common) to Talla Mudfoot for 14 TC. (1101 TC on hand)\n[2026-09-04T02:43:18.722Z] [reward] Sold Bone Knife (Common) to Talla Mudfoot for 14 TC. (1115 TC on hand)\n[2026-09-04T02:43:18.809Z] [reward] Sold Bone Knife (Common) to Talla Mudfoot for 14 TC. (1129 TC on hand)\n",
+      "[2026-09-04T02:43:18.895Z] [reward] Sold Bone Knife (Common) to Talla Mudfoot for 14 TC. (1143 TC on hand)\n[2026-09-04T02:43:18.980Z] [reward] Sold Compact Laser Pistol (Ranged) (Common) to Talla Mudfoot for 14 TC. (1157 TC on hand)\n[2026-09-04T02:43:19.066Z] [reward] Sold Throwing Knife (Common) to Talla Mudfoot for 14 TC. (1171 TC on hand)\n",
+      "[2026-09-04T02:43:19.152Z] [reward] Sold Tartarian Hand Axe (Common) to Talla Mudfoot for 13 TC. (1184 TC on hand)\n[2026-09-04T02:43:19.238Z] [reward] Sold Aetheric Rod (Common) to Talla Mudfoot for 13 TC. (1197 TC on hand)\n[2026-09-04T02:43:19.323Z] [reward] Sold Mud-fist Wraps (Common) to Talla Mudfoot for 13 TC. (1210 TC on hand)\n",
+      "[2026-09-04T02:43:19.408Z] [reward] Sold Plasma Dagger (Common) to Talla Mudfoot for 13 TC. (1223 TC on hand)\n[2026-09-04T02:43:19.493Z] [reward] Sold Bone Shortsword (Common) to Talla Mudfoot for 13 TC. (1236 TC on hand)\n[2026-09-04T02:43:19.578Z] [reward] Sold Mud Knife (Common) to Talla Mudfoot for 13 TC. (1249 TC on hand)\n",
+      "[2026-09-04T02:43:19.663Z] [reward] Sold Repeater Rifle (Common) to Talla Mudfoot for 13 TC. (1262 TC on hand)\n[2026-09-04T02:43:19.747Z] [reward] Sold Scrap Targe (Common) to Talla Mudfoot for 13 TC. (1275 TC on hand)\n[2026-09-04T02:43:19.832Z] [reward] Sold Mud Harpoon (Common) to Talla Mudfoot for 13 TC. (1288 TC on hand)\n",
+      "[2026-09-04T02:43:19.917Z] [reward] Sold Mud-fist Wraps (Common) to Talla Mudfoot for 13 TC. (1301 TC on hand)\n[2026-09-04T02:43:20.002Z] [reward] Sold Tartarian Hand Axe (Common) to Talla Mudfoot for 13 TC. (1314 TC on hand)\n[2026-09-04T02:43:20.086Z] [reward] Sold Mud Grinder Axe (Common) to Talla Mudfoot for 13 TC. (1327 TC on hand)\n",
+      "[2026-09-04T02:43:20.171Z] [reward] Sold Aetheric Baton (Common) to Talla Mudfoot for 13 TC. (1340 TC on hand)\n[2026-09-04T02:43:20.256Z] [reward] Sold Tartarian Bone Knife (Common) to Talla Mudfoot for 13 TC. (1353 TC on hand)\n[2026-09-04T02:43:20.341Z] [reward] Sold Mud War Pike (Common) to Talla Mudfoot for 13 TC. (1366 TC on hand)\n",
+      "[2026-09-04T02:43:20.426Z] [reward] Sold Bonebreaker Mace (Common) to Talla Mudfoot for 13 TC. (1379 TC on hand)\n[2026-09-04T02:43:20.510Z] [reward] Sold Plasma Thrower (Common) to Talla Mudfoot for 13 TC. (1392 TC on hand)\n[2026-09-04T02:43:20.594Z] [reward] Sold Rusted Blade (Common) to Talla Mudfoot for 13 TC. (1405 TC on hand)\n",
+      "[2026-09-04T02:43:20.678Z] [reward] Sold Repeater Rifle (Common) to Talla Mudfoot for 13 TC. (1418 TC on hand)\n[2026-09-04T02:43:20.763Z] [reward] Sold Bone Splitter Axe (Common) to Talla Mudfoot for 13 TC. (1431 TC on hand)\n[2026-09-04T02:43:20.847Z] [reward] Sold Plasma Cutter (Common) to Talla Mudfoot for 13 TC. (1444 TC on hand)\n",
+      "[2026-09-04T02:43:20.931Z] [reward] Sold Throwing Knife (Common) to Talla Mudfoot for 13 TC. (1457 TC on hand)\n[2026-09-04T02:43:21.014Z] [reward] Sold Bonebreaker Mace (Common) to Talla Mudfoot for 12 TC. (1469 TC on hand)\n[2026-09-04T02:43:21.098Z] [reward] Sold Bone Shiv (Stealth) (Common) to Talla Mudfoot for 12 TC. (1481 TC on hand)\n",
+      "[2026-09-04T02:43:21.182Z] [reward] Sold Mud Knife (Common) to Talla Mudfoot for 12 TC. (1493 TC on hand)\n[2026-09-04T02:43:21.265Z] [reward] Sold Iron Spear (Common) to Talla Mudfoot for 12 TC. (1505 TC on hand)\n[2026-09-04T02:43:21.348Z] [reward] Sold Stone Spear (Common) to Talla Mudfoot for 12 TC. (1517 TC on hand)\n",
+      "[2026-09-04T02:43:21.432Z] [reward] Sold Magnetized Rod (Common) to Talla Mudfoot for 12 TC. (1529 TC on hand)\n[2026-09-04T02:43:21.515Z] [reward] Sold Bog-Hide Buckler (Common) to Talla Mudfoot for 12 TC. (1541 TC on hand)\n[2026-09-04T02:43:21.598Z] [reward] Sold Rusty Shortsword (Common) to Talla Mudfoot for 12 TC. (1553 TC on hand)\n",
+      "[2026-09-04T02:43:21.681Z] [reward] Sold Plasma Dagger (Common) to Talla Mudfoot for 12 TC. (1565 TC on hand)\n[2026-09-04T02:43:21.764Z] [reward] Sold Mud Grinder Axe (Common) to Talla Mudfoot for 12 TC. (1577 TC on hand)\n[2026-09-04T02:43:21.846Z] [reward] Sold Mud Shortsword (Common) to Talla Mudfoot for 12 TC. (1589 TC on hand)\n",
+      "[2026-09-04T02:43:21.929Z] [reward] Sold Sentinel's Chestplate (Common) to Talla Mudfoot for 10 TC. (1599 TC on hand)\n[2026-09-04T02:43:22.011Z] [reward] Sold Hardened Titan's Chestplate (Common) to Talla Mudfoot for 10 TC. (1609 TC on hand)\n[2026-09-04T02:43:22.093Z] [reward] Sold Titan's Guard Mask (Common) to Talla Mudfoot for 8 TC. (1617 TC on hand)\n",
+      "[2026-09-04T02:43:22.175Z] [reward] Sold Titan's Vest (Common) to Talla Mudfoot for 8 TC. (1625 TC on hand)\n[2026-09-04T02:43:22.257Z] [reward] Sold Architect's Mantle (Common) to Talla Mudfoot for 8 TC. (1633 TC on hand)\n[2026-09-04T02:43:22.338Z] [reward] Sold Golem-Guardian's Greaves (Common) to Talla Mudfoot for 8 TC. (1641 TC on hand)\n",
+      "[2026-09-04T02:43:22.419Z] [reward] Sold Reclaimer's Salvage Vest (Common) to Talla Mudfoot for 8 TC. (1649 TC on hand)\n[2026-09-04T02:43:22.500Z] [reward] Sold Reclaimer's Salvage Vest (Common) to Talla Mudfoot for 8 TC. (1657 TC on hand)\n[2026-09-04T02:43:22.581Z] [reward] Sold Reclaimer's Salvage Vest (Common) to Talla Mudfoot for 8 TC. (1665 TC on hand)\n",
+      "[2026-09-04T02:43:22.662Z] [reward] Sold Mud-Warden's Vest (Common) to Talla Mudfoot for 8 TC. (1673 TC on hand)\n[2026-09-04T02:43:22.742Z] [reward] Sold Golem-Warden's Legplates (Common) to Talla Mudfoot for 8 TC. (1681 TC on hand)\n[2026-09-04T02:43:22.823Z] [reward] Sold Mud-Warden's Vest (Common) to Talla Mudfoot for 8 TC. (1689 TC on hand)\n",
+      "[2026-09-04T02:43:22.907Z] [reward] Sold Rough-Hewn Chestplate (Common) to Talla Mudfoot for 8 TC. (1697 TC on hand)\n[2026-09-04T02:43:22.988Z] [reward] Sold Titan's Swiftstep Boots (Common) to Talla Mudfoot for 8 TC. (1705 TC on hand)\n[2026-09-04T02:43:23.068Z] [reward] Sold Stone-Strider Boots (Common) to Talla Mudfoot for 8 TC. (1713 TC on hand)\n",
+      "[Filtered]",
+      "[2026-09-04T02:43:23.385Z] [reward] Sold Lost Traveler's Boots (Common) to Talla Mudfoot for 6 TC. (1739 TC on hand)\n[2026-09-04T02:43:23.464Z] [reward] Sold Sentinel's Overcoat (Common) to Talla Mudfoot for 6 TC. (1745 TC on hand)\n[2026-09-04T02:43:23.542Z] [reward] Sold Mud-Bound Cloak (Common) to Talla Mudfoot for 6 TC. (1751 TC on hand)\n",
+      "[2026-09-04T02:43:23.621Z] [reward] Sold Wanderer's Worn Gauntlets (Common) to Talla Mudfoot for 6 TC. (1757 TC on hand)\n[2026-09-04T02:43:23.699Z] [reward] Sold Mud-Bound Cloak (Common) to Talla Mudfoot for 6 TC. (1763 TC on hand)\n[2026-09-04T02:43:23.777Z] [reward] Sold Mud-Bound Cloak (Common) to Talla Mudfoot for 6 TC. (1769 TC on hand)\n",
+      "[2026-09-04T02:43:23.855Z] [reward] Sold Mud-Bound Cloak (Common) to Talla Mudfoot for 6 TC. (1775 TC on hand)\n[2026-09-04T02:43:23.932Z] [reward] Sold Mud-Bound Cloak (Common) to Talla Mudfoot for 6 TC. (1781 TC on hand)\n[2026-09-04T02:43:24.009Z] [reward] Sold Shaman's Mud Helm (Common) to Talla Mudfoot for 6 TC. (1787 TC on hand)\n",
+      "[2026-09-04T02:43:24.086Z] [reward] Sold Bone Knife (Common) to Talla Mudfoot for 6 TC. (1793 TC on hand)\n[2026-09-04T02:43:24.162Z] [reward] Sold Bone Knife (Common) to Talla Mudfoot for 6 TC. (1799 TC on hand)\n[2026-09-04T02:43:24.239Z] [reward] Sold Architect's Grip (Common) to Talla Mudfoot for 6 TC. (1805 TC on hand)\n",
+      "[2026-09-04T02:43:24.316Z] [reward] Sold Reclaimer's Salvage Cap (Common) to Talla Mudfoot for 6 TC. (1811 TC on hand)\n[2026-09-04T02:43:24.392Z] [reward] Sold Reclaimer's Mask (Common) to Talla Mudfoot for 6 TC. (1817 TC on hand)\n[2026-09-04T02:43:24.469Z] [reward] Sold Mud-Seer's Hood (Common) to Talla Mudfoot for 6 TC. (1823 TC on hand)\n",
+      "[2026-09-04T02:43:24.545Z] [reward] Sold Bone Knife (Common) to Talla Mudfoot for 6 TC. (1829 TC on hand)\n[2026-09-04T02:43:24.621Z] [reward] Sold Bone Knife (Common) to Talla Mudfoot for 6 TC. (1835 TC on hand)\n[2026-09-04T02:43:24.697Z] [reward] Sold Bone Knife (Common) to Talla Mudfoot for 6 TC. (1841 TC on hand)\n",
+      "[2026-09-04T02:43:24.773Z] [reward] Sold Reclaimer's Trousers (Common) to Talla Mudfoot for 6 TC. (1847 TC on hand)\n[2026-09-04T02:43:24.849Z] [reward] Sold Wanderer's Worn Gauntlets (Common) to Talla Mudfoot for 6 TC. (1853 TC on hand)\n[2026-09-04T02:43:24.924Z] [reward] Sold Aetheric Helm of Insight (Common) to Talla Mudfoot for 6 TC. (1859 TC on hand)\n",
+      "[2026-09-04T02:43:25.000Z] [reward] Sold Mud-Seer's Hood (Common) to Talla Mudfoot for 6 TC. (1865 TC on hand)\n[2026-09-04T02:43:25.075Z] [reward] Sold Salvager's Worn Gloves (Common) to Talla Mudfoot for 6 TC. (1871 TC on hand)\n[2026-09-04T02:43:25.150Z] [reward] Sold Aetheric Gauntlets (Common) to Talla Mudfoot for 6 TC. (1877 TC on hand)\n",
+      "[2026-09-04T02:43:25.225Z] [reward] Sold Sentinel's Overcoat (Common) to Talla Mudfoot for 6 TC. (1883 TC on hand)\n[2026-09-04T02:43:25.300Z] [reward] Sold Crude Golem Pike (Common) to Talla Mudfoot for 5 TC. (1888 TC on hand)\n[2026-09-04T02:43:25.375Z] [reward] Sold Crude Golem Greatsword (Common) to Talla Mudfoot for 5 TC. (1893 TC on hand)\n",
+      "[2026-09-04T02:43:25.449Z] [reward] Sold Reclaimer's Salvage Vest (Common) to Talla Mudfoot for 5 TC. (1898 TC on hand)\n[2026-09-04T02:43:25.523Z] [reward] Sold Mud-Warden's Vest (Common) to Talla Mudfoot for 5 TC. (1903 TC on hand)\n[2026-09-04T02:43:25.596Z] [reward] Sold Mud-Bound Cloak (Common) to Talla Mudfoot for 5 TC. (1908 TC on hand)\n",
+      "[2026-09-04T02:43:25.669Z] [reward] Sold Mud-Warden's Vest (Common) to Talla Mudfoot for 5 TC. (1913 TC on hand)\n[2026-09-04T02:43:25.742Z] [reward] Sold Mud-Bound Cloak (Common) to Talla Mudfoot for 5 TC. (1918 TC on hand)\n[2026-09-04T02:43:25.815Z] [reward] Sold Cudgel (Common) to Talla Mudfoot for 5 TC. (1923 TC on hand)\n",
+      "[2026-09-04T02:43:25.888Z] [reward] Sold Reclaimer's Salvage Vest (Common) to Talla Mudfoot for 5 TC. (1928 TC on hand)\n[2026-09-04T02:43:25.961Z] [reward] Sold Reclaimer's Salvage Vest (Common) to Talla Mudfoot for 5 TC. (1933 TC on hand)\n[2026-09-04T02:43:26.033Z] [reward] So"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-04-1667-the-key-goes-where-the-player-is #mtnaawyn2pyt [inline 13/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtnaawyn2pyt"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1667-the-key-goes-where-the-player-is"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "13"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1667-the-key-goes-where-the-player-is"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T18:25:23.530105Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "31": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 360,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T18:25:25.514000Z",
+  "fingerprints": [
+    "5ac1b3658bc728e8b97d1704393c7b64"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1955885716,
+    "commitCount": 3,
+    "data": {},
+    "dateCreated": "2026-09-04T18:13:29.724780Z",
+    "dateReleased": "2026-09-04T18:14:31.270348Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "db7231c53271128a3a0226f390f97a59a74a9862",
+      "message": "[ota-hal] OTA-1667: the key goes where the player is\n\nOwner, three things in one message: \"the about tab, should that be there or\nshould it just be wrapped up in the log? it honestly doesn't mean anything to\nanyone but you and me. the weapon glyphs section should be under the lore button\nthat lives on the minimap not in about, that should be easily player facing.\nalso audit the glyphs list to see if all of those damage types exist in game.\"\n\n\u26a0\u26a0\u26a0 THE AUDIT ANSWER IS NO. FOUR OF THE THIRTEEN DID NOT EXIST.\n\nMeasured across all 301 catalog weapons, through the SAME baseDamageGlyph path\nthe combat buttons paint from:\n\n    \u2692 bludgeoning 65    \u25b2 piercing 55    \u2726 aetheric 49    \u2694 slashing 45\n    \ud83d\udd25 burn 45          \u26a1 electrical 22  \u2620 poison 9       \u2744 cold 6\n    \u2622 radiation 5\n    \u2699 degradation 0     \u2731 stun 0         \u2697 acid 0         \u2623 corruption 0\n\n\u26a0\u26a0 AND \u2699 WAS UNREACHABLE BY CONSTRUCTION, not merely unused. OTA-1652 aliased\n`degradation \u2192 acid`, and baseDamageGlyph canonicalises BEFORE the glyph lookup \u2014\nso even a weapon authored with degradation prints \u2697. That row could not appear\non a button under any circumstances, and the key has promised it for 29 OTAs.\n\n\u26a0 ACID AND CORRUPTION ARE NOT MISSING FROM THE GAME. They are missing as a\nweapon's OWN damage. Both are live coating families with real vials (burn 3,\nelectrical 3, poison 3, cold 2, corruption 2, acid 1) and the COATS section\nlisted them correctly all along. The defect was listing them a SECOND time under\n\"own damage\", where nothing can carry them.\n\n\u26a0\u26a0\u26a0 SO THE FIX IS A DERIVATION, NOT A SHORTER LIST \u2014 and that is the part worth\nkeeping. A list I prune by hand today is wrong again the first time somebody\nauthors an acid-based weapon: the key would then HIDE a glyph the buttons paint,\nthe same lie pointing the other way. `baseTypesInPlay()` reads the catalog, so\nboth directions are now impossible and ota1667 is what holds it there.\n\nTHE KEY MOVED. It is the GLYPHS tab of the lore codex, third in the row behind\nBEASTS and FALLEN \u2014 by the same rule OTA-1365 ordered that row with, how often\nit is opened WHILE PLAYING. \"What does \u2697 mean\" is asked from inside a fight,\nwhich is the worst possible moment to be told the answer is behind a gear icon,\nunder a build-id dump, in a settings screen. The card itself is unchanged and\nstill reads the live weaponGlyphs tables.\n\nTHE ABOUT TAB FOLDED AWAY, and he is right that the log already had it: every\nCOPY LOG export and every REPORT A BUG carries buildBasicDeviceSummary(), so the\ntab was a THIRD copy of a thing that already reaches me two better ways. Nothing\nwas lost \u2014 the dedication, the seven-tap owner ritual (OTA-1490; both your\nphones depend on it) and the third-party notices are one page now, called ABOUT,\nwith the dedication LEADING instead of buried under diagnostics where nobody\nscrolls. SETTINGS is down to four tabs: SESSION \u00b7 SFX \u00b7 DISPLAY \u00b7 ABOUT.\n\nGates: all 18 green by exit code. Full suite green.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T18:10:56Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1667-the-key-goes-where-the-player-is",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1667-the-key-goes-where-the-player-is",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T18:14:31.270348Z",
+          "dateCreated": "2026-09-04T18:13:29.724780Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155633698",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T18:14:31.584822Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1667-the-key-goes-where-the-player-is",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1667-the-key-goes-where-the-player-is",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1667-the-key-goes-where-the-player-is",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1667-the-key-goes-where-the-player-is)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "d407d92f3d7e464f8bb7f11b05957410",
+  "previousEventID": "c41f9270ec484865b2213dd956735256"
+}

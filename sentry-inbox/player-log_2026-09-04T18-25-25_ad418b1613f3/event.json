@@ -1,0 +1,274 @@
+{
+  "id": "ad418b1613f34e378fb2c72df1104b8f",
+  "groupID": "7712386239",
+  "eventID": "ad418b1613f34e378fb2c72df1104b8f",
+  "projectID": "4511945117532160",
+  "size": 18129,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-04-1667-the-key-goes-where-the-player-is #mtnaawyn2pyt [inline 15/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1667-the-key-goes-where-the-player-is",
+  "message": "player-log 2026-09-04-1667-the-key-goes-where-the-player-is #mtnaawyn2pyt [inline 15/28]",
+  "title": "player-log 2026-09-04-1667-the-key-goes-where-the-player-is #mtnaawyn2pyt [inline 15/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "86ae1806afea4e0cb02be19e62f94e9c",
+      "span_id": "958387190fe27c30",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-04T02:47:24.063Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T02:47:24.411Z] [cognitive] neutral  (347ms)\n[2026-09-04T02:47:25.675Z] [debug] ui: tap \"\u2623\u26a1 shroud-spun slinger \u2692\"\n[2026-09-04T02:47:25.679Z] [system] evasive \u2014 harder to hit fades.\n[2026-09-04T02:47:25.739Z] [player] attack with the off-hand reclaimers guild shroud-spun slinger\n",
+      "[2026-09-04T02:47:25.740Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand reclaimers guild shroud spun slinger resolved=Reclaimers Guild Shroud-Spun Slinger range=close enemies=4 hooks=3\n[2026-09-04T02:47:25.741Z] [debug] attack: target=Mud Monarchs Patrol 1 range=close reach.bands=[distant,far,mid,close] reach.label=Reclaimers Guild Shroud-Spun Slinger bareHand=false\n",
+      "[2026-09-04T02:47:25.742Z] [arbiter] Glass Hail hangs between you. \"\u22121 to the swing \u2014 see what you can,\" the Arbiter says.\n[2026-09-04T02:47:25.742Z] [debug] attack: visibility penalty \u22121 (Glass Hail)\n[2026-09-04T02:47:25.743Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-09-04T02:47:25.812Z] [world] You raise the corrupted resonant reclaimers guild shroud-spun slinger toward Mud Monarchs Patrol 1. The room narrows around the both of you.\n[2026-09-04T02:47:25.812Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T02:47:26.145Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 USE_ITEM  (332ms)\n",
+      "[2026-09-04T02:47:26.845Z] [debug] persist sizes(KB): total=326 player=73 wm=166[rooms=93 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=78 scene=8\n[2026-09-04T02:47:35.249Z] [world] You seize the initiative. Mud Monarchs Patrol 1 has no time to react.\n",
+      "[2026-09-04T02:47:35.249Z] [combat] You \u2014 d20 \u2192 20 + DEX 18 \u2212 1 (Glass Hail) + 2 (point blank) perfect opening (2\u00d7 dice) = 39 vs Mud Monarchs Patrol 1 AC 12 \u2014 \u2713 CRITICAL HIT\n[2026-09-04T02:47:35.251Z] [combat] Final strike with the corrupted resonant reclaimers guild shroud-spun slinger for 34. Mud Monarchs Patrol 1 is still. The Aetherstone hums on, indifferent.\n",
+      "[2026-09-04T02:47:35.251Z] [reward] Mud Monarchs Patrol 1 defeated. You recover Patched Cloth \u00d72, Burlap Vest.\n[2026-09-04T02:47:35.252Z] [reward] You strip the body: Cudgel, Reclaimer's Salvage Vest (+14 TC). The kit took the fight badly.\n[2026-09-04T02:47:35.253Z] [combat] 3 attackers remain. Mud Monarchs Patrol 2 now in your sights.\n",
+      "[2026-09-04T02:47:35.253Z] [system] Forgotten Order standing +1 (now 54)\n[2026-09-04T02:47:35.253Z] [reward] +9 TC pried from the dust.\n[2026-09-04T02:47:35.320Z] [debug] ac-shift 25\u219222: race/base 10 + gear 18 + title 0 \u2192 trimmed 22 + status 0 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloa",
+      "k\n[2026-09-04T02:47:35.320Z] [combat] Mud Monarchs Patrol 2 \u2014 d20 \u2192 13 + ATK 8 = 21 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-04T02:47:35.322Z] [combat] Mud Monarchs Patrol 3 \u2014 d20 \u2192 11 + ATK 10 = 21 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-04T02:47:35.322Z] [combat] Mud Monarchs Patrol 4 closes the distance.\n[2026-09-04T02:47:38.371Z] [debug] ui: tap \"\u2620\u2623 bone crossbow \u25b2\"\n",
+      "[2026-09-04T02:47:38.410Z] [player] attack with the bone crossbow\n[2026-09-04T02:47:38.411Z] [debug] parser: intent=attack conf=1.00 verb=attack target=bone crossbow resolved=Bone Crossbow range=mid enemies=3 hooks=3\n[2026-09-04T02:47:38.411Z] [debug] attack: target=Mud Monarchs Patrol 2 range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n",
+      "[2026-09-04T02:47:38.413Z] [debug] attack: visibility penalty \u22121 (Glass Hail)\n[2026-09-04T02:47:38.485Z] [world] Your poisoned corrupted bone crossbow comes around in an arc; Mud Monarchs Patrol 2 squares up to meet it.\n[2026-09-04T02:47:38.485Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T02:47:38.829Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE \u00b7 RELOAD  (343ms)\n",
+      "[2026-09-04T02:47:46.785Z] [world] Mud Monarchs Patrol 2 moves first. The pressure is immediate.\n[2026-09-04T02:47:46.785Z] [combat] Mud Monarchs Patrol 3 turns on Mercy \u2014 d20 5 + ATK 8 = 13 vs Mercy's AC 13 (vest +3) \u2014 \u2713 HIT\n[2026-09-04T02:47:46.786Z] [combat] Mercy takes 10. (5/15 HP left)\n",
+      "[2026-09-04T02:47:46.790Z] [reward] Mercy's vest hums and gives it back \u2014 Mud Monarchs Patrol 3 takes 1 aetheric. (24 HP left)\n[2026-09-04T02:47:46.793Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 12 + ATK 10 = 22 vs your AC 22 \u2014 \u2713 HIT\n[2026-09-04T02:47:46.797Z] [combat] Mud Monarchs Patrol 2 \u2014 d20 \u2192 19 + ATK 8 = 27 vs your AC 22 \u2014 \u2713 HIT\n",
+      "[2026-09-04T02:47:46.798Z] [combat] You \u2014 d20 \u2192 4 + DEX 18 \u2212 1 (Glass Hail) = 21 vs Mud Monarchs Patrol 2 AC 12 \u2014 \u2713 HIT\n[2026-09-04T02:47:46.801Z] [combat] You crack the Mud Monarchs Patrol 2 with the Poisoned Corrupted Bone Crossbow for 15 \u2014 the better part of their fight, gone in one blow. They crumple, out cold. (4/19 HP) Loot them before they come to.\n",
+      "[2026-09-04T02:47:46.801Z] [combat] Mud Monarchs Patrol 2 is out of it. Mud Monarchs Patrol 3 now in your sights.\n[2026-09-04T02:47:46.801Z] [combat] Poisoned Corrupted Bone Crossbow \u2014 6 poison bites in and festers (3 turns).\n[2026-09-04T02:47:46.802Z] [combat] Poisoned Corrupted Bone Crossbow \u2014 2 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n",
+      "[2026-09-04T02:47:47.189Z] [combat] Mud Monarchs Patrol 4 deals 2 slashing damage [edge of reach \u2014 halved]. You have 39 HP remaining.\n[2026-09-04T02:47:47.189Z] [combat] Mud Monarchs Patrol 4's strike leaves you poisoned.\n[2026-09-04T02:47:47.189Z] [combat] Mud Monarchs Patrol 2 deals 3 slashing damage [armor \u221225%] [edge of reach \u2014 halved]. You have 36 HP remaining.\n",
+      "[2026-09-04T02:47:47.189Z] [combat] Mud Monarchs Patrol 2's strike leaves you bleeding.\n[2026-09-04T02:47:49.222Z] [debug] ui: tap \"dodge\"\n[2026-09-04T02:47:49.230Z] [world] A shard of mud-glass nicks you. Small wound, steady reminder. (\u22121 HP)\n[2026-09-04T02:47:49.237Z] [player] dodge\n",
+      "[2026-09-04T02:47:49.238Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=3 hooks=3\n[2026-09-04T02:47:49.239Z] [world] You commit to the dodge. Slip Mud Monarchs Patrol 3's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-04T02:47:49.240Z] [combat] Mud Monarchs Patrol 2 shudders \u2014 poison eats 6. (0/19 HP, 2 turns left)\n[2026-09-04T02:47:49.240Z] [combat] Mud Monarchs Patrol 2 blackens \u2014 corruption eats 2. (0/19 HP, 2 turns left)\n[2026-09-04T02:47:49.242Z] [reward] Mud Monarchs Patrol 2 defeated. You recover Patched Cloth, Aether Residue.\n",
+      "[2026-09-04T02:47:49.242Z] [world] You crouch for the blade \u2014 the Hollow Edge, the black mark of the Forgotten Order's enforcers, its steel weeping a faint corruption that fogs the air. But the grip is wrong. It's honed: razored along the inner curve so the handle itself is a second blade, and only one of its edges is meant for the enemy. Take it up untrained and you flay your own palm to the bone",
+      ". Only a hand that knows the Order's hold \u2014 that two-finger grip they teach behind sealed doors \u2014 can carry it. You leave it where it fell.\n[2026-09-04T02:47:49.244Z] [reward] You strip the body: Mud-Bound Cloak (+15 TC). The kit took the fight badly.\n[2026-09-04T02:47:49.245Z] [reward] \u2726 Hard-won spoils \u2014 Energy Fragment (Uncommon).\n",
+      "[2026-09-04T02:47:49.245Z] [combat] 2 attackers remain. Mud Monarchs Patrol 3 now in your sights.\n[2026-09-04T02:47:49.245Z] [system] Forgotten Order standing +1 (now 55)\n[2026-09-04T02:47:49.246Z] [reward] +15 TC pried from the dust.\n[2026-09-04T02:47:49.321Z] [combat] Mud Monarchs Patrol 4 turns on Mercy \u2014 d20 8 + ATK 8 = 16 vs Mercy's AC 13 (vest +3) \u2014 \u2713 HIT\n",
+      "[2026-09-04T02:47:49.322Z] [combat] Mercy takes 5. (0/15 HP left)\n[2026-09-04T02:47:49.322Z] [reward] Mercy's vest hums and gives it back \u2014 Mud Monarchs Patrol 4 takes 1 aetheric. (18 HP left)\n[2026-09-04T02:47:49.322Z] [arbiter] Mercy drops under the Mud Monarchs Patrol 4 and drags herself clear of the fight. She is down \u2014 tend her within a day or she won't get back up.\n",
+      "[2026-09-04T02:47:49.392Z] [combat] Mud Monarchs Patrol 3 \u2014 d20 \u2192 17 + ATK 8 = 25 vs your AC 22 \u2014 \u2717 EVADED\n[2026-09-04T02:47:49.392Z] [combat] Dodge \u2014 d20 \u2192 12 + DEX 19 = 31 vs ATK 25. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n",
+      "[2026-09-04T02:47:49.393Z] [world] You slip Mud Monarchs Patrol 3's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n[2026-09-04T02:47:49.393Z] [debug] arbiter: template (reason=combat)\n[2026-09-04T02:47:49.393Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-09-04T02:47:49.394Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T02:47:49.766Z] [cognitive] neutral  (371ms)\n[2026-09-04T02:47:51.254Z] [debug] ui: tap \"\u2620\u2623 bone crossbow \u25b2\"\n[2026-09-04T02:47:51.257Z] [system] evasive \u2014 harder to hit fades.\n[2026-09-04T02:47:51.292Z] [player] attack with the bone crossbow\n",
+      "[2026-09-04T02:47:51.292Z] [debug] parser: intent=attack conf=1.00 verb=attack target=bone crossbow resolved=Bone Crossbow range=mid enemies=2 hooks=3\n[2026-09-04T02:47:51.293Z] [debug] attack: target=Mud Monarchs Patrol 3 range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-09-04T02:47:51.294Z] [debug] attack: visibility penalty \u22121 (Glass Hail)\n",
+      "[2026-09-04T02:47:51.294Z] [debug] attack: status mods poisoned -2 \u00b7 perfect opening (2\u00d7 dice)\n[2026-09-04T02:47:51.367Z] [world] You bring the poisoned corrupted bone crossbow to bear on Mud Monarchs Patrol 3.\n[2026-09-04T02:47:51.368Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T02:47:51.704Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE \u00b7 RELOAD  (335ms)\n",
+      "[2026-09-04T02:48:04.728Z] [world] You seize the initiative. Mud Monarchs Patrol 3 has no time to react.\n[2026-09-04T02:48:04.729Z] [combat] You \u2014 d20 \u2192 13 + DEX 18 \u2212 1 (Glass Hail) poisoned -2 perfect opening (2\u00d7 dice) = 28 vs Mud Monarchs Patrol 3 AC 12 \u2014 \u2713 HIT\n[2026-09-04T02:48:04.731Z] [combat] Piercing flares \u2014 +1 on hit.\n",
+      "[2026-09-04T02:48:04.732Z] [combat] You crack the Mud Monarchs Patrol 3 with the Poisoned Corrupted Bone Crossbow for 19 \u2014 the better part of their fight, gone in one blow. They crumple, out cold. (5/25 HP) Loot them before they come to.\n[2026-09-04T02:48:04.732Z] [combat] Mud Monarchs Patrol 3 is out of it. Mud Monarchs Patrol 4 now in your sights.\n",
+      "[2026-09-04T02:48:04.733Z] [combat] Poisoned Corrupted Bone Crossbow \u2014 5 poison bites in and festers (3 turns).\n[2026-09-04T02:48:04.733Z] [combat] Poisoned Corrupted Bone Crossbow \u2014 2 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n[2026-09-04T02:48:04.736Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 7 + ATK 8 = 15 vs your AC 22 \u2014 \u2717 MISS\n",
+      "[2026-09-04T02:48:04.736Z] [arbiter] The Arbiter does not look up. \"Hit it before it hits you. That's the entire trick.\"\n[2026-09-04T02:48:10.393Z] [debug] ui: tap \"stealth\"\n[2026-09-04T02:48:10.394Z] [system] poisoned fades.\n[2026-09-04T02:48:10.394Z] [system] bleeding fades.\n[2026-09-04T02:48:10.395Z] [player] sneak\n",
+      "[2026-09-04T02:48:10.395Z] [debug] parser: intent=stealth conf=1.00 verb=sneak target=- resolved=- range=mid enemies=2 hooks=3\n[2026-09-04T02:48:10.466Z] [system] \u23f3 Time passed: 15 min\n[2026-09-04T02:48:11.113Z] [cognitive] DISENGAGE \u00b7 HIDE \u00b7 TAKE_COVER  (646ms)\n[2026-09-04T02:48:12.991Z] [debug] skillcheck: stealth d20=2 STE 8 + 1 (title: Shadow Diver) = 11 vs DC 12 \u2014 Hard \u2192 FAIL\n",
+      "[2026-09-04T02:48:13.102Z] [debug] stats: STR18 DEX19 INT13 WIS17 CHA13 STE8 | gear: WIS+5,INT+3,STR+6,DEX+7,STE+2,CHA+1 | worn: main=Bone Crossbow off=Reclaimers Guild Shroud-Spun Slinger head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Amulet of the Silt Warden ring=Tartarian Oath-Band rin",
+      "g2=Tin Ward Ring ring3=Tin Ward Ring ring4=Scribe's Signet\n[2026-09-04T02:48:13.102Z] [world] Your foot scrapes stone. Something stirs in the dark.\n[2026-09-04T02:48:13.102Z] [combat] Mud Monarchs Patrol 3 shudders \u2014 poison eats 5. (0/25 HP, 2 turns left)\n[2026-09-04T02:48:13.102Z] [combat] Mud Monarchs Patrol 3 blackens \u2014 corruption eats 2. (0/25 HP, 2 turns left)\n",
+      "[2026-09-04T02:48:13.103Z] [reward] Mud Monarchs Patrol 3 defeated. You recover Aetheric Shard \u00d72, Patched Cloth.\n[2026-09-04T02:48:13.104Z] [reward] You strip the body: Bone Knife, Mud-Bound Cloak (+14 TC). The kit took the fight badly.\n[2026-09-04T02:48:13.104Z] [combat] 1 attacker remains. Mud Monarchs Patrol 4 now in your sights.\n",
+      "[2026-09-04T02:48:13.104Z] [system] Forgotten Order standing +1 (now 56)\n[2026-09-04T02:48:13.105Z] [reward] +30 TC pried from the dust.\n[2026-09-04T02:48:13.167Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 9 + ATK 8 = 17 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-04T02:48:13.168Z] [arbiter] The Arbiter looks around. \"An inscription above the central console reads simply: not a wish.\"\n",
+      "[2026-09-04T02:48:13.619Z] [debug] persist sizes(KB): total=326 player=74 wm=167[rooms=93 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=80 scene=6\n[2026-09-04T02:48:16.437Z] [debug] ui: tap \"dodge\"\n[2026-09-04T02:48:16.440Z] [player] dodge\n[2026-09-04T02:48:16.440Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=1 hooks=3\n",
+      "[2026-09-04T02:48:16.440Z] [world] You commit to the dodge. Slip Mud Monarchs Patrol 4's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-04T02:48:16.512Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 11 + ATK 8 = 19 vs your AC 22 \u2014 \u2717 EVADED\n",
+      "[2026-09-04T02:48:16.512Z] [combat] Dodge \u2014 d20 \u2192 13 + DEX 19 = 32 vs ATK 19. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-04T02:48:16.513Z] [debug] arbiter: template (reason=combat)\n[2026-09-04T02:48:16.513Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-04T02:48:16.513Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-04T02:48:16.853Z] [cognitive] neutral  (339ms)\n[2026-09-04T02:48:17.688Z] [debug] ui: tap \"\u2623\u26a1 shroud-spun slinger \u2692\"\n[2026-09-04T02:48:17.752Z] [player] attack with the off-hand reclaimers guild shroud-spun slinger\n",
+      "[2026-09-04T02:48:17.752Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand reclaimers guild shroud spun slinger resolved=Reclaimers Guild Shroud-Spun Slinger range=mid enemies=1 hooks=3\n[2026-09-04T02:48:17.753Z] [debug] attack: target=Mud Monarchs Patrol 4 range=mid reach.bands=[distant,far,mid,close] reach.label=Reclaimers Guild Shroud-Spun Slinger bareHand=false\n",
+      "[2026-09-04T02:48:17.754Z] [debug] attack: visibility penalty \u22121 (Glass Hail)\n[2026-09-04T02:48:17.755Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-04T02:48:17.825Z] [world] You commit forward with the corrupted resonant reclaimers guild shroud-spun slinger. Mud Monarchs Patrol 4 watches your hands.\n[2026-09-04T02:48:17.826Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-04T02:48:18.159Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 USE_ITEM  (333ms)\n[2026-09-04T02:48:21.579Z] [wor"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-04-1667-the-key-goes-where-the-player-is #mtnaawyn2pyt [inline 15/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtnaawyn2pyt"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1667-the-key-goes-where-the-player-is"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "15"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1667-the-key-goes-where-the-player-is"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T18:25:23.577565Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T18:25:25.514000Z",
+  "fingerprints": [
+    "5ac1b3658bc728e8b97d1704393c7b64"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1955885716,
+    "commitCount": 3,
+    "data": {},
+    "dateCreated": "2026-09-04T18:13:29.724780Z",
+    "dateReleased": "2026-09-04T18:14:31.270348Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "db7231c53271128a3a0226f390f97a59a74a9862",
+      "message": "[ota-hal] OTA-1667: the key goes where the player is\n\nOwner, three things in one message: \"the about tab, should that be there or\nshould it just be wrapped up in the log? it honestly doesn't mean anything to\nanyone but you and me. the weapon glyphs section should be under the lore button\nthat lives on the minimap not in about, that should be easily player facing.\nalso audit the glyphs list to see if all of those damage types exist in game.\"\n\n\u26a0\u26a0\u26a0 THE AUDIT ANSWER IS NO. FOUR OF THE THIRTEEN DID NOT EXIST.\n\nMeasured across all 301 catalog weapons, through the SAME baseDamageGlyph path\nthe combat buttons paint from:\n\n    \u2692 bludgeoning 65    \u25b2 piercing 55    \u2726 aetheric 49    \u2694 slashing 45\n    \ud83d\udd25 burn 45          \u26a1 electrical 22  \u2620 poison 9       \u2744 cold 6\n    \u2622 radiation 5\n    \u2699 degradation 0     \u2731 stun 0         \u2697 acid 0         \u2623 corruption 0\n\n\u26a0\u26a0 AND \u2699 WAS UNREACHABLE BY CONSTRUCTION, not merely unused. OTA-1652 aliased\n`degradation \u2192 acid`, and baseDamageGlyph canonicalises BEFORE the glyph lookup \u2014\nso even a weapon authored with degradation prints \u2697. That row could not appear\non a button under any circumstances, and the key has promised it for 29 OTAs.\n\n\u26a0 ACID AND CORRUPTION ARE NOT MISSING FROM THE GAME. They are missing as a\nweapon's OWN damage. Both are live coating families with real vials (burn 3,\nelectrical 3, poison 3, cold 2, corruption 2, acid 1) and the COATS section\nlisted them correctly all along. The defect was listing them a SECOND time under\n\"own damage\", where nothing can carry them.\n\n\u26a0\u26a0\u26a0 SO THE FIX IS A DERIVATION, NOT A SHORTER LIST \u2014 and that is the part worth\nkeeping. A list I prune by hand today is wrong again the first time somebody\nauthors an acid-based weapon: the key would then HIDE a glyph the buttons paint,\nthe same lie pointing the other way. `baseTypesInPlay()` reads the catalog, so\nboth directions are now impossible and ota1667 is what holds it there.\n\nTHE KEY MOVED. It is the GLYPHS tab of the lore codex, third in the row behind\nBEASTS and FALLEN \u2014 by the same rule OTA-1365 ordered that row with, how often\nit is opened WHILE PLAYING. \"What does \u2697 mean\" is asked from inside a fight,\nwhich is the worst possible moment to be told the answer is behind a gear icon,\nunder a build-id dump, in a settings screen. The card itself is unchanged and\nstill reads the live weaponGlyphs tables.\n\nTHE ABOUT TAB FOLDED AWAY, and he is right that the log already had it: every\nCOPY LOG export and every REPORT A BUG carries buildBasicDeviceSummary(), so the\ntab was a THIRD copy of a thing that already reaches me two better ways. Nothing\nwas lost \u2014 the dedication, the seven-tap owner ritual (OTA-1490; both your\nphones depend on it) and the third-party notices are one page now, called ABOUT,\nwith the dedication LEADING instead of buried under diagnostics where nobody\nscrolls. SETTINGS is down to four tabs: SESSION \u00b7 SFX \u00b7 DISPLAY \u00b7 ABOUT.\n\nGates: all 18 green by exit code. Full suite green.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T18:10:56Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1667-the-key-goes-where-the-player-is",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1667-the-key-goes-where-the-player-is",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T18:14:31.270348Z",
+          "dateCreated": "2026-09-04T18:13:29.724780Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155633698",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T18:14:31.584822Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1667-the-key-goes-where-the-player-is",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1667-the-key-goes-where-the-player-is",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1667-the-key-goes-where-the-player-is",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1667-the-key-goes-where-the-player-is)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "ae17c747dd174e01bd1188dcab1e5242",
+  "previousEventID": "9afce5a5bd594bffb625aef46d7ee4d8"
+}

@@ -1,0 +1,276 @@
+{
+  "id": "8cac79a4059e489eb90111e5d27e46d2",
+  "groupID": "7712468970",
+  "eventID": "8cac79a4059e489eb90111e5d27e46d2",
+  "projectID": "4511945117532160",
+  "size": 18172,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-04-1668-the-row-says-what-it-does #mtnaj1w6w78b [inline 1/4]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1668-the-row-says-what-it-does",
+  "message": "player-log 2026-09-04-1668-the-row-says-what-it-does #mtnaj1w6w78b [inline 1/4]",
+  "title": "player-log 2026-09-04-1668-the-row-says-what-it-does #mtnaj1w6w78b [inline 1/4]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "6d8b0f1359b04abe884dd2a01eb89ee7",
+      "span_id": "8a3e38bedf178299",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "Bug Report \u2014 Cheddar Bob \u00b7 (2026-09-04-1667-the-key-goes-where-the-player-is) \u00b7 I still can't enter the Outpost. I made a comment about it in the game\n=== TARTARIA BUG REPORT ===\nSubmitted: 2026-09-04T18:31:44.981Z\nCharacter: Cheddar Bob\nSlot ID: slot_mtdifdmg_g2si12\nRace: Reclaimers\nLocation: Tartarian Pilgrim Camp\nHP: 47/50\n\n--- DESCRIPTION ---\n",
+      "I still can't enter the Outpost. I made a comment about it in the game\n\n--- DEVICE / BUILD ---\nDevice\n  Name: Pixel 10 Pro XL\n  Platform: android 37\n  Hermes: yes\n  Locale: en-US\n  Timezone: America/New_York\n  Screen: window 443\u00d7986 / screen 443\u00d7986 @ 2.4375x density\n  Captured at: 2026-09-04T18:31:44.784Z\n\nInstall\n  App ID: com.hotatticgames.tartarprim\n  App version: 4.32.11\n",
+      "  APK build version: 2.4.1\n  APK build: 293\n  AAB: (build 293)\n  OTA: (2026-09-04-1667-the-key-goes-where-the-player-is)\n  Boot stage: qwen:done\n\nML runtime health\n  Status: active (no crashes detected)\n  Crash count: 0\n  Last init attempt: 2026-09-04T18:25:44.455Z\n  Last init success: 2026-09-04T18:25:45.887Z\n  Crashes-before-disable threshold: 2\n",
+      "  Qwen completion guard: clean (no completion crashes)\n  Qwen kernel variant: rnllama_v8_2_fp16_dotprod\n  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k\n",
+      "  Voice (TTS) guard: clean (no voice crashes on this build)\nSave-load health\n  Status: clean (no load-crash flags)\nLast JS crash\n  Status: none recorded\nThis launch\n  Life: bmtnaast54u \u00b7 started 2026-09-04T18:25:19.961Z\n  Cold start \u2014 this boot did not follow an OTA apply\nCrash ledger \u2014 10 recorded (newest last)\n  \u2022 2026-09-03T02:52:27.753Z (2379m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-09-03-1639-every-ingredient-exists \u00b7 stage rendered\n      Process died with no orderly exit while: tap \"craft\"\n      doing: tap \"craft\" \u00b7 room mud_flood_nexus \u00b7 screen exploration\n      last checkpoint: rendered \u00b7 7466ms into the action \u00b7 alive 1498ms after it\n      launch: died 21448ms into the process \u00b7 not an OTA-apply boot\n",
+      "      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-03T12:10:12.789Z (1822m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-03-1642-every-drop-has-a-name-in-the-book \u00b7 stage mid-action\n      Process died with no orderly exit while: tap \"inventory\"\n      doing: tap \"inventory\" \u00b7 room mud_flood_nexus \u00b7 screen exploration\n",
+      "      launch: died 12819ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-03T15:48:24.471Z (1603m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-03-1643-the-dice-riders-pay \u00b7 stage boot:qwen:deferred\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n",
+      "      last checkpoint: boot:qwen:deferred \u00b7 838ms into the action \u00b7 alive 11400ms after it\n      launch: died 12276ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-03T19:31:31.355Z (1380m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-03-1648-a-fourth-ring \u00b7 stage boot:qwen:deferred\n",
+      "      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: boot:qwen:deferred \u00b7 901ms into the action \u00b7 alive 0ms after it\n      launch: died 956ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-03T20:39:06.948Z (1313m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-09-03-1649-what-a-ring-is-for \u00b7 stage boot:qwen:deferred\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: boot:qwen:deferred \u00b7 750ms into the action \u00b7 alive 0ms after it\n      launch: died 803ms into the process \u00b7 not an OTA-apply boot\n",
+      "      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-03T21:28:44.213Z (1263m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-03-1649-what-a-ring-is-for \u00b7 stage boot:qwen:deferred\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n",
+      "      last checkpoint: boot:qwen:deferred \u00b7 707ms into the action \u00b7 alive 0ms after it\n      launch: died 797ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-03T22:43:58.985Z (1188m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-03-1653-the-wear-ward \u00b7 stage boot:qwen:deferred\n",
+      "      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: boot:qwen:deferred \u00b7 627ms into the action \u00b7 alive 0ms after it\n      launch: died 672ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-04T04:42:22.271Z (829m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-09-04-1664-no-phantom-syllable \u00b7 stage boot:qwen:deferred\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: boot:qwen:deferred \u00b7 743ms into the action \u00b7 alive 0ms after it\n      launch: died 776ms into the process \u00b7 not an OTA-apply boot\n",
+      "      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-04T13:31:35.149Z (300m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-04-1665-the-bug-report-pushes \u00b7 stage boot:qwen:deferred\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n",
+      "      last checkpoint: boot:qwen:deferred \u00b7 1075ms into the action \u00b7 alive 62922ms after it\n      launch: died 64046ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-04T18:21:13.034Z (11m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-04-1667-the-key-goes-where-the-player-is \u00b7 stage boot:qwen:deferred\n",
+      "      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: boot:qwen:deferred \u00b7 956ms into the action \u00b7 alive 0ms after it\n      launch: died 1006ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\nCrash delivery: ON \u2014 reports go to Sentry when you crash.\n",
+      "Runtime pressure\n  \u26a0\u26a0 LAST BOOT DIED MID-ACTION \u2014 no orderly exit was recorded.\n     Last thing the app did: (no action yet)\n     Where: (unknown) on (unknown) screen\n     Last seen alive: 2026-09-04T18:21:13.034Z (11 min before this boot \u2014 the kill landed somewhere in that gap)\n     Last checkpoint reached: boot:qwen:deferred (+956ms after it)\n",
+      "     \u26a0 The disk log's tail is UNRELIABLE for that session \u2014 batched lines\n       die in memory when the JS thread wedges. Trust this line over it.\n  Memory warnings: none this session\n  Freeze watch: no stalls seen (JS clocks only \u2014 see the native queue below)\n  \u26a0 Native queue: worst wait 2.7s \u00b7 0 job kinds queued >3s \u00b7 worst 11.0ms/prompt-token \u00b7 5 generations thrown away (39.9s)\n",
+      "     The JS thread was healthy and the native model queue was not. A stall the freeze watch above is structurally blind to.\n  App state trail: background \u2192 active \u2192 background \u2192 active\nModel contexts\n  Live now: 1\n  Opened: 1 \u00b7 Released: 0 \u00b7 Peak live: 1\n  Narration engine: ready\n\n--- VOICE ---\n  TTS enabled: no\n  Engine: bundled\n  Rate: 1.05 \u00b7 Pitch: 1.00\n  System voice id: (default)\n",
+      "  Kokoro voice: am_michael\n  Kokoro state: idle\n\n--- INVENTORY ---\nInventory (Cheddar Bob)\n  HP: 47/50  Stamina: 21/21  TC: 421  Corruption: 3\n  Pack: 179 distinct rows / 1398 total\n\nWeapons (27)\n  Aetheric Shield-Hammer (Uncommon, 2d6 bludgeoning, dur 41/41, [weapon,melee,two_handed,hammer,aetheric])\n    actions: equip:main, equip:off, use(off), scrap, drop\n",
+      "  Aetheric Spark Wand (1d6 aetheric, dur 38/38, [runecaster,rune_power,aetheric])\n    actions: equip:main, equip:off, use(off), scrap, drop\n  Acid-Etched Auralite Talon (Rare, +1d4 acid coat, dur 35/35, 2d6 aetheric, resist:aetheric, unique, [fused,unique,aetheric])\n    actions: equip:main, equip:off, use(off), scrap, drop\n",
+      "  Bone Crossbow (Uncommon, 2d6 piercing, dur 2/10, [weapon,ranged,crossbow,bolt-caster,loot])\n    actions: equip:main, equip:off, use(off), scrap, repair, drop\n  Bone Siege Crossbow (Uncommon, 2d6 piercing, dur 26/26, [weapon,ranged,two_handed,crossbow,giants])\n    actions: equip:main, equip:off, use(off), scrap, drop\n",
+      "  Searing Choir-Bound Launcher (Rare, +1d4 burn coat, dur 35/35, 2d6 aetheric, resist:aetheric, unique, [fused,unique,aetheric])\n    actions: equip:main, equip:off, use(off), scrap, drop\n  Energy Baton (Uncommon, 1d8 electrical, dur 36/36, [weapon,melee,dual_wield,aetheric])\n    actions: equip:main, equip:off, use(off), scrap, drop\n",
+      "  Force Wave Wand (1d6 force, dur 30/30, [weapon,runecaster,rune_power,aetheric,force])\n    actions: equip:main, equip:off, use(off), scrap, drop\n  Giant-Watch Greatspear (Uncommon, 2d6 piercing, dur 26/26, \u2665reserved, [weapon,melee,two_handed,faction_gear,servants_of_giants])\n    actions: equip:main, equip:off, use(off), scrap, release-from-fusion, drop\n",
+      "  Litany Maul (Legendary, dur 75/75, 1d12+2 bludgeoning, unique, [core_guardian_set,aether_born,blunt,two_handed,stagger_chance])\n    actions: equip:main, equip:off, use(off), scrap, drop\n  Magnetic Axe (Rare, 2d6 electrical, dur 41/41, [weapon,melee,single_handed,axe,aetheric])\n    actions: equip:main, equip:off, use(off), scrap, drop\n",
+      "  Mud Armor Rod (Uncommon, 1d8 bludgeoning, dur 39/39, [runecaster,rune_power,mud_dwellers,ward])\n    actions: equip:main, equip:off, use(off), scrap, drop\n  Mud Grip Wand (1d6 bludgeoning, dur 42/42, [runecaster,rune_power,mud_dwellers,restrain])\n    actions: equip:main, equip:off, use(off), scrap, drop\n  Mud Shell Wand (1d6 bludgeoning, dur 22/22, [runecaster,rune_power,mud_dwellers,ward])\n",
+      "    actions: equip:main, equip:off, use(off), scrap, drop\n  Mud Spear (Runecaster) (Uncommon, 2d6 piercing, dur 27/27, [runecaster,rune_power,mud_dwellers,loot])\n    actions: equip:main, equip:off, use(off), scrap, drop\n  Mud Venom Blade (Rare, 2d6 poison, dur 25/25, [weapon,melee,dual_wield,blade,mud_dwellers])\n    actions: equip:main, equip:off, use(off), scrap, drop\n",
+      "  Frost-Rimed Mud-Iron Greatblade (Rare, 2d8 slashing, +1d6 cold coat, dur 16/16, [weapon,melee,two_handed,blade,mud])\n    actions: equip:main, equip:off, use(off), scrap, drop\n  Pillar Brand (Uncommon, dur 25/25, 1d8 bludgeoning, unique, [fused,unique])\n    actions: equip:main, equip:off, use(off), scrap, drop\n",
+      "  Pulse-Woven Edge (Legendary, dur 45/45, 2d8 aetheric, resist:aetheric, unique, [fused,unique,faction_gear,servants_of_giants,aetheric])\n    actions: equip:main, equip:off, use(off), scrap, drop\n  Smoldering Reclaimers Guild Geode-Cored Cleaver (Legendary, +1d4 burn coat, dur 35/35, equipped:main, \u2665reserved, 2d6 bludgeoning, unique, [fused,unique,faction_gear,reclaimers_guild])\n",
+      "    actions: equip:off, unequip:main, use(off), release-from-fusion\n  Corrupted Reclaimers Guild Shroud-Spun Slinger (Legendary, +1d4 corruption coat, dur 35/35, equipped:off, 2d6 bludgeoning, unique, [fused,unique,faction_gear,reclaimers_guild])\n    actions: equip:main, unequip:off, use\n  Sentinel Cleaver (Rare, 2d8 slashing, dur 22/34, [weapon,blade,melee,sentinel])\n",
+      "    actions: equip:main, equip:off, use(off), scrap, repair, drop\n  Sentinel Cleaver (Rare, 2d8 slashing, dur 25/25, [weapon,blade,melee,sentinel])\n    actions: equip:main, equip:off, use(off), scrap, drop\n  Slick Mud Wand (1d6 bludgeoning, dur 27/27, [runecaster,rune_power,mud_dwellers,terrain])\n    actions: equip:main, equip:off, use(off), scrap, drop\n",
+      "  Sparkstrike Wand (1d6 electrical, dur 40/40, [weapon,runecaster,rune_power,aetheric,electrical])\n    actions: equip:main, equip:off, use(off), scrap, drop\n  Vine Grasp Wand (1d6 piercing, dur 41/41, [runecaster,rune_power,mud_dwellers,restrain])\n    actions: equip:main, equip:off, use(off), scrap, drop\n",
+      "  Void Pulse Rod (Uncommon, 2d6 aetheric, dur 13/13, [weapon,runecaster,rune_power,aetheric,crafted])\n    actions: equip:main, equip:off, use(off), scrap, drop\n\nArmor (14)\n  Aether-Walker's Boots (Uncommon, dur 27/27, equipped:feet, AC +4 \u00b7 Resists: aetheric, acid (coated), cold (coated) \u00b7 Regen: +1 stamina per action \u00b7 DEX +4 \u00b7 STR +2, [armor,feet,boots,tartarian_giants])\n",
+      "    actions: unequip:feet\n  Aether-Walker's Boots (Uncommon, dur 22/22, AC +4 \u00b7 Resists: aetheric \u00b7 Regen: +1 stamina per action \u00b7 DEX +4 \u00b7 STR +2, [armor,feet,boots,tartarian_giants])\n    actions: equip:feet, use, scrap, drop\n",
+      "  Architect's Sight Enhancer (Uncommon, dur 35/35, equipped:head, AC +3 \u00b7 Resists: cold, cold (coated) \u00b7 Regen: +1 HP per action \u00b7 WIS +3 \u00b7 INT +1, [armor,head,cloth,helmet,architectural_sentinels])\n    actions: unequip:head\n  Forgotten Protector's Plate (Uncommon, dur 42/42, AC +2 \u00b7 Resists: slashing \u00b7 DEX +1, [armor,chest,plate,unknowing_masses])\n    actions: equip:chest, use, scrap, drop\n",
+      "  Forgotten Seeker's Mask (Rare, dur 45/45, AC +3 \u00b7 Resists: slashing, aetheric \u00b7 DEX +3, [armor,head,mask,face,reclaimers])\n    actions: equip:head, use, scrap, drop\n  Litany Greaves (Legendary, dur 80/85, equipped:legs, AC+3, unique, [core_guardian_set,aether_born,ac:3,legs,heavy])\n    actions: unequip:legs, repair\n",
+      "  Lumenforged Stompers (Rare, dur 35/35, AC+3, resist:aetheric, unique, [fused,unique,aetheric])\n    actions: equip:feet, use, scrap, drop\n  Mask of the Aether Seeker (Uncommon, dur 12/12, AC +5 \u00b7 Resists: aetheric \u00b7 CHA +5 \u00b7 DEX +2, [armor,head,mask,face,aetherborn])\n    actions: equip:head, use, scrap, drop\n",
+      "  Mud-glass Scales (Uncommon, dur 49/49, equipped:chest, AC +4 \u00b7 Resists: piercing, burn (coated) \u00b7 Regen: +2 stamina per action, [armor,chest,scale,mud_glass,true_tartarians])\n    actions: unequip:chest\n  Mudstone Bulwark (Rare, dur 61/61, AC +4 \u00b7 Resists: bludgeoning, piercing \u00b7 HP +30, [armor,chest,heavy,stone,mud])\n    actions: equip:chest, use, scrap, drop\n",
+      "  Reclaimer's Cloak (dur 13/13, AC +2 \u00b7 Resists: cold, burn (coated), acid (coated) \u00b7 DEX +2 \u00b7 STE +2, [armor,cloak,outer,reclaimers,stealth])\n    actions: equip:cloak, use, scrap, drop\n  Relic Hunter's Gauntlets (Uncommon, dur 27/27, AC +4 \u00b7 Resists: slashing, cold (coated), burn (coated) \u00b7 DEX +4 \u00b7 STR +2, [armor,hands,gauntlets,reclaimers])\n    actions: equip:hands, use, scrap, drop\n",
+      "  Titan's Gauntlets (dur 16/16, AC +2 \u00b7 STR +2, [armor,hands,gauntlets,tartarian_giants])\n    actions: equip:hands, use, scrap, drop\n  Veil-Stitched Plate (Uncommon, dur 25/25, AC+2, unique, [fused,unique])\n    actions: equip:chest, use, scrap, drop\n\nShields (1)\n  Grounded Buckler (Uncommon, 1d6 bludgeoning, dur 323/323, [weapon,shield,dual_wield,unknowing_masses])\n    actio"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-04-1668-the-row-says-what-it-does #mtnaj1w6w78b [inline 1/4]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtnaj1w6w78b"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1668-the-row-says-what-it-does"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "1"
+    },
+    {
+      "key": "parts",
+      "value": "4"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1668-the-row-says-what-it-does"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T19:14:50.366405Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T19:14:52.426000Z",
+  "fingerprints": [
+    "d359e346338320c7459e848f8af46352"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1955935008,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-04T18:40:44.294692Z",
+    "dateReleased": "2026-09-04T18:42:15.646786Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "2ba93f935007c5a362f3ceb461c484bcea657a9c",
+      "message": "[ota-hal] OTA-1668: the row says what it is and what it does\n\nOwner: \"at workings to learn at a vendor, the things you buy need more than a\nname, they need to tell you what they are and what they do on the button line. I\nunderstand that if you tap on it you get the full detailed view but that's an\nextra step. If I know it's an axe with electric base damage and it's a 2d10 then\nit helps me choose faster.\"\n\n\u26a0\u26a0 HE NAMED THE ONE BUY SURFACE THAT HAD NOTHING, and he was precise about which.\nThe ordinary offer rows have carried `kindLabel \u00b7 rarity` plus a full stat line\nfor many OTAs. WORKINGS TO LEARN \u2014 the recipe list \u2014 printed the result's NAME,\nits price, and the literal word \"recipe\". Comparing two workings meant opening\nboth and backing out of one, every time.\n\n\u26a0 THE HEADLINE IS BUILT AT THE SOURCE, NOT PARSED AT THE ROW. Every branch of\nitemPreview writes its own from values it already holds. The tempting shortcut \u2014\nhave the caller slice stats[0] and regex \"Damage: 2d10 (electrical)\" back apart \u2014\nis how a screen eventually prints a weapon's durability where its damage belongs,\nand it would have had to be repeated at every surface wanting the line. The\ndamage glyph is the one the combat button paints (OTA-1636) and the codex GLYPHS\ntab explains (OTA-1667), so the shop and the fight teach one symbol.\n\n\u26a0 AND THE INSTANCE HEADLINE FOLLOWS THE INSTANCE. A plain spread would have\ncarried the CATALOG's AC onto a piece whose AC was rolled \u2014 the row and the card\ndisagreeing about the same object, which is the OTA-1611 defect in a new place.\n\n\u26a0\u26a0\u26a0 LOOT FINALLY SAYS WHAT IT IS FOR, folded in from the same message: \"we need\nto define what loot is in the inventory. It's just there, but what is it for?\"\n\nIt already had a job and never said so \u2014 isForgeableLootReagent has fed the\nFusing Crucible since OTA-737, and OTA-1642 authored 86 enemy drops specifically\nto keep that hopper full. \u26a0 BUT THE ANSWER IS NOT ONE ANSWER, and a blanket label\nwould have been a lie: a drop named by ANY recipe is deliberately excluded from\nthe Crucible so fusing can never cannibalise crafting. lootPurposeLine reads those\nsame two predicates, so it says \"crafting ingredient\", or \"Crucible fodder\", or \u2014\nfor the many things that are simply worth what a vendor pays \u2014 nothing at all.\nThe label and the bench's refusal cannot disagree. It renders on the vendor SELL\nrows, which is exactly where the question gets asked, one tap before you sell\nsomething the forge wanted.\n\nGates: all 18 green by exit code. Full suite green (1129 suites / 11,711 tests).\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T18:38:20Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1668-the-row-says-what-it-does",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1668-the-row-says-what-it-does",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T18:42:15.646786Z",
+          "dateCreated": "2026-09-04T18:40:44.294692Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155642392",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T18:42:15.820426Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1668-the-row-says-what-it-does",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1668-the-row-says-what-it-does",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1668-the-row-says-what-it-does",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1668-the-row-says-what-it-does)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "ef89de73d8224287a608f13abe3ddc41",
+  "previousEventID": "2f147a10dc0c43d6b4e4ee992fddf64c"
+}
