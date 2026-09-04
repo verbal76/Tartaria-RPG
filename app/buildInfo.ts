@@ -27433,6 +27433,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // three consecutive OTAs, so ota1663 SWEEPS the whole screen for
 // `submitPlayerAction(\`feed|arm|heal` rather than pinning the two I touched.
 export const OTA_BUILD_ID = '2026-09-04-1663-the-golem-eats-from-the-pouch';
+// golem catch-up 2026-09-04: markerless publish of OTA-1663 - the golem eats
+// from the pouch. Owner asked for golem-feedable materials in the heals pouch,
+// with those going straight to the golem and nowhere else. Widening the gate was
+// easy; the instruction that mattered was "only" - a chooser on scrap would be
+// OTA-1662's mistake inverted, a question with one answer. One predicate
+// (medkitRole) decides both what gets IN and what it DOES on the way out, heals
+// win a tie, and it cannot throw because it now runs during render. Wiring it up
+// found the third and fourth instances of the OTA-1658 defect: Heal <golem> and
+// Arm <golem> both routed through submitPlayerAction and therefore did nothing
+// mid-fight. Fixed, and the suite now SWEEPS the screen for that pattern instead
+// of pinning the two I touched. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-04-1662-the-pouch-asks-who';
 // golem catch-up 2026-09-04: markerless publish of OTA-1662 - the pouch asks
 // who. Owner: the heals pouch "automatically applies it to me", and he wants it
