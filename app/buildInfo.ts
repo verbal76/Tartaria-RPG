@@ -27599,6 +27599,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // 18.1%, strength 17.7%, dexterity 17.4%, hp 16.3%, wisdom 14.2%, charisma 9.0%,
 // stealth 7.3% - and saved gear follows its row, keeping the rolled amount.
 export const OTA_BUILD_ID = '2026-09-04-1670-the-name-says-the-stat';
+// golem catch-up 2026-09-04: markerless publish of OTA-1670 - the name says the
+// stat. All 297 armour rows redistributed by what their NAME implies, after
+// measuring dexterity at 35.8% of 827 stat rolls (double the next stat, leading
+// four of six slots; a piece called Stealth Hood granted dexterity). Two defects
+// were caught inside the fix itself: my first pass balanced ten channels, four of
+// which STAT_ALIAS collapses before payout, so the pretty table would not have
+// reached a character sheet; and an hp-scale +20 chest piece ("Tomb-Warden
+// Plate") was nearly relabelled into a +20 WISDOM item because "warden" matches
+// the wisdom line. Final spread across the seven real channels: int 18.1, str
+// 17.7, dex 17.4, hp 16.3, wis 14.2, cha 9.0, ste 7.3. Saved gear follows its
+// row and keeps the rolled amount. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-04-1669-the-gate-opens-for-the-tap';
 // golem catch-up 2026-09-04: markerless publish of OTA-1669 - the gate opens for
 // the tap. ENTER OUTPOST was silently refused whenever the player had a travel
