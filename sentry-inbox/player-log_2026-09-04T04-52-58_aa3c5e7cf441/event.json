@@ -1,0 +1,236 @@
+{
+  "id": "aa3c5e7cf44148098f2bdd7547009d9a",
+  "groupID": "7711143892",
+  "eventID": "aa3c5e7cf44148098f2bdd7547009d9a",
+  "projectID": "4511945117532160",
+  "size": 4704,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-04-1664-no-phantom-syllable #mtmha35hxvzg [inline 28/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1664-no-phantom-syllable",
+  "message": "player-log 2026-09-04-1664-no-phantom-syllable #mtmha35hxvzg [inline 28/28]",
+  "title": "player-log 2026-09-04-1664-no-phantom-syllable #mtmha35hxvzg [inline 28/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "488faa54deec4c3ba82e08a6e9ae84cf",
+      "span_id": "969b9d9218324799",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "t an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-03T22:43:58.985Z (369m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-03-1653-the-wear-ward \u00b7 stage boot:qwen:deferred\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n",
+      "      last checkpoint: boot:qwen:deferred \u00b7 627ms into the action \u00b7 alive 0ms after it\n      launch: died 672ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-04T04:42:22.271Z (11m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-04-1664-no-phantom-syllable \u00b7 stage boot:qwen:deferred\n",
+      "      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: boot:qwen:deferred \u00b7 743ms into the action \u00b7 alive 0ms after it\n      launch: died 776ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\nCrash delivery: ON \u2014 reports go to Sentry when you crash.\n",
+      "Runtime pressure\n  \u26a0\u26a0 LAST BOOT DIED MID-ACTION \u2014 no orderly exit was recorded.\n     Last thing the app did: (no action yet)\n     Where: (unknown) on (unknown) screen\n     Last seen alive: 2026-09-04T04:42:22.271Z (11 min before this boot \u2014 the kill landed somewhere in that gap)\n     Last checkpoint reached: boot:qwen:deferred (+743ms after it)\n",
+      "     \u26a0 The disk log's tail is UNRELIABLE for that session \u2014 batched lines\n       die in memory when the JS thread wedges. Trust this line over it.\n  Memory warnings: none this session\n  Freeze watch: no stalls seen (JS clocks only \u2014 see the native queue below)\n  Native queue: worst wait 0.0s \u00b7 0 job kinds queued >3s \u00b7 worst 0.0ms/prompt-token\n  App state trail: (none recorded)\nModel contexts\n",
+      "  Live now: 0\n  Opened: 0 \u00b7 Released: 0 \u00b7 Peak live: 0\n  Narration engine: idle\n"
+    ],
+    "chunkChars": 1917
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-04-1664-no-phantom-syllable #mtmha35hxvzg [inline 28/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtmha35hxvzg"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1664-no-phantom-syllable"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "28"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1664-no-phantom-syllable"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T04:52:56.558920Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T04:52:58.041000Z",
+  "fingerprints": [
+    "64dd8aba247618f8258f26ac076e31e3"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1954595382,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-04T04:14:29.574155Z",
+    "dateReleased": "2026-09-04T04:16:01.629112Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "082d8b0c5221a969630765f5cbcadd7ec8b6793c",
+      "message": "[ota-hal] OTA-1664: no phantom syllable\n\nOwner, after I offered to \"re-tune\" two place names: \"there should be no a sound\nin front of either of those. the s and the n are the starting sound of each\nword. where are you getting an AY sound before that \u2014 to me it reads like you're\nmispronouncing the word, not a tone or inflection, but adding a syllable.\"\n\n\u26a0\u26a0\u26a0 HE IS RIGHT, AND MY FRAMING WAS THE PROBLEM. I reported this as a vowel\nquality issue \u2014 \"eh\" coming out as \"AY\" \u2014 which invited a better spelling of the\nsame wrong thing. It is not a vowel problem. The leading token should not be\nthere at all. Samarran is three syllables and opens on S. Nimari is three and\nopens on N. Both have been saying four since OTA-104.\n\n\u26a0 THE CAUSE IS A MISREAD OF THE PLAYTESTER'S IPA. OTA-104 was handed\n/\u025bs\u025bm\u0254\u02d0\u027e\u025bn/ and /\u025bn\u025bm\u0251\u0279i/, saw the leading \u025b, and promoted it to its own\nspace-separated token \u2014 which this file's own header says espeak treats as a\nseparate WORD. Then it recorded the mistake as a finding: \"all three open with a\nleading /\u025b/ schwa that the prior respellings dropped. Samarran and Nimari are\n4-syllable words, not 3.\" Both sentences are false, and the second is exactly\nthe sort of confident note that stops the next reader from checking. It stopped\nme twice tonight \u2014 I read that comment during the OTA-1659 audit and moved on.\n\nMeasured (`espeak-ng -v en-us -q --ipa`), these were not shades off. They were\ndifferent words:\n\n    eh sem or en    \u2192 \u02c8e\u026a s\u02c8\u025bm \u0254\u02d0\u0279 \u02c8\u025bn    \"AY-SEM-OR-EN\"   (4 beats, 4 stresses)\n    Samarran        \u2192 s\u02c8\u00e6m\u00e6\u0279\u0259n            \"SAM-a-run\"      \u2713\n    eh neh mah ree  \u2192 \u02c8e\u026a n\u02c8e\u026a m\u02c8\u0251\u02d0 \u0279\u02c8i\u02d0  \"AY-NAY-MAH-REE\" (\"neh\" also says NAY)\n    Nimari          \u2192 n\u02c8\u026am\u025a\u0279i             \"NIM-uh-ree\"     \u2713\n\n\u26a0\u26a0 SO THE FIX IS REMOVAL, NOT A RE-TUNE. That is the third time in six OTAs that\nthe right answer here was to delete an entry rather than re-spell it \u2014 \"the\" and\n\"doesn't\" went the same way in OTA-1659, for the same reason: an override was\nadded to correct a word the phonemizer already read properly, and the override\nwas the mispronunciation.\n\n\u26a0 ASGARDAR STAYS, and the distinction matters. A-s-gardar genuinely opens on a\nvowel, so its \"ez\" is the first syllable of the word rather than a beat welded\nin front of it. Same syllable count as the raw word, different vowel \u2014 which is\nwhat he asked for at OTA-104. He complained about two names, not three, and he\nwas precise about which.\n\n\u26a0\u26a0 AND THE SUITE NOW GUARDS THE CLASS, NOT THE INSTANCE. The defect is not \"eh\"\n\u2014 it is a respelling that changes how many beats a word has. ota1664 checks the\nchunk count of every surviving entry against the count verified here, so the\nnext entry that adds or drops a syllable fails a test instead of shipping and\nwaiting for someone to notice it in a sentence.\n\nGates: all 18 green by exit code. Full suite green.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T04:12:09Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1664-no-phantom-syllable",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1664-no-phantom-syllable",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T04:16:01.629112Z",
+          "dateCreated": "2026-09-04T04:14:29.574155Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155428664",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T04:16:01.857063Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1664-no-phantom-syllable",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1664-no-phantom-syllable",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1664-no-phantom-syllable",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1664-no-phantom-syllable)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "adfde1f0852e46138218367a9c66923b",
+  "previousEventID": "9bbd108227e6488fb39f12dd9eb16eff"
+}

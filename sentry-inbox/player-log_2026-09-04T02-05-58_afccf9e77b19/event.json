@@ -1,0 +1,279 @@
+{
+  "id": "afccf9e77b194b199e5fcb5ea2ac1436",
+  "groupID": "7710939431",
+  "eventID": "afccf9e77b194b199e5fcb5ea2ac1436",
+  "projectID": "4511945117532160",
+  "size": 18100,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-04-1659-the-is-not-in-the-lexicon #mtm6enrfz3iy [inline 23/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1659-the-is-not-in-the-lexicon",
+  "message": "player-log 2026-09-04-1659-the-is-not-in-the-lexicon #mtm6enrfz3iy [inline 23/28]",
+  "title": "player-log 2026-09-04-1659-the-is-not-in-the-lexicon #mtm6enrfz3iy [inline 23/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "059db7a4ee6e4eeb8cd6b108f1f16eae",
+      "span_id": "815dc870aa0895ec",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "SSION 2026-09-03T21:31:57.941Z \u00b7 build 2026-09-03-1649-what-a-ring-is-for \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-09-03T21:31:57.947Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-03T21:31:57.947Z] [debug] missions: hunt:hunt_bog_dragon stage 4/7 [diplomacy] @monarch_waystation npc=\"Old Mira\" needs=The Boy's Locket\u2713 gives=Eshren's Name-Token\n[2026-09-03T21:31:57.947Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n",
+      "[2026-09-03T21:31:57.947Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n[2026-09-03T21:31:57.948Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n",
+      "[2026-09-03T21:31:57.948Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n[2026-09-03T21:31:57.948Z] [debug] missions: \u00b7 at=mud_flood_nexus travelTo=monarch_waystation\n[2026-09-03T21:31:57.948Z] [debug] boot: life bmtm1h5kbls started 2026-09-03T21:30:33.707Z \u00b7 not an OTA apply (no handoff on disk)\n",
+      "[2026-09-03T21:32:01.568Z] [debug] send-log: crash on record (2026-09-03T21:28:44.213Z) \u2014 game log pushed automatically, delivered to Sentry, kept on disk as #mtm1iz3wmdt1\n[2026-09-03T21:32:01.990Z] [debug] ui: tap \"approach\"\n[2026-09-03T21:32:01.991Z] [debug] qwen: loading (was idle) \u2014 the Arbiter speaks templates until it is ready\n",
+      "[2026-09-03T21:32:02.032Z] [player] approach Conspiracy Architects Raider 2\n[2026-09-03T21:32:02.033Z] [debug] parser: intent=advance conf=1.00 verb=approach target=conspiracy architects raider 2 resolved=Conspiracy Architects Raider 2 range=mid enemies=5 hooks=2\n[2026-09-03T21:32:02.036Z] [debug] move: advance from range=mid enemies=5 weather=Black Rain cost=1 partial=0\n",
+      "[2026-09-03T21:32:02.037Z] [debug] move: field advance target=Conspiracy Architects Raider 2 d 1.58->0.58 band mid->close\n[2026-09-03T21:32:02.037Z] [world] You close the gap with the Conspiracy Architects Raider 2 and 4 others. (range: close / arm's reach)\n",
+      "[2026-09-03T21:32:02.037Z] [world] The field shifts around you \u2014 Conspiracy Architects Raider 3 now mid-range; Conspiracy Architects Raider 4 now far; Conspiracy Architects Raider 5 now far.\n[2026-09-03T21:32:02.039Z] [combat] Conspiracy Architects Raider 1 \u2014 d20 \u2192 2 + ATK 10 = 12 vs your AC 22 \u2014 \u2717 MISS\n",
+      "[2026-09-03T21:32:02.039Z] [combat] Conspiracy Architects Raider 2 turns on Mercy \u2014 d20 5 + ATK 9 = 14 vs Mercy's AC 10 \u2014 \u2713 HIT\n[2026-09-03T21:32:02.040Z] [combat] Mercy takes 6. (9/15 HP left)\n[2026-09-03T21:32:02.041Z] [combat] Conspiracy Architects Raider 3 \u2014 d20 \u2192 3 + ATK 11 = 14 vs your AC 22 \u2014 \u2717 MISS\n",
+      "[2026-09-03T21:32:02.042Z] [combat] Conspiracy Architects Raider 4 and 1 other close the distance.\n[2026-09-03T21:32:02.043Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-03T21:32:02.043Z] [arbiter] The Arbiter watches the blow land or fail. \"Both are answers.\"\n",
+      "[2026-09-03T21:32:02.043Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter watches the blow land or fail. \"Both are answers\u2026\"\n[2026-09-03T21:32:02.422Z] [cognitive] neutral  (378ms)\n[2026-09-03T21:32:03.227Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-09-03T21:32:03.592Z] [debug] ui: tap \"dodge\"\n[2026-09-03T21:32:03.596Z] [player] dodge\n",
+      "[2026-09-03T21:32:03.596Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=5 hooks=2\n[2026-09-03T21:32:03.596Z] [world] You commit to the dodge. Slip Conspiracy Architects Raider 2's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-03T21:32:03.673Z] [combat] Conspiracy Architects Raider 3 \u2014 d20 \u2192 12 + ATK 9 = 21 vs your AC 22 \u2014 \u2717 EVADED\n[2026-09-03T21:32:03.673Z] [combat] Dodge \u2014 d20 \u2192 14 + DEX 21 = 35 vs ATK 21. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n",
+      "[2026-09-03T21:32:03.673Z] [world] You slip Conspiracy Architects Raider 3's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n[2026-09-03T21:32:03.675Z] [debug] ac-shift 22\u219225: race/base 10 + gear 18 + title 0 \u2192 trimmed 22 + status 3 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany ",
+      "Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n[2026-09-03T21:32:03.675Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 3 + ATK 10 = 13 vs your AC 25 \u2014 \u2717 MISS\n[2026-09-03T21:32:03.677Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 18 + ATK 7 = 25 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n",
+      "[2026-09-03T21:32:03.678Z] [combat] Conspiracy Architects Raider 2 turns on Mercy \u2014 d20 8 + ATK 9 = 17 vs Mercy's AC 10 \u2014 \u2713 HIT\n[2026-09-03T21:32:03.678Z] [combat] Mercy takes 7. (2/15 HP left)\n[2026-09-03T21:32:03.678Z] [combat] Conspiracy Architects Raider 1 presses in behind the others, waiting for an opening.\n[2026-09-03T21:32:03.678Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-09-03T21:32:03.678Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T21:32:03.679Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T21:32:04.078Z] [combat] Conspiracy Architects Raider 5 deals 6 piercing damage [armor \u221235%, plate \u22121]. You have 43 HP remaining.\n[2026-09-03T21:32:04.782Z] [cognitive] neutral  (1102ms)\n",
+      "[2026-09-03T21:32:05.140Z] [debug] ui: tap \"\u2623 shroud-spun slinger \u2692\"\n[2026-09-03T21:32:05.140Z] [system] evasive \u2014 harder to hit fades.\n[2026-09-03T21:32:05.183Z] [player] attack with the off-hand reclaimers guild shroud-spun slinger\n",
+      "[2026-09-03T21:32:05.183Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand reclaimers guild shroud spun slinger resolved=Reclaimers Guild Shroud-Spun Slinger range=close enemies=5 hooks=2\n[2026-09-03T21:32:05.184Z] [debug] attack: target=Conspiracy Architects Raider 2 range=close reach.bands=[distant,far,mid,close] reach.label=Reclaimers Guild Shroud-Spun Slinger bareHand=false\n",
+      "[2026-09-03T21:32:05.186Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-03T21:32:05.261Z] [world] You commit forward with the corrupted reclaimers guild shroud-spun slinger. Conspiracy Architects Raider 2 watches your hands.\n[2026-09-03T21:32:05.261Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T21:32:05.963Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 USE_ITEM  (701ms)\n",
+      "[2026-09-03T21:32:14.286Z] [world] Conspiracy Architects Raider 2 moves first. The pressure is immediate.\n[2026-09-03T21:32:14.288Z] [debug] ac-shift 25\u219222: race/base 10 + gear 18 + title 0 \u2192 trimmed 22 + status 0 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n",
+      "[2026-09-03T21:32:14.288Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 17 + ATK 7 = 24 vs your AC 22 \u2014 \u2713 HIT\n[2026-09-03T21:32:14.289Z] [combat] Conspiracy Architects Raider 1 turns on Mercy \u2014 d20 8 + ATK 8 = 16 vs Mercy's AC 10 \u2014 \u2713 HIT\n[2026-09-03T21:32:14.290Z] [combat] Mercy takes 7. (0/15 HP left)\n",
+      "[2026-09-03T21:32:14.290Z] [arbiter] Mercy drops under the Conspiracy Architects Raider 1 and drags herself clear of the fight. She is down \u2014 tend her within a day or she won't get back up.\n[2026-09-03T21:32:14.292Z] [combat] Conspiracy Architects Raider 2 \u2014 d20 \u2192 12 + ATK 11 = 23 vs your AC 22 \u2014 \u2713 HIT\n",
+      "[2026-09-03T21:32:14.295Z] [combat] Conspiracy Architects Raider 3 \u2014 d20 \u2192 5 + ATK 9 = 14 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T21:32:14.295Z] [combat] Conspiracy Architects Raider 4 presses in behind the others, waiting for an opening.\n[2026-09-03T21:32:14.295Z] [combat] You \u2014 d20 \u2192 18 + DEX 21 + 2 (point blank) perfect opening (2\u00d7 dice) = 41 vs Conspiracy Architects Raider 2 AC 13 \u2014 \u2713 HIT\n",
+      "[2026-09-03T21:32:14.296Z] [combat] Clean hit with the corrupted reclaimers guild shroud-spun slinger for 12. Conspiracy Architects Raider 2 has 13 left and does not back away.\n[2026-09-03T21:32:14.297Z] [combat] Corrupted Reclaimers Guild Shroud-Spun Slinger \u2014 2 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n",
+      "[2026-09-03T21:32:14.701Z] [combat] Conspiracy Architects Raider 5 deals 4 piercing damage [armor \u221235%]. You have 39 HP remaining.\n[2026-09-03T21:32:14.701Z] [combat] Conspiracy Architects Raider 2 deals 5 bludgeoning damage. You have 34 HP remaining.\n[2026-09-03T21:32:19.736Z] [debug] ui: tap \"golem (51/68)\"\n[2026-09-03T21:32:19.746Z] [player] use golem\n",
+      "[2026-09-03T21:32:19.747Z] [combat] Ashwright attacks Conspiracy Architects Raider 2 \u2014 d20 18 + 3 = 21 vs AC 13 \u2014 \u2713 HIT\n[2026-09-03T21:32:19.748Z] [combat] Ashwright swings the Crude Golem Greatsword \u2014 10 slashing damage on Conspiracy Architects Raider 2. (3 HP left)\n",
+      "[2026-09-03T21:32:19.749Z] [combat] Conspiracy Architects Raider 2 retaliates \u2014 d20 9 + 8 hits Ashwright for 5 (35% resisted). (46/68)\n[2026-09-03T21:32:19.765Z] [combat] Conspiracy Architects Raider 2 blackens \u2014 corruption eats 2. (1/25 HP, 2 turns left)\n[2026-09-03T21:32:19.769Z] [combat] Conspiracy Architects Raider 2 \u2014 d20 \u2192 5 + ATK 9 = 14 vs your AC 22 \u2014 \u2717 MISS\n",
+      "[2026-09-03T21:32:19.772Z] [combat] Conspiracy Architects Raider 3 \u2014 d20 \u2192 2 + ATK 9 = 11 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T21:32:19.774Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 13 + ATK 8 = 21 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T21:32:19.775Z] [combat] Conspiracy Architects Raider 5 and 1 other press in behind their own pack, waiting for an opening.\n",
+      "[2026-09-03T21:32:22.186Z] [debug] ui: tap \"golem (46/68)\"\n[2026-09-03T21:32:22.194Z] [player] use golem\n[2026-09-03T21:32:22.194Z] [combat] Ashwright attacks Conspiracy Architects Raider 2 \u2014 d20 15 + 3 = 18 vs AC 13 \u2014 \u2713 HIT\n[2026-09-03T21:32:22.196Z] [combat] Ashwright swings the Crude Golem Greatsword \u2014 14 slashing damage on Conspiracy Architects Raider 2. (0 HP left)\n",
+      "[2026-09-03T21:32:22.196Z] [world] Conspiracy Architects Raider 2 crumbles under Ashwright's assault.\n[2026-09-03T21:32:22.198Z] [reward] Conspiracy Architects Raider 2 defeated. You recover Aetheric Shard, Aether Residue.\n[2026-09-03T21:32:22.200Z] [reward] You strip the body: Bone Knife, Mud-Bound Cloak (+14 TC). The kit took the fight badly.\n",
+      "[2026-09-03T21:32:22.201Z] [combat] 4 attackers remain. Conspiracy Architects Raider 1 now in your sights.\n[2026-09-03T21:32:22.201Z] [reward] +12 TC pried from the dust.\n[2026-09-03T21:32:22.277Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 20 + ATK 8 = 28 vs your AC 22 \u2014 \u2713 CRITICAL HIT\n",
+      "[2026-09-03T21:32:22.280Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 2 + ATK 7 = 9 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T21:32:22.281Z] [combat] Conspiracy Architects Raider 1 \u2014 d20 \u2192 9 + ATK 8 = 17 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T21:32:22.281Z] [combat] Conspiracy Architects Raider 3 presses in behind the others, waiting for an opening.\n",
+      "[2026-09-03T21:32:22.679Z] [combat] Conspiracy Architects Raider 4 deals 5 slashing damage [armor \u221225%] [edge of reach \u2014 halved]. You have 29 HP remaining.\n[2026-09-03T21:32:25.153Z] [debug] ui: tap \"golem (46/68)\"\n[2026-09-03T21:32:25.166Z] [player] use golem\n[2026-09-03T21:32:25.166Z] [combat] Ashwright attacks Conspiracy Architects Raider 3 \u2014 d20 3 + 3 = 6 vs AC 13 \u2014 \u2717 MISS\n",
+      "[2026-09-03T21:32:25.167Z] [world] Ashwright's strike sails wide of Conspiracy Architects Raider 3.\n[2026-09-03T21:32:25.167Z] [combat] Conspiracy Architects Raider 3 retaliates \u2014 d20 3 + 8 hits Ashwright for 3 (35% resisted). (43/68)\n[2026-09-03T21:32:25.191Z] [combat] Conspiracy Architects Raider 1 \u2014 d20 \u2192 18 + ATK 8 = 26 vs your AC 22 \u2014 \u2713 HIT\n",
+      "[2026-09-03T21:32:25.196Z] [combat] Conspiracy Architects Raider 3 \u2014 d20 \u2192 2 + ATK 9 = 11 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T21:32:25.199Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 12 + ATK 8 = 20 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T21:32:25.201Z] [combat] Conspiracy Architects Raider 5 presses in behind the others, waiting for an opening.\n",
+      "[2026-09-03T21:32:25.607Z] [combat] Conspiracy Architects Raider 1 deals 3 slashing damage [armor \u221225%]. You have 26 HP remaining.\n[2026-09-03T21:32:25.607Z] [combat] Conspiracy Architects Raider 1's strike leaves you bleeding.\n[2026-09-03T21:32:26.319Z] [debug] ui: tap \"golem (43/68)\"\n[2026-09-03T21:32:26.322Z] [player] use golem\n",
+      "[2026-09-03T21:32:26.322Z] [combat] Ashwright attacks Conspiracy Architects Raider 3 \u2014 d20 6 + 3 = 9 vs AC 13 \u2014 \u2717 MISS\n[2026-09-03T21:32:26.322Z] [world] Ashwright's strike sails wide of Conspiracy Architects Raider 3.\n[2026-09-03T21:32:26.322Z] [combat] Conspiracy Architects Raider 3 retaliates \u2014 d20 11 + 8 hits Ashwright for 4 (35% resisted). (39/68)\n",
+      "[2026-09-03T21:32:26.324Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 17 + ATK 8 = 25 vs your AC 22 \u2014 \u2713 HIT\n[2026-09-03T21:32:26.328Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 20 + ATK 7 = 27 vs your AC 22 \u2014 \u2713 CRITICAL HIT\n[2026-09-03T21:32:26.330Z] [combat] Conspiracy Architects Raider 1 \u2014 d20 \u2192 14 + ATK 8 = 22 vs your AC 22 \u2014 \u2713 HIT\n",
+      "[2026-09-03T21:32:26.331Z] [combat] Conspiracy Architects Raider 3 presses in behind the others, waiting for an opening.\n[2026-09-03T21:32:26.725Z] [combat] Conspiracy Architects Raider 4 deals 5 slashing damage [armor \u221225%] [edge of reach \u2014 halved]. You have 21 HP remaining.\n",
+      "[2026-09-03T21:32:26.725Z] [combat] Conspiracy Architects Raider 5 deals 11 piercing damage [armor \u221235%]. You have 10 HP remaining.\n[2026-09-03T21:32:26.725Z] [combat] Conspiracy Architects Raider 1 deals 9 slashing damage [armor \u221225%]. You have 1 HP remaining.\n",
+      "[2026-09-03T21:32:26.725Z] [arbiter] The Arbiter holds your gaze. \"Cheddar Bob, you're badly injured. Take a moment \u2014 eat what you have, open the first-aid kit, or rest somewhere safe. The Outskirts do not return what they take.\"\n[2026-09-03T21:32:27.507Z] [debug] ui: tap \"golem (39/68)\"\n[2026-09-03T21:32:27.509Z] [player] use golem\n",
+      "[2026-09-03T21:32:27.509Z] [combat] Ashwright attacks Conspiracy Architects Raider 3 \u2014 d20 15 + 3 = 18 vs AC 13 \u2014 \u2713 HIT\n[2026-09-03T21:32:27.510Z] [combat] Ashwright swings the Crude Golem Greatsword \u2014 8 slashing damage on Conspiracy Architects Raider 3. (17 HP left)\n",
+      "[2026-09-03T21:32:27.510Z] [combat] Conspiracy Architects Raider 3 retaliates \u2014 d20 15 + 8 hits Ashwright for 4 (35% resisted). (35/68)\n[2026-09-03T21:32:27.512Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 7 + ATK 7 = 14 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T21:32:27.513Z] [combat] Conspiracy Architects Raider 1 \u2014 d20 \u2192 13 + ATK 8 = 21 vs your AC 22 \u2014 \u2717 MISS\n",
+      "[2026-09-03T21:32:27.515Z] [combat] Conspiracy Architects Raider 3 \u2014 d20 \u2192 9 + ATK 9 = 18 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T21:32:27.515Z] [combat] Conspiracy Architects Raider 4 presses in behind the others, waiting for an opening.\n[2026-09-03T21:32:27.975Z] [debug] persist sizes(KB): total=329 player=86 wm=155[rooms=85 events=5 memos=1 npc"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-04-1659-the-is-not-in-the-lexicon #mtm6enrfz3iy [inline 23/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtm6enrfz3iy"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1659-the-is-not-in-the-lexicon"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "23"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1659-the-is-not-in-the-lexicon"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "4"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T02:05:56.725777Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T02:05:58.081000Z",
+  "fingerprints": [
+    "bd47edb593360462ba0f7f54604b828c"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1954433048,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-04T02:01:03.781476Z",
+    "dateReleased": "2026-09-04T02:02:04.357945Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "6a658907950273ce80604a3f492ea9d071955a27",
+      "message": "[ota-hal] OTA-1659: \"the\" is not in the lexicon\n\nOwner, for the second time: \"the needs to be pronounced thuh in kokoro.\"\n\nHe reported this once before, and OTA-1146 answered it by rewriting every\nconsonant-position \"the\" to the literal string \"thuh\" before the line reached\nthe engine. That fix is what he has been hearing since.\n\n\u26a0\u26a0\u26a0 NOBODY EVER MEASURED IT. espeak-ng is installable in this container, and it\nis the same phonemizer the app bundles per voice under <voice>/espeak-ng-data.\nOne command settles the whole question:\n\n    $ espeak-ng -v en-us -q --ipa \"The raider swings the rusted blade at the dog.\"\n      plain     \u2192  \u00f0\u0259 \u0279\u02c8e\u026ad\u025a sw\u02c8\u026a\u014bz \u00f0\u0259 \u0279\u02c8\u028cst\u1d7bd bl\u02c8e\u026ad \u00e6t \u00f0\u0259 d\u02c8\u0251\u02d0\u0261\n      OTA-1146  \u2192  \u03b8\u02c8\u028c \u0279\u02c8e\u026ad\u025a sw\u02c8\u026a\u014bz \u03b8\u02c8\u028c \u0279\u02c8\u028cst\u1d7bd bl\u02c8e\u026ad \u00e6t \u03b8\u02c8\u028c d\u02c8\u0251\u02d0\u0261\n\n\u26a0 THE ENGINE WAS ALREADY SAYING \"thuh\". /\u00f0\u0259/ IS \"thuh\" \u2014 the exact sound he\nasked for, three times in that sentence, before anyone touched anything. The\nrespelling replaced it with \u03b8\u02c8\u028c: the voiceless th of THUMB instead of the voiced\nth of THIS, the STRUT vowel instead of a schwa, and STRESSED, because espeak\nstresses a monosyllable it has to sound out. An unstressed article became a hard\nbeat in front of every noun in the game. He was not still hearing the old\nproblem \u2014 he was hearing the fix.\n\n\u26a0\u26a0 THE ESCAPE HATCH OTA-1146 WROTE COULD NEVER HAVE WORKED. It said that if the\nvoicing came back wrong the alternates to try, in order, were \"thuh\" \u2192 \"thu\" \u2192\n\"tha\". Measured, all three are voiceless and all three are stressed; the ladder\nonly ever changed the vowel, and the vowel was not the defect:\n\n    thuh \u2192 \u03b8\u02c8\u028c      thu \u2192 \u03b8\u02c8\u025c\u02d0      tha \u2192 \u03b8\u02c8\u0251\u02d0      dhuh \u2192 d\u02c8i\u02d0h\u02c8\u028c (\"dee-huh\")\n\n\u26a0\u26a0\u26a0 AND NO RESPELLING COULD HAVE WORKED, WHICH IS THE REAL FINDING. espeak gives\nword-initial `th` its voiceless reading for every word it does not know; voiced\n/\u00f0/ at the head of a word survives only in the closed set of function words in\nits dictionary. So there is exactly one string that phonemizes to /\u00f0\u0259/ on this\nengine, and it is \"the\" \u2014 entry `Found: 'the' [D@2]`, schwa at stress level 2,\nwith the vowel/consonant switch applied by espeak itself, identical on en-us,\nen-gb and en-gb-x-rp. The two hand-maintained exception lists OTA-1146 built for\nhour/honest/heir and use/unit/one were reimplementing, in JavaScript, a rule\nalready present in C and already correct.\n\nTHE RULE THIS LEAVES, pinned: this file respells words the phonemizer does NOT\nknow. Overriding a word it does know is how you create a mispronunciation, not\nhow you fix one. Before adding an entry, run the word through espeak.\n\n\u26a0 THE SAME MEASUREMENT CONDEMNED THREE MORE ENTRIES, so I ran every one:\n\n  \u00b7 doesn't \u2192 duzzent    INERT. The entry claimed espeak said \"DOSE-ent\". Both\n                         spellings are d\u02c8\u028cz\u0259nt; it never did. Removed.\n  \u00b7 Zharak  \u2192 zah rak    DESTRUCTIVE. The worksheet's own key says zh \u2248 the s in\n                         \"treasure\" \u2014 and the respelling dropped the h, so the\n                         RAW word was closer than the fix. Zharak \u2192 \u0292\u02c8\u00e6\u0279\u00e6k;\n                         \"zah rak\" \u2192 z\u02c8\u0251\u02d0 \u0279\u02c8\u00e6k, a plain Z. Now \"zhah rak\" \u2192\n                         \u0292\u02c8\u0251\u02d0 \u0279\u02c8\u00e6k: the owner's vowel AND the zh.\n  \u00b7 Tartaria family      A SYLLABLE SHORT OF THE GAME'S OWN NAME. espeak reads\n                         `eeu` as the glide /ju\u02d0/, so \"tar taireeuh\" said \"tar\n                         TERR-yoo\" and the plural picked up a parasitic t\n                         (t\u02c8\u025b\u0279ju\u02d0nts). Respelled -ea / -ean / -eans \u2192 t\u02c8\u025b\u0279i\u0259 /\n                         t\u02c8\u025b\u0279i\u0259n / t\u02c8\u025b\u0279i\u0259nz.\n\n\u26a0\u26a0\u26a0 AND THE IPA-OVERRIDE MAP WAS A LOADED GUN BEHIND A BOOLEAN. It held Unicode\nIPA, which is NOT what espeak reads between double brackets \u2014 it reads its own\nASCII mnemonics:\n\n    [[\u00f0\u0259]] blade  \u2192  \"bl\u02c8e\u026ad\"       \u26a0 THE WORD IS SIMPLY GONE. Silently.\n    [[D@]] blade  \u2192  \"\u00f0\u0259 bl\u02c8e\u026ad\"    \u2713\n\nSo the failure mode of flipping IPA_OVERRIDES_ENABLED was never \"Kokoro reads\nthe brackets out loud\" \u2014 the old comment's own stated worst case \u2014 it was every\nTartaria, Drakova and Aether in the game going SILENT with no error anywhere.\nRewritten in mnemonics, each measured. The flag stays OFF: measuring espeak is\nnot the same as measuring the device, and that is exactly the distinction this\nOTA exists to enforce.\n\n\u26a0 OTA-1146'S SUITE IS DELETED, NOT REPOINTED, and that is the honest outcome:\nits entire premise was the rule that is gone. ota1659 replaces it and inverts\nthe reproduction \u2014 every shape 1146 rewrote is asserted to pass through\nuntouched, including the vowel-position cases, so the correctness that used to\nlive in two exception lists is now demonstrated to survive without them. Two\nother suites pinned the old behaviour and were repointed with the history kept\nbeside them (ota1147's article line, loreLexicon's Reclaimers' apostrophe test \u2014\nwhich has now been retargeted twice for a claim, about apostrophes, that never\nchanged).\n\nGates: all 18 green by exit code. Full suite green.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T01:58:06Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1659-the-is-not-in-the-lexicon",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1659-the-is-not-in-the-lexicon",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T02:02:04.357945Z",
+          "dateCreated": "2026-09-04T02:01:03.781476Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155402294",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T02:02:04.608679Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1659-the-is-not-in-the-lexicon",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1659-the-is-not-in-the-lexicon",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1659-the-is-not-in-the-lexicon",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1659-the-is-not-in-the-lexicon)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "c0cd47c5de604f10a29c52d30c28b684",
+  "previousEventID": "a7ac0d32fb2343afa98e03bf6d4218f7"
+}

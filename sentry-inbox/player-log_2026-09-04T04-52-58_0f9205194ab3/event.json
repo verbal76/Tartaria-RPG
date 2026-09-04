@@ -1,0 +1,274 @@
+{
+  "id": "0f9205194ab349e5b8401650f9498ed8",
+  "groupID": "7711143892",
+  "eventID": "0f9205194ab349e5b8401650f9498ed8",
+  "projectID": "4511945117532160",
+  "size": 18058,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-04-1664-no-phantom-syllable #mtmha35hxvzg [inline 20/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1664-no-phantom-syllable",
+  "message": "player-log 2026-09-04-1664-no-phantom-syllable #mtmha35hxvzg [inline 20/28]",
+  "title": "player-log 2026-09-04-1664-no-phantom-syllable #mtmha35hxvzg [inline 20/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "488faa54deec4c3ba82e08a6e9ae84cf",
+      "span_id": "969b9d9218324799",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      " template (reason=qwen-not-ready)\n[2026-09-04T02:38:14.787Z] [arbiter] The Arbiter looks around. \"This is the room where the disaster was managed, or could have been.\"\n[2026-09-04T02:38:14.788Z] [system] \u23f3 Time passed: 24 min\n[2026-09-04T02:38:15.039Z] [cognitive] CLIMB  (251ms)\n[2026-09-04T02:38:16.107Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n",
+      "[2026-09-04T02:38:18.118Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-09-04T02:38:18.172Z] [debug] spawn: gear=[Plasma Thrower] window=10 roster=new\n[2026-09-04T02:38:18.173Z] [world] Ilva Sidelong pushes the good stock to the front without being asked. \"Cheddar Bob. You know where everything is.\"\n",
+      "[2026-09-04T02:38:18.174Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Ilva Sidelong, fence. Tap the vendor banner to trade.\n[2026-09-04T02:38:18.183Z] [world] Rare workings for sale: Ring of the Quiet Hand (500 TC), Rustbreaker Shield (200 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.",
+      "\n[2026-09-04T02:38:18.184Z] [world] You walk north through open silt. The compass tells you The Buried Cities lies further north \u2014 4 tiles, about 10 hours of travel.\n[2026-09-04T02:38:18.184Z] [world] The thread you were following waits where you left it.\n[2026-09-04T02:38:23.685Z] [player] Ask if there are fewer stalls\n",
+      "[2026-09-04T02:38:23.688Z] [world] \"There are fewer stalls than there were.\" Said while tidying something already tidy. \"Not because the trade dried up. Because the stretches got longer. Every year the distance between two safe places gets a little bigger and nobody announces it.\"\n",
+      "[2026-09-04T02:38:23.689Z] [world] Ilva Sidelong drops their voice, though there is nobody in here but the two of you.\n[2026-09-04T02:38:24.887Z] [debug] qwen\u23f1 flourish ok 2306ms read 1861ms/write 413ms in 175t\u2192out 14t 10.6ms/t (55ch)\n[2026-09-04T02:38:25.125Z] [debug] flourish: \u2713 2788ms\n[2026-09-04T02:38:25.332Z] [player] Ask what passes when nobody is watching\n",
+      "[2026-09-04T02:38:25.333Z] [world] The trader banks the fire down a little, which is what they do instead of lowering their voice. \"Night traffic. Not much, but steady \u2014 and night walkers fall in two kinds. The ones who stop at my fire are just late. The ones who pass a lit fire at a walking pace, no hail, no look \u2014\" a slow headshake \"\u2014 those I count. Four this season. All heading the same directi",
+      "on, all carrying nothing, all walking like the dark was daylight. I sell to everyone, but I did not call out to those, and I bank the fire earlier than I used to.\"\n[2026-09-04T02:38:25.333Z] [world] Ilva Sidelong is a fence, standing tall and determined.\n[2026-09-04T02:38:26.936Z] [world] You let the conversation go and Ilva Sidelong gets back to it.\n",
+      "[2026-09-04T02:38:27.818Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-09-04T02:38:32.392Z] [reward] Bought 2\u00d7 Trail Rations from Ilva Sidelong for 10 TC. (1717 TC left)\n[2026-09-04T02:38:32.746Z] [debug] persist sizes(KB): total=347 player=101 wm=162[rooms=90 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=79 scene=5\n",
+      "[2026-09-04T02:38:35.051Z] [reward] Bought 4\u00d7 Blue Cap Mushroom from Ilva Sidelong for 20 TC. (1697 TC left)\n[2026-09-04T02:38:37.338Z] [reward] Bought 5\u00d7 Red Cap Mushroom from Ilva Sidelong for 30 TC. (1667 TC left)\n[2026-09-04T02:38:37.338Z] [reward] They don't charge a friend full price \u2014 5 TC stayed in your pouch.\n",
+      "[2026-09-04T02:38:38.763Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 10730ms read 8684ms/write 2017ms in 731t\u2192out 33t 11.9ms/t HIT-CAP (157ch)\n[2026-09-04T02:38:38.790Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 10730ms \u2014 intro-fill:\u2205\n[2026-09-04T02:38:38.791Z] [debug] homework: scene_intro \"Mud Flood Nexus\" \u2205 10973ms\n",
+      "[2026-09-04T02:38:42.549Z] [reward] Bought the Ring of the Quiet Hand working for 500 TC. \u2726 Recipe learned (Legendary)! Open Crafting to forge it \u2014 you'll still need the materials.\n[2026-09-04T02:38:45.972Z] [reward] Bought the Rustbreaker Shield working for 200 TC. \u2726 Recipe learned (Rare)! Open Crafting to forge it \u2014 you'll still need the materials.\n",
+      "[2026-09-04T02:38:58.695Z] [debug] ui: tap \"take / salvage\"\n[2026-09-04T02:39:00.094Z] [world] You break the archive apart. Among the pieces, something worth keeping.\n[2026-09-04T02:39:00.094Z] [world] You work the cold spring apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n",
+      "[2026-09-04T02:39:00.095Z] [world] You break the cooling pipe apart. Among the pieces, something worth keeping.\n[2026-09-04T02:39:00.095Z] [world] You salvage the core stabilizer. The take is small but real.\n[2026-09-04T02:39:00.095Z] [world] You salvage the gauge. The take is small but real.\n[2026-09-04T02:39:00.096Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-09-04T02:39:00.096Z] [reward]     \u2022 Aether Dust (Common)\n[2026-09-04T02:39:00.096Z] [reward]     \u2022 Web-Silk Wadding (Common)\n[2026-09-04T02:39:00.096Z] [reward]     \u2022 Aether Crystal x2 (Common)\n[2026-09-04T02:39:00.097Z] [reward]     \u2022 Automaton Circuit x2 (Common)\n[2026-09-04T02:39:00.097Z] [reward]     \u2022 Bent Nail x3 (Common)\n",
+      "[2026-09-04T02:39:01.231Z] [world] You get a hand under the Plasma Thrower and take it.\n[2026-09-04T02:39:01.231Z] [reward] \u2726 Plasma Thrower (Common).\n[2026-09-04T02:39:02.995Z] [debug] ui: tap \"investigate\"\n[2026-09-04T02:39:04.813Z] [player] investigate the ground\n",
+      "[2026-09-04T02:39:04.814Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=3\n[2026-09-04T02:39:04.819Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Aether Residue (Common).\n[2026-09-04T02:39:04.828Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n",
+      "[2026-09-04T02:39:04.828Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-04T02:39:04.828Z] [system] \u23f3 Time passed: 24 min\n[2026-09-04T02:39:05.083Z] [cognitive] CLIMB  (253ms)\n[2026-09-04T02:39:06.094Z] [player] investigate steam burst\n",
+      "[2026-09-04T02:39:06.094Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=steam burst resolved=steam burst range=- enemies=0 hooks=3\n[2026-09-04T02:39:06.097Z] [world] You look the steam burst over. Nothing about it sings, nothing about it warns \u2014 Tartaria is full of things waiting to be remembered.\n[2026-09-04T02:39:06.361Z] [cognitive] neutral  (261ms)\n",
+      "[2026-09-04T02:39:06.641Z] [debug] persist sizes(KB): total=361 player=102 wm=175[rooms=103 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=79 scene=5\n[2026-09-04T02:39:09.028Z] [debug] qwen\u23f1 investigate_lore ok 2686ms read 1279ms/write 1370ms in 126t\u2192out 39t 10.2ms/t (175ch)\n",
+      "[2026-09-04T02:39:19.903Z] [debug] qwen\u23f1 ambient ok 13561ms wait 2899ms read 3892ms/write 1165ms in 359t\u2192out 31t 10.8ms/t HIT-CAP (155ch)\n[2026-09-04T02:39:20.366Z] [debug] \u26a0 FREEZE WATCH: LOGIC stalled while frames kept coming (js 3382ms \u00b7 frames 254ms). Something blocked the JS thread \u2014 look for a long synchronous run. \u00b7 crumb before: native:homework:start +11337ms \u2192 now: native:homework:done +4",
+      "63ms \u00b7 doing: action \"investigate steam burst\" \u00b7 native: idle\n[2026-09-04T02:39:20.367Z] [arbiter] You've traversed the winding streets of the old city, each step a step toward greater understanding and more resilience.\n[2026-09-04T02:39:20.367Z] [debug] arbiter: ambient \u2713 14269ms\n",
+      "[2026-09-04T02:39:20.367Z] [debug] arbiter: ambient-said \"You've traversed the winding streets of the old city, each step a step toward greater understanding and more resilience.\"\n[2026-09-04T02:39:22.674Z] [debug] homework: intro-fill armed after 6000ms idle (strike 2/3)\n",
+      "[2026-09-04T02:39:23.918Z] [debug] voice\u23f1 gap 5932ms (wait 0ms + synth 3552ms, live) \"You've traversed the winding streets of \u2026\"\n[2026-09-04T02:39:25.371Z] [debug] freeze watch: recovered \u2014 painting again after 254ms quiet.\n[2026-09-04T02:39:32.114Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 9431ms wait 1321ms read 6901ms/write 1174ms in 728t\u2192out 33t 9.5ms/t HIT-CAP (164ch)\n",
+      "[2026-09-04T02:39:32.124Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 9431ms \u2014 intro-fill:\u2205\n[2026-09-04T02:39:32.125Z] [debug] homework: scene_intro \"Mud Flood Nexus\" \u2205 9451ms\n[2026-09-04T02:39:41.272Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-09-04T02:39:41.305Z] [debug] spawn: gear=[Plasma Dagger, Mud-Seer's Hood, Rusted Blade] window=10 roster=new\n",
+      "[2026-09-04T02:39:41.312Z] [world] Wysh Coincatcher sets down what they're holding. \"Didn't expect you today, Cheddar Bob.\"\n[2026-09-04T02:39:41.312Z] [world] \"Been a while,\" Wysh Coincatcher says. \"Thought the mud had you.\"\n[2026-09-04T02:39:41.312Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Wysh Coincatcher, fence. Tap the vendor banner to trade.\n",
+      "[2026-09-04T02:39:41.334Z] [world] Rare workings for sale: Warden's Aegis (500 TC), Warden's Bulwark Pendant (200 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n",
+      "[2026-09-04T02:39:41.340Z] [world] You walk west through open silt. The compass tells you The Flooded Reliquary lies further west \u2014 1 tile, about 3 hours of travel.\n[2026-09-04T02:39:41.343Z] [world] What you started here has not finished itself in your absence.\n[2026-09-04T02:39:42.529Z] [debug] ui: tap \"take / salvage\"\n[2026-09-04T02:39:43.835Z] [world] You claim the Plasma Dagger.\n",
+      "[2026-09-04T02:39:43.836Z] [reward] \u2726 Plasma Dagger (Common).\n[2026-09-04T02:39:43.856Z] [world] The Rusted Blade comes up out of the silt with a small sucking protest.\n[2026-09-04T02:39:43.856Z] [reward] \u2726 Rusted Blade (Common).\n[2026-09-04T02:39:43.857Z] [world] The Mud-Seer's Hood was half under something. It is not now.\n[2026-09-04T02:39:43.858Z] [reward] \u2726 Mud-Seer's Hood (Common).\n",
+      "[2026-09-04T02:39:44.905Z] [world] You strip the broken conduit carefully. Something usable comes free in your hand.\n[2026-09-04T02:39:44.906Z] [world] You strip the cold spring carefully. Something usable comes free in your hand.\n[2026-09-04T02:39:44.906Z] [world] You scavenge the mask thoroughly. One Bent Nail survives the sorting.\n",
+      "[2026-09-04T02:39:44.906Z] [world] Tucked inside the sensor: an oddment that matches no quartermaster's list. The kind of thing that fuses well.\n[2026-09-04T02:39:44.907Z] [reward] \u2726 Salvage haul:\n[2026-09-04T02:39:44.907Z] [reward]     \u2022 Scrap Metal x5 (Common)\n[2026-09-04T02:39:44.908Z] [reward]     \u2022 Bent Nail (Common)\n[2026-09-04T02:39:44.908Z] [reward]     \u2022 Brass Cog Cluster (Common)\n",
+      "[2026-09-04T02:39:46.847Z] [debug] ui: tap \"investigate\"\n[2026-09-04T02:39:48.607Z] [player] investigate the ground\n[2026-09-04T02:39:48.607Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=3\n[2026-09-04T02:39:48.613Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Speckled Egg (Uncommon).\n",
+      "[2026-09-04T02:39:48.621Z] [system] \u23f3 Time passed: 24 min\n[2026-09-04T02:39:48.881Z] [cognitive] CLIMB  (258ms)\n[2026-09-04T02:39:50.942Z] [debug] persist sizes(KB): total=350 player=103 wm=162[rooms=90 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=80 scene=5\n[2026-09-04T02:39:57.598Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n",
+      "[2026-09-04T02:39:57.617Z] [debug] spawn: gear=[Force Wave Wand, Salvager's Worn Gloves] window=10 roster=new\n[2026-09-04T02:39:57.619Z] [world] You walk north through open silt. The compass points north into open ground.\n[2026-09-04T02:39:57.620Z] [world] The loose end is exactly as loose as you left it.\n[2026-09-04T02:39:59.016Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-09-04T02:40:01.370Z] [world] You work the Force Wave Wand loose from where the mud had it.\n[2026-09-04T02:40:01.371Z] [reward] \u2726 Force Wave Wand (Common).\n[2026-09-04T02:40:01.392Z] [world] The Salvager's Worn Gloves had settled into the ground. You unsettle it.\n[2026-09-04T02:40:01.392Z] [reward] \u2726 Salvager's Worn Gloves (Common).\n",
+      "[2026-09-04T02:40:02.675Z] [world] Whatever the Aether Core was lying against, it lets go without much argument.\n[2026-09-04T02:40:02.675Z] [reward] \u2726 Aether Core (Legendary).\n[2026-09-04T02:40:03.650Z] [world] You break the cold spring apart. Among the pieces, something worth keeping.\n[2026-09-04T02:40:03.650Z] [world] You break the horn apart. Among the pieces, something worth keeping.\n",
+      "[2026-09-04T02:40:03.650Z] [world] The signal spark yields little of value, though a Smooth Stone ends up in your pack.\n[2026-09-04T02:40:03.651Z] [reward] \u2726 Salvage haul:\n[2026-09-04T02:40:03.651Z] [reward]     \u2022 Bent Nail x2 (Common)\n[2026-09-04T02:40:03.651Z] [reward]     \u2022 Scrap Metal x3 (Common)\n[2026-09-04T02:40:03.652Z] [reward]     \u2022 Smooth Stone (Common)\n",
+      "[2026-09-04T02:40:06.602Z] [debug] ui: tap \"investigate\"\n[2026-09-04T02:40:07.721Z] [debug] homework: intro-fill armed after 6000ms idle (strike 3/3)\n[2026-09-04T02:40:08.583Z] [player] investigate the ground\n[2026-09-04T02:40:08.584Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=3\n",
+      "[2026-09-04T02:40:08.590Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Aether Residue (Common).\n[2026-09-04T02:40:08.604Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-09-04T02:40:08.604Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-04T02:40:08.604Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-09-04T02:40:08.999Z] [cognitive] CLIMB  (393ms)\n[2026-09-04T02:40:10.038Z] [player] investigate maintenance rail\n[2026-09-04T02:40:10.039Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=maintenance rail resolved=maintenance rail range=- enemies=0 hooks=3\n",
+      "[2026-09-04T02:40:10.041Z] [world] The maintenance rail keeps its silence, and it isn't going anywhere for you to press it. The Arbiter does not lean in. You move on.\n[2026-09-04T02:40:10.042Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-09-04T02:40:10.042Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-09-04T02:40:11.431Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-09-04T02:40:11.448Z] [debug] spawn: gear=[Aetheric Shield-Hammer] window=10 roster=new\n[2026-09-04T02:40:11.449Z] [world] You walk west through open silt. The compass tells you Samarran lies further west \u2014 1 tile, about 3 hours of travel.\n",
+      "[2026-09-04T02:40:11.450Z] [world] Whatever you turned over here is still turned over.\n[2026-09-04T02:40:11.687Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 3538ms read 0ms/write 0ms in 723t\u2192out 0t (0ch)\n[2026-09-04T02:40:11.910Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 3538ms \u2014 intro-fill:\u2205\n",
+      "[2026-09-04T02:40:11.910Z] [debug] homework: scene_intro \"Mud Flood Nexus\" \u2205 4191ms\n[2026-09-04T02:40:12.123Z] [cognitive] neutral  (2080ms)\n[2026-09-04T02:40:14.351Z] [debug] qwen\u23f1 investigate_lore ok 3985ms wait 1758ms read/write unusable (native mis-reported 5253ms/914ms \u2014 llama.rn split bug"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-04-1664-no-phantom-syllable #mtmha35hxvzg [inline 20/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtmha35hxvzg"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1664-no-phantom-syllable"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "20"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1664-no-phantom-syllable"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T04:52:56.659000Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T04:52:58.040000Z",
+  "fingerprints": [
+    "64dd8aba247618f8258f26ac076e31e3"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1954595382,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-04T04:14:29.574155Z",
+    "dateReleased": "2026-09-04T04:16:01.629112Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "082d8b0c5221a969630765f5cbcadd7ec8b6793c",
+      "message": "[ota-hal] OTA-1664: no phantom syllable\n\nOwner, after I offered to \"re-tune\" two place names: \"there should be no a sound\nin front of either of those. the s and the n are the starting sound of each\nword. where are you getting an AY sound before that \u2014 to me it reads like you're\nmispronouncing the word, not a tone or inflection, but adding a syllable.\"\n\n\u26a0\u26a0\u26a0 HE IS RIGHT, AND MY FRAMING WAS THE PROBLEM. I reported this as a vowel\nquality issue \u2014 \"eh\" coming out as \"AY\" \u2014 which invited a better spelling of the\nsame wrong thing. It is not a vowel problem. The leading token should not be\nthere at all. Samarran is three syllables and opens on S. Nimari is three and\nopens on N. Both have been saying four since OTA-104.\n\n\u26a0 THE CAUSE IS A MISREAD OF THE PLAYTESTER'S IPA. OTA-104 was handed\n/\u025bs\u025bm\u0254\u02d0\u027e\u025bn/ and /\u025bn\u025bm\u0251\u0279i/, saw the leading \u025b, and promoted it to its own\nspace-separated token \u2014 which this file's own header says espeak treats as a\nseparate WORD. Then it recorded the mistake as a finding: \"all three open with a\nleading /\u025b/ schwa that the prior respellings dropped. Samarran and Nimari are\n4-syllable words, not 3.\" Both sentences are false, and the second is exactly\nthe sort of confident note that stops the next reader from checking. It stopped\nme twice tonight \u2014 I read that comment during the OTA-1659 audit and moved on.\n\nMeasured (`espeak-ng -v en-us -q --ipa`), these were not shades off. They were\ndifferent words:\n\n    eh sem or en    \u2192 \u02c8e\u026a s\u02c8\u025bm \u0254\u02d0\u0279 \u02c8\u025bn    \"AY-SEM-OR-EN\"   (4 beats, 4 stresses)\n    Samarran        \u2192 s\u02c8\u00e6m\u00e6\u0279\u0259n            \"SAM-a-run\"      \u2713\n    eh neh mah ree  \u2192 \u02c8e\u026a n\u02c8e\u026a m\u02c8\u0251\u02d0 \u0279\u02c8i\u02d0  \"AY-NAY-MAH-REE\" (\"neh\" also says NAY)\n    Nimari          \u2192 n\u02c8\u026am\u025a\u0279i             \"NIM-uh-ree\"     \u2713\n\n\u26a0\u26a0 SO THE FIX IS REMOVAL, NOT A RE-TUNE. That is the third time in six OTAs that\nthe right answer here was to delete an entry rather than re-spell it \u2014 \"the\" and\n\"doesn't\" went the same way in OTA-1659, for the same reason: an override was\nadded to correct a word the phonemizer already read properly, and the override\nwas the mispronunciation.\n\n\u26a0 ASGARDAR STAYS, and the distinction matters. A-s-gardar genuinely opens on a\nvowel, so its \"ez\" is the first syllable of the word rather than a beat welded\nin front of it. Same syllable count as the raw word, different vowel \u2014 which is\nwhat he asked for at OTA-104. He complained about two names, not three, and he\nwas precise about which.\n\n\u26a0\u26a0 AND THE SUITE NOW GUARDS THE CLASS, NOT THE INSTANCE. The defect is not \"eh\"\n\u2014 it is a respelling that changes how many beats a word has. ota1664 checks the\nchunk count of every surviving entry against the count verified here, so the\nnext entry that adds or drops a syllable fails a test instead of shipping and\nwaiting for someone to notice it in a sentence.\n\nGates: all 18 green by exit code. Full suite green.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T04:12:09Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1664-no-phantom-syllable",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1664-no-phantom-syllable",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T04:16:01.629112Z",
+          "dateCreated": "2026-09-04T04:14:29.574155Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155428664",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T04:16:01.857063Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1664-no-phantom-syllable",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1664-no-phantom-syllable",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1664-no-phantom-syllable",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1664-no-phantom-syllable)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "182b93505a574da7ba364d0a87c4c9a6",
+  "previousEventID": "0e32810a9d4c4b699ff776125ab70342"
+}

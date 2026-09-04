@@ -1,0 +1,279 @@
+{
+  "id": "c626a76a53414639959521708125122f",
+  "groupID": "7710939431",
+  "eventID": "c626a76a53414639959521708125122f",
+  "projectID": "4511945117532160",
+  "size": 18111,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-04-1659-the-is-not-in-the-lexicon #mtm6enrfz3iy [inline 19/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1659-the-is-not-in-the-lexicon",
+  "message": "player-log 2026-09-04-1659-the-is-not-in-the-lexicon #mtm6enrfz3iy [inline 19/28]",
+  "title": "player-log 2026-09-04-1659-the-is-not-in-the-lexicon #mtm6enrfz3iy [inline 19/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "059db7a4ee6e4eeb8cd6b108f1f16eae",
+      "span_id": "815dc870aa0895ec",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "y Architects Raider 5 has no time to react.\n[2026-09-03T14:40:19.678Z] [combat] You \u2014 d20 \u2192 5 + DEX 21 + 2 (point blank) = 28 vs Conspiracy Architects Raider 5 AC 11 \u2014 \u2713 HIT\n[2026-09-03T14:40:19.681Z] [combat] Conspiracy Architects Raider 5 takes 7 with the corrupted reclaimers guild shroud-spun slinger. It reels: 12 left. Then it fights back.\n",
+      "[2026-09-03T14:40:19.681Z] [combat] Corrupted Reclaimers Guild Shroud-Spun Slinger \u2014 4 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n[2026-09-03T14:40:19.683Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 1 + ATK 7 = 8 vs your AC 22 \u2014 \u2717 FUMBLE\n[2026-09-03T14:40:22.638Z] [debug] ui: tap \"dodge\"\n[2026-09-03T14:40:22.651Z] [player] dodge\n",
+      "[2026-09-03T14:40:22.652Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=2 hooks=1\n[2026-09-03T14:40:22.653Z] [world] You commit to the dodge. Slip Conspiracy Architects Raider 5's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-03T14:40:22.654Z] [combat] Conspiracy Architects Raider 5 blackens \u2014 corruption eats 4. (8/19 HP, 2 turns left)\n[2026-09-03T14:40:22.746Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 5 + ATK 7 = 12 vs your AC 22 \u2014 \u2717 EVADED\n[2026-09-03T14:40:22.746Z] [combat] Dodge \u2014 d20 \u2192 10 + DEX 21 = 31 vs ATK 12. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n",
+      "[2026-09-03T14:40:22.746Z] [world] You slip Conspiracy Architects Raider 5's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n[2026-09-03T14:40:22.747Z] [debug] arbiter: template (reason=combat)\n[2026-09-03T14:40:22.747Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-09-03T14:40:22.747Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T14:40:23.100Z] [cognitive] neutral  (352ms)\n[2026-09-03T14:40:23.766Z] [debug] ui: tap \"\u2623 shroud-spun slinger \u2692\"\n[2026-09-03T14:40:23.767Z] [system] evasive \u2014 harder to hit fades.\n[2026-09-03T14:40:23.808Z] [player] attack with the off-hand reclaimers guild shroud-spun slinger\n",
+      "[2026-09-03T14:40:23.808Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand reclaimers guild shroud spun slinger resolved=Reclaimers Guild Shroud-Spun Slinger range=close enemies=2 hooks=1\n[2026-09-03T14:40:23.809Z] [combat] Conspiracy Architects Raider 5 blackens \u2014 corruption eats 4. (4/19 HP, 1 turn left)\n",
+      "[2026-09-03T14:40:23.809Z] [debug] attack: target=Conspiracy Architects Raider 5 range=close reach.bands=[distant,far,mid,close] reach.label=Reclaimers Guild Shroud-Spun Slinger bareHand=false\n[2026-09-03T14:40:23.811Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-09-03T14:40:23.883Z] [world] Your corrupted reclaimers guild shroud-spun slinger comes around in an arc; Conspiracy Architects Raider 5 squares up to meet it.\n[2026-09-03T14:40:23.884Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T14:40:24.219Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 USE_ITEM  (335ms)\n",
+      "[2026-09-03T14:40:32.627Z] [world] You seize the initiative. Conspiracy Architects Raider 5 has no time to react.\n[2026-09-03T14:40:32.628Z] [combat] You \u2014 d20 \u2192 16 + DEX 21 + 2 (point blank) perfect opening (2\u00d7 dice) = 39 vs Conspiracy Architects Raider 5 AC 11 \u2014 \u2713 HIT\n",
+      "[2026-09-03T14:40:32.628Z] [combat] The killing blow with the corrupted reclaimers guild shroud-spun slinger: 14. Conspiracy Architects Raider 5 drops where it stood.\n[2026-09-03T14:40:32.629Z] [reward] Conspiracy Architects Raider 5 defeated. You recover Aether Residue \u00d72, Scrap Metal, Aetheric Padded Vest, Architect Sigil.\n",
+      "[2026-09-03T14:40:32.630Z] [reward] You strip the body: Cudgel, Reclaimer's Salvage Vest (+6 TC). The kit took the fight badly.\n[2026-09-03T14:40:32.631Z] [combat] Nobody left standing \u2014 the fight is yours. You strip the sleepers where they lie.\n",
+      "[2026-09-03T14:40:32.632Z] [reward] You strip the unconscious Conspiracy Architects Raider 1 \u2014 Cudgel, Mud-Warden's Vest, Patched Cloth, Worn Tartarian Coin, +30 TC. The gear's seen better days (worn from the fight).\n[2026-09-03T14:40:32.641Z] [reward] +16 TC pried from the dust.\n",
+      "[2026-09-03T14:40:32.687Z] [arbiter] The Arbiter looks around. \"This is the room where the disaster was managed, or could have been.\"\n[2026-09-03T14:40:32.687Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T14:41:26.284Z] [debug] persist sizes(KB): total=323 player=80 wm=154[rooms=84 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=85 scene=4\n",
+      "[2026-09-03T14:41:30.756Z] [debug] send-log: #mtlmv3v5hg6u \u2014 DELIVERED (inline, no attachments): beacon out, 28/28 parts accepted (407435 chars) \u2014 flush said yes\n[2026-09-03T14:41:30.757Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mtlmv3v5hg6u kept on disk, boots retry up to 5 sends total\n",
+      "[2026-09-03T15:48:11.026Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a065c0-bf22-74d7-b448-49e4c56cee88\n[2026-09-03T15:48:11.026Z] [debug] ota: Checking\u2026\n[2026-09-03T15:48:11.988Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-09-03T15:48:12.064Z] [debug] ota: Saving progress\u2026\n[2026-09-03T15:48:12.065Z] [debug] ota: Restarting to apply\u2026\n",
+      "[2026-09-03T15:48:12.241Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a067d5-fa6c-7846-8795-12be2fefd5f0\n[2026-09-03T15:48:12.241Z] [debug] ota: Checking\u2026\n[2026-09-03T15:48:12.344Z] [debug] ota: Already up to date\n[2026-09-03T15:48:12.344Z] [debug] ota: boot check result = noUpdate\n[2026-09-03T15:48:12.420Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-09-03T15:48:12.420Z] [debug] voice: bundled idle\n[2026-09-03T15:48:12.645Z] [debug] send-log: bundle #mtlmv3v5hg6u attempt 2/5 delivered to Sentry\n[2026-09-03T15:48:15.946Z] [debug] OTA applied: 2026-09-03-1642-every-drop-has-a-name-in-the-book \u2192 2026-09-03-1643-the-dice-riders-pay.\n[2026-09-03T15:48:15.946Z] [debug] OTA session start: 2026-09-03-1643-the-dice-riders-pay.\n",
+      "[2026-09-03T15:48:15.946Z] [world] You step back into Mud Flood Nexus. The world waits for your move.\n[2026-09-03T15:48:15.946Z] [arbiter] The Arbiter looks up as you return. \"Welcome back, Cheddar Bob. I wondered when you'd take up the thread again.\"\n",
+      "[2026-09-03T15:48:16.361Z] [debug] \u2550\u2550\u2550 SESSION 2026-09-03T15:48:16.357Z \u00b7 build 2026-09-03-1643-the-dice-riders-pay \u00b7 updated from 2026-09-03-1642-every-drop-has-a-name-in-the-book \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-09-03T15:48:16.362Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-03T15:48:16.363Z] [debug] missions: hunt:hunt_bog_dragon stage 4/7 [diplomacy] @monarch_waystation npc=\"Old Mira\" needs=The Boy's Locket\u2713 gives=Eshren's Name-Token\n[2026-09-03T15:48:16.363Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n",
+      "[2026-09-03T15:48:16.363Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n[2026-09-03T15:48:16.363Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n",
+      "[2026-09-03T15:48:16.363Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n[2026-09-03T15:48:16.363Z] [debug] missions: \u00b7 at=mud_flood_nexus travelTo=monarch_waystation\n",
+      "[2026-09-03T15:48:16.364Z] [debug] boot: life bmtlp8vmrvw started 2026-09-03T15:48:12.195Z \u00b7 FOLLOWED AN OTA APPLY 130ms ago via boot-front \u00b7 prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)\n[2026-09-03T15:48:20.234Z] [debug] send-log: #mtlp91n0yrsc \u2014 DELIVERED (inline, no attachments): beacon out, 28/28 parts accepted (406745 chars) \u2014 flush said yes\n",
+      "[2026-09-03T15:48:20.235Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mtlp91n0yrsc kept on disk, boots retry up to 5 sends total\n[2026-09-03T16:54:06.078Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a067d5-fa6c-7846-8795-12be2fefd5f0\n[2026-09-03T16:54:06.078Z] [debug] ota: Checking\u2026\n",
+      "[2026-09-03T16:54:07.025Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-09-03T16:54:07.111Z] [debug] ota: Saving progress\u2026\n[2026-09-03T16:54:07.111Z] [debug] ota: Restarting to apply\u2026\n[2026-09-03T16:54:07.308Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a0682c-5d1e-70c5-a095-081f696b94b1\n[2026-09-03T16:54:07.308Z] [debug] ota: Checking\u2026\n",
+      "[2026-09-03T16:54:07.411Z] [debug] ota: Already up to date\n[2026-09-03T16:54:07.412Z] [debug] ota: boot check result = noUpdate\n[2026-09-03T16:54:07.483Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-09-03T16:54:07.483Z] [debug] voice: bundled idle\n[2026-09-03T16:54:07.679Z] [debug] send-log: bundle #mtlp91n0yrsc attempt 2/5 delivered to Sentry\n",
+      "[2026-09-03T19:31:30.465Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a06892-1fa9-713e-af70-74305240b74c\n[2026-09-03T19:31:30.465Z] [debug] ota: Checking\u2026\n[2026-09-03T19:31:30.570Z] [debug] ota: Already up to date\n[2026-09-03T19:31:30.570Z] [debug] ota: boot check result = noUpdate\n[2026-09-03T19:31:30.686Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-09-03T19:31:30.686Z] [debug] voice: bundled idle\n[2026-09-03T19:31:30.857Z] [debug] send-log: bundle #mtlp91n0yrsc attempt 3/5 delivered to Sentry\n[2026-09-03T20:39:04.887Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a06892-1fa9-713e-af70-74305240b74c\n[2026-09-03T20:39:04.888Z] [debug] ota: Checking\u2026\n",
+      "[2026-09-03T20:39:05.918Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-09-03T20:39:06.008Z] [debug] ota: Saving progress\u2026\n[2026-09-03T20:39:06.008Z] [debug] ota: Restarting to apply\u2026\n[2026-09-03T20:39:06.212Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a068da-a415-7a8e-ae27-dc6da17c0ec9\n[2026-09-03T20:39:06.212Z] [debug] ota: Checking\u2026\n",
+      "[2026-09-03T20:39:06.321Z] [debug] ota: Already up to date\n[2026-09-03T20:39:06.322Z] [debug] ota: boot check result = noUpdate\n[2026-09-03T20:39:06.385Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-09-03T20:39:06.385Z] [debug] voice: bundled idle\n[2026-09-03T20:39:06.627Z] [debug] send-log: bundle #mtlp91n0yrsc attempt 4/5 delivered to Sentry\n",
+      "[2026-09-03T20:39:59.081Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a068da-a415-7a8e-ae27-dc6da17c0ec9\n[2026-09-03T20:39:59.081Z] [debug] ota: Checking\u2026\n[2026-09-03T20:39:59.127Z] [debug] ota: Already up to date\n[2026-09-03T20:39:59.128Z] [debug] ota: boot check result = noUpdate\n",
+      "[2026-09-03T20:39:59.171Z] [debug] send-log: bundle #mtlp91n0yrsc held \u2014 only 53s since the last try (a restart, not a chance); 1 left\n[2026-09-03T20:39:59.172Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-09-03T20:39:59.172Z] [debug] voice: bundled idle\n",
+      "[2026-09-03T20:47:11.893Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a068da-a415-7a8e-ae27-dc6da17c0ec9\n[2026-09-03T20:47:11.893Z] [debug] ota: Checking\u2026\n[2026-09-03T20:47:11.962Z] [debug] ota: Already up to date\n[2026-09-03T20:47:11.962Z] [debug] ota: boot check result = noUpdate\n[2026-09-03T20:47:12.069Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-09-03T20:47:12.069Z] [debug] voice: bundled idle\n[2026-09-03T20:47:12.324Z] [debug] send-log: bundle #mtlp91n0yrsc attempt 5/5 delivered to Sentry \u2014 final try, cleared\n[2026-09-03T20:47:16.062Z] [debug] OTA session start: 2026-09-03-1649-what-a-ring-is-for.\n[2026-09-03T20:47:16.062Z] [world] You step back into Mud Flood Nexus. The world waits for your move.\n",
+      "[2026-09-03T20:47:16.065Z] [arbiter] The Arbiter meets your eyes. \"Welcome back, Cheddar Bob. The buried country is no place to walk alone. The waste did not sleep while you were gone \u2014 blood was spilled and ground changed hands. Read the World for the account.\"\n",
+      "[2026-09-03T20:47:16.458Z] [debug] \u2550\u2550\u2550 SESSION 2026-09-03T20:47:16.455Z \u00b7 build 2026-09-03-1649-what-a-ring-is-for \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-09-03T20:47:16.459Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-03T20:47:16.459Z] [debug] missions: hunt:hunt_bog_dragon stage 4/7 [diplomacy] @monarch_waystation npc=\"Old Mira\" needs=The Boy's Locket\u2713 gives=Eshren's Name-Token\n[2026-09-03T20:47:16.459Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n",
+      "[2026-09-03T20:47:16.460Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n[2026-09-03T20:47:16.460Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n",
+      "[2026-09-03T20:47:16.460Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n[2026-09-03T20:47:16.460Z] [debug] missions: \u00b7 at=mud_flood_nexus travelTo=monarch_waystation\n[2026-09-03T20:47:16.460Z] [debug] boot: life bmtlzxdwvcp started 2026-09-03T20:47:11.791Z \u00b7 not an OTA apply (no handoff on disk)\n",
+      "[2026-09-03T20:47:17.324Z] [debug] send-log: crash on record (2026-09-03T20:39:06.948Z) \u2014 game log pushed automatically, delivered to Sentry, kept on disk as #mtlzxhu9g966\n[2026-09-03T20:47:19.077Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-09-03T20:47:19.126Z] [debug] spawn: gear=[Golem-Warden's Legplates] window=10 roster=new\n",
+      "[2026-09-03T20:47:19.127Z] [world] You walk west through open silt. The compass points west into open ground.\n[2026-09-03T20:47:19.128Z] [world] The thread you were following waits where you left it.\n[2026-09-03T20:47:20.276Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T20:47:21.732Z] [world] You take the Golem-Warden's Legplates from where it lay.\n",
+      "[2026-09-03T20:47:21.732Z] [reward] \u2726 Golem-Warden's Legplates (Common).\n[2026-09-03T20:47:22.646Z] [world] You salvage the cold spring. The take is small but real.\n[2026-09-03T20:47:22.646Z] [world] You break the data slate apart. Among the pieces, something worth keeping.\n[2026-09-03T20:47:22.647Z] [world] You work the rusted chain over. A part of it comes loose, intact.\n",
+      "[2026-09-03T20:47:22.647Z] [world] You scavenge the signal spark thoroughly. One Smooth Stone survives the sorting.\n[2026-09-03T20:47:22.647Z] [world] Tucked inside the silt pump: an oddment that matches no quartermaster's list. The kind of thing that fuses well.\n[2026-09-03T20:47:22.648Z] [reward] \u2726 Salvage haul:\n[2026-09-03T20:47:22.648Z] [reward]     \u2022 Scrap Metal x6 (Common)\n",
+      "[2026-09-03T20:47:22.648Z] [reward"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-04-1659-the-is-not-in-the-lexicon #mtm6enrfz3iy [inline 19/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtm6enrfz3iy"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1659-the-is-not-in-the-lexicon"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "19"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1659-the-is-not-in-the-lexicon"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "4"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T02:05:56.698532Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T02:05:58.080000Z",
+  "fingerprints": [
+    "bd47edb593360462ba0f7f54604b828c"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1954433048,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-04T02:01:03.781476Z",
+    "dateReleased": "2026-09-04T02:02:04.357945Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "6a658907950273ce80604a3f492ea9d071955a27",
+      "message": "[ota-hal] OTA-1659: \"the\" is not in the lexicon\n\nOwner, for the second time: \"the needs to be pronounced thuh in kokoro.\"\n\nHe reported this once before, and OTA-1146 answered it by rewriting every\nconsonant-position \"the\" to the literal string \"thuh\" before the line reached\nthe engine. That fix is what he has been hearing since.\n\n\u26a0\u26a0\u26a0 NOBODY EVER MEASURED IT. espeak-ng is installable in this container, and it\nis the same phonemizer the app bundles per voice under <voice>/espeak-ng-data.\nOne command settles the whole question:\n\n    $ espeak-ng -v en-us -q --ipa \"The raider swings the rusted blade at the dog.\"\n      plain     \u2192  \u00f0\u0259 \u0279\u02c8e\u026ad\u025a sw\u02c8\u026a\u014bz \u00f0\u0259 \u0279\u02c8\u028cst\u1d7bd bl\u02c8e\u026ad \u00e6t \u00f0\u0259 d\u02c8\u0251\u02d0\u0261\n      OTA-1146  \u2192  \u03b8\u02c8\u028c \u0279\u02c8e\u026ad\u025a sw\u02c8\u026a\u014bz \u03b8\u02c8\u028c \u0279\u02c8\u028cst\u1d7bd bl\u02c8e\u026ad \u00e6t \u03b8\u02c8\u028c d\u02c8\u0251\u02d0\u0261\n\n\u26a0 THE ENGINE WAS ALREADY SAYING \"thuh\". /\u00f0\u0259/ IS \"thuh\" \u2014 the exact sound he\nasked for, three times in that sentence, before anyone touched anything. The\nrespelling replaced it with \u03b8\u02c8\u028c: the voiceless th of THUMB instead of the voiced\nth of THIS, the STRUT vowel instead of a schwa, and STRESSED, because espeak\nstresses a monosyllable it has to sound out. An unstressed article became a hard\nbeat in front of every noun in the game. He was not still hearing the old\nproblem \u2014 he was hearing the fix.\n\n\u26a0\u26a0 THE ESCAPE HATCH OTA-1146 WROTE COULD NEVER HAVE WORKED. It said that if the\nvoicing came back wrong the alternates to try, in order, were \"thuh\" \u2192 \"thu\" \u2192\n\"tha\". Measured, all three are voiceless and all three are stressed; the ladder\nonly ever changed the vowel, and the vowel was not the defect:\n\n    thuh \u2192 \u03b8\u02c8\u028c      thu \u2192 \u03b8\u02c8\u025c\u02d0      tha \u2192 \u03b8\u02c8\u0251\u02d0      dhuh \u2192 d\u02c8i\u02d0h\u02c8\u028c (\"dee-huh\")\n\n\u26a0\u26a0\u26a0 AND NO RESPELLING COULD HAVE WORKED, WHICH IS THE REAL FINDING. espeak gives\nword-initial `th` its voiceless reading for every word it does not know; voiced\n/\u00f0/ at the head of a word survives only in the closed set of function words in\nits dictionary. So there is exactly one string that phonemizes to /\u00f0\u0259/ on this\nengine, and it is \"the\" \u2014 entry `Found: 'the' [D@2]`, schwa at stress level 2,\nwith the vowel/consonant switch applied by espeak itself, identical on en-us,\nen-gb and en-gb-x-rp. The two hand-maintained exception lists OTA-1146 built for\nhour/honest/heir and use/unit/one were reimplementing, in JavaScript, a rule\nalready present in C and already correct.\n\nTHE RULE THIS LEAVES, pinned: this file respells words the phonemizer does NOT\nknow. Overriding a word it does know is how you create a mispronunciation, not\nhow you fix one. Before adding an entry, run the word through espeak.\n\n\u26a0 THE SAME MEASUREMENT CONDEMNED THREE MORE ENTRIES, so I ran every one:\n\n  \u00b7 doesn't \u2192 duzzent    INERT. The entry claimed espeak said \"DOSE-ent\". Both\n                         spellings are d\u02c8\u028cz\u0259nt; it never did. Removed.\n  \u00b7 Zharak  \u2192 zah rak    DESTRUCTIVE. The worksheet's own key says zh \u2248 the s in\n                         \"treasure\" \u2014 and the respelling dropped the h, so the\n                         RAW word was closer than the fix. Zharak \u2192 \u0292\u02c8\u00e6\u0279\u00e6k;\n                         \"zah rak\" \u2192 z\u02c8\u0251\u02d0 \u0279\u02c8\u00e6k, a plain Z. Now \"zhah rak\" \u2192\n                         \u0292\u02c8\u0251\u02d0 \u0279\u02c8\u00e6k: the owner's vowel AND the zh.\n  \u00b7 Tartaria family      A SYLLABLE SHORT OF THE GAME'S OWN NAME. espeak reads\n                         `eeu` as the glide /ju\u02d0/, so \"tar taireeuh\" said \"tar\n                         TERR-yoo\" and the plural picked up a parasitic t\n                         (t\u02c8\u025b\u0279ju\u02d0nts). Respelled -ea / -ean / -eans \u2192 t\u02c8\u025b\u0279i\u0259 /\n                         t\u02c8\u025b\u0279i\u0259n / t\u02c8\u025b\u0279i\u0259nz.\n\n\u26a0\u26a0\u26a0 AND THE IPA-OVERRIDE MAP WAS A LOADED GUN BEHIND A BOOLEAN. It held Unicode\nIPA, which is NOT what espeak reads between double brackets \u2014 it reads its own\nASCII mnemonics:\n\n    [[\u00f0\u0259]] blade  \u2192  \"bl\u02c8e\u026ad\"       \u26a0 THE WORD IS SIMPLY GONE. Silently.\n    [[D@]] blade  \u2192  \"\u00f0\u0259 bl\u02c8e\u026ad\"    \u2713\n\nSo the failure mode of flipping IPA_OVERRIDES_ENABLED was never \"Kokoro reads\nthe brackets out loud\" \u2014 the old comment's own stated worst case \u2014 it was every\nTartaria, Drakova and Aether in the game going SILENT with no error anywhere.\nRewritten in mnemonics, each measured. The flag stays OFF: measuring espeak is\nnot the same as measuring the device, and that is exactly the distinction this\nOTA exists to enforce.\n\n\u26a0 OTA-1146'S SUITE IS DELETED, NOT REPOINTED, and that is the honest outcome:\nits entire premise was the rule that is gone. ota1659 replaces it and inverts\nthe reproduction \u2014 every shape 1146 rewrote is asserted to pass through\nuntouched, including the vowel-position cases, so the correctness that used to\nlive in two exception lists is now demonstrated to survive without them. Two\nother suites pinned the old behaviour and were repointed with the history kept\nbeside them (ota1147's article line, loreLexicon's Reclaimers' apostrophe test \u2014\nwhich has now been retargeted twice for a claim, about apostrophes, that never\nchanged).\n\nGates: all 18 green by exit code. Full suite green.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T01:58:06Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1659-the-is-not-in-the-lexicon",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1659-the-is-not-in-the-lexicon",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T02:02:04.357945Z",
+          "dateCreated": "2026-09-04T02:01:03.781476Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155402294",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T02:02:04.608679Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1659-the-is-not-in-the-lexicon",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1659-the-is-not-in-the-lexicon",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1659-the-is-not-in-the-lexicon",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1659-the-is-not-in-the-lexicon)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "cab74d2f5c1140f4bd762ae6661fb2b7",
+  "previousEventID": "c4322ed1beb84ff4a2f3049fbeb18eff"
+}

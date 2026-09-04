@@ -1,0 +1,277 @@
+{
+  "id": "90285a04dbed477e88d1587af3a23f28",
+  "groupID": "7710939431",
+  "eventID": "90285a04dbed477e88d1587af3a23f28",
+  "projectID": "4511945117532160",
+  "size": 18156,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-04-1659-the-is-not-in-the-lexicon #mtm6enrfz3iy [inline 27/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1659-the-is-not-in-the-lexicon",
+  "message": "player-log 2026-09-04-1659-the-is-not-in-the-lexicon #mtm6enrfz3iy [inline 27/28]",
+  "title": "player-log 2026-09-04-1659-the-is-not-in-the-lexicon #mtm6enrfz3iy [inline 27/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "059db7a4ee6e4eeb8cd6b108f1f16eae",
+      "span_id": "815dc870aa0895ec",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "21:41:00.546Z] [debug] appstate: background \u2192 active (was background for 220674ms)\n[2026-09-03T21:41:00.580Z] [debug] homework: intro-fill armed after 6000ms idle (strike 3/3)\n[2026-09-03T21:41:02.585Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 1844ms read 0ms/write 1757ms in 727t\u2192out 34t HIT-CAP (154ch)\n",
+      "[2026-09-03T21:41:02.589Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 1844ms \u2014 intro-fill:\u2205\n[2026-09-03T21:41:02.589Z] [debug] homework: scene_intro \"Mud Flood Nexus\" \u2205 2010ms\n[2026-09-03T21:41:10.059Z] [player] craft Rustbane Charm\n[2026-09-03T21:41:10.064Z] [debug] parser: intent=craft conf=1.00 verb=craft target=rustbane charm resolved=- range=- enemies=0 hooks=2\n",
+      "[2026-09-03T21:41:10.071Z] [arbiter] \"Crafting Rustbane Charm would strip Smooth Stone \u2192 Small Rock from your pack \u2014 confirm in the prompt to proceed, or it stays unmade.\"\n[2026-09-03T21:41:10.155Z] [cognitive] USE_ITEM  (80ms)\n[2026-09-03T21:41:12.373Z] [player] craft Rustbane Charm\n",
+      "[2026-09-03T21:41:12.374Z] [debug] parser: intent=craft conf=1.00 verb=craft target=rustbane charm resolved=- range=- enemies=0 hooks=2\n[2026-09-03T21:41:12.382Z] [arbiter] The Arbiter nods. \"Stripped for parts: Smooth Stone \u2192 Small Rock.\"\n[2026-09-03T21:41:12.388Z] [reward] \u2726 Crafted Rustbane Charm. The Arbiter watches you set the last piece.\n",
+      "[2026-09-03T21:41:12.530Z] [cognitive] USE_ITEM  (140ms)\n[2026-09-03T21:41:12.905Z] [debug] qwen\u23f1 ambient preempted 2778ms read 0ms/write 0ms in 363t\u2192out 0t (0ch)\n[2026-09-03T21:41:12.909Z] [debug] arbiter: ambient cut short 2837ms \u2014 yielded to the player\n[2026-09-03T21:41:12.910Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient after 2778ms \u2014 ambient:preempted\n",
+      "[2026-09-03T21:41:22.922Z] [player] craft Scribe's Signet\n[2026-09-03T21:41:22.923Z] [debug] parser: intent=craft conf=1.00 verb=craft target=scribe signet resolved=- range=- enemies=0 hooks=2\n[2026-09-03T21:41:22.962Z] [arbiter] \"Crafting Scribe's Signet would strip Cloth Scrap \u2192 Patched Cloth from your pack \u2014 confirm in the prompt to proceed, or it stays unmade.\"\n",
+      "[2026-09-03T21:41:23.015Z] [cognitive] neutral  (51ms)\n[2026-09-03T21:41:24.825Z] [player] craft Scribe's Signet\n[2026-09-03T21:41:24.825Z] [debug] parser: intent=craft conf=1.00 verb=craft target=scribe signet resolved=- range=- enemies=0 hooks=2\n[2026-09-03T21:41:24.863Z] [arbiter] The Arbiter nods. \"Stripped for parts: Cloth Scrap \u2192 Patched Cloth.\"\n",
+      "[2026-09-03T21:41:24.876Z] [reward] \u2726 Crafted Scribe's Signet. The Arbiter watches you set the last piece.\n[2026-09-03T21:41:24.970Z] [cognitive] neutral  (92ms)\n[2026-09-03T21:41:31.418Z] [player] craft Tin Ward Ring\n[2026-09-03T21:41:31.418Z] [debug] parser: intent=craft conf=1.00 verb=craft target=tin ward ring resolved=cold spring range=- enemies=0 hooks=2\n",
+      "[2026-09-03T21:41:31.421Z] [reward] \u2726 Crafted Tin Ward Ring. The Arbiter watches you set the last piece.\n[2026-09-03T21:41:31.422Z] [debug] arbiter: template (reason=intent-not-allowed:craft)\n[2026-09-03T21:41:31.422Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T21:41:31.521Z] [cognitive] neutral  (98ms)\n[2026-09-03T21:41:36.493Z] [player] craft Tin Ward Ring\n",
+      "[2026-09-03T21:41:36.494Z] [debug] parser: intent=craft conf=1.00 verb=craft target=tin ward ring resolved=Tin Ward Ring range=- enemies=0 hooks=2\n[2026-09-03T21:41:36.503Z] [reward] \u2726 Crafted Tin Ward Ring. The Arbiter watches you set the last piece.\n[2026-09-03T21:41:36.504Z] [debug] arbiter: template (reason=intent-not-allowed:craft)\n",
+      "[2026-09-03T21:41:36.505Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T21:41:36.633Z] [cognitive] neutral  (127ms)\n[2026-09-03T21:41:42.726Z] [player] craft Tartarian Oath-Band\n[2026-09-03T21:41:42.727Z] [debug] parser: intent=craft conf=1.00 verb=craft target=tartarian oath band resolved=- range=- enemies=0 hooks=2\n",
+      "[2026-09-03T21:41:42.729Z] [reward] \u2726 Crafted Tartarian Oath-Band. The Arbiter watches you set the last piece.\n[2026-09-03T21:41:42.730Z] [debug] arbiter: template (reason=intent-not-allowed:craft)\n[2026-09-03T21:41:42.730Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T21:41:42.849Z] [cognitive] SEARCH \u00b7 TRAVEL \u00b7 USE_ITEM  (118ms)\n",
+      "[2026-09-03T21:41:47.787Z] [debug] persist sizes(KB): total=331 player=85 wm=156[rooms=85 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=85 scene=4\n[2026-09-03T21:41:49.881Z] [debug] ui: tap \"inventory\"\n",
+      "[2026-09-03T21:42:00.910Z] [debug] qwen\u23f1 item_synthesis_hw ok 5316ms read/write unusable (native mis-reported 49165ms/1562ms \u2014 llama.rn split bug, not this call) in 327t\u2192out 40t (162ch)\n[2026-09-03T21:42:00.915Z] [debug] qwen\u23f1 \u2702 DISCARDED item_synthesis_hw after 5316ms \u2014 item_synth:rejected-by-clamp bad-kind=\"weapon_coating\"\n",
+      "[2026-09-03T21:42:00.916Z] [debug] homework: item_desc \"Acid Flask\" \u2205 5335ms\n[2026-09-03T21:42:26.927Z] [debug] qwen\u23f1 item_synthesis_hw ok 1278ms read 342ms/write 908ms in 325t\u2192out 25t 1.1ms/t (94ch)\n[2026-09-03T21:42:26.940Z] [debug] homework: item_desc \"Veil of Peace\" \u2713 1302ms\n",
+      "[2026-09-03T21:42:36.219Z] [debug] stats: STR17 DEX21 INT11 WIS17 CHA11 STE8 | gear: WIS+5,INT+1,STR+5,DEX+9,STE+2 | worn: main=Magnetic Axe off=Reclaimers Guild Shroud-Spun Slinger head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Amulet of the Silt Warden ring=Light-Finger Guild Band ring2=",
+      "Tin Ward Ring\n[2026-09-03T21:42:45.051Z] [debug] stats: STR17 DEX21 INT11 WIS17 CHA11 STE8 | gear: WIS+5,INT+1,STR+5,DEX+9,STE+2 | worn: main=Magnetic Axe off=Reclaimers Guild Shroud-Spun Slinger head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Amulet of the Silt Warden ring=Light-Finger Gui",
+      "ld Band ring2=Tin Ward Ring ring3=Tin Ward Ring\n[2026-09-03T21:42:56.315Z] [debug] stats: STR17 DEX21 INT13 WIS17 CHA11 STE8 | gear: WIS+5,INT+3,STR+5,DEX+9,STE+2 | worn: main=Magnetic Axe off=Reclaimers Guild Shroud-Spun Slinger head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Amulet of the",
+      " Silt Warden ring=Light-Finger Guild Band ring2=Tin Ward Ring ring3=Tin Ward Ring ring4=Scribe's Signet\n[2026-09-03T21:42:59.394Z] [debug] qwen\u23f1 item_synthesis_hw ok 2248ms read 642ms/write 1563ms in 333t\u2192out 39t 1.9ms/t (174ch)\n[2026-09-03T21:43:01.028Z] [debug] homework: item_desc \"Architect's Sight Enhancer\" \u2713 4797ms\n",
+      "[2026-09-03T21:43:02.493Z] [debug] stats: STR19 DEX19 INT13 WIS17 CHA11 STE8 | gear: WIS+5,INT+3,STR+7,DEX+7,STE+2 | worn: main=Magnetic Axe off=Reclaimers Guild Shroud-Spun Slinger head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Amulet of the Silt Warden ring=Tartarian Oath-Band ring2=Tin ",
+      "Ward Ring ring3=Tin Ward Ring ring4=Scribe's Signet\n[2026-09-03T21:45:01.572Z] [debug] appstate: active \u2192 background (was active for 241032ms)\n[2026-09-03T21:45:01.822Z] [debug] persist sizes(KB): total=332 player=85 wm=156[rooms=85 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=86 scene=4\n[2026-09-03T22:43:49.320Z] [debug] appstate: background \u2192 active (was background for 3527740ms)\n",
+      "[2026-09-03T22:43:58.068Z] [debug] ctx: RELEASED \u2014 live=0 (opened=1 released=1)\n[2026-09-03T22:43:58.377Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a0696f-45b5-71a1-95e5-82a6a9f4f506\n[2026-09-03T22:43:58.377Z] [debug] ota: Checking\u2026\n[2026-09-03T22:43:58.508Z] [debug] ota: Already up to date\n[2026-09-03T22:43:58.508Z] [debug] ota: boot check result = noUpdate\n",
+      "[2026-09-03T22:43:58.578Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-09-03T22:43:58.579Z] [debug] voice: bundled idle\n[2026-09-03T22:43:59.229Z] [debug] send-log: bundle #mtm1iz3wmdt1 attempt 2/5 delivered to Sentry\n[2026-09-03T23:07:19.129Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a0696f-45b5-71a1-95e5-82a6a9f4f506\n",
+      "[2026-09-03T23:07:19.130Z] [debug] ota: Checking\u2026\n[2026-09-03T23:07:19.193Z] [debug] ota: Already up to date\n[2026-09-03T23:07:19.193Z] [debug] ota: boot check result = noUpdate\n[2026-09-03T23:07:19.273Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-09-03T23:07:19.273Z] [debug] voice: bundled idle\n",
+      "[2026-09-03T23:07:19.603Z] [debug] send-log: bundle #mtm1iz3wmdt1 attempt 3/5 delivered to Sentry\n[2026-09-03T23:48:29.066Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a0696f-45b5-71a1-95e5-82a6a9f4f506\n[2026-09-03T23:48:29.067Z] [debug] ota: Checking\u2026\n[2026-09-03T23:48:30.196Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n",
+      "[2026-09-03T23:48:30.265Z] [debug] ota: Saving progress\u2026\n[2026-09-03T23:48:30.266Z] [debug] ota: Restarting to apply\u2026\n[2026-09-03T23:48:30.459Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a069a9-5aae-79eb-8570-56ecdbb80207\n[2026-09-03T23:48:30.459Z] [debug] ota: Checking\u2026\n[2026-09-03T23:48:30.547Z] [debug] ota: Already up to date\n",
+      "[2026-09-03T23:48:30.548Z] [debug] ota: boot check result = noUpdate\n[2026-09-03T23:48:30.613Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-09-03T23:48:30.613Z] [debug] voice: bundled idle\n[2026-09-03T23:48:31.111Z] [debug] send-log: bundle #mtm1iz3wmdt1 attempt 4/5 delivered to Sentry\n",
+      "[2026-09-03T23:48:34.649Z] [debug] OTA applied: 2026-09-03-1653-the-wear-ward \u2192 2026-09-03-1655-the-card-is-asked.\n[2026-09-03T23:48:34.649Z] [debug] OTA session start: 2026-09-03-1655-the-card-is-asked.\n[2026-09-03T23:48:34.649Z] [world] You step back into Mud Flood Nexus. The world waits for your move.\n",
+      "[2026-09-03T23:48:34.649Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. \"Welcome back, Cheddar Bob. The road kept your place.\"\n\n=== END LOG \u00b7 399901 CHARS ===\n\nTartaria Realms\n\nDevice\n  Name: Pixel 10 Pro XL\n  Platform: android 37\n  Hermes: yes\n  Locale: en-US\n  Timezone: America/New_York\n  Screen: window 443\u00d7986 / screen 443\u00d7986 @ 2.4375x density\n",
+      "  Captured at: 2026-09-03T23:48:35.228Z\n\nInstall\n  App ID: com.hotatticgames.tartarprim\n  App version: 4.32.11\n  APK build version: 2.4.1\n  APK build: 293\n  AAB: (build 293)\n  OTA: (2026-09-03-1655-the-card-is-asked)\n  Boot stage: qwen:deferred\n\nML runtime health\n  Status: active (no crashes detected)\n  Crash count: 0\n  Last init attempt: 2026-09-03T23:48:30.632Z\n",
+      "  Last init success: 2026-09-03T23:48:31.259Z\n  Crashes-before-disable threshold: 2\n  Qwen completion guard: clean (no completion crashes)\n  Qwen kernel variant: rnllama_v8_2_fp16_dotprod\n  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6",
+      ".6.118-android15-8-g1831c2a45d9b-ab15739706-4k\n  Voice (TTS) guard: clean (no voice crashes on this build)\nSave-load health\n  Status: clean (no load-crash flags)\nLast JS crash\n  Status: none recorded\nThis launch\n  Life: bmtm6ejwl3h \u00b7 started 2026-09-03T23:48:30.405Z\n  Followed an OTA apply 138ms ago (boot-front)\n  The previous life released its model contexts before reloading (o0/r0/l0/p0/dn0)\n",
+      "Crash ledger \u2014 10 recorded (newest last)\n  \u2022 2026-09-02T02:45:58.234Z (2703m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-02-1621-the-ask-is-a-command \u00b7 stage boot:qwen:deferred\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: boot:qwen:deferred \u00b7 930ms into the action \u00b7 alive 0ms after it\n",
+      "      launch: died 965ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-02T22:42:22.972Z (1506m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-02-1633-a-batch-is-one-action \u00b7 stage boot:qwen:deferred\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n",
+      "      last checkpoint: boot:qwen:deferred \u00b7 957ms into the action \u00b7 alive 0ms after it\n      launch: died 1031ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-03T00:49:33.538Z (1379m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-02-1634-the-aside-yields \u00b7 stage rendered\n",
+      "      Process died with no orderly exit while: tap \"take / salvage\"\n      doing: tap \"take / salvage\" \u00b7 room mud_flood_nexus \u00b7 screen exploration\n      last checkpoint: rendered \u00b7 221ms into the action \u00b7 alive 9133ms after it\n      launch: died 3096833ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n",
+      "  \u2022 2026-09-03T02:52:27.753Z (1256m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-03-1639-every-ingredient-exists \u00b7 stage rendered\n      Process died with no orderly exit while: tap \"craft\"\n      doing: tap \"craft\" \u00b7 room mud_flood_nexus \u00b7 screen exploration\n      last checkpoint: rendered \u00b7 7466ms into the action \u00b7 alive 1498ms after it\n",
+      "      launch: died 21448ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-03T12:10:12.789Z (698m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-03-1642-every-drop-has-a-name-in-the-book \u00b7 stage mid-action\n      Process died with no orderly exit while: tap \"inventory\"\n",
+      "      doing: tap \"inventory\" \u00b7 room mud_flood_nexus \u00b7 screen exploration\n      launch: died 12819ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-03T15:48:24.471Z (480m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-03-1643-the-dice-riders-pay \u00b7 stage boot:qwen:deferred\n",
+      "      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: boot:qwen:deferred \u00b7 838ms into the action \u00b7 alive 11400ms after it\n      launch: died 12276ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n",
+      "  \u2022 2026-09-03T19:31:31.355Z (257m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-03-1648-a-fourth-ring \u00b7 stage boot:qwen:deferred\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: boot:qwen:deferred \u00b7 901ms into the action \u00b7 alive 0ms after it\n",
+      "      launch: died 956ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-03T20:39:06.948Z (189m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-03-1649-what-a-ring-is-for \u00b7 stage boot:qwen:deferred\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n",
+      "      last checkpoi"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-04-1659-the-is-not-in-the-lexicon #mtm6enrfz3iy [inline 27/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtm6enrfz3iy"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1659-the-is-not-in-the-lexicon"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "27"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1659-the-is-not-in-the-lexicon"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "4"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T02:05:56.751105Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T02:05:58.082000Z",
+  "fingerprints": [
+    "bd47edb593360462ba0f7f54604b828c"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1954433048,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-04T02:01:03.781476Z",
+    "dateReleased": "2026-09-04T02:02:04.357945Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "6a658907950273ce80604a3f492ea9d071955a27",
+      "message": "[ota-hal] OTA-1659: \"the\" is not in the lexicon\n\nOwner, for the second time: \"the needs to be pronounced thuh in kokoro.\"\n\nHe reported this once before, and OTA-1146 answered it by rewriting every\nconsonant-position \"the\" to the literal string \"thuh\" before the line reached\nthe engine. That fix is what he has been hearing since.\n\n\u26a0\u26a0\u26a0 NOBODY EVER MEASURED IT. espeak-ng is installable in this container, and it\nis the same phonemizer the app bundles per voice under <voice>/espeak-ng-data.\nOne command settles the whole question:\n\n    $ espeak-ng -v en-us -q --ipa \"The raider swings the rusted blade at the dog.\"\n      plain     \u2192  \u00f0\u0259 \u0279\u02c8e\u026ad\u025a sw\u02c8\u026a\u014bz \u00f0\u0259 \u0279\u02c8\u028cst\u1d7bd bl\u02c8e\u026ad \u00e6t \u00f0\u0259 d\u02c8\u0251\u02d0\u0261\n      OTA-1146  \u2192  \u03b8\u02c8\u028c \u0279\u02c8e\u026ad\u025a sw\u02c8\u026a\u014bz \u03b8\u02c8\u028c \u0279\u02c8\u028cst\u1d7bd bl\u02c8e\u026ad \u00e6t \u03b8\u02c8\u028c d\u02c8\u0251\u02d0\u0261\n\n\u26a0 THE ENGINE WAS ALREADY SAYING \"thuh\". /\u00f0\u0259/ IS \"thuh\" \u2014 the exact sound he\nasked for, three times in that sentence, before anyone touched anything. The\nrespelling replaced it with \u03b8\u02c8\u028c: the voiceless th of THUMB instead of the voiced\nth of THIS, the STRUT vowel instead of a schwa, and STRESSED, because espeak\nstresses a monosyllable it has to sound out. An unstressed article became a hard\nbeat in front of every noun in the game. He was not still hearing the old\nproblem \u2014 he was hearing the fix.\n\n\u26a0\u26a0 THE ESCAPE HATCH OTA-1146 WROTE COULD NEVER HAVE WORKED. It said that if the\nvoicing came back wrong the alternates to try, in order, were \"thuh\" \u2192 \"thu\" \u2192\n\"tha\". Measured, all three are voiceless and all three are stressed; the ladder\nonly ever changed the vowel, and the vowel was not the defect:\n\n    thuh \u2192 \u03b8\u02c8\u028c      thu \u2192 \u03b8\u02c8\u025c\u02d0      tha \u2192 \u03b8\u02c8\u0251\u02d0      dhuh \u2192 d\u02c8i\u02d0h\u02c8\u028c (\"dee-huh\")\n\n\u26a0\u26a0\u26a0 AND NO RESPELLING COULD HAVE WORKED, WHICH IS THE REAL FINDING. espeak gives\nword-initial `th` its voiceless reading for every word it does not know; voiced\n/\u00f0/ at the head of a word survives only in the closed set of function words in\nits dictionary. So there is exactly one string that phonemizes to /\u00f0\u0259/ on this\nengine, and it is \"the\" \u2014 entry `Found: 'the' [D@2]`, schwa at stress level 2,\nwith the vowel/consonant switch applied by espeak itself, identical on en-us,\nen-gb and en-gb-x-rp. The two hand-maintained exception lists OTA-1146 built for\nhour/honest/heir and use/unit/one were reimplementing, in JavaScript, a rule\nalready present in C and already correct.\n\nTHE RULE THIS LEAVES, pinned: this file respells words the phonemizer does NOT\nknow. Overriding a word it does know is how you create a mispronunciation, not\nhow you fix one. Before adding an entry, run the word through espeak.\n\n\u26a0 THE SAME MEASUREMENT CONDEMNED THREE MORE ENTRIES, so I ran every one:\n\n  \u00b7 doesn't \u2192 duzzent    INERT. The entry claimed espeak said \"DOSE-ent\". Both\n                         spellings are d\u02c8\u028cz\u0259nt; it never did. Removed.\n  \u00b7 Zharak  \u2192 zah rak    DESTRUCTIVE. The worksheet's own key says zh \u2248 the s in\n                         \"treasure\" \u2014 and the respelling dropped the h, so the\n                         RAW word was closer than the fix. Zharak \u2192 \u0292\u02c8\u00e6\u0279\u00e6k;\n                         \"zah rak\" \u2192 z\u02c8\u0251\u02d0 \u0279\u02c8\u00e6k, a plain Z. Now \"zhah rak\" \u2192\n                         \u0292\u02c8\u0251\u02d0 \u0279\u02c8\u00e6k: the owner's vowel AND the zh.\n  \u00b7 Tartaria family      A SYLLABLE SHORT OF THE GAME'S OWN NAME. espeak reads\n                         `eeu` as the glide /ju\u02d0/, so \"tar taireeuh\" said \"tar\n                         TERR-yoo\" and the plural picked up a parasitic t\n                         (t\u02c8\u025b\u0279ju\u02d0nts). Respelled -ea / -ean / -eans \u2192 t\u02c8\u025b\u0279i\u0259 /\n                         t\u02c8\u025b\u0279i\u0259n / t\u02c8\u025b\u0279i\u0259nz.\n\n\u26a0\u26a0\u26a0 AND THE IPA-OVERRIDE MAP WAS A LOADED GUN BEHIND A BOOLEAN. It held Unicode\nIPA, which is NOT what espeak reads between double brackets \u2014 it reads its own\nASCII mnemonics:\n\n    [[\u00f0\u0259]] blade  \u2192  \"bl\u02c8e\u026ad\"       \u26a0 THE WORD IS SIMPLY GONE. Silently.\n    [[D@]] blade  \u2192  \"\u00f0\u0259 bl\u02c8e\u026ad\"    \u2713\n\nSo the failure mode of flipping IPA_OVERRIDES_ENABLED was never \"Kokoro reads\nthe brackets out loud\" \u2014 the old comment's own stated worst case \u2014 it was every\nTartaria, Drakova and Aether in the game going SILENT with no error anywhere.\nRewritten in mnemonics, each measured. The flag stays OFF: measuring espeak is\nnot the same as measuring the device, and that is exactly the distinction this\nOTA exists to enforce.\n\n\u26a0 OTA-1146'S SUITE IS DELETED, NOT REPOINTED, and that is the honest outcome:\nits entire premise was the rule that is gone. ota1659 replaces it and inverts\nthe reproduction \u2014 every shape 1146 rewrote is asserted to pass through\nuntouched, including the vowel-position cases, so the correctness that used to\nlive in two exception lists is now demonstrated to survive without them. Two\nother suites pinned the old behaviour and were repointed with the history kept\nbeside them (ota1147's article line, loreLexicon's Reclaimers' apostrophe test \u2014\nwhich has now been retargeted twice for a claim, about apostrophes, that never\nchanged).\n\nGates: all 18 green by exit code. Full suite green.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T01:58:06Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1659-the-is-not-in-the-lexicon",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1659-the-is-not-in-the-lexicon",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T02:02:04.357945Z",
+          "dateCreated": "2026-09-04T02:01:03.781476Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155402294",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T02:02:04.608679Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1659-the-is-not-in-the-lexicon",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1659-the-is-not-in-the-lexicon",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1659-the-is-not-in-the-lexicon",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1659-the-is-not-in-the-lexicon)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "a71916f2f77d4bdd8e8b9c8819dbbfa2",
+  "previousEventID": "8986f107e71c44eca7ee566ebfab406b"
+}

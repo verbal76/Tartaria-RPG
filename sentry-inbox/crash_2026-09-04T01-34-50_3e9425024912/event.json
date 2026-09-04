@@ -1,0 +1,235 @@
+{
+  "id": "3e94250249124a8882749af3776a2b17",
+  "groupID": "7700159767",
+  "eventID": "3e94250249124a8882749af3776a2b17",
+  "projectID": "4511945117532160",
+  "size": 3117,
+  "entries": [
+    {
+      "data": {
+        "formatted": "Process died with no orderly exit while: (no action yet)"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1658-the-pouch-actually-heals",
+  "message": "Process died with no orderly exit while: (no action yet)",
+  "title": "Process died with no orderly exit while: (no action yet)",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2600:4041:1e8:d600:7569:149d:f7b:b343",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "f81fa1384fc245f0a1e8c0acafb504e1",
+      "span_id": "9f4f65ca7893ed9a",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "actionAgeMs": 66228,
+    "id": "1788485690482_native-death",
+    "lastAction": "(no action yet)",
+    "lastPhase": "native:voice:done",
+    "lastPhaseAgeMs": 0,
+    "lastPhaseDetail": "q0",
+    "sinceBootMs": 66255,
+    "stack": "(none \u2014 the process died without one)"
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "Process died with no orderly exit while: (no action yet)"
+  },
+  "tags": [
+    {
+      "key": "build",
+      "value": "2026-09-04-1658-the-pouch-actually-heals"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1658-the-pouch-actually-heals"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "native-death"
+    },
+    {
+      "key": "level",
+      "value": "fatal"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1658-the-pouch-actually-heals"
+    },
+    {
+      "key": "stage",
+      "value": "native:voice:done"
+    },
+    {
+      "key": "user",
+      "value": "ip:2600:4041:1e8:d600:7569:149d:f7b:b343",
+      "query": "user.ip:\"2600:4041:1e8:d600:7569:149d:f7b:b343\""
+    },
+    {
+      "key": "version",
+      "value": "4.32.11"
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T01:35:05.822893Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T01:34:50.482000Z",
+  "fingerprints": [
+    "1d449f5b8376d37a9ec5828c60760c03"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1954395555,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-04T01:31:51.615748Z",
+    "dateReleased": "2026-09-04T01:33:17.479647Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "25b6cdf2e977e6e852535daecbe4a23c53c4d002",
+      "message": "[ota-hal] OTA-1658: the pouch actually heals\n\nOwner, playing OTA-1657: \"the heals load into the pouch and it can collapse, I\ncan open heals in battle, but when tapped they don't do anything.\"\n\nHe is right. This is a fix for a defect I shipped four hours ago, and the cause\nis the argument I made for it in OTA-1657's own commit message.\n\n\u26a0\u26a0\u26a0 I ROUTED THE TAP THROUGH `useInventoryItem` AND CALLED THAT CORRECTNESS.\nThe message said: \"not 'like', the SAME action the pack's USE button fires \u2014 so\nthe heal, the stamina, the cure, the stack decrement and every downstream hook\nstay one implementation.\" Every word of that is true. What I never did was check\nwhat that action does in the one place this button was built for:\n\n    useInventoryItem  \u2192  submitPlayerAction(`use ${name}`)\n    submitPlayerAction, first line:\n        if (!trimmed || get().pendingRolls) return;\n\n\u26a0 COMBAT IN THIS GAME *IS* `pendingRolls`. Every swing sets it and it stays set\nwhile the dice are on screen. So in a fight the tap reached a guard clause and\nreturned \u2014 no heal, no refusal, no log line. That is the worst failure a button\ncan have, because it is indistinguishable from a dead control: he tapped, nothing\nhappened, and the game gave him no reason.\n\n\u26a0\u26a0 THE LESSON WAS ALREADY WRITTEN DOWN, FORTY LINES FROM THE CODE I ADDED.\n`dropInventoryItem`, in the same file, carries a comment about threading a UI\naction through `submitPlayerAction`, watching it work in a probe, watching it\nfail on a real id, and concluding the BODY has to be callable directly \u2014 \"an\nidentifier whose resolution depends on whether it happens to look like a word is\nnot a mechanism, it is a coincidence.\" I added a new UI action a few dozen lines\naway and made the same class of mistake anyway.\n\nTHE FIX is the path the combat bar already used: `useHealBatch`, a direct store\naction. HP, stamina AND the OTA-1573 cures, one off the stack, logged, persisted\n\u2014 with no parser and no roll gate between the tap and the heal. The OTA-1657 GOAL\nwas right (one implementation, not two); the ROUTE was wrong.\n\n\u26a0 THE SUITE REPRODUCES THE DEFECT BEFORE IT PROVES THE FIX. ota1658 boots a real\nstore, damages the player, puts a roll on the screen \u2014 which is what combat is \u2014\nand asserts that the OLD call changes the player's HP by exactly nothing. Then it\nasserts the new call heals through that same state, spends exactly one from the\nstack, leaves the pocket loaded, empties cleanly on the last one, and still works\nwith no roll pending. A fix whose test cannot fail against the old code is not a\nregression test, it is a description.\n\n\u26a0 AND THE RULE IT LEAVES, pinned: a button that must work mid-fight calls a store\naction DIRECTLY. The bandolier throw already did (`throwFromBandolier`); the heals\npopup now does too, and the suite asserts both so a third rack gets it right by\ndefault.\n\nOne honest note on the log assertion: `appendLog` does not land synchronously in\nthe jest harness \u2014 measured, the heal applies and the in-process feed stays empty\n\u2014 so asserting through `gameLog` would test the harness, not the game. That one\nclaim is pinned at the source instead, on the same `world` line the inventory\nheal emits.\n\n\u26a0 AND OTA-1657'S OWN SUITE WENT RED, CORRECTLY: it pinned\n`useInventoryItem(it.name)` \u2014 so it was pinning the BUG, and went green over a\nbutton that did nothing in a fight. That is the sharpest lesson here: a source\npin certifies the code you wrote, never the behaviour you promised. Repointed to\nthe working route, with the history written beside it.\n\nGates: all 18 green by exit code. Full suite green \u2014 1121 suites, 11,612 tests.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T01:29:31Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1658-the-pouch-actually-heals",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1658-the-pouch-actually-heals",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T01:33:17.479647Z",
+          "dateCreated": "2026-09-04T01:31:51.615748Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155396336",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T01:33:17.774207Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1658-the-pouch-actually-heals",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1658-the-pouch-actually-heals",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1658-the-pouch-actually-heals",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1658-the-pouch-actually-heals)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": "c8ec492e40574c4e96c3adcf1530b080"
+}

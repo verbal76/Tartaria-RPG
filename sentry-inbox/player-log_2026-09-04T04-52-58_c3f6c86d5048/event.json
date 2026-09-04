@@ -1,0 +1,274 @@
+{
+  "id": "c3f6c86d50484dd98e7bbde4657765ec",
+  "groupID": "7711143892",
+  "eventID": "c3f6c86d50484dd98e7bbde4657765ec",
+  "projectID": "4511945117532160",
+  "size": 18033,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-04-1664-no-phantom-syllable #mtmha35hxvzg [inline 2/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1664-no-phantom-syllable",
+  "message": "player-log 2026-09-04-1664-no-phantom-syllable #mtmha35hxvzg [inline 2/28]",
+  "title": "player-log 2026-09-04-1664-no-phantom-syllable #mtmha35hxvzg [inline 2/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "488faa54deec4c3ba82e08a6e9ae84cf",
+      "span_id": "969b9d9218324799",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "[2026-09-03T20:39:59.128Z] [debug] ota: boot check result = noUpdate\n[2026-09-03T20:39:59.171Z] [debug] send-log: bundle #mtlp91n0yrsc held \u2014 only 53s since the last try (a restart, not a chance); 1 left\n[2026-09-03T20:39:59.172Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-09-03T20:39:59.172Z] [debug] voice: bundled idle\n",
+      "[2026-09-03T20:47:11.893Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a068da-a415-7a8e-ae27-dc6da17c0ec9\n[2026-09-03T20:47:11.893Z] [debug] ota: Checking\u2026\n[2026-09-03T20:47:11.962Z] [debug] ota: Already up to date\n[2026-09-03T20:47:11.962Z] [debug] ota: boot check result = noUpdate\n[2026-09-03T20:47:12.069Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-09-03T20:47:12.069Z] [debug] voice: bundled idle\n[2026-09-03T20:47:12.324Z] [debug] send-log: bundle #mtlp91n0yrsc attempt 5/5 delivered to Sentry \u2014 final try, cleared\n[2026-09-03T20:47:16.062Z] [debug] OTA session start: 2026-09-03-1649-what-a-ring-is-for.\n[2026-09-03T20:47:16.062Z] [world] You step back into Mud Flood Nexus. The world waits for your move.\n",
+      "[2026-09-03T20:47:16.065Z] [arbiter] The Arbiter meets your eyes. \"Welcome back, Cheddar Bob. The buried country is no place to walk alone. The waste did not sleep while you were gone \u2014 blood was spilled and ground changed hands. Read the World for the account.\"\n",
+      "[2026-09-03T20:47:16.458Z] [debug] \u2550\u2550\u2550 SESSION 2026-09-03T20:47:16.455Z \u00b7 build 2026-09-03-1649-what-a-ring-is-for \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-09-03T20:47:16.459Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-03T20:47:16.459Z] [debug] missions: hunt:hunt_bog_dragon stage 4/7 [diplomacy] @monarch_waystation npc=\"Old Mira\" needs=The Boy's Locket\u2713 gives=Eshren's Name-Token\n[2026-09-03T20:47:16.459Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n",
+      "[2026-09-03T20:47:16.460Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n[2026-09-03T20:47:16.460Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n",
+      "[2026-09-03T20:47:16.460Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n[2026-09-03T20:47:16.460Z] [debug] missions: \u00b7 at=mud_flood_nexus travelTo=monarch_waystation\n[2026-09-03T20:47:16.460Z] [debug] boot: life bmtlzxdwvcp started 2026-09-03T20:47:11.791Z \u00b7 not an OTA apply (no handoff on disk)\n",
+      "[2026-09-03T20:47:17.324Z] [debug] send-log: crash on record (2026-09-03T20:39:06.948Z) \u2014 game log pushed automatically, delivered to Sentry, kept on disk as #mtlzxhu9g966\n[2026-09-03T20:47:19.077Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-09-03T20:47:19.126Z] [debug] spawn: gear=[Golem-Warden's Legplates] window=10 roster=new\n",
+      "[2026-09-03T20:47:19.127Z] [world] You walk west through open silt. The compass points west into open ground.\n[2026-09-03T20:47:19.128Z] [world] The thread you were following waits where you left it.\n[2026-09-03T20:47:20.276Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T20:47:21.732Z] [world] You take the Golem-Warden's Legplates from where it lay.\n",
+      "[2026-09-03T20:47:21.732Z] [reward] \u2726 Golem-Warden's Legplates (Common).\n[2026-09-03T20:47:22.646Z] [world] You salvage the cold spring. The take is small but real.\n[2026-09-03T20:47:22.646Z] [world] You break the data slate apart. Among the pieces, something worth keeping.\n[2026-09-03T20:47:22.647Z] [world] You work the rusted chain over. A part of it comes loose, intact.\n",
+      "[2026-09-03T20:47:22.647Z] [world] You scavenge the signal spark thoroughly. One Smooth Stone survives the sorting.\n[2026-09-03T20:47:22.647Z] [world] Tucked inside the silt pump: an oddment that matches no quartermaster's list. The kind of thing that fuses well.\n[2026-09-03T20:47:22.648Z] [reward] \u2726 Salvage haul:\n[2026-09-03T20:47:22.648Z] [reward]     \u2022 Scrap Metal x6 (Common)\n",
+      "[2026-09-03T20:47:22.648Z] [reward]     \u2022 Worn Tartarian Coin x2 (Common)\n[2026-09-03T20:47:22.648Z] [reward]     \u2022 Smooth Stone (Common)\n[2026-09-03T20:47:22.648Z] [reward]     \u2022 Warped Plank Offcut (Common)\n[2026-09-03T20:47:24.175Z] [debug] ui: tap \"investigate\"\n[2026-09-03T20:47:25.727Z] [debug] qwen: loading (was idle) \u2014 the Arbiter speaks templates until it is ready\n",
+      "[2026-09-03T20:47:25.751Z] [player] investigate the ground\n[2026-09-03T20:47:25.751Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n[2026-09-03T20:47:25.756Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Wild Onion (Common).\n[2026-09-03T20:47:25.764Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-09-03T20:47:25.999Z] [cognitive] CLIMB  (234ms)\n[2026-09-03T20:47:26.797Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-09-03T20:47:27.018Z] [player] investigate pathway\n[2026-09-03T20:47:27.018Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=pathway resolved=pathway range=- enemies=0 hooks=1\n",
+      "[2026-09-03T20:47:27.020Z] [world] The pathway reads as ordinary, which in Tartaria is a small kind of relief. You leave it be.\n[2026-09-03T20:47:27.217Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-09-03T20:47:27.222Z] [debug] spawn: gear=[Wanderer's Worn Gauntlets] window=10 roster=new\n",
+      "[2026-09-03T20:47:27.225Z] [world] The flat silt heaves, and a hand breaks the surface, then an arm, then a face caked grey with a thousand years of it.\n[2026-09-03T20:47:27.225Z] [arbiter] You've heard of these on the road: the Aetherkin, the ones the mud drowned and the Aether raised back up.\n",
+      "[2026-09-03T20:47:27.225Z] [world] In life it was a baker, flour still ghosts the creases of what were once their sleeves \u2014 or maybe just someone who happened to live here \u2014 you can't be sure. They surfaced out of the flat mud like a held breath finally, terribly let go.\n",
+      "[2026-09-03T20:47:27.226Z] [world] It looks at you the way a cornered animal looks at a door. Fight or flight, and the flight is walled off. Press it and it will strike; leave it and it will let you.\n[2026-09-03T20:47:27.226Z] [world] You walk north through open silt. The compass tells you The Core-Casing lies further north \u2014 5 tiles, about 13 hours of travel.\n",
+      "[2026-09-03T20:47:27.226Z] [world] What you started here has not finished itself in your absence.\n[2026-09-03T20:47:27.591Z] [cognitive] neutral  (570ms)\n[2026-09-03T20:47:30.410Z] [debug] qwen\u23f1 investigate_lore ok 2820ms read 1479ms/write 850ms in 125t\u2192out 26t 11.8ms/t (118ch)\n[2026-09-03T20:47:30.828Z] [debug] ui: tap \"approach\"\n[2026-09-03T20:47:30.869Z] [player] approach Mud-Wracked Aetherkin\n",
+      "[2026-09-03T20:47:30.870Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud wracked aetherkin resolved=Mud-Wracked Aetherkin range=mid enemies=1 hooks=1\n[2026-09-03T20:47:30.873Z] [debug] move: advance from range=mid enemies=1 weather=Black Rain cost=1 partial=0\n[2026-09-03T20:47:30.873Z] [debug] move: field advance target=Mud-Wracked Aetherkin d 1.50->0.50 band mid->close\n",
+      "[2026-09-03T20:47:30.873Z] [world] You close the gap with Mud-Wracked Aetherkin. (range: close / arm's reach)\n[2026-09-03T20:47:30.873Z] [combat] Mud-Wracked Aetherkin stops \u2014 and the air in front of it thickens, faintly bright. An AETHER SHIELD stands where its swing should have been (+3 AC).\n[2026-09-03T20:47:30.874Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-09-03T20:47:30.874Z] [arbiter] The Arbiter watches the mud-wracked aetherkin. \"It is not the first thing here that decided to keep its distance, then changed its mind.\"\n[2026-09-03T20:47:31.270Z] [cognitive] SWIM \u00b7 RETREAT \u00b7 REST \u00b7 SEARCH  (395ms)\n[2026-09-03T20:47:38.839Z] [debug] ui: tap \"dodge\"\n[2026-09-03T20:47:38.853Z] [player] dodge\n",
+      "[2026-09-03T20:47:38.854Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=1\n[2026-09-03T20:47:38.855Z] [world] You commit to the dodge. Slip Mud-Wracked Aetherkin's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-03T20:47:38.952Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 13 + ATK 5 = 18 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n[2026-09-03T20:47:38.952Z] [combat] Dodge \u2014 d20 \u2192 19 + DEX 21 = 40 vs ATK 18. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-03T20:47:38.952Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-09-03T20:47:38.953Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T20:47:38.953Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T20:47:39.320Z] [cognitive] neutral  (366ms)\n[2026-09-03T20:47:40.005Z] [debug] ui: tap \"\u2623 shroud-spun slinger \u2692\"\n[2026-09-03T20:47:40.045Z] [player] attack with the off-hand reclaimers guild shroud-spun slinger\n",
+      "[2026-09-03T20:47:40.045Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand reclaimers guild shroud spun slinger resolved=Reclaimers Guild Shroud-Spun Slinger range=close enemies=1 hooks=1\n[2026-09-03T20:47:40.046Z] [debug] attack: target=Mud-Wracked Aetherkin range=close reach.bands=[distant,far,mid,close] reach.label=Reclaimers Guild Shroud-Spun Slinger bareHand=false\n",
+      "[2026-09-03T20:47:40.048Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-03T20:47:40.122Z] [world] You bring the corrupted reclaimers guild shroud-spun slinger to bear on Mud-Wracked Aetherkin.\n[2026-09-03T20:47:40.123Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T20:47:40.471Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 USE_ITEM  (347ms)\n",
+      "[2026-09-03T20:47:48.330Z] [world] You seize the initiative. Mud-Wracked Aetherkin has no time to react.\n[2026-09-03T20:47:48.330Z] [combat] You \u2014 d20 \u2192 9 + DEX 21 + 2 (point blank) perfect opening (2\u00d7 dice) = 32 vs Mud-Wracked Aetherkin AC 14 \u2014 \u2713 HIT\n[2026-09-03T20:47:48.330Z] [combat] Mud-Wracked Aetherkin shrugs off the bludgeoning. (resisted, \u00d70.5 for 11)\n",
+      "[2026-09-03T20:47:48.334Z] [arbiter] The Arbiter watches the bludgeoning skid off. \"Swap to the Plasma Thrower \u2014 burn will bite where bludgeoning won't.\"\n[2026-09-03T20:47:48.335Z] [combat] Mud-Wracked Aetherkin takes 11 with the corrupted reclaimers guild shroud-spun slinger. It reels: 105 left. Then it fights back.\n",
+      "[2026-09-03T20:47:48.335Z] [combat] Corrupted Reclaimers Guild Shroud-Spun Slinger \u2014 4 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n[2026-09-03T20:47:48.337Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 19 + ATK 5 = 24 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-09-03T20:47:48.338Z] [arbiter] The Arbiter watches the blow land or fail. \"Both are answers.\"\n",
+      "[2026-09-03T20:47:48.730Z] [combat] Mud-Wracked Aetherkin deals 3 aetheric damage [armor \u221234%, title \u00bd] +2 corruption [Mud-glass Scales took it]. You have 45 HP remaining.\n[2026-09-03T20:47:54.312Z] [debug] ui: tap \"\u2623 shroud-spun slinger \u2692\"\n[2026-09-03T20:47:54.352Z] [player] attack with the off-hand reclaimers guild shroud-spun slinger\n",
+      "[2026-09-03T20:47:54.352Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand reclaimers guild shroud spun slinger resolved=Reclaimers Guild Shroud-Spun Slinger range=close enemies=1 hooks=1\n[2026-09-03T20:47:54.353Z] [combat] Mud-Wracked Aetherkin blackens \u2014 corruption eats 4. (101/116 HP, 2 turns left)\n",
+      "[2026-09-03T20:47:54.353Z] [debug] attack: target=Mud-Wracked Aetherkin range=close reach.bands=[distant,far,mid,close] reach.label=Reclaimers Guild Shroud-Spun Slinger bareHand=false\n[2026-09-03T20:47:54.429Z] [world] You commit forward with the corrupted reclaimers guild shroud-spun slinger. Mud-Wracked Aetherkin watches your hands.\n[2026-09-03T20:47:54.429Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-03T20:47:54.774Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 USE_ITEM  (344ms)\n[2026-09-03T20:47:55.189Z] [debug] persist sizes(KB): total=329 player=83 wm=154[rooms=84 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=87 scene=5\n[2026-09-03T20:48:02.269Z] [world] Mud-Wracked Aetherkin moves first. The pressure is immediate.\n",
+      "[2026-09-03T20:48:02.272Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 18 + ATK 5 = 23 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-09-03T20:48:02.273Z] [combat] You \u2014 d20 \u2192 8 + DEX 21 + 2 (point blank) = 31 vs Mud-Wracked Aetherkin AC 14 \u2014 \u2713 HIT\n[2026-09-03T20:48:02.273Z] [combat] The Corrupted coating fails to take on Mud-Wracked Aetherkin.\n",
+      "[2026-09-03T20:48:02.273Z] [combat] Mud-Wracked Aetherkin shrugs off the bludgeoning. (resisted, \u00d70.5 for 2)\n[2026-09-03T20:48:02.277Z] [combat] The blow with the corrupted reclaimers guild shroud-spun slinger finds purchase \u2014 2 damage, 99 HP standing. Mud-Wracked Aetherkin commits to the counter.\n",
+      "[2026-09-03T20:48:02.664Z] [combat] Mud-Wracked Aetherkin deals 9 aetheric damage [armor \u221234%, title \u00bd, floor 30%] +3 corruption [Titan's Gauntlets took it]. You have 36 HP remaining.\n[2026-09-03T20:48:04.407Z] [debug] ui: tap \"magnetic axe \u26a1\"\n[2026-09-03T20:48:04.448Z] [player] attack with the magnetic axe\n",
+      "[2026-09-03T20:48:04.449Z] [debug] parser: intent=attack conf=1.00 verb=attack target=magnetic axe resolved=Magnetic Axe range=close enemies=1 hooks=1\n[2026-09-03T20:48:04.450Z] [combat] Mud-Wracked Aetherkin blackens \u2014 corruption eats 4. (95/116 HP, 1 turn left)\n",
+      "[2026-09-03T20:48:04.450Z] [debug] attack: target=Mud-Wracked Aetherkin range=close reach.bands=[close] reach.label=Magnetic Axe bareHand=false\n[2026-09-03T20:48:04.532Z] [world] You raise the magnetic axe toward Mud-Wracked Aetherkin. The room narrows around the both of you.\n[2026-09-03T20:48:04.533Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-03T20:48:04.899Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 THROW \u00b7 DISENGAGE  (364ms)\n[2026-09-03T20:48:09.573Z] [world] You seize the initiative. Mud-Wracked Aetherkin has no time to react.\n[2026-09-03T20:48:09.574Z] [combat] You \u2014 d20 \u2192 14 + STR 17 = 31 vs Mud-Wracked Aetherkin AC 14 \u2014 \u2713 HIT\n",
+      "[2026-09-03T20:48:09.577Z] [combat] Your strike with the magnetic axe lands for 9. Mud-Wracked Aetherkin staggers \u2014 86 HP remaining. It answers.\n[2026-09-03T20:48:09.580Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 12 + ATK 5 = 17 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-03T20:48:11.676Z] [debug] ui: tap \"dodge\"\n[2026-09-03T20:48:11.691Z] [player] dodge\n",
+      "[2026-09-03T20:48:11.691Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=1\n[2026-09-03T20:48:11.692Z] [world] You commit to the dodge. Slip Mud-Wracked Aetherkin's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-03T20:48:11.693Z] [combat] Mud-Wracked Aetherkin blackens \u2014 corruption eats 4. (82/116 HP, 0 turns left)\n[2026-09-03T20:48:11.693Z] [combat] Mud-Wracked Aetherkin shakes off the last "
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-04-1664-no-phantom-syllable #mtmha35hxvzg [inline 2/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtmha35hxvzg"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1664-no-phantom-syllable"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "2"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1664-no-phantom-syllable"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T04:52:56.393000Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T04:52:58.038000Z",
+  "fingerprints": [
+    "64dd8aba247618f8258f26ac076e31e3"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1954595382,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-04T04:14:29.574155Z",
+    "dateReleased": "2026-09-04T04:16:01.629112Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "082d8b0c5221a969630765f5cbcadd7ec8b6793c",
+      "message": "[ota-hal] OTA-1664: no phantom syllable\n\nOwner, after I offered to \"re-tune\" two place names: \"there should be no a sound\nin front of either of those. the s and the n are the starting sound of each\nword. where are you getting an AY sound before that \u2014 to me it reads like you're\nmispronouncing the word, not a tone or inflection, but adding a syllable.\"\n\n\u26a0\u26a0\u26a0 HE IS RIGHT, AND MY FRAMING WAS THE PROBLEM. I reported this as a vowel\nquality issue \u2014 \"eh\" coming out as \"AY\" \u2014 which invited a better spelling of the\nsame wrong thing. It is not a vowel problem. The leading token should not be\nthere at all. Samarran is three syllables and opens on S. Nimari is three and\nopens on N. Both have been saying four since OTA-104.\n\n\u26a0 THE CAUSE IS A MISREAD OF THE PLAYTESTER'S IPA. OTA-104 was handed\n/\u025bs\u025bm\u0254\u02d0\u027e\u025bn/ and /\u025bn\u025bm\u0251\u0279i/, saw the leading \u025b, and promoted it to its own\nspace-separated token \u2014 which this file's own header says espeak treats as a\nseparate WORD. Then it recorded the mistake as a finding: \"all three open with a\nleading /\u025b/ schwa that the prior respellings dropped. Samarran and Nimari are\n4-syllable words, not 3.\" Both sentences are false, and the second is exactly\nthe sort of confident note that stops the next reader from checking. It stopped\nme twice tonight \u2014 I read that comment during the OTA-1659 audit and moved on.\n\nMeasured (`espeak-ng -v en-us -q --ipa`), these were not shades off. They were\ndifferent words:\n\n    eh sem or en    \u2192 \u02c8e\u026a s\u02c8\u025bm \u0254\u02d0\u0279 \u02c8\u025bn    \"AY-SEM-OR-EN\"   (4 beats, 4 stresses)\n    Samarran        \u2192 s\u02c8\u00e6m\u00e6\u0279\u0259n            \"SAM-a-run\"      \u2713\n    eh neh mah ree  \u2192 \u02c8e\u026a n\u02c8e\u026a m\u02c8\u0251\u02d0 \u0279\u02c8i\u02d0  \"AY-NAY-MAH-REE\" (\"neh\" also says NAY)\n    Nimari          \u2192 n\u02c8\u026am\u025a\u0279i             \"NIM-uh-ree\"     \u2713\n\n\u26a0\u26a0 SO THE FIX IS REMOVAL, NOT A RE-TUNE. That is the third time in six OTAs that\nthe right answer here was to delete an entry rather than re-spell it \u2014 \"the\" and\n\"doesn't\" went the same way in OTA-1659, for the same reason: an override was\nadded to correct a word the phonemizer already read properly, and the override\nwas the mispronunciation.\n\n\u26a0 ASGARDAR STAYS, and the distinction matters. A-s-gardar genuinely opens on a\nvowel, so its \"ez\" is the first syllable of the word rather than a beat welded\nin front of it. Same syllable count as the raw word, different vowel \u2014 which is\nwhat he asked for at OTA-104. He complained about two names, not three, and he\nwas precise about which.\n\n\u26a0\u26a0 AND THE SUITE NOW GUARDS THE CLASS, NOT THE INSTANCE. The defect is not \"eh\"\n\u2014 it is a respelling that changes how many beats a word has. ota1664 checks the\nchunk count of every surviving entry against the count verified here, so the\nnext entry that adds or drops a syllable fails a test instead of shipping and\nwaiting for someone to notice it in a sentence.\n\nGates: all 18 green by exit code. Full suite green.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T04:12:09Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1664-no-phantom-syllable",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1664-no-phantom-syllable",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T04:16:01.629112Z",
+          "dateCreated": "2026-09-04T04:14:29.574155Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155428664",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T04:16:01.857063Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1664-no-phantom-syllable",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1664-no-phantom-syllable",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1664-no-phantom-syllable",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1664-no-phantom-syllable)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "c6987b94ff414ce19745174f5deaaa78",
+  "previousEventID": "bb98a6b2c3024f97ac4723c8341dafae"
+}

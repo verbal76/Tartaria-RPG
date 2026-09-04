@@ -1,0 +1,274 @@
+{
+  "id": "adfde1f0852e46138218367a9c66923b",
+  "groupID": "7711143892",
+  "eventID": "adfde1f0852e46138218367a9c66923b",
+  "projectID": "4511945117532160",
+  "size": 18031,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-04-1664-no-phantom-syllable #mtmha35hxvzg [inline 25/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1664-no-phantom-syllable",
+  "message": "player-log 2026-09-04-1664-no-phantom-syllable #mtmha35hxvzg [inline 25/28]",
+  "title": "player-log 2026-09-04-1664-no-phantom-syllable #mtmha35hxvzg [inline 25/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "488faa54deec4c3ba82e08a6e9ae84cf",
+      "span_id": "969b9d9218324799",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "edge of reach \u2014 halved]. You have 39 HP remaining.\n[2026-09-04T02:47:47.189Z] [combat] Mud Monarchs Patrol 4's strike leaves you poisoned.\n[2026-09-04T02:47:47.189Z] [combat] Mud Monarchs Patrol 2 deals 3 slashing damage [armor \u221225%] [edge of reach \u2014 halved]. You have 36 HP remaining.\n[2026-09-04T02:47:47.189Z] [combat] Mud Monarchs Patrol 2's strike leaves you bleeding.\n",
+      "[2026-09-04T02:47:49.222Z] [debug] ui: tap \"dodge\"\n[2026-09-04T02:47:49.230Z] [world] A shard of mud-glass nicks you. Small wound, steady reminder. (\u22121 HP)\n[2026-09-04T02:47:49.237Z] [player] dodge\n[2026-09-04T02:47:49.238Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=3 hooks=3\n",
+      "[2026-09-04T02:47:49.239Z] [world] You commit to the dodge. Slip Mud Monarchs Patrol 3's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-04T02:47:49.240Z] [combat] Mud Monarchs Patrol 2 shudders \u2014 poison eats 6. (0/19 HP, 2 turns left)\n",
+      "[2026-09-04T02:47:49.240Z] [combat] Mud Monarchs Patrol 2 blackens \u2014 corruption eats 2. (0/19 HP, 2 turns left)\n[2026-09-04T02:47:49.242Z] [reward] Mud Monarchs Patrol 2 defeated. You recover Patched Cloth, Aether Residue.\n",
+      "[2026-09-04T02:47:49.242Z] [world] You crouch for the blade \u2014 the Hollow Edge, the black mark of the Forgotten Order's enforcers, its steel weeping a faint corruption that fogs the air. But the grip is wrong. It's honed: razored along the inner curve so the handle itself is a second blade, and only one of its edges is meant for the enemy. Take it up untrained and you flay your own palm to the bone",
+      ". Only a hand that knows the Order's hold \u2014 that two-finger grip they teach behind sealed doors \u2014 can carry it. You leave it where it fell.\n[2026-09-04T02:47:49.244Z] [reward] You strip the body: Mud-Bound Cloak (+15 TC). The kit took the fight badly.\n[2026-09-04T02:47:49.245Z] [reward] \u2726 Hard-won spoils \u2014 Energy Fragment (Uncommon).\n",
+      "[2026-09-04T02:47:49.245Z] [combat] 2 attackers remain. Mud Monarchs Patrol 3 now in your sights.\n[2026-09-04T02:47:49.245Z] [system] Forgotten Order standing +1 (now 55)\n[2026-09-04T02:47:49.246Z] [reward] +15 TC pried from the dust.\n[2026-09-04T02:47:49.321Z] [combat] Mud Monarchs Patrol 4 turns on Mercy \u2014 d20 8 + ATK 8 = 16 vs Mercy's AC 13 (vest +3) \u2014 \u2713 HIT\n",
+      "[2026-09-04T02:47:49.322Z] [combat] Mercy takes 5. (0/15 HP left)\n[2026-09-04T02:47:49.322Z] [reward] Mercy's vest hums and gives it back \u2014 Mud Monarchs Patrol 4 takes 1 aetheric. (18 HP left)\n[2026-09-04T02:47:49.322Z] [arbiter] Mercy drops under the Mud Monarchs Patrol 4 and drags herself clear of the fight. She is down \u2014 tend her within a day or she won't get back up.\n",
+      "[2026-09-04T02:47:49.392Z] [combat] Mud Monarchs Patrol 3 \u2014 d20 \u2192 17 + ATK 8 = 25 vs your AC 22 \u2014 \u2717 EVADED\n[2026-09-04T02:47:49.392Z] [combat] Dodge \u2014 d20 \u2192 12 + DEX 19 = 31 vs ATK 25. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n",
+      "[2026-09-04T02:47:49.393Z] [world] You slip Mud Monarchs Patrol 3's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n[2026-09-04T02:47:49.393Z] [debug] arbiter: template (reason=combat)\n[2026-09-04T02:47:49.393Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-09-04T02:47:49.394Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T02:47:49.766Z] [cognitive] neutral  (371ms)\n[2026-09-04T02:47:51.254Z] [debug] ui: tap \"\u2620\u2623 bone crossbow \u25b2\"\n[2026-09-04T02:47:51.257Z] [system] evasive \u2014 harder to hit fades.\n[2026-09-04T02:47:51.292Z] [player] attack with the bone crossbow\n",
+      "[2026-09-04T02:47:51.292Z] [debug] parser: intent=attack conf=1.00 verb=attack target=bone crossbow resolved=Bone Crossbow range=mid enemies=2 hooks=3\n[2026-09-04T02:47:51.293Z] [debug] attack: target=Mud Monarchs Patrol 3 range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-09-04T02:47:51.294Z] [debug] attack: visibility penalty \u22121 (Glass Hail)\n",
+      "[2026-09-04T02:47:51.294Z] [debug] attack: status mods poisoned -2 \u00b7 perfect opening (2\u00d7 dice)\n[2026-09-04T02:47:51.367Z] [world] You bring the poisoned corrupted bone crossbow to bear on Mud Monarchs Patrol 3.\n[2026-09-04T02:47:51.368Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T02:47:51.704Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE \u00b7 RELOAD  (335ms)\n",
+      "[2026-09-04T02:48:04.728Z] [world] You seize the initiative. Mud Monarchs Patrol 3 has no time to react.\n[2026-09-04T02:48:04.729Z] [combat] You \u2014 d20 \u2192 13 + DEX 18 \u2212 1 (Glass Hail) poisoned -2 perfect opening (2\u00d7 dice) = 28 vs Mud Monarchs Patrol 3 AC 12 \u2014 \u2713 HIT\n[2026-09-04T02:48:04.731Z] [combat] Piercing flares \u2014 +1 on hit.\n",
+      "[2026-09-04T02:48:04.732Z] [combat] You crack the Mud Monarchs Patrol 3 with the Poisoned Corrupted Bone Crossbow for 19 \u2014 the better part of their fight, gone in one blow. They crumple, out cold. (5/25 HP) Loot them before they come to.\n[2026-09-04T02:48:04.732Z] [combat] Mud Monarchs Patrol 3 is out of it. Mud Monarchs Patrol 4 now in your sights.\n",
+      "[2026-09-04T02:48:04.733Z] [combat] Poisoned Corrupted Bone Crossbow \u2014 5 poison bites in and festers (3 turns).\n[2026-09-04T02:48:04.733Z] [combat] Poisoned Corrupted Bone Crossbow \u2014 2 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n[2026-09-04T02:48:04.736Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 7 + ATK 8 = 15 vs your AC 22 \u2014 \u2717 MISS\n",
+      "[2026-09-04T02:48:04.736Z] [arbiter] The Arbiter does not look up. \"Hit it before it hits you. That's the entire trick.\"\n[2026-09-04T02:48:10.393Z] [debug] ui: tap \"stealth\"\n[2026-09-04T02:48:10.394Z] [system] poisoned fades.\n[2026-09-04T02:48:10.394Z] [system] bleeding fades.\n[2026-09-04T02:48:10.395Z] [player] sneak\n",
+      "[2026-09-04T02:48:10.395Z] [debug] parser: intent=stealth conf=1.00 verb=sneak target=- resolved=- range=mid enemies=2 hooks=3\n[2026-09-04T02:48:10.466Z] [system] \u23f3 Time passed: 15 min\n[2026-09-04T02:48:11.113Z] [cognitive] DISENGAGE \u00b7 HIDE \u00b7 TAKE_COVER  (646ms)\n[2026-09-04T02:48:12.991Z] [debug] skillcheck: stealth d20=2 STE 8 + 1 (title: Shadow Diver) = 11 vs DC 12 \u2014 Hard \u2192 FAIL\n",
+      "[2026-09-04T02:48:13.102Z] [debug] stats: STR18 DEX19 INT13 WIS17 CHA13 STE8 | gear: WIS+5,INT+3,STR+6,DEX+7,STE+2,CHA+1 | worn: main=Bone Crossbow off=Reclaimers Guild Shroud-Spun Slinger head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Amulet of the Silt Warden ring=Tartarian Oath-Band rin",
+      "g2=Tin Ward Ring ring3=Tin Ward Ring ring4=Scribe's Signet\n[2026-09-04T02:48:13.102Z] [world] Your foot scrapes stone. Something stirs in the dark.\n[2026-09-04T02:48:13.102Z] [combat] Mud Monarchs Patrol 3 shudders \u2014 poison eats 5. (0/25 HP, 2 turns left)\n[2026-09-04T02:48:13.102Z] [combat] Mud Monarchs Patrol 3 blackens \u2014 corruption eats 2. (0/25 HP, 2 turns left)\n",
+      "[2026-09-04T02:48:13.103Z] [reward] Mud Monarchs Patrol 3 defeated. You recover Aetheric Shard \u00d72, Patched Cloth.\n[2026-09-04T02:48:13.104Z] [reward] You strip the body: Bone Knife, Mud-Bound Cloak (+14 TC). The kit took the fight badly.\n[2026-09-04T02:48:13.104Z] [combat] 1 attacker remains. Mud Monarchs Patrol 4 now in your sights.\n",
+      "[2026-09-04T02:48:13.104Z] [system] Forgotten Order standing +1 (now 56)\n[2026-09-04T02:48:13.105Z] [reward] +30 TC pried from the dust.\n[2026-09-04T02:48:13.167Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 9 + ATK 8 = 17 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-04T02:48:13.168Z] [arbiter] The Arbiter looks around. \"An inscription above the central console reads simply: not a wish.\"\n",
+      "[2026-09-04T02:48:13.619Z] [debug] persist sizes(KB): total=326 player=74 wm=167[rooms=93 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=80 scene=6\n[2026-09-04T02:48:16.437Z] [debug] ui: tap \"dodge\"\n[2026-09-04T02:48:16.440Z] [player] dodge\n[2026-09-04T02:48:16.440Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=1 hooks=3\n",
+      "[2026-09-04T02:48:16.440Z] [world] You commit to the dodge. Slip Mud Monarchs Patrol 4's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-04T02:48:16.512Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 11 + ATK 8 = 19 vs your AC 22 \u2014 \u2717 EVADED\n",
+      "[2026-09-04T02:48:16.512Z] [combat] Dodge \u2014 d20 \u2192 13 + DEX 19 = 32 vs ATK 19. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-04T02:48:16.513Z] [debug] arbiter: template (reason=combat)\n[2026-09-04T02:48:16.513Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-04T02:48:16.513Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-04T02:48:16.853Z] [cognitive] neutral  (339ms)\n[2026-09-04T02:48:17.688Z] [debug] ui: tap \"\u2623\u26a1 shroud-spun slinger \u2692\"\n[2026-09-04T02:48:17.752Z] [player] attack with the off-hand reclaimers guild shroud-spun slinger\n",
+      "[2026-09-04T02:48:17.752Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand reclaimers guild shroud spun slinger resolved=Reclaimers Guild Shroud-Spun Slinger range=mid enemies=1 hooks=3\n[2026-09-04T02:48:17.753Z] [debug] attack: target=Mud Monarchs Patrol 4 range=mid reach.bands=[distant,far,mid,close] reach.label=Reclaimers Guild Shroud-Spun Slinger bareHand=false\n",
+      "[2026-09-04T02:48:17.754Z] [debug] attack: visibility penalty \u22121 (Glass Hail)\n[2026-09-04T02:48:17.755Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-04T02:48:17.825Z] [world] You commit forward with the corrupted resonant reclaimers guild shroud-spun slinger. Mud Monarchs Patrol 4 watches your hands.\n[2026-09-04T02:48:17.826Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-04T02:48:18.159Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 USE_ITEM  (333ms)\n[2026-09-04T02:48:21.579Z] [world] Mud Monarchs Patrol 4 moves first. The pressure is immediate.\n[2026-09-04T02:48:21.582Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 1 + ATK 8 = 9 vs your AC 22 \u2014 \u2717 FUMBLE\n",
+      "[2026-09-04T02:48:21.582Z] [combat] You \u2014 d20 \u2192 1 + DEX 18 \u2212 1 (Glass Hail) perfect opening (2\u00d7 dice) = 18 vs Mud Monarchs Patrol 4 AC 12 \u2014 \u2717 FUMBLE\n[2026-09-04T02:48:21.582Z] [combat] Mud Monarchs Patrol 4 reads the motion and slips it \u2014 the corrupted resonant reclaimers guild shroud-spun slinger carves only air. The counter is already coming.\n",
+      "[2026-09-04T02:48:21.582Z] [arbiter] \"Either you walk away or it does,\" the Arbiter says. \"I'm not particular.\"\n[2026-09-04T02:48:22.595Z] [debug] ui: tap \"step back\"\n[2026-09-04T02:48:22.599Z] [player] step back\n[2026-09-04T02:48:22.599Z] [debug] parser: intent=retreat conf=1.00 verb=stepback target=- resolved=- range=mid enemies=1 hooks=3\n",
+      "[2026-09-04T02:48:22.600Z] [debug] move: retreat from range=mid enemies=1 weather=Glass Hail cost=1 partial=0\n[2026-09-04T02:48:22.601Z] [debug] move: field retreat target=Mud Monarchs Patrol 4 d 1.49->2.49 band mid->far\n[2026-09-04T02:48:22.601Z] [world] You pull back from Mud Monarchs Patrol 4. (range: far)\n[2026-09-04T02:48:22.949Z] [cognitive] neutral  (347ms)\n",
+      "[2026-09-04T02:48:23.657Z] [debug] ui: tap \"\u2620\u2623 bone crossbow \u25b2\"\n[2026-09-04T02:48:23.677Z] [player] attack with the bone crossbow\n[2026-09-04T02:48:23.677Z] [debug] parser: intent=attack conf=1.00 verb=attack target=bone crossbow resolved=Bone Crossbow range=far enemies=1 hooks=3\n",
+      "[2026-09-04T02:48:23.678Z] [debug] attack: target=Mud Monarchs Patrol 4 range=far reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-09-04T02:48:23.679Z] [debug] attack: visibility penalty \u22121 (Glass Hail)\n[2026-09-04T02:48:23.751Z] [world] You commit forward with the poisoned corrupted bone crossbow. Mud Monarchs Patrol 4 watches your hands.\n",
+      "[2026-09-04T02:48:23.751Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T02:48:24.077Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE \u00b7 RELOAD  (324ms)\n[2026-09-04T02:48:33.157Z] [world] Mud Monarchs Patrol 4 moves first. The pressure is immediate.\n[2026-09-04T02:48:33.158Z] [combat] Mud Monarchs Patrol 4 closes the distance.\n",
+      "[2026-09-04T02:48:33.158Z] [combat] You \u2014 d20 \u2192 3 + DEX 18 \u2212 1 (Glass Hail) = 20 vs Mud Monarchs Patrol 4 AC 12 \u2014 \u2713 HIT\n[2026-09-04T02:48:33.160Z] [debug] wear ward: Bone Crossbow keeps its point (15%)\n[2026-09-04T02:48:33.160Z] [combat] Your blow with the poisoned corrupted bone crossbow lands clean \u2014 19 damage. Mud Monarchs Patrol 4 crumples in the dust. The Aetherstone settles.\n",
+      "[2026-09-04T02:48:33.162Z] [reward] Mud Monarchs Patrol 4 defeated. You recover Patched Cloth \u00d72, Aether Residue.\n[2026-09-04T02:48:33.162Z] [world] You crouch for the blade \u2014 the Hollow Edge, the black mark of the Forgotten Order's enforcers, its steel weeping a faint corruption that fogs the air. But the grip is wrong. It's honed: razored along the inner curve so the handle itself is a second bl",
+      "ade, and only one of its edges is meant for the enemy. Take it up untrained and you flay your own palm to the bone. Only a hand that knows the Order's hold \u2014 that two-finger grip they teach behind sealed doors \u2014 can carry it. You leave it where it fell.\n[2026-09-04T02:48:33.164Z] [reward] You strip the body: Mud-Bound Cloak (+15 TC). The kit took the fight badly.\n",
+      "[2026-09-04T02:48:33.164Z] [system] Forgotten Order standing +1 (now 57)\n[2026-09-04T02:48:33.165Z] [reward] +27 TC pried from the dust.\n[2026-09-04T02:48:35.761Z] [debug] ui: tap \"take / salvage\"\n[2026-09-04T02:48:37.274Z] [world] You break the conduit apart. Among the pieces, something worth keeping.\n[2026-09-04T02:48:37.275Z] [world] You work the core over. A part of it comes loose, intact.\n",
+      "[2026-09-04T02:48:37.275Z] [world] You salvage the drain hatch. The take is small but real.\n[2026-09-04T02:48:37.276Z] [world] You strip the dust terminal carefully. Something usable comes free in your hand.\n[2026-09-04T02:48:37.276Z] [world] You work the mud crack apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n",
+      "[2026-09-04T02:48:37.277Z] [world] You salvage the reactor hum. The take is small but real.\n[2026-09-04T02:48:37.277Z] [world] You strip the silt pump carefully. Something usable comes free in your hand.\n[2026-09-04T02:48:37.277Z] [reward] \u2726 Salvage haul:\n[2026-09-04T02:48:37.277Z] [reward]     \u2022 Automaton Circuit x2 (Common)\n[2026-09-04T02:48:37.278Z] [reward]     \u2022 Scrap Metal x7 (Common)\n",
+      "[2026-09-04T02:48:37.278Z] [reward]     \u2022 Dried Tendon Coil (Common)\n[2026-09-04T02:48:37.278Z] [reward]     \u2022 Aetheric Shard (Uncommon)\n[2026-09-04T02:48:38.066Z] [debug] persist sizes(KB): total=326 player=74 wm=167[rooms=93 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=81 scene=4\n[2026-09-04T02:48:38.253Z] [debug] homework: intro-fill armed after 10470ms idle\n",
+      "[2026-09-04T02:48:40.321Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-09-04T02:48:40.329Z] [world] You walk west. You arrive at The Reaver's Crest.\n[2026-09-04T02:48:40.330Z] [debug] scene: loc=reavers_crest hub=- arrival=y opening=n passing=y\n",
+      "[2026-09-04T02:48:40.331Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest HERE needs=Raider's Ridge-Sign\u2713 PAUSED\n[20"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-04-1664-no-phantom-syllable #mtmha35hxvzg [inline 25/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtmha35hxvzg"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1664-no-phantom-syllable"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "25"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1664-no-phantom-syllable"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T04:52:56.537000Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T04:52:58.041000Z",
+  "fingerprints": [
+    "64dd8aba247618f8258f26ac076e31e3"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1954595382,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-04T04:14:29.574155Z",
+    "dateReleased": "2026-09-04T04:16:01.629112Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "082d8b0c5221a969630765f5cbcadd7ec8b6793c",
+      "message": "[ota-hal] OTA-1664: no phantom syllable\n\nOwner, after I offered to \"re-tune\" two place names: \"there should be no a sound\nin front of either of those. the s and the n are the starting sound of each\nword. where are you getting an AY sound before that \u2014 to me it reads like you're\nmispronouncing the word, not a tone or inflection, but adding a syllable.\"\n\n\u26a0\u26a0\u26a0 HE IS RIGHT, AND MY FRAMING WAS THE PROBLEM. I reported this as a vowel\nquality issue \u2014 \"eh\" coming out as \"AY\" \u2014 which invited a better spelling of the\nsame wrong thing. It is not a vowel problem. The leading token should not be\nthere at all. Samarran is three syllables and opens on S. Nimari is three and\nopens on N. Both have been saying four since OTA-104.\n\n\u26a0 THE CAUSE IS A MISREAD OF THE PLAYTESTER'S IPA. OTA-104 was handed\n/\u025bs\u025bm\u0254\u02d0\u027e\u025bn/ and /\u025bn\u025bm\u0251\u0279i/, saw the leading \u025b, and promoted it to its own\nspace-separated token \u2014 which this file's own header says espeak treats as a\nseparate WORD. Then it recorded the mistake as a finding: \"all three open with a\nleading /\u025b/ schwa that the prior respellings dropped. Samarran and Nimari are\n4-syllable words, not 3.\" Both sentences are false, and the second is exactly\nthe sort of confident note that stops the next reader from checking. It stopped\nme twice tonight \u2014 I read that comment during the OTA-1659 audit and moved on.\n\nMeasured (`espeak-ng -v en-us -q --ipa`), these were not shades off. They were\ndifferent words:\n\n    eh sem or en    \u2192 \u02c8e\u026a s\u02c8\u025bm \u0254\u02d0\u0279 \u02c8\u025bn    \"AY-SEM-OR-EN\"   (4 beats, 4 stresses)\n    Samarran        \u2192 s\u02c8\u00e6m\u00e6\u0279\u0259n            \"SAM-a-run\"      \u2713\n    eh neh mah ree  \u2192 \u02c8e\u026a n\u02c8e\u026a m\u02c8\u0251\u02d0 \u0279\u02c8i\u02d0  \"AY-NAY-MAH-REE\" (\"neh\" also says NAY)\n    Nimari          \u2192 n\u02c8\u026am\u025a\u0279i             \"NIM-uh-ree\"     \u2713\n\n\u26a0\u26a0 SO THE FIX IS REMOVAL, NOT A RE-TUNE. That is the third time in six OTAs that\nthe right answer here was to delete an entry rather than re-spell it \u2014 \"the\" and\n\"doesn't\" went the same way in OTA-1659, for the same reason: an override was\nadded to correct a word the phonemizer already read properly, and the override\nwas the mispronunciation.\n\n\u26a0 ASGARDAR STAYS, and the distinction matters. A-s-gardar genuinely opens on a\nvowel, so its \"ez\" is the first syllable of the word rather than a beat welded\nin front of it. Same syllable count as the raw word, different vowel \u2014 which is\nwhat he asked for at OTA-104. He complained about two names, not three, and he\nwas precise about which.\n\n\u26a0\u26a0 AND THE SUITE NOW GUARDS THE CLASS, NOT THE INSTANCE. The defect is not \"eh\"\n\u2014 it is a respelling that changes how many beats a word has. ota1664 checks the\nchunk count of every surviving entry against the count verified here, so the\nnext entry that adds or drops a syllable fails a test instead of shipping and\nwaiting for someone to notice it in a sentence.\n\nGates: all 18 green by exit code. Full suite green.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T04:12:09Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1664-no-phantom-syllable",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1664-no-phantom-syllable",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T04:16:01.629112Z",
+          "dateCreated": "2026-09-04T04:14:29.574155Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155428664",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T04:16:01.857063Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1664-no-phantom-syllable",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1664-no-phantom-syllable",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1664-no-phantom-syllable",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1664-no-phantom-syllable)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "b0596c5a2bfd4695bbb92a6397e75084",
+  "previousEventID": "aa3c5e7cf44148098f2bdd7547009d9a"
+}

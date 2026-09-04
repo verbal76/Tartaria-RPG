@@ -1,0 +1,278 @@
+{
+  "id": "cbe8dfecf4ae41638f1e0e47fdbf29eb",
+  "groupID": "7710939431",
+  "eventID": "cbe8dfecf4ae41638f1e0e47fdbf29eb",
+  "projectID": "4511945117532160",
+  "size": 18090,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-04-1659-the-is-not-in-the-lexicon #mtm6enrfz3iy [inline 3/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1659-the-is-not-in-the-lexicon",
+  "message": "player-log 2026-09-04-1659-the-is-not-in-the-lexicon #mtm6enrfz3iy [inline 3/28]",
+  "title": "player-log 2026-09-04-1659-the-is-not-in-the-lexicon #mtm6enrfz3iy [inline 3/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "059db7a4ee6e4eeb8cd6b108f1f16eae",
+      "span_id": "815dc870aa0895ec",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      " Ilva Sidelong for 6 TC. (1123 TC on hand)\n[2026-09-03T00:35:33.597Z] [reward] Sold Reclaimer's Mask (Common) to Ilva Sidelong for 6 TC. (1129 TC on hand)\n[2026-09-03T00:35:33.664Z] [reward] Sold Reclaimer's Trousers (Common) to Ilva Sidelong for 6 TC. (1135 TC on hand)\n[2026-09-03T00:35:33.731Z] [reward] Sold Cudgel (Common) to Ilva Sidelong for 5 TC. (1140 TC on hand)\n",
+      "[2026-09-03T00:35:33.799Z] [reward] Sold Reclaimer's Salvage Vest (Common) to Ilva Sidelong for 5 TC. (1145 TC on hand)\n[2026-09-03T00:35:33.865Z] [reward] Sold Cudgel (Common) to Ilva Sidelong for 5 TC. (1150 TC on hand)\n[2026-09-03T00:35:33.933Z] [reward] Sold Reclaimer's Salvage Vest (Common) to Ilva Sidelong for 5 TC. (1155 TC on hand)\n",
+      "[2026-09-03T00:35:34.000Z] [reward] Sold Cudgel (Common) to Ilva Sidelong for 5 TC. (1160 TC on hand)\n[2026-09-03T00:35:34.067Z] [reward] Sold Mud-Bound Cloak (Common) to Ilva Sidelong for 5 TC. (1165 TC on hand)\n[2026-09-03T00:35:34.132Z] [reward] Sold Mud-Bound Cloak (Common) to Ilva Sidelong for 5 TC. (1170 TC on hand)\n",
+      "[2026-09-03T00:35:34.199Z] [reward] Sold Cudgel (Common) to Ilva Sidelong for 5 TC. (1175 TC on hand)\n[2026-09-03T00:35:34.264Z] [reward] Sold Mud-Warden's Vest (Common) to Ilva Sidelong for 5 TC. (1180 TC on hand)\n[2026-09-03T00:35:34.330Z] [reward] Sold Cudgel (Common) to Ilva Sidelong for 5 TC. (1185 TC on hand)\n",
+      "[2026-09-03T00:35:34.396Z] [reward] Sold Reclaimer's Salvage Vest (Common) to Ilva Sidelong for 5 TC. (1190 TC on hand)\n[2026-09-03T00:35:34.459Z] [reward] Sold Cudgel (Common) to Ilva Sidelong for 5 TC. (1195 TC on hand)\n[2026-09-03T00:35:34.524Z] [reward] Sold Mud-Warden's Vest (Common) to Ilva Sidelong for 5 TC. (1200 TC on hand)\n",
+      "[2026-09-03T00:35:34.591Z] [reward] Sold Mud-Warden's Vest (Common) to Ilva Sidelong for 5 TC. (1205 TC on hand)\n[2026-09-03T00:35:34.655Z] [reward] Sold Reclaimer's Salvage Vest (Common) to Ilva Sidelong for 5 TC. (1210 TC on hand)\n[2026-09-03T00:35:34.720Z] [reward] Sold Cudgel (Common) to Ilva Sidelong for 5 TC. (1215 TC on hand)\n",
+      "[2026-09-03T00:35:34.785Z] [reward] Sold Mud-Bound Cloak (Common) to Ilva Sidelong for 5 TC. (1220 TC on hand)\n[2026-09-03T00:35:34.850Z] [reward] Sold Rust Dagger (Common) to Ilva Sidelong for 4 TC. (1224 TC on hand)\n[2026-09-03T00:35:52.653Z] [reward] Sold 481\u00d7 Worn Tartarian Coin (Common) to Ilva Sidelong for 2405 TC (5 TC each). (3629 TC on hand)\n",
+      "[2026-09-03T00:36:00.017Z] [reward] Bought the Mire Stave working for 200 TC. \u2726 Recipe learned (Rare)! Open Crafting to forge it \u2014 you'll still need the materials.\n[2026-09-03T00:36:01.894Z] [reward] Bought the Many-Colored Tonic working for 200 TC. \u2726 Recipe learned (Rare)! Open Crafting to forge it \u2014 you'll still need the materials.\n",
+      "[2026-09-03T00:36:03.975Z] [reward] Bought the Lich-Heart Pendant working for 200 TC. \u2726 Recipe learned (Rare)! Open Crafting to forge it \u2014 you'll still need the materials.\n[2026-09-03T00:36:04.208Z] [debug] persist sizes(KB): total=302 player=72 wm=144[rooms=75 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=82 scene=4\n",
+      "[2026-09-03T00:36:10.460Z] [reward] Bought Red Cap Mushroom from Ilva Sidelong for 6 TC. (3023 TC left)\n[2026-09-03T00:36:10.460Z] [reward] They don't charge a friend full price \u2014 1 TC stayed in your pouch.\n[2026-09-03T00:36:16.374Z] [debug] ui: tap \"investigate\"\n[2026-09-03T00:36:17.934Z] [player] investigate the ground\n",
+      "[2026-09-03T00:36:17.934Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=3\n[2026-09-03T00:36:17.937Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-09-03T00:36:17.949Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T00:36:18.156Z] [cognitive] CLIMB  (206ms)\n",
+      "[2026-09-03T00:36:18.589Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n[2026-09-03T00:36:18.596Z] [debug] spawn: gear=[Titan's Gauntlets, Titan's Guard Mask, Mud Buckler] window=10 roster=new\n[2026-09-03T00:36:18.597Z] [world] The flat silt heaves, and a hand breaks the surface, then an arm, then a face caked grey with a thousand years of it.\n",
+      "[2026-09-03T00:36:18.597Z] [arbiter] You've heard of these on the road: the Aetherkin, the ones the mud drowned and the Aether raised back up.\n[2026-09-03T00:36:18.598Z] [debug] dedup: suppressed arbiter repeat \u2014 \"You've heard of these on the road: the Aetherkin, the ones t\u2026\"\n",
+      "[2026-09-03T00:36:18.598Z] [world] In life it was a machinist, one hand fused half-around a wrench that rusted into the bone \u2014 the mud takes faces first, so the rest is a guess and a kindness. Something you stirred woke the Aetherstone that held them; now they're awake and out.\n",
+      "[2026-09-03T00:36:18.598Z] [world] It flinches from you and puts its back to the wall, hands raised \u2014 not a hunter, just something frightened that has forgotten everything except how to be afraid.\n[2026-09-03T00:36:18.598Z] [world] You walk south through open silt. The compass tells you The Conduit Line lies further south \u2014 4 tiles, about 10 hours of travel.\n",
+      "[2026-09-03T00:36:18.598Z] [world] The air over it has the same weight it had before.\n[2026-09-03T00:36:21.894Z] [debug] ui: tap \"flee\"\n[2026-09-03T00:36:21.907Z] [player] flee\n[2026-09-03T00:36:21.908Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=mid enemies=1 hooks=3\n[2026-09-03T00:36:22.002Z] [system] \u23f3 Time passed: 15 min\n",
+      "[2026-09-03T00:36:22.304Z] [cognitive] FEAR \u00b7 RETREAT \u00b7 HIDE  (301ms)\n[2026-09-03T00:36:24.079Z] [debug] skillcheck: escape d20=18 DEX 19 = 37 vs Pursuit 6 \u2014 Mud-Wracked Aetherkin (d20 4 + SPD 2) \u2192 PASS\n",
+      "[2026-09-03T00:36:24.173Z] [debug] stats: STR14 DEX19 INT12 WIS15 CHA11 STE7 | gear: WIS+4,INT+3,DEX+8,STR+3,STE+2 | worn: main=Auralite Talon off=Choir-Bound Launcher head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Honey-Glazed Knuckle legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n",
+      "[2026-09-03T00:36:24.174Z] [debug] train: dexterity (escape check) \u2192 progress 94/100\n[2026-09-03T00:36:24.174Z] [world] You turn and run and the running works.\n[2026-09-03T00:36:27.226Z] [debug] ui: tap \"\u2605 Take & wear Titan's Gauntlets \u2014 your hands slot is bare\"\n[2026-09-03T00:36:27.233Z] [world] The Titan's Gauntlets had settled into the ground. You unsettle it.\n",
+      "[2026-09-03T00:36:27.233Z] [reward] \u2726 Titan's Gauntlets (Common).\n[2026-09-03T00:36:27.254Z] [debug] take&wear: equipping \"Titan's Gauntlets\" -> hands\n[2026-09-03T00:36:27.344Z] [debug] stats: STR16 DEX19 INT12 WIS15 CHA11 STE7 | gear: WIS+4,INT+3,STR+5,DEX+8,STE+2 | worn: main=Auralite Talon off=Choir-Bound Launcher head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets le",
+      "gs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n[2026-09-03T00:36:29.762Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T00:36:31.864Z] [world] Whatever the Titan's Guard Mask was lying against, it lets go without much argument.\n[2026-09-03T00:36:31.865Z] [reward] \u2726 Titan's Guard Mask (Common).\n",
+      "[2026-09-03T00:36:32.187Z] [debug] persist sizes(KB): total=302 player=73 wm=143[rooms=75 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=82 scene=4\n[2026-09-03T00:36:33.229Z] [world] You break the abandoned skiff apart. Among the pieces, something worth keeping.\n[2026-09-03T00:36:33.229Z] [world] You break the bell apart. Among the pieces, something worth keeping.\n",
+      "[2026-09-03T00:36:33.230Z] [world] You break the mooring post apart. Among the pieces, something worth keeping.\n[2026-09-03T00:36:33.230Z] [world] You salvage the standing water. The take is small but real.\n[2026-09-03T00:36:33.230Z] [reward] \u2726 Salvage haul:\n[2026-09-03T00:36:33.230Z] [reward]     \u2022 Aetheric Cloth (Uncommon)\n[2026-09-03T00:36:33.231Z] [reward]     \u2022 Bent Nail x2 (Common)\n",
+      "[2026-09-03T00:36:33.231Z] [reward]     \u2022 Worn Tartarian Coin (Common)\n[2026-09-03T00:36:33.231Z] [reward]     \u2022 Smooth Stone x2 (Common)\n[2026-09-03T00:36:39.417Z] [player] investigate Mud Buckler\n[2026-09-03T00:36:39.418Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud buckler resolved=Mud Buckler range=- enemies=0 hooks=3\n",
+      "[2026-09-03T00:36:39.418Z] [debug] route: hook intercept (kind=pulsing_mud, target=\"mud buckler\") \u2014 original intent=investigate\n[2026-09-03T00:36:39.418Z] [world] \u2605 STORY THREAD (step 1) \u2014 You step toward the glow. The mud is warm against your boot \u2014 an Aetherstone deposit, surface-thin but real.\n",
+      "[2026-09-03T00:36:40.673Z] [world] \u2605\u2605 STORY THREAD COMPLETE \u2014 You pry the deposit out of the silt. A few good shards, dense and humming, plus a thumb-sized core.\n[2026-09-03T00:36:40.674Z] [reward] \u2726 Aetheric Shard, Aetheric Shard, Aether Crystal.\n[2026-09-03T00:36:44.174Z] [debug] ui: tap \"investigate\"\n[2026-09-03T00:36:45.757Z] [player] investigate the ground\n",
+      "[2026-09-03T00:36:45.757Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=3\n[2026-09-03T00:36:45.763Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Small Rock (Common).\n[2026-09-03T00:36:45.771Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-09-03T00:36:45.774Z] [world] A Conspiracy Architects war party crests the rise \u2014 5 of them, blades already out. They've marked you for standing with the Forgotten Order.\n[2026-09-03T00:36:45.774Z] [arbiter] \"The Conspiracy Architects do not forgive a friend of the Forgotten Order,\" the Arbiter murmurs. \"Stand, or run \u2014 but decide now.\"\n[2026-09-03T00:36:46.137Z] [cognitive] CLIMB  (365ms)\n",
+      "[2026-09-03T00:36:51.758Z] [debug] ui: tap \"dodge\"\n[2026-09-03T00:36:51.764Z] [world] A silent bolt strikes near enough to singe your sleeve. (\u22123 HP)\n[2026-09-03T00:36:51.772Z] [player] dodge\n[2026-09-03T00:36:51.772Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=5 hooks=3\n",
+      "[2026-09-03T00:36:51.773Z] [world] You commit to the dodge. Slip Conspiracy Architects Raider 1's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-03T00:36:51.855Z] [combat] Conspiracy Architects Raider 1 \u2014 d20 \u2192 12 + ATK 11 = 23 vs your AC 22 \u2014 \u2717 EVADED\n",
+      "[2026-09-03T00:36:51.855Z] [combat] Dodge \u2014 d20 \u2192 5 + DEX 19 = 24 vs ATK 23. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-03T00:36:51.855Z] [world] You slip Conspiracy Architects Raider 1's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n",
+      "[2026-09-03T00:36:51.856Z] [debug] ac-shift 22\u219225: race/base 10 + gear 18 + title 0 \u2192 trimmed 22 + status 3 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n[2026-09-03T00:36:51.857Z] [combat] Conspiracy Architects Raider 2 \u2014 d20 \u2192 9 + ATK 10 = 19 vs your AC 25 \u2014 \u2717 MISS\n",
+      "[2026-09-03T00:36:51.857Z] [combat] Conspiracy Architects Raider 4 and 2 others close the distance.\n[2026-09-03T00:36:51.858Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T00:36:52.184Z] [cognitive] neutral  (326ms)\n[2026-09-03T00:36:52.874Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n[2026-09-03T00:36:52.876Z] [system] evasive \u2014 harder to hit fades.\n",
+      "[2026-09-03T00:36:52.896Z] [player] attack with the auralite talon\n[2026-09-03T00:36:52.896Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=5 hooks=3\n[2026-09-03T00:36:52.897Z] [debug] attack: target=Conspiracy Architects Raider 1 range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n",
+      "[2026-09-03T00:36:52.898Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-03T00:36:52.967Z] [world] You bring the acid-etched corrupted auralite talon to bear on Conspiracy Architects Raider 1.\n[2026-09-03T00:36:52.967Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T00:36:53.282Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (314ms)\n",
+      "[2026-09-03T00:37:01.976Z] [world] Conspiracy Architects Raider 1 moves first. The pressure is immediate.\n[2026-09-03T00:37:01.979Z] [debug] ac-shift 25\u219222: race/base 10 + gear 18 + title 0 \u2192 trimmed 22 + status 0 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n",
+      "[2026-09-03T00:37:01.979Z] [combat] Conspiracy Architects Raider 1 \u2014 d20 \u2192 2 + ATK 9 = 11 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T00:37:01.981Z] [combat] Conspiracy Architects Raider 2 \u2014 d20 \u2192 2 + ATK 8 = 10 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T00:37:01.983Z] [combat] Conspiracy Architects Raider 3 \u2014 d20 \u2192 2 + ATK 10 = 12 vs your AC 22 \u2014 \u2717 MISS\n",
+      "[2026-09-03T00:37:01.983Z] [combat] Conspiracy Architects Raider 5 and 1 other close the distance.\n[2026-09-03T00:37:01.983Z] [combat] You \u2014 d20 \u2192 12 + INT 13 perfect opening (2\u00d7 dice) = 25 vs Conspiracy Architects Raider 1 AC 13 \u2014 \u2713 HIT\n[2026-09-03T00:37:01.984Z] [combat] Conspiracy Architects Raider 1 shrugs off the aetheric. (resisted, \u00d70.5 for 11)\n",
+      "[2026-09-03T00:37:01.988Z] [combat] The blow with the acid-etched corrupted auralite talon finds purchase \u2014 11 damage, 14 HP standing. Conspiracy Architects Raider 1 commits to the counter.\n[2026-09-03T00:37:01.989Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 1 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n",
+      "[2026-09-03T00:37:01.989Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 1 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n[2026-09-03T00:37:06.528Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n[2026-09-03T00:37:06.564Z] [player] attack with the auralite talon\n",
+      "[2026-09-03T00:37:06.565Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=5 hooks=3\n[2026-09-03T00:37:06.566Z] [combat] Conspiracy Architects Raider 1 smokes \u2014 acid eats 1. (13/25 HP, 2 turns left)\n[2026-09-03T00:37:06.566Z] [combat] Conspiracy Architects Raider 1 blackens \u2014 corruption eats 1. (12/25 HP, 2 turns left)\n",
+      "[2026-09-03T00:37:06.567Z] [debug] attack: target=Conspiracy Architects Raider 1 range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n[2026-09-03T00:37:06.640Z] [world] You commit forward with the acid-etched corrupted auralite talon. Conspiracy Architects Raider 1 watches your hands.\n[2026-09-03T00:37:06.641Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-03T00:37:06.957Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (316ms)\n[2026-09-03T00:37:15.828Z] [world] You seize the initiative. Conspiracy Architects Raider 1 has no time to react.\n[2026-09-03T00:37:15.828Z] [combat] You \u2014 d20 \u2192 14 + INT 13 = 27 vs Conspiracy Architects Raider 1 AC 12 \u2014 \u2713 HIT\n",
+      "[2026-09-03T00:37:15.829Z] [combat] Conspiracy Architects Raider 1 shrugs off the aetheric. (resisted, \u00d70.5 for 10)\n[2026-09-03T00:37:15.832Z] [combat] The aetheric has worn Conspiracy Architects Raider 1'"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-04-1659-the-is-not-in-the-lexicon #mtm6enrfz3iy [inline 3/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtm6enrfz3iy"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1659-the-is-not-in-the-lexicon"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "3"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1659-the-is-not-in-the-lexicon"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "4"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T02:05:56.568000Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T02:05:58.078000Z",
+  "fingerprints": [
+    "bd47edb593360462ba0f7f54604b828c"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1954433048,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-04T02:01:03.781476Z",
+    "dateReleased": "2026-09-04T02:02:04.357945Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "6a658907950273ce80604a3f492ea9d071955a27",
+      "message": "[ota-hal] OTA-1659: \"the\" is not in the lexicon\n\nOwner, for the second time: \"the needs to be pronounced thuh in kokoro.\"\n\nHe reported this once before, and OTA-1146 answered it by rewriting every\nconsonant-position \"the\" to the literal string \"thuh\" before the line reached\nthe engine. That fix is what he has been hearing since.\n\n\u26a0\u26a0\u26a0 NOBODY EVER MEASURED IT. espeak-ng is installable in this container, and it\nis the same phonemizer the app bundles per voice under <voice>/espeak-ng-data.\nOne command settles the whole question:\n\n    $ espeak-ng -v en-us -q --ipa \"The raider swings the rusted blade at the dog.\"\n      plain     \u2192  \u00f0\u0259 \u0279\u02c8e\u026ad\u025a sw\u02c8\u026a\u014bz \u00f0\u0259 \u0279\u02c8\u028cst\u1d7bd bl\u02c8e\u026ad \u00e6t \u00f0\u0259 d\u02c8\u0251\u02d0\u0261\n      OTA-1146  \u2192  \u03b8\u02c8\u028c \u0279\u02c8e\u026ad\u025a sw\u02c8\u026a\u014bz \u03b8\u02c8\u028c \u0279\u02c8\u028cst\u1d7bd bl\u02c8e\u026ad \u00e6t \u03b8\u02c8\u028c d\u02c8\u0251\u02d0\u0261\n\n\u26a0 THE ENGINE WAS ALREADY SAYING \"thuh\". /\u00f0\u0259/ IS \"thuh\" \u2014 the exact sound he\nasked for, three times in that sentence, before anyone touched anything. The\nrespelling replaced it with \u03b8\u02c8\u028c: the voiceless th of THUMB instead of the voiced\nth of THIS, the STRUT vowel instead of a schwa, and STRESSED, because espeak\nstresses a monosyllable it has to sound out. An unstressed article became a hard\nbeat in front of every noun in the game. He was not still hearing the old\nproblem \u2014 he was hearing the fix.\n\n\u26a0\u26a0 THE ESCAPE HATCH OTA-1146 WROTE COULD NEVER HAVE WORKED. It said that if the\nvoicing came back wrong the alternates to try, in order, were \"thuh\" \u2192 \"thu\" \u2192\n\"tha\". Measured, all three are voiceless and all three are stressed; the ladder\nonly ever changed the vowel, and the vowel was not the defect:\n\n    thuh \u2192 \u03b8\u02c8\u028c      thu \u2192 \u03b8\u02c8\u025c\u02d0      tha \u2192 \u03b8\u02c8\u0251\u02d0      dhuh \u2192 d\u02c8i\u02d0h\u02c8\u028c (\"dee-huh\")\n\n\u26a0\u26a0\u26a0 AND NO RESPELLING COULD HAVE WORKED, WHICH IS THE REAL FINDING. espeak gives\nword-initial `th` its voiceless reading for every word it does not know; voiced\n/\u00f0/ at the head of a word survives only in the closed set of function words in\nits dictionary. So there is exactly one string that phonemizes to /\u00f0\u0259/ on this\nengine, and it is \"the\" \u2014 entry `Found: 'the' [D@2]`, schwa at stress level 2,\nwith the vowel/consonant switch applied by espeak itself, identical on en-us,\nen-gb and en-gb-x-rp. The two hand-maintained exception lists OTA-1146 built for\nhour/honest/heir and use/unit/one were reimplementing, in JavaScript, a rule\nalready present in C and already correct.\n\nTHE RULE THIS LEAVES, pinned: this file respells words the phonemizer does NOT\nknow. Overriding a word it does know is how you create a mispronunciation, not\nhow you fix one. Before adding an entry, run the word through espeak.\n\n\u26a0 THE SAME MEASUREMENT CONDEMNED THREE MORE ENTRIES, so I ran every one:\n\n  \u00b7 doesn't \u2192 duzzent    INERT. The entry claimed espeak said \"DOSE-ent\". Both\n                         spellings are d\u02c8\u028cz\u0259nt; it never did. Removed.\n  \u00b7 Zharak  \u2192 zah rak    DESTRUCTIVE. The worksheet's own key says zh \u2248 the s in\n                         \"treasure\" \u2014 and the respelling dropped the h, so the\n                         RAW word was closer than the fix. Zharak \u2192 \u0292\u02c8\u00e6\u0279\u00e6k;\n                         \"zah rak\" \u2192 z\u02c8\u0251\u02d0 \u0279\u02c8\u00e6k, a plain Z. Now \"zhah rak\" \u2192\n                         \u0292\u02c8\u0251\u02d0 \u0279\u02c8\u00e6k: the owner's vowel AND the zh.\n  \u00b7 Tartaria family      A SYLLABLE SHORT OF THE GAME'S OWN NAME. espeak reads\n                         `eeu` as the glide /ju\u02d0/, so \"tar taireeuh\" said \"tar\n                         TERR-yoo\" and the plural picked up a parasitic t\n                         (t\u02c8\u025b\u0279ju\u02d0nts). Respelled -ea / -ean / -eans \u2192 t\u02c8\u025b\u0279i\u0259 /\n                         t\u02c8\u025b\u0279i\u0259n / t\u02c8\u025b\u0279i\u0259nz.\n\n\u26a0\u26a0\u26a0 AND THE IPA-OVERRIDE MAP WAS A LOADED GUN BEHIND A BOOLEAN. It held Unicode\nIPA, which is NOT what espeak reads between double brackets \u2014 it reads its own\nASCII mnemonics:\n\n    [[\u00f0\u0259]] blade  \u2192  \"bl\u02c8e\u026ad\"       \u26a0 THE WORD IS SIMPLY GONE. Silently.\n    [[D@]] blade  \u2192  \"\u00f0\u0259 bl\u02c8e\u026ad\"    \u2713\n\nSo the failure mode of flipping IPA_OVERRIDES_ENABLED was never \"Kokoro reads\nthe brackets out loud\" \u2014 the old comment's own stated worst case \u2014 it was every\nTartaria, Drakova and Aether in the game going SILENT with no error anywhere.\nRewritten in mnemonics, each measured. The flag stays OFF: measuring espeak is\nnot the same as measuring the device, and that is exactly the distinction this\nOTA exists to enforce.\n\n\u26a0 OTA-1146'S SUITE IS DELETED, NOT REPOINTED, and that is the honest outcome:\nits entire premise was the rule that is gone. ota1659 replaces it and inverts\nthe reproduction \u2014 every shape 1146 rewrote is asserted to pass through\nuntouched, including the vowel-position cases, so the correctness that used to\nlive in two exception lists is now demonstrated to survive without them. Two\nother suites pinned the old behaviour and were repointed with the history kept\nbeside them (ota1147's article line, loreLexicon's Reclaimers' apostrophe test \u2014\nwhich has now been retargeted twice for a claim, about apostrophes, that never\nchanged).\n\nGates: all 18 green by exit code. Full suite green.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T01:58:06Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1659-the-is-not-in-the-lexicon",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1659-the-is-not-in-the-lexicon",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T02:02:04.357945Z",
+          "dateCreated": "2026-09-04T02:01:03.781476Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155402294",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T02:02:04.608679Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1659-the-is-not-in-the-lexicon",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1659-the-is-not-in-the-lexicon",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1659-the-is-not-in-the-lexicon",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1659-the-is-not-in-the-lexicon)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "cfd839fcef6b4eb4b4f4c84a896891fb",
+  "previousEventID": "cab74d2f5c1140f4bd762ae6661fb2b7"
+}

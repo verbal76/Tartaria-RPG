@@ -1,0 +1,273 @@
+{
+  "id": "ba7393604045450598e6dbb00fbdb81b",
+  "groupID": "7711143892",
+  "eventID": "ba7393604045450598e6dbb00fbdb81b",
+  "projectID": "4511945117532160",
+  "size": 18036,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-04-1664-no-phantom-syllable #mtmha35hxvzg [inline 9/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1664-no-phantom-syllable",
+  "message": "player-log 2026-09-04-1664-no-phantom-syllable #mtmha35hxvzg [inline 9/28]",
+  "title": "player-log 2026-09-04-1664-no-phantom-syllable #mtmha35hxvzg [inline 9/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "488faa54deec4c3ba82e08a6e9ae84cf",
+      "span_id": "969b9d9218324799",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "s is Crucible stock: 2\u00d7 Salvager's Tether Loop, 2\u00d7 Stiffened Leather Offcut. Say the word and I'll set it aside instead.\"\n[2026-09-03T21:36:11.516Z] [arbiter] The Arbiter nods. \"Patched in: 2\u00d7 Salvager's Tether Loop \u2192 Patched Cloth, 2\u00d7 Stiffened Leather Offcut \u2192 Patched Cloth.\"\n",
+      "[2026-09-03T21:36:11.530Z] [world] You repair the Mud-Warden's Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n[2026-09-03T21:36:11.569Z] [arbiter] The Arbiter stops with his hand over your pack. \"Before I touch the Reclaimer's Salvage Vest \u2014 1 piece of this is Crucible stock: Coiled Snare Thread. Say the word and I'll set it aside instead.\"\n",
+      "[2026-09-03T21:36:12.438Z] [arbiter] The Arbiter nods. \"Patched in: Coiled Snare Thread \u2192 Patched Cloth, 3\u00d7 Spider Silk \u2192 Patched Cloth.\"\n[2026-09-03T21:36:12.456Z] [world] You repair the Reclaimer's Salvage Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n[2026-09-03T21:36:12.506Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Spider Silk \u2192 Patched Cloth.\"\n",
+      "[2026-09-03T21:36:12.518Z] [world] You repair the Reclaimer's Salvage Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n[2026-09-03T21:36:12.558Z] [arbiter] The Arbiter nods. \"Patched in: Spider Silk \u2192 Patched Cloth, 3\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n[2026-09-03T21:36:12.570Z] [world] You repair the Reclaimer's Salvage Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n",
+      "[2026-09-03T21:36:17.539Z] [player] craft Forager's Stew\n[2026-09-03T21:36:17.540Z] [debug] parser: intent=craft conf=1.00 verb=craft target=forager stew resolved=- range=- enemies=0 hooks=2\n[2026-09-03T21:36:17.549Z] [reward] \u2726 Crafted Forager's Stew. The Arbiter watches you set the last piece.\n[2026-09-03T21:36:17.550Z] [debug] arbiter: template (reason=intent-not-allowed:craft)\n",
+      "[2026-09-03T21:36:17.550Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T21:36:17.641Z] [cognitive] neutral  (90ms)\n[2026-09-03T21:36:25.737Z] [player] craft Poison Vial\n[2026-09-03T21:36:25.738Z] [debug] parser: intent=craft conf=1.00 verb=craft target=poison vial resolved=- range=- enemies=0 hooks=2\n",
+      "[2026-09-03T21:36:25.739Z] [reward] \u2726 Crafted Poison Vial. The Arbiter watches you set the last piece.\n[2026-09-03T21:36:25.740Z] [debug] arbiter: template (reason=intent-not-allowed:craft)\n[2026-09-03T21:36:25.740Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T21:36:25.836Z] [cognitive] USE_ITEM  (94ms)\n[2026-09-03T21:36:27.610Z] [player] craft Searing Paste\n",
+      "[2026-09-03T21:36:27.610Z] [debug] parser: intent=craft conf=1.00 verb=craft target=searing paste resolved=Searing Paste range=- enemies=0 hooks=2\n[2026-09-03T21:36:27.613Z] [reward] \u2726 Crafted Searing Paste. The Arbiter watches you set the last piece.\n[2026-09-03T21:36:27.755Z] [cognitive] neutral  (140ms)\n[2026-09-03T21:36:37.139Z] [player] craft Acid Flask\n",
+      "[2026-09-03T21:36:37.140Z] [debug] parser: intent=craft conf=1.00 verb=craft target=acid flask resolved=Acid Flask range=- enemies=0 hooks=2\n[2026-09-03T21:36:37.466Z] [reward] \u2726 Crafted Acid Flask \u00d710. The Arbiter watches you set the last piece.\n[2026-09-03T21:36:37.539Z] [cognitive] neutral  (71ms)\n[2026-09-03T21:36:40.667Z] [player] craft Incendiary Paste\n",
+      "[2026-09-03T21:36:40.668Z] [debug] parser: intent=craft conf=1.00 verb=craft target=incendiary paste resolved=Incendiary Paste range=- enemies=0 hooks=2\n[2026-09-03T21:36:40.919Z] [reward] \u2726 Crafted Incendiary Paste \u00d78. The Arbiter watches you set the last piece.\n[2026-09-03T21:36:41.005Z] [cognitive] neutral  (84ms)\n",
+      "[2026-09-03T21:36:41.123Z] [debug] persist sizes(KB): total=330 player=84 wm=156[rooms=85 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=85 scene=4\n[2026-09-03T21:36:48.437Z] [debug] homework: intro-fill armed after 6000ms idle (strike 2/3)\n[2026-09-03T21:36:55.955Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 7510ms read 6876ms/write 595ms in 727t\u2192out 17t 9.5ms/t (73ch)\n",
+      "[2026-09-03T21:36:55.971Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 7510ms \u2014 intro-fill:\u2205\n[2026-09-03T21:36:55.972Z] [debug] homework: scene_intro \"Mud Flood Nexus\" \u2205 7537ms\n[2026-09-03T21:37:19.866Z] [debug] appstate: active \u2192 background (was active for 316280ms)\n[2026-09-03T21:41:00.546Z] [debug] appstate: background \u2192 active (was background for 220674ms)\n",
+      "[2026-09-03T21:41:00.580Z] [debug] homework: intro-fill armed after 6000ms idle (strike 3/3)\n[2026-09-03T21:41:02.585Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 1844ms read 0ms/write 1757ms in 727t\u2192out 34t HIT-CAP (154ch)\n[2026-09-03T21:41:02.589Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 1844ms \u2014 intro-fill:\u2205\n",
+      "[2026-09-03T21:41:02.589Z] [debug] homework: scene_intro \"Mud Flood Nexus\" \u2205 2010ms\n[2026-09-03T21:41:10.059Z] [player] craft Rustbane Charm\n[2026-09-03T21:41:10.064Z] [debug] parser: intent=craft conf=1.00 verb=craft target=rustbane charm resolved=- range=- enemies=0 hooks=2\n",
+      "[2026-09-03T21:41:10.071Z] [arbiter] \"Crafting Rustbane Charm would strip Smooth Stone \u2192 Small Rock from your pack \u2014 confirm in the prompt to proceed, or it stays unmade.\"\n[2026-09-03T21:41:10.155Z] [cognitive] USE_ITEM  (80ms)\n[2026-09-03T21:41:12.373Z] [player] craft Rustbane Charm\n",
+      "[2026-09-03T21:41:12.374Z] [debug] parser: intent=craft conf=1.00 verb=craft target=rustbane charm resolved=- range=- enemies=0 hooks=2\n[2026-09-03T21:41:12.382Z] [arbiter] The Arbiter nods. \"Stripped for parts: Smooth Stone \u2192 Small Rock.\"\n[2026-09-03T21:41:12.388Z] [reward] \u2726 Crafted Rustbane Charm. The Arbiter watches you set the last piece.\n",
+      "[2026-09-03T21:41:12.530Z] [cognitive] USE_ITEM  (140ms)\n[2026-09-03T21:41:12.905Z] [debug] qwen\u23f1 ambient preempted 2778ms read 0ms/write 0ms in 363t\u2192out 0t (0ch)\n[2026-09-03T21:41:12.909Z] [debug] arbiter: ambient cut short 2837ms \u2014 yielded to the player\n[2026-09-03T21:41:12.910Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient after 2778ms \u2014 ambient:preempted\n",
+      "[2026-09-03T21:41:22.922Z] [player] craft Scribe's Signet\n[2026-09-03T21:41:22.923Z] [debug] parser: intent=craft conf=1.00 verb=craft target=scribe signet resolved=- range=- enemies=0 hooks=2\n[2026-09-03T21:41:22.962Z] [arbiter] \"Crafting Scribe's Signet would strip Cloth Scrap \u2192 Patched Cloth from your pack \u2014 confirm in the prompt to proceed, or it stays unmade.\"\n",
+      "[2026-09-03T21:41:23.015Z] [cognitive] neutral  (51ms)\n[2026-09-03T21:41:24.825Z] [player] craft Scribe's Signet\n[2026-09-03T21:41:24.825Z] [debug] parser: intent=craft conf=1.00 verb=craft target=scribe signet resolved=- range=- enemies=0 hooks=2\n[2026-09-03T21:41:24.863Z] [arbiter] The Arbiter nods. \"Stripped for parts: Cloth Scrap \u2192 Patched Cloth.\"\n",
+      "[2026-09-03T21:41:24.876Z] [reward] \u2726 Crafted Scribe's Signet. The Arbiter watches you set the last piece.\n[2026-09-03T21:41:24.970Z] [cognitive] neutral  (92ms)\n[2026-09-03T21:41:31.418Z] [player] craft Tin Ward Ring\n[2026-09-03T21:41:31.418Z] [debug] parser: intent=craft conf=1.00 verb=craft target=tin ward ring resolved=cold spring range=- enemies=0 hooks=2\n",
+      "[2026-09-03T21:41:31.421Z] [reward] \u2726 Crafted Tin Ward Ring. The Arbiter watches you set the last piece.\n[2026-09-03T21:41:31.422Z] [debug] arbiter: template (reason=intent-not-allowed:craft)\n[2026-09-03T21:41:31.422Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T21:41:31.521Z] [cognitive] neutral  (98ms)\n[2026-09-03T21:41:36.493Z] [player] craft Tin Ward Ring\n",
+      "[2026-09-03T21:41:36.494Z] [debug] parser: intent=craft conf=1.00 verb=craft target=tin ward ring resolved=Tin Ward Ring range=- enemies=0 hooks=2\n[2026-09-03T21:41:36.503Z] [reward] \u2726 Crafted Tin Ward Ring. The Arbiter watches you set the last piece.\n[2026-09-03T21:41:36.504Z] [debug] arbiter: template (reason=intent-not-allowed:craft)\n",
+      "[2026-09-03T21:41:36.505Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T21:41:36.633Z] [cognitive] neutral  (127ms)\n[2026-09-03T21:41:42.726Z] [player] craft Tartarian Oath-Band\n[2026-09-03T21:41:42.727Z] [debug] parser: intent=craft conf=1.00 verb=craft target=tartarian oath band resolved=- range=- enemies=0 hooks=2\n",
+      "[2026-09-03T21:41:42.729Z] [reward] \u2726 Crafted Tartarian Oath-Band. The Arbiter watches you set the last piece.\n[2026-09-03T21:41:42.730Z] [debug] arbiter: template (reason=intent-not-allowed:craft)\n[2026-09-03T21:41:42.730Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T21:41:42.849Z] [cognitive] SEARCH \u00b7 TRAVEL \u00b7 USE_ITEM  (118ms)\n",
+      "[2026-09-03T21:41:47.787Z] [debug] persist sizes(KB): total=331 player=85 wm=156[rooms=85 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=85 scene=4\n[2026-09-03T21:41:49.881Z] [debug] ui: tap \"inventory\"\n",
+      "[2026-09-03T21:42:00.910Z] [debug] qwen\u23f1 item_synthesis_hw ok 5316ms read/write unusable (native mis-reported 49165ms/1562ms \u2014 llama.rn split bug, not this call) in 327t\u2192out 40t (162ch)\n[2026-09-03T21:42:00.915Z] [debug] qwen\u23f1 \u2702 DISCARDED item_synthesis_hw after 5316ms \u2014 item_synth:rejected-by-clamp bad-kind=\"weapon_coating\"\n",
+      "[2026-09-03T21:42:00.916Z] [debug] homework: item_desc \"Acid Flask\" \u2205 5335ms\n[2026-09-03T21:42:26.927Z] [debug] qwen\u23f1 item_synthesis_hw ok 1278ms read 342ms/write 908ms in 325t\u2192out 25t 1.1ms/t (94ch)\n[2026-09-03T21:42:26.940Z] [debug] homework: item_desc \"Veil of Peace\" \u2713 1302ms\n",
+      "[2026-09-03T21:42:36.219Z] [debug] stats: STR17 DEX21 INT11 WIS17 CHA11 STE8 | gear: WIS+5,INT+1,STR+5,DEX+9,STE+2 | worn: main=Magnetic Axe off=Reclaimers Guild Shroud-Spun Slinger head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Amulet of the Silt Warden ring=Light-Finger Guild Band ring2=",
+      "Tin Ward Ring\n[2026-09-03T21:42:45.051Z] [debug] stats: STR17 DEX21 INT11 WIS17 CHA11 STE8 | gear: WIS+5,INT+1,STR+5,DEX+9,STE+2 | worn: main=Magnetic Axe off=Reclaimers Guild Shroud-Spun Slinger head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Amulet of the Silt Warden ring=Light-Finger Gui",
+      "ld Band ring2=Tin Ward Ring ring3=Tin Ward Ring\n[2026-09-03T21:42:56.315Z] [debug] stats: STR17 DEX21 INT13 WIS17 CHA11 STE8 | gear: WIS+5,INT+3,STR+5,DEX+9,STE+2 | worn: main=Magnetic Axe off=Reclaimers Guild Shroud-Spun Slinger head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Amulet of the",
+      " Silt Warden ring=Light-Finger Guild Band ring2=Tin Ward Ring ring3=Tin Ward Ring ring4=Scribe's Signet\n[2026-09-03T21:42:59.394Z] [debug] qwen\u23f1 item_synthesis_hw ok 2248ms read 642ms/write 1563ms in 333t\u2192out 39t 1.9ms/t (174ch)\n[2026-09-03T21:43:01.028Z] [debug] homework: item_desc \"Architect's Sight Enhancer\" \u2713 4797ms\n",
+      "[2026-09-03T21:43:02.493Z] [debug] stats: STR19 DEX19 INT13 WIS17 CHA11 STE8 | gear: WIS+5,INT+3,STR+7,DEX+7,STE+2 | worn: main=Magnetic Axe off=Reclaimers Guild Shroud-Spun Slinger head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Amulet of the Silt Warden ring=Tartarian Oath-Band ring2=Tin ",
+      "Ward Ring ring3=Tin Ward Ring ring4=Scribe's Signet\n[2026-09-03T21:45:01.572Z] [debug] appstate: active \u2192 background (was active for 241032ms)\n[2026-09-03T21:45:01.822Z] [debug] persist sizes(KB): total=332 player=85 wm=156[rooms=85 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=86 scene=4\n[2026-09-03T22:43:49.320Z] [debug] appstate: background \u2192 active (was background for 3527740ms)\n",
+      "[2026-09-03T22:43:58.068Z] [debug] ctx: RELEASED \u2014 live=0 (opened=1 released=1)\n[2026-09-03T22:43:58.377Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a0696f-45b5-71a1-95e5-82a6a9f4f506\n[2026-09-03T22:43:58.377Z] [debug] ota: Checking\u2026\n[2026-09-03T22:43:58.508Z] [debug] ota: Already up to date\n[2026-09-03T22:43:58.508Z] [debug] ota: boot check result = noUpdate\n",
+      "[2026-09-03T22:43:58.578Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-09-03T22:43:58.579Z] [debug] voice: bundled idle\n[2026-09-03T22:43:59.229Z] [debug] send-log: bundle #mtm1iz3wmdt1 attempt 2/5 delivered to Sentry\n[2026-09-03T23:07:19.129Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a0696f-45b5-71a1-95e5-82a6a9f4f506\n",
+      "[2026-09-03T23:07:19.130Z] [debug] ota: Checking\u2026\n[2026-09-03T23:07:19.193Z] [debug] ota: Already up to date\n[2026-09-03T23:07:19.193Z] [debug] ota: boot check result = noUpdate\n[2026-09-03T23:07:19.273Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-09-03T23:07:19.273Z] [debug] voice: bundled idle\n",
+      "[2026-09-03T23:07:19.603Z] [debug] send-log: bundle #mtm1iz3wmdt1 attempt 3/5 delivered to Sentry\n[2026-09-03T23:48:29.066Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a0696f-45b5-71a1-95e5-82a6a9f4f506\n[2026-09-03T23:48:29.067Z] [debug] ota: Checking\u2026\n[2026-09-03T23:48:30.196Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n",
+      "[2026-09-03T23:48:30.265Z] [debug] ota: Saving progress\u2026\n[2026-09-03T23:48:30.266Z] [debug] ota: Restarting to apply\u2026\n[2026-09-03T23:48:30.459Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a069a9-5aae-79eb-8570-56ecdbb80207\n[2026-09-03T23:48:30.459Z] [debug] ota: Checking\u2026\n[2026-09-03T23:48:30.547Z] [debug] ota: Already up to date\n",
+      "[2026-09-03T23:48:30.548Z] [debug] ota: boot check result = noUpdate\n[2026-09-03T23:48:30.613Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-09-03T23:48:30.613Z] [debug] voice: bundled idle\n[2026-09-03T23:48:31.111Z] [debug] send-log: bundle #mtm1iz3wmdt1 attempt 4/5 delivered to Sentry\n",
+      "[2026-09-03T23:48:34.649Z] [debug] OTA applied: 2026-09-03-1653-the-wear-ward \u2192 2026-09-03-1655-the-card-is-asked.\n[2026-09-03T23:48:34.649Z] [debug] OTA session start: 2026-09-03-1655-the-card-is-asked.\n[2026-09-03T23:48:34.649Z] [world] You step back into Mud Flood Nexus. The world waits for your move.\n",
+      "[2026-09-03T23:48:34.649Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. \"Welcome back, Cheddar Bob. The road kept your place.\"\n[2026-09-03T23:48:35.019Z] [debug] \u2550\u2550\u2550 SESSION 2026-09-03T23:48:35.015Z \u00b7 build 2026-09-03-1655-the-card-is-asked \u00b7 updated from 2026-09-03-1653-the-wear-ward \u00b7 previous entry moments earlier \u2550\u2550\u2550\n",
+      "[2026-09-03T23:48:35.020Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n[2026-09-03T23:48:35.020Z] [debug] missions: hunt:hunt_bog_dragon stage 4/7 [diplomacy] @monarch_waystation npc=\"Old Mira\" needs=The Boy's Locket\u2713 gives=Eshren's Name-Token\n",
+      "[2026-09-03T23:48:35.020Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n[2026-09-03T23:48:35.020Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=T"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-04-1664-no-phantom-syllable #mtmha35hxvzg [inline 9/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtmha35hxvzg"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1664-no-phantom-syllable"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "9"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1664-no-phantom-syllable"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T04:52:56.449000Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T04:52:58.039000Z",
+  "fingerprints": [
+    "64dd8aba247618f8258f26ac076e31e3"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1954595382,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-04T04:14:29.574155Z",
+    "dateReleased": "2026-09-04T04:16:01.629112Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "082d8b0c5221a969630765f5cbcadd7ec8b6793c",
+      "message": "[ota-hal] OTA-1664: no phantom syllable\n\nOwner, after I offered to \"re-tune\" two place names: \"there should be no a sound\nin front of either of those. the s and the n are the starting sound of each\nword. where are you getting an AY sound before that \u2014 to me it reads like you're\nmispronouncing the word, not a tone or inflection, but adding a syllable.\"\n\n\u26a0\u26a0\u26a0 HE IS RIGHT, AND MY FRAMING WAS THE PROBLEM. I reported this as a vowel\nquality issue \u2014 \"eh\" coming out as \"AY\" \u2014 which invited a better spelling of the\nsame wrong thing. It is not a vowel problem. The leading token should not be\nthere at all. Samarran is three syllables and opens on S. Nimari is three and\nopens on N. Both have been saying four since OTA-104.\n\n\u26a0 THE CAUSE IS A MISREAD OF THE PLAYTESTER'S IPA. OTA-104 was handed\n/\u025bs\u025bm\u0254\u02d0\u027e\u025bn/ and /\u025bn\u025bm\u0251\u0279i/, saw the leading \u025b, and promoted it to its own\nspace-separated token \u2014 which this file's own header says espeak treats as a\nseparate WORD. Then it recorded the mistake as a finding: \"all three open with a\nleading /\u025b/ schwa that the prior respellings dropped. Samarran and Nimari are\n4-syllable words, not 3.\" Both sentences are false, and the second is exactly\nthe sort of confident note that stops the next reader from checking. It stopped\nme twice tonight \u2014 I read that comment during the OTA-1659 audit and moved on.\n\nMeasured (`espeak-ng -v en-us -q --ipa`), these were not shades off. They were\ndifferent words:\n\n    eh sem or en    \u2192 \u02c8e\u026a s\u02c8\u025bm \u0254\u02d0\u0279 \u02c8\u025bn    \"AY-SEM-OR-EN\"   (4 beats, 4 stresses)\n    Samarran        \u2192 s\u02c8\u00e6m\u00e6\u0279\u0259n            \"SAM-a-run\"      \u2713\n    eh neh mah ree  \u2192 \u02c8e\u026a n\u02c8e\u026a m\u02c8\u0251\u02d0 \u0279\u02c8i\u02d0  \"AY-NAY-MAH-REE\" (\"neh\" also says NAY)\n    Nimari          \u2192 n\u02c8\u026am\u025a\u0279i             \"NIM-uh-ree\"     \u2713\n\n\u26a0\u26a0 SO THE FIX IS REMOVAL, NOT A RE-TUNE. That is the third time in six OTAs that\nthe right answer here was to delete an entry rather than re-spell it \u2014 \"the\" and\n\"doesn't\" went the same way in OTA-1659, for the same reason: an override was\nadded to correct a word the phonemizer already read properly, and the override\nwas the mispronunciation.\n\n\u26a0 ASGARDAR STAYS, and the distinction matters. A-s-gardar genuinely opens on a\nvowel, so its \"ez\" is the first syllable of the word rather than a beat welded\nin front of it. Same syllable count as the raw word, different vowel \u2014 which is\nwhat he asked for at OTA-104. He complained about two names, not three, and he\nwas precise about which.\n\n\u26a0\u26a0 AND THE SUITE NOW GUARDS THE CLASS, NOT THE INSTANCE. The defect is not \"eh\"\n\u2014 it is a respelling that changes how many beats a word has. ota1664 checks the\nchunk count of every surviving entry against the count verified here, so the\nnext entry that adds or drops a syllable fails a test instead of shipping and\nwaiting for someone to notice it in a sentence.\n\nGates: all 18 green by exit code. Full suite green.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T04:12:09Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1664-no-phantom-syllable",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1664-no-phantom-syllable",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T04:16:01.629112Z",
+          "dateCreated": "2026-09-04T04:14:29.574155Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155428664",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T04:16:01.857063Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1664-no-phantom-syllable",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1664-no-phantom-syllable",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1664-no-phantom-syllable",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1664-no-phantom-syllable)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "bb98a6b2c3024f97ac4723c8341dafae",
+  "previousEventID": "b0596c5a2bfd4695bbb92a6397e75084"
+}

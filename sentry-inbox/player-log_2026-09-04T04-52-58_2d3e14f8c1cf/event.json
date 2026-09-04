@@ -1,0 +1,274 @@
+{
+  "id": "2d3e14f8c1cf4b67a2b5509feb691a3c",
+  "groupID": "7711143892",
+  "eventID": "2d3e14f8c1cf4b67a2b5509feb691a3c",
+  "projectID": "4511945117532160",
+  "size": 18041,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-04-1664-no-phantom-syllable #mtmha35hxvzg [inline 3/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1664-no-phantom-syllable",
+  "message": "player-log 2026-09-04-1664-no-phantom-syllable #mtmha35hxvzg [inline 3/28]",
+  "title": "player-log 2026-09-04-1664-no-phantom-syllable #mtmha35hxvzg [inline 3/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "488faa54deec4c3ba82e08a6e9ae84cf",
+      "span_id": "969b9d9218324799",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "of the corruption \u2014 the Reclaimers Guild Shroud-Spun Slinger has run its course.\n[2026-09-03T20:48:11.785Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 17 + ATK 5 = 22 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n[2026-09-03T20:48:11.786Z] [combat] Dodge \u2014 d20 \u2192 19 + DEX 21 = 40 vs ATK 22. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n",
+      "[2026-09-03T20:48:11.786Z] [debug] arbiter: template (reason=combat)\n[2026-09-03T20:48:11.786Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T20:48:11.787Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T20:48:12.156Z] [cognitive] neutral  (368ms)\n[2026-09-03T20:48:13.426Z] [debug] ui: tap \"\u2623 shroud-spun slinger \u2692\"\n",
+      "[2026-09-03T20:48:13.494Z] [player] attack with the off-hand reclaimers guild shroud-spun slinger\n[2026-09-03T20:48:13.494Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand reclaimers guild shroud spun slinger resolved=Reclaimers Guild Shroud-Spun Slinger range=close enemies=1 hooks=1\n",
+      "[2026-09-03T20:48:13.496Z] [debug] attack: target=Mud-Wracked Aetherkin range=close reach.bands=[distant,far,mid,close] reach.label=Reclaimers Guild Shroud-Spun Slinger bareHand=false\n[2026-09-03T20:48:13.497Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-09-03T20:48:13.574Z] [world] Your corrupted reclaimers guild shroud-spun slinger comes around in an arc; Mud-Wracked Aetherkin squares up to meet it.\n[2026-09-03T20:48:13.574Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T20:48:13.926Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 USE_ITEM  (351ms)\n[2026-09-03T20:48:21.133Z] [world] You seize the initiative. Mud-Wracked Aetherkin has no time to react.\n",
+      "[2026-09-03T20:48:21.134Z] [combat] You \u2014 d20 \u2192 16 + DEX 21 + 2 (point blank) perfect opening (2\u00d7 dice) = 39 vs Mud-Wracked Aetherkin AC 14 \u2014 \u2713 HIT\n[2026-09-03T20:48:21.134Z] [combat] The Corrupted coating fails to take on Mud-Wracked Aetherkin.\n[2026-09-03T20:48:21.134Z] [combat] Mud-Wracked Aetherkin shrugs off the bludgeoning. (resisted, \u00d70.5 for 8)\n",
+      "[2026-09-03T20:48:21.135Z] [combat] The bludgeoning has worn Mud-Wracked Aetherkin's guard through \u2014 it bites full from here.\n[2026-09-03T20:48:21.136Z] [combat] Your strike with the corrupted reclaimers guild shroud-spun slinger lands for 8. Mud-Wracked Aetherkin staggers \u2014 74 HP remaining. It answers.\n",
+      "[2026-09-03T20:48:21.138Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 9 + ATK 5 = 14 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-03T20:48:33.426Z] [debug] ui: tap \"magnetic axe \u26a1\"\n[2026-09-03T20:48:33.468Z] [player] attack with the magnetic axe\n",
+      "[2026-09-03T20:48:33.469Z] [debug] parser: intent=attack conf=1.00 verb=attack target=magnetic axe resolved=Magnetic Axe range=close enemies=1 hooks=1\n[2026-09-03T20:48:33.470Z] [debug] attack: target=Mud-Wracked Aetherkin range=close reach.bands=[close] reach.label=Magnetic Axe bareHand=false\n",
+      "[2026-09-03T20:48:33.551Z] [world] Your magnetic axe comes around in an arc; Mud-Wracked Aetherkin squares up to meet it.\n[2026-09-03T20:48:33.552Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T20:48:33.895Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 THROW \u00b7 DISENGAGE  (342ms)\n[2026-09-03T20:48:39.209Z] [world] Mud-Wracked Aetherkin moves first. The pressure is immediate.\n",
+      "[2026-09-03T20:48:39.212Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 18 + ATK 5 = 23 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-09-03T20:48:39.213Z] [combat] You \u2014 d20 \u2192 4 + STR 17 = 21 vs Mud-Wracked Aetherkin AC 14 \u2014 \u2713 HIT\n[2026-09-03T20:48:39.215Z] [combat] Electrical flares \u2014 +4 on hit.\n",
+      "[2026-09-03T20:48:39.216Z] [combat] Clean hit with the magnetic axe for 8. Mud-Wracked Aetherkin has 66 left and does not back away.\n[2026-09-03T20:48:39.217Z] [combat] Mud-Wracked Aetherkin is left exposed \u2014 easier to hit.\n",
+      "[2026-09-03T20:48:39.624Z] [combat] Mud-Wracked Aetherkin deals 6 aetheric damage [armor \u221234%, title \u00bd, floor 30%] +3 corruption [Mud-glass Scales took it]. You have 30 HP remaining.\n[2026-09-03T20:48:46.047Z] [debug] ui: tap \"golem (28/68)\"\n[2026-09-03T20:48:46.060Z] [player] use golem\n[2026-09-03T20:48:46.060Z] [combat] Ashwright attacks Mud-Wracked Aetherkin \u2014 d20 15 + 3 = 18 vs AC 11 \u2014 \u2713 HIT\n",
+      "[2026-09-03T20:48:46.061Z] [combat] Ashwright swings the Crude Golem Greatsword \u2014 4 slashing damage on Mud-Wracked Aetherkin. (62 HP left)\n[2026-09-03T20:48:46.061Z] [combat] Mud-Wracked Aetherkin swings at Ashwright and misses.\n[2026-09-03T20:48:46.077Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 6 + ATK 5 = 11 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-03T20:48:46.514Z] [debug] persist sizes(KB): total=329 player=83 wm=154[rooms=84 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=87 scene=5\n[2026-09-03T20:48:49.033Z] [debug] ui: tap \"golem (28/68)\"\n[2026-09-03T20:48:49.042Z] [player] use golem\n[2026-09-03T20:48:49.043Z] [combat] Ashwright attacks Mud-Wracked Aetherkin \u2014 d20 5 + 3 = 8 vs AC 11 \u2014 \u2717 MISS\n",
+      "[2026-09-03T20:48:49.043Z] [world] Ashwright's strike sails wide of Mud-Wracked Aetherkin.\n[2026-09-03T20:48:49.044Z] [combat] Mud-Wracked Aetherkin retaliates \u2014 d20 15 + 6 hits Ashwright for 8 (35% resisted). (20/68)\n[2026-09-03T20:48:49.061Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 5 + ATK 5 = 10 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-03T20:51:53.542Z] [debug] ui: tap \"inventory\"\n[2026-09-03T20:52:07.272Z] [world] You use 3\u00d7 Trail Rations. +18 HP (48/49), +1 stamina.\n[2026-09-03T20:52:10.933Z] [debug] persist sizes(KB): total=329 player=83 wm=154[rooms=84 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=87 scene=5\n[2026-09-03T20:52:11.420Z] [debug] ui: tap \"inventory\"\n",
+      "[2026-09-03T20:52:24.966Z] [player] arm golem with Crude Golem Greatsword\n[2026-09-03T20:52:24.966Z] [player] arm golem with Crude Golem Greatsword\n[2026-09-03T20:52:24.967Z] [world] Ashwright takes up the Crude Golem Greatsword. It settles into the construct's grip like it was cast for it.\n[2026-09-03T20:52:33.896Z] [debug] ui: tap \"golem (20/68)\"\n[2026-09-03T20:52:33.908Z] [player] use golem\n",
+      "[2026-09-03T20:52:33.909Z] [combat] Ashwright attacks Mud-Wracked Aetherkin \u2014 d20 13 + 3 = 16 vs AC 11 \u2014 \u2713 HIT\n[2026-09-03T20:52:33.910Z] [combat] Ashwright swings the Crude Golem Greatsword \u2014 8 slashing damage on Mud-Wracked Aetherkin. (54 HP left)\n[2026-09-03T20:52:33.911Z] [combat] Mud-Wracked Aetherkin retaliates \u2014 d20 12 + 6 hits Ashwright for 7 (35% resisted). (13/68)\n",
+      "[2026-09-03T20:52:33.933Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 6 + ATK 5 = 11 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-03T20:52:41.226Z] [debug] ui: tap \"golem (13/68)\"\n[2026-09-03T20:52:41.241Z] [player] use golem\n[2026-09-03T20:52:41.241Z] [combat] Ashwright attacks Mud-Wracked Aetherkin \u2014 d20 1 + 3 = 4 vs AC 11 \u2014 \u2717 MISS\n",
+      "[2026-09-03T20:52:41.242Z] [world] Ashwright's strike sails wide of Mud-Wracked Aetherkin.\n[2026-09-03T20:52:41.242Z] [combat] Mud-Wracked Aetherkin swings at Ashwright and misses.\n[2026-09-03T20:52:41.258Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 11 + ATK 5 = 16 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-03T20:52:42.686Z] [debug] ui: tap \"golem (13/68)\"\n",
+      "[2026-09-03T20:52:42.688Z] [player] use golem\n[2026-09-03T20:52:42.689Z] [combat] Ashwright attacks Mud-Wracked Aetherkin \u2014 d20 7 + 3 = 10 vs AC 11 \u2014 \u2717 MISS\n[2026-09-03T20:52:42.689Z] [world] Ashwright's strike sails wide of Mud-Wracked Aetherkin.\n[2026-09-03T20:52:42.689Z] [combat] Mud-Wracked Aetherkin retaliates \u2014 d20 10 + 6 hits Ashwright for 3 (35% resisted). (10/68)\n",
+      "[2026-09-03T20:52:42.698Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 3 + ATK 5 = 8 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-03T20:52:43.534Z] [debug] persist sizes(KB): total=329 player=83 wm=154[rooms=84 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=87 scene=5\n[2026-09-03T20:52:43.947Z] [debug] ui: tap \"golem (10/68)\"\n[2026-09-03T20:52:43.950Z] [player] use golem\n",
+      "[2026-09-03T20:52:43.951Z] [combat] Ashwright attacks Mud-Wracked Aetherkin \u2014 d20 9 + 3 = 12 vs AC 11 \u2014 \u2713 HIT\n[2026-09-03T20:52:43.951Z] [combat] Ashwright swings the Crude Golem Greatsword \u2014 4 slashing damage on Mud-Wracked Aetherkin. (50 HP left)\n[2026-09-03T20:52:43.951Z] [combat] Mud-Wracked Aetherkin retaliates \u2014 d20 13 + 6 hits Ashwright for 7 (35% resisted). (3/68)\n",
+      "[2026-09-03T20:52:43.963Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 5 + ATK 5 = 10 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-03T20:52:46.362Z] [debug] ui: tap \"inventory\"\n[2026-09-03T20:53:02.979Z] [world] You pack 3\u00d7 Aetheric Shard into Ashwright's frame. +51 HP (54/68).\n",
+      "[2026-09-03T20:53:08.100Z] [debug] \u26a0 FREEZE WATCH: LOGIC stalled while frames kept coming (js 2076ms \u00b7 frames 907ms). Something blocked the JS thread \u2014 look for a long synchronous run. \u00b7 crumb before: (no phase) ? \u2192 now: (no phase) ? \u00b7 doing: tap \"inventory\" \u00b7 native: idle\n[2026-09-03T20:53:08.251Z] [player] feed golem Aetheric Shard\n",
+      "[2026-09-03T20:53:08.251Z] [world] You work the Aetheric Shard into Ashwright's frame. It fuses into the Aetherstone and the cracks seal over. (+14 HP, 68/68)\n[2026-09-03T20:53:13.113Z] [debug] freeze watch: recovered \u2014 painting again after 907ms quiet.\n[2026-09-03T20:53:17.098Z] [debug] ui: tap \"golem (68/68)\"\n[2026-09-03T20:53:17.108Z] [player] use golem\n",
+      "[2026-09-03T20:53:17.108Z] [combat] Ashwright attacks Mud-Wracked Aetherkin \u2014 d20 12 + 3 = 15 vs AC 11 \u2014 \u2713 HIT\n[2026-09-03T20:53:17.109Z] [combat] Ashwright swings the Crude Golem Greatsword \u2014 5 slashing damage on Mud-Wracked Aetherkin. (45 HP left)\n[2026-09-03T20:53:17.110Z] [combat] Mud-Wracked Aetherkin retaliates \u2014 d20 14 + 6 hits Ashwright for 3 (35% resisted). (65/68)\n",
+      "[2026-09-03T20:53:17.132Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 1 + ATK 5 = 6 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 FUMBLE\n[2026-09-03T20:53:18.114Z] [debug] ui: tap \"golem (65/68)\"\n[2026-09-03T20:53:18.124Z] [player] use golem\n[2026-09-03T20:53:18.124Z] [combat] Ashwright attacks Mud-Wracked Aetherkin \u2014 d20 13 + 3 = 16 vs AC 11 \u2014 \u2713 HIT\n",
+      "[2026-09-03T20:53:18.125Z] [combat] Ashwright swings the Crude Golem Greatsword \u2014 6 slashing damage on Mud-Wracked Aetherkin. (39 HP left)\n[2026-09-03T20:53:18.126Z] [combat] Mud-Wracked Aetherkin retaliates \u2014 d20 17 + 6 hits Ashwright for 8 (35% resisted). (57/68)\n[2026-09-03T20:53:18.146Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 19 + ATK 5 = 24 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n",
+      "[2026-09-03T20:53:18.561Z] [combat] Mud-Wracked Aetherkin deals 6 aetheric damage [armor \u221234%, title \u00bd, floor 30%] +1 corruption [Litany Greaves took it, corruption-resistant, halved]. You have 42 HP remaining.\n[2026-09-03T20:53:19.314Z] [debug] persist sizes(KB): total=328 player=83 wm=154[rooms=84 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=87 scene=5\n",
+      "[2026-09-03T20:53:20.022Z] [debug] ui: tap \"golem (57/68)\"\n[2026-09-03T20:53:20.024Z] [player] use golem\n[2026-09-03T20:53:20.024Z] [combat] Ashwright attacks Mud-Wracked Aetherkin \u2014 d20 9 + 3 = 12 vs AC 11 \u2014 \u2713 HIT\n[2026-09-03T20:53:20.024Z] [combat] Ashwright swings the Crude Golem Greatsword \u2014 6 slashing damage on Mud-Wracked Aetherkin. (33 HP left)\n",
+      "[2026-09-03T20:53:20.024Z] [combat] Mud-Wracked Aetherkin swings at Ashwright and misses.\n[2026-09-03T20:53:20.026Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 18 + ATK 5 = 23 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n",
+      "[2026-09-03T20:53:20.420Z] [combat] Mud-Wracked Aetherkin deals 7 aetheric damage [armor \u221234%, title \u00bd, floor 30%] +1 corruption [Litany Greaves took it, corruption-resistant, halved]. You have 35 HP remaining.\n[2026-09-03T20:53:21.205Z] [debug] ui: tap \"golem (57/68)\"\n[2026-09-03T20:53:21.207Z] [player] use golem\n",
+      "[2026-09-03T20:53:21.207Z] [combat] Ashwright attacks Mud-Wracked Aetherkin \u2014 d20 1 + 3 = 4 vs AC 11 \u2014 \u2717 MISS\n[2026-09-03T20:53:21.207Z] [world] Ashwright's strike sails wide of Mud-Wracked Aetherkin.\n[2026-09-03T20:53:21.207Z] [combat] Mud-Wracked Aetherkin retaliates \u2014 d20 12 + 6 hits Ashwright for 6 (35% resisted). (51/68)\n",
+      "[2026-09-03T20:53:21.209Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 20 + ATK 5 = 25 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 CRITICAL HIT\n[2026-09-03T20:53:21.607Z] [combat] Mud-Wracked Aetherkin deals 4 aetheric damage [armor \u221234%, title \u00bd, floor 30%] +1 corruption [Reclaimer's Cloak took it]. You have 31 HP remaining.\n[2026-09-03T20:53:23.134Z] [debug] ui: tap \"dodge\"\n",
+      "[2026-09-03T20:53:23.153Z] [player] dodge\n[2026-09-03T20:53:23.154Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=1\n[2026-09-03T20:53:23.155Z] [world] You commit to the dodge. Slip Mud-Wracked Aetherkin's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-03T20:53:23.256Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 12 + ATK 5 = 17 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n[2026-09-03T20:53:23.257Z] [combat] Dodge \u2014 d20 \u2192 16 + DEX 21 = 37 vs ATK 17. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-03T20:53:23.257Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-09-03T20:53:23.257Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T20:53:23.258Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T20:53:23.625Z] [cognitive] neutral  (366ms)\n[2026-09-03T20:53:24.679Z] [debug] ui: tap \"\u2623 shroud-spun slinger \u2692\"\n[2026-09-03T20:53:24.720Z] [player] attack with the off-hand reclaimers guild shroud-spun slinger\n",
+      "[2026-09-03T20:53:24.720Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand reclaimers guild shroud spun slinger resolved=Reclaimers Guild Shroud-Spun Slinger range=close enemies=1 hooks=1\n[2026-09-03T20:53:24.721Z] [debug] attack: target=Mud-Wracked Aetherkin range=close reach.bands=[distant,far,mid,close] reach.label=Reclaimers Guild Shroud-Spun Slinger bareHand=false\n",
+      "[2026-09-03T20:53:24.723Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-03T20:53:24.800Z] [world] You commit forward with the corrupted reclaimers guild shroud-spun slinger. Mud-Wracked Aetherkin watches your hands.\n[2026-09-03T20:53:24.800Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T20:53:25.159Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 USE_ITEM  (358ms)\n",
+      "[2026-09-03T20:53:32.406Z] [world] You seize the initiative. Mud-Wracked Aetherkin has no time to react.\n[2026-09-03T20:53:32.406Z] [combat] You \u2014 d20 \u2192 12 + DEX 21 + 2 (point blank) perfect opening (2\u00d7 dice) = 35 vs Mud-Wracked Aetherkin AC 14 \u2014 \u2713 HIT\n[2026-09-03T20:53:32.407Z] [combat] The Corrupted coating fails to take on Mud-Wracked Aetherkin.\n",
+      "[2026-09-03T20:53:32.407Z] [combat] Bludgeoning flares \u2014 +3 on hit.\n[2026-09-03T20:53:32.408Z] [combat] Your strike with the corrupted reclaimers guild shroud-spun slinger lands for 16. Mud-Wracked Aetherkin staggers \u2014 17 HP remaining. It answers.\n[2026-09-03T20:53:32.408Z] [combat] Mud-Wracked Aetherkin is left exposed \u2014 easier to hit.\n",
+      "[2026-09-03T20:53:32.410Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 10 + ATK 5 = 15 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-03T2"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-04-1664-no-phantom-syllable #mtmha35hxvzg [inline 3/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtmha35hxvzg"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1664-no-phantom-syllable"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "3"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1664-no-phantom-syllable"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T04:52:56.398000Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T04:52:58.038000Z",
+  "fingerprints": [
+    "64dd8aba247618f8258f26ac076e31e3"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1954595382,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-04T04:14:29.574155Z",
+    "dateReleased": "2026-09-04T04:16:01.629112Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "082d8b0c5221a969630765f5cbcadd7ec8b6793c",
+      "message": "[ota-hal] OTA-1664: no phantom syllable\n\nOwner, after I offered to \"re-tune\" two place names: \"there should be no a sound\nin front of either of those. the s and the n are the starting sound of each\nword. where are you getting an AY sound before that \u2014 to me it reads like you're\nmispronouncing the word, not a tone or inflection, but adding a syllable.\"\n\n\u26a0\u26a0\u26a0 HE IS RIGHT, AND MY FRAMING WAS THE PROBLEM. I reported this as a vowel\nquality issue \u2014 \"eh\" coming out as \"AY\" \u2014 which invited a better spelling of the\nsame wrong thing. It is not a vowel problem. The leading token should not be\nthere at all. Samarran is three syllables and opens on S. Nimari is three and\nopens on N. Both have been saying four since OTA-104.\n\n\u26a0 THE CAUSE IS A MISREAD OF THE PLAYTESTER'S IPA. OTA-104 was handed\n/\u025bs\u025bm\u0254\u02d0\u027e\u025bn/ and /\u025bn\u025bm\u0251\u0279i/, saw the leading \u025b, and promoted it to its own\nspace-separated token \u2014 which this file's own header says espeak treats as a\nseparate WORD. Then it recorded the mistake as a finding: \"all three open with a\nleading /\u025b/ schwa that the prior respellings dropped. Samarran and Nimari are\n4-syllable words, not 3.\" Both sentences are false, and the second is exactly\nthe sort of confident note that stops the next reader from checking. It stopped\nme twice tonight \u2014 I read that comment during the OTA-1659 audit and moved on.\n\nMeasured (`espeak-ng -v en-us -q --ipa`), these were not shades off. They were\ndifferent words:\n\n    eh sem or en    \u2192 \u02c8e\u026a s\u02c8\u025bm \u0254\u02d0\u0279 \u02c8\u025bn    \"AY-SEM-OR-EN\"   (4 beats, 4 stresses)\n    Samarran        \u2192 s\u02c8\u00e6m\u00e6\u0279\u0259n            \"SAM-a-run\"      \u2713\n    eh neh mah ree  \u2192 \u02c8e\u026a n\u02c8e\u026a m\u02c8\u0251\u02d0 \u0279\u02c8i\u02d0  \"AY-NAY-MAH-REE\" (\"neh\" also says NAY)\n    Nimari          \u2192 n\u02c8\u026am\u025a\u0279i             \"NIM-uh-ree\"     \u2713\n\n\u26a0\u26a0 SO THE FIX IS REMOVAL, NOT A RE-TUNE. That is the third time in six OTAs that\nthe right answer here was to delete an entry rather than re-spell it \u2014 \"the\" and\n\"doesn't\" went the same way in OTA-1659, for the same reason: an override was\nadded to correct a word the phonemizer already read properly, and the override\nwas the mispronunciation.\n\n\u26a0 ASGARDAR STAYS, and the distinction matters. A-s-gardar genuinely opens on a\nvowel, so its \"ez\" is the first syllable of the word rather than a beat welded\nin front of it. Same syllable count as the raw word, different vowel \u2014 which is\nwhat he asked for at OTA-104. He complained about two names, not three, and he\nwas precise about which.\n\n\u26a0\u26a0 AND THE SUITE NOW GUARDS THE CLASS, NOT THE INSTANCE. The defect is not \"eh\"\n\u2014 it is a respelling that changes how many beats a word has. ota1664 checks the\nchunk count of every surviving entry against the count verified here, so the\nnext entry that adds or drops a syllable fails a test instead of shipping and\nwaiting for someone to notice it in a sentence.\n\nGates: all 18 green by exit code. Full suite green.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T04:12:09Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1664-no-phantom-syllable",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1664-no-phantom-syllable",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T04:16:01.629112Z",
+          "dateCreated": "2026-09-04T04:14:29.574155Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155428664",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T04:16:01.857063Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1664-no-phantom-syllable",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1664-no-phantom-syllable",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1664-no-phantom-syllable",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1664-no-phantom-syllable)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "3465bbaa6f52486b956f989030aa1c76",
+  "previousEventID": "27c06ac842124689b4217c01cc2b6cd9"
+}
