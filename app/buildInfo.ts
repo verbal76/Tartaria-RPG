@@ -27559,6 +27559,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // or "Crucible fodder" or nothing at all. The label and the bench's refusal
 // cannot disagree.
 export const OTA_BUILD_ID = '2026-09-04-1668-the-row-says-what-it-does';
+// golem catch-up 2026-09-04: markerless publish of OTA-1668 - the row says what
+// it is and what it does. The vendor's WORKINGS TO LEARN rows now carry a
+// headline (kind, damage glyph + dice + type, scaling stat) built at the source
+// in itemPreview rather than parsed back out of a stats string, and the loot
+// label finally states what a drop is for - "crafting ingredient" or "Crucible
+// fodder" or nothing - read from the same two predicates the Fusing Crucible
+// enforces, so the label and the bench's refusal cannot disagree. hal took the
+// marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-04-1667-the-key-goes-where-the-player-is';
 // golem catch-up 2026-09-04: markerless publish of OTA-1667 - the key goes where
 // the player is. The WEAPON GLYPHS card moved from Settings to the lore codex as
