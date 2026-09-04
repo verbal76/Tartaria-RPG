@@ -260,7 +260,11 @@ describe('OTA-1665 — ⚠⚠⚠ one report per changed log', () => {
     // second identical report through would queue a duplicate of something
     // already waiting — the exact outcome this rule exists to prevent.
     const src = module_();
-    const setMark = src.indexOf('AsyncStorage.setItem(BUG_REPORT_MARK_KEY');
+    // ⚠ OTA-1672 — the key is chosen per mode now (`markKeyForMode`), so this
+    // reads the write rather than the constant it used to name. The ORDERING is
+    // the claim and it is untouched: the mark lands before either return, so a
+    // queued send consumes it exactly as a landed one does.
+    const setMark = src.indexOf('AsyncStorage.setItem(markKey');
     const ret = src.indexOf("status: 'sent'", setMark);
     expect(setMark).toBeGreaterThan(-1);
     expect(ret).toBeGreaterThan(setMark);

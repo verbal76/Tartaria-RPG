@@ -1,8 +1,21 @@
-// OTA-063 — Bug-report modal for the TitleScreen. Lets the player
-// pick the character the bug happened on (or "General — no
-// character"), type a description, and submit. The actual send
-// (clipboard staging + mailto open) lives on the TitleScreen side
-// so this component stays presentation-only and easy to test.
+// OTA-063 — Bug-report modal, used by the TitleScreen and the in-game About
+// screen. Presentation only: it collects a choice and (for two of the three
+// modes) a description, and hands them to the caller. The send itself lives in
+// diagnostics/bugReport.
+//
+// ⚠⚠⚠ OTA-1672 — THREE MODES, AND THE TEXT GATE ONLY BINDS TWO OF THEM. Owner:
+// *"I can't hit send on a bug on my main character until I type something in
+// that box … there should still be a text box gate on the send button for
+// general bugs or character bugs, because I need to know what you're trying to
+// show me … but this new button that would just say send log doesn't need me to
+// type something in the box, cuz I'm legitimately just sending you a log."*
+//
+// So: a character bug and a general bug both still require a description, and
+// SEND FULL LOG FOR ANALYSIS is offered with no text box at all — not a disabled
+// one, which would still read as a field the player is failing to fill in.
+//
+// ⚠ The mailto this file's header used to describe is gone (OTA-1665). The body
+// copy that still described it went with it.
 import React, { useEffect, useState } from 'react';
 import {
   Modal,
@@ -17,20 +30,32 @@ import {
   Platform,
 } from 'react-native';
 import type { SlotSummary } from '../engine/saveSystem';
+import type { BugReportMode } from '../diagnostics/bugReport';
 
 interface Props {
   visible: boolean;
   slots: SlotSummary[];
+  /** ⚠ OTA-1672 — the character whose log a FULL LOG push should carry, when the
+   *  caller knows one (the in-game About screen does; the title screen does not).
+   *  Absent falls back to the most recently saved slot — the character the player
+   *  was last inside, which is the only honest guess available from the title
+   *  screen and the right one there. */
+  activeSlotId?: string | null;
   onCancel: () => void;
   /** Called when the player taps SEND. slot is null when the
    *  player chose "General — no character". */
-  onSend: (args: { slot: SlotSummary | null; description: string }) => void;
+  onSend: (args: { slot: SlotSummary | null; description: string; mode: BugReportMode }) => void;
 }
 
-export function BugReportModal({ visible, slots, onCancel, onSend }: Props) {
+/** ⚠⚠⚠ OTA-1672 — the sentinel for the third choice. Owner: *"it should just say
+ *  send full log for analysis; in there there really shouldn't be a text box."*
+ *  Real slot IDs are slot_{base36}, so neither sentinel can collide with one. */
+const FULL_LOG = 'fulllog';
+
+export function BugReportModal({ visible, slots, activeSlotId, onCancel, onSend }: Props) {
   // 'general' sentinel for the "no character" option. Real slot IDs
   // are slot_{base36}, so no collision risk.
-  const [selectedId, setSelectedId] = useState<string | 'general'>('general');
+  const [selectedId, setSelectedId] = useState<string | 'general' | typeof FULL_LOG>('general');
   const [description, setDescription] = useState('');
 
   // Reset state every time the modal opens — bug reports should
@@ -43,14 +68,36 @@ export function BugReportModal({ visible, slots, onCancel, onSend }: Props) {
     }
   }, [visible]);
 
-  const canSend = description.trim().length > 0;
+  // ⚠⚠ THE LOG A FULL PUSH WOULD CARRY, resolved here so THE ROW CAN NAME IT. A
+  // button that says "send full log" without saying whose log is the shape of
+  // control this project keeps having to repair: the player taps it, something
+  // goes somewhere, and nobody can say what went. Active character when the
+  // caller knows one, newest save otherwise.
+  const fullLogSlot: SlotSummary | null =
+    (activeSlotId ? slots.find((s) => s.slotId === activeSlotId) : undefined)
+    ?? [...slots].sort((a, b) => (b.savedAt ?? 0) - (a.savedAt ?? 0))[0]
+    ?? null;
+
+  const isFullLog = selectedId === FULL_LOG;
+
+  // ⚠⚠⚠ THE TEXT GATE APPLIES TO THE DESCRIBED REPORTS ONLY, which is exactly
+  // the line the owner drew: *"there should still be a text box gate on the send
+  // button for general bugs or character bugs, because I need to know what
+  // you're trying to show me … this new button that would just say send log
+  // doesn't need me to type something in the box, cuz I'm legitimately just
+  // sending you a log."*
+  const canSend = isFullLog ? fullLogSlot !== null : description.trim().length > 0;
 
   const handleSend = (): void => {
     if (!canSend) return;
+    if (isFullLog) {
+      onSend({ slot: fullLogSlot, description: '', mode: 'fulllog' });
+      return;
+    }
     const slot = selectedId === 'general'
       ? null
       : slots.find((s) => s.slotId === selectedId) ?? null;
-    onSend({ slot, description: description.trim() });
+    onSend({ slot, description: description.trim(), mode: slot ? 'character' : 'general' });
   };
 
   return (
@@ -74,26 +121,27 @@ export function BugReportModal({ visible, slots, onCancel, onSend }: Props) {
                   <View style={styles.ruleLine} />
                 </View>
 
+                {/* ⚠⚠ OTA-1672 — THIS COPY WAS DESCRIBING A ROUTE THAT NO LONGER
+                    EXISTS. It told the player their report would be "copied to
+                    your clipboard — paste them into the email body before
+                    sending", which OTA-1665 retired when REPORT A BUG became the
+                    push. Stale instructions on the one screen a confused player
+                    reads are worse than none: they send someone hunting for an
+                    email that never opens. It says what actually happens now. */}
                 <Text style={styles.body}>
-                  Pick the character the bug happened on, then describe
-                  what went wrong. Your description, device info, and
-                  the most recent log entries (newest first) will be
-                  copied to your clipboard — paste them into the email
-                  body before sending.
+                  Pick what this is about, then send. It goes straight from here —
+                  no email, no copy-and-paste.
                 </Text>
 
-                <Text style={styles.sectionLabel}>CHARACTER</Text>
+                <Text style={styles.sectionLabel}>WHAT IS THIS?</Text>
                 <ScrollView
                   style={styles.slotList}
                   contentContainerStyle={styles.slotListContent}
                   showsVerticalScrollIndicator
                 >
-                  <SlotRow
-                    label="General — no character"
-                    sub="Title-screen / startup / setup issues"
-                    selected={selectedId === 'general'}
-                    onPress={() => setSelectedId('general')}
-                  />
+                  {/* ⚠ OTA-1672 — the characters lead now. The owner listed the
+                      three choices in this order, and it is also the order of
+                      use: a bug almost always happened to somebody. */}
                   {slots.map((s) => (
                     <SlotRow
                       key={s.slotId}
@@ -103,24 +151,56 @@ export function BugReportModal({ visible, slots, onCancel, onSend }: Props) {
                       onPress={() => setSelectedId(s.slotId)}
                     />
                   ))}
+                  <SlotRow
+                    label="General bug — no character"
+                    sub="Title-screen / startup / setup issues"
+                    selected={selectedId === 'general'}
+                    onPress={() => setSelectedId('general')}
+                  />
+                  {/* ⚠⚠⚠ THE THIRD MODE. Only offered when there is a log to
+                      push — a row that promises to send one and then cannot is
+                      the claims-success-without-checking defect this project has
+                      fixed repeatedly, and the sub-line NAMES whose log goes. */}
+                  {fullLogSlot !== null && (
+                    <SlotRow
+                      label="Send full log for analysis"
+                      sub={`${fullLogSlot.playerName}'s log · no description needed`}
+                      selected={isFullLog}
+                      onPress={() => setSelectedId(FULL_LOG)}
+                    />
+                  )}
                   {slots.length === 0 && (
                     <Text style={styles.emptyHint}>
-                      (no characters yet — only General is available)
+                      (no characters yet — only a general bug can be sent)
                     </Text>
                   )}
                 </ScrollView>
 
-                <Text style={styles.sectionLabel}>DESCRIBE THE ISSUE</Text>
-                <TextInput
-                  style={styles.input}
-                  multiline
-                  numberOfLines={4}
-                  placeholder="What did you expect? What actually happened? Any reproduction steps?"
-                  placeholderTextColor="#5c5345"
-                  value={description}
-                  onChangeText={setDescription}
-                  textAlignVertical="top"
-                />
+                {/* ⚠⚠⚠ OTA-1672 — NO TEXT BOX ON THE FULL-LOG PUSH. Owner: *"in
+                    there there really shouldn't be a text box."* Disabling it
+                    would have been the smaller edit and the wrong one: a greyed
+                    field still reads as something you are failing to fill in. */}
+                {isFullLog ? (
+                  <Text style={styles.body}>
+                    Nothing to type. This sends {fullLogSlot?.playerName}&apos;s
+                    whole log, pack, device and voice state as-is, for me to read
+                    through.
+                  </Text>
+                ) : (
+                  <>
+                    <Text style={styles.sectionLabel}>DESCRIBE THE ISSUE</Text>
+                    <TextInput
+                      style={styles.input}
+                      multiline
+                      numberOfLines={4}
+                      placeholder="What did you expect? What actually happened? Any reproduction steps?"
+                      placeholderTextColor="#5c5345"
+                      value={description}
+                      onChangeText={setDescription}
+                      textAlignVertical="top"
+                    />
+                  </>
+                )}
 
                 <View style={styles.buttonRow}>
                   <Pressable
@@ -151,7 +231,7 @@ export function BugReportModal({ visible, slots, onCancel, onSend }: Props) {
                         canSend ? styles.btnTextPrimary : styles.btnTextDisabled,
                       ]}
                     >
-                      SEND
+                      {isFullLog ? 'SEND LOG' : 'SEND'}
                     </Text>
                   </Pressable>
                 </View>

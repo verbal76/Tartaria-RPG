@@ -36,7 +36,9 @@ import { BrandedModal } from '../components/BrandedModal';
 import { BugReportModal } from '../components/BugReportModal';
 import { InvitePlaytesterModal } from '../components/InvitePlaytesterModal';
 import { buildBasicDeviceSummary, stampLogExport } from '../diagnostics/aboutSummary';
-import { composeAndSendBugReport } from '../diagnostics/bugReport';
+import {
+  composeAndSendBugReport, bugReportOutcomeTitle, type BugReportMode,
+} from '../diagnostics/bugReport';
 import { loadCrashSave, clearCrashSave, buildCrashSaveExport, type CrashSaveCapture } from '../diagnostics/crashSave';
 import racesData from '../data/races/races.json';
 import locationsData from '../data/locations/locations.json';
@@ -295,6 +297,13 @@ export function TitleScreen() {
   // ("nothing has happened in the log since") has to be as visible as a success,
   // or the button looks broken to the person it just correctly said no to.
   const [bugReportNote, setBugReportNote] = useState<string | null>(null);
+  // ⚠⚠ OTA-1672 — and it POPS UP as well as printing. The note above is a small
+  // line under a button on a busy screen, and the owner missed it his first few
+  // sends. Same treatment on both surfaces, from the same helper, so the title
+  // screen and the in-game settings screen cannot drift apart on what a push
+  // said. The note stays as the record; the popup is what makes it land.
+  const [bugReportPopup, setBugReportPopup] =
+    useState<{ title: string; body: string } | null>(null);
   // OTA-065 — invite-playtester modal state. Same UX pattern as
   // bug-report: open modal, collect input, open mailto, flash
   // a "✓ SENT" confirmation on the button so the player has
@@ -553,6 +562,7 @@ export function TitleScreen() {
   const sendBugReport = async (args: {
     slot: SlotSummary | null;
     description: string;
+    mode: BugReportMode;
   }): Promise<void> => {
     // arb75 — compose+send lives in the shared diagnostics/bugReport module so
     // this screen and the in-game Settings screen file the identical report.
@@ -566,6 +576,9 @@ export function TitleScreen() {
     setBugReportNote('Sending…');
     const outcome = await composeAndSendBugReport(args);
     setBugReportNote(outcome.message);
+    // OTA-1672 — and the same words take the screen, so the outcome cannot be
+    // missed on a title screen with six other things on it.
+    setBugReportPopup({ title: bugReportOutcomeTitle(outcome.status), body: outcome.message });
     setBugReportSent(outcome.status === 'sent' || outcome.status === 'queued');
     setTimeout(() => { setBugReportSent(false); setBugReportNote(null); }, 6000);
   };
@@ -1288,6 +1301,17 @@ export function TitleScreen() {
         slots={slots}
         onCancel={() => setBugReportOpen(false)}
         onSend={(args) => { void sendBugReport(args); }}
+      />
+
+      {/* ⚠⚠ OTA-1672 — the push's outcome, as a card. Same helper as the About
+          screen's, so the two surfaces cannot say different words about the same
+          result. Dismiss-only: this is a receipt, not a decision. */}
+      <BrandedModal
+        visible={bugReportPopup !== null}
+        title={bugReportPopup?.title ?? ''}
+        body={bugReportPopup?.body}
+        buttons={[{ label: 'OK', tone: 'primary', onPress: () => setBugReportPopup(null) }]}
+        onRequestClose={() => setBugReportPopup(null)}
       />
 
       <InvitePlaytesterModal

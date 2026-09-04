@@ -27624,7 +27624,31 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Summed across worn pieces and capped at 8, because six slots can carry it and
 // uncapped the optimal play against a fast swinger is to stop swinging back. It
 // fires only on damage that GOT THROUGH, and a kill by it resolves as a defeat.
-export const OTA_BUILD_ID = '2026-09-04-1671-the-armour-bites-back';
+// OTA-1672 — THREE THINGS TO SEND, AND THE ANSWER TAKES THE SCREEN.
+// Owner: *"this new button that would just say send log doesn't need me to type
+// something in the box, cuz I'm legitimately just sending you a log … there
+// should still be a text box gate on the send button for general bugs or
+// character bugs, because I need to know what you're trying to show me"*, and
+// *"have the log sent line that I missed the first few times appear as a popup
+// so it's very visible."*
+// REPORT A BUG now offers the characters, then a general bug, then SEND FULL LOG
+// FOR ANALYSIS. The first two still require a description; the third has no text
+// box at all - absent, not disabled, because a greyed field still reads as
+// something you are failing to fill in. The full-log row NAMES whose log it will
+// push and is not offered at all when there is no log to send.
+// ⚠⚠⚠ TWO DEDUPE MARKS, and that is the owner's ruling after I put the choice to
+// him plainly. With one shared fingerprint, filing a described report and then
+// pushing the raw log about the same moment is refused - you would have to go
+// play before you could send the log about the thing you just reported. The
+// OTA-1665 rule is unchanged, it just applies PER MODE, so neither becomes a spam
+// button. ERASE THIS LOG now clears BOTH marks; clearing one would leave the
+// other refusing a push on evidence that no longer exists.
+// ⚠⚠ AND THE POPUP ATTACKS THE DEDUPE'S OWN CAUSE. A player who does not see the
+// outcome taps the button again, which is the duplicate the gate was built to
+// stop. Both surfaces raise it from one helper, so they cannot disagree, and only
+// a landed send is titled REPORT SENT. The quiet line stays as the record.
+export const OTA_BUILD_ID = '2026-09-04-1672-three-things-to-send';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-04-1671-the-armour-bites-back';
 // golem catch-up 2026-09-04: markerless publish of OTA-1671 - the armour bites
 // back. 31 of 297 pieces (10.4%) return damage to whatever hits them, in the
 // ATTACKER'S OWN element rather than the dog vest's fixed aetheric, so a

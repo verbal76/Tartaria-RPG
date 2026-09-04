@@ -38,7 +38,11 @@ import {
 } from '../engine/saveSystem';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // OTA-1666 — the dedupe mark on CLEAR LOG
 import { BugReportModal } from '../components/BugReportModal';
-import { composeAndSendBugReport, BUG_REPORT_MARK_KEY } from '../diagnostics/bugReport';
+import { BrandedModal } from '../components/BrandedModal'; // OTA-1672 — the outcome popup
+import {
+  composeAndSendBugReport, bugReportOutcomeTitle,
+  BUG_REPORT_MARK_KEY, FULL_LOG_MARK_KEY,
+} from '../diagnostics/bugReport';
 import {
   loadReportingPref, setReportingEnabled, reportingStatusLine, reportingConfigured,
 } from '../diagnostics/crashReporter';
@@ -142,6 +146,14 @@ export function AboutScreen() {
   // sent, queued, refused as a duplicate, refused because reporting is off —
   // so a tap can never end in silence.
   const [bugReportResult, setBugReportResult] = useState<string | null>(null);
+  // ⚠⚠⚠ OTA-1672 — AND NOW IT POPS UP. Owner: *"have the log sent line that I
+  // missed the first few times appear as a popup so it's very visible."* The
+  // line above stays — it is the record you can scroll back to, and it costs
+  // nothing — but the OUTCOME of a push now takes the screen, because a player
+  // who does not see it taps the button again, which is the whole reason
+  // OTA-1665's dedupe gate had to exist in the first place.
+  const [bugReportPopup, setBugReportPopup] =
+    useState<{ title: string; body: string } | null>(null);
   // OTA-1490 — device-sticky owner unlock: seeing an unlock-named character
   // marks the device, then EVERY character on it gets the owner tools.
   const [ownerTools, setOwnerTools] = useState(false);
@@ -389,7 +401,14 @@ export function AboutScreen() {
       // Matches bugReport.ts's `${slotId}:${raw.length}:${raw.slice(-240)}` for
       // an empty log — the exact fingerprint the very next report would compute
       // if nothing has been played since, and nothing else.
-      if (slotId) await AsyncStorage.setItem(BUG_REPORT_MARK_KEY, `${slotId}:0:`);
+      // ⚠⚠ OTA-1672 — BOTH MARKS. There are two now (a described report and a
+      // full-log push each own one), and clearing only the one this line
+      // originally knew about would leave the other refusing a push on a log
+      // that no longer exists — the gate outliving its evidence.
+      if (slotId) {
+        await AsyncStorage.setItem(BUG_REPORT_MARK_KEY, `${slotId}:0:`);
+        await AsyncStorage.setItem(FULL_LOG_MARK_KEY, `${slotId}:0:`);
+      }
     } catch { /* the gate simply stays as it was — never block a clear on this */ }
     setLogCleared(true);
     // v2.4.1 (OTA 053) — reset the chunked-copy cursor so the next
@@ -1769,18 +1788,36 @@ export function AboutScreen() {
           (under Lore Codex) so the player can pull updates from the
           main screen without opening settings. */}
 
-      {/* arb75 — in-game bug report (bundles voice + device + log into one
-          clipboard copy → one paste). Native zero-paste (mail-composer) is
-          a follow-up build. */}
+      {/* arb75 — in-game bug report. OTA-1665 made it the push (the clipboard
+          and mailto this comment used to describe are retired); OTA-1672 gave
+          it three modes and made the outcome a popup. */}
       <BugReportModal
         visible={bugReportOpen}
         slots={bugReportSlots}
+        // ⚠ OTA-1672 — in here we KNOW who is being played, so a full-log push
+        // sends this character's log rather than the newest save's. From the
+        // title screen there is no such answer and the modal falls back.
+        activeSlotId={useGameStore.getState().activeSlotId}
         onCancel={() => setBugReportOpen(false)}
         onSend={(args) => {
           setBugReportOpen(false);
           setBugReportResult('Sending…');
-          void composeAndSendBugReport(args).then((r) => setBugReportResult(r.message));
+          void composeAndSendBugReport(args).then((r) => {
+            setBugReportResult(r.message);
+            setBugReportPopup({ title: bugReportOutcomeTitle(r.status), body: r.message });
+          });
         }}
+      />
+      {/* ⚠⚠⚠ OTA-1672 — THE OUTCOME TAKES THE SCREEN. Owner: *"have the log sent
+          line that I missed the first few times appear as a popup so it's very
+          visible."* One button, and it dismisses — nothing here is a decision,
+          it is a receipt. */}
+      <BrandedModal
+        visible={bugReportPopup !== null}
+        title={bugReportPopup?.title ?? ''}
+        body={bugReportPopup?.body}
+        buttons={[{ label: 'OK', tone: 'primary', onPress: () => setBugReportPopup(null) }]}
+        onRequestClose={() => setBugReportPopup(null)}
       />
     </View>
   );

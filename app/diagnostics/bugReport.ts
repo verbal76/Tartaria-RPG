@@ -94,6 +94,46 @@ const INVENTORY_CHARS_CAP = 12_000;
 
 export const BUG_REPORT_MARK_KEY = '@tartaria/lastBugReportFingerprint';
 
+/** ⚠⚠⚠ OTA-1672 — THE FULL-LOG PUSH KEEPS ITS OWN MARK, and this is the owner's
+ *  explicit call after I put the choice to him in one question.
+ *
+ *  With a single mark, filing a described report and then pushing the raw log
+ *  about the same moment is refused — the log has not changed since, so the
+ *  second send looks like the duplicate the OTA-1665 rule exists to block. But it
+ *  is not a duplicate: one carries the player's words about what went wrong, the
+ *  other carries the evidence with no interpretation, and the owner asks for them
+ *  separately on purpose. Blocking the second would mean going off to play before
+ *  you could send the log about the thing you just reported.
+ *
+ *  ⚠ THE RULE ITSELF IS UNCHANGED, it just applies PER MODE: each of the two can
+ *  still only be sent once per changed log, so neither becomes a spam button. */
+export const FULL_LOG_MARK_KEY = '@tartaria/lastFullLogFingerprint';
+
+/** Which of the three things the player picked. `character` and `general` are the
+ *  described report (the text box gates SEND); `fulllog` is the raw push with no
+ *  description asked for and none required. */
+export type BugReportMode = 'character' | 'general' | 'fulllog';
+
+/** The mark a mode consumes. Named rather than inlined so the About screen's
+ *  ERASE THIS LOG can clear the same two keys this module writes — a clear that
+ *  reset only one of them would leave the other refusing on a log that no longer
+ *  exists. */
+export function markKeyForMode(mode: BugReportMode): string {
+  return mode === 'fulllog' ? FULL_LOG_MARK_KEY : BUG_REPORT_MARK_KEY;
+}
+
+/** ⚠⚠ OTA-1672 — THE POPUP'S TITLE, derived here so both screens say the same
+ *  word for the same outcome. Owner: *"have the log sent line that I missed the
+ *  first few times appear as a popup so it's very visible."* A popup needs a
+ *  heading, and a heading that said SENT over a queued or refused push would be
+ *  the lie the outcome messages were written to avoid. */
+export function bugReportOutcomeTitle(status: BugReportStatus): string {
+  if (status === 'sent') return 'REPORT SENT';
+  if (status === 'queued') return 'SAVED — WILL FINISH SENDING';
+  if (status === 'unchanged') return 'ALREADY SENT THIS ONE';
+  return 'NOT SENT';
+}
+
 /** ⚠ WHAT "THE LOG CHANGED" MEANS, precisely. The raw slot log grows at the end
  *  (the composer reverses it for display), so its LENGTH plus its newest tail
  *  moves the moment anything is written — a step, a swing, a persist line. Two
@@ -120,8 +160,20 @@ export interface BugReportOutcome {
 export async function composeAndSendBugReport(args: {
   slot: SlotSummary | null;
   description: string;
+  /** OTA-1672. Absent means the described report, which is what every caller
+   *  before this OTA meant — so old call sites keep their exact behaviour. */
+  mode?: BugReportMode;
 }): Promise<BugReportOutcome> {
-  const { slot, description } = args;
+  const { slot } = args;
+  const mode: BugReportMode = args.mode ?? (slot ? 'character' : 'general');
+  // ⚠ OTA-1672 — A FULL-LOG PUSH HAS NO DESCRIPTION AND IS NOT ASKED FOR ONE.
+  // Owner: *"when I want to send a full log … there really shouldn't be a text
+  // box."* The report still needs SOMETHING under --- DESCRIPTION ---, and an
+  // empty block would read to a triager as a player who had nothing to say
+  // rather than as a deliberate raw push. So it says which it is.
+  const description = mode === 'fulllog'
+    ? '(full log pushed for analysis — no description asked for)'
+    : args.description;
   const charName = slot?.playerName ?? '(general / no character)';
   // ⚠ THE HEADLINE, and it is the first line of the payload on purpose. This
   // used to be the email SUBJECT; with the mailto gone it would have been dead
@@ -129,7 +181,10 @@ export async function composeAndSendBugReport(args: {
   // triageable at a glance — who, and what they said. The first sentence of the
   // description rides along, trimmed, so a list of reports reads as a list of
   // problems rather than a column of identical titles.
-  const headline = `Bug Report${slot ? ` — ${slot.playerName}` : ''}`
+  // ⚠ OTA-1672 — the KIND leads, so a list of reports separates the ones
+  // carrying a player's words from the raw log pushes at a glance.
+  const headline = `${mode === 'fulllog' ? 'Full Log' : 'Bug Report'}`
+    + `${slot ? ` — ${slot.playerName}` : ''}`
     + ` · ${getBuildCodename(OTA_BUILD_ID)}`
     + (description ? ` · ${description.split('\n')[0]!.slice(0, 80)}` : ' · (no description)');
 
@@ -226,15 +281,24 @@ export async function composeAndSendBugReport(args: {
   // screen has no log to change, so gating it on one would lock the player out
   // of the only channel they have for "the game won't start" — the report that
   // matters most and the one that by definition carries no play.
+  //
+  // ⚠⚠⚠ OTA-1672 — AND IT IS PER MODE, not one mark for the pair. See
+  // FULL_LOG_MARK_KEY above for the owner's ruling and the reason: a described
+  // report and a raw log push about the same moment are two different artefacts,
+  // and sharing a mark would refuse the second one for looking like the first.
+  const markKey = markKeyForMode(mode);
   const mark = slot ? logFingerprint(slot.slotId, rawLog) : null;
   if (mark) {
     let seen: string | null = null;
-    try { seen = await AsyncStorage.getItem(BUG_REPORT_MARK_KEY); } catch { seen = null; }
+    try { seen = await AsyncStorage.getItem(markKey); } catch { seen = null; }
     if (seen === mark) {
       return {
         status: 'unchanged',
-        message: 'You already sent this one. Nothing has happened in the log since — '
-          + 'play a while and the button comes back.',
+        message: mode === 'fulllog'
+          ? 'You already pushed this log. Nothing has happened in it since — '
+            + 'play a while and the button comes back.'
+          : 'You already sent this one. Nothing has happened in the log since — '
+            + 'play a while and the button comes back.',
       };
     }
   }
@@ -260,7 +324,7 @@ export async function composeAndSendBugReport(args: {
   // kill costs nothing: the next boot re-sends it. The retries run even after a
   // "successful" flush, because flush()===true has been caught reporting
   // envelopes that never arrived.
-  let pendingId = `bug${Date.now().toString(36)}`;
+  let pendingId = `${mode === 'fulllog' ? 'log' : 'bug'}${Date.now().toString(36)}`;
   try {
     // OTA-1666 — `inventory` was an empty string here while the pack had no
     // home in the report at all. It is inside `report` now AND named in its own
@@ -302,7 +366,7 @@ export async function composeAndSendBugReport(args: {
   // report through would queue a duplicate of something already waiting — the
   // exact outcome the owner asked to prevent, arriving twice instead of once.
   if (mark) {
-    try { await AsyncStorage.setItem(BUG_REPORT_MARK_KEY, mark); } catch { /* retried next report */ }
+    try { await AsyncStorage.setItem(markKey, mark); } catch { /* retried next report */ }
   }
 
   return ok
