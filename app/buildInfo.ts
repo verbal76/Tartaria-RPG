@@ -27432,7 +27432,29 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // mid-fight both did nothing at all. Four buttons in one feature family across
 // three consecutive OTAs, so ota1663 SWEEPS the whole screen for
 // `submitPlayerAction(\`feed|arm|heal` rather than pinning the two I touched.
-export const OTA_BUILD_ID = '2026-09-04-1663-the-golem-eats-from-the-pouch';
+// ⚠⚠⚠ OTA-1664 — NO PHANTOM SYLLABLE. Owner, after I offered to "re-tune" two
+// place names: *"there should be no a sound in front of either of those. the s
+// and the n are the starting sound of each word. where are you getting an AY
+// sound before that — to me it reads like you're mispronouncing the word, not a
+// tone or inflection, but adding a syllable."* ⚠ HE IS RIGHT AND MY FRAMING WAS
+// WRONG: I reported it as a vowel-quality problem ("eh" coming out "AY"), which
+// invited a re-spelling. The leading token should not exist at all. Samarran is
+// three syllables opening on S; Nimari is three opening on N. OTA-104 welded a
+// fourth beat onto the front of both by misreading the playtester's IPA — it saw
+// the leading ɛ in /ɛsɛmɔːɾɛn/ and promoted it to its own space-separated token,
+// which this file's own header says espeak treats as a separate WORD — and then
+// wrote the error down as fact ("Samarran and Nimari are 4-syllable words, not
+// 3"), which is the kind of confident note that stops the next reader checking.
+// Measured: `eh sem or en` → ˈeɪ sˈɛm ɔːɹ ˈɛn (AY-SEM-OR-EN, four stresses) vs
+// raw `Samarran` → sˈæmæɹən (SAM-a-run) ✓; `eh neh mah ree` → ˈeɪ nˈeɪ mˈɑː ɹˈiː
+// (AY-NAY-MAH-REE — "neh" also says NAY) vs raw `Nimari` → nˈɪmɚɹi (NIM-uh-ree)
+// ✓. ⚠⚠ SO THE FIX IS REMOVAL, NOT A RE-TUNE — the third time in six OTAs that
+// deleting an entry was right (1659: "the", "doesn't"). Asgardar STAYS: it
+// genuinely opens on a vowel, so its "ez" is the word, not an addition. And
+// ota1664 adds a syllable-count guard over every surviving respelling, because
+// changing a word's number of beats is the defect class, not any one entry.
+export const OTA_BUILD_ID = '2026-09-04-1664-no-phantom-syllable';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-04-1663-the-golem-eats-from-the-pouch';
 // golem catch-up 2026-09-04: markerless publish of OTA-1663 - the golem eats
 // from the pouch. Owner asked for golem-feedable materials in the heals pouch,
 // with those going straight to the golem and nowhere else. Widening the gate was

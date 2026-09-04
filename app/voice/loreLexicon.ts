@@ -115,22 +115,41 @@ const LEXICON: Array<[RegExp, LexiconReplacement]> = [
   [/\bTartarian\b/gi, 'tar taireean'],
   [/\bTartarians\b/gi, 'tar taireeans'],
   [/\bTartary\b/gi, 'tar tar ee'],
-  // Playtester spec OTA 219; place-name IPA refresh OTA-104 for
-  // Asgardar, Samarran, Nimari per fresh playtester IPA:
-  //   Asgardar /ɛz gɑdɔɹ/    → "ez gah dor"    (was "az gar dar")
-  //   Samarran /ɛsɛmɔːɾɛn/   → "eh sem or en"  (was "sam ah ran")
-  //   Nimari   /ɛnɛmɑɹi/     → "eh neh mah ree" (was "nih mar ee")
-  // Common pattern: all three open with a leading /ɛ/ schwa
-  // ("eh") that the prior respellings dropped. Samarran and Nimari
-  // are 4-syllable words, not 3; the prior respellings collapsed
-  // an internal vowel.
+  // Playtester spec OTA 219; place-name IPA refresh OTA-104 for Asgardar per
+  // fresh playtester IPA: /ɛz gɑdɔɹ/ → "ez gah dor" (was "az gar dar"). Asgardar
+  // genuinely OPENS on a vowel, so its leading "ez" is the word, not an addition.
+  //
+  // ⚠⚠⚠ OTA-1664 — SAMARRAN AND NIMARI ARE GONE FROM THIS LIST, because OTA-104
+  // gave them a syllable they do not have. Owner: *"there should be no a sound
+  // in front of either of those. the s and the n are the starting sound of each
+  // word… it reads like you're mispronouncing the word, not a tone or
+  // inflection, but adding a syllable."*
+  //
+  // He is exactly right, and the cause is a misread of the playtester's IPA.
+  // OTA-104 took /ɛsɛmɔːɾɛn/ and /ɛnɛmɑɹi/, saw a leading ɛ, and wrote it out as
+  // its own token — then said so in this comment: "all three open with a leading
+  // /ɛ/ schwa that the prior respellings dropped. Samarran and Nimari are
+  // 4-syllable words, not 3." Both sentences were wrong. Samarran is three
+  // syllables and starts with S; Nimari is three and starts with N.
+  //
+  // Measured (`espeak-ng -v en-us -q --ipa`), the respellings were not a shade
+  // off — they were a different word with an extra beat welded to the front:
+  //
+  //   eh sem or en    → ˈeɪ sˈɛm ɔːɹ ˈɛn   "AY-SEM-OR-EN"   (4 beats, 4 stresses)
+  //   Samarran        → sˈæmæɹən           "SAM-a-run"      ✓
+  //   eh neh mah ree  → ˈeɪ nˈeɪ mˈɑː ɹˈiː "AY-NAY-MAH-REE" (and "neh" says NAY)
+  //   Nimari          → nˈɪmɚɹi            "NIM-uh-ree"     ✓
+  //
+  // The engine had both right on its own. This is the OTA-1659 finding again —
+  // an entry added to "correct" a word the phonemizer was already reading
+  // properly — and the removal is the fix, not a re-tune. If the canon wants a
+  // different stress (suh-MAR-an rather than SAM-a-run) that is one entry, but
+  // it must be measured first, and it must keep three syllables.
   [/\bDrakova\b/gi, 'dra koh vah'],
   [/\bVarakush\b/gi, 'vara koosh'],
   [/\bAsgardar\b/gi, 'ez gah dor'],
   [/\bVoronov\b/gi, 'voro nov'],
-  [/\bSamarran\b/gi, 'eh sem or en'],
   [/\bThametan\b/gi, 'thuh meh tahn'],
-  [/\bNimari\b/gi, 'eh neh mah ree'],
   // ⚠ OTA-1659 — THIS RESPELLING WAS DESTROYING THE SOUND IT EXISTED TO PROTECT.
   // The worksheet's own key says `zh` ≈ the s in "treasure", and espeak agrees —
   // but the entry shipped as "zah rak", which drops the h and therefore the
