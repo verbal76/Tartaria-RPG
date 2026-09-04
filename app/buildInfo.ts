@@ -27667,6 +27667,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // and the disciplines were the last surface still calling setScreen -
 // an ordinary craft has stayed put since OTA-983.
 export const OTA_BUILD_ID = '2026-09-04-1673-one-scanner-per-band';
+// golem catch-up 2026-09-04: markerless publish of OTA-1673 - one scanner per
+// band. A scanner you already carry is not buildable again, read off the
+// catalog property (effect.kind === 'scanner') not a list of three names, per
+// band so owning one never blocks another, and failing OPEN if the lookup
+// throws. Stone Manipulation gets + / - and MAX on the same stepper the craft
+// picker uses, bounded by BOTH costs (fuel AND Small Rock); the count rides the
+// action, not a loop over the verb. The batch stop-test asks whether the NEXT
+// cast can finish - my first draft fingerprinted spent fuel and a probe caught
+// it rolling 5 times on 3 rocks, burning fuel for nothing. The disciplines were
+// the last surface still bouncing to exploration; the menu stays open now. The
+// batch layer lives in state/aethercraftBatch.ts because its first draft
+// tripped the OTA-1400 line ratchet inline. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-04-1672-three-things-to-send';
 // golem catch-up 2026-09-04: markerless publish of OTA-1672 - three things to
 // send. REPORT A BUG offers the characters, then a general bug, then SEND FULL
