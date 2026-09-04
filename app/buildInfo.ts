@@ -27409,6 +27409,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // line. Exactly the failure the owner reported on the pouch, in the very button
 // the pouch was told to imitate. Fixed to the direct action and pinned.
 export const OTA_BUILD_ID = '2026-09-04-1662-the-pouch-asks-who';
+// golem catch-up 2026-09-04: markerless publish of OTA-1662 - the pouch asks
+// who. Owner: the heals pouch "automatically applies it to me", and he wants it
+// to ask like the inventory does. I hard-coded 'self' in OTA-1658 while fixing
+// the dead button - right about the route, silently wrong about the target, in
+// a feature that had been told to imitate the pack. A tap now offers YOU, the
+// dog by name with its HP, and BACK, both branches calling useHealBatch
+// directly per the 1658 rule; with no dog it still just heals, because a
+// question with one answer is worse than the bug. Wiring it up found the same
+// defect live in the INVENTORY's own Feed button, which routed through
+// submitPlayerAction and therefore did nothing mid-fight - fixed there too.
+// hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-04-1661-anyone-testing-can-push-a-log';
 // golem catch-up 2026-09-04: markerless publish of OTA-1661 - anyone testing
 // can push a log. Owner: "anyone testing should be able to push a log." SEND LOG
