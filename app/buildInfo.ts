@@ -27648,6 +27648,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // stop. Both surfaces raise it from one helper, so they cannot disagree, and only
 // a landed send is titled REPORT SENT. The quiet line stays as the record.
 export const OTA_BUILD_ID = '2026-09-04-1672-three-things-to-send';
+// golem catch-up 2026-09-04: markerless publish of OTA-1672 - three things to
+// send. REPORT A BUG offers the characters, then a general bug, then SEND FULL
+// LOG FOR ANALYSIS; the first two still require a description, the third has no
+// text box at all (absent, not disabled - a greyed field still reads as
+// something you are failing to fill in). The full-log row names whose log it
+// pushes and is not offered when there is none. TWO dedupe marks, the owner's
+// ruling: a described report and a raw log push about the same moment are
+// different artefacts, and one shared mark would refuse the second for looking
+// like the first. ERASE THIS LOG clears both. The outcome now pops up on both
+// surfaces from one helper - a player who cannot see the answer taps again,
+// which is the duplicate the dedupe gate exists to stop. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-04-1671-the-armour-bites-back';
 // golem catch-up 2026-09-04: markerless publish of OTA-1671 - the armour bites
 // back. 31 of 297 pieces (10.4%) return damage to whatever hits them, in the
