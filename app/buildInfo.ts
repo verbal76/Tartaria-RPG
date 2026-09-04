@@ -27332,6 +27332,19 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Tartaria, Drakova and Aether in the game. Rewritten in espeak's own mnemonics
 // (`[[D@]]` → ðə), each measured; the flag stays off pending device proof.
 export const OTA_BUILD_ID = '2026-09-04-1659-the-is-not-in-the-lexicon';
+// golem catch-up 2026-09-04: markerless publish of OTA-1659 - "the" is not in
+// the lexicon. Owner reported the same thing twice; the second report was about
+// the first fix. Measured with espeak-ng, the phonemizer this app bundles:
+// plain "the" is already ðə, which IS "thuh", while OTA-1146's respelling
+// "thuh" is θˈʌ - the voiceless th of THUMB, the STRUT vowel, and stressed. No
+// respelling could have fixed it, because espeak voices word-initial th only
+// for words in its dictionary, and "the" is one of them. The rule removed, the
+// machinery deleted. The same measurement condemned doesn't/duzzent (inert),
+// Zharak/zah rak (it deleted the zh it protected) and the Tartaria -eeuh tail
+// (read as the glide /juː/, a syllable short of the game's own name); and it
+// found the IPA-override map holding Unicode IPA, which espeak silently drops
+// between brackets - rewritten in mnemonics, flag still off. hal took the
+// marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-04-1658-the-pouch-actually-heals';
 // golem catch-up 2026-09-04: markerless publish of OTA-1658 - the pouch actually
 // heals. OTA-1657's tap routed through useInventoryItem, which ends in
