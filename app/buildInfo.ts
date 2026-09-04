@@ -27454,6 +27454,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ota1664 adds a syllable-count guard over every surviving respelling, because
 // changing a word's number of beats is the defect class, not any one entry.
 export const OTA_BUILD_ID = '2026-09-04-1664-no-phantom-syllable';
+// golem catch-up 2026-09-04: markerless publish of OTA-1664 - no phantom
+// syllable. Owner: there should be no vowel in front of Samarran or Nimari -
+// "the s and the n are the starting sound of each word... it reads like you're
+// adding a syllable." Right, and my framing was wrong: I called it a vowel
+// quality problem, which invited a better spelling of the same wrong thing.
+// OTA-104 misread the playtester IPA, promoted a leading schwa to its own token
+// (which espeak treats as a separate word) and wrote the error down as fact.
+// Measured, "eh sem or en" is AY-SEM-OR-EN while the raw word is SAM-a-run, and
+// the raw word was right. Both entries removed - the third deletion-not-retune
+// in six OTAs. Asgardar stays: it genuinely opens on a vowel. The suite now
+// guards the CLASS by checking every surviving respelling's syllable count.
+// hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-04-1663-the-golem-eats-from-the-pouch';
 // golem catch-up 2026-09-04: markerless publish of OTA-1663 - the golem eats
 // from the pouch. Owner asked for golem-feedable materials in the heals pouch,
