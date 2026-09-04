@@ -9605,11 +9605,56 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // tile now stays OVERLAND; the gate opens only for the opening scene (the
     // tutorial starts in the spawn room, unchanged) or an explicit entry —
     // the ENTER OUTPOST chip / typed 'enter outpost' passes enterHub.
-    const freshOutpostVisit = inHub && !hubRoomId && !opts?.skipHubEntry && !passingThrough
+    // ⚠⚠⚠ OTA-1669 — `passingThrough` NO LONGER BARS THE GATE, and leaving it
+    // here was the whole defect. Owner: *"I still can't enter an outpost and I
+    // don't know if it's a legitimate reason."* It was not legitimate. His log:
+    //
+    //     ui: tap "ENTER OUTPOST"
+    //     [player] enter outpost
+    //     [world] You cross to the gate and step through.
+    //     scene: loc=pilgrim_waycamp hub=- arrival=n opening=n passing=y
+    //     [world] You are at Tartarian Pilgrim Camp …  ← still outside
+    //
+    // — eight times in thirteen seconds, because the line said it worked.
+    // `passing=y` is the tell: he had a course plotted to mud_seas (the mission
+    // trace on the same line reads `travelTo=mud_seas`), so `passingThrough`
+    // was true and this predicate went false.
+    //
+    // ⚠⚠ THE GUARD WAS CORRECT WHEN IT WAS WRITTEN AND WAS ORPHANED BY OTA-1606.
+    // It existed so a multi-tile auto-travel would not dump the player inside
+    // every outpost it crossed — back when ARRIVAL opened the gate by itself.
+    // OTA-1606 removed that on the owner's instruction ("i shouldn't
+    // automatically enter an outpost because i land on that tile, there should
+    // be an enter outpost button"). From that commit on, the only ways in are
+    // `enterHub` (the chip / the typed verb) and `isOpening` (the tutorial
+    // spawn) — both already required on the line below. So `passingThrough`
+    // stopped guarding automatic entry, because there is none, and its only
+    // remaining effect was to block the deliberate act it was never aimed at.
+    //
+    // ⚠ Having a destination in mind is not a reason you cannot walk through a
+    // door you are standing at. The course survives the visit untouched.
+    const freshOutpostVisit = inHub && !hubRoomId && !opts?.skipHubEntry
       && (!!opts?.isOpening || !!opts?.enterHub);
     if (freshOutpostVisit) {
       hubRoomId = hubEntryRoomId();
       set((s) => (s.player ? { player: { ...s.player, hubRoomId } } : s));
+      // ⚠⚠⚠ OTA-1669 — THE WALK-THROUGH IS NARRATED HERE, WHERE THE ENTRY IS
+      // DECIDED, and moving it here is the second half of this fix.
+      //
+      // The verb used to print it BEFORE calling this function, which is how it
+      // came to announce an entry that never happened. My first pass moved the
+      // line after beginScene so it could check — and ota970 #112 immediately
+      // caught what that cost: the gate line then landed AFTER the room's
+      // "Paths:" listing, so the player read the room they were in before being
+      // told they had walked through the door. Both orderings were wrong for
+      // opposite reasons.
+      //
+      // ⚠ One place decides, one place speaks. The line cannot outrun the entry
+      // (it is inside the branch that performs it) and cannot trail the scene
+      // (it is emitted before the scene body paints). `enterHub` gates it so the
+      // tutorial's opening spawn — which starts you in the room, never at a gate
+      // — does not narrate a walk the player did not take.
+      if (opts?.enterHub) get().appendLog('world', `You cross to the gate and step through.`);
     }
     const hubRoom = inHub && hubRoomId ? hubRoomFor(hubRoomId, hubSkinFactionFor(player.currentLocationId, player.factionId)) : null;
     get().appendLog('debug', `scene: loc=${location.id} hub=${hubRoomId ?? '-'} arrival=${opts?.arrivalFromName ? 'y' : 'n'} opening=${opts?.isOpening ? 'y' : 'n'} passing=${passingThrough ? 'y' : 'n'}`);
@@ -12604,8 +12649,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
             get().appendLog('arbiter', `The Arbiter angles between you and the gate. "Not with blades out — the outpost holds its truce. Settle this first."`);
             return;
           }
-          get().appendLog('world', `You cross to the gate and step through.`);
+          // ⚠⚠⚠ OTA-1669 — AND IT NO LONGER ANNOUNCES A SUCCESS IT HAS NOT
+          // CHECKED. This printed "You cross to the gate and step through."
+          // BEFORE calling beginScene, so when the entry was refused the player
+          // read a confirmation and stayed exactly where he was — which is why
+          // he tapped it eight times rather than once and concluded the button
+          // was broken. It is the "standing writers that claim success without
+          // checking" class this project has fixed elsewhere, sitting on the
+          // one button that moves you between the two halves of the game.
+          //
+          // ⚠ The gate is open when `hubRoomId` is SET, and that is the only
+          // honest test: beginScene assigns it in exactly one place. Read it
+          // back, and say what actually happened either way.
           get().beginScene({ enterHub: true });
+          const wentIn = !!get().player?.hubRoomId;
+          if (!wentIn) {
+            // B15 — a refusal always speaks, and it names the thing that stopped
+            // it rather than going quiet. If this ever fires, the sentence is
+            // also the bug report: it says which gate, on which tile.
+            get().appendLog('arbiter', `The Arbiter watches the gate stay shut. "Something here won't let you in — and I can't tell you what. Say so in a bug report; it should have opened."`);
+          }
           void get().persist();
           return;
         }

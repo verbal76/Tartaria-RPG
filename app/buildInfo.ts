@@ -27558,7 +27558,27 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // lootPurposeLine reads those same two predicates and says "crafting ingredient"
 // or "Crucible fodder" or nothing at all. The label and the bench's refusal
 // cannot disagree.
-export const OTA_BUILD_ID = '2026-09-04-1668-the-row-says-what-it-does';
+// ⚠⚠⚠ OTA-1669 — THE GATE OPENS FOR THE TAP. Owner: *"I still can't enter an
+// outpost and I don't know if it's a legitimate reason. I've pushed a log that
+// has that in there."* It was NOT legitimate, and his log said so in five lines:
+// tap "ENTER OUTPOST" → [player] enter outpost → "You cross to the gate and step
+// through." → `scene: loc=pilgrim_waycamp hub=- … passing=y` → "You are at
+// Tartarian Pilgrim Camp" — still outside. Eight taps in thirteen seconds,
+// because the line said it worked. ⚠⚠ `passing=y` IS THE DIAGNOSIS: he had a
+// course plotted to mud_seas, so `passingThrough` was true and
+// `freshOutpostVisit` (which required `!passingThrough`) went false. ⚠ THE GUARD
+// WAS CORRECT WHEN WRITTEN AND WAS ORPHANED BY OTA-1606: it stopped a multi-tile
+// auto-travel dumping the player inside every outpost en route, back when
+// ARRIVAL opened the gate by itself — which OTA-1606 removed on his own
+// instruction. From that commit the only doors are enterHub (chip / verb) and
+// isOpening (tutorial), both already required, so the guard protected nothing
+// and blocked only the deliberate act. ⚠⚠⚠ AND THE SECOND HALF COST HIM THE
+// EVENING: the verb printed its success line BEFORE calling beginScene and never
+// checked. It now enters first, reads hubRoomId back, and either confirms or
+// speaks a real refusal — the claims-success-without-checking class, on the one
+// control that moves you between the two halves of the game.
+export const OTA_BUILD_ID = '2026-09-04-1669-the-gate-opens-for-the-tap';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-04-1668-the-row-says-what-it-does';
 // golem catch-up 2026-09-04: markerless publish of OTA-1668 - the row says what
 // it is and what it does. The vendor's WORKINGS TO LEARN rows now carry a
 // headline (kind, damage glyph + dice + type, scaling stat) built at the source

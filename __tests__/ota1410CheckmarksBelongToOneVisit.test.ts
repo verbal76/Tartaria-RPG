@@ -119,7 +119,12 @@ describe('OTA-1410 — hung off the ONE door in, not the six doors out', () => {
     // mistake this session has already paid for three times (the sprint gate, the
     // timing guard, the equip inference).
     expect(STORE).toContain(
-      'const freshOutpostVisit = inHub && !hubRoomId && !opts?.skipHubEntry && !passingThrough'
+      // ⚠ OTA-1669 dropped `!passingThrough` from this predicate — it was an
+      // orphan of OTA-1606 that blocked a deliberate ENTER OUTPOST whenever the
+      // player had a course plotted elsewhere. The claim OTA-1410 makes is
+      // unchanged and is the one pinned here: the per-visit reset rides the ONE
+      // door in.
+      'const freshOutpostVisit = inHub && !hubRoomId && !opts?.skipHubEntry'
       // ⚠ OTA-1606 — the door now also demands INTENT (isOpening or enterHub):
       // the gate waits for a tap. Still the one door; the reset still rides it.
     ,
