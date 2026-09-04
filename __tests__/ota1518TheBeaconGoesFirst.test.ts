@@ -38,6 +38,16 @@ jest.mock('../app/diagnostics/crashReporter', () => ({
 const ROOT = join(__dirname, '..');
 const SRC = readFileSync(join(ROOT, 'app', 'diagnostics', 'sentryTransport.ts'), 'utf8');
 const ABOUT = readFileSync(join(ROOT, 'app', 'screens', 'AboutScreen.tsx'), 'utf8');
+// ⚠⚠ OTA-1665 — THE BUTTON'S SEND PATH MOVED, and this constant moved with it.
+// Every "button" assertion in this file used to read AboutScreen, because that
+// is where SEND LOG's handler lived. SEND LOG is deleted (the owner: "I've
+// removed the send log") and REPORT A BUG is the one push now, so the same
+// claims are asserted against `diagnostics/bugReport.ts`. The claims themselves
+// are unchanged and were worth every line: repointing them caught that the new
+// implementation read `!chunk.stopped` instead of `chunk.delivered` — the exact
+// false positive OTA-1519 was written about — and that it had dropped the
+// OTA-1492 result line entirely. Both fixed in the code, not the test.
+const BUTTON = readFileSync(join(ROOT, 'app', 'diagnostics', 'bugReport.ts'), 'utf8');
 const RELAY = readFileSync(join(ROOT, '.github', 'workflows', 'sentry-inbox.yml'), 'utf8');
 
 function inlineBody(): string {
@@ -135,9 +145,9 @@ describe('OTA-1518 — the chunk fits an event body, not an envelope', () => {
   });
 
   it('⚠ the button sends inline, and the whole-envelope senders are off this path', () => {
-    expect(ABOUT).toContain('await sendGameLogInline(bundle.log,');
-    expect(ABOUT).not.toMatch(/sendDiagnosticsBundle\(bundle/);
-    expect(ABOUT).toContain('describeInlineSend(chunk)');
+    expect(BUTTON).toContain('await sendGameLogInline(report, pendingId);');
+    expect(BUTTON).not.toMatch(/sendDiagnosticsBundle\(/);
+    expect(BUTTON).toContain('describeInlineSend(chunk)');
   });
 });
 

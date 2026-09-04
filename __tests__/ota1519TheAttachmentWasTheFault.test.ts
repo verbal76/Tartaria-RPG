@@ -37,6 +37,16 @@ const SRC = readFileSync(join(ROOT, 'app', 'diagnostics', 'sentryTransport.ts'),
 const PENDING = readFileSync(join(ROOT, 'app', 'diagnostics', 'pendingBundle.ts'), 'utf8');
 const AUTO = readFileSync(join(ROOT, 'app', 'diagnostics', 'autoBundle.ts'), 'utf8');
 const ABOUT = readFileSync(join(ROOT, 'app', 'screens', 'AboutScreen.tsx'), 'utf8');
+// ⚠⚠ OTA-1665 — THE BUTTON'S SEND PATH MOVED, and this constant moved with it.
+// Every "button" assertion in this file used to read AboutScreen, because that
+// is where SEND LOG's handler lived. SEND LOG is deleted (the owner: "I've
+// removed the send log") and REPORT A BUG is the one push now, so the same
+// claims are asserted against `diagnostics/bugReport.ts`. The claims themselves
+// are unchanged and were worth every line: repointing them caught that the new
+// implementation read `!chunk.stopped` instead of `chunk.delivered` — the exact
+// false positive OTA-1519 was written about — and that it had dropped the
+// OTA-1492 result line entirely. Both fixed in the code, not the test.
+const BUTTON = readFileSync(join(ROOT, 'app', 'diagnostics', 'bugReport.ts'), 'utf8');
 
 function codeOnly(src: string): string {
   return src
@@ -46,7 +56,7 @@ function codeOnly(src: string): string {
 
 describe('OTA-1519 — every production path is attachment-free', () => {
   it('⚠⚠⚠ ALL THREE SENDERS ARE INLINE — button, boot retry, crash auto-push', () => {
-    for (const src of [ABOUT, PENDING, AUTO]) {
+    for (const src of [BUTTON, PENDING, AUTO]) {
       expect(codeOnly(src)).toContain('sendGameLogInline(');
     }
   });
@@ -54,7 +64,7 @@ describe('OTA-1519 — every production path is attachment-free', () => {
   it('⚠⚠⚠ AND NOT ONE OF THEM CAN REACH AN ATTACHMENT SENDER', () => {
     // The two attachment senders are proven not to leave the device. A caller
     // wandering back onto one is the bug returning, silently, for two more days.
-    for (const src of [ABOUT, PENDING, AUTO]) {
+    for (const src of [BUTTON, PENDING, AUTO]) {
       const code = codeOnly(src);
       expect(code).not.toMatch(/sendDiagnosticsBundle/);
       expect(code).not.toMatch(/sendGameLogChunked/);
@@ -81,11 +91,11 @@ describe('OTA-1519 — flush() is the signal again', () => {
   });
 
   it('⚠⚠⚠ AND EVERY CALL SITE GATES ON IT', () => {
-    expect(codeOnly(ABOUT)).toContain('const ok = chunk.delivered;');
+    expect(codeOnly(BUTTON)).toContain('ok = chunk.delivered;');
     expect(codeOnly(PENDING)).toContain('const ok = chunk.delivered;');
     expect(codeOnly(AUTO)).toContain('const ok = chunk.delivered;');
     // The OTA-1518 shape — counting acceptance alone as success — is gone.
-    for (const src of [ABOUT, PENDING, AUTO]) {
+    for (const src of [BUTTON, PENDING, AUTO]) {
       expect(codeOnly(src)).not.toMatch(/chunk\.sent > 0 && chunk\.sent === chunk\.parts/);
     }
   });

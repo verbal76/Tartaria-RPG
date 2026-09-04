@@ -27453,7 +27453,39 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // genuinely opens on a vowel, so its "ez" is the word, not an addition. And
 // ota1664 adds a syllable-count guard over every surviving respelling, because
 // changing a word's number of beats is the defect class, not any one entry.
-export const OTA_BUILD_ID = '2026-09-04-1664-no-phantom-syllable';
+// ⚠⚠⚠ OTA-1665 — THE BUG REPORT PUSHES, AND ONLY ONCE PER CHANGED LOG. Owner,
+// three instructions together: *"I've removed the send log"*, *"report a bug
+// should be the button that pushed the log, so we don't need the email route
+// anymore, we can archive that bug report land"*, and *"after you do a bug
+// report and that pushes a log, you can't do another one until something in the
+// log is changed. so you have to go play for a little bit before it allows you
+// to push another one."* ⚠ THE EMAIL ROUTE WAS NEVER THE DESIGN — bugReport.ts
+// said so itself: true zero-paste needed expo-mail-composer, i.e. a native
+// rebuild, and native builds are parked. So players got a READ-ME-FIRST body, a
+// manual paste, and a report that "arrives empty and we can't track the bug
+// down" if they missed a step — which is exactly how both daughters filed
+// tonight. The transport had been in the app since August; it was simply not
+// wired to the button people actually find. Now REPORT A BUG persists to disk
+// and pushes inline through the OTA-1504 durable pipeline, carrying the typed
+// description, and the payload leads with a headline so a report is triageable
+// at a glance. ⚠⚠ SEND LOG IS DELETED, one day after OTA-1661 opened it: with
+// REPORT A BUG asking for a description first — a better consent surface AND
+// better evidence — two buttons doing one send was clutter. ⚠⚠⚠ EVERY OUTCOME
+// SPEAKS. A push can be queued, refused as a duplicate, refused because
+// reporting is off, or have nowhere to go; the old Title screen flashed
+// "✓ COPIED" unconditionally because opening a mailto cannot meaningfully fail.
+// Flashing success over a refusal is a lie told by the one control that must
+// never lie, so every path returns a player-facing message and both screens
+// render it verbatim. ⚠ THE DEDUPE fingerprints the raw log (length + newest
+// tail, keyed per slot) BEFORE anything is sent, and is stored even on a queued
+// send so a duplicate cannot be queued behind one already waiting. A general
+// report with no character loaded is never blocked — "the game won't start"
+// carries no play by definition. docs/PRIVACY.md moved with the button, and the
+// dead `_legacySendBugReport` copy that still held a clipboard stage, a
+// READ-ME-FIRST body and a mailto is deleted: that is the land he asked to
+// archive, and a dead function holding it is where it grows back.
+export const OTA_BUILD_ID = '2026-09-04-1665-the-bug-report-pushes';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-04-1664-no-phantom-syllable';
 // golem catch-up 2026-09-04: markerless publish of OTA-1664 - no phantom
 // syllable. Owner: there should be no vowel in front of Samarran or Nimari -
 // "the s and the n are the starting sound of each word... it reads like you're

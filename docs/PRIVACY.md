@@ -1,10 +1,11 @@
 # Privacy Policy for Tartaria Realms
 
 **Effective date:** May 23, 2026
-**Last updated:** September 4, 2026 — a new SEND LOG button lets you send
-your own game log to the developer when you choose to; see "Sending a log
-yourself" below for exactly what it includes. Automatic crash reports still
-start ON (August 24, 2026); see "The AUTOMATIC CRASH REPORTS switch".
+**Last updated:** September 4, 2026 — REPORT A BUG now sends your report
+straight to the developer instead of opening an email, and it includes your
+game log; see "Sending a report yourself" below for exactly what it contains.
+Automatic crash reports still start ON (August 24, 2026); see "The AUTOMATIC
+CRASH REPORTS switch".
 **Publisher:** Hot Attic Games
 **Contact:** ernstkevin@yahoo.com
 
@@ -23,10 +24,10 @@ off at any time**. While they are on, technical details about a crash —
 never anything about you, and never anything from your saves — go to Sentry
 so the crash can be fixed.
 
-**Sending a log yourself** is something you do deliberately, and it sends
-much more: your game log, which includes anything you typed, plus your save
-and inventory. It never happens on its own. Nothing is sent unless you tap
-SEND LOG and then confirm on a second tap.
+**Sending a report yourself** is something you do deliberately, and it sends
+much more: your game log, which includes anything you typed. It never happens
+on its own. Nothing is sent unless you open REPORT A BUG, describe the
+problem, and tap send.
 
 What each of them includes, exactly, is listed below, along with the switch
 that stops both.
@@ -34,10 +35,10 @@ that stops both.
 ## Data we collect
 
 **Nothing except crash reports (while their switch is on) and whatever you
-choose to send yourself with SEND LOG.** The app does not request or store
-any personal information about you or your device. Crash reporting starts
-on; switch it off in Settings and the app transmits nothing at all — that
-switch governs SEND LOG too.
+choose to send yourself with REPORT A BUG.** The app does not request or
+store any personal information about you or your device. Crash reporting
+starts on; switch it off in Settings and the app transmits nothing at all —
+that switch governs REPORT A BUG too.
 
 There is no:
 - account or login system
@@ -109,8 +110,8 @@ policy at https://sentry.io/privacy/.
 
 Your save files, character history, settings, and game log are
 stored only on your device, inside the app's private storage area,
-unless you choose to send them with SEND LOG (see "Sending a log
-yourself" below). Uninstalling the app permanently deletes all of it.
+unless you choose to send them with REPORT A BUG (see "Sending a
+report yourself" below). Uninstalling the app permanently deletes all of it.
 
 ## Data we share
 
@@ -158,42 +159,44 @@ circumstances:
    full contents of a report are listed under "The AUTOMATIC CRASH
    REPORTS switch" above.
 
-5. **A log you send yourself.** If you tap SEND LOG and confirm, the app
-   posts that one bundle to the same address. It is sent once, when you
-   ask for it, and never on a schedule or in the background. With
-   AUTOMATIC CRASH REPORTS off, this button cannot send at all.
+5. **A report you send yourself.** If you file a REPORT A BUG, the app posts
+   that one report to the same address. It is sent once, when you ask for
+   it, and never on a schedule or in the background. With AUTOMATIC CRASH
+   REPORTS off, the button cannot send at all.
 
 No other outbound network traffic originates from the app.
 
-## Sending a log yourself
+## Sending a report yourself
 
-Settings → SESSION → REPORTING has a **SEND LOG** button. It exists so
-that a bug you hit can be traced without you having to copy and paste
-anything into an email.
+Settings → SESSION → REPORTING, and the title screen, both have a **REPORT A
+BUG** button. It exists so that a bug you hit can be traced without you
+having to copy and paste anything into an email — which is what it used to
+require, and what it no longer does.
 
-**It only ever runs when you ask.** The first tap arms the button and
-tells you what is about to be sent; nothing leaves your device until you
-tap a second time to confirm. Switching tabs or leaving the screen
-cancels it.
+**It only ever runs when you ask.** You open it, describe what went wrong,
+and tap send. Nothing leaves your device before that.
 
 **What it sends:**
 
-- your **game log** — the play-by-play of your session, which includes
-  the commands and text you typed into the game
-- your **save** — the same export the COPY SAVE button produces
-- your **inventory** — the same snapshot COPY INVENTORY produces
-- the **device and build summary** shown on the About screen (device
-  model, Android version, app and update version, memory and crash
-  counters)
+- what you **typed into the report** — your description of the problem
+- your **game log** — the play-by-play of your session, which includes the
+  commands and text you typed into the game
+- the **voice diagnostics** (engine, voice, recent speech routes and errors)
+- the **device and build summary** shown on the About screen (device model,
+  Android version, app and update version, memory and crash counters)
 
-**What it still never sends:** your name, an account identifier (the app
-has no accounts), your location, your contacts, or any advertising
-identifier.
+**What it still never sends:** your name, an account identifier (the app has
+no accounts), your location, your contacts, or any advertising identifier.
 
-It goes to the same destination as crash reports (`ingest.us.sentry.io`)
-and is read only by the developer, to find the bug. If AUTOMATIC CRASH
-REPORTS is off, SEND LOG does nothing — it is the same connection, and
-the switch governs both.
+**One report per session of play.** After a report goes out, the button will
+not send another until something new has happened in your game log — a second
+report on an identical log carries identical evidence. It tells you so when it
+refuses, rather than appearing to send.
+
+It goes to the same destination as crash reports (`ingest.us.sentry.io`) and
+is read only by the developer, to find the bug. If AUTOMATIC CRASH REPORTS is
+off, REPORT A BUG cannot send — it is the same connection, and the switch
+governs both.
 
 ## After the model download
 
@@ -212,12 +215,11 @@ rolls describing combat outcomes). No personal data is collected
 from any user regardless of age — including in crash reports, which
 carry no name, no account, and nothing typed into the game.
 
-If a player chooses to use SEND LOG, the log they send does include what
-they typed into the game — that is what makes it useful for finding a bug.
-It is never sent automatically, it takes two deliberate taps, the screen
-says what it contains before the second one, and turning AUTOMATIC CRASH
-REPORTS off disables it entirely. A younger player should ask a parent
-before using it.
+If a player chooses to file a REPORT A BUG, the report they send does include
+what they typed into the game — that is what makes it useful for finding a
+bug. It is never sent automatically, it takes a deliberate description and
+send, and turning AUTOMATIC CRASH REPORTS off disables it entirely. A younger
+player should ask a parent before using it.
 
 ## Changes to this policy
 

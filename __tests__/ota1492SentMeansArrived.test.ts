@@ -67,8 +67,15 @@ describe('OTA-1492 — the send answers with DELIVERY, not with queueing', () =>
 });
 
 describe('OTA-1492 — the outcome is written down on-device', () => {
-  it('⚠ handleSendLog logs the result either way — the next diagnosis starts from a line, not a memory', () => {
-    const about = readFileSync(join(__dirname, '..', 'app', 'screens', 'AboutScreen.tsx'), 'utf8');
-    expect(about).toMatch(/appendLog\('debug', `send-log: \$\{ok \? /);
+  it('⚠ the push logs the result either way — the next diagnosis starts from a line, not a memory', () => {
+    // ⚠ RE-ANCHORED for OTA-1665, and this pin earned its keep. SEND LOG's
+    // handler is deleted; REPORT A BUG is the push. Repointing it caught that
+    // the new implementation had dropped the result line ENTIRELY — the exact
+    // thing this OTA exists to prevent — so the CODE gained it back rather than
+    // the test losing it. It now emits the full describeInlineSend report
+    // (parts accepted, what flush said, where it threw), strictly more than the
+    // old one-word ok/not-ok line.
+    const about = readFileSync(join(__dirname, '..', 'app', 'diagnostics', 'bugReport.ts'), 'utf8');
+    expect(about).toContain("appendLog('debug', describeInlineSend(chunk))");
   });
 });

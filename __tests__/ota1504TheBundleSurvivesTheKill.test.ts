@@ -68,6 +68,16 @@ import { between } from '../test-utils/srcBlock';
 
 const ROOT = join(__dirname, '..');
 const ABOUT = readFileSync(join(ROOT, 'app', 'screens', 'AboutScreen.tsx'), 'utf8');
+// ⚠⚠ OTA-1665 — THE BUTTON'S SEND PATH MOVED, and this constant moved with it.
+// Every "button" assertion in this file used to read AboutScreen, because that
+// is where SEND LOG's handler lived. SEND LOG is deleted (the owner: "I've
+// removed the send log") and REPORT A BUG is the one push now, so the same
+// claims are asserted against `diagnostics/bugReport.ts`. The claims themselves
+// are unchanged and were worth every line: repointing them caught that the new
+// implementation read `!chunk.stopped` instead of `chunk.delivered` — the exact
+// false positive OTA-1519 was written about — and that it had dropped the
+// OTA-1492 result line entirely. Both fixed in the code, not the test.
+const BUTTON = readFileSync(join(ROOT, 'app', 'diagnostics', 'bugReport.ts'), 'utf8');
 const APP = readFileSync(join(ROOT, 'App.tsx'), 'utf8');
 const BOOT = readFileSync(join(ROOT, 'app', 'state', 'slices', 'bootSlice.ts'), 'utf8');
 const PRESSURE = readFileSync(join(ROOT, 'app', 'diagnostics', 'runtimePressure.ts'), 'utf8');
@@ -124,31 +134,24 @@ describe('OTA-1504 — the bundle is on disk before anything is sent', () => {
     expect(mockDisk.size).toBe(0);
   });
 
-  it('⚠⚠ AboutScreen persists BEFORE it sends, and reports the queued state honestly', () => {
-    const body = between(ABOUT, 'async function handleSendLog()', 'async function handleCopyLog()');
-    const persistAt = body.indexOf('persistPendingBundle(bundle)');
-    // ⚠ OTA-1515 changed WHAT is sent (the game log, in parts) and OTA-1518
-    // changed HOW (inline, no attachments) — but neither changed this
+  it('⚠⚠ the push persists BEFORE it sends, and reports the queued state honestly', () => {
+    // ⚠ RE-ANCHORED for OTA-1665. This read AboutScreen's `handleSendLog`, which
+    // is deleted along with the SEND LOG button; the one push is now REPORT A
+    // BUG, in diagnostics/bugReport.ts. OTA-1515 changed WHAT is sent, OTA-1518
+    // changed HOW, OTA-1665 changed WHICH BUTTON — and none of them changed this
     // ORDER, which is the whole point of the pin: the durable copy is on disk
-    // before anything crosses the wire, so the owner's swipe-away habit is
-    // free. Re-pinned to the current sender rather than deleted.
-    const sendAt = body.indexOf('sendGameLogInline(bundle.log,');
+    // before anything crosses the wire, so the owner's swipe-away habit is free.
+    const body = BUTTON.slice(BUTTON.indexOf('export async function composeAndSendBugReport'));
+    const persistAt = body.indexOf('persistPendingBundle({');
+    const sendAt = body.indexOf('sendGameLogInline(report, pendingId)');
     expect(persistAt).toBeGreaterThan(-1);
     expect(sendAt).toBeGreaterThan(persistAt);
-    // The three outcomes are distinct: sent, saved-for-retry, truly failed.
-    // (Pins carry their ternary context — bound to the code, not to prose,
-    // per the check:quotedpins discipline.)
-    expect(body).toContain("setLogSendState(ok ? 'sent' : pending ? 'queued' : 'failed')");
-    // ⚠ OTA-1515 replaced the boot-retry copy: the retry no longer needs a
-    // restart, so the button says so. The CONTRACT pinned here is unchanged —
-    // the queued state still tells the truth about a bundle kept on disk.
-    expect(ABOUT).toContain("logSendState === 'queued' ? '⏳ SAVED — TAP AGAIN TO RETRY NOW'");
-    // "SAFE TO CLOSE" is the owner's exact habit being blessed, not decoration.
-    expect(ABOUT).toContain("logSendState === 'sent' ? '✓ LOG SENT — SAFE TO CLOSE'");
+    // The outcomes stay distinct: sent, saved-for-retry, and the refusals.
+    expect(body).toContain("status: 'sent'");
+    expect(body).toContain("status: 'queued'");
+    expect(body).toMatch(/Saved on this device and queued/);
   });
-});
 
-describe('OTA-1504 — the boot retry', () => {
   it('⚠ an empty disk is a silent no-op — no send, no line', async () => {
     await armed();
     expect(await retryPendingBundleAtBoot()).toBeNull();

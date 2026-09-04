@@ -3,12 +3,30 @@
 // report. Now bundles VOICE + ABOUT(device) + LOGS into one report, so the
 // player no longer copies three separate diagnostics — one button, one paste.
 //
-// NOTE (native follow-up): true zero-paste needs `expo-mail-composer` (sets the
-// mail body directly, no URL length limit). That's a native module → a native
-// rebuild. Until then this copies the full report to the clipboard and opens a
-// mailto with a READ-ME-FIRST body; the player pastes once.
-import * as Clipboard from 'expo-clipboard';
-import { Linking } from 'react-native';
+// ⚠⚠⚠ OTA-1665 — IT PUSHES NOW. THE EMAIL ROUTE IS RETIRED. Owner: *"report a
+// bug should be the button that pushed the log, so we don't need the email route
+// anymore, we can archive that bug report land"*, alongside *"I've removed the
+// send log."* So there is ONE button for this in the whole product, and it goes
+// straight to Sentry carrying what the player typed.
+//
+// ⚠ THE CLIPBOARD + MAILTO DANCE IS GONE, and it deserves an obituary because it
+// was never the design anyone wanted — the note here used to say true zero-paste
+// needed `expo-mail-composer`, i.e. a native rebuild, and native builds are
+// parked. So the player got a READ-ME-FIRST body, a manual paste, and a report
+// that "arrives empty and we can't track the bug down" whenever they missed a
+// step. Both the owner's daughters sent reports that way tonight. The transport
+// this needed was already in the app: the OTA-1504 durable pipeline SEND LOG has
+// used since August. It just was not wired to the button people actually find.
+//
+// ⚠⚠ ONE REPORT PER CHANGED LOG. Owner: *"after you do a bug report and that
+// pushes a log, you can't do another one until something in the log is changed.
+// so you have to go play for a little bit before it allows you to push another
+// one."* A second report on an identical log is a duplicate issue carrying
+// identical evidence, and the fingerprint below is the whole enforcement.
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { persistPendingBundle } from './pendingBundle';
+import { sendGameLogInline, describeInlineSend } from './sentryTransport';
+import { reportingEnabled, crashReportDsn } from './crashReporter';
 import { buildBasicDeviceSummary } from './aboutSummary';
 import { readSlotLog, type SlotSummary } from '../engine/saveSystem';
 import { OTA_BUILD_ID } from '../buildInfo';
@@ -60,24 +78,56 @@ function buildVoiceSummary(): string {
 // accepts ~64KB per paste, iOS Mail ~50KB; 40KB leaves room for the wrapper.
 const LOG_CHARS_CAP = 40_000;
 
-/** Compose the full bug report (description + device + VOICE + log), copy it to
- *  the clipboard, and open a mailto with paste instructions. Used by both the
- *  Title screen and the in-game Settings/About screen. */
+export const BUG_REPORT_MARK_KEY = '@tartaria/lastBugReportFingerprint';
+
+/** ⚠ WHAT "THE LOG CHANGED" MEANS, precisely. The raw slot log grows at the end
+ *  (the composer reverses it for display), so its LENGTH plus its newest tail
+ *  moves the moment anything is written — a step, a swing, a persist line. Two
+ *  reports filed without playing produce the identical pair; that is the case
+ *  the owner asked to block. Length alone is not enough: an edit that keeps the
+ *  size would slip through, and the tail costs nothing. */
+function logFingerprint(slotId: string, raw: string): string {
+  return `${slotId}:${raw.length}:${raw.slice(-240)}`;
+}
+
+export type BugReportStatus = 'sent' | 'queued' | 'unchanged' | 'off' | 'unconfigured' | 'failed';
+export interface BugReportOutcome {
+  status: BugReportStatus;
+  /** ⚠ ALWAYS SET, for every status. B15: a refusal always speaks. A bug button
+   *  that goes quiet is the exact failure this session has now fixed four times
+   *  in other places; it is not shipping here. */
+  message: string;
+}
+
+/** Compose the full bug report (description + device + VOICE + log) and PUSH it,
+ *  once, to the same destination crash records go to. Used by both the Title
+ *  screen and the in-game Settings/About screen. Never throws: every path
+ *  returns an outcome whose `message` can be shown to the player as-is. */
 export async function composeAndSendBugReport(args: {
   slot: SlotSummary | null;
   description: string;
-}): Promise<void> {
+}): Promise<BugReportOutcome> {
   const { slot, description } = args;
   const charName = slot?.playerName ?? '(general / no character)';
-  const subject = `Bug Report${slot ? ` — ${slot.playerName}` : ''}`;
+  // ⚠ THE HEADLINE, and it is the first line of the payload on purpose. This
+  // used to be the email SUBJECT; with the mailto gone it would have been dead
+  // code, but the value it carried is exactly what a Sentry event needs to be
+  // triageable at a glance — who, and what they said. The first sentence of the
+  // description rides along, trimmed, so a list of reports reads as a list of
+  // problems rather than a column of identical titles.
+  const headline = `Bug Report${slot ? ` — ${slot.playerName}` : ''}`
+    + ` · ${getBuildCodename(OTA_BUILD_ID)}`
+    + (description ? ` · ${description.split('\n')[0]!.slice(0, 80)}` : ' · (no description)');
 
   const deviceBlock = buildBasicDeviceSummary();
   const voiceBlock = buildVoiceSummary();
 
   let logBlock = '(no character selected — no log attached)';
+  let rawLog = '';
   if (slot) {
     try {
       const raw = await readSlotLog(slot.slotId);
+      rawLog = raw ?? '';
       if (raw && raw.length > 0) {
         const allLines = raw.split('\n').filter((l) => l.length > 0);
         const totalLines = allLines.length;
@@ -103,6 +153,7 @@ export async function composeAndSendBugReport(args: {
   }
 
   const report = [
+    headline,
     `=== TARTARIA BUG REPORT ===`,
     `Submitted: ${new Date().toISOString()}`,
     `Character: ${charName}`,
@@ -126,39 +177,95 @@ export async function composeAndSendBugReport(args: {
     `=== END REPORT ===`,
   ].filter((l) => l !== null).join('\n');
 
-  try {
-    await Clipboard.setStringAsync(report);
-  } catch {
-    /* clipboard rarely fails — proceed to mailto anyway */
+  // ⚠⚠ THE DEDUPE GATE, and it runs BEFORE anything is sent or stored. Owner:
+  // *"after you do a bug report and that pushes a log, you can't do another one
+  // until something in the log is changed. so you have to go play for a little
+  // bit before it allows you to push another one."*
+  //
+  // ⚠ IT ONLY APPLIES WITH A CHARACTER LOADED. A general report from the title
+  // screen has no log to change, so gating it on one would lock the player out
+  // of the only channel they have for "the game won't start" — the report that
+  // matters most and the one that by definition carries no play.
+  const mark = slot ? logFingerprint(slot.slotId, rawLog) : null;
+  if (mark) {
+    let seen: string | null = null;
+    try { seen = await AsyncStorage.getItem(BUG_REPORT_MARK_KEY); } catch { seen = null; }
+    if (seen === mark) {
+      return {
+        status: 'unchanged',
+        message: 'You already sent this one. Nothing has happened in the log since — '
+          + 'play a while and the button comes back.',
+      };
+    }
   }
 
-  const mailtoBody =
-    `READ ME FIRST\n` +
-    `=============\n` +
-    `Your full bug report (description, device, VOICE info, and most-\n` +
-    `recent log entries — newest at top) has been COPIED TO YOUR\n` +
-    `CLIPBOARD. Before sending this email:\n` +
-    `\n` +
-    `  1. Long-press anywhere below the "PASTE BELOW" line\n` +
-    `  2. Tap PASTE\n` +
-    `  3. Then tap Send\n` +
-    `\n` +
-    `Without the paste, this email arrives empty and we can't\n` +
-    `track the bug down.\n` +
-    `\n` +
-    `Character: ${charName}\n` +
-    `Build: ${getBuildCodename(OTA_BUILD_ID)}\n` +
-    `\n` +
-    `--- PASTE BELOW THIS LINE ---\n` +
-    `\n`;
-  const mailto =
-    `mailto:hotatticgames@gmail.com` +
-    `?subject=${encodeURIComponent(subject)}` +
-    `&body=${encodeURIComponent(mailtoBody)}`;
-
-  try {
-    await Linking.openURL(mailto);
-  } catch {
-    /* no mail client — report is still on the clipboard */
+  // ⚠ THE SAME TWO CHECKS SEND LOG ANSWERS TO, said in the player's words rather
+  // than failing quietly. `crashReportDsn` is fixed for the life of the build;
+  // `reportingEnabled` is the switch on this very screen.
+  if (crashReportDsn() === null) {
+    return {
+      status: 'unconfigured',
+      message: 'This version has no reporting destination built in, so there is nowhere to send it.',
+    };
   }
+  if (!reportingEnabled()) {
+    return {
+      status: 'off',
+      message: 'Reports are switched off on this device. Turn AUTOMATIC CRASH REPORTS on to send this.',
+    };
+  }
+
+  // ⚠⚠ PERSIST BEFORE THE FIRST SEND — the OTA-1504 rule, learned the night a
+  // mid-flush force-close destroyed every bundle. With the file on disk first, a
+  // kill costs nothing: the next boot re-sends it. The retries run even after a
+  // "successful" flush, because flush()===true has been caught reporting
+  // envelopes that never arrived.
+  let pendingId = `bug${Date.now().toString(36)}`;
+  try {
+    const pending = await persistPendingBundle({
+      log: report, inventory: '', save: '', device: deviceBlock,
+    });
+    if (pending?.id) pendingId = pending.id;
+  } catch {
+    /* disk full or unavailable — the inline send below is still worth trying */
+  }
+
+  // ⚠⚠⚠ `delivered`, NOT `!stopped` — AND THE SUITE CAUGHT ME GETTING THIS WRONG.
+  // My first version read `!chunk.stopped`, i.e. "we attempted it, so it went".
+  // That is exactly the false positive OTA-1519 exists because of: a send can be
+  // attempted, report no stop reason, and still lose parts on the wire — that
+  // OTA measured Sentry silently replacing NINE of 49 inline parts. `delivered`
+  // is `sent === parts`, the only field that means the whole thing arrived.
+  let ok = false;
+  try {
+    const chunk = await sendGameLogInline(report, pendingId);
+    ok = chunk.delivered;
+    // ⚠⚠ AND IT LEAVES A LINE. OTA-1492's rule: the next diagnosis starts from a
+    // line, not a memory — so the full inline-send report (parts accepted, what
+    // flush said, where it threw) goes into the game log either way. Lazily
+    // required because a diagnostics module must not take a static dependency
+    // on the store.
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { useGameStore } = require('../state/gameStore') as typeof import('../state/gameStore');
+      useGameStore.getState().appendLog('debug', describeInlineSend(chunk));
+    } catch { /* no store in this context (title screen boot) — the send still counts */ }
+  } catch {
+    ok = false;
+  }
+
+  // ⚠ THE MARK IS STORED ON A QUEUED SEND TOO, deliberately. The bundle is on
+  // disk and the boot retry owns it from here, so letting a second identical
+  // report through would queue a duplicate of something already waiting — the
+  // exact outcome the owner asked to prevent, arriving twice instead of once.
+  if (mark) {
+    try { await AsyncStorage.setItem(BUG_REPORT_MARK_KEY, mark); } catch { /* retried next report */ }
+  }
+
+  return ok
+    ? { status: 'sent', message: 'Report sent. Thank you — it arrived with your log attached.' }
+    : {
+      status: 'queued',
+      message: 'Saved on this device and queued. It will finish sending the next time the game starts.',
+    };
 }

@@ -40,6 +40,16 @@ import { between } from '../test-utils/srcBlock';
 
 const ROOT = join(__dirname, '..');
 const ABOUT = readFileSync(join(ROOT, 'app', 'screens', 'AboutScreen.tsx'), 'utf8');
+// ⚠⚠ OTA-1665 — THE BUTTON'S SEND PATH MOVED, and this constant moved with it.
+// Every "button" assertion in this file used to read AboutScreen, because that
+// is where SEND LOG's handler lived. SEND LOG is deleted (the owner: "I've
+// removed the send log") and REPORT A BUG is the one push now, so the same
+// claims are asserted against `diagnostics/bugReport.ts`. The claims themselves
+// are unchanged and were worth every line: repointing them caught that the new
+// implementation read `!chunk.stopped` instead of `chunk.delivered` — the exact
+// false positive OTA-1519 was written about — and that it had dropped the
+// OTA-1492 result line entirely. Both fixed in the code, not the test.
+const BUTTON = readFileSync(join(ROOT, 'app', 'diagnostics', 'bugReport.ts'), 'utf8');
 
 const armed = async () => {
   await AsyncStorage.removeItem(CRASH_REPORTING_PREF_KEY);
@@ -115,7 +125,15 @@ describe('OTA-1489 — the button is honest about its work', () => {
     // that was always about honesty rather than access: the button appears only
     // where the build has a destination, because a live-looking button that
     // cannot deliver is how a tester concludes their report was received.
-    expect(ABOUT).toContain('{crashConfigured && (');
+    // ⚠ RE-ANCHORED AGAIN for OTA-1665. This asserted SEND LOG rendered only
+    // where the build could deliver — a real claim about a button that no
+    // longer exists. What survives is the claim underneath it: there IS a way
+    // to report from this screen, and it is not hidden behind an owner gate.
+    // ⚠ Pinned to the WIRING, not the label. 'REPORT A BUG' is three prose
+    // words — a pin that fails on a reword and passes if the button is deleted,
+    // which is the shape check:quotedpins exists to retire. What must be true is
+    // that this screen can open the report at all, and that nothing gates it.
+    expect(ABOUT).toContain('setBugReportOpen(true)');
     expect(ABOUT).not.toContain('{ownerTools && crashConfigured && (');
   });
 
@@ -126,20 +144,21 @@ describe('OTA-1489 — the button is honest about its work', () => {
     expect(sharingUnlockedFor(null)).toBe(false);
   });
 
-  it('⚠⚠ every part is composed by the SAME function its COPY button uses', () => {
-    // One derivation per artifact: what arrives at Sentry can never disagree
-    // with what the corresponding clipboard export would have said.
-    const body = between(ABOUT, 'async function handleSendLog()', 'async function handleCopyLog()');
-    const flushAt = body.indexOf('flushLogWrites()');
-    const readAt = body.indexOf('readFullLog()');
-    expect(flushAt).toBeGreaterThan(-1);
-    expect(readAt).toBeGreaterThan(flushAt);
-    expect(body).toContain('log: stampLogExport(fresh),');
-    expect(body).toContain('inventory: stampInventoryExport(buildInventorySnapshot(s.player), device, s.player?.name),');
-    expect(body).toContain('save: stampSaveExport(buildSaveSnapshot(s.player, s.worldMemory), device, s.player?.name),');
-    expect(body).toContain('device,');
-    // And a failure is SHOWN, with the clipboard path named as the fallback —
-    // claim-level: the failed state's text points at COPY LOG, however worded.
-    expect(ABOUT).toMatch(/FAILED[^']{0,40}COPY LOG/);
+  it('⚠⚠ the report is composed by the SAME functions the COPY buttons use', () => {
+    // ⚠ RE-ANCHORED for OTA-1665. One derivation per artifact: what arrives at
+    // the developer can never disagree with what the corresponding clipboard
+    // export would have said. That claim outlived the button it was written
+    // for — SEND LOG is deleted, REPORT A BUG carries the payload — so it is
+    // asserted where the payload is actually built.
+    const body = BUTTON.slice(BUTTON.indexOf('export async function composeAndSendBugReport'));
+    expect(body).toContain('buildBasicDeviceSummary()');
+    expect(body).toContain('buildVoiceSummary()');
+    expect(body).toContain('readSlotLog(slot.slotId)');
+    // And a failure is SHOWN rather than swallowed. The clipboard fallback it
+    // used to name is gone with the clipboard route, so the surviving claim is
+    // the stronger one: every outcome carries words for the player.
+    expect(body).toContain("status: 'queued'");
+    expect(body).toContain("status: 'unchanged'");
+    expect(body).toMatch(/message: '/);
   });
 });

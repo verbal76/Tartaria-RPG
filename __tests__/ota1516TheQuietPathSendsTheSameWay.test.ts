@@ -42,6 +42,16 @@ const ROOT = join(__dirname, '..');
 const PENDING = readFileSync(join(ROOT, 'app', 'diagnostics', 'pendingBundle.ts'), 'utf8');
 const AUTO = readFileSync(join(ROOT, 'app', 'diagnostics', 'autoBundle.ts'), 'utf8');
 const ABOUT = readFileSync(join(ROOT, 'app', 'screens', 'AboutScreen.tsx'), 'utf8');
+// ⚠⚠ OTA-1665 — THE BUTTON'S SEND PATH MOVED, and this constant moved with it.
+// Every "button" assertion in this file used to read AboutScreen, because that
+// is where SEND LOG's handler lived. SEND LOG is deleted (the owner: "I've
+// removed the send log") and REPORT A BUG is the one push now, so the same
+// claims are asserted against `diagnostics/bugReport.ts`. The claims themselves
+// are unchanged and were worth every line: repointing them caught that the new
+// implementation read `!chunk.stopped` instead of `chunk.delivered` — the exact
+// false positive OTA-1519 was written about — and that it had dropped the
+// OTA-1492 result line entirely. Both fixed in the code, not the test.
+const BUTTON = readFileSync(join(ROOT, 'app', 'diagnostics', 'bugReport.ts'), 'utf8');
 const TRANSPORT = readFileSync(join(ROOT, 'app', 'diagnostics', 'sentryTransport.ts'), 'utf8');
 const APP = readFileSync(join(ROOT, 'App.tsx'), 'utf8');
 
@@ -80,11 +90,11 @@ describe('OTA-1516 — every send path sends the same payload the same way', () 
     // ⚠ OTA-1519 brought all three onto the SAME inline sender, which is what
     // "agree" was always reaching for — 1516 could only get them off the
     // four-artifact envelope, because the attachment fault was not yet proven.
-    for (const src of [ABOUT, PENDING, AUTO]) {
+    for (const src of [BUTTON, PENDING, AUTO]) {
       expect(codeOnly(src)).toContain('sendGameLogInline(');
     }
     // And nothing anywhere still reaches for the one-envelope sender.
-    for (const src of [ABOUT, PENDING, AUTO]) {
+    for (const src of [BUTTON, PENDING, AUTO]) {
       expect(codeOnly(src)).not.toMatch(/sendDiagnosticsBundle\(/);
     }
   });
@@ -92,7 +102,7 @@ describe('OTA-1516 — every send path sends the same payload the same way', () 
   it('⚠⚠ THE DURABLE COPY IS UNTOUCHED — chunking changed the WIRE, not the disk', () => {
     // The save and inventory still go into the file on disk. Losing them would
     // have traded one diagnosis for another; only the upload narrowed.
-    expect(codeOnly(ABOUT)).toContain('const pending = await persistPendingBundle(bundle);');
+    expect(codeOnly(BUTTON)).toContain('await persistPendingBundle({');
     expect(codeOnly(AUTO)).toContain('const pending = await persistPendingBundle(bundle);');
     // The stored shape still carries all four artifacts.
     expect(PENDING).toMatch(/DiagnosticsBundle/);

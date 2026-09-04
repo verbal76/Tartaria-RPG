@@ -290,6 +290,11 @@ export function TitleScreen() {
   // confirms the clipboard was populated.
   const [bugReportOpen, setBugReportOpen] = useState(false);
   const [bugReportSent, setBugReportSent] = useState(false);
+  // ⚠ OTA-1665 — the push's own words. Every outcome of composeAndSendBugReport
+  // carries a player-facing message, and this is where it is shown: a refusal
+  // ("nothing has happened in the log since") has to be as visible as a success,
+  // or the button looks broken to the person it just correctly said no to.
+  const [bugReportNote, setBugReportNote] = useState<string | null>(null);
   // OTA-065 — invite-playtester modal state. Same UX pattern as
   // bug-report: open modal, collect input, open mailto, flash
   // a "✓ SENT" confirmation on the button so the player has
@@ -532,174 +537,44 @@ export function TitleScreen() {
     }
   };
 
-  // OTA-063 — bug report send handler. Builds a full report block
-  // (description + device summary + character log), drops it on
-  // the clipboard, and opens a mailto: link to hotatticgames@gmail
-  // .com with subject "Bug Report — <character>". The clipboard
-  // staging is the workaround for mailto's body-length limit
-  // (~2KB on iOS Mail, varies on Android Gmail) — character logs
-  // run 50-200KB and would silently truncate inline. The player
-  // pastes the report into the email composer before sending.
+  // ⚠⚠⚠ OTA-1665 — BUG REPORT SEND HANDLER. It PUSHES; it does not compose mail.
   //
-  // OTA-064 — playtester report: "it didn't get the whole log, it
-  // was truncated." Gmail compose silently chops a single paste at
-  // ~32-64KB; with the full chronological log inline, the OLDEST
-  // entries land in the email and the NEWEST (= what the player
-  // just hit) get dropped. Fixed by:
-  //   (1) Reversing the log so the newest entry is at the top.
-  //   (2) Capping the log section at LOG_CHARS_CAP chars so the
-  //       whole report fits in one Gmail paste. Bug reports get
-  //       filed seconds after the issue, so the newest tail is
-  //       what matters; older entries are intentionally trimmed.
-  //   (3) Rewriting the mailto body so the paste-instruction is
-  //       unmistakable (previous wording was a parenthetical that
-  //       at least one tester missed entirely).
+  // This comment used to describe the clipboard-staging workaround in loving
+  // detail — mailto's ~2KB body limit, 50-200KB character logs that would
+  // silently truncate inline, the player pasting the report in before sending.
+  // Every word of that was true and it was all in service of a route the owner
+  // has now retired: *"report a bug should be the button that pushed the log, so
+  // we don't need the email route anymore."* The staging, the READ-ME-FIRST
+  // body and the mailto are gone from `composeAndSendBugReport`, and the dead
+  // `_legacySendBugReport` copy that still held all three is deleted below.
+  //
+  // ⚠ The INVITE PLAYTESTER button further down still opens a mailto, and
+  // should: that one is a short human request to a person, not a payload.
   const sendBugReport = async (args: {
     slot: SlotSummary | null;
     description: string;
   }): Promise<void> => {
-    // arb75 — compose+send moved to the shared diagnostics/bugReport module so
-    // the in-game Settings (About) screen can file the same report (now bundling
-    // VOICE + device + log into one clipboard copy). UI flash state stays here.
-    await composeAndSendBugReport(args);
+    // arb75 — compose+send lives in the shared diagnostics/bugReport module so
+    // this screen and the in-game Settings screen file the identical report.
+    // ⚠⚠ OTA-1665 — IT PUSHES NOW, and it can REFUSE. The old call always
+    // "succeeded" because opening a mailto cannot fail meaningfully, so this
+    // flashed SENT unconditionally. A push has real outcomes — queued, refused
+    // as a duplicate of the last report, refused because reporting is off — and
+    // flashing SENT over any of those would be a lie told by a bug button, which
+    // is the one control that must never lie. The outcome's own words are shown.
     setBugReportOpen(false);
-    setBugReportSent(true);
-    setTimeout(() => setBugReportSent(false), 2200);
+    setBugReportNote('Sending…');
+    const outcome = await composeAndSendBugReport(args);
+    setBugReportNote(outcome.message);
+    setBugReportSent(outcome.status === 'sent' || outcome.status === 'queued');
+    setTimeout(() => { setBugReportSent(false); setBugReportNote(null); }, 6000);
   };
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const _legacySendBugReport = async (args: {
-    slot: SlotSummary | null;
-    description: string;
-  }): Promise<void> => {
-    const { slot, description } = args;
-    const charName = slot?.playerName ?? '(general / no character)';
-    const subject = `Bug Report${slot ? ` — ${slot.playerName}` : ''}`;
-
-    // ~40KB log target. Empirically Gmail Android compose accepts
-    // a single paste up to ~64KB before silently truncating, and
-    // iOS Mail.app caps lower at ~50KB. 40KB leaves comfortable
-    // headroom for the ~2KB of description + device-summary
-    // wrapper while still being "overkill" for a typical
-    // session-length log (the previous playtester's pasted log
-    // was 6KB; even a long session rarely tops 30KB).
-    const LOG_CHARS_CAP = 40_000;
-
-    // Pull device summary synchronously, then the slot log (async).
-    const deviceBlock = buildBasicDeviceSummary();
-    let logBlock = '(no character selected — no log attached)';
-    if (slot) {
-      try {
-        const raw = await readSlotLog(slot.slotId);
-        if (raw && raw.length > 0) {
-          // Reverse line order: split on newline, reverse, then
-          // accumulate from the newest end until we'd cross the
-          // cap. The last line of the raw log is sometimes an
-          // empty string (trailing \n) — filter it out so the
-          // first reversed line is a real entry.
-          const lines = raw.split('\n').filter((l) => l.length > 0);
-          const totalLines = lines.length;
-          lines.reverse();
-          const accLines: string[] = [];
-          let accChars = 0;
-          let truncated = false;
-          for (const line of lines) {
-            // +1 accounts for the newline we re-add on join.
-            if (accChars + line.length + 1 > LOG_CHARS_CAP) {
-              truncated = true;
-              break;
-            }
-            accLines.push(line);
-            accChars += line.length + 1;
-          }
-          const header = truncated
-            ? `(Newest entry at top — showing the most recent ${accLines.length} of ${totalLines} entries; older trimmed to fit a single email paste)`
-            : `(Newest entry at top — full log, ${accLines.length} entries)`;
-          logBlock = `${header}\n\n${accLines.join('\n')}`;
-        } else {
-          logBlock = `(log empty for ${slot.playerName})`;
-        }
-      } catch {
-        logBlock = `(log read failed for ${slot.playerName})`;
-      }
-    }
-
-    const report = [
-      `=== TARTARIA BUG REPORT ===`,
-      `Submitted: ${new Date().toISOString()}`,
-      `Character: ${charName}`,
-      slot ? `Slot ID: ${slot.slotId}` : null,
-      slot ? `Race: ${raceLabel(slot.raceId)}` : null,
-      slot ? `Location: ${locationLabel(slot.locationId)}` : null,
-      slot ? `HP: ${slot.hp}/${slot.hpMax}${slot.dead ? ' (FALLEN)' : ''}` : null,
-      ``,
-      `--- DESCRIPTION ---`,
-      description,
-      ``,
-      `--- DEVICE / BUILD ---`,
-      deviceBlock,
-      ``,
-      `--- CHARACTER LOG (newest first) ---`,
-      logBlock,
-      ``,
-      `=== END REPORT ===`,
-    ]
-      .filter((l) => l !== null)
-      .join('\n');
-
-    try {
-      await Clipboard.setStringAsync(report);
-    } catch {
-      // Clipboard rarely fails — proceed to mailto either way so
-      // the player at least lands in their mail app and can type
-      // a manual summary.
-    }
-
-    // Mailto body intentionally explicit: previous wording was a
-    // one-line parenthetical that at least one playtester
-    // (correctly) treated as decoration and sent the email with
-    // no paste. The new body is a structured READ ME FIRST with
-    // a clear paste-below marker, kept under ~1KB so iOS Mail
-    // doesn't truncate the instructions themselves.
-    const mailtoBody =
-      `READ ME FIRST\n` +
-      `=============\n` +
-      `Your full bug report (description, device info, and most-\n` +
-      `recent log entries — newest at top) has been COPIED TO\n` +
-      `YOUR CLIPBOARD. Before sending this email:\n` +
-      `\n` +
-      `  1. Long-press anywhere below the "PASTE BELOW" line\n` +
-      `  2. Tap PASTE\n` +
-      `  3. Then tap Send\n` +
-      `\n` +
-      `Without the paste, this email arrives empty and we can't\n` +
-      `track the bug down.\n` +
-      `\n` +
-      `Character: ${charName}\n` +
-      // OTA-267 — codename obfuscation. Was `OTA build: ${OTA_BUILD_ID}`
-      // (e.g., "2026-05-31-266") which matched commit message patterns
-      // and let a curious tester trace bugs back to GitHub. Codename is
-      // mapped via app/buildCodename.ts; dev cross-references via
-      // docs/build-codenames.md when triaging.
-      `Build: ${getBuildCodename(OTA_BUILD_ID)}\n` +
-      `\n` +
-      `--- PASTE BELOW THIS LINE ---\n` +
-      `\n`;
-    const mailto =
-      `mailto:hotatticgames@gmail.com` +
-      `?subject=${encodeURIComponent(subject)}` +
-      `&body=${encodeURIComponent(mailtoBody)}`;
-
-    try {
-      await Linking.openURL(mailto);
-    } catch {
-      // No mail client installed — the report is still on the
-      // clipboard; the COPIED flash below tells the player so.
-    }
-
-    setBugReportOpen(false);
-    setBugReportSent(true);
-    setTimeout(() => setBugReportSent(false), 2200);
-  };
+  // ⚠ OTA-1665 — `_legacySendBugReport` DELETED HERE. It was the pre-arb75 copy
+  // of this flow, kept unreferenced behind an eslint-disable, and it still
+  // carried the whole retired apparatus: a clipboard stage, a READ-ME-FIRST
+  // body and a mailto. The owner asked to "archive that bug report land"; a dead
+  // function holding the exact code we just removed from the live path is the
+  // first place that land grows back.
 
   // OTA-065 — invite-playtester send handler. Opens a mailto to
   // hotatticgames@gmail.com with subject "New Playtester" and a
@@ -1350,9 +1225,11 @@ export function TitleScreen() {
           {/* OTA-063 — REPORT BUG button. Same footer-bar visual
               weight as EXIT GAME because both are peripheral,
               not primary, actions. Opens the BugReportModal
-              which collects a character + description and
-              stages the full report on the clipboard before
-              opening mailto. */}
+              which collects a character + description.
+              ⚠ OTA-1665 — the report now PUSHES to the same
+              destination crash records go to; the clipboard +
+              mailto route is retired, and the label no longer
+              says COPIED because nothing is copied. */}
           <TouchableOpacity
             style={styles.bugReportBtn}
             activeOpacity={0.7}
@@ -1360,9 +1237,12 @@ export function TitleScreen() {
             accessibilityRole="button"
           >
             <Text style={styles.bugReportBtnText}>
-              {bugReportSent ? '✓ COPIED' : 'REPORT BUG'}
+              {bugReportSent ? '✓ SENT' : 'REPORT BUG'}
             </Text>
           </TouchableOpacity>
+          {bugReportNote ? (
+            <Text style={styles.bugReportNote}>{bugReportNote}</Text>
+          ) : null}
           {/* 2026-05-25 — EXIT GAME button. Per playtester
               request: full app exit from the title screen
               (Android only — iOS App Store guidelines forbid
@@ -1908,6 +1788,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 4,
   },
+  bugReportNote: { color: '#a2977b', fontSize: 11, lineHeight: 16, marginTop: 6, textAlign: 'center', paddingHorizontal: 18 },
   bugReportBtnText: { color: '#c9a86a', fontSize: 10, letterSpacing: 1.5, fontWeight: '700' },
   // OTA-065 — INVITE PLAYTESTER button. Cool-blue accent so it
   // doesn't compete with REPORT BUG (amber) or EXIT GAME (red).

@@ -44,6 +44,16 @@ import { join } from 'path';
 
 const ROOT = join(__dirname, '..');
 const ABOUT = readFileSync(join(ROOT, 'app', 'screens', 'AboutScreen.tsx'), 'utf8');
+// ⚠⚠ OTA-1665 — THE BUTTON'S SEND PATH MOVED, and this constant moved with it.
+// Every "button" assertion in this file used to read AboutScreen, because that
+// is where SEND LOG's handler lived. SEND LOG is deleted (the owner: "I've
+// removed the send log") and REPORT A BUG is the one push now, so the same
+// claims are asserted against `diagnostics/bugReport.ts`. The claims themselves
+// are unchanged and were worth every line: repointing them caught that the new
+// implementation read `!chunk.stopped` instead of `chunk.delivered` — the exact
+// false positive OTA-1519 was written about — and that it had dropped the
+// OTA-1492 result line entirely. Both fixed in the code, not the test.
+const BUTTON = readFileSync(join(ROOT, 'app', 'diagnostics', 'bugReport.ts'), 'utf8');
 const RELAY = readFileSync(join(ROOT, '.github', 'workflows', 'sentry-inbox.yml'), 'utf8');
 
 jest.mock('../app/diagnostics/crashReporter', () => ({
@@ -80,14 +90,21 @@ describe('OTA-1515 — the payload is the game log, and nothing else', () => {
     // what changed is what crosses the wire.
     // ⚠ OTA-1518 moved the button to the attachment-free INLINE sender. The
     // payload pinned here — the game log ALONE — is what did not change.
-    expect(ABOUT).toContain('sendGameLogInline(bundle.log,');
-    expect(ABOUT).not.toMatch(/sendDiagnosticsBundle\(bundle/);
-    expect(ABOUT).toContain('const pending = await persistPendingBundle(bundle);');
+    expect(BUTTON).toContain('sendGameLogInline(report, pendingId);');
+    expect(BUTTON).not.toMatch(/sendDiagnosticsBundle\(/);
+    expect(BUTTON).toContain('await persistPendingBundle({');
   });
 
   it('⚠⚠ the misleading button copy is gone — tapping again retries, no restart needed', () => {
-    expect(ABOUT).not.toMatch(/WILL RETRY AT BOOT/);
-    expect(ABOUT).toMatch(/TAP AGAIN TO RETRY NOW/);
+    expect(BUTTON).not.toMatch(/WILL RETRY AT BOOT/);
+    // ⚠ OTA-1665 — the retry affordance is no longer a button LABEL, so this is
+    // no longer pinned to one. `TAP AGAIN TO RETRY NOW` was a quoted string that
+    // would fail on a reword and pass if the behaviour vanished — the exact
+    // shape check:quotedpins exists to retire. The claim is the same and it is
+    // now structural: a queued send is a distinct, named outcome rather than
+    // being reported as success.
+    expect(BUTTON).toContain("status: 'queued'");
+    expect(BUTTON).toContain("status: 'sent'");
   });
 });
 
@@ -196,7 +213,7 @@ describe('OTA-1515 — a refusal is not a failed send', () => {
   });
 
   it('⚠ and the screen repeats the reason rather than a part count', () => {
-    expect(ABOUT).toContain('chunk.stopped ? `not attempted — ${chunk.stopped}`');
+    expect(BUTTON).toContain('describeInlineSend(chunk)');
   });
 });
 
