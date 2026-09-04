@@ -262,7 +262,14 @@ describe('OTA-1553 — the wiring', () => {
   it('⚠⚠⚠ the ★ and the enemy card read ONE reconcile and ONE Wisdom gate', () => {
     // The defect this forecloses: two copies of the same arithmetic drifting, so
     // the button and the card describe the same enemy differently.
-    expect(PANEL).toContain("import { reconciledDefenses, WEAKNESS_READ_WIS as SHARED_WEAKNESS_READ_WIS } from '../engine/weaponGlyphs';");
+    // ⚠ OTA-1656 — this pinned the whole import LINE, so adding COATING_GLYPH to
+    // it (to draw the enemy's coated blade) broke a test about something else
+    // entirely. What the claim actually is: both symbols come from weaponGlyphs,
+    // the one module that owns the reconcile — not which other names ride along
+    // on the same line.
+    expect(PANEL).toMatch(
+      /import \{[^}]*\breconciledDefenses\b[^}]*\bWEAKNESS_READ_WIS as SHARED_WEAKNESS_READ_WIS\b[^}]*\} from '\.\.\/engine\/weaponGlyphs';/,
+    );
     expect(PANEL).toContain('const defensesFor = reconciledDefenses;');
     expect(PANEL).toContain('const WEAKNESS_READ_WIS = SHARED_WEAKNESS_READ_WIS;');
     // The old private copy is gone — not shadowed, gone.

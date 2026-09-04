@@ -65,23 +65,32 @@ describe('OTA-1513 — the roll at birth', () => {
 
   it('⚠⚠ a low roll arms it, a high roll leaves it clean — and the kind comes from its own table', () => {
     expect(rollEnemyCoating(foe({ rarity: 'Rare', type: 'mud_revenant' }), rolls(0.01, 0.0)))
-      .toEqual({ kind: 'poison', dice: '1d4' });
+      .toEqual({ kind: 'poison', dice: '1d6' });
     expect(rollEnemyCoating(foe({ rarity: 'Rare', type: 'mud_revenant' }), rolls(0.01, 0.99)))
-      .toEqual({ kind: 'acid', dice: '1d4' });
+      .toEqual({ kind: 'acid', dice: '1d6' });
     expect(rollEnemyCoating(foe({ rarity: 'Common' }), rolls(0.99))).toBeNull();
   });
 
   it('⚠ dice scale with the ENEMY, so a coating never becomes why a common kills him', () => {
-    expect(rollEnemyCoating(foe({ rarity: 'Common' }), rolls(0))!.dice).toBe('1d3');
-    expect(rollEnemyCoating(foe({ rarity: 'Rare' }), rolls(0))!.dice).toBe('1d4');
-    expect(rollEnemyCoating(foe({ boss: true }), rolls(0))!.dice).toBe('1d6');
+    // ⚠ OTA-1656 — the whole ladder stepped up one (1d3/1d3/1d4/1d6 →
+    // 1d4/1d4/1d6/1d8), putting back what OTA-1646 took: shield-first HALVES a
+    // coating that lands on the raised shield, which cut this mechanic in half
+    // on the exact high-AC build it exists to pressure. What this test holds is
+    // the SHAPE of the rule — the dice follow the enemy's own standing and
+    // never the player's — and that is unchanged.
+    expect(rollEnemyCoating(foe({ rarity: 'Common' }), rolls(0))!.dice).toBe('1d4');
+    expect(rollEnemyCoating(foe({ rarity: 'Rare' }), rolls(0))!.dice).toBe('1d6');
+    expect(rollEnemyCoating(foe({ boss: true }), rolls(0))!.dice).toBe('1d8');
+    const sides = (d: string) => Number(d.split('d')[1]);
+    expect(sides(rollEnemyCoating(foe({ rarity: 'Common' }), rolls(0))!.dice))
+      .toBeLessThan(sides(rollEnemyCoating(foe({ boss: true }), rolls(0))!.dice));
   });
 
   it('⚠⚠⚠ EVERY enemy is born through the scaler, so one hook covers the whole population', () => {
     // scaledEnemyForContext is where a spawn DEFINITION becomes this fight's
     // enemy. An always-hit rng proves the wiring on the ordinary path…
     const armed = scaledEnemyForContext(foe({ rarity: 'Legendary', type: 'mud_revenant' }), 3, 5, () => 0);
-    expect(armed.coating).toEqual({ kind: 'poison', dice: '1d6' });
+    expect(armed.coating).toEqual({ kind: 'poison', dice: '1d8' });
     // …and an always-miss rng proves a clean weapon is still the common case.
     expect(scaledEnemyForContext(foe(), 0, 1, () => 0.99).coating).toBeUndefined();
   });

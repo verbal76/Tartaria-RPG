@@ -27228,7 +27228,36 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // "undefined", an unreadable foe SAYS it is unreadable instead of looking
 // defenceless, Wisdom 12 discloses what the gate withheld, and no enemy shape a
 // save can hold makes the popup throw.
-export const OTA_BUILD_ID = '2026-09-03-1655-the-card-is-asked';
+// OTA-1656 — THE BLADE YOU CAN SEE. Owner, after reading the overpowered-check
+// measurements: *"do all 4, but let's shoot for 30% having coatings."* Five
+// levers, each solved against the real catalogs. ⚠ THE COATING RATE WAS NEVER
+// THE REASON HE HAD NOT SEEN ONE: 24.3% of spawns already came coated, and
+// `enemy.coating` was rendered in NO component and NO screen — the only place it
+// ever surfaced was a clause appended to the damage line AFTER the blow landed.
+// So the blade is drawn now: one glyph inline in the enemy card's type row (NOT
+// a new row — OTA-1651 shortened these cards on purpose), in the same vocabulary
+// and colours as his own weapon buttons, and the popup names the kind, the dice
+// and the fact that armour resisting that type halves it. THEN the rate moved:
+// 8/20/33/47, boss 60, which is a roster-weighted 30.23% over the 135 authored
+// enemies — solved against enemies.json, and the suite re-solves it so the
+// ladder cannot drift off 30 silently. Commons stay gentle (6→8) because the
+// complaint was always mid-game. ⚠⚠ THE DICE GO UP ONE STEP (1d4/1d4/1d6/1d8)
+// TO PUT BACK WHAT I TOOK YESTERDAY: OTA-1646 sent every blow to the raised
+// shield, where a coating is halved, so the one mechanic that CANNOT be stacked
+// out of existence — the whole argument for its existence — got cut in half on
+// exactly the high-AC build it was written to answer. ⚠⚠ SHIELD_BYPASS_FLOOR =
+// 10%: measured, 66 of 135 enemies carried none of the three bypass traits, so
+// against half the bestiary a raised shield meant armour NEVER chipped — the
+// repair economy did not move onto the shield, it switched off. A shield stays
+// excellent (nine blows in ten still land on it, armour life still ~6x) but no
+// fight is free. ⚠⚠ AND ONE RING IS ONE BURST: nothing in equipItem stops the
+// same row sitting on four fingers, so four farmed copies of one Legendary ring
+// were 200 flat AoE on the opening tap against a roster whose median enemy has
+// 115 HP. Distinct sources still stack — that is the designed trade, four
+// fingers of passive value for four openings; four copies of one ring is that
+// trade with the cost removed.
+export const OTA_BUILD_ID = '2026-09-04-1656-the-blade-you-can-see';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-03-1655-the-card-is-asked';
 // golem catch-up 2026-09-03: markerless publish of OTA-1655 - the card is asked,
 // not read. The 24-hour audit scored all twenty OTAs by HOW they prove
 // themselves; nineteen carry real behavioural proof and OTA-1651 was the outlier

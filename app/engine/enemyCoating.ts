@@ -48,14 +48,27 @@ export interface EnemyCoating {
  *  commons a new character meets and real on the rarities that only show up
  *  once the AC stack exists. Making early fights harder would answer a
  *  complaint nobody made. */
+/** ⚠⚠ OTA-1656 — RAISED TO A MEASURED 30%. Owner: *"let's shoot for 30% having
+ *  coatings."* The old ladder (6/14/26/40, boss 55) came out at a
+ *  roster-weighted **24.3%** across the 135 authored enemies — already one in
+ *  four, and not the reason he had never seen one (that was OTA-1656's other
+ *  half: nothing ever DREW the coated blade, so a quarter of every fight was
+ *  invisible). With the card telling him now, the rate is worth moving.
+ *
+ *  ⚠ THE COMMONS STAY GENTLE, because the original note still holds: he named
+ *  the problem as MID-game, and making a new character's first fights harder
+ *  answers a complaint nobody made. The 2 points added to common are the whole
+ *  early-game change; the load goes onto rare and legendary, the tiers that
+ *  only appear once the AC stack exists. Weighted over the real roster this is
+ *  **30.23%** — solved against enemies.json, not guessed. */
 const CHANCE_BY_RARITY: Readonly<Record<string, number>> = {
-  common: 0.06,
-  uncommon: 0.14,
-  rare: 0.26,
-  legendary: 0.4,
+  common: 0.08,
+  uncommon: 0.20,
+  rare: 0.33,
+  legendary: 0.47,
 };
 /** A boss is armed deliberately, not by chance — its handlers coat its weapon. */
-const BOSS_CHANCE = 0.55;
+const BOSS_CHANCE = 0.60;
 
 /** ⚠ Danger nudges it, it does not drive it: a common bandit on a bad tile is
  *  still mostly a common bandit. Capped so no tile turns every swing toxic. */
@@ -100,12 +113,27 @@ export function coatingKindsFor(enemy: Enemy): readonly EnemyCoatingKind[] {
 /** ⚠ Dice scale with the enemy's standing, not with the player's, so a coating
  *  never becomes the reason a common kills him — it is chip damage that gets
  *  through, which is exactly the pressure AC had removed. */
+/** ⚠⚠⚠ OTA-1656 — UP ONE STEP, TO PUT BACK WHAT OTA-1646 TOOK. The ladder was
+ *  1d3 / 1d3 / 1d4 / 1d6 and it was tuned against a world where a coated blow
+ *  reached the player. Then OTA-1646 sent every blow to the raised shield
+ *  first, and a coating that lands on a shield is HALVED — or turned away
+ *  outright by a shield whose card names that type. Measured average damage
+ *  after that change: 1.0 on a common, 2.0 on a legendary.
+ *
+ *  ⚠ That is precisely backwards. The coating exists to pressure a HIGH-AC
+ *  player — it is the one mechanic that cannot be stacked out of existence,
+ *  which is the entire argument in this file's header — and shield-first cut it
+ *  in half on exactly the build it was written to answer. One step up
+ *  (1d4 / 1d4 / 1d6 / 1d8) lands the post-shield number back where the
+ *  pre-shield number was, without unpicking the shield's own logic: a shield
+ *  still keeps it off your skin, it just no longer erases it. An unshielded
+ *  player takes the step as a real increase, which is the raise he asked for. */
 function diceFor(enemy: Enemy): string {
-  if (enemy.boss) return '1d6';
+  if (enemy.boss) return '1d8';
   const rarity = String(enemy.rarity ?? 'Common').toLowerCase();
-  if (rarity === 'legendary') return '1d6';
-  if (rarity === 'rare') return '1d4';
-  return '1d3';
+  if (rarity === 'legendary') return '1d8';
+  if (rarity === 'rare') return '1d6';
+  return '1d4';
 }
 
 /**
@@ -196,12 +224,27 @@ const SHIELD_BYPASS: ReadonlyArray<readonly [string, number]> = [
   ['quick', 0.12],
 ];
 
+/** ⚠⚠⚠ OTA-1656 — EVERY ATTACKER GETS A FOOT IN THE DOOR. Measured on the real
+ *  roster: **66 of 135 enemies (49%) carry none of the three bypass traits**, so
+ *  against half the bestiary a raised shield meant the player's armour took
+ *  ZERO wear for the entire fight — not "lasts longer", literally never chipped.
+ *  Roster-average bypass was 7.7%, which stretched a 5-piece set from ~150
+ *  landed blows to ~1,950. The repair economy did not move onto the shield so
+ *  much as switch off.
+ *
+ *  A 10% floor is the smallest honest fix: a shield stays excellent (armour life
+ *  still ~6x, and the shield still eats nine blows in ten) but no fight is ever
+ *  completely free, because nobody holds a shield perfectly for an entire
+ *  engagement. The three authored traits still matter — they sit ABOVE the floor
+ *  and still decide who is genuinely slippery. */
+export const SHIELD_BYPASS_FLOOR = 0.10;
+
 export function shieldBypassChance(traits: readonly string[] | undefined): number {
-  if (!traits) return 0;
   // The BEST of them, never the sum — two ways of being slippery is still one
-  // attacker going around one shield.
-  let chance = 0;
-  for (const t of traits) {
+  // attacker going around one shield. The floor is the same rule: it is another
+  // candidate in the max(), not an addition on top of a trait.
+  let chance = SHIELD_BYPASS_FLOOR;
+  for (const t of traits ?? []) {
     for (const [trait, n] of SHIELD_BYPASS) if (t === trait) chance = Math.max(chance, n);
   }
   return chance;
@@ -221,9 +264,15 @@ export function rollBlowLanding(
     return { on: 'body', slot: rollHitLocation(roll01), wentAround: false };
   }
   const bypass = shieldBypassChance(opts.traits);
-  // ⚠ The bypass roll is spent FIRST and only when there is something to bypass,
-  // so the body roll that follows is drawn fresh. Rolling the location first and
-  // re-rolling on a bypass would quietly bias the table.
+  // ⚠ The bypass roll is spent FIRST, so the body roll that follows is drawn
+  // fresh. Rolling the location first and re-rolling on a bypass would quietly
+  // bias the table.
+  // ⚠⚠ OTA-1656 — the `bypass > 0` half of this guard is now always true, since
+  // SHIELD_BYPASS_FLOOR gives every attacker 10%. It is KEPT rather than
+  // deleted: it is what makes the function honest if the floor is ever tuned
+  // back to zero, and dropping it would mean a 0% attacker still burned a draw
+  // from the shared RNG stream — the exact class of bug OTA-1653 shipped and
+  // ota1017 caught.
   if (bypass > 0 && roll01() < bypass) {
     return { on: 'body', slot: rollHitLocation(roll01), wentAround: true };
   }

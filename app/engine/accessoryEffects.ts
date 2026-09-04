@@ -269,12 +269,29 @@ export function equippedAccessoryPowers(player: PlayerCharacter | null | undefin
         // encounter — a player who gives up four fingers of passive value for
         // four openings has bought exactly one very loud opening round, and
         // then wears four rings that do nothing for the rest of the fight.
-        out.bursts.push({
-          source: row.name,
-          damageType: String(row.burst.damageType).toLowerCase(),
-          amount: BURST_DAMAGE[row.rarity],
-          bands,
-        });
+        //
+        // ⚠⚠⚠ OTA-1656 — BUT DISTINCT SOURCES ONLY, and this closes a real hole.
+        // "Four fingers for four openings" means four DIFFERENT rings; nothing
+        // in the equip path enforces that. `equipItem` fills the first empty
+        // ring slot and never asks whether the same row is already on another
+        // finger, so FOUR COPIES OF ONE Rimebinder's Ring were four bursts —
+        // 4 × 50 plus a Legendary amulet is **250 flat AoE on the opening tap**,
+        // against a roster whose median enemy has 115 HP. That is not the trade
+        // this comment describes, it is the trade with the cost removed: one
+        // ring farmed four times, no build diversity spent at all.
+        //
+        // Deduping by SOURCE keeps the designed version exactly (the two authored
+        // burst rings and the three burst amulets still all stack — a reachable
+        // 135) and deletes only the copy-paste. It is also the same shape as
+        // every other rule in this file: the row decides, once.
+        if (!out.bursts.some((b) => b.source === row.name)) {
+          out.bursts.push({
+            source: row.name,
+            damageType: String(row.burst.damageType).toLowerCase(),
+            amount: BURST_DAMAGE[row.rarity],
+            bands,
+          });
+        }
       }
     }
   }

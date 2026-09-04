@@ -20,7 +20,7 @@ import { enemyTypeDefenses } from '../engine/crafting';
 // OTA-1553 — the weakness reconcile and the WIS gate now live in the engine so
 // the combat buttons' ★ and this card answer from one function. See the note at
 // `defensesFor` below.
-import { reconciledDefenses, WEAKNESS_READ_WIS as SHARED_WEAKNESS_READ_WIS } from '../engine/weaponGlyphs';
+import { reconciledDefenses, WEAKNESS_READ_WIS as SHARED_WEAKNESS_READ_WIS, COATING_GLYPH, COATING_GLYPH_COLOR } from '../engine/weaponGlyphs';
 import { enemyDamageType } from '../engine/damageTypes';
 import { BrandedModal } from './BrandedModal';
 
@@ -479,6 +479,17 @@ export function enemyDetailBody(view: EnemyView, canRead: boolean, observed?: { 
   lines.push(`Attack ${atkLabel}     Damage ${enemyDamageCompact(e)}${dealsType ? ` (${cap(dealsType)})` : ''}`);
   // OTA-1609 — the move name rides along in the roomy popup too.
   if (enemyAttackName(e)) lines.push(`Strikes with: ${enemyAttackName(e)}`);
+  // ⚠⚠ OTA-1656 — AND THE COATING IN WORDS, so the card's glyph is never a
+  // mystery the player has to go look up. The combat card carries one symbol
+  // because it has no room for a sentence; the popup has the room, so it says
+  // the kind, what the blade adds, and — the part that makes it actionable —
+  // that armour resisting that type halves it where it lands.
+  if (e.coating) {
+    lines.push(
+      `Coated blade: ${COATING_GLYPH[e.coating.kind]} ${cap(e.coating.kind)} `
+      + `(+${e.coating.dice} on a landed hit; armour that resists ${e.coating.kind} halves it)`,
+    );
+  }
   // ⚠⚠ OTA-1651 — AND YOUR OWN HANDS, spelled out. On the combat card this was
   // two bare weapon names with a lit or unlit dot, and the owner read them as a
   // stray reference to his own axe on an ENEMY's card — which is exactly what
@@ -606,6 +617,23 @@ function EnemyCard({ view, cardWidth, hpBarWidth, canRead, observed, playerPower
       <View style={styles.subhead}>
         <Text style={styles.subline} numberOfLines={1}>
           {view.enemy.type}
+          {/* ⚠⚠⚠ OTA-1656 — THE COATED BLADE, AT LAST VISIBLE. Owner: *"I have
+              yet to see an enemy use a coating, check the logs, did I miss it?"*
+              He had not missed it. A measured 24.3% of spawns came coated and
+              `enemy.coating` was rendered in NO component and NO screen — the
+              only place it ever surfaced was a clause appended to the damage
+              line AFTER the blow landed. A quarter of every fight was carrying a
+              poisoned edge and the game never once said so before it hit him.
+              ⚠ It rides INSIDE the existing type line, not on a row of its own:
+              OTA-1651 shortened these cards on purpose and this must not spend
+              that back. One glyph, in the same vocabulary as his own weapon
+              buttons (OTA-1636/1638), coloured by the same family map so fire is
+              the same orange wherever it appears. */}
+          {!!view.enemy.coating && (
+            <Text style={{ color: COATING_GLYPH_COLOR[view.enemy.coating.kind] }}>
+              {`  ${COATING_GLYPH[view.enemy.coating.kind]}`}
+            </Text>
+          )}
         </Text>
         <Text style={[styles.range, inRange ? styles.rangeIn : styles.rangeOut]}>
           {view.rangeLabel

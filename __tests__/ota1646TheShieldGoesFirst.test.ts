@@ -54,6 +54,7 @@ import { readFileSync } from 'node:fs';
 import weaponsJson from '../app/data/items/weapons.json';
 import {
   rollBlowLanding, shieldBypassChance, rollHitLocation, HIT_LOCATION_WEIGHTS,
+  SHIELD_BYPASS_FLOOR,
 } from '../app/engine/enemyCoating';
 
 type Row = { name: string; tags: string[]; rarity: string; baseDurability?: number };
@@ -70,12 +71,21 @@ const seq = (...ns: number[]) => {
 describe('OTA-1646 — the shield goes first', () => {
   // ── THE RULE ────────────────────────────────────────────────────────────
   it('a blow lands on the shield when one is up and the attacker is not slippery', () => {
-    // A `savage` brute has no bypass at all: the shield takes every blow.
-    for (const r of [0, 0.5, 0.99]) {
+    // ⚠ OTA-1656 — a `savage` brute now gets SHIELD_BYPASS_FLOOR (10%) like
+    // every other attacker, so "the shield takes EVERY blow" became "the shield
+    // takes nine in ten". Measured cause: 66 of 135 enemies carried no bypass
+    // trait, so against half the bestiary armour NEVER chipped — not "lasted
+    // longer", switched off. Any roll above the floor still lands on the shield,
+    // which is the rule this test exists to hold.
+    for (const r of [0.5, 0.9, 0.99]) {
       const landing = rollBlowLanding({ hasShield: true, traits: ['savage', 'armored'] }, seq(r));
       expect(landing.on).toBe('shield');
       expect(landing.slot).toBeNull();
     }
+    // …and a roll UNDER the floor is the one blow in ten that reaches the body.
+    const slipped = rollBlowLanding({ hasShield: true, traits: ['savage'] }, seq(0.01));
+    expect(slipped.on).toBe('body');
+    expect(slipped.wentAround).toBe(true);
   });
 
   it('no shield up means the OTA-1513 body table answers, unchanged', () => {
@@ -89,14 +99,20 @@ describe('OTA-1646 — the shield goes first', () => {
   });
 
   // ── DODGE AND STEALTH GO AROUND IT ──────────────────────────────────────
-  it('dodge and stealth are the only ways around a raised shield', () => {
+  it('dodge and stealth are still the ways AROUND a raised shield', () => {
     expect(shieldBypassChance(['agile'])).toBeCloseTo(0.18);
     expect(shieldBypassChance(['ambush_strike'])).toBeCloseTo(0.15);
     expect(shieldBypassChance(['quick'])).toBeCloseTo(0.12);
-    // Being big, angry or armoured is not a way past a shield.
-    expect(shieldBypassChance(['savage', 'armored', 'slow', 'bleeder'])).toBe(0);
-    expect(shieldBypassChance(undefined)).toBe(0);
-    expect(shieldBypassChance([])).toBe(0);
+    // ⚠ OTA-1656 — being big, angry or armoured is still not a WAY PAST a
+    // shield; it just no longer means a guaranteed block. Everyone gets the
+    // 10% floor (nobody holds a shield perfectly for a whole engagement), and
+    // the three authored traits keep their whole meaning by sitting ABOVE it.
+    for (const dull of [['savage', 'armored', 'slow', 'bleeder'], undefined, []]) {
+      expect(shieldBypassChance(dull)).toBe(SHIELD_BYPASS_FLOOR);
+    }
+    for (const slippery of ['agile', 'ambush_strike', 'quick']) {
+      expect(shieldBypassChance([slippery])).toBeGreaterThan(SHIELD_BYPASS_FLOOR);
+    }
   });
 
   it('two ways of being slippery is still one attacker — the best, never the sum', () => {
