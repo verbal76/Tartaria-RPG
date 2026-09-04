@@ -1,0 +1,278 @@
+{
+  "id": "f76fc2853ccc41b18fc98b0fb3585ca2",
+  "groupID": "7711855976",
+  "eventID": "f76fc2853ccc41b18fc98b0fb3585ca2",
+  "projectID": "4511945117532160",
+  "size": 18098,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-04-1665-the-bug-report-pushes #mtmhqinlc5jl [inline 9/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1665-the-bug-report-pushes",
+  "message": "player-log 2026-09-04-1665-the-bug-report-pushes #mtmhqinlc5jl [inline 9/28]",
+  "title": "player-log 2026-09-04-1665-the-bug-report-pushes #mtmhqinlc5jl [inline 9/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "94de418b69a247ecb9bc8ea3abcadee8",
+      "span_id": "814dfe84e4af1eb8",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "3.177Z] [combat] The Poisoned coating fails to take on Drowned Aetherkin.\n[2026-09-04T00:11:03.177Z] [combat] Drowned Aetherkin shrugs off the piercing. (resisted, \u00d70.5 for 6)\n[2026-09-04T00:11:03.184Z] [arbiter] The Arbiter watches the piercing skid off. \"Swap to the Plasma Thrower \u2014 burn will bite where piercing won't.\"\n",
+      "[2026-09-04T00:11:03.185Z] [combat] Clean hit with the poisoned bone crossbow for 6. Drowned Aetherkin has 49 left and does not back away.\n[2026-09-04T00:11:03.185Z] [arbiter] \"Tartaria does not award style points,\" the Arbiter says, eyes on the drowned aetherkin. \"End it.\"\n",
+      "[2026-09-04T00:11:03.619Z] [combat] Drowned Aetherkin deals 3 aetheric damage [armor \u221234%, title \u00bd, plate \u22121, floor 30%]. You have 16 HP remaining.\n[2026-09-04T00:11:04.086Z] [debug] persist sizes(KB): total=340 player=94 wm=159[rooms=87 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=82 scene=5\n[2026-09-04T00:11:05.956Z] [debug] ui: tap \"inventory\"\n",
+      "[2026-09-04T00:11:49.731Z] [debug] appstate: active \u2192 background (was active for 51146ms)\n[2026-09-04T00:16:12.076Z] [debug] appstate: background \u2192 active (was background for 262340ms)\n[2026-09-04T00:16:25.860Z] [debug] appstate: active \u2192 background (was active for 13789ms)\n",
+      "[2026-09-04T01:02:15.002Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a069a9-5aae-79eb-8570-56ecdbb80207\n[2026-09-04T01:02:15.002Z] [debug] ota: Checking\u2026\n[2026-09-04T01:02:16.680Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-09-04T01:02:16.752Z] [debug] ota: Saving progress\u2026\n[2026-09-04T01:02:16.753Z] [debug] ota: Restarting to apply\u2026\n",
+      "[2026-09-04T01:02:16.811Z] [debug] ota: boot check result = applied\n[2026-09-04T01:02:17.007Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a069ed-56bb-78f6-8b8e-4ed967fc6dc1\n[2026-09-04T01:02:17.007Z] [debug] ota: Checking\u2026\n[2026-09-04T01:02:17.160Z] [debug] ota: Already up to date\n[2026-09-04T01:02:17.161Z] [debug] ota: boot check result = noUpdate\n",
+      "[2026-09-04T01:02:17.235Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-09-04T01:02:17.235Z] [debug] voice: bundled idle\n[2026-09-04T01:02:17.512Z] [debug] send-log: bundle #mtm6enrfz3iy attempt 2/5 delivered to Sentry\n[2026-09-04T01:02:21.081Z] [debug] OTA applied: 2026-09-03-1655-the-card-is-asked \u2192 2026-09-04-1657-the-healing-pouch.\n",
+      "[2026-09-04T01:02:21.081Z] [debug] OTA session start: 2026-09-04-1657-the-healing-pouch.\n[2026-09-04T01:02:21.081Z] [world] You step back into Mud Flood Nexus. The world waits for your move.\n[2026-09-04T01:02:21.081Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. \"Welcome back, Cheddar Bob. The road kept your place.\"\n",
+      "[2026-09-04T01:02:21.644Z] [debug] \u2550\u2550\u2550 SESSION 2026-09-04T01:02:21.640Z \u00b7 build 2026-09-04-1657-the-healing-pouch \u00b7 updated from 2026-09-03-1655-the-card-is-asked \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-09-04T01:02:21.645Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-04T01:02:21.645Z] [debug] missions: hunt:hunt_bog_dragon stage 4/7 [diplomacy] @monarch_waystation npc=\"Old Mira\" needs=The Boy's Locket\u2713 gives=Eshren's Name-Token\n[2026-09-04T01:02:21.645Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n",
+      "[2026-09-04T01:02:21.645Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n[2026-09-04T01:02:21.646Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n",
+      "[2026-09-04T01:02:21.646Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n[2026-09-04T01:02:21.646Z] [debug] missions: \u00b7 at=mud_flood_nexus travelTo=monarch_waystation\n",
+      "[2026-09-04T01:02:21.646Z] [debug] boot: life bmtm91fg91w started 2026-09-04T01:02:16.953Z \u00b7 FOLLOWED AN OTA APPLY 199ms ago via boot-front \u00b7 prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)\n[2026-09-04T01:02:23.378Z] [debug] ui: tap \"inventory\"\n[2026-09-04T01:02:33.952Z] [world] You tuck Trauma Kit \u00d78 into your healing pouch.\n",
+      "[2026-09-04T01:02:43.048Z] [world] You tuck First Aid Kit \u00d73 into your healing pouch.\n[2026-09-04T01:02:53.101Z] [world] You tuck Trail Rations \u00d722 into your healing pouch.\n[2026-09-04T01:03:12.631Z] [debug] ui: tap \"inventory\"\n[2026-09-04T01:04:36.388Z] [debug] ui: tap \"\u2623 shroud-spun slinger \u2692\"\n",
+      "[2026-09-04T01:04:36.395Z] [debug] qwen: loading (was idle) \u2014 the Arbiter speaks templates until it is ready\n[2026-09-04T01:04:36.464Z] [player] attack with the off-hand reclaimers guild shroud-spun slinger\n",
+      "[2026-09-04T01:04:36.464Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand reclaimers guild shroud spun slinger resolved=Reclaimers Guild Shroud-Spun Slinger range=mid enemies=1 hooks=2\n[2026-09-04T01:04:36.465Z] [debug] attack: target=Drowned Aetherkin range=mid reach.bands=[distant,far,mid,close] reach.label=Reclaimers Guild Shroud-Spun Slinger bareHand=false\n",
+      "[2026-09-04T01:04:36.467Z] [debug] attack: visibility penalty \u22121 (Glass Hail)\n[2026-09-04T01:04:36.548Z] [world] You commit forward with the corrupted reclaimers guild shroud-spun slinger. Drowned Aetherkin watches your hands.\n[2026-09-04T01:04:36.549Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T01:04:36.923Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 USE_ITEM  (373ms)\n",
+      "[2026-09-04T01:04:37.753Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-09-04T01:04:44.274Z] [world] Drowned Aetherkin moves first. The pressure is immediate.\n[2026-09-04T01:04:44.277Z] [combat] Drowned Aetherkin \u2014 d20 \u2192 1 + ATK 3 = 4 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 FUMBLE\n",
+      "[2026-09-04T01:04:44.277Z] [combat] You \u2014 d20 \u2192 11 + DEX 18 \u2212 1 (Glass Hail) = 28 vs Drowned Aetherkin AC 9 \u2014 \u2713 HIT\n[2026-09-04T01:04:44.277Z] [combat] The Corrupted coating fails to take on Drowned Aetherkin.\n[2026-09-04T01:04:44.278Z] [combat] Drowned Aetherkin takes 8 with the corrupted reclaimers guild shroud-spun slinger. It reels: 41 left. Then it fights back.\n",
+      "[2026-09-04T01:04:44.279Z] [arbiter] The Arbiter watches the blow land or fail. \"Both are answers.\"\n[2026-09-04T01:04:44.834Z] [debug] persist sizes(KB): total=342 player=96 wm=159[rooms=87 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=82 scene=5\n[2026-09-04T01:06:17.750Z] [debug] ui: tap \"\u271a heals (3)\"\n[2026-09-04T01:06:19.275Z] [player] use Trail Rations\n",
+      "[2026-09-04T01:06:19.276Z] [debug] parser: intent=use_relic conf=1.00 verb=use target=trail rations resolved=Trail Rations range=mid enemies=1 hooks=2\n[2026-09-04T01:06:19.277Z] [world] You use one Trail Rations. +6 HP, +1 stamina.\n[2026-09-04T01:06:19.289Z] [system] \u23f3 Time passed: 15 min\n[2026-09-04T01:06:19.721Z] [cognitive] neutral  (431ms)\n",
+      "[2026-09-04T01:06:21.546Z] [debug] ui: tap \"\u271a heals (3)\"\n[2026-09-04T01:06:23.328Z] [player] use First Aid Kit\n[2026-09-04T01:06:23.328Z] [debug] parser: intent=use_relic conf=1.00 verb=use target=first aid kit resolved=First Aid Kit range=mid enemies=1 hooks=2\n[2026-09-04T01:06:23.330Z] [world] You use one First Aid Kit. +25 HP, stamina already full.\n",
+      "[2026-09-04T01:06:23.344Z] [debug] arbiter: template (reason=combat)\n[2026-09-04T01:06:23.344Z] [arbiter] \"Make the next strike count for two,\" the Arbiter says. \"Tartaria taxes the first.\"\n[2026-09-04T01:06:23.345Z] [system] \u23f3 Time passed: 15 min\n[2026-09-04T01:06:24.116Z] [cognitive] neutral  (771ms)\n[2026-09-04T01:06:26.874Z] [debug] appstate: active \u2192 background (was active for 108744ms)\n",
+      "[2026-09-04T01:08:08.597Z] [debug] appstate: background \u2192 active (was background for 101718ms)\n[2026-09-04T01:08:10.215Z] [debug] ui: tap \"\u2726 bandolier (5)\"\n[2026-09-04T01:08:14.995Z] [reward] You hurl the Acid Flask. It bursts across Drowned Aetherkin \u2014 9 acid (3/turn \u00d7 3). (32 HP left)\n",
+      "[2026-09-04T01:08:14.997Z] [combat] Drowned Aetherkin \u2014 d20 \u2192 1 + ATK 3 = 4 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 FUMBLE\n[2026-09-04T01:08:28.810Z] [debug] ui: tap \"dodge\"\n[2026-09-04T01:08:28.824Z] [player] dodge\n[2026-09-04T01:08:28.826Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=1 hooks=2\n",
+      "[2026-09-04T01:08:28.828Z] [world] You commit to the dodge. Slip Drowned Aetherkin's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-04T01:08:28.925Z] [combat] Drowned Aetherkin \u2014 d20 \u2192 13 + ATK 3 = 16 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n",
+      "[2026-09-04T01:08:28.925Z] [combat] Dodge \u2014 d20 \u2192 6 + DEX 19 = 25 vs ATK 16. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-04T01:08:28.926Z] [debug] arbiter: template (reason=combat)\n[2026-09-04T01:08:28.928Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-04T01:08:28.931Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-04T01:08:29.675Z] [cognitive] neutral  (743ms)\n[2026-09-04T01:08:30.246Z] [debug] ui: tap \"\u2620 bone crossbow \u25b2\"\n[2026-09-04T01:08:30.286Z] [player] attack with the bone crossbow\n[2026-09-04T01:08:30.286Z] [debug] parser: intent=attack conf=1.00 verb=attack target=bone crossbow resolved=Bone Crossbow range=mid enemies=1 hooks=2\n",
+      "[2026-09-04T01:08:30.287Z] [debug] attack: target=Drowned Aetherkin range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-09-04T01:08:30.289Z] [debug] attack: visibility penalty \u22121 (Glass Hail)\n[2026-09-04T01:08:30.290Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-09-04T01:08:30.379Z] [world] You bring the poisoned bone crossbow to bear on Drowned Aetherkin.\n[2026-09-04T01:08:30.379Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T01:08:30.752Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE \u00b7 RELOAD  (372ms)\n",
+      "[2026-09-04T01:08:31.165Z] [debug] persist sizes(KB): total=342 player=96 wm=159[rooms=87 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=82 scene=5\n[2026-09-04T01:08:43.607Z] [world] Drowned Aetherkin moves first. The pressure is immediate.\n[2026-09-04T01:08:43.611Z] [combat] Drowned Aetherkin \u2014 d20 \u2192 4 + ATK 3 = 7 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-04T01:08:43.611Z] [combat] You \u2014 d20 \u2192 8 + DEX 18 \u2212 1 (Glass Hail) perfect opening (2\u00d7 dice) = 25 vs Drowned Aetherkin AC 9 \u2014 \u2713 HIT\n[2026-09-04T01:08:43.613Z] [combat] The Poisoned coating fails to take on Drowned Aetherkin.\n[2026-09-04T01:08:43.613Z] [combat] Drowned Aetherkin shrugs off the piercing. (resisted, \u00d70.5 for 6)\n",
+      "[2026-09-04T01:08:43.618Z] [combat] The blow with the poisoned bone crossbow finds purchase \u2014 6 damage, 26 HP standing. Drowned Aetherkin commits to the counter.\n[2026-09-04T01:08:51.054Z] [debug] ui: tap \"inventory\"\n[2026-09-04T01:09:33.049Z] [world] You break the Cudgel down. \u2726 Recovered: Small Rock x2, Stick.\n",
+      "[2026-09-04T01:09:33.139Z] [world] You break the Cudgel down. \u2726 Recovered: Small Rock x2, Stick.\n[2026-09-04T01:09:33.219Z] [world] The first pass on the Cudgel crumbles in your hands \u2014 but your training kicks in. You stop, breathe, change angle, and try again.\n[2026-09-04T01:09:33.219Z] [world] You break the Cudgel down. \u2726 Recovered: Small Rock x2, Stick.\n",
+      "[2026-09-04T01:09:33.300Z] [world] You break the Cudgel down. \u2726 Recovered: Small Rock x2, Stick.\n[2026-09-04T01:09:33.380Z] [world] You break the Cudgel down. \u2726 Recovered: Small Rock x2, Stick.\n[2026-09-04T01:09:33.459Z] [world] You break the Cudgel down. \u2726 Recovered: Small Rock x2, Stick.\n[2026-09-04T01:09:33.538Z] [world] You break the Cudgel down. \u2726 Recovered: Small Rock x2, Stick.\n",
+      "[2026-09-04T01:09:33.618Z] [world] You break the Cudgel down. \u2726 Recovered: Small Rock x2, Stick.\n[2026-09-04T01:09:33.695Z] [world] You break the Cudgel down. \u2726 Recovered: Small Rock x2, Stick.\n[2026-09-04T01:09:43.712Z] [debug] ui: tap \"\u2620 bone crossbow \u25b2\"\n[2026-09-04T01:09:43.750Z] [player] attack with the bone crossbow\n",
+      "[2026-09-04T01:09:43.751Z] [debug] parser: intent=attack conf=1.00 verb=attack target=bone crossbow resolved=Bone Crossbow range=mid enemies=1 hooks=2\n[2026-09-04T01:09:43.752Z] [debug] attack: target=Drowned Aetherkin range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-09-04T01:09:43.754Z] [debug] attack: visibility penalty \u22121 (Glass Hail)\n",
+      "[2026-09-04T01:09:43.844Z] [world] You commit forward with the poisoned bone crossbow. Drowned Aetherkin watches your hands.\n[2026-09-04T01:09:43.844Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T01:09:44.204Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE \u00b7 RELOAD  (359ms)\n[2026-09-04T01:09:51.898Z] [world] You seize the initiative. Drowned Aetherkin has no time to react.\n",
+      "[2026-09-04T01:09:51.898Z] [combat] You \u2014 d20 \u2192 16 + DEX 18 \u2212 1 (Glass Hail) = 33 vs Drowned Aetherkin AC 9 \u2014 \u2713 HIT\n[2026-09-04T01:09:51.900Z] [combat] The Poisoned coating fails to take on Drowned Aetherkin.\n[2026-09-04T01:09:51.901Z] [combat] Drowned Aetherkin shrugs off the piercing. (resisted, \u00d70.5 for 5)\n",
+      "[2026-09-04T01:09:51.901Z] [combat] The piercing has worn Drowned Aetherkin's guard through \u2014 it bites full from here.\n[2026-09-04T01:09:51.902Z] [combat] Your strike with the poisoned bone crossbow lands for 5. Drowned Aetherkin staggers \u2014 21 HP remaining. It answers.\n[2026-09-04T01:09:51.905Z] [combat] Drowned Aetherkin \u2014 d20 \u2192 15 + ATK 3 = 18 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-04T01:09:55.814Z] [debug] ui: tap \"golem (12/68)\"\n[2026-09-04T01:09:55.824Z] [world] A shard of mud-glass nicks you. Small wound, steady reminder. (\u22121 HP)\n[2026-09-04T01:09:55.826Z] [player] use golem\n[2026-09-04T01:09:55.827Z] [combat] Ashwright attacks Drowned Aetherkin \u2014 d20 9 + 3 = 12 vs AC 9 \u2014 \u2713 HIT\n",
+      "[2026-09-04T01:09:55.829Z] [combat] Ashwright swings the Crude Golem Greatsword \u2014 8 slashing damage on Drowned Aetherkin. (13 HP left)\n[2026-09-04T01:09:55.830Z] [combat] Drowned Aetherkin retaliates \u2014 d20 7 + 4 hits Ashwright for 3 (35% resisted). (9/68)\n[2026-09-04T01:09:55.853Z] [combat] Drowned Aetherkin \u2014 d20 \u2192 10 + ATK 3 = 13 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-04T01:09:57.160Z] [debug] persist sizes(KB): total=340 player=93 wm=159[rooms=87 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=83 scene=5\n[2026-09-04T01:09:58.514Z] [debug] ui: tap \"inventory\"\n[2026-09-04T01:10:10.087Z] [world] You pack 3\u00d7 Aetheric Shard into Ashwright's frame. +51 HP (60/68).\n[2026-09-04T01:10:16.751Z] [debug] ui: tap \"inventory\"\n",
+      "[2026-09-04T01:10:33.333Z] [world] You strap the Aetheric Padded Vest onto Mercy.\n[2026-09-04T01:10:38.385Z] [debug] ui: tap \"dodge\"\n[2026-09-04T01:10:38.400Z] [player] dodge\n[2026-09-04T01:10:38.401Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=1 hooks=2\n[2026-09-04T01:10:38.402Z] [world] You commit to the dodge. Slip "
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-04-1665-the-bug-report-pushes #mtmhqinlc5jl [inline 9/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtmhqinlc5jl"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1665-the-bug-report-pushes"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "9"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1665-the-bug-report-pushes"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T13:30:29.686000Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T13:30:31.459000Z",
+  "fingerprints": [
+    "82b3bd9794294f43365029396594bd02"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1954691241,
+    "commitCount": 3,
+    "data": {},
+    "dateCreated": "2026-09-04T05:42:51.380846Z",
+    "dateReleased": "2026-09-04T05:43:40.910086Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "5bd2090d8c7d7204b9c58c0844aa871a9b237564",
+      "message": "[ota-hal] OTA-1665: the bug report pushes, and only once per changed log\n\nOwner, three instructions together: \"I've removed the send log\", \"report a bug\nshould be the button that pushed the log, so we don't need the email route\nanymore, we can archive that bug report land\", and \"after you do a bug report\nand that pushes a log, you can't do another one until something in the log is\nchanged. so you have to go play for a little bit before it allows you to push\nanother one.\"\n\n\u26a0\u26a0\u26a0 THE EMAIL ROUTE WAS NEVER THE DESIGN, and bugReport.ts said so in its own\nheader: true zero-paste needed `expo-mail-composer`, which needs a native\nrebuild, and native builds are parked. So what shipped instead was a clipboard\nstage, a READ-ME-FIRST body, a manual paste, and a report that \u2014 in the file's\nown words \u2014 \"arrives empty and we can't track the bug down\" whenever a step was\nmissed. That is exactly how both his daughters filed tonight. The transport this\nneeded has been in the app since August; it was simply never wired to the button\npeople actually find.\n\nNow REPORT A BUG persists to disk and pushes inline through the OTA-1504 durable\npipeline, carrying what the player typed, and the payload leads with a headline\n(character \u00b7 build \u00b7 first line of the description) so a list of reports reads as\na list of problems instead of a column of identical titles. That headline is the\nold email SUBJECT, which would otherwise have become dead code \u2014 the value it\ncarried is exactly what a Sentry event needs.\n\n\u26a0\u26a0 SEND LOG IS DELETED, one day after OTA-1661 opened it to everyone and gave it\na two-tap consent step. With REPORT A BUG asking for a description first \u2014 a\nbetter consent surface AND better evidence \u2014 two buttons doing one send was\nclutter on a screen that has already fought a wall of COPY buttons.\n\n\u26a0\u26a0\u26a0 EVERY OUTCOME SPEAKS, and this is the part I care most about. A push has\nreal failure modes a mailto never had: queued, refused as a duplicate, refused\nbecause reporting is off, no destination in this build. The old Title screen\nflashed \"\u2713 COPIED\" unconditionally \u2014 which was honest enough when opening a\nmailto could not meaningfully fail, and would now be a lie told by the one\ncontrol that must never lie. `composeAndSendBugReport` returns a player-facing\nmessage on every path, never throws, and both screens render it verbatim. The\nsuite proves that by RUNNING the paths and asserting the message is non-empty,\nnot by scanning for strings.\n\n\u26a0 THE DEDUPE fingerprints the raw slot log \u2014 length plus its newest tail, keyed\nper slot \u2014 and the check runs BEFORE anything is persisted or sent. Length alone\nwould let a same-size edit through; the tail costs nothing. The mark is stored\neven on a QUEUED send, because the bundle is already on disk and letting a\nsecond identical report through would queue a duplicate behind one already\nwaiting. And a general report with NO character loaded is never blocked: \"the\ngame won't start\" carries no play by definition, and gating it on a changed log\nwould lock a player out of the only channel they have.\n\n\u26a0 TWO THINGS THE CLEANUP TURNED UP. `_legacySendBugReport` sat unreferenced\nbehind an eslint-disable, still holding a clipboard stage, a READ-ME-FIRST body\nand a mailto \u2014 that is the land he asked to archive, and a dead function holding\na copy of it is precisely where it grows back. Deleted. And the OTA-063 comment\nabove the handler still described the clipboard workaround in loving detail;\nrewritten, because a comment describing a route the code no longer takes is what\nstopped me checking the Samarran entry two OTAs ago.\n\n\u26a0 THREE ASSERTIONS IN THIS SUITE WERE WRONG BEFORE THEY WERE RIGHT, all the same\nway: too broad. A blanket \"no COPIED\" condemned COPY URL and COPY CRASHED SAVE;\na blanket \"no mailto:\" condemned INVITE PLAYTESTER, which should keep one \u2014 that\nis a short human request to a person, not a payload; and a scan for the deleted\nfunction's bare name failed against its own obituary, which is the OTA-1659\nlesson arriving in a second file. Each is now scoped to the thing it means.\n\ndocs/PRIVACY.md moved with the button: the section is \"Sending a report\nyourself\", it names the description as something that gets sent, and it states\nthe one-report-per-changed-log rule, because the player will meet that refusal\nand should not think the button is broken.\n\n\u26a0\u26a0\u26a0 AND THE FULL SUITE CAUGHT TWO REAL DEFECTS THE GATES DID NOT. Eight suites\nwent red on the first run \u2014 1489, 1492, 1504, 1515, 1516, 1518, 1519 and 1661 \u2014\nbecause every one of them pinned SEND LOG's send path in AboutScreen, which this\nOTA deletes. Repointing them at bugReport.ts was not bookkeeping; it is what\nsurfaced the following, and I would have shipped both:\n\n  \u00b7 I wrote `landed = !chunk.stopped` \u2014 \"we attempted it, so it went.\" That is\n    precisely the false positive OTA-1519 exists because of: a send can be\n    attempted, report no stop reason, and still lose parts, which that OTA\n    measured as Sentry silently replacing NINE of 49 inline parts. Corrected to\n    `chunk.delivered`, the field that means `sent === parts`.\n\n  \u00b7 I dropped the result line entirely. OTA-1492's rule is that the next\n    diagnosis starts from a line, not a memory. The push now logs the full\n    `describeInlineSend` report \u2014 parts accepted, what flush said, where it\n    threw \u2014 which is strictly more than the one-word ok/not-ok line it replaced.\n\nIn both cases the CODE gained the property back; the tests did not lose it. That\nis the whole argument for pinning behaviour you have already paid to learn.\n\n\u26a0 ota1661's SUITE IS DELETED, not re-anchored. It was one day old and every\nassertion in it described a button that no longer exists \u2014 its premise is\nsuperseded, like ota1146's was. The claims that OUTLIVED it are carried into\nota1665 explicitly: the push is not owner-gated, `reportingEnabled()` still\ngoverns it, the privacy page names what leaves the device, and \u2014 importantly \u2014\nthe OTA-1505 auto-bundle is STILL owner-gated. SEND LOG going away does not\nmerge consent and collection.\n\n\u26a0 ONE GATE FAILED FOR THE RIGHT REASON. check:quotedpins refused a new\nprose-shaped pin, and rather than raise the baseline I measured which one it was\n(a dump of the counted set, diffed against HEAD: `'REPORT A BUG'` in ota1489) and\nconverted it to the wiring instead \u2014 `setBugReportOpen(true)`. A label pin fails\non a reword and passes if the button is deleted; the wiring pin cannot.\n\nGates: all 18 green by exit code. Full suite green.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T05:40:17Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1665-the-bug-report-pushes",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1665-the-bug-report-pushes",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T05:43:40.910086Z",
+          "dateCreated": "2026-09-04T05:42:51.380846Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155444244",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T05:43:41.150780Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1665-the-bug-report-pushes",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1665-the-bug-report-pushes",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1665-the-bug-report-pushes",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1665-the-bug-report-pushes)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": "f59093870dbb4834ad6e4601e1c4dfdf"
+}

@@ -1,0 +1,298 @@
+{
+  "id": "bd82f10de2e247c9b328944c419732fc",
+  "groupID": "7711856800",
+  "eventID": "bd82f10de2e247c9b328944c419732fc",
+  "projectID": "4511945117532160",
+  "size": 17887,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-04-1665-the-bug-report-pushes #mtmzs9dzspnn [inline 1/4]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1665-the-bug-report-pushes",
+  "message": "player-log 2026-09-04-1665-the-bug-report-pushes #mtmzs9dzspnn [inline 1/4]",
+  "title": "player-log 2026-09-04-1665-the-bug-report-pushes #mtmzs9dzspnn [inline 1/4]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "94de418b69a247ecb9bc8ea3abcadee8",
+      "span_id": "814dfe84e4af1eb8",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "Bug Report \u2014 Cheddar Bob \u00b7 (2026-09-04-1665-the-bug-report-pushes) \u00b7 Ytt\n=== TARTARIA BUG REPORT ===\nSubmitted: 2026-09-04T13:30:58.821Z\nCharacter: Cheddar Bob\nSlot ID: slot_mtdifdmg_g2si12\nRace: Reclaimers\nLocation: Dynasty Border Post\nHP: 46/50\n\n--- DESCRIPTION ---\nYtt\n\n--- DEVICE / BUILD ---\nDevice\n  Name: Pixel 10 Pro XL\n  Platform: android 37\n  Hermes: yes\n  Locale: en-US\n",
+      "  Timezone: America/New_York\n  Screen: window 443\u00d7986 / screen 443\u00d7986 @ 2.4375x density\n  Captured at: 2026-09-04T13:30:58.767Z\n\nInstall\n  App ID: com.hotatticgames.tartarprim\n  App version: 4.32.11\n  APK build version: 2.4.1\n  APK build: 293\n  AAB: (build 293)\n  OTA: (2026-09-04-1665-the-bug-report-pushes)\n  Boot stage: qwen:deferred\n\nML runtime health\n  Status: active (no crashes detected)\n",
+      "  Crash count: 0\n  Last init attempt: 2026-09-04T13:30:31.497Z\n  Last init success: 2026-09-04T13:30:32.227Z\n  Crashes-before-disable threshold: 2\n  Qwen completion guard: clean (no completion crashes)\n  Qwen kernel variant: rnllama_v8_2_fp16_dotprod\n",
+      "  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k\n  Voice (TTS) guard: clean (no voice crashes on this build)\nSave-load health\n  Status: clean (no load-crash flags)\nLast JS crash\n",
+      "  Status: none recorded\nThis launch\n  Life: bmtmzrnzzgi \u00b7 started 2026-09-04T13:30:31.103Z\n  Followed an OTA apply 217ms ago (boot-front)\n  The previous life released its model contexts before reloading (o0/r0/l0/p0/dn0)\nCrash ledger \u2014 10 recorded (newest last)\n  \u2022 2026-09-02T22:42:22.972Z (2329m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-09-02-1633-a-batch-is-one-action \u00b7 stage boot:qwen:deferred\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: boot:qwen:deferred \u00b7 957ms into the action \u00b7 alive 0ms after it\n      launch: died 1031ms into the process \u00b7 not an OTA-apply boot\n",
+      "      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-03T00:49:33.538Z (2201m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-02-1634-the-aside-yields \u00b7 stage rendered\n      Process died with no orderly exit while: tap \"take / salvage\"\n      doing: tap \"take / salvage\" \u00b7 room mud_flood_nexus \u00b7 screen exploration\n",
+      "      last checkpoint: rendered \u00b7 221ms into the action \u00b7 alive 9133ms after it\n      launch: died 3096833ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-03T02:52:27.753Z (2079m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-03-1639-every-ingredient-exists \u00b7 stage rendered\n",
+      "      Process died with no orderly exit while: tap \"craft\"\n      doing: tap \"craft\" \u00b7 room mud_flood_nexus \u00b7 screen exploration\n      last checkpoint: rendered \u00b7 7466ms into the action \u00b7 alive 1498ms after it\n      launch: died 21448ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n",
+      "  \u2022 2026-09-03T12:10:12.789Z (1521m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-03-1642-every-drop-has-a-name-in-the-book \u00b7 stage mid-action\n      Process died with no orderly exit while: tap \"inventory\"\n      doing: tap \"inventory\" \u00b7 room mud_flood_nexus \u00b7 screen exploration\n      launch: died 12819ms into the process \u00b7 not an OTA-apply boot\n",
+      "      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-03T15:48:24.471Z (1303m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-03-1643-the-dice-riders-pay \u00b7 stage boot:qwen:deferred\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n",
+      "      last checkpoint: boot:qwen:deferred \u00b7 838ms into the action \u00b7 alive 11400ms after it\n      launch: died 12276ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-03T19:31:31.355Z (1079m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-03-1648-a-fourth-ring \u00b7 stage boot:qwen:deferred\n",
+      "      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: boot:qwen:deferred \u00b7 901ms into the action \u00b7 alive 0ms after it\n      launch: died 956ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-03T20:39:06.948Z (1012m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-09-03-1649-what-a-ring-is-for \u00b7 stage boot:qwen:deferred\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: boot:qwen:deferred \u00b7 750ms into the action \u00b7 alive 0ms after it\n      launch: died 803ms into the process \u00b7 not an OTA-apply boot\n",
+      "      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-03T21:28:44.213Z (962m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-03-1649-what-a-ring-is-for \u00b7 stage boot:qwen:deferred\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n",
+      "      last checkpoint: boot:qwen:deferred \u00b7 707ms into the action \u00b7 alive 0ms after it\n      launch: died 797ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-03T22:43:58.985Z (887m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-03-1653-the-wear-ward \u00b7 stage boot:qwen:deferred\n",
+      "      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: boot:qwen:deferred \u00b7 627ms into the action \u00b7 alive 0ms after it\n      launch: died 672ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-04T04:42:22.271Z (529m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-09-04-1664-no-phantom-syllable \u00b7 stage boot:qwen:deferred\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: boot:qwen:deferred \u00b7 743ms into the action \u00b7 alive 0ms after it\n      launch: died 776ms into the process \u00b7 not an OTA-apply boot\n",
+      "      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\nCrash delivery: ON \u2014 reports go to Sentry when you crash.\nRuntime pressure\n  Memory warnings: none this session\n  Freeze watch: no stalls seen (JS clocks only \u2014 see the native queue below)\n  Native queue: worst wait 0.0s \u00b7 0 job kinds queued >3s \u00b7 worst 0.0ms/prompt-token\n  App state trail: (none recorded)\nModel contexts\n  Live now: 0\n",
+      "  Opened: 0 \u00b7 Released: 0 \u00b7 Peak live: 0\n  Narration engine: idle\n\n--- VOICE ---\n  TTS enabled: no\n  Engine: bundled\n  Rate: 1.05 \u00b7 Pitch: 1.00\n  System voice id: (default)\n  Kokoro voice: am_michael\n  Kokoro state: idle\n\n--- CHARACTER LOG (newest first) ---\n(Newest entry at top \u2014 showing the most recent 353 of 3675 entries; older trimmed to fit a single email paste)\n\n",
+      "[2026-09-04T13:30:38.229Z] [debug] boot: life bmtmzrnzzgi started 2026-09-04T13:30:31.103Z \u00b7 FOLLOWED AN OTA APPLY 217ms ago via boot-front \u00b7 prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)\n[2026-09-04T13:30:38.229Z] [debug] missions: \u00b7 at=dynasty_border_post travelTo=mud_seas\n",
+      "[2026-09-04T13:30:38.229Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n[2026-09-04T13:30:38.229Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n",
+      "[2026-09-04T13:30:38.229Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n[2026-09-04T13:30:38.229Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc=\"the Order envoy\" gives=Sealed Reliquary Box PAUSED\n",
+      "[2026-09-04T13:30:38.229Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n[2026-09-04T13:30:38.229Z] [debug] missions: hunt:hunt_bog_dragon stage 5/7 [attack_provoke\u2192attack] @mud_seas needs=Eshren's Name-Token\u2713 spawn=Mud Harpy\u00d73 AMBUSH\n",
+      "[2026-09-04T13:30:38.228Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n[2026-09-04T13:30:38.227Z] [debug] \u2550\u2550\u2550 SESSION 2026-09-04T13:30:38.225Z \u00b7 build 2026-09-04-1665-the-bug-report-pushes \u00b7 updated from 2026-09-04-1664-no-phantom-syllable \u00b7 previous entry moments earlier \u2550\u2550\u2550\n",
+      "[2026-09-04T13:30:37.814Z] [arbiter] The Arbiter sets the quiet aside. \"Welcome back, Cheddar Bob. I kept watch while you were gone. The waste did not sleep while you were gone \u2014 blood was spilled and ground changed hands. Read the World for the account.\"\n",
+      "[2026-09-04T13:30:37.810Z] [world] Mud Monarch heralds left a sigil-mark on a stone you don't remember being marked. The faction is paying attention.\n[2026-09-04T13:30:37.810Z] [world] You step back into Dynasty Border Post. The world waits for your move.\n[2026-09-04T13:30:37.810Z] [debug] OTA session start: 2026-09-04-1665-the-bug-report-pushes.\n",
+      "[2026-09-04T13:30:37.809Z] [debug] OTA applied: 2026-09-04-1664-no-phantom-syllable \u2192 2026-09-04-1665-the-bug-report-pushes.\n[2026-09-04T13:30:31.838Z] [debug] send-log: bundle #mtmhqinlc5jl attempt 2/5 delivered to Sentry\n[2026-09-04T13:30:31.497Z] [debug] voice: bundled idle\n[2026-09-04T13:30:31.496Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-09-04T13:30:31.392Z] [debug] ota: boot check result = noUpdate\n[2026-09-04T13:30:31.391Z] [debug] ota: Already up to date\n[2026-09-04T13:30:31.176Z] [debug] ota: Checking\u2026\n[2026-09-04T13:30:31.176Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a06af0-5988-7a5c-8879-496013fbab11\n[2026-09-04T13:30:30.885Z] [debug] ota: Saving progress\u2026\n",
+      "[2026-09-04T13:30:30.789Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-09-04T13:30:28.467Z] [debug] ota: Checking\u2026\n[2026-09-04T13:30:28.467Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a06a9f-c9d0-725a-85bb-944c1fa4eb3d\n",
+      "[2026-09-04T05:05:44.959Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mtmhqinlc5jl kept on disk, boots retry up to 5 sends total\n[2026-09-04T05:05:44.959Z] [debug] send-log: #mtmhqinlc5jl \u2014 DELIVERED (inline, no attachments): beacon out, 28/28 parts accepted (407077 chars) \u2014 flush said yes\n",
+      "[2026-09-04T05:05:37.042Z] [debug] qwen\u23f1 investigate_lore ok 2158ms read 1294ms/write 835ms in 126t\u2192out 23t 10.3ms/t (114ch)\n[2026-09-04T05:05:34.893Z] [cognitive] SWIM  (22ms)\n[2026-09-04T05:05:34.879Z] [debug] arbiter: ambient-empty reason=unknown raw=\"You have traversed the rugged terrain of Active Dig Trench, the borderlands that have been long since forgotten, and it \"\n",
+      "[2026-09-04T05:05:34.878Z] [debug] arbiter: ambient stale:moved-scene 15681ms\n[2026-09-04T05:05:34.878Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient after 15172ms \u2014 ambient:stale:moved-scene\n[2026-09-04T05:05:34.870Z] [world] You look the shallow pool over. Nothing about it sings, nothing about it warns \u2014 Tartaria is full of things waiting to be remembered.\n",
+      "[2026-09-04T05:05:34.869Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=shallow pool resolved=shallow pool range=- enemies=0 hooks=1\n[2026-09-04T05:05:34.868Z] [player] investigate shallow pool\n[2026-09-04T05:05:34.636Z] [debug] qwen\u23f1 ambient ok 15172ms wait 4198ms read 4801ms/write 1236ms in 364t\u2192out 31t 13.2ms/t HIT-CAP (151ch)\n",
+      "[2026-09-04T05:05:27.960Z] [debug] ui: tap \"investigate\"\n[2026-09-04T05:05:25.549Z] [debug] persist sizes(KB): total=328 player=72 wm=168[rooms=93 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=84 scene=3\n[2026-09-04T05:05:24.864Z] [reward]     \u2022 Splintered Haft End (Common)\n[2026-09-04T05:05:24.863Z] [reward] \u2726 Salvage haul:\n",
+      "[Filtered]",
+      "[2026-09-04T05:05:21.663Z] [debug] qwen\u23f1 investigate_lore ok 2198ms read/write unusable (native mis-reported 92424ms/834ms \u2014 llama.rn split bug, not this call) in 126t\u2192out 23t (99ch)\n[2026-09-04T05:05:20.984Z] [world] The thread you were following waits where you left it.\n",
+      "[2026-09-04T05:05:20.984Z] [world] You walk east through open silt. The compass tells you Tartarian Pilgrim Camp lies further east \u2014 2 tiles, about 5 hours of travel.\n[2026-09-04T05:05:20.978Z] [debug] ui: tap \"\u2192 MUD SEAS\"\n[2026-09-04T05:05:20.767Z] [cognitive] READY  (297ms)\n",
+      "[2026-09-04T05:05:20.468Z] [world] The watch fire sits the way ordinary things sit. The Arbiter does not lean in. You move on.\n[2026-09-04T05:05:20.467Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=watch fire resolved=watch fire range=- enemies=0 hooks=1\n[2026-09-04T05:05:20.466Z] [player] investigate watch fire\n[2026-09-04T05:05:19.481Z] [cognitive] SWIM  (283ms)\n",
+      "[2026-09-04T05:05:19.195Z] [world] You give the waterskin your full attention. It returns the gesture by being exactly what it appears to be.\n[2026-09-04T05:05:19.193Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=waterskin resolved=waterskin range=- enemies=0 hooks=1\n[2026-09-04T05:05:19.192Z] [player] investigate waterskin\n",
+      "[2026-09-04T05:05:18.150Z] [cognitive] SWIM  (194ms)\n[2026-09-04T05:05:17.955Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-04T05:05:17.955Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-09-04T05:05:17.955Z] [world] You've already examined the mud. There's nothing more to find here.\n",
+      "[2026-09-04T05:05:17.954Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=rusted petrified mud wave range=- enemies=0 hooks=1\n[2026-09-04T05:05:17.954Z] [player] investigate the mud\n[2026-09-04T05:05:16.218Z] [debug] ui: tap \"investigate\"\n[2026-09-04T05:05:07.406Z] [cognitive] neutral  (439ms)\n",
+      "[2026-09-04T05:05:06.966Z] [reward] \u2726 Crafted Field Dressing \u00d74. The Arbiter watches you set the last piece.\n[2026-09-04T05:05:06.818Z] [debug] parser: intent=craft conf=1.00 verb=craft target=field dressing resolved=Field Dressing range=- enemies=0 hooks=1\n[2026-09-04T05:05:06.817Z] [player] craft Field Dressing\n[2026-09-04T05:05:02.846Z] [cognitive] neutral  (466ms)\n",
+      "[2026-09-04T05:05:02.378Z] [reward] \u2726 Crafted Trauma Kit. The Arbiter watches you set the last piece.\n[2026-09-04T05:05:02.374Z] [debug] parser: intent=craft c"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-04-1665-the-bug-report-pushes #mtmzs9dzspnn [inline 1/4]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtmzs9dzspnn"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1665-the-bug-report-pushes"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "1"
+    },
+    {
+      "key": "parts",
+      "value": "4"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1665-the-bug-report-pushes"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T13:30:56.859126Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "35": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 336,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T13:30:58.829000Z",
+  "fingerprints": [
+    "becc43348393caae43fdd2da5bdb5350"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1954691241,
+    "commitCount": 3,
+    "data": {},
+    "dateCreated": "2026-09-04T05:42:51.380846Z",
+    "dateReleased": "2026-09-04T05:43:40.910086Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "5bd2090d8c7d7204b9c58c0844aa871a9b237564",
+      "message": "[ota-hal] OTA-1665: the bug report pushes, and only once per changed log\n\nOwner, three instructions together: \"I've removed the send log\", \"report a bug\nshould be the button that pushed the log, so we don't need the email route\nanymore, we can archive that bug report land\", and \"after you do a bug report\nand that pushes a log, you can't do another one until something in the log is\nchanged. so you have to go play for a little bit before it allows you to push\nanother one.\"\n\n\u26a0\u26a0\u26a0 THE EMAIL ROUTE WAS NEVER THE DESIGN, and bugReport.ts said so in its own\nheader: true zero-paste needed `expo-mail-composer`, which needs a native\nrebuild, and native builds are parked. So what shipped instead was a clipboard\nstage, a READ-ME-FIRST body, a manual paste, and a report that \u2014 in the file's\nown words \u2014 \"arrives empty and we can't track the bug down\" whenever a step was\nmissed. That is exactly how both his daughters filed tonight. The transport this\nneeded has been in the app since August; it was simply never wired to the button\npeople actually find.\n\nNow REPORT A BUG persists to disk and pushes inline through the OTA-1504 durable\npipeline, carrying what the player typed, and the payload leads with a headline\n(character \u00b7 build \u00b7 first line of the description) so a list of reports reads as\na list of problems instead of a column of identical titles. That headline is the\nold email SUBJECT, which would otherwise have become dead code \u2014 the value it\ncarried is exactly what a Sentry event needs.\n\n\u26a0\u26a0 SEND LOG IS DELETED, one day after OTA-1661 opened it to everyone and gave it\na two-tap consent step. With REPORT A BUG asking for a description first \u2014 a\nbetter consent surface AND better evidence \u2014 two buttons doing one send was\nclutter on a screen that has already fought a wall of COPY buttons.\n\n\u26a0\u26a0\u26a0 EVERY OUTCOME SPEAKS, and this is the part I care most about. A push has\nreal failure modes a mailto never had: queued, refused as a duplicate, refused\nbecause reporting is off, no destination in this build. The old Title screen\nflashed \"\u2713 COPIED\" unconditionally \u2014 which was honest enough when opening a\nmailto could not meaningfully fail, and would now be a lie told by the one\ncontrol that must never lie. `composeAndSendBugReport` returns a player-facing\nmessage on every path, never throws, and both screens render it verbatim. The\nsuite proves that by RUNNING the paths and asserting the message is non-empty,\nnot by scanning for strings.\n\n\u26a0 THE DEDUPE fingerprints the raw slot log \u2014 length plus its newest tail, keyed\nper slot \u2014 and the check runs BEFORE anything is persisted or sent. Length alone\nwould let a same-size edit through; the tail costs nothing. The mark is stored\neven on a QUEUED send, because the bundle is already on disk and letting a\nsecond identical report through would queue a duplicate behind one already\nwaiting. And a general report with NO character loaded is never blocked: \"the\ngame won't start\" carries no play by definition, and gating it on a changed log\nwould lock a player out of the only channel they have.\n\n\u26a0 TWO THINGS THE CLEANUP TURNED UP. `_legacySendBugReport` sat unreferenced\nbehind an eslint-disable, still holding a clipboard stage, a READ-ME-FIRST body\nand a mailto \u2014 that is the land he asked to archive, and a dead function holding\na copy of it is precisely where it grows back. Deleted. And the OTA-063 comment\nabove the handler still described the clipboard workaround in loving detail;\nrewritten, because a comment describing a route the code no longer takes is what\nstopped me checking the Samarran entry two OTAs ago.\n\n\u26a0 THREE ASSERTIONS IN THIS SUITE WERE WRONG BEFORE THEY WERE RIGHT, all the same\nway: too broad. A blanket \"no COPIED\" condemned COPY URL and COPY CRASHED SAVE;\na blanket \"no mailto:\" condemned INVITE PLAYTESTER, which should keep one \u2014 that\nis a short human request to a person, not a payload; and a scan for the deleted\nfunction's bare name failed against its own obituary, which is the OTA-1659\nlesson arriving in a second file. Each is now scoped to the thing it means.\n\ndocs/PRIVACY.md moved with the button: the section is \"Sending a report\nyourself\", it names the description as something that gets sent, and it states\nthe one-report-per-changed-log rule, because the player will meet that refusal\nand should not think the button is broken.\n\n\u26a0\u26a0\u26a0 AND THE FULL SUITE CAUGHT TWO REAL DEFECTS THE GATES DID NOT. Eight suites\nwent red on the first run \u2014 1489, 1492, 1504, 1515, 1516, 1518, 1519 and 1661 \u2014\nbecause every one of them pinned SEND LOG's send path in AboutScreen, which this\nOTA deletes. Repointing them at bugReport.ts was not bookkeeping; it is what\nsurfaced the following, and I would have shipped both:\n\n  \u00b7 I wrote `landed = !chunk.stopped` \u2014 \"we attempted it, so it went.\" That is\n    precisely the false positive OTA-1519 exists because of: a send can be\n    attempted, report no stop reason, and still lose parts, which that OTA\n    measured as Sentry silently replacing NINE of 49 inline parts. Corrected to\n    `chunk.delivered`, the field that means `sent === parts`.\n\n  \u00b7 I dropped the result line entirely. OTA-1492's rule is that the next\n    diagnosis starts from a line, not a memory. The push now logs the full\n    `describeInlineSend` report \u2014 parts accepted, what flush said, where it\n    threw \u2014 which is strictly more than the one-word ok/not-ok line it replaced.\n\nIn both cases the CODE gained the property back; the tests did not lose it. That\nis the whole argument for pinning behaviour you have already paid to learn.\n\n\u26a0 ota1661's SUITE IS DELETED, not re-anchored. It was one day old and every\nassertion in it described a button that no longer exists \u2014 its premise is\nsuperseded, like ota1146's was. The claims that OUTLIVED it are carried into\nota1665 explicitly: the push is not owner-gated, `reportingEnabled()` still\ngoverns it, the privacy page names what leaves the device, and \u2014 importantly \u2014\nthe OTA-1505 auto-bundle is STILL owner-gated. SEND LOG going away does not\nmerge consent and collection.\n\n\u26a0 ONE GATE FAILED FOR THE RIGHT REASON. check:quotedpins refused a new\nprose-shaped pin, and rather than raise the baseline I measured which one it was\n(a dump of the counted set, diffed against HEAD: `'REPORT A BUG'` in ota1489) and\nconverted it to the wiring instead \u2014 `setBugReportOpen(true)`. A label pin fails\non a reword and passes if the button is deleted; the wiring pin cannot.\n\nGates: all 18 green by exit code. Full suite green.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T05:40:17Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1665-the-bug-report-pushes",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1665-the-bug-report-pushes",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T05:43:40.910086Z",
+          "dateCreated": "2026-09-04T05:42:51.380846Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155444244",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T05:43:41.150780Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1665-the-bug-report-pushes",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1665-the-bug-report-pushes",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1665-the-bug-report-pushes",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1665-the-bug-report-pushes)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "cc8f8b85ba574ed0b719d53013ba7b6d",
+  "previousEventID": "6928a82d829546ceaeb6ca4a6183bd89"
+}

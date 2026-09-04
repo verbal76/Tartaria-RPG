@@ -1,0 +1,280 @@
+{
+  "id": "237525ede01e4c618d6341176d056285",
+  "groupID": "7711855976",
+  "eventID": "237525ede01e4c618d6341176d056285",
+  "projectID": "4511945117532160",
+  "size": 18083,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-04-1665-the-bug-report-pushes #mtmhqinlc5jl [inline 24/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1665-the-bug-report-pushes",
+  "message": "player-log 2026-09-04-1665-the-bug-report-pushes #mtmhqinlc5jl [inline 24/28]",
+  "title": "player-log 2026-09-04-1665-the-bug-report-pushes #mtmhqinlc5jl [inline 24/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "94de418b69a247ecb9bc8ea3abcadee8",
+      "span_id": "814dfe84e4af1eb8",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "(68/111 HP, 1 turn left)\n[2026-09-04T04:56:44.244Z] [debug] attack: target=Mud-Wracked Aetherkin range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-09-04T04:56:44.246Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-09-04T04:56:44.332Z] [world] Your poisoned corrupted bone crossbow comes around in an arc; Mud-Wracked Aetherkin squares up to meet it.\n[2026-09-04T04:56:44.333Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T04:56:44.666Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE \u00b7 RELOAD  (332ms)\n[2026-09-04T04:56:53.842Z] [world] Mud-Wracked Aetherkin moves first. The pressure is immediate.\n",
+      "[2026-09-04T04:56:53.845Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 2 + ATK 5 = 7 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-04T04:56:53.846Z] [combat] You \u2014 d20 \u2192 12 + DEX 19 perfect opening (2\u00d7 dice) = 31 vs Mud-Wracked Aetherkin AC 11 \u2014 \u2713 HIT\n[2026-09-04T04:56:53.851Z] [combat] The Poisoned coating fails to take on Mud-Wracked Aetherkin.\n",
+      "[2026-09-04T04:56:53.851Z] [combat] The Corrupted coating fails to take on Mud-Wracked Aetherkin.\n[2026-09-04T04:56:53.852Z] [combat] Clean hit with the poisoned corrupted bone crossbow for 11. Mud-Wracked Aetherkin has 57 left and does not back away.\n[2026-09-04T04:56:57.666Z] [debug] ui: tap \"\u2623\u26a1 shroud-spun slinger \u2692\"\n",
+      "[2026-09-04T04:56:57.757Z] [player] attack with the off-hand reclaimers guild shroud-spun slinger\n[2026-09-04T04:56:57.758Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand reclaimers guild shroud spun slinger resolved=Reclaimers Guild Shroud-Spun Slinger range=mid enemies=1 hooks=1\n",
+      "[2026-09-04T04:56:57.758Z] [arbiter] The Arbiter keeps one eye on the fight. \"That is the right move for The Bog Dragon of Old Drakova \u2014 but not with something on you. Put this down first.\"\n[2026-09-04T04:56:57.759Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter keeps one eye on the fight. \"That is the right m\u2026\"\n",
+      "[2026-09-04T04:56:57.759Z] [combat] Mud-Wracked Aetherkin shudders \u2014 poison eats 2. (55/111 HP, 0 turns left)\n[2026-09-04T04:56:57.759Z] [combat] Mud-Wracked Aetherkin shakes off the last of the poison \u2014 the Bone Crossbow has run its course.\n",
+      "[2026-09-04T04:56:57.760Z] [debug] attack: target=Mud-Wracked Aetherkin range=mid reach.bands=[distant,far,mid,close] reach.label=Reclaimers Guild Shroud-Spun Slinger bareHand=false\n[2026-09-04T04:56:57.840Z] [world] You bring the corrupted resonant reclaimers guild shroud-spun slinger to bear on Mud-Wracked Aetherkin.\n[2026-09-04T04:56:57.841Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-04T04:56:58.172Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 USE_ITEM  (330ms)\n[2026-09-04T04:57:07.590Z] [world] You seize the initiative. Mud-Wracked Aetherkin has no time to react.\n[2026-09-04T04:57:07.590Z] [combat] You \u2014 d20 \u2192 4 + DEX 19 = 23 vs Mud-Wracked Aetherkin AC 11 \u2014 \u2713 HIT\n[2026-09-04T04:57:07.591Z] [combat] The Corrupted coating fails to take on Mud-Wracked Aetherkin.\n",
+      "[2026-09-04T04:57:07.591Z] [combat] Mud-Wracked Aetherkin shrugs off the bludgeoning. (resisted, \u00d70.5 for 5)\n[2026-09-04T04:57:07.597Z] [arbiter] The Arbiter watches the bludgeoning skid off. \"Swap to the Sparkstrike Wand \u2014 electrical will bite where bludgeoning won't.\"\n",
+      "[2026-09-04T04:57:07.598Z] [combat] Clean hit with the corrupted resonant reclaimers guild shroud-spun slinger for 5. Mud-Wracked Aetherkin has 50 left and does not back away.\n[2026-09-04T04:57:07.599Z] [combat] Corrupted Resonant Reclaimers Guild Shroud-Spun Slinger \u2014 1 electrical bites in and festers (3 turns).\n",
+      "[2026-09-04T04:57:07.601Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 20 + ATK 5 = 25 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 CRITICAL HIT\n[2026-09-04T04:57:07.984Z] [combat] Mud-Wracked Aetherkin deals 7 aetheric damage [armor \u221234%, title \u00bd, floor 30%]. You have 24 HP remaining.\n[2026-09-04T04:57:10.128Z] [debug] ui: tap \"dodge\"\n[2026-09-04T04:57:10.134Z] [player] dodge\n",
+      "[2026-09-04T04:57:10.134Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=1 hooks=1\n[2026-09-04T04:57:10.134Z] [world] You commit to the dodge. Slip Mud-Wracked Aetherkin's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-04T04:57:10.134Z] [combat] Mud-Wracked Aetherkin convulses \u2014 arcing current bites 1. (49/111 HP, 2 turns left)\n[2026-09-04T04:57:10.208Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 4 + ATK 5 = 9 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n[2026-09-04T04:57:10.209Z] [combat] Dodge \u2014 d20 \u2192 17 + DEX 19 = 36 vs ATK 9. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n",
+      "[2026-09-04T04:57:10.209Z] [debug] arbiter: template (reason=combat)\n[2026-09-04T04:57:10.209Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-04T04:57:10.210Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T04:57:10.556Z] [cognitive] neutral  (345ms)\n",
+      "[2026-09-04T04:57:11.290Z] [debug] persist sizes(KB): total=334 player=78 wm=168[rooms=93 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=85 scene=3\n[2026-09-04T04:57:11.636Z] [debug] ui: tap \"\u2620\u2623 bone crossbow \u25b2\"\n[2026-09-04T04:57:11.654Z] [player] attack with the bone crossbow\n",
+      "[2026-09-04T04:57:11.654Z] [debug] parser: intent=attack conf=1.00 verb=attack target=bone crossbow resolved=Bone Crossbow range=mid enemies=1 hooks=1\n[2026-09-04T04:57:11.655Z] [arbiter] The Arbiter keeps one eye on the fight. \"That is the right move for The Bog Dragon of Old Drakova \u2014 but not with something on you. Put this down first.\"\n",
+      "[2026-09-04T04:57:11.655Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter keeps one eye on the fight. \"That is the right m\u2026\"\n[2026-09-04T04:57:11.655Z] [combat] Mud-Wracked Aetherkin convulses \u2014 arcing current bites 1. (48/111 HP, 1 turn left)\n",
+      "[2026-09-04T04:57:11.655Z] [debug] attack: target=Mud-Wracked Aetherkin range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-09-04T04:57:11.656Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-04T04:57:11.731Z] [world] You raise the poisoned corrupted bone crossbow toward Mud-Wracked Aetherkin. The room narrows around the both of you.\n",
+      "[2026-09-04T04:57:11.731Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T04:57:12.071Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE \u00b7 RELOAD  (339ms)\n[2026-09-04T04:57:21.103Z] [world] Mud-Wracked Aetherkin moves first. The pressure is immediate.\n[2026-09-04T04:57:21.106Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 2 + ATK 5 = 7 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-04T04:57:21.107Z] [combat] You \u2014 d20 \u2192 8 + DEX 19 perfect opening (2\u00d7 dice) = 27 vs Mud-Wracked Aetherkin AC 11 \u2014 \u2713 HIT\n[2026-09-04T04:57:21.108Z] [combat] The Poisoned coating fails to take on Mud-Wracked Aetherkin.\n[2026-09-04T04:57:21.109Z] [combat] The Corrupted coating fails to take on Mud-Wracked Aetherkin.\n[2026-09-04T04:57:21.109Z] [combat] Piercing flares \u2014 +1 on hit.\n",
+      "[2026-09-04T04:57:21.110Z] [system] \u26a0 Your Bone Crossbow is coming apart \u2014 a few more hits will finish it. Mend it or lose it.\n[2026-09-04T04:57:21.110Z] [combat] Clean hit with the poisoned corrupted bone crossbow for 13. Mud-Wracked Aetherkin has 35 left and does not back away.\n[2026-09-04T04:57:23.346Z] [debug] ui: tap \"\u2623\u26a1 shroud-spun slinger \u2692\"\n",
+      "[2026-09-04T04:57:23.428Z] [player] attack with the off-hand reclaimers guild shroud-spun slinger\n[2026-09-04T04:57:23.429Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand reclaimers guild shroud spun slinger resolved=Reclaimers Guild Shroud-Spun Slinger range=mid enemies=1 hooks=1\n",
+      "[2026-09-04T04:57:23.430Z] [arbiter] The Arbiter keeps one eye on the fight. \"That is the right move for The Bog Dragon of Old Drakova \u2014 but not with something on you. Put this down first.\"\n[2026-09-04T04:57:23.430Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter keeps one eye on the fight. \"That is the right m\u2026\"\n",
+      "[2026-09-04T04:57:23.430Z] [combat] Mud-Wracked Aetherkin convulses \u2014 arcing current bites 1. (34/111 HP, 0 turns left)\n[2026-09-04T04:57:23.431Z] [combat] Mud-Wracked Aetherkin shakes off the last of the current \u2014 the Reclaimers Guild Shroud-Spun Slinger has run its course.\n",
+      "[2026-09-04T04:57:23.432Z] [debug] attack: target=Mud-Wracked Aetherkin range=mid reach.bands=[distant,far,mid,close] reach.label=Reclaimers Guild Shroud-Spun Slinger bareHand=false\n[2026-09-04T04:57:23.511Z] [world] Your corrupted resonant reclaimers guild shroud-spun slinger comes around in an arc; Mud-Wracked Aetherkin squares up to meet it.\n",
+      "[2026-09-04T04:57:23.511Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T04:57:23.843Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 USE_ITEM  (330ms)\n[2026-09-04T04:57:32.994Z] [world] Mud-Wracked Aetherkin moves first. The pressure is immediate.\n[2026-09-04T04:57:32.998Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 15 + ATK 5 = 20 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-04T04:57:32.998Z] [combat] You \u2014 d20 \u2192 6 + DEX 19 = 25 vs Mud-Wracked Aetherkin AC 11 \u2014 \u2713 HIT\n[2026-09-04T04:57:32.999Z] [combat] The Corrupted coating fails to take on Mud-Wracked Aetherkin.\n[2026-09-04T04:57:32.999Z] [combat] Mud-Wracked Aetherkin shrugs off the bludgeoning. (resisted, \u00d70.5 for 6)\n",
+      "[2026-09-04T04:57:33.004Z] [combat] Your strike with the corrupted resonant reclaimers guild shroud-spun slinger lands for 6. Mud-Wracked Aetherkin staggers \u2014 28 HP remaining. It answers.\n[2026-09-04T04:57:33.005Z] [combat] Corrupted Resonant Reclaimers Guild Shroud-Spun Slinger \u2014 1 electrical bites in and festers (3 turns).\n[2026-09-04T04:57:35.481Z] [debug] ui: tap \"dodge\"\n",
+      "[2026-09-04T04:57:35.507Z] [player] dodge\n[2026-09-04T04:57:35.508Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=1 hooks=1\n[2026-09-04T04:57:35.509Z] [world] You commit to the dodge. Slip Mud-Wracked Aetherkin's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-04T04:57:35.510Z] [combat] Mud-Wracked Aetherkin convulses \u2014 arcing current bites 1. (27/111 HP, 2 turns left)\n[2026-09-04T04:57:35.612Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 20 + ATK 5 = 25 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 CRITICAL HIT\n",
+      "[2026-09-04T04:57:35.612Z] [combat] Dodge \u2014 Mud-Wracked Aetherkin rolls a NAT 20. No read beats a perfect strike; it lands through your dodge.\n[2026-09-04T04:57:35.613Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T04:57:35.991Z] [combat] Mud-Wracked Aetherkin deals 4 aetheric damage [armor \u221234%, title \u00bd, floor 30%]. You have 20 HP remaining.\n[2026-09-04T04:57:36.329Z] [cognitive] neutral  (379ms)\n",
+      "[2026-09-04T04:57:36.700Z] [debug] ui: tap \"\u2623\u26a1 shroud-spun slinger \u2692\"\n[2026-09-04T04:57:36.743Z] [player] attack with the off-hand reclaimers guild shroud-spun slinger\n[2026-09-04T04:57:36.744Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand reclaimers guild shroud spun slinger resolved=Reclaimers Guild Shroud-Spun Slinger range=mid enemies=1 hooks=1\n",
+      "[2026-09-04T04:57:36.744Z] [arbiter] The Arbiter keeps one eye on the fight. \"That is the right move for The Bog Dragon of Old Drakova \u2014 but not with something on you. Put this down first.\"\n[2026-09-04T04:57:36.744Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter keeps one eye on the fight. \"That is the right m\u2026\"\n",
+      "[2026-09-04T04:57:36.744Z] [combat] Mud-Wracked Aetherkin convulses \u2014 arcing current bites 1. (26/111 HP, 1 turn left)\n[2026-09-04T04:57:36.745Z] [debug] attack: target=Mud-Wracked Aetherkin range=mid reach.bands=[distant,far,mid,close] reach.label=Reclaimers Guild Shroud-Spun Slinger bareHand=false\n",
+      "[2026-09-04T04:57:36.816Z] [world] You raise the corrupted resonant reclaimers guild shroud-spun slinger toward Mud-Wracked Aetherkin. The room narrows around the both of you.\n[2026-09-04T04:57:36.816Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T04:57:37.146Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 USE_ITEM  (329ms)\n",
+      "[2026-09-04T04:57:47.099Z] [world] Mud-Wracked Aetherkin moves first. The pressure is immediate.\n[2026-09-04T04:57:47.102Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 4 + ATK 5 = 9 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-04T04:57:47.102Z] [combat] You \u2014 d20 \u2192 11 + DEX 19 = 30 vs Mud-Wracked Aetherkin AC 11 \u2014 \u2713 HIT\n",
+      "[2026-09-04T04:57:47.103Z] [combat] The Corrupted coating fails to take on Mud-Wracked Aetherkin.\n[2026-09-04T04:57:47.103Z] [combat] Mud-Wracked Aetherkin shrugs off the bludgeoning. (resisted, \u00d70.5 for 4)\n[2026-09-04T04:57:47.104Z] [combat] The bludgeoning has worn Mud-Wracked Aetherkin's guard through \u2014 it bites full from here.\n",
+      "[2026-09-04T04:57:47.105Z] [combat] Clean hit with the corrupted resonant reclaimers guild shroud-spun slinger for 4. Mud-Wracked Aetherkin has 22 left and does not back away.\n[2026-09-04T04:57:47.105Z] [combat] Corrupted Resonant Reclaimers Guild Shroud-Spun Slinger \u2014 2 electrical bites in and festers (3 turns).\n",
+      "[2026-09-04T04:57:47.105Z] [arbiter] The Arbiter's hand drifts to nothing in particular. \"The mud-wracked aetherkin will not tire before you do. Spend wisely.\"\n[2026-09-04T04:57:49.153Z] [debug] ui: tap \"\u271a heals (3)\"\n[2026-09-04T04:57:55.156Z] [world] You use 1\u00d7 First Aid Kit. +25 HP (45/50), +1 stamina.\n[2026-09-04T04:57:58.606Z] [debug] ui: tap \"\u2620\u2623 bone crossbow \u25b2\"\n",
+      "[2026-09-04T04:57:58.656Z] [player] attack with the bone crossbow\n[2026-09-04T04:57:58.657Z] [debug] parser: intent=attack conf=1.00 verb=attack target=bone crossbow resolved=Bone Crossbow range=mid enemies=1 hooks=1\n",
+      "[2026-09-04T04:57:58.658Z] [arbiter] The Arbiter keeps one eye on the fight. \"That is the right move for The Bog Dragon of Old Drakova \u2014 but not with something on you. Put this down first.\"\n[2026-09-04T04:57:58.659Z] [combat] Mud-Wracked Aetherkin convulses \u2014 arcing current bites 2. (20/111 HP, 2 turns left)\n",
+      "[2026-09-04T04:57:58.659Z] [debug] attack: target=Mud-Wracked Aetherkin range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-09-04T04:57:58.748Z] [world] You raise the poisoned corrupted bone crossbow toward Mud-Wracked Aetherkin. The room narrows around the both of you.\n[2026-09-04T04:57:58.748Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-04T04:57:59.080Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE \u00b7 RELOAD  (330ms)\n[2026-09-04T04:57:59.491Z] [debug] persist sizes(KB): total=333 player=77 wm=168[rooms=93 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=85 scene=3\n[2026-09-04T04:58:08.323Z] [world] You seize the initiative. Mud-Wracked Aetherkin has no time to react.\n",
+      "[2026-09-04T04:58:08.324Z] [combat] You \u2014 d20 \u2192 6 + DEX 19 = 25 vs Mud-Wracked Aetherkin AC 11 \u2014 \u2713 HIT\n[2026-09-04T04:58:08.326Z] [combat] The Poisoned coating fails to take on Mud-Wracked Aetherkin.\n[2026-09-04T04:58:08.326Z] [combat] The Corrupted coating fails to take on Mud-Wracked Aetherkin.\n[2026-09-04T04:58:08.330Z] [debug] wear ward: Bone Crossbow keeps its point (15%)\n",
+      "[2026-09-04T04:58:08.331Z] [combat] Mud-Wracked Aetherkin takes 5 w"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-04-1665-the-bug-report-pushes #mtmhqinlc5jl [inline 24/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtmhqinlc5jl"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1665-the-bug-report-pushes"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "24"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1665-the-bug-report-pushes"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T13:30:29.766208Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T13:30:31.465000Z",
+  "fingerprints": [
+    "82b3bd9794294f43365029396594bd02"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1954691241,
+    "commitCount": 3,
+    "data": {},
+    "dateCreated": "2026-09-04T05:42:51.380846Z",
+    "dateReleased": "2026-09-04T05:43:40.910086Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "5bd2090d8c7d7204b9c58c0844aa871a9b237564",
+      "message": "[ota-hal] OTA-1665: the bug report pushes, and only once per changed log\n\nOwner, three instructions together: \"I've removed the send log\", \"report a bug\nshould be the button that pushed the log, so we don't need the email route\nanymore, we can archive that bug report land\", and \"after you do a bug report\nand that pushes a log, you can't do another one until something in the log is\nchanged. so you have to go play for a little bit before it allows you to push\nanother one.\"\n\n\u26a0\u26a0\u26a0 THE EMAIL ROUTE WAS NEVER THE DESIGN, and bugReport.ts said so in its own\nheader: true zero-paste needed `expo-mail-composer`, which needs a native\nrebuild, and native builds are parked. So what shipped instead was a clipboard\nstage, a READ-ME-FIRST body, a manual paste, and a report that \u2014 in the file's\nown words \u2014 \"arrives empty and we can't track the bug down\" whenever a step was\nmissed. That is exactly how both his daughters filed tonight. The transport this\nneeded has been in the app since August; it was simply never wired to the button\npeople actually find.\n\nNow REPORT A BUG persists to disk and pushes inline through the OTA-1504 durable\npipeline, carrying what the player typed, and the payload leads with a headline\n(character \u00b7 build \u00b7 first line of the description) so a list of reports reads as\na list of problems instead of a column of identical titles. That headline is the\nold email SUBJECT, which would otherwise have become dead code \u2014 the value it\ncarried is exactly what a Sentry event needs.\n\n\u26a0\u26a0 SEND LOG IS DELETED, one day after OTA-1661 opened it to everyone and gave it\na two-tap consent step. With REPORT A BUG asking for a description first \u2014 a\nbetter consent surface AND better evidence \u2014 two buttons doing one send was\nclutter on a screen that has already fought a wall of COPY buttons.\n\n\u26a0\u26a0\u26a0 EVERY OUTCOME SPEAKS, and this is the part I care most about. A push has\nreal failure modes a mailto never had: queued, refused as a duplicate, refused\nbecause reporting is off, no destination in this build. The old Title screen\nflashed \"\u2713 COPIED\" unconditionally \u2014 which was honest enough when opening a\nmailto could not meaningfully fail, and would now be a lie told by the one\ncontrol that must never lie. `composeAndSendBugReport` returns a player-facing\nmessage on every path, never throws, and both screens render it verbatim. The\nsuite proves that by RUNNING the paths and asserting the message is non-empty,\nnot by scanning for strings.\n\n\u26a0 THE DEDUPE fingerprints the raw slot log \u2014 length plus its newest tail, keyed\nper slot \u2014 and the check runs BEFORE anything is persisted or sent. Length alone\nwould let a same-size edit through; the tail costs nothing. The mark is stored\neven on a QUEUED send, because the bundle is already on disk and letting a\nsecond identical report through would queue a duplicate behind one already\nwaiting. And a general report with NO character loaded is never blocked: \"the\ngame won't start\" carries no play by definition, and gating it on a changed log\nwould lock a player out of the only channel they have.\n\n\u26a0 TWO THINGS THE CLEANUP TURNED UP. `_legacySendBugReport` sat unreferenced\nbehind an eslint-disable, still holding a clipboard stage, a READ-ME-FIRST body\nand a mailto \u2014 that is the land he asked to archive, and a dead function holding\na copy of it is precisely where it grows back. Deleted. And the OTA-063 comment\nabove the handler still described the clipboard workaround in loving detail;\nrewritten, because a comment describing a route the code no longer takes is what\nstopped me checking the Samarran entry two OTAs ago.\n\n\u26a0 THREE ASSERTIONS IN THIS SUITE WERE WRONG BEFORE THEY WERE RIGHT, all the same\nway: too broad. A blanket \"no COPIED\" condemned COPY URL and COPY CRASHED SAVE;\na blanket \"no mailto:\" condemned INVITE PLAYTESTER, which should keep one \u2014 that\nis a short human request to a person, not a payload; and a scan for the deleted\nfunction's bare name failed against its own obituary, which is the OTA-1659\nlesson arriving in a second file. Each is now scoped to the thing it means.\n\ndocs/PRIVACY.md moved with the button: the section is \"Sending a report\nyourself\", it names the description as something that gets sent, and it states\nthe one-report-per-changed-log rule, because the player will meet that refusal\nand should not think the button is broken.\n\n\u26a0\u26a0\u26a0 AND THE FULL SUITE CAUGHT TWO REAL DEFECTS THE GATES DID NOT. Eight suites\nwent red on the first run \u2014 1489, 1492, 1504, 1515, 1516, 1518, 1519 and 1661 \u2014\nbecause every one of them pinned SEND LOG's send path in AboutScreen, which this\nOTA deletes. Repointing them at bugReport.ts was not bookkeeping; it is what\nsurfaced the following, and I would have shipped both:\n\n  \u00b7 I wrote `landed = !chunk.stopped` \u2014 \"we attempted it, so it went.\" That is\n    precisely the false positive OTA-1519 exists because of: a send can be\n    attempted, report no stop reason, and still lose parts, which that OTA\n    measured as Sentry silently replacing NINE of 49 inline parts. Corrected to\n    `chunk.delivered`, the field that means `sent === parts`.\n\n  \u00b7 I dropped the result line entirely. OTA-1492's rule is that the next\n    diagnosis starts from a line, not a memory. The push now logs the full\n    `describeInlineSend` report \u2014 parts accepted, what flush said, where it\n    threw \u2014 which is strictly more than the one-word ok/not-ok line it replaced.\n\nIn both cases the CODE gained the property back; the tests did not lose it. That\nis the whole argument for pinning behaviour you have already paid to learn.\n\n\u26a0 ota1661's SUITE IS DELETED, not re-anchored. It was one day old and every\nassertion in it described a button that no longer exists \u2014 its premise is\nsuperseded, like ota1146's was. The claims that OUTLIVED it are carried into\nota1665 explicitly: the push is not owner-gated, `reportingEnabled()` still\ngoverns it, the privacy page names what leaves the device, and \u2014 importantly \u2014\nthe OTA-1505 auto-bundle is STILL owner-gated. SEND LOG going away does not\nmerge consent and collection.\n\n\u26a0 ONE GATE FAILED FOR THE RIGHT REASON. check:quotedpins refused a new\nprose-shaped pin, and rather than raise the baseline I measured which one it was\n(a dump of the counted set, diffed against HEAD: `'REPORT A BUG'` in ota1489) and\nconverted it to the wiring instead \u2014 `setBugReportOpen(true)`. A label pin fails\non a reword and passes if the button is deleted; the wiring pin cannot.\n\nGates: all 18 green by exit code. Full suite green.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T05:40:17Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1665-the-bug-report-pushes",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1665-the-bug-report-pushes",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T05:43:40.910086Z",
+          "dateCreated": "2026-09-04T05:42:51.380846Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155444244",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T05:43:41.150780Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1665-the-bug-report-pushes",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1665-the-bug-report-pushes",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1665-the-bug-report-pushes",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1665-the-bug-report-pushes)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "3e7820bf7a434c918c300a2ec96e771c",
+  "previousEventID": "20e51b5a09284da9827e03b4ea8756bf"
+}

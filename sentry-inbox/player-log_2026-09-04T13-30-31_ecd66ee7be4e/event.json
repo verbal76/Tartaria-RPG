@@ -1,0 +1,278 @@
+{
+  "id": "ecd66ee7be4e446dbf8869b92c383e7d",
+  "groupID": "7711855976",
+  "eventID": "ecd66ee7be4e446dbf8869b92c383e7d",
+  "projectID": "4511945117532160",
+  "size": 18089,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-04-1665-the-bug-report-pushes #mtmhqinlc5jl [inline 21/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1665-the-bug-report-pushes",
+  "message": "player-log 2026-09-04-1665-the-bug-report-pushes #mtmhqinlc5jl [inline 21/28]",
+  "title": "player-log 2026-09-04-1665-the-bug-report-pushes #mtmhqinlc5jl [inline 21/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "94de418b69a247ecb9bc8ea3abcadee8",
+      "span_id": "814dfe84e4af1eb8",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "avel, all in. Tap the \u2192 MUD SEAS button on the travel row to press on; STOP TRAVEL to halt.\n[2026-09-04T02:50:03.270Z] [world] Auto-routing to the next stage of The Bog Dragon of Old Drakova: Mud Seas.\n[2026-09-04T02:50:03.270Z] [debug] mission card: \"The Bog Dragon of Old Drakova\" \u00b7 close \u00b7 \u25b8 Next: Mud Seas \u00b7 provoke it \u2014 3 \u00d7 Mud Harpy \u00b7 bring Eshren's Name-Token. \u00b7 got Eshren's Name-Token\n",
+      "[2026-09-04T02:50:06.022Z] [debug] ui: tap \"mission card \u00b7 CONTINUE\"\n[2026-09-04T02:50:09.723Z] [debug] ui: tap \"\u2192 MUD SEAS\"\n[2026-09-04T02:50:09.747Z] [world] You walk east through open silt. The compass tells you Dynasty Border Post lies further east \u2014 3 tiles, about 8 hours of travel.\n[2026-09-04T02:50:09.748Z] [world] Time went somewhere. It did not come here.\n",
+      "[2026-09-04T02:50:10.956Z] [debug] ui: tap \"take / salvage\"\n[2026-09-04T02:50:12.205Z] [world] You work the banner over. A part of it comes loose, intact.\n[2026-09-04T02:50:12.205Z] [world] You break the firepit apart. Among the pieces, something worth keeping.\n[2026-09-04T02:50:12.206Z] [world] You work the signpost over. A part of it comes loose, intact.\n",
+      "[2026-09-04T02:50:12.206Z] [world] You work the stall over. A part of it comes loose, intact.\n[2026-09-04T02:50:12.206Z] [reward] \u2726 Salvage haul:\n[2026-09-04T02:50:12.206Z] [reward]     \u2022 Aether Dust (Common)\n[2026-09-04T02:50:12.207Z] [reward]     \u2022 Mud Fragment x4 (Common)\n[2026-09-04T02:50:12.207Z] [reward]     \u2022 Scrap Metal (Common)\n",
+      "[2026-09-04T02:50:13.254Z] [debug] homework: intro-fill armed after 10463ms idle\n[2026-09-04T02:50:15.727Z] [debug] ui: tap \"investigate\"\n[2026-09-04T02:50:18.348Z] [player] investigate still pond\n[2026-09-04T02:50:18.349Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=pond resolved=still pond range=- enemies=0 hooks=1\n",
+      "[2026-09-04T02:50:18.351Z] [world] The still pond resists your reading. Not hostile \u2014 just closed. Some things in the buried world don't open for the curious.\n[2026-09-04T02:50:18.352Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-09-04T02:50:18.352Z] [arbiter] The Arbiter speaks low. \"I noticed how you handled that.\"\n",
+      "[2026-09-04T02:50:18.352Z] [debug] arbiter: ambient held (he just spoke)\n[2026-09-04T02:50:18.368Z] [arbiter] Mercy is down and bleeding \u2014 about 18h before she is gone for good. Feed her or work a poultice to bring her back up.\n[2026-09-04T02:50:19.259Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 5787ms read 0ms/write 0ms in 754t\u2192out 0t (0ch)\n",
+      "[2026-09-04T02:50:19.485Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 5787ms \u2014 intro-fill:\u2205\n[2026-09-04T02:50:19.485Z] [debug] homework: scene_intro \"The Monarch's Waystation\" \u2205 6233ms\n[2026-09-04T02:50:19.687Z] [cognitive] SWIM  (1333ms)\n[2026-09-04T02:50:19.909Z] [player] investigate roadside camp\n",
+      "[2026-09-04T02:50:19.910Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=roadside camp resolved=roadside camp range=- enemies=0 hooks=1\n[2026-09-04T02:50:19.910Z] [world] The roadside camp reads as ordinary, which in Tartaria is a small kind of relief. You leave it be.\n[2026-09-04T02:50:21.257Z] [player] investigate watch fire\n",
+      "[2026-09-04T02:50:21.258Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=watch fire resolved=watch fire range=- enemies=0 hooks=1\n[2026-09-04T02:50:21.259Z] [world] The watch fire sits the way ordinary things sit. The Arbiter does not lean in. You move on.\n[2026-09-04T02:50:21.260Z] [debug] arbiter: ambient held (he just spoke)\n",
+      "[2026-09-04T02:50:21.658Z] [debug] ui: tap \"\u2192 MUD SEAS\"\n[2026-09-04T02:50:21.671Z] [world] You walk east through open silt. The compass tells you Dynasty Border Post lies further east \u2014 2 tiles, about 5 hours of travel.\n",
+      "[2026-09-04T02:50:21.672Z] [world] A crack in the plain you would have walked past \u2014 except the air coming out of it smells of hot iron and not mud. You climb down. Below: a pre-flood Forgotten Order workshop, the forge bed still warm, the anvil cold but unmarked. Half-finished runecasters lie in a neat row on the workbench. Whoever was here heard the flood coming and went up the ladder.\n",
+      "[2026-09-04T02:50:21.672Z] [world] A draft on the bench, in a careful Order hand: 'Wrath of Titans \u2014 for the Iron one in the Sentinel Ward. Do not finish without the third rune.' The third rune is not engraved.\n[2026-09-04T02:50:21.673Z] [reward] \u2726 Recovered Rune Engraving Kit.\n",
+      "[2026-09-04T02:50:21.679Z] [combat] Mud Lurker steps out of the shadows of the place \u2014 Mud Smash ready, 2D6 damage on a hit. The loot you found will leave with whoever walks out alive. (range: close)\n[2026-09-04T02:50:21.679Z] [world] Parked \u2014 you're already running a contract. Activate it in Contracts \u2192 Hunts when you're ready.\n",
+      "[2026-09-04T02:50:21.679Z] [reward] \u2726 Hunt added to your slate \u2014 The Iron Titan in the Sentinel Ward (target: Iron Titan).\n[2026-09-04T02:50:21.680Z] [arbiter] The Arbiter holds up a hand. \"That hunt is on your slate now. Open Contracts \u2192 Hunts to read the steps. Tap ABANDON there if you don't want it.\"\n",
+      "[2026-09-04T02:50:21.689Z] [world] Your hands remember the shape of what you were doing before your head does.\n[2026-09-04T02:50:23.319Z] [debug] persist sizes(KB): total=330 player=74 wm=168[rooms=93 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=85 scene=2\n[2026-09-04T02:50:23.717Z] [debug] ui: tap \"\u2623\u26a1 shroud-spun slinger \u2692\"\n",
+      "[2026-09-04T02:50:23.768Z] [player] attack with the off-hand reclaimers guild shroud-spun slinger\n[2026-09-04T02:50:23.769Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand reclaimers guild shroud spun slinger resolved=Reclaimers Guild Shroud-Spun Slinger range=close enemies=1 hooks=1\n",
+      "[2026-09-04T02:50:23.770Z] [arbiter] The Arbiter keeps one eye on the fight. \"That is the right move for The Bog Dragon of Old Drakova \u2014 but not with something on you. Put this down first.\"\n[2026-09-04T02:50:23.771Z] [debug] attack: target=Mud Lurker range=close reach.bands=[distant,far,mid,close] reach.label=Reclaimers Guild Shroud-Spun Slinger bareHand=false\n",
+      "[2026-09-04T02:50:23.861Z] [world] You raise the corrupted resonant reclaimers guild shroud-spun slinger toward Mud Lurker. The room narrows around the both of you.\n[2026-09-04T02:50:23.861Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T02:50:24.245Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 USE_ITEM  (383ms)\n",
+      "[2026-09-04T02:50:24.965Z] [debug] qwen\u23f1 investigate_lore ok 6249ms wait 970ms read/write unusable (native mis-reported 7831ms/2486ms \u2014 llama.rn split bug, not this call) in 129t\u2192out 26t (128ch)\n[2026-09-04T02:50:25.338Z] [cognitive] neutral  (5426ms)\n[2026-09-04T02:50:25.693Z] [cognitive] READY  (4431ms)\n",
+      "[2026-09-04T02:50:27.841Z] [debug] qwen\u23f1 investigate_lore ok 7699ms wait 5551ms read 411ms/write 1719ms in 129t\u2192out 34t 3.2ms/t (176ch)\n[2026-09-04T02:50:29.866Z] [debug] qwen\u23f1 investigate_lore ok 8337ms wait 6678ms read 422ms/write 1220ms in 129t\u2192out 37t 3.3ms/t (171ch)\n[2026-09-04T02:50:34.524Z] [world] Mud Lurker moves first. The pressure is immediate.\n",
+      "[2026-09-04T02:50:34.526Z] [combat] Mud Lurker \u2014 d20 \u2192 1 + ATK 7 = 8 vs your AC 22 \u2014 \u2717 FUMBLE\n[2026-09-04T02:50:34.526Z] [combat] You \u2014 d20 \u2192 7 + DEX 19 + 2 (point blank) = 28 vs Mud Lurker AC 12 \u2014 \u2713 HIT\n[2026-09-04T02:50:34.528Z] [combat] Your strike with the corrupted resonant reclaimers guild shroud-spun slinger lands for 10. Mud Lurker staggers \u2014 15 HP remaining. It answers.\n",
+      "[2026-09-04T02:50:34.528Z] [combat] Corrupted Resonant Reclaimers Guild Shroud-Spun Slinger \u2014 4 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n[2026-09-04T02:50:34.528Z] [combat] Corrupted Resonant Reclaimers Guild Shroud-Spun Slinger \u2014 2 electrical bites in and festers (3 turns).\n[2026-09-04T02:50:35.333Z] [debug] ui: tap \"approach\"\n",
+      "[2026-09-04T02:50:35.386Z] [player] approach Mud Lurker\n[2026-09-04T02:50:35.387Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud lurker resolved=Mud Lurker range=close enemies=1 hooks=1\n[2026-09-04T02:50:35.388Z] [debug] move: advance from range=close enemies=1 weather=Aether Lightning cost=1 partial=0\n",
+      "[2026-09-04T02:50:35.389Z] [debug] move: field advance target=Mud Lurker d 0.50->0.35 band close->close\n[2026-09-04T02:50:35.389Z] [world] You close the gap with Mud Lurker. (range: close / arm's reach)\n[2026-09-04T02:50:35.389Z] [combat] Mud Lurker blackens \u2014 corruption eats 4. (11/25 HP, 2 turns left)\n",
+      "[2026-09-04T02:50:35.389Z] [combat] Mud Lurker convulses \u2014 arcing current bites 2. (9/25 HP, 2 turns left)\n[2026-09-04T02:50:35.391Z] [combat] Mud Lurker \u2014 d20 \u2192 7 + ATK 5 = 12 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-04T02:50:35.751Z] [cognitive] SWIM \u00b7 TALK  (358ms)\n[2026-09-04T02:50:37.230Z] [debug] ui: tap \"\u2620\u2623 bone crossbow \u25b2\"\n",
+      "[2026-09-04T02:50:37.269Z] [player] attack with the bone crossbow\n[2026-09-04T02:50:37.269Z] [debug] parser: intent=attack conf=1.00 verb=attack target=bone crossbow resolved=Bone Crossbow range=close enemies=1 hooks=1\n[2026-09-04T02:50:37.270Z] [combat] Mud Lurker blackens \u2014 corruption eats 4. (5/25 HP, 1 turn left)\n",
+      "[2026-09-04T02:50:37.270Z] [combat] Mud Lurker convulses \u2014 arcing current bites 2. (3/25 HP, 1 turn left)\n[2026-09-04T02:50:37.271Z] [debug] attack: target=Mud Lurker range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-09-04T02:50:37.346Z] [world] You commit forward with the poisoned corrupted bone crossbow. Mud Lurker watches your hands.\n",
+      "[2026-09-04T02:50:37.347Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T02:50:37.676Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE \u00b7 RELOAD  (329ms)\n[2026-09-04T02:50:46.882Z] [world] Mud Lurker moves first. The pressure is immediate.\n[2026-09-04T02:50:46.885Z] [combat] Mud Lurker \u2014 d20 \u2192 13 + ATK 5 = 18 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-04T02:50:46.885Z] [combat] You \u2014 d20 \u2192 9 + DEX 19 + 2 (point blank) = 30 vs Mud Lurker AC 12 \u2014 \u2713 HIT\n[2026-09-04T02:50:46.887Z] [combat] Mud Lurker shrugs off the piercing. (resisted, \u00d70.5 for 11)\n[2026-09-04T02:50:46.890Z] [arbiter] The Arbiter watches the piercing skid off. \"Swap to the Mud Armor Rod \u2014 bludgeoning or aetheric will bite where piercing won't.\"\n",
+      "[2026-09-04T02:50:46.891Z] [debug] wear ward: Bone Crossbow keeps its point (15%)\n[2026-09-04T02:50:46.891Z] [combat] Final strike with the poisoned corrupted bone crossbow for 11. Mud Lurker is still. The Aetherstone hums on, indifferent.\n[2026-09-04T02:50:46.892Z] [reward] Mud Lurker defeated. You recover Relic Key \u00d72.\n[2026-09-04T02:50:46.894Z] [reward] +12 TC pried from the dust.\n",
+      "[2026-09-04T02:50:53.340Z] [debug] voice\u23f1 gap 880ms (wait 0ms + synth 866ms, live) \"Choose your character.\"\n[2026-09-04T02:50:58.166Z] [debug] ctx: RELEASED \u2014 live=0 (opened=1 released=1)\n[2026-09-04T02:50:59.518Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a06a50-4630-7fe6-b379-722e84867f5e\n[2026-09-04T02:50:59.518Z] [debug] ota: Checking\u2026\n",
+      "[2026-09-04T02:50:59.664Z] [debug] ota: Already up to date\n[2026-09-04T02:50:59.665Z] [debug] ota: boot check result = noUpdate\n[2026-09-04T02:50:59.702Z] [debug] voice: engine=bundled tts=on voice=am_michael\n[2026-09-04T02:50:59.702Z] [debug] voice: bundled loading\n[2026-09-04T02:51:03.104Z] [debug] voice: bundled ready\n",
+      "[2026-09-04T02:51:04.157Z] [debug] voice\u23f1 gap 1020ms (wait 74ms + synth 935ms, live) \"Choose your character.\"\n[2026-09-04T04:42:20.273Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a06a50-4630-7fe6-b379-722e84867f5e\n[2026-09-04T04:42:20.273Z] [debug] ota: Checking\u2026\n[2026-09-04T04:42:21.299Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n",
+      "[2026-09-04T04:42:21.347Z] [debug] ota: Saving progress\u2026\n[2026-09-04T04:42:21.348Z] [debug] ota: Restarting to apply\u2026\n[2026-09-04T04:42:21.409Z] [debug] ota: boot check result = applied\n[2026-09-04T04:42:21.538Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a06a9f-c9d0-725a-85bb-944c1fa4eb3d\n[2026-09-04T04:42:21.538Z] [debug] ota: Checking\u2026\n",
+      "[2026-09-04T04:42:21.611Z] [debug] ota: Already up to date\n[2026-09-04T04:42:21.612Z] [debug] ota: boot check result = noUpdate\n[2026-09-04T04:42:21.634Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-09-04T04:42:21.634Z] [debug] voice: bundled idle\n",
+      "[2026-09-04T04:52:51.634Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a06a9f-c9d0-725a-85bb-944c1fa4eb3d\n[2026-09-04T04:52:51.634Z] [debug] ota: Checking\u2026\n[2026-09-04T04:52:51.705Z] [debug] ota: Already up to date\n[2026-09-04T04:52:51.705Z] [debug] ota: boot check result = noUpdate\n[2026-09-04T04:52:51.738Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-09-04T04:52:51.739Z] [debug] voice: bundled idle\n[2026-09-04T04:52:56.883Z] [debug] OTA session start: 2026-09-04-1664-no-phantom-syllable.\n[2026-09-04T04:52:56.884Z] [world] You step back into The Monarch's Waystation. The world waits for your move.\n[2026-09-04T04:52:56.884Z] [arbiter] The Arbiter meets your eyes. \"Welcome back, Cheddar Bob. The buried country is no place to walk alone.\"\n",
+      "[2026-09-04T04:52:57.490Z] [debug] \u2550\u2550\u2550 SESSION 2026-09-04T04:52:57.487Z \u00b7 build 2026-09-04-1664-no-phantom-syllable \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-09-04T04:52:57.491Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-04T04:52:57.491Z] [debug] missions: hunt:hunt_bog_dragon stage 5/7 [attack_provoke\u2192attack] @mud_seas needs=Eshren's Name-Token\u2713 spawn=Mud Harpy\u00d73 AMBUSH\n[2026-09-04T04:52:57.491Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n",
+      "[2026-09-04T04:52:57.491Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc=\"the Order envoy\" gives=Sealed Reliquary Box PAUSED\n[2026-09-04T04:52:57.491Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n",
+      "[2026-09-04T04:52:57.491Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation OFF-CELL(2 tiles west) npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n[2026-09-04T04:52:57.491Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n",
+      "[2026-09-04T04:52:57.492Z] [debug] missions: \u00b7 at=monarch_waystation travelTo=mud_seas\n[2026-09-04T04:52:57.492Z] [debug] boot: life bmtmh9y9phv started 2026-09-04T04:52:51.517Z \u00b7 not an OTA apply (no handoff on disk)\n[2026-09-04T04:52:58.333Z] [debug] send-log: crash on record (2026-09-04T04:42:22.271Z) \u2014 game log pushed automatically, delivered to Sentry, kept on disk as #mtmha35hxvzg\n",
+      "[2026-09-04T04:53:04.167Z] [debug] ui: tap \"take / salvage\"\n[2026-09-04T04:53:05.732Z] [world] You work the lamp over. A part of it comes loose, intact.\n[2026-09-04T04:53:05.733Z] [world] You b"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-04-1665-the-bug-report-pushes #mtmhqinlc5jl [inline 21/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtmhqinlc5jl"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1665-the-bug-report-pushes"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "21"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1665-the-bug-report-pushes"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T13:30:29.747520Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T13:30:31.464000Z",
+  "fingerprints": [
+    "82b3bd9794294f43365029396594bd02"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1954691241,
+    "commitCount": 3,
+    "data": {},
+    "dateCreated": "2026-09-04T05:42:51.380846Z",
+    "dateReleased": "2026-09-04T05:43:40.910086Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "5bd2090d8c7d7204b9c58c0844aa871a9b237564",
+      "message": "[ota-hal] OTA-1665: the bug report pushes, and only once per changed log\n\nOwner, three instructions together: \"I've removed the send log\", \"report a bug\nshould be the button that pushed the log, so we don't need the email route\nanymore, we can archive that bug report land\", and \"after you do a bug report\nand that pushes a log, you can't do another one until something in the log is\nchanged. so you have to go play for a little bit before it allows you to push\nanother one.\"\n\n\u26a0\u26a0\u26a0 THE EMAIL ROUTE WAS NEVER THE DESIGN, and bugReport.ts said so in its own\nheader: true zero-paste needed `expo-mail-composer`, which needs a native\nrebuild, and native builds are parked. So what shipped instead was a clipboard\nstage, a READ-ME-FIRST body, a manual paste, and a report that \u2014 in the file's\nown words \u2014 \"arrives empty and we can't track the bug down\" whenever a step was\nmissed. That is exactly how both his daughters filed tonight. The transport this\nneeded has been in the app since August; it was simply never wired to the button\npeople actually find.\n\nNow REPORT A BUG persists to disk and pushes inline through the OTA-1504 durable\npipeline, carrying what the player typed, and the payload leads with a headline\n(character \u00b7 build \u00b7 first line of the description) so a list of reports reads as\na list of problems instead of a column of identical titles. That headline is the\nold email SUBJECT, which would otherwise have become dead code \u2014 the value it\ncarried is exactly what a Sentry event needs.\n\n\u26a0\u26a0 SEND LOG IS DELETED, one day after OTA-1661 opened it to everyone and gave it\na two-tap consent step. With REPORT A BUG asking for a description first \u2014 a\nbetter consent surface AND better evidence \u2014 two buttons doing one send was\nclutter on a screen that has already fought a wall of COPY buttons.\n\n\u26a0\u26a0\u26a0 EVERY OUTCOME SPEAKS, and this is the part I care most about. A push has\nreal failure modes a mailto never had: queued, refused as a duplicate, refused\nbecause reporting is off, no destination in this build. The old Title screen\nflashed \"\u2713 COPIED\" unconditionally \u2014 which was honest enough when opening a\nmailto could not meaningfully fail, and would now be a lie told by the one\ncontrol that must never lie. `composeAndSendBugReport` returns a player-facing\nmessage on every path, never throws, and both screens render it verbatim. The\nsuite proves that by RUNNING the paths and asserting the message is non-empty,\nnot by scanning for strings.\n\n\u26a0 THE DEDUPE fingerprints the raw slot log \u2014 length plus its newest tail, keyed\nper slot \u2014 and the check runs BEFORE anything is persisted or sent. Length alone\nwould let a same-size edit through; the tail costs nothing. The mark is stored\neven on a QUEUED send, because the bundle is already on disk and letting a\nsecond identical report through would queue a duplicate behind one already\nwaiting. And a general report with NO character loaded is never blocked: \"the\ngame won't start\" carries no play by definition, and gating it on a changed log\nwould lock a player out of the only channel they have.\n\n\u26a0 TWO THINGS THE CLEANUP TURNED UP. `_legacySendBugReport` sat unreferenced\nbehind an eslint-disable, still holding a clipboard stage, a READ-ME-FIRST body\nand a mailto \u2014 that is the land he asked to archive, and a dead function holding\na copy of it is precisely where it grows back. Deleted. And the OTA-063 comment\nabove the handler still described the clipboard workaround in loving detail;\nrewritten, because a comment describing a route the code no longer takes is what\nstopped me checking the Samarran entry two OTAs ago.\n\n\u26a0 THREE ASSERTIONS IN THIS SUITE WERE WRONG BEFORE THEY WERE RIGHT, all the same\nway: too broad. A blanket \"no COPIED\" condemned COPY URL and COPY CRASHED SAVE;\na blanket \"no mailto:\" condemned INVITE PLAYTESTER, which should keep one \u2014 that\nis a short human request to a person, not a payload; and a scan for the deleted\nfunction's bare name failed against its own obituary, which is the OTA-1659\nlesson arriving in a second file. Each is now scoped to the thing it means.\n\ndocs/PRIVACY.md moved with the button: the section is \"Sending a report\nyourself\", it names the description as something that gets sent, and it states\nthe one-report-per-changed-log rule, because the player will meet that refusal\nand should not think the button is broken.\n\n\u26a0\u26a0\u26a0 AND THE FULL SUITE CAUGHT TWO REAL DEFECTS THE GATES DID NOT. Eight suites\nwent red on the first run \u2014 1489, 1492, 1504, 1515, 1516, 1518, 1519 and 1661 \u2014\nbecause every one of them pinned SEND LOG's send path in AboutScreen, which this\nOTA deletes. Repointing them at bugReport.ts was not bookkeeping; it is what\nsurfaced the following, and I would have shipped both:\n\n  \u00b7 I wrote `landed = !chunk.stopped` \u2014 \"we attempted it, so it went.\" That is\n    precisely the false positive OTA-1519 exists because of: a send can be\n    attempted, report no stop reason, and still lose parts, which that OTA\n    measured as Sentry silently replacing NINE of 49 inline parts. Corrected to\n    `chunk.delivered`, the field that means `sent === parts`.\n\n  \u00b7 I dropped the result line entirely. OTA-1492's rule is that the next\n    diagnosis starts from a line, not a memory. The push now logs the full\n    `describeInlineSend` report \u2014 parts accepted, what flush said, where it\n    threw \u2014 which is strictly more than the one-word ok/not-ok line it replaced.\n\nIn both cases the CODE gained the property back; the tests did not lose it. That\nis the whole argument for pinning behaviour you have already paid to learn.\n\n\u26a0 ota1661's SUITE IS DELETED, not re-anchored. It was one day old and every\nassertion in it described a button that no longer exists \u2014 its premise is\nsuperseded, like ota1146's was. The claims that OUTLIVED it are carried into\nota1665 explicitly: the push is not owner-gated, `reportingEnabled()` still\ngoverns it, the privacy page names what leaves the device, and \u2014 importantly \u2014\nthe OTA-1505 auto-bundle is STILL owner-gated. SEND LOG going away does not\nmerge consent and collection.\n\n\u26a0 ONE GATE FAILED FOR THE RIGHT REASON. check:quotedpins refused a new\nprose-shaped pin, and rather than raise the baseline I measured which one it was\n(a dump of the counted set, diffed against HEAD: `'REPORT A BUG'` in ota1489) and\nconverted it to the wiring instead \u2014 `setBugReportOpen(true)`. A label pin fails\non a reword and passes if the button is deleted; the wiring pin cannot.\n\nGates: all 18 green by exit code. Full suite green.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T05:40:17Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1665-the-bug-report-pushes",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1665-the-bug-report-pushes",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T05:43:40.910086Z",
+          "dateCreated": "2026-09-04T05:42:51.380846Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155444244",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T05:43:41.150780Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1665-the-bug-report-pushes",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1665-the-bug-report-pushes",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1665-the-bug-report-pushes",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1665-the-bug-report-pushes)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "efdf8acf6e744732b3e086746ed6746d",
+  "previousEventID": "e277ebc0e69e498592b316845416ef52"
+}
