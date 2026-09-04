@@ -105,12 +105,18 @@ describe('OTA-1489 — the switch governs every contact with Sentry', () => {
   });
 });
 
-describe('OTA-1489 — the button is the owner\'s, and honest about its work', () => {
-  it('⚠⚠ the render gate is the owner unlock AND a configured build', () => {
-    // ⚠ OTA-1490 widened the unlock from the loaded character's name to the
-    // DEVICE (sticky flag; see ota1490TheDeviceIsTheOwner) — the gate shape
-    // here is the claim that SOME owner gate still fronts the button.
-    expect(ABOUT).toContain('{ownerTools && crashConfigured && (');
+describe('OTA-1489 — the button is honest about its work', () => {
+  it('⚠⚠ the render gate is a build that can actually deliver', () => {
+    // ⚠ RETARGETED TWICE. OTA-1490 widened the unlock from the loaded
+    // character's name to the DEVICE (sticky flag); OTA-1661 then REMOVED the
+    // owner half entirely — *"anyone testing should be able to push a log"* —
+    // and moved docs/PRIVACY.md to match, adding a two-tap confirm that names
+    // the contents. What survives from this test's original claim is the half
+    // that was always about honesty rather than access: the button appears only
+    // where the build has a destination, because a live-looking button that
+    // cannot deliver is how a tester concludes their report was received.
+    expect(ABOUT).toContain('{crashConfigured && (');
+    expect(ABOUT).not.toContain('{ownerTools && crashConfigured && (');
   });
 
   it('⚠⚠ the gate function itself: owner names pass, a player name does not', () => {

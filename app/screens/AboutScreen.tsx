@@ -131,10 +131,18 @@ export function AboutScreen() {
   const [logCharCount, setLogCharCount] = useState(0);
   const [logCopied, setLogCopied] = useState(false);
   const [logCleared, setLogCleared] = useState(false);
-  // OTA-1489 — SEND LOG button lifecycle (owner-gated; see the render site).
+  // OTA-1489 — SEND LOG button lifecycle. ⚠ OTA-1661 — NO LONGER OWNER-GATED:
+  // *"anyone testing should be able to push a log."* See the render site.
   // ⚠ OTA-1504 — 'queued' = the flush failed but the bundle is safe on disk
   // and boots will retry it; 'failed' now means it could not even be saved.
-  const [logSendState, setLogSendState] = useState<'idle' | 'busy' | 'sent' | 'queued' | 'failed'>('idle');
+  // ⚠⚠ OTA-1661 — 'armed' is the CONSENT STEP, and it is what makes opening
+  // this to everyone honest. The first tap does not send: it names what the
+  // send contains and waits for a second, deliberate tap. The owner tapping his
+  // own button always knew what was in it. A tester does not, and this bundle
+  // carries the game log — which includes everything they typed — plus their
+  // save and inventory.
+  const [logSendState, setLogSendState] =
+    useState<'idle' | 'armed' | 'busy' | 'sent' | 'queued' | 'failed'>('idle');
   // OTA-1490 — device-sticky owner unlock: seeing an unlock-named character
   // marks the device, then EVERY character on it gets the owner tools.
   const [ownerTools, setOwnerTools] = useState(false);
@@ -145,6 +153,13 @@ export function AboutScreen() {
       .then((on) => { if (live) setOwnerTools(on); });
     return () => { live = false; };
   }, [player?.name]);
+  // ⚠ OTA-1661 — LEAVING DISARMS, because the armed caption promises it does.
+  // The consent step is only meaningful if backing out is a real cancel, and
+  // switching tabs does not unmount this screen — so without this, "switch tabs
+  // to cancel" would be a sentence the code did not honour.
+  useEffect(() => {
+    setLogSendState((st) => (st === 'armed' ? 'idle' : st));
+  }, [tab]);
   // ⚠ OTA-1490 — the universal unlock: SEVEN TAPS on the About info block
   // (the dev-mode ritual). The owner runs golem AND hal with three characters
   // across two accounts; per-install storage means a name-based unlock cannot
@@ -1032,9 +1047,10 @@ export function AboutScreen() {
               <Text style={styles.crashOptTitle}>AUTOMATIC CRASH REPORTS</Text>
               <Text style={styles.crashOptBody}>{reportingStatus}</Text>
               <Text style={styles.crashOptBody}>
-                On unless you turn it off — flipping it OFF stops all automatic sending, permanently.
-                Crashes are always recorded ON THIS DEVICE either way — REPORT A BUG sends them
-                only when you choose to.
+                On unless you turn it off — flipping it OFF stops all automatic sending, permanently,
+                and SEND LOG stops working too (it is the same connection).
+                Crashes are always recorded ON THIS DEVICE either way — REPORT A BUG and SEND LOG
+                send them only when you choose to.
               </Text>
             </View>
             <TouchableOpacity
@@ -1055,29 +1071,74 @@ export function AboutScreen() {
               </Text>
             </TouchableOpacity>
           </View>
-          {/* ⚠⚠ OTA-1489 — SEND LOG, the owner's tool ("it's easier than copying
-              slices"). Renders ONLY for the unlock names — the privacy policy
-              promises players that nothing but crash records leaves their
-              device, and a log carries what they typed, so players never see
-              this affordance. It also obeys the crash-reports switch: OFF means
-              the app contacts Sentry for nothing, this included. */}
-          {ownerTools && crashConfigured && (
+          {/* ⚠⚠⚠ OTA-1661 — SEND LOG IS FOR EVERYONE NOW. Owner: *"anyone testing
+              should be able to push a log."*
+
+              It began (OTA-1489) as his own tool — "it's easier than copying
+              slices" — and rendered only behind `ownerTools`, on the argument
+              that the privacy policy promised players nothing but crash records
+              would leave their device. That argument was sound about the POLICY
+              and wrong about the PRODUCT: it left every tester who is not in a
+              two-name allowlist emailing a clipboard paste, which is how both
+              his daughters ended up reporting bugs by hand.
+
+              ⚠ SO THE POLICY MOVED TOO, RATHER THAN THE PROMISE BEING BENT.
+              docs/PRIVACY.md now carries a section describing this send: what it
+              contains, that it happens only on a deliberate tap, and that the
+              crash switch governs it. A feature that contradicts the privacy
+              page is not a feature, it is a breach — the page had to change
+              first, and it did, in the same commit.
+
+              ⚠⚠ WHAT DID NOT OPEN: the OTA-1505 auto-bundle. That one uploads
+              the same payload with NO TAP AT ALL, and "anyone testing should be
+              able to push a log" is about the ABILITY TO PUSH, not about
+              collecting from people silently. It stays behind
+              `ownerToolsUnlocked`. The asymmetry is deliberate; see autoBundle.ts.
+
+              Two gates remain, and both are real: `crashConfigured` (this build
+              has a destination) and, inside the transport, `reportingEnabled()`
+              — measured, not assumed: sentryTransport refuses with "crash
+              reporting is switched off on this device" when the switch is OFF. */}
+          {crashConfigured && (
             <TouchableOpacity
               style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 }]}
-              onPress={() => { void handleSendLog(); }}
+              onPress={() => {
+                // ⚠ TWO TAPS, AND THE FIRST ONE ONLY EXPLAINS. Consent is the
+                // whole basis on which this button is open to strangers, so the
+                // send cannot be one stray tap away from a tester who has not
+                // been told what is in it.
+                if (logSendState === 'idle' || logSendState === 'sent') { setLogSendState('armed'); return; }
+                void handleSendLog();
+              }}
               activeOpacity={0.7}
               accessibilityRole="button"
-              accessibilityLabel="Send the full game log to Sentry"
+              accessibilityLabel={logSendState === 'armed'
+                ? 'Confirm sending your game log, save and inventory to the developer'
+                : 'Send the full game log to the developer'}
               disabled={logSendState === 'busy'}
             >
               <Text style={styles.sessionBtnSecondaryText}>
                 {logSendState === 'busy' ? 'SENDING LOG…'
+                  : logSendState === 'armed' ? '⚠ TAP AGAIN TO CONFIRM SEND'
                   : logSendState === 'sent' ? '✓ LOG SENT — SAFE TO CLOSE'
                   : logSendState === 'queued' ? '⏳ SAVED — TAP AGAIN TO RETRY NOW'
                   : logSendState === 'failed' ? '✗ SEND FAILED — USE COPY LOG'
-                  : 'SEND LOG TO SENTRY'}
+                  : 'SEND LOG TO DEVELOPER'}
               </Text>
             </TouchableOpacity>
+          )}
+          {crashConfigured && logSendState === 'armed' && (
+            <Text style={styles.crashOptBody}>
+              This sends your game log (including anything you typed), your save and your
+              inventory to the developer, so a bug can be traced. Nothing else is sent, and
+              only when you tap again. Switch tabs or leave this screen to cancel.
+            </Text>
+          )}
+          {crashConfigured && logSendState === 'idle' && (
+            <Text style={styles.crashOptBody}>
+              Found a bug? This sends your log, save and inventory straight to the developer —
+              faster than REPORT A BUG, and it needs no email.
+            </Text>
           )}
           {/* arb172 — rarely-needed clipboard dumps tucked behind a toggle so the
               page isn't a wall of COPY buttons. COPY SAVE = the loadable save for
@@ -1664,7 +1725,7 @@ export function AboutScreen() {
             <Text style={styles.mono}>{`${7 - ownerTaps} more taps to unlock owner tools`}</Text>
           )}
           {ownerTools && ownerTaps > 0 && (
-            <Text style={styles.mono}>OWNER TOOLS UNLOCKED — SEND LOG is under SESSION → REPORTING</Text>
+            <Text style={styles.mono}>OWNER TOOLS UNLOCKED — crash bundles now push themselves</Text>
           )}
           {/* OTA-1638 — the weapon glyph key and what the discovery star means,
               read from the same tables the combat buttons paint from. */}

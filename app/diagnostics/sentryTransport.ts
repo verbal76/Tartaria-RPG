@@ -341,14 +341,29 @@ export function installSentryIfAvailable(): boolean {
 // Attachments, not message/extra fields, because Sentry truncates long strings
 // in those; files arrive whole.
 //
-// ⚠⚠ TWO GATES, NEITHER OPTIONAL:
+// ⚠⚠ THE GATE, AND IT IS NOT OPTIONAL:
 //   · `reportingEnabled()` — the privacy policy says that with the crash-
 //     reports switch off "the app never contacts Sentry at all, not even to
 //     check in." This send is contacting Sentry; the switch governs it too.
-//   · The BUTTON that calls this renders only for the owner's unlock names
-//     (`sharingUnlockedFor`, the fallen-exchange gate). The policy promises
-//     players that only crash records leave; a player-facing upload of their
-//     log and save would break that promise, so players never see it at all.
+//     Enforced at the top of sendGameLogInline, which refuses with "crash
+//     reporting is switched off on this device" rather than failing silently.
+//
+// ⚠⚠⚠ OTA-1661 — THE SECOND GATE IS GONE, DELIBERATELY. Owner: *"anyone
+// testing should be able to push a log."* This used to say the calling BUTTON
+// renders only for the owner's unlock names, because the policy promised
+// players that only crash records leave their device. That was true of the
+// policy, and it meant every tester outside a two-name allowlist had to email a
+// clipboard paste instead — which is exactly what both his daughters did.
+//
+// So the POLICY moved rather than the promise being quietly bent: docs/PRIVACY.md
+// now carries a section describing this send — what it contains, that it happens
+// only on a deliberate confirmed tap, and that the crash switch governs it. The
+// button is armed by one tap and sent by a second, naming the contents in
+// between, because consent is the entire basis on which it is open to strangers.
+//
+// ⚠ WHAT STAYED SHUT: the OTA-1505 auto-bundle in autoBundle.ts, which pushes
+// this same payload with NO TAP. "Able to push a log" is about the ability to
+// push, not about collecting from people who never chose to send anything.
 const LOG_ATTACHMENT_MAX_CHARS = 800_000;
 
 export interface DiagnosticsBundle {

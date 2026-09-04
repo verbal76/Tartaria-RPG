@@ -67,16 +67,33 @@ describe('OTA-1490 — the seven-tap universal unlock', () => {
     // And the ritual gives feedback: a countdown once it is clearly
     // deliberate, and a pointer to where the unlocked tool lives.
     expect(ABOUT).toMatch(/more taps to unlock owner tools/);
-    expect(ABOUT).toMatch(/OWNER TOOLS UNLOCKED[^<]*SESSION/);
+    // ⚠ OTA-1661 changed what the ritual is FOR: SEND LOG needs no unlock now,
+    // so the payoff line names what it actually still buys — the no-tap bundle.
+    expect(ABOUT).toMatch(/OWNER TOOLS UNLOCKED[^<]*push themselves/);
   });
 });
 
-describe('OTA-1490 — wired into the SEND LOG gate', () => {
-  it('⚠⚠ the render gate is the device unlock, and the screen both NOTES and READS', () => {
-    expect(ABOUT).toContain('{ownerTools && crashConfigured && (');
-    // The note runs BEFORE the read, so the visit that introduces the owner
-    // character is also the visit that unlocks — no second trip needed.
+describe('OTA-1490 — wired into the owner-tools gate', () => {
+  it('⚠⚠ the screen both NOTES and READS, and the note runs FIRST', () => {
+    // ⚠ RETARGETED for OTA-1661: this used to assert the device unlock fronted
+    // SEND LOG. It no longer does — that button is open to every tester now,
+    // with a two-tap confirm and a privacy section to match. The sticky unlock
+    // still exists and still matters; what it fronts is the NO-TAP auto-bundle
+    // (asserted below) and the fallen-exchange panel.
+    //
+    // The claim this test was really making is unchanged: the note runs BEFORE
+    // the read, so the visit that introduces the owner character is also the
+    // visit that unlocks — no second trip needed.
     const effect = between(ABOUT, 'void noteOwnerCharacterSeen(player?.name)', 'setOwnerTools(on)');
     expect(effect).toContain('ownerToolsUnlocked(player?.name)');
+  });
+
+  it('⚠⚠⚠ and the thing it now fronts is the upload that needs no tap', () => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const auto = require('fs').readFileSync(
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      require('path').join(__dirname, '..', 'app', 'diagnostics', 'autoBundle.ts'), 'utf8',
+    ) as string;
+    expect(auto).toContain('if (!(await ownerToolsUnlocked(player?.name))) return null;');
   });
 });

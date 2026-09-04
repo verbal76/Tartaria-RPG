@@ -13,12 +13,21 @@
  * newer than the last one bundled, the full bundle is composed and pushed
  * through the OTA-1504 durable pipeline automatically — no tap.
  *
- * ⚠⚠ WHO THIS FIRES FOR, EXACTLY. The same gate SEND LOG renders behind:
- * `ownerToolsUnlocked` — the character's name passes `sharingUnlockedFor`
- * (the 'verbal'/'sasmooch' prefix list) or the device was stickily marked by
- * one that did (OTA-1490). Players' devices never set that flag, so players
- * keep exactly the privacy-page promise: only slim crash records leave. The
- * bundle carries typed input and a save; it stays owner-family-only.
+ * ⚠⚠ WHO THIS FIRES FOR, EXACTLY: `ownerToolsUnlocked` — the character's name
+ * passes `sharingUnlockedFor` (the 'verbal'/'sasmooch' prefix list, or the
+ * OTA-1660 exact list) or the device was stickily marked by one that did
+ * (OTA-1490).
+ *
+ * ⚠⚠⚠ OTA-1661 — THIS IS NO LONGER "the same gate SEND LOG renders behind",
+ * AND THE DIFFERENCE IS THE POINT. SEND LOG opened to everyone when the owner
+ * said *"anyone testing should be able to push a log."* This did NOT, and must
+ * not: SEND LOG is a person deciding to send their own log and confirming it on
+ * a second tap; THIS uploads the same payload — typed input and a save —
+ * with no tap at all, on a slot load they did not connect to any transmission.
+ * One is consent. The other is collection, and it is only defensible on devices
+ * belonging to people who set it up. If a future OTA "aligns" these two gates
+ * for tidiness, it will be turning silent uploads on for strangers; ota1661
+ * asserts they stay different, and this paragraph is why.
  *
  * ⚠⚠ WHY THE TRIGGER IS THE SLOT LOAD, NOT APP BOOT. Three reasons, each
  * load-bearing:

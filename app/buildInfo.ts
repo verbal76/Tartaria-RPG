@@ -27361,7 +27361,35 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Pixel — with the app's own guard flagging "VOICE CRASH ... last voice:
 // kokoro:bf_emma". Not task #110 (that is native:cognition:done on OTA-apply
 // boots; this was a cold 66-second-old life). Logged, not chased here.
-export const OTA_BUILD_ID = '2026-09-04-1660-both-daughters-can-push-a-log';
+// ⚠⚠⚠ OTA-1661 — ANYONE TESTING CAN PUSH A LOG. Owner, one OTA after I added
+// two names to an allowlist: *"anyone testing should be able to push a log."*
+// He is right, and the allowlist was never the right shape for this. OTA-1489
+// put SEND LOG behind `ownerTools` on a sound argument — the privacy policy
+// promised players nothing but crash records leaves their device, and this
+// bundle carries the game log (everything they typed) plus their save. Correct
+// about the POLICY, wrong about the PRODUCT: it left every tester outside a
+// two-name list emailing a clipboard paste, which is exactly what both his
+// daughters did tonight rather than push a button. ⚠⚠ SO THE POLICY MOVED
+// RATHER THAN THE PROMISE BEING QUIETLY BENT. docs/PRIVACY.md gains a "Sending
+// a log yourself" section naming the contents, the deliberate two taps and the
+// switch that disables it; the blanket "Nothing except crash reports" claim,
+// true only while the button was owner-only, is corrected; the Children section
+// says plainly that a sent log includes what was typed and that a younger
+// player should ask a parent. ota1661 fails if the button opens without those.
+// ⚠ CONSENT IS A REAL STEP, NOT A LABEL: one tap ARMS and names what is about
+// to leave, a second sends, and switching tabs disarms — because the caption
+// promises that and a caption the code ignores is the defect this repo keeps
+// finding. ⚠⚠⚠ WHAT DID NOT OPEN: the OTA-1505 auto-bundle, which pushes the
+// SAME payload with NO TAP on a slot load. "Able to push a log" is about the
+// ability to push, not about collecting from people who never chose to send
+// anything — one is consent, the other is collection. It stays behind
+// ownerToolsUnlocked, the asymmetry is argued in autoBundle.ts, and a test
+// asserts the two gates stay different so a later "tidy-up" cannot turn silent
+// uploads on for strangers. Two suites that pinned the old owner gate went red
+// correctly and were repointed, ota1489 to the honesty half it was really
+// making and ota1490 to the no-tap bundle the sticky unlock now fronts.
+export const OTA_BUILD_ID = '2026-09-04-1661-anyone-testing-can-push-a-log';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-04-1660-both-daughters-can-push-a-log';
 // golem catch-up 2026-09-04: markerless publish of OTA-1660 - both daughters
 // can push a log. Owner asked why they couldn't; both girls then answered it
 // themselves, each emailing a bug report because the button was not on her
