@@ -231,6 +231,41 @@ export function restampInventory(inventory: readonly InventoryItem[]): Inventory
  *
  *  Pure and idempotent: a save that has already been through it comes back
  *  unchanged, which is what makes it safe to run on every single load. */
+
+/** ⚠⚠⚠ OTA-1670 — A SAVED PIECE FOLLOWS ITS CATALOG ROW TO THE NEW STAT.
+ *
+ *  The owner's ruling when I asked whether the redistribution should touch live
+ *  saves: *"yes this should affect all game save files."* It has to, or the
+ *  rebalance only reaches characters nobody has made yet — and his own run, and
+ *  both his daughters', would keep the old pile forever.
+ *
+ *  ⚠ THE ROLLED AMOUNT IS KEPT. `rollInstancePerks` seeds an instance's channel
+ *  from the CATALOG stat and then varies the magnitude, so a saved piece is
+ *  carrying its own roll on a channel that has now moved. Rewriting the channel
+ *  NAME and leaving the number is the whole migration: the player keeps exactly
+ *  the piece they earned, pointed at the stat its name always implied.
+ *
+ *  ⚠⚠ AND IT REFUSES TO GUESS. It fires only when the piece has exactly ONE
+ *  rolled stat channel and is not a Crucible fusion — a fused piece's extra
+ *  channels are its own history, not a catalog echo, and there is no honest way
+ *  to tell which of three rolled channels was once the catalog's. Those keep
+ *  what they have. Idempotent: a save already migrated matches on the first
+ *  comparison and returns unchanged. */
+function followCatalogStat(item: InventoryItem): InventoryItem {
+  const rolled = item.instanceStats?.statBonuses;
+  if (!rolled || rolled.length !== 1) return item;
+  if (item.uniqueStats || (item.tags ?? []).some((t) => t.toLowerCase() === 'fused')) return item;
+  const row = findArmorByName(item.name);
+  const want = row?.statBonus?.stat;
+  if (!want) return item;
+  const have = rolled[0]!;
+  if (have.stat === want) return item;
+  return {
+    ...item,
+    instanceStats: { ...item.instanceStats, statBonuses: [{ stat: want, amount: have.amount }] },
+  };
+}
+
 export function healSavedItem(saved: InventoryItem): InventoryItem {
   let i = saved;
   // OTA-631 — settle any fused item still "materializing" when the app was last
@@ -273,6 +308,9 @@ export function healSavedItem(saved: InventoryItem): InventoryItem {
   item = resealUtilityDurability(item);
   // OTA-1654 — regrade against the catalog. See resealCatalogRarity above.
   item = resealCatalogRarity(item);
+  // OTA-1670 — follow the catalog's stat channel. AFTER the rarity reseal, for
+  // the same reason that one runs late: the row this reads is the healed row.
+  item = followCatalogStat(item);
   // OTA-688 — mark older Crucible forges. applyFusion now stamps uniqueStats AND
   // a 'fused' tag, but pieces forged before the tag existed carry uniqueStats
   // without it. Backfill the tag on load so every crucible item is marked (the

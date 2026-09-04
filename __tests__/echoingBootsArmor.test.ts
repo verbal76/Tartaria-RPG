@@ -1,6 +1,7 @@
 import { itemIsTool } from '../app/engine/pouchEligibility';
 import { validSlotsForItem } from '../app/engine/equipment';
 import armorData from '../app/data/items/armor.json';
+import { armorStatAffinity } from '../app/engine/armorStatAffinity';
 import type { InventoryItem } from '../app/engine/types';
 
 // arb-fix — several worn pieces (Echoing Steps Boots, gloves/gauntlets, Aether
@@ -12,24 +13,38 @@ const ARMOR = (armorData as { armor: Array<Record<string, unknown>> }).armor;
 const byName = (n: string) => ARMOR.find((a) => a.name === n);
 
 describe('worn gear reclassified exploration-tool → armor', () => {
-  const cases: Array<[string, string, string, number]> = [
-    // name, slot, statBonus.stat, statBonus.amount
-    ['Echoing Steps Boots', 'feet', 'dexterity', 1],
-    ['Golem Leather Gloves', 'hands', 'strength', 1],
-    ['Mud-Sealer Gauntlets', 'hands', 'strength', 1],
-    ['Heat-Shield Gloves', 'hands', 'strength', 1],
-    ['Aetheric Cloak', 'cloak', 'dexterity', 1],
-    ['Anti-Aetheric Cloak', 'cloak', 'dexterity', 1],
-    ['Stealth Hood', 'head', 'dexterity', 1],
+  // ⚠ OTA-1670 REPOINTED THE STAT COLUMN, and repointing it is the honest fix.
+  // These rows pinned literal stats — five of the seven were `dexterity`,
+  // including a piece literally called STEALTH HOOD. That was the defect
+  // OTA-1670 exists for, written down as an expectation. The claim this suite
+  // actually makes is "these worn pieces live in armor.json with a proper armor
+  // schema, not as pouch tools", and the stat is now read from the rule so it
+  // can never go stale against the catalog again.
+  const cases: Array<[string, string, number]> = [
+    // name, slot, statBonus.amount
+    ['Echoing Steps Boots', 'feet', 1],
+    ['Golem Leather Gloves', 'hands', 1],
+    ['Mud-Sealer Gauntlets', 'hands', 1],
+    ['Heat-Shield Gloves', 'hands', 1],
+    ['Aetheric Cloak', 'cloak', 1],
+    ['Anti-Aetheric Cloak', 'cloak', 1],
+    ['Stealth Hood', 'head', 1],
   ];
 
-  it.each(cases)('%s lives in armor.json with slot/statBonus', (name, slot, stat, amt) => {
+  it.each(cases)('%s lives in armor.json with slot/statBonus', (name, slot, amt) => {
     const e = byName(name) as Record<string, unknown> | undefined;
     expect(e).toBeTruthy();
     expect(e!.slot).toBe(slot);
-    expect(e!.statBonus).toEqual({ stat, amount: amt });
+    expect(e!.statBonus).toEqual({ stat: armorStatAffinity(name, slot, amt).stat, amount: amt });
     expect((e!.tags as string[])).toContain('armor');
     expect((e!.tags as string[])).not.toContain('tool');
+  });
+
+  it('⚠ and the one the rebalance was FOR: a Stealth Hood grants stealth', () => {
+    // It granted dexterity for the life of the catalog. Nothing about the name
+    // was ambiguous; DEX was simply the number that got reached for.
+    expect((byName('Stealth Hood') as Record<string, unknown>).statBonus)
+      .toEqual({ stat: 'stealth', amount: 1 });
   });
 
   it('Echoing Steps Boots: not a tool, equips to feet, +1 DEX applies (statBonus)', () => {

@@ -27577,7 +27577,29 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // checked. It now enters first, reads hubRoomId back, and either confirms or
 // speaks a real refusal — the claims-success-without-checking class, on the one
 // control that moves you between the two halves of the game.
-export const OTA_BUILD_ID = '2026-09-04-1669-the-gate-opens-for-the-tap';
+// ⚠⚠⚠ OTA-1670 — WHAT A PIECE IS CALLED DECIDES WHAT IT DOES FOR YOU. Owner:
+// *"let's rearrange everything by what stat best ties into the name… that should
+// have been the guiding principle throughout this whole thing instead of just
+// sprinkling them in"*, and *"yes this should affect all game save files."*
+// MEASURED FIRST: 827 stat rolls across 297 pieces read dexterity 296 (35.8%),
+// more than double the next stat and more than INT+CHA+WIS+acrobatics+stealth
+// combined, leading four of six slots. A default, not a design.
+// ⚠⚠⚠ AND MY FIRST FIX WAS ITSELF THE PROJECT'S OWN RECURRING DEFECT. I balanced
+// TEN channels to a 16.3% peak before reading equipment.ts: STAT_ALIAS collapses
+// acrobatics→dexterity, investigation→intelligence, constitution→hp BEFORE
+// anything is paid, so four of the ten never reach a character sheet. Authored
+// intelligence 32 + investigation 37 would have ARRIVED as 69 (a fresh 24% peak)
+// while the audit reported 11% - dead behaviour wearing live clothes, introduced
+// by the fix for it. The rule emits only the seven channels the engine pays.
+// ⚠⚠ AND THE SUITE CAUGHT A SECOND ONE: "Tomb-Warden Plate" is a +20 chest
+// piece; "warden" matches the wisdom line, so the rule handed a character with
+// 17 total Wisdom a +20 Wisdom item and called it a relabel. Amounts are not
+// interchangeable across channels - an hp-scale amount now pins the piece to hp
+// whatever its name says, so power really is unchanged. RESULT: intelligence
+// 18.1%, strength 17.7%, dexterity 17.4%, hp 16.3%, wisdom 14.2%, charisma 9.0%,
+// stealth 7.3% - and saved gear follows its row, keeping the rolled amount.
+export const OTA_BUILD_ID = '2026-09-04-1670-the-name-says-the-stat';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-04-1669-the-gate-opens-for-the-tap';
 // golem catch-up 2026-09-04: markerless publish of OTA-1669 - the gate opens for
 // the tap. ENTER OUTPOST was silently refused whenever the player had a travel
 // course plotted elsewhere (`passingThrough`, an orphan of OTA-1606 that once
