@@ -27510,6 +27510,23 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // REPORTING / AI / ADVANCED each answer one question now; Display size went to
 // the DISPLAY tab where it belongs.
 export const OTA_BUILD_ID = '2026-09-04-1666-everything-in-its-room';
+// golem catch-up 2026-09-04: markerless publish of OTA-1666 - everything in its
+// room. The settings SESSION tab reorganised into RUN / REPORTING / AI /
+// ADVANCED, and the duplicate LORE tab deleted (it rendered the same
+// LoreCodexBody the minimap's crest button opens). Owner: "everything in its
+// appropriate place, everything labeled correctly, everything intuitive... this
+// is layer after layer after layer of debug attempt. is everything we have in
+// there still necessary?" Four findings were false statements rather than
+// clutter, three of them mine from the last two days: a footnote naming a
+// long-press that onLongPress has never implemented; the crash switch explaining
+// SEND LOG twice, one OTA after that button was deleted; CLEAR LOG standing as a
+// one-tap bypass of OTA-1665's dedupe gate; and a clipboard dump plus a
+// destructive erase sitting above the one button that reports anything. Two of
+// my own audit findings were wrong and the code said so - COPY SAVE is not a
+// duplicate of BACK UP CHARACTER (different encoder, and IMPORT SAVE parses only
+// its format) and COPY INVENTORY was not redundant (the report carried no pack
+// at all), so the report gained an INVENTORY block first and only then was the
+// button removable. Display size moved to the DISPLAY tab. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-04-1665-the-bug-report-pushes';
 // golem catch-up 2026-09-04: markerless publish of OTA-1665 - the bug report
 // pushes, and only once per changed log. Owner: "I've removed the send log",
