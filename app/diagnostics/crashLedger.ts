@@ -93,11 +93,20 @@ export interface CrashRecord {
     /** How long the process that died had been alive. A death 1.4s in is a
      *  boot-time OOM; a death forty minutes in is not. */
     ageMs?: number;
-    /** This boot followed an OTA apply, per the handoff the reloading life left. */
+    /** ⚠⚠⚠ OTA-1674 — THE DEAD LIFE'S OWN FACT, read off its crumb. Until this
+     *  OTA it was the READING life's: the handoff is consumed on read by the
+     *  life that then dies, so the next boot found none, computed `false` about
+     *  itself, and wrote that here. A death record could never say "yes" —
+     *  "not an OTA-apply boot" on eight of ten kills was the only value the
+     *  field could take, not a finding. `undefined` now means the life died
+     *  before its launch resolved (or the crumb predates 1674) and is printed
+     *  as unknown, never as a cold start. */
     afterOtaApply?: boolean;
-    /** Handoff → this boot. Small means the death sits inside the reload window. */
+    otaPath?: 'boot-front' | 'mid-session';
+    /** Handoff → the dead life's boot. Small means the death sat inside the
+     *  reload window. */
     otaGapMs?: number;
-    /** The PREVIOUS life's model ledger at the reload (`o1/r0/l1/p1/dn0`). A
+    /** The life BEFORE the dead one, at the reload (`o1/r0/l1/p1/dn0`). A
      *  non-zero `l` is the orphaned-context hypothesis with a number under it. */
     prevCtx?: string;
     /** The DEAD life's own model ledger at its last stamp. */
@@ -214,19 +223,54 @@ const KIND_LABEL: Record<CrashKind, string> = {
   'native-death': 'PROCESS KILLED — no JS ran',
 };
 
+/** ⚠⚠⚠ OTA-1674 — A RECORD THAT IS NOT FATAL MUST NOT SAY "KILLED".
+ *
+ *  OTA-1567 stopped filing an idle reclaim as a fatal crash (`isFatal: false`),
+ *  and Sentry has honoured that since (level `error`, not `fatal`). This
+ *  renderer never did: it keyed the label on `kind` alone, so every reclaim
+ *  still printed PROCESS KILLED — no JS ran, in About and in every bug report,
+ *  and was counted in "N recorded" beside the real ones. Two of the owner's ten
+ *  entries in the 19:40 report were that. A ledger that overstates kills to the
+ *  one person reading it is the exact failure OTA-1521 named: it sends the hunt
+ *  at the wrong thing. The label now says what the record already knew. */
+function recordLabel(r: CrashRecord): string {
+  if (r.kind === 'native-death' && r.isFatal === false) return 'PROCESS RECLAIMED — not a crash (no JS ran)';
+  return KIND_LABEL[r.kind] ?? r.kind;
+}
+
+/** Fatal unless the record says otherwise. `undefined` is fatal: every record
+ *  written before `isFatal` existed was a real crash, and a missing flag must
+ *  not quietly downgrade it. */
+function isFatalRecord(r: CrashRecord): boolean {
+  return r.isFatal !== false;
+}
+
 /** Sync block for the About screen and the bug report. Reads the cache, so a
  *  caller that has never awaited `loadCrashLedger()` gets the header and an
  *  honest "not loaded yet" rather than a lie about there being none. */
 export function crashLedgerSummary(): string {
   if (cache === null) return 'Crash ledger\n  (not loaded yet)';
   if (cache.length === 0) return 'Crash ledger\n  No crashes recorded.';
-  const out: string[] = [`Crash ledger — ${cache.length} recorded (newest last)`];
+  // ⚠ OTA-1674 — the count says how many were FATAL. "10 recorded" with two
+  // idle reclaims among them read as ten kills to the owner; it was eight.
+  const fatalCount = cache.filter(isFatalRecord).length;
+  const out: string[] = [
+    fatalCount === cache.length
+      ? `Crash ledger — ${cache.length} recorded (newest last)`
+      : `Crash ledger — ${cache.length} recorded, ${fatalCount} fatal (newest last)`,
+  ];
   // ⚠⚠⚠ OTA-1587 — THE ROLLUP THAT NAMES THE PATTERN, because the pattern is
   // what a reader misses. Six of the owner's last seven kills followed an OTA
   // apply, and finding that took reading ten records against a list of OTA
   // timestamps by hand. Any reader who has the ledger now has the count.
-  const kills = cache.filter((r) => r.kind === 'native-death');
-  const onOta = kills.filter((r) => r.launch?.afterOtaApply);
+  //
+  // ⚠⚠ OTA-1674 — over FATAL kills, and `=== true`. An idle reclaim that
+  // happened to follow an apply is not the #110 signal, and `undefined` (the
+  // life died before its launch resolved) is not a "no" — counting it as one
+  // is the same lie the field told for two OTAs, one layer down.
+  const kills = cache.filter((r) => r.kind === 'native-death' && isFatalRecord(r));
+  const onOta = kills.filter((r) => r.launch?.afterOtaApply === true);
+  const unresolved = kills.filter((r) => r.launch && r.launch.afterOtaApply === undefined);
   if (onOta.length > 0) {
     out.push(`  ⚠⚠ ${onOta.length} of ${kills.length} process kills landed on an OTA-apply boot`);
     const orphaned = onOta.filter((r) => /\/l[1-9]/.test(r.launch?.prevCtx ?? ''));
@@ -235,9 +279,13 @@ export function crashLedgerSummary(): string {
         + `previous life never released — reloadAsync reuses the same native process`);
     }
   }
+  if (unresolved.length > 0) {
+    // ⚠ Said out loud, because the absence of the line is how the hole hid.
+    out.push(`  ⚠ ${unresolved.length} of ${kills.length} died before their launch resolved — whether they followed an OTA apply is not known`);
+  }
   for (const r of cache) {
     const age = Math.round(Math.max(0, Date.now() - r.ts) / 60_000);
-    out.push(`  • ${new Date(r.ts).toISOString()} (${age}m ago) — ${KIND_LABEL[r.kind] ?? r.kind}`);
+    out.push(`  • ${new Date(r.ts).toISOString()} (${age}m ago) — ${recordLabel(r)}`);
     out.push(`      build ${r.version} · ${r.build} · stage ${r.stage}`);
     if (r.message) out.push(`      ${r.message}`);
     if (r.breadcrumb) {
@@ -274,9 +322,16 @@ export function crashLedgerSummary(): string {
       // for what the new life inherited.
       const l = r.launch;
       const age = l.ageMs != null ? `died ${l.ageMs}ms into the process` : 'age of the process unknown';
-      const ota = l.afterOtaApply
-        ? ` · THIS BOOT FOLLOWED AN OTA APPLY ${l.otaGapMs}ms earlier`
-        : ' · not an OTA-apply boot';
+      // ⚠⚠⚠ OTA-1674 — THREE ANSWERS, NOT TWO. `undefined` is the life dying
+      // before its launch resolved (or a crumb older than this OTA), and
+      // printing it as "not an OTA-apply boot" is exactly how the hole in the
+      // instrument stayed hidden for two OTAs: the absence of a fact wore the
+      // words of a fact.
+      const ota = l.afterOtaApply === true
+        ? ` · THIS BOOT FOLLOWED AN OTA APPLY${l.otaGapMs != null ? ` ${l.otaGapMs}ms earlier` : ''}${l.otaPath ? ` via ${l.otaPath}` : ''}`
+        : l.afterOtaApply === false
+          ? ' · not an OTA-apply boot'
+          : ' · whether it followed an OTA apply is not known (died before its launch resolved)';
       out.push(`      launch: ${age}${ota}`);
       if (l.prevCtx) {
         out.push(/\/l[1-9]/.test(l.prevCtx)

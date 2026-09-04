@@ -138,12 +138,59 @@ export function contextTag(c: HandoffContexts = readContexts()): string {
   return `o${c.opened}/r${c.released}/l${c.live}/p${c.peakLive}/dn${c.disposeFoundNothing}`;
 }
 
+/** What rides on every breadcrumb. `bootId` / `bootAt` / `ctx` since OTA-1587;
+ *  the launch facts since OTA-1674, and those are the fix for a hole in the
+ *  instrument itself — see the note on `afterOta` below. */
+export interface BootStamp {
+  bootId: string;
+  bootAt: number;
+  ctx: string;
+  /** ⚠⚠⚠ OTA-1674 — THE DEAD LIFE'S OWN ANSWER, which the record never carried.
+   *
+   *  OTA-1587 asked one question of every death: did the process that died
+   *  boot on the far side of `reloadAsync`? It stored the answer in the wrong
+   *  life. The handoff is consumed on read (see `snapshotHandoff`, and that is
+   *  correct — a handoff is a fact about ONE boot), so the life that reads it is
+   *  the life that then dies, taking the only copy with it. The NEXT boot finds
+   *  no handoff, computes `afterOtaApply: false` about ITSELF, and bootSlice
+   *  wrote that onto the dead life's record. Structurally, a death record could
+   *  never say "yes". Eight of the owner's last ten kills read "not an OTA-apply
+   *  boot", and that was not a finding — it was the only value the field could
+   *  take.
+   *
+   *  So the fact rides the crumb: once `noteLaunchFacts` has run (early in
+   *  hydrate, before any stage that matters), every crumb this life writes says
+   *  whether THIS life followed an apply. A crumb written before that — the first
+   *  few milliseconds — leaves it undefined, which the reader must print as
+   *  "died before its launch was resolved", not as a cold start. Those are
+   *  different facts, and OTA-1587's own summary already refuses to conflate
+   *  them ("not resolved yet" vs "cold start"). */
+  afterOta?: boolean;
+  otaPath?: OtaHandoff['path'];
+  /** Handoff → that life's boot, ms. Small means the death sat inside the
+   *  reload window. */
+  otaGapMs?: number;
+  /** The life BEFORE the dead one, at the reload — the orphaned-context tag. */
+  prevCtx?: string;
+}
+
 /** The fields every breadcrumb carries so a survivor can name its own life.
  *  ⚠ Never throws — a breadcrumb that can fail is worse than a breadcrumb that
- *  is vague, because the whole point of the crumb is to survive a bad moment. */
-export function bootStampFields(): { bootId: string; bootAt: number; ctx: string } {
+ *  is vague, because the whole point of the crumb is to survive a bad moment.
+ *  ⚠ The launch fields are added ONLY once the launch has resolved; an unset
+ *  `afterOta` is a fact ("not yet known") and must not be forged as `false`. */
+export function bootStampFields(): BootStamp {
   try {
-    return { bootId: BOOT_ID, bootAt: BOOT_AT, ctx: contextTag() };
+    const base: BootStamp = { bootId: BOOT_ID, bootAt: BOOT_AT, ctx: contextTag() };
+    const f = _facts;
+    if (!f) return base;
+    return {
+      ...base,
+      afterOta: f.afterOtaApply,
+      ...(f.path ? { otaPath: f.path } : {}),
+      ...(f.otaGapMs != null ? { otaGapMs: f.otaGapMs } : {}),
+      ...(f.prevCtx ? { prevCtx: f.prevCtx } : {}),
+    };
   } catch {
     return { bootId: BOOT_ID, bootAt: BOOT_AT, ctx: '' };
   }

@@ -265,6 +265,19 @@ export function toSentryEvent(rec: CrashRecord): Record<string, unknown> {
       // that to decide whether to call the label stale — and then spends it on a
       // prose sentence, where nothing can group, sort or alert on it.
       actionAgeMs: bc?.aliveAt && bc?.at ? Math.max(0, bc.aliveAt - bc.at) : undefined,
+      // ⚠⚠ OTA-1674 — THE INSTRUMENT FINALLY REACHES THE SERVER. OTA-1587's
+      // `launch` block — which life died, how old it was, whether it followed
+      // an OTA apply, what the previous life handed over — has been on every
+      // record since it shipped and forwarded to Sentry on none of them. The
+      // rollup it exists for could only ever be done by hand, on a device. Now
+      // it can be grouped and alerted on. `launchAfterOta` is three-valued on
+      // purpose: `undefined` is "died before its launch resolved", not "no".
+      launchAgeMs: rec.launch?.ageMs,
+      launchAfterOta: rec.launch?.afterOtaApply,
+      launchOtaPath: rec.launch?.otaPath,
+      launchOtaGapMs: rec.launch?.otaGapMs,
+      launchPrevCtx: rec.launch?.prevCtx,
+      launchCtx: rec.launch?.ctx,
     },
   };
 }

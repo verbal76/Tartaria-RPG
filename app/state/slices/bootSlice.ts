@@ -245,11 +245,22 @@ export const createBootSlice = (
             // crumb written before this OTA, so old records simply omit the
             // block rather than inventing an age from the boot that read them.
             sinceBoot: crumb.bootAt != null ? Math.max(0, lastAlive - crumb.bootAt) : undefined,
+            // ⚠⚠⚠ OTA-1674 — THE DEAD LIFE'S FACT, OFF ITS OWN CRUMB — NOT THIS
+            // BOOT'S. Until now these read `launch.afterOtaApply` etc.: the facts
+            // of the life doing the reading, written onto the record of the life
+            // that died. The handoff is consumed on read by the life that then
+            // dies, so this boot found none, computed `false` about ITSELF, and
+            // filed it as the dead life's cold start. A death record could never
+            // say "yes" — eight of ten kills reading "not an OTA-apply boot" was
+            // the only value the field could take. The crumb now carries what
+            // its own life resolved (bootIdentity.bootStampFields), and an
+            // unset value stays unset: "not known" is a fact, "false" is a lie.
             launch: {
               ageMs: crumb.bootAt != null ? Math.max(0, lastAlive - crumb.bootAt) : undefined,
-              afterOtaApply: launch.afterOtaApply,
-              otaGapMs: launch.otaGapMs,
-              prevCtx: launch.prevCtx,
+              afterOtaApply: crumb.afterOta,
+              otaPath: crumb.otaPath,
+              otaGapMs: crumb.otaGapMs,
+              prevCtx: crumb.prevCtx,
               ctx: crumb.ctx,
             },
           });

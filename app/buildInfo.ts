@@ -27666,7 +27666,33 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // The count rides the action (the OTA-1633 rule) rather than looping the verb,
 // and the disciplines were the last surface still calling setScreen -
 // an ordinary craft has stayed put since OTA-983.
-export const OTA_BUILD_ID = '2026-09-04-1673-one-scanner-per-band';
+// OTA-1674 — THE DEAD LIFE ANSWERS FOR ITSELF. Item one of the owner's "fix all
+// existing issues one through six": #110, the process kill on nearly every boot.
+// ⚠⚠⚠ WHAT THE 19:40 LEDGER SAID, ENTRY BY ENTRY. Eight of ten at
+// boot:qwen:deferred, six dead 670-1006ms into the process with alive 0ms after
+// the stamp and no action yet - before the first screen, before Qwen loads (it
+// is DEFERRED). Every one: "not an OTA-apply boot". Ruled out: a boot-front
+// race (App.tsx awaits the check and RETURNS on applied, so qwen:deferred is
+// unreachable on an apply); anything heavy at that stage (armQwenWarm stores a
+// closure); ML init (mlHealth crash count 0).
+// ⚠⚠⚠ AND THE ONE THING THAT COULD NOT BE RULED EITHER WAY, because the
+// instrument built to decide it kept its answer in the wrong life. OTA-1587's
+// handoff is consumed on read - correctly - by the life that then DIES, taking
+// the only copy with it; the next boot finds none, computes afterOtaApply:false
+// about ITSELF, and bootSlice wrote that onto the dead life's record. A death
+// record could never say "yes". "Not an OTA-apply boot" on eight of ten was not
+// a finding; it was the only value the field could take. The fact now rides
+// the CRUMB, stamped by the life it describes, and undefined stays undefined -
+// "not known" is a fact, "false" is a lie - with every reader printing the
+// three cases apart. Two more from the same read: the label keyed on kind
+// alone, so OTA-1567's idle reclaims still printed PROCESS KILLED in About and
+// every bug report and counted in "N recorded"; and the launch block was never
+// forwarded to Sentry. ⚠ NO boot-phase exemption: six sub-second no-action
+// deaths look like a force-close at the splash AND like OTA-1587's candidate
+// (b), a reload-boot killed by an orphaned native context. This is what tells
+// them apart. Measure the cause, or ship an instrument. This is the instrument.
+export const OTA_BUILD_ID = '2026-09-04-1674-the-dead-life-answers';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-04-1673-one-scanner-per-band';
 // golem catch-up 2026-09-04: markerless publish of OTA-1673 - one scanner per
 // band. A scanner you already carry is not buildable again, read off the
 // catalog property (effect.kind === 'scanner') not a list of three names, per

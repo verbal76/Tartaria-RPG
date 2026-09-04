@@ -815,6 +815,18 @@ export interface LiveBreadcrumb {
    *  idle runtime, and the session summary that carries those counters is the
    *  one thing a killed process never gets to print. */
   ctx?: string;
+  /** ⚠⚠⚠ OTA-1674 — THE DEAD LIFE'S OWN LAUNCH FACT. OTA-1587 wrote the READING
+   *  life's `afterOtaApply` onto the dead life's record, because the handoff is
+   *  consumed on read by the life that then dies — so a death record could
+   *  never say it followed an OTA apply. These are stamped by the life itself
+   *  once its launch has resolved (see bootIdentity.bootStampFields), so a
+   *  survivor finally answers OTA-1587's one question about the right process.
+   *  Absent = the life died before its launch resolved, or a pre-1674 crumb;
+   *  the reader prints that as unknown, never as a cold start. */
+  afterOta?: boolean;
+  otaPath?: 'boot-front' | 'mid-session';
+  otaGapMs?: number;
+  prevCtx?: string;
 }
 
 /** ⚠ OTA-1587 — every crumb write goes through here, so none can be born without

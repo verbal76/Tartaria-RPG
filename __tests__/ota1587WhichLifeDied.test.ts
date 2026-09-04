@@ -219,7 +219,15 @@ describe('OTA-1587 — wired where a dying process will actually reach it', () =
   it('⚠⚠ boot reads the handoff and files it on the death record', () => {
     expect(BOOT).toContain('const launch = launchFacts(await readOtaHandoff());');
     expect(BOOT).toContain('get().appendLog(\'debug\', launchLine(launch));');
-    expect(BOOT).toContain('afterOtaApply: launch.afterOtaApply,');
+    // ⚠⚠⚠ OTA-1674 — THIS PIN USED TO READ `afterOtaApply: launch.afterOtaApply,`
+    // AND IT WAS PINNING THE DEFECT. `launch` is the READING life's facts. The
+    // handoff is consumed on read by the life that then dies (see
+    // snapshotHandoff — correct, a handoff is a fact about one boot), so the
+    // next boot found none, computed `false` about ITSELF, and this line wrote
+    // it onto the dead life's record. A death record could never say "yes".
+    // The record now reads the dead life's own answer off its crumb.
+    expect(BOOT).toContain('afterOtaApply: crumb.afterOta,');
+    expect(BOOT).not.toContain('afterOtaApply: launch.afterOtaApply,');
     expect(BOOT).toContain('ctx: crumb.ctx,');
   });
 
