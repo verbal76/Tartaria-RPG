@@ -305,6 +305,24 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   const medkitItems = medkitIds
     .map((id) => inventory.find((it) => it.id === id))
     .filter((it): it is InventoryItem => !!it && it.quantity > 0);
+  // ⚠⚠⚠ OTA-1662 — WHO IS THIS FOR? Owner, playing the pouch: *"I can tap on a
+  // button and it heals but it automatically applies it to me. I want them to
+  // act like they act when you tap on the inventory so you tap on it and it
+  // asks if you want to heal you or your dog."*
+  //
+  // OTA-1658 hard-coded `'self'` — I fixed the dead button and never noticed I
+  // had also thrown away the choice the pack has offered since OTA-184. So a
+  // tap on a heal now opens a second row: heal you, or feed the dog. `null`
+  // means no item is picked and the list of stacks is showing.
+  const [medkitPick, setMedkitPick] = useState<string | null>(null);
+  // The dog only counts as a target when one is actually walking with you —
+  // the same three-part test the inventory's Feed button uses. With no dog
+  // there is only one possible answer, and asking a question with one answer is
+  // a worse experience than the bug being fixed, so the tap just heals.
+  const medkitDog = useGameStore((s) => {
+    const d = s.player?.dog;
+    return d && d.status !== 'abandoned' && d.status !== 'dead' ? d : null;
+  });
   // ⚠⚠ OTA-1270 — the draft lives in the STORE, shared with the floating
   // KeyboardInputBar. Two private useState copies were how "act doesn't see
   // any text" happened: the player typed into one field and tapped the other
@@ -919,7 +937,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
               ) : null}
               {/* OTA-1657 — the healing pouch, in the fight it was built for. */}
               {medkitItems.length > 0 ? (
-                <QuickBtn label={`✚ heals (${medkitItems.length})`} tone="ready" onPress={() => setMedkitOpen((v) => !v)} />
+                <QuickBtn label={`✚ heals (${medkitItems.length})`} tone="ready" onPress={() => { setMedkitPick(null); setMedkitOpen((v) => !v); }} />
               ) : null}
             </View>
 
@@ -957,7 +975,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 effect — patching up after a fight is the same walk through the
                 pack that the pouch exists to delete. */}
             {medkitItems.length > 0 ? (
-              <QuickBtn label={`✚ heals (${medkitItems.length})`} tone="ready" onPress={() => setMedkitOpen((v) => !v)} />
+              <QuickBtn label={`✚ heals (${medkitItems.length})`} tone="ready" onPress={() => { setMedkitPick(null); setMedkitOpen((v) => !v); }} />
             ) : null}
             <QuickBtn
               label={investigateSweeping ? 'investigating…' : 'investigate'}
@@ -1124,16 +1142,65 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
           forty lines away and made the same mistake anyway. */}
       {medkitOpen && medkitItems.length > 0 ? (
         <View style={styles.bandolierPicker}>
-          {medkitItems.map((it) => (
+          {medkitPick === null ? medkitItems.map((it) => (
             <Pressable
               key={it.id}
-              onPress={() => { setMedkitOpen(false); useGameStore.getState().useHealBatch(it.name, 'self', 1); }}
+              onPress={() => {
+                // ⚠ OTA-1662 — with a dog beside you the tap ASKS; alone it acts.
+                if (medkitDog) { setMedkitPick(it.id); return; }
+                setMedkitOpen(false);
+                useGameStore.getState().useHealBatch(it.name, 'self', 1);
+              }}
               style={[styles.bandolierPickerBtn, styles.medkitPickerBtn]}
             >
               <Text style={[styles.bandolierPickerLabel, styles.medkitPickerLabel]} numberOfLines={1}>{it.name.toUpperCase()}</Text>
-              <Text style={styles.bandolierPickerHint}>use{it.quantity > 1 ? ` · ×${it.quantity} left` : ''}</Text>
+              <Text style={styles.bandolierPickerHint}>
+                {medkitDog ? 'who?' : 'use'}{it.quantity > 1 ? ` · ×${it.quantity} left` : ''}
+              </Text>
             </Pressable>
-          ))}
+          )) : (() => {
+            const it = medkitItems.find((m) => m.id === medkitPick);
+            // The stack can empty between the two taps (a cure fired, a batch
+            // spent it) — resolve live and fall back rather than heal a ghost.
+            if (!it) { setMedkitPick(null); return null; }
+            const heal = (target: 'self' | 'dog') => {
+              setMedkitPick(null);
+              setMedkitOpen(false);
+              // ⚠ DIRECTLY, both branches — the OTA-1658 rule. The inventory's
+              // own single-feed button still routes through
+              // `submitPlayerAction('feed dog …')`, which returns on its first
+              // line while a roll is pending; that is the same defect 1658
+              // fixed here, and it is fixed there in this OTA too.
+              useGameStore.getState().useHealBatch(it.name, target, 1);
+            };
+            return (
+              <>
+                <Pressable
+                  onPress={() => heal('self')}
+                  style={[styles.bandolierPickerBtn, styles.medkitPickerBtn]}
+                >
+                  <Text style={[styles.bandolierPickerLabel, styles.medkitPickerLabel]} numberOfLines={1}>YOU</Text>
+                  <Text style={styles.bandolierPickerHint}>{it.name.toLowerCase()}</Text>
+                </Pressable>
+                <Pressable
+                  onPress={() => heal('dog')}
+                  style={[styles.bandolierPickerBtn, styles.medkitPickerBtn]}
+                >
+                  <Text style={[styles.bandolierPickerLabel, styles.medkitPickerLabel]} numberOfLines={1}>
+                    {medkitDog!.name.toUpperCase()}
+                  </Text>
+                  <Text style={styles.bandolierPickerHint}>{medkitDog!.hp}/{medkitDog!.hpMax}</Text>
+                </Pressable>
+                <Pressable
+                  onPress={() => setMedkitPick(null)}
+                  style={[styles.bandolierPickerBtn, styles.medkitPickerBtn]}
+                >
+                  <Text style={[styles.bandolierPickerLabel, styles.medkitPickerLabel]} numberOfLines={1}>BACK</Text>
+                  <Text style={styles.bandolierPickerHint}>pick another</Text>
+                </Pressable>
+              </>
+            );
+          })()}
         </View>
       ) : null}
       <TutorialTarget area="input-row" style={styles.inputRow}>

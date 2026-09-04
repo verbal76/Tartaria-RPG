@@ -27388,7 +27388,28 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // uploads on for strangers. Two suites that pinned the old owner gate went red
 // correctly and were repointed, ota1489 to the honesty half it was really
 // making and ota1490 to the no-tap bundle the sticky unlock now fronts.
-export const OTA_BUILD_ID = '2026-09-04-1661-anyone-testing-can-push-a-log';
+// ⚠⚠⚠ OTA-1662 — THE POUCH ASKS WHO. Owner: *"the heals bandolier works. I can
+// tap on a button and it heals but it automatically applies it to me. I want
+// them to act like they act when you tap on the inventory so you tap on it and
+// it asks if you want to heal you or your dog."* ⚠ I HARD-CODED 'self' IN
+// OTA-1658 AND NEVER SAW WHAT I DROPPED: that OTA was fixing a dead button
+// (the tap died on submitPlayerAction's pendingRolls guard) and its fix was
+// right about the ROUTE and silently wrong about the TARGET. The pack has
+// offered a dog since OTA-184; the pouch was explicitly asked to behave "like
+// the inventory" and instead answered a question the player never got asked.
+// Now a tap opens a second row — YOU, the dog by name with its HP, and BACK —
+// and both branches call useHealBatch DIRECTLY, per the OTA-1658 rule. ⚠⚠ WITH
+// NO DOG IT STILL JUST HEALS: a confirmation step with one option is worse than
+// the bug it replaces, so the chooser appears only when a dog is really there,
+// by the same three-part test the inventory's Feed button uses. ⚠⚠⚠ AND WIRING
+// THIS UP FOUND THE SAME DEFECT STILL LIVE NEXT DOOR: the INVENTORY's single
+// "Feed <dog>" button routed through submitPlayerAction('feed dog …') — eleven
+// lines above a useHealBatch call that already knew better — so feeding the dog
+// from the pack during a fight did nothing at all: no heal, no refusal, no
+// line. Exactly the failure the owner reported on the pouch, in the very button
+// the pouch was told to imitate. Fixed to the direct action and pinned.
+export const OTA_BUILD_ID = '2026-09-04-1662-the-pouch-asks-who';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-04-1661-anyone-testing-can-push-a-log';
 // golem catch-up 2026-09-04: markerless publish of OTA-1661 - anyone testing
 // can push a log. Owner: "anyone testing should be able to push a log." SEND LOG
 // was owner-gated on a sound privacy argument that had the effect of making

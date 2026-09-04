@@ -1078,8 +1078,20 @@ export function InventoryScreen() {
       const dog = player!.dog!;
       buttons.push({
         label: `Feed ${dogName}  ${dog.hp}/${dog.hpMax}`,
+        // ⚠⚠⚠ OTA-1662 — WAS `submitPlayerAction('feed dog …')`, AND THAT IS THE
+        // OTA-1658 DEFECT, STILL LIVE, ELEVEN LINES ABOVE A `useHealBatch` CALL
+        // THAT ALREADY KNEW BETTER. `submitPlayerAction` returns on its first
+        // line while `pendingRolls` is set, and combat IS pendingRolls — so
+        // feeding the dog from the pack during a fight did nothing at all: no
+        // heal, no refusal, no line. Exactly the failure the owner reported on
+        // the pouch, in the button the pouch was told to imitate.
+        //
+        // Found while wiring the pouch's target chooser to this screen's
+        // grammar. `useHealBatch(name, 'dog', 1)` is the same action the
+        // "Feed Max" button below already used, and it applies the dog's heal,
+        // spends one, logs and persists with no parser in the way.
         onPress: () => {
-          useGameStore.getState().submitPlayerAction(`feed dog ${pending.item.name}`);
+          useHealBatch(pending.item.name, 'dog', 1);
           closeModal();
         },
         tone: 'primary',
