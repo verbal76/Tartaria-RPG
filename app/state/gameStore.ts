@@ -463,6 +463,8 @@ import {
   type ArmorSlotResist,
   type Recipe,
 } from '../engine/crafting';
+import { oneToAPackRefusal } from '../engine/oneToAPack'; // OTA-1673 — one scanner per band
+import { runAethercraftBatch, MAX_CAST_BATCH } from './aethercraftBatch'; // OTA-1673 — casts by the handful
 import { getEquippedWeapon, isBareHandAttack, parseDamageDice, reachClassFor, enemyDamageDisplay, enemyDamageCompact, bossSwingsTwice, enemyAC } from '../engine/combatRules';
 import { reachBandsFor, reachFiresDown, RANGE_ORDER, RANGE_LABELS } from '../engine/types';
 import { knocksOutHumanoid } from '../engine/knockout';
@@ -7064,7 +7066,7 @@ export interface GameStore {
    * lets the outer submit own the bookkeeping while the inner
    * submit performs the actual state change.
    */
-  submitPlayerAction: (text: string, _opts?: { skipPreChecks?: boolean; silent?: boolean; craftCount?: number }) => void;
+  submitPlayerAction: (text: string, _opts?: { skipPreChecks?: boolean; silent?: boolean; craftCount?: number; castCount?: number }) => void;
   resolveRollStep: (values: number[]) => void;
   cancelPendingRolls: () => void;
   // OTA-957 — a bandolier throw transiently equips the throwable to the off hand
@@ -16671,7 +16673,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
               const { parseGolemKind } = require('../engine/golems');
               golemKindHint = parseGolemKind(`${verbLow} ${tgtLow}`);
             }
-            runAethercraft(discipline, get, set, player, currentScene, golemKindHint);
+            // ⚠⚠ OTA-1673 — the count rides the action (the OTA-1633 rule), see
+            // state/aethercraftBatch.ts. A summon never batches: one tether.
+            const castTimes = discipline === 'summon'
+              ? 1
+              : Math.max(1, Math.min(Math.floor(_opts?.castCount ?? 1), MAX_CAST_BATCH));
+            runAethercraft(discipline, get, set, player, currentScene, golemKindHint, castTimes);
             break;
           }
           // ⚠ OTA-1195 — AETHER TECHNIQUES (PUNCHLIST P16), and the ORDER matters: this
@@ -21715,6 +21722,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
             );
             break;
           }
+        }
+        // ⚠⚠⚠ OTA-1673 — one scanner per band (engine/oneToAPack.ts). ABOVE the
+        // ingredient check on purpose: "you already own this" is the true reason,
+        // and a better answer than "you're short 3 Aether Crystal".
+        {
+          const dupe = oneToAPackRefusal(recipe.result, player.inventory);
+          if (dupe) { get().appendLog('arbiter', dupe); break; }
         }
         // OTA-193 — check shortfall AFTER tag-substitution. Misc items
         // with the right material tag (a synthesized "Brass Sextant"
@@ -34001,7 +34015,30 @@ function narratePossibleDirections(
 //
 // Fuel: 1 Aetherstone-tagged consumable (Aether Crystal, Aether Mud,
 // Aether Residue, Aetheric Shard, Golem Core).
+// ⚠⚠ OTA-1673 — the batch layer lives in state/aethercraftBatch.ts (its first
+// draft sat here and tripped the OTA-1400 ratchet, which is what it is for).
+// This door injects the single-cast body so that module never imports the store.
 function runAethercraft(
+  discipline: 'shape' | 'summon' | 'mend',
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  player: PlayerCharacter,
+  scene: CurrentScene,
+  golemKindHint?: import('../engine/types').GolemKind | null,
+  times = 1,
+): void {
+  runAethercraftBatch(
+    discipline,
+    () => get().player ?? player,
+    (ch, text) => get().appendLog(ch, text),
+    scene,
+    golemKindHint,
+    times,
+    (d, live, hint) => runAethercraftOnce(d, get, set, live, scene, hint),
+  );
+}
+
+function runAethercraftOnce(
   discipline: 'shape' | 'summon' | 'mend',
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,

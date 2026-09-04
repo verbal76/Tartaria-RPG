@@ -27647,7 +27647,27 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // outcome taps the button again, which is the duplicate the gate was built to
 // stop. Both surfaces raise it from one helper, so they cannot disagree, and only
 // a landed send is titled REPORT SENT. The quiet line stays as the record.
-export const OTA_BUILD_ID = '2026-09-04-1672-three-things-to-send';
+// OTA-1673 — ONE SCANNER PER BAND, CASTS BY THE HANDFUL, MENU STAYS OPEN.
+// Owner: *"once you build one and have one that's in the pouch, it should not be
+// buildable again … stone manipulation should have a plus and minus button so
+// you can do more than one at a time, it should also have the max button …
+// every time you do one it kicks you back out of crafting to the exploration
+// screen, you should be staying in crafting once you're done."*
+// The scanner rule reads a PROPERTY (effect.kind === 'scanner' - an off-hand
+// reader, one slot, one band), not a list of three names that would go stale the
+// moment a fourth is authored. Per band, so owning the Mud Scanner never blocks
+// building the Aetheric one, and it fails OPEN if the catalog lookup throws.
+// ⚠⚠⚠ THE BATCH STOP-TEST IS WHAT NEARLY SHIPPED WRONG. My first draft compared
+// a fuel fingerprint before and after each pass. A probe caught it: a shape cast
+// with fuel but NO Small Rock still BURNS the fuel, so the fingerprint moved,
+// the loop ran on, and 5 casts with 3 rocks rolled FIVE times - spending two
+// Aether Residue on attempts that could not produce anything, silently. It now
+// asks whether the NEXT cast can finish, stops there, and names what ran out.
+// The count rides the action (the OTA-1633 rule) rather than looping the verb,
+// and the disciplines were the last surface still calling setScreen -
+// an ordinary craft has stayed put since OTA-983.
+export const OTA_BUILD_ID = '2026-09-04-1673-one-scanner-per-band';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-04-1672-three-things-to-send';
 // golem catch-up 2026-09-04: markerless publish of OTA-1672 - three things to
 // send. REPORT A BUG offers the characters, then a general bug, then SEND FULL
 // LOG FOR ANALYSIS; the first two still require a description, the third has no

@@ -278,7 +278,10 @@ describe('OTA-1195 / P16 — the Aetheric tab', () => {
   });
 
   test('⚠ the confirm says CHANNEL, not CAST — nothing here is a spell', () => {
-    expect(SCREEN).toContain("label: disciplineConfirm?.technique ? 'Channel' : 'Cast'");
+    // ⚠ OTA-1673 — the label grew a `Cast ×N` arm for the batch picker and went
+    // multi-line, so this reads the claim (a technique says CHANNEL) rather than
+    // the exact single-line literal it used to pin.
+    expect(SCREEN).toMatch(/disciplineConfirm\?\.technique\s*\?\s*'Channel'/);
   });
 
   test('⚠ and it states the dose before the player commits', () => {

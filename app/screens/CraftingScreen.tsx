@@ -11,7 +11,10 @@ import { BrandedModal } from '../components/BrandedModal';
 // OTA-1552 — the Crucible guard. Mounted on both screens that can start a job
 // which spends substitutes, exactly like the craft substitution prompt above it.
 import { CrucibleGuardModal } from '../components/CrucibleGuardModal';
-import type { InventoryDelta } from '../components/inventoryDelta';
+import { computeInventoryDelta, type InventoryDelta } from '../components/inventoryDelta';
+// OTA-1673 — the cast-count bound, shared with the engine so the picker can
+// never offer a number the action would silently clamp.
+import { MAX_CAST_BATCH } from '../state/aethercraftBatch';
 import { SearchSortBar, type SortDirection } from '../components/SearchSortBar';
 import { FirstTimeHint } from '../components/FirstTimeHint';
 import type { InventoryItem, PlayerCharacter } from '../engine/types';
@@ -209,13 +212,37 @@ function ownedQty(inventory: InventoryItem[], name: string): number {
 // dose. One extra field beat a second, near-identical modal.
 type DisciplineConfirm = {
   title: string; phrase: string; body: string; fuel: string; afford: boolean; technique?: boolean;
+  /** ⚠ OTA-1673 — how many casts this pack could pay for. `null` on the golem
+   *  summon and on techniques, which are one-at-a-time by their own rules. */
+  maxCasts?: number | null;
 };
-function buildDisciplineConfirm(d: AethercraftDiscipline, inventory: InventoryItem[]): DisciplineConfirm {
+
+/** ⚠⚠⚠ OTA-1673 — HOW MANY TIMES CAN THIS DISCIPLINE ACTUALLY FIRE. Owner wanted
+ *  MAX on the shape card, and MAX has to mean what OTA-1631 made it mean on the
+ *  craft picker: everything the pack can really pay for, never a number that
+ *  runs out halfway.
+ *
+ *  ⚠ A cast spends ONE fuel from the "any one of" list — and, for shape out of
+ *  combat, ALSO one Small Rock, because the shard is pulled from a rock. The
+ *  binding constraint is the smaller of the two, and a MAX that counted only
+ *  fuel would promise casts that fizzle with "no Small Rock to bind it to". */
+function maxDisciplineCasts(d: AethercraftDiscipline, player: PlayerCharacter): number {
+  const fuel = d.fuels.reduce((n, f) => n + ownedQty(player.inventory, f), 0);
+  if (fuel <= 0) return 0;
+  const isShape = /aetherstone manipulation|shape/i.test(`${d.id} ${d.title}`);
+  if (!isShape) return fuel;
+  const rocks = ownedQty(player.inventory, 'Small Rock');
+  return Math.max(0, Math.min(fuel, rocks));
+}
+
+function buildDisciplineConfirm(d: AethercraftDiscipline, player: PlayerCharacter): DisciplineConfirm {
   const phrase = d.examples[0] ?? d.id;
   // Aethercraft fuels are an "any ONE of" list — affordable if the player holds ≥1.
-  const afford = d.fuels.some((f) => ownedQty(inventory, f) >= 1);
+  const afford = d.fuels.some((f) => ownedQty(player.inventory, f) >= 1);
   const fuel = `any one of: ${d.fuels.join(', ')}`;
-  return { title: d.title, phrase, body: d.body, fuel, afford };
+  // ⚠ The summon card never reaches here (it opens the golem confirm), so every
+  // discipline that does is battable.
+  return { title: d.title, phrase, body: d.body, fuel, afford, maxCasts: maxDisciplineCasts(d, player) };
 }
 
 /** OTA-1195 — the same popup, aimed at a technique. ⚠ It states the DOSE up front: this is
@@ -338,6 +365,17 @@ export function CraftingScreen() {
   // Healing). Same UX as the golem summon: tap the card → confirm → cast (no
   // clipboard copy-paste).
   const [disciplineConfirm, setDisciplineConfirm] = useState<DisciplineConfirm | null>(null);
+  // ⚠ OTA-1673 — the discipline's cast count. Reset to 1 whenever the confirm
+  // opens, so a ×9 chosen on the last card is never inherited by the next one —
+  // a stale count on an action that spends crystals is how a player burns nine
+  // meaning to burn one.
+  const [castCount, setCastCount] = useState(1);
+  useEffect(() => { if (disciplineConfirm !== null) setCastCount(1); }, [disciplineConfirm]);
+  // A technique is one channel per tap (each carries its own corruption dose), so
+  // it gets no stepper at all — the picker only appears where batching is honest.
+  const castBatchMax = disciplineConfirm && !disciplineConfirm.technique
+    ? Math.max(1, Math.min(disciplineConfirm.maxCasts ?? 1, MAX_CAST_BATCH))
+    : 1;
   // OTA-087 — per-tab search + sort state. Each tab keeps its
   // own so switching tabs doesn't clobber the user's filter.
   // Defaults are tuned per category: craft/recipes default to
@@ -743,7 +781,7 @@ export function CraftingScreen() {
                       setGolemConfirm(buildGolemConfirm(pick, player.inventory));
                       return;
                     }
-                    setDisciplineConfirm(buildDisciplineConfirm(d, player.inventory));
+                    setDisciplineConfirm(buildDisciplineConfirm(d, player));
                   }}
                 >
                   <Text style={styles.aetherCardTitle}>{d.title}</Text>
@@ -1168,8 +1206,19 @@ export function CraftingScreen() {
       />
 
       {/* OTA-983 — shape (Aetherstone Manipulation) + mend (Aetheric Healing) confirm.
-          Same UX as the golem summon: confirm dispatches the cast and returns to
-          exploration so the roll plays out live. No clipboard copy-paste. */}
+          ⚠⚠⚠ OTA-1673 — AND IT NO LONGER THROWS YOU OUT. Owner: *"every time you do
+          one it kicks you back out of crafting to the exploration screen — you
+          should be staying in crafting once you're done."* He is right, and this
+          was the only surface still doing it: an ordinary craft has stayed put
+          since OTA-983, and only the aetheric disciplines still called
+          setScreen('exploration'). The roll still narrates into the world feed —
+          nothing is lost by staying — and the same transient banner an ordinary
+          craft uses reports what came of it.
+
+          ⚠⚠ The +/− and MAX ride the same NumberStepper BrandedModal already
+          carries, so this is one control the player has met before rather than a
+          second picker with its own habits. Techniques keep a single cast: a
+          dose of corruption per channel is not something to batch behind one tap. */}
       <BrandedModal
         visible={disciplineConfirm !== null}
         title={disciplineConfirm?.title ?? 'Aethercraft'}
@@ -1179,19 +1228,35 @@ export function CraftingScreen() {
                   // OTA-1195 — a technique's line names the two costs a discipline does not
                   // have: the dose lands either way, and in a fight this IS your round.
                   ? 'You have fuel for it. The dose lands whether the field holds or not, and in a fight this spends your turn — watch it play out in the world view.'
-                  : 'You have fuel for it. Casting rolls against the discipline’s DC — watch it play out in the world view.')
+                  : 'You have fuel for it. Each cast rolls against the discipline’s DC on its own — the results land in the world feed, and this menu stays open.')
               : 'You’re short on fuel — the attempt will name exactly what’s missing.'}`
           : undefined}
+        quantityStepper={castBatchMax > 1 ? {
+          label: `How many casts? (fuel and rock for ${castBatchMax})`,
+          value: castCount,
+          min: 1,
+          max: castBatchMax,
+          onChange: setCastCount,
+        } : undefined}
         buttons={[
           {
-            label: disciplineConfirm?.technique ? 'Channel' : 'Cast',
+            label: disciplineConfirm?.technique
+              ? 'Channel'
+              : (castBatchMax > 1 && castCount > 1 ? `Cast ×${castCount}` : 'Cast'),
             tone: 'primary',
             onPress: () => {
               const phrase = disciplineConfirm?.phrase;
+              const n = castBatchMax > 1 ? castCount : 1;
               setDisciplineConfirm(null);
               if (phrase) {
-                useGameStore.getState().submitPlayerAction(phrase);
-                setScreen('exploration');
+                const preInv = (useGameStore.getState().player?.inventory ?? []).map((i) => ({ ...i }));
+                useGameStore.getState().submitPlayerAction(phrase, { castCount: n });
+                // ⚠ The SAME banner an ordinary craft uses, from the same delta
+                // helper — so "what did I just get" is answered identically
+                // whichever tab produced it, and neither surface can drift.
+                const post = useGameStore.getState().player?.inventory ?? [];
+                const delta = computeInventoryDelta(preInv, post).filter((d) => d.quantity > 0);
+                if (delta.length > 0) setCraftResult(delta);
               }
             },
           },
