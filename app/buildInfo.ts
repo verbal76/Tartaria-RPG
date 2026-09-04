@@ -27625,6 +27625,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // uncapped the optimal play against a fast swinger is to stop swinging back. It
 // fires only on damage that GOT THROUGH, and a kill by it resolves as a defeat.
 export const OTA_BUILD_ID = '2026-09-04-1671-the-armour-bites-back';
+// golem catch-up 2026-09-04: markerless publish of OTA-1671 - the armour bites
+// back. 31 of 297 pieces (10.4%) return damage to whatever hits them, in the
+// ATTACKER'S OWN element rather than the dog vest's fixed aetheric, so a
+// fire-breather burns itself on your plate. Chosen by CONTACT - chest/hands/legs,
+// the armour you are inside - after measuring that only TWO of 297 names read as
+// spiked, which killed the name-driven version I had planned one OTA after moving
+// every stat by name. Ladder 2/3, summed and capped at 8; fires only on damage
+// that got through, and a kill by it routes through resolveEnemyDefeat. The
+// [fits dog] chip is gone with it: swept across 905 catalog names x four stored
+// kinds, the chip's predicate and the section heading agree 3620 of 3620 times,
+// and the single shape where they differ is one where the chip was the liar.
+// hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-04-1670-the-name-says-the-stat';
 // golem catch-up 2026-09-04: markerless publish of OTA-1670 - the name says the
 // stat. All 297 armour rows redistributed by what their NAME implies, after
