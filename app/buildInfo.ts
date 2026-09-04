@@ -27484,7 +27484,33 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // dead `_legacySendBugReport` copy that still held a clipboard stage, a
 // READ-ME-FIRST body and a mailto is deleted: that is the land he asked to
 // archive, and a dead function holding it is where it grows back.
-export const OTA_BUILD_ID = '2026-09-04-1665-the-bug-report-pushes';
+// OTA-1666 — EVERYTHING IN ITS ROOM. The settings SESSION tab reorganised, and
+// the LORE tab deleted. Owner: *"the session tab has got a little convoluted, a
+// little disorganized… everything in its appropriate place, everything labeled
+// correctly, everything intuitive, and if we really need to still show all those
+// buttons there. this is layer after layer after layer of debug attempt since we
+// started doing this game. is everything we have in there still necessary?"* And
+// then: *"lore should not be under settings, this is a duplicate. it has another
+// home already, the correct one lives on the minimap."* ⚠⚠⚠ FOUR OF THE FINDINGS
+// WERE NOT UNTIDINESS, THEY WERE FALSE STATEMENTS, and three were mine from the
+// last two days: a footnote instructing a LONG-PRESS that `onLongPress` has never
+// implemented in this file; the crash switch explaining its effect on SEND LOG
+// TWICE, one OTA after OTA-1665 deleted that button; CLEAR LOG standing as a
+// ONE-TAP BYPASS of OTA-1665's own dedupe gate (erasing the log changes the
+// fingerprint, so a second evidence-free report was admitted — it now stamps the
+// empty-log mark, and a suite proves the next report is refused); and, under the
+// header REPORTING, a clipboard dump and a destructive erase sitting ABOVE the
+// one button that reports anything. ⚠⚠ TWO OF MY AUDIT'S OWN FINDINGS WERE
+// WRONG, which is the reason nothing was deleted on the strength of the table: I
+// had COPY SAVE down as a strict duplicate of BACK UP CHARACTER (they share no
+// encoder — checksummed envelope vs flat blob, and IMPORT SAVE parses only the
+// second, so it stays and is relabelled as that partner) and COPY INVENTORY down
+// as redundant (the report carried no pack at all — so bugReport.ts gained an
+// `--- INVENTORY ---` block FIRST, and only then was the button removable). RUN /
+// REPORTING / AI / ADVANCED each answer one question now; Display size went to
+// the DISPLAY tab where it belongs.
+export const OTA_BUILD_ID = '2026-09-04-1666-everything-in-its-room';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-04-1665-the-bug-report-pushes';
 // golem catch-up 2026-09-04: markerless publish of OTA-1665 - the bug report
 // pushes, and only once per changed log. Owner: "I've removed the send log",
 // "report a bug should be the button that pushed the log, so we don't need the

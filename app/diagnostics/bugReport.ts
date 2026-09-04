@@ -28,6 +28,14 @@ import { persistPendingBundle } from './pendingBundle';
 import { sendGameLogInline, describeInlineSend } from './sentryTransport';
 import { reportingEnabled, crashReportDsn } from './crashReporter';
 import { buildBasicDeviceSummary } from './aboutSummary';
+// ⚠⚠ OTA-1666 — THE PACK RIDES ALONG NOW. The report carried description +
+// device + voice + log and nothing about what the player was CARRYING, so every
+// balance or item defect ("this heal did nothing", "the coating vanished")
+// arrived with the sentence and none of the evidence. COPY INVENTORY existed to
+// fill that gap by hand, on a separate button, in a separate paste, which is
+// exactly the split REPORT A BUG was built to end. Folding the same snapshot in
+// here is what made deleting that button honest rather than a loss.
+import { buildInventorySnapshot } from './inventorySnapshot';
 import { readSlotLog, type SlotSummary } from '../engine/saveSystem';
 import { OTA_BUILD_ID } from '../buildInfo';
 import { getBuildCodename } from '../buildCodename';
@@ -78,6 +86,12 @@ function buildVoiceSummary(): string {
 // accepts ~64KB per paste, iOS Mail ~50KB; 40KB leaves room for the wrapper.
 const LOG_CHARS_CAP = 40_000;
 
+/** ⚠ OTA-1666 — the pack's own ceiling, kept well under the log's. A hoarder's
+ *  snapshot runs long (every instance, with durability, slot and stat lines),
+ *  and the log is the part that explains WHY a report was filed — so if
+ *  something has to be trimmed, it is not the log. */
+const INVENTORY_CHARS_CAP = 12_000;
+
 export const BUG_REPORT_MARK_KEY = '@tartaria/lastBugReportFingerprint';
 
 /** ⚠ WHAT "THE LOG CHANGED" MEANS, precisely. The raw slot log grows at the end
@@ -121,6 +135,27 @@ export async function composeAndSendBugReport(args: {
 
   const deviceBlock = buildBasicDeviceSummary();
   const voiceBlock = buildVoiceSummary();
+
+  // ⚠ OTA-1666 — THE PACK, read from the LIVE store rather than the slot. The
+  // slot summary carries name / race / location / hp and no items, and the
+  // player is looking at the pack they are complaining about right now — so the
+  // live state is both the only source and the correct one. Lazily required for
+  // the same reason the log line below is: a diagnostics module must not take a
+  // static dependency on the store, and on the title screen there is no store
+  // to take. `buildInventorySnapshot(null)` answers "(no active character)", so
+  // the no-character path needs no branch of its own.
+  let inventoryBlock = '(inventory unavailable)';
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { useGameStore } = require('../state/gameStore') as typeof import('../state/gameStore');
+    const snap = buildInventorySnapshot(useGameStore.getState().player);
+    inventoryBlock = snap.length > INVENTORY_CHARS_CAP
+      ? `${snap.slice(0, INVENTORY_CHARS_CAP)}\n(pack listing trimmed at ${INVENTORY_CHARS_CAP} characters)`
+      : snap;
+  } catch {
+    /* no store in this context, or a catalog lookup threw — the report is still
+       worth sending, and this line says which of the two it was to a reader. */
+  }
 
   let logBlock = '(no character selected — no log attached)';
   let rawLog = '';
@@ -170,6 +205,11 @@ export async function composeAndSendBugReport(args: {
     ``,
     `--- VOICE ---`,
     voiceBlock,
+    ``,
+    // OTA-1666 — above the log deliberately: the pack is the state the log's
+    // last few lines are usually about, and it is short enough to read first.
+    `--- INVENTORY ---`,
+    inventoryBlock,
     ``,
     `--- CHARACTER LOG (newest first) ---`,
     logBlock,
@@ -222,8 +262,11 @@ export async function composeAndSendBugReport(args: {
   // envelopes that never arrived.
   let pendingId = `bug${Date.now().toString(36)}`;
   try {
+    // OTA-1666 — `inventory` was an empty string here while the pack had no
+    // home in the report at all. It is inside `report` now AND named in its own
+    // field, which is what the bundle's shape was always for.
     const pending = await persistPendingBundle({
-      log: report, inventory: '', save: '', device: deviceBlock,
+      log: report, inventory: inventoryBlock, save: '', device: deviceBlock,
     });
     if (pending?.id) pendingId = pending.id;
   } catch {

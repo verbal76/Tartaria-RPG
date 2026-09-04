@@ -3,7 +3,8 @@
 **Effective date:** May 23, 2026
 **Last updated:** September 4, 2026 — REPORT A BUG now sends your report
 straight to the developer instead of opening an email, and it includes your
-game log; see "Sending a report yourself" below for exactly what it contains.
+game log and your character's inventory; see "Sending a report yourself" below
+for exactly what it contains.
 Automatic crash reports still start ON (August 24, 2026); see "The AUTOMATIC
 CRASH REPORTS switch".
 **Publisher:** Hot Attic Games
@@ -181,6 +182,10 @@ and tap send. Nothing leaves your device before that.
 - what you **typed into the report** — your description of the problem
 - your **game log** — the play-by-play of your session, which includes the
   commands and text you typed into the game
+- your **inventory** — a list of what your character is carrying and wearing.
+  This is new in the September 4, 2026 update; the same list used to require a
+  separate COPY INVENTORY button and a second paste, and that button is gone
+  now that the report carries it
 - the **voice diagnostics** (engine, voice, recent speech routes and errors)
 - the **device and build summary** shown on the About screen (device model,
   Android version, app and update version, memory and crash counters)

@@ -6,7 +6,8 @@ import { useGameStore } from '../state/gameStore';
 import { OTA_BUILD_ID } from '../buildInfo';
 import { getBuildCodename } from '../buildCodename';
 import { buildBasicDeviceSummary, stampLogExport } from '../diagnostics/aboutSummary';
-import { buildInventorySnapshot, stampInventoryExport } from '../diagnostics/inventorySnapshot';
+// OTA-1666 — inventorySnapshot import dropped with COPY INVENTORY. Its new (and
+// only) caller is diagnostics/bugReport.ts, which folds the pack into the report.
 import { buildSaveSnapshot, stampSaveExport } from '../diagnostics/saveSnapshot';
 import { NumberStepper } from '../components/NumberStepper';
 import { ColorWheel } from '../components/ColorWheel';
@@ -17,7 +18,9 @@ import {
   resetDisplaySettings,
   type DisplaySettings,
 } from '../ui/displaySettings';
-import { LoreCodexBody } from '../components/LoreCodexBody';
+// OTA-1666 — LoreCodexBody import dropped with the duplicate LORE tab. The
+// component itself is untouched; LoreScreen (the crest button's destination)
+// is now its only caller.
 import { WeaponGlyphKey } from '../components/WeaponGlyphKey'; // OTA-1638
 import { useHintsDisabled, setHintsDisabled, resetAllFirstTimeHints } from '../components/useFirstTimeHint';
 import { useAutosaveDisabled, setAutosaveDisabled } from '../ui/autosave';
@@ -33,8 +36,9 @@ import {
   listSlots,
   type SlotSummary,
 } from '../engine/saveSystem';
+import AsyncStorage from '@react-native-async-storage/async-storage'; // OTA-1666 — the dedupe mark on CLEAR LOG
 import { BugReportModal } from '../components/BugReportModal';
-import { composeAndSendBugReport } from '../diagnostics/bugReport';
+import { composeAndSendBugReport, BUG_REPORT_MARK_KEY } from '../diagnostics/bugReport';
 import {
   loadReportingPref, setReportingEnabled, reportingStatusLine, reportingConfigured,
 } from '../diagnostics/crashReporter';
@@ -111,7 +115,9 @@ export function AboutScreen() {
   // clear log — the three actions that previously cluttered the
   // bottom of the ExplorationScreen menu row. save & exit is the
   // most-pressed action, so it's the default tab on open.
-  const [tab, setTab] = useState<'session' | 'sfx' | 'display' | 'lore' | 'about' | 'notices'>('session');
+  // ⚠ OTA-1666 — 'lore' left this union, so a stale `tab === 'lore'` anywhere
+  // in the file is now a COMPILE error rather than a tab nobody can reach.
+  const [tab, setTab] = useState<'session' | 'sfx' | 'display' | 'about' | 'notices'>('session');
   // OTA-860 — global first-time-tips kill-switch (per-install, reactive).
   const hintsDisabled = useHintsDisabled();
   const autosaveDisabled = useAutosaveDisabled();
@@ -164,10 +170,10 @@ export function AboutScreen() {
   const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved' | 'failed'>('idle');
   // OTA-1208 — the RUN card's BACK UP CHARACTER button (moved from the title rows).
   const [backupState, setBackupState] = useState<'idle' | 'busy' | 'done' | 'failed'>('idle');
-  // OTA-203 — dedicated COPY INVENTORY button. Separate from the log
-  // export so the player can choose which one to paste back.
-  const [invCopied, setInvCopied] = useState(false);
-  const [invCharCount, setInvCharCount] = useState(0);
+  // ⚠ OTA-1666 — invCopied / invCharCount deleted with the COPY INVENTORY
+  // button. The pack is not lost: bugReport.ts composes the same
+  // `buildInventorySnapshot` into an `--- INVENTORY ---` block, so the thing
+  // this button existed to hand over now rides in the report automatically.
   // arb172 — Session-tab declutter: the rarely-used clipboard dumps (COPY SAVE,
   // COPY INVENTORY) hide behind this toggle. (COPY AI HEALTH was removed — its
   // output is already inside COPY LOG / REPORT A BUG's device summary.)
@@ -312,27 +318,14 @@ export function AboutScreen() {
       }
     } catch { /* clipboard rarely fails on Android */ }
   }
-  // OTA-203 — dedicated COPY INVENTORY button. Builds the snapshot
-  // from the live player state, wraps it in the BEGIN/END envelope +
-  // device summary (so the paste is greppable and pairs the pack
-  // against the OTA build), and drops it on the clipboard. Separate
-  // from COPY LOG so the player can share just the pack contents
-  // without a giant log appended.
-  async function handleCopyInventory() {
-    try {
-      const player = useGameStore.getState().player;
-      const snapshot = buildInventorySnapshot(player);
-      const stamped = stampInventoryExport(
-        snapshot,
-        buildBasicDeviceSummary(),
-        player?.name,
-      );
-      await Clipboard.setStringAsync(stamped);
-      setInvCharCount(stamped.length);
-      setInvCopied(true);
-      setTimeout(() => setInvCopied(false), 2500);
-    } catch { /* clipboard rarely fails on Android */ }
-  }
+  // ⚠⚠ OTA-1666 — handleCopyInventory DELETED along with its button. OTA-203
+  // added it for a player who asked to see the pack as a flat list "so you can
+  // check for recurring themes", and for three years that meant a separate,
+  // manual paste. bugReport.ts now folds the identical
+  // `stampInventoryExport(buildInventorySnapshot(player), …)` output into every
+  // report, so the pack arrives with the log that explains it instead of on its
+  // own. That is the order this had to happen in: the report gained the data
+  // FIRST, and only then did the button become removable rather than missed.
   // OTA-341 — COPY SAVE. Exports the loadable save state (player +
   // worldMemory, minus the narration log) so a crashing/bricked save can be
   // pasted back and reproduced EXACTLY via loadSlotIntoGame. Player ask after
@@ -376,11 +369,28 @@ export function AboutScreen() {
       setTimeout(() => setImportMsg(null), 6000);
     }
   }
+  // ⚠⚠⚠ OTA-1666 — CLEARING THE LOG WAS A ONE-TAP BYPASS OF THE OTA-1665
+  // DEDUPE GATE, and I found it by asking what this button does to the feature
+  // I shipped one OTA ago rather than by anyone hitting it. The gate compares a
+  // fingerprint of `slotId : rawLog.length : rawLog.slice(-240)`. Erasing the
+  // log changes the length AND the tail, so the fingerprint changes, so a
+  // second report is admitted — one carrying an EMPTY log, filed seconds after
+  // the first, which is precisely the duplicate-with-no-evidence the owner
+  // asked to block ("you have to go play for a little bit before it allows you
+  // to push another one"). Stamping the mark to a value no real log can produce
+  // closes it: the next report must find something actually written since.
   async function handleClearLog() {
     useGameStore.getState().clearGameLog();
     try {
       await clearActiveSlotLog();
     } catch { /* tolerated */ }
+    try {
+      const slotId = useGameStore.getState().activeSlotId;
+      // Matches bugReport.ts's `${slotId}:${raw.length}:${raw.slice(-240)}` for
+      // an empty log — the exact fingerprint the very next report would compute
+      // if nothing has been played since, and nothing else.
+      if (slotId) await AsyncStorage.setItem(BUG_REPORT_MARK_KEY, `${slotId}:0:`);
+    } catch { /* the gate simply stays as it was — never block a clear on this */ }
     setLogCleared(true);
     // v2.4.1 (OTA 053) — reset the chunked-copy cursor so the next
     // tap starts from PART 1 of the fresh log.
@@ -740,9 +750,18 @@ export function AboutScreen() {
       {/* Tab row — two sections in one screen. OTA 23-006 collapsed
           'music' + 'voice' into a single SFX tab; the technical
           ABOUT / diagnostic block stays its own tab. Music card
-          renders first inside SFX (most tweaked), voice card below. */}
+          renders first inside SFX (most tweaked), voice card below.
+
+          ⚠⚠ OTA-1666 — LORE IS GONE FROM HERE. Owner: *"lore should not be
+          under settings, this is a duplicate. it has another home already, the
+          correct one lives on the minimap, so this duplicate tab in settings
+          can go."* He is right and it was never two implementations — both tabs
+          rendered the SAME <LoreCodexBody />, so the codex had two doors and
+          one of them was inside a settings screen. The crest button on the
+          exploration screen (`setScreen('lore')` → LoreScreen) is the door the
+          game is built around; this one only ever competed with it. */}
       <View style={styles.tabRow}>
-        {(['session', 'sfx', 'display', 'lore', 'about', 'notices'] as const).map((id) => (
+        {(['session', 'sfx', 'display', 'about', 'notices'] as const).map((id) => (
           <TouchableOpacity
             key={id}
             onPress={() => setTab(id)}
@@ -768,12 +787,45 @@ export function AboutScreen() {
             actions that used to clutter the in-game menu row
             (save & exit, copy log, clear log) live here as proper
             buttons. Save & exit is the headline action so it's
-            first; copy + clear are diagnostic tools below. */}
+            first; copy + clear are diagnostic tools below.
+
+            ⚠⚠⚠ OTA-1666 — THE TAB WAS REORGANISED, AND FOUR CONTROLS LEFT IT.
+            Owner: *"the session tab has got a little convoluted, a little
+            disorganized… let's make sure that everything is in its appropriate
+            place, everything is labeled correctly, everything is intuitive, and
+            if we really need to still show all those buttons there. this is
+            layer after layer after layer of debug attempt since we started
+            doing this game. is everything we have in there still necessary?"*
+
+            The four sections now each answer ONE question, in the order a
+            player meets them:
+              RUN       — keep this character (save / back up / leave)
+              REPORTING — tell us something is wrong
+              AI        — the narrator stopped talking
+              ADVANCED  — collapsed; the tools only a diagnosis needs
+
+            ⚠ WHAT MOVED, and why each one was in the wrong room:
+              • Display size → the DISPLAY tab. A display setting, sitting in
+                RUN, with a tab named DISPLAY one tap away.
+              • COPY LOG + CLEAR LOG → ADVANCED. They sat ABOVE the REPORT A BUG
+                button under the header REPORTING, so the first two things a
+                player saw under "reporting" were a clipboard dump and a
+                destructive erase — neither of which reports anything.
+              • The long-press footnote → deleted. It read *"Long-press COPY LOG
+                for the share + chunked-paste view"* and `onLongPress` has never
+                appeared in this file. It instructed an action that does not
+                exist, on a screen whose whole job is telling the truth about
+                what a button does.
+              • COPY INVENTORY → deleted, because the report now CARRIES the
+                inventory (bugReport.ts grew an `--- INVENTORY ---` block in the
+                same commit). Deleting it first and hoping would have been the
+                lie; this is the button becoming genuinely redundant. */}
         {tab === 'session' && (
         <View style={styles.sessionCard}>
           <Text style={styles.sessionLabel} accessibilityRole="header">RUN</Text>
           <Text style={styles.sessionHint}>
-            Save or leave the run, share a log / bug report, or reload the AI.
+            Keep this character: save where you are, keep a copy you can restore
+            from, or stop for now.
           </Text>
 
           {/* SAVE in place — keep playing. Separate from SAVE & EXIT so the
@@ -849,38 +901,13 @@ export function AboutScreen() {
             background — this timer just bounds what an idle stretch could lose.
           </Text>
 
-          {/* ⚠ OTA-1227 — UI SCALE (desktop/Steam only). Deliberately NOT a
-              resolution picker: inside a maximized window the OS owns the
-              resolution, and a dropdown fighting it is a mobile-porting
-              anti-pattern. This is the desktop convention — scale the whole
-              interface, text and controls together, via the Electron zoom.
-              The row is absent entirely off-desktop rather than shown inert. */}
-          {scaleSupported && (
-            <>
-              <View style={styles.musicRow}>
-                <Text style={styles.musicLabel}>Display size</Text>
-                <View style={{ flex: 1 }} />
-                {UI_SCALES.map((s2: UiScale) => (
-                  <TouchableOpacity
-                    key={s2}
-                    onPress={() => { void setUiScale(s2); }}
-                    style={[styles.musicToggle, uiScale === s2 && styles.musicToggleOn, { marginLeft: 6 }]}
-                    activeOpacity={0.7}
-                    accessibilityRole="button"
-                    accessibilityLabel={`Display size ${s2}`}
-                    accessibilityState={{ selected: uiScale === s2 }}
-                  >
-                    <Text style={[styles.musicToggleText, uiScale === s2 && styles.musicToggleTextOn]}>
-                      {s2 === 'small' ? 'S' : s2 === 'medium' ? 'M' : 'L'}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-              <Text style={styles.sessionHint}>
-                Scales the whole interface for your monitor. F11 toggles fullscreen.
-              </Text>
-            </>
-          )}
+          {/* ⚠ OTA-1666 — the OTA-1227 "Display size" row LEFT THIS TAB for the
+              DISPLAY tab, where it renders as its own INTERFACE card. Nothing
+              about the control changed — same `scaleSupported` gate, same
+              setUiScale, same absent-off-desktop behaviour. It was simply a
+              display setting living under RUN with a DISPLAY tab one tap away,
+              which is the single clearest example of what the owner meant by
+              "everything in its appropriate place". */}
 
           {/* OTA-1023 — REPLAY OPENING moved to the CharacterScreen header
               (owner: "I went to settings and about and there was no replay
@@ -890,46 +917,19 @@ export function AboutScreen() {
               character sheet only exists with a live run — no gate needed. */}
 
           <Text style={[styles.sessionLabel, { marginTop: 14 }]} accessibilityRole="header">REPORTING</Text>
-          <View style={styles.sessionBtnRow}>
-            <TouchableOpacity
-              style={[styles.sessionBtn, styles.sessionBtnSecondary, { flex: 1 }]}
-              onPress={() => { void handleCopyLog(); }}
-              activeOpacity={0.7}
-              accessibilityRole="button"
-            >
-              <Text style={styles.sessionBtnSecondaryText}>
-                {(() => {
-                  // Single-chunk legacy flash.
-                  if (logCopied) return `✓ ${logCharCount.toLocaleString()} CHARS`;
-                  // Multipart cursor — shows what gets copied next, and
-                  // a brief "COPIED PART X/Y" flash for 2.5s after a
-                  // copy. Wraps to PART 1 after the final part.
-                  if (logChunk) {
-                    const { lastIndex, total, copiedAt } = logChunk;
-                    const flashing = Date.now() - copiedAt < 2500;
-                    if (flashing) {
-                      return lastIndex >= total
-                        ? `✓ PART ${lastIndex}/${total} — DONE`
-                        : `✓ PART ${lastIndex}/${total} — TAP FOR NEXT`;
-                    }
-                    const next = lastIndex >= total ? 1 : lastIndex + 1;
-                    return `COPY PART ${next}/${total}`;
-                  }
-                  return 'COPY LOG';
-                })()}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.sessionBtn, styles.sessionBtnSecondary, { flex: 1 }]}
-              onPress={() => { void handleClearLog(); }}
-              activeOpacity={0.7}
-              accessibilityRole="button"
-            >
-              <Text style={styles.sessionBtnSecondaryText}>
-                {logCleared ? '✓ CLEARED' : 'CLEAR LOG'}
-              </Text>
-            </TouchableOpacity>
-          </View>
+          {/* ⚠⚠ OTA-1666 — THE ACTION IS FIRST NOW. Until this OTA, the two
+              controls directly under the word REPORTING were COPY LOG and
+              CLEAR LOG — a clipboard dump and a destructive erase, neither of
+              which reports anything to anybody, both sitting ABOVE the one
+              button that does. They are in ADVANCED now and this section is
+              three things in the order they happen: the button, what happened
+              when you pressed it, and the switch that governs whether it can
+              send at all. */}
+          <Text style={styles.sessionHint}>
+            One button. It sends what you type along with this character&apos;s log,
+            your pack, your device and the voice engine&apos;s state — no email, no
+            copy-and-paste.
+          </Text>
           {/* arb75 — REPORT A BUG. One report bundling voice + device + log
               (no more separate COPY VOICE / COPY LOG). Opens the same
               BugReportModal the Title screen uses. */}
@@ -941,6 +941,17 @@ export function AboutScreen() {
           >
             <Text style={styles.sessionBtnPrimaryText}>REPORT A BUG</Text>
           </TouchableOpacity>
+          {/* ⚠⚠⚠ OTA-1665 — SEND LOG IS GONE. Owner: *"I've removed the send
+              log"*, and *"report a bug should be the button that pushed the
+              log."* One button for this in the whole product, and it is the one
+              players already find. This outcome line is where every result of
+              that push is spoken — sent, queued, refused as a duplicate,
+              refused because reporting is off. OTA-1666 moved it up here,
+              directly under the button it describes, rather than below the
+              crash toggle where it read as a comment on the switch. */}
+          {bugReportResult ? (
+            <Text style={styles.crashOptBody}>{bugReportResult}</Text>
+          ) : null}
           {/* ⚠⚠ OTA-1380 — AUTOMATIC CRASH REPORTS. Was opt-in, default off;
               ⚠⚠ OTA-1487 flipped it to OPT-OUT, DEFAULT ON — the owner's
               explicit ruling ("make it an opt out, not an opt in",
@@ -958,11 +969,19 @@ export function AboutScreen() {
             <View style={{ flex: 1 }}>
               <Text style={styles.crashOptTitle}>AUTOMATIC CRASH REPORTS</Text>
               <Text style={styles.crashOptBody}>{reportingStatus}</Text>
+              {/* ⚠⚠ OTA-1666 — THIS COPY NAMED A BUTTON THAT NO LONGER EXISTS,
+                  twice, and I shipped it that way one OTA ago. OTA-1665 deleted
+                  SEND LOG and rewrote the screen around it; these two sentences
+                  were not re-read, so the switch spent an OTA explaining its
+                  effect on a control the player cannot find. That is exactly the
+                  "layer after layer" the owner is describing — the sediment is
+                  not only extra buttons, it is prose about buttons that are
+                  gone. */}
               <Text style={styles.crashOptBody}>
-                On unless you turn it off — flipping it OFF stops all automatic sending, permanently,
-                and SEND LOG stops working too (it is the same connection).
-                Crashes are always recorded ON THIS DEVICE either way — REPORT A BUG and SEND LOG
-                send them only when you choose to.
+                On unless you turn it off — flipping it OFF stops all automatic sending,
+                permanently, and REPORT A BUG cannot send either (it is the same connection).
+                Crashes are always recorded ON THIS DEVICE either way; turning this off only
+                stops them leaving the phone.
               </Text>
             </View>
             <TouchableOpacity
@@ -983,69 +1002,6 @@ export function AboutScreen() {
               </Text>
             </TouchableOpacity>
           </View>
-          {/* ⚠⚠⚠ OTA-1665 — SEND LOG IS GONE. Owner: *"I've removed the send
-              log"*, and *"report a bug should be the button that pushed the
-              log."* One button for this in the whole product, and it is the one
-              players already find. OTA-1661 opened SEND LOG to everyone and gave
-              it a two-tap consent step; a day later that button was redundant,
-              because REPORT A BUG asks for a description first — which is a
-              better consent surface AND better evidence. The outcome line below
-              is where every result of that push is spoken. */}
-          {bugReportResult ? (
-            <Text style={styles.crashOptBody}>{bugReportResult}</Text>
-          ) : null}
-          {/* arb172 — rarely-needed clipboard dumps tucked behind a toggle so the
-              page isn't a wall of COPY buttons. COPY SAVE = the loadable save for
-              brick-repro; COPY INVENTORY = the pack snapshot for balance reports. */}
-          <TouchableOpacity
-            style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 }]}
-            onPress={() => setAdvancedOpen((v) => !v)}
-            activeOpacity={0.7}
-            accessibilityRole="button"
-            accessibilityState={{ expanded: advancedOpen }}
-          >
-            <Text style={styles.sessionBtnSecondaryText}>
-              {advancedOpen ? '▾ ADVANCED EXPORTS' : '▸ ADVANCED EXPORTS'}
-            </Text>
-          </TouchableOpacity>
-          {advancedOpen && (
-            <>
-              <TouchableOpacity
-                style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 }]}
-                onPress={() => { void handleCopySave(); }}
-                activeOpacity={0.7}
-                accessibilityRole="button"
-              >
-                <Text style={styles.sessionBtnSecondaryText}>
-                  {saveCopied ? `✓ ${saveCharCount.toLocaleString()} CHARS` : 'COPY SAVE (download / export)'}
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 }]}
-                onPress={() => { void handleImportSave(); }}
-                activeOpacity={0.7}
-                disabled={importBusy}
-              >
-                <Text style={styles.sessionBtnSecondaryText}>
-                  {importBusy ? 'IMPORTING…' : 'IMPORT SAVE (upload / paste)'}
-                </Text>
-              </TouchableOpacity>
-              {importMsg ? (
-                <Text style={styles.sessionFootnote}>{importMsg}</Text>
-              ) : null}
-              <TouchableOpacity
-                style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 }]}
-                onPress={() => { void handleCopyInventory(); }}
-                activeOpacity={0.7}
-                accessibilityRole="button"
-              >
-                <Text style={styles.sessionBtnSecondaryText}>
-                  {invCopied ? `✓ ${invCharCount.toLocaleString()} CHARS` : 'COPY INVENTORY'}
-                </Text>
-              </TouchableOpacity>
-            </>
-          )}
-
           <Text style={[styles.sessionLabel, { marginTop: 14 }]} accessibilityRole="header">AI</Text>
           {/* OTA-459/460 — RESET AI NARRATION & RELOAD. Clears the ML crash
               breadcrumbs AND force-loads Qwen in-session, bypassing the boot-time
@@ -1079,9 +1035,162 @@ export function AboutScreen() {
             Current state: {mlHealthSummary().split('\n')[1]?.replace(/^\s*Status:\s*/, '').trim() ?? 'unknown'}
             {qwenStatus === 'failed' && qwenError ? `\nLoad error: ${qwenError}` : ''}
           </Text>
-          <Text style={styles.sessionFootnote}>
-            Long-press COPY LOG for the share + chunked-paste view.
+          {/* ⚠ OTA-1666 — a footnote saying *"Long-press COPY LOG for the share
+              + chunked-paste view"* stood here. `onLongPress` does not appear
+              anywhere in this file and never has, so the instruction was for a
+              gesture that has never existed. Deleted rather than implemented:
+              the chunked cursor it promised is on the COPY LOG button itself,
+              in ADVANCED below, and always has been. */}
+
+          {/* arb172 → ⚠⚠ OTA-1666 — "ADVANCED EXPORTS" became "ADVANCED", and
+              the contents changed with the name. It holds an IMPORT and a
+              DESTRUCTIVE ERASE, neither of which is an export, so the old label
+              was wrong about two of its four buttons. What lives here now is
+              the honest definition: the tools a DIAGNOSIS needs and ordinary
+              play never does — collapsed by default so they cost nothing. */}
+          <TouchableOpacity
+            style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 14 }]}
+            onPress={() => setAdvancedOpen((v) => !v)}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityState={{ expanded: advancedOpen }}
+          >
+            <Text style={styles.sessionBtnSecondaryText}>
+              {advancedOpen ? '▾ ADVANCED' : '▸ ADVANCED'}
+            </Text>
+          </TouchableOpacity>
+          {advancedOpen && (
+            <>
+              <Text style={styles.sessionHint}>
+                You should not need any of these. REPORT A BUG already sends the log
+                and your pack.
+              </Text>
+              {/* ⚠ COPY LOG SURVIVED THE CUT, and it is the one button in here I
+                  argued myself out of deleting. REPORT A BUG has made it
+                  redundant for its original job — getting the log to me — but it
+                  is the ONLY path that does not depend on the network or on
+                  reporting being switched on, and "the report says queued" is
+                  exactly when someone wants the text in hand. It keeps its
+                  25KB chunk cursor: chat clients truncate longer pastes
+                  silently, which is how a hand-carried log arrives half-empty
+                  and nobody notices. */}
+              <TouchableOpacity
+                style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 }]}
+                onPress={() => { void handleCopyLog(); }}
+                activeOpacity={0.7}
+                accessibilityRole="button"
+              >
+                <Text style={styles.sessionBtnSecondaryText}>
+                  {(() => {
+                    // Single-chunk legacy flash.
+                    if (logCopied) return `✓ ${logCharCount.toLocaleString()} CHARS`;
+                    // Multipart cursor — shows what gets copied next, and
+                    // a brief "COPIED PART X/Y" flash for 2.5s after a
+                    // copy. Wraps to PART 1 after the final part.
+                    if (logChunk) {
+                      const { lastIndex, total, copiedAt } = logChunk;
+                      const flashing = Date.now() - copiedAt < 2500;
+                      if (flashing) {
+                        return lastIndex >= total
+                          ? `✓ PART ${lastIndex}/${total} — DONE`
+                          : `✓ PART ${lastIndex}/${total} — TAP FOR NEXT`;
+                      }
+                      const next = lastIndex >= total ? 1 : lastIndex + 1;
+                      return `COPY PART ${next}/${total}`;
+                    }
+                    return 'COPY LOG TO CLIPBOARD';
+                  })()}
+                </Text>
+              </TouchableOpacity>
+              {/* ⚠⚠ COPY SAVE ALSO SURVIVED, AND MY FIRST AUDIT HAD IT WRONG. I
+                  wrote it down as a strict duplicate of BACK UP CHARACTER and
+                  then read both: BACK UP writes `encodeSaveExport` — a
+                  checksummed, truncation-detecting envelope whose partner is
+                  RESTORE on the title screen — while this writes
+                  `stampSaveExport(buildSaveSnapshot(…))`, the flat
+                  {player, worldMemory} blob that IMPORT SAVE directly below
+                  parses. Deleting it would have left IMPORT SAVE with no
+                  documented partner. It is relabelled instead, so the pair
+                  reads as a pair. */}
+              <TouchableOpacity
+                style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 }]}
+                onPress={() => { void handleCopySave(); }}
+                activeOpacity={0.7}
+                accessibilityRole="button"
+              >
+                <Text style={styles.sessionBtnSecondaryText}>
+                  {saveCopied ? `✓ ${saveCharCount.toLocaleString()} CHARS` : 'COPY SAVE (for IMPORT SAVE below)'}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 }]}
+                onPress={() => { void handleImportSave(); }}
+                activeOpacity={0.7}
+                disabled={importBusy}
+              >
+                <Text style={styles.sessionBtnSecondaryText}>
+                  {importBusy ? 'IMPORTING…' : 'IMPORT SAVE (paste a copied save)'}
+                </Text>
+              </TouchableOpacity>
+              {importMsg ? (
+                <Text style={styles.sessionFootnote}>{importMsg}</Text>
+              ) : null}
+              {/* ⚠⚠⚠ CLEAR LOG IS LAST, AND IT SAYS WHAT IT COSTS. It used to
+                  sit second from the top of the REPORTING section, one thumb's
+                  width from REPORT A BUG, labelled only "CLEAR LOG" — a
+                  destructive erase of the exact evidence the button beside it
+                  sends. It is at the bottom of a collapsed drawer now, and the
+                  label names the consequence rather than the mechanism. */}
+              <TouchableOpacity
+                style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 }]}
+                onPress={() => { void handleClearLog(); }}
+                activeOpacity={0.7}
+                accessibilityRole="button"
+              >
+                <Text style={styles.sessionBtnSecondaryText}>
+                  {logCleared ? '✓ LOG ERASED' : 'ERASE THIS LOG (a report can no longer carry it)'}
+                </Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </View>
+        )}
+
+        {/* ⚠⚠ OTA-1666 — INTERFACE: the OTA-1227 display-scale control, moved
+            here from the SESSION tab's RUN section. It is a display setting and
+            this is the DISPLAY tab; it spent 439 OTAs one tab away from home.
+            The control is byte-for-byte the one that was there — same
+            `scaleSupported` gate (absent entirely off-desktop rather than shown
+            inert), same setUiScale, same S/M/L. It renders FIRST in this tab
+            because it scales everything the other cards tune. */}
+        {tab === 'display' && scaleSupported && (
+        <View style={styles.musicCard}>
+          <View style={styles.musicHeader}>
+            <Text style={styles.musicTitle} accessibilityRole="header">INTERFACE</Text>
+          </View>
+          <Text style={styles.sessionHint}>
+            Scales the whole interface — text and controls together — for your monitor.
+            F11 toggles fullscreen.
           </Text>
+          <View style={styles.musicRow}>
+            <Text style={styles.musicLabel}>Display size</Text>
+            <View style={{ flex: 1 }} />
+            {UI_SCALES.map((s2: UiScale) => (
+              <TouchableOpacity
+                key={s2}
+                onPress={() => { void setUiScale(s2); }}
+                style={[styles.musicToggle, uiScale === s2 && styles.musicToggleOn, { marginLeft: 6 }]}
+                activeOpacity={0.7}
+                accessibilityRole="button"
+                accessibilityLabel={`Display size ${s2}`}
+                accessibilityState={{ selected: uiScale === s2 }}
+              >
+                <Text style={[styles.musicToggleText, uiScale === s2 && styles.musicToggleTextOn]}>
+                  {s2 === 'small' ? 'S' : s2 === 'medium' ? 'M' : 'L'}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
         </View>
         )}
 
@@ -1562,13 +1671,10 @@ export function AboutScreen() {
         </View>
         )}
 
-        {/* v2.4.1 (OTA 046) — LORE tab. Renders the shared
-            LoreCodexBody (races / factions / places / timeline)
-            inside the gear-screen. Same content as the standalone
-            LoreScreen, no duplicate code. */}
-        {tab === 'lore' && (
-          <LoreCodexBody />
-        )}
+        {/* ⚠ OTA-1666 — the LORE tab body was `<LoreCodexBody />` and nothing
+            else. Deleted with its tab: the codex's home is the crest button on
+            the exploration screen, and a second door into the same component
+            from inside SETTINGS is what the owner called the duplicate. */}
 
         {tab === 'about' && (
         <>
