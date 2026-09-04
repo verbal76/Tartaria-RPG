@@ -27578,6 +27578,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // speaks a real refusal — the claims-success-without-checking class, on the one
 // control that moves you between the two halves of the game.
 export const OTA_BUILD_ID = '2026-09-04-1669-the-gate-opens-for-the-tap';
+// golem catch-up 2026-09-04: markerless publish of OTA-1669 - the gate opens for
+// the tap. ENTER OUTPOST was silently refused whenever the player had a travel
+// course plotted elsewhere (`passingThrough`, an orphan of OTA-1606 that once
+// stopped auto-travel dumping you inside every outpost en route, back when
+// arrival opened the gate by itself). The verb also printed its success line
+// BEFORE attempting the entry, so a refused tap read as a confirmation - the
+// owner tapped it eight times in thirteen seconds. The narration now lives
+// inside the branch that performs the entry, so it can neither outrun it nor
+// trail the room listing, and the verb speaks only to refuse. hal took the
+// marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-04-1668-the-row-says-what-it-does';
 // golem catch-up 2026-09-04: markerless publish of OTA-1668 - the row says what
 // it is and what it does. The vendor's WORKINGS TO LEARN rows now carry a
