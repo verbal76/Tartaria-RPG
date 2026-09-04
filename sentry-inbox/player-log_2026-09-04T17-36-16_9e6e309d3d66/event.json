@@ -1,0 +1,296 @@
+{
+  "id": "9e6e309d3d664347a2d142c21b9616b0",
+  "groupID": "7712304262",
+  "eventID": "9e6e309d3d664347a2d142c21b9616b0",
+  "projectID": "4511945117532160",
+  "size": 17850,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-04-1665-the-bug-report-pushes #mtn8jpkop1dk [inline 16/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1665-the-bug-report-pushes",
+  "message": "player-log 2026-09-04-1665-the-bug-report-pushes #mtn8jpkop1dk [inline 16/28]",
+  "title": "player-log 2026-09-04-1665-the-bug-report-pushes #mtn8jpkop1dk [inline 16/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:dba0:c4dc:ad2:ae57:503d:d553",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "f12998ffca8a453697a7b7d1f7d3f770",
+      "span_id": "90f42afd406e793a",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      " it.\n[2026-09-04T02:42:19.945Z] [reward] \u2726 Salvage haul:\n[2026-09-04T02:42:19.946Z] [reward]     \u2022 Scrap Metal x2 (Common)\n[2026-09-04T02:42:19.946Z] [reward]     \u2022 Worn Tartarian Coin x3 (Common)\n[2026-09-04T02:42:19.946Z] [reward]     \u2022 Glass-Beaded Strap (Uncommon)\n[2026-09-04T02:42:19.947Z] [reward]     \u2022 Splintered Haft End (Common)\n[2026-09-04T02:42:21.695Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-09-04T02:42:23.517Z] [player] investigate the ground\n[2026-09-04T02:42:23.518Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=3\n[2026-09-04T02:42:23.524Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Spider Silk (Common).\n[2026-09-04T02:42:23.532Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-09-04T02:42:23.791Z] [cognitive] CLIMB  (259ms)\n[2026-09-04T02:42:24.749Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.\n[2026-09-04T02:42:24.784Z] [player] investigate oil stain\n[2026-09-04T02:42:24.785Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=oil stain resolved=oil stain range=- enemies=0 hooks=3\n",
+      "[2026-09-04T02:42:24.787Z] [world] The oil stain sits the way ordinary things sit. The Arbiter does not lean in. You move on.\n[2026-09-04T02:42:24.788Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-09-04T02:42:24.788Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-04T02:42:25.025Z] [cognitive] neutral  (234ms)\n",
+      "[2026-09-04T02:42:26.049Z] [player] investigate wall\n[2026-09-04T02:42:26.050Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=wall resolved=wall range=- enemies=0 hooks=3\n[2026-09-04T02:42:26.051Z] [world] The wall reads as ordinary, which down here is a small kind of relief. You leave it be.\n",
+      "[2026-09-04T02:42:26.052Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-09-04T02:42:26.052Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-04T02:42:26.463Z] [debug] persist sizes(KB): total=364 player=105 wm=177[rooms=105 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=78 scene=4\n",
+      "[2026-09-04T02:42:27.585Z] [debug] qwen\u23f1 investigate_lore ok 2571ms read 1375ms/write 1030ms in 126t\u2192out 31t 10.9ms/t (155ch)\n[2026-09-04T02:42:27.585Z] [debug] qwen\u23f1 stats \u2014 narration:scene_intro_fill n4 avg8.4s max10.7s read7.8s/write1.6s \u26a02unusable in735t\u2192out17t ms/tok 9.5-11.9 cap2 \u23f82 \u27024/33.5s | investigate_lore n3 avg3.1s max4.0s read1.3s/write1.2s \u26a01unusable in126t\u2192out33t ms/tok 10.2-10.9 wa",
+      "it0.6s | flourish n1 avg2.3s max2.3s read1.9s/write0.4s in175t\u2192out14t ms/tok 10.6-10.6 | ambient n1 avg13.6s max13.6s read3.9s/write1.2s in359t\u2192out31t ms/tok 10.8-10.8 cap1 wait2.9s | ambient_fill n1 avg15.7s max15.7s \u26a01unusable in358t\u2192out31t cap1 \u27021/15.7s || WASTED 5 calls / 49.2s\n[2026-09-04T02:42:28.258Z] [cognitive] TAKE_COVER  (2204ms)\n",
+      "[2026-09-04T02:42:29.855Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-09-04T02:42:29.873Z] [debug] spawn: gear=[Plasma Cutter, Bone Splitter Axe, Mud Grinder Axe] window=10 roster=new\n[2026-09-04T02:42:29.874Z] [world] You walk west through open silt. The compass points west into open ground.\n[2026-09-04T02:42:29.875Z] [world] Some part of you has been keeping the place bookmarked.\n",
+      "[2026-09-04T02:42:30.363Z] [debug] qwen\u23f1 investigate_lore ok 3962ms wait 1856ms read 319ms/write 1764ms in 125t\u2192out 48t 2.6ms/t (209ch)\n[2026-09-04T02:42:31.472Z] [debug] ui: tap \"take / salvage\"\n[2026-09-04T02:42:32.977Z] [world] It takes two pulls. The Bone Splitter Axe is yours on the second.\n[2026-09-04T02:42:32.978Z] [reward] \u2726 Bone Splitter Axe (Common).\n",
+      "[2026-09-04T02:42:33.005Z] [world] The Mud Grinder Axe resists, then does not.\n[2026-09-04T02:42:33.006Z] [reward] \u2726 Mud Grinder Axe (Common).\n[2026-09-04T02:42:33.007Z] [world] You brace a foot and the Plasma Cutter gives.\n[2026-09-04T02:42:33.007Z] [reward] \u2726 Plasma Cutter (Common).\n[2026-09-04T02:42:34.184Z] [world] You work the cold spring over. A part of it comes loose, intact.\n",
+      "[2026-09-04T02:42:34.185Z] [world] You break the core stabilizer apart. Among the pieces, something worth keeping.\n[2026-09-04T02:42:34.185Z] [world] You strip the gauge carefully. Something usable comes free in your hand.\n[2026-09-04T02:42:34.185Z] [world] You salvage the rusted lever. The take is small but real.\n",
+      "[2026-09-04T02:42:34.186Z] [world] You work the signal spark over. A part of it comes loose, intact.\n[2026-09-04T02:42:34.186Z] [reward] \u2726 Salvage haul:\n[2026-09-04T02:42:34.186Z] [reward]     \u2022 Aether Dust x2 (Common)\n[2026-09-04T02:42:34.187Z] [reward]     \u2022 Automaton Circuit (Common)\n[2026-09-04T02:42:34.187Z] [reward]     \u2022 Worn Tartarian Coin x3 (Common)\n",
+      "[2026-09-04T02:42:34.187Z] [reward]     \u2022 Bent Nail x3 (Common)\n[2026-09-04T02:42:34.187Z] [reward]     \u2022 Scrap Metal x3 (Common)\n[2026-09-04T02:42:40.059Z] [debug] ui: tap \"investigate\"\n[2026-09-04T02:42:42.018Z] [player] investigate the ground\n[2026-09-04T02:42:42.019Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=3\n",
+      "[2026-09-04T02:42:42.026Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Wild Chicken (Rare).\n[2026-09-04T02:42:42.035Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-09-04T02:42:42.035Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-04T02:42:42.035Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-09-04T02:42:42.291Z] [cognitive] CLIMB  (255ms)\n[2026-09-04T02:42:47.977Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-09-04T02:42:47.994Z] [debug] spawn: gear=[Sentinel's Overcoat, Gale Binder Wand] window=10 roster=new\n[2026-09-04T02:42:47.996Z] [world] You walk north through open silt. The compass points north into open ground.\n",
+      "[2026-09-04T02:42:48.000Z] [world] You catch yourself checking, the way you check a pocket you already know is empty.\n[2026-09-04T02:42:49.441Z] [debug] ui: tap \"take / salvage\"\n[2026-09-04T02:42:50.964Z] [world] One good tug and the Gale Binder Wand is out.\n[2026-09-04T02:42:50.965Z] [reward] \u2726 Gale Binder Wand (Common).\n",
+      "[2026-09-04T02:42:50.987Z] [world] The Sentinel's Overcoat leaves a shape behind it in the mud, filling slowly.\n[2026-09-04T02:42:50.987Z] [reward] \u2726 Sentinel's Overcoat (Common).\n[2026-09-04T02:42:52.119Z] [world] You strip the battery housing down. Mostly debris \u2014 but a Cloth Scrap comes loose at the bottom of the pile.\n",
+      "[Filtered]",
+      "[2026-09-04T02:42:52.119Z] [world] You work the gravity valve over. A part of it comes loose, intact.\n[2026-09-04T02:42:52.119Z] [world] You work the rusted ladder over. A part of it comes loose, intact.\n[2026-09-04T02:42:52.120Z] [reward] \u2726 Salvage haul:\n[2026-09-04T02:42:52.120Z] [reward]     \u2022 Cloth Scrap (Common)\n[2026-09-04T02:42:52.120Z] [reward]     \u2022 Tin Valve Housing (Common)\n",
+      "[2026-09-04T02:42:52.120Z] [reward]     \u2022 Automaton Circuit x2 (Common)\n[2026-09-04T02:42:52.120Z] [reward]     \u2022 Bent Nail (Common)\n[2026-09-04T02:42:52.120Z] [reward]     \u2022 Aether Crystal x2 (Common)\n[2026-09-04T02:42:52.120Z] [reward]     \u2022 Stick (Common)\n[2026-09-04T02:42:53.744Z] [debug] ui: tap \"investigate\"\n[2026-09-04T02:42:55.664Z] [player] investigate the ground\n",
+      "[2026-09-04T02:42:55.664Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=3\n[2026-09-04T02:42:55.669Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Stick (Common).\n[2026-09-04T02:42:55.677Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n",
+      "[2026-09-04T02:42:55.678Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-04T02:42:55.678Z] [system] \u23f3 Time passed: 24 min\n[2026-09-04T02:42:55.938Z] [cognitive] CLIMB  (259ms)\n[2026-09-04T02:42:56.239Z] [debug] persist sizes(KB): total=354 player=107 wm=165[rooms=93 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=78 scene=5\n",
+      "[2026-09-04T02:43:00.026Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-09-04T02:43:00.044Z] [debug] spawn: gear=[Mud Shortsword, Bone Knife] window=10 roster=new\n[2026-09-04T02:43:00.046Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Talla Mudfoot, wandering trader. Tap the vendor banner to trade.\n",
+      "[2026-09-04T02:43:00.061Z] [world] Rare workings for sale: Titan Shield (200 TC), Titanforged Cuirass (500 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n[2026-09-04T02:43:00.061Z] [world] You walk west through open silt. The compass points west into open ground.\n",
+      "[2026-09-04T02:43:00.062Z] [world] The thought you set down here is right where you set it down.\n[2026-09-04T02:43:01.695Z] [debug] ui: tap \"take / salvage\"\n[2026-09-04T02:43:03.207Z] [world] You salvage the broken conduit. The take is small but real.\n[2026-09-04T02:43:03.207Z] [world] You break the cold spring apart. Among the pieces, something worth keeping.\n",
+      "[2026-09-04T02:43:03.207Z] [world] Slim pickings on the horn. You pocket a Bent Nail on the way out.\n[2026-09-04T02:43:03.208Z] [world] You break the stabilizer apart. Among the pieces, something worth keeping.\n[2026-09-04T02:43:03.208Z] [reward] \u2726 Salvage haul:\n[2026-09-04T02:43:03.208Z] [reward]     \u2022 Aether Crystal x3 (Common)\n[2026-09-04T02:43:03.208Z] [reward]     \u2022 Bent Nail x4 (Common)\n",
+      "[2026-09-04T02:43:04.301Z] [world] Where the Throwing Knife was, the ground is a shade darker.\n[2026-09-04T02:43:04.301Z] [reward] \u2726 Throwing Knife (Common).\n[2026-09-04T02:43:04.322Z] [world] You take the Mud Shortsword. The hollow it came out of starts closing.\n[2026-09-04T02:43:04.323Z] [reward] \u2726 Mud Shortsword (Common).\n[2026-09-04T02:43:07.210Z] [player] Ask why the stall is here\n",
+      "[2026-09-04T02:43:07.211Z] [world] \"Stall goes up where the ground is flat and comes down when it is not worth it,\" the trader says. \"That is the whole business plan.\"\n[2026-09-04T02:43:07.212Z] [world] Talla Mudfoot places you, roughly, and adjusts what they were about to say.\n[2026-09-04T02:43:08.361Z] [debug] qwen\u23f1 flourish ok 2135ms read 1842ms/write 279ms in 175t\u2192out 9t 10.5ms/t (36ch)\n",
+      "[2026-09-04T02:43:08.623Z] [debug] qwen\u23f1 \u2702 DISCARDED flourish after 2135ms \u2014 flourish:empty\n[2026-09-04T02:43:08.624Z] [debug] flourish: \u2205 2646ms\n[2026-09-04T02:43:08.843Z] [world] You let the conversation go and Talla Mudfoot gets back to it.\n[2026-09-04T02:43:17.929Z] [reward] Sold Bonebreaker Mace (Common) to Talla Mudfoot for 14 TC. (989 TC on hand)\n",
+      "[2026-09-04T02:43:18.026Z] [reward] Sold Plasma Thrower (Common) to Talla Mudfoot for 14 TC. (1003 TC on hand)\n[2026-09-04T02:43:18.114Z] [reward] Sold Bone Throwing Axe (Common) to Talla Mudfoot for 14 TC. (1017 TC on hand)\n[2026-09-04T02:43:18.202Z] [reward] Sold Bone Knife (Common) to Talla Mudfoot for 14 TC. (1031 TC on hand)\n",
+      "[2026-09-04T02:43:18.289Z] [reward] Sold Bone Knife (Common) to Talla Mudfoot for 14 TC. (1045 TC on hand)\n[2026-09-04T02:43:18.377Z] [reward] Sold Mud Heater Sword (Common) to Talla Mudfoot for 14 TC. (1059 TC on hand)\n[2026-09-04T02:43:18.463Z] [reward] Sold Bone Knife (Common) to Talla Mudfoot for 14 TC. (1073 TC on hand)\n",
+      "[2026-09-04T02:43:18.550Z] [reward] Sold Bone Knife (Common) to Talla Mudfoot for 14 TC. (1087 TC on hand)\n[2026-09-04T02:43:18.636Z] [reward] Sold Bone Knife (Common) to Talla Mudfoot for 14 TC. (1101 TC on hand)\n[2026-09-04T02:43:18.722Z] [reward] Sold Bone Knife (Common) to Talla Mudfoot for 14 TC. (1115 TC on hand)\n",
+      "[2026-09-04T02:43:18.809Z] [reward] Sold Bone Knife (Common) to Talla Mudfoot for 14 TC. (1129 TC on hand)\n[2026-09-04T02:43:18.895Z] [reward] Sold Bone Knife (Common) to Talla Mudfoot for 14 TC. (1143 TC on hand)\n[2026-09-04T02:43:18.980Z] [reward] Sold Compact Laser Pistol (Ranged) (Common) to Talla Mudfoot for 14 TC. (1157 TC on hand)\n",
+      "[2026-09-04T02:43:19.066Z] [reward] Sold Throwing Knife (Common) to Talla Mudfoot for 14 TC. (1171 TC on hand)\n[2026-09-04T02:43:19.152Z] [reward] Sold Tartarian Hand Axe (Common) to Talla Mudfoot for 13 TC. (1184 TC on hand)\n[2026-09-04T02:43:19.238Z] [reward] Sold Aetheric Rod (Common) to Talla Mudfoot for 13 TC. (1197 TC on hand)\n",
+      "[2026-09-04T02:43:19.323Z] [reward] Sold Mud-fist Wraps (Common) to Talla Mudfoot for 13 TC. (1210 TC on hand)\n[2026-09-04T02:43:19.408Z] [reward] Sold Plasma Dagger (Common) to Talla Mudfoot for 13 TC. (1223 TC on hand)\n[2026-09-04T02:43:19.493Z] [reward] Sold Bone Shortsword (Common) to Talla Mudfoot for 13 TC. (1236 TC on hand)\n",
+      "[2026-09-04T02:43:19.578Z] [reward] Sold Mud Knife (Common) to Talla Mudfoot for 13 TC. (1249 TC on hand)\n[2026-09-04T02:43:19.663Z] [reward] Sold Repeater Rifle (Common) to Talla Mudfoot for 13 TC. (1262 TC on hand)\n[2026-09-04T02:43:19.747Z] [reward] Sold Scrap Targe (Common) to Talla Mudfoot for 13 TC. (1275 TC on hand)\n",
+      "[2026-09-04T02:43:19.832Z] [reward] Sold Mud Harpoon (Common) to Talla Mudfoot for 13 TC. (1288 TC on hand)\n[2026-09-04T02:43:19.917Z] [reward] Sold Mud-fist Wraps (Common) to Talla Mudfoot for 13 TC. (1301 TC on hand)\n[2026-09-04T02:43:20.002Z] [reward] Sold Tartarian Hand Axe (Common) to Talla Mudfoot for 13 TC. (1314 TC on hand)\n",
+      "[2026-09-04T02:43:20.086Z] [reward] Sold Mud Grinder Axe (Common) to Talla Mudfoot for 13 TC. (1327 TC on hand)\n[2026-09-04T02:43:20.171Z] [reward] Sold Aetheric Baton (Common) to Talla Mudfoot for 13 TC. (1340 TC on hand)\n[2026-09-04T02:43:20.256Z] [reward] Sold Tartarian Bone Knife (Common) to Talla Mudfoot for 13 TC. (1353 TC on hand)\n",
+      "[2026-09-04T02:43:20.341Z] [reward] Sold Mud War Pike (Common) to Talla Mudfoot for 13 TC. (1366 TC on hand)\n[2026-09-04T02:43:20.426Z] [reward] Sold Bonebreaker Mace (Common) to Talla Mudfoot for 13 TC. (1379 TC on hand)\n[2026-09-04T02:43:20.510Z] [reward] Sold Plasma Thrower (Common) to Talla Mudfoot for 13 TC. (1392 TC on hand)\n",
+      "[2026-09-04T02:43:20.594Z] [reward] Sold Rusted Blade (Common) to Talla Mudfoot for 13 TC. (1405 TC on hand)\n[2026-09-04T02:43:20.678Z] [reward] Sold Repeater Rifle (Common) to Talla Mudfoot for 13 TC. (1418 TC on hand)\n[2026-09-04T02:43:20.763Z] [reward] Sold Bone Splitter Axe (Common) to Talla Mudfoot for 13 TC. (1431 TC on hand)\n",
+      "[2026-09-04T02:43:20.847Z] [reward] Sold Plasma Cutter (Common) to Talla Mudfoot for 13 TC. (1444 TC on hand)\n[2026-09-04T02:43:20.931Z] [reward] Sold Throwing Knife (Common) to Talla Mudfoot for 13 TC. (1457 TC on hand)\n[2026-09-04T02:43:21.014Z] [reward] Sold Bonebreaker Mace (Common) to Talla Mudfoot for 12 TC. (1469 TC on hand)\n",
+      "[2026-09-04T02:43:21.098Z] [reward] Sold Bone Shiv (Stealth) (Common) to Talla Mudfoot for 12 TC. (1481 TC on hand)\n["
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-04-1665-the-bug-report-pushes #mtn8jpkop1dk [inline 16/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtn8jpkop1dk"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1665-the-bug-report-pushes"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "16"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1665-the-bug-report-pushes"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:dba0:c4dc:ad2:ae57:503d:d553",
+      "query": "user.ip:\"2607:fb90:dba0:c4dc:ad2:ae57:503d:d553\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T17:36:15.119997Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "18": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 370,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T17:36:16.630000Z",
+  "fingerprints": [
+    "e07769fe74d2091018c3fc9233b25461"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1954691241,
+    "commitCount": 3,
+    "data": {},
+    "dateCreated": "2026-09-04T05:42:51.380846Z",
+    "dateReleased": "2026-09-04T05:43:40.910086Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "5bd2090d8c7d7204b9c58c0844aa871a9b237564",
+      "message": "[ota-hal] OTA-1665: the bug report pushes, and only once per changed log\n\nOwner, three instructions together: \"I've removed the send log\", \"report a bug\nshould be the button that pushed the log, so we don't need the email route\nanymore, we can archive that bug report land\", and \"after you do a bug report\nand that pushes a log, you can't do another one until something in the log is\nchanged. so you have to go play for a little bit before it allows you to push\nanother one.\"\n\n\u26a0\u26a0\u26a0 THE EMAIL ROUTE WAS NEVER THE DESIGN, and bugReport.ts said so in its own\nheader: true zero-paste needed `expo-mail-composer`, which needs a native\nrebuild, and native builds are parked. So what shipped instead was a clipboard\nstage, a READ-ME-FIRST body, a manual paste, and a report that \u2014 in the file's\nown words \u2014 \"arrives empty and we can't track the bug down\" whenever a step was\nmissed. That is exactly how both his daughters filed tonight. The transport this\nneeded has been in the app since August; it was simply never wired to the button\npeople actually find.\n\nNow REPORT A BUG persists to disk and pushes inline through the OTA-1504 durable\npipeline, carrying what the player typed, and the payload leads with a headline\n(character \u00b7 build \u00b7 first line of the description) so a list of reports reads as\na list of problems instead of a column of identical titles. That headline is the\nold email SUBJECT, which would otherwise have become dead code \u2014 the value it\ncarried is exactly what a Sentry event needs.\n\n\u26a0\u26a0 SEND LOG IS DELETED, one day after OTA-1661 opened it to everyone and gave it\na two-tap consent step. With REPORT A BUG asking for a description first \u2014 a\nbetter consent surface AND better evidence \u2014 two buttons doing one send was\nclutter on a screen that has already fought a wall of COPY buttons.\n\n\u26a0\u26a0\u26a0 EVERY OUTCOME SPEAKS, and this is the part I care most about. A push has\nreal failure modes a mailto never had: queued, refused as a duplicate, refused\nbecause reporting is off, no destination in this build. The old Title screen\nflashed \"\u2713 COPIED\" unconditionally \u2014 which was honest enough when opening a\nmailto could not meaningfully fail, and would now be a lie told by the one\ncontrol that must never lie. `composeAndSendBugReport` returns a player-facing\nmessage on every path, never throws, and both screens render it verbatim. The\nsuite proves that by RUNNING the paths and asserting the message is non-empty,\nnot by scanning for strings.\n\n\u26a0 THE DEDUPE fingerprints the raw slot log \u2014 length plus its newest tail, keyed\nper slot \u2014 and the check runs BEFORE anything is persisted or sent. Length alone\nwould let a same-size edit through; the tail costs nothing. The mark is stored\neven on a QUEUED send, because the bundle is already on disk and letting a\nsecond identical report through would queue a duplicate behind one already\nwaiting. And a general report with NO character loaded is never blocked: \"the\ngame won't start\" carries no play by definition, and gating it on a changed log\nwould lock a player out of the only channel they have.\n\n\u26a0 TWO THINGS THE CLEANUP TURNED UP. `_legacySendBugReport` sat unreferenced\nbehind an eslint-disable, still holding a clipboard stage, a READ-ME-FIRST body\nand a mailto \u2014 that is the land he asked to archive, and a dead function holding\na copy of it is precisely where it grows back. Deleted. And the OTA-063 comment\nabove the handler still described the clipboard workaround in loving detail;\nrewritten, because a comment describing a route the code no longer takes is what\nstopped me checking the Samarran entry two OTAs ago.\n\n\u26a0 THREE ASSERTIONS IN THIS SUITE WERE WRONG BEFORE THEY WERE RIGHT, all the same\nway: too broad. A blanket \"no COPIED\" condemned COPY URL and COPY CRASHED SAVE;\na blanket \"no mailto:\" condemned INVITE PLAYTESTER, which should keep one \u2014 that\nis a short human request to a person, not a payload; and a scan for the deleted\nfunction's bare name failed against its own obituary, which is the OTA-1659\nlesson arriving in a second file. Each is now scoped to the thing it means.\n\ndocs/PRIVACY.md moved with the button: the section is \"Sending a report\nyourself\", it names the description as something that gets sent, and it states\nthe one-report-per-changed-log rule, because the player will meet that refusal\nand should not think the button is broken.\n\n\u26a0\u26a0\u26a0 AND THE FULL SUITE CAUGHT TWO REAL DEFECTS THE GATES DID NOT. Eight suites\nwent red on the first run \u2014 1489, 1492, 1504, 1515, 1516, 1518, 1519 and 1661 \u2014\nbecause every one of them pinned SEND LOG's send path in AboutScreen, which this\nOTA deletes. Repointing them at bugReport.ts was not bookkeeping; it is what\nsurfaced the following, and I would have shipped both:\n\n  \u00b7 I wrote `landed = !chunk.stopped` \u2014 \"we attempted it, so it went.\" That is\n    precisely the false positive OTA-1519 exists because of: a send can be\n    attempted, report no stop reason, and still lose parts, which that OTA\n    measured as Sentry silently replacing NINE of 49 inline parts. Corrected to\n    `chunk.delivered`, the field that means `sent === parts`.\n\n  \u00b7 I dropped the result line entirely. OTA-1492's rule is that the next\n    diagnosis starts from a line, not a memory. The push now logs the full\n    `describeInlineSend` report \u2014 parts accepted, what flush said, where it\n    threw \u2014 which is strictly more than the one-word ok/not-ok line it replaced.\n\nIn both cases the CODE gained the property back; the tests did not lose it. That\nis the whole argument for pinning behaviour you have already paid to learn.\n\n\u26a0 ota1661's SUITE IS DELETED, not re-anchored. It was one day old and every\nassertion in it described a button that no longer exists \u2014 its premise is\nsuperseded, like ota1146's was. The claims that OUTLIVED it are carried into\nota1665 explicitly: the push is not owner-gated, `reportingEnabled()` still\ngoverns it, the privacy page names what leaves the device, and \u2014 importantly \u2014\nthe OTA-1505 auto-bundle is STILL owner-gated. SEND LOG going away does not\nmerge consent and collection.\n\n\u26a0 ONE GATE FAILED FOR THE RIGHT REASON. check:quotedpins refused a new\nprose-shaped pin, and rather than raise the baseline I measured which one it was\n(a dump of the counted set, diffed against HEAD: `'REPORT A BUG'` in ota1489) and\nconverted it to the wiring instead \u2014 `setBugReportOpen(true)`. A label pin fails\non a reword and passes if the button is deleted; the wiring pin cannot.\n\nGates: all 18 green by exit code. Full suite green.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T05:40:17Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1665-the-bug-report-pushes",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1665-the-bug-report-pushes",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T05:43:40.910086Z",
+          "dateCreated": "2026-09-04T05:42:51.380846Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155444244",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T05:43:41.150780Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1665-the-bug-report-pushes",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1665-the-bug-report-pushes",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1665-the-bug-report-pushes",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1665-the-bug-report-pushes)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "a0347c355fd44c67909a3bfa19243c54",
+  "previousEventID": "8c521f2ec2544ef983bd5d9b034a019c"
+}

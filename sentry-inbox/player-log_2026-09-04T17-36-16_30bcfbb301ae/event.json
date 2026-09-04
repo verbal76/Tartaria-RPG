@@ -1,0 +1,273 @@
+{
+  "id": "30bcfbb301ae44d8b774a952f788b4d5",
+  "groupID": "7712304262",
+  "eventID": "30bcfbb301ae44d8b774a952f788b4d5",
+  "projectID": "4511945117532160",
+  "size": 18121,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-04-1665-the-bug-report-pushes #mtn8jpkop1dk [inline 3/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1665-the-bug-report-pushes",
+  "message": "player-log 2026-09-04-1665-the-bug-report-pushes #mtn8jpkop1dk [inline 3/28]",
+  "title": "player-log 2026-09-04-1665-the-bug-report-pushes #mtn8jpkop1dk [inline 3/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:dba0:c4dc:ad2:ae57:503d:d553",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "f12998ffca8a453697a7b7d1f7d3f770",
+      "span_id": "90f42afd406e793a",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "e resolved=Searing Paste range=- enemies=0 hooks=2\n[2026-09-03T21:36:27.613Z] [reward] \u2726 Crafted Searing Paste. The Arbiter watches you set the last piece.\n[2026-09-03T21:36:27.755Z] [cognitive] neutral  (140ms)\n[2026-09-03T21:36:37.139Z] [player] craft Acid Flask\n",
+      "[2026-09-03T21:36:37.140Z] [debug] parser: intent=craft conf=1.00 verb=craft target=acid flask resolved=Acid Flask range=- enemies=0 hooks=2\n[2026-09-03T21:36:37.466Z] [reward] \u2726 Crafted Acid Flask \u00d710. The Arbiter watches you set the last piece.\n[2026-09-03T21:36:37.539Z] [cognitive] neutral  (71ms)\n[2026-09-03T21:36:40.667Z] [player] craft Incendiary Paste\n",
+      "[2026-09-03T21:36:40.668Z] [debug] parser: intent=craft conf=1.00 verb=craft target=incendiary paste resolved=Incendiary Paste range=- enemies=0 hooks=2\n[2026-09-03T21:36:40.919Z] [reward] \u2726 Crafted Incendiary Paste \u00d78. The Arbiter watches you set the last piece.\n[2026-09-03T21:36:41.005Z] [cognitive] neutral  (84ms)\n",
+      "[2026-09-03T21:36:41.123Z] [debug] persist sizes(KB): total=330 player=84 wm=156[rooms=85 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=85 scene=4\n[2026-09-03T21:36:48.437Z] [debug] homework: intro-fill armed after 6000ms idle (strike 2/3)\n[2026-09-03T21:36:55.955Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 7510ms read 6876ms/write 595ms in 727t\u2192out 17t 9.5ms/t (73ch)\n",
+      "[2026-09-03T21:36:55.971Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 7510ms \u2014 intro-fill:\u2205\n[2026-09-03T21:36:55.972Z] [debug] homework: scene_intro \"Mud Flood Nexus\" \u2205 7537ms\n[2026-09-03T21:37:19.866Z] [debug] appstate: active \u2192 background (was active for 316280ms)\n[2026-09-03T21:41:00.546Z] [debug] appstate: background \u2192 active (was background for 220674ms)\n",
+      "[2026-09-03T21:41:00.580Z] [debug] homework: intro-fill armed after 6000ms idle (strike 3/3)\n[2026-09-03T21:41:02.585Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 1844ms read 0ms/write 1757ms in 727t\u2192out 34t HIT-CAP (154ch)\n[2026-09-03T21:41:02.589Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 1844ms \u2014 intro-fill:\u2205\n",
+      "[2026-09-03T21:41:02.589Z] [debug] homework: scene_intro \"Mud Flood Nexus\" \u2205 2010ms\n[2026-09-03T21:41:10.059Z] [player] craft Rustbane Charm\n[2026-09-03T21:41:10.064Z] [debug] parser: intent=craft conf=1.00 verb=craft target=rustbane charm resolved=- range=- enemies=0 hooks=2\n",
+      "[2026-09-03T21:41:10.071Z] [arbiter] \"Crafting Rustbane Charm would strip Smooth Stone \u2192 Small Rock from your pack \u2014 confirm in the prompt to proceed, or it stays unmade.\"\n[2026-09-03T21:41:10.155Z] [cognitive] USE_ITEM  (80ms)\n[2026-09-03T21:41:12.373Z] [player] craft Rustbane Charm\n",
+      "[2026-09-03T21:41:12.374Z] [debug] parser: intent=craft conf=1.00 verb=craft target=rustbane charm resolved=- range=- enemies=0 hooks=2\n[2026-09-03T21:41:12.382Z] [arbiter] The Arbiter nods. \"Stripped for parts: Smooth Stone \u2192 Small Rock.\"\n[2026-09-03T21:41:12.388Z] [reward] \u2726 Crafted Rustbane Charm. The Arbiter watches you set the last piece.\n",
+      "[2026-09-03T21:41:12.530Z] [cognitive] USE_ITEM  (140ms)\n[2026-09-03T21:41:12.905Z] [debug] qwen\u23f1 ambient preempted 2778ms read 0ms/write 0ms in 363t\u2192out 0t (0ch)\n[2026-09-03T21:41:12.909Z] [debug] arbiter: ambient cut short 2837ms \u2014 yielded to the player\n[2026-09-03T21:41:12.910Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient after 2778ms \u2014 ambient:preempted\n",
+      "[2026-09-03T21:41:22.922Z] [player] craft Scribe's Signet\n[2026-09-03T21:41:22.923Z] [debug] parser: intent=craft conf=1.00 verb=craft target=scribe signet resolved=- range=- enemies=0 hooks=2\n[2026-09-03T21:41:22.962Z] [arbiter] \"Crafting Scribe's Signet would strip Cloth Scrap \u2192 Patched Cloth from your pack \u2014 confirm in the prompt to proceed, or it stays unmade.\"\n",
+      "[2026-09-03T21:41:23.015Z] [cognitive] neutral  (51ms)\n[2026-09-03T21:41:24.825Z] [player] craft Scribe's Signet\n[2026-09-03T21:41:24.825Z] [debug] parser: intent=craft conf=1.00 verb=craft target=scribe signet resolved=- range=- enemies=0 hooks=2\n[2026-09-03T21:41:24.863Z] [arbiter] The Arbiter nods. \"Stripped for parts: Cloth Scrap \u2192 Patched Cloth.\"\n",
+      "[2026-09-03T21:41:24.876Z] [reward] \u2726 Crafted Scribe's Signet. The Arbiter watches you set the last piece.\n[2026-09-03T21:41:24.970Z] [cognitive] neutral  (92ms)\n[2026-09-03T21:41:31.418Z] [player] craft Tin Ward Ring\n[2026-09-03T21:41:31.418Z] [debug] parser: intent=craft conf=1.00 verb=craft target=tin ward ring resolved=cold spring range=- enemies=0 hooks=2\n",
+      "[2026-09-03T21:41:31.421Z] [reward] \u2726 Crafted Tin Ward Ring. The Arbiter watches you set the last piece.\n[2026-09-03T21:41:31.422Z] [debug] arbiter: template (reason=intent-not-allowed:craft)\n[2026-09-03T21:41:31.422Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T21:41:31.521Z] [cognitive] neutral  (98ms)\n[2026-09-03T21:41:36.493Z] [player] craft Tin Ward Ring\n",
+      "[2026-09-03T21:41:36.494Z] [debug] parser: intent=craft conf=1.00 verb=craft target=tin ward ring resolved=Tin Ward Ring range=- enemies=0 hooks=2\n[2026-09-03T21:41:36.503Z] [reward] \u2726 Crafted Tin Ward Ring. The Arbiter watches you set the last piece.\n[2026-09-03T21:41:36.504Z] [debug] arbiter: template (reason=intent-not-allowed:craft)\n",
+      "[2026-09-03T21:41:36.505Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T21:41:36.633Z] [cognitive] neutral  (127ms)\n[2026-09-03T21:41:42.726Z] [player] craft Tartarian Oath-Band\n[2026-09-03T21:41:42.727Z] [debug] parser: intent=craft conf=1.00 verb=craft target=tartarian oath band resolved=- range=- enemies=0 hooks=2\n",
+      "[2026-09-03T21:41:42.729Z] [reward] \u2726 Crafted Tartarian Oath-Band. The Arbiter watches you set the last piece.\n[2026-09-03T21:41:42.730Z] [debug] arbiter: template (reason=intent-not-allowed:craft)\n[2026-09-03T21:41:42.730Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T21:41:42.849Z] [cognitive] SEARCH \u00b7 TRAVEL \u00b7 USE_ITEM  (118ms)\n",
+      "[2026-09-03T21:41:47.787Z] [debug] persist sizes(KB): total=331 player=85 wm=156[rooms=85 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=85 scene=4\n[2026-09-03T21:41:49.881Z] [debug] ui: tap \"inventory\"\n",
+      "[2026-09-03T21:42:00.910Z] [debug] qwen\u23f1 item_synthesis_hw ok 5316ms read/write unusable (native mis-reported 49165ms/1562ms \u2014 llama.rn split bug, not this call) in 327t\u2192out 40t (162ch)\n[2026-09-03T21:42:00.915Z] [debug] qwen\u23f1 \u2702 DISCARDED item_synthesis_hw after 5316ms \u2014 item_synth:rejected-by-clamp bad-kind=\"weapon_coating\"\n",
+      "[2026-09-03T21:42:00.916Z] [debug] homework: item_desc \"Acid Flask\" \u2205 5335ms\n[2026-09-03T21:42:26.927Z] [debug] qwen\u23f1 item_synthesis_hw ok 1278ms read 342ms/write 908ms in 325t\u2192out 25t 1.1ms/t (94ch)\n[2026-09-03T21:42:26.940Z] [debug] homework: item_desc \"Veil of Peace\" \u2713 1302ms\n",
+      "[2026-09-03T21:42:36.219Z] [debug] stats: STR17 DEX21 INT11 WIS17 CHA11 STE8 | gear: WIS+5,INT+1,STR+5,DEX+9,STE+2 | worn: main=Magnetic Axe off=Reclaimers Guild Shroud-Spun Slinger head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Amulet of the Silt Warden ring=Light-Finger Guild Band ring2=",
+      "Tin Ward Ring\n[2026-09-03T21:42:45.051Z] [debug] stats: STR17 DEX21 INT11 WIS17 CHA11 STE8 | gear: WIS+5,INT+1,STR+5,DEX+9,STE+2 | worn: main=Magnetic Axe off=Reclaimers Guild Shroud-Spun Slinger head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Amulet of the Silt Warden ring=Light-Finger Gui",
+      "ld Band ring2=Tin Ward Ring ring3=Tin Ward Ring\n[2026-09-03T21:42:56.315Z] [debug] stats: STR17 DEX21 INT13 WIS17 CHA11 STE8 | gear: WIS+5,INT+3,STR+5,DEX+9,STE+2 | worn: main=Magnetic Axe off=Reclaimers Guild Shroud-Spun Slinger head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Amulet of the",
+      " Silt Warden ring=Light-Finger Guild Band ring2=Tin Ward Ring ring3=Tin Ward Ring ring4=Scribe's Signet\n[2026-09-03T21:42:59.394Z] [debug] qwen\u23f1 item_synthesis_hw ok 2248ms read 642ms/write 1563ms in 333t\u2192out 39t 1.9ms/t (174ch)\n[2026-09-03T21:43:01.028Z] [debug] homework: item_desc \"Architect's Sight Enhancer\" \u2713 4797ms\n",
+      "[2026-09-03T21:43:02.493Z] [debug] stats: STR19 DEX19 INT13 WIS17 CHA11 STE8 | gear: WIS+5,INT+3,STR+7,DEX+7,STE+2 | worn: main=Magnetic Axe off=Reclaimers Guild Shroud-Spun Slinger head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Amulet of the Silt Warden ring=Tartarian Oath-Band ring2=Tin ",
+      "Ward Ring ring3=Tin Ward Ring ring4=Scribe's Signet\n[2026-09-03T21:45:01.572Z] [debug] appstate: active \u2192 background (was active for 241032ms)\n[2026-09-03T21:45:01.822Z] [debug] persist sizes(KB): total=332 player=85 wm=156[rooms=85 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=86 scene=4\n[2026-09-03T22:43:49.320Z] [debug] appstate: background \u2192 active (was background for 3527740ms)\n",
+      "[2026-09-03T22:43:58.068Z] [debug] ctx: RELEASED \u2014 live=0 (opened=1 released=1)\n[2026-09-03T22:43:58.377Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a0696f-45b5-71a1-95e5-82a6a9f4f506\n[2026-09-03T22:43:58.377Z] [debug] ota: Checking\u2026\n[2026-09-03T22:43:58.508Z] [debug] ota: Already up to date\n[2026-09-03T22:43:58.508Z] [debug] ota: boot check result = noUpdate\n",
+      "[2026-09-03T22:43:58.578Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-09-03T22:43:58.579Z] [debug] voice: bundled idle\n[2026-09-03T22:43:59.229Z] [debug] send-log: bundle #mtm1iz3wmdt1 attempt 2/5 delivered to Sentry\n[2026-09-03T23:07:19.129Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a0696f-45b5-71a1-95e5-82a6a9f4f506\n",
+      "[2026-09-03T23:07:19.130Z] [debug] ota: Checking\u2026\n[2026-09-03T23:07:19.193Z] [debug] ota: Already up to date\n[2026-09-03T23:07:19.193Z] [debug] ota: boot check result = noUpdate\n[2026-09-03T23:07:19.273Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-09-03T23:07:19.273Z] [debug] voice: bundled idle\n",
+      "[2026-09-03T23:07:19.603Z] [debug] send-log: bundle #mtm1iz3wmdt1 attempt 3/5 delivered to Sentry\n[2026-09-03T23:48:29.066Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a0696f-45b5-71a1-95e5-82a6a9f4f506\n[2026-09-03T23:48:29.067Z] [debug] ota: Checking\u2026\n[2026-09-03T23:48:30.196Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n",
+      "[2026-09-03T23:48:30.265Z] [debug] ota: Saving progress\u2026\n[2026-09-03T23:48:30.266Z] [debug] ota: Restarting to apply\u2026\n[2026-09-03T23:48:30.459Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a069a9-5aae-79eb-8570-56ecdbb80207\n[2026-09-03T23:48:30.459Z] [debug] ota: Checking\u2026\n[2026-09-03T23:48:30.547Z] [debug] ota: Already up to date\n",
+      "[2026-09-03T23:48:30.548Z] [debug] ota: boot check result = noUpdate\n[2026-09-03T23:48:30.613Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-09-03T23:48:30.613Z] [debug] voice: bundled idle\n[2026-09-03T23:48:31.111Z] [debug] send-log: bundle #mtm1iz3wmdt1 attempt 4/5 delivered to Sentry\n",
+      "[2026-09-03T23:48:34.649Z] [debug] OTA applied: 2026-09-03-1653-the-wear-ward \u2192 2026-09-03-1655-the-card-is-asked.\n[2026-09-03T23:48:34.649Z] [debug] OTA session start: 2026-09-03-1655-the-card-is-asked.\n[2026-09-03T23:48:34.649Z] [world] You step back into Mud Flood Nexus. The world waits for your move.\n",
+      "[2026-09-03T23:48:34.649Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. \"Welcome back, Cheddar Bob. The road kept your place.\"\n[2026-09-03T23:48:35.019Z] [debug] \u2550\u2550\u2550 SESSION 2026-09-03T23:48:35.015Z \u00b7 build 2026-09-03-1655-the-card-is-asked \u00b7 updated from 2026-09-03-1653-the-wear-ward \u00b7 previous entry moments earlier \u2550\u2550\u2550\n",
+      "[2026-09-03T23:48:35.020Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n[2026-09-03T23:48:35.020Z] [debug] missions: hunt:hunt_bog_dragon stage 4/7 [diplomacy] @monarch_waystation npc=\"Old Mira\" needs=The Boy's Locket\u2713 gives=Eshren's Name-Token\n",
+      "[2026-09-03T23:48:35.020Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n[2026-09-03T23:48:35.020Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n",
+      "[2026-09-03T23:48:35.021Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n[2026-09-03T23:48:35.021Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n",
+      "[2026-09-03T23:48:35.021Z] [debug] missions: \u00b7 at=mud_flood_nexus travelTo=monarch_waystation\n[2026-09-03T23:48:35.021Z] [debug] boot: life bmtm6ejwl3h started 2026-09-03T23:48:30.405Z \u00b7 FOLLOWED AN OTA APPLY 138ms ago via boot-front \u00b7 prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)\n",
+      "[2026-09-03T23:48:35.883Z] [debug] send-log: crash on record (2026-09-03T22:43:58.985Z) \u2014 game log pushed automatically, delivered to Sentry, kept on disk as #mtm6enrfz3iy\n[2026-09-03T23:48:52.933Z] [debug] ui: tap \"rest\"\n[2026-09-03T23:48:52.938Z] [debug] qwen: loading (was idle) \u2014 the Arbiter speaks templates until it is ready\n[2026-09-03T23:48:52.947Z] [player] rest\n",
+      "[2026-09-03T23:48:52.948Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=2\n[2026-09-03T23:48:52.954Z] [world] Mercy circles three times and curls beside you. Her breathing slows to yours.\n[2026-09-03T23:48:52.955Z] [world] You rest for 8 hours. +8 HP recovered. (Day 62, afternoon)\n[2026-09-03T23:48:52.967Z] [system] \u23f3 Time passed: 8h\n",
+      "[2026-09-03T23:48:53.170Z] [cognitive] REST  (203ms)\n[2026-09-03T23:48:53.747Z] [debug] ui: tap \"rest\"\n[2026-09-03T23:48:53.757Z] [player] rest\n[2026-09-03T23:48:53.757Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=2\n[2026-09-03T23:48:53.759Z] [world] Mercy turns twice, thinks about a third, and drops where she stands.\n",
+      "[2026-09-03T23:48:53.759Z] [world] You rest for 8 hours. +8 HP recovered. (Day 62, evening)\n[2026-09-03T23:48:53.759Z] [arbiter] The Arbiter is quiet a long moment after you stir. \"I was wrong about something earlier. I'll say so when the moment's right.\"\n[2026-09-03T23:48:53.770Z] [system] \u23f3 Time passed: 8h\n[2026-09-03T23:48:53.966Z] [cognitive] REST  (192ms)\n",
+      "[2026-09-03T23:48:54.387Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-09-03T23:48:54.749Z] [debug] ui: tap \"rest\"\n[2026-09-03T23:48:54.752Z] [player] rest\n[2026-09-03T23:48:54.752Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=2\n",
+      "[2026-09-03T23:48:54.752Z] [world] Mercy paws the ground flat before trusting it, then folds down onto it.\n[2026-09-03T23:48:54.753Z"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-04-1665-the-bug-report-pushes #mtn8jpkop1dk [inline 3/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtn8jpkop1dk"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1665-the-bug-report-pushes"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "3"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1665-the-bug-report-pushes"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:dba0:c4dc:ad2:ae57:503d:d553",
+      "query": "user.ip:\"2607:fb90:dba0:c4dc:ad2:ae57:503d:d553\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T17:36:14.777199Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T17:36:16.629000Z",
+  "fingerprints": [
+    "e07769fe74d2091018c3fc9233b25461"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1954691241,
+    "commitCount": 3,
+    "data": {},
+    "dateCreated": "2026-09-04T05:42:51.380846Z",
+    "dateReleased": "2026-09-04T05:43:40.910086Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "5bd2090d8c7d7204b9c58c0844aa871a9b237564",
+      "message": "[ota-hal] OTA-1665: the bug report pushes, and only once per changed log\n\nOwner, three instructions together: \"I've removed the send log\", \"report a bug\nshould be the button that pushed the log, so we don't need the email route\nanymore, we can archive that bug report land\", and \"after you do a bug report\nand that pushes a log, you can't do another one until something in the log is\nchanged. so you have to go play for a little bit before it allows you to push\nanother one.\"\n\n\u26a0\u26a0\u26a0 THE EMAIL ROUTE WAS NEVER THE DESIGN, and bugReport.ts said so in its own\nheader: true zero-paste needed `expo-mail-composer`, which needs a native\nrebuild, and native builds are parked. So what shipped instead was a clipboard\nstage, a READ-ME-FIRST body, a manual paste, and a report that \u2014 in the file's\nown words \u2014 \"arrives empty and we can't track the bug down\" whenever a step was\nmissed. That is exactly how both his daughters filed tonight. The transport this\nneeded has been in the app since August; it was simply never wired to the button\npeople actually find.\n\nNow REPORT A BUG persists to disk and pushes inline through the OTA-1504 durable\npipeline, carrying what the player typed, and the payload leads with a headline\n(character \u00b7 build \u00b7 first line of the description) so a list of reports reads as\na list of problems instead of a column of identical titles. That headline is the\nold email SUBJECT, which would otherwise have become dead code \u2014 the value it\ncarried is exactly what a Sentry event needs.\n\n\u26a0\u26a0 SEND LOG IS DELETED, one day after OTA-1661 opened it to everyone and gave it\na two-tap consent step. With REPORT A BUG asking for a description first \u2014 a\nbetter consent surface AND better evidence \u2014 two buttons doing one send was\nclutter on a screen that has already fought a wall of COPY buttons.\n\n\u26a0\u26a0\u26a0 EVERY OUTCOME SPEAKS, and this is the part I care most about. A push has\nreal failure modes a mailto never had: queued, refused as a duplicate, refused\nbecause reporting is off, no destination in this build. The old Title screen\nflashed \"\u2713 COPIED\" unconditionally \u2014 which was honest enough when opening a\nmailto could not meaningfully fail, and would now be a lie told by the one\ncontrol that must never lie. `composeAndSendBugReport` returns a player-facing\nmessage on every path, never throws, and both screens render it verbatim. The\nsuite proves that by RUNNING the paths and asserting the message is non-empty,\nnot by scanning for strings.\n\n\u26a0 THE DEDUPE fingerprints the raw slot log \u2014 length plus its newest tail, keyed\nper slot \u2014 and the check runs BEFORE anything is persisted or sent. Length alone\nwould let a same-size edit through; the tail costs nothing. The mark is stored\neven on a QUEUED send, because the bundle is already on disk and letting a\nsecond identical report through would queue a duplicate behind one already\nwaiting. And a general report with NO character loaded is never blocked: \"the\ngame won't start\" carries no play by definition, and gating it on a changed log\nwould lock a player out of the only channel they have.\n\n\u26a0 TWO THINGS THE CLEANUP TURNED UP. `_legacySendBugReport` sat unreferenced\nbehind an eslint-disable, still holding a clipboard stage, a READ-ME-FIRST body\nand a mailto \u2014 that is the land he asked to archive, and a dead function holding\na copy of it is precisely where it grows back. Deleted. And the OTA-063 comment\nabove the handler still described the clipboard workaround in loving detail;\nrewritten, because a comment describing a route the code no longer takes is what\nstopped me checking the Samarran entry two OTAs ago.\n\n\u26a0 THREE ASSERTIONS IN THIS SUITE WERE WRONG BEFORE THEY WERE RIGHT, all the same\nway: too broad. A blanket \"no COPIED\" condemned COPY URL and COPY CRASHED SAVE;\na blanket \"no mailto:\" condemned INVITE PLAYTESTER, which should keep one \u2014 that\nis a short human request to a person, not a payload; and a scan for the deleted\nfunction's bare name failed against its own obituary, which is the OTA-1659\nlesson arriving in a second file. Each is now scoped to the thing it means.\n\ndocs/PRIVACY.md moved with the button: the section is \"Sending a report\nyourself\", it names the description as something that gets sent, and it states\nthe one-report-per-changed-log rule, because the player will meet that refusal\nand should not think the button is broken.\n\n\u26a0\u26a0\u26a0 AND THE FULL SUITE CAUGHT TWO REAL DEFECTS THE GATES DID NOT. Eight suites\nwent red on the first run \u2014 1489, 1492, 1504, 1515, 1516, 1518, 1519 and 1661 \u2014\nbecause every one of them pinned SEND LOG's send path in AboutScreen, which this\nOTA deletes. Repointing them at bugReport.ts was not bookkeeping; it is what\nsurfaced the following, and I would have shipped both:\n\n  \u00b7 I wrote `landed = !chunk.stopped` \u2014 \"we attempted it, so it went.\" That is\n    precisely the false positive OTA-1519 exists because of: a send can be\n    attempted, report no stop reason, and still lose parts, which that OTA\n    measured as Sentry silently replacing NINE of 49 inline parts. Corrected to\n    `chunk.delivered`, the field that means `sent === parts`.\n\n  \u00b7 I dropped the result line entirely. OTA-1492's rule is that the next\n    diagnosis starts from a line, not a memory. The push now logs the full\n    `describeInlineSend` report \u2014 parts accepted, what flush said, where it\n    threw \u2014 which is strictly more than the one-word ok/not-ok line it replaced.\n\nIn both cases the CODE gained the property back; the tests did not lose it. That\nis the whole argument for pinning behaviour you have already paid to learn.\n\n\u26a0 ota1661's SUITE IS DELETED, not re-anchored. It was one day old and every\nassertion in it described a button that no longer exists \u2014 its premise is\nsuperseded, like ota1146's was. The claims that OUTLIVED it are carried into\nota1665 explicitly: the push is not owner-gated, `reportingEnabled()` still\ngoverns it, the privacy page names what leaves the device, and \u2014 importantly \u2014\nthe OTA-1505 auto-bundle is STILL owner-gated. SEND LOG going away does not\nmerge consent and collection.\n\n\u26a0 ONE GATE FAILED FOR THE RIGHT REASON. check:quotedpins refused a new\nprose-shaped pin, and rather than raise the baseline I measured which one it was\n(a dump of the counted set, diffed against HEAD: `'REPORT A BUG'` in ota1489) and\nconverted it to the wiring instead \u2014 `setBugReportOpen(true)`. A label pin fails\non a reword and passes if the button is deleted; the wiring pin cannot.\n\nGates: all 18 green by exit code. Full suite green.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T05:40:17Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1665-the-bug-report-pushes",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1665-the-bug-report-pushes",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T05:43:40.910086Z",
+          "dateCreated": "2026-09-04T05:42:51.380846Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155444244",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T05:43:41.150780Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1665-the-bug-report-pushes",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1665-the-bug-report-pushes",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1665-the-bug-report-pushes",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1665-the-bug-report-pushes)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "348333c514c2496aaa3c21541ef69a72",
+  "previousEventID": "2bb4d16a5e4346469133811a59a1d09a"
+}

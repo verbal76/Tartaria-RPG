@@ -1,0 +1,301 @@
+{
+  "id": "b8f4077a9c8c4bca820647da3f64dd63",
+  "groupID": "7712330506",
+  "eventID": "b8f4077a9c8c4bca820647da3f64dd63",
+  "projectID": "4511945117532160",
+  "size": 17872,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-04-1666-everything-in-its-room #mtn91pdwbmaq [inline 3/4]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1666-everything-in-its-room",
+  "message": "player-log 2026-09-04-1666-everything-in-its-room #mtn91pdwbmaq [inline 3/4]",
+  "title": "player-log 2026-09-04-1666-everything-in-its-room #mtn91pdwbmaq [inline 3/4]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:dba0:c4dc:ad2:ae57:503d:d553",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "571a504ffab14ad9ab2beea63ffc32f5",
+      "span_id": "9790e4dbb7134ed6",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      " \u00b7 east: Sinking Cathedral (3 tiles, 8 hours) \u00b7 south: The Buried Cities (3 tiles, 8 hours) \u00b7 west: Dynasty Border Post (4 tiles, 10 hours)\n[2026-09-04T17:41:33.108Z] [world] You could walk this stretch with your eyes shut, and nearly do. The bodies you left are still here. Nothing has moved in to replace them.\n",
+      "You are at Tartarian Pilgrim Camp. A rest-camp of True Tartarian pilgrims on the frontier track, where the faithful gather before the long descent into the deep buried cities.\n[2026-09-04T17:41:33.108Z] [world] Rain the color of old oil. It pools on Aetherstone and refuses to soak in.\n[2026-09-04T17:41:33.075Z] [debug] missions: \u00b7 at=pilgrim_waycamp travelTo=mud_seas\n",
+      "[2026-09-04T17:41:33.074Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n[2026-09-04T17:41:33.074Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n",
+      "[2026-09-04T17:41:33.074Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n[2026-09-04T17:41:33.074Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc=\"the Order envoy\" gives=Sealed Reliquary Box PAUSED\n",
+      "[2026-09-04T17:41:33.074Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n[2026-09-04T17:41:33.074Z] [debug] missions: hunt:hunt_bog_dragon stage 5/7 [attack_provoke\u2192attack] @mud_seas needs=Eshren's Name-Token\u2713 spawn=Mud Harpy\u00d73 AMBUSH\n",
+      "[2026-09-04T17:41:33.073Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n[2026-09-04T17:41:33.072Z] [debug] scene: loc=pilgrim_waycamp hub=- arrival=n opening=n passing=y\n[2026-09-04T17:41:33.072Z] [world] You cross to the gate and step through.\n[2026-09-04T17:41:33.072Z] [player] enter outpost\n",
+      "[2026-09-04T17:41:33.069Z] [debug] ui: tap \"ENTER OUTPOST\"\n[2026-09-04T17:41:30.343Z] [debug] persist sizes(KB): total=333 player=72 wm=174[rooms=99 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=85 scene=2\n",
+      "[2026-09-04T17:41:30.089Z] [world] [Tartarian Pilgrim Camp] north: Garrin (return the folio) (17 tiles, 1 day, 19 hours) \u00b7 east: Sinking Cathedral (3 tiles, 8 hours) \u00b7 south: The Buried Cities (3 tiles, 8 hours) \u00b7 west: Dynasty Border Post (4 tiles, 10 hours)\n",
+      "[2026-09-04T17:41:30.085Z] [world] You know this place. Not well, but you know it. The bodies you left are still here. Nothing has moved in to replace them.\nHazard: Awakening Defenses. Dormant Tartarian sentinels register your heat signature. Old gears begin to grind.\n",
+      "You are at Tartarian Pilgrim Camp. A rest-camp of True Tartarian pilgrims on the frontier track, where the faithful gather before the long descent into the deep buried cities.\n[2026-09-04T17:41:30.085Z] [world] Rain the color of old oil. It pools on Aetherstone and refuses to soak in.\n[2026-09-04T17:41:30.049Z] [debug] missions: \u00b7 at=pilgrim_waycamp travelTo=mud_seas\n",
+      "[2026-09-04T17:41:30.048Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n[2026-09-04T17:41:30.048Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n",
+      "[2026-09-04T17:41:30.048Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n[2026-09-04T17:41:30.048Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc=\"the Order envoy\" gives=Sealed Reliquary Box PAUSED\n",
+      "[2026-09-04T17:41:30.047Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n[2026-09-04T17:41:30.047Z] [debug] missions: hunt:hunt_bog_dragon stage 5/7 [attack_provoke\u2192attack] @mud_seas needs=Eshren's Name-Token\u2713 spawn=Mud Harpy\u00d73 AMBUSH\n",
+      "[2026-09-04T17:41:30.046Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n[2026-09-04T17:41:30.044Z] [debug] scene: loc=pilgrim_waycamp hub=- arrival=n opening=n passing=y\n[2026-09-04T17:41:30.044Z] [world] You cross to the gate and step through.\n[2026-09-04T17:41:30.042Z] [player] enter outpost\n",
+      "[2026-09-04T17:41:30.039Z] [debug] ui: tap \"ENTER OUTPOST\"\n[2026-09-04T17:41:26.265Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient after 2778ms \u2014 ambient:preempted\n[2026-09-04T17:41:26.264Z] [debug] arbiter: ambient cut short 3356ms \u2014 yielded to the player\n[2026-09-04T17:41:26.088Z] [debug] qwen\u23f1 ambient preempted 2778ms read 0ms/write 0ms in 366t\u2192out 0t (0ch)\n",
+      "[2026-09-04T17:41:25.799Z] [debug] arbiter: intro \u2713 0ms (banked, 1 left)\n[2026-09-04T17:41:25.797Z] [arbiter] You continue to investigate the mud pond, the only water body accessible in the north exit.\n",
+      "[2026-09-04T17:41:25.795Z] [world] [Tartarian Pilgrim Camp] north: Garrin (return the folio) (17 tiles, 1 day, 19 hours) \u00b7 east: Sinking Cathedral (3 tiles, 8 hours) \u00b7 south: The Buried Cities (3 tiles, 8 hours) \u00b7 west: Dynasty Border Post (4 tiles, 10 hours)\n",
+      "[2026-09-04T17:41:25.790Z] [world] Something about this ground is already familiar. The bodies you left are still here. Nothing has moved in to replace them.\nThe horizon shimmers, settles, shimmers again.\nYou are at Tartarian Pilgrim Camp. A rest-camp of True Tartarian pilgrims on the frontier track, where the faithful gather before the long descent into the deep buried cities.\n",
+      "[2026-09-04T17:41:25.790Z] [world] Rain the color of old oil. It pools on Aetherstone and refuses to soak in.\n[2026-09-04T17:41:25.759Z] [debug] missions: \u00b7 at=pilgrim_waycamp travelTo=mud_seas\n[2026-09-04T17:41:25.759Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n",
+      "[2026-09-04T17:41:25.759Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n[2026-09-04T17:41:25.758Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n",
+      "[2026-09-04T17:41:25.758Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc=\"the Order envoy\" gives=Sealed Reliquary Box PAUSED\n[2026-09-04T17:41:25.758Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n",
+      "[2026-09-04T17:41:25.758Z] [debug] missions: hunt:hunt_bog_dragon stage 5/7 [attack_provoke\u2192attack] @mud_seas needs=Eshren's Name-Token\u2713 spawn=Mud Harpy\u00d73 AMBUSH\n[2026-09-04T17:41:25.758Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-04T17:41:25.757Z] [debug] scene: loc=pilgrim_waycamp hub=- arrival=n opening=n passing=y\n[2026-09-04T17:41:25.757Z] [world] You cross to the gate and step through.\n[2026-09-04T17:41:25.757Z] [player] enter outpost\n[2026-09-04T17:41:25.746Z] [debug] ui: tap \"ENTER OUTPOST\"\n[2026-09-04T17:41:23.130Z] [cognitive] SWIM  (220ms)\n[2026-09-04T17:41:22.908Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-09-04T17:41:22.890Z] [reward] You scrape at the silt with the sentinel cleaver. \u2726 Recovered Golem Core (Rare).\n[2026-09-04T17:41:22.885Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=- range=- enemies=0 hooks=0\n[2026-09-04T17:41:22.884Z] [player] investigate the mud\n[2026-09-04T17:41:21.116Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-09-04T17:41:11.489Z] [reward] Bought the Warden's Bulwark Pendant working for 200 TC. \u2726 Recipe learned (Rare)! Open Crafting to forge it \u2014 you'll still need the materials.\n[2026-09-04T17:41:04.470Z] [reward] Bought the Warden's Aegis working for 500 TC. \u2726 Recipe learned (Legendary)! Open Crafting to forge it \u2014 you'll still need the materials.\n",
+      "[2026-09-04T17:40:57.621Z] [debug] persist sizes(KB): total=335 player=74 wm=174[rooms=99 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=84 scene=2\n[2026-09-04T17:40:55.770Z] [reward] Sold Mud-Warden's Vest (Common) to Wysh Coincatcher for 5 TC. (1321 TC on hand)\n[2026-09-04T17:40:55.703Z] [reward] Sold Reclaimer's Salvage Vest (Common) to Wysh Coincatcher for 5 TC. (1316 TC on hand)\n",
+      "[2026-09-04T17:40:55.635Z] [reward] Sold Mud-Bound Cloak (Common) to Wysh Coincatcher for 5 TC. (1311 TC on hand)\n[2026-09-04T17:40:55.567Z] [reward] Sold Mud-Warden's Vest (Common) to Wysh Coincatcher for 5 TC. (1306 TC on hand)\n[2026-09-04T17:40:55.499Z] [reward] Sold Reclaimer's Salvage Vest (Common) to Wysh Coincatcher for 5 TC. (1301 TC on hand)\n",
+      "[2026-09-04T17:40:55.431Z] [reward] Sold Mud-Bound Cloak (Common) to Wysh Coincatcher for 5 TC. (1296 TC on hand)\n[2026-09-04T17:40:55.362Z] [reward] Sold Mud-Bound Cloak (Common) to Wysh Coincatcher for 5 TC. (1291 TC on hand)\n[2026-09-04T17:40:55.293Z] [reward] Sold Mud-Bound Cloak (Common) to Wysh Coincatcher for 5 TC. (1286 TC on hand)\n",
+      "[2026-09-04T17:40:55.216Z] [reward] Sold Reclaimer's Salvage Vest (Common) to Wysh Coincatcher for 5 TC. (1281 TC on hand)\n[2026-09-04T17:40:49.388Z] [debug] appstate: background \u2192 active (was background for 61451ms)\n[2026-09-04T17:39:47.937Z] [debug] appstate: active \u2192 background (was active for 12253ms)\n[2026-09-04T17:39:42.800Z] [debug] homework: scene_intro \"Tartarian Pilgrim Camp\" \u2713 6848ms\n",
+      "[2026-09-04T17:39:42.787Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 6671ms read 0ms/write 6566ms in 754t\u2192out 34t HIT-CAP (149ch)\n[2026-09-04T17:39:35.952Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-09-04T17:39:35.693Z] [debug] appstate: background \u2192 active (was background for 58886ms)\n[2026-09-04T17:38:36.798Z] [debug] appstate: active \u2192 background (was active for 144087ms)\n",
+      "[2026-09-04T17:38:35.713Z] [debug] homework: scene_intro \"Tartarian Pilgrim Camp\" \u2713 12691ms\n[2026-09-04T17:38:35.706Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 12487ms read 8554ms/write 3910ms in 754t\u2192out 33t 11.3ms/t HIT-CAP (158ch)\n[2026-09-04T17:38:23.022Z] [debug] homework: intro-fill armed after 6000ms idle\n",
+      "[2026-09-04T17:38:22.806Z] [debug] qwen\u23f1 investigate_lore ok 5884ms wait 3823ms read 1474ms/write 571ms in 128t\u2192out 18t 11.5ms/t (84ch)\n[2026-09-04T17:38:21.080Z] [world] You let the conversation go and Wysh Coincatcher gets back to it.\n[2026-09-04T17:38:20.744Z] [debug] flourish: \u2713 5054ms\n",
+      "[2026-09-04T17:38:20.532Z] [debug] qwen\u23f1 flourish ok 4638ms wait 2367ms read 1950ms/write 288ms in 175t\u2192out 9t 11.1ms/t (28ch)\n[2026-09-04T17:38:18.261Z] [cognitive] READY  (1717ms)\n[2026-09-04T17:38:18.058Z] [debug] qwen\u23f1 investigate_lore ok 2566ms read 1429ms/write 949ms in 128t\u2192out 30t 11.2ms/t (129ch)\n[2026-09-04T17:38:16.542Z] [debug] arbiter: ambient held (he just spoke)\n",
+      "[2026-09-04T17:38:16.541Z] [world] The watch fire sits the way ordinary things sit. The Arbiter does not lean in. You move on.\n[2026-09-04T17:38:16.540Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=watch fire resolved=watch fire range=- enemies=0 hooks=0\n[2026-09-04T17:38:16.539Z] [player] investigate watch fire\n",
+      "[2026-09-04T17:38:16.514Z] [world] You let the conversation go and Wysh Coincatcher gets back to it.\n[2026-09-04T17:38:15.494Z] [cognitive] SWIM  (194ms)\n[2026-09-04T17:38:15.300Z] [debug] arbiter: ambient held (he just spoke)\n[2026-09-04T17:38:15.299Z] [world] The still pond resists your reading. Not hostile \u2014 just closed. Some things in the buried world don't open for the curious.\n",
+      "[2026-09-04T17:38:15.298Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=pond resolved=still pond range=- enemies=0 hooks=0\n[2026-09-04T17:38:15.298Z] [player] investigate still pond\n[2026-09-04T17:38:14.829Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro after 8676ms \u2014 cancelled:player-acted-again\n",
+      "[2026-09-04T17:38:14.628Z] [debug] qwen\u23f1 narration:scene_intro preempted 8676ms read/write unusable (native mis-reported 48632ms/1391ms \u2014 llama.rn split bug, not this call) in 782t\u2192out 33t HIT-CAP (158ch)\n[2026-09-04T17:38:14.244Z] [cognitive] SWIM  (241ms)\n[2026-09-04T17:38:14.003Z] [arbiter] \"There's coin on the board for a willing blade,\" the Arbiter says. \"Read the World.\"\n",
+      "[2026-09-04T17:38:14.002Z] [system] \u23f3 Time passed: 24 min\n[2026-09-04T17:38:14.002Z] [debug] arbiter: ambient held (he just spoke)\n[2026-09-04T17:38:13.994Z] [reward] You scrape at the silt with the sentinel cleaver. \u2726 Recovered Mud Fragment (Common).\n[2026-09-04T17:38:13.990Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-09-04T17:38:13.990Z] [player] investigate the mud\n[2026-09-04T17:38:13.972Z] [world] You let the conversation go and Wysh Coincatcher gets back to it.\n[2026-09-04T17:38:10.465Z] [debug] ui: tap \"investigate\"\n[2026-09-04T17:38:08.548Z] [reward]     \u2022 Aetheric Shard (Uncommon)\n[2026-09-04T17:38:08.548Z] [reward]     \u2022 Cracked Carapace Curl (Common)\n",
+      "[2026-09-04T17:38:08.548Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-09-04T17:38:08.548Z] [reward]     \u2022 Bent Nail (Common)\n[2026-09-04T17:38:08.547Z] [reward]     \u2022 Tar-Black Lashing (Common)\n[2026-09-04T17:38:08.547Z] [reward]     \u2022 Scrap Metal x2 (Common)\n[2026-09-04T17:38:08.547Z] [reward] \u2726 Salvage haul:\n",
+      "[Filtered]",
+      "[2026-09-04T17:38:08.546Z] [world] The half-buried wagon yields little of value, though a Bent Nail ends up in your pack.\n[2026-09-04T17:38:08.546Z] [world] You work the bedroll apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n[2026-09-04T17:38:08.545Z] [world] You salvage the barrel. The take is small but real.\n",
+      "[2026-09-04T17:38:07.113Z] [debug] ui: tap \"take / salvage\"\n[2026-09-04T17:38:06.365Z] [debug] persist sizes(KB): total=335 player=74 wm=173[rooms=98 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=85 scene=2\n[2026-09-04T17:38:05.746Z] [world] Wysh Coincatcher places you as you come in. \"Cheddar Bob. What are you after?\"\n",
+      "[2026-09-04T17:38:05.746Z] [world] [Tartarian Pilgrim Camp] north: Garrin (return the folio) (17 tiles, 1 day, 19 hours) \u00b7 east: Sinking Cathedral (3 tiles, 8 hours) \u00b7 south: The Buried Cities (3 tiles, 8 hours) \u00b7 west: Dynasty Border Post (4 tiles, 10 hours)\n[2026-09-04T17:38:05.743Z] [world] You have been here. The shape of it comes back before the details do.\n[2026-09-04"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-04-1666-everything-in-its-room #mtn91pdwbmaq [inline 3/4]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtn91pdwbmaq"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1666-everything-in-its-room"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "3"
+    },
+    {
+      "key": "parts",
+      "value": "4"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1666-everything-in-its-room"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:dba0:c4dc:ad2:ae57:503d:d553",
+      "query": "user.ip:\"2607:fb90:dba0:c4dc:ad2:ae57:503d:d553\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T17:52:12.356307Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "40": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 372,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T17:52:14.354000Z",
+  "fingerprints": [
+    "9e60d46c61ed394916bc9bb153182d12"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1955836932,
+    "commitCount": 3,
+    "data": {},
+    "dateCreated": "2026-09-04T17:46:24.620191Z",
+    "dateReleased": "2026-09-04T17:47:57.882603Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "ce0bdd4eac5b2fca3dee38d4f52c9cc58ecdb3e9",
+      "message": "[ota-hal] OTA-1666: everything in its room\n\nOwner, on the settings SESSION tab: \"it looks like in the settings the session\ntab has got a little convoluted, a little disorganized, and it's kind of weird\nhow it's set up. let's make sure that everything is in its appropriate place,\neverything is labeled correctly, everything is intuitive, and if we really need\nto still show all those buttons there. I mean this is layer after layer after\nlayer of debug attempt since we started doing this game. is everything we have\nin there still necessary?\"\n\nAnd mid-build: \"lore should not be under settings, this is a duplicate. it has\nanother home already, the correct one lives on the minimap, so this duplicate\ntab in settings can go.\"\n\n\u26a0\u26a0\u26a0 FOUR FINDINGS WERE NOT UNTIDINESS. THEY WERE FALSE STATEMENTS ON A SCREEN\nWHOSE JOB IS TELLING THE TRUTH ABOUT BUTTONS \u2014 and three of the four are mine,\nfrom the last two days:\n\n  1. A footnote read \"Long-press COPY LOG for the share + chunked-paste view.\"\n     `onLongPress` has never appeared in AboutScreen.tsx. It instructed a\n     gesture that does not exist.\n  2. The crash-reports switch explained its effect on SEND LOG, twice. OTA-1665\n     deleted SEND LOG one OTA ago; I rewrote the screen around that deletion and\n     did not re-read the two sentences beside it.\n  3. \u26a0 CLEAR LOG WAS A ONE-TAP BYPASS OF OTA-1665'S OWN DEDUPE GATE. The gate\n     fingerprints slotId : rawLog.length : rawLog.slice(-240). Erasing the log\n     changes the length AND the tail, so the fingerprint changes, so a second\n     report is admitted \u2014 carrying an EMPTY log, seconds after the first. That\n     is exactly the duplicate-with-no-evidence he asked to block, reachable in\n     one tap from the same screen. The erase now stamps the empty-log mark, and\n     ota1666 proves the next report is refused by actually filing one.\n  4. Under the header REPORTING, the first two controls were COPY LOG and CLEAR\n     LOG \u2014 a clipboard dump and a destructive erase \u2014 sitting ABOVE the one\n     button that reports anything.\n\n\u26a0\u26a0 AND TWO OF MY OWN AUDIT FINDINGS WERE WRONG, WHICH IS WHY NOTHING WAS DELETED\nON THE STRENGTH OF THE TABLE. I had written down \"COPY SAVE is a strict\nduplicate of BACK UP CHARACTER\" and \"COPY INVENTORY is dead, the report carries\nthe inventory.\" Reading the code instead:\n\n  \u2022 They share no encoder. BACK UP writes encodeSaveExport \u2014 a checksummed,\n    truncation-detecting envelope whose partner is RESTORE on the title screen.\n    COPY SAVE writes stampSaveExport(buildSaveSnapshot(\u2026)), the flat blob IMPORT\n    SAVE parses. Deleting it would have orphaned IMPORT SAVE. It STAYS, relabelled\n    \"COPY SAVE (for IMPORT SAVE below)\" so the pair reads as a pair.\n  \u2022 The report carried description + device + voice + log and NOTHING about the\n    pack. COPY INVENTORY was not dead \u2014 it was the only way that evidence ever\n    arrived. So bugReport.ts gained an --- INVENTORY --- block FIRST, and only\n    then was the button removable. The order matters: the data got a verified new\n    home before the control was taken away.\n\nTHE TAB NOW: RUN (save / back up / leave) \u00b7 REPORTING (the button, its outcome\nline, the switch) \u00b7 AI (reload) \u00b7 ADVANCED, collapsed (copy log, copy save,\nimport save, erase log). Four sections, one question each.\n\nWHAT MOVED OUT: Display size \u2192 the DISPLAY tab, as its own INTERFACE card, gate\nand all \u2014 a display setting that spent 439 OTAs one tab away from home. The LORE\ntab \u2192 deleted; it rendered the SAME <LoreCodexBody /> the crest button on the\nexploration screen opens, so the codex had two doors and one was buried in\nsettings. ota1666 asserts the surviving door is still wired.\n\ndocs/PRIVACY.md moved with the payload: the report now sends the inventory, and\nthe \"What it sends\" list says so.\n\nGates: all 18 green by exit code. Full suite green.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T17:43:50Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1666-everything-in-its-room",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1666-everything-in-its-room",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T17:47:57.882603Z",
+          "dateCreated": "2026-09-04T17:46:24.620191Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155625543",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T17:47:58.166729Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1666-everything-in-its-room",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1666-everything-in-its-room",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1666-everything-in-its-room",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1666-everything-in-its-room)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "ddd1868b75e349dabcdf1428bb5aeb1a",
+  "previousEventID": null
+}

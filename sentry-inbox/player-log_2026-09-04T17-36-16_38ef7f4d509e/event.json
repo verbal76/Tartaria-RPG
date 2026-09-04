@@ -1,0 +1,273 @@
+{
+  "id": "38ef7f4d509e4d2ca32f6cb064ac7376",
+  "groupID": "7712304262",
+  "eventID": "38ef7f4d509e4d2ca32f6cb064ac7376",
+  "projectID": "4511945117532160",
+  "size": 18125,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-04-1665-the-bug-report-pushes #mtn8jpkop1dk [inline 11/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1665-the-bug-report-pushes",
+  "message": "player-log 2026-09-04-1665-the-bug-report-pushes #mtn8jpkop1dk [inline 11/28]",
+  "title": "player-log 2026-09-04-1665-the-bug-report-pushes #mtn8jpkop1dk [inline 11/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:dba0:c4dc:ad2:ae57:503d:d553",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "f12998ffca8a453697a7b7d1f7d3f770",
+      "span_id": "90f42afd406e793a",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "04T02:06:18.172Z] [reward]     \u2022 Aether Dust (Common)\n[2026-09-04T02:06:18.173Z] [reward]     \u2022 Aether Crystal x2 (Common)\n[2026-09-04T02:06:18.173Z] [reward]     \u2022 Scrap Metal x3 (Common)\n[2026-09-04T02:06:19.658Z] [debug] ui: tap \"investigate\"\n[2026-09-04T02:06:21.279Z] [player] investigate the ground\n",
+      "[2026-09-04T02:06:21.279Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2\n[2026-09-04T02:06:21.284Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Wild Lettuce (Common).\n[2026-09-04T02:06:21.293Z] [system] \u23f3 Time passed: 24 min\n[2026-09-04T02:06:21.527Z] [cognitive] CLIMB  (234ms)\n",
+      "[2026-09-04T02:06:22.965Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-09-04T02:06:22.986Z] [debug] spawn: gear=[Force Wave Wand, Mud-Seer's Hood, Aetheric Baton] window=10 roster=new\n[2026-09-04T02:06:22.989Z] [world] You walk west through open silt. The compass points west into open ground.\n[2026-09-04T02:06:22.990Z] [world] What you started here has not finished itself in your absence.\n",
+      "[2026-09-04T02:06:25.760Z] [debug] ui: tap \"\u271a heals (3)\"\n[2026-09-04T02:06:28.191Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-09-04T02:06:28.796Z] [world] You use 1\u00d7 Trail Rations. +3 HP (49/49), +3 stamina.\n[2026-09-04T02:06:36.902Z] [debug] appstate: active \u2192 background (was active for 22880ms)\n",
+      "[2026-09-04T02:06:43.428Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 15038ms read 9751ms/write 5170ms in 723t\u2192out 33t 13.5ms/t HIT-CAP (159ch)\n[2026-09-04T02:06:44.881Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 15038ms \u2014 intro-fill:action-opener\n[2026-09-04T02:06:44.883Z] [debug] homework: scene_intro \"Mud Flood Nexus\" \u2713 16692ms\n",
+      "[2026-09-04T02:14:09.862Z] [debug] appstate: background \u2192 active (was background for 452954ms)\n[2026-09-04T02:14:10.231Z] [debug] homework: intro-fill armed after 6000ms idle (strike 2/3)\n[2026-09-04T02:14:11.115Z] [debug] persist sizes(KB): total=339 player=95 wm=159[rooms=88 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=80 scene=4\n",
+      "[2026-09-04T02:14:12.482Z] [debug] ui: tap \"take / salvage\"\n[2026-09-04T02:14:13.719Z] [world] You lift the Aetheric Baton clear.\n[2026-09-04T02:14:13.721Z] [reward] \u2726 Aetheric Baton (Common).\n[2026-09-04T02:14:13.741Z] [world] You get a hand under the Force Wave Wand and take it.\n[2026-09-04T02:14:13.741Z] [reward] \u2726 Force Wave Wand (Common).\n",
+      "[2026-09-04T02:14:13.742Z] [world] You claim the Mud-Seer's Hood.\n[2026-09-04T02:14:13.742Z] [reward] \u2726 Mud-Seer's Hood (Common).\n[2026-09-04T02:14:15.043Z] [world] You work the cold spring over. A part of it comes loose, intact.\n[2026-09-04T02:14:15.043Z] [world] You break the gravity valve apart. Among the pieces, something worth keeping.\n",
+      "[2026-09-04T02:14:15.044Z] [world] You work the rusted chain over. A part of it comes loose, intact.\n[2026-09-04T02:14:15.044Z] [reward] \u2726 Salvage haul:\n[2026-09-04T02:14:15.044Z] [reward]     \u2022 Aether Crystal x2 (Common)\n[2026-09-04T02:14:15.045Z] [reward]     \u2022 Scrap Metal (Common)\n",
+      "[2026-09-04T02:14:15.890Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 5038ms read 3613ms/write 1147ms in 724t\u2192out 33t 5.0ms/t HIT-CAP (181ch)\n[2026-09-04T02:14:16.292Z] [debug] homework: scene_intro \"Mud Flood Nexus\" \u2713 6061ms\n[2026-09-04T02:14:16.865Z] [debug] ui: tap \"investigate\"\n[2026-09-04T02:14:18.442Z] [player] investigate the ground\n",
+      "[2026-09-04T02:14:18.443Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2\n[2026-09-04T02:14:18.451Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-09-04T02:14:18.460Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-09-04T02:14:18.465Z] [world] A Conspiracy Architects war party crests the rise \u2014 5 of them, blades already out. They've marked you for standing with the Forgotten Order.\n[2026-09-04T02:14:18.465Z] [arbiter] \"The Conspiracy Architects do not forgive a friend of the Forgotten Order,\" the Arbiter murmurs. \"Stand, or run \u2014 but decide now.\"\n[2026-09-04T02:14:21.601Z] [debug] ui: tap \"dodge\"\n",
+      "[2026-09-04T02:14:21.623Z] [player] dodge\n[2026-09-04T02:14:21.624Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=5 hooks=2\n[2026-09-04T02:14:21.626Z] [world] You commit to the dodge. Slip Conspiracy Architects Raider 1's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-04T02:14:21.741Z] [combat] Conspiracy Architects Raider 2 \u2014 d20 \u2192 8 + ATK 6 = 14 vs your AC 22 \u2014 \u2717 EVADED\n[2026-09-04T02:14:21.742Z] [combat] Dodge \u2014 d20 \u2192 6 + DEX 19 = 25 vs ATK 14. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n",
+      "[2026-09-04T02:14:21.743Z] [world] You slip Conspiracy Architects Raider 2's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n[2026-09-04T02:14:21.745Z] [debug] ac-shift 22\u219225: race/base 10 + gear 18 + title 0 \u2192 trimmed 22 + status 3 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany ",
+      "Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n[2026-09-04T02:14:21.748Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 5 + ATK 7 = 12 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-04T02:14:21.751Z] [combat] Conspiracy Architects Raider 1 \u2014 d20 \u2192 4 + ATK 9 = 13 vs your AC 25 \u2014 \u2717 MISS\n",
+      "[2026-09-04T02:14:21.752Z] [combat] Conspiracy Architects Raider 3 and 1 other close the distance.\n[2026-09-04T02:14:21.753Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T02:14:27.078Z] [debug] ui: tap \"\u2620 bone crossbow \u25b2 \u2605\"\n[2026-09-04T02:14:27.082Z] [system] evasive \u2014 harder to hit fades.\n[2026-09-04T02:14:27.121Z] [player] attack with the bone crossbow\n",
+      "[2026-09-04T02:14:27.121Z] [debug] parser: intent=attack conf=1.00 verb=attack target=bone crossbow resolved=Bone Crossbow range=close enemies=5 hooks=2\n[2026-09-04T02:14:27.122Z] [debug] attack: target=Conspiracy Architects Raider 1 range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n",
+      "[2026-09-04T02:14:27.124Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-04T02:14:27.210Z] [world] You commit forward with the poisoned bone crossbow. Conspiracy Architects Raider 1 watches your hands.\n[2026-09-04T02:14:27.211Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T02:14:27.608Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE \u00b7 RELOAD  (397ms)\n",
+      "[2026-09-04T02:14:35.154Z] [world] You seize the initiative. Conspiracy Architects Raider 1 has no time to react.\n[2026-09-04T02:14:35.155Z] [combat] You \u2014 d20 \u2192 9 + DEX 19 + 2 (point blank) perfect opening (2\u00d7 dice) = 30 vs Conspiracy Architects Raider 1 AC 11 \u2014 \u2713 HIT\n[2026-09-04T02:14:35.158Z] [combat] Weakness exposed \u2014 Conspiracy Architects Raider 1 flinches. (piercing \u00d72.25 for 17)\n",
+      "[2026-09-04T02:14:35.159Z] [combat] Your blow with the poisoned bone crossbow lands clean \u2014 17 damage. Conspiracy Architects Raider 1 crumples in the dust. The Aetherstone settles.\n[2026-09-04T02:14:35.160Z] [reward] Conspiracy Architects Raider 1 defeated. You recover Aether Residue, Patched Cloth, Burlap Vest, Architect Sigil.\n",
+      "[2026-09-04T02:14:35.162Z] [reward] You strip the body: Cudgel, Reclaimer's Salvage Vest (+6 TC). The kit took the fight badly.\n[2026-09-04T02:14:35.162Z] [combat] 4 attackers remain. Conspiracy Architects Raider 2 now in your sights.\n[2026-09-04T02:14:35.162Z] [reward] +10 TC pried from the dust.\n",
+      "[2026-09-04T02:14:35.238Z] [debug] ac-shift 25\u219222: race/base 10 + gear 18 + title 0 \u2192 trimmed 22 + status 0 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n[2026-09-04T02:14:35.238Z] [combat] Conspiracy Architects Raider 3 \u2014 d20 \u2192 17 + ATK 9 = 26 vs your AC 22 \u2014 \u2713 HIT\n",
+      "[2026-09-04T02:14:35.241Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 4 + ATK 7 = 11 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-04T02:14:35.242Z] [combat] Conspiracy Architects Raider 2 \u2014 d20 \u2192 8 + ATK 6 = 14 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-04T02:14:35.243Z] [combat] Conspiracy Architects Raider 4 closes the distance.\n",
+      "[2026-09-04T02:14:35.660Z] [combat] Conspiracy Architects Raider 3 deals 2 slashing damage [edge of reach \u2014 halved]. You have 47 HP remaining.\n[2026-09-04T02:14:44.403Z] [debug] ui: tap \"mercy (9/15)\"\n[2026-09-04T02:14:44.406Z] [arbiter] \"Mercy is still down from that last fight,\" the Arbiter says. \"Feed her to bring her up, then rest somewhere safe and she will fall in at your side.\"\n",
+      "[2026-09-04T02:14:45.836Z] [debug] ui: tap \"approach\"\n[2026-09-04T02:14:45.902Z] [player] approach Conspiracy Architects Raider 2\n[2026-09-04T02:14:45.902Z] [debug] parser: intent=advance conf=1.00 verb=approach target=conspiracy architects raider 2 resolved=Conspiracy Architects Raider 2 range=mid enemies=4 hooks=2\n",
+      "[2026-09-04T02:14:45.905Z] [debug] move: advance from range=mid enemies=4 weather=Silent Blizzard cost=1 partial=0\n[2026-09-04T02:14:45.906Z] [debug] move: field advance target=Conspiracy Architects Raider 2 d 1.48->0.48 band mid->close\n[2026-09-04T02:14:45.906Z] [world] You close the gap with the Conspiracy Architects Raider 2 and 3 others. (range: close / arm's reach)\n",
+      "[2026-09-04T02:14:45.906Z] [world] The field shifts around you \u2014 Conspiracy Architects Raider 3 now close / arm's reach; Conspiracy Architects Raider 4 now close / arm's reach; Conspiracy Architects Raider 5 now far.\n[2026-09-04T02:14:45.908Z] [combat] Conspiracy Architects Raider 3 \u2014 d20 \u2192 12 + ATK 7 = 19 vs your AC 22 \u2014 \u2717 MISS\n",
+      "[2026-09-04T02:14:45.910Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 3 + ATK 7 = 10 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-04T02:14:45.911Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 9 + ATK 7 = 16 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-04T02:14:45.913Z] [combat] Conspiracy Architects Raider 2 \u2014 d20 \u2192 1 + ATK 6 = 7 vs your AC 22 \u2014 \u2717 FUMBLE\n",
+      "[2026-09-04T02:14:45.917Z] [debug] arbiter: template (reason=combat)\n[2026-09-04T02:14:45.917Z] [arbiter] The Arbiter watches the Conspiracy Architects Raider 2. \"It is not the first thing here that decided to keep its distance, then changed its mind.\"\n[2026-09-04T02:14:46.681Z] [cognitive] neutral  (762ms)\n",
+      "[2026-09-04T02:14:47.143Z] [debug] persist sizes(KB): total=343 player=96 wm=160[rooms=88 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=81 scene=7\n[2026-09-04T02:14:48.303Z] [debug] ui: tap \"golem (60/68)\"\n[2026-09-04T02:14:48.311Z] [player] use golem\n[2026-09-04T02:14:48.312Z] [combat] Ashwright attacks Conspiracy Architects Raider 2 \u2014 d20 20 + 3 = 23 vs AC 10 \u2014 \u2713 NAT 20\n",
+      "[2026-09-04T02:14:48.313Z] [combat] Ashwright swings the Crude Golem Greatsword \u2014 27 slashing damage on Conspiracy Architects Raider 2. (0 HP left)\n[2026-09-04T02:14:48.313Z] [world] Conspiracy Architects Raider 2 crumbles under Ashwright's assault.\n[2026-09-04T02:14:48.316Z] [reward] Conspiracy Architects Raider 2 defeated. You recover Patched Cloth, Aether Residue, Burlap Vest.\n",
+      "[2026-09-04T02:14:48.318Z] [reward] You strip the body: Bone Knife, Reclaimer's Salvage Vest (+6 TC). The kit took the fight badly.\n[2026-09-04T02:14:48.319Z] [combat] 3 attackers remain. Conspiracy Architects Raider 3 now in your sights.\n[2026-09-04T02:14:48.319Z] [reward] +12 TC pried from the dust.\n",
+      "[2026-09-04T02:14:48.397Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 6 + ATK 7 = 13 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-04T02:14:48.399Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 2 + ATK 7 = 9 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-04T02:14:48.400Z] [combat] Conspiracy Architects Raider 3 \u2014 d20 \u2192 17 + ATK 7 = 24 vs your AC 22 \u2014 \u2713 HIT\n",
+      "[2026-09-04T02:14:48.816Z] [combat] Conspiracy Architects Raider 3 deals 5 slashing damage [armor \u221225%]. You have 42 HP remaining.\n[2026-09-04T02:14:49.623Z] [debug] ui: tap \"golem (60/68)\"\n[2026-09-04T02:14:49.625Z] [player] use golem\n[2026-09-04T02:14:49.625Z] [combat] Ashwright attacks Conspiracy Architects Raider 3 \u2014 d20 10 + 3 = 13 vs AC 11 \u2014 \u2713 HIT\n",
+      "[2026-09-04T02:14:49.626Z] [combat] Ashwright swings the Crude Golem Greatsword \u2014 11 slashing damage on Conspiracy Architects Raider 3. (5 HP left)\n[2026-09-04T02:14:49.626Z] [system] \u26a0 Ashwright's Crude Golem Greatsword is failing \u2014 a few more swings will finish it. Mend it at the bench or lose it.\n",
+      "[2026-09-04T02:14:49.626Z] [combat] Conspiracy Architects Raider 3 retaliates \u2014 d20 6 + 6 hits Ashwright for 3 (35% resisted). (57/68)\n[2026-09-04T02:14:49.628Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 18 + ATK 7 = 25 vs your AC 22 \u2014 \u2713 HIT\n[2026-09-04T02:14:49.630Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 7 + ATK 7 = 14 vs your AC 22 \u2014 \u2717 MISS\n",
+      "[2026-09-04T02:14:49.632Z] [combat] Conspiracy Architects Raider 3 \u2014 d20 \u2192 14 + ATK 7 = 21 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-04T02:14:50.047Z] [combat] Conspiracy Architects Raider 4 deals 7 bludgeoning damage. You have 35 HP remaining.\n[2026-09-04T02:14:51.521Z] [debug] ui: tap \"golem (57/68)\"\n[2026-09-04T02:14:51.529Z] [player] use golem\n",
+      "[2026-09-04T02:14:51.530Z] [combat] Ashwright attacks Conspiracy Architects Raider 3 \u2014 d20 6 + 3 = 9 vs AC 11 \u2014 \u2717 MISS\n[2026-09-04T02:14:51.530Z] [world] Ashwright's strike sails wide of Conspiracy Architects Raider 3.\n[2026-09-04T02:14:51.531Z] [combat] Conspiracy Architects Raider 3 retaliates \u2014 d20 12 + 6 hits Ashwright for 3 (35% resisted). (54/68)\n",
+      "[2026-09-04T02:14:51.550Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 19 + ATK 7 = 26 vs your AC 22 \u2014 \u2713 HIT\n[2026-09-04T02:14:51.553Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 2 + ATK 7 = 9 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-04T02:14:51.557Z] [combat] Conspiracy Architects Raider 3 \u2014 d20 \u2192 1 + ATK 7 = 8 vs your AC 22 \u2014 \u2717 FUMBLE\n",
+      "[2026-09-04T02:14:51.974Z] [combat] Conspiracy Architects Raider 4 deals 9 bludgeoning damage. You have 26 HP remaining.\n[2026-09-04T02:14:53.158Z] [debug] ui: tap \"golem (54/68)\"\n[2026-09-04T02:14:53.160Z] [player] use golem\n[2026-09-04T02:14:53.160Z] [combat] Ashwright attacks Conspiracy Architects Raider 3 \u2014 d20 17 + 3 = 20 vs AC 11 \u2014 \u2713 HIT\n",
+      "[2026-09-04T02:14:53.161Z] [combat] Ashwright swings the Crude Golem Greatsword \u2014 10 slashing damage on Conspiracy Architects Raider 3. (0 HP left)\n[2026-09-04T02:14:53.161Z] [world] Conspiracy Architects Raider 3 crumbles under Ashwright's assault.\n[2026-09-04T02:14:53.162Z] [reward] Conspiracy Architects Raider 3 defeated. You recover Aether Residue \u00d72.\n",
+      "[2026-09-04T02:14:53.162Z] [reward] You strip the body: Bone Knife, Mud-Warden's Vest (+6 TC). The kit took the fight badly.\n[2026-09-04T02:14:53.163Z] [combat] 2 attackers remain. Conspiracy Architects Raider 4 now in your sights.\n[2026-09-04T02:14:53.163Z] [reward] +16 TC pried from the dust.\n",
+      "[2026-09-04T02:14:53.217Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 1 + ATK 7 = 8 vs your AC 22 \u2014 \u2717 FUMBLE\n[2026-09-04T02:14:53.219Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 20 + ATK 7 = 27 vs your AC 22 \u2014 \u2713 CRITICAL HIT\n[2026-09-04T02:14:53.635Z] [combat] Conspira"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-04-1665-the-bug-report-pushes #mtn8jpkop1dk [inline 11/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtn8jpkop1dk"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1665-the-bug-report-pushes"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "11"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1665-the-bug-report-pushes"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:dba0:c4dc:ad2:ae57:503d:d553",
+      "query": "user.ip:\"2607:fb90:dba0:c4dc:ad2:ae57:503d:d553\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T17:36:15.076804Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T17:36:16.630000Z",
+  "fingerprints": [
+    "e07769fe74d2091018c3fc9233b25461"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1954691241,
+    "commitCount": 3,
+    "data": {},
+    "dateCreated": "2026-09-04T05:42:51.380846Z",
+    "dateReleased": "2026-09-04T05:43:40.910086Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "5bd2090d8c7d7204b9c58c0844aa871a9b237564",
+      "message": "[ota-hal] OTA-1665: the bug report pushes, and only once per changed log\n\nOwner, three instructions together: \"I've removed the send log\", \"report a bug\nshould be the button that pushed the log, so we don't need the email route\nanymore, we can archive that bug report land\", and \"after you do a bug report\nand that pushes a log, you can't do another one until something in the log is\nchanged. so you have to go play for a little bit before it allows you to push\nanother one.\"\n\n\u26a0\u26a0\u26a0 THE EMAIL ROUTE WAS NEVER THE DESIGN, and bugReport.ts said so in its own\nheader: true zero-paste needed `expo-mail-composer`, which needs a native\nrebuild, and native builds are parked. So what shipped instead was a clipboard\nstage, a READ-ME-FIRST body, a manual paste, and a report that \u2014 in the file's\nown words \u2014 \"arrives empty and we can't track the bug down\" whenever a step was\nmissed. That is exactly how both his daughters filed tonight. The transport this\nneeded has been in the app since August; it was simply never wired to the button\npeople actually find.\n\nNow REPORT A BUG persists to disk and pushes inline through the OTA-1504 durable\npipeline, carrying what the player typed, and the payload leads with a headline\n(character \u00b7 build \u00b7 first line of the description) so a list of reports reads as\na list of problems instead of a column of identical titles. That headline is the\nold email SUBJECT, which would otherwise have become dead code \u2014 the value it\ncarried is exactly what a Sentry event needs.\n\n\u26a0\u26a0 SEND LOG IS DELETED, one day after OTA-1661 opened it to everyone and gave it\na two-tap consent step. With REPORT A BUG asking for a description first \u2014 a\nbetter consent surface AND better evidence \u2014 two buttons doing one send was\nclutter on a screen that has already fought a wall of COPY buttons.\n\n\u26a0\u26a0\u26a0 EVERY OUTCOME SPEAKS, and this is the part I care most about. A push has\nreal failure modes a mailto never had: queued, refused as a duplicate, refused\nbecause reporting is off, no destination in this build. The old Title screen\nflashed \"\u2713 COPIED\" unconditionally \u2014 which was honest enough when opening a\nmailto could not meaningfully fail, and would now be a lie told by the one\ncontrol that must never lie. `composeAndSendBugReport` returns a player-facing\nmessage on every path, never throws, and both screens render it verbatim. The\nsuite proves that by RUNNING the paths and asserting the message is non-empty,\nnot by scanning for strings.\n\n\u26a0 THE DEDUPE fingerprints the raw slot log \u2014 length plus its newest tail, keyed\nper slot \u2014 and the check runs BEFORE anything is persisted or sent. Length alone\nwould let a same-size edit through; the tail costs nothing. The mark is stored\neven on a QUEUED send, because the bundle is already on disk and letting a\nsecond identical report through would queue a duplicate behind one already\nwaiting. And a general report with NO character loaded is never blocked: \"the\ngame won't start\" carries no play by definition, and gating it on a changed log\nwould lock a player out of the only channel they have.\n\n\u26a0 TWO THINGS THE CLEANUP TURNED UP. `_legacySendBugReport` sat unreferenced\nbehind an eslint-disable, still holding a clipboard stage, a READ-ME-FIRST body\nand a mailto \u2014 that is the land he asked to archive, and a dead function holding\na copy of it is precisely where it grows back. Deleted. And the OTA-063 comment\nabove the handler still described the clipboard workaround in loving detail;\nrewritten, because a comment describing a route the code no longer takes is what\nstopped me checking the Samarran entry two OTAs ago.\n\n\u26a0 THREE ASSERTIONS IN THIS SUITE WERE WRONG BEFORE THEY WERE RIGHT, all the same\nway: too broad. A blanket \"no COPIED\" condemned COPY URL and COPY CRASHED SAVE;\na blanket \"no mailto:\" condemned INVITE PLAYTESTER, which should keep one \u2014 that\nis a short human request to a person, not a payload; and a scan for the deleted\nfunction's bare name failed against its own obituary, which is the OTA-1659\nlesson arriving in a second file. Each is now scoped to the thing it means.\n\ndocs/PRIVACY.md moved with the button: the section is \"Sending a report\nyourself\", it names the description as something that gets sent, and it states\nthe one-report-per-changed-log rule, because the player will meet that refusal\nand should not think the button is broken.\n\n\u26a0\u26a0\u26a0 AND THE FULL SUITE CAUGHT TWO REAL DEFECTS THE GATES DID NOT. Eight suites\nwent red on the first run \u2014 1489, 1492, 1504, 1515, 1516, 1518, 1519 and 1661 \u2014\nbecause every one of them pinned SEND LOG's send path in AboutScreen, which this\nOTA deletes. Repointing them at bugReport.ts was not bookkeeping; it is what\nsurfaced the following, and I would have shipped both:\n\n  \u00b7 I wrote `landed = !chunk.stopped` \u2014 \"we attempted it, so it went.\" That is\n    precisely the false positive OTA-1519 exists because of: a send can be\n    attempted, report no stop reason, and still lose parts, which that OTA\n    measured as Sentry silently replacing NINE of 49 inline parts. Corrected to\n    `chunk.delivered`, the field that means `sent === parts`.\n\n  \u00b7 I dropped the result line entirely. OTA-1492's rule is that the next\n    diagnosis starts from a line, not a memory. The push now logs the full\n    `describeInlineSend` report \u2014 parts accepted, what flush said, where it\n    threw \u2014 which is strictly more than the one-word ok/not-ok line it replaced.\n\nIn both cases the CODE gained the property back; the tests did not lose it. That\nis the whole argument for pinning behaviour you have already paid to learn.\n\n\u26a0 ota1661's SUITE IS DELETED, not re-anchored. It was one day old and every\nassertion in it described a button that no longer exists \u2014 its premise is\nsuperseded, like ota1146's was. The claims that OUTLIVED it are carried into\nota1665 explicitly: the push is not owner-gated, `reportingEnabled()` still\ngoverns it, the privacy page names what leaves the device, and \u2014 importantly \u2014\nthe OTA-1505 auto-bundle is STILL owner-gated. SEND LOG going away does not\nmerge consent and collection.\n\n\u26a0 ONE GATE FAILED FOR THE RIGHT REASON. check:quotedpins refused a new\nprose-shaped pin, and rather than raise the baseline I measured which one it was\n(a dump of the counted set, diffed against HEAD: `'REPORT A BUG'` in ota1489) and\nconverted it to the wiring instead \u2014 `setBugReportOpen(true)`. A label pin fails\non a reword and passes if the button is deleted; the wiring pin cannot.\n\nGates: all 18 green by exit code. Full suite green.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T05:40:17Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1665-the-bug-report-pushes",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1665-the-bug-report-pushes",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T05:43:40.910086Z",
+          "dateCreated": "2026-09-04T05:42:51.380846Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155444244",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T05:43:41.150780Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1665-the-bug-report-pushes",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1665-the-bug-report-pushes",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1665-the-bug-report-pushes",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1665-the-bug-report-pushes)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "39ee88e29b9144a6b626110e00932690",
+  "previousEventID": "3571da49704049089e8d9d8f51163990"
+}

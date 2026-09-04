@@ -1,0 +1,272 @@
+{
+  "id": "68f76686fe6b40d490053590b4461110",
+  "groupID": "7712304262",
+  "eventID": "68f76686fe6b40d490053590b4461110",
+  "projectID": "4511945117532160",
+  "size": 18145,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-04-1665-the-bug-report-pushes #mtn8jpkop1dk [inline 5/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1665-the-bug-report-pushes",
+  "message": "player-log 2026-09-04-1665-the-bug-report-pushes #mtn8jpkop1dk [inline 5/28]",
+  "title": "player-log 2026-09-04-1665-the-bug-report-pushes #mtn8jpkop1dk [inline 5/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:dba0:c4dc:ad2:ae57:503d:d553",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "f12998ffca8a453697a7b7d1f7d3f770",
+      "span_id": "90f42afd406e793a",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "udgel, Mud-Warden's Vest (+10 TC). The kit took the fight badly.\n[2026-09-03T23:50:50.141Z] [combat] Nobody left standing \u2014 the fight is yours. You strip the sleepers where they lie.\n[2026-09-03T23:50:50.142Z] [reward] You strip the unconscious Conspiracy Architects Raider 1 \u2014 Bone Knife, Mud-Bound Cloak, Patched Cloth, +14 TC. The gear's seen better days (worn from the fight).\n",
+      "[2026-09-03T23:50:50.155Z] [reward] +6 TC pried from the dust.\n[2026-09-03T23:50:50.751Z] [debug] persist sizes(KB): total=337 player=90 wm=157[rooms=85 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=86 scene=4\n[2026-09-03T23:51:00.828Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-09-03T23:51:01.063Z] [debug] ui: tap \"more \u25b8\"\n",
+      "[2026-09-03T23:51:02.998Z] [debug] ui: tap \"inventory\"\n[2026-09-03T23:51:08.955Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 7946ms read 6778ms/write 1140ms in 729t\u2192out 33t 9.3ms/t HIT-CAP (154ch)\n[2026-09-03T23:51:08.969Z] [debug] homework: scene_intro \"Mud Flood Nexus\" \u2713 8141ms\n",
+      "[2026-09-03T23:51:17.513Z] [debug] qwen\u23f1 item_synthesis_hw ok 6849ms read 3675ms/write 3135ms in 327t\u2192out 40t 11.2ms/t (162ch)\n[2026-09-03T23:51:17.519Z] [debug] qwen\u23f1 \u2702 DISCARDED item_synthesis_hw after 6849ms \u2014 item_synth:rejected-by-clamp bad-kind=\"weapon_coating\"\n[2026-09-03T23:51:17.521Z] [debug] homework: item_desc \"Acid Flask\" \u2205 6871ms\n",
+      "[2026-09-03T23:51:21.253Z] [player] feed dog Forager's Stew\n[2026-09-03T23:51:21.254Z] [world] You feed Mercy the Forager's Stew. She eats, slow and serious. (+8 HP, +20 loyalty)\n[2026-09-03T23:51:34.087Z] [player] use Purification Vial\n[2026-09-03T23:51:34.087Z] [debug] parser: intent=use_relic conf=1.00 verb=use target=purification vial resolved=Purification Vial range=- enemies=0 hooks=2\n",
+      "[2026-09-03T23:51:34.089Z] [world] You use one Purification Vial. -9 corruption.\n[2026-09-03T23:51:34.102Z] [debug] arbiter: template (reason=intent-not-allowed:use_relic)\n[2026-09-03T23:51:34.103Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T23:51:34.103Z] [system] \u23f3 Time passed: 15 min\n[2026-09-03T23:51:35.992Z] [cognitive] neutral  (1888ms)\n",
+      "[2026-09-03T23:51:43.231Z] [debug] kbbar: mounted bottom=355 raw=0 from=estimate winH=986 beat=-\n[2026-09-03T23:51:43.630Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-09-03T23:51:47.730Z] [player] pet mercy\n[2026-09-03T23:51:55.690Z] [debug] homework: intro-fill armed after 6000ms idle\n",
+      "[2026-09-03T23:51:58.839Z] [world] You feed Mercy the Wild Oats. She eats, slow and serious. (+1 HP, +20 loyalty)\n[2026-09-03T23:52:05.598Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 9689ms read 8505ms/write 1143ms in 727t\u2192out 33t 11.7ms/t HIT-CAP (157ch)\n[2026-09-03T23:52:05.800Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 9689ms \u2014 intro-fill:\u2205\n",
+      "[2026-09-03T23:52:05.800Z] [debug] homework: scene_intro \"Mud Flood Nexus\" \u2205 10111ms\n[2026-09-03T23:52:14.487Z] [debug] appstate: active \u2192 background (was active for 199921ms)\n[2026-09-04T00:03:03.470Z] [debug] appstate: background \u2192 active (was background for 648976ms)\n[2026-09-04T00:03:03.486Z] [debug] homework: intro-fill armed after 6000ms idle (strike 2/3)\n",
+      "[2026-09-04T00:03:03.612Z] [debug] persist sizes(KB): total=335 player=89 wm=156[rooms=85 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=85 scene=4\n[2026-09-04T00:03:05.084Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 1541ms read 0ms/write 1463ms in 727t\u2192out 34t HIT-CAP (145ch)\n",
+      "[2026-09-04T00:03:05.088Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 1541ms \u2014 intro-fill:\u2205\n[2026-09-04T00:03:05.088Z] [debug] homework: scene_intro \"Mud Flood Nexus\" \u2205 1603ms\n[2026-09-04T00:03:05.446Z] [debug] OTA session start: 2026-09-03-1655-the-card-is-asked.\n[2026-09-04T00:03:05.448Z] [world] You step back into Mud Flood Nexus. The world waits for your move.\n",
+      "[2026-09-04T00:03:05.448Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. \"Welcome back, Cheddar Bob. The road kept your place.\"\n[2026-09-04T00:03:05.736Z] [debug] \u2550\u2550\u2550 SESSION 2026-09-04T00:03:05.732Z \u00b7 build 2026-09-03-1655-the-card-is-asked \u00b7 previous entry moments earlier \u2550\u2550\u2550\n",
+      "[2026-09-04T00:03:05.737Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n[2026-09-04T00:03:05.737Z] [debug] missions: hunt:hunt_bog_dragon stage 4/7 [diplomacy] @monarch_waystation npc=\"Old Mira\" needs=The Boy's Locket\u2713 gives=Eshren's Name-Token\n",
+      "[2026-09-04T00:03:05.737Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n[2026-09-04T00:03:05.737Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n",
+      "[2026-09-04T00:03:05.737Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n[2026-09-04T00:03:05.738Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n",
+      "[2026-09-04T00:03:05.738Z] [debug] missions: \u00b7 at=mud_flood_nexus travelTo=monarch_waystation\n[2026-09-04T00:03:05.738Z] [debug] boot: life bmtm6ejwl3h started 2026-09-03T23:48:30.405Z \u00b7 FOLLOWED AN OTA APPLY 138ms ago via boot-front \u00b7 prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)\n[2026-09-04T00:03:07.252Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n",
+      "[2026-09-04T00:03:07.369Z] [reward] \u2726 Your bearing reads. +1 CHA (base 11, 12 as you stand).\n[2026-09-04T00:03:07.388Z] [debug] spawn: gear=[Rough-Hewn Chestplate, Sentinel's Chestplate] window=10 roster=new\n[2026-09-04T00:03:07.389Z] [world] You walk north through open silt. The compass tells you Nimari lies further north \u2014 5 tiles, about 13 hours of travel.\n",
+      "[2026-09-04T00:03:07.389Z] [world] The thread you were following waits where you left it.\n[2026-09-04T00:03:08.390Z] [debug] ui: tap \"take / salvage\"\n[2026-09-04T00:03:09.857Z] [world] You take the Rough-Hewn Chestplate from where it lay.\n[2026-09-04T00:03:09.857Z] [reward] \u2726 Rough-Hewn Chestplate (Common).\n[2026-09-04T00:03:09.884Z] [world] You pick up the Sentinel's Chestplate.\n",
+      "[2026-09-04T00:03:09.884Z] [reward] \u2726 Sentinel's Chestplate (Common).\n[2026-09-04T00:03:10.804Z] [world] You strip the anchor carefully. Something usable comes free in your hand.\n[2026-09-04T00:03:10.804Z] [world] You work the cold spring over. A part of it comes loose, intact.\n[2026-09-04T00:03:10.805Z] [world] You break the conduit apart. Among the pieces, something worth keeping.\n",
+      "[2026-09-04T00:03:10.805Z] [world] You lever something loose from the pressure gauge \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n[2026-09-04T00:03:10.805Z] [world] You work the shrine over. A part of it comes loose, intact.\n[2026-09-04T00:03:10.805Z] [reward] \u2726 Salvage haul:\n[2026-09-04T00:03:10.806Z] [reward]     \u2022 Worn Tartarian Coin x5 (Common)\n",
+      "[2026-09-04T00:03:10.806Z] [reward]     \u2022 Bent Nail (Common)\n[2026-09-04T00:03:10.806Z] [reward]     \u2022 Scrap Metal (Common)\n[2026-09-04T00:03:10.806Z] [reward]     \u2022 Mortar-Bound Cobble (Common)\n[2026-09-04T00:03:10.806Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-09-04T00:03:14.255Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n",
+      "[2026-09-04T00:03:14.277Z] [debug] spawn: gear=[Mud Harpoon] window=10 roster=new\n[2026-09-04T00:03:14.279Z] [world] Norrick Pryce glances up. \"You again.\" Not warm, not cold \u2014 noted.\n[2026-09-04T00:03:14.279Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Norrick Pryce, fence. Tap the vendor banner to trade.\n",
+      "[2026-09-04T00:03:14.294Z] [world] Rare workings for sale: Nightglass Pendant (500 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n[2026-09-04T00:03:14.295Z] [world] You walk west through open silt. The compass tells you Varakush lies further west \u2014 7 tiles, about 18 hours of travel.\n",
+      "[2026-09-04T00:03:14.296Z] [world] What you started here has not finished itself in your absence.\n[2026-09-04T00:03:15.660Z] [debug] ui: tap \"take / salvage\"\n[2026-09-04T00:03:17.063Z] [world] You work the cold spring apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n",
+      "[2026-09-04T00:03:17.064Z] [world] You work the control panel over. A part of it comes loose, intact.\n[2026-09-04T00:03:17.064Z] [world] You strip the relay conduit carefully. Something usable comes free in your hand.\n[2026-09-04T00:03:17.065Z] [world] You break the sensor apart. Among the pieces, something worth keeping.\n",
+      "[2026-09-04T00:03:17.065Z] [world] You work the shrine apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n[2026-09-04T00:03:17.065Z] [reward] \u2726 Salvage haul:\n[2026-09-04T00:03:17.066Z] [reward]     \u2022 Stiffened Leather Offcut (Uncommon)\n[2026-09-04T00:03:17.066Z] [reward]     \u2022 Aether Crystal (Common)\n",
+      "[2026-09-04T00:03:17.071Z] [reward]     \u2022 Scrap Metal x3 (Common)\n[2026-09-04T00:03:17.071Z] [reward]     \u2022 Bent Nail x2 (Common)\n[2026-09-04T00:03:17.071Z] [reward]     \u2022 Copper Wire Spool (Uncommon)\n[2026-09-04T00:03:18.093Z] [world] You lift the Mud Harpoon clear.\n[2026-09-04T00:03:18.094Z] [reward] \u2726 Mud Harpoon (Common).\n[2026-09-04T00:03:19.555Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-09-04T00:03:21.268Z] [player] investigate the ground\n[2026-09-04T00:03:21.269Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2\n[2026-09-04T00:03:21.276Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-09-04T00:03:21.285Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-09-04T00:03:21.742Z] [cognitive] CLIMB  (457ms)\n[2026-09-04T00:03:24.890Z] [player] Ask why the stall is here\n[2026-09-04T00:03:24.891Z] [world] \"Stall goes up where the ground is flat and comes down when it is not worth it,\" the trader says. \"That is the whole business plan.\"\n[2026-09-04T00:03:24.891Z] [world] Whatever Norrick Pryce is chewing goes over to the other cheek.\n",
+      "[2026-09-04T00:03:26.401Z] [debug] qwen\u23f1 flourish ok 2405ms read 1827ms/write 557ms in 174t\u2192out 19t 10.5ms/t (74ch)\n[2026-09-04T00:03:26.645Z] [debug] flourish: \u2713 2869ms\n[2026-09-04T00:03:33.671Z] [world] You let the conversation go and Norrick Pryce gets back to it.\n",
+      "[2026-09-04T00:03:40.313Z] [reward] Bought the Nightglass Pendant working for 500 TC. \u2726 Recipe learned (Legendary)! Open Crafting to forge it \u2014 you'll still need the materials.\n[2026-09-04T00:03:40.566Z] [debug] persist sizes(KB): total=337 player=91 wm=157[rooms=86 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=85 scene=4\n",
+      "[2026-09-04T00:03:46.089Z] [reward] Bought 3\u00d7 Blue Cap Mushroom from Norrick Pryce for 24 TC. (1608 TC left)\n[2026-09-04T00:03:47.992Z] [reward] Bought Trail Rations from Norrick Pryce for 5 TC. (1603 TC left)\n[2026-09-04T00:03:53.495Z] [debug] homework: intro-fill armed after 7990ms idle (strike 3/3)\n[2026-09-04T00:03:56.285Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n",
+      "[2026-09-04T00:03:56.296Z] [debug] spawn: gear=[Architect's Grip, Titan's Swiftstep Boots] window=10 roster=new\n[2026-09-04T00:03:56.298Z] [world] You walk north through open silt. The compass points north into open ground.\n[2026-09-04T00:03:56.298Z] [world] The loose end is exactly as loose as you left it.\n[2026-09-04T00:03:59.172Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-09-04T00:04:00.505Z] [world] You get a hand under the Architect's Grip and take it.\n[2026-09-04T00:04:00.505Z] [reward] \u2726 Architect's Grip (Common).\n[2026-09-04T00:04:00.520Z] [world] You claim the Titan's Swiftstep Boots.\n[2026-09-04T00:04:00.520Z] [reward] \u2726 Titan's Swiftstep Boots (Common).\n",
+      "[2026-09-04T00:04:01.621Z] [world] You strip the blueprint carefully. Something usable comes free in your hand.\n[2026-09-04T00:04:01.621Z] [world] You strip the cold spring carefully. Something usable comes free in your hand.\n[2026-09-04T00:04:01.622Z] [world] You strip the core carefully. Something usable comes free in your hand.\n",
+      "[2026-09-04T00:04:01.622Z] [world] The gear assembly yields little of value, though a Bone Sliver ends up in your pack.\n[2026-09-04T00:04:01.622Z] [world] You strip the mud crack carefully. Something usable comes free in your hand.\n[2026-09-04T00:04:01.622Z] [world] You break the relay terminal apart. Among the pieces, something worth keeping.\n[2026-09-04T00:04:01.623Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-09-04T00:04:01.623Z] [reward]     \u2022 Aether Dust x2 (Common)\n[2026-09-04T00:04:01.623Z] [reward]     \u2022 Scrap Metal (Common)\n[2026-09-04T00:04:01.624Z] [reward]     \u2022 Aether Crystal x2 (Common)\n[2026-09-04T00:04:01.624Z] [reward]     \u2022 Bone Sliver (Common)\n[2026-09-04T00:04:01.624Z] [reward]     \u2022 Bent Nail x2 (Common)\n[2026-09-04T00:04:03.172Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-09-04T00:04:04.586Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 10858ms read 9167ms/write 1642ms in 724t\u2192out 33t 12.7ms/t HIT-CAP (139ch)\n[2026-09-04T00:04:04.806Z] [debug] homework: scene_intro \"Mud Flood Nexus\" \u2713 11312ms\n[2026-09-04T00:04:05.495Z] [player] investigate the ground\n",
+      "[2026-09-04T00:04:05.495Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2\n[2026-09-04T00:04:05.498Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-09-04T00:04:05.506Z] [system] \u23f3 Time passed: 24 min\n[2026-09-04T00:04:05.740Z] [cognitive] CLIMB  (233ms)\n",
+      "[2026-09-04T00:04:15.710Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-09-04T00:04:15.718Z] [debug] spawn: gear=[Mud-fist Wraps, Magnetized Rod, Reclaimer's Salvage Cap] window=10 roster=new\n[2026-09-04T00:04:15.719Z] [world] Ilva Sidelong waves off the customer they were serving. \"Cheddar Bob's here. Give me a moment.\" The other one waits.\n",
+      "[2026-09-04T00:04:15.719Z] [world] \"Cheddar Bob.\" Ilva Sidelong says it like setting down something heavy. \"You've been gone. I kept your usual back anyway.\"\n[2026-09-04T00:04:15.719Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Ilva Sidelong, fence. Tap the vendor banner to trade.\n",
+      "[2026-09-04T00:04:15.727Z] [world] Rare workings for sale: Ring of the Quiet Hand (500 TC), Rustbreaker Shield (200 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n[2026-09-04T00:04:15.728Z] [world] You walk west through open silt. The compass points west into open ground.\n",
+      "[2026-09-04T00:04:15.728Z] [world] Whatever you turned over here is still turned over.\n[2026-09-04T00:04:16.859Z] [debug] ui: tap \"take / salvage\"\n[2026-09-04T00:04:18.419Z] [world] The Magnetized Rod comes up out of the silt with a small sucking protest.\n[2026-09-04T00:04:18.420Z] [reward] \u2726 Magnetized Rod (Common).\n[2026-09-04T00:04:18.441Z] [world] The Mud-fist "
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-04-1665-the-bug-report-pushes #mtn8jpkop1dk [inline 5/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtn8jpkop1dk"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1665-the-bug-report-pushes"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "5"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1665-the-bug-report-pushes"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:dba0:c4dc:ad2:ae57:503d:d553",
+      "query": "user.ip:\"2607:fb90:dba0:c4dc:ad2:ae57:503d:d553\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T17:36:14.987379Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T17:36:16.629000Z",
+  "fingerprints": [
+    "e07769fe74d2091018c3fc9233b25461"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1954691241,
+    "commitCount": 3,
+    "data": {},
+    "dateCreated": "2026-09-04T05:42:51.380846Z",
+    "dateReleased": "2026-09-04T05:43:40.910086Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "5bd2090d8c7d7204b9c58c0844aa871a9b237564",
+      "message": "[ota-hal] OTA-1665: the bug report pushes, and only once per changed log\n\nOwner, three instructions together: \"I've removed the send log\", \"report a bug\nshould be the button that pushed the log, so we don't need the email route\nanymore, we can archive that bug report land\", and \"after you do a bug report\nand that pushes a log, you can't do another one until something in the log is\nchanged. so you have to go play for a little bit before it allows you to push\nanother one.\"\n\n\u26a0\u26a0\u26a0 THE EMAIL ROUTE WAS NEVER THE DESIGN, and bugReport.ts said so in its own\nheader: true zero-paste needed `expo-mail-composer`, which needs a native\nrebuild, and native builds are parked. So what shipped instead was a clipboard\nstage, a READ-ME-FIRST body, a manual paste, and a report that \u2014 in the file's\nown words \u2014 \"arrives empty and we can't track the bug down\" whenever a step was\nmissed. That is exactly how both his daughters filed tonight. The transport this\nneeded has been in the app since August; it was simply never wired to the button\npeople actually find.\n\nNow REPORT A BUG persists to disk and pushes inline through the OTA-1504 durable\npipeline, carrying what the player typed, and the payload leads with a headline\n(character \u00b7 build \u00b7 first line of the description) so a list of reports reads as\na list of problems instead of a column of identical titles. That headline is the\nold email SUBJECT, which would otherwise have become dead code \u2014 the value it\ncarried is exactly what a Sentry event needs.\n\n\u26a0\u26a0 SEND LOG IS DELETED, one day after OTA-1661 opened it to everyone and gave it\na two-tap consent step. With REPORT A BUG asking for a description first \u2014 a\nbetter consent surface AND better evidence \u2014 two buttons doing one send was\nclutter on a screen that has already fought a wall of COPY buttons.\n\n\u26a0\u26a0\u26a0 EVERY OUTCOME SPEAKS, and this is the part I care most about. A push has\nreal failure modes a mailto never had: queued, refused as a duplicate, refused\nbecause reporting is off, no destination in this build. The old Title screen\nflashed \"\u2713 COPIED\" unconditionally \u2014 which was honest enough when opening a\nmailto could not meaningfully fail, and would now be a lie told by the one\ncontrol that must never lie. `composeAndSendBugReport` returns a player-facing\nmessage on every path, never throws, and both screens render it verbatim. The\nsuite proves that by RUNNING the paths and asserting the message is non-empty,\nnot by scanning for strings.\n\n\u26a0 THE DEDUPE fingerprints the raw slot log \u2014 length plus its newest tail, keyed\nper slot \u2014 and the check runs BEFORE anything is persisted or sent. Length alone\nwould let a same-size edit through; the tail costs nothing. The mark is stored\neven on a QUEUED send, because the bundle is already on disk and letting a\nsecond identical report through would queue a duplicate behind one already\nwaiting. And a general report with NO character loaded is never blocked: \"the\ngame won't start\" carries no play by definition, and gating it on a changed log\nwould lock a player out of the only channel they have.\n\n\u26a0 TWO THINGS THE CLEANUP TURNED UP. `_legacySendBugReport` sat unreferenced\nbehind an eslint-disable, still holding a clipboard stage, a READ-ME-FIRST body\nand a mailto \u2014 that is the land he asked to archive, and a dead function holding\na copy of it is precisely where it grows back. Deleted. And the OTA-063 comment\nabove the handler still described the clipboard workaround in loving detail;\nrewritten, because a comment describing a route the code no longer takes is what\nstopped me checking the Samarran entry two OTAs ago.\n\n\u26a0 THREE ASSERTIONS IN THIS SUITE WERE WRONG BEFORE THEY WERE RIGHT, all the same\nway: too broad. A blanket \"no COPIED\" condemned COPY URL and COPY CRASHED SAVE;\na blanket \"no mailto:\" condemned INVITE PLAYTESTER, which should keep one \u2014 that\nis a short human request to a person, not a payload; and a scan for the deleted\nfunction's bare name failed against its own obituary, which is the OTA-1659\nlesson arriving in a second file. Each is now scoped to the thing it means.\n\ndocs/PRIVACY.md moved with the button: the section is \"Sending a report\nyourself\", it names the description as something that gets sent, and it states\nthe one-report-per-changed-log rule, because the player will meet that refusal\nand should not think the button is broken.\n\n\u26a0\u26a0\u26a0 AND THE FULL SUITE CAUGHT TWO REAL DEFECTS THE GATES DID NOT. Eight suites\nwent red on the first run \u2014 1489, 1492, 1504, 1515, 1516, 1518, 1519 and 1661 \u2014\nbecause every one of them pinned SEND LOG's send path in AboutScreen, which this\nOTA deletes. Repointing them at bugReport.ts was not bookkeeping; it is what\nsurfaced the following, and I would have shipped both:\n\n  \u00b7 I wrote `landed = !chunk.stopped` \u2014 \"we attempted it, so it went.\" That is\n    precisely the false positive OTA-1519 exists because of: a send can be\n    attempted, report no stop reason, and still lose parts, which that OTA\n    measured as Sentry silently replacing NINE of 49 inline parts. Corrected to\n    `chunk.delivered`, the field that means `sent === parts`.\n\n  \u00b7 I dropped the result line entirely. OTA-1492's rule is that the next\n    diagnosis starts from a line, not a memory. The push now logs the full\n    `describeInlineSend` report \u2014 parts accepted, what flush said, where it\n    threw \u2014 which is strictly more than the one-word ok/not-ok line it replaced.\n\nIn both cases the CODE gained the property back; the tests did not lose it. That\nis the whole argument for pinning behaviour you have already paid to learn.\n\n\u26a0 ota1661's SUITE IS DELETED, not re-anchored. It was one day old and every\nassertion in it described a button that no longer exists \u2014 its premise is\nsuperseded, like ota1146's was. The claims that OUTLIVED it are carried into\nota1665 explicitly: the push is not owner-gated, `reportingEnabled()` still\ngoverns it, the privacy page names what leaves the device, and \u2014 importantly \u2014\nthe OTA-1505 auto-bundle is STILL owner-gated. SEND LOG going away does not\nmerge consent and collection.\n\n\u26a0 ONE GATE FAILED FOR THE RIGHT REASON. check:quotedpins refused a new\nprose-shaped pin, and rather than raise the baseline I measured which one it was\n(a dump of the counted set, diffed against HEAD: `'REPORT A BUG'` in ota1489) and\nconverted it to the wiring instead \u2014 `setBugReportOpen(true)`. A label pin fails\non a reword and passes if the button is deleted; the wiring pin cannot.\n\nGates: all 18 green by exit code. Full suite green.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T05:40:17Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1665-the-bug-report-pushes",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1665-the-bug-report-pushes",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T05:43:40.910086Z",
+          "dateCreated": "2026-09-04T05:42:51.380846Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155444244",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T05:43:41.150780Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1665-the-bug-report-pushes",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1665-the-bug-report-pushes",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1665-the-bug-report-pushes",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1665-the-bug-report-pushes)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "6ad01e4e4f71426ca6120da7d93662cc",
+  "previousEventID": "633afde3e7344e3bbe6155d66498b3cc"
+}

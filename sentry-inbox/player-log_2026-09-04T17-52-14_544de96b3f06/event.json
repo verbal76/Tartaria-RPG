@@ -1,0 +1,225 @@
+{
+  "id": "544de96b3f06485a8f8bf0245e55db04",
+  "groupID": "7712330545",
+  "eventID": "544de96b3f06485a8f8bf0245e55db04",
+  "projectID": "4511945117532160",
+  "size": 2756,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log-beacon 2026-09-04-1666-everything-in-its-room #mtn91pdwbmaq"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1666-everything-in-its-room",
+  "message": "player-log-beacon 2026-09-04-1666-everything-in-its-room #mtn91pdwbmaq",
+  "title": "player-log-beacon 2026-09-04-1666-everything-in-its-room #mtn91pdwbmaq",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:dba0:c4dc:ad2:ae57:503d:d553",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "571a504ffab14ad9ab2beea63ffc32f5",
+      "span_id": "9790e4dbb7134ed6",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {},
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log-beacon 2026-09-04-1666-everything-in-its-room #mtn91pdwbmaq"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtn91pdwbmaq"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1666-everything-in-its-room"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-beacon"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "parts",
+      "value": "4"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1666-everything-in-its-room"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:dba0:c4dc:ad2:ae57:503d:d553",
+      "query": "user.ip:\"2607:fb90:dba0:c4dc:ad2:ae57:503d:d553\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T17:52:12.355689Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T17:52:14.353000Z",
+  "fingerprints": [
+    "6b786cf63266de461a5537bca1ebf91e"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1955836932,
+    "commitCount": 3,
+    "data": {},
+    "dateCreated": "2026-09-04T17:46:24.620191Z",
+    "dateReleased": "2026-09-04T17:47:57.882603Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "ce0bdd4eac5b2fca3dee38d4f52c9cc58ecdb3e9",
+      "message": "[ota-hal] OTA-1666: everything in its room\n\nOwner, on the settings SESSION tab: \"it looks like in the settings the session\ntab has got a little convoluted, a little disorganized, and it's kind of weird\nhow it's set up. let's make sure that everything is in its appropriate place,\neverything is labeled correctly, everything is intuitive, and if we really need\nto still show all those buttons there. I mean this is layer after layer after\nlayer of debug attempt since we started doing this game. is everything we have\nin there still necessary?\"\n\nAnd mid-build: \"lore should not be under settings, this is a duplicate. it has\nanother home already, the correct one lives on the minimap, so this duplicate\ntab in settings can go.\"\n\n\u26a0\u26a0\u26a0 FOUR FINDINGS WERE NOT UNTIDINESS. THEY WERE FALSE STATEMENTS ON A SCREEN\nWHOSE JOB IS TELLING THE TRUTH ABOUT BUTTONS \u2014 and three of the four are mine,\nfrom the last two days:\n\n  1. A footnote read \"Long-press COPY LOG for the share + chunked-paste view.\"\n     `onLongPress` has never appeared in AboutScreen.tsx. It instructed a\n     gesture that does not exist.\n  2. The crash-reports switch explained its effect on SEND LOG, twice. OTA-1665\n     deleted SEND LOG one OTA ago; I rewrote the screen around that deletion and\n     did not re-read the two sentences beside it.\n  3. \u26a0 CLEAR LOG WAS A ONE-TAP BYPASS OF OTA-1665'S OWN DEDUPE GATE. The gate\n     fingerprints slotId : rawLog.length : rawLog.slice(-240). Erasing the log\n     changes the length AND the tail, so the fingerprint changes, so a second\n     report is admitted \u2014 carrying an EMPTY log, seconds after the first. That\n     is exactly the duplicate-with-no-evidence he asked to block, reachable in\n     one tap from the same screen. The erase now stamps the empty-log mark, and\n     ota1666 proves the next report is refused by actually filing one.\n  4. Under the header REPORTING, the first two controls were COPY LOG and CLEAR\n     LOG \u2014 a clipboard dump and a destructive erase \u2014 sitting ABOVE the one\n     button that reports anything.\n\n\u26a0\u26a0 AND TWO OF MY OWN AUDIT FINDINGS WERE WRONG, WHICH IS WHY NOTHING WAS DELETED\nON THE STRENGTH OF THE TABLE. I had written down \"COPY SAVE is a strict\nduplicate of BACK UP CHARACTER\" and \"COPY INVENTORY is dead, the report carries\nthe inventory.\" Reading the code instead:\n\n  \u2022 They share no encoder. BACK UP writes encodeSaveExport \u2014 a checksummed,\n    truncation-detecting envelope whose partner is RESTORE on the title screen.\n    COPY SAVE writes stampSaveExport(buildSaveSnapshot(\u2026)), the flat blob IMPORT\n    SAVE parses. Deleting it would have orphaned IMPORT SAVE. It STAYS, relabelled\n    \"COPY SAVE (for IMPORT SAVE below)\" so the pair reads as a pair.\n  \u2022 The report carried description + device + voice + log and NOTHING about the\n    pack. COPY INVENTORY was not dead \u2014 it was the only way that evidence ever\n    arrived. So bugReport.ts gained an --- INVENTORY --- block FIRST, and only\n    then was the button removable. The order matters: the data got a verified new\n    home before the control was taken away.\n\nTHE TAB NOW: RUN (save / back up / leave) \u00b7 REPORTING (the button, its outcome\nline, the switch) \u00b7 AI (reload) \u00b7 ADVANCED, collapsed (copy log, copy save,\nimport save, erase log). Four sections, one question each.\n\nWHAT MOVED OUT: Display size \u2192 the DISPLAY tab, as its own INTERFACE card, gate\nand all \u2014 a display setting that spent 439 OTAs one tab away from home. The LORE\ntab \u2192 deleted; it rendered the SAME <LoreCodexBody /> the crest button on the\nexploration screen opens, so the codex had two doors and one was buried in\nsettings. ota1666 asserts the surviving door is still wired.\n\ndocs/PRIVACY.md moved with the payload: the report now sends the inventory, and\nthe \"What it sends\" list says so.\n\nGates: all 18 green by exit code. Full suite green.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T17:43:50Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1666-everything-in-its-room",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1666-everything-in-its-room",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T17:47:57.882603Z",
+          "dateCreated": "2026-09-04T17:46:24.620191Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155625543",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T17:47:58.166729Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1666-everything-in-its-room",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1666-everything-in-its-room",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1666-everything-in-its-room",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1666-everything-in-its-room)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": null
+}
