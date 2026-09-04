@@ -27539,6 +27539,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ritual and the third-party notices are one page now, called ABOUT, with the
 // dedication leading instead of buried underneath diagnostics.
 export const OTA_BUILD_ID = '2026-09-04-1667-the-key-goes-where-the-player-is';
+// golem catch-up 2026-09-04: markerless publish of OTA-1667 - the key goes where
+// the player is. The WEAPON GLYPHS card moved from Settings to the lore codex as
+// a GLYPHS tab (third, behind BEASTS and FALLEN), the SETTINGS ABOUT tab folded
+// into the notices page (dedication first, seven-tap owner ritual intact), and
+// the glyph list is derived from the weapon catalog instead of hand-listed.
+// Owner asked whether all thirteen damage types exist in game; measured across
+// 301 weapons, four do not - degradation 0, stun 0, acid 0, corruption 0 - and
+// degradation was unreachable by construction because OTA-1652 aliases it to
+// acid before the glyph lookup runs. Acid and corruption are real COATINGS and
+// stay listed as such; they were simply never a weapon's own damage. hal took
+// the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-04-1666-everything-in-its-room';
 // golem catch-up 2026-09-04: markerless publish of OTA-1666 - everything in its
 // room. The settings SESSION tab reorganised into RUN / REPORTING / AI /
