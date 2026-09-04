@@ -507,9 +507,46 @@ export function isPairedHouse(installId: string, paired: readonly PairedHouse[])
  *  Trivially widened: add a name to the array. */
 export const SHARING_UNLOCK_NAMES: readonly string[] = ['verbal', 'sasmooch'];
 
+/** ⚠⚠ OTA-1660 — THE EXACT TIER, AND IT EXISTS BECAUSE PREFIXES DO NOT SCALE
+ *  DOWN. Owner: *"why can't my daughters push a log to sentry"* — and the
+ *  answer was read straight off his daughter's own bug report: her character is
+ *  named `kai`, her build carries the DSN and her crash delivery is ON
+ *  ("Crash delivery: ON — reports go to Sentry when you crash"), so this list
+ *  was the ONLY thing standing between her and SEND LOG.
+ *
+ *  ⚠ BUT "kai" CANNOT GO IN THE LIST ABOVE. That one is a PREFIX match, and it
+ *  is safe only because its two entries are long: the worst "verbal" can do is
+ *  "Verbalist". "kai" is three letters and the head of Kaiden, Kaira, Kaito,
+ *  Kaiya — every one a name a stranger might genuinely pick. A prefix entry
+ *  there would hand owner tools to them, and with the tools the OTA-1505
+ *  auto-bundle, which uploads typed input and a save with NO tap at all. That
+ *  is the privacy page's promise broken by a three-letter shortcut.
+ *
+ *  So: exact match, after the same normalisation. "Kai" and "kai" pass;
+ *  "Kaiden" does not. The two mechanisms are kept visibly separate so that a
+ *  later tidy-up cannot quietly fold a short name into the prefix list.
+ *
+ *  ⚠ THE SECOND SISTER ARRIVED WHILE THIS WAS BEING WRITTEN, from a second
+ *  SM-S942U on its own OTA (1657, not kai's 1658), with the same two lines:
+ *  `Character: Grilled cheese sandwich` and `Crash delivery: ON`. Her
+ *  description was three words — *"To send a log"*. Normalisation strips the
+ *  spaces, so the stored form is one token; the entry has to be written the way
+ *  the gate will see it, not the way the character sheet spells it.
+ *
+ *  ⚠⚠ AND EITHER OF THESE ONLY HAS TO WORK ONCE. OTA-1490 made the unlock
+ *  DEVICE-STICKY: the first time a matching character is seen, the install is
+ *  marked and every character on it — including ones they have not made yet —
+ *  keeps the tools. So this list does not need to chase whatever they name the
+ *  next one, which is the whole reason it stays this short. */
+export const SHARING_UNLOCK_EXACT: readonly string[] = [
+  'kai',
+  'grilledcheesesandwich',
+];
+
 export function sharingUnlockedFor(name: string | null | undefined): boolean {
   const n = String(name ?? '').toLowerCase().replace(/[^a-z0-9]/g, '');
   if (!n) return false;
+  if (SHARING_UNLOCK_EXACT.includes(n)) return true;
   return SHARING_UNLOCK_NAMES.some((allowed) => n.startsWith(allowed));
 }
 

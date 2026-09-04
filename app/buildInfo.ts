@@ -27331,7 +27331,38 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // "blˈeɪd", the word SILENTLY GONE. Flipping that flag would have muted every
 // Tartaria, Drakova and Aether in the game. Rewritten in espeak's own mnemonics
 // (`[[D@]]` → ðə), each measured; the flag stays off pending device proof.
-export const OTA_BUILD_ID = '2026-09-04-1659-the-is-not-in-the-lexicon';
+// ⚠⚠⚠ OTA-1660 — BOTH DAUGHTERS CAN PUSH A LOG. Owner: *"why can't my daughters
+// push a log to sentry"* — and the answer arrived as their own bug reports,
+// EMAILED because the button they needed was not on their screens. kai wrote
+// *"Can't push a log so I se t this"*; her sister, on a second SM-S942U running
+// its own OTA, wrote *"To send a log"*. ⚠ EACH REPORT DIAGNOSED ITSELF IN TWO
+// LINES: `Character: kai` / `Character: Grilled cheese sandwich`, and on both
+// `Crash delivery: ON — reports go to Sentry when you crash.` SEND LOG renders
+// behind `ownerTools && crashConfigured`; the second half was ALREADY TRUE on
+// both phones, so the transport, the DSN, the opt-in and the update channel
+// were never the problem on either. `ownerTools` reads the LOADED CHARACTER'S
+// NAME against SHARING_UNLOCK_NAMES — ['verbal','sasmooch'] — and neither girl
+// names a character after herself. That list was the entire obstacle. ⚠⚠ AND THE OBVIOUS FIX WAS THE
+// WRONG ONE: that list is a PREFIX match, safe only because its entries are
+// long enough that the worst collision is "Verbalist". "kai" is three letters
+// and the head of Kaiden, Kaira, Kaito, Kaiya — and admitting them is not
+// cosmetic, because owner tools carry the OTA-1505 auto-bundle that uploads
+// typed input and a save with NO tap at all. So a second, EXACT tier
+// (SHARING_UNLOCK_EXACT) sits beside the prefix list: "Kai" passes, "Kaiden"
+// does not, and ota1660 pins that nothing short is ever folded into the prefix
+// list. The sister's name is stored normalised (`grilledcheesesandwich`)
+// because the gate strips spaces BEFORE comparing — an entry written with the
+// spaces in would be permanently dead, and a guard now asserts every entry is
+// already in the form the gate will see. ⚠ EITHER NAME ONLY HAS TO FIRE ONCE:
+// OTA-1490's unlock is device-sticky, so the first load marks the install and
+// every character they make afterwards inherits the tools. ⚠ SHE ALSO SENT A CRASH SHE WAS NOT ASKED FOR: PROCESS KILLED at stage
+// native:voice:done, 19ms after Kokoro spoke "Choose your character." on a
+// return to character select, on a Samsung SM8850 — a second device, not the
+// Pixel — with the app's own guard flagging "VOICE CRASH ... last voice:
+// kokoro:bf_emma". Not task #110 (that is native:cognition:done on OTA-apply
+// boots; this was a cold 66-second-old life). Logged, not chased here.
+export const OTA_BUILD_ID = '2026-09-04-1660-both-daughters-can-push-a-log';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-04-1659-the-is-not-in-the-lexicon';
 // golem catch-up 2026-09-04: markerless publish of OTA-1659 - "the" is not in
 // the lexicon. Owner reported the same thing twice; the second report was about
 // the first fix. Measured with espeak-ng, the phonemizer this app bundles:
