@@ -16,6 +16,7 @@ import { findWeaponByName, isFusedInventoryItem } from '../engine/crafting';
 import { resolveDisplayWeapon } from '../engine/itemResolution';
 import { isPouchEligible } from '../engine/pouchEligibility';
 import { isBandolierEligible, itemIsThrowable } from '../engine/bandolierEligibility';
+import { isMedkitEligible } from '../engine/medkitEligibility';
 import { isWeaponCoatingItem } from '../engine/weaponCoating';
 import { canonicalItemRarity, canonicalItemTags } from '../engine/crafting';
 import { useReadableMuted } from '../ui/displaySettings';
@@ -167,6 +168,7 @@ export function InventoryScreen() {
   // on the eligible item stows it and clears the filter.
   const stowInPouch = useGameStore((s) => s.stowInPouch);
   const stowInBandolier = useGameStore((s) => s.stowInBandolier);
+  const stowInMedkit = useGameStore((s) => s.stowInMedkit);
   const useHealBatch = useGameStore((s) => s.useHealBatch);
   const [pending, setPending] = useState<{ item: InventoryItem; slots: EquipSlot[] } | null>(null);
   // After-scrap result list. When non-null, the action-modal body
@@ -216,6 +218,17 @@ export function InventoryScreen() {
   const [pouchFilterActive, setPouchFilterActive] = useState(false);
   // arb110 — bandolier fill mode (mutually exclusive with the pouch fill mode).
   const [bandolierFilterActive, setBandolierFilterActive] = useState(false);
+  // OTA-1657 — healing-pouch fill mode, the third member of that same mutually
+  // exclusive set: two racks in fill mode at once would leave the pack filtered
+  // by one and the tap handled by the other.
+  const [medkitFilterActive, setMedkitFilterActive] = useState(false);
+  // ⚠ OTA-1657 — one collapse state for all three racks, defaulting OPEN. Owner:
+  // *"let's make the bandolier, tool pouch and healing pouch collapsable like
+  // inventory categories to save space."* Keyed by rack so folding one leaves
+  // the others where he put them.
+  const [racksOpen, setRacksOpen] = useState<Record<string, boolean>>({});
+  const rackOpen = (k: string) => racksOpen[k] ?? true;
+  const toggleRack = (k: string) => setRacksOpen((r) => ({ ...r, [k]: !(r[k] ?? true) }));
   // OTA-1100 — inventory GROUP mode. Owner, after OTA-1099's group sell: "yes
   // wire drop, fusable select and scrap the same way." Same contract as the
   // vendor list, which is the whole point — one gesture, one meaning, wherever
@@ -319,7 +332,11 @@ export function InventoryScreen() {
     // arb110 — bandolier fill mode narrows the list to throwables.
     : bandolierFilterActive
       ? queryFiltered.filter((i) => isBandolierEligible(i, player).eligible)
-      : queryFiltered;
+      // OTA-1657 — healing-pouch fill mode narrows to what actually mends, so he
+      // is not scrolling a forty-row pack for the one kit he meant.
+      : medkitFilterActive
+        ? queryFiltered.filter((i) => isMedkitEligible(i, player).eligible)
+        : queryFiltered;
   // arb-fix — the FUSABLE tab is a filter, not just a sort: narrow to items
   // that qualify for the Crucible (reserved or not).
   const fusionFiltered = sortKey === 'fusionable'
@@ -331,7 +348,7 @@ export function InventoryScreen() {
   // been selected it automatically deselects") and category headers carry a
   // SELECT ALL. The pouch / bandolier fill modes already own the tap, so they win
   // — two "armed" tap modes at once would be a coin flip.
-  const fusionSelectMode = sortKey === 'fusionable' && !pouchFilterActive && !bandolierFilterActive;
+  const fusionSelectMode = sortKey === 'fusionable' && !pouchFilterActive && !bandolierFilterActive && !medkitFilterActive;
   // Which rows in a category the bulk button may act on, and whether they are
   // already all reserved (which flips the button to CLEAR). Quest-locked rows are
   // excluded here for the same reason the store skips them — the button must never
@@ -668,6 +685,15 @@ export function InventoryScreen() {
       setBandolierFilterActive(false);
       return;
     }
+    // OTA-1657 — and the same again for the healing pouch. ⚠ Passing the INSTANCE
+    // ID matters here in a way it does not for the bandolier: a pocket holds a
+    // whole STACK, and the player tapped one specific row — so it loads the stack
+    // he pointed at, not the first one that happens to share the name.
+    if (medkitFilterActive) {
+      stowInMedkit(item.name, item.id);
+      setMedkitFilterActive(false);
+      return;
+    }
     // OTA-1097 — FUSABLE view: a tap IS the selection. Owner: "if you tap on an
     // item that has been selected it automatically deselects." Deselect-on-tap
     // without select-on-tap would be maddening, so the tap is a straight toggle
@@ -693,7 +719,7 @@ export function InventoryScreen() {
   const handleItemLongPress = (item: InventoryItem) => {
     // The pouch / bandolier fill modes own the tap while they're armed; letting
     // a hold start a group underneath them would leave two live modes fighting.
-    if (pouchFilterActive || bandolierFilterActive) return;
+    if (pouchFilterActive || bandolierFilterActive || medkitFilterActive) return;
     if (invSelectMode) { toggleInvSelect(item.id); return; }
     beginInvSelect(item.id);
   };
@@ -1698,14 +1724,34 @@ export function InventoryScreen() {
         <ToolPouchBanner
           player={player}
           pouchFilterActive={pouchFilterActive}
-          onTapEmptySlot={() => { setBandolierFilterActive(false); setPouchFilterActive((v) => !v); }}
+          onTapEmptySlot={() => { setBandolierFilterActive(false); setMedkitFilterActive(false); setPouchFilterActive((v) => !v); }}
+          open={rackOpen('pouch')}
+          onToggle={() => toggleRack('pouch')}
         />
         {/* arb110 — BANDOLIER (throwables), mutually exclusive fill mode with the pouch. */}
         <BandolierBanner
           player={player}
           filterActive={bandolierFilterActive}
-          onTapEmptySlot={() => { setPouchFilterActive(false); setBandolierFilterActive((v) => !v); }}
+          onTapEmptySlot={() => { setPouchFilterActive(false); setMedkitFilterActive(false); setBandolierFilterActive((v) => !v); }}
+          open={rackOpen('bandolier')}
+          onToggle={() => toggleRack('bandolier')}
         />
+        {/* ⚠ OTA-1657 — HEALING POUCH, the third rack and the third member of the
+            mutually exclusive fill set. */}
+        <MedkitBanner
+          player={player}
+          filterActive={medkitFilterActive}
+          onTapEmptySlot={() => { setPouchFilterActive(false); setBandolierFilterActive(false); setMedkitFilterActive((v) => !v); }}
+          open={rackOpen('medkit')}
+          onToggle={() => toggleRack('medkit')}
+        />
+        {medkitFilterActive && (
+          <View style={styles.pouchFilterBanner}>
+            <Text style={styles.pouchFilterText}>
+              Tap a heal below to load it into your healing pouch.
+            </Text>
+          </View>
+        )}
         {bandolierFilterActive && (
           <View style={styles.pouchFilterBanner}>
             <Text style={styles.pouchFilterText}>
@@ -1889,7 +1935,7 @@ export function InventoryScreen() {
                   // arb105 — the red ✗ means "this item's EQUIP slot is already
                   // worn". In pouch/bandolier fill mode the player isn't equipping —
                   // a scanner's off-hand being full is irrelevant — so suppress it.
-                  slotTaken={!pouchFilterActive && !bandolierFilterActive && itemSlotTaken(item)}
+                  slotTaken={!pouchFilterActive && !bandolierFilterActive && !medkitFilterActive && itemSlotTaken(item)}
                   stripeColor={companionStripeColor(item)}
                   onPress={() => handleItemTap(item)}
                   onLongPress={() => handleItemLongPress(item)}
@@ -2139,14 +2185,81 @@ export function InventoryScreen() {
 // so the player can easily see them, and when you tap the empty slot
 // your inventory should sort to only the items available to be used
 // there."
+/** ⚠⚠⚠ OTA-1657 — ONE COLLAPSE, THREE RACKS. Owner: *"when you are in inventory
+ *  let's make the bandolier, tool pouch and healing pouch collapsable like
+ *  inventory categories to save space."*
+ *
+ *  Three racks stacked above the pack cost real screen on a phone, and the
+ *  healing pouch has just made it three. This is the SAME affordance arb108 gave
+ *  the inventory categories — a ▸/▾ chevron on the header, the body folded
+ *  behind it — deliberately reusing that grammar instead of inventing a second
+ *  one, because a player who has learned to fold a category should have to learn
+ *  nothing at all to fold a rack.
+ *
+ *  ⚠ THE COUNT STAYS ON THE HEADER WHEN FOLDED, and that is what makes folding
+ *  safe: collapsed, "3/5 racked" still says what is loaded, so the space saved
+ *  costs him no information he was reading the banner for. A rack you have to
+ *  unfold to trust is a rack you stop folding.
+ *
+ *  ⚠ Defaults OPEN, unlike categories (which default closed). A category is one
+ *  of a dozen above a long pack; a rack is one of three whose whole job is to be
+ *  glanceable. Folding is something he does, not a state he inherits. */
+function RackFrame({
+  title, hint, summary, open, onToggle, style, titleStyle, hintStyle, children,
+}: {
+  title: string;
+  hint: string;
+  summary: string;
+  open: boolean;
+  onToggle: () => void;
+  style: object;
+  titleStyle: object;
+  hintStyle: object;
+  children: React.ReactNode;
+}) {
+  return (
+    <View style={style}>
+      <TouchableOpacity
+        onPress={onToggle}
+        activeOpacity={0.7}
+        accessibilityRole="button"
+        accessibilityLabel={`${title}, ${summary}`}
+        accessibilityState={{ expanded: open }}
+        style={rackFrameStyles.header}
+      >
+        <Text style={[titleStyle, rackFrameStyles.headerTitle]}>
+          {open ? '▾' : '▸'} {title}
+        </Text>
+        <Text style={[hintStyle, rackFrameStyles.headerSummary]}>{summary}</Text>
+      </TouchableOpacity>
+      {open ? (
+        <>
+          <Text style={hintStyle}>{hint}</Text>
+          {children}
+        </>
+      ) : null}
+    </View>
+  );
+}
+
+const rackFrameStyles = StyleSheet.create({
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 2 },
+  headerTitle: { marginBottom: 0 },
+  headerSummary: { marginBottom: 0, fontStyle: 'normal' },
+});
+
 function ToolPouchBanner({
   player,
   pouchFilterActive,
   onTapEmptySlot,
+  open,
+  onToggle,
 }: {
   player: PlayerCharacter;
   pouchFilterActive: boolean;
   onTapEmptySlot: () => void;
+  open: boolean;
+  onToggle: () => void;
 }) {
   const POUCH_MAX = 3;
   const pouchIds = player.equipped?.toolPouchIds ?? [];
@@ -2157,10 +2270,18 @@ function ToolPouchBanner({
     const item = id ? player.inventory.find((it) => it.id === id) : undefined;
     slots.push({ name: item?.name ?? null, id: id ?? null });
   }
+  const filled = slots.filter((s) => s.name).length;
   return (
-    <View style={pouchStyles.banner}>
-      <Text style={pouchStyles.title}>SCANNER POUCH</Text>
-      <Text style={pouchStyles.hint}>Scanners run whenever you search (3 slots). Tap an empty slot to stow one from your pack.</Text>
+    <RackFrame
+      title="SCANNER POUCH"
+      summary={`${filled}/${POUCH_MAX} stowed`}
+      hint="Scanners run whenever you search (3 slots). Tap an empty slot to stow one from your pack."
+      open={open}
+      onToggle={onToggle}
+      style={pouchStyles.banner}
+      titleStyle={pouchStyles.title}
+      hintStyle={pouchStyles.hint}
+    >
       <View style={pouchStyles.row}>
         {slots.map((slot, idx) => (
           <View key={idx} style={pouchStyles.slot}>
@@ -2195,7 +2316,7 @@ function ToolPouchBanner({
           </View>
         ))}
       </View>
-    </View>
+    </RackFrame>
   );
 }
 
@@ -2253,10 +2374,14 @@ function BandolierBanner({
   player,
   filterActive,
   onTapEmptySlot,
+  open,
+  onToggle,
 }: {
   player: PlayerCharacter;
   filterActive: boolean;
   onTapEmptySlot: () => void;
+  open: boolean;
+  onToggle: () => void;
 }) {
   const BANDOLIER_MAX = 5;
   const ids = player.equipped?.bandolierIds ?? [];
@@ -2267,10 +2392,18 @@ function BandolierBanner({
     const item = id ? player.inventory.find((it) => it.id === id) : undefined;
     slots.push({ name: item?.name ?? null, qty: item?.quantity ?? 0, id: id ?? null });
   }
+  const filled = slots.filter((sl) => sl.name).length;
   return (
-    <View style={bandolierStyles.banner}>
-      <Text style={bandolierStyles.title}>BANDOLIER</Text>
-      <Text style={bandolierStyles.hint}>Ready-to-throw (5 slots). Tap an empty slot to rack a throwable; in combat, tap the bandolier to hurl one.</Text>
+    <RackFrame
+      title="BANDOLIER"
+      summary={`${filled}/${BANDOLIER_MAX} racked`}
+      hint="Ready-to-throw (5 slots). Tap an empty slot to rack a throwable; in combat, tap the bandolier to hurl one."
+      open={open}
+      onToggle={onToggle}
+      style={bandolierStyles.banner}
+      titleStyle={bandolierStyles.title}
+      hintStyle={bandolierStyles.hint}
+    >
       <View style={bandolierStyles.row}>
         {slots.map((slot, idx) => (
           <View key={idx} style={bandolierStyles.slot}>
@@ -2301,9 +2434,111 @@ function BandolierBanner({
           </View>
         ))}
       </View>
-    </View>
+    </RackFrame>
   );
 }
+
+/** ⚠⚠⚠ OTA-1657 — THE HEALING POUCH RACK. Three pockets, and unlike the other
+ *  two racks a pocket holds a whole STACK: "Trauma Kit ×5" is one pocket, which
+ *  is exactly the load-out the owner described (*"5 trauma kits, say 3 trail
+ *  rations and maybe 10 blueberries"*). Everything else — tap-filled to load,
+ *  tap-filled to unload, mutually exclusive fill mode with the other two — is
+ *  the bandolier's behaviour on purpose. */
+function MedkitBanner({
+  player,
+  filterActive,
+  onTapEmptySlot,
+  open,
+  onToggle,
+}: {
+  player: PlayerCharacter;
+  filterActive: boolean;
+  onTapEmptySlot: () => void;
+  open: boolean;
+  onToggle: () => void;
+}) {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { MEDKIT_MAX } = require('../engine/medkitEligibility') as typeof import('../engine/medkitEligibility');
+  const ids = player.equipped?.medkitIds ?? [];
+  const removeFromMedkit = useGameStore((s) => s.removeFromMedkit);
+  const slots: Array<{ name: string | null; qty: number; id: string | null }> = [];
+  for (let i = 0; i < MEDKIT_MAX; i++) {
+    const id = ids[i];
+    const item = id ? player.inventory.find((it) => it.id === id) : undefined;
+    slots.push({ name: item?.name ?? null, qty: item?.quantity ?? 0, id: id ?? null });
+  }
+  const filled = slots.filter((sl) => sl.name).length;
+  return (
+    <RackFrame
+      title="HEALING POUCH"
+      summary={`${filled}/${MEDKIT_MAX} loaded`}
+      hint="Heals within reach (3 pockets, whole stacks). Tap an empty pocket to load one; tap ✚ heals in a fight or out on the road to use it."
+      open={open}
+      onToggle={onToggle}
+      style={medkitStyles.banner}
+      titleStyle={medkitStyles.title}
+      hintStyle={bandolierStyles.hint}
+    >
+      <View style={bandolierStyles.row}>
+        {slots.map((slot, idx) => (
+          <View key={idx} style={medkitStyles.slot}>
+            {slot.name ? (
+              <TouchableOpacity
+                style={medkitStyles.slotFilled}
+                activeOpacity={0.7}
+                onPress={() => removeFromMedkit(slot.name!, slot.id ?? undefined)}
+                accessibilityRole="button"
+              >
+                <Text style={medkitStyles.slotName} numberOfLines={1}>
+                  {slot.name}{slot.qty > 1 ? ` \u00d7${slot.qty}` : ''}
+                </Text>
+                <Text style={bandolierStyles.slotAction}>tap to unload</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                style={[bandolierStyles.slotEmpty, filterActive && medkitStyles.slotEmptyActive]}
+                activeOpacity={0.7}
+                onPress={onTapEmptySlot}
+                accessibilityRole="button"
+              >
+                <Text style={[bandolierStyles.slotEmptyText, filterActive && medkitStyles.slotEmptyTextActive]}>
+                  {filterActive ? 'pick a heal \u2193' : '+ load heal'}
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        ))}
+      </View>
+    </RackFrame>
+  );
+}
+
+// OTA-1657 — green where the bandolier is orange: one rack throws things away
+// from you, one puts you back together.
+const medkitStyles = StyleSheet.create({
+  banner: {
+    marginBottom: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 8,
+    backgroundColor: '#131b11',
+    borderColor: '#3a5a30',
+    borderWidth: 1,
+    borderRadius: 4,
+  },
+  title: { color: '#9ec96a', fontSize: 11, fontWeight: '800', letterSpacing: 2, marginBottom: 2 },
+  slot: { flexBasis: '31%', flexGrow: 1 },
+  slotFilled: {
+    paddingVertical: 6,
+    paddingHorizontal: 6,
+    borderColor: '#9ec96a',
+    borderWidth: 1,
+    borderRadius: 3,
+    backgroundColor: '#1a2416',
+  },
+  slotName: { color: '#9ec96a', fontSize: 10, fontWeight: '700' },
+  slotEmptyActive: { borderColor: '#9ec96a', backgroundColor: '#1a2416' },
+  slotEmptyTextActive: { color: '#9ec96a' },
+});
 
 const bandolierStyles = StyleSheet.create({
   banner: {

@@ -941,6 +941,17 @@ export interface PlayerEquipped {
    *  tapping an item throws it (full attack + status), decrementing the stack and
    *  clearing the slot when it empties. Cap enforced in stowInBandolier. */
   bandolierIds?: string[];
+  /** ⚠⚠ OTA-1657 — THE HEALING POUCH: up to 3 STACKS of anything that mends.
+   *  Owner: *"battle gets slowed down when you have to heal… we can load it with
+   *  any three healing items they want… 5 trauma kits, say 3 trail rations and
+   *  maybe 10 blueberries."* Same storage contract as `bandolierIds` and
+   *  `toolPouchIds` — the items stay in `player.inventory` and this records only
+   *  WHICH STACKS are within reach, so one slot is "10 Blueberries", not one
+   *  berry. Tapping one routes through `useInventoryItem`, the very action the
+   *  pack's USE button calls, which is his other requirement: *"when you use it,
+   *  it acts like they do when being used from inventory."* Cap enforced in
+   *  stowInMedkit; eligibility in engine/medkitEligibility.ts. */
+  medkitIds?: string[];
 
   // Legacy fields kept on the type so existing saves still deserialize
   // cleanly. backfillPlayer migrates them to the new slot shape.

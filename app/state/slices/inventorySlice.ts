@@ -80,6 +80,12 @@ export interface InventorySlice {
   equipItem: (itemName: string, slot: EquipSlot, itemId?: string) => void;
   unequipSlot: (slot: EquipSlot) => void;
   removeFromBandolier: (itemName: string, itemId?: string) => void;
+  /** ⚠ OTA-1657 — the HEALING POUCH: three pockets, each holding a whole stack
+   *  of anything that mends. stowInMedkit loads one, removeFromMedkit pulls it
+   *  back into the pack, and the popup's tap routes through useInventoryItem so
+   *  a heal from the pouch is the same event as a heal from the pack. */
+  stowInMedkit: (itemName: string, itemId?: string) => void;
+  removeFromMedkit: (itemName: string, itemId?: string) => void;
   useHealBatch: (itemName: string, target: 'self' | 'dog' | 'golem', count: number) => void;
   dropInventoryItem: (itemName: string, itemId?: string) => void;
   dropInventoryInstance: (itemId: string) => void;
@@ -381,6 +387,68 @@ export const createInventorySlice = (
     // Routine unequip no longer narrates to the story feed (see equipItem) — the
     // inventory screen + HUD already reflect the empty slot. Suppressed so gear
     // management doesn't bury the scene.
+    void get().persist();
+  },
+
+  // ⚠⚠⚠ OTA-1657 — LOAD THE HEALING POUCH. Owner: *"battle gets slowed down when
+  // you have to heal… we can load it with any three healing items they want."*
+  // Mirrors stowInBandolier line for line; only the gate and the cap differ,
+  // because three racks that behave three ways is three things to remember in the
+  // middle of a fight. It racks a STACK: one slot is "5 Trauma Kits", carrying
+  // whatever quantity the pack instance holds.
+  stowInMedkit(itemName, itemId) {
+    const player = get().player;
+    if (!player) return;
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const mk = require('../../engine/medkitEligibility') as typeof import('../../engine/medkitEligibility');
+    // OTA-1005 — count LIVE ids only, so a stack spent by any other path can
+    // never hold a pocket hostage as a ghost.
+    const current = (player.equipped?.medkitIds ?? []).filter((id) => player.inventory.some((i) => i.id === id));
+    // Prefer the exact instance the UI tapped; else the first UN-racked stack of
+    // that name (the OTA-690 rule — otherwise a second Trauma Kit stack could
+    // never be loaded, because the search kept re-finding the racked one).
+    const item = (itemId ? player.inventory.find((i) => i.id === itemId && i.quantity > 0) : undefined)
+      ?? player.inventory.find(
+        (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0 && !current.includes(i.id),
+      )
+      ?? player.inventory.find((i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0);
+    if (!item) {
+      get().appendLog('arbiter', `The Arbiter glances at your pack. "I don't see ${withArticle(itemName)} on you."`);
+      return;
+    }
+    const eligibility = mk.isMedkitEligible(item, player);
+    if (!eligibility.eligible) {
+      // B15 — a refusal always speaks, and it says WHY.
+      get().appendLog('arbiter', `The Arbiter looks at the ${item.name}. "${eligibility.reason}."`);
+      return;
+    }
+    if (current.length >= mk.MEDKIT_MAX) {
+      get().appendLog('arbiter', `The Arbiter taps the pouch. "Three pockets. Take something out before you put something in."`);
+      return;
+    }
+    set((s) => s.player
+      ? { player: { ...s.player, equipped: { ...(s.player.equipped ?? {}), medkitIds: [...current, item.id] } } }
+      : s);
+    get().appendLog('world', `You tuck ${item.name}${item.quantity > 1 ? ` ×${item.quantity}` : ''} into your healing pouch.`);
+    void get().persist();
+  },
+
+  removeFromMedkit(itemName, itemId) {
+    const player = get().player;
+    if (!player) return;
+    const current = player.equipped?.medkitIds ?? [];
+    const item = (itemId ? player.inventory.find((i) => i.id === itemId && current.includes(i.id)) : undefined)
+      ?? player.inventory.find(
+        (i) => i.name.toLowerCase() === itemName.toLowerCase() && current.includes(i.id),
+      );
+    if (!item) {
+      get().appendLog('arbiter', `The Arbiter looks at the pouch. "${itemName} isn't in there."`);
+      return;
+    }
+    set((s) => s.player
+      ? { player: { ...s.player, equipped: { ...(s.player.equipped ?? {}), medkitIds: current.filter((id) => id !== item.id) } } }
+      : s);
+    get().appendLog('world', `You take ${item.name} out of the healing pouch and back into your pack.`);
     void get().persist();
   },
 

@@ -7417,6 +7417,12 @@ export interface GameStore {
    *  when the stack empties. */
   stowInBandolier: (itemName: string) => void;
   removeFromBandolier: (itemName: string, itemId?: string) => void;
+  /** ⚠ OTA-1657 — the HEALING POUCH: three pockets, each holding a whole stack
+   *  of anything that mends. stowInMedkit loads one, removeFromMedkit pulls it
+   *  back into the pack, and the popup's tap routes through useInventoryItem so
+   *  a heal from the pouch is the same event as a heal from the pack. */
+  stowInMedkit: (itemName: string, itemId?: string) => void;
+  removeFromMedkit: (itemName: string, itemId?: string) => void;
   throwFromBandolier: (itemName: string, itemId?: string) => void;
   /** ⚠ OTA-1511 — hurl a hand-carried throwing spear / javelin (the long
    *  shafts OTA-605 keeps OFF the bandolier) at the active enemy through the

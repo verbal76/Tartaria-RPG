@@ -91,6 +91,11 @@ const REGISTRY = [
   { file: 'app/screens/ContractsScreen.tsx', cond: 'active', trueMeans: 'open' },
   { file: 'app/screens/ContractsScreen.tsx', cond: 'mqExpanded', trueMeans: 'open' },
   { file: 'app/screens/InventoryScreen.tsx', cond: 'collapsed', trueMeans: 'closed' },
+  // OTA-1657 — RackFrame, the ONE collapse shared by the scanner pouch, the
+  // bandolier and the healing pouch. Its prop is `open`, so true means OPEN —
+  // the opposite polarity to the category headers three lines above it in the
+  // same file, which is exactly the collision this gate exists to keep honest.
+  { file: 'app/screens/InventoryScreen.tsx', cond: 'open', trueMeans: 'open' },
   { file: 'app/screens/VendorScreen.tsx', cond: 'collapsed', trueMeans: 'closed' },
   { file: 'app/screens/WorldScreen.tsx', cond: 'collapsed[key]', trueMeans: 'closed' },
   { file: 'app/screens/AboutScreen.tsx', cond: 'advancedOpen', trueMeans: 'open' },

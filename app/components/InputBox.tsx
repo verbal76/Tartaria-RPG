@@ -293,6 +293,18 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   const bandolierItems = bandolierIds
     .map((id) => inventory.find((it) => it.id === id))
     .filter((it): it is InventoryItem => !!it && it.quantity > 0);
+  // ⚠⚠⚠ OTA-1657 — THE HEALING POUCH, AND IT OPENS OUT OF COMBAT TOO. Owner:
+  // *"battle gets slowed down when you have to heal. let's make it available from
+  // the exploration screen."* So unlike the bandolier — which is a THROW, and has
+  // no meaning with nobody to throw at — this button renders on BOTH rows.
+  // Patching up between fights is the same three taps through the pack that the
+  // pouch exists to delete, and the walk away from a fight is exactly when a
+  // player does it.
+  const [medkitOpen, setMedkitOpen] = useState(false);
+  const medkitIds = useGameStore((s) => s.player?.equipped?.medkitIds ?? EMPTY_BANDOLIER_IDS);
+  const medkitItems = medkitIds
+    .map((id) => inventory.find((it) => it.id === id))
+    .filter((it): it is InventoryItem => !!it && it.quantity > 0);
   // ⚠⚠ OTA-1270 — the draft lives in the STORE, shared with the floating
   // KeyboardInputBar. Two private useState copies were how "act doesn't see
   // any text" happened: the player typed into one field and tapped the other
@@ -905,6 +917,10 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
               {bandolierItems.length > 0 ? (
                 <QuickBtn label={`✦ bandolier (${bandolierItems.length})`} tone="ready" onPress={() => setBandolierOpen((v) => !v)} />
               ) : null}
+              {/* OTA-1657 — the healing pouch, in the fight it was built for. */}
+              {medkitItems.length > 0 ? (
+                <QuickBtn label={`✚ heals (${medkitItems.length})`} tone="ready" onPress={() => setMedkitOpen((v) => !v)} />
+              ) : null}
             </View>
 
             <View style={styles.quickRowLine}>
@@ -934,6 +950,14 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             ))}
             {raceAbilityReady && onOpenRaceAbilities && !tutLock ? (
               <QuickBtn label="✦ ability" onPress={onOpenRaceAbilities} tone="ready" />
+            ) : null}
+            {/* ⚠ OTA-1657 — the healing pouch on the EXPLORATION row too, which is
+                the half the owner asked for by name: *"let's make it available
+                from the exploration screen."* Same button, same popup, same
+                effect — patching up after a fight is the same walk through the
+                pack that the pouch exists to delete. */}
+            {medkitItems.length > 0 ? (
+              <QuickBtn label={`✚ heals (${medkitItems.length})`} tone="ready" onPress={() => setMedkitOpen((v) => !v)} />
             ) : null}
             <QuickBtn
               label={investigateSweeping ? 'investigating…' : 'investigate'}
@@ -1071,6 +1095,32 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
               </Pressable>
             );
           })}
+        </View>
+      ) : null}
+      {/* ⚠⚠⚠ OTA-1657 — THE HEALING POUCH POPUP. One button per loaded stack; tap
+          to use it. ⚠ NOT gated on `inCombat` — the bandolier's popup is, because
+          a throw needs something to throw at, but a heal is exactly as useful on
+          the walk home, and that walk is where the owner said he wanted it.
+
+          ⚠⚠ THE TAP CALLS `useInventoryItem`, WHICH IS THE POINT. Owner: *"when
+          you use it, it acts like they do when being used from inventory."* That
+          is not a similarity, it is the same action the pack's USE button
+          fires — so the heal, the stamina, the cure, the stack decrement, the
+          Arbiter's line and every downstream hook are one implementation, not
+          two that can drift. A second copy of "what eating a Trauma Kit does" is
+          precisely the class of bug this session has spent the day removing. */}
+      {medkitOpen && medkitItems.length > 0 ? (
+        <View style={styles.bandolierPicker}>
+          {medkitItems.map((it) => (
+            <Pressable
+              key={it.id}
+              onPress={() => { setMedkitOpen(false); useGameStore.getState().useInventoryItem(it.name); }}
+              style={[styles.bandolierPickerBtn, styles.medkitPickerBtn]}
+            >
+              <Text style={[styles.bandolierPickerLabel, styles.medkitPickerLabel]} numberOfLines={1}>{it.name.toUpperCase()}</Text>
+              <Text style={styles.bandolierPickerHint}>use{it.quantity > 1 ? ` · ×${it.quantity} left` : ''}</Text>
+            </Pressable>
+          ))}
         </View>
       ) : null}
       <TutorialTarget area="input-row" style={styles.inputRow}>
@@ -1474,6 +1524,12 @@ const styles = StyleSheet.create({
   bandolierPickerHint: { color: '#8a7e66', fontSize: 9, marginTop: 3, textAlign: 'center' },
   // OTA-550 — reach coloring on the bandolier picker: green border when the
   // throwable can reach the current combat range, red when it's out of range.
+  // OTA-1657 — the healing pouch reads GREEN, not the bandolier's orange: one
+  // rack throws things away from you and one puts you back together, and a
+  // player reaching for either mid-fight should not have to read the label to
+  // know which popup opened.
+  medkitPickerBtn: { borderColor: '#4f7a3a', backgroundColor: '#131b11' },
+  medkitPickerLabel: { color: '#9ec96a' },
   bandolierInRange: { borderColor: '#4f7a3a' },
   bandolierOutOfRange: { borderColor: '#7a2f2f', backgroundColor: '#241211' },
   bandolierOutOfRangeLabel: { color: '#c45b4a' },

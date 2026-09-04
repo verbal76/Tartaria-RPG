@@ -186,7 +186,13 @@ describe('OTA-1097 — source locks on the selection surface', () => {
 
   it('the FUSABLE view is a selection mode, and the pouch/bandolier fills still win the tap', () => {
     // Two "armed" tap modes at once would be a coin flip.
-    expect(view).toContain("const fusionSelectMode = sortKey === 'fusionable' && !pouchFilterActive && !bandolierFilterActive;");
+    // ⚠ OTA-1657 — was a hand-typed two-flag string, which broke when the healing
+    // pouch made it three. The rule is that fusion-select yields to EVERY rack
+    // fill mode; assert that, not the arity.
+    expect(view).toMatch(/const fusionSelectMode = sortKey === 'fusionable'(?: && ![a-zA-Z]+FilterActive)+;/);
+    for (const flag of ['pouchFilterActive', 'bandolierFilterActive', 'medkitFilterActive']) {
+      expect(view).toMatch(new RegExp(`const fusionSelectMode = [^;]*!${flag}\\b`));
+    }
   });
 
   it('a tap TOGGLES in both directions and moves the whole stack', () => {

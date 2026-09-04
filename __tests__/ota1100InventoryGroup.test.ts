@@ -102,8 +102,16 @@ describe('OTA-1100 — one gesture, one meaning', () => {
     expect(view).toContain('onLongPress={() => handleItemLongPress(item)}');
   });
 
-  it('the pouch / bandolier fill modes still own the tap — no two live modes', () => {
-    expect(view).toMatch(/if \(pouchFilterActive \|\| bandolierFilterActive\) return;[\s\S]{0,120}beginInvSelect/);
+  it('EVERY rack fill mode still owns the tap — no two live modes', () => {
+    // ⚠ OTA-1657 — this pinned the two-mode expression by hand and so broke when
+    // the healing pouch made it three, on a test about something else. The claim
+    // is "a fill mode beats the group gesture", however many racks exist — so it
+    // now asserts that EACH known fill flag appears in the guard, and the guard
+    // still precedes beginInvSelect.
+    expect(view).toMatch(/if \((?:[a-zA-Z]+FilterActive(?: \|\| )?)+\) return;[\s\S]{0,120}beginInvSelect/);
+    for (const flag of ['pouchFilterActive', 'bandolierFilterActive', 'medkitFilterActive']) {
+      expect(view).toMatch(new RegExp(`if \\([^)]*\\b${flag}\\b[^)]*\\) return;[\\s\\S]{0,120}beginInvSelect`));
+    }
   });
 
   it('emptying the group leaves the mode', () => {

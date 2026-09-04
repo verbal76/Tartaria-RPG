@@ -27256,7 +27256,31 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // 115 HP. Distinct sources still stack — that is the designed trade, four
 // fingers of passive value for four openings; four copies of one ring is that
 // trade with the cost removed.
-export const OTA_BUILD_ID = '2026-09-04-1656-the-blade-you-can-see';
+// OTA-1657 — THE HEALING POUCH, AND THREE RACKS THAT FOLD. Owner: *"battle gets
+// slowed down when you have to heal. let's make it available from the exploration
+// screen. let's make another bandolier and call it the healing pouch… we can load
+// it with any three healing items they want so… 5 trauma kits, say 3 trail rations
+// and maybe 10 blueberries in it… and when you use it, it acts like they do when
+// being used from inventory."* ⚠ THREE POCKETS, AND A POCKET IS A STACK — that is
+// the whole feature, and it is why his load-out fits: a racked id points at an
+// inventory stack, so "Blueberries ×10" is ONE pocket you can tap ten times. Same
+// storage contract as the bandolier since arb110 — items never leave the pack, the
+// rack only records which stacks are within reach, so nothing duplicates and a
+// spent stack simply stops resolving. ⚠⚠ THE TAP CALLS `useInventoryItem`, the
+// very action the pack's USE button fires: not "behaves like", the SAME event, so
+// the heal, the stamina, the cure, the decrement and every downstream hook stay
+// one implementation. Eligibility delegates to `consumableDoesSomething` rather
+// than restating what a heal is — that predicate exists because a pure antivenom
+// (healHP 0, cure yes) was once accepted by one screen and refused by another.
+// ⚠ The ✚ heals button renders on the combat row AND the exploration row and its
+// popup is NOT gated on combat, which is the half he asked for by name; the
+// bandolier stays combat-only because a throw needs a target. ⚠⚠ AND ALL THREE
+// RACKS NOW FOLD, through ONE shared RackFrame rather than three copies of a
+// chevron: same ▸/▾ grammar arb108 gave the inventory categories, defaulting OPEN
+// (a rack is one of three and exists to be glanceable, unlike a category), and the
+// COUNT STAYS ON THE HEADER WHEN FOLDED so the space saved costs no information.
+export const OTA_BUILD_ID = '2026-09-04-1657-the-healing-pouch';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-04-1656-the-blade-you-can-see';
 // golem catch-up 2026-09-04: markerless publish of OTA-1656 - the blade you can
 // see. Coatings were already on 24.3% of spawns and drawn NOWHERE, so the enemy
 // card gets the glyph inline and the popup names the kind, the dice and what
