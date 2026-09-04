@@ -27279,7 +27279,28 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // chevron: same ▸/▾ grammar arb108 gave the inventory categories, defaulting OPEN
 // (a rack is one of three and exists to be glanceable, unlike a category), and the
 // COUNT STAYS ON THE HEADER WHEN FOLDED so the space saved costs no information.
-export const OTA_BUILD_ID = '2026-09-04-1657-the-healing-pouch';
+// ⚠⚠⚠ OTA-1658 — THE POUCH ACTUALLY HEALS, and this is a fix for a defect I
+// shipped in OTA-1657 four hours ago. Owner: *"the heals load into the pouch and
+// it can collapse, I can open heals in battle, but when tapped they don't do
+// anything."* He is right, and the cause is the sentence I wrote in 1657's own
+// message: I routed the tap through `useInventoryItem` and argued it was correct
+// BECAUSE it is the same action the pack's USE button fires. True — and beside the
+// point, because that action ends in `submitPlayerAction('use …')` whose FIRST
+// LINE is `if (!trimmed || get().pendingRolls) return;`. Combat in this game IS
+// pendingRolls. So in a fight the tap hit a guard clause and returned: no heal, no
+// refusal, no log line — the worst failure available, because it cannot be told
+// apart from a dead button. ⚠ Now it calls `useHealBatch`, the direct store action
+// the combat bar already used: HP, stamina and the OTA-1573 cures, one off the
+// stack, logged and persisted, with no parser between the tap and the heal.
+// ⚠⚠ THE LESSON WAS ALREADY WRITTEN DOWN FORTY LINES FROM THE CODE I ADDED —
+// `dropInventoryItem` carries a comment about threading a UI action through
+// submitPlayerAction, watching it pass a probe and fail in the real game, and
+// concluding the BODY must be callable directly. The standing rule, now pinned by
+// ota1658: a button that must work mid-fight calls a store action directly. The
+// suite reproduces the defect first (useInventoryItem under a pending roll changes
+// nothing) and then proves the fix heals through that same state.
+export const OTA_BUILD_ID = '2026-09-04-1658-the-pouch-actually-heals';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-04-1657-the-healing-pouch';
 // golem catch-up 2026-09-04: markerless publish of OTA-1657 - the healing pouch,
 // and three racks that fold. Three pockets, each holding a whole STACK, so his
 // 5 kits / 3 rations / 10 berries fits; the tap calls useInventoryItem so a heal

@@ -1102,19 +1102,32 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
           a throw needs something to throw at, but a heal is exactly as useful on
           the walk home, and that walk is where the owner said he wanted it.
 
-          ⚠⚠ THE TAP CALLS `useInventoryItem`, WHICH IS THE POINT. Owner: *"when
-          you use it, it acts like they do when being used from inventory."* That
-          is not a similarity, it is the same action the pack's USE button
-          fires — so the heal, the stamina, the cure, the stack decrement, the
-          Arbiter's line and every downstream hook are one implementation, not
-          two that can drift. A second copy of "what eating a Trauma Kit does" is
-          precisely the class of bug this session has spent the day removing. */}
+          ⚠⚠⚠ OTA-1658 — AND THE TAP CALLS `useHealBatch`, NOT `useInventoryItem`.
+          Owner, playing 1657: *"I can open heals in battle, but when tapped they
+          don't do anything."* He was right, and the reason was the argument
+          written here in 1657 — that routing through `useInventoryItem` was
+          correct BECAUSE it is the same action the pack's USE button fires. True,
+          and beside the point: that action ends in
+          `submitPlayerAction('use …')`, whose FIRST LINE is
+          `if (!trimmed || get().pendingRolls) return;`. Combat in this game IS
+          pendingRolls. So in a fight the tap hit a guard clause and returned —
+          no heal, no refusal, no log line, which is the worst failure available
+          because it cannot be told apart from a dead button.
+
+          ⚠ `useHealBatch` is the path the combat bar already used: a direct store
+          action that applies HP, stamina AND the OTA-1573 cures, spends one from
+          the stack, logs it and persists — with no parser between the tap and the
+          heal. The 1657 goal was right (one implementation, not two); the route
+          was wrong. ⚠ THE RULE THIS LEAVES: a button that must work mid-fight
+          calls a store action directly. `dropInventoryItem` learned this exact
+          lesson in this exact file and wrote it down; I added a new UI action
+          forty lines away and made the same mistake anyway. */}
       {medkitOpen && medkitItems.length > 0 ? (
         <View style={styles.bandolierPicker}>
           {medkitItems.map((it) => (
             <Pressable
               key={it.id}
-              onPress={() => { setMedkitOpen(false); useGameStore.getState().useInventoryItem(it.name); }}
+              onPress={() => { setMedkitOpen(false); useGameStore.getState().useHealBatch(it.name, 'self', 1); }}
               style={[styles.bandolierPickerBtn, styles.medkitPickerBtn]}
             >
               <Text style={[styles.bandolierPickerLabel, styles.medkitPickerLabel]} numberOfLines={1}>{it.name.toUpperCase()}</Text>

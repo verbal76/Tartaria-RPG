@@ -152,14 +152,22 @@ describe('OTA-1657 — the pouch holds three STACKS', () => {
 });
 
 describe('OTA-1657 — using from the pouch IS using from the pack', () => {
-  it('⚠⚠ the popup tap calls useInventoryItem — not a second copy of the heal', () => {
+  it('⚠⚠ the popup tap calls the SHARED heal — not a second copy of it', () => {
     // Owner: "when you use it, it acts like they do when being used from
-    // inventory." Not "similarly to" — the SAME action, so the heal, the
-    // stamina, the cure, the stack decrement and every downstream hook are one
-    // implementation. A second "what eating a Trauma Kit does" is the exact class
-    // of drift this session has spent the day removing.
+    // inventory." Not "similarly to" — one implementation of what eating a
+    // Trauma Kit does.
+    //
+    // ⚠⚠⚠ OTA-1658 — THIS TEST ORIGINALLY PINNED `useInventoryItem`, AND THAT
+    // PINNED THE BUG. That route ends in `submitPlayerAction`, whose first line
+    // returns while `pendingRolls` is set — which is exactly what combat is — so
+    // the tap did nothing in a fight and this assertion went green over it. The
+    // owner found it in minutes: "I can open heals in battle, but when tapped
+    // they don't do anything." The shared implementation is `useHealBatch`, the
+    // direct store action the combat bar already used; ota1658 reproduces the
+    // failure before proving the fix.
     const src = readSrc('app/components/InputBox.tsx');
-    expect(src).toContain('useGameStore.getState().useInventoryItem(it.name)');
+    expect(src).toContain("useGameStore.getState().useHealBatch(it.name, 'self', 1)");
+    expect(src).not.toContain('useInventoryItem(it.name)');
   });
 
   it('⚠ the popup is NOT gated on combat — that is the half he asked for by name', () => {
