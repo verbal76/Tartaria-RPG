@@ -97,13 +97,23 @@ const LEXICON: Array<[RegExp, LexiconReplacement]> = [
   // slow emphasized syllables; collapsing the trailing chunks into one
   // unbroken token lets espeak-ng pronounce tair+ee+uh as a single
   // beat per the playtester's "tar then everything-else-together" spec.
-  //   Tartaria   = "tar taireeuh"
-  //   Tartarian  = "tar taireeun"
-  //   Tartarians = "tar taireeunz"
+  //   Tartaria   = "tar taireea"
+  //   Tartarian  = "tar taireean"
+  //   Tartarians = "tar taireeans"
   //   Tartary    = "tar tar ee" (unchanged — different word)
-  [/\bTartaria\b/gi, 'tar taireeuh'],
-  [/\bTartarian\b/gi, 'tar taireeun'],
-  [/\bTartarians\b/gi, 'tar taireeunz'],
+  // ⚠ OTA-1659 — THE TAIL WAS EATING A SYLLABLE OUT OF THE GAME'S OWN NAME.
+  // The respelling shipped as "taireeuh"/"taireeun"/"taireeunz", and measured
+  // (`espeak-ng -v en-us -q --ipa`) espeak reads `eeu` as the GLIDE /juː/, not
+  // as two vowels — so the trailing "-ee-uh" collapsed into "-yoo":
+  //     tar taireeuh   → tˈɑːɹ tˈɛɹjuː     ("tar TERR-yoo")
+  //     tar taireeunz  → tˈɑːɹ tˈɛɹjuːnts  (and a parasitic t on the plural)
+  // Spelling the tail `-ea` / `-ean` / `-eans` — ordinary English orthography,
+  // which is this file's whole convention — lands the intended three beats:
+  //     tar taireea    → tˈɑːɹ tˈɛɹiə      tar taireean  → tˈɑːɹ tˈɛɹiən
+  //     tar taireeans  → tˈɑːɹ tˈɛɹiənz
+  [/\bTartaria\b/gi, 'tar taireea'],
+  [/\bTartarian\b/gi, 'tar taireean'],
+  [/\bTartarians\b/gi, 'tar taireeans'],
   [/\bTartary\b/gi, 'tar tar ee'],
   // Playtester spec OTA 219; place-name IPA refresh OTA-104 for
   // Asgardar, Samarran, Nimari per fresh playtester IPA:
@@ -121,7 +131,14 @@ const LEXICON: Array<[RegExp, LexiconReplacement]> = [
   [/\bSamarran\b/gi, 'eh sem or en'],
   [/\bThametan\b/gi, 'thuh meh tahn'],
   [/\bNimari\b/gi, 'eh neh mah ree'],
-  [/\bZharak\b/gi, 'zah rak'],
+  // ⚠ OTA-1659 — THIS RESPELLING WAS DESTROYING THE SOUND IT EXISTED TO PROTECT.
+  // The worksheet's own key says `zh` ≈ the s in "treasure", and espeak agrees —
+  // but the entry shipped as "zah rak", which drops the h and therefore the
+  // sound. Measured: the RAW word was closer than the respelling.
+  //     Zharak    → ʒˈæɹæk    (raw: right consonant, wrong vowel)
+  //     zah rak   → zˈɑː ɹˈæk (shipped: right vowel, plain Z — the zh is gone)
+  //     zhah rak  → ʒˈɑː ɹˈæk (both)
+  [/\bZharak\b/gi, 'zhah rak'],
 
   // Faction / role nouns sometimes mangled by stress placement.
   // Monarch — playtester spell-it-out spec OTA-109: "mon-nark"
@@ -143,11 +160,14 @@ const LEXICON: Array<[RegExp, LexiconReplacement]> = [
   [/\bRunecaster\b/gi, 'rune caster'],
   [/\bRunecasters\b/gi, 'rune casters'],
 
-  // English contractions where espeak's letter-to-sound rule lands on
-  // the wrong vowel. "doesn't" comes out as "DOSE-ent" (like "rose")
-  // instead of "DUZ-ent". Match with or without the apostrophe in case
-  // the pipeline strips it before we get here.
-  [/\bdoesn'?t\b/gi, 'duzzent'],
+  // ⚠ OTA-1659 — THE "doesn't" ENTRY IS GONE, BECAUSE IT NEVER DID ANYTHING.
+  // It claimed espeak reads the contraction as "DOSE-ent" (like "rose") and
+  // respelled it "duzzent" to force the /ʌ/. Measured, the two are the same
+  // string of phonemes — espeak has "doesn't" in its dictionary and always had
+  // it right:
+  //     doesn't  → dˈʌzənt        duzzent → dˈʌzənt
+  // Same class of mistake as the article: an entry added to correct a word the
+  // phonemizer already knew. This one was merely inert; "the" was not.
 ];
 
 // OTA 013 — sort lexicon entries by pattern length descending so
@@ -172,26 +192,41 @@ const SORTED_LEXICON: Array<[RegExp, LexiconReplacement]> = [...LEXICON]
     return b[0].source.length - a[0].source.length;
   });
 
-// 2026-05-25 [TTS-1] — IPA-override channel. The user asked "we
+// 2026-05-25 [TTS-1] — inline-phoneme override channel. The user asked "we
 // should see if kokoro can read ipa text" with /tɑːrˈtɑːriə/ as
 // the example case for "Tartaria." Kokoro's phonemizer is
-// espeak-ng-derived, and espeak-ng accepts inline IPA wrapped in
-// double brackets (e.g. `[[tɑːrˈtɑːriə]]`). Whether the bracket
-// syntax survives the Kokoro tokenizer is verified on-device only
-// — this map is OFF by default. To enable: flip the
-// IPA_OVERRIDES_ENABLED flag at the top of applyLoreLexicon.
+// espeak-ng-derived, and espeak-ng accepts inline phonemes wrapped
+// in double brackets. Whether the bracket syntax survives the
+// Kokoro tokenizer is verified on-device only — this map is OFF by
+// default. To enable: flip the IPA_OVERRIDES_ENABLED flag at the
+// top of applyLoreLexicon.
 //
-// If on-device test shows Kokoro speaks the IPA correctly, expand
-// this map with the proper-noun set the playtester surfaces and
-// drop the corresponding respelling regex from LEXICON above.
-// If Kokoro speaks the brackets verbatim ("double-bracket open
-// tee a colon r…"), leave disabled and rely on respellings only.
+// ⚠⚠⚠ OTA-1659 — THIS MAP WAS A LOADED GUN AND THE ENCODING WAS THE TRIGGER.
+// It shipped holding Unicode IPA, and Unicode IPA is NOT what espeak-ng reads
+// between double brackets — it reads its OWN ASCII phoneme mnemonics. Measured
+// on espeak-ng 1.51 (`espeak-ng -v en-us -q --ipa`):
+//
+//     [[ðə]] blade     →  "blˈeɪd"        ⚠ THE WORD IS GONE. Silently.
+//     [[D@]] blade     →  "ðə blˈeɪd"     ✓
+//
+// So the failure mode of flipping that flag was never "Kokoro reads the
+// brackets out loud" — the comment's own stated worst case — it was that every
+// Tartaria, Tartarian, Drakova and Aether in the game would go SILENT, leaving
+// a hole in the sentence with no error anywhere. Rewritten below in the
+// mnemonics, each one measured through the same command:
+//
+//     [[tA:t'A:ri@]]   →  tɑːtˈɑːɹiə        [[tA:t'A:ri@n]]  → tɑːtˈɑːɹiən
+//     [[tA:t'A:ri@nz]] →  tɑːtˈɑːɹiənz      [[dr@k'oUv@]]    → dɹəkˈoʊvə
+//     [['eIT@]]        →  ˈeɪθə
+//
+// The flag stays OFF — device verification is still the only thing that can
+// turn it on — but it is now safe to flip, which it demonstrably was not.
 const IPA_OVERRIDES: Record<string, string> = {
-  Tartaria:   'tɑːrˈtɑːriə',
-  Tartarian:  'tɑːrˈtɑːriən',
-  Tartarians: 'tɑːrˈtɑːriənz',
-  Drakova:    'drəˈkoʊvə',
-  Aether:     'ˈeɪθər',
+  Tartaria:   "tA:t'A:ri@",
+  Tartarian:  "tA:t'A:ri@n",
+  Tartarians: "tA:t'A:ri@nz",
+  Drakova:    "dr@k'oUv@",
+  Aether:     "'eIT@",
 };
 function applyIPAOverrides(text: string): string {
   let out = text;
@@ -218,77 +253,75 @@ export function applyLoreLexicon(text: string): string {
       ? out.replace(pattern, replacement)
       : out.replace(pattern, replacement);
   }
-  // ⚠ OTA-1146 — LAST, and that ordering is load-bearing. The article's
-  // pronunciation depends on the sound of the word AFTER it, and the
-  // respellings above CHANGE that sound: "the Aether" becomes "the ay thur",
-  // consonant-initial on the page and vowel-initial in the mouth. Running this
-  // after the loop means it judges the text espeak will actually receive.
-  return respellTheArticle(out);
+  // ⚠⚠⚠ OTA-1659 — AND NOTHING TOUCHES "the". See the block below; the article
+  // is the one word in this file the engine already had exactly right, and the
+  // respelling OTA-1146 added here is what the owner has been hearing.
+  return out;
 }
 
-// ⚠ OTA-1146 — "THE" IS TWO WORDS, and Kokoro only ever says one of them.
+// ⚠⚠⚠ OTA-1659 — "the" IS NOT IN THIS LEXICON, AND IT NEVER SHOULD HAVE BEEN.
 //
-// Owner: *"kokoro pronounces the as thee it should be pronounce thuh or tha."*
+// Owner, twice: *"kokoro pronounces the as thee it should be pronounce thuh or
+// tha"* (→ OTA-1146) and then again, still wrong: *"the needs to be pronounced
+// thuh in kokoro."*
 //
-// English has two articles spelled "the": /ðə/ ("thuh") before a consonant
-// SOUND, and /ðiː/ ("thee") before a vowel SOUND. Every native speaker
-// switches between them without noticing, which is exactly why hearing the
-// wrong one is so grating — "thee blade", "thee guardian", "thee dog" reads as
-// someone spelling the word out rather than speaking it.
+// OTA-1146 answered the first report by adding a rule right here that rewrote
+// every consonant-position "the" to the literal string "thuh" before handing
+// the line to the engine. That rule is what he has been hearing ever since, and
+// this is the measurement that says so — espeak-ng 1.51, the phonemizer this
+// app bundles per voice under `<voice>/espeak-ng-data/`, run as
+// `espeak-ng -v en-us -q --ipa`:
 //
-// ⚠ IT IS THE SOUND THAT DECIDES, NOT THE LETTER, and that is the whole
-// difficulty. "the hour" is thee (silent h → vowel sound). "the university" is
-// thuh (the u says "yoo" → consonant sound). "the unknown" is thee (the u says
-// "uh"). So a bare /^[aeiou]/ test gets the two most common shapes in this
-// game's prose backwards, and both lists below exist to catch them:
-//   · VOWEL_SOUND  — consonant letter, vowel sound (hour, honest, heir).
-//   · CONSONANT_SOUND — vowel letter, consonant sound (use, unit, one, euro).
-// Both are whole-word anchored on purpose: a `uni` PREFIX match would swallow
-// "uninformed" / "uninvited" / "unimportant", which are vowel-sound words and
-// far more common here than "unicorn".
-const THE_VOWEL_SOUND = /^(?:hour(?:s|ly)?|honest(?:y|ly)?|hono(?:u)?rs?|honou?rable|heirs?|heirloom)$/i;
-const THE_CONSONANT_SOUND = new RegExp('^(?:' + [
-  'use[sdr]?', 'using', 'useful', 'useless', 'usual(?:ly)?',
-  'unit(?:s|e|ed|ing|y)?', 'unions?', 'unique(?:ly)?', 'uniforms?', 'unison',
-  'univers(?:e|es|al|ally|it(?:y|ies))', 'unicorns?', 'unilateral(?:ly)?',
-  'utensils?', 'utilit(?:y|ies)', 'uranium', 'ukuleles?',
-  'eu\\w*', 'ewes?', 'ones?', 'once',
-].join('|') + ')$', 'i');
-
-/** ⚠ THE RESPELLING ITSELF. "thuh" is the owner's own first suggestion and the
- *  conventional audiobook respelling. If it comes back voiced wrong on device —
- *  a "thumb" th instead of a "this" th, which is the one real risk, since
- *  espeak-ng gives word-initial `th` its voiceless reading for words it does
- *  not know — the alternates to try, in order, are "thuh" → "thu" → "tha".
- *  Changing this ONE constant is the whole knob; nothing else needs touching. */
-export const THE_SCHWA_RESPELLING = 'thuh';
-
-/** True when the next spoken word BEGINS WITH A VOWEL SOUND, so "the" keeps
- *  its "thee" reading. Exported for the suite — the two exception lists are the
- *  part worth pinning. */
-export function startsWithVowelSound(word: string): boolean {
-  const w = word.replace(/^[^A-Za-z]+/, '');
-  if (!w) return false;
-  if (THE_VOWEL_SOUND.test(w)) return true;
-  if (THE_CONSONANT_SOUND.test(w)) return false;
-  return /^[aeiou]/i.test(w);
-}
-
-/** Rewrite the "thuh" article for TTS only. The visible log keeps "the" — this
- *  runs on the copy handed to the engine, like every other lexicon entry. */
-export function respellTheArticle(text: string): string {
-  // Lookahead, so the following word is inspected but NOT consumed — otherwise
-  // "the the" would leave the second one unexamined.
-  // The optional punctuation class matters: an opening quote or bracket sits
-  // between the article and its noun often enough in this game's prose
-  // (`the "blade"`, `the (broken) rope`) that skipping those lines would leave
-  // the loudest ones — quoted item names — still saying "thee".
-  return text.replace(
-    /\bthe\b(?=(\s+)(["'“‘([]*)([A-Za-z][A-Za-z'’-]*))/gi,
-    (match, _space: string, _punct: string, nextWord: string) =>
-      (startsWithVowelSound(nextWord) ? match : THE_SCHWA_RESPELLING),
-  );
-}
+//     "The raider swings the rusted blade at the dog."
+//        plain     →  ðə ɹˈeɪdɚ swˈɪŋz ðə ɹˈʌstᵻd blˈeɪd æt ðə dˈɑːɡ
+//        OTA-1146  →  θˈʌ ɹˈeɪdɚ swˈɪŋz θˈʌ ɹˈʌstᵻd blˈeɪd æt θˈʌ dˈɑːɡ
+//
+// ⚠ THE ENGINE ALREADY SAID "thuh". `ðə` IS "thuh" — that is the exact sound he
+// asked for, and the untouched text was already producing it three times in
+// that sentence. What the respelling did was replace it with `θˈʌ`: wrong
+// consonant (the voiceless th of THUMB, not the voiced th of THIS), wrong vowel
+// (the STRUT vowel of "duh", not a schwa) and — worst of all — STRESSED, since
+// espeak stresses an unknown monosyllable it has to sound out. An unstressed
+// article turned into a hard stressed beat before every noun in the game.
+//
+// ⚠⚠ THE ESCAPE HATCH OTA-1146 WROTE COULD NEVER HAVE WORKED EITHER. It said
+// that if the voicing came back wrong the alternates to try, in order, were
+// "thuh" → "thu" → "tha". Measured, all three are voiceless and all three are
+// stressed — the ladder only ever changed the vowel, and the vowel was not the
+// defect:
+//
+//     thuh → θˈʌ        thu → θˈɜː        tha → θˈɑː
+//
+// ⚠⚠⚠ AND NO RESPELLING COULD HAVE WORKED, WHICH IS THE REAL FINDING. espeak-ng
+// gives word-initial `th` its VOICELESS reading for every word not in its
+// dictionary — voiced /ð/ at the head of a word survives only in the closed set
+// of function words it already knows (the, this, that, them, than, thus). And
+// the narrator's "dh" convention is worse than useless here, because espeak
+// reads it as an initialism:
+//
+//     dhuh → dˈiːhˈʌ ("dee-huh")      dha → dˌiːˌeɪtʃˈeɪ ("dee-aitch-ay")
+//
+// So there is exactly one string that phonemizes to /ðə/ on this engine, and it
+// is "the". The dictionary entry is `Found: 'the' [D@2]` — schwa, stress level
+// 2, i.e. unstressed — and espeak applies the vowel/consonant switch itself,
+// measured identical on en-us, en-gb and en-gb-x-rp:
+//
+//     the blade → ðə      the guardian → ðə      the dog → ðə
+//     the hour  → ðɪ      the ayther   → ðɪ
+//
+// That last line matters: the lexicon above respells "Aether" to "ayther", and
+// the engine STILL gets the article right, because it judges the text actually
+// handed to it. The context rule OTA-1146 reimplemented in JavaScript — with
+// two hand-maintained exception lists for hour/honest/heir and use/unit/one —
+// was already there, in C, in the dictionary, and correct.
+//
+// ⚠ THE RULE THIS LEAVES: this file respells words the phonemizer does NOT
+// know. "the" is the single most common word in English and the first entry in
+// its dictionary. Respelling into the engine's own vocabulary does not correct
+// it, it overrides it — with letters the engine has no entry for, which is
+// precisely the condition that produces a mispronunciation. Before adding an
+// entry here, check that espeak actually gets the word wrong; the command above
+// is the whole test.
 
 /**
  * TTS-only text cleanup. Strips / rewrites symbols that the engine

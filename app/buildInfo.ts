@@ -27299,7 +27299,40 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ota1658: a button that must work mid-fight calls a store action directly. The
 // suite reproduces the defect first (useInventoryItem under a pending roll changes
 // nothing) and then proves the fix heals through that same state.
-export const OTA_BUILD_ID = '2026-09-04-1658-the-pouch-actually-heals';
+// ⚠⚠⚠ OTA-1659 — "the" IS NOT IN THE LEXICON, AND THE ENGINE ALWAYS HAD IT RIGHT.
+// Owner, for the second time: *"the needs to be pronounced thuh in kokoro."* He
+// reported the same thing at OTA-1146, and OTA-1146 is what he has been hearing
+// since. That fix rewrote every consonant-position "the" to the literal string
+// "thuh" before the line reached the engine, on the argument that espeak was
+// saying "thee". ⚠ NOBODY MEASURED IT. espeak-ng 1.51 — the phonemizer this app
+// bundles per voice under <voice>/espeak-ng-data — reads the plain sentence
+// "The raider swings the rusted blade at the dog" as ðə … ðə … ðə. /ðə/ IS
+// "thuh": the exact sound he asked for, three times, before anyone touched
+// anything. The respelling replaced it with θˈʌ — the voiceless th of THUMB
+// instead of the voiced th of THIS, the STRUT vowel instead of a schwa, and
+// STRESSED, because espeak stresses a monosyllable it has to sound out. An
+// unstressed article became a hard beat in front of every noun in the game.
+// ⚠⚠ AND NO RESPELLING COULD HAVE FIXED IT: espeak gives word-initial `th` its
+// voiceless reading for every word it does not know, so the escape hatch
+// OTA-1146 wrote ("thuh" → "thu" → "tha") only ever changed the vowel, and the
+// vowel was not the defect. There is exactly one string that phonemizes to /ðə/
+// on this engine and it is "the" — dictionary entry `Found: 'the' [D@2]`, with
+// the vowel/consonant switch applied by espeak itself, identical on en-us,
+// en-gb and en-gb-x-rp. The rule this leaves: this file respells words the
+// phonemizer does NOT know; overriding a word it does know is how you create a
+// mispronunciation, not fix one. ⚠ THE SAME MEASUREMENT CONDEMNED THREE MORE
+// ENTRIES. "doesn't"→"duzzent" was inert (both are dˈʌzənt — espeak never said
+// DOSE-ent). "Zharak"→"zah rak" DELETED the zh it existed to protect (ʒ → plain
+// z; now "zhah rak" → ʒˈɑː ɹˈæk). And the Tartaria family's "-eeuh" tail was
+// read as the glide /juː/, so the game's own name came out "tar TERR-yoo", a
+// syllable short — respelled "-ea"/"-ean"/"-eans" → tˈɛɹiə / tˈɛɹiən / tˈɛɹiənz.
+// ⚠⚠⚠ AND THE IPA-OVERRIDE MAP WAS A LOADED GUN: it held Unicode IPA, which
+// espeak does not read between double brackets — `[[ðə]] blade` measures as
+// "blˈeɪd", the word SILENTLY GONE. Flipping that flag would have muted every
+// Tartaria, Drakova and Aether in the game. Rewritten in espeak's own mnemonics
+// (`[[D@]]` → ðə), each measured; the flag stays off pending device proof.
+export const OTA_BUILD_ID = '2026-09-04-1659-the-is-not-in-the-lexicon';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-04-1658-the-pouch-actually-heals';
 // golem catch-up 2026-09-04: markerless publish of OTA-1658 - the pouch actually
 // heals. OTA-1657's tap routed through useInventoryItem, which ends in
 // submitPlayerAction, whose first line returns while pendingRolls is set - and

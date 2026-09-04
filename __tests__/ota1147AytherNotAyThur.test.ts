@@ -22,7 +22,7 @@
 //
 // ⚠ PRONUNCIATION, NOT SPELLING: this is the TTS copy only. The visible log,
 // the item names and the codex all still read "Aether".
-import { applyLoreLexicon, respellTheArticle } from '../app/voice/loreLexicon';
+import { applyLoreLexicon } from '../app/voice/loreLexicon';
 
 /** Every Aether-prefixed word actually present in the game's content, found by
  *  grepping app/data + app/engine. The point of the list is that only five of
@@ -111,15 +111,14 @@ describe('OTA-1147 — it stays inside its own family', () => {
   });
 });
 
-describe('OTA-1147 — it composes with the OTA-1146 article rule', () => {
-  it('⚠ "the Aether" still takes the THEE reading', () => {
-    // The respelling is vowel-initial in the mouth as well as on the page, so
-    // the article rule (which runs after it) correctly leaves "the" alone.
+describe('OTA-1147 — the respelling leaves the article alone', () => {
+  it('⚠ "the Aether" keeps its "the", and the engine reads it correctly', () => {
+    // OTA-1146 used to rewrite the article here; OTA-1659 removed that rule.
+    // espeak already gives "the ayther" the vowel-position article (measured:
+    // ðɪ) because it phonemizes the text it is actually handed — which is the
+    // ordering argument OTA-1146 made, answered by the engine itself. The full
+    // measurement lives in the OTA-1659 block in loreLexicon.ts.
     expect(applyLoreLexicon('the Aether')).toBe('the ayther');
     expect(applyLoreLexicon('the Aetheric surge')).toBe('the aytheric surge');
-  });
-
-  it('the article rule reads the respelling, not the original', () => {
-    expect(respellTheArticle('the ayther')).toBe('the ayther');
   });
 });

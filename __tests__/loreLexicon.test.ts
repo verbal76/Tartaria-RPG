@@ -28,9 +28,12 @@ describe('applyLoreLexicon', () => {
   });
 
   it('respells Tartaria / Tartarian / Tartarians', () => {
-    expect(applyLoreLexicon('walk into Tartaria')).toBe('walk into tar taireeuh');
-    expect(applyLoreLexicon('a Tartarian Giant')).toBe('a tar taireeun Giant');
-    expect(applyLoreLexicon('Tartarians remember')).toBe('tar taireeunz remember');
+    // ⚠ RETARGETED for OTA-1659: the tail is spelled `-ea`/`-ean`/`-eans`, not
+    // `-euh`/`-eun`/`-eunz`. Measured, espeak reads `eeu` as the glide /juː/, so
+    // the old spelling said "tar TERR-yoo" — a syllable short of the name.
+    expect(applyLoreLexicon('walk into Tartaria')).toBe('walk into tar taireea');
+    expect(applyLoreLexicon('a Tartarian Giant')).toBe('a tar taireean Giant');
+    expect(applyLoreLexicon('Tartarians remember')).toBe('tar taireeans remember');
   });
 
   it('respells Reclaimer / Reclaimers (apostrophe stays attached)', () => {
@@ -38,10 +41,12 @@ describe('applyLoreLexicon', () => {
     // The trailing apostrophe in "Reclaimers'" stays in place after
     // substitution — TTS reads "ree clay merz Outpost" naturally
     // because the apostrophe isn't pronounced.
-    // ⚠ RETARGETED for OTA-1146: the article now takes its schwa reading before
-    // a consonant sound, and the respelling "ree…" is one. The claim this test
-    // makes — that the apostrophe survives substitution — is unchanged.
-    expect(applyLoreLexicon("the Reclaimers' Outpost")).toBe("thuh ree clay merz' Outpost");
+    // ⚠ RETARGETED TWICE. OTA-1146 made this "thuh ree clay merz'"; OTA-1659
+    // removed that rule after measuring that espeak already reads a bare "the"
+    // as ðə and that "thuh" phonemizes to θˈʌ — the wrong consonant entirely.
+    // The claim this test actually makes — that the apostrophe survives
+    // substitution — is unchanged through both.
+    expect(applyLoreLexicon("the Reclaimers' Outpost")).toBe("the ree clay merz' Outpost");
   });
 
   it('respells place names (Drakova, Varakush, Asgardar, etc.)', () => {
