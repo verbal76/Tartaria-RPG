@@ -22,6 +22,7 @@
 
 import type { InventoryItem, PlayerCharacter } from './types';
 import { consumableDoesSomething } from './consumableCures';
+import { isGolemRepairPart, isGolemSubstitutePart } from './golems';
 import { resolveItemEffect } from './itemEffect';
 import { findGearByName, findExplorationItemByName, findMaterialByName } from './crafting';
 
@@ -53,6 +54,55 @@ export function itemHeals(item: InventoryItem): boolean {
   return consumableDoesSomething(fx);
 }
 
+/** ⚠⚠⚠ OTA-1663 — THE GOLEM EATS FROM THE POUCH TOO. Owner: *"I think we should
+ *  allow materials that can be fed to the Golem in the heals pouches, but those
+ *  only have the option to go straight to the Golem."*
+ *
+ *  Same two predicates the inventory's "Heal <golem>" button uses, so a scrap
+ *  that mends the golem in the pack mends it from the pouch — an exact fuel
+ *  part (full heal) or an element-matched substitute (rarity-scaled). Both are
+ *  golem-KIND dependent, which is why this needs the player and not just the
+ *  item: a Mud golem's parts are not an Iron golem's. */
+export function itemFeedsGolem(
+  item: InventoryItem,
+  player: PlayerCharacter | null | undefined,
+): boolean {
+  const golem = player?.golem;
+  if (!golem) return false;
+  // ⚠ AND IT CANNOT THROW, because this now runs during RENDER — once per racked
+  // row, every frame the input bar paints. `golemRepairParts` indexes
+  // GOLEM_DEFINITIONS without a guard, so a golem whose stored `kind` has
+  // drifted (the OTA-1603 dog-vest failure, one species over) would take the
+  // whole input bar down instead of quietly not offering a button. `golemStats`
+  // already guards the same lookup; this is the same defence at the new caller.
+  try {
+    return isGolemRepairPart(golem.kind, item.name) || isGolemSubstitutePart(golem.kind, item);
+  } catch {
+    return false;
+  }
+}
+
+/** ⚠⚠ WHAT A RACKED ITEM IS FOR — and it is ONE function on purpose. The pouch
+ *  now holds two different kinds of thing, and the screen has to know which it
+ *  tapped. Deriving that at the call site is how the eligibility check and the
+ *  button drift apart: something gets racked as a heal and then behaves like a
+ *  golem part, or the reverse. Everything asks here.
+ *
+ *  ⚠ HEALS WIN A TIE. A few materials both mend the player and match the
+ *  golem's element; the owner's words were "materials that can be fed to the
+ *  Golem", not "food", and a Trail Ration that silently went into the frame
+ *  instead of his mouth would be the OTA-1662 defect again with the targets
+ *  swapped. If it can heal a person, it is a heal. */
+export type MedkitRole = 'heal' | 'golem';
+export function medkitRole(
+  item: InventoryItem,
+  player: PlayerCharacter | null | undefined,
+): MedkitRole | null {
+  if (itemHeals(item)) return 'heal';
+  if (itemFeedsGolem(item, player)) return 'golem';
+  return null;
+}
+
 export interface MedkitEligibility { eligible: boolean; reason: string }
 
 /** Can this item be loaded into the healing pouch? Returns the `{ eligible,
@@ -66,8 +116,16 @@ export function isMedkitEligible(
   if ((item.quantity ?? 0) <= 0) {
     return { eligible: false, reason: `You have none of those left` };
   }
-  if (!itemHeals(item)) {
-    return { eligible: false, reason: `That won't mend anything — the pouch is for kits, food and cures` };
+  // ⚠ OTA-1663 — golem fuel counts now, but only while a golem is actually
+  // yours: `itemFeedsGolem` is false without one, so a stranger's scrap metal
+  // still cannot be racked, and the refusal below still says why.
+  if (!medkitRole(item, player)) {
+    return {
+      eligible: false,
+      reason: player?.golem
+        ? `That won't mend anything — the pouch is for kits, food, cures and ${player.golem.name}'s parts`
+        : `That won't mend anything — the pouch is for kits, food and cures`,
+    };
   }
   const loaded = player?.equipped?.medkitIds ?? [];
   if (loaded.includes(item.id)) {

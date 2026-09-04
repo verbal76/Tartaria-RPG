@@ -1131,8 +1131,17 @@ export function InventoryScreen() {
         buttons.push({
           // arb106 — "Heal" (not "Repair"), with the golem's current HP.
           label: `Heal ${golem.name}  ${golem.hp}/${golem.hpMax}${full ? ' (full)' : ''}`,
+          // ⚠⚠⚠ OTA-1663 — THE THIRD INSTANCE OF THE OTA-1658 DEFECT, found while
+          // letting the healing pouch hold golem fuel. `submitPlayerAction`
+          // returns on its first line while `pendingRolls` is set, and combat IS
+          // pendingRolls — so mending your golem from the pack DURING A FIGHT,
+          // which is the exact moment it is falling apart, did nothing at all:
+          // no heal, no refusal, no line. `useHealBatch(name, 'golem', 1)` is
+          // the same direct action the "Heal Max" button eight lines down has
+          // always used, and it carries its own spoken refusals (no golem / this
+          // won't feed it), so the B15 rule holds.
           onPress: () => {
-            if (!full) useGameStore.getState().submitPlayerAction(`feed golem ${pending.item.name}`);
+            if (!full) useHealBatch(pending.item.name, 'golem', 1);
             closeModal();
           },
           tone: full ? 'neutral' : 'primary',
@@ -1158,8 +1167,13 @@ export function InventoryScreen() {
         if (cat && isGolemWeapon(cat.tags)) {
           buttons.push({
             label: `Arm ${golem.name}`,
+            // ⚠⚠ OTA-1663 — the FOURTH, in the same block. Same guard, same
+            // silence: handing your golem a weapon mid-fight did nothing.
+            // `armGolem` is already a store action in its own right — the
+            // parser's `arm golem with <weapon>` branch just calls it — so this
+            // is the same work with the dead gate taken out from in front.
             onPress: () => {
-              useGameStore.getState().submitPlayerAction(`arm golem with ${pending.item.name}`);
+              useGameStore.getState().armGolem(pending.item.name);
               closeModal();
             },
             tone: 'primary',

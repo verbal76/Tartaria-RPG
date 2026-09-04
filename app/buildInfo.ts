@@ -27408,7 +27408,32 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // from the pack during a fight did nothing at all: no heal, no refusal, no
 // line. Exactly the failure the owner reported on the pouch, in the very button
 // the pouch was told to imitate. Fixed to the direct action and pinned.
-export const OTA_BUILD_ID = '2026-09-04-1662-the-pouch-asks-who';
+// ⚠⚠⚠ OTA-1663 — THE GOLEM EATS FROM THE POUCH. Owner: *"I think we should
+// allow materials that can be fed to the Golem in the heals pouches, but those
+// only have the option to go straight to the Golem."* Two halves, and the second
+// is the interesting one: widening what the pouch ACCEPTS is easy; "only have
+// the option to go straight to the Golem" is the instruction that matters, one
+// turn after OTA-1662 taught this rack to ASK. A scrap plate is not something
+// you eat or feed the dog, so a chooser there would be 1662's mistake wearing
+// the opposite coat — a question with one possible answer. ⚠⚠ ONE PREDICATE
+// DECIDES BOTH: `medkitRole` is what the eligibility gate uses to let a thing IN
+// and what the popup uses to decide what it DOES on the way out, because two
+// copies of that judgement is exactly how a rack and its gate drift. Heals win a
+// tie on purpose — some materials both mend a person and match the golem's
+// element, and a ration that silently went into the frame would be 1662 again
+// with the targets swapped. ⚠ AND IT CANNOT THROW: this now runs during RENDER,
+// once per racked row, and `golemRepairParts` indexes its table unguarded, so a
+// drifted golem kind (the OTA-1603 failure, one species over) would have taken
+// the input bar down instead of quietly offering no button. ⚠⚠⚠ WIRING IT UP
+// FOUND THE THIRD AND FOURTH INSTANCES OF THE OTA-1658 DEFECT, both in the same
+// golem block: "Heal <golem>" and "Arm <golem>" each routed through
+// submitPlayerAction, which returns while pendingRolls is set — so mending your
+// golem mid-fight, the exact moment it is coming apart, and handing it a weapon
+// mid-fight both did nothing at all. Four buttons in one feature family across
+// three consecutive OTAs, so ota1663 SWEEPS the whole screen for
+// `submitPlayerAction(\`feed|arm|heal` rather than pinning the two I touched.
+export const OTA_BUILD_ID = '2026-09-04-1663-the-golem-eats-from-the-pouch';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-04-1662-the-pouch-asks-who';
 // golem catch-up 2026-09-04: markerless publish of OTA-1662 - the pouch asks
 // who. Owner: the heals pouch "automatically applies it to me", and he wants it
 // to ask like the inventory does. I hard-coded 'self' in OTA-1658 while fixing

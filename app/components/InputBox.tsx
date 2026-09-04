@@ -16,6 +16,7 @@ import { visibleBuildingRooms, roomHasExitDoor } from '../engine/buildings';
 import type { ClimbBlockReason } from '../engine/climbReadiness';
 import { TUTORIAL_STEPS, TUT_LOCK_BEATS } from './tutorialSteps';
 import { useGameStore, logUiTap } from '../state/gameStore';
+import { medkitRole, type MedkitRole } from '../engine/medkitEligibility'; // OTA-1663
 // ⚠ OTA-1404 — combat resolution moved out of gameStore into its own leaf.
 import { playerWeaponReach } from '../state/combatResolution';
 import { itemIsShield, findWeaponByName } from '../engine/crafting';
@@ -323,6 +324,14 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
     const d = s.player?.dog;
     return d && d.status !== 'abandoned' && d.status !== 'dead' ? d : null;
   });
+  // ⚠⚠ OTA-1663 — and the golem, for the same reason. What a racked item is FOR
+  // is decided by `medkitRole`, the SAME predicate the eligibility check uses,
+  // so a thing that was allowed IN as golem fuel cannot behave like a heal on
+  // the way out. Deriving that at the call site instead is exactly how a rack
+  // and its gate drift apart.
+  const medkitGolem = useGameStore((s) => ((s.player?.golem?.hp ?? 0) > 0 ? s.player!.golem! : null));
+  const medkitPlayer = useGameStore((s) => s.player);
+  const medkitRoleOf = (it: InventoryItem): MedkitRole | null => medkitRole(it, medkitPlayer);
   // ⚠⚠ OTA-1270 — the draft lives in the STORE, shared with the floating
   // KeyboardInputBar. Two private useState copies were how "act doesn't see
   // any text" happened: the player typed into one field and tapped the other
@@ -1146,6 +1155,16 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             <Pressable
               key={it.id}
               onPress={() => {
+                // ⚠⚠⚠ OTA-1663 — GOLEM FUEL GOES STRAIGHT TO THE GOLEM. Owner:
+                // *"allow materials that can be fed to the Golem in the heals
+                // pouches, but those only have the option to go straight to the
+                // Golem."* A scrap plate is not something you eat or feed the
+                // dog, so there is nothing to ask — one target, no question.
+                if (medkitRoleOf(it) === 'golem') {
+                  setMedkitOpen(false);
+                  useGameStore.getState().useHealBatch(it.name, 'golem', 1);
+                  return;
+                }
                 // ⚠ OTA-1662 — with a dog beside you the tap ASKS; alone it acts.
                 if (medkitDog) { setMedkitPick(it.id); return; }
                 setMedkitOpen(false);
@@ -1155,7 +1174,9 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             >
               <Text style={[styles.bandolierPickerLabel, styles.medkitPickerLabel]} numberOfLines={1}>{it.name.toUpperCase()}</Text>
               <Text style={styles.bandolierPickerHint}>
-                {medkitDog ? 'who?' : 'use'}{it.quantity > 1 ? ` · ×${it.quantity} left` : ''}
+                {medkitRoleOf(it) === 'golem'
+                  ? `→ ${medkitGolem?.name ?? 'golem'}`
+                  : medkitDog ? 'who?' : 'use'}{it.quantity > 1 ? ` · ×${it.quantity} left` : ''}
               </Text>
             </Pressable>
           )) : (() => {
