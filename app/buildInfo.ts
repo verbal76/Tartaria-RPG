@@ -27485,6 +27485,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // READ-ME-FIRST body and a mailto is deleted: that is the land he asked to
 // archive, and a dead function holding it is where it grows back.
 export const OTA_BUILD_ID = '2026-09-04-1665-the-bug-report-pushes';
+// golem catch-up 2026-09-04: markerless publish of OTA-1665 - the bug report
+// pushes, and only once per changed log. Owner: "I've removed the send log",
+// "report a bug should be the button that pushed the log, so we don't need the
+// email route anymore", and "you can't do another one until something in the log
+// is changed." The clipboard + mailto route is retired (bugReport.ts said itself
+// that zero-paste needed a native rebuild, which is parked), SEND LOG is
+// deleted, and REPORT A BUG now persists then pushes through the OTA-1504
+// pipeline carrying the typed description. Every outcome returns words - sent,
+// queued, duplicate, reporting off - because a push can fail in ways a mailto
+// could not, and the old screen flashed COPIED unconditionally. ⚠ Repointing the
+// eight suites that pinned the old send path caught two real defects before they
+// shipped: I had written !chunk.stopped instead of chunk.delivered (the exact
+// OTA-1519 false positive) and had dropped the OTA-1492 result line entirely.
+// Both fixed in the code, not the tests. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-04-1664-no-phantom-syllable';
 // golem catch-up 2026-09-04: markerless publish of OTA-1664 - no phantom
 // syllable. Owner: there should be no vowel in front of Samarran or Nimari -
