@@ -1,0 +1,323 @@
+{
+  "id": "4a261b1abbfa4e2ea977eac446596d06",
+  "groupID": "7710650004",
+  "eventID": "4a261b1abbfa4e2ea977eac446596d06",
+  "projectID": "4511945117532160",
+  "size": 17624,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-03-1653-the-wear-ward #mtm1iz3wmdt1 [inline 10/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-03-1653-the-wear-ward",
+  "message": "player-log 2026-09-03-1653-the-wear-ward #mtm1iz3wmdt1 [inline 10/28]",
+  "title": "player-log 2026-09-03-1653-the-wear-ward #mtm1iz3wmdt1 [inline 10/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "b3422fd91a384ee39d08ceef95327e53",
+      "span_id": "b4b8834dc4e549ce",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "Saltbeard glances up. \"You again.\" Not warm, not cold \u2014 noted.\n[2026-09-03T00:40:24.836Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Duvo Saltbeard, wandering trader. Tap the vendor banner to trade.\n[2026-09-03T00:40:24.843Z] [world] This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n",
+      "[2026-09-03T00:40:24.843Z] [world] You walk east through open silt. The compass points east into open ground.\n[2026-09-03T00:40:24.844Z] [world] Nothing about the place has anything to add.\n[2026-09-03T00:40:25.080Z] [debug] persist sizes(KB): total=304 player=73 wm=145[rooms=76 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=82 scene=4\n",
+      "[2026-09-03T00:40:25.988Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T00:40:27.154Z] [world] You strip the anemone bloom down. Mostly debris \u2014 but a Cloth Scrap comes loose at the bottom of the pile.\n[2026-09-03T00:40:27.155Z] [world] You work the broken net apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n",
+      "[2026-09-03T00:40:27.155Z] [world] You scavenge the crab claw thoroughly. One Smooth Stone survives the sorting.\n[2026-09-03T00:40:27.155Z] [world] You break the hermit crab apart. Among the pieces, something worth keeping.\n[2026-09-03T00:40:27.156Z] [world] You work the rock over. A part of it comes loose, intact.\n",
+      "[2026-09-03T00:40:27.156Z] [world] You salvage the sea-glass shard. The take is small but real.\n[2026-09-03T00:40:27.156Z] [world] You break the standing water apart. Among the pieces, something worth keeping.\n[2026-09-03T00:40:27.156Z] [reward] \u2726 Salvage haul:\n[2026-09-03T00:40:27.157Z] [reward]     \u2022 Cloth Scrap (Common)\n[2026-09-03T00:40:27.157Z] [reward]     \u2022 Corroded Hinge Set (Common)\n",
+      "[2026-09-03T00:40:27.157Z] [reward]     \u2022 Smooth Stone x3 (Common)\n[2026-09-03T00:40:27.157Z] [reward]     \u2022 Aether Crystal x2 (Common)\n[2026-09-03T00:40:27.158Z] [reward]     \u2022 Scrap Metal x2 (Common)\n[2026-09-03T00:40:28.554Z] [debug] ui: tap \"investigate\"\n[2026-09-03T00:40:33.416Z] [player] investigate the ground\n",
+      "[2026-09-03T00:40:33.416Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=4\n[2026-09-03T00:40:33.420Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Big Rock (Common).\n[2026-09-03T00:40:33.430Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-09-03T00:40:33.431Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T00:40:33.431Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T00:40:33.431Z] [arbiter] \"There's coin on the board for a willing blade,\" the Arbiter says. \"Read the World.\"\n[2026-09-03T00:40:33.647Z] [cognitive] CLIMB  (215ms)\n[2026-09-03T00:40:36.439Z] [player] Ask why the stall is here\n",
+      "[2026-09-03T00:40:36.441Z] [world] \"Stall goes up where the ground is flat and comes down when it is not worth it,\" the trader says. \"That is the whole business plan.\"\n[2026-09-03T00:40:36.442Z] [world] Duvo Saltbeard places you, roughly, and adjusts what they were about to say.\n[2026-09-03T00:40:44.102Z] [world] You let the conversation go and Duvo Saltbeard gets back to it.\n",
+      "[Filtered]",
+      "[2026-09-03T00:40:47.842Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Riska Panhandle, wandering trader. Tap the vendor banner to trade.\n[2026-09-03T00:40:47.849Z] [world] This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n",
+      "[2026-09-03T00:40:47.850Z] [world] You walk south through open silt. The compass tells you The Giant Vault lies further south \u2014 2 tiles, about 5 hours of travel.\n[2026-09-03T00:40:47.850Z] [world] The quiet here is the specific quiet of a thing left half-done.\n[2026-09-03T00:40:48.837Z] [debug] ui: tap \"take / salvage\"\n",
+      "[Filtered]",
+      "[2026-09-03T00:40:51.056Z] [world] You lever something loose from the fish hook \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n[2026-09-03T00:40:51.056Z] [world] You strip the lobster trap carefully. Something usable comes free in your hand.\n[2026-09-03T00:40:51.056Z] [world] You salvage the oyster bed. The take is small but real.\n",
+      "[2026-09-03T00:40:51.056Z] [world] You salvage the rock. The take is small but real.\n[2026-09-03T00:40:51.057Z] [world] You work the standing water over. A part of it comes loose, intact.\n[2026-09-03T00:40:51.057Z] [world] You strip the whale bone carefully. Something usable comes free in your hand.\n[2026-09-03T00:40:51.057Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-09-03T00:40:51.057Z] [reward]     \u2022 Scrap Metal x5 (Common)\n[2026-09-03T00:40:51.058Z] [reward]     \u2022 Split Slate Piece (Common)\n[2026-09-03T00:40:51.058Z] [reward]     \u2022 Aether Dust x3 (Common)\n[2026-09-03T00:40:51.058Z] [reward]     \u2022 Stick x2 (Common)\n[2026-09-03T00:40:51.058Z] [reward]     \u2022 Smooth Stone x2 (Common)\n[2026-09-03T00:40:52.470Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-09-03T00:40:53.980Z] [player] investigate the ground\n[2026-09-03T00:40:53.980Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=4\n[2026-09-03T00:40:53.983Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-09-03T00:40:53.992Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-09-03T00:40:54.209Z] [cognitive] CLIMB  (216ms)\n[2026-09-03T00:40:55.403Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n[2026-09-03T00:40:55.423Z] [debug] spawn: gear=[Reclaimer's Boots] window=10 roster=new\n[2026-09-03T00:40:55.425Z] [world] You walk east through open silt. The compass points east into open ground.\n[2026-09-03T00:40:55.425Z] [world] No one came. Nothing spoke. It simply kept.\n",
+      "[2026-09-03T00:40:57.120Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T00:40:58.281Z] [world] It takes two pulls. The Reclaimer's Boots is yours on the second.\n[2026-09-03T00:40:58.282Z] [reward] \u2726 Reclaimer's Boots (Common).\n[2026-09-03T00:40:58.636Z] [debug] persist sizes(KB): total=306 player=74 wm=146[rooms=77 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=82 scene=4\n",
+      "[2026-09-03T00:40:59.156Z] [world] You work the anemone bloom over. A part of it comes loose, intact.\n[2026-09-03T00:40:59.157Z] [world] You work the coral shelf over. A part of it comes loose, intact.\n[2026-09-03T00:40:59.157Z] [world] You work the fish hook over. A part of it comes loose, intact.\n",
+      "[2026-09-03T00:40:59.157Z] [world] You break the fisherman's lantern apart. Among the pieces, something worth keeping.\n[2026-09-03T00:40:59.157Z] [world] You work the standing water over. A part of it comes loose, intact.\n[2026-09-03T00:40:59.158Z] [world] You work the tackle box apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n",
+      "[2026-09-03T00:40:59.158Z] [world] You strip the whale bone carefully. Something usable comes free in your hand.\n[2026-09-03T00:40:59.158Z] [reward] \u2726 Salvage haul:\n[2026-09-03T00:40:59.158Z] [reward]     \u2022 Mud Fragment x2 (Common)\n[2026-09-03T00:40:59.159Z] [reward]     \u2022 Worn Tartarian Coin x13 (Common)\n[2026-09-03T00:40:59.159Z] [reward]     \u2022 Scrap Metal x2 (Common)\n",
+      "[2026-09-03T00:40:59.159Z] [reward]     \u2022 Aether Dust (Common)\n[2026-09-03T00:40:59.159Z] [reward]     \u2022 Smooth Stone x3 (Common)\n[2026-09-03T00:40:59.159Z] [reward]     \u2022 Copper Wire Spool (Uncommon)\n[2026-09-03T00:41:00.504Z] [debug] ui: tap \"investigate\"\n[2026-09-03T00:41:02.767Z] [player] investigate the ground\n",
+      "[2026-09-03T00:41:02.767Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=4\n[2026-09-03T00:41:02.770Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-09-03T00:41:02.781Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T00:41:02.986Z] [cognitive] CLIMB  (204ms)\n",
+      "[2026-09-03T00:41:12.251Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n[2026-09-03T00:41:12.277Z] [debug] spawn: gear=[Wanderer's Footwraps] window=10 roster=new\n[2026-09-03T00:41:12.279Z] [world] You walk south through open silt. The compass tells you Grand Spire of Etheria lies further south \u2014 3 tiles, about 8 hours of travel.\n",
+      "[2026-09-03T00:41:12.279Z] [world] The silence has the shape of an unanswered question.\n[2026-09-03T00:41:13.483Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T00:41:14.690Z] [world] The Wanderer's Footwraps resists, then does not.\n[2026-09-03T00:41:14.691Z] [reward] \u2726 Wanderer's Footwraps (Common).\n",
+      "[2026-09-03T00:41:15.534Z] [world] You strip the abandoned skiff carefully. Something usable comes free in your hand.\n[2026-09-03T00:41:15.535Z] [world] Slim pickings on the barnacle ridge. You pocket a Smooth Stone on the way out.\n[2026-09-03T00:41:15.535Z] [world] You break the crag apart. Among the pieces, something worth keeping.\n",
+      "[2026-09-03T00:41:15.535Z] [world] You strip the sea-glass shard carefully. Something usable comes free in your hand.\n[2026-09-03T00:41:15.536Z] [world] You salvage the spire. The take is small but real.\n[2026-09-03T00:41:15.536Z] [world] You strip the standing water carefully. Something usable comes free in your hand.\n[2026-09-03T00:41:15.536Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-09-03T00:41:15.536Z] [reward]     \u2022 Cloth Scrap x2 (Common)\n[2026-09-03T00:41:15.537Z] [reward]     \u2022 Smooth Stone x2 (Common)\n[2026-09-03T00:41:15.538Z] [reward]     \u2022 Aether Dust (Common)\n[2026-09-03T00:41:15.538Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-09-03T00:41:15.539Z] [reward]     \u2022 Aetheric Shard (Uncommon)\n[2026-09-03T00:41:16.750Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-09-03T00:41:18.227Z] [player] investigate the ground\n[2026-09-03T00:41:18.228Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=4\n[2026-09-03T00:41:18.231Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Small Rock (Common).\n[2026-09-03T00:41:18.241Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-09-03T00:41:18.446Z] [cognitive] CLIMB  (203ms)\n[2026-09-03T00:41:18.868Z] [debug] ui: tap \"rest\"\n[2026-09-03T00:41:18.870Z] [player] rest\n[2026-09-03T00:41:18.870Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=4\n[2026-09-03T00:41:18.871Z] [world] Mercy paws the ground flat before trusting it, then folds down onto it.\n",
+      "[2026-09-03T00:41:18.871Z] [world] You rest for 8 hours. +8 HP, +8 stamina recovered. (Day 58, afternoon)\n[2026-09-03T00:41:18.871Z] [system] \u23f3 Time passed: 8h\n[2026-09-03T00:41:19.040Z] [cognitive] REST  (168ms)\n[2026-09-03T00:41:20.101Z] [debug] ui: tap \"rest\"\n[2026-09-03T00:41:20.108Z] [player] rest\n",
+      "[2026-09-03T00:41:20.109Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=4\n[2026-09-03T00:41:20.111Z] [world] Mercy tests three spots and settles on the one nearest your boot.\n[2026-09-03T00:41:20.111Z] [world] You rest for 8 hours. +7 HP, +8 stamina recovered. (Day 59, night)\n[2026-09-03T00:41:20.125Z] [system] \u23f3 Time passed: 8h\n",
+      "[2026-09-03T00:41:20.308Z] [cognitive] REST  (181ms)\n[2026-09-03T00:41:20.779Z] [debug] persist sizes(KB): total=305 player=74 wm=145[rooms=78 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=82 scene=4\n[2026-09-03T00:41:21.820Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n[2026-09-03T00:41:21.842Z] [debug] spawn: gear=[Mud Shell, Rough-Hewn Chestplate] window=10 roster=new\n",
+      "[2026-09-03T00:41:21.844Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Grit Maalen, wandering trader. Tap the vendor banner to trade.\n[2026-09-03T00:41:21.850Z] [world] This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n",
+      "[2026-09-03T00:41:21.851Z] [world] You walk east through open silt. The compass points east into open ground.\n[2026-09-03T00:41:21.852Z] [world] A country this old is not troubled by one unfinished thing.\n[2026-09-03T00:41:24.170Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T00:41:25.372Z] [world] You brace a foot and the Rough-Hewn Chestplate gives.\n",
+      "[2026-09-03T00:41:25.373Z] [reward] \u2726 Rough-Hewn Chestplate (Common).\n[2026-09-03T00:41:26.487Z] [world] Tucked inside the barnacle ridge: an oddment that matches no quartermaster's list. The kind of thing that fuses well.\n[2026-09-03T00:41:26.487Z] [world] You strip the nest carefully. Something usable comes free in your hand.\n",
+      "[2026-09-03T00:41:26.487Z] [world] You strip the salt crust down. Mostly debris \u2014 but a Smooth Stone comes loose at the bottom of the pile.\n[2026-09-03T00:41:26.488Z] [world] You scavenge the shell thoroughly. One Smooth Stone survives the sorting.\n[2026-09-03T00:41:26.488Z] [world] You work the standing water over. A part of it comes loose, intact.\n",
+      "[2026-09-03T00:41:26.488Z] [reward] \u2726 Salvage haul:\n[2026-09-03T00:41:26.488Z] [reward]     \u2022 Beetle-Chitin Flake (Common)\n[2026-09-03T00:41:26.489Z] [reward]     \u2022 Stick x2 (Common)\n[2026-09-03T00:41:26.489Z] [reward]     \u2022 Smooth Stone x2 (Common)\n[2026-09-03T00:41:26.489Z] [reward]     \u2022 Mud Fragment x2 (Common)\n[2026-09-03T00:41:27.887Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-09-03T00:41:29.720Z] [world] A silent bolt strikes near enough to singe your sleeve. (\u22121 HP)\n[2026-09-03T00:41:29.741Z] [player] investigate the ground\n[2026-09-03T00:41:29.742Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=4\n[2026-09-03T00:41:29.744Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n",
+      "[2026-09-03T00:41:29.752Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T00:41:29.962Z] [cognitive] CLIMB  (209ms)\n[2026-09-03T00:41:31.471Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n[2026-09-03T00:41:31.492Z] [debug] spawn: gear=[Plasma Thrower, Thought-Crafter's Headpiece] window=10 roster=new\n",
+      "[2026-09-03T00:41:31.494Z] [world] The flat silt heaves, and a hand breaks the surface, then an arm, then a face caked grey with a thousand years of it.\n[2026-09-03T00:41:31.494Z] [arbiter] These are the Aetherkin the roadside traders whisper about \u2014 the flood-dead the Aether would not let rest.\n",
+      "[2026-09-03T00:41:31.494Z] [world] In life it was a bell-ringer, shoulders rounded from a rope pulled ten thousand times \u2014 there's a ring worn thin on one finger; someone loved them, whoever they were. The silt let go of them all at once, and they came up clawing at the light.\n",
+      "[2026-09-03T00:41:31.495Z] [world] It doesn't lunge. It cringes back, arms up over its face \u2014 remembering, dimly, that living things once meant harm. It will only fight if you "
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-03-1653-the-wear-ward #mtm1iz3wmdt1 [inline 10/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtm1iz3wmdt1"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-03-1653-the-wear-ward"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "10"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-03-1653-the-wear-ward"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "3"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-03T23:07:17.795185Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "12": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 263,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        },
+        "9": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 329,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-03T23:07:19.248000Z",
+  "fingerprints": [
+    "569fe6819d8acb64e939c3b2a6ff0e93"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1954152327,
+    "commitCount": 3,
+    "data": {},
+    "dateCreated": "2026-09-03T22:42:18.916025Z",
+    "dateReleased": "2026-09-03T22:42:55.442608Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "5831f3279f035e5fae54ee6b0788fe7b23f7ba96",
+      "message": "[ota-hal] OTA-1653: the wear ward\n\nOwner: \"I kind of like those two items the amulet in the ring that it slows\ndown the durability decline of your gear\u2026 I think the ring that I have on is\n-6% then it slows down the wear and tear of your items by 6% each and it\nsays stackable with armor\u2026 that's a pretty cool buff right?\"\n\n\u26a0 HE WAS DESCRIBING A BUFF THAT DID NOT EXIST. What he was reading is\nOTA-1649's resist line \u2014 \"Resists degradation (\u22126% each, stacks with\narmour)\" \u2014 which meant \u22126% of incoming DEGRADATION damage, a type OTA-1652\nthen proved nothing in the game even dealt. A bare percentage beside a word\ndoes not say what it reduces, and the type being dead meant nothing in play\never contradicted his reading.\n\nHis reading is the better item. So it is real now, on the ring he had on.\n\n  \u2022 6 / 10 / 15 / 25% by rarity. \u26a0 BEST, NOT SUM \u2014 and here that is not\n    generosity, it is necessary: four Rare wards summed is 60% and four\n    Legendary is 100%, which would make a jewellery build's gear literally\n    immortal and quietly delete the repair economy the bench and the\n    Crucible are built on. The ceiling stays where the ladder put it.\n  \u2022 \u26a0 THE PERCENTAGE IS A CHANCE TO SKIP A WEAR POINT, not a fraction taken\n    off one. Durability is an INTEGER that moves a point at a time \u2014 there\n    is no 0.85 of a chip \u2014 so a fractional decrement would round back to a\n    full point on every single hit and the buff would do nothing at all.\n    15% means 15% of the chips do not happen.\n  \u2022 ONE GATE, in `wearEquippedItem`, asked BEFORE the point is spent. That\n    is the single place every piece of the player's own kit wears down \u2014\n    combat blows, digging tools, all of it \u2014 so a warded player cannot be\n    warded on one path and not another.\n\n\u26a0 THE TIN WARD RING MOVED COMMON \u2192 RARE TO CARRY IT, and that is the ladder\nworking rather than being worked around. OTA-1649's rule is that Common and\nUncommon may never carry a SPECIAL, and a wear ward is a special; smuggling\none onto a Common would have broken the rule an entire OTA was spent\nestablishing. Its recipe gained a Rare anchor to match (the ingredient-\nquality rule), drawn from a name recipes already used so the Crucible's\nfodder pool is untouched (the OTA-1649 fusion-pool rule).\n\n\u26a0\u26a0\u26a0 A REAL BUG SHIPPED INSIDE THIS OTA AND THE SUITE CAUGHT IT. The first\ndraft wrote `wearIsWarded(pct, roll = Math.random())` \u2014 and a DEFAULT\nPARAMETER IS EVALUATED ON EVERY CALL, guard or no guard. So a player wearing\nno ward at all burned one Math.random() per wear event, which shifts the\nentire RNG stream: every initiative, hit, crit and loot roll after any piece\nof gear chipped came out different for everyone. ota1017 found it \u2014 \"a\nvolley that kills you means your swing never lands\" stopped killing the\nplayer. A silent, global change to how the game rolls, from a default\nargument. The early return is now load-bearing, and ota1653 pins it by\ncounting draws through a stubbed Math.random.\n\nThe card says it in words that cannot be misread the way the last line was:\n\"Everything you wear or wield lasts 15% longer.\"\n\nGates: all 18 green by exit code. Full suite green.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-03T22:39:14Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-03-1653-the-wear-ward",
+          "shortVersion": "tartaria@4.32.11+2026-09-03-1653-the-wear-ward",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-03T22:42:55.442608Z",
+          "dateCreated": "2026-09-03T22:42:18.916025Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155356192",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-03T22:42:55.724109Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-03-1653-the-wear-ward",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-03-1653-the-wear-ward",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-03-1653-the-wear-ward",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-03-1653-the-wear-ward)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "54bcf9d682ce4ce58cb68bd319ccfc5d",
+  "previousEventID": "465f0f99b2734d6e98e28c9f00a6d9ac"
+}

@@ -1,0 +1,277 @@
+{
+  "id": "9649c5b2cf744727bdfc447f64cfc2af",
+  "groupID": "7710650004",
+  "eventID": "9649c5b2cf744727bdfc447f64cfc2af",
+  "projectID": "4511945117532160",
+  "size": 18016,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-03-1653-the-wear-ward #mtm1iz3wmdt1 [inline 15/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-03-1653-the-wear-ward",
+  "message": "player-log 2026-09-03-1653-the-wear-ward #mtm1iz3wmdt1 [inline 15/28]",
+  "title": "player-log 2026-09-03-1653-the-wear-ward #mtm1iz3wmdt1 [inline 15/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "8c4e909cf9934c649bbed27291258628",
+      "span_id": "916eed03c65a4075",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "ped) \u2014 \u2717 MISS\n[2026-09-03T02:06:56.088Z] [combat] You \u2014 d20 \u2192 8 + INT 12 perfect opening (2\u00d7 dice) = 20 vs Mud-Wracked Aetherkin AC 11 \u2014 \u2713 HIT\n[2026-09-03T02:06:56.088Z] [combat] The Corrupted coating fails to take on Mud-Wracked Aetherkin.\n[2026-09-03T02:06:56.089Z] [combat] Aetheric flares \u2014 +1 on hit (weak \u2014 bites deep!).\n",
+      "[2026-09-03T02:06:56.089Z] [combat] Weakness exposed \u2014 Mud-Wracked Aetherkin flinches. (aetheric \u00d71.5 for 26)\n[2026-09-03T02:06:56.090Z] [combat] The killing blow with the acid-etched corrupted auralite talon: 26. Mud-Wracked Aetherkin drops where it stood.\n[2026-09-03T02:06:56.091Z] [reward] Mud-Wracked Aetherkin defeated. You recover Aetherstone Fragment \u00d72, Aether Mud.\n",
+      "[2026-09-03T02:06:56.093Z] [system] Word moves through the buried world \u2014 many people view you differently now.\n[2026-09-03T02:06:56.095Z] [system] \u25bc Eternal Dynasty turns HOSTILE \u2014 their patrols hunt you on their own ground now, and their counters mark you up.\n",
+      "[2026-09-03T02:06:56.096Z] [system] \u25bc Tartarian Revivalists turns HOSTILE \u2014 their patrols hunt you on their own ground now, and their counters mark you up.\n[2026-09-03T02:06:56.096Z] [system] Word travels among those who keep the flood-dead sacred: you put one of the Aetherkin down.\n[2026-09-03T02:06:56.096Z] [reward] +20 TC pried from the dust.\n",
+      "[2026-09-03T02:06:57.977Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=360 from=cached winH=986 beat=-\n[2026-09-03T02:06:58.417Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-09-03T02:07:00.254Z] [debug] persist sizes(KB): total=319 player=81 wm=149[rooms=79 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=85 scene=4\n",
+      "[2026-09-03T02:08:17.571Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-09-03T02:08:17.596Z] [debug] spawn: gear=[Bone Throwing Axe, Mud-fist Wraps, Short Hunting Bow] window=10 roster=new\n[2026-09-03T02:08:17.599Z] [world] Marlow Quicksleeve glances up. \"You again.\" Not warm, not cold \u2014 noted.\n",
+      "[2026-09-03T02:08:17.601Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Marlow Quicksleeve, fence. Tap the vendor banner to trade.\n[2026-09-03T02:08:17.611Z] [world] Rare workings for sale: Plague Vial (200 TC), Reclaimer's Aegis Pendant (200 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask",
+      ".\n[2026-09-03T02:08:17.613Z] [arbiter] The Arbiter, walking with you: \"Tartaria was a continent once. A flood older than any honest map drowned it. We are crossing the top of it.\"\n[2026-09-03T02:08:17.614Z] [world] You walk west through open silt. The compass points west into open ground.\n[2026-09-03T02:08:17.615Z] [world] What you started here has not finished itself in your absence.\n",
+      "[2026-09-03T02:08:19.153Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T02:08:20.424Z] [world] You pick up the Bone Throwing Axe.\n[2026-09-03T02:08:20.424Z] [reward] \u2726 Bone Throwing Axe (Common).\n[2026-09-03T02:08:20.444Z] [world] You lift the Mud-fist Wraps clear.\n[2026-09-03T02:08:20.444Z] [reward] \u2726 Mud-fist Wraps (Common).\n",
+      "[2026-09-03T02:08:20.446Z] [world] You get a hand under the Short Hunting Bow and take it.\n[2026-09-03T02:08:20.446Z] [reward] \u2726 Short Hunting Bow (Common).\n[2026-09-03T02:08:21.458Z] [world] You strip the blueprint carefully. Something usable comes free in your hand.\n[2026-09-03T02:08:21.459Z] [world] You break the cold spring apart. Among the pieces, something worth keeping.\n",
+      "[2026-09-03T02:08:21.459Z] [world] You break the drain hatch apart. Among the pieces, something worth keeping.\n[2026-09-03T02:08:21.459Z] [world] You break the rusted chain apart. Among the pieces, something worth keeping.\n[2026-09-03T02:08:21.460Z] [reward] \u2726 Salvage haul:\n[2026-09-03T02:08:21.460Z] [reward]     \u2022 Worn Tartarian Coin x13 (Common)\n",
+      "[2026-09-03T02:08:21.460Z] [reward]     \u2022 Scrap Metal x2 (Common)\n[2026-09-03T02:08:21.461Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-09-03T02:08:22.939Z] [debug] ui: tap \"investigate\"\n[2026-09-03T02:08:24.664Z] [player] investigate the ground\n[2026-09-03T02:08:24.664Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-09-03T02:08:24.668Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Stick (Common).\n[2026-09-03T02:08:24.677Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T02:08:24.897Z] [cognitive] CLIMB  (219ms)\n[2026-09-03T02:08:26.475Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-09-03T02:08:26.495Z] [debug] spawn: gear=[Wanderer's Worn Gauntlets] window=10 roster=new\n",
+      "[2026-09-03T02:08:26.497Z] [world] You walk west through open silt. The compass points west into open ground.\n[2026-09-03T02:08:26.497Z] [world] The loose end is exactly as loose as you left it.\n[2026-09-03T02:08:27.908Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T02:08:29.343Z] [world] You salvage the broken glass. The take is small but real.\n",
+      "[2026-09-03T02:08:29.344Z] [world] You break the cold spring apart. Among the pieces, something worth keeping.\n[2026-09-03T02:08:29.344Z] [world] You work the observation hatch over. A part of it comes loose, intact.\n[2026-09-03T02:08:29.344Z] [world] You salvage the pipe. The take is small but real.\n",
+      "[2026-09-03T02:08:29.345Z] [world] You break the shrine apart. Among the pieces, something worth keeping.\n[2026-09-03T02:08:29.345Z] [world] You work the stabilizer over. A part of it comes loose, intact.\n[2026-09-03T02:08:29.345Z] [reward] \u2726 Salvage haul:\n[2026-09-03T02:08:29.346Z] [reward]     \u2022 Smooth Stone (Common)\n[2026-09-03T02:08:29.346Z] [reward]     \u2022 Scrap Metal x3 (Common)\n",
+      "[2026-09-03T02:08:29.346Z] [reward]     \u2022 Bent Nail x5 (Common)\n[2026-09-03T02:08:29.346Z] [reward]     \u2022 Worn Tartarian Coin x6 (Common)\n[2026-09-03T02:08:30.329Z] [world] You claim the Wanderer's Worn Gauntlets.\n[2026-09-03T02:08:30.329Z] [reward] \u2726 Wanderer's Worn Gauntlets (Common).\n[2026-09-03T02:08:31.976Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-09-03T02:08:33.507Z] [player] investigate the ground\n[2026-09-03T02:08:33.507Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n[2026-09-03T02:08:33.512Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Wild Grapes (Uncommon).\n[2026-09-03T02:08:33.520Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-09-03T02:08:33.521Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T02:08:33.521Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T02:08:33.739Z] [cognitive] CLIMB  (217ms)\n[2026-09-03T02:08:34.443Z] [debug] persist sizes(KB): total=320 player=82 wm=150[rooms=80 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=84 scene=4\n",
+      "[2026-09-03T02:08:35.477Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-09-03T02:08:35.497Z] [debug] spawn: gear=[Plasma Dagger] window=10 roster=new\n[2026-09-03T02:08:35.498Z] [world] You walk west through open silt. The compass points west into open ground.\n[2026-09-03T02:08:35.499Z] [world] Whatever you turned over here is still turned over.\n",
+      "[2026-09-03T02:08:36.576Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T02:08:37.942Z] [world] You strip the battery housing carefully. Something usable comes free in your hand.\n[2026-09-03T02:08:37.942Z] [world] You break the cold spring apart. Among the pieces, something worth keeping.\n[2026-09-03T02:08:37.942Z] [world] You salvage the cooling pipe. The take is small but real.\n",
+      "[2026-09-03T02:08:37.942Z] [world] You break the gear assembly apart. Among the pieces, something worth keeping.\n[2026-09-03T02:08:37.945Z] [world] You salvage the rusted ladder. The take is small but real.\n[2026-09-03T02:08:37.946Z] [world] You salvage the shrine. The take is small but real.\n[2026-09-03T02:08:37.946Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-09-03T02:08:37.946Z] [reward]     \u2022 Aether Dust x5 (Common)\n[2026-09-03T02:08:37.946Z] [reward]     \u2022 Scrap Metal x3 (Common)\n[2026-09-03T02:08:37.946Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-09-03T02:08:37.947Z] [reward]     \u2022 Worn Tartarian Coin x4 (Common)\n[2026-09-03T02:08:39.114Z] [world] The Plasma Dagger comes up out of the silt with a small sucking protest.\n",
+      "[2026-09-03T02:08:39.114Z] [reward] \u2726 Plasma Dagger (Common).\n[2026-09-03T02:08:40.611Z] [debug] ui: tap \"investigate\"\n[2026-09-03T02:08:42.222Z] [player] investigate the ground\n[2026-09-03T02:08:42.222Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-09-03T02:08:42.228Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Aetheric Shard (Uncommon).\n[2026-09-03T02:08:42.236Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T02:08:42.452Z] [cognitive] CLIMB  (214ms)\n[2026-09-03T02:08:43.497Z] [player] investigate maintenance rail\n",
+      "[2026-09-03T02:08:43.498Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=maintenance rail resolved=maintenance rail range=- enemies=0 hooks=1\n[2026-09-03T02:08:43.500Z] [world] The maintenance rail keeps its silence, and it isn't going anywhere for you to press it. The Arbiter does not lean in. You move on.\n",
+      "[2026-09-03T02:08:43.501Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-03T02:08:43.501Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T02:08:43.504Z] [world] A Conspiracy Architects war party crests the rise \u2014 5 of them, blades already out. They've marked you for standing with the Forgotten Order.\n",
+      "[2026-09-03T02:08:43.504Z] [arbiter] \"The Conspiracy Architects do not forgive a friend of the Forgotten Order,\" the Arbiter murmurs. \"Stand, or run \u2014 but decide now.\"\n[2026-09-03T02:08:43.923Z] [cognitive] neutral  (420ms)\n[2026-09-03T02:09:42.524Z] [debug] ui: tap \"dodge\"\n[2026-09-03T02:09:42.539Z] [player] dodge\n",
+      "[2026-09-03T02:09:42.540Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=5 hooks=1\n[2026-09-03T02:09:42.542Z] [world] You commit to the dodge. Slip Conspiracy Architects Raider 1's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-03T02:09:42.639Z] [combat] Conspiracy Architects Raider 1 \u2014 d20 \u2192 18 + ATK 10 = 28 vs your AC 22 \u2014 \u2717 EVADED\n[2026-09-03T02:09:42.639Z] [combat] Dodge \u2014 d20 \u2192 8 + DEX 20 = 28 vs ATK 28. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n",
+      "[2026-09-03T02:09:42.641Z] [world] You slip Conspiracy Architects Raider 1's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n[2026-09-03T02:09:42.643Z] [debug] ac-shift 22\u219225: race/base 10 + gear 18 + title 0 \u2192 trimmed 22 + status 3 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany ",
+      "Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n[2026-09-03T02:09:42.644Z] [combat] Conspiracy Architects Raider 2 \u2014 d20 \u2192 19 + ATK 7 = 26 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-09-03T02:09:42.645Z] [combat] Conspiracy Architects Raider 5 and 2 others close the distance.\n[2026-09-03T02:09:42.645Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-09-03T02:09:42.645Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T02:09:42.645Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T02:09:43.032Z] [combat] Conspiracy Architects Raider 2 deals 4 bludgeoning damage [plate \u22121] [edge of reach \u2014 halved]. You have 38 HP remaining.\n[2026-09-03T02:09:43.364Z] [cognitive] neutral  (387ms)\n",
+      "[2026-09-03T02:09:44.029Z] [debug] ui: tap \"\u2697\u2623 auralite talon \u2726\"\n[2026-09-03T02:09:44.029Z] [system] evasive \u2014 harder to hit fades.\n[2026-09-03T02:09:44.048Z] [player] attack with the auralite talon\n[2026-09-03T02:09:44.048Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=5 hooks=1\n",
+      "[2026-09-03T02:09:44.050Z] [debug] attack: target=Conspiracy Architects Raider 1 range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n[2026-09-03T02:09:44.052Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-03T02:09:44.121Z] [world] You commit forward with the acid-etched corrupted auralite talon. Conspiracy Architects Raider 1 watches your hands.\n",
+      "[2026-09-03T02:09:44.122Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T02:09:44.451Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (329ms)\n[2026-09-03T02:09:53.569Z] [world] Conspiracy Architects Raider 1 moves first. The pressure is immediate.\n",
+      "[2026-09-03T02:09:53.572Z] [debug] ac-shift 25\u219222: race/base 10 + gear 18 + title 0 \u2192 trimmed 22 + status 0 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n[2026-09-03T02:09:53.573Z] [combat] Conspiracy Architects Raider 1 \u2014 d20 \u2192 2 + ATK 8 = 10 vs your AC 22 \u2014 \u2717 MISS\n",
+      "[2026-09-03T02:09:53.574Z] [combat] Conspiracy Architects Raider 2 \u2014 d20 \u2192 13 + ATK 7 = 20 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T02:09:53.576Z] [combat] Conspiracy Architects Raider 3 \u2014 d20 \u2192 8 + ATK 7 = 15 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T02:09:53.577Z] [combat] Conspiracy Architects Raider 5 and 1 other close the distance.\n",
+      "[2026-09-03T02:09:53.577Z] [combat] You \u2014 d20 \u2192 13 + INT 12 perfect opening (2\u00d7 dice) = 25 vs Conspiracy Architects Raider 1 AC 12 \u2014 \u2713 HIT\n[2026-09-03T02:09:53.577Z] [combat] Conspiracy Architects Raider 1 shrugs off the aetheric. (resisted, \u00d70.5 for 9)\n",
+      "[2026-09-03T02:09:53.581Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Reclaimers Guild Geode-Cored Cleaver \u2014 slashing will bite where aetheric won't.\"\n[2026-09-03T02:09:53.582Z] [combat] You crack the Conspiracy Architects Raider 1 with the Acid-Etched Corrupted Auralite Talon for 9 \u2014 half their fight, gone in one blow. They crumple, out cold. (7/16 HP) Loot them before they",
+      " come to.\n[2026-09-03T02:09:53.583Z] [combat] Conspiracy Architects Raider 1 is out of it. Conspiracy Architects Raider 2 now in your sights.\n[2026-09-03T02:09:53.583Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 1 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n",
+      "[2026-09-03T02:09:53.583Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 1 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n[2026-09-03T02:09:54.060Z] [debug] persist sizes(KB): total=336 player=82 wm=163[rooms=93 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=84 scene=7\n[2026-09-03T02:09:55.804Z] [debug] ui: tap \"\ud83d\udd25\u2623 choir-bound launcher \u2726\"\n",
+      "[2026-09-03T02:09:55.852Z] [player] attack with the off-hand choir-bound launcher\n[2026-09-03T02:09:55.853Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=mid enemies=5 hooks=1\n[2026-09-03T02:09:55.853Z] [combat] Conspiracy Architects Raider 1 smokes \u2014 acid eats 1. (6/16 HP, 2 turns left)\n[2026-09-"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-03-1653-the-wear-ward #mtm1iz3wmdt1 [inline 15/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtm1iz3wmdt1"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-03-1653-the-wear-ward"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "15"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-03-1653-the-wear-ward"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-03T22:43:57.317000Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-03T22:43:58.558000Z",
+  "fingerprints": [
+    "569fe6819d8acb64e939c3b2a6ff0e93"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1954152327,
+    "commitCount": 3,
+    "data": {},
+    "dateCreated": "2026-09-03T22:42:18.916025Z",
+    "dateReleased": "2026-09-03T22:42:55.442608Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "5831f3279f035e5fae54ee6b0788fe7b23f7ba96",
+      "message": "[ota-hal] OTA-1653: the wear ward\n\nOwner: \"I kind of like those two items the amulet in the ring that it slows\ndown the durability decline of your gear\u2026 I think the ring that I have on is\n-6% then it slows down the wear and tear of your items by 6% each and it\nsays stackable with armor\u2026 that's a pretty cool buff right?\"\n\n\u26a0 HE WAS DESCRIBING A BUFF THAT DID NOT EXIST. What he was reading is\nOTA-1649's resist line \u2014 \"Resists degradation (\u22126% each, stacks with\narmour)\" \u2014 which meant \u22126% of incoming DEGRADATION damage, a type OTA-1652\nthen proved nothing in the game even dealt. A bare percentage beside a word\ndoes not say what it reduces, and the type being dead meant nothing in play\never contradicted his reading.\n\nHis reading is the better item. So it is real now, on the ring he had on.\n\n  \u2022 6 / 10 / 15 / 25% by rarity. \u26a0 BEST, NOT SUM \u2014 and here that is not\n    generosity, it is necessary: four Rare wards summed is 60% and four\n    Legendary is 100%, which would make a jewellery build's gear literally\n    immortal and quietly delete the repair economy the bench and the\n    Crucible are built on. The ceiling stays where the ladder put it.\n  \u2022 \u26a0 THE PERCENTAGE IS A CHANCE TO SKIP A WEAR POINT, not a fraction taken\n    off one. Durability is an INTEGER that moves a point at a time \u2014 there\n    is no 0.85 of a chip \u2014 so a fractional decrement would round back to a\n    full point on every single hit and the buff would do nothing at all.\n    15% means 15% of the chips do not happen.\n  \u2022 ONE GATE, in `wearEquippedItem`, asked BEFORE the point is spent. That\n    is the single place every piece of the player's own kit wears down \u2014\n    combat blows, digging tools, all of it \u2014 so a warded player cannot be\n    warded on one path and not another.\n\n\u26a0 THE TIN WARD RING MOVED COMMON \u2192 RARE TO CARRY IT, and that is the ladder\nworking rather than being worked around. OTA-1649's rule is that Common and\nUncommon may never carry a SPECIAL, and a wear ward is a special; smuggling\none onto a Common would have broken the rule an entire OTA was spent\nestablishing. Its recipe gained a Rare anchor to match (the ingredient-\nquality rule), drawn from a name recipes already used so the Crucible's\nfodder pool is untouched (the OTA-1649 fusion-pool rule).\n\n\u26a0\u26a0\u26a0 A REAL BUG SHIPPED INSIDE THIS OTA AND THE SUITE CAUGHT IT. The first\ndraft wrote `wearIsWarded(pct, roll = Math.random())` \u2014 and a DEFAULT\nPARAMETER IS EVALUATED ON EVERY CALL, guard or no guard. So a player wearing\nno ward at all burned one Math.random() per wear event, which shifts the\nentire RNG stream: every initiative, hit, crit and loot roll after any piece\nof gear chipped came out different for everyone. ota1017 found it \u2014 \"a\nvolley that kills you means your swing never lands\" stopped killing the\nplayer. A silent, global change to how the game rolls, from a default\nargument. The early return is now load-bearing, and ota1653 pins it by\ncounting draws through a stubbed Math.random.\n\nThe card says it in words that cannot be misread the way the last line was:\n\"Everything you wear or wield lasts 15% longer.\"\n\nGates: all 18 green by exit code. Full suite green.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-03T22:39:14Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-03-1653-the-wear-ward",
+          "shortVersion": "tartaria@4.32.11+2026-09-03-1653-the-wear-ward",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-03T22:42:55.442608Z",
+          "dateCreated": "2026-09-03T22:42:18.916025Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155356192",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-03T22:42:55.724109Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-03-1653-the-wear-ward",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-03-1653-the-wear-ward",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-03-1653-the-wear-ward",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-03-1653-the-wear-ward)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "c92b08ef966b481897eb1c6933204d7a",
+  "previousEventID": "95ebf4be34f544acb96e22ce93eefa3a"
+}

@@ -1,0 +1,277 @@
+{
+  "id": "b38317b98f8f457fb9a973bf2c1337b7",
+  "groupID": "7710650004",
+  "eventID": "b38317b98f8f457fb9a973bf2c1337b7",
+  "projectID": "4511945117532160",
+  "size": 18082,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-03-1653-the-wear-ward #mtm1iz3wmdt1 [inline 27/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-03-1653-the-wear-ward",
+  "message": "player-log 2026-09-03-1653-the-wear-ward #mtm1iz3wmdt1 [inline 27/28]",
+  "title": "player-log 2026-09-03-1653-the-wear-ward #mtm1iz3wmdt1 [inline 27/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "b3422fd91a384ee39d08ceef95327e53",
+      "span_id": "b4b8834dc4e549ce",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "Z] [world] You work the rusted lever over. A part of it comes loose, intact.\n[2026-09-03T20:54:37.100Z] [reward] \u2726 Salvage haul:\n[2026-09-03T20:54:37.100Z] [reward]     \u2022 Flint-and-Twine Bundle (Common)\n[2026-09-03T20:54:37.100Z] [reward]     \u2022 Aether Dust x2 (Common)\n[2026-09-03T20:54:37.101Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-09-03T20:54:37.101Z] [reward]     \u2022 Bent Nail (Common)\n",
+      "[2026-09-03T20:54:37.102Z] [reward]     \u2022 Scrap Metal x3 (Common)\n[2026-09-03T20:54:37.102Z] [reward]     \u2022 Cloth Scrap (Common)\n[2026-09-03T20:54:37.831Z] [debug] persist sizes(KB): total=326 player=84 wm=154[rooms=84 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=84 scene=4\n[2026-09-03T20:54:39.078Z] [debug] appstate: active \u2192 background (was active for 432077ms)\n",
+      "[2026-09-03T20:55:40.133Z] [debug] appstate: background \u2192 active (was background for 61049ms)\n[2026-09-03T20:55:40.885Z] [debug] homework: intro-fill armed after 6000ms idle (strike 2/3)\n[2026-09-03T20:55:41.426Z] [debug] ui: tap \"investigate\"\n[2026-09-03T20:55:43.304Z] [player] investigate the ground\n",
+      "[2026-09-03T20:55:43.305Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n[2026-09-03T20:55:43.313Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Empty Water Bottle (Common).\n[2026-09-03T20:55:43.327Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n",
+      "[2026-09-03T20:55:43.327Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T20:55:43.328Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T20:55:45.514Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 4433ms read 0ms/write 0ms in 735t\u2192out 0t (0ch)\n[2026-09-03T20:55:45.749Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 4433ms \u2014 intro-fill:\u2205\n",
+      "[2026-09-03T20:55:45.749Z] [debug] homework: scene_intro \"Mud Flood Nexus\" \u2205 4864ms\n[2026-09-03T20:55:51.388Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-09-03T20:55:51.410Z] [debug] spawn: gear=[Scrap Targe, Mud Knife] window=10 roster=new\n",
+      "[2026-09-03T20:55:51.411Z] [world] Someone is sitting on their pack at the edge of the path \u2014 no party, no fire, and a long way from anywhere. They stand when they see you.\n[2026-09-03T20:55:51.414Z] [system] Try \"talk to the traveler\" \u2014 they want something from you.\n",
+      "[2026-09-03T20:55:51.415Z] [world] You walk north through open silt. The compass tells you Red Tower of Nimari lies further north \u2014 4 tiles, about 10 hours of travel.\n[2026-09-03T20:55:51.416Z] [world] Whatever you turned over here is still turned over.\n[2026-09-03T20:55:52.437Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T20:55:53.509Z] [world] You get a hand under the Mud Knife and take it.\n",
+      "[2026-09-03T20:55:53.509Z] [reward] \u2726 Mud Knife (Common).\n[2026-09-03T20:55:53.534Z] [world] You claim the Scrap Targe.\n[2026-09-03T20:55:53.534Z] [reward] \u2726 Scrap Targe (Common).\n[2026-09-03T20:55:54.422Z] [world] You salvage the archive. The take is small but real.\n[2026-09-03T20:55:54.422Z] [world] You salvage the battery housing. The take is small but real.\n",
+      "[2026-09-03T20:55:54.423Z] [world] You strip the cold spring carefully. Something usable comes free in your hand.\n[2026-09-03T20:55:54.423Z] [world] You break the dust terminal apart. Among the pieces, something worth keeping.\n[2026-09-03T20:55:54.423Z] [world] You work the pipe apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n",
+      "[2026-09-03T20:55:54.424Z] [reward] \u2726 Salvage haul:\n[2026-09-03T20:55:54.424Z] [reward]     \u2022 Worn Tartarian Coin x3 (Common)\n[2026-09-03T20:55:54.424Z] [reward]     \u2022 Aetheric Shard x2 (Uncommon)\n[2026-09-03T20:55:54.424Z] [reward]     \u2022 Bent Nail (Common)\n[2026-09-03T20:55:54.424Z] [reward]     \u2022 Tin Valve Housing (Common)\n[2026-09-03T20:55:55.772Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-09-03T20:55:57.411Z] [player] investigate the ground\n[2026-09-03T20:55:57.412Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2\n[2026-09-03T20:55:57.416Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Aetheric Dust (Uncommon).\n[2026-09-03T20:55:57.426Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-09-03T20:55:57.655Z] [cognitive] CLIMB  (228ms)\n[2026-09-03T20:55:58.671Z] [player] investigate corridor\n[2026-09-03T20:55:58.672Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=corridor resolved=corridor range=- enemies=0 hooks=2\n[2026-09-03T20:55:58.675Z] [world] The corridor reads as ordinary, which down here is a small kind of relief. You leave it be.\n",
+      "[2026-09-03T20:55:58.943Z] [cognitive] neutral  (262ms)\n[2026-09-03T20:55:59.191Z] [debug] persist sizes(KB): total=338 player=84 wm=167[rooms=97 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=83 scene=4\n[2026-09-03T20:56:00.739Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n",
+      "[2026-09-03T20:56:00.753Z] [debug] spawn: gear=[Energy Baton, Stone Spear, Shaman's Mud Helm] window=10 roster=new\n[2026-09-03T20:56:00.755Z] [world] You walk west through open silt. The compass points west into open ground.\n[2026-09-03T20:56:00.755Z] [world] It sits where it sat. Patient is the wrong word \u2014 it simply does not move.\n",
+      "[2026-09-03T20:56:01.054Z] [debug] qwen\u23f1 investigate_lore ok 2136ms read/write unusable (native mis-reported 117554ms/761ms \u2014 llama.rn split bug, not this call) in 125t\u2192out 25t (126ch)\n[2026-09-03T20:56:06.452Z] [debug] qwen\u23f1 ambient ok 7534ms wait 2331ms read 4036ms/write 933ms in 363t\u2192out 31t 11.1ms/t HIT-CAP (152ch)\n",
+      "[2026-09-03T20:56:06.648Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient after 7534ms \u2014 ambient:\u2205\n[2026-09-03T20:56:06.648Z] [debug] arbiter: ambient \u2205 7970ms\n[2026-09-03T20:56:06.649Z] [debug] arbiter: ambient-empty reason=instruction-echo raw=\"Your read of them: You have traversed the path that led you to this Nexus, slowly passing through the mud and the debris\"\n",
+      "[2026-09-03T20:56:16.080Z] [debug] ui: tap \"rest\"\n[2026-09-03T20:56:16.095Z] [player] rest\n[2026-09-03T20:56:16.096Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=2\n[2026-09-03T20:56:16.097Z] [world] Mercy circles three times and curls beside you. Her breathing slows to yours.\n",
+      "[2026-09-03T20:56:16.097Z] [world] You rest for 8 hours. +8 HP, +8 stamina recovered. (Day 61, afternoon)\n[2026-09-03T20:56:16.113Z] [system] \u23f3 Time passed: 8h\n[2026-09-03T20:56:16.516Z] [cognitive] REST  (403ms)\n[2026-09-03T20:56:16.975Z] [debug] ui: tap \"rest\"\n[2026-09-03T20:56:16.980Z] [player] rest\n",
+      "[2026-09-03T20:56:16.980Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=2\n[2026-09-03T20:56:16.980Z] [world] Mercy turns twice, thinks about a third, and drops where she stands.\n[2026-09-03T20:56:16.980Z] [world] You rest for 8 hours. +8 HP recovered. (Day 62, night)\n[2026-09-03T20:56:16.981Z] [system] \u23f3 Time passed: 8h\n",
+      "[2026-09-03T20:56:16.981Z] [arbiter] \"There's coin on the board for a willing blade,\" the Arbiter says. \"Read the World.\"\n[2026-09-03T20:56:16.985Z] [world] A Conspiracy Architects war party crests the rise \u2014 5 of them, blades already out. They've marked you for standing with the Forgotten Order.\n",
+      "[2026-09-03T20:56:16.985Z] [arbiter] \"The Conspiracy Architects do not forgive a friend of the Forgotten Order,\" the Arbiter murmurs. \"Stand, or run \u2014 but decide now.\"\n[2026-09-03T20:56:17.378Z] [cognitive] REST  (396ms)\n[2026-09-03T20:56:27.545Z] [debug] appstate: active \u2192 background (was active for 47418ms)\n",
+      "[2026-09-03T20:57:03.566Z] [debug] appstate: background \u2192 active (was background for 36020ms)\n[2026-09-03T20:57:08.030Z] [debug] appstate: active \u2192 background (was active for 4465ms)\n[2026-09-03T20:57:29.044Z] [debug] appstate: background \u2192 active (was background for 21013ms)\n[2026-09-03T20:57:40.591Z] [debug] appstate: active \u2192 background (was active for 11548ms)\n",
+      "[2026-09-03T20:58:14.351Z] [debug] appstate: background \u2192 active (was background for 33760ms)\n[2026-09-03T20:58:28.470Z] [debug] appstate: active \u2192 background (was active for 14118ms)\n[2026-09-03T20:58:53.344Z] [debug] appstate: background \u2192 active (was background for 24875ms)\n[2026-09-03T20:59:16.421Z] [debug] appstate: active \u2192 background (was active for 23077ms)\n",
+      "[2026-09-03T20:59:17.936Z] [debug] persist sizes(KB): total=329 player=84 wm=154[rooms=85 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=82 scene=8\n[2026-09-03T21:15:53.200Z] [debug] appstate: background \u2192 active (was background for 996774ms)\n[2026-09-03T21:16:15.626Z] [debug] appstate: active \u2192 background (was active for 22423ms)\n",
+      "[2026-09-03T21:28:43.526Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a068da-a415-7a8e-ae27-dc6da17c0ec9\n[2026-09-03T21:28:43.526Z] [debug] ota: Checking\u2026\n[2026-09-03T21:28:43.578Z] [debug] ota: Already up to date\n[2026-09-03T21:28:43.579Z] [debug] ota: boot check result = noUpdate\n[2026-09-03T21:28:43.649Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-09-03T21:28:43.650Z] [debug] voice: bundled idle\n[2026-09-03T21:28:43.931Z] [debug] send-log: bundle #mtlzxhu9g966 attempt 2/5 delivered to Sentry\n[2026-09-03T21:30:33.776Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a068da-a415-7a8e-ae27-dc6da17c0ec9\n[2026-09-03T21:30:33.776Z] [debug] ota: Checking\u2026\n[2026-09-03T21:30:33.828Z] [debug] ota: Already up to date\n",
+      "[2026-09-03T21:30:33.828Z] [debug] ota: boot check result = noUpdate\n[2026-09-03T21:30:33.905Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-09-03T21:30:33.905Z] [debug] voice: bundled idle\n[2026-09-03T21:30:34.113Z] [debug] send-log: bundle #mtlzxhu9g966 attempt 3/5 delivered to Sentry\n[2026-09-03T21:31:57.324Z] [debug] OTA session start: 2026-09-03-1649-what-a-ring-is-for.\n",
+      "[2026-09-03T21:31:57.324Z] [world] You step back into Mud Flood Nexus. The world waits for your move.\n[2026-09-03T21:31:57.325Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. \"Welcome back, Cheddar Bob. The road kept your place.\"\n\n=== END LOG \u00b7 399998 CHARS ===\n\nTartaria Realms\n\nDevice\n  Name: Pixel 10 Pro XL\n  Platform: android 37\n  Hermes: yes\n  Locale: en-US\n",
+      "  Timezone: America/New_York\n  Screen: window 443\u00d7986 / screen 443\u00d7986 @ 2.4375x density\n  Captured at: 2026-09-03T21:31:58.478Z\n\nInstall\n  App ID: com.hotatticgames.tartarprim\n  App version: 4.32.11\n  APK build version: 2.4.1\n  APK build: 293\n  AAB: (build 293)\n  OTA: (2026-09-03-1649-what-a-ring-is-for)\n  Boot stage: qwen:deferred\n\nML runtime health\n  Status: active (no crashes detected)\n",
+      "  Crash count: 0\n  Last init attempt: 2026-09-03T21:30:33.916Z\n  Last init success: 2026-09-03T21:30:34.398Z\n  Crashes-before-disable threshold: 2\n  Qwen completion guard: clean (no completion crashes)\n  Qwen kernel variant: rnllama_v8_2_fp16_dotprod\n",
+      "  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k\n  Voice (TTS) guard: clean (no voice crashes on this build)\nSave-load health\n  Status: clean (no load-crash flags)\nLast JS crash\n",
+      "  Status: none recorded\nThis launch\n  Life: bmtm1h5kbls \u00b7 started 2026-09-03T21:30:33.707Z\n  Cold start \u2014 this boot did not follow an OTA apply\nCrash ledger \u2014 10 recorded (newest last)\n  \u2022 2026-09-01T16:57:39.191Z (3154m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-01-1608-one-card-one-arithmetic \u00b7 stage boot:qwen:deferred\n",
+      "      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: boot:qwen:deferred \u00b7 866ms into the action \u00b7 alive 0ms after it\n      launch: died 910ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-02T02:45:58.234Z (2566m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-09-02-1621-the-ask-is-a-command \u00b7 stage boot:qwen:deferred\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: boot:qwen:deferred \u00b7 930ms into the action \u00b7 alive 0ms after it\n      launch: died 965ms into the process \u00b7 not an OTA-apply boot\n",
+      "      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-02T22:42:22.972Z (1370m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-02-1633-a-batch-is-one-action \u00b7 stage boot:qwen:deferred\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n",
+      "      last checkpoint: boot:qwen:deferred \u00b7 957ms into the action \u00b7 alive 0ms after it\n      launch: died 1031ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-03T00:49:33.538Z (1242m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-02-1634-the-aside-yields \u00b7 stage rendered\n",
+      "      Process died with no orderly exit while: tap \"take / salvage\"\n      doing: tap \"take / salvage\" \u00b7 room mud_flood_nexus \u00b7 screen exploration\n      last checkpoint: rendered \u00b7 221ms into the action \u00b7 alive 9133ms after it\n      launch: died 3096833ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n",
+      "  \u2022 2026-09-03T02:52:27.753Z (1120m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-03-1639-every-ingredient-exists \u00b7 stage rendered\n      Process died with no orderly exit while: tap \"craft\"\n      doing: tap \"craft\" \u00b7 room mud_flood_nexus \u00b7 screen exploration\n      last checkpoint: rendered \u00b7 7466ms into the action \u00b7 alive 1498ms after it\n",
+      "      launch: died 21448ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-03T12:10:12.789Z (562m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-03-1642-every-drop-has-a-name-in-the-book \u00b7 stage mid-action\n      Process died with no orderly exit while: tap \"inventory\"\n",
+      "      doing: tap \"inventory\" \u00b7 room mud_flood_nexus \u00b7 screen exploration\n      launch: died 12819ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-03T15:48:24.471Z (344m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-03-1643-the-dice-riders-pay \u00b7 stage boot:qwen:deferred\n",
+      "      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: boot:qwen:deferred \u00b7 838ms into the action \u00b7 alive 11400ms after it\n      launch: died 12276ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n",
+      "  \u2022 2026-09-03T19:31:31.355Z (120m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-03-1648-a-fourth-ring \u00b7 stage boot:qwen:deferred\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 s"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-03-1653-the-wear-ward #mtm1iz3wmdt1 [inline 27/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtm1iz3wmdt1"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-03-1653-the-wear-ward"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "27"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-03-1653-the-wear-ward"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "3"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-03T23:07:17.918580Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-03T23:07:19.252000Z",
+  "fingerprints": [
+    "569fe6819d8acb64e939c3b2a6ff0e93"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1954152327,
+    "commitCount": 3,
+    "data": {},
+    "dateCreated": "2026-09-03T22:42:18.916025Z",
+    "dateReleased": "2026-09-03T22:42:55.442608Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "5831f3279f035e5fae54ee6b0788fe7b23f7ba96",
+      "message": "[ota-hal] OTA-1653: the wear ward\n\nOwner: \"I kind of like those two items the amulet in the ring that it slows\ndown the durability decline of your gear\u2026 I think the ring that I have on is\n-6% then it slows down the wear and tear of your items by 6% each and it\nsays stackable with armor\u2026 that's a pretty cool buff right?\"\n\n\u26a0 HE WAS DESCRIBING A BUFF THAT DID NOT EXIST. What he was reading is\nOTA-1649's resist line \u2014 \"Resists degradation (\u22126% each, stacks with\narmour)\" \u2014 which meant \u22126% of incoming DEGRADATION damage, a type OTA-1652\nthen proved nothing in the game even dealt. A bare percentage beside a word\ndoes not say what it reduces, and the type being dead meant nothing in play\never contradicted his reading.\n\nHis reading is the better item. So it is real now, on the ring he had on.\n\n  \u2022 6 / 10 / 15 / 25% by rarity. \u26a0 BEST, NOT SUM \u2014 and here that is not\n    generosity, it is necessary: four Rare wards summed is 60% and four\n    Legendary is 100%, which would make a jewellery build's gear literally\n    immortal and quietly delete the repair economy the bench and the\n    Crucible are built on. The ceiling stays where the ladder put it.\n  \u2022 \u26a0 THE PERCENTAGE IS A CHANCE TO SKIP A WEAR POINT, not a fraction taken\n    off one. Durability is an INTEGER that moves a point at a time \u2014 there\n    is no 0.85 of a chip \u2014 so a fractional decrement would round back to a\n    full point on every single hit and the buff would do nothing at all.\n    15% means 15% of the chips do not happen.\n  \u2022 ONE GATE, in `wearEquippedItem`, asked BEFORE the point is spent. That\n    is the single place every piece of the player's own kit wears down \u2014\n    combat blows, digging tools, all of it \u2014 so a warded player cannot be\n    warded on one path and not another.\n\n\u26a0 THE TIN WARD RING MOVED COMMON \u2192 RARE TO CARRY IT, and that is the ladder\nworking rather than being worked around. OTA-1649's rule is that Common and\nUncommon may never carry a SPECIAL, and a wear ward is a special; smuggling\none onto a Common would have broken the rule an entire OTA was spent\nestablishing. Its recipe gained a Rare anchor to match (the ingredient-\nquality rule), drawn from a name recipes already used so the Crucible's\nfodder pool is untouched (the OTA-1649 fusion-pool rule).\n\n\u26a0\u26a0\u26a0 A REAL BUG SHIPPED INSIDE THIS OTA AND THE SUITE CAUGHT IT. The first\ndraft wrote `wearIsWarded(pct, roll = Math.random())` \u2014 and a DEFAULT\nPARAMETER IS EVALUATED ON EVERY CALL, guard or no guard. So a player wearing\nno ward at all burned one Math.random() per wear event, which shifts the\nentire RNG stream: every initiative, hit, crit and loot roll after any piece\nof gear chipped came out different for everyone. ota1017 found it \u2014 \"a\nvolley that kills you means your swing never lands\" stopped killing the\nplayer. A silent, global change to how the game rolls, from a default\nargument. The early return is now load-bearing, and ota1653 pins it by\ncounting draws through a stubbed Math.random.\n\nThe card says it in words that cannot be misread the way the last line was:\n\"Everything you wear or wield lasts 15% longer.\"\n\nGates: all 18 green by exit code. Full suite green.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-03T22:39:14Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-03-1653-the-wear-ward",
+          "shortVersion": "tartaria@4.32.11+2026-09-03-1653-the-wear-ward",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-03T22:42:55.442608Z",
+          "dateCreated": "2026-09-03T22:42:18.916025Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155356192",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-03T22:42:55.724109Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-03-1653-the-wear-ward",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-03-1653-the-wear-ward",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-03-1653-the-wear-ward",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-03-1653-the-wear-ward)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "bfaa608918324ee89439243a923b48f4",
+  "previousEventID": "b27471e896fb4c2c8508f183acde4529"
+}

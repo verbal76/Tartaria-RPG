@@ -1,0 +1,275 @@
+{
+  "id": "9184b0beda154a429cb96c2270a63cee",
+  "groupID": "7710739011",
+  "eventID": "9184b0beda154a429cb96c2270a63cee",
+  "projectID": "4511945117532160",
+  "size": 18028,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-03-1655-the-card-is-asked #mtm6enrfz3iy [inline 19/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-03-1655-the-card-is-asked",
+  "message": "player-log 2026-09-03-1655-the-card-is-asked #mtm6enrfz3iy [inline 19/28]",
+  "title": "player-log 2026-09-03-1655-the-card-is-asked #mtm6enrfz3iy [inline 19/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "cfb3d45301ea4d6cab5a93b1d15cdf59",
+      "span_id": "bfd38caa6426016c",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "y Architects Raider 5 has no time to react.\n[2026-09-03T14:40:19.678Z] [combat] You \u2014 d20 \u2192 5 + DEX 21 + 2 (point blank) = 28 vs Conspiracy Architects Raider 5 AC 11 \u2014 \u2713 HIT\n[2026-09-03T14:40:19.681Z] [combat] Conspiracy Architects Raider 5 takes 7 with the corrupted reclaimers guild shroud-spun slinger. It reels: 12 left. Then it fights back.\n",
+      "[2026-09-03T14:40:19.681Z] [combat] Corrupted Reclaimers Guild Shroud-Spun Slinger \u2014 4 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n[2026-09-03T14:40:19.683Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 1 + ATK 7 = 8 vs your AC 22 \u2014 \u2717 FUMBLE\n[2026-09-03T14:40:22.638Z] [debug] ui: tap \"dodge\"\n[2026-09-03T14:40:22.651Z] [player] dodge\n",
+      "[2026-09-03T14:40:22.652Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=2 hooks=1\n[2026-09-03T14:40:22.653Z] [world] You commit to the dodge. Slip Conspiracy Architects Raider 5's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-03T14:40:22.654Z] [combat] Conspiracy Architects Raider 5 blackens \u2014 corruption eats 4. (8/19 HP, 2 turns left)\n[2026-09-03T14:40:22.746Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 5 + ATK 7 = 12 vs your AC 22 \u2014 \u2717 EVADED\n[2026-09-03T14:40:22.746Z] [combat] Dodge \u2014 d20 \u2192 10 + DEX 21 = 31 vs ATK 12. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n",
+      "[2026-09-03T14:40:22.746Z] [world] You slip Conspiracy Architects Raider 5's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n[2026-09-03T14:40:22.747Z] [debug] arbiter: template (reason=combat)\n[2026-09-03T14:40:22.747Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-09-03T14:40:22.747Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T14:40:23.100Z] [cognitive] neutral  (352ms)\n[2026-09-03T14:40:23.766Z] [debug] ui: tap \"\u2623 shroud-spun slinger \u2692\"\n[2026-09-03T14:40:23.767Z] [system] evasive \u2014 harder to hit fades.\n[2026-09-03T14:40:23.808Z] [player] attack with the off-hand reclaimers guild shroud-spun slinger\n",
+      "[2026-09-03T14:40:23.808Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand reclaimers guild shroud spun slinger resolved=Reclaimers Guild Shroud-Spun Slinger range=close enemies=2 hooks=1\n[2026-09-03T14:40:23.809Z] [combat] Conspiracy Architects Raider 5 blackens \u2014 corruption eats 4. (4/19 HP, 1 turn left)\n",
+      "[2026-09-03T14:40:23.809Z] [debug] attack: target=Conspiracy Architects Raider 5 range=close reach.bands=[distant,far,mid,close] reach.label=Reclaimers Guild Shroud-Spun Slinger bareHand=false\n[2026-09-03T14:40:23.811Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-09-03T14:40:23.883Z] [world] Your corrupted reclaimers guild shroud-spun slinger comes around in an arc; Conspiracy Architects Raider 5 squares up to meet it.\n[2026-09-03T14:40:23.884Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T14:40:24.219Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 USE_ITEM  (335ms)\n",
+      "[2026-09-03T14:40:32.627Z] [world] You seize the initiative. Conspiracy Architects Raider 5 has no time to react.\n[2026-09-03T14:40:32.628Z] [combat] You \u2014 d20 \u2192 16 + DEX 21 + 2 (point blank) perfect opening (2\u00d7 dice) = 39 vs Conspiracy Architects Raider 5 AC 11 \u2014 \u2713 HIT\n",
+      "[2026-09-03T14:40:32.628Z] [combat] The killing blow with the corrupted reclaimers guild shroud-spun slinger: 14. Conspiracy Architects Raider 5 drops where it stood.\n[2026-09-03T14:40:32.629Z] [reward] Conspiracy Architects Raider 5 defeated. You recover Aether Residue \u00d72, Scrap Metal, Aetheric Padded Vest, Architect Sigil.\n",
+      "[2026-09-03T14:40:32.630Z] [reward] You strip the body: Cudgel, Reclaimer's Salvage Vest (+6 TC). The kit took the fight badly.\n[2026-09-03T14:40:32.631Z] [combat] Nobody left standing \u2014 the fight is yours. You strip the sleepers where they lie.\n",
+      "[2026-09-03T14:40:32.632Z] [reward] You strip the unconscious Conspiracy Architects Raider 1 \u2014 Cudgel, Mud-Warden's Vest, Patched Cloth, Worn Tartarian Coin, +30 TC. The gear's seen better days (worn from the fight).\n[2026-09-03T14:40:32.641Z] [reward] +16 TC pried from the dust.\n",
+      "[2026-09-03T14:40:32.687Z] [arbiter] The Arbiter looks around. \"This is the room where the disaster was managed, or could have been.\"\n[2026-09-03T14:40:32.687Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T14:41:26.284Z] [debug] persist sizes(KB): total=323 player=80 wm=154[rooms=84 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=85 scene=4\n",
+      "[2026-09-03T14:41:30.756Z] [debug] send-log: #mtlmv3v5hg6u \u2014 DELIVERED (inline, no attachments): beacon out, 28/28 parts accepted (407435 chars) \u2014 flush said yes\n[2026-09-03T14:41:30.757Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mtlmv3v5hg6u kept on disk, boots retry up to 5 sends total\n",
+      "[2026-09-03T15:48:11.026Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a065c0-bf22-74d7-b448-49e4c56cee88\n[2026-09-03T15:48:11.026Z] [debug] ota: Checking\u2026\n[2026-09-03T15:48:11.988Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-09-03T15:48:12.064Z] [debug] ota: Saving progress\u2026\n[2026-09-03T15:48:12.065Z] [debug] ota: Restarting to apply\u2026\n",
+      "[2026-09-03T15:48:12.241Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a067d5-fa6c-7846-8795-12be2fefd5f0\n[2026-09-03T15:48:12.241Z] [debug] ota: Checking\u2026\n[2026-09-03T15:48:12.344Z] [debug] ota: Already up to date\n[2026-09-03T15:48:12.344Z] [debug] ota: boot check result = noUpdate\n[2026-09-03T15:48:12.420Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-09-03T15:48:12.420Z] [debug] voice: bundled idle\n[2026-09-03T15:48:12.645Z] [debug] send-log: bundle #mtlmv3v5hg6u attempt 2/5 delivered to Sentry\n[2026-09-03T15:48:15.946Z] [debug] OTA applied: 2026-09-03-1642-every-drop-has-a-name-in-the-book \u2192 2026-09-03-1643-the-dice-riders-pay.\n[2026-09-03T15:48:15.946Z] [debug] OTA session start: 2026-09-03-1643-the-dice-riders-pay.\n",
+      "[2026-09-03T15:48:15.946Z] [world] You step back into Mud Flood Nexus. The world waits for your move.\n[2026-09-03T15:48:15.946Z] [arbiter] The Arbiter looks up as you return. \"Welcome back, Cheddar Bob. I wondered when you'd take up the thread again.\"\n",
+      "[2026-09-03T15:48:16.361Z] [debug] \u2550\u2550\u2550 SESSION 2026-09-03T15:48:16.357Z \u00b7 build 2026-09-03-1643-the-dice-riders-pay \u00b7 updated from 2026-09-03-1642-every-drop-has-a-name-in-the-book \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-09-03T15:48:16.362Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-03T15:48:16.363Z] [debug] missions: hunt:hunt_bog_dragon stage 4/7 [diplomacy] @monarch_waystation npc=\"Old Mira\" needs=The Boy's Locket\u2713 gives=Eshren's Name-Token\n[2026-09-03T15:48:16.363Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n",
+      "[2026-09-03T15:48:16.363Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n[2026-09-03T15:48:16.363Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n",
+      "[2026-09-03T15:48:16.363Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n[2026-09-03T15:48:16.363Z] [debug] missions: \u00b7 at=mud_flood_nexus travelTo=monarch_waystation\n",
+      "[2026-09-03T15:48:16.364Z] [debug] boot: life bmtlp8vmrvw started 2026-09-03T15:48:12.195Z \u00b7 FOLLOWED AN OTA APPLY 130ms ago via boot-front \u00b7 prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)\n[2026-09-03T15:48:20.234Z] [debug] send-log: #mtlp91n0yrsc \u2014 DELIVERED (inline, no attachments): beacon out, 28/28 parts accepted (406745 chars) \u2014 flush said yes\n",
+      "[2026-09-03T15:48:20.235Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mtlp91n0yrsc kept on disk, boots retry up to 5 sends total\n[2026-09-03T16:54:06.078Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a067d5-fa6c-7846-8795-12be2fefd5f0\n[2026-09-03T16:54:06.078Z] [debug] ota: Checking\u2026\n",
+      "[2026-09-03T16:54:07.025Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-09-03T16:54:07.111Z] [debug] ota: Saving progress\u2026\n[2026-09-03T16:54:07.111Z] [debug] ota: Restarting to apply\u2026\n[2026-09-03T16:54:07.308Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a0682c-5d1e-70c5-a095-081f696b94b1\n[2026-09-03T16:54:07.308Z] [debug] ota: Checking\u2026\n",
+      "[2026-09-03T16:54:07.411Z] [debug] ota: Already up to date\n[2026-09-03T16:54:07.412Z] [debug] ota: boot check result = noUpdate\n[2026-09-03T16:54:07.483Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-09-03T16:54:07.483Z] [debug] voice: bundled idle\n[2026-09-03T16:54:07.679Z] [debug] send-log: bundle #mtlp91n0yrsc attempt 2/5 delivered to Sentry\n",
+      "[2026-09-03T19:31:30.465Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a06892-1fa9-713e-af70-74305240b74c\n[2026-09-03T19:31:30.465Z] [debug] ota: Checking\u2026\n[2026-09-03T19:31:30.570Z] [debug] ota: Already up to date\n[2026-09-03T19:31:30.570Z] [debug] ota: boot check result = noUpdate\n[2026-09-03T19:31:30.686Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-09-03T19:31:30.686Z] [debug] voice: bundled idle\n[2026-09-03T19:31:30.857Z] [debug] send-log: bundle #mtlp91n0yrsc attempt 3/5 delivered to Sentry\n[2026-09-03T20:39:04.887Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a06892-1fa9-713e-af70-74305240b74c\n[2026-09-03T20:39:04.888Z] [debug] ota: Checking\u2026\n",
+      "[2026-09-03T20:39:05.918Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-09-03T20:39:06.008Z] [debug] ota: Saving progress\u2026\n[2026-09-03T20:39:06.008Z] [debug] ota: Restarting to apply\u2026\n[2026-09-03T20:39:06.212Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a068da-a415-7a8e-ae27-dc6da17c0ec9\n[2026-09-03T20:39:06.212Z] [debug] ota: Checking\u2026\n",
+      "[2026-09-03T20:39:06.321Z] [debug] ota: Already up to date\n[2026-09-03T20:39:06.322Z] [debug] ota: boot check result = noUpdate\n[2026-09-03T20:39:06.385Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-09-03T20:39:06.385Z] [debug] voice: bundled idle\n[2026-09-03T20:39:06.627Z] [debug] send-log: bundle #mtlp91n0yrsc attempt 4/5 delivered to Sentry\n",
+      "[2026-09-03T20:39:59.081Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a068da-a415-7a8e-ae27-dc6da17c0ec9\n[2026-09-03T20:39:59.081Z] [debug] ota: Checking\u2026\n[2026-09-03T20:39:59.127Z] [debug] ota: Already up to date\n[2026-09-03T20:39:59.128Z] [debug] ota: boot check result = noUpdate\n",
+      "[2026-09-03T20:39:59.171Z] [debug] send-log: bundle #mtlp91n0yrsc held \u2014 only 53s since the last try (a restart, not a chance); 1 left\n[2026-09-03T20:39:59.172Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-09-03T20:39:59.172Z] [debug] voice: bundled idle\n",
+      "[2026-09-03T20:47:11.893Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a068da-a415-7a8e-ae27-dc6da17c0ec9\n[2026-09-03T20:47:11.893Z] [debug] ota: Checking\u2026\n[2026-09-03T20:47:11.962Z] [debug] ota: Already up to date\n[2026-09-03T20:47:11.962Z] [debug] ota: boot check result = noUpdate\n[2026-09-03T20:47:12.069Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-09-03T20:47:12.069Z] [debug] voice: bundled idle\n[2026-09-03T20:47:12.324Z] [debug] send-log: bundle #mtlp91n0yrsc attempt 5/5 delivered to Sentry \u2014 final try, cleared\n[2026-09-03T20:47:16.062Z] [debug] OTA session start: 2026-09-03-1649-what-a-ring-is-for.\n[2026-09-03T20:47:16.062Z] [world] You step back into Mud Flood Nexus. The world waits for your move.\n",
+      "[2026-09-03T20:47:16.065Z] [arbiter] The Arbiter meets your eyes. \"Welcome back, Cheddar Bob. The buried country is no place to walk alone. The waste did not sleep while you were gone \u2014 blood was spilled and ground changed hands. Read the World for the account.\"\n",
+      "[2026-09-03T20:47:16.458Z] [debug] \u2550\u2550\u2550 SESSION 2026-09-03T20:47:16.455Z \u00b7 build 2026-09-03-1649-what-a-ring-is-for \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-09-03T20:47:16.459Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-03T20:47:16.459Z] [debug] missions: hunt:hunt_bog_dragon stage 4/7 [diplomacy] @monarch_waystation npc=\"Old Mira\" needs=The Boy's Locket\u2713 gives=Eshren's Name-Token\n[2026-09-03T20:47:16.459Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n",
+      "[2026-09-03T20:47:16.460Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n[2026-09-03T20:47:16.460Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n",
+      "[2026-09-03T20:47:16.460Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n[2026-09-03T20:47:16.460Z] [debug] missions: \u00b7 at=mud_flood_nexus travelTo=monarch_waystation\n[2026-09-03T20:47:16.460Z] [debug] boot: life bmtlzxdwvcp started 2026-09-03T20:47:11.791Z \u00b7 not an OTA apply (no handoff on disk)\n",
+      "[2026-09-03T20:47:17.324Z] [debug] send-log: crash on record (2026-09-03T20:39:06.948Z) \u2014 game log pushed automatically, delivered to Sentry, kept on disk as #mtlzxhu9g966\n[2026-09-03T20:47:19.077Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-09-03T20:47:19.126Z] [debug] spawn: gear=[Golem-Warden's Legplates] window=10 roster=new\n",
+      "[2026-09-03T20:47:19.127Z] [world] You walk west through open silt. The compass points west into open ground.\n[2026-09-03T20:47:19.128Z] [world] The thread you were following waits where you left it.\n[2026-09-03T20:47:20.276Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T20:47:21.732Z] [world] You take the Golem-Warden's Legplates from where it lay.\n",
+      "[2026-09-03T20:47:21.732Z] [reward] \u2726 Golem-Warden's Legplates (Common).\n[2026-09-03T20:47:22.646Z] [world] You salvage the cold spring. The take is small but real.\n[2026-09-03T20:47:22.646Z] [world] You break the data slate apart. Among the pieces, something worth keeping.\n[2026-09-03T20:47:22.647Z] [world] You work the rusted chain over. A part of it comes loose, intact.\n",
+      "[2026-09-03T20:47:22.647Z] [world] You scavenge the signal spark thoroughly. One Smooth Stone survives the sorting.\n[2026-09-03T20:47:22.647Z] [world] Tucked inside the silt pump: an oddment that matches no quartermaster's list. The kind of thing that fuses well.\n[2026-09-03T20:47:22.648Z] [reward] \u2726 Salvage haul:\n[2026-09-03T20:47:22.648Z] [reward]     \u2022 Scrap Metal x6 (Common)\n",
+      "[2026-09-03T20:47:22.648Z] [reward"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-03-1655-the-card-is-asked #mtm6enrfz3iy [inline 19/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtm6enrfz3iy"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-03-1655-the-card-is-asked"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "19"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-03-1655-the-card-is-asked"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-03T23:48:34.131938Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-03T23:48:35.602000Z",
+  "fingerprints": [
+    "03c230bc7fc13fb32ff9b5cd08147e14"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1954246178,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-03T23:45:14.043451Z",
+    "dateReleased": "2026-09-03T23:46:49.090887Z",
+    "deployCount": 1,
+    "ref": null,
+    "lastCommit": {
+      "id": "318ba98ffe29325b46199d8c764e609eba3d8075",
+      "message": "[ota-hal] OTA-1655: the card is asked, not read\n\nOwner: \"Run a comprehensive audit across all code, schema definitions, item\ntables, and OTA updates deployed over the last 24 hours\u2026 make sure they all\nwork.\"\n\n\u26a0 THE AUDIT'S ONE REPAIRABLE FINDING, AND HOW IT WAS FOUND. \"Do the suites\npass?\" is the wrong question \u2014 they all pass. The question that finds anything\nis HOW each suite proves its OTA: assertions that CALL the code and check the\nanswer, versus assertions that read the source file and look for a string. All\ntwenty OTAs from the last day were scored that way:\n\n  ota1634 25/26 behavioural   ota1644 27/28   ota1649 73/88\n  ota1635 25/25               ota1645 24/24   ota1650 68/72\n  ota1636 21/26               ota1646 34/39   ota1651  1/23  \u26a0\n  ota1637 28/38               ota1647 24/25   ota1652 20/22\n  ota1638 24/36               ota1648 10/17   ota1653 21/27\n  ota1639 15/16   ota1640 19/25   ota1641 16/17   ota1642 16/18   ota1643 53/53\n\nNineteen carry real proof. \u26a0 OTA-1651 is the outlier at ONE, and it is the one\nthat moved what the player looks at: the enemy's flavour line and his own hands\noff the combat card and into the expanded popup.\n\nA source pin cannot tell a working card from a broken one. Rename a local and it\ngoes RED on correct code; route the same text through another helper and it\nstays GREEN on a card that lost the line. Two of those pins are worse than that:\nthey compare `.indexOf` of two SOURCE strings to assert that the flavour prints\nABOVE the numbers \u2014 which measures the order two `lines.push` CALLS appear in the\nfile, not the order the lines come out.\n\n`enemyDetailBody` was already pure \u2014 an EnemyView in, a block of text out, no\nhooks, no state, no rendering \u2014 and module-local only because nothing had needed\nit. So the whole fix is one export, and ota1655 asks the card what OTA-1651\npromised:\n\n  \u2022 the flavour is in the body, and above the HP line MEASURED ON THE RENDERED\n    LINES rather than on the source\n  \u2022 both hands are named in words \u2014 and the sentence still says what it means\n    with the \u25cf/\u25cb glyphs stripped out, which is the entire reason they moved off\n    the combat card\n  \u2022 a flavourless enemy leaves no blank gap and never the word \"undefined\"\n  \u2022 \u26a0 an unreadable foe SAYS it is unreadable: a card that simply omitted the\n    section would read as \"this thing has no defences\"\n  \u2022 Wisdom 12 discloses exactly what the gate withheld, and what you have already\n    SEEN shows through with the line telling you how to learn the rest\n  \u2022 no enemy shape a save can hold \u2014 no flavour, no traits, no range, 0 HP \u2014\n    makes the popup throw, because a popup that throws takes the screen with it\n\n\u26a0 ONE FIXTURE ASSUMPTION OF MINE WAS WRONG AND THE RUN CAUGHT IT: the first\ndraft handed the boss `weaknesses: ['burn']` and asserted Burn came back. It\ndoes not \u2014 defences come from `defensesFor`, the OTA-1611 reconciler that reads\nthe enemy's type and traits, and no fixture can hand them over. The test now\nasserts what is actually true and actually matters: a boss's defences are\nDISCLOSED and each is named in words beside a labelled type, whatever those\ntypes resolve to.\n\nThe rest of the audit is reported to the owner, not committed: recipes 205/205\nresolve with 0 missing ingredients, 0 missing results and 0 duplicate\ningredients; shields sit at 150/200/265/350 by rarity in weapons.json with the\nblow landing on the shield 100% of the time barring a best-of bypass trait;\ndog vests and golem arms equip, wear, warn and repair; and no unguarded catalog\nlookup, floating promise or unparsed JSON was found in the 47 TS/TSX files the\nday touched.\n\nGates: all 18 green by exit code. Full suite green \u2014 1118 suites, 11,562 tests.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-03T23:42:58Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-03-1655-the-card-is-asked",
+          "shortVersion": "tartaria@4.32.11+2026-09-03-1655-the-card-is-asked",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-03T23:46:49.090887Z",
+          "dateCreated": "2026-09-03T23:45:14.043451Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155372432",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-03T23:46:49.345391Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-03-1655-the-card-is-asked",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-03-1655-the-card-is-asked",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-03-1655-the-card-is-asked",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-03-1655-the-card-is-asked)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "9322335f1e49490fa1b04f1c1e6abd30",
+  "previousEventID": "84c3f31ca2ef4b62bf473ea2604d16ed"
+}

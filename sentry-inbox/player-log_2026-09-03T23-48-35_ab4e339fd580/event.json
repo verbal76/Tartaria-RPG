@@ -1,0 +1,297 @@
+{
+  "id": "ab4e339fd58040ee802aeb39ffb993e9",
+  "groupID": "7710739011",
+  "eventID": "ab4e339fd58040ee802aeb39ffb993e9",
+  "projectID": "4511945117532160",
+  "size": 17818,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-03-1655-the-card-is-asked #mtm6enrfz3iy [inline 1/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-03-1655-the-card-is-asked",
+  "message": "player-log 2026-09-03-1655-the-card-is-asked #mtm6enrfz3iy [inline 1/28]",
+  "title": "player-log 2026-09-03-1655-the-card-is-asked #mtm6enrfz3iy [inline 1/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "cfb3d45301ea4d6cab5a93b1d15cdf59",
+      "span_id": "bfd38caa6426016c",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "=== TARTARIA LOG \u00b7 399901 CHARS \u00b7 BEGIN ===\n[2026-09-03T00:33:09.314Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T00:33:10.318Z] [world] Old habit: see it, take it, keep walking. The Vine Grasp is yours.\n[2026-09-03T00:33:10.318Z] [reward] \u2726 Vine Grasp (Common).\n",
+      "[2026-09-03T00:33:10.339Z] [world] You take the Golem-Bound Armor the way you take everything out here \u2014 quickly, and without ceremony.\n[2026-09-03T00:33:10.340Z] [reward] \u2726 Golem-Bound Armor (Common).\n[2026-09-03T00:33:11.312Z] [world] You salvage the anemone bloom. The take is small but real.\n[2026-09-03T00:33:11.312Z] [world] You work the nest over. A part of it comes loose, intact.\n",
+      "[2026-09-03T00:33:11.313Z] [world] You salvage the shedding. The take is small but real.\n[2026-09-03T00:33:11.313Z] [world] You salvage the standing water. The take is small but real.\n[2026-09-03T00:33:11.314Z] [reward] \u2726 Salvage haul:\n[2026-09-03T00:33:11.314Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-09-03T00:33:11.314Z] [reward]     \u2022 Mud Fragment x3 (Common)\n",
+      "[2026-09-03T00:33:11.314Z] [reward]     \u2022 Smooth Stone x3 (Common)\n[2026-09-03T00:33:12.679Z] [debug] ui: tap \"investigate\"\n[2026-09-03T00:33:14.312Z] [player] investigate the ground\n[2026-09-03T00:33:14.313Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2\n",
+      "[2026-09-03T00:33:14.319Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Firewood (Common).\n[2026-09-03T00:33:14.328Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T00:33:14.542Z] [cognitive] CLIMB  (213ms)\n[2026-09-03T00:33:15.415Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n[2026-09-03T00:33:15.435Z] [debug] spawn: gear=[Aetheric Spark] window=10 roster=new\n",
+      "[2026-09-03T00:33:15.437Z] [world] You walk south through open silt. The compass points south into open ground.\n[2026-09-03T00:33:15.437Z] [world] Time went somewhere. It did not come here.\n[2026-09-03T00:33:15.657Z] [player] investigate tidal pool\n",
+      "[2026-09-03T00:33:15.658Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=tidal pool resolved=tidal pool range=- enemies=0 hooks=2\n[2026-09-03T00:33:15.659Z] [world] The tidal pool reads as ordinary, which in Tartaria is a small kind of relief. You leave it be.\n[2026-09-03T00:33:15.863Z] [cognitive] neutral  (203ms)\n[2026-09-03T00:33:16.950Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-09-03T00:33:18.288Z] [world] You strip the abandoned skiff carefully. Something usable comes free in your hand.\n[2026-09-03T00:33:18.288Z] [world] You salvage the broken net. The take is small but real.\n[2026-09-03T00:33:18.288Z] [world] You lever something loose from the hull \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n",
+      "[2026-09-03T00:33:18.288Z] [world] You strip the lobster trap carefully. Something usable comes free in your hand.\n[2026-09-03T00:33:18.289Z] [world] Slim pickings on the spire. You pocket a Bent Nail on the way out.\n[2026-09-03T00:33:18.289Z] [world] You strip the standing water carefully. Something usable comes free in your hand.\n",
+      "[2026-09-03T00:33:18.289Z] [world] You work the tangle line apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n[2026-09-03T00:33:18.289Z] [reward] \u2726 Salvage haul:\n[2026-09-03T00:33:18.289Z] [reward]     \u2022 Stick (Common)\n[2026-09-03T00:33:18.290Z] [reward]     \u2022 Bent Nail x5 (Common)\n[2026-09-03T00:33:18.290Z] [reward]     \u2022 Charred Twig Bundle (Common)\n",
+      "[2026-09-03T00:33:18.290Z] [reward]     \u2022 Smooth Stone (Common)\n[2026-09-03T00:33:18.290Z] [reward]     \u2022 Iron-Pinned Plank Shard (Uncommon)\n[2026-09-03T00:33:19.256Z] [world] You pocket the Aetheric Spark and check the horizon, in that order.\n[2026-09-03T00:33:19.257Z] [reward] \u2726 Aetheric Spark (Common).\n[2026-09-03T00:33:20.568Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-09-03T00:33:22.309Z] [player] investigate the ground\n[2026-09-03T00:33:22.309Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2\n[2026-09-03T00:33:22.315Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Aether Residue (Common).\n[2026-09-03T00:33:22.323Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-09-03T00:33:22.536Z] [cognitive] CLIMB  (212ms)\n[2026-09-03T00:33:22.953Z] [debug] persist sizes(KB): total=321 player=84 wm=150[rooms=81 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=83 scene=3\n[2026-09-03T00:33:27.135Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n[2026-09-03T00:33:27.242Z] [reward] \u2726 Your bearing reads. +1 CHA (base 10, 11 as you stand).\n",
+      "[2026-09-03T00:33:27.243Z] [debug] spawn: gear=[Mud Shortsword] window=10 roster=new\n[2026-09-03T00:33:27.244Z] [world] You walk east through open silt. The compass points east into open ground.\n[2026-09-03T00:33:27.244Z] [world] Your hands remember the shape of what you were doing before your head does.\n[2026-09-03T00:33:28.320Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-09-03T00:33:31.773Z] [world] You break the barnacle ridge apart. Among the pieces, something worth keeping.\n[2026-09-03T00:33:31.774Z] [world] You salvage the fisherman's lantern. The take is small but real.\n[2026-09-03T00:33:31.774Z] [world] You salvage the oyster bed. The take is small but real.\n",
+      "[Filtered]",
+      "[2026-09-03T00:33:31.775Z] [world] You strip the standing water carefully. Something usable comes free in your hand.\n[2026-09-03T00:33:31.776Z] [reward] \u2726 Salvage haul:\n[2026-09-03T00:33:31.776Z] [reward]     \u2022 Smooth Stone x3 (Common)\n[2026-09-03T00:33:31.776Z] [reward]     \u2022 Aether Dust x2 (Common)\n[2026-09-03T00:33:31.776Z] [reward]     \u2022 Bone Sliver x2 (Common)\n",
+      "[2026-09-03T00:33:31.776Z] [reward]     \u2022 Bent Nail x2 (Common)\n[2026-09-03T00:33:31.777Z] [reward]     \u2022 Mud Fragment x4 (Common)\n[2026-09-03T00:33:31.777Z] [reward]     \u2022 Flint-and-Twine Bundle (Common)\n[2026-09-03T00:33:32.792Z] [world] The Mud Shortsword goes into the pack by feel. You have done this a great many times.\n[2026-09-03T00:33:32.793Z] [reward] \u2726 Mud Shortsword (Common).\n",
+      "[2026-09-03T00:33:43.368Z] [debug] ui: tap \"investigate\"\n[2026-09-03T00:33:45.003Z] [world] A silent bolt strikes near enough to singe your sleeve. (\u22121 HP)\n[2026-09-03T00:33:45.025Z] [player] investigate the ground\n[2026-09-03T00:33:45.026Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2\n",
+      "[2026-09-03T00:33:45.026Z] [world] Something shifted while you were turned away \u2014 an Aetheric Leech breaks cover, fast and low. (range: close)\n[2026-09-03T00:33:45.026Z] [combat] Aetheric Leech \u2014 Energy Drain ready, 1D10 Aetheric damage on a hit.\n[2026-09-03T00:33:45.027Z] [debug] enemy: Aetheric Leech hp=16 ac=9 atk=Energy Drain dmg=1D10 Aetheric rarity=Common ap=4\n",
+      "[2026-09-03T00:33:45.027Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-03T00:33:45.027Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T00:33:45.366Z] [cognitive] CLIMB  (337ms)\n[2026-09-03T00:33:48.187Z] [debug] ui: tap \"approach\"\n[2026-09-03T00:33:48.232Z] [player] approach Aetheric Leech\n",
+      "[2026-09-03T00:33:48.233Z] [debug] parser: intent=advance conf=1.00 verb=approach target=aetheric leech resolved=Aetheric Leech range=mid enemies=1 hooks=2\n[2026-09-03T00:33:48.234Z] [debug] move: advance from range=mid enemies=1 weather=Aether Lightning cost=1 partial=0\n[2026-09-03T00:33:48.237Z] [debug] move: field advance target=Aetheric Leech d 1.50->0.50 band mid->close\n",
+      "[2026-09-03T00:33:48.237Z] [world] You close the gap with Aetheric Leech. (range: close / arm's reach)\n[2026-09-03T00:33:48.239Z] [combat] Aetheric Leech \u2014 d20 \u2192 2 + ATK 4 = 6 vs your AC 21 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-03T00:33:48.591Z] [cognitive] USE_ITEM \u00b7 RETREAT  (349ms)\n[2026-09-03T00:33:54.782Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n",
+      "[2026-09-03T00:33:54.821Z] [player] attack with the auralite talon\n[2026-09-03T00:33:54.822Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=1 hooks=2\n[2026-09-03T00:33:54.823Z] [debug] attack: target=Aetheric Leech range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n",
+      "[2026-09-03T00:33:54.899Z] [world] You bring the acid-etched corrupted auralite talon to bear on Aetheric Leech.\n[2026-09-03T00:33:54.899Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T00:33:55.220Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (319ms)\n[2026-09-03T00:34:05.382Z] [world] Aetheric Leech moves first. The pressure is immediate.\n",
+      "[2026-09-03T00:34:05.384Z] [combat] Aetheric Leech \u2014 d20 \u2192 20 + ATK 4 = 24 vs your AC 21 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 CRITICAL HIT\n[2026-09-03T00:34:05.389Z] [combat] You \u2014 d20 \u2192 8 + INT 13 = 21 vs Aetheric Leech AC 9 \u2014 \u2713 HIT\n[2026-09-03T00:34:05.390Z] [combat] The Acid-Etched coating fails to take on Aetheric Leech.\n[2026-09-03T00:34:05.390Z] [combat] Aetheric flares \u2014 +4 on hit.\n",
+      "[2026-09-03T00:34:05.391Z] [combat] Aetheric Leech shrugs off the aetheric. (resisted, \u00d70.5 for 9)\n[2026-09-03T00:34:05.394Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Mud Armor \u2014 bludgeoning or burn will bite where aetheric won't.\"\n",
+      "[2026-09-03T00:34:05.397Z] [combat] Clean hit with the acid-etched corrupted auralite talon for 9. Aetheric Leech has 7 left and does not back away.\n[2026-09-03T00:34:05.397Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 2 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n[2026-09-03T00:34:05.398Z] [combat] Aetheric Leech is left exposed \u2014 easier to hit.\n",
+      "[2026-09-03T00:34:05.764Z] [combat] Aetheric Leech deals 3 aetheric damage [armor \u221234%, title \u00bd, floor 30%]. You have 17 HP remaining.\n[2026-09-03T00:34:05.764Z] [combat] Aetheric Leech's strike leaves you bleeding.\n[2026-09-03T00:34:08.912Z] [debug] ui: tap \"\ud83d\udd25\u2623 choir-bound launcher\"\n[2026-09-03T00:34:08.966Z] [player] attack with the off-hand choir-bound launcher\n",
+      "[2026-09-03T00:34:08.966Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=close enemies=1 hooks=2\n[2026-09-03T00:34:08.967Z] [combat] Aetheric Leech blackens \u2014 corruption eats 2. (5/16 HP, 2 turns left)\n",
+      "[2026-09-03T00:34:08.968Z] [debug] attack: target=Aetheric Leech range=close reach.bands=[distant,far,mid,close] reach.label=Choir-Bound Launcher bareHand=false\n[2026-09-03T00:34:09.046Z] [world] You raise the searing corrupted choir-bound launcher toward Aetheric Leech. The room narrows around the both of you.\n[2026-09-03T00:34:09.047Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-03T00:34:09.374Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 TAKE_COVER  (326ms)\n[2026-09-03T00:34:21.979Z] [world] Aetheric Leech moves first. The pressure is immediate.\n[2026-09-03T00:34:21.982Z] [combat] Aetheric Leech \u2014 d20 \u2192 6 + ATK 4 = 10 vs your AC 21 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-03T00:34:21.983Z] [combat] You \u2014 d20 \u2192 19 + INT 13 + 2 (point blank) = 34 vs Aetheric Leech AC 8 \u2014 \u2713 HIT\n[2026-09-03T00:34:21.983Z] [combat] Aetheric Leech shrugs off the aetheric. (resisted, \u00d70.5 for 12)\n[2026-09-03T00:34:21.986Z] [combat] Your blow with the searing corrupted choir-bound launcher lands clean \u2014 12 damage. Aetheric Leech crumples in the dust. The Aetherstone settles.\n",
+      "[2026-09-03T00:34:21.987Z] [reward] Aetheric Leech defeated. You recover Leech Mucus \u00d72, Riveted Leather Vest.\n[2026-09-03T00:34:21.988Z] [reward] +10 TC pried from the dust.\n[2026-09-03T00:34:22.605Z] [debug] persist sizes(KB): total=313 player=85 wm=142[rooms=74 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=83 scene=3\n[2026-09-03T00:34:24.619Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-09-03T00:34:26.186Z] [player] investigate the ground\n[2026-09-03T00:34:26.186Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2\n[2026-09-03T00:34:26.190Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Wild Onion (Common).\n[2026-09-03T00:34:26.199Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-09-03T00:34:26.199Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T00:34:26.199Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T00:34:26.414Z] [cognitive] CLIMB  (214ms)\n[2026-09-03T00:34:30.156Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n",
+      "[2026-09-03T00:34:30.190Z] [debug] spawn: gear=[Architect's Observer Visor, Mud-Stalker Leggings, Thought-Crafter's Headpiece] window=10 roster=new\n[2026-09-03T00:34:30.192Z] [world] Bersk Cartwright nods once. \"Cheddar Bob. Come look \u2014 a few things moved since you were last through.\"\n[2026-09-03T00:34:30.192Z] [world] \"Been a while,\" Bersk Cartwright says. \"Thought the mud had you.\"\n",
+      "[2026-09-03T00:34:30.192Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Bersk Cartwright, wandering trader. Tap the vendor banner to trade.\n[2026-09-03T00:34:30.202Z] [world] Rare workings for sale: Winter's Verdict (500 TC), Wrath of Titans (500 TC), Aether Bolt-Caster (200 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches ",
+      "up a hurt dog or golem \u2014 just ask.\n[2026-09-03T00:34:30.202Z] [world] You walk south through open silt. The compass points south into open ground.\n[2026-09-03T00:34:30.203Z] [world] You are standing the way you stood last time, without meaning to.\n[2026-09-03T00:34:38.250Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-09-03T00:34:39.438Z] [world] You take the Architect's Observer Visor from where it lay.\n[2026-09-03T00:34:39.439Z] [reward] \u2726 Architect's Observer Visor (Common).\n[2026-09-03T00:34:39.459Z] [world] You pick up the Mud-Stalker Leggings.\n[2026-09-03T00:34:39.459Z] [reward] \u2726 Mud-Stalker Leggings (Common).\n[2026-09-03T00:34:39.460Z] [world] You lift the Thought-Crafter's Headpiece clear.\n",
+      "[2026-09-03T00:34:39.460Z] [reward] \u2726 Thought-Crafter's Headpiece (Common).\n[2026-09-03T00:34:40.446Z] [world] You work the hermit crab over. A part of it comes loose, intact.\n[2026-09-03T00:34:40.446Z] [world] You salvage the standing water. The take is small but real.\n",
+      "[2026-09-03T00:34:40.447Z] [world] You lever something loose from the tackle box \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n[2026-09-03T00:34:40.447Z] [reward] \u2726 Salvage haul:\n[2026-09-03T00:34:40.447Z] [reward]     \u2022 Bone Sliver x2 (Common)\n[2026-09-03T00:34:40.448Z] [reward]     \u2022 Mud Fragment x3 (Common)\n",
+      "[2026-09-03T00:34:40.448Z] [reward]     \u2022 Flint Core Nodule (Common)\n[2026-09-03T00:34:41.885Z] [debug] ui: tap \"investigate\"\n[2026-09-03T00:34:43.439Z] [system] bleeding fades.\n[2026-09-03T00:34:43.460Z] [player] investigate the ground\n[2026-09-03T00:34:43.461"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-03-1655-the-card-is-asked #mtm6enrfz3iy [inline 1/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtm6enrfz3iy"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-03-1655-the-card-is-asked"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "1"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-03-1655-the-card-is-asked"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-03T23:48:34.004320Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "15": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 328,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-03T23:48:35.599000Z",
+  "fingerprints": [
+    "03c230bc7fc13fb32ff9b5cd08147e14"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1954246178,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-03T23:45:14.043451Z",
+    "dateReleased": "2026-09-03T23:46:49.090887Z",
+    "deployCount": 1,
+    "ref": null,
+    "lastCommit": {
+      "id": "318ba98ffe29325b46199d8c764e609eba3d8075",
+      "message": "[ota-hal] OTA-1655: the card is asked, not read\n\nOwner: \"Run a comprehensive audit across all code, schema definitions, item\ntables, and OTA updates deployed over the last 24 hours\u2026 make sure they all\nwork.\"\n\n\u26a0 THE AUDIT'S ONE REPAIRABLE FINDING, AND HOW IT WAS FOUND. \"Do the suites\npass?\" is the wrong question \u2014 they all pass. The question that finds anything\nis HOW each suite proves its OTA: assertions that CALL the code and check the\nanswer, versus assertions that read the source file and look for a string. All\ntwenty OTAs from the last day were scored that way:\n\n  ota1634 25/26 behavioural   ota1644 27/28   ota1649 73/88\n  ota1635 25/25               ota1645 24/24   ota1650 68/72\n  ota1636 21/26               ota1646 34/39   ota1651  1/23  \u26a0\n  ota1637 28/38               ota1647 24/25   ota1652 20/22\n  ota1638 24/36               ota1648 10/17   ota1653 21/27\n  ota1639 15/16   ota1640 19/25   ota1641 16/17   ota1642 16/18   ota1643 53/53\n\nNineteen carry real proof. \u26a0 OTA-1651 is the outlier at ONE, and it is the one\nthat moved what the player looks at: the enemy's flavour line and his own hands\noff the combat card and into the expanded popup.\n\nA source pin cannot tell a working card from a broken one. Rename a local and it\ngoes RED on correct code; route the same text through another helper and it\nstays GREEN on a card that lost the line. Two of those pins are worse than that:\nthey compare `.indexOf` of two SOURCE strings to assert that the flavour prints\nABOVE the numbers \u2014 which measures the order two `lines.push` CALLS appear in the\nfile, not the order the lines come out.\n\n`enemyDetailBody` was already pure \u2014 an EnemyView in, a block of text out, no\nhooks, no state, no rendering \u2014 and module-local only because nothing had needed\nit. So the whole fix is one export, and ota1655 asks the card what OTA-1651\npromised:\n\n  \u2022 the flavour is in the body, and above the HP line MEASURED ON THE RENDERED\n    LINES rather than on the source\n  \u2022 both hands are named in words \u2014 and the sentence still says what it means\n    with the \u25cf/\u25cb glyphs stripped out, which is the entire reason they moved off\n    the combat card\n  \u2022 a flavourless enemy leaves no blank gap and never the word \"undefined\"\n  \u2022 \u26a0 an unreadable foe SAYS it is unreadable: a card that simply omitted the\n    section would read as \"this thing has no defences\"\n  \u2022 Wisdom 12 discloses exactly what the gate withheld, and what you have already\n    SEEN shows through with the line telling you how to learn the rest\n  \u2022 no enemy shape a save can hold \u2014 no flavour, no traits, no range, 0 HP \u2014\n    makes the popup throw, because a popup that throws takes the screen with it\n\n\u26a0 ONE FIXTURE ASSUMPTION OF MINE WAS WRONG AND THE RUN CAUGHT IT: the first\ndraft handed the boss `weaknesses: ['burn']` and asserted Burn came back. It\ndoes not \u2014 defences come from `defensesFor`, the OTA-1611 reconciler that reads\nthe enemy's type and traits, and no fixture can hand them over. The test now\nasserts what is actually true and actually matters: a boss's defences are\nDISCLOSED and each is named in words beside a labelled type, whatever those\ntypes resolve to.\n\nThe rest of the audit is reported to the owner, not committed: recipes 205/205\nresolve with 0 missing ingredients, 0 missing results and 0 duplicate\ningredients; shields sit at 150/200/265/350 by rarity in weapons.json with the\nblow landing on the shield 100% of the time barring a best-of bypass trait;\ndog vests and golem arms equip, wear, warn and repair; and no unguarded catalog\nlookup, floating promise or unparsed JSON was found in the 47 TS/TSX files the\nday touched.\n\nGates: all 18 green by exit code. Full suite green \u2014 1118 suites, 11,562 tests.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-03T23:42:58Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-03-1655-the-card-is-asked",
+          "shortVersion": "tartaria@4.32.11+2026-09-03-1655-the-card-is-asked",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-03T23:46:49.090887Z",
+          "dateCreated": "2026-09-03T23:45:14.043451Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155372432",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-03T23:46:49.345391Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-03-1655-the-card-is-asked",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-03-1655-the-card-is-asked",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-03-1655-the-card-is-asked",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-03-1655-the-card-is-asked)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "ab74daf0150643ba8a1b53280fe9f9e1",
+  "previousEventID": "9646dd0c1aad4941ae71b4438c83563d"
+}
