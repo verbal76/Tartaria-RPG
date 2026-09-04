@@ -27300,6 +27300,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // suite reproduces the defect first (useInventoryItem under a pending roll changes
 // nothing) and then proves the fix heals through that same state.
 export const OTA_BUILD_ID = '2026-09-04-1658-the-pouch-actually-heals';
+// golem catch-up 2026-09-04: markerless publish of OTA-1658 - the pouch actually
+// heals. OTA-1657's tap routed through useInventoryItem, which ends in
+// submitPlayerAction, whose first line returns while pendingRolls is set - and
+// combat IS pendingRolls, so in a fight the button did nothing at all: no heal,
+// no refusal, no line. It now calls useHealBatch, the direct store action the
+// combat bar already used. The rule this leaves, pinned: a button that must work
+// mid-fight calls a store action directly. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-04-1657-the-healing-pouch';
 // golem catch-up 2026-09-04: markerless publish of OTA-1657 - the healing pouch,
 // and three racks that fold. Three pockets, each holding a whole STACK, so his
