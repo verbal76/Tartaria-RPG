@@ -27362,6 +27362,19 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // kokoro:bf_emma". Not task #110 (that is native:cognition:done on OTA-apply
 // boots; this was a cold 66-second-old life). Logged, not chased here.
 export const OTA_BUILD_ID = '2026-09-04-1660-both-daughters-can-push-a-log';
+// golem catch-up 2026-09-04: markerless publish of OTA-1660 - both daughters
+// can push a log. Owner asked why they couldn't; both girls then answered it
+// themselves, each emailing a bug report because the button was not on her
+// screen. Every report carried "Crash delivery: ON", so the DSN, the transport,
+// the opt-in and the channel were all fine on both phones - the only obstacle
+// was SHARING_UNLOCK_NAMES, which tests the LOADED CHARACTER'S name, and
+// neither girl names a character after herself ("kai", "Grilled cheese
+// sandwich"). Those go in a new EXACT tier, not the prefix list: "kai" is three
+// letters and a prefix entry would have admitted every Kaiden and Kaira along
+// with the OTA-1505 auto-bundle, which uploads typed input and a save with no
+// tap. The sister's name is stored normalised because the gate strips spaces
+// before comparing, and a guard now asserts that of every entry. hal took the
+// marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-04-1659-the-is-not-in-the-lexicon';
 // golem catch-up 2026-09-04: markerless publish of OTA-1659 - "the" is not in
 // the lexicon. Owner reported the same thing twice; the second report was about
