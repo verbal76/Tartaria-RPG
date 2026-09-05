@@ -3,6 +3,7 @@ import {
   runExclusiveNativeMl, ML_PRIORITY_LLM, ML_PRIORITY_HOMEWORK, ML_PRIORITY_TEARDOWN,
 } from '../nativeMlLock';
 import { recordQwenCall } from './qwenTelemetry';
+import { startJsHeartbeat, threadsForLane } from './jsHeartbeat';
 import {
   noteContextOpened,
   noteContextReleased,
@@ -31,6 +32,8 @@ import {
 // don't take a hard type dependency on the package across version bumps.
 export interface LlamaCompletionParams {
   prompt: string;
+  /** OTA-1692 — llama.rn 0.4.x takes the thread count per completion (NativeCompletionParams.n_threads). */
+  n_threads?: number;
   n_predict?: number;
   temperature?: number;
   top_p?: number;
@@ -230,6 +233,8 @@ export interface LlamaGenerateOptions {
 
 export class LlamaRuntime {
   private context: LlamaContext | null = null;
+  /** OTA-1692 — the thread count the context was loaded with; the per-call lane picks from it. */
+  private threads = 4;
   private modelPath: string | null = null;
 
   /** ⚠ OTA-1177 — TELLS THE TWO REASONS `dispose()` FINDS NOTHING APART, AND THE
@@ -312,6 +317,7 @@ export class LlamaRuntime {
     // await; compared after. If it moved, a dispose landed mid-allocation and the
     // context arriving below belongs to nobody. See the adoption check.
     const epochAtLoad = this.disposeEpoch;
+    this.threads = opts.threads ?? 4; // OTA-1692 — the lane lever reads it per call
     const fresh = await runExclusiveNativeMl<LlamaContext | null>(async () => {
       const ctx = await mod.initLlama({
         model: opts.modelPath,
@@ -455,6 +461,10 @@ export class LlamaRuntime {
     // completely different.
     const telT0 = Date.now();
     let telLockAt = telT0;
+    // OTA-1692 — measured from inside the call: the JS thread's lateness while
+    // the native completion runs, and the thread count the lane asked for.
+    let telJsLateMs: number | undefined;
+    const telThreads = threadsForLane(this.threads, opts.homework);
     try {
       // arb159 — run the completion through the shared native-ML lock so it
       // never overlaps a Kokoro TTS synth (the two heavy native workloads
@@ -503,6 +513,7 @@ export class LlamaRuntime {
           preempted = true;
           return Promise.resolve({ text: '', tokens_predicted: 0 } as LlamaCompletionResult);
         }
+        const beat = startJsHeartbeat();
         return ctx.completion(
           {
             prompt,
@@ -511,9 +522,10 @@ export class LlamaRuntime {
             top_p: opts.topP ?? 0.9,
             top_k: opts.topK ?? 40,
             stop: [...QWEN_STOP_TOKENS],
+            n_threads: telThreads, // OTA-1692 — one thread for homework, the loaded count for the player's own call
           },
           onTokenEvt,
-        );
+        ).finally(() => { telJsLateMs = beat.stop().maxLateMs; });
       },
       opts.homework ? ML_PRIORITY_HOMEWORK : ML_PRIORITY_LLM,
       // OTA-1134 — the hook is now independent of the priority. Homework gets it
@@ -582,6 +594,8 @@ export class LlamaRuntime {
           : r.stopping_word ? 'word'
           : 'unknown',
         promptChars: prompt.length,
+        jsLateMs: telJsLateMs,
+        threads: telThreads,
       });
       return text;
     } catch (err) {
@@ -595,6 +609,8 @@ export class LlamaRuntime {
         outcome: this.context === null ? 'dormant' : 'error',
         at: telT0,
         promptChars: prompt.length,
+        jsLateMs: telJsLateMs,
+        threads: telThreads,
       });
       throw err;
     } finally {

@@ -74,6 +74,12 @@ export interface QwenCallRecord {
   stop?: QwenStopReason;
   /** Prompt size in characters, measured on our side of the boundary. */
   promptChars?: number;
+  /** OTA-1692 — worst JS-timer lateness (ms) sampled WHILE the native call
+   *  ran (jsHeartbeat). Seconds here mean the JS thread was starved under the
+   *  model; absent when the call never reached the native side. */
+  jsLateMs?: number;
+  /** OTA-1692 — the thread count this completion asked llama.rn for. */
+  threads?: number;
 }
 
 interface JobAggregate {

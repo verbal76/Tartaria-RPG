@@ -28033,7 +28033,24 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // are still here. Nothing has moved in to replace them."; after it "You cleared
 // this place of Mud Wasps once; the floor has been swept since, one way or
 // another." Two names at most, the one pluraliser.
-export const OTA_BUILD_ID = '2026-09-05-1691-the-room-names-its-dead';
+// 2026-09-05 OTA-1692 — THE THREAD UNDER THE MODEL. The owner's lag. Thirteen
+// freeze-watch stalls across the pulled logs (09-01 → 09-05): eleven land
+// within half a second after a `qwen⏱ … ok` line and run as long as that
+// completion's read or write phase; two are synchronous JS batches (SELL ALL,
+// a persist). llama.rn 0.4.8 runs the completion on a native thread and nothing
+// runs per token, so the JS thread is STARVED under inference, not blocked —
+// and the five-second freeze watch can only say so afterwards. Two halves:
+// (1) the instrument — a 250ms JS heartbeat runs inside every native call and
+// its worst lateness rides the qwen⏱ line (`js-late 3400ms`) beside the thread
+// count the call used (`thr2` / `thr1`); (2) the lever — llama.rn takes
+// n_threads PER COMPLETION, so homework (ambient asides, item descriptions,
+// scene-intro fills) now runs on ONE thread and only the player's own
+// narration keeps the loaded two. The next log compares js-late by lane on
+// the same phone; if the homework lane reads healthy and the player lane
+// does not, the starvation is the model's and the next lever is the
+// player lane's count (or the ambient window). jsHeartbeat.ts.
+export const OTA_BUILD_ID = '2026-09-05-1692-the-thread-under-the-model';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1691-the-room-names-its-dead';
 // golem catch-up 2026-09-05: markerless publish of OTA-1691 - the room names
 // its dead. The return line names the bodies inside the respawn window and
 // remembers the clearing after it; a hunted apex keeps its name. hal took the

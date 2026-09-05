@@ -308,6 +308,9 @@ export const createBootSlice = (
           : ` read/write unusable (native mis-reported ${r.prefillMs ?? '?'}ms/${r.decodeMs ?? '?'}ms — llama.rn split bug, not this call)`)
         : '';
       const sizes = r.promptTokens != null ? ` in ${r.promptTokens}t→out ${r.outTokens ?? '?'}t` : '';
+      // OTA-1692 — how starved the JS thread was under this call, and on how many threads.
+      const starve = r.jsLateMs != null && r.jsLateMs >= 250 ? ` js-late ${r.jsLateMs}ms` : '';
+      const thr = r.threads != null ? ` thr${r.threads}` : '';
       // ⚠⚠ OTA-1259 (N4) — THE `reuse Nt` NUMBER WAS STRUCTURALLY ZERO AND IS GONE.
       //
       // OTA-1108 derived it as `cachedTokens - promptTokens - outTokens` and read
@@ -360,7 +363,7 @@ export const createBootSlice = (
         ? ` ${(r.prefillMs! / r.promptTokens!).toFixed(1)}ms/t`
         : '';
       const stop = r.stop === 'limit' ? ' HIT-CAP' : '';
-      get().appendLog('debug', `qwen⏱ ${r.job} ${r.outcome} ${r.totalMs}ms${wait}${split}${sizes}${msPerTok}${stop} (${r.chars}ch)`);
+      get().appendLog('debug', `qwen⏱ ${r.job} ${r.outcome} ${r.totalMs}ms${wait}${split}${sizes}${starve}${thr}${msPerTok}${stop} (${r.chars}ch)`);
       if (qwenCallCount() % 10 === 0) {
         get().appendLog('debug', `qwen⏱ stats — ${qwenTelemetrySummary()}`);
       }
