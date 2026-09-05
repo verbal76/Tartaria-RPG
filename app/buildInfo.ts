@@ -28104,6 +28104,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // stall line (HermesInternal.getInstrumentedStats) so a collector pause can
 // no longer hide behind "something blocked the JS thread".
 export const OTA_BUILD_ID = '2026-09-05-1696-the-fight-sheds-its-passengers';
+// golem catch-up 2026-09-05: markerless publish of OTA-1696 - the fight sheds
+// its passengers. The classifier keeps two cores and skips confident combat
+// actions; the feed keeps 150 memoised rows; a render clock after every
+// action and heap/gc/feed on the stall line. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1695-the-tap-has-a-clock';
 // golem catch-up 2026-09-05: markerless publish of OTA-1695 - the tap has a
 // clock. Every ledgered control notes the DOWN event's wait against the OS
