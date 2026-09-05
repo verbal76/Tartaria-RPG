@@ -27894,6 +27894,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // "(no character selected — no log attached)" was arriving under the owner's
 // own word "Log".
 export const OTA_BUILD_ID = '2026-09-05-1682-the-buffer-was-thirty-deep';
+// golem catch-up 2026-09-05: markerless publish of OTA-1682 - the buffer was
+// thirty deep. maxQueueSize 200 on both sides of the Sentry bridge; transport
+// refusals counted per bundle through afterSendEvent and folded into
+// `delivered`; a delivered bundle is cleared from disk at all three senders;
+// a general report carries the last-played character's log and says whose.
+// hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1681-the-outpost-lets-go';
 // golem catch-up 2026-09-05: markerless publish of OTA-1681 - the outpost lets
 // go. continueTravel drops hubRoomId/activeBuildingId on the way out (the third
