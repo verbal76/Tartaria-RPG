@@ -33,7 +33,8 @@ import {
 } from '../app/diagnostics/sentryTransport';
 
 const ROOT = join(__dirname, '..');
-const decode = (b: string): string => Buffer.from(b, 'base64').toString('utf8');
+// ⚠ OTA-1680 — the relay's decoder: strip the seams, then base64 (Node would read a '-' as base64url).
+const decode = (b: string): string => Buffer.from(b.replace(/-/g, ''), 'base64').toString('utf8');
 /** What Sentry measures: the JSON of the array, quotes and commas included. */
 const wireLen = (blocks: string[]): number => JSON.stringify(blocks).length;
 /** The trim, as measured on 56 parts: 16,413 … 16,424 JSON characters. */
@@ -52,8 +53,11 @@ describe('OTA-1679 — the budget is below the measured trim, with room', () => 
     // The old raw part could never have fit once encoded: 15,000 → 20,000.
     expect(Math.ceil(15_000 / 3) * 4).toBeGreaterThan(MEASURED_TRIM_MIN);
     // The raw ceiling is what the budget can carry in ASCII, not more.
-    expect(INLINE_CHUNK_CHARS).toBe(10_000);
-    expect(Math.ceil(INLINE_CHUNK_CHARS / 3) * 4).toBeLessThan(INLINE_PART_BUDGET_CHARS);
+    // ⚠ OTA-1680 — 7,500 since the envelope gained a seam every three characters
+    // (wire cost 4/3 of the base64): 7,500 → 10,000 → 13,333 on the wire.
+    expect(INLINE_CHUNK_CHARS).toBe(7_500);
+    const b64 = Math.ceil(INLINE_CHUNK_CHARS / 3) * 4;
+    expect(b64 + Math.ceil(b64 / 3)).toBeLessThan(INLINE_PART_BUDGET_CHARS);
   });
 });
 
@@ -69,15 +73,16 @@ describe('OTA-1679 — no part can exceed the wire budget', () => {
     }
     expect(parts.map((p) => p.raw).join('')).toBe(log);
     // And the packing is not timid: on mostly-ASCII prose the raw ceiling
-    // closes a part first, at ~10,000 raw → ~13,000–13,400 on the wire, so
-    // every full part sits within a block or two of the budget, not at half.
+    // closes a part first, at ~7,500 raw → ~13,000–13,400 on the wire (OTA-1680
+    // seams included), so every full part sits within a block or two of the
+    // budget, not at half.
     const full = parts.slice(0, -1);
     expect(Math.min(...full.map((p) => wireLen(p.blocks)))).toBeGreaterThan(INLINE_PART_BUDGET_CHARS - 1_200);
     expect(Math.min(...full.map((p) => p.raw.length))).toBeGreaterThan(INLINE_CHUNK_CHARS - INLINE_BLOCK_CHARS - 1);
   });
 
   it('⚠⚠ a log of three-byte glyphs — the worst case the raw cut ignored — still fits', () => {
-    // 400 characters of ✦ are 1,200 bytes → 1,600 base64 characters per block.
+    // 400 characters of ✦ are 1,200 bytes → 1,600 base64 characters per block (2,133 seamed).
     const glyphs = '✦'.repeat(60_000);
     const parts = packLogIntoParts(glyphs);
     for (const p of parts) {
@@ -86,7 +91,7 @@ describe('OTA-1679 — no part can exceed the wire budget', () => {
     }
     expect(parts.map((p) => p.raw).join('')).toBe(glyphs);
     // Under the OLD rule the same text would have been 4 parts of 15,000 raw,
-    // each ~60,000 on the wire (38 blocks × 1,600) — more than three times the trim.
+    // each ~60,000 on the wire (38 blocks × 1,600, ~80,000 seamed) — more than three times the trim.
     expect(wireLen(splitLogIntoBlocks(glyphs.slice(0, 15_000)).map(encodeLogBlock))).toBeGreaterThan(MEASURED_TRIM_MIN * 3);
     expect(parts.length).toBeGreaterThan(4);
   });

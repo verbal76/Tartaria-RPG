@@ -710,7 +710,7 @@ export function _resetSentryTransportForTests(): void {
  * `INLINE_PART_BUDGET_CHARS`, and `INLINE_CHUNK_CHARS` becomes the raw
  * ceiling a part may reach rather than the size it is cut to.
  */
-export const INLINE_CHUNK_CHARS = 10_000;
+export const INLINE_CHUNK_CHARS = 7_500;
 
 /**
  * ⚠⚠ OTA-1679 — THE WIRE BUDGET OF ONE PART, in JSON characters of the
@@ -722,6 +722,10 @@ export const INLINE_CHUNK_CHARS = 10_000;
  * 10,000 ASCII characters encode to 13,336 plus ~80 of quotes and commas, so
  * the raw ceiling and the wire budget agree on plain text and the budget alone
  * decides on anything heavier.
+ * ⚠ OTA-1680 — the envelope grew a separator every three characters (see
+ * LOG_BLOCK_SEPARATOR), so the wire cost of a block is 4/3 of its base64, and
+ * the raw ceiling dropped to 7,500: 7,500 ASCII → 10,000 base64 → 13,333 on
+ * the wire, plus ~60 of quotes and commas, still under this budget.
  */
 export const INLINE_PART_BUDGET_CHARS = 14_000;
 
@@ -866,7 +870,36 @@ export function splitLogIntoBlocks(slice: string, size = INLINE_BLOCK_CHARS): st
  * runtime guarantees neither TextEncoder nor btoa, and because a suite can then
  * prove the encoder against the real scrubbing pattern over a real log.
  */
-export const LOG_BLOCK_ENCODING = 'base64';
+/**
+ * ⚠⚠⚠ OTA-1680 — THE ENVELOPE GETS A SEAM EVERY THREE CHARACTERS. 1677's claim
+ * was that the base64 alphabet "has no word": true of `@password`, `@email`
+ * and `@ip`, and false of the rules that match SHAPES. The owner's first
+ * whole log under 1679 (bundle #mtnrscwz8, part 29) came back with block 2
+ * unreadable, and Sentry's `_meta` said why:
+ *
+ *   "chunkBlocks": { "2": { "": { "rem": [["@iban:filter", "s", 264, 274]], … } } }
+ *
+ * `@iban:filter` is a DEFAULT rule too, and an IBAN is two letters, two digits
+ * and a run of letters and digits — a shape random base64 produces about once
+ * in every thousand blocks. `@creditcard` (thirteen digits in a row) and the
+ * case-insensitive `auth` / `secret` inside `@password` are the same class:
+ * they need a RUN of characters, and any dense alphabet will eventually hand
+ * them one.
+ *
+ * ⚠⚠ SO NO RUN IS EVER LONGER THAN THREE. A `-` after every third base64
+ * character means the longest string of letters-and-digits the scrubber can
+ * see is three: too short for `auth`, for two-letters-two-digits-and-on, for
+ * a thirteen-digit card, for `token…=`, for `factor`. The only rule left with
+ * a matching SHAPE is `api[-_]key` (two three-letter groups either side of the
+ * seam), at odds of one in a hundred thousand million blocks, and it costs one
+ * block if it ever fires. The relay strips the seams before decoding; the
+ * encoding name changes so a relay that only knows `base64` never misreads a
+ * seamed block. Wire cost per block: 4/3 of its base64 (the raw ceiling and
+ * the budget note above absorb it).
+ */
+export const LOG_BLOCK_ENCODING = 'base64-3';
+export const LOG_BLOCK_SEPARATOR = '-';
+export const LOG_BLOCK_SEAM_EVERY = 3;
 const B64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
 function utf8BytesOf(s: string): number[] {
@@ -889,8 +922,9 @@ function utf8BytesOf(s: string): number[] {
   return out;
 }
 
-/** One block, UTF-8 then base64, standard alphabet with `=` padding. */
-export function encodeLogBlock(block: string): string {
+/** One block, UTF-8 then base64, standard alphabet with `=` padding — the
+ *  plain form, with no seams. What the relay sees after it strips them. */
+export function base64Of(block: string): string {
   const bytes = utf8BytesOf(block);
   let out = '';
   for (let i = 0; i < bytes.length; i += 3) {
@@ -901,6 +935,19 @@ export function encodeLogBlock(block: string): string {
     out += B64[(n >> 18) & 63]! + B64[(n >> 12) & 63]!;
     out += b === undefined ? '=' : B64[(n >> 6) & 63]!;
     out += c === undefined ? '=' : B64[n & 63]!;
+  }
+  return out;
+}
+
+/** ⚠ OTA-1680 — the block as it goes on the wire: base64 with a seam after
+ *  every third character (`abc-def-gh`), so no rule that needs a run of four
+ *  can match. Exactly what `chunkEncoding: 'base64-3'` promises the relay. */
+export function encodeLogBlock(block: string): string {
+  const plain = base64Of(block);
+  let out = '';
+  for (let i = 0; i < plain.length; i += LOG_BLOCK_SEAM_EVERY) {
+    if (i > 0) out += LOG_BLOCK_SEPARATOR;
+    out += plain.slice(i, i + LOG_BLOCK_SEAM_EVERY);
   }
   return out;
 }

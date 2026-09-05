@@ -273,7 +273,13 @@ jobs:
               # OTA-1677 — one base64 block back to text. Anything that is not
               # valid base64 (a "[Filtered]" Sentry substituted, a truncated element)
               # is returned as-is so the hole is seen rather than swallowed.
+              # ⚠ OTA-1680 — 'base64-3' blocks carry a '-' seam after every third
+              # character so no scrubbing rule can see a run of four; the seams are
+              # stripped here and the plain form decodes exactly as before. A '-'
+              # is not in the base64 alphabet, so a plain 1677 block is unchanged
+              # by the strip and the one decoder serves both encodings.
               try:
+                  b = b.replace('-', '')
                   return base64.b64decode(b, validate=True).decode('utf-8')
               except Exception:
                   return b
@@ -355,7 +361,9 @@ jobs:
                   # so; an element Sentry replaced anyway ("[Filtered]") is not valid
                   # base64 and stands in the reassembly as itself, exactly as
                   # visible as before, and the chunkChars shortfall still reports it.
-                  if extraval(ev, 'chunkEncoding') == 'base64':
+                  # ⚠ OTA-1680 — 'base64-3' is the seamed form; decode_block strips
+                  # the seams, so both names take the same branch.
+                  if extraval(ev, 'chunkEncoding') in ('base64', 'base64-3'):
                       blocks = [decode_block(b) for b in blocks if isinstance(b, str)]
                   chunk = ''.join(b for b in blocks if isinstance(b, str))
               else:

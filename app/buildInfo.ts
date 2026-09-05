@@ -27844,7 +27844,24 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // break it: the packer counts what the wire will carry. The suite packs a real
 // 400 KB delivered log and a 60,000-glyph worst case and proves every part
 // under budget and the join exact.
-export const OTA_BUILD_ID = '2026-09-05-1679-the-part-fits-the-wire';
+// OTA-1680 — THE ENVELOPE HAS NO WORD. Found in the owner's first whole log
+// under 1679 (bundle #mtnrscwz8, part 29): block 2 came back unreadable and
+// Sentry's _meta named the rule - @iban:filter, at characters 264-274 of a
+// base64 block. 1677's claim was that the base64 alphabet "has no word"; true
+// of @password, @email and @ip, false of the rules that match SHAPES. An IBAN
+// is two letters, two digits and a run of letters-and-digits, which random
+// base64 produces about once in a thousand blocks; @creditcard (thirteen
+// digits) and the case-insensitive `auth` of @password are the same class.
+// ⚠⚠⚠ SO NO RUN IS EVER LONGER THAN THREE. A '-' seam after every third base64
+// character (chunkEncoding 'base64-3'): the longest letters-and-digits run any
+// rule can see is three, too short for auth, for an IBAN, for a card number,
+// for token=. The relay strips the seams before decoding, one decoder serves
+// both encodings (a plain 1677 block has no '-'), and the raw ceiling drops to
+// 7,500 so a part still fits the 14,000 wire budget with the seams on. Proven
+// on ten thousand blocks of noise: plain base64 trips the shape rules, the
+// seamed form never does; a real 400 KB log packs whole and joins exact.
+export const OTA_BUILD_ID = '2026-09-05-1680-the-envelope-has-no-word';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1679-the-part-fits-the-wire';
 // golem catch-up 2026-09-05: markerless publish of OTA-1679 - the part fits
 // the wire. An OTA-1677 regression found in the owner's 01:50 push: Sentry
 // trims the base64 block array at ~16.4K JSON chars, so every 15,000-char

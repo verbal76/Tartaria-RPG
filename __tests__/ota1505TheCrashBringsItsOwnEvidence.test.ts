@@ -130,8 +130,9 @@ describe('OTA-1505 — who it fires for', () => {
     // ⚠ OTA-1677 — and each block leaves base64-encoded (the scrubber is handed
     // no text at all); the relay decodes. Decoded and joined, it is still the
     // log exactly.
-    expect((event.extra as { chunkEncoding?: string }).chunkEncoding).toBe('base64');
-    expect(event.extra.chunkBlocks.map((b: string) => Buffer.from(b, 'base64').toString('utf8')).join('')).toBe('LOG[THE LOG BODY]');
+    // ⚠ OTA-1680 — seamed base64 ('base64-3'): the relay strips the '-' seams first.
+    expect((event.extra as { chunkEncoding?: string }).chunkEncoding).toBe('base64-3');
+    expect(event.extra.chunkBlocks.map((b: string) => Buffer.from(b.replace(/-/g, ''), 'base64').toString('utf8')).join('')).toBe('LOG[THE LOG BODY]');
     // Durable: the same bundle sits in the OTA-1504 slot with its id on the event.
     const pending = await readPendingBundle();
     expect(pending).not.toBeNull();

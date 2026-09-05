@@ -27,12 +27,13 @@ jest.mock('../app/diagnostics/crashReporter', () => ({
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 import {
-  encodeLogBlock, splitLogIntoBlocks, LOG_BLOCK_ENCODING, INLINE_BLOCK_CHARS,
+  encodeLogBlock, base64Of, splitLogIntoBlocks, LOG_BLOCK_ENCODING, INLINE_BLOCK_CHARS,
 } from '../app/diagnostics/sentryTransport';
 
 const ROOT = join(__dirname, '..');
 const src = (...p: string[]): string => readFileSync(join(ROOT, ...p), 'utf8');
-const decode = (b: string): string => Buffer.from(b, 'base64').toString('utf8');
+// ⚠ OTA-1680 — the relay's decoder: strip the seams, then base64.
+const decode = (b: string): string => Buffer.from(b.replace(/-/g, ''), 'base64').toString('utf8');
 
 // Sentry's DEFAULT rule, verbatim (see ota1520 for its provenance).
 const PASSWORD_KEY_REGEX = new RegExp(
@@ -54,15 +55,17 @@ describe('OTA-1677 — the encoder', () => {
     ]) {
       expect(decode(encodeLogBlock(s))).toBe(s);
       // Standard alphabet, standard padding — what Python's b64decode(validate=True) accepts.
-      expect(encodeLogBlock(s)).toMatch(/^[A-Za-z0-9+/]*={0,2}$/);
-      expect(encodeLogBlock(s).length % 4).toBe(0);
+      // ⚠ OTA-1680 — once the seams are stripped; the seamed form is checked in ota1680.
+      expect(base64Of(s)).toMatch(/^[A-Za-z0-9+/]*={0,2}$/);
+      expect(base64Of(s).length % 4).toBe(0);
+      expect(encodeLogBlock(s).replace(/-/g, '')).toBe(base64Of(s));
     }
   });
 
   it('agrees with Node\'s own base64 on a real log, block by block', () => {
     const log = realLogSample();
     for (const block of splitLogIntoBlocks(log)) {
-      expect(encodeLogBlock(block)).toBe(Buffer.from(block, 'utf8').toString('base64'));
+      expect(base64Of(block)).toBe(Buffer.from(block, 'utf8').toString('base64'));
     }
   });
 
@@ -103,7 +106,10 @@ describe('OTA-1677 — the encoder', () => {
 
   it('an envelope is at most 4/3 of its bytes — a 400-character block stays a small array element', () => {
     const block = 'x'.repeat(INLINE_BLOCK_CHARS);
-    expect(encodeLogBlock(block).length).toBe(Math.ceil(INLINE_BLOCK_CHARS / 3) * 4);
+    expect(base64Of(block).length).toBe(Math.ceil(INLINE_BLOCK_CHARS / 3) * 4);
+    // ⚠ OTA-1680 — plus one seam per three characters on the wire.
+    const plain = base64Of(block).length;
+    expect(encodeLogBlock(block).length).toBe(plain + Math.ceil(plain / 3) - 1);
   });
 });
 
@@ -112,7 +118,8 @@ describe('OTA-1677 — the sender and the relay agree on the envelope', () => {
   const RELAY = src('.github', 'workflows', 'sentry-inbox.yml');
 
   it('the sender encodes every block, names the encoding, and keeps the raw receipt', () => {
-    expect(LOG_BLOCK_ENCODING).toBe('base64');
+    // ⚠ OTA-1680 — the seamed form; the relay strips the seams and decodes as before.
+    expect(LOG_BLOCK_ENCODING).toBe('base64-3');
     // ⚠ OTA-1679 — the blocks are packed under the wire budget before the
     // send (packLogIntoParts); the array on the event is the packed part's.
     expect(TRANSPORT.includes('chunkBlocks: part.blocks,')).toBe(true);
@@ -122,13 +129,13 @@ describe('OTA-1677 — the sender and the relay agree on the envelope', () => {
   });
 
   it('the relay decodes when the event says base64, and leaves a "[Filtered]" standing as itself', () => {
-    expect(RELAY.includes("if extraval(ev, 'chunkEncoding') == 'base64':")).toBe(true);
+    expect(RELAY.includes("if extraval(ev, 'chunkEncoding') in ('base64', 'base64-3'):")).toBe(true);
     expect(RELAY.includes('blocks = [decode_block(b) for b in blocks if isinstance(b, str)]')).toBe(true);
     expect(RELAY.includes("return base64.b64decode(b, validate=True).decode('utf-8')")).toBe(true);
     expect(RELAY.includes('import json, os, urllib.request, pathlib, re, base64')).toBe(true);
     // The decode happens BEFORE the join and the receipt check, so chunkChars
     // (raw characters) is compared against raw characters.
-    const decodeAt = RELAY.indexOf("if extraval(ev, 'chunkEncoding') == 'base64':");
+    const decodeAt = RELAY.indexOf("if extraval(ev, 'chunkEncoding') in ('base64', 'base64-3'):");
     const joinAt = RELAY.indexOf("chunk = ''.join(b for b in blocks if isinstance(b, str))");
     const receiptAt = RELAY.indexOf("declared = extraval(ev, 'chunkChars')");
     expect(decodeAt).toBeGreaterThan(-1);
@@ -144,7 +151,7 @@ describe('OTA-1677 — the sender and the relay agree on the envelope', () => {
 
   it('pre-1677 events (no chunkEncoding) still reassemble as plain text — the relay branch is opt-in', () => {
     const branch = RELAY.slice(RELAY.indexOf("blocks = extraval(ev, 'chunkBlocks')"), RELAY.indexOf("chunk = extraval(ev, 'chunk')"));
-    expect(branch).toContain("if extraval(ev, 'chunkEncoding') == 'base64':");
+    expect(branch).toContain("if extraval(ev, 'chunkEncoding') in ('base64', 'base64-3'):");
     expect(branch).toContain("chunk = ''.join(b for b in blocks if isinstance(b, str))");
   });
 });
