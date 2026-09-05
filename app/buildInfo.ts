@@ -28072,7 +28072,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // player or a tap the screen did not take, tap→settle past 800 is the
 // engine. Instrument only; the one-tap-per-attack question stays the
 // owner's. diagnostics/rollTiming.ts.
-export const OTA_BUILD_ID = '2026-09-05-1694-the-dice-clock';
+// 2026-09-05 OTA-1695 — THE TAP HAS A CLOCK. Owner: "I hit Dodge and it hangs
+// for 4 or 5 seconds before it lets me touch anything else … you don't see
+// those button presses and the lags between inputs." Right: `ui: tap` is
+// stamped when the JS thread RUNS the handler, not when the finger landed, so a
+// touch that waited five seconds reads as a tap five seconds later; the 09-04
+// log's dodge → next-tap 1.5s median cannot tell a reading player from a screen
+// that would not take the touch. The OS stamps every touch on the monotonic
+// clock and RN forwards it (nativeEvent.timestamp); performance.now() is the
+// same clock. onPressIn on every ledgered control (both chip families, ROLL)
+// notes the DOWN event's wait, and logUiTap rides it on the line —
+// `ui: tap "dodge" ⏱+4237ms late 4200ms` — flagged when it clears the session
+// floor by 250ms. ROLL joins the tap ledger. diagnostics/tapClock.ts.
+export const OTA_BUILD_ID = '2026-09-05-1695-the-tap-has-a-clock';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1694-the-dice-clock';
 // golem catch-up 2026-09-05: markerless publish of OTA-1694 - the dice clock.
 // One debug line per roll step names open → shown → tapped → settled and a
 // late hold; Beginner's Luck moved to combatRules for the line ratchet. hal

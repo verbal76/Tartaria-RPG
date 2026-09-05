@@ -117,6 +117,7 @@ import {
 } from '../diagnostics/saveLoadHealth';
 import { loadLastCrash } from '../diagnostics/lastCrash';
 import { rollTimingLine, type RollTapTiming } from '../diagnostics/rollTiming'; // OTA-1694
+import { takeTouchLateSuffix } from '../diagnostics/tapClock'; // OTA-1695
 // OTA-1172 — memory warnings, app-state churn and the two-clock freeze detector.
 import {
   FREEZE_SAMPLE_MS, APPSTATE_TRAIL_MAX,
@@ -2794,7 +2795,9 @@ const GUARD_CRACK_HITS = 3;
  *  a future edit that moves it after the handler destroys the signal. */
 export function logUiTap(label: string): void {
   try {
-    useGameStore.getState().appendLog('debug', `ui: tap "${label}"`);
+    // OTA-1695 — the touch's own wait (noteTouchDown at onPressIn) rides the line:
+    // `ui: tap "dodge" ⏱+4237ms late 4200ms` says the screen held the finger, not the player.
+    useGameStore.getState().appendLog('debug', `ui: tap "${label}"${takeTouchLateSuffix()}`);
     // ⚠⚠ OTA-1276 — AND STAMP IT WHERE A WEDGE CANNOT SWALLOW IT. The line
     // above goes into the BATCHED disk log, which drains on a promise chain —
     // and a wedged JS thread never drains it, so the last lines before a freeze

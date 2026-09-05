@@ -3,6 +3,8 @@ import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native
 import type { RollStep, PendingRollState } from '../engine/types';
 import { rollDie } from '../engine/rng';
 import { AUTO_RESOLVE_HOLD_MS, type RollTapTiming } from '../diagnostics/rollTiming'; // OTA-1694
+import { noteTouchDown } from '../diagnostics/tapClock'; // OTA-1695
+import { logUiTap } from '../state/gameStore'; // OTA-1695 — ROLL joins the tap ledger
 
 // OTA-255 — Auto-resolve dice rolls instead of gating on a RESOLVE /
 // NEXT ROLL button tap. Once the dice land and the post-roll values
@@ -68,6 +70,7 @@ export function DiceRoller({ state, onRoll, onCancel }: Props) {
 
   function handleRoll() {
     tappedAt.current = Date.now(); // OTA-1694 — before any work, like logUiTap
+    logUiTap('roll'); // OTA-1695 — the one combat control that was outside the ledger
     Animated.sequence([
       Animated.timing(scale, { toValue: 1.15, duration: 80, useNativeDriver: true }),
       Animated.timing(scale, { toValue: 0.95, duration: 60, useNativeDriver: true }),
@@ -177,7 +180,7 @@ export function DiceRoller({ state, onRoll, onCancel }: Props) {
       {/* Action button (pre-roll only — post-roll auto-resolves) */}
       {rolledValues === null ? (
         <Animated.View style={{ transform: [{ scale }] }}>
-          <TouchableOpacity accessibilityRole="button" style={styles.rollBtn} onPress={handleRoll} activeOpacity={0.7}>
+          <TouchableOpacity accessibilityRole="button" style={styles.rollBtn} onPressIn={noteTouchDown} onPress={handleRoll} activeOpacity={0.7}>
             <Text style={styles.rollBtnText}>ROLL {diceLabel.toUpperCase()}</Text>
           </TouchableOpacity>
         </Animated.View>

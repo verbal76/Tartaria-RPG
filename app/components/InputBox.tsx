@@ -16,6 +16,7 @@ import { visibleBuildingRooms, roomHasExitDoor } from '../engine/buildings';
 import type { ClimbBlockReason } from '../engine/climbReadiness';
 import { TUTORIAL_STEPS, TUT_LOCK_BEATS } from './tutorialSteps';
 import { useGameStore, logUiTap } from '../state/gameStore';
+import { noteTouchDown } from '../diagnostics/tapClock'; // OTA-1695 — the tap has a clock
 import { medkitRole, type MedkitRole } from '../engine/medkitEligibility'; // OTA-1663
 // ⚠ OTA-1404 — combat resolution moved out of gameStore into its own leaf.
 import { playerWeaponReach } from '../state/combatResolution';
@@ -1446,6 +1447,7 @@ function QuickBtn({
     // exposes a button role, its label, and a disabled state when blocked.
     <TouchableOpacity
       style={containerStyle}
+      onPressIn={noteTouchDown}
       onPress={handlePress}
       accessibilityRole="button"
       accessibilityLabel={cooldownFill !== undefined && cooldownFill < 1
@@ -1588,6 +1590,7 @@ function TravelBtn({ label, onPress, blocked, spent, active, destination, wayOut
     <TouchableOpacity
       testID={testID}
       style={[styles.travelBtn, isDestination && styles.travelBtnDest, wayOut && styles.travelBtnWayOut, (blocked || spent) && styles.travelBtnBlocked, active && styles.travelBtnActive]}
+      onPressIn={noteTouchDown}
       onPress={handlePress}
       activeOpacity={blocked ? 1 : 0.7}
       accessibilityRole="button"
