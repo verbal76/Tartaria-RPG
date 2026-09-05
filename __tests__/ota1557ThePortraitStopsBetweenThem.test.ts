@@ -116,7 +116,9 @@ describe('OTA-1557 — all three faults are closed', () => {
     // onScrollEndDrag, and that is also what an inner vertical ScrollView hands
     // back when it returns a horizontal gesture. It had no reader at all.
     expect(PANEL).toContain('onMomentumScrollEnd={onMomentumEnd}');
-    expect(PANEL).toContain('onScrollEndDrag={onDragEnd}');
+    // OTA-1693 — the drag end also releases the settle watchdog's finger flag, then resolves as before.
+    expect(PANEL).toContain('onScrollEndDrag={onDragEndSettled}');
+    expect(PANEL).toContain('dragging.current = false; onDragEnd(e);');
     // …and both go through the SAME resolver, so they cannot disagree.
     expect(PANEL).toContain('const onMomentumEnd = resolvePage;');
     expect(PANEL).toContain('const onDragEnd = resolvePage;');

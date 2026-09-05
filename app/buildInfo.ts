@@ -28049,7 +28049,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the same phone; if the homework lane reads healthy and the player lane
 // does not, the starvation is the model's and the next lever is the
 // player lane's count (or the ambient window). jsHeartbeat.ts.
-export const OTA_BUILD_ID = '2026-09-05-1692-the-thread-under-the-model';
+// 2026-09-05 OTA-1693 — THE PORTRAIT SETTLES. Owner, 22:15Z on the 09-04 log,
+// two harpies up, no roster change: "The enemy portrait is stuck between a
+// left and right swipe and I did not swipe." OTA-1557 closed three doors and
+// named the fourth in its own notes — on Android the card's vertical scroller
+// can claim a drag and hand it back, and a drag released that way ends with
+// NEITHER a momentum end NOR a drag end, so the pager parks between pages
+// with no event to resolve it. A watchdog that needs no event: every scroll
+// tick records the offset; a quarter second after the last tick, with no
+// finger down, an offset off its page snaps to the nearest one and the
+// target follows (EnemyPanel.settleOffset, PAGER_SETTLE_MS).
+export const OTA_BUILD_ID = '2026-09-05-1693-the-portrait-settles';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1692-the-thread-under-the-model';
 // golem catch-up 2026-09-05: markerless publish of OTA-1692 - the thread under
 // the model. A JS heartbeat inside every Qwen call (js-late on the qwen⏱ line)
 // and homework on one thread; the player's narration keeps two. hal took the

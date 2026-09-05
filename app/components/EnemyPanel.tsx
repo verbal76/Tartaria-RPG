@@ -134,6 +134,28 @@ export function pageIndexForOffset(offsetX: number, cardWidth: number, count: nu
   return Math.max(0, Math.min(raw, count - 1));
 }
 
+// ⚠⚠ OTA-1693 — THE PORTRAIT SETTLES. Owner, 22:15Z on the 09-04 log, two
+// harpies up, no roster change, no swipe: "The enemy portrait is stuck between
+// a left and right swipe and I did not swipe." OTA-1557 closed three doors and
+// named a fourth in its own notes — on Android the cell's vertical ScrollView
+// can claim a drag and hand it back, and a drag released that way produces
+// NEITHER a momentum end NOR a drag end. A finger that only meant to scroll the
+// card can leave the pager parked between two pages with no event to resolve
+// it. So: a watchdog that does not need an event. Every scroll tick records the
+// offset; a quarter second after the last tick, with no finger down, an offset
+// that is not on a page is snapped to the nearest one and the target follows.
+/** How far the pager sits from a page, and which page is nearest. Pure. */
+export function settleOffset(offsetX: number, cardWidth: number, count: number): { idx: number; snap: number; offBy: number } {
+  const idx = pageIndexForOffset(offsetX, cardWidth, count);
+  const snap = Number.isFinite(cardWidth) && cardWidth > 0 ? idx * cardWidth : 0;
+  const offBy = Number.isFinite(offsetX) ? Math.abs(offsetX - snap) : 0;
+  return { idx, snap, offBy };
+}
+/** Quiet time after the last scroll tick before the watchdog settles, and the
+ *  slack (px) inside which an offset counts as already on its page. */
+export const PAGER_SETTLE_MS = 250;
+export const PAGER_SETTLE_SLACK_PX = 2;
+
 /** Combine the macro type-resistance map with the enemy's per-instance
  *  resist:/vulnerable: traits into the damage types it resists / is weak to.
  *  OTA-798 — RECONCILE per type the same way combat does (combineDamageTypeMatch):
@@ -317,6 +339,35 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, pl
   // here and NOWHERE else. This is the event that was missing.
   const onDragEnd = resolvePage;
 
+  // ⚠⚠ OTA-1693 — THE WATCHDOG (see settleOffset). A drag the nested card
+  // scroller claimed and handed back ends with no event at all; this settles
+  // it from the ticks alone. `dragging` keeps it off a finger that is still
+  // down; the timer re-arms on every tick, so it only ever fires in the quiet.
+  const dragging = useRef(false);
+  const lastOffset = useRef(0);
+  const settleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const onDragBegin = useCallback(() => { dragging.current = true; }, []);
+  const onScrollTick = useCallback(
+    (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+      lastOffset.current = e.nativeEvent.contentOffset.x;
+      if (settleTimer.current) clearTimeout(settleTimer.current);
+      settleTimer.current = setTimeout(() => {
+        settleTimer.current = null;
+        if (dragging.current || cardWidth <= 0 || enemies.length < 2) return;
+        const s = settleOffset(lastOffset.current, cardWidth, enemies.length);
+        if (s.offBy <= PAGER_SETTLE_SLACK_PX) return;
+        try { listRef.current?.scrollToOffset({ offset: s.snap, animated: true }); } catch { /* pre-layout */ }
+        if (s.idx !== activeIndex) onSelectActive(s.idx);
+      }, PAGER_SETTLE_MS);
+    },
+    [activeIndex, cardWidth, enemies.length, onSelectActive],
+  );
+  const onDragEndSettled = useCallback(
+    (e: NativeSyntheticEvent<NativeScrollEvent>) => { dragging.current = false; onDragEnd(e); },
+    [onDragEnd],
+  );
+  useEffect(() => () => { if (settleTimer.current) clearTimeout(settleTimer.current); }, []);
+
   // ⚠⚠ THE PAGER FOLLOWS THE TARGET. A kill splices the roster and re-points
   // activeEnemyIdx in the store; without this the card the player is looking at
   // and the enemy his buttons are aimed at are two different creatures. Not
@@ -398,7 +449,10 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive, maxHeight, pl
           // only in onScrollEndDrag. That second door had no reader at all, so a
           // half-scrolled pager was never noticed, let alone corrected.
           onMomentumScrollEnd={onMomentumEnd}
-          onScrollEndDrag={onDragEnd}
+          onScrollEndDrag={onDragEndSettled}
+          onScrollBeginDrag={onDragBegin}
+          onScroll={onScrollTick}
+          scrollEventThrottle={64}
           renderItem={renderItem}
           decelerationRate="fast"
         />
