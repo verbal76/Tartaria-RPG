@@ -27927,6 +27927,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // About and the bug report under the launch line, and carried on the Sentry
 // event as nativeSdkSawCrash. The next kill says which kind it was.
 export const OTA_BUILD_ID = '2026-09-05-1685-the-native-side-gives-its-verdict';
+// golem catch-up 2026-09-05: markerless publish of OTA-1685 - the native side
+// gives its verdict. sentry-android's isCrashedLastRun is asked once per boot
+// and written onto the native-death record minted that boot (yes / no / could
+// not say), so the next mid-play kill says signal or OS. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1684-the-typo-is-asked-not-run';
 // golem catch-up 2026-09-05: markerless publish of OTA-1684 - the typo is
 // asked, not run. A one-edit miss on the first word is named and asked
