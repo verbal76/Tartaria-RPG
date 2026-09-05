@@ -152,3 +152,27 @@ export function meetsJoinThreshold(standing: readonly FactionStanding[], faction
  *  at all — off by this entire constant, and exactly the drift OTA-1156 #8 cleaned
  *  up for JOIN_THRESHOLD. One definition, two readers. */
 export const BUY_REP_TC_PER_STANDING = 500;
+
+// ⚠⚠ OTA-1690 — THE CAP SPEAKS. The narrative-agency audit (hole 9): the two
+// lifetime standing budgets — gifts to a faction's people
+// (gifting.GIFT_STANDING_FACTION_CAP) and the rivals' gratitude for spiting
+// someone else (gameStore SPITE_STANDING_FACTION_CAP) — stopped the number in
+// silence. A player kept handing over presents and the standing line simply
+// never printed again; nothing said the budget was spent, so it read as a
+// broken counter. One line, at the moment the budget is reached — the
+// CROSSING, not every refused gain after it — names the ceiling and what still
+// moves: the person, not the banner.
+
+export type StandingCapKind = 'gift' | 'spite';
+
+/** The line for the moment a faction's standing budget is used up, or null
+ *  when this gain does not reach it (still under) or the ceiling was already
+ *  reached on an earlier gain (already said once). `spentBefore` is the
+ *  budget used before this gain; `allowed` is what this gain still lands. */
+export function standingCapLine(kind: StandingCapKind, factionName: string, spentBefore: number, allowed: number, cap: number): string | null {
+  if (spentBefore >= cap) return null;            // already at the ceiling — said once, at the crossing
+  if (spentBefore + allowed < cap) return null;   // still under it
+  return kind === 'gift'
+    ? `${factionName} has taken your measure through gifts already — from here on a present wins the person, not the banner.`
+    : `Their rivals' gratitude has a ceiling — ${factionName} will not think better of you for spiting someone else again.`;
+}

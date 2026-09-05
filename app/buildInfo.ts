@@ -28015,7 +28015,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // so 100 × 1.1 (= 110.00000000000001) charged 111 — every 1.05 tide and 1.25
 // regard before it could overcharge a coin the same way; the ceiling now
 // ignores float noise (vendorPricing.ceilPrice).
-export const OTA_BUILD_ID = '2026-09-05-1689-the-feared-face';
+// 2026-09-05 OTA-1690 — THE CAP SPEAKS. Step-4 mundane reader, audit hole 9:
+// the two lifetime standing budgets (gifts to a faction's people, the rivals'
+// gratitude for spiting someone else) stopped the number in silence — a
+// player kept handing over presents and the standing line simply never
+// printed again, which reads as a broken counter. One line at the CROSSING
+// (factions.standingCapLine), never again after it: "<Faction> has taken your
+// measure through gifts already — from here on a present wins the person, not
+// the banner." / "Their rivals' gratitude has a ceiling — <Faction> will not
+// think better of you for spiting someone else again." Both sites in
+// gameStore (the gift standing path, meterSpiteGains).
+export const OTA_BUILD_ID = '2026-09-05-1690-the-cap-speaks';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1689-the-feared-face';
 // golem catch-up 2026-09-05: markerless publish of OTA-1689 - the feared face.
 // Menace reaches the counter: Feared +5% / Dreaded +10% on buys, shown and
 // charged through one helper, one extra greeting beat at Feared and Dreaded;

@@ -609,7 +609,7 @@ import {
 } from '../engine/crafting';
 import {
   FACTIONS,
-  findFaction,
+  findFaction, standingCapLine, // OTA-1690 — the standing budgets say when they are spent
   canonicalFactionId,
   applyRepChange,
   getStanding,
@@ -4498,6 +4498,7 @@ function meterSpiteGains(
     if (c.delta <= 0) { out.push(c); continue; }
     const spent = granted[c.factionId] ?? 0;
     const allowed = Math.max(0, Math.min(c.delta, SPITE_STANDING_FACTION_CAP - spent));
+    { const capLine = standingCapLine('spite', FACTIONS.find((f) => f.id === c.factionId)?.name ?? c.factionId, spent, allowed, SPITE_STANDING_FACTION_CAP); if (capLine) get().appendLog('system', capLine); } // OTA-1690
     if (allowed === c.delta) {
       granted[c.factionId] = spent + allowed;
       out.push(c);
@@ -5405,6 +5406,7 @@ function applyGiftStanding(
   if (delta > 0) {
     const spent = get().worldMemory.giftStandingGranted?.[faction] ?? 0;
     applied = Math.max(0, Math.min(delta, GIFT_STANDING_FACTION_CAP - spent));
+    { const capLine = standingCapLine('gift', factionLabel, spent, applied, GIFT_STANDING_FACTION_CAP); if (capLine) get().appendLog('system', capLine); } // OTA-1690
     if (applied === 0) return; // budget exhausted — the gift still lands personally
     set((st) => ({
       worldMemory: {
