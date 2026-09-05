@@ -1,0 +1,65 @@
+{
+  "title": "Process died with no orderly exit while: (no action yet) Process died with no orderly exit while: (no action yet)",
+  "eventID": "b25e592108fd45cbbadeb5f21a5c5a95",
+  "dateCreated": "2026-09-05T08:31:21Z",
+  "tags": [
+    {
+      "key": "build",
+      "value": "2026-09-05-1687-the-mission-layer-remembers-itself"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "native-death"
+    },
+    {
+      "key": "level",
+      "value": "fatal"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-05-1687-the-mission-layer-remembers-itself"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-05-1687-the-mission-layer-remembers-itself"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    },
+    {
+      "key": "stage",
+      "value": "boot:qwen:deferred"
+    },
+    {
+      "key": "version",
+      "value": "4.32.11"
+    }
+  ],
+  "project": "tartaria"
+}
