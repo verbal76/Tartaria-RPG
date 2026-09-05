@@ -28138,6 +28138,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // walks all eighteen hunts down all four roads and prints the punch list
 // every "no" goes on. No game code changes in this OTA.
 export const OTA_BUILD_ID = '2026-09-05-1699-every-hunt-walks-the-four-roads';
+// golem catch-up 2026-09-05: markerless publish of OTA-1699 - every hunt walks
+// the four roads. The contrary walker reads its roadmap and nouns from each
+// hunt definition; a heavy-CI sweep walks all eighteen. Test-side only. hal
+// took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1698-the-counter-remembers-the-question';
 // golem catch-up 2026-09-05: markerless publish of OTA-1698 - the counter
 // remembers the question. On a return visit the person names the last thing
