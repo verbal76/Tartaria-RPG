@@ -27845,6 +27845,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // 400 KB delivered log and a 60,000-glyph worst case and proves every part
 // under budget and the join exact.
 export const OTA_BUILD_ID = '2026-09-05-1679-the-part-fits-the-wire';
+// golem catch-up 2026-09-05: markerless publish of OTA-1679 - the part fits
+// the wire. An OTA-1677 regression found in the owner's 01:50 push: Sentry
+// trims the base64 block array at ~16.4K JSON chars, so every 15,000-char
+// part lost its last fifth (11,891 of 15,000 survived per part). Parts are
+// now packed by encoded cost under a 14,000-char wire budget (raw ceiling
+// 10,000), proven on a real 400 KB log and a 60,000-glyph worst case.
+// hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1678-the-chase-gets-harder';
 // golem catch-up 2026-09-05: markerless publish of OTA-1678 - the chase gets
 // harder. Flee escalation on the randoms only: the pursuer's bar rises with
