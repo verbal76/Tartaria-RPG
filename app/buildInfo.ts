@@ -27878,6 +27878,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // notation (ENTER OUTPOST at the Pilgrim Camp stepping into nothing) was on
 // 1668 and is what 1669 fixed; pinned here so all three stay accounted for.
 export const OTA_BUILD_ID = '2026-09-05-1681-the-outpost-lets-go';
+// golem catch-up 2026-09-05: markerless publish of OTA-1681 - the outpost lets
+// go. continueTravel drops hubRoomId/activeBuildingId on the way out (the third
+// door, same clear and line as setTravelCourse and the whisper course), and the
+// travel row yields to the room row while inside, so ENTER OUTPOST with a
+// course plotted gives the whole outpost and the minimap follows you out.
+// hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1680-the-envelope-has-no-word';
 // golem catch-up 2026-09-05: markerless publish of OTA-1680 - the envelope
 // has no word. Sentry's @iban:filter matched inside a base64 block (part 29
