@@ -28150,6 +28150,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // buzz, same nudge); isTutorialLocked is the one rule InputBox, ExplorationScreen
 // and MapScreen read; WORLD / map / LORE taps write `ui: tap` lines.
 export const OTA_BUILD_ID = '2026-09-05-1700-the-world-runs-while-you-learn';
+// golem catch-up 2026-09-05: markerless publish of OTA-1700 - the world runs
+// while you learn. The heartbeat moves the World board during the tutorial, the
+// minimap opens the Atlas (its travel rows carry the lock), the three doors log
+// their taps. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1699-every-hunt-walks-the-four-roads';
 // golem catch-up 2026-09-05: markerless publish of OTA-1699 - every hunt walks
 // the four roads. The contrary walker reads its roadmap and nouns from each
