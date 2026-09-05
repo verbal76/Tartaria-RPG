@@ -90,8 +90,9 @@ export const BOG_DRAGON_ID = 'hunt_bog_dragon';
 
 /** Words a line uses when it knows you have been here, or done this, before.
  *  ⚠ Measured tight: "before" matched "stands before you", "ran" matched
- *  "runes", "left" matched "You've left Drakova" on the first pass. */
-const RETURN_WORDS = /\b(again|already|last time|second time|once more|returned|come back|came back|back for more|changed your mind|walked off|walked away|you left|you ran|you fled|here before)\b/i;
+ *  "runes", "left" matched "You've left Drakova" on the first pass, and a bare
+ *  "already" matched the Arbiter's combat quip "It already has." on the eighth. */
+const RETURN_WORDS = /\b(again|you already|already (been|here|seen|done|met|stood|read|tried)|last time|second time|once more|returned|come back|came back|back for more|changed your mind|walked off|walked away|you left|you ran|you fled|here before)\b/i;
 /** The hunt's own nouns — a line has to be ABOUT the hunt to count as an
  *  acknowledgement. ⚠ Place names and common nouns are out on purpose: the
  *  scene generator says "steeple", "roost" and "locket" of its own accord and

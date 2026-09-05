@@ -144,7 +144,7 @@ describe('OTA-1630 — the chip is not the mission', () => {
 
   it('source pin — the matcher reads the parsed noun, and the scanner refusal skips dedup', () => {
     const src = readFileSync(join(__dirname, '../app/state/gameStore.ts'), 'utf8');
-    expect(src).toContain('if (advanceStagesOnIntent(get, set, parsed.intent, parsed.resolvedNoun)) {');
+    expect(src).toContain('if (advanceStagesOnIntent(get, set, parsed.intent, parsed.resolvedNoun, parsed.matchedVerb)) {');
     expect(src).toContain("const namesChip = !!resolvedNoun && (currentScene.ambientNouns ?? []).some((n) => n.toLowerCase() === resolvedNoun.toLowerCase());");
     // Three families, three "Not here" claims, every one of them steps aside for a named chip.
     expect(src).toContain('} else if (!inCombat && !namesChip) {');

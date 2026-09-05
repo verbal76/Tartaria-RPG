@@ -886,6 +886,11 @@ function resolveLeadCompletion(
  *  advance may be in flight per mission at a time; the burst's extras are dropped,
  *  and the next real action re-reads the fresh stage. */
 const stageAdvancesInFlight = new Set<string>();
+/** OTA-1687 — the intents a stage can be paid by (questStage.payingIntent's
+ *  range, minus escape, which is combat). A typed one of these on a stage's
+ *  own cell that pays nothing draws the ask the stage prints on arrival. */
+const STAGE_VERB_INTENTS = new Set<string>(['investigate', 'diplomacy', 'attack', 'stealth', 'cast']);
+const LOOK_VERBS = new Set<string>(['look', 'l', 'glance', 'peek', 'observe', 'watch']);
 
 /** ⚠⚠ P19 — HAND OVER WHAT THE STAGES IN [from, to) PROMISED. Two callers need this and
  *  they need it to behave identically:
@@ -1022,6 +1027,7 @@ function advanceStagesOnIntent(
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   intent: Intent,
   resolvedNoun?: string | null,
+  verb?: string | null,
 ): boolean {
   const player = get().player;
   const currentScene = get().currentScene;
@@ -1245,6 +1251,26 @@ function advanceStagesOnIntent(
       void Promise.resolve().then(() => {
         try { get().advanceStoryline(storyMatch.rec.id); } finally { stageAdvancesInFlight.delete(flightKey); }
       });
+    }
+  }
+
+  // ⚠⚠ OTA-1687 — THE WRONG VERB ON THE RIGHT GROUND SAYS WHAT THE GROUND
+  // WANTS. Every matcher above speaks when the verb matches and the ground
+  // does not ("Not here … points elsewhere"). The contrary walker typed
+  // "negotiate" and "attack" on the Cradle of Dusk — a search stage, boots on
+  // the cell — and nothing about the hunt was said. A stage verb that no
+  // tracked stage pays, typed on a stage's own cell, now draws the ask that
+  // stage prints on arrival. Only stage verbs (a cardinal or a "look" is not
+  // an attempt at the stage), never in combat, never for a chip's own noun.
+  // ⚠ "look around" parses as INVESTIGATE (verb=look); a look is not an
+  // attempt at the stage, so the look family never draws the line.
+  if (!inCombat && !namesChip && !huntMatch && !mysteryMatch && !storyMatch && STAGE_VERB_INTENTS.has(intent) && !LOOK_VERBS.has((verb ?? '').toLowerCase())) {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const under = (require('../engine/missionTrace') as typeof import('../engine/missionTrace')).stageUnderfoot(player);
+    if (under && under.ask && under.intent !== intent) {
+      const line = `The Arbiter taps the slate. "Not that. ${under.title} wants you to ${under.ask} here."`;
+      const recent = get().gameLog.slice(-30).some((e) => e.text === line);
+      if (!recent) get().appendLog('arbiter', line);
     }
   }
 
@@ -14104,7 +14130,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // healed item used to vanish one log line after its receipt printed — and how the
     // generic INVESTIGATE beat burned the tile's once-only search on an action whose
     // meaning was already spent. "Go again" costs the player one tap, on clean state.
-    if (advanceStagesOnIntent(get, set, parsed.intent, parsed.resolvedNoun)) {
+    if (advanceStagesOnIntent(get, set, parsed.intent, parsed.resolvedNoun, parsed.matchedVerb)) {
       set((sLive) => (sLive.player ? { player: advanceTime(sLive.player, 0.1) } : sLive));
       void get().persist();
       return;

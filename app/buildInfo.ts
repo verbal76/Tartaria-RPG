@@ -27951,7 +27951,27 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // points left held the apex shut at both arm guards — "live" means conscious
 // (OTA-1612's rule) at the arrival arm and the freeze-for-kill guard;
 // (4) "3 Mud Harpys" → pluralizeNoun.
-export const OTA_BUILD_ID = '2026-09-05-1686-the-contrary-walker';
+//
+// 2026-09-05 OTA-1687 — THE MISSION LAYER REMEMBERS ITSELF. Punch items 6–8
+// of the contrary walker's list, no ledger needed. (6) ABANDON drops the
+// mission's encounter records — the reeve's and Mira's cards kept their
+// `resolved` phase across an ABANDON + ACCEPT and the card component hides a
+// resolved card, so the re-accepted hunt had no card at either and only the
+// typed verb paid; a dropped contract drops its conversations. (7) The wrong
+// verb on the right ground says what the ground wants — "negotiate" on the
+// Cradle of Dusk (a search stage) drew nothing about the hunt; a stage verb
+// that pays nothing, on a stage's own cell, now draws "Not that. <title>
+// wants you to search this ground here." (missionTrace.stageUnderfoot).
+// (8) The escort clear stops narrating the next beat on the spot when the
+// ground moves — Mira "reads the locket" was printed 46 tiles from her
+// holding and the Dragon "uncoils" while the player stood on the Mud Seas,
+// then both again on the ground; the clear says the clear and the ▸ Next
+// line, on the feed and on the card, and the beat's prose prints where the
+// beat happens (a same-ground next stage keeps it: no arrival will narrate
+// it). Two ota1686 pins flipped (abandon handled → yes; wrong verb
+// acknowledged → yes).
+export const OTA_BUILD_ID = '2026-09-05-1687-the-mission-layer-remembers-itself';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1686-the-contrary-walker';
 // golem catch-up 2026-09-05: markerless publish of OTA-1686 - the contrary
 // walker. The Bog Dragon walked obedient / premature / contrary / interrupted,
 // graded and pinned, the punch list in docs/; four road defects fixed (the

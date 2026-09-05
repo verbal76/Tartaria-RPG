@@ -223,8 +223,18 @@ describe('OTA-1578 — the escort has to be dealt with, not walked away from', (
     expect(QS).toContain('if (!stillUp) {');
   });
 
-  it('⚠⚠ the next beat is narrated on the spot, not silently entered', () => {
-    expect(QS).toContain('get().appendLog(\'world\', nextDef.narration);');
+  it('⚠⚠ the next beat is announced on the spot — its direction, not its prose (OTA-1687 re-anchor)', () => {
+    // The clear used to print `nextDef.narration` on the spot; the contrary
+    // walker read Mira "reads the locket" 46 tiles from her holding and the
+    // Dragon uncoiling from the steeple while standing on the Mud Seas, then
+    // read both again on the ground. The clear now says the clear and the
+    // "▸ Next" direction; the beat's own prose prints where the beat happens.
+    // ⚠ The one case that keeps the prose on the spot: a next stage on the SAME
+    // ground — no arrival will ever narrate it, so the clear must (OTA-1622's
+    // card carries it there too).
+    expect(QS.includes("if (!movedGround) get().appendLog('world', nextDef.narration);")).toBe(true);
+    expect(QS.includes("if (dir) get().appendLog('system', dir);")).toBe(true);
+    expect(QS.includes("line: `The last of them is down.${nextDef && !movedGround ? `")).toBe(true);
   });
 });
 

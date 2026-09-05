@@ -342,9 +342,17 @@ export function resolveStageEscortClear(
           // OTA-1622 — the direction the block below composes rides onto the
           // close card raised after it.
           let clearNext: string | null = null;
+          // ⚠⚠ OTA-1687 — THE NEXT BEAT'S PROSE WAITS FOR THE NEXT BEAT WHEN THE
+          // GROUND MOVES. This printed `nextDef.narration` (and its Arbiter line)
+          // at every clear and carried it on the close card, so the contrary
+          // walker read "Mira reads the locket without crying" on the Mud Flood
+          // Nexus, 46 tiles from her holding, and "the Dragon uncoils from" the
+          // steeple while standing on the Mud Seas — then read both again on the
+          // ground, where advanceHunt and the conversation card say them properly.
+          // The one case that keeps the prose here: a next stage on THIS ground,
+          // which no arrival will ever narrate (OTA-1622's same-tile close).
+          let movedGround = false;
           if (nextDef) {
-            get().appendLog('world', nextDef.narration);
-            if (nextDef.arbiter) get().appendLog('arbiter', nextDef.arbiter);
             // ⚠⚠ OTA-1601 — THE DIRECTION AND THE ROUTE MOVED HERE from the
             // spawn call. advanceHunt used to announce and route the next
             // stage BEFORE the fight it had just stood up — and once fight-
@@ -363,7 +371,9 @@ export function resolveStageEscortClear(
               const clearedDef = escortRec.def.stages[escortRec.rec.stage];
               const hereId = QS.stageLocationId(clearedDef as never, anchor, CM.resolvePosterLocation);
               const nextId = QS.stageLocationId(nextDef as never, anchor, CM.resolvePosterLocation);
-              const movedGround = nextId !== hereId;
+              movedGround = nextId !== hereId;
+              if (!movedGround) get().appendLog('world', nextDef.narration);
+              if (!movedGround && nextDef.arbiter) get().appendLog('arbiter', nextDef.arbiter);
               const dir = QS.nextStageDirection(nextDef as never, (nextDef as { locationName?: string }).locationName ?? null, movedGround, escortRec.family);
               if (dir) get().appendLog('system', dir);
               clearNext = dir ?? null;
@@ -402,7 +412,9 @@ export function resolveStageEscortClear(
           // it just cleared, with the next beat's prose and command word.
           raiseMissionClose(get, set, {
             title: escortRec.def.title,
-            line: `The last of them is down.${nextDef ? `\n\n${nextDef.narration}` : ''}`,
+            // OTA-1687 — the card carries the next beat's prose only when the
+            // beat is on this ground (see the note above).
+            line: `The last of them is down.${nextDef && !movedGround ? `\n\n${nextDef.narration}` : ''}`,
             next: nextDef
               ? clearNext
               : escortRec.family === 'storyline'
@@ -3281,6 +3293,21 @@ export const createQuestSlice = (
   abandonContract(kind, id) {
     const player = get().player;
     if (!player) return;
+    // ⚠⚠ OTA-1687 — THE CONVERSATIONS GO WITH THE POSTER. The contrary walker
+    // abandoned the Bog Dragon at stage 3 and took it again: the record
+    // restarted at stage 0, but every card it had already answered kept its
+    // `resolved` phase (keyed `family:id:stage`), and the card component hides
+    // a resolved card — so the reeve, and then Old Mira, showed no card at all
+    // and only the typed verb paid. A dropped contract drops its encounter
+    // records too; the next accept starts every conversation fresh.
+    const forgetEncounters = (family: 'hunt' | 'mystery' | 'storyline') => {
+      const prefix = `${family}:${id}:`;
+      set((s) => {
+        if (!s.player?.missionEncounters) return s;
+        const kept = Object.fromEntries(Object.entries(s.player.missionEncounters).filter(([k]) => !k.startsWith(prefix)));
+        return { player: { ...s.player, missionEncounters: kept } };
+      });
+    };
     if (kind === 'hunt') {
       const def = findHuntById(id);
       const rec = (player.activeHunts ?? []).find((h) => h.id === id);
@@ -3293,6 +3320,7 @@ export const createQuestSlice = (
           activeHunts: (s.player.activeHunts ?? []).filter((h) => h.id !== id),
         },
       } : s));
+      forgetEncounters('hunt');
       get().appendLog('world', `You set ${def ? theLower(def.title) : 'the hunt'} aside. The poster goes back in the pack, edge-creased.`);
     } else if (kind === 'mystery') {
       const def = findMysteryById(id);
@@ -3304,6 +3332,7 @@ export const createQuestSlice = (
           activeMysteries: (s.player.activeMysteries ?? []).filter((m) => m.id !== id),
         },
       } : s));
+      forgetEncounters('mystery');
       get().appendLog('world', `You let ${def ? theLower(def.title) : 'the mystery'} go. Some questions Tartaria keeps.`);
     } else if (kind === 'storyline') {
       const def = findStorylineById(id);
@@ -3315,6 +3344,7 @@ export const createQuestSlice = (
           activeStorylines: (s.player.activeStorylines ?? []).filter((q) => q.id !== id),
         },
       } : s));
+      forgetEncounters('storyline');
       get().appendLog('world', `You step away from ${def ? theLower(def.title) : 'the'} chapter. The Arbiter doesn't argue.`);
     } else if (kind === 'whisper') {
       const rec = (player.activeWhispers ?? []).find((w) => w.id === id);

@@ -175,8 +175,11 @@ describe('OTA-1686 — the contrary walker on the Bog Dragon of Old Drakova', ()
     expect(grades(r)).toEqual([
       { step: 'the trophy before the hunt', handled: 'yes', acknowledged: 'yes', prior: 'n/a' },
       { step: 'walking out on the reeve', handled: 'yes', acknowledged: 'yes', prior: 'no' },
-      { step: 'the wrong verb on the right ground', handled: 'yes', acknowledged: 'partial', prior: 'n/a' },
-      { step: 'abandon with the items, take it up again', handled: 'partial', acknowledged: 'yes', prior: 'no' },
+      // ⚠ OTA-1687 flipped two pins: the wrong verb on the right ground now draws
+      // "Not that. … wants you to search this ground here", and ABANDON drops the
+      // mission's encounter records so the reeve's card comes back on re-accept.
+      { step: 'the wrong verb on the right ground', handled: 'yes', acknowledged: 'yes', prior: 'n/a' },
+      { step: 'abandon with the items, take it up again', handled: 'yes', acknowledged: 'yes', prior: 'no' },
     ]);
   });
 

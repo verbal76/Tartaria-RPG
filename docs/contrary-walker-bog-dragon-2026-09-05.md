@@ -129,20 +129,22 @@ fixes that need no ledger.
    record where the pack proves it was (the token *and* the map are held, so
    stage 3) or resets the hunt's encounter records with the record. The walker
    falls through to the typed door and reports the shut card; a real player
-   may not.
+   may not. **Closed by OTA-1687** (ABANDON drops the mission's records).
 7. **The wrong verb on the right ground is silent about the hunt.** "negotiate"
    on a search stage draws nothing; the hunt matcher only speaks when the verb
    matches and the ground does not. Expected: on the stage's cell, a verb the
    hunt does not want says what it does want — *"Not a parley. This ground
    wants searching."* One line in `advanceStagesOnIntent` where the ground
-   matches and no stage pays the intent.
+   matches and no stage pays the intent. **Closed by OTA-1687**
+   (`missionTrace.stageUnderfoot`; the look family excluded).
 8. **The escort clear narrates the next beat before the player reaches it.**
    `resolveStageEscortClear` prints `nextDef.narration` on the clear: Mira
    *"reads the locket without crying"* at the Mud Flood Nexus, 46 tiles from
    her holding, and the Dragon *"uncoils from"* the steeple while the player
    stands on the Mud Seas; both then print again at the ground. Expected: the
    clear prints the direction line and the card; the beat's prose waits for
-   the beat.
+   the beat whenever the ground moves (a same-ground next stage keeps it, since
+   no arrival will ever narrate it). **Closed by OTA-1687.**
 
 Observations, not defects: the auto-route from the Mud Seas to the steeple
 reported 23 tiles on one run and 1 tile on another for the same adjacent

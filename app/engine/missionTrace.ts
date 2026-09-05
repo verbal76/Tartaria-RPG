@@ -255,6 +255,41 @@ export function stalledInCombat(
     ?? consider('storyline', player.activeStorylines, findStorylineById, ((d: never) => contractAnchorId(d)) as never);
 }
 
+/**
+ * ⚠⚠ OTA-1687 — THE STAGE UNDER THE BOOTS. The first tracked contract, any
+ * family, whose CURRENT stage stands on the player's cell — with the intent
+ * that pays it and the ask the arrival line prints. The contrary walker typed
+ * "negotiate" and "attack" on the Cradle of Dusk (a search stage) and the
+ * game said nothing about the hunt: every matcher speaks only when the VERB
+ * matches and the ground does not. This is the other half — the ground
+ * matches and the verb does not — so the store can say what the ground wants.
+ */
+export function stageUnderfoot(
+  player: PlayerCharacter | null | undefined,
+): { family: MissionFamily; title: string; intent: string | null; ask: string | null } | null {
+  if (!player?.currentLocationId) return null;
+  const consider = (
+    family: MissionFamily,
+    recs: Rec[] | undefined,
+    find: (id: string) => { title: string; stages?: StageLike[] } | null,
+    anchorOf: (def: never) => string | undefined,
+  ) => {
+    for (const rec of recs ?? []) {
+      if (rec.tracked === false) continue;
+      const def = find(rec.id);
+      const st = def?.stages?.[rec.stage];
+      if (!def || !st || st.checkKind === null) continue;
+      const ground = stageLocationId(st, anchorOf(def as never) ?? '', resolvePosterLocation);
+      if (!standingAtLocation(player, ground)) continue;
+      return { family, title: def.title, intent: payingIntent(family, st), ask: stageVerbAsk(family, st) };
+    }
+    return null;
+  };
+  return consider('hunt', player.activeHunts, findHuntById, ((d: never) => huntAnchorId(d)) as never)
+    ?? consider('mystery', player.activeMysteries, findMysteryById, ((d: never) => contractAnchorId(d)) as never)
+    ?? consider('storyline', player.activeStorylines, findStorylineById, ((d: never) => contractAnchorId(d)) as never);
+}
+
 export function missionArrivalLines(player: PlayerCharacter | null | undefined): string[] {
   if (!player?.currentLocationId) return [];
   const out: string[] = [];
