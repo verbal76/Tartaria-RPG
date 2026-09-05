@@ -27861,6 +27861,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // on ten thousand blocks of noise: plain base64 trips the shape rules, the
 // seamed form never does; a real 400 KB log packs whole and joins exact.
 export const OTA_BUILD_ID = '2026-09-05-1680-the-envelope-has-no-word';
+// golem catch-up 2026-09-05: markerless publish of OTA-1680 - the envelope
+// has no word. Sentry's @iban:filter matched inside a base64 block (part 29
+// of the owner's first whole log under 1679), so the envelope gets a '-' seam
+// after every third character: no rule that needs a run of four can see one.
+// chunkEncoding 'base64-3'; the relay strips the seams; raw ceiling 7,500.
+// hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1679-the-part-fits-the-wire';
 // golem catch-up 2026-09-05: markerless publish of OTA-1679 - the part fits
 // the wire. An OTA-1677 regression found in the owner's 01:50 push: Sentry
