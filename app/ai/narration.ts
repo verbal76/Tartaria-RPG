@@ -60,6 +60,7 @@ import { pick, chance } from '../engine/rng';
 import { noteQwenDiscarded, lastQwenCallPreempted } from './generation/qwenTelemetry';
 import { buildLlmContext, buildSystemPrompt, type SceneSlice } from '../engine/contextInjector';
 import { deedsHereLine } from '../engine/deeds';
+import { chainMemosLine } from '../engine/chainMemos'; // OTA-1697
 import { findMicroMicroAnywhere } from '../engine/worldLadder';
 import { isRepetitiveArbiterLine } from '../engine/arbiterDedup';
 import { canonicalLocationAtCell, clampGridCell } from '../engine/worldMap';
@@ -982,6 +983,7 @@ export async function narrateViaArbiter(
     // OTA-1688 — the deed ledger's line for the ground being narrated (never
     // for a pre-generated destination: its deeds belong to where the player is).
     deedsHere: forLoc ? null : deedsHereLine(state.worldMemory, player?.currentLocationId),
+    chainMemos: chainMemosLine(state.worldMemory.chainMemos), // OTA-1697 — the notes travel with the player
   });
   const messages = buildSystemPrompt(ctx);
   // ⚠ OTA-1129 — A BACKGROUND FILL DOES NOT OWN THE EPOCH. The epoch exists so
@@ -1336,6 +1338,7 @@ export async function maybeGenerateAmbientArbiter(
     ladder,
     ambient: true,
     deedsHere: deedsHereLine(get().worldMemory, player?.currentLocationId),
+    chainMemos: chainMemosLine(get().worldMemory.chainMemos), // OTA-1697
   });
   const messages = buildSystemPrompt(ctx);
   const t0 = Date.now();

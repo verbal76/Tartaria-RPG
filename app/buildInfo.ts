@@ -28103,7 +28103,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // action past 300ms (renderClock); `heap NMB · gc +Nms/K · feed N` on every
 // stall line (HermesInternal.getInstrumentedStats) so a collector pause can
 // no longer hide behind "something blocked the JS thread".
-export const OTA_BUILD_ID = '2026-09-05-1696-the-fight-sheds-its-passengers';
+// 2026-09-05 OTA-1697 — THE NOTES REACH THE NARRATOR. Narrative-agency audit,
+// hole 6: `worldMemory.chainMemos` — the whisper chains' `memo` effects ("A
+// Reclaimer at a roadside fire spoke of an unmapped hollow two ridges over.")
+// — was written, read only as a dedupe, and the type comment promised the
+// Arbiter could reference it; nothing did. One reader: chainMemos.chainMemosLine
+// puts the newest three authored notes, oldest first, on the Qwen fact sheet
+// (`The player's own notes, oldest first: …`) from both narration builders, so
+// the narrator can recall what the player wrote down. The two machine memos
+// that share the list (`dog_rescue_pending:`, `puppy_vendor_trade_id:`) are
+// bookkeeping and never reach a prompt.
+export const OTA_BUILD_ID = '2026-09-05-1697-the-notes-reach-the-narrator';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1696-the-fight-sheds-its-passengers';
 // golem catch-up 2026-09-05: markerless publish of OTA-1696 - the fight sheds
 // its passengers. The classifier keeps two cores and skips confident combat
 // actions; the feed keeps 150 memoised rows; a render clock after every

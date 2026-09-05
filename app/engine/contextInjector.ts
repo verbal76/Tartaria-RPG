@@ -51,6 +51,10 @@ export interface LlmContext {
    *  the one line of it that fits the prompt budget. Absent when the ground
    *  holds no deeds. */
   deeds_here?: string;
+  /** OTA-1697 — the audit's hole 6: the player's own notes (whisper-chain
+   *  `memo` effects), the newest few oldest-first, as one line. Machine memos
+   *  never reach it (chainMemos.authoredMemos). Absent when there are none. */
+  chain_memos?: string;
   /** arb163 — ambient mode. When true, buildSystemPrompt uses the
    *  AMBIENT_INSTRUCTION: an UNPROMPTED, reflective companion line that does
    *  NOT react to the last action. Ambient lines are decoupled from events, so
@@ -97,6 +101,8 @@ export interface ContextInputs {
    * unchanged rather than silently filtered to nothing.
    */
   sceneStartedAt?: number;
+  /** OTA-1697 — chainMemos.chainMemosLine(worldMemory.chainMemos); null/undefined when there are no notes. */
+  chainMemos?: string | null;
 }
 
 export interface SceneSlice {
@@ -150,6 +156,7 @@ export function buildLlmContext(input: ContextInputs): LlmContext {
     player_faction_id: player?.factionId,
     ambient: input.ambient ?? false,
     ...(input.deedsHere ? { deeds_here: input.deedsHere } : {}),
+    ...(input.chainMemos ? { chain_memos: input.chainMemos } : {}), // OTA-1697
   };
 }
 
@@ -476,6 +483,8 @@ export function buildSystemPrompt(ctx: LlmContext): ChatMessage[] {
   ];
   // OTA-1688 — the ground's own memory of the player, when it has one.
   if (ctx.deeds_here) parts.push(`Here before, the player: ${ctx.deeds_here}.`);
+  // OTA-1697 — what the player has written down along the way; may be recalled, never contradicted.
+  if (ctx.chain_memos) parts.push(`The player's own notes, oldest first: ${ctx.chain_memos}`);
   if (canonLine) {
     parts.push('', '[CANON LORE - true facts; may color narration, never contradict]', canonLine);
   }
