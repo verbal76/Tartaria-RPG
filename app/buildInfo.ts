@@ -28059,7 +28059,21 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // tick records the offset; a quarter second after the last tick, with no
 // finger down, an offset off its page snaps to the nearest one and the
 // target follows (EnemyPanel.settleOffset, PAGER_SETTLE_MS).
-export const OTA_BUILD_ID = '2026-09-05-1693-the-portrait-settles';
+// 2026-09-05 OTA-1694 — THE DICE CLOCK. Owner: "I am talking specifically
+// about lag during combat." The 09-05 log put attack→dice at a 5.4s median
+// (p90 10.2s) against a tenth of a second when nothing sat between, and could
+// not say where the seconds went — the roll modal had no clock. Every combat
+// step now stamps four moments: the store OPENS it (pendingRolls.openedAt,
+// re-stamped per step), the modal SHOWS it (commit effect), the player TAPS
+// ROLL, the 800ms hold SETTLES into resolveRollStep. One `debug` line per
+// step — `dice⏱ attack: shown +12ms, tapped +3400ms, settled +820ms = 4232ms`
+// — with `(hold late Nms)` when the setTimeout fired 100ms+ past the hold
+// (the JS thread was busy). open→shown is the render, shown→tap is the
+// player or a tap the screen did not take, tap→settle past 800 is the
+// engine. Instrument only; the one-tap-per-attack question stays the
+// owner's. diagnostics/rollTiming.ts.
+export const OTA_BUILD_ID = '2026-09-05-1694-the-dice-clock';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1693-the-portrait-settles';
 // golem catch-up 2026-09-05: markerless publish of OTA-1693 - the portrait
 // settles. A watchdog snaps the enemy pager to the nearest page a quarter
 // second after the last scroll tick with no finger down. hal took the marker.

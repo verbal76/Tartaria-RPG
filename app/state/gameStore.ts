@@ -116,6 +116,7 @@ import {
   getCrashedSlotIds,
 } from '../diagnostics/saveLoadHealth';
 import { loadLastCrash } from '../diagnostics/lastCrash';
+import { rollTimingLine, type RollTapTiming } from '../diagnostics/rollTiming'; // OTA-1694
 // OTA-1172 — memory warnings, app-state churn and the two-clock freeze detector.
 import {
   FREEZE_SAMPLE_MS, APPSTATE_TRAIL_MAX,
@@ -403,7 +404,7 @@ import { pickWastelandEncounter, RECENT_ENCOUNTER_MEMORY } from '../engine/waste
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { OTA_BUILD_ID } from '../buildInfo';
 import { rollDie, rollFromNotation, pick, chance, rotatingPick } from '../engine/rng';
-import { buildCombatSteps, buildSkillSteps, rollMods, classifyManeuver, fleeGraceApplies, FLEE_STAMINA_COST } from '../engine/combatRules';
+import { buildCombatSteps, buildSkillSteps, rollMods, classifyManeuver, fleeGraceApplies, FLEE_STAMINA_COST, beginnersLuck } from '../engine/combatRules';
 // ⚠ OTA-1678 — the escape bar escalates on RANDOM ground only. The four world
 // rolls stamp their bodies; the dispatch reads the bar through fleeOdds, the
 // same reader the FLEE chip prints its odds from.
@@ -6999,7 +7000,7 @@ export interface GameStore {
    * submit performs the actual state change.
    */
   submitPlayerAction: (text: string, _opts?: { skipPreChecks?: boolean; silent?: boolean; craftCount?: number; castCount?: number }) => void;
-  resolveRollStep: (values: number[]) => void;
+  resolveRollStep: (values: number[], timing?: RollTapTiming) => void; // OTA-1694 — the modal's shown/tapped stamps
   cancelPendingRolls: () => void;
   // OTA-957 — a bandolier throw transiently equips the throwable to the off hand
   // while its dice modal is open. This records what to put back (and the
@@ -14406,7 +14407,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // destroyed earned buffs (perfect_opening, stealthed +5, ready,
           // distract +4) — and doubled as an exploit: cancel + re-attack shed
           // the 'surprised' penalty without ever rolling a die.
-          set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0, consumeOnResolve: statusMods.consume.length > 0 ? statusMods.consume : undefined } });
+          set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0, openedAt: Date.now(), consumeOnResolve: statusMods.consume.length > 0 ? statusMods.consume : undefined } });
           // arb138 — the opener's weapon noun comes from parsed.resolvedNoun, but the
           // resolver sometimes binds a weapon phrase ("Tartarian Hand Axe (Throw)") to a
           // SCENE object ("shattered tartarian relay"), so the narration named the wrong
@@ -16269,7 +16270,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             companionAssist: !!player.companion,
             raceCtx: { relicTarget: invRelicTarget, inRuins: invInRuins },
           });
-          set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0 } });
+          set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0, openedAt: Date.now() } });
           break;
         }
         // (Ground search routing was moved earlier — step 1.5 — so it
@@ -16997,7 +16998,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           raceCtx: { relicTarget, inRuins },
           pursuit: parsed.intent === 'escape' ? fleePursuitFor(currentScene) : null,
         });
-        set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0, refundOnCancel } });
+        set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0, openedAt: Date.now(), refundOnCancel } });
         break;
       }
       case 'rest': {
@@ -20819,7 +20820,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           companionAssist: !!player.companion,
           statusMods: rollMods(liveFx, 'skill'),
         });
-        set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0 } });
+        set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0, openedAt: Date.now() } });
         const buildNote = penaltyDice > 0
           ? ` ${enemy.name} is built tougher (${enemyBuild} vs your ${playerBuild}); -${penaltyDice * 2} on the roll.`
           : ` Build favors you (${playerBuild} vs ${enemyBuild}); maneuver lands clean if you make the roll.`;
@@ -22042,7 +22043,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
   },
 
-  resolveRollStep(values: number[]) {
+  resolveRollStep(values: number[], timing?: RollTapTiming) {
     const state = get().pendingRolls;
     if (!state) return;
     const hadLive = fieldHasLiveHostiles(get().currentScene); // OTA-1688 — for rearmAfterRoll
@@ -22050,27 +22051,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const idx = state.currentStep;
     const step = state.steps[idx];
     if (!step) return;
+    { const tl = rollTimingLine(step.id, state.openedAt, timing); if (tl) get().appendLog('debug', tl); } // OTA-1694 — the dice clock
 
     let total = values.reduce((a, b) => a + b, 0) + step.bonus;
     let success = step.target !== undefined ? total >= step.target : undefined;
-    // OTA-835 — Unknowing Masses "Beginner's Luck": if this difficulty roll FAILED
-    // and the player has banked a reroll (set by the daily race ability), roll the
-    // same dice again and keep the better total. One shot — the token is burned
-    // whether or not the second throw lands. Applies to any targeted roll (skill,
-    // combat attack, relic check) — the trait's "survival, combat, or relic" scope.
-    if (success === false && step.target !== undefined) {
-      const pl = get().player;
-      if (pl?.raceId === 'unknowing_mass' && pl.luckyRerollReady) {
-        const reValues = values.map(() => rollDie(step.sides));
-        const reTotal = reValues.reduce((a, b) => a + b, 0) + step.bonus;
-        if (reTotal > total) { values = reValues; total = reTotal; }
-        success = total >= step.target;
-        set((s) => s.player ? { player: { ...s.player, luckyRerollReady: false } } : s);
-        const landed = success;
-        void Promise.resolve().then(() =>
-          get().appendLog('reward', `✦ Beginner's Luck — you throw again and ${landed ? 'pull it off' : 'still come up short'} (${total} vs DC ${step.target}).`),
-        );
-      }
+    // OTA-835 — Beginner's Luck: a failed targeted roll with a banked token is
+    // thrown again, the better total kept, the token burned either way
+    // (combatRules.beginnersLuck; extracted OTA-1694 for the line ratchet).
+    const luck = beginnersLuck(step, values, total, success, get().player);
+    if (luck) {
+      ({ values, total, success } = luck);
+      set((s) => s.player ? { player: { ...s.player, luckyRerollReady: false } } : s);
+      void Promise.resolve().then(() => get().appendLog('reward', luck.line));
     }
     let critical: boolean | undefined;
     // Natural 1 / natural 20 rule on d20 attack rolls. Forces the
@@ -22134,7 +22126,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
 
     if (nextIdx < updatedSteps.length) {
-      set({ pendingRolls: { ...state, steps: updatedSteps, currentStep: nextIdx } });
+      set({ pendingRolls: { ...state, steps: updatedSteps, currentStep: nextIdx, openedAt: Date.now() } }); // OTA-1694 — each step has its own open
     } else {
       set({ pendingRolls: null, pendingHookContinue: null });
       get().concludeRolls(updatedSteps, state.actionText);

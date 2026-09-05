@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import type { RollStep, PendingRollState } from '../engine/types';
 import { rollDie } from '../engine/rng';
+import { AUTO_RESOLVE_HOLD_MS, type RollTapTiming } from '../diagnostics/rollTiming'; // OTA-1694
 
 // OTA-255 — Auto-resolve dice rolls instead of gating on a RESOLVE /
 // NEXT ROLL button tap. Once the dice land and the post-roll values
@@ -18,17 +19,24 @@ import { rollDie } from '../engine/rng';
 // to register as a wait. Multi-step rolls (attack + damage) now
 // cumulate under 2s. Matches the OTA-257 hook-continue modal's hold
 // for a consistent feel across the codebase.
-const AUTO_RESOLVE_HOLD_MS = 800;
+// OTA-1694 — the constant moved to diagnostics/rollTiming so the store can
+// name a late hold without importing this component.
 
 interface Props {
   state: PendingRollState;
-  onRoll: (values: number[]) => void;
+  onRoll: (values: number[], timing?: RollTapTiming) => void; // OTA-1694 — the dice clock's two stamps
   onCancel: () => void;
 }
 
 export function DiceRoller({ state, onRoll, onCancel }: Props) {
   const [rolledValues, setRolledValues] = useState<number[] | null>(null);
   const [scale] = useState(new Animated.Value(1));
+  // OTA-1694 — the dice clock. shownAt: when this step's card COMMITTED (the
+  // effect runs after the paint is scheduled); tappedAt: when ROLL was pressed.
+  // Both ride onRoll so the store can print open → shown → tapped → settled.
+  const shownAt = useRef(0);
+  const tappedAt = useRef(0);
+  useEffect(() => { shownAt.current = Date.now(); }, [state.currentStep, state.openedAt]);
 
   const step = state.steps[state.currentStep];
   if (!step) return null;
@@ -59,6 +67,7 @@ export function DiceRoller({ state, onRoll, onCancel }: Props) {
   const rollCount = isAdv || isDis ? 2 : stepCount;
 
   function handleRoll() {
+    tappedAt.current = Date.now(); // OTA-1694 — before any work, like logUiTap
     Animated.sequence([
       Animated.timing(scale, { toValue: 1.15, duration: 80, useNativeDriver: true }),
       Animated.timing(scale, { toValue: 0.95, duration: 60, useNativeDriver: true }),
@@ -80,11 +89,12 @@ export function DiceRoller({ state, onRoll, onCancel }: Props) {
       // Match the prior handleNext() shape: kept-die for adv/dis,
       // raw values otherwise. The caller's bonus math expects a
       // single-element array on adv/dis steps.
+      const timing: RollTapTiming = { shownAt: shownAt.current, tappedAt: tappedAt.current }; // OTA-1694
       if (isAdv || isDis) {
         const kept = isAdv ? Math.max(...rolledValues) : Math.min(...rolledValues);
-        onRoll([kept]);
+        onRoll([kept], timing);
       } else {
-        onRoll(rolledValues);
+        onRoll(rolledValues, timing);
       }
       setRolledValues(null);
     }, AUTO_RESOLVE_HOLD_MS);

@@ -1966,6 +1966,10 @@ export interface PendingRollState {
    *  destroyed earned buffs — and let a player shed the 'surprised' penalty
    *  by cancel + re-attack without ever rolling. */
   consumeOnResolve?: string[];
+  /** OTA-1694 — Date.now() when THIS step was put in front of the player
+   *  (set on creation and re-stamped on every step advance). Read by the dice
+   *  clock (diagnostics/rollTiming) against the modal's shown/tapped stamps. */
+  openedAt?: number;
 }
 
 /**

@@ -1149,3 +1149,31 @@ export function enemyDamageCompact(enemy: { damage?: unknown; boss?: boolean; tr
   if (enemy.boss) out = bossSwingsTwice(enemy) ? `${out}+1d6 ×2` : `${out}+1d6`;
   return hasDice && canonType ? `${out} ${canonType}` : out;
 }
+
+/** OTA-835 — Unknowing Masses "Beginner's Luck": when a targeted roll FAILED
+ *  and the player has banked a reroll (the daily race ability sets
+ *  luckyRerollReady), the same dice are thrown again and the better total is
+ *  kept. One shot — the caller burns the token whether or not the second throw
+ *  lands. Applies to any targeted roll (skill, combat attack, relic check) —
+ *  the trait's "survival, combat, or relic" scope. Pure apart from the dice:
+ *  returns the corrected roll and the reward line, or null when the roll did
+ *  not fail, has no target, or the player holds no token. Extracted from
+ *  resolveRollStep in OTA-1694 (the store's line ratchet). */
+export function beginnersLuck(
+  step: RollStep,
+  values: number[],
+  total: number,
+  success: boolean | undefined,
+  pl: Pick<PlayerCharacter, 'raceId' | 'luckyRerollReady'> | null | undefined,
+): { values: number[]; total: number; success: boolean; line: string } | null {
+  if (success !== false || step.target === undefined) return null;
+  if (pl?.raceId !== 'unknowing_mass' || !pl.luckyRerollReady) return null;
+  const reValues = values.map(() => rollDie(step.sides));
+  const reTotal = reValues.reduce((a, b) => a + b, 0) + step.bonus;
+  if (reTotal > total) { values = reValues; total = reTotal; }
+  const landed = total >= step.target;
+  return {
+    values, total, success: landed,
+    line: `✦ Beginner's Luck — you throw again and ${landed ? 'pull it off' : 'still come up short'} (${total} vs DC ${step.target}).`,
+  };
+}
