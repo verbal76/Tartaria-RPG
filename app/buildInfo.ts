@@ -27971,6 +27971,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // it). Two ota1686 pins flipped (abandon handled → yes; wrong verb
 // acknowledged → yes).
 export const OTA_BUILD_ID = '2026-09-05-1687-the-mission-layer-remembers-itself';
+// golem catch-up 2026-09-05: markerless publish of OTA-1687 - the mission
+// layer remembers itself. ABANDON drops the mission's encounter records; the
+// wrong verb on the right ground says what the ground wants; the escort clear
+// keeps the next beat's prose only for a same-ground next stage. hal took the
+// marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1686-the-contrary-walker';
 // golem catch-up 2026-09-05: markerless publish of OTA-1686 - the contrary
 // walker. The Bog Dragon walked obedient / premature / contrary / interrupted,
