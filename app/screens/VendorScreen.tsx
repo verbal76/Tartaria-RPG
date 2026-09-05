@@ -1058,7 +1058,13 @@ export function VendorScreen() {
               // NOT in the sweep, because a player who cannot see the boundary
               // has to take it on trust — and Common covers rations, scrap and
               // Aether Dust, which this must never touch.
-              ? `+${pending.total} TC   ·   You have: ${player.tc} TC   →   After: ${player.tc + pending.total} TC\n\nWeapons and armor only, unequipped, Common rarity. Consumables, crafting materials and anything you forged at the Crucible are left alone.${bulkSellHeldBackNote(bulkHeldBack) ? `\n\n⚠ ${bulkSellHeldBackNote(bulkHeldBack)}` : ''}`
+              ? `+${pending.total} TC   ·   You have: ${player.tc} TC   →   After: ${player.tc + pending.total} TC\n\nWeapons and armor only, unequipped, Common rarity. Consumables, crafting materials, anything you forged at the Crucible and anything you coated are left alone.${bulkSellHeldBackNote(bulkHeldBack) ? `\n\n⚠ ${bulkSellHeldBackNote(bulkHeldBack)}` : ''}${(() => {
+                // ⚠ OTA-1683 — the coated pieces the sweep stepped around, counted
+                // in the same breath as the gate hold-backs, for the same reason:
+                // a hold-out nobody explains reads as the button refusing to work.
+                const spared = planCommonGearSale(bulkSellable).sparedCoated;
+                return spared > 0 ? `\n\n${spared} coated ${spared === 1 ? 'piece' : 'pieces'} kept — a coating is work you did. Sell those by hand if you mean to.` : '';
+              })()}`
             : pending?.mode === 'sell'
               ? (pendingGateLoss
                   ? `Price: +${pending.price} TC   ·   You have: ${player.tc} TC   →   After: ${player.tc + pending.price} TC\n\n⚠ This is your ONLY way to ${pendingGateLoss.label}. Selling it leaves you with no other tool that satisfies the gate — actions that need it will refuse until you find or craft a replacement.`

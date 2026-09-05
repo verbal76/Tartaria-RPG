@@ -981,85 +981,40 @@ export function statNowClause(p: PlayerCharacter | null | undefined, stat: strin
   return eff === base ? `now ${base}` : `base ${base}, ${eff} as you stand`;
 }
 
+/**
+ * ⚠⚠⚠ OTA-1683 — ONE ARITHMETIC. Owner, 09-04 22:01: *"do all of the benefits
+ * of stat boosts gained from gear show properly on the full character sheet?"*
+ * Measured: the GEAR did (equipped + pack passive were in both sums), but the
+ * sheet's total was built by a SECOND copy of this math that had fallen four
+ * sources behind the one combat rolls with — the stone's mark (OTA-1575), the
+ * chill (OTA-831), the Aether Dust buff (OTA-211) and the title perks (OTA-910
+ * Skyreacher DEX, OTA-1189 Siren CHA) all moved the number the dice use and
+ * never reached the sheet, which also never applied the ≥1 floor. So a
+ * Skyreacher's sheet read DEX 11 while the roll used 12, and a chilled fighter's
+ * sheet read 12 while the roll used 10.
+ *
+ * `effectiveStatsBreakdown` is now the ONLY place the sum is written, every
+ * source named; `effectiveStats` is its totals. The two cannot disagree again.
+ */
 export function effectiveStats(
   player: PlayerCharacter,
   weatherMod?: Partial<Stats>,
 ): Stats {
-  const bonus = aggregateEquippedStatBonuses(player);
-  // OTA 192 — inventory passives stack on top (capped per-stat to
-  // prevent backpack-build inflation).
-  const inv = aggregateInventoryPassiveStatBonuses(player);
-  // OTA 003 — timed food/potion buffs stack on top of everything
-  // else. Each food_buff status carries (buffStat, buffBonus); sum
-  // them per stat. No cap — these expire on their own.
-  const food: Partial<Stats> = {};
-  for (const eff of player.statusEffects ?? []) {
-    // OTA-1575 — the stone's mark rides the same bucket as a food buff (it is a
-    // timed stat bonus and should stack and floor identically), but keeps its own
-    // KIND so it never collides with a food buff on the same stat the way two
-    // food_buffs would.
-    if ((eff.kind !== 'food_buff' && eff.kind !== 'stone_marked') || !eff.buffStat || !eff.buffBonus) continue;
-    food[eff.buffStat] = (food[eff.buffStat] ?? 0) + eff.buffBonus;
-  }
-  // OTA-831 — a `chilled` status (from a cold-typed hit) slows the hands: −2 DEX while
-  // it lasts. Folds into the food-buff bucket so it flows through the ≥1 floor below.
-  // Cleared by a warming coating drink (coatingDrinkRemedy) or by expiry.
-  if ((player.statusEffects ?? []).some((e) => e.kind === 'chilled')) {
-    food.dexterity = (food.dexterity ?? 0) - 2;
-  }
-  // OTA-211 — Aether Dust food additive grants +3 to a player-chosen
-  // stat for 5 real-world minutes. Stored on player.aetherBuff with a
-  // wall-clock expiresAtMs; we apply IF still active. Stacks on top
-  // of food_buff (the additive is supposed to feel meaningful).
-  if (player.aetherBuff && Date.now() < player.aetherBuff.expiresAtMs) {
-    food[player.aetherBuff.stat] = (food[player.aetherBuff.stat] ?? 0) + player.aetherBuff.bonus;
-  }
-  const w = weatherMod ?? {};
-  // OTA 038 — race-derived always-on stat bonuses.
-  const racial = racialStatBonusesFor(player.raceId);
-  // OTA-835 — Unknowing Masses "Curious Mind": a persistent +2 INT / +2 WIS that
-  // AWAKENS the first time the character is exposed to Tartaria's secrets (a relic
-  // or a ruin sets player.curiousMindAwakened). Flat-static racialStatBonusesFor
-  // can't express a flag-gated bonus, so it folds in here.
-  const curious = player.raceId === 'unknowing_mass' && player.curiousMindAwakened
-    ? { intelligence: 2, wisdom: 2 }
-    : {};
-  // OTA 039 — corruption tier penalty. Tainted=-1 CHA, Corrupted=-1
-  // all, Hollowed=-2 all. Subtracts at every skill-check site so the
-  // aether under your skin actually costs you something.
-  const tier = corruptionTierOf(player.corruption ?? 0);
-  const corrPen = corruptionStatPenalty(tier);
-  // OTA-910 — Skyreacher (all five great climbs crested) grants a passive +DEX.
-  // Read via the title-perk aggregate so it flows through every effectiveStats
-  // call site (combat, dodge, climb, checks). Lazy require avoids a static
-  // import cycle and is module-cached.
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const titlePerks = require('./titles').titlePerkModifiers(player);
-  const titleDex = titlePerks.dexterityBonus ?? 0;
-  // ⚠ OTA-1189 — the Siren story's +CHA rides the same aggregate, for the same reason:
-  // one injection point means diplomacy checks and the CHA vendor discount both honour it.
-  const titleCha = titlePerks.charismaBonus ?? 0;
-  // engine_Dev — floor every effective stat at 1 so stacked debuffs (weather + corruption + damage-
-  // type onHit) can't drive a roll stat to 0 or negative.
+  const b = effectiveStatsBreakdown(player, weatherMod);
   return {
-    strength: Math.max(1, player.stats.strength + (bonus.strength ?? 0) + (inv.strength ?? 0) + (food.strength ?? 0) + (w.strength ?? 0) + (racial.strength ?? 0) + (corrPen.strength ?? 0)),
-    dexterity: Math.max(1, player.stats.dexterity + (bonus.dexterity ?? 0) + (inv.dexterity ?? 0) + (food.dexterity ?? 0) + (w.dexterity ?? 0) + (racial.dexterity ?? 0) + (corrPen.dexterity ?? 0) + titleDex),
-    intelligence: Math.max(1, player.stats.intelligence + (bonus.intelligence ?? 0) + (inv.intelligence ?? 0) + (food.intelligence ?? 0) + (w.intelligence ?? 0) + (racial.intelligence ?? 0) + (curious.intelligence ?? 0) + (corrPen.intelligence ?? 0)),
-    wisdom: Math.max(1, player.stats.wisdom + (bonus.wisdom ?? 0) + (inv.wisdom ?? 0) + (food.wisdom ?? 0) + (w.wisdom ?? 0) + (racial.wisdom ?? 0) + (curious.wisdom ?? 0) + (corrPen.wisdom ?? 0)),
-    charisma: Math.max(1, player.stats.charisma + (bonus.charisma ?? 0) + (inv.charisma ?? 0) + (food.charisma ?? 0) + (w.charisma ?? 0) + (racial.charisma ?? 0) + (corrPen.charisma ?? 0) + titleCha),
-    // OTA-348 — stealth. `?? 0` guards a pre-backfill in-memory player. Floored at 0, not 1: unlike the
-    // five core attributes (which always have a positive base, so the ≥1 clamp only ever catches debuff
-    // overshoot), an untrained character legitimately has 0 stealth — clamping it to 1 would fabricate a
-    // phantom point. 0 still blocks debuffs from driving it negative.
-    stealth: Math.max(0, (player.stats.stealth ?? 0) + (bonus.stealth ?? 0) + (inv.stealth ?? 0) + (food.stealth ?? 0) + (w.stealth ?? 0) + (racial.stealth ?? 0) + (corrPen.stealth ?? 0)),
+    strength: b.strength.total,
+    dexterity: b.dexterity.total,
+    intelligence: b.intelligence.total,
+    wisdom: b.wisdom.total,
+    charisma: b.charisma.total,
+    stealth: b.stealth.total,
   };
 }
 
-// OTA 040 — annotated effective-stats. Same math as effectiveStats
-// but returns per-source labels so the Player Sheet can show
-// "STR 12 (base 10, +2 race, +1 helm, +1 weather, −1 corruption)".
-// Doesn't change the existing effectiveStats signature; all 30+ call
-// sites that just want the value-only object stay on the old one.
+// OTA 040 — annotated effective-stats: per-source labels so the Player Sheet can
+// show "STR 12 (base 10, +2 race, +1 helm, +1 weather, −1 corruption)".
+// ⚠ OTA-1683 — and since this OTA the value-only `effectiveStats` above is
+// DERIVED from it, so the sheet and the dice read one sum.
 export type StatSource = { label: string; delta: number };
 export interface StatBreakdown {
   base: number;
@@ -1073,26 +1028,54 @@ export function effectiveStatsBreakdown(
   weatherMod?: Partial<Stats>,
 ): EffectiveStatsBreakdown {
   const bonus = aggregateEquippedStatBonuses(player);
+  // OTA 192 — inventory passives stack on top (capped per-stat to prevent
+  // backpack-build inflation).
   const inv = aggregateInventoryPassiveStatBonuses(player);
-  // Food buffs — sum per stat, but also record each individual buff
-  // so the breakdown can show the source food name.
-  const foodBuffs: Array<{ stat: keyof Stats; delta: number; label: string }> = [];
+  // OTA 003 — timed food/potion buffs, each recorded by name so the sheet can
+  // say which. No cap — these expire on their own.
+  // OTA-1575 — the stone's mark rides the same bucket (a timed stat bonus that
+  // stacks and floors identically) under its own KIND, so it never collides with
+  // a food buff on the same stat the way two food_buffs would.
+  const timed: Array<{ stat: keyof Stats; delta: number; label: string }> = [];
   for (const eff of player.statusEffects ?? []) {
-    if (eff.kind !== 'food_buff' || !eff.buffStat || !eff.buffBonus) continue;
-    foodBuffs.push({
+    if ((eff.kind !== 'food_buff' && eff.kind !== 'stone_marked') || !eff.buffStat || !eff.buffBonus) continue;
+    timed.push({
       stat: eff.buffStat,
       delta: eff.buffBonus,
-      label: eff.label ? `${eff.label}` : `food (+${eff.buffBonus})`,
+      label: eff.kind === 'stone_marked'
+        ? (eff.label ? `${eff.label}` : "the stone's mark")
+        : (eff.label ? `${eff.label}` : `food (+${eff.buffBonus})`),
     });
   }
+  // OTA-831 — a `chilled` status (from a cold-typed hit) slows the hands: −2 DEX
+  // while it lasts. Cleared by a warming coating drink or by expiry.
+  if ((player.statusEffects ?? []).some((e) => e.kind === 'chilled')) {
+    timed.push({ stat: 'dexterity', delta: -2, label: 'chilled' });
+  }
+  // OTA-211 — Aether Dust food additive: +3 to a player-chosen stat for 5
+  // real-world minutes, applied while its wall-clock expiry has not passed.
+  if (player.aetherBuff && Date.now() < player.aetherBuff.expiresAtMs) {
+    timed.push({ stat: player.aetherBuff.stat, delta: player.aetherBuff.bonus, label: 'Aether Dust' });
+  }
+  // OTA 038 — race-derived always-on stat bonuses.
   const racial = racialStatBonusesFor(player.raceId);
-  // OTA-835 — Curious Mind persistent +2 INT/+2 WIS (see effectiveStats).
+  // OTA-835 — Unknowing Masses "Curious Mind": a persistent +2 INT / +2 WIS that
+  // AWAKENS the first time the character is exposed to Tartaria's secrets.
   const curious: Partial<Stats> = player.raceId === 'unknowing_mass' && player.curiousMindAwakened
     ? { intelligence: 2, wisdom: 2 }
     : {};
+  // OTA 039 — corruption tier penalty. Tainted=-1 CHA, Corrupted=-1 all,
+  // Hollowed=-2 all.
   const tier = corruptionTierOf(player.corruption ?? 0);
   const corrPen = corruptionStatPenalty(tier);
   const w = weatherMod ?? {};
+  // OTA-910 — Skyreacher grants a passive +DEX; ⚠ OTA-1189 — the Siren story's
+  // +CHA rides the same aggregate. Lazy require avoids a static import cycle
+  // and is module-cached.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const titlePerks = require('./titles').titlePerkModifiers(player) as { dexterityBonus?: number; charismaBonus?: number };
+  const titleDex = titlePerks.dexterityBonus ?? 0;
+  const titleCha = titlePerks.charismaBonus ?? 0;
 
   const build = (stat: keyof Stats): StatBreakdown => {
     const base = player.stats[stat] ?? 0; // OTA-348 — guard pre-backfill stealth
@@ -1101,12 +1084,21 @@ export function effectiveStatsBreakdown(
     if ((curious[stat] ?? 0) !== 0) sources.push({ label: 'Curious Mind', delta: curious[stat]! });
     if ((bonus[stat] ?? 0) !== 0) sources.push({ label: 'equipped', delta: bonus[stat]! });
     if ((inv[stat] ?? 0) !== 0) sources.push({ label: 'pack passive', delta: inv[stat]! });
-    for (const fb of foodBuffs) {
-      if (fb.stat === stat) sources.push({ label: fb.label, delta: fb.delta });
+    for (const t of timed) {
+      if (t.stat === stat) sources.push({ label: t.label, delta: t.delta });
     }
     if ((w[stat] ?? 0) !== 0) sources.push({ label: 'weather', delta: w[stat]! });
     if ((corrPen[stat] ?? 0) !== 0) sources.push({ label: `corruption (${tier})`, delta: corrPen[stat]! });
-    const total = base + sources.reduce((s, x) => s + x.delta, 0);
+    if (stat === 'dexterity' && titleDex !== 0) sources.push({ label: 'titles', delta: titleDex });
+    if (stat === 'charisma' && titleCha !== 0) sources.push({ label: 'titles & stories', delta: titleCha });
+    const raw = base + sources.reduce((s, x) => s + x.delta, 0);
+    // engine_Dev — every effective stat floors at 1 so stacked debuffs cannot
+    // drive a roll stat to 0 or negative. OTA-348 — stealth floors at 0: an
+    // untrained character legitimately has none, and clamping to 1 would
+    // fabricate a phantom point. When the floor catches, it is listed too, so
+    // the sources always sum to the total the sheet prints.
+    const total = Math.max(stat === 'stealth' ? 0 : 1, raw);
+    if (total !== raw) sources.push({ label: 'floor', delta: total - raw });
     return { base, total, sources };
   };
   return {

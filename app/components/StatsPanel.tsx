@@ -345,6 +345,10 @@ export function StatsPanel({ player, enemyPower }: Props) {
         <Stat label="INT" value={formatStat(player.stats.intelligence, eff.intelligence)} />
         <Stat label="WIS" value={formatStat(player.stats.wisdom, eff.wisdom)} />
         <Stat label="CHA" value={formatStat(player.stats.charisma, eff.charisma)} />
+        {/* ⚠ OTA-1683 — STE was the one attribute this card left off. Owner:
+            "in the small character portrait, ste is not shown." Same cell,
+            same base/effective reading as the other five. */}
+        <Stat label="STE" value={formatStat(player.stats.stealth ?? 0, eff.stealth)} />
       </View>
       {/* ⚠⚠ OTA-1651 — THE EQUIPPED BLOCK IS GONE FROM THIS CARD. Owner, with
           a screenshot: *"we can remove all of the gold writing telling me

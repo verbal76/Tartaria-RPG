@@ -46,6 +46,7 @@ import {
 } from '../engine/arbiterPersona';
 import { hpBreakdown, hpBreakdownLine } from '../engine/hpBreakdown';
 import { giftLedger, giftLedgerLine } from '../engine/giftLedger';
+import { wrongsLedger, AMENDS_TC_PER_WRONG } from '../engine/npcMemory'; // OTA-1683 — the wrongs row opens
 import type { EquipSlot } from '../engine/types';
 import { fineProgressBar, rawProgressPercent, SKILL_ACTIVITIES } from '../engine/statTraining';
 import { barehandDamageFor } from '../engine/raceMechanics';
@@ -101,6 +102,10 @@ export function CharacterScreen() {
   const [openTitle, setOpenTitle] = useState<string | null>(null);
   // OTA-1161 — the gift ledger drills into the Arbiter's "N gifts given" row.
   const [giftsOpen, setGiftsOpen] = useState(false);
+  // ⚠ OTA-1683 — the wrongs ledger drills into "N wrongs still standing". Owner:
+  // "when I tap on it, it doesn't expand to show what they are." It did not,
+  // because only the gifts row had ever been given a drill.
+  const [wrongsOpen, setWrongsOpen] = useState(false);
 
   if (!player) {
     return (
@@ -145,6 +150,7 @@ export function CharacterScreen() {
   // what was given to whom. Both derive from state already saved; neither writes.
   const hpParts = hpBreakdown(player, worldMemory);
   const ledger = giftLedger(worldMemory);
+  const wrongs = wrongsLedger(worldMemory); // OTA-1683
 
   // OTA-843 [Chronicle] — assemble the character's legend from accreted state
   // (memorable beats + milestones + titles + corruption + main-quest progress).
@@ -408,6 +414,11 @@ export function CharacterScreen() {
               {arbiter.parts.length > 0 && (
                 <View style={{ marginTop: 10 }}>
                   {arbiter.parts.map((part, i) => {
+                    // ⚠ OTA-1683 — TWO rows drill now, on one mechanism: the
+                    // gifts row (OTA-1161) and the wrongs row, which the owner
+                    // tapped and found flat. `open` is whichever ledger this row
+                    // owns; a row with no kind stays flat, as before.
+                    const open = part.kind === 'gifts' ? giftsOpen : part.kind === 'wrongs' ? wrongsOpen : null;
                     const row = (
                       <View style={styles.kvRow}>
                         <Text style={styles.kvValue}>
@@ -416,13 +427,45 @@ export function CharacterScreen() {
                               identical to a flat one is a feature nobody finds. */}
                           {/* ⚠ OTA-1456 — was `›`, a THIRD pair on this screen. Same
                               vocabulary as everything else now: ▸ closed, ▾ open. */}
-                          {part.kind === 'gifts' ? <Text style={styles.tapHint}>{giftsOpen ? '  ▾' : '  ▸'}</Text> : null}
+                          {open !== null ? <Text style={styles.tapHint}>{open ? '  ▾' : '  ▸'}</Text> : null}
                         </Text>
                         <Text style={[styles.kvValue, { color: part.value >= 0 ? '#7a8a5a' : '#a85a3a' }]}>
                           {part.value >= 0 ? '+' : ''}{part.value}
                         </Text>
                       </View>
                     );
+                    if (part.kind === 'wrongs') {
+                      return (
+                        <View key={i}>
+                          <TouchableOpacity activeOpacity={0.7} onPress={() => setWrongsOpen((v) => !v)} accessibilityRole="button">
+                            {row}
+                          </TouchableOpacity>
+                          {wrongsOpen && (
+                            <View style={styles.giftLedger}>
+                              {wrongs.length === 0
+                                ? <Text style={styles.kvSub}>Nothing recorded yet.</Text>
+                                : wrongs.map((e, j) => (
+                                  <View key={j} style={styles.giftRow}>
+                                    <Text style={styles.giftLine}>
+                                      {e.name}{e.role ? ` (${e.role})` : ''} — {e.outstanding} wrong{e.outstanding === 1 ? '' : 's'}
+                                    </Text>
+                                    <Text style={styles.giftMeta}>
+                                      spend {e.owed} TC at their counter to clear the next
+                                      {e.banked > 0 ? ` · ${e.banked} TC already toward it` : ''}
+                                    </Text>
+                                  </View>
+                                ))}
+                              {/* The rule, in one line, so the number above is a
+                                  debt the player can plan against rather than a
+                                  verdict: recordNpcDealing's amends bank, read back. */}
+                              <Text style={styles.kvSub}>
+                                Buying from someone you wronged pays it down — {AMENDS_TC_PER_WRONG} TC per wrong, and the price climbs with each wrong still standing with them. Robbing them again forfeits what you had paid.
+                              </Text>
+                            </View>
+                          )}
+                        </View>
+                      );
+                    }
                     if (part.kind !== 'gifts') return <View key={i}>{row}</View>;
                     return (
                       <View key={i}>

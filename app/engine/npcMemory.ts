@@ -103,6 +103,44 @@ export type NpcRegard =
   | 'met'        // seen once or twice, no dealings
   | 'stranger';  // never met
 
+/** ⚠ OTA-1683 — WHO HOLDS EACH WRONG, AND WHAT CLEARS IT. The sheet's "N wrongs
+ *  still standing" row summed these and opened nothing when tapped; this is the
+ *  list behind the number, built from the SAME relations regardParts sums, so
+ *  the two can never disagree. `owed` is what the next clear costs at THIS
+ *  counter — AMENDS_TC_PER_WRONG per wrong outstanding, less what is already
+ *  banked toward it (the recordNpcDealing rule, read back, not re-derived). */
+export interface WrongsLedgerEntry {
+  npcId: string;
+  name: string;
+  role?: string;
+  /** Wrongs not yet made good with this person. */
+  outstanding: number;
+  /** TC already spent at their counter toward the next clear. */
+  banked: number;
+  /** TC still to spend with them before the next wrong clears. */
+  owed: number;
+}
+
+export function wrongsLedger(
+  memory: Pick<WorldMemory, 'npcRelations'> | null | undefined,
+): WrongsLedgerEntry[] {
+  const out: WrongsLedgerEntry[] = [];
+  for (const r of Object.values(memory?.npcRelations ?? {})) {
+    const outstanding = Math.max(0, (r.wrongs ?? 0) - (r.amendsCleared ?? 0));
+    if (outstanding <= 0) continue;
+    const banked = Math.max(0, r.amendsTc ?? 0);
+    out.push({
+      npcId: r.id,
+      name: r.name || r.id,
+      role: r.role,
+      outstanding,
+      banked,
+      owed: Math.max(0, AMENDS_TC_PER_WRONG * outstanding - banked),
+    });
+  }
+  return out.sort((a, b) => b.outstanding - a.outstanding || a.name.localeCompare(b.name));
+}
+
 export function emptyRelation(npc: NpcMet, nowMs: number, hours: number): NpcRelation {
   return {
     id: npc.id,

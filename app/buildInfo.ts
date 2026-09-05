@@ -27893,7 +27893,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // log (the log is per slot; there is no global ring), saying whose it is —
 // "(no character selected — no log attached)" was arriving under the owner's
 // own word "Log".
-export const OTA_BUILD_ID = '2026-09-05-1682-the-buffer-was-thirty-deep';
+// 2026-09-05 OTA-1683 — THE SHEET AND THE PACK (task #193, five notations
+// from the owner's 09-04 22:00–22:07). STE joins the small portrait's stat
+// row. The full sheet's stat total was a SECOND copy of the combat sum, four
+// sources behind it (stone's mark, chill, Aether Dust, title perks) and never
+// floored — effectiveStats now derives from effectiveStatsBreakdown, one
+// arithmetic, every source named. "N wrongs still standing" drills into who
+// holds each wrong and what clears it (600 TC per wrong at their counter).
+// SELL ALL COMMON GEAR steps around coated pieces and the confirm says how
+// many. The Weapons section reads in runs headed by reach class: Melee,
+// Spears & polearms, Ranged, Rune-casters, Thrown.
+export const OTA_BUILD_ID = '2026-09-05-1683-the-sheet-and-the-pack';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1682-the-buffer-was-thirty-deep';
 // golem catch-up 2026-09-05: markerless publish of OTA-1682 - the buffer was
 // thirty deep. maxQueueSize 200 on both sides of the Sentry bridge; transport
 // refusals counted per bundle through afterSendEvent and folded into

@@ -111,10 +111,13 @@ export interface RegardPart {
   /** Shown on the character sheet. The player is allowed to know why. */
   label: string;
   value: number;
-  /** OTA-1161 — marks a row the sheet can DRILL INTO. Only 'gifts' so far: the
-   *  count is a summary of `npcRelations[].gifts`, and the player asked to see
-   *  what he gave, to whom, and how it landed. Absent = a plain, flat row. */
-  kind?: 'gifts';
+  /** OTA-1161 — marks a row the sheet can DRILL INTO. 'gifts': the count is a
+   *  summary of `npcRelations[].gifts`, and the player asked to see what he
+   *  gave, to whom, and how it landed. ⚠ OTA-1683 — 'wrongs': the owner tapped
+   *  "2 wrongs still standing" and nothing opened; it now lists who holds each
+   *  wrong and what clears it (see npcMemory.wrongsLedger). Absent = a plain,
+   *  flat row. */
+  kind?: 'gifts' | 'wrongs';
 }
 
 const FORK_REGARD: Record<string, number> = personaData.forkRegard as Record<string, number>;
@@ -141,7 +144,7 @@ export function regardParts(
     outstanding += Math.max(0, (r.wrongs ?? 0) - (r.amendsCleared ?? 0));
     gifts += (r.gifts ?? []).length;
   }
-  if (outstanding > 0) parts.push({ label: `${outstanding} wrong${outstanding === 1 ? '' : 's'} still standing`, value: clamp(outstanding * -6, -24, 0) });
+  if (outstanding > 0) parts.push({ label: `${outstanding} wrong${outstanding === 1 ? '' : 's'} still standing`, value: clamp(outstanding * -6, -24, 0), kind: 'wrongs' });
   if (cleared > 0) parts.push({ label: `${cleared} debt${cleared === 1 ? '' : 's'} made good`, value: clamp(cleared * 4, 0, 12) });
   // ⚠ OTA-1161 — "things given away" → "gifts given". The owner's wording, and the
   // better one: "given away" reads as loss or charity when the mechanic is a gift

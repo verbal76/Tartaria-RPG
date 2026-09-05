@@ -8,6 +8,7 @@ import {
   CATEGORY_LABEL,
   CATEGORY_ORDER,
   groupInventoryByCategory,
+  weaponRuns, WEAPON_SUBSECTION_LABEL, // OTA-1683 — sub-headings inside Weapons
 } from '../components/InventoryCategorize';
 import type { InventoryItem, EquipSlot, PlayerCharacter } from '../engine/types';
 import { validSlotsForItem, SLOT_LABEL, wornInstanceIds, byWornFirst, planGroupEquip, RING_SLOTS, RING_ID_KEYS } from '../engine/equipment';
@@ -1944,7 +1945,23 @@ export function InventoryScreen() {
                   {items.reduce((sum, i) => sum + i.quantity, 0)}
                 </Text>
               </TouchableOpacity>
-              {!collapsed && items.map((item) => (
+              {/* ⚠⚠ OTA-1683 — THE WEAPONS SECTION READS IN RUNS. Owner: "weapons
+                  category in inventory should have subsections for each type of
+                  weapon, I don't know what's what, mele, spear, ranged and so
+                  on." Each run is headed by the reach class combat already
+                  resolves the weapon to (InventoryCategorize.weaponRuns); every
+                  other section is one unlabelled run, exactly as before. */}
+              {!collapsed && (cat === 'weapon'
+                ? weaponRuns(items).map((run) => ({ label: WEAPON_SUBSECTION_LABEL[run.sub], items: run.items }))
+                : [{ label: null as string | null, items }]
+              ).map((run) => (
+                <View key={run.label ?? '_'}>
+                  {run.label !== null && (
+                    <Text style={[styles.weaponSubLabel, { color: CATEGORY_COLORS[cat] }]}>
+                      {run.label.toUpperCase()} · {run.items.reduce((sum, i) => sum + i.quantity, 0)}
+                    </Text>
+                  )}
+                  {run.items.map((item) => (
                 <View
                   key={item.id}
                   onLayout={(e) => { rowInfoRef.current[item.id] = { y: e.nativeEvent.layout.y, cat }; }}
@@ -1972,6 +1989,8 @@ export function InventoryScreen() {
                   grouped={invSelectMode}
                   groupPicked={invSelected.includes(item.id)}
                 />
+                </View>
+                  ))}
                 </View>
               ))}
             </View>
@@ -2949,6 +2968,9 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
   sectionHeaderLeft: { flexDirection: 'row', alignItems: 'center' },
+  // OTA-1683 — the run heading inside Weapons: smaller and quieter than the
+  // section label, indented under the section's colour bar.
+  weaponSubLabel: { fontSize: 10, fontWeight: '700', letterSpacing: 1.5, opacity: 0.85, marginTop: 6, marginBottom: 2, paddingLeft: 12 },
   // arb108 — collapse chevron (▾ open / ▸ collapsed).
   sectionChevron: { fontSize: 11, fontWeight: '900', marginRight: 7, width: 11, textAlign: 'center' },
   sectionLabel: { fontSize: 11, fontWeight: '700', letterSpacing: 2 },

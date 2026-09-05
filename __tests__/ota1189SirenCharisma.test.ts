@@ -74,12 +74,13 @@ describe('⚠⚠ OTA-1189 — THE PERK HAS CONSUMERS. Same rule OTA-1184 shipped
     // Exactly how OTA-910's Skyreacher +DEX is wired. One injection, no call site can miss it.
     const eq = SRC('app/engine/equipment.ts');
     expect(eq).toContain('const titleCha = titlePerks.charismaBonus ?? 0;');
-    // ⚠ Read the LINE, not a regex across it. The first version used `[^)]*`, which cannot
-    // cross the `)` in `(bonus.charisma ?? 0)` — a pattern that could never have matched
-    // the correct code. Same shape of mistake as the OTA-1186 call-site regex.
-    const chaLine = eq.split('\n').find((l) => l.trim().startsWith('charisma: Math.max(1,'));
-    expect(chaLine).toBeDefined();
-    expect(chaLine!).toContain('+ titleCha)');
+    // ⚠ OTA-1683 — the per-stat `charisma: Math.max(1, …)` line this used to read
+    // is gone: effectiveStats now DERIVES from effectiveStatsBreakdown, the one
+    // sum, and the perk is a named source there. Same injection point, one
+    // level up — and now the sheet shows it too, which the old line never did.
+    expect(eq).toContain("if (stat === 'charisma' && titleCha !== 0) sources.push({ label: 'titles & stories', delta: titleCha });");
+    expect(eq).toContain('const b = effectiveStatsBreakdown(player, weatherMod);');
+    expect(eq).toContain('charisma: b.charisma.total,');
   });
 
   test('⚠⚠ CONSUMER 1 — diplomacy checks read charisma', () => {
@@ -95,8 +96,21 @@ describe('⚠⚠ OTA-1189 — THE PERK HAS CONSUMERS. Same rule OTA-1184 shipped
   });
 
   test('⚠ and the floor still applies, so no debuff stack can drive CHA below 1', () => {
+    // ⚠ OTA-1683 — the floor lives in the one sum now, and it is measured rather
+    // than read: Hollowed (−2 all) on a CHA of 1 still answers 1, on both the
+    // value the dice use and the total the sheet prints.
     const eq = SRC('app/engine/equipment.ts');
-    expect(eq).toMatch(/charisma: Math\.max\(1,/);
+    expect(eq).toContain("const total = Math.max(stat === 'stealth' ? 0 : 1, raw);");
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { effectiveStats, effectiveStatsBreakdown } = require('../app/engine/equipment') as typeof import('../app/engine/equipment');
+    const p = {
+      name: 'Floor', raceId: 'unknowing_mass', factionId: 'reclaimers_guild',
+      stats: { strength: 10, dexterity: 10, intelligence: 10, wisdom: 10, charisma: 1, stealth: 0 },
+      hp: 10, hpMax: 10, stamina: 10, staminaMax: 10, equipped: {}, ac: 10, tc: 0, corruption: 100,
+      inventory: [], factionStanding: [], activeQuests: [], milestones: {},
+    } as never;
+    expect(effectiveStats(p).charisma).toBe(1);
+    expect(effectiveStatsBreakdown(p).charisma.total).toBe(1);
   });
 });
 

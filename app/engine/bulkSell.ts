@@ -77,6 +77,21 @@ function isRunecaster(item: InventoryItem): boolean {
   return RUNECASTER_NAMES.has(item.name.toLowerCase());
 }
 
+/**
+ * ⚠⚠ OTA-1683 — A COATED PIECE IS WORK YOU DID. Owner, 09-04 22:03: *"when you
+ * sell common gear in bulk, it should exclude common gear that is unequipped
+ * but has had coatings applied to them"* — and his alternative, a lock like the
+ * Crucible reserve, is the same sentence from the other side: the sweep must
+ * not spend something the player invested in. A coating is a consumable
+ * painted on for the life of the weapon (OTA-360), exactly the shape `isForged`
+ * already spares one step up, so it joins that rule rather than a new one. The
+ * per-item sell row still sells a coated piece by hand; only the sweep steps
+ * around it, and the confirm says how many it stepped around.
+ */
+export function isCoatedGear(item: Pick<InventoryItem, 'coating' | 'coating2'>): boolean {
+  return !!item.coating || !!item.coating2;
+}
+
 export interface BulkSellCandidate {
   item: InventoryItem;
   price: number;
@@ -89,6 +104,10 @@ export interface BulkSellPlan {
   count: number;
   /** Total TC at the prices the caller computed (war premium, rapport, all of it). */
   total: number;
+  /** OTA-1683 — Common gear the sweep stepped around because it carries a
+   *  coating. Counted so the confirm can say so instead of leaving a held-out
+   *  piece to read as a button that missed one. */
+  sparedCoated: number;
 }
 
 /** ⚠⚠ THE PLAN IS RETURNED, NOT EXECUTED. The screen shows `count` and `total` in
@@ -100,15 +119,18 @@ export interface BulkSellPlan {
  *  Takes the caller's ALREADY-FILTERED sellable rows (equipped instances and
  *  unsellables removed, prices computed) and narrows to Common gear. */
 export function planCommonGearSale(sellable: readonly BulkSellCandidate[]): BulkSellPlan {
-  const rows = sellable.filter(({ item }) =>
+  const commonGear = sellable.filter(({ item }) =>
     item.rarity === 'Common'      // explicit — never the colour, never a default
     && isGearItem(item)           // weapons + armor only
     && !isForged(item)            // never something the player built
     && !isRunecaster(item),       // OTA-1570 — never the thing the Crucible upgrades
   );
+  // OTA-1683 — never something the player coated, and say how many were spared.
+  const rows = commonGear.filter(({ item }) => !isCoatedGear(item));
+  const sparedCoated = commonGear.length - rows.length;
   const count = rows.reduce((n, r) => n + Math.max(1, r.item.quantity ?? 1), 0);
   const total = rows.reduce((n, r) => n + r.price * Math.max(1, r.item.quantity ?? 1), 0);
-  return { rows, count, total };
+  return { rows, count, total, sparedCoated };
 }
 
 /** ⚠ OTA-1349 — PUNCHLIST-BRAVO B5: THE SWEEP'S HOLD-BACKS ARE SAID OUT LOUD.

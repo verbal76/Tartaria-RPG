@@ -6,6 +6,7 @@ import { isQuestLockedItem } from '../engine/questItems';
 import { isWeaponCoatingItem } from '../engine/weaponCoating';
 import { itemIsThrowable } from '../engine/bandolierEligibility';
 import { canonicalItemKind, canonicalItemTags, itemIsShield } from '../engine/crafting';
+import { reachClassFor } from '../engine/combatRules'; // OTA-1683 — weapon sub-headings by reach class
 
 export type InventoryCategory =
   | 'weapon'
@@ -254,6 +255,58 @@ export function categoriesForItem(item: InventoryItem): InventoryCategory[] {
     return ['weapon', 'material'];
   }
   return [primary];
+}
+
+/**
+ * ⚠⚠ OTA-1683 — THE WEAPONS SECTION GETS ITS SUB-HEADINGS. Owner, 09-04 22:07:
+ * *"weapons category in inventory should have subsections for each type of
+ * weapon, I don't know what's what, mele, spear, ranged and so on."* The
+ * classes already exist — combat has resolved every weapon to a reach class
+ * since OTA-550 (melee / long / ranged / runecaster / throwable) and that is
+ * the distinction that changes how a fight goes — so the pack lists by the SAME
+ * resolver rather than a second opinion. Labels in the owner's words.
+ */
+export type WeaponSubsection = 'melee' | 'long' | 'ranged' | 'runecaster' | 'throwable';
+
+export const WEAPON_SUBSECTION_ORDER: WeaponSubsection[] = ['melee', 'long', 'ranged', 'runecaster', 'throwable'];
+
+export const WEAPON_SUBSECTION_LABEL: Record<WeaponSubsection, string> = {
+  melee: 'Melee',
+  long: 'Spears & polearms',
+  ranged: 'Ranged',
+  runecaster: 'Rune-casters',
+  throwable: 'Thrown',
+};
+
+export function weaponSubsectionOf(item: InventoryItem): WeaponSubsection {
+  const cat = findWeaponByName(item.name);
+  const tags = canonicalItemTags(item);
+  const kind = cat?.weaponKind
+    ?? (item.kind === 'runecaster' ? 'runecaster' : undefined)
+    ?? (item.uniqueStats?.kind === 'weapon' ? 'melee' : undefined);
+  const rc = reachClassFor({
+    weaponKind: kind,
+    name: item.name,
+    tags,
+    throwable: itemIsThrowable(item) || tags.some((t) => /^thrown$/i.test(t)),
+  });
+  // 'barehanded' is a stance, not a thing in a pack; nothing listed here can be
+  // it, and if the resolver ever answers it for an odd row, it is a melee row.
+  return rc === 'barehanded' ? 'melee' : rc;
+}
+
+/** The Weapons rows split into labelled runs, in WEAPON_SUBSECTION_ORDER, with
+ *  empty runs dropped — the order of items within a run is the caller's. */
+export function weaponRuns(items: InventoryItem[]): Array<{ sub: WeaponSubsection; items: InventoryItem[] }> {
+  const buckets = new Map<WeaponSubsection, InventoryItem[]>();
+  for (const it of items) {
+    const sub = weaponSubsectionOf(it);
+    const arr = buckets.get(sub);
+    if (arr) arr.push(it); else buckets.set(sub, [it]);
+  }
+  return WEAPON_SUBSECTION_ORDER
+    .filter((sub) => (buckets.get(sub)?.length ?? 0) > 0)
+    .map((sub) => ({ sub, items: buckets.get(sub)! }));
 }
 
 export function groupInventoryByCategory(

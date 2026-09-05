@@ -85,7 +85,9 @@ const EXTS = new Set(['.ts', '.tsx']);
  */
 const REGISTRY = [
   { file: 'app/screens/CharacterScreen.tsx', cond: 'collapsed[key]', trueMeans: 'closed' },
-  { file: 'app/screens/CharacterScreen.tsx', cond: 'giftsOpen', trueMeans: 'open' },
+  // OTA-1683 — the gifts row and the wrongs row share one toggle site; `open`
+  // is whichever ledger the row owns (giftsOpen / wrongsOpen).
+  { file: 'app/screens/CharacterScreen.tsx', cond: 'open', trueMeans: 'open' },
   { file: 'app/screens/CharacterScreen.tsx', cond: 'isOpen', trueMeans: 'open' },
   { file: 'app/screens/CharacterScreen.tsx', cond: 'expanded', trueMeans: 'open' },
   { file: 'app/screens/ContractsScreen.tsx', cond: 'active', trueMeans: 'open' },
