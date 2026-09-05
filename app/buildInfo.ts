@@ -28114,6 +28114,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // that share the list (`dog_rescue_pending:`, `puppy_vendor_trade_id:`) are
 // bookkeeping and never reach a prompt.
 export const OTA_BUILD_ID = '2026-09-05-1697-the-notes-reach-the-narrator';
+// golem catch-up 2026-09-05: markerless publish of OTA-1697 - the notes reach
+// the narrator. The newest three whisper-chain notes ride the Qwen fact sheet
+// from both narration builders; machine memos never reach a prompt. hal took
+// the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1696-the-fight-sheds-its-passengers';
 // golem catch-up 2026-09-05: markerless publish of OTA-1696 - the fight sheds
 // its passengers. The classifier keeps two cores and skips confident combat
