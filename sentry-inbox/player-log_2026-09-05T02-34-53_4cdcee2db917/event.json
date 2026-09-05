@@ -1,0 +1,261 @@
+{
+  "id": "4cdcee2db91742419456ad14ff353332",
+  "groupID": "7713038385",
+  "eventID": "4cdcee2db91742419456ad14ff353332",
+  "projectID": "4511945117532160",
+  "size": 16368,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-05-1679-the-part-fits-the-wire #mtnrscwz8pab [inline 15/42]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-05-1679-the-part-fits-the-wire",
+  "message": "player-log 2026-09-05-1679-the-part-fits-the-wire #mtnrscwz8pab [inline 15/42]",
+  "title": "player-log 2026-09-05-1679-the-part-fits-the-wire #mtnrscwz8pab [inline 15/42]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db9b:1270:ad2:ae57:4dfe:c42c",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "b18202b390484d3faf1a66cb518122ae",
+      "span_id": "866705e4d69af894",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "WzIwMjYtMDktMDRUMjM6NDk6MzUuMzM0Wl0gW2RlYnVnXSBzdGF0czogU1RSMjIgREVYMTggSU5UMTQgV0lTMTcgQ0hBMTIgU1RFOCB8IGdlYXI6IFdJUys1LElOVCszLFNUUis5LERFWCs2LFNURSsyIHwgd29ybjogbWFpbj1NdWQtSXJvbiBHcmVhdGJsYWRlIGhlYWQ9QXJjaGl0ZWN0J3MgU2lnaHQgRW5oYW5jZXIgY2hlc3Q9TXVkLWdsYXNzIFNjYWxlcyBoYW5kcz1UaXRhbidzIEdhdW50bGV0cyBsZWdzPUxpdGFueSBHcmVhdmVzIGZlZXQ9QWV0aGVyLVdhbGtlcidzIEJvb3RzIGNsb2FrPVJlY2xhaW1lcidzIENsb2FrIGFtdWxldD1BbXVsZXQgb2YgdGhlIFNpbHQgV2FyZGVuIHJpbmc9VGFydGFyaWFuIE9hdGgtQmFuZCByaW5nMj1UaW4gV2FyZCBSaW5nIHJpbmczPVRpbiBXYXJkIFJpbmcgcmluZw==",
+      "ND1TY3JpYmUncyBTaWduZXQKWzIwMjYtMDktMDRUMjM6NDk6NDUuMDc4Wl0gW3dvcmxkXSBZb3Ugc2V0IHRoZSBNdWQtSXJvbiBHcmVhdGJsYWRlIGFzaWRlIHRvIGZyZWUgeW91ciBvZmYgaGFuZCBmb3IgdGhlIFJlY2xhaW1lcnMgR3VpbGQgR2VvZGUtQ29yZWQgQ2xlYXZlci4KWzIwMjYtMDktMDRUMjM6NDk6NDUuMTcyWl0gW2RlYnVnXSBzdGF0czogU1RSMTkgREVYMTkgSU5UMTUgV0lTMTcgQ0hBMTIgU1RFOCB8IGdlYXI6IFdJUys1LElOVCs0LFNUUis2LERFWCs3LFNURSsyIHwgd29ybjogb2ZmPVJlY2xhaW1lcnMgR3VpbGQgR2VvZGUtQ29yZWQgQ2xlYXZlciBoZWFkPUFyY2hpdGVjdCdzIFNpZ2h0IEVuaGFuY2VyIGNoZXN0PU11ZC1nbGFzcyBTY2FsZXMgaGFuZHM9VGl0YW4ncyBHYXVudGxldA==",
+      "cyBsZWdzPUxpdGFueSBHcmVhdmVzIGZlZXQ9QWV0aGVyLVdhbGtlcidzIEJvb3RzIGNsb2FrPVJlY2xhaW1lcidzIENsb2FrIGFtdWxldD1BbXVsZXQgb2YgdGhlIFNpbHQgV2FyZGVuIHJpbmc9VGFydGFyaWFuIE9hdGgtQmFuZCByaW5nMj1UaW4gV2FyZCBSaW5nIHJpbmczPVRpbiBXYXJkIFJpbmcgcmluZzQ9U2NyaWJlJ3MgU2lnbmV0ClsyMDI2LTA5LTA0VDIzOjQ5OjU0LjQ3NVpdIFtkZWJ1Z10gdWk6IHRhcCAi8J+UpSBnZW9kZS1jb3JlZCBjbGVhdmVyIOKakiIKWzIwMjYtMDktMDRUMjM6NDk6NTQuNDgwWl0gW2RlYnVnXSBxd2VuOiBsb2FkaW5nICh3YXMgaWRsZSkg4oCUIHRoZSBBcmJpdGVyIHNwZWFrcyB0ZW1wbGF0ZXMgdW50aWwgaXQgaXMgcmVhZHkK",
+      "WzIwMjYtMDktMDRUMjM6NDk6NTQuNTU2Wl0gW3BsYXllcl0gYXR0YWNrIHdpdGggdGhlIG9mZi1oYW5kIHJlY2xhaW1lcnMgZ3VpbGQgZ2VvZGUtY29yZWQgY2xlYXZlcgpbMjAyNi0wOS0wNFQyMzo0OTo1NC41NTdaXSBbZGVidWddIHBhcnNlcjogaW50ZW50PWF0dGFjayBjb25mPTEuMDAgdmVyYj1hdHRhY2sgdGFyZ2V0PWhhbmQgcmVjbGFpbWVycyBndWlsZCBnZW9kZSBjb3JlZCBjbGVhdmVyIHJlc29sdmVkPVJlY2xhaW1lcnMgR3VpbGQgR2VvZGUtQ29yZWQgQ2xlYXZlciByYW5nZT1taWQgZW5lbWllcz0xIGhvb2tzPTAK",
+      "WzIwMjYtMDktMDRUMjM6NDk6NTQuNTU4Wl0gW2RlYnVnXSBhdHRhY2s6IHRhcmdldD1Cb2cgRHJhZ29uIChodW50ZWQpIHJhbmdlPW1pZCByZWFjaC5iYW5kcz1bY2xvc2VdIHJlYWNoLmxhYmVsPVJlY2xhaW1lcnMgR3VpbGQgR2VvZGUtQ29yZWQgQ2xlYXZlciBiYXJlSGFuZD1mYWxzZQpbMjAyNi0wOS0wNFQyMzo0OTo1NC41NThaXSBbYXJiaXRlcl0gVGhlIEFyYml0ZXIgaG9sZHMgdXAgYSBoYW5kLiAiUmVjbGFpbWVycyBHdWlsZCBHZW9kZS1Db3JlZCBDbGVhdmVyIHdvcmtzIGF0IGNsb3NlIC8gYXJtJ3MgcmVhY2ggcmFuZ2Ugb25seSDigJQgeW91J3JlIGF0IG1pZC1yYW5nZS4gQURWQU5DRSB0byBjbG9zZSBpbiAodGhleSdsbCBhbnN3ZXIgdGhlIGFwcHJvYWNoKSwgb3IgYXR0YWNrIHdpdGggc29t",
+      "ZXRoaW5nIHRoYXQgcmVhY2hlcy4iClsyMDI2LTA5LTA0VDIzOjQ5OjU0LjkzMFpdIFtjb2duaXRpdmVdIERJU0VOR0FHRSDCtyBUQUxLICAoMzcwbXMpClsyMDI2LTA5LTA0VDIzOjQ5OjU1Ljc4NVpdIFtkZWJ1Z10gY3R4OiBPUEVORUQg4oCUIGxpdmU9MSAob3BlbmVkPTEgcmVsZWFzZWQ9MCkg4omINDI1TUIgZXN0ClsyMDI2LTA5LTA0VDIzOjQ5OjU2LjY1NlpdIFtkZWJ1Z10gdWk6IHRhcCAiYXBwcm9hY2giClsyMDI2LTA5LTA0VDIzOjQ5OjU2LjcxOVpdIFtwbGF5ZXJdIGFwcHJvYWNoIEJvZyBEcmFnb24gKGh1bnRlZCkK",
+      "WzIwMjYtMDktMDRUMjM6NDk6NTYuNzE5Wl0gW2RlYnVnXSBwYXJzZXI6IGludGVudD1hZHZhbmNlIGNvbmY9MS4wMCB2ZXJiPWFwcHJvYWNoIHRhcmdldD1ib2cgZHJhZ29uIGh1bnRlZCByZXNvbHZlZD1Cb2cgRHJhZ29uIChodW50ZWQpIHJhbmdlPW1pZCBlbmVtaWVzPTEgaG9va3M9MApbMjAyNi0wOS0wNFQyMzo0OTo1Ni43MjJaXSBbZGVidWddIG1vdmU6IGFkdmFuY2UgZnJvbSByYW5nZT1taWQgZW5lbWllcz0xIHdlYXRoZXI9QWV0aGVyIExpZ2h0bmluZyBjb3N0PTEgcGFydGlhbD0wClsyMDI2LTA5LTA0VDIzOjQ5OjU2LjcyM1pdIFtkZWJ1Z10gbW92ZTogZmllbGQgYWR2YW5jZSB0YXJnZXQ9Qm9nIERyYWdvbiAoaHVudGVkKSBkIDEuNTAtPjAuNTAgYmFuZCBtaWQtPmNsb3NlCg==",
+      "WzIwMjYtMDktMDRUMjM6NDk6NTYuNzIzWl0gW3dvcmxkXSBZb3UgY2xvc2UgdGhlIGdhcCB3aXRoIEJvZyBEcmFnb24gKGh1bnRlZCkuIChyYW5nZTogY2xvc2UgLyBhcm0ncyByZWFjaCkKWzIwMjYtMDktMDRUMjM6NDk6NTYuNzI1Wl0gW2NvbWJhdF0gQm9nIERyYWdvbiAoaHVudGVkKSDigJQgZDIwIOKGkiAxMiArIEFUSyAxMSA9IDIzIHZzIHlvdXIgQUMgMjIg4oCUIOKckyBISVQKWzIwMjYtMDktMDRUMjM6NDk6NTYuNzI2Wl0gW2NvbWJhdF0gWW91ciBhcm1vdXIgdHVybnMgdGhlIGJsb3cgYmFjayDigJQgQm9nIERyYWdvbiAoaHVudGVkKSB0YWtlcyAxIGJsdWRnZW9uaW5nLiAoMzgzIEhQIGxlZnQpCg==",
+      "WzIwMjYtMDktMDRUMjM6NDk6NTcuMDkwWl0gW2NvbWJhdF0gQm9nIERyYWdvbiAoaHVudGVkKSBkZWFscyAyNyBibHVkZ2VvbmluZyBkYW1hZ2UuIFlvdSBoYXZlIDIgSFAgcmVtYWluaW5nLgpbMjAyNi0wOS0wNFQyMzo0OTo1Ny4wOTFaXSBbYXJiaXRlcl0gVGhlIEFyYml0ZXIgaG9sZHMgeW91ciBnYXplLiAiQ2hlZGRhciBCb2IsIHlvdSdyZSBiYWRseSBpbmp1cmVkLiBUYWtlIGEgbW9tZW50IOKAlCBlYXQgd2hhdCB5b3UgaGF2ZSwgb3BlbiB0aGUgZmlyc3QtYWlkIGtpdCwgb3IgcmVzdCBzb21ld2hlcmUgc2FmZS4gVGhlIE91dHNraXJ0cyBkbyBub3QgcmV0dXJuIHdoYXQgdGhleSB0YWtlLiIK",
+      "WzIwMjYtMDktMDRUMjM6NDk6NTcuMDkxWl0gW2NvbWJhdF0gQm9nIERyYWdvbiAoaHVudGVkKSByZWdlbmVyYXRlcyAyIEhQICgzODQvMzg0KS4KWzIwMjYtMDktMDRUMjM6NDk6NTcuNDA1Wl0gW2NvZ25pdGl2ZV0gbmV1dHJhbCAgKDY3Nm1zKQpbMjAyNi0wOS0wNFQyMzo0OTo1OC4wMDhaXSBbZGVidWddIHVpOiB0YXAgIvCflKUgZ2VvZGUtY29yZWQgY2xlYXZlciDimpIiClsyMDI2LTA5LTA0VDIzOjQ5OjU4LjA0NVpdIFtwbGF5ZXJdIGF0dGFjayB3aXRoIHRoZSBvZmYtaGFuZCByZWNsYWltZXJzIGd1aWxkIGdlb2RlLWNvcmVkIGNsZWF2ZXIK",
+      "WzIwMjYtMDktMDRUMjM6NDk6NTguMDQ2Wl0gW2RlYnVnXSBwYXJzZXI6IGludGVudD1hdHRhY2sgY29uZj0xLjAwIHZlcmI9YXR0YWNrIHRhcmdldD1oYW5kIHJlY2xhaW1lcnMgZ3VpbGQgZ2VvZGUgY29yZWQgY2xlYXZlciByZXNvbHZlZD1SZWNsYWltZXJzIEd1aWxkIEdlb2RlLUNvcmVkIENsZWF2ZXIgcmFuZ2U9Y2xvc2UgZW5lbWllcz0xIGhvb2tzPTAKWzIwMjYtMDktMDRUMjM6NDk6NTguMDQ3Wl0gW2RlYnVnXSBhdHRhY2s6IHRhcmdldD1Cb2cgRHJhZ29uIChodW50ZWQpIHJhbmdlPWNsb3NlIHJlYWNoLmJhbmRzPVtjbG9zZV0gcmVhY2gubGFiZWw9UmVjbGFpbWVycyBHdWlsZCBHZW9kZS1Db3JlZCBDbGVhdmVyIGJhcmVIYW5kPWZhbHNlCg==",
+      "WzIwMjYtMDktMDRUMjM6NDk6NTguMTE4Wl0gW3dvcmxkXSBZb3UgcmFpc2UgdGhlIHNtb2xkZXJpbmcgcmVjbGFpbWVycyBndWlsZCBnZW9kZS1jb3JlZCBjbGVhdmVyIHRvd2FyZCBCb2cgRHJhZ29uIChodW50ZWQpLiBUaGUgcm9vbSBuYXJyb3dzIGFyb3VuZCB0aGUgYm90aCBvZiB5b3UuClsyMDI2LTA5LTA0VDIzOjQ5OjU4LjExOFpdIFtzeXN0ZW1dIOKPsyBUaW1lIHBhc3NlZDogNiBtaW4KWzIwMjYtMDktMDRUMjM6NDk6NTguNDIyWl0gW2NvZ25pdGl2ZV0gRElTRU5HQUdFIMK3IFRBTEsgICgzMDNtcykKWzIwMjYtMDktMDRUMjM6NTA6MDUuNDA2Wl0gW3dvcmxkXSBCb2cgRHJhZ29uIChodW50ZWQpIG1vdmVzIGZpcnN0LiBUaGUgcHJlc3N1cmUgaXMgaW1tZWRpYXRlLgo=",
+      "WzIwMjYtMDktMDRUMjM6NTA6MDUuNDA4Wl0gW2NvbWJhdF0gQm9nIERyYWdvbiAoaHVudGVkKSDigJQgZDIwIOKGkiAxMiArIEFUSyAxMSA9IDIzIHZzIHlvdXIgQUMgMjIg4oCUIOKckyBISVQKWzIwMjYtMDktMDRUMjM6NTA6MDUuNzU2Wl0gW2NvbWJhdF0gQm9nIERyYWdvbiAoaHVudGVkKSBkZWFscyAyOCBibHVkZ2VvbmluZyBkYW1hZ2UuIFlvdSBmYWxsLgpbMjAyNi0wOS0wNFQyMzo1MDowNS43NTdaXSBbY29tYmF0XSBDaGVkZGFyIEJvYidzIGJyZWF0aCBsZWF2ZXMuIFRoZSBkdXN0IHNldHRsZXMgYmFjayBpbnRvIGl0cyBvbGQgcGF0dGVybnMuCg==",
+      "WzIwMjYtMDktMDRUMjM6NTA6MDUuNzU3Wl0gW3N5c3RlbV0gQ2hlZGRhciBCb2IgaGFzIGZhbGxlbi4gQSBSZXN1cnJlY3Rpb24gR2VtIGZyb20gdGhlIHRpdGxlIHNjcmVlbiBjYW4gYnJpbmcgdGhlbSBiYWNrLgpbMjAyNi0wOS0wNFQyMzo1MDowNi4zOTNaXSBbc3lzdGVtXSBZb3Ugam9pbiB0aGUgRmFsbGVuIG9mIFRhcnRhcmlhIOKAlCAxMiBuYW1lcyB0aGUgYnVyaWVkIHdvcmxkIGtlZXBzIG5vdy4gUmVhZCB0aGUgcm9sbCBmcm9tIHRoZSBMb3JlIENvZGV4Lgo=",
+      "WzIwMjYtMDktMDRUMjM6NTA6MDYuNzg3Wl0gW2RlYnVnXSBwZXJzaXN0IHNpemVzKEtCKTogdG90YWw9MzM0IHBsYXllcj03NSB3bT0xNzVbcm9vbXM9OTkgZXZlbnRzPTYgbWVtb3M9MSBucGNzPTYgZGVmZWF0ZWQ9MSB0YWdzPTEgZGlzY292ZXJlZD0xXSBsb2c9ODEgc2NlbmU9MgpbMjAyNi0wOS0wNFQyMzo1MDoxMi4xMzJaXSBbZGVidWddIHNjZW5lOiBsb2M9YnJva2VuX3N0ZWVwbGUgaHViPS0gYXJyaXZhbD1uIG9wZW5pbmc9biBwYXNzaW5nPW4K",
+      "WzIwMjYtMDktMDRUMjM6NTA6MTIuMTM1Wl0gW2RlYnVnXSBtaXNzaW9uczogaHVudDpodW50X3NlcnZhbnRzX2RvdWJ0ZXIgc3RhZ2UgNC81IFtib3Nz4oaSYXR0YWNrXSBAcmVhdmVyc19jcmVzdCBuZWVkcz1SYWlkZXIncyBSaWRnZS1TaWdu4pyTIFBBVVNFRApbMjAyNi0wOS0wNFQyMzo1MDoxMi4xMzVaXSBbZGVidWddIG1pc3Npb25zOiBodW50Omh1bnRfYm9nX2RyYWdvbiBzdGFnZSA2LzcgW2Jvc3PihpJhdHRhY2tdIEBicm9rZW5fc3RlZXBsZSBIRVJFIG5lZWRzPUVzaHJlbidzIE5hbWUtVG9rZW7inJMK",
+      "WzIwMjYtMDktMDRUMjM6NTA6MTIuMTM1Wl0gW2RlYnVnXSBtaXNzaW9uczogaHVudDpodW50X211ZF90aXRhbiBzdGFnZSAwLzcgW2RpcGxvbWFjeV0gQHRhcnRhcmlhbl9lbmNsYXZlIG5wYz0idGhlIFRydWUgVGFydGFyaWFuIGFnZW50IiBnaXZlcz1FbmNsYXZlIFdyaXQgUEFVU0VEClsyMDI2LTA5LTA0VDIzOjUwOjEyLjEzNVpdIFtkZWJ1Z10gbWlzc2lvbnM6IGh1bnQ6aHVudF9pcm9uX3RpdGFuIHN0YWdlIDAvNyBbZGlwbG9tYWN5XSBAdmFyYWt1c2ggbnBjPSJ0aGUgT3JkZXIgZW52b3kiIGdpdmVzPVNlYWxlZCBSZWxpcXVhcnkgQm94IFBBVVNFRAo=",
+      "WzIwMjYtMDktMDRUMjM6NTA6MTIuMTM1Wl0gW2RlYnVnXSBtaXNzaW9uczogbXlzdGVyeTpteXN0ZXJ5X3RlbXBvcmFsX3dhdGNoIHN0YWdlIDIvNCBbc3RlYWx0aF0gQGJ1cmllZF9jaXRpZXMgbmVlZHM9RWRkeS1ab25lIFJlYWRpbmfinJdNSVNTSU5HIGdpdmVzPVRlbXBvcmFsIERpc3RvcnRpb24gV2F0Y2ggUEFVU0VEClsyMDI2LTA5LTA0VDIzOjUwOjEyLjEzNVpdIFtkZWJ1Z10gbWlzc2lvbnM6IG15c3Rlcnk6bXlzdGVyeV9vYnNpZGlhbl9vcmIgc3RhZ2UgMC80IFtkaXBsb21hY3ldIEBtb25hcmNoX3dheXN0YXRpb24gbnBjPSJ0aGUgTXVkIE1vbmFyY2ggY291cmllciIgZ2l2ZXM9TW9uYXJjaCBDb3VyaWVyIFdyaXQgUEFVU0VECg==",
+      "WzIwMjYtMDktMDRUMjM6NTA6MTIuMTM1Wl0gW2RlYnVnXSBtaXNzaW9uczogbXlzdGVyeTpteXN0ZXJ5X2NyYWRsZV9jb21wYXNzIHN0YWdlIDAvMyBbZGlwbG9tYWN5XSBAaGlkZGVuX21hcmtldCBucGM9IkhhbGVtIHRoZSBUcmFkZXIiIGdpdmVzPUhhbGVtJ3MgQnJva2VuIENvbXBhc3MgUEFVU0VEClsyMDI2LTA5LTA0VDIzOjUwOjEyLjEzNlpdIFtkZWJ1Z10gbWlzc2lvbnM6IMK3IGF0PWJyb2tlbl9zdGVlcGxlClsyMDI2LTA5LTA0VDIzOjUwOjEyLjEzNlpdIFt3b3JsZF0g4pa4IFRoZSBCb2cgRHJhZ29uIG9mIE9sZCBEcmFrb3ZhOiB0aGlzIGlzIHRoZSBwbGFjZSDigJQgc3RyaWtlLgo=",
+      "WzIwMjYtMDktMDRUMjM6NTA6MTIuMTY1Wl0gW3dvcmxkXSBCb2x0cyBvZiBibHVlLXB1cnBsZSBlbmVyZ3kgc3RyaWtlIHdpdGhvdXQgdGh1bmRlciDigJQgdHJhcHBlZCBFdGhlcml1bSB2ZW50aW5nIGEgY2hhcmdlIGl0IGhhcyBoZWxkIHNpbmNlIHRoZSBjYWxjaWZpY2F0aW9uLiBFYWNoIGZsYXNoIGxlYXZlcyBhbiBhZnRlcmltYWdlIGJ1cm5lZCBvbnRvIHRoZSBleWUuCgo=",
+      "WW91IGFyZSBhdCBUaGUgQnJva2VuIFN0ZWVwbGUuIEEgZHJvd25lZCBjYXRoZWRyYWwncyBzdGVlcGxlIHN0YW5kaW5nIG91dCBvZiB0aGUgTXVkIFNlYXMgbGlrZSBhIGJyb2tlbiB0b290aCDigJQgdGhlIG9uZSBoYXJkIHBvaW50IGluIGEgaG9yaXpvbiBvZiBzbG93IHdhdGVyLCBhbmQgdGhlIHBlcmNoIHRoZSBCb2cgRHJhZ29uIGNvaWxzIHRvIHdoZW4gaXQgd2FudHMgdG8gYmUgZm91bmQuCgpIYXphcmQ6IFRhcnRhcmlhbiBUcmFwLiBBIHByZXNzdXJlIHBsYXRlIG9sZGVyIHRoYW4gcmVjb3JkZWQgaGlzdG9yeSB0cmlnZ2Vycy4gV2FsbHMgc2hpZnQsIGZsb29yIG9wZW5zLCBlbmVyZ3kgbGFuY2VzIHN0cmlrZS4K",
+      "WzIwMjYtMDktMDRUMjM6NTA6MTIuMTY1Wl0gW3dvcmxkXSBZb3UgaGF2ZSBiZWVuIGhlcmUuIFRoZSBzaGFwZSBvZiBpdCBjb21lcyBiYWNrIGJlZm9yZSB0aGUgZGV0YWlscyBkby4gVGhlIGJvZGllcyB5b3UgbGVmdCBhcmUgc3RpbGwgaGVyZS4gTm90aGluZyBoYXMgbW92ZWQgaW4gdG8gcmVwbGFjZSB0aGVtLgpbMjAyNi0wOS0wNFQyMzo1MDoxMi4xNjhaXSBbd29ybGRdIFtUaGUgQnJva2VuIFN0ZWVwbGVdIG5vcnRoOiBSZXZpdmFsaXN0IEZpZWxkIENhbXAgKDQgdGlsZXMsIDEwIGhvdXJzKSDCtyBlYXN0OiBUaGUgRHJvd25lZCBRdWFydGVyICg0IHRpbGVzLCAxMCBob3Vycykgwrcgc291dGg6IERyYWtvdmEgKDMgdGlsZXMsIDggaG91cnMpIMK3IHdlc3Q6IE11ZCBTZWFzICgxIHRpbGUsIDMgaG91cg==",
+      "cykKWzIwMjYtMDktMDRUMjM6NTA6MTIuMTc1Wl0gW3Jld2FyZF0g4pymIFJlc3VycmVjdGlvbi4gQ2hlZGRhciBCb2IgcmV0dXJucyB0byBUYXJ0YXJpYSwgcmVzdG9yZWQuIFRoZSBBZXRoZXJzdG9uZSBodW1zIGluIHJlY29nbml0aW9uLgpbMjAyNi0wOS0wNFQyMzo1MDoxMi4zOTFaXSBbd29ybGRdIFRoZSBjYXRoZWRyYWwgc3RlZXBsZSBzdGFuZHMgb3V0IG9mIHRoZSBNdWQgU2VhcyBsaWtlIGEgYnJva2VuIHRvb3RoLCBhbmQgdGhlIERyYWdvbiB1bmNvaWxzIGZyb20gaXQuIFlvdSByZWFkIHRoZSB0aW4g4oCUIEVTSFJFTiDigJQgYW5kIGl0IHN0YWxscywgZm9yIG9uZSBsb25nIGJyZWF0aCwgZXllcyB3aWRlLiBOb3cgb3IgbmV2ZXIuCg==",
+      "WzIwMjYtMDktMDRUMjM6NTA6MTIuMzkyWl0gW2FyYml0ZXJdICJXaGF0ZXZlciB5b3UgZG8sIGRvIG5vdCBsZXQgaXQgZ2V0IGFpcmJvcm5lIGFnYWluLCIgdGhlIEFyYml0ZXIgc2F5cy4KWzIwMjYtMDktMDRUMjM6NTA6MTIuMzkyWl0gW2RlYnVnXSBkZWR1cDogc3VwcHJlc3NlZCBhcmJpdGVyIHJlcGVhdCDigJQgIiJXaGF0ZXZlciB5b3UgZG8sIGRvIG5vdCBsZXQgaXQgZ2V0IGFpcmJvcm5lIGFnYWluLCIgdGhlIEFyYuKApiIKWzIwMjYtMDktMDRUMjM6NTA6MTIuMzkzWl0gW2NvbWJhdF0gQm9nIERyYWdvbiAoaHVudGVkKSBjbG9zZXMgdGhlIGRpc3RhbmNlLiBUaGUgaHVudCBjb21lcyB0byBpdHMgZW5kLgo=",
+      "WzIwMjYtMDktMDRUMjM6NTA6MTIuMzkzWl0gW2NvbWJhdF0gVGhlIGJvZyBzd2VsbHMgYW5kIHBhcnRzLiBUaGUgb2xkIERyYWdvbiBoYXMgZGVjaWRlZCB5b3UgYXJlIHdvcnRoIHN1cmZhY2luZyBmb3IuClsyMDI2LTA5LTA0VDIzOjUwOjEyLjM5M1pdIFtkZWJ1Z10gbWlzc2lvbiBjYXJkOiAiVGhlIEJvZyBEcmFnb24gb2YgT2xkIERyYWtvdmEiIMK3IGZpZ2h0ClsyMDI2LTA5LTA0VDIzOjUwOjE1LjA0MVpdIFtkZWJ1Z10gdWk6IHRhcCAibWlzc2lvbiBjYXJkIMK3IEZJR0hUIgpbMjAyNi0wOS0wNFQyMzo1MDoxNy41OTNaXSBbZGVidWddIHVpOiB0YXAgImludmVudG9yeSIK",
+      "WzIwMjYtMDktMDRUMjM6NTA6NDQuMDUwWl0gW3dvcmxkXSBZb3UgcHVsbCBTZW50aW5lbCBDb3JlIFBsYXRlIG9mZiB0aGUgYmFuZG9saWVyIGFuZCBiYWNrIGludG8geW91ciBwYWNrLgpbMjAyNi0wOS0wNFQyMzo1MDo1My4yMTdaXSBbd29ybGRdIFlvdSByYWNrIENvcnJ1cHRpb24gVG9uaWMgb24geW91ciBiYW5kb2xpZXIuIFJlYWR5IHRvIHRocm93Lgo=",
+      "WzIwMjYtMDktMDRUMjM6NTE6MTguNzU3Wl0gW2RlYnVnXSBzdGF0czogU1RSMTkgREVYMTkgSU5UMTYgV0lTMTcgQ0hBMTIgU1RFOCB8IGdlYXI6IFdJUys1LElOVCs1LFNUUis2LERFWCs3LFNURSsyIHwgd29ybjogbWFpbj1BdXJhbGl0ZSBUYWxvbiBvZmY9UmVjbGFpbWVycyBHdWlsZCBHZW9kZS1Db3JlZCBDbGVhdmVyIGhlYWQ9QXJjaGl0ZWN0J3MgU2lnaHQgRW5oYW5jZXIgY2hlc3Q9TXVkLWdsYXNzIFNjYWxlcyBoYW5kcz1UaXRhbidzIEdhdW50bGV0cyBsZWdzPUxpdGFueSBHcmVhdmVzIGZlZXQ9QWV0aGVyLVdhbGtlcidzIEJvb3RzIGNsb2FrPVJlY2xhaW1lcidzIENsb2FrIGFtdWxldD1BbXVsZXQgb2YgdGhlIFNpbHQgV2FyZGVuIHJpbmc9VGFydGFyaWFuIE9hdGgtQmFuZCByaW5nMj1UaQ==",
+      "biBXYXJkIFJpbmcgcmluZzM9VGluIFdhcmQgUmluZyByaW5nND1TY3JpYmUncyBTaWduZXQKWzIwMjYtMDktMDRUMjM6NTE6MzUuNjY4Wl0gW2RlYnVnXSBzdGF0czogU1RSMjEgREVYMTggSU5UMTUgV0lTMTcgQ0hBMTIgU1RFOCB8IGdlYXI6IFdJUys1LElOVCs0LFNUUis4LERFWCs2LFNURSsyIHwgd29ybjogbWFpbj1BdXJhbGl0ZSBUYWxvbiBvZmY9U2VudGluZWwgQ2xlYXZlciBoZWFkPUFyY2hpdGVjdCdzIFNpZ2h0IEVuaGFuY2VyIGNoZXN0PU11ZC1nbGFzcyBTY2FsZXMgaGFuZHM9VGl0YW4ncyBHYXVudGxldHMgbGVncz1MaXRhbnkgR3JlYXZlcyBmZWV0PUFldGhlci1XYWxrZXIncyBCb290cyBjbG9haz1SZWNsYWltZXIncyBDbG9hayBhbXVsZXQ9QW11bGV0IG9mIHRoZSBTaWx0IFdhcmRlbg==",
+      "IHJpbmc9VGFydGFyaWFuIE9hdGgtQmFuZCByaW5nMj1UaW4gV2FyZCBSaW5nIHJpbmczPVRpbiBXYXJkIFJpbmcgcmluZzQ9U2NyaWJlJ3MgU2lnbmV0ClsyMDI2LTA5LTA0VDIzOjUxOjQ3LjQ4MlpdIFtyZXdhcmRdIFlvdSB3b3JrIHRoZSBmcm9zdCBwYXN0ZSBhbG9uZyB0aGUgd2VhcG9uLiBOb3cgd2llbGRpbmcgdGhlIEZyb3N0LVJpbWVkIFNlbnRpbmVsIENsZWF2ZXIg4oCUIDFkNiBjb2xkIG9uIGV2ZXJ5IGxhbmRpbmcgaGl0Lgo=",
+      "WzIwMjYtMDktMDRUMjM6NTE6NDkuMDcyWl0gW2RlYnVnXSBwZXJzaXN0IHNpemVzKEtCKTogdG90YWw9MzM2IHBsYXllcj03NSB3bT0xNzZbcm9vbXM9OTkgZXZlbnRzPTYgbWVtb3M9MSBucGNzPTYgZGVmZWF0ZWQ9MSB0YWdzPTEgZGlzY292ZXJlZD0xXSBsb2c9ODMgc2NlbmU9MgpbMjAyNi0wOS0wNFQyMzo1MTo1OS4yODRaXSBbZGVidWddIHVpOiB0YXAgImFwcHJvYWNoIgpbMjAyNi0wOS0wNFQyMzo1MTo1OS4zMzRaXSBbcGxheWVyXSBhcHByb2FjaCBCb2cgRHJhZ29uIChodW50ZWQpCg=="
+    ],
+    "chunkChars": 9949,
+    "chunkEncoding": "base64"
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-05-1679-the-part-fits-the-wire #mtnrscwz8pab [inline 15/42]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtnrscwz8pab"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-05-1679-the-part-fits-the-wire"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "15"
+    },
+    {
+      "key": "parts",
+      "value": "42"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-05-1679-the-part-fits-the-wire"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db9b:1270:ad2:ae57:4dfe:c42c",
+      "query": "user.ip:\"2607:fb90:db9b:1270:ad2:ae57:4dfe:c42c\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-05T02:34:51.654577Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-05T02:34:53.639000Z",
+  "fingerprints": [
+    "ce9c76087b5893738c6b72fecf9a040b"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1956561089,
+    "commitCount": 6,
+    "data": {},
+    "dateCreated": "2026-09-05T02:26:55.564830Z",
+    "dateReleased": "2026-09-05T02:28:06.654518Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "1ed15bf153feca7f81461bd8d91693cb24f9f2cb",
+      "message": "[ota-hal] OTA-1679: the part fits the wire\n\nAn OTA-1677 regression, found reviewing the owner's 01:50 push \u2014 the first\nfull logs sent under 1677.\n\nMEASURED\nEvery one of the 56 full parts in the two bundles came back as 33\u201337 blocks\nwhose JSON ran 16,413\u201316,424 characters, the last block cut mid-string\n(undecodable) and every block after it gone. 11,891 of 15,000 characters\nsurvived per part: a 21% hole in every log, where 1520's problem had been one\n400-character block in 29% of events. The assembled logs read 332,519 of the\n399,911 characters the device said it sent.\n\nWHY\nOTA-1677 base64-encoded every block so the scrubber is handed no text. It was\nmeasured against the scrubber and it won. It was never measured against\nSentry's TRIM of the `extra` value: a 15,000-character raw part encodes to\n~20,000 characters of array, and Sentry cuts the value at a fixed budget. The\npre-1677 part (15,000 raw, ~15.1K of JSON) had sat just under that budget,\nwhich is why the trim had never shown itself in a year of parts.\n\nFIX\nParts are packed by ENCODED cost, not cut by raw length. `packLogIntoParts`\nencodes every block first and closes a part when the next block would push\nits JSON past INLINE_PART_BUDGET_CHARS (14,000 \u2014 a fifth under the measured\ntrim) or its raw text past INLINE_CHUNK_CHARS (now 10,000, the ceiling rather\nthan the cut). Nothing the log contains can push a part past the budget: a\nrun of three-byte glyphs encodes to four times its character count and the\npacker counts what the wire will carry. `chunkChars` stays the raw receipt,\nthe relay is unchanged, and a part count is whatever the packing produced.\n\nPROVEN: the suite packs a real 400 KB delivered log from the inbox and a\n60,000-glyph worst case, and checks every part under budget, every raw part\nunder the ceiling, every block whole, and the join exact.\n\n- app/diagnostics/sentryTransport.ts \u2014 INLINE_PART_BUDGET_CHARS,\n  packLogIntoParts, INLINE_CHUNK_CHARS 15,000 \u2192 10,000; sendGameLogInline\n  ships the packed parts.\n- __tests__/ota1679ThePartFitsTheWire.test.ts \u2014 7 tests.\n- __tests__/ota1518, ota1520, ota1677 \u2014 the sender-shape pins repointed.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-05T02:24:12Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-05-1679-the-part-fits-the-wire",
+          "shortVersion": "tartaria@4.32.11+2026-09-05-1679-the-part-fits-the-wire",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-05T02:28:06.654518Z",
+          "dateCreated": "2026-09-05T02:26:55.564830Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155746036",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-05T02:28:06.954267Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-05-1679-the-part-fits-the-wire",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-05-1679-the-part-fits-the-wire",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-05-1679-the-part-fits-the-wire",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-05-1679-the-part-fits-the-wire)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "5dee77b158c64dd887c6c369c5a02fda",
+  "previousEventID": "434673296d7d45b68158e5a6f5423943"
+}

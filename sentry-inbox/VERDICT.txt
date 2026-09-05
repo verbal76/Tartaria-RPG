@@ -8,13 +8,9 @@
   /organizations/hot-attic-games-llc/issues/7700159767/events/?full=false
     1 page(s), 3 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7703017060/events/?full=false
-    1 page(s), 16 rows — COMPLETE — ended short of a full page
-  /organizations/hot-attic-games-llc/issues/7705210551/events/?full=false
-    1 page(s), 84 rows — COMPLETE — ended short of a full page
+    1 page(s), 17 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7705427321/events/?full=false
     1 page(s), 84 rows — COMPLETE — ended short of a full page
-  /organizations/hot-attic-games-llc/issues/7705427482/events/?full=false
-    1 page(s), 3 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7705664046/events/?full=false
     1 page(s), 28 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7705664064/events/?full=false
@@ -198,9 +194,13 @@
   /organizations/hot-attic-games-llc/issues/7712990710/events/?full=false
     1 page(s), 1 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7713029622/events/?full=false
-    1 page(s), 3 rows — COMPLETE — ended short of a full page
+    1 page(s), 7 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7713029643/events/?full=false
-    1 page(s), 2 rows — COMPLETE — ended short of a full page
+    1 page(s), 4 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7713038385/events/?full=false
+    1 page(s), 29 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7713038393/events/?full=false
+    1 page(s), 1 rows — COMPLETE — ended short of a full page
   /projects/hot-attic-games-llc/tartaria/events/?full=false
     1 page(s), 100 rows — SUSPECT — ended on a full page of 100 with no next cursor; this endpoint caps rather than paginates
   /projects/hot-attic-games-llc/tartaria/issues/?query=&statsPeriod=
@@ -209,6 +209,7 @@
   incomplete bundles:
     mtaxtx2bzl8l: 5/27 parts
     mtkrb966ae71: 19/28 parts
+    mtnrscwz8pab: 29/42 parts
   scrub cost per bundle:
     mtavnjvdw4u4: 4 redactions, 60000 chars
     mtavou0hiube: 1 redactions, 9994 chars
@@ -299,3 +300,4 @@
     mtnovtl10c8a: 89 redactions, 41486 chars
     mtnq7iawibjn: 29 redactions, 13980 chars
     mtnq7pifxq0m: 2 redactions, 1056 chars
+    mtnrscwz8pab: 1 redactions, 436 chars
