@@ -27772,7 +27772,34 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // into a max roll, "auto-wins vs Aetherkin" into +1d6 against them, the summons
 // into blasts. gameStore absorbed the family under its ratchet by giving up two
 // set() blocks to app/state/weaponRiderEffects.ts.
-export const OTA_BUILD_ID = '2026-09-05-1676-the-tail-is-read';
+// OTA-1677 — THE LOG LEAVES IN AN ENVELOPE. Item four of "fix all existing
+// issues one through six": #82, the Sentry @password:filter still taking a
+// block per send after OTA-1520.
+// ⚠⚠⚠ RE-MEASURED FIRST, on 711 delivered events from 09-03/04: 209 (29%) still
+// lost a block, 273 blocks, 93,210 characters. OTA-1520 worked exactly as far
+// as it claimed - blocks, not parts - but the scrubber was still being handed
+// English, and the surviving neighbours finally named the trigger: 219 of the
+// 273 holes sit in SALVAGE prose, and one of the four rotating curio lines is
+// "Nobody authored this piece" - `auth` inside "authored", the no-word-boundary
+// match 1520 predicted. The other 54 recur across re-sent bundles: a haul
+// naming a "…of Secrets" armour, and an NPC's line. Sentry's Safe Fields could
+// not exempt it (the rule runs on chunkBlocks.0, .1, …), and a fantasy log
+// cannot avoid "secret" or "authored".
+// ⚠⚠⚠ SO THE TEXT STOPS BEING TEXT IN TRANSIT. Each block is base64 on the
+// device (UTF-8 then base64, by hand - the runtime guarantees neither
+// TextEncoder nor btoa) and decoded by the relay when the event says
+// chunkEncoding: base64. The alphabet has no @, no ., no space and no word:
+// @password, @email, @ip and @creditcard have nothing to match, whatever the
+// prose says and whatever a future default rule says. This is the class fix -
+// a content-scrubbing redactor is never handed content - where rewording one
+// curio line was the next whack-a-mole. chunkChars stays the RAW receipt, so
+// the relay's shortfall check is unchanged; a block Sentry replaced anyway is
+// not valid base64 and stands in the reassembly as "[Filtered]", exactly as
+// visible as before. Proven in the suite against the real scrubbing pattern
+// over a real 400 KB delivered log: the text trips it, no envelope does.
+// ⚠ The task's second finding (release/dist null) was closed by OTA-1592 / #109.
+export const OTA_BUILD_ID = '2026-09-05-1677-the-log-leaves-in-an-envelope';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1676-the-tail-is-read';
 // golem catch-up 2026-09-05: markerless publish of OTA-1676 - the tail is
 // read (slice 4c, the last unit of slice 4). The live unread tail of the
 // weapon effect column goes 87 -> 28, every one of the 28 pinned by name as

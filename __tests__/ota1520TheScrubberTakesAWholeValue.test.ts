@@ -164,7 +164,11 @@ describe('OTA-1520 — measured against the actual rule, not a paraphrase of it'
 describe('OTA-1520 — the sender hands over blocks, and says how many characters it owes', () => {
   it('⚠⚠⚠ THE SLICE GOES AS AN ARRAY, AND THE SCALAR IS GONE', () => {
     const body = inlineBody();
-    expect(body).toContain('extra: { chunkBlocks: splitLogIntoBlocks(slice), chunkChars: slice.length },');
+    // ⚠ OTA-1677 — the blocks are still an array, still built by
+    // splitLogIntoBlocks; each one now leaves base64-encoded (see ota1677),
+    // so the shape pinned here is the array-of-blocks, not the plain text.
+    expect(body).toContain('chunkBlocks: splitLogIntoBlocks(slice).map(encodeLogBlock),');
+    expect(body).toContain('chunkEncoding: LOG_BLOCK_ENCODING,');
     // A lingering `chunk: slice` would be filtered on exactly the parts that
     // matter and would double the payload to do it.
     expect(body).not.toMatch(/chunk: slice/);

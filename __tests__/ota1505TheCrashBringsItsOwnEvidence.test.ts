@@ -127,7 +127,11 @@ describe('OTA-1505 — who it fires for', () => {
     // replaces a WHOLE value and took nine entire parts on 08-27; small blocks
     // cap that at ~400 characters. Joining is the contract — the blocks are the
     // log exactly, with nothing inferred at the seams.
-    expect(event.extra.chunkBlocks.join('')).toBe('LOG[THE LOG BODY]');
+    // ⚠ OTA-1677 — and each block leaves base64-encoded (the scrubber is handed
+    // no text at all); the relay decodes. Decoded and joined, it is still the
+    // log exactly.
+    expect((event.extra as { chunkEncoding?: string }).chunkEncoding).toBe('base64');
+    expect(event.extra.chunkBlocks.map((b: string) => Buffer.from(b, 'base64').toString('utf8')).join('')).toBe('LOG[THE LOG BODY]');
     // Durable: the same bundle sits in the OTA-1504 slot with its id on the event.
     const pending = await readPendingBundle();
     expect(pending).not.toBeNull();

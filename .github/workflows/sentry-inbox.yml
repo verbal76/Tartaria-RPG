@@ -56,7 +56,7 @@ jobs:
           BASE: https://us.sentry.io/api/0
         run: |
           python3 - <<'PYEOF'
-          import json, os, urllib.request, pathlib, re
+          import json, os, urllib.request, pathlib, re, base64
 
           tok = os.environ['SENTRY_READ_TOKEN']
           org = os.environ['ORG']
@@ -269,6 +269,15 @@ jobs:
           # it just has to look in `extra.chunk` instead of on disk. The BEACON
           # (kind=player-log-beacon) is the experiment's answer all by itself:
           # if it is here, attachment-free sending works.
+          def decode_block(b):
+              # OTA-1677 — one base64 block back to text. Anything that is not
+              # valid base64 (a "[Filtered]" Sentry substituted, a truncated element)
+              # is returned as-is so the hole is seen rather than swallowed.
+              try:
+                  return base64.b64decode(b, validate=True).decode('utf-8')
+              except Exception:
+                  return b
+
           def extraval(ev, key):
               for e in (ev.get('entries') or []):
                   if e.get('type') == 'extra' or e.get('type') == 'context':
@@ -341,6 +350,13 @@ jobs:
               blocks = extraval(ev, 'chunkBlocks')
               if isinstance(blocks, list):
                   field = 'chunkBlocks'
+                  # ⚠⚠ OTA-1677 — the blocks leave the device base64-encoded, so the
+                  # scrubber is handed no text to match. Decode when the event says
+                  # so; an element Sentry replaced anyway ("[Filtered]") is not valid
+                  # base64 and stands in the reassembly as itself, exactly as
+                  # visible as before, and the chunkChars shortfall still reports it.
+                  if extraval(ev, 'chunkEncoding') == 'base64':
+                      blocks = [decode_block(b) for b in blocks if isinstance(b, str)]
                   chunk = ''.join(b for b in blocks if isinstance(b, str))
               else:
                   field = 'chunk'

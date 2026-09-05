@@ -770,6 +770,72 @@ export function splitLogIntoBlocks(slice: string, size = INLINE_BLOCK_CHARS): st
   return blocks;
 }
 
+/**
+ * ⚠⚠⚠ OTA-1677 — THE LOG LEAVES IN AN ENVELOPE. OTA-1520 was measured again on
+ * 711 delivered events from 09-03/04: 209 of them (29%) still lost a block to
+ * `@password:filter`, 273 blocks, 93,210 characters. Blocks, not parts — the
+ * 1520 fix worked exactly as far as it claimed — but the scrubber was still
+ * being handed English, and the surviving neighbours finally named what it
+ * takes: 219 of the 273 holes sit in SALVAGE prose, and one of the four
+ * rotating curio lines reads *"Nobody authored this piece"* — `auth` inside
+ * "authored", the no-word-boundary match OTA-1520 predicted. The other 54 are
+ * two blocks that recur across re-sent bundles: a haul that names a "…of
+ * Secrets" armour, and an NPC's line. A fantasy log cannot avoid "secret" and
+ * "authored", and Sentry's Safe Fields could not exempt it either (the rule
+ * runs on `chunkBlocks.0`, `.1`, … — the relay prints that finding).
+ *
+ * ⚠⚠ SO THE TEXT STOPS BEING TEXT WHILE IT IS IN TRANSIT. Each block is
+ * base64-encoded on the device and decoded by the relay. The base64 alphabet
+ * has no `@`, no `.`, no space and no word: `@password`, `@email`, `@ip` and
+ * `@creditcard` have nothing to match, whatever the prose says, whatever a
+ * future default rule says. This is the class fix — a content-scrubbing
+ * redactor is never handed content — where rewording one curio line would have
+ * been the next whack-a-mole. `chunkChars` stays the receipt in RAW characters,
+ * so the relay's shortfall check is unchanged; a block Sentry did replace would
+ * fail to decode and stand in the reassembly as the literal `[Filtered]`,
+ * exactly as visible as before. Encoded by hand (UTF-8 → base64) because the
+ * runtime guarantees neither TextEncoder nor btoa, and because a suite can then
+ * prove the encoder against the real scrubbing pattern over a real log.
+ */
+export const LOG_BLOCK_ENCODING = 'base64';
+const B64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+
+function utf8BytesOf(s: string): number[] {
+  const out: number[] = [];
+  for (let i = 0; i < s.length; i += 1) {
+    let c = s.charCodeAt(i);
+    if (c < 0x80) { out.push(c); continue; }
+    if (c < 0x800) { out.push(0xc0 | (c >> 6), 0x80 | (c & 63)); continue; }
+    if (c >= 0xd800 && c <= 0xdbff && i + 1 < s.length) {
+      const next = s.charCodeAt(i + 1);
+      if (next >= 0xdc00 && next <= 0xdfff) {
+        c = ((c - 0xd800) << 10) + (next - 0xdc00) + 0x10000;
+        i += 1;
+        out.push(0xf0 | (c >> 18), 0x80 | ((c >> 12) & 63), 0x80 | ((c >> 6) & 63), 0x80 | (c & 63));
+        continue;
+      }
+    }
+    out.push(0xe0 | (c >> 12), 0x80 | ((c >> 6) & 63), 0x80 | (c & 63));
+  }
+  return out;
+}
+
+/** One block, UTF-8 then base64, standard alphabet with `=` padding. */
+export function encodeLogBlock(block: string): string {
+  const bytes = utf8BytesOf(block);
+  let out = '';
+  for (let i = 0; i < bytes.length; i += 3) {
+    const a = bytes[i]!;
+    const b = bytes[i + 1];
+    const c = bytes[i + 2];
+    const n = (a << 16) | ((b ?? 0) << 8) | (c ?? 0);
+    out += B64[(n >> 18) & 63]! + B64[(n >> 12) & 63]!;
+    out += b === undefined ? '=' : B64[(n >> 6) & 63]!;
+    out += c === undefined ? '=' : B64[n & 63]!;
+  }
+  return out;
+}
+
 export interface InlineSendReport extends ChunkedSendReport {
   /** Did the no-attachment beacon leave without throwing? The experiment. */
   beaconOut: boolean;
@@ -866,7 +932,14 @@ export async function sendGameLogInline(
       // stays as the honest total: the relay compares it against what it
       // reassembles and can therefore say EXACTLY how much a redaction cost,
       // instead of silently stitching a hole the way part 1 did on 08-27.
-      extra: { chunkBlocks: splitLogIntoBlocks(slice), chunkChars: slice.length },
+      // ⚠ OTA-1677 — AND EACH BLOCK IS ENCODED, so the scrubber is handed no
+      // text at all. `chunkEncoding` tells the relay; `chunkChars` is still the
+      // RAW length, the receipt the shortfall check reads.
+      extra: {
+        chunkBlocks: splitLogIntoBlocks(slice).map(encodeLogBlock),
+        chunkEncoding: LOG_BLOCK_ENCODING,
+        chunkChars: slice.length,
+      },
       });
       // ⚠⚠ ACCEPTED, NOT FLUSHED. See the header: flush() has lied both ways,
       // and the path that never flushes is the path that works.

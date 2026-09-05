@@ -66,7 +66,11 @@ describe('OTA-1518 — nothing on this path carries an attachment', () => {
     // `extra` with no attachment anywhere, but as an ARRAY of small blocks,
     // because Sentry's @password rule replaces a whole value and ate nine whole
     // parts. `chunkChars` stays so the relay can prove nothing went missing.
-    expect(body).toContain('extra: { chunkBlocks: splitLogIntoBlocks(slice), chunkChars: slice.length },');
+    // ⚠ OTA-1677 amended it once more, same principle: still `extra`, still an
+    // array of blocks, no attachment — each block now base64 so the scrubber is
+    // handed no text at all. The pin follows the shape.
+    expect(body).toContain('chunkBlocks: splitLogIntoBlocks(slice).map(encodeLogBlock),');
+    expect(body).toContain('chunkChars: slice.length,');
   });
 
   it('⚠⚠⚠ THE BEACON GOES FIRST, AND IT IS SHAPED LIKE A CRASH RECORD', () => {
