@@ -50,7 +50,7 @@
  *
  * ⚠ WHAT DID NOT CHANGE: twenty-five bodies, verbatim.
  */
-import { withArticle, theLower } from '../../engine/grammar';
+import { withArticle, theLower, pluralizeNoun } from '../../engine/grammar';
 import type { PlayerCharacter, Quest, InventoryItem } from '../../engine/types';
 import { recordNpcDealing } from '../../engine/npcMemory';
 import { isQuestLockedItem } from '../../engine/questItems';
@@ -573,12 +573,15 @@ function spawnStageEscort(
   );
   get().appendLog(
     'combat',
+    // ⚠ OTA-1686 — "3 Mud Harpys" on the contrary walker's feed: a bare +s
+    // where grammar.pluralizeNoun has known the -y and sibilant endings since
+    // OTA-817. One pluraliser, like the party announcer.
     ambush
       ? (many
-        ? `${escort.length} ${who}s are on you before you have the room to turn.`
+        ? `${escort.length} ${pluralizeNoun(who)} are on you before you have the room to turn.`
         : `${who} is on you before you have the room to turn.`)
       : (many
-        ? `${escort.length} ${who}s rise from the positions they were left in.`
+        ? `${escort.length} ${pluralizeNoun(who)} rise from the positions they were left in.`
         : `${who} rises from the position it was left in.`),
   );
   if (!ambush) return true;
@@ -1892,7 +1895,10 @@ export const createQuestSlice = (
     // moment the last body drops. Silent by design — you're already fighting.
     if (willFreezeForKill) {
       const sc = get().currentScene;
-      if ((sc?.enemies ?? []).some((_, i) => (sc?.enemyHps?.[i] ?? 0) > 0)) return;
+      // ⚠ OTA-1686 — a knocked-out body is not a live hostile (OTA-1612's rule,
+      // applied here and at the arrival arm): the walker left a wanderer out
+      // cold on the steeple and the apex was held shut by a sleeper.
+      if ((sc?.enemies ?? []).some((_, i) => (sc?.enemyHps?.[i] ?? 0) > 0 && !(sc?.enemyKnockedOut?.[i] ?? false))) return;
     }
     get().appendLog('world', stageDef.narration);
     if (stageDef.arbiter) get().appendLog('arbiter', stageDef.arbiter);

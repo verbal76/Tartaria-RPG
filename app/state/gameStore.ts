@@ -12680,7 +12680,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // attempts came out of one bug report. The check now runs on EVERY entry to
     // this function, clause or not; see `anyClauseIsMeta` for why a note stays a
     // note after it has been cut up.
-    const metaVerdict = classifyMetaComment(trimmed);
+    // ⚠ OTA-1686 — the scene's own names are cut out before the guard reads:
+    // "approach Mud Elemental Spawn" is the APPROACH picker's own submission,
+    // not a note about spawning. See metaComment.stripWorldNames.
+    const metaScene = get().currentScene;
+    const worldNames = [
+      ...(metaScene?.enemies ?? []).map((e) => e.name),
+      ...(metaScene?.ambientNouns ?? []),
+      ...(metaScene?.vendor?.name ? [metaScene.vendor.name] : []),
+    ];
+    const metaVerdict = classifyMetaComment(trimmed, worldNames);
     if (metaVerdict.isMeta) {
       if (!_opts?.silent) get().appendLog('player', trimmed, { meta: true });
       get().appendLog(
@@ -12715,7 +12724,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // individually look like prose is still running fragments of a paragraph
       // as commands. If any clause reads as a note, the entire input is a note.
       if (clauses.length > 1) {
-        const clauseVerdict = anyClauseIsMeta(trimmed, clauses);
+        const clauseVerdict = anyClauseIsMeta(trimmed, clauses, worldNames);
         if (clauseVerdict.isMeta) {
           if (!_opts?.silent) get().appendLog('player', trimmed, { meta: true });
           get().appendLog(

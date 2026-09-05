@@ -27926,7 +27926,33 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // boot (sdkSawCrash: true/false/null — three answers, never two), printed in
 // About and the bug report under the launch line, and carried on the Sentry
 // event as nativeSdkSawCrash. The next kill says which kind it was.
-export const OTA_BUILD_ID = '2026-09-05-1685-the-native-side-gives-its-verdict';
+//
+// 2026-09-05 OTA-1686 — THE CONTRARY WALKER (task #195, step 1 of the
+// Narrative Agency plan). One hunt, the Bog Dragon of Old Drakova, walked four
+// ways through the player's own surfaces: obedient (the baseline), premature
+// (the steeple and Old Mira before the reeve), contrary (the empty hand-in,
+// walking out on the reeve, the wrong verb on the right ground, ABANDON with
+// the token and the map in the pack and ACCEPT again), interrupted (one harpy
+// killed and a flee, the Dragon wounded and a flee, back to both). Every
+// deviation graded handled / acknowledged / prior knowledge from the feed and
+// pinned in ota1686; the punch list is docs/contrary-walker-bog-dragon-
+// 2026-09-05.md — eight items, five of them the deed ledger's (step 2). The
+// game handled every road; it acknowledged most of them; it remembered none:
+// the brood respawns at three with one dead, the Dragon at full after being
+// wounded, the name stalls it twice, the reeve forgets you walked out, an
+// early visit to the roost is invisible, ABANDON + ACCEPT leaves every
+// answered card shut. Four defects fixed on the road: (1) "approach Mud
+// Elemental Spawn" was filed as a bug note — the meta-comment guard's `spawn`
+// matched inside the enemy's own name; the scene's names are cut out before
+// the guard reads (the parent walker's one "intermittent", root-caused);
+// (2) the OTA-1624 stall line fired on every road fight while a provoke stage
+// was pending, and on the harpies themselves — it skips provoke/spawn stages
+// and speaks only on the stage's cell; (3) a knocked-out wanderer with hit
+// points left held the apex shut at both arm guards — "live" means conscious
+// (OTA-1612's rule) at the arrival arm and the freeze-for-kill guard;
+// (4) "3 Mud Harpys" → pluralizeNoun.
+export const OTA_BUILD_ID = '2026-09-05-1686-the-contrary-walker';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1685-the-native-side-gives-its-verdict';
 // golem catch-up 2026-09-05: markerless publish of OTA-1685 - the native side
 // gives its verdict. sentry-android's isCrashedLastRun is asked once per boot
 // and written onto the native-death record minted that boot (yes / no / could

@@ -118,7 +118,7 @@ async function settle(pred: () => boolean, deadlineMs = 4000): Promise<boolean> 
 
 const tick = () => new Promise((r) => setTimeout(r, 40));
 
-class Walker {
+export class Walker {
   readonly family: WalkFamily;
   readonly def: MissionLike;
   readonly breaks: string[] = [];

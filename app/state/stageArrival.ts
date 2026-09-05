@@ -210,8 +210,13 @@ export function armSpawnStagesAtArrival(get: Get, set: Set): void {
     // ⚠ A live hostile already on the tile keeps the door: stacking the pack
     // onto an ambient fight is a pile-on nothing authored. The verb path (and
     // the next arrival) still arm it once the ground is clear.
+    // ⚠ OTA-1686 — "LIVE" MEANS CONSCIOUS, the OTA-1612 rule the escort clear
+    // already follows. The contrary walker cleared a wandering pack on the
+    // Broken Steeple with the last body left out cold (HP 9, knocked out) and
+    // the Dragon never rose: a sleeper with hit points kept this door shut,
+    // silently, on the one tile the hunt ends on. A subdued body is not a fight.
     const scene = get().currentScene;
-    const liveHostiles = (scene?.enemies ?? []).some((_, i) => (scene?.enemyHps?.[i] ?? 0) > 0);
+    const liveHostiles = (scene?.enemies ?? []).some((_, i) => (scene?.enemyHps?.[i] ?? 0) > 0 && !(scene?.enemyKnockedOut?.[i] ?? false));
     if (liveHostiles) continue;
     // One writer: the same advance the attack verb and the card run — the
     // narration, the spawn, the freeze-for-kill, the escort clear all come

@@ -214,7 +214,24 @@ export function stalledInCombat(
   intent: string,
 ): { family: MissionFamily; title: string } | null {
   if (!player) return null;
-  const consider = (family: MissionFamily, recs: Rec[] | undefined, find: (id: string) => { title: string; stages?: StageLike[] } | null): { family: MissionFamily; title: string } | null => {
+  // ⚠⚠⚠ OTA-1686 — MEASURED BY THE CONTRARY WALKER, twice in one road: with the
+  // harpy stage (attack_provoke) pending, EVERY road fight — two Mud Striders
+  // at Dynasty Border Post, twenty tiles from the Mud Seas — printed "That is
+  // the right move for The Bog Dragon of Old Drakova — but not with something
+  // on you. Put this down first." on the player's own swing; and on the Mud
+  // Seas the same line printed while the player was cutting down the very
+  // harpies the stage had stood up. Two holes, one reader: (1) a stage whose
+  // beat IS a fight — attack_provoke, or any authored spawn — cannot be
+  // stalled by fighting, exactly as the apex could not; (2) the line means
+  // "the right move HERE", so it speaks only on the stage's own cell, the
+  // same test the verb matcher and the arrival line run. Off the ground the
+  // verb would not have paid anyway, and the fight is just a fight.
+  const consider = (
+    family: MissionFamily,
+    recs: Rec[] | undefined,
+    find: (id: string) => { title: string; stages?: StageLike[] } | null,
+    anchorOf: (def: never) => string | undefined,
+  ): { family: MissionFamily; title: string } | null => {
     for (const rec of recs ?? []) {
       if (rec.tracked === false) continue;
       const def = find(rec.id);
@@ -223,13 +240,19 @@ export function stalledInCombat(
       // A hunt's apex IS the fight; fleeing IS combat — neither is a stall.
       if (family === 'hunt' && next.checkKind === 'boss') continue;
       if (family === 'hunt' && next.checkKind === 'escape') continue;
-      if (payingIntent(family, next) === intent) return { family, title: def.title };
+      // OTA-1686 — so is a provoke, and so is any stage that stands bodies up.
+      if (family === 'hunt' && next.checkKind === 'attack_provoke') continue;
+      if (next.spawn) continue;
+      if (payingIntent(family, next) !== intent) continue;
+      const ground = stageLocationId(next, anchorOf(def as never) ?? '', resolvePosterLocation);
+      if (!standingAtLocation(player, ground)) continue;
+      return { family, title: def.title };
     }
     return null;
   };
-  return consider('hunt', player.activeHunts, findHuntById)
-    ?? consider('mystery', player.activeMysteries, findMysteryById)
-    ?? consider('storyline', player.activeStorylines, findStorylineById);
+  return consider('hunt', player.activeHunts, findHuntById, ((d: never) => huntAnchorId(d)) as never)
+    ?? consider('mystery', player.activeMysteries, findMysteryById, ((d: never) => contractAnchorId(d)) as never)
+    ?? consider('storyline', player.activeStorylines, findStorylineById, ((d: never) => contractAnchorId(d)) as never);
 }
 
 export function missionArrivalLines(player: PlayerCharacter | null | undefined): string[] {

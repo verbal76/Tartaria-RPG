@@ -271,8 +271,37 @@ const firstMatch = (text: string, pats: readonly RegExp[]): string | null => {
  * line names the strongest evidence rather than whichever rule happened to sit
  * at the top of the file.
  */
-export function classifyMetaComment(raw: string): MetaCommentVerdict {
-  const text = String(raw ?? '').trim();
+/**
+ * ⚠⚠⚠ OTA-1686 — THE WORLD'S OWN NAMES ARE NOT EVIDENCE. The header above
+ * says `spawn` "was verified never to reach the player". It reaches him on a
+ * name tag: the bestiary holds a Legendary called **Mud Elemental Spawn**, the
+ * party announcer prints it, and the APPROACH picker submits "approach Mud
+ * Elemental Spawn" on his behalf. The contrary walker typed exactly that on
+ * the Broken Steeple 166 times and the Arbiter said "I'm not sure what you're
+ * trying to tell me" once and swallowed the rest — a fight that could not be
+ * closed and could not be fled from. The parent walker's one "intermittent"
+ * (a mid-range approach that would not close) was this, every time.
+ *
+ * So the caller hands over the names the scene is using right now — the
+ * enemies on the field, the ambient nouns, the vendor — and they are cut out
+ * of the text before any tier looks at it. A note that only contains an
+ * engine word inside a monster's name is not a note. "nothing spawned here to
+ * combat" is still a note: no scene name contains "spawned".
+ */
+function stripWorldNames(text: string, names: readonly string[] | undefined): string {
+  if (!names?.length) return text;
+  let out = text;
+  for (const n of names) {
+    const t = (n ?? '').trim();
+    if (t.length < 3) continue;
+    const esc = t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    out = out.replace(new RegExp(esc, 'gi'), ' ');
+  }
+  return out.replace(/\s+/g, ' ').trim();
+}
+
+export function classifyMetaComment(raw: string, worldNames?: readonly string[]): MetaCommentVerdict {
+  const text = stripWorldNames(String(raw ?? '').trim(), worldNames);
   if (!text) return { isMeta: false, reason: null, match: null };
 
   const strong = firstMatch(text, STRONG_MARKERS);
@@ -329,11 +358,12 @@ export function isMetaComment(raw: string): boolean {
 export function anyClauseIsMeta(
   whole: string,
   clauses: readonly string[],
+  worldNames?: readonly string[],
 ): MetaCommentVerdict {
-  const full = classifyMetaComment(whole);
+  const full = classifyMetaComment(whole, worldNames);
   if (full.isMeta) return full;
   for (const c of clauses) {
-    const v = classifyMetaComment(c);
+    const v = classifyMetaComment(c, worldNames);
     if (v.isMeta) return v;
   }
   return { isMeta: false, reason: null, match: null };
