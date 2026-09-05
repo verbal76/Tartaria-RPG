@@ -27799,6 +27799,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // over a real 400 KB delivered log: the text trips it, no envelope does.
 // ⚠ The task's second finding (release/dist null) was closed by OTA-1592 / #109.
 export const OTA_BUILD_ID = '2026-09-05-1677-the-log-leaves-in-an-envelope';
+// golem catch-up 2026-09-05: markerless publish of OTA-1677 - the log leaves
+// in an envelope. #82 re-measured: 209 of 711 delivered events (29%) still
+// lost a ~400-char block to @password:filter, 219 of 273 holes in salvage
+// prose ("Nobody authored this piece" - auth inside authored). Each block is
+// now base64 on the device and decoded by the relay, so a content-scrubbing
+// redactor is never handed content; chunkChars stays the raw receipt, and a
+// block Sentry still replaced stands as "[Filtered]" exactly as before.
+// hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1676-the-tail-is-read';
 // golem catch-up 2026-09-05: markerless publish of OTA-1676 - the tail is
 // read (slice 4c, the last unit of slice 4). The live unread tail of the
