@@ -107,7 +107,7 @@ import { knownEnemyWeaknesses } from '../engine/weaponGlyphs';
 // surface chip and the INVESTIGATE badge grey on exactly what the dig refuses.
 import { digSpotWorkedOut } from '../engine/digging';
 import { TutorialTarget } from '../components/TutorialTarget';
-import { TUTORIAL_STEPS, TUT_LOCK_BEATS } from '../components/tutorialSteps';
+import { TUTORIAL_STEPS, isTutorialLocked } from '../components/tutorialSteps';
 import { reachBandsFor, RANGE_LABELS } from '../engine/types';
 import type { CombatRange, InventoryItem } from '../engine/types';
 import { CONTENT_MAX_WIDTH } from '../ui/displayScale'; // OTA-1227 — one column width, platform-aware
@@ -151,6 +151,13 @@ function timeOfDayTint(hours: number): string {
 // submit runs. The RN <Modal> fade is ~300ms on iOS; 400 clears it with margin
 // without reading as lag (the tap still lands its feed line right after).
 const SHEET_SETTLE_MS = 400;
+
+// ⚠ OTA-1700 — the corner's three doors log the label they RENDER (ota1485's rule:
+// one derivation, never a twin string). The minimap has no text of its own; its
+// tap logs the word the Atlas is filed under.
+const CREST_WORLD_LABEL = '⚑ WORLD';
+const CREST_LORE_LABEL = '◈ LORE';
+const MINIMAP_TAP_LABEL = 'map';
 
 export function ExplorationScreen() {
   const player = useGameStore((s) => s.player);
@@ -223,10 +230,9 @@ export function ExplorationScreen() {
   // out-of-band controls buzz until the player makes the stay/leave choice.
   // ⚠ OTA-1249 — reads the SAME exported list InputBox does. This was an
   // identical literal array in both files, and 'look' was missing from both.
-  const tutLock =
-    tutBeat !== null
-    && TUT_LOCK_BEATS.includes(tutBeat)
-    && !tutorialExploreChosen;
+  // ⚠ OTA-1700 — one rule for InputBox, this screen and the Atlas's travel rows;
+  // isTutorialLocked reads TUT_LOCK_BEATS once, so no reader re-types the list.
+  const tutLock = isTutorialLocked(tutorialStep, tutorialExploreChosen);
   const chooseTutorialLeave = useGameStore((s) => s.chooseTutorialLeave);
   const pendingRolls = useGameStore((s) => s.pendingRolls);
   // OTA-1076 — the talk/parley sheets share the DiceRoller's controls slot;
@@ -1377,8 +1383,8 @@ export function ExplorationScreen() {
             // Both vanish the instant an enemy is staged (the panel flips to
             // EnemyPanel), so they never cost permanent space or clutter combat.
             <>
-              <TouchableOpacity style={styles.crestNavBtn} activeOpacity={0.7} onPress={() => setScreen('world')} accessibilityRole="button">
-                <Text style={styles.crestNavText}>⚑ WORLD</Text>
+              <TouchableOpacity style={styles.crestNavBtn} activeOpacity={0.7} onPress={() => { logUiTap(CREST_WORLD_LABEL); setScreen('world'); }} accessibilityRole="button">
+                <Text style={styles.crestNavText}>{CREST_WORLD_LABEL}</Text>
               </TouchableOpacity>
               {/* ⚠⚠ OTA-1370 — the crest tile is now a live, player-centred
                   mini-map: the outpost interior while you are inside one, the
@@ -1393,23 +1399,20 @@ export function ExplorationScreen() {
                   title screen's preview) and the art is still referenced. */}
               <MiniMap
                 onPress={() => {
-                  // ⚠⚠ OTA-1375 — THE LOCK COMES ACROSS WITH THE TAP. The MAP
-                  // button this replaces refused during the tutorial lockdown
-                  // (arb109: double-pulse buzz + an Arbiter nudge, because a
-                  // silent no-op reads as a broken button). Deleting that button
-                  // without carrying its guard would have left the corner as an
-                  // unguarded way out of the scripted crawl — the lockdown is
-                  // only as tight as its loosest affordance.
-                  if (tutLock) {
-                    try { Vibration.vibrate([0, 32, 45, 32]); } catch { /* ignore */ }
-                    useGameStore.getState().nudgeTutorialBlocked();
-                    return;
-                  }
+                  // ⚠⚠ OTA-1700 — THE MAP OPENS DURING THE TUTORIAL. OTA-1375 carried
+                  // the old MAP button's lockdown refusal onto this tap (buzz + nudge),
+                  // and the owner met it on a fresh character: "the minimap no longer
+                  // takes you to the big map". The Atlas is a READING surface; the one
+                  // way out of the scripted crawl on it is its travel rows, and those
+                  // now carry the lock themselves (MapScreen, same buzz, same nudge).
+                  // Reading the map was never the escape — the lock stays exactly as
+                  // tight, one level deeper, and the corner does what it looks like.
+                  logUiTap(MINIMAP_TAP_LABEL);
                   setScreen('map');
                 }}
               />
-              <TouchableOpacity style={styles.crestNavBtn} activeOpacity={0.7} onPress={() => setScreen('lore')} accessibilityRole="button">
-                <Text style={styles.crestNavText}>◈ LORE</Text>
+              <TouchableOpacity style={styles.crestNavBtn} activeOpacity={0.7} onPress={() => { logUiTap(CREST_LORE_LABEL); setScreen('lore'); }} accessibilityRole="button">
+                <Text style={styles.crestNavText}>{CREST_LORE_LABEL}</Text>
               </TouchableOpacity>
             </>
           )}

@@ -25,9 +25,11 @@ import {
   Easing,
   PanResponder,
   ScrollView,
+  Vibration,
   type GestureResponderEvent,
 } from 'react-native';
 import { useGameStore, playerGridCell } from '../state/gameStore';
+import { isTutorialLocked } from '../components/tutorialSteps'; // OTA-1700
 import { FirstTimeHint } from '../components/FirstTimeHint';
 // OTA-171 — Location + locationsData are already imported below for
 // the existing LOCATIONS const; reused here for the Places list
@@ -259,6 +261,20 @@ export function MapScreen() {
   const buildingId = useGameStore((s) => s.activeBuildingId);
   const buildingRoomId = useGameStore((s) => s.activeBuildingRoomId);
   const buildingVisited = useGameStore((s) => s.buildingVisited);
+  // ⚠⚠ OTA-1700 — THE LOCK THE MINIMAP USED TO HOLD LIVES HERE NOW. The corner
+  // map opens during the tutorial (reading is not leaving); the travel rows are
+  // the one thing on this screen that could walk a fresh character out of the
+  // scripted crawl, so THEY refuse under the lockdown — the same double-pulse
+  // buzz and the same Arbiter nudge the MAP button carried since arb109.
+  const tutorialStep = useGameStore((s) => s.tutorialStep);
+  const tutorialExploreChosen = useGameStore((s) => s.tutorialExploreChosen);
+  const tutLock = isTutorialLocked(tutorialStep, tutorialExploreChosen);
+  const refuseUnderTutorial = (): boolean => {
+    if (!tutLock) return false;
+    try { Vibration.vibrate([0, 32, 45, 32]); } catch { /* ignore */ }
+    useGameStore.getState().nudgeTutorialBlocked();
+    return true;
+  };
   // OTA-171 — Places list sorted with the current location pinned at
   // the top so the player can see where they are at a glance, then
   // by danger ascending (safer trips first) so the easiest
@@ -1218,6 +1234,7 @@ export function MapScreen() {
                     accessibilityRole="button"
                     onPress={() => {
                       if (!player) return;
+                      if (refuseUnderTutorial()) return; // OTA-1700
                       // OTA-616 — standing on the contract's anchor (its turn-in
                       // counter): tapping turns it in if ready. completeContractFromUI
                       // self-gates — it pays out when complete, or tells you exactly
@@ -1310,6 +1327,7 @@ export function MapScreen() {
                 accessibilityState={{ disabled: isHere }}
                 onPress={() => {
                   if (!player) return;
+                  if (refuseUnderTutorial()) return; // OTA-1700
                   if (player.hubRoomId) {
                     appendLog(
                       'arbiter',

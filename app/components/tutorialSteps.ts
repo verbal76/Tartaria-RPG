@@ -458,3 +458,14 @@ export const TUTORIAL_DOCS_FULL: TutorialStep[] = [
       '"closest hub", and rest when you need to. Good hunting.',
   },
 ];
+
+/** ⚠⚠ OTA-1700 — THE ONE ANSWER TO "IS THE OUTPOST LOCKDOWN ON". InputBox and
+ *  ExplorationScreen each computed this from TUT_LOCK_BEATS by hand (OTA-1249
+ *  unified the LIST, not the rule), and the Atlas needed a third copy when the
+ *  minimap's tap stopped refusing and the lock moved onto the Atlas's travel
+ *  rows. Three copies of a boolean drift; one function does not. */
+export function isTutorialLocked(tutorialStep: number | null, tutorialExploreChosen: boolean): boolean {
+  if (tutorialStep === null) return false;
+  const id = TUTORIAL_STEPS[tutorialStep]?.id ?? null;
+  return id !== null && TUT_LOCK_BEATS.includes(id) && !tutorialExploreChosen;
+}

@@ -372,16 +372,18 @@ describe('OTA-1375 — one control for the Atlas, not two', () => {
       .toContain('setScreen(\'map\')');
   });
 
-  it('⚠⚠ and it inherits the tutorial lock the MAP button was carrying', () => {
-    // The lockdown is only as tight as its loosest affordance. The deleted
-    // button refused during the tutorial with a double-pulse buzz and an
-    // Arbiter nudge (arb109 — a silent no-op reads as a broken button); the
-    // tap that replaces it has to do the same or the corner becomes an
-    // unguarded way out of the scripted crawl.
+  it('⚠⚠ OTA-1700 — the tap opens the Atlas even under the tutorial lock; the lock moved to the travel rows', () => {
+    // OTA-1375 carried the MAP button's lockdown refusal onto this tap. The owner
+    // met it on a fresh character ("the minimap no longer takes you to the big
+    // map"). Reading the Atlas was never the way out of the scripted crawl — its
+    // TRAVEL rows are — so they carry the buzz + nudge now, and the corner opens.
     const tap = exp.slice(exp.indexOf('<MiniMap'), exp.indexOf('</>', exp.indexOf('<MiniMap')));
-    expect(tap).toContain('if (tutLock) {');
-    expect(tap).toContain('Vibration.vibrate([0, 32, 45, 32])');
-    expect(tap).toContain('nudgeTutorialBlocked()');
+    expect(tap).not.toContain('if (tutLock)');
+    expect(tap).not.toContain('nudgeTutorialBlocked()');
+    const map = src('app', 'screens', 'MapScreen.tsx');
+    expect(map).toContain('Vibration.vibrate([0, 32, 45, 32])');
+    expect(map).toContain('nudgeTutorialBlocked()');
+    expect((map.match(/refuseUnderTutorial\(\)\) return/g) ?? []).length).toBe(2);
   });
 
   it('the now-dead onOpenMap prop is removed rather than left dangling', () => {

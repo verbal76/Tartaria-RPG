@@ -26245,11 +26245,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const player = s.player;
     if (!player) return; // no game in progress yet — nothing to simulate
     // Don't churn the world during a boss/ending cutscene or on the title flow.
-    // arb-fix — also freeze during the tutorial: it runs on currentScreen
-    // 'exploration' with tutorialStep !== null, which this screen check missed,
-    // so the intro was drifting faction standing before the player acted.
+    // ⚠⚠ OTA-1700 — and it RUNS DURING THE TUTORIAL. The arb-fix guard froze this
+    // heartbeat while tutorialStep was set, to stop the intro drifting faction
+    // STANDING; OTA-958 then took standing out of this path (tides, patrols, the
+    // board only), so the guard protected nothing and cost a fresh character its
+    // whole living world until the twelve-beat tutorial ended — "all the background
+    // stuff under world is broken". worldTideCheck (in-game pulse, moves standing) keeps its guard.
     if (s.currentScreen === 'title' || s.currentScreen === 'character_creation' || s.currentScreen === 'ending') return;
-    if (s.tutorialStep !== null) return;
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const factions = require('../data/factions/factions.json') as import('../engine/worldPulse').FactionMeta[];
     const hour = player.hoursElapsed ?? 0;

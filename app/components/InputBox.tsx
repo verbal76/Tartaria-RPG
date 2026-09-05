@@ -14,7 +14,7 @@ import {
 import { TutorialTarget } from './TutorialTarget';
 import { visibleBuildingRooms, roomHasExitDoor } from '../engine/buildings';
 import type { ClimbBlockReason } from '../engine/climbReadiness';
-import { TUTORIAL_STEPS, TUT_LOCK_BEATS } from './tutorialSteps';
+import { TUTORIAL_STEPS, isTutorialLocked } from './tutorialSteps';
 import { useGameStore, logUiTap } from '../state/gameStore';
 import { noteTouchDown } from '../diagnostics/tapClock'; // OTA-1695 — the tap has a clock
 import { medkitRole, type MedkitRole } from '../engine/medkitEligibility'; // OTA-1663
@@ -667,10 +667,8 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   // the direct quick row / travel / MAP). The lock lifts the moment the
   // player chooses (tutorialExploreChosen, or the beat advances past
   // explore_or_leave). The SKIP TUTORIAL pill is the one always-allowed exit.
-  const tutLock =
-    currentBeatId !== null
-    && TUT_LOCK_BEATS.includes(currentBeatId)
-    && !tutorialExploreChosen;
+  // ⚠ OTA-1700 — isTutorialLocked reads TUT_LOCK_BEATS once for every reader.
+  const tutLock = isTutorialLocked(tutorialStep, tutorialExploreChosen);
   // The single button the current beat permits (null = none; type/choose).
   const tutInstructed: 'look' | 'take' | 'salvage' | 'investigate' | 'climb' | null =
     // ⚠ OTA-1248 — 'armor' permits the same button as 'cudgel': the vest is TAKEN

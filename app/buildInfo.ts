@@ -28137,7 +28137,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // under generic step names; the new sweep (heavy CI: ota1699ContraryWalkerSweep)
 // walks all eighteen hunts down all four roads and prints the punch list
 // every "no" goes on. No game code changes in this OTA.
-export const OTA_BUILD_ID = '2026-09-05-1699-every-hunt-walks-the-four-roads';
+// 2026-09-05 OTA-1700 — THE WORLD RUNS WHILE YOU LEARN. Owner, on a fresh
+// character: "all the background stuff under world is broken ... the minimap
+// no longer takes you to the big map" — fine on his old character. Both keyed
+// off the tutorial. worldRealtimeTick returned early while tutorialStep was set
+// (a guard from before OTA-958 took standing out of the heartbeat), so a new
+// character's World board had no patrols, no events and no power moving for the
+// whole twelve-beat tutorial; the minimap tap carried the old MAP button's
+// lockdown refusal (OTA-1375). Now: the heartbeat runs during the tutorial
+// (worldTideCheck, which moves standing, keeps its guard); the minimap opens the
+// Atlas, and the Atlas's travel rows refuse under the lockdown instead (same
+// buzz, same nudge); isTutorialLocked is the one rule InputBox, ExplorationScreen
+// and MapScreen read; WORLD / map / LORE taps write `ui: tap` lines.
+export const OTA_BUILD_ID = '2026-09-05-1700-the-world-runs-while-you-learn';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1699-every-hunt-walks-the-four-roads';
 // golem catch-up 2026-09-05: markerless publish of OTA-1699 - every hunt walks
 // the four roads. The contrary walker reads its roadmap and nouns from each
 // hunt definition; a heavy-CI sweep walks all eighteen. Test-side only. hal
