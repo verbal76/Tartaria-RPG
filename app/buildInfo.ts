@@ -27952,6 +27952,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (OTA-1612's rule) at the arrival arm and the freeze-for-kill guard;
 // (4) "3 Mud Harpys" → pluralizeNoun.
 export const OTA_BUILD_ID = '2026-09-05-1686-the-contrary-walker';
+// golem catch-up 2026-09-05: markerless publish of OTA-1686 - the contrary
+// walker. The Bog Dragon walked obedient / premature / contrary / interrupted,
+// graded and pinned, the punch list in docs/; four road defects fixed (the
+// meta-guard's spawn inside a monster's name, the stall line on every fight,
+// a sleeper holding the apex shut, "Mud Harpys"). hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1685-the-native-side-gives-its-verdict';
 // golem catch-up 2026-09-05: markerless publish of OTA-1685 - the native side
 // gives its verdict. sentry-android's isCrashedLastRun is asked once per boot
