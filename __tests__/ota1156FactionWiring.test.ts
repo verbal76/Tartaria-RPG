@@ -284,20 +284,20 @@ describe('OTA-1156 — honest custom is not confiscated', () => {
 });
 
 describe('OTA-1156 — the vendor screen charges what it shows', () => {
-  it('⚠ the display passes all SIX price factors, like the purchase does', () => {
+  it('⚠ the display passes all SEVEN price factors, like the purchase does (OTA-1689 added menace)', () => {
     // It passed four. Missing: OTA-1053 per-person regard and OTA-1066's Phase-4
     // pressure tide — so shown and charged silently disagreed for any vendor who
     // liked or disliked you, inside the very file written to prevent that drift.
     const shown = VENDOR_SCREEN.match(/finalBuyPrice\(o\.price, \{([^}]*)\}/)?.[1] ?? '';
     expect(shown).toBeTruthy();
-    for (const part of ['corruptionMult', 'buyDiscount', 'tideMult', 'warBuyMult', 'regardMult', 'pressureTideMult']) {
+    for (const part of ['corruptionMult', 'buyDiscount', 'tideMult', 'warBuyMult', 'regardMult', 'pressureTideMult', 'menaceMult']) {
       expect([part, shown.includes(part)]).toEqual([part, true]);
     }
   });
 
-  it('the store side still passes the same six', () => {
+  it('the store side still passes the same seven', () => {
     const charged = STORE.match(/const priceParts = \{([^}]*)\}/)?.[1] ?? '';
-    for (const part of ['corruptionMult', 'buyDiscount', 'tideMult', 'warBuyMult', 'regardMult', 'pressureTideMult']) {
+    for (const part of ['corruptionMult', 'buyDiscount', 'tideMult', 'warBuyMult', 'regardMult', 'pressureTideMult', 'menaceMult']) {
       expect([part, charged.includes(part)]).toEqual([part, true]);
     }
   });

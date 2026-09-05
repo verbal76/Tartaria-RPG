@@ -38,6 +38,7 @@
 import type { InventoryItem } from '../../engine/types';
 import { recordNpcDealing, getRelation } from '../../engine/npcMemory';
 import { npcRegard, regardPriceMult } from '../../engine/npcMemory';
+import { decayedMenace, menacePriceMult } from '../../engine/menace';
 import { profileOf, tideStage, tidePriceMultiplier } from '../../engine/pressure';
 import { pick } from '../../engine/rng';
 import { grantItem } from '../../engine/inventory';
@@ -241,7 +242,11 @@ export const createVendorSlice = (
     // stay in it. Flat, capped at TIDE_MAX_STAGES, and exactly 1.0 for a fresh
     // character and for the whole of the 'salvage' tier.
     const pressureTideMult = tidePriceMultiplier(tideStage(player.hoursElapsed ?? 0, profileOf(player)));
-    const priceParts = { corruptionMult: mult, buyDiscount, tideMult: vendorTideMult, warBuyMult, regardMult: buyRegardMult, pressureTideMult };
+    // OTA-1689 — and the player's own reputation for getting their way: a
+    // feared face pays a padded price (menace.menacePriceMult), shown on the
+    // vendor screen through the same helper.
+    const menaceMult = menacePriceMult(decayedMenace(player.menace ?? 0, player.menaceUpdatedHour ?? 0, player.hoursElapsed ?? 0));
+    const priceParts = { corruptionMult: mult, buyDiscount, tideMult: vendorTideMult, warBuyMult, regardMult: buyRegardMult, pressureTideMult, menaceMult };
     const effectivePrice = VP.finalBuyPrice(offer.price, priceParts);
     if (player.tc < effectivePrice) {
       get().appendLog(

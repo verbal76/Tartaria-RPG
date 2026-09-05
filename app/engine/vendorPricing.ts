@@ -38,14 +38,27 @@ export interface BuyPriceParts {
    *  favour and +25% against, which is inside the swing CHA + tide already
    *  produce, so it cannot open a buy-here-sell-there arbitrage. */
   regardMult?: number;
+  /** OTA-1689 — the player's menace (menace.menacePriceMult): Feared +5%,
+   *  Dreaded +10%. Optional so every existing caller keeps its exact
+   *  behaviour; absent means 1. Excluded from strangerBuyPrice on purpose —
+   *  a stranger has no reputation, so the "friend's price" line (shown only
+   *  when it saved coin) never reports fear as a discount. */
+  menaceMult?: number;
 }
+
+/** ⚠ OTA-1689 — THE CEILING IS OF THE PRICE, NOT OF THE FLOAT NOISE. Seven
+ *  binary-inexact factors multiply here; 100 × 1.1 is 110.00000000000001 in
+ *  IEEE double and a bare ceil charged 111 for it. Found the day the menace
+ *  factor landed, latent for every 1.05 tide and 1.25 regard before it. */
+const CEIL_EPSILON = 1e-9;
+const ceilPrice = (x: number) => Math.max(1, Math.ceil(x - CEIL_EPSILON));
 
 /** The price the player actually pays for one unit (integer, floored at 1). */
 export function finalBuyPrice(base: number, p: BuyPriceParts): number {
-  return Math.max(1, Math.ceil(
+  return ceilPrice(
     base * p.corruptionMult * (1 - p.buyDiscount) * p.tideMult * p.warBuyMult * (p.regardMult ?? 1)
-    * (p.pressureTideMult ?? 1),
-  ));
+    * (p.pressureTideMult ?? 1) * (p.menaceMult ?? 1),
+  );
 }
 
 /** The same buy price WITHOUT the player's CHA/rapport discount — i.e. what a stranger
@@ -57,7 +70,7 @@ export function finalBuyPrice(base: number, p: BuyPriceParts): number {
 export function strangerBuyPrice(base: number, p: BuyPriceParts): number {
   // The Phase 4 tide is scarcity, not charm — a stranger pays it too, so it
   // belongs on this side of the 'what your standing saved you' line.
-  return Math.max(1, Math.ceil(base * p.corruptionMult * p.tideMult * p.warBuyMult * (p.pressureTideMult ?? 1)));
+  return ceilPrice(base * p.corruptionMult * p.tideMult * p.warBuyMult * (p.pressureTideMult ?? 1));
 }
 
 /** Price direction vs. the catalogue base, for the ▲/▼ ticker next to a price.

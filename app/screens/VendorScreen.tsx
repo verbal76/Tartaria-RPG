@@ -22,6 +22,7 @@ import { tideVendorPriceMult } from '../engine/worldPulse';
 // OTA-1156 — the two price factors the display was missing; see `priceParts` below.
 import { npcRegard, regardPriceMult, getRelation } from '../engine/npcMemory';
 import { profileOf, tideStage, tidePriceMultiplier } from '../engine/pressure';
+import { decayedMenace, menacePriceMult } from '../engine/menace';
 import { canonicalCellOf } from '../engine/worldMap';
 import factionsData from '../data/factions/factions.json';
 import { CONTENT_MAX_WIDTH } from '../ui/displayScale'; // OTA-1227 — one column width, platform-aware
@@ -333,6 +334,10 @@ export function VendorScreen() {
     : 1;
   const pressureTideMult = player
     ? tidePriceMultiplier(tideStage(player.hoursElapsed ?? 0, profileOf(player)))
+    : 1;
+  // OTA-1689 — the menace markup, the same helper the store charges through.
+  const vendorMenaceMult = player
+    ? menacePriceMult(decayedMenace(player.menace ?? 0, player.menaceUpdatedHour ?? 0, player.hoursElapsed ?? 0))
     : 1;
   const warCell = player ? canonicalCellOf(player.currentLocationId) : { x: 0, y: 0 };
   const warHeat = localWarHeat(worldMemory?.patrols ?? [], warCell.x, warCell.y);
@@ -713,7 +718,7 @@ export function VendorScreen() {
               // OTA-865 — the FULL buy price (now including faction-tide + war heat, which
               // the display used to drop), from the same helper buyFromVendor uses so the
               // shown price is exactly what transacts. The ▲/▼ ticker compares it to base.
-              const effPrice = finalBuyPrice(o.price, { corruptionMult, buyDiscount: rapportMod, tideMult: vendorTideMult, warBuyMult, regardMult: vendorRegardMult, pressureTideMult });
+              const effPrice = finalBuyPrice(o.price, { corruptionMult, buyDiscount: rapportMod, tideMult: vendorTideMult, warBuyMult, regardMult: vendorRegardMult, pressureTideMult, menaceMult: vendorMenaceMult });
               const buyTick = priceArrow(effPrice, o.price, 'buy');
               const canAfford = player.tc >= effPrice;
               const itemPreview = getItemPreview(o.itemName);

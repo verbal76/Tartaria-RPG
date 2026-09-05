@@ -56,3 +56,37 @@ export function raiseMenace(current: number, kind: 'person' | 'animal'): number 
   const add = kind === 'person' ? MENACE_PER_INTIMIDATE_PERSON : MENACE_PER_INTIMIDATE_ANIMAL;
   return Math.min(MENACE_MAX, Math.max(0, current) + add);
 }
+
+// ⚠⚠ OTA-1689 — THE FEARED FACE. The narrative-agency audit (hole 8): a
+// "Dreaded" player was priced and greeted like anyone else — `npcRegard` reads
+// the ledger with one person and menace is a reputation with everyone, so the
+// two never met. Two readers, both keyed on the tier the portrait already
+// shows, so the player can see the cause of every line and every markup:
+//   - the counter pads the price for a face like yours (Feared +5%, Dreaded
+//     +10% on buys; sells untouched — fear does not make your goods worth more);
+//   - the greeting gets one extra beat at Feared and Dreaded. Not when the
+//     person is `wronged`: their own line already says they know what you are.
+// The trade-off menace was built as (OTA-808) finally reaches the market: the
+// threat that buys you free goods costs you coin at every honest counter.
+
+export const MENACE_PRICE_FEARED = 1.05;
+export const MENACE_PRICE_DREADED = 1.10;
+
+/** The buy-price factor for the player's menace (≥ 1). Unremarkable and
+ *  Noticed pay the board price. */
+export function menacePriceMult(menace: number): number {
+  const tier = menaceTier(menace);
+  if (tier === 'Dreaded') return MENACE_PRICE_DREADED;
+  if (tier === 'Feared') return MENACE_PRICE_FEARED;
+  return 1;
+}
+
+/** One extra greeting beat for a feared face, or null. `regard` is the
+ *  person's own rung: a `wronged` counter already speaks for itself. */
+export function menaceGreetingBeat(menace: number, npcName: string, regard?: string | null): string | null {
+  if (regard === 'wronged') return null;
+  const tier = menaceTier(menace);
+  if (tier === 'Dreaded') return `${npcName} does not quite meet your eye. "Whatever you want. Just say it." The prices on the board have already crept up for a face like yours.`;
+  if (tier === 'Feared') return `${npcName} keeps the counter between you. Word of how you get your way has come this far.`;
+  return null;
+}

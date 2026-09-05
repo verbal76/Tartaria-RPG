@@ -27999,7 +27999,24 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // dice and the Dragon never rose) — resolveRollStep now re-checks the ground
 // when the roll took the last body (stageArrival.rearmAfterRoll). gameStore
 // stays under the 37,000-line ratchet (the writers live in stageArrival).
-export const OTA_BUILD_ID = '2026-09-05-1688-the-deed-ledger';
+// 2026-09-05 OTA-1689 — THE FEARED FACE. Step-4 mundane reader, audit hole 8:
+// a "Dreaded" player was priced and greeted like anyone else — npcRegard reads
+// the ledger with one person, menace is a reputation with everyone, and the
+// two never met. Two readers on the tier the portrait already shows
+// (menace.ts): the counter pads the buy price for a face like yours (Feared
+// +5%, Dreaded +10%; sells untouched; excluded from the "friend's price" line
+// so fear is never reported as a discount), wired into BOTH the charged path
+// (vendorSlice priceParts.menaceMult) and the shown path (VendorScreen) per
+// vendorPricing's shown-equals-charged rule; and one extra greeting beat at
+// Feared ("keeps the counter between you") and Dreaded ("does not quite meet
+// your eye … the prices have already crept up for a face like yours"), on
+// both greeting doors, never over a wronged counter's own line. And a latent
+// defect the new factor exposed: finalBuyPrice ceiled the raw float product,
+// so 100 × 1.1 (= 110.00000000000001) charged 111 — every 1.05 tide and 1.25
+// regard before it could overcharge a coin the same way; the ceiling now
+// ignores float noise (vendorPricing.ceilPrice).
+export const OTA_BUILD_ID = '2026-09-05-1689-the-feared-face';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1688-the-deed-ledger';
 // golem catch-up 2026-09-05: markerless publish of OTA-1688 - the deed ledger.
 // worldMemory.deeds: a mission ground under the boots, a card walked out on and
 // a mission fight fled are written down; the arrival line, the people and the

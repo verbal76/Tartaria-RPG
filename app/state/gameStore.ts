@@ -520,7 +520,7 @@ import {
   parleySuccessLine, parleyWrongKeyLine, parleyRolledFailLine,
 } from '../engine/parley';
 import {
-  raiseMenace, decayedMenace, menaceIntimidateDcBonus, menaceEncounterBonus,
+  raiseMenace, decayedMenace, menaceIntimidateDcBonus, menaceEncounterBonus, menaceGreetingBeat,
 } from '../engine/menace';
 // OTA-1254 — the cudgel beat readies the cudgel through the SAME comparison the
 // loot picker's ★ uses, rather than its own hand-rolled guess. See grantTutorialItem.
@@ -5961,6 +5961,7 @@ function emitVendorGreeting(
   if (!rel || rel.meetings <= 1) return; // a stranger gets the arrival line, not a greeting
   const hours = player.hoursElapsed ?? 0;
   get().appendLog('world', npcGreeting(rel, vendor.name, player.name, player.sex));
+  { const mb = menaceGreetingBeat(decayedMenace(player.menace ?? 0, player.menaceUpdatedHour ?? 0, hours), vendor.name, npcRegard(rel)); if (mb) get().appendLog('world', mb); } // OTA-1689
   const awayLine = npcAbsenceLine(rel, vendor.name, player.name, hours, player.sex);
   if (awayLine) get().appendLog('world', awayLine);
   const raid = raidNewsFor(get().worldMemory, rel, hours);
@@ -11646,6 +11647,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // knowing you and not reads as broken, not as varied.
         const rel = relNow;
         get().appendLog('world', npcGreeting(rel, vendor.name, player.name, player.sex));
+        { const mb = menaceGreetingBeat(decayedMenace(player.menace ?? 0, player.menaceUpdatedHour ?? 0, player.hoursElapsed ?? 0), vendor.name, npcRegard(rel)); if (mb) get().appendLog('world', mb); } // OTA-1689
         const awayLine = npcAbsenceLine(rel, vendor.name, player.name, player.hoursElapsed ?? 0, player.sex);
         if (awayLine) get().appendLog('world', awayLine);
         // OTA-1081 — the delayed mumble: a pocket lifted CLEAN on an earlier
