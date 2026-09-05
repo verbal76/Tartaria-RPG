@@ -401,7 +401,14 @@ import { pickWastelandEncounter, RECENT_ENCOUNTER_MEMORY } from '../engine/waste
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { OTA_BUILD_ID } from '../buildInfo';
 import { rollDie, rollFromNotation, pick, chance, rotatingPick } from '../engine/rng';
-import { buildCombatSteps, buildSkillSteps, rollMods, classifyManeuver, fleeGraceApplies, escapePursuit, FLEE_STAMINA_COST } from '../engine/combatRules';
+import { buildCombatSteps, buildSkillSteps, rollMods, classifyManeuver, fleeGraceApplies, FLEE_STAMINA_COST } from '../engine/combatRules';
+// ⚠ OTA-1678 — the escape bar escalates on RANDOM ground only. The four world
+// rolls stamp their bodies; the dispatch reads the bar through fleeOdds, the
+// same reader the FLEE chip prints its odds from.
+import { markUnscripted, isUnscriptedLineup } from '../engine/fleeEscalation';
+import { fleePursuitFor } from './fleeOdds';
+// ⚠ OTA-1678 — the faction-party spawner moved out under the OTA-1400 ratchet.
+import { injectFactionParty } from './factionParty';
 import { CognitiveOrchestrator, type BootStage } from '../ai/CognitiveOrchestrator';
 import type { CognitiveResponse, WorldContext, ModelInfo } from '../ai/types';
 import { QwenGenerativeEngine, type QwenStatus } from '../ai/generation/QwenGenerativeEngine';
@@ -1592,6 +1599,11 @@ export interface CurrentScene {
    *  the first 3 contest wins per scene visit, so a pet weak enemy can't be
    *  dodge-farmed for unbounded stats. Resets with the scene. */
   dodgeTrainsUsed?: number;
+  /** ⚠ OTA-1678 — FAILED breaks against THIS lineup. Each one raises the next
+   *  escape bar on random ground (engine/fleeEscalation); never read for a
+   *  scripted lineup. Reset by every lineup producer and by FRESH_ENEMY_ARRAYS,
+   *  so a count can never outlive the bodies it was earned against. */
+  fleeAttempts?: number;
   /** Live narrative hooks the player can follow into multi-stage chains. */
   hooks: Hook[];
   /** Notable nouns extracted from location.description — the things the
@@ -4419,13 +4431,6 @@ function captureBossVictoryLine(channel: string, text: string): void {
   bucket.push(clean);
 }
 
-/** OTA-1116 — what actually landed. `null` = nothing spawned (callers already
- *  treat that as falsy and bail). `elite` is set only when the OTA-1116 swap
- *  fired, so the announce line can stop claiming a headcount that is no longer
- *  true — a "war party, 4 of them" line over a single body is the kind of small
- *  lie that reads as a bug. */
-type InjectedParty = { elite: Enemy | null } | null;
-
 /** ⚠ OTA-1159 — THE GAIN SIDE OF A HOSTILE CASCADE IS METERED. THE LOSS SIDE IS NOT.
  *
  *  Every standing LOSS cascades through `applyRepChange`: allies take half, and rivals
@@ -4539,111 +4544,6 @@ export function scalePowerOf(player: PlayerCharacter): number {
   return enemyScalePower(base, player.hpMax, gear);
 }
 
-function injectFactionParty(
-  get: () => GameStore,
-  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
-  opts: { factionId: string; factionName: string; partySize: number; noun: string },
-): InjectedParty {
-  const s = get();
-  const player = s.player;
-  const scene = s.currentScene;
-  if (!player || !scene || !scene.location) return null;
-  // OTA-1015 — a faction party is made of that faction's PEOPLE. This builder reskins
-  // whatever the local wild table rolls (rename + stamp a factionId) and KEEPS
-  // every trait, so an Aetherkin roll used to walk in as "<Faction> Patrol 1" —
-  // a mud-mummified corpse wearing a soldier's name, resisting piercing and
-  // burning like tinder. That reskin is also what double-docked the victim's own
-  // faction on the kill (the reverence penalty below assumes Aetherkin carry no
-  // faction). Special-marked creatures are excluded from the pool outright; if
-  // nothing ordinary is available here, no party lands (callers handle false).
-  const specialTemplate = (e: Enemy): boolean => {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { isAetherkin: isAk } = require('../engine/aetherkin') as typeof import('../engine/aetherkin');
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { isRevenant } = require('../engine/fallenRevenants') as typeof import('../engine/fallenRevenants');
-    return isAk(e) || isRevenant(e);
-  };
-  const base = rollEncounter(scene.location).filter((e) => !e.boss && !specialTemplate(e));
-  if (base.length === 0) return null;
-  // OTA-1035 — AND THE BODY IS A PERSON. Owner: "let's fix the loot drop issue
-  // where humans drop beast loot." The reskin above kept every trait of the WILD
-  // roll, so a "Conspiracy Architects Patrol" could be a Mud Cyclops underneath —
-  // dropping Raven Feather and Aether Wing off a man's corpse, burning like
-  // tinder, swinging a beak. The indoor ambush was fixed this way in OTA-1056;
-  // this is the outdoor half, sharing the same body list. The wild roll still
-  // decides HOW MANY and at what RARITY (so the tile's danger still governs) —
-  // it just no longer decides what a soldier is made of. Difficulty is unmoved:
-  // scaleEncounterForContext below anchors the pack on its mean HP against the
-  // tile's danger, not on the template's authored numbers.
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const fbMod = require('../engine/factionBodies') as typeof import('../engine/factionBodies');
-  const party: Enemy[] = [];
-  for (let i = 0; i < opts.partySize; i++) {
-    const tmpl = base[i % base.length]!;
-    // `nearest` because a Common tile still sends PEOPLE — the roster has no
-    // Common human, and borrowing the cheapest one beats sending a rat in
-    // faction colours. Falls back to the old reskin only if the roster somehow
-    // yields no human at all, so this can never leave a raid unspawned.
-    const body = fbMod.pickFactionBody(tmpl.rarity, { nearest: true }) ?? tmpl;
-    party.push(fbMod.dressFactionFighter(
-      body, opts.factionId, opts.factionName, opts.noun,
-      opts.partySize > 1 ? i + 1 : undefined,
-    ));
-  }
-  const tide = Math.max(0, s.worldMemory.factionTides?.[opts.factionId] ?? 0);
-  const power = scalePowerOf(player) + tide; // escalation: an ascendant faction hits harder
-  const packDanger = scene.location.danger + Math.floor(tide / 2);
-  let scaled = scaleEncounterForContext(party, packDanger, power);
-  // OTA-1116 — THE ELITE SWAP. The `elite` dial (OTA-1113) finally has a
-  // consumer. On a hit, the party that would have crested the rise arrives as
-  // ONE named body instead — the survey's CONTENT lever rather than another
-  // multiplier, and the only one that makes a fight different instead of
-  // longer.
-  //
-  // ⚠ The fold happens AFTER scaling, on purpose. The scaled pack's summed HP
-  // IS the elite's budget, straight from scaleEncounterForContext's pack
-  // branch, so the elite is exactly as durable as the party would have been —
-  // with no new balance constant to drift. Re-scaling the single body then
-  // routes it through the SOLO branch, which grants the FULL attack/AC bump
-  // rather than the pack's 0.6x; that softening exists precisely BECAUSE there
-  // are several of them, so one body earning the full rate is the shipped rule
-  // and not a new opinion. The pack's HP total is then restored over whatever
-  // the solo path computed: durability from the pack, aggression from the solo.
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const eliteSwapMod = require('../engine/eliteSwap') as typeof import('../engine/eliteSwap');
-  const eliteMult = profileOf(player).elite;
-  if (eliteSwapMod.shouldSwapToElite(scaled.length, { eliteMult })) {
-    const folded = eliteSwapMod.foldPartyIntoElite(scaled, {
-      factionName: opts.factionName, noun: opts.noun,
-    });
-    if (folded) {
-      const solo = scaleEncounterForContext([folded.elite], packDanger, power);
-      const body = solo[0] ?? folded.elite;
-      scaled = [{ ...body, hp: folded.hpBudget, eliteReplaced: folded.elite.eliteReplaced }];
-    }
-  }
-  // ⚠ OTA-1506 — the party lands ON THE BULLSEYE: a raid travels together, so
-  // it clusters (patrol shape) and staggers across the rings, leader nearest.
-  const placedParty = placeEnemies(scaled, 'patrol');
-  const enemyHps = placedParty.map((e) => e.hp);
-  set((st) => (st.currentScene ? {
-    currentScene: {
-      ...st.currentScene,
-      enemies: placedParty,
-      enemyHps,
-      activeEnemyIdx: 0,
-      range: openingRange(placedParty),
-      enemyAmbushUsed: placedParty.map(() => false),
-      stealthOpenerUsed: false,
-      // OTA-960 — a party that crests the rise while you're UP a climb masses at
-      // the BASE (drives the elevation combat gates); on level ground the
-      // flag clears so a stale siege can't linger into the next fight.
-      enemiesAtBase: !!st.currentScene.elevatedOn,
-    },
-  } : st));
-  return { elite: scaled.length === 1 && scaled[0]?.eliteReplaced ? scaled[0] : null };
-}
-
 // OTA-1016 — ARE YOU UNDER A ROOF? The three outdoor world-event spawners below each
 // asked `player.hubRoomId` — which is ONLY set inside an OUTPOST room. Explorable
 // building interiors (a flooded house's kitchen, its study, its attic) live on the
@@ -4726,7 +4626,7 @@ function maybeSpawnRaid(
   if (!plan) return;
   const landed = injectFactionParty(get, set, {
     factionId: plan.raiderId, factionName: plan.raiderName, partySize: plan.partySize, noun: 'Raider',
-  });
+  }, { scalePowerOf });
   if (!landed) return;
   set((st) => ({ worldMemory: { ...st.worldMemory, lastRaidHour: hour } }));
   // OTA-1116 — if the elite swap fired, the headcount is no longer true. One
@@ -4779,7 +4679,7 @@ function maybeInterceptPatrol(
   const holderName = factions.find((f) => f.id === holderId)?.name ?? holderId;
   const tide = Math.max(0, s.worldMemory.factionTides?.[holderId] ?? 0);
   const partySize = Math.max(2, Math.min(4, 2 + Math.floor(tide / 2)));
-  const landed = injectFactionParty(get, set, { factionId: holderId, factionName: holderName, partySize, noun: 'Patrol' });
+  const landed = injectFactionParty(get, set, { factionId: holderId, factionName: holderName, partySize, noun: 'Patrol' }, { scalePowerOf });
   if (!landed) return;
   set((st) => ({ worldMemory: { ...st.worldMemory, lastRaidHour: hour } }));
   get().appendLog(
@@ -4984,7 +4884,7 @@ function maybePatrolAmbush(
     Math.max(2, Math.min(4, 2 + Math.floor(tide / 2))),
     profileOf(player).pack,
   );
-  const landed = injectFactionParty(get, set, { factionId: hostile.factionId, factionName: name, partySize, noun: 'Patrol' });
+  const landed = injectFactionParty(get, set, { factionId: hostile.factionId, factionName: name, partySize, noun: 'Patrol', unscripted: true }, { scalePowerOf });
   if (!landed) return;
   set((st) => ({ worldMemory: {
     ...st.worldMemory,
@@ -9878,9 +9778,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // ⚠ OTA-1506 — THE MAIN ENCOUNTER PATH LANDS ON THE BULLSEYE: a met-on-the-
     // ground lineup clusters ahead of you (patrol shape) and staggers across
     // the rings, nearest first. A lone foe keeps the shipped 'mid' opening.
-    const enemies: Enemy[] = placeEnemies(
+    // ⚠ OTA-1678 — the world rolled these: marked so the flee contest escalates.
+    const enemies: Enemy[] = markUnscripted(placeEnemies(
       scaleEncounterForContext(encounter, location.danger, scalePower), 'patrol',
-    );
+    ));
     const enemyHps: number[] = enemies.map((e) => e.hp);
     const activeEnemyIdx = 0;
     const hasEnemies = enemies.length > 0;
@@ -17028,14 +16929,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // pursuer sets the escape bar (its d20 + speed) instead of the flat
         // DC 9 that a grown DEX could never fail against. No pursuer (trap /
         // stage escapes, cleared scenes) keeps the flat DC.
-        const fleePursuers = parsed.intent === 'escape'
-          ? (currentScene.enemies ?? []).filter((e, ei) => (currentScene.enemyHps?.[ei] ?? e.hp) > 0)
-          : [];
+        // ⚠⚠ OTA-1678 — and on RANDOM ground the bar escalates (danger, the
+        // pursuer's rarity, failed breaks this encounter, minus its wounds).
+        // `fleePursuitFor` is the ONE reader: it filters the live bodies, decides
+        // scripted-vs-random from the producers' mark, and is what the FLEE chip
+        // prints its odds from — so the chip cannot promise a different chase.
         const steps = buildSkillSteps(parsed.intent, player, {
           weatherMod: weatherStatModifiers(currentScene.weather, playerArmorResistKinds(player)),
           companionAssist: !!player.companion,
           raceCtx: { relicTarget, inRuins },
-          pursuit: fleePursuers.length > 0 ? escapePursuit(fleePursuers) : null,
+          pursuit: parsed.intent === 'escape' ? fleePursuitFor(currentScene) : null,
         });
         set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0, refundOnCancel } });
         break;
@@ -17588,9 +17491,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 ? {
                     currentScene: {
                       ...s.currentScene,
-                      enemies: [...s.currentScene.enemies, { ...enemy, pos: arrivalPos('far') }],
+                      // ⚠ OTA-1678 — a world roll: marked, and the break count starts fresh.
+                      enemies: [...s.currentScene.enemies, { ...enemy, pos: arrivalPos('far'), unscripted: true }],
                       enemyHps: [...s.currentScene.enemyHps, enemy.hp],
                       enemyAmbushUsed: [...(s.currentScene.enemyAmbushUsed ?? []), false],
+                      fleeAttempts: undefined,
                       range: 'far',
                     },
                   }
@@ -20329,13 +20234,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
               const climbPower = scalePowerOf(livePl);
               const climbDanger = sceneNow.location?.danger ?? 3;
               // OTA-1506 — a climb encounter meets you on the route: patrol shape.
-              const scaledEnc = placeEnemies(scaleEncounterForContext(enc.enemies, climbDanger, climbPower), 'patrol');
+              // ⚠ OTA-1678 — a world roll: marked, and the break count starts fresh.
+              const scaledEnc = markUnscripted(placeEnemies(scaleEncounterForContext(enc.enemies, climbDanger, climbPower), 'patrol'));
               const scaledEncHps = scaledEnc.map((e) => e.hp);
               set((s) => (s.currentScene ? {
                 currentScene: {
                   ...s.currentScene,
                   enemies: scaledEnc,
                   enemyHps: scaledEncHps,
+                  fleeAttempts: undefined,
                   activeEnemyIdx: 0,
                   range: openingRange(scaledEnc),
                   enemyAmbushUsed: scaledEnc.map(() => false),
@@ -23029,6 +22936,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // provokes). Only when enemies are present. runEnemyGroupCounters
             // self-guards against a dead player mid-volley.
             if (inCombat) {
+              // ⚠⚠ OTA-1678 — ON RANDOM GROUND THE FAILED BREAK IS COUNTED. The
+              // next bar is FLEE_RETRY_STEP higher (engine/fleeEscalation), and
+              // the feed says so before the volley lands, so the harder roll
+              // that follows is a consequence the player was told about, not a
+              // number that moved on its own. A scripted lineup counts nothing.
+              if (isUnscriptedLineup(currentScene.enemies, currentScene.enemyHps)) {
+                set((s) => (s.currentScene
+                  ? { currentScene: { ...s.currentScene, fleeAttempts: (s.currentScene.fleeAttempts ?? 0) + 1 } }
+                  : s));
+                get().appendLog('world', 'They have your measure now. The next break will be harder.');
+              }
               runEnemyGroupCounters(get, set, player);
             }
             break;
@@ -32854,6 +32772,8 @@ export const FRESH_ENEMY_ARRAYS = {
   enemyStaggered: undefined,
   enemyKnockedOut: undefined,
   enemyAmbushUsed: undefined,
+  // ⚠ OTA-1678 — the failed-break count belongs to the bodies it was earned against.
+  fleeAttempts: undefined,
 } as const;
 
 

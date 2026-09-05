@@ -914,6 +914,10 @@ export interface EscapePursuit {
   label: string;
   /** Test injection for the pursuer's d20; production rolls it live. */
   d20?: number;
+  /** ⚠ OTA-1678 — the breakdown behind an ESCALATED bonus (random ground only:
+   *  `SPD 5, danger +2, Rare +2, 2nd try +2, wounded −2`), printed on the roll
+   *  card so the player can see why the bar moved. Absent on a plain chase. */
+  note?: string;
 }
 export function escapePursuit(enemies: readonly Enemy[]): EscapePursuit | null {
   let best: EscapePursuit | null = null;
@@ -1049,7 +1053,7 @@ export function buildSkillSteps(
     bonusLabel: `${statLabel} ${statVal}${assistLabel}${perkLabel}${statusLabel}`,
     target,
     targetLabel: pursuit
-      ? `Pursuit ${target} — ${pursuit.label} (d20 ${pursuitD20} + SPD ${pursuit.bonus})`
+      ? `Pursuit ${target} — ${pursuit.label} (d20 ${pursuitD20} + ${pursuit.note ? `${pursuit.bonus}: ${pursuit.note}` : `SPD ${pursuit.bonus}`})`
       : `DC ${dc}${dcName ? ` — ${dcName}` : ''}`,
     context: pursuit
       ? `d20 + ${statLabel}${assistLabel}${perkLabel}${statusLabel} vs ${pursuit.label} — contested chase`

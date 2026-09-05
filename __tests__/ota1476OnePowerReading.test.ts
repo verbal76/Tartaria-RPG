@@ -258,7 +258,11 @@ describe('OTA-1476 — the stale claim is gone, and the honest one is written do
   it('⚠⚠ the raid really does add an uncapped tide — the claim is checked, not asserted', () => {
     // If this ever gains a ceiling, the note above becomes wrong and should be
     // revisited rather than left standing.
-    expect(STORE).toContain('const power = scalePowerOf(player) + tide;');
-    expect(STORE).toContain('const packDanger = scene.location.danger + Math.floor(tide / 2);');
+    // ⚠ OTA-1678 — the party builder lives in state/factionParty.ts now and is
+    // handed scalePowerOf by its store callers; the arithmetic is unchanged.
+    const PARTY = codeOnly(read('app', 'state', 'factionParty.ts'));
+    expect(PARTY).toContain('const power = deps.scalePowerOf(player) + tide;');
+    expect(PARTY).toContain('const packDanger = scene.location.danger + Math.floor(tide / 2);');
+    expect((STORE.match(/\{ scalePowerOf \}\)/g) ?? []).length).toBe(3);
   });
 });

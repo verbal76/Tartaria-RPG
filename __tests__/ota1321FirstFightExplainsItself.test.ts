@@ -159,7 +159,10 @@ describe('OTA-1321 — the card describes the game that shipped', () => {
 
   it('⚠⚠ every control the card names is a real button on the fight screen', () => {
     for (const label of ['dodge', 'stealth', 'approach', 'inventory', 'flee']) {
-      expect(INPUTBOX).toContain(`label="${label}"`);
+      // ⚠ OTA-1678 — FLEE carries its odds ("flee 48%"), so its label is an
+      // expression whose bare form is still the word the card names.
+      const bare = INPUTBOX.includes(`label="${label}"`) || INPUTBOX.includes(`? '${label}' : \`${label} `);
+      expect(bare).toBe(true);
       expect(CARD_PROSE.toLowerCase()).toContain(label);
     }
   });

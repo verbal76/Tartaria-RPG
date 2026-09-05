@@ -139,7 +139,12 @@ describe('OTA-1159 — one place builds a scale power', () => {
     // was the one this OTA missed. A RISING count here is this test's claim getting
     // STRONGER: "every spawner routes through scalePowerOf" is more true than it was.
     // If it ever DROPS, a spawner has gone back to rolling its own measure.
-    const uses = STORE.match(/scalePowerOf\(/g) ?? [];
+    // ⚠ OTA-1678 — the faction-party spawner moved to state/factionParty.ts and
+    // calls the measure it is HANDED (`deps.scalePowerOf(`), so the count is
+    // taken over both files: nine in the store plus the one that moved. Still
+    // ten spawners, still one measure.
+    const PARTY = read('app', 'state', 'factionParty.ts');
+    const uses = [...(STORE.match(/scalePowerOf\(/g) ?? []), ...(PARTY.match(/scalePowerOf\(/g) ?? [])];
     // ⚠ OTA-1576 RETARGET, and the ratchet moved the RIGHT way: the false-summit
     // escort spawn (scaleHuntEscort) routes through the same shared measure, so
     // this is a tenth spawner joining the rule rather than one leaving it.

@@ -27798,7 +27798,37 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // visible as before. Proven in the suite against the real scrubbing pattern
 // over a real 400 KB delivered log: the text trips it, no envelope does.
 // ⚠ The task's second finding (release/dist null) was closed by OTA-1592 / #109.
-export const OTA_BUILD_ID = '2026-09-05-1677-the-log-leaves-in-an-envelope';
+// OTA-1678 — THE CHASE GETS HARDER. Item six (a) of "fix all existing issues
+// one through six": the flee escalation, on the randoms only. Owner: "on the
+// randoms there should be a flee escalation… the ones that I'm purposely
+// throwing you head first into some big guy because you have to do that to
+// complete or progress a mission or a storyline - I don't think there should
+// be a progression on those, only on the randoms. I want the rest of the world
+// to be dangerous." His log: he flees everything at ~100 HP+ on random ground
+// and wins nearly every escape - OTA-1009 made the flee contested and OTA-1459
+// made it cost stamina, and neither moved the bar between the first break and
+// the fourth, a danger-1 verge and a danger-5 pit, a rat and a Legendary.
+// ⚠⚠⚠ ON RANDOM GROUND THE PURSUER'S BAR NOW MOVES: +1 per danger level above
+// 1, +0/+1/+2/+3 by its rarity, +2 per failed break this encounter, and -2 / -4
+// when it is at half / a quarter HP - the one who can catch you is chosen
+// AFTER escalation, so a bleeding sprinter loses the chase to a fresh brute.
+// The roll card prints the breakdown ("d20 14 + 11: SPD 5, danger +2, Rare +2,
+// 2nd try +2"), a failed break says "They have your measure now" before the
+// volley, and the FLEE chip carries the exact odds ("flee 48%") from the SAME
+// reader the roll is built from (state/fleeOdds), so it cannot promise a
+// different chase.
+// ⚠⚠ RANDOM IS DECLARED BY THE PRODUCER, never inferred: the four world rolls
+// (beginScene's encounter, the climb encounter, the rest ambush, the patrol
+// crossing) stamp Enemy.unscripted; every scripted spawn - hunt stages, core
+// guardians, chain marks, captors, summit bosses, hostile traders, and every
+// body from a save before this OTA - keeps the OTA-1009 contract exactly. A
+// lineup escalates only when EVERY live body carries the mark. The failed-break
+// count lives on the scene (fleeAttempts) and is reset by FRESH_ENEMY_ARRAYS
+// and by every lineup producer, so it cannot outlive the bodies it was earned
+// against. injectFactionParty moved verbatim to state/factionParty.ts under
+// the OTA-1400 line ratchet (gameStore 36,914 lines).
+export const OTA_BUILD_ID = '2026-09-05-1678-the-chase-gets-harder';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1677-the-log-leaves-in-an-envelope';
 // golem catch-up 2026-09-05: markerless publish of OTA-1677 - the log leaves
 // in an envelope. #82 re-measured: 209 of 711 delivered events (29%) still
 // lost a ~400-char block to @password:filter, 219 of 273 holes in salvage

@@ -147,8 +147,12 @@ describe('OTA-1015 — SOURCE LOCKS (category: one event, one price; promises ar
   });
 
   it('faction parties are never reskinned from special creature templates', () => {
-    expect(src).toMatch(/const specialTemplate = \(e: Enemy\): boolean =>/);
-    expect(src).toMatch(/rollEncounter\(scene\.location\)\.filter\(\(e\) => !e\.boss && !specialTemplate\(e\)\)/);
+    // ⚠ OTA-1678 — injectFactionParty moved verbatim to state/factionParty.ts
+    // (the OTA-1400 line ratchet); the claim is the same, read where it lives.
+    const party = fs.readFileSync(path.join(__dirname, '..', 'app', 'state', 'factionParty.ts'), 'utf8');
+    expect(party).toMatch(/const specialTemplate = \(e: Enemy\): boolean =>/);
+    expect(party).toMatch(/rollEncounter\(scene\.location\)\.filter\(\(e\) => !e\.boss && !specialTemplate\(e\)\)/);
+    expect(party).not.toMatch(/rollEncounter\(scene\.location\)\.filter\(\(e\) => !e\.boss\);/);
     expect(src).not.toMatch(/rollEncounter\(scene\.location\)\.filter\(\(e\) => !e\.boss\);/);
   });
 

@@ -234,7 +234,10 @@ describe('OTA-1506 — the wiring is complete (source claims)', () => {
   it('⚠⚠ every spawn site stamps positions — staggered lineups and placed arrivals', () => {
     // Fresh lineups (main encounter, faction party, aetherkin, escort party,
     // climb) go through placeEnemies; every add-one newcomer through arrivalPos.
-    expect((STORE.match(/placeEnemies\(/g) ?? []).length).toBeGreaterThanOrEqual(5);
+    // ⚠ OTA-1678 — the faction party's placeEnemies moved with injectFactionParty
+    // to state/factionParty.ts; the census counts both files.
+    const PARTY = readFileSync(join(ROOT, 'app', 'state', 'factionParty.ts'), 'utf8');
+    expect((STORE.match(/placeEnemies\(/g) ?? []).length + (PARTY.match(/placeEnemies\(/g) ?? []).length).toBeGreaterThanOrEqual(5);
     expect((STORE.match(/arrivalPos\(/g) ?? []).length).toBeGreaterThanOrEqual(12);
     // No spawn writes a bare enemies array next to a range literal any more:
     // an appended body without a pos would silently inherit the SHARED band.

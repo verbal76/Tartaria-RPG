@@ -328,6 +328,15 @@ export interface Enemy {
    *  absent, engine/parley.deriveAnimalTemperament() infers it from the name/traits
    *  so every foe has a stable read. Bosses are unparley-able regardless. */
   temperament?: import('./parley').Temperament;
+  /** ⚠⚠ OTA-1678 — THIS BODY WAS ROLLED BY THE WORLD, not placed by a mission.
+   *  Stamped by the four world rolls only (beginScene's encounter, the climb
+   *  encounter, the rest ambush, the patrol crossing — see engine/fleeEscalation)
+   *  and read by the flee contest: a lineup where every live body carries it is
+   *  a "random" in the owner's sense and the escape bar escalates; any body
+   *  without it (hunt stages, guardians, chain marks, captors, summit bosses,
+   *  hostile traders, and every save from before this OTA) keeps the OTA-1009
+   *  contract. Rides on the enemy like `pos` and `coating`. */
+  unscripted?: boolean;
 }
 
 export interface WeatherEntry {

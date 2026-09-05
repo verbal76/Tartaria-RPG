@@ -157,18 +157,23 @@ describe('OTA-1116 — the things it must never touch', () => {
 describe('OTA-1116 — the store wires it where a party spawns, and nowhere else', () => {
   const store: string = fs.readFileSync(
     path.join(__dirname, '../app/state/gameStore.ts'), 'utf8');
+  // ⚠ OTA-1678 — `injectFactionParty` moved verbatim to state/factionParty.ts
+  // (the OTA-1400 line ratchet). The injector's own pins read it there; the
+  // callers, the loot path and the announce lines are still the store's.
+  const party: string = fs.readFileSync(
+    path.join(__dirname, '../app/state/factionParty.ts'), 'utf8');
 
   it('the swap is driven by the tier profile, not a local constant', () => {
-    expect(store).toContain('const eliteMult = profileOf(player).elite;');
-    expect(store).toContain('eliteSwapMod.shouldSwapToElite(scaled.length, { eliteMult })');
+    expect(party).toContain('const eliteMult = profileOf(player).elite;');
+    expect(party).toContain('eliteSwapMod.shouldSwapToElite(scaled.length, { eliteMult })');
   });
 
   it('⚠ the fold runs AFTER pack scaling — that is where the HP budget comes from', () => {
     // Sliced to the function's OWN body (column-0 closing brace) rather than a
     // magic character count — anchoring on a length is how an assertion breaks
     // on someone else's edit, which is the least useful kind of red there is.
-    const from = store.indexOf('function injectFactionParty(');
-    const fn = store.slice(from, store.indexOf('\n}\n', from));
+    const from = party.indexOf('export function injectFactionParty(');
+    const fn = party.slice(from, party.indexOf('\n}\n', from));
     const scaleAt = fn.indexOf('scaleEncounterForContext(party, packDanger, power)');
     const foldAt = fn.indexOf('foldPartyIntoElite');
     expect(scaleAt).toBeGreaterThan(-1);
@@ -179,8 +184,8 @@ describe('OTA-1116 — the store wires it where a party spawns, and nowhere else
   it('⚠ and the single body is RE-scaled through the solo branch, then given the pack HP', () => {
     // Durability from the pack, aggression from the solo. Losing either half
     // makes the elite either a pushover or a spike.
-    expect(store).toContain('scaleEncounterForContext([folded.elite], packDanger, power)');
-    expect(store).toContain('hp: folded.hpBudget');
+    expect(party).toContain('scaleEncounterForContext([folded.elite], packDanger, power)');
+    expect(party).toContain('hp: folded.hpBudget');
   });
 
   it('the loot path pays the carry, and rides the roll count rather than a flat grant', () => {
@@ -194,8 +199,10 @@ describe('OTA-1116 — the store wires it where a party spawns, and nowhere else
   });
 
   it('the injector reports what landed, and a failed spawn is still falsy', () => {
-    expect(store).toContain('type InjectedParty = { elite: Enemy | null } | null;');
-    expect(store).toContain('return { elite: scaled.length === 1 && scaled[0]?.eliteReplaced ? scaled[0] : null };');
+    expect(party).toContain('export type InjectedParty = { elite: Enemy | null } | null;');
+    expect(party).toContain('return { elite: scaled.length === 1 && scaled[0]?.eliteReplaced ? scaled[0] : null };');
+    // And the three store callers still land through it (raid, hostile ground, crossing).
+    expect((store.match(/injectFactionParty\(get, set, \{/g) ?? []).length).toBe(3);
   });
 });
 

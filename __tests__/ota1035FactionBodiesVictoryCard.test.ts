@@ -122,8 +122,13 @@ describe('OTA-1035 — a faction fighter is a PERSON', () => {
 });
 
 describe('OTA-1035 — the battle follow-up card', () => {
+  // ⚠ OTA-1678 — the outdoor raid builder (injectFactionParty) moved verbatim
+  // to state/factionParty.ts; it is read alongside the store so the claims below
+  // still see it.
   const store = fs.readFileSync(
     path.join(__dirname, '..', 'app', 'state', 'gameStore.ts'), 'utf8',
+  ) + '\n' + fs.readFileSync(
+    path.join(__dirname, '..', 'app', 'state', 'factionParty.ts'), 'utf8',
   ) + '\n' + storeSource();
   const modal = fs.readFileSync(
     path.join(__dirname, '..', 'app', 'components', 'MissionCompleteModal.tsx'), 'utf8',

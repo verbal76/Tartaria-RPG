@@ -19,6 +19,8 @@ import { useGameStore, logUiTap } from '../state/gameStore';
 import { medkitRole, type MedkitRole } from '../engine/medkitEligibility'; // OTA-1663
 // ⚠ OTA-1404 — combat resolution moved out of gameStore into its own leaf.
 import { playerWeaponReach } from '../state/combatResolution';
+// ⚠ OTA-1678 — the FLEE chip's odds, from the one reader the escape roll uses.
+import { fleeOddsFor } from '../state/fleeOdds';
 import { itemIsShield, findWeaponByName } from '../engine/crafting';
 // OTA-1562 — the bandolier button has to give the SAME reach answer the throw
 // gate will give; see the note at its `inRange` below.
@@ -375,6 +377,13 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   // ⚠⚠ OTA-1458 — EMPTY LEGS. Drives the travel row's spent state so a move the
   // store is about to refuse never looks tappable. See TravelBtn's `spent`.
   const noStamina = useGameStore((s) => (s.player?.stamina ?? 1) <= 0);
+  // ⚠⚠ OTA-1678 — THE ODDS ON THE CHIP. Owner: "on the randoms there should be
+  // a flee escalation". The bar now moves (danger, rarity, failed breaks,
+  // wounds), so the chip says what the next tap is worth — read through the
+  // SAME function the dispatch builds the roll from, and reduced to one number
+  // here because a selector that returns a fresh object re-renders on every
+  // store write. Null (plain "flee") when nothing alive is chasing.
+  const fleeOddsPct = useGameStore((s) => (s.player && s.currentScene ? fleeOddsFor(s.player, s.currentScene)?.pct ?? null : null));
   const dodgeCooldown = useGameStore((s) => s.player?.dodgeCooldown ?? 0);
   // ⚠ OTA-1171 — the bar's DENOMINATOR is this character's difficulty tier, not the bare
   // constant. Divide bury_me's 5-round lock by 3 and the chip reads full blue with two
@@ -934,7 +943,8 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
               <QuickBtn label="stealth" defensive onPress={() => onSubmit('sneak')} />
               {/* OTA — flee is legal in wall fights now: one tap, normal flee
                   roll, success dives for the base (double stamina per tier). */}
-              <QuickBtn label="flee" defensive onPress={() => onSubmit('flee')} />
+              {/* ⚠ OTA-1678 — the chip carries the odds of the next break. */}
+              <QuickBtn label={fleeOddsPct === null ? 'flee' : `flee ${fleeOddsPct}%`} defensive onPress={() => onSubmit('flee')} />
               {/* OTA-361 — loot a knocked-out humanoid. One tap strips their
                   kit (damaged) + drops + TC and clears them from the fight. */}
               {knockedOutPresent ? (

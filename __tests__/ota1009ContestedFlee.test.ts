@@ -70,8 +70,16 @@ describe('OTA-1009 — category lock: the store wires live pursuers into the esc
   const RULES = fs.readFileSync(path.join(__dirname, '..', 'app', 'engine', 'combatRules.ts'), 'utf8');
 
   it('the skill dispatch passes escapePursuit over live enemies (hp-filtered)', () => {
-    expect(STORE).toMatch(/pursuit: fleePursuers\.length > 0 \? escapePursuit\(fleePursuers\) : null,/);
-    expect(STORE).toMatch(/currentScene\.enemyHps\?\.\[ei\] \?\? e\.hp\) > 0/);
+    // ⚠ OTA-1678 — the dispatch now reads the bar through ONE function
+    // (state/fleeOdds.fleePursuitFor → engine/fleeEscalation.escalatedPursuit),
+    // shared with the FLEE chip's odds. The hp filter moved with it; a
+    // scripted lineup still resolves to exactly this file's `escapePursuit`.
+    expect(STORE).toMatch(/pursuit: parsed\.intent === 'escape' \? fleePursuitFor\(currentScene\) : null,/);
+    const ODDS = fs.readFileSync(path.join(__dirname, '..', 'app', 'state', 'fleeOdds.ts'), 'utf8');
+    expect(ODDS).toMatch(/return escalatedPursuit\(/);
+    const ESC = fs.readFileSync(path.join(__dirname, '..', 'app', 'engine', 'fleeEscalation.ts'), 'utf8');
+    expect(ESC).toMatch(/const hp = hps\?\.\[i\] \?\? e\.hp;\s*\n\s*if \(hp > 0\) out\.push/);
+    expect(ESC).toMatch(/if \(!isUnscriptedLineup\(enemies, hps\)\) return escapePursuit\(live\.map\(\(\{ e \}\) => e\)\);/);
   });
 
   it('the escape step builder is pursuit-aware — the bar is no longer always the flat table DC', () => {
