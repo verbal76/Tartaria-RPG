@@ -169,6 +169,16 @@ const ENGINE_VOCABULARY: readonly RegExp[] = [
   /\b(ui|ux|hud)\b/i,
   /\bota\b/i,
   /\bparser\b/i,
+  // ⚠ OTA-1684 — the owner's 09-04 22:15 note: "0 The enemy portrait is stuck
+  // between a left and right swipe and I did not swipe" parsed as STEAL
+  // (`swipe` is a steal synonym) and the Arbiter said "Nothing to steal here".
+  // "enemy portrait" is the combat card, "swipe left/right" is a gesture —
+  // neither is a sentence a character in the fiction could form. A bare
+  // "portrait" stays OUT: "investigate family portrait" is a real command in
+  // the ota1464 corpus.
+  /\benemy\s+portraits?\b/i,
+  /\bswipe[sd]?\s+(left|right|up|down)\b/i,
+  /\b(left|right)\s+(and|or)\s+(left|right)\s+swipes?\b/i,
 ];
 
 const REPORT_MARKERS: readonly RegExp[] = [
@@ -190,6 +200,10 @@ const REPORT_MARKERS: readonly RegExp[] = [
   /\bnot\s+working\b/i,
   /\bsupposed\s+to\b/i,
   /\bthere\s+(was|is)\s+no\s+\w+\s+(telling|saying|explaining)\b/i,
+  // ⚠ OTA-1684 — "I did not swipe / tap / press": a player DENYING an interface
+  // act is reporting the interface, not commanding the world. Only the acts a
+  // finger does to glass; "I did not attack" stays with the parser.
+  new RegExp(String.raw`\bi\s+(?:did|do|have|had)${NOT}\s+(?:swipe|tap|press|click|type|scroll|touch)\b`, 'i'),
   /\bwhen\s+i\s+.{0,60}\bit\s+(refreshes|resets|puts|went|goes|shows|said|says|told)\b/i,
 ];
 

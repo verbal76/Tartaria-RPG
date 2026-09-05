@@ -27903,7 +27903,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SELL ALL COMMON GEAR steps around coated pieces and the confirm says how
 // many. The Weapons section reads in runs headed by reach class: Melee,
 // Spears & polearms, Ranged, Rune-casters, Thrown.
-export const OTA_BUILD_ID = '2026-09-05-1683-the-sheet-and-the-pack';
+// 2026-09-05 OTA-1684 — THE TYPO IS ASKED, NOT RUN (task #194, three
+// notations from 09-04). "srink": the fuzzy matcher is exact-only at 4–5
+// letters (OTA-094), so the word went to Qwen for 4.8s and came back as a
+// rope; the parser now names the one-edit miss and the Arbiter asks "did you
+// mean drink?" with the corrected line first on the chip row. "0 The enemy
+// portrait is stuck between a left and right swipe and I did not swipe"
+// parsed as STEAL; the guard learns "enemy portrait", swipe gestures, and
+// "I did not swipe/tap/press". CONTRACTS ▸ shows on every vendor; a roadside
+// trader's board says it keeps none, instead of the button being absent.
+// The dog notation needs the save; nothing in the log names the dog's state.
+export const OTA_BUILD_ID = '2026-09-05-1684-the-typo-is-asked-not-run';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1683-the-sheet-and-the-pack';
 // golem catch-up 2026-09-05: markerless publish of OTA-1683 - the sheet and
 // the pack. STE on the portrait; effectiveStats derives from the breakdown
 // (one sum, every source named, floored); the wrongs row drills into who and

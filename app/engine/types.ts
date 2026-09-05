@@ -128,6 +128,14 @@ export interface ParsedInput {
    *  'unknown'` returns. Lets the engine surface useful feedback
    *  instead of silently rewriting state. */
   validationIssues?: string[];
+  /** ⚠ OTA-1684 — THE NEAR MISS, NAMED. Set only when no verb matched and the
+   *  first token sits ONE edit from a table verb the fuzzy matcher deliberately
+   *  refuses to auto-correct (4–5 letter words are exact-only since OTA-094, or
+   *  "leave" becomes "cleave"). The parser does not ACT on it — the owner's
+   *  "srink" is not run as "drink" — it offers it: the engine says "did you
+   *  mean drink?" and puts the corrected line first on the chip row, instead
+   *  of a five-second Qwen round trip that answered about a rope. */
+  didYouMean?: { typed: string; meant: string; command: string };
 }
 
 /** OTA 204 — argument role taxonomy. See ParsedInput.args for the

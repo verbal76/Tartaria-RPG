@@ -667,19 +667,23 @@ export function VendorScreen() {
         >
           <Text style={[styles.tabText, mode === 'sell' && styles.tabTextActive]}>SELL</Text>
         </TouchableOpacity>
-        {vendor.faction && (
-          // arb151 — CONTRACTS now opens a mission-board-style popup instead of
-          // an inline tab (player preferred the Mission Board modal). It's a
-          // button, not a tab, so it never holds the active state.
-          <TouchableOpacity
-            style={styles.tab}
-            onPress={() => setContractsOpen(true)}
-            activeOpacity={0.7}
-            accessibilityRole="button"
-          >
-            <Text style={styles.tabText}>CONTRACTS ▸</Text>
-          </TouchableOpacity>
-        )}
+        {/* arb151 — CONTRACTS opens a mission-board-style popup instead of an
+            inline tab (player preferred the Mission Board modal). It's a
+            button, not a tab, so it never holds the active state.
+            ⚠ OTA-1684 — ON EVERY VENDOR NOW. It was gated on `vendor.faction`,
+            so a roadside trader (Skiv, 09-04 22:10: "haven't seen the missions
+            button on a vendor in a while") simply had no button — and a
+            missing control reads as a broken one. The board is still empty
+            for them by design; the popup says so in words (B15: a refusal
+            always speaks). */}
+        <TouchableOpacity
+          style={styles.tab}
+          onPress={() => setContractsOpen(true)}
+          activeOpacity={0.7}
+          accessibilityRole="button"
+        >
+          <Text style={styles.tabText}>CONTRACTS ▸</Text>
+        </TouchableOpacity>
       </View>
       )}
 

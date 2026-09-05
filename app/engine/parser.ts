@@ -588,6 +588,80 @@ function inflectionStems(token: string): string[] {
   return out;
 }
 
+/**
+ * ⚠⚠ OTA-1684 — THE NEAR MISS THE MATCHER REFUSES, OFFERED INSTEAD OF DROPPED.
+ *
+ * Owner, 09-04 21:59: typed "srink". `fuzzyEqual` is exact-only for 4–5 letter
+ * words (OTA-094: one edit at that length is "leave"→"cleave"), so the parser
+ * answered `unknown`, handed the word to Qwen for 4.8 seconds, got nothing
+ * usable, and the Arbiter talked about a rope. His note: *"I think typing
+ * drink is broken"* — and then, that there was no "did you mean drink?".
+ *
+ * The matcher's refusal is right: the game must not RUN a guess. But it can
+ * SAY one. This finds a table verb exactly one edit from the token — a
+ * substitution or a transposition, the shapes a thumb makes — and leaves the
+ * prepended-letter pairs (word/sword, leave/cleave) alone for the same reason
+ * fuzzyEqual does. It never returns for a token that already matched.
+ */
+/** QWERTY neighbours — the letters a thumb lands on instead of the one it
+ *  meant. Two candidates one edit away are told apart by this: "srink" is one
+ *  edit from BOTH "drink" and "slink", and only the s↔d slip is a keyboard
+ *  neighbour. Measured on the owner's own typo before it was written down. */
+const KEY_ROWS = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
+function keysAdjacent(a: string, b: string): boolean {
+  for (let r = 0; r < KEY_ROWS.length; r++) {
+    const row = KEY_ROWS[r]!;
+    const i = row.indexOf(a);
+    if (i < 0) continue;
+    for (let rr = Math.max(0, r - 1); rr <= Math.min(KEY_ROWS.length - 1, r + 1); rr++) {
+      const j = KEY_ROWS[rr]!.indexOf(b);
+      if (j >= 0 && Math.abs(i - j) <= 1) return true;
+    }
+    return false;
+  }
+  return false;
+}
+
+/** How much a one-edit miss looks like a thumb slip: 2 for a substitution of
+ *  a keyboard neighbour or a swap of two adjacent letters, 1 for any other
+ *  single edit. */
+function slipScore(token: string, verb: string): number {
+  if (token.length === verb.length) {
+    let at = -1;
+    for (let i = 0; i < token.length; i++) {
+      if (token[i] !== verb[i]) { at = i; break; }
+    }
+    if (at >= 0 && keysAdjacent(token[at]!, verb[at]!)) return 2;
+    // Adjacent transposition ("dirnk" → "drink") reads as levenshtein 2 but is
+    // one slip; it never reaches here with d === 1, so score the substitution.
+    return 1;
+  }
+  return 1;
+}
+
+export function nearMissVerb(token: string): string | null {
+  if (token.length < 4) return null;
+  let best: { verb: string; score: number } | null = null;
+  let tied = false;
+  for (const intent of ALL_INTENTS) {
+    for (const verb of VERB_SYNONYMS_LOOKUP[intent]) {
+      if (verb.length < 4 || verb.includes(' ')) continue;
+      if (Math.abs(verb.length - token.length) > 1) continue;
+      // The prepended-letter family fuzzyEqual refuses: not a near miss.
+      const [shorter, longer] = token.length <= verb.length ? [token, verb] : [verb, token];
+      if (longer.length === shorter.length + 1 && longer.slice(1) === shorter) continue;
+      if (levenshtein(token, verb) !== 1) continue;
+      const score = slipScore(token, verb);
+      if (!best || score > best.score) { best = { verb, score }; tied = false; }
+      else if (score === best.score && verb !== best.verb) tied = true;
+    }
+  }
+  // Two equally likely guesses is no guess — asking "did you mean drink?"
+  // when it could as well have been "slink" would be the parser inventing.
+  if (!best || tied) return null;
+  return best.verb;
+}
+
 function bestVerbMatch(token: string): { intent: Exclude<Intent, 'unknown'>; verb: string; distance: number } | null {
   let best: { intent: Exclude<Intent, 'unknown'>; verb: string; distance: number } | null = null;
   for (const intent of ALL_INTENTS) {
@@ -1356,6 +1430,16 @@ export function parseInput(raw: string, context: ParseContext = {}): ParsedInput
     // arb167 — 'sneak' (not 'hide') so the stealth tactic reads as an offensive
     // setup: mid-range it's the unseen opener, close-range the initiative gamble.
     if (context.enemyPresent) suggestions.push('attack', 'dodge', 'advance', 'retreat', 'sneak', 'parley');
+    // ⚠ OTA-1684 — a one-edit miss on the first word leads the suggestions and
+    // is NAMED, so the engine can ask "did you mean drink?" instead of guessing
+    // or going to Qwen. Only the first token: a verb typed later in the line is
+    // the line's own business, and a noun one edit from a verb is not a typo.
+    const first = tokens[0]!;
+    const meant = nearMissVerb(first);
+    const didYouMean = meant
+      ? { typed: first, meant, command: [meant, ...tokens.slice(1)].join(' ') }
+      : undefined;
+    if (didYouMean) suggestions.unshift(didYouMean.command);
     if (!suggestions.length) suggestions.push('look around', 'search', 'rest');
     // OTA 204 — even when no verb matched, run the meta-talk regex so
     // feedback-style inputs without a recognized verb still get the
@@ -1375,6 +1459,7 @@ export function parseInput(raw: string, context: ParseContext = {}): ParsedInput
       suggestions,
       resolvedNoun: noun,
       ...(metaIssues.length > 0 ? { validationIssues: metaIssues } : {}),
+      ...(didYouMean ? { didYouMean } : {}),
     };
   }
 

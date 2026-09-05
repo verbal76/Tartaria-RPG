@@ -13645,6 +13645,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
 
     if (parsed.intent === 'unknown' || parsed.confidence < 0.5) {
+      // ⚠⚠ OTA-1684 — A TYPO IS ANSWERED AS A TYPO. "srink" went to Qwen for
+      // 4.8s and came back as a rope; the parser now names the one-edit miss
+      // (types.ts ParsedInput.didYouMean) and this asks, instead of guessing
+      // or resolving. The corrected line leads the chip row, one tap away.
+      if (parsed.didYouMean && !_opts?.skipPreChecks) {
+        const dym = parsed.didYouMean;
+        get().appendLog('debug', `parser: near miss "${dym.typed}" → "${dym.meant}" — asked, not run`);
+        get().appendLog('arbiter', `"${dym.typed}" — did you mean ${dym.meant}?`);
+        get().appendLog('system', `Try: ${parsed.suggestions.slice(0, 3).join(' · ')}`);
+        set({ parseSuggestions: parsed.suggestions.slice(0, 3) });
+        void get().persist();
+        return;
+      }
       // Qwen-backed parse fallback. The dictionary parser missed —
       // before showing the soft refusal, hand the input to Qwen with
       // the scene's noun pool and let it pick an intent + target. If

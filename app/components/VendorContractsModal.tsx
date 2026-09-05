@@ -189,8 +189,12 @@ export function VendorContractsModal({ visible, onClose, vendor }: Props) {
               <View style={styles.rule} />
               {empty ? (
                 <Text style={styles.empty}>
-                  {vendor.name} has no contracts on offer for you right now. Build reputation, or
-                  finish what you're already carrying, then check back.
+                  {/* ⚠ OTA-1684 — a roadside trader carries stock, not a board.
+                      Saying "build reputation" to somebody who can never post
+                      work would send the player grinding for nothing. */}
+                  {!vendor.faction && !isBrokerVendor(vendor)
+                    ? `${vendor.name} keeps no board — roadside traders carry stock, not contracts. Faction traders and outposts post work.`
+                    : `${vendor.name} has no contracts on offer for you right now. Build reputation, or finish what you're already carrying, then check back.`}
                 </Text>
               ) : (
                 <>
