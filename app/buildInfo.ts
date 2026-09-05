@@ -27904,6 +27904,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // many. The Weapons section reads in runs headed by reach class: Melee,
 // Spears & polearms, Ranged, Rune-casters, Thrown.
 export const OTA_BUILD_ID = '2026-09-05-1683-the-sheet-and-the-pack';
+// golem catch-up 2026-09-05: markerless publish of OTA-1683 - the sheet and
+// the pack. STE on the portrait; effectiveStats derives from the breakdown
+// (one sum, every source named, floored); the wrongs row drills into who and
+// what clears it; SELL ALL COMMON GEAR spares coated pieces and says so; the
+// Weapons section reads in reach-class runs. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1682-the-buffer-was-thirty-deep';
 // golem catch-up 2026-09-05: markerless publish of OTA-1682 - the buffer was
 // thirty deep. maxQueueSize 200 on both sides of the Sentry bridge; transport
