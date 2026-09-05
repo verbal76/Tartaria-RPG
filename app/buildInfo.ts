@@ -28016,6 +28016,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // regard before it could overcharge a coin the same way; the ceiling now
 // ignores float noise (vendorPricing.ceilPrice).
 export const OTA_BUILD_ID = '2026-09-05-1689-the-feared-face';
+// golem catch-up 2026-09-05: markerless publish of OTA-1689 - the feared face.
+// Menace reaches the counter: Feared +5% / Dreaded +10% on buys, shown and
+// charged through one helper, one extra greeting beat at Feared and Dreaded;
+// the float-noise ceiling fixed. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1688-the-deed-ledger';
 // golem catch-up 2026-09-05: markerless publish of OTA-1688 - the deed ledger.
 // worldMemory.deeds: a mission ground under the boots, a card walked out on and
