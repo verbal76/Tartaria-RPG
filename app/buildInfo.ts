@@ -28073,6 +28073,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // engine. Instrument only; the one-tap-per-attack question stays the
 // owner's. diagnostics/rollTiming.ts.
 export const OTA_BUILD_ID = '2026-09-05-1694-the-dice-clock';
+// golem catch-up 2026-09-05: markerless publish of OTA-1694 - the dice clock.
+// One debug line per roll step names open → shown → tapped → settled and a
+// late hold; Beginner's Luck moved to combatRules for the line ratchet. hal
+// took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1693-the-portrait-settles';
 // golem catch-up 2026-09-05: markerless publish of OTA-1693 - the portrait
 // settles. A watchdog snaps the enemy pager to the nearest page a quarter
