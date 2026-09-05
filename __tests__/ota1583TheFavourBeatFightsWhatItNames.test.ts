@@ -221,7 +221,7 @@ describe('OTA-1583 — one writer stands them up, in all three families', () => 
 
   it('⚠ a peaceful advance still stands nobody up', () => {
     // OTA-1581's persuade-won and take-in-the-aftermath paths.
-    expect(QUEST).toContain('const override = peaceful ? null : stageDef.spawn;');
+    expect(QUEST).toContain('const override = peaceful\n      ? null\n      : (stageDef.spawn && fledHere');
   });
 });
 

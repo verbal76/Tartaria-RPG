@@ -27970,7 +27970,37 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // beat happens (a same-ground next stage keeps it: no arrival will narrate
 // it). Two ota1686 pins flipped (abandon handled → yes; wrong verb
 // acknowledged → yes).
-export const OTA_BUILD_ID = '2026-09-05-1687-the-mission-layer-remembers-itself';
+// 2026-09-05 OTA-1688 — THE DEED LEDGER. Step 2 of the Narrative Agency plan:
+// punch items 1–5 of the contrary walker's list. One ledger,
+// `worldMemory.deeds[locationId]` (engine/deeds.ts) — typed, timestamped facts
+// about what the player did on that ground, 24 per place, 60 places, capped
+// again by saveTrim. Four writers: a mission ground under the boots (current
+// AND later stages, stageArrival.noteMissionGroundsUnderfoot), a card walked
+// out on (answerMissionEncounter 'leave'), a mission fight fled with the
+// bodies' state (stageArrival.noteMissionFlee, from the pre-clear scene).
+// Three readers: (1) the arrival line — a later step's ground says "▸ <title>:
+// this is a later step's ground — not yet. First: find the Drakovan reeve at
+// Drakova — talk it through." (missionTrace.laterStageUnderfoot, once per
+// standing) and the proper visit ends "You have stood here before, ahead of
+// the trail."; (2) the people — the person you walked out on says "<name>
+// looks up as you come back. \"Back, then.\"" on SUMMON; (3) the narrator —
+// `deeds_here` on the Qwen fact sheet ("Here before, the player: …", three
+// clauses, newest first). And the mission fight reads it: the brood comes
+// back at the count left standing, rising instead of ambushing ("The one you
+// put down stays down. The rest remember you."); the apex comes back with its
+// wound ("The wound you gave it is still open — 521 of 561."); the authored
+// first-time curtain (narration, arbiter, stinger) is replaced by a return
+// line, so the name-token never stalls the Dragon twice word for word. The
+// contrary walker re-measured: every deviation now handled AND remembered;
+// seven ota1686 pins flipped. And one gap the re-measure found: a kill that
+// lands INSIDE a dice roll cleared the field after the per-action re-arm had
+// already run, so the apex on the ground just cleared waited for the next
+// action (the walker cleared a wandering pack on the steeple through the
+// dice and the Dragon never rose) — resolveRollStep now re-checks the ground
+// when the roll took the last body (stageArrival.rearmAfterRoll). gameStore
+// stays under the 37,000-line ratchet (the writers live in stageArrival).
+export const OTA_BUILD_ID = '2026-09-05-1688-the-deed-ledger';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1687-the-mission-layer-remembers-itself';
 // golem catch-up 2026-09-05: markerless publish of OTA-1687 - the mission
 // layer remembers itself. ABANDON drops the mission's encounter records; the
 // wrong verb on the right ground says what the ground wants; the escort clear

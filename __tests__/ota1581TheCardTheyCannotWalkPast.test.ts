@@ -211,7 +211,8 @@ describe('OTA-1581 — the two engine holes the wiring exposed', () => {
     expect(bossBranch).toContain('scaleHuntBoss');
     expect(bossBranch).not.toContain('scaleHuntEscort');
     // …and the escort now stands up for any stage that authored one.
-    expect(QUEST).toContain('const override = peaceful ? null : stageDef.spawn;');
+    // (OTA-1688 — the override also reads the ground's last flee; a peaceful advance is still null.)
+    expect(QUEST).toContain('const override = peaceful\n      ? null\n      : (stageDef.spawn && fledHere');
   });
 
   it('⚠⚠⚠ A CARD-OWNED FIGHT DOES NOT AUTO-ADVANCE THE STAGE', () => {

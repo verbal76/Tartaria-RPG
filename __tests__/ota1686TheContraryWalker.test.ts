@@ -152,48 +152,51 @@ describe('OTA-1686 — the contrary walker on the Bog Dragon of Old Drakova', ()
     ]);
   });
 
-  it('premature — the roost and Old Mira before the reeve: handled, unremarked', async () => {
+  it('premature — the roost and Old Mira before the reeve: handled, and now remarked', async () => {
     const r = await walkPremature(def);
     emit(r);
     expect(r.finish?.breaks).toEqual([]);
-    // ⚠ MEASURED 2026-09-05. The early visits are invisible: nothing at the
-    // steeple names the hunt; Mira's ground draws only the generic "Not here …
-    // points elsewhere" for the parley verb; the proper visits afterwards read
-    // exactly as a first visit. Flip these when the deed ledger (step 2) lands.
+    // ⚠ MEASURED 2026-09-05, RE-MEASURED UNDER OTA-1688. The early visits were
+    // invisible; the deed ledger's arrival reader now says "this is a later
+    // step's ground — not yet. First: find the Drakovan reeve…" at the steeple
+    // (the grader's ceiling for that probe is 'partial'), names the reeve at
+    // Mira's, and the proper visits end "You have stood here before".
     expect(grades(r)).toEqual([
-      { step: 'the steeple before the reeve', handled: 'yes', acknowledged: 'no', prior: 'n/a' },
-      { step: 'Old Mira before the reeve', handled: 'yes', acknowledged: 'partial', prior: 'n/a' },
-      { step: 'the proper visits, after the early ones', handled: 'yes', acknowledged: 'n/a', prior: 'no' },
+      { step: 'the steeple before the reeve', handled: 'yes', acknowledged: 'partial', prior: 'n/a' },
+      { step: 'Old Mira before the reeve', handled: 'yes', acknowledged: 'yes', prior: 'n/a' },
+      { step: 'the proper visits, after the early ones', handled: 'yes', acknowledged: 'n/a', prior: 'yes' },
     ]);
   });
 
-  it('contrary — walking out, the empty hand-in, the wrong verb, the abandon: handled, mostly unremarked', async () => {
+  it('contrary — walking out, the empty hand-in, the wrong verb, the abandon: handled and remembered', async () => {
     const r = await walkContrary(def);
     emit(r);
     expect(r.finish?.breaks).toEqual([]);
     // ⚠ MEASURED 2026-09-05. See the report for each verdict.
     expect(grades(r)).toEqual([
       { step: 'the trophy before the hunt', handled: 'yes', acknowledged: 'yes', prior: 'n/a' },
-      { step: 'walking out on the reeve', handled: 'yes', acknowledged: 'yes', prior: 'no' },
+      // ⚠ OTA-1688 — the reeve reads the `walked_out` deed: "Back, then."
+      { step: 'walking out on the reeve', handled: 'yes', acknowledged: 'yes', prior: 'yes' },
       // ⚠ OTA-1687 flipped two pins: the wrong verb on the right ground now draws
       // "Not that. … wants you to search this ground here", and ABANDON drops the
       // mission's encounter records so the reeve's card comes back on re-accept.
       { step: 'the wrong verb on the right ground', handled: 'yes', acknowledged: 'yes', prior: 'n/a' },
-      { step: 'abandon with the items, take it up again', handled: 'yes', acknowledged: 'yes', prior: 'no' },
+      // ⚠ OTA-1688 — the re-accepted arrival at the reeve knows the boots stood there.
+      { step: 'abandon with the items, take it up again', handled: 'yes', acknowledged: 'yes', prior: 'yes' },
     ]);
   });
 
-  it('interrupted — a harpy killed and a Dragon wounded before running: handled, nothing remembered', async () => {
+  it('interrupted — a harpy killed and a Dragon wounded before running: handled, the kill and the wound remembered', async () => {
     const r = await walkInterrupted(def);
     emit(r);
     expect(r.finish?.breaks).toEqual([]);
-    // ⚠ MEASURED 2026-09-05. The flee is honoured on the tile (OTA-1610) and
-    // the return re-arms the fight (OTA-1597) — but the brood is back to three
-    // and the Dragon back to full, the name stalls it a second time word for
-    // word, and no line knows you ran.
+    // ⚠ MEASURED 2026-09-05, RE-MEASURED UNDER OTA-1688. The flee is honoured
+    // on the tile (OTA-1610), the return re-arms the fight (OTA-1597) — and the
+    // `fled` deed now brings the brood back one short and the Dragon back at
+    // the hit points it was left with; the name is read once.
     expect(grades(r)).toEqual([
-      { step: 'one harpy down, then run', handled: 'yes', acknowledged: 'yes', prior: 'no' },
-      { step: 'the Dragon wounded, then run', handled: 'yes', acknowledged: 'yes', prior: 'no' },
+      { step: 'one harpy down, then run', handled: 'yes', acknowledged: 'yes', prior: 'yes' },
+      { step: 'the Dragon wounded, then run', handled: 'yes', acknowledged: 'yes', prior: 'yes' },
     ]);
   });
 

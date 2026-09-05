@@ -90,30 +90,35 @@ is live; the mission layer does not read it.
 ## The punch list
 
 Each item is a "no" or "partial" above, with the reader that would close it.
-Items 1–5 are the deed ledger's work (step 2, #196); 6–8 are mission-layer
-fixes that need no ledger.
+Items 1–5 are the deed ledger's work (step 2, #196 — **all five closed by
+OTA-1688**, re-measured by the walker: every road handled and remembered);
+6–8 are mission-layer fixes that need no ledger (closed by OTA-1687).
 
 1. **A hunt ground visited early says nothing.** Standing on the Broken
    Steeple at stage 0 there is no line at all about the hunt; the arrival
    reader (`missionArrivalLines`) considers only the *current* stage's
    ground. Expected: *"▸ The Bog Dragon of Old Drakova: the roost — but not
    yet. The Drakovan reeve first."* Reader 1 of the ledger (arrival) keyed on
-   every stage's ground, not just the current one.
+   every stage's ground, not just the current one. **Closed by OTA-1688**
+   (`missionTrace.laterStageUnderfoot`, printed once per standing).
 2. **The early visit is not remembered on the proper one.** Arriving at Mira's
    or the steeple after having been there reads as a first visit. Expected: the
    arrival line or the Arbiter's callback notes it (*"You have stood on this
-   roost once already."*). Reader 1 again, from a `visited` deed.
+   roost once already."*). Reader 1 again, from a `visited` deed. **Closed by
+   OTA-1688** (*"You have stood here before, ahead of the trail."*).
 3. **Old Mira before the reeve is a generic refusal.** Her ground, at stage 0,
    answers a parley with *"Not here … points elsewhere"*. Expected: Mira (or the
    slate) says what she wants — *"Old Mira wants the reeve's token before she
    talks."* The wrong-ground line (`standingAt.wrongGroundLine`) can name the
    stage that *does* stand here and what it requires; a person-stage's
-   `npcName`/`requires` are already on the def.
+   `npcName`/`requires` are already on the def. **Closed by OTA-1688** (the
+   same later-step line names her and the reeve).
 4. **Walking out on the reeve is forgotten by the reeve.** The encounter record
    carries `phase: fled`, so the fact is stored; nothing reads it back except
    the SUMMON bar. Expected: on the reopened card, one line — *"Back, then."*
    `onReenter` already has a `mock` slot for the persuade case; the walk-away
-   case needs its own line. Reader 2 (people).
+   case needs its own line. Reader 2 (people). **Closed by OTA-1688** (a
+   `walked_out` deed; SUMMON draws *"Back, then."*).
 5. **The brood and the Dragon forget their dead and their wounds.** After a
    flee and a return, the escort respawns at its authored count (three, with
    one dead) and the apex at full HP, and the name-token narration stalls the
@@ -121,7 +126,8 @@ fixes that need no ledger.
    `count − killed`), the wound sticks or a line says it healed, and the second
    stall is refused (*"It has heard the name once. It does not stall twice."*).
    Needs a per-stage deed (`fled`, `killed n`) read by `spawnStageEscort` /
-   `scaleHuntBoss` and by the apex narration.
+   `scaleHuntBoss` and by the apex narration. **Closed by OTA-1688** (a `fled`
+   deed with the bodies' state; the return replaces the first-time curtain).
 6. **ABANDON + ACCEPT leaves every answered card shut.** The record restarts at
    stage 0 but `missionEncounters[hunt:…:0]` keeps `resolved`, and the card
    component hides a resolved card — the player sees no card at the reeve and

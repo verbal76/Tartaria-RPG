@@ -112,6 +112,10 @@ export function trimSaveStateToFit(state: SaveState, maxChars = SAFE_BLOB_CHARS)
       ...next.worldMemory,
       memorableEvents: (next.worldMemory.memorableEvents ?? []).slice(-40),
       chainMemos: (next.worldMemory.chainMemos ?? []).slice(-40),
+      // OTA-1688 — the deed ledger keeps its last eight deeds per place under pressure.
+      ...(next.worldMemory.deeds
+        ? { deeds: Object.fromEntries(Object.entries(next.worldMemory.deeds).map(([k, v]) => [k, v.slice(-8)])) }
+        : {}),
       // OTA-920 — aetherkinRolledBuildings only ever grows (one key per house/shed
       // tile entered, never pruned). It's regenerable — shedding old keys just lets
       // long-abandoned buildings re-roll their Aetherkin spawn — so bound it here as

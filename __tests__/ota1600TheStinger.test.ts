@@ -173,7 +173,9 @@ describe('OTA-1600 — every stage that stands bodies up carries a line, and no 
     // `raiseMissionClose` whenever bodies stood up (the authored stinger when
     // there is one, the stage's prose otherwise), and it now carries the
     // close's freight. The gate is still `stoodUp` and nothing else.
-    expect(QSL).toContain('if (stoodUp) {\n      if (stageDef.stinger) get().appendLog(\'combat\', stageDef.stinger);');
+    // (OTA-1688 — a return to a fled fight keeps its own line in place of the stinger.)
+    expect(QSL).toContain('if (stoodUp) {\n      // OTA-1688');
+    expect(QSL).toContain("if (stageDef.stinger && !returnLine) get().appendLog('combat', stageDef.stinger);");
     expect(QSL).toContain('fight: true,');
     // And the modal is story, not a tip: the component has no hints gate.
     const MODAL = readFileSync(join(__dirname, '..', 'app', 'components', 'MissionStingerModal.tsx'), 'utf8');

@@ -160,7 +160,7 @@ describe('OTA-1596 — beginScene wires both halves', () => {
   it('⚠⚠ the heal runs BEFORE the arrival receipt prints', () => {
     // (OTA-1597 moved the wiring to a static import — same call, no require dot.)
     const heal = SRC.indexOf('healStageDebtsAtArrival(get, set, grantStageItems)');
-    const receipt = SRC.indexOf('for (const l of missionArrivalLines(get().player))');
+    const receipt = SRC.indexOf('for (const l of missionArrivalLines(get().player, get().worldMemory))');
     expect(heal).toBeGreaterThan(-1);
     expect(receipt).toBeGreaterThan(heal);
   });

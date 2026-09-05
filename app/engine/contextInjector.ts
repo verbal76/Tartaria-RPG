@@ -45,6 +45,12 @@ export interface LlmContext {
    *  'forgotten_order'). Surfaces into the canon-fact picker so the
    *  Arbiter prefers events that involve the player's faction. */
   player_faction_id?: string;
+  /** ⚠ OTA-1688 — reader 3 of the deed ledger: what the player did on THIS
+   *  ground before, as a few short clauses (deeds.deedsHereLine). The audit's
+   *  first hole was that the narrator sees none of the world's memory; this is
+   *  the one line of it that fits the prompt budget. Absent when the ground
+   *  holds no deeds. */
+  deeds_here?: string;
   /** arb163 — ambient mode. When true, buildSystemPrompt uses the
    *  AMBIENT_INSTRUCTION: an UNPROMPTED, reflective companion line that does
    *  NOT react to the last action. Ambient lines are decoupled from events, so
@@ -66,6 +72,8 @@ export interface ContextInputs {
   ladder?: { macro: MacroLocation; micro: MicroLocation; microMicro: MicroMicroLocation } | null;
   /** arb163 — request the ambient (reflective companion) instruction. */
   ambient?: boolean;
+  /** OTA-1688 — the deed ledger's line for the current ground, if any. */
+  deedsHere?: string | null;
   /**
    * ⚠⚠ OTA-1409 — WHEN THE CURRENT SCENE BEGAN. Everything the player did
    * BEFORE this moment happened somewhere else, and handing it to the model as
@@ -141,6 +149,7 @@ export function buildLlmContext(input: ContextInputs): LlmContext {
     in_combat: (scene?.enemies?.length ?? 0) > 0,
     player_faction_id: player?.factionId,
     ambient: input.ambient ?? false,
+    ...(input.deedsHere ? { deeds_here: input.deedsHere } : {}),
   };
 }
 
@@ -465,6 +474,8 @@ export function buildSystemPrompt(ctx: LlmContext): ChatMessage[] {
     `Exits: ${ctx.available_exits}`,
     `Entities Present: ${ctx.active_entities}`,
   ];
+  // OTA-1688 — the ground's own memory of the player, when it has one.
+  if (ctx.deeds_here) parts.push(`Here before, the player: ${ctx.deeds_here}.`);
   if (canonLine) {
     parts.push('', '[CANON LORE - true facts; may color narration, never contradict]', canonLine);
   }

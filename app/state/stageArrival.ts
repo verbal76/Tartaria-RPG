@@ -226,6 +226,136 @@ export function armSpawnStagesAtArrival(get: Get, set: Set): void {
   }
 }
 
+/**
+ * ⚠⚠ OTA-1688 — THE GROUND WRITES ITSELF DOWN. Every tracked contract whose
+ * CURRENT or LATER stage stands on the player's cell gets a `visited` deed on
+ * that ground, once per (place, mission, stage). A later step's ground says
+ * so out loud the first time — the contrary walker stood on the Broken
+ * Steeple at stage 0 and nothing on screen mentioned the hunt — and the proper
+ * visit reads the deed back ("You stood here once already", missionTrace).
+ */
+export function noteMissionGroundsUnderfoot(get: Get, set: Set): void {
+  const player = get().player;
+  if (!player?.currentLocationId) return;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { playerGridCell } = require('./playerGrid') as typeof import('./playerGrid');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { canonicalCellOf } = require('../engine/worldMap') as typeof import('../engine/worldMap');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const QS = require('../engine/questStage') as typeof import('../engine/questStage');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const CM = require('../engine/contractMarkers') as typeof import('../engine/contractMarkers');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const D = require('../engine/deeds') as typeof import('../engine/deeds');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const MT = require('../engine/missionTrace') as typeof import('../engine/missionTrace');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { findHuntById } = require('../engine/hunts') as typeof import('../engine/hunts');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { findMysteryById } = require('../engine/mysteries') as typeof import('../engine/mysteries');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { findStorylineById } = require('../engine/factionStorylines') as typeof import('../engine/factionStorylines');
+  const cell = playerGridCell(player);
+  const hour = player.hoursElapsed ?? 0;
+  const consider = (
+    recs: ReadonlyArray<{ id: string; stage: number; tracked?: boolean }> | undefined,
+    find: (id: string) => { id: string; title: string; stages?: readonly unknown[] } | null | undefined,
+    anchorOf: (def: never) => string,
+  ) => {
+    for (const rec of recs ?? []) {
+      if (rec.tracked === false) continue;
+      const def = find(rec.id);
+      if (!def) continue;
+      const stages = (def.stages ?? []) as ReadonlyArray<{ checkKind?: string | null }>;
+      for (let i = rec.stage; i < stages.length; i++) {
+        const st = stages[i]!;
+        if (st.checkKind === null) continue;
+        const ground = QS.stageLocationId(st as never, anchorOf(def as never), CM.resolvePosterLocation);
+        const gc = canonicalCellOf(ground);
+        if (cell.x !== gc.x || cell.y !== gc.y) continue;
+        const already = D.hasDeed(get().worldMemory, ground, (d) => d.kind === 'visited' && d.missionId === def.id && d.stage === i);
+        if (already) continue;
+        set((s) => ({ worldMemory: D.recordDeed(s.worldMemory, ground, { kind: 'visited', hour, missionId: def.id, stage: i, title: def.title }) }));
+      }
+    }
+  };
+  consider(player.activeHunts, findHuntById as never, ((d: never) => CM.huntAnchorId(d)) as never);
+  consider(player.activeMysteries, findMysteryById as never, ((d: never) => CM.contractAnchorId(d)) as never);
+  consider(player.activeStorylines, findStorylineById as never, ((d: never) => CM.contractAnchorId(d)) as never);
+  // A later step's ground says so — once per standing (the line is throttled
+  // like every other slate line: not while the same line sits in the recent log).
+  const later = MT.laterStageUnderfoot(player);
+  if (later) {
+    const line = MT.laterStageLine(later);
+    // (`includes`, not equality: a line printed inside an action's turn is
+    // folded into that action's world paragraph.)
+    const recent = get().gameLog.slice(-40).some((e) => e.text.includes(line));
+    if (!recent) get().appendLog('world', line);
+  }
+}
+
+/**
+ * ⚠⚠ OTA-1688 — THE FLEE IS WRITTEN DOWN, with the bodies' state. The
+ * contrary walker killed one harpy of three, fled, came back to three; wounded
+ * the Dragon, fled, came back to a full one. The escape snapshot (the scene
+ * as it stood BEFORE the flee cleared it) still holds every body and its hit
+ * points; the stage's own bodies go on the ground's ledger for advanceHunt
+ * to read on the way back: the apex with its hit points held, the spawn with
+ * how many were still standing (a knocked-out body is not standing).
+ */
+export function noteMissionFlee(
+  get: Get,
+  set: Set,
+  scene: {
+    enemies: ReadonlyArray<{ name: string; hp: number }>;
+    enemyHps: ReadonlyArray<number>;
+    enemyKnockedOut?: ReadonlyArray<boolean>;
+  },
+): void {
+  const fledPl = get().player;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const D = require('../engine/deeds') as typeof import('../engine/deeds');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const MT = require('../engine/missionTrace') as typeof import('../engine/missionTrace');
+  const fight = MT.missionFightUnderfoot(fledPl);
+  if (!fight) return;
+  const bodies = scene.enemies.map((e, i) => ({ name: e.name, hp: scene.enemyHps[i] ?? 0, ko: scene.enemyKnockedOut?.[i] ?? false }));
+  const hourNow = fledPl?.hoursElapsed ?? 0;
+  const base = { kind: 'fled' as const, hour: hourNow, missionId: fight.missionId, stage: fight.stage, title: fight.title };
+  const apex = fight.apexName ? bodies.find((b) => b.name === fight.apexName) : undefined;
+  if (fight.apexName && apex) {
+    const apexMax = scene.enemies.find((e) => e.name === fight.apexName)?.hp ?? apex.hp;
+    set((s) => ({ worldMemory: D.recordDeed(s.worldMemory, fight.groundId, { ...base, who: fight.apexName!, hpLeft: Math.max(1, apex.hp), hpMax: apexMax }) }));
+  } else if (fight.spawnName) {
+    const standing = bodies.filter((b) => b.name === fight.spawnName && b.hp > 0 && !b.ko).length;
+    set((s) => ({ worldMemory: D.recordDeed(s.worldMemory, fight.groundId, { ...base, who: fight.spawnName!, n: standing }) }));
+  }
+}
+
+/** Is anyone conscious and standing on the field? (OTA-1612's rule: a
+ *  knocked-out body is not a live hostile.) */
+export function fieldHasLiveHostiles(
+  scene: { enemies: ReadonlyArray<unknown>; enemyHps: ReadonlyArray<number>; enemyKnockedOut?: ReadonlyArray<boolean> } | null | undefined,
+): boolean {
+  return (scene?.enemies ?? []).some((_, i) => (scene?.enemyHps?.[i] ?? 0) > 0 && !(scene?.enemyKnockedOut?.[i] ?? false));
+}
+
+/**
+ * ⚠⚠ OTA-1688 — THE CLEAR-FIELD RE-ARM ON THE DICE PATH. OTA-1605's rule —
+ * "the clear-field re-arm raises the curtain the moment the last body drops"
+ * — was kept only by the per-action tail (checkStandingGround beside
+ * maybeSeedQuarry). A kill that lands INSIDE a roll resolves after that tail
+ * already ran with hostiles still up, so the stage fight on the ground just
+ * cleared waited for the player's next action. The contrary walker cleared a
+ * wandering pack on the Broken Steeple through the dice and the Dragon never
+ * rose. Called at the end of resolveRollStep with the field's state from
+ * before the roll: hostile then, clear now → the ground is checked.
+ */
+export function rearmAfterRoll(get: Get, set: Set, grantStageItems: GrantStageItems, hadLive: boolean): void {
+  if (!hadLive || fieldHasLiveHostiles(get().currentScene)) return;
+  checkStandingGround(get, set, grantStageItems);
+}
+
 /** ⚠⚠ OTA-1597 — THE ONE DOOR for every way of standing on the tile: heal the
  *  record's debts, then arm the fight. Called from the per-action catch-all
  *  (typed cardinals, chips, any verb while standing there), from
@@ -236,5 +366,6 @@ export function armSpawnStagesAtArrival(get: Get, set: Set): void {
  *  these doors costs nothing — but a route in cannot silently miss. */
 export function checkStandingGround(get: Get, set: Set, grantStageItems: GrantStageItems): void {
   healStageDebtsAtArrival(get, set, grantStageItems);
+  noteMissionGroundsUnderfoot(get, set);
   armSpawnStagesAtArrival(get, set);
 }

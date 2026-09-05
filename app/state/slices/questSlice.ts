@@ -1912,8 +1912,37 @@ export const createQuestSlice = (
       // cold on the steeple and the apex was held shut by a sleeper.
       if ((sc?.enemies ?? []).some((_, i) => (sc?.enemyHps?.[i] ?? 0) > 0 && !(sc?.enemyKnockedOut?.[i] ?? false))) return;
     }
-    get().appendLog('world', stageDef.narration);
-    if (stageDef.arbiter) get().appendLog('arbiter', stageDef.arbiter);
+    // ⚠⚠ OTA-1688 — THE GROUND REMEMBERS THE LAST FLEE. A `fled` deed for this
+    // stage on this ground (deeds.stageFled) says how many of the brood were
+    // left standing, or how much of the apex was left: the escort comes back
+    // at that count, rising from where it was left rather than ambushing, and
+    // the apex comes back with its wound. The name-token, read once, is not
+    // read as new a second time.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const QSg = require('../../engine/questStage') as typeof import('../../engine/questStage');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const CMg = require('../../engine/contractMarkers') as typeof import('../../engine/contractMarkers');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { stageFled } = require('../../engine/deeds') as typeof import('../../engine/deeds');
+    const groundNow = QSg.stageLocationId(stageDef, CMg.huntAnchorId(hunt), CMg.resolvePosterLocation);
+    const fledHere = peaceful ? null : stageFled(get().worldMemory, groundNow, hunt.id, record.stage);
+    // The authored curtain is for the first time. A return to a fight you ran
+    // from gets its own line — the name-token narration ("it stalls, for one
+    // long breath") must not read word for word a second time, and the brood
+    // does not "drop off the reeds" onto someone it has already met.
+    let returnLine: string | null = null;
+    if (fledHere && fledHere.hpLeft !== undefined) {
+      returnLine = `${hunt.targetEnemyName} rises from where you left it. It has not forgotten you.`;
+    } else if (fledHere && fledHere.n !== undefined && stageDef.spawn) {
+      returnLine = `You come back onto ground you ran from. ${pluralizeNoun(stageDef.spawn.enemyName)} rise from the positions they were left in.`;
+    }
+    if (returnLine) {
+      get().appendLog('world', returnLine);
+      if (fledHere?.hpLeft !== undefined) get().appendLog('arbiter', `The Arbiter, low: "It has seen your opening once. Whatever caught it the first time will not catch it twice."`);
+    } else {
+      get().appendLog('world', stageDef.narration);
+      if (stageDef.arbiter) get().appendLog('arbiter', stageDef.arbiter);
+    }
     // ⚠⚠⚠ OTA-1622 — remembered from the direction block below for the close
     // card: the "▸ Next" line and what the close handed over. (OTA-1602 kept
     // these only for a same-tile close; the owner's rule is EVERY close.)
@@ -2020,8 +2049,18 @@ export const createQuestSlice = (
     // waiting for a kill that nothing had spawned. Unwinnable, silently.
     //
     // The boss SCALING stays boss-only. Only the escort moved out.
-    const override = peaceful ? null : stageDef.spawn;
+    const override = peaceful
+      ? null
+      : (stageDef.spawn && fledHere && fledHere.n !== undefined && fledHere.n > 0
+        ? { ...stageDef.spawn, count: Math.min(stageDef.spawn.count ?? 1, fledHere.n), ambush: false }
+        : stageDef.spawn);
     let stoodUp = spawnStageEscort(get, set, deps, player, override);
+    if (stoodUp && override && stageDef.spawn && override !== stageDef.spawn) {
+      // (a flee with none standing — every body out cold — comes back to the
+      // authored count: the sleepers woke; nothing is owed for a knockout.)
+      const gone = (stageDef.spawn.count ?? 1) - (override.count ?? 1);
+      if (gone > 0) get().appendLog('world', `${gone === 1 ? 'The one you put down' : `The ${gone} you put down`} stay${gone === 1 ? 's' : ''} down. The rest remember you.`);
+    }
     if (stageDef.checkKind === 'boss') {
       // ⚠ OTA-1167 — pass the REAL power measure, so the boss sees stats, weapon and AC
       // rather than max HP alone. `scalePowerOf` carries the guarded gear read.
@@ -2030,7 +2069,11 @@ export const createQuestSlice = (
       // and the freeze honoured it, but this line read only `override`, so a
       // persuade landed on a boss stage stood the boss up anyway (and would now
       // have shouted a stinger over a fight the persuade had just bought off).
-      const boss = peaceful || override ? null : scaleHuntBoss(player, hunt, deps.scalePowerOf(player));
+      const boss0 = peaceful || override ? null : scaleHuntBoss(player, hunt, deps.scalePowerOf(player));
+      // OTA-1688 — the wound holds; the name does not stall it twice.
+      const wounded = boss0 && fledHere && fledHere.hpLeft !== undefined && fledHere.hpLeft < boss0.hp;
+      const boss = boss0 && wounded ? { ...boss0, hp: Math.max(1, fledHere!.hpLeft!) } : boss0;
+      if (boss && wounded) get().appendLog('world', `The wound you gave it is still open — ${boss.hp} of ${boss0!.hp}.`);
       if (boss) {
         set((s) =>
           s.currentScene
@@ -2067,10 +2110,12 @@ export const createQuestSlice = (
     // beat's word rides on it; a frozen stage shows what the close handed
     // over and holds the next until the last body drops.
     if (stoodUp) {
-      if (stageDef.stinger) get().appendLog('combat', stageDef.stinger);
+      // OTA-1688 — a return to a fled fight keeps its own line; the authored
+      // stinger ("Three harpies drop screaming") is the first time's.
+      if (stageDef.stinger && !returnLine) get().appendLog('combat', stageDef.stinger);
       raiseMissionClose(get, set, {
         title: hunt.title,
-        line: stageDef.stinger ?? stageDef.narration,
+        line: returnLine ?? stageDef.stinger ?? stageDef.narration,
         next: freezeForKill ? null : closeNext,
         granted: grantedNow,
         fight: true,

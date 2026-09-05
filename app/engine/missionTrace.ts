@@ -290,7 +290,98 @@ export function stageUnderfoot(
     ?? consider('storyline', player.activeStorylines, findStorylineById, ((d: never) => contractAnchorId(d)) as never);
 }
 
-export function missionArrivalLines(player: PlayerCharacter | null | undefined): string[] {
+/**
+ * ⚠⚠ OTA-1688 — A LATER STEP'S GROUND UNDER THE BOOTS. The contrary walker
+ * stood on the Broken Steeple at stage 0 and nothing on screen mentioned the
+ * hunt; stood at Old Mira's at stage 0 and got the generic "Not here". The
+ * arrival reader considered only the CURRENT stage's ground. This finds the
+ * first tracked contract with a LATER stage standing on the player's cell,
+ * and says what comes first — the current stage's ask and ground.
+ */
+export function laterStageUnderfoot(
+  player: PlayerCharacter | null | undefined,
+): { family: MissionFamily; missionId: string; title: string; stageIndex: number; npcName: string | null; firstAsk: string | null; firstGroundId: string; firstNpc: string | null } | null {
+  if (!player?.currentLocationId) return null;
+  const consider = (
+    family: MissionFamily,
+    recs: Rec[] | undefined,
+    find: (id: string) => { id: string; title: string; stages?: StageLike[] } | null,
+    anchorOf: (def: never) => string | undefined,
+  ) => {
+    for (const rec of recs ?? []) {
+      if (rec.tracked === false) continue;
+      const def = find(rec.id);
+      const stages = def?.stages ?? [];
+      const cur = stages[rec.stage];
+      if (!def || !cur) continue;
+      const anchor = anchorOf(def as never) ?? '';
+      const curGround = stageLocationId(cur, anchor, resolvePosterLocation);
+      if (standingAtLocation(player, curGround)) continue; // the current stage stands here — the arrival line has it
+      for (let i = rec.stage + 1; i < stages.length; i++) {
+        const st = stages[i]!;
+        if (st.checkKind === null) continue;
+        const ground = stageLocationId(st, anchor, resolvePosterLocation);
+        if (!standingAtLocation(player, ground)) continue;
+        return {
+          family, missionId: def.id, title: def.title, stageIndex: i, npcName: st.npcName ?? null,
+          firstAsk: stageVerbAsk(family, cur), firstGroundId: curGround, firstNpc: cur.npcName ?? null,
+        };
+      }
+    }
+    return null;
+  };
+  return consider('hunt', player.activeHunts, findHuntById, ((d: never) => huntAnchorId(d)) as never)
+    ?? consider('mystery', player.activeMysteries, findMysteryById, ((d: never) => contractAnchorId(d)) as never)
+    ?? consider('storyline', player.activeStorylines, findStorylineById, ((d: never) => contractAnchorId(d)) as never);
+}
+
+/** The "not yet" line for a later step's ground — one spelling, used by the
+ *  arrival door and by the verb refusal. */
+export function laterStageLine(
+  hit: NonNullable<ReturnType<typeof laterStageUnderfoot>>,
+): string {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { getLocationById } = require('./encounter') as typeof import('./encounter');
+  const where = getLocationById(hit.firstGroundId)?.name ?? hit.firstGroundId;
+  const here = hit.npcName ? `${hit.npcName} is a later step` : 'this is a later step\'s ground';
+  const first = hit.firstNpc ? `find ${hit.firstNpc} at ${where}` : where;
+  const ask = hit.firstAsk ? ` — ${hit.firstAsk}` : '';
+  return `▸ ${hit.title}: ${here} — not yet. First: ${first}${ask}.`;
+}
+
+/**
+ * ⚠ OTA-1688 — THE MISSION FIGHT ON THIS GROUND. The tracked hunt whose
+ * current stage stands on the player's cell and puts bodies up (an authored
+ * spawn, or the apex), with the names those bodies carry — so a flee can be
+ * written down against the stage it belongs to.
+ */
+export function missionFightUnderfoot(
+  player: PlayerCharacter | null | undefined,
+): { missionId: string; title: string; stage: number; groundId: string; spawnName: string | null; spawnCount: number; apexName: string | null } | null {
+  if (!player?.currentLocationId) return null;
+  for (const rec of player.activeHunts ?? []) {
+    if (rec.tracked === false) continue;
+    const def = findHuntById(rec.id);
+    const st = def?.stages[rec.stage];
+    if (!def || !st) continue;
+    const ground = stageLocationId(st, huntAnchorId(def), resolvePosterLocation);
+    if (!standingAtLocation(player, ground)) continue;
+    let lastBoss = -1;
+    for (let i = 0; i < def.stages.length; i++) if (def.stages[i]!.checkKind === 'boss') lastBoss = i;
+    const apex = st.checkKind === 'boss' && rec.stage === lastBoss ? `${def.targetEnemyName} (hunted)` : null;
+    if (!st.spawn && !apex) continue;
+    return {
+      missionId: def.id, title: def.title, stage: rec.stage, groundId: ground,
+      spawnName: st.spawn?.enemyName ?? null, spawnCount: st.spawn?.count ?? 1, apexName: apex,
+    };
+  }
+  return null;
+}
+
+export function missionArrivalLines(
+  player: PlayerCharacter | null | undefined,
+  memory?: import('./types').WorldMemory | null,
+): string[] {
   if (!player?.currentLocationId) return [];
   const out: string[] = [];
   // ⚠⚠⚠ OTA-1588 — THE ASK COMES FROM THE ENGINE'S OWN ANSWER NOW, NOT FROM A
@@ -353,7 +444,14 @@ export function missionArrivalLines(player: PlayerCharacter | null | undefined):
     const truce = bladesHere && isHubLocation(player.currentLocationId)
       ? ' Outside the walls — the outpost holds its truce.'
       : '';
-    out.push(`▸ ${def.title}: this is the place${who}${doThis}${owed}.${truce}`);
+    // ⚠ OTA-1688 — reader 1 of the deed ledger: the proper visit remembers the
+    // early one. A `visited` deed for THIS stage's ground, written on an
+    // earlier hour, means the boots have stood here ahead of the trail.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { visitedBefore } = require('./deeds') as typeof import('./deeds');
+    const before = memory ? visitedBefore(memory, ground, (def as { id?: string }).id ?? '', rec.stage, player.hoursElapsed ?? 0) : null;
+    const again = before ? ' You have stood here before, ahead of the trail.' : '';
+    out.push(`▸ ${def.title}: this is the place${who}${doThis}${owed}.${truce}${again}`);
   };
   for (const rec of player.activeHunts ?? []) {
     const def = findHuntById(rec.id);

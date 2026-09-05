@@ -2006,6 +2006,27 @@ export interface TalkTurn {
   ts: number;
 }
 
+/** OTA-1688 — one fact about what the player did on a piece of ground. */
+export type DeedKind = 'visited' | 'walked_out' | 'fled';
+export interface Deed {
+  kind: DeedKind;
+  /** Wall clock, for pruning. */
+  ts: number;
+  /** In-game hour it happened (player.hoursElapsed). */
+  hour: number;
+  missionId?: string;
+  stage?: number;
+  /** The mission's title, for the readers that phrase it. */
+  title?: string;
+  /** The person walked out on, or the body fled from. */
+  who?: string;
+  /** Bodies of the stage's spawn still standing when the player fled. */
+  n?: number;
+  /** The apex's hit points when the player fled, and its full pool. */
+  hpLeft?: number;
+  hpMax?: number;
+}
+
 export interface MemorableEvent {
   id: string;
   kind:
@@ -2148,6 +2169,12 @@ export interface WorldMemory {
    *  already played. One fire per Capital per character. */
   capitalArrivalSeen?: string[];
   memorableEvents?: MemorableEvent[];
+  /** ⚠ OTA-1688 — THE DEED LEDGER, keyed by location id: what the player did
+   *  on that ground (a mission ground stood on, a card walked out on, a mission
+   *  fight fled and the state the bodies were left in). Written by the store at
+   *  the moments it already handles; read by the arrival line, the people on
+   *  the ground and the narrator's fact sheet. See engine/deeds.ts. */
+  deeds?: Record<string, Deed[]>;
   /** Active multi-scene hook chains — a hook resolution may queue a follow-up
    *  hook kind to plant in a future wander. plantedAtHour lets beginScene
    *  expire chains that have sat unused too long (combat-heavy biomes

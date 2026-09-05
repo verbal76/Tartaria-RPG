@@ -212,7 +212,8 @@ import {
 // OTA: single-owner state moves WITH its owner, shared state moves DOWN.
 import { notePlayerActionForSprint, playerIsSprinting, _resetSprintForTest } from './sprint';
 import { playerGridCell } from './playerGrid';
-import { armSpawnStagesAtArrival, checkStandingGround, healStageDebtsAtArrival } from './stageArrival';
+import { armSpawnStagesAtArrival, checkStandingGround, healStageDebtsAtArrival, noteMissionGroundsUnderfoot, noteMissionFlee, fieldHasLiveHostiles, rearmAfterRoll } from './stageArrival';
+import { recordDeed, lastDeed as lastDeedAt } from '../engine/deeds';
 // ⚠⚠ OTA-1461 — the pools for the lines a player hears ten times an hour. Each is
 // consumed through `rotatingPick`, which cycles in order and refuses an immediate
 // repeat, so a pool of forty is forty distinct fires before anything comes round.
@@ -9605,7 +9606,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // stage NAMES somebody, so every investigate / stealth / cast beat ended a
     // twenty-hour walk in silence. This fires for every live stage standing on
     // this ground, person or none.
-    for (const l of missionArrivalLines(get().player)) get().appendLog('world', l);
+    // ⚠ OTA-1688 — the arrival line reads the deed ledger ("You stood here once
+    // already"), and the ledger is written AFTER it reads, so the first visit
+    // is a first visit and the second knows it. A later step's ground gets its
+    // "not yet" line from the same writer.
+    for (const l of missionArrivalLines(get().player, get().worldMemory)) get().appendLog('world', l);
+    noteMissionGroundsUnderfoot(get, set);
     if (!inHub && hubRoomId) {
       // Player left the hub — clear the hubRoomId.
       set((s) => (s.player ? { player: { ...s.player, hubRoomId: null } } : s));
@@ -22036,6 +22042,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   resolveRollStep(values: number[]) {
     const state = get().pendingRolls;
     if (!state) return;
+    const hadLive = fieldHasLiveHostiles(get().currentScene); // OTA-1688 — for rearmAfterRoll
 
     const idx = state.currentStep;
     const step = state.steps[idx];
@@ -22131,6 +22138,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // OTA-957 — settle a bandolier throw only after the WHOLE swing resolved, so
       // the damage phase read the thrown item, not the restored off hand.
       get().settleThrowRestore('resolved');
+      rearmAfterRoll(get, set, grantStageItems, hadLive); // OTA-1688 — the last body dropped inside the roll
     }
   },
 
@@ -22688,6 +22696,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               // fight-verb still summons on purpose (stageArrival has the gate).
               const fledPl = get().player;
               if (fledPl) set({ missionFleeHoldCell: playerGridCell(fledPl) });
+              noteMissionFlee(get, set, currentScene); // ⚠ OTA-1688 — the flee is written down, bodies' state and all
             }
             // ⚠⚠⚠ OTA-1459 — RUNNING COSTS SOMETHING NOW. See FLEE_STAMINA_COST.
             //
@@ -26814,6 +26823,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     if (step.effect.kind === 'leave') {
       get().appendLog('player', `You break off and step away from ${armed.person.name}.`);
+      // ⚠ OTA-1688 — the deed ledger: the walk-away is written against the
+      // ground it happened on, so the person can read it back (reader 2).
+      const hourNow = get().player?.hoursElapsed ?? 0;
+      set((s) => ({ worldMemory: recordDeed(s.worldMemory, armed.locationId, { kind: 'walked_out', hour: hourNow, missionId: armed.missionId, stage: armed.stageIndex, title: armed.missionTitle, who: armed.person.name }) }));
     } else if (step.effect.kind === 'start_fight') {
       // ⚠⚠ THE CARD DOES NOT SPAWN. It hands off to the stage's OWN advance, the
       // same one the typed verb runs, which spawns the pack and freezes the stage
@@ -26867,6 +26880,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
         'arbiter',
         `${armed.person.name} watches you walk back up. "Changed your mind about the talking, then." There is nothing left to say.`,
       );
+    } else if (lastDeedAt(get().worldMemory, armed.locationId, (d) => d.kind === 'walked_out' && d.who === armed.person.name)) {
+      // ⚠ OTA-1688 — reader 2 of the deed ledger: the person you walked out on
+      // knows it. The contrary walker walked out on the reeve and came back to
+      // a conversation that picked up as if nothing had happened.
+      get().appendLog('arbiter', `${armed.person.name} looks up as you come back. "Back, then." The conversation resumes where you left it.`);
     }
     void get().persist();
   },

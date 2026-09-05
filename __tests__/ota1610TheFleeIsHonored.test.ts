@@ -145,7 +145,9 @@ describe('OTA-1610 — the flee is honored', () => {
     store.setState({ missionFleeHoldCell: playerGridCell(get().player!) });
     get().advanceHunt('hunt_servants_doubter'); // the verb door, not the arm
     expect(liveEnemies().length).toBeGreaterThanOrEqual(1);
-    expect(get().pendingMissionStinger?.line).toContain('Come, then');
+    // OTA-1688 — the ledger knows the hold cell was a flee: the re-engagement
+    // card carries the return line, not the first-time stinger.
+    expect(get().pendingMissionStinger?.line).toContain('where you left it');
   });
 
   it('⚠⚠ stepping OFF the cell clears the hold — leave and return, and the tile is the trigger again', () => {

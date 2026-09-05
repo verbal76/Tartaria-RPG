@@ -143,7 +143,7 @@ describe('OTA-1576 — the false summit stops spawning the boss it says is gone'
     // (OTA-1600 supersede: `peaceful` now reaches the boss scale too — the
     // OTA-1581 contract, finally honoured. Apex stages still spawn on a
     // normal advance; only a landed persuade stands nobody up.)
-    expect(QS).toContain('const boss = peaceful || override ? null : scaleHuntBoss(player, hunt, deps.scalePowerOf(player));');
+    expect(QS).toContain('const boss0 = peaceful || override ? null : scaleHuntBoss(player, hunt, deps.scalePowerOf(player));');
     for (const h of HUNTS) {
       const apex = h.stages.filter((s) => s.stageType === 'apex');
       for (const a of apex) expect(a.spawn).toBeUndefined();

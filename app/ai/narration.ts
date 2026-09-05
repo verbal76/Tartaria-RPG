@@ -59,6 +59,7 @@ import { QWEN_ALLOWED_INTENTS } from '../engine/narrativeGenerator';
 import { pick, chance } from '../engine/rng';
 import { noteQwenDiscarded, lastQwenCallPreempted } from './generation/qwenTelemetry';
 import { buildLlmContext, buildSystemPrompt, type SceneSlice } from '../engine/contextInjector';
+import { deedsHereLine } from '../engine/deeds';
 import { findMicroMicroAnywhere } from '../engine/worldLadder';
 import { isRepetitiveArbiterLine } from '../engine/arbiterDedup';
 import { canonicalLocationAtCell, clampGridCell } from '../engine/worldMap';
@@ -978,6 +979,9 @@ export async function narrateViaArbiter(
     // filtering to an empty history — but the intro prompt does not lean on
     // history anyway, which is why this was safe to leave alone.
     sceneStartedAt: forLoc ? undefined : state.sceneStartedAt,
+    // OTA-1688 — the deed ledger's line for the ground being narrated (never
+    // for a pre-generated destination: its deeds belong to where the player is).
+    deedsHere: forLoc ? null : deedsHereLine(state.worldMemory, player?.currentLocationId),
   });
   const messages = buildSystemPrompt(ctx);
   // ⚠ OTA-1129 — A BACKGROUND FILL DOES NOT OWN THE EPOCH. The epoch exists so
@@ -1331,6 +1335,7 @@ export async function maybeGenerateAmbientArbiter(
     gameLog: get().gameLog,
     ladder,
     ambient: true,
+    deedsHere: deedsHereLine(get().worldMemory, player?.currentLocationId),
   });
   const messages = buildSystemPrompt(ctx);
   const t0 = Date.now();
