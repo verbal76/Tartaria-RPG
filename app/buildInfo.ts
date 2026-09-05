@@ -28026,6 +28026,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // think better of you for spiting someone else again." Both sites in
 // gameStore (the gift standing path, meterSpiteGains).
 export const OTA_BUILD_ID = '2026-09-05-1690-the-cap-speaks';
+// golem catch-up 2026-09-05: markerless publish of OTA-1690 - the cap speaks.
+// The gift and spite standing budgets say so once, at the crossing, instead of
+// stopping the number in silence. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1689-the-feared-face';
 // golem catch-up 2026-09-05: markerless publish of OTA-1689 - the feared face.
 // Menace reaches the counter: Feared +5% / Dreaded +10% on buys, shown and
