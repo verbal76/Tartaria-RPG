@@ -59,3 +59,4 @@ pull 2026-09-03T14:40:00Z — owner: "did we fix the issue with me not being abl
 2026-09-05T13:35:21Z pull — owner: 'pull the log I just pushed, check all errors especially the lag issue' (device on 1689/1690; fetch everything since the 08:31Z bundle #mtnrsk5gmmd9)
 2026-09-05T13:36:45Z pull — re-request: the previous request commit carried [skip ci], which skips the relay too
 pull: owner's newest log, 2026-09-05T14:31:09Z — combat lag after DODGE / APPROACH
+pull: owner's newest log, 2026-09-05T20:55Z — 'log pushed' (after OTA-1700; the new-character world doors + whatever else he played)
