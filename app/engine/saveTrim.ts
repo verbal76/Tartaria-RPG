@@ -68,6 +68,21 @@ export function trimSaveStateToFit(state: SaveState, maxChars = SAFE_BLOB_CHARS)
   let next: SaveState = { ...state, worldMemory: { ...wm, visitedRooms: rooms } };
   const size = () => JSON.stringify(next).length;
 
+  // ⚠⚠ OTA-1702 — THE TRIM MEASURES ONCE. The passes below used to re-stringify
+  // the WHOLE blob before every room they looked at: an 830K save with 838
+  // visited rooms cost 838 × 8ms ≈ 7 seconds of synchronous JS per persist, and
+  // persist runs on every action — the contrary-walker sweep sat at 100% CPU
+  // for twenty minutes doing nothing else (measured with the inspector on the
+  // live process: every stack sample inside `size()`). On a device that is a
+  // multi-second freeze per tap the moment a long save crosses the budget.
+  // A room's serialized form inside the blob IS `JSON.stringify(room)`, so each
+  // pass keeps a running estimate from per-room sizes (a few hundred bytes each)
+  // and measures the whole blob once to confirm — `est` is an estimate only
+  // where a separator comma is concerned, and `measure()` is the truth the
+  // loops resume on if the estimate was optimistic.
+  let est = charsBefore;
+  const measure = (): number => { est = size(); return est; };
+
   const oldestFirst = Object.keys(rooms).sort(
     (a, b) => (rooms[a]?.lastVisitAt ?? rooms[a]?.firstVisitAt ?? 0)
       - (rooms[b]?.lastVisitAt ?? rooms[b]?.firstVisitAt ?? 0),
@@ -78,32 +93,37 @@ export function trimSaveStateToFit(state: SaveState, maxChars = SAFE_BLOB_CHARS)
   let memosCapped = false;
   let sceneDropped = false;
   const result = (): TrimResult => ({
-    state: next, trimmed: true, charsBefore, charsAfter: size(),
+    state: next, trimmed: true, charsBefore, charsAfter: measure(),
     tablesStripped, roomsDropped, memosCapped, sceneDropped,
   });
 
   // Pass 1 — strip regenerable investigation tables, oldest first (re-seed on
   // re-entry). Keeps all lightweight per-room memory intact.
   for (const k of oldestFirst) {
-    if (size() <= maxChars) return result();
-    if (rooms[k]?.roomInvestigationTable) {
-      const { roomInvestigationTable: _drop, ...rest } = rooms[k]!;
+    if (est <= maxChars && measure() <= maxChars) return result();
+    const r = rooms[k];
+    if (r?.roomInvestigationTable) {
+      const before = JSON.stringify(r).length;
+      const { roomInvestigationTable: _drop, ...rest } = r;
       rooms[k] = rest;
+      est -= before - JSON.stringify(rest).length;
       tablesStripped++;
     }
   }
-  if (size() <= maxChars) return result();
+  if (measure() <= maxChars) return result();
 
   // Pass 2 — drop the oldest rooms outright (re-roll fresh on re-entry), never
   // one that holds player-dropped items.
   for (const k of oldestFirst) {
-    if (size() <= maxChars) return result();
+    if (est <= maxChars && measure() <= maxChars) return result();
     const r = rooms[k];
     if (!r || (r.droppedItems?.length ?? 0) > 0) continue;
+    // `"key":` + the value + its separator comma.
+    est -= JSON.stringify(k).length + 1 + JSON.stringify(r).length + 1;
     delete rooms[k];
     roomsDropped++;
   }
-  if (size() <= maxChars) return result();
+  if (measure() <= maxChars) return result();
 
   // Pass 3 — cap old narrative memos (the Arbiter only references recent ones).
   next = {
