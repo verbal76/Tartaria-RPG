@@ -1,0 +1,147 @@
+Bug Report · (2026-09-05-1679-the-part-fits-the-wire) · Log
+=== TARTARIA BUG REPORT ===
+Submitted: 2026-09-05T02:27:31.791Z
+Character: (general / no character)
+
+--- DESCRIPTION ---
+Log
+
+--- DEVICE / BUILD ---
+Device
+  Name: Pixel 10 Pro XL
+  Platform: android 37
+  Hermes: yes
+  Locale: en-US
+  Timezone: America/New_York
+  Screen: window 443×986 / screen 443×986 @ 2.4375x density
+  Captured at: 2026-09-05T02:27:31.790Z
+
+Install
+  App ID: com.hotatticgames.tartarprim
+  App version: 4.32.11
+  APK build version: 2.4.1
+  APK build: 293
+  AAB: (build 293)
+  OTA: (2026-09-05-1679-the-part-fits-the-wire)
+  Boot stage: qwen:deferred
+
+ML runtime health
+  Status: active (no crashes detected)
+  Crash count: 0
+  Last init attempt: 2026-09-05T02:27:19.974Z
+  Last init success: 2026-09-05T02:27:20.651Z
+  Crashes-before-disable threshold: 2
+  Qwen completion guard: RECOVERED — a retry survived a clean run; AI narration re-enabled
+  Qwen kernel variant: rnllama_v8_2_fp16_dotprod
+  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k
+  Voice (TTS) guard: clean (no voice crashes on this build)
+Save-load health
+  Status: clean (no load-crash flags)
+Last JS crash
+  Status: none recorded
+This launch
+  Life: bmtnrincki8 · started 2026-09-05T02:27:19.604Z
+  Followed an OTA apply 254ms ago (boot-front)
+  The previous life released its model contexts before reloading (o0/r0/l0/p0/dn0)
+Crash ledger — 10 recorded (newest last)
+  ⚠⚠ 3 of 10 process kills landed on an OTA-apply boot
+  • 2026-09-03T20:39:06.948Z (1788m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-03-1649-what-a-ring-is-for · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 750ms into the action · alive 0ms after it
+      launch: died 803ms into the process · not an OTA-apply boot
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-03T21:28:44.213Z (1739m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-03-1649-what-a-ring-is-for · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 707ms into the action · alive 0ms after it
+      launch: died 797ms into the process · not an OTA-apply boot
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-03T22:43:58.985Z (1664m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-03-1653-the-wear-ward · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 627ms into the action · alive 0ms after it
+      launch: died 672ms into the process · not an OTA-apply boot
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-04T04:42:22.271Z (1305m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-04-1664-no-phantom-syllable · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 743ms into the action · alive 0ms after it
+      launch: died 776ms into the process · not an OTA-apply boot
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-04T13:31:35.149Z (776m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-04-1665-the-bug-report-pushes · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 1075ms into the action · alive 62922ms after it
+      launch: died 64046ms into the process · not an OTA-apply boot
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-04T18:21:13.034Z (486m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-04-1667-the-key-goes-where-the-player-is · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 956ms into the action · alive 0ms after it
+      launch: died 1006ms into the process · not an OTA-apply boot
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-04T23:24:18.137Z (183m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-04-1673-one-scanner-per-band · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 2025ms into the action · alive 0ms after it
+      launch: died 2088ms into the process · not an OTA-apply boot
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-05T00:20:20.831Z (127m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1675-the-voice-names-its-step · stage native:cognition:done
+      Process died with no orderly exit while: action "what's going on there?"
+      doing: action "what's going on there?" · room drakova · screen exploration
+      last checkpoint: native:cognition:done [q0] · 285ms into the action · alive 0ms after it
+      launch: died 525846ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 160ms earlier via boot-front
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-05T01:31:00.931Z (57m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1677-the-log-leaves-in-an-envelope · stage native:voice:done
+      Process died with no orderly exit while: action "attack with the off-hand sentinel cleaver"
+      doing: action "attack with the off-hand sentinel cleaver" · room voronov · screen exploration
+      last checkpoint: native:voice:done [q0] · 21850ms into the action · alive 0ms after it
+      launch: died 152574ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 893ms earlier via mid-session
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-05T01:50:40.430Z (37m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1678-the-chase-gets-harder · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 891ms into the action · alive 4136ms after it
+      launch: died 5071ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 162ms earlier via boot-front
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+Crash delivery: ON — reports go to Sentry when you crash.
+Runtime pressure
+  Memory warnings: none this session
+  Freeze watch: no stalls seen (JS clocks only — see the native queue below)
+  Native queue: worst wait 0.0s · 0 job kinds queued >3s · worst 0.0ms/prompt-token
+  App state trail: (none recorded)
+Model contexts
+  Live now: 0
+  Opened: 0 · Released: 0 · Peak live: 0
+  Narration engine: idle
+
+--- VOICE ---
+  TTS enabled: no
+  Engine: bundled
+  Rate: 1.05 · Pitch: 1.00
+  System voice id: (default)
+  Kokoro voice: am_michael
+  Kokoro state: idle
+
+--- INVENTORY ---
+Inventory
+  (no active character)
+
+--- CHARACTER LOG (newest first) ---
+(no character selected — no log attached)
+
+=== END REPORT ===
