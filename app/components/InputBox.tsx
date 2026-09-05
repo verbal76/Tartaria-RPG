@@ -745,7 +745,16 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 <TravelBtn label="🚪 EXIT" wayOut testID="exit-chip" a11yLabel="Exit, leave this building" onPress={() => exitBuilding()} />
               ) : null}
             </>
-          ) : travelTargetName ? (
+          ) : travelTargetName && !hubRoom ? (
+            // ⚠⚠⚠ OTA-1681 — NOT WHILE YOU ARE INSIDE. With a course plotted this
+            // branch used to win over the room row, so the owner walked through
+            // Tomb Vigil's gate and saw "→ MUD SEAS · STOP TRAVEL" where the room
+            // chips and EXIT should have been: "I can only go to the very first
+            // room and then my only other options are go back to my auto route."
+            // Inside, the row is the outpost's (rooms + EXIT, the branch below);
+            // the course is untouched and the travel row returns the moment EXIT
+            // puts him back on the tile — "when you exit you're still on that
+            // tile … and you still have your auto route ready to go."
             <>
               {/* OTA-621 — a structure stands on THIS tile even mid-journey. Keep
                   the ENTER affordance on the travel row so "Tap ENTER to step

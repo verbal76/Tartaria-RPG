@@ -27860,7 +27860,25 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // 7,500 so a part still fits the 14,000 wire budget with the seams on. Proven
 // on ten thousand blocks of noise: plain base64 trips the shape rules, the
 // seamed form never does; a real 400 KB log packs whole and joins exact.
-export const OTA_BUILD_ID = '2026-09-05-1680-the-envelope-has-no-word';
+// OTA-1681 — THE OUTPOST LETS GO. Task #191, three notations from the 09-04
+// log, one root between two of them. Since OTA-1669 the gate opens with a
+// course still plotted, and two things had never learned that: InputBox let
+// the travel-row branch win over the room row whenever a course existed (he
+// walked into Tomb Vigil's entry room and saw "→ MUD SEAS · STOP TRAVEL"
+// instead of the rooms and EXIT - "I can only go to the very first room"),
+// and continueTravel never dropped hubRoomId on the way out - beginScene only
+// drops it when the LOCATION changes, and a step inside the same location's
+// grid never does, so the minimap kept drawing the outpost two tiles into the
+// open ("my mini-map still shows me stuck in the outpost even though I'm
+// not"). OTA-993 put "a course begins outside" at setTravelCourse and
+// OTA-1595 at the whisper course; continueTravel is the third door, same
+// clear, same line. Inside an outpost the row is now the outpost's (rooms +
+// EXIT) whatever course is plotted; the course survives the visit and the
+// travel row returns the moment EXIT puts you back on the tile. The 17:42
+// notation (ENTER OUTPOST at the Pilgrim Camp stepping into nothing) was on
+// 1668 and is what 1669 fixed; pinned here so all three stay accounted for.
+export const OTA_BUILD_ID = '2026-09-05-1681-the-outpost-lets-go';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1680-the-envelope-has-no-word';
 // golem catch-up 2026-09-05: markerless publish of OTA-1680 - the envelope
 // has no word. Sentry's @iban:filter matched inside a base64 block (part 29
 // of the owner's first whole log under 1679), so the envelope gets a '-' seam

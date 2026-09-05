@@ -26394,6 +26394,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
       buzzBlocked(); // arb41 — physical "can't move" signal
       return;
     }
+    // ⚠⚠⚠ OTA-1681 — A STEP BEGINS OUTSIDE, THIS DOOR TOO. OTA-993 put "a course
+    // begins outside" at setTravelCourse and OTA-1595 at the whisper course, and
+    // this one was left out: since OTA-1669 the gate opens with a course still
+    // plotted, so the owner stood in Tomb Vigil's entry room with "→ MUD SEAS"
+    // on the travel row, tapped it, walked east through open silt — and kept
+    // the room. beginScene only drops a hubRoomId when the LOCATION changes,
+    // and a step inside the same location's grid never does, so the minimap
+    // kept drawing the outpost interior two tiles into the open. His words:
+    // "my mini-map still shows me stuck in the outpost even though I'm not."
+    // Same clear, same line, same choke-point rule as the other two doors.
+    if (player.hubRoomId || get().activeBuildingId) {
+      set((s2) => (s2.player ? { player: { ...s2.player, hubRoomId: null }, activeBuildingId: null } : s2));
+      get().appendLog('world', 'You step out under open sky and take your bearings.');
+    }
     const targetId = player.travelTarget.locationId;
     // arb103 — ARRIVAL is "standing on the target's canon cell", NOT "currentLocationId
     // equals the target". When you've wandered off a location in open ground (the
