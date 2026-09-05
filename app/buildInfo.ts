@@ -28085,6 +28085,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // `ui: tap "dodge" ⏱+4237ms late 4200ms` — flagged when it clears the session
 // floor by 250ms. ROLL joins the tap ledger. diagnostics/tapClock.ts.
 export const OTA_BUILD_ID = '2026-09-05-1695-the-tap-has-a-clock';
+// golem catch-up 2026-09-05: markerless publish of OTA-1695 - the tap has a
+// clock. Every ledgered control notes the DOWN event's wait against the OS
+// touch stamp and the tap line rides it (`⏱+Nms`, `late Nms` past the session
+// floor); ROLL joins the ledger. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1694-the-dice-clock';
 // golem catch-up 2026-09-05: markerless publish of OTA-1694 - the dice clock.
 // One debug line per roll step names open → shown → tapped → settled and a
