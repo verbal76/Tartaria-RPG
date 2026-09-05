@@ -28000,6 +28000,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // when the roll took the last body (stageArrival.rearmAfterRoll). gameStore
 // stays under the 37,000-line ratchet (the writers live in stageArrival).
 export const OTA_BUILD_ID = '2026-09-05-1688-the-deed-ledger';
+// golem catch-up 2026-09-05: markerless publish of OTA-1688 - the deed ledger.
+// worldMemory.deeds: a mission ground under the boots, a card walked out on and
+// a mission fight fled are written down; the arrival line, the people and the
+// narrator read them back; the brood comes back one short and the apex keeps
+// its wound; the dice-path clear-field re-arm. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1687-the-mission-layer-remembers-itself';
 // golem catch-up 2026-09-05: markerless publish of OTA-1687 - the mission
 // layer remembers itself. ABANDON drops the mission's encounter records; the
