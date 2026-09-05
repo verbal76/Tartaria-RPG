@@ -28034,6 +28034,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // this place of Mud Wasps once; the floor has been swept since, one way or
 // another." Two names at most, the one pluraliser.
 export const OTA_BUILD_ID = '2026-09-05-1691-the-room-names-its-dead';
+// golem catch-up 2026-09-05: markerless publish of OTA-1691 - the room names
+// its dead. The return line names the bodies inside the respawn window and
+// remembers the clearing after it; a hunted apex keeps its name. hal took the
+// marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1690-the-cap-speaks';
 // golem catch-up 2026-09-05: markerless publish of OTA-1690 - the cap speaks.
 // The gift and spite standing budgets say so once, at the crossing, instead of
