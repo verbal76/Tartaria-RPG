@@ -62,6 +62,7 @@ import { hubRoomFor, hubSkinFactionFor } from '../../engine/hub';
 import { findCatalogItem } from '../../engine/crafting';
 import { setCanonExtraLocations } from '../../engine/worldMap';
 import type { PlayerCharacter, WorldMemory } from '../../engine/types';
+import { afterRevive } from '../../engine/progressionHints'; // OTA-1701
 
 /**
  * ⚠ `import type * as` is fully erased at compile time, so this is NOT a runtime
@@ -754,6 +755,8 @@ export const createSlotSlice = (
         kind: 'death_revive',
         text: `returned from death by a Resurrection Gem`,
       });
+      // ⚠ OTA-1701 — a Guardian's kill gets the Arbiter's word once, then the record clears.
+      { const ph = afterRevive(get().worldMemory); if (ph) { get().appendLog('arbiter', ph); set((s) => ({ worldMemory: { ...s.worldMemory, lastDeath: undefined } })); } }
       // Clean completion — drop the breadcrumb and clear any prior crash flag
       // on this slot (it loads fine now).
       await markSlotLoadDone();

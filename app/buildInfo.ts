@@ -28149,7 +28149,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Atlas, and the Atlas's travel rows refuse under the lockdown instead (same
 // buzz, same nudge); isTutorialLocked is the one rule InputBox, ExplorationScreen
 // and MapScreen read; WORLD / map / LORE taps write `ui: tap` lines.
-export const OTA_BUILD_ID = '2026-09-05-1700-the-world-runs-while-you-learn';
+// 2026-09-05 OTA-1701 — THE WORLD TELLS YOU WHERE THE POWER IS. Owner's
+// direction after his progression assessment: no rebalancing; make the game
+// surface its own progression ecosystem. The Arbiter speaks from the second
+// Guardian wall on (flee or death — the killer is now written on the death and
+// counted), from the second apex flee on (deed ledger), on first arrival at a
+// chart-unlocked climb, on the first beacon, and at a late Core seat with the
+// numbers against you — cooldowns in game hours, never a refusal. A smith
+// recognises the beacon in the pack; a familiar counter passes on what the
+// climbers brought down. engine/progressionHints.ts holds every line.
+export const OTA_BUILD_ID = '2026-09-05-1701-the-world-tells-you-where-the-power-is';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1700-the-world-runs-while-you-learn';
 // golem catch-up 2026-09-05: markerless publish of OTA-1700 - the world runs
 // while you learn. The heartbeat moves the World board during the tutorial, the
 // minimap opens the Atlas (its travel rows carry the lock), the three doors log

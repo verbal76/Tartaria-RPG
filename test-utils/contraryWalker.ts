@@ -42,6 +42,7 @@ import type { GameStore } from '../app/state/gameStore';
 import { findHuntById } from '../app/engine/hunts';
 import { armedEncounter } from '../app/engine/missionEncounterArm';
 import { choicesFor, freshEncounter } from '../app/engine/missionEncounter';
+import { FLEE_OPEN_LINES, FLEE_INDOOR_LINES } from '../app/engine/voicePools';
 import { Walker, resetForMission, playMission, type WalkReport, type MissionLike } from './playerWalker';
 
 const store = useGameStore;
@@ -294,6 +295,16 @@ export class ContraryWalker extends Walker {
     const { playerGridCell } = require('../app/state/playerGrid') as typeof import('../app/state/playerGrid');
     const at = () => { const g = playerGridCell(get().player!); return `${g.x},${g.y}`; };
     const from = at();
+    // ⚠ MEASURED (the 1699 sweep, hunt_mud_siren_queen): the Siren Queen's
+    // first ask stands at the Hidden Market, and the market tile auto-enters
+    // its building on arrival (OTA-508). Indoors a typed cardinal is swallowed
+    // — "Inside, you move room to room. Tap a room, or EXIT to step back
+    // outside." — so the boots never left the cell. A player walking out on
+    // someone in a building taps EXIT first; so does this. The step back onto
+    // the tile re-enters the market by itself, which the caller reads as the
+    // return.
+    if (get().activeBuildingId) { this.tap('EXIT (the building)'); get().exitBuilding(); await tick(); }
+    if (get().player?.hubRoomId) { this.tap('EXIT'); await this.type('leave outpost'); }
     const p = get().player!;
     if (p.stamina < (p.staminaMax ?? 50)) { this.allowances.add('stamina restored by fiat instead of resting'); store.setState({ player: { ...p, stamina: p.staminaMax ?? 50 } }); }
     this.tap('NORTH'); await this.type('north');
@@ -417,6 +428,13 @@ export class ContraryWalker extends Walker {
     return this.accept();
   }
 
+  /** Every standing body of this name gets `hp` hit points (allowance recorded). */
+  hardenBrood(name: string, hp: number): void {
+    const sc = get().currentScene;
+    if (!sc) return;
+    this.allowances.add(`the brood hardened to ${hp} HP so one falls at a time`);
+    store.setState({ currentScene: { ...sc, enemyHps: sc.enemyHps.map((h, i) => (sc.enemies[i]?.name === name && h > 0 ? hp : h)) } as never });
+  }
   livingNamed(name: string): number {
     const sc = get().currentScene;
     if (!sc) return 0;
@@ -428,6 +446,17 @@ export class ContraryWalker extends Walker {
     const i = sc.enemies.findIndex((e) => e.name === name);
     return i < 0 ? null : sc.enemyHps[i] ?? null;
   }
+}
+
+/** ⚠ OTA-1700 — the flee is SAID when the feed carries one of the game's own flee
+ *  lines (voicePools, thirty open + fifteen indoor) or the Guardian's rebuke. The
+ *  1699 sweep read a four-phrase regex against a thirty-line pool and graded three
+ *  honest flees silent. Read the pool the game reads. */
+const FLEE_LINES: readonly string[] = [...FLEE_OPEN_LINES, ...FLEE_INDOOR_LINES];
+export function isFleeLine(l: string): boolean {
+  // ⚠ `includes`, not equality: two world entries inside 500ms merge into one feed
+  // line (HANDOFF #4), so the flee sentence often arrives glued to its neighbour.
+  return FLEE_LINES.some((f) => l.includes(f)) || /watches you go|The Guardian/.test(l);
 }
 
 // ── the four roads ──────────────────────────────────────────────────────────
@@ -577,11 +606,16 @@ export async function walkPremature(def: MissionLike): Promise<ContraryReport> {
       const about = w.aboutTheHunt(saw).filter((l) => !/^\[/.test(l));
       const stoodUp = saw.some((l) => l.includes(m.apexName));
       const stillStage0 = w.stage() === 0;
+      // ⚠ OTA-1700 walker — 'yes' when the slate says "not yet" AND names the first
+      // ask (the OTA-1688 arrival reader's exact shape); 'partial' when the hunt is
+      // merely mentioned. The 1699 sweep graded fourteen hunts 'partial' on the
+      // same line and hid the three where that line never printed.
+      const notYet = about.find((l) => /not yet/i.test(l) && /First:/.test(l));
       return {
         handled: stillStage0 && !stoodUp ? 'yes' : 'no',
-        acknowledged: about.length ? 'partial' : 'no',
+        acknowledged: notYet ? 'yes' : about.length ? 'partial' : 'no',
         priorKnowledge: 'n/a',
-        verdict: stoodUp ? 'the apex stood up with the hunt at stage 0' : about.length ? `the hunt was named: ${about[0]}` : 'nothing on screen mentioned the hunt or its ground; the early visit is invisible',
+        verdict: stoodUp ? 'the apex stood up with the hunt at stage 0' : notYet ? `the slate said not yet: ${notYet}` : about.length ? `the hunt was named, but not the order: ${about[0]}` : 'nothing on screen mentioned the hunt or its ground; the early visit is invisible',
       };
     },
   );
@@ -853,6 +887,13 @@ export async function walkInterrupted(def: MissionLike): Promise<ContraryReport>
         w.fieldReport('on the brood ground');
         n0 = await w.clearAmbient(brood, 'on the brood ground');
         if (n0 === 0) { w.breaks.push(`no ${brood} stood up on arrival at stage ${m.brood} — ${w.fieldReport('no brood')}`); return; }
+        // ⚠ MEASURED (second sweep, sludge behemoth + harpy cradle): STR 20 with
+        // whatever the road had looted swung once and the whole brood fell, so
+        // "kill one and run" ran from an empty field, the stage closed, and the
+        // return had nothing to stand up. A player with a splash weapon meets the
+        // same thing; the probe is about the ONE survivor's memory, so the brood
+        // is hardened by fiat until one falls at a time.
+        w.hardenBrood(brood, 200);
         await w.fightUntil(() => w.livingNamed(brood) < n0, 'to thin the brood');
         killed = n0 - w.livingNamed(brood);
         get().appendLog('system', `(walker) killed ${killed} of ${n0} ${brood}, fleeing`);
@@ -865,7 +906,7 @@ export async function walkInterrupted(def: MissionLike): Promise<ContraryReport>
         get().appendLog('system', `(walker) back on the tile: ${back} ${brood} up`);
       },
       (saw) => {
-        const fledLine = saw.find((l) => /break for|You run|open ground|escape/i.test(l));
+        const fledLine = saw.find(isFleeLine);
         const resummoned = /after investigate on the fled tile: ([1-9])/.exec(saw.join('\n'));
         const backCount = Number(/back on the tile: (\d+)/.exec(saw.join('\n'))?.[1] ?? '0');
         const back = w.remembers(saw);
@@ -921,7 +962,7 @@ export async function walkInterrupted(def: MissionLike): Promise<ContraryReport>
       get().appendLog('system', `(walker) back on the apex ground: apex ${w.livingNamed(apex) ? `up at ${w.hpOf(apex)}` : 'not up'}`);
     },
     (saw) => {
-      const fledLine = saw.find((l) => /break for|You run|open ground|escape/i.test(l));
+      const fledLine = saw.find(isFleeLine);
       const backHp = Number(/back on the apex ground: apex up at (\d+)/.exec(saw.join('\n'))?.[1] ?? '-1');
       const back = w.remembers(saw);
       return {

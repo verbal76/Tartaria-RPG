@@ -174,10 +174,11 @@ describe('OTA-1686 — the contrary walker on the Bog Dragon of Old Drakova', ()
     // ⚠ MEASURED 2026-09-05, RE-MEASURED UNDER OTA-1688. The early visits were
     // invisible; the deed ledger's arrival reader now says "this is a later
     // step's ground — not yet. First: find the Drakovan reeve…" at the steeple
-    // (the grader's ceiling for that probe is 'partial'), names the reeve at
+    // (graded 'yes' since the 1700 walker: "not yet" + the first ask named —
+    // it was the grader's ceiling, 'partial', before), names the reeve at
     // Mira's, and the proper visits end "You have stood here before".
     expect(grades(r)).toEqual([
-      { step: 'the apex ground before the first ask', handled: 'yes', acknowledged: 'partial', prior: 'n/a' },
+      { step: 'the apex ground before the first ask', handled: 'yes', acknowledged: 'yes', prior: 'n/a' },
       { step: 'a later door before the first ask', handled: 'yes', acknowledged: 'yes', prior: 'n/a' },
       { step: 'the proper visits, after the early ones', handled: 'yes', acknowledged: 'n/a', prior: 'yes' },
     ]);

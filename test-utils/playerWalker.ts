@@ -135,6 +135,13 @@ export class Walker {
 
   // ── the thumb ────────────────────────────────────────────────────────────
   tap(label: string): void {
+    // ⚠⚠ THE ABORT TOKEN. Jest cannot cancel a promise: a road that outran the
+    // test timeout kept walking while the next hunt's test began, and two walkers
+    // drove ONE store — the 1699 sweep's five-hunt cascade ("ENTER OUTPOST did
+    // not open the gate" a breath after "You cross to the gate and step through":
+    // the abandoned road's SET COURSE had cleared the room). A sweep that gives
+    // up on a road flips this flag; the next tap throws the road out.
+    if (walkerControl.abort) throw new WalkerAborted(`road abandoned at tap "${label}"`);
     this.taps += 1;
     get().appendLog('debug', `ui: tap "${label}"`);
   }
@@ -344,6 +351,19 @@ export class Walker {
     return true;
   }
 
+  /** ⚠ The 1699 sweep's cascade (five hunts broken at a gate after one finished
+   *  inside an outpost) could not be read from four feed lines: the break never
+   *  said where the boots were. This does. */
+  whereAmI(): string {
+    const st = get();
+    const p = st.player;
+    if (!p) return '[no player]';
+    const g = playerGridCell(p);
+    const sc = st.currentScene;
+    const field = (sc?.enemies ?? []).map((e, i) => `${e.name}:${sc!.enemyHps[i] ?? '?'}`).join(',') || 'empty';
+    return `[at ${p.currentLocationId} cell=${g.x},${g.y} map=${p.mapX ?? '-'},${p.mapY ?? '-'} room=${p.hubRoomId ?? '-'} bldg=${st.activeBuildingId ?? '-'} course=${p.travelTarget?.locationId ?? '-'} confirm=${st.pendingTravelConfirm ? 'yes' : '-'} field=[${field}] screen=${st.currentScreen}]`;
+  }
+
   async enterOutpost(): Promise<boolean> {
     // The gate holds its truce: whatever closed on you at the tile is dealt
     // with first, as the Arbiter says ("Not with blades out").
@@ -357,7 +377,7 @@ export class Walker {
       this.tap('EXIT');
       await this.type('leave outpost');
       if (get().player?.hubRoomId) {
-        this.breaks.push(`EXIT from ${get().player?.hubRoomId} at ${get().player?.currentLocationId} did not leave the outpost. last lines:\n${this.lastLines(4)}`);
+        this.breaks.push(`EXIT from ${get().player?.hubRoomId} at ${get().player?.currentLocationId} did not leave the outpost. ${this.whereAmI()} last lines:\n${this.lastLines(4)}`);
         return false;
       }
     }
@@ -365,7 +385,7 @@ export class Walker {
     await this.type('enter outpost');
     const st = get();
     if (!st.player?.hubRoomId) {
-      this.breaks.push(`ENTER OUTPOST at ${st.player?.currentLocationId} did not open the gate. last lines:\n${this.lastLines(4)}`);
+      this.breaks.push(`ENTER OUTPOST at ${st.player?.currentLocationId} did not open the gate. ${this.whereAmI()} last lines:\n${this.lastLines(4)}`);
       return false;
     }
     if (st.currentScene?.vendor?.id !== CONTRACT_BROKER_VENDOR_ID) {
@@ -742,6 +762,12 @@ export class Walker {
 }
 
 /** A fresh slate for one mission on the one long-lived character. */
+/** ⚠ One flag, read at every tap (Walker.tap): a sweep that abandons a road sets
+ *  it, the road's next tap throws WalkerAborted, and the sweep clears it before
+ *  the next road. Without this two roads share one store. */
+export const walkerControl = { abort: false };
+export class WalkerAborted extends Error {}
+
 export function resetForMission(): void {
   const p = get().player!;
   const questless = p.inventory.filter((i) => !(i.tags ?? []).includes('quest') && !(i.tags ?? []).includes('mission'));

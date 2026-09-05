@@ -2179,6 +2179,11 @@ export interface WorldMemory {
    *  the moments it already handles; read by the arrival line, the people on
    *  the ground and the narrator's fact sheet. See engine/deeds.ts. */
   deeds?: Record<string, Deed[]>;
+  /** ⚠ OTA-1701 — who did it, for the Arbiter's word on the way back (the
+   *  resurrection clears it once spoken). */
+  lastDeath?: { enemyName: string; locationId: string | null; hour: number; guardian: boolean };
+  /** OTA-1701 — deaths a Core Guardian handed out, for the "not the first time" count. */
+  guardianDeaths?: number;
   /** Active multi-scene hook chains — a hook resolution may queue a follow-up
    *  hook kind to plant in a future wander. plantedAtHour lets beginScene
    *  expire chains that have sat unused too long (combat-heavy biomes

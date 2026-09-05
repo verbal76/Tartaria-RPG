@@ -46,14 +46,21 @@ import { useGameStore } from '../app/state/gameStore';
 import { getRaces, getFactions } from '../app/engine/character';
 import { HUNTS } from '../app/engine/hunts';
 import { walkObedient, walkPremature, walkContrary, walkInterrupted, formatContrary, punchList, huntRoadmap, type ContraryReport, type MissionLike } from '../test-utils/contraryWalker';
+import { walkerControl } from '../test-utils/playerWalker';
 import { appendFileSync } from 'node:fs';
 
-jest.setTimeout(1_500_000);
+// ⚠⚠ FOUR ROADS, EACH ABANDONED AT ROAD_MS — never the test as a whole. Jest's
+// own timeout cannot stop a running road; it starts the next test over it, and
+// two walkers on one store was the first sweep's five-hunt cascade. The test
+// budget is wider than four abandoned roads so jest never gets there first.
+const ROAD_MS = 20 * 60_000;
+jest.setTimeout(4 * ROAD_MS + 10 * 60_000);
 
 const store = useGameStore;
 const REPORT = process.env.PLAYER_WALKER_REPORT;
 const ONLY = (process.env.CONTRARY_HUNTS ?? '').split(',').map((s: string) => s.trim()).filter(Boolean);
 const reports: ContraryReport[] = [];
+const STALL_MS = 15 * 60_000;
 
 async function settle(pred: () => boolean, deadlineMs = 5000) {
   const t0 = Date.now();
@@ -103,7 +110,43 @@ describe('OTA-1699 — the contrary walker on every hunt', () => {
     it(`⚠⚠ ${h.id} — four roads, every one finishes`, async () => {
       const outcomes: Record<string, string[]> = {};
       for (const [name, walk] of [['obedient', walkObedient], ['premature', walkPremature], ['contrary', walkContrary], ['interrupted', walkInterrupted]] as const) {
-        const r = await walk(def);
+        // ⚠ The first full sweep lost three 25-minute timeouts to roads that went
+        // quiet (0% CPU, nothing written) and left no trace of WHERE. A stalled
+        // road now writes the boots' position and the last feed lines to the report
+        // while it is still stalled, so the next one can be read.
+        const stall = setTimeout(() => {
+          const st = store.getState();
+          const p = st.player;
+          const tail = st.gameLog.slice(-12).map((e) => `  | [${e.channel}] ${(e.text.split('\n')[0] ?? '').slice(0, 160)}`).join('\n');
+          const text = `── STALLED · ${h.id} · ${name} ── ${STALL_MS / 60000} minutes without finishing. at=${p?.currentLocationId} map=${p?.mapX},${p?.mapY} room=${p?.hubRoomId ?? '-'} bldg=${st.activeBuildingId ?? '-'} course=${p?.travelTarget?.locationId ?? '-'} confirm=${st.pendingTravelConfirm ? 'yes' : '-'} rolls=${st.pendingRolls ? 'yes' : '-'} enemies=${st.currentScene?.enemies.length ?? 0} screen=${st.currentScreen} modals=${[st.pendingMissionStinger && 'stinger', st.pendingMissionBeat && 'beat', st.pendingTalk && 'talk', st.pendingParley && 'parley', st.pendingPayoff && 'payoff'].filter(Boolean).join(',') || 'none'}\n${tail}`;
+          if (REPORT) appendFileSync(REPORT, `${text}\n\n`);
+          process.stdout.write(`${text}\n`);
+        }, STALL_MS);
+        let giveUp: ReturnType<typeof setTimeout> | null = null;
+        const deadline = new Promise<'abandoned'>((resolve) => { giveUp = setTimeout(() => resolve('abandoned'), ROAD_MS); });
+        walkerControl.abort = false;
+        const r = await Promise.race([walk(def).catch((e: unknown) => ({ error: String(e) })), deadline]);
+        clearTimeout(stall);
+        if (giveUp) clearTimeout(giveUp);
+        if (r === 'abandoned') {
+          // Flip the token, let the road throw itself out at its next tap, then
+          // clear it for the next road. The store is one walker's again.
+          walkerControl.abort = true;
+          await new Promise((res) => setTimeout(res, 3000));
+          walkerControl.abort = false;
+          const text = `── ABANDONED · ${h.id} · ${name} ── gave up after ${ROAD_MS / 60000} minutes; the walker was thrown out at its next tap.`;
+          if (REPORT) appendFileSync(REPORT, `${text}\n\n`);
+          process.stdout.write(`${text}\n`);
+          outcomes[name] = ['abandoned after 20 minutes'];
+          continue;
+        }
+        if ('error' in r) {
+          const text = `── THREW · ${h.id} · ${name} ── ${r.error}`;
+          if (REPORT) appendFileSync(REPORT, `${text}\n\n`);
+          process.stdout.write(`${text}\n`);
+          outcomes[name] = [`threw: ${r.error}`];
+          continue;
+        }
         emit(r);
         outcomes[name] = r.finish?.breaks ?? ['no finish'];
       }

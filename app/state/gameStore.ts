@@ -217,6 +217,7 @@ import { notePlayerActionForSprint, playerIsSprinting, _resetSprintForTest } fro
 import { playerGridCell } from './playerGrid';
 import { armSpawnStagesAtArrival, checkStandingGround, healStageDebtsAtArrival, noteMissionGroundsUnderfoot, noteMissionFlee, fieldHasLiveHostiles, rearmAfterRoll } from './stageArrival';
 import { recordDeed, lastDeed as lastDeedAt } from '../engine/deeds';
+import * as PH from '../engine/progressionHints'; // OTA-1701
 // ⚠⚠ OTA-1461 — the pools for the lines a player hears ten times an hour. Each is
 // consumed through `rotatingPick`, which cycles in order and refuses an immediate
 // repeat, so a pool of forty is forty distinct fires before anything comes round.
@@ -5970,9 +5971,9 @@ function emitVendorGreeting(
   const hours = player.hoursElapsed ?? 0;
   get().appendLog('world', npcGreeting(rel, vendor.name, player.name, player.sex));
   { const mb = menaceGreetingBeat(decayedMenace(player.menace ?? 0, player.menaceUpdatedHour ?? 0, hours), vendor.name, npcRegard(rel)); if (mb) get().appendLog('world', mb); } // OTA-1689
-  const awayLine = npcAbsenceLine(rel, vendor.name, player.name, hours, player.sex);
-  if (awayLine) get().appendLog('world', awayLine);
+  { const awayLine = npcAbsenceLine(rel, vendor.name, player.name, hours, player.sex); if (awayLine) get().appendLog('world', awayLine); }
   { const la = lastAskedLine(get().worldMemory.npcTranscripts?.[vendorNpcId(vendor)], rel, vendor.name); if (la) get().appendLog('world', la); } // OTA-1698
+  { const pr = PH.vendorTowerRumour(get().worldMemory, player, vendor, rel); if (pr) get().appendLog('world', pr); } // OTA-1701 — the world's own knowledge
   const raid = raidNewsFor(get().worldMemory, rel, hours);
   if (raid) {
     get().appendLog('world', raidNewsLine(rel, raid, vendor.name, player.name));
@@ -10509,6 +10510,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (gc && gcUnlocked && !get().player?.hubRoomId && !hasEnemies) {
         sceneAmbientNouns = Array.from(new Set([gc.noun, ...sceneAmbientNouns]));
         sceneDisplayedNouns = Array.from(new Set([gc.noun, ...sceneDisplayedNouns]));
+        void Promise.resolve().then(() => { const ph = PH.towerDiscovered(gc.id, (get().worldMemory.greatClimbsCrested ?? []).includes(gc.id)); if (ph) get().appendLog('arbiter', ph); }); // OTA-1701 — after the scene lands
       }
     }
     // OTA-951 — Phase B of real heights: seed PERCHES onto taller climbables
@@ -11658,6 +11660,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const awayLine = npcAbsenceLine(rel, vendor.name, player.name, player.hoursElapsed ?? 0, player.sex);
         if (awayLine) get().appendLog('world', awayLine);
         { const la = lastAskedLine(get().worldMemory.npcTranscripts?.[vendorNpcId(vendor)], rel, vendor.name); if (la) get().appendLog('world', la); } // OTA-1698 — the counter remembers the question
+        { const pr = PH.vendorTowerRumour(get().worldMemory, player, vendor, rel); if (pr) get().appendLog('world', pr); } // OTA-1701 — the world's own knowledge
         // OTA-1081 — the delayed mumble: a pocket lifted CLEAN on an earlier
         // visit surfaces here, on the return, as them noticing the loss out
         // loud without suspecting anyone. One per visit, ledger-counted.
@@ -22654,9 +22657,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 def ? cg.guardianRebukeLine(def) : 'The Guardian watches you go without moving.',
               );
               const after = cg.fleeAftermathLine(player.factionId);
-              if (after) {
-                get().appendLog('arbiter', after);
-              }
+              if (after) get().appendLog('arbiter', after);
+              { const ph = PH.afterGuardianWall(PH.wallContext(get().worldMemory, player, PH.guardianWallsSoFar(get().worldMemory))); if (ph) get().appendLog('arbiter', ph); } // OTA-1701 — from the second wall on
               if (capitalId && def) {
                 recordMemorableEvent(get, set, {
                   kind: 'mq_guardian_fled',
@@ -25443,6 +25445,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           });
           set((s) => (s.player ? { player: { ...s.player, inventory: mergeOrPushItem(mergeOrPushItem(s.player.inventory, beacon), armorPiece) } } : s));
           get().appendLog('reward', `✦ Aether Collection Beacon — prised from the still-humming heart of the collector tower. (${nextDefeated.length} of 5)`);
+          { const ph = PH.beaconInHand(nextDefeated.length); if (ph) get().appendLog('arbiter', ph); } // OTA-1701 — the first one, wondered at
           get().appendLog('reward', `✦ ${pieceName} (Legendary) — ${climb.summitFlavor}`);
           recordTitleProgress(get, set, undefined, { greatClimbsCompleted: nextCrested.length });
           if (nextCrested.length < 5) {
@@ -26245,12 +26248,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const player = s.player;
     if (!player) return; // no game in progress yet — nothing to simulate
     // Don't churn the world during a boss/ending cutscene or on the title flow.
-    // ⚠⚠ OTA-1700 — and it RUNS DURING THE TUTORIAL. The arb-fix guard froze this
-    // heartbeat while tutorialStep was set, to stop the intro drifting faction
-    // STANDING; OTA-958 then took standing out of this path (tides, patrols, the
-    // board only), so the guard protected nothing and cost a fresh character its
-    // whole living world until the twelve-beat tutorial ended — "all the background
-    // stuff under world is broken". worldTideCheck (in-game pulse, moves standing) keeps its guard.
+    // ⚠⚠ OTA-1700 — and it RUNS DURING THE TUTORIAL: the arb-fix guard here protected standing, which OTA-958
+    // took out of this path, and cost a fresh character its living world. worldTideCheck keeps its guard.
     if (s.currentScreen === 'title' || s.currentScreen === 'character_creation' || s.currentScreen === 'ending') return;
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const factions = require('../data/factions/factions.json') as import('../engine/worldPulse').FactionMeta[];
@@ -30567,6 +30566,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         get().player?.mainQuest?.coresRecovered?.length ?? 0,
       ),
     );
+    { const ph = PH.stubbornAtTheSeat(player, guardian); if (ph) get().appendLog('arbiter', ph); } // OTA-1701 — a warning, never a refusal; the Guardian has risen
     recordMemorableEvent(get, set, {
       kind: 'mq_guardian_spawned',
       text: `summoned ${guardian.name} at ${cg.GUARDIANS_BY_CAPITAL[capitalId].capitalName}`,

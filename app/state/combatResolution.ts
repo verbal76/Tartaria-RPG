@@ -3013,6 +3013,13 @@ export function handlePlayerDeath(
     });
   }
 
+  // ⚠ OTA-1701 — the killer, read before the field is cleared, so the Arbiter
+  // can say on the way back that it was a Guardian (progressionHints.afterRevive).
+  const killerIdx = Math.max(0, Math.min(state.currentScene?.activeEnemyIdx ?? 0, (state.currentScene?.enemies.length ?? 1) - 1));
+  const killer = state.currentScene?.enemies[killerIdx] ?? null;
+  const killerName = killer?.name ?? 'The buried world';
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const killerIsGuardian = !!killer && (require('../engine/coreGuardians') as typeof import('../engine/coreGuardians')).isCoreGuardian(killer);
   // Mark the character dead in-place. Persist immediately so the slot
   // summary on the title list reflects the new state.
   // 2026-05-25 [MECHANIC-1b] — clear golem sidekick on player death.
@@ -3035,9 +3042,11 @@ export function handlePlayerDeath(
         golem: null,
         dog: dogDiedInFight && dog ? { ...dog, status: 'dead' as const } : dog,
       },
-      worldMemory: dogDiedInFight && !wm.puppyVendorUsed
-        ? { ...wm, puppyVendorOwed: true }
-        : wm,
+      worldMemory: {
+        ...(dogDiedInFight && !wm.puppyVendorUsed ? { ...wm, puppyVendorOwed: true } : wm),
+        lastDeath: { enemyName: killerName, locationId: s.currentScene?.location.id ?? null, hour: s.player.hoursElapsed ?? 0, guardian: killerIsGuardian },
+        guardianDeaths: (wm.guardianDeaths ?? 0) + (killerIsGuardian ? 1 : 0),
+      },
       pendingRolls: null,
   pendingHookContinue: null,
     };

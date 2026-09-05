@@ -325,7 +325,13 @@ export function noteMissionFlee(
   const apex = fight.apexName ? bodies.find((b) => b.name === fight.apexName) : undefined;
   if (fight.apexName && apex) {
     const apexMax = scene.enemies.find((e) => e.name === fight.apexName)?.hp ?? apex.hp;
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const PH = require('../engine/progressionHints') as typeof import('../engine/progressionHints');
+    const priorApexWalls = PH.apexWallsSoFar(get().worldMemory);
     set((s) => ({ worldMemory: D.recordDeed(s.worldMemory, fight.groundId, { ...base, who: fight.apexName!, hpLeft: Math.max(1, apex.hp), hpMax: apexMax }) }));
+    // ⚠ OTA-1701 — the second time an apex sends the player off, the Arbiter
+    // says where else the power is. Never a gate: the flee has already landed.
+    if (fledPl) { const ph = PH.afterApexWall(PH.wallContext(get().worldMemory, fledPl, priorApexWalls)); if (ph) get().appendLog('arbiter', ph); }
   } else if (fight.spawnName) {
     const standing = bodies.filter((b) => b.name === fight.spawnName && b.hp > 0 && !b.ko).length;
     set((s) => ({ worldMemory: D.recordDeed(s.worldMemory, fight.groundId, { ...base, who: fight.spawnName!, n: standing }) }));
