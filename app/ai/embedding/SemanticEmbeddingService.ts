@@ -1,4 +1,15 @@
 import * as ort from 'onnxruntime-react-native';
+
+// ⚠⚠ OTA-1696 — THE CLASSIFIER KEEPS TWO CORES. onnxruntime's default intra-op
+// pool is one thread per core — eight on the Tensor G5 — and every one of them
+// spins for the run. The 13:32 bundle: seven JS stalls of 2.5–5.2s in a
+// three-minute fight, the engine's own log lines 70–150ms apart where they are
+// normally 1ms, the classifier reading 3–7s where it reads 0.35s, `native:
+// cognition running` on four of the seven stall lines. A pool that owns every
+// core starves the JS thread that has to paint the round. Two intra-op threads
+// (the JSI binding parses the option — cpp/SessionUtils.cpp) leave the rest to
+// the game; the embed is ~60ms of work either way.
+export const COGNITION_SESSION_OPTIONS: ort.InferenceSession.SessionOptions = { intraOpNumThreads: 2, interOpNumThreads: 1 };
 import * as FileSystem from 'expo-file-system';
 // ⚠⚠ OTA-1358 — the classifier joins the native-ML lock. It was the ONE native
 // ML engine running outside it: every inference (and every foreground-resume
@@ -34,7 +45,7 @@ export class SemanticEmbeddingService {
 
   async initialize(modelPath: string, vocabText: string): Promise<void> {
     this.tokenizer.loadVocab(vocabText);
-    this.session = await runExclusiveNativeMl(() => ort.InferenceSession.create(modelPath), ML_PRIORITY_COGNITION);
+    this.session = await runExclusiveNativeMl(() => ort.InferenceSession.create(modelPath, COGNITION_SESSION_OPTIONS), ML_PRIORITY_COGNITION);
     this.modelPath = modelPath;
   }
 
@@ -76,7 +87,7 @@ export class SemanticEmbeddingService {
   async reinitializeIfNeeded(): Promise<void> {
     if (this.session || !this.modelPath || !this.tokenizer.isLoaded()) return;
     const path = this.modelPath;
-    this.session = await runExclusiveNativeMl(() => ort.InferenceSession.create(path), ML_PRIORITY_COGNITION);
+    this.session = await runExclusiveNativeMl(() => ort.InferenceSession.create(path, COGNITION_SESSION_OPTIONS), ML_PRIORITY_COGNITION);
   }
 
   clearCache(): void {

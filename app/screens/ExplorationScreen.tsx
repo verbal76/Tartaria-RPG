@@ -10,11 +10,12 @@ import { playerGridCell } from '../state/playerGrid';
 import { enemyBandOf, enemyIsAirborne, enemyThreatAt, playerWeaponReach } from '../state/combatResolution';
 // OTA-1480 — "am I really at the place my record names", once, for all four readers.
 import { stationedAtNamedLocation } from '../engine/standingAt';
-import { readFullLog, flushLogWrites, clearActiveSlotLog, getLastLogWriteError, clearLastLogWriteError, stampBreadcrumbPhase } from '../engine/saveSystem';
+import { readFullLog, flushLogWrites, clearActiveSlotLog, getLastLogWriteError, clearLastLogWriteError, stampBreadcrumbPhase, peekLiveBreadcrumb } from '../engine/saveSystem';
 import { StatsPanel } from '../components/StatsPanel';
 import { FirstTimeHint } from '../components/FirstTimeHint';
 import { useHintsDisabled } from '../components/useFirstTimeHint'; // OTA-1524 — the primer honours the tips switch
 import { AdventureFeed } from '../components/AdventureFeed';
+import { renderLagAfterEngine } from '../diagnostics/renderClock'; // OTA-1696
 import { InputBox } from '../components/InputBox';
 import { DiceRoller } from '../components/DiceRoller';
 import { EnemyPanel, type EnemyView } from '../components/EnemyPanel';
@@ -158,7 +159,17 @@ export function ExplorationScreen() {
   // commit of this screen (no dep array, throttled inside the stamp), so a
   // freeze crumb that reached `engine-done` but never `rendered` indicts the
   // render side — the exact question the 2026-08-17 receipt could not answer.
-  useEffect(() => { stampBreadcrumbPhase('rendered'); });
+  // OTA-1696 — the render clock: the gap from engine-done to this commit, once
+  // per action, printed when it is long enough to feel (renderClock.ts). Read
+  // BEFORE the heartbeat stamps over the crumb.
+  const renderMeasuredAt = useRef(0);
+  useEffect(() => {
+    try {
+      const lag = renderLagAfterEngine(peekLiveBreadcrumb(), renderMeasuredAt.current, gameLog.length);
+      if (lag) { renderMeasuredAt.current = lag.measuredAt; if (lag.line) useGameStore.getState().appendLog('debug', lag.line); }
+    } catch { /* an instrument never breaks the screen */ }
+    stampBreadcrumbPhase('rendered');
+  });
   const partialArbiterText = useGameStore((s) => s.partialArbiterText);
   const isGenerating = useGameStore((s) => s.isGenerating);
   const submit = useGameStore((s) => s.submitPlayerAction);

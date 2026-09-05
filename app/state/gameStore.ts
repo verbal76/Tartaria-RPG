@@ -118,6 +118,7 @@ import {
 import { loadLastCrash } from '../diagnostics/lastCrash';
 import { rollTimingLine, type RollTapTiming } from '../diagnostics/rollTiming'; // OTA-1694
 import { takeTouchLateSuffix } from '../diagnostics/tapClock'; // OTA-1695
+import { cognitionSkippedInCombat } from '../ai/cognitionGate'; // OTA-1696
 // OTA-1172 — memory warnings, app-state churn and the two-clock freeze detector.
 import {
   FREEZE_SAMPLE_MS, APPSTATE_TRAIL_MAX,
@@ -21953,7 +21954,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Fire-and-forget cognitive enrichment — runs in parallel with the
     // deterministic resolution above, never blocks gameplay. Skipped during
     // the scripted tutorial prefix (nothing should run the model there).
-    if (!scriptedTutorial && get().cognitiveStatus === 'ready') {
+    // OTA-1696 — a confident action inside a fight skips the classifier (cognitionGate).
+    if (!scriptedTutorial && get().cognitiveStatus === 'ready' && !cognitionSkippedInCombat(currentScene.enemies.length, parsed.confidence)) {
       // ⚠ OTA-1359 — the classifier's SYNCHRONOUS prefix (tokenize + native
       // tensor construction) runs inline on the JS thread before its first
       // await — real onnxruntime on device, a harmless mock in jest, which

@@ -98,6 +98,11 @@ describe('OTA-1356 — the dying breath learns phases', () => {
     expect(store).toContain("stampBreadcrumbPhase('homework:intro-fill', target.id)");
     expect(store).toContain("stampBreadcrumbPhase('homework:item-desc', key)");
     const screen = readFileSync(join(__dirname, '..', 'app', 'screens', 'ExplorationScreen.tsx'), 'utf8');
-    expect(screen).toContain("useEffect(() => { stampBreadcrumbPhase('rendered'); });");
+    // OTA-1696 — the render clock reads the crumb inside the same effect before
+    // the stamp; the checkpoint is still stamped after EVERY commit (no dep array).
+    expect(screen).toContain("    stampBreadcrumbPhase('rendered');\n  });");
+    const eff = screen.indexOf('const lag = renderLagAfterEngine(peekLiveBreadcrumb()');
+    expect(eff).toBeGreaterThan(-1);
+    expect(screen.indexOf("stampBreadcrumbPhase('rendered');", eff)).toBeGreaterThan(eff);
   });
 });

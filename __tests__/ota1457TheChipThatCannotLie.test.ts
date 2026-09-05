@@ -192,7 +192,8 @@ describe('OTA-1457 — it cannot yank the feed', () => {
     //
     // Pinned positionally rather than by comment: the chip's JSX must appear
     // AFTER the map closes.
-    const mapCloses = FEED.indexOf('      })}');
+    // OTA-1696 — the map is one memoised row per entry now; it closes on that line.
+    const mapCloses = FEED.indexOf('<FeedRow key={entry.id} entry={entry} names={names} />)}');
     const chipAt = FEED.indexOf('{actionChipLabel ? (');
     expect(mapCloses).toBeGreaterThan(-1);
     expect(chipAt).toBeGreaterThan(mapCloses);

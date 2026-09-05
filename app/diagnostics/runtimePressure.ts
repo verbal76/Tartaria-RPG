@@ -298,3 +298,32 @@ export function runtimePressureSummary(s: PressureSnapshot): string {
   out.push(`  App state trail: ${trail.length ? trail.join(' → ') : '(none recorded)'}`);
   return out.join('\n');
 }
+
+// ⚠ OTA-1696 — THE HEAP ON THE STALL LINE. A JS thread that is late while
+// frames keep coming is either starved of CPU (a native pool owns the cores),
+// running something long (a render of five hundred rows), or paused by the
+// collector. The first two the crumb and the native lane already name; the
+// third was invisible. Hermes exposes its own counters
+// (HermesInternal.getInstrumentedStats); the watch reads them every sample and
+// prints the delta on the stall edge: `heap 48MB · gc +3120ms/2` is the
+// collector, `heap 48MB · gc +0ms/0` is not.
+export interface HermesStats { heapBytes: number; gcMs: number; gcCount: number }
+
+export function readHermesStats(): HermesStats | null {
+  try {
+    const hi = (globalThis as { HermesInternal?: { getInstrumentedStats?: () => Record<string, unknown> } }).HermesInternal;
+    const st = hi?.getInstrumentedStats?.();
+    if (!st) return null;
+    const num = (k: string): number => { const v = st[k]; return typeof v === 'number' && Number.isFinite(v) ? v : 0; };
+    return { heapBytes: num('js_heapSize'), gcMs: num('js_gcTime'), gcCount: num('js_numGCs') };
+  } catch { return null; }
+}
+
+/** ` · heap 48MB · gc +3120ms/2` — the delta since the previous sample; '' when Hermes does not answer. */
+export function hermesDeltaLine(prev: HermesStats | null, now: HermesStats | null): string {
+  if (!now) return '';
+  const mb = Math.round(now.heapBytes / 1048576);
+  const gcMs = prev ? Math.max(0, Math.round(now.gcMs - prev.gcMs)) : 0;
+  const gcN = prev ? Math.max(0, now.gcCount - prev.gcCount) : 0;
+  return ` · heap ${mb}MB · gc +${gcMs}ms/${gcN}`;
+}

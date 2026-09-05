@@ -150,39 +150,20 @@ function renderBodyWithEnemyHighlight(
   return <Text style={[styles.body, { color: baseColor }]}>{parts}</Text>;
 }
 
-export function AdventureFeed({ entries, enemyNames, actionChipLabel, actionChipA11yLabel, onActionChipPress, packChipLabel, packChipA11yLabel, onPackChipPress }: Props) {
-  const scrollRef = useRef<ScrollView>(null);
-  const visible = entries.filter((e) => !HIDDEN_CHANNELS.has(e.channel));
-  const names = useMemo(
-    () => (enemyNames ?? []).filter((n) => n && n.trim().length > 0),
-    [enemyNames],
-  );
+/** ⚠ OTA-1696 — the rows the feed keeps mounted. The feed yanks to the bottom on
+ *  every line (OTA 026), so what a player can scroll back through is the recent
+ *  past; the whole log stays in `gameLog` and on disk. 150 rows is several
+ *  screens; the render cost is bounded by it instead of by MAX_LOG_IN_MEMORY. */
+export const FEED_WINDOW = 150;
 
-  // v2.4.1 (OTA 026) — always auto-scroll on every new entry.
-  //
-  // Playtester: "anytime anything happens the text scroll she always
-  // show the newest text, I died of a full climb and three
-  // investigates and had to keep scrolling down." Reverting the
-  // OTA 025 isNearBottom gate — yank-to-bottom is the desired
-  // behavior, not sticky-to-bottom. onContentSizeChange ALSO fires
-  // the scroll so the initial-mount / screen-re-entry case (where
-  // useEffect runs before layout) still lands at the bottom.
-  const handleAutoScroll = () => {
-    scrollRef.current?.scrollToEnd({ animated: true });
-  };
-
-  useEffect(() => {
-    handleAutoScroll();
-  }, [visible.length]);
-
-  return (
-    <ScrollView
-      ref={scrollRef}
-      style={styles.container}
-      contentContainerStyle={styles.content}
-      onContentSizeChange={handleAutoScroll}
-    >
-      {visible.map((entry) => {
+// ⚠⚠ OTA-1696 — ONE ROW, MEMOISED. The feed used to re-map EVERY visible entry
+// on every log line: `gameLog` is an external-store subscription, so each
+// appendLog commits synchronously, and a five-raider round writes twenty-five
+// lines — twenty-five full re-renders of up to five hundred rich rows. The 13:32
+// bundle read that as engine lines 70–150ms apart and JS stalls of 2.5–5.2s
+// after every action. Entries are immutable objects, so a memoised row only
+// renders once; `names` is keyed on its contents (below) so it is stable too.
+const FeedRow = React.memo(function FeedRow({ entry, names }: { entry: GameLogEntry; names: string[] }) {
         // OTA 221 — combat-outcome color override. Lines tagged with
         // meta.combatOutcome='player_dmg' (player landed damage)
         // render in green so the win pops out of the red roll math.
@@ -212,7 +193,7 @@ export function AdventureFeed({ entries, enemyNames, actionChipLabel, actionChip
 
         if (outcome === 'player_dmg') {
           return (
-            <View key={entry.id} style={styles.entry}>
+            <View style={styles.entry}>
               <Text style={[styles.body, { color: REWARD_COLOR, fontWeight: '600' }]}>
                 {entry.text}
               </Text>
@@ -221,7 +202,7 @@ export function AdventureFeed({ entries, enemyNames, actionChipLabel, actionChip
         }
         if (outcome === 'enemy_miss') {
           return (
-            <View key={entry.id} style={styles.entry}>
+            <View style={styles.entry}>
               {renderEnemyMissLine(entry.text)}
             </View>
           );
@@ -235,7 +216,7 @@ export function AdventureFeed({ entries, enemyNames, actionChipLabel, actionChip
         // turning over scrolled past looking exactly like "✦ Rusted Bolt".
         if (isStoryBeat) {
           return (
-            <View key={entry.id} style={styles.storyEntry}>
+            <View style={styles.storyEntry}>
               <View style={styles.storyRule} />
               <Text style={styles.storyTag}>STORY</Text>
               <Text style={[styles.body, styles.storyBody, { color }]}>{entry.text}</Text>
@@ -243,7 +224,7 @@ export function AdventureFeed({ entries, enemyNames, actionChipLabel, actionChip
           );
         }
         return (
-          <View key={entry.id} style={styles.entry}>
+          <View style={styles.entry}>
             {tag ? <Text style={[styles.tag, { color }]}>{tag}</Text> : null}
             {entry.channel === 'mission'
               ? renderMissionBody(entry.text, color)
@@ -252,7 +233,42 @@ export function AdventureFeed({ entries, enemyNames, actionChipLabel, actionChip
                 : <Text style={[styles.body, { color }]}>{entry.text}</Text>}
           </View>
         );
-      })}
+});
+
+export function AdventureFeed({ entries, enemyNames, actionChipLabel, actionChipA11yLabel, onActionChipPress, packChipLabel, packChipA11yLabel, onPackChipPress }: Props) {
+  const scrollRef = useRef<ScrollView>(null);
+  const visible = entries.filter((e) => !HIDDEN_CHANNELS.has(e.channel)).slice(-FEED_WINDOW); // OTA-1696
+  // OTA-1696 — keyed on the CONTENTS: the screen builds a fresh `enemyNames`
+  // array every render, so a dependency on the array itself changed every time
+  // and every memoised row re-rendered with it.
+  const namesKey = (enemyNames ?? []).filter((n) => n && n.trim().length > 0).join('\u0000');
+  const names = useMemo(() => (namesKey ? namesKey.split('\u0000') : []), [namesKey]);
+
+  // v2.4.1 (OTA 026) — always auto-scroll on every new entry.
+  //
+  // Playtester: "anytime anything happens the text scroll she always
+  // show the newest text, I died of a full climb and three
+  // investigates and had to keep scrolling down." Reverting the
+  // OTA 025 isNearBottom gate — yank-to-bottom is the desired
+  // behavior, not sticky-to-bottom. onContentSizeChange ALSO fires
+  // the scroll so the initial-mount / screen-re-entry case (where
+  // useEffect runs before layout) still lands at the bottom.
+  const handleAutoScroll = () => {
+    scrollRef.current?.scrollToEnd({ animated: true });
+  };
+
+  useEffect(() => {
+    handleAutoScroll();
+  }, [visible.length]);
+
+  return (
+    <ScrollView
+      ref={scrollRef}
+      style={styles.container}
+      contentContainerStyle={styles.content}
+      onContentSizeChange={handleAutoScroll}
+    >
+      {visible.map((entry) => <FeedRow key={entry.id} entry={entry} names={names} />)}
 
       {/* ⚠⚠⚠ OTA-1457 — THE TRAILING ACTION CHIP, AND WHY IT IS *HERE*.
           It renders AFTER the entry map, outside it, so it is structurally

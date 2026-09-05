@@ -51,6 +51,7 @@ import {
   freezeVerdictLine,
   memoryWarningLine,
   stallContextLine,
+  readHermesStats, hermesDeltaLine, type HermesStats, // OTA-1696
   type FreezeVerdict,
   type PressureSnapshot,
 } from './runtimePressure';
@@ -374,6 +375,7 @@ export function startRuntimePressureWatch(
   // ⚠ OTA-1634 — the crumb as it stood at the PREVIOUS tick. On a stall edge the
   // pair (then, now) brackets the quiet stretch; see stallContextLine.
   let crumbAtLastSample: ReturnType<typeof peekLiveBreadcrumb> = null;
+  let hermesAtLastSample: HermesStats | null = null; // OTA-1696
   const sample = (): void => {
     const t = Date.now();
     const jsGap = t - rpLastJsAt - FREEZE_SAMPLE_MS;
@@ -381,6 +383,7 @@ export function startRuntimePressureWatch(
     rpLastJsAt = t;
     let crumbNow: ReturnType<typeof peekLiveBreadcrumb> = null;
     try { crumbNow = peekLiveBreadcrumb(); } catch { /* an instrument never breaks the watch */ }
+    const hermesNow = readHermesStats(); // OTA-1696 — never throws
     // Only judge while the app is actually foregrounded — see the note above.
     if (rpAppState === 'active') {
       const v = freezeVerdict(Math.max(0, jsGap), frameGap);
@@ -393,6 +396,7 @@ export function startRuntimePressureWatch(
         try {
           let ctx = '';
           try { ctx = ` · ${stallContextLine(crumbAtLastSample, crumbNow, nativeMlSnapshot(), t)}`; } catch { /* ignore */ }
+          try { ctx += `${hermesDeltaLine(hermesAtLastSample, hermesNow)} · feed ${get().gameLog.length}`; } catch { /* ignore */ } // OTA-1696
           get().appendLog('debug', `${freezeVerdictLine(v, Math.max(0, jsGap), frameGap)}${ctx}`);
         } catch { /* ignore */ }
       } else if (v === 'ok' && rpLastVerdict !== 'ok') {
@@ -401,6 +405,7 @@ export function startRuntimePressureWatch(
       rpLastVerdict = v;
     }
     crumbAtLastSample = crumbNow;
+    hermesAtLastSample = hermesNow; // OTA-1696
     rpSampleTimer = setTimeout(sample, FREEZE_SAMPLE_MS);
   };
   rpSampleTimer = setTimeout(sample, FREEZE_SAMPLE_MS);

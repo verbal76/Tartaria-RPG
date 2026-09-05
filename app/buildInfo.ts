@@ -28084,7 +28084,27 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // notes the DOWN event's wait, and logUiTap rides it on the line —
 // `ui: tap "dodge" ⏱+4237ms late 4200ms` — flagged when it clears the session
 // floor by 250ms. ROLL joins the tap ledger. diagnostics/tapClock.ts.
-export const OTA_BUILD_ID = '2026-09-05-1695-the-tap-has-a-clock';
+// 2026-09-05 OTA-1696 — THE FIGHT SHEDS ITS PASSENGERS. The 13:32 bundle
+// (#mtof9i1d5eoj, stamp 1690) is the owner's hang on paper: seven freeze-watch
+// stalls in a three-minute five-raider fight, each right after a DODGE /
+// APPROACH / attack, the JS thread 2.5–5.2s late while frames kept coming, the
+// engine's own lines 70–150ms apart where they are normally 1ms, and the
+// MiniLM classifier reading 0.4–7.4s per action against its usual 0.35s —
+// `native: cognition running` on four of the seven stall lines. Two loads
+// ride every combat tap: the classifier (an eight-thread onnxruntime pool
+// spinning on every core for a mood tag the parser did not need at conf=1.00),
+// and the feed (up to five hundred rich rows re-mapped on EVERY log line
+// through a synchronous store subscription — twenty-five lines a round). Four
+// levers and two clocks: intraOpNumThreads 2 on the classifier session
+// (COGNITION_SESSION_OPTIONS); no classifier pass on a confident action with
+// hostiles on the field (cognitionGate); the feed keeps FEED_WINDOW rows
+// mounted (150) with each row memoised and the enemy-name key stable
+// (AdventureFeed.FeedRow); `render⏱ Nms after engine-done · feed N` once per
+// action past 300ms (renderClock); `heap NMB · gc +Nms/K · feed N` on every
+// stall line (HermesInternal.getInstrumentedStats) so a collector pause can
+// no longer hide behind "something blocked the JS thread".
+export const OTA_BUILD_ID = '2026-09-05-1696-the-fight-sheds-its-passengers';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1695-the-tap-has-a-clock';
 // golem catch-up 2026-09-05: markerless publish of OTA-1695 - the tap has a
 // clock. Every ledgered control notes the DOWN event's wait against the OS
 // touch stamp and the tap line rides it (`⏱+Nms`, `late Nms` past the session
