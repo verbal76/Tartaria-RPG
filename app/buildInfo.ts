@@ -28159,6 +28159,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // recognises the beacon in the pack; a familiar counter passes on what the
 // climbers brought down. engine/progressionHints.ts holds every line.
 export const OTA_BUILD_ID = '2026-09-05-1701-the-world-tells-you-where-the-power-is';
+// golem catch-up 2026-09-05: markerless publish of OTA-1701 - the world tells
+// you where the power is. The Arbiter and the counters surface the hunts, the
+// Crucible and the Great Climbs after repeated high-tier walls; never a gate.
+// hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1700-the-world-runs-while-you-learn';
 // golem catch-up 2026-09-05: markerless publish of OTA-1700 - the world runs
 // while you learn. The heartbeat moves the World board during the tutorial, the
