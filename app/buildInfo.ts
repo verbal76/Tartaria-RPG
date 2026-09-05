@@ -28060,6 +28060,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // finger down, an offset off its page snaps to the nearest one and the
 // target follows (EnemyPanel.settleOffset, PAGER_SETTLE_MS).
 export const OTA_BUILD_ID = '2026-09-05-1693-the-portrait-settles';
+// golem catch-up 2026-09-05: markerless publish of OTA-1693 - the portrait
+// settles. A watchdog snaps the enemy pager to the nearest page a quarter
+// second after the last scroll tick with no finger down. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1692-the-thread-under-the-model';
 // golem catch-up 2026-09-05: markerless publish of OTA-1692 - the thread under
 // the model. A JS heartbeat inside every Qwen call (js-late on the qwen⏱ line)
