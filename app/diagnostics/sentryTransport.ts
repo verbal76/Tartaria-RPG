@@ -694,8 +694,77 @@ export function _resetSentryTransportForTests(): void {
  * ⚠ CHUNK SIZE. Inline text is normalised into the event body, so the parts are
  * far smaller than the attachment chunks — 15K keeps every event comfortably
  * inside Sentry's payload budget with room for the tags and message.
+ *
+ * ⚠⚠⚠ OTA-1679 — THAT SENTENCE WAS TRUE OF TEXT AND FALSE OF ENVELOPES. OTA-1677
+ * base64-encoded every block (so the scrubber is handed no text), which makes a
+ * 15,000-character part a ~20,000-character array — and Sentry TRIMS the
+ * `extra` value at a fixed budget. Measured on the owner's first two bundles
+ * after 1677 (56 parts): every full part came back as 33–37 blocks whose JSON
+ * ran 16,413–16,424 characters, the last block cut mid-string (undecodable) and
+ * every block after it gone. 11,891 of 15,000 characters survived per part —
+ * a 21% hole in every log, where 1520's problem had been one 400-character
+ * block in 29% of events. The pre-1677 part (15,000 raw characters, ~15.1K
+ * of JSON) sat just under the same budget, which is why the trim had never
+ * shown itself. So the part is no longer cut by RAW length: blocks are packed
+ * into parts by the ENCODED size they will occupy on the wire, under
+ * `INLINE_PART_BUDGET_CHARS`, and `INLINE_CHUNK_CHARS` becomes the raw
+ * ceiling a part may reach rather than the size it is cut to.
  */
-export const INLINE_CHUNK_CHARS = 15_000;
+export const INLINE_CHUNK_CHARS = 10_000;
+
+/**
+ * ⚠⚠ OTA-1679 — THE WIRE BUDGET OF ONE PART, in JSON characters of the
+ * `chunkBlocks` array (quotes, commas and brackets included). Sentry's trim
+ * landed at 16,413–16,424 on 56 measured parts; 14,000 leaves a fifth in hand
+ * for the rest of the event and for a rule that tightens. A part can never
+ * exceed it whatever the log contains: a run of three-byte glyphs encodes to
+ * four times its character count, and the packer counts the ENCODED cost.
+ * 10,000 ASCII characters encode to 13,336 plus ~80 of quotes and commas, so
+ * the raw ceiling and the wire budget agree on plain text and the budget alone
+ * decides on anything heavier.
+ */
+export const INLINE_PART_BUDGET_CHARS = 14_000;
+
+/** One inline part as it goes on the wire: the raw text it carries (the
+ *  receipt the relay checks) and its blocks, already encoded. */
+export interface InlineLogPart {
+  raw: string;
+  blocks: string[];
+}
+
+/**
+ * ⚠⚠⚠ OTA-1679 — PACK BLOCKS INTO PARTS BY THEIR ENCODED COST. Every block of
+ * the log (`splitLogIntoBlocks`, so redaction still costs ≤400 characters) is
+ * encoded first; a part closes when the next block would push its JSON past
+ * the budget or its raw text past `INLINE_CHUNK_CHARS`. The parts' raw texts
+ * concatenate to the input exactly. A single oversized block (impossible at
+ * 400 characters, kept for safety) still ships alone rather than being lost.
+ */
+export function packLogIntoParts(
+  text: string,
+  budget = INLINE_PART_BUDGET_CHARS,
+  rawCeiling = INLINE_CHUNK_CHARS,
+): InlineLogPart[] {
+  const parts: InlineLogPart[] = [];
+  let raw = '';
+  let blocks: string[] = [];
+  let json = 2; // the brackets
+  for (const block of splitLogIntoBlocks(text)) {
+    const enc = encodeLogBlock(block);
+    const cost = enc.length + 3; // two quotes and a comma
+    if (blocks.length > 0 && (json + cost > budget || raw.length + block.length > rawCeiling)) {
+      parts.push({ raw, blocks });
+      raw = '';
+      blocks = [];
+      json = 2;
+    }
+    raw += block;
+    blocks.push(enc);
+    json += cost;
+  }
+  if (blocks.length > 0 || parts.length === 0) parts.push({ raw, blocks });
+  return parts;
+}
 
 /**
  * ⚠⚠⚠ OTA-1520 — THE SCRUBBER TAKES A WHOLE VALUE, SO STOP HANDING IT WHOLE
@@ -886,7 +955,10 @@ export async function sendGameLogInline(
   }
 
   const text = String(fullLog ?? '');
-  const total = Math.max(1, Math.ceil(text.length / INLINE_CHUNK_CHARS));
+  // ⚠⚠ OTA-1679 — parts are packed by encoded cost, not cut by raw length; see
+  // packLogIntoParts. The count is whatever the packing produced.
+  const packed = packLogIntoParts(text);
+  const total = packed.length;
   report.parts = total;
 
   // ⚠⚠⚠ THE BEACON. Deliberately the smallest thing this app can send, and
@@ -911,7 +983,8 @@ export async function sendGameLogInline(
   }
 
   for (let i = 0; i < total; i++) {
-    const slice = text.slice(i * INLINE_CHUNK_CHARS, (i + 1) * INLINE_CHUNK_CHARS);
+    const part = packed[i]!;
+    const slice = part.raw;
     const partNo = i + 1;
     const startedAt = Date.now();
     try {
@@ -935,8 +1008,10 @@ export async function sendGameLogInline(
       // ⚠ OTA-1677 — AND EACH BLOCK IS ENCODED, so the scrubber is handed no
       // text at all. `chunkEncoding` tells the relay; `chunkChars` is still the
       // RAW length, the receipt the shortfall check reads.
+      // ⚠⚠ OTA-1679 — the blocks were packed under the wire budget up front
+      // (packLogIntoParts); this array is exactly what was measured to fit.
       extra: {
-        chunkBlocks: splitLogIntoBlocks(slice).map(encodeLogBlock),
+        chunkBlocks: part.blocks,
         chunkEncoding: LOG_BLOCK_ENCODING,
         chunkChars: slice.length,
       },

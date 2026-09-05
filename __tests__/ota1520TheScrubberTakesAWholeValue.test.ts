@@ -167,8 +167,11 @@ describe('OTA-1520 — the sender hands over blocks, and says how many character
     // ⚠ OTA-1677 — the blocks are still an array, still built by
     // splitLogIntoBlocks; each one now leaves base64-encoded (see ota1677),
     // so the shape pinned here is the array-of-blocks, not the plain text.
-    expect(body).toContain('chunkBlocks: splitLogIntoBlocks(slice).map(encodeLogBlock),');
+    // ⚠ OTA-1679 — still an array of splitLogIntoBlocks blocks, now packed into
+    // parts by encoded wire cost before the send (packLogIntoParts).
+    expect(body).toContain('chunkBlocks: part.blocks,');
     expect(body).toContain('chunkEncoding: LOG_BLOCK_ENCODING,');
+    expect(SRC.includes('for (const block of splitLogIntoBlocks(text)) {')).toBe(true);
     // A lingering `chunk: slice` would be filtered on exactly the parts that
     // matter and would double the payload to do it.
     expect(body).not.toMatch(/chunk: slice/);

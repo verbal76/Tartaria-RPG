@@ -27827,7 +27827,25 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // and by every lineup producer, so it cannot outlive the bodies it was earned
 // against. injectFactionParty moved verbatim to state/factionParty.ts under
 // the OTA-1400 line ratchet (gameStore 36,914 lines).
-export const OTA_BUILD_ID = '2026-09-05-1678-the-chase-gets-harder';
+// OTA-1679 — THE PART FITS THE WIRE. Found reviewing the owner's 01:50 push,
+// the first full logs sent under OTA-1677: every one of 56 full parts came
+// back as 33-37 blocks whose JSON ran 16,413-16,424 characters, the last block
+// cut mid-string and everything after it gone - 11,891 of 15,000 characters
+// per part, a 21% hole in every log. 1677 measured its envelopes against the
+// scrubber and won; it never measured them against Sentry's TRIM of the extra
+// value, and a 15,000-character raw part encodes to ~20,000 on the wire. The
+// pre-1677 part (~15.1K of JSON) had sat just under the same budget, which is
+// why the trim had never shown itself.
+// ⚠⚠⚠ SO PARTS ARE PACKED BY ENCODED COST, NOT CUT BY RAW LENGTH.
+// packLogIntoParts encodes every block first and closes a part when the next
+// block would push its JSON past INLINE_PART_BUDGET_CHARS (14,000 - a fifth
+// under the measured trim) or its raw text past INLINE_CHUNK_CHARS (now
+// 10,000, the ceiling rather than the cut). A run of three-byte glyphs cannot
+// break it: the packer counts what the wire will carry. The suite packs a real
+// 400 KB delivered log and a 60,000-glyph worst case and proves every part
+// under budget and the join exact.
+export const OTA_BUILD_ID = '2026-09-05-1679-the-part-fits-the-wire';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1678-the-chase-gets-harder';
 // golem catch-up 2026-09-05: markerless publish of OTA-1678 - the chase gets
 // harder. Flee escalation on the randoms only: the pursuer's bar rises with
 // the ground (+1 per danger level above 1), its rarity (+0..+3), and each

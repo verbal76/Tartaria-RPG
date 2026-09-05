@@ -69,7 +69,11 @@ describe('OTA-1518 — nothing on this path carries an attachment', () => {
     // ⚠ OTA-1677 amended it once more, same principle: still `extra`, still an
     // array of blocks, no attachment — each block now base64 so the scrubber is
     // handed no text at all. The pin follows the shape.
-    expect(body).toContain('chunkBlocks: splitLogIntoBlocks(slice).map(encodeLogBlock),');
+    // ⚠ OTA-1679 — and the blocks are now PACKED into parts by their encoded
+    // wire cost (Sentry trims the array at ~16.4K JSON chars; 1677's 15K raw
+    // parts encoded to ~20K and lost a fifth of every part). Still `extra`,
+    // still an array, still no attachment.
+    expect(body).toContain('chunkBlocks: part.blocks,');
     expect(body).toContain('chunkChars: slice.length,');
   });
 

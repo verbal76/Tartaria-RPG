@@ -113,7 +113,10 @@ describe('OTA-1677 — the sender and the relay agree on the envelope', () => {
 
   it('the sender encodes every block, names the encoding, and keeps the raw receipt', () => {
     expect(LOG_BLOCK_ENCODING).toBe('base64');
-    expect(TRANSPORT.includes('chunkBlocks: splitLogIntoBlocks(slice).map(encodeLogBlock),')).toBe(true);
+    // ⚠ OTA-1679 — the blocks are packed under the wire budget before the
+    // send (packLogIntoParts); the array on the event is the packed part's.
+    expect(TRANSPORT.includes('chunkBlocks: part.blocks,')).toBe(true);
+    expect(TRANSPORT.includes('const packed = packLogIntoParts(text);')).toBe(true);
     expect(TRANSPORT.includes('chunkEncoding: LOG_BLOCK_ENCODING,')).toBe(true);
     expect(TRANSPORT.includes('chunkChars: slice.length,')).toBe(true);
   });
