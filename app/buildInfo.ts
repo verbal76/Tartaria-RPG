@@ -28050,6 +28050,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // does not, the starvation is the model's and the next lever is the
 // player lane's count (or the ambient window). jsHeartbeat.ts.
 export const OTA_BUILD_ID = '2026-09-05-1692-the-thread-under-the-model';
+// golem catch-up 2026-09-05: markerless publish of OTA-1692 - the thread under
+// the model. A JS heartbeat inside every Qwen call (js-late on the qwen⏱ line)
+// and homework on one thread; the player's narration keeps two. hal took the
+// marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1691-the-room-names-its-dead';
 // golem catch-up 2026-09-05: markerless publish of OTA-1691 - the room names
 // its dead. The return line names the bodies inside the respawn window and
