@@ -323,11 +323,25 @@ function pumpMl(): void {
   runningPriority = task.priority;
   runningPreempt = task.onPreempt ?? null;
   stampNativePhase('start', task.priority, pending.length); // OTA-1546
+  // ⚠⚠⚠ OTA-1675 — `done` IS STAMPED BEFORE THE CALLER IS RESOLVED. It used to
+  // ride the `.then` AFTER `task.resolve`, one microtask late — and the caller's
+  // continuation runs in between. Measured on kai's death (task #180): the
+  // voice drain resumed, encoded the WAV and DISPATCHED expo-av's player load
+  // before `native:voice:done` was written, so the ledger's last checkpoint
+  // said "the synth finished" about a process that had already moved on to
+  // playback. Any checkpoint the caller stamps in that continuation was
+  // overwritten by a fact from the step before it. `done` now means what it
+  // says — the native op settled — and nothing the caller does afterwards is
+  // filed under it. Exclusivity is untouched: `running` still clears only
+  // after the caller has been resolved, exactly as before.
+  const settle = (): void => { stampNativePhase('done', task.priority, pending.length); }; // OTA-1546
   Promise.resolve()
     .then(task.fn)
-    .then(task.resolve, task.reject)
+    .then(
+      (v) => { settle(); task.resolve(v); },
+      (e) => { settle(); task.reject(e); },
+    )
     .then(() => {
-      stampNativePhase('done', task.priority, pending.length); // OTA-1546
       running = false;
       runningPreempt = null;
       pumpMl();

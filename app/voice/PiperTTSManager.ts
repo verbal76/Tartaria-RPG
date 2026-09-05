@@ -30,7 +30,7 @@ import { padSilence } from './audioPad';
 import { setMusicDuck } from '../audio/AudioManager';
 import {
   runExclusiveNativeMl, ML_PRIORITY_VOICE, ML_PRIORITY_HOMEWORK,
-  reserveVoiceSlot, releaseVoiceSlot,
+  reserveVoiceSlot, releaseVoiceSlot, nativeMlSnapshot,
 } from '../ai/nativeMlLock';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -87,6 +87,56 @@ const EDGE_FADE_MS = 6;
 // hardware AudioTrack still holds (~100-250ms on Pixel-class devices), which
 // clipped the tail of every spoken line.
 const UNLOAD_DRAIN_MS = 300;
+
+// ⚠⚠⚠ OTA-1675 — THE VOICE NAMES ITS STEP.
+//
+// Task #180, kai's SM-S942U (Samsung, SM8850, Android 16), a cold 66-second
+// life on the title screen, OTA-1658:
+//
+//   PROCESS KILLED — no JS ran · stage native:voice:done
+//   last checkpoint: native:voice:done [q0] · 66228ms into the action · alive 0ms after it
+//   Voice (TTS) guard: ⚠ VOICE CRASH detected on previous launch — last voice: kokoro:bf_emma
+//
+// Read together those three lines corner the death to a window a few
+// milliseconds wide. `native:voice:done` is stamped by the lock the instant
+// `model.forward` settles; `markTTSDone` (which would have cleared the guard)
+// runs in drain's finally, AFTER playback. The process died between the two —
+// and 66 s into the life, `q0`, with the model ledger at o0/r0, that was the
+// FIRST utterance this device ever played: the title line `ReadyFlash` speaks
+// the moment Kokoro comes online. Nothing native runs in that window except
+// what this file does with the samples: the WAV encode, `Audio.Sound.createAsync`
+// on a `data:` URI (expo-av → ExoPlayer → AudioTrack, the one step that is
+// pure platform media code), the playback itself, and the deferred
+// `unloadAsync`. OTA-1546 stamped the lock and nothing stamped these, so the
+// ledger could say "the synth finished" and no more. The owner's own two voice
+// deaths (08-30 `native:voice:done (+11080ms)`, 08-31 `native:voice:start
+// [q1]`) sit in the same blind spot.
+//
+// So the playback path stamps its own checkpoints — `voice:play:encode`,
+// `voice:play:create`, `voice:play:started`, `voice:play:done`,
+// `voice:play:unload`, and `voice:stop` — with the utterance's ordinal in this
+// life and its length as the detail (`#1 1.9s`), because "the first line after
+// a fresh model load" is the fact that separates a one-off from a device that
+// cannot play at all. The next voice-path death reads which step it died in.
+// Measure the cause, or ship an instrument. This is the instrument; the cause
+// is still open, and no exemption is bought with it.
+//
+// ⚠ THE UNLOAD STAMP YIELDS TO AN IN-FLIGHT NATIVE OP. It fires 300 ms after
+// the line ends, by which time the lock may be inside the NEXT synth or a Qwen
+// job. Overwriting `native:llm:start` with `voice:play:unload` would file a
+// death inside inference as a death in a player release — the same blind-spot
+// trade OTA-1377 and OTA-1413 refused. When the lock is running, the crumb it
+// wrote stands; when it is idle, the release is the only native thing
+// happening and the stamp is honest. Lazy-required and wrapped, as the lock's
+// own stamp is: an instrument may never break the thing it measures.
+let utterancesThisLife = 0;
+function stampVoicePhase(step: string, detail?: string): void {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { stampBreadcrumbPhase } = require('../engine/saveSystem') as typeof import('../engine/saveSystem');
+    stampBreadcrumbPhase(`voice:${step}`, detail);
+  } catch { /* an instrument may never break the thing it measures */ }
+}
 
 interface QueuedUtterance {
   id: number;
@@ -1130,6 +1180,8 @@ export async function stopAndClear(): Promise<void> {
   currentlySpeaking = null;
   void setMusicDuck(false);
   if (currentSound) {
+    // OTA-1675 — a live player is about to be stopped and released natively.
+    stampVoicePhase('stop');
     try { await currentSound.stopAsync(); } catch { /* ignore */ }
     try { await currentSound.unloadAsync(); } catch { /* ignore */ }
     currentSound = null;
@@ -1200,6 +1252,11 @@ async function playPcm(samples: Float32Array, sampleRate: number): Promise<void>
   // then trim + fade — but never let post-processing throw and silence the
   // voice: on any failure, play the raw samples.
   const src = asFloat32(samples);
+  // OTA-1675 — which utterance of this life, and how long. `#1` on a fresh
+  // model load is the shape of kai's death; `#40` is a different fact.
+  utterancesThisLife += 1;
+  const utteranceTag = `#${utterancesThisLife} ${(src.length / sampleRate).toFixed(1)}s`;
+  stampVoicePhase('play:encode', utteranceTag);
   let buf = src;
   try {
     buf = trimSilenceLeadTrail(src, sampleRate);
@@ -1229,15 +1286,20 @@ async function playPcm(samples: Float32Array, sampleRate: number): Promise<void>
   // on the next sentence (no need to rebuild the queue). Clamp 0..1
   // defensively even though setVoiceSettings clamps on write.
   const ttsVolume = Math.max(0, Math.min(1, getVoiceSettings().volume ?? 1));
+  // OTA-1675 — the one platform-media step in the window kai's process died
+  // in: expo-av builds the player and decodes the data: URI natively here.
+  stampVoicePhase('play:create', utteranceTag);
   const { sound } = await Audio.Sound.createAsync(
     { uri: `data:audio/wav;base64,${wavBase64}` },
     { shouldPlay: true, progressUpdateIntervalMillis: 25, volume: ttsVolume },
   );
   currentSound = sound;
+  stampVoicePhase('play:started', utteranceTag);
   await new Promise<void>((resolve) => {
     sound.setOnPlaybackStatusUpdate((status) => {
       if (!status.isLoaded) return;
       if (status.didJustFinish) {
+        stampVoicePhase('play:done', utteranceTag);
         // OTA-790 — DEFER the release. didJustFinish means the decoder finished
         // feeding the sink, not that the speaker finished playing: Android can
         // still hold ~100-250ms in the hardware AudioTrack, and an immediate
@@ -1246,6 +1308,9 @@ async function playPcm(samples: Float32Array, sampleRate: number): Promise<void>
         // stopAndClear() may unload this sound first; the timer's second unload
         // rejects harmlessly into its catch.
         setTimeout(() => {
+          // OTA-1675 — see the note on `stampVoicePhase`: never overwrite the
+          // crumb of a native op that is running right now.
+          if (!nativeMlSnapshot().running) stampVoicePhase('play:unload', utteranceTag);
           try { void sound.unloadAsync().catch(() => { /* already unloaded */ }); } catch { /* ignore */ }
           if (currentSound === sound) currentSound = null;
         }, UNLOAD_DRAIN_MS);

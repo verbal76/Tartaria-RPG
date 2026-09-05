@@ -201,9 +201,15 @@ describe('OTA-1546 — the dying breath names the native job', () => {
     expect(lock).toContain("stampNativePhase('done', task.priority, pending.length);");
     // start BEFORE task.fn runs, done AFTER it settles — the order is the
     // instrument: a death between them is a death inside native work.
+    // ⚠ OTA-1675 — the done stamp moved into a `settle` closure that runs in
+    // the settle handlers BEFORE the caller is resolved (it used to ride the
+    // `.then` after `task.resolve`, one microtask late, so the caller's
+    // continuation ran under the previous checkpoint). The property pinned
+    // here is unchanged — done is stamped once the fn has settled — so the
+    // pin reads the call site in the handlers, not the closure's definition.
     const start = lock.indexOf("stampNativePhase('start'");
     const fn = lock.indexOf('.then(task.fn)');
-    const done = lock.indexOf("stampNativePhase('done'");
+    const done = lock.indexOf('(v) => { settle(); task.resolve(v); }');
     expect(start).toBeGreaterThan(-1);
     expect(start).toBeLessThan(fn);
     expect(fn).toBeLessThan(done);

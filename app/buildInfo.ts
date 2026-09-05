@@ -27691,7 +27691,41 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // deaths look like a force-close at the splash AND like OTA-1587's candidate
 // (b), a reload-boot killed by an orphaned native context. This is what tells
 // them apart. Measure the cause, or ship an instrument. This is the instrument.
-export const OTA_BUILD_ID = '2026-09-04-1674-the-dead-life-answers';
+// OTA-1675 — THE VOICE NAMES ITS STEP. Item two of "fix all existing issues one
+// through six": #180, the voice-path process kill on kai's SM-S942U (Samsung,
+// SM8850, Android 16) - the first non-Pixel kill on record.
+// ⚠⚠⚠ WHAT HER LEDGER SAID. A cold 66-second life on the title screen, no
+// action yet, model ledger o0/r0: `native:voice:done [q0] · alive 0ms after
+// it`, and the app's own guard on the next boot: "VOICE CRASH detected - last
+// voice: kokoro:bf_emma". The guard is armed by markTTSStart before the synth
+// and cleared by markTTSDone AFTER playback, so the process died between the
+// synth settling and the line finishing - on the FIRST utterance that device
+// ever played (ReadyFlash speaks "Choose your character." the moment Kokoro
+// comes online). Nothing native runs in that window except what the voice
+// layer does with the samples: the WAV encode, expo-av's player load on a
+// data: URI, the playback, the deferred unload. The lock stamped the synth;
+// nothing stamped these. The owner's own two voice deaths (08-30 voice:done
+// +11080ms, 08-31 voice:start [q1]) sit in the same blind spot.
+// ⚠⚠⚠ AND THE INSTRUMENT ITSELF WAS ONE MICROTASK LATE. The lock's `done`
+// stamp rode the .then AFTER task.resolve, so the caller's continuation ran
+// first: measured in the suite, the voice drain resumed, encoded the WAV and
+// DISPATCHED the player load before `native:voice:done` was written. Her last
+// checkpoint said "the synth finished" about a process that had already moved
+// on to playback - and any checkpoint the caller stamped in that continuation
+// was overwritten by a fact from the step before it. `done` is now stamped
+// before the caller is resolved; it means the native op settled, nothing more.
+// ⚠⚠ THE PLAYBACK PATH STAMPS ITS OWN STEPS: voice:play:encode / create /
+// started / done / unload and voice:stop, each carrying the utterance's
+// ordinal in this life and its length (`#1 0.2s`) - "the first line after a
+// fresh model load" is the fact that separates a one-off from a device that
+// cannot play at all. ⚠ The deferred unload stamp YIELDS when the lock is
+// running: overwriting native:llm:start with voice:play:unload would file a
+// death inside inference as a death in a player release - the blind-spot trade
+// OTA-1377 and OTA-1413 refused. Lazy-required and wrapped, as the lock's is.
+// Not the cure; the cause is still open, and no exemption is bought with this.
+// The next voice-path death reads which step it died in.
+export const OTA_BUILD_ID = '2026-09-05-1675-the-voice-names-its-step';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-04-1674-the-dead-life-answers';
 // golem catch-up 2026-09-04: markerless publish of OTA-1674 - the dead life
 // answers for itself. Not the fix for #110; the instrument the previous one
 // turned out to be missing. OTA-1587's handoff is consumed on read by the life
