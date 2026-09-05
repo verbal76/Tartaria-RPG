@@ -27914,6 +27914,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // trader's board says it keeps none, instead of the button being absent.
 // The dog notation needs the save; nothing in the log names the dog's state.
 export const OTA_BUILD_ID = '2026-09-05-1684-the-typo-is-asked-not-run';
+// golem catch-up 2026-09-05: markerless publish of OTA-1684 - the typo is
+// asked, not run. A one-edit miss on the first word is named and asked
+// ("srink" — did you mean drink?) with the corrected line first on the chip
+// row, before any Qwen handoff; the meta-guard learns "enemy portrait",
+// swipe gestures and "I did not swipe/tap"; CONTRACTS ▸ on every vendor with
+// the roadside line. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1683-the-sheet-and-the-pack';
 // golem catch-up 2026-09-05: markerless publish of OTA-1683 - the sheet and
 // the pack. STE on the portrait; effectiveStats derives from the breakdown
