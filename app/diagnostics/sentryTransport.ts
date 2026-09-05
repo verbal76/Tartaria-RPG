@@ -48,6 +48,11 @@ interface SentryClientLike {
 interface SentryLike {
   init: (opts: Record<string, unknown>) => void;
   getClient?: () => SentryClientLike | undefined;
+  /** ⚠ OTA-1685 — the native SDK's own answer to "did the previous run of this
+   *  app die of a crash?" (sentry-android's `isCrashedLastRun`: true when its
+   *  NDK handler caught a signal last life, false when the process ended with
+   *  no signal — an out-of-memory kill or a reclaim — null when it cannot say). */
+  crashedLastRun?: () => Promise<boolean | null>;
   // ⚠ OTA-1489 — the optional second argument is the SDK's event HINT; its
   // `attachments` array is how a whole game log rides along with one event.
   // Same runtime function, wider type — crash records keep calling it 1-arg.
@@ -278,6 +283,9 @@ export function toSentryEvent(rec: CrashRecord): Record<string, unknown> {
       id: rec.id,
       stack: rec.stack ?? '(none — the process died without one)',
       sinceBootMs: rec.sinceBoot,
+      // OTA-1685 — the native SDK's verdict on the life that died, when it
+      // arrived before this event left. 'unknown' is a fact, not a guess.
+      nativeSdkSawCrash: rec.sdkSawCrash === true ? 'yes' : rec.sdkSawCrash === false ? 'no' : 'unknown',
       // The breadcrumb IS the report for a native death: it is the only record
       // of what the app was doing when the OS killed it.
       lastAction: bc?.what,
@@ -334,6 +342,38 @@ export function toSentryEvent(rec: CrashRecord): Record<string, unknown> {
  * `reportingEnabled()`, which additionally requires the player's opt-in — see
  * `crashReporter.ts`. This only makes a destination exist.
  */
+/**
+ * ⚠⚠⚠ OTA-1685 — THE NATIVE SIDE GIVES ITS VERDICT.
+ *
+ * Every native-death record this ledger has ever carried says the same thing:
+ * "PROCESS KILLED — no JS ran", a last checkpoint, and an age. Two of the
+ * owner's 09-05 kills — `native:cognition:done` 285ms into an ask, and
+ * `native:voice:done` 21.8s into an attack — sit inside windows a few
+ * milliseconds wide that JS cannot see into, and every fix on the table
+ * depends on ONE fact the JS side cannot know: was the process killed by a
+ * SIGNAL (a real native crash — a bad pointer in a model runtime, a JNI
+ * fault) or by the OS with no signal at all (lowmemorykiller's SIGKILL, which
+ * leaves nothing behind)? A signal crash is a bug to find in a stack; a
+ * memory kill is a budget to cut. They have opposite fixes and, until now, one
+ * identical record.
+ *
+ * sentry-android already knows. Its NDK handler writes a marker when it
+ * catches a signal, and `isCrashedLastRun()` reads it on the next init. Its
+ * event, if any, is on Sentry under the native SDK. This asks, once per boot,
+ * after init, and the ledger writes the answer onto the death it just minted.
+ * Three answers, never two: `null` is "could not say", not "no".
+ */
+export async function nativeSdkSawCrashLastRun(): Promise<boolean | null> {
+  try {
+    const s = loadSdk();
+    if (!s || typeof s.crashedLastRun !== 'function') return null;
+    const v = await s.crashedLastRun();
+    return typeof v === 'boolean' ? v : null;
+  } catch {
+    return null;
+  }
+}
+
 export function installSentryIfAvailable(): boolean {
   try {
     const dsn = crashReportDsn();

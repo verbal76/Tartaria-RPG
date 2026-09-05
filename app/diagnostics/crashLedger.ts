@@ -114,6 +114,61 @@ export interface CrashRecord {
   };
   /** Set once a transport has accepted it. Absent = never delivered anywhere. */
   sent?: boolean;
+  /** ⚠⚠⚠ OTA-1685 — THE NATIVE SDK'S VERDICT ON THE LIFE THAT DIED. `true`: its
+   *  NDK handler caught a signal in that life — a real native crash, and its
+   *  own report should be on Sentry. `false`: the process ended with no signal
+   *  — the OS took it (out-of-memory kill or reclaim). `null`: the SDK could not
+   *  say. Absent: the record predates this OTA, or the verdict never arrived.
+   *  Only a `native-death` minted in the boot that asked carries one. */
+  sdkSawCrash?: boolean | null;
+  /** OTA-1685 — when THIS process wrote the record. A verdict is only ever
+   *  applied to a death minted in the same boot that asked for it. */
+  mintedAt?: number;
+}
+
+/** OTA-1685 — the verdict, held for a native-death that is minted AFTER it
+ *  arrived (hydrate promotes the crumb on its own schedule). */
+let pendingSdkVerdict: { value: boolean | null } | null = null;
+/** When this JS context came up — the fence for "minted this boot". */
+const PROCESS_STARTED_AT = Date.now();
+
+/** ⚠ OTA-1685 — the three answers, in words, for About and the bug report. */
+export function sdkVerdictLine(v: boolean | null | undefined): string | null {
+  if (v === true) return '      the native SDK SAW A CRASH in that life — a signal was raised (a real native fault, not a memory kill); its own report should be on Sentry';
+  if (v === false) return '      the native SDK saw NO crash in that life — the process ended with no signal: the OS took it (out-of-memory kill or reclaim)';
+  if (v === null) return '      the native SDK could not say whether that life crashed (no native module, or not initialised in time)';
+  return null;
+}
+
+/**
+ * ⚠⚠⚠ OTA-1685 — WRITE THE NATIVE SDK'S VERDICT ONTO THE DEATH THIS BOOT MINTED.
+ * Called once per boot, after Sentry is installed. Annotates every native-death
+ * record minted in this process that has no verdict yet, and holds the verdict
+ * for one minted later (hydrate runs on its own schedule). Returns the debug
+ * line to log, or null when there was no death to annotate.
+ */
+export async function applyNativeSdkVerdict(verdict: boolean | null): Promise<string | null> {
+  try {
+    pendingSdkVerdict = { value: verdict };
+    await settleCrashWrites();
+    const list = await loadCrashLedger();
+    const targets = list.filter((r) =>
+      r.kind === 'native-death' && r.sdkSawCrash === undefined
+      && r.mintedAt != null && r.mintedAt >= PROCESS_STARTED_AT - 1000);
+    const word = verdict === true ? 'yes' : verdict === false ? 'no' : 'unknown';
+    if (targets.length === 0) {
+      return verdict === true
+        ? `crash-ledger: the native SDK reports a crash in the previous run (crashed=yes) but no death crumb was minted this boot — the signal came with no live action recorded`
+        : null;
+    }
+    const ids = new Set(targets.map((r) => r.id));
+    const next = list.map((r) => (ids.has(r.id) ? { ...r, sdkSawCrash: verdict } : r));
+    cache = next;
+    await AsyncStorage.setItem(CRASH_LEDGER_KEY, JSON.stringify(next));
+    return `crash-ledger: native SDK verdict on the life that died — crashed=${word} (${targets.length} record${targets.length === 1 ? '' : 's'} annotated)`;
+  } catch {
+    return null;
+  }
 }
 
 /** Sync mirror so `crashLedgerSummary()` can serve the About screen and the bug
@@ -156,6 +211,9 @@ export function recordCrash(
       breadcrumb: rec.breadcrumb,
       launch: rec.launch,
       sent: rec.sent,
+      mintedAt: Date.now(),
+      // OTA-1685 — a native death minted after the verdict arrived takes it now.
+      ...(rec.kind === 'native-death' && pendingSdkVerdict ? { sdkSawCrash: pendingSdkVerdict.value } : {}),
     };
     writeTail = writeTail.then(async () => {
       try {
@@ -333,6 +391,10 @@ export function crashLedgerSummary(): string {
           ? ' · not an OTA-apply boot'
           : ' · whether it followed an OTA apply is not known (died before its launch resolved)';
       out.push(`      launch: ${age}${ota}`);
+      // ⚠⚠⚠ OTA-1685 — the native SDK's verdict, right under the launch line it
+      // qualifies. Absent on records older than this OTA: nothing is invented.
+      const verdict = sdkVerdictLine(r.sdkSawCrash);
+      if (verdict) out.push(verdict);
       if (l.prevCtx) {
         out.push(/\/l[1-9]/.test(l.prevCtx)
           ? `      ⚠⚠ the previous life handed over a LIVE native context (${l.prevCtx}) — `

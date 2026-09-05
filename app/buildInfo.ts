@@ -27913,7 +27913,21 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // "I did not swipe/tap/press". CONTRACTS ▸ shows on every vendor; a roadside
 // trader's board says it keeps none, instead of the button being absent.
 // The dog notation needs the save; nothing in the log names the dog's state.
-export const OTA_BUILD_ID = '2026-09-05-1684-the-typo-is-asked-not-run';
+// 2026-09-05 OTA-1685 — THE NATIVE SIDE GIVES ITS VERDICT (task #192, an
+// instrument). Two mid-play kills on 09-05: 00:20:20 at Drakova, checkpoint
+// native:cognition:done 285ms into "what's going on there?", 8.8 minutes into
+// a life that followed an OTA apply by 160ms; 01:31:00 at Voronov, checkpoint
+// native:voice:done 21.8s into an attack on the Cantor, 152s into a life that
+// followed an OTA apply by 893ms. Both died in windows a few milliseconds wide
+// that JS cannot see into, and the one fact that decides the fix — a signal
+// crash (find the fault) or a memory kill with no signal (cut the budget) —
+// is one the native SDK already holds: sentry-android's isCrashedLastRun.
+// Asked once per boot after init, written onto the death record minted this
+// boot (sdkSawCrash: true/false/null — three answers, never two), printed in
+// About and the bug report under the launch line, and carried on the Sentry
+// event as nativeSdkSawCrash. The next kill says which kind it was.
+export const OTA_BUILD_ID = '2026-09-05-1685-the-native-side-gives-its-verdict';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1684-the-typo-is-asked-not-run';
 // golem catch-up 2026-09-05: markerless publish of OTA-1684 - the typo is
 // asked, not run. A one-edit miss on the first word is named and asked
 // ("srink" — did you mean drink?) with the corrected line first on the chip

@@ -377,6 +377,16 @@ export default function App() {
         const st = require('./app/diagnostics/sentryTransport');
         st.installSentryIfAvailable();
         await cl.loadCrashLedger();
+        // ⚠⚠⚠ OTA-1685 — ASK THE NATIVE SIDE WHAT KILLED THE LAST LIFE. Two of
+        // the owner's 09-05 kills died inside windows JS cannot see into; the
+        // one fact that decides their fix — signal crash or memory kill — is
+        // one sentry-android already holds. Written onto the death record the
+        // ledger minted (or will mint) this boot; see crashLedger.applyNativeSdkVerdict.
+        try {
+          const verdict = await st.nativeSdkSawCrashLastRun();
+          const line = await cl.applyNativeSdkVerdict(verdict);
+          if (line) useGameStore.getState().appendLog('debug', line);
+        } catch { /* an instrument may never break the boot */ }
         await cr.loadReportingPref();
         // ⚠ OTA-1488 — the FIRST send waits for the one-time opt-out notice:
         // nothing leaves the device before the player has seen the popup that
