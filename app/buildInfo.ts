@@ -27725,6 +27725,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Not the cure; the cause is still open, and no exemption is bought with this.
 // The next voice-path death reads which step it died in.
 export const OTA_BUILD_ID = '2026-09-05-1675-the-voice-names-its-step';
+// golem catch-up 2026-09-05: markerless publish of OTA-1675 - the voice names
+// its step. Item two, #180, kai's voice-path kill: the process died between
+// the synth settling and playback finishing, on the first utterance her device
+// ever played, and the lock's `done` stamp was one microtask late - written
+// after the caller had already dispatched the player load - so the ledger's
+// last checkpoint named the step before the one it died in. `done` now lands
+// before the caller resumes, and the playback path stamps encode / create /
+// started / done / unload and stop with the utterance's ordinal and length.
+// The unload stamp yields to a running native op. An instrument, not a cure.
+// hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-04-1674-the-dead-life-answers';
 // golem catch-up 2026-09-04: markerless publish of OTA-1674 - the dead life
 // answers for itself. Not the fix for #110; the instrument the previous one
