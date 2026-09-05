@@ -51,7 +51,7 @@ import { rescueScenarioForNoun } from '../engine/storyNouns';
 import { emptyMemory, recordTags, discoverLocation, recordEnemyDefeat, recordNothingSearch, registerCanonLocation, setCanonLocationMarker, pickResolvedEvent, waterSourceReady, recordWaterUse, spireMoveNoticeLine } from '../engine/worldMemory';
 // OTA-1049 — Phase 1: the per-person ledger the greeting layer reads.
 import {
-  spokenName, rememberNpcMeeting, recordNpcDealing, getRelation, npcGreeting, npcAbsenceLine, npcAddress, knowsPlayerName, vendorLedgerId, pocketLossMumble } from '../engine/npcMemory';
+  spokenName, rememberNpcMeeting, recordNpcDealing, getRelation, npcGreeting, npcAbsenceLine, npcAddress, knowsPlayerName, vendorLedgerId, pocketLossMumble, lastAskedLine } from '../engine/npcMemory';
 // OTA-1053 — the relationship reaches the counter.
 import { npcRegard, regardPriceMult } from '../engine/npcMemory';
 // OTA-1054 — the offscreen war reaches the people who live in it.
@@ -5972,6 +5972,7 @@ function emitVendorGreeting(
   { const mb = menaceGreetingBeat(decayedMenace(player.menace ?? 0, player.menaceUpdatedHour ?? 0, hours), vendor.name, npcRegard(rel)); if (mb) get().appendLog('world', mb); } // OTA-1689
   const awayLine = npcAbsenceLine(rel, vendor.name, player.name, hours, player.sex);
   if (awayLine) get().appendLog('world', awayLine);
+  { const la = lastAskedLine(get().worldMemory.npcTranscripts?.[vendorNpcId(vendor)], rel, vendor.name); if (la) get().appendLog('world', la); } // OTA-1698
   const raid = raidNewsFor(get().worldMemory, rel, hours);
   if (raid) {
     get().appendLog('world', raidNewsLine(rel, raid, vendor.name, player.name));
@@ -11656,6 +11657,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         { const mb = menaceGreetingBeat(decayedMenace(player.menace ?? 0, player.menaceUpdatedHour ?? 0, player.hoursElapsed ?? 0), vendor.name, npcRegard(rel)); if (mb) get().appendLog('world', mb); } // OTA-1689
         const awayLine = npcAbsenceLine(rel, vendor.name, player.name, player.hoursElapsed ?? 0, player.sex);
         if (awayLine) get().appendLog('world', awayLine);
+        { const la = lastAskedLine(get().worldMemory.npcTranscripts?.[vendorNpcId(vendor)], rel, vendor.name); if (la) get().appendLog('world', la); } // OTA-1698 — the counter remembers the question
         // OTA-1081 — the delayed mumble: a pocket lifted CLEAN on an earlier
         // visit surfaces here, on the return, as them noticing the loss out
         // loud without suspecting anyone. One per visit, ledger-counted.

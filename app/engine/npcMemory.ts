@@ -18,7 +18,7 @@
 // is a pure function of what has actually passed between you, and which line
 // they greet you with is indexed off the meeting count rather than picked at
 // random — varied across visits, identical on any replay of the same state.
-import type { NpcRelation, NpcMet, OutpostRaid, WorldMemory } from './types';
+import type { NpcRelation, NpcMet, OutpostRaid, WorldMemory, TalkTurn } from './types'; // OTA-1698 — TalkTurn
 // OTA-1052 — rememberNpcMeeting pairs the two stores; see below.
 import { recordNpcMet } from './worldMemory';
 // OTA-1155 — see healFactionId, just above recordNpcSighting.
@@ -898,4 +898,43 @@ export function pocketLossMumble(rel: NpcRelation | undefined, name: string): st
     `${name} mutters something about holes in coats and the price of thread — and never once looks your way.`,
   ];
   return lines[(rel.pocketsMumbled ?? 0) % lines.length]!;
+}
+
+// ---------------------------------------------------------------------------
+// OTA-1698 — THE COUNTER REMEMBERS THE QUESTION. Narrative-agency audit, hole
+// 7: `worldMemory.npcTranscripts` is the durable record of every question put
+// to every person (OTA-1151) — stored, and read by nothing but the talk sheet's
+// EARLIER column. Nothing ever quoted it back. One reader: on a return visit,
+// after the greeting and the absence beat, the person names the last thing you
+// asked them. Deterministic like the greeting (variant off the meeting count);
+// never for a stranger or a wronged counter (their own lines carry the mood);
+// and only when the last exchange is at least LAST_ASKED_MIN_GAP_MS old, so
+// flicking between two stalls in one sitting does not make them parrot it.
+// ---------------------------------------------------------------------------
+
+/** The last exchange must be this much older than now (wall clock) to be recalled. */
+export const LAST_ASKED_MIN_GAP_MS = 30 * 60_000;
+
+const LAST_ASKED_LINES = [
+  `{npc} picks up where you left off. "You were asking about {q}. I've had time to think on it."`,
+  `"Last time it was {q} you wanted to know about," {npc} says. "Ask, if there's more."`,
+  `{npc} nods you closer. "Still chewing on {q}, or is it something new today?"`,
+];
+
+export function lastAskedLine(
+  turns: readonly TalkTurn[] | undefined,
+  rel: NpcRelation | null | undefined,
+  npcName: string,
+  nowMs: number = Date.now(),
+): string | null {
+  const last = turns && turns.length > 0 ? turns[turns.length - 1] : undefined;
+  const q = last?.q?.trim();
+  if (!last || !q) return null;
+  if (nowMs - last.ts < LAST_ASKED_MIN_GAP_MS) return null;
+  const regard = npcRegard(rel);
+  if (regard === 'stranger' || regard === 'wronged') return null;
+  const idx = Math.abs(rel?.meetings ?? 0) % LAST_ASKED_LINES.length;
+  return (LAST_ASKED_LINES[idx] ?? '')
+    .replace(/\{npc\}/g, npcName)
+    .replace(/\{q\}/g, `\u2018${q}\u2019`);
 }

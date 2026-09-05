@@ -28113,7 +28113,19 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the narrator can recall what the player wrote down. The two machine memos
 // that share the list (`dog_rescue_pending:`, `puppy_vendor_trade_id:`) are
 // bookkeeping and never reach a prompt.
-export const OTA_BUILD_ID = '2026-09-05-1697-the-notes-reach-the-narrator';
+// 2026-09-05 OTA-1698 — THE COUNTER REMEMBERS THE QUESTION. Narrative-agency
+// audit, hole 7: `worldMemory.npcTranscripts` (OTA-1151) is the durable record
+// of every question put to every person — stored, read only by the talk
+// sheet's EARLIER column, quoted by nothing. One reader on both greeting doors
+// (the returning-face arrival in beginScene and emitVendorGreeting), after the
+// greeting and the absence beat: `{npc} picks up where you left off. "You were
+// asking about 'The Sixth Landing'. I've had time to think on it."` — variant
+// off the meeting count like the greeting, never for a stranger or a wronged
+// counter, and only when the last exchange is thirty real minutes old
+// (npcMemory.lastAskedLine, LAST_ASKED_MIN_GAP_MS), so flicking between two
+// stalls does not make them parrot it.
+export const OTA_BUILD_ID = '2026-09-05-1698-the-counter-remembers-the-question';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1697-the-notes-reach-the-narrator';
 // golem catch-up 2026-09-05: markerless publish of OTA-1697 - the notes reach
 // the narrator. The newest three whisper-chain notes ride the Qwen fact sheet
 // from both narration builders; machine memos never reach a prompt. hal took
