@@ -1,0 +1,241 @@
+{
+  "id": "41009fd047b3421ab278ad814c19b2b0",
+  "groupID": "7703017060",
+  "eventID": "41009fd047b3421ab278ad814c19b2b0",
+  "projectID": "4511945117532160",
+  "size": 3320,
+  "entries": [
+    {
+      "data": {
+        "formatted": "Process died with no orderly exit while: (no action yet)"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-05-1696-the-fight-sheds-its-passengers",
+  "message": "Process died with no orderly exit while: (no action yet)",
+  "title": "Process died with no orderly exit while: (no action yet)",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db27:9ca0:ad2:ae51:4eeb:fbe3",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "6141c933888f4c4d9f230536dbf604f5",
+      "span_id": "9ce15458808c10c1",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "actionAgeMs": 1898,
+    "id": "1788625112776_native-death",
+    "lastAction": "(no action yet)",
+    "lastPhase": "boot:qwen:deferred",
+    "lastPhaseAgeMs": 0,
+    "launchAfterOta": true,
+    "launchAgeMs": 1965,
+    "launchCtx": "o0/r0/l0/p0/dn0",
+    "launchOtaGapMs": 413,
+    "launchOtaPath": "boot-front",
+    "launchPrevCtx": "o0/r0/l0/p0/dn0",
+    "nativeSdkSawCrash": "unknown",
+    "sinceBootMs": 1965,
+    "stack": "(none \u2014 the process died without one)"
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "Process died with no orderly exit while: (no action yet)"
+  },
+  "tags": [
+    {
+      "key": "build",
+      "value": "2026-09-05-1696-the-fight-sheds-its-passengers"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-05-1696-the-fight-sheds-its-passengers"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "native-death"
+    },
+    {
+      "key": "level",
+      "value": "fatal"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-05-1696-the-fight-sheds-its-passengers"
+    },
+    {
+      "key": "stage",
+      "value": "boot:qwen:deferred"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db27:9ca0:ad2:ae51:4eeb:fbe3",
+      "query": "user.ip:\"2607:fb90:db27:9ca0:ad2:ae51:4eeb:fbe3\""
+    },
+    {
+      "key": "version",
+      "value": "4.32.11"
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-05T17:22:00.297308Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-05T16:18:32.776000Z",
+  "fingerprints": [
+    "ded7ba861a46476d883cdebd335596a0"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1957029554,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-05T15:25:04.514937Z",
+    "dateReleased": "2026-09-05T15:26:39.336550Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "9748b2411932d44b1f6f3617cad88a76ebc944ea",
+      "message": "[ota-hal] OTA-1696: the fight sheds its passengers\n\nThe second bundle the owner pushed at 13:32 (#mtof9i1d5eoj, stamp 1690) is\nhis hang on paper. A five-raider fight, 13:28\u201313:31: seven freeze-watch\nstalls in three minutes, each right after a DODGE / APPROACH / attack, the\nJS thread 2.5\u20135.2s late while frames kept coming, the engine's own log\nlines 70\u2013150ms apart where they are normally 1ms, and the MiniLM classifier\nreading 0.4\u20137.4s per action (one-enemy actions included: 5.5s median)\nagainst its usual 0.35s. `native: cognition running` on four of the seven\nstall lines; Qwen idle throughout; TTS off; no memory warning; no input\nlock anywhere in the code. The night session on the same build and phone\nread 1.5s dodge-to-next-tap and one stall in five hours.\n\nTwo loads ride every combat tap. The classifier: onnxruntime's default\nintra-op pool is one thread per core \u2014 eight on the Tensor G5 \u2014 spinning\nfor the run, for a mood tag the parser did not need on a chip it resolved\nat conf=1.00. The feed: `gameLog` is an external-store subscription, so\nevery appendLog commits synchronously, and AdventureFeed re-mapped EVERY\nvisible entry \u2014 up to five hundred rich rows \u2014 on each of the twenty-five\nlines a five-raider round writes.\n\nFour levers:\n  - COGNITION_SESSION_OPTIONS: intraOpNumThreads 2 / interOpNumThreads 1\n    on both classifier session creates (the JSI binding parses it \u2014\n    onnxruntime-react-native/cpp/SessionUtils.cpp).\n  - cognitionGate.cognitionSkippedInCombat: no classifier pass on a\n    confident action (conf \u2265 0.9) with hostiles on the field; free text in\n    a fight and everything outside one are untouched; the OTA-1359 stamps\n    keep their order inside the condition.\n  - AdventureFeed keeps FEED_WINDOW (150) rows mounted; each row is a\n    memoised FeedRow; the enemy-name list is keyed on its contents so the\n    screen's fresh array per render no longer invalidates every row. The\n    trailing chips stay outside the map (OTA-1457, pin re-anchored).\nTwo clocks:\n  - renderClock.renderLagAfterEngine: the exploration screen reads the\n    live crumb before its `rendered` heartbeat stamps over it and prints\n    `render\u23f1 Nms after engine-done \u00b7 feed N` once per action past 300ms.\n  - The stall line grows ` \u00b7 heap NMB \u00b7 gc +Nms/K \u00b7 feed N`\n    (HermesInternal.getInstrumentedStats, delta per sample), so a collector\n    pause can no longer hide behind \"something blocked the JS thread\".\n\nSuite: __tests__/ota1696TheFightShedsItsPassengers.test.ts (7).\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-05T15:22:48Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-05-1696-the-fight-sheds-its-passengers",
+          "shortVersion": "tartaria@4.32.11+2026-09-05-1696-the-fight-sheds-its-passengers",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-05T15:26:39.336550Z",
+          "dateCreated": "2026-09-05T15:25:04.514937Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155819913",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-05T15:26:39.580600Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-05-1696-the-fight-sheds-its-passengers",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-05-1696-the-fight-sheds-its-passengers",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-05-1696-the-fight-sheds-its-passengers",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-05-1696-the-fight-sheds-its-passengers)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": "c7b870513f734883930a18494737bf9b"
+}
