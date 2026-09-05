@@ -27773,6 +27773,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // into blasts. gameStore absorbed the family under its ratchet by giving up two
 // set() blocks to app/state/weaponRiderEffects.ts.
 export const OTA_BUILD_ID = '2026-09-05-1676-the-tail-is-read';
+// golem catch-up 2026-09-05: markerless publish of OTA-1676 - the tail is
+// read (slice 4c, the last unit of slice 4). The live unread tail of the
+// weapon effect column goes 87 -> 28, every one of the 28 pinned by name as
+// flavour. Nine shields' soak / immunity / on-block bite are spent on a blow
+// that landed on the shield (and on a raised BLOCK); the wielder's own share -
+// guard, cover, ward, heal - pays on the swing or the hit; "pins", "reduces
+// speed", "pushes back", "disables tech", "+1 to tech", "the arc jumps to one
+// extra enemy" and a new `pull` control are read in the catalog's own words;
+// the on-hit shred lands, capped; 52 cards reworded onto what the engine does.
+// hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1675-the-voice-names-its-step';
 // golem catch-up 2026-09-05: markerless publish of OTA-1675 - the voice names
 // its step. Item two, #180, kai's voice-path kill: the process died between
