@@ -1,0 +1,222 @@
+{
+  "id": "660b25a3ce604cd08da50c57677d4d21",
+  "groupID": "7714165908",
+  "eventID": "660b25a3ce604cd08da50c57677d4d21",
+  "projectID": "4511945117532160",
+  "size": 2826,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log-beacon 2026-09-05-1699-every-hunt-walks-the-four-roads #mtor1070wp13"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-05-1699-every-hunt-walks-the-four-roads",
+  "message": "player-log-beacon 2026-09-05-1699-every-hunt-walks-the-four-roads #mtor1070wp13",
+  "title": "player-log-beacon 2026-09-05-1699-every-hunt-walks-the-four-roads #mtor1070wp13",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db27:9ca0:ad2:ae51:4eeb:fbe3",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "af6795791dd24494a7ffa3d0d85cbb09",
+      "span_id": "91eeb0112a6e81ef",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {},
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log-beacon 2026-09-05-1699-every-hunt-walks-the-four-roads #mtor1070wp13"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtor1070wp13"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-05-1699-every-hunt-walks-the-four-roads"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-beacon"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "parts",
+      "value": "56"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-05-1699-every-hunt-walks-the-four-roads"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db27:9ca0:ad2:ae51:4eeb:fbe3",
+      "query": "user.ip:\"2607:fb90:db27:9ca0:ad2:ae51:4eeb:fbe3\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-05T19:01:22.767000Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-05T19:01:22.774000Z",
+  "fingerprints": [
+    "86bbf865d00506359ffb81d408a8692d"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1957123261,
+    "commitCount": 20,
+    "data": {},
+    "dateCreated": "2026-09-05T17:28:34.194469Z",
+    "dateReleased": "2026-09-05T17:28:34.986399Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "b7e35ab17b2237d7fda8c05cd5d2a6c0f1e3ffbb",
+      "message": "[ota-hal] OTA-1699: every hunt walks the four roads\n\nStep 3 of the Narrative Agency plan (task #197): generalise the contrary\nwalker. OTA-1686's walker named the Bog Dragon's stages by number (the\nreeve at 0, Mira at 2, the harpies at 5, the steeple at 6) and its nouns by\nhand. Every hunt in the catalog follows one of two templates (standard_7,\nbait_switch_5), so the roadmap is now read from the definition:\n\n  huntRoadmap(def)  the first ask (an npc stage), the later ask that\n                    requires an item, the first \"investigate\" ground, the\n                    first brood of two or more, the apex, the abandon\n                    point and the items held by then\n  huntNouns(def)    the hunt's title, target, people, beasts and items \u2014\n                    what a line has to be ABOUT to count as an\n                    acknowledgement; roster names learned on the road\n                    (the card's \"Reeve Halvard\") join the set\n\nThe four roads take their grounds and names from the map. A probe with no\nground on a hunt (no brood of two, no later ask) is skipped and listed as\nskipped \u2014 never counted as a pass. The Bog Dragon suite (ota1686) keeps its\nmeasured grades under the generic step names and pins the roadmap it\nproduces against the hand-written road. The new sweep\n(__tests__/ota1699ContraryWalkerSweep.test.ts, heavy CI by name) walks all\neighteen hunts down all four roads; its one hard assertion per road is\nHANDLED, and the punch list it prints is what step 3's tasks are cut from.\nNo game code changes in this OTA.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-05T17:26:36Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-05-1699-every-hunt-walks-the-four-roads",
+          "shortVersion": "tartaria@4.32.11+2026-09-05-1699-every-hunt-walks-the-four-roads",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-05T17:28:34.986399Z",
+          "dateCreated": "2026-09-05T17:28:34.194469Z"
+        }
+      ],
+      "repository": {
+        "id": "7194700",
+        "name": "origin",
+        "url": null,
+        "provider": {
+          "id": "unknown",
+          "name": "Unknown Provider"
+        },
+        "status": "active",
+        "dateCreated": "2026-09-05T17:30:01.428037Z",
+        "integrationId": null,
+        "externalSlug": null,
+        "externalId": null
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155834809",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-05T17:30:02.133418Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-05-1699-every-hunt-walks-the-four-roads",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-05-1699-every-hunt-walks-the-four-roads",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-05-1699-every-hunt-walks-the-four-roads",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-05-1699-every-hunt-walks-the-four-roads)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": null
+}

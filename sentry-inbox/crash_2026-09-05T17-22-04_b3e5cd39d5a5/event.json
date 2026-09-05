@@ -1,0 +1,241 @@
+{
+  "id": "b3e5cd39d5a5435c878e40931c7a12e5",
+  "groupID": "7703017060",
+  "eventID": "b3e5cd39d5a5435c878e40931c7a12e5",
+  "projectID": "4511945117532160",
+  "size": 3344,
+  "entries": [
+    {
+      "data": {
+        "formatted": "Process died with no orderly exit while: (no action yet)"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-05-1698-the-counter-remembers-the-question",
+  "message": "Process died with no orderly exit while: (no action yet)",
+  "title": "Process died with no orderly exit while: (no action yet)",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db27:9ca0:ad2:ae51:4eeb:fbe3",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "bba5759e797944c1b1c71ce9a7f09950",
+      "span_id": "87dcee1fc5416832",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "actionAgeMs": 2285,
+    "id": "1788628924013_native-death",
+    "lastAction": "(no action yet)",
+    "lastPhase": "boot:qwen:deferred",
+    "lastPhaseAgeMs": 0,
+    "launchAfterOta": true,
+    "launchAgeMs": 2341,
+    "launchCtx": "o0/r0/l0/p0/dn0",
+    "launchOtaGapMs": 222,
+    "launchOtaPath": "boot-front",
+    "launchPrevCtx": "o0/r0/l0/p0/dn0",
+    "nativeSdkSawCrash": "unknown",
+    "sinceBootMs": 2341,
+    "stack": "(none \u2014 the process died without one)"
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "Process died with no orderly exit while: (no action yet)"
+  },
+  "tags": [
+    {
+      "key": "build",
+      "value": "2026-09-05-1698-the-counter-remembers-the-question"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-05-1698-the-counter-remembers-the-question"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "native-death"
+    },
+    {
+      "key": "level",
+      "value": "fatal"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-05-1698-the-counter-remembers-the-question"
+    },
+    {
+      "key": "stage",
+      "value": "boot:qwen:deferred"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db27:9ca0:ad2:ae51:4eeb:fbe3",
+      "query": "user.ip:\"2607:fb90:db27:9ca0:ad2:ae51:4eeb:fbe3\""
+    },
+    {
+      "key": "version",
+      "value": "4.32.11"
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-05T18:28:31.811555Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-05T17:22:04.013000Z",
+  "fingerprints": [
+    "ded7ba861a46476d883cdebd335596a0"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1957105924,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-05T17:04:52.119278Z",
+    "dateReleased": "2026-09-05T17:06:20.080111Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "5cd00849fa3a065a6eec493b1506819b237f953b",
+      "message": "[ota-hal] OTA-1698: the counter remembers the question\n\nNarrative-agency audit (docs/narrative-agency-audit-2026-09-05.md), hole 7:\n`worldMemory.npcTranscripts` (OTA-1151) is the durable record of every\nquestion put to every person \u2014 stored per NPC, capped at forty turns, and\nread by nothing but the talk sheet's EARLIER column. Nothing ever quoted\nwhat was said back to the player.\n\nOne reader on both greeting doors \u2014 the returning-face arrival in\nbeginScene and emitVendorGreeting \u2014 after the greeting, the OTA-1689 menace\nbeat and the absence line:\n\n  Irma picks up where you left off. \"You were asking about \u2018The Sixth\n  Landing\u2019. I've had time to think on it.\"\n  \"Last time it was \u2018The Sixth Landing\u2019 you wanted to know about,\" Irma\n  says. \"Ask, if there's more.\"\n  Irma nods you closer. \"Still chewing on \u2018The Sixth Landing\u2019, or is it\n  something new today?\"\n\nnpcMemory.lastAskedLine: the LAST turn's topic label, quoted verbatim;\nvariant indexed off the meeting count like npcGreeting (same save, same\nwords); never for a stranger or a wronged counter (their own lines carry\nthe mood); and only when the last exchange is thirty real minutes old\n(LAST_ASKED_MIN_GAP_MS), so flicking between two stalls in one sitting does\nnot make them parrot it.\nSuite: __tests__/ota1698TheCounterRemembersTheQuestion.test.ts (3).\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-05T17:02:38Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-05-1698-the-counter-remembers-the-question",
+          "shortVersion": "tartaria@4.32.11+2026-09-05-1698-the-counter-remembers-the-question",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-05T17:06:20.080111Z",
+          "dateCreated": "2026-09-05T17:04:52.119278Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155831914",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-05T17:06:20.380213Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-05-1698-the-counter-remembers-the-question",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-05-1698-the-counter-remembers-the-question",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-05-1698-the-counter-remembers-the-question",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-05-1698-the-counter-remembers-the-question)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "fae4c2d29829446aa2205e046f19ff28",
+  "previousEventID": "41009fd047b3421ab278ad814c19b2b0"
+}
