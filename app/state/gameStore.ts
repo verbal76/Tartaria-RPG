@@ -221,6 +221,7 @@ import { recordDeed, lastDeed as lastDeedAt } from '../engine/deeds';
 // choice is itself a claim worth testing — see its header.
 import {
   UNRESOLVED_HOOK_LINES, DOG_SETTLE_LINES, TAKE_LINES, fleeLine, returnLine,
+  clearedBodiesNote, // OTA-1691 — the room names its dead
 } from '../engine/voicePools';
 // ⚠ OTA-1459 — the bounty nudge's in-game-hours cooldown.
 import { takeBountyNudge } from '../engine/arbiterNudge';
@@ -11438,9 +11439,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // ⚠ `returnLine` takes the count and returns PROSE, so there is no
       // argument a caller can leak to the screen. Same reasoning as `fleeLine`:
       // a decision with no name can only be tested through the text around it.
-      const clearedNote = recentlyCleared
-        ? ` The bodies you left are still here. Nothing has moved in to replace them.`
-        : '';
+      const clearedNote = clearedBodiesNote(existing.enemiesCleared, recentlyCleared); // OTA-1691 — named, and remembered past the quiet window
       get().appendLog('world', `${returnLine(existing.visitCount)}${clearedNote}`);
       // Tourist-and-Vandal persistence — surface the room's leftover
       // state from prior visits so the narration reflects what's

@@ -38,6 +38,7 @@
 // refuses an immediate repeat — so a pool of forty is forty distinct fires before
 // anything comes round again. A pool of one, cycled, is still one.
 import { rotatingPick } from './rng';
+import { pluralizeNoun } from './grammar';
 
 /** ⚠ THE HOOK IS STILL HERE, said forty ways.
  *
@@ -424,4 +425,27 @@ export function returnLine(visitCount: number): string {
   return n >= RETURN_MANY_THRESHOLD
     ? rotatingPick(RETURN_FAMILIAR_LINES, 'return-familiar')
     : rotatingPick(RETURN_AGAIN_LINES, 'return-again');
+}
+
+// ⚠⚠ OTA-1691 — THE ROOM NAMES ITS DEAD. The narrative-agency audit (hole 3):
+// `enemiesCleared` was written on every kill and read only for the respawn
+// quiet window, and the one line that read it — "The bodies you left are
+// still here" — never said whose. After the window nothing was said at all,
+// so a place the player had emptied of Mud Wasps read as any other place.
+// One writer for the clause: inside the quiet window the bodies are named;
+// after it the clearing is remembered as a fact about the place. Two names at
+// most, pluralised by the one pluraliser (OTA-1686's rule).
+
+/** The clause that rides the return line, or '' when the room holds no clears.
+ *  `recent` is the respawn quiet window: the bodies are still on the floor. */
+export function clearedBodiesNote(cleared: ReadonlyArray<string> | undefined, recent: boolean): string {
+  const names = (cleared ?? []).filter((n) => !!n);
+  if (names.length === 0) return '';
+  // A hunted apex carries its "(hunted)" tag in the ledger; it is one named
+  // beast, not a kind — "the Bog Dragon", never "Bog Dragon (hunted)s".
+  const shown = names.slice(-2).map((n) => (/\s\(hunted\)$/.test(n) ? `the ${n.replace(/\s\(hunted\)$/, '')}` : pluralizeNoun(n)));
+  const who = shown.length === 2 ? `${shown[0]} and ${shown[1]}` : shown[0]!;
+  return recent
+    ? ` The ${who} you left are still here. Nothing has moved in to replace them.`
+    : ` You cleared this place of ${who} once; the floor has been swept since, one way or another.`;
 }

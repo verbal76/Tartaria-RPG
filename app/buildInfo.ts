@@ -28025,7 +28025,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the banner." / "Their rivals' gratitude has a ceiling — <Faction> will not
 // think better of you for spiting someone else again." Both sites in
 // gameStore (the gift standing path, meterSpiteGains).
-export const OTA_BUILD_ID = '2026-09-05-1690-the-cap-speaks';
+// 2026-09-05 OTA-1691 — THE ROOM NAMES ITS DEAD. Step-4 mundane reader, audit
+// hole 3: `enemiesCleared` was written on every kill and read only for the
+// respawn quiet window; the one line that read it ("The bodies you left are
+// still here") never said whose, and after the window nothing was said at
+// all. voicePools.clearedBodiesNote: inside the window "The Mud Wasps you left
+// are still here. Nothing has moved in to replace them."; after it "You cleared
+// this place of Mud Wasps once; the floor has been swept since, one way or
+// another." Two names at most, the one pluraliser.
+export const OTA_BUILD_ID = '2026-09-05-1691-the-room-names-its-dead';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1690-the-cap-speaks';
 // golem catch-up 2026-09-05: markerless publish of OTA-1690 - the cap speaks.
 // The gift and spite standing budgets say so once, at the crossing, instead of
 // stopping the number in silence. hal took the marker.

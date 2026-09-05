@@ -200,7 +200,8 @@ describe('OTA-1467 — the wiring', () => {
   it('⚠⚠ the cleared-bodies note still rides along', () => {
     // OTA's neighbouring feature: a tile you cleared reports its dead. Losing it
     // while rewriting the sentence around it would be a silent content loss.
-    expect(STORE).toContain('The bodies you left are still here.');
+    // OTA-1691 — the clause moved to voicePools.clearedBodiesNote and names the dead.
+    expect(read('app', 'engine', 'voicePools.ts')).toContain('you left are still here. Nothing has moved in to replace them.');
     expect(STORE).toContain('${clearedNote}');
   });
 

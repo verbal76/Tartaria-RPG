@@ -38,7 +38,7 @@ const TESTS = path.join(ROOT, '__tests__');
  *  OTA-1483). Deliberately no headroom: a new prose pin must displace an old one
  *  or state its claim another way. Lower it as pins are converted; never raise
  *  it without an owner decision. */
-const PROSE_PIN_BASELINE = 113;
+const PROSE_PIN_BASELINE = 112; // OTA-1691 — ota1467's cleared-bodies pin followed its sentence into voicePools
 
 /** Comments stripped — the same reader every scanning suite uses. */
 const codeOnly = (s) => s
