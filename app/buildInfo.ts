@@ -27877,7 +27877,24 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // travel row returns the moment EXIT puts you back on the tile. The 17:42
 // notation (ENTER OUTPOST at the Pilgrim Camp stepping into nothing) was on
 // 1668 and is what 1669 fixed; pinned here so all three stay accounted for.
-export const OTA_BUILD_ID = '2026-09-05-1681-the-outpost-lets-go';
+// 2026-09-05 OTA-1682 — THE BUFFER WAS THIRTY DEEP (task #199, and the loss
+// it uncovered). Bundle #mtnrscwz8 went out in 42 parts; 1–29 reached Sentry
+// and 30–42 never did, while the device logged DELIVERED 42/42. Beacon + 29
+// parts = 30 = @sentry/react-native's default maxQueueSize, which is BOTH the
+// JS buffer at the bridge and the native send queue; the thirty-first capture
+// is refused without a throw, visible only through the client's afterSendEvent
+// hook. Now: maxQueueSize 200 on both sides; refusals counted per bundle
+// through the hook and folded into `delivered` (a refused part = NOT
+// DELIVERED, kept for the retry, the line names the parts). A DELIVERED bundle
+// is cleared from disk at all three senders — the re-sends the owner watched
+// (#mtn91pdwbmaq ×4 boots, the 01:50:49 report again at 02:23 and 02:27) were
+// OTA-1504's "duplicates are the design", written when flush lied on the
+// attachment path. And a general report carries the last-played character's
+// log (the log is per slot; there is no global ring), saying whose it is —
+// "(no character selected — no log attached)" was arriving under the owner's
+// own word "Log".
+export const OTA_BUILD_ID = '2026-09-05-1682-the-buffer-was-thirty-deep';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1681-the-outpost-lets-go';
 // golem catch-up 2026-09-05: markerless publish of OTA-1681 - the outpost lets
 // go. continueTravel drops hubRoomId/activeBuildingId on the way out (the third
 // door, same clear and line as setTravelCourse and the whisper course), and the

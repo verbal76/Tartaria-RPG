@@ -133,11 +133,15 @@ describe('OTA-1505 — who it fires for', () => {
     // ⚠ OTA-1680 — seamed base64 ('base64-3'): the relay strips the '-' seams first.
     expect((event.extra as { chunkEncoding?: string }).chunkEncoding).toBe('base64-3');
     expect(event.extra.chunkBlocks.map((b: string) => Buffer.from(b.replace(/-/g, ''), 'base64').toString('utf8')).join('')).toBe('LOG[THE LOG BODY]');
-    // Durable: the same bundle sits in the OTA-1504 slot with its id on the event.
-    const pending = await readPendingBundle();
-    expect(pending).not.toBeNull();
-    expect(pending!.attempts).toBe(1);
-    expect(event.message).toContain(`#${pending!.id}`);
+    // Durable: the bundle went to the OTA-1504 slot BEFORE the send, with its id
+    // on the event — and, ⚠ OTA-1682, a DELIVERED send clears it again (the
+    // transport's refusals are in the verdict now, so delivered is receipt; the
+    // re-send that used to follow every boot was the duplicate the owner watched
+    // land three times). The line names the id and says it was cleared.
+    const id = /#([a-z0-9]+) cleared from disk/.exec(line ?? '')?.[1];
+    expect(id).toBeTruthy();
+    expect(event.message).toContain(`#${id}`);
+    expect(await readPendingBundle()).toBeNull();
   });
 
   it("⚠⚠ sasmooch's characters pass the same gate", async () => {

@@ -55,7 +55,7 @@ import { buildSaveSnapshot, stampSaveExport } from './saveSnapshot';
 import { loadCrashLedger, settleCrashWrites } from './crashLedger';
 import { reportingEnabled } from './crashReporter';
 import { ownerToolsUnlocked } from './ownerTools';
-import { persistPendingBundle } from './pendingBundle';
+import { persistPendingBundle, clearPendingBundle } from './pendingBundle';
 // ⚠⚠⚠ OTA-1519 — inline and attachment-free, like every other send now.
 import { sendGameLogInline, describeInlineSend, type DiagnosticsBundle } from './sentryTransport';
 
@@ -117,8 +117,11 @@ export async function maybeAutoQueueCrashBundle(
     // unattended after a crash.
     const chunk = await sendGameLogInline(bundle.log, pending?.id ?? `auto${newest.toString(36)}`);
     const ok = chunk.delivered;
+    // ⚠ OTA-1682 — delivered means done; the file is for the send that did NOT go.
+    if (ok) await clearPendingBundle();
     return `send-log: crash on record (${new Date(newest).toISOString()}) — game log pushed automatically, `
-      + `${ok ? 'delivered to Sentry' : describeInlineSend(chunk)}${pending ? `, kept on disk as #${pending.id}` : ''}`;
+      + `${ok ? 'delivered to Sentry' : describeInlineSend(chunk)}`
+      + `${pending ? (ok ? `, #${pending.id} cleared from disk` : `, kept on disk as #${pending.id}`) : ''}`;
   } catch {
     return null; // the auto path must never become a slot-load hazard
   }

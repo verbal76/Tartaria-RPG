@@ -24,7 +24,7 @@
 // one."* A second report on an identical log is a duplicate issue carrying
 // identical evidence, and the fingerprint below is the whole enforcement.
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { persistPendingBundle } from './pendingBundle';
+import { persistPendingBundle, clearPendingBundle } from './pendingBundle';
 import { sendGameLogInline, describeInlineSend } from './sentryTransport';
 import { reportingEnabled, crashReportDsn } from './crashReporter';
 import { buildBasicDeviceSummary } from './aboutSummary';
@@ -163,8 +163,18 @@ export async function composeAndSendBugReport(args: {
   /** OTA-1672. Absent means the described report, which is what every caller
    *  before this OTA meant — so old call sites keep their exact behaviour. */
   mode?: BugReportMode;
+  /** ⚠⚠ OTA-1682 — WHOSE LOG A GENERAL REPORT CARRIES. The log is per slot
+   *  (`tartaria.gamelog.<slot>.v2`); there is no global ring. So "General bug
+   *  — no character" was arriving with nothing under CHARACTER LOG, twice on
+   *  09-05 with the owner's own word "Log" as the whole description. The modal
+   *  already resolves the character a full push would send (the one being
+   *  played, else the newest save); a general report rides the same answer and
+   *  the report says whose it is. `slot` still wins when the player picked one. */
+  logSlot?: SlotSummary | null;
 }): Promise<BugReportOutcome> {
   const { slot } = args;
+  const logSource: SlotSummary | null = slot ?? args.logSlot ?? null;
+  const logBorrowed = !slot && logSource !== null;
   const mode: BugReportMode = args.mode ?? (slot ? 'character' : 'general');
   // ⚠ OTA-1672 — A FULL-LOG PUSH HAS NO DESCRIPTION AND IS NOT ASKED FOR ONE.
   // Owner: *"when I want to send a full log … there really shouldn't be a text
@@ -212,11 +222,16 @@ export async function composeAndSendBugReport(args: {
        worth sending, and this line says which of the two it was to a reader. */
   }
 
-  let logBlock = '(no character selected — no log attached)';
+  // ⚠ OTA-1682 — this line is only ever true of a device with NO character. A
+  // general report with a character on the device carries that character's log
+  // (see `logSlot` above); the old "(no character selected — no log attached)"
+  // was describing a choice the player could not see they were making.
+  let logBlock = '(no character on this device — no log to attach)';
   let rawLog = '';
-  if (slot) {
+  if (logSource) {
+    const src = logSource;
     try {
-      const raw = await readSlotLog(slot.slotId);
+      const raw = await readSlotLog(src.slotId);
       rawLog = raw ?? '';
       if (raw && raw.length > 0) {
         const allLines = raw.split('\n').filter((l) => l.length > 0);
@@ -235,10 +250,10 @@ export async function composeAndSendBugReport(args: {
           : `(Newest entry at top — full log, ${accLines.length} entries)`;
         logBlock = `${header}\n\n${accLines.join('\n')}`;
       } else {
-        logBlock = `(log empty for ${slot.playerName})`;
+        logBlock = `(log empty for ${src.playerName})`;
       }
     } catch {
-      logBlock = `(log read failed for ${slot.playerName})`;
+      logBlock = `(log read failed for ${src.playerName})`;
     }
   }
 
@@ -251,6 +266,8 @@ export async function composeAndSendBugReport(args: {
     slot ? `Race: ${raceLabel(slot.raceId)}` : null,
     slot ? `Location: ${locationLabel(slot.locationId)}` : null,
     slot ? `HP: ${slot.hp}/${slot.hpMax}${slot.dead ? ' (FALLEN)' : ''}` : null,
+    // OTA-1682 — a borrowed log says so, right under the character line.
+    logBorrowed && logSource ? `Log from: ${logSource.playerName} (the character last played — not selected)` : null,
     ``,
     `--- DESCRIPTION ---`,
     description,
@@ -360,6 +377,11 @@ export async function composeAndSendBugReport(args: {
   } catch {
     ok = false;
   }
+
+  // ⚠⚠⚠ OTA-1682 — DELIVERED MEANS DONE. The durable file exists for the send
+  // that did not go; leaving it behind a delivered one is what re-sent the
+  // 01:50:49 report at 02:23 and 02:27. See pendingBundle.ts's header.
+  if (ok) await clearPendingBundle();
 
   // ⚠ THE MARK IS STORED ON A QUEUED SEND TOO, deliberately. The bundle is on
   // disk and the boot retry owns it from here, so letting a second identical

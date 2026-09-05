@@ -43,8 +43,16 @@ interface Props {
   activeSlotId?: string | null;
   onCancel: () => void;
   /** Called when the player taps SEND. slot is null when the
-   *  player chose "General — no character". */
-  onSend: (args: { slot: SlotSummary | null; description: string; mode: BugReportMode }) => void;
+   *  player chose "General — no character".
+   *  ⚠ OTA-1682 — `logSlot` is the character whose log rides along when no
+   *  slot was picked: the one being played, else the newest save — the same
+   *  answer the full-log row names. A general report used to carry no log. */
+  onSend: (args: {
+    slot: SlotSummary | null;
+    logSlot?: SlotSummary | null;
+    description: string;
+    mode: BugReportMode;
+  }) => void;
 }
 
 /** ⚠⚠⚠ OTA-1672 — the sentinel for the third choice. Owner: *"it should just say
@@ -97,7 +105,7 @@ export function BugReportModal({ visible, slots, activeSlotId, onCancel, onSend 
     const slot = selectedId === 'general'
       ? null
       : slots.find((s) => s.slotId === selectedId) ?? null;
-    onSend({ slot, description: description.trim(), mode: slot ? 'character' : 'general' });
+    onSend({ slot, logSlot: fullLogSlot, description: description.trim(), mode: slot ? 'character' : 'general' });
   };
 
   return (

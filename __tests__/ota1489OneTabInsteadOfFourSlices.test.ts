@@ -153,7 +153,9 @@ describe('OTA-1489 — the button is honest about its work', () => {
     const body = BUTTON.slice(BUTTON.indexOf('export async function composeAndSendBugReport'));
     expect(body).toContain('buildBasicDeviceSummary()');
     expect(body).toContain('buildVoiceSummary()');
-    expect(body).toContain('readSlotLog(slot.slotId)');
+    // ⚠ OTA-1682 — the log source is `src` (the picked slot, else the last-played
+    // one a general report borrows); the derivation is the same readSlotLog.
+    expect(body).toContain('readSlotLog(src.slotId)');
     // And a failure is SHOWN rather than swallowed. The clipboard fallback it
     // used to name is gone with the clipboard route, so the surviving claim is
     // the stronger one: every outcome carries words for the player.

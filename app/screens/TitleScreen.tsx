@@ -561,6 +561,7 @@ export function TitleScreen() {
   // should: that one is a short human request to a person, not a payload.
   const sendBugReport = async (args: {
     slot: SlotSummary | null;
+    logSlot?: SlotSummary | null; // OTA-1682 — whose log a general report carries
     description: string;
     mode: BugReportMode;
   }): Promise<void> => {

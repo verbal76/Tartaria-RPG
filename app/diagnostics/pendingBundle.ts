@@ -34,11 +34,18 @@
  * dependency on every build (ModelDownloader), so a document-directory file
  * costs nothing new.
  *
- * ⚠ DUPLICATES ARE THE DESIGN, NOT A BUG. A bundle that DID arrive and is
- * re-sent next boot lands as a second event with the same `bundleId` tag and
- * `#id` message suffix; the relay commits both and the reader dedupes on the
- * id. Wasting a few uploads is nothing next to losing the one bundle that
- * held the evidence — which is what actually happened, four times, tonight.
+ * ⚠ DUPLICATES WERE THE DESIGN — UNTIL OTA-1682. A bundle that DID arrive was
+ * re-sent next boot anyway, landing as a second event with the same `bundleId`
+ * tag, because flush()'s yes had been caught lying on the attachment path and
+ * nothing client-side could confirm receipt. OTA-1519 moved every sender to
+ * the inline path and proved flush honest there; OTA-1682 found the one way
+ * that path still lied (the transport's thirty-deep buffer refusing parts
+ * `captureEvent` had accepted) and put THAT in the verdict too. So `delivered`
+ * is receipt enough now, and a delivered bundle is CLEARED — at the button, at
+ * the boot retry, on the crash auto-push. The owner's 09-05 log showed what
+ * the old rule cost: #mtn91pdwbmaq landed on four boots, #mtnaj1w6w78b on
+ * three, the 01:50:49 title-screen report at 02:23 and 02:27 again. The retry
+ * is back to being what it was for: the bundle that did NOT go.
  *
  * ⚠ LATEST WINS. One slot, overwritten on every tap. The owner's taps are
  * strictly-growing pictures of the same device (the log accumulates), so the
@@ -220,11 +227,19 @@ export async function retryPendingBundleAtBoot(): Promise<string | null> {
     const ok = chunk.delivered;
     const took = Date.now() - startedAt;
     const how = ok ? 'delivered to Sentry' : `${describeInlineSend(chunk)} (after ${took}ms)`;
+    // ⚠⚠⚠ OTA-1682 — A DELIVERED BUNDLE IS DONE. See the header: with the
+    // transport's refusals in the verdict, `delivered` is receipt, and the
+    // re-send that used to follow it every boot was the duplicate the owner
+    // watched land three and four times.
+    if (ok) {
+      await clearPendingBundle();
+      return `send-log: bundle #${p.id} attempt ${attempt}/${MAX_SEND_ATTEMPTS} ${how} — cleared from disk`;
+    }
     if (attempt >= MAX_SEND_ATTEMPTS) {
       await clearPendingBundle();
       return `send-log: bundle #${p.id} attempt ${attempt}/${MAX_SEND_ATTEMPTS} ${how} — final try, cleared`;
     }
-    return `send-log: bundle #${p.id} attempt ${attempt}/${MAX_SEND_ATTEMPTS} ${how}${ok ? '' : ' — kept for next boot'}`;
+    return `send-log: bundle #${p.id} attempt ${attempt}/${MAX_SEND_ATTEMPTS} ${how} — kept for next boot`;
   } catch {
     return null; // the retry is best-effort; the file stays for the next boot
   }

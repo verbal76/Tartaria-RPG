@@ -39,8 +39,15 @@ import { OTA_BUILD_ID, DISPLAY_VERSION } from '../buildInfo';
 
 /** Minimal shape of the bits of the SDK this file uses. Declared rather than
  *  imported so the type does not drag the module into the bundle graph. */
+/** ⚠⚠ OTA-1682 — the client's hook surface, the ONLY place a transport refusal
+ *  is visible from JS. `captureEvent` never throws for one; see sendGameLogInline. */
+interface SentryClientLike {
+  on?: (hook: 'afterSendEvent', cb: (event: Record<string, unknown>, resp: unknown) => void) => (() => void) | void;
+}
+
 interface SentryLike {
   init: (opts: Record<string, unknown>) => void;
+  getClient?: () => SentryClientLike | undefined;
   // ⚠ OTA-1489 — the optional second argument is the SDK's event HINT; its
   // `attachments` array is how a whole game log rides along with one event.
   // Same runtime function, wider type — crash records keep calling it 1-arg.
@@ -143,6 +150,42 @@ interface SentryLike {
  * instead of costing another round of guessing.
  */
 let lastFlushNote: string | null = null;
+
+/**
+ * ⚠⚠⚠ OTA-1682 — THE QUEUE WAS THIRTY DEEP, AND THE OWNER'S LOG WAS FORTY-THREE.
+ *
+ * Bundle #mtnrscwz8 (09-05, the first whole log under OTA-1679) went out in 42
+ * parts. Parts 1–29 reached Sentry; 30–42 — the last hour and a quarter of play
+ * — never did, after three re-pulls, and the device had logged DELIVERED 42/42.
+ * One beacon plus twenty-nine parts is THIRTY envelopes.
+ *
+ * `@sentry/react-native` 6.10 defaults `maxQueueSize` to 30, and that one number
+ * is BOTH the JS promise buffer in front of the native bridge (`makePromiseBuffer
+ * (bufferSize)`) AND the native SDK's own send queue (RNSentryModuleImpl forwards
+ * it to `setMaxQueueSize`). The inline loop below captures every part in one
+ * synchronous pass, so the bridge has answered for none of them when the
+ * thirty-first arrives; the buffer refuses it — `SentryError('Not adding Promise
+ * because buffer limit was reached.')` — and `captureEvent` DOES NOT THROW. The
+ * refusal surfaces only through the client's `afterSendEvent` hook, where the
+ * error object arrives as the "response". `report.sent` counted 42, flush drained
+ * the thirty that were in the buffer and said yes, and `delivered` was a lie told
+ * by arithmetic that never saw the door.
+ *
+ * Two repairs. The queue is sized for the job — the log ring is 800KB, about 85
+ * parts at the 1679 packing; 200 covers it twice over on both sides of the
+ * bridge. And the refusals are COUNTED, per bundle, through the hook, and folded
+ * into `delivered`: a refused part is a NOT DELIVERED send, kept on disk for the
+ * boot retry, and the line names the parts that were turned away.
+ */
+export const SEND_QUEUE_SIZE = 200;
+
+/** True when the transport's answer to a send was the refusal itself — the
+ *  SDK's `sendEnvelope` resolves with the rejection reason rather than
+ *  rethrowing, so a refused envelope "responds" with an Error. A native accept
+ *  answers `{}`; the fetch transport answers `{ statusCode, headers }`. */
+function transportRefused(resp: unknown): boolean {
+  return resp instanceof Error;
+}
 
 async function flushWithRealDeadline(s: SentryLike, ms: number): Promise<boolean> {
   lastFlushNote = null;
@@ -310,6 +353,8 @@ export function installSentryIfAvailable(): boolean {
       // The ledger is the source of truth for what happened; Sentry's own
       // breadcrumb collection would duplicate it and disagree at the edges.
       maxBreadcrumbs: 0,
+      // ⚠⚠⚠ OTA-1682 — THE QUEUE WAS THIRTY DEEP. See SEND_QUEUE_SIZE.
+      maxQueueSize: SEND_QUEUE_SIZE,
       environment: productLine(),
       // ⚠⚠⚠ OTA-1592 — THE EVENTS FINALLY SAY WHICH BUILD SENT THEM. All 356
       // delivered events carried `release: null · dist: null`, so the repo link
@@ -976,6 +1021,18 @@ export interface InlineSendReport extends ChunkedSendReport {
    * path, was true for two days while nothing arrived. Call sites gate on THIS.
    */
   delivered: boolean;
+  /** ⚠⚠⚠ OTA-1682 — parts of THIS bundle the transport turned away after
+   *  `captureEvent` had accepted them (the thirty-deep buffer, or any queue
+   *  overflow the SDK grows later). Counted through the client hook; zero when
+   *  the hook is unavailable, which `transportWatched` says. Optional only so
+   *  the pre-1682 fixtures in older suites still type; the sender always sets
+   *  both. */
+  transportRefused?: number;
+  /** Which part numbers were refused, for the line. */
+  transportRefusedParts?: string[];
+  /** Whether the hook was available to count with. `false` means the count
+   *  above is UNOBSERVED, not zero — the line says which. */
+  transportWatched?: boolean;
 }
 
 export async function sendGameLogInline(
@@ -986,6 +1043,7 @@ export async function sendGameLogInline(
   const report: InlineSendReport = {
     sent: 0, parts: 0, chars: 0, timings: [], threwAt: null, flushNote: null,
     stopped: null, bundleId, beaconOut: false, flushSaid: 'no-flush', delivered: false,
+    transportRefused: 0, transportRefusedParts: [], transportWatched: false,
   };
   if (!reportingEnabled()) {
     report.stopped = 'crash reporting is switched off on this device';
@@ -1007,6 +1065,30 @@ export async function sendGameLogInline(
   const packed = packLogIntoParts(text);
   const total = packed.length;
   report.parts = total;
+
+  // ⚠⚠⚠ OTA-1682 — WATCH THE DOOR. `captureEvent` accepting a part means the
+  // SDK took it into ITS pipeline; whether the transport's buffer then took it
+  // is answered only here, per event, after the fact. Only THIS bundle's inline
+  // parts are counted — the beacon and any crash record sharing the queue are
+  // not this send's refusals. See SEND_QUEUE_SIZE for the night this was found.
+  let unhook: (() => void) | undefined;
+  try {
+    const client = s.getClient?.();
+    if (client && typeof client.on === 'function') {
+      const off = client.on('afterSendEvent', (event, resp) => {
+        const tags = (event as { tags?: Record<string, string> }).tags;
+        if (!tags || tags.bundleId !== bundleId || tags.kind !== 'player-log-inline') return;
+        if (transportRefused(resp)) {
+          report.transportRefused = (report.transportRefused ?? 0) + 1;
+          report.transportRefusedParts?.push(tags.part ?? '?');
+        }
+      });
+      if (typeof off === 'function') unhook = off;
+      report.transportWatched = true;
+    }
+  } catch {
+    // An SDK without hooks: the count stays unobserved, and the line says so.
+  }
 
   // ⚠⚠⚠ THE BEACON. Deliberately the smallest thing this app can send, and
   // shaped EXACTLY like a crash record — one event, no hint, no attachment —
@@ -1090,17 +1172,31 @@ export async function sendGameLogInline(
   // share one queue anyway. Accepted-by-the-SDK is necessary; flushed is what
   // makes it sufficient. An SDK too old to offer flush keeps the old
   // queue-and-hope answer rather than being called a failure.
+  // ⚠⚠⚠ OTA-1682 — the hook comes down BEFORE the verdict is read. Refusals are
+  // synchronous with the capture (the buffer answers in the same tick), so every
+  // one this send will ever get has been counted by the time the flush returns.
+  try { unhook?.(); } catch { /* nothing to take down */ }
   report.delivered = report.sent === report.parts
     && report.parts > 0
-    && report.flushSaid !== 'no';
+    && report.flushSaid !== 'no'
+    && report.transportRefused === 0;
   return report;
 }
 
 /** One line for the device log — the experiment's result, readable at a glance. */
 export function describeInlineSend(r: InlineSendReport): string {
   if (r.stopped) return `send-log: #${r.bundleId} — NOT ATTEMPTED: ${r.stopped}`;
+  // ⚠ OTA-1682 — the door's answer rides the line: "took every part", or the
+  // parts it turned away by number, or "unobserved" on an SDK without the hook.
+  const refused = r.transportRefused ?? 0;
+  const door = r.transportWatched !== true
+    ? 'transport unobserved'
+    : refused === 0
+      ? 'transport took every part'
+      : `transport REFUSED ${refused} (parts ${(r.transportRefusedParts ?? []).join(',')})`;
   return `send-log: #${r.bundleId} — ${r.delivered ? 'DELIVERED' : 'NOT DELIVERED'} `
     + `(inline, no attachments): beacon ${r.beaconOut ? 'out' : 'FAILED'}, `
     + `${r.sent}/${r.parts} parts accepted (${r.chars} chars) — flush said ${r.flushSaid}`
-    + `${r.flushNote ? ` (${r.flushNote})` : ''}${r.threwAt ? ` — THREW at ${r.threwAt}` : ''}`;
+    + `${r.flushNote ? ` (${r.flushNote})` : ''}, ${door}`
+    + `${r.threwAt ? ` — THREW at ${r.threwAt}` : ''}`;
 }

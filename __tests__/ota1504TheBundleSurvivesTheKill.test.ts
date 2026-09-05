@@ -15,6 +15,11 @@
 // flush() answered, because its yes has been caught lying and no client-side
 // signal is receipt.
 //
+// ⚠ OTA-1682 amended the last clause: on the inline path, with the transport's
+// own refusals counted into `delivered`, that verdict IS receipt, and a
+// delivered bundle is cleared instead of re-sent. The retry keeps the bundle
+// that did not go. See the re-anchored pin below.
+//
 // ⚠⚠ AND THE DEATHS THEMSELVES WERE MISDATED. The native-death record carried
 // the ACTION's timestamp (`crumb.at`), not the last sign of life (`phaseAt`).
 // His 15:08 record wore `ctx-release (+2,639,101ms)` — the action was 44
@@ -180,16 +185,23 @@ describe('OTA-1504 — the bundle is on disk before anything is sent', () => {
     expect(mockOps.indexOf('send')).toBeGreaterThan(mockOps.indexOf('write'));
   });
 
-  it('⚠⚠⚠ A FLUSH THAT ANSWERS TRUE STILL KEEPS THE FILE — flush()===true has been caught lying', async () => {
+  it('⚠⚠⚠ A DELIVERED RETRY CLEARS THE FILE — the contract OTA-1682 reversed, on purpose', async () => {
+    // ⚠ THIS PIN USED TO SAY THE OPPOSITE: "a flush that answers true still
+    // keeps the file — flush()===true has been caught lying". It had, on the
+    // ATTACHMENT path, in August. OTA-1519 moved every sender to the inline
+    // path and proved flush honest there; OTA-1682 found the one way that path
+    // still lied (the transport's thirty-deep buffer refusing parts captureEvent
+    // had accepted) and put the refusal count into `delivered`. With that,
+    // delivered is receipt, and the re-send that followed every delivered
+    // bundle each boot was the duplicate the owner watched land three and four
+    // times on 09-05. The retry is for the bundle that did NOT go.
     await armed();
     mockSentry.flush = jest.fn().mockResolvedValue(true);
     plant({ attempts: 1 });
     const line = await retryPendingBundleAtBoot();
-    // ⚠ OTA-1519 — 'delivered' now means accepted AND flush-confirmed, so the
-    // word changed with the meaning. The contract pinned here is unchanged:
-    // a success still KEEPS the file, because a claim is not a receipt.
     expect(line).toContain(`attempt 2/${MAX_SEND_ATTEMPTS} delivered to Sentry`);
-    expect((await readPendingBundle())!.attempts).toBe(2); // kept — next boot goes again
+    expect(line).toContain('cleared from disk');
+    expect(await readPendingBundle()).toBeNull();
   });
 
   it('⚠⚠ the re-send carries the SAME id and its attempt number, so the relay reader can dedupe', async () => {
@@ -218,7 +230,10 @@ describe('OTA-1504 — the bundle is on disk before anything is sent', () => {
     await armed();
     plant({ attempts: MAX_SEND_ATTEMPTS - 1 });
     const line = await retryPendingBundleAtBoot();
-    expect(line).toContain('final try, cleared');
+    // ⚠ OTA-1682 — a WIN now clears on its own ("cleared from disk"); the
+    // "final try, cleared" wording is the LOSS on the last attempt. Either way
+    // the claim holds: the file is gone and the retrying ends.
+    expect(line).toMatch(/cleared from disk|final try, cleared/);
     // ⚠ OTA-1519 — beacon + one inline part. The attempt ACCOUNTING this pins
     // (the last try clears the file, win or lose) is untouched.
     expect(mockSentry.captureEvent).toHaveBeenCalledTimes(2);
