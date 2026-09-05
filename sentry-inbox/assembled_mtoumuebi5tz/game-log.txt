@@ -1,0 +1,756 @@
+Bug Report — Cheddar Bob · (2026-09-05-1700-the-world-runs-while-you-learn) · Hi
+=== TARTARIA BUG REPORT ===
+Submitted: 2026-09-05T20:42:20.386Z
+Character: Cheddar Bob
+Slot ID: slot_mtdifdmg_g2si12
+Race: Reclaimers
+Location: Voronov
+HP: 30/51
+
+--- DESCRIPTION ---
+Hi
+
+--- DEVICE / BUILD ---
+Device
+  Name: Pixel 10 Pro XL
+  Platform: android 37
+  Hermes: yes
+  Locale: en-US
+  Timezone: America/New_York
+  Screen: window 443×986 / screen 443×986 @ 2.4375x density
+  Captured at: 2026-09-05T20:42:20.195Z
+
+Install
+  App ID: com.hotatticgames.tartarprim
+  App version: 4.32.11
+  APK build version: 2.4.1
+  APK build: 293
+  AAB: (build 293)
+  OTA: (2026-09-05-1700-the-world-runs-while-you-learn)
+  Boot stage: qwen:done
+
+ML runtime health
+  Status: active (no crashes detected)
+  Crash count: 0
+  Last init attempt: 2026-09-05T20:34:09.818Z
+  Last init success: 2026-09-05T20:34:14.141Z
+  Crashes-before-disable threshold: 2
+  Qwen completion guard: clean (no completion crashes)
+  Qwen kernel variant: rnllama_v8_2_fp16_dotprod
+  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k
+  Voice (TTS) guard: clean (no voice crashes on this build)
+Save-load health
+  Status: clean (no load-crash flags)
+Last JS crash
+  Status: none recorded
+This launch
+  Life: bmtou3vcdth · started 2026-09-05T20:27:35.149Z
+  Cold start — this boot did not follow an OTA apply
+Crash ledger — 10 recorded (newest last)
+  ⚠⚠ 9 of 10 process kills landed on an OTA-apply boot
+  • 2026-09-05T01:50:40.430Z (1132m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1678-the-chase-gets-harder · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 891ms into the action · alive 4136ms after it
+      launch: died 5071ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 162ms earlier via boot-front
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-05T02:27:20.651Z (1095m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1679-the-part-fits-the-wire · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 974ms into the action · alive 0ms after it
+      launch: died 1047ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 254ms earlier via boot-front
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-05T04:22:19.915Z (980m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1681-the-outpost-lets-go · stage homework-done
+      Process died with no orderly exit while: tap "craft"
+      doing: tap "craft" · room voronov · screen exploration
+      last checkpoint: homework-done · 13450ms into the action · alive 0ms after it
+      launch: died 515390ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 154ms earlier via boot-front
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o1/r0/l1/p1/dn0
+  • 2026-09-05T08:31:21.524Z (731m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1687-the-mission-layer-remembers-itself · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 870ms into the action · alive 0ms after it
+      launch: died 904ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 187ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-05T13:16:47.707Z (446m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1690-the-cap-speaks · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 782ms into the action · alive 10351ms after it
+      launch: died 11166ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 208ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-05T16:18:32.776Z (264m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1696-the-fight-sheds-its-passengers · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 1898ms into the action · alive 0ms after it
+      launch: died 1965ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 413ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-05T17:22:04.013Z (200m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1698-the-counter-remembers-the-question · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 2285ms into the action · alive 0ms after it
+      launch: died 2341ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 222ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-05T18:28:33.919Z (134m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1699-every-hunt-walks-the-four-roads · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 772ms into the action · alive 0ms after it
+      launch: died 811ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 163ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-05T19:15:20.497Z (87m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1699-every-hunt-walks-the-four-roads · stage mid-action
+      Process died with no orderly exit while: tap "missions"
+      doing: tap "missions" · room voronov · screen exploration
+      launch: died 842671ms into the process · not an OTA-apply boot
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-05T20:20:16.991Z (22m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1700-the-world-runs-while-you-learn · stage rendered
+      Process died with no orderly exit while: tap "◈ LORE"
+      doing: tap "◈ LORE" · room voronov · screen exploration
+      last checkpoint: rendered · 5887ms into the action · alive 3237ms after it
+      launch: died 30204ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 204ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+Crash delivery: ON — reports go to Sentry when you crash.
+Runtime pressure
+  ⚠⚠ LAST BOOT DIED MID-ACTION — no orderly exit was recorded.
+     Last thing the app did: tap "◈ LORE"
+     Where: voronov on exploration screen
+     Last seen alive: 2026-09-05T20:20:13.754Z (22 min before this boot — the kill landed somewhere in that gap)
+     Last checkpoint reached: rendered (+5887ms after it)
+     ⚠ The disk log's tail is UNRELIABLE for that session — batched lines
+       die in memory when the JS thread wedges. Trust this line over it.
+  Memory warnings: none this session
+  ⚠ Freeze watch: 1 render stall (worst: frames quiet 2125ms while logic ran)
+  ⚠ Worst logic stall: 2460ms
+  ⚠ Native queue: worst wait 0.0s · 0 job kinds queued >3s · worst 12.0ms/prompt-token
+     The JS thread was healthy and the native model queue was not. A stall the freeze watch above is structurally blind to.
+  App state trail: background → active
+Model contexts
+  Live now: 1
+  Opened: 1 · Released: 0 · Peak live: 1
+  Narration engine: ready
+
+--- VOICE ---
+  TTS enabled: no
+  Engine: bundled
+  Rate: 1.05 · Pitch: 1.00
+  System voice id: (default)
+  Kokoro voice: am_michael
+  Kokoro state: idle
+
+--- INVENTORY ---
+Inventory (Great Scott)
+  HP: 59/59  Stamina: 19/19  TC: 255  Corruption: 15
+  Pack: 105 distinct rows / 386 total
+
+Weapons (11)
+  Aetheric Crystal Blade (Uncommon, 1d8 slashing, dur 32/33, [weapon,blade,melee,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Searing Bone Crossbow (Uncommon, 2d6 piercing, +1d4 burn coat, dur 9/10, equipped:off, [weapon,ranged,crossbow,bolt-caster,loot])
+    actions: equip:main, unequip:off, use, repair
+  Bone Crossbow (Uncommon, 2d6 piercing, dur 10/10, [weapon,ranged,crossbow,bolt-caster,loot])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bone Crossbow (Uncommon, 2d6 piercing, dur 10/10, [weapon,ranged,crossbow,bolt-caster,loot])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bone Crossbow (Uncommon, 2d6 piercing, dur 10/10, [weapon,ranged,crossbow,bolt-caster,loot])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Searing Cantor's Tuning Fork (Legendary, +1d4 burn coat, dur 10/50, 2d6+2 aetheric, unique, [core_guardian_set,aether_born,exotic,sonic,armor_ignore_partial])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Cold-Iron Rosary (Legendary, dur 45/45, 1d8+3 aetheric, unique, [core_guardian_set,aether_born,exotic,corruption_damage,aether_drain])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Searing Knot-Grained Gouge (Legendary, +1d4 burn coat, dur 43/45, equipped:main, 2d8 bludgeoning, unique, [fused,unique])
+    actions: equip:off, unequip:main, use(off), repair
+  Litany Maul (Legendary, dur 75/75, 1d12+2 bludgeoning, unique, [core_guardian_set,aether_born,blunt,two_handed,stagger_chance])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Reaver's Greatsword (Legendary, 2d10 slashing, dur 50/50, [weapon,melee,two_handed,blade,reaver])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Resonant Talon (Legendary, dur 45/45, 2d8 aetheric, resist:aetheric, unique, [fused,unique,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+
+Armor (15)
+  Anvil-Struck Footguards (Legendary, dur 45/45, AC+5, resist:degradation, unique, [fused,unique,degradation])
+    actions: equip:feet, use, scrap, drop
+  Burl Aegis (Legendary, dur 42/45, equipped:chest, AC+5, unique, [fused,unique])
+    actions: unequip:chest, repair
+  Cantor's Robe (Legendary, dur 55/55, AC+4, resist:aetheric, unique, [core_guardian_set,aether_born,ac:4,chest,light])
+    actions: equip:chest, use, scrap, drop
+  Choir-Bound Boots (Legendary, dur 44/45, equipped:feet, AC+5, resist:aetheric, unique, [fused,unique,aetheric])
+    actions: unequip:feet, repair
+  Forge-Black Cowl (Legendary, dur 42/45, equipped:head, AC+5, resist:degradation, unique, [fused,unique,degradation])
+    actions: unequip:head, repair
+  Ichor-Slick Casque (Legendary, dur 45/45, AC+5, resist:poison, unique, [fused,unique,poison])
+    actions: equip:head, use, scrap, drop
+  Litany Greaves (Legendary, dur 85/85, AC+3, unique, [core_guardian_set,aether_born,ac:3,legs,heavy])
+    actions: equip:legs, use, scrap, drop
+  Matriarch's Aegis (Legendary, dur 60/60, AC+2, resist:aetheric, unique, [core_guardian_set,aether_born,ac:2,head,will_save])
+    actions: equip:head, use, scrap, drop
+  Reaver's Pauldron ×3 (Legendary, dur 40/40, AC +5 · Resists: slashing, bludgeoning, burn · STR +5 · DEX +5, [armor,chest,plate,reaver,boss])
+    actions: equip:chest, use, scrap, drop
+  Scrap-Forged Breastplate (dur 16/16, AC +2 · Resists: slashing · STR +2, [armor,chest,plate,reclaimers])
+    actions: equip:chest, use, scrap, drop
+  Spore-Crusted Tassets (Legendary, dur 45/45, equipped:legs, AC+5, resist:poison, unique, [fused,unique,poison])
+    actions: unequip:legs
+  Stone-Forged War Armor (Uncommon, dur 46/46, AC +2 · Resists: slashing · STR +2, [armor,chest,plate,mud_golems])
+    actions: equip:chest, use, scrap, drop
+  Traveler's Cloak (dur 15/17, AC +2 · DEX +2 · STE +2 · Resists: burn (coated), [armor,cloak,outer,unknowing_masses,stealth])
+    actions: equip:cloak, use, scrap, repair, drop
+  Vest of the Forgotten Hero (Legendary, dur 65/65, AC +4 · Resists: slashing, cold, burn · STR +3, [armor,chest,plate,reclaimers,loot])
+    actions: equip:chest, use, scrap, drop
+  Wanderer's Worn Gauntlets (dur 18/18, AC +2 · STR +2 · Resists: burn (coated), [armor,hands,gauntlets,unknowing_masses])
+    actions: equip:hands, use, scrap, drop
+
+Dog Armor (4)
+  ◆ Aetheric Padded Vest (Rare, dur 28/28, AC +3 (dog) · Bites back: 1 aetheric to whatever hits the dog, [dog_armor,vest,aether,padded,loot])
+    actions: scrap, save-for-fusion, drop
+  ◆ Burlap Vest (dur 18/18, AC +1 (dog), [dog_armor,vest,burlap,loot,improvised])
+    actions: scrap, save-for-fusion, drop
+  Pith-Cored Saddle (Legendary, dur 45/45, AC+5, unique, [fused,unique])
+    actions: scrap, drop
+  Tendon-Lashed Saddle (Legendary, dur 45/45, AC+5, resist:poison, unique, [fused,unique,poison])
+    actions: scrap, drop
+
+Amulets & Rings (2)
+  Aetheric Locket ×2 (dur 30/30, equipped:amulet, WIS +1 · Resists aetheric: −9% incoming damage of each, on top of armour, [detection,amulet,relic])
+    actions: unequip:amulet
+  Noble's Signet Ring (dur 8/8, equipped:ring, [ring,relic,tartarian])
+    actions: unequip:ring
+
+Consumables (3)
+  Blueberries ×3 (Uncommon, [food,foraged,fruit])
+    actions: use(eat), drop
+  Wild Carrot ×3 ([food,foraged,vegetable])
+    actions: use(eat), drop
+  Wild Lettuce ×4 ([food,foraged,leafy])
+    actions: use(eat), drop
+
+Coatings (3)
+  Frost Paste (Uncommon, [potion,weapon_coating,cold,aether,crafted])
+    actions: use(eat), drop
+  Incendiary Paste ×5 (Uncommon, [potion,weapon_coating,burn,aether,crafted])
+    actions: use(eat), drop
+  Smoldering Paste ×19 (Uncommon, [potion,weapon_coating,burn,aether,crafted])
+    actions: use(eat), drop
+
+Tools (7)
+  Aetheric Scanner (Uncommon, [exploration,relic,uncommon,architectural_sentinel])
+    actions: equip:off, use(off), scrap, drop
+  Aetheric Vision Lens ([exploration,relic,common,race_starter,tartarian_giant])
+    actions: equip:lens, use, scrap, drop
+  Climbing Rope ×6 (dur 150/150, [utility,gate,rope])
+    actions: use, drop
+  Hardened Climbing Strap ([exploration,common,race_starter,tartarian_giant,wardrobe])
+    actions: equip:legs, use, scrap, drop
+  Pry Bar (dur 120/120, [tool,pry,utility,metal])
+    actions: scrap, drop
+  Pulse Scanner ([exploration,relic,common,race_starter,architectural_sentinel])
+    actions: equip:off, use(off), scrap, drop
+  Reclaimer's Rope (dur 300/300, [climb,rope,fiber,exploration,tool])
+    actions: use, scrap, drop
+
+Materials (39)
+  Aether Crystal ×6 ([aether,crystal])
+    actions: drop
+  Aether Mud ([mud,aether])
+    actions: drop
+  ◆ Aether Venom ×2 ([trophy,loot,organic,aether,alchemy])
+    actions: scrap, save-for-fusion, drop
+  Aetheric Dust ×2 (Uncommon, [aether])
+    actions: scrap, drop
+  Aetheric Pelt (Rare, [organic,aether,loot])
+    actions: scrap, drop
+  Aetheric Shard ×23 (Uncommon, [aether,crystal])
+    actions: drop
+  Aetheric Sludge ([mud,aether,loot])
+    actions: scrap, drop
+  ◆ Aetheric Teeth ×2 ([trophy,loot,organic,aether,bone])
+    actions: scrap, save-for-fusion, drop
+  Automaton Circuit ([automation,tech,scrap])
+    actions: drop
+  Bent Nail ×16 ([metal,junk,scrap])
+    actions: scrap, drop
+  Big Rock ×4 ([thrown,stone,improvised,heavy])
+    actions: drop
+  Blank Runecaster Casing (Legendary) (Legendary, [runecaster,casing,blank,loot])
+    actions: drop
+  Blank Runecaster Casing (Rare) ×2 (Rare, [runecaster,casing,blank,loot])
+    actions: drop
+  Blank Runecaster Casing (Uncommon) ×3 (Uncommon, [runecaster,casing,blank,loot])
+    actions: drop
+  ◆ Bone Bolt ×8 ([ammunition,bone,loot])
+    actions: save-for-fusion, drop
+  Bone Sliver ×10 ([bone,junk,scrap])
+    actions: drop
+  ◆ Brittle Antler Fork ([trophy,organic])
+    actions: scrap, save-for-fusion, drop
+  ◆ Chipped Phial Neck ([trophy,crystal])
+    actions: scrap, save-for-fusion, drop
+  Clockwork Core (Rare, ♥reserved, [machine,core,loot])
+    actions: release-from-fusion, drop
+  Cloth Scrap ([fiber,junk,scrap])
+    actions: scrap, drop
+  ◆ Clouded Lens Blank ([trophy,crystal])
+    actions: scrap, save-for-fusion, drop
+  ◆ Copper-Threaded Veil (Uncommon, ♥reserved, [trophy,metal,cloth])
+    actions: scrap, release-from-fusion, drop
+  Drone Core ×2 (Uncommon, [automation,aether,loot,bonus])
+    actions: scrap, drop
+  Energy Fragment (Uncommon, [aether,energy])
+    actions: scrap, drop
+  Firewood ([wood,fuel,campfire,weightless])
+    actions: scrap, drop
+  ◆ Flint Core Nodule ×3 ([trophy,stone])
+    actions: scrap, save-for-fusion, drop
+  ◆ Hollow Quill Sheaf (Uncommon, [trophy,organic])
+    actions: scrap, save-for-fusion, drop
+  Mud Fragment ×32 ([mud])
+    actions: drop
+  Mud Poison ([trophy,loot,improvised,organic,alchemy])
+    actions: scrap, drop
+  ◆ Mud-Frosted Bead ([trophy,crystal])
+    actions: scrap, save-for-fusion, drop
+  ◆ River-Worn Pebble Set ([trophy,stone])
+    actions: scrap, save-for-fusion, drop
+  Sentinel Core Plate (Uncommon, [automation,tech,salvage,scrap,throwable])
+    actions: equip:main, equip:off, use(off), drop
+  Shadow Core (Rare, [aether,core,loot])
+    actions: scrap, drop
+  Smooth Stone ×10 ([stone,junk,scrap])
+    actions: scrap, drop
+  Stick ×4 ([wood,improvised,kindling])
+    actions: drop
+  ◆ Stiffened Leather Offcut (Uncommon, [trophy,cloth])
+    actions: scrap, save-for-fusion, drop
+  Veil of Peace ×4 (Uncommon, [aether,relic,loot])
+    actions: scrap, drop
+  Worn Tartarian Coin ×125 ([currency,metal,pre-flood])
+    actions: scrap, drop
+  Wyrm Fang (Legendary, [organic,bone,boss,legendary,loot])
+    actions: scrap, drop
+
+Loot (3)
+  Empty Water Bottle ×3 ([container,water])
+    actions: drop
+  Eternal Dynasty Sigil ×3 ([sigil,eternal_dynasty,keepsake,loot])
+    actions: drop
+  True Tartarian Sigil ([sigil,true_tartarians,keepsake,loot])
+    actions: drop
+
+Quest Items (18)
+  Archivist's Requisition ([quest,mission,improvised])
+    actions: drop
+  Caravan-Master's Pass-Chit ([quest,mission,improvised])
+    actions: drop
+  Caravan-Mother's Grit-Token ([quest,mission,stone])
+    actions: drop
+  Coil of Tartarian Filament ([quest,mission,improvised])
+    actions: drop
+  Dive-Boss's Mooring Chit ([quest,mission,improvised])
+    actions: drop
+  Drakova Core (Legendary, [quest,aetheric_core,main_quest,improvised])
+    actions: drop
+  Drifter's South-Spire Poster ([quest,mission,improvised])
+    actions: drop
+  Engineer's Conduit Chit ([quest,mission,improvised])
+    actions: drop
+  Ferryman's Crossing-Token ([quest,mission,improvised])
+    actions: drop
+  Lodge Survey Warrant ([quest,mission,improvised])
+    actions: drop
+  Nimari Core (Legendary, [quest,aetheric_core,main_quest,improvised])
+    actions: drop
+  Physician's Rot-Ward Mask (dur 12/12, [quest,mission,armor,head])
+    actions: equip:head, use, drop
+  Reeve's Road-Writ ([quest,mission,improvised])
+    actions: drop
+  Sealed Coordinate Tube ([quest,mission,improvised])
+    actions: drop
+  Servants' Mark of Sanction ([quest,mission,improvised])
+    actions: drop
+  Voronov Core (Legendary, [quest,aetheric_core,main_quest,improvised])
+    actions: drop
+  Warden's Dusk-Warrant ([quest,mission,improvised])
+    actions: drop
+  Warden's Tally of the Missing ([quest,mission,improvised])
+    actions: drop
+
+--- CHARACTER LOG (newest first) ---
+(Newest entry at top — showing the most recent 353 of 3585 entries; older trimmed to fit a single email paste)
+
+[2026-09-05T20:27:35.478Z] [debug] voice: bundled idle
+[2026-09-05T20:27:35.478Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-05T20:27:35.457Z] [debug] ota: boot check result = noUpdate
+[2026-09-05T20:27:35.457Z] [debug] ota: Already up to date
+[2026-09-05T20:27:35.265Z] [debug] ota: Checking…
+[2026-09-05T20:27:35.265Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a07333-94e4-740c-8722-e20c968773f5
+[2026-09-05T20:20:07.864Z] [debug] ui: tap "◈ LORE"
+[2026-09-05T20:19:56.961Z] [debug] ui: tap "⚑ WORLD"
+[2026-09-05T20:19:54.283Z] [debug] send-log: crash on record (2026-09-05T19:15:20.497Z) — game log pushed automatically, delivered to Sentry, #mtotty6ieng7 cleared from disk
+[2026-09-05T20:19:53.627Z] [debug] ui: tap "map"
+[2026-09-05T20:19:51.898Z] [debug] boot: life bmtotttybim started 2026-09-05T20:19:46.787Z · FOLLOWED AN OTA APPLY 204ms ago via boot-front · prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)
+[2026-09-05T20:19:51.898Z] [debug] missions: · at=voronov travelTo=tartarian_enclave
+[2026-09-05T20:19:51.898Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc="Halem the Trader" gives=Halem's Broken Compass PAUSED
+[2026-09-05T20:19:51.898Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc="the Mud Monarch courier" gives=Monarch Courier Writ PAUSED
+[2026-09-05T20:19:51.898Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading✗MISSING gives=Temporal Distortion Watch PAUSED
+[2026-09-05T20:19:51.897Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc="the Order envoy" gives=Sealed Reliquary Box PAUSED
+[2026-09-05T20:19:51.897Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc="the True Tartarian agent" gives=Enclave Writ
+[2026-09-05T20:19:51.897Z] [debug] missions: hunt:hunt_bog_dragon stage 6/7 [boss→attack] @broken_steeple needs=Eshren's Name-Token✓ PAUSED
+[2026-09-05T20:19:51.897Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss→attack] @reavers_crest needs=Raider's Ridge-Sign✓ PAUSED
+[2026-09-05T20:19:51.896Z] [debug] ═══ SESSION 2026-09-05T20:19:51.893Z · build 2026-09-05-1700-the-world-runs-while-you-learn · updated from 2026-09-05-1699-every-hunt-walks-the-four-roads · previous entry moments earlier ═══
+[2026-09-05T20:19:51.510Z] [arbiter] The Arbiter looks up as you return. "Welcome back, Cheddar Bob. I wondered when you'd take up the thread again."
+[2026-09-05T20:19:51.510Z] [world] You step back into Voronov. The world waits for your move.
+[2026-09-05T20:19:51.509Z] [debug] OTA session start: 2026-09-05-1700-the-world-runs-while-you-learn.
+[2026-09-05T20:19:51.509Z] [debug] OTA applied: 2026-09-05-1699-every-hunt-walks-the-four-roads → 2026-09-05-1700-the-world-runs-while-you-learn.
+[2026-09-05T20:19:47.005Z] [debug] voice: bundled idle
+[2026-09-05T20:19:47.004Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-05T20:19:46.954Z] [debug] ota: boot check result = noUpdate
+[2026-09-05T20:19:46.954Z] [debug] ota: Already up to date
+[2026-09-05T20:19:46.837Z] [debug] ota: Checking…
+[2026-09-05T20:19:46.837Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a07333-94e4-740c-8722-e20c968773f5
+[2026-09-05T20:19:46.582Z] [debug] ota: Restarting to apply…
+[2026-09-05T20:19:46.581Z] [debug] ota: Saving progress…
+[2026-09-05T20:19:46.463Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-05T20:19:45.288Z] [debug] ota: Checking…
+[2026-09-05T20:19:45.288Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a0729d-5157-725c-ab5b-d381719241e3
+[2026-09-05T19:15:20.495Z] [debug] ui: tap "missions" ⏱+15ms
+[2026-09-05T19:14:28.021Z] [debug] persist sizes(KB): total=368 player=80 wm=200[rooms=114 events=7 memos=1 npcs=7 defeated=1 tags=1 discovered=1] log=85 scene=4
+[2026-09-05T19:01:24.450Z] [debug] send-log: crash on record (2026-09-05T18:28:33.919Z) — game log pushed automatically, delivered to Sentry, #mtor1070wp13 cleared from disk
+[2026-09-05T19:01:22.263Z] [debug] boot: life bmtor0whunq started 2026-09-05T19:01:17.826Z · not an OTA apply (no handoff on disk)
+[2026-09-05T19:01:22.263Z] [debug] missions: · at=voronov travelTo=tartarian_enclave
+[2026-09-05T19:01:22.263Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc="Halem the Trader" gives=Halem's Broken Compass PAUSED
+[2026-09-05T19:01:22.263Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc="the Mud Monarch courier" gives=Monarch Courier Writ PAUSED
+[2026-09-05T19:01:22.262Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading✗MISSING gives=Temporal Distortion Watch PAUSED
+[2026-09-05T19:01:22.262Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc="the Order envoy" gives=Sealed Reliquary Box PAUSED
+[2026-09-05T19:01:22.262Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc="the True Tartarian agent" gives=Enclave Writ
+[2026-09-05T19:01:22.262Z] [debug] missions: hunt:hunt_bog_dragon stage 6/7 [boss→attack] @broken_steeple needs=Eshren's Name-Token✓ PAUSED
+[2026-09-05T19:01:22.262Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss→attack] @reavers_crest needs=Raider's Ridge-Sign✓ PAUSED
+[2026-09-05T19:01:22.261Z] [debug] ═══ SESSION 2026-09-05T19:01:22.259Z · build 2026-09-05-1699-every-hunt-walks-the-four-roads · previous entry moments earlier ═══
+[2026-09-05T19:01:21.713Z] [arbiter] The Arbiter meets your eyes. "Welcome back, Cheddar Bob. The buried country is no place to walk alone. The waste did not sleep while you were gone — blood was spilled and ground changed hands. Read the World for the account."
+[2026-09-05T19:01:21.710Z] [world] You step back into Voronov. The world waits for your move.
+[2026-09-05T19:01:21.710Z] [debug] OTA session start: 2026-09-05-1699-every-hunt-walks-the-four-roads.
+[2026-09-05T18:37:07.402Z] [debug] voice: bundled idle
+[2026-09-05T18:37:07.401Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-05T18:37:07.380Z] [debug] ota: boot check result = noUpdate
+[2026-09-05T18:37:07.379Z] [debug] ota: Already up to date
+[2026-09-05T18:37:07.260Z] [debug] ota: Checking…
+[2026-09-05T18:37:07.260Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a0729d-5157-725c-ab5b-d381719241e3
+[2026-09-05T18:28:33.269Z] [debug] voice: bundled idle
+[2026-09-05T18:28:33.268Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-05T18:28:33.247Z] [debug] ota: boot check result = noUpdate
+[2026-09-05T18:28:33.247Z] [debug] ota: Already up to date
+[2026-09-05T18:28:33.158Z] [debug] ota: Checking…
+[2026-09-05T18:28:33.158Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a0729d-5157-725c-ab5b-d381719241e3
+[2026-09-05T18:28:33.010Z] [debug] ota: boot check result = applied
+[2026-09-05T18:28:32.942Z] [debug] ota: Restarting to apply…
+[2026-09-05T18:28:32.941Z] [debug] ota: Saving progress…
+[2026-09-05T18:28:32.847Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-05T18:28:31.845Z] [debug] ota: Checking…
+[2026-09-05T18:28:31.845Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a07287-91a4-75e3-aa4a-c5c3b15a3b1d
+[2026-09-05T17:22:02.114Z] [debug] voice: bundled idle
+[2026-09-05T17:22:02.113Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-05T17:22:02.043Z] [debug] ota: boot check result = noUpdate
+[2026-09-05T17:22:02.042Z] [debug] ota: Already up to date
+[2026-09-05T17:22:01.799Z] [debug] ota: Checking…
+[2026-09-05T17:22:01.798Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a07287-91a4-75e3-aa4a-c5c3b15a3b1d
+[2026-09-05T17:22:01.449Z] [debug] ota: Restarting to apply…
+[2026-09-05T17:22:01.448Z] [debug] ota: Saving progress…
+[2026-09-05T17:22:01.318Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-05T17:22:00.303Z] [debug] ota: Checking…
+[2026-09-05T17:22:00.302Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a0722c-3388-7c2c-9820-11ea13306423
+[2026-09-05T16:18:31.183Z] [debug] voice: bundled idle
+[2026-09-05T16:18:31.183Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-05T16:18:31.138Z] [debug] ota: boot check result = noUpdate
+[2026-09-05T16:18:31.138Z] [debug] ota: Already up to date
+[2026-09-05T16:18:30.930Z] [debug] ota: Checking…
+[2026-09-05T16:18:30.930Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a0722c-3388-7c2c-9820-11ea13306423
+[2026-09-05T16:18:30.395Z] [debug] ota: Restarting to apply…
+[2026-09-05T16:18:30.389Z] [debug] ota: Saving progress…
+[2026-09-05T16:18:30.226Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-05T16:18:29.244Z] [debug] ota: Checking…
+[2026-09-05T16:18:29.244Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a071b2-ed2c-7422-bca8-0f11eca2d02e
+[2026-09-05T13:32:07.453Z] [debug] appstate: active → background (was active for 318499ms)
+[2026-09-05T13:32:03.873Z] [debug] send-log: #mtof9i1d5eoj — DELIVERED (inline, no attachments): beacon out, 9/9 parts accepted (61109 chars) — flush said yes, transport took every part
+[2026-09-05T13:31:45.805Z] [debug] meta-comment guard: skipped intent parse (ui-vocabulary: "screen") on 200-char input
+[2026-09-05T13:31:45.804Z] [arbiter] The Arbiter studies you, plainly. "I'm not sure what you're trying to tell me. I'll keep your note in the log either way. If you mean to act, phrase it as a verb — 'investigate the rubble', 'go east', 'attack the figure'."
+[2026-09-05T13:31:45.803Z] [player] there is a ton of lag on the exploration screen during combat when hitting movement buttons and attack button like stealth and dodge, chack all of the buttons and remove all associated lag accordingly
+[2026-09-05T13:31:44.436Z] [debug] homework: scene_intro "The Sixth Landing" ✓ 6868ms
+[2026-09-05T13:31:44.245Z] [debug] qwen⏱ narration:scene_intro_fill ok 6482ms read 5345ms/write 1106ms in 765t→out 33t 7.0ms/t HIT-CAP (171ch)
+[2026-09-05T13:31:37.569Z] [debug] homework: intro-fill armed after 12224ms idle
+[2026-09-05T13:31:03.810Z] [debug] homework: scene_intro "Voronov" ∅ 11253ms
+[2026-09-05T13:31:03.810Z] [debug] qwen⏱ ✂ DISCARDED narration:scene_intro_fill after 10830ms — intro-fill:∅
+[2026-09-05T13:31:03.587Z] [debug] qwen⏱ narration:scene_intro_fill ok 10830ms read 9724ms/write 1083ms in 740t→out 33t 13.1ms/t HIT-CAP (154ch)
+[2026-09-05T13:30:56.084Z] [debug] kbbar: mounted bottom=359.79486083984375 raw=360 from=live winH=986 beat=-
+[2026-09-05T13:30:55.577Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=cached winH=986 beat=-
+[2026-09-05T13:30:52.558Z] [debug] homework: intro-fill armed after 6000ms idle (strike 3/3)
+[2026-09-05T13:30:51.431Z] [reward] +18 TC pried from the dust.
+[2026-09-05T13:30:51.430Z] [reward] You strip the body: Bone Knife, Mud-Warden's Vest (+6 TC). The kit took the fight badly.
+[2026-09-05T13:30:51.429Z] [reward] Conspiracy Architects Raider 5 defeated. You recover Patched Cloth ×2.
+[2026-09-05T13:30:51.428Z] [combat] The killing blow with the acid-etched corrupted auralite talon: 13. Conspiracy Architects Raider 5 drops where it stood.
+[2026-09-05T13:30:51.426Z] [arbiter] The Arbiter watches the aetheric skid off. "Swap to the Mud-Iron Greatblade — slashing will bite where aetheric won't."
+[2026-09-05T13:30:51.419Z] [combat] Conspiracy Architects Raider 5 shrugs off the aetheric. (resisted, ×0.5 for 13)
+[2026-09-05T13:30:51.419Z] [combat] You — d20 → 3 + INT 16 perfect opening (2× dice) = 19 vs Conspiracy Architects Raider 5 AC 11 — ✓ HIT
+[2026-09-05T13:30:51.418Z] [world] You seize the initiative. Conspiracy Architects Raider 5 has no time to react.
+[2026-09-05T13:30:45.502Z] [debug] freeze watch: recovered — painting again after 2342ms quiet.
+[2026-09-05T13:30:43.737Z] [debug] persist sizes(KB): total=366 player=78 wm=199[rooms=114 events=7 memos=1 npcs=7 defeated=1 tags=1 discovered=1] log=85 scene=4
+[2026-09-05T13:30:42.662Z] [cognitive] AGGRESSION · ATTACK · USE_ITEM · DISENGAGE · TAKE_COVER · HIDE  (477ms)
+[2026-09-05T13:30:42.184Z] [system] ⏳ Time passed: 6 min
+[2026-09-05T13:30:42.110Z] [world] You commit forward with the acid-etched corrupted auralite talon. Conspiracy Architects Raider 5 watches your hands.
+[2026-09-05T13:30:41.891Z] [debug] attack: status mods perfect opening (2× dice)
+[2026-09-05T13:30:41.744Z] [debug] attack: target=Conspiracy Architects Raider 5 range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false
+[2026-09-05T13:30:41.524Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=1 hooks=2
+[2026-09-05T13:30:41.449Z] [player] attack with the auralite talon
+[2026-09-05T13:30:41.134Z] [debug] ui: tap "⚗☣ auralite talon ✦"
+[2026-09-05T13:30:40.572Z] [cognitive] RETREAT  (5550ms)
+[2026-09-05T13:30:38.669Z] [cognitive] RETREAT  (7383ms)
+[2026-09-05T13:30:38.036Z] [cognitive] neutral  (635ms)
+[2026-09-05T13:30:37.326Z] [system] ⏳ Time passed: 6 min
+[2026-09-05T13:30:37.250Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-05T13:30:37.175Z] [debug] arbiter: template (reason=combat)
+[2026-09-05T13:30:36.810Z] [combat] Dodge — d20 → 16 + DEX 18 = 34 vs ATK 17. ✓ You slip the arc — PERFECT OPENING (next strike ×2 dice).
+[2026-09-05T13:30:36.736Z] [combat] Conspiracy Architects Raider 5 — d20 → 10 + ATK 7 = 17 vs your AC 23 — ✗ EVADED
+[2026-09-05T13:30:36.438Z] [world] You commit to the dodge. Slip Conspiracy Architects Raider 5's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-09-05T13:30:36.291Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=2
+[2026-09-05T13:30:36.218Z] [player] dodge
+[2026-09-05T13:30:36.068Z] [debug] ui: tap "dodge"
+[2026-09-05T13:30:35.509Z] [cognitive] neutral  (6013ms)
+[2026-09-05T13:30:34.872Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-05T13:30:34.797Z] [debug] arbiter: template (reason=combat)
+[2026-09-05T13:30:34.725Z] [world] You are already at close / arm's reach with Conspiracy Architects Raider 5.
+[2026-09-05T13:30:34.652Z] [debug] move: advance from range=close enemies=1 weather=Aether Lightning cost=1 partial=0
+[2026-09-05T13:30:34.501Z] [debug] parser: intent=advance conf=1.00 verb=approach target=conspiracy architects raider 5 resolved=Conspiracy Architects Raider 5 range=close enemies=1 hooks=2
+[2026-09-05T13:30:34.426Z] [player] approach Conspiracy Architects Raider 5
+[2026-09-05T13:30:34.241Z] [debug] ui: tap "approach"
+[2026-09-05T13:30:33.683Z] [cognitive] neutral  (5256ms)
+[2026-09-05T13:30:33.039Z] [cognitive] neutral  (5672ms)
+[2026-09-05T13:30:31.696Z] [debug] ⚠ FREEZE WATCH: LOGIC stalled while frames kept coming (js 5216ms · frames 1043ms). Something blocked the JS thread — look for a long synchronous run. · crumb before: engine-done +10698ms → now: engine-done +485ms · doing: action "approach Conspiracy Architects Raider 5" · native: cognition running · q3
+[2026-09-05T13:30:31.137Z] [world] You are already at close / arm's reach with Conspiracy Architects Raider 5.
+[2026-09-05T13:30:31.064Z] [debug] move: advance from range=close enemies=1 weather=Aether Lightning cost=1 partial=0
+[2026-09-05T13:30:30.915Z] [debug] parser: intent=advance conf=1.00 verb=approach target=conspiracy architects raider 5 resolved=Conspiracy Architects Raider 5 range=close enemies=1 hooks=2
+[2026-09-05T13:30:30.840Z] [player] approach Conspiracy Architects Raider 5
+[2026-09-05T13:30:30.654Z] [debug] ui: tap "approach"
+[2026-09-05T13:30:29.343Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-05T13:30:29.269Z] [debug] arbiter: template (reason=combat)
+[2026-09-05T13:30:29.196Z] [combat] Conspiracy Architects Raider 5 — d20 → 2 + ATK 7 = 9 vs your AC 23 — ✗ MISS
+[2026-09-05T13:30:29.046Z] [world] You close the gap with Conspiracy Architects Raider 5. (range: close / arm's reach)
+[2026-09-05T13:30:28.974Z] [debug] move: field advance target=Conspiracy Architects Raider 5 d 1.26->0.35 band mid->close
+[2026-09-05T13:30:28.829Z] [debug] move: advance from range=mid enemies=1 weather=Aether Lightning cost=1 partial=0
+[2026-09-05T13:30:28.683Z] [debug] parser: intent=advance conf=1.00 verb=approach target=conspiracy architects raider 4 resolved=Conspiracy Architects Raider 5 range=mid enemies=1 hooks=2
+[2026-09-05T13:30:28.610Z] [player] approach Conspiracy Architects Raider 4
+[2026-09-05T13:30:28.424Z] [debug] ui: tap "approach"
+[2026-09-05T13:30:28.276Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-05T13:30:28.202Z] [debug] arbiter: template (reason=combat)
+[2026-09-05T13:30:28.130Z] [combat] Conspiracy Architects Raider 5 — d20 → 12 + ATK 7 = 19 vs your AC 23 — ✗ MISS
+[2026-09-05T13:30:27.983Z] [world] You close the gap with Conspiracy Architects Raider 5. (range: mid-range)
+[2026-09-05T13:30:27.911Z] [debug] move: field advance target=Conspiracy Architects Raider 5 d 2.26->1.26 band far->mid
+[2026-09-05T13:30:27.766Z] [debug] move: advance from range=far enemies=1 weather=Aether Lightning cost=1 partial=0
+[2026-09-05T13:30:27.622Z] [debug] parser: intent=advance conf=1.00 verb=approach target=conspiracy architects raider 4 resolved=Conspiracy Architects Raider 5 range=far enemies=1 hooks=2
+[2026-09-05T13:30:27.550Z] [player] approach Conspiracy Architects Raider 4
+[2026-09-05T13:30:27.365Z] [debug] ui: tap "approach"
+[2026-09-05T13:30:27.219Z] [combat] Conspiracy Architects Raider 5 — d20 → 14 + ATK 7 = 21 vs your AC 23 — ✗ MISS
+[2026-09-05T13:30:27.035Z] [reward] +14 TC pried from the dust.
+[2026-09-05T13:30:26.893Z] [combat] 1 attacker remains. Conspiracy Architects Raider 5 now in your sights.
+[2026-09-05T13:30:26.821Z] [reward] You strip the body: Bone Knife, Mud-Warden's Vest (+6 TC). The kit took the fight badly.
+[2026-09-05T13:30:26.604Z] [reward] Conspiracy Architects Raider 4 defeated. You recover Patched Cloth ×3, Architect Sigil.
+[2026-09-05T13:30:26.316Z] [combat] Conspiracy Architects Raider 4 shakes off the last of the corruption — the Auralite Talon has run its course.
+[2026-09-05T13:30:26.242Z] [combat] Conspiracy Architects Raider 4 blackens — corruption eats 2. (0/16 HP, 0 turns left)
+[2026-09-05T13:30:26.168Z] [combat] Conspiracy Architects Raider 4 shakes off the last of the acid — the Auralite Talon has run its course.
+[2026-09-05T13:30:26.094Z] [combat] Conspiracy Architects Raider 4 smokes — acid eats 1. (2/16 HP, 0 turns left)
+[2026-09-05T13:30:26.021Z] [world] The field shifts around you — Conspiracy Architects Raider 5 now far.
+[2026-09-05T13:30:25.949Z] [world] You close the gap with the Conspiracy Architects Raider 4 and Conspiracy Architects Raider 5. (range: close / arm's reach)
+[2026-09-05T13:30:25.877Z] [debug] move: field advance target=Conspiracy Architects Raider 4 d 1.57->0.57 band mid->close
+[2026-09-05T13:30:25.733Z] [debug] move: advance from range=mid enemies=2 weather=Aether Lightning cost=1 partial=0
+[2026-09-05T13:30:25.588Z] [debug] parser: intent=advance conf=1.00 verb=approach target=conspiracy architects raider 4 resolved=Conspiracy Architects Raider 4 range=mid enemies=2 hooks=2
+[2026-09-05T13:30:25.517Z] [player] approach Conspiracy Architects Raider 4
+[2026-09-05T13:30:25.261Z] [debug] ui: tap "approach"
+[2026-09-05T13:30:24.708Z] [cognitive] neutral  (3721ms)
+[2026-09-05T13:30:24.074Z] [cognitive] neutral  (741ms)
+[2026-09-05T13:30:23.449Z] [combat] Conspiracy Architects Raider 5 deals 4 piercing damage [armor −35%] [edge of reach — halved]. You have 30 HP remaining.
+[2026-09-05T13:30:22.780Z] [system] ⏳ Time passed: 6 min
+[2026-09-05T13:30:22.708Z] [combat] Your armour turns the blow back — Conspiracy Architects Raider 5 takes 1 piercing. (12 HP left)
+[2026-09-05T13:30:22.491Z] [combat] Conspiracy Architects Raider 5 — d20 → 20 + ATK 7 = 27 vs your AC 23 — ✓ CRITICAL HIT
+[2026-09-05T13:30:22.414Z] [world] Your read is a beat off — no opening this time — but the swing goes wide on its own.
+[2026-09-05T13:30:22.342Z] [combat] Dodge — d20 → 1 + DEX 18 = 19 vs ATK 17. ✗ You misread it — no opening, and the blow lands as it normally would (armor still counts).
+[2026-09-05T13:30:22.267Z] [combat] Conspiracy Architects Raider 4 — d20 → 10 + ATK 7 = 17 vs your AC 23 — ✗ MISS
+[2026-09-05T13:30:21.983Z] [combat] Conspiracy Architects Raider 4 blackens — corruption eats 2. (3/16 HP, 1 turn left)
+[2026-09-05T13:30:21.912Z] [combat] Conspiracy Architects Raider 4 smokes — acid eats 1. (5/16 HP, 1 turn left)
+[2026-09-05T13:30:21.841Z] [world] You commit to the dodge. Slip Conspiracy Architects Raider 4's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-09-05T13:30:21.699Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=2 hooks=2
+[2026-09-05T13:30:21.628Z] [player] dodge
+[2026-09-05T13:30:21.481Z] [debug] ui: tap "dodge"
+[2026-09-05T13:30:20.840Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-05T13:30:20.767Z] [debug] arbiter: template (reason=combat)
+[2026-09-05T13:30:20.697Z] [combat] Conspiracy Architects Raider 5 — d20 → 12 + ATK 7 = 19 vs your AC 23 — ✗ MISS
+[2026-09-05T13:30:20.625Z] [combat] Conspiracy Architects Raider 4 — d20 → 4 + ATK 7 = 11 vs your AC 23 — ✗ MISS
+[2026-09-05T13:30:20.482Z] [combat] Conspiracy Architects Raider 4 blackens — corruption eats 2. (6/16 HP, 2 turns left)
+[2026-09-05T13:30:20.411Z] [combat] Conspiracy Architects Raider 4 smokes — acid eats 1. (8/16 HP, 2 turns left)
+[2026-09-05T13:30:20.341Z] [world] The field shifts around you — Conspiracy Architects Raider 5 now distant.
+[2026-09-05T13:30:20.270Z] [world] You pull back from the Conspiracy Architects Raider 4 and Conspiracy Architects Raider 5. (range: mid-range)
+[2026-09-05T13:30:20.199Z] [debug] move: field retreat target=Conspiracy Architects Raider 4 d 0.57->1.57 band close->mid
+[2026-09-05T13:30:20.051Z] [debug] move: retreat from range=close enemies=2 weather=Aether Lightning cost=1 partial=0
+[2026-09-05T13:30:19.978Z] [debug] parser: intent=retreat conf=1.00 verb=stepback target=- resolved=- range=close enemies=2 hooks=2
+[2026-09-05T13:30:19.906Z] [player] step back
+[2026-09-05T13:30:19.658Z] [debug] ui: tap "step back"
+[2026-09-05T13:30:18.672Z] [combat] Conspiracy Architects Raider 4 — d20 → 3 + ATK 7 = 10 vs your AC 23 — ✗ MISS
+[2026-09-05T13:30:18.669Z] [combat] Conspiracy Architects Raider 5 — d20 → 12 + ATK 7 = 19 vs your AC 23 — ✗ MISS
+[2026-09-05T13:30:18.666Z] [combat] Acid-Etched Corrupted Auralite Talon — 2 corruption bites in and festers (3 turns). The rot deepens (1 stack).
+[2026-09-05T13:30:18.665Z] [combat] Acid-Etched Corrupted Auralite Talon — 1 acid bites in and festers (3 turns). Its guard pits and hisses — easier to hit now (−1 AC, 1 total).
+[2026-09-05T13:30:18.665Z] [combat] Conspiracy Architects Raider 4 takes 7 with the acid-etched corrupted auralite talon. It reels: 9 left. Then it fights back.
+[2026-09-05T13:30:18.664Z] [debug] dedup: suppressed arbiter repeat — "The Arbiter watches the aetheric skid off. "Swap to the Mud …"
+[2026-09-05T13:30:18.664Z] [arbiter] The Arbiter watches the aetheric skid off. "Swap to the Mud Venom Blade — poison will bite where aetheric won't."
+[2026-09-05T13:30:18.660Z] [combat] Conspiracy Architects Raider 4 shrugs off the aetheric. (resisted, ×0.5 for 7)
+[2026-09-05T13:30:18.659Z] [combat] You — d20 → 19 + INT 16 = 35 vs Conspiracy Architects Raider 4 AC 11 — ✓ HIT
+[2026-09-05T13:30:18.659Z] [world] You seize the initiative. Conspiracy Architects Raider 4 has no time to react.
+[2026-09-05T13:30:14.658Z] [debug] freeze watch: recovered — painting again after 2342ms quiet.
+[2026-09-05T13:30:09.641Z] [debug] ⚠ FREEZE WATCH: LOGIC stalled while frames kept coming (js 2530ms · frames 0ms). Something blocked the JS thread — look for a long synchronous run. · crumb before: engine-done +15091ms → now: engine-done +692ms · doing: action "attack with the auralite talon" · native: idle
+[2026-09-05T13:30:09.320Z] [cognitive] AGGRESSION · ATTACK · USE_ITEM · DISENGAGE · TAKE_COVER · HIDE  (512ms)
+[2026-09-05T13:30:08.808Z] [system] ⏳ Time passed: 6 min
+[2026-09-05T13:30:08.737Z] [world] You bring the acid-etched corrupted auralite talon to bear on Conspiracy Architects Raider 4.
+[2026-09-05T13:30:08.454Z] [debug] attack: target=Conspiracy Architects Raider 4 range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false
+[2026-09-05T13:30:08.232Z] [arbiter] The Arbiter eyes your new pieces. "You could make a Reclaimer's Trousers now, if you wanted."
+[2026-09-05T13:30:08.122Z] [reward] +8 TC pried from the dust.
+[2026-09-05T13:30:07.981Z] [combat] 2 attackers remain. Conspiracy Architects Raider 4 now in your sights.
+[2026-09-05T13:30:07.910Z] [reward] You strip the body: Cudgel, Mud-Warden's Vest (+6 TC). The kit took the fight badly.
+[2026-09-05T13:30:07.699Z] [reward] Conspiracy Architects Raider 3 defeated. You recover Patched Cloth ×2.
+[2026-09-05T13:30:07.419Z] [combat] Conspiracy Architects Raider 3 blackens — corruption eats 1. (0/16 HP, 2 turns left)
+[2026-09-05T13:30:07.348Z] [combat] Conspiracy Architects Raider 3 smokes — acid eats 4. (1/16 HP, 2 turns left)
+[2026-09-05T13:30:07.208Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=3 hooks=2
+[2026-09-05T13:30:07.137Z] [player] attack with the auralite talon
+[2026-09-05T13:30:06.873Z] [debug] ui: tap "⚗☣ auralite talon ✦"
+[2026-09-05T13:30:04.853Z] [combat] Conspiracy Architects Raider 3 deals 1 bludgeoning damage. You have 34 HP remaining.
+[2026-09-05T13:30:04.313Z] [combat] Conspiracy Architects Raider 4 — d20 → 1 + ATK 7 = 8 vs your AC 23 — ✗ FUMBLE
+[2026-09-05T13:30:04.310Z] [combat] Your armour turns the blow back — Conspiracy Architects Raider 3 takes 1 bludgeoning. (5 HP left)
+[2026-09-05T13:30:04.309Z] [debug] wear ward: Architect's Sight Enhancer keeps its point (15%)
+[2026-09-05T13:30:04.307Z] [combat] Conspiracy Architects Raider 3 — d20 → 17 + ATK 6 = 23 vs your AC 23 (needs nat 16+ — AC capped) — ✓ HIT
+[2026-09-05T13:30:04.304Z] [combat] Conspiracy Architects Raider 5 — d20 → 15 + ATK 7 = 22 vs your AC 23 — ✗ MISS
+[2026-09-05T13:30:04.301Z] [combat] Acid-Etched Corrupted Auralite Talon — 1 corruption bites in and festers (3 turns). The rot deepens (1 stack).
+[2026-09-05T13:30:04.301Z] [combat] Acid-Etched Corrupted Auralite Talon — 4 acid bites in and festers (3 turns). Its guard pits and hisses — easier to hit now (−1 AC, 1 total).
+[2026-09-05T13:30:04.300Z] [combat] Clean hit with the acid-etched corrupted auralite talon for 8. Conspiracy Architects Raider 3 has 6 left and does not back away.
+[2026-09-05T13:30:04.300Z] [debug] dedup: suppressed arbiter repeat — "The Arbiter watches the aetheric skid off. "Swap to the Mud …"
+[2026-09-05T13:30:04.299Z] [arbiter] The Arbiter watches the aetheric skid off. "Swap to the Mud Venom Blade — poison will bite where aetheric won't."
+[2026-09-05T13:30:04.292Z] [combat] Conspiracy Architects Raider 3 shrugs off the aetheric. (resisted, ×0.5 for 8)
+[2026-09-05T13:30:04.291Z] [combat] You — d20 → 7 + INT 16 = 23 vs Conspiracy Architects Raider 3 AC 10 — ✓ HIT
+[2026-09-05T13:30:04.291Z] [world] You seize the initiative. Conspiracy Architects Raider 3 has no time to react.
+[2026-09-05T13:29:57.096Z] [debug] freeze watch: recovered — painting again after 2342ms quiet.
+[2026-09-05T13:29:54.932Z] [cognitive] AGGRESSION · ATTACK · USE_ITEM · DISENGAGE · TAKE_COVER · HIDE  (523ms)
+[2026-09-05T13:29:54.408Z] [system] ⏳ Time passed: 6 min
+[2026-09-05T13:29:54.335Z] [world] You raise the acid-etched corrupted auralite talon toward Conspiracy Architects Raider 3. The room narrows around the both of you.
+[2026-09-05T13:29:54.048Z] [debug] attack: target=Conspiracy Architects Raider 3 range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false
+[2026-09-05T13:29:53.905Z] [arbiter] The Arbiter eyes your new pieces. "You could make a Reclaimer's Boots now, if you wanted."
+[2026-09-05T13:29:53.795Z] [reward] +12 TC pried from the dust.
+[2026-09-05T13:29:53.652Z] [combat] 3 attackers remain. Conspiracy Architects Raider 3 now in your sights.
+[2026-09-05T13:29:53.580Z] [reward] You strip the body: Cudgel, Mud-Warden's Vest (+10 TC). The kit took the fight badly.
+[2026-09-05T13:29:53.366Z] [reward] Conspiracy Architects Raider 2 defeated. You recover Patched Cloth, Worn Tartarian Coin ×2.
+[2026-09-05T13:29:53.084Z] [combat] Conspiracy Architects Raider 2 blackens — corruption eats 2. (0/20 HP, 1 turn left)
+[2026-09-05T13:29:53.013Z] [combat] Conspiracy Architects Raider 2 smokes — acid eats 2. (1/20 HP, 1 turn left)
+[2026-09-05T13:29:52.867Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=4 hooks=2
+[2026-09-05T13:29:52.792Z] [player] attack with the auralite talon
+[2026-09-05T13:29:52.562Z] [debug] ui: tap "⚗☣ auralite talon ✦"
+[2026-09-05T13:29:52.013Z] [debug] ⚠ FREEZE WATCH: LOGIC stalled while frames kept coming (js 3281ms · frames 0ms). Something blocked the JS thread — look for a long synchronous run. · crumb before: native:cognition:done +14952ms → now: engine-done +1656ms · doing: action "dodge" · native: idle
+[2026-09-05T13:29:51.458Z] [cognitive] neutral  (770ms)
+[2026-09-05T13:29:50.838Z] [combat] Conspiracy Architects Raider 3 deals 6 bludgeoning damage. You have 35 HP remaining.
+[2026-09-05T13:29:50.140Z] [system] ⏳ Time passed: 6 min
+[2026-09-05T13:29:50.068Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-05T13:29:49.995Z] [debug] arbiter: template (reason=combat)
+[2026-09-05T13:29:49.925Z] [combat] Conspiracy Architects Raider 5 — d20 → 1 + ATK 7 = 8 vs your AC 23 — ✗ FUMBLE
+[2026-09-05T13:29:49.854Z] [combat] Conspiracy Architects Raider 4 — d20 → 8 + ATK 7 = 15 vs your AC 23 — ✗ MISS
+[2026-09-05T13:29:49.782Z] [combat] Your armour turns the blow back — Conspiracy Architects Raider 3 takes 1 bludgeoning. (14 HP left)
+[2026-09-05T13:29:49.573Z] [debug] wear ward: Architect's Sight Enhancer keeps its point (15%)
+[2026-09-05T13:29:49.504Z] [combat] Dodge — Conspiracy Architects Raider 3 rolls a NAT 20. No read beats a perfect strike; it lands through your dodge.
+[2026-09-05T13:29:49.434Z] [combat] Conspiracy Architects Raider 3 — d20 → 20 + ATK 6 = 26 vs your AC 23 (needs nat 16+ — AC capped) — ✓ CRITICAL HIT
+[2026-09-05T13:29:49.154Z] [combat] Conspiracy Architects Raider 2 blackens — corruption eats 2. (3/20 HP, 2 turns left)
+[2026-09-05T13:29:49.085Z] [combat] Conspiracy Architects Raider 2 smokes — acid eats 2. (5/20 HP, 2 turns left)
+[2026-09-05T13:29:49.015Z] [world] You commit to the dodge. Slip Conspiracy Architects Raider 3's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-09-05T13:29:48.875Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=4 hooks=2
+[2026-09-05T13:29:48.804Z] [player] dodge
+[2026-09-05T13:29:48.552Z] [debug] ui: tap "dodge"
+[2026-09-05T13:29:46.646Z] [combat] Conspiracy Architects Raider 3 deals 7 bludgeoning damage. You have 41 HP remaining.
+[2026-09-05T13:29:46.106Z] [combat] Conspiracy Architects Raider 5 — d20 → 8 + ATK 7 = 15 vs your AC 23 — ✗ MISS
+[2026-09-05T13:29:46.103Z] [combat] Conspiracy Architects Raider 4 — d20 → 2 + ATK 7 = 9 vs your AC 23 — ✗ MISS
+[2026-09-05T13:29:46.101Z] [combat] Your armour turns the blow back — Conspiracy Architects Raider 3 takes 1 bludgeoning. (15 HP left)
+[2026-09-05T13:29:46.099Z] [combat] Conspiracy Architects Raider 3 — d20 → 19 + ATK 6 = 25 vs your AC 23 (needs nat 16+ — AC capped) — ✓ HIT
+[2026-09-05T13:29:46.094Z] [combat] Conspiracy Architects Raider 2 is left exposed — easier to hit.
+[2026-09-05T13:29:46.094Z] [combat] Acid-Etched Corrupted Auralite Talon — 2 corruption bites in and festers (3 turns). The rot deepens (1 stack).
+[2026-09-05T13:29:46.091Z] [combat] Acid-Etched Corrupted Auralite Talon — 2 acid bites in and festers (3 turns). Its guard pits and hisses — easier to hit now (−1 AC, 1 total).
+[2026-09-05T13:29:46.091Z] [combat] Conspiracy Architects Raider 2 is out of it. Conspiracy Architects Raider 3 now in your sights.
+[2026-09-05T13:29:46.090Z] [combat] You crack the Conspiracy Architects Raider 2 with the Acid-Etched Corrupted Auralite Talon for 11 — half their fight, gone in one blow. They crumple, out cold. (7/20 HP) Loot them before they come to.
+[2026-09-05T13:29:46.090Z] [debug] wear ward: Auralite Talon keeps its point (15%)
+[2026-09-05T13:29:46.089Z] [arbiter] The Arbiter watches the aetheric skid off. "Swap to the Giant-Watch Greatspear — piercing will bite where aetheric won't."
+[2026-09-05T13:29:46.085Z] [combat] Conspiracy Architects Raider 2 shrugs off the aetheric. (resisted, ×0.5 for 11)
+[2026-09-05T13:29:46.085Z] [combat] Aetheric flares — +3 on hit.
+[2026-09-05T13:29:46.084Z] [combat] You — d20 → 16 + INT 16 = 32 vs Conspiracy Architects Raider 2 AC 11 — ✓ HIT
+[2026-09-05T13:29:46.084Z] [world] You seize the initiative. Conspiracy Architects Raider 2 has no time to react.
+[2026-09-05T13:29:38.715Z] [debug] freeze watch: recovered — painting again after 2342ms quiet.
+[2026-09-05T13:29:37.756Z] [debug] persist sizes(KB): total=367 player=76 wm=199[rooms=114 events=7 memos=1 npcs=7 defeated=1 tags=1 discovered=1] log=85 scene=7
+[2026-09-05T13:29:37.063Z] [cognitive] neutral  (4524ms)
+[2026-09-05T13:29:36.734Z] [cognitive] AGGRESSION · ATTACK · USE_ITEM · DISENGAGE · TAKE_COVER · HIDE  (406ms)
+[2026-09-05T13:29:36.328Z] [system] ⏳ Time passed: 6 min
+[2026-09-05T13:29:36.256Z] [world] You commit forward with the acid-etched corrupted auralite talon. Conspiracy Architects Raider 2 watches your hands.
+[2026-09-05T13:29:35.969Z] [debug] attack: target=Conspiracy Architects Raider 2 range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false
+[2026-09-05T13:29:35.755Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=4 hooks=2
+[2026-09-05T13:29:35.682Z] [player] attack with the auralite talon
+[2026-09-05T13:29:35.511Z] [debug] ui: tap "⚗☣ auralite talon ✦"
+[2026-09-05T13:29:34.948Z] [cognitive] neutral  (4699ms)
+[2026-09-05T13:29:33.626Z] [debug] ⚠ FREEZE WATCH: both clocks stopped (js 5174ms · frames 2342ms). Whole app wedged, or it was backgrounded — check the appstate trail beside this line. · crumb before: engine-done +11855ms → now: engine-done +1087ms · doing: action "approach Conspiracy Architects Raider 2" · native: cognition running · q1
+[2026-09-05T13:29:33.061Z] [combat] Conspiracy Architects Raider 5 deals 2 piercing damage [armor −35%]. You have 48 HP remaining.
+[2026-09-05T13:29:32.467Z] [combat] Conspiracy Architects Raider 4 — d20 → 7 + ATK 7 = 14 vs your AC 23 — ✗ MISS
+[2026-09-05T13:29:32.394Z] [combat] Conspiracy Architects Raider 3 — d20 → 6 + ATK 6 = 12 vs your AC 23 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-05T13:29:32.321Z] [combat] Conspiracy Architects Raider 2 — d20 → 13 + ATK 6 = 19 vs your AC 23 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-05T13:29:32.248Z] [combat] Your armour turns the blow back — Conspiracy Architects Raider 5 takes 1 piercing. (13 HP left)
+[2026-09-05T13:29:32.034Z] [combat] Conspiracy Architects Raider 5 — d20 → 17 + ATK 7 = 24 vs your AC 23 — ✓ HIT
+[2026-09-05T13:29:31.890Z] [world] You close the gap with the Conspiracy Architects Raider 2 and 3 others. (range: close / arm's reach)
+[2026-09-05T13:29:31.819Z] [debug] move: field advance target=Conspiracy Architects Raider 2 d 0.76->0.35 band close->close
+[2026-09-05T13:29:31.678Z] [debug] move: advance from range=close enemies=4 weather=Aether Lightning cost=1 partial=0
+[2026-09-05T13:29:31.534Z] [debug] parser: intent=advance conf=1.00 verb=approach target=conspiracy architects raider 2 resolved=Conspiracy Architects Raider 2 range=close enemies=4 hooks=2
+[2026-09-05T13:29:31.463Z] [player] approach Conspiracy Architects Raider 2
+[2026-09-05T13:29:31.284Z] [debug] ui: tap "approach"
+[2026-09-05T13:29:30.735Z] [cognitive] AGGRESSION · ATTACK · USE_ITEM · DISENGAGE · TAKE_COVER · HIDE  (1888ms)
+[2026-09-05T13:29:30.102Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-05T13:29:30.030Z] [debug] arbiter: template (reason=combat)
+[2026-09-05T13:29:29.959Z] [combat] Conspiracy Architects Raider 3 — d20 → 11 + ATK 6 = 17 vs your AC 23 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-05T13:29:29.886Z] [combat] Conspiracy Architects Raider 2 — d20 → 11 + ATK 6 = 17 vs your AC 23 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-05T13:29:29.814Z] [combat] Conspiracy Architects Raider 5 — d20 → 1 + ATK 7 = 8 vs your AC 23 — ✗ FUMBLE
+[2026-09-05T13:29:29.741Z] [combat] Conspiracy Architects Raider 4 — d20 → 3 + ATK 7 = 10 vs your AC 23 — ✗ MISS
+[2026-09-05T13:29:29.670Z] [debug] ac-shift 26→23: race/base 11 + gear 18 + title 0 → trimmed 23 + status 0 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak
+[2026-09-05T13:29:29.526Z] [world] The field shifts around you — Conspiracy Architects Raider 3 now close / arm's reach; Conspiracy Architects Raider 4 now close / arm's reach; Conspiracy Architects Raider 5 now far.
+[2026-09-05T13:29:29.455Z] [world] You close the gap with the Conspiracy Architects Raider 2 and 3 others. (range: close / arm's reach)
+[2026-09-05T13:29:29.384Z] [debug] move: field advance target=Conspiracy Architects Raider 2 d 1.76->0.76 band mid->close
+[2026-09-05T13:29:29.243Z] [debug] move: advance from range=mid enemies=4 weather=Aether Lightning cost=1 partial=0
+[2026-09-05T13:29:29.100Z] [debug] parser: intent=advance conf=1.00 verb=approach target=conspiracy architects raider 2 resolved=Conspiracy Architects Raider 2 range=mid enemies=4 hooks=2
+[2026-09-05T13:29:29.028Z] [player] approach Conspiracy Architects Raider 2
+[2026-09-05T13:29:28.847Z] [debug] ui: tap "approach"
+[2026-09-05T13:29:28.699Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-05T13:29:28.626Z] [debug] arbiter: template (reason=combat)
+[2026-09-05T13:29:28.554Z] [arbiter] The Arbiter holds up a hand. "Auralite Talon works at close / arm's reach range only — you're at mid-range. ADVANCE to close in (they'll answer the approach), or attack with something that reaches."
+[2026-09-05T13:29:28.484Z] [debug] attack: target=Conspiracy Architects Raider 2 range=mid reach.bands=[close] reach.label=Auralite Talon bareHand=false
+[2026-09-05T13:29:28.271Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=mid enemies=4 hooks=2
+[2026-09-05T13:29:28.200Z] [player] attack with the auralite talon
+[2026-09-05T13:29:28.111Z] [system] perfect opening fades.
+[2026-09-05T13:29:27.893Z] [debug] ui: tap "⚗☣ auralite talon ✦"
+[2026-09-05T13:29:26.505Z] [cognitive] AGGRESSION · ATTACK · USE_ITEM · DISENGAGE · TAKE_COVER · HIDE  (601ms)
+[2026-09-05T13:29:25.758Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-05T13:29:25.686Z] [debug] arbiter: template (reason=combat)
+[2026-09-05T13:29:25.615Z] [arbiter] The Arbiter holds up a hand. "Auralite Talon works at close / arm's reach range only — you're at mid-range. ADVANCE to close in (they'll answer the approach), or attack with something that reaches."
+
+=== END REPORT ===
