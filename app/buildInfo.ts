@@ -28125,6 +28125,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (npcMemory.lastAskedLine, LAST_ASKED_MIN_GAP_MS), so flicking between two
 // stalls does not make them parrot it.
 export const OTA_BUILD_ID = '2026-09-05-1698-the-counter-remembers-the-question';
+// golem catch-up 2026-09-05: markerless publish of OTA-1698 - the counter
+// remembers the question. On a return visit the person names the last thing
+// you asked them, after the greeting and the absence beat. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1697-the-notes-reach-the-narrator';
 // golem catch-up 2026-09-05: markerless publish of OTA-1697 - the notes reach
 // the narrator. The newest three whisper-chain notes ride the Qwen fact sheet
