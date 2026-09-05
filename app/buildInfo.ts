@@ -27828,6 +27828,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // against. injectFactionParty moved verbatim to state/factionParty.ts under
 // the OTA-1400 line ratchet (gameStore 36,914 lines).
 export const OTA_BUILD_ID = '2026-09-05-1678-the-chase-gets-harder';
+// golem catch-up 2026-09-05: markerless publish of OTA-1678 - the chase gets
+// harder. Flee escalation on the randoms only: the pursuer's bar rises with
+// the ground (+1 per danger level above 1), its rarity (+0..+3), and each
+// failed break this encounter (+2), and falls with its wounds (-2 / -4); the
+// roll card prints the breakdown and the FLEE chip carries the exact odds from
+// the same reader. The four world rolls stamp Enemy.unscripted; every scripted
+// spawn and every pre-1678 save keeps the OTA-1009 contract exactly.
+// hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1677-the-log-leaves-in-an-envelope';
 // golem catch-up 2026-09-05: markerless publish of OTA-1677 - the log leaves
 // in an envelope. #82 re-measured: 209 of 711 delivered events (29%) still
