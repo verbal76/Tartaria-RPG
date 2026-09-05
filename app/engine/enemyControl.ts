@@ -63,6 +63,7 @@ export function controlAttackPenalty(c: EnemyControlState | null | undefined): n
     case 'blinded': return -4;   // it cannot see you
     case 'prone': return -2;     // swinging from the ground
     case 'knockback': return -2; // it closed the distance instead of aiming
+    case 'pull': return -2;      // OTA-1676 — dragged in off its footing, the mirror of knockback
     case 'slowed': return -2;    // late, and the blow shows it
     default: return 0;
   }
@@ -72,6 +73,7 @@ export function controlAttackPenalty(c: EnemyControlState | null | undefined): n
 export function controlLabel(kind: ControlKind): string {
   switch (kind) {
     case 'knockback': return 'driven back';
+    case 'pull': return 'dragged in';
     case 'restrained': return 'restrained';
     case 'paralyzed': return 'paralyzed';
     case 'stunned': return 'stunned';

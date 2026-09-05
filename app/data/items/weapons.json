@@ -951,7 +951,7 @@
         "blade",
         "aetheric"
       ],
-      "effect": "+1 to grip usage while in your possession.",
+      "effect": "Balanced for two hands; it never slips.",
       "description": "Aether-charged greatsword. Hums steady in the hand."
     },
     {
@@ -1022,7 +1022,7 @@
         "flail",
         "aetheric"
       ],
-      "effect": "Automatically wins attack rolls against Aetherkin.",
+      "effect": "+1d6 damage against Aetherkin.",
       "description": "Aether-cored flail. The chain hums when the Veil is thin."
     },
     {
@@ -1066,7 +1066,7 @@
         "polearm",
         "aetheric"
       ],
-      "effect": "Pulls metallic objects toward the wielder.",
+      "effect": "Pulls metallic enemies closer on hit.",
       "description": "Aether-magnetized polearm. The air around it tugs at iron."
     },
     {
@@ -1110,7 +1110,7 @@
         "spear",
         "mud_dwellers"
       ],
-      "effect": "Can be thrown to far range from any other.",
+      "effect": "Long throw — reaches far range.",
       "description": "A hardened mud-glass spear, balanced for the long throw."
     },
     {
@@ -1703,7 +1703,7 @@
         "knife",
         "mud_dwellers"
       ],
-      "effect": "Breaks on any parry attempt.",
+      "effect": "Rust in the seams — it will not last.",
       "description": "Cheap mud-iron dagger. Fragile, sharp, expendable."
     },
     {
@@ -1859,7 +1859,7 @@
         "dual_wield",
         "mud_dwellers"
       ],
-      "effect": "Can bash for 1d4; does not count as attack move. Grants +10 HP.",
+      "effect": "Bash with it — a landed blow rings the target's bell and denies its next swing. Grants +10 HP.",
       "description": "Round iron buckler. Cheap, dented, dependable.",
       "statBonuses": [
         {
@@ -1911,7 +1911,7 @@
         "giants",
         "stealth"
       ],
-      "effect": "+1 to Stealth.",
+      "effect": "+2 Stealth while held.",
       "description": "Slim bone shiv shaped for the quiet kill.",
       "statBonuses": [
         {
@@ -2338,7 +2338,7 @@
         "blade",
         "aetheric"
       ],
-      "effect": "+1d20 to all in close range if broken on parry.",
+      "effect": "On a max roll the blade bursts — 1d20 to all enemies in reach.",
       "description": "Volatile plasma blade. Goes out in a flash if it breaks."
     },
     {
@@ -2437,7 +2437,7 @@
         "dual_wield",
         "unknowing_masses"
       ],
-      "effect": "Reflects 1d6 plasma damage back at attacker on max roll. Grants +20 HP.",
+      "effect": "Reflects 1d6 plasma back at the attacker on the block. Grants +20 HP.",
       "description": "Buckler with a plasma surface. Mirrors energy attacks.",
       "statBonuses": [
         {
@@ -2532,7 +2532,7 @@
         "firearm",
         "unknowing_masses"
       ],
-      "effect": "50% enemy HP loss on rolls of 20+.",
+      "effect": "+2d10 damage on a max roll.",
       "description": "Concentrated plasma pistol. Each round is a small star."
     },
     {
@@ -2748,7 +2748,7 @@
         "unknowing_masses",
         "legendary"
       ],
-      "effect": "Blocks all plasma damage; reflects 1d6 back. Grants +30 HP.",
+      "effect": "Blocks all plasma damage on the block; reflects 1d6 back. Grants +30 HP.",
       "description": "Plasma-screen shield. Eats fire, throws fire back.",
       "statBonuses": [
         {
@@ -2851,7 +2851,7 @@
         "blade",
         "mud_dwellers"
       ],
-      "effect": "-1 to attack after each fight.",
+      "effect": "Rust-bitten and dull.",
       "description": "Cheap mud-iron shortsword. Holds an edge for one fight, maybe two."
     },
     {
@@ -2873,7 +2873,7 @@
         "hammer",
         "giants"
       ],
-      "effect": "+1 to Coercion. Grants +5 HP.",
+      "effect": "A heavy club. Grants +5 HP.",
       "description": "Knotted bone club. Conversations end faster around it.",
       "statBonuses": [
         {
@@ -2923,7 +2923,7 @@
         "knife",
         "mud_dwellers"
       ],
-      "effect": "Chance to inflict 1d4 bleed.",
+      "effect": "Bleeds — +1d4 slashing damage for 2 rounds on rolls of 3+.",
       "description": "Standard mud-iron utility knife. Cuts more than rope."
     },
     {
@@ -2969,7 +2969,7 @@
         "giants",
         "throw"
       ],
-      "effect": "Throwable to Close range.",
+      "effect": "Short-ranged throw — close range only.",
       "description": "Balanced for the hurl as well as the swing."
     },
     {
@@ -3056,7 +3056,7 @@
         "blade",
         "giants"
       ],
-      "effect": "+1 to parry when used with shields.",
+      "effect": "A sound short blade — quick in the hand beside a shield.",
       "description": "Bone-bladed shortsword. Pairs well with a buckler."
     },
     {
@@ -3077,7 +3077,7 @@
         "single_handed",
         "aetheric"
       ],
-      "effect": "Pulls metallic objects toward the wielder.",
+      "effect": "Pulls metallic enemies closer on hit.",
       "description": "Aether-magnetized rod. Tugs at iron from a distance."
     },
     {
@@ -3341,7 +3341,7 @@
         "blade",
         "unknowing_masses"
       ],
-      "effect": "Emits energy pulse on hit.",
+      "effect": "+1d4 energy damage on hit.",
       "description": "High-tech saber. The crossguard pulses when it lands."
     },
     {
@@ -3606,7 +3606,7 @@
         "mud_dwellers",
         "legendary"
       ],
-      "effect": "Bleed (1d6 × 2 rounds); reduces enemy armor.",
+      "effect": "Bleeds — +1d6 slashing damage for 2 rounds; reduces enemy armor by 1 on hit.",
       "description": "Royal-tier saber of the Mud Emperor. Hooked at the tip."
     },
     {
@@ -3721,7 +3721,7 @@
         "aetheric",
         "legendary"
       ],
-      "effect": "Instantly kills enemies on max roll if HP below 20.",
+      "effect": "+20 damage on a max roll — the edge finds the artery.",
       "description": "Aether blade with a cold, listening edge."
     },
     {
@@ -3744,7 +3744,7 @@
         "mud_dwellers",
         "legendary"
       ],
-      "effect": "Poison (1d6/turn); reduces enemy armor by 2.",
+      "effect": "Poison that lasts — +1d6 poison damage for 2 rounds; reduces enemy armor by 2 on hit.",
       "description": "Royal Mud blade, etched with the venom recipe."
     },
     {
@@ -4527,7 +4527,7 @@
         "unknowing_masses",
         "legendary"
       ],
-      "effect": "Ignores shields on advantage rolls.",
+      "effect": "Ignores shields on a max roll.",
       "description": "Burst-fire plasma rifle. Each pull empties three bolts."
     },
     {
@@ -4658,7 +4658,7 @@
         "aetheric",
         "buff"
       ],
-      "effect": "Caster moves at 2× speed for 2 rounds.",
+      "effect": "Quick as light — +3 AC for 2 rounds, on use.",
       "description": "Wind-carved runecaster. Quickens the foot, blurs the step."
     },
     {
@@ -4679,7 +4679,7 @@
         "mud_dwellers",
         "cover"
       ],
-      "effect": "Creates a small dust cloud for cover. 1 round.",
+      "effect": "Raises a dust cloud — you are in cover for 1 round, on use.",
       "description": "Powdered-clay runecaster. Throws a screen of dust at the snap."
     },
     {
@@ -4700,7 +4700,7 @@
         "aetheric",
         "healing"
       ],
-      "effect": "Restores 1d6 HP to a target. Instantaneous.",
+      "effect": "Restores 1d6 HP to you on use.",
       "description": "A warm runecaster — knits small wounds when pressed to skin."
     },
     {
@@ -4762,7 +4762,7 @@
         "aetheric",
         "utility"
       ],
-      "effect": "Repairs Tartarian tech. Instantaneous.",
+      "effect": "Chirps at broken Tartarian tech and mends none of it — a diagnostic, not a cure.",
       "description": "A patchwork runecaster — bends Aether toward broken metal."
     },
     {
@@ -4804,7 +4804,7 @@
         "mud_dwellers",
         "ward"
       ],
-      "effect": "Shields caster with mud barrier; blocks 1d6 damage. 3 rounds.",
+      "effect": "Wards you in a shell of mud — blocks 1d6 damage for 3 rounds, on use.",
       "description": "A dome-shaped runecaster. Calls a mud shell up around the wielder."
     },
     {
@@ -4846,7 +4846,7 @@
         "aetheric",
         "unmaking"
       ],
-      "effect": "Disables magical effects in a small area. 2 rounds.",
+      "effect": "Unmakes the aether around the target — slows it for 2 rounds.",
       "description": "Cracked-crystal runecaster. Severs the Aether-thread of nearby effects."
     },
     {
@@ -4887,7 +4887,7 @@
         "aetheric",
         "ward"
       ],
-      "effect": "Creates force barrier; blocks 1d6 damage. 5 rounds.",
+      "effect": "Wards you behind a force barrier — blocks 1d6 damage for 5 rounds, on use.",
       "description": "Lattice-runecaster. Calls a small force-screen between caster and threat."
     },
     {
@@ -4949,7 +4949,7 @@
         "mud_dwellers",
         "ward"
       ],
-      "effect": "Covers self in mud armor; blocks 2d6 damage. 5 rounds.",
+      "effect": "Wards you in mud armor — blocks 2d6 damage for 5 rounds, on use.",
       "description": "Wide flat runecaster. Plates the wielder in living mud."
     },
     {
@@ -4990,7 +4990,7 @@
         "aetheric",
         "aoe"
       ],
-      "effect": "Area attack — 2d6 force damage to all targets. Instantaneous.",
+      "effect": "Area attack — 2d6 force to all enemies in reach.",
       "description": "Wave-front runecaster. Cracks the air outward from the caster."
     },
     {
@@ -5011,7 +5011,7 @@
         "aetheric",
         "ward"
       ],
-      "effect": "Floating Aether shield; blocks 2d6 damage. 3 rounds.",
+      "effect": "Wards you in floating aether — blocks 2d6 damage for 3 rounds, on use.",
       "description": "A small disk-runecaster. Hovers between caster and harm. Renamed from Aetheric Shield in OTA-134 — the melee Aetheric Shield is a different item."
     },
     {
@@ -5073,7 +5073,7 @@
         "mud_dwellers",
         "summon"
       ],
-      "effect": "Creates temporary mud weapons; last 1 encounter.",
+      "effect": "Mud hardens into a second edge in your off hand — +1d6 bludgeoning damage on hit.",
       "description": "Anvil-shaped runecaster. Calls a brief mud-iron blade into a free hand."
     },
     {
@@ -5115,7 +5115,7 @@
         "aetheric",
         "ward"
       ],
-      "effect": "Invisible force armor; blocks 2d10 damage. 5 rounds.",
+      "effect": "Wards you in invisible force armor — blocks 2d10 damage for 5 rounds, on use.",
       "description": "Lattice runecaster. Plates the caster in unseen force."
     },
     {
@@ -5177,7 +5177,7 @@
         "mud_dwellers",
         "summon"
       ],
-      "effect": "Summons a powerful mud golem (golem stats). 10 rounds.",
+      "effect": "Wards you in a golem's hide of packed mud — blocks 2d8 damage for 5 rounds, on use.",
       "description": "Heart-shaped runecaster. Hardens a heap of silt into a moving guardian."
     },
     {
@@ -5198,7 +5198,7 @@
         "aetheric",
         "aoe"
       ],
-      "effect": "Causes structures to collapse on enemies. 2d8 damage. Instantaneous.",
+      "effect": "Brings the roof down — 2d8 to all enemies in reach.",
       "description": "Cracked-key runecaster. Pulls overhead structure down with a word."
     },
     {
@@ -5219,7 +5219,7 @@
         "mud_dwellers",
         "ward"
       ],
-      "effect": "Mud covers an ally — blocks 2d8 damage. 5 rounds.",
+      "effect": "Wards you in packed mud — blocks 2d8 damage for 5 rounds, on use.",
       "description": "Twin-runecaster. Plates an ally in living mud at range."
     },
     {
@@ -5241,7 +5241,7 @@
         "legendary",
         "unmaking"
       ],
-      "effect": "Teleports caster to a visible location. Instantaneous.",
+      "effect": "1d10 aetheric; you blink out of reach — +4 AC for 2 rounds after a hit.",
       "description": "Spiral-runecaster. Pulls the caster sideways through the Veil."
     },
     {
@@ -5284,7 +5284,7 @@
         "mud_dwellers",
         "legendary"
       ],
-      "effect": "Curse — 2d10 damage per round. 3 rounds.",
+      "effect": "2d10 poison; the curse festers — +1d10 poison damage for 3 rounds.",
       "description": "Royal-tier runecaster. The Mud Emperor's curse, sealed in clay."
     },
     {
@@ -5305,7 +5305,7 @@
         "aetheric",
         "legendary"
       ],
-      "effect": "Breaks any magical effect or structure. Instantaneous.",
+      "effect": "Shatters whatever holds the target together — reduces enemy armor by 3 on hit.",
       "description": "Fracture-runecaster. Snaps Aether-binding outright."
     },
     {
@@ -5327,7 +5327,7 @@
         "summon",
         "legendary"
       ],
-      "effect": "Summons an army of mud creatures (each 2d8). 1 encounter.",
+      "effect": "Raises a mud army under your enemies — 2d8 to all enemies in reach.",
       "description": "Banner-runecaster of the Mud Emperor. Calls a small army of clay-soldiers."
     },
     {
@@ -5417,7 +5417,7 @@
         "fire",
         "crafted"
       ],
-      "effect": "1d6 fire; chance to ignite the target for 1 round.",
+      "effect": "1d6 fire; the target keeps burning — +1d4 burn damage for 2 rounds.",
       "description": "Flame of Aether. A pocket-sized runecaster that breathes a thumb of orange flame on a held tap."
     },
     {
@@ -5571,7 +5571,7 @@
         "poison",
         "crafted"
       ],
-      "effect": "2d6 necrotic; 50% chance to apply poisoned (2 rounds).",
+      "effect": "2d6 poison; the blight festers — +1d4 poison damage for 2 rounds.",
       "description": "Dark Blight. A dull obsidian runecaster, etched with quarantine-glyphs. Leaves a green halo on the wound."
     },
     {
@@ -5658,7 +5658,7 @@
         "crafted",
         "unmaking"
       ],
-      "effect": "2d8 aetheric; caster turns invisible for 1 round after the hit.",
+      "effect": "2d8 aetheric; you step into shadow — +3 AC for 1 round after a hit.",
       "description": "Shadow Caller. A black-glass runecaster. The strike lands, then you aren't where you were."
     },
     {
@@ -5681,7 +5681,7 @@
         "aoe",
         "crafted"
       ],
-      "effect": "2d8 fire; 15 ft AoE, burning ground for 2 rounds.",
+      "effect": "2d8 fire to all enemies in reach; the ground keeps burning — +1d4 burn damage for 2 rounds.",
       "description": "Ember Storm. A ribbed cylinder runecaster — exhales a fan of embers, leaves the floor glowing."
     },
     {
@@ -5703,7 +5703,7 @@
         "electrical",
         "crafted"
       ],
-      "effect": "2d8 lightning; arcs to one extra target within 10 ft.",
+      "effect": "2d8 lightning; the arc jumps to one extra enemy in reach.",
       "description": "Stormcaller. A bronze trident-runecaster. Calls a private squall onto whatever it's pointed at."
     },
     {
@@ -5749,7 +5749,7 @@
         "legendary",
         "crafted"
       ],
-      "effect": "2d20 fire; resurrects one downed ally to half HP.",
+      "effect": "2d20 fire; the phoenix's warmth restores 2d6 HP to you after a hit.",
       "description": "Phoenix Rebirth. A crown-shaped runecaster set with a single Aether Wing. The fire it throws is the same fire that brings the ally back."
     },
     {
@@ -5772,7 +5772,7 @@
         "crafted",
         "unmaking"
       ],
-      "effect": "2d20 void; opens a damaging rift on the target tile for 2 rounds.",
+      "effect": "2d20 void; the rift keeps cutting — +1d8 aetheric damage for 2 rounds.",
       "description": "Void Edge. A blade-shaped runecaster, no edge — the cut happens in the Veil. Whatever stands in the rift keeps bleeding."
     },
     {
@@ -6245,7 +6245,7 @@
         "ward",
         "crafted"
       ],
-      "effect": "Sheathes you in a shell of standing frost that cracks before you do.",
+      "effect": "Wards you in standing frost that cracks before you do — blocks 2d8 damage for 4 rounds, on use.",
       "description": "Hoarfrost Ward. Frost grown outward in plates until it stands off the body — it takes the blow and shatters, and you walk out of the shards."
     },
     {
@@ -6314,7 +6314,7 @@
         "radiation",
         "crafted"
       ],
-      "effect": "1d8 radiation; the wound keeps working after the light is gone.",
+      "effect": "1d8 radiation; the wound keeps working — +1d4 radiation damage for 2 rounds.",
       "description": "Glowrot. A cracked lens over a seed of something that has not stopped burning since before the water came. Point it and the light does the rest."
     },
     {
@@ -6383,7 +6383,7 @@
         "legendary",
         "crafted"
       ],
-      "effect": "2d10 radiation; the decay keeps going long after the pulse ends.",
+      "effect": "2d10 radiation; the decay keeps going — +1d6 radiation damage for 3 rounds.",
       "description": "Half-Life Pulse. Whatever powers it has been dying for ten thousand years and is not finished. Neither is what it points at."
     },
     {
@@ -6474,7 +6474,7 @@
         "loot",
         "legendary"
       ],
-      "effect": "2d8 aetheric; the struck target bleeds 1 corruption a round for 3 rounds.",
+      "effect": "2d8 aetheric; the rot keeps working — +1d4 aetheric damage for 3 rounds.",
       "description": "Necromancer Staff. A length of lich-bone capped with a skull that is not quite empty. A power weapon: it casts what it remembers."
     },
     {

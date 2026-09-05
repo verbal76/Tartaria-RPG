@@ -163,8 +163,17 @@ describe('OTA-1645 — the shield AC on the card is the shield AC in the fight',
     const withAc = WEAPONS.filter((w) => /\+\s*\d+\s*AC\b/i.test(w.effect ?? ''));
     expect(withAc.length).toBeGreaterThanOrEqual(8);
     const unread = withAc.filter((w) => !parseWeaponEffect(w.effect)?.shieldAc);
+    // ⚠ OTA-1676 (slice 4c) — every timed "+N AC" is read now, just not HERE:
+    // a guard you earn by swinging is a status on the wielder, not a passive
+    // the gear stack holds, so it rides `selfBuff` (guard). This list is the
+    // proof the two readers do not overlap — each of these four has a selfBuff
+    // and no shieldAc, and the Shield-Hammer waited for exactly this.
     expect(unread.map((w) => `${w.name}: ${w.effect}`)).toEqual([
       'Aetheric Shield-Hammer: +2 AC for 1 round after a hit. Grants +15 HP.',
+      'Lightfoot Dash Wand: Quick as light — +3 AC for 2 rounds, on use.',
+      'Displace Aether Scepter: 1d10 aetheric; you blink out of reach — +4 AC for 2 rounds after a hit.',
+      'Shadow Caller Stave: 2d8 aetheric; you step into shadow — +3 AC for 1 round after a hit.',
     ]);
+    for (const w of unread) expect(parseWeaponEffect(w.effect)?.selfBuff?.kind).toBe('guard');
   });
 });

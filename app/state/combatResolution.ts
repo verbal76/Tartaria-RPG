@@ -1804,6 +1804,18 @@ function applyEnemyCounter(
       `${enemy.name} strikes — and the blow breaks WHOLE on your raised shield. ✓ BLOCKED (absorbed; the block is spent).`,
       { combatOutcome: 'enemy_miss' },
     );
+    // ⚠ OTA-1676 — a raised BLOCK is the block the spiked shields name. The
+    // blow broke on the shield, so the shield's bite is owed here too.
+    {
+      const raised = heldShieldAc(player);
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const wevBlk = require('../engine/weaponEffects') as typeof import('../engine/weaponEffects');
+      const bite = wevBlk.rollShieldReflect(raised.riders);
+      if (bite > 0) {
+        const t = raised.riders?.reflect?.type ?? resolveEnemyDamageType(enemy);
+        dealReflectToAttacker(get, set, enemy, bite, `Your ${raised.name} bites on the block — ${enemy.name} takes ${bite} ${t}.`);
+      }
+    }
     return;
   }
 
@@ -2449,6 +2461,27 @@ function applyEnemyCounter(
       { hasShield: !!heldShield.name, traits: enemy.traits },
       Math.random,
     );
+    // ⚠⚠⚠ OTA-1676 (slice 4c) — THE SHIELD'S RIDERS, SPENT ON THE BLOW THAT
+    // LANDED ON IT. Nine shields print a soak ("reduces incoming slashing by
+    // 1d6"), an immunity ("Blocks all plasma damage") or both, and OTA-1645's
+    // note admitted it read only their AC. The landing roll above is what makes
+    // this honest: a plate that turns slashing does nothing for a blow that
+    // came around it to your ribs. It runs on the FINAL number, after the
+    // mitigation floor, as a soak pool — OTA-924's own carve-out for the ward —
+    // so a matched immunity may zero a hit, and the line says which shield did.
+    let shieldSoakTag = '';
+    if (landing.on === 'shield' && heldShield.riders && dmg > 0) {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const wev4c = require('../engine/weaponEffects') as typeof import('../engine/weaponEffects');
+      const cut = wev4c.shieldDamageReduction(heldShield.riders, enemyDamageType, dmg);
+      if (cut.immune) {
+        shieldSoakTag = ` [${heldShield.name} turns the ${enemyDamageType} aside entirely]`;
+        dmg = 0;
+      } else if (cut.soaked > 0) {
+        shieldSoakTag = ` [${heldShield.name} takes ${cut.soaked} of it]`;
+        dmg = cut.dmg;
+      }
+    }
     let coatingClause = '';
     let coatingAilment: string | null = null;
     let coatingCorruption = 0;
@@ -2579,8 +2612,8 @@ function applyEnemyCounter(
         plate: plateDr,                // OTA-1141 — capped-off AC soaks instead
       });
       const msg = killed
-        ? `${enemy.name} deals ${dmg} ${enemyDamageType} damage${modClause}${edgeWeak ? ' [edge of reach — halved]' : ''}${coatingClause}. You fall.`
-        : `${enemy.name} deals ${dmg} ${enemyDamageType} damage${modClause}${edgeWeak ? ' [edge of reach — halved]' : ''}${coatingClause}. You have ${newHp} HP remaining.`;
+        ? `${enemy.name} deals ${dmg} ${enemyDamageType} damage${modClause}${edgeWeak ? ' [edge of reach — halved]' : ''}${shieldSoakTag}${coatingClause}. You fall.`
+        : `${enemy.name} deals ${dmg} ${enemyDamageType} damage${modClause}${edgeWeak ? ' [edge of reach — halved]' : ''}${shieldSoakTag}${coatingClause}. You have ${newHp} HP remaining.`;
       const prevHpForWarn = nextPlayer.hp;
       const hpMaxForWarn = nextPlayer.hpMax ?? 1;
       void Promise.resolve().then(() => {
@@ -2663,27 +2696,24 @@ function applyEnemyCounter(
     // post-mitigation rule the escort line above uses. A blow that was wholly
     // parried or soaked did not sink into the spikes, and paying reflect on it
     // would make a perfect defence also the best offence.
-    const reflectBack = dmg > 0 && !killed ? aggregateEquippedReflect(player) : 0;
+    const armourReflect = dmg > 0 && !killed ? aggregateEquippedReflect(player) : 0;
+    // ⚠⚠ OTA-1676 — AND THE SHIELD BITES ON THE BLOCK. Four shields print it
+    // ("Deals 1d6 damage on the block", "reflects 1d6 back"), and unlike the
+    // armour above it is owed by the BLOCK, not by the wound: a blow that
+    // landed on a spiked shield paid the spikes even when the shield soaked all
+    // of it. Same kill path — an enemy that dies on your shield is defeated.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const wevReflect = require('../engine/weaponEffects') as typeof import('../engine/weaponEffects');
+    const shieldReflect = !killed && landing.on === 'shield' ? wevReflect.rollShieldReflect(heldShield.riders) : 0;
+    const reflectBack = armourReflect + shieldReflect;
     if (reflectBack > 0) {
-      const sc = get().currentScene;
-      const ri = sc ? sc.enemies.findIndex((e) => e === enemy) : -1;
-      const rAt = ri >= 0 ? ri : (sc ? sc.enemies.findIndex((e, i) => e.name === enemy.name && (sc.enemyHps[i] ?? 0) > 0) : -1);
-      if (sc && rAt >= 0) {
-        const rBefore = sc.enemyHps[rAt] ?? 0;
-        const rAfter = Math.max(0, rBefore - reflectBack);
-        set((st) => (st.currentScene
-          ? { currentScene: { ...st.currentScene, enemyHps: st.currentScene.enemyHps.map((hp, i) => (i === rAt ? rAfter : hp)) } }
-          : st));
-        get().appendLog('combat', `Your armour turns the blow back — ${enemy.name} takes ${reflectBack} ${enemyDamageType}. (${rAfter} HP left)`);
-        // ⚠ A kill by reflect goes through resolveEnemyDefeat exactly as the dog
-        // vest's does (OTA-1640), so loot, credit and the mission slate all fire.
-        // An enemy that dies to your own armour is still an enemy you defeated.
-        if (rBefore > 0 && rAfter <= 0) {
-          get().appendLog('world', `${enemy.name} drops, undone by what it spent on you.`);
-          set((st) => (st.currentScene ? { currentScene: { ...st.currentScene, activeEnemyIdx: rAt } } : st));
-          get().resolveEnemyDefeat();
-        }
-      }
+      const reflectType = heldShield.riders?.reflect?.type ?? enemyDamageType;
+      const line = shieldReflect > 0 && armourReflect > 0
+        ? `Your armour and your ${heldShield.name} turn the blow back — ${enemy.name} takes ${reflectBack} (${armourReflect} ${enemyDamageType}, ${shieldReflect} ${reflectType} off the shield).`
+        : shieldReflect > 0
+          ? `Your ${heldShield.name} bites on the block — ${enemy.name} takes ${shieldReflect} ${reflectType}.`
+          : `Your armour turns the blow back — ${enemy.name} takes ${reflectBack} ${enemyDamageType}.`;
+      dealReflectToAttacker(get, set, enemy, reflectBack, line);
     }
 
     // OTA-936 — LEGIBILITY CUES (once per encounter, after the damage line). A matched
@@ -3052,5 +3082,39 @@ export function handlePlayerDeath(
       `${player.name}|${Date.now()}`,
     );
     set(() => ({ pendingDeath: scene }));
+  }
+}
+
+/**
+ * ⚠⚠ OTA-1676 — ONE PATH FOR EVERYTHING THAT BITES THE ATTACKER BACK. Lifted
+ * out of the OTA-1671 armour block so the shield's on-block bite (and the
+ * raised-BLOCK path, which never reaches that block) pay through the same
+ * write: find the attacker, take the HP, print the line with what is left, and
+ * — because an enemy that dies to your own gear is still an enemy you defeated
+ * (OTA-1640's rule) — route a kill through resolveEnemyDefeat so loot, credit
+ * and the mission slate all fire.
+ */
+export function dealReflectToAttacker(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  enemy: Enemy,
+  amount: number,
+  line: string,
+): void {
+  if (amount <= 0) return;
+  const sc = get().currentScene;
+  const ri = sc ? sc.enemies.findIndex((e) => e === enemy) : -1;
+  const rAt = ri >= 0 ? ri : (sc ? sc.enemies.findIndex((e, i) => e.name === enemy.name && (sc.enemyHps[i] ?? 0) > 0) : -1);
+  if (!sc || rAt < 0) return;
+  const rBefore = sc.enemyHps[rAt] ?? 0;
+  const rAfter = Math.max(0, rBefore - amount);
+  set((st) => (st.currentScene
+    ? { currentScene: { ...st.currentScene, enemyHps: st.currentScene.enemyHps.map((hp, i) => (i === rAt ? rAfter : hp)) } }
+    : st));
+  get().appendLog('combat', `${line} (${rAfter} HP left)`);
+  if (rBefore > 0 && rAfter <= 0) {
+    get().appendLog('world', `${enemy.name} drops, undone by what it spent on you.`);
+    set((st) => (st.currentScene ? { currentScene: { ...st.currentScene, activeEnemyIdx: rAt } } : st));
+    get().resolveEnemyDefeat();
   }
 }

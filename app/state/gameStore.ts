@@ -240,6 +240,7 @@ import {
   staggerEnemy, sweepDeadEnemies, tickEnemyDotsAndMaybeEndFight,
   dogVestStatBonus, // OTA-1640
 } from './combatResolution';
+import { applyWeaponSelfBuff, shredEnemyArmor, landControlOnScene } from './weaponRiderEffects'; // OTA-1676
 // ⚠ OTA-1404 — gear wear moved DOWN because combat AND digging both wear gear,
 // so neither could own it. See gearWear.ts.
 import { wearEquippedItem } from './gearWear';
@@ -23233,6 +23234,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
         'combat',
         `You — d20 → ${naturalRoll} + ${attack.bonusLabel} = ${attack.total} ${acTag} — ${outcome}`,
       );
+      // OTA-1676 — the wielder's own share, owed by the SWING: a ward you raise lands on a miss too.
+      const swung = getEquippedWeapon(player, /\boff[- ]?hand\b/.test(actionText) ? 'off' : 'main');
+      applyWeaponSelfBuff(get, set, parseWeaponEffect(swung?.effect), swung?.name ?? 'your weapon', 'use');
 
       // ⚠⚠⚠ OTA-1564 — THE WEAPON THAT PUNISHES YOU FOR A NATURAL 1. Four
       // firearms have said so on the card forever, and `ActionReferenceScreen`
@@ -23701,6 +23705,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (blastScene && targetBand) {
           const victims: number[] = [];
           blastScene.enemies.forEach((e, i) => {
+            if (splashSpec.maxVictims && victims.length >= splashSpec.maxVictims) return; // OTA-1676 — a blast with a headcount
             if (i === activeIdx) return;                                  // the target took the swing itself
             if ((blastScene.enemyHps[i] ?? 0) <= 0) return;               // never re-kill a corpse
             if (blastScene.enemyKnockedOut?.[i]) return;
@@ -23916,17 +23921,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           triggered,
         });
         if (landed) {
-          set((s) => {
-            if (!s.currentScene) return s;
-            const n = s.currentScene.enemies.length;
-            const ctrls = [...(s.currentScene.enemyControl ?? [])];
-            const braces = [...(s.currentScene.enemyBraced ?? [])];
-            while (ctrls.length < n) ctrls.push(null);
-            while (braces.length < n) braces.push(0);
-            ctrls[idxCtl] = landed.control;
-            braces[idxCtl] = landed.braceRounds;
-            return { currentScene: { ...s.currentScene, enemyControl: ctrls, enemyBraced: braces } };
-          });
+          landControlOnScene(set, idxCtl, landed);
           const lbl = controlLabel(landed.control.kind);
           const rds = landed.control.roundsRemaining;
           get().appendLog(
@@ -23935,6 +23930,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
         }
       }
+      // ⚠ OTA-1676 (slice 4c) — the shred a hit leaves on the guard (the four mud
+      // blades OTA-1563 left "for the shred slice"), capped like the acid coating's,
+      // and the wielder's own share that a HIT earns (the Shield-Hammer's guard).
+      if (parsedEffect?.onHitShred && newEnemyHp > 0) {
+        shredEnemyArmor(set, Math.max(0, Math.min(activeIdx, currentScene.enemies.length - 1)), parsedEffect.onHitShred, acidShredCap(enemy));
+        get().appendLog('combat', `The ${equipped?.name ?? 'blow'} tears ${parsedEffect.onHitShred} off ${enemy.name}'s armour — easier to hit from here.`);
+      }
+      applyWeaponSelfBuff(get, set, parsedEffect, equipped?.name ?? 'your weapon', 'hit');
 
       // ⚠⚠⚠ OTA-1564 — THE MAX-ROLL PAYLOADS, PAID. Named out loud on the beat
       // they happen: a signature effect the player cannot SEE fire is, from
@@ -23953,14 +23956,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // implementable and closer to what "splits shields" means anyway.
         const shred = maxRollShredAmount(onMax, enemy);
         if (shred > 0) {
-          const idxShred = Math.max(0, Math.min(activeIdx, currentScene.enemies.length - 1));
-          set((s) => {
-            if (!s.currentScene) return s;
-            const arr = [...(s.currentScene.enemyArmorShred ?? [])];
-            while (arr.length < s.currentScene.enemies.length) arr.push(0);
-            arr[idxShred] = (arr[idxShred] ?? 0) + shred;
-            return { currentScene: { ...s.currentScene, enemyArmorShred: arr } };
-          });
+          shredEnemyArmor(set, Math.max(0, Math.min(activeIdx, currentScene.enemies.length - 1)), shred);
           get().appendLog(
             'combat',
             onMax.pierce

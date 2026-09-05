@@ -877,11 +877,21 @@ export function equippedGearAc(
  */
 export function heldShieldAc(
   player: PlayerCharacter | null | undefined,
-): { flat: number; vs: { amount: number; types: readonly string[] } | null; name: string | null } {
-  const none = { flat: 0, vs: null, name: null };
+): {
+  flat: number;
+  vs: { amount: number; types: readonly string[] } | null;
+  name: string | null;
+  /** OTA-1676 — the whole parsed shield (dr / immune / reflect ride here), so
+   *  the resolver reads one object for everything the held shield does. */
+  riders: import('./weaponEffects').ShieldAc | null;
+} {
+  const none = { flat: 0, vs: null, name: null, riders: null };
   if (!player) return none;
   const eq = player.equipped ?? {};
-  let best = none as { flat: number; vs: { amount: number; types: readonly string[] } | null; name: string | null };
+  let best = none as {
+    flat: number; vs: { amount: number; types: readonly string[] } | null; name: string | null;
+    riders: import('./weaponEffects').ShieldAc | null;
+  };
   for (const held of [eq.main, eq.off]) {
     if (!held) continue;
     // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -891,10 +901,20 @@ export function heldShieldAc(
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { parseWeaponEffect } = require('./weaponEffects') as typeof import('./weaponEffects');
     const sac = parseWeaponEffect(row.effect)?.shieldAc;
-    if (!sac) continue;
-    const flat = sac.flat ?? 0;
-    if (flat > best.flat || (best.name === null && (flat > 0 || sac.vs))) {
-      best = { flat, vs: sac.vs ?? null, name: row.name };
+    // ⚠ OTA-1676 — A SHIELD WITH NOTHING ON ITS CARD IS STILL A SHIELD. The Mud
+    // Buckler and Iron Buckler print only an HP grant, so they parsed to nothing
+    // and were never "held" for OTA-1646's landing roll — a blow could not land
+    // on them and they never took the wear. The tag is what makes a shield a
+    // shield (the bash and the BLOCK action already read it); the effect column
+    // only says what ELSE it does.
+    const taggedShield = (row.tags ?? []).includes('shield');
+    if (!sac && !taggedShield) continue;
+    const flat = sac?.flat ?? 0;
+    // ⚠ OTA-1676 — a shield whose whole card is a rider (Mud Spiked Shield:
+    // "Deals 1d6 damage on the block") is still the held shield.
+    const carries = taggedShield || flat > 0 || !!sac?.vs || !!sac?.dr || !!sac?.immune || !!sac?.reflect;
+    if (flat > best.flat || (best.name === null && carries)) {
+      best = { flat, vs: sac?.vs ?? null, name: row.name, riders: sac ?? null };
     }
   }
   return best;

@@ -55,17 +55,28 @@ describe('OTA-1565 — nine weapons stop hitting exactly one thing', () => {
     // nearby enemies". OTA-1563 already taught this codebase that the verb list
     // is usually the real ceiling, not the catalog.
     const found = WEAPONS.filter((w) => parseWeaponEffect(w.effect)?.splash).map((w) => w.name).sort();
+    // ⚠ OTA-1676 (slice 4c) — six more, each a card reworded onto the blast
+    // grammar or a new spelling of it: the Collapse Stave, Wave Rod and Army
+    // Scepter say "to all enemies in reach"; the Plasma Blade bursts on a max
+    // roll; Ember Storm's terrain became a real festering rider so its blast no
+    // longer waits; and the Stormcaller's arc is a blast with a headcount of one.
     expect(found).toEqual([
+      'Aetheric Collapse Stave',
+      'Aetheric Plasma Blade',
       'Aetheric Storm Scepter',
       'Aetheric Sword of Storms',
+      'Aetheric Wave Rod',
+      'Ember Storm Stave',
       'Fallout Bloom Stave',
       'Giant Warblade',
       'Magna-Cannon',
+      'Mud Army Scepter',
       'Mud Army War Hammer',
       'Plasma Artillery Cannon',
       'Plasma Cannon',
       'Plasma Destroyer',
       'Plasma Rifle',
+      'Stormcaller Stave',
     ]);
   });
 
@@ -132,9 +143,13 @@ describe('OTA-1565 — nine weapons stop hitting exactly one thing', () => {
     expect(parseWeaponEffect('2d8 damage to all enemies; knocks prone.')?.splash).toBeUndefined();
     expect(parseWeaponEffect('2d20 bludgeoning; massive AoE stun + knockback (all enemies in 15 ft).')?.splash)
       .toBeUndefined();
-    // Ember Storm's blast comes packaged with burning terrain this slice cannot
-    // lay down, so the weapon waits rather than getting half of itself.
-    expect(splashOf('Ember Storm Stave')).toBeUndefined();
+    // Ember Storm's blast used to come packaged with burning terrain this slice
+    // could not lay down, so the weapon waited rather than getting half of
+    // itself. ⚠ OTA-1676 — the terrain was reworded onto a real festering rider
+    // ("+1d4 burn damage for 2 rounds"), so the whole card is paid now: the
+    // blast at its base dice AND the burn. The deferral rule above is unchanged.
+    expect(splashOf('Ember Storm Stave')).toEqual({ dice: '2d8' });
+    expect(parseWeaponEffect(row('Ember Storm Stave').effect)?.riderDot).toMatchObject({ dice: '1d4', type: 'burn', rounds: 2 });
   });
 
   it('⚠⚠⚠ …but the DICE may sit in a neighbouring clause, and are still found', () => {

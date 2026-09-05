@@ -149,6 +149,32 @@ export interface SplashSpec {
   whenMaxRoll?: boolean;
   /** "enemies or allies", "(allies included)" — friendly fire is real. */
   hitsAllies?: boolean;
+  /** OTA-1676 — "the arc jumps to one extra enemy": a blast with a headcount.
+   *  Unset means everyone in the band, as before. */
+  maxVictims?: number;
+}
+
+/**
+ * ⚠⚠⚠ OTA-1676 (slice 4c) — WHAT THE WEAPON DOES TO ITS OWN WIELDER. Twelve
+ * rune-casters and one hammer promise something to the person holding them —
+ * a ward that soaks damage, a round of cover, a burst of AC after a hit, a
+ * heal — and every one of those cards was flavour, because the only reader the
+ * catalog ever had looked for what a hit did to the ENEMY. The statuses they
+ * need have existed for months: `stone_ward` (OTA-835) soaks a pool,
+ * `in_cover` (+4 AC, defender advantage) is what a dust cloud is, and a timed
+ * AC bump is one field on a status. So the family is four kinds on machinery
+ * already in the game, and `when` says whether the card earns it by swinging
+ * ("on use" — a ward you raise) or by connecting ("after a hit").
+ */
+export interface SelfBuff {
+  kind: 'guard' | 'cover' | 'ward' | 'heal';
+  when: 'use' | 'hit';
+  /** guard: the AC added. */
+  amount?: number;
+  /** ward: the pool soaked (rolled once when raised); heal: the HP restored. */
+  dice?: string;
+  /** Rounds it holds. A heal is instantaneous and carries 0. */
+  rounds: number;
 }
 
 /** "Natural 1 → overheat, useless 2 rounds." A weapon that punishes you later. */
@@ -262,6 +288,12 @@ export interface ParsedWeaponEffect {
   onHitControl?: OnHitControl;
   /** OTA-1574 — how this weapon answers the sky. */
   weather?: WeatherNote;
+  /** OTA-1676 — what the weapon does for the one holding it. */
+  selfBuff?: SelfBuff;
+  /** OTA-1676 — "reduces enemy armor by N on hit": the same `enemyArmorShred`
+   *  lever the acid coating and the max-roll pierce already write, on every
+   *  landed hit. The four mud blades OTA-1563 left "for the shred slice". */
+  onHitShred?: number;
   /** OTA-1645 — the AC a held shield adds. See ShieldAc. */
   shieldAc?: ShieldAc;
 }
@@ -298,6 +330,24 @@ export interface ShieldAc {
    * can spend it.
    */
   vs?: { amount: number; types: readonly string[] };
+  /**
+   * ⚠⚠ OTA-1676 (slice 4c) — THE RIDERS A SHIELD CARRIES PAST ITS AC, all three
+   * spent only when the blow actually LANDS ON THE SHIELD (OTA-1646's landing
+   * roll — the shield answers first unless the enemy comes around it). A plate
+   * that turns slashing does nothing for a blow that reached your ribs.
+   *
+   *   dr      — "reduces incoming slashing by 1d6", "blocks +1d6 from physical
+   *             attacks", "+1d6 environmental damage reduction": rolled off the
+   *             blow that hit the shield, typed by the card's own word.
+   *   immune  — "Blocks all plasma damage", "Blocks Aetheric-based damage":
+   *             the blow is turned outright when its type is named.
+   *   reflect — "Deals 1d6 damage on the block", "reflects 1d6 back": the
+   *             attacker takes it, through the same path as OTA-1671's armour
+   *             bite-back (a kill by reflect is still a defeat).
+   */
+  dr?: { dice: string; types: readonly string[] };
+  immune?: readonly string[];
+  reflect?: { dice: string; type?: string };
 }
 
 /** What the catalog's defensive adjectives mean in damage-type terms. Taken
@@ -316,6 +366,14 @@ const SHIELD_VS_TYPES: ReadonlyArray<readonly [RegExp, readonly string[]]> = [
   // The broad clause first — see the order note above.
   [/\benergy\b/, ['aetheric', 'electrical', 'burn']],
   [/\bphysical\b/, ['slashing', 'piercing', 'bludgeoning']],
+  // ⚠ OTA-1676 — "environmental" is the titles' own hazard set (see the
+  // Etherbound Survivor shave in the resolver): every elemental type, no steel.
+  [/\benvironmental\b|\belemental\b/, ['burn', 'cold', 'electrical', 'poison', 'radiation', 'aetheric']],
+  // ⚠ OTA-1676 — "plasma" is this world's word for the burn-class energy the
+  // plasma weapons deal: every one of them is typed `burn` in the catalog and
+  // no enemy deals a type called plasma, so a plasma shield turns burn or it
+  // turns nothing.
+  [/\bplasma\b/, ['burn']],
   [/\bfire\b|\bflame\b|\bburn\b|\bheat\b/, ['burn']],
   [/\bcold\b|\bfrost\b|\brime\b|\bice\b/, ['cold']],
   [/\bshock\b|\belectric\w*\b|\blightning\b/, ['electrical']],
@@ -330,9 +388,65 @@ const SHIELD_VS_TYPES: ReadonlyArray<readonly [RegExp, readonly string[]]> = [
   [/\baetheric\b|\baether\b/, ['aetheric']],
 ];
 
+/** The damage types a shield clause names, through the one vocabulary. */
+function shieldTypesIn(clause: string): readonly string[] | null {
+  for (const [re, types] of SHIELD_VS_TYPES) if (re.test(clause)) return types;
+  return null;
+}
+
+/**
+ * ⚠⚠ OTA-1676 — THE THREE SHIELD RIDERS, read clause by clause off the nine
+ * strings that carry them. Every pattern here is a shield's sentence quoted, not
+ * a rule invented: `reduces incoming slashing by 1d6`, `reduces blunt force by
+ * 1d6`, `blocks +1d6 from physical attacks`, `+1d6 environmental damage
+ * reduction`, `Blocks all plasma damage`, `Blocks Aetheric-based damage`,
+ * `Deflects runecasters`, `Deals 1d6 damage on the block`, `reflects 1d6 back`,
+ * `reflects up to 1d6 back at attacker`.
+ */
+function shieldRidersFrom(text: string, out: ShieldAc): boolean {
+  let touched = false;
+  for (const clause of text.split(/[.;]/)) {
+    // Reflect — the attacker's share. Read before DR because "reflects 1d6
+    // back" has no defensive verb in it and must not fall through to nothing.
+    const refl = clause.match(/\breflects?\s+(?:up\s+to\s+)?(\d+d\d+)/)
+      ?? clause.match(/\bdeals?\s+(\d+d\d+)\s+damage\s+on\s+the\s+block/);
+    if (refl) {
+      const typeWord = clause.match(RIDER_TYPE_RE)?.[1];
+      out.reflect = { dice: refl[1]!, ...(typeWord ? { type: typeWord } : {}) };
+      touched = true;
+      continue;
+    }
+    // Immunity — "blocks all X damage", "blocks X-based damage", "deflects
+    // runecasters". A word this strong needs the type named, or it is not read.
+    if (/\bblocks\s+all\b|\bblocks\s+\w+-based\b|\bdeflects\s+runecasters?\b/.test(clause)) {
+      const types = /\brunecasters?\b/.test(clause) ? ['aetheric'] : shieldTypesIn(clause);
+      if (types) { out.immune = [...(out.immune ?? []), ...types]; touched = true; }
+      continue;
+    }
+    // Damage reduction — dice, typed by the clause's own word. "+1d6" alone is
+    // never enough: the AC parser above owns the plus-sign, and OTA-1643 records
+    // what happens when a defensive number is read as an offensive one.
+    const dr = clause.match(/\breduces?\s+(?:incoming\s+)?[\w\s-]*?\bby\s+(\d+d\d+)/)
+      ?? clause.match(/\bblocks?\s+\+?(\d+d\d+)\s+from\b/)
+      ?? clause.match(/\+(\d+d\d+)\s+\w+\s+damage\s+reduction/);
+    if (dr) {
+      const types = shieldTypesIn(clause);
+      if (types) { out.dr = { dice: dr[1]!, types }; touched = true; }
+    }
+  }
+  return touched;
+}
+
 function shieldAcFrom(text: string): ShieldAc | null {
   const out: ShieldAc = {};
   let touched = false;
+  // ⚠ OTA-1676 — a shield's riders ride the same object as its AC, so one
+  // holder (`heldShieldAc`) hands the resolver everything the shield does. No
+  // word-gate in front of it: the first draft required "shield"/"block" in the
+  // TEXT and the Graviton Shield ("Absorbs impact; +1d6 environmental damage
+  // reduction") has neither — the rider patterns are specific enough to stand
+  // alone, and the probe that found it is now the suite's tail ratchet.
+  if (shieldRidersFrom(text, out)) touched = true;
   for (const clause of text.split(/[.;]/)) {
     const m = clause.match(/\+\s*(\d+)\s*ac\b/);
     if (!m) continue;
@@ -406,7 +520,8 @@ export interface WeatherNote {
 export type ControlKind =
   | 'stunned' | 'paralyzed' | 'restrained'   // skip: the swing is gone
   | 'prone' | 'slowed' | 'blinded'           // hinder: the swing lands worse
-  | 'knockback';                             // hinder: it lands from further off
+  | 'knockback'                              // hinder: it lands from further off
+  | 'pull';                                  // hinder (OTA-1676): dragged off its footing
 
 /** Kinds that cost the enemy its counter-attack outright. */
 export const CONTROL_SKIPS: ReadonlySet<ControlKind> = new Set<ControlKind>([
@@ -670,14 +785,22 @@ const SPLASH_DEFERRED_RE = /\bknock|\bpush\b|\bstun\b|\bprone\b|\bburning ground
  * a weapon that promises two control effects gets the more severe, never both,
  * because two controls off one swing is a lock however it is spelled.
  */
+// ⚠ OTA-1676 (slice 4c) — WIDENED OFF THE TAIL, in the catalog's own words
+// again: "pins enemies for 2 rounds" (both harpoons), "reduces enemy speed by
+// 10 ft" (Mud Saber), "pushes the target back" (Gale Binder, Push Rod, War
+// Pike's "pushed back"), "disables Tartarian tech in the target" (Ether Bolt
+// Rod — a machine with its works stopped is stunned, and only a machine), and
+// the new `pull` — "pulls the target 5 ft closer", "pulls metallic enemies
+// closer" — the mirror of knockback: dragged off its footing, it swings worse.
 const CONTROL_PATTERNS: ReadonlyArray<readonly [ControlKind, RegExp]> = [
   ['paralyzed', /\bparaly\w*|\bshackle|\bbinds?\s+\w*\s*target|\bseizes?\s+(?:a\s+\w+'s\s+)?joints?\b|\bseizes?\s+machin\w*|\bchill\s+seizes\b/],
-  ['restrained', /\brestrain\w*|\bentangl\w*|\bsnare\w*|\bimmobiliz\w*|\bvines?\s+to\b|\broots?\s+entangl/],
-  ['stunned', /\bstuns?\b|\bstunned\b|\bstunning\b|\bknock-stun\b|\bdaze\w*/],
-  ['knockback', /\bknock(?:s|ed)?\s*back\b|\bknockback\b|\bpush(?:es)?\s+enem|\bpush\s+\w+\s+to\s+far\b/],
+  ['restrained', /\brestrain\w*|\bentangl\w*|\bsnare\w*|\bimmobiliz\w*|\bvines?\s+to\b|\broots?\s+entangl|\bpins?\s+(?:the\s+)?(?:enem\w*|target)\b/],
+  ['stunned', /\bstuns?\b|\bstunned\b|\bstunning\b|\bknock-stun\b|\bdaze\w*|\bdisables?\s+(?:tartarian\s+)?tech\b/],
+  ['knockback', /\bknock(?:s|ed)?\s*back\b|\bknockback\b|\bpush(?:es)?\s+enem|\bpush\s+\w+\s+to\s+far\b|\bpush(?:es|ed)?\s+(?:the\s+)?target\s+back\b|\bpushed\s+back\b/],
+  ['pull', /\bpulls?\s+(?:the\s+)?(?:\w+\s+){0,4}closer\b/],
   ['prone', /\bprone\b|\bknocks?\s+\w*\s*down\b|\bor\s+fall\b|\btrip\s+enem|\bfall\b/],
   ['blinded', /\bblind\w*/],
-  ['slowed', /\bslow\w*|\bstrikes?\s+late\b|\bstaggers?\b|\bchill\s+sets\s+in\b|\bsickens?\b|\bweaken\b/],
+  ['slowed', /\bslow\w*|\bstrikes?\s+late\b|\bstaggers?\b|\bchill\s+sets\s+in\b|\bsickens?\b|\bweaken\b|\breduces?\s+(?:enemy\s+|target\s+)?speed\b/],
 ];
 
 /**
@@ -686,7 +809,9 @@ const CONTROL_PATTERNS: ReadonlyArray<readonly [ControlKind, RegExp]> = [
  * "construct" keyword is deliberate: not one of the four uses the word the
  * condition is called.
  */
-const MACHINE_SCOPED_RE = /\bmachin\w*|\bconstruct\w*|\bautomation/;
+// OTA-1676 — "tech" (Ether Bolt Rod) and "metallic" (Magnetic Axe, the
+// magnetised pair) are the same scope in two more of the catalog's words.
+const MACHINE_SCOPED_RE = /\bmachin\w*|\bconstruct\w*|\bautomation|\btech\b|\bmetallic\b/;
 /** The lesser thing the card promises everyone who is not a machine. */
 const MACHINE_FALLBACK_RE = /\bstaggers?\s+the\s+living\b|\band\s+staggers?\b/;
 
@@ -748,7 +873,54 @@ function controlFrom(text: string): OnHitControl | null {
     out.restrictedTo = 'construct';
     if (MACHINE_FALLBACK_RE.test(text)) out.fallback = 'slowed';
   }
+  // ⚠ OTA-1676 — a magnet drags METAL. "Pulls metallic enemies closer" is
+  // scoped exactly like the freezes above: a beast of mud and bone is not
+  // pulled by a magnetised axe, and the card says so.
+  if (found === 'pull' && /\bmetallic\b/.test(text)) out.restrictedTo = 'mechanical';
   return out;
+}
+
+/**
+ * ⚠⚠ OTA-1676 — THE SELF-BUFF GRAMMAR, four shapes and no more, because every
+ * one of the thirteen cards was REWORDED onto them in the same OTA (the "exotic
+ * reword pass" of slice 4c): the catalog's own spellings ("Shields caster with
+ * mud barrier; blocks 1d6 damage. 3 rounds.", "Creates a small dust cloud for
+ * cover. 1 round.", "Caster moves at 2× speed for 2 rounds.") were thirteen
+ * different sentences for four mechanics, and a parser loose enough to read them
+ * all would read a shield's "blocks +1d6 from physical attacks" as a ward too.
+ *
+ *   guard  "+N AC for R rounds"            (+ "after a hit" → when: 'hit')
+ *   cover  "you are in cover for R rounds"
+ *   ward   "wards you … blocks NdN damage for R rounds"
+ *   heal   "restores NdN hp to you"
+ */
+function selfBuffFrom(text: string): SelfBuff | null {
+  for (const clause of text.split(/[.;]/)) {
+    const when: SelfBuff['when'] = /\bafter\s+(?:a|the)\s+hit\b/.test(clause) ? 'hit' : 'use';
+    const ward = clause.match(/\bwards?\s+you\b[^]*?\bblocks\s+(\d+d\d+)\s+damage\s+for\s+(\d+)\s+rounds?/);
+    if (ward) return { kind: 'ward', when, dice: ward[1]!, rounds: Math.min(10, parseInt(ward[2]!, 10)) };
+    const cover = clause.match(/\byou\s+are\s+in\s+cover\s+for\s+(\d+)\s+rounds?/);
+    if (cover) return { kind: 'cover', when, rounds: Math.min(5, parseInt(cover[1]!, 10)) };
+    const guard = clause.match(/\+\s*(\d+)\s*ac\s+for\s+(\d+)\s+rounds?/);
+    if (guard) return { kind: 'guard', when, amount: parseInt(guard[1]!, 10), rounds: Math.min(5, parseInt(guard[2]!, 10)) };
+    const heal = clause.match(/\brestores?\s+(\d+d\d+)\s+hp\s+to\s+you\b/);
+    if (heal) return { kind: 'heal', when, dice: heal[1]!, rounds: 0 };
+  }
+  return null;
+}
+
+/** OTA-1676 — "reduces enemy armor by 2 on hit" / "reduces enemy armor" (1). A
+ *  max-roll shred is OTA-1564's and stays there: this reads only the clause
+ *  with no gate on it. */
+function onHitShredFrom(text: string): number | null {
+  for (const clause of text.split(/[.;]/)) {
+    if (MAX_ROLL_RE.test(clause)) continue;
+    const m = clause.match(/\breduces?\s+enemy\s+armou?r(?:\s+by\s+(\d+))?/);
+    if (!m) continue;
+    const n = m[1] ? parseInt(m[1], 10) : 1;
+    return Number.isFinite(n) && n > 0 ? Math.min(4, n) : 1;
+  }
+  return null;
 }
 
 /**
@@ -818,12 +990,19 @@ function weatherFrom(text: string): WeatherNote | null {
 function splashFrom(text: string): SplashSpec | null {
   if (SPLASH_DEFERRED_RE.test(text)) return null;
   for (const clause of text.split(/[.;]/)) {
+    // OTA-1676 — "the arc jumps to one extra enemy" is a blast with a headcount
+    // of one; "to all targets" is the Wave Rod's spelling of "to all enemies".
+    const chain = clause.match(/\b(?:arcs?|jumps?|leaps?)\s+to\s+(one|two|\d+)\s+(?:extra|more|other)\b/);
     const isBlast =
       /\bsplash\b|\baoe\b|\bexplosive\b/.test(clause)
-      || /\bto all enemies\b|\bto everything\b|\ball enemies in\b/.test(clause)
+      || /\bto all enemies\b|\bto everything\b|\ball enemies in\b|\bto all targets\b/.test(clause)
       || (/\bshockwave\b/.test(clause) && /\bradius\b/.test(clause))
-      || (/\bdamage\b/.test(clause) && /\bnearby enemies\b/.test(clause));
+      || (/\bdamage\b/.test(clause) && /\bnearby enemies\b/.test(clause))
+      || !!chain;
     if (!isBlast) continue;
+    const maxVictims = chain
+      ? (/^\d+$/.test(chain[1]!) ? parseInt(chain[1]!, 10) : (WORD_COUNT[chain[1]!] ?? (chain[1] === 'one' ? 1 : 0)))
+      : 0;
     // ⚠⚠ THE DICE MAY LIVE IN A NEIGHBOURING CLAUSE — the mirror of the bug
     // above, and just as real: `"2d8 fire; 15 ft AoE"` names the blast in one
     // clause and its damage in the other. Falling back to the line finds it.
@@ -835,6 +1014,7 @@ function splashFrom(text: string): SplashSpec | null {
       // Stated in the weapon's own words, never inferred. A weapon that can kill
       // your companion has to say so in its data.
       ...(/\ballies\b|\bally\b/.test(clause) ? { hitsAllies: true } : {}),
+      ...(maxVictims > 0 ? { maxVictims } : {}),
     };
   }
   return null;
@@ -959,7 +1139,8 @@ function conditionFromTarget(tgt: string): BonusCondition | null {
   // aerial BEFORE mechanical so "airborne / aerial / flying" targets route to
   // the flyer match (drones are both — the aerial bonus is the point).
   if (/aerial|airborne|flying|flyer/.test(tgt)) return 'aerial';
-  if (/mechanical|machine|automaton|drone|sentinel/.test(tgt)) return 'mechanical';
+  // OTA-1676 — "+1 damage to tech" (Aetheric Rod): tech is the machine family.
+  if (/mechanical|machine|automaton|drone|sentinel|\btech\b/.test(tgt)) return 'mechanical';
   if (/animal|beast|creature.*natural/.test(tgt)) return 'animal';
   if (/shield|shielded|energy-shield/.test(tgt)) return 'shielded';
   if (/magic|magical|supernatural/.test(tgt)) return 'magical';
@@ -1237,7 +1418,42 @@ export function parseWeaponEffect(effect: string | undefined | null): ParsedWeap
   const sac = shieldAcFrom(text);
   if (sac) { out.shieldAc = sac; touched = true; }
 
+  // ── OTA-1676 (slice 4c) — the wielder's own share, and the shred on hit ────
+  const self = selfBuffFrom(text);
+  if (self) { out.selfBuff = self; touched = true; }
+  const shred = onHitShredFrom(text);
+  if (shred) { out.onHitShred = shred; touched = true; }
+
   return touched ? out : null;
+}
+
+/**
+ * ⚠⚠ OTA-1676 — WHAT A SHIELD TAKES OFF A BLOW THAT LANDED ON IT. Immunity is
+ * tested first and zeroes the blow; otherwise the DR dice are rolled off it,
+ * floored at 0 — a shield is a soak pool like the stone ward, not a resist
+ * layer, so it runs AFTER the mitigation floor and may legitimately zero a hit
+ * (OTA-924's own carve-out for the ward). Returns what happened, so the log can
+ * say it in the shield's name.
+ */
+export function shieldDamageReduction(
+  sac: ShieldAc | null | undefined,
+  incomingDamageType: string | null | undefined,
+  dmg: number,
+): { dmg: number; soaked: number; immune: boolean } {
+  if (!sac || dmg <= 0) return { dmg, soaked: 0, immune: false };
+  const t = (incomingDamageType ?? '').toLowerCase();
+  if (sac.immune && t && sac.immune.includes(t)) return { dmg: 0, soaked: dmg, immune: true };
+  if (sac.dr && t && sac.dr.types.includes(t)) {
+    const soak = Math.min(dmg, Math.max(0, rollFromNotation(sac.dr.dice)));
+    return { dmg: dmg - soak, soaked: soak, immune: false };
+  }
+  return { dmg, soaked: 0, immune: false };
+}
+
+/** OTA-1676 — the attacker's share of a blow that landed on the shield. */
+export function rollShieldReflect(sac: ShieldAc | null | undefined): number {
+  if (!sac?.reflect) return 0;
+  return Math.max(0, rollFromNotation(sac.reflect.dice));
 }
 
 /**

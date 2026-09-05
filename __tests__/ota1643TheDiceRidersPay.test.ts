@@ -356,9 +356,18 @@ describe('OTA-1643 — the audit that keeps the column honest', () => {
    * Listing them by name is what makes this a ratchet rather than a wish: a
    * NEWLY authored dead promise is not on the list and fails here.
    */
+  // ⚠ OTA-1676 (slice 4c) — three of the four came OFF the list, exactly as the
+  // note above says they must: Graviton Shield and Titan Shield's defensive
+  // dice are read as `shieldAc.dr` and spent on a blow that lands on the
+  // shield; the Aetheric Plasma Blade was reworded onto a max-roll blast. The
+  // Aetheric Pike's faction condition is the one promise still without a reader.
   const DEFERRED_TO_LATER_UNITS = [
-    'Graviton Shield', 'Titan Shield', 'Aetheric Pike (Rare)', 'Aetheric Plasma Blade',
+    'Aetheric Pike (Rare)',
   ];
+
+  // OTA-1676 — a shield's DR is a paid "+NdN": counted off the blow, not dealt.
+  const isPaid = (p: ReturnType<typeof parseWeaponEffect>): boolean => !!(p && (p.bonuses?.length || p.flatRider || p.riderDot
+    || p.onMaxRoll || p.splash || p.weather?.bonus || p.onHitBleed || p.onHitBurn || p.shieldAc?.dr));
 
   it('no weapon carries an unread "+NdN damage" promise except the named debt', () => {
     const dead: string[] = [];
@@ -369,8 +378,7 @@ describe('OTA-1643 — the audit that keeps the column honest', () => {
       // ⚠ onHitBleed / onHitBurn count as PAID: "+1d6 bleed damage on hit" has
       // been read since long before this slice, and omitting them from the
       // check is how an audit reports a defect that was fixed years ago.
-      const paid = !!(p && (p.bonuses?.length || p.flatRider || p.riderDot
-        || p.onMaxRoll || p.splash || p.weather?.bonus || p.onHitBleed || p.onHitBurn));
+      const paid = isPaid(p);
       if (!paid && !DEFERRED_TO_LATER_UNITS.includes(w.name)) dead.push(`${w.name} :: ${e}`);
     }
     expect(dead).toEqual([]);
@@ -380,10 +388,7 @@ describe('OTA-1643 — the audit that keeps the column honest', () => {
     // If a later unit pays one of these, it must come OFF the list — otherwise
     // the list quietly grows into an exemption nobody re-checks.
     for (const name of DEFERRED_TO_LATER_UNITS) {
-      const p = parseWeaponEffect(row(name).effect);
-      const paid = !!(p && (p.bonuses?.length || p.flatRider || p.riderDot
-        || p.onMaxRoll || p.splash || p.weather?.bonus || p.onHitBleed || p.onHitBurn));
-      expect(paid).toBe(false);
+      expect(isPaid(parseWeaponEffect(row(name).effect))).toBe(false);
     }
   });
 
@@ -391,6 +396,9 @@ describe('OTA-1643 — the audit that keeps the column honest', () => {
     const unparsed = ALL.filter((w) => (w.effect ?? '').trim() && !parseWeaponEffect(w.effect));
     // 139 before this OTA, 123 after. Slice 4b (shields) and 4c (the exotic
     // reword pass) take this down further; nothing may push it back up.
-    expect(unparsed.length).toBeLessThanOrEqual(123);
+    // ⚠ OTA-1676 (4c) — 57: the 28 named flavour lines in weapons.json (pinned
+    // by name in ota1676) plus the 29 rows of the orphaned runecasters.json
+    // that `ALL` still counts. The live tail is the 28.
+    expect(unparsed.length).toBeLessThanOrEqual(57);
   });
 });

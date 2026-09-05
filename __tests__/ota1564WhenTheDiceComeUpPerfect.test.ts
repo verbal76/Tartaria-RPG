@@ -198,8 +198,12 @@ describe('OTA-1564 — the payloads that landed, and the ones that deliberately 
     // roll and the trigger now fires for them — but their payloads belong to
     // systems 1c and slice 2 own. Half-building one here is how a weapon ends up
     // with a signature move that fires and does nothing.
+    // ⚠ OTA-1676 — the Deathblade came off this list: its "instantly kills … if
+    // HP below 20" was reworded to "+20 damage on a max roll", which IS this
+    // slice's payload. The Plasma Buckler's max roll became "on the block" in
+    // the same OTA and stays unread here on purpose — a shield has no roll.
     for (const name of ['Energy Baton', 'Shock Gauntlet', 'Mud Long Axe', 'Shockwave Club',
-                        'Giant Warblade', 'Aetheric Sword of Storms', 'Aetheric Deathblade',
+                        'Giant Warblade', 'Aetheric Sword of Storms',
                         'Plasma Buckler', 'Mud Army War Hammer']) {
       expect({ name, spec: parseWeaponEffect(row(name).effect)?.onMaxRoll }).toEqual({ name, spec: undefined });
     }

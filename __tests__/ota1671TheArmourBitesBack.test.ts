@@ -198,14 +198,23 @@ describe('OTA-1671 — ⚠⚠ the combat payout is wired, and wired honestly', (
     // Post-mitigation, the same rule applyEscortDamage uses one line above. A
     // wholly parried blow did not sink into the spikes, and paying reflect on it
     // would make a perfect defence also the best offence.
-    expect(COMBAT).toContain('const reflectBack = dmg > 0 && !killed ? aggregateEquippedReflect(player) : 0;');
+    // ⚠ OTA-1676 — the armour's share is `armourReflect` now (the shield's
+    // on-block bite is summed beside it), and its rule is unchanged: the blow
+    // must have got through. The shield's bite deliberately does NOT carry
+    // this guard — it is owed by the block, not by the wound.
+    expect(COMBAT).toContain('const armourReflect = dmg > 0 && !killed ? aggregateEquippedReflect(player) : 0;');
   });
 
   it('⚠ a kill by reflect still resolves as a defeat', () => {
     // Loot, credit and the mission slate all hang off resolveEnemyDefeat. An
     // enemy that dies on your armour is still an enemy you defeated — the dog
     // vest already works this way (OTA-1640) and the two must not diverge.
+    // ⚠ OTA-1676 — the write moved into `dealReflectToAttacker` so the shield's
+    // bite (and the raised-BLOCK path) pay through the same helper; the block
+    // calls it, and the helper is where the defeat resolves.
     const block = COMBAT.slice(COMBAT.indexOf('const reflectBack'), COMBAT.indexOf('const cueKey'));
-    expect(block).toContain('resolveEnemyDefeat()');
+    expect(block).toContain('dealReflectToAttacker(get, set, enemy, reflectBack, line);');
+    const helper = COMBAT.slice(COMBAT.indexOf('export function dealReflectToAttacker'));
+    expect(helper).toContain('resolveEnemyDefeat()');
   });
 });

@@ -27724,7 +27724,56 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // OTA-1377 and OTA-1413 refused. Lazy-required and wrapped, as the lock's is.
 // Not the cure; the cause is still open, and no exemption is bought with this.
 // The next voice-path death reads which step it died in.
-export const OTA_BUILD_ID = '2026-09-05-1675-the-voice-names-its-step';
+// OTA-1676 — THE TAIL IS READ (slice 4c, the last unit of slice 4 / task #98).
+// Item three of "fix all existing issues one through six".
+// ⚠⚠⚠ THE MEASUREMENT FIRST. Slice 4's probe re-run on the current catalog:
+// 316 effect strings, 200 parsed, 116 unread. Twenty-nine of the unread were
+// rows of app/data/items/runecasters.json, which nothing in the app imports
+// (the suite asserts it) - so the live tail was 87, the "~85" the task
+// recorded. It is 28 now, and every one of the 28 is on a flavour list BY
+// NAME: HP grants statBonuses already pays, faction-issue lines, the bucklers'
+// bash (paid by the shield tag), and six sentences this OTA wrote to say a
+// weapon does nothing special. A card that promises something unread cannot be
+// authored again without failing the suite.
+// ⚠⚠⚠ THE SHIELD RIDERS - the rest of what OTA-1645 admitted it only half read.
+// Nine shields print a soak ("reduces incoming slashing by 1d6", "blocks +1d6
+// from physical attacks", Graviton's "+1d6 environmental damage reduction"), an
+// immunity ("Blocks all plasma damage", "Blocks Aetheric-based damage",
+// "Deflects runecasters") or a bite ("Deals 1d6 damage on the block", "reflects
+// 1d6 back"). All three are spent ONLY on a blow that landed on the shield -
+// OTA-1646's landing roll is what makes that honest - the soak as a pool after
+// the mitigation floor (OTA-924's own carve-out for the ward), the bite through
+// OTA-1671's reflect path, owed by the BLOCK rather than the wound, and paid on
+// a raised BLOCK too. "Plasma" reads as burn: every plasma weapon is typed burn
+// and no enemy deals a type called plasma, so a plasma shield turns burn or
+// turns nothing. ⚠ The two "on max roll" bites became "on the block" - a shield
+// has no roll. ⚠ A tagged buckler with nothing on its card is a held shield now
+// (the Mud and Iron Bucklers never took a blow or wore, because they parsed to
+// nothing).
+// ⚠⚠⚠ THE WIELDER'S OWN SHARE, on machinery that already existed: guard (a
+// timed +N AC - the Shield-Hammer's "+2 AC for 1 round after a hit", read by
+// statusAcAdjustment through one new kind, guard_up), cover (in_cover), ward
+// (the OTA-835 stone_ward soak pool) and heal. Thirteen cards were reworded
+// onto ONE grammar for the four, because a parser loose enough to read
+// "Shields caster with mud barrier; blocks 1d6 damage. 3 rounds." would read a
+// shield's "blocks +1d6 from physical attacks" as a ward. "On use" pays on the
+// swing (a ward you raise lands on a miss); "after a hit" pays on the hit.
+// ⚠⚠ THE CATALOG'S OWN WORDS, READ: "pins enemies" (restrained), "reduces enemy
+// speed" (slowed), "pushes the target back" / "pushed back" (knockback,
+// the War Pike's "Strength save or" a 50% gate), "disables Tartarian tech"
+// (stunned, machines only), "+1 damage to tech" (mechanical), "the arc jumps to
+// one extra enemy" (a blast with a headcount), and a new `pull` control - the
+// mirror of knockback, dragged in off its footing, the magnets restricted to
+// metal. The on-hit shred OTA-1563 left "for the shred slice" lands on the
+// same enemyArmorShred lever, capped like the acid coating's. Onto real
+// mechanics of the same weight: the "decay keeps going" flavour into festering
+// riders, "instantly kills … below 20" into +20 on a max roll, "50% enemy HP
+// loss on 20+" into +2d10 on a max roll, "ignores shields on advantage rolls"
+// into a max roll, "auto-wins vs Aetherkin" into +1d6 against them, the summons
+// into blasts. gameStore absorbed the family under its ratchet by giving up two
+// set() blocks to app/state/weaponRiderEffects.ts.
+export const OTA_BUILD_ID = '2026-09-05-1676-the-tail-is-read';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1675-the-voice-names-its-step';
 // golem catch-up 2026-09-05: markerless publish of OTA-1675 - the voice names
 // its step. Item two, #180, kai's voice-path kill: the process died between
 // the synth settling and playback finishing, on the first utterance her device

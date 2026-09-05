@@ -123,6 +123,11 @@ export function applyEffect(
     buffStat: incoming.buffStat ?? next[idx]!.buffStat,
     buffBonus: incoming.buffBonus ?? next[idx]!.buffBonus,
     label: incoming.label ?? next[idx]!.label,
+    // OTA-1676 — a refreshed guard keeps the larger AC, never a smaller one
+    // sneaking in under a longer clock.
+    ...(incoming.acBonus !== undefined || next[idx]!.acBonus !== undefined
+      ? { acBonus: Math.max(incoming.acBonus ?? 0, next[idx]!.acBonus ?? 0) }
+      : {}),
   };
   return next;
 }
@@ -163,6 +168,8 @@ const COMBAT_ONLY_STATUSES: ReadonlySet<StatusEffectKind> = new Set([
   // OTA-1510 — the shield stance is this round's, this fight's. An unspent
   // block never carries out of the encounter that raised it.
   'shield_block',
+  // OTA-1676 — a weapon's own guard is a stance too.
+  'guard_up',
 ]);
 const STAMINA_GATED_STATUSES: ReadonlySet<StatusEffectKind> = new Set(['tired', 'exhausted']);
 
@@ -238,6 +245,8 @@ export function statusAcAdjustment(current: readonly StatusEffect[] | undefined)
     // Small Rock, this is three rounds off a technique. The longer field is the weaker
     // one per round, or there would be no reason to shape stone again.
     if (e.kind === 'aether_shield') adj += 3;
+    // OTA-1676 — the weapon's own guard, at the amount its card prints.
+    if (e.kind === 'guard_up') adj += Math.max(0, e.acBonus ?? 0);
     // 'dodging' deliberately NOT here as of 2026-05-21 — the dodge
     // rework moved it from a passive +4 AC into an active post-hit
     // parry roll handled in applyEnemyCounter. The roll itself is

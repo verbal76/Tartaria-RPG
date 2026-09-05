@@ -1088,7 +1088,12 @@ export type StatusEffectKind =
   // shaped_stone_ward is, and temporal_slip is consumed at the damage site exactly as
   // 'shielded' (the Sentinel's Defensive Protocols) is.
   | 'aether_shield'  // +3 AC while the field is held (3 rounds)
-  | 'temporal_slip'; // negates ONE incoming blow entirely, then is consumed
+  | 'temporal_slip'  // negates ONE incoming blow entirely, then is consumed
+  // ⚠ OTA-1676 (slice 4c) — a weapon's timed AC for its own wielder: the
+  // Shield-Hammer's "+2 AC for 1 round after a hit", the Lightfoot Dash Wand's
+  // "+3 AC for 2 rounds". Read by statusAcAdjustment through `acBonus`, so one
+  // kind serves every amount the catalog prints. Combat-only, like a stance.
+  | 'guard_up';
 
 export interface StatusEffect {
   kind: StatusEffectKind;
@@ -1104,6 +1109,8 @@ export interface StatusEffect {
   /** OTA-835 — remaining damage this ward can still soak (stone_ward). Each hit
    *  subtracts from it; the ward is dropped when it reaches 0. */
   absorb?: number;
+  /** OTA-1676 — the AC a `guard_up` adds while it holds. */
+  acBonus?: number;
 }
 
 // v2.4.1 (OTA 033) — Mud Flood Nexus main quest arc.
