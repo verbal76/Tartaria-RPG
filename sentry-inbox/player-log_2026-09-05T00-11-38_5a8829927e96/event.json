@@ -1,0 +1,301 @@
+{
+  "id": "5a8829927e96484f90e450ab7d7a3bb1",
+  "groupID": "7712876642",
+  "eventID": "5a8829927e96484f90e450ab7d7a3bb1",
+  "projectID": "4511945117532160",
+  "size": 17929,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-05-1675-the-voice-names-its-step #mtnlu0casj0h [inline 7/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-05-1675-the-voice-names-its-step",
+  "message": "player-log 2026-09-05-1675-the-voice-names-its-step #mtnlu0casj0h [inline 7/28]",
+  "title": "player-log 2026-09-05-1675-the-voice-names-its-step #mtnlu0casj0h [inline 7/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "df6ce37bbffa478cbc518316acd1a51e",
+      "span_id": "a14a66191405160f",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "4s/write1.1s \u26a01unusable in326t\u2192out27t ms/tok 1.0-1.3 | narration:scene_intro_fill n2 avg8.2s max11.2s read6.8s/write1.2s in766t\u2192out31t ms/tok 5.0-12.7 cap1 | ambient n2 avg4.2s max4.8s \u26a02unusable in364t\u2192out0t \u23f82 \u27021/3.5s || WASTED 1 calls / 3.5s\n[2026-09-04T05:03:53.217Z] [debug] arbiter: ambient cut short 5369ms \u2014 yielded to the player\n",
+      "[2026-09-04T05:03:53.217Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient after 4826ms \u2014 ambient:preempted\n[2026-09-04T05:04:08.789Z] [player] craft Mudstone Bulwark\n[2026-09-04T05:04:08.790Z] [debug] parser: intent=craft conf=1.00 verb=craft target=mudstone bulwark resolved=- range=- enemies=0 hooks=1\n[2026-09-04T05:04:08.794Z] [reward] \u2726 Crafted Mudstone Bulwark. The Arbiter watches you set the last piece.\n",
+      "[2026-09-04T05:04:08.795Z] [debug] arbiter: template (reason=intent-not-allowed:craft)\n[2026-09-04T05:04:08.795Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-04T05:04:09.336Z] [cognitive] THROW \u00b7 USE_ITEM \u00b7 SEARCH  (540ms)\n[2026-09-04T05:04:17.608Z] [player] craft Aetheric Padded Vest\n",
+      "[2026-09-04T05:04:17.608Z] [debug] parser: intent=craft conf=1.00 verb=craft target=aetheric padded vest resolved=Aetheric Padded Vest range=- enemies=0 hooks=1\n[2026-09-04T05:04:17.611Z] [reward] \u2726 Crafted Dog Aetheric Padded Vest. The Arbiter watches you set the last piece.\n[2026-09-04T05:04:17.612Z] [debug] arbiter: template (reason=intent-not-allowed:craft)\n",
+      "[2026-09-04T05:04:17.612Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-04T05:04:18.167Z] [cognitive] neutral  (554ms)\n[2026-09-04T05:04:39.481Z] [player] craft Mudstone\n[2026-09-04T05:04:39.482Z] [debug] parser: intent=craft conf=1.00 verb=craft target=mudstone resolved=Hardened Mudstone range=- enemies=0 hooks=1\n",
+      "[2026-09-04T05:04:39.943Z] [arbiter] \"Crafting 21\u00d7 Mudstone would strip 4\u00d7 Mud Essence \u2192 Mud Fragment, 17\u00d7 Aether Mud \u2192 Mud Fragment, 4\u00d7 Aetheric Sludge \u2192 Mud Fragment from your pack \u2014 confirm in the prompt to proceed, or it stays unmade.\"\n[2026-09-04T05:04:40.055Z] [cognitive] SEARCH \u00b7 USE_ITEM \u00b7 THROW  (110ms)\n",
+      "[2026-09-04T05:04:40.199Z] [debug] persist sizes(KB): total=328 player=74 wm=168[rooms=93 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=83 scene=3\n[2026-09-04T05:04:41.152Z] [player] craft Mudstone\n[2026-09-04T05:04:41.153Z] [debug] parser: intent=craft conf=1.00 verb=craft target=mudstone resolved=Hardened Mudstone range=- enemies=0 hooks=1\n",
+      "[2026-09-04T05:04:41.615Z] [arbiter] The Arbiter nods. \"Stripped for parts: 4\u00d7 Mud Essence \u2192 Mud Fragment, 17\u00d7 Aether Mud \u2192 Mud Fragment, 4\u00d7 Aetheric Sludge \u2192 Mud Fragment.\"\n[2026-09-04T05:04:42.033Z] [reward] \u2726 Crafted Mudstone \u00d721. The Arbiter watches you set the last piece.\n[2026-09-04T05:04:42.597Z] [cognitive] SEARCH \u00b7 USE_ITEM \u00b7 THROW  (562ms)\n",
+      "[2026-09-04T05:04:49.597Z] [player] craft Hardened Mudstone\n[2026-09-04T05:04:49.598Z] [debug] parser: intent=craft conf=1.00 verb=craft target=hardened mudstone resolved=Hardened Mudstone range=- enemies=0 hooks=1\n[2026-09-04T05:04:49.819Z] [reward] \u2726 Crafted Hardened Mudstone \u00d76. The Arbiter watches you set the last piece.\n",
+      "[2026-09-04T05:04:50.372Z] [cognitive] SEARCH \u00b7 THROW \u00b7 USE_ITEM  (551ms)\n[2026-09-04T05:05:02.373Z] [player] craft Trauma Kit\n[2026-09-04T05:05:02.374Z] [debug] parser: intent=craft conf=1.00 verb=craft target=trauma kit resolved=Trauma Kit range=- enemies=0 hooks=1\n[2026-09-04T05:05:02.378Z] [reward] \u2726 Crafted Trauma Kit. The Arbiter watches you set the last piece.\n",
+      "[2026-09-04T05:05:02.846Z] [cognitive] neutral  (466ms)\n[2026-09-04T05:05:06.817Z] [player] craft Field Dressing\n[2026-09-04T05:05:06.818Z] [debug] parser: intent=craft conf=1.00 verb=craft target=field dressing resolved=Field Dressing range=- enemies=0 hooks=1\n[2026-09-04T05:05:06.966Z] [reward] \u2726 Crafted Field Dressing \u00d74. The Arbiter watches you set the last piece.\n",
+      "[2026-09-04T05:05:07.406Z] [cognitive] neutral  (439ms)\n[2026-09-04T05:05:16.218Z] [debug] ui: tap \"investigate\"\n[2026-09-04T05:05:17.954Z] [player] investigate the mud\n[2026-09-04T05:05:17.954Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=rusted petrified mud wave range=- enemies=0 hooks=1\n",
+      "[2026-09-04T05:05:17.955Z] [world] You've already examined the mud. There's nothing more to find here.\n[2026-09-04T05:05:17.955Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-09-04T05:05:17.955Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-04T05:05:18.150Z] [cognitive] SWIM  (194ms)\n[2026-09-04T05:05:19.192Z] [player] investigate waterskin\n",
+      "[2026-09-04T05:05:19.193Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=waterskin resolved=waterskin range=- enemies=0 hooks=1\n[2026-09-04T05:05:19.195Z] [world] You give the waterskin your full attention. It returns the gesture by being exactly what it appears to be.\n[2026-09-04T05:05:19.481Z] [cognitive] SWIM  (283ms)\n",
+      "[2026-09-04T05:05:20.466Z] [player] investigate watch fire\n[2026-09-04T05:05:20.467Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=watch fire resolved=watch fire range=- enemies=0 hooks=1\n[2026-09-04T05:05:20.468Z] [world] The watch fire sits the way ordinary things sit. The Arbiter does not lean in. You move on.\n[2026-09-04T05:05:20.767Z] [cognitive] READY  (297ms)\n",
+      "[2026-09-04T05:05:20.978Z] [debug] ui: tap \"\u2192 MUD SEAS\"\n[2026-09-04T05:05:20.984Z] [world] You walk east through open silt. The compass tells you Tartarian Pilgrim Camp lies further east \u2014 2 tiles, about 5 hours of travel.\n[2026-09-04T05:05:20.984Z] [world] The thread you were following waits where you left it.\n",
+      "[2026-09-04T05:05:21.663Z] [debug] qwen\u23f1 investigate_lore ok 2198ms read/write unusable (native mis-reported 92424ms/834ms \u2014 llama.rn split bug, not this call) in 126t\u2192out 23t (99ch)\n[2026-09-04T05:05:23.291Z] [debug] ui: tap \"take / salvage\"\n[2026-09-04T05:05:23.484Z] [debug] qwen\u23f1 investigate_lore ok 2507ms wait 917ms read 498ms/write 861ms in 126t\u2192out 25t 4.0ms/t (120ch)\n",
+      "[Filtered]",
+      "[2026-09-04T05:05:25.549Z] [debug] persist sizes(KB): total=328 player=72 wm=168[rooms=93 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=84 scene=3\n[2026-09-04T05:05:27.960Z] [debug] ui: tap \"investigate\"\n[2026-09-04T05:05:34.636Z] [debug] qwen\u23f1 ambient ok 15172ms wait 4198ms read 4801ms/write 1236ms in 364t\u2192out 31t 13.2ms/t HIT-CAP (151ch)\n",
+      "[2026-09-04T05:05:34.868Z] [player] investigate shallow pool\n[2026-09-04T05:05:34.869Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=shallow pool resolved=shallow pool range=- enemies=0 hooks=1\n[2026-09-04T05:05:34.870Z] [world] You look the shallow pool over. Nothing about it sings, nothing about it warns \u2014 Tartaria is full of things waiting to be remembered.\n",
+      "[2026-09-04T05:05:34.878Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient after 15172ms \u2014 ambient:stale:moved-scene\n[2026-09-04T05:05:34.878Z] [debug] arbiter: ambient stale:moved-scene 15681ms\n[2026-09-04T05:05:34.879Z] [debug] arbiter: ambient-empty reason=unknown raw=\"You have traversed the rugged terrain of Active Dig Trench, the borderlands that have been long since forgotten, and it \"\n",
+      "[2026-09-04T05:05:34.893Z] [cognitive] SWIM  (22ms)\n[2026-09-04T05:05:37.042Z] [debug] qwen\u23f1 investigate_lore ok 2158ms read 1294ms/write 835ms in 126t\u2192out 23t 10.3ms/t (114ch)\n[2026-09-04T05:05:44.959Z] [debug] send-log: #mtmhqinlc5jl \u2014 DELIVERED (inline, no attachments): beacon out, 28/28 parts accepted (407077 chars) \u2014 flush said yes\n",
+      "[2026-09-04T05:05:44.959Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mtmhqinlc5jl kept on disk, boots retry up to 5 sends total\n[2026-09-04T13:30:28.467Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a06a9f-c9d0-725a-85bb-944c1fa4eb3d\n[2026-09-04T13:30:28.467Z] [debug] ota: Checking\u2026\n",
+      "[2026-09-04T13:30:30.789Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-09-04T13:30:30.885Z] [debug] ota: Saving progress\u2026\n[2026-09-04T13:30:31.176Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a06af0-5988-7a5c-8879-496013fbab11\n[2026-09-04T13:30:31.176Z] [debug] ota: Checking\u2026\n[2026-09-04T13:30:31.391Z] [debug] ota: Already up to date\n",
+      "[2026-09-04T13:30:31.392Z] [debug] ota: boot check result = noUpdate\n[2026-09-04T13:30:31.496Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-09-04T13:30:31.497Z] [debug] voice: bundled idle\n[2026-09-04T13:30:31.838Z] [debug] send-log: bundle #mtmhqinlc5jl attempt 2/5 delivered to Sentry\n",
+      "[2026-09-04T13:30:37.809Z] [debug] OTA applied: 2026-09-04-1664-no-phantom-syllable \u2192 2026-09-04-1665-the-bug-report-pushes.\n[2026-09-04T13:30:37.810Z] [debug] OTA session start: 2026-09-04-1665-the-bug-report-pushes.\n[2026-09-04T13:30:37.810Z] [world] You step back into Dynasty Border Post. The world waits for your move.\n",
+      "[2026-09-04T13:30:37.810Z] [world] Mud Monarch heralds left a sigil-mark on a stone you don't remember being marked. The faction is paying attention.\n[2026-09-04T13:30:37.814Z] [arbiter] The Arbiter sets the quiet aside. \"Welcome back, Cheddar Bob. I kept watch while you were gone. The waste did not sleep while you were gone \u2014 blood was spilled and ground changed hands. Read the World for the acco",
+      "unt.\"\n[2026-09-04T13:30:38.227Z] [debug] \u2550\u2550\u2550 SESSION 2026-09-04T13:30:38.225Z \u00b7 build 2026-09-04-1665-the-bug-report-pushes \u00b7 updated from 2026-09-04-1664-no-phantom-syllable \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-09-04T13:30:38.228Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-04T13:30:38.229Z] [debug] missions: hunt:hunt_bog_dragon stage 5/7 [attack_provoke\u2192attack] @mud_seas needs=Eshren's Name-Token\u2713 spawn=Mud Harpy\u00d73 AMBUSH\n[2026-09-04T13:30:38.229Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n",
+      "[2026-09-04T13:30:38.229Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc=\"the Order envoy\" gives=Sealed Reliquary Box PAUSED\n[2026-09-04T13:30:38.229Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n",
+      "[2026-09-04T13:30:38.229Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n[2026-09-04T13:30:38.229Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n",
+      "[2026-09-04T13:30:38.229Z] [debug] missions: \u00b7 at=dynasty_border_post travelTo=mud_seas\n[2026-09-04T13:30:38.229Z] [debug] boot: life bmtmzrnzzgi started 2026-09-04T13:30:31.103Z \u00b7 FOLLOWED AN OTA APPLY 217ms ago via boot-front \u00b7 prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)\n",
+      "[2026-09-04T13:30:59.030Z] [debug] send-log: #mtmzs9dzspnn \u2014 DELIVERED (inline, no attachments): beacon out, 4/4 parts accepted (47030 chars) \u2014 flush said yes\n[2026-09-04T17:10:46.834Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a06af0-5988-7a5c-8879-496013fbab11\n[2026-09-04T17:10:46.834Z] [debug] ota: Checking\u2026\n",
+      "[2026-09-04T17:10:46.891Z] [debug] ota: Already up to date\n[2026-09-04T17:10:46.891Z] [debug] ota: boot check result = noUpdate\n[2026-09-04T17:10:46.983Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-09-04T17:10:46.983Z] [debug] voice: bundled idle\n[2026-09-04T17:10:47.319Z] [debug] send-log: bundle #mtmzs9dzspnn attempt 2/5 delivered to Sentry\n",
+      "[2026-09-04T17:11:21.932Z] [debug] qwen: loading (was idle) \u2014 the Arbiter speaks templates until it is ready\n[2026-09-04T17:11:22.855Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-09-04T17:11:30.579Z] [debug] appstate: active \u2192 background (was active for 7702ms)\n[2026-09-04T17:21:37.887Z] [debug] appstate: background \u2192 active (was background for 607304ms)\n",
+      "[2026-09-04T17:21:49.426Z] [debug] appstate: active \u2192 background (was active for 11542ms)\n[2026-09-04T17:23:28.377Z] [debug] appstate: background \u2192 active (was background for 98947ms)\n[2026-09-04T17:24:25.840Z] [debug] appstate: active \u2192 background (was active for 57468ms)\n[2026-09-04T17:25:57.825Z] [debug] appstate: background \u2192 active (was background for 91980ms)\n",
+      "[2026-09-04T17:26:06.245Z] [debug] appstate: active \u2192 background (was active for 8424ms)\n[2026-09-04T17:34:00.071Z] [debug] appstate: background \u2192 active (was background for 473820ms)\n[2026-09-04T17:34:51.092Z] [debug] appstate: active \u2192 background (was active for 51027ms)\n[2026-09-04T17:36:12.717Z] [debug] appstate: background \u2192 active (was background for 81620ms)\n",
+      "[2026-09-04T17:36:15.680Z] [debug] OTA session start: 2026-09-04-1665-the-bug-report-pushes.\n[2026-09-04T17:36:15.680Z] [world] You step back into Dynasty Border Post. The world waits for your move.\n[2026-09-04T17:36:15.684Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. \"Welcome back, Cheddar Bob. We've still got ground to cover, you and I. The waste did not sleep while yo",
+      "u were gone \u2014 blood was spilled and ground changed hands. Read the World for the account.\"\n[2026-09-04T17:36:16.070Z] [debug] \u2550\u2550\u2550 SESSION 2026-09-04T17:36:16.067Z \u00b7 build 2026-09-04-1665-the-bug-report-pushes \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-09-04T17:36:16.073Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-04T17:36:16.073Z] [debug] missions: hunt:hunt_bog_dragon stage 5/7 [attack_provoke\u2192attack] @mud_seas needs=Eshren's Name-Token\u2713 spawn=Mud Harpy\u00d73 AMBUSH\n[2026-09-04T17:36:16.073Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n",
+      "[2026-09-04T17:36:16.073Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc=\"the Order envoy\" gives=Sealed Reliquary Box PAUSED\n[2026-09-04T17:36:16.073Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n",
+      "[2026-09-04T17:36:16.074Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n[2026-09-04T17:36:16.074Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n",
+      "[2026-09-04T17:36:16.074Z] [debug] missions: \u00b7 at=dynasty_border_post travelTo=mud_seas\n[2026-09-04T17:36:16.074Z] [debug] boot: life bmtn7mx7fyx started 2026-09-04T17:10:46.683Z \u00b7 not an OTA apply (no handoff on disk)\n["
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-05-1675-the-voice-names-its-step #mtnlu0casj0h [inline 7/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtnlu0casj0h"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-05-1675-the-voice-names-its-step"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "7"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-05-1675-the-voice-names-its-step"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-05T00:11:36.258546Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "17": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 265,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-05T00:11:38.210000Z",
+  "fingerprints": [
+    "8ed2684bc6b608ad4a9f0db04cd45c70"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1956427903,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-05T00:11:38.213000Z",
+    "dateReleased": "2026-09-05T00:12:48.923167Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "8fbd09d83bf9d0c3ec1fb0527509158bfc77bc5b",
+      "message": "[ota-hal] OTA-1675: the voice names its step\n\nItem two of \"fix all existing issues one through six\": #180, the voice-path\nprocess kill on kai's SM-S942U (Samsung, SM8850, Android 16) \u2014 the first\nnon-Pixel kill on record. Like item one, this is the instrument, not the cure,\nand it also repairs a defect in the instrument it extends.\n\nWHAT HER LEDGER SAID\nA cold 66-second life on the title screen, no action yet, model ledger o0/r0:\n\n    native:voice:done [q0] \u00b7 66228ms into the action \u00b7 alive 0ms after it\n    Voice (TTS) guard: \u26a0 VOICE CRASH detected \u2014 last voice: kokoro:bf_emma\n\nThe guard is armed by markTTSStart before the synth and cleared by markTTSDone\nAFTER playback; so the process died between the synth settling and the line\nfinishing. Sixty-six seconds in, q0, o0/r0: that was the FIRST utterance that\ndevice ever played \u2014 ReadyFlash speaks \"Choose your character.\" the moment\nKokoro comes online. Nothing native runs in that window except what the voice\nlayer does with the samples: the WAV encode, expo-av's player load on a data:\nURI (ExoPlayer \u2192 AudioTrack, the one step that is pure platform media code),\nthe playback, the deferred unload. OTA-1546 stamped the lock; nothing stamped\nthese. The owner's own two voice deaths (08-30 `native:voice:done (+11080ms)`,\n08-31 `native:voice:start [q1]`) sit in the same blind spot.\n\nAND THE INSTRUMENT ITSELF WAS ONE MICROTASK LATE\nMeasured in the new suite before it could be shipped: the lock's `done` stamp\nrode the `.then` AFTER `task.resolve`, so the caller's continuation ran first.\nThe voice drain resumed, encoded the WAV and DISPATCHED the player load before\n`native:voice:done` was written. Her last checkpoint said \"the synth finished\"\nabout a process that had already moved on to playback \u2014 and any checkpoint a\ncaller stamped in that continuation was overwritten by a fact from the step\nbefore it, which is exactly what would have happened to the stamps below.\n`done` is now stamped before the caller is resolved; it means the native op\nsettled, nothing more. Exclusivity is untouched \u2014 `running` still clears only\nafter the caller has been resolved. The ota1546 pin is repointed with the\nreason.\n\nTHE PLAYBACK PATH STAMPS ITS OWN STEPS\n`voice:play:encode` / `create` / `started` / `done` / `unload`, and\n`voice:stop`, each carrying the utterance's ordinal in this life and its\nlength (`#1 0.2s`) \u2014 \"the first line after a fresh model load\" is the fact\nthat separates a one-off from a device that cannot play at all.\n\n\u26a0 THE UNLOAD STAMP YIELDS. It fires 300 ms after the line ends, by which time\nthe lock may be inside the next synth or a Qwen job; overwriting\n`native:llm:start` with `voice:play:unload` would file a death inside\ninference as a death in a player release \u2014 the blind-spot trade OTA-1377 and\nOTA-1413 refused. When the lock is running the crumb it wrote stands. Lazy-\nrequired and wrapped, as the lock's own stamp is.\n\nNot the cure. No exemption is bought with this. The next voice-path death\nreads which step it died in.\n\n- app/ai/nativeMlLock.ts \u2014 `done` stamped in the settle handlers, before\n  resolve/reject.\n- app/voice/PiperTTSManager.ts \u2014 `stampVoicePhase`, the per-life ordinal, the\n  six stamps, the unload gate on `nativeMlSnapshot().running`.\n- __tests__/ota1675TheVoiceNamesItsStep.test.ts \u2014 16 tests: the whole window\n  driven end to end through a mocked Kokoro + expo-av (load, warm-up, the\n  line, then encode \u2192 create \u2192 started \u2192 done), the tag, the yield, voice:stop,\n  the lock ordering measurement, and the source pins.\n- __tests__/ota1546TheDyingBreathNamesTheNativeJob.test.ts \u2014 the order pin\n  reads the settle handler.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-05T00:09:10Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-05-1675-the-voice-names-its-step",
+          "shortVersion": "tartaria@4.32.11+2026-09-05-1675-the-voice-names-its-step",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-05T00:12:48.923167Z",
+          "dateCreated": "2026-09-05T00:11:38.213000Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155726114",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-05T00:12:49.150027Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-05-1675-the-voice-names-its-step",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-05-1675-the-voice-names-its-step",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-05-1675-the-voice-names-its-step",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-05-1675-the-voice-names-its-step)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "5e1ae63f1e51466fbf38afce88701f4a",
+  "previousEventID": "5518baeb5cb34242bd27a22499b1e614"
+}

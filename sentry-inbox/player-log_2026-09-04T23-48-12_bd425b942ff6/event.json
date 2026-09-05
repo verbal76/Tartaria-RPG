@@ -1,0 +1,275 @@
+{
+  "id": "bd425b942ff6422ea33d97c3be45741b",
+  "groupID": "7712848145",
+  "eventID": "bd425b942ff6422ea33d97c3be45741b",
+  "projectID": "4511945117532160",
+  "size": 18061,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-04-1674-the-dead-life-answers #mtnlu0casj0h [inline 6/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1674-the-dead-life-answers",
+  "message": "player-log 2026-09-04-1674-the-dead-life-answers #mtnlu0casj0h [inline 6/28]",
+  "title": "player-log 2026-09-04-1674-the-dead-life-answers #mtnlu0casj0h [inline 6/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "c5b67a9338b7442887fcbe9331ce1a85",
+      "span_id": "be7cafa4edcda137",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "trike leaves you bleeding.\n[2026-09-04T04:59:28.504Z] [debug] ui: tap \"\u2623\u26a1 shroud-spun slinger \u2692\"\n[2026-09-04T04:59:28.587Z] [player] attack with the off-hand reclaimers guild shroud-spun slinger\n[2026-09-04T04:59:28.588Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand reclaimers guild shroud spun slinger resolved=Reclaimers Guild Shroud-Spun Slinger range=mid enemies=3 hooks=1\n",
+      "[2026-09-04T04:59:28.588Z] [arbiter] The Arbiter keeps one eye on the fight. \"That is the right move for The Bog Dragon of Old Drakova \u2014 but not with something on you. Put this down first.\"\n[2026-09-04T04:59:28.588Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter keeps one eye on the fight. \"That is the right m\u2026\"\n",
+      "[2026-09-04T04:59:28.589Z] [debug] attack: target=Mud Monarchs Patrol 2 range=mid reach.bands=[distant,far,mid,close] reach.label=Reclaimers Guild Shroud-Spun Slinger bareHand=false\n[2026-09-04T04:59:28.669Z] [world] You raise the corrupted resonant reclaimers guild shroud-spun slinger toward Mud Monarchs Patrol 2. The room narrows around the both of you.\n",
+      "[2026-09-04T04:59:28.669Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T04:59:29.014Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 USE_ITEM  (344ms)\n[2026-09-04T04:59:38.115Z] [world] You seize the initiative. Mud Monarchs Patrol 2 has no time to react.\n[2026-09-04T04:59:38.115Z] [combat] You \u2014 d20 \u2192 14 + DEX 19 = 33 vs Mud Monarchs Patrol 2 AC 11 \u2014 \u2713 HIT\n",
+      "[2026-09-04T04:59:38.116Z] [combat] Bludgeoning flares \u2014 +4 on hit.\n[2026-09-04T04:59:38.116Z] [debug] wear ward: Reclaimers Guild Shroud-Spun Slinger keeps its point (15%)\n[2026-09-04T04:59:38.117Z] [combat] You crack the Mud Monarchs Patrol 2 with the Corrupted Resonant Reclaimers Guild Shroud-Spun Slinger for 11 \u2014 the better part of their fight, gone in one blow. They crumple, out cold. (7/18 H",
+      "P) Loot them before they come to.\n[2026-09-04T04:59:38.117Z] [combat] Mud Monarchs Patrol 2 is out of it. Mud Monarchs Patrol 3 now in your sights.\n[2026-09-04T04:59:38.118Z] [combat] Corrupted Resonant Reclaimers Guild Shroud-Spun Slinger \u2014 1 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n",
+      "[2026-09-04T04:59:38.118Z] [combat] Corrupted Resonant Reclaimers Guild Shroud-Spun Slinger \u2014 1 electrical bites in and festers (3 turns).\n[2026-09-04T04:59:38.118Z] [combat] Mud Monarchs Patrol 2 is left exposed \u2014 easier to hit.\n[2026-09-04T04:59:38.121Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 11 + ATK 7 = 18 vs your AC 22 \u2014 \u2717 MISS\n",
+      "[2026-09-04T04:59:38.123Z] [combat] Mud Monarchs Patrol 3 \u2014 d20 \u2192 12 + ATK 7 = 19 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-04T04:59:39.742Z] [debug] ui: tap \"\u2620\u2623 bone crossbow \u25b2 \u2605\"\n[2026-09-04T04:59:39.790Z] [player] attack with the bone crossbow\n[2026-09-04T04:59:39.791Z] [debug] parser: intent=attack conf=1.00 verb=attack target=bone crossbow resolved=Bone Crossbow range=mid enemies=3 hooks=1\n",
+      "[2026-09-04T04:59:39.792Z] [arbiter] The Arbiter keeps one eye on the fight. \"That is the right move for The Bog Dragon of Old Drakova \u2014 but not with something on you. Put this down first.\"\n[2026-09-04T04:59:39.792Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter keeps one eye on the fight. \"That is the right m\u2026\"\n",
+      "[2026-09-04T04:59:39.792Z] [combat] Mud Monarchs Patrol 2 blackens \u2014 corruption eats 1. (6/18 HP, 2 turns left)\n[2026-09-04T04:59:39.792Z] [combat] Mud Monarchs Patrol 2 convulses \u2014 arcing current bites 1. (5/18 HP, 2 turns left)\n[2026-09-04T04:59:39.793Z] [debug] attack: target=Mud Monarchs Patrol 3 range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n",
+      "[2026-09-04T04:59:39.883Z] [world] You bring the poisoned corrupted bone crossbow to bear on Mud Monarchs Patrol 3.\n[2026-09-04T04:59:39.884Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T04:59:40.230Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE \u00b7 RELOAD  (345ms)\n",
+      "[2026-09-04T04:59:40.999Z] [debug] persist sizes(KB): total=333 player=78 wm=168[rooms=93 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=82 scene=5\n[2026-09-04T04:59:48.844Z] [world] You seize the initiative. Mud Monarchs Patrol 3 has no time to react.\n[2026-09-04T04:59:48.845Z] [combat] You \u2014 d20 \u2192 19 + DEX 19 = 38 vs Mud Monarchs Patrol 3 AC 11 \u2014 \u2713 HIT\n",
+      "[2026-09-04T04:59:48.847Z] [combat] Weakness exposed \u2014 Mud Monarchs Patrol 3 flinches. (piercing \u00d72.25 for 27)\n[2026-09-04T04:59:48.848Z] [combat] The killing blow with the poisoned corrupted bone crossbow: 27. Mud Monarchs Patrol 3 drops where it stood.\n[2026-09-04T04:59:48.849Z] [reward] Mud Monarchs Patrol 3 defeated. You recover Patched Cloth \u00d73, Mud Monarch Sigil.\n",
+      "[2026-09-04T04:59:48.851Z] [reward] You strip the body: Bone Knife, Mud-Bound Cloak (+6 TC). The kit took the fight badly.\n[2026-09-04T04:59:48.852Z] [combat] 1 attacker remains. Mud Monarchs Patrol 4 now in your sights.\n[2026-09-04T04:59:48.852Z] [system] Forgotten Order standing +1 (now 59)\n[2026-09-04T04:59:48.853Z] [reward] +22 TC pried from the dust.\n",
+      "[2026-09-04T04:59:48.934Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 4 + ATK 7 = 11 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-04T04:59:49.319Z] [combat] Your Bone Crossbow shatters from wear. It is gone. A twist of Scrap Metal comes free in your hand.\n[2026-09-04T04:59:49.319Z] [reward] \u2726 Scrap Metal (Common).\n[2026-09-04T04:59:52.190Z] [debug] ui: tap \"dodge\"\n",
+      "[2026-09-04T04:59:52.191Z] [system] bleeding fades.\n[2026-09-04T04:59:52.194Z] [player] dodge\n[2026-09-04T04:59:52.194Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=2 hooks=1\n",
+      "[2026-09-04T04:59:52.195Z] [world] You commit to the dodge. Slip Mud Monarchs Patrol 4's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-04T04:59:52.195Z] [combat] Mud Monarchs Patrol 2 blackens \u2014 corruption eats 1. (4/18 HP, 1 turn left)\n",
+      "[2026-09-04T04:59:52.195Z] [combat] Mud Monarchs Patrol 2 convulses \u2014 arcing current bites 1. (3/18 HP, 1 turn left)\n[2026-09-04T04:59:52.267Z] [combat] Mud Monarchs Patrol 4 \u2014 d20 \u2192 10 + ATK 7 = 17 vs your AC 22 \u2014 \u2717 EVADED\n[2026-09-04T04:59:52.268Z] [combat] Dodge \u2014 d20 \u2192 19 + DEX 19 = 38 vs ATK 17. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n",
+      "[2026-09-04T04:59:52.268Z] [world] You slip Mud Monarchs Patrol 4's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n[2026-09-04T04:59:52.269Z] [debug] arbiter: template (reason=combat)\n[2026-09-04T04:59:52.269Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-09-04T04:59:52.269Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T04:59:52.624Z] [cognitive] neutral  (354ms)\n[2026-09-04T05:00:05.498Z] [debug] ui: tap \"\u2623\u26a1 shroud-spun slinger \u2692\"\n[2026-09-04T05:00:05.503Z] [system] evasive \u2014 harder to hit fades.\n[2026-09-04T05:00:05.581Z] [player] attack with the off-hand reclaimers guild shroud-spun slinger\n",
+      "[2026-09-04T05:00:05.582Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand reclaimers guild shroud spun slinger resolved=Reclaimers Guild Shroud-Spun Slinger range=mid enemies=2 hooks=1\n[2026-09-04T05:00:05.582Z] [arbiter] The Arbiter keeps one eye on the fight. \"That is the right move for The Bog Dragon of Old Drakova \u2014 but not with something on you. Put this down first.\"\n",
+      "[2026-09-04T05:00:05.582Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter keeps one eye on the fight. \"That is the right m\u2026\"\n[2026-09-04T05:00:05.583Z] [combat] Mud Monarchs Patrol 2 blackens \u2014 corruption eats 1. (2/18 HP, 0 turns left)\n",
+      "[2026-09-04T05:00:05.583Z] [combat] Mud Monarchs Patrol 2 shakes off the last of the corruption \u2014 the Reclaimers Guild Shroud-Spun Slinger has run its course.\n[2026-09-04T05:00:05.583Z] [combat] Mud Monarchs Patrol 2 convulses \u2014 arcing current bites 1. (1/18 HP, 0 turns left)\n",
+      "[2026-09-04T05:00:05.583Z] [combat] Mud Monarchs Patrol 2 shakes off the last of the current \u2014 the Reclaimers Guild Shroud-Spun Slinger has run its course.\n[2026-09-04T05:00:05.584Z] [debug] attack: target=Mud Monarchs Patrol 4 range=mid reach.bands=[distant,far,mid,close] reach.label=Reclaimers Guild Shroud-Spun Slinger bareHand=false\n",
+      "[2026-09-04T05:00:05.587Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-04T05:00:05.662Z] [world] You commit forward with the corrupted resonant reclaimers guild shroud-spun slinger. Mud Monarchs Patrol 4 watches your hands.\n[2026-09-04T05:00:05.663Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T05:00:06.004Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 USE_ITEM  (340ms)\n",
+      "[2026-09-04T05:00:15.418Z] [world] You seize the initiative. Mud Monarchs Patrol 4 has no time to react.\n[2026-09-04T05:00:15.419Z] [combat] You \u2014 d20 \u2192 6 + DEX 19 perfect opening (2\u00d7 dice) = 25 vs Mud Monarchs Patrol 4 AC 11 \u2014 \u2713 HIT\n",
+      "[2026-09-04T05:00:15.421Z] [combat] Your blow with the corrupted resonant reclaimers guild shroud-spun slinger lands clean \u2014 27 damage. Mud Monarchs Patrol 4 crumples in the dust. The Aetherstone settles.\n[2026-09-04T05:00:15.424Z] [reward] Mud Monarchs Patrol 4 defeated. You recover Scrap Metal \u00d72.\n",
+      "[2026-09-04T05:00:15.425Z] [reward] You strip the body: Cudgel, Reclaimer's Salvage Vest (+6 TC). The kit took the fight badly.\n[2026-09-04T05:00:15.425Z] [combat] Nobody left standing \u2014 the fight is yours. You strip the sleepers where they lie.\n",
+      "[2026-09-04T05:00:15.426Z] [reward] You strip the unconscious Mud Monarchs Patrol 2 \u2014 Bone Knife, Mud-Warden's Vest, Patched Cloth, Aether Residue, +26 TC. The gear's seen better days (worn from the fight).\n[2026-09-04T05:00:15.435Z] [system] Forgotten Order standing +1 (now 60)\n[2026-09-04T05:00:15.435Z] [reward] +12 TC pried from the dust.\n",
+      "[2026-09-04T05:00:15.491Z] [arbiter] The Arbiter looks around. \"The garrison lamps are kept lit around the clock. The Dynasty does not explain to the dark.\"\n[2026-09-04T05:00:15.492Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T05:00:21.893Z] [debug] ui: tap \"more \u25b8\"\n[2026-09-04T05:00:23.334Z] [debug] ui: tap \"inventory\"\n",
+      "[2026-09-04T05:00:32.260Z] [debug] qwen\u23f1 item_synthesis_hw ok 5332ms read/write unusable (native mis-reported 116905ms/782ms \u2014 llama.rn split bug, not this call) in 321t\u2192out 22t (94ch)\n[2026-09-04T05:00:32.272Z] [debug] homework: item_desc \"Empty Water Bottle\" \u2713 5353ms\n[2026-09-04T05:00:58.212Z] [debug] qwen\u23f1 item_synthesis_hw ok 1237ms read 322ms/write 887ms in 323t\u2192out 25t 1.0ms/t (105ch)\n",
+      "[2026-09-04T05:00:58.234Z] [debug] homework: item_desc \"Wild Onion\" \u2713 1276ms\n[2026-09-04T05:01:18.701Z] [debug] stats: STR18 DEX20 INT14 WIS17 CHA13 STE8 | gear: WIS+5,INT+4,STR+6,DEX+8,STE+2,CHA+1 | worn: main=Reclaimers Guild Geode-Cored Cleaver off=Reclaimers Guild Shroud-Spun Slinger head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-",
+      "Walker's Boots cloak=Reclaimer's Cloak amulet=Amulet of the Silt Warden ring=Tartarian Oath-Band ring2=Tin Ward Ring ring3=Tin Ward Ring ring4=Scribe's Signet\n[2026-09-04T05:01:28.795Z] [debug] qwen\u23f1 item_synthesis_hw ok 1766ms read 405ms/write 1335ms in 332t\u2192out 35t 1.2ms/t (123ch)\n[2026-09-04T05:01:28.803Z] [debug] homework: item_desc \"Mud Monarch Sigil\" \u2713 1797ms\n",
+      "[2026-09-04T05:01:51.920Z] [debug] persist sizes(KB): total=330 player=79 wm=167[rooms=93 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=81 scene=3\n[2026-09-04T05:01:59.058Z] [debug] qwen\u23f1 item_synthesis_hw ok 2008ms read 425ms/write 1465ms in 332t\u2192out 39t 1.3ms/t (162ch)\n[2026-09-04T05:01:59.066Z] [debug] homework: item_desc \"Relic Hunter's Gauntlets\" \u2713 2033ms\n",
+      "[2026-09-04T05:02:28.236Z] [debug] qwen\u23f1 item_synthesis_hw ok 1157ms read 353ms/write 778ms in 324t\u2192out 21t 1.1ms/t (92ch)\n[2026-09-04T05:02:28.248Z] [debug] homework: item_desc \"Wild Oats\" \u2713 1193ms\n[2026-09-04T05:02:58.252Z] [debug] qwen\u23f1 item_synthesis_hw ok 1162ms read 316ms/write 813ms in 324t\u2192out 22t 1.0ms/t (92ch)\n[2026-09-04T05:02:58.271Z] [debug] homework: item_desc \"Wild Grapes\" \u2713 1192ms\n",
+      "[2026-09-04T05:02:59.185Z] [world] You break the Aetheric Spark Wand down. \u2726 Recovered: Scrap Metal x2, Stick.\n[2026-09-04T05:02:59.265Z] [world] You break the Aetheric Spark Wand down. \u2726 Recovered: Scrap Metal x2, Stick.\n[2026-09-04T05:02:59.337Z] [world] You break the Aetheric Spark Wand down. \u2726 Recovered: Scrap Metal x2, Stick.\n",
+      "[2026-09-04T05:02:59.408Z] [world] You break the Aetheric Touch Wand down. \u2726 Recovered: Scrap Metal x2, Stick.\n[2026-09-04T05:02:59.479Z] [world] You break the Bone Knife down. \u2726 Recovered: Scrap Metal x2, Stick.\n[2026-09-04T05:02:59.548Z] [reward] \u2726 Your eye for parts sharpens. +1 INT (base 11, 15 as you stand).\n",
+      "[2026-09-04T05:02:59.619Z] [world] You break the Bone Knife down. \u2726 Recovered: Scrap Metal x2, Stick.\n[2026-09-04T05:02:59.690Z] [world] You break the Bone Knife down. \u2726 Recovered: Scrap Metal x2, Stick.\n[2026-09-04T05:02:59.761Z] [world] You break the Bone Knife down. \u2726 Recovered: Scrap Metal x2, Stick.\n",
+      "[2026-09-04T05:02:59.831Z] [world] You break the Cudgel down. \u2726 Recovered: Small Rock x2, Stick.\n[2026-09-04T05:02:59.901Z] [world] You break the Cudgel down. \u2726 Recovered: Small Rock x2, Stick.\n[2026-09-04T05:02:59.971Z] [world] You break the Force Wave Wand down. \u2726 Recovered: Scrap Metal x2, Stick.\n",
+      "[2026-09-04T05:03:00.047Z] [world] You break the Force Wave Wand down. \u2726 Recovered: Scrap Metal x2, Stick.\n[2026-09-04T05:03:00.118Z] [world] You break the Earthshaker Wand down. \u2726 Recovered: Scrap Metal x2, Stick.\n[2026-09-04T05:03:00.188Z] [world] You break the Slick Mud Wand down. \u2726 Recovered: Scrap Metal x2, Stick.\n",
+      "[2026-09-04T05:03:00.258Z] [world] You break the Slick Mud Wand down. \u2726 Recovered: Scrap Metal x2, Stick.\n[2026-09-04T05:03:00.327Z] [world] You break the Minor Repair Wand down. \u2726 Recovered: Scrap Metal x2, Stick.\n[2026-09-04T05:03:00.396Z] [world] You break the Gale Binder Wand down. \u2726 Recovered: Scrap Metal x2, Stick.\n",
+      "[2026-09-04T05:03:00.465Z] [world] You break the Vine Grasp Wand down. \u2726 Recovered: Scrap Metal x2, Stick.\n[2026-09-04T05:03:00.533Z] [world] You break the Energy Baton down. \u2726 Recovered: Scrap Metal x3, Stick.\n[2026-09-04T05:03:06.681Z] [debug] ui: tap \"craft\"\n[2026-09-04T05:03:47.844Z] [player] craft Sentinel Cleaver\n",
+      "[2026-09-04T05:03:47.845Z] [debug] parser: intent=craft conf=1.00 verb=craft target=sentinel cleaver resolved=- range=- enemies=0 hooks=1\n[2026-09-04T05:03:47.847Z] [reward] \u2726 Crafted Sentinel Cleaver. The Arbiter watches you set the last piece.\n[2026-09-04T05:03:48.381Z] [cognitive] ATTACK \u00b7 HIDE  (531ms)\n[2026-09-04T05:03:51.241Z] [player] craft Sentinel Cleaver\n",
+      "[2026-09-04T05:03:51.242Z] [debug] parser: intent=craft conf=1.00 verb=craft target=sentinel cleaver resolved=Sentinel Cleaver range=- enemies=0 hooks=1\n[2026-09-04T05:03:51.243Z] [reward] \u2726 Crafted Sentinel Cleaver. The Arbiter watches you set the last piece.\n[2026-09-04T05:03:52.016Z] [cognitive] ATTACK \u00b7 HIDE  (771ms)\n",
+      "[2026-09-04T05:03:53.199Z] [debug] qwen\u23f1 ambient preempted 4826ms read 0ms/write 0ms in 364t\u2192out 0t (0ch)\n[2026-09-04T05:03:53.206Z] [debug] qwen\u23f1 stats \u2014 item_synthesis_hw n6 avg2.1s max5.3s read0."
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-04-1674-the-dead-life-answers #mtnlu0casj0h [inline 6/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtnlu0casj0h"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1674-the-dead-life-answers"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "6"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1674-the-dead-life-answers"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T23:48:10.082656Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T23:48:12.282000Z",
+  "fingerprints": [
+    "9a539618ef59f5fbf89b2d9bec7d1bb6"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1956404347,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-04T23:47:35.927290Z",
+    "dateReleased": "2026-09-04T23:48:24.735279Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "cc2abf544a2897d2e91a0d613af8eea6b385a38a",
+      "message": "[ota-hal] OTA-1674: the dead life answers for itself\n\nItem one of \"fix all existing issues one through six\": #110, the process kill\non nearly every boot. This is not the fix for the kill. It is the instrument\nthat the previous instrument turned out to be missing \u2014 and, by the owner's own\nrule recorded in contextLedger.ts, that is the correct thing to ship: measure\nthe cause, or ship an instrument.\n\nWHAT THE 19:40 LEDGER SAID, ENTRY BY ENTRY\nTen records. Eight at `stage boot:qwen:deferred`. Six of those dead 670\u20131006ms\ninto the process, `alive 0ms` after the stamp, `(no action yet)` \u2014 sub-second,\nbefore the first screen, before Qwen has loaded (it is DEFERRED). And every one\nof the eight: `not an OTA-apply boot`.\n\nThree things ruled out before anything was written:\n- a boot-front race \u2014 App.tsx AWAITS the OTA check and RETURNS on 'applied',\n  so `qwen:deferred` is unreachable on an apply. My first hypothesis, and wrong;\n- anything heavy at that stage \u2014 `armQwenWarm` stores a closure and returns;\n- ML init \u2014 mlHealth reports crash count 0.\n\nAND THE ONE THING THAT COULD NOT BE RULED EITHER WAY\nOTA-1587 asked of every death: did the process that died boot on the far side\nof `reloadAsync`? It stored the answer in the wrong life. The handoff that\ncarries it is consumed on read \u2014 correctly; a handoff is a fact about ONE boot\n\u2014 by the life that then dies, taking the only copy with it. The next boot finds\nno handoff, computes `afterOtaApply: false` about ITSELF, and bootSlice wrote\nthat onto the dead life's record. Structurally, a death record could never say\n\"yes\". \"Not an OTA-apply boot\" on eight of ten was not a finding; it was the\nonly value the field could take. The ota1587 suite pinned the exact line \u2014\n`afterOtaApply: launch.afterOtaApply,` \u2014 as correct.\n\nSo the fact now rides the CRUMB. `bootStampFields()` (the one writer every\ncrumb passes through) adds `afterOta` / `otaPath` / `otaGapMs` / `prevCtx` once\n`noteLaunchFacts` has run \u2014 early in hydrate, before any stage that matters \u2014\nand the record reads the dead life's own answer off its own crumb. A crumb from\nthe first milliseconds, before the launch resolved, leaves it UNDEFINED, and\nevery reader prints that as \"not known\", never as a cold start. \"Not known\" is\na fact; \"false\" is a lie, and it is exactly the lie that hid this for two OTAs.\n\nTWO MORE THINGS THE SAME READ TURNED UP\n- The ledger label keyed on `kind` alone, so the idle reclaims OTA-1567 already\n  made non-fatal (`isFatal: false`, and Sentry has honoured that as level\n  `error` since) still printed PROCESS KILLED \u2014 no JS ran in About and in every\n  bug report, and were counted in \"N recorded\". Two of the owner's ten were\n  that. A ledger that overstates kills to the one person reading it sends the\n  hunt at the wrong thing \u2014 OTA-1521's own words. The label now says what the\n  record knew, and the header says \"10 recorded, 8 fatal\".\n- The whole `launch` block \u2014 which life died, how old it was, what it inherited\n  \u2014 has been on every record since OTA-1587 and forwarded to Sentry on none.\n  The rollup it exists for could only ever be done by hand, on a device. It is\n  in `extra` now, three-valued.\n\nThe OTA-1587 rollup counts FATAL kills and only a true \"yes\"; an idle reclaim\non an apply boot is not the signal, and `undefined` is not a \"no\" \u2014 counting it\nas one would be the same defect one layer down. It also says out loud how many\ndied before their launch resolved, because the absence of that line is how the\nhole hid.\n\n\u26a0 NO BOOT-PHASE EXEMPTION, DELIBERATELY. Six sub-second no-action deaths look\nexactly like a force-close during the splash \u2014 the owner's recorded habit. They\nalso look exactly like OTA-1587's candidate (b): a reload-boot killed by a\nnative context the previous life never released, in a process `reloadAsync`\ndoes not restart. This instrument is what tells those two apart. Filing them as\nnon-fatal today would hide (b) if it is real \u2014 the blind-spot trade OTA-1377 and\nOTA-1413 both refused. The next log closes #110 one way or the other.\n\n- app/diagnostics/bootIdentity.ts \u2014 `BootStamp`, `bootStampFields` carries the\n  launch facts once resolved.\n- app/engine/saveSystem.ts \u2014 `LiveBreadcrumb` gains the four fields.\n- app/state/slices/bootSlice.ts \u2014 the record reads the crumb, not the reader.\n- app/diagnostics/crashLedger.ts \u2014 `recordLabel`, `isFatalRecord`, the header,\n  the rollup over fatal with `=== true` and the unresolved line, the three-way\n  launch line, `launch.otaPath`.\n- app/diagnostics/sentryTransport.ts \u2014 `launch*` in `extra`.\n- __tests__/ota1674TheDeadLifeAnswers.test.ts \u2014 19 tests.\n- __tests__/ota1587WhichLifeDied.test.ts \u2014 the pin on the defect repointed to\n  the fix, with the reason.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T23:45:16Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1674-the-dead-life-answers",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1674-the-dead-life-answers",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T23:48:24.735279Z",
+          "dateCreated": "2026-09-04T23:47:35.927290Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155722001",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T23:48:25.072821Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1674-the-dead-life-answers",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1674-the-dead-life-answers",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1674-the-dead-life-answers",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1674-the-dead-life-answers)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "c45e3a9bfb094c8797e214bf0b7c2774",
+  "previousEventID": "a040f1c7f94e49aba2de70a24b82bdd3"
+}

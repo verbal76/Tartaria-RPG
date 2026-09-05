@@ -1,0 +1,246 @@
+{
+  "id": "0e4e1f2c473140d3a3538da1faa36b35",
+  "groupID": "7712848145",
+  "eventID": "0e4e1f2c473140d3a3538da1faa36b35",
+  "projectID": "4511945117532160",
+  "size": 7165,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-04-1674-the-dead-life-answers #mtnir5vqr3fw [inline 2/2]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1674-the-dead-life-answers",
+  "message": "player-log 2026-09-04-1674-the-dead-life-answers #mtnir5vqr3fw [inline 2/2]",
+  "title": "player-log 2026-09-04-1674-the-dead-life-answers #mtnir5vqr3fw [inline 2/2]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "c5b67a9338b7442887fcbe9331ce1a85",
+      "span_id": "be7cafa4edcda137",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "r,cloak,outer,reclaimers,stealth])\n    actions: equip:cloak, use, scrap, repair, drop\n  Relic Hunter's Gauntlets (Uncommon, dur 27/27, AC +4 \u00b7 Resists: slashing, cold (coated), burn (coated) \u00b7 DEX +4 \u00b7 STR +2, [armor,hands,gauntlets,reclaimers])\n    actions: equip:hands, use, scrap, drop\n  Titan's Gauntlets (dur 11/16, AC +2 \u00b7 STR +2, [armor,hands,gauntlets,tartarian_giants])\n",
+      "    actions: equip:hands, use, scrap, repair, drop\n  Veil-Stitched Plate (Uncommon, dur 25/25, AC+2, unique, [fused,unique])\n    actions: equip:chest, use, scrap, drop\n\nShields (1)\n  Grounded Buckler (Uncommon, 1d6 bludgeoning, dur 323/323, [weapon,shield,dual_wield,unknowing_masses])\n    actions: equip:off, use(off), scrap, drop\n\nDog Armor (5)\n",
+      "  \u25c6 Aetheric Padded Vest \u00d72 (Rare, dur 25/28, \u2665reserved, AC +3 (dog) \u00b7 Bites back: 1 aetheric to whatever hits the dog, [dog_armor,vest,aether,padded,loot])\n    actions: scrap, repair, release-from-fusion, drop\n  \u25c6 Burlap Vest \u00d79 (dur 18/18, AC +1 (dog), [dog_armor,vest,burlap,loot,improvised])\n    actions: scrap, save-for-fusion, drop\n",
+      "  \u25c6 Dog Aetheric Padded Vest (Rare, dur 18/18, AC +3 \u00b7 Resists: aetheric, [dog_armor,vest,aether,padded,armor])\n    actions: scrap, save-for-fusion, drop\n  \u25c6 Riveted Leather Vest (Uncommon, dur 24/24, \u2665reserved, AC +2 (dog), [dog_armor,vest,leather,loot,cloth])\n    actions: scrap, release-from-fusion, drop\n  Vein-Threaded Cover (Rare, dur 35/35, AC+3, resist:poison, unique, [fused,unique,poison])\n",
+      "    actions: scrap, drop\n\nAmulets & Rings (11)\n  Aether-Shard Ring (Uncommon, dur 30/30, INT +1 \u00b7 Resists aetheric: \u221210% incoming damage of each, on top of armour, [ring,aether,crafted])\n    actions: equip:ring, use, scrap, drop\n  Aetheric Locket \u00d72 (dur 30/30, WIS +1 \u00b7 Resists aetheric: \u22129% incoming damage of each, on top of armour, [detection,amulet,relic])\n",
+      "    actions: equip:amulet, use, scrap, drop\n  Aetheric Locket (dur 30/30, WIS +1 \u00b7 Resists aetheric: \u22129% incoming damage of each, on top of armour, [amulet,relic,detection])\n    actions: equip:amulet, use, scrap, drop\n  Amulet of the Silt Warden (Rare, dur 40/40, equipped:amulet, WIS +2 \u00b7 Resists poison, corruption: \u221220% incoming damage of each, on top of armour, [amulet,mud,crafted])\n",
+      "    actions: unequip:amulet\n  Golem Controller Ring (Uncommon, dur 35/35, INT +1, [ring,construct])\n    actions: equip:ring, use, scrap, drop\n  Rustbane Charm (dur 30/30, Resists degradation: \u22129% incoming damage of each, on top of armour, [amulet,charm,crafted])\n    actions: equip:amulet, use, scrap, drop\n  Rusted Band of Knowledge (dur 25/25, INT +1, [ring,scholarly])\n",
+      "    actions: equip:ring, use, scrap, drop\n  Scribe's Signet \u00d72 (Uncommon, dur 35/35, INT +2 \u00b7 WIS +1, [ring,signet,scholarly,crafted])\n    actions: equip:ring, use, scrap, drop\n  Tartarian Oath-Band \u00d72 (Uncommon, dur 35/35, equipped:ring, STR +2, [ring,faction_gear,true_tartarians,oath])\n    actions: unequip:ring\n",
+      "  Tin Ward Ring \u00d72 (Rare, dur 40/40, Resists acid: \u221215% incoming damage of each, on top of armour \u00b7 Everything you wear or wield lasts 15% longer, [ring,crafted,defensive])\n    actions: equip:ring, use, scrap, drop\n  Tin Ward Ring (Rare, dur 40/40, Resists acid: \u221215% incoming damage of each, on top of armour \u00b7 Everything you wear or wield lasts 15% longer, [ring,crafted,defensive])\n",
+      "    actions: equip:ring, use, scrap, drop\n\nConsumables (20)\n  Bioluminescent Fungus (Uncommon, [food,foraged,mushroom,light,aether])\n    actions: use(eat), drop\n  Bioluminescent Fungus (Uncommon, [fungus,light,gear,food,foraged])\n    actions: use(eat), drop\n  Blue Aetheric Fungus ([fungus,blue,distillable,food,foraged])\n    actions: use(eat), drop\n  Blueberries \u00d77 (Uncommon, [food,foraged,fruit])\n",
+      "    actions: use(eat), drop\n  Field Dressing \u00d78 ([healing,crafted])\n    actions: use(eat), drop\n  First Aid Kit \u00d75 (Uncommon, [healing,crafted])\n    actions: use(apply), drop\n  Forager's Stew \u00d73 (Uncommon, [food,cooked,stew])\n    actions: use(eat), drop\n  Orange Sporecap ([food,foraged,mushroom,orange])\n    actions: use(eat), drop\n  Raspberries \u00d72 (Uncommon, [food,foraged,fruit])\n",
+      "    actions: use(eat), drop\n  Reclaimer's Mud-Beer \u00d72 ([alcohol,drink])\n    a\n(pack listing trimmed at 12000 characters)\n\n--- CHARACTER LOG (newest first) ---\n(no character selected \u2014 no log attached)\n\n=== END REPORT ==="
+    ],
+    "chunkChars": 4289
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-04-1674-the-dead-life-answers #mtnir5vqr3fw [inline 2/2]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtnir5vqr3fw"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1674-the-dead-life-answers"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "2"
+    },
+    {
+      "key": "parts",
+      "value": "2"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1674-the-dead-life-answers"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "3"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T23:48:01.287107Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T23:48:03.412000Z",
+  "fingerprints": [
+    "9a539618ef59f5fbf89b2d9bec7d1bb6"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1956404347,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-04T23:47:35.927290Z",
+    "dateReleased": "2026-09-04T23:48:24.735279Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "cc2abf544a2897d2e91a0d613af8eea6b385a38a",
+      "message": "[ota-hal] OTA-1674: the dead life answers for itself\n\nItem one of \"fix all existing issues one through six\": #110, the process kill\non nearly every boot. This is not the fix for the kill. It is the instrument\nthat the previous instrument turned out to be missing \u2014 and, by the owner's own\nrule recorded in contextLedger.ts, that is the correct thing to ship: measure\nthe cause, or ship an instrument.\n\nWHAT THE 19:40 LEDGER SAID, ENTRY BY ENTRY\nTen records. Eight at `stage boot:qwen:deferred`. Six of those dead 670\u20131006ms\ninto the process, `alive 0ms` after the stamp, `(no action yet)` \u2014 sub-second,\nbefore the first screen, before Qwen has loaded (it is DEFERRED). And every one\nof the eight: `not an OTA-apply boot`.\n\nThree things ruled out before anything was written:\n- a boot-front race \u2014 App.tsx AWAITS the OTA check and RETURNS on 'applied',\n  so `qwen:deferred` is unreachable on an apply. My first hypothesis, and wrong;\n- anything heavy at that stage \u2014 `armQwenWarm` stores a closure and returns;\n- ML init \u2014 mlHealth reports crash count 0.\n\nAND THE ONE THING THAT COULD NOT BE RULED EITHER WAY\nOTA-1587 asked of every death: did the process that died boot on the far side\nof `reloadAsync`? It stored the answer in the wrong life. The handoff that\ncarries it is consumed on read \u2014 correctly; a handoff is a fact about ONE boot\n\u2014 by the life that then dies, taking the only copy with it. The next boot finds\nno handoff, computes `afterOtaApply: false` about ITSELF, and bootSlice wrote\nthat onto the dead life's record. Structurally, a death record could never say\n\"yes\". \"Not an OTA-apply boot\" on eight of ten was not a finding; it was the\nonly value the field could take. The ota1587 suite pinned the exact line \u2014\n`afterOtaApply: launch.afterOtaApply,` \u2014 as correct.\n\nSo the fact now rides the CRUMB. `bootStampFields()` (the one writer every\ncrumb passes through) adds `afterOta` / `otaPath` / `otaGapMs` / `prevCtx` once\n`noteLaunchFacts` has run \u2014 early in hydrate, before any stage that matters \u2014\nand the record reads the dead life's own answer off its own crumb. A crumb from\nthe first milliseconds, before the launch resolved, leaves it UNDEFINED, and\nevery reader prints that as \"not known\", never as a cold start. \"Not known\" is\na fact; \"false\" is a lie, and it is exactly the lie that hid this for two OTAs.\n\nTWO MORE THINGS THE SAME READ TURNED UP\n- The ledger label keyed on `kind` alone, so the idle reclaims OTA-1567 already\n  made non-fatal (`isFatal: false`, and Sentry has honoured that as level\n  `error` since) still printed PROCESS KILLED \u2014 no JS ran in About and in every\n  bug report, and were counted in \"N recorded\". Two of the owner's ten were\n  that. A ledger that overstates kills to the one person reading it sends the\n  hunt at the wrong thing \u2014 OTA-1521's own words. The label now says what the\n  record knew, and the header says \"10 recorded, 8 fatal\".\n- The whole `launch` block \u2014 which life died, how old it was, what it inherited\n  \u2014 has been on every record since OTA-1587 and forwarded to Sentry on none.\n  The rollup it exists for could only ever be done by hand, on a device. It is\n  in `extra` now, three-valued.\n\nThe OTA-1587 rollup counts FATAL kills and only a true \"yes\"; an idle reclaim\non an apply boot is not the signal, and `undefined` is not a \"no\" \u2014 counting it\nas one would be the same defect one layer down. It also says out loud how many\ndied before their launch resolved, because the absence of that line is how the\nhole hid.\n\n\u26a0 NO BOOT-PHASE EXEMPTION, DELIBERATELY. Six sub-second no-action deaths look\nexactly like a force-close during the splash \u2014 the owner's recorded habit. They\nalso look exactly like OTA-1587's candidate (b): a reload-boot killed by a\nnative context the previous life never released, in a process `reloadAsync`\ndoes not restart. This instrument is what tells those two apart. Filing them as\nnon-fatal today would hide (b) if it is real \u2014 the blind-spot trade OTA-1377 and\nOTA-1413 both refused. The next log closes #110 one way or the other.\n\n- app/diagnostics/bootIdentity.ts \u2014 `BootStamp`, `bootStampFields` carries the\n  launch facts once resolved.\n- app/engine/saveSystem.ts \u2014 `LiveBreadcrumb` gains the four fields.\n- app/state/slices/bootSlice.ts \u2014 the record reads the crumb, not the reader.\n- app/diagnostics/crashLedger.ts \u2014 `recordLabel`, `isFatalRecord`, the header,\n  the rollup over fatal with `=== true` and the unresolved line, the three-way\n  launch line, `launch.otaPath`.\n- app/diagnostics/sentryTransport.ts \u2014 `launch*` in `extra`.\n- __tests__/ota1674TheDeadLifeAnswers.test.ts \u2014 19 tests.\n- __tests__/ota1587WhichLifeDied.test.ts \u2014 the pin on the defect repointed to\n  the fix, with the reason.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T23:45:16Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1674-the-dead-life-answers",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1674-the-dead-life-answers",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T23:48:24.735279Z",
+          "dateCreated": "2026-09-04T23:47:35.927290Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155722001",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T23:48:25.072821Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1674-the-dead-life-answers",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1674-the-dead-life-answers",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1674-the-dead-life-answers",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1674-the-dead-life-answers)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "7905524d511a4ebd93b2100d21755adb",
+  "previousEventID": null
+}

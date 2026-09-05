@@ -1,0 +1,241 @@
+{
+  "id": "25477858f75f40a79b7540d59bf02b04",
+  "groupID": "7712968307",
+  "eventID": "25477858f75f40a79b7540d59bf02b04",
+  "projectID": "4511945117532160",
+  "size": 5496,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-05-1677-the-log-leaves-in-an-envelope #mtnovtl10c8a [inline 28/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-05-1677-the-log-leaves-in-an-envelope",
+  "message": "player-log 2026-09-05-1677-the-log-leaves-in-an-envelope #mtnovtl10c8a [inline 28/28]",
+  "title": "player-log 2026-09-05-1677-the-log-leaves-in-an-envelope #mtnovtl10c8a [inline 28/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "5596f059f3da4e8097dae887acf3c727",
+      "span_id": "b4ed50b47898befa",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "ZS1wbGF5ZXItaXMgwrcgc3RhZ2UgYm9vdDpxd2VuOmRlZmVycmVkCiAgICAgIFByb2Nlc3MgZGllZCB3aXRoIG5vIG9yZGVybHkgZXhpdCB3aGlsZTogKG5vIGFjdGlvbiB5ZXQpCiAgICAgIGRvaW5nOiAobm8gYWN0aW9uIHlldCkgwrcgcm9vbSA/IMK3IHNjcmVlbiA/CiAgICAgIGxhc3QgY2hlY2twb2ludDogYm9vdDpxd2VuOmRlZmVycmVkIMK3IDk1Nm1zIGludG8gdGhlIGFjdGlvbiDCtyBhbGl2ZSAwbXMgYWZ0ZXIgaXQKICAgICAgbGF1bmNoOiBkaWVkIDEwMDZtcyBpbnRvIHRoZSBwcm9jZXNzIMK3IG5vdCBhbiBPVEEtYXBwbHkgYm9vdAogICAgICBpdHMgb3duIG1vZGVsIGxlZGdlciBhdCB0aGUgbGFzdCBzdGFtcDogbzAvcjAvbDAvcDAvZG4wCg==",
+      "ICDigKIgMjAyNi0wOS0wNFQyMzoyNDoxOC4xMzdaICgxMDltIGFnbykg4oCUIFBST0NFU1MgS0lMTEVEIOKAlCBubyBKUyByYW4KICAgICAgYnVpbGQgNC4zMi4xMSDCtyAyMDI2LTA5LTA0LTE2NzMtb25lLXNjYW5uZXItcGVyLWJhbmQgwrcgc3RhZ2UgYm9vdDpxd2VuOmRlZmVycmVkCiAgICAgIFByb2Nlc3MgZGllZCB3aXRoIG5vIG9yZGVybHkgZXhpdCB3aGlsZTogKG5vIGFjdGlvbiB5ZXQpCiAgICAgIGRvaW5nOiAobm8gYWN0aW9uIHlldCkgwrcgcm9vbSA/IMK3IHNjcmVlbiA/CiAgICAgIGxhc3QgY2hlY2twb2ludDogYm9vdDpxd2VuOmRlZmVycmVkIMK3IDIwMjVtcyBpbnRvIHRoZSBhY3Rpb24gwrcgYWxpdmUgMG1zIGFmdGVyIGl0Cg==",
+      "ICAgICAgbGF1bmNoOiBkaWVkIDIwODhtcyBpbnRvIHRoZSBwcm9jZXNzIMK3IG5vdCBhbiBPVEEtYXBwbHkgYm9vdAogICAgICBpdHMgb3duIG1vZGVsIGxlZGdlciBhdCB0aGUgbGFzdCBzdGFtcDogbzAvcjAvbDAvcDAvZG4wCiAg4oCiIDIwMjYtMDktMDVUMDA6MjA6MjAuODMxWiAoNTNtIGFnbykg4oCUIFBST0NFU1MgS0lMTEVEIOKAlCBubyBKUyByYW4KICAgICAgYnVpbGQgNC4zMi4xMSDCtyAyMDI2LTA5LTA1LTE2NzUtdGhlLXZvaWNlLW5hbWVzLWl0cy1zdGVwIMK3IHN0YWdlIG5hdGl2ZTpjb2duaXRpb246ZG9uZQogICAgICBQcm9jZXNzIGRpZWQgd2l0aCBubyBvcmRlcmx5IGV4aXQgd2hpbGU6IGFjdGlvbiAid2hhdCdzIGdvaW5nIG9uIHRoZXJlPyIK",
+      "ICAgICAgZG9pbmc6IGFjdGlvbiAid2hhdCdzIGdvaW5nIG9uIHRoZXJlPyIgwrcgcm9vbSBkcmFrb3ZhIMK3IHNjcmVlbiBleHBsb3JhdGlvbgogICAgICBsYXN0IGNoZWNrcG9pbnQ6IG5hdGl2ZTpjb2duaXRpb246ZG9uZSBbcTBdIMK3IDI4NW1zIGludG8gdGhlIGFjdGlvbiDCtyBhbGl2ZSAwbXMgYWZ0ZXIgaXQKICAgICAgbGF1bmNoOiBkaWVkIDUyNTg0Nm1zIGludG8gdGhlIHByb2Nlc3MgwrcgVEhJUyBCT09UIEZPTExPV0VEIEFOIE9UQSBBUFBMWSAxNjBtcyBlYXJsaWVyIHZpYSBib290LWZyb250CiAgICAgIHByZXZpb3VzIGxpZmUgcmVsZWFzZWQgaXRzIGNvbnRleHRzIGJlZm9yZSByZWxvYWRpbmcgKG8wL3IwL2wwL3AwL2RuMCkK",
+      "ICAgICAgaXRzIG93biBtb2RlbCBsZWRnZXIgYXQgdGhlIGxhc3Qgc3RhbXA6IG8wL3IwL2wwL3AwL2RuMApDcmFzaCBkZWxpdmVyeTogT04g4oCUIHJlcG9ydHMgZ28gdG8gU2VudHJ5IHdoZW4geW91IGNyYXNoLgpSdW50aW1lIHByZXNzdXJlCiAgTWVtb3J5IHdhcm5pbmdzOiBub25lIHRoaXMgc2Vzc2lvbgogIEZyZWV6ZSB3YXRjaDogbm8gc3RhbGxzIHNlZW4gKEpTIGNsb2NrcyBvbmx5IOKAlCBzZWUgdGhlIG5hdGl2ZSBxdWV1ZSBiZWxvdykKICBOYXRpdmUgcXVldWU6IHdvcnN0IHdhaXQgMC4wcyDCtyAwIGpvYiBraW5kcyBxdWV1ZWQgPjNzIMK3IHdvcnN0IDAuMG1zL3Byb21wdC10b2tlbgogIEFwcCBzdGF0ZSB0cmFpbDogKG5vbmUgcmVjb3JkZWQpCk1vZGVsIGNvbnRleHRzCiAgTGl2ZSBub3c6IDAK",
+      "ICBPcGVuZWQ6IDAgwrcgUmVsZWFzZWQ6IDAgwrcgUGVhayBsaXZlOiAwCiAgTmFycmF0aW9uIGVuZ2luZTogaWRsZQo="
+    ],
+    "chunkChars": 1917,
+    "chunkEncoding": "base64"
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-05-1677-the-log-leaves-in-an-envelope #mtnovtl10c8a [inline 28/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtnovtl10c8a"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-05-1677-the-log-leaves-in-an-envelope"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "28"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-05-1677-the-log-leaves-in-an-envelope"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "3"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-05T01:43:13.871805Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-05T01:43:15.894000Z",
+  "fingerprints": [
+    "170b135345fce40183cccb82d2a58a64"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1956497342,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-05T01:14:25.158057Z",
+    "dateReleased": "2026-09-05T01:15:07.733872Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "fb94664868824e828d1649ce6e3230b818834b44",
+      "message": "[ota-hal] OTA-1677: the log leaves in an envelope\n\nItem four of \"fix all existing issues one through six\": #82, Sentry's\n@password:filter still taking a block from roughly a third of the log sends\nafter OTA-1520.\n\nRE-MEASURED FIRST\n711 delivered events from 09-03/04 in the inbox: 209 of them (29%) still lost a\nblock, 273 blocks, 93,210 characters. OTA-1520 worked exactly as far as it\nclaimed \u2014 the loss went from whole 15,000-character parts to ~400-character\nblocks \u2014 but the scrubber was still being handed English, and the surviving\nneighbours finally named what it takes: 219 of the 273 holes sit in SALVAGE\nprose, and one of the four rotating curio lines in salvagePools.ts reads\n\"Nobody authored this piece\" \u2014 `auth` inside \"authored\", the no-word-boundary\nmatch 1520 predicted and could not yet see. The other 54 are two blocks that\nrecur across re-sent bundles: a haul naming a \"\u2026of Secrets\" armour, and an\nNPC's line. Sentry's Safe Fields could not exempt it (the relay already prints\nthat finding: the rule runs on chunkBlocks.0, .1, \u2026), and a fantasy log cannot\navoid \"secret\" or \"authored\".\n\nSO THE TEXT STOPS BEING TEXT IN TRANSIT\nEach block is base64 on the device \u2014 UTF-8 then base64, by hand, because the\nruntime guarantees neither TextEncoder nor btoa \u2014 and decoded by the relay when\nthe event says `chunkEncoding: base64`. The base64 alphabet has no `@`, no `.`,\nno space and no word: @password, @email, @ip and @creditcard have nothing to\nmatch, whatever the prose says and whatever a future default rule says. This is\nthe class fix \u2014 a content-scrubbing redactor is never handed content \u2014 where\nrewording one curio line would have been the next whack-a-mole (the three\n\"\u2026of Secrets\" armours were next in line, and renaming items is a save\nmigration).\n\n`chunkChars` stays the RAW receipt, so the relay's shortfall check is\nunchanged. A block Sentry replaced anyway is not valid base64 and stands in the\nreassembly as the literal \"[Filtered]\", exactly as visible as before. Pre-1677\nevents carry no `chunkEncoding` and reassemble as plain text, as they always\ndid \u2014 the branch is opt-in.\n\nPROVEN, NOT ASSERTED: the suite runs Sentry's own pattern over a real 400 KB\ndelivered log from the inbox, block by block \u2014 the text trips it, no envelope\ndoes \u2014 and checks the hand encoder against Node's base64 on every one of those\nblocks, plus the four curio lines and the three armour names by name.\n\nThe task's second finding (release/dist null on every event) was closed by\nOTA-1592 / task #109.\n\n- app/diagnostics/sentryTransport.ts \u2014 encodeLogBlock, LOG_BLOCK_ENCODING;\n  the inline sender encodes every block and names the encoding.\n- .github/workflows/sentry-inbox.yml \u2014 decode_block; the base64 branch before\n  the join and the receipt check.\n- __tests__/ota1677TheLogLeavesInAnEnvelope.test.ts \u2014 9 tests.\n- __tests__/ota1520 / ota1518 / ota1505 \u2014 the extra-shape pins repointed to\n  the encoded array (1505 decodes before it compares).\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-05T01:11:24Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-05-1677-the-log-leaves-in-an-envelope",
+          "shortVersion": "tartaria@4.32.11+2026-09-05-1677-the-log-leaves-in-an-envelope",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-05T01:15:07.733872Z",
+          "dateCreated": "2026-09-05T01:14:25.158057Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155735682",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-05T01:15:08.064601Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-05-1677-the-log-leaves-in-an-envelope",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-05-1677-the-log-leaves-in-an-envelope",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-05-1677-the-log-leaves-in-an-envelope",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-05-1677-the-log-leaves-in-an-envelope)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "27b3b05b275e44049cea2db95fc2fa57",
+  "previousEventID": "18f1652e21f14bf0bbce6d25431663c1"
+}

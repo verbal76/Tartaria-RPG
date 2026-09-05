@@ -1,0 +1,277 @@
+{
+  "id": "4c1419f3f6654169b38badbf2ff3ead8",
+  "groupID": "7709458547",
+  "eventID": "4c1419f3f6654169b38badbf2ff3ead8",
+  "projectID": "4511945117532160",
+  "size": 18270,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-03-1642-every-drop-has-a-name-in-the-book #mtkvtzmb9qii [inline 6/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-03-1642-every-drop-has-a-name-in-the-book",
+  "message": "player-log 2026-09-03-1642-every-drop-has-a-name-in-the-book #mtkvtzmb9qii [inline 6/28]",
+  "title": "player-log 2026-09-03-1642-every-drop-has-a-name-in-the-book #mtkvtzmb9qii [inline 6/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:dba5:7266:ad2:ae57:4fda:d815",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "ff5fd4bae71c495992211840f867cf46",
+      "span_id": "9acccdb044e60195",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "9:28.378Z] [world] You work the cold spring over. A part of it comes loose, intact.\n[2026-09-02T22:39:28.378Z] [world] You work the leaning ruined skyscraper over. A part of it comes loose, intact.\n[2026-09-02T22:39:28.379Z] [world] You salvage the shattered buried market row rooftop. The take is small but real.\n[2026-09-02T22:39:28.379Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-09-02T22:39:28.379Z] [reward]     \u2022 Aether Dust (Common)\n[2026-09-02T22:39:28.380Z] [reward]     \u2022 Bent Nail x2 (Common)\n[2026-09-02T22:39:28.380Z] [reward]     \u2022 Worn Tartarian Coin x2 (Common)\n[2026-09-02T22:39:28.380Z] [reward]     \u2022 Cloth Scrap x2 (Common)\n[2026-09-02T22:39:29.854Z] [debug] ui: tap \"investigate\"\n[2026-09-02T22:39:31.334Z] [player] investigate the ground\n",
+      "[2026-09-02T22:39:31.334Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2\n[2026-09-02T22:39:31.338Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Empty Water Bottle (Common).\n[2026-09-02T22:39:31.346Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n",
+      "[2026-09-02T22:39:31.346Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-02T22:39:31.346Z] [system] \u23f3 Time passed: 24 min\n[2026-09-02T22:39:31.561Z] [cognitive] CLIMB  (214ms)\n[2026-09-02T22:39:32.513Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-09-02T22:39:32.531Z] [debug] spawn: gear=[Crude Golem Pike, Compact Laser Pistol (Ranged)] window=10 roster=new\n",
+      "[2026-09-02T22:39:32.533Z] [world] Halda Roadsworn glances up. \"You again.\" Not warm, not cold \u2014 noted.\n[2026-09-02T22:39:32.533Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Halda Roadsworn, wandering trader. Tap the vendor banner to trade.\n",
+      "[2026-09-02T22:39:32.542Z] [world] This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n[2026-09-02T22:39:32.542Z] [world] You walk west through open silt. The compass tells you The Architect's Blind lies further west \u2014 3 tiles, about 8 hours of travel.\n",
+      "[2026-09-02T22:39:32.543Z] [world] Your hands remember the shape of what you were doing before your head does.\n[2026-09-02T22:39:32.761Z] [player] investigate ash drift\n[2026-09-02T22:39:32.761Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ash drift resolved=ash drift range=- enemies=0 hooks=2\n",
+      "[2026-09-02T22:39:32.762Z] [world] The ash drift sits the way ordinary things sit. The Arbiter does not lean in. You move on.\n[2026-09-02T22:39:32.763Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-09-02T22:39:32.763Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-02T22:39:32.975Z] [cognitive] THROW \u00b7 SEARCH  (211ms)\n",
+      "[2026-09-02T22:39:33.745Z] [debug] ui: tap \"take / salvage\"\n[2026-09-02T22:39:34.919Z] [world] You crouch, take the Compact Laser Pistol (Ranged), and are moving again before you have straightened up.\n[2026-09-02T22:39:34.921Z] [reward] \u2726 Compact Laser Pistol (Ranged) (Common).\n[2026-09-02T22:39:34.938Z] [world] You do not think about it. The Crude Golem Pike is simply in your hand now.\n",
+      "[2026-09-02T22:39:34.938Z] [reward] \u2726 Crude Golem Pike (Common).\n[2026-09-02T22:39:35.880Z] [world] You strip the calm ring carefully. Something usable comes free in your hand.\n[2026-09-02T22:39:35.880Z] [world] You lever something loose from the chart cairn \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n",
+      "[2026-09-02T22:39:35.880Z] [world] You break the cold spring apart. Among the pieces, something worth keeping.\n[2026-09-02T22:39:35.881Z] [world] You break the half-buried submerged giant statue apart. Among the pieces, something worth keeping.\n[2026-09-02T22:39:35.881Z] [world] You strip the half-buried wagon carefully. Something usable comes free in your hand.\n",
+      "[2026-09-02T22:39:35.881Z] [reward] \u2726 Salvage haul:\n[2026-09-02T22:39:35.881Z] [reward]     \u2022 Scrap Metal x3 (Common)\n[2026-09-02T22:39:35.881Z] [reward]     \u2022 Tin Valve Housing (Common)\n[2026-09-02T22:39:35.881Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-09-02T22:39:35.881Z] [reward]     \u2022 Cloth Scrap (Common)\n",
+      "[2026-09-02T22:39:36.457Z] [debug] persist sizes(KB): total=310 player=87 wm=139[rooms=72 events=5 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=81 scene=3\n[2026-09-02T22:39:37.216Z] [debug] ui: tap \"investigate\"\n[2026-09-02T22:39:38.845Z] [player] investigate the ground\n",
+      "[2026-09-02T22:39:38.845Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2\n[2026-09-02T22:39:38.849Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Firewood (Common).\n[2026-09-02T22:39:38.856Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n",
+      "[2026-09-02T22:39:38.857Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-02T22:39:38.857Z] [system] \u23f3 Time passed: 24 min\n[2026-09-02T22:39:39.111Z] [cognitive] CLIMB  (253ms)\n[2026-09-02T22:39:39.320Z] [debug] qwen\u23f1 investigate_lore ok 6351ms read 1462ms/write 4226ms in 127t\u2192out 35t 11.5ms/t (160ch)\n[2026-09-02T22:39:39.532Z] [debug] ui: tap \"rest\"\n",
+      "[2026-09-02T22:39:39.534Z] [player] rest\n[2026-09-02T22:39:39.534Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=2\n[2026-09-02T22:39:39.534Z] [world] Mercy tests three spots and settles on the one nearest your boot.\n[2026-09-02T22:39:39.535Z] [world] You rest for 8 hours. +7 stamina recovered. (Day 53, afternoon)\n",
+      "[2026-09-02T22:39:39.535Z] [arbiter] The Arbiter goes still. \"It watched you sleep from the treeline and made up its mind about you.\"\n[2026-09-02T22:39:39.535Z] [world] A Mud Strider rises out of the silt where you took it for a ridge. The rest is over.\n[2026-09-02T22:39:39.536Z] [debug] enemy: Mud Strider hp=23 ac=10 atk=Spear Jab dmg=2D6 rarity=Common ap=5\n",
+      "[2026-09-02T22:39:39.536Z] [system] \u23f3 Time passed: 8h\n[2026-09-02T22:39:39.915Z] [cognitive] REST  (378ms)\n[2026-09-02T22:39:42.147Z] [debug] ui: tap \"flee\"\n[2026-09-02T22:39:42.153Z] [player] flee\n[2026-09-02T22:39:42.154Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=far enemies=1 hooks=2\n[2026-09-02T22:39:42.253Z] [system] \u23f3 Time passed: 15 min\n",
+      "[2026-09-02T22:39:42.606Z] [cognitive] FEAR \u00b7 RETREAT \u00b7 HIDE  (352ms)\n[2026-09-02T22:39:44.393Z] [debug] skillcheck: escape d20=4 DEX 22 = 26 vs Pursuit 22 \u2014 Mud Strider (d20 15 + SPD 7) \u2192 PASS\n[2026-09-02T22:39:44.508Z] [debug] stats: STR16 DEX23 INT12 WIS14 CHA10 STE7 | gear: WIS+4,INT+3,DEX+12,STR+5,STE+2 | worn: main=Auralite Talon off=Choir-Bound Launcher head=Architect's Sight Enhancer chest",
+      "=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n[2026-09-02T22:39:44.509Z] [debug] train: dexterity (escape check) \u2192 progress 70/100\n[2026-09-02T22:39:44.509Z] [world] You turn and run and the running works.\n",
+      "[2026-09-02T22:39:45.982Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-09-02T22:39:46.007Z] [world] Ymer Tinpot sets down what they're holding. \"Didn't expect you today, Cheddar Bob.\"\n[2026-09-02T22:39:46.007Z] [world] \"Been a while,\" Ymer Tinpot says. \"Thought the mud had you.\"\n",
+      "[2026-09-02T22:39:46.008Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Ymer Tinpot, wandering trader. Tap the vendor banner to trade.\n[2026-09-02T22:39:46.015Z] [world] Rare workings for sale: Lich-Heart Pendant (200 TC), Many-Colored Tonic (200 TC), Mire Stave (200 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hur",
+      "t dog or golem \u2014 just ask.\n[2026-09-02T22:39:46.015Z] [world] You walk north through open silt. The compass points north into open ground.\n[2026-09-02T22:39:46.016Z] [world] You are standing the way you stood last time, without meaning to.\n[2026-09-02T22:39:46.982Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-09-02T22:39:48.446Z] [world] You lever something loose from the chart cairn \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n[2026-09-02T22:39:48.447Z] [world] You salvage the cold spring. The take is small but real.\n[2026-09-02T22:39:48.447Z] [world] You strip the cracked aetheric drone shell carefully. Something usable comes free in your hand.\n",
+      "[2026-09-02T22:39:48.447Z] [world] You work the half-buried wagon over. A part of it comes loose, intact.\n[2026-09-02T22:39:48.448Z] [world] You work the leaning ruined skyscraper over. A part of it comes loose, intact.\n[2026-09-02T22:39:48.448Z] [world] You salvage the old stake. The take is small but real.\n",
+      "[2026-09-02T22:39:48.448Z] [world] You work the shattered buried market row rooftop over. A part of it comes loose, intact.\n[2026-09-02T22:39:48.449Z] [reward] \u2726 Salvage haul:\n[2026-09-02T22:39:48.449Z] [reward]     \u2022 Horn-Capped Dowel (Common)\n[2026-09-02T22:39:48.449Z] [reward]     \u2022 Aether Dust x2 (Common)\n[2026-09-02T22:39:48.449Z] [reward]     \u2022 Scrap Metal x4 (Common)\n",
+      "[2026-09-02T22:39:48.449Z] [reward]     \u2022 Worn Tartarian Coin x7 (Common)\n[2026-09-02T22:39:48.450Z] [reward]     \u2022 Stick (Common)\n[2026-09-02T22:39:50.898Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-09-02T22:39:50.925Z] [world] You walk west. You arrive at The Reaver's Crest.\n[2026-09-02T22:39:50.926Z] [debug] scene: loc=reavers_crest hub=- arrival=y opening=n passing=y\n",
+      "[2026-09-02T22:39:50.927Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest HERE needs=Raider's Ridge-Sign\u2713 PAUSED\n[2026-09-02T22:39:50.927Z] [debug] missions: hunt:hunt_bog_dragon stage 2/7 [diplomacy] @monarch_waystation npc=\"Old Mira\" needs=Reeve's Brass Token\u2713 gives=Mira's Shrine-Map\n",
+      "[2026-09-02T22:39:50.927Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n[2026-09-02T22:39:50.928Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n",
+      "[2026-09-02T22:39:50.928Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n[2026-09-02T22:39:50.928Z] [debug] missions: \u00b7 at=reavers_crest travelTo=monarch_waystation\n",
+      "[2026-09-02T22:39:50.943Z] [world] You've left The Storm's Eye and entered The Reaver's Crest. The crest gives you the whole borderland, and gives the whole borderland you. It's dusk. Nobody else is in sight. north leads to The Monarch's Waystation; east leads to Sinking Cathedral; west leads to Raider's Ridge. Nothing named to the south.\n",
+      "[2026-09-02T22:39:50.943Z] [world] Something about this ground is already familiar.\n[2026-09-02T22:39:50.944Z] [system] Weather effect \u2014 Iron Fog: -1 DEX\n[2026-09-02T22:39:50.946Z] [world] [The Reaver's Crest] north: The Monarch's Waystation (1 tile, 3 hours) \u00b7 east: Dynasty Border Post (4 tiles, 10 hours) \u00b7 south: Samarran (8 tiles, 20 hours) \u00b7 west: Raider's Ridge (1 tile, 3 hours)\n",
+      "[2026-09-02T22:39:50.958Z] [world] A Mud Monarchs patrol works the ground near their outpost \u2014 4 of them \u2014 and spots you closing in. They move to cut you off.\n[2026-09-02T22:39:50.958Z] [arbiter] \"You're on Mud Monarchs ground now,\" the Arbiter says low. \"Their patrols don't ask why you came.\"\n[2026-09-02T22:39:52.998Z] [debug] ui: tap \"flee\"\n[2026-09-02T22:39:53.006Z] [player] flee\n",
+      "[2026-09-02T22:39:53.007Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=close enemies=4 hooks=0\n[2026-09-02T22:39:53.141Z] [system] \u23f3 Time passed: 15 min\n[2026-09-02T22:39:53.750Z] [cognitive] FEAR \u00b7 RETREAT \u00b7 HIDE  (607ms)\n[2026-09-02T22:39:55.843Z] [debug] skillcheck: escape d20=12 DEX 22 = 34 vs Pursuit 14 \u2014 Mud Monarchs Patrol 3 (d20 6 + SPD 8) \u2192 PASS\n",
+      "[2026-09-02T22:39:55.964Z] [debug] stats: STR16 DEX23 INT12 WIS14 CHA10 STE7 | gear: WIS+4,INT+3,DEX+12,STR+5,STE+2 | worn: main=Auralite Talon off=Choir-Bound Launcher head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n",
+      "[2026-09-02T22:39:55.965Z] [debug] train: dexterity (escape check) \u2192 progress 72/100\n[2026-09-02T22:39:55.965Z] [world] You take the gap while there is a gap to take.\n[2026-09-02T22:39:55.967Z] [arbiter] The Arbiter looks around. \"The crest gives you the whole borderland, and gives the whole borderland you.\"\n",
+      "[2026-09-02T22:39:56.263Z] [debug] persist sizes(KB): total=308 player=87 wm=137[rooms=70 events=5 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=82 scene=2\n[2026-09-02T22:39:57.748Z] [debug] ui: tap \"take / salvage\"\n[2026-09-02T22:39:59.055Z] [world] Old habit: see it, take it, keep walking. The Diplomat's Mask of the Giants is yours.\n",
+      "[2026-09-02T22:39:59.056Z] [reward] \u2726 Diplomat's Mask of the Giants (Common).\n[2026-09-02T22:40:00.178Z] [world] You break the bone tally apart. Among the pieces, something worth keeping.\n[2026-09-02T22:40:00.180Z] [reward] \u2726 Salvage haul:\n[2026-09-02T22:40:00.181Z] [reward]     \u2022 Worn Tartarian Coin x6 (Common)\n",
+      "[2026-09-02T22:40:01.480Z] [debug] qwen\u23f1 narration:scene_intro preempted 10141ms read 10089ms/write 0ms in 797t\u2192out 0t 12.7ms/t (3ch)\n[2026-09-02T22:40:01.719Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro after 10141ms \u2014 cancelled:player-acted-again\n[2026-09-02T22:40:01.934Z] [debug] ui: tap \"investigate\"\n[2026-09-02T22:40:03.825Z] [player] investigate loose shale\n",
+      "[2026-09-02T22:40:03.825Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=loose shale resolved=loose shale range=- enemies=0 hooks=0\n[2026-09-02T22:40:03.826Z] [world] You take the measure of the loose shale. The Aetheric haze does not gather; the dust does not stir. Just a thing, in a place.\n",
+      "[2026-09-02T22:40:03.826Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-09-02T22:40:03.826Z] [arbiter] The Arbiter looks around. \"Cut steps climb the last rise \u2014 someone wanted visitors to arrive tired and visible.\"\n[2026-09-02T22:40:04.235Z] [cognitive] SEARCH  (407ms)\n[2026-09-02T22:40:05.283Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n",
+      "[2026-09-02T22:40:05.300Z] [world] You walk north. You arrive at The Monarch's Waystation.\n[2026-09-02T22:40:05.301Z] [debug] scene: loc=monarch_waystation hub=- arrival=y opening=n passing=n\n[2026-09-02T22:40:05.302Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-02T22:40:05.302Z] [debug] missions: hunt:hunt_bog_dragon stage 2/7 [diplomacy] @monarch_waystation HERE npc=\"Old Mira\" needs=Reeve's Brass Token\u2713 gives=Mira's Shrine-Map\n[2026-09-02T22:40:05.303Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n[2026-09-02T22:40:05.303Z] [debu"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-03-1642-every-drop-has-a-name-in-the-book #mtkvtzmb9qii [inline 6/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtkvtzmb9qii"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-03-1642-every-drop-has-a-name-in-the-book"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "6"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-03-1642-every-drop-has-a-name-in-the-book"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "3"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:dba5:7266:ad2:ae57:4fda:d815",
+      "query": "user.ip:\"2607:fb90:dba5:7266:ad2:ae57:4fda:d815\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-03T12:09:59.117176Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-03T12:10:00.204000Z",
+  "fingerprints": [
+    "3c27d77f5d9c2d489de88e5962e23a69"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1952890889,
+    "commitCount": 20,
+    "data": {},
+    "dateCreated": "2026-09-03T12:10:00.204000Z",
+    "dateReleased": "2026-09-03T14:02:00.424207Z",
+    "deployCount": 1,
+    "ref": null,
+    "lastCommit": {
+      "id": "1fc5ac79d97859fb19c740742255089af058654c",
+      "message": "golem republish of OTA-1642 to exercise the Sentry release step (task #109)\n\nSame bundle as c72cdbec \u2014 no app change, one note beside the stamp. The\nActions dispatch is not reachable from this session (403 on the dispatch\nendpoint), and the new Sentry step only runs inside a publish, so this\nmarkerless golem push is the measurement: the run log will say whether\nSENTRY_READ_TOKEN already carries project:releases or a SENTRY_AUTH_TOKEN\nsecret is needed.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-03T13:59:43Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-03-1642-every-drop-has-a-name-in-the-book",
+          "shortVersion": "tartaria@4.32.11+2026-09-03-1642-every-drop-has-a-name-in-the-book",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-03T14:02:00.424207Z",
+          "dateCreated": "2026-09-03T12:10:00.204000Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155183521",
+      "environment": "golem",
+      "dateStarted": null,
+      "dateFinished": "2026-09-03T14:02:00.682876Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-03-1642-every-drop-has-a-name-in-the-book",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-03-1642-every-drop-has-a-name-in-the-book",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-03-1642-every-drop-has-a-name-in-the-book",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-03-1642-every-drop-has-a-name-in-the-book)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "5941a05f498b4ad3aa87bbc31172e4dc",
+  "previousEventID": "4347fc2c635d4e2f94026a31333146ca"
+}

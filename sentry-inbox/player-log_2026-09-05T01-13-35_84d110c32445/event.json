@@ -1,0 +1,272 @@
+{
+  "id": "84d110c324454b46a6bec5e236334ddf",
+  "groupID": "7712952778",
+  "eventID": "84d110c324454b46a6bec5e236334ddf",
+  "projectID": "4511945117532160",
+  "size": 18022,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-05-1676-the-tail-is-read #mtnovtl10c8a [inline 12/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-05-1676-the-tail-is-read",
+  "message": "player-log 2026-09-05-1676-the-tail-is-read #mtnovtl10c8a [inline 12/28]",
+  "title": "player-log 2026-09-05-1676-the-tail-is-read #mtnovtl10c8a [inline 12/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "d6e911fd187243f49c34438ba2fdbf6f",
+      "span_id": "bec3bb8a4734e03c",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "gives=Sealed Reliquary Box PAUSED\n[2026-09-04T22:05:44.249Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2717MISSING gives=Temporal Distortion Watch PAUSED\n[2026-09-04T22:05:44.249Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n",
+      "[2026-09-04T22:05:44.249Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n[2026-09-04T22:05:44.249Z] [debug] missions: \u00b7 at=giant_watch_shrine travelTo=mud_seas\n[2026-09-04T22:05:44.261Z] [debug] spawn: gear=[Rusted Blade, Tartarian Claw Knife] window=10 roster=new\n",
+      "[2026-09-04T22:05:44.275Z] [world] A low-hanging mist that murmurs in old Tartarian. Step too far in and you forget which century you came from.\n\nYou are at Giant-Watch Shrine. A roadside vigil-shrine of the Servants of the Giants at the frontier, where keepers wait and watch before the long road down to the giant vaults.\n[2026-09-04T22:05:44.276Z] [system] Weather effect \u2014 Whisper Fog: -1 WIS\n",
+      "[2026-09-04T22:05:44.278Z] [world] [Cradle of Dusk Outskirts] north: the Silt Thief (15 tiles, 1 day, 14 hours) \u00b7 east: Revivalist Field Camp (2 tiles, 5 hours) \u00b7 south: The Slack Flats (2 tiles, 5 hours) \u00b7 west: Giant-Watch Shrine (4 tiles, 10 hours)\n[2026-09-04T22:05:44.288Z] [system] \u23f3 Time passed: 1h\n",
+      "[2026-09-04T22:05:44.294Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.\n[2026-09-04T22:05:44.313Z] [player] exit outpost\n[2026-09-04T22:05:44.314Z] [debug] parser: intent=travel conf=1.00 verb=exit target=outpost resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-09-04T22:05:44.314Z] [world] You're already out in the open \u2014 there's nothing here to step out of. Pick a direction and walk.\n[2026-09-04T22:05:45.493Z] [debug] qwen\u23f1 ambient preempted 11309ms read 4308ms/write 1092ms in 365t\u2192out 31t 11.8ms/t HIT-CAP (142ch)\n[2026-09-04T22:05:45.891Z] [debug] arbiter: ambient cut short 11911ms \u2014 yielded to the player\n",
+      "[2026-09-04T22:05:45.891Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient after 11309ms \u2014 ambient:preempted\n[2026-09-04T22:05:46.090Z] [cognitive] RETREAT \u00b7 DISENGAGE \u00b7 HIDE  (1801ms)\n[2026-09-04T22:05:46.287Z] [cognitive] RETREAT \u00b7 DISENGAGE \u00b7 HIDE  (1971ms)\n[2026-09-04T22:05:46.479Z] [debug] qwen\u23f1 narration:scene_intro preempted 593ms wait 401ms (0ch)\n",
+      "[2026-09-04T22:05:46.687Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro after 593ms \u2014 cancelled:player-acted-again\n[2026-09-04T22:05:49.062Z] [debug] freeze watch: recovered \u2014 painting again after 3370ms quiet.\n[2026-09-04T22:05:57.481Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-09-04T22:05:59.084Z] [debug] ui: tap \"\u2605 Take & wield Rusted Blade \u2014 your off hand is free\"\n",
+      "[2026-09-04T22:05:59.090Z] [world] You work the Rusted Blade loose from where the mud had it.\n[2026-09-04T22:05:59.090Z] [reward] \u2726 Rusted Blade (Common).\n[2026-09-04T22:05:59.107Z] [debug] take&wear: equipping \"Rusted Blade\" -> off\n[2026-09-04T22:05:59.108Z] [world] You set the Giant-Watch Greatspear aside to free your off hand for the Rusted Blade.\n",
+      "[2026-09-04T22:05:59.225Z] [debug] stats: STR19 DEX18 INT14 WIS17 CHA12 STE8 | gear: WIS+5,INT+3,STR+7,DEX+6,STE+2 | worn: off=Rusted Blade head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Amulet of the Silt Warden ring=Tartarian Oath-Band ring2=Tin Ward Ring ring3=Tin Ward Ring ring4=Scribe",
+      "'s Signet\n[2026-09-04T22:06:00.632Z] [debug] persist sizes(KB): total=340 player=77 wm=178[rooms=103 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=82 scene=2\n[2026-09-04T22:06:01.916Z] [debug] ui: tap \"\u2605 Take & wield Tartarian Claw Knife \u2014 your main hand is empty\"\n[2026-09-04T22:06:01.919Z] [world] The Tartarian Claw Knife had settled into the ground. You unsettle it.\n",
+      "[2026-09-04T22:06:01.920Z] [reward] \u2726 Tartarian Claw Knife (Common).\n[2026-09-04T22:06:01.937Z] [debug] take&wear: equipping \"Tartarian Claw Knife\" -> main\n[2026-09-04T22:06:02.066Z] [debug] stats: STR19 DEX18 INT14 WIS17 CHA12 STE9 | gear: WIS+5,INT+3,STR+7,DEX+6,STE+3 | worn: main=Tartarian Claw Knife off=Rusted Blade head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets",
+      " legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Amulet of the Silt Warden ring=Tartarian Oath-Band ring2=Tin Ward Ring ring3=Tin Ward Ring ring4=Scribe's Signet\n[2026-09-04T22:06:05.324Z] [debug] ui: tap \"inventory\"\n[2026-09-04T22:06:06.311Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 8613ms read 7120ms/write 1291ms in 733t\u2192out 33t 9.7ms/t HIT-CAP (173ch)\n",
+      "[2026-09-04T22:06:06.320Z] [debug] homework: scene_intro \"Giant-Watch Shrine\" \u2713 8842ms\n[2026-09-04T22:06:19.632Z] [debug] qwen\u23f1 item_synthesis_hw ok 7153ms read 4340ms/write 1575ms in 339t\u2192out 47t 12.8ms/t (174ch)\n[2026-09-04T22:06:20.557Z] [debug] homework: item_desc \"Blue Aetheric Fungus\" \u2713 8092ms\n",
+      "[2026-09-04T22:06:20.964Z] [debug] stats: STR19 DEX18 INT15 WIS17 CHA12 STE8 | gear: WIS+5,INT+4,STR+7,DEX+6,STE+2 | worn: main=Auralite Talon off=Rusted Blade head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Amulet of the Silt Warden ring=Tartarian Oath-Band ring2=Tin Ward Ring ring3=Tin Wa",
+      "rd Ring ring4=Scribe's Signet\n[2026-09-04T22:06:42.482Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-09-04T22:06:52.671Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 10184ms read 8988ms/write 1149ms in 738t\u2192out 33t 12.2ms/t HIT-CAP (133ch)\n[2026-09-04T22:06:52.687Z] [debug] homework: scene_intro \"Giant-Watch Shrine\" \u2713 10206ms\n",
+      "[2026-09-04T22:06:58.277Z] [debug] stats: STR18 DEX18 INT17 WIS17 CHA12 STE8 | gear: WIS+5,INT+6,STR+6,DEX+6,STE+2 | worn: main=Auralite Talon off=Void Pulse Rod head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Amulet of the Silt Warden ring=Tartarian Oath-Band ring2=Tin Ward Ring ring3=Tin ",
+      "Ward Ring ring4=Scribe's Signet\n[2026-09-04T22:07:02.811Z] [debug] qwen\u23f1 item_synthesis_hw ok 5288ms read 3767ms/write 1389ms in 329t\u2192out 42t 11.4ms/t (177ch)\n[2026-09-04T22:07:03.024Z] [debug] homework: item_desc \"Hardened Mudstone\" \u2713 5513ms\n[2026-09-04T22:07:04.895Z] [debug] kbbar: mounted bottom=359.79486083984375 raw=360 from=cached winH=986 beat=-\n",
+      "[2026-09-04T22:07:05.298Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-09-04T22:07:48.325Z] [player] weapons category in inventory should have subsections for each type of weapon, I don't know what's what, mele, spear, ranged and so on.\n",
+      "[2026-09-04T22:07:48.326Z] [arbiter] The Arbiter studies you, plainly. \"I'm not sure what you're trying to tell me. I'll keep your note in the log either way. If you mean to act, phrase it as a verb \u2014 'investigate the rubble', 'go east', 'attack the figure'.\"\n[2026-09-04T22:07:48.326Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter studies you, plainly. \"I'm not sure what you're \u2026\"\n",
+      "[2026-09-04T22:07:48.326Z] [debug] meta-comment guard: skipped intent parse (suggestion: \"should have\") on 135-char input\n[2026-09-04T22:07:51.408Z] [debug] ui: tap \"take / salvage\"\n[2026-09-04T22:07:52.668Z] [world] Whatever the Scrap Metal was lying against, it lets go without much argument.\n[2026-09-04T22:07:52.668Z] [reward] \u2726 Scrap Metal (Common).\n",
+      "[2026-09-04T22:07:53.717Z] [world] You work the banner over. A part of it comes loose, intact.\n[2026-09-04T22:07:53.718Z] [world] You strip the crate carefully. Something usable comes free in your hand.\n[2026-09-04T22:07:53.718Z] [world] You work the dust-buried crashed automaton chassis over. A part of it comes loose, intact.\n",
+      "[2026-09-04T22:07:53.718Z] [world] You lever something loose from the marker \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n[2026-09-04T22:07:53.718Z] [world] You salvage the rusted submerged giant statue. The take is small but real.\n[2026-09-04T22:07:53.719Z] [world] You salvage the salt-crusted lockbox. The take is small but real.\n",
+      "[2026-09-04T22:07:53.719Z] [reward] \u2726 Salvage haul:\n[2026-09-04T22:07:53.719Z] [reward]     \u2022 Aether Dust (Common)\n[2026-09-04T22:07:53.719Z] [reward]     \u2022 Worn Tartarian Coin x9 (Common)\n[2026-09-04T22:07:53.720Z] [reward]     \u2022 Scrap Metal x2 (Common)\n[2026-09-04T22:07:53.720Z] [reward]     \u2022 Driftwood Sliver (Common)\n[2026-09-04T22:07:53.720Z] [reward]     \u2022 Smooth Stone x2 (Common)\n",
+      "[2026-09-04T22:07:53.720Z] [reward]     \u2022 Aetheric Shard (Uncommon)\n[2026-09-04T22:07:55.176Z] [debug] ui: tap \"investigate\"\n[2026-09-04T22:07:56.741Z] [player] investigate the mud\n[2026-09-04T22:07:56.744Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=mud range=- enemies=0 hooks=0\n",
+      "[2026-09-04T22:07:56.745Z] [world] You inspect the mud. Whatever was here once, this is what remains.\n[2026-09-04T22:07:56.746Z] [world] Your study of the mud draws your eye to something past it \u2014 A thread of footprints, not yours, crosses your path and trails off.\n[2026-09-04T22:07:56.746Z] [world] Mud Scanner reads flat. Nothing in the mud.\n",
+      "[2026-09-04T22:07:56.747Z] [debug] investigate: \"mud\" marked searched\n[2026-09-04T22:07:56.747Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-09-04T22:07:56.747Z] [arbiter] The Arbiter looks around. \"The vigil has not been broken since the Flood. Shifts change without a word.\"\n[2026-09-04T22:07:56.749Z] [debug] arbiter: ambient held (he just spoke)\n",
+      "[2026-09-04T22:07:56.945Z] [cognitive] SWIM  (195ms)\n[2026-09-04T22:07:57.220Z] [debug] persist sizes(KB): total=341 player=77 wm=179[rooms=103 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=83 scene=2\n[2026-09-04T22:07:57.847Z] [debug] appstate: active \u2192 background (was active for 541472ms)\n[2026-09-04T22:08:16.501Z] [debug] appstate: background \u2192 active (was background for 18654ms)\n",
+      "[2026-09-04T22:08:16.761Z] [player] investigate crevice-pool\n[2026-09-04T22:08:16.761Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=crevice pool resolved=crevice-pool range=- enemies=0 hooks=1\n[2026-09-04T22:08:16.763Z] [world] You study the crevice-pool. It bears no marks worth naming \u2014 no glyph, no fingerprint, no trace the Reclaimers would catalog.\n",
+      "[2026-09-04T22:08:19.128Z] [debug] ui: tap \"\u2192 MUD SEAS\"\n[2026-09-04T22:08:19.146Z] [debug] spawn: gear=[Aetheric Warplate, Sentinel's Greaves, Forgotten Leggings] window=10 roster=new\n[2026-09-04T22:08:19.148Z] [world] You walk south through open silt. The compass tells you The Slack Flats lies further south \u2014 1 tile, about 3 hours of travel.\n",
+      "[2026-09-04T22:08:19.150Z] [world] The wind shifts a crust of mud aside ahead of you. Underneath, a small object.\n[2026-09-04T22:08:19.150Z] [reward] \u2726 Trail Rations (Common).\n[2026-09-04T22:08:19.150Z] [world] The loose end is exactly as loose as you left it.\n[2026-09-04T22:08:19.699Z] [debug] qwen\u23f1 investigate_lore ok 2557ms read 1417ms/write 1039ms in 129t\u2192out 33t 11.0ms/t (139ch)\n",
+      "[2026-09-04T22:08:20.380Z] [debug] ui: tap \"take / salvage\"\n[2026-09-04T22:08:21.450Z] [world] The Aetheric Warplate is heavier than it looks. Most things down here are.\n[2026-09-04T22:08:21.451Z] [reward] \u2726 Aetheric Warplate (Common).\n[2026-09-04T22:08:21.470Z] [world] The Forgotten Leggings is lighter than it looks, which is its own kind of warning.\n",
+      "[2026-09-04T22:08:21.470Z] [reward] \u2726 Forgotten Leggings (Common).\n[2026-09-04T22:08:21.472Z] [world] The Sentinel's Greaves is cold through your glove.\n[2026-09-04T22:08:21.472Z] [reward] \u2726 Sentinel's Greaves (Common).\n[2026-09-04T22:08:22.373Z] [world] The Scrap Metal fits the hand better than it has any right to.\n[2026-09-04T22:08:22.374Z] [reward] \u2726 Scrap Metal (Common).\n",
+      "[2026-09-04T22:08:23.227Z] [world] You work the cart over. A part of it comes loose, intact.\n[2026-09-04T22:08:23.228Z] [world] You salvage the signpost. The take is small but real.\n[2026-09-04T22:08:23.228Z] [world] You salvage the tent. The take is small but real.\n[2026-09-04T22:08:23.228Z] [reward] \u2726 Salvage haul:\n[2026-09-04T22:08:23.229Z] [reward]     \u2022 Worn Tartarian Coin x7 (Common)\n",
+      "[2026-09-04T22:08:23.229Z] [reward]     \u2022 Smooth Stone x3 (Common)\n[2026-09-04T22:08:23.229Z] [reward]     \u2022 Cloth Scrap x3 (Common)\n[2026-09-04T22:08:24.664Z] [debug] ui: tap \"investigate\"\n[2026-09-04T22:08:26.278Z] [player] investigate the mud\n[2026-09-04T22:08:26.279Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=mud range=- enemies=0 hooks=1\n",
+      "[2026-09-04T22:08:26.280Z] [world] You study the mud. The Aetheric haze around it thickens, then settles.\n[2026-09-04T22:08:26.281Z] [world] The mud carries the same blue-mud crust every relic-age artifact wears down here. Six inches of silt accreted since the flood last raised the seas.\n",
+      "[2026-09-04T22:08:26.281Z] [world] A sealed first aid kit, slipped behind the mud and forgotten. Bandages, salve, a single dose.\n[2026-09-04T22:08:26.282Z] [reward] \u2726 First Aid Kit (Uncommon).\n[2026-09-04T22:08:26.283Z] [world] Mud Scanner ticks \u2014 buried trace in the mud.\n[2026-09-04T22:08:26.283Z] [reward] \u2726 Mud Essence (Uncommon).\n",
+      "[2026-09-04T22:08:26.285Z] [debug] investigate: \"mud\" marked searched\n[2026-09-04T22:08:26.285Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-09-04T22:08:26.285Z] [arbiter] The Arbiter looks around. \"From the shrine the road runs down toward the giant vaults, and the keepers watch it the way sailors watch weather.\"\n",
+      "[2026-09-04T22:08:26.286Z] [debug] arbiter: ambient held (he just spoke)\n[2026-09-04T22:08:26.508Z] [cognitive] SWIM  (221ms)\n[2026-09-04T22:08:27.549Z] [player] investigate crevice-pool\n[2026-09-04T22:08:27.550Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=crevice pool resolved=crevice-pool range=- enemies=0 hooks=1\n",
+      "[2026-09-04T22:08:27.551Z] [world] You study the crevice-pool. It bears no marks worth naming \u2014 no glyph, no fingerprint, no trace the Reclaimers would catalog.\n[2026-09-04T22:08:27.552Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-09-04T22:08:27.552Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-09-04T22:08:27.552Z] [debug] arbiter: ambient held (he just spoke)\n[2026-09-04T22:08:27.771Z] [cognitive] SWIM  (216ms)\n[2026-09-04T22:08:28.779Z] [debug] qwen\u23f1 investigate_lore ok 1022ms read 0ms/write 893ms in 129t\u2192out 27t (128ch)\n",
+      "[2026-09-04T22:08:28.780Z] [debug] qwen\u23f1 stats \u2014 parse_fallback n2 avg2.7s max4.8s read2.3s/write0.4s in371t\u2192out12t ms/tok 0.7-12.0 | narration:scene_intro_fill n2 avg9.4s max10.2s read8.1s/write1.2s in736t\u2192out33t ms/tok 9.7-12.2 cap2 | item_synthesis_hw n2 avg6.2s max7.2s read4.1s/write1.5s in334t\u2192out45t ms/tok 11.4-12.8 | investigate"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-05-1676-the-tail-is-read #mtnovtl10c8a [inline 12/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtnovtl10c8a"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-05-1676-the-tail-is-read"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "12"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-05-1676-the-tail-is-read"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-05T01:13:33.265257Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-05T01:13:35.395000Z",
+  "fingerprints": [
+    "901d39e2a99ee2e211148263b6b1fad9"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1956463043,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-05T00:44:59.530818Z",
+    "dateReleased": "2026-09-05T00:46:23.751514Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "773b9a7b9973d9b2fa93a4a8ca35903f5853b55d",
+      "message": "[ota-hal] OTA-1676: the tail is read (slice 4c)\n\nItem three of \"fix all existing issues one through six\": #98, the last unit of\nslice 4 \u2014 the exotic reword pass, the shield DR/reflect riders, and the\nShield-Hammer's timed +2 AC. Slice 4 is closed with this.\n\nTHE MEASUREMENT FIRST\nSlice 4's probe, re-run on the current catalog: 316 effect strings, 200 parsed,\n116 unread. Twenty-nine of the unread were rows of app/data/items/runecasters.json\n\u2014 a catalog nothing in the app imports (the suite asserts it) \u2014 so the live tail\nwas 87, the \"~85\" the task recorded. It is 28 now, and every one of the 28 is on\na flavour list BY NAME: HP grants that `statBonuses` already pays, faction-issue\nlines, the bucklers' bash (paid by the shield tag), and six sentences this OTA\nwrote to say plainly that a weapon does nothing special. A card that promises\nsomething unread cannot be authored again without failing the suite.\n\nTHE SHIELD RIDERS \u2014 what OTA-1645 admitted it only half read\nNine shields print a soak (\"reduces incoming slashing by 1d6\", \"blocks +1d6 from\nphysical attacks\", Graviton's \"+1d6 environmental damage reduction\"), an\nimmunity (\"Blocks all plasma damage\", \"Blocks Aetheric-based damage\", \"Deflects\nrunecasters\") or a bite (\"Deals 1d6 damage on the block\", \"reflects 1d6 back\").\nAll three are spent ONLY on a blow that landed on the shield \u2014 OTA-1646's\nlanding roll is what makes that honest; a plate that turns slashing does nothing\nfor a blow that came around it to your ribs. The soak runs as a pool after the\nmitigation floor (OTA-924's own carve-out for the ward). The bite goes through\nOTA-1671's reflect path, lifted into one helper (`dealReflectToAttacker`) so the\nraised-BLOCK path pays it too \u2014 owed by the block, not by the wound, so a spiked\nshield that soaked the whole blow still bites. A kill by reflect is a defeat.\n\"Plasma\" reads as burn: every plasma weapon is typed burn and no enemy deals a\ntype called plasma, so a plasma shield turns burn or turns nothing. The two \"on\nmax roll\" bites became \"on the block\" \u2014 a shield has no roll to be max on.\n\u26a0 A tagged buckler with nothing on its card is a held shield now: the Mud and\nIron Bucklers parsed to nothing, so no blow ever landed on them and they never\nwore. The tag is what makes a shield a shield.\n\nTHE WIELDER'S OWN SHARE, on machinery that already existed\nguard (a timed +N AC \u2014 the Shield-Hammer's \"+2 AC for 1 round after a hit\",\nread by statusAcAdjustment through one new kind, `guard_up`, combat-only like a\nstance), cover (`in_cover`), ward (OTA-835's `stone_ward` soak pool, rolled once\nwhen raised, replaces the old one) and heal (clamped to the room there is).\nThirteen cards were reworded onto ONE grammar for the four, because a parser\nloose enough to read \"Shields caster with mud barrier; blocks 1d6 damage. 3\nrounds.\" would read a shield's \"blocks +1d6 from physical attacks\" as a ward.\n\"On use\" pays on the swing (a ward you raise lands on a miss too); \"after a hit\"\npays on the hit.\n\nTHE CATALOG'S OWN WORDS, READ\n\"pins enemies\" (restrained), \"reduces enemy speed\" (slowed), \"pushes the target\nback\" / \"pushed back\" (knockback \u2014 the War Pike's \"Strength save or\" is a 50%\ngate), \"disables Tartarian tech\" (stunned, machines only), \"+1 damage to tech\"\n(mechanical), \"the arc jumps to one extra enemy\" (a blast with a headcount), and\na new `pull` control \u2014 the mirror of knockback, dragged in off its footing, a\nhinder that never braces, the magnets restricted to metal. The on-hit shred\nOTA-1563 left \"for the shred slice\" (\"reduces enemy armor by N on hit\") lands on\nthe same enemyArmorShred lever, capped like the acid coating's.\n\nTHE REWORDS, 52 cards, onto mechanics of the same weight or onto honest flavour:\nthe \"decay keeps going\" lines into real festering riders (OTA-1643's DOT shape);\n\"instantly kills \u2026 if HP below 20\" into +20 on a max roll; \"50% enemy HP loss on\n20+\" into +2d10 on a max roll; \"ignores shields on advantage rolls\" into a max\nroll; \"auto-wins vs Aetherkin\" into +1d6 against them; the summons and the\ncollapse into blasts; the teleport into a guard after a hit; the resurrection\ninto a heal after a hit; the parry-break blade into a max-roll burst. Bone Shiv\nsaid \"+1 to Stealth\" over a `statBonuses` row of +2 \u2014 it says +2 now. The\nimpossible ones with nothing of equal weight (repair, coercion, grip, parry,\nrust) say so in plain words.\n\ngameStore absorbed the family under its OTA-1400 ratchet by giving up two set()\nblocks (the max-roll shred and the control landing) to\napp/state/weaponRiderEffects.ts.\n\n- app/engine/weaponEffects.ts \u2014 ShieldAc.dr/immune/reflect + shieldRidersFrom;\n  SelfBuff + selfBuffFrom; onHitShred; `pull`; the widened control, target and\n  blast vocabularies; shieldDamageReduction, rollShieldReflect.\n- app/engine/enemyControl.ts \u2014 pull: \u22122, \"dragged in\".\n- app/engine/types.ts \u2014 `guard_up`, StatusEffect.acBonus.\n- app/engine/statusEffects.ts \u2014 guard_up in statusAcAdjustment and the\n  combat-only set; applyEffect keeps the larger acBonus.\n- app/engine/equipment.ts \u2014 heldShieldAc returns the riders; tagged shields\n  count.\n- app/state/combatResolution.ts \u2014 the riders after the landing roll; the bite\n  on the block and on a raised BLOCK; dealReflectToAttacker.\n- app/state/weaponRiderEffects.ts \u2014 new: planSelfBuff / applyWeaponSelfBuff,\n  shredEnemyArmor, landControlOnScene.\n- app/state/gameStore.ts \u2014 the \"use\" and \"hit\" shares wired, on-hit shred,\n  splash headcount; two blocks moved out.\n- app/data/items/weapons.json \u2014 52 effect lines.\n- __tests__/ota1676TheTailIsRead.test.ts \u2014 60 tests: the tail ratchet by name,\n  the runecasters.json orphan check, every rider and buff off the real rows,\n  the pure planners, the status, the wiring.\n- ota1643 / ota1645 / ota1564 / ota1565 / ota1671 \u2014 pins repointed with the\n  reason: three debts paid, four timed ACs read elsewhere, the Deathblade\n  paid, six more blasts, the reflect helper.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-05T00:42:30Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-05-1676-the-tail-is-read",
+          "shortVersion": "tartaria@4.32.11+2026-09-05-1676-the-tail-is-read",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-05T00:46:23.751514Z",
+          "dateCreated": "2026-09-05T00:44:59.530818Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155731346",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-05T00:46:24.035895Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-05-1676-the-tail-is-read",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-05-1676-the-tail-is-read",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-05-1676-the-tail-is-read",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-05-1676-the-tail-is-read)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "89e19dd448cb4494b7d0df1279e914fc",
+  "previousEventID": "7e9f39c3252c4debbbb39c59ccf933de"
+}

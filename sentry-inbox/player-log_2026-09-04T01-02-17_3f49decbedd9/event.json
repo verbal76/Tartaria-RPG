@@ -1,0 +1,277 @@
+{
+  "id": "3f49decbedd9455aa68c68027343c01b",
+  "groupID": "7710845046",
+  "eventID": "3f49decbedd9455aa68c68027343c01b",
+  "projectID": "4511945117532160",
+  "size": 18058,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-04-1657-the-healing-pouch #mtm6enrfz3iy [inline 14/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1657-the-healing-pouch",
+  "message": "player-log 2026-09-04-1657-the-healing-pouch #mtm6enrfz3iy [inline 14/28]",
+  "title": "player-log 2026-09-04-1657-the-healing-pouch #mtm6enrfz3iy [inline 14/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "660230bbb4654cea944b5ced5e11ec5c",
+      "span_id": "b155f8ce88db87d1",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      ". Among the pieces, something worth keeping.\n[2026-09-03T02:16:03.111Z] [world] You work the shelf over. A part of it comes loose, intact.\n[2026-09-03T02:16:03.112Z] [reward] \u2726 Salvage haul:\n[2026-09-03T02:16:03.112Z] [reward]     \u2022 Worn Tartarian Coin x9 (Common)\n[2026-09-03T02:16:03.112Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-09-03T02:16:04.968Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-09-03T02:16:06.497Z] [player] investigate the ground\n[2026-09-03T02:16:06.497Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=0\n[2026-09-03T02:16:06.499Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-09-03T02:16:06.507Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-09-03T02:16:06.507Z] [arbiter] The Arbiter looks around. \"The Nexus has waited centuries to be addressed. It will answer.\"\n[2026-09-03T02:16:06.507Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T02:16:06.720Z] [cognitive] CLIMB  (212ms)\n[2026-09-03T02:16:07.385Z] [debug] ui: tap \"\u2199 Vault\"\n[2026-09-03T02:16:07.388Z] [world] You step into the vault.\n",
+      "[2026-09-03T02:16:07.388Z] [world] An iron door stands ajar. Strongboxes line the floor, most pried open long ago, one still sealed.\n[2026-09-03T02:16:07.739Z] [player] investigate cask\n[2026-09-03T02:16:07.739Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=cask resolved=- range=- enemies=0 hooks=0\n[2026-09-03T02:16:07.936Z] [cognitive] neutral  (194ms)\n",
+      "[2026-09-03T02:16:08.136Z] [arbiter] The Arbiter tilts their head. \"I do not see a 'cask' here. Choose words carefully \u2014 try: strongbox, iron door, lockbox.\"\n[2026-09-03T02:16:08.552Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T02:16:09.732Z] [world] You strip the iron door carefully. Something usable comes free in your hand.\n",
+      "[2026-09-03T02:16:09.732Z] [world] You work the lockbox over. A part of it comes loose, intact.\n[2026-09-03T02:16:09.733Z] [world] You work the strongbox over. A part of it comes loose, intact.\n[2026-09-03T02:16:09.733Z] [reward] \u2726 Salvage haul:\n[2026-09-03T02:16:09.734Z] [reward]     \u2022 Cloth Scrap x2 (Common)\n[2026-09-03T02:16:09.734Z] [reward]     \u2022 Worn Tartarian Coin x5 (Common)\n",
+      "[2026-09-03T02:16:09.734Z] [reward]     \u2022 Scrap Metal (Common)\n[2026-09-03T02:16:10.421Z] [debug] persist sizes(KB): total=320 player=85 wm=151[rooms=82 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=82 scene=2\n[2026-09-03T02:16:11.053Z] [debug] ui: tap \"investigate\"\n[2026-09-03T02:16:12.600Z] [player] investigate the ground\n",
+      "[2026-09-03T02:16:12.600Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=0\n[2026-09-03T02:16:12.602Z] [world] You scrape at the silt with the bent nail. Nothing of worth.\n[2026-09-03T02:16:12.612Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T02:16:12.826Z] [cognitive] CLIMB  (213ms)\n",
+      "[2026-09-03T02:16:13.589Z] [debug] ui: tap \"\u2191 Hall \u2713\"\n[2026-09-03T02:16:13.594Z] [world] You step into the great hall.\n[2026-09-03T02:16:13.596Z] [world] A long hall under a sagging roof. Trestle tables run its length, a central fire pit sits cold, and banners hang gone to rags.\n[2026-09-03T02:16:14.506Z] [debug] ui: tap \"\ud83d\udeaa EXIT\"\n",
+      "[2026-09-03T02:16:14.508Z] [world] You step back outside, leaving abandoned outpost behind.\n[2026-09-03T02:16:16.872Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-09-03T02:16:16.894Z] [debug] spawn: gear=[Architect's Mantle] window=10 roster=new\n[2026-09-03T02:16:16.896Z] [world] Bersk Cartwright sets down what they're holding. \"Didn't expect you today, Cheddar Bob.\"\n",
+      "[2026-09-03T02:16:16.896Z] [world] \"Been a while,\" Bersk Cartwright says. \"Thought the mud had you.\"\n[2026-09-03T02:16:16.897Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Bersk Cartwright, wandering trader. Tap the vendor banner to trade.\n",
+      "[2026-09-03T02:16:16.904Z] [world] Rare workings for sale: Winter's Verdict (500 TC), Wrath of Titans (500 TC), Aether Bolt-Caster (200 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n[2026-09-03T02:16:16.905Z] [world] You walk west through open silt. The compass points west into open ground.\n",
+      "[2026-09-03T02:16:16.905Z] [world] Your eye goes back to it before you decide to look.\n[2026-09-03T02:16:20.522Z] [player] Ask how far they range\n[2026-09-03T02:16:20.523Z] [world] \"I do this stretch and one other.\" They gesture vaguely. \"Any more and you are travelling, not trading. Travelling is how you lose stock.\"\n",
+      "[2026-09-03T02:16:20.524Z] [world] Bersk Cartwright keeps facing the way they were going, and talks to you sideways.\n[2026-09-03T02:16:22.781Z] [world] You let the conversation go and Bersk Cartwright gets back to it.\n[2026-09-03T02:16:36.364Z] [reward] Bought the Winter's Verdict working for 500 TC. \u2726 Recipe learned (Legendary)! Open Crafting to forge it \u2014 you'll still need the materials.\n",
+      "[2026-09-03T02:16:46.512Z] [reward] Bought the Wrath of Titans working for 500 TC. \u2726 Recipe learned (Legendary)! Open Crafting to forge it \u2014 you'll still need the materials.\n[2026-09-03T02:16:48.935Z] [reward] Bought the Aether Bolt-Caster working for 200 TC. \u2726 Recipe learned (Rare)! Open Crafting to forge it \u2014 you'll still need the materials.\n",
+      "[2026-09-03T02:16:53.309Z] [reward] Bought 5\u00d7 Wild Oats from Bersk Cartwright for 15 TC. (1935 TC left)\n[2026-09-03T02:16:55.240Z] [reward] Bought Water Bottle from Bersk Cartwright for 5 TC. (1930 TC left)\n[2026-09-03T02:16:57.112Z] [reward] Bought 2\u00d7 Wild Lettuce from Bersk Cartwright for 8 TC. (1922 TC left)\n",
+      "[2026-09-03T02:16:57.335Z] [debug] persist sizes(KB): total=322 player=85 wm=151[rooms=82 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=82 scene=4\n[2026-09-03T02:16:59.716Z] [reward] Bought 2\u00d7 Trail Rations from Bersk Cartwright for 14 TC. (1908 TC left)\n[2026-09-03T02:17:03.598Z] [debug] ui: tap \"craft\"\n[2026-09-03T02:17:12.142Z] [player] craft Forager's Stew\n",
+      "[2026-09-03T02:17:12.142Z] [debug] parser: intent=craft conf=1.00 verb=craft target=forager stew resolved=- range=- enemies=0 hooks=1\n[2026-09-03T02:17:12.149Z] [reward] \u2726 Crafted Forager's Stew. The Arbiter watches you set the last piece.\n[2026-09-03T02:17:12.241Z] [cognitive] neutral  (89ms)\n[2026-09-03T02:17:14.982Z] [player] craft First Aid Kit\n",
+      "[2026-09-03T02:17:14.983Z] [debug] parser: intent=craft conf=1.00 verb=craft target=first aid kit resolved=First Aid Kit range=- enemies=0 hooks=1\n[2026-09-03T02:17:15.076Z] [arbiter] \"Crafting 4\u00d7 First Aid Kit would strip 4\u00d7 Cloth Scrap \u2192 Patched Cloth from your pack \u2014 confirm in the prompt to proceed, or it stays unmade.\"\n",
+      "[2026-09-03T02:17:15.076Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-03T02:17:15.076Z] [arbiter] The Arbiter looks around. \"Restoration and ruin sit on the same dial. The dial does not label them.\"\n[2026-09-03T02:17:15.103Z] [cognitive] neutral  (26ms)\n[2026-09-03T02:17:17.475Z] [arbiter] The Arbiter sets the schematic down. \"Left them be, then. Your pieces stay in your pack.\"\n",
+      "[2026-09-03T02:17:19.313Z] [player] craft First Aid Kit\n[2026-09-03T02:17:19.314Z] [debug] parser: intent=craft conf=1.00 verb=craft target=first aid kit resolved=First Aid Kit range=- enemies=0 hooks=1\n[2026-09-03T02:17:19.347Z] [arbiter] \"Crafting First Aid Kit would strip Cloth Scrap \u2192 Patched Cloth from your pack \u2014 confirm in the prompt to proceed, or it stays unmade.\"\n",
+      "[2026-09-03T02:17:19.347Z] [debug] arbiter: ambient held (he just spoke)\n[2026-09-03T02:17:19.376Z] [cognitive] neutral  (27ms)\n[2026-09-03T02:17:21.040Z] [player] craft First Aid Kit\n[2026-09-03T02:17:21.041Z] [debug] parser: intent=craft conf=1.00 verb=craft target=first aid kit resolved=First Aid Kit range=- enemies=0 hooks=1\n",
+      "[2026-09-03T02:17:21.070Z] [arbiter] The Arbiter nods. \"Stripped for parts: Cloth Scrap \u2192 Patched Cloth.\"\n[2026-09-03T02:17:21.080Z] [reward] \u2726 Crafted First Aid Kit. The Arbiter watches you set the last piece.\n[2026-09-03T02:17:21.081Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-03T02:17:21.081Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-09-03T02:17:21.081Z] [debug] arbiter: ambient held (he just spoke)\n[2026-09-03T02:17:21.154Z] [cognitive] neutral  (72ms)\n[2026-09-03T02:17:29.106Z] [player] shape stone\n[2026-09-03T02:17:29.107Z] [debug] parser: intent=cast conf=1.00 verb=shape target=stone resolved=Smooth Stone range=- enemies=0 hooks=1\n",
+      "[2026-09-03T02:17:29.190Z] [reward] Aetherstone Manipulation \u2014 d20 9 + INT 11 = 20 vs DC 15 \u2014 \u2713 SHAPED\n[2026-09-03T02:17:29.190Z] [world] (1 Aether Residue consumed.)\n[2026-09-03T02:17:29.259Z] [reward] \u2726 The aether teaches you. +1 INT (base 10, 12 as you stand).\n[2026-09-03T02:17:29.260Z] [world] You shape the Aetherstone but have no Small Rock to bind it to. The shape dissipates.\n",
+      "[2026-09-03T02:17:29.260Z] [system] \u23f3 Time passed: 30 min\n[2026-09-03T02:17:29.729Z] [cognitive] neutral  (468ms)\n[2026-09-03T02:17:30.465Z] [debug] persist sizes(KB): total=323 player=85 wm=152[rooms=82 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=82 scene=4\n[2026-09-03T02:17:34.670Z] [reward] Bersk Cartwright fires up a portable Crucible for you. (\u221225 TC)\n",
+      "[2026-09-03T02:17:40.407Z] [debug] ui: tap \"craft\"\n[2026-09-03T02:19:53.559Z] [player] fuse\n[2026-09-03T02:20:03.481Z] [reward] \u2726 The Crucible drinks the five pieces and works an extra resist channel into the Titan's Gauntlets. It can now hold one more worked-in resist. (Its armor rating is unchanged.)\n",
+      "[2026-09-03T02:20:05.466Z] [reward] Bersk Cartwright fires up a portable Crucible for you. (\u221225 TC)\n[2026-09-03T02:20:50.902Z] [world] You set your reserved pieces on the three pedestals. The Crucible takes them in.\n[2026-09-03T02:20:50.906Z] [reward] \u2726 The Crucible forges a Rare piece of armor from your reserved pieces \u2014 and it's in your pack, still cooling.\n",
+      "[2026-09-03T02:20:50.907Z] [world] The Crucible exhales slow. The shape is set, but the Aether hasn't named it yet \u2014 let it finish. You'll know it the moment it announces itself.\n[2026-09-03T02:20:50.920Z] [reward] \u2726 The forging finishes \u2014 the Aether names it Lumenforged Stompers (Rare).\n[2026-09-03T02:21:17.034Z] [world] You break the Mud-Bound Cloak down. \u2726 Recovered: Patched Cloth x2.\n",
+      "[2026-09-03T02:21:21.593Z] [debug] persist sizes(KB): total=324 player=85 wm=152[rooms=82 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=83 scene=4\n[2026-09-03T02:21:25.901Z] [world] You break the Architect's Outer Mantle down. \u2726 Recovered: Patched Cloth x2.\n[2026-09-03T02:22:18.309Z] [world] You break the Wanderer's Footwraps down. \u2726 Recovered: Patched Cloth x2.\n",
+      "[2026-09-03T02:22:18.387Z] [world] You break the Reclaimer's Boots down. \u2726 Recovered: Patched Cloth x2.\n[2026-09-03T02:22:18.455Z] [world] You break the Wanderer's Worn Gauntlets down. \u2726 Recovered: Patched Cloth x2.\n[2026-09-03T02:22:18.523Z] [world] The first pass on the Shaman's Warden Gloves crumbles in your hands \u2014 but your training kicks in. You stop, breathe, change angle, and try again.\n",
+      "[2026-09-03T02:22:18.524Z] [world] You break the Shaman's Warden Gloves down. \u2726 Recovered: Patched Cloth x2.\n[2026-09-03T02:22:18.593Z] [world] You break the Rough-Hewn Chestplate down. \u2726 Recovered: Scrap Metal x2, Patched Cloth x2.\n[2026-09-03T02:22:18.660Z] [world] You break the Mud-Warden's Vest down. \u2726 Recovered: Scrap Metal x2, Patched Cloth x2.\n",
+      "[2026-09-03T02:22:18.729Z] [world] You break the Mud-Warden's Vest down. \u2726 Recovered: Scrap Metal x2, Patched Cloth x2.\n[2026-09-03T02:22:18.797Z] [world] You break the Mud-Warden's Vest down. \u2726 Recovered: Scrap Metal x2, Patched Cloth x2.\n[2026-09-03T02:22:18.864Z] [world] You break the Mud-Warden's Vest down. \u2726 Recovered: Scrap Metal x2, Patched Cloth x2.\n",
+      "[2026-09-03T02:22:18.932Z] [world] You break the Mud-Warden's Vest down. \u2726 Recovered: Scrap Metal x2, Patched Cloth x2.\n[2026-09-03T02:22:18.999Z] [world] You break the Titan's Forehead Guard down. \u2726 Recovered: Patched Cloth x2.\n[2026-09-03T02:22:19.065Z] [world] You break the Thought-Crafter's Headpiece down. \u2726 Recovered: Patched Cloth x2.\n",
+      "[2026-09-03T02:22:19.132Z] [world] You break the Relic Hunter's Veil down. \u2726 Recovered: Patched Cloth x2.\n[2026-09-03T02:23:57.489Z] [world] You break the Vine Grasp down. \u2726 Recovered: Scrap Metal x2, Stick.\n[2026-09-03T02:23:57.570Z] [world] You break the Sparkstrike down. \u2726 Recovered: Scrap Metal x2, Stick.\n",
+      "[2026-09-03T02:23:57.637Z] [world] You break the Short Hunting Bow down. \u2726 Recovered: Scrap Metal x2, Stick.\n[2026-09-03T02:23:57.703Z] [world] You break the Mud Shell down. \u2726 Recovered: Scrap Metal x2, Stick.\n[2026-09-03T02:23:57.769Z] [world] You break the Mud Shell down. \u2726 Recovered: Scrap Metal x2, Stick.\n",
+      "[2026-09-03T02:23:57.836Z] [world] You break the Mud Kukri down. \u2726 Recovered: Scrap Metal x3, Stick.\n[2026-09-03T02:23:57.902Z] [world] You break the Mud Grip down. \u2726 Recovered: Scrap Metal x2, Stick.\n[2026-09-03T02:23:57.968Z] [world] You break the Mud Grip down. \u2726 Recovered: Scrap Metal x2, Stick.\n",
+      "[2026-09-03T02:23:58.033Z] [world] You break the Minor Repair down. \u2726 Recovered: Scrap Metal x2, Stick.\n[2026-09-03T02:23:58.097Z] [world] You break the Minor Repair down. \u2726 Recovered: Scrap Metal x2, Stick.\n[2026-09-03T02:23:58.161Z] [world] You break the Minor Repair down. \u2726 Recovered: Scrap Metal x2, Stick.\n",
+      "[2026-09-03T02:23:58.227Z] [world] You break the Flame of Aether down. \u2726 Recovered: Scrap Metal x2, Stick.\n[2026-09-03T02:23:58.291Z] [world] You break the Flame of Aether down. \u2726 Recovered: Scrap Metal x2, Stick.\n[2026-09-03T02:23:58.355Z] [world] You break the Dust Cloud down. \u2726 Recovered: Scrap Metal x2, Stick.\n",
+      "[2026-09-03T02:23:58.421Z] [world] You break the Dust Cloud down. \u2726 Recovered: Scrap Metal x2, Stick.\n[2026-09-03T02:23:58.486Z] [world] You break the Dust Cloud down. \u2726 Recovered: Scrap Metal x2, Stick.\n[2026-09-03T02:23:58.550Z] [world] The first pass on the Bone Knife crumbles in your hands \u2014 but your training kicks in. You stop, breathe, change angle, and try again.\n",
+      "[2026-09-03T02:23:58.551Z] [world] You break the Bone Knife down. \u2726 Recovered: Scrap Metal x2, Stick.\n[2026-09-03T02:23:58.615Z] [world] The first pass on the Bone Knife crumbles in your hands \u2014 but your training kicks in. You stop, breathe, change angle, and try again.\n[2026-09-03T02:23:58.615Z] [world] You break the Bone Knife down. \u2726 Recovered: Scrap Metal x2, Stick.\n",
+      "[2026-09-03T02:23:58.678Z] [world] You break the Bone Crossbow down. \u2726 Recovered: Scrap Metal x3, Stick.\n[2026-09-03T02:23:58.743Z] [world] You break the Bone Crossbow down. \u2726 Recovered: Scrap Metal x3, Stick.\n[2026-09-03T02:23:58.807Z] [world] You break the Bone Crossbow down. \u2726 Recovered: Scrap Metal x3, Stick.\n[2026-09-03T02:24:03.765Z] [debug] ui: tap \"craft\"\n",
+      "[2026-09-03T02:24:33.712Z] [debug] persist sizes(KB): total=315 player=74 wm=152[rooms=82 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=85 scene=4\n[2026-09-03T02:52:06.371Z] [debug] ota: boot check "
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-04-1657-the-healing-pouch #mtm6enrfz3iy [inline 14/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtm6enrfz3iy"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1657-the-healing-pouch"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "14"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1657-the-healing-pouch"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T01:02:15.759000Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T01:02:17.218000Z",
+  "fingerprints": [
+    "b8836b9cdc04ed394ec6ffc5df292ab3"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1954353365,
+    "commitCount": 3,
+    "data": {},
+    "dateCreated": "2026-09-04T00:59:26.615127Z",
+    "dateReleased": "2026-09-04T01:00:59.146953Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "32f104d12f8d1c1459be026d4060eb5e1c4a9a36",
+      "message": "[ota-hal] OTA-1657: the healing pouch, and three racks that fold\n\nOwner: \"battle gets slowed down when you have to heal. let's make it available\nfrom the exploration screen. let's make another bandolier and call it the healing\npouch or something. and we can load it with any three healing items they want so\nin an out 5 trauma kits, say 3 trail rations and maybe 10 blueberries in it. and\nwe open it like a bandolier during combat and can use the preloaded heals from\nthere. and when you use it, it acts like they do when being used from inventory.\"\n\nAnd, a moment later: \"when you are in inventory let's make the bandolier, tool\npouch and healing pouch collapsable like inventory categories to save space.\"\n\n\u26a0 THREE POCKETS, AND A POCKET IS A STACK. That distinction is the whole feature\nand it is why his exact load-out fits in three: a racked id points at an\ninventory STACK, so \"Blueberries \u00d710\" is ONE pocket you can tap ten times, not\nten pockets. It is the same storage contract the bandolier has had since arb110 \u2014\nthe items never leave `player.inventory`, the rack only records WHICH STACKS are\nwithin reach \u2014 so nothing is duplicated, nothing can be lost by racking, and a\nstack spent by any other path simply stops resolving instead of holding a pocket\nhostage as a ghost (OTA-1005's lesson from the tool pouch, applied up front).\n\n\u26a0\u26a0 THE TAP CALLS `useInventoryItem`, AND THAT IS THE POINT. He said it should act\n\"like they do when being used from inventory\" \u2014 so it is not \"like\", it is the\nSAME action the pack's USE button fires. The heal, the stamina, the cure, the\nstack decrement, the Arbiter's line and every downstream hook stay one\nimplementation. A second copy of \"what eating a Trauma Kit does\" is precisely the\nclass of drift the last three OTAs have been spent removing.\n\n\u26a0 AND ELIGIBILITY DELEGATES RATHER THAN DECIDING. `consumableDoesSomething`\nalready answers \"does this mend, restore, cleanse or cure?\", and it exists\nbecause a pure antivenom (healHP 0, cure yes) was once accepted by the combat bar\nand refused by the inventory screen. Restating \"what is a heal\" in a third place\nwould have rebuilt that split. All three items he named pass it \u2014 Trauma Kit\n(45 HP + cure bleed), Trail Rations (6 + 3), Blueberries (4 + 1) \u2014 and a pure\nstat buff does not. The effect is read from the CATALOG, not the instance, so an\nold saved kit racks exactly like a fresh one (the OTA-997 bug on the bandolier).\n\n\u26a0 THE \u271a heals BUTTON IS ON BOTH ROWS and its popup is NOT gated on combat, which\nis the half he asked for by name. The bandolier stays combat-only because a throw\nneeds something to throw at; a heal is exactly as useful on the walk home, and\nthe walk home is when you actually patch up. Green where the bandolier is orange:\none rack throws things away from you, one puts you back together, and mid-fight\nnobody should have to read the label to know which popup opened.\n\n\u26a0\u26a0 ALL THREE RACKS NOW FOLD, THROUGH ONE `RackFrame`. Three banners above the\npack cost real screen on a phone and the healing pouch has just made it three, so\nthey collapse \u2014 but through ONE shared frame rather than three copies of a\nchevron, and in the SAME \u25b8/\u25be grammar arb108 gave the inventory categories, so a\nplayer who has learned to fold a category learns nothing new to fold a rack.\n\n  \u2022 \u26a0 THE COUNT STAYS ON THE HEADER WHEN FOLDED (\"2/3 loaded\"), which is what\n    makes folding safe: the space saved costs no information he was reading the\n    banner for. A rack you must unfold to trust is a rack you stop folding.\n  \u2022 Defaults OPEN, unlike categories, which default closed. A category is one of\n    a dozen above a long pack; a rack is one of three whose whole job is to be\n    glanceable. Folding is something he does, not a state he inherits.\n  \u2022 All THREE fill modes are now mutually exclusive \u2014 two armed tap modes at once\n    is a coin flip over which rack receives the item.\n\n\u26a0 THE CHEVRON GATE CAUGHT THIS AND WAS RIGHT TO. `RackFrame`'s prop is `open`, so\ntrue means OPEN \u2014 the OPPOSITE polarity to the category headers a few hundred\nlines above it in the same file, which is exactly the collision check:chevrons\nwas written for. Registered rather than worked around.\n\n\u26a0 TWO SUITES WENT RED ON THE FIRST FULL RUN, BOTH FOR THE SAME REASON: ota1097\nand ota1100 each hand-typed the TWO-flag fill-mode guard into a string, so making\nit three broke tests about fusion-select and the group gesture. Their actual claim\nis \"a rack fill mode beats this gesture\", however many racks exist \u2014 both now\nassert that over EVERY known fill flag instead of pinning the arity, so the fourth\nrack will not break them.\n\nGates: all 18 green by exit code. Full suite green \u2014 1120 suites, 11,604 tests.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T00:57:14Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1657-the-healing-pouch",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1657-the-healing-pouch",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T01:00:59.146953Z",
+          "dateCreated": "2026-09-04T00:59:26.615127Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155389086",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T01:00:59.447835Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1657-the-healing-pouch",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1657-the-healing-pouch",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1657-the-healing-pouch",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1657-the-healing-pouch)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "56e31ca09e9148cea22e79c02249253c",
+  "previousEventID": "2cb6dc2087f34988a7ad0ca5519733ea"
+}

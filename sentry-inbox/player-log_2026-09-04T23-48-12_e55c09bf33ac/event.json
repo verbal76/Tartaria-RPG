@@ -1,0 +1,274 @@
+{
+  "id": "e55c09bf33ac4a58b4f84d24f48fa3de",
+  "groupID": "7712848145",
+  "eventID": "e55c09bf33ac4a58b4f84d24f48fa3de",
+  "projectID": "4511945117532160",
+  "size": 18062,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-04-1674-the-dead-life-answers #mtnlu0casj0h [inline 26/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1674-the-dead-life-answers",
+  "message": "player-log 2026-09-04-1674-the-dead-life-answers #mtnlu0casj0h [inline 26/28]",
+  "title": "player-log 2026-09-04-1674-the-dead-life-answers #mtnlu0casj0h [inline 26/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "c5b67a9338b7442887fcbe9331ce1a85",
+      "span_id": "be7cafa4edcda137",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "wap to the Mud Armor Rod \u2014 bludgeoning will bite where aetheric won't.\"\n[2026-09-04T22:19:28.935Z] [combat] The blow with the acid-etched corrupted auralite talon finds purchase \u2014 5 damage, 80 HP standing. Aetheric Minotaur commits to the counter.\n[2026-09-04T22:19:28.936Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 2 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n",
+      "[2026-09-04T22:19:28.939Z] [combat] Mud Tortoise \u2014 d20 \u2192 11 + ATK 5 = 16 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-04T22:19:28.941Z] [combat] Aetheric Minotaur \u2014 d20 \u2192 13 + ATK 11 = 24 vs your AC 22 \u2014 \u2713 HIT\n[2026-09-04T22:19:28.946Z] [combat] Your armour turns the blow back \u2014 Aetheric Minotaur takes 1 slashing. (79 HP left)\n",
+      "[2026-09-04T22:19:28.951Z] [combat] Dice Palmer \u2014 d20 \u2192 14 + ATK 8 = 22 vs your AC 22 \u2014 \u2713 HIT\n[2026-09-04T22:19:28.952Z] [combat] Your armour turns the blow back \u2014 Dice Palmer takes 1 slashing. (6 HP left)\n[2026-09-04T22:19:29.316Z] [combat] Aetheric Minotaur deals 7 slashing damage [armor \u221225%]. You have 43 HP remaining.\n",
+      "[2026-09-04T22:19:29.316Z] [combat] Dice Palmer deals 3 slashing damage [armor \u221225%] [edge of reach \u2014 halved]. You have 40 HP remaining.\n[2026-09-04T22:19:29.316Z] [combat] Dice Palmer's strike leaves you bleeding.\n[2026-09-04T22:19:32.307Z] [debug] ui: tap \"dodge\"\n[2026-09-04T22:19:32.322Z] [player] dodge\n",
+      "[2026-09-04T22:19:32.323Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=3 hooks=0\n[2026-09-04T22:19:32.324Z] [world] You commit to the dodge. Slip Aetheric Minotaur's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-04T22:19:32.324Z] [combat] Aetheric Minotaur blackens \u2014 corruption eats 2. (77/104 HP, 2 turns left)\n[2026-09-04T22:19:32.407Z] [combat] Aetheric Minotaur \u2014 d20 \u2192 6 + ATK 11 = 17 vs your AC 22 \u2014 \u2717 EVADED\n[2026-09-04T22:19:32.407Z] [combat] Dodge \u2014 d20 \u2192 19 + DEX 18 = 37 vs ATK 17. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n",
+      "[2026-09-04T22:19:32.408Z] [world] You slip Aetheric Minotaur's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n[2026-09-04T22:19:32.410Z] [debug] ac-shift 22\u219225: race/base 10 + gear 18 + title 0 \u2192 trimmed 22 + status 3 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=",
+      "Aether-Walker's Boots cloak=Reclaimer's Cloak\n[2026-09-04T22:19:32.411Z] [combat] Dice Palmer \u2014 d20 \u2192 11 + ATK 8 = 19 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-04T22:19:32.412Z] [combat] Mud Tortoise \u2014 d20 \u2192 11 + ATK 5 = 16 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-04T22:19:32.413Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-09-04T22:19:32.413Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-04T22:19:32.413Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T22:19:32.740Z] [cognitive] neutral  (326ms)\n[2026-09-04T22:19:33.660Z] [debug] ui: tap \"\u2697\u2623 auralite talon \u2726\"\n[2026-09-04T22:19:33.664Z] [system] evasive \u2014 harder to hit fades.\n",
+      "[2026-09-04T22:19:33.698Z] [player] attack with the auralite talon\n[2026-09-04T22:19:33.700Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=3 hooks=0\n[2026-09-04T22:19:33.701Z] [combat] Aetheric Minotaur blackens \u2014 corruption eats 2. (75/104 HP, 1 turn left)\n",
+      "[2026-09-04T22:19:33.702Z] [debug] attack: target=Aetheric Minotaur range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n[2026-09-04T22:19:33.709Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-04T22:19:33.802Z] [world] You commit forward with the acid-etched corrupted auralite talon. Aetheric Minotaur watches your hands.\n",
+      "[2026-09-04T22:19:33.802Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T22:19:34.124Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (321ms)\n[2026-09-04T22:19:45.678Z] [world] Aetheric Minotaur moves first. The pressure is immediate.\n",
+      "[2026-09-04T22:19:45.682Z] [debug] ac-shift 25\u219222: race/base 10 + gear 18 + title 0 \u2192 trimmed 22 + status 0 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n[2026-09-04T22:19:45.682Z] [combat] Mud Tortoise \u2014 d20 \u2192 5 + ATK 5 = 10 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-04T22:19:45.686Z] [combat] Aetheric Minotaur \u2014 d20 \u2192 18 + ATK 11 = 29 vs your AC 22 \u2014 \u2713 HIT\n[2026-09-04T22:19:45.688Z] [combat] Your armour turns the blow back \u2014 Aetheric Minotaur takes 1 slashing. (74 HP left)\n[2026-09-04T22:19:45.690Z] [combat] Dice Palmer \u2014 d20 \u2192 10 + ATK 8 = 18 vs your AC 22 \u2014 \u2717 MISS\n",
+      "[2026-09-04T22:19:45.691Z] [combat] You \u2014 d20 \u2192 7 + INT 17 perfect opening (2\u00d7 dice) = 24 vs Aetheric Minotaur AC 17 \u2014 \u2713 HIT\n[2026-09-04T22:19:45.691Z] [combat] The Acid-Etched coating fails to take on Aetheric Minotaur.\n[2026-09-04T22:19:45.691Z] [combat] Aetheric flares \u2014 +3 on hit.\n[2026-09-04T22:19:45.692Z] [combat] Aetheric Minotaur shrugs off the aetheric. (resisted, \u00d70.25 for 8)\n",
+      "[2026-09-04T22:19:45.696Z] [combat] Your strike with the acid-etched corrupted auralite talon lands for 8. Aetheric Minotaur staggers \u2014 66 HP remaining. It answers.\n[2026-09-04T22:19:45.696Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 2 corruption bites in and festers (3 turns). The rot deepens (2 stacks).\n[2026-09-04T22:19:45.696Z] [combat] Aetheric Minotaur is left exposed \u2014 easier to hit.\n",
+      "[2026-09-04T22:19:45.697Z] [arbiter] \"Make the next strike count for two,\" the Arbiter says. \"Tartaria taxes the first.\"\n[2026-09-04T22:19:46.063Z] [combat] Aetheric Minotaur deals 17 slashing damage [armor \u221225%]. You have 23 HP remaining.\n[2026-09-04T22:19:49.323Z] [debug] ui: tap \"grasp wand \u25b2\"\n[2026-09-04T22:19:49.327Z] [system] bleeding fades.\n",
+      "[2026-09-04T22:19:49.371Z] [player] attack with the off-hand vine grasp wand\n[2026-09-04T22:19:49.372Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand vine grasp wand resolved=Vine Grasp Wand range=close enemies=3 hooks=0\n[2026-09-04T22:19:49.373Z] [combat] Aetheric Minotaur blackens \u2014 corruption eats 3. (63/104 HP, 2 turns left)\n",
+      "[2026-09-04T22:19:49.374Z] [debug] attack: target=Aetheric Minotaur range=close reach.bands=[distant,far,mid,close] reach.label=Vine Grasp Wand bareHand=false\n[2026-09-04T22:19:49.449Z] [world] You bring the vine grasp wand to bear on Aetheric Minotaur.\n[2026-09-04T22:19:49.449Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T22:19:49.772Z] [cognitive] AGGRESSION \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 AIM  (321ms)\n",
+      "[2026-09-04T22:19:54.874Z] [world] You seize the initiative. Aetheric Minotaur has no time to react.\n[2026-09-04T22:19:54.875Z] [combat] You \u2014 d20 \u2192 15 + INT 17 + 2 (point blank) = 34 vs Aetheric Minotaur AC 16 \u2014 \u2713 HIT\n[2026-09-04T22:19:54.877Z] [combat] Piercing flares \u2014 +1 on hit.\n[2026-09-04T22:19:54.877Z] [combat] Aetheric Minotaur is restrained \u2014 3 rounds.\n",
+      "[2026-09-04T22:19:54.878Z] [combat] The blow with the vine grasp wand finds purchase \u2014 6 damage, 57 HP standing. Aetheric Minotaur commits to the counter.\n[2026-09-04T22:19:54.883Z] [combat] Mud Tortoise \u2014 d20 \u2192 6 + ATK 5 = 11 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-04T22:19:54.889Z] [combat] Dice Palmer \u2014 d20 \u2192 5 + ATK 8 = 13 vs your AC 22 \u2014 \u2717 MISS\n",
+      "[2026-09-04T22:19:54.890Z] [combat] Aetheric Minotaur (restrained) \u2014 held by your last blow, and it loses the round.\n[2026-09-04T22:20:03.146Z] [debug] ui: tap \"golem (32/74)\"\n[2026-09-04T22:20:03.157Z] [player] use golem\n[2026-09-04T22:20:03.157Z] [combat] Ashwright attacks Aetheric Minotaur \u2014 d20 12 + 4 = 16 vs AC 15 \u2014 \u2713 HIT\n",
+      "[2026-09-04T22:20:03.158Z] [combat] Ashwright swings the Crude Golem Sledge \u2014 15 bludgeoning damage on Aetheric Minotaur. (42 HP left)\n[2026-09-04T22:20:03.159Z] [combat] Aetheric Minotaur retaliates \u2014 d20 5 + 10 hits Ashwright for 7 (37% resisted). (25/74)\n[2026-09-04T22:20:03.173Z] [combat] Aetheric Minotaur blackens \u2014 corruption eats 3. (39/104 HP, 1 turn left)\n",
+      "[2026-09-04T22:20:03.177Z] [combat] Dice Palmer \u2014 d20 \u2192 1 + ATK 8 = 9 vs your AC 22 \u2014 \u2717 FUMBLE\n[2026-09-04T22:20:03.183Z] [combat] Mud Tortoise \u2014 d20 \u2192 8 + ATK 5 = 13 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-04T22:20:03.183Z] [combat] Aetheric Minotaur (restrained) \u2014 held by your last blow, and it loses the round.\n",
+      "[2026-09-04T22:20:03.578Z] [debug] persist sizes(KB): total=333 player=73 wm=175[rooms=99 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=81 scene=4\n[2026-09-04T22:20:05.047Z] [debug] ui: tap \"approach\"\n[2026-09-04T22:20:05.103Z] [player] approach Aetheric Minotaur\n",
+      "[2026-09-04T22:20:05.104Z] [debug] parser: intent=advance conf=1.00 verb=approach target=aetheric minotaur resolved=Aetheric Minotaur range=close enemies=3 hooks=0\n[2026-09-04T22:20:05.107Z] [debug] move: advance from range=close enemies=3 weather=Aether Lightning cost=1 partial=0\n[2026-09-04T22:20:05.108Z] [debug] move: field advance target=Aetheric Minotaur d 0.39->0.35 band close->close\n",
+      "[2026-09-04T22:20:05.108Z] [world] You close the gap with the Aetheric Minotaur and 2 others. (range: close / arm's reach)\n[2026-09-04T22:20:05.108Z] [combat] Aetheric Minotaur blackens \u2014 corruption eats 3. (36/104 HP, 0 turns left)\n[2026-09-04T22:20:05.109Z] [combat] Aetheric Minotaur shakes off the last of the corruption \u2014 the Auralite Talon has run its course.\n",
+      "[2026-09-04T22:20:05.112Z] [combat] Mud Tortoise \u2014 d20 \u2192 5 + ATK 5 = 10 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-04T22:20:05.119Z] [combat] Dice Palmer \u2014 d20 \u2192 16 + ATK 8 = 24 vs your AC 22 \u2014 \u2713 HIT\n[2026-09-04T22:20:05.131Z] [combat] Your armour turns the blow back \u2014 Dice Palmer takes 1 slashing. (5 HP left)\n",
+      "[2026-09-04T22:20:05.132Z] [combat] Aetheric Minotaur (restrained) \u2014 held by your last blow, and it loses the round.\n[2026-09-04T22:20:05.503Z] [combat] Dice Palmer deals 2 slashing damage [edge of reach \u2014 halved]. You have 21 HP remaining.\n[2026-09-04T22:20:06.138Z] [cognitive] USE_ITEM \u00b7 SEARCH  (1004ms)\n[2026-09-04T22:20:06.454Z] [debug] ui: tap \"mercy (15/15)\"\n",
+      "[2026-09-04T22:20:06.458Z] [arbiter] \"Mercy is still down from that last fight,\" the Arbiter says. \"Feed her to bring her up, then rest somewhere safe and she will fall in at your side.\"\n[2026-09-04T22:20:10.539Z] [debug] ui: tap \"\u2726 bandolier (5)\"\n[2026-09-04T22:20:12.609Z] [player] attack with the off-hand Sentinel Core Plate\n",
+      "[2026-09-04T22:20:12.610Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand sentinel core plate resolved=Sentinel Core Plate range=close enemies=3 hooks=0\n[2026-09-04T22:20:12.611Z] [debug] attack: target=Aetheric Minotaur range=close reach.bands=[far,mid,close] reach.label=Sentinel Core Plate bareHand=false\n",
+      "[2026-09-04T22:20:12.688Z] [world] You raise the sentinel core plate toward Aetheric Minotaur. The room narrows around the both of you.\n[2026-09-04T22:20:12.689Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T22:20:13.014Z] [cognitive] ATTACK \u00b7 DISENGAGE \u00b7 THROW \u00b7 AIM  (323ms)\n[2026-09-04T22:20:17.702Z] [world] You seize the initiative. Aetheric Minotaur has no time to react.\n",
+      "[2026-09-04T22:20:17.702Z] [combat] You \u2014 d20 \u2192 10 + DEX 18 + 2 (point blank) = 30 vs Aetheric Minotaur AC 17 \u2014 \u2713 HIT\n[2026-09-04T22:20:17.703Z] [combat] Aetheric flares \u2014 +1 on hit.\n[2026-09-04T22:20:17.703Z] [combat] Aetheric Minotaur shrugs off the aetheric. (resisted, \u00d70.25 for 3)\n",
+      "[2026-09-04T22:20:17.704Z] [combat] The aetheric has worn Aetheric Minotaur's guard through \u2014 it bites full from here.\n[2026-09-04T22:20:17.704Z] [combat] Clean hit with the sentinel core plate for 3. Aetheric Minotaur has 33 left and does not back away.\n[2026-09-04T22:20:17.705Z] [combat] Aetheric Minotaur is left exposed \u2014 easier to hit.\n",
+      "[2026-09-04T22:20:17.708Z] [combat] Aetheric Minotaur \u2014 d20 \u2192 16 + ATK 11 = 27 vs your AC 22 \u2014 \u2713 HIT\n[2026-09-04T22:20:17.709Z] [combat] Your armour turns the blow back \u2014 Aetheric Minotaur takes 1 slashing. (32 HP left)\n[2026-09-04T22:20:17.711Z] [combat] Dice Palmer \u2014 d20 \u2192 5 + ATK 8 = 13 vs your AC 22 \u2014 \u2717 MISS\n",
+      "[2026-09-04T22:20:17.713Z] [combat] Mud Tortoise \u2014 d20 \u2192 11 + ATK 5 = 16 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-04T22:20:17.713Z] [arbiter] \"That one bleeds slow,\" the Arbiter says. \"Make the hit count.\"\n[2026-09-04T22:20:18.072Z] [combat] Aetheric Minotaur deals 9 slashing damage [armor \u221225%]. You have 12 HP remaining.\n[2026-09-04T22:20:19.558Z] [debug] ui: tap \"\u271a heals (3)\"\n",
+      "[2026-09-04T22:20:24.481Z] [world] You use 1\u00d7 Trauma Kit. +38 HP (50/50), +1 stamina.\n[2026-09-04T22:20:27.495Z] [debug] ui: tap \"\u271a heals (3)\"\n[2026-09-04T22:20:28.665Z] [world] You pack 1\u00d7 Aether Crystal into Ashwright's frame. +17 HP (42/74).\n[2026-09-04T22:20:30.465Z] [debug] ui: tap \"\u271a heals (3)\"\n",
+      "[2026-09-04T22:20:32.818Z] [world] You pack 1\u00d7 Aether Crystal into Ashwright's frame. +17 HP (59/74).\n[2026-09-04T22:20:33.298Z] [debug] persist sizes(KB): total=333 player=73 wm=175[rooms=99 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=81 scene=3\n[2026-09-04T22:20:35.613Z] [debug] ui: tap \"\u271a heals (3)\"\n",
+      "[2026-09-04T22:20:36.785Z] [world] You pack 1\u00d7 Aether Crystal into Ashwright's frame. +15 HP (74/74).\n[2026-09-04T22:20:39.316Z] [debug] ui: tap \"dodge\"\n[2026-09-04T22:20:39.331Z] [player] dodge\n[2026-09-04T22:20:39.331Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=3 hooks=0\n",
+      "[2026-09-04T22:20:39.332Z] [world] You commit to the dodge. Slip Aetheric Minotaur's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-04T22:20:39.420Z] [combat] Dice Palmer \u2014 d20 \u2192 17 + ATK 8 = 25 vs your AC 22 \u2014 \u2717 EVADED\n",
+      "[2026-09-04T22:20:39.420Z] [combat] Dodge \u2014 d20 \u2192 19 + DEX 18 = 37 vs ATK 25. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-04T22:20:39.420Z] [world] You slip Dice Palmer's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n",
+      "[2026-09-04T22:20:39.424Z] [debug] ac-shift 22\u219225: race/base 10 + gear 18 + title 0 \u2192 trimmed 22 + status 3 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n[2026-09-04T22:20:39.424Z] [combat] Mud Tortoise \u2014 d20 \u2192 19 + ATK 5 = 24 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n",
+      "[2026-09-04T22:20:39.424Z] [debug] wear ward: Aether-Walker's Boots keeps its point (15%)\n[2026-09-04T22:20:39.425Z] [combat] Your armour turns the blow back \u2014 Mud Tortoise takes 1 bludgeoning. (6 HP left)\n[2026-09-04T22:20:39.427Z] [combat] Aetheric Minotaur \u2014 d20 \u2192 17 + ATK 11 = 28 vs your AC 25 \u2014 \u2713 HIT\n",
+      "[2026-09-04T22:20:39.428Z] [combat] Your armour turns the blow back \u2014 Aetheric Minotaur takes 1 slashing. (31 HP left)\n[2026-09-04T22:20:39.429Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T22:20:39"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-04-1674-the-dead-life-answers #mtnlu0casj0h [inline 26/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtnlu0casj0h"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1674-the-dead-life-answers"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "26"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1674-the-dead-life-answers"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T23:48:10.218405Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T23:48:12.286000Z",
+  "fingerprints": [
+    "9a539618ef59f5fbf89b2d9bec7d1bb6"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1956404347,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-04T23:47:35.927290Z",
+    "dateReleased": "2026-09-04T23:48:24.735279Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "cc2abf544a2897d2e91a0d613af8eea6b385a38a",
+      "message": "[ota-hal] OTA-1674: the dead life answers for itself\n\nItem one of \"fix all existing issues one through six\": #110, the process kill\non nearly every boot. This is not the fix for the kill. It is the instrument\nthat the previous instrument turned out to be missing \u2014 and, by the owner's own\nrule recorded in contextLedger.ts, that is the correct thing to ship: measure\nthe cause, or ship an instrument.\n\nWHAT THE 19:40 LEDGER SAID, ENTRY BY ENTRY\nTen records. Eight at `stage boot:qwen:deferred`. Six of those dead 670\u20131006ms\ninto the process, `alive 0ms` after the stamp, `(no action yet)` \u2014 sub-second,\nbefore the first screen, before Qwen has loaded (it is DEFERRED). And every one\nof the eight: `not an OTA-apply boot`.\n\nThree things ruled out before anything was written:\n- a boot-front race \u2014 App.tsx AWAITS the OTA check and RETURNS on 'applied',\n  so `qwen:deferred` is unreachable on an apply. My first hypothesis, and wrong;\n- anything heavy at that stage \u2014 `armQwenWarm` stores a closure and returns;\n- ML init \u2014 mlHealth reports crash count 0.\n\nAND THE ONE THING THAT COULD NOT BE RULED EITHER WAY\nOTA-1587 asked of every death: did the process that died boot on the far side\nof `reloadAsync`? It stored the answer in the wrong life. The handoff that\ncarries it is consumed on read \u2014 correctly; a handoff is a fact about ONE boot\n\u2014 by the life that then dies, taking the only copy with it. The next boot finds\nno handoff, computes `afterOtaApply: false` about ITSELF, and bootSlice wrote\nthat onto the dead life's record. Structurally, a death record could never say\n\"yes\". \"Not an OTA-apply boot\" on eight of ten was not a finding; it was the\nonly value the field could take. The ota1587 suite pinned the exact line \u2014\n`afterOtaApply: launch.afterOtaApply,` \u2014 as correct.\n\nSo the fact now rides the CRUMB. `bootStampFields()` (the one writer every\ncrumb passes through) adds `afterOta` / `otaPath` / `otaGapMs` / `prevCtx` once\n`noteLaunchFacts` has run \u2014 early in hydrate, before any stage that matters \u2014\nand the record reads the dead life's own answer off its own crumb. A crumb from\nthe first milliseconds, before the launch resolved, leaves it UNDEFINED, and\nevery reader prints that as \"not known\", never as a cold start. \"Not known\" is\na fact; \"false\" is a lie, and it is exactly the lie that hid this for two OTAs.\n\nTWO MORE THINGS THE SAME READ TURNED UP\n- The ledger label keyed on `kind` alone, so the idle reclaims OTA-1567 already\n  made non-fatal (`isFatal: false`, and Sentry has honoured that as level\n  `error` since) still printed PROCESS KILLED \u2014 no JS ran in About and in every\n  bug report, and were counted in \"N recorded\". Two of the owner's ten were\n  that. A ledger that overstates kills to the one person reading it sends the\n  hunt at the wrong thing \u2014 OTA-1521's own words. The label now says what the\n  record knew, and the header says \"10 recorded, 8 fatal\".\n- The whole `launch` block \u2014 which life died, how old it was, what it inherited\n  \u2014 has been on every record since OTA-1587 and forwarded to Sentry on none.\n  The rollup it exists for could only ever be done by hand, on a device. It is\n  in `extra` now, three-valued.\n\nThe OTA-1587 rollup counts FATAL kills and only a true \"yes\"; an idle reclaim\non an apply boot is not the signal, and `undefined` is not a \"no\" \u2014 counting it\nas one would be the same defect one layer down. It also says out loud how many\ndied before their launch resolved, because the absence of that line is how the\nhole hid.\n\n\u26a0 NO BOOT-PHASE EXEMPTION, DELIBERATELY. Six sub-second no-action deaths look\nexactly like a force-close during the splash \u2014 the owner's recorded habit. They\nalso look exactly like OTA-1587's candidate (b): a reload-boot killed by a\nnative context the previous life never released, in a process `reloadAsync`\ndoes not restart. This instrument is what tells those two apart. Filing them as\nnon-fatal today would hide (b) if it is real \u2014 the blind-spot trade OTA-1377 and\nOTA-1413 both refused. The next log closes #110 one way or the other.\n\n- app/diagnostics/bootIdentity.ts \u2014 `BootStamp`, `bootStampFields` carries the\n  launch facts once resolved.\n- app/engine/saveSystem.ts \u2014 `LiveBreadcrumb` gains the four fields.\n- app/state/slices/bootSlice.ts \u2014 the record reads the crumb, not the reader.\n- app/diagnostics/crashLedger.ts \u2014 `recordLabel`, `isFatalRecord`, the header,\n  the rollup over fatal with `=== true` and the unresolved line, the three-way\n  launch line, `launch.otaPath`.\n- app/diagnostics/sentryTransport.ts \u2014 `launch*` in `extra`.\n- __tests__/ota1674TheDeadLifeAnswers.test.ts \u2014 19 tests.\n- __tests__/ota1587WhichLifeDied.test.ts \u2014 the pin on the defect repointed to\n  the fix, with the reason.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T23:45:16Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1674-the-dead-life-answers",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1674-the-dead-life-answers",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T23:48:24.735279Z",
+          "dateCreated": "2026-09-04T23:47:35.927290Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155722001",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T23:48:25.072821Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1674-the-dead-life-answers",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1674-the-dead-life-answers",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1674-the-dead-life-answers",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1674-the-dead-life-answers)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "e5761d54f9774942b712507dc48947e4",
+  "previousEventID": "dffb6de04f77482bbc2b4a321c782862"
+}

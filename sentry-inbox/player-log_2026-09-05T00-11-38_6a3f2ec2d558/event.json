@@ -1,0 +1,324 @@
+{
+  "id": "6a3f2ec2d55847e2aff093311becc684",
+  "groupID": "7712876642",
+  "eventID": "6a3f2ec2d55847e2aff093311becc684",
+  "projectID": "4511945117532160",
+  "size": 17642,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-05-1675-the-voice-names-its-step #mtnlu0casj0h [inline 20/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-05-1675-the-voice-names-its-step",
+  "message": "player-log 2026-09-05-1675-the-voice-names-its-step #mtnlu0casj0h [inline 20/28]",
+  "title": "player-log 2026-09-05-1675-the-voice-names-its-step #mtnlu0casj0h [inline 20/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "df6ce37bbffa478cbc518316acd1a51e",
+      "span_id": "a14a66191405160f",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      " (budget \u2014 one per tile, 25s apart)\n[2026-09-04T22:08:27.552Z] [debug] arbiter: ambient held (he just spoke)\n[2026-09-04T22:08:27.771Z] [cognitive] SWIM  (216ms)\n[2026-09-04T22:08:28.779Z] [debug] qwen\u23f1 investigate_lore ok 1022ms read 0ms/write 893ms in 129t\u2192out 27t (128ch)\n",
+      "[2026-09-04T22:08:28.780Z] [debug] qwen\u23f1 stats \u2014 parse_fallback n2 avg2.7s max4.8s read2.3s/write0.4s in371t\u2192out12t ms/tok 0.7-12.0 | narration:scene_intro_fill n2 avg9.4s max10.2s read8.1s/write1.2s in736t\u2192out33t ms/tok 9.7-12.2 cap2 | item_synthesis_hw n2 avg6.2s max7.2s read4.1s/write1.5s in334t\u2192out45t ms/tok 11.4-12.8 | investigate_lore n2 avg1.8s max2.6s read1.4s/write1.0s in129t\u2192out30t ms/to",
+      "k 11.0-11.0 | ambient n1 avg11.3s max11.3s read4.3s in365t\u2192out31t ms/tok 11.8-11.8 cap1 \u23f81 \u27021/11.3s | narration:scene_intro n1 avg0.6s max0.6s \u23f81 \u27021/0.6s || WASTED 2 calls / 11.9s\n[2026-09-04T22:08:32.770Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=cached winH=986 beat=-\n",
+      "[2026-09-04T22:08:33.176Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-09-04T22:08:36.560Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-09-04T22:08:38.266Z] [player] fill water bottles\n[2026-09-04T22:08:38.267Z] [debug] parser: intent=fill conf=1.00 verb=fill target=water bottles resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-09-04T22:08:38.269Z] [world] You scoop water from the crevice into the bottle. The filter seam in its neck pulls the murk out \u2014 bottled water drinks clean. (\u2726 Water Bottle, \u2717 Empty Water Bottle)\n[2026-09-04T22:08:38.269Z] [system] \u23f3 Time passed: 5 min\n",
+      "[2026-09-04T22:08:39.083Z] [debug] persist sizes(KB): total=343 player=78 wm=179[rooms=104 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=83 scene=2\n[2026-09-04T22:08:42.640Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 5900ms read 0ms/write 0ms in 751t\u2192out 0t (0ch)\n[2026-09-04T22:08:42.905Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 5900ms \u2014 intro-fill:\u2205\n",
+      "[2026-09-04T22:08:42.906Z] [debug] homework: scene_intro \"The Slack Flats\" \u2205 6346ms\n[2026-09-04T22:08:43.096Z] [cognitive] neutral  (4826ms)\n[2026-09-04T22:08:50.392Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=cached winH=986 beat=-\n[2026-09-04T22:08:50.788Z] [debug] kbbar: mounted bottom=359.79486083984375 raw=360 from=live winH=986 beat=-\n",
+      "[2026-09-04T22:08:53.303Z] [player] drink\n[2026-09-04T22:08:53.304Z] [debug] parser: intent=drink conf=1.00 verb=drink target=- resolved=- range=- enemies=0 hooks=1\n[2026-09-04T22:08:53.305Z] [world] You cup the crevice in your hands and drink. You weren't tired; mostly you were thirsty. (+1 corruption, 5 min)\n",
+      "[2026-09-04T22:08:53.305Z] [arbiter] The Arbiter watches you wipe your mouth. \"Raw crevice carries what the ground put in it. Fill a bottle next time \u2014 the filter takes the taint out.\"\n[2026-09-04T22:08:53.307Z] [system] \u23f3 Time passed: 5 min\n[2026-09-04T22:08:53.516Z] [cognitive] neutral  (208ms)\n",
+      "[2026-09-04T22:08:54.747Z] [debug] kbbar: mounted bottom=359.79486083984375 raw=360 from=cached winH=986 beat=-\n[2026-09-04T22:08:55.159Z] [debug] kbbar: mounted bottom=359.79486083984375 raw=360 from=live winH=986 beat=-\n[2026-09-04T22:08:59.432Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.\n[2026-09-04T22:08:59.459Z] [player] fill water bottle\n",
+      "[2026-09-04T22:08:59.460Z] [debug] parser: intent=fill conf=1.00 verb=fill target=water bottle resolved=Water Bottle range=- enemies=0 hooks=1\n[2026-09-04T22:08:59.460Z] [arbiter] The Arbiter nods at the crevice. \"You've already topped up here. The filter needs time between draws \u2014 fill again at the next stop, or give this one time to settle.\"\n",
+      "[2026-09-04T22:08:59.663Z] [cognitive] neutral  (198ms)\n[2026-09-04T22:09:08.866Z] [debug] qwen\u23f1 ambient ok 9029ms read/write unusable (native mis-reported 25791ms/1234ms \u2014 llama.rn split bug, not this call) in 364t\u2192out 31t HIT-CAP (167ch)\n[2026-09-04T22:09:09.243Z] [debug] ui: tap \"\u2192 MUD SEAS\"\n",
+      "[2026-09-04T22:09:09.251Z] [debug] spawn: gear=[Magnetized Rod, Rough-Hewn Gauntlets, Memory Weaver's Hood] window=10 roster=new\n[2026-09-04T22:09:09.252Z] [world] You walk east through open silt. The compass points east into open ground.\n[2026-09-04T22:09:09.252Z] [world] Whatever you turned over here is still turned over.\n",
+      "[2026-09-04T22:09:09.451Z] [debug] arbiter: ambient stale:moved-scene\u2192banked 9987ms\n[2026-09-04T22:09:09.452Z] [debug] arbiter: ambient-empty reason=near-duplicate-of-recent raw=\"You have traversed the borders of the Borderlands, and the terrain has changed from rugged hills to expansive forests. Y\"\n[2026-09-04T22:09:10.461Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-09-04T22:09:11.764Z] [world] You turn the Magnetized Rod over once, then keep it.\n[2026-09-04T22:09:11.765Z] [reward] \u2726 Magnetized Rod (Common).\n[2026-09-04T22:09:11.788Z] [world] The Memory Weaver's Hood comes away clean.\n[2026-09-04T22:09:11.788Z] [reward] \u2726 Memory Weaver's Hood (Common).\n",
+      "[2026-09-04T22:09:11.790Z] [world] It takes two pulls. The Rough-Hewn Gauntlets is yours on the second.\n[2026-09-04T22:09:11.790Z] [reward] \u2726 Rough-Hewn Gauntlets (Common).\n[2026-09-04T22:09:12.695Z] [world] You salvage the cart. The take is small but real.\n[2026-09-04T22:09:12.695Z] [world] You break the firepit apart. Among the pieces, something worth keeping.\n",
+      "[2026-09-04T22:09:12.695Z] [world] You strip the rusted submerged giant statue carefully. Something usable comes free in your hand.\n[2026-09-04T22:09:12.696Z] [world] You lever something loose from the weathered ruined skyscraper \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n[2026-09-04T22:09:12.696Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-09-04T22:09:12.696Z] [reward]     \u2022 Scrap Metal x5 (Common)\n[2026-09-04T22:09:12.697Z] [reward]     \u2022 Worn Tartarian Coin (Common)\n[2026-09-04T22:09:12.697Z] [reward]     \u2022 Tattered Gauze Roll (Common)\n[2026-09-04T22:09:14.278Z] [debug] ui: tap \"investigate\"\n[2026-09-04T22:09:15.916Z] [player] investigate the mud\n",
+      "[Filtered]",
+      "[2026-09-04T22:09:15.920Z] [world] Mud Scanner ticks \u2014 buried trace in the mud.\n[2026-09-04T22:09:15.920Z] [reward] \u2726 Aether Mud (Common).\n[2026-09-04T22:09:15.921Z] [debug] investigate: \"mud\" marked searched\n[2026-09-04T22:09:15.921Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n",
+      "[2026-09-04T22:09:15.921Z] [arbiter] The Arbiter looks around. \"The shrine's bell has no rope. If it rings, the keepers say, pulling it will not have been the cause.\"\n[2026-09-04T22:09:16.143Z] [cognitive] SWIM  (221ms)\n[2026-09-04T22:09:17.176Z] [player] investigate crevice-pool\n",
+      "[2026-09-04T22:09:17.176Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=crevice pool resolved=crevice-pool range=- enemies=0 hooks=1\n[2026-09-04T22:09:17.177Z] [world] You study the crevice-pool. It bears no marks worth naming \u2014 no glyph, no fingerprint, no trace the Reclaimers would catalog.\n",
+      "[2026-09-04T22:09:17.178Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-09-04T22:09:17.178Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-04T22:09:17.376Z] [cognitive] SWIM  (197ms)\n[2026-09-04T22:09:17.761Z] [debug] ui: tap \"\u2192 MUD SEAS\"\n[2026-09-04T22:09:17.772Z] [debug] spawn: gear=[Bone Shiv] window=10 roster=new\n",
+      "[2026-09-04T22:09:17.773Z] [world] Skiv glances up. \"You again.\" Not warm, not cold \u2014 noted.\n[2026-09-04T22:09:17.773Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Skiv, fence. Tap the vendor banner to trade.\n[2026-09-04T22:09:17.786Z] [world] This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n",
+      "[2026-09-04T22:09:17.787Z] [world] You walk south through open silt. The compass points south into open ground.\n[2026-09-04T22:09:17.787Z] [world] It sits where it sat. Patient is the wrong word \u2014 it simply does not move.\n[2026-09-04T22:09:20.002Z] [debug] qwen\u23f1 investigate_lore ok 2439ms read 1300ms/write 1075ms in 129t\u2192out 33t 10.1ms/t (142ch)\n",
+      "[2026-09-04T22:09:25.948Z] [reward] Bought Trail Rations from Skiv for 4 TC. (490 TC left)\n[2026-09-04T22:09:31.612Z] [debug] homework: intro-fill armed after 10290ms idle (strike 2/3)\n[2026-09-04T22:09:44.510Z] [reward] Sold Bone Sling (Common) to Skiv for 14 TC. (504 TC on hand)\n[2026-09-04T22:09:44.631Z] [reward] Sold Mud Harpoon (Common) to Skiv for 14 TC. (518 TC on hand)\n",
+      "[2026-09-04T22:09:44.737Z] [reward] Sold Mud-Iron Cleaver (Common) to Skiv for 14 TC. (532 TC on hand)\n[2026-09-04T22:09:44.844Z] [reward] Sold Mud Knife (Common) to Skiv for 13 TC. (545 TC on hand)\n[2026-09-04T22:09:44.951Z] [reward] Sold Rusty Shortbow (Common) to Skiv for 13 TC. (558 TC on hand)\n[2026-09-04T22:09:45.059Z] [reward] Sold Rusted Blade (Common) to Skiv for 13 TC. (571 TC on hand)\n",
+      "[2026-09-04T22:09:45.164Z] [reward] Sold Stone Spear (Common) to Skiv for 12 TC. (583 TC on hand)\n[2026-09-04T22:09:45.269Z] [reward] Sold Tartarian Claw Knife (Common) to Skiv for 12 TC. (595 TC on hand)\n[2026-09-04T22:09:45.376Z] [reward] Sold Magnetized Rod (Common) to Skiv for 12 TC. (607 TC on hand)\n",
+      "[2026-09-04T22:09:45.482Z] [reward] Sold Stone Seeker's Brow Guard (Common) to Skiv for 8 TC. (615 TC on hand)\n[2026-09-04T22:09:45.587Z] [reward] Sold Stone-Stride Greaves (Common) to Skiv for 8 TC. (623 TC on hand)\n[2026-09-04T22:09:45.693Z] [reward] Sold Titan's Guard Mask (Common) to Skiv for 8 TC. (631 TC on hand)\n",
+      "[2026-09-04T22:09:45.800Z] [reward] Sold Aetheric Warplate (Common) to Skiv for 8 TC. (639 TC on hand)\n[2026-09-04T22:09:45.907Z] [reward] Sold Salvager's Worn Boots (Common) to Skiv for 6 TC. (645 TC on hand)\n[2026-09-04T22:09:46.014Z] [reward] Sold Architect's Field Jacket (Common) to Skiv for 6 TC. (651 TC on hand)\n",
+      "[2026-09-04T22:09:46.119Z] [reward] Sold Rough-Hewn Gauntlets (Common) to Skiv for 6 TC. (657 TC on hand)\n[2026-09-04T22:09:46.208Z] [reward] Sold Salvager's Worn Gloves (Common) to Skiv for 6 TC. (663 TC on hand)\n[2026-09-04T22:09:46.290Z] [reward] Sold Bone Knife (Common) to Skiv for 6 TC. (669 TC on hand)\n",
+      "[2026-09-04T22:09:46.373Z] [reward] Sold Forgotten Leggings (Common) to Skiv for 6 TC. (675 TC on hand)\n[2026-09-04T22:09:46.454Z] [reward] Sold Sentinel's Greaves (Common) to Skiv for 6 TC. (681 TC on hand)\n[2026-09-04T22:09:46.534Z] [reward] Sold Memory Weaver's Hood (Common) to Skiv for 6 TC. (687 TC on hand)\n",
+      "[2026-09-04T22:09:46.614Z] [reward] Sold Rough-Hewn Gauntlets (Common) to Skiv for 6 TC. (693 TC on hand)\n[2026-09-04T22:09:46.693Z] [reward] Sold Mud-Warden's Vest (Common) to Skiv for 5 TC. (698 TC on hand)\n",
+      "[2026-09-04T22:09:47.361Z] [debug] \u26a0 FREEZE WATCH: LOGIC stalled while frames kept coming (js 2837ms \u00b7 frames 0ms). Something blocked the JS thread \u2014 look for a long synchronous run. \u00b7 crumb before: native:homework:start +15741ms \u2192 now: native:homework:start +15741ms \u00b7 doing: tap \"\u2192 MUD SEAS\" \u00b7 native: homework running \u00b7 q0\n",
+      "[2026-09-04T22:09:47.361Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 15742ms read 11179ms/write 3495ms in 749t\u2192out 33t 14.9ms/t HIT-CAP (152ch)\n[2026-09-04T22:09:48.033Z] [debug] homework: scene_intro \"The Slack Flats\" \u2713 16423ms\n[2026-09-04T22:09:49.010Z] [debug] persist sizes(KB): total=337 player=79 wm=173[rooms=98 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=82 scene=3\n",
+      "[2026-09-04T22:09:50.404Z] [debug] kbbar: mounted bottom=359.79486083984375 raw=360 from=cached winH=986 beat=-\n[2026-09-04T22:09:50.855Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-09-04T22:09:52.365Z] [debug] freeze watch: recovered \u2014 painting again after 3370ms quiet.\n",
+      "[2026-09-04T22:10:03.572Z] [player] inha haven't seen the missions button on a vendor in a while\n[2026-09-04T22:10:03.573Z] [debug] parser: intent=unknown conf=0.10 verb=- target=- resolved=- range=- enemies=0 hooks=1\n[2026-09-04T22:10:03.573Z] [debug] parse-fallback: handing \"inha haven't seen the missions button on a vendor in a while\" to qwen\n",
+      "[2026-09-04T22:10:03.574Z] [system] The Arbiter considers your words\u2026\n[2026-09-04T22:10:06.587Z] [player] Ask how far they range\n[2026-09-04T22:10:06.588Z] [world] \"I do this stretch and one other.\" They gesture vaguely. \"Any more and you are travelling, not trading. Travelling is how you lose stock.\"\n",
+      "[2026-09-04T22:10:06.590Z] [world] Skiv keeps facing the way they were going, and talks to you sideways.\n[2026-09-04T22:10:07.786Z] [world] You let the conversation go and Skiv gets back to it.\n[2026-09-04T22:10:09.608Z] [debug] qwen\u23f1 parse_fallback ok 5819ms read 5480ms/write 310ms in 458t\u2192out 9t 12.0ms/t (35ch)\n",
+      "[2026-09-04T22:10:09.827Z] [debug] parse-fallback: qwen no usable result \u2192 soft refusal\n[2026-09-04T22:10:09.828Z] [arbiter] The Arbiter glances at your pack. \"Your frost paste is still there, if it suits the moment.\"\n[2026-09-04T22:10:09.828Z] [system] Try: look around \u00b7 search \u00b7 rest\n[2026-09-04T22:10:10.052Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-09-04T22:10:11.638Z] [world] The Bone Shiv resists, then does not.\n[2026-09-04T22:10:11.639Z] [reward] \u2726 Bone Shiv (Common).\n[2026-09-04T22:10:12.277Z] [debug] qwen\u23f1 flourish ok 7144ms wait 4693ms read 2253ms/write 187ms in 172t\u2192out 6t 13.1ms/t (16ch)\n[2026-09-04T22:10:12.493Z] [debug] qwen\u23f1 \u2702 DISCARDED flourish after 7144ms \u2014 flourish:stale-walked-away\n",
+      "[2026-09-04T22:10:12.493Z] [debug] flourish: stale 7626ms\n[2026-09-04T22:10:12.709Z] [world] You brace a foot and the Scrap Metal gives.\n[2026-09-04T22:10:12.709Z] [reward] \u2726 Scrap Metal (Common).\n[2026-09-04T22:10:13.611Z] [world] You lever something loose from the crate \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n",
+      "[2026-09-04T22:10:13.611Z] [world] You break the shattered fallen sentinel husk apart. Among the pieces, something worth keeping.\n[2026-09-04T22:10:13.611Z] [world] You work the weathered ruined skyscraper over. A part of it comes loose, intact.\n[2026-09-04T22:10:13.611Z] [reward] \u2726 Salvage haul:\n[2026-09-04T22:10:13.612Z] [reward]     \u2022 Verdigris Bell Fragment (Common)\n",
+      "[2026-09-04T22:10:13.612Z] [reward]     \u2022 Aether Dust (Common)\n[2026-09-04T22:10:13.612Z] [reward]     \u2022 Bent Nail (Common)\n[2026-09-04T22:10:15.439Z] [debug] ui: tap \"investigate\"\n[2026-09-04T22:10:16.959Z] [debug] homework: intro-fill armed after 12638ms idle\n[2026-09-04T22:10:17.163Z] [player] investigate the mud\n",
+      "[Filtered]"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-05-1675-the-voice-names-its-step #mtnlu0casj0h [inline 20/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtnlu0casj0h"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-05-1675-the-voice-names-its-step"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "20"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-05-1675-the-voice-names-its-step"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-05T00:11:36.375431Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "18": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 395,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        },
+        "44": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 250,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-05T00:11:38.213000Z",
+  "fingerprints": [
+    "8ed2684bc6b608ad4a9f0db04cd45c70"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1956427903,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-05T00:11:38.213000Z",
+    "dateReleased": "2026-09-05T00:12:48.923167Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "8fbd09d83bf9d0c3ec1fb0527509158bfc77bc5b",
+      "message": "[ota-hal] OTA-1675: the voice names its step\n\nItem two of \"fix all existing issues one through six\": #180, the voice-path\nprocess kill on kai's SM-S942U (Samsung, SM8850, Android 16) \u2014 the first\nnon-Pixel kill on record. Like item one, this is the instrument, not the cure,\nand it also repairs a defect in the instrument it extends.\n\nWHAT HER LEDGER SAID\nA cold 66-second life on the title screen, no action yet, model ledger o0/r0:\n\n    native:voice:done [q0] \u00b7 66228ms into the action \u00b7 alive 0ms after it\n    Voice (TTS) guard: \u26a0 VOICE CRASH detected \u2014 last voice: kokoro:bf_emma\n\nThe guard is armed by markTTSStart before the synth and cleared by markTTSDone\nAFTER playback; so the process died between the synth settling and the line\nfinishing. Sixty-six seconds in, q0, o0/r0: that was the FIRST utterance that\ndevice ever played \u2014 ReadyFlash speaks \"Choose your character.\" the moment\nKokoro comes online. Nothing native runs in that window except what the voice\nlayer does with the samples: the WAV encode, expo-av's player load on a data:\nURI (ExoPlayer \u2192 AudioTrack, the one step that is pure platform media code),\nthe playback, the deferred unload. OTA-1546 stamped the lock; nothing stamped\nthese. The owner's own two voice deaths (08-30 `native:voice:done (+11080ms)`,\n08-31 `native:voice:start [q1]`) sit in the same blind spot.\n\nAND THE INSTRUMENT ITSELF WAS ONE MICROTASK LATE\nMeasured in the new suite before it could be shipped: the lock's `done` stamp\nrode the `.then` AFTER `task.resolve`, so the caller's continuation ran first.\nThe voice drain resumed, encoded the WAV and DISPATCHED the player load before\n`native:voice:done` was written. Her last checkpoint said \"the synth finished\"\nabout a process that had already moved on to playback \u2014 and any checkpoint a\ncaller stamped in that continuation was overwritten by a fact from the step\nbefore it, which is exactly what would have happened to the stamps below.\n`done` is now stamped before the caller is resolved; it means the native op\nsettled, nothing more. Exclusivity is untouched \u2014 `running` still clears only\nafter the caller has been resolved. The ota1546 pin is repointed with the\nreason.\n\nTHE PLAYBACK PATH STAMPS ITS OWN STEPS\n`voice:play:encode` / `create` / `started` / `done` / `unload`, and\n`voice:stop`, each carrying the utterance's ordinal in this life and its\nlength (`#1 0.2s`) \u2014 \"the first line after a fresh model load\" is the fact\nthat separates a one-off from a device that cannot play at all.\n\n\u26a0 THE UNLOAD STAMP YIELDS. It fires 300 ms after the line ends, by which time\nthe lock may be inside the next synth or a Qwen job; overwriting\n`native:llm:start` with `voice:play:unload` would file a death inside\ninference as a death in a player release \u2014 the blind-spot trade OTA-1377 and\nOTA-1413 refused. When the lock is running the crumb it wrote stands. Lazy-\nrequired and wrapped, as the lock's own stamp is.\n\nNot the cure. No exemption is bought with this. The next voice-path death\nreads which step it died in.\n\n- app/ai/nativeMlLock.ts \u2014 `done` stamped in the settle handlers, before\n  resolve/reject.\n- app/voice/PiperTTSManager.ts \u2014 `stampVoicePhase`, the per-life ordinal, the\n  six stamps, the unload gate on `nativeMlSnapshot().running`.\n- __tests__/ota1675TheVoiceNamesItsStep.test.ts \u2014 16 tests: the whole window\n  driven end to end through a mocked Kokoro + expo-av (load, warm-up, the\n  line, then encode \u2192 create \u2192 started \u2192 done), the tag, the yield, voice:stop,\n  the lock ordering measurement, and the source pins.\n- __tests__/ota1546TheDyingBreathNamesTheNativeJob.test.ts \u2014 the order pin\n  reads the settle handler.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-05T00:09:10Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-05-1675-the-voice-names-its-step",
+          "shortVersion": "tartaria@4.32.11+2026-09-05-1675-the-voice-names-its-step",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-05T00:12:48.923167Z",
+          "dateCreated": "2026-09-05T00:11:38.213000Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155726114",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-05T00:12:49.150027Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-05-1675-the-voice-names-its-step",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-05-1675-the-voice-names-its-step",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-05-1675-the-voice-names-its-step",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-05-1675-the-voice-names-its-step)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "6d33d797c1004c89b26c311750656a45",
+  "previousEventID": "69a0948b856142169ba0a7762c79271b"
+}

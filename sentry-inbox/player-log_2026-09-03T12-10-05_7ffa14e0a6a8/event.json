@@ -1,0 +1,275 @@
+{
+  "id": "7ffa14e0a6a84b1683db0cbd84091e36",
+  "groupID": "7709458959",
+  "eventID": "7ffa14e0a6a84b1683db0cbd84091e36",
+  "projectID": "4511945117532160",
+  "size": 18248,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-03-1642-every-drop-has-a-name-in-the-book #mtlhgdw29v8x [inline 8/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-03-1642-every-drop-has-a-name-in-the-book",
+  "message": "player-log 2026-09-03-1642-every-drop-has-a-name-in-the-book #mtlhgdw29v8x [inline 8/28]",
+  "title": "player-log 2026-09-03-1642-every-drop-has-a-name-in-the-book #mtlhgdw29v8x [inline 8/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:dba5:7266:ad2:ae57:4fda:d815",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "ff5fd4bae71c495992211840f867cf46",
+      "span_id": "9acccdb044e60195",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      " strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-03T00:06:02.905Z] [combat] Scrap Drone stops \u2014 and the air in front of it thickens, faintly bright. An AETHER SHIELD stands where its swing should have been (+3 AC).\n[2026-09-03T00:06:02.906Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-09-03T00:06:02.906Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T00:06:02.907Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T00:06:03.236Z] [cognitive] neutral  (329ms)\n[2026-09-03T00:06:04.590Z] [debug] ui: tap \"\ud83d\udd25\u2623 choir-bound launcher\"\n[2026-09-03T00:06:04.595Z] [system] dodging (parry) fades.\n",
+      "[2026-09-03T00:06:04.641Z] [player] attack with the off-hand choir-bound launcher\n[2026-09-03T00:06:04.641Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=mid enemies=1 hooks=0\n",
+      "[2026-09-03T00:06:04.642Z] [debug] attack: target=Scrap Drone range=mid reach.bands=[distant,far,mid,close] reach.label=Choir-Bound Launcher bareHand=false\n[2026-09-03T00:06:04.644Z] [arbiter] Whisper Fog hangs between you. \"\u22121 to the swing \u2014 see what you can,\" the Arbiter says.\n[2026-09-03T00:06:04.644Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n",
+      "[2026-09-03T00:06:04.730Z] [world] You commit forward with the searing corrupted choir-bound launcher. Scrap Drone watches your hands.\n[2026-09-03T00:06:04.731Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T00:06:05.026Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 TAKE_COVER  (295ms)\n[2026-09-03T00:06:13.559Z] [world] You seize the initiative. Scrap Drone has no time to react.\n",
+      "[2026-09-03T00:06:13.559Z] [combat] You \u2014 d20 \u2192 5 + INT 12 \u2212 1 (Whisper Fog) = 16 vs Scrap Drone AC 14 \u2014 \u2713 HIT\n[2026-09-03T00:06:13.560Z] [combat] The Corrupted coating fails to take on Scrap Drone.\n[2026-09-03T00:06:13.560Z] [combat] Scrap Drone shrugs off the aetheric. (resisted, \u00d70.5 for 9)\n",
+      "[2026-09-03T00:06:13.563Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Mud Armor \u2014 bludgeoning or burn will bite where aetheric won't.\"\n[2026-09-03T00:06:13.565Z] [combat] Scrap Drone takes 9 with the searing corrupted choir-bound launcher. It reels: 8 left. Then it fights back.\n",
+      "[2026-09-03T00:06:13.565Z] [combat] Searing Corrupted Choir-Bound Launcher \u2014 6 burn bites in and festers (3 turns).\n[2026-09-03T00:06:13.566Z] [combat] Scrap Drone \u2014 d20 \u2192 17 + ATK 4 = 21 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-09-03T00:06:13.567Z] [arbiter] \"That one bleeds slow,\" the Arbiter says. \"Make the hit count.\"\n",
+      "[2026-09-03T00:06:13.929Z] [combat] Scrap Drone deals 4 bludgeoning damage [plate \u22121] [edge of reach \u2014 halved]. You have 36 HP remaining.\n[2026-09-03T00:06:18.653Z] [debug] ui: tap \"stealth\"\n[2026-09-03T00:06:18.659Z] [player] sneak\n[2026-09-03T00:06:18.660Z] [debug] parser: intent=stealth conf=1.00 verb=sneak target=- resolved=- range=mid enemies=1 hooks=0\n",
+      "[2026-09-03T00:06:18.745Z] [system] \u23f3 Time passed: 15 min\n[2026-09-03T00:06:19.036Z] [cognitive] DISENGAGE \u00b7 HIDE \u00b7 TAKE_COVER  (291ms)\n[2026-09-03T00:06:20.905Z] [debug] skillcheck: stealth d20=10 STE 7 + 1 (title: Shadow Diver) = 18 vs DC 12 \u2014 Hard \u2192 (resolved below)\n",
+      "[2026-09-03T00:06:21.031Z] [debug] stats: STR16 DEX23 INT12 WIS15 CHA10 STE7 | gear: WIS+4,INT+3,DEX+12,STR+5,STE+2 | worn: main=Auralite Talon off=Choir-Bound Launcher head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n",
+      "[2026-09-03T00:06:21.031Z] [debug] train: stealth (stealth check) \u2192 progress 74/100\n[2026-09-03T00:06:21.031Z] [world] The daylight leaves you little cover. (stealth \u22121, day)\n[2026-09-03T00:06:21.032Z] [world] You drop low and move quiet, closing on Scrap Drone unseen across the open ground. (+5 next attack)\n",
+      "[2026-09-03T00:06:21.032Z] [debug] stealth: opener carried by the skill roll (18 vs DC 12 \u2014 Hard) \u2014 UNSEEN\n[2026-09-03T00:06:23.288Z] [debug] ui: tap \"\ud83d\udd25\u2623 choir-bound launcher\"\n[2026-09-03T00:06:23.339Z] [player] attack with the off-hand choir-bound launcher\n",
+      "[2026-09-03T00:06:23.340Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=mid enemies=1 hooks=0\n[2026-09-03T00:06:23.341Z] [combat] Scrap Drone blisters \u2014 clinging fire sears 6. (2/17 HP, 2 turns left)\n",
+      "[2026-09-03T00:06:23.345Z] [debug] attack: target=Scrap Drone range=mid reach.bands=[distant,far,mid,close] reach.label=Choir-Bound Launcher bareHand=false\n[2026-09-03T00:06:23.346Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-09-03T00:06:23.346Z] [debug] attack: status mods stealthed +5\n",
+      "[2026-09-03T00:06:23.412Z] [world] You bring the searing corrupted choir-bound launcher to bear on Scrap Drone.\n[2026-09-03T00:06:23.413Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T00:06:23.707Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 TAKE_COVER  (293ms)\n[2026-09-03T00:06:33.154Z] [world] Scrap Drone moves first. The pressure is immediate.\n",
+      "[2026-09-03T00:06:33.156Z] [combat] Scrap Drone \u2014 d20 \u2192 17 + ATK 4 = 21 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-09-03T00:06:33.157Z] [combat] You \u2014 d20 \u2192 6 + INT 12 \u2212 1 (Whisper Fog) stealthed +5 = 22 vs Scrap Drone AC 14 \u2014 \u2713 HIT\n[2026-09-03T00:06:33.158Z] [combat] The Corrupted coating fails to take on Scrap Drone.\n",
+      "[2026-09-03T00:06:33.158Z] [combat] Scrap Drone shrugs off the aetheric. (resisted, \u00d70.5 for 5)\n[2026-09-03T00:06:33.166Z] [combat] The killing blow with the searing corrupted choir-bound launcher: 5. Scrap Drone drops where it stood.\n[2026-09-03T00:06:33.167Z] [reward] Scrap Drone defeated. You recover Aetheric Cog \u00d72.\n[2026-09-03T00:06:33.168Z] [reward] +5 TC pried from the dust.\n",
+      "[2026-09-03T00:06:33.229Z] [arbiter] The Arbiter looks around. \"The calm has an edge you can stand on: dust wall on one side of your boot, stillness on the other.\"\n[2026-09-03T00:06:33.424Z] [combat] Scrap Drone deals 4 bludgeoning damage [plate \u22121] [edge of reach \u2014 halved]. You have 32 HP remaining.\n",
+      "[2026-09-03T00:06:33.667Z] [debug] persist sizes(KB): total=295 player=73 wm=139[rooms=71 events=5 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=82 scene=2\n[2026-09-03T00:06:37.393Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T00:06:38.732Z] [world] Tucked inside the quiet line: an oddment that matches no quartermaster's list. The kind of thing that fuses well.\n",
+      "[2026-09-03T00:06:38.732Z] [reward] \u2726 Salvage haul:\n[2026-09-03T00:06:38.733Z] [reward]     \u2022 Bone-Handled Rivet (Uncommon)\n[2026-09-03T00:06:39.893Z] [debug] ui: tap \"investigate\"\n[2026-09-03T00:06:41.507Z] [player] investigate ash drift\n[2026-09-03T00:06:41.508Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ash drift resolved=ash drift range=- enemies=0 hooks=0\n",
+      "[2026-09-03T00:06:41.508Z] [world] The ash drift sits the way ordinary things sit. The Arbiter does not lean in. You move on.\n[2026-09-03T00:06:41.509Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-03T00:06:41.509Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T00:06:41.692Z] [cognitive] THROW \u00b7 SEARCH  (182ms)\n",
+      "[2026-09-03T00:06:42.261Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n[2026-09-03T00:06:42.280Z] [world] You walk east. You arrive at Great Tartary Plains.\n[2026-09-03T00:06:42.281Z] [debug] scene: loc=great_tartary_plains hub=- arrival=y opening=n passing=y\n[2026-09-03T00:06:42.282Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-03T00:06:42.282Z] [debug] missions: hunt:hunt_bog_dragon stage 3/7 [boss\u2192attack] @mud_flood_nexus needs=Mira's Shrine-Map\u2713 gives=The Boy's Locket spawn=Mud Wraith\u00d71 AMBUSH\n[2026-09-03T00:06:42.282Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n",
+      "[2026-09-03T00:06:42.283Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n[2026-09-03T00:06:42.283Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n",
+      "[2026-09-03T00:06:42.283Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n[2026-09-03T00:06:42.283Z] [debug] missions: \u00b7 at=great_tartary_plains travelTo=mud_flood_nexus\n",
+      "[2026-09-03T00:06:42.313Z] [world] Time and the wasteland have worked this place over since you last passed through \u2014 there's something worth a second look again.\n[2026-09-03T00:06:42.338Z] [world] You've left The Storm's Eye and entered Great Tartary Plains. The horizon refuses to settle. Aether moves under the grass like breath under a sheet. It's afternoon. Nobody else is in sight. west leads t",
+      "o The Storm's Eye. Nothing named to the north or east or south.\n[2026-09-03T00:06:42.338Z] [world] You have stood on this exact patch of ground before.\n[2026-09-03T00:06:42.338Z] [world] Still open from before: tartarian trap, titarian trap hit look.\n[2026-09-03T00:06:42.338Z] [system] Weather effect \u2014 Black Rain: -1 CHA\n",
+      "[2026-09-03T00:06:42.341Z] [world] [Great Tartary Plains] north: Garrin (return the folio) (17 tiles, 1 day, 19 hours) \u00b7 east: Zharak's Teeth (4 tiles, 10 hours) \u00b7 south: Nimari (8 tiles, 20 hours) \u00b7 west: The Storm's Eye (1 tile, 3 hours)\n[2026-09-03T00:06:46.630Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n",
+      "[2026-09-03T00:06:46.655Z] [world] You walk south through open silt. The compass points south into open ground.\n[2026-09-03T00:06:46.656Z] [world] An Aetheric construct lies half-toppled in the mud, one arm still flexing weakly, its core dim but unbroken.\n[2026-09-03T00:06:48.180Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-09-03T00:06:49.343Z] [world] You salvage the glass. The take is small but real.\n[2026-09-03T00:06:49.344Z] [world] You break the standing water apart. Among the pieces, something worth keeping.\n[2026-09-03T00:06:49.344Z] [world] You scavenge the survey tripod thoroughly. One Smooth Stone survives the sorting.\n[2026-09-03T00:06:49.345Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-09-03T00:06:49.345Z] [reward]     \u2022 Smooth Stone x4 (Common)\n[2026-09-03T00:06:50.370Z] [world] The Iron Spear was half under something. It is not now.\n[2026-09-03T00:06:50.370Z] [reward] \u2726 Iron Spear (Common).\n[2026-09-03T00:06:51.580Z] [debug] ui: tap \"investigate\"\n[2026-09-03T00:06:53.182Z] [player] investigate the ground\n",
+      "[2026-09-03T00:06:53.183Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n[2026-09-03T00:06:53.187Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Aetheric Shard (Uncommon).\n[2026-09-03T00:06:53.196Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-09-03T00:06:53.196Z] [arbiter] The Arbiter looks around. \"The horizon refuses to settle. Aether moves under the grass like breath under a sheet.\"\n[2026-09-03T00:06:53.196Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T00:06:53.410Z] [cognitive] CLIMB  (212ms)\n[2026-09-03T00:06:54.331Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n",
+      "[2026-09-03T00:06:54.354Z] [debug] spawn: gear=[Lost Seeker's Gloves, Aetheric Helm of Command] window=10 roster=new\n[2026-09-03T00:06:54.355Z] [world] You walk east through open silt. The compass points east into open ground.\n[2026-09-03T00:06:54.356Z] [world] Your eye goes back to it before you decide to look.\n[2026-09-03T00:06:54.556Z] [player] investigate wave\n",
+      "[2026-09-03T00:06:54.556Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=wave resolved=wave range=- enemies=0 hooks=1\n[2026-09-03T00:06:54.558Z] [world] You study the wave and find no answer. The silence here is patient; whatever it knew, it has decided to keep.\n[2026-09-03T00:06:54.558Z] [debug] arbiter: ambient held (he just spoke)\n",
+      "[2026-09-03T00:06:54.764Z] [cognitive] neutral  (204ms)\n[2026-09-03T00:06:55.004Z] [debug] persist sizes(KB): total=307 player=73 wm=148[rooms=81 events=5 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=82 scene=3\n[2026-09-03T00:06:55.665Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T00:06:57.055Z] [world] You salvage the overturned wagon. The take is small but real.\n",
+      "[2026-09-03T00:06:57.055Z] [world] You lever something loose from the standing water \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n[2026-09-03T00:06:57.055Z] [world] You break the tracks apart. Among the pieces, something worth keeping.\n[2026-09-03T00:06:57.055Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-09-03T00:06:57.055Z] [reward]     \u2022 Worn Tartarian Coin x7 (Common)\n[2026-09-03T00:06:57.055Z] [reward]     \u2022 Mortar-Bound Cobble (Common)\n[2026-09-03T00:06:57.055Z] [reward]     \u2022 Stick x2 (Common)\n[2026-09-03T00:06:57.971Z] [world] You work the Aetheric Helm of Command loose from where the mud had it.\n[2026-09-03T00:06:57.972Z] [reward] \u2726 Aetheric Helm of Command (Common).\n",
+      "[2026-09-03T00:06:57.991Z] [world] The Lost Seeker's Gloves had settled into the ground. You unsettle it.\n[2026-09-03T00:06:57.991Z] [reward] \u2726 Lost Seeker's Gloves (Common).\n[2026-09-03T00:06:59.399Z] [debug] ui: tap \"investigate\"\n[2026-09-03T00:07:01.041Z] [player] investigate the ground\n",
+      "[2026-09-03T00:07:01.041Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n[2026-09-03T00:07:01.045Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Firewood (Common).\n[2026-09-03T00:07:01.054Z] [debug] arbiter: ambient held (he just spoke)\n[2026-09-03T00:07:01.055Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-09-03T00:07:01.255Z] [cognitive] CLIMB  (199ms)\n[2026-09-03T00:07:01.657Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n[2026-09-03T00:07:01.666Z] [debug] spawn: gear=[Titan's Guard Mask, Sentinel's Greaves, Wanderer's Face of Shadows] window=10 roster=new\n",
+      "[2026-09-03T00:07:01.666Z] [world] You walk south through open silt. The compass tells you Nimari lies further south \u2014 5 tiles, about 13 hours of travel.\n[2026-09-03T00:07:01.667Z] [world] You had a question here. You still have it.\n[2026-09-03T00:07:02.286Z] [player] investigate rift\n",
+      "[2026-09-03T00:07:02.286Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=rift resolved=rift range=- enemies=0 hooks=1\n[2026-09-03T00:07:02.288Z] [world] The rift resists your reading. Not hostile \u2014 just closed. Some things in the buried world don't open for the curious.\n[2026-09-03T00:07:02.486Z] [cognitive] neutral  (196ms)\n",
+      "[2026-09-03T00:07:02.671Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T00:07:04.561Z] [player] investigate weathered crashed automaton chassis\n[2026-09-03T00:07:04.561Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=weathered crashed automaton chassis resolved=weathered crashed automaton chassis ra"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-03-1642-every-drop-has-a-name-in-the-book #mtlhgdw29v8x [inline 8/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtlhgdw29v8x"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-03-1642-every-drop-has-a-name-in-the-book"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "8"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-03-1642-every-drop-has-a-name-in-the-book"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:dba5:7266:ad2:ae57:4fda:d815",
+      "query": "user.ip:\"2607:fb90:dba5:7266:ad2:ae57:4fda:d815\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-03T12:10:04.635857Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-03T12:10:05.735000Z",
+  "fingerprints": [
+    "8641a52080b8535475cb5d6753a9c9a3"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1952890889,
+    "commitCount": 20,
+    "data": {},
+    "dateCreated": "2026-09-03T12:10:00.204000Z",
+    "dateReleased": "2026-09-03T14:02:00.424207Z",
+    "deployCount": 1,
+    "ref": null,
+    "lastCommit": {
+      "id": "1fc5ac79d97859fb19c740742255089af058654c",
+      "message": "golem republish of OTA-1642 to exercise the Sentry release step (task #109)\n\nSame bundle as c72cdbec \u2014 no app change, one note beside the stamp. The\nActions dispatch is not reachable from this session (403 on the dispatch\nendpoint), and the new Sentry step only runs inside a publish, so this\nmarkerless golem push is the measurement: the run log will say whether\nSENTRY_READ_TOKEN already carries project:releases or a SENTRY_AUTH_TOKEN\nsecret is needed.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-03T13:59:43Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-03-1642-every-drop-has-a-name-in-the-book",
+          "shortVersion": "tartaria@4.32.11+2026-09-03-1642-every-drop-has-a-name-in-the-book",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-03T14:02:00.424207Z",
+          "dateCreated": "2026-09-03T12:10:00.204000Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155183521",
+      "environment": "golem",
+      "dateStarted": null,
+      "dateFinished": "2026-09-03T14:02:00.682876Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-03-1642-every-drop-has-a-name-in-the-book",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-03-1642-every-drop-has-a-name-in-the-book",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-03-1642-every-drop-has-a-name-in-the-book",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-03-1642-every-drop-has-a-name-in-the-book)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "82399f553bee4703a9ec1514ca52e9fc",
+  "previousEventID": "76443eee04b44192ab7c0c26945bbee4"
+}

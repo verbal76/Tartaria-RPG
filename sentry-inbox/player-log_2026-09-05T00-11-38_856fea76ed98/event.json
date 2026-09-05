@@ -1,0 +1,277 @@
+{
+  "id": "856fea76ed9842149a269152afa7135b",
+  "groupID": "7712876642",
+  "eventID": "856fea76ed9842149a269152afa7135b",
+  "projectID": "4511945117532160",
+  "size": 18121,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-05-1675-the-voice-names-its-step #mtnlu0casj0h [inline 17/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-05-1675-the-voice-names-its-step",
+  "message": "player-log 2026-09-05-1675-the-voice-names-its-step #mtnlu0casj0h [inline 17/28]",
+  "title": "player-log 2026-09-05-1675-the-voice-names-its-step #mtnlu0casj0h [inline 17/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "df6ce37bbffa478cbc518316acd1a51e",
+      "span_id": "a14a66191405160f",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "4.394Z] [debug] ui: tap \"\u2192 MUD SEAS\"\n[2026-09-04T19:39:14.407Z] [debug] spawn: gear=[Salvager's Worn Gloves] window=10 roster=new\n[2026-09-04T19:39:14.409Z] [world] You walk east through open silt. The compass tells you Revivalist Field Camp lies further east \u2014 5 tiles, about 13 hours of travel.\n",
+      "[2026-09-04T19:39:14.411Z] [world] A buried dome's apex breaks the surface ahead, Aetherstone-glazed and humming faintly.\n[2026-09-04T19:39:15.597Z] [debug] ui: tap \"take / salvage\"\n[2026-09-04T19:39:16.923Z] [world] Slim pickings on the brick. You pocket a Smooth Stone on the way out.\n",
+      "[2026-09-04T19:39:16.924Z] [world] You strip the broken capacitor coil rack carefully. Something usable comes free in your hand.\n[2026-09-04T19:39:16.924Z] [world] You scavenge the gate thoroughly. One Bone Sliver survives the sorting.\n[2026-09-04T19:39:16.924Z] [world] You salvage the rusted engine chamber scaffolding. The take is small but real.\n",
+      "[2026-09-04T19:39:16.925Z] [world] You work the sign over. A part of it comes loose, intact.\n[2026-09-04T19:39:16.925Z] [world] You work the table over. A part of it comes loose, intact.\n[2026-09-04T19:39:16.925Z] [reward] \u2726 Salvage haul:\n[2026-09-04T19:39:16.926Z] [reward]     \u2022 Smooth Stone (Common)\n[2026-09-04T19:39:16.926Z] [reward]     \u2022 Scrap Metal x4 (Common)\n",
+      "[2026-09-04T19:39:16.926Z] [reward]     \u2022 Bone Sliver (Common)\n[2026-09-04T19:39:16.927Z] [reward]     \u2022 Mud Fragment x2 (Common)\n[2026-09-04T19:39:16.927Z] [reward]     \u2022 Bent Nail (Common)\n[2026-09-04T19:39:18.039Z] [world] Whatever the Salvager's Worn Gloves was lying against, it lets go without much argument.\n[2026-09-04T19:39:18.040Z] [reward] \u2726 Salvager's Worn Gloves (Common).\n",
+      "[2026-09-04T19:39:20.085Z] [debug] homework: intro-fill armed after 6000ms idle (strike 2/3)\n[2026-09-04T19:39:21.583Z] [debug] ui: tap \"rest\"\n[2026-09-04T19:39:21.593Z] [world] Iron fog disorients you. Compasses spin; intent costs more.\n[2026-09-04T19:39:21.597Z] [player] rest\n[2026-09-04T19:39:21.597Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-09-04T19:39:21.599Z] [world] Mercy circles three times and curls beside you. Her breathing slows to yours.\n[2026-09-04T19:39:21.600Z] [world] You rest for 8 hours. +8 HP, +8 stamina recovered. (Day 68, night)\n[2026-09-04T19:39:21.616Z] [system] \u23f3 Time passed: 8h\n[2026-09-04T19:39:22.000Z] [cognitive] REST  (383ms)\n[2026-09-04T19:39:22.381Z] [debug] ui: tap \"\u2192 MUD SEAS\"\n",
+      "[2026-09-04T19:39:22.387Z] [debug] spawn: gear=[Titan's Guard Mask, Mud Harpoon, Stone Spear] window=10 roster=new\n[2026-09-04T19:39:22.387Z] [world] You walk east through open silt. The compass tells you Revivalist Field Camp lies further east \u2014 4 tiles, about 10 hours of travel.\n",
+      "[2026-09-04T19:39:22.388Z] [world] An Aetherkin stands with its back to you, very still, facing a section of buried wall where the silhouettes of the Entombed are pressed into the Aetherstone like coins into wax. Twelve of them. Maybe fourteen. The Aetherkin does not turn when you approach. The pressure in the air says it is aware of you and does not yet care.\n",
+      "[2026-09-04T19:39:22.388Z] [arbiter] The Aetherkin tilts its head a quarter inch and the air pulls toward it. 'You will not need what is in their pockets. They needed it more.'\n[2026-09-04T19:39:22.389Z] [world] If you pass by without disturbing the Entombed the Aetherkin lets you go. If you reach for a coin, you will not reach it twice.\n",
+      "[2026-09-04T19:39:22.389Z] [world] What you started here has not finished itself in your absence.\n[2026-09-04T19:39:22.934Z] [debug] persist sizes(KB): total=333 player=74 wm=172[rooms=96 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=85 scene=2\n",
+      "[2026-09-04T19:39:30.711Z] [debug] \u26a0 FREEZE WATCH: both clocks stopped (js 5093ms \u00b7 frames 3675ms). Whole app wedged, or it was backgrounded \u2014 check the appstate trail beside this line. \u00b7 crumb before: homework-done +10405ms \u2192 now: rendered +8130ms \u00b7 doing: tap \"\u2192 MUD SEAS\" \u00b7 native: homework running \u00b7 q0\n",
+      "[2026-09-04T19:39:31.739Z] [debug] qwen\u23f1 ambient_fill ok 9922ms read/write unusable (native mis-reported 104339ms/995ms \u2014 llama.rn split bug, not this call) in 364t\u2192out 31t HIT-CAP (151ch)\n[2026-09-04T19:39:32.150Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=408 from=cached winH=986 beat=-\n",
+      "[2026-09-04T19:39:32.562Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=408 from=live winH=986 beat=-\n[2026-09-04T19:39:32.778Z] [debug] arbiter: ambient-fill banked (1/3) 11176ms\n[2026-09-04T19:39:33.003Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-09-04T19:39:35.721Z] [debug] freeze watch: recovered \u2014 painting again after 3675ms quiet.\n",
+      "[2026-09-04T19:39:56.992Z] [player] okay I've now sorry traveled two tiles and since I didn't technically have an exit button to exit the Outpost, I believe that's the reason why my mini map even after two other trial travels of tiles. while I can't talk today, even after 2:00 tile travels, my mini-map still shows me stuck in the outpost even though I'm not\n",
+      "[2026-09-04T19:39:56.993Z] [arbiter] The Arbiter studies you, plainly. \"I'm not sure what you're trying to tell me. I'll keep your note in the log either way. If you mean to act, phrase it as a verb \u2014 'investigate the rubble', 'go east', 'attack the figure'.\"\n[2026-09-04T19:39:56.994Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter studies you, plainly. \"I'm not sure what you're \u2026\"\n",
+      "[2026-09-04T19:39:56.994Z] [debug] meta-comment guard: skipped intent parse (ui-vocabulary: \"button\") on 323-char input\n[2026-09-04T19:40:05.116Z] [debug] homework: intro-fill armed after 6000ms idle (strike 2/3)\n[2026-09-04T19:40:13.985Z] [debug] send-log: #mtncz4bh65rg \u2014 DELIVERED (inline, no attachments): beacon out, 2/2 parts accepted (19326 chars) \u2014 flush said yes\n",
+      "[2026-09-04T21:56:14.738Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a06ddf-b25f-7a8f-ba86-96fd40c6236e\n[2026-09-04T21:56:14.739Z] [debug] ota: Checking\u2026\n[2026-09-04T21:56:16.416Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-09-04T21:56:16.523Z] [debug] ota: Saving progress\u2026\n[2026-09-04T21:56:16.524Z] [debug] ota: Restarting to apply\u2026\n",
+      "[2026-09-04T21:56:16.651Z] [debug] ota: boot check result = applied\n[2026-09-04T21:56:16.819Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a06e58-4c89-723a-9074-4aa8fd4fd9e6\n[2026-09-04T21:56:16.819Z] [debug] ota: Checking\u2026\n[2026-09-04T21:56:16.904Z] [debug] ota: Already up to date\n[2026-09-04T21:56:16.904Z] [debug] ota: boot check result = noUpdate\n",
+      "[2026-09-04T21:56:16.941Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-09-04T21:56:16.941Z] [debug] voice: bundled idle\n[2026-09-04T21:56:17.157Z] [debug] send-log: bundle #mtncz4bh65rg attempt 2/5 delivered to Sentry\n[2026-09-04T21:56:21.187Z] [debug] OTA applied: 2026-09-04-1669-the-gate-opens-for-the-tap \u2192 2026-09-04-1671-the-armour-bites-back.\n",
+      "[2026-09-04T21:56:21.188Z] [debug] OTA session start: 2026-09-04-1671-the-armour-bites-back.\n[2026-09-04T21:56:21.188Z] [world] You step back into Giant-Watch Shrine. The world waits for your move.\n[2026-09-04T21:56:21.188Z] [arbiter] The Arbiter looks up as you return. \"Welcome back, Cheddar Bob. I wondered when you'd take up the thread again.\"\n",
+      "[2026-09-04T21:56:21.554Z] [debug] \u2550\u2550\u2550 SESSION 2026-09-04T21:56:21.551Z \u00b7 build 2026-09-04-1671-the-armour-bites-back \u00b7 updated from 2026-09-04-1669-the-gate-opens-for-the-tap \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-09-04T21:56:21.558Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-04T21:56:21.559Z] [debug] missions: hunt:hunt_bog_dragon stage 5/7 [attack_provoke\u2192attack] @mud_seas needs=Eshren's Name-Token\u2713 spawn=Mud Harpy\u00d73 AMBUSH\n[2026-09-04T21:56:21.559Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n",
+      "[2026-09-04T21:56:21.559Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc=\"the Order envoy\" gives=Sealed Reliquary Box PAUSED\n[2026-09-04T21:56:21.560Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2717MISSING gives=Temporal Distortion Watch PAUSED\n",
+      "[2026-09-04T21:56:21.560Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n[2026-09-04T21:56:21.560Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n",
+      "[2026-09-04T21:56:21.560Z] [debug] missions: \u00b7 at=giant_watch_shrine travelTo=mud_seas\n[2026-09-04T21:56:21.560Z] [debug] boot: life bmtnhu2vcjq started 2026-09-04T21:56:16.776Z \u00b7 FOLLOWED AN OTA APPLY 252ms ago via boot-front \u00b7 prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)\n[2026-09-04T21:56:25.213Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-09-04T21:56:26.554Z] [world] You take the Mud Harpoon from where it lay.\n[2026-09-04T21:56:26.555Z] [reward] \u2726 Mud Harpoon (Common).\n[2026-09-04T21:56:26.580Z] [world] You pick up the Stone Spear.\n[2026-09-04T21:56:26.580Z] [reward] \u2726 Stone Spear (Common).\n[2026-09-04T21:56:26.584Z] [world] You lift the Titan's Guard Mask clear.\n",
+      "[2026-09-04T21:56:26.585Z] [reward] \u2726 Titan's Guard Mask (Common).\n[2026-09-04T21:56:27.564Z] [world] Tucked inside the broken capacitor coil rack: an oddment that matches no quartermaster's list. The kind of thing that fuses well.\n[2026-09-04T21:56:27.565Z] [world] You break the gate apart. Among the pieces, something worth keeping.\n",
+      "[2026-09-04T21:56:27.565Z] [world] You work the rusted engine chamber scaffolding over. A part of it comes loose, intact.\n[2026-09-04T21:56:27.566Z] [world] You strip the stripped maintenance panel carefully. Something usable comes free in your hand.\n[2026-09-04T21:56:27.566Z] [reward] \u2726 Salvage haul:\n[2026-09-04T21:56:27.567Z] [reward]     \u2022 Frayed Rigging Twine (Common)\n",
+      "[2026-09-04T21:56:27.567Z] [reward]     \u2022 Aether Dust x3 (Common)\n[2026-09-04T21:56:27.567Z] [reward]     \u2022 Aetheric Shard (Uncommon)\n[2026-09-04T21:56:27.568Z] [reward]     \u2022 Automaton Circuit x2 (Common)\n[2026-09-04T21:56:30.679Z] [debug] ui: tap \"more \u25b8\"\n[2026-09-04T21:56:32.161Z] [debug] ui: tap \"inventory\"\n[2026-09-04T21:58:48.435Z] [debug] ui: tap \"\u2192 MUD SEAS\"\n",
+      "[2026-09-04T21:58:48.489Z] [debug] spawn: gear=[Mud Knife, Rusty Shortbow, Mud-Iron Cleaver] window=10 roster=new\n[2026-09-04T21:58:48.490Z] [world] You walk east through open silt. The compass tells you Revivalist Field Camp lies further east \u2014 3 tiles, about 8 hours of travel.\n[2026-09-04T21:58:48.490Z] [world] The thread you were following waits where you left it.\n",
+      "[2026-09-04T21:58:49.517Z] [debug] ui: tap \"take / salvage\"\n[2026-09-04T21:58:50.650Z] [world] You get a hand under the Climbing Rope and take it.\n[2026-09-04T21:58:50.651Z] [reward] \u2726 Climbing Rope (Common).\n[2026-09-04T21:58:50.994Z] [debug] persist sizes(KB): total=335 player=76 wm=172[rooms=96 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=85 scene=2\n",
+      "[2026-09-04T21:58:51.486Z] [world] You claim the Mud Knife.\n[2026-09-04T21:58:51.487Z] [reward] \u2726 Mud Knife (Common).\n[2026-09-04T21:58:51.506Z] [world] The Mud-Iron Cleaver comes up out of the silt with a small sucking protest.\n[2026-09-04T21:58:51.506Z] [reward] \u2726 Mud-Iron Cleaver (Common).\n[2026-09-04T21:58:51.507Z] [world] The Rusty Shortbow was half under something. It is not now.\n",
+      "[2026-09-04T21:58:51.507Z] [reward] \u2726 Rusty Shortbow (Common).\n[2026-09-04T21:58:52.376Z] [world] You salvage the broken capacitor coil rack. The take is small but real.\n[2026-09-04T21:58:52.376Z] [world] You salvage the lantern. The take is small but real.\n[2026-09-04T21:58:52.376Z] [world] You salvage the stairwell. The take is small but real.\n",
+      "[2026-09-04T21:58:52.377Z] [world] You strip the table carefully. Something usable comes free in your hand.\n[2026-09-04T21:58:52.377Z] [reward] \u2726 Salvage haul:\n[2026-09-04T21:58:52.377Z] [reward]     \u2022 Automaton Circuit (Common)\n[2026-09-04T21:58:52.378Z] [reward]     \u2022 Aether Crystal x2 (Common)\n[2026-09-04T21:58:52.378Z] [reward]     \u2022 Stick (Common)\n",
+      "[2026-09-04T21:58:54.969Z] [debug] ui: tap \"rest\"\n[2026-09-04T21:58:54.972Z] [debug] qwen: loading (was idle) \u2014 the Arbiter speaks templates until it is ready\n[2026-09-04T21:58:54.979Z] [world] A shard of mud-glass nicks you. Small wound, steady reminder. (\u22121 HP)\n[2026-09-04T21:58:54.988Z] [player] rest\n",
+      "[2026-09-04T21:58:54.988Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1\n[2026-09-04T21:58:54.989Z] [world] Mercy circles three times and curls beside you. Her breathing slows to yours.\n[2026-09-04T21:58:54.990Z] [world] You rest for 8 hours. +8 stamina, \u22121 corruption recovered. (Day 68, morning)\n[2026-09-04T21:58:55.000Z] [system] \u23f3 Time passed: 8h\n",
+      "[2026-09-04T21:58:55.198Z] [cognitive] REST  (196ms)\n[2026-09-04T21:58:56.168Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-09-04T21:58:58.358Z] [debug] kbbar: mounted bottom=355 raw=0 from=estimate winH=986 beat=-\n[2026-09-04T21:58:58.771Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n",
+      "[2026-09-04T21:59:01.228Z] [world] A shard of mud-glass nicks you. Small wound, steady reminder. (\u22121 HP)\n[2026-09-04T21:59:01.233Z] [player] drink\n[2026-09-04T21:59:01.233Z] [debug] parser: intent=drink conf=1.00 verb=drink target=- resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-09-04T21:59:01.234Z] [arbiter] The Arbiter tilts their head. \"Drink what? You'd need a water source nearby, or a Water Bottle in your pack.\"\n[2026-09-04T21:59:01.235Z] [debug] arbiter: template (reason=intent-not-allowed:drink)\n[2026-09-04T21:59:01.235Z] [arbiter] The Arbiter watches. \"I saw the way you came at that.\"\n[2026-09-04T21:59:01.634Z] [cognitive] neutral  (397ms)\n",
+      "[2026-09-04T21:59:05.328Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=cached winH=986 beat=-\n[2026-09-04T21:59:05.692Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-09-04T21:59:07.468Z] [player] drink\n[2026-09-04T21:59:07.469Z] [debug] parser: intent=drink conf=1.00 verb=drink target=- resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-09-04T21:59:07.469Z] [arbiter] The Arbiter tilts their head. \"Drink what? You'd need a water source nearby, or a Water Bottle in your pack.\"\n[2026-09-04T21:59:07.470Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter tilts their head. \"Drink what? You'd need a wate\u2026\"\n[2026-09-04T21:59:07.470Z] [debug] arbiter: template (reason=intent-not-allowed:drink)\n",
+      "[2026-09-04T21:59:07.471Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-04T21:59:07.684Z] [cognitive] neutral  (212ms)\n[2026-09-04T21:59:15.094Z] [debug] kbbar: mounted bottom=407.79486083984375 raw"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-05-1675-the-voice-names-its-step #mtnlu0casj0h [inline 17/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtnlu0casj0h"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-05-1675-the-voice-names-its-step"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "17"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-05-1675-the-voice-names-its-step"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-05T00:11:36.359853Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-05T00:11:38.213000Z",
+  "fingerprints": [
+    "8ed2684bc6b608ad4a9f0db04cd45c70"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1956427903,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-05T00:11:38.213000Z",
+    "dateReleased": "2026-09-05T00:12:48.923167Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "8fbd09d83bf9d0c3ec1fb0527509158bfc77bc5b",
+      "message": "[ota-hal] OTA-1675: the voice names its step\n\nItem two of \"fix all existing issues one through six\": #180, the voice-path\nprocess kill on kai's SM-S942U (Samsung, SM8850, Android 16) \u2014 the first\nnon-Pixel kill on record. Like item one, this is the instrument, not the cure,\nand it also repairs a defect in the instrument it extends.\n\nWHAT HER LEDGER SAID\nA cold 66-second life on the title screen, no action yet, model ledger o0/r0:\n\n    native:voice:done [q0] \u00b7 66228ms into the action \u00b7 alive 0ms after it\n    Voice (TTS) guard: \u26a0 VOICE CRASH detected \u2014 last voice: kokoro:bf_emma\n\nThe guard is armed by markTTSStart before the synth and cleared by markTTSDone\nAFTER playback; so the process died between the synth settling and the line\nfinishing. Sixty-six seconds in, q0, o0/r0: that was the FIRST utterance that\ndevice ever played \u2014 ReadyFlash speaks \"Choose your character.\" the moment\nKokoro comes online. Nothing native runs in that window except what the voice\nlayer does with the samples: the WAV encode, expo-av's player load on a data:\nURI (ExoPlayer \u2192 AudioTrack, the one step that is pure platform media code),\nthe playback, the deferred unload. OTA-1546 stamped the lock; nothing stamped\nthese. The owner's own two voice deaths (08-30 `native:voice:done (+11080ms)`,\n08-31 `native:voice:start [q1]`) sit in the same blind spot.\n\nAND THE INSTRUMENT ITSELF WAS ONE MICROTASK LATE\nMeasured in the new suite before it could be shipped: the lock's `done` stamp\nrode the `.then` AFTER `task.resolve`, so the caller's continuation ran first.\nThe voice drain resumed, encoded the WAV and DISPATCHED the player load before\n`native:voice:done` was written. Her last checkpoint said \"the synth finished\"\nabout a process that had already moved on to playback \u2014 and any checkpoint a\ncaller stamped in that continuation was overwritten by a fact from the step\nbefore it, which is exactly what would have happened to the stamps below.\n`done` is now stamped before the caller is resolved; it means the native op\nsettled, nothing more. Exclusivity is untouched \u2014 `running` still clears only\nafter the caller has been resolved. The ota1546 pin is repointed with the\nreason.\n\nTHE PLAYBACK PATH STAMPS ITS OWN STEPS\n`voice:play:encode` / `create` / `started` / `done` / `unload`, and\n`voice:stop`, each carrying the utterance's ordinal in this life and its\nlength (`#1 0.2s`) \u2014 \"the first line after a fresh model load\" is the fact\nthat separates a one-off from a device that cannot play at all.\n\n\u26a0 THE UNLOAD STAMP YIELDS. It fires 300 ms after the line ends, by which time\nthe lock may be inside the next synth or a Qwen job; overwriting\n`native:llm:start` with `voice:play:unload` would file a death inside\ninference as a death in a player release \u2014 the blind-spot trade OTA-1377 and\nOTA-1413 refused. When the lock is running the crumb it wrote stands. Lazy-\nrequired and wrapped, as the lock's own stamp is.\n\nNot the cure. No exemption is bought with this. The next voice-path death\nreads which step it died in.\n\n- app/ai/nativeMlLock.ts \u2014 `done` stamped in the settle handlers, before\n  resolve/reject.\n- app/voice/PiperTTSManager.ts \u2014 `stampVoicePhase`, the per-life ordinal, the\n  six stamps, the unload gate on `nativeMlSnapshot().running`.\n- __tests__/ota1675TheVoiceNamesItsStep.test.ts \u2014 16 tests: the whole window\n  driven end to end through a mocked Kokoro + expo-av (load, warm-up, the\n  line, then encode \u2192 create \u2192 started \u2192 done), the tag, the yield, voice:stop,\n  the lock ordering measurement, and the source pins.\n- __tests__/ota1546TheDyingBreathNamesTheNativeJob.test.ts \u2014 the order pin\n  reads the settle handler.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-05T00:09:10Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-05-1675-the-voice-names-its-step",
+          "shortVersion": "tartaria@4.32.11+2026-09-05-1675-the-voice-names-its-step",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-05T00:12:48.923167Z",
+          "dateCreated": "2026-09-05T00:11:38.213000Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155726114",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-05T00:12:49.150027Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-05-1675-the-voice-names-its-step",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-05-1675-the-voice-names-its-step",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-05-1675-the-voice-names-its-step",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-05-1675-the-voice-names-its-step)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "894411b1882c477cb5afc9ab2de3bdee",
+  "previousEventID": "778d77b6dd584a5aa06102a3eadfea48"
+}

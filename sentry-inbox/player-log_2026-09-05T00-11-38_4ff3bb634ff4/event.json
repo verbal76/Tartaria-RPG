@@ -1,0 +1,277 @@
+{
+  "id": "4ff3bb634ff449eb8f0724dba4baa271",
+  "groupID": "7712876642",
+  "eventID": "4ff3bb634ff449eb8f0724dba4baa271",
+  "projectID": "4511945117532160",
+  "size": 18113,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-05-1675-the-voice-names-its-step #mtnlu0casj0h [inline 18/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-05-1675-the-voice-names-its-step",
+  "message": "player-log 2026-09-05-1675-the-voice-names-its-step #mtnlu0casj0h [inline 18/28]",
+  "title": "player-log 2026-09-05-1675-the-voice-names-its-step #mtnlu0casj0h [inline 18/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "df6ce37bbffa478cbc518316acd1a51e",
+      "span_id": "a14a66191405160f",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "=408 from=cached winH=986 beat=-\n[2026-09-04T21:59:15.493Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-09-04T21:59:17.198Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-09-04T21:59:17.865Z] [player] drink\n[2026-09-04T21:59:17.865Z] [debug] parser: intent=drink conf=1.00 verb=drink target=- resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-09-04T21:59:17.867Z] [arbiter] The Arbiter tilts their head. \"Drink what? You'd need a water source nearby, or a Water Bottle in your pack.\"\n[2026-09-04T21:59:17.867Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter tilts their head. \"Drink what? You'd need a wate\u2026\"\n[2026-09-04T21:59:18.086Z] [cognitive] neutral  (218ms)\n",
+      "[2026-09-04T21:59:20.897Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=cached winH=986 beat=-\n[2026-09-04T21:59:21.320Z] [debug] kbbar: mounted bottom=359.79486083984375 raw=360 from=live winH=986 beat=-\n[2026-09-04T21:59:23.859Z] [player] srink\n[2026-09-04T21:59:23.860Z] [debug] parser: intent=unknown conf=0.10 verb=- target=- resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-09-04T21:59:23.860Z] [debug] parse-fallback: handing \"srink\" to qwen\n[2026-09-04T21:59:23.860Z] [system] The Arbiter considers your words\u2026\n[2026-09-04T21:59:27.581Z] [debug] kbbar: mounted bottom=359.79486083984375 raw=360 from=cached winH=986 beat=-\n[2026-09-04T21:59:28.011Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n",
+      "[2026-09-04T21:59:28.897Z] [debug] qwen\u23f1 parse_fallback ok 4838ms read 4406ms/write 417ms in 366t\u2192out 13t 12.0ms/t (47ch)\n[2026-09-04T21:59:29.094Z] [debug] parse-fallback: qwen no usable result \u2192 soft refusal\n[2026-09-04T21:59:29.095Z] [arbiter] The Arbiter glances at your pack. \"Your reclaimer's rope is still there, if it suits the moment.\"\n",
+      "[2026-09-04T21:59:29.095Z] [system] Try: look around \u00b7 search \u00b7 rest\n[2026-09-04T21:59:29.560Z] [debug] persist sizes(KB): total=333 player=76 wm=172[rooms=96 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=83 scene=2\n[2026-09-04T21:59:34.546Z] [player] fill water bottle\n",
+      "[2026-09-04T21:59:34.546Z] [debug] parser: intent=fill conf=1.00 verb=fill target=water bottle resolved=- range=- enemies=0 hooks=1\n[2026-09-04T21:59:34.547Z] [arbiter] The Arbiter glances around. \"No water to draw from here. Try a puddle, lake, waterfall, stream, current, well \u2014 anywhere the wet collects.\"\n[2026-09-04T21:59:34.548Z] [debug] arbiter: template (reason=intent-not-allowed:fill)\n",
+      "[2026-09-04T21:59:34.548Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-04T21:59:34.926Z] [cognitive] neutral  (376ms)\n[2026-09-04T21:59:39.744Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=cached winH=986 beat=-\n[2026-09-04T21:59:40.155Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n",
+      "[2026-09-04T21:59:55.607Z] [player] I think typing drink is broken, look at this chain of events\n[2026-09-04T21:59:55.607Z] [debug] parser: intent=drink conf=1.00 verb=drink target=broken look chain events resolved=- range=- enemies=0 hooks=1\n[2026-09-04T21:59:55.608Z] [arbiter] The Arbiter tilts their head. \"Drink what? You'd need a water source nearby, or a Water Bottle in your pack.\"\n",
+      "[2026-09-04T21:59:55.608Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter tilts their head. \"Drink what? You'd need a wate\u2026\"\n[2026-09-04T21:59:55.608Z] [debug] arbiter: template (reason=intent-not-allowed:drink)\n[2026-09-04T21:59:55.608Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-04T21:59:56.014Z] [cognitive] neutral  (405ms)\n",
+      "[2026-09-04T22:00:07.107Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-09-04T22:00:26.703Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=cached winH=986 beat=-\n[2026-09-04T22:00:27.098Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n",
+      "[2026-09-04T22:00:50.666Z] [world] A shard of mud-glass nicks you. Small wound, steady reminder. (\u22121 HP)\n[2026-09-04T22:00:50.750Z] [player] also in the small character portrait, ste is not shown\n[2026-09-04T22:00:50.751Z] [debug] parser: intent=unknown conf=0.10 verb=- target=- resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-09-04T22:00:50.751Z] [debug] parse-fallback: handing \"also in the small character portrait, ste is not shown\" to qwen\n[2026-09-04T22:00:50.751Z] [system] The Arbiter considers your words\u2026\n[2026-09-04T22:00:51.586Z] [debug] qwen\u23f1 parse_fallback ok 638ms read 276ms/write 340ms in 375t\u2192out 11t 0.7ms/t (53ch)\n",
+      "[2026-09-04T22:00:51.803Z] [debug] parse-fallback: qwen no usable result \u2192 soft refusal\n[2026-09-04T22:00:51.804Z] [arbiter] The Arbiter glances at your pack. \"Your sentinel core plate is still there, if it suits the moment.\"\n[2026-09-04T22:00:51.804Z] [system] Try: look around \u00b7 search \u00b7 rest\n",
+      "[2026-09-04T22:00:52.764Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=cached winH=986 beat=-\n[2026-09-04T22:00:53.182Z] [debug] kbbar: mounted bottom=359.79486083984375 raw=360 from=live winH=986 beat=-\n[2026-09-04T22:00:57.183Z] [debug] homework: intro-fill armed after 6000ms idle\n",
+      "[2026-09-04T22:01:31.294Z] [player] do all of the benefits of stat boosts gained from gear show properly on the full character sheet?\n[2026-09-04T22:01:31.295Z] [debug] parser: intent=inventory conf=1.00 verb=gear target=show properly full character sheet resolved=- range=- enemies=0 hooks=1\n[2026-09-04T22:01:32.705Z] [cognitive] neutral  (1401ms)\n",
+      "[2026-09-04T22:01:36.287Z] [debug] persist sizes(KB): total=334 player=76 wm=173[rooms=96 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=83 scene=2\n[2026-09-04T22:01:42.227Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-09-04T22:02:09.891Z] [debug] kbbar: mounted bottom=359.79486083984375 raw=360 from=cached winH=986 beat=-\n",
+      "[2026-09-04T22:02:10.295Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-09-04T22:02:27.241Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-09-04T22:02:43.066Z] [player] under what moved it in the full character sheet it shows 2 wrongs still standing, but when I tap on it, it doesn't expand to show what they are\n",
+      "[2026-09-04T22:02:43.067Z] [arbiter] The Arbiter studies you, plainly. \"I'm not sure what you're trying to tell me. I'll keep your note in the log either way. If you mean to act, phrase it as a verb \u2014 'investigate the rubble', 'go east', 'attack the figure'.\"\n[2026-09-04T22:02:43.067Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter studies you, plainly. \"I'm not sure what you're \u2026\"\n",
+      "[2026-09-04T22:02:43.067Z] [debug] meta-comment guard: skipped intent parse (report-of-behaviour: \"it doesn't expand\") on 143-char input\n[2026-09-04T22:02:45.455Z] [debug] ui: tap \"\u2192 MUD SEAS\"\n[2026-09-04T22:02:45.479Z] [debug] spawn: gear=[Wanderer's Armor of Wisdom, Titan's Vest, Titan's Trail Leggings] window=10 roster=new\n",
+      "[2026-09-04T22:02:45.480Z] [world] You walk east through open silt. The compass tells you Revivalist Field Camp lies further east \u2014 2 tiles, about 5 hours of travel.\n[2026-09-04T22:02:45.481Z] [world] Footsteps behind you the wrong way \u2014 too close, too fast. A Silt Thief peels out of a side passage, hand already in your line of sight where your coin-pouch hangs. They thought you'd sleep deeper tha",
+      "n you did.\n[2026-09-04T22:02:45.484Z] [combat] Silt Thief closes \u2014 Quick Knife ready, 1D8 damage on a hit. (range: close)\n[2026-09-04T22:02:45.496Z] [world] What you started here has not finished itself in your absence.\n[2026-09-04T22:03:07.547Z] [debug] ui: tap \"inventory\"\n[2026-09-04T22:03:20.046Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=cached winH=986 beat=-\n",
+      "[2026-09-04T22:03:20.721Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-09-04T22:03:48.623Z] [player] when you sell common gear in bulk, it should exclude common gear they is unequipped but has had coatings applied to them\n",
+      "[2026-09-04T22:03:48.624Z] [debug] parser: intent=ask conf=1.00 verb=when target=sell common gear bulk should exclude common gear unequipped coatings applied resolved=- range=close enemies=1 hooks=1\n[2026-09-04T22:03:48.624Z] [arbiter] \"The Arbiter,\" the Arbiter says. \"I have walked these places longer than I will tell you. I do not roll your dice and I do not decide your story. I notice. I narrat",
+      "e. I remember more than I let on. Some of it is mine.\"\n[2026-09-04T22:03:49.302Z] [cognitive] neutral  (676ms)\n[2026-09-04T22:03:57.862Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=cached winH=986 beat=-\n[2026-09-04T22:03:58.567Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n",
+      "[2026-09-04T22:04:35.854Z] [player] either that or you should be able to mark weapons as locked like we do for fusion if it's something you are saving for later\n[2026-09-04T22:04:35.854Z] [arbiter] The Arbiter studies you, plainly. \"I'm not sure what you're trying to tell me. I'll keep your note in the log either way. If you mean to act, phrase it as a verb \u2014 'investigate the rubble', 'go east', '",
+      "attack the figure'.\"\n[2026-09-04T22:04:35.855Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter studies you, plainly. \"I'm not sure what you're \u2026\"\n[2026-09-04T22:04:35.855Z] [debug] meta-comment guard: skipped intent parse (suggestion: \"you should\") on 124-char input\n[2026-09-04T22:04:38.202Z] [debug] ui: tap \"inventory\"\n",
+      "[2026-09-04T22:04:59.308Z] [world] You set the Reclaimers Guild Shroud-Spun Slinger aside to free your hands for the Giant-Watch Greatspear.\n[2026-09-04T22:04:59.417Z] [debug] stats: STR20 DEX18 INT14 WIS17 CHA12 STE8 | gear: WIS+5,INT+3,STR+8,DEX+6,STE+2 | worn: main=Giant-Watch Greatspear head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aeth",
+      "er-Walker's Boots cloak=Reclaimer's Cloak amulet=Amulet of the Silt Warden ring=Tartarian Oath-Band ring2=Tin Ward Ring ring3=Tin Ward Ring ring4=Scribe's Signet\n[2026-09-04T22:05:01.667Z] [debug] persist sizes(KB): total=335 player=76 wm=173[rooms=96 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=83 scene=2\n[2026-09-04T22:05:04.766Z] [debug] ui: tap \"dodge\"\n",
+      "[2026-09-04T22:05:04.771Z] [player] dodge\n[2026-09-04T22:05:04.771Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=1\n[2026-09-04T22:05:04.772Z] [world] You commit to the dodge. Slip Silt Thief's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-04T22:05:04.860Z] [combat] Silt Thief \u2014 d20 \u2192 6 + ATK 8 = 14 vs your AC 22 \u2014 \u2717 EVADED\n[2026-09-04T22:05:04.860Z] [combat] Dodge \u2014 d20 \u2192 2 + DEX 18 = 20 vs ATK 14. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-04T22:05:04.861Z] [debug] arbiter: template (reason=combat)\n[2026-09-04T22:05:04.861Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-09-04T22:05:04.862Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T22:05:05.520Z] [cognitive] neutral  (657ms)\n[2026-09-04T22:05:06.155Z] [debug] ui: tap \"giant-watch greatspear \u25b2\"\n[2026-09-04T22:05:06.178Z] [player] attack with the giant-watch greatspear\n",
+      "[2026-09-04T22:05:06.179Z] [debug] parser: intent=attack conf=1.00 verb=attack target=giant watch greatspear resolved=Giant-Watch Greatspear range=close enemies=1 hooks=1\n[2026-09-04T22:05:06.179Z] [arbiter] The Arbiter keeps one eye on the fight. \"That is the right move for The Bog Dragon of Old Drakova \u2014 but not with something on you. Put this down first.\"\n",
+      "[2026-09-04T22:05:06.180Z] [debug] attack: target=Silt Thief range=close reach.bands=[close] reach.label=Giant-Watch Greatspear bareHand=false\n[2026-09-04T22:05:06.181Z] [arbiter] Glass Hail hangs between you. \"\u22121 to the swing \u2014 see what you can,\" the Arbiter says.\n[2026-09-04T22:05:06.181Z] [debug] attack: visibility penalty \u22121 (Glass Hail)\n",
+      "[2026-09-04T22:05:06.182Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-04T22:05:06.255Z] [world] You bring the giant-watch greatspear to bear on Silt Thief.\n[2026-09-04T22:05:06.255Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T22:05:06.584Z] [cognitive] READY \u00b7 RETREAT  (328ms)\n[2026-09-04T22:05:11.590Z] [world] You seize the initiative. Silt Thief has no time to react.\n",
+      "[2026-09-04T22:05:11.590Z] [combat] You \u2014 d20 \u2192 11 + STR 20 \u2212 1 (Glass Hail) perfect opening (2\u00d7 dice) = 30 vs Silt Thief AC 10 \u2014 \u2713 HIT\n[2026-09-04T22:05:11.592Z] [combat] Weakness exposed \u2014 Silt Thief flinches. (piercing \u00d71.5 for 26)\n",
+      "[2026-09-04T22:05:11.593Z] [combat] You crack the Silt Thief with the Giant-Watch Greatspear for 26 \u2014 nearly the whole of their fight, gone in one blow. They crumple, out cold. (2/28 HP) Loot them before they come to.\n[2026-09-04T22:05:11.593Z] [combat] Nobody left standing \u2014 the fight is yours.\n",
+      "[2026-09-04T22:05:11.594Z] [reward] You strip the unconscious Silt Thief \u2014 Bone Knife, Mud-Warden's Vest, Patched Cloth, Aether Residue, +12 TC. The gear's seen better days (worn from the fight).\n[2026-09-04T22:05:11.602Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T22:05:12.421Z] [debug] homework: intro-fill armed after 6000ms idle\n",
+      "[2026-09-04T22:05:16.180Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=cached winH=986 beat=-\n[2026-09-04T22:05:16.600Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-09-04T22:05:33.977Z] [player] I'm still stuck in the outpost minimap\n",
+      "[2026-09-04T22:05:33.978Z] [debug] parser: intent=wait conf=1.00 verb=still target=stuck outpost minimap resolved=- range=- enemies=0 hooks=1\n[2026-09-04T22:05:33.978Z] [world] You wait an hour. Tartaria waits with you.\n[2026-09-04T22:05:33.979Z] [debug] arbiter: template (reason=intent-not-allowed:wait)\n[2026-09-04T22:05:33.979Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-09-04T22:05:33.980Z] [system] \u23f3 Time passed: 1h\n[2026-09-04T22:05:34.392Z] [cognitive] RETREAT \u00b7 HIDE \u00b7 REST  (411ms)\n[2026-09-04T22:05:35.161Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=cached winH=986 beat=-\n[2026-09-04T22:05:36.046Z] [debug] kbbar: mounted bottom=359.79486083984375 raw=360 from=live winH=986 beat=-\n",
+      "[2026-09-04T22:05:44.030Z] [debug] \u26a0 FREEZE WATCH: both clocks stopped (js 4447ms \u00b7 frames 3370ms). Whole app wedged, or it was backgrounded \u2014 check the appstate trail beside this line. \u00b7 crumb before: native:homework:start +9639ms \u2192 now: native:homework:start +9639ms \u00b7 doing: action \"I'm still stuck in the outpost minimap\" \u00b7 native: homework running \u00b7 q0\n",
+      "[2026-09-04T22:05:44.245Z] [player] exit outpost\n[2026-09-04T22:05:44.245Z] [debug] parser: intent=travel conf=1.00 verb=exit target=outpost resolved=- range=- enemies=0 hooks=1\n[2026-09-04T22:05:44.246Z] [world] You walk back through the gate and out into the open ground. The outpost falls away behind you.\n[2026-09-04T22:05:44.246Z] [debug] scene: loc=giant_watch_shrine hub=- arrival="
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-05-1675-the-voice-names-its-step #mtnlu0casj0h [inline 18/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtnlu0casj0h"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-05-1675-the-voice-names-its-step"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "18"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-05-1675-the-voice-names-its-step"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-05T00:11:36.364443Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-05T00:11:38.213000Z",
+  "fingerprints": [
+    "8ed2684bc6b608ad4a9f0db04cd45c70"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1956427903,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-05T00:11:38.213000Z",
+    "dateReleased": "2026-09-05T00:12:48.923167Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "8fbd09d83bf9d0c3ec1fb0527509158bfc77bc5b",
+      "message": "[ota-hal] OTA-1675: the voice names its step\n\nItem two of \"fix all existing issues one through six\": #180, the voice-path\nprocess kill on kai's SM-S942U (Samsung, SM8850, Android 16) \u2014 the first\nnon-Pixel kill on record. Like item one, this is the instrument, not the cure,\nand it also repairs a defect in the instrument it extends.\n\nWHAT HER LEDGER SAID\nA cold 66-second life on the title screen, no action yet, model ledger o0/r0:\n\n    native:voice:done [q0] \u00b7 66228ms into the action \u00b7 alive 0ms after it\n    Voice (TTS) guard: \u26a0 VOICE CRASH detected \u2014 last voice: kokoro:bf_emma\n\nThe guard is armed by markTTSStart before the synth and cleared by markTTSDone\nAFTER playback; so the process died between the synth settling and the line\nfinishing. Sixty-six seconds in, q0, o0/r0: that was the FIRST utterance that\ndevice ever played \u2014 ReadyFlash speaks \"Choose your character.\" the moment\nKokoro comes online. Nothing native runs in that window except what the voice\nlayer does with the samples: the WAV encode, expo-av's player load on a data:\nURI (ExoPlayer \u2192 AudioTrack, the one step that is pure platform media code),\nthe playback, the deferred unload. OTA-1546 stamped the lock; nothing stamped\nthese. The owner's own two voice deaths (08-30 `native:voice:done (+11080ms)`,\n08-31 `native:voice:start [q1]`) sit in the same blind spot.\n\nAND THE INSTRUMENT ITSELF WAS ONE MICROTASK LATE\nMeasured in the new suite before it could be shipped: the lock's `done` stamp\nrode the `.then` AFTER `task.resolve`, so the caller's continuation ran first.\nThe voice drain resumed, encoded the WAV and DISPATCHED the player load before\n`native:voice:done` was written. Her last checkpoint said \"the synth finished\"\nabout a process that had already moved on to playback \u2014 and any checkpoint a\ncaller stamped in that continuation was overwritten by a fact from the step\nbefore it, which is exactly what would have happened to the stamps below.\n`done` is now stamped before the caller is resolved; it means the native op\nsettled, nothing more. Exclusivity is untouched \u2014 `running` still clears only\nafter the caller has been resolved. The ota1546 pin is repointed with the\nreason.\n\nTHE PLAYBACK PATH STAMPS ITS OWN STEPS\n`voice:play:encode` / `create` / `started` / `done` / `unload`, and\n`voice:stop`, each carrying the utterance's ordinal in this life and its\nlength (`#1 0.2s`) \u2014 \"the first line after a fresh model load\" is the fact\nthat separates a one-off from a device that cannot play at all.\n\n\u26a0 THE UNLOAD STAMP YIELDS. It fires 300 ms after the line ends, by which time\nthe lock may be inside the next synth or a Qwen job; overwriting\n`native:llm:start` with `voice:play:unload` would file a death inside\ninference as a death in a player release \u2014 the blind-spot trade OTA-1377 and\nOTA-1413 refused. When the lock is running the crumb it wrote stands. Lazy-\nrequired and wrapped, as the lock's own stamp is.\n\nNot the cure. No exemption is bought with this. The next voice-path death\nreads which step it died in.\n\n- app/ai/nativeMlLock.ts \u2014 `done` stamped in the settle handlers, before\n  resolve/reject.\n- app/voice/PiperTTSManager.ts \u2014 `stampVoicePhase`, the per-life ordinal, the\n  six stamps, the unload gate on `nativeMlSnapshot().running`.\n- __tests__/ota1675TheVoiceNamesItsStep.test.ts \u2014 16 tests: the whole window\n  driven end to end through a mocked Kokoro + expo-av (load, warm-up, the\n  line, then encode \u2192 create \u2192 started \u2192 done), the tag, the yield, voice:stop,\n  the lock ordering measurement, and the source pins.\n- __tests__/ota1546TheDyingBreathNamesTheNativeJob.test.ts \u2014 the order pin\n  reads the settle handler.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-05T00:09:10Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-05-1675-the-voice-names-its-step",
+          "shortVersion": "tartaria@4.32.11+2026-09-05-1675-the-voice-names-its-step",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-05T00:12:48.923167Z",
+          "dateCreated": "2026-09-05T00:11:38.213000Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155726114",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-05T00:12:49.150027Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-05-1675-the-voice-names-its-step",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-05-1675-the-voice-names-its-step",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-05-1675-the-voice-names-its-step",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-05-1675-the-voice-names-its-step)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "5518baeb5cb34242bd27a22499b1e614",
+  "previousEventID": "4dfe0a5f1dc84d049be059e8ec885030"
+}

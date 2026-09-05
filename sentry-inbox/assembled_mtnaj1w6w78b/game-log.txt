@@ -1,0 +1,663 @@
+Bug Report — Cheddar Bob · (2026-09-04-1667-the-key-goes-where-the-player-is) · I still can't enter the Outpost. I made a comment about it in the game
+=== TARTARIA BUG REPORT ===
+Submitted: 2026-09-04T18:31:44.981Z
+Character: Cheddar Bob
+Slot ID: slot_mtdifdmg_g2si12
+Race: Reclaimers
+Location: Tartarian Pilgrim Camp
+HP: 47/50
+
+--- DESCRIPTION ---
+I still can't enter the Outpost. I made a comment about it in the game
+
+--- DEVICE / BUILD ---
+Device
+  Name: Pixel 10 Pro XL
+  Platform: android 37
+  Hermes: yes
+  Locale: en-US
+  Timezone: America/New_York
+  Screen: window 443×986 / screen 443×986 @ 2.4375x density
+  Captured at: 2026-09-04T18:31:44.784Z
+
+Install
+  App ID: com.hotatticgames.tartarprim
+  App version: 4.32.11
+  APK build version: 2.4.1
+  APK build: 293
+  AAB: (build 293)
+  OTA: (2026-09-04-1667-the-key-goes-where-the-player-is)
+  Boot stage: qwen:done
+
+ML runtime health
+  Status: active (no crashes detected)
+  Crash count: 0
+  Last init attempt: 2026-09-04T18:25:44.455Z
+  Last init success: 2026-09-04T18:25:45.887Z
+  Crashes-before-disable threshold: 2
+  Qwen completion guard: clean (no completion crashes)
+  Qwen kernel variant: rnllama_v8_2_fp16_dotprod
+  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k
+  Voice (TTS) guard: clean (no voice crashes on this build)
+Save-load health
+  Status: clean (no load-crash flags)
+Last JS crash
+  Status: none recorded
+This launch
+  Life: bmtnaast54u · started 2026-09-04T18:25:19.961Z
+  Cold start — this boot did not follow an OTA apply
+Crash ledger — 10 recorded (newest last)
+  • 2026-09-03T02:52:27.753Z (2379m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-03-1639-every-ingredient-exists · stage rendered
+      Process died with no orderly exit while: tap "craft"
+      doing: tap "craft" · room mud_flood_nexus · screen exploration
+      last checkpoint: rendered · 7466ms into the action · alive 1498ms after it
+      launch: died 21448ms into the process · not an OTA-apply boot
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-03T12:10:12.789Z (1822m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-03-1642-every-drop-has-a-name-in-the-book · stage mid-action
+      Process died with no orderly exit while: tap "inventory"
+      doing: tap "inventory" · room mud_flood_nexus · screen exploration
+      launch: died 12819ms into the process · not an OTA-apply boot
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-03T15:48:24.471Z (1603m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-03-1643-the-dice-riders-pay · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 838ms into the action · alive 11400ms after it
+      launch: died 12276ms into the process · not an OTA-apply boot
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-03T19:31:31.355Z (1380m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-03-1648-a-fourth-ring · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 901ms into the action · alive 0ms after it
+      launch: died 956ms into the process · not an OTA-apply boot
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-03T20:39:06.948Z (1313m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-03-1649-what-a-ring-is-for · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 750ms into the action · alive 0ms after it
+      launch: died 803ms into the process · not an OTA-apply boot
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-03T21:28:44.213Z (1263m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-03-1649-what-a-ring-is-for · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 707ms into the action · alive 0ms after it
+      launch: died 797ms into the process · not an OTA-apply boot
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-03T22:43:58.985Z (1188m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-03-1653-the-wear-ward · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 627ms into the action · alive 0ms after it
+      launch: died 672ms into the process · not an OTA-apply boot
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-04T04:42:22.271Z (829m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-04-1664-no-phantom-syllable · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 743ms into the action · alive 0ms after it
+      launch: died 776ms into the process · not an OTA-apply boot
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-04T13:31:35.149Z (300m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-04-1665-the-bug-report-pushes · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 1075ms into the action · alive 62922ms after it
+      launch: died 64046ms into the process · not an OTA-apply boot
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-04T18:21:13.034Z (11m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-04-1667-the-key-goes-where-the-player-is · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 956ms into the action · alive 0ms after it
+      launch: died 1006ms into the process · not an OTA-apply boot
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+Crash delivery: ON — reports go to Sentry when you crash.
+Runtime pressure
+  ⚠⚠ LAST BOOT DIED MID-ACTION — no orderly exit was recorded.
+     Last thing the app did: (no action yet)
+     Where: (unknown) on (unknown) screen
+     Last seen alive: 2026-09-04T18:21:13.034Z (11 min before this boot — the kill landed somewhere in that gap)
+     Last checkpoint reached: boot:qwen:deferred (+956ms after it)
+     ⚠ The disk log's tail is UNRELIABLE for that session — batched lines
+       die in memory when the JS thread wedges. Trust this line over it.
+  Memory warnings: none this session
+  Freeze watch: no stalls seen (JS clocks only — see the native queue below)
+  ⚠ Native queue: worst wait 2.7s · 0 job kinds queued >3s · worst 11.0ms/prompt-token · 5 generations thrown away (39.9s)
+     The JS thread was healthy and the native model queue was not. A stall the freeze watch above is structurally blind to.
+  App state trail: background → active → background → active
+Model contexts
+  Live now: 1
+  Opened: 1 · Released: 0 · Peak live: 1
+  Narration engine: ready
+
+--- VOICE ---
+  TTS enabled: no
+  Engine: bundled
+  Rate: 1.05 · Pitch: 1.00
+  System voice id: (default)
+  Kokoro voice: am_michael
+  Kokoro state: idle
+
+--- INVENTORY ---
+Inventory (Cheddar Bob)
+  HP: 47/50  Stamina: 21/21  TC: 421  Corruption: 3
+  Pack: 179 distinct rows / 1398 total
+
+Weapons (27)
+  Aetheric Shield-Hammer (Uncommon, 2d6 bludgeoning, dur 41/41, [weapon,melee,two_handed,hammer,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Aetheric Spark Wand (1d6 aetheric, dur 38/38, [runecaster,rune_power,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Acid-Etched Auralite Talon (Rare, +1d4 acid coat, dur 35/35, 2d6 aetheric, resist:aetheric, unique, [fused,unique,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bone Crossbow (Uncommon, 2d6 piercing, dur 2/10, [weapon,ranged,crossbow,bolt-caster,loot])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Bone Siege Crossbow (Uncommon, 2d6 piercing, dur 26/26, [weapon,ranged,two_handed,crossbow,giants])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Searing Choir-Bound Launcher (Rare, +1d4 burn coat, dur 35/35, 2d6 aetheric, resist:aetheric, unique, [fused,unique,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Energy Baton (Uncommon, 1d8 electrical, dur 36/36, [weapon,melee,dual_wield,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Force Wave Wand (1d6 force, dur 30/30, [weapon,runecaster,rune_power,aetheric,force])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Giant-Watch Greatspear (Uncommon, 2d6 piercing, dur 26/26, ♥reserved, [weapon,melee,two_handed,faction_gear,servants_of_giants])
+    actions: equip:main, equip:off, use(off), scrap, release-from-fusion, drop
+  Litany Maul (Legendary, dur 75/75, 1d12+2 bludgeoning, unique, [core_guardian_set,aether_born,blunt,two_handed,stagger_chance])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Magnetic Axe (Rare, 2d6 electrical, dur 41/41, [weapon,melee,single_handed,axe,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Armor Rod (Uncommon, 1d8 bludgeoning, dur 39/39, [runecaster,rune_power,mud_dwellers,ward])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Grip Wand (1d6 bludgeoning, dur 42/42, [runecaster,rune_power,mud_dwellers,restrain])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Shell Wand (1d6 bludgeoning, dur 22/22, [runecaster,rune_power,mud_dwellers,ward])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Spear (Runecaster) (Uncommon, 2d6 piercing, dur 27/27, [runecaster,rune_power,mud_dwellers,loot])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Venom Blade (Rare, 2d6 poison, dur 25/25, [weapon,melee,dual_wield,blade,mud_dwellers])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Frost-Rimed Mud-Iron Greatblade (Rare, 2d8 slashing, +1d6 cold coat, dur 16/16, [weapon,melee,two_handed,blade,mud])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Pillar Brand (Uncommon, dur 25/25, 1d8 bludgeoning, unique, [fused,unique])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Pulse-Woven Edge (Legendary, dur 45/45, 2d8 aetheric, resist:aetheric, unique, [fused,unique,faction_gear,servants_of_giants,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Smoldering Reclaimers Guild Geode-Cored Cleaver (Legendary, +1d4 burn coat, dur 35/35, equipped:main, ♥reserved, 2d6 bludgeoning, unique, [fused,unique,faction_gear,reclaimers_guild])
+    actions: equip:off, unequip:main, use(off), release-from-fusion
+  Corrupted Reclaimers Guild Shroud-Spun Slinger (Legendary, +1d4 corruption coat, dur 35/35, equipped:off, 2d6 bludgeoning, unique, [fused,unique,faction_gear,reclaimers_guild])
+    actions: equip:main, unequip:off, use
+  Sentinel Cleaver (Rare, 2d8 slashing, dur 22/34, [weapon,blade,melee,sentinel])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Sentinel Cleaver (Rare, 2d8 slashing, dur 25/25, [weapon,blade,melee,sentinel])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Slick Mud Wand (1d6 bludgeoning, dur 27/27, [runecaster,rune_power,mud_dwellers,terrain])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Sparkstrike Wand (1d6 electrical, dur 40/40, [weapon,runecaster,rune_power,aetheric,electrical])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Vine Grasp Wand (1d6 piercing, dur 41/41, [runecaster,rune_power,mud_dwellers,restrain])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Void Pulse Rod (Uncommon, 2d6 aetheric, dur 13/13, [weapon,runecaster,rune_power,aetheric,crafted])
+    actions: equip:main, equip:off, use(off), scrap, drop
+
+Armor (14)
+  Aether-Walker's Boots (Uncommon, dur 27/27, equipped:feet, AC +4 · Resists: aetheric, acid (coated), cold (coated) · Regen: +1 stamina per action · DEX +4 · STR +2, [armor,feet,boots,tartarian_giants])
+    actions: unequip:feet
+  Aether-Walker's Boots (Uncommon, dur 22/22, AC +4 · Resists: aetheric · Regen: +1 stamina per action · DEX +4 · STR +2, [armor,feet,boots,tartarian_giants])
+    actions: equip:feet, use, scrap, drop
+  Architect's Sight Enhancer (Uncommon, dur 35/35, equipped:head, AC +3 · Resists: cold, cold (coated) · Regen: +1 HP per action · WIS +3 · INT +1, [armor,head,cloth,helmet,architectural_sentinels])
+    actions: unequip:head
+  Forgotten Protector's Plate (Uncommon, dur 42/42, AC +2 · Resists: slashing · DEX +1, [armor,chest,plate,unknowing_masses])
+    actions: equip:chest, use, scrap, drop
+  Forgotten Seeker's Mask (Rare, dur 45/45, AC +3 · Resists: slashing, aetheric · DEX +3, [armor,head,mask,face,reclaimers])
+    actions: equip:head, use, scrap, drop
+  Litany Greaves (Legendary, dur 80/85, equipped:legs, AC+3, unique, [core_guardian_set,aether_born,ac:3,legs,heavy])
+    actions: unequip:legs, repair
+  Lumenforged Stompers (Rare, dur 35/35, AC+3, resist:aetheric, unique, [fused,unique,aetheric])
+    actions: equip:feet, use, scrap, drop
+  Mask of the Aether Seeker (Uncommon, dur 12/12, AC +5 · Resists: aetheric · CHA +5 · DEX +2, [armor,head,mask,face,aetherborn])
+    actions: equip:head, use, scrap, drop
+  Mud-glass Scales (Uncommon, dur 49/49, equipped:chest, AC +4 · Resists: piercing, burn (coated) · Regen: +2 stamina per action, [armor,chest,scale,mud_glass,true_tartarians])
+    actions: unequip:chest
+  Mudstone Bulwark (Rare, dur 61/61, AC +4 · Resists: bludgeoning, piercing · HP +30, [armor,chest,heavy,stone,mud])
+    actions: equip:chest, use, scrap, drop
+  Reclaimer's Cloak (dur 13/13, AC +2 · Resists: cold, burn (coated), acid (coated) · DEX +2 · STE +2, [armor,cloak,outer,reclaimers,stealth])
+    actions: equip:cloak, use, scrap, drop
+  Relic Hunter's Gauntlets (Uncommon, dur 27/27, AC +4 · Resists: slashing, cold (coated), burn (coated) · DEX +4 · STR +2, [armor,hands,gauntlets,reclaimers])
+    actions: equip:hands, use, scrap, drop
+  Titan's Gauntlets (dur 16/16, AC +2 · STR +2, [armor,hands,gauntlets,tartarian_giants])
+    actions: equip:hands, use, scrap, drop
+  Veil-Stitched Plate (Uncommon, dur 25/25, AC+2, unique, [fused,unique])
+    actions: equip:chest, use, scrap, drop
+
+Shields (1)
+  Grounded Buckler (Uncommon, 1d6 bludgeoning, dur 323/323, [weapon,shield,dual_wield,unknowing_masses])
+    actions: equip:off, use(off), scrap, drop
+
+Dog Armor (5)
+  ◆ Aetheric Padded Vest ×2 (Rare, dur 28/28, ♥reserved, AC +3 (dog) · Bites back: 1 aetheric to whatever hits the dog, [dog_armor,vest,aether,padded,loot])
+    actions: scrap, release-from-fusion, drop
+  ◆ Burlap Vest ×8 (dur 18/18, AC +1 (dog), [dog_armor,vest,burlap,loot,improvised])
+    actions: scrap, save-for-fusion, drop
+  ◆ Dog Aetheric Padded Vest (Rare, dur 18/18, AC +3 · Resists: aetheric, [dog_armor,vest,aether,padded,armor])
+    actions: scrap, save-for-fusion, drop
+  ◆ Riveted Leather Vest (Uncommon, dur 24/24, ♥reserved, AC +2 (dog), [dog_armor,vest,leather,loot,cloth])
+    actions: scrap, release-from-fusion, drop
+  Vein-Threaded Cover (Rare, dur 35/35, AC+3, resist:poison, unique, [fused,unique,poison])
+    actions: scrap, drop
+
+Amulets & Rings (11)
+  Aether-Shard Ring (Uncommon, dur 30/30, INT +1 · Resists aetheric: −10% incoming damage of each, on top of armour, [ring,aether,crafted])
+    actions: equip:ring, use, scrap, drop
+  Aetheric Locket ×2 (dur 30/30, WIS +1 · Resists aetheric: −9% incoming damage of each, on top of armour, [detection,amulet,relic])
+    actions: equip:amulet, use, scrap, drop
+  Aetheric Locket (dur 30/30, WIS +1 · Resists aetheric: −9% incoming damage of each, on top of armour, [amulet,relic,detection])
+    actions: equip:amulet, use, scrap, drop
+  Amulet of the Silt Warden (Rare, dur 40/40, equipped:amulet, WIS +2 · Resists poison, corruption: −20% incoming damage of each, on top of armour, [amulet,mud,crafted])
+    actions: unequip:amulet
+  Golem Controller Ring (Uncommon, dur 35/35, INT +1, [ring,construct])
+    actions: equip:ring, use, scrap, drop
+  Rustbane Charm (dur 30/30, Resists degradation: −9% incoming damage of each, on top of armour, [amulet,charm,crafted])
+    actions: equip:amulet, use, scrap, drop
+  Rusted Band of Knowledge (dur 25/25, INT +1, [ring,scholarly])
+    actions: equip:ring, use, scrap, drop
+  Scribe's Signet ×2 (Uncommon, dur 35/35, INT +2 · WIS +1, [ring,signet,scholarly,crafted])
+    actions: equip:ring, use, scrap, drop
+  Tartarian Oath-Band ×2 (Uncommon, dur 35/35, equipped:ring, STR +2, [ring,faction_gear,true_tartarians,oath])
+    actions: unequip:ring
+  Tin Ward Ring ×2 (Rare, dur 40/40, Resists acid: −15% incoming damage of each, on top of armour · Everything you wear or wield lasts 15% longer, [ring,crafted,defensive])
+    actions: equip:ring, use, scrap, drop
+  Tin Ward Ring (Rare, dur 40/40, Resists acid: −15% incoming damage of each, on top of armour · Everything you wear or wield lasts 15% longer, [ring,crafted,defensive])
+    actions: equip:ring, use, scrap, drop
+
+Consumables (20)
+  Bioluminescent Fungus (Uncommon, [food,foraged,mushroom,light,aether])
+    actions: use(eat), drop
+  Bioluminescent Fungus (Uncommon, [fungus,light,gear,food,foraged])
+    actions: use(eat), drop
+  Blue Aetheric Fungus ([fungus,blue,distillable,food,foraged])
+    actions: use(eat), drop
+  Blueberries ×7 (Uncommon, [food,foraged,fruit])
+    actions: use(eat), drop
+  Field Dressing ×8 ([healing,crafted])
+    actions: use(eat), drop
+  First Aid Kit (Uncommon, [healing,crafted])
+    actions: use(apply), drop
+  Forager's Stew ×2 (Uncommon, [food,cooked,stew])
+    actions: use(eat), drop
+  Orange Sporecap ([food,foraged,mushroom,orange])
+    actions: use(eat), drop
+  Raspberries ×2 (Uncommon, [food,foraged,fruit])
+    actions: use(eat), drop
+  Reclaimer's Mud-Beer ×2 ([alcohol,drink])
+    actions: use(drink), drop
+  Smoke-Cured Jerky Strip ×6 ([food,treat,dog_treat])
+    actions: use(eat), drop
+  Speckled Egg (Uncommon, [food,foraged,protein])
+    actions: use(eat), drop
+  Trail Rations ×25 ([food])
+    actions: use(eat), drop
+  Trauma Kit ×8 (Rare, [healing,crafted])
+    actions: use(eat), drop
+  Wild Carrot ×18 ([food,foraged,vegetable])
+    actions: use(eat), drop
+  Wild Chicken ×2 (Rare, [food,foraged,meat])
+    actions: use(eat), drop
+  Wild Grapes ×3 (Uncommon, [food,foraged,fruit])
+    actions: use(eat), drop
+  Wild Lettuce ×11 ([food,foraged,leafy])
+    actions: use(eat), drop
+  Wild Oats ×22 ([food,foraged,grain])
+    actions: use(eat), drop
+  Wild Onion ×18 ([food,foraged,vegetable])
+    actions: use(eat), drop
+
+Coatings (6)
+  Acid Flask ×42 (Uncommon, [potion,weapon_coating,acid,crafted])
+    actions: drop
+  Corruption Tonic ×13 (Uncommon, [potion,weapon_coating,corruption,crafted])
+    actions: use(apply), drop
+  Frost Paste ×12 (Uncommon, [potion,weapon_coating,cold,aether,crafted])
+    actions: use(eat), drop
+  Incendiary Paste ×13 (Uncommon, [potion,weapon_coating,burn,aether,crafted])
+    actions: use(eat), drop
+  Searing Paste ×2 (Uncommon, [potion,weapon_coating,burn,aether,crafted])
+    actions: use(eat), drop
+  Smoldering Paste ×3 (Uncommon, [potion,weapon_coating,
+(pack listing trimmed at 12000 characters)
+
+--- CHARACTER LOG (newest first) ---
+(Newest entry at top — showing the most recent 330 of 3653 entries; older trimmed to fit a single email paste)
+
+[2026-09-04T18:31:23.649Z] [debug] appstate: background → active (was background for 79374ms)
+[2026-09-04T18:30:04.269Z] [debug] appstate: active → background (was active for 70739ms)
+[2026-09-04T18:29:39.319Z] [world] You repair the Titan's Gauntlets. Back to full. (spent: Patched Cloth x4)
+[2026-09-04T18:29:39.301Z] [arbiter] The Arbiter nods. "Patched in: Aetheric Blood → Patched Cloth, Copper-Threaded Veil → Patched Cloth, Tar-Black Lashing → Patched Cloth, Cracked Carapace Curl → Patched Cloth."
+[2026-09-04T18:29:37.936Z] [arbiter] The Arbiter stops with his hand over your pack. "Before I touch the Titan's Gauntlets — 4 pieces of this is Crucible stock: Aetheric Blood, Copper-Threaded Veil, Tar-Black Lashing, Cracked Carapace Curl. Say the word and I'll set it aside instead."
+[2026-09-04T18:29:34.012Z] [world] You repair the Corrupted Resonant Reclaimers Guild Shroud-Spun Slinger. Back to full. (spent: Small Rock x2)
+[2026-09-04T18:29:32.888Z] [world] You repair the Reclaimer's Cloak. Back to full. (spent: Patched Cloth x4)
+[2026-09-04T18:29:32.870Z] [arbiter] The Arbiter nods. "Patched in: 3× Cloth Scrap → Patched Cloth, Tortoise Shell → Patched Cloth."
+[2026-09-04T18:29:31.291Z] [arbiter] The Arbiter stops with his hand over your pack. "Before I touch the Reclaimer's Cloak — 1 piece of this is Crucible stock: Tortoise Shell. Say the word and I'll set it aside instead."
+[2026-09-04T18:29:30.278Z] [debug] persist sizes(KB): total=334 player=70 wm=175[rooms=100 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=87 scene=2
+[2026-09-04T18:29:30.040Z] [world] You repair the Mud-glass Scales. Back to full. (spent: Patched Cloth x4)
+[2026-09-04T18:29:30.021Z] [arbiter] The Arbiter nods. "Patched in: Frayed Rigging Twine → Patched Cloth, Tattered Gauze Roll → Patched Cloth, Web-Silk Wadding → Patched Cloth, Cloth Scrap → Patched Cloth."
+[2026-09-04T18:29:28.575Z] [arbiter] The Arbiter stops with his hand over your pack. "Before I touch the Mud-glass Scales — 3 pieces of this is Crucible stock: Frayed Rigging Twine, Tattered Gauze Roll, Web-Silk Wadding. Say the word and I'll set it aside instead."
+[2026-09-04T18:29:27.325Z] [world] You repair the Crude Golem Sledge. Back to full. (spent: Scrap Metal x2)
+[2026-09-04T18:29:25.722Z] [world] You repair the Architect's Sight Enhancer. Back to full. (spent: Patched Cloth x4)
+[2026-09-04T18:29:25.708Z] [arbiter] The Arbiter nods. "Patched in: Eddy-Zone Reading → Patched Cloth, Stiffened Leather Offcut → Patched Cloth."
+[2026-09-04T18:29:21.155Z] [arbiter] The Arbiter stops with his hand over your pack. "Before I touch the Architect's Sight Enhancer — 1 piece of this is Crucible stock: Stiffened Leather Offcut. Say the word and I'll set it aside instead."
+[2026-09-04T18:29:14.749Z] [debug] qwen⏱ ✂ DISCARDED ambient after 5088ms — ambient:preempted
+[2026-09-04T18:29:14.749Z] [debug] arbiter: ambient cut short 5376ms — yielded to the player
+[2026-09-04T18:29:14.743Z] [cognitive] SEARCH · TRAVEL · USE_ITEM  (285ms)
+[2026-09-04T18:29:14.737Z] [debug] qwen⏱ ambient preempted 5088ms read 3095ms/write 1633ms in 366t→out 16t 8.5ms/t (39ch)
+[2026-09-04T18:29:14.456Z] [reward] ✦ Crafted Tartarian Oath-Band. The Arbiter watches you set the last piece.
+[2026-09-04T18:29:14.453Z] [debug] parser: intent=craft conf=1.00 verb=craft target=tartarian oath band resolved=Tartarian Oath-Band range=- enemies=0 hooks=0
+[2026-09-04T18:29:14.453Z] [player] craft Tartarian Oath-Band
+[2026-09-04T18:29:09.657Z] [cognitive] neutral  (282ms)
+[2026-09-04T18:29:09.372Z] [reward] ✦ Crafted Scribe's Signet. The Arbiter watches you set the last piece.
+[2026-09-04T18:29:09.361Z] [debug] parser: intent=craft conf=1.00 verb=craft target=scribe signet resolved=- range=- enemies=0 hooks=0
+[2026-09-04T18:29:09.360Z] [player] craft Scribe's Signet
+[2026-09-04T18:29:01.204Z] [reward] ✦ Crafted Rusted Band of Knowledge. The Arbiter watches you set the last piece.
+[2026-09-04T18:29:01.195Z] [debug] parser: intent=craft conf=1.00 verb=craft target=rusted band knowledge resolved=- range=- enemies=0 hooks=0
+[2026-09-04T18:29:01.195Z] [player] craft Rusted Band of Knowledge
+[2026-09-04T18:28:53.530Z] [debug] appstate: background → active (was background for 54840ms)
+[2026-09-04T18:27:58.691Z] [debug] appstate: active → background (was active for 132803ms)
+[2026-09-04T18:27:52.621Z] [cognitive] neutral  (279ms)
+[2026-09-04T18:27:52.340Z] [reward] ✦ Crafted Golem Controller Ring. The Arbiter watches you set the last piece.
+[2026-09-04T18:27:52.338Z] [debug] parser: intent=craft conf=1.00 verb=craft target=golem controller ring resolved=- range=- enemies=0 hooks=0
+[2026-09-04T18:27:52.338Z] [player] craft Golem Controller Ring
+[2026-09-04T18:27:40.599Z] [debug] homework: scene_intro "Tartarian Pilgrim Camp" ∅ 10359ms
+[2026-09-04T18:27:40.598Z] [debug] qwen⏱ ✂ DISCARDED narration:scene_intro_fill after 10328ms — intro-fill:near-dup
+[2026-09-04T18:27:40.575Z] [debug] qwen⏱ narration:scene_intro_fill ok 10328ms read/write unusable (native mis-reported 27614ms/3139ms — llama.rn split bug, not this call) in 753t→out 33t HIT-CAP (146ch)
+[2026-09-04T18:27:30.241Z] [debug] homework: intro-fill armed after 6000ms idle (strike 3/3)
+[2026-09-04T18:27:20.036Z] [debug] ui: tap "craft"
+[2026-09-04T18:27:18.851Z] [debug] ui: tap "more ▸"
+[2026-09-04T18:27:16.763Z] [debug] persist sizes(KB): total=335 player=71 wm=174[rooms=100 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=87 scene=2
+[2026-09-04T18:27:16.302Z] [cognitive] SWIM  (202ms)
+[2026-09-04T18:27:16.099Z] [system] ⏳ Time passed: 24 min
+[2026-09-04T18:27:16.091Z] [reward] You scrape at the silt with the sentinel cleaver. ✦ Recovered Firewood (Common).
+[2026-09-04T18:27:16.088Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=- range=- enemies=0 hooks=0
+[2026-09-04T18:27:16.087Z] [player] investigate the mud
+[2026-09-04T18:27:15.479Z] [debug] qwen⏱ ✂ DISCARDED ambient after 8159ms — ambient:preempted
+[2026-09-04T18:27:15.478Z] [debug] arbiter: ambient cut short 8567ms — yielded to the player
+[2026-09-04T18:27:15.271Z] [debug] qwen⏱ ambient preempted 8159ms wait 2685ms read 0ms/write 0ms in 366t→out 0t (0ch)
+[2026-09-04T18:27:14.457Z] [debug] ui: tap "investigate"
+[2026-09-04T18:27:11.108Z] [cognitive] SWIM  (286ms)
+[2026-09-04T18:27:10.820Z] [system] ⏳ Time passed: 24 min
+[2026-09-04T18:27:10.808Z] [reward] You scrape at the silt with the sentinel cleaver. ✦ Recovered Stick (Common).
+[2026-09-04T18:27:10.803Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=- range=- enemies=0 hooks=0
+[2026-09-04T18:27:10.802Z] [player] investigate the mud
+[2026-09-04T18:27:09.635Z] [debug] qwen⏱ investigate_lore ok 2524ms read 1258ms/write 1128ms in 127t→out 25t 9.9ms/t (127ch)
+[2026-09-04T18:27:08.564Z] [debug] ui: tap "investigate"
+[2026-09-04T18:27:07.125Z] [cognitive] neutral  (212ms)
+[2026-09-04T18:27:06.909Z] [world] The ladder reads as ordinary, which down here is a small kind of relief. You leave it be.
+[2026-09-04T18:27:06.907Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ladder resolved=ladder range=- enemies=0 hooks=0
+[2026-09-04T18:27:06.907Z] [player] investigate ladder
+[2026-09-04T18:27:05.861Z] [cognitive] SWIM  (205ms)
+[2026-09-04T18:27:05.655Z] [system] ⏳ Time passed: 24 min
+[2026-09-04T18:27:05.647Z] [reward] You scrape at the silt with the sentinel cleaver. ✦ Recovered Scrap Metal (Common).
+[2026-09-04T18:27:05.642Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=- range=- enemies=0 hooks=0
+[2026-09-04T18:27:05.642Z] [player] investigate the mud
+[2026-09-04T18:27:04.017Z] [debug] ui: tap "investigate"
+[2026-09-04T18:26:50.449Z] [reward] Bought 4× Wild Onion from Vosk Barrowman for 28 TC. (421 TC left)
+[2026-09-04T18:26:50.014Z] [debug] homework: scene_intro "Tartarian Pilgrim Camp" ✓ 4825ms
+[2026-09-04T18:26:50.014Z] [debug] qwen⏱ ✂ DISCARDED narration:scene_intro_fill after 4807ms — intro-fill:action-opener
+[2026-09-04T18:26:50.009Z] [debug] qwen⏱ narration:scene_intro_fill ok 4807ms read 3684ms/write 1085ms in 754t→out 33t 4.9ms/t HIT-CAP (149ch)
+[2026-09-04T18:26:48.512Z] [debug] persist sizes(KB): total=337 player=71 wm=175[rooms=100 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=88 scene=2
+[2026-09-04T18:26:48.293Z] [reward] Bought 2× Forager's Stew from Vosk Barrowman for 28 TC. (449 TC left)
+[2026-09-04T18:26:45.190Z] [debug] homework: intro-fill armed after 6000ms idle (strike 2/3)
+[2026-09-04T18:26:36.329Z] [reward] Bought Patched Cloth from Vosk Barrowman for 6 TC. (477 TC left)
+[2026-09-04T18:26:31.798Z] [reward] Bought Skyreacher Map 4 of 5 — Thametan Tower from Vosk Barrowman for 157 TC. (483 TC left)
+[2026-09-04T18:26:16.534Z] [reward] Sold Crude Golem Pike (Common) to Vosk Barrowman for 5 TC. (640 TC on hand)
+[2026-09-04T18:26:16.469Z] [reward] Sold Shaman's Warden Gloves (Common) to Vosk Barrowman for 6 TC. (635 TC on hand)
+[2026-09-04T18:26:16.396Z] [reward] Sold Titan's Trail Leggings (Common) to Vosk Barrowman for 8 TC. (629 TC on hand)
+[2026-09-04T18:26:11.789Z] [debug] homework: scene_intro "Tartarian Pilgrim Camp" ∅ 11667ms
+[2026-09-04T18:26:11.789Z] [debug] qwen⏱ ✂ DISCARDED narration:scene_intro_fill after 11470ms — intro-fill:near-dup
+[2026-09-04T18:26:11.781Z] [debug] qwen⏱ narration:scene_intro_fill ok 11470ms read 8273ms/write 2916ms in 754t→out 33t 11.0ms/t HIT-CAP (150ch)
+[2026-09-04T18:26:00.124Z] [debug] homework: intro-fill armed after 6000ms idle
+[2026-09-04T18:25:52.948Z] [world] Vosk Barrowman does not greet you. They watch your hands.
+[2026-09-04T18:25:52.948Z] [world] [Tartarian Pilgrim Camp] north: Garrin (return the folio) (17 tiles, 1 day, 19 hours) · east: Sinking Cathedral (3 tiles, 8 hours) · south: The Buried Cities (3 tiles, 8 hours) · west: Dynasty Border Post (4 tiles, 10 hours)
+[2026-09-04T18:25:52.945Z] [world] This ground has stopped being a place and started being a route. The bodies you left are still here. Nothing has moved in to replace them.
+Hazard: Spatial Distortion. Distance unspools. A chamber thirty paces wide becomes thirty paces deep, then thirty paces tall. The geometry refuses to settle.
+You are at Tartarian Pilgrim Camp. A rest-camp of True Tartarian pilgrims on the frontier track, where the faithful gather before the long descent into the deep buried cities.
+[2026-09-04T18:25:52.945Z] [world] Rain the color of old oil. It pools on Aetherstone and refuses to soak in.
+[2026-09-04T18:25:52.842Z] [debug] missions: · at=pilgrim_waycamp travelTo=mud_seas
+[2026-09-04T18:25:52.841Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc="Halem the Trader" gives=Halem's Broken Compass PAUSED
+[2026-09-04T18:25:52.841Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc="the Mud Monarch courier" gives=Monarch Courier Writ PAUSED
+[2026-09-04T18:25:52.841Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading✓ gives=Temporal Distortion Watch PAUSED
+[2026-09-04T18:25:52.840Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc="the Order envoy" gives=Sealed Reliquary Box PAUSED
+[2026-09-04T18:25:52.840Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc="the True Tartarian agent" gives=Enclave Writ PAUSED
+[2026-09-04T18:25:52.839Z] [debug] missions: hunt:hunt_bog_dragon stage 5/7 [attack_provoke→attack] @mud_seas needs=Eshren's Name-Token✓ spawn=Mud Harpy×3 AMBUSH
+[2026-09-04T18:25:52.839Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss→attack] @reavers_crest needs=Raider's Ridge-Sign✓ PAUSED
+[2026-09-04T18:25:52.837Z] [debug] scene: loc=pilgrim_waycamp hub=- arrival=n opening=n passing=y
+[2026-09-04T18:25:52.837Z] [world] You cross to the gate and step through.
+[2026-09-04T18:25:52.836Z] [player] enter outpost
+[2026-09-04T18:25:52.833Z] [debug] ui: tap "ENTER OUTPOST"
+[2026-09-04T18:25:45.724Z] [debug] ctx: OPENED — live=1 (opened=1 released=0) ≈425MB est
+[2026-09-04T18:25:44.521Z] [arbiter] The Arbiter eyes one corner of Tartarian Pilgrim Camp. "Begin there, if you must begin somewhere."
+[2026-09-04T18:25:44.521Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-04T18:25:44.521Z] [world] [Tartarian Pilgrim Camp] north: Garrin (return the folio) (17 tiles, 1 day, 19 hours) · east: Sinking Cathedral (3 tiles, 8 hours) · south: The Buried Cities (3 tiles, 8 hours) · west: Dynasty Border Post (4 tiles, 10 hours)
+[2026-09-04T18:25:44.518Z] [world] You could walk this stretch with your eyes shut, and nearly do. The bodies you left are still here. Nothing has moved in to replace them.
+You are at Tartarian Pilgrim Camp. A rest-camp of True Tartarian pilgrims on the frontier track, where the faithful gather before the long descent into the deep buried cities.
+[2026-09-04T18:25:44.517Z] [world] Rain the color of old oil. It pools on Aetherstone and refuses to soak in.
+[2026-09-04T18:25:44.463Z] [debug] missions: · at=pilgrim_waycamp travelTo=mud_seas
+[2026-09-04T18:25:44.463Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc="Halem the Trader" gives=Halem's Broken Compass PAUSED
+[2026-09-04T18:25:44.463Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc="the Mud Monarch courier" gives=Monarch Courier Writ PAUSED
+[2026-09-04T18:25:44.462Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading✓ gives=Temporal Distortion Watch PAUSED
+[2026-09-04T18:25:44.462Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc="the Order envoy" gives=Sealed Reliquary Box PAUSED
+[2026-09-04T18:25:44.462Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc="the True Tartarian agent" gives=Enclave Writ PAUSED
+[2026-09-04T18:25:44.462Z] [debug] missions: hunt:hunt_bog_dragon stage 5/7 [attack_provoke→attack] @mud_seas needs=Eshren's Name-Token✓ spawn=Mud Harpy×3 AMBUSH
+[2026-09-04T18:25:44.461Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss→attack] @reavers_crest needs=Raider's Ridge-Sign✓ PAUSED
+[2026-09-04T18:25:44.460Z] [debug] scene: loc=pilgrim_waycamp hub=- arrival=n opening=n passing=y
+[2026-09-04T18:25:44.459Z] [world] You cross to the gate and step through.
+[2026-09-04T18:25:44.458Z] [player] enter outpost
+[2026-09-04T18:25:44.456Z] [debug] qwen: loading (was idle) — the Arbiter speaks templates until it is ready
+[2026-09-04T18:25:44.451Z] [debug] ui: tap "ENTER OUTPOST"
+[2026-09-04T18:25:25.836Z] [debug] send-log: crash on record (2026-09-04T18:21:13.034Z) — game log pushed automatically, delivered to Sentry, kept on disk as #mtnaawyn2pyt
+[2026-09-04T18:25:25.003Z] [debug] boot: life bmtnaast54u started 2026-09-04T18:25:19.961Z · not an OTA apply (no handoff on disk)
+[2026-09-04T18:25:25.003Z] [debug] missions: · at=pilgrim_waycamp travelTo=mud_seas
+[2026-09-04T18:25:25.003Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc="Halem the Trader" gives=Halem's Broken Compass PAUSED
+[2026-09-04T18:25:25.002Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc="the Mud Monarch courier" gives=Monarch Courier Writ PAUSED
+[2026-09-04T18:25:25.002Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading✓ gives=Temporal Distortion Watch PAUSED
+[2026-09-04T18:25:25.002Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc="the Order envoy" gives=Sealed Reliquary Box PAUSED
+[2026-09-04T18:25:25.002Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc="the True Tartarian agent" gives=Enclave Writ PAUSED
+[2026-09-04T18:25:25.002Z] [debug] missions: hunt:hunt_bog_dragon stage 5/7 [attack_provoke→attack] @mud_seas needs=Eshren's Name-Token✓ spawn=Mud Harpy×3 AMBUSH
+[2026-09-04T18:25:25.002Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss→attack] @reavers_crest needs=Raider's Ridge-Sign✓ PAUSED
+[2026-09-04T18:25:25.001Z] [debug] ═══ SESSION 2026-09-04T18:25:24.998Z · build 2026-09-04-1667-the-key-goes-where-the-player-is · previous entry moments earlier ═══
+[2026-09-04T18:25:24.646Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. "Welcome back, Cheddar Bob. We've still got ground to cover, you and I."
+[2026-09-04T18:25:24.646Z] [world] You step back into Tartarian Pilgrim Camp. The world waits for your move.
+[2026-09-04T18:25:24.645Z] [debug] OTA session start: 2026-09-04-1667-the-key-goes-where-the-player-is.
+[2026-09-04T18:25:20.366Z] [debug] send-log: bundle #mtn91pdwbmaq attempt 4/5 delivered to Sentry
+[2026-09-04T18:25:20.174Z] [debug] voice: bundled idle
+[2026-09-04T18:25:20.174Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-04T18:25:20.136Z] [debug] ota: boot check result = noUpdate
+[2026-09-04T18:25:20.135Z] [debug] ota: Already up to date
+[2026-09-04T18:25:20.064Z] [debug] ota: Checking…
+[2026-09-04T18:25:20.064Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a06d9f-be19-7224-b96c-c03c37d04562
+[2026-09-04T18:21:12.662Z] [debug] send-log: bundle #mtn91pdwbmaq attempt 3/5 delivered to Sentry
+[2026-09-04T18:21:12.385Z] [debug] voice: bundled idle
+[2026-09-04T18:21:12.385Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-04T18:21:12.336Z] [debug] ota: boot check result = noUpdate
+[2026-09-04T18:21:12.335Z] [debug] ota: Already up to date
+[2026-09-04T18:21:12.126Z] [debug] ota: Checking…
+[2026-09-04T18:21:12.126Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a06d9f-be19-7224-b96c-c03c37d04562
+[2026-09-04T17:52:14.651Z] [debug] send-log: bundle #mtn91pdwbmaq attempt 2/5 delivered to Sentry
+[2026-09-04T17:52:14.414Z] [debug] voice: bundled idle
+[2026-09-04T17:52:14.414Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-04T17:52:14.310Z] [debug] ota: boot check result = noUpdate
+[2026-09-04T17:52:14.310Z] [debug] ota: Already up to date
+[2026-09-04T17:52:14.086Z] [debug] ota: Checking…
+[2026-09-04T17:52:14.085Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a06d87-38f8-7831-97fd-534048e16ec4
+[2026-09-04T17:52:13.788Z] [debug] ctx: RELEASED — live=0 (opened=1 released=1)
+[2026-09-04T17:52:07.585Z] [debug] persist sizes(KB): total=336 player=71 wm=175[rooms=100 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=88 scene=2
+[2026-09-04T17:52:07.482Z] [debug] appstate: background → active (was background for 95258ms)
+[2026-09-04T17:50:32.224Z] [debug] appstate: active → background (was active for 65186ms)
+[2026-09-04T17:50:16.294Z] [debug] send-log: #mtn91pdwbmaq — DELIVERED (inline, no attachments): beacon out, 4/4 parts accepted (47811 chars) — flush said yes
+[2026-09-04T17:50:03.368Z] [debug] send-log: #mtn91f6kkav3 — DELIVERED (inline, no attachments): beacon out, 4/4 parts accepted (47825 chars) — flush said yes
+[2026-09-04T17:49:29.465Z] [debug] homework: item_desc "Architect Sigil" ✓ 2422ms
+[2026-09-04T17:49:29.453Z] [debug] qwen⏱ item_synthesis_hw ok 1579ms read 544ms/write 1009ms in 331t→out 30t 1.6ms/t (134ch)
+[2026-09-04T17:49:27.045Z] [debug] freeze watch: recovered — painting again after 1024ms quiet.
+[2026-09-04T17:49:27.038Z] [debug] appstate: background → active (was background for 65155ms)
+[2026-09-04T17:48:41.895Z] [debug] homework: item_desc "Reclaimers Guild Geode-Cored Cleaver" ✓ 23858ms
+[2026-09-04T17:48:41.871Z] [debug] qwen⏱ item_synthesis_hw ok 20151ms read 3706ms/write 16261ms in 343t→out 51t 10.8ms/t (191ch)
+[2026-09-04T17:48:21.884Z] [debug] appstate: active → background (was active for 70053ms)
+[2026-09-04T17:48:21.723Z] [debug] ⚠ FREEZE WATCH: LOGIC stalled while frames kept coming (js 3585ms · frames 0ms). Something blocked the JS thread — look for a long synchronous run. · crumb before: native:homework:start +9673ms → now: native:homework:start +1ms · doing: (no action yet) · native: homework running · q0
+[2026-09-04T17:48:16.511Z] [debug] qwen⏱ item_synthesis_hw ok 4463ms read 265ms/write 3710ms in 321t→out 44t 0.8ms/t (162ch)
+[2026-09-04T17:47:44.174Z] [debug] homework: item_desc "Pillar Brand" ✓ 2287ms
+[2026-09-04T17:47:44.170Z] [debug] qwen⏱ item_synthesis_hw ok 2261ms read 699ms/write 1533ms in 322t→out 46t 2.2ms/t (194ch)
+[2026-09-04T17:47:30.095Z] [world] You break the Woven Stride down. ✦ Recovered: Small Rock.
+[2026-09-04T17:47:30.015Z] [world] You break the Riveted Leather Vest down. ✦ Recovered: Patched Cloth x2.
+[2026-09-04T17:47:14.274Z] [debug] homework: item_desc "Auralite Talon" ✓ 2424ms
+[2026-09-04T17:47:14.264Z] [debug] qwen⏱ item_synthesis_hw ok 1800ms read 461ms/write 1312ms in 327t→out 40t 1.4ms/t (155ch)
+[2026-09-04T17:47:11.830Z] [debug] appstate: background → active (was background for 71814ms)
+[2026-09-04T17:46:00.016Z] [debug] appstate: active → background (was active for 24745ms)
+[2026-09-04T17:45:37.809Z] [debug] homework: item_desc "Mud Armor Rod" ✓ 2537ms
+[2026-09-04T17:45:37.806Z] [debug] qwen⏱ item_synthesis_hw ok 2522ms read 469ms/write 2021ms in 332t→out 50t 1.4ms/t (177ch)
+[2026-09-04T17:45:35.271Z] [debug] appstate: background → active (was background for 33816ms)
+[2026-09-04T17:45:03.529Z] [debug] persist sizes(KB): total=337 player=71 wm=175[rooms=100 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=89 scene=2
+[2026-09-04T17:45:01.455Z] [debug] appstate: active → background (was active for 24196ms)
+[2026-09-04T17:44:39.579Z] [debug] homework: item_desc "Woven Stride" ✓ 2305ms
+[2026-09-04T17:44:39.572Z] [debug] qwen⏱ item_synthesis_hw ok 1729ms read 373ms/write 1206ms in 322t→out 37t 1.2ms/t (155ch)
+[2026-09-04T17:44:37.259Z] [debug] appstate: background → active (was background for 65364ms)
+[2026-09-04T17:43:31.895Z] [debug] appstate: active → background (was active for 162507ms)
+[2026-09-04T17:43:08.772Z] [debug] homework: item_desc "Raspberries" ✓ 4245ms
+[2026-09-04T17:43:08.761Z] [debug] qwen⏱ item_synthesis_hw ok 4228ms read 3520ms/write 673ms in 324t→out 22t 10.9ms/t (96ch)
+[2026-09-04T17:42:58.177Z] [debug] ui: tap "inventory"
+[2026-09-04T17:42:49.979Z] [world] You repair the Aetheric Padded Vest. Back to full. (spent: Aetheric Shard x6, Aether Crystal x2, Aether Dust x2, Small Rock x6, Patched Cloth x6)
+[2026-09-04T17:42:49.963Z] [arbiter] The Arbiter nods. "Patched in: Worm Mucus → Patched Cloth, 2× Moth-Eaten Felt Scrap → Patched Cloth, Waxed Yarn Bundle → Patched Cloth, Oil-Stained Sash → Patched Cloth, Stiffened Leather Offcut → Patched Cloth."
+[2026-09-04T17:42:48.051Z] [arbiter] The Arbiter stops with his hand over your pack. "Before I touch the Aetheric Padded Vest — 6 pieces of this is Crucible stock: Worm Mucus, 2× Moth-Eaten Felt Scrap, Waxed Yarn Bundle, Oil-Stained Sash, Stiffened Leather Offcut. Say the word and I'll set it aside instead."
+[2026-09-04T17:42:47.151Z] [world] You repair the Aether-Walker's Boots. Back to full. (spent: Patched Cloth x4)
+[2026-09-04T17:42:44.053Z] [debug] ui: tap "craft"
+[2026-09-04T17:42:42.618Z] [debug] ui: tap "more ▸"
+[2026-09-04T17:42:38.504Z] [cognitive] neutral  (207ms)
+[2026-09-04T17:42:38.296Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-04T17:42:38.295Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-09-04T17:42:38.295Z] [arbiter] The Arbiter follows your gaze up. "The weathered bird nest is up on the tilting submerged giant statue, tier 1. Climb the tilting submerged giant statue for it."
+[2026-09-04T17:42:38.294Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=weathered bird nest resolved=weathered bird nest range=- enemies=0 hooks=0
+[2026-09-04T17:42:38.293Z] [player] investigate weathered bird nest
+[2026-09-04T17:42:37.452Z] [debug] persist sizes(KB): total=337 player=73 wm=174[rooms=100 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=88 scene=2
+[2026-09-04T17:42:37.211Z] [cognitive] SWIM  (200ms)
+[2026-09-04T17:42:37.010Z] [system] ⏳ Time passed: 24 min
+[2026-09-04T17:42:37.002Z] [reward] You scrape at the silt with the sentinel cleaver. ✦ Recovered Orange Sporecap (Common).
+[2026-09-04T17:42:36.997Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=- range=- enemies=0 hooks=0
+[2026-09-04T17:42:36.996Z] [player] investigate the mud
+[2026-09-04T17:42:34.704Z] [debug] ui: tap "investigate"
+[2026-09-04T17:42:31.898Z] [cognitive] neutral  (362ms)
+[2026-09-04T17:42:31.534Z] [arbiter] The Arbiter follows your gaze up. "The weathered bird nest is up on the tilting submerged giant statue, tier 1. Climb the tilting submerged giant statue for it."
+[2026-09-04T17:42:31.533Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=weathered bird nest resolved=weathered bird nest range=- enemies=0 hooks=0
+[2026-09-04T17:42:31.532Z] [player] investigate weathered bird nest
+[2026-09-04T17:42:30.460Z] [cognitive] SWIM  (199ms)
+[2026-09-04T17:42:30.260Z] [system] ⏳ Time passed: 24 min
+[2026-09-04T17:42:30.251Z] [world] You scrape at the silt with the sentinel cleaver. Nothing of worth.
+[2026-09-04T17:42:30.250Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=- range=- enemies=0 hooks=0
+[2026-09-04T17:42:30.249Z] [player] investigate the mud
+[2026-09-04T17:42:28.749Z] [debug] ui: tap "investigate"
+[2026-09-04T17:42:27.347Z] [reward]     • Bone-Handled Rivet (Uncommon)
+[2026-09-04T17:42:27.347Z] [reward]     • Stick x2 (Common)
+[Filtered][2026-09-04T17:42:26.454Z] [world] You lift the Titan's Trail Leggings clear.
+[2026-09-04T17:42:26.453Z] [reward] ✦ Shaman's Warden Gloves (Common).
+[2026-09-04T17:42:26.453Z] [world] You pick up the Shaman's Warden Gloves.
+[2026-09-04T17:42:26.434Z] [reward] ✦ Crude Golem Pike (Common).
+[2026-09-04T17:42:26.433Z] [world] You take the Crude Golem Pike from where it lay.
+[2026-09-04T17:42:25.383Z] [debug] ui: tap "take / salvage"
+[2026-09-04T17:42:23.272Z] [debug] meta-comment guard: skipped intent parse (report-of-behaviour: "it won't let") on 105-char input
+[2026-09-04T17:42:23.270Z] [arbiter] The Arbiter studies you, plainly. "I'm not sure what you're trying to tell me. I'll keep your note in the log either way. If you mean to act, phrase it as a verb — 'investigate the rubble', 'go east', 'attack the figure'."
+[2026-09-04T17:42:23.268Z] [player] I am trying to enter this outpost, but it won't let me, if there is a legit reason it should tell me why.
+[2026-09-04T17:42:03.353Z] [debug] homework: scene_intro "Tartarian Pilgrim Camp" ✓ 8868ms
+[2026-09-04T17:42:03.158Z] [debug] qwen⏱ narration:scene_intro_fill ok 8497ms read 7381ms/write 1089ms in 751t→out 33t 9.8ms/t HIT-CAP (167ch)
+[2026-09-04T17:41:54.486Z] [debug] homework: intro-fill armed after 12714ms idle
+[2026-09-04T17:41:52.234Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-
+[2026-09-04T17:41:51.835Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=360 from=cached winH=986 beat=-
+[2026-09-04T17:41:47.064Z] [debug] arbiter: qwen ✓ 13948ms (intent=scene_intro)
+[2026-09-04T17:41:47.062Z] [arbiter] You, the Arbiter, stood at the brazier, the air thick with the scent of decaying grass and the faint odors of damp earth.
+[2026-09-04T17:41:46.718Z] [debug] qwen⏱ stats — narration:scene_intro_fill n3 avg10.2s max12.5s read8.6s/write5.2s ⚠1unusable in756t→out22t ms/tok 11.3-11.3 cap2 ⏸1 ✂1/11.4s | ambient n2 avg4.4s max6.1s ⚠2unusable in365t→out0t ⏸2 ✂2/8.9s | narration:scene_intro n2 avg11.0s max13.4s ⚠2unusable in779t→out33t cap2 ⏸1 ✂1/8.7s | investigate_lore n2 avg4.2s max5.9s read1.5s/write0.8s in128t→out24t ms/tok 11.2-11.5 wait1.9s | flourish n1 avg4.6s max4.6s read1.9s/write0.3s in175t→out9t ms/tok 11.1-11.1 wait2.4s || WASTED 4 calls / 28.9s
+[2026-09-04T17:41:46.718Z] [debug] qwen⏱ narration:scene_intro ok 13417ms read/write unusable (native mis-reported 17409ms/1596ms — llama.rn split bug, not this call) in 776t→out 33t HIT-CAP (137ch)
+[2026-09-04T17:41:38.976Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-04T17:41:38.975Z] [debug] arbiter: template (reason=busy)
+[2026-09-04T17:41:38.975Z] [world] [Tartarian Pilgrim Camp] north: Garrin (return the folio) (17 tiles, 1 day, 19 hours) · east: Sinking Cathedral (3 tiles, 8 hours) · south: The Buried Cities (3 tiles, 8 hours) · west: Dynasty Border Post (4 tiles, 10 hours)
+[2026-09-04T17:41:38.970Z] [world] Your feet do the thinking here. You are just along for it. The bodies you left are still here. Nothing has moved in to replace them.
+You are at Tartarian Pilgrim Camp. A rest-camp of True Tartarian pilgrims on the frontier track, where the faithful gather before the long descent into the deep buried cities.
+[2026-09-04T17:41:38.970Z] [world] Rain the color of old oil. It pools on Aetherstone and refuses to soak in.
+[2026-09-04T17:41:38.970Z] [debug] dedup: suppressed arbiter repeat — "The Arbiter tilts their head toward you. "You can just ask m…"
+[2026-09-04T17:41:38.970Z] [arbiter] The Arbiter tilts their head toward you. "You can just ask me things, you know — a faction, a place, a name you half-remember. I keep more than I offer."
+[2026-09-04T17:41:38.942Z] [debug] missions: · at=pilgrim_waycamp travelTo=mud_seas
+[2026-09-04T17:41:38.942Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc="Halem the Trader" gives=Halem's Broken Compass PAUSED
+[2026-09-04T17:41:38.942Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc="the Mud Monarch courier" gives=Monarch Courier Writ PAUSED
+[2026-09-04T17:41:38.942Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading✓ gives=Temporal Distortion Watch PAUSED
+[2026-09-04T17:41:38.942Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc="the Order envoy" gives=Sealed Reliquary Box PAUSED
+[2026-09-04T17:41:38.942Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc="the True Tartarian agent" gives=Enclave Writ PAUSED
+[2026-09-04T17:41:38.941Z] [debug] missions: hunt:hunt_bog_dragon stage 5/7 [attack_provoke→attack] @mud_seas needs=Eshren's Name-Token✓ spawn=Mud Harpy×3 AMBUSH
+[2026-09-04T17:41:38.941Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss→attack] @reavers_crest needs=Raider's Ridge-Sign✓ PAUSED
+[2026-09-04T17:41:38.941Z] [debug] scene: loc=pilgrim_waycamp hub=- arrival=n opening=n passing=y
+[2026-09-04T17:41:38.940Z] [world] You cross to the gate and step through.
+[2026-09-04T17:41:38.940Z] [player] enter outpost
+[2026-09-04T17:41:38.939Z] [debug] ui: tap "ENTER OUTPOST"
+[2026-09-04T17:41:38.372Z] [debug] persist sizes(KB): total=336 player=72 wm=174[rooms=99 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=88 scene=2
+[2026-09-04T17:41:38.018Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-04T17:41:38.018Z] [debug] arbiter: template (reason=busy)
+[2026-09-04T17:41:38.016Z] [world] [Tartarian Pilgrim Camp] north: Garrin (return the folio) (17 tiles, 1 day, 19 hours) · east: Sinking Cathedral (3 tiles, 8 hours) · south: The Buried Cities (3 tiles, 8 hours) · west: Dynasty Border Post (4 tiles, 10 hours)
+[2026-09-04T17:41:38.009Z] [world] Familiar to the point of invisibility. The bodies you left are still here. Nothing has moved in to replace them.
+Violet threads briefly knit the air, then forget the pattern.
+Hazard: Flooded Tunnel. Standing water laced with Aether residue. Things move beneath the surface.
+You are at Tartarian Pilgrim Camp. A rest-camp of True Tartarian pilgrims on the frontier track, where the faithful gather before the long descent into the deep buried cities.
+[2026-09-04T17:41:38.009Z] [world] Rain the color of old oil. It pools on Aetherstone and refuses to soak in.
+[2026-09-04T17:41:38.008Z] [arbiter] The Arbiter tilts their head toward you. "You can just ask me things, you know — a faction, a place, a name you half-remember. I keep more than I offer."
+[2026-09-04T17:41:37.975Z] [debug] missions: · at=pilgrim_waycamp travelTo=mud_seas
+[2026-09-04T17:41:37.974Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc="Halem the Trader" gives=Halem's Broken Compass PAUSED
+[2026-09-04T17:41:37.974Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc="the Mud Monarch courier" gives=Monarch Courier Writ PAUSED
+[2026-09-04T17:41:37.974Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading✓ gives=Temporal Distortion Watch PAUSED
+[2026-09-04T17:41:37.973Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc="the Order envoy" gives=Sealed Reliquary Box PAUSED
+[2026-09-04T17:41:37.973Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc="the True Tartarian agent" gives=Enclave Writ PAUSED
+[2026-09-04T17:41:37.973Z] [debug] missions: hunt:hunt_bog_dragon stage 5/7 [attack_provoke→attack] @mud_seas needs=Eshren's Name-Token✓ spawn=Mud Harpy×3 AMBUSH
+[2026-09-04T17:41:37.972Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss→attack] @reavers_crest needs=Raider's Ridge-Sign✓ PAUSED
+[2026-09-04T17:41:37.971Z] [debug] scene: loc=pilgrim_waycamp hub=- arrival=n opening=n passing=y
+[2026-09-04T17:41:37.971Z] [world] You cross to the gate and step through.
+[2026-09-04T17:41:37.971Z] [player] enter outpost
+[2026-09-04T17:41:37.970Z] [debug] ui: tap "ENTER OUTPOST"
+[2026-09-04T17:41:36.910Z] [world] [Tartarian Pilgrim Camp] north: Garrin (return the folio) (17 tiles, 1 day, 19 hours) · east: Sinking Cathedral (3 tiles, 8 hours) · south: The Buried Cities (3 tiles, 8 hours) · west: Dynasty Border Post (4 tiles, 10 hours)
+[2026-09-04T17:41:36.906Z] [world] You stopped looking at this place some visits ago. The bodies you left are still here. Nothing has moved in to replace them.
+Hazard: Aetheric Storm Burst. A localized burst of pure Aether discharge. Reality buckles for a moment.
+You are at Tartarian Pilgrim Camp. A rest-camp of True Tartarian pilgrims on the frontier track, where the faithful gather before the long descent into the deep buried cities.
+[2026-09-04T17:41:36.906Z] [world] Rain the color of old oil. It pools on Aetherstone and refuses to soak in.
+[2026-09-04T17:41:36.873Z] [debug] missions: · at=pilgrim_waycamp travelTo=mud_seas
+[2026-09-04T17:41:36.873Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc="Halem the Trader" gives=Halem's Broken Compass PAUSED
+[2026-09-04T17:41:36.873Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc="the Mud Monarch courier" gives=Monarch Courier Writ PAUSED
+[2026-09-04T17:41:36.873Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading✓ gives=Temporal Distortion Watch PAUSED
+[2026-09-04T17:41:36.872Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc="the Order envoy" gives=Sealed Reliquary Box PAUSED
+[2026-09-04T17:41:36.872Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc="the True Tartarian agent" gives=Enclave Writ PAUSED
+[2026-09-04T17:41:36.872Z] [debug] missions: hunt:hunt_bog_dragon stage 5/7 [attack_provoke→attack] @mud_seas needs=Eshren's Name-Token✓ spawn=Mud Harpy×3 AMBUSH
+[2026-09-04T17:41:36.872Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss→attack] @reavers_crest needs=Raider's Ridge-Sign✓ PAUSED
+[2026-09-04T17:41:36.871Z] [debug] scene: loc=pilgrim_waycamp hub=- arrival=n opening=n passing=y
+[2026-09-04T17:41:36.871Z] [world] You cross to the gate and step through.
+[2026-09-04T17:41:36.871Z] [player] enter outpost
+[2026-09-04T17:41:36.870Z] [debug] ui: tap "ENTER OUTPOST"
+[2026-09-04T17:41:35.878Z] [world] [Tartarian Pilgrim Camp] north: Garrin (return the folio) (17 tiles, 1 day, 19 hours) · east: Sinking Cathedral (3 tiles, 8 hours) · south: The Buried Cities (3 tiles, 8 hours) · west: Dynasty Border Post (4 tiles, 10 hours)
+[2026-09-04T17:41:35.874Z] [world] You know this patch better than you ever meant to. The bodies you left are still here. Nothing has moved in to replace them.
+Hazard: Temporal Loop. You walk the same corridor and find yourself walking it again. The Aetheric field has caught the moment in a fold.
+You are at Tartarian Pilgrim Camp. A rest-camp of True Tartarian pilgrims on the frontier track, where the faithful gather before the long descent into the deep buried cities.
+[2026-09-04T17:41:35.873Z] [world] Rain the color of old oil. It pools on Aetherstone and refuses to soak in.
+[2026-09-04T17:41:35.845Z] [debug] missions: · at=pilgrim_waycamp travelTo=mud_seas
+[2026-09-04T17:41:35.845Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc="Halem the Trader" gives=Halem's Broken Compass PAUSED
+[2026-09-04T17:41:35.845Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc="the Mud Monarch courier" gives=Monarch Courier Writ PAUSED
+[2026-09-04T17:41:35.845Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading✓ gives=Temporal Distortion Watch PAUSED
+[2026-09-04T17:41:35.844Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc="the Order envoy" gives=Sealed Reliquary Box PAUSED
+[2026-09-04T17:41:35.844Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc="the True Tartarian agent" gives=Enclave Writ PAUSED
+[2026-09-04T17:41:35.844Z] [debug] missions: hunt:hunt_bog_dragon stage 5/7 [attack_provoke→attack] @mud_seas needs=Eshren's Name-Token✓ spawn=Mud Harpy×3 AMBUSH
+[2026-09-04T17:41:35.844Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss→attack] @reavers_crest needs=Raider's Ridge-Sign✓ PAUSED
+[2026-09-04T17:41:35.843Z] [debug] scene: loc=pilgrim_waycamp hub=- arrival=n opening=n passing=y
+[2026-09-04T17:41:35.842Z] [world] You cross to the gate and step through.
+[2026-09-04T17:41:35.841Z] [player] enter outpost
+[2026-09-04T17:41:35.837Z] [debug] ui: tap "ENTER OUTPOST"
+[2026-09-04T17:41:34.832Z] [world] [Tartarian Pilgrim Camp] north: Garrin (return the folio) (17 tiles, 1 day, 19 hours) · east: Sinking Cathedral (3 tiles, 8 hours) · south: The Buried Cities (3 tiles, 8 hours) · west: Dynasty Border Post (4 tiles, 10 hours)
+[2026-09-04T17:41:34.827Z] [world] This ground has stopped being a place and started being a route. The bodies you left are still here. Nothing has moved in to replace them.
+You are at Tartarian Pilgrim Camp. A rest-camp of True Tartarian pilgrims on the frontier track, where the faithful gather before the long descent into the deep buried cities.
+[2026-09-04T17:41:34.827Z] [world] Rain the color of old oil. It pools on Aetherstone and refuses to soak in.
+[2026-09-04T17:41:34.797Z] [debug] missions: · at=pilgrim_waycamp travelTo=mud_seas
+[2026-09-04T17:41:34.797Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc="Halem the Trader" gives=Halem's Broken Compass PAUSED
+[2026-09-04T17:41:34.797Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc="the Mud Monarch courier" gives=Monarch Courier Writ PAUSED
+
+=== END REPORT ===

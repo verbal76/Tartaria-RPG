@@ -1,0 +1,272 @@
+{
+  "id": "75df9a35d9254817a2ffb0fd124ccce4",
+  "groupID": "7712848145",
+  "eventID": "75df9a35d9254817a2ffb0fd124ccce4",
+  "projectID": "4511945117532160",
+  "size": 18066,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-04-1674-the-dead-life-answers #mtnlu0casj0h [inline 19/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1674-the-dead-life-answers",
+  "message": "player-log 2026-09-04-1674-the-dead-life-answers #mtnlu0casj0h [inline 19/28]",
+  "title": "player-log 2026-09-04-1674-the-dead-life-answers #mtnlu0casj0h [inline 19/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "c5b67a9338b7442887fcbe9331ce1a85",
+      "span_id": "be7cafa4edcda137",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "n opening=n passing=y\n[2026-09-04T22:05:44.247Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n[2026-09-04T22:05:44.247Z] [debug] missions: hunt:hunt_bog_dragon stage 5/7 [attack_provoke\u2192attack] @mud_seas needs=Eshren's Name-Token\u2713 spawn=Mud Harpy\u00d73 AMBUSH\n",
+      "[2026-09-04T22:05:44.247Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n[2026-09-04T22:05:44.247Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc=\"the Order envoy\" gives=Sealed Reliquary Box PAUSED\n",
+      "[2026-09-04T22:05:44.249Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2717MISSING gives=Temporal Distortion Watch PAUSED\n[2026-09-04T22:05:44.249Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n",
+      "[2026-09-04T22:05:44.249Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n[2026-09-04T22:05:44.249Z] [debug] missions: \u00b7 at=giant_watch_shrine travelTo=mud_seas\n[2026-09-04T22:05:44.261Z] [debug] spawn: gear=[Rusted Blade, Tartarian Claw Knife] window=10 roster=new\n",
+      "[2026-09-04T22:05:44.275Z] [world] A low-hanging mist that murmurs in old Tartarian. Step too far in and you forget which century you came from.\n\nYou are at Giant-Watch Shrine. A roadside vigil-shrine of the Servants of the Giants at the frontier, where keepers wait and watch before the long road down to the giant vaults.\n[2026-09-04T22:05:44.276Z] [system] Weather effect \u2014 Whisper Fog: -1 WIS\n",
+      "[2026-09-04T22:05:44.278Z] [world] [Cradle of Dusk Outskirts] north: the Silt Thief (15 tiles, 1 day, 14 hours) \u00b7 east: Revivalist Field Camp (2 tiles, 5 hours) \u00b7 south: The Slack Flats (2 tiles, 5 hours) \u00b7 west: Giant-Watch Shrine (4 tiles, 10 hours)\n[2026-09-04T22:05:44.288Z] [system] \u23f3 Time passed: 1h\n",
+      "[2026-09-04T22:05:44.294Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.\n[2026-09-04T22:05:44.313Z] [player] exit outpost\n[2026-09-04T22:05:44.314Z] [debug] parser: intent=travel conf=1.00 verb=exit target=outpost resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-09-04T22:05:44.314Z] [world] You're already out in the open \u2014 there's nothing here to step out of. Pick a direction and walk.\n[2026-09-04T22:05:45.493Z] [debug] qwen\u23f1 ambient preempted 11309ms read 4308ms/write 1092ms in 365t\u2192out 31t 11.8ms/t HIT-CAP (142ch)\n[2026-09-04T22:05:45.891Z] [debug] arbiter: ambient cut short 11911ms \u2014 yielded to the player\n",
+      "[2026-09-04T22:05:45.891Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient after 11309ms \u2014 ambient:preempted\n[2026-09-04T22:05:46.090Z] [cognitive] RETREAT \u00b7 DISENGAGE \u00b7 HIDE  (1801ms)\n[2026-09-04T22:05:46.287Z] [cognitive] RETREAT \u00b7 DISENGAGE \u00b7 HIDE  (1971ms)\n[2026-09-04T22:05:46.479Z] [debug] qwen\u23f1 narration:scene_intro preempted 593ms wait 401ms (0ch)\n",
+      "[2026-09-04T22:05:46.687Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro after 593ms \u2014 cancelled:player-acted-again\n[2026-09-04T22:05:49.062Z] [debug] freeze watch: recovered \u2014 painting again after 3370ms quiet.\n[2026-09-04T22:05:57.481Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-09-04T22:05:59.084Z] [debug] ui: tap \"\u2605 Take & wield Rusted Blade \u2014 your off hand is free\"\n",
+      "[2026-09-04T22:05:59.090Z] [world] You work the Rusted Blade loose from where the mud had it.\n[2026-09-04T22:05:59.090Z] [reward] \u2726 Rusted Blade (Common).\n[2026-09-04T22:05:59.107Z] [debug] take&wear: equipping \"Rusted Blade\" -> off\n[2026-09-04T22:05:59.108Z] [world] You set the Giant-Watch Greatspear aside to free your off hand for the Rusted Blade.\n",
+      "[2026-09-04T22:05:59.225Z] [debug] stats: STR19 DEX18 INT14 WIS17 CHA12 STE8 | gear: WIS+5,INT+3,STR+7,DEX+6,STE+2 | worn: off=Rusted Blade head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Amulet of the Silt Warden ring=Tartarian Oath-Band ring2=Tin Ward Ring ring3=Tin Ward Ring ring4=Scribe",
+      "'s Signet\n[2026-09-04T22:06:00.632Z] [debug] persist sizes(KB): total=340 player=77 wm=178[rooms=103 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=82 scene=2\n[2026-09-04T22:06:01.916Z] [debug] ui: tap \"\u2605 Take & wield Tartarian Claw Knife \u2014 your main hand is empty\"\n[2026-09-04T22:06:01.919Z] [world] The Tartarian Claw Knife had settled into the ground. You unsettle it.\n",
+      "[2026-09-04T22:06:01.920Z] [reward] \u2726 Tartarian Claw Knife (Common).\n[2026-09-04T22:06:01.937Z] [debug] take&wear: equipping \"Tartarian Claw Knife\" -> main\n[2026-09-04T22:06:02.066Z] [debug] stats: STR19 DEX18 INT14 WIS17 CHA12 STE9 | gear: WIS+5,INT+3,STR+7,DEX+6,STE+3 | worn: main=Tartarian Claw Knife off=Rusted Blade head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets",
+      " legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Amulet of the Silt Warden ring=Tartarian Oath-Band ring2=Tin Ward Ring ring3=Tin Ward Ring ring4=Scribe's Signet\n[2026-09-04T22:06:05.324Z] [debug] ui: tap \"inventory\"\n[2026-09-04T22:06:06.311Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 8613ms read 7120ms/write 1291ms in 733t\u2192out 33t 9.7ms/t HIT-CAP (173ch)\n",
+      "[2026-09-04T22:06:06.320Z] [debug] homework: scene_intro \"Giant-Watch Shrine\" \u2713 8842ms\n[2026-09-04T22:06:19.632Z] [debug] qwen\u23f1 item_synthesis_hw ok 7153ms read 4340ms/write 1575ms in 339t\u2192out 47t 12.8ms/t (174ch)\n[2026-09-04T22:06:20.557Z] [debug] homework: item_desc \"Blue Aetheric Fungus\" \u2713 8092ms\n",
+      "[2026-09-04T22:06:20.964Z] [debug] stats: STR19 DEX18 INT15 WIS17 CHA12 STE8 | gear: WIS+5,INT+4,STR+7,DEX+6,STE+2 | worn: main=Auralite Talon off=Rusted Blade head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Amulet of the Silt Warden ring=Tartarian Oath-Band ring2=Tin Ward Ring ring3=Tin Wa",
+      "rd Ring ring4=Scribe's Signet\n[2026-09-04T22:06:42.482Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-09-04T22:06:52.671Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 10184ms read 8988ms/write 1149ms in 738t\u2192out 33t 12.2ms/t HIT-CAP (133ch)\n[2026-09-04T22:06:52.687Z] [debug] homework: scene_intro \"Giant-Watch Shrine\" \u2713 10206ms\n",
+      "[2026-09-04T22:06:58.277Z] [debug] stats: STR18 DEX18 INT17 WIS17 CHA12 STE8 | gear: WIS+5,INT+6,STR+6,DEX+6,STE+2 | worn: main=Auralite Talon off=Void Pulse Rod head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Amulet of the Silt Warden ring=Tartarian Oath-Band ring2=Tin Ward Ring ring3=Tin ",
+      "Ward Ring ring4=Scribe's Signet\n[2026-09-04T22:07:02.811Z] [debug] qwen\u23f1 item_synthesis_hw ok 5288ms read 3767ms/write 1389ms in 329t\u2192out 42t 11.4ms/t (177ch)\n[2026-09-04T22:07:03.024Z] [debug] homework: item_desc \"Hardened Mudstone\" \u2713 5513ms\n[2026-09-04T22:07:04.895Z] [debug] kbbar: mounted bottom=359.79486083984375 raw=360 from=cached winH=986 beat=-\n",
+      "[2026-09-04T22:07:05.298Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-09-04T22:07:48.325Z] [player] weapons category in inventory should have subsections for each type of weapon, I don't know what's what, mele, spear, ranged and so on.\n",
+      "[2026-09-04T22:07:48.326Z] [arbiter] The Arbiter studies you, plainly. \"I'm not sure what you're trying to tell me. I'll keep your note in the log either way. If you mean to act, phrase it as a verb \u2014 'investigate the rubble', 'go east', 'attack the figure'.\"\n[2026-09-04T22:07:48.326Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter studies you, plainly. \"I'm not sure what you're \u2026\"\n",
+      "[2026-09-04T22:07:48.326Z] [debug] meta-comment guard: skipped intent parse (suggestion: \"should have\") on 135-char input\n[2026-09-04T22:07:51.408Z] [debug] ui: tap \"take / salvage\"\n[2026-09-04T22:07:52.668Z] [world] Whatever the Scrap Metal was lying against, it lets go without much argument.\n[2026-09-04T22:07:52.668Z] [reward] \u2726 Scrap Metal (Common).\n",
+      "[2026-09-04T22:07:53.717Z] [world] You work the banner over. A part of it comes loose, intact.\n[2026-09-04T22:07:53.718Z] [world] You strip the crate carefully. Something usable comes free in your hand.\n[2026-09-04T22:07:53.718Z] [world] You work the dust-buried crashed automaton chassis over. A part of it comes loose, intact.\n",
+      "[2026-09-04T22:07:53.718Z] [world] You lever something loose from the marker \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n[2026-09-04T22:07:53.718Z] [world] You salvage the rusted submerged giant statue. The take is small but real.\n[2026-09-04T22:07:53.719Z] [world] You salvage the salt-crusted lockbox. The take is small but real.\n",
+      "[2026-09-04T22:07:53.719Z] [reward] \u2726 Salvage haul:\n[2026-09-04T22:07:53.719Z] [reward]     \u2022 Aether Dust (Common)\n[2026-09-04T22:07:53.719Z] [reward]     \u2022 Worn Tartarian Coin x9 (Common)\n[2026-09-04T22:07:53.720Z] [reward]     \u2022 Scrap Metal x2 (Common)\n[2026-09-04T22:07:53.720Z] [reward]     \u2022 Driftwood Sliver (Common)\n[2026-09-04T22:07:53.720Z] [reward]     \u2022 Smooth Stone x2 (Common)\n",
+      "[2026-09-04T22:07:53.720Z] [reward]     \u2022 Aetheric Shard (Uncommon)\n[2026-09-04T22:07:55.176Z] [debug] ui: tap \"investigate\"\n[2026-09-04T22:07:56.741Z] [player] investigate the mud\n[2026-09-04T22:07:56.744Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=mud range=- enemies=0 hooks=0\n",
+      "[2026-09-04T22:07:56.745Z] [world] You inspect the mud. Whatever was here once, this is what remains.\n[2026-09-04T22:07:56.746Z] [world] Your study of the mud draws your eye to something past it \u2014 A thread of footprints, not yours, crosses your path and trails off.\n[2026-09-04T22:07:56.746Z] [world] Mud Scanner reads flat. Nothing in the mud.\n",
+      "[2026-09-04T22:07:56.747Z] [debug] investigate: \"mud\" marked searched\n[2026-09-04T22:07:56.747Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-09-04T22:07:56.747Z] [arbiter] The Arbiter looks around. \"The vigil has not been broken since the Flood. Shifts change without a word.\"\n[2026-09-04T22:07:56.749Z] [debug] arbiter: ambient held (he just spoke)\n",
+      "[2026-09-04T22:07:56.945Z] [cognitive] SWIM  (195ms)\n[2026-09-04T22:07:57.220Z] [debug] persist sizes(KB): total=341 player=77 wm=179[rooms=103 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=83 scene=2\n[2026-09-04T22:07:57.847Z] [debug] appstate: active \u2192 background (was active for 541472ms)\n[2026-09-04T22:08:16.501Z] [debug] appstate: background \u2192 active (was background for 18654ms)\n",
+      "[2026-09-04T22:08:16.761Z] [player] investigate crevice-pool\n[2026-09-04T22:08:16.761Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=crevice pool resolved=crevice-pool range=- enemies=0 hooks=1\n[2026-09-04T22:08:16.763Z] [world] You study the crevice-pool. It bears no marks worth naming \u2014 no glyph, no fingerprint, no trace the Reclaimers would catalog.\n",
+      "[2026-09-04T22:08:19.128Z] [debug] ui: tap \"\u2192 MUD SEAS\"\n[2026-09-04T22:08:19.146Z] [debug] spawn: gear=[Aetheric Warplate, Sentinel's Greaves, Forgotten Leggings] window=10 roster=new\n[2026-09-04T22:08:19.148Z] [world] You walk south through open silt. The compass tells you The Slack Flats lies further south \u2014 1 tile, about 3 hours of travel.\n",
+      "[2026-09-04T22:08:19.150Z] [world] The wind shifts a crust of mud aside ahead of you. Underneath, a small object.\n[2026-09-04T22:08:19.150Z] [reward] \u2726 Trail Rations (Common).\n[2026-09-04T22:08:19.150Z] [world] The loose end is exactly as loose as you left it.\n[2026-09-04T22:08:19.699Z] [debug] qwen\u23f1 investigate_lore ok 2557ms read 1417ms/write 1039ms in 129t\u2192out 33t 11.0ms/t (139ch)\n",
+      "[2026-09-04T22:08:20.380Z] [debug] ui: tap \"take / salvage\"\n[2026-09-04T22:08:21.450Z] [world] The Aetheric Warplate is heavier than it looks. Most things down here are.\n[2026-09-04T22:08:21.451Z] [reward] \u2726 Aetheric Warplate (Common).\n[2026-09-04T22:08:21.470Z] [world] The Forgotten Leggings is lighter than it looks, which is its own kind of warning.\n",
+      "[2026-09-04T22:08:21.470Z] [reward] \u2726 Forgotten Leggings (Common).\n[2026-09-04T22:08:21.472Z] [world] The Sentinel's Greaves is cold through your glove.\n[2026-09-04T22:08:21.472Z] [reward] \u2726 Sentinel's Greaves (Common).\n[2026-09-04T22:08:22.373Z] [world] The Scrap Metal fits the hand better than it has any right to.\n[2026-09-04T22:08:22.374Z] [reward] \u2726 Scrap Metal (Common).\n",
+      "[2026-09-04T22:08:23.227Z] [world] You work the cart over. A part of it comes loose, intact.\n[2026-09-04T22:08:23.228Z] [world] You salvage the signpost. The take is small but real.\n[2026-09-04T22:08:23.228Z] [world] You salvage the tent. The take is small but real.\n[2026-09-04T22:08:23.228Z] [reward] \u2726 Salvage haul:\n[2026-09-04T22:08:23.229Z] [reward]     \u2022 Worn Tartarian Coin x7 (Common)\n",
+      "[2026-09-04T22:08:23.229Z] [reward]     \u2022 Smooth Stone x3 (Common)\n[2026-09-04T22:08:23.229Z] [reward]     \u2022 Cloth Scrap x3 (Common)\n[2026-09-04T22:08:24.664Z] [debug] ui: tap \"investigate\"\n[2026-09-04T22:08:26.278Z] [player] investigate the mud\n[2026-09-04T22:08:26.279Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=mud range=- enemies=0 hooks=1\n",
+      "[2026-09-04T22:08:26.280Z] [world] You study the mud. The Aetheric haze around it thickens, then settles.\n[2026-09-04T22:08:26.281Z] [world] The mud carries the same blue-mud crust every relic-age artifact wears down here. Six inches of silt accreted since the flood last raised the seas.\n",
+      "[2026-09-04T22:08:26.281Z] [world] A sealed first aid kit, slipped behind the mud and forgotten. Bandages, salve, a single dose.\n[2026-09-04T22:08:26.282Z] [reward] \u2726 First Aid Kit (Uncommon).\n[2026-09-04T22:08:26.283Z] [world] Mud Scanner ticks \u2014 buried trace in the mud.\n[2026-09-04T22:08:26.283Z] [reward] \u2726 Mud Essence (Uncommon).\n",
+      "[2026-09-04T22:08:26.285Z] [debug] investigate: \"mud\" marked searched\n[2026-09-04T22:08:26.285Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-09-04T22:08:26.285Z] [arbiter] The Arbiter looks around. \"From the shrine the road runs down toward the giant vaults, and the keepers watch it the way sailors watch weather.\"\n",
+      "[2026-09-04T22:08:26.286Z] [debug] arbiter: ambient held (he just spoke)\n[2026-09-04T22:08:26.508Z] [cognitive] SWIM  (221ms)\n[2026-09-04T22:08:27.549Z] [player] investigate crevice-pool\n[2026-09-04T22:08:27.550Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=crevice pool resolved=crevice-pool range=- enemies=0 hooks=1\n",
+      "[2026-09-04T22:08:27.551Z] [world] You study the crevice-pool. It bears no marks worth naming \u2014 no glyph, no fingerprint, no trace the Reclaimers would catalog.\n[2026-09-04T22:08:27.552Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-09-04T22:08:27.552Z] [debug] arbiter: flavor held"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-04-1674-the-dead-life-answers #mtnlu0casj0h [inline 19/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtnlu0casj0h"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1674-the-dead-life-answers"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "19"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1674-the-dead-life-answers"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T23:48:10.176054Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T23:48:12.284000Z",
+  "fingerprints": [
+    "9a539618ef59f5fbf89b2d9bec7d1bb6"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1956404347,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-04T23:47:35.927290Z",
+    "dateReleased": "2026-09-04T23:48:24.735279Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "cc2abf544a2897d2e91a0d613af8eea6b385a38a",
+      "message": "[ota-hal] OTA-1674: the dead life answers for itself\n\nItem one of \"fix all existing issues one through six\": #110, the process kill\non nearly every boot. This is not the fix for the kill. It is the instrument\nthat the previous instrument turned out to be missing \u2014 and, by the owner's own\nrule recorded in contextLedger.ts, that is the correct thing to ship: measure\nthe cause, or ship an instrument.\n\nWHAT THE 19:40 LEDGER SAID, ENTRY BY ENTRY\nTen records. Eight at `stage boot:qwen:deferred`. Six of those dead 670\u20131006ms\ninto the process, `alive 0ms` after the stamp, `(no action yet)` \u2014 sub-second,\nbefore the first screen, before Qwen has loaded (it is DEFERRED). And every one\nof the eight: `not an OTA-apply boot`.\n\nThree things ruled out before anything was written:\n- a boot-front race \u2014 App.tsx AWAITS the OTA check and RETURNS on 'applied',\n  so `qwen:deferred` is unreachable on an apply. My first hypothesis, and wrong;\n- anything heavy at that stage \u2014 `armQwenWarm` stores a closure and returns;\n- ML init \u2014 mlHealth reports crash count 0.\n\nAND THE ONE THING THAT COULD NOT BE RULED EITHER WAY\nOTA-1587 asked of every death: did the process that died boot on the far side\nof `reloadAsync`? It stored the answer in the wrong life. The handoff that\ncarries it is consumed on read \u2014 correctly; a handoff is a fact about ONE boot\n\u2014 by the life that then dies, taking the only copy with it. The next boot finds\nno handoff, computes `afterOtaApply: false` about ITSELF, and bootSlice wrote\nthat onto the dead life's record. Structurally, a death record could never say\n\"yes\". \"Not an OTA-apply boot\" on eight of ten was not a finding; it was the\nonly value the field could take. The ota1587 suite pinned the exact line \u2014\n`afterOtaApply: launch.afterOtaApply,` \u2014 as correct.\n\nSo the fact now rides the CRUMB. `bootStampFields()` (the one writer every\ncrumb passes through) adds `afterOta` / `otaPath` / `otaGapMs` / `prevCtx` once\n`noteLaunchFacts` has run \u2014 early in hydrate, before any stage that matters \u2014\nand the record reads the dead life's own answer off its own crumb. A crumb from\nthe first milliseconds, before the launch resolved, leaves it UNDEFINED, and\nevery reader prints that as \"not known\", never as a cold start. \"Not known\" is\na fact; \"false\" is a lie, and it is exactly the lie that hid this for two OTAs.\n\nTWO MORE THINGS THE SAME READ TURNED UP\n- The ledger label keyed on `kind` alone, so the idle reclaims OTA-1567 already\n  made non-fatal (`isFatal: false`, and Sentry has honoured that as level\n  `error` since) still printed PROCESS KILLED \u2014 no JS ran in About and in every\n  bug report, and were counted in \"N recorded\". Two of the owner's ten were\n  that. A ledger that overstates kills to the one person reading it sends the\n  hunt at the wrong thing \u2014 OTA-1521's own words. The label now says what the\n  record knew, and the header says \"10 recorded, 8 fatal\".\n- The whole `launch` block \u2014 which life died, how old it was, what it inherited\n  \u2014 has been on every record since OTA-1587 and forwarded to Sentry on none.\n  The rollup it exists for could only ever be done by hand, on a device. It is\n  in `extra` now, three-valued.\n\nThe OTA-1587 rollup counts FATAL kills and only a true \"yes\"; an idle reclaim\non an apply boot is not the signal, and `undefined` is not a \"no\" \u2014 counting it\nas one would be the same defect one layer down. It also says out loud how many\ndied before their launch resolved, because the absence of that line is how the\nhole hid.\n\n\u26a0 NO BOOT-PHASE EXEMPTION, DELIBERATELY. Six sub-second no-action deaths look\nexactly like a force-close during the splash \u2014 the owner's recorded habit. They\nalso look exactly like OTA-1587's candidate (b): a reload-boot killed by a\nnative context the previous life never released, in a process `reloadAsync`\ndoes not restart. This instrument is what tells those two apart. Filing them as\nnon-fatal today would hide (b) if it is real \u2014 the blind-spot trade OTA-1377 and\nOTA-1413 both refused. The next log closes #110 one way or the other.\n\n- app/diagnostics/bootIdentity.ts \u2014 `BootStamp`, `bootStampFields` carries the\n  launch facts once resolved.\n- app/engine/saveSystem.ts \u2014 `LiveBreadcrumb` gains the four fields.\n- app/state/slices/bootSlice.ts \u2014 the record reads the crumb, not the reader.\n- app/diagnostics/crashLedger.ts \u2014 `recordLabel`, `isFatalRecord`, the header,\n  the rollup over fatal with `=== true` and the unresolved line, the three-way\n  launch line, `launch.otaPath`.\n- app/diagnostics/sentryTransport.ts \u2014 `launch*` in `extra`.\n- __tests__/ota1674TheDeadLifeAnswers.test.ts \u2014 19 tests.\n- __tests__/ota1587WhichLifeDied.test.ts \u2014 the pin on the defect repointed to\n  the fix, with the reason.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T23:45:16Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1674-the-dead-life-answers",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1674-the-dead-life-answers",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T23:48:24.735279Z",
+          "dateCreated": "2026-09-04T23:47:35.927290Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155722001",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T23:48:25.072821Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1674-the-dead-life-answers",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1674-the-dead-life-answers",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1674-the-dead-life-answers",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1674-the-dead-life-answers)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "7d3b5f2bf27646d89f3cac211d63d3fd",
+  "previousEventID": "6c96b54e931941f8abeeda3192a2cf31"
+}

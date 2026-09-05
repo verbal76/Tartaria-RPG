@@ -1,0 +1,276 @@
+{
+  "id": "7905524d511a4ebd93b2100d21755adb",
+  "groupID": "7712848145",
+  "eventID": "7905524d511a4ebd93b2100d21755adb",
+  "projectID": "4511945117532160",
+  "size": 18136,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-04-1674-the-dead-life-answers #mtnir5vqr3fw [inline 1/2]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1674-the-dead-life-answers",
+  "message": "player-log 2026-09-04-1674-the-dead-life-answers #mtnir5vqr3fw [inline 1/2]",
+  "title": "player-log 2026-09-04-1674-the-dead-life-answers #mtnir5vqr3fw [inline 1/2]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "c5b67a9338b7442887fcbe9331ce1a85",
+      "span_id": "be7cafa4edcda137",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "Bug Report \u00b7 (2026-09-04-1671-the-armour-bites-back) \u00b7 Log\n=== TARTARIA BUG REPORT ===\nSubmitted: 2026-09-04T22:22:00.326Z\nCharacter: (general / no character)\n\n--- DESCRIPTION ---\nLog\n\n--- DEVICE / BUILD ---\nDevice\n  Name: Pixel 10 Pro XL\n  Platform: android 37\n  Hermes: yes\n  Locale: en-US\n  Timezone: America/New_York\n  Screen: window 443\u00d7986 / screen 443\u00d7986 @ 2.4375x density\n",
+      "  Captured at: 2026-09-04T22:22:00.127Z\n\nInstall\n  App ID: com.hotatticgames.tartarprim\n  App version: 4.32.11\n  APK build version: 2.4.1\n  APK build: 293\n  AAB: (build 293)\n  OTA: (2026-09-04-1671-the-armour-bites-back)\n  Boot stage: qwen:done\n\nML runtime health\n  Status: active (no crashes detected)\n  Crash count: 0\n  Last init attempt: 2026-09-04T21:58:54.972Z\n",
+      "  Last init success: 2026-09-04T21:58:56.375Z\n  Crashes-before-disable threshold: 2\n  Qwen completion guard: clean (no completion crashes)\n  Qwen kernel variant: rnllama_v8_2_fp16_dotprod\n  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6",
+      ".6.118-android15-8-g1831c2a45d9b-ab15739706-4k\n  Voice (TTS) guard: clean (no voice crashes on this build)\nSave-load health\n  Status: clean (no load-crash flags)\nLast JS crash\n  Status: none recorded\nThis launch\n  Life: bmtnhu2vcjq \u00b7 started 2026-09-04T21:56:16.776Z\n  Followed an OTA apply 252ms ago (boot-front)\n  The previous life released its model contexts before reloading (o0/r0/l0/p0/dn0)\n",
+      "Crash ledger \u2014 10 recorded (newest last)\n  \u2022 2026-09-03T02:52:27.753Z (2610m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-03-1639-every-ingredient-exists \u00b7 stage rendered\n      Process died with no orderly exit while: tap \"craft\"\n      doing: tap \"craft\" \u00b7 room mud_flood_nexus \u00b7 screen exploration\n      last checkpoint: rendered \u00b7 7466ms into the action \u00b7 alive 1498ms after it\n",
+      "      launch: died 21448ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-03T12:10:12.789Z (2052m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-03-1642-every-drop-has-a-name-in-the-book \u00b7 stage mid-action\n      Process died with no orderly exit while: tap \"inventory\"\n",
+      "      doing: tap \"inventory\" \u00b7 room mud_flood_nexus \u00b7 screen exploration\n      launch: died 12819ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-03T15:48:24.471Z (1834m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-03-1643-the-dice-riders-pay \u00b7 stage boot:qwen:deferred\n",
+      "      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: boot:qwen:deferred \u00b7 838ms into the action \u00b7 alive 11400ms after it\n      launch: died 12276ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n",
+      "  \u2022 2026-09-03T19:31:31.355Z (1610m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-03-1648-a-fourth-ring \u00b7 stage boot:qwen:deferred\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: boot:qwen:deferred \u00b7 901ms into the action \u00b7 alive 0ms after it\n",
+      "      launch: died 956ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-03T20:39:06.948Z (1543m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-03-1649-what-a-ring-is-for \u00b7 stage boot:qwen:deferred\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n",
+      "      last checkpoint: boot:qwen:deferred \u00b7 750ms into the action \u00b7 alive 0ms after it\n      launch: died 803ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-03T21:28:44.213Z (1493m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-03-1649-what-a-ring-is-for \u00b7 stage boot:qwen:deferred\n",
+      "      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: boot:qwen:deferred \u00b7 707ms into the action \u00b7 alive 0ms after it\n      launch: died 797ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-03T22:43:58.985Z (1418m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n",
+      "      build 4.32.11 \u00b7 2026-09-03-1653-the-wear-ward \u00b7 stage boot:qwen:deferred\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: boot:qwen:deferred \u00b7 627ms into the action \u00b7 alive 0ms after it\n      launch: died 672ms into the process \u00b7 not an OTA-apply boot\n",
+      "      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-04T04:42:22.271Z (1060m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-04-1664-no-phantom-syllable \u00b7 stage boot:qwen:deferred\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n",
+      "      last checkpoint: boot:qwen:deferred \u00b7 743ms into the action \u00b7 alive 0ms after it\n      launch: died 776ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-04T13:31:35.149Z (530m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-04-1665-the-bug-report-pushes \u00b7 stage boot:qwen:deferred\n",
+      "      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: boot:qwen:deferred \u00b7 1075ms into the action \u00b7 alive 62922ms after it\n      launch: died 64046ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n",
+      "  \u2022 2026-09-04T18:21:13.034Z (241m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-04-1667-the-key-goes-where-the-player-is \u00b7 stage boot:qwen:deferred\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: boot:qwen:deferred \u00b7 956ms into the action \u00b7 alive 0ms after it\n",
+      "      launch: died 1006ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\nCrash delivery: ON \u2014 reports go to Sentry when you crash.\nRuntime pressure\n  Memory warnings: none this session\n  \u26a0 Freeze watch: 2 render stalls (worst: frames quiet 4039ms while logic ran)\n  \u26a0 Worst logic stall: 5589ms\n",
+      "  \u26a0 Native queue: worst wait 7.9s \u00b7 2 job kinds queued >3s \u00b7 worst 14.9ms/prompt-token \u00b7 6 generations thrown away (43.1s)\n     The JS thread was healthy and the native model queue was not. A stall the freeze watch above is structurally blind to.\n  App state trail: background \u2192 active\nModel contexts\n  Live now: 1\n  Opened: 1 \u00b7 Released: 0 \u00b7 Peak live: 1\n  Narration engine: ready\n\n--- VOICE ---\n",
+      "  TTS enabled: no\n  Engine: bundled\n  Rate: 1.05 \u00b7 Pitch: 1.00\n  System voice id: (default)\n  Kokoro voice: am_michael\n  Kokoro state: idle\n\n--- INVENTORY ---\nInventory (Cheddar Bob)\n  HP: 44/66  Stamina: 21/22  TC: 794  Corruption: 6\n  Pack: 202 distinct rows / 1559 total\n\nWeapons (33)\n  Aether Axe \u00d73 (Legendary, 2d8 aetheric, [weapon,melee,two_handed,axe,aetheric])\n",
+      "    actions: equip:main, equip:off, use(off), scrap, drop\n  Aetheric Shield-Hammer (Uncommon, 2d6 bludgeoning, dur 40/41, equipped:main, [weapon,melee,two_handed,hammer,aetheric])\n    actions: equip:off, unequip:main, use(off), repair\n  Aetheric Spark Wand (1d6 aetheric, dur 38/38, [runecaster,rune_power,aetheric])\n    actions: equip:main, equip:off, use(off), scrap, drop\n",
+      "  Aetherium Spear (1d8 aetheric, dur 30/30, [weapon,melee,two_handed,spear,aetheric])\n    actions: equip:main, equip:off, use(off), scrap, drop\n  Acid-Etched Auralite Talon (Rare, +1d4 acid coat, dur 31/35, 2d6 aetheric, resist:aetheric, unique, [fused,unique,aetheric])\n    actions: equip:main, equip:off, use(off), scrap, repair, drop\n",
+      "  Bone Knife (1d4 piercing, dur 2/10, [weapon,melee,dual_wield,knife,giants])\n    actions: equip:main, equip:off, use(off), scrap, repair, drop\n  Bone Shiv (1d4 piercing, dur 20/20, [weapon,melee,knife,tool,bone])\n    actions: equip:main, equip:off, use(off), scrap, drop\n  Bone Siege Crossbow (Uncommon, 2d6 piercing, dur 26/26, [weapon,ranged,two_handed,crossbow,giants])\n",
+      "    actions: equip:main, equip:off, use(off), scrap, drop\n  Searing Choir-Bound Launcher (Rare, +1d4 burn coat, dur 35/35, 2d6 aetheric, resist:aetheric, unique, [fused,unique,aetheric])\n    actions: equip:main, equip:off, use(off), scrap, drop\n  Energy Baton (Uncommon, 1d8 electrical, dur 36/36, [weapon,melee,dual_wield,aetheric])\n    actions: equip:main, equip:off, use(off), scrap, drop\n",
+      "  Force Wave Wand (1d6 force, dur 30/30, [weapon,runecaster,rune_power,aetheric,force])\n    actions: equip:main, equip:off, use(off), scrap, drop\n  Giant-Watch Greatspear (Uncommon, 2d6 piercing, dur 25/26, \u2665reserved, [weapon,melee,two_handed,faction_gear,servants_of_giants])\n    actions: equip:main, equip:off, use(off), scrap, repair, release-from-fusion, drop\n",
+      "  Lightfoot Dash Wand (1d6 aetheric, dur 22/22, [runecaster,rune_power,aetheric,buff])\n    actions: equip:main, equip:off, use(off), scrap, drop\n  Litany Maul (Legendary, dur 75/75, 1d12+2 bludgeoning, unique, [core_guardian_set,aether_born,blunt,two_handed,stagger_chance])\n    actions: equip:main, equip:off, use(off), scrap, drop\n",
+      "  Magnetic Axe (Rare, 2d6 electrical, dur 41/41, [weapon,melee,single_handed,axe,aetheric])\n    actions: equip:main, equip:off, use(off), scrap, drop\n  Mud Armor Rod (Uncommon, 1d8 bludgeoning, dur 39/39, [runecaster,rune_power,mud_dwellers,ward])\n    actions: equip:main, equip:off, use(off), scrap, drop\n  Mud Grip Wand (1d6 bludgeoning, dur 42/42, [runecaster,rune_power,mud_dwellers,restrain])\n",
+      "    actions: equip:main, equip:off, use(off), scrap, drop\n  Mud Long Axe (1d8 slashing, dur 10/10, [weapon,melee,two_handed,axe,mud_dwellers])\n    actions: equip:main, equip:off, use(off), scrap, drop\n  Mud Shell Wand (1d6 bludgeoning, dur 22/22, [runecaster,rune_power,mud_dwellers,ward])\n    actions: equip:main, equip:off, use(off), scrap, drop\n",
+      "  Mud Spear (Runecaster) (Uncommon, 2d6 piercing, dur 27/27, [runecaster,rune_power,mud_dwellers,loot])\n    actions: equip:main, equip:off, use(off), scrap, drop\n  Mud Venom Blade (Rare, 2d6 poison, dur 25/25, [weapon,melee,dual_wield,blade,mud_dwellers])\n    actions: equip:main, equip:off, use(off), scrap, drop\n",
+      "  Frost-Rimed Mud-Iron Greatblade (Rare, 2d8 slashing, +1d6 cold coat, dur 16/16, [weapon,melee,two_handed,blade,mud])\n    actions: equip:main, equip:off, use(off), scrap, drop\n  Pillar Brand (Uncommon, dur 25/25, 1d8 bludgeoning, unique, [fused,unique])\n    actions: equip:main, equip:off, use(off), scrap, drop\n",
+      "  Pulse-Woven Edge (Legendary, dur 45/45, 2d8 aetheric, resist:aetheric, unique, [fused,unique,faction_gear,servants_of_giants,aetheric])\n    actions: equip:main, equip:off, use(off), scrap, drop\n  Smoldering Reclaimers Guild Geode-Cored Cleaver (Legendary, +1d4 burn coat, dur 34/35, \u2665reserved, 2d6 bludgeoning, unique, [fused,unique,faction_gear,reclaimers_guild])\n",
+      "    actions: equip:main, equip:off, use(off), scrap, repair, release-from-fusion, drop\n  Corrupted Reclaimers Guild Shroud-Spun Slinger (Legendary, +1d4 corruption coat, dur 33/35, 2d6 bludgeoning, unique, [fused,unique,faction_gear,reclaimers_guild])\n    actions: equip:main, equip:off, use(off), scrap, repair, drop\n  Sentinel Cleaver (Rare, 2d8 slashing, dur 22/34, [weapon,blade,melee,sentinel])\n",
+      "    actions: equip:main, equip:off, use(off), scrap, repair, drop\n  Sentinel Cleaver (Rare, 2d8 slashing, dur 25/25, [weapon,blade,melee,sentinel])\n    actions: equip:main, equip:off, use(off), scrap, drop\n  Shaped Aetheric Shard (Rare, [throwable,aether,shaped])\n    actions: equip:main, equip:off, use(off), scrap, drop\n",
+      "  Slick Mud Wand (1d6 bludgeoning, dur 27/27, [runecaster,rune_power,mud_dwellers,terrain])\n    actions: equip:main, equip:off, use(off), scrap, drop\n  Sparkstrike Wand (1d6 electrical, dur 40/40, [weapon,runecaster,rune_power,aetheric,electrical])\n    actions: equip:main, equip:off, use(off), scrap, drop\n  Vine Grasp Wand (1d6 piercing, dur 37/41, [runecaster,rune_power,mud_dwellers,restrain])\n",
+      "    actions: equip:main, equip:off, use(off), scrap, repair, drop\n  Void Pulse Rod (Uncommon, 2d6 aetheric, dur 13/13, [weapon,runecaster,rune_power,aetheric,crafted])\n    actions: equip:main, equip:off, use(off), scrap, drop\n\nArmor (16)\n",
+      "  Aether-Walker's Boots (Uncommon, dur 24/27, equipped:feet, AC +4 \u00b7 Resists: aetheric, acid (coated), cold (coated) \u00b7 Regen: +1 stamina per action \u00b7 DEX +4 \u00b7 STR +2, [armor,feet,boots,tartarian_giants])\n    actions: unequip:feet, repair\n  Aether-Walker's Boots (Uncommon, dur 22/22, AC +4 \u00b7 Resists: aetheric \u00b7 Regen: +1 stamina per action \u00b7 DEX +4 \u00b7 STR +2, [armor,feet,boots,tartarian_giants])\n",
+      "    actions: equip:feet, use, scrap, drop\n  Architect's Sight Enhancer (Uncommon, dur 32/35, equipped:head, AC +3 \u00b7 Resists: cold, cold (coated) \u00b7 Regen: +1 HP per action \u00b7 WIS +3 \u00b7 INT +1, [armor,head,cloth,helmet,architectural_sentinels])\n    actions: unequip:head, repair\n",
+      "  Forgotten Protector's Plate (Uncommon, dur 42/42, AC +2 \u00b7 Resists: slashing \u00b7 STR +1, [armor,chest,plate,unknowing_masses])\n    actions: equip:chest, use, scrap, drop\n  Forgotten Seeker's Mask (Rare, dur 45/45, AC +3 \u00b7 Resists: slashing, aetheric \u00b7 INT +3, [armor,head,mask,face,reclaimers])\n    actions: equip:head, use, scrap, drop\n",
+      "  Litany Greaves (Legendary, dur 75/85, equipped:legs, AC+3, unique, [core_guardian_set,aether_born,ac:3,legs,heavy])\n    actions: unequip:legs, repair\n  Lumenforged Stompers (Rare, dur 35/35, AC+3, resist:aetheric, unique, [fused,unique,aetheric])\n    actions: equip:feet, use, scrap, drop\n",
+      "  Mask of the Aether Seeker (Uncommon, dur 12/12, AC +5 \u00b7 Resists: aetheric \u00b7 CHA +5 \u00b7 DEX +2, [armor,head,mask,face,aetherborn])\n    actions: equip:head, use, scrap, drop\n  Mud-glass Scales (Uncommon, dur 45/49, equipped:chest, AC +4 \u00b7 Resists: piercing, burn (coated) \u00b7 Regen: +2 stamina per action \u00b7 Bites back: 1 damage to whatever hits you, in its own element, [armor,chest,scale,mud_glass,true_",
+      "tartarians])\n    actions: unequip:chest, repair\n  Mud-Treader's Greaves (dur 19/19, AC +2 \u00b7 DEX +2, [armor,legs,greaves,legs,mud_dwellers])\n    actions: equip:legs, use, scrap, drop\n  Mud-Warden's Vest (dur 3/20, AC +1 \u00b7 Resists: slashing \u00b7 WIS +1, [armor,chest,plate,chest,mud_dwellers])\n    actions: equip:chest, use, scrap, repair, drop\n",
+      "  Mudstone Bulwark (Rare, dur 61/61, AC +4 \u00b7 Resists: bludgeoning, piercing \u00b7 HP +30 \u00b7 Bites back: 2 damage to whatever hits you, in its own element, [armor,chest,heavy,stone,mud])\n    actions: equip:chest, use, scrap, drop\n  Reclaimer's Cloak (dur 9/13, AC +2 \u00b7 Resists: cold, burn (coated), acid (coated) \u00b7 DEX +2 \u00b7 STE +2, [armo"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-04-1674-the-dead-life-answers #mtnir5vqr3fw [inline 1/2]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtnir5vqr3fw"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1674-the-dead-life-answers"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "1"
+    },
+    {
+      "key": "parts",
+      "value": "2"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1674-the-dead-life-answers"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "3"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T23:48:01.243758Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T23:48:03.412000Z",
+  "fingerprints": [
+    "9a539618ef59f5fbf89b2d9bec7d1bb6"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1956404347,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-04T23:47:35.927290Z",
+    "dateReleased": "2026-09-04T23:48:24.735279Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "cc2abf544a2897d2e91a0d613af8eea6b385a38a",
+      "message": "[ota-hal] OTA-1674: the dead life answers for itself\n\nItem one of \"fix all existing issues one through six\": #110, the process kill\non nearly every boot. This is not the fix for the kill. It is the instrument\nthat the previous instrument turned out to be missing \u2014 and, by the owner's own\nrule recorded in contextLedger.ts, that is the correct thing to ship: measure\nthe cause, or ship an instrument.\n\nWHAT THE 19:40 LEDGER SAID, ENTRY BY ENTRY\nTen records. Eight at `stage boot:qwen:deferred`. Six of those dead 670\u20131006ms\ninto the process, `alive 0ms` after the stamp, `(no action yet)` \u2014 sub-second,\nbefore the first screen, before Qwen has loaded (it is DEFERRED). And every one\nof the eight: `not an OTA-apply boot`.\n\nThree things ruled out before anything was written:\n- a boot-front race \u2014 App.tsx AWAITS the OTA check and RETURNS on 'applied',\n  so `qwen:deferred` is unreachable on an apply. My first hypothesis, and wrong;\n- anything heavy at that stage \u2014 `armQwenWarm` stores a closure and returns;\n- ML init \u2014 mlHealth reports crash count 0.\n\nAND THE ONE THING THAT COULD NOT BE RULED EITHER WAY\nOTA-1587 asked of every death: did the process that died boot on the far side\nof `reloadAsync`? It stored the answer in the wrong life. The handoff that\ncarries it is consumed on read \u2014 correctly; a handoff is a fact about ONE boot\n\u2014 by the life that then dies, taking the only copy with it. The next boot finds\nno handoff, computes `afterOtaApply: false` about ITSELF, and bootSlice wrote\nthat onto the dead life's record. Structurally, a death record could never say\n\"yes\". \"Not an OTA-apply boot\" on eight of ten was not a finding; it was the\nonly value the field could take. The ota1587 suite pinned the exact line \u2014\n`afterOtaApply: launch.afterOtaApply,` \u2014 as correct.\n\nSo the fact now rides the CRUMB. `bootStampFields()` (the one writer every\ncrumb passes through) adds `afterOta` / `otaPath` / `otaGapMs` / `prevCtx` once\n`noteLaunchFacts` has run \u2014 early in hydrate, before any stage that matters \u2014\nand the record reads the dead life's own answer off its own crumb. A crumb from\nthe first milliseconds, before the launch resolved, leaves it UNDEFINED, and\nevery reader prints that as \"not known\", never as a cold start. \"Not known\" is\na fact; \"false\" is a lie, and it is exactly the lie that hid this for two OTAs.\n\nTWO MORE THINGS THE SAME READ TURNED UP\n- The ledger label keyed on `kind` alone, so the idle reclaims OTA-1567 already\n  made non-fatal (`isFatal: false`, and Sentry has honoured that as level\n  `error` since) still printed PROCESS KILLED \u2014 no JS ran in About and in every\n  bug report, and were counted in \"N recorded\". Two of the owner's ten were\n  that. A ledger that overstates kills to the one person reading it sends the\n  hunt at the wrong thing \u2014 OTA-1521's own words. The label now says what the\n  record knew, and the header says \"10 recorded, 8 fatal\".\n- The whole `launch` block \u2014 which life died, how old it was, what it inherited\n  \u2014 has been on every record since OTA-1587 and forwarded to Sentry on none.\n  The rollup it exists for could only ever be done by hand, on a device. It is\n  in `extra` now, three-valued.\n\nThe OTA-1587 rollup counts FATAL kills and only a true \"yes\"; an idle reclaim\non an apply boot is not the signal, and `undefined` is not a \"no\" \u2014 counting it\nas one would be the same defect one layer down. It also says out loud how many\ndied before their launch resolved, because the absence of that line is how the\nhole hid.\n\n\u26a0 NO BOOT-PHASE EXEMPTION, DELIBERATELY. Six sub-second no-action deaths look\nexactly like a force-close during the splash \u2014 the owner's recorded habit. They\nalso look exactly like OTA-1587's candidate (b): a reload-boot killed by a\nnative context the previous life never released, in a process `reloadAsync`\ndoes not restart. This instrument is what tells those two apart. Filing them as\nnon-fatal today would hide (b) if it is real \u2014 the blind-spot trade OTA-1377 and\nOTA-1413 both refused. The next log closes #110 one way or the other.\n\n- app/diagnostics/bootIdentity.ts \u2014 `BootStamp`, `bootStampFields` carries the\n  launch facts once resolved.\n- app/engine/saveSystem.ts \u2014 `LiveBreadcrumb` gains the four fields.\n- app/state/slices/bootSlice.ts \u2014 the record reads the crumb, not the reader.\n- app/diagnostics/crashLedger.ts \u2014 `recordLabel`, `isFatalRecord`, the header,\n  the rollup over fatal with `=== true` and the unresolved line, the three-way\n  launch line, `launch.otaPath`.\n- app/diagnostics/sentryTransport.ts \u2014 `launch*` in `extra`.\n- __tests__/ota1674TheDeadLifeAnswers.test.ts \u2014 19 tests.\n- __tests__/ota1587WhichLifeDied.test.ts \u2014 the pin on the defect repointed to\n  the fix, with the reason.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T23:45:16Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1674-the-dead-life-answers",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1674-the-dead-life-answers",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T23:48:24.735279Z",
+          "dateCreated": "2026-09-04T23:47:35.927290Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155722001",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T23:48:25.072821Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1674-the-dead-life-answers",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1674-the-dead-life-answers",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1674-the-dead-life-answers",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1674-the-dead-life-answers)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "0e4f782f5c0a414ea6f2d856a82e9984",
+  "previousEventID": "0e4e1f2c473140d3a3538da1faa36b35"
+}

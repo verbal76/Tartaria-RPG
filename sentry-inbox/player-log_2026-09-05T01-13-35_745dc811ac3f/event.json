@@ -1,0 +1,320 @@
+{
+  "id": "745dc811ac3f424dae1b858ba8a3b613",
+  "groupID": "7712952778",
+  "eventID": "745dc811ac3f424dae1b858ba8a3b613",
+  "projectID": "4511945117532160",
+  "size": 17417,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-05-1676-the-tail-is-read #mtnovtl10c8a [inline 13/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-05-1676-the-tail-is-read",
+  "message": "player-log 2026-09-05-1676-the-tail-is-read #mtnovtl10c8a [inline 13/28]",
+  "title": "player-log 2026-09-05-1676-the-tail-is-read #mtnovtl10c8a [inline 13/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "d6e911fd187243f49c34438ba2fdbf6f",
+      "span_id": "bec3bb8a4734e03c",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "_lore n2 avg1.8s max2.6s read1.4s/write1.0s in129t\u2192out30t ms/tok 11.0-11.0 | ambient n1 avg11.3s max11.3s read4.3s in365t\u2192out31t ms/tok 11.8-11.8 cap1 \u23f81 \u27021/11.3s | narration:scene_intro n1 avg0.6s max0.6s \u23f81 \u27021/0.6s || WASTED 2 calls / 11.9s\n[2026-09-04T22:08:32.770Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=cached winH=986 beat=-\n",
+      "[2026-09-04T22:08:33.176Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-09-04T22:08:36.560Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-09-04T22:08:38.266Z] [player] fill water bottles\n[2026-09-04T22:08:38.267Z] [debug] parser: intent=fill conf=1.00 verb=fill target=water bottles resolved=- range=- enemies=0 hooks=1\n",
+      "[2026-09-04T22:08:38.269Z] [world] You scoop water from the crevice into the bottle. The filter seam in its neck pulls the murk out \u2014 bottled water drinks clean. (\u2726 Water Bottle, \u2717 Empty Water Bottle)\n[2026-09-04T22:08:38.269Z] [system] \u23f3 Time passed: 5 min\n",
+      "[2026-09-04T22:08:39.083Z] [debug] persist sizes(KB): total=343 player=78 wm=179[rooms=104 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=83 scene=2\n[2026-09-04T22:08:42.640Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 5900ms read 0ms/write 0ms in 751t\u2192out 0t (0ch)\n[2026-09-04T22:08:42.905Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 5900ms \u2014 intro-fill:\u2205\n",
+      "[2026-09-04T22:08:42.906Z] [debug] homework: scene_intro \"The Slack Flats\" \u2205 6346ms\n[2026-09-04T22:08:43.096Z] [cognitive] neutral  (4826ms)\n[2026-09-04T22:08:50.392Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=cached winH=986 beat=-\n[2026-09-04T22:08:50.788Z] [debug] kbbar: mounted bottom=359.79486083984375 raw=360 from=live winH=986 beat=-\n",
+      "[2026-09-04T22:08:53.303Z] [player] drink\n[2026-09-04T22:08:53.304Z] [debug] parser: intent=drink conf=1.00 verb=drink target=- resolved=- range=- enemies=0 hooks=1\n[2026-09-04T22:08:53.305Z] [world] You cup the crevice in your hands and drink. You weren't tired; mostly you were thirsty. (+1 corruption, 5 min)\n",
+      "[2026-09-04T22:08:53.305Z] [arbiter] The Arbiter watches you wipe your mouth. \"Raw crevice carries what the ground put in it. Fill a bottle next time \u2014 the filter takes the taint out.\"\n[2026-09-04T22:08:53.307Z] [system] \u23f3 Time passed: 5 min\n[2026-09-04T22:08:53.516Z] [cognitive] neutral  (208ms)\n",
+      "[2026-09-04T22:08:54.747Z] [debug] kbbar: mounted bottom=359.79486083984375 raw=360 from=cached winH=986 beat=-\n[2026-09-04T22:08:55.159Z] [debug] kbbar: mounted bottom=359.79486083984375 raw=360 from=live winH=986 beat=-\n[2026-09-04T22:08:59.432Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.\n[2026-09-04T22:08:59.459Z] [player] fill water bottle\n",
+      "[2026-09-04T22:08:59.460Z] [debug] parser: intent=fill conf=1.00 verb=fill target=water bottle resolved=Water Bottle range=- enemies=0 hooks=1\n[2026-09-04T22:08:59.460Z] [arbiter] The Arbiter nods at the crevice. \"You've already topped up here. The filter needs time between draws \u2014 fill again at the next stop, or give this one time to settle.\"\n",
+      "[2026-09-04T22:08:59.663Z] [cognitive] neutral  (198ms)\n[2026-09-04T22:09:08.866Z] [debug] qwen\u23f1 ambient ok 9029ms read/write unusable (native mis-reported 25791ms/1234ms \u2014 llama.rn split bug, not this call) in 364t\u2192out 31t HIT-CAP (167ch)\n[2026-09-04T22:09:09.243Z] [debug] ui: tap \"\u2192 MUD SEAS\"\n",
+      "[2026-09-04T22:09:09.251Z] [debug] spawn: gear=[Magnetized Rod, Rough-Hewn Gauntlets, Memory Weaver's Hood] window=10 roster=new\n[2026-09-04T22:09:09.252Z] [world] You walk east through open silt. The compass points east into open ground.\n[2026-09-04T22:09:09.252Z] [world] Whatever you turned over here is still turned over.\n",
+      "[2026-09-04T22:09:09.451Z] [debug] arbiter: ambient stale:moved-scene\u2192banked 9987ms\n[2026-09-04T22:09:09.452Z] [debug] arbiter: ambient-empty reason=near-duplicate-of-recent raw=\"You have traversed the borders of the Borderlands, and the terrain has changed from rugged hills to expansive forests. Y\"\n[2026-09-04T22:09:10.461Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-09-04T22:09:11.764Z] [world] You turn the Magnetized Rod over once, then keep it.\n[2026-09-04T22:09:11.765Z] [reward] \u2726 Magnetized Rod (Common).\n[2026-09-04T22:09:11.788Z] [world] The Memory Weaver's Hood comes away clean.\n[2026-09-04T22:09:11.788Z] [reward] \u2726 Memory Weaver's Hood (Common).\n",
+      "[2026-09-04T22:09:11.790Z] [world] It takes two pulls. The Rough-Hewn Gauntlets is yours on the second.\n[2026-09-04T22:09:11.790Z] [reward] \u2726 Rough-Hewn Gauntlets (Common).\n[2026-09-04T22:09:12.695Z] [world] You salvage the cart. The take is small but real.\n[2026-09-04T22:09:12.695Z] [world] You break the firepit apart. Among the pieces, something worth keeping.\n",
+      "[2026-09-04T22:09:12.695Z] [world] You strip the rusted submerged giant statue carefully. Something usable comes free in your hand.\n[2026-09-04T22:09:12.696Z] [world] You lever something loose from the weathered ruined skyscraper \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n[2026-09-04T22:09:12.696Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-09-04T22:09:12.696Z] [reward]     \u2022 Scrap Metal x5 (Common)\n[2026-09-04T22:09:12.697Z] [reward]     \u2022 Worn Tartarian Coin (Common)\n[2026-09-04T22:09:12.697Z] [reward]     \u2022 Tattered Gauze Roll (Common)\n[2026-09-04T22:09:14.278Z] [debug] ui: tap \"investigate\"\n[2026-09-04T22:09:15.916Z] [player] investigate the mud\n",
+      "[Filtered]",
+      "[2026-09-04T22:09:15.920Z] [world] Mud Scanner ticks \u2014 buried trace in the mud.\n[2026-09-04T22:09:15.920Z] [reward] \u2726 Aether Mud (Common).\n[2026-09-04T22:09:15.921Z] [debug] investigate: \"mud\" marked searched\n[2026-09-04T22:09:15.921Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n",
+      "[2026-09-04T22:09:15.921Z] [arbiter] The Arbiter looks around. \"The shrine's bell has no rope. If it rings, the keepers say, pulling it will not have been the cause.\"\n[2026-09-04T22:09:16.143Z] [cognitive] SWIM  (221ms)\n[2026-09-04T22:09:17.176Z] [player] investigate crevice-pool\n",
+      "[2026-09-04T22:09:17.176Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=crevice pool resolved=crevice-pool range=- enemies=0 hooks=1\n[2026-09-04T22:09:17.177Z] [world] You study the crevice-pool. It bears no marks worth naming \u2014 no glyph, no fingerprint, no trace the Reclaimers would catalog.\n",
+      "[2026-09-04T22:09:17.178Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-09-04T22:09:17.178Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-04T22:09:17.376Z] [cognitive] SWIM  (197ms)\n[2026-09-04T22:09:17.761Z] [debug] ui: tap \"\u2192 MUD SEAS\"\n[2026-09-04T22:09:17.772Z] [debug] spawn: gear=[Bone Shiv] window=10 roster=new\n",
+      "[2026-09-04T22:09:17.773Z] [world] Skiv glances up. \"You again.\" Not warm, not cold \u2014 noted.\n[2026-09-04T22:09:17.773Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Skiv, fence. Tap the vendor banner to trade.\n[2026-09-04T22:09:17.786Z] [world] This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n",
+      "[2026-09-04T22:09:17.787Z] [world] You walk south through open silt. The compass points south into open ground.\n[2026-09-04T22:09:17.787Z] [world] It sits where it sat. Patient is the wrong word \u2014 it simply does not move.\n[2026-09-04T22:09:20.002Z] [debug] qwen\u23f1 investigate_lore ok 2439ms read 1300ms/write 1075ms in 129t\u2192out 33t 10.1ms/t (142ch)\n",
+      "[2026-09-04T22:09:25.948Z] [reward] Bought Trail Rations from Skiv for 4 TC. (490 TC left)\n[2026-09-04T22:09:31.612Z] [debug] homework: intro-fill armed after 10290ms idle (strike 2/3)\n[2026-09-04T22:09:44.510Z] [reward] Sold Bone Sling (Common) to Skiv for 14 TC. (504 TC on hand)\n[2026-09-04T22:09:44.631Z] [reward] Sold Mud Harpoon (Common) to Skiv for 14 TC. (518 TC on hand)\n",
+      "[2026-09-04T22:09:44.737Z] [reward] Sold Mud-Iron Cleaver (Common) to Skiv for 14 TC. (532 TC on hand)\n[2026-09-04T22:09:44.844Z] [reward] Sold Mud Knife (Common) to Skiv for 13 TC. (545 TC on hand)\n[2026-09-04T22:09:44.951Z] [reward] Sold Rusty Shortbow (Common) to Skiv for 13 TC. (558 TC on hand)\n[2026-09-04T22:09:45.059Z] [reward] Sold Rusted Blade (Common) to Skiv for 13 TC. (571 TC on hand)\n",
+      "[2026-09-04T22:09:45.164Z] [reward] Sold Stone Spear (Common) to Skiv for 12 TC. (583 TC on hand)\n[2026-09-04T22:09:45.269Z] [reward] Sold Tartarian Claw Knife (Common) to Skiv for 12 TC. (595 TC on hand)\n[2026-09-04T22:09:45.376Z] [reward] Sold Magnetized Rod (Common) to Skiv for 12 TC. (607 TC on hand)\n",
+      "[2026-09-04T22:09:45.482Z] [reward] Sold Stone Seeker's Brow Guard (Common) to Skiv for 8 TC. (615 TC on hand)\n[2026-09-04T22:09:45.587Z] [reward] Sold Stone-Stride Greaves (Common) to Skiv for 8 TC. (623 TC on hand)\n[2026-09-04T22:09:45.693Z] [reward] Sold Titan's Guard Mask (Common) to Skiv for 8 TC. (631 TC on hand)\n",
+      "[2026-09-04T22:09:45.800Z] [reward] Sold Aetheric Warplate (Common) to Skiv for 8 TC. (639 TC on hand)\n[2026-09-04T22:09:45.907Z] [reward] Sold Salvager's Worn Boots (Common) to Skiv for 6 TC. (645 TC on hand)\n[2026-09-04T22:09:46.014Z] [reward] Sold Architect's Field Jacket (Common) to Skiv for 6 TC. (651 TC on hand)\n",
+      "[2026-09-04T22:09:46.119Z] [reward] Sold Rough-Hewn Gauntlets (Common) to Skiv for 6 TC. (657 TC on hand)\n[2026-09-04T22:09:46.208Z] [reward] Sold Salvager's Worn Gloves (Common) to Skiv for 6 TC. (663 TC on hand)\n[2026-09-04T22:09:46.290Z] [reward] Sold Bone Knife (Common) to Skiv for 6 TC. (669 TC on hand)\n",
+      "[2026-09-04T22:09:46.373Z] [reward] Sold Forgotten Leggings (Common) to Skiv for 6 TC. (675 TC on hand)\n[2026-09-04T22:09:46.454Z] [reward] Sold Sentinel's Greaves (Common) to Skiv for 6 TC. (681 TC on hand)\n[2026-09-04T22:09:46.534Z] [reward] Sold Memory Weaver's Hood (Common) to Skiv for 6 TC. (687 TC on hand)\n",
+      "[2026-09-04T22:09:46.614Z] [reward] Sold Rough-Hewn Gauntlets (Common) to Skiv for 6 TC. (693 TC on hand)\n[2026-09-04T22:09:46.693Z] [reward] Sold Mud-Warden's Vest (Common) to Skiv for 5 TC. (698 TC on hand)\n",
+      "[2026-09-04T22:09:47.361Z] [debug] \u26a0 FREEZE WATCH: LOGIC stalled while frames kept coming (js 2837ms \u00b7 frames 0ms). Something blocked the JS thread \u2014 look for a long synchronous run. \u00b7 crumb before: native:homework:start +15741ms \u2192 now: native:homework:start +15741ms \u00b7 doing: tap \"\u2192 MUD SEAS\" \u00b7 native: homework running \u00b7 q0\n",
+      "[2026-09-04T22:09:47.361Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 15742ms read 11179ms/write 3495ms in 749t\u2192out 33t 14.9ms/t HIT-CAP (152ch)\n[2026-09-04T22:09:48.033Z] [debug] homework: scene_intro \"The Slack Flats\" \u2713 16423ms\n[2026-09-04T22:09:49.010Z] [debug] persist sizes(KB): total=337 player=79 wm=173[rooms=98 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=82 scene=3\n",
+      "[2026-09-04T22:09:50.404Z] [debug] kbbar: mounted bottom=359.79486083984375 raw=360 from=cached winH=986 beat=-\n[2026-09-04T22:09:50.855Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-09-04T22:09:52.365Z] [debug] freeze watch: recovered \u2014 painting again after 3370ms quiet.\n",
+      "[2026-09-04T22:10:03.572Z] [player] inha haven't seen the missions button on a vendor in a while\n[2026-09-04T22:10:03.573Z] [debug] parser: intent=unknown conf=0.10 verb=- target=- resolved=- range=- enemies=0 hooks=1\n[2026-09-04T22:10:03.573Z] [debug] parse-fallback: handing \"inha haven't seen the missions button on a vendor in a while\" to qwen\n",
+      "[2026-09-04T22:10:03.574Z] [system] The Arbiter considers your words\u2026\n[2026-09-04T22:10:06.587Z] [player] Ask how far they range\n[2026-09-04T22:10:06.588Z] [world] \"I do this stretch and one other.\" They gesture vaguely. \"Any more and you are travelling, not trading. Travelling is how you lose stock.\"\n",
+      "[2026-09-04T22:10:06.590Z] [world] Skiv keeps facing the way they were going, and talks to you sideways.\n[2026-09-04T22:10:07.786Z] [world] You let the conversation go and Skiv gets back to it.\n[2026-09-04T22:10:09.608Z] [debug] qwen\u23f1 parse_fallback ok 5819ms read 5480ms/write 310ms in 458t\u2192out 9t 12.0ms/t (35ch)\n",
+      "[2026-09-04T22:10:09.827Z] [debug] parse-fallback: qwen no usable result \u2192 soft refusal\n[2026-09-04T22:10:09.828Z] [arbiter] The Arbiter glances at your pack. \"Your frost paste is still there, if it suits the moment.\"\n[2026-09-04T22:10:09.828Z] [system] Try: look around \u00b7 search \u00b7 rest\n[2026-09-04T22:10:10.052Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-09-04T22:10:11.638Z] [world] The Bone Shiv resists, then does not.\n[2026-09-04T22:10:11.639Z] [reward] \u2726 Bone Shiv (Common).\n[2026-09-04T22:10:12.277Z] [debug] qwen\u23f1 flourish ok 7144ms wait 4693ms read 2253ms/write 187ms in 172t\u2192out 6t 13.1ms/t (16ch)\n[2026-09-04T22:10:12.493Z] [debug] qwen\u23f1 \u2702 DISCARDED flourish after 7144ms \u2014 flourish:stale-walked-away\n",
+      "[2026-09-04T22:10:12.493Z] [debug] flourish: stale 7626ms\n[2026-09-04T22:10:12.709Z] [world] You brace a foot and the Scrap Metal gives.\n[2026-09-04T22:10:12.709Z] [reward] \u2726 Scrap Metal (Common).\n[2026-09-04T22:10:13.611Z] [world] You lever something loose from the crate \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n",
+      "[2026-09-04T22:10:13.611Z] [world] You break the shattered fallen sentinel husk apart. Among the pieces, something worth keeping.\n[2026-09-04T22:10:13.611Z] [world] You work the weathered ruined skyscraper over. A part of it comes loose, intact.\n[2026-09-04T22:10:13.611Z] [reward] \u2726 Salvage haul:\n[2026-09-04T22:10:13.612Z] [reward]     \u2022 Verdigris Bell Fragment (Common)\n",
+      "[2026-09-04T22:10:13.612Z] [reward]     \u2022 Aether Dust (Common)\n[2026-09-04T22:10:13.612Z] [reward]     \u2022 Bent Nail (Common)\n[2026-09-04T22:10:15.439Z] [debug] ui: tap \"investigate\"\n[2026-09-04T22:10:16.959Z] [debug] homework: intro-fill armed after 12638ms idle\n[2026-09-04T22:10:17.163Z] [player] investigate the mud\n",
+      "[Filtered]",
+      "[2026-09-04T22:10:17.167Z] [world] Mud Scanner ticks \u2014 buried trace in the mud.\n[2026-09-04T22:10:17.167Z] [reward] \u2726 Aetheric Sludge (Common).\n[2026-09-04T22:10:17.168Z] [debug] investigate: \"mud\" marked searched\n[2026-09-04T22:10:17.168Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-09-04T22:10:17.168Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-09-04T22:10:17.417Z] [cognitive] SWIM  (248ms)\n[2026-09-04T22:1"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-05-1676-the-tail-is-read #mtnovtl10c8a [inline 13/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtnovtl10c8a"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-05-1676-the-tail-is-read"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "13"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-05-1676-the-tail-is-read"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-05T01:13:33.286458Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "16": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 395,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        },
+        "42": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 395,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-05T01:13:35.395000Z",
+  "fingerprints": [
+    "901d39e2a99ee2e211148263b6b1fad9"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1956463043,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-05T00:44:59.530818Z",
+    "dateReleased": "2026-09-05T00:46:23.751514Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "773b9a7b9973d9b2fa93a4a8ca35903f5853b55d",
+      "message": "[ota-hal] OTA-1676: the tail is read (slice 4c)\n\nItem three of \"fix all existing issues one through six\": #98, the last unit of\nslice 4 \u2014 the exotic reword pass, the shield DR/reflect riders, and the\nShield-Hammer's timed +2 AC. Slice 4 is closed with this.\n\nTHE MEASUREMENT FIRST\nSlice 4's probe, re-run on the current catalog: 316 effect strings, 200 parsed,\n116 unread. Twenty-nine of the unread were rows of app/data/items/runecasters.json\n\u2014 a catalog nothing in the app imports (the suite asserts it) \u2014 so the live tail\nwas 87, the \"~85\" the task recorded. It is 28 now, and every one of the 28 is on\na flavour list BY NAME: HP grants that `statBonuses` already pays, faction-issue\nlines, the bucklers' bash (paid by the shield tag), and six sentences this OTA\nwrote to say plainly that a weapon does nothing special. A card that promises\nsomething unread cannot be authored again without failing the suite.\n\nTHE SHIELD RIDERS \u2014 what OTA-1645 admitted it only half read\nNine shields print a soak (\"reduces incoming slashing by 1d6\", \"blocks +1d6 from\nphysical attacks\", Graviton's \"+1d6 environmental damage reduction\"), an\nimmunity (\"Blocks all plasma damage\", \"Blocks Aetheric-based damage\", \"Deflects\nrunecasters\") or a bite (\"Deals 1d6 damage on the block\", \"reflects 1d6 back\").\nAll three are spent ONLY on a blow that landed on the shield \u2014 OTA-1646's\nlanding roll is what makes that honest; a plate that turns slashing does nothing\nfor a blow that came around it to your ribs. The soak runs as a pool after the\nmitigation floor (OTA-924's own carve-out for the ward). The bite goes through\nOTA-1671's reflect path, lifted into one helper (`dealReflectToAttacker`) so the\nraised-BLOCK path pays it too \u2014 owed by the block, not by the wound, so a spiked\nshield that soaked the whole blow still bites. A kill by reflect is a defeat.\n\"Plasma\" reads as burn: every plasma weapon is typed burn and no enemy deals a\ntype called plasma, so a plasma shield turns burn or turns nothing. The two \"on\nmax roll\" bites became \"on the block\" \u2014 a shield has no roll to be max on.\n\u26a0 A tagged buckler with nothing on its card is a held shield now: the Mud and\nIron Bucklers parsed to nothing, so no blow ever landed on them and they never\nwore. The tag is what makes a shield a shield.\n\nTHE WIELDER'S OWN SHARE, on machinery that already existed\nguard (a timed +N AC \u2014 the Shield-Hammer's \"+2 AC for 1 round after a hit\",\nread by statusAcAdjustment through one new kind, `guard_up`, combat-only like a\nstance), cover (`in_cover`), ward (OTA-835's `stone_ward` soak pool, rolled once\nwhen raised, replaces the old one) and heal (clamped to the room there is).\nThirteen cards were reworded onto ONE grammar for the four, because a parser\nloose enough to read \"Shields caster with mud barrier; blocks 1d6 damage. 3\nrounds.\" would read a shield's \"blocks +1d6 from physical attacks\" as a ward.\n\"On use\" pays on the swing (a ward you raise lands on a miss too); \"after a hit\"\npays on the hit.\n\nTHE CATALOG'S OWN WORDS, READ\n\"pins enemies\" (restrained), \"reduces enemy speed\" (slowed), \"pushes the target\nback\" / \"pushed back\" (knockback \u2014 the War Pike's \"Strength save or\" is a 50%\ngate), \"disables Tartarian tech\" (stunned, machines only), \"+1 damage to tech\"\n(mechanical), \"the arc jumps to one extra enemy\" (a blast with a headcount), and\na new `pull` control \u2014 the mirror of knockback, dragged in off its footing, a\nhinder that never braces, the magnets restricted to metal. The on-hit shred\nOTA-1563 left \"for the shred slice\" (\"reduces enemy armor by N on hit\") lands on\nthe same enemyArmorShred lever, capped like the acid coating's.\n\nTHE REWORDS, 52 cards, onto mechanics of the same weight or onto honest flavour:\nthe \"decay keeps going\" lines into real festering riders (OTA-1643's DOT shape);\n\"instantly kills \u2026 if HP below 20\" into +20 on a max roll; \"50% enemy HP loss on\n20+\" into +2d10 on a max roll; \"ignores shields on advantage rolls\" into a max\nroll; \"auto-wins vs Aetherkin\" into +1d6 against them; the summons and the\ncollapse into blasts; the teleport into a guard after a hit; the resurrection\ninto a heal after a hit; the parry-break blade into a max-roll burst. Bone Shiv\nsaid \"+1 to Stealth\" over a `statBonuses` row of +2 \u2014 it says +2 now. The\nimpossible ones with nothing of equal weight (repair, coercion, grip, parry,\nrust) say so in plain words.\n\ngameStore absorbed the family under its OTA-1400 ratchet by giving up two set()\nblocks (the max-roll shred and the control landing) to\napp/state/weaponRiderEffects.ts.\n\n- app/engine/weaponEffects.ts \u2014 ShieldAc.dr/immune/reflect + shieldRidersFrom;\n  SelfBuff + selfBuffFrom; onHitShred; `pull`; the widened control, target and\n  blast vocabularies; shieldDamageReduction, rollShieldReflect.\n- app/engine/enemyControl.ts \u2014 pull: \u22122, \"dragged in\".\n- app/engine/types.ts \u2014 `guard_up`, StatusEffect.acBonus.\n- app/engine/statusEffects.ts \u2014 guard_up in statusAcAdjustment and the\n  combat-only set; applyEffect keeps the larger acBonus.\n- app/engine/equipment.ts \u2014 heldShieldAc returns the riders; tagged shields\n  count.\n- app/state/combatResolution.ts \u2014 the riders after the landing roll; the bite\n  on the block and on a raised BLOCK; dealReflectToAttacker.\n- app/state/weaponRiderEffects.ts \u2014 new: planSelfBuff / applyWeaponSelfBuff,\n  shredEnemyArmor, landControlOnScene.\n- app/state/gameStore.ts \u2014 the \"use\" and \"hit\" shares wired, on-hit shred,\n  splash headcount; two blocks moved out.\n- app/data/items/weapons.json \u2014 52 effect lines.\n- __tests__/ota1676TheTailIsRead.test.ts \u2014 60 tests: the tail ratchet by name,\n  the runecasters.json orphan check, every rider and buff off the real rows,\n  the pure planners, the status, the wiring.\n- ota1643 / ota1645 / ota1564 / ota1565 / ota1671 \u2014 pins repointed with the\n  reason: three debts paid, four timed ACs read elsewhere, the Deathblade\n  paid, six more blasts, the reflect helper.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-05T00:42:30Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-05-1676-the-tail-is-read",
+          "shortVersion": "tartaria@4.32.11+2026-09-05-1676-the-tail-is-read",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-05T00:46:23.751514Z",
+          "dateCreated": "2026-09-05T00:44:59.530818Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155731346",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-05T00:46:24.035895Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-05-1676-the-tail-is-read",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-05-1676-the-tail-is-read",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-05-1676-the-tail-is-read",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-05-1676-the-tail-is-read)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "7e9f39c3252c4debbbb39c59ccf933de",
+  "previousEventID": "6a60b86934b94dc790fafb6a3d3d8be1"
+}

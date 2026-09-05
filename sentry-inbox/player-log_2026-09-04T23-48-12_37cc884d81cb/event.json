@@ -1,0 +1,274 @@
+{
+  "id": "37cc884d81cb47649063af44a3217c56",
+  "groupID": "7712848145",
+  "eventID": "37cc884d81cb47649063af44a3217c56",
+  "projectID": "4511945117532160",
+  "size": 18085,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-04-1674-the-dead-life-answers #mtnlu0casj0h [inline 3/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1674-the-dead-life-answers",
+  "message": "player-log 2026-09-04-1674-the-dead-life-answers #mtnlu0casj0h [inline 3/28]",
+  "title": "player-log 2026-09-04-1674-the-dead-life-answers #mtnlu0casj0h [inline 3/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "c5b67a9338b7442887fcbe9331ce1a85",
+      "span_id": "be7cafa4edcda137",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "e Bog Dragon of Old Drakova \u2014 but not with something on you. Put this down first.\"\n[2026-09-04T04:54:30.788Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter keeps one eye on the fight. \"That is the right m\u2026\"\n[2026-09-04T04:54:30.788Z] [debug] attack: target=Mud-Wracked Aetherkin range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n",
+      "[2026-09-04T04:54:30.790Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-04T04:54:30.885Z] [world] Your poisoned corrupted bone crossbow comes around in an arc; Mud-Wracked Aetherkin squares up to meet it.\n[2026-09-04T04:54:30.886Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T04:54:31.530Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE \u00b7 RELOAD  (335ms)\n",
+      "[2026-09-04T04:54:32.251Z] [debug] persist sizes(KB): total=335 player=77 wm=168[rooms=93 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=86 scene=3\n[2026-09-04T04:54:40.356Z] [world] Mud-Wracked Aetherkin moves first. The pressure is immediate.\n[2026-09-04T04:54:40.360Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 4 + ATK 5 = 9 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-04T04:54:40.360Z] [combat] You \u2014 d20 \u2192 12 + DEX 19 perfect opening (2\u00d7 dice) = 31 vs Mud-Wracked Aetherkin AC 11 \u2014 \u2713 HIT\n[2026-09-04T04:54:40.362Z] [combat] The Poisoned coating fails to take on Mud-Wracked Aetherkin.\n[2026-09-04T04:54:40.362Z] [combat] The Corrupted coating fails to take on Mud-Wracked Aetherkin.\n[2026-09-04T04:54:40.362Z] [combat] Piercing flares \u2014 +4 on hit.\n",
+      "[2026-09-04T04:54:40.362Z] [combat] Mud-Wracked Aetherkin shrugs off the piercing. (resisted, \u00d70.5 for 11)\n[2026-09-04T04:54:40.366Z] [arbiter] The Arbiter watches the piercing skid off. \"Swap to the Sparkstrike Wand \u2014 electrical will bite where piercing won't.\"\n[2026-09-04T04:54:40.367Z] [debug] wear ward: Bone Crossbow keeps its point (15%)\n",
+      "[2026-09-04T04:54:40.368Z] [combat] Your strike with the poisoned corrupted bone crossbow lands for 11. Mud-Wracked Aetherkin staggers \u2014 100 HP remaining. It answers.\n[2026-09-04T04:54:46.645Z] [debug] ui: tap \"golem (34/68)\"\n[2026-09-04T04:54:46.658Z] [player] use golem\n[2026-09-04T04:54:46.659Z] [combat] Ashwright attacks Mud-Wracked Aetherkin \u2014 d20 18 + 3 = 21 vs AC 11 \u2014 \u2713 HIT\n",
+      "[2026-09-04T04:54:46.660Z] [combat] Ashwright swings the Crude Golem Sledge \u2014 6 bludgeoning damage on Mud-Wracked Aetherkin. (94 HP left)\n[2026-09-04T04:54:46.661Z] [combat] Mud-Wracked Aetherkin swings at Ashwright and misses.\n[2026-09-04T04:54:46.685Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 15 + ATK 5 = 20 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-04T04:54:47.798Z] [debug] ui: tap \"golem (34/68)\"\n[2026-09-04T04:54:47.810Z] [player] use golem\n[2026-09-04T04:54:47.811Z] [combat] Ashwright attacks Mud-Wracked Aetherkin \u2014 d20 11 + 3 = 14 vs AC 11 \u2014 \u2713 HIT\n[2026-09-04T04:54:47.811Z] [reward] \u2726 Ashwright's Power rises to 1.\n",
+      "[2026-09-04T04:54:47.813Z] [combat] Ashwright swings the Crude Golem Sledge \u2014 4 bludgeoning damage on Mud-Wracked Aetherkin. (90 HP left)\n[2026-09-04T04:54:47.813Z] [combat] Mud-Wracked Aetherkin swings at Ashwright and misses.\n[2026-09-04T04:54:47.833Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 4 + ATK 5 = 9 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-04T04:54:49.095Z] [debug] ui: tap \"golem (37/71)\"\n[2026-09-04T04:54:49.105Z] [player] use golem\n[2026-09-04T04:54:49.106Z] [combat] Ashwright attacks Mud-Wracked Aetherkin \u2014 d20 16 + 4 = 20 vs AC 11 \u2014 \u2713 HIT\n[2026-09-04T04:54:49.107Z] [combat] Ashwright swings the Crude Golem Sledge \u2014 6 bludgeoning damage on Mud-Wracked Aetherkin. (84 HP left)\n",
+      "[2026-09-04T04:54:49.108Z] [combat] Mud-Wracked Aetherkin retaliates \u2014 d20 20 + 6 (NAT 20) hits Ashwright for 8 (35% resisted). (29/71)\n[2026-09-04T04:54:49.129Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 10 + ATK 5 = 15 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-04T04:54:50.545Z] [debug] ui: tap \"golem (29/71)\"\n[2026-09-04T04:54:50.555Z] [player] use golem\n",
+      "[2026-09-04T04:54:50.556Z] [combat] Ashwright attacks Mud-Wracked Aetherkin \u2014 d20 5 + 4 = 9 vs AC 11 \u2014 \u2717 MISS\n[2026-09-04T04:54:50.556Z] [world] Ashwright's strike sails wide of Mud-Wracked Aetherkin.\n[2026-09-04T04:54:50.557Z] [combat] Mud-Wracked Aetherkin retaliates \u2014 d20 16 + 6 hits Ashwright for 5 (35% resisted). (24/71)\n",
+      "[2026-09-04T04:54:50.579Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 13 + ATK 5 = 18 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-04T04:54:51.647Z] [debug] ui: tap \"golem (24/71)\"\n[2026-09-04T04:54:51.657Z] [player] use golem\n[2026-09-04T04:54:51.658Z] [combat] Ashwright attacks Mud-Wracked Aetherkin \u2014 d20 10 + 4 = 14 vs AC 11 \u2014 \u2713 HIT\n",
+      "[2026-09-04T04:54:51.659Z] [combat] Ashwright swings the Crude Golem Sledge \u2014 4 bludgeoning damage on Mud-Wracked Aetherkin. (80 HP left)\n[2026-09-04T04:54:51.660Z] [combat] Mud-Wracked Aetherkin retaliates \u2014 d20 17 + 6 hits Ashwright for 2 (35% resisted). (22/71)\n[2026-09-04T04:54:51.682Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 11 + ATK 5 = 16 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-04T04:54:52.476Z] [debug] persist sizes(KB): total=334 player=77 wm=168[rooms=93 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=85 scene=3\n[2026-09-04T04:54:53.159Z] [debug] ui: tap \"golem (22/71)\"\n[2026-09-04T04:54:53.161Z] [player] use golem\n[2026-09-04T04:54:53.161Z] [combat] Ashwright attacks Mud-Wracked Aetherkin \u2014 d20 6 + 4 = 10 vs AC 11 \u2014 \u2717 MISS\n",
+      "[2026-09-04T04:54:53.161Z] [world] Ashwright's strike sails wide of Mud-Wracked Aetherkin.\n[2026-09-04T04:54:53.161Z] [combat] Mud-Wracked Aetherkin retaliates \u2014 d20 13 + 6 hits Ashwright for 7 (35% resisted). (15/71)\n[2026-09-04T04:54:53.163Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 17 + ATK 5 = 22 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n",
+      "[2026-09-04T04:54:53.527Z] [combat] Mud-Wracked Aetherkin deals 4 aetheric damage [armor \u221234%, title \u00bd, floor 30%]. You have 31 HP remaining.\n[2026-09-04T04:54:54.647Z] [debug] ui: tap \"\u271a heals (3)\"\n[2026-09-04T04:55:06.532Z] [debug] ui: tap \"inventory\"\n[2026-09-04T04:55:09.751Z] [world] You take Trail Rations out of the healing pouch and back into your pack.\n",
+      "[2026-09-04T04:55:32.356Z] [world] You tuck Aether Crystal \u00d7118 into your healing pouch.\n[2026-09-04T04:55:38.287Z] [debug] ui: tap \"\u271a heals (3)\"\n[2026-09-04T04:55:40.057Z] [world] You pack 1\u00d7 Aether Crystal into Ashwright's frame. +17 HP (32/71).\n[2026-09-04T04:55:47.024Z] [debug] ui: tap \"\u271a heals (3)\"\n",
+      "[2026-09-04T04:55:48.693Z] [world] You pack 1\u00d7 Aether Crystal into Ashwright's frame. +17 HP (49/71).\n[2026-09-04T04:55:54.193Z] [debug] ui: tap \"\u271a heals (3)\"\n[2026-09-04T04:55:55.475Z] [world] You pack 1\u00d7 Aether Crystal into Ashwright's frame. +17 HP (66/71).\n",
+      "[2026-09-04T04:55:56.002Z] [debug] persist sizes(KB): total=333 player=77 wm=168[rooms=93 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=85 scene=3\n[2026-09-04T04:56:01.826Z] [debug] ui: tap \"\u2620\u2623 bone crossbow \u25b2\"\n[2026-09-04T04:56:01.877Z] [player] attack with the bone crossbow\n",
+      "[2026-09-04T04:56:01.878Z] [debug] parser: intent=attack conf=1.00 verb=attack target=bone crossbow resolved=Bone Crossbow range=mid enemies=1 hooks=1\n[2026-09-04T04:56:01.879Z] [arbiter] The Arbiter keeps one eye on the fight. \"That is the right move for The Bog Dragon of Old Drakova \u2014 but not with something on you. Put this down first.\"\n",
+      "[2026-09-04T04:56:01.879Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter keeps one eye on the fight. \"That is the right m\u2026\"\n[2026-09-04T04:56:01.880Z] [debug] attack: target=Mud-Wracked Aetherkin range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n",
+      "[2026-09-04T04:56:01.968Z] [world] You commit forward with the poisoned corrupted bone crossbow. Mud-Wracked Aetherkin watches your hands.\n[2026-09-04T04:56:01.968Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T04:56:02.295Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE \u00b7 RELOAD  (325ms)\n[2026-09-04T04:56:11.743Z] [world] Mud-Wracked Aetherkin moves first. The pressure is immediate.\n",
+      "[2026-09-04T04:56:11.747Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 4 + ATK 5 = 9 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-04T04:56:11.747Z] [combat] You \u2014 d20 \u2192 17 + DEX 19 = 36 vs Mud-Wracked Aetherkin AC 11 \u2014 \u2713 HIT\n[2026-09-04T04:56:11.753Z] [combat] The Poisoned coating fails to take on Mud-Wracked Aetherkin.\n",
+      "[2026-09-04T04:56:11.753Z] [combat] The Corrupted coating fails to take on Mud-Wracked Aetherkin.\n[2026-09-04T04:56:11.753Z] [combat] Mud-Wracked Aetherkin shrugs off the piercing. (resisted, \u00d70.5 for 4)\n[2026-09-04T04:56:11.758Z] [combat] Your strike with the poisoned corrupted bone crossbow lands for 4. Mud-Wracked Aetherkin staggers \u2014 76 HP remaining. It answers.\n",
+      "[2026-09-04T04:56:28.082Z] [debug] ui: tap \"\u2620\u2623 bone crossbow \u25b2\"\n[2026-09-04T04:56:28.100Z] [player] attack with the bone crossbow\n[2026-09-04T04:56:28.100Z] [debug] parser: intent=attack conf=1.00 verb=attack target=bone crossbow resolved=Bone Crossbow range=mid enemies=1 hooks=1\n",
+      "[2026-09-04T04:56:28.101Z] [arbiter] The Arbiter keeps one eye on the fight. \"That is the right move for The Bog Dragon of Old Drakova \u2014 but not with something on you. Put this down first.\"\n[2026-09-04T04:56:28.101Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter keeps one eye on the fight. \"That is the right m\u2026\"\n",
+      "[2026-09-04T04:56:28.101Z] [debug] attack: target=Mud-Wracked Aetherkin range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-09-04T04:56:28.174Z] [world] Your poisoned corrupted bone crossbow comes around in an arc; Mud-Wracked Aetherkin squares up to meet it.\n[2026-09-04T04:56:28.174Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-04T04:56:28.496Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE \u00b7 RELOAD  (320ms)\n[2026-09-04T04:56:38.366Z] [world] You seize the initiative. Mud-Wracked Aetherkin has no time to react.\n[2026-09-04T04:56:38.367Z] [combat] You \u2014 d20 \u2192 5 + DEX 19 = 24 vs Mud-Wracked Aetherkin AC 11 \u2014 \u2713 HIT\n",
+      "[2026-09-04T04:56:38.372Z] [combat] The Corrupted coating fails to take on Mud-Wracked Aetherkin.\n[2026-09-04T04:56:38.373Z] [combat] Mud-Wracked Aetherkin shrugs off the piercing. (resisted, \u00d70.5 for 4)\n[2026-09-04T04:56:38.373Z] [combat] The piercing has worn Mud-Wracked Aetherkin's guard through \u2014 it bites full from here.\n",
+      "[2026-09-04T04:56:38.374Z] [combat] Clean hit with the poisoned corrupted bone crossbow for 4. Mud-Wracked Aetherkin has 72 left and does not back away.\n[2026-09-04T04:56:38.375Z] [combat] Poisoned Corrupted Bone Crossbow \u2014 2 poison bites in and festers (3 turns).\n[2026-09-04T04:56:38.377Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 10 + ATK 5 = 15 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-04T04:56:38.378Z] [arbiter] The Arbiter does not look away from the mud-wracked aetherkin. \"Decide quickly. It already has.\"\n[2026-09-04T04:56:41.738Z] [debug] ui: tap \"dodge\"\n[2026-09-04T04:56:41.757Z] [player] dodge\n[2026-09-04T04:56:41.758Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=1 hooks=1\n",
+      "[2026-09-04T04:56:41.759Z] [world] You commit to the dodge. Slip Mud-Wracked Aetherkin's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-04T04:56:41.760Z] [combat] Mud-Wracked Aetherkin shudders \u2014 poison eats 2. (70/111 HP, 2 turns left)\n",
+      "[2026-09-04T04:56:41.866Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 7 + ATK 5 = 12 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n[2026-09-04T04:56:41.866Z] [combat] Dodge \u2014 d20 \u2192 15 + DEX 19 = 34 vs ATK 12. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-04T04:56:41.867Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-09-04T04:56:41.868Z] [arbiter] \"You hit what you commit to,\" the Arbiter says. \"The mud-wracked aetherkin hears the difference.\"\n[2026-09-04T04:56:41.868Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T04:56:42.213Z] [cognitive] neutral  (344ms)\n[2026-09-04T04:56:44.190Z] [debug] ui: tap \"\u2620\u2623 bone crossbow \u25b2\"\n[2026-09-04T04:56:44.241Z] [player] attack with the bone crossbow\n",
+      "[2026-09-04T04:56:44.242Z] [debug] parser: intent=attack conf=1.00 verb=attack target=bone crossbow resolved=Bone Crossbow range=mid enemies=1 hooks=1\n[2026-09-04T04:56:44.243Z] [arbiter] The Arbiter keeps one eye on the fight. \"That is the right move for The Bog Dragon of Old Drakova \u2014 but not with something on you. Put this down first.\"\n",
+      "[2026-09-04T04:56:44.243Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter keeps one eye on the fight. \"That is the right m\u2026\"\n[2026-09-04T04:56:44.243Z] [combat] Mud-Wracked Aetherkin shudders \u2014 poison eats 2. (68/111 HP, 1 turn left)\n",
+      "[2026-09-04T04:56:44.244Z] [debug] attack: target=Mud-Wracked Aetherkin range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-09-04T04:56:44.246Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-04T04:56:44.332Z] [world] Your poisoned corrupted bone crossbow comes around in an arc; Mud-Wracked Aetherkin squares up to meet it.\n",
+      "[2026-09-04T04:56:44.333Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T04:56:44.666Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE \u00b7 RELOAD  (332ms)\n[2026-09-04T04:56:53.842Z] [world] Mud-Wracked Aetherkin moves first. The pressure is immediate.\n[2026-09-04T04:56:53.845Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 2 + ATK 5 = 7 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-04T04:56:53.846Z] [combat] You \u2014 d20 \u2192 12 + DEX 19 perfect opening (2\u00d7 dice) = 31 vs Mud-Wracked Aetherkin AC 11 \u2014 \u2713 HIT\n[2026-09-04T04:56:53.851Z] [combat] The Poisoned coating fails to take on Mud-Wracked Aetherkin.\n[2026-09-04T04:56:53.851Z] [combat] The Corrupted coating fails to take on Mud-Wracked Aetherkin.\n",
+      "[2026-09-04T04:56:53.852Z] [combat] Clean hit with the poisoned corrupted bone crossbow for 11. Mud-Wracked Aetherkin has 57 left and does not back away.\n[2026-09-04T04:56:57.666Z] [debug] ui: tap \"\u2623\u26a1 shroud-spun slinger \u2692\"\n[2026-09-04T04:56:57.757Z] [player] attack with the off-hand reclaimers guild shroud-spun slinger\n",
+      "[2026-09-04T04:56:57.758Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand reclaimers guild shroud spun slinger resolved=Reclaimers Guild Shroud-Spun Slinger range=mid enemies=1 hooks=1\n[2026-09-04T04:56:57.758Z] [arbiter] The Arbiter keeps one eye on the fight. \"That is the right move for The Bog Dragon of Old Drakova \u2014 but not with something on you. Put this down first.\"\n",
+      "[2026-09-04T04:56:57.759Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter keeps one eye on the fight. \"That is the right m\u2026\"\n[2026-09-04T04:56:57.759Z] [combat] Mud-Wracked Aetherkin shudders \u2014 poison eats 2. (55/111 HP, 0 turns left)\n[2026-09-04T04:56:57.759Z] [combat] Mud-Wracked Aetherkin shakes off the last of the poison \u2014 the Bone Crossbow has run its course.\n",
+      "[2026-09-04T04:56:57.760Z] [debug] attack: target=Mud-Wracked Aetherkin range=mid reach.bands=[distant,far,mid,close] reach.label=Re"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-04-1674-the-dead-life-answers #mtnlu0casj0h [inline 3/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtnlu0casj0h"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1674-the-dead-life-answers"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "3"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1674-the-dead-life-answers"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T23:48:10.056804Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T23:48:12.282000Z",
+  "fingerprints": [
+    "9a539618ef59f5fbf89b2d9bec7d1bb6"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1956404347,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-04T23:47:35.927290Z",
+    "dateReleased": "2026-09-04T23:48:24.735279Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "cc2abf544a2897d2e91a0d613af8eea6b385a38a",
+      "message": "[ota-hal] OTA-1674: the dead life answers for itself\n\nItem one of \"fix all existing issues one through six\": #110, the process kill\non nearly every boot. This is not the fix for the kill. It is the instrument\nthat the previous instrument turned out to be missing \u2014 and, by the owner's own\nrule recorded in contextLedger.ts, that is the correct thing to ship: measure\nthe cause, or ship an instrument.\n\nWHAT THE 19:40 LEDGER SAID, ENTRY BY ENTRY\nTen records. Eight at `stage boot:qwen:deferred`. Six of those dead 670\u20131006ms\ninto the process, `alive 0ms` after the stamp, `(no action yet)` \u2014 sub-second,\nbefore the first screen, before Qwen has loaded (it is DEFERRED). And every one\nof the eight: `not an OTA-apply boot`.\n\nThree things ruled out before anything was written:\n- a boot-front race \u2014 App.tsx AWAITS the OTA check and RETURNS on 'applied',\n  so `qwen:deferred` is unreachable on an apply. My first hypothesis, and wrong;\n- anything heavy at that stage \u2014 `armQwenWarm` stores a closure and returns;\n- ML init \u2014 mlHealth reports crash count 0.\n\nAND THE ONE THING THAT COULD NOT BE RULED EITHER WAY\nOTA-1587 asked of every death: did the process that died boot on the far side\nof `reloadAsync`? It stored the answer in the wrong life. The handoff that\ncarries it is consumed on read \u2014 correctly; a handoff is a fact about ONE boot\n\u2014 by the life that then dies, taking the only copy with it. The next boot finds\nno handoff, computes `afterOtaApply: false` about ITSELF, and bootSlice wrote\nthat onto the dead life's record. Structurally, a death record could never say\n\"yes\". \"Not an OTA-apply boot\" on eight of ten was not a finding; it was the\nonly value the field could take. The ota1587 suite pinned the exact line \u2014\n`afterOtaApply: launch.afterOtaApply,` \u2014 as correct.\n\nSo the fact now rides the CRUMB. `bootStampFields()` (the one writer every\ncrumb passes through) adds `afterOta` / `otaPath` / `otaGapMs` / `prevCtx` once\n`noteLaunchFacts` has run \u2014 early in hydrate, before any stage that matters \u2014\nand the record reads the dead life's own answer off its own crumb. A crumb from\nthe first milliseconds, before the launch resolved, leaves it UNDEFINED, and\nevery reader prints that as \"not known\", never as a cold start. \"Not known\" is\na fact; \"false\" is a lie, and it is exactly the lie that hid this for two OTAs.\n\nTWO MORE THINGS THE SAME READ TURNED UP\n- The ledger label keyed on `kind` alone, so the idle reclaims OTA-1567 already\n  made non-fatal (`isFatal: false`, and Sentry has honoured that as level\n  `error` since) still printed PROCESS KILLED \u2014 no JS ran in About and in every\n  bug report, and were counted in \"N recorded\". Two of the owner's ten were\n  that. A ledger that overstates kills to the one person reading it sends the\n  hunt at the wrong thing \u2014 OTA-1521's own words. The label now says what the\n  record knew, and the header says \"10 recorded, 8 fatal\".\n- The whole `launch` block \u2014 which life died, how old it was, what it inherited\n  \u2014 has been on every record since OTA-1587 and forwarded to Sentry on none.\n  The rollup it exists for could only ever be done by hand, on a device. It is\n  in `extra` now, three-valued.\n\nThe OTA-1587 rollup counts FATAL kills and only a true \"yes\"; an idle reclaim\non an apply boot is not the signal, and `undefined` is not a \"no\" \u2014 counting it\nas one would be the same defect one layer down. It also says out loud how many\ndied before their launch resolved, because the absence of that line is how the\nhole hid.\n\n\u26a0 NO BOOT-PHASE EXEMPTION, DELIBERATELY. Six sub-second no-action deaths look\nexactly like a force-close during the splash \u2014 the owner's recorded habit. They\nalso look exactly like OTA-1587's candidate (b): a reload-boot killed by a\nnative context the previous life never released, in a process `reloadAsync`\ndoes not restart. This instrument is what tells those two apart. Filing them as\nnon-fatal today would hide (b) if it is real \u2014 the blind-spot trade OTA-1377 and\nOTA-1413 both refused. The next log closes #110 one way or the other.\n\n- app/diagnostics/bootIdentity.ts \u2014 `BootStamp`, `bootStampFields` carries the\n  launch facts once resolved.\n- app/engine/saveSystem.ts \u2014 `LiveBreadcrumb` gains the four fields.\n- app/state/slices/bootSlice.ts \u2014 the record reads the crumb, not the reader.\n- app/diagnostics/crashLedger.ts \u2014 `recordLabel`, `isFatalRecord`, the header,\n  the rollup over fatal with `=== true` and the unresolved line, the three-way\n  launch line, `launch.otaPath`.\n- app/diagnostics/sentryTransport.ts \u2014 `launch*` in `extra`.\n- __tests__/ota1674TheDeadLifeAnswers.test.ts \u2014 19 tests.\n- __tests__/ota1587WhichLifeDied.test.ts \u2014 the pin on the defect repointed to\n  the fix, with the reason.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T23:45:16Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1674-the-dead-life-answers",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1674-the-dead-life-answers",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T23:48:24.735279Z",
+          "dateCreated": "2026-09-04T23:47:35.927290Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155722001",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T23:48:25.072821Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1674-the-dead-life-answers",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1674-the-dead-life-answers",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1674-the-dead-life-answers",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1674-the-dead-life-answers)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "4a76e84bf0564d27803fdb53e081535c",
+  "previousEventID": "368bc15d35574c0a83e7f2ef5d47a468"
+}

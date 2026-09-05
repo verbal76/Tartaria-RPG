@@ -1,0 +1,275 @@
+{
+  "id": "ecc5ef20648848768edcd38a8e3a09ee",
+  "groupID": "7712952778",
+  "eventID": "ecc5ef20648848768edcd38a8e3a09ee",
+  "projectID": "4511945117532160",
+  "size": 18025,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-05-1676-the-tail-is-read #mtnovtl10c8a [inline 16/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-05-1676-the-tail-is-read",
+  "message": "player-log 2026-09-05-1676-the-tail-is-read #mtnovtl10c8a [inline 16/28]",
+  "title": "player-log 2026-09-05-1676-the-tail-is-read #mtnovtl10c8a [inline 16/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "d6e911fd187243f49c34438ba2fdbf6f",
+      "span_id": "bec3bb8a4734e03c",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "T22:12:51.468Z] [combat] Mud Harpy blackens \u2014 corruption eats 1. (0/101 HP, 1 turn left)\n[2026-09-04T22:12:51.470Z] [reward] Mud Harpy defeated. You recover Mud Fragment \u00d73.\n[2026-09-04T22:12:51.471Z] [combat] 2 attackers remain. Mud Harpy now in your sights.\n[2026-09-04T22:12:51.472Z] [reward] +16 TC pried from the dust.\n",
+      "[2026-09-04T22:12:51.614Z] [combat] Mud Harpy \u2014 d20 \u2192 13 + ATK 6 = 19 vs your AC 22 \u2014 \u2717 EVADED\n[2026-09-04T22:12:51.615Z] [combat] Dodge \u2014 d20 \u2192 10 + DEX 18 = 28 vs ATK 19. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n",
+      "[2026-09-04T22:12:51.615Z] [world] You slip Mud Harpy's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n[2026-09-04T22:12:51.617Z] [debug] ac-shift 22\u219225: race/base 10 + gear 18 + title 0 \u2192 trimmed 22 + status 3 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-W",
+      "alker's Boots cloak=Reclaimer's Cloak\n[2026-09-04T22:12:51.618Z] [combat] Mud Harpy \u2014 d20 \u2192 16 + ATK 6 = 22 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-09-04T22:12:51.619Z] [combat] Your armour turns the blow back \u2014 Mud Harpy takes 1 slashing. (46 HP left)\n[2026-09-04T22:12:51.619Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-04T22:12:51.983Z] [combat] Mud Harpy deals 5 slashing damage [armor \u221225%, plate \u22121]. You have 8 HP remaining.\n[2026-09-04T22:12:52.303Z] [cognitive] neutral  (364ms)\n[2026-09-04T22:12:53.628Z] [debug] ui: tap \"\u2697\u2623 auralite talon \u2726\"\n[2026-09-04T22:12:53.629Z] [system] evasive \u2014 harder to hit fades.\n",
+      "[2026-09-04T22:12:53.631Z] [world] Iron fog disorients you. Compasses spin; intent costs more.\n[2026-09-04T22:12:53.650Z] [player] attack with the auralite talon\n[2026-09-04T22:12:53.650Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=2 hooks=0\n",
+      "[2026-09-04T22:12:53.651Z] [arbiter] The Arbiter keeps one eye on the fight. \"That is the right move for The Bog Dragon of Old Drakova \u2014 but not with something on you. Put this down first.\"\n[2026-09-04T22:12:53.651Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter keeps one eye on the fight. \"That is the right m\u2026\"\n",
+      "[2026-09-04T22:12:53.651Z] [debug] attack: target=Mud Harpy range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n[2026-09-04T22:12:53.652Z] [debug] attack: visibility penalty \u22122 (Iron Fog)\n[2026-09-04T22:12:53.653Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-04T22:12:53.722Z] [world] You bring the acid-etched corrupted auralite talon to bear on Mud Harpy.\n",
+      "[2026-09-04T22:12:53.722Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T22:12:54.064Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (341ms)\n[2026-09-04T22:13:03.342Z] [world] Mud Harpy moves first. The pressure is immediate.\n",
+      "[2026-09-04T22:13:03.346Z] [debug] ac-shift 25\u219222: race/base 10 + gear 18 + title 0 \u2192 trimmed 22 + status 0 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n[2026-09-04T22:13:03.347Z] [combat] Mud Harpy \u2014 d20 \u2192 17 + ATK 6 = 23 vs your AC 22 \u2014 \u2713 HIT\n",
+      "[2026-09-04T22:13:03.351Z] [combat] Your armour turns the blow back \u2014 Mud Harpy takes 1 slashing. (45 HP left)\n[2026-09-04T22:13:03.354Z] [combat] Mud Harpy \u2014 d20 \u2192 12 + ATK 6 = 18 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-04T22:13:03.356Z] [combat] You \u2014 d20 \u2192 4 + INT 17 \u2212 2 (Iron Fog) perfect opening (2\u00d7 dice) = 19 vs Mud Harpy AC 11 \u2014 \u2713 HIT\n",
+      "[2026-09-04T22:13:03.361Z] [combat] Your strike with the acid-etched corrupted auralite talon lands for 15. Mud Harpy staggers \u2014 73 HP remaining. It answers.\n[2026-09-04T22:13:03.361Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 2 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n",
+      "[2026-09-04T22:13:03.361Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 1 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n[2026-09-04T22:13:03.737Z] [combat] Mud Harpy deals 6 slashing damage [armor \u221225%]. You have 2 HP remaining.\n",
+      "[2026-09-04T22:13:03.737Z] [arbiter] The Arbiter holds your gaze. \"Cheddar Bob, you're badly injured. Take a moment \u2014 eat what you have, open the first-aid kit, or rest somewhere safe. The Outskirts do not return what they take.\"\n[2026-09-04T22:13:05.372Z] [debug] ui: tap \"\u271a heals (3)\"\n[2026-09-04T22:13:09.554Z] [world] You use 1\u00d7 Trauma Kit. +45 HP (47/50), +1 stamina.\n",
+      "[2026-09-04T22:13:14.543Z] [debug] ui: tap \"\u2726 bandolier (5)\"\n[2026-09-04T22:13:20.969Z] [reward] You hurl the Incendiary Paste. It bursts across Mud Harpy \u2014 18 burn (4/turn \u00d7 3, burn-weak). (55 HP left)\n[2026-09-04T22:13:20.971Z] [combat] Mud Harpy reels from the burn \u2014 staggered, and slow to recover.\n[2026-09-04T22:13:20.972Z] [combat] Mud Harpy smokes \u2014 acid eats 2. (53/101 HP, 2 turns left)\n",
+      "[2026-09-04T22:13:20.973Z] [combat] Mud Harpy blackens \u2014 corruption eats 1. (52/101 HP, 2 turns left)\n[2026-09-04T22:13:20.987Z] [combat] Mud Harpy \u2014 d20 \u2192 11 + ATK 6 = 17 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-04T22:13:20.992Z] [combat] Mud Harpy \u2014 d20 \u2192 15 + ATK 6 = 21 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-04T22:13:23.422Z] [debug] ui: tap \"inventory\"\n",
+      "[2026-09-04T22:13:39.248Z] [debug] stats: STR18 DEX18 INT15 WIS17 CHA12 STE8 | gear: WIS+5,INT+4,STR+6,DEX+6,STE+2 | worn: main=Auralite Talon off=Bone Crossbow head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Amulet of the Silt Warden ring=Tartarian Oath-Band ring2=Tin Ward Ring ring3=Tin W",
+      "ard Ring ring4=Scribe's Signet\n[2026-09-04T22:13:41.888Z] [debug] persist sizes(KB): total=339 player=73 wm=182[rooms=106 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=80 scene=3\n[2026-09-04T22:13:44.304Z] [debug] ui: tap \"inventory\"\n",
+      "[2026-09-04T22:14:01.994Z] [reward] You work the incendiary paste along the weapon. Now wielding the Burning Bone Crossbow \u2014 1d6 burn on every landing hit.\n[2026-09-04T22:14:06.295Z] [debug] ui: tap \"\ud83d\udd25 bone crossbow \u25b2 \u2605\"\n[2026-09-04T22:14:06.341Z] [player] attack with the off-hand bone crossbow\n",
+      "[2026-09-04T22:14:06.342Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=2 hooks=0\n[2026-09-04T22:14:06.342Z] [arbiter] The Arbiter keeps one eye on the fight. \"That is the right move for The Bog Dragon of Old Drakova \u2014 but not with something on you. Put this down first.\"\n",
+      "[2026-09-04T22:14:06.343Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter keeps one eye on the fight. \"That is the right m\u2026\"\n[2026-09-04T22:14:06.343Z] [combat] Mud Harpy smokes \u2014 acid eats 2. (50/101 HP, 1 turn left)\n[2026-09-04T22:14:06.343Z] [combat] Mud Harpy blackens \u2014 corruption eats 1. (49/101 HP, 1 turn left)\n",
+      "[2026-09-04T22:14:06.343Z] [debug] attack: target=Mud Harpy range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n[2026-09-04T22:14:06.344Z] [debug] attack: visibility penalty \u22122 (Iron Fog)\n[2026-09-04T22:14:06.420Z] [world] You raise the burning bone crossbow toward Mud Harpy. The room narrows around the both of you.\n",
+      "[2026-09-04T22:14:06.420Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T22:14:06.760Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (338ms)\n[2026-09-04T22:14:13.772Z] [world] You seize the initiative. Mud Harpy has no time to react.\n[2026-09-04T22:14:13.772Z] [combat] You \u2014 d20 \u2192 20 + DEX 17 \u2212 2 (Iron Fog) + 2 (point blank) = 37 vs Mud Harpy AC 10 \u2014 \u2713 CRITICAL HIT\n",
+      "[2026-09-04T22:14:13.774Z] [combat] Mud Harpy shrugs off the piercing. (resisted, \u00d70.5 for 13)\n[2026-09-04T22:14:13.781Z] [arbiter] The Arbiter watches the piercing skid off. \"Swap to the Mud Armor Rod \u2014 bludgeoning or aetheric will bite where piercing won't.\"\n",
+      "[2026-09-04T22:14:13.783Z] [combat] The blow with the burning bone crossbow finds purchase \u2014 13 damage, 36 HP standing. Mud Harpy commits to the counter.\n[2026-09-04T22:14:13.783Z] [combat] Burning Bone Crossbow \u2014 6 burn bites in and festers (3 turns).\n[2026-09-04T22:14:13.785Z] [combat] Mud Harpy \u2014 d20 \u2192 19 + ATK 6 = 25 vs your AC 22 \u2014 \u2713 HIT\n",
+      "[2026-09-04T22:14:13.786Z] [combat] Your armour turns the blow back \u2014 Mud Harpy takes 1 slashing. (44 HP left)\n[2026-09-04T22:14:13.788Z] [combat] Mud Harpy \u2014 d20 \u2192 15 + ATK 6 = 21 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-04T22:14:14.173Z] [combat] Mud Harpy deals 9 slashing damage [armor \u221225%]. You have 38 HP remaining.\n[2026-09-04T22:14:16.609Z] [debug] ui: tap \"inventory\"\n",
+      "[2026-09-04T22:14:46.226Z] [debug] ui: tap \"dodge\"\n[2026-09-04T22:14:46.239Z] [player] dodge\n[2026-09-04T22:14:46.240Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=2 hooks=0\n",
+      "[2026-09-04T22:14:46.241Z] [world] You commit to the dodge. Slip Mud Harpy's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-04T22:14:46.242Z] [combat] Mud Harpy smokes \u2014 acid eats 2. (34/101 HP, 0 turns left)\n",
+      "[2026-09-04T22:14:46.242Z] [combat] Mud Harpy shakes off the last of the acid \u2014 the Auralite Talon has run its course.\n[2026-09-04T22:14:46.242Z] [combat] Mud Harpy blackens \u2014 corruption eats 1. (33/101 HP, 0 turns left)\n[2026-09-04T22:14:46.243Z] [combat] Mud Harpy shakes off the last of the corruption \u2014 the Auralite Talon has run its course.\n",
+      "[2026-09-04T22:14:46.243Z] [combat] Mud Harpy blisters \u2014 clinging fire sears 6. (27/101 HP, 2 turns left)\n[2026-09-04T22:14:46.330Z] [combat] Mud Harpy \u2014 d20 \u2192 14 + ATK 6 = 20 vs your AC 22 \u2014 \u2717 EVADED\n[2026-09-04T22:14:46.331Z] [combat] Dodge \u2014 d20 \u2192 13 + DEX 18 = 31 vs ATK 20. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n",
+      "[2026-09-04T22:14:46.331Z] [world] You slip Mud Harpy's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n[2026-09-04T22:14:46.333Z] [debug] ac-shift 22\u219225: race/base 10 + gear 18 + title 0 \u2192 trimmed 22 + status 3 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-W",
+      "alker's Boots cloak=Reclaimer's Cloak\n[2026-09-04T22:14:46.334Z] [combat] Mud Harpy \u2014 d20 \u2192 20 + ATK 6 = 26 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 CRITICAL HIT\n[2026-09-04T22:14:46.335Z] [combat] Your armour turns the blow back \u2014 Mud Harpy takes 1 slashing. (26 HP left)\n[2026-09-04T22:14:46.335Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-04T22:14:46.702Z] [combat] Mud Harpy deals 7 slashing damage [armor \u221225%, plate \u22121]. You have 31 HP remaining.\n[2026-09-04T22:14:47.025Z] [cognitive] neutral  (367ms)\n[2026-09-04T22:14:47.980Z] [debug] ui: tap \"\ud83d\udd25 bone crossbow \u25b2 \u2605\"\n[2026-09-04T22:14:47.981Z] [system] evasive \u2014 harder to hit fades.\n[2026-09-04T22:14:48.004Z] [player] attack with the off-hand bone crossbow\n",
+      "[2026-09-04T22:14:48.005Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=2 hooks=0\n[2026-09-04T22:14:48.005Z] [arbiter] The Arbiter keeps one eye on the fight. \"That is the right move for The Bog Dragon of Old Drakova \u2014 but not with something on you. Put this down first.\"\n",
+      "[2026-09-04T22:14:48.005Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter keeps one eye on the fight. \"That is the right m\u2026\"\n[2026-09-04T22:14:48.005Z] [combat] Mud Harpy blisters \u2014 clinging fire sears 6. (20/101 HP, 1 turn left)\n[2026-09-04T22:14:48.005Z] [debug] attack: target=Mud Harpy range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false\n",
+      "[2026-09-04T22:14:48.008Z] [debug] attack: visibility penalty \u22122 (Iron Fog)\n[2026-09-04T22:14:48.008Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-04T22:14:48.078Z] [world] You bring the burning bone crossbow to bear on Mud Harpy.\n[2026-09-04T22:14:48.078Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T22:14:48.417Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 AIM \u00b7 DISENGAGE  (338ms)\n",
+      "[2026-09-04T22:14:49.163Z] [debug] persist sizes(KB): total=340 player=74 wm=182[rooms=106 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=81 scene=3\n[2026-09-04T22:14:58.860Z] [world] Mud Harpy moves first. The pressure is immediate.\n",
+      "[2026-09-04T22:14:58.863Z] [debug] ac-shift 25\u219222: race/base 10 + gear 18 + title 0 \u2192 trimmed 22 + status 0 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n[2026-09-04T22:14:58.863Z] [combat] Mud Harpy \u2014 d20 \u2192 8 + ATK 6 = 14 vs your AC 22 \u2014 \u2717 MISS\n",
+      "[2026-09-04T22:14:58.865Z] [combat] Mud Harpy \u2014 d20 \u2192 8 + ATK 6 = 14 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-04T22:14:58.865Z] [combat] You \u2014 d20 \u2192 17 + DEX 17 \u2212 2 (Iron Fog) + 2 (point blank) perfect opening (2\u00d7 dice) = 34 vs Mud Harpy AC 11 \u2014 \u2713 HIT\n[2026-09-04T22:14:58.869Z] [combat] Mud Harpy shrugs off the piercing. (resisted, \u00d70.5 for 13)\n",
+      "[2026-09-04T22:14:58.875Z] [combat] Your strike with the burning bone crossbow lands for 13. Mud Harpy staggers \u2014 7 HP remaining. It answers.\n[2026-09-04T22:14:58.875Z] [combat] Burning Bone Crossbow \u2014 5 burn bites in and festers (3 turns).\n[2026-09-04T22:14:58.875Z] [arbiter] The Arbiter watches the blow land or fail. \"Both are answers.\"\n",
+      "[2026-09-04T22:14:59.257Z] [combat] Your Bone Crossbow shatters from wear. It is gone. A twist of Scrap Metal comes free in your hand.\n[2026-09-04T22:14:59.257Z] [reward] \u2726 Scrap Metal (Common).\n[2026-09-04T22:15:01.118Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=cached winH=986 beat=-\n",
+      "[2026-09-04T22:15:01.817Z] [debug] kbbar: mounted bottom=407.79486083984375 raw=408 from=live winH=986 beat=-\n[2026-09-04T22:15:10.762Z] [player] 0 The enemy portrait is stuck between a left and right swipe and I did not swipe\n[2026-09-04T22:15:10.763Z] [debug] parser: intent=steal conf=1.00 verb=swipe target=not swipe resolved=- range=close enemies=2 hooks=0\n",
+      "[2026-09-04T22:15:10.764Z] [arbiter] The Arbiter watches the empty path. \"Nothing to steal here.\"\n[2026-09-04T22:15:11.464Z] [cognitive] DISENGAGE \u00b7 MANEUVER  (699ms)\n[2026-09-04T22:15:17.242Z] [debug] ui: tap \"inventory\"\n",
+      "[2026-09-04T22:16:07.178Z] [debug] stats: STR18 DEX18 INT16 WIS17 CHA12 STE8 | gear: WIS+5,INT+5,STR+6,DEX+6,STE+2 | worn: main=Auralite Talon off=Vine Grasp Wand head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Amulet of the Silt Warden ring=Tartarian Oath-Band ring2=Tin Ward Ring ring3=Tin",
+      " Ward Ring ring4=Scribe's Signet\n[2026-09-04T22:16:13.505Z] [debug] ui: tap \"\u271a heals (3)\"\n[2026-09-04T22:16:15.493Z] [world] You use 1\u00d7 First Aid Kit. +19 HP (50/50).\n[2026-09-04T22:16:19.682Z] [debug] ui: tap \"dodge\"\n[2026-09-04T22:16:19.700Z] [player] dodge\n[2026-09-04T22:16:19.700Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=2 hooks=0"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-05-1676-the-tail-is-read #mtnovtl10c8a [inline 16/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtnovtl10c8a"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-05-1676-the-tail-is-read"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "16"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-05-1676-the-tail-is-read"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-05T01:13:33.329424Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-05T01:13:35.396000Z",
+  "fingerprints": [
+    "901d39e2a99ee2e211148263b6b1fad9"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1956463043,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-05T00:44:59.530818Z",
+    "dateReleased": "2026-09-05T00:46:23.751514Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "773b9a7b9973d9b2fa93a4a8ca35903f5853b55d",
+      "message": "[ota-hal] OTA-1676: the tail is read (slice 4c)\n\nItem three of \"fix all existing issues one through six\": #98, the last unit of\nslice 4 \u2014 the exotic reword pass, the shield DR/reflect riders, and the\nShield-Hammer's timed +2 AC. Slice 4 is closed with this.\n\nTHE MEASUREMENT FIRST\nSlice 4's probe, re-run on the current catalog: 316 effect strings, 200 parsed,\n116 unread. Twenty-nine of the unread were rows of app/data/items/runecasters.json\n\u2014 a catalog nothing in the app imports (the suite asserts it) \u2014 so the live tail\nwas 87, the \"~85\" the task recorded. It is 28 now, and every one of the 28 is on\na flavour list BY NAME: HP grants that `statBonuses` already pays, faction-issue\nlines, the bucklers' bash (paid by the shield tag), and six sentences this OTA\nwrote to say plainly that a weapon does nothing special. A card that promises\nsomething unread cannot be authored again without failing the suite.\n\nTHE SHIELD RIDERS \u2014 what OTA-1645 admitted it only half read\nNine shields print a soak (\"reduces incoming slashing by 1d6\", \"blocks +1d6 from\nphysical attacks\", Graviton's \"+1d6 environmental damage reduction\"), an\nimmunity (\"Blocks all plasma damage\", \"Blocks Aetheric-based damage\", \"Deflects\nrunecasters\") or a bite (\"Deals 1d6 damage on the block\", \"reflects 1d6 back\").\nAll three are spent ONLY on a blow that landed on the shield \u2014 OTA-1646's\nlanding roll is what makes that honest; a plate that turns slashing does nothing\nfor a blow that came around it to your ribs. The soak runs as a pool after the\nmitigation floor (OTA-924's own carve-out for the ward). The bite goes through\nOTA-1671's reflect path, lifted into one helper (`dealReflectToAttacker`) so the\nraised-BLOCK path pays it too \u2014 owed by the block, not by the wound, so a spiked\nshield that soaked the whole blow still bites. A kill by reflect is a defeat.\n\"Plasma\" reads as burn: every plasma weapon is typed burn and no enemy deals a\ntype called plasma, so a plasma shield turns burn or turns nothing. The two \"on\nmax roll\" bites became \"on the block\" \u2014 a shield has no roll to be max on.\n\u26a0 A tagged buckler with nothing on its card is a held shield now: the Mud and\nIron Bucklers parsed to nothing, so no blow ever landed on them and they never\nwore. The tag is what makes a shield a shield.\n\nTHE WIELDER'S OWN SHARE, on machinery that already existed\nguard (a timed +N AC \u2014 the Shield-Hammer's \"+2 AC for 1 round after a hit\",\nread by statusAcAdjustment through one new kind, `guard_up`, combat-only like a\nstance), cover (`in_cover`), ward (OTA-835's `stone_ward` soak pool, rolled once\nwhen raised, replaces the old one) and heal (clamped to the room there is).\nThirteen cards were reworded onto ONE grammar for the four, because a parser\nloose enough to read \"Shields caster with mud barrier; blocks 1d6 damage. 3\nrounds.\" would read a shield's \"blocks +1d6 from physical attacks\" as a ward.\n\"On use\" pays on the swing (a ward you raise lands on a miss too); \"after a hit\"\npays on the hit.\n\nTHE CATALOG'S OWN WORDS, READ\n\"pins enemies\" (restrained), \"reduces enemy speed\" (slowed), \"pushes the target\nback\" / \"pushed back\" (knockback \u2014 the War Pike's \"Strength save or\" is a 50%\ngate), \"disables Tartarian tech\" (stunned, machines only), \"+1 damage to tech\"\n(mechanical), \"the arc jumps to one extra enemy\" (a blast with a headcount), and\na new `pull` control \u2014 the mirror of knockback, dragged in off its footing, a\nhinder that never braces, the magnets restricted to metal. The on-hit shred\nOTA-1563 left \"for the shred slice\" (\"reduces enemy armor by N on hit\") lands on\nthe same enemyArmorShred lever, capped like the acid coating's.\n\nTHE REWORDS, 52 cards, onto mechanics of the same weight or onto honest flavour:\nthe \"decay keeps going\" lines into real festering riders (OTA-1643's DOT shape);\n\"instantly kills \u2026 if HP below 20\" into +20 on a max roll; \"50% enemy HP loss on\n20+\" into +2d10 on a max roll; \"ignores shields on advantage rolls\" into a max\nroll; \"auto-wins vs Aetherkin\" into +1d6 against them; the summons and the\ncollapse into blasts; the teleport into a guard after a hit; the resurrection\ninto a heal after a hit; the parry-break blade into a max-roll burst. Bone Shiv\nsaid \"+1 to Stealth\" over a `statBonuses` row of +2 \u2014 it says +2 now. The\nimpossible ones with nothing of equal weight (repair, coercion, grip, parry,\nrust) say so in plain words.\n\ngameStore absorbed the family under its OTA-1400 ratchet by giving up two set()\nblocks (the max-roll shred and the control landing) to\napp/state/weaponRiderEffects.ts.\n\n- app/engine/weaponEffects.ts \u2014 ShieldAc.dr/immune/reflect + shieldRidersFrom;\n  SelfBuff + selfBuffFrom; onHitShred; `pull`; the widened control, target and\n  blast vocabularies; shieldDamageReduction, rollShieldReflect.\n- app/engine/enemyControl.ts \u2014 pull: \u22122, \"dragged in\".\n- app/engine/types.ts \u2014 `guard_up`, StatusEffect.acBonus.\n- app/engine/statusEffects.ts \u2014 guard_up in statusAcAdjustment and the\n  combat-only set; applyEffect keeps the larger acBonus.\n- app/engine/equipment.ts \u2014 heldShieldAc returns the riders; tagged shields\n  count.\n- app/state/combatResolution.ts \u2014 the riders after the landing roll; the bite\n  on the block and on a raised BLOCK; dealReflectToAttacker.\n- app/state/weaponRiderEffects.ts \u2014 new: planSelfBuff / applyWeaponSelfBuff,\n  shredEnemyArmor, landControlOnScene.\n- app/state/gameStore.ts \u2014 the \"use\" and \"hit\" shares wired, on-hit shred,\n  splash headcount; two blocks moved out.\n- app/data/items/weapons.json \u2014 52 effect lines.\n- __tests__/ota1676TheTailIsRead.test.ts \u2014 60 tests: the tail ratchet by name,\n  the runecasters.json orphan check, every rider and buff off the real rows,\n  the pure planners, the status, the wiring.\n- ota1643 / ota1645 / ota1564 / ota1565 / ota1671 \u2014 pins repointed with the\n  reason: three debts paid, four timed ACs read elsewhere, the Deathblade\n  paid, six more blasts, the reflect helper.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-05T00:42:30Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-05-1676-the-tail-is-read",
+          "shortVersion": "tartaria@4.32.11+2026-09-05-1676-the-tail-is-read",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-05T00:46:23.751514Z",
+          "dateCreated": "2026-09-05T00:44:59.530818Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155731346",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-05T00:46:24.035895Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-05-1676-the-tail-is-read",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-05-1676-the-tail-is-read",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-05-1676-the-tail-is-read",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-05-1676-the-tail-is-read)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "ee0bbc0369e045d2befee2143989f728",
+  "previousEventID": "e9bab31319f6484db8839ef6c0f3b3eb"
+}

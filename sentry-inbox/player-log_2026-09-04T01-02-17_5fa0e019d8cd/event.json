@@ -1,0 +1,279 @@
+{
+  "id": "5fa0e019d8cd45eca8da991bffa41c1e",
+  "groupID": "7710845046",
+  "eventID": "5fa0e019d8cd45eca8da991bffa41c1e",
+  "projectID": "4511945117532160",
+  "size": 18040,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-04-1657-the-healing-pouch #mtm6enrfz3iy [inline 20/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1657-the-healing-pouch",
+  "message": "player-log 2026-09-04-1657-the-healing-pouch #mtm6enrfz3iy [inline 20/28]",
+  "title": "player-log 2026-09-04-1657-the-healing-pouch #mtm6enrfz3iy [inline 20/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "660230bbb4654cea944b5ced5e11ec5c",
+      "span_id": "b155f8ce88db87d1",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "]     \u2022 Worn Tartarian Coin x2 (Common)\n[2026-09-03T20:47:22.648Z] [reward]     \u2022 Smooth Stone (Common)\n[2026-09-03T20:47:22.648Z] [reward]     \u2022 Warped Plank Offcut (Common)\n[2026-09-03T20:47:24.175Z] [debug] ui: tap \"investigate\"\n[2026-09-03T20:47:25.727Z] [debug] qwen: loading (was idle) \u2014 the Arbiter speaks templates until it is ready\n[2026-09-03T20:47:25.751Z] [player] investigate the ground\n",
+      "[2026-09-03T20:47:25.751Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n[2026-09-03T20:47:25.756Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Wild Onion (Common).\n[2026-09-03T20:47:25.764Z] [system] \u23f3 Time passed: 24 min\n[2026-09-03T20:47:25.999Z] [cognitive] CLIMB  (234ms)\n",
+      "[2026-09-03T20:47:26.797Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-09-03T20:47:27.018Z] [player] investigate pathway\n[2026-09-03T20:47:27.018Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=pathway resolved=pathway range=- enemies=0 hooks=1\n",
+      "[2026-09-03T20:47:27.020Z] [world] The pathway reads as ordinary, which in Tartaria is a small kind of relief. You leave it be.\n[2026-09-03T20:47:27.217Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-09-03T20:47:27.222Z] [debug] spawn: gear=[Wanderer's Worn Gauntlets] window=10 roster=new\n",
+      "[2026-09-03T20:47:27.225Z] [world] The flat silt heaves, and a hand breaks the surface, then an arm, then a face caked grey with a thousand years of it.\n[2026-09-03T20:47:27.225Z] [arbiter] You've heard of these on the road: the Aetherkin, the ones the mud drowned and the Aether raised back up.\n",
+      "[2026-09-03T20:47:27.225Z] [world] In life it was a baker, flour still ghosts the creases of what were once their sleeves \u2014 or maybe just someone who happened to live here \u2014 you can't be sure. They surfaced out of the flat mud like a held breath finally, terribly let go.\n",
+      "[2026-09-03T20:47:27.226Z] [world] It looks at you the way a cornered animal looks at a door. Fight or flight, and the flight is walled off. Press it and it will strike; leave it and it will let you.\n[2026-09-03T20:47:27.226Z] [world] You walk north through open silt. The compass tells you The Core-Casing lies further north \u2014 5 tiles, about 13 hours of travel.\n",
+      "[2026-09-03T20:47:27.226Z] [world] What you started here has not finished itself in your absence.\n[2026-09-03T20:47:27.591Z] [cognitive] neutral  (570ms)\n[2026-09-03T20:47:30.410Z] [debug] qwen\u23f1 investigate_lore ok 2820ms read 1479ms/write 850ms in 125t\u2192out 26t 11.8ms/t (118ch)\n[2026-09-03T20:47:30.828Z] [debug] ui: tap \"approach\"\n[2026-09-03T20:47:30.869Z] [player] approach Mud-Wracked Aetherkin\n",
+      "[2026-09-03T20:47:30.870Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud wracked aetherkin resolved=Mud-Wracked Aetherkin range=mid enemies=1 hooks=1\n[2026-09-03T20:47:30.873Z] [debug] move: advance from range=mid enemies=1 weather=Black Rain cost=1 partial=0\n[2026-09-03T20:47:30.873Z] [debug] move: field advance target=Mud-Wracked Aetherkin d 1.50->0.50 band mid->close\n",
+      "[2026-09-03T20:47:30.873Z] [world] You close the gap with Mud-Wracked Aetherkin. (range: close / arm's reach)\n[2026-09-03T20:47:30.873Z] [combat] Mud-Wracked Aetherkin stops \u2014 and the air in front of it thickens, faintly bright. An AETHER SHIELD stands where its swing should have been (+3 AC).\n[2026-09-03T20:47:30.874Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-09-03T20:47:30.874Z] [arbiter] The Arbiter watches the mud-wracked aetherkin. \"It is not the first thing here that decided to keep its distance, then changed its mind.\"\n[2026-09-03T20:47:31.270Z] [cognitive] SWIM \u00b7 RETREAT \u00b7 REST \u00b7 SEARCH  (395ms)\n[2026-09-03T20:47:38.839Z] [debug] ui: tap \"dodge\"\n[2026-09-03T20:47:38.853Z] [player] dodge\n",
+      "[2026-09-03T20:47:38.854Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=1\n[2026-09-03T20:47:38.855Z] [world] You commit to the dodge. Slip Mud-Wracked Aetherkin's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-03T20:47:38.952Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 13 + ATK 5 = 18 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n[2026-09-03T20:47:38.952Z] [combat] Dodge \u2014 d20 \u2192 19 + DEX 21 = 40 vs ATK 18. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-03T20:47:38.952Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-09-03T20:47:38.953Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T20:47:38.953Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T20:47:39.320Z] [cognitive] neutral  (366ms)\n[2026-09-03T20:47:40.005Z] [debug] ui: tap \"\u2623 shroud-spun slinger \u2692\"\n[2026-09-03T20:47:40.045Z] [player] attack with the off-hand reclaimers guild shroud-spun slinger\n",
+      "[2026-09-03T20:47:40.045Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand reclaimers guild shroud spun slinger resolved=Reclaimers Guild Shroud-Spun Slinger range=close enemies=1 hooks=1\n[2026-09-03T20:47:40.046Z] [debug] attack: target=Mud-Wracked Aetherkin range=close reach.bands=[distant,far,mid,close] reach.label=Reclaimers Guild Shroud-Spun Slinger bareHand=false\n",
+      "[2026-09-03T20:47:40.048Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-03T20:47:40.122Z] [world] You bring the corrupted reclaimers guild shroud-spun slinger to bear on Mud-Wracked Aetherkin.\n[2026-09-03T20:47:40.123Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T20:47:40.471Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 USE_ITEM  (347ms)\n",
+      "[2026-09-03T20:47:48.330Z] [world] You seize the initiative. Mud-Wracked Aetherkin has no time to react.\n[2026-09-03T20:47:48.330Z] [combat] You \u2014 d20 \u2192 9 + DEX 21 + 2 (point blank) perfect opening (2\u00d7 dice) = 32 vs Mud-Wracked Aetherkin AC 14 \u2014 \u2713 HIT\n[2026-09-03T20:47:48.330Z] [combat] Mud-Wracked Aetherkin shrugs off the bludgeoning. (resisted, \u00d70.5 for 11)\n",
+      "[2026-09-03T20:47:48.334Z] [arbiter] The Arbiter watches the bludgeoning skid off. \"Swap to the Plasma Thrower \u2014 burn will bite where bludgeoning won't.\"\n[2026-09-03T20:47:48.335Z] [combat] Mud-Wracked Aetherkin takes 11 with the corrupted reclaimers guild shroud-spun slinger. It reels: 105 left. Then it fights back.\n",
+      "[2026-09-03T20:47:48.335Z] [combat] Corrupted Reclaimers Guild Shroud-Spun Slinger \u2014 4 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n[2026-09-03T20:47:48.337Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 19 + ATK 5 = 24 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-09-03T20:47:48.338Z] [arbiter] The Arbiter watches the blow land or fail. \"Both are answers.\"\n",
+      "[2026-09-03T20:47:48.730Z] [combat] Mud-Wracked Aetherkin deals 3 aetheric damage [armor \u221234%, title \u00bd] +2 corruption [Mud-glass Scales took it]. You have 45 HP remaining.\n[2026-09-03T20:47:54.312Z] [debug] ui: tap \"\u2623 shroud-spun slinger \u2692\"\n[2026-09-03T20:47:54.352Z] [player] attack with the off-hand reclaimers guild shroud-spun slinger\n",
+      "[2026-09-03T20:47:54.352Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand reclaimers guild shroud spun slinger resolved=Reclaimers Guild Shroud-Spun Slinger range=close enemies=1 hooks=1\n[2026-09-03T20:47:54.353Z] [combat] Mud-Wracked Aetherkin blackens \u2014 corruption eats 4. (101/116 HP, 2 turns left)\n",
+      "[2026-09-03T20:47:54.353Z] [debug] attack: target=Mud-Wracked Aetherkin range=close reach.bands=[distant,far,mid,close] reach.label=Reclaimers Guild Shroud-Spun Slinger bareHand=false\n[2026-09-03T20:47:54.429Z] [world] You commit forward with the corrupted reclaimers guild shroud-spun slinger. Mud-Wracked Aetherkin watches your hands.\n[2026-09-03T20:47:54.429Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-03T20:47:54.774Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 USE_ITEM  (344ms)\n[2026-09-03T20:47:55.189Z] [debug] persist sizes(KB): total=329 player=83 wm=154[rooms=84 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=87 scene=5\n[2026-09-03T20:48:02.269Z] [world] Mud-Wracked Aetherkin moves first. The pressure is immediate.\n",
+      "[2026-09-03T20:48:02.272Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 18 + ATK 5 = 23 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-09-03T20:48:02.273Z] [combat] You \u2014 d20 \u2192 8 + DEX 21 + 2 (point blank) = 31 vs Mud-Wracked Aetherkin AC 14 \u2014 \u2713 HIT\n[2026-09-03T20:48:02.273Z] [combat] The Corrupted coating fails to take on Mud-Wracked Aetherkin.\n",
+      "[2026-09-03T20:48:02.273Z] [combat] Mud-Wracked Aetherkin shrugs off the bludgeoning. (resisted, \u00d70.5 for 2)\n[2026-09-03T20:48:02.277Z] [combat] The blow with the corrupted reclaimers guild shroud-spun slinger finds purchase \u2014 2 damage, 99 HP standing. Mud-Wracked Aetherkin commits to the counter.\n",
+      "[2026-09-03T20:48:02.664Z] [combat] Mud-Wracked Aetherkin deals 9 aetheric damage [armor \u221234%, title \u00bd, floor 30%] +3 corruption [Titan's Gauntlets took it]. You have 36 HP remaining.\n[2026-09-03T20:48:04.407Z] [debug] ui: tap \"magnetic axe \u26a1\"\n[2026-09-03T20:48:04.448Z] [player] attack with the magnetic axe\n",
+      "[2026-09-03T20:48:04.449Z] [debug] parser: intent=attack conf=1.00 verb=attack target=magnetic axe resolved=Magnetic Axe range=close enemies=1 hooks=1\n[2026-09-03T20:48:04.450Z] [combat] Mud-Wracked Aetherkin blackens \u2014 corruption eats 4. (95/116 HP, 1 turn left)\n",
+      "[2026-09-03T20:48:04.450Z] [debug] attack: target=Mud-Wracked Aetherkin range=close reach.bands=[close] reach.label=Magnetic Axe bareHand=false\n[2026-09-03T20:48:04.532Z] [world] You raise the magnetic axe toward Mud-Wracked Aetherkin. The room narrows around the both of you.\n[2026-09-03T20:48:04.533Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-03T20:48:04.899Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 THROW \u00b7 DISENGAGE  (364ms)\n[2026-09-03T20:48:09.573Z] [world] You seize the initiative. Mud-Wracked Aetherkin has no time to react.\n[2026-09-03T20:48:09.574Z] [combat] You \u2014 d20 \u2192 14 + STR 17 = 31 vs Mud-Wracked Aetherkin AC 14 \u2014 \u2713 HIT\n",
+      "[2026-09-03T20:48:09.577Z] [combat] Your strike with the magnetic axe lands for 9. Mud-Wracked Aetherkin staggers \u2014 86 HP remaining. It answers.\n[2026-09-03T20:48:09.580Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 12 + ATK 5 = 17 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-03T20:48:11.676Z] [debug] ui: tap \"dodge\"\n[2026-09-03T20:48:11.691Z] [player] dodge\n",
+      "[2026-09-03T20:48:11.691Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=1\n[2026-09-03T20:48:11.692Z] [world] You commit to the dodge. Slip Mud-Wracked Aetherkin's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-03T20:48:11.693Z] [combat] Mud-Wracked Aetherkin blackens \u2014 corruption eats 4. (82/116 HP, 0 turns left)\n[2026-09-03T20:48:11.693Z] [combat] Mud-Wracked Aetherkin shakes off the last of the corruption \u2014 the Reclaimers Guild Shroud-Spun Slinger has run its course.\n",
+      "[2026-09-03T20:48:11.785Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 17 + ATK 5 = 22 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n[2026-09-03T20:48:11.786Z] [combat] Dodge \u2014 d20 \u2192 19 + DEX 21 = 40 vs ATK 22. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-03T20:48:11.786Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-09-03T20:48:11.786Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T20:48:11.787Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T20:48:12.156Z] [cognitive] neutral  (368ms)\n[2026-09-03T20:48:13.426Z] [debug] ui: tap \"\u2623 shroud-spun slinger \u2692\"\n[2026-09-03T20:48:13.494Z] [player] attack with the off-hand reclaimers guild shroud-spun slinger\n",
+      "[2026-09-03T20:48:13.494Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand reclaimers guild shroud spun slinger resolved=Reclaimers Guild Shroud-Spun Slinger range=close enemies=1 hooks=1\n[2026-09-03T20:48:13.496Z] [debug] attack: target=Mud-Wracked Aetherkin range=close reach.bands=[distant,far,mid,close] reach.label=Reclaimers Guild Shroud-Spun Slinger bareHand=false\n",
+      "[2026-09-03T20:48:13.497Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-03T20:48:13.574Z] [world] Your corrupted reclaimers guild shroud-spun slinger comes around in an arc; Mud-Wracked Aetherkin squares up to meet it.\n[2026-09-03T20:48:13.574Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T20:48:13.926Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 USE_ITEM  (351ms)\n",
+      "[2026-09-03T20:48:21.133Z] [world] You seize the initiative. Mud-Wracked Aetherkin has no time to react.\n[2026-09-03T20:48:21.134Z] [combat] You \u2014 d20 \u2192 16 + DEX 21 + 2 (point blank) perfect opening (2\u00d7 dice) = 39 vs Mud-Wracked Aetherkin AC 14 \u2014 \u2713 HIT\n[2026-09-03T20:48:21.134Z] [combat] The Corrupted coating fails to take on Mud-Wracked Aetherkin.\n",
+      "[2026-09-03T20:48:21.134Z] [combat] Mud-Wracked Aetherkin shrugs off the bludgeoning. (resisted, \u00d70.5 for 8)\n[2026-09-03T20:48:21.135Z] [combat] The bludgeoning has worn Mud-Wracked Aetherkin's guard through \u2014 it bites full from here.\n",
+      "[2026-09-03T20:48:21.136Z] [combat] Your strike with the corrupted reclaimers guild shroud-spun slinger lands for 8. Mud-Wracked Aetherkin staggers \u2014 74 HP remaining. It answers.\n[2026-09-03T20:48:21.138Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 9 + ATK 5 = 14 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-03T20:48:33.426Z] [debug] ui: tap \"magnetic axe \u26a1\"\n",
+      "[2026-09-03T20:48:33.468Z] [player] attack with the magnetic axe\n[2026-09-03T20:48:33.469Z] [debug] parser: intent=attack conf=1.00 verb=attack target=magnetic axe resolved=Magnetic Axe range=close enemies=1 hooks=1\n[2026-09-03T20:48:33.470Z] [debug] attack: target=Mud-Wracked Aetherkin range=close reach.bands=[close] reach.label=Magnetic Axe bareHand=false\n",
+      "[2026-09-03T20:48:33.551Z] [world] Your magnetic axe comes around in an arc; Mud-Wracked Aetherkin squares up to meet it.\n[2026-09-03T20:48:33.552Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T20:48:33.895Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 THROW \u00b7 DISENGAGE  (342ms)\n[2026-09-03T20:48:39.209Z] [world] Mud-Wracked Aetherkin moves first. The pressure is immediate.\n",
+      "[2026-09-03T20:48:39.212Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 18 + ATK 5 = 23 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-09-03T20:48:39.213Z] [combat] You \u2014 d20 \u2192 4 + STR 17 = 21 vs Mud-Wracked Aetherkin AC 14 \u2014 \u2713 HIT\n[2026-09-03T20:48:39.215Z] [combat] Electrical flares \u2014 +4 on hit.\n",
+      "[2026-09-03T20:48:39.216Z] [combat] Clean hit with the magnetic axe for 8. Mud-Wracked Aetherkin has 66 left and does not back away.\n[2026-09-03T20:48:39.217Z] [combat] Mud-Wracked Aetherkin is left exposed \u2014 easier to hit.\n",
+      "[2026-09-03T20:48:39.624Z] [combat] Mud-Wracked Aetherkin deals 6 aetheric damage [armor \u221234%, title \u00bd, floor 30%] +3 corruption [Mud-glass Scales took it]. You have 30 HP remaining.\n[2026-09-03T20:48:46.047Z] [debug] ui: tap \"golem (28/68)\"\n[2026-09-03T20:48:46.060Z] [player] use golem\n[2026-09-03T20:48:46.060Z] [combat] Ashwright attacks Mud-Wracked Aetherkin \u2014 d20 15 + 3 = 18 vs AC 11 \u2014 \u2713 HIT\n",
+      "[2026-09-03T20:48:46.061Z] [combat] Ashwright swings the Crude Golem Greats"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-04-1657-the-healing-pouch #mtm6enrfz3iy [inline 20/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtm6enrfz3iy"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1657-the-healing-pouch"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "20"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1657-the-healing-pouch"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T01:02:15.793132Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T01:02:17.219000Z",
+  "fingerprints": [
+    "b8836b9cdc04ed394ec6ffc5df292ab3"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1954353365,
+    "commitCount": 3,
+    "data": {},
+    "dateCreated": "2026-09-04T00:59:26.615127Z",
+    "dateReleased": "2026-09-04T01:00:59.146953Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "32f104d12f8d1c1459be026d4060eb5e1c4a9a36",
+      "message": "[ota-hal] OTA-1657: the healing pouch, and three racks that fold\n\nOwner: \"battle gets slowed down when you have to heal. let's make it available\nfrom the exploration screen. let's make another bandolier and call it the healing\npouch or something. and we can load it with any three healing items they want so\nin an out 5 trauma kits, say 3 trail rations and maybe 10 blueberries in it. and\nwe open it like a bandolier during combat and can use the preloaded heals from\nthere. and when you use it, it acts like they do when being used from inventory.\"\n\nAnd, a moment later: \"when you are in inventory let's make the bandolier, tool\npouch and healing pouch collapsable like inventory categories to save space.\"\n\n\u26a0 THREE POCKETS, AND A POCKET IS A STACK. That distinction is the whole feature\nand it is why his exact load-out fits in three: a racked id points at an\ninventory STACK, so \"Blueberries \u00d710\" is ONE pocket you can tap ten times, not\nten pockets. It is the same storage contract the bandolier has had since arb110 \u2014\nthe items never leave `player.inventory`, the rack only records WHICH STACKS are\nwithin reach \u2014 so nothing is duplicated, nothing can be lost by racking, and a\nstack spent by any other path simply stops resolving instead of holding a pocket\nhostage as a ghost (OTA-1005's lesson from the tool pouch, applied up front).\n\n\u26a0\u26a0 THE TAP CALLS `useInventoryItem`, AND THAT IS THE POINT. He said it should act\n\"like they do when being used from inventory\" \u2014 so it is not \"like\", it is the\nSAME action the pack's USE button fires. The heal, the stamina, the cure, the\nstack decrement, the Arbiter's line and every downstream hook stay one\nimplementation. A second copy of \"what eating a Trauma Kit does\" is precisely the\nclass of drift the last three OTAs have been spent removing.\n\n\u26a0 AND ELIGIBILITY DELEGATES RATHER THAN DECIDING. `consumableDoesSomething`\nalready answers \"does this mend, restore, cleanse or cure?\", and it exists\nbecause a pure antivenom (healHP 0, cure yes) was once accepted by the combat bar\nand refused by the inventory screen. Restating \"what is a heal\" in a third place\nwould have rebuilt that split. All three items he named pass it \u2014 Trauma Kit\n(45 HP + cure bleed), Trail Rations (6 + 3), Blueberries (4 + 1) \u2014 and a pure\nstat buff does not. The effect is read from the CATALOG, not the instance, so an\nold saved kit racks exactly like a fresh one (the OTA-997 bug on the bandolier).\n\n\u26a0 THE \u271a heals BUTTON IS ON BOTH ROWS and its popup is NOT gated on combat, which\nis the half he asked for by name. The bandolier stays combat-only because a throw\nneeds something to throw at; a heal is exactly as useful on the walk home, and\nthe walk home is when you actually patch up. Green where the bandolier is orange:\none rack throws things away from you, one puts you back together, and mid-fight\nnobody should have to read the label to know which popup opened.\n\n\u26a0\u26a0 ALL THREE RACKS NOW FOLD, THROUGH ONE `RackFrame`. Three banners above the\npack cost real screen on a phone and the healing pouch has just made it three, so\nthey collapse \u2014 but through ONE shared frame rather than three copies of a\nchevron, and in the SAME \u25b8/\u25be grammar arb108 gave the inventory categories, so a\nplayer who has learned to fold a category learns nothing new to fold a rack.\n\n  \u2022 \u26a0 THE COUNT STAYS ON THE HEADER WHEN FOLDED (\"2/3 loaded\"), which is what\n    makes folding safe: the space saved costs no information he was reading the\n    banner for. A rack you must unfold to trust is a rack you stop folding.\n  \u2022 Defaults OPEN, unlike categories, which default closed. A category is one of\n    a dozen above a long pack; a rack is one of three whose whole job is to be\n    glanceable. Folding is something he does, not a state he inherits.\n  \u2022 All THREE fill modes are now mutually exclusive \u2014 two armed tap modes at once\n    is a coin flip over which rack receives the item.\n\n\u26a0 THE CHEVRON GATE CAUGHT THIS AND WAS RIGHT TO. `RackFrame`'s prop is `open`, so\ntrue means OPEN \u2014 the OPPOSITE polarity to the category headers a few hundred\nlines above it in the same file, which is exactly the collision check:chevrons\nwas written for. Registered rather than worked around.\n\n\u26a0 TWO SUITES WENT RED ON THE FIRST FULL RUN, BOTH FOR THE SAME REASON: ota1097\nand ota1100 each hand-typed the TWO-flag fill-mode guard into a string, so making\nit three broke tests about fusion-select and the group gesture. Their actual claim\nis \"a rack fill mode beats this gesture\", however many racks exist \u2014 both now\nassert that over EVERY known fill flag instead of pinning the arity, so the fourth\nrack will not break them.\n\nGates: all 18 green by exit code. Full suite green \u2014 1120 suites, 11,604 tests.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T00:57:14Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1657-the-healing-pouch",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1657-the-healing-pouch",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T01:00:59.146953Z",
+          "dateCreated": "2026-09-04T00:59:26.615127Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155389086",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T01:00:59.447835Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1657-the-healing-pouch",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1657-the-healing-pouch",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1657-the-healing-pouch",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1657-the-healing-pouch)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "6e0b6cdaedd5439b9d993b73281b0bd6",
+  "previousEventID": "5d0f84cb453e4ad08038704801e93182"
+}

@@ -1,0 +1,246 @@
+{
+  "id": "ff2c3a9ca10644f5b544cb6dc5a02129",
+  "groupID": "7712710517",
+  "eventID": "ff2c3a9ca10644f5b544cb6dc5a02129",
+  "projectID": "4511945117532160",
+  "size": 7203,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-04-1671-the-armour-bites-back #mtncz4bh65rg [inline 2/2]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1671-the-armour-bites-back",
+  "message": "player-log 2026-09-04-1671-the-armour-bites-back #mtncz4bh65rg [inline 2/2]",
+  "title": "player-log 2026-09-04-1671-the-armour-bites-back #mtncz4bh65rg [inline 2/2]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "ec145bd1db6d45d7827790af2c4cec02",
+      "span_id": "b163c44c6e0fc193",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "/11, AC +2 \u00b7 WIS +2, [armor,head,cloth,helmet,mud_golems])\n    actions: equip:head, use, scrap, drop\n  Stone-Stride Greaves (dur 22/22, AC +2 \u00b7 Resists: bludgeoning \u00b7 DEX +2, [armor,legs,greaves,legs,mud_golems])\n    actions: equip:legs, use, scrap, drop\n  Titan's Gauntlets (dur 16/16, AC +2 \u00b7 STR +2, [armor,hands,gauntlets,tartarian_giants])\n    actions: equip:hands, use, scrap, drop\n",
+      "  Veil-Stitched Plate (Uncommon, dur 25/25, AC+2, unique, [fused,unique])\n    actions: equip:chest, use, scrap, drop\n\nShields (1)\n  Grounded Buckler (Uncommon, 1d6 bludgeoning, dur 323/323, [weapon,shield,dual_wield,unknowing_masses])\n    actions: equip:off, use(off), scrap, drop\n\nDog Armor (5)\n",
+      "  \u25c6 Aetheric Padded Vest \u00d72 (Rare, dur 28/28, \u2665reserved, AC +3 (dog) \u00b7 Bites back: 1 aetheric to whatever hits the dog, [dog_armor,vest,aether,padded,loot])\n    actions: scrap, release-from-fusion, drop\n  \u25c6 Burlap Vest \u00d78 (dur 18/18, AC +1 (dog), [dog_armor,vest,burlap,loot,improvised])\n    actions: scrap, save-for-fusion, drop\n",
+      "  \u25c6 Dog Aetheric Padded Vest (Rare, dur 18/18, AC +3 \u00b7 Resists: aetheric, [dog_armor,vest,aether,padded,armor])\n    actions: scrap, save-for-fusion, drop\n  \u25c6 Riveted Leather Vest (Uncommon, dur 24/24, \u2665reserved, AC +2 (dog), [dog_armor,vest,leather,loot,cloth])\n    actions: scrap, release-from-fusion, drop\n  Vein-Threaded Cover (Rare, dur 35/35, AC+3, resist:poison, unique, [fused,unique,poison])\n",
+      "    actions: scrap, drop\n\nAmulets & Rings (11)\n  Aether-Shard Ring (Uncommon, dur 30/30, INT +1 \u00b7 Resists aetheric: \u221210% incoming damage of each, on top of armour, [ring,aether,crafted])\n    actions: equip:ring, use, scrap, drop\n  Aetheric Locket \u00d72 (dur 30/30, WIS +1 \u00b7 Resists aetheric: \u22129% incoming damage of each, on top of armour, [detection,amulet,relic])\n",
+      "    actions: equip:amulet, use, scrap, drop\n  Aetheric Locket (dur 30/30, WIS +1 \u00b7 Resists aetheric: \u22129% incoming damage of each, on top of armour, [amulet,relic,detection])\n    actions: equip:amulet, use, scrap, drop\n  Amulet of the Silt Warden (Rare, dur 40/40, equipped:amulet, WIS +2 \u00b7 Resists poison, corruption: \u221220% incoming damage of each, on top of armour, [amulet,mud,crafted])\n",
+      "    actions: unequip:amulet\n  Golem Controller Ring (Uncommon, dur 35/35, INT +1, [ring,construct])\n    actions: equip:ring, use, scrap, drop\n  Rustbane Charm (dur 30/30, Resists degradation: \u22129% incoming damage of each, on top of armour, [amulet,charm,crafted])\n    actions: equip:amulet, use, scrap, drop\n  Rusted Band of Knowledge (dur 25/25, INT +1, [ring,scholarly])\n",
+      "    actions: equip:ring, use, scrap, drop\n  Scribe's Signet \u00d72 (Uncommon, dur 35/35, INT +2 \u00b7 WIS +1, [ring,signet,scholarly,crafted])\n    actions: equip:ring, use, scrap, drop\n  Tartarian Oath-Band \u00d72 (Uncommon, dur 35/35, equipped:ring, STR +2, [ring,faction_gear,true_tartarians,oath])\n    actions: unequip:ring\n",
+      "  Tin Ward Ring \u00d72 (Rare, dur 40/40, Resists acid: \u221215% incoming damage of each, on top of armour \u00b7 Everything you wear or wield lasts 15% longer, [ring,crafted,defensive])\n    actions: equip:ring, use, scrap, drop\n  Tin Ward Ring (Rare, dur 40/40, Resists acid: \u221215% incoming damage of each, on top of armour \u00b7 Everything you wear or wield lasts 15% longer, [ring,crafted,defensive])\n",
+      "    actions: equip:ring, use, scrap, drop\n\nConsumables (20)\n  Bioluminescent Fungus (Uncommon, [food,foraged,mushroom,light,aether])\n    actions: use(eat), drop\n  Bioluminescent Fungus (Uncommon, [fungus,light,gear,food,foraged])\n    actions: use(eat), drop\n  Blue Aetheric Fungus ([fungus,blue,distillable,food,foraged])\n    actions: use(eat), drop\n  Blueberries \u00d77 (Uncommon, [food,foraged,fruit])\n",
+      "    actions: use(eat), drop\n  Field Dressing \u00d78 ([healing,crafted])\n    actions: use(eat), drop\n  First Aid Kit (Uncommon, [healing,crafted])\n    actions: use(apply), drop\n  Forager's Stew \u00d72 (Uncommon, [food,cooked,stew])\n    actions: use(eat), drop\n  Orange Sporecap ([food,foraged,mushroom,orange])\n    actions: use(eat), drop\n  Raspberries \u00d72 (Uncommon, [food,foraged,fruit])\n",
+      "    actions: use(eat), drop\n  Reclaimer's Mud-Beer \u00d72 ([alcohol,drink])\n    actions: use(drink), drop\n  Smoke-Cured Jerky Strip \u00d76 ([food,treat,dog_treat])\n    actions\n(pack listing trimmed at 12000 characters)\n\n--- CHARACTER LOG (newest first) ---\n(no character selected \u2014 no log attached)\n\n=== END REPORT ==="
+    ],
+    "chunkChars": 4326
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-04-1671-the-armour-bites-back #mtncz4bh65rg [inline 2/2]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtncz4bh65rg"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1671-the-armour-bites-back"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "2"
+    },
+    {
+      "key": "parts",
+      "value": "2"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1671-the-armour-bites-back"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T21:56:14.893580Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T21:56:16.939000Z",
+  "fingerprints": [
+    "a8a51e28f02e887f0d1e36c2c4e79b16"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1956227197,
+    "commitCount": 3,
+    "data": {},
+    "dateCreated": "2026-09-04T21:35:27.475934Z",
+    "dateReleased": "2026-09-04T21:36:21.171958Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "5a5ade19edd93939d3a5417be41b350da5a803f2",
+      "message": "[ota-hal] OTA-1671: the armour bites back, and \"fits dog\" stops repeating the heading\n\nTwo of the owner's five queued items, shipped together because they are the\nsame object seen twice \u2014 the dog vest that already bites back, and the dog\narmour rows that announce they fit a dog while sitting under a heading that\nsays so.\n\nTHE CHIP DELETION IS MEASURED, AND MY FIRST REASON FOR IT WAS WRONG\nI first justified this by calling the chip's predicate a strict subset of the\nsection's. It is a subset in neither direction: the chip fires on\n`itemIsDogArmor` (canonical kind OR CANONICAL tags), the heading on\n`categorizeItem` (canonical kind OR RAW tags OR the DOG_GEAR name, behind a\nfused-kind branch that returns first).\n\nSo I swept them instead. Across all 905 catalog names \u00d7 four stored kinds the\ntwo answers agree 3620 times out of 3620 \u2014 no divergence in either direction.\nOn everything a player can actually hold, the chip said exactly what the\nheading above it already said, which is the owner's point word for word.\n\nAnd the one shape that DOES diverge argues for the deletion rather than\nagainst it: a fused piece stamped `uniqueStats.kind: 'armor'` that still\ncarries a dog_armor tag got `[fits dog]` while sitting \u2014 correctly, because\nOTA-688 made uniqueStats.kind the forge's ground truth \u2014 under ARMOR. The chip\nwas the half that could lie. Removing it removes the only row-level label in\nthe pack that could contradict the section its item is filed in. ota1671 holds\nboth facts, and the OTA-1603 pin on the deleted chip line moves to the\nbehaviour it was protecting: a drifted vest still sections as dog armour.\n\nTHE BITE-BACK IS NOT THE VEST'S BITE-BACK\nThe dog vest (OTA-1640) always returns AETHERIC, whatever hit it. Player\narmour returns the ATTACKER'S OWN damage type \u2014 the owner's call when I put\nthe choice to him. A fire-breather burns itself on your plate; a clawed thing\ncuts itself. One field means something different every encounter, instead of\nbecoming a second, quieter aetheric channel that would make the vest's line\nredundant.\n\nWHY NOT NAME-DRIVEN, ONE OTA AFTER NAMES STARTED DECIDING STATS\nI measured before choosing: exactly TWO of 297 catalog pieces have names that\nalready say they hurt what touches them (Mud-glass Scales, Mud-Claw Gloves).\nDriving the sprinkle off names would have meant renaming ~30 pieces the owner\nalready owns, the OTA right after moving all their stats \u2014 churn on churn, for\na property the item card states plainly anyway. Names decide STATS (OTA-1670);\nthis is a different question, so it gets a different rule.\n\nTHE RULE IS CONTACT. You are INSIDE chest, hands and legs when something lands\non you. A cloak billows and a hood covers your head; neither is something an\nattacker impales itself on. Skewed to Rare/Legendary because a Common should\nnot carry a rider, one in two of the eligible pool by stable hash, and the two\nalready-named pieces are in at any rarity because their names promise it and a\ncard must not lie. Result: 31 of 297 (10.4%) \u2014 Rare 17, Legendary 12,\nUncommon 1, Common 1; chest 13, hands 10, legs 8.\n\nTHE LADDER IS DELIBERATELY SHALLOW. 2 and 3, summed across worn pieces and\ncapped at ARMOR_REFLECT_CAP = 8, because six slots can carry this: a committed\nthorn build lands near the cap rather than blowing past it, and a single piece\nstays a nice rider rather than a strategy.\n\nThe payout fires only when the enemy actually landed a blow (dmg > 0) and only\nwhen it survived it, so a corpse never takes a return hit; a kill by reflect\nroutes through resolveEnemyDefeat() rather than leaving an enemy at 0 HP\nstanding in the scene.\n\n- app/engine/armorBiteBack.ts (new) \u2014 the rule, readable and pure.\n- app/data/items/armor.json \u2014 `reflect` authored on 31 rows, agreeing with it.\n- app/engine/equipment.ts \u2014 ARMOR_REFLECT_CAP, aggregateEquippedReflect().\n- app/engine/crafting.ts \u2014 `reflect?: number` on the armour catalog type.\n- app/state/combatResolution.ts \u2014 the return hit, in the attacker's own element.\n- app/components/itemPreview.ts \u2014 the card states it: \"Bites back: N damage to\n  whatever hits you, in its own element\".\n- app/screens/InventoryScreen.tsx \u2014 the `[fits dog]` chip removed.\n- __tests__/ota1671TheArmourBitesBack.test.ts \u2014 the catalog sweep + the rule.\n- __tests__/ota1603TheVestKnows.test.ts \u2014 the pin on the deleted chip line\n  repointed to the behaviour it guarded.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T21:32:26Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1671-the-armour-bites-back",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1671-the-armour-bites-back",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T21:36:21.171958Z",
+          "dateCreated": "2026-09-04T21:35:27.475934Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155692953",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T21:36:21.418163Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1671-the-armour-bites-back",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1671-the-armour-bites-back",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1671-the-armour-bites-back",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1671-the-armour-bites-back)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "0a3812bbbc644af2862a3474aeaf143e",
+  "previousEventID": "f8abcf670ba043869980694397d93e7a"
+}

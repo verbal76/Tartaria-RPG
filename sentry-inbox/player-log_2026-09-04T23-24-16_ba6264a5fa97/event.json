@@ -1,0 +1,226 @@
+{
+  "id": "ba6264a5fa974a1dbd42f3584a24bc68",
+  "groupID": "7712822085",
+  "eventID": "ba6264a5fa974a1dbd42f3584a24bc68",
+  "projectID": "4511945117532160",
+  "size": 2682,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log-beacon 2026-09-04-1673-one-scanner-per-band #mtnir5vqr3fw"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1673-one-scanner-per-band",
+  "message": "player-log-beacon 2026-09-04-1673-one-scanner-per-band #mtnir5vqr3fw",
+  "title": "player-log-beacon 2026-09-04-1673-one-scanner-per-band #mtnir5vqr3fw",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "b597baef2e1641018c4e37f399367db6",
+      "span_id": "89df0edece4a5ad7",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {},
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log-beacon 2026-09-04-1673-one-scanner-per-band #mtnir5vqr3fw"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtnir5vqr3fw"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1673-one-scanner-per-band"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-beacon"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "parts",
+      "value": "2"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1673-one-scanner-per-band"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T23:24:14.145125Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T23:24:16.304000Z",
+  "fingerprints": [
+    "7beb567128624f1e0c9e921a0a53bf8e"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1956365261,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-04T23:16:14.526124Z",
+    "dateReleased": "2026-09-04T23:17:35.007139Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "ba1152fd903e2f17130a4238276de19bd07e760a",
+      "message": "[ota-hal] OTA-1673: one scanner per band, casts by the handful, and the menu stays open\n\nThree things the owner reported in one message, all in the crafting screen.\n\nA SCANNER YOU ALREADY CARRY IS NOT BUILDABLE AGAIN\n\"Once you build one and have one that's in the pouch, it should not be buildable\nagain.\" The rule reads a PROPERTY rather than naming the three scanners:\n`effect.kind === 'scanner'` in exploration.json means an off-hand reader, one\nslot, one band \u2014 a second copy cannot be equipped and reads nothing the first\ndoes not. A hardcoded ['Pulse Scanner', 'Aetheric Scanner', 'Mud Scanner'] would\ngo stale the moment a fourth is authored, which is the shape of OTA-1603's\ndog-armour kind drift.\n\nIt is per BAND, not per category: pulse reads Sentinel tech, aetheric reads\npre-flood phenomena, mud reads what the flood buried, so carrying all three is\nthe intended end state and owning one must never block building another. The\nguard sits ABOVE the ingredient check, because \"you already own this\" is both\nthe better answer and the true one \u2014 otherwise the player is told they are short\n3 Aether Crystal, which is not why the craft should stop. And it fails OPEN: a\ncatalog lookup that throws must never make a legitimate craft impossible.\n\n+ / \u2212 AND MAX ON THE AETHERIC TAB, AND THE COUNT RIDES THE ACTION\nThe picker is the same NumberStepper BrandedModal already carries, so it is a\ncontrol the player has met. MAX is bounded by BOTH costs a shape has \u2014 one\naether fuel AND one Small Rock out of combat, since the shard is pulled from a\nrock \u2014 because a MAX counting only fuel would promise casts that fizzle.\n\nThe count rides the action (`castCount`), it does not loop the verb. Looping\nsubmitPlayerAction N times is exactly what OTA-1633 deleted: N parses, N Arbiter\nremarks, N cognitive evals, N persists for one thumb tap. Each cast is still its\nown d20 \u2014 batching must not turn ten rolls into one \u2014 so the loop sits around\nthe roll and its outcome instead.\n\n\u26a0 THE STOP-TEST IS WHAT NEARLY SHIPPED WRONG, AND A PROBE CAUGHT IT\nMy first draft compared a fuel fingerprint before and after each pass and\nstopped when nothing moved. It looked reasonable and it was not: a shape cast\nwith fuel but NO Small Rock still BURNS the fuel (\"you shape the Aetherstone but\nhave no Small Rock to bind it to\"), so the fingerprint moved, the loop ran on,\nand asking for 5 casts with 3 rocks rolled FIVE times \u2014 spending two Aether\nResidue on attempts that could not produce anything, and reporting nothing\nwrong. Spending a player's materials silently on attempts that cannot succeed is\nthe exact class of defect this project keeps closing.\n\nIt now asks whether the NEXT cast can finish, stops there, and names what ran\nout: \"That is 3 of 5 \u2014 you're out of Small Rock to bind the shape to.\" A batch\nthat completes in full says nothing extra. ota1673 pins the preserved fuel, not\njust the roll count \u2014 the count could be right while the fuel was spent anyway.\n\nTHE MENU STAYS OPEN\n\"Every time you do one it kicks you back out of crafting to the exploration\nscreen \u2014 you should be staying in crafting once you're done.\" The disciplines\nwere the last surface still calling setScreen('exploration'); an ordinary craft\nhas stayed put since OTA-983. The rolls still narrate into the world feed, so\nnothing is lost by staying, and the same transient haul banner an ordinary craft\nuses reports what came of it \u2014 from the same delta helper, so the two surfaces\ncannot drift on \"what did I just get\".\n\n- app/engine/oneToAPack.ts (new) \u2014 the property, the pack check, the refusal.\n- app/state/aethercraftBatch.ts (new) \u2014 MAX_CAST_BATCH, the stop-test, the loop;\n  its first draft sat inline in gameStore and tripped the OTA-1400 line ratchet,\n  which is exactly what that ratchet is for.\n- app/state/gameStore.ts \u2014 the guard on the craft door; MAX_CAST_BATCH;\n  runAethercraft gains `times` with runAethercraftOnce underneath it, and\n  aethercraftShortfall as the stop-test.\n- app/screens/CraftingScreen.tsx \u2014 maxDisciplineCasts, the stepper, the banner,\n  and the setScreen removed.\n- __tests__/ota1673OneScannerPerBand.test.ts \u2014 17 tests.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T23:13:42Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1673-one-scanner-per-band",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1673-one-scanner-per-band",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T23:17:35.007139Z",
+          "dateCreated": "2026-09-04T23:16:14.526124Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155716216",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T23:17:35.417556Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1673-one-scanner-per-band",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1673-one-scanner-per-band",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1673-one-scanner-per-band",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1673-one-scanner-per-band)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": null
+}

@@ -1,0 +1,493 @@
+Bug Report — Cheddar Bob · (2026-09-04-1665-the-bug-report-pushes) · Ytt
+=== TARTARIA BUG REPORT ===
+Submitted: 2026-09-04T13:30:58.821Z
+Character: Cheddar Bob
+Slot ID: slot_mtdifdmg_g2si12
+Race: Reclaimers
+Location: Dynasty Border Post
+HP: 46/50
+
+--- DESCRIPTION ---
+Ytt
+
+--- DEVICE / BUILD ---
+Device
+  Name: Pixel 10 Pro XL
+  Platform: android 37
+  Hermes: yes
+  Locale: en-US
+  Timezone: America/New_York
+  Screen: window 443×986 / screen 443×986 @ 2.4375x density
+  Captured at: 2026-09-04T13:30:58.767Z
+
+Install
+  App ID: com.hotatticgames.tartarprim
+  App version: 4.32.11
+  APK build version: 2.4.1
+  APK build: 293
+  AAB: (build 293)
+  OTA: (2026-09-04-1665-the-bug-report-pushes)
+  Boot stage: qwen:deferred
+
+ML runtime health
+  Status: active (no crashes detected)
+  Crash count: 0
+  Last init attempt: 2026-09-04T13:30:31.497Z
+  Last init success: 2026-09-04T13:30:32.227Z
+  Crashes-before-disable threshold: 2
+  Qwen completion guard: clean (no completion crashes)
+  Qwen kernel variant: rnllama_v8_2_fp16_dotprod
+  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k
+  Voice (TTS) guard: clean (no voice crashes on this build)
+Save-load health
+  Status: clean (no load-crash flags)
+Last JS crash
+  Status: none recorded
+This launch
+  Life: bmtmzrnzzgi · started 2026-09-04T13:30:31.103Z
+  Followed an OTA apply 217ms ago (boot-front)
+  The previous life released its model contexts before reloading (o0/r0/l0/p0/dn0)
+Crash ledger — 10 recorded (newest last)
+  • 2026-09-02T22:42:22.972Z (2329m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-02-1633-a-batch-is-one-action · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 957ms into the action · alive 0ms after it
+      launch: died 1031ms into the process · not an OTA-apply boot
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-03T00:49:33.538Z (2201m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-02-1634-the-aside-yields · stage rendered
+      Process died with no orderly exit while: tap "take / salvage"
+      doing: tap "take / salvage" · room mud_flood_nexus · screen exploration
+      last checkpoint: rendered · 221ms into the action · alive 9133ms after it
+      launch: died 3096833ms into the process · not an OTA-apply boot
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-03T02:52:27.753Z (2079m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-03-1639-every-ingredient-exists · stage rendered
+      Process died with no orderly exit while: tap "craft"
+      doing: tap "craft" · room mud_flood_nexus · screen exploration
+      last checkpoint: rendered · 7466ms into the action · alive 1498ms after it
+      launch: died 21448ms into the process · not an OTA-apply boot
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-03T12:10:12.789Z (1521m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-03-1642-every-drop-has-a-name-in-the-book · stage mid-action
+      Process died with no orderly exit while: tap "inventory"
+      doing: tap "inventory" · room mud_flood_nexus · screen exploration
+      launch: died 12819ms into the process · not an OTA-apply boot
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-03T15:48:24.471Z (1303m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-03-1643-the-dice-riders-pay · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 838ms into the action · alive 11400ms after it
+      launch: died 12276ms into the process · not an OTA-apply boot
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-03T19:31:31.355Z (1079m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-03-1648-a-fourth-ring · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 901ms into the action · alive 0ms after it
+      launch: died 956ms into the process · not an OTA-apply boot
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-03T20:39:06.948Z (1012m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-03-1649-what-a-ring-is-for · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 750ms into the action · alive 0ms after it
+      launch: died 803ms into the process · not an OTA-apply boot
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-03T21:28:44.213Z (962m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-03-1649-what-a-ring-is-for · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 707ms into the action · alive 0ms after it
+      launch: died 797ms into the process · not an OTA-apply boot
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-03T22:43:58.985Z (887m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-03-1653-the-wear-ward · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 627ms into the action · alive 0ms after it
+      launch: died 672ms into the process · not an OTA-apply boot
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-04T04:42:22.271Z (529m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-04-1664-no-phantom-syllable · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 743ms into the action · alive 0ms after it
+      launch: died 776ms into the process · not an OTA-apply boot
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+Crash delivery: ON — reports go to Sentry when you crash.
+Runtime pressure
+  Memory warnings: none this session
+  Freeze watch: no stalls seen (JS clocks only — see the native queue below)
+  Native queue: worst wait 0.0s · 0 job kinds queued >3s · worst 0.0ms/prompt-token
+  App state trail: (none recorded)
+Model contexts
+  Live now: 0
+  Opened: 0 · Released: 0 · Peak live: 0
+  Narration engine: idle
+
+--- VOICE ---
+  TTS enabled: no
+  Engine: bundled
+  Rate: 1.05 · Pitch: 1.00
+  System voice id: (default)
+  Kokoro voice: am_michael
+  Kokoro state: idle
+
+--- CHARACTER LOG (newest first) ---
+(Newest entry at top — showing the most recent 353 of 3675 entries; older trimmed to fit a single email paste)
+
+[2026-09-04T13:30:38.229Z] [debug] boot: life bmtmzrnzzgi started 2026-09-04T13:30:31.103Z · FOLLOWED AN OTA APPLY 217ms ago via boot-front · prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)
+[2026-09-04T13:30:38.229Z] [debug] missions: · at=dynasty_border_post travelTo=mud_seas
+[2026-09-04T13:30:38.229Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc="Halem the Trader" gives=Halem's Broken Compass PAUSED
+[2026-09-04T13:30:38.229Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc="the Mud Monarch courier" gives=Monarch Courier Writ PAUSED
+[2026-09-04T13:30:38.229Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading✓ gives=Temporal Distortion Watch PAUSED
+[2026-09-04T13:30:38.229Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc="the Order envoy" gives=Sealed Reliquary Box PAUSED
+[2026-09-04T13:30:38.229Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc="the True Tartarian agent" gives=Enclave Writ PAUSED
+[2026-09-04T13:30:38.229Z] [debug] missions: hunt:hunt_bog_dragon stage 5/7 [attack_provoke→attack] @mud_seas needs=Eshren's Name-Token✓ spawn=Mud Harpy×3 AMBUSH
+[2026-09-04T13:30:38.228Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss→attack] @reavers_crest needs=Raider's Ridge-Sign✓ PAUSED
+[2026-09-04T13:30:38.227Z] [debug] ═══ SESSION 2026-09-04T13:30:38.225Z · build 2026-09-04-1665-the-bug-report-pushes · updated from 2026-09-04-1664-no-phantom-syllable · previous entry moments earlier ═══
+[2026-09-04T13:30:37.814Z] [arbiter] The Arbiter sets the quiet aside. "Welcome back, Cheddar Bob. I kept watch while you were gone. The waste did not sleep while you were gone — blood was spilled and ground changed hands. Read the World for the account."
+[2026-09-04T13:30:37.810Z] [world] Mud Monarch heralds left a sigil-mark on a stone you don't remember being marked. The faction is paying attention.
+[2026-09-04T13:30:37.810Z] [world] You step back into Dynasty Border Post. The world waits for your move.
+[2026-09-04T13:30:37.810Z] [debug] OTA session start: 2026-09-04-1665-the-bug-report-pushes.
+[2026-09-04T13:30:37.809Z] [debug] OTA applied: 2026-09-04-1664-no-phantom-syllable → 2026-09-04-1665-the-bug-report-pushes.
+[2026-09-04T13:30:31.838Z] [debug] send-log: bundle #mtmhqinlc5jl attempt 2/5 delivered to Sentry
+[2026-09-04T13:30:31.497Z] [debug] voice: bundled idle
+[2026-09-04T13:30:31.496Z] [debug] voice: engine=bundled tts=off voice=am_michael
+[2026-09-04T13:30:31.392Z] [debug] ota: boot check result = noUpdate
+[2026-09-04T13:30:31.391Z] [debug] ota: Already up to date
+[2026-09-04T13:30:31.176Z] [debug] ota: Checking…
+[2026-09-04T13:30:31.176Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a06af0-5988-7a5c-8879-496013fbab11
+[2026-09-04T13:30:30.885Z] [debug] ota: Saving progress…
+[2026-09-04T13:30:30.789Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-04T13:30:28.467Z] [debug] ota: Checking…
+[2026-09-04T13:30:28.467Z] [debug] ota: boot check — enabled=true channel=hal2001 rt=2.4.1 updateId=01a06a9f-c9d0-725a-85bb-944c1fa4eb3d
+[2026-09-04T05:05:44.959Z] [debug] send-log: all parts accepted by the SDK — bundle #mtmhqinlc5jl kept on disk, boots retry up to 5 sends total
+[2026-09-04T05:05:44.959Z] [debug] send-log: #mtmhqinlc5jl — DELIVERED (inline, no attachments): beacon out, 28/28 parts accepted (407077 chars) — flush said yes
+[2026-09-04T05:05:37.042Z] [debug] qwen⏱ investigate_lore ok 2158ms read 1294ms/write 835ms in 126t→out 23t 10.3ms/t (114ch)
+[2026-09-04T05:05:34.893Z] [cognitive] SWIM  (22ms)
+[2026-09-04T05:05:34.879Z] [debug] arbiter: ambient-empty reason=unknown raw="You have traversed the rugged terrain of Active Dig Trench, the borderlands that have been long since forgotten, and it "
+[2026-09-04T05:05:34.878Z] [debug] arbiter: ambient stale:moved-scene 15681ms
+[2026-09-04T05:05:34.878Z] [debug] qwen⏱ ✂ DISCARDED ambient after 15172ms — ambient:stale:moved-scene
+[2026-09-04T05:05:34.870Z] [world] You look the shallow pool over. Nothing about it sings, nothing about it warns — Tartaria is full of things waiting to be remembered.
+[2026-09-04T05:05:34.869Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=shallow pool resolved=shallow pool range=- enemies=0 hooks=1
+[2026-09-04T05:05:34.868Z] [player] investigate shallow pool
+[2026-09-04T05:05:34.636Z] [debug] qwen⏱ ambient ok 15172ms wait 4198ms read 4801ms/write 1236ms in 364t→out 31t 13.2ms/t HIT-CAP (151ch)
+[2026-09-04T05:05:27.960Z] [debug] ui: tap "investigate"
+[2026-09-04T05:05:25.549Z] [debug] persist sizes(KB): total=328 player=72 wm=168[rooms=93 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=84 scene=3
+[2026-09-04T05:05:24.864Z] [reward]     • Splintered Haft End (Common)
+[2026-09-04T05:05:24.863Z] [reward] ✦ Salvage haul:
+[Filtered][2026-09-04T05:05:21.663Z] [debug] qwen⏱ investigate_lore ok 2198ms read/write unusable (native mis-reported 92424ms/834ms — llama.rn split bug, not this call) in 126t→out 23t (99ch)
+[2026-09-04T05:05:20.984Z] [world] The thread you were following waits where you left it.
+[2026-09-04T05:05:20.984Z] [world] You walk east through open silt. The compass tells you Tartarian Pilgrim Camp lies further east — 2 tiles, about 5 hours of travel.
+[2026-09-04T05:05:20.978Z] [debug] ui: tap "→ MUD SEAS"
+[2026-09-04T05:05:20.767Z] [cognitive] READY  (297ms)
+[2026-09-04T05:05:20.468Z] [world] The watch fire sits the way ordinary things sit. The Arbiter does not lean in. You move on.
+[2026-09-04T05:05:20.467Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=watch fire resolved=watch fire range=- enemies=0 hooks=1
+[2026-09-04T05:05:20.466Z] [player] investigate watch fire
+[2026-09-04T05:05:19.481Z] [cognitive] SWIM  (283ms)
+[2026-09-04T05:05:19.195Z] [world] You give the waterskin your full attention. It returns the gesture by being exactly what it appears to be.
+[2026-09-04T05:05:19.193Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=waterskin resolved=waterskin range=- enemies=0 hooks=1
+[2026-09-04T05:05:19.192Z] [player] investigate waterskin
+[2026-09-04T05:05:18.150Z] [cognitive] SWIM  (194ms)
+[2026-09-04T05:05:17.955Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-04T05:05:17.955Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-09-04T05:05:17.955Z] [world] You've already examined the mud. There's nothing more to find here.
+[2026-09-04T05:05:17.954Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=rusted petrified mud wave range=- enemies=0 hooks=1
+[2026-09-04T05:05:17.954Z] [player] investigate the mud
+[2026-09-04T05:05:16.218Z] [debug] ui: tap "investigate"
+[2026-09-04T05:05:07.406Z] [cognitive] neutral  (439ms)
+[2026-09-04T05:05:06.966Z] [reward] ✦ Crafted Field Dressing ×4. The Arbiter watches you set the last piece.
+[2026-09-04T05:05:06.818Z] [debug] parser: intent=craft conf=1.00 verb=craft target=field dressing resolved=Field Dressing range=- enemies=0 hooks=1
+[2026-09-04T05:05:06.817Z] [player] craft Field Dressing
+[2026-09-04T05:05:02.846Z] [cognitive] neutral  (466ms)
+[2026-09-04T05:05:02.378Z] [reward] ✦ Crafted Trauma Kit. The Arbiter watches you set the last piece.
+[2026-09-04T05:05:02.374Z] [debug] parser: intent=craft conf=1.00 verb=craft target=trauma kit resolved=Trauma Kit range=- enemies=0 hooks=1
+[2026-09-04T05:05:02.373Z] [player] craft Trauma Kit
+[2026-09-04T05:04:50.372Z] [cognitive] SEARCH · THROW · USE_ITEM  (551ms)
+[2026-09-04T05:04:49.819Z] [reward] ✦ Crafted Hardened Mudstone ×6. The Arbiter watches you set the last piece.
+[2026-09-04T05:04:49.598Z] [debug] parser: intent=craft conf=1.00 verb=craft target=hardened mudstone resolved=Hardened Mudstone range=- enemies=0 hooks=1
+[2026-09-04T05:04:49.597Z] [player] craft Hardened Mudstone
+[2026-09-04T05:04:42.597Z] [cognitive] SEARCH · USE_ITEM · THROW  (562ms)
+[2026-09-04T05:04:42.033Z] [reward] ✦ Crafted Mudstone ×21. The Arbiter watches you set the last piece.
+[2026-09-04T05:04:41.615Z] [arbiter] The Arbiter nods. "Stripped for parts: 4× Mud Essence → Mud Fragment, 17× Aether Mud → Mud Fragment, 4× Aetheric Sludge → Mud Fragment."
+[2026-09-04T05:04:41.153Z] [debug] parser: intent=craft conf=1.00 verb=craft target=mudstone resolved=Hardened Mudstone range=- enemies=0 hooks=1
+[2026-09-04T05:04:41.152Z] [player] craft Mudstone
+[2026-09-04T05:04:40.199Z] [debug] persist sizes(KB): total=328 player=74 wm=168[rooms=93 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=83 scene=3
+[2026-09-04T05:04:40.055Z] [cognitive] SEARCH · USE_ITEM · THROW  (110ms)
+[2026-09-04T05:04:39.943Z] [arbiter] "Crafting 21× Mudstone would strip 4× Mud Essence → Mud Fragment, 17× Aether Mud → Mud Fragment, 4× Aetheric Sludge → Mud Fragment from your pack — confirm in the prompt to proceed, or it stays unmade."
+[2026-09-04T05:04:39.482Z] [debug] parser: intent=craft conf=1.00 verb=craft target=mudstone resolved=Hardened Mudstone range=- enemies=0 hooks=1
+[2026-09-04T05:04:39.481Z] [player] craft Mudstone
+[2026-09-04T05:04:18.167Z] [cognitive] neutral  (554ms)
+[2026-09-04T05:04:17.612Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-04T05:04:17.612Z] [debug] arbiter: template (reason=intent-not-allowed:craft)
+[2026-09-04T05:04:17.611Z] [reward] ✦ Crafted Dog Aetheric Padded Vest. The Arbiter watches you set the last piece.
+[2026-09-04T05:04:17.608Z] [debug] parser: intent=craft conf=1.00 verb=craft target=aetheric padded vest resolved=Aetheric Padded Vest range=- enemies=0 hooks=1
+[2026-09-04T05:04:17.608Z] [player] craft Aetheric Padded Vest
+[2026-09-04T05:04:09.336Z] [cognitive] THROW · USE_ITEM · SEARCH  (540ms)
+[2026-09-04T05:04:08.795Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-04T05:04:08.795Z] [debug] arbiter: template (reason=intent-not-allowed:craft)
+[2026-09-04T05:04:08.794Z] [reward] ✦ Crafted Mudstone Bulwark. The Arbiter watches you set the last piece.
+[2026-09-04T05:04:08.790Z] [debug] parser: intent=craft conf=1.00 verb=craft target=mudstone bulwark resolved=- range=- enemies=0 hooks=1
+[2026-09-04T05:04:08.789Z] [player] craft Mudstone Bulwark
+[2026-09-04T05:03:53.217Z] [debug] qwen⏱ ✂ DISCARDED ambient after 4826ms — ambient:preempted
+[2026-09-04T05:03:53.217Z] [debug] arbiter: ambient cut short 5369ms — yielded to the player
+[2026-09-04T05:03:53.206Z] [debug] qwen⏱ stats — item_synthesis_hw n6 avg2.1s max5.3s read0.4s/write1.1s ⚠1unusable in326t→out27t ms/tok 1.0-1.3 | narration:scene_intro_fill n2 avg8.2s max11.2s read6.8s/write1.2s in766t→out31t ms/tok 5.0-12.7 cap1 | ambient n2 avg4.2s max4.8s ⚠2unusable in364t→out0t ⏸2 ✂1/3.5s || WASTED 1 calls / 3.5s
+[2026-09-04T05:03:53.199Z] [debug] qwen⏱ ambient preempted 4826ms read 0ms/write 0ms in 364t→out 0t (0ch)
+[2026-09-04T05:03:52.016Z] [cognitive] ATTACK · HIDE  (771ms)
+[2026-09-04T05:03:51.243Z] [reward] ✦ Crafted Sentinel Cleaver. The Arbiter watches you set the last piece.
+[2026-09-04T05:03:51.242Z] [debug] parser: intent=craft conf=1.00 verb=craft target=sentinel cleaver resolved=Sentinel Cleaver range=- enemies=0 hooks=1
+[2026-09-04T05:03:51.241Z] [player] craft Sentinel Cleaver
+[2026-09-04T05:03:48.381Z] [cognitive] ATTACK · HIDE  (531ms)
+[2026-09-04T05:03:47.847Z] [reward] ✦ Crafted Sentinel Cleaver. The Arbiter watches you set the last piece.
+[2026-09-04T05:03:47.845Z] [debug] parser: intent=craft conf=1.00 verb=craft target=sentinel cleaver resolved=- range=- enemies=0 hooks=1
+[2026-09-04T05:03:47.844Z] [player] craft Sentinel Cleaver
+[2026-09-04T05:03:06.681Z] [debug] ui: tap "craft"
+[2026-09-04T05:03:00.533Z] [world] You break the Energy Baton down. ✦ Recovered: Scrap Metal x3, Stick.
+[2026-09-04T05:03:00.465Z] [world] You break the Vine Grasp Wand down. ✦ Recovered: Scrap Metal x2, Stick.
+[2026-09-04T05:03:00.396Z] [world] You break the Gale Binder Wand down. ✦ Recovered: Scrap Metal x2, Stick.
+[2026-09-04T05:03:00.327Z] [world] You break the Minor Repair Wand down. ✦ Recovered: Scrap Metal x2, Stick.
+[2026-09-04T05:03:00.258Z] [world] You break the Slick Mud Wand down. ✦ Recovered: Scrap Metal x2, Stick.
+[2026-09-04T05:03:00.188Z] [world] You break the Slick Mud Wand down. ✦ Recovered: Scrap Metal x2, Stick.
+[2026-09-04T05:03:00.118Z] [world] You break the Earthshaker Wand down. ✦ Recovered: Scrap Metal x2, Stick.
+[2026-09-04T05:03:00.047Z] [world] You break the Force Wave Wand down. ✦ Recovered: Scrap Metal x2, Stick.
+[2026-09-04T05:02:59.971Z] [world] You break the Force Wave Wand down. ✦ Recovered: Scrap Metal x2, Stick.
+[2026-09-04T05:02:59.901Z] [world] You break the Cudgel down. ✦ Recovered: Small Rock x2, Stick.
+[2026-09-04T05:02:59.831Z] [world] You break the Cudgel down. ✦ Recovered: Small Rock x2, Stick.
+[2026-09-04T05:02:59.761Z] [world] You break the Bone Knife down. ✦ Recovered: Scrap Metal x2, Stick.
+[2026-09-04T05:02:59.690Z] [world] You break the Bone Knife down. ✦ Recovered: Scrap Metal x2, Stick.
+[2026-09-04T05:02:59.619Z] [world] You break the Bone Knife down. ✦ Recovered: Scrap Metal x2, Stick.
+[2026-09-04T05:02:59.548Z] [reward] ✦ Your eye for parts sharpens. +1 INT (base 11, 15 as you stand).
+[2026-09-04T05:02:59.479Z] [world] You break the Bone Knife down. ✦ Recovered: Scrap Metal x2, Stick.
+[2026-09-04T05:02:59.408Z] [world] You break the Aetheric Touch Wand down. ✦ Recovered: Scrap Metal x2, Stick.
+[2026-09-04T05:02:59.337Z] [world] You break the Aetheric Spark Wand down. ✦ Recovered: Scrap Metal x2, Stick.
+[2026-09-04T05:02:59.265Z] [world] You break the Aetheric Spark Wand down. ✦ Recovered: Scrap Metal x2, Stick.
+[2026-09-04T05:02:59.185Z] [world] You break the Aetheric Spark Wand down. ✦ Recovered: Scrap Metal x2, Stick.
+[2026-09-04T05:02:58.271Z] [debug] homework: item_desc "Wild Grapes" ✓ 1192ms
+[2026-09-04T05:02:58.252Z] [debug] qwen⏱ item_synthesis_hw ok 1162ms read 316ms/write 813ms in 324t→out 22t 1.0ms/t (92ch)
+[2026-09-04T05:02:28.248Z] [debug] homework: item_desc "Wild Oats" ✓ 1193ms
+[2026-09-04T05:02:28.236Z] [debug] qwen⏱ item_synthesis_hw ok 1157ms read 353ms/write 778ms in 324t→out 21t 1.1ms/t (92ch)
+[2026-09-04T05:01:59.066Z] [debug] homework: item_desc "Relic Hunter's Gauntlets" ✓ 2033ms
+[2026-09-04T05:01:59.058Z] [debug] qwen⏱ item_synthesis_hw ok 2008ms read 425ms/write 1465ms in 332t→out 39t 1.3ms/t (162ch)
+[2026-09-04T05:01:51.920Z] [debug] persist sizes(KB): total=330 player=79 wm=167[rooms=93 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=81 scene=3
+[2026-09-04T05:01:28.803Z] [debug] homework: item_desc "Mud Monarch Sigil" ✓ 1797ms
+[2026-09-04T05:01:28.795Z] [debug] qwen⏱ item_synthesis_hw ok 1766ms read 405ms/write 1335ms in 332t→out 35t 1.2ms/t (123ch)
+[2026-09-04T05:01:18.701Z] [debug] stats: STR18 DEX20 INT14 WIS17 CHA13 STE8 | gear: WIS+5,INT+4,STR+6,DEX+8,STE+2,CHA+1 | worn: main=Reclaimers Guild Geode-Cored Cleaver off=Reclaimers Guild Shroud-Spun Slinger head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Amulet of the Silt Warden ring=Tartarian Oath-Band ring2=Tin Ward Ring ring3=Tin Ward Ring ring4=Scribe's Signet
+[2026-09-04T05:00:58.234Z] [debug] homework: item_desc "Wild Onion" ✓ 1276ms
+[2026-09-04T05:00:58.212Z] [debug] qwen⏱ item_synthesis_hw ok 1237ms read 322ms/write 887ms in 323t→out 25t 1.0ms/t (105ch)
+[2026-09-04T05:00:32.272Z] [debug] homework: item_desc "Empty Water Bottle" ✓ 5353ms
+[2026-09-04T05:00:32.260Z] [debug] qwen⏱ item_synthesis_hw ok 5332ms read/write unusable (native mis-reported 116905ms/782ms — llama.rn split bug, not this call) in 321t→out 22t (94ch)
+[2026-09-04T05:00:23.334Z] [debug] ui: tap "inventory"
+[2026-09-04T05:00:21.893Z] [debug] ui: tap "more ▸"
+[2026-09-04T05:00:15.492Z] [system] ⏳ Time passed: 6 min
+[2026-09-04T05:00:15.491Z] [arbiter] The Arbiter looks around. "The garrison lamps are kept lit around the clock. The Dynasty does not explain to the dark."
+[2026-09-04T05:00:15.435Z] [reward] +12 TC pried from the dust.
+[2026-09-04T05:00:15.435Z] [system] Forgotten Order standing +1 (now 60)
+[2026-09-04T05:00:15.426Z] [reward] You strip the unconscious Mud Monarchs Patrol 2 — Bone Knife, Mud-Warden's Vest, Patched Cloth, Aether Residue, +26 TC. The gear's seen better days (worn from the fight).
+[2026-09-04T05:00:15.425Z] [combat] Nobody left standing — the fight is yours. You strip the sleepers where they lie.
+[2026-09-04T05:00:15.425Z] [reward] You strip the body: Cudgel, Reclaimer's Salvage Vest (+6 TC). The kit took the fight badly.
+[2026-09-04T05:00:15.424Z] [reward] Mud Monarchs Patrol 4 defeated. You recover Scrap Metal ×2.
+[2026-09-04T05:00:15.421Z] [combat] Your blow with the corrupted resonant reclaimers guild shroud-spun slinger lands clean — 27 damage. Mud Monarchs Patrol 4 crumples in the dust. The Aetherstone settles.
+[2026-09-04T05:00:15.419Z] [combat] You — d20 → 6 + DEX 19 perfect opening (2× dice) = 25 vs Mud Monarchs Patrol 4 AC 11 — ✓ HIT
+[2026-09-04T05:00:15.418Z] [world] You seize the initiative. Mud Monarchs Patrol 4 has no time to react.
+[2026-09-04T05:00:06.004Z] [cognitive] DISENGAGE · ATTACK · USE_ITEM  (340ms)
+[2026-09-04T05:00:05.663Z] [system] ⏳ Time passed: 6 min
+[2026-09-04T05:00:05.662Z] [world] You commit forward with the corrupted resonant reclaimers guild shroud-spun slinger. Mud Monarchs Patrol 4 watches your hands.
+[2026-09-04T05:00:05.587Z] [debug] attack: status mods perfect opening (2× dice)
+[2026-09-04T05:00:05.584Z] [debug] attack: target=Mud Monarchs Patrol 4 range=mid reach.bands=[distant,far,mid,close] reach.label=Reclaimers Guild Shroud-Spun Slinger bareHand=false
+[2026-09-04T05:00:05.583Z] [combat] Mud Monarchs Patrol 2 shakes off the last of the current — the Reclaimers Guild Shroud-Spun Slinger has run its course.
+[2026-09-04T05:00:05.583Z] [combat] Mud Monarchs Patrol 2 convulses — arcing current bites 1. (1/18 HP, 0 turns left)
+[2026-09-04T05:00:05.583Z] [combat] Mud Monarchs Patrol 2 shakes off the last of the corruption — the Reclaimers Guild Shroud-Spun Slinger has run its course.
+[2026-09-04T05:00:05.583Z] [combat] Mud Monarchs Patrol 2 blackens — corruption eats 1. (2/18 HP, 0 turns left)
+[2026-09-04T05:00:05.582Z] [debug] dedup: suppressed arbiter repeat — "The Arbiter keeps one eye on the fight. "That is the right m…"
+[2026-09-04T05:00:05.582Z] [arbiter] The Arbiter keeps one eye on the fight. "That is the right move for The Bog Dragon of Old Drakova — but not with something on you. Put this down first."
+[2026-09-04T05:00:05.582Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand reclaimers guild shroud spun slinger resolved=Reclaimers Guild Shroud-Spun Slinger range=mid enemies=2 hooks=1
+[2026-09-04T05:00:05.581Z] [player] attack with the off-hand reclaimers guild shroud-spun slinger
+[2026-09-04T05:00:05.503Z] [system] evasive — harder to hit fades.
+[2026-09-04T05:00:05.498Z] [debug] ui: tap "☣⚡ shroud-spun slinger ⚒"
+[2026-09-04T04:59:52.624Z] [cognitive] neutral  (354ms)
+[2026-09-04T04:59:52.269Z] [system] ⏳ Time passed: 6 min
+[2026-09-04T04:59:52.269Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-04T04:59:52.269Z] [debug] arbiter: template (reason=combat)
+[2026-09-04T04:59:52.268Z] [world] You slip Mud Monarchs Patrol 4's arc clean and stay light on your feet — the rest of the pack still swings, but you're a harder mark for the moment.
+[2026-09-04T04:59:52.268Z] [combat] Dodge — d20 → 19 + DEX 19 = 38 vs ATK 17. ✓ You slip the arc — PERFECT OPENING (next strike ×2 dice).
+[2026-09-04T04:59:52.267Z] [combat] Mud Monarchs Patrol 4 — d20 → 10 + ATK 7 = 17 vs your AC 22 — ✗ EVADED
+[2026-09-04T04:59:52.195Z] [combat] Mud Monarchs Patrol 2 convulses — arcing current bites 1. (3/18 HP, 1 turn left)
+[2026-09-04T04:59:52.195Z] [combat] Mud Monarchs Patrol 2 blackens — corruption eats 1. (4/18 HP, 1 turn left)
+[2026-09-04T04:59:52.195Z] [world] You commit to the dodge. Slip Mud Monarchs Patrol 4's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-09-04T04:59:52.194Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=2 hooks=1
+[2026-09-04T04:59:52.194Z] [player] dodge
+[2026-09-04T04:59:52.191Z] [system] bleeding fades.
+[2026-09-04T04:59:52.190Z] [debug] ui: tap "dodge"
+[2026-09-04T04:59:49.319Z] [reward] ✦ Scrap Metal (Common).
+[2026-09-04T04:59:49.319Z] [combat] Your Bone Crossbow shatters from wear. It is gone. A twist of Scrap Metal comes free in your hand.
+[2026-09-04T04:59:48.934Z] [combat] Mud Monarchs Patrol 4 — d20 → 4 + ATK 7 = 11 vs your AC 22 — ✗ MISS
+[2026-09-04T04:59:48.853Z] [reward] +22 TC pried from the dust.
+[2026-09-04T04:59:48.852Z] [system] Forgotten Order standing +1 (now 59)
+[2026-09-04T04:59:48.852Z] [combat] 1 attacker remains. Mud Monarchs Patrol 4 now in your sights.
+[2026-09-04T04:59:48.851Z] [reward] You strip the body: Bone Knife, Mud-Bound Cloak (+6 TC). The kit took the fight badly.
+[2026-09-04T04:59:48.849Z] [reward] Mud Monarchs Patrol 3 defeated. You recover Patched Cloth ×3, Mud Monarch Sigil.
+[2026-09-04T04:59:48.848Z] [combat] The killing blow with the poisoned corrupted bone crossbow: 27. Mud Monarchs Patrol 3 drops where it stood.
+[2026-09-04T04:59:48.847Z] [combat] Weakness exposed — Mud Monarchs Patrol 3 flinches. (piercing ×2.25 for 27)
+[2026-09-04T04:59:48.845Z] [combat] You — d20 → 19 + DEX 19 = 38 vs Mud Monarchs Patrol 3 AC 11 — ✓ HIT
+[2026-09-04T04:59:48.844Z] [world] You seize the initiative. Mud Monarchs Patrol 3 has no time to react.
+[2026-09-04T04:59:40.999Z] [debug] persist sizes(KB): total=333 player=78 wm=168[rooms=93 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=82 scene=5
+[2026-09-04T04:59:40.230Z] [cognitive] AGGRESSION · ATTACK · AIM · DISENGAGE · RELOAD  (345ms)
+[2026-09-04T04:59:39.884Z] [system] ⏳ Time passed: 6 min
+[2026-09-04T04:59:39.883Z] [world] You bring the poisoned corrupted bone crossbow to bear on Mud Monarchs Patrol 3.
+[2026-09-04T04:59:39.793Z] [debug] attack: target=Mud Monarchs Patrol 3 range=mid reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false
+[2026-09-04T04:59:39.792Z] [combat] Mud Monarchs Patrol 2 convulses — arcing current bites 1. (5/18 HP, 2 turns left)
+[2026-09-04T04:59:39.792Z] [combat] Mud Monarchs Patrol 2 blackens — corruption eats 1. (6/18 HP, 2 turns left)
+[2026-09-04T04:59:39.792Z] [debug] dedup: suppressed arbiter repeat — "The Arbiter keeps one eye on the fight. "That is the right m…"
+[2026-09-04T04:59:39.792Z] [arbiter] The Arbiter keeps one eye on the fight. "That is the right move for The Bog Dragon of Old Drakova — but not with something on you. Put this down first."
+[2026-09-04T04:59:39.791Z] [debug] parser: intent=attack conf=1.00 verb=attack target=bone crossbow resolved=Bone Crossbow range=mid enemies=3 hooks=1
+[2026-09-04T04:59:39.790Z] [player] attack with the bone crossbow
+[2026-09-04T04:59:39.742Z] [debug] ui: tap "☠☣ bone crossbow ▲ ★"
+[2026-09-04T04:59:38.123Z] [combat] Mud Monarchs Patrol 3 — d20 → 12 + ATK 7 = 19 vs your AC 22 — ✗ MISS
+[2026-09-04T04:59:38.121Z] [combat] Mud Monarchs Patrol 4 — d20 → 11 + ATK 7 = 18 vs your AC 22 — ✗ MISS
+[2026-09-04T04:59:38.118Z] [combat] Mud Monarchs Patrol 2 is left exposed — easier to hit.
+[2026-09-04T04:59:38.118Z] [combat] Corrupted Resonant Reclaimers Guild Shroud-Spun Slinger — 1 electrical bites in and festers (3 turns).
+[2026-09-04T04:59:38.118Z] [combat] Corrupted Resonant Reclaimers Guild Shroud-Spun Slinger — 1 corruption bites in and festers (3 turns). The rot deepens (1 stack).
+[2026-09-04T04:59:38.117Z] [combat] Mud Monarchs Patrol 2 is out of it. Mud Monarchs Patrol 3 now in your sights.
+[2026-09-04T04:59:38.117Z] [combat] You crack the Mud Monarchs Patrol 2 with the Corrupted Resonant Reclaimers Guild Shroud-Spun Slinger for 11 — the better part of their fight, gone in one blow. They crumple, out cold. (7/18 HP) Loot them before they come to.
+[2026-09-04T04:59:38.116Z] [debug] wear ward: Reclaimers Guild Shroud-Spun Slinger keeps its point (15%)
+[2026-09-04T04:59:38.116Z] [combat] Bludgeoning flares — +4 on hit.
+[2026-09-04T04:59:38.115Z] [combat] You — d20 → 14 + DEX 19 = 33 vs Mud Monarchs Patrol 2 AC 11 — ✓ HIT
+[2026-09-04T04:59:38.115Z] [world] You seize the initiative. Mud Monarchs Patrol 2 has no time to react.
+[2026-09-04T04:59:29.014Z] [cognitive] DISENGAGE · ATTACK · USE_ITEM  (344ms)
+[2026-09-04T04:59:28.669Z] [system] ⏳ Time passed: 6 min
+[2026-09-04T04:59:28.669Z] [world] You raise the corrupted resonant reclaimers guild shroud-spun slinger toward Mud Monarchs Patrol 2. The room narrows around the both of you.
+[2026-09-04T04:59:28.589Z] [debug] attack: target=Mud Monarchs Patrol 2 range=mid reach.bands=[distant,far,mid,close] reach.label=Reclaimers Guild Shroud-Spun Slinger bareHand=false
+[2026-09-04T04:59:28.588Z] [debug] dedup: suppressed arbiter repeat — "The Arbiter keeps one eye on the fight. "That is the right m…"
+[2026-09-04T04:59:28.588Z] [arbiter] The Arbiter keeps one eye on the fight. "That is the right move for The Bog Dragon of Old Drakova — but not with something on you. Put this down first."
+[2026-09-04T04:59:28.588Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand reclaimers guild shroud spun slinger resolved=Reclaimers Guild Shroud-Spun Slinger range=mid enemies=3 hooks=1
+[2026-09-04T04:59:28.587Z] [player] attack with the off-hand reclaimers guild shroud-spun slinger
+[2026-09-04T04:59:28.504Z] [debug] ui: tap "☣⚡ shroud-spun slinger ⚒"
+[2026-09-04T04:59:24.925Z] [combat] Mud Monarchs Patrol 3's strike leaves you bleeding.
+[2026-09-04T04:59:24.925Z] [combat] Mud Monarchs Patrol 3 deals 5 slashing damage [armor −25%] [edge of reach — halved]. You have 45 HP remaining.
+[2026-09-04T04:59:24.535Z] [arbiter] The Arbiter does not move. "If you can't finish the Mud Monarchs Patrol 2, I will. I'd rather not. My afternoon's planned."
+[2026-09-04T04:59:24.535Z] [combat] Mud Monarchs Patrol 2 — d20 → 1 + ATK 7 = 8 vs your AC 22 — ✗ FUMBLE
+[2026-09-04T04:59:24.533Z] [combat] Mud Monarchs Patrol 4 — d20 → 5 + ATK 7 = 12 vs your AC 22 — ✗ MISS
+[2026-09-04T04:59:24.531Z] [combat] Mud Monarchs Patrol 3 — d20 → 20 + ATK 7 = 27 vs your AC 22 — ✓ CRITICAL HIT
+[2026-09-04T04:59:24.531Z] [debug] ac-shift 25→22: race/base 10 + gear 18 + title 0 → trimmed 22 + status 0 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak
+[2026-09-04T04:59:24.452Z] [reward] +20 TC pried from the dust.
+[2026-09-04T04:59:24.452Z] [system] Forgotten Order standing +1 (now 58)
+[2026-09-04T04:59:24.452Z] [combat] 3 attackers remain. Mud Monarchs Patrol 2 now in your sights.
+[2026-09-04T04:59:24.451Z] [reward] You strip the body: Bone Knife, Mud-Warden's Vest (+6 TC). The kit took the fight badly.
+[2026-09-04T04:59:24.450Z] [reward] Mud Monarchs Patrol 1 defeated. You recover Patched Cloth, Aether Residue.
+[2026-09-04T04:59:24.449Z] [combat] Your blow with the poisoned corrupted bone crossbow lands clean — 26 damage. Mud Monarchs Patrol 1 crumples in the dust. The Aetherstone settles.
+[2026-09-04T04:59:24.444Z] [combat] Piercing flares — +3 on hit.
+[2026-09-04T04:59:24.442Z] [combat] You — d20 → 16 + DEX 19 + 2 (point blank) perfect opening (2× dice) = 37 vs Mud Monarchs Patrol 1 AC 11 — ✓ HIT
+[2026-09-04T04:59:24.441Z] [world] You seize the initiative. Mud Monarchs Patrol 1 has no time to react.
+[2026-09-04T04:59:14.533Z] [cognitive] AGGRESSION · ATTACK · AIM · DISENGAGE · RELOAD  (344ms)
+[2026-09-04T04:59:14.188Z] [system] ⏳ Time passed: 6 min
+[2026-09-04T04:59:14.187Z] [world] You commit forward with the poisoned corrupted bone crossbow. Mud Monarchs Patrol 1 watches your hands.
+[2026-09-04T04:59:14.112Z] [debug] attack: status mods perfect opening (2× dice)
+[2026-09-04T04:59:14.111Z] [debug] attack: target=Mud Monarchs Patrol 1 range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false
+[2026-09-04T04:59:14.110Z] [combat] Mud Monarchs Patrol 1 blackens — corruption eats 1. (1/18 HP, 1 turn left)
+[2026-09-04T04:59:14.110Z] [combat] Mud Monarchs Patrol 1 shudders — poison eats 4. (2/18 HP, 1 turn left)
+[2026-09-04T04:59:14.110Z] [debug] dedup: suppressed arbiter repeat — "The Arbiter keeps one eye on the fight. "That is the right m…"
+[2026-09-04T04:59:14.110Z] [arbiter] The Arbiter keeps one eye on the fight. "That is the right move for The Bog Dragon of Old Drakova — but not with something on you. Put this down first."
+[2026-09-04T04:59:14.109Z] [debug] parser: intent=attack conf=1.00 verb=attack target=bone crossbow resolved=Bone Crossbow range=close enemies=4 hooks=1
+[2026-09-04T04:59:14.109Z] [player] attack with the bone crossbow
+[2026-09-04T04:59:14.086Z] [system] evasive — harder to hit fades.
+[2026-09-04T04:59:14.085Z] [debug] ui: tap "☠☣ bone crossbow ▲"
+[2026-09-04T04:59:13.342Z] [cognitive] neutral  (355ms)
+[2026-09-04T04:59:12.986Z] [system] ⏳ Time passed: 6 min
+[2026-09-04T04:59:12.986Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-04T04:59:12.986Z] [debug] arbiter: template (reason=combat)
+[2026-09-04T04:59:12.985Z] [combat] Mud Monarchs Patrol 3 presses in behind the others, waiting for an opening.
+[2026-09-04T04:59:12.985Z] [combat] Mud Monarchs Patrol 2 — d20 → 14 + ATK 7 = 21 vs your AC 25 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-04T04:59:12.984Z] [combat] Mud Monarchs Patrol 1 — d20 → 12 + ATK 7 = 19 vs your AC 25 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-04T04:59:12.984Z] [debug] ac-shift 22→25: race/base 10 + gear 18 + title 0 → trimmed 22 + status 3 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak
+[2026-09-04T04:59:12.982Z] [world] You slip Mud Monarchs Patrol 4's arc clean and stay light on your feet — the rest of the pack still swings, but you're a harder mark for the moment.
+[2026-09-04T04:59:12.981Z] [combat] Dodge — d20 → 17 + DEX 19 = 36 vs ATK 24. ✓ You slip the arc — PERFECT OPENING (next strike ×2 dice).
+[2026-09-04T04:59:12.981Z] [combat] Mud Monarchs Patrol 4 — d20 → 17 + ATK 7 = 24 vs your AC 22 — ✗ EVADED
+[2026-09-04T04:59:12.872Z] [combat] Mud Monarchs Patrol 1 blackens — corruption eats 1. (6/18 HP, 2 turns left)
+[2026-09-04T04:59:12.872Z] [combat] Mud Monarchs Patrol 1 shudders — poison eats 4. (7/18 HP, 2 turns left)
+[2026-09-04T04:59:12.871Z] [world] You commit to the dodge. Slip Mud Monarchs Patrol 1's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-09-04T04:59:12.870Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=4 hooks=1
+[2026-09-04T04:59:12.868Z] [player] dodge
+[2026-09-04T04:59:12.852Z] [debug] ui: tap "dodge"
+[2026-09-04T04:59:10.389Z] [world] You use 1× Trauma Kit. +33 HP (50/50), +1 stamina, bleeding stopped.
+[2026-09-04T04:59:02.252Z] [debug] ui: tap "✚ heals (3)"
+[2026-09-04T04:58:59.422Z] [combat] Mud Monarchs Patrol 2 deals 2 slashing damage [edge of reach — halved]. You have 17 HP remaining.
+[2026-09-04T04:58:59.421Z] [combat] Mud Monarchs Patrol 1's strike leaves you bleeding.
+[2026-09-04T04:58:59.421Z] [combat] Mud Monarchs Patrol 1 deals 6 slashing damage [armor −25%]. You have 19 HP remaining.
+[2026-09-04T04:58:59.421Z] [combat] Mud Monarchs Patrol 4 deals 6 bludgeoning damage [edge of reach — halved]. You have 25 HP remaining.
+[2026-09-04T04:58:59.020Z] [combat] Mud Monarchs Patrol 3 presses in behind the others, waiting for an opening.
+[2026-09-04T04:58:59.019Z] [combat] Mud Monarchs Patrol 2 — d20 → 18 + ATK 7 = 25 vs your AC 22 — ✓ HIT
+[2026-09-04T04:58:59.016Z] [debug] wear ward: Titan's Gauntlets keeps its point (15%)
+[2026-09-04T04:58:59.015Z] [combat] Mud Monarchs Patrol 1 — d20 → 19 + ATK 7 = 26 vs your AC 22 — ✓ HIT
+[2026-09-04T04:58:59.013Z] [debug] wear ward: Titan's Gauntlets keeps its point (15%)
+[2026-09-04T04:58:59.012Z] [combat] Mud Monarchs Patrol 4 — d20 → 19 + ATK 7 = 26 vs your AC 22 — ✓ HIT
+[2026-09-04T04:58:59.009Z] [combat] Poisoned Corrupted Bone Crossbow — 1 corruption bites in and festers (3 turns). The rot deepens (1 stack).
+[2026-09-04T04:58:59.009Z] [combat] Poisoned Corrupted Bone Crossbow — 4 poison bites in and festers (3 turns).
+[2026-09-04T04:58:59.008Z] [combat] Mud Monarchs Patrol 1 takes 7 with the poisoned corrupted bone crossbow. It reels: 11 left. Then it fights back.
+[2026-09-04T04:58:59.005Z] [combat] You — d20 → 19 + DEX 19 + 2 (point blank) = 40 vs Mud Monarchs Patrol 1 AC 11 — ✓ HIT
+[2026-09-04T04:58:59.004Z] [world] You seize the initiative. Mud Monarchs Patrol 1 has no time to react.
+[2026-09-04T04:58:49.650Z] [debug] persist sizes(KB): total=333 player=77 wm=168[rooms=93 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=82 scene=5
+[2026-09-04T04:58:49.235Z] [cognitive] AGGRESSION · ATTACK · AIM · DISENGAGE · RELOAD  (342ms)
+[2026-09-04T04:58:48.892Z] [system] ⏳ Time passed: 6 min
+[2026-09-04T04:58:48.892Z] [world] You bring the poisoned corrupted bone crossbow to bear on Mud Monarchs Patrol 1.
+[2026-09-04T04:58:48.802Z] [debug] attack: target=Mud Monarchs Patrol 1 range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false
+[2026-09-04T04:58:48.802Z] [debug] dedup: suppressed arbiter repeat — "The Arbiter keeps one eye on the fight. "That is the right m…"
+[2026-09-04T04:58:48.801Z] [arbiter] The Arbiter keeps one eye on the fight. "That is the right move for The Bog Dragon of Old Drakova — but not with something on you. Put this down first."
+[2026-09-04T04:58:48.800Z] [debug] parser: intent=attack conf=1.00 verb=attack target=bone crossbow resolved=Bone Crossbow range=close enemies=4 hooks=1
+[2026-09-04T04:58:48.799Z] [player] attack with the bone crossbow
+[2026-09-04T04:58:48.748Z] [debug] ui: tap "☠☣ bone crossbow ▲"
+[2026-09-04T04:58:46.646Z] [combat] Mud Monarchs Patrol 1 deals 5 slashing damage [armor −25%]. You have 31 HP remaining.
+[2026-09-04T04:58:46.244Z] [arbiter] The Arbiter loosens something inside the cloak, not looking down. "The Mud Monarchs Patrol 1 is closer than you think it is."
+[2026-09-04T04:58:46.244Z] [combat] The poisoned corrupted bone crossbow cuts air. Mud Monarchs Patrol 1 answers immediately.
+[2026-09-04T04:58:46.240Z] [combat] You — d20 → 1 + DEX 19 + 2 (point blank) = 22 vs Mud Monarchs Patrol 1 AC 11 — ✗ FUMBLE
+[2026-09-04T04:58:46.240Z] [combat] Mud Monarchs Patrol 4 closes the distance.
+[2026-09-04T04:58:46.239Z] [combat] Mud Monarchs Patrol 3 — d20 → 3 + ATK 7 = 10 vs your AC 22 — ✗ MISS
+[2026-09-04T04:58:46.237Z] [combat] Mud Monarchs Patrol 2 — d20 → 4 + ATK 7 = 11 vs your AC 22 — ✗ MISS
+[2026-09-04T04:58:46.234Z] [combat] Mud Monarchs Patrol 1 — d20 → 15 + ATK 7 = 22 vs your AC 22 — ✓ HIT
+[2026-09-04T04:58:46.232Z] [world] Mud Monarchs Patrol 1 moves first. The pressure is immediate.
+[2026-09-04T04:58:39.171Z] [debug] qwen⏱ ✂ DISCARDED ambient after 3494ms — ambient:preempted
+[2026-09-04T04:58:39.170Z] [debug] arbiter: ambient cut short 5347ms — yielded to the player
+[2026-09-04T04:58:38.836Z] [cognitive] AGGRESSION · ATTACK · AIM · DISENGAGE · RELOAD  (339ms)
+[2026-09-04T04:58:38.496Z] [system] ⏳ Time passed: 6 min
+[2026-09-04T04:58:38.495Z] [world] You raise the poisoned corrupted bone crossbow toward Mud Monarchs Patrol 1. The room narrows around the both of you.
+[2026-09-04T04:58:38.420Z] [debug] attack: target=Mud Monarchs Patrol 1 range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false
+[2026-09-04T04:58:38.420Z] [debug] dedup: suppressed arbiter repeat — "The Arbiter keeps one eye on the fight. "That is the right m…"
+[2026-09-04T04:58:38.420Z] [arbiter] The Arbiter keeps one eye on the fight. "That is the right move for The Bog Dragon of Old Drakova — but not with something on you. Put this down first."
+[2026-09-04T04:58:38.419Z] [debug] parser: intent=attack conf=1.00 verb=attack target=bone crossbow resolved=Bone Crossbow range=close enemies=4 hooks=1
+[2026-09-04T04:58:38.419Z] [player] attack with the bone crossbow
+[2026-09-04T04:58:38.400Z] [debug] ui: tap "☠☣ bone crossbow ▲"
+[2026-09-04T04:58:38.045Z] [debug] qwen⏱ ambient preempted 3494ms read 0ms/write 0ms in 364t→out 0t (0ch)
+[2026-09-04T04:58:37.697Z] [cognitive] neutral  (562ms)
+[2026-09-04T04:58:37.349Z] [combat] Mud Monarchs Patrol 1's strike leaves you bleeding.
+[2026-09-04T04:58:37.349Z] [combat] Mud Monarchs Patrol 1 deals 3 slashing damage [armor −25%]. You have 36 HP remaining.
+[2026-09-04T04:58:36.787Z] [system] ⏳ Time passed: 6 min
+[2026-09-04T04:58:36.787Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-04T04:58:36.786Z] [debug] arbiter: template (reason=combat)
+[2026-09-04T04:58:36.786Z] [combat] Mud Monarchs Patrol 3 and 1 other close the distance.
+[2026-09-04T04:58:36.785Z] [combat] Mud Monarchs Patrol 2 — d20 → 7 + ATK 7 = 14 vs your AC 22 — ✗ MISS
+[2026-09-04T04:58:36.782Z] [combat] Dodge — Mud Monarchs Patrol 1 rolls a NAT 20. No read beats a perfect strike; it lands through your dodge.
+[2026-09-04T04:58:36.781Z] [combat] Mud Monarchs Patrol 1 — d20 → 20 + ATK 7 = 27 vs your AC 22 — ✓ CRITICAL HIT
+[2026-09-04T04:58:36.669Z] [world] You commit to the dodge. Slip Mud Monarchs Patrol 1's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-09-04T04:58:36.668Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=4 hooks=1
+[2026-09-04T04:58:36.667Z] [player] dodge
+[2026-09-04T04:58:36.651Z] [debug] ui: tap "dodge"
+[2026-09-04T04:58:34.553Z] [cognitive] SWIM  (728ms)
+[2026-09-04T04:58:33.826Z] [arbiter] "Mud Monarchs riders," the Arbiter says. "They've marked you. No outrunning this one."
+[2026-09-04T04:58:33.826Z] [world] A Mud Monarchs patrol crosses your path in the open — and turns toward you.
+[2026-09-04T04:58:33.822Z] [world] You've already examined the mud. There's nothing more to find here.
+[2026-09-04T04:58:33.822Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=rusted petrified mud wave range=- enemies=0 hooks=1
+[2026-09-04T04:58:33.821Z] [player] investigate the mud
+[2026-09-04T04:58:32.577Z] [debug] homework: scene_intro "Dynasty Border Post" ✓ 5751ms
+[2026-09-04T04:58:32.199Z] [debug] qwen⏱ narration:scene_intro_fill ok 5150ms read 3818ms/write 1166ms in 764t→out 33t 5.0ms/t HIT-CAP (165ch)
+[2026-09-04T04:58:31.912Z] [debug] ui: tap "investigate"
+[2026-09-04T04:58:26.828Z] [debug] homework: intro-fill armed after 6000ms idle
+[2026-09-04T04:58:25.005Z] [reward] +24 TC pried from the dust.
+[2026-09-04T04:58:25.004Z] [system] Word travels among those who keep the flood-dead sacred: you put one of the Aetherkin down.
+[2026-09-04T04:58:25.004Z] [system] ▼ True Tartarians turns HOSTILE — their patrols hunt you on their own ground now, and their counters mark you up.
+[2026-09-04T04:58:25.004Z] [system] Word moves through the buried world — many people view you differently now.
+[2026-09-04T04:58:25.002Z] [reward] Mud-Wracked Aetherkin defeated. You recover Veil of Peace ×2, Aether Mud.
+
+=== END REPORT ===

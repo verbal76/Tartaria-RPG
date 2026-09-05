@@ -1,0 +1,301 @@
+{
+  "id": "e97037b8d192492b824653ac7bc2454a",
+  "groupID": "7709458959",
+  "eventID": "e97037b8d192492b824653ac7bc2454a",
+  "projectID": "4511945117532160",
+  "size": 17961,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-03-1642-every-drop-has-a-name-in-the-book #mtlhgdw29v8x [inline 1/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-03-1642-every-drop-has-a-name-in-the-book",
+  "message": "player-log 2026-09-03-1642-every-drop-has-a-name-in-the-book #mtlhgdw29v8x [inline 1/28]",
+  "title": "player-log 2026-09-03-1642-every-drop-has-a-name-in-the-book #mtlhgdw29v8x [inline 1/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "623fc14c3f634bdd98d2130db9530d16",
+      "span_id": "9bc5f01fafc21928",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "=== TARTARIA LOG \u00b7 399981 CHARS \u00b7 BEGIN ===\n[2026-09-02T22:40:05.351Z] [world] You've left The Reaver's Crest and entered The Monarch's Waystation. The seneschal logs your name without asking it. The Monarchs' ledgers have their ways. It's dusk. Nobody else is in sight. east leads to Dynasty Border Post; south leads to The Reaver's Crest; west leads to Iskan-Veil. Nothing named to the north.\n",
+      "[2026-09-02T22:40:05.352Z] [world] The gate of Monarch Court stands before you \u2014 their ground, not yet their halls. (Tap ENTER OUTPOST to step inside.)\n[2026-09-02T22:40:05.352Z] [world] You know this place. Not well, but you know it.\n[2026-09-02T22:40:05.353Z] [system] Weather effect \u2014 Whisper Fog: -1 WIS\n",
+      "[2026-09-02T22:40:05.358Z] [world] [The Monarch's Waystation] north: Garrin (return the folio) (17 tiles, 1 day, 19 hours) \u00b7 east: Dynasty Border Post (4 tiles, 10 hours) \u00b7 south: The Reaver's Crest (1 tile, 3 hours) \u00b7 west: Raider's Ridge (2 tiles, 5 hours)\n[2026-09-02T22:40:05.358Z] [debug] arbiter: template (reason=burned-recently)\n",
+      "[2026-09-02T22:40:05.358Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-02T22:40:07.852Z] [world] Old Mira turns the reeve's token over twice before she waves you to sit. \"I'll mark his roost,\" she says. \"But my boy went into the flooded shrine at the Mud Flood Nexus after the first attack, and he's still in there. Bring me back his locket. Then we talk.\" She draws you ",
+      "the way down on a scrap of hide and presses it into your hand.\n[2026-09-02T22:40:07.853Z] [arbiter] \"She has been carrying that wait for a season,\" the Arbiter says quietly. \"Make it count.\"\n[2026-09-02T22:40:07.853Z] [reward] \u2726 Mira's Shrine-Map \u2014 mission item.\n",
+      "[2026-09-02T22:40:07.853Z] [system] \u25b8 Next: Mud Flood Nexus \u00b7 strike \u2014 Mud Wraith \u2014 come away with the The Boy's Locket \u00b7 bring Mira's Shrine-Map.\n[2026-09-02T22:40:07.856Z] [world] You set course for Mud Flood Nexus. 46 tiles \u2014 about 4 days, 19 hours of travel, all in. Tap the \u2192 MUD FLOOD NEXUS button on the travel row to press on; STOP TRAVEL to halt.\n",
+      "[2026-09-02T22:40:07.856Z] [world] Auto-routing to the next stage of The Bog Dragon of Old Drakova: Mud Flood Nexus.\n[2026-09-02T22:40:07.857Z] [debug] mission card: \"The Bog Dragon of Old Drakova\" \u00b7 close \u00b7 \u25b8 Next: Mud Flood Nexus \u00b7 strike \u2014 Mud Wraith \u2014 come away with the The Boy's Locket \u00b7 bring Mira's Shrine-Map. \u00b7 got Mira's Shrine-Map\n",
+      "[2026-09-02T22:40:08.969Z] [debug] qwen\u23f1 investigate_lore ok 4739ms read/write unusable (native mis-reported 4178ms/3310ms \u2014 llama.rn split bug, not this call) in 128t\u2192out 41t (177ch)\n[2026-09-02T22:40:17.882Z] [debug] homework: intro-fill armed after 13268ms idle\n[2026-09-02T22:40:22.499Z] [debug] ui: tap \"mission card \u00b7 CONTINUE\"\n[2026-09-02T22:40:27.718Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-09-02T22:40:29.205Z] [world] You take the Scrap Metal the way you take everything out here \u2014 quickly, and without ceremony.\n[2026-09-02T22:40:29.206Z] [reward] \u2726 Scrap Metal (Common).\n[2026-09-02T22:40:30.213Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 12120ms read 8678ms/write 3399ms in 738t\u2192out 33t 11.8ms/t HIT-CAP (144ch)\n",
+      "[2026-09-02T22:40:30.538Z] [debug] homework: scene_intro \"The Monarch's Waystation\" \u2713 12657ms\n[2026-09-02T22:40:30.865Z] [world] You break the lantern apart. Among the pieces, something worth keeping.\n[2026-09-02T22:40:30.865Z] [world] You strip the rubble carefully. Something usable comes free in your hand.\n[2026-09-02T22:40:30.865Z] [world] You salvage the sack. The take is small but real.\n",
+      "[Filtered]",
+      "[2026-09-02T22:40:30.866Z] [world] You work the tilting obsidian pillar apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n[2026-09-02T22:40:30.866Z] [reward] \u2726 Salvage haul:\n[2026-09-02T22:40:30.866Z] [reward]     \u2022 Aether Dust (Common)\n[2026-09-02T22:40:30.867Z] [reward]     \u2022 Scrap Metal x2 (Common)\n[2026-09-02T22:40:30.867Z] [reward]     \u2022 Stick (Common)\n",
+      "[2026-09-02T22:40:30.867Z] [reward]     \u2022 Copper Wire Spool (Uncommon)\n[2026-09-02T22:40:30.867Z] [reward]     \u2022 Obsidian Chip (Common)\n[2026-09-02T22:40:30.867Z] [reward]     \u2022 Salt-Cured Dowel (Common)\n[2026-09-02T22:40:32.210Z] [debug] persist sizes(KB): total=314 player=88 wm=142[rooms=74 events=5 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=83 scene=2\n",
+      "[2026-09-02T22:40:38.910Z] [debug] ui: tap \"rest\"\n[2026-09-02T22:40:38.914Z] [world] The fog whispers your name in old Tartarian. You forget, for a moment, why you came.\n[2026-09-02T22:40:38.917Z] [player] rest\n[2026-09-02T22:40:38.917Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-09-02T22:40:38.918Z] [world] Mercy does the old circle \u2014 some instinct about grass that has not been grass in a thousand years.\n[2026-09-02T22:40:38.918Z] [world] You rest for 8 hours. +8 stamina recovered. (Day 54, night)\n[2026-09-02T22:40:38.933Z] [debug] arbiter: template (reason=busy)\n",
+      "[2026-09-02T22:40:38.933Z] [arbiter] The Arbiter looks around. \"The seneschal logs your name without asking it. The Monarchs' ledgers have their ways.\"\n[2026-09-02T22:40:38.934Z] [system] \u23f3 Time passed: 8h\n[2026-09-02T22:40:39.195Z] [cognitive] REST  (260ms)\n[2026-09-02T22:40:40.156Z] [debug] ui: tap \"rest\"\n[2026-09-02T22:40:40.160Z] [player] rest\n",
+      "[2026-09-02T22:40:40.160Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0\n[2026-09-02T22:40:40.161Z] [world] Her ribs rise and fall and slow until you cannot hear them.\n[2026-09-02T22:40:40.161Z] [world] You rest for 8 hours. +8 stamina recovered. (Day 54, morning)\n[2026-09-02T22:40:40.162Z] [debug] arbiter: ambient held (he just spoke)\n",
+      "[2026-09-02T22:40:40.171Z] [system] \u23f3 Time passed: 8h\n[2026-09-02T22:40:40.172Z] [arbiter] \"There's coin on the board for a willing blade,\" the Arbiter says. \"Read the World.\"\n[2026-09-02T22:40:40.172Z] [debug] dedup: suppressed arbiter repeat \u2014 \"\"There's coin on the board for a willing blade,\" the Arbiter\u2026\"\n",
+      "[2026-09-02T22:40:40.178Z] [world] A Conspiracy Architects patrol crosses your path in the open \u2014 and turns toward you.\n[2026-09-02T22:40:40.178Z] [arbiter] \"Conspiracy Architects riders,\" the Arbiter says. \"They've marked you. No outrunning this one.\"\n[2026-09-02T22:40:40.762Z] [cognitive] REST  (590ms)\n[2026-09-02T22:40:41.853Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n",
+      "[2026-09-02T22:40:41.883Z] [player] attack with the auralite talon\n[2026-09-02T22:40:41.884Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=4 hooks=0\n[2026-09-02T22:40:41.885Z] [debug] attack: target=Conspiracy Architects Patrol 1 range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n",
+      "[2026-09-02T22:40:41.887Z] [arbiter] Whisper Fog hangs between you. \"\u22121 to the swing \u2014 see what you can,\" the Arbiter says.\n[2026-09-02T22:40:41.887Z] [debug] attack: visibility penalty \u22121 (Whisper Fog)\n[2026-09-02T22:40:42.004Z] [world] You commit forward with the acid-etched corrupted auralite talon. Conspiracy Architects Patrol 1 watches your hands.\n",
+      "[2026-09-02T22:40:42.005Z] [system] \u23f3 Time passed: 6 min\n[2026-09-02T22:40:42.867Z] [debug] qwen\u23f1 ambient_fill preempted 3454ms read 0ms/write 0ms in 359t\u2192out 0t (0ch)\n[2026-09-02T22:40:43.259Z] [debug] arbiter: ambient-fill \u2205 4340ms\n[2026-09-02T22:40:43.259Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient_fill after 3454ms \u2014 ambient:fill-\u2205\n",
+      "[2026-09-02T22:40:43.660Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (1654ms)\n[2026-09-02T22:41:10.234Z] [world] You seize the initiative. Conspiracy Architects Patrol 1 has no time to react.\n[2026-09-02T22:41:10.234Z] [combat] You \u2014 d20 \u2192 10 + INT 12 \u2212 1 (Whisper Fog) = 21 vs Conspiracy Architects Patrol 1 AC 10 \u2014 \u2713 HIT\n",
+      "[2026-09-02T22:41:10.235Z] [combat] Aetheric flares \u2014 +2 on hit.\n[2026-09-02T22:41:10.235Z] [combat] Conspiracy Architects Patrol 1 shrugs off the aetheric. (resisted, \u00d70.5 for 11)\n[2026-09-02T22:41:10.239Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Reclaimers Guild Geode-Cored Cleaver \u2014 slashing will bite where aetheric won't.\"\n",
+      "[2026-09-02T22:41:10.240Z] [combat] You crack the Conspiracy Architects Patrol 1 with the Acid-Etched Corrupted Auralite Talon for 11 \u2014 the better part of their fight, gone in one blow. They crumple, out cold. (7/18 HP) Loot them before they come to.\n[2026-09-02T22:41:10.240Z] [combat] Conspiracy Architects Patrol 1 is out of it. Conspiracy Architects Patrol 2 now in your sights.\n",
+      "[2026-09-02T22:41:10.241Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 2 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n[2026-09-02T22:41:10.241Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 2 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n",
+      "[2026-09-02T22:41:10.241Z] [combat] Conspiracy Architects Patrol 1 is left exposed \u2014 easier to hit.\n[2026-09-02T22:41:10.243Z] [combat] Conspiracy Architects Patrol 2 \u2014 d20 \u2192 4 + ATK 5 = 9 vs your AC 23 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-02T22:41:10.243Z] [combat] Conspiracy Architects Patrol 4 and 1 other close the distance.\n[2026-09-02T22:41:12.265Z] [debug] ui: tap \"flee\"\n",
+      "[2026-09-02T22:41:12.272Z] [player] flee\n[2026-09-02T22:41:12.273Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=mid enemies=4 hooks=0\n[2026-09-02T22:41:12.368Z] [system] \u23f3 Time passed: 15 min\n[2026-09-02T22:41:12.742Z] [cognitive] FEAR \u00b7 RETREAT \u00b7 HIDE  (373ms)\n",
+      "[2026-09-02T22:41:14.490Z] [debug] skillcheck: escape d20=10 DEX 23 = 33 vs Pursuit 12 \u2014 Conspiracy Architects Patrol 4 (d20 3 + SPD 9) \u2192 PASS\n[2026-09-02T22:41:14.599Z] [debug] stats: STR16 DEX23 INT12 WIS14 CHA10 STE7 | gear: WIS+4,INT+3,DEX+12,STR+5,STE+2 | worn: main=Auralite Talon off=Choir-Bound Launcher head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets le",
+      "gs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n[2026-09-02T22:41:14.600Z] [debug] train: dexterity (escape check) \u2192 progress 74/100\n[2026-09-02T22:41:14.600Z] [world] It follows to the edge of whatever it calls its own, and no further.\n",
+      "[2026-09-02T22:41:14.601Z] [arbiter] The Arbiter looks around. \"Silt-stiff banners crack in the wind like slow applause. The court has standards to keep, even here.\"\n[2026-09-02T22:41:21.660Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n[2026-09-02T22:41:21.681Z] [world] You walk east through open silt. The compass tells you Dynasty Border Post lies further east \u2014 3 tiles, about 8 hours of travel.\n",
+      "[2026-09-02T22:41:21.682Z] [world] Boot impressions press deep into the silt, heading toward the rise.\n[2026-09-02T22:41:24.660Z] [debug] ui: tap \"\u2192 MUD FLOOD NEXUS\"\n[2026-09-02T22:41:24.680Z] [world] You walk east through open silt. The compass tells you Dynasty Border Post lies further east \u2014 2 tiles, about 5 hours of travel.\n",
+      "[2026-09-02T22:41:24.681Z] [world] Something in your shoulders drops back into the same set.\n[2026-09-02T22:41:25.679Z] [debug] ui: tap \"take / salvage\"\n[2026-09-02T22:41:27.257Z] [world] You work the banner over. A part of it comes loose, intact.\n[2026-09-02T22:41:27.257Z] [world] You work the bedroll over. A part of it comes loose, intact.\n",
+      "[2026-09-02T22:41:27.257Z] [world] You work the shattered endless stair landing over. A part of it comes loose, intact.\n[2026-09-02T22:41:27.258Z] [world] Tucked inside the shattered tartarian relay: an oddment that matches no quartermaster's list. The kind of thing that fuses well.\n[2026-09-02T22:41:27.258Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-09-02T22:41:27.258Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-09-02T22:41:27.258Z] [reward]     \u2022 Cloth Scrap x3 (Common)\n[2026-09-02T22:41:27.259Z] [reward]     \u2022 Stick (Common)\n[2026-09-02T22:41:27.259Z] [reward]     \u2022 Stiffened Leather Offcut (Uncommon)\n[2026-09-02T22:41:28.001Z] [debug] homework: intro-fill armed after 13581ms idle\n",
+      "[2026-09-02T22:41:33.478Z] [debug] ui: tap \"investigate\"\n[2026-09-02T22:41:35.124Z] [player] investigate faint musk\n[2026-09-02T22:41:35.125Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=faint musk resolved=faint musk range=- enemies=0 hooks=1\n",
+      "[2026-09-02T22:41:35.126Z] [world] You give the faint musk your full attention. It returns the gesture by being exactly what it appears to be.\n[2026-09-02T22:41:35.127Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)\n[2026-09-02T22:41:35.128Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-09-02T22:41:36.050Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 7864ms read 0ms/write 0ms in 743t\u2192out 0t (0ch)\n[2026-09-02T22:41:36.265Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 7864ms \u2014 intro-fill:\u2205\n[2026-09-02T22:41:36.266Z] [debug] homework: scene_intro \"The Monarch's Waystation\" \u2205 8265ms\n[2026-09-02T22:41:36.484Z] [cognitive] neutral  (1355ms)\n",
+      "[2026-09-02T22:41:36.732Z] [debug] persist sizes(KB): total=315 player=88 wm=141[rooms=74 events=5 memos=1 npcs=5 defeated=1 tags=1 discovered=0] log=83 scene=2\n[2026-09-02T22:41:39.049Z] [debug] qwen\u23f1 investigate_lore ok 3602ms wait 1038ms read/write unusable (native mis-reported 58511ms/1099ms \u2014 llama.rn split bug, not this call) in 130t\u2192out 34t (143ch)\n",
+      "[2026-09-02T22:42:09.829Z] [debug] send-log: #mtkoldfngwnk \u2014 DELIVERED (inline, no attachments): beacon out, 28/28 parts accepted (406797 chars) \u2014 flush said yes\n[2026-09-02T22:42:09.831Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mtkoldfngwnk kept on disk, boots retry up to 5 sends total\n[2026-09-02T22:42:17.904Z] [debug] homework: intro-fill armed after 13045ms idle (strike 2/3)\n",
+      "[2026-09-02T22:42:22.041Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a06432-2657-7d38-930e-5f0fad37dd8b\n[2026-09-02T22:42:22.042Z] [debug] ota: Checking\u2026\n[2026-09-02T22:42:22.283Z] [debug] ota: Already up to date\n[2026-09-02T22:42:22.284Z] [debug] ota: boot check result = noUpdate\n",
+      "[2026-09-02T22:42:22.324Z] [debug] send-log: bundle #mtkoldfngwnk held \u2014 only 13s since the last try (a restart, not a chance); 4 left\n[2026-09-02T22:42:22.333Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-09-02T22:42:22.334Z] [debug] voice: bundled idle\n",
+      "[2026-09-02T23:32:33.998Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a06432-2657-7d38-930e-5f0fad37dd8b\n[2026-09-02T23:32:33.999Z] [debug] ota: Checking\u2026\n[2026-09-02T23:32:34.046Z] [debug] ota: Already up to date\n[2026-09-02T23:32:34.046Z] [debug] ota: boot check result = noUpdate\n[2026-09-02T23:32:34.119Z] [debug] voice: engine=bundled tts=off voice=am_"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-03-1642-every-drop-has-a-name-in-the-book #mtlhgdw29v8x [inline 1/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtlhgdw29v8x"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-03-1642-every-drop-has-a-name-in-the-book"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "1"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-03-1642-every-drop-has-a-name-in-the-book"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-03T14:32:51.830000Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "10": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 332,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-03T14:32:53.191000Z",
+  "fingerprints": [
+    "8641a52080b8535475cb5d6753a9c9a3"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1952890889,
+    "commitCount": 20,
+    "data": {},
+    "dateCreated": "2026-09-03T12:10:00.204000Z",
+    "dateReleased": "2026-09-03T14:02:00.424207Z",
+    "deployCount": 1,
+    "ref": null,
+    "lastCommit": {
+      "id": "1fc5ac79d97859fb19c740742255089af058654c",
+      "message": "golem republish of OTA-1642 to exercise the Sentry release step (task #109)\n\nSame bundle as c72cdbec \u2014 no app change, one note beside the stamp. The\nActions dispatch is not reachable from this session (403 on the dispatch\nendpoint), and the new Sentry step only runs inside a publish, so this\nmarkerless golem push is the measurement: the run log will say whether\nSENTRY_READ_TOKEN already carries project:releases or a SENTRY_AUTH_TOKEN\nsecret is needed.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-03T13:59:43Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-03-1642-every-drop-has-a-name-in-the-book",
+          "shortVersion": "tartaria@4.32.11+2026-09-03-1642-every-drop-has-a-name-in-the-book",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-03T14:02:00.424207Z",
+          "dateCreated": "2026-09-03T12:10:00.204000Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155183521",
+      "environment": "golem",
+      "dateStarted": null,
+      "dateFinished": "2026-09-03T14:02:00.682876Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-03-1642-every-drop-has-a-name-in-the-book",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-03-1642-every-drop-has-a-name-in-the-book",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-03-1642-every-drop-has-a-name-in-the-book",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-03-1642-every-drop-has-a-name-in-the-book)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "f576cdc9e8a940c08a05ad7945548208",
+  "previousEventID": "dff6273549494a739a83cab8e0f023b3"
+}

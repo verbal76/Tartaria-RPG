@@ -1,0 +1,278 @@
+{
+  "id": "76dc37b33f934121ace55de71d891b4f",
+  "groupID": "7712876642",
+  "eventID": "76dc37b33f934121ace55de71d891b4f",
+  "projectID": "4511945117532160",
+  "size": 18104,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-05-1675-the-voice-names-its-step #mtnlu0casj0h [inline 13/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-05-1675-the-voice-names-its-step",
+  "message": "player-log 2026-09-05-1675-the-voice-names-its-step #mtnlu0casj0h [inline 13/28]",
+  "title": "player-log 2026-09-05-1675-the-voice-names-its-step #mtnlu0casj0h [inline 13/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "df6ce37bbffa478cbc518316acd1a51e",
+      "span_id": "a14a66191405160f",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "661Z] [debug] arbiter: template (reason=intent-not-allowed:pickup)\n[2026-09-04T19:15:32.663Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-04T19:15:32.663Z] [system] \u23f3 Time passed: 15 min\n[2026-09-04T19:15:34.520Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 6996ms read 0ms/write 0ms in 752t\u2192out 0t (0ch)\n",
+      "[2026-09-04T19:15:34.744Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 6996ms \u2014 intro-fill:\u2205\n[2026-09-04T19:15:34.744Z] [debug] homework: scene_intro \"Tartarian Pilgrim Camp\" \u2205 7459ms\n[2026-09-04T19:15:34.964Z] [cognitive] neutral  (2299ms)\n",
+      "[2026-09-04T19:15:36.440Z] [world] \u2605 STORY THREAD (step 2) \u2014 You pry the crystal loose. The whispering stops \u2014 but the direction it gave you stays.\n[2026-09-04T19:15:36.441Z] [reward] \u2726 Aether Crystal.\n[2026-09-04T19:15:41.546Z] [world] \u2605\u2605 STORY THREAD COMPLETE \u2014 You stand at the place the crystal indicated. The whispering crystal in your pack warms once and goes still.\n",
+      "[2026-09-04T19:15:41.553Z] [reward] \u2726 For your persistence \u2014 Mudstone (Rare).\n[2026-09-04T19:16:10.518Z] [debug] ui: tap \"\u2192 MUD SEAS\"\n[2026-09-04T19:16:10.525Z] [world] You walk east through open silt. The compass tells you Builders' Survey Camp lies further east \u2014 2 tiles, about 5 hours of travel.\n",
+      "[2026-09-04T19:16:10.525Z] [world] A thread of footprints, not yours, crosses your path and trails off.\n[2026-09-04T19:16:11.408Z] [debug] ui: tap \"take / salvage\"\n[2026-09-04T19:16:12.360Z] [debug] homework: intro-fill armed after 6000ms idle (strike 2/3)\n[2026-09-04T19:16:12.543Z] [world] You take the Scrap Metal from where it lay.\n[2026-09-04T19:16:12.544Z] [reward] \u2726 Scrap Metal (Common).\n",
+      "[2026-09-04T19:16:13.451Z] [world] You salvage the banner. The take is small but real.\n[2026-09-04T19:16:13.451Z] [world] You strip the bedroll carefully. Something usable comes free in your hand.\n[2026-09-04T19:16:13.452Z] [world] You salvage the crate. The take is small but real.\n[2026-09-04T19:16:13.452Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-09-04T19:16:13.453Z] [reward]     \u2022 Aether Crystal x2 (Common)\n[2026-09-04T19:16:13.453Z] [reward]     \u2022 Cloth Scrap x3 (Common)\n[2026-09-04T19:16:14.463Z] [debug] persist sizes(KB): total=329 player=70 wm=169[rooms=93 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=87 scene=2\n[2026-09-04T19:16:17.227Z] [debug] ui: tap \"\u2192 MUD SEAS\"\n",
+      "[2026-09-04T19:16:17.246Z] [world] You walk east. You arrive at Builders' Survey Camp.\n[2026-09-04T19:16:17.249Z] [debug] scene: loc=builders_survey_camp hub=- arrival=y opening=n passing=y\n[2026-09-04T19:16:17.255Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-04T19:16:17.255Z] [debug] missions: hunt:hunt_bog_dragon stage 5/7 [attack_provoke\u2192attack] @mud_seas needs=Eshren's Name-Token\u2713 spawn=Mud Harpy\u00d73 AMBUSH\n[2026-09-04T19:16:17.256Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n",
+      "[2026-09-04T19:16:17.256Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc=\"the Order envoy\" gives=Sealed Reliquary Box PAUSED\n[2026-09-04T19:16:17.256Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2717MISSING gives=Temporal Distortion Watch PAUSED\n",
+      "[2026-09-04T19:16:17.256Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n[2026-09-04T19:16:17.257Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n",
+      "[2026-09-04T19:16:17.257Z] [debug] missions: \u00b7 at=builders_survey_camp travelTo=mud_seas\n[2026-09-04T19:16:17.276Z] [world] Time and the wasteland have worked this place over since you last passed through \u2014 there's something worth a second look again.\n",
+      "[2026-09-04T19:16:17.293Z] [world] You've left Tartarian Pilgrim Camp and entered Builders' Survey Camp. Theodolite stakes march to the edge of the ruin-field and stop, like a sentence that thought better of itself. It's pre-dawn dark. 2 Mud Spiders are already here. east leads to Giant-Watch Shrine; south leads to The Master-Strand; west leads to Tartarian Pilgrim Camp. Nothing named to the north",
+      ".\n[2026-09-04T19:16:17.294Z] [combat] Distance: close / arm's reach. Reclaimers Guild Geode-Cored Cleaver \u2713 in range \u00b7 Reclaimers Guild Shroud-Spun Slinger \u2713 in range.\n[2026-09-04T19:16:17.365Z] [arbiter] The Arbiter lowers their voice. \"You're carrying shadow with you \u2014 use it. Tap STEALTH before they close, and you can be on them before they know it. A clean opening strike, or slip past entirely",
+      ".\"\n[2026-09-04T19:16:17.365Z] [world] You have been here. The shape of it comes back before the details do.\n[2026-09-04T19:16:17.366Z] [system] Weather effect \u2014 Aetheric Storm: +1 INT \u00b7 -1 WIS\n[2026-09-04T19:16:17.368Z] [world] [Builders' Survey Camp] north: Garrin (return the folio) (17 tiles, 1 day, 19 hours) \u00b7 east: The Storm's Eye (4 tiles, 10 hours) \u00b7 south: The Master-Strand (5 tiles, 13 hou",
+      "rs) \u00b7 west: The Deep Nave (2 tiles, 5 hours)\n[2026-09-04T19:16:17.368Z] [combat] 2 Mud Spiders close on you. Tap the right-side panel to cycle targets.\n[2026-09-04T19:16:17.739Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 4996ms read/write unusable (native mis-reported 48767ms/912ms \u2014 llama.rn split bug, not this call) in 752t\u2192out 26t (115ch)\n",
+      "[2026-09-04T19:16:18.070Z] [debug] homework: scene_intro \"Tartarian Pilgrim Camp\" \u2713 5711ms\n[2026-09-04T19:16:22.574Z] [debug] ui: tap \"dodge\"\n[2026-09-04T19:16:22.579Z] [player] dodge\n[2026-09-04T19:16:22.580Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=2 hooks=0\n",
+      "[2026-09-04T19:16:22.581Z] [world] You commit to the dodge. Slip Mud Spider's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-04T19:16:22.645Z] [combat] Mud Spider \u2014 d20 \u2192 6 + ATK 7 = 13 vs your AC 22 \u2014 \u2717 EVADED\n",
+      "[2026-09-04T19:16:22.645Z] [combat] Dodge \u2014 d20 \u2192 5 + DEX 20 = 25 vs ATK 13. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-04T19:16:22.645Z] [world] You slip Mud Spider's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n",
+      "[2026-09-04T19:16:22.647Z] [combat] Mud Spider stops \u2014 and the air in front of it thickens, faintly bright. An AETHER SHIELD stands where its swing should have been (+3 AC).\n[2026-09-04T19:16:22.647Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-09-04T19:16:22.647Z] [arbiter] The Arbiter watches the mud spider. \"It is not the first thing here that decided to keep its distance, then changed its mind.\"\n[2026-09-04T19:16:22.648Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T19:16:23.542Z] [cognitive] neutral  (893ms)\n[2026-09-04T19:16:23.859Z] [debug] ui: tap \"\ud83d\udd25 geode-cored cleaver \u2692\"\n",
+      "[2026-09-04T19:16:23.860Z] [system] evasive \u2014 harder to hit fades.\n[2026-09-04T19:16:23.893Z] [player] attack with the reclaimers guild geode-cored cleaver\n[2026-09-04T19:16:23.894Z] [debug] parser: intent=attack conf=1.00 verb=attack target=reclaimers guild geode cored cleaver resolved=Reclaimers Guild Geode-Cored Cleaver range=close enemies=2 hooks=0\n",
+      "[2026-09-04T19:16:23.894Z] [arbiter] The Arbiter keeps one eye on the fight. \"That is the right move for The Bog Dragon of Old Drakova \u2014 but not with something on you. Put this down first.\"\n[2026-09-04T19:16:23.896Z] [debug] attack: target=Mud Spider range=close reach.bands=[close] reach.label=Reclaimers Guild Geode-Cored Cleaver bareHand=false\n",
+      "[2026-09-04T19:16:23.898Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-04T19:16:23.965Z] [world] You commit forward with the smoldering reclaimers guild geode-cored cleaver. Mud Spider watches your hands.\n[2026-09-04T19:16:23.966Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T19:16:24.570Z] [cognitive] TALK  (603ms)\n",
+      "[2026-09-04T19:16:31.106Z] [world] You seize the initiative. Mud Spider has no time to react.\n[2026-09-04T19:16:31.107Z] [combat] You \u2014 d20 \u2192 15 + DEX 20 perfect opening (2\u00d7 dice) = 35 vs Mud Spider AC 9 \u2014 \u2713 HIT\n[2026-09-04T19:16:31.107Z] [combat] Mud Spider shrugs off the bludgeoning. (resisted, \u00d70.5 for 8)\n",
+      "[2026-09-04T19:16:31.112Z] [arbiter] The Arbiter watches the bludgeoning skid off. \"Swap to the Aetheric Spark Wand \u2014 aetheric or electrical will bite where bludgeoning won't.\"\n[2026-09-04T19:16:31.113Z] [combat] The blow with the smoldering reclaimers guild geode-cored cleaver finds purchase \u2014 8 damage, 4 HP standing. Mud Spider commits to the counter.\n",
+      "[2026-09-04T19:16:31.113Z] [combat] Smoldering Reclaimers Guild Geode-Cored Cleaver \u2014 2 burn bites in and festers (3 turns).\n[2026-09-04T19:16:31.116Z] [combat] Mud Spider \u2014 d20 \u2192 6 + ATK 7 = 13 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-04T19:16:31.119Z] [combat] Mud Spider \u2014 d20 \u2192 4 + ATK 5 = 9 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-04T19:16:44.827Z] [debug] ui: tap \"\u2623\u26a1 shroud-spun slinger \u2692\"\n[2026-09-04T19:16:44.893Z] [player] attack with the off-hand reclaimers guild shroud-spun slinger\n[2026-09-04T19:16:44.894Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand reclaimers guild shroud spun slinger resolved=Reclaimers Guild Shroud-Spun Slinger range=close enemies=2 hooks=0\n",
+      "[2026-09-04T19:16:44.894Z] [combat] Mud Spider blisters \u2014 clinging fire sears 2. (2/12 HP, 2 turns left)\n[2026-09-04T19:16:44.895Z] [debug] attack: target=Mud Spider range=close reach.bands=[distant,far,mid,close] reach.label=Reclaimers Guild Shroud-Spun Slinger bareHand=false\n",
+      "[2026-09-04T19:16:44.960Z] [world] You commit forward with the corrupted resonant reclaimers guild shroud-spun slinger. Mud Spider watches your hands.\n[2026-09-04T19:16:44.961Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T19:16:45.269Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 USE_ITEM  (307ms)\n[2026-09-04T19:16:53.735Z] [world] Mud Spider moves first. The pressure is immediate.\n",
+      "[2026-09-04T19:16:53.739Z] [combat] Mud Spider \u2014 d20 \u2192 9 + ATK 5 = 14 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-04T19:16:53.741Z] [combat] Mud Spider \u2014 d20 \u2192 11 + ATK 5 = 16 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-04T19:16:53.742Z] [combat] You \u2014 d20 \u2192 12 + DEX 20 + 2 (point blank) = 34 vs Mud Spider AC 9 \u2014 \u2713 HIT\n",
+      "[2026-09-04T19:16:53.742Z] [combat] Mud Spider shrugs off the bludgeoning. (resisted, \u00d70.5 for 7)\n[2026-09-04T19:16:53.744Z] [combat] Your blow with the corrupted resonant reclaimers guild shroud-spun slinger lands clean \u2014 7 damage. Mud Spider crumples in the dust. The Aetherstone settles.\n[2026-09-04T19:16:53.745Z] [reward] Mud Spider defeated. You recover Mud Poison, Spider Silk.\n",
+      "[2026-09-04T19:16:53.746Z] [combat] 1 attacker remains. Mud Spider now in your sights.\n[2026-09-04T19:16:53.746Z] [reward] +9 TC pried from the dust.\n[2026-09-04T19:16:53.798Z] [arbiter] The Arbiter eyes your new pieces. \"You could make an Aether-Shard Spear now, if you wanted.\"\n[2026-09-04T19:16:57.914Z] [debug] ui: tap \"dodge\"\n[2026-09-04T19:16:57.930Z] [player] dodge\n",
+      "[2026-09-04T19:16:57.930Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=1 hooks=0\n[2026-09-04T19:16:57.931Z] [world] You commit to the dodge. Slip Mud Spider's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-04T19:16:58.013Z] [combat] Mud Spider \u2014 d20 \u2192 12 + ATK 5 = 17 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n[2026-09-04T19:16:58.013Z] [combat] Dodge \u2014 d20 \u2192 14 + DEX 20 = 34 vs ATK 17. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-04T19:16:58.015Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-09-04T19:16:58.015Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-04T19:16:58.015Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T19:16:58.322Z] [cognitive] neutral  (306ms)\n[2026-09-04T19:16:59.195Z] [debug] ui: tap \"\u2623\u26a1 shroud-spun slinger \u2692\"\n[2026-09-04T19:16:59.233Z] [player] attack with the off-hand reclaimers guild shroud-spun slinger\n",
+      "[2026-09-04T19:16:59.234Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand reclaimers guild shroud spun slinger resolved=Reclaimers Guild Shroud-Spun Slinger range=mid enemies=1 hooks=0\n[2026-09-04T19:16:59.234Z] [arbiter] The Arbiter keeps one eye on the fight. \"That is the right move for The Bog Dragon of Old Drakova \u2014 but not with something on you. Put this down first.\"\n",
+      "[2026-09-04T19:16:59.234Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter keeps one eye on the fight. \"That is the right m\u2026\"\n[2026-09-04T19:16:59.235Z] [debug] attack: target=Mud Spider range=mid reach.bands=[distant,far,mid,close] reach.label=Reclaimers Guild Shroud-Spun Slinger bareHand=false\n[2026-09-04T19:16:59.236Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-09-04T19:16:59.300Z] [world] Your corrupted resonant reclaimers guild shroud-spun slinger comes around in an arc; Mud Spider squares up to meet it.\n[2026-09-04T19:16:59.301Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T19:16:59.587Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 USE_ITEM  (285ms)\n",
+      "[2026-09-04T19:17:00.289Z] [debug] persist sizes(KB): total=337 player=70 wm=175[rooms=99 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=89 scene=3\n[2026-09-04T19:17:08.787Z] [world] You seize the initiative. Mud Spider has no time to react.\n[2026-09-04T19:17:08.788Z] [combat] You \u2014 d20 \u2192 19 + DEX 20 perfect opening (2\u00d7 dice) = 39 vs Mud Spider AC 12 \u2014 \u2713 HIT\n",
+      "[2026-09-04T19:17:08.789Z] [combat] Mud Spider shrugs off the bludgeoning. (resisted, \u00d70.5 for 9)\n[2026-09-04T19:17:08.790Z] [combat] The bludgeoning has worn Mud Spider's guard through \u2014 it bites full from here.\n[2026-09-04T19:17:08.790Z] [combat] Your strike with the corrupted resonant reclaimers guild shroud-spun slinger lands for 9. Mud Spider staggers \u2014 2 HP remaining. It answers.\n",
+      "[2026-09-04T19:17:08.791Z] [combat] Corrupted Resonant Reclaimers Guild Shroud-Spun Slinger \u2014 2 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n[2026-09-04T19:17:08.791Z] [combat] Corrupted Resonant Reclaimers Guild Shroud-Spun Slinger \u2014 2 electrical bites in and festers (3 turns).\n",
+      "[2026-09-04T19:17:08.793Z] [combat] Mud Spider \u2014 d20 \u2192 11 + ATK 5 = 16 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-04T19:17:12.321Z] [debug] ui: tap \"approach\"\n[2026-09-04T19:17:12.364Z] [player] approach Mud Spider\n[2026-09-04T19:17:12.365Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud spider resolved=Mud Spider range=mid enemies=1 hooks=0\n",
+      "[2026-09-04T19:17:12.367Z] [debug] move: advance from range=mid enemies=1 weather=Aetheric Storm cost=1 partial=0\n[2026-09-04T19:17:12.368Z] [debug] move: field advance target=Mud Spider d 1.16->0.35 band mid->close\n[2026-09-04T19:17:12.368Z] [world] You close the gap with Mud Spider. (range"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-05-1675-the-voice-names-its-step #mtnlu0casj0h [inline 13/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtnlu0casj0h"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-05-1675-the-voice-names-its-step"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "13"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-05-1675-the-voice-names-its-step"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-05T00:11:36.336178Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-05T00:11:38.212000Z",
+  "fingerprints": [
+    "8ed2684bc6b608ad4a9f0db04cd45c70"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1956427903,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-05T00:11:38.213000Z",
+    "dateReleased": "2026-09-05T00:12:48.923167Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "8fbd09d83bf9d0c3ec1fb0527509158bfc77bc5b",
+      "message": "[ota-hal] OTA-1675: the voice names its step\n\nItem two of \"fix all existing issues one through six\": #180, the voice-path\nprocess kill on kai's SM-S942U (Samsung, SM8850, Android 16) \u2014 the first\nnon-Pixel kill on record. Like item one, this is the instrument, not the cure,\nand it also repairs a defect in the instrument it extends.\n\nWHAT HER LEDGER SAID\nA cold 66-second life on the title screen, no action yet, model ledger o0/r0:\n\n    native:voice:done [q0] \u00b7 66228ms into the action \u00b7 alive 0ms after it\n    Voice (TTS) guard: \u26a0 VOICE CRASH detected \u2014 last voice: kokoro:bf_emma\n\nThe guard is armed by markTTSStart before the synth and cleared by markTTSDone\nAFTER playback; so the process died between the synth settling and the line\nfinishing. Sixty-six seconds in, q0, o0/r0: that was the FIRST utterance that\ndevice ever played \u2014 ReadyFlash speaks \"Choose your character.\" the moment\nKokoro comes online. Nothing native runs in that window except what the voice\nlayer does with the samples: the WAV encode, expo-av's player load on a data:\nURI (ExoPlayer \u2192 AudioTrack, the one step that is pure platform media code),\nthe playback, the deferred unload. OTA-1546 stamped the lock; nothing stamped\nthese. The owner's own two voice deaths (08-30 `native:voice:done (+11080ms)`,\n08-31 `native:voice:start [q1]`) sit in the same blind spot.\n\nAND THE INSTRUMENT ITSELF WAS ONE MICROTASK LATE\nMeasured in the new suite before it could be shipped: the lock's `done` stamp\nrode the `.then` AFTER `task.resolve`, so the caller's continuation ran first.\nThe voice drain resumed, encoded the WAV and DISPATCHED the player load before\n`native:voice:done` was written. Her last checkpoint said \"the synth finished\"\nabout a process that had already moved on to playback \u2014 and any checkpoint a\ncaller stamped in that continuation was overwritten by a fact from the step\nbefore it, which is exactly what would have happened to the stamps below.\n`done` is now stamped before the caller is resolved; it means the native op\nsettled, nothing more. Exclusivity is untouched \u2014 `running` still clears only\nafter the caller has been resolved. The ota1546 pin is repointed with the\nreason.\n\nTHE PLAYBACK PATH STAMPS ITS OWN STEPS\n`voice:play:encode` / `create` / `started` / `done` / `unload`, and\n`voice:stop`, each carrying the utterance's ordinal in this life and its\nlength (`#1 0.2s`) \u2014 \"the first line after a fresh model load\" is the fact\nthat separates a one-off from a device that cannot play at all.\n\n\u26a0 THE UNLOAD STAMP YIELDS. It fires 300 ms after the line ends, by which time\nthe lock may be inside the next synth or a Qwen job; overwriting\n`native:llm:start` with `voice:play:unload` would file a death inside\ninference as a death in a player release \u2014 the blind-spot trade OTA-1377 and\nOTA-1413 refused. When the lock is running the crumb it wrote stands. Lazy-\nrequired and wrapped, as the lock's own stamp is.\n\nNot the cure. No exemption is bought with this. The next voice-path death\nreads which step it died in.\n\n- app/ai/nativeMlLock.ts \u2014 `done` stamped in the settle handlers, before\n  resolve/reject.\n- app/voice/PiperTTSManager.ts \u2014 `stampVoicePhase`, the per-life ordinal, the\n  six stamps, the unload gate on `nativeMlSnapshot().running`.\n- __tests__/ota1675TheVoiceNamesItsStep.test.ts \u2014 16 tests: the whole window\n  driven end to end through a mocked Kokoro + expo-av (load, warm-up, the\n  line, then encode \u2192 create \u2192 started \u2192 done), the tag, the yield, voice:stop,\n  the lock ordering measurement, and the source pins.\n- __tests__/ota1546TheDyingBreathNamesTheNativeJob.test.ts \u2014 the order pin\n  reads the settle handler.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-05T00:09:10Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-05-1675-the-voice-names-its-step",
+          "shortVersion": "tartaria@4.32.11+2026-09-05-1675-the-voice-names-its-step",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-05T00:12:48.923167Z",
+          "dateCreated": "2026-09-05T00:11:38.213000Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155726114",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-05T00:12:49.150027Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-05-1675-the-voice-names-its-step",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-05-1675-the-voice-names-its-step",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-05-1675-the-voice-names-its-step",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-05-1675-the-voice-names-its-step)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "778d77b6dd584a5aa06102a3eadfea48",
+  "previousEventID": "6d33d797c1004c89b26c311750656a45"
+}

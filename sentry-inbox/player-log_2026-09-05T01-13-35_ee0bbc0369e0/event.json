@@ -1,0 +1,275 @@
+{
+  "id": "ee0bbc0369e045d2befee2143989f728",
+  "groupID": "7712952778",
+  "eventID": "ee0bbc0369e045d2befee2143989f728",
+  "projectID": "4511945117532160",
+  "size": 18020,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-05-1676-the-tail-is-read #mtnovtl10c8a [inline 25/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-05-1676-the-tail-is-read",
+  "message": "player-log 2026-09-05-1676-the-tail-is-read #mtnovtl10c8a [inline 25/28]",
+  "title": "player-log 2026-09-05-1676-the-tail-is-read #mtnovtl10c8a [inline 25/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "d6e911fd187243f49c34438ba2fdbf6f",
+      "span_id": "bec3bb8a4734e03c",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Amulet of the Silt Warden ring=Tartarian Oath-Band ring2=Tin Ward Ring ring3=Tin Ward Ring ring4=Scribe's Signet\n[2026-09-05T00:14:36.402Z] [debug] train: stealth (stealth check) \u2192 progress 41/100\n[2026-09-05T00:14:36.402Z] [world] The daylight leaves you little cover. (stealth \u22121, day)\n",
+      "[2026-09-05T00:14:36.402Z] [world] Aetheric Leech reads the move before you finish it \u2014 you break contact a beat too slow and leave yourself open. Their next strike has the advantage.\n[2026-09-05T00:14:36.402Z] [debug] stealth: reset LOSE init 16 vs 23 \u2014 surprised applied\n[2026-09-05T00:14:36.403Z] [combat] Aetheric Leech blackens \u2014 corruption eats 1. (8/16 HP, 2 turns left)\n",
+      "[2026-09-05T00:14:36.405Z] [combat] Aetheric Leech \u2014 d20 \u2192 7 [surprise: 7/5 \u2192 7] + ATK 4 = 11 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-05T00:14:39.097Z] [debug] ui: tap \"dodge\"\n[2026-09-05T00:14:39.102Z] [system] bleeding fades.\n[2026-09-05T00:14:39.103Z] [system] exposed opening fades.\n[2026-09-05T00:14:39.113Z] [player] dodge\n",
+      "[2026-09-05T00:14:39.114Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=1\n[2026-09-05T00:14:39.115Z] [world] You commit to the dodge. Slip Aetheric Leech's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-05T00:14:39.115Z] [combat] Aetheric Leech blackens \u2014 corruption eats 1. (7/16 HP, 1 turn left)\n[2026-09-05T00:14:39.207Z] [combat] Aetheric Leech \u2014 d20 \u2192 10 + ATK 4 = 14 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n[2026-09-05T00:14:39.207Z] [combat] Dodge \u2014 d20 \u2192 18 + DEX 18 = 36 vs ATK 14. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n",
+      "[2026-09-05T00:14:39.208Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-05T00:14:39.208Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-05T00:14:39.208Z] [system] \u23f3 Time passed: 6 min\n[2026-09-05T00:14:39.543Z] [cognitive] neutral  (334ms)\n[2026-09-05T00:14:40.431Z] [debug] ui: tap \"\u2744 sentinel cleaver \u2694\"\n",
+      "[2026-09-05T00:14:40.481Z] [player] attack with the off-hand sentinel cleaver\n[2026-09-05T00:14:40.482Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand sentinel cleaver resolved=Sentinel Cleaver range=close enemies=1 hooks=1\n[2026-09-05T00:14:40.482Z] [combat] Aetheric Leech blackens \u2014 corruption eats 1. (6/16 HP, 0 turns left)\n",
+      "[2026-09-05T00:14:40.482Z] [combat] Aetheric Leech shakes off the last of the corruption \u2014 the Auralite Talon has run its course.\n[2026-09-05T00:14:40.483Z] [debug] attack: target=Aetheric Leech range=close reach.bands=[close] reach.label=Sentinel Cleaver bareHand=false\n[2026-09-05T00:14:40.485Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-09-05T00:14:40.561Z] [world] You raise the frost-rimed sentinel cleaver toward Aetheric Leech. The room narrows around the both of you.\n[2026-09-05T00:14:40.561Z] [system] \u23f3 Time passed: 6 min\n[2026-09-05T00:14:40.894Z] [cognitive] ATTACK \u00b7 DISENGAGE \u00b7 HIDE \u00b7 AIM  (332ms)\n[2026-09-05T00:14:48.353Z] [world] You seize the initiative. Aetheric Leech has no time to react.\n",
+      "[2026-09-05T00:14:48.353Z] [combat] You \u2014 d20 \u2192 11 + STR 21 perfect opening (2\u00d7 dice) = 32 vs Aetheric Leech AC 9 \u2014 \u2713 HIT\n[2026-09-05T00:14:48.355Z] [combat] Slashing flares \u2014 +4 on hit.\n[2026-09-05T00:14:48.355Z] [combat] The killing blow with the frost-rimed sentinel cleaver: 25. Aetheric Leech drops where it stood.\n",
+      "[2026-09-05T00:14:48.356Z] [reward] Aetheric Leech defeated. You recover Leech Mucus \u00d72.\n[2026-09-05T00:14:48.357Z] [reward] +9 TC pried from the dust.\n[2026-09-05T00:14:48.744Z] [debug] persist sizes(KB): total=343 player=76 wm=178[rooms=101 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=86 scene=2\n[2026-09-05T00:14:51.301Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-09-05T00:14:53.086Z] [player] investigate steeple\n[2026-09-05T00:14:53.087Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=steeple resolved=steeple range=- enemies=0 hooks=1\n",
+      "[2026-09-05T00:14:53.088Z] [world] The steeple rises out of the silt like a memory the world refuses to bury. Up close, the surface is scored with old weathering and finer marks \u2014 names, prayers, accounts no one closed.\n[2026-09-05T00:14:53.280Z] [cognitive] neutral  (191ms)\n[2026-09-05T00:14:54.311Z] [debug] ui: tap \"\u2192 DRAKOVA\"\n",
+      "[2026-09-05T00:14:54.331Z] [world] You walk east through open silt. The compass points east into open ground.\n[2026-09-05T00:14:54.333Z] [world] Movement low and fast \u2014 a Scrap Drone cuts across your path. You're closer than either of you wanted to be.\n[2026-09-05T00:14:54.335Z] [combat] Scrap Drone closes \u2014 Drill Arm ready, 2D6 damage on a hit. (range: close)\n",
+      "[2026-09-05T00:14:54.346Z] [world] The thread you were following waits where you left it.\n[2026-09-05T00:14:56.930Z] [debug] ui: tap \"stealth\"\n[2026-09-05T00:14:56.939Z] [player] sneak\n[2026-09-05T00:14:56.940Z] [debug] parser: intent=stealth conf=1.00 verb=sneak target=- resolved=- range=close enemies=1 hooks=1\n[2026-09-05T00:14:57.031Z] [system] \u23f3 Time passed: 15 min\n",
+      "[2026-09-05T00:14:57.354Z] [cognitive] DISENGAGE \u00b7 HIDE \u00b7 TAKE_COVER  (322ms)\n[2026-09-05T00:14:59.538Z] [debug] skillcheck: stealth d20=16 STE 8 + 1 (title: Shadow Diver) = 25 vs DC 12 \u2014 Hard \u2192 (resolved below)\n",
+      "[2026-09-05T00:14:59.610Z] [debug] stats: STR21 DEX18 INT15 WIS17 CHA12 STE8 | gear: WIS+5,INT+4,STR+8,DEX+6,STE+2 | worn: main=Auralite Talon off=Sentinel Cleaver head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Amulet of the Silt Warden ring=Tartarian Oath-Band ring2=Tin Ward Ring ring3=Ti",
+      "n Ward Ring ring4=Scribe's Signet\n[2026-09-05T00:14:59.610Z] [debug] train: stealth (stealth check) \u2192 progress 43/100\n[2026-09-05T00:14:59.610Z] [world] The daylight leaves you little cover. (stealth \u22121, day)\n[2026-09-05T00:14:59.611Z] [world] You fling a fistful of grit into Scrap Drone's eyes and slip their line of sight. Half-blind, they swing at where you were. (+5 next attack)\n",
+      "[2026-09-05T00:14:59.611Z] [debug] stealth: reset WIN init 26 vs 7 (dust, +5 1r)\n[2026-09-05T00:14:59.613Z] [combat] Scrap Drone \u2014 d20 \u2192 9 + ATK 3 = 12 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-05T00:15:01.997Z] [debug] ui: tap \"dodge\"\n[2026-09-05T00:15:02.003Z] [system] unseen \u2014 next strike +5 fades.\n[2026-09-05T00:15:02.015Z] [player] dodge\n",
+      "[2026-09-05T00:15:02.015Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=1\n[2026-09-05T00:15:02.016Z] [world] You commit to the dodge. Slip Scrap Drone's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-05T00:15:02.104Z] [combat] Scrap Drone \u2014 d20 \u2192 4 + ATK 3 = 7 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n[2026-09-05T00:15:02.104Z] [combat] Dodge \u2014 d20 \u2192 18 + DEX 18 = 36 vs ATK 7. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-05T00:15:02.104Z] [system] \u23f3 Time passed: 6 min\n[2026-09-05T00:15:02.447Z] [cognitive] neutral  (342ms)\n",
+      "[2026-09-05T00:15:03.416Z] [debug] ui: tap \"\u2744 sentinel cleaver \u2694\"\n[2026-09-05T00:15:03.472Z] [player] attack with the off-hand sentinel cleaver\n[2026-09-05T00:15:03.472Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand sentinel cleaver resolved=Sentinel Cleaver range=close enemies=1 hooks=1\n",
+      "[2026-09-05T00:15:03.473Z] [debug] attack: target=Scrap Drone range=close reach.bands=[close] reach.label=Sentinel Cleaver bareHand=false\n[2026-09-05T00:15:03.475Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-05T00:15:03.550Z] [world] Your frost-rimed sentinel cleaver comes around in an arc; Scrap Drone squares up to meet it.\n",
+      "[2026-09-05T00:15:03.551Z] [system] \u23f3 Time passed: 6 min\n[2026-09-05T00:15:03.883Z] [cognitive] ATTACK \u00b7 DISENGAGE \u00b7 HIDE \u00b7 AIM  (331ms)\n[2026-09-05T00:15:11.572Z] [world] Scrap Drone moves first. The pressure is immediate.\n[2026-09-05T00:15:11.574Z] [combat] Scrap Drone \u2014 d20 \u2192 14 + ATK 3 = 17 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-05T00:15:11.574Z] [combat] You \u2014 d20 \u2192 19 + STR 21 perfect opening (2\u00d7 dice) = 40 vs Scrap Drone AC 8 \u2014 \u2713 HIT\n[2026-09-05T00:15:11.575Z] [combat] Slashing flares \u2014 +2 on hit.\n[2026-09-05T00:15:11.576Z] [combat] Your blow with the frost-rimed sentinel cleaver lands clean \u2014 27 damage. Scrap Drone crumples in the dust. The Aetherstone settles.\n",
+      "[2026-09-05T00:15:11.576Z] [reward] Scrap Drone defeated. You recover Aetheric Cog.\n[2026-09-05T00:15:11.577Z] [reward] +8 TC pried from the dust.\n[2026-09-05T00:15:14.796Z] [debug] ui: tap \"take / salvage\"\n[2026-09-05T00:15:16.283Z] [world] You take the Scrap-Forged Breastplate from where it lay.\n[2026-09-05T00:15:16.284Z] [reward] \u2726 Scrap-Forged Breastplate (Common).\n",
+      "[2026-09-05T00:15:16.629Z] [debug] persist sizes(KB): total=341 player=77 wm=177[rooms=99 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=85 scene=2\n[2026-09-05T00:15:17.467Z] [world] You strip the bell mount carefully. Something usable comes free in your hand.\n",
+      "[2026-09-05T00:15:17.467Z] [world] Tucked inside the coil groove: an oddment that matches no quartermaster's list. The kind of thing that fuses well.\n[2026-09-05T00:15:17.468Z] [world] You strip the gull nest carefully. Something usable comes free in your hand.\n[2026-09-05T00:15:17.468Z] [world] You strip the mud swell carefully. Something usable comes free in your hand.\n",
+      "[2026-09-05T00:15:17.468Z] [reward] \u2726 Salvage haul:\n[2026-09-05T00:15:17.468Z] [reward]     \u2022 Aether Dust (Common)\n[2026-09-05T00:15:17.469Z] [reward]     \u2022 Mud-Frosted Bead (Common)\n[2026-09-05T00:15:17.469Z] [reward]     \u2022 Stick (Common)\n[2026-09-05T00:15:17.469Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-09-05T00:15:19.463Z] [debug] ui: tap \"investigate\"\n",
+      "[2026-09-05T00:15:21.207Z] [player] investigate the ground\n[2026-09-05T00:15:21.208Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n[2026-09-05T00:15:21.216Z] [reward] You scrape at the silt with the sentinel cleaver. \u2726 Recovered Raspberries (Uncommon).\n",
+      "[2026-09-05T00:15:21.216Z] [debug] wear ward: Sentinel Cleaver keeps its point (15%)\n[2026-09-05T00:15:21.223Z] [system] \u23f3 Time passed: 24 min\n[2026-09-05T00:15:21.444Z] [cognitive] CLIMB  (220ms)\n[2026-09-05T00:15:22.453Z] [player] investigate drowned rail\n",
+      "[2026-09-05T00:15:22.454Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=drowned rail resolved=drowned rail range=- enemies=0 hooks=1\n[2026-09-05T00:15:22.455Z] [world] You run a hand along the drowned rail. Cold, set fast in place, and about as talkative as the rest of the buried world.\n[2026-09-05T00:15:22.455Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-09-05T00:15:22.455Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-05T00:15:22.668Z] [cognitive] neutral  (211ms)\n[2026-09-05T00:15:23.699Z] [player] investigate steeple\n[2026-09-05T00:15:23.700Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=steeple resolved=steeple range=- enemies=0 hooks=1\n",
+      "[2026-09-05T00:15:23.700Z] [world] The steeple rises out of the silt like a memory the world refuses to bury. Up close, the surface is scored with old weathering and finer marks \u2014 names, prayers, accounts no one closed.\n[2026-09-05T00:15:23.701Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-05T00:15:23.701Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-09-05T00:15:23.892Z] [cognitive] neutral  (190ms)\n[2026-09-05T00:15:26.047Z] [debug] ui: tap \"\u2192 DRAKOVA\"\n[2026-09-05T00:15:26.068Z] [world] You walk south. You arrive at Drakova.\n[2026-09-05T00:15:26.069Z] [debug] scene: loc=drakova hub=- arrival=y opening=n passing=n\n",
+      "[2026-09-05T00:15:26.070Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n[2026-09-05T00:15:26.071Z] [debug] missions: hunt:hunt_bog_dragon stage 6/7 [boss\u2192attack] @broken_steeple needs=Eshren's Name-Token\u2713\n",
+      "[2026-09-05T00:15:26.071Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n[2026-09-05T00:15:26.071Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc=\"the Order envoy\" gives=Sealed Reliquary Box PAUSED\n",
+      "[2026-09-05T00:15:26.071Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2717MISSING gives=Temporal Distortion Watch PAUSED\n[2026-09-05T00:15:26.072Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n",
+      "[2026-09-05T00:15:26.072Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n[2026-09-05T00:15:26.072Z] [debug] missions: \u00b7 at=drakova travelTo=drakova\n",
+      "[2026-09-05T00:15:26.136Z] [world] You've left The Broken Steeple and entered Drakova. A Lost Capital. Lost means sealed, not destroyed. There is a difference. It's morning. An aetheric phoenix and a mud viper and a mud giant are already here. east leads to The Drowned Quarter. Nothing named to the north or south or west.\n",
+      "[2026-09-05T00:15:26.136Z] [world] The gate of Drakova stands before you \u2014 their ground, not yet their halls. (Tap ENTER OUTPOST to step inside.)\n[2026-09-05T00:15:26.136Z] [combat] Distance: close / arm's reach. Auralite Talon \u2713 in range \u00b7 Sentinel Cleaver \u2713 in range.\n",
+      "[2026-09-05T00:15:26.207Z] [arbiter] The Arbiter lowers their voice. \"You're carrying shadow with you \u2014 use it. Tap STEALTH before they close, and you can be on them before they know it. A clean opening strike, or slip past entirely.\"\n[2026-09-05T00:15:26.208Z] [world] You have been here. The shape of it comes back before the details do.\n",
+      "[2026-09-05T00:15:26.208Z] [system] Weather effect \u2014 Glass Hail: -1 DEX\n[2026-09-05T00:15:26.211Z] [world] [Drakova] north: The Broken Steeple (3 tiles, 8 hours) \u00b7 east: The Drowned Quarter (1 tile, 3 hours) \u00b7 south: The Vault Steps (12 tiles, 1 day, 6 hours) \u00b7 west: Mud Seas (4 tiles, 10 hours)\n",
+      "[2026-09-05T00:15:26.211Z] [combat] An Aetheric Phoenix, a Mud Viper, and a Mud Giant close on you. Tap the right-side panel to cycle targets.\n[2026-09-05T00:15:26.211Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-05T00:15:26.211Z] [arbiter] The Arbiter's hand drifts to nothing in particular. \"The aetheric phoenix will not tire before you do. Spend wisely.\"\n",
+      "[2026-09-05T00:15:26.219Z] [arbiter] (Reclaimer route \u2014 to recover the Drakova Core, SALVAGE something here. The Aetheric housing comes loose under the right trowel.)\n[2026-09-05T00:15:32.685Z] [arbiter] The Core-hum will not answer ov"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-05-1676-the-tail-is-read #mtnovtl10c8a [inline 25/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtnovtl10c8a"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-05-1676-the-tail-is-read"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "25"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-05-1676-the-tail-is-read"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-05T01:13:33.382653Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-05T01:13:35.406000Z",
+  "fingerprints": [
+    "901d39e2a99ee2e211148263b6b1fad9"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1956463043,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-05T00:44:59.530818Z",
+    "dateReleased": "2026-09-05T00:46:23.751514Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "773b9a7b9973d9b2fa93a4a8ca35903f5853b55d",
+      "message": "[ota-hal] OTA-1676: the tail is read (slice 4c)\n\nItem three of \"fix all existing issues one through six\": #98, the last unit of\nslice 4 \u2014 the exotic reword pass, the shield DR/reflect riders, and the\nShield-Hammer's timed +2 AC. Slice 4 is closed with this.\n\nTHE MEASUREMENT FIRST\nSlice 4's probe, re-run on the current catalog: 316 effect strings, 200 parsed,\n116 unread. Twenty-nine of the unread were rows of app/data/items/runecasters.json\n\u2014 a catalog nothing in the app imports (the suite asserts it) \u2014 so the live tail\nwas 87, the \"~85\" the task recorded. It is 28 now, and every one of the 28 is on\na flavour list BY NAME: HP grants that `statBonuses` already pays, faction-issue\nlines, the bucklers' bash (paid by the shield tag), and six sentences this OTA\nwrote to say plainly that a weapon does nothing special. A card that promises\nsomething unread cannot be authored again without failing the suite.\n\nTHE SHIELD RIDERS \u2014 what OTA-1645 admitted it only half read\nNine shields print a soak (\"reduces incoming slashing by 1d6\", \"blocks +1d6 from\nphysical attacks\", Graviton's \"+1d6 environmental damage reduction\"), an\nimmunity (\"Blocks all plasma damage\", \"Blocks Aetheric-based damage\", \"Deflects\nrunecasters\") or a bite (\"Deals 1d6 damage on the block\", \"reflects 1d6 back\").\nAll three are spent ONLY on a blow that landed on the shield \u2014 OTA-1646's\nlanding roll is what makes that honest; a plate that turns slashing does nothing\nfor a blow that came around it to your ribs. The soak runs as a pool after the\nmitigation floor (OTA-924's own carve-out for the ward). The bite goes through\nOTA-1671's reflect path, lifted into one helper (`dealReflectToAttacker`) so the\nraised-BLOCK path pays it too \u2014 owed by the block, not by the wound, so a spiked\nshield that soaked the whole blow still bites. A kill by reflect is a defeat.\n\"Plasma\" reads as burn: every plasma weapon is typed burn and no enemy deals a\ntype called plasma, so a plasma shield turns burn or turns nothing. The two \"on\nmax roll\" bites became \"on the block\" \u2014 a shield has no roll to be max on.\n\u26a0 A tagged buckler with nothing on its card is a held shield now: the Mud and\nIron Bucklers parsed to nothing, so no blow ever landed on them and they never\nwore. The tag is what makes a shield a shield.\n\nTHE WIELDER'S OWN SHARE, on machinery that already existed\nguard (a timed +N AC \u2014 the Shield-Hammer's \"+2 AC for 1 round after a hit\",\nread by statusAcAdjustment through one new kind, `guard_up`, combat-only like a\nstance), cover (`in_cover`), ward (OTA-835's `stone_ward` soak pool, rolled once\nwhen raised, replaces the old one) and heal (clamped to the room there is).\nThirteen cards were reworded onto ONE grammar for the four, because a parser\nloose enough to read \"Shields caster with mud barrier; blocks 1d6 damage. 3\nrounds.\" would read a shield's \"blocks +1d6 from physical attacks\" as a ward.\n\"On use\" pays on the swing (a ward you raise lands on a miss too); \"after a hit\"\npays on the hit.\n\nTHE CATALOG'S OWN WORDS, READ\n\"pins enemies\" (restrained), \"reduces enemy speed\" (slowed), \"pushes the target\nback\" / \"pushed back\" (knockback \u2014 the War Pike's \"Strength save or\" is a 50%\ngate), \"disables Tartarian tech\" (stunned, machines only), \"+1 damage to tech\"\n(mechanical), \"the arc jumps to one extra enemy\" (a blast with a headcount), and\na new `pull` control \u2014 the mirror of knockback, dragged in off its footing, a\nhinder that never braces, the magnets restricted to metal. The on-hit shred\nOTA-1563 left \"for the shred slice\" (\"reduces enemy armor by N on hit\") lands on\nthe same enemyArmorShred lever, capped like the acid coating's.\n\nTHE REWORDS, 52 cards, onto mechanics of the same weight or onto honest flavour:\nthe \"decay keeps going\" lines into real festering riders (OTA-1643's DOT shape);\n\"instantly kills \u2026 if HP below 20\" into +20 on a max roll; \"50% enemy HP loss on\n20+\" into +2d10 on a max roll; \"ignores shields on advantage rolls\" into a max\nroll; \"auto-wins vs Aetherkin\" into +1d6 against them; the summons and the\ncollapse into blasts; the teleport into a guard after a hit; the resurrection\ninto a heal after a hit; the parry-break blade into a max-roll burst. Bone Shiv\nsaid \"+1 to Stealth\" over a `statBonuses` row of +2 \u2014 it says +2 now. The\nimpossible ones with nothing of equal weight (repair, coercion, grip, parry,\nrust) say so in plain words.\n\ngameStore absorbed the family under its OTA-1400 ratchet by giving up two set()\nblocks (the max-roll shred and the control landing) to\napp/state/weaponRiderEffects.ts.\n\n- app/engine/weaponEffects.ts \u2014 ShieldAc.dr/immune/reflect + shieldRidersFrom;\n  SelfBuff + selfBuffFrom; onHitShred; `pull`; the widened control, target and\n  blast vocabularies; shieldDamageReduction, rollShieldReflect.\n- app/engine/enemyControl.ts \u2014 pull: \u22122, \"dragged in\".\n- app/engine/types.ts \u2014 `guard_up`, StatusEffect.acBonus.\n- app/engine/statusEffects.ts \u2014 guard_up in statusAcAdjustment and the\n  combat-only set; applyEffect keeps the larger acBonus.\n- app/engine/equipment.ts \u2014 heldShieldAc returns the riders; tagged shields\n  count.\n- app/state/combatResolution.ts \u2014 the riders after the landing roll; the bite\n  on the block and on a raised BLOCK; dealReflectToAttacker.\n- app/state/weaponRiderEffects.ts \u2014 new: planSelfBuff / applyWeaponSelfBuff,\n  shredEnemyArmor, landControlOnScene.\n- app/state/gameStore.ts \u2014 the \"use\" and \"hit\" shares wired, on-hit shred,\n  splash headcount; two blocks moved out.\n- app/data/items/weapons.json \u2014 52 effect lines.\n- __tests__/ota1676TheTailIsRead.test.ts \u2014 60 tests: the tail ratchet by name,\n  the runecasters.json orphan check, every rider and buff off the real rows,\n  the pure planners, the status, the wiring.\n- ota1643 / ota1645 / ota1564 / ota1565 / ota1671 \u2014 pins repointed with the\n  reason: three debts paid, four timed ACs read elsewhere, the Deathblade\n  paid, six more blasts, the reflect helper.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-05T00:42:30Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-05-1676-the-tail-is-read",
+          "shortVersion": "tartaria@4.32.11+2026-09-05-1676-the-tail-is-read",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-05T00:46:23.751514Z",
+          "dateCreated": "2026-09-05T00:44:59.530818Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155731346",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-05T00:46:24.035895Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-05-1676-the-tail-is-read",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-05-1676-the-tail-is-read",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-05-1676-the-tail-is-read",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-05-1676-the-tail-is-read)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": "ecc5ef20648848768edcd38a8e3a09ee"
+}

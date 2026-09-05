@@ -1,0 +1,278 @@
+{
+  "id": "9ee700904899498b94e26fa18f80ffa4",
+  "groupID": "7712876642",
+  "eventID": "9ee700904899498b94e26fa18f80ffa4",
+  "projectID": "4511945117532160",
+  "size": 18114,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-05-1675-the-voice-names-its-step #mtnlu0casj0h [inline 11/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-05-1675-the-voice-names-its-step",
+  "message": "player-log 2026-09-05-1675-the-voice-names-its-step #mtnlu0casj0h [inline 11/28]",
+  "title": "player-log 2026-09-05-1675-the-voice-names-its-step #mtnlu0casj0h [inline 11/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "df6ce37bbffa478cbc518316acd1a51e",
+      "span_id": "a14a66191405160f",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "or 65364ms)\n[2026-09-04T17:44:39.572Z] [debug] qwen\u23f1 item_synthesis_hw ok 1729ms read 373ms/write 1206ms in 322t\u2192out 37t 1.2ms/t (155ch)\n[2026-09-04T17:44:39.579Z] [debug] homework: item_desc \"Woven Stride\" \u2713 2305ms\n[2026-09-04T17:45:01.455Z] [debug] appstate: active \u2192 background (was active for 24196ms)\n",
+      "[2026-09-04T17:45:03.529Z] [debug] persist sizes(KB): total=337 player=71 wm=175[rooms=100 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=89 scene=2\n[2026-09-04T17:45:35.271Z] [debug] appstate: background \u2192 active (was background for 33816ms)\n[2026-09-04T17:45:37.806Z] [debug] qwen\u23f1 item_synthesis_hw ok 2522ms read 469ms/write 2021ms in 332t\u2192out 50t 1.4ms/t (177ch)\n",
+      "[2026-09-04T17:45:37.809Z] [debug] homework: item_desc \"Mud Armor Rod\" \u2713 2537ms\n[2026-09-04T17:46:00.016Z] [debug] appstate: active \u2192 background (was active for 24745ms)\n[2026-09-04T17:47:11.830Z] [debug] appstate: background \u2192 active (was background for 71814ms)\n[2026-09-04T17:47:14.264Z] [debug] qwen\u23f1 item_synthesis_hw ok 1800ms read 461ms/write 1312ms in 327t\u2192out 40t 1.4ms/t (155ch)\n",
+      "[2026-09-04T17:47:14.274Z] [debug] homework: item_desc \"Auralite Talon\" \u2713 2424ms\n[2026-09-04T17:47:30.015Z] [world] You break the Riveted Leather Vest down. \u2726 Recovered: Patched Cloth x2.\n[2026-09-04T17:47:30.095Z] [world] You break the Woven Stride down. \u2726 Recovered: Small Rock.\n",
+      "[2026-09-04T17:47:44.170Z] [debug] qwen\u23f1 item_synthesis_hw ok 2261ms read 699ms/write 1533ms in 322t\u2192out 46t 2.2ms/t (194ch)\n[2026-09-04T17:47:44.174Z] [debug] homework: item_desc \"Pillar Brand\" \u2713 2287ms\n[2026-09-04T17:48:16.511Z] [debug] qwen\u23f1 item_synthesis_hw ok 4463ms read 265ms/write 3710ms in 321t\u2192out 44t 0.8ms/t (162ch)\n",
+      "[2026-09-04T17:48:21.723Z] [debug] \u26a0 FREEZE WATCH: LOGIC stalled while frames kept coming (js 3585ms \u00b7 frames 0ms). Something blocked the JS thread \u2014 look for a long synchronous run. \u00b7 crumb before: native:homework:start +9673ms \u2192 now: native:homework:start +1ms \u00b7 doing: (no action yet) \u00b7 native: homework running \u00b7 q0\n",
+      "[2026-09-04T17:48:21.884Z] [debug] appstate: active \u2192 background (was active for 70053ms)\n[2026-09-04T17:48:41.871Z] [debug] qwen\u23f1 item_synthesis_hw ok 20151ms read 3706ms/write 16261ms in 343t\u2192out 51t 10.8ms/t (191ch)\n[2026-09-04T17:48:41.895Z] [debug] homework: item_desc \"Reclaimers Guild Geode-Cored Cleaver\" \u2713 23858ms\n",
+      "[2026-09-04T17:49:27.038Z] [debug] appstate: background \u2192 active (was background for 65155ms)\n[2026-09-04T17:49:27.045Z] [debug] freeze watch: recovered \u2014 painting again after 1024ms quiet.\n[2026-09-04T17:49:29.453Z] [debug] qwen\u23f1 item_synthesis_hw ok 1579ms read 544ms/write 1009ms in 331t\u2192out 30t 1.6ms/t (134ch)\n[2026-09-04T17:49:29.465Z] [debug] homework: item_desc \"Architect Sigil\" \u2713 2422ms\n",
+      "[2026-09-04T17:50:03.368Z] [debug] send-log: #mtn91f6kkav3 \u2014 DELIVERED (inline, no attachments): beacon out, 4/4 parts accepted (47825 chars) \u2014 flush said yes\n[2026-09-04T17:50:16.294Z] [debug] send-log: #mtn91pdwbmaq \u2014 DELIVERED (inline, no attachments): beacon out, 4/4 parts accepted (47811 chars) \u2014 flush said yes\n",
+      "[2026-09-04T17:50:32.224Z] [debug] appstate: active \u2192 background (was active for 65186ms)\n[2026-09-04T17:52:07.482Z] [debug] appstate: background \u2192 active (was background for 95258ms)\n[2026-09-04T17:52:07.585Z] [debug] persist sizes(KB): total=336 player=71 wm=175[rooms=100 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=88 scene=2\n",
+      "[2026-09-04T17:52:13.788Z] [debug] ctx: RELEASED \u2014 live=0 (opened=1 released=1)\n[2026-09-04T17:52:14.085Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a06d87-38f8-7831-97fd-534048e16ec4\n[2026-09-04T17:52:14.086Z] [debug] ota: Checking\u2026\n[2026-09-04T17:52:14.310Z] [debug] ota: Already up to date\n[2026-09-04T17:52:14.310Z] [debug] ota: boot check result = noUpdate\n",
+      "[2026-09-04T17:52:14.414Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-09-04T17:52:14.414Z] [debug] voice: bundled idle\n[2026-09-04T17:52:14.651Z] [debug] send-log: bundle #mtn91pdwbmaq attempt 2/5 delivered to Sentry\n[2026-09-04T18:21:12.126Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a06d9f-be19-7224-b96c-c03c37d04562\n",
+      "[2026-09-04T18:21:12.126Z] [debug] ota: Checking\u2026\n[2026-09-04T18:21:12.335Z] [debug] ota: Already up to date\n[2026-09-04T18:21:12.336Z] [debug] ota: boot check result = noUpdate\n[2026-09-04T18:21:12.385Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-09-04T18:21:12.385Z] [debug] voice: bundled idle\n",
+      "[2026-09-04T18:21:12.662Z] [debug] send-log: bundle #mtn91pdwbmaq attempt 3/5 delivered to Sentry\n[2026-09-04T18:25:20.064Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a06d9f-be19-7224-b96c-c03c37d04562\n[2026-09-04T18:25:20.064Z] [debug] ota: Checking\u2026\n[2026-09-04T18:25:20.135Z] [debug] ota: Already up to date\n",
+      "[2026-09-04T18:25:20.136Z] [debug] ota: boot check result = noUpdate\n[2026-09-04T18:25:20.174Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-09-04T18:25:20.174Z] [debug] voice: bundled idle\n[2026-09-04T18:25:20.366Z] [debug] send-log: bundle #mtn91pdwbmaq attempt 4/5 delivered to Sentry\n",
+      "[2026-09-04T18:25:24.645Z] [debug] OTA session start: 2026-09-04-1667-the-key-goes-where-the-player-is.\n[2026-09-04T18:25:24.646Z] [world] You step back into Tartarian Pilgrim Camp. The world waits for your move.\n[2026-09-04T18:25:24.646Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. \"Welcome back, Cheddar Bob. We've still got ground to cover, you and I.\"\n",
+      "[2026-09-04T18:25:25.001Z] [debug] \u2550\u2550\u2550 SESSION 2026-09-04T18:25:24.998Z \u00b7 build 2026-09-04-1667-the-key-goes-where-the-player-is \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-09-04T18:25:25.002Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-04T18:25:25.002Z] [debug] missions: hunt:hunt_bog_dragon stage 5/7 [attack_provoke\u2192attack] @mud_seas needs=Eshren's Name-Token\u2713 spawn=Mud Harpy\u00d73 AMBUSH\n[2026-09-04T18:25:25.002Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n",
+      "[2026-09-04T18:25:25.002Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc=\"the Order envoy\" gives=Sealed Reliquary Box PAUSED\n[2026-09-04T18:25:25.002Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n",
+      "[2026-09-04T18:25:25.002Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n[2026-09-04T18:25:25.003Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n",
+      "[2026-09-04T18:25:25.003Z] [debug] missions: \u00b7 at=pilgrim_waycamp travelTo=mud_seas\n[2026-09-04T18:25:25.003Z] [debug] boot: life bmtnaast54u started 2026-09-04T18:25:19.961Z \u00b7 not an OTA apply (no handoff on disk)\n[2026-09-04T18:25:25.836Z] [debug] send-log: crash on record (2026-09-04T18:21:13.034Z) \u2014 game log pushed automatically, delivered to Sentry, kept on disk as #mtnaawyn2pyt\n",
+      "[2026-09-04T18:25:44.451Z] [debug] ui: tap \"ENTER OUTPOST\"\n[2026-09-04T18:25:44.456Z] [debug] qwen: loading (was idle) \u2014 the Arbiter speaks templates until it is ready\n[2026-09-04T18:25:44.458Z] [player] enter outpost\n[2026-09-04T18:25:44.459Z] [world] You cross to the gate and step through.\n[2026-09-04T18:25:44.460Z] [debug] scene: loc=pilgrim_waycamp hub=- arrival=n opening=n passing=y\n",
+      "[2026-09-04T18:25:44.461Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n[2026-09-04T18:25:44.462Z] [debug] missions: hunt:hunt_bog_dragon stage 5/7 [attack_provoke\u2192attack] @mud_seas needs=Eshren's Name-Token\u2713 spawn=Mud Harpy\u00d73 AMBUSH\n",
+      "[2026-09-04T18:25:44.462Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n[2026-09-04T18:25:44.462Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc=\"the Order envoy\" gives=Sealed Reliquary Box PAUSED\n",
+      "[2026-09-04T18:25:44.462Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n[2026-09-04T18:25:44.463Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n",
+      "[2026-09-04T18:25:44.463Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n[2026-09-04T18:25:44.463Z] [debug] missions: \u00b7 at=pilgrim_waycamp travelTo=mud_seas\n[2026-09-04T18:25:44.517Z] [world] Rain the color of old oil. It pools on Aetherstone and refuses to soak in.\n\n",
+      "You are at Tartarian Pilgrim Camp. A rest-camp of True Tartarian pilgrims on the frontier track, where the faithful gather before the long descent into the deep buried cities.\n[2026-09-04T18:25:44.518Z] [world] You could walk this stretch with your eyes shut, and nearly do. The bodies you left are still here. Nothing has moved in to replace them.\n",
+      "[2026-09-04T18:25:44.521Z] [world] [Tartarian Pilgrim Camp] north: Garrin (return the folio) (17 tiles, 1 day, 19 hours) \u00b7 east: Sinking Cathedral (3 tiles, 8 hours) \u00b7 south: The Buried Cities (3 tiles, 8 hours) \u00b7 west: Dynasty Border Post (4 tiles, 10 hours)\n[2026-09-04T18:25:44.521Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-09-04T18:25:44.521Z] [arbiter] The Arbiter eyes one corner of Tartarian Pilgrim Camp. \"Begin there, if you must begin somewhere.\"\n[2026-09-04T18:25:45.724Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-09-04T18:25:52.833Z] [debug] ui: tap \"ENTER OUTPOST\"\n[2026-09-04T18:25:52.836Z] [player] enter outpost\n",
+      "[2026-09-04T18:25:52.837Z] [world] You cross to the gate and step through.\n[2026-09-04T18:25:52.837Z] [debug] scene: loc=pilgrim_waycamp hub=- arrival=n opening=n passing=y\n[2026-09-04T18:25:52.839Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-04T18:25:52.839Z] [debug] missions: hunt:hunt_bog_dragon stage 5/7 [attack_provoke\u2192attack] @mud_seas needs=Eshren's Name-Token\u2713 spawn=Mud Harpy\u00d73 AMBUSH\n[2026-09-04T18:25:52.840Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n",
+      "[2026-09-04T18:25:52.840Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc=\"the Order envoy\" gives=Sealed Reliquary Box PAUSED\n[2026-09-04T18:25:52.841Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n",
+      "[2026-09-04T18:25:52.841Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n[2026-09-04T18:25:52.841Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n",
+      "[2026-09-04T18:25:52.842Z] [debug] missions: \u00b7 at=pilgrim_waycamp travelTo=mud_seas\n[2026-09-04T18:25:52.945Z] [world] Rain the color of old oil. It pools on Aetherstone and refuses to soak in.\n\nYou are at Tartarian Pilgrim Camp. A rest-camp of True Tartarian pilgrims on the frontier track, where the faithful gather before the long descent into the deep buried cities.\n\n",
+      "Hazard: Spatial Distortion. Distance unspools. A chamber thirty paces wide becomes thirty paces deep, then thirty paces tall. The geometry refuses to settle.\n[2026-09-04T18:25:52.945Z] [world] This ground has stopped being a place and started being a route. The bodies you left are still here. Nothing has moved in to replace them.\n",
+      "[2026-09-04T18:25:52.948Z] [world] [Tartarian Pilgrim Camp] north: Garrin (return the folio) (17 tiles, 1 day, 19 hours) \u00b7 east: Sinking Cathedral (3 tiles, 8 hours) \u00b7 south: The Buried Cities (3 tiles, 8 hours) \u00b7 west: Dynasty Border Post (4 tiles, 10 hours)\n[2026-09-04T18:25:52.948Z] [world] Vosk Barrowman does not greet you. They watch your hands.\n",
+      "[2026-09-04T18:26:00.124Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-09-04T18:26:11.781Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 11470ms read 8273ms/write 2916ms in 754t\u2192out 33t 11.0ms/t HIT-CAP (150ch)\n[2026-09-04T18:26:11.789Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 11470ms \u2014 intro-fill:near-dup\n",
+      "[2026-09-04T18:26:11.789Z] [debug] homework: scene_intro \"Tartarian Pilgrim Camp\" \u2205 11667ms\n[2026-09-04T18:26:16.396Z] [reward] Sold Titan's Trail Leggings (Common) to Vosk Barrowman for 8 TC. (629 TC on hand)\n[2026-09-04T18:26:16.469Z] [reward] Sold Shaman's Warden Gloves (Common) to Vosk Barrowman for 6 TC. (635 TC on hand)\n",
+      "[2026-09-04T18:26:16.534Z] [reward] Sold Crude Golem Pike (Common) to Vosk Barrowman for 5 TC. (640 TC on hand)\n[2026-09-04T18:26:31.798Z] [reward] Bought Skyreacher Map 4 of 5 \u2014 Thametan Tower from Vosk Barrowman for 157 TC. (483 TC left)\n[2026-09-04T18:26:36.329Z] [reward] Bought Patched Cloth from Vosk Barrowman for 6 TC. (477 TC left)\n",
+      "[2026-09-04T18:26:45.190Z] [debug] homework: intro-fill armed after 6000ms idle (strike 2/3)\n[2026-09-04T18:26:48.293Z] [reward] Bought 2\u00d7 Forager's Stew from Vosk Barrowman for 28 TC. (449 TC left)\n[2026-09-04T18:26:48.512Z] [debug] persist sizes(KB): total=337 player=71 wm=175[rooms=100 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=88 scene=2\n",
+      "[2026-09-04T18:26:50.009Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 4807ms read 3684ms/write 1085ms in 754t\u2192out 33t 4.9ms/t HIT-CAP (149ch)\n[2026-09-04T18:26:50.014Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 4807ms \u2014 intro-fill:action-opener\n[2026-09-04T18:26:50.014Z] [debug] homework: scene_intro \"Tartarian Pilgrim Camp\" \u2713 4825ms\n",
+      "[2026-09-04T18:26:50.449Z] [reward] Bought 4\u00d7 Wild Onion from Vosk Barrowman for 28 TC. (421 TC left)\n[2026-09-04T18:27:04.017Z] [debug] ui: tap \"investigate\"\n[2026-09-04T18:27:05.642Z] [player] investigate the mud\n[2026-09-04T18:27:05.642Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=- range=- enemies=0 hooks=0\n",
+      "[2026-09-04T18:27:05.647Z] [reward] You scrape at the silt with the sentinel cleaver. \u2726 Recovered Scrap Metal (Common).\n[2026-09-04T18:27:05.655Z] [system] \u23f3 Time passed: 24 min\n[2026-09-04T18:27:05.861Z] [cognitive] SWIM  (205ms)\n[2026-09-04T18:27:06.907Z] [player] investigate ladder\n",
+      "[2026-09-04T18:27:06.907Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ladder resolved=ladder range=- enemies=0 hooks=0\n[2026-09-04T18:27:06.909Z] [world] The ladder reads as ordinary, which down here is a small kind of relief. You leave it be.\n[2026-09-04T18:27:07.1"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-05-1675-the-voice-names-its-step #mtnlu0casj0h [inline 11/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtnlu0casj0h"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-05-1675-the-voice-names-its-step"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "11"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-05-1675-the-voice-names-its-step"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-05T00:11:36.317731Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-05T00:11:38.211000Z",
+  "fingerprints": [
+    "8ed2684bc6b608ad4a9f0db04cd45c70"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1956427903,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-05T00:11:38.213000Z",
+    "dateReleased": "2026-09-05T00:12:48.923167Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "8fbd09d83bf9d0c3ec1fb0527509158bfc77bc5b",
+      "message": "[ota-hal] OTA-1675: the voice names its step\n\nItem two of \"fix all existing issues one through six\": #180, the voice-path\nprocess kill on kai's SM-S942U (Samsung, SM8850, Android 16) \u2014 the first\nnon-Pixel kill on record. Like item one, this is the instrument, not the cure,\nand it also repairs a defect in the instrument it extends.\n\nWHAT HER LEDGER SAID\nA cold 66-second life on the title screen, no action yet, model ledger o0/r0:\n\n    native:voice:done [q0] \u00b7 66228ms into the action \u00b7 alive 0ms after it\n    Voice (TTS) guard: \u26a0 VOICE CRASH detected \u2014 last voice: kokoro:bf_emma\n\nThe guard is armed by markTTSStart before the synth and cleared by markTTSDone\nAFTER playback; so the process died between the synth settling and the line\nfinishing. Sixty-six seconds in, q0, o0/r0: that was the FIRST utterance that\ndevice ever played \u2014 ReadyFlash speaks \"Choose your character.\" the moment\nKokoro comes online. Nothing native runs in that window except what the voice\nlayer does with the samples: the WAV encode, expo-av's player load on a data:\nURI (ExoPlayer \u2192 AudioTrack, the one step that is pure platform media code),\nthe playback, the deferred unload. OTA-1546 stamped the lock; nothing stamped\nthese. The owner's own two voice deaths (08-30 `native:voice:done (+11080ms)`,\n08-31 `native:voice:start [q1]`) sit in the same blind spot.\n\nAND THE INSTRUMENT ITSELF WAS ONE MICROTASK LATE\nMeasured in the new suite before it could be shipped: the lock's `done` stamp\nrode the `.then` AFTER `task.resolve`, so the caller's continuation ran first.\nThe voice drain resumed, encoded the WAV and DISPATCHED the player load before\n`native:voice:done` was written. Her last checkpoint said \"the synth finished\"\nabout a process that had already moved on to playback \u2014 and any checkpoint a\ncaller stamped in that continuation was overwritten by a fact from the step\nbefore it, which is exactly what would have happened to the stamps below.\n`done` is now stamped before the caller is resolved; it means the native op\nsettled, nothing more. Exclusivity is untouched \u2014 `running` still clears only\nafter the caller has been resolved. The ota1546 pin is repointed with the\nreason.\n\nTHE PLAYBACK PATH STAMPS ITS OWN STEPS\n`voice:play:encode` / `create` / `started` / `done` / `unload`, and\n`voice:stop`, each carrying the utterance's ordinal in this life and its\nlength (`#1 0.2s`) \u2014 \"the first line after a fresh model load\" is the fact\nthat separates a one-off from a device that cannot play at all.\n\n\u26a0 THE UNLOAD STAMP YIELDS. It fires 300 ms after the line ends, by which time\nthe lock may be inside the next synth or a Qwen job; overwriting\n`native:llm:start` with `voice:play:unload` would file a death inside\ninference as a death in a player release \u2014 the blind-spot trade OTA-1377 and\nOTA-1413 refused. When the lock is running the crumb it wrote stands. Lazy-\nrequired and wrapped, as the lock's own stamp is.\n\nNot the cure. No exemption is bought with this. The next voice-path death\nreads which step it died in.\n\n- app/ai/nativeMlLock.ts \u2014 `done` stamped in the settle handlers, before\n  resolve/reject.\n- app/voice/PiperTTSManager.ts \u2014 `stampVoicePhase`, the per-life ordinal, the\n  six stamps, the unload gate on `nativeMlSnapshot().running`.\n- __tests__/ota1675TheVoiceNamesItsStep.test.ts \u2014 16 tests: the whole window\n  driven end to end through a mocked Kokoro + expo-av (load, warm-up, the\n  line, then encode \u2192 create \u2192 started \u2192 done), the tag, the yield, voice:stop,\n  the lock ordering measurement, and the source pins.\n- __tests__/ota1546TheDyingBreathNamesTheNativeJob.test.ts \u2014 the order pin\n  reads the settle handler.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-05T00:09:10Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-05-1675-the-voice-names-its-step",
+          "shortVersion": "tartaria@4.32.11+2026-09-05-1675-the-voice-names-its-step",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-05T00:12:48.923167Z",
+          "dateCreated": "2026-09-05T00:11:38.213000Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155726114",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-05T00:12:49.150027Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-05-1675-the-voice-names-its-step",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-05-1675-the-voice-names-its-step",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-05-1675-the-voice-names-its-step",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-05-1675-the-voice-names-its-step)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "9fdc7c24be04494eb091fba6f8648f47",
+  "previousEventID": "950a16d5b19841528f97c8bbf12c4ce4"
+}

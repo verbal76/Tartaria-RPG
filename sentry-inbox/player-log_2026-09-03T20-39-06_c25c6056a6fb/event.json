@@ -1,0 +1,226 @@
+{
+  "id": "c25c6056a6fb4cd58b446529bcab299e",
+  "groupID": "7710441160",
+  "eventID": "c25c6056a6fb4cd58b446529bcab299e",
+  "projectID": "4511945117532160",
+  "size": 2673,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log-beacon 2026-09-03-1649-what-a-ring-is-for #mtlp91n0yrsc"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-03-1649-what-a-ring-is-for",
+  "message": "player-log-beacon 2026-09-03-1649-what-a-ring-is-for #mtlp91n0yrsc",
+  "title": "player-log-beacon 2026-09-03-1649-what-a-ring-is-for #mtlp91n0yrsc",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "35b50d6346924a61a52c94cb12123cc5",
+      "span_id": "a4595ccc083fb8dc",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {},
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log-beacon 2026-09-03-1649-what-a-ring-is-for #mtlp91n0yrsc"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtlp91n0yrsc"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-03-1649-what-a-ring-is-for"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-beacon"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-03-1649-what-a-ring-is-for"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "4"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-03T20:39:04.928421Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-03T20:39:06.365000Z",
+  "fingerprints": [
+    "0f53359e8c9ae372477753f393e92b89"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1953857096,
+    "commitCount": 3,
+    "data": {},
+    "dateCreated": "2026-09-03T20:00:12.950036Z",
+    "dateReleased": "2026-09-03T20:00:42.063795Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "3f3f31e984f1edd9efaa4a21fcab9d9e29400d28",
+      "message": "[ota-hal] OTA-1649: what a ring is for\n\nOwner: \"do the ring and amulet recipes, and give the diadem a route. again\nbetter effects with rarity and ingredient quality. they should give\ncombinations of stat buffs, moderate resists and let's get some special\nAOE effects... each ring doesn't need to have all three things. the\ncombinations of 1, 2 or three things should scale with rarity.\"\n\n\u26a0 WHAT THE MEASUREMENT FOUND FIRST, before a line was written. Fifteen of\nthe thirty-two shipped accessories carry a `resistances` list. The item\ncard prints it \u2014 \"Resists: aetheric\" \u2014 and combat has NEVER SEEN ONE.\naggregateArmor's resist walk covered ARMOR_SLOTS only, so a Legendary\naetheric amulet arrived at the damage math as `[]` with a mitigation\nfraction of 0. Probed before any change; that probe is now the first test\nin ota1649 so the field cannot go quiet again.\n\nSo \"moderate resists\" was not a new feature. It was a dead field, and\nwiring it is the spine of this OTA.\n\n  \u2022 The jewellery joins the EXISTING armour stack \u2014 same multiplicative\n    diminishing returns, same MAX_ARMOR_RESIST ceiling \u2014 through a new\n    optional per-entry `weight` on ArmorSlotResist. Armour never sets it\n    (a chest is a chest whatever it is made of); jewellery always does,\n    because a ring's worth against a type is its RARITY, not which finger\n    it sits on. Every pre-existing caller is bit-identical.\n  \u2022 An amulet outweighs a ring at equal rarity \u2014 one neck, four fingers \u2014\n    and neither out-armours a breastplate. His \"50% of incoming fire\" is\n    measured, not asserted: a Legendary amulet + a Legendary ring + a Rare\n    ring = 0.497. Three slots given to one element buys half. One\n    Legendary ring alone buys a fifth.\n\nTHREE NEW EFFECT FAMILIES, wired and pinned:\n\n  \u2022 A COATING BOOST. His fire ring, exactly: a Rare burn ring is +25% on\n    burn coatings and nothing else. Applied to the rolled coating bonus\n    only (a bare blade gets nothing) and AFTER the weakness multiplier, so\n    a resistant hide cannot halve the ring's share as well.\n  \u2022 A STEALTH MULTIPLIER. Legendary = his +60%. It multiplies the whole\n    strike, and it does NOT check the weapon: the dice-doubling backstab\n    is a rogue's privilege, this is not, or it would be a second rogue tax\n    on an item a heavy build might want. \u26a0 The flag rides the DAMAGE STEP:\n    `stealthed` is stripped by consumeOnResolve the instant the attack\n    step resolves and pendingRolls is nulled before concludeRolls runs, so\n    a damage-time read of the player would miss the exact swing the ring\n    was bought for. combatRules stamps `fromStealth` at build time.\n  \u2022 A ONCE-PER-ENCOUNTER DISCHARGE. His frost ring: 50 cold across two\n    rings of range. It fires on the first swing of the fight \u2014 there is no\n    free action in this combat loop to hang a trigger on, and committing\n    to the fight is the honest trigger. Not the weapon splash: that is\n    keyed to the TARGET's band, this to the WEARER's. All discharges are\n    planned off one lineup and applied in one write, so the first ring's\n    kill cannot hide a body from the second. A burst that catches nobody\n    is still spent \u2014 refunding it would make a ring strictly better than a\n    splash, which pays the same price.\n\n\u26a0\u26a0 THE ROW PICKS THE FLAVOUR, THE LADDER PICKS THE NUMBER. Not one catalog\nrow carries a magnitude. A ring says \"I boost burn coatings\"; how much is\nCOATED_BOOST_PCT[rarity]. That is what makes \"better effects with rarity\"\na property of the system rather than a promise about forty-four\nhand-typed numbers \u2014 a row cannot sit off the ladder, and a rebalance is\none table edit.\n\n\u26a0 THE LADDER'S GATE IS THE SPECIAL, NOT A FAMILY COUNT, and the first\ndraft got that wrong. An exact count per rarity failed against the shipped\ncatalog on contact: five accessories \u2014 two of them COMMON \u2014 already\ncarried two families, and holding the line would have meant deleting a\nresist off items sitting in players' packs right now. So the rule moved to\nwhere the owner's sentence actually points. Common and Uncommon never\ncarry a special; Rare may; Legendary must, and carries all three. Every\nband is still strictly better than the one below on MAGNITUDE too, on all\nfive tables, so a two-family Uncommon never out-values a two-family Rare.\nThe rule needed no removals at all: the seven rows it found off-ladder\nwere each missing something, and each gained it.\n\nTHE ROUTES. 16 new accessories (48 total) and a recipe for every ring and\namulet in the game \u2014 205 recipes. The Aetheric Diadem was the only\ngenuinely unobtainable item in the catalog (no recipe, no loot table, no\nvendor, no quest) and now has one. Ingredient quality is mechanical: every\naccessory recipe must carry at least one ingredient of the result's own\nrarity or higher, so a Legendary cannot be reached from scrap. One shipped\nrecipe failed that and was repaired rather than grandfathered \u2014\nReclaimer's Aegis Pendant is Rare and asked for Scrap Metal / Aetheric\nShard / Spider Silk.\n\n\u26a0\u26a0\u26a0 THE MISTAKE I MADE AND HAD TO UNDO, kept as a rule. The first draft of\nthose 38 recipes reached for whatever material fitted the flavour and\nclaimed 22 fresh names \u2014 Aetheric Blood, Spirit Residue, Warden Stone,\nAetheric Cog and eighteen more. `isRecipeIngredientName` bars any recipe\ningredient from the Crucible, so every one of them silently LEFT the\nfusion fodder pool, and seven shipped fusion suites went red. They were\nright; the Crucible had genuinely lost its fodder. The fix was not to\nrepoint them. Every recipe was re-authored out of the 96 names recipes\nalready used, so the fodder pool after this OTA is bit-identical to the\none before it \u2014 measured, `newly claimed: []`. ota1649 pins it, so the\nnext accessory recipe reaching for a fresh material has to answer for the\nCrucible first. A second pin catches the other thing that pass produced: a\nblind substitution left seven recipes naming one ingredient twice.\n\nThe line ratchet did its job too. This walked gameStore through the 37,000\ncap (ota1400), which is what the cap is for. The discharge's targeting and\napplication moved out to `planBursts` / `applyBursts` in accessoryEffects,\nwhere they are pure and testable rather than reachable only through a live\ncombat turn. gameStore lands at 36,996.\n\nThe item card now names numbers instead of a bare \"Resists: aetheric\",\nreading the same tables combat reads so the two cannot drift, and a\ndischarge card admits on its face that it is once per fight.\n\nGates: all 18 green by exit code. Full suite green.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-03T19:57:15Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-03-1649-what-a-ring-is-for",
+          "shortVersion": "tartaria@4.32.11+2026-09-03-1649-what-a-ring-is-for",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-03T20:00:42.063795Z",
+          "dateCreated": "2026-09-03T20:00:12.950036Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155305262",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-03T20:00:43.872258Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-03-1649-what-a-ring-is-for",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-03-1649-what-a-ring-is-for",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-03-1649-what-a-ring-is-for",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-03-1649-what-a-ring-is-for)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "df8d817fbec943e7a461ff1a14e14ad3",
+  "previousEventID": null
+}

@@ -1,0 +1,273 @@
+{
+  "id": "638689eccfae4436b7181d1fac6d6c04",
+  "groupID": "7712952778",
+  "eventID": "638689eccfae4436b7181d1fac6d6c04",
+  "projectID": "4511945117532160",
+  "size": 18014,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-05-1676-the-tail-is-read #mtnovtl10c8a [inline 20/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-05-1676-the-tail-is-read",
+  "message": "player-log 2026-09-05-1676-the-tail-is-read #mtnovtl10c8a [inline 20/28]",
+  "title": "player-log 2026-09-05-1676-the-tail-is-read #mtnovtl10c8a [inline 20/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "d6e911fd187243f49c34438ba2fdbf6f",
+      "span_id": "bec3bb8a4734e03c",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      ": STR20 DEX18 INT14 WIS17 CHA12 STE8 | gear: WIS+5,INT+3,STR+7,DEX+6,STE+2 | worn: main=Aetheric Shield-Hammer head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Amulet of the Silt Warden ring=Tartarian Oath-Band ring2=Tin Ward Ring ring3=Tin Ward Ring ring4=Scribe's Signet\n",
+      "[2026-09-04T22:21:03.450Z] [debug] ui: tap \"aetheric shield-hammer \u2692\"\n[2026-09-04T22:21:03.457Z] [system] evasive \u2014 harder to hit fades.\n[2026-09-04T22:21:03.497Z] [player] attack with the aetheric shield-hammer\n[2026-09-04T22:21:03.497Z] [debug] parser: intent=attack conf=1.00 verb=attack target=aetheric shield hammer resolved=Aetheric Minotaur range=close enemies=3 hooks=0\n",
+      "[2026-09-04T22:21:03.499Z] [debug] attack: target=Aetheric Minotaur range=close reach.bands=[close] reach.label=Aetheric Shield-Hammer bareHand=false\n[2026-09-04T22:21:03.500Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-04T22:21:03.573Z] [world] You raise the aetheric shield-hammer toward Aetheric Minotaur. The room narrows around the both of you.\n",
+      "[2026-09-04T22:21:03.573Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T22:21:03.902Z] [cognitive] AGGRESSION \u00b7 RETREAT \u00b7 ATTACK \u00b7 DISENGAGE \u00b7 USE_ITEM \u00b7 TAKE_COVER \u00b7 REST  (327ms)\n[2026-09-04T22:21:09.084Z] [world] Aetheric Minotaur moves first. The pressure is immediate.\n",
+      "[2026-09-04T22:21:09.087Z] [debug] ac-shift 25\u219222: race/base 10 + gear 18 + title 0 \u2192 trimmed 22 + status 0 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n[2026-09-04T22:21:09.087Z] [combat] Mud Tortoise \u2014 d20 \u2192 3 + ATK 5 = 8 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-04T22:21:09.089Z] [combat] Aetheric Minotaur \u2014 d20 \u2192 15 + ATK 11 = 26 vs your AC 22 \u2014 \u2713 HIT\n[2026-09-04T22:21:09.092Z] [combat] Your armour turns the blow back \u2014 Aetheric Minotaur takes 1 slashing. (30 HP left)\n[2026-09-04T22:21:09.095Z] [combat] Dice Palmer \u2014 d20 \u2192 18 + ATK 8 = 26 vs your AC 22 \u2014 \u2713 HIT\n",
+      "[2026-09-04T22:21:09.099Z] [combat] Your armour turns the blow back \u2014 Dice Palmer takes 1 slashing. (4 HP left)\n[2026-09-04T22:21:09.099Z] [combat] You \u2014 d20 \u2192 2 + STR 20 perfect opening (2\u00d7 dice) = 22 vs Aetheric Minotaur AC 17 \u2014 \u2713 HIT\n[2026-09-04T22:21:09.100Z] [combat] Bludgeoning flares \u2014 +4 on hit (weak \u2014 bites deep!).\n",
+      "[2026-09-04T22:21:09.101Z] [combat] Weakness exposed \u2014 Aetheric Minotaur flinches. (bludgeoning \u00d72.25 for 31)\n[2026-09-04T22:21:09.101Z] [combat] Final strike with the aetheric shield-hammer for 31. Aetheric Minotaur is still. The Aetherstone hums on, indifferent.\n[2026-09-04T22:21:09.102Z] [reward] Aetheric Minotaur defeated. You recover Aether Axe \u00d73, Minotaur Horn, Burlap Vest.\n",
+      "[2026-09-04T22:21:09.117Z] [reward] \u2726 Recipe recovered from the kill: Golem Sledge (Rare)! Open Crafting to forge it.\n[2026-09-04T22:21:09.117Z] [combat] 2 attackers remain. Dice Palmer now in your sights.\n[2026-09-04T22:21:09.117Z] [reward] \u2726 You feel hardier from your trials. +1 max HP (now 66). [189 enemies defeated]\n[2026-09-04T22:21:09.117Z] [reward] +36 TC pried from the dust.\n",
+      "[2026-09-04T22:21:09.537Z] [combat] Aetheric Minotaur deals 8 slashing damage [armor \u221225%]. You have 45 HP remaining.\n[2026-09-04T22:21:09.537Z] [combat] Aetheric Minotaur's strike leaves you bleeding.\n[2026-09-04T22:21:09.538Z] [combat] Dice Palmer deals 2 slashing damage [armor \u221225%] [edge of reach \u2014 halved]. You have 43 HP remaining.\n",
+      "[2026-09-04T22:21:09.538Z] [combat] Dice Palmer's strike leaves you bleeding.\n[2026-09-04T22:21:27.874Z] [debug] ui: tap \"golem (74/74)\"\n[2026-09-04T22:21:27.889Z] [player] use golem\n[2026-09-04T22:21:27.889Z] [combat] Ashwright attacks Dice Palmer \u2014 d20 14 + 4 = 18 vs AC 12 \u2014 \u2713 HIT\n",
+      "[2026-09-04T22:21:27.891Z] [combat] Ashwright swings the Crude Golem Sledge \u2014 10 bludgeoning damage on Dice Palmer. (0 HP left)\n[2026-09-04T22:21:27.891Z] [world] Dice Palmer crumbles under Ashwright's assault.\n[2026-09-04T22:21:27.894Z] [reward] Dice Palmer defeated. You recover Worn Tartarian Coin \u00d72.\n",
+      "[2026-09-04T22:21:27.896Z] [reward] You strip the body: Bone Knife, Mud-Warden's Vest (+6 TC). The kit took the fight badly.\n[2026-09-04T22:21:27.897Z] [combat] 1 attacker remains. Mud Tortoise now in your sights.\n[2026-09-04T22:21:27.898Z] [reward] +14 TC pried from the dust.\n",
+      "[2026-09-04T22:21:27.965Z] [combat] Mud Tortoise \u2014 d20 \u2192 5 + ATK 5 = 10 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-04T22:21:28.783Z] [debug] persist sizes(KB): total=332 player=74 wm=176[rooms=99 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=80 scene=2\n[2026-09-04T22:21:31.768Z] [debug] ui: tap \"golem (74/74)\"\n[2026-09-04T22:21:31.779Z] [player] use golem\n",
+      "[2026-09-04T22:21:31.779Z] [combat] Ashwright attacks Mud Tortoise \u2014 d20 1 + 4 = 5 vs AC 11 \u2014 \u2717 MISS\n[2026-09-04T22:21:31.779Z] [world] Ashwright's strike sails wide of Mud Tortoise.\n[2026-09-04T22:21:31.780Z] [combat] Mud Tortoise swings at Ashwright and misses.\n[2026-09-04T22:21:31.802Z] [combat] Mud Tortoise \u2014 d20 \u2192 14 + ATK 5 = 19 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-04T22:21:32.692Z] [debug] ui: tap \"golem (74/74)\"\n[2026-09-04T22:21:32.694Z] [system] bleeding fades.\n[2026-09-04T22:21:32.697Z] [player] use golem\n[2026-09-04T22:21:32.698Z] [combat] Ashwright attacks Mud Tortoise \u2014 d20 12 + 4 = 16 vs AC 11 \u2014 \u2713 HIT\n[2026-09-04T22:21:32.698Z] [combat] Ashwright swings the Crude Golem Sledge \u2014 7 bludgeoning damage on Mud Tortoise. (0 HP left)\n",
+      "[2026-09-04T22:21:32.699Z] [world] Mud Tortoise crumbles under Ashwright's assault.\n[2026-09-04T22:21:32.700Z] [reward] Mud Tortoise defeated. You recover Mudstone.\n[2026-09-04T22:21:32.701Z] [reward] +4 TC pried from the dust.\n",
+      "[2026-09-04T22:21:32.749Z] [world] The cathedral steeple stands out of the Mud Seas like a broken tooth, and the Dragon uncoils from it. You read the tin \u2014 ESHREN \u2014 and it stalls, for one long breath, eyes wide. Now or never.\n[2026-09-04T22:21:32.750Z] [arbiter] \"Whatever you do, do not let it get airborne again,\" the Arbiter says.\n",
+      "[2026-09-04T22:21:32.750Z] [debug] dedup: suppressed arbiter repeat \u2014 \"\"Whatever you do, do not let it get airborne again,\" the Arb\u2026\"\n[2026-09-04T22:21:32.751Z] [combat] Bog Dragon (hunted) closes the distance. The hunt comes to its end.\n[2026-09-04T22:21:32.752Z] [combat] The bog swells and parts. The old Dragon has decided you are worth surfacing for.\n",
+      "[2026-09-04T22:21:32.752Z] [debug] mission card: \"The Bog Dragon of Old Drakova\" \u00b7 fight\n[2026-09-04T22:21:32.761Z] [combat] Bog Dragon (hunted) \u2014 d20 \u2192 1 + ATK 11 = 12 vs your AC 22 \u2014 \u2717 FUMBLE\n[2026-09-04T22:21:37.371Z] [debug] ui: tap \"mission card \u00b7 FIGHT\"\n",
+      "[2026-09-04T22:22:02.413Z] [debug] send-log: #mtnir5vqr3fw \u2014 DELIVERED (inline, no attachments): beacon out, 2/2 parts accepted (19289 chars) \u2014 flush said yes\n[2026-09-04T22:22:06.549Z] [debug] appstate: active \u2192 background (was active for 830048ms)\n[2026-09-04T23:24:07.863Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a06e7c-f925-75b9-885f-decc767a6ea8\n",
+      "[2026-09-04T23:24:07.863Z] [debug] ota: Checking\u2026\n[2026-09-04T23:24:15.251Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-09-04T23:24:15.774Z] [debug] ota: Saving progress\u2026\n[2026-09-04T23:24:16.154Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a06eb4-ff9b-7fc2-8e1e-fdd012dc0a8e\n[2026-09-04T23:24:16.154Z] [debug] ota: Checking\u2026\n",
+      "[2026-09-04T23:24:16.269Z] [debug] ota: Already up to date\n[2026-09-04T23:24:16.270Z] [debug] ota: boot check result = noUpdate\n[2026-09-04T23:24:16.308Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-09-04T23:24:16.308Z] [debug] voice: bundled idle\n[2026-09-04T23:24:16.533Z] [debug] send-log: bundle #mtnir5vqr3fw attempt 2/5 delivered to Sentry\n",
+      "[2026-09-04T23:48:01.355Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a06eb4-ff9b-7fc2-8e1e-fdd012dc0a8e\n[2026-09-04T23:48:01.355Z] [debug] ota: Checking\u2026\n[2026-09-04T23:48:02.923Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-09-04T23:48:03.026Z] [debug] ota: Saving progress\u2026\n[2026-09-04T23:48:03.027Z] [debug] ota: Restarting to apply\u2026\n",
+      "[2026-09-04T23:48:03.095Z] [debug] ota: boot check result = applied\n[2026-09-04T23:48:03.301Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a06ed1-8611-716f-b986-4aadec8de171\n[2026-09-04T23:48:03.301Z] [debug] ota: Checking\u2026\n[2026-09-04T23:48:03.389Z] [debug] ota: Already up to date\n[2026-09-04T23:48:03.389Z] [debug] ota: boot check result = noUpdate\n",
+      "[2026-09-04T23:48:03.416Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-09-04T23:48:03.416Z] [debug] voice: bundled idle\n[2026-09-04T23:48:03.585Z] [debug] send-log: bundle #mtnir5vqr3fw attempt 3/5 delivered to Sentry\n[2026-09-04T23:48:10.956Z] [debug] OTA applied: 2026-09-04-1673-one-scanner-per-band \u2192 2026-09-04-1674-the-dead-life-answers.\n",
+      "[2026-09-04T23:48:10.956Z] [debug] OTA session start: 2026-09-04-1674-the-dead-life-answers.\n[2026-09-04T23:48:10.956Z] [world] You step back into The Broken Steeple. The world waits for your move.\n[2026-09-04T23:48:10.956Z] [arbiter] The Arbiter meets your eyes. \"Welcome back, Cheddar Bob. The buried country is no place to walk alone.\"\n",
+      "[2026-09-04T23:48:11.469Z] [debug] \u2550\u2550\u2550 SESSION 2026-09-04T23:48:11.465Z \u00b7 build 2026-09-04-1674-the-dead-life-answers \u00b7 updated from 2026-09-04-1673-one-scanner-per-band \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-09-04T23:48:11.470Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-04T23:48:11.470Z] [debug] missions: hunt:hunt_bog_dragon stage 6/7 [boss\u2192attack] @broken_steeple HERE needs=Eshren's Name-Token\u2713\n[2026-09-04T23:48:11.470Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n",
+      "[2026-09-04T23:48:11.471Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc=\"the Order envoy\" gives=Sealed Reliquary Box PAUSED\n[2026-09-04T23:48:11.471Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2717MISSING gives=Temporal Distortion Watch PAUSED\n",
+      "[2026-09-04T23:48:11.471Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n[2026-09-04T23:48:11.471Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n",
+      "[2026-09-04T23:48:11.471Z] [debug] missions: \u00b7 at=broken_steeple\n[2026-09-04T23:48:11.471Z] [debug] boot: life bmtnlttm4oa started 2026-09-04T23:48:03.244Z \u00b7 FOLLOWED AN OTA APPLY 217ms ago via boot-front \u00b7 prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)\n",
+      "[2026-09-04T23:48:12.564Z] [debug] send-log: crash on record (2026-09-04T23:24:18.137Z) \u2014 game log pushed automatically, delivered to Sentry, kept on disk as #mtnlu0casj0h\n[2026-09-04T23:48:32.417Z] [debug] ui: tap \"inventory\"\n[2026-09-04T23:49:04.178Z] [reward] You work the frost paste along the weapon. Now wielding the Frost-Rimed Aetheric Shield-Hammer \u2014 1d6 cold on every landing hit.\n",
+      "[2026-09-04T23:49:35.334Z] [debug] stats: STR22 DEX18 INT14 WIS17 CHA12 STE8 | gear: WIS+5,INT+3,STR+9,DEX+6,STE+2 | worn: main=Mud-Iron Greatblade head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Amulet of the Silt Warden ring=Tartarian Oath-Band ring2=Tin Ward Ring ring3=Tin Ward Ring ring",
+      "4=Scribe's Signet\n[2026-09-04T23:49:45.078Z] [world] You set the Mud-Iron Greatblade aside to free your off hand for the Reclaimers Guild Geode-Cored Cleaver.\n[2026-09-04T23:49:45.172Z] [debug] stats: STR19 DEX19 INT15 WIS17 CHA12 STE8 | gear: WIS+5,INT+4,STR+6,DEX+7,STE+2 | worn: off=Reclaimers Guild Geode-Cored Cleaver head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlet",
+      "s legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Amulet of the Silt Warden ring=Tartarian Oath-Band ring2=Tin Ward Ring ring3=Tin Ward Ring ring4=Scribe's Signet\n[2026-09-04T23:49:54.475Z] [debug] ui: tap \"\ud83d\udd25 geode-cored cleaver \u2692\"\n[2026-09-04T23:49:54.480Z] [debug] qwen: loading (was idle) \u2014 the Arbiter speaks templates until it is ready\n",
+      "[2026-09-04T23:49:54.556Z] [player] attack with the off-hand reclaimers guild geode-cored cleaver\n[2026-09-04T23:49:54.557Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand reclaimers guild geode cored cleaver resolved=Reclaimers Guild Geode-Cored Cleaver range=mid enemies=1 hooks=0\n",
+      "[2026-09-04T23:49:54.558Z] [debug] attack: target=Bog Dragon (hunted) range=mid reach.bands=[close] reach.label=Reclaimers Guild Geode-Cored Cleaver bareHand=false\n[2026-09-04T23:49:54.558Z] [arbiter] The Arbiter holds up a hand. \"Reclaimers Guild Geode-Cored Cleaver works at close / arm's reach range only \u2014 you're at mid-range. ADVANCE to close in (they'll answer the approach), or attack with som",
+      "ething that reaches.\"\n[2026-09-04T23:49:54.930Z] [cognitive] DISENGAGE \u00b7 TALK  (370ms)\n[2026-09-04T23:49:55.785Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-09-04T23:49:56.656Z] [debug] ui: tap \"approach\"\n[2026-09-04T23:49:56.719Z] [player] approach Bog Dragon (hunted)\n",
+      "[2026-09-04T23:49:56.719Z] [debug] parser: intent=advance conf=1.00 verb=approach target=bog dragon hunted resolved=Bog Dragon (hunted) range=mid enemies=1 hooks=0\n[2026-09-04T23:49:56.722Z] [debug] move: advance from range=mid enemies=1 weather=Aether Lightning cost=1 partial=0\n[2026-09-04T23:49:56.723Z] [debug] move: field advance target=Bog Dragon (hunted) d 1.50->0.50 band mid->close\n",
+      "[2026-09-04T23:49:56.723Z] [world] You close the gap with Bog Dragon (hunted). (range: close / arm's reach)\n[2026-09-04T23:49:56.725Z] [combat] Bog Dragon (hunted) \u2014 d20 \u2192 12 + ATK 11 = 23 vs your AC 22 \u2014 \u2713 HIT\n[2026-09-04T23:49:56.726Z] [combat] Your armour turns the blow back \u2014 Bog Dragon (hunted) takes 1 bludgeoning. (383 HP left)\n",
+      "[2026-09-04T23:49:57.090Z] [combat] Bog Dragon (hunted) deals 27 bludgeoning damage. You have 2 HP remaining.\n[2026-09-04T23:49:57.091Z] [arbiter] The Arbiter holds your gaze. \"Cheddar Bob, you're badly injured. Take a moment \u2014 eat what you have, open the first-aid kit, or rest somewhere safe. The Outskirts do not return what they take.\"\n",
+      "[2026-09-04T23:49:57.091Z] [combat] Bog Dragon (hunted) regenerates 2 HP (384/384).\n[2026-09-04T23:49:57.405Z] [cognitive] neutral  (676ms)\n[2026-09-04T23:49:58.008Z] [debug] ui: tap \"\ud83d\udd25 geode-cored cleaver \u2692\"\n[2026-09-04T23:49:58.045Z] [player] attack with the off-hand reclaimers guild geode-cored cleaver\n[2026-09-04T23:49:58.046Z] [debug] parser: intent=attack conf=1.00 verb=attack tar"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-05-1676-the-tail-is-read #mtnovtl10c8a [inline 20/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtnovtl10c8a"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-05-1676-the-tail-is-read"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "20"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-05-1676-the-tail-is-read"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-05T01:13:33.338317Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-05T01:13:35.402000Z",
+  "fingerprints": [
+    "901d39e2a99ee2e211148263b6b1fad9"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1956463043,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-05T00:44:59.530818Z",
+    "dateReleased": "2026-09-05T00:46:23.751514Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "773b9a7b9973d9b2fa93a4a8ca35903f5853b55d",
+      "message": "[ota-hal] OTA-1676: the tail is read (slice 4c)\n\nItem three of \"fix all existing issues one through six\": #98, the last unit of\nslice 4 \u2014 the exotic reword pass, the shield DR/reflect riders, and the\nShield-Hammer's timed +2 AC. Slice 4 is closed with this.\n\nTHE MEASUREMENT FIRST\nSlice 4's probe, re-run on the current catalog: 316 effect strings, 200 parsed,\n116 unread. Twenty-nine of the unread were rows of app/data/items/runecasters.json\n\u2014 a catalog nothing in the app imports (the suite asserts it) \u2014 so the live tail\nwas 87, the \"~85\" the task recorded. It is 28 now, and every one of the 28 is on\na flavour list BY NAME: HP grants that `statBonuses` already pays, faction-issue\nlines, the bucklers' bash (paid by the shield tag), and six sentences this OTA\nwrote to say plainly that a weapon does nothing special. A card that promises\nsomething unread cannot be authored again without failing the suite.\n\nTHE SHIELD RIDERS \u2014 what OTA-1645 admitted it only half read\nNine shields print a soak (\"reduces incoming slashing by 1d6\", \"blocks +1d6 from\nphysical attacks\", Graviton's \"+1d6 environmental damage reduction\"), an\nimmunity (\"Blocks all plasma damage\", \"Blocks Aetheric-based damage\", \"Deflects\nrunecasters\") or a bite (\"Deals 1d6 damage on the block\", \"reflects 1d6 back\").\nAll three are spent ONLY on a blow that landed on the shield \u2014 OTA-1646's\nlanding roll is what makes that honest; a plate that turns slashing does nothing\nfor a blow that came around it to your ribs. The soak runs as a pool after the\nmitigation floor (OTA-924's own carve-out for the ward). The bite goes through\nOTA-1671's reflect path, lifted into one helper (`dealReflectToAttacker`) so the\nraised-BLOCK path pays it too \u2014 owed by the block, not by the wound, so a spiked\nshield that soaked the whole blow still bites. A kill by reflect is a defeat.\n\"Plasma\" reads as burn: every plasma weapon is typed burn and no enemy deals a\ntype called plasma, so a plasma shield turns burn or turns nothing. The two \"on\nmax roll\" bites became \"on the block\" \u2014 a shield has no roll to be max on.\n\u26a0 A tagged buckler with nothing on its card is a held shield now: the Mud and\nIron Bucklers parsed to nothing, so no blow ever landed on them and they never\nwore. The tag is what makes a shield a shield.\n\nTHE WIELDER'S OWN SHARE, on machinery that already existed\nguard (a timed +N AC \u2014 the Shield-Hammer's \"+2 AC for 1 round after a hit\",\nread by statusAcAdjustment through one new kind, `guard_up`, combat-only like a\nstance), cover (`in_cover`), ward (OTA-835's `stone_ward` soak pool, rolled once\nwhen raised, replaces the old one) and heal (clamped to the room there is).\nThirteen cards were reworded onto ONE grammar for the four, because a parser\nloose enough to read \"Shields caster with mud barrier; blocks 1d6 damage. 3\nrounds.\" would read a shield's \"blocks +1d6 from physical attacks\" as a ward.\n\"On use\" pays on the swing (a ward you raise lands on a miss too); \"after a hit\"\npays on the hit.\n\nTHE CATALOG'S OWN WORDS, READ\n\"pins enemies\" (restrained), \"reduces enemy speed\" (slowed), \"pushes the target\nback\" / \"pushed back\" (knockback \u2014 the War Pike's \"Strength save or\" is a 50%\ngate), \"disables Tartarian tech\" (stunned, machines only), \"+1 damage to tech\"\n(mechanical), \"the arc jumps to one extra enemy\" (a blast with a headcount), and\na new `pull` control \u2014 the mirror of knockback, dragged in off its footing, a\nhinder that never braces, the magnets restricted to metal. The on-hit shred\nOTA-1563 left \"for the shred slice\" (\"reduces enemy armor by N on hit\") lands on\nthe same enemyArmorShred lever, capped like the acid coating's.\n\nTHE REWORDS, 52 cards, onto mechanics of the same weight or onto honest flavour:\nthe \"decay keeps going\" lines into real festering riders (OTA-1643's DOT shape);\n\"instantly kills \u2026 if HP below 20\" into +20 on a max roll; \"50% enemy HP loss on\n20+\" into +2d10 on a max roll; \"ignores shields on advantage rolls\" into a max\nroll; \"auto-wins vs Aetherkin\" into +1d6 against them; the summons and the\ncollapse into blasts; the teleport into a guard after a hit; the resurrection\ninto a heal after a hit; the parry-break blade into a max-roll burst. Bone Shiv\nsaid \"+1 to Stealth\" over a `statBonuses` row of +2 \u2014 it says +2 now. The\nimpossible ones with nothing of equal weight (repair, coercion, grip, parry,\nrust) say so in plain words.\n\ngameStore absorbed the family under its OTA-1400 ratchet by giving up two set()\nblocks (the max-roll shred and the control landing) to\napp/state/weaponRiderEffects.ts.\n\n- app/engine/weaponEffects.ts \u2014 ShieldAc.dr/immune/reflect + shieldRidersFrom;\n  SelfBuff + selfBuffFrom; onHitShred; `pull`; the widened control, target and\n  blast vocabularies; shieldDamageReduction, rollShieldReflect.\n- app/engine/enemyControl.ts \u2014 pull: \u22122, \"dragged in\".\n- app/engine/types.ts \u2014 `guard_up`, StatusEffect.acBonus.\n- app/engine/statusEffects.ts \u2014 guard_up in statusAcAdjustment and the\n  combat-only set; applyEffect keeps the larger acBonus.\n- app/engine/equipment.ts \u2014 heldShieldAc returns the riders; tagged shields\n  count.\n- app/state/combatResolution.ts \u2014 the riders after the landing roll; the bite\n  on the block and on a raised BLOCK; dealReflectToAttacker.\n- app/state/weaponRiderEffects.ts \u2014 new: planSelfBuff / applyWeaponSelfBuff,\n  shredEnemyArmor, landControlOnScene.\n- app/state/gameStore.ts \u2014 the \"use\" and \"hit\" shares wired, on-hit shred,\n  splash headcount; two blocks moved out.\n- app/data/items/weapons.json \u2014 52 effect lines.\n- __tests__/ota1676TheTailIsRead.test.ts \u2014 60 tests: the tail ratchet by name,\n  the runecasters.json orphan check, every rider and buff off the real rows,\n  the pure planners, the status, the wiring.\n- ota1643 / ota1645 / ota1564 / ota1565 / ota1671 \u2014 pins repointed with the\n  reason: three debts paid, four timed ACs read elsewhere, the Deathblade\n  paid, six more blasts, the reflect helper.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-05T00:42:30Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-05-1676-the-tail-is-read",
+          "shortVersion": "tartaria@4.32.11+2026-09-05-1676-the-tail-is-read",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-05T00:46:23.751514Z",
+          "dateCreated": "2026-09-05T00:44:59.530818Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155731346",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-05T00:46:24.035895Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-05-1676-the-tail-is-read",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-05-1676-the-tail-is-read",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-05-1676-the-tail-is-read",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-05-1676-the-tail-is-read)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "69972c9a60344a9b883ed3a87988d6bd",
+  "previousEventID": "6166db7e296640bf918d184990678871"
+}

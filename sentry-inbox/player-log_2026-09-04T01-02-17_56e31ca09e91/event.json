@@ -1,0 +1,278 @@
+{
+  "id": "56e31ca09e9148cea22e79c02249253c",
+  "groupID": "7710845046",
+  "eventID": "56e31ca09e9148cea22e79c02249253c",
+  "projectID": "4511945117532160",
+  "size": 18037,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-04-1657-the-healing-pouch #mtm6enrfz3iy [inline 24/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1657-the-healing-pouch",
+  "message": "player-log 2026-09-04-1657-the-healing-pouch #mtm6enrfz3iy [inline 24/28]",
+  "title": "player-log 2026-09-04-1657-the-healing-pouch #mtm6enrfz3iy [inline 24/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "660230bbb4654cea944b5ced5e11ec5c",
+      "span_id": "b155f8ce88db87d1",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "s=6 defeated=1 tags=1 discovered=1] log=81 scene=7\n[2026-09-03T21:32:31.256Z] [debug] ui: tap \"inventory\"\n[2026-09-03T21:32:43.056Z] [system] bleeding fades.\n[2026-09-03T21:32:43.075Z] [player] use Trauma Kit\n[2026-09-03T21:32:43.075Z] [debug] parser: intent=use_relic conf=1.00 verb=use target=trauma kit resolved=Trauma Kit range=mid enemies=4 hooks=2\n",
+      "[2026-09-03T21:32:43.079Z] [world] You use one Trauma Kit. +45 HP, +1 stamina, bleeding stopped.\n[2026-09-03T21:32:43.089Z] [debug] arbiter: template (reason=combat)\n[2026-09-03T21:32:43.089Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T21:32:43.089Z] [system] \u23f3 Time passed: 15 min\n[2026-09-03T21:32:44.496Z] [cognitive] neutral  (1406ms)\n",
+      "[2026-09-03T21:32:47.895Z] [debug] ui: tap \"inventory\"\n[2026-09-03T21:32:58.858Z] [world] You feed Mercy 2\u00d7 Trail Rations. +12 HP (12/15), +loyalty.\n[2026-09-03T21:33:05.076Z] [debug] ui: tap \"dodge\"\n[2026-09-03T21:33:05.098Z] [player] dodge\n[2026-09-03T21:33:05.099Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=4 hooks=2\n",
+      "[2026-09-03T21:33:05.100Z] [world] You commit to the dodge. Slip Conspiracy Architects Raider 3's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-03T21:33:05.199Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 5 + ATK 8 = 13 vs your AC 22 \u2014 \u2717 EVADED\n",
+      "[2026-09-03T21:33:05.200Z] [combat] Dodge \u2014 d20 \u2192 16 + DEX 21 = 37 vs ATK 13. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-03T21:33:05.200Z] [world] You slip Conspiracy Architects Raider 4's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n",
+      "[2026-09-03T21:33:05.202Z] [debug] ac-shift 22\u219225: race/base 10 + gear 18 + title 0 \u2192 trimmed 22 + status 3 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n",
+      "[2026-09-03T21:33:05.202Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 18 + ATK 7 = 25 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-09-03T21:33:05.203Z] [system] \u26a0 Your Reclaimer's Cloak is coming apart \u2014 a few more hits will finish it. Mend it or lose it.\n",
+      "[2026-09-03T21:33:05.205Z] [combat] Conspiracy Architects Raider 1 \u2014 d20 \u2192 5 + ATK 8 = 13 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-03T21:33:05.205Z] [combat] Conspiracy Architects Raider 3 presses in behind the others, waiting for an opening.\n[2026-09-03T21:33:05.205Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-03T21:33:05.608Z] [combat] Conspiracy Architects Raider 5 deals 8 piercing damage [armor \u221235%, plate \u22121]. You have 38 HP remaining.\n[2026-09-03T21:33:05.965Z] [cognitive] neutral  (403ms)\n[2026-09-03T21:33:06.675Z] [debug] ui: tap \"\u2623 shroud-spun slinger \u2692\"\n[2026-09-03T21:33:06.676Z] [system] evasive \u2014 harder to hit fades.\n",
+      "[2026-09-03T21:33:06.717Z] [player] attack with the off-hand reclaimers guild shroud-spun slinger\n[2026-09-03T21:33:06.718Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand reclaimers guild shroud spun slinger resolved=Reclaimers Guild Shroud-Spun Slinger range=mid enemies=4 hooks=2\n",
+      "[2026-09-03T21:33:06.719Z] [debug] attack: target=Conspiracy Architects Raider 3 range=mid reach.bands=[distant,far,mid,close] reach.label=Reclaimers Guild Shroud-Spun Slinger bareHand=false\n[2026-09-03T21:33:06.720Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-09-03T21:33:06.797Z] [world] You bring the corrupted reclaimers guild shroud-spun slinger to bear on Conspiracy Architects Raider 3.\n[2026-09-03T21:33:06.798Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T21:33:07.150Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 USE_ITEM  (352ms)\n[2026-09-03T21:33:14.687Z] [world] Conspiracy Architects Raider 3 moves first. The pressure is immediate.\n",
+      "[2026-09-03T21:33:14.692Z] [debug] ac-shift 25\u219222: race/base 10 + gear 18 + title 0 \u2192 trimmed 22 + status 0 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n[2026-09-03T21:33:14.692Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 4 + ATK 7 = 11 vs your AC 22 \u2014 \u2717 MISS\n",
+      "[2026-09-03T21:33:14.694Z] [combat] Conspiracy Architects Raider 1 \u2014 d20 \u2192 3 + ATK 8 = 11 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T21:33:14.696Z] [combat] Conspiracy Architects Raider 3 \u2014 d20 \u2192 10 + ATK 9 = 19 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T21:33:14.696Z] [combat] Conspiracy Architects Raider 4 presses in behind the others, waiting for an opening.\n",
+      "[2026-09-03T21:33:14.696Z] [combat] You \u2014 d20 \u2192 17 + DEX 21 perfect opening (2\u00d7 dice) = 38 vs Conspiracy Architects Raider 3 AC 13 \u2014 \u2713 HIT\n[2026-09-03T21:33:14.697Z] [combat] Your blow with the corrupted reclaimers guild shroud-spun slinger lands clean \u2014 19 damage. Conspiracy Architects Raider 3 crumples in the dust. The Aetherstone settles.\n",
+      "[2026-09-03T21:33:14.697Z] [reward] Conspiracy Architects Raider 3 defeated. You recover Aetheric Shard \u00d72.\n[2026-09-03T21:33:14.698Z] [reward] You strip the body: Bone Knife, Mud-Bound Cloak (+14 TC). The kit took the fight badly.\n[2026-09-03T21:33:14.698Z] [combat] 3 attackers remain. Conspiracy Architects Raider 1 now in your sights.\n",
+      "[2026-09-03T21:33:14.699Z] [reward] +21 TC pried from the dust.\n[2026-09-03T21:33:15.254Z] [debug] persist sizes(KB): total=328 player=86 wm=156[rooms=85 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=80 scene=6\n[2026-09-03T21:33:16.454Z] [debug] ui: tap \"approach\"\n[2026-09-03T21:33:16.518Z] [player] approach Conspiracy Architects Raider 4\n",
+      "[2026-09-03T21:33:16.518Z] [debug] parser: intent=advance conf=1.00 verb=approach target=conspiracy architects raider 4 resolved=Conspiracy Architects Raider 4 range=mid enemies=3 hooks=2\n[2026-09-03T21:33:16.521Z] [debug] move: advance from range=mid enemies=3 weather=Black Rain cost=1 partial=0\n",
+      "[2026-09-03T21:33:16.522Z] [debug] move: field advance target=Conspiracy Architects Raider 4 d 1.54->0.54 band mid->close\n[2026-09-03T21:33:16.522Z] [world] You close the gap with the Conspiracy Architects Raider 4 and 2 others. (range: close / arm's reach)\n",
+      "[2026-09-03T21:33:16.522Z] [world] The field shifts around you \u2014 Conspiracy Architects Raider 1 now mid-range; Conspiracy Architects Raider 5 now close / arm's reach.\n[2026-09-03T21:33:16.524Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 8 + ATK 7 = 15 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T21:33:16.526Z] [combat] Conspiracy Architects Raider 1 \u2014 d20 \u2192 6 + ATK 8 = 14 vs your AC 22 \u2014 \u2717 MISS\n",
+      "[2026-09-03T21:33:16.528Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 13 + ATK 8 = 21 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T21:33:16.528Z] [debug] arbiter: template (reason=combat)\n[2026-09-03T21:33:16.528Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T21:33:16.924Z] [cognitive] neutral  (394ms)\n[2026-09-03T21:33:17.643Z] [debug] ui: tap \"approach\"\n",
+      "[2026-09-03T21:33:17.685Z] [player] approach Conspiracy Architects Raider 4\n[2026-09-03T21:33:17.686Z] [debug] parser: intent=advance conf=1.00 verb=approach target=conspiracy architects raider 4 resolved=Conspiracy Architects Raider 4 range=close enemies=3 hooks=2\n[2026-09-03T21:33:17.687Z] [debug] move: advance from range=close enemies=3 weather=Black Rain cost=1 partial=0\n",
+      "[2026-09-03T21:33:17.687Z] [debug] move: field advance target=Conspiracy Architects Raider 4 d 0.54->0.35 band close->close\n[2026-09-03T21:33:17.687Z] [world] You close the gap with the Conspiracy Architects Raider 4 and 2 others. (range: close / arm's reach)\n[2026-09-03T21:33:17.689Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 12 + ATK 8 = 20 vs your AC 22 \u2014 \u2717 MISS\n",
+      "[2026-09-03T21:33:17.692Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 14 + ATK 7 = 21 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T21:33:17.694Z] [combat] Conspiracy Architects Raider 1 \u2014 d20 \u2192 17 + ATK 8 = 25 vs your AC 22 \u2014 \u2713 HIT\n[2026-09-03T21:33:17.695Z] [debug] arbiter: template (reason=combat)\n[2026-09-03T21:33:17.695Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n",
+      "[2026-09-03T21:33:18.099Z] [combat] Conspiracy Architects Raider 1 deals 4 slashing damage [armor \u221225%] [edge of reach \u2014 halved]. You have 34 HP remaining.\n[2026-09-03T21:33:18.452Z] [cognitive] neutral  (405ms)\n[2026-09-03T21:33:18.814Z] [debug] ui: tap \"approach\"\n[2026-09-03T21:33:18.853Z] [player] approach Conspiracy Architects Raider 4\n",
+      "[2026-09-03T21:33:18.855Z] [debug] parser: intent=advance conf=1.00 verb=approach target=conspiracy architects raider 4 resolved=Conspiracy Architects Raider 4 range=close enemies=3 hooks=2\n[2026-09-03T21:33:18.857Z] [debug] move: advance from range=close enemies=3 weather=Black Rain cost=1 partial=0\n",
+      "[2026-09-03T21:33:18.857Z] [world] You are already at close / arm's reach with the Conspiracy Architects Raider 4 and 2 others.\n[2026-09-03T21:33:18.857Z] [debug] arbiter: template (reason=combat)\n[2026-09-03T21:33:18.857Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T21:33:19.211Z] [cognitive] neutral  (352ms)\n[2026-09-03T21:33:19.566Z] [debug] ui: tap \"approach\"\n",
+      "[2026-09-03T21:33:19.607Z] [player] approach Conspiracy Architects Raider 4\n[2026-09-03T21:33:19.607Z] [debug] parser: intent=advance conf=1.00 verb=approach target=conspiracy architects raider 4 resolved=Conspiracy Architects Raider 4 range=close enemies=3 hooks=2\n[2026-09-03T21:33:19.608Z] [debug] move: advance from range=close enemies=3 weather=Black Rain cost=1 partial=0\n",
+      "[2026-09-03T21:33:19.609Z] [world] You are already at close / arm's reach with the Conspiracy Architects Raider 4 and 2 others.\n[2026-09-03T21:33:19.966Z] [cognitive] neutral  (356ms)\n[2026-09-03T21:33:20.323Z] [debug] ui: tap \"throw spear\"\n[2026-09-03T21:33:20.388Z] [player] attack with the off-hand Tartarian Spear (Throw)\n",
+      "[2026-09-03T21:33:20.389Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand tartarian spear throw resolved=- range=close enemies=3 hooks=2\n[2026-09-03T21:33:20.389Z] [debug] attack: target=Conspiracy Architects Raider 4 range=close reach.bands=[distant,far,mid,close] reach.label=Tartarian Spear (Throw) bareHand=false\n",
+      "[2026-09-03T21:33:20.468Z] [world] You commit forward with the tartarian spear (throw). Conspiracy Architects Raider 4 watches your hands.\n[2026-09-03T21:33:20.469Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T21:33:20.830Z] [cognitive] ATTACK \u00b7 DISENGAGE \u00b7 THROW \u00b7 AIM \u00b7 USE_ITEM \u00b7 TAKE_COVER  (361ms)\n",
+      "[2026-09-03T21:33:26.418Z] [world] Conspiracy Architects Raider 4 moves first. The pressure is immediate.\n[2026-09-03T21:33:26.421Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 2 + ATK 7 = 9 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T21:33:26.423Z] [combat] Conspiracy Architects Raider 1 \u2014 d20 \u2192 11 + ATK 8 = 19 vs your AC 22 \u2014 \u2717 MISS\n",
+      "[2026-09-03T21:33:26.424Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 17 + ATK 8 = 25 vs your AC 22 \u2014 \u2713 HIT\n[2026-09-03T21:33:26.425Z] [combat] You \u2014 d20 \u2192 15 + WIS 19 + 2 (point blank) = 36 vs Conspiracy Architects Raider 4 AC 12 \u2014 \u2713 HIT\n[2026-09-03T21:33:26.426Z] [world] The Tartarian Spear (Throw) sings through the air \u2014 spent. Your hand is empty.\n",
+      "[2026-09-03T21:33:26.426Z] [combat] Conspiracy Architects Raider 4 takes 6 with the tartarian spear (throw). It reels: 18 left. Then it fights back.\n[2026-09-03T21:33:26.830Z] [combat] Conspiracy Architects Raider 4 deals 7 slashing damage [armor \u221225%]. You have 27 HP remaining.\n[2026-09-03T21:33:31.674Z] [debug] ui: tap \"approach\"\n",
+      "[2026-09-03T21:33:31.715Z] [player] approach Conspiracy Architects Raider 4\n[2026-09-03T21:33:31.716Z] [debug] parser: intent=advance conf=1.00 verb=approach target=conspiracy architects raider 4 resolved=Conspiracy Architects Raider 4 range=close enemies=3 hooks=2\n[2026-09-03T21:33:31.717Z] [debug] move: advance from range=close enemies=3 weather=Black Rain cost=1 partial=0\n",
+      "[2026-09-03T21:33:31.717Z] [world] You are already at close / arm's reach with the Conspiracy Architects Raider 4 and 2 others.\n[2026-09-03T21:33:31.718Z] [debug] arbiter: template (reason=combat)\n[2026-09-03T21:33:31.718Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T21:33:32.083Z] [cognitive] neutral  (364ms)\n[2026-09-03T21:33:32.457Z] [debug] ui: tap \"approach\"\n",
+      "[2026-09-03T21:33:32.497Z] [player] approach Conspiracy Architects Raider 4\n[2026-09-03T21:33:32.498Z] [debug] parser: intent=advance conf=1.00 verb=approach target=conspiracy architects raider 4 resolved=Conspiracy Architects Raider 4 range=close enemies=3 hooks=2\n[2026-09-03T21:33:32.499Z] [debug] move: advance from range=close enemies=3 weather=Black Rain cost=1 partial=0\n",
+      "[2026-09-03T21:33:32.499Z] [world] You are already at close / arm's reach with the Conspiracy Architects Raider 4 and 2 others.\n[2026-09-03T21:33:32.857Z] [cognitive] neutral  (357ms)\n[2026-09-03T21:33:36.527Z] [debug] ui: tap \"dodge\"\n[2026-09-03T21:33:36.540Z] [player] dodge\n",
+      "[2026-09-03T21:33:36.541Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=3 hooks=2\n[2026-09-03T21:33:36.542Z] [world] You commit to the dodge. Slip Conspiracy Architects Raider 4's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-03T21:33:36.636Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 11 + ATK 8 = 19 vs your AC 22 \u2014 \u2717 EVADED\n[2026-09-03T21:33:36.637Z] [combat] Dodge \u2014 d20 \u2192 12 + DEX 21 = 33 vs ATK 19. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n",
+      "[2026-09-03T21:33:36.637Z] [world] You slip Conspiracy Architects Raider 4's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n[2026-09-03T21:33:36.639Z] [debug] ac-shift 22\u219225: race/base 10 + gear 18 + title 0 \u2192 trimmed 22 + status 3 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany ",
+      "Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n[2026-09-03T21:33:36.639Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 8 + ATK 7 = 15 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-03T21:33:36.641Z] [combat] Conspiracy Architects Raider 1 \u2014 d20 \u2192 14 + ATK 8 = 22 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-03T21:33:36.641Z] [debug] arbiter: template (reason=combat)\n[2026-09-03T21:33:36.641Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T21:33:36.641Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T21:33:37.018Z] [cognitive] neutral  (375ms)\n[2026-09-03T21:33:38.177Z] [debug] ui: tap \"magnetic axe \u26a1\"\n[2026-09-03T21:33:38.180Z] [system] evasive \u2014 harder to hit fades.\n",
+      "[2026-09-03T21:33:38.217Z] [player] attack with the magnetic axe\n[2026-09-03T21:33:38.218Z] [debug] parser: intent=attack conf=1.00 verb=attack target=magnetic axe resolved=Magnetic Axe range=close enemies=3 hooks=2\n[2026-09-03T21:33:38.219Z] [debug] attack: target=Conspiracy Architects Raider 4 range="
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-04-1657-the-healing-pouch #mtm6enrfz3iy [inline 24/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtm6enrfz3iy"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1657-the-healing-pouch"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "24"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1657-the-healing-pouch"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T01:02:15.811877Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T01:02:17.220000Z",
+  "fingerprints": [
+    "b8836b9cdc04ed394ec6ffc5df292ab3"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1954353365,
+    "commitCount": 3,
+    "data": {},
+    "dateCreated": "2026-09-04T00:59:26.615127Z",
+    "dateReleased": "2026-09-04T01:00:59.146953Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "32f104d12f8d1c1459be026d4060eb5e1c4a9a36",
+      "message": "[ota-hal] OTA-1657: the healing pouch, and three racks that fold\n\nOwner: \"battle gets slowed down when you have to heal. let's make it available\nfrom the exploration screen. let's make another bandolier and call it the healing\npouch or something. and we can load it with any three healing items they want so\nin an out 5 trauma kits, say 3 trail rations and maybe 10 blueberries in it. and\nwe open it like a bandolier during combat and can use the preloaded heals from\nthere. and when you use it, it acts like they do when being used from inventory.\"\n\nAnd, a moment later: \"when you are in inventory let's make the bandolier, tool\npouch and healing pouch collapsable like inventory categories to save space.\"\n\n\u26a0 THREE POCKETS, AND A POCKET IS A STACK. That distinction is the whole feature\nand it is why his exact load-out fits in three: a racked id points at an\ninventory STACK, so \"Blueberries \u00d710\" is ONE pocket you can tap ten times, not\nten pockets. It is the same storage contract the bandolier has had since arb110 \u2014\nthe items never leave `player.inventory`, the rack only records WHICH STACKS are\nwithin reach \u2014 so nothing is duplicated, nothing can be lost by racking, and a\nstack spent by any other path simply stops resolving instead of holding a pocket\nhostage as a ghost (OTA-1005's lesson from the tool pouch, applied up front).\n\n\u26a0\u26a0 THE TAP CALLS `useInventoryItem`, AND THAT IS THE POINT. He said it should act\n\"like they do when being used from inventory\" \u2014 so it is not \"like\", it is the\nSAME action the pack's USE button fires. The heal, the stamina, the cure, the\nstack decrement, the Arbiter's line and every downstream hook stay one\nimplementation. A second copy of \"what eating a Trauma Kit does\" is precisely the\nclass of drift the last three OTAs have been spent removing.\n\n\u26a0 AND ELIGIBILITY DELEGATES RATHER THAN DECIDING. `consumableDoesSomething`\nalready answers \"does this mend, restore, cleanse or cure?\", and it exists\nbecause a pure antivenom (healHP 0, cure yes) was once accepted by the combat bar\nand refused by the inventory screen. Restating \"what is a heal\" in a third place\nwould have rebuilt that split. All three items he named pass it \u2014 Trauma Kit\n(45 HP + cure bleed), Trail Rations (6 + 3), Blueberries (4 + 1) \u2014 and a pure\nstat buff does not. The effect is read from the CATALOG, not the instance, so an\nold saved kit racks exactly like a fresh one (the OTA-997 bug on the bandolier).\n\n\u26a0 THE \u271a heals BUTTON IS ON BOTH ROWS and its popup is NOT gated on combat, which\nis the half he asked for by name. The bandolier stays combat-only because a throw\nneeds something to throw at; a heal is exactly as useful on the walk home, and\nthe walk home is when you actually patch up. Green where the bandolier is orange:\none rack throws things away from you, one puts you back together, and mid-fight\nnobody should have to read the label to know which popup opened.\n\n\u26a0\u26a0 ALL THREE RACKS NOW FOLD, THROUGH ONE `RackFrame`. Three banners above the\npack cost real screen on a phone and the healing pouch has just made it three, so\nthey collapse \u2014 but through ONE shared frame rather than three copies of a\nchevron, and in the SAME \u25b8/\u25be grammar arb108 gave the inventory categories, so a\nplayer who has learned to fold a category learns nothing new to fold a rack.\n\n  \u2022 \u26a0 THE COUNT STAYS ON THE HEADER WHEN FOLDED (\"2/3 loaded\"), which is what\n    makes folding safe: the space saved costs no information he was reading the\n    banner for. A rack you must unfold to trust is a rack you stop folding.\n  \u2022 Defaults OPEN, unlike categories, which default closed. A category is one of\n    a dozen above a long pack; a rack is one of three whose whole job is to be\n    glanceable. Folding is something he does, not a state he inherits.\n  \u2022 All THREE fill modes are now mutually exclusive \u2014 two armed tap modes at once\n    is a coin flip over which rack receives the item.\n\n\u26a0 THE CHEVRON GATE CAUGHT THIS AND WAS RIGHT TO. `RackFrame`'s prop is `open`, so\ntrue means OPEN \u2014 the OPPOSITE polarity to the category headers a few hundred\nlines above it in the same file, which is exactly the collision check:chevrons\nwas written for. Registered rather than worked around.\n\n\u26a0 TWO SUITES WENT RED ON THE FIRST FULL RUN, BOTH FOR THE SAME REASON: ota1097\nand ota1100 each hand-typed the TWO-flag fill-mode guard into a string, so making\nit three broke tests about fusion-select and the group gesture. Their actual claim\nis \"a rack fill mode beats this gesture\", however many racks exist \u2014 both now\nassert that over EVERY known fill flag instead of pinning the arity, so the fourth\nrack will not break them.\n\nGates: all 18 green by exit code. Full suite green \u2014 1120 suites, 11,604 tests.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T00:57:14Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1657-the-healing-pouch",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1657-the-healing-pouch",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T01:00:59.146953Z",
+          "dateCreated": "2026-09-04T00:59:26.615127Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155389086",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T01:00:59.447835Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1657-the-healing-pouch",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1657-the-healing-pouch",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1657-the-healing-pouch",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1657-the-healing-pouch)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "5d0f84cb453e4ad08038704801e93182",
+  "previousEventID": "3f49decbedd9455aa68c68027343c01b"
+}

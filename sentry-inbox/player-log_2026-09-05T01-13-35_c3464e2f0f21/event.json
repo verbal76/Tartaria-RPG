@@ -1,0 +1,318 @@
+{
+  "id": "c3464e2f0f214eab8c9962cd23bdf187",
+  "groupID": "7712952778",
+  "eventID": "c3464e2f0f214eab8c9962cd23bdf187",
+  "projectID": "4511945117532160",
+  "size": 17495,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-05-1676-the-tail-is-read #mtnovtl10c8a [inline 8/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-05-1676-the-tail-is-read",
+  "message": "player-log 2026-09-05-1676-the-tail-is-read #mtnovtl10c8a [inline 8/28]",
+  "title": "player-log 2026-09-05-1676-the-tail-is-read #mtnovtl10c8a [inline 8/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "d6e911fd187243f49c34438ba2fdbf6f",
+      "span_id": "bec3bb8a4734e03c",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "ered=1] log=85 scene=3\n[2026-09-04T19:18:14.189Z] [world] You work the barrel apart and come away with a curiosity \u2014 no catalog name, but real weight in the hand.\n[2026-09-04T19:18:14.189Z] [world] You salvage the lamp. The take is small but real.\n[2026-09-04T19:18:14.190Z] [world] You break the sack apart. Among the pieces, something worth keeping.\n",
+      "[2026-09-04T19:18:14.190Z] [world] You salvage the weathered buried market row rooftop. The take is small but real.\n[2026-09-04T19:18:14.190Z] [reward] \u2726 Salvage haul:\n[2026-09-04T19:18:14.191Z] [reward]     \u2022 Mud-Frosted Bead (Common)\n[2026-09-04T19:18:14.191Z] [reward]     \u2022 Aether Dust x2 (Common)\n[2026-09-04T19:18:14.191Z] [reward]     \u2022 Spider Silk (Common)\n",
+      "[2026-09-04T19:18:14.191Z] [reward]     \u2022 Bent Nail x3 (Common)\n[2026-09-04T19:18:16.620Z] [debug] ui: tap \"\u2192 MUD SEAS\"\n[2026-09-04T19:18:16.625Z] [debug] spawn: gear=[Forgotten Leggings, Mud-Walker Mask, Aetheric Scout Greaves] window=10 roster=new\n[2026-09-04T19:18:16.626Z] [world] Norrick Pryce places you as you come in. \"Cheddar Bob. What are you after?\"\n",
+      "[2026-09-04T19:18:16.626Z] [world] \"Been a while,\" Norrick Pryce says. \"Thought the mud had you.\"\n[2026-09-04T19:18:16.627Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Norrick Pryce, fence. Tap the vendor banner to trade.\n[2026-09-04T19:18:16.636Z] [world] This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n",
+      "[2026-09-04T19:18:16.636Z] [world] You walk east through open silt. The compass tells you Giant-Watch Shrine lies further east \u2014 2 tiles, about 5 hours of travel.\n[2026-09-04T19:18:16.637Z] [world] The loose end is exactly as loose as you left it.\n[2026-09-04T19:18:17.446Z] [debug] homework: intro-fill armed after 7580ms idle (strike 2/3)\n",
+      "[Filtered]",
+      "[Filtered]",
+      "[2026-09-04T19:18:19.566Z] [reward]     \u2022 Smooth Stone (Common)\n[2026-09-04T19:18:19.566Z] [reward]     \u2022 Cloth Scrap (Common)\n[2026-09-04T19:18:19.566Z] [reward]     \u2022 Frayed Rigging Twine (Common)\n[2026-09-04T19:18:20.659Z] [world] You work the Aetheric Scout Greaves loose from where the mud had it.\n[2026-09-04T19:18:20.659Z] [reward] \u2726 Aetheric Scout Greaves (Common).\n",
+      "[2026-09-04T19:18:20.672Z] [world] The Forgotten Leggings had settled into the ground. You unsettle it.\n[2026-09-04T19:18:20.672Z] [reward] \u2726 Forgotten Leggings (Common).\n[2026-09-04T19:18:20.673Z] [world] Whatever the Mud-Walker Mask was lying against, it lets go without much argument.\n[2026-09-04T19:18:20.673Z] [reward] \u2726 Mud-Walker Mask (Common).\n",
+      "[2026-09-04T19:18:25.176Z] [player] Ask how far they range\n[2026-09-04T19:18:25.177Z] [world] \"I do this stretch and one other.\" They gesture vaguely. \"Any more and you are travelling, not trading. Travelling is how you lose stock.\"\n[2026-09-04T19:18:25.178Z] [world] Whatever Norrick Pryce is chewing goes over to the other cheek.\n",
+      "[2026-09-04T19:18:28.205Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 10541ms read 9326ms/write 1188ms in 758t\u2192out 33t 12.3ms/t HIT-CAP (176ch)\n[2026-09-04T19:18:28.431Z] [debug] homework: scene_intro \"Builders' Survey Camp\" \u2713 10987ms\n[2026-09-04T19:18:28.826Z] [world] You let the conversation go and Norrick Pryce gets back to it.\n",
+      "[2026-09-04T19:18:34.957Z] [reward] Bought 4\u00d7 Trail Rations from Norrick Pryce for 24 TC. (412 TC left)\n[2026-09-04T19:18:43.547Z] [debug] persist sizes(KB): total=330 player=73 wm=169[rooms=94 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=85 scene=3\n[2026-09-04T19:18:48.645Z] [reward] Sold Mud Knife (Common) to Norrick Pryce for 13 TC. (425 TC on hand)\n",
+      "[2026-09-04T19:18:48.724Z] [reward] Sold Plasma Thrower (Common) to Norrick Pryce for 13 TC. (438 TC on hand)\n[2026-09-04T19:18:48.797Z] [reward] Sold Rough-Hewn Chestplate (Common) to Norrick Pryce for 8 TC. (446 TC on hand)\n[2026-09-04T19:18:48.869Z] [reward] Sold Mud-Stalker Leggings (Common) to Norrick Pryce for 6 TC. (452 TC on hand)\n",
+      "[2026-09-04T19:18:48.940Z] [reward] Sold Sentinel's Mobile Greaves (Common) to Norrick Pryce for 6 TC. (458 TC on hand)\n[2026-09-04T19:18:49.011Z] [reward] Sold Aetheric Scout Greaves (Common) to Norrick Pryce for 6 TC. (464 TC on hand)\n[2026-09-04T19:18:49.080Z] [reward] Sold Forgotten Leggings (Common) to Norrick Pryce for 6 TC. (470 TC on hand)\n",
+      "[2026-09-04T19:18:49.150Z] [reward] Sold Mud-Walker Mask (Common) to Norrick Pryce for 6 TC. (476 TC on hand)\n[2026-09-04T19:19:00.777Z] [debug] appstate: active \u2192 background (was active for 220244ms)\n[2026-09-04T19:36:36.507Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a06db8-e1f2-70a3-8865-2e1f85155c78\n[2026-09-04T19:36:36.507Z] [debug] ota: Checking\u2026\n",
+      "[2026-09-04T19:36:39.610Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-09-04T19:36:39.717Z] [debug] ota: Saving progress\u2026\n[2026-09-04T19:36:39.718Z] [debug] ota: Restarting to apply\u2026\n[2026-09-04T19:36:39.961Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a06ddf-b25f-7a8f-ba86-96fd40c6236e\n[2026-09-04T19:36:39.961Z] [debug] ota: Checking\u2026\n",
+      "[2026-09-04T19:36:40.031Z] [debug] ota: Already up to date\n[2026-09-04T19:36:40.031Z] [debug] ota: boot check result = noUpdate\n[2026-09-04T19:36:40.069Z] [debug] voice: engine=bundled tts=off voice=am_michael\n[2026-09-04T19:36:40.069Z] [debug] voice: bundled idle\n[2026-09-04T19:36:40.203Z] [debug] send-log: bundle #mtnaj1w6w78b attempt 3/5 delivered to Sentry\n",
+      "[2026-09-04T19:36:44.256Z] [debug] OTA applied: 2026-09-04-1668-the-row-says-what-it-does \u2192 2026-09-04-1669-the-gate-opens-for-the-tap.\n[2026-09-04T19:36:44.256Z] [debug] OTA session start: 2026-09-04-1669-the-gate-opens-for-the-tap.\n[2026-09-04T19:36:44.257Z] [world] You step back into Builders' Survey Camp. The world waits for your move.\n",
+      "[2026-09-04T19:36:44.257Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. \"Welcome back, Cheddar Bob. The road kept your place.\"\n[2026-09-04T19:36:44.794Z] [debug] \u2550\u2550\u2550 SESSION 2026-09-04T19:36:44.792Z \u00b7 build 2026-09-04-1669-the-gate-opens-for-the-tap \u00b7 updated from 2026-09-04-1668-the-row-says-what-it-does \u00b7 previous entry moments earlier \u2550\u2550\u2550\n",
+      "[2026-09-04T19:36:44.795Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n[2026-09-04T19:36:44.795Z] [debug] missions: hunt:hunt_bog_dragon stage 5/7 [attack_provoke\u2192attack] @mud_seas needs=Eshren's Name-Token\u2713 spawn=Mud Harpy\u00d73 AMBUSH\n",
+      "[2026-09-04T19:36:44.795Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n[2026-09-04T19:36:44.795Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc=\"the Order envoy\" gives=Sealed Reliquary Box PAUSED\n",
+      "[2026-09-04T19:36:44.795Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2717MISSING gives=Temporal Distortion Watch PAUSED\n[2026-09-04T19:36:44.796Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n",
+      "[2026-09-04T19:36:44.796Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n[2026-09-04T19:36:44.796Z] [debug] missions: \u00b7 at=builders_survey_camp travelTo=mud_seas\n",
+      "[2026-09-04T19:36:44.796Z] [debug] boot: life bmtncuj8f93 started 2026-09-04T19:36:39.903Z \u00b7 FOLLOWED AN OTA APPLY 184ms ago via boot-front \u00b7 prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)\n[2026-09-04T19:36:57.809Z] [debug] ui: tap \"\u2192 MUD SEAS\"\n[2026-09-04T19:36:57.869Z] [debug] spawn: gear=[Salvager's Worn Boots, Bone Sling] window=10 roster=new\n",
+      "[2026-09-04T19:36:57.871Z] [world] Marlow Quicksleeve places you as you come in. \"Cheddar Bob. What are you after?\"\n[2026-09-04T19:36:57.872Z] [world] \"Been a while,\" Marlow Quicksleeve says. \"Thought the mud had you.\"\n[2026-09-04T19:36:57.872Z] [world] A stall has been thrown up on the next stretch of ground \u2014 Marlow Quicksleeve, fence. Tap the vendor banner to trade.\n",
+      "[2026-09-04T19:36:57.882Z] [world] Rare workings for sale: Ember Storm Stave (200 TC), Emberheart Locket (200 TC), Fallout Bloom Stave (200 TC) \u2014 buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem \u2014 just ask.\n",
+      "[2026-09-04T19:36:57.883Z] [world] You walk east through open silt. The compass tells you Giant-Watch Shrine lies further east \u2014 1 tile, about 3 hours of travel.\n[2026-09-04T19:36:57.883Z] [world] The thread you were following waits where you left it.\n[2026-09-04T19:36:59.827Z] [debug] ui: tap \"take / salvage\"\n[2026-09-04T19:37:01.664Z] [world] You take the Bone Sling from where it lay.\n",
+      "[2026-09-04T19:37:01.665Z] [reward] \u2726 Bone Sling (Common).\n[2026-09-04T19:37:01.685Z] [world] You pick up the Salvager's Worn Boots.\n[2026-09-04T19:37:01.686Z] [reward] \u2726 Salvager's Worn Boots (Common).\n[2026-09-04T19:37:02.782Z] [world] You lift the Climbing Rope clear.\n[2026-09-04T19:37:02.782Z] [reward] \u2726 Climbing Rope (Common).\n",
+      "[2026-09-04T19:37:02.813Z] [world] You get a hand under the Scrap Metal and take it.\n[2026-09-04T19:37:02.814Z] [reward] \u2726 Scrap Metal (Common).\n[2026-09-04T19:37:03.911Z] [world] You strip the banner carefully. Something usable comes free in your hand.\n[2026-09-04T19:37:03.911Z] [world] You strip the cart carefully. Something usable comes free in your hand.\n",
+      "[2026-09-04T19:37:03.911Z] [world] You strip the weathered buried market row rooftop carefully. Something usable comes free in your hand.\n[2026-09-04T19:37:03.912Z] [reward] \u2726 Salvage haul:\n[2026-09-04T19:37:03.914Z] [reward]     \u2022 Aether Dust x2 (Common)\n[2026-09-04T19:37:03.914Z] [reward]     \u2022 Scrap Metal x3 (Common)\n[2026-09-04T19:37:03.917Z] [reward]     \u2022 Bent Nail x3 (Common)\n",
+      "[2026-09-04T19:37:06.413Z] [debug] ui: tap \"investigate\"\n[2026-09-04T19:37:08.331Z] [debug] qwen: loading (was idle) \u2014 the Arbiter speaks templates until it is ready\n[2026-09-04T19:37:08.341Z] [player] investigate the mud\n[2026-09-04T19:37:08.342Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=mud range=- enemies=0 hooks=1\n",
+      "[2026-09-04T19:37:08.345Z] [world] You study the mud. The Aetheric haze around it thickens, then settles.\n[2026-09-04T19:37:08.346Z] [world] Fine grey-blue dust sifts off the mud when you handle it. You catch what you can.\n[2026-09-04T19:37:08.346Z] [reward] \u2726 Aether Dust (Common).\n[2026-09-04T19:37:08.347Z] [world] Mud Scanner reads flat. Nothing in the mud.\n",
+      "[2026-09-04T19:37:08.347Z] [debug] investigate: \"mud\" marked searched\n[2026-09-04T19:37:08.348Z] [arbiter] \"There's coin on the board for a willing blade,\" the Arbiter says. \"Read the World.\"\n[2026-09-04T19:37:08.571Z] [cognitive] SWIM  (223ms)\n[2026-09-04T19:37:09.430Z] [debug] ctx: OPENED \u2014 live=1 (opened=1 released=0) \u2248425MB est\n[2026-09-04T19:37:09.633Z] [player] investigate watch fire\n",
+      "[2026-09-04T19:37:09.633Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=watch fire resolved=watch fire range=- enemies=0 hooks=1\n[2026-09-04T19:37:09.634Z] [world] The watch fire sits the way ordinary things sit. The Arbiter does not lean in. You move on.\n[2026-09-04T19:37:09.816Z] [cognitive] READY  (180ms)\n",
+      "[2026-09-04T19:37:12.114Z] [debug] qwen\u23f1 investigate_lore ok 2302ms read 1453ms/write 823ms in 127t\u2192out 25t 11.4ms/t (108ch)\n[2026-09-04T19:37:13.398Z] [debug] ui: tap \"\u2192 MUD SEAS\"\n[2026-09-04T19:37:13.420Z] [world] You walk east. You arrive at Giant-Watch Shrine.\n[2026-09-04T19:37:13.422Z] [debug] scene: loc=giant_watch_shrine hub=- arrival=y opening=n passing=y\n",
+      "[2026-09-04T19:37:13.423Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n[2026-09-04T19:37:13.423Z] [debug] missions: hunt:hunt_bog_dragon stage 5/7 [attack_provoke\u2192attack] @mud_seas needs=Eshren's Name-Token\u2713 spawn=Mud Harpy\u00d73 AMBUSH\n",
+      "[2026-09-04T19:37:13.424Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n[2026-09-04T19:37:13.424Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc=\"the Order envoy\" gives=Sealed Reliquary Box PAUSED\n",
+      "[2026-09-04T19:37:13.424Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2717MISSING gives=Temporal Distortion Watch PAUSED\n[2026-09-04T19:37:13.424Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n",
+      "[2026-09-04T19:37:13.425Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n[2026-09-04T19:37:13.425Z] [debug] missions: \u00b7 at=giant_watch_shrine travelTo=mud_seas\n",
+      "[2026-09-04T19:37:13.443Z] [debug] spawn: gear=[Rough-Hewn Gauntlets, Stone Seeker's Brow Guard, Architect's Field Jacket] window=10 roster=new\n[2026-09-04T19:37:13.466Z] [world] You've left Builders' Survey Camp and entered Giant-Watch Shrine. The keepers wait and watch. Ask what for and they offer you tea. It's midday. An aetheric worm is already here. east leads to Revivalist Field Camp; south ",
+      "leads to The Central Pillars; west leads to Builders' Survey Camp. Nothing named to the north.\n[2026-09-04T19:37:13.467Z] [combat] Distance: mid-range. Reclaimers Guild Geode-Cored Cleaver \u2014 needs approach \u00b7 Reclaimers Guild Shroud-Spun Slinger \u2014 needs approach.\n[2026-09-04T19:37:13.534Z] [system] Weather effect \u2014 Iron Fog: -1 DEX\n",
+      "[2026-09-04T19:37:13.538Z] [world] [Giant-Watch Shrine] north: Garrin (return the folio) (17 tiles, 1 day, 19 hours) \u00b7 east: Cradle of Dusk (5 tiles, 13 hours) \u00b7 south: The Central Pillars (5 tiles, 13 hours) \u00b7 west: Builders' Survey Camp (6 tiles, 15 hours)\n[2026-09-04T19:37:13.539Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-09-04T19:37:13.540Z] [arbiter] The Arbiter's gaze stays on the aetheric worm. \"Strike, hide, or speak \u2014 the choice is yours and it is brief.\"\n[2026-09-04T19:37:14.242Z] [debug] persist sizes(KB): total=336 player=72 wm=176[rooms=101 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=85 scene=3\n[2026"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-05-1676-the-tail-is-read #mtnovtl10c8a [inline 8/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtnovtl10c8a"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-05-1676-the-tail-is-read"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "8"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-05-1676-the-tail-is-read"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-05T01:13:33.228000Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "5": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 327,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        },
+        "6": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 375,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-05T01:13:35.394000Z",
+  "fingerprints": [
+    "901d39e2a99ee2e211148263b6b1fad9"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1956463043,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-05T00:44:59.530818Z",
+    "dateReleased": "2026-09-05T00:46:23.751514Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "773b9a7b9973d9b2fa93a4a8ca35903f5853b55d",
+      "message": "[ota-hal] OTA-1676: the tail is read (slice 4c)\n\nItem three of \"fix all existing issues one through six\": #98, the last unit of\nslice 4 \u2014 the exotic reword pass, the shield DR/reflect riders, and the\nShield-Hammer's timed +2 AC. Slice 4 is closed with this.\n\nTHE MEASUREMENT FIRST\nSlice 4's probe, re-run on the current catalog: 316 effect strings, 200 parsed,\n116 unread. Twenty-nine of the unread were rows of app/data/items/runecasters.json\n\u2014 a catalog nothing in the app imports (the suite asserts it) \u2014 so the live tail\nwas 87, the \"~85\" the task recorded. It is 28 now, and every one of the 28 is on\na flavour list BY NAME: HP grants that `statBonuses` already pays, faction-issue\nlines, the bucklers' bash (paid by the shield tag), and six sentences this OTA\nwrote to say plainly that a weapon does nothing special. A card that promises\nsomething unread cannot be authored again without failing the suite.\n\nTHE SHIELD RIDERS \u2014 what OTA-1645 admitted it only half read\nNine shields print a soak (\"reduces incoming slashing by 1d6\", \"blocks +1d6 from\nphysical attacks\", Graviton's \"+1d6 environmental damage reduction\"), an\nimmunity (\"Blocks all plasma damage\", \"Blocks Aetheric-based damage\", \"Deflects\nrunecasters\") or a bite (\"Deals 1d6 damage on the block\", \"reflects 1d6 back\").\nAll three are spent ONLY on a blow that landed on the shield \u2014 OTA-1646's\nlanding roll is what makes that honest; a plate that turns slashing does nothing\nfor a blow that came around it to your ribs. The soak runs as a pool after the\nmitigation floor (OTA-924's own carve-out for the ward). The bite goes through\nOTA-1671's reflect path, lifted into one helper (`dealReflectToAttacker`) so the\nraised-BLOCK path pays it too \u2014 owed by the block, not by the wound, so a spiked\nshield that soaked the whole blow still bites. A kill by reflect is a defeat.\n\"Plasma\" reads as burn: every plasma weapon is typed burn and no enemy deals a\ntype called plasma, so a plasma shield turns burn or turns nothing. The two \"on\nmax roll\" bites became \"on the block\" \u2014 a shield has no roll to be max on.\n\u26a0 A tagged buckler with nothing on its card is a held shield now: the Mud and\nIron Bucklers parsed to nothing, so no blow ever landed on them and they never\nwore. The tag is what makes a shield a shield.\n\nTHE WIELDER'S OWN SHARE, on machinery that already existed\nguard (a timed +N AC \u2014 the Shield-Hammer's \"+2 AC for 1 round after a hit\",\nread by statusAcAdjustment through one new kind, `guard_up`, combat-only like a\nstance), cover (`in_cover`), ward (OTA-835's `stone_ward` soak pool, rolled once\nwhen raised, replaces the old one) and heal (clamped to the room there is).\nThirteen cards were reworded onto ONE grammar for the four, because a parser\nloose enough to read \"Shields caster with mud barrier; blocks 1d6 damage. 3\nrounds.\" would read a shield's \"blocks +1d6 from physical attacks\" as a ward.\n\"On use\" pays on the swing (a ward you raise lands on a miss too); \"after a hit\"\npays on the hit.\n\nTHE CATALOG'S OWN WORDS, READ\n\"pins enemies\" (restrained), \"reduces enemy speed\" (slowed), \"pushes the target\nback\" / \"pushed back\" (knockback \u2014 the War Pike's \"Strength save or\" is a 50%\ngate), \"disables Tartarian tech\" (stunned, machines only), \"+1 damage to tech\"\n(mechanical), \"the arc jumps to one extra enemy\" (a blast with a headcount), and\na new `pull` control \u2014 the mirror of knockback, dragged in off its footing, a\nhinder that never braces, the magnets restricted to metal. The on-hit shred\nOTA-1563 left \"for the shred slice\" (\"reduces enemy armor by N on hit\") lands on\nthe same enemyArmorShred lever, capped like the acid coating's.\n\nTHE REWORDS, 52 cards, onto mechanics of the same weight or onto honest flavour:\nthe \"decay keeps going\" lines into real festering riders (OTA-1643's DOT shape);\n\"instantly kills \u2026 if HP below 20\" into +20 on a max roll; \"50% enemy HP loss on\n20+\" into +2d10 on a max roll; \"ignores shields on advantage rolls\" into a max\nroll; \"auto-wins vs Aetherkin\" into +1d6 against them; the summons and the\ncollapse into blasts; the teleport into a guard after a hit; the resurrection\ninto a heal after a hit; the parry-break blade into a max-roll burst. Bone Shiv\nsaid \"+1 to Stealth\" over a `statBonuses` row of +2 \u2014 it says +2 now. The\nimpossible ones with nothing of equal weight (repair, coercion, grip, parry,\nrust) say so in plain words.\n\ngameStore absorbed the family under its OTA-1400 ratchet by giving up two set()\nblocks (the max-roll shred and the control landing) to\napp/state/weaponRiderEffects.ts.\n\n- app/engine/weaponEffects.ts \u2014 ShieldAc.dr/immune/reflect + shieldRidersFrom;\n  SelfBuff + selfBuffFrom; onHitShred; `pull`; the widened control, target and\n  blast vocabularies; shieldDamageReduction, rollShieldReflect.\n- app/engine/enemyControl.ts \u2014 pull: \u22122, \"dragged in\".\n- app/engine/types.ts \u2014 `guard_up`, StatusEffect.acBonus.\n- app/engine/statusEffects.ts \u2014 guard_up in statusAcAdjustment and the\n  combat-only set; applyEffect keeps the larger acBonus.\n- app/engine/equipment.ts \u2014 heldShieldAc returns the riders; tagged shields\n  count.\n- app/state/combatResolution.ts \u2014 the riders after the landing roll; the bite\n  on the block and on a raised BLOCK; dealReflectToAttacker.\n- app/state/weaponRiderEffects.ts \u2014 new: planSelfBuff / applyWeaponSelfBuff,\n  shredEnemyArmor, landControlOnScene.\n- app/state/gameStore.ts \u2014 the \"use\" and \"hit\" shares wired, on-hit shred,\n  splash headcount; two blocks moved out.\n- app/data/items/weapons.json \u2014 52 effect lines.\n- __tests__/ota1676TheTailIsRead.test.ts \u2014 60 tests: the tail ratchet by name,\n  the runecasters.json orphan check, every rider and buff off the real rows,\n  the pure planners, the status, the wiring.\n- ota1643 / ota1645 / ota1564 / ota1565 / ota1671 \u2014 pins repointed with the\n  reason: three debts paid, four timed ACs read elsewhere, the Deathblade\n  paid, six more blasts, the reflect helper.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-05T00:42:30Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-05-1676-the-tail-is-read",
+          "shortVersion": "tartaria@4.32.11+2026-09-05-1676-the-tail-is-read",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-05T00:46:23.751514Z",
+          "dateCreated": "2026-09-05T00:44:59.530818Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155731346",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-05T00:46:24.035895Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-05-1676-the-tail-is-read",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-05-1676-the-tail-is-read",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-05-1676-the-tail-is-read",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-05-1676-the-tail-is-read)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "d9f3ba280c9d441f825a8c71c3fda5c9",
+  "previousEventID": "c1ccc7b702354d08beb321f3b334ec86"
+}

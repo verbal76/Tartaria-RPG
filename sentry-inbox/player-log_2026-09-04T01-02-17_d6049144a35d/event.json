@@ -1,0 +1,303 @@
+{
+  "id": "d6049144a35d4c65883d04d4fdd130b9",
+  "groupID": "7710845046",
+  "eventID": "d6049144a35d4c65883d04d4fdd130b9",
+  "projectID": "4511945117532160",
+  "size": 17825,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-04-1657-the-healing-pouch #mtm6enrfz3iy [inline 26/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1657-the-healing-pouch",
+  "message": "player-log 2026-09-04-1657-the-healing-pouch #mtm6enrfz3iy [inline 26/28]",
+  "title": "player-log 2026-09-04-1657-the-healing-pouch #mtm6enrfz3iy [inline 26/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "660230bbb4654cea944b5ced5e11ec5c",
+      "span_id": "b155f8ce88db87d1",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "] [player] dodge\n[2026-09-03T21:35:31.377Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=2\n[2026-09-03T21:35:31.378Z] [world] You commit to the dodge. Slip Conspiracy Architects Raider 5's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-03T21:35:31.477Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 10 + ATK 7 = 17 vs your AC 22 \u2014 \u2717 EVADED\n[2026-09-03T21:35:31.477Z] [combat] Dodge \u2014 d20 \u2192 10 + DEX 21 = 31 vs ATK 17. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-03T21:35:31.478Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-09-03T21:35:31.478Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T21:35:31.478Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T21:35:31.840Z] [cognitive] neutral  (361ms)\n[2026-09-03T21:35:32.778Z] [debug] ui: tap \"magnetic axe \u26a1\"\n[2026-09-03T21:35:32.816Z] [player] attack with the magnetic axe\n",
+      "[2026-09-03T21:35:32.817Z] [debug] parser: intent=attack conf=1.00 verb=attack target=magnetic axe resolved=Magnetic Axe range=close enemies=1 hooks=2\n[2026-09-03T21:35:32.818Z] [debug] attack: target=Conspiracy Architects Raider 5 range=close reach.bands=[close] reach.label=Magnetic Axe bareHand=false\n[2026-09-03T21:35:32.820Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-09-03T21:35:32.905Z] [world] You raise the magnetic axe toward Conspiracy Architects Raider 5. The room narrows around the both of you.\n[2026-09-03T21:35:32.905Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T21:35:33.261Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 THROW \u00b7 DISENGAGE  (354ms)\n[2026-09-03T21:35:38.500Z] [world] Conspiracy Architects Raider 5 moves first. The pressure is immediate.\n",
+      "[2026-09-03T21:35:38.508Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 19 + ATK 7 = 26 vs your AC 22 \u2014 \u2713 HIT\n[2026-09-03T21:35:38.509Z] [combat] You \u2014 d20 \u2192 19 + STR 17 perfect opening (2\u00d7 dice) = 36 vs Conspiracy Architects Raider 5 AC 11 \u2014 \u2713 HIT\n[2026-09-03T21:35:38.510Z] [combat] Electrical flares \u2014 +2 on hit.\n",
+      "[2026-09-03T21:35:38.511Z] [combat] Final strike with the magnetic axe for 15. Conspiracy Architects Raider 5 is still. The Aetherstone hums on, indifferent.\n[2026-09-03T21:35:38.512Z] [reward] Conspiracy Architects Raider 5 defeated. You recover Patched Cloth, Purification Vial, Burlap Vest.\n",
+      "[2026-09-03T21:35:38.513Z] [reward] You strip the body: Iron Spear, Mud-Warden's Vest (+20 TC). The kit took the fight badly.\n[2026-09-03T21:35:38.528Z] [reward] \u2726 Recipe recovered from the kill: Venomwright Band (Rare)! Open Crafting to forge it.\n[2026-09-03T21:35:38.528Z] [reward] +21 TC pried from the dust.\n",
+      "[2026-09-03T21:35:38.841Z] [combat] Conspiracy Architects Raider 5 deals 9 piercing damage [armor \u221235%]. You have 18 HP remaining.\n[2026-09-03T21:35:39.102Z] [debug] persist sizes(KB): total=330 player=87 wm=156[rooms=85 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=83 scene=4\n[2026-09-03T21:35:42.732Z] [debug] ui: tap \"take / salvage\"\n",
+      "[2026-09-03T21:35:43.349Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-09-03T21:35:44.049Z] [world] You take the Energy Baton from where it lay.\n[2026-09-03T21:35:44.050Z] [reward] \u2726 Energy Baton (Uncommon).\n[2026-09-03T21:35:44.064Z] [world] You pick up the Stone Spear.\n[2026-09-03T21:35:44.065Z] [reward] \u2726 Stone Spear (Common).\n",
+      "[2026-09-03T21:35:44.066Z] [world] You lift the Shaman's Mud Helm clear.\n[2026-09-03T21:35:44.066Z] [reward] \u2726 Shaman's Mud Helm (Common).\n[2026-09-03T21:35:45.118Z] [world] You salvage the cold spring. The take is small but real.\n[2026-09-03T21:35:45.118Z] [world] You break the mask apart. Among the pieces, something worth keeping.\n",
+      "[Filtered]",
+      "[2026-09-03T21:35:45.119Z] [reward] \u2726 Salvage haul:\n[2026-09-03T21:35:45.119Z] [reward]     \u2022 Aether Crystal x4 (Common)\n[2026-09-03T21:35:45.119Z] [reward]     \u2022 Scrap Metal (Common)\n[2026-09-03T21:35:45.119Z] [reward]     \u2022 Oil-Stained Sash (Common)\n[2026-09-03T21:35:46.933Z] [debug] ui: tap \"investigate\"\n[2026-09-03T21:35:48.797Z] [player] investigate the ground\n",
+      "[2026-09-03T21:35:48.798Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=2\n[2026-09-03T21:35:48.806Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Wild Grapes (Uncommon).\n[2026-09-03T21:35:48.822Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-09-03T21:35:49.771Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 6215ms read 0ms/write 0ms in 726t\u2192out 0t (0ch)\n[2026-09-03T21:35:50.019Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 6215ms \u2014 intro-fill:\u2205\n[2026-09-03T21:35:50.019Z] [debug] homework: scene_intro \"Mud Flood Nexus\" \u2205 6670ms\n[2026-09-03T21:35:50.231Z] [cognitive] CLIMB  (1408ms)\n",
+      "[2026-09-03T21:35:58.368Z] [debug] ui: tap \"more \u25b8\"\n[2026-09-03T21:35:58.369Z] [debug] ui: tap \"more \u25b8\"\n[2026-09-03T21:35:59.945Z] [debug] qwen\u23f1 ambient ok 10711ms wait 997ms read 9342ms/write 1205ms in 363t\u2192out 31t 25.7ms/t HIT-CAP (153ch)\n",
+      "[2026-09-03T21:36:00.146Z] [debug] \u26a0 FREEZE WATCH: LOGIC stalled while frames kept coming (js 2230ms \u00b7 frames 0ms). Something blocked the JS thread \u2014 look for a long synchronous run. \u00b7 crumb before: native:homework:start +9916ms \u2192 now: native:homework:done +201ms \u00b7 doing: tap \"more \u25b8\" \u00b7 native: idle\n[2026-09-03T21:36:00.346Z] [debug] ui: tap \"more \u25b8\"\n",
+      "[2026-09-03T21:36:00.737Z] [arbiter] You have traversed the winding paths that once led to the ruins of the ancient city, now transformed into the vibrant heart of the region.\n[2026-09-03T21:36:00.738Z] [debug] arbiter: ambient \u2713 11916ms\n",
+      "[2026-09-03T21:36:00.738Z] [debug] arbiter: ambient-said \"You have traversed the winding paths that once led to the ruins of the ancient city, now transformed into the vibrant heart of the region.\"\n[2026-09-03T21:36:02.810Z] [debug] ui: tap \"craft\"\n[2026-09-03T21:36:05.133Z] [world] You repair the Aether-Walker's Boots. Back to full. (spent: Patched Cloth x4)\n",
+      "[2026-09-03T21:36:05.180Z] [world] You repair the Architect's Sight Enhancer. Back to full. (spent: Patched Cloth x4)\n[2026-09-03T21:36:05.201Z] [world] You repair the Litany Greaves. Back to full. (spent: Aetheric Shard x10, Aetheric Dust x4, Aetheric Cloth x2)\n[2026-09-03T21:36:05.220Z] [world] You repair the Magnetic Axe. Back to full. (spent: Scrap Metal x8, Stick x4)\n",
+      "[2026-09-03T21:36:05.238Z] [world] You repair the Mud-glass Scales. Back to full. (spent: Patched Cloth x4)\n[2026-09-03T21:36:05.256Z] [world] You repair the Reclaimer's Cloak. Back to full. (spent: Patched Cloth x4)\n[2026-09-03T21:36:05.276Z] [world] You repair the Corrupted Reclaimers Guild Shroud-Spun Slinger. Back to full. (spent: Small Rock x2)\n",
+      "[2026-09-03T21:36:05.294Z] [world] You repair the Titan's Gauntlets. Back to full. (spent: Patched Cloth x4)\n[2026-09-03T21:36:05.312Z] [world] You repair the Bone Knife. Back to full. (spent: Scrap Metal x4, Stick x2)\n[2026-09-03T21:36:05.330Z] [world] You repair the Bone Knife. Back to full. (spent: Scrap Metal x4, Stick x2)\n",
+      "[2026-09-03T21:36:05.350Z] [world] You repair the Bone Knife. Back to full. (spent: Scrap Metal x4, Stick x2)\n[2026-09-03T21:36:05.367Z] [world] You repair the Bone Knife. Back to full. (spent: Scrap Metal x4, Stick x2)\n[2026-09-03T21:36:05.385Z] [world] You repair the Bone Knife. Back to full. (spent: Scrap Metal x4, Stick x2)\n",
+      "[2026-09-03T21:36:05.403Z] [world] You repair the Bone Knife. Back to full. (spent: Scrap Metal x4, Stick x2)\n[2026-09-03T21:36:05.420Z] [world] You repair the Crude Golem Greatsword. Back to full. (spent: Scrap Metal x2)\n[2026-09-03T21:36:05.441Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Smooth Stone \u2192 Small Rock.\"\n",
+      "[2026-09-03T21:36:05.444Z] [world] You repair the Cudgel. Back to full. (spent: Small Rock x4, Stick x2)\n[2026-09-03T21:36:05.464Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Smooth Stone \u2192 Small Rock.\"\n[2026-09-03T21:36:05.464Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Patched in: 4\u00d7 Smooth Stone \u2192 Small Rock.\u2026\"\n",
+      "[2026-09-03T21:36:05.466Z] [world] You repair the Cudgel. Back to full. (spent: Small Rock x4, Stick x2)\n[2026-09-03T21:36:05.488Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Smooth Stone \u2192 Small Rock.\"\n[2026-09-03T21:36:05.488Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter nods. \"Patched in: 4\u00d7 Smooth Stone \u2192 Small Rock.\u2026\"\n",
+      "[2026-09-03T21:36:05.490Z] [world] You repair the Cudgel. Back to full. (spent: Small Rock x4, Stick x2)\n[2026-09-03T21:36:05.507Z] [world] You repair the Iron Spear. Back to full. (spent: Scrap Metal x4, Stick x2)\n[2026-09-03T21:36:05.525Z] [world] You repair the Mud-Bound Cloak. Back to full. (spent: Patched Cloth x4)\n",
+      "[2026-09-03T21:36:05.542Z] [world] You repair the Mud-Bound Cloak. Back to full. (spent: Patched Cloth x4)\n[2026-09-03T21:36:05.560Z] [world] You repair the Mud-Bound Cloak. Back to full. (spent: Patched Cloth x4)\n[2026-09-03T21:36:05.578Z] [world] You repair the Mud-Bound Cloak. Back to full. (spent: Patched Cloth x4)\n",
+      "[2026-09-03T21:36:05.602Z] [arbiter] The Arbiter stops with his hand over your pack. \"Before I touch the Mud-Bound Cloak \u2014 2 pieces of this is Crucible stock: 2\u00d7 Yellowed Tusk Stub. Say the word and I'll set it aside instead.\"\n[2026-09-03T21:36:05.751Z] [debug] freeze watch: recovered \u2014 painting again after 841ms quiet.\n",
+      "[2026-09-03T21:36:09.101Z] [arbiter] The Arbiter nods. \"Patched in: 2\u00d7 Yellowed Tusk Stub \u2192 Patched Cloth, Mud Poison \u2192 Patched Cloth.\"\n[2026-09-03T21:36:09.112Z] [world] You repair the Mud-Bound Cloak. Back to full. (spent: Patched Cloth x4)\n",
+      "[2026-09-03T21:36:09.160Z] [arbiter] The Arbiter stops with his hand over your pack. \"Before I touch the Mud-Warden's Vest \u2014 4 pieces of this is Crucible stock: 2\u00d7 Cracked Carapace Curl, 2\u00d7 Copper-Threaded Veil. Say the word and I'll set it aside instead.\"\n",
+      "[2026-09-03T21:36:09.374Z] [debug] persist sizes(KB): total=332 player=86 wm=156[rooms=85 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=85 scene=4\n[2026-09-03T21:36:10.389Z] [arbiter] The Arbiter nods. \"Patched in: 2\u00d7 Cracked Carapace Curl \u2192 Patched Cloth, 2\u00d7 Copper-Threaded Veil \u2192 Patched Cloth.\"\n",
+      "[2026-09-03T21:36:10.402Z] [world] You repair the Mud-Warden's Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n[2026-09-03T21:36:10.443Z] [arbiter] The Arbiter stops with his hand over your pack. \"Before I touch the Mud-Warden's Vest \u2014 4 pieces of this is Crucible stock: 2\u00d7 Salvager's Tether Loop, 2\u00d7 Stiffened Leather Offcut. Say the word and I'll set it aside instead.\"\n",
+      "[2026-09-03T21:36:11.516Z] [arbiter] The Arbiter nods. \"Patched in: 2\u00d7 Salvager's Tether Loop \u2192 Patched Cloth, 2\u00d7 Stiffened Leather Offcut \u2192 Patched Cloth.\"\n[2026-09-03T21:36:11.530Z] [world] You repair the Mud-Warden's Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n",
+      "[2026-09-03T21:36:11.569Z] [arbiter] The Arbiter stops with his hand over your pack. \"Before I touch the Reclaimer's Salvage Vest \u2014 1 piece of this is Crucible stock: Coiled Snare Thread. Say the word and I'll set it aside instead.\"\n[2026-09-03T21:36:12.438Z] [arbiter] The Arbiter nods. \"Patched in: Coiled Snare Thread \u2192 Patched Cloth, 3\u00d7 Spider Silk \u2192 Patched Cloth.\"\n",
+      "[2026-09-03T21:36:12.456Z] [world] You repair the Reclaimer's Salvage Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n[2026-09-03T21:36:12.506Z] [arbiter] The Arbiter nods. \"Patched in: 4\u00d7 Spider Silk \u2192 Patched Cloth.\"\n[2026-09-03T21:36:12.518Z] [world] You repair the Reclaimer's Salvage Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n",
+      "[2026-09-03T21:36:12.558Z] [arbiter] The Arbiter nods. \"Patched in: Spider Silk \u2192 Patched Cloth, 3\u00d7 Cloth Scrap \u2192 Patched Cloth.\"\n[2026-09-03T21:36:12.570Z] [world] You repair the Reclaimer's Salvage Vest. Back to full. (spent: Scrap Metal x4, Patched Cloth x4)\n[2026-09-03T21:36:17.539Z] [player] craft Forager's Stew\n",
+      "[2026-09-03T21:36:17.540Z] [debug] parser: intent=craft conf=1.00 verb=craft target=forager stew resolved=- range=- enemies=0 hooks=2\n[2026-09-03T21:36:17.549Z] [reward] \u2726 Crafted Forager's Stew. The Arbiter watches you set the last piece.\n[2026-09-03T21:36:17.550Z] [debug] arbiter: template (reason=intent-not-allowed:craft)\n",
+      "[2026-09-03T21:36:17.550Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T21:36:17.641Z] [cognitive] neutral  (90ms)\n[2026-09-03T21:36:25.737Z] [player] craft Poison Vial\n[2026-09-03T21:36:25.738Z] [debug] parser: intent=craft conf=1.00 verb=craft target=poison vial resolved=- range=- enemies=0 hooks=2\n",
+      "[2026-09-03T21:36:25.739Z] [reward] \u2726 Crafted Poison Vial. The Arbiter watches you set the last piece.\n[2026-09-03T21:36:25.740Z] [debug] arbiter: template (reason=intent-not-allowed:craft)\n[2026-09-03T21:36:25.740Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T21:36:25.836Z] [cognitive] USE_ITEM  (94ms)\n[2026-09-03T21:36:27.610Z] [player] craft Searing Paste\n",
+      "[2026-09-03T21:36:27.610Z] [debug] parser: intent=craft conf=1.00 verb=craft target=searing paste resolved=Searing Paste range=- enemies=0 hooks=2\n[2026-09-03T21:36:27.613Z] [reward] \u2726 Crafted Searing Paste. The Arbiter watches you set the last piece.\n[2026-09-03T21:36:27.755Z] [cognitive] neutral  (140ms)\n[2026-09-03T21:36:37.139Z] [player] craft Acid Flask\n",
+      "[2026-09-03T21:36:37.140Z] [debug] parser: intent=craft conf=1.00 verb=craft target=acid flask resolved=Acid Flask range=- enemies=0 hooks=2\n[2026-09-03T21:36:37.466Z] [reward] \u2726 Crafted Acid Flask \u00d710. The Arbiter watches you set the last piece.\n[2026-09-03T21:36:37.539Z] [cognitive] neutral  (71ms)\n[2026-09-03T21:36:40.667Z] [player] craft Incendiary Paste\n",
+      "[2026-09-03T21:36:40.668Z] [debug] parser: intent=craft conf=1.00 verb=craft target=incendiary paste resolved=Incendiary Paste range=- enemies=0 hooks=2\n[2026-09-03T21:36:40.919Z] [reward] \u2726 Crafted Incendiary Paste \u00d78. The Arbiter watches you set the last piece.\n[2026-09-03T21:36:41.005Z] [cognitive] neutral  (84ms)\n",
+      "[2026-09-03T21:36:41.123Z] [debug] persist sizes(KB): total=330 player=84 wm=156[rooms=85 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=85 scene=4\n[2026-09-03T21:36:48.437Z] [debug] homework: intro-fill armed after 6000ms idle (strike 2/3)\n[2026-09-03T21:36:55.955Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 7510ms read 6876ms/write 595ms in 727t\u2192out 17t 9.5ms/t (73ch)\n",
+      "[2026-09-03T21:36:55.971Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 7510ms \u2014 intro-fill:\u2205\n[2026-09-03T21:36:55.972Z] [debug] homework: scene_intro \"Mud Flood Nexus\" \u2205 7537ms\n[2026-09-03T21:37:19.866Z] [debug] appstate: active \u2192 background (was active for 316280ms)\n[2026-09-03T"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-04-1657-the-healing-pouch #mtm6enrfz3iy [inline 26/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtm6enrfz3iy"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1657-the-healing-pouch"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "26"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1657-the-healing-pouch"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T01:02:15.817796Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "11": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 349,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T01:02:17.220000Z",
+  "fingerprints": [
+    "b8836b9cdc04ed394ec6ffc5df292ab3"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1954353365,
+    "commitCount": 3,
+    "data": {},
+    "dateCreated": "2026-09-04T00:59:26.615127Z",
+    "dateReleased": "2026-09-04T01:00:59.146953Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "32f104d12f8d1c1459be026d4060eb5e1c4a9a36",
+      "message": "[ota-hal] OTA-1657: the healing pouch, and three racks that fold\n\nOwner: \"battle gets slowed down when you have to heal. let's make it available\nfrom the exploration screen. let's make another bandolier and call it the healing\npouch or something. and we can load it with any three healing items they want so\nin an out 5 trauma kits, say 3 trail rations and maybe 10 blueberries in it. and\nwe open it like a bandolier during combat and can use the preloaded heals from\nthere. and when you use it, it acts like they do when being used from inventory.\"\n\nAnd, a moment later: \"when you are in inventory let's make the bandolier, tool\npouch and healing pouch collapsable like inventory categories to save space.\"\n\n\u26a0 THREE POCKETS, AND A POCKET IS A STACK. That distinction is the whole feature\nand it is why his exact load-out fits in three: a racked id points at an\ninventory STACK, so \"Blueberries \u00d710\" is ONE pocket you can tap ten times, not\nten pockets. It is the same storage contract the bandolier has had since arb110 \u2014\nthe items never leave `player.inventory`, the rack only records WHICH STACKS are\nwithin reach \u2014 so nothing is duplicated, nothing can be lost by racking, and a\nstack spent by any other path simply stops resolving instead of holding a pocket\nhostage as a ghost (OTA-1005's lesson from the tool pouch, applied up front).\n\n\u26a0\u26a0 THE TAP CALLS `useInventoryItem`, AND THAT IS THE POINT. He said it should act\n\"like they do when being used from inventory\" \u2014 so it is not \"like\", it is the\nSAME action the pack's USE button fires. The heal, the stamina, the cure, the\nstack decrement, the Arbiter's line and every downstream hook stay one\nimplementation. A second copy of \"what eating a Trauma Kit does\" is precisely the\nclass of drift the last three OTAs have been spent removing.\n\n\u26a0 AND ELIGIBILITY DELEGATES RATHER THAN DECIDING. `consumableDoesSomething`\nalready answers \"does this mend, restore, cleanse or cure?\", and it exists\nbecause a pure antivenom (healHP 0, cure yes) was once accepted by the combat bar\nand refused by the inventory screen. Restating \"what is a heal\" in a third place\nwould have rebuilt that split. All three items he named pass it \u2014 Trauma Kit\n(45 HP + cure bleed), Trail Rations (6 + 3), Blueberries (4 + 1) \u2014 and a pure\nstat buff does not. The effect is read from the CATALOG, not the instance, so an\nold saved kit racks exactly like a fresh one (the OTA-997 bug on the bandolier).\n\n\u26a0 THE \u271a heals BUTTON IS ON BOTH ROWS and its popup is NOT gated on combat, which\nis the half he asked for by name. The bandolier stays combat-only because a throw\nneeds something to throw at; a heal is exactly as useful on the walk home, and\nthe walk home is when you actually patch up. Green where the bandolier is orange:\none rack throws things away from you, one puts you back together, and mid-fight\nnobody should have to read the label to know which popup opened.\n\n\u26a0\u26a0 ALL THREE RACKS NOW FOLD, THROUGH ONE `RackFrame`. Three banners above the\npack cost real screen on a phone and the healing pouch has just made it three, so\nthey collapse \u2014 but through ONE shared frame rather than three copies of a\nchevron, and in the SAME \u25b8/\u25be grammar arb108 gave the inventory categories, so a\nplayer who has learned to fold a category learns nothing new to fold a rack.\n\n  \u2022 \u26a0 THE COUNT STAYS ON THE HEADER WHEN FOLDED (\"2/3 loaded\"), which is what\n    makes folding safe: the space saved costs no information he was reading the\n    banner for. A rack you must unfold to trust is a rack you stop folding.\n  \u2022 Defaults OPEN, unlike categories, which default closed. A category is one of\n    a dozen above a long pack; a rack is one of three whose whole job is to be\n    glanceable. Folding is something he does, not a state he inherits.\n  \u2022 All THREE fill modes are now mutually exclusive \u2014 two armed tap modes at once\n    is a coin flip over which rack receives the item.\n\n\u26a0 THE CHEVRON GATE CAUGHT THIS AND WAS RIGHT TO. `RackFrame`'s prop is `open`, so\ntrue means OPEN \u2014 the OPPOSITE polarity to the category headers a few hundred\nlines above it in the same file, which is exactly the collision check:chevrons\nwas written for. Registered rather than worked around.\n\n\u26a0 TWO SUITES WENT RED ON THE FIRST FULL RUN, BOTH FOR THE SAME REASON: ota1097\nand ota1100 each hand-typed the TWO-flag fill-mode guard into a string, so making\nit three broke tests about fusion-select and the group gesture. Their actual claim\nis \"a rack fill mode beats this gesture\", however many racks exist \u2014 both now\nassert that over EVERY known fill flag instead of pinning the arity, so the fourth\nrack will not break them.\n\nGates: all 18 green by exit code. Full suite green \u2014 1120 suites, 11,604 tests.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T00:57:14Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1657-the-healing-pouch",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1657-the-healing-pouch",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T01:00:59.146953Z",
+          "dateCreated": "2026-09-04T00:59:26.615127Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155389086",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T01:00:59.447835Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1657-the-healing-pouch",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1657-the-healing-pouch",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1657-the-healing-pouch",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1657-the-healing-pouch)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "e0ff22d08b5a4c49a160e8849f2e008c",
+  "previousEventID": "d5b604dcc76446509bf2425956a6c8a6"
+}

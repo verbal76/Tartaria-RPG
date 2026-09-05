@@ -1,0 +1,233 @@
+{
+  "id": "8dd9edfeebbc49ac822e84bb2922b745",
+  "groupID": "7709732459",
+  "eventID": "8dd9edfeebbc49ac822e84bb2922b745",
+  "projectID": "4511945117532160",
+  "size": 3051,
+  "entries": [
+    {
+      "data": {
+        "formatted": "Process died with no orderly exit while: tap \"inventory\""
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-03-1642-every-drop-has-a-name-in-the-book",
+  "message": "Process died with no orderly exit while: tap \"inventory\"",
+  "title": "Process died with no orderly exit while: tap \"inventory\"",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "623fc14c3f634bdd98d2130db9530d16",
+      "span_id": "9bc5f01fafc21928",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "id": "1788437412789_native-death",
+    "lastAction": "tap \"inventory\"",
+    "lastRoom": "mud_flood_nexus",
+    "lastScreen": "exploration",
+    "sinceBootMs": 12819,
+    "stack": "(none \u2014 the process died without one)"
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "Process died with no orderly exit while: tap \"inventory\""
+  },
+  "tags": [
+    {
+      "key": "build",
+      "value": "2026-09-03-1642-every-drop-has-a-name-in-the-book"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-03-1642-every-drop-has-a-name-in-the-book"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "native-death"
+    },
+    {
+      "key": "level",
+      "value": "fatal"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-03-1642-every-drop-has-a-name-in-the-book"
+    },
+    {
+      "key": "stage",
+      "value": "mid-action"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    },
+    {
+      "key": "version",
+      "value": "4.32.11"
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-03T14:32:51.741329Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-03T12:10:12.789000Z",
+  "fingerprints": [
+    "7c380e83d7521cac43645921c2703ea5"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1952890889,
+    "commitCount": 20,
+    "data": {},
+    "dateCreated": "2026-09-03T12:10:00.204000Z",
+    "dateReleased": "2026-09-03T14:02:00.424207Z",
+    "deployCount": 1,
+    "ref": null,
+    "lastCommit": {
+      "id": "1fc5ac79d97859fb19c740742255089af058654c",
+      "message": "golem republish of OTA-1642 to exercise the Sentry release step (task #109)\n\nSame bundle as c72cdbec \u2014 no app change, one note beside the stamp. The\nActions dispatch is not reachable from this session (403 on the dispatch\nendpoint), and the new Sentry step only runs inside a publish, so this\nmarkerless golem push is the measurement: the run log will say whether\nSENTRY_READ_TOKEN already carries project:releases or a SENTRY_AUTH_TOKEN\nsecret is needed.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-03T13:59:43Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-03-1642-every-drop-has-a-name-in-the-book",
+          "shortVersion": "tartaria@4.32.11+2026-09-03-1642-every-drop-has-a-name-in-the-book",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-03T14:02:00.424207Z",
+          "dateCreated": "2026-09-03T12:10:00.204000Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155183521",
+      "environment": "golem",
+      "dateStarted": null,
+      "dateFinished": "2026-09-03T14:02:00.682876Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-03-1642-every-drop-has-a-name-in-the-book",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-03-1642-every-drop-has-a-name-in-the-book",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-03-1642-every-drop-has-a-name-in-the-book",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-03-1642-every-drop-has-a-name-in-the-book)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": null
+}

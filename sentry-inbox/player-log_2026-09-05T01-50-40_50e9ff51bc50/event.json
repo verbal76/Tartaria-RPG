@@ -1,0 +1,297 @@
+{
+  "id": "50e9ff51bc504d3eabdfcac0ccfbe228",
+  "groupID": "7712990664",
+  "eventID": "50e9ff51bc504d3eabdfcac0ccfbe228",
+  "projectID": "4511945117532160",
+  "size": 19269,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-05-1678-the-chase-gets-harder #mtnq7iawibjn [inline 23/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-05-1678-the-chase-gets-harder",
+  "message": "player-log 2026-09-05-1678-the-chase-gets-harder #mtnq7iawibjn [inline 23/28]",
+  "title": "player-log 2026-09-05-1678-the-chase-gets-harder #mtnq7iawibjn [inline 23/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "5317154d72ee413daa482178f24ea919",
+      "span_id": "8ea1b0d798dc1664",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "ciA0IHNocnVncyBvZmYgdGhlIGFldGhlcmljLiAocmVzaXN0ZWQsIMOXMC41IGZvciAxNCkKWzIwMjYtMDktMDVUMDE6MjQ6MDQuNjc2Wl0gW2FyYml0ZXJdIFRoZSBBcmJpdGVyIHdhdGNoZXMgdGhlIGFldGhlcmljIHNraWQgb2ZmLiAiU3dhcCB0byB0aGUgR2lhbnQtV2F0Y2ggR3JlYXRzcGVhciDigJQgcGllcmNpbmcgd2lsbCBiaXRlIHdoZXJlIGFldGhlcmljIHdvbid0LiIKWzIwMjYtMDktMDVUMDE6MjQ6MDQuNjc3Wl0gW2RlYnVnXSBkZWR1cDogc3VwcHJlc3NlZCBhcmJpdGVyIHJlcGVhdCDigJQgIlRoZSBBcmJpdGVyIHdhdGNoZXMgdGhlIGFldGhlcmljIHNraWQgb2ZmLiAiU3dhcCB0byB0aGUgR2lhbuKApiIK",
+      "WzIwMjYtMDktMDVUMDE6MjQ6MDQuNjc3Wl0gW2RlYnVnXSB3ZWFyIHdhcmQ6IEF1cmFsaXRlIFRhbG9uIGtlZXBzIGl0cyBwb2ludCAoMTUlKQpbMjAyNi0wOS0wNVQwMToyNDowNC42NzdaXSBbY29tYmF0XSBZb3VyIGJsb3cgd2l0aCB0aGUgYWNpZC1ldGNoZWQgY29ycnVwdGVkIGF1cmFsaXRlIHRhbG9uIGxhbmRzIGNsZWFuIOKAlCAxNCBkYW1hZ2UuIENvbnNwaXJhY3kgQXJjaGl0ZWN0cyBSYWlkZXIgNCBjcnVtcGxlcyBpbiB0aGUgZHVzdC4gVGhlIEFldGhlcnN0b25lIHNldHRsZXMuClsyMDI2LTA5LTA1VDAxOjI0OjA0LjY3OFpdIFtyZXdhcmRdIENvbnNwaXJhY3kgQXJjaGl0ZWN0cyBSYWlkZXIgNCBkZWZlYXRlZC4gWW91IHJlY292ZXIgUGF0Y2hlZCBDbG90aCDDlzIuCg==",
+      "WzIwMjYtMDktMDVUMDE6MjQ6MDQuNjc4Wl0gW3Jld2FyZF0gWW91IHN0cmlwIHRoZSBib2R5OiBCb25lIEtuaWZlLCBNdWQtQm91bmQgQ2xvYWsgKCs2IFRDKS4gVGhlIGtpdCB0b29rIHRoZSBmaWdodCBiYWRseS4KWzIwMjYtMDktMDVUMDE6MjQ6MDQuNjc4Wl0gW2NvbWJhdF0gMSBhdHRhY2tlciByZW1haW5zLiBDb25zcGlyYWN5IEFyY2hpdGVjdHMgUmFpZGVyIDUgbm93IGluIHlvdXIgc2lnaHRzLgpbMjAyNi0wOS0wNVQwMToyNDowNC42NzlaXSBbcmV3YXJkXSArMTIgVEMgcHJpZWQgZnJvbSB0aGUgZHVzdC4K",
+      "WzIwMjYtMDktMDVUMDE6MjQ6MDQuNzQ0Wl0gW2RlYnVnXSBhYy1zaGlmdCAyNuKGkjIzOiByYWNlL2Jhc2UgMTEgKyBnZWFyIDE4ICsgdGl0bGUgMCDihpIgdHJpbW1lZCAyMyArIHN0YXR1cyAwIHwgd29ybjogaGVhZD1BcmNoaXRlY3QncyBTaWdodCBFbmhhbmNlciBjaGVzdD1NdWQtZ2xhc3MgU2NhbGVzIGhhbmRzPVRpdGFuJ3MgR2F1bnRsZXRzIGxlZ3M9TGl0YW55IEdyZWF2ZXMgZmVldD1BZXRoZXItV2Fsa2VyJ3MgQm9vdHMgY2xvYWs9UmVjbGFpbWVyJ3MgQ2xvYWsKWzIwMjYtMDktMDVUMDE6MjQ6MDQuNzQ0Wl0gW2NvbWJhdF0gQ29uc3BpcmFjeSBBcmNoaXRlY3RzIFJhaWRlciA1IOKAlCBkMjAg4oaSIDE3ICsgQVRLIDggPSAyNSB2cyB5b3VyIEFDIDIzIOKAlCDinJMgSElUCg==",
+      "WzIwMjYtMDktMDVUMDE6MjQ6MDQuNzQ1Wl0gW2NvbWJhdF0gWW91ciBhcm1vdXIgdHVybnMgdGhlIGJsb3cgYmFjayDigJQgQ29uc3BpcmFjeSBBcmNoaXRlY3RzIFJhaWRlciA1IHRha2VzIDEgYmx1ZGdlb25pbmcuICgxMiBIUCBsZWZ0KQpbMjAyNi0wOS0wNVQwMToyNDowNS4xMjhaXSBbY29tYmF0XSBDb25zcGlyYWN5IEFyY2hpdGVjdHMgUmFpZGVyIDUgZGVhbHMgNiBibHVkZ2VvbmluZyBkYW1hZ2UuIFlvdSBoYXZlIDM0IEhQIHJlbWFpbmluZy4KWzIwMjYtMDktMDVUMDE6MjQ6MDguNTA0Wl0gW2RlYnVnXSB1aTogdGFwICLimpfimKMgYXVyYWxpdGUgdGFsb24g4pymIgpbMjAyNi0wOS0wNVQwMToyNDowOC41NTRaXSBbcGxheWVyXSBhdHRhY2sgd2l0aCB0aGUgYXVyYWxpdGUgdGFsb24K",
+      "WzIwMjYtMDktMDVUMDE6MjQ6MDguNTU1Wl0gW2RlYnVnXSBwYXJzZXI6IGludGVudD1hdHRhY2sgY29uZj0xLjAwIHZlcmI9YXR0YWNrIHRhcmdldD1hdXJhbGl0ZSB0YWxvbiByZXNvbHZlZD1BdXJhbGl0ZSBUYWxvbiByYW5nZT1jbG9zZSBlbmVtaWVzPTEgaG9va3M9MQpbMjAyNi0wOS0wNVQwMToyNDowOC41NTdaXSBbZGVidWddIGF0dGFjazogdGFyZ2V0PUNvbnNwaXJhY3kgQXJjaGl0ZWN0cyBSYWlkZXIgNSByYW5nZT1jbG9zZSByZWFjaC5iYW5kcz1bY2xvc2VdIHJlYWNoLmxhYmVsPUF1cmFsaXRlIFRhbG9uIGJhcmVIYW5kPWZhbHNlCg==",
+      "WzIwMjYtMDktMDVUMDE6MjQ6MDguNjUxWl0gW3dvcmxkXSBZb3VyIGFjaWQtZXRjaGVkIGNvcnJ1cHRlZCBhdXJhbGl0ZSB0YWxvbiBjb21lcyBhcm91bmQgaW4gYW4gYXJjOyBDb25zcGlyYWN5IEFyY2hpdGVjdHMgUmFpZGVyIDUgc3F1YXJlcyB1cCB0byBtZWV0IGl0LgpbMjAyNi0wOS0wNVQwMToyNDowOC42NTFaXSBbc3lzdGVtXSDij7MgVGltZSBwYXNzZWQ6IDYgbWluClsyMDI2LTA5LTA1VDAxOjI0OjA4Ljk5OVpdIFtjb2duaXRpdmVdIEFHR1JFU1NJT04gwrcgQVRUQUNLIMK3IFVTRV9JVEVNIMK3IERJU0VOR0FHRSDCtyBUQUtFX0NPVkVSIMK3IEhJREUgICgzNDdtcykK",
+      "WzIwMjYtMDktMDVUMDE6MjQ6MTcuNjc2Wl0gW3dvcmxkXSBZb3Ugc2VpemUgdGhlIGluaXRpYXRpdmUuIENvbnNwaXJhY3kgQXJjaGl0ZWN0cyBSYWlkZXIgNSBoYXMgbm8gdGltZSB0byByZWFjdC4KWzIwMjYtMDktMDVUMDE6MjQ6MTcuNjc3Wl0gW2NvbWJhdF0gWW91IOKAlCBkMjAg4oaSIDEyICsgSU5UIDE1ID0gMjcgdnMgQ29uc3BpcmFjeSBBcmNoaXRlY3RzIFJhaWRlciA1IEFDIDEyIOKAlCDinJMgSElUClsyMDI2LTA5LTA1VDAxOjI0OjE3LjY3OFpdIFtjb21iYXRdIEFldGhlcmljIGZsYXJlcyDigJQgKzEgb24gaGl0Lgo=",
+      "WzIwMjYtMDktMDVUMDE6MjQ6MTcuNjc4Wl0gW2NvbWJhdF0gQ29uc3BpcmFjeSBBcmNoaXRlY3RzIFJhaWRlciA1IHNocnVncyBvZmYgdGhlIGFldGhlcmljLiAocmVzaXN0ZWQsIMOXMC41IGZvciA5KQpbMjAyNi0wOS0wNVQwMToyNDoxNy42ODJaXSBbYXJiaXRlcl0gVGhlIEFyYml0ZXIgd2F0Y2hlcyB0aGUgYWV0aGVyaWMgc2tpZCBvZmYuICJTd2FwIHRvIHRoZSBDb21wYWN0IEJsYXN0ZXIg4oCUIGJ1cm4gd2lsbCBiaXRlIHdoZXJlIGFldGhlcmljIHdvbid0LiIKWzIwMjYtMDktMDVUMDE6MjQ6MTcuNjgyWl0gW2RlYnVnXSBkZWR1cDogc3VwcHJlc3NlZCBhcmJpdGVyIHJlcGVhdCDigJQgIlRoZSBBcmJpdGVyIHdhdGNoZXMgdGhlIGFldGhlcmljIHNraWQgb2ZmLiAiU3dhcCB0byB0aGUgQ29tcOKApiIK",
+      "WzIwMjYtMDktMDVUMDE6MjQ6MTcuNjgzWl0gW2NvbWJhdF0gVGhlIGJsb3cgd2l0aCB0aGUgYWNpZC1ldGNoZWQgY29ycnVwdGVkIGF1cmFsaXRlIHRhbG9uIGZpbmRzIHB1cmNoYXNlIOKAlCA5IGRhbWFnZSwgMyBIUCBzdGFuZGluZy4gQ29uc3BpcmFjeSBBcmNoaXRlY3RzIFJhaWRlciA1IGNvbW1pdHMgdG8gdGhlIGNvdW50ZXIuClsyMDI2LTA5LTA1VDAxOjI0OjE3LjY4M1pdIFtjb21iYXRdIEFjaWQtRXRjaGVkIENvcnJ1cHRlZCBBdXJhbGl0ZSBUYWxvbiDigJQgMiBhY2lkIGJpdGVzIGluIGFuZCBmZXN0ZXJzICgzIHR1cm5zKS4gSXRzIGd1YXJkIHBpdHMgYW5kIGhpc3NlcyDigJQgZWFzaWVyIHRvIGhpdCBub3cgKOKIkjEgQUMsIDEgdG90YWwpLgo=",
+      "WzIwMjYtMDktMDVUMDE6MjQ6MTcuNjg0Wl0gW2NvbWJhdF0gQWNpZC1FdGNoZWQgQ29ycnVwdGVkIEF1cmFsaXRlIFRhbG9uIOKAlCAyIGNvcnJ1cHRpb24gYml0ZXMgaW4gYW5kIGZlc3RlcnMgKDMgdHVybnMpLiBUaGUgcm90IGRlZXBlbnMgKDEgc3RhY2spLgpbMjAyNi0wOS0wNVQwMToyNDoxNy42ODRaXSBbY29tYmF0XSBDb25zcGlyYWN5IEFyY2hpdGVjdHMgUmFpZGVyIDUgaXMgbGVmdCBleHBvc2VkIOKAlCBlYXNpZXIgdG8gaGl0LgpbMjAyNi0wOS0wNVQwMToyNDoxNy42ODdaXSBbY29tYmF0XSBDb25zcGlyYWN5IEFyY2hpdGVjdHMgUmFpZGVyIDUg4oCUIGQyMCDihpIgMTEgKyBBVEsgOCA9IDE5IHZzIHlvdXIgQUMgMjMg4oCUIOKclyBNSVNTCg==",
+      "WzIwMjYtMDktMDVUMDE6MjQ6MTguMTg2Wl0gW2RlYnVnXSBwZXJzaXN0IHNpemVzKEtCKTogdG90YWw9MzUwIHBsYXllcj04MCB3bT0xODFbcm9vbXM9MTAzIGV2ZW50cz03IG1lbW9zPTEgbnBjcz02IGRlZmVhdGVkPTEgdGFncz0xIGRpc2NvdmVyZWQ9MV0gbG9nPTg0IHNjZW5lPTUKWzIwMjYtMDktMDVUMDE6MjQ6MjAuMTc0Wl0gW2RlYnVnXSB1aTogdGFwICJwdW5jaCIKWzIwMjYtMDktMDVUMDE6MjQ6MjAuMTg4Wl0gW3BsYXllcl0gcHVuY2gKWzIwMjYtMDktMDVUMDE6MjQ6MjAuMTg4Wl0gW2RlYnVnXSBwYXJzZXI6IGludGVudD1hdHRhY2sgY29uZj0xLjAwIHZlcmI9cHVuY2ggdGFyZ2V0PS0gcmVzb2x2ZWQ9LSByYW5nZT1jbG9zZSBlbmVtaWVzPTEgaG9va3M9MQo=",
+      "WzIwMjYtMDktMDVUMDE6MjQ6MjAuMTg5Wl0gW2NvbWJhdF0gQ29uc3BpcmFjeSBBcmNoaXRlY3RzIFJhaWRlciA1IHNtb2tlcyDigJQgYWNpZCBlYXRzIDIuICgxLzE5IEhQLCAyIHR1cm5zIGxlZnQpClsyMDI2LTA5LTA1VDAxOjI0OjIwLjE5MFpdIFtjb21iYXRdIENvbnNwaXJhY3kgQXJjaGl0ZWN0cyBSYWlkZXIgNSBibGFja2VucyDigJQgY29ycnVwdGlvbiBlYXRzIDIuICgwLzE5IEhQLCAyIHR1cm5zIGxlZnQpClsyMDI2LTA5LTA1VDAxOjI0OjIwLjE5MlpdIFtyZXdhcmRdIENvbnNwaXJhY3kgQXJjaGl0ZWN0cyBSYWlkZXIgNSBkZWZlYXRlZC4gWW91IHJlY292ZXIgU2NyYXAgTWV0YWwgw5czLgo=",
+      "WzIwMjYtMDktMDVUMDE6MjQ6MjAuMTk0Wl0gW3Jld2FyZF0gWW91IHN0cmlwIHRoZSBib2R5OiBDdWRnZWwsIFJlY2xhaW1lcidzIFNhbHZhZ2UgVmVzdCAoKzYgVEMpLiBUaGUga2l0IHRvb2sgdGhlIGZpZ2h0IGJhZGx5LgpbMjAyNi0wOS0wNVQwMToyNDoyMC4xOTVaXSBbcmV3YXJkXSArMTYgVEMgcHJpZWQgZnJvbSB0aGUgZHVzdC4KWzIwMjYtMDktMDVUMDE6MjQ6MjUuNDYwWl0gW2RlYnVnXSB1aTogdGFwICLihpIgVk9ST05PViIKWzIwMjYtMDktMDVUMDE6MjQ6MjUuNDg1Wl0gW3dvcmxkXSBZb3Ugd2FsayBzb3V0aCB0aHJvdWdoIG9wZW4gc2lsdC4gVGhlIGNvbXBhc3MgcG9pbnRzIHNvdXRoIGludG8gb3BlbiBncm91bmQuCg==",
+      "WzIwMjYtMDktMDVUMDE6MjQ6MjUuNDg2Wl0gW3dvcmxkXSBZb3UgY2F0Y2ggeW91cnNlbGYgY2hlY2tpbmcsIHRoZSB3YXkgeW91IGNoZWNrIGEgcG9ja2V0IHlvdSBhbHJlYWR5IGtub3cgaXMgZW1wdHkuClsyMDI2LTA5LTA1VDAxOjI0OjI2Ljc2MFpdIFtkZWJ1Z10gdWk6IHRhcCAidGFrZSAvIHNhbHZhZ2UiClsyMDI2LTA5LTA1VDAxOjI0OjI4LjAzNFpdIFt3b3JsZF0gWW91IGNyb3VjaCwgdGFrZSB0aGUgU2NyYXAgTWV0YWwsIGFuZCBhcmUgbW92aW5nIGFnYWluIGJlZm9yZSB5b3UgaGF2ZSBzdHJhaWdodGVuZWQgdXAuClsyMDI2LTA5LTA1VDAxOjI0OjI4LjAzNVpdIFtyZXdhcmRdIOKcpiBTY3JhcCBNZXRhbCAoQ29tbW9uKS4K",
+      "WzIwMjYtMDktMDVUMDE6MjQ6MjkuMDc2Wl0gW3dvcmxkXSBZb3Ugc3RyaXAgdGhlIHJlbGF5IHdpcmUgY2FyZWZ1bGx5LiBTb21ldGhpbmcgdXNhYmxlIGNvbWVzIGZyZWUgaW4geW91ciBoYW5kLgpbMjAyNi0wOS0wNVQwMToyNDoyOS4wNzZaXSBbd29ybGRdIFlvdSB3b3JrIHRoZSByaWZsZSBvdmVyLiBBIHBhcnQgb2YgaXQgY29tZXMgbG9vc2UsIGludGFjdC4KWzIwMjYtMDktMDVUMDE6MjQ6MjkuMDc3Wl0gW3dvcmxkXSBZb3UgYnJlYWsgdGhlIHN1cHBseSBzaGVsZiBhcGFydC4gQW1vbmcgdGhlIHBpZWNlcywgc29tZXRoaW5nIHdvcnRoIGtlZXBpbmcuCg==",
+      "WzIwMjYtMDktMDVUMDE6MjQ6MjkuMDc3Wl0gW3dvcmxkXSBZb3Ugc3RyaXAgdGhlIHdhdGVybG9nZ2VkIGNoZXN0IGNhcmVmdWxseS4gU29tZXRoaW5nIHVzYWJsZSBjb21lcyBmcmVlIGluIHlvdXIgaGFuZC4KWzIwMjYtMDktMDVUMDE6MjQ6MjkuMDc3Wl0gW3dvcmxkXSBBbHJlYWR5IHdvcmtlZCBvdmVyOiBydXN0ZWQgcmlmbGUuClsyMDI2LTA5LTA1VDAxOjI0OjI5LjA3OFpdIFtyZXdhcmRdIOKcpiBTYWx2YWdlIGhhdWw6ClsyMDI2LTA5LTA1VDAxOjI0OjI5LjA3OFpdIFtyZXdhcmRdICAgICDigKIgQWV0aGVyIENyeXN0YWwgeDIgKENvbW1vbikKWzIwMjYtMDktMDVUMDE6MjQ6MjkuMDc5Wl0gW3Jld2FyZF0gICAgIOKAoiBBZXRoZXIgRHVzdCB4MiAoQ29tbW9uKQo=",
+      "WzIwMjYtMDktMDVUMDE6MjQ6MjkuMDc5Wl0gW3Jld2FyZF0gICAgIOKAoiBXb3JuIFRhcnRhcmlhbiBDb2luIHgzIChDb21tb24pClsyMDI2LTA5LTA1VDAxOjI0OjMwLjc1OVpdIFtkZWJ1Z10gdWk6IHRhcCAiaW52ZXN0aWdhdGUiClsyMDI2LTA5LTA1VDAxOjI0OjMyLjU1N1pdIFtwbGF5ZXJdIGludmVzdGlnYXRlIHRoZSBncm91bmQKWzIwMjYtMDktMDVUMDE6MjQ6MzIuNTU3Wl0gW2RlYnVnXSBwYXJzZXI6IGludGVudD1pbnZlc3RpZ2F0ZSBjb25mPTEuMDAgdmVyYj1pbnZlc3RpZ2F0ZSB0YXJnZXQ9Z3JvdW5kIHJlc29sdmVkPS0gcmFuZ2U9LSBlbmVtaWVzPTAgaG9va3M9MQo=",
+      "WzIwMjYtMDktMDVUMDE6MjQ6MzIuNTYwWl0gW3dvcmxkXSBZb3Ugc2NyYXBlIGF0IHRoZSBzaWx0IHdpdGggdGhlIHNlbnRpbmVsIGNsZWF2ZXIuIE5vdGhpbmcgb2Ygd29ydGguClsyMDI2LTA5LTA1VDAxOjI0OjMyLjU3MVpdIFtkZWJ1Z10gYXJiaXRlcjogdGVtcGxhdGUgKHJlYXNvbj1xd2VuLW5vdC1yZWFkeSkKWzIwMjYtMDktMDVUMDE6MjQ6MzIuNTcxWl0gW2FyYml0ZXJdIFRoZSBBcmJpdGVyIGxvb2tzIGFyb3VuZC4gIkRyYWtvdmEncyBnYXRlcyBhcmUgaW50YWN0LiBUaGV5IGhhdmUgbm90IGJlZW4gb3BlbmVkIHNpbmNlIHRoZSBtdWQgYXJyaXZlZC4gVGhleSBhcmUgbm90IGxvY2tlZC4iCg==",
+      "WzIwMjYtMDktMDVUMDE6MjQ6MzIuNTcxWl0gW2RlYnVnXSBhcmJpdGVyOiBhbWJpZW50IGhlbGQgKGhlIGp1c3Qgc3Bva2UpClsyMDI2LTA5LTA1VDAxOjI0OjMyLjU3MVpdIFtzeXN0ZW1dIOKPsyBUaW1lIHBhc3NlZDogMjQgbWluClsyMDI2LTA5LTA1VDAxOjI0OjMyLjgwMVpdIFtjb2duaXRpdmVdIENMSU1CICAoMjI5bXMpClsyMDI2LTA5LTA1VDAxOjI0OjMzLjgzMVpdIFtwbGF5ZXJdIGludmVzdGlnYXRlIGluc2NyaXB0aW9uClsyMDI2LTA5LTA1VDAxOjI0OjMzLjgzMVpdIFtkZWJ1Z10gcGFyc2VyOiBpbnRlbnQ9aW52ZXN0aWdhdGUgY29uZj0xLjAwIHZlcmI9aW52ZXN0aWdhdGUgdGFyZ2V0PWluc2NyaXB0aW9uIHJlc29sdmVkPWluc2NyaXB0aW9uIHJhbmdlPS0gZW5lbWllcz0wIGhvb2tzPTEK",
+      "WzIwMjYtMDktMDVUMDE6MjQ6MzMuODM0Wl0gW3dvcmxkXSBUaGUgc2NyaXB0IGlzIGhhbGYtZmFkZWQuIE1vc3Qgb2YgaXQgaXMgYSBuYW1lLCBvciBhIGxpc3Qgb2YgbmFtZXMsIG9yIGEgZGVidCBubyBvbmUgcGFpZC4KWzIwMjYtMDktMDVUMDE6MjQ6MzQuMDcxWl0gW2NvZ25pdGl2ZV0gU0VBUkNIICAoMjM0bXMpClsyMDI2LTA5LTA1VDAxOjI0OjM2LjU2MVpdIFtkZWJ1Z10gdWk6IHRhcCAi4oaSIFZPUk9OT1YiClsyMDI2LTA5LTA1VDAxOjI0OjM2LjU4OVpdIFtkZWJ1Z10gc3Bhd246IGdlYXI9W0xpZ2h0Zm9vdCBEYXNoIFdhbmRdIHdpbmRvdz0xMCByb3N0ZXI9bmV3Cg==",
+      "WzIwMjYtMDktMDVUMDE6MjQ6MzYuNTkxWl0gW3dvcmxkXSBZb3Ugd2FsayB3ZXN0IHRocm91Z2ggb3BlbiBzaWx0LiBUaGUgY29tcGFzcyBwb2ludHMgd2VzdCBpbnRvIG9wZW4gZ3JvdW5kLgpbMjAyNi0wOS0wNVQwMToyNDozNi41OTFaXSBbd29ybGRdIFRoZSB0aG91Z2h0IHlvdSBzZXQgZG93biBoZXJlIGlzIHJpZ2h0IHdoZXJlIHlvdSBzZXQgaXQgZG93bi4KWzIwMjYtMDktMDVUMDE6MjQ6MzguMTYwWl0gW2RlYnVnXSB1aTogdGFwICJ0YWtlIC8gc2FsdmFnZSIKWzIwMjYtMDktMDVUMDE6MjQ6MzkuODQ1Wl0gW3dvcmxkXSBZb3Ugd29yayB0aGUgYnJva2VuIGdhdW50bGV0IG92ZXIuIEEgcGFydCBvZiBpdCBjb21lcyBsb29zZSwgaW50YWN0Lgo=",
+      "WzIwMjYtMDktMDVUMDE6MjQ6MzkuODQ1Wl0gW3dvcmxkXSBZb3UgYnJlYWsgdGhlIGNoYWluIGhvb2sgYXBhcnQuIEFtb25nIHRoZSBwaWVjZXMsIHNvbWV0aGluZyB3b3J0aCBrZWVwaW5nLgpbMjAyNi0wOS0wNVQwMToyNDozOS44NDVaXSBbd29ybGRdIFR1Y2tlZCBpbnNpZGUgdGhlIGNpc3Rlcm46IGFuIG9kZG1lbnQgdGhhdCBtYXRjaGVzIG5vIHF1YXJ0ZXJtYXN0ZXIncyBsaXN0LiBUaGUga2luZCBvZiB0aGluZyB0aGF0IGZ1c2VzIHdlbGwuClsyMDI2LTA5LTA1VDAxOjI0OjM5Ljg0NlpdIFt3b3JsZF0gWW91IHdvcmsgdGhlIGVtaXR0ZXIgb3Zlci4gQSBwYXJ0IG9mIGl0IGNvbWVzIGxvb3NlLCBpbnRhY3QuCg==",
+      "WzIwMjYtMDktMDVUMDE6MjQ6MzkuODQ2Wl0gW3dvcmxkXSBZb3UgYnJlYWsgdGhlIHJ1c3RlZCByaWZsZSBhcGFydC4gQW1vbmcgdGhlIHBpZWNlcywgc29tZXRoaW5nIHdvcnRoIGtlZXBpbmcuClsyMDI2LTA5LTA1VDAxOjI0OjM5Ljg0N1pdIFtyZXdhcmRdIOKcpiBTYWx2YWdlIGhhdWw6ClsyMDI2LTA5LTA1VDAxOjI0OjM5Ljg0N1pdIFtyZXdhcmRdICAgICDigKIgU2NyYXAgTWV0YWwgeDYgKENvbW1vbikKWzIwMjYtMDktMDVUMDE6MjQ6MzkuODQ3Wl0gW3Jld2FyZF0gICAgIOKAoiBUYXItQmxhY2sgTGFzaGluZyAoQ29tbW9uKQpbMjAyNi0wOS0wNVQwMToyNDozOS44NDhaXSBbcmV3YXJkXSAgICAg4oCiIEJlbnQgTmFpbCAoQ29tbW9uKQo=",
+      "WzIwMjYtMDktMDVUMDE6MjQ6NDEuMDgxWl0gW3dvcmxkXSBZb3UgZG8gbm90IHRoaW5rIGFib3V0IGl0LiBUaGUgTGlnaHRmb290IERhc2ggV2FuZCBpcyBzaW1wbHkgaW4geW91ciBoYW5kIG5vdy4KWzIwMjYtMDktMDVUMDE6MjQ6NDEuMDgyWl0gW3Jld2FyZF0g4pymIExpZ2h0Zm9vdCBEYXNoIFdhbmQgKENvbW1vbikuClsyMDI2LTA5LTA1VDAxOjI0OjQzLjMzOFpdIFtwbGF5ZXJdIGludmVzdGlnYXRlIHJ1YmJsZSBwaWxlClsyMDI2LTA5LTA1VDAxOjI0OjQzLjMzOVpdIFtkZWJ1Z10gcGFyc2VyOiBpbnRlbnQ9aW52ZXN0aWdhdGUgY29uZj0xLjAwIHZlcmI9aW52ZXN0aWdhdGUgdGFyZ2V0PXJ1YmJsZSBwaWxlIHJlc29sdmVkPXJ1YmJsZSBwaWxlIHJhbmdlPS0gZW5lbWllcz0wIGhvb2tzPTEK",
+      "WzIwMjYtMDktMDVUMDE6MjQ6NDMuMzM5Wl0gW2RlYnVnXSByb3V0ZTogaG9vayBpbnRlcmNlcHQgKGtpbmQ9Z2xpbnQsIHRhcmdldD0icnViYmxlIHBpbGUiKSDigJQgb3JpZ2luYWwgaW50ZW50PWludmVzdGlnYXRlClsyMDI2LTA5LTA1VDAxOjI0OjQzLjM0MFpdIFt3b3JsZF0g4piFIFNUT1JZIFRIUkVBRCAoc3RlcCAxKSDigJQgWW91IHBpY2sgdGhlIG1ldGFsIG91dCBvZiB0aGUgcnViYmxlLiBBIHBlbmRhbnQg4oCUIFRhcnRhcmlhbiBtYWtlLCBoYW1tZXJlZCB0aGluLCBldGNoZWQgd2l0aCBhIGZhY3Rpb24gY3Jlc3QuClsyMDI2LTA5LTA1VDAxOjI0OjQzLjM0MFpdIFtyZXdhcmRdIOKcpiBGb3Jnb3R0ZW4gT3JkZXIgU2lnaWwuCg==",
+      "WzIwMjYtMDktMDVUMDE6MjQ6NDQuNjMwWl0gW3dvcmxkXSDimIXimIUgU1RPUlkgVEhSRUFEIENPTVBMRVRFIOKAlCBZb3UgdHVybiB0aGUgcGVuZGFudCBvdmVyLiBXaG9ldmVyIHdvcmUgaXQgbGFzdCBibGVkIG91dCBjbHV0Y2hpbmcgaXQg4oCUIGEgZmFpbnQgcnVzdC1icm93biBsaW5lIHN0aWxsIHJ1bnMgYWxvbmcgdGhlIGluc2lkZSBvZiB0aGUgY2hhaW4uClsyMDI2LTA5LTA1VDAxOjI0OjQ0LjYzMVpdIFthcmJpdGVyXSAiVGhhdCBjcmVzdCBpcyB0aGUgRm9yZ290dGVuIE9yZGVyJ3MsIiB0aGUgQXJiaXRlciBzYXlzLiAiQ2FycnkgaXQgdG8gdGhlaXIgcGVvcGxlIGFuZCBsYXkgaXQgZG93bi4gVGhleSBob25vciB0aGUgb25lcyB3aG8gYnJpbmcgdGhlaXIgZGVhZCBob21lLiIK",
+      "WzIwMjYtMDktMDVUMDE6MjQ6NDcuNTEzWl0gW2RlYnVnXSB1aTogdGFwICJpbnZlc3RpZ2F0ZSIKWzIwMjYtMDktMDVUMDE6MjQ6NDkuMzQ1Wl0gW3BsYXllcl0gaW52ZXN0aWdhdGUgdGhlIGdyb3VuZApbMjAyNi0wOS0wNVQwMToyNDo0OS4zNDZaXSBbZGVidWddIHBhcnNlcjogaW50ZW50PWludmVzdGlnYXRlIGNvbmY9MS4wMCB2ZXJiPWludmVzdGlnYXRlIHRhcmdldD1ncm91bmQgcmVzb2x2ZWQ9LSByYW5nZT0tIGVuZW1pZXM9MCBob29rcz0xClsyMDI2LTA5LTA1VDAxOjI0OjQ5LjM1MVpdIFtyZXdhcmRdIFlvdSBzY3JhcGUgYXQgdGhlIHNpbHQgd2l0aCB0aGUgc2VudGluZWwgY2xlYXZlci4g4pymIFJlY292ZXJlZCBEcm9uZSBDb3JlIChVbmNvbW1vbikuCg==",
+      "WzIwMjYtMDktMDVUMDE6MjQ6NDkuMzYxWl0gW2RlYnVnXSBhcmJpdGVyOiB0ZW1wbGF0ZSAocmVhc29uPXF3ZW4tbm90LXJlYWR5KQpbMjAyNi0wOS0wNVQwMToyNDo0OS4zNjFaXSBbZGVidWddIGFyYml0ZXI6IGZsYXZvciBoZWxkIChidWRnZXQg4oCUIG9uZSBwZXIgdGlsZSwgMjVzIGFwYXJ0KQpbMjAyNi0wOS0wNVQwMToyNDo0OS4zNjFaXSBbZGVidWddIGFyYml0ZXI6IGFtYmllbnQgaGVsZCAoaGUganVzdCBzcG9rZSkKWzIwMjYtMDktMDVUMDE6MjQ6NDkuMzYyWl0gW3N5c3RlbV0g4o+zIFRpbWUgcGFzc2VkOiAyNCBtaW4K",
+      "WzIwMjYtMDktMDVUMDE6MjQ6NDkuMzYyWl0gW2FyYml0ZXJdICJUaGVyZSdzIGNvaW4gb24gdGhlIGJvYXJkIGZvciBhIHdpbGxpbmcgYmxhZGUsIiB0aGUgQXJiaXRlciBzYXlzLiAiUmVhZCB0aGUgV29ybGQuIgpbMjAyNi0wOS0wNVQwMToyNDo0OS42MDRaXSBbY29nbml0aXZlXSBDTElNQiAgKDI0MW1zKQpbMjAyNi0wOS0wNVQwMToyNDo0OS45MzNaXSBbZGVidWddIHBlcnNpc3Qgc2l6ZXMoS0IpOiB0b3RhbD0zNDkgcGxheWVyPTgxIHdtPTE4MVtyb29tcz0xMDMgZXZlbnRzPTcgbWVtb3M9MSBucGNzPTYgZGVmZWF0ZWQ9MSB0YWdzPTEgZGlzY292ZXJlZD0xXSBsb2c9ODMgc2NlbmU9NApbMjAyNi0wOS0wNVQwMToyNDo1My45MTVaXSBbZGVidWddIHVpOiB0YXAgIuKGkiBWT1JPTk9WIgo=",
+      "WzIwMjYtMDktMDVUMDE6MjQ6NTMuOTQxWl0gW2RlYnVnXSBzcGF3bjogZ2Vhcj1bUGxhc21hIFRocm93ZXJdIHdpbmRvdz0xMCByb3N0ZXI9bmV3ClsyMDI2LTA5LTA1VDAxOjI0OjUzLjk0MlpdIFt3b3JsZF0gWW91IHdhbGsgc291dGggdGhyb3VnaCBvcGVuIHNpbHQuIFRoZSBjb21wYXNzIHRlbGxzIHlvdSBUaGUgQ29uZHVpdCBMaW5lIGxpZXMgZnVydGhlciBzb3V0aCDigJQgMSB0aWxlLCBhYm91dCAzIGhvdXJzIG9mIHRyYXZlbC4KWzIwMjYtMDktMDVUMDE6MjQ6NTMuOTQ0Wl0gW3dvcmxkXSBPbiB0aGUgZmFyIHJpZGdlIOKAlCBmb3IgdGhlIHNwYWNlIG9mIGEgaGVsZCBicmVhdGgg4oCUIGEgZmlndXJlIHRvbyB0YWxsIHRvIGJlIGh1bWFuIHdhdGNoZXMgeW91LiBUaGVuIGl0IGlzbid0IHRoZXJlLgo=",
+      "WzIwMjYtMDktMDVUMDE6MjQ6NTUuNDk3Wl0gW2RlYnVnXSB1aTogdGFwICJ0YWtlIC8gc2FsdmFnZSIKWzIwMjYtMDktMDVUMDE6MjQ6NTcuMjcwWl0gW3dvcmxkXSBPbGQgaGFiaXQ6IHNlZSBpdCwgdGFrZSBpdCwga2VlcCB3YWxraW5nLiBUaGUgUGxhc21hIFRocm93ZXIgaXMgeW91cnMuClsyMDI2LTA5LTA1VDAxOjI0OjU3LjI3MVpdIFtyZXdhcmRdIOKcpiBQbGFzbWEgVGhyb3dlciAoQ29tbW9uKS4KWzIwMjYtMDktMDVUMDE6MjQ6NTguNTEzWl0gW3dvcmxkXSBZb3UgdGFrZSB0aGUgU2NyYXAgTWV0YWwgdGhlIHdheSB5b3UgdGFrZSBldmVyeXRoaW5nIG91dCBoZXJlIOKAlCBxdWlja2x5LCBhbmQgd2l0aG91dCBjZXJlbW9ueS4K",
+      "WzIwMjYtMDktMDVUMDE6MjQ6NTguNTEzWl0gW3Jld2FyZF0g4pymIFNjcmFwIE1ldGFsIChDb21tb24pLgpbMjAyNi0wOS0wNVQwMToyNDo1OS41NDFaXSBbd29ybGRdIFR1Y2tlZCBpbnNpZGUgdGhlIGJhcnJpY2FkZTogYW4gb2RkbWVudCB0aGF0IG1hdGNoZXMgbm8gcXVhcnRlcm1hc3RlcidzIGxpc3QuIFRoZSBraW5kIG9mIHRoaW5nIHRoYXQgZnVzZXMgd2VsbC4KWzIwMjYtMDktMDVUMDE6MjQ6NTkuNTQxWl0gW3dvcmxkXSBZb3Ugd29yayB0aGUgYnJva2VuIGdhdW50bGV0IG92ZXIuIEEgcGFydCBvZiBpdCBjb21lcyBsb29zZSwgaW50YWN0Lgo=",
+      "WzIwMjYtMDktMDVUMDE6MjQ6NTkuNTQyWl0gW3dvcmxkXSBZb3Ugd29yayB0aGUgY3J5c3RhbCBvdmVyLiBBIHBhcnQgb2YgaXQgY29tZXMgbG9vc2UsIGludGFjdC4KWzIwMjYtMDktMDVUMDE6MjQ6NTkuNTQyWl0gW3dvcmxkXSBZb3Ugd29yayB0aGUgZ2F0ZSBvdmVyLiBBIHBhcnQgb2YgaXQgY29tZXMgbG9vc2UsIGludGFjdC4KWzIwMjYtMDktMDVUMDE6MjQ6NTkuNTQyWl0gW3dvcmxkXSBZb3Ugc2FsdmFnZSB0aGUgcmlmbGUuIFRoZSB0YWtlIGlzIHNtYWxsIGJ1dCByZWFsLgo=",
+      "WzIwMjYtMDktMDVUMDE6MjQ6NTk..."
+    ],
+    "chunkChars": 15000,
+    "chunkEncoding": "base64"
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-05-1678-the-chase-gets-harder #mtnq7iawibjn [inline 23/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtnq7iawibjn"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-05-1678-the-chase-gets-harder"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "23"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-05-1678-the-chase-gets-harder"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-05T01:50:39.334343Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "": {
+          "len": 43
+        },
+        "34": {
+          "": {
+            "rem": [
+              [
+                "!limit",
+                "s",
+                27,
+                30
+              ]
+            ],
+            "len": 460,
+            "chunks": [
+              {
+                "type": "text",
+                "text": "WzIwMjYtMDktMDVUMDE6MjQ6NTk"
+              },
+              {
+                "type": "redaction",
+                "text": "...",
+                "rule_id": "!limit",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-05T01:50:40.504000Z",
+  "fingerprints": [
+    "667e66b830fb96662ec7102714b44d13"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1956522555,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-05T01:45:08.063656Z",
+    "dateReleased": "2026-09-05T01:46:04.346144Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "0033536cee170b95bf2f474b0c24b5bae8b2517b",
+      "message": "[ota-hal] OTA-1678: the chase gets harder\n\nItem six (a) of \"fix all existing issues one through six\": the flee\nescalation, on the randoms only.\n\nTHE OWNER'S RULE, IN HIS WORDS\n\"on the randoms there should be a flee escalation. the ones that I'm purposely\nthrowing you head first into some big guy because you have to do that to\ncomplete or progress a mission or a storyline \u2014 I don't think there should be\na progression on those, only on the randoms. I want the rest of the world to\nbe dangerous\u2026 if you step into danger level 3 you're going to see some big bad\nguys and there is a chance you're going to get stuck having that fight that\nmight end the game for you.\"\n\nHis own log is the measurement behind it: he flees everything at ~100 HP or\nmore on random ground and wins the escape roll nearly every time. OTA-1009\nmade the flee contested (fastest pursuer's d20 + speed) and OTA-1459 made it\ncost stamina, and neither moved the outcome \u2014 the bar was the same on the\nfirst break as on the fourth, on a danger-1 verge as in a danger-5 pit, for a\nrat as for a Legendary.\n\nON RANDOM GROUND THE PURSUER'S BAR NOW MOVES\n  +1 per danger level above 1 (danger 3 \u2192 +2, danger 5 \u2192 +4)\n  +0 / +1 / +2 / +3 by the pursuer's rarity\n  +2 per failed break THIS encounter (2nd try +2, 3rd try +4 \u2026)\n  \u22122 when the pursuer is at or under half HP, \u22124 at or under a quarter\nThe one who can catch you is chosen AFTER escalation, so a bleeding sprinter\nloses the chase to a fresh brute. The roll card prints the breakdown (\"Pursuit\n25 \u2014 Mud Wasp (d20 14 + 11: SPD 5, danger +2, Rare +2, 2nd try +2)\"), a failed\nbreak says \"They have your measure now. The next break will be harder.\" before\nthe volley lands, and the FLEE chip carries the exact odds (\"flee 48%\"),\ncounted over all 400 d20 pairs \u2014 from the SAME reader the roll is built from\n(state/fleeOdds), so the chip cannot promise a different chase than the tap\nproduces. His picture at DEX 11 (+1 Reclaimer): danger 3 vs a Rare, 66% \u2192 57%\n\u2192 48% over three tries; danger 5 vs a Legendary on the third try, 30%.\n\nRANDOM IS DECLARED BY THE PRODUCER, NEVER INFERRED\nThere is no field on an Enemy or a scene that says \"this fight is a\nmission's\", and there are dozens of scripted spawn sites against four world\nrolls. So the four rolls stamp `Enemy.unscripted` \u2014 beginScene's encounter,\nthe climb encounter, the rest ambush, the patrol crossing \u2014 and every scripted\nspawn (hunt stages, core guardians, chain marks, captors, summit bosses,\nhostile traders, raids, hostile-ground patrols, and every body from a save\nbefore this OTA) resolves to exactly OTA-1009's escapePursuit, asserted equal.\nA lineup escalates only when EVERY live body carries the mark: a mission mark\nthat joins a roaming pack turns the scene scripted, which is the direction the\nrule leans. The mark rides on the enemy like `pos` and `coating`, so splices,\nsaves and loads carry it with no bookkeeping. The failed-break count lives on\nthe scene (`fleeAttempts`), reset by FRESH_ENEMY_ARRAYS and by every lineup\nproducer, so it cannot outlive the bodies it was earned against.\n\nUnder the OTA-1400 line ratchet, `injectFactionParty` moved verbatim to\napp/state/factionParty.ts (its three callers pass `scalePowerOf` in);\ngameStore is at 36,914 lines.\n\n- app/engine/fleeEscalation.ts (NEW) \u2014 the mark, the four terms, the escalated\n  pursuit, the exact odds.\n- app/state/fleeOdds.ts (NEW) \u2014 the one reader for the bar: the dispatch and\n  the FLEE chip both go through it.\n- app/state/factionParty.ts (NEW) \u2014 injectFactionParty, moved.\n- app/engine/types.ts \u2014 Enemy.unscripted. app/engine/combatRules.ts \u2014\n  EscapePursuit.note, printed on the card.\n- app/state/gameStore.ts \u2014 four producers stamp; the dispatch reads\n  fleePursuitFor; the failed-escape arm counts and speaks; CurrentScene\n  .fleeAttempts; FRESH_ENEMY_ARRAYS resets it.\n- app/components/InputBox.tsx \u2014 \"flee 48%\".\n- __tests__/ota1678TheChaseGetsHarder.test.ts \u2014 25 tests, including the\n  scripted-lineup identity with escapePursuit, the bestiary-wide worst case,\n  and the producer census (exactly four stamps, no scripted site touches it).\n- __tests__/ota1009, ota1116, ota1015, ota1035, ota1159, ota1321, ota1476,\n  ota1506 \u2014 pins repointed to the shared reader, the moved spawner, and the\n  odds-bearing FLEE label; their claims are unchanged.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-05T01:42:51Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-05-1678-the-chase-gets-harder",
+          "shortVersion": "tartaria@4.32.11+2026-09-05-1678-the-chase-gets-harder",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-05T01:46:04.346144Z",
+          "dateCreated": "2026-09-05T01:45:08.063656Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155740035",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-05T01:46:04.683255Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-05-1678-the-chase-gets-harder",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-05-1678-the-chase-gets-harder",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-05-1678-the-chase-gets-harder",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-05-1678-the-chase-gets-harder)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "53bdd704df2c441e9ffb916b8947216e",
+  "previousEventID": "4f9358807779467380d14e0493b8a097"
+}

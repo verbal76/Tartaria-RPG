@@ -1,0 +1,274 @@
+{
+  "id": "4e854dc927744f4a97fe9aa552d45723",
+  "groupID": "7710441096",
+  "eventID": "4e854dc927744f4a97fe9aa552d45723",
+  "projectID": "4511945117532160",
+  "size": 18038,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-03-1649-what-a-ring-is-for #mtlzxhu9g966 [inline 15/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-03-1649-what-a-ring-is-for",
+  "message": "player-log 2026-09-03-1649-what-a-ring-is-for #mtlzxhu9g966 [inline 15/28]",
+  "title": "player-log 2026-09-03-1649-what-a-ring-is-for #mtlzxhu9g966 [inline 15/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "d4b5207536cb442688b387041f8546fe",
+      "span_id": "9ae573fff8323c20",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "\n[2026-09-03T00:42:21.835Z] [cognitive] neutral  (338ms)\n[2026-09-03T00:42:22.567Z] [debug] persist sizes(KB): total=323 player=75 wm=159[rooms=90 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=83 scene=4\n[2026-09-03T00:42:22.895Z] [debug] ui: tap \"\ud83d\udd25\u2623 choir-bound launcher\"\n[2026-09-03T00:42:22.895Z] [system] evasive \u2014 harder to hit fades.\n",
+      "[2026-09-03T00:42:22.922Z] [player] attack with the off-hand choir-bound launcher\n[2026-09-03T00:42:22.923Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=close enemies=2 hooks=0\n",
+      "[2026-09-03T00:42:22.924Z] [debug] attack: target=Aetheric Ooze range=close reach.bands=[distant,far,mid,close] reach.label=Choir-Bound Launcher bareHand=false\n[2026-09-03T00:42:22.925Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-03T00:42:22.991Z] [world] You commit forward with the searing corrupted choir-bound launcher. Aetheric Ooze watches your hands.\n",
+      "[2026-09-03T00:42:22.991Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T00:42:23.314Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 TAKE_COVER  (322ms)\n[2026-09-03T00:42:37.656Z] [world] Aetheric Ooze moves first. The pressure is immediate.\n[2026-09-03T00:42:37.658Z] [combat] Spore Skimmer \u2014 d20 \u2192 6 + ATK 5 = 11 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-03T00:42:37.658Z] [combat] Aetheric Ooze turns on Mercy \u2014 d20 5 + ATK 3 = 8 vs Mercy's AC 10 \u2014 \u2717 MISS\n[2026-09-03T00:42:37.658Z] [combat] You \u2014 d20 \u2192 11 + INT 12 + 2 (point blank) perfect opening (2\u00d7 dice) = 25 vs Aetheric Ooze AC 8 \u2014 \u2713 HIT\n[2026-09-03T00:42:37.659Z] [combat] Aetheric Ooze shrugs off the aetheric. (resisted, \u00d70.5 for 12)\n",
+      "[2026-09-03T00:42:37.664Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Flame of Aether \u2014 burn will bite where aetheric won't.\"\n[2026-09-03T00:42:37.666Z] [combat] Your blow with the searing corrupted choir-bound launcher lands clean \u2014 12 damage. Aetheric Ooze crumples in the dust. The Aetherstone settles.\n",
+      "[2026-09-03T00:42:37.667Z] [reward] Aetheric Ooze defeated. You recover Ooze Residue, Aether Crystal.\n[2026-09-03T00:42:37.667Z] [combat] 1 attacker remains. Spore Skimmer now in your sights.\n[2026-09-03T00:42:37.668Z] [reward] \u2726 You feel hardier from your trials. +1 max HP (now 49). [142 enemies defeated]\n[2026-09-03T00:42:37.668Z] [reward] +5 TC pried from the dust.\n",
+      "[2026-09-03T00:42:37.732Z] [arbiter] The Arbiter does not look up. \"Hit it before it hits you. That's the entire trick.\"\n[2026-09-03T00:42:40.614Z] [debug] ui: tap \"\ud83d\udd25\u2623 choir-bound launcher\"\n[2026-09-03T00:42:40.664Z] [player] attack with the off-hand choir-bound launcher\n",
+      "[2026-09-03T00:42:40.664Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=mid enemies=1 hooks=0\n[2026-09-03T00:42:40.665Z] [debug] attack: target=Spore Skimmer range=mid reach.bands=[distant,far,mid,close] reach.label=Choir-Bound Launcher bareHand=false\n",
+      "[2026-09-03T00:42:40.737Z] [world] You commit forward with the searing corrupted choir-bound launcher. Spore Skimmer watches your hands.\n[2026-09-03T00:42:40.738Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T00:42:41.057Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 TAKE_COVER  (318ms)\n[2026-09-03T00:42:51.236Z] [world] Spore Skimmer moves first. The pressure is immediate.\n",
+      "[2026-09-03T00:42:51.238Z] [combat] Spore Skimmer \u2014 d20 \u2192 12 + ATK 5 = 17 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-03T00:42:51.238Z] [combat] You \u2014 d20 \u2192 11 + INT 12 = 23 vs Spore Skimmer AC 9 \u2014 \u2713 HIT\n[2026-09-03T00:42:51.239Z] [combat] Spore Skimmer shrugs off the aetheric. (resisted, \u00d70.5 for 7)\n",
+      "[2026-09-03T00:42:51.242Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Reclaimers Guild Geode-Cored Cleaver \u2014 slashing will bite where aetheric won't.\"\n[2026-09-03T00:42:51.243Z] [combat] The blow with the searing corrupted choir-bound launcher finds purchase \u2014 7 damage, 12 HP standing. Spore Skimmer commits to the counter.\n",
+      "[2026-09-03T00:42:51.245Z] [combat] Searing Corrupted Choir-Bound Launcher \u2014 1 burn bites in and festers (3 turns).\n[2026-09-03T00:42:51.245Z] [combat] Searing Corrupted Choir-Bound Launcher \u2014 2 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n[2026-09-03T00:42:53.209Z] [debug] ui: tap \"approach\"\n[2026-09-03T00:42:53.254Z] [player] approach Spore Skimmer\n",
+      "[2026-09-03T00:42:53.255Z] [debug] parser: intent=advance conf=1.00 verb=approach target=spore skimmer resolved=Spore Skimmer range=mid enemies=1 hooks=0\n[2026-09-03T00:42:53.256Z] [debug] move: advance from range=mid enemies=1 weather=Black Rain cost=1 partial=0\n[2026-09-03T00:42:53.256Z] [debug] move: field advance target=Spore Skimmer d 1.58->0.58 band mid->close\n",
+      "[2026-09-03T00:42:53.256Z] [world] You close the gap with Spore Skimmer. (range: close / arm's reach)\n[2026-09-03T00:42:53.257Z] [combat] Spore Skimmer blisters \u2014 clinging fire sears 1. (11/19 HP, 2 turns left)\n[2026-09-03T00:42:53.257Z] [combat] Spore Skimmer blackens \u2014 corruption eats 2. (9/19 HP, 2 turns left)\n",
+      "[2026-09-03T00:42:53.258Z] [combat] Spore Skimmer \u2014 d20 \u2192 1 + ATK 5 = 6 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 FUMBLE\n[2026-09-03T00:42:53.922Z] [cognitive] neutral  (663ms)\n[2026-09-03T00:42:54.493Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n[2026-09-03T00:42:54.535Z] [player] attack with the auralite talon\n",
+      "[2026-09-03T00:42:54.535Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=1 hooks=0\n[2026-09-03T00:42:54.536Z] [combat] Spore Skimmer blisters \u2014 clinging fire sears 1. (8/19 HP, 1 turn left)\n[2026-09-03T00:42:54.536Z] [combat] Spore Skimmer blackens \u2014 corruption eats 2. (6/19 HP, 1 turn left)\n",
+      "[2026-09-03T00:42:54.537Z] [debug] attack: target=Spore Skimmer range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n[2026-09-03T00:42:54.610Z] [world] You raise the acid-etched corrupted auralite talon toward Spore Skimmer. The room narrows around the both of you.\n[2026-09-03T00:42:54.610Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-03T00:42:54.944Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (333ms)\n[2026-09-03T00:43:06.743Z] [world] Spore Skimmer moves first. The pressure is immediate.\n[2026-09-03T00:43:06.746Z] [combat] Spore Skimmer \u2014 d20 \u2192 3 + ATK 5 = 8 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-03T00:43:06.746Z] [combat] You \u2014 d20 \u2192 4 + INT 12 = 16 vs Spore Skimmer AC 9 \u2014 \u2717 DODGED\n[2026-09-03T00:43:06.747Z] [combat] Spore Skimmer reads the swing and twists clear \u2014 the blow finds nothing. (dodged, quick)\n[2026-09-03T00:43:10.457Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n[2026-09-03T00:43:10.505Z] [player] attack with the auralite talon\n",
+      "[2026-09-03T00:43:10.505Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=1 hooks=0\n[2026-09-03T00:43:10.506Z] [combat] Spore Skimmer blisters \u2014 clinging fire sears 1. (5/19 HP, 0 turns left)\n[2026-09-03T00:43:10.506Z] [combat] Spore Skimmer shakes off the last of the fire \u2014 the Choir-Bound Launcher has run its course.\n",
+      "[2026-09-03T00:43:10.506Z] [combat] Spore Skimmer blackens \u2014 corruption eats 2. (3/19 HP, 0 turns left)\n[2026-09-03T00:43:10.507Z] [combat] Spore Skimmer shakes off the last of the corruption \u2014 the Choir-Bound Launcher has run its course.\n[2026-09-03T00:43:10.507Z] [debug] attack: target=Spore Skimmer range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n",
+      "[2026-09-03T00:43:10.591Z] [world] Your acid-etched corrupted auralite talon comes around in an arc; Spore Skimmer squares up to meet it.\n[2026-09-03T00:43:10.591Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T00:43:10.919Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (327ms)\n[2026-09-03T00:43:20.351Z] [world] Spore Skimmer moves first. The pressure is immediate.\n",
+      "[2026-09-03T00:43:20.354Z] [combat] Spore Skimmer \u2014 d20 \u2192 4 + ATK 5 = 9 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-03T00:43:20.354Z] [combat] You \u2014 d20 \u2192 7 + INT 12 = 19 vs Spore Skimmer AC 9 \u2014 \u2713 HIT\n[2026-09-03T00:43:20.354Z] [combat] Spore Skimmer shrugs off the aetheric. (resisted, \u00d70.5 for 12)\n",
+      "[2026-09-03T00:43:20.358Z] [combat] The killing blow with the acid-etched corrupted auralite talon: 12. Spore Skimmer drops where it stood.\n[2026-09-03T00:43:20.359Z] [reward] Spore Skimmer defeated. You recover Aether Residue, Patched Cloth, Burlap Vest.\n[2026-09-03T00:43:20.361Z] [reward] You strip the body: Bone Knife, Mud-Warden's Vest (+6 TC). The kit took the fight badly.\n",
+      "[2026-09-03T00:43:20.361Z] [reward] +20 TC pried from the dust.\n[2026-09-03T00:43:20.424Z] [world] Mira's map takes you down through the Nexus to where the flood-works pool. The shrine is silt-glass and old prayer. You find the boy where he fell \u2014 and the Mud Wraith that has been feeding on what is left of him comes off the body fast, before your hand is anywhere near the locket.\n",
+      "[2026-09-03T00:43:20.425Z] [reward] \u2726 The Boy's Locket \u2014 mission item.\n[2026-09-03T00:43:20.425Z] [combat] Mud Wraith is on you before you have the room to turn.\n[2026-09-03T00:43:20.426Z] [combat] Mud Wraith turns on Mercy \u2014 d20 14 + ATK 7 = 21 vs Mercy's AC 10 \u2014 \u2713 HIT\n[2026-09-03T00:43:20.426Z] [combat] Mercy takes 12. (1/15 HP left)\n",
+      "[2026-09-03T00:43:20.426Z] [combat] Something the Dragon drowned is still on watch \u2014 and it has seen you.\n[2026-09-03T00:43:20.426Z] [debug] mission card: \"The Bog Dragon of Old Drakova\" \u00b7 fight \u00b7 got The Boy's Locket\n[2026-09-03T00:43:21.549Z] [debug] persist sizes(KB): total=323 player=76 wm=159[rooms=90 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=83 scene=4\n",
+      "[2026-09-03T00:43:25.564Z] [debug] ui: tap \"mission card \u00b7 FIGHT\"\n[2026-09-03T00:43:33.209Z] [debug] ui: tap \"dodge\"\n[2026-09-03T00:43:33.214Z] [system] ambushed fades.\n[2026-09-03T00:43:33.227Z] [player] dodge\n[2026-09-03T00:43:33.228Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=0\n",
+      "[2026-09-03T00:43:33.229Z] [world] You commit to the dodge. Slip Mud Wraith's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-03T00:43:33.316Z] [combat] Mud Wraith \u2014 d20 \u2192 12 + ATK 7 = 19 vs your AC 22 \u2014 \u2717 EVADED\n",
+      "[2026-09-03T00:43:33.317Z] [combat] Dodge \u2014 d20 \u2192 16 + DEX 20 = 36 vs ATK 19. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-03T00:43:33.318Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-03T00:43:33.318Z] [arbiter] \"That mud wraith is making the same mistake,\" the Arbiter says, almost bored. \"Capitalize.\"\n",
+      "[2026-09-03T00:43:33.319Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T00:43:33.659Z] [cognitive] neutral  (340ms)\n[2026-09-03T00:43:38.358Z] [debug] ui: tap \"\ud83d\udd25\u2623 choir-bound launcher\"\n[2026-09-03T00:43:38.390Z] [player] attack with the off-hand choir-bound launcher\n",
+      "[2026-09-03T00:43:38.390Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=close enemies=1 hooks=0\n[2026-09-03T00:43:38.391Z] [debug] attack: target=Mud Wraith range=close reach.bands=[distant,far,mid,close] reach.label=Choir-Bound Launcher bareHand=false\n",
+      "[2026-09-03T00:43:38.392Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-03T00:43:38.463Z] [world] Your searing corrupted choir-bound launcher comes around in an arc; Mud Wraith squares up to meet it.\n[2026-09-03T00:43:38.463Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T00:43:38.788Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 TAKE_COVER  (324ms)\n",
+      "[2026-09-03T00:43:47.822Z] [world] You seize the initiative. Mud Wraith has no time to react.\n[2026-09-03T00:43:47.822Z] [combat] You \u2014 d20 \u2192 14 + INT 12 + 2 (point blank) perfect opening (2\u00d7 dice) = 28 vs Mud Wraith AC 13 \u2014 \u2713 HIT\n[2026-09-03T00:43:47.823Z] [combat] Aetheric flares \u2014 +1 on hit (weak \u2014 bites deep!).\n",
+      "[2026-09-03T00:43:47.824Z] [combat] Weakness exposed \u2014 Mud Wraith flinches. (aetheric \u00d71.5 for 36)\n[2026-09-03T00:43:47.897Z] [reward] \u2726 The work hones you. +1 STR (base 12, 17 as you stand).\n[2026-09-03T00:43:47.898Z] [combat] Clean hit with the searing corrupted choir-bound launcher for 36. Mud Wraith has 93 left and does not back away.\n",
+      "[2026-09-03T00:43:47.898Z] [combat] Searing Corrupted Choir-Bound Launcher \u2014 6 burn bites in and festers (3 turns).\n[2026-09-03T00:43:47.898Z] [combat] Searing Corrupted Choir-Bound Launcher \u2014 2 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n[2026-09-03T00:43:47.898Z] [combat] Mud Wraith is left exposed \u2014 easier to hit.\n",
+      "[2026-09-03T00:43:47.899Z] [combat] Mud Wraith \u2014 d20 \u2192 8 + ATK 7 = 15 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T00:43:50.064Z] [debug] ui: tap \"inventory\"\n[2026-09-03T00:44:06.805Z] [world] You feed Mercy 2\u00d7 Trail Rations. +12 HP (13/15), +loyalty.\n[2026-09-03T00:44:15.963Z] [player] use Trail Rations\n",
+      "[2026-09-03T00:44:15.963Z] [debug] parser: intent=use_relic conf=1.00 verb=use target=trail rations resolved=Trail Rations range=close enemies=1 hooks=0\n[2026-09-03T00:44:15.964Z] [world] You use one Trail Rations. HP already full, +1 stamina.\n[2026-09-03T00:44:15.975Z] [system] \u23f3 Time passed: 15 min\n[2026-09-03T00:44:17.736Z] [cognitive] neutral  (1759ms)\n",
+      "[2026-09-03T00:44:26.312Z] [debug] persist sizes(KB): total=322 player=76 wm=160[rooms=90 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=82 scene=4\n[2026-09-03T00:46:34.059Z] [debug] ui: tap \"\ud83d\udd25\u2623 choir-bound launcher \u2605\"\n[2026-09-03T00:46:34.113Z] [player] attack with the off-hand choir-bound launcher\n",
+      "[2026-09-03T00:46:34.113Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=close enemies=1 hooks=0\n[2026-09-03T00:46:34.114Z] [combat] Mud Wraith blisters \u2014 clinging fire sears 6. (87/129 HP, 2 turns left)\n[2026-09-03T00:46:34.114Z] [combat] Mud Wraith blackens \u2014 corruption eats 2. (85/129 HP, 2 turns left)\n",
+      "[2026-09-03T00:46:34.115Z] [debug] attack: target=Mud Wraith range=close reach.bands=[distant,far,mid,close] reach.label=Choir-Bound Launcher bareHand=false\n[2026-09-03T00:46:34.189Z] [world] You raise the searing corrupted choir-bound launcher toward Mud Wraith. The room narrows around the both of you.\n[2026-09-03T00:46:34.190Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-03T00:46:34.522Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 TAKE_COVER  (332ms)\n[2026-09-03T00:46:46.549Z] [world] You seize the initiative. Mud Wraith has no time to react.\n[2026-09-03T00:46:46.549Z] [combat] You \u2014 d20 \u2192 18 + INT 12 + 2 (point blank) = 32 vs Mud Wraith AC 12 \u2014 \u2713 HIT\n[2026-09-03T00:46:46.549Z] [combat] Weakness exposed \u2014 Mud Wraith flinches. (aetheric \u00d71.5 for 12)\n",
+      "[2026-09-03T00:46:46.551Z] [combat] The blow with the searing corrupted choir-bound launcher finds purchase \u2014 12 damage, 73 HP standing. Mud Wraith commits to the counter.\n[2026-09-03T00:46:46.551Z] [combat] Searing Corrupte"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-03-1649-what-a-ring-is-for #mtlzxhu9g966 [inline 15/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtlzxhu9g966"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-03-1649-what-a-ring-is-for"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "15"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-03-1649-what-a-ring-is-for"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-03T20:47:15.682819Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-03T20:47:17.073000Z",
+  "fingerprints": [
+    "1b960547e4e555cc81721671e25adbb9"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1953857096,
+    "commitCount": 3,
+    "data": {},
+    "dateCreated": "2026-09-03T20:00:12.950036Z",
+    "dateReleased": "2026-09-03T20:00:42.063795Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "3f3f31e984f1edd9efaa4a21fcab9d9e29400d28",
+      "message": "[ota-hal] OTA-1649: what a ring is for\n\nOwner: \"do the ring and amulet recipes, and give the diadem a route. again\nbetter effects with rarity and ingredient quality. they should give\ncombinations of stat buffs, moderate resists and let's get some special\nAOE effects... each ring doesn't need to have all three things. the\ncombinations of 1, 2 or three things should scale with rarity.\"\n\n\u26a0 WHAT THE MEASUREMENT FOUND FIRST, before a line was written. Fifteen of\nthe thirty-two shipped accessories carry a `resistances` list. The item\ncard prints it \u2014 \"Resists: aetheric\" \u2014 and combat has NEVER SEEN ONE.\naggregateArmor's resist walk covered ARMOR_SLOTS only, so a Legendary\naetheric amulet arrived at the damage math as `[]` with a mitigation\nfraction of 0. Probed before any change; that probe is now the first test\nin ota1649 so the field cannot go quiet again.\n\nSo \"moderate resists\" was not a new feature. It was a dead field, and\nwiring it is the spine of this OTA.\n\n  \u2022 The jewellery joins the EXISTING armour stack \u2014 same multiplicative\n    diminishing returns, same MAX_ARMOR_RESIST ceiling \u2014 through a new\n    optional per-entry `weight` on ArmorSlotResist. Armour never sets it\n    (a chest is a chest whatever it is made of); jewellery always does,\n    because a ring's worth against a type is its RARITY, not which finger\n    it sits on. Every pre-existing caller is bit-identical.\n  \u2022 An amulet outweighs a ring at equal rarity \u2014 one neck, four fingers \u2014\n    and neither out-armours a breastplate. His \"50% of incoming fire\" is\n    measured, not asserted: a Legendary amulet + a Legendary ring + a Rare\n    ring = 0.497. Three slots given to one element buys half. One\n    Legendary ring alone buys a fifth.\n\nTHREE NEW EFFECT FAMILIES, wired and pinned:\n\n  \u2022 A COATING BOOST. His fire ring, exactly: a Rare burn ring is +25% on\n    burn coatings and nothing else. Applied to the rolled coating bonus\n    only (a bare blade gets nothing) and AFTER the weakness multiplier, so\n    a resistant hide cannot halve the ring's share as well.\n  \u2022 A STEALTH MULTIPLIER. Legendary = his +60%. It multiplies the whole\n    strike, and it does NOT check the weapon: the dice-doubling backstab\n    is a rogue's privilege, this is not, or it would be a second rogue tax\n    on an item a heavy build might want. \u26a0 The flag rides the DAMAGE STEP:\n    `stealthed` is stripped by consumeOnResolve the instant the attack\n    step resolves and pendingRolls is nulled before concludeRolls runs, so\n    a damage-time read of the player would miss the exact swing the ring\n    was bought for. combatRules stamps `fromStealth` at build time.\n  \u2022 A ONCE-PER-ENCOUNTER DISCHARGE. His frost ring: 50 cold across two\n    rings of range. It fires on the first swing of the fight \u2014 there is no\n    free action in this combat loop to hang a trigger on, and committing\n    to the fight is the honest trigger. Not the weapon splash: that is\n    keyed to the TARGET's band, this to the WEARER's. All discharges are\n    planned off one lineup and applied in one write, so the first ring's\n    kill cannot hide a body from the second. A burst that catches nobody\n    is still spent \u2014 refunding it would make a ring strictly better than a\n    splash, which pays the same price.\n\n\u26a0\u26a0 THE ROW PICKS THE FLAVOUR, THE LADDER PICKS THE NUMBER. Not one catalog\nrow carries a magnitude. A ring says \"I boost burn coatings\"; how much is\nCOATED_BOOST_PCT[rarity]. That is what makes \"better effects with rarity\"\na property of the system rather than a promise about forty-four\nhand-typed numbers \u2014 a row cannot sit off the ladder, and a rebalance is\none table edit.\n\n\u26a0 THE LADDER'S GATE IS THE SPECIAL, NOT A FAMILY COUNT, and the first\ndraft got that wrong. An exact count per rarity failed against the shipped\ncatalog on contact: five accessories \u2014 two of them COMMON \u2014 already\ncarried two families, and holding the line would have meant deleting a\nresist off items sitting in players' packs right now. So the rule moved to\nwhere the owner's sentence actually points. Common and Uncommon never\ncarry a special; Rare may; Legendary must, and carries all three. Every\nband is still strictly better than the one below on MAGNITUDE too, on all\nfive tables, so a two-family Uncommon never out-values a two-family Rare.\nThe rule needed no removals at all: the seven rows it found off-ladder\nwere each missing something, and each gained it.\n\nTHE ROUTES. 16 new accessories (48 total) and a recipe for every ring and\namulet in the game \u2014 205 recipes. The Aetheric Diadem was the only\ngenuinely unobtainable item in the catalog (no recipe, no loot table, no\nvendor, no quest) and now has one. Ingredient quality is mechanical: every\naccessory recipe must carry at least one ingredient of the result's own\nrarity or higher, so a Legendary cannot be reached from scrap. One shipped\nrecipe failed that and was repaired rather than grandfathered \u2014\nReclaimer's Aegis Pendant is Rare and asked for Scrap Metal / Aetheric\nShard / Spider Silk.\n\n\u26a0\u26a0\u26a0 THE MISTAKE I MADE AND HAD TO UNDO, kept as a rule. The first draft of\nthose 38 recipes reached for whatever material fitted the flavour and\nclaimed 22 fresh names \u2014 Aetheric Blood, Spirit Residue, Warden Stone,\nAetheric Cog and eighteen more. `isRecipeIngredientName` bars any recipe\ningredient from the Crucible, so every one of them silently LEFT the\nfusion fodder pool, and seven shipped fusion suites went red. They were\nright; the Crucible had genuinely lost its fodder. The fix was not to\nrepoint them. Every recipe was re-authored out of the 96 names recipes\nalready used, so the fodder pool after this OTA is bit-identical to the\none before it \u2014 measured, `newly claimed: []`. ota1649 pins it, so the\nnext accessory recipe reaching for a fresh material has to answer for the\nCrucible first. A second pin catches the other thing that pass produced: a\nblind substitution left seven recipes naming one ingredient twice.\n\nThe line ratchet did its job too. This walked gameStore through the 37,000\ncap (ota1400), which is what the cap is for. The discharge's targeting and\napplication moved out to `planBursts` / `applyBursts` in accessoryEffects,\nwhere they are pure and testable rather than reachable only through a live\ncombat turn. gameStore lands at 36,996.\n\nThe item card now names numbers instead of a bare \"Resists: aetheric\",\nreading the same tables combat reads so the two cannot drift, and a\ndischarge card admits on its face that it is once per fight.\n\nGates: all 18 green by exit code. Full suite green.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-03T19:57:15Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-03-1649-what-a-ring-is-for",
+          "shortVersion": "tartaria@4.32.11+2026-09-03-1649-what-a-ring-is-for",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-03T20:00:42.063795Z",
+          "dateCreated": "2026-09-03T20:00:12.950036Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155305262",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-03T20:00:43.872258Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-03-1649-what-a-ring-is-for",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-03-1649-what-a-ring-is-for",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-03-1649-what-a-ring-is-for",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-03-1649-what-a-ring-is-for)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "5246a4362c124637993d7a017e1f119b",
+  "previousEventID": "40c677f0d613491f9e7d4a7ac35f874f"
+}

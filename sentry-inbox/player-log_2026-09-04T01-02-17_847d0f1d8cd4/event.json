@@ -1,0 +1,278 @@
+{
+  "id": "847d0f1d8cd44c658641657a14421b72",
+  "groupID": "7710845046",
+  "eventID": "847d0f1d8cd44c658641657a14421b72",
+  "projectID": "4511945117532160",
+  "size": 18036,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-04-1657-the-healing-pouch #mtm6enrfz3iy [inline 7/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1657-the-healing-pouch",
+  "message": "player-log 2026-09-04-1657-the-healing-pouch #mtm6enrfz3iy [inline 7/28]",
+  "title": "player-log 2026-09-04-1657-the-healing-pouch #mtm6enrfz3iy [inline 7/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "660230bbb4654cea944b5ced5e11ec5c",
+      "span_id": "b155f8ce88db87d1",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "ir-Bound Launcher head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Aetheric Locket ring=Light-Finger Guild Band\n[2026-09-03T00:42:18.791Z] [debug] train: stealth (stealth check) \u2192 progress 89/100\n[2026-09-03T00:42:18.791Z] [world] The daylight leaves you little cover. (stealth \u22121, day)\n",
+      "[2026-09-03T00:42:18.792Z] [world] You fling a fistful of grit into Aetheric Ooze's eyes and slip their line of sight. Half-blind, they swing at where you were. (+5 next attack)\n[2026-09-03T00:42:18.792Z] [debug] stealth: reset WIN init 19 vs 13 (dust, +5 1r)\n[2026-09-03T00:42:18.792Z] [combat] Spore Skimmer turns on Mercy \u2014 d20 4 + ATK 5 = 9 vs Mercy's AC 10 \u2014 \u2717 MISS\n",
+      "[2026-09-03T00:42:18.793Z] [combat] Aetheric Ooze \u2014 d20 \u2192 8 + ATK 3 = 11 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-03T00:42:21.325Z] [debug] ui: tap \"dodge\"\n[2026-09-03T00:42:21.329Z] [system] unseen \u2014 next strike +5 fades.\n[2026-09-03T00:42:21.338Z] [player] dodge\n",
+      "[2026-09-03T00:42:21.338Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=2 hooks=0\n[2026-09-03T00:42:21.339Z] [world] You commit to the dodge. Slip Aetheric Ooze's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-03T00:42:21.426Z] [combat] Aetheric Ooze \u2014 d20 \u2192 7 + ATK 3 = 10 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n[2026-09-03T00:42:21.426Z] [combat] Dodge \u2014 d20 \u2192 3 + DEX 19 = 22 vs ATK 10. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n",
+      "[2026-09-03T00:42:21.427Z] [world] You slip Aetheric Ooze's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n[2026-09-03T00:42:21.494Z] [reward] \u2726 Reflex like water. +1 DEX (base 11, 20 as you stand).\n[2026-09-03T00:42:21.496Z] [combat] Spore Skimmer turns on Mercy \u2014 d20 10 + ATK 5 = 15 vs Mercy's AC 10 \u2014 \u2713 HIT\n",
+      "[2026-09-03T00:42:21.496Z] [combat] Mercy takes 2. (13/15 HP left)\n[2026-09-03T00:42:21.496Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T00:42:21.835Z] [cognitive] neutral  (338ms)\n[2026-09-03T00:42:22.567Z] [debug] persist sizes(KB): total=323 player=75 wm=159[rooms=90 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=83 scene=4\n",
+      "[2026-09-03T00:42:22.895Z] [debug] ui: tap \"\ud83d\udd25\u2623 choir-bound launcher\"\n[2026-09-03T00:42:22.895Z] [system] evasive \u2014 harder to hit fades.\n[2026-09-03T00:42:22.922Z] [player] attack with the off-hand choir-bound launcher\n[2026-09-03T00:42:22.923Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=close enemies=2 hooks=0\n",
+      "[2026-09-03T00:42:22.924Z] [debug] attack: target=Aetheric Ooze range=close reach.bands=[distant,far,mid,close] reach.label=Choir-Bound Launcher bareHand=false\n[2026-09-03T00:42:22.925Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-03T00:42:22.991Z] [world] You commit forward with the searing corrupted choir-bound launcher. Aetheric Ooze watches your hands.\n",
+      "[2026-09-03T00:42:22.991Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T00:42:23.314Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 TAKE_COVER  (322ms)\n[2026-09-03T00:42:37.656Z] [world] Aetheric Ooze moves first. The pressure is immediate.\n[2026-09-03T00:42:37.658Z] [combat] Spore Skimmer \u2014 d20 \u2192 6 + ATK 5 = 11 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-03T00:42:37.658Z] [combat] Aetheric Ooze turns on Mercy \u2014 d20 5 + ATK 3 = 8 vs Mercy's AC 10 \u2014 \u2717 MISS\n[2026-09-03T00:42:37.658Z] [combat] You \u2014 d20 \u2192 11 + INT 12 + 2 (point blank) perfect opening (2\u00d7 dice) = 25 vs Aetheric Ooze AC 8 \u2014 \u2713 HIT\n[2026-09-03T00:42:37.659Z] [combat] Aetheric Ooze shrugs off the aetheric. (resisted, \u00d70.5 for 12)\n",
+      "[2026-09-03T00:42:37.664Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Flame of Aether \u2014 burn will bite where aetheric won't.\"\n[2026-09-03T00:42:37.666Z] [combat] Your blow with the searing corrupted choir-bound launcher lands clean \u2014 12 damage. Aetheric Ooze crumples in the dust. The Aetherstone settles.\n",
+      "[2026-09-03T00:42:37.667Z] [reward] Aetheric Ooze defeated. You recover Ooze Residue, Aether Crystal.\n[2026-09-03T00:42:37.667Z] [combat] 1 attacker remains. Spore Skimmer now in your sights.\n[2026-09-03T00:42:37.668Z] [reward] \u2726 You feel hardier from your trials. +1 max HP (now 49). [142 enemies defeated]\n[2026-09-03T00:42:37.668Z] [reward] +5 TC pried from the dust.\n",
+      "[2026-09-03T00:42:37.732Z] [arbiter] The Arbiter does not look up. \"Hit it before it hits you. That's the entire trick.\"\n[2026-09-03T00:42:40.614Z] [debug] ui: tap \"\ud83d\udd25\u2623 choir-bound launcher\"\n[2026-09-03T00:42:40.664Z] [player] attack with the off-hand choir-bound launcher\n",
+      "[2026-09-03T00:42:40.664Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=mid enemies=1 hooks=0\n[2026-09-03T00:42:40.665Z] [debug] attack: target=Spore Skimmer range=mid reach.bands=[distant,far,mid,close] reach.label=Choir-Bound Launcher bareHand=false\n",
+      "[2026-09-03T00:42:40.737Z] [world] You commit forward with the searing corrupted choir-bound launcher. Spore Skimmer watches your hands.\n[2026-09-03T00:42:40.738Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T00:42:41.057Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 TAKE_COVER  (318ms)\n[2026-09-03T00:42:51.236Z] [world] Spore Skimmer moves first. The pressure is immediate.\n",
+      "[2026-09-03T00:42:51.238Z] [combat] Spore Skimmer \u2014 d20 \u2192 12 + ATK 5 = 17 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-03T00:42:51.238Z] [combat] You \u2014 d20 \u2192 11 + INT 12 = 23 vs Spore Skimmer AC 9 \u2014 \u2713 HIT\n[2026-09-03T00:42:51.239Z] [combat] Spore Skimmer shrugs off the aetheric. (resisted, \u00d70.5 for 7)\n",
+      "[2026-09-03T00:42:51.242Z] [arbiter] The Arbiter watches the aetheric skid off. \"Swap to the Reclaimers Guild Geode-Cored Cleaver \u2014 slashing will bite where aetheric won't.\"\n[2026-09-03T00:42:51.243Z] [combat] The blow with the searing corrupted choir-bound launcher finds purchase \u2014 7 damage, 12 HP standing. Spore Skimmer commits to the counter.\n",
+      "[2026-09-03T00:42:51.245Z] [combat] Searing Corrupted Choir-Bound Launcher \u2014 1 burn bites in and festers (3 turns).\n[2026-09-03T00:42:51.245Z] [combat] Searing Corrupted Choir-Bound Launcher \u2014 2 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n[2026-09-03T00:42:53.209Z] [debug] ui: tap \"approach\"\n[2026-09-03T00:42:53.254Z] [player] approach Spore Skimmer\n",
+      "[2026-09-03T00:42:53.255Z] [debug] parser: intent=advance conf=1.00 verb=approach target=spore skimmer resolved=Spore Skimmer range=mid enemies=1 hooks=0\n[2026-09-03T00:42:53.256Z] [debug] move: advance from range=mid enemies=1 weather=Black Rain cost=1 partial=0\n[2026-09-03T00:42:53.256Z] [debug] move: field advance target=Spore Skimmer d 1.58->0.58 band mid->close\n",
+      "[2026-09-03T00:42:53.256Z] [world] You close the gap with Spore Skimmer. (range: close / arm's reach)\n[2026-09-03T00:42:53.257Z] [combat] Spore Skimmer blisters \u2014 clinging fire sears 1. (11/19 HP, 2 turns left)\n[2026-09-03T00:42:53.257Z] [combat] Spore Skimmer blackens \u2014 corruption eats 2. (9/19 HP, 2 turns left)\n",
+      "[2026-09-03T00:42:53.258Z] [combat] Spore Skimmer \u2014 d20 \u2192 1 + ATK 5 = 6 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 FUMBLE\n[2026-09-03T00:42:53.922Z] [cognitive] neutral  (663ms)\n[2026-09-03T00:42:54.493Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n[2026-09-03T00:42:54.535Z] [player] attack with the auralite talon\n",
+      "[2026-09-03T00:42:54.535Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=1 hooks=0\n[2026-09-03T00:42:54.536Z] [combat] Spore Skimmer blisters \u2014 clinging fire sears 1. (8/19 HP, 1 turn left)\n[2026-09-03T00:42:54.536Z] [combat] Spore Skimmer blackens \u2014 corruption eats 2. (6/19 HP, 1 turn left)\n",
+      "[2026-09-03T00:42:54.537Z] [debug] attack: target=Spore Skimmer range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n[2026-09-03T00:42:54.610Z] [world] You raise the acid-etched corrupted auralite talon toward Spore Skimmer. The room narrows around the both of you.\n[2026-09-03T00:42:54.610Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-03T00:42:54.944Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (333ms)\n[2026-09-03T00:43:06.743Z] [world] Spore Skimmer moves first. The pressure is immediate.\n[2026-09-03T00:43:06.746Z] [combat] Spore Skimmer \u2014 d20 \u2192 3 + ATK 5 = 8 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-03T00:43:06.746Z] [combat] You \u2014 d20 \u2192 4 + INT 12 = 16 vs Spore Skimmer AC 9 \u2014 \u2717 DODGED\n[2026-09-03T00:43:06.747Z] [combat] Spore Skimmer reads the swing and twists clear \u2014 the blow finds nothing. (dodged, quick)\n[2026-09-03T00:43:10.457Z] [debug] ui: tap \"\u2697\u2623 auralite talon\"\n[2026-09-03T00:43:10.505Z] [player] attack with the auralite talon\n",
+      "[2026-09-03T00:43:10.505Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=1 hooks=0\n[2026-09-03T00:43:10.506Z] [combat] Spore Skimmer blisters \u2014 clinging fire sears 1. (5/19 HP, 0 turns left)\n[2026-09-03T00:43:10.506Z] [combat] Spore Skimmer shakes off the last of the fire \u2014 the Choir-Bound Launcher has run its course.\n",
+      "[2026-09-03T00:43:10.506Z] [combat] Spore Skimmer blackens \u2014 corruption eats 2. (3/19 HP, 0 turns left)\n[2026-09-03T00:43:10.507Z] [combat] Spore Skimmer shakes off the last of the corruption \u2014 the Choir-Bound Launcher has run its course.\n[2026-09-03T00:43:10.507Z] [debug] attack: target=Spore Skimmer range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n",
+      "[2026-09-03T00:43:10.591Z] [world] Your acid-etched corrupted auralite talon comes around in an arc; Spore Skimmer squares up to meet it.\n[2026-09-03T00:43:10.591Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T00:43:10.919Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (327ms)\n[2026-09-03T00:43:20.351Z] [world] Spore Skimmer moves first. The pressure is immediate.\n",
+      "[2026-09-03T00:43:20.354Z] [combat] Spore Skimmer \u2014 d20 \u2192 4 + ATK 5 = 9 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-03T00:43:20.354Z] [combat] You \u2014 d20 \u2192 7 + INT 12 = 19 vs Spore Skimmer AC 9 \u2014 \u2713 HIT\n[2026-09-03T00:43:20.354Z] [combat] Spore Skimmer shrugs off the aetheric. (resisted, \u00d70.5 for 12)\n",
+      "[2026-09-03T00:43:20.358Z] [combat] The killing blow with the acid-etched corrupted auralite talon: 12. Spore Skimmer drops where it stood.\n[2026-09-03T00:43:20.359Z] [reward] Spore Skimmer defeated. You recover Aether Residue, Patched Cloth, Burlap Vest.\n[2026-09-03T00:43:20.361Z] [reward] You strip the body: Bone Knife, Mud-Warden's Vest (+6 TC). The kit took the fight badly.\n",
+      "[2026-09-03T00:43:20.361Z] [reward] +20 TC pried from the dust.\n[2026-09-03T00:43:20.424Z] [world] Mira's map takes you down through the Nexus to where the flood-works pool. The shrine is silt-glass and old prayer. You find the boy where he fell \u2014 and the Mud Wraith that has been feeding on what is left of him comes off the body fast, before your hand is anywhere near the locket.\n",
+      "[2026-09-03T00:43:20.425Z] [reward] \u2726 The Boy's Locket \u2014 mission item.\n[2026-09-03T00:43:20.425Z] [combat] Mud Wraith is on you before you have the room to turn.\n[2026-09-03T00:43:20.426Z] [combat] Mud Wraith turns on Mercy \u2014 d20 14 + ATK 7 = 21 vs Mercy's AC 10 \u2014 \u2713 HIT\n[2026-09-03T00:43:20.426Z] [combat] Mercy takes 12. (1/15 HP left)\n",
+      "[2026-09-03T00:43:20.426Z] [combat] Something the Dragon drowned is still on watch \u2014 and it has seen you.\n[2026-09-03T00:43:20.426Z] [debug] mission card: \"The Bog Dragon of Old Drakova\" \u00b7 fight \u00b7 got The Boy's Locket\n[2026-09-03T00:43:21.549Z] [debug] persist sizes(KB): total=323 player=76 wm=159[rooms=90 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=83 scene=4\n",
+      "[2026-09-03T00:43:25.564Z] [debug] ui: tap \"mission card \u00b7 FIGHT\"\n[2026-09-03T00:43:33.209Z] [debug] ui: tap \"dodge\"\n[2026-09-03T00:43:33.214Z] [system] ambushed fades.\n[2026-09-03T00:43:33.227Z] [player] dodge\n[2026-09-03T00:43:33.228Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=0\n",
+      "[2026-09-03T00:43:33.229Z] [world] You commit to the dodge. Slip Mud Wraith's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-03T00:43:33.316Z] [combat] Mud Wraith \u2014 d20 \u2192 12 + ATK 7 = 19 vs your AC 22 \u2014 \u2717 EVADED\n",
+      "[2026-09-03T00:43:33.317Z] [combat] Dodge \u2014 d20 \u2192 16 + DEX 20 = 36 vs ATK 19. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-03T00:43:33.318Z] [debug] arbiter: template (reason=qwen-not-ready)\n[2026-09-03T00:43:33.318Z] [arbiter] \"That mud wraith is making the same mistake,\" the Arbiter says, almost bored. \"Capitalize.\"\n",
+      "[2026-09-03T00:43:33.319Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T00:43:33.659Z] [cognitive] neutral  (340ms)\n[2026-09-03T00:43:38.358Z] [debug] ui: tap \"\ud83d\udd25\u2623 choir-bound launcher\"\n[2026-09-03T00:43:38.390Z] [player] attack with the off-hand choir-bound launcher\n",
+      "[2026-09-03T00:43:38.390Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=close enemies=1 hooks=0\n[2026-09-03T00:43:38.391Z] [debug] attack: target=Mud Wraith range=close reach.bands=[distant,far,mid,close] reach.label=Choir-Bound Launcher bareHand=false\n",
+      "[2026-09-03T00:43:38.392Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-03T00:43:38.463Z] [world] Your searing corrupted choir-bound launcher comes around in an arc; Mud Wraith squares up to meet it.\n[2026-09-03T00:43:38.463Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T00:43:38.788Z] [cognitive] DISENGAGE \u00b7 ATTACK \u00b7 AIM \u00b7 TAKE_COVER  (324ms)\n",
+      "[2026-09-03T00:43:47.822Z] [world] You seize the initiative. Mud Wraith has no time to react.\n[2026-09-03T00:43:47.822Z] [combat] You \u2014 d20 \u2192 14 + INT 12 + 2 (point blank) perfect opening (2\u00d7 dice) = 28 vs Mud Wraith AC 13 \u2014 \u2713 HIT\n[2026-09-03T00:43:47.823Z] [combat] Aetheric flares \u2014 +1 on hit (weak \u2014 bites deep!).\n",
+      "[2026-09-03T00:43:47.824Z] [combat] Weakness exposed \u2014 Mud Wraith flinches. (aetheric \u00d71.5 for 36)\n[2026-09-03T00:43:47.897Z] [reward] \u2726 The work hones you. +1 STR (base 12, 17 as you stand).\n[2026-09-03T00:43:47.898Z] [combat] Clean hit with the searing corrupted choir-bound launcher for 36. Mud Wraith has 93 left and does not back away.\n",
+      "[2026-09-03T00:43:47.898Z] [combat] Searing Corrupted Choir-Bound Launcher \u2014 6 burn bites in and festers (3 turns).\n[2026-09-03T00:43:47.898Z] [combat] Searing Corrupted Choir-Bound Launcher \u2014 2 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n[2026-09-03T00:43:47.898Z] [combat] Mud Wraith is left exposed \u2014 easier to hit.\n",
+      "[2026-09-03T00:43:47.899Z] [combat] Mud Wraith \u2014 d20 \u2192 8 + ATK 7 = 15 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T00:43:50.064Z] [debug] ui: tap \"inventory\"\n[2026-09-03T00:44:06.805Z] [world] You feed "
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-04-1657-the-healing-pouch #mtm6enrfz3iy [inline 7/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtm6enrfz3iy"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1657-the-healing-pouch"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "7"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1657-the-healing-pouch"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T01:02:15.719000Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T01:02:17.217000Z",
+  "fingerprints": [
+    "b8836b9cdc04ed394ec6ffc5df292ab3"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1954353365,
+    "commitCount": 3,
+    "data": {},
+    "dateCreated": "2026-09-04T00:59:26.615127Z",
+    "dateReleased": "2026-09-04T01:00:59.146953Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "32f104d12f8d1c1459be026d4060eb5e1c4a9a36",
+      "message": "[ota-hal] OTA-1657: the healing pouch, and three racks that fold\n\nOwner: \"battle gets slowed down when you have to heal. let's make it available\nfrom the exploration screen. let's make another bandolier and call it the healing\npouch or something. and we can load it with any three healing items they want so\nin an out 5 trauma kits, say 3 trail rations and maybe 10 blueberries in it. and\nwe open it like a bandolier during combat and can use the preloaded heals from\nthere. and when you use it, it acts like they do when being used from inventory.\"\n\nAnd, a moment later: \"when you are in inventory let's make the bandolier, tool\npouch and healing pouch collapsable like inventory categories to save space.\"\n\n\u26a0 THREE POCKETS, AND A POCKET IS A STACK. That distinction is the whole feature\nand it is why his exact load-out fits in three: a racked id points at an\ninventory STACK, so \"Blueberries \u00d710\" is ONE pocket you can tap ten times, not\nten pockets. It is the same storage contract the bandolier has had since arb110 \u2014\nthe items never leave `player.inventory`, the rack only records WHICH STACKS are\nwithin reach \u2014 so nothing is duplicated, nothing can be lost by racking, and a\nstack spent by any other path simply stops resolving instead of holding a pocket\nhostage as a ghost (OTA-1005's lesson from the tool pouch, applied up front).\n\n\u26a0\u26a0 THE TAP CALLS `useInventoryItem`, AND THAT IS THE POINT. He said it should act\n\"like they do when being used from inventory\" \u2014 so it is not \"like\", it is the\nSAME action the pack's USE button fires. The heal, the stamina, the cure, the\nstack decrement, the Arbiter's line and every downstream hook stay one\nimplementation. A second copy of \"what eating a Trauma Kit does\" is precisely the\nclass of drift the last three OTAs have been spent removing.\n\n\u26a0 AND ELIGIBILITY DELEGATES RATHER THAN DECIDING. `consumableDoesSomething`\nalready answers \"does this mend, restore, cleanse or cure?\", and it exists\nbecause a pure antivenom (healHP 0, cure yes) was once accepted by the combat bar\nand refused by the inventory screen. Restating \"what is a heal\" in a third place\nwould have rebuilt that split. All three items he named pass it \u2014 Trauma Kit\n(45 HP + cure bleed), Trail Rations (6 + 3), Blueberries (4 + 1) \u2014 and a pure\nstat buff does not. The effect is read from the CATALOG, not the instance, so an\nold saved kit racks exactly like a fresh one (the OTA-997 bug on the bandolier).\n\n\u26a0 THE \u271a heals BUTTON IS ON BOTH ROWS and its popup is NOT gated on combat, which\nis the half he asked for by name. The bandolier stays combat-only because a throw\nneeds something to throw at; a heal is exactly as useful on the walk home, and\nthe walk home is when you actually patch up. Green where the bandolier is orange:\none rack throws things away from you, one puts you back together, and mid-fight\nnobody should have to read the label to know which popup opened.\n\n\u26a0\u26a0 ALL THREE RACKS NOW FOLD, THROUGH ONE `RackFrame`. Three banners above the\npack cost real screen on a phone and the healing pouch has just made it three, so\nthey collapse \u2014 but through ONE shared frame rather than three copies of a\nchevron, and in the SAME \u25b8/\u25be grammar arb108 gave the inventory categories, so a\nplayer who has learned to fold a category learns nothing new to fold a rack.\n\n  \u2022 \u26a0 THE COUNT STAYS ON THE HEADER WHEN FOLDED (\"2/3 loaded\"), which is what\n    makes folding safe: the space saved costs no information he was reading the\n    banner for. A rack you must unfold to trust is a rack you stop folding.\n  \u2022 Defaults OPEN, unlike categories, which default closed. A category is one of\n    a dozen above a long pack; a rack is one of three whose whole job is to be\n    glanceable. Folding is something he does, not a state he inherits.\n  \u2022 All THREE fill modes are now mutually exclusive \u2014 two armed tap modes at once\n    is a coin flip over which rack receives the item.\n\n\u26a0 THE CHEVRON GATE CAUGHT THIS AND WAS RIGHT TO. `RackFrame`'s prop is `open`, so\ntrue means OPEN \u2014 the OPPOSITE polarity to the category headers a few hundred\nlines above it in the same file, which is exactly the collision check:chevrons\nwas written for. Registered rather than worked around.\n\n\u26a0 TWO SUITES WENT RED ON THE FIRST FULL RUN, BOTH FOR THE SAME REASON: ota1097\nand ota1100 each hand-typed the TWO-flag fill-mode guard into a string, so making\nit three broke tests about fusion-select and the group gesture. Their actual claim\nis \"a rack fill mode beats this gesture\", however many racks exist \u2014 both now\nassert that over EVERY known fill flag instead of pinning the arity, so the fourth\nrack will not break them.\n\nGates: all 18 green by exit code. Full suite green \u2014 1120 suites, 11,604 tests.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T00:57:14Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1657-the-healing-pouch",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1657-the-healing-pouch",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T01:00:59.146953Z",
+          "dateCreated": "2026-09-04T00:59:26.615127Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155389086",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T01:00:59.447835Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1657-the-healing-pouch",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1657-the-healing-pouch",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1657-the-healing-pouch",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1657-the-healing-pouch)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "879df84e39c64902afbf8b869e658443",
+  "previousEventID": "6e0b6cdaedd5439b9d993b73281b0bd6"
+}

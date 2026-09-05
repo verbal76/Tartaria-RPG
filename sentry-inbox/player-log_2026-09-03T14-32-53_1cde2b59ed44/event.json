@@ -1,0 +1,278 @@
+{
+  "id": "1cde2b59ed4449a2aff535b3c13a719e",
+  "groupID": "7709458959",
+  "eventID": "1cde2b59ed4449a2aff535b3c13a719e",
+  "projectID": "4511945117532160",
+  "size": 18171,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-03-1642-every-drop-has-a-name-in-the-book #mtlhgdw29v8x [inline 24/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-03-1642-every-drop-has-a-name-in-the-book",
+  "message": "player-log 2026-09-03-1642-every-drop-has-a-name-in-the-book #mtlhgdw29v8x [inline 24/28]",
+  "title": "player-log 2026-09-03-1642-every-drop-has-a-name-in-the-book #mtlhgdw29v8x [inline 24/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "68.162.161.251",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "623fc14c3f634bdd98d2130db9530d16",
+      "span_id": "9bc5f01fafc21928",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "have 32 HP remaining.\n[2026-09-03T02:11:16.231Z] [cognitive] neutral  (1074ms)\n[2026-09-03T02:11:16.561Z] [debug] ui: tap \"dodge\"\n[2026-09-03T02:11:16.565Z] [player] dodge\n[2026-09-03T02:11:16.565Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=5 hooks=1\n",
+      "[2026-09-03T02:11:16.565Z] [world] You commit to the dodge. Slip Conspiracy Architects Raider 2's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-03T02:11:16.566Z] [combat] Conspiracy Architects Raider 1 smokes \u2014 acid eats 1. (2/16 HP, 0 turns left)\n",
+      "[2026-09-03T02:11:16.566Z] [combat] Conspiracy Architects Raider 1 shakes off the last of the acid \u2014 the Auralite Talon has run its course.\n[2026-09-03T02:11:16.566Z] [combat] Conspiracy Architects Raider 1 blackens \u2014 corruption eats 1. (1/16 HP, 0 turns left)\n",
+      "[2026-09-03T02:11:16.566Z] [combat] Conspiracy Architects Raider 1 shakes off the last of the corruption \u2014 the Auralite Talon has run its course.\n[2026-09-03T02:11:16.566Z] [combat] Conspiracy Architects Raider 2 blisters \u2014 clinging fire sears 4. (0/17 HP, 1 turn left)\n[2026-09-03T02:11:16.566Z] [combat] Conspiracy Architects Raider 2 blackens \u2014 corruption eats 1. (0/17 HP, 1 turn left)\n",
+      "[2026-09-03T02:11:16.567Z] [reward] Conspiracy Architects Raider 2 defeated. You recover Patched Cloth \u00d72.\n[2026-09-03T02:11:16.568Z] [reward] You strip the body: Cudgel, Mud-Warden's Vest (+6 TC). The kit took the fight badly.\n[2026-09-03T02:11:16.568Z] [combat] 3 attackers remain. Conspiracy Architects Raider 3 now in your sights.\n[2026-09-03T02:11:16.568Z] [reward] +8 TC pried from the dust.\n",
+      "[2026-09-03T02:11:16.693Z] [combat] Conspiracy Architects Raider 3 \u2014 d20 \u2192 17 + ATK 7 = 24 vs your AC 22 \u2014 \u2713 HIT\n[2026-09-03T02:11:16.693Z] [combat] Dodge \u2014 d20 \u2192 2 + DEX 20 = 22 vs ATK 24. \u2717 You misread it \u2014 no opening, and the blow lands as it normally would (armor still counts).\n",
+      "[2026-09-03T02:11:16.693Z] [world] Your read is a beat off \u2014 you fail to make the opening, and the swing lands the way it always meant to.\n[2026-09-03T02:11:16.695Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 1 + ATK 7 = 8 vs your AC 22 \u2014 \u2717 FUMBLE\n[2026-09-03T02:11:16.696Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 12 + ATK 7 = 19 vs your AC 22 \u2014 \u2717 MISS\n",
+      "[2026-09-03T02:11:16.696Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T02:11:17.078Z] [combat] Conspiracy Architects Raider 3 deals 12 bludgeoning damage. You have 20 HP remaining.\n[2026-09-03T02:11:17.408Z] [cognitive] neutral  (382ms)\n[2026-09-03T02:11:17.770Z] [debug] ui: tap \"magnetic axe \u26a1\"\n[2026-09-03T02:11:17.789Z] [player] attack with the magnetic axe\n",
+      "[2026-09-03T02:11:17.789Z] [debug] parser: intent=attack conf=1.00 verb=attack target=magnetic axe resolved=Magnetic Axe range=close enemies=4 hooks=1\n[2026-09-03T02:11:17.790Z] [debug] attack: target=Conspiracy Architects Raider 3 range=close reach.bands=[close] reach.label=Magnetic Axe bareHand=false\n",
+      "[2026-09-03T02:11:17.865Z] [world] You bring the magnetic axe to bear on Conspiracy Architects Raider 3.\n[2026-09-03T02:11:17.865Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T02:11:18.212Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 THROW \u00b7 DISENGAGE  (344ms)\n[2026-09-03T02:11:25.107Z] [world] Conspiracy Architects Raider 3 moves first. The pressure is immediate.\n",
+      "[2026-09-03T02:11:25.109Z] [combat] Conspiracy Architects Raider 3 \u2014 d20 \u2192 7 + ATK 7 = 14 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T02:11:25.111Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 18 + ATK 7 = 25 vs your AC 22 \u2014 \u2713 HIT\n[2026-09-03T02:11:25.114Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 20 + ATK 7 = 27 vs your AC 22 \u2014 \u2713 CRITICAL HIT\n",
+      "[2026-09-03T02:11:25.115Z] [combat] You \u2014 d20 \u2192 7 + STR 18 = 25 vs Conspiracy Architects Raider 3 AC 11 \u2014 \u2713 HIT\n[2026-09-03T02:11:25.117Z] [combat] Electrical flares \u2014 +3 on hit.\n[2026-09-03T02:11:25.118Z] [combat] Conspiracy Architects Raider 3 takes 8 with the magnetic axe. It reels: 10 left. Then it fights back.\n",
+      "[2026-09-03T02:11:25.118Z] [combat] Conspiracy Architects Raider 3 is left exposed \u2014 easier to hit.\n[2026-09-03T02:11:25.118Z] [arbiter] \"Tartaria does not award style points,\" the Arbiter says, eyes on the Conspiracy Architects Raider 3. \"End it.\"\n[2026-09-03T02:11:25.510Z] [combat] Conspiracy Architects Raider 4 deals 8 slashing damage [armor \u221225%]. You have 12 HP remaining.\n",
+      "[2026-09-03T02:11:25.510Z] [combat] Conspiracy Architects Raider 5 deals 8 slashing damage [armor \u221225%]. You have 4 HP remaining.\n[2026-09-03T02:11:25.510Z] [combat] Conspiracy Architects Raider 5's strike leaves you bleeding.\n[2026-09-03T02:11:29.671Z] [debug] ui: tap \"inventory\"\n[2026-09-03T02:11:43.429Z] [player] use Trauma Kit\n",
+      "[2026-09-03T02:11:43.429Z] [debug] parser: intent=use_relic conf=1.00 verb=use target=trauma kit resolved=Trauma Kit range=close enemies=4 hooks=1\n[2026-09-03T02:11:43.431Z] [world] You use one Trauma Kit. +45 HP, +1 stamina, bleeding stopped.\n[2026-09-03T02:11:43.446Z] [debug] arbiter: template (reason=qwen-not-ready)\n",
+      "[2026-09-03T02:11:43.446Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-03T02:11:43.447Z] [system] \u23f3 Time passed: 15 min\n[2026-09-03T02:11:45.156Z] [cognitive] neutral  (1709ms)\n[2026-09-03T02:11:46.086Z] [debug] persist sizes(KB): total=337 player=83 wm=163[rooms=93 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=84 scene=6\n",
+      "[2026-09-03T02:12:04.226Z] [debug] stats: STR18 DEX20 INT11 WIS16 CHA11 STE8 | gear: WIS+5,INT+2,STR+6,DEX+8,STE+2 | worn: main=Magnetic Axe off=Choir-Bound Launcher head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Amulet of the Silt Warden ring=Light-Finger Guild Band\n",
+      "[2026-09-03T02:12:39.765Z] [debug] ui: tap \"dodge\"\n[2026-09-03T02:12:39.777Z] [player] dodge\n[2026-09-03T02:12:39.778Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=4 hooks=1\n",
+      "[2026-09-03T02:12:39.779Z] [world] You commit to the dodge. Slip Conspiracy Architects Raider 3's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-03T02:12:39.869Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 12 + ATK 7 = 19 vs your AC 22 \u2014 \u2717 EVADED\n",
+      "[2026-09-03T02:12:39.869Z] [combat] Dodge \u2014 d20 \u2192 17 + DEX 20 = 37 vs ATK 19. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-03T02:12:39.869Z] [world] You slip Conspiracy Architects Raider 5's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n",
+      "[2026-09-03T02:12:39.871Z] [debug] ac-shift 22\u219225: race/base 10 + gear 18 + title 0 \u2192 trimmed 22 + status 3 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n",
+      "[2026-09-03T02:12:39.871Z] [combat] Conspiracy Architects Raider 3 \u2014 d20 \u2192 19 + ATK 7 = 26 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-09-03T02:12:39.872Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 17 + ATK 7 = 24 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 HIT\n[2026-09-03T02:12:39.874Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-03T02:12:40.254Z] [combat] Conspiracy Architects Raider 3 deals 3 bludgeoning damage [plate \u22121]. You have 46 HP remaining.\n[2026-09-03T02:12:40.254Z] [combat] Conspiracy Architects Raider 4 deals 1 slashing damage [plate \u22121]. You have 45 HP remaining.\n[2026-09-03T02:12:41.232Z] [debug] ui: tap \"magnetic axe \u26a1\"\n[2026-09-03T02:12:41.235Z] [system] evasive \u2014 harder to hit fades.\n",
+      "[2026-09-03T02:12:41.270Z] [player] attack with the magnetic axe\n[2026-09-03T02:12:41.271Z] [debug] parser: intent=attack conf=1.00 verb=attack target=magnetic axe resolved=Magnetic Axe range=close enemies=4 hooks=1\n[2026-09-03T02:12:41.272Z] [debug] attack: target=Conspiracy Architects Raider 3 range=close reach.bands=[close] reach.label=Magnetic Axe bareHand=false\n",
+      "[2026-09-03T02:12:41.274Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-03T02:12:41.355Z] [world] You raise the magnetic axe toward Conspiracy Architects Raider 3. The room narrows around the both of you.\n[2026-09-03T02:12:41.356Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T02:12:47.052Z] [world] You seize the initiative. Conspiracy Architects Raider 3 has no time to react.\n",
+      "[2026-09-03T02:12:47.052Z] [combat] You \u2014 d20 \u2192 18 + STR 18 perfect opening (2\u00d7 dice) = 36 vs Conspiracy Architects Raider 3 AC 11 \u2014 \u2713 HIT\n[2026-09-03T02:12:47.054Z] [combat] Conspiracy Architects Raider 3 folds under the magnetic axe. 13 damage was enough. The room exhales.\n[2026-09-03T02:12:47.055Z] [reward] Conspiracy Architects Raider 3 defeated. You recover Patched Cloth \u00d72, Architect Sigil.\n",
+      "[2026-09-03T02:12:47.056Z] [reward] You strip the body: Cudgel, Mud-Warden's Vest (+6 TC). The kit took the fight badly.\n[2026-09-03T02:12:47.056Z] [combat] 2 attackers remain. Conspiracy Architects Raider 4 now in your sights.\n[2026-09-03T02:12:47.056Z] [reward] +22 TC pried from the dust.\n",
+      "[2026-09-03T02:12:47.121Z] [debug] ac-shift 25\u219222: race/base 10 + gear 18 + title 0 \u2192 trimmed 22 + status 0 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n[2026-09-03T02:12:47.121Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 18 + ATK 7 = 25 vs your AC 22 \u2014 \u2713 HIT\n",
+      "[2026-09-03T02:12:47.122Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 9 + ATK 7 = 16 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T02:12:47.519Z] [combat] Conspiracy Architects Raider 5 deals 2 slashing damage. You have 43 HP remaining.\n[2026-09-03T02:12:47.519Z] [combat] Conspiracy Architects Raider 5's strike leaves you bleeding.\n[2026-09-03T02:12:53.652Z] [debug] ui: tap \"golem (39/68)\"\n",
+      "[2026-09-03T02:12:53.654Z] [player] use golem\n[2026-09-03T02:12:53.655Z] [combat] Ashwright attacks Conspiracy Architects Raider 4 \u2014 d20 6 + 3 = 9 vs AC 11 \u2014 \u2717 MISS\n[2026-09-03T02:12:53.655Z] [world] Ashwright's strike sails wide of Conspiracy Architects Raider 4.\n",
+      "[2026-09-03T02:12:53.655Z] [combat] Conspiracy Architects Raider 4 retaliates \u2014 d20 14 + 6 hits Ashwright for 3 (35% resisted). (36/68)\n[2026-09-03T02:12:53.667Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 6 + ATK 7 = 13 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T02:12:53.669Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 17 + ATK 7 = 24 vs your AC 22 \u2014 \u2713 HIT\n",
+      "[2026-09-03T02:12:54.050Z] [combat] Conspiracy Architects Raider 5 deals 1 slashing damage. You have 42 HP remaining.\n[2026-09-03T02:12:54.050Z] [combat] Conspiracy Architects Raider 5's strike leaves you bleeding.\n[2026-09-03T02:12:54.479Z] [debug] persist sizes(KB): total=336 player=83 wm=163[rooms=93 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=84 scene=6\n",
+      "[2026-09-03T02:12:57.069Z] [debug] ui: tap \"golem (36/68)\"\n[2026-09-03T02:12:57.079Z] [player] use golem\n[2026-09-03T02:12:57.080Z] [combat] Ashwright attacks Conspiracy Architects Raider 4 \u2014 d20 12 + 3 = 15 vs AC 11 \u2014 \u2713 HIT\n[2026-09-03T02:12:57.081Z] [combat] Ashwright swings the Crude Golem Greatsword \u2014 10 slashing damage on Conspiracy Architects Raider 4. (6 HP left)\n",
+      "[2026-09-03T02:12:57.081Z] [combat] Conspiracy Architects Raider 4 retaliates \u2014 d20 5 + 6 hits Ashwright for 1 (35% resisted). (35/68)\n[2026-09-03T02:12:57.100Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 15 + ATK 7 = 22 vs your AC 22 \u2014 \u2713 HIT\n[2026-09-03T02:12:57.106Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 15 + ATK 7 = 22 vs your AC 22 \u2014 \u2713 HIT\n",
+      "[2026-09-03T02:12:57.494Z] [combat] Conspiracy Architects Raider 5 deals 3 slashing damage [armor \u221225%]. You have 39 HP remaining.\n[2026-09-03T02:12:57.494Z] [combat] Conspiracy Architects Raider 5's strike leaves you bleeding.\n[2026-09-03T02:12:57.494Z] [combat] Conspiracy Architects Raider 4 deals 3 slashing damage [armor \u221225%]. You have 36 HP remaining.\n",
+      "[2026-09-03T02:12:57.494Z] [combat] Conspiracy Architects Raider 4's strike leaves you bleeding.\n[2026-09-03T02:13:00.052Z] [debug] ui: tap \"golem (35/68)\"\n[2026-09-03T02:13:00.059Z] [player] use golem\n[2026-09-03T02:13:00.060Z] [combat] Ashwright attacks Conspiracy Architects Raider 4 \u2014 d20 3 + 3 = 6 vs AC 11 \u2014 \u2717 MISS\n",
+      "[2026-09-03T02:13:00.060Z] [world] Ashwright's strike sails wide of Conspiracy Architects Raider 4.\n[2026-09-03T02:13:00.060Z] [combat] Conspiracy Architects Raider 4 retaliates \u2014 d20 8 + 6 hits Ashwright for 2 (35% resisted). (33/68)\n[2026-09-03T02:13:00.077Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 1 + ATK 7 = 8 vs your AC 22 \u2014 \u2717 FUMBLE\n",
+      "[2026-09-03T02:13:00.079Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 10 + ATK 7 = 17 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T02:13:37.326Z] [debug] ui: tap \"inventory\"\n[2026-09-03T02:13:53.698Z] [debug] ui: tap \"magnetic axe \u26a1\"\n[2026-09-03T02:13:53.716Z] [player] attack with the magnetic axe\n",
+      "[2026-09-03T02:13:53.717Z] [debug] parser: intent=attack conf=1.00 verb=attack target=magnetic axe resolved=Magnetic Axe range=close enemies=3 hooks=1\n[2026-09-03T02:13:53.718Z] [debug] attack: target=Conspiracy Architects Raider 4 range=close reach.bands=[close] reach.label=Magnetic Axe bareHand=false\n",
+      "[2026-09-03T02:13:53.793Z] [world] Your magnetic axe comes around in an arc; Conspiracy Architects Raider 4 squares up to meet it.\n[2026-09-03T02:13:53.793Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T02:13:54.125Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 THROW \u00b7 DISENGAGE  (331ms)\n",
+      "[2026-09-03T02:13:54.533Z] [debug] persist sizes(KB): total=336 player=83 wm=163[rooms=93 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=84 scene=6\n[2026-09-03T02:13:59.693Z] [world] Conspiracy Architects Raider 4 moves first. The pressure is immediate.\n[2026-09-03T02:13:59.695Z] [combat] Conspiracy Architects Raider 4 \u2014 d20 \u2192 14 + ATK 7 = 21 vs your AC 22 \u2014 \u2717 MISS\n",
+      "[2026-09-03T02:13:59.696Z] [combat] Conspiracy Architects Raider 5 \u2014 d20 \u2192 15 + ATK 7 = 22 vs your AC 22 \u2014 \u2713 HIT\n[2026-09-03T02:13:59.696Z] [combat] You \u2014 d20 \u2192 8 + STR 18 = 26 vs Conspiracy Architects Raider 4 AC 11 \u2014 \u2713 HIT\n[2026-09-03T02:13:59.700Z] [combat] Your blow with the magnetic axe lands clean \u2014 9 damage. Conspiracy Architects Raider 4 crumples in the dust. The Aetherstone settles.\n",
+      "[2026-09-03T02:13:59.700Z] [reward] Conspiracy Architects Raider 4 defeated. You recover Aether Residue, Patched Cloth.\n[2026-09-03T02:13:59.701Z] [reward] You strip the body: Bone Knife, Mud-Warden's Vest (+6 TC). The kit took the fight badly.\n[2026-09-03T02:13:59.701Z] [combat] 1 attacker remains. Conspiracy Architects Raider 5 now in your sights.\n",
+      "[2026-09-03T02:13:59.701Z] [reward] +18 TC pried from the dust.\n[2026-09-03T02:14:00.140Z] [combat] Conspiracy Architects Raider 5 deals 5 slashing damage [armor \u221225%]. You have 31 HP remaining.\n[2026-09-03T02:14:04.467Z] [debug] ui: tap \"dodge\"\n[2026-09-03T02:14:04.470Z] [system] bleeding fades.\n[2026-09-03T02:14:04.479Z] [player] dodge\n[2026-09-03T02:1"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-03-1642-every-drop-has-a-name-in-the-book #mtlhgdw29v8x [inline 24/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtlhgdw29v8x"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-03-1642-every-drop-has-a-name-in-the-book"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "24"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-03-1642-every-drop-has-a-name-in-the-book"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:68.162.161.251",
+      "query": "user.ip:\"68.162.161.251\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-03T14:32:51.981916Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-03T14:32:53.196000Z",
+  "fingerprints": [
+    "8641a52080b8535475cb5d6753a9c9a3"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1952890889,
+    "commitCount": 20,
+    "data": {},
+    "dateCreated": "2026-09-03T12:10:00.204000Z",
+    "dateReleased": "2026-09-03T14:02:00.424207Z",
+    "deployCount": 1,
+    "ref": null,
+    "lastCommit": {
+      "id": "1fc5ac79d97859fb19c740742255089af058654c",
+      "message": "golem republish of OTA-1642 to exercise the Sentry release step (task #109)\n\nSame bundle as c72cdbec \u2014 no app change, one note beside the stamp. The\nActions dispatch is not reachable from this session (403 on the dispatch\nendpoint), and the new Sentry step only runs inside a publish, so this\nmarkerless golem push is the measurement: the run log will say whether\nSENTRY_READ_TOKEN already carries project:releases or a SENTRY_AUTH_TOKEN\nsecret is needed.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-03T13:59:43Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-03-1642-every-drop-has-a-name-in-the-book",
+          "shortVersion": "tartaria@4.32.11+2026-09-03-1642-every-drop-has-a-name-in-the-book",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-03T14:02:00.424207Z",
+          "dateCreated": "2026-09-03T12:10:00.204000Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155183521",
+      "environment": "golem",
+      "dateStarted": null,
+      "dateFinished": "2026-09-03T14:02:00.682876Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-03-1642-every-drop-has-a-name-in-the-book",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-03-1642-every-drop-has-a-name-in-the-book",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-03-1642-every-drop-has-a-name-in-the-book",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-03-1642-every-drop-has-a-name-in-the-book)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "2cb7ec4e022e45c0a828a6f35daba70a",
+  "previousEventID": "0d9c4ef1cc5c417fa8835f6d61a872bb"
+}

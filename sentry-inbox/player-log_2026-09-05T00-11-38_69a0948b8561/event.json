@@ -1,0 +1,302 @@
+{
+  "id": "69a0948b856142169ba0a7762c79271b",
+  "groupID": "7712876642",
+  "eventID": "69a0948b856142169ba0a7762c79271b",
+  "projectID": "4511945117532160",
+  "size": 17842,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-05-1675-the-voice-names-its-step #mtnlu0casj0h [inline 16/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-05-1675-the-voice-names-its-step",
+  "message": "player-log 2026-09-05-1675-the-voice-names-its-step #mtnlu0casj0h [inline 16/28]",
+  "title": "player-log 2026-09-05-1675-the-voice-names-its-step #mtnlu0casj0h [inline 16/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "df6ce37bbffa478cbc518316acd1a51e",
+      "span_id": "a14a66191405160f",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "ld] [Giant-Watch Shrine] north: Garrin (return the folio) (17 tiles, 1 day, 19 hours) \u00b7 east: Cradle of Dusk (5 tiles, 13 hours) \u00b7 south: The Central Pillars (5 tiles, 13 hours) \u00b7 west: Builders' Survey Camp (6 tiles, 15 hours)\n[2026-09-04T19:37:13.539Z] [debug] arbiter: template (reason=combat)\n",
+      "[2026-09-04T19:37:13.540Z] [arbiter] The Arbiter's gaze stays on the aetheric worm. \"Strike, hide, or speak \u2014 the choice is yours and it is brief.\"\n[2026-09-04T19:37:14.242Z] [debug] persist sizes(KB): total=336 player=72 wm=176[rooms=101 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=85 scene=3\n[2026-09-04T19:37:20.369Z] [debug] ui: tap \"approach\"\n",
+      "[2026-09-04T19:37:20.409Z] [player] approach Aetheric Worm\n[2026-09-04T19:37:20.410Z] [debug] parser: intent=advance conf=1.00 verb=approach target=aetheric worm resolved=Aetheric Worm range=mid enemies=1 hooks=0\n[2026-09-04T19:37:20.418Z] [debug] move: advance from range=mid enemies=1 weather=Iron Fog cost=2 partial=0\n",
+      "[2026-09-04T19:37:20.419Z] [world] Iron Fog slows you down. You push toward Aetheric Worm but the compass spins and your footing drags. (1/2 \u2014 type 'advance' again to close)\n[2026-09-04T19:37:20.419Z] [debug] move: slow weather progress 1/2\n[2026-09-04T19:37:21.059Z] [cognitive] USE_ITEM \u00b7 RETREAT  (638ms)\n[2026-09-04T19:37:21.367Z] [debug] ui: tap \"approach\"\n",
+      "[2026-09-04T19:37:21.387Z] [player] approach Aetheric Worm\n[2026-09-04T19:37:21.388Z] [debug] parser: intent=advance conf=1.00 verb=approach target=aetheric worm resolved=Aetheric Worm range=mid enemies=1 hooks=0\n[2026-09-04T19:37:21.389Z] [debug] move: advance from range=mid enemies=1 weather=Iron Fog cost=2 partial=1\n",
+      "[2026-09-04T19:37:21.389Z] [debug] move: field advance target=Aetheric Worm d 1.50->0.50 band mid->close\n[2026-09-04T19:37:21.390Z] [world] You close the gap with Aetheric Worm. (range: close / arm's reach)\n[2026-09-04T19:37:21.391Z] [combat] Aetheric Worm \u2014 d20 \u2192 20 + ATK 5 = 25 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2713 CRITICAL HIT\n",
+      "[2026-09-04T19:37:21.744Z] [combat] Aetheric Worm deals 8 acid damage [armor \u221257%]. You have 42 HP remaining.\n[2026-09-04T19:37:21.744Z] [combat] That's your acid resist working \u2014 the armor drank most of that hit (8 of 18 got through).\n[2026-09-04T19:37:22.045Z] [cognitive] USE_ITEM \u00b7 RETREAT  (352ms)\n[2026-09-04T19:37:22.343Z] [debug] ui: tap \"dodge\"\n[2026-09-04T19:37:22.347Z] [player] dodge\n",
+      "[2026-09-04T19:37:22.347Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=0\n[2026-09-04T19:37:22.348Z] [world] You commit to the dodge. Slip Aetheric Worm's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-04T19:37:22.415Z] [combat] Aetheric Worm \u2014 d20 \u2192 7 + ATK 5 = 12 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n[2026-09-04T19:37:22.416Z] [combat] Dodge \u2014 d20 \u2192 15 + DEX 20 = 35 vs ATK 12. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-04T19:37:22.417Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T19:37:23.063Z] [debug] ui: tap \"\ud83d\udd25 geode-cored cleaver \u2692\"\n",
+      "[2026-09-04T19:37:23.097Z] [player] attack with the reclaimers guild geode-cored cleaver\n[2026-09-04T19:37:23.097Z] [debug] parser: intent=attack conf=1.00 verb=attack target=reclaimers guild geode cored cleaver resolved=Reclaimers Guild Geode-Cored Cleaver range=close enemies=1 hooks=0\n",
+      "[2026-09-04T19:37:23.097Z] [arbiter] The Arbiter keeps one eye on the fight. \"That is the right move for The Bog Dragon of Old Drakova \u2014 but not with something on you. Put this down first.\"\n[2026-09-04T19:37:23.098Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter keeps one eye on the fight. \"That is the right m\u2026\"\n",
+      "[2026-09-04T19:37:23.099Z] [debug] attack: target=Aetheric Worm range=close reach.bands=[close] reach.label=Reclaimers Guild Geode-Cored Cleaver bareHand=false\n[2026-09-04T19:37:23.100Z] [arbiter] Iron Fog hangs between you. \"\u22122 to the swing \u2014 see what you can,\" the Arbiter says.\n[2026-09-04T19:37:23.100Z] [debug] attack: visibility penalty \u22122 (Iron Fog)\n",
+      "[2026-09-04T19:37:23.102Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n[2026-09-04T19:37:23.170Z] [world] You commit forward with the smoldering reclaimers guild geode-cored cleaver. Aetheric Worm watches your hands.\n[2026-09-04T19:37:23.170Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T19:37:23.496Z] [cognitive] neutral  (1078ms)\n[2026-09-04T19:37:23.810Z] [cognitive] TALK  (639ms)\n",
+      "[2026-09-04T19:37:28.358Z] [world] Aetheric Worm moves first. The pressure is immediate.\n[2026-09-04T19:37:28.360Z] [combat] Aetheric Worm \u2014 d20 \u2192 7 + ATK 5 = 12 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n[2026-09-04T19:37:28.360Z] [combat] You \u2014 d20 \u2192 1 + DEX 19 \u2212 2 (Iron Fog) perfect opening (2\u00d7 dice) = 18 vs Aetheric Worm AC 10 \u2014 \u2717 FUMBLE\n",
+      "[2026-09-04T19:37:28.360Z] [combat] Half a beat too slow. Aetheric Worm steps inside your reach.\n[2026-09-04T19:37:30.628Z] [debug] ui: tap \"\ud83d\udd25 geode-cored cleaver \u2692\"\n[2026-09-04T19:37:30.682Z] [player] attack with the reclaimers guild geode-cored cleaver\n",
+      "[2026-09-04T19:37:30.682Z] [debug] parser: intent=attack conf=1.00 verb=attack target=reclaimers guild geode cored cleaver resolved=Reclaimers Guild Geode-Cored Cleaver range=close enemies=1 hooks=0\n[2026-09-04T19:37:30.683Z] [arbiter] The Arbiter keeps one eye on the fight. \"That is the right move for The Bog Dragon of Old Drakova \u2014 but not with something on you. Put this down first.\"\n",
+      "[2026-09-04T19:37:30.683Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter keeps one eye on the fight. \"That is the right m\u2026\"\n[2026-09-04T19:37:30.683Z] [debug] attack: target=Aetheric Worm range=close reach.bands=[close] reach.label=Reclaimers Guild Geode-Cored Cleaver bareHand=false\n[2026-09-04T19:37:30.685Z] [debug] attack: visibility penalty \u22122 (Iron Fog)\n",
+      "[2026-09-04T19:37:30.752Z] [world] You commit forward with the smoldering reclaimers guild geode-cored cleaver. Aetheric Worm watches your hands.\n[2026-09-04T19:37:30.752Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T19:37:31.052Z] [cognitive] TALK  (299ms)\n[2026-09-04T19:37:37.856Z] [world] You seize the initiative. Aetheric Worm has no time to react.\n",
+      "[2026-09-04T19:37:37.857Z] [combat] You \u2014 d20 \u2192 12 + DEX 19 \u2212 2 (Iron Fog) = 29 vs Aetheric Worm AC 10 \u2014 \u2713 HIT\n[2026-09-04T19:37:37.857Z] [combat] Bludgeoning flares \u2014 +4 on hit (weak \u2014 bites deep!).\n[2026-09-04T19:37:37.857Z] [combat] Weakness exposed \u2014 Aetheric Worm flinches. (bludgeoning \u00d72.25 for 29)\n",
+      "[2026-09-04T19:37:37.858Z] [debug] wear ward: Reclaimers Guild Geode-Cored Cleaver keeps its point (15%)\n[2026-09-04T19:37:37.858Z] [combat] Final strike with the smoldering reclaimers guild geode-cored cleaver for 29. Aetheric Worm is still. The Aetherstone hums on, indifferent.\n[2026-09-04T19:37:37.859Z] [reward] Aetheric Worm defeated. You recover Worm Mucus \u00d72.\n",
+      "[2026-09-04T19:37:37.860Z] [reward] +6 TC pried from the dust.\n[2026-09-04T19:37:40.222Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-09-04T19:37:40.498Z] [debug] ui: tap \"take / salvage\"\n[2026-09-04T19:37:41.569Z] [world] You claim the Architect's Field Jacket.\n[2026-09-04T19:37:41.569Z] [reward] \u2726 Architect's Field Jacket (Common).\n",
+      "[2026-09-04T19:37:41.581Z] [world] The Rough-Hewn Gauntlets comes up out of the silt with a small sucking protest.\n[2026-09-04T19:37:41.581Z] [reward] \u2726 Rough-Hewn Gauntlets (Common).\n[2026-09-04T19:37:41.582Z] [world] The Stone Seeker's Brow Guard was half under something. It is not now.\n[2026-09-04T19:37:41.582Z] [reward] \u2726 Stone Seeker's Brow Guard (Common).\n",
+      "[2026-09-04T19:37:42.500Z] [world] You work the bedroll over. A part of it comes loose, intact.\n[2026-09-04T19:37:42.500Z] [world] You strip the broken petrified mud wave down. Mostly debris \u2014 but a Bent Nail comes loose at the bottom of the pile.\n[2026-09-04T19:37:42.501Z] [world] You work the cracked toppled obelisk fragment over. A part of it comes loose, intact.\n",
+      "[Filtered]",
+      "[2026-09-04T19:37:42.502Z] [reward] \u2726 Salvage haul:\n[2026-09-04T19:37:42.502Z] [reward]     \u2022 Spider Silk (Common)\n[2026-09-04T19:37:42.502Z] [reward]     \u2022 Bent Nail (Common)\n[2026-09-04T19:37:42.502Z] [reward]     \u2022 Mud Fragment x3 (Common)\n[2026-09-04T19:37:42.503Z] [reward]     \u2022 Aether Crystal (Common)\n[2026-09-04T19:37:42.503Z] [reward]     \u2022 Horn-Capped Dowel (Common)\n",
+      "[2026-09-04T19:37:42.503Z] [reward]     \u2022 Worn Tartarian Coin x10 (Common)\n[2026-09-04T19:37:43.186Z] [debug] persist sizes(KB): total=337 player=73 wm=177[rooms=101 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=84 scene=2\n[2026-09-04T19:37:45.516Z] [debug] ui: tap \"ENTER OUTPOST\"\n[2026-09-04T19:37:45.517Z] [player] enter outpost\n",
+      "[2026-09-04T19:37:45.517Z] [world] You cross to the gate and step through.\n[2026-09-04T19:37:45.517Z] [debug] scene: loc=giant_watch_shrine hub=outpost_gate arrival=n opening=n passing=y\n[2026-09-04T19:37:45.518Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-04T19:37:45.518Z] [debug] missions: hunt:hunt_bog_dragon stage 5/7 [attack_provoke\u2192attack] @mud_seas needs=Eshren's Name-Token\u2713 spawn=Mud Harpy\u00d73 AMBUSH\n[2026-09-04T19:37:45.519Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n",
+      "[2026-09-04T19:37:45.519Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc=\"the Order envoy\" gives=Sealed Reliquary Box PAUSED\n[2026-09-04T19:37:45.519Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2717MISSING gives=Temporal Distortion Watch PAUSED\n",
+      "[2026-09-04T19:37:45.519Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n[2026-09-04T19:37:45.519Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n",
+      "[2026-09-04T19:37:45.519Z] [debug] missions: \u00b7 at=giant_watch_shrine travelTo=mud_seas\n[2026-09-04T19:37:45.633Z] [debug] spawn: gear=[Lightfoot Dash Wand, Stone-Stride Greaves] window=10 roster=new\n[2026-09-04T19:37:45.634Z] [world] Tomb Vigil \u2014 The Vigil Door. A stone arch wreathed in chains and lit by a single Giant-burnished lantern. The keeper inclines their head as you pass; speech is for th",
+      "e inner halls.\n[2026-09-04T19:37:45.634Z] [world] Paths: north to Court \u00b7 south to First Landing. (Type 'leave outpost' to head into the wilds.)\n[2026-09-04T19:37:45.635Z] [world] Halem the Trader waves off the customer they were serving. \"Cheddar Bob's here. Give me a moment.\" The other one waits.\n",
+      "[2026-09-04T19:37:45.635Z] [world] \"Cheddar Bob.\" Halem the Trader says it like setting down something heavy. \"You've been gone. I kept your usual back anyway.\"\n[2026-09-04T19:37:46.567Z] [debug] qwen\u23f1 narration:scene_intro_fill preempted 6177ms read 0ms/write 0ms in 762t\u2192out 0t (0ch)\n[2026-09-04T19:37:46.781Z] [debug] qwen\u23f1 \u2702 DISCARDED narration:scene_intro_fill after 6177ms \u2014 intro-fill:\u2205\n",
+      "[2026-09-04T19:37:46.781Z] [debug] homework: scene_intro \"Giant-Watch Shrine\" \u2205 6559ms\n[2026-09-04T19:37:47.667Z] [debug] ui: tap \"take / salvage\"\n[2026-09-04T19:37:48.836Z] [world] You work the Lightfoot Dash Wand loose from where the mud had it.\n[2026-09-04T19:37:48.836Z] [reward] \u2726 Lightfoot Dash Wand (Common).\n",
+      "[2026-09-04T19:37:48.856Z] [world] The Stone-Stride Greaves had settled into the ground. You unsettle it.\n[2026-09-04T19:37:48.856Z] [reward] \u2726 Stone-Stride Greaves (Common).\n[2026-09-04T19:37:49.821Z] [world] You work the broken capacitor coil rack over. A part of it comes loose, intact.\n[2026-09-04T19:37:49.821Z] [world] You break the lantern apart. Among the pieces, something worth keeping.\n",
+      "[2026-09-04T19:37:49.821Z] [world] You salvage the rusted engine chamber scaffolding. The take is small but real.\n[2026-09-04T19:37:49.822Z] [world] You break the sign apart. Among the pieces, something worth keeping.\n[2026-09-04T19:37:49.822Z] [world] You break the stairwell apart. Among the pieces, something worth keeping.\n",
+      "[2026-09-04T19:37:49.822Z] [world] You lever something loose from the stripped maintenance panel \u2014 not standard salvage. Odd enough that the Crucible would know what to do with it.\n[2026-09-04T19:37:49.823Z] [world] You strip the table carefully. Something usable comes free in your hand.\n[2026-09-04T19:37:49.823Z] [reward] \u2726 Salvage haul:\n",
+      "[2026-09-04T19:37:49.823Z] [reward]     \u2022 Scrap Metal x3 (Common)\n[2026-09-04T19:37:49.823Z] [reward]     \u2022 Aether Dust x3 (Common)\n[2026-09-04T19:37:49.823Z] [reward]     \u2022 Aether Crystal x2 (Common)\n[2026-09-04T19:37:49.823Z] [reward]     \u2022 Smooth Stone x2 (Common)\n[2026-09-04T19:37:49.824Z] [reward]     \u2022 Copper-Threaded Veil (Uncommon)\n",
+      "[2026-09-04T19:37:49.824Z] [reward]     \u2022 Stick x2 (Common)\n[2026-09-04T19:37:57.662Z] [debug] kbbar: mounted bottom=355 raw=0 from=estimate winH=986 beat=-\n[2026-09-04T19:37:58.080Z] [debug] kbbar: mounted bottom=407.7948624048478 raw=408 from=live winH=986 beat=-\n[2026-09-04T19:38:30.053Z] [debug] homework: intro-fill armed after 6000ms idle (strike 2/3)\n",
+      "[2026-09-04T19:39:10.916Z] [player] so now I can enter an outpost, but I can only go to the very first room and then my only other options are go back to my auto route like I don't have access to the full outpost it only lets me. enter so it doesn't actually let me get into the instance the full instance of the Outpost. so what I didn't want was the automatic entry of the Outpost stopping my auto ",
+      "route and automatically entering what I want to happen is you land on the tile? it does not automatically put you in the output. it keeps your auto route directed to where you're supposed to be, but if you do chose to enter the Outpost you get to enter the full outpost and have full functionality of it and then when you exit you're still on that tile. but you're at surface level of the tile now an",
+      "d you still have your auto route ready to go. so it's just another thing that you can do on that tile but it doesn't interrupt your travel unless you want it to and then you can continue on with your travel after\n",
+      "[2026-09-04T19:39:10.918Z] [arbiter] The Arbiter studies you, plainly. \"I'm not sure what you're trying to tell me. I'll keep your note in the log either way. If you mean to act, phrase it as a verb \u2014 'investigate the rubble', 'go east', 'attack the figure'.\"\n[2026-09-04T19:39:10.919Z] [debug] meta-comment guard: skipped intent parse (report-of-behaviour: \"it doesn't actually\") on 976-char input\n",
+      "[2026-09-04T19:39:1"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-05-1675-the-voice-names-its-step #mtnlu0casj0h [inline 16/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtnlu0casj0h"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-05-1675-the-voice-names-its-step"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "16"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-05-1675-the-voice-names-its-step"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-05T00:11:36.348177Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "23": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 371,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-05T00:11:38.213000Z",
+  "fingerprints": [
+    "8ed2684bc6b608ad4a9f0db04cd45c70"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1956427903,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-05T00:11:38.213000Z",
+    "dateReleased": "2026-09-05T00:12:48.923167Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "8fbd09d83bf9d0c3ec1fb0527509158bfc77bc5b",
+      "message": "[ota-hal] OTA-1675: the voice names its step\n\nItem two of \"fix all existing issues one through six\": #180, the voice-path\nprocess kill on kai's SM-S942U (Samsung, SM8850, Android 16) \u2014 the first\nnon-Pixel kill on record. Like item one, this is the instrument, not the cure,\nand it also repairs a defect in the instrument it extends.\n\nWHAT HER LEDGER SAID\nA cold 66-second life on the title screen, no action yet, model ledger o0/r0:\n\n    native:voice:done [q0] \u00b7 66228ms into the action \u00b7 alive 0ms after it\n    Voice (TTS) guard: \u26a0 VOICE CRASH detected \u2014 last voice: kokoro:bf_emma\n\nThe guard is armed by markTTSStart before the synth and cleared by markTTSDone\nAFTER playback; so the process died between the synth settling and the line\nfinishing. Sixty-six seconds in, q0, o0/r0: that was the FIRST utterance that\ndevice ever played \u2014 ReadyFlash speaks \"Choose your character.\" the moment\nKokoro comes online. Nothing native runs in that window except what the voice\nlayer does with the samples: the WAV encode, expo-av's player load on a data:\nURI (ExoPlayer \u2192 AudioTrack, the one step that is pure platform media code),\nthe playback, the deferred unload. OTA-1546 stamped the lock; nothing stamped\nthese. The owner's own two voice deaths (08-30 `native:voice:done (+11080ms)`,\n08-31 `native:voice:start [q1]`) sit in the same blind spot.\n\nAND THE INSTRUMENT ITSELF WAS ONE MICROTASK LATE\nMeasured in the new suite before it could be shipped: the lock's `done` stamp\nrode the `.then` AFTER `task.resolve`, so the caller's continuation ran first.\nThe voice drain resumed, encoded the WAV and DISPATCHED the player load before\n`native:voice:done` was written. Her last checkpoint said \"the synth finished\"\nabout a process that had already moved on to playback \u2014 and any checkpoint a\ncaller stamped in that continuation was overwritten by a fact from the step\nbefore it, which is exactly what would have happened to the stamps below.\n`done` is now stamped before the caller is resolved; it means the native op\nsettled, nothing more. Exclusivity is untouched \u2014 `running` still clears only\nafter the caller has been resolved. The ota1546 pin is repointed with the\nreason.\n\nTHE PLAYBACK PATH STAMPS ITS OWN STEPS\n`voice:play:encode` / `create` / `started` / `done` / `unload`, and\n`voice:stop`, each carrying the utterance's ordinal in this life and its\nlength (`#1 0.2s`) \u2014 \"the first line after a fresh model load\" is the fact\nthat separates a one-off from a device that cannot play at all.\n\n\u26a0 THE UNLOAD STAMP YIELDS. It fires 300 ms after the line ends, by which time\nthe lock may be inside the next synth or a Qwen job; overwriting\n`native:llm:start` with `voice:play:unload` would file a death inside\ninference as a death in a player release \u2014 the blind-spot trade OTA-1377 and\nOTA-1413 refused. When the lock is running the crumb it wrote stands. Lazy-\nrequired and wrapped, as the lock's own stamp is.\n\nNot the cure. No exemption is bought with this. The next voice-path death\nreads which step it died in.\n\n- app/ai/nativeMlLock.ts \u2014 `done` stamped in the settle handlers, before\n  resolve/reject.\n- app/voice/PiperTTSManager.ts \u2014 `stampVoicePhase`, the per-life ordinal, the\n  six stamps, the unload gate on `nativeMlSnapshot().running`.\n- __tests__/ota1675TheVoiceNamesItsStep.test.ts \u2014 16 tests: the whole window\n  driven end to end through a mocked Kokoro + expo-av (load, warm-up, the\n  line, then encode \u2192 create \u2192 started \u2192 done), the tag, the yield, voice:stop,\n  the lock ordering measurement, and the source pins.\n- __tests__/ota1546TheDyingBreathNamesTheNativeJob.test.ts \u2014 the order pin\n  reads the settle handler.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-05T00:09:10Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-05-1675-the-voice-names-its-step",
+          "shortVersion": "tartaria@4.32.11+2026-09-05-1675-the-voice-names-its-step",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-05T00:12:48.923167Z",
+          "dateCreated": "2026-09-05T00:11:38.213000Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155726114",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-05T00:12:49.150027Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-05-1675-the-voice-names-its-step",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-05-1675-the-voice-names-its-step",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-05-1675-the-voice-names-its-step",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-05-1675-the-voice-names-its-step)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "6a3f2ec2d55847e2aff093311becc684",
+  "previousEventID": "6582f53849ac4a41a4c7502800a4cadd"
+}

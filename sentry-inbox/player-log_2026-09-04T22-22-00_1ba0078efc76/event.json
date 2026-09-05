@@ -1,0 +1,222 @@
+{
+  "id": "1ba0078efc76485aa96446595e1a26f5",
+  "groupID": "7712710522",
+  "eventID": "1ba0078efc76485aa96446595e1a26f5",
+  "projectID": "4511945117532160",
+  "size": 2670,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log-beacon 2026-09-04-1671-the-armour-bites-back #mtnir5vqr3fw"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1671-the-armour-bites-back",
+  "message": "player-log-beacon 2026-09-04-1671-the-armour-bites-back #mtnir5vqr3fw",
+  "title": "player-log-beacon 2026-09-04-1671-the-armour-bites-back #mtnir5vqr3fw",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "ec145bd1db6d45d7827790af2c4cec02",
+      "span_id": "b163c44c6e0fc193",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {},
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log-beacon 2026-09-04-1671-the-armour-bites-back #mtnir5vqr3fw"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtnir5vqr3fw"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1671-the-armour-bites-back"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-beacon"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "parts",
+      "value": "2"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1671-the-armour-bites-back"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T22:22:00.104606Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T22:22:00.333000Z",
+  "fingerprints": [
+    "35360e77f1e95e8792480b8d7d5ff926"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1956227197,
+    "commitCount": 3,
+    "data": {},
+    "dateCreated": "2026-09-04T21:35:27.475934Z",
+    "dateReleased": "2026-09-04T21:36:21.171958Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "5a5ade19edd93939d3a5417be41b350da5a803f2",
+      "message": "[ota-hal] OTA-1671: the armour bites back, and \"fits dog\" stops repeating the heading\n\nTwo of the owner's five queued items, shipped together because they are the\nsame object seen twice \u2014 the dog vest that already bites back, and the dog\narmour rows that announce they fit a dog while sitting under a heading that\nsays so.\n\nTHE CHIP DELETION IS MEASURED, AND MY FIRST REASON FOR IT WAS WRONG\nI first justified this by calling the chip's predicate a strict subset of the\nsection's. It is a subset in neither direction: the chip fires on\n`itemIsDogArmor` (canonical kind OR CANONICAL tags), the heading on\n`categorizeItem` (canonical kind OR RAW tags OR the DOG_GEAR name, behind a\nfused-kind branch that returns first).\n\nSo I swept them instead. Across all 905 catalog names \u00d7 four stored kinds the\ntwo answers agree 3620 times out of 3620 \u2014 no divergence in either direction.\nOn everything a player can actually hold, the chip said exactly what the\nheading above it already said, which is the owner's point word for word.\n\nAnd the one shape that DOES diverge argues for the deletion rather than\nagainst it: a fused piece stamped `uniqueStats.kind: 'armor'` that still\ncarries a dog_armor tag got `[fits dog]` while sitting \u2014 correctly, because\nOTA-688 made uniqueStats.kind the forge's ground truth \u2014 under ARMOR. The chip\nwas the half that could lie. Removing it removes the only row-level label in\nthe pack that could contradict the section its item is filed in. ota1671 holds\nboth facts, and the OTA-1603 pin on the deleted chip line moves to the\nbehaviour it was protecting: a drifted vest still sections as dog armour.\n\nTHE BITE-BACK IS NOT THE VEST'S BITE-BACK\nThe dog vest (OTA-1640) always returns AETHERIC, whatever hit it. Player\narmour returns the ATTACKER'S OWN damage type \u2014 the owner's call when I put\nthe choice to him. A fire-breather burns itself on your plate; a clawed thing\ncuts itself. One field means something different every encounter, instead of\nbecoming a second, quieter aetheric channel that would make the vest's line\nredundant.\n\nWHY NOT NAME-DRIVEN, ONE OTA AFTER NAMES STARTED DECIDING STATS\nI measured before choosing: exactly TWO of 297 catalog pieces have names that\nalready say they hurt what touches them (Mud-glass Scales, Mud-Claw Gloves).\nDriving the sprinkle off names would have meant renaming ~30 pieces the owner\nalready owns, the OTA right after moving all their stats \u2014 churn on churn, for\na property the item card states plainly anyway. Names decide STATS (OTA-1670);\nthis is a different question, so it gets a different rule.\n\nTHE RULE IS CONTACT. You are INSIDE chest, hands and legs when something lands\non you. A cloak billows and a hood covers your head; neither is something an\nattacker impales itself on. Skewed to Rare/Legendary because a Common should\nnot carry a rider, one in two of the eligible pool by stable hash, and the two\nalready-named pieces are in at any rarity because their names promise it and a\ncard must not lie. Result: 31 of 297 (10.4%) \u2014 Rare 17, Legendary 12,\nUncommon 1, Common 1; chest 13, hands 10, legs 8.\n\nTHE LADDER IS DELIBERATELY SHALLOW. 2 and 3, summed across worn pieces and\ncapped at ARMOR_REFLECT_CAP = 8, because six slots can carry this: a committed\nthorn build lands near the cap rather than blowing past it, and a single piece\nstays a nice rider rather than a strategy.\n\nThe payout fires only when the enemy actually landed a blow (dmg > 0) and only\nwhen it survived it, so a corpse never takes a return hit; a kill by reflect\nroutes through resolveEnemyDefeat() rather than leaving an enemy at 0 HP\nstanding in the scene.\n\n- app/engine/armorBiteBack.ts (new) \u2014 the rule, readable and pure.\n- app/data/items/armor.json \u2014 `reflect` authored on 31 rows, agreeing with it.\n- app/engine/equipment.ts \u2014 ARMOR_REFLECT_CAP, aggregateEquippedReflect().\n- app/engine/crafting.ts \u2014 `reflect?: number` on the armour catalog type.\n- app/state/combatResolution.ts \u2014 the return hit, in the attacker's own element.\n- app/components/itemPreview.ts \u2014 the card states it: \"Bites back: N damage to\n  whatever hits you, in its own element\".\n- app/screens/InventoryScreen.tsx \u2014 the `[fits dog]` chip removed.\n- __tests__/ota1671TheArmourBitesBack.test.ts \u2014 the catalog sweep + the rule.\n- __tests__/ota1603TheVestKnows.test.ts \u2014 the pin on the deleted chip line\n  repointed to the behaviour it guarded.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T21:32:26Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1671-the-armour-bites-back",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1671-the-armour-bites-back",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T21:36:21.171958Z",
+          "dateCreated": "2026-09-04T21:35:27.475934Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155692953",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T21:36:21.418163Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1671-the-armour-bites-back",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1671-the-armour-bites-back",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1671-the-armour-bites-back",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1671-the-armour-bites-back)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": "6a121699069e499b8adf88cd13bd9529"
+}

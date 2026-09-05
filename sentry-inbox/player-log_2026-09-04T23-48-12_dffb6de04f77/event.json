@@ -1,0 +1,275 @@
+{
+  "id": "dffb6de04f77482bbc2b4a321c782862",
+  "groupID": "7712848145",
+  "eventID": "dffb6de04f77482bbc2b4a321c782862",
+  "projectID": "4511945117532160",
+  "size": 18083,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-04-1674-the-dead-life-answers #mtnlu0casj0h [inline 24/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1674-the-dead-life-answers",
+  "message": "player-log 2026-09-04-1674-the-dead-life-answers #mtnlu0casj0h [inline 24/28]",
+  "title": "player-log 2026-09-04-1674-the-dead-life-answers #mtnlu0casj0h [inline 24/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "c5b67a9338b7442887fcbe9331ce1a85",
+      "span_id": "be7cafa4edcda137",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "ect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Amulet of the Silt Warden ring=Tartarian Oath-Band ring2=Tin Ward Ring ring3=Tin Ward Ring ring4=Scribe's Signet\n[2026-09-04T22:16:13.505Z] [debug] ui: tap \"\u271a heals (3)\"\n[2026-09-04T22:16:15.493Z] [world] You use 1\u00d7 First Aid Kit. +19 HP (50/50).\n",
+      "[2026-09-04T22:16:19.682Z] [debug] ui: tap \"dodge\"\n[2026-09-04T22:16:19.700Z] [player] dodge\n[2026-09-04T22:16:19.700Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=2 hooks=0\n",
+      "[2026-09-04T22:16:19.702Z] [world] You commit to the dodge. Slip Mud Harpy's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-04T22:16:19.702Z] [combat] Mud Harpy blisters \u2014 clinging fire sears 5. (2/101 HP, 2 turns left)\n[2026-09-04T22:16:19.797Z] [combat] Mud Harpy \u2014 d20 \u2192 17 + ATK 6 = 23 vs your AC 22 \u2014 \u2717 EVADED\n",
+      "[2026-09-04T22:16:19.797Z] [combat] Dodge \u2014 d20 \u2192 16 + DEX 18 = 34 vs ATK 23. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-04T22:16:19.797Z] [world] You slip Mud Harpy's arc clean and stay light on your feet \u2014 the rest of the pack still swings, but you're a harder mark for the moment.\n",
+      "[2026-09-04T22:16:19.799Z] [debug] ac-shift 22\u219225: race/base 10 + gear 18 + title 0 \u2192 trimmed 22 + status 3 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n[2026-09-04T22:16:19.800Z] [combat] Mud Harpy \u2014 d20 \u2192 4 + ATK 6 = 10 vs your AC 25 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-04T22:16:19.800Z] [debug] arbiter: template (reason=combat)\n[2026-09-04T22:16:19.800Z] [arbiter] \"Footwork over fury,\" the Arbiter says quietly. \"The mud harpy is patient. Be patienter.\"\n[2026-09-04T22:16:19.801Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T22:16:20.137Z] [cognitive] neutral  (335ms)\n[2026-09-04T22:16:21.365Z] [debug] ui: tap \"grasp wand \u25b2\"\n",
+      "[2026-09-04T22:16:21.368Z] [system] evasive \u2014 harder to hit fades.\n[2026-09-04T22:16:21.417Z] [player] attack with the off-hand vine grasp wand\n[2026-09-04T22:16:21.418Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand vine grasp wand resolved=Vine Grasp Wand range=close enemies=2 hooks=0\n",
+      "[2026-09-04T22:16:21.419Z] [arbiter] The Arbiter keeps one eye on the fight. \"That is the right move for The Bog Dragon of Old Drakova \u2014 but not with something on you. Put this down first.\"\n[2026-09-04T22:16:21.419Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter keeps one eye on the fight. \"That is the right m\u2026\"\n",
+      "[2026-09-04T22:16:21.419Z] [combat] Mud Harpy blisters \u2014 clinging fire sears 5. (0/101 HP, 1 turn left)\n[2026-09-04T22:16:21.421Z] [reward] Mud Harpy defeated. You recover Mud Fragment \u00d72, Harpy Feather.\n[2026-09-04T22:16:21.422Z] [combat] 1 attacker remains. Mud Harpy now in your sights.\n[2026-09-04T22:16:21.422Z] [reward] +10 TC pried from the dust.\n",
+      "[2026-09-04T22:16:21.508Z] [debug] attack: target=Mud Harpy range=close reach.bands=[distant,far,mid,close] reach.label=Vine Grasp Wand bareHand=false\n[2026-09-04T22:16:21.510Z] [debug] attack: visibility penalty \u22122 (Iron Fog)\n[2026-09-04T22:16:21.510Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-09-04T22:16:21.580Z] [world] You raise the vine grasp wand toward Mud Harpy. The room narrows around the both of you.\n[2026-09-04T22:16:21.580Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T22:16:22.247Z] [cognitive] AGGRESSION \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 AIM  (666ms)\n",
+      "[2026-09-04T22:16:22.623Z] [debug] persist sizes(KB): total=339 player=73 wm=182[rooms=106 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=81 scene=3\n[2026-09-04T22:16:27.361Z] [world] You seize the initiative. Mud Harpy has no time to react.\n",
+      "[2026-09-04T22:16:27.361Z] [combat] You \u2014 d20 \u2192 20 + INT 16 \u2212 2 (Iron Fog) + 2 (point blank) perfect opening (2\u00d7 dice) = 36 vs Mud Harpy AC 11 \u2014 \u2713 CRITICAL HIT\n[2026-09-04T22:16:27.367Z] [combat] Mud Harpy shrugs off the piercing. (resisted, \u00d70.5 for 6)\n[2026-09-04T22:16:27.368Z] [combat] The piercing has worn Mud Harpy's guard through \u2014 it bites full from here.\n",
+      "[2026-09-04T22:16:27.368Z] [combat] Mud Harpy is restrained \u2014 3 rounds.\n[2026-09-04T22:16:27.369Z] [combat] Clean hit with the vine grasp wand for 6. Mud Harpy has 38 left and does not back away.\n[2026-09-04T22:16:27.369Z] [combat] Mud Harpy (restrained) \u2014 held by your last blow, and it loses the round.\n[2026-09-04T22:16:28.117Z] [debug] ui: tap \"approach\"\n",
+      "[2026-09-04T22:16:28.156Z] [player] approach Mud Harpy\n[2026-09-04T22:16:28.157Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud harpy resolved=Mud Harpy range=close enemies=1 hooks=0\n[2026-09-04T22:16:28.159Z] [debug] move: advance from range=close enemies=1 weather=Iron Fog cost=2 partial=0\n",
+      "[2026-09-04T22:16:28.159Z] [world] Iron Fog slows you down. You push toward Mud Harpy but the compass spins and your footing drags. (1/2 \u2014 type 'advance' again to close)\n[2026-09-04T22:16:28.159Z] [debug] move: slow weather progress 1/2\n[2026-09-04T22:16:28.513Z] [cognitive] SWIM  (352ms)\n[2026-09-04T22:16:29.292Z] [debug] ui: tap \"\u2726 bandolier (5)\"\n",
+      "[2026-09-04T22:16:31.654Z] [reward] You hurl the Acid Flask. It bursts across Mud Harpy \u2014 6 acid (2/turn \u00d7 3). (32 HP left)\n[2026-09-04T22:16:31.656Z] [combat] Mud Harpy (restrained) \u2014 held by your last blow, and it loses the round.\n[2026-09-04T22:16:33.803Z] [debug] ui: tap \"dodge\"\n[2026-09-04T22:16:33.818Z] [player] dodge\n",
+      "[2026-09-04T22:16:33.819Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=0\n[2026-09-04T22:16:33.820Z] [world] You commit to the dodge. Slip Mud Harpy's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-04T22:16:33.821Z] [combat] Mud Harpy (restrained) \u2014 held by your last blow, and it loses the round.\n[2026-09-04T22:16:33.822Z] [debug] arbiter: template (reason=combat)\n[2026-09-04T22:16:33.822Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-04T22:16:33.823Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T22:16:34.179Z] [cognitive] neutral  (355ms)\n",
+      "[2026-09-04T22:16:35.285Z] [debug] ui: tap \"\u2697\u2623 auralite talon \u2726\"\n[2026-09-04T22:16:35.285Z] [system] dodging (parry) fades.\n[2026-09-04T22:16:35.287Z] [world] Iron fog disorients you. Compasses spin; intent costs more.\n[2026-09-04T22:16:35.303Z] [player] attack with the auralite talon\n",
+      "[2026-09-04T22:16:35.303Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=1 hooks=0\n[2026-09-04T22:16:35.304Z] [arbiter] The Arbiter keeps one eye on the fight. \"That is the right move for The Bog Dragon of Old Drakova \u2014 but not with something on you. Put this down first.\"\n",
+      "[2026-09-04T22:16:35.304Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter keeps one eye on the fight. \"That is the right m\u2026\"\n[2026-09-04T22:16:35.304Z] [debug] attack: target=Mud Harpy range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n[2026-09-04T22:16:35.306Z] [debug] attack: visibility penalty \u22122 (Iron Fog)\n",
+      "[2026-09-04T22:16:35.375Z] [world] You commit forward with the acid-etched corrupted auralite talon. Mud Harpy watches your hands.\n[2026-09-04T22:16:35.376Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T22:16:35.700Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (324ms)\n[2026-09-04T22:16:44.191Z] [world] You seize the initiative. Mud Harpy has no time to react.\n",
+      "[2026-09-04T22:16:44.192Z] [combat] You \u2014 d20 \u2192 4 + INT 16 \u2212 2 (Iron Fog) = 18 vs Mud Harpy AC 11 \u2014 \u2717 DODGED\n[2026-09-04T22:16:44.192Z] [combat] Mud Harpy reads the swing and twists clear \u2014 the blow finds nothing. (dodged, agile)\n",
+      "[2026-09-04T22:16:44.195Z] [debug] ac-shift 25\u219222: race/base 10 + gear 18 + title 0 \u2192 trimmed 22 + status 0 | worn: head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak\n[2026-09-04T22:16:44.196Z] [combat] Mud Harpy \u2014 d20 \u2192 7 + ATK 6 = 13 vs your AC 22 \u2014 \u2717 MISS\n",
+      "[2026-09-04T22:16:47.302Z] [debug] ui: tap \"stealth\"\n[2026-09-04T22:16:47.303Z] [player] sneak\n[2026-09-04T22:16:47.303Z] [debug] parser: intent=stealth conf=1.00 verb=sneak target=- resolved=- range=close enemies=1 hooks=0\n[2026-09-04T22:16:47.372Z] [system] \u23f3 Time passed: 15 min\n[2026-09-04T22:16:47.718Z] [cognitive] DISENGAGE \u00b7 HIDE \u00b7 TAKE_COVER  (345ms)\n",
+      "[2026-09-04T22:16:49.275Z] [debug] skillcheck: stealth d20=6 STE 8 + 1 (title: Shadow Diver) = 15 vs DC 12 \u2014 Hard \u2192 (resolved below)\n[2026-09-04T22:16:49.373Z] [debug] stats: STR18 DEX18 INT16 WIS17 CHA12 STE8 | gear: WIS+5,INT+5,STR+6,DEX+6,STE+2 | worn: main=Auralite Talon off=Vine Grasp Wand head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Titan's Gauntlets legs=Litany Greaves feet=",
+      "Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Amulet of the Silt Warden ring=Tartarian Oath-Band ring2=Tin Ward Ring ring3=Tin Ward Ring ring4=Scribe's Signet\n[2026-09-04T22:16:49.374Z] [debug] train: stealth (stealth check) \u2192 progress 23/100\n[2026-09-04T22:16:49.374Z] [world] Dusk is with you \u2014 the silt eats sound after dark. (stealth +1, night)\n",
+      "[2026-09-04T22:16:49.374Z] [world] You fling a fistful of grit into Mud Harpy's eyes and slip their line of sight. Half-blind, they swing at where you were. (+5 next attack)\n[2026-09-04T22:16:49.374Z] [debug] stealth: reset WIN init 18 vs 8 (dust, +5 1r)\n[2026-09-04T22:16:49.376Z] [combat] Mud Harpy \u2014 d20 \u2192 17 + ATK 6 = 23 vs your AC 22 \u2014 \u2713 HIT\n",
+      "[2026-09-04T22:16:49.378Z] [combat] Your armour turns the blow back \u2014 Mud Harpy takes 1 slashing. (31 HP left)\n[2026-09-04T22:16:49.736Z] [combat] Mud Harpy deals 7 slashing damage [armor \u221225%]. You have 43 HP remaining.\n[2026-09-04T22:16:52.580Z] [debug] ui: tap \"golem (55/74)\"\n[2026-09-04T22:16:52.582Z] [system] unseen \u2014 next strike +5 fades.\n[2026-09-04T22:16:52.584Z] [player] use golem\n",
+      "[2026-09-04T22:16:52.585Z] [combat] Ashwright attacks Mud Harpy \u2014 d20 2 + 4 = 6 vs AC 10 \u2014 \u2717 MISS\n[2026-09-04T22:16:52.585Z] [world] Ashwright's strike sails wide of Mud Harpy.\n[2026-09-04T22:16:52.585Z] [combat] Mud Harpy retaliates \u2014 d20 15 + 5 hits Ashwright for 3 (37% resisted). (52/74)\n[2026-09-04T22:16:52.604Z] [combat] Mud Harpy \u2014 d20 \u2192 17 + ATK 6 = 23 vs your AC 22 \u2014 \u2713 HIT\n",
+      "[2026-09-04T22:16:52.605Z] [debug] wear ward: Litany Greaves keeps its point (15%)\n[2026-09-04T22:16:52.606Z] [combat] Your armour turns the blow back \u2014 Mud Harpy takes 1 slashing. (30 HP left)\n[2026-09-04T22:16:52.948Z] [combat] Mud Harpy deals 6 slashing damage [armor \u221225%]. You have 37 HP remaining.\n[2026-09-04T22:16:53.646Z] [debug] ui: tap \"golem (52/74)\"\n",
+      "[2026-09-04T22:16:53.647Z] [player] use golem\n[2026-09-04T22:16:53.647Z] [combat] Ashwright attacks Mud Harpy \u2014 d20 5 + 4 = 9 vs AC 10 \u2014 \u2717 MISS\n[2026-09-04T22:16:53.648Z] [world] Ashwright's strike sails wide of Mud Harpy.\n[2026-09-04T22:16:53.648Z] [combat] Mud Harpy swings at Ashwright and misses.\n[2026-09-04T22:16:53.650Z] [combat] Mud Harpy \u2014 d20 \u2192 10 + ATK 6 = 16 vs your AC 22 \u2014 \u2717 MISS\n",
+      "[2026-09-04T22:16:54.073Z] [debug] persist sizes(KB): total=339 player=73 wm=182[rooms=106 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=81 scene=3\n[2026-09-04T22:16:56.860Z] [debug] ui: tap \"dodge\"\n[2026-09-04T22:16:56.872Z] [player] dodge\n[2026-09-04T22:16:56.873Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=0\n",
+      "[2026-09-04T22:16:56.874Z] [world] You commit to the dodge. Slip Mud Harpy's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n[2026-09-04T22:16:56.960Z] [combat] Mud Harpy \u2014 d20 \u2192 17 + ATK 6 = 23 vs your AC 22 \u2014 \u2717 EVADED\n",
+      "[2026-09-04T22:16:56.960Z] [combat] Dodge \u2014 d20 \u2192 16 + DEX 18 = 34 vs ATK 23. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n[2026-09-04T22:16:56.960Z] [debug] arbiter: template (reason=combat)\n[2026-09-04T22:16:56.961Z] [debug] arbiter: flavor held (budget \u2014 one per tile, 25s apart)\n[2026-09-04T22:16:56.961Z] [system] \u23f3 Time passed: 6 min\n",
+      "[2026-09-04T22:16:57.301Z] [cognitive] neutral  (340ms)\n[2026-09-04T22:16:58.161Z] [debug] ui: tap \"grasp wand \u25b2\"\n[2026-09-04T22:16:58.205Z] [player] attack with the off-hand vine grasp wand\n[2026-09-04T22:16:58.206Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand vine grasp wand resolved=Vine Grasp Wand range=close enemies=1 hooks=0\n",
+      "[2026-09-04T22:16:58.207Z] [arbiter] The Arbiter keeps one eye on the fight. \"That is the right move for The Bog Dragon of Old Drakova \u2014 but not with something on you. Put this down first.\"\n[2026-09-04T22:16:58.207Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter keeps one eye on the fight. \"That is the right m\u2026\"\n",
+      "[2026-09-04T22:16:58.207Z] [debug] attack: target=Mud Harpy range=close reach.bands=[distant,far,mid,close] reach.label=Vine Grasp Wand bareHand=false\n[2026-09-04T22:16:58.209Z] [debug] attack: visibility penalty \u22122 (Iron Fog)\n[2026-09-04T22:16:58.209Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-09-04T22:16:58.281Z] [world] You raise the vine grasp wand toward Mud Harpy. The room narrows around the both of you.\n[2026-09-04T22:16:58.282Z] [system] \u23f3 Time passed: 6 min\n[2026-09-04T22:16:58.613Z] [cognitive] AGGRESSION \u00b7 DISENGAGE \u00b7 ATTACK \u00b7 AIM  (330ms)\n[2026-09-04T22:17:03.879Z] [world] Mud Harpy moves first. The pressure is immediate.\n",
+      "[2026-09-04T22:17:03.882Z] [combat] Mud Harpy \u2014 d20 \u2192 12 + ATK 6 = 18 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-04T22:17:03.882Z] [combat] You \u2014 d20 \u2192 20 + INT 16 \u2212 2 (Iron Fog) + 2 (point blank) perfect opening (2\u00d7 dice) = 36 vs Mud Harpy AC 11 \u2014 \u2713 CRITICAL HIT\n[2026-09-04T22:17:03.884Z] [combat] Piercing flares \u2014 +1 on hit.\n[2026-09-04T22:17:03.884Z] [combat] Mud Harpy is restrained \u2014 3 rounds.\n",
+      "[2026-09-04T22:17:03.885Z] [combat] Mud Harpy takes 20 with the vine grasp wand. It reels: 10 left. Then it fights back.\n[2026-09-04T22:17:11.604Z] [debug] ui: tap \"grasp wand \u25b2\"\n[2026-09-04T22:17:11.650Z] [player] attack with the off-hand vine grasp wand\n",
+      "[2026-09-04T22:17:11.652Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand vine grasp wand resolved=Vine Grasp Wand range=close enemies=1 hooks=0\n[2026-09-04T22:17:11.653Z] [arbiter] The Arbiter keeps one eye on the fight. \"That is the right move for The Bog Dragon of Old Drakova \u2014 but not with something on you. Put this down first.\"\n",
+      "[2026-09-04T22:17:11.653Z] [debug] dedup: suppressed arbiter repeat \u2014 \"The Arbiter keeps one eye on the fight. \"That is the right m\u2026\"\n[2026-09-04T22:17:11.654Z] [debug] attack: target=Mud Harpy range=close reach.bands=[distant,far,mid,close] reach.label=Vine Grasp Wand bareHand=false\n[2026-09-04T22:17:11.656Z] [debug] attack: visibility penalty \u22122 (Iron Fog)\n",
+      "[2026-09-04T22:17:11.728Z] [world] Your "
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-04-1674-the-dead-life-answers #mtnlu0casj0h [inline 24/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtnlu0casj0h"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1674-the-dead-life-answers"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "24"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1674-the-dead-life-answers"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T23:48:10.218354Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T23:48:12.286000Z",
+  "fingerprints": [
+    "9a539618ef59f5fbf89b2d9bec7d1bb6"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1956404347,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-04T23:47:35.927290Z",
+    "dateReleased": "2026-09-04T23:48:24.735279Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "cc2abf544a2897d2e91a0d613af8eea6b385a38a",
+      "message": "[ota-hal] OTA-1674: the dead life answers for itself\n\nItem one of \"fix all existing issues one through six\": #110, the process kill\non nearly every boot. This is not the fix for the kill. It is the instrument\nthat the previous instrument turned out to be missing \u2014 and, by the owner's own\nrule recorded in contextLedger.ts, that is the correct thing to ship: measure\nthe cause, or ship an instrument.\n\nWHAT THE 19:40 LEDGER SAID, ENTRY BY ENTRY\nTen records. Eight at `stage boot:qwen:deferred`. Six of those dead 670\u20131006ms\ninto the process, `alive 0ms` after the stamp, `(no action yet)` \u2014 sub-second,\nbefore the first screen, before Qwen has loaded (it is DEFERRED). And every one\nof the eight: `not an OTA-apply boot`.\n\nThree things ruled out before anything was written:\n- a boot-front race \u2014 App.tsx AWAITS the OTA check and RETURNS on 'applied',\n  so `qwen:deferred` is unreachable on an apply. My first hypothesis, and wrong;\n- anything heavy at that stage \u2014 `armQwenWarm` stores a closure and returns;\n- ML init \u2014 mlHealth reports crash count 0.\n\nAND THE ONE THING THAT COULD NOT BE RULED EITHER WAY\nOTA-1587 asked of every death: did the process that died boot on the far side\nof `reloadAsync`? It stored the answer in the wrong life. The handoff that\ncarries it is consumed on read \u2014 correctly; a handoff is a fact about ONE boot\n\u2014 by the life that then dies, taking the only copy with it. The next boot finds\nno handoff, computes `afterOtaApply: false` about ITSELF, and bootSlice wrote\nthat onto the dead life's record. Structurally, a death record could never say\n\"yes\". \"Not an OTA-apply boot\" on eight of ten was not a finding; it was the\nonly value the field could take. The ota1587 suite pinned the exact line \u2014\n`afterOtaApply: launch.afterOtaApply,` \u2014 as correct.\n\nSo the fact now rides the CRUMB. `bootStampFields()` (the one writer every\ncrumb passes through) adds `afterOta` / `otaPath` / `otaGapMs` / `prevCtx` once\n`noteLaunchFacts` has run \u2014 early in hydrate, before any stage that matters \u2014\nand the record reads the dead life's own answer off its own crumb. A crumb from\nthe first milliseconds, before the launch resolved, leaves it UNDEFINED, and\nevery reader prints that as \"not known\", never as a cold start. \"Not known\" is\na fact; \"false\" is a lie, and it is exactly the lie that hid this for two OTAs.\n\nTWO MORE THINGS THE SAME READ TURNED UP\n- The ledger label keyed on `kind` alone, so the idle reclaims OTA-1567 already\n  made non-fatal (`isFatal: false`, and Sentry has honoured that as level\n  `error` since) still printed PROCESS KILLED \u2014 no JS ran in About and in every\n  bug report, and were counted in \"N recorded\". Two of the owner's ten were\n  that. A ledger that overstates kills to the one person reading it sends the\n  hunt at the wrong thing \u2014 OTA-1521's own words. The label now says what the\n  record knew, and the header says \"10 recorded, 8 fatal\".\n- The whole `launch` block \u2014 which life died, how old it was, what it inherited\n  \u2014 has been on every record since OTA-1587 and forwarded to Sentry on none.\n  The rollup it exists for could only ever be done by hand, on a device. It is\n  in `extra` now, three-valued.\n\nThe OTA-1587 rollup counts FATAL kills and only a true \"yes\"; an idle reclaim\non an apply boot is not the signal, and `undefined` is not a \"no\" \u2014 counting it\nas one would be the same defect one layer down. It also says out loud how many\ndied before their launch resolved, because the absence of that line is how the\nhole hid.\n\n\u26a0 NO BOOT-PHASE EXEMPTION, DELIBERATELY. Six sub-second no-action deaths look\nexactly like a force-close during the splash \u2014 the owner's recorded habit. They\nalso look exactly like OTA-1587's candidate (b): a reload-boot killed by a\nnative context the previous life never released, in a process `reloadAsync`\ndoes not restart. This instrument is what tells those two apart. Filing them as\nnon-fatal today would hide (b) if it is real \u2014 the blind-spot trade OTA-1377 and\nOTA-1413 both refused. The next log closes #110 one way or the other.\n\n- app/diagnostics/bootIdentity.ts \u2014 `BootStamp`, `bootStampFields` carries the\n  launch facts once resolved.\n- app/engine/saveSystem.ts \u2014 `LiveBreadcrumb` gains the four fields.\n- app/state/slices/bootSlice.ts \u2014 the record reads the crumb, not the reader.\n- app/diagnostics/crashLedger.ts \u2014 `recordLabel`, `isFatalRecord`, the header,\n  the rollup over fatal with `=== true` and the unresolved line, the three-way\n  launch line, `launch.otaPath`.\n- app/diagnostics/sentryTransport.ts \u2014 `launch*` in `extra`.\n- __tests__/ota1674TheDeadLifeAnswers.test.ts \u2014 19 tests.\n- __tests__/ota1587WhichLifeDied.test.ts \u2014 the pin on the defect repointed to\n  the fix, with the reason.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T23:45:16Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1674-the-dead-life-answers",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1674-the-dead-life-answers",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T23:48:24.735279Z",
+          "dateCreated": "2026-09-04T23:47:35.927290Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155722001",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T23:48:25.072821Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1674-the-dead-life-answers",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1674-the-dead-life-answers",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1674-the-dead-life-answers",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1674-the-dead-life-answers)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "e55c09bf33ac4a58b4f84d24f48fa3de",
+  "previousEventID": "de8f0d1f94294fd29107a7fb6809648e"
+}

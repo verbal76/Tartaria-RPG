@@ -1,0 +1,239 @@
+{
+  "id": "5c7eedc826a143da8390ee8d576af228",
+  "groupID": "7709458547",
+  "eventID": "5c7eedc826a143da8390ee8d576af228",
+  "projectID": "4511945117532160",
+  "size": 4727,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-03-1642-every-drop-has-a-name-in-the-book #mtkvtzmb9qii [inline 28/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-03-1642-every-drop-has-a-name-in-the-book",
+  "message": "player-log 2026-09-03-1642-every-drop-has-a-name-in-the-book #mtkvtzmb9qii [inline 28/28]",
+  "title": "player-log 2026-09-03-1642-every-drop-has-a-name-in-the-book #mtkvtzmb9qii [inline 28/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:dba5:7266:ad2:ae57:4fda:d815",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "ff5fd4bae71c495992211840f867cf46",
+      "span_id": "9acccdb044e60195",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "boot:qwen:deferred\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: boot:qwen:deferred \u00b7 930ms into the action \u00b7 alive 0ms after it\n      launch: died 965ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n",
+      "  \u2022 2026-09-02T22:42:22.972Z (202m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-02-1633-a-batch-is-one-action \u00b7 stage boot:qwen:deferred\n      Process died with no orderly exit while: (no action yet)\n      doing: (no action yet) \u00b7 room ? \u00b7 screen ?\n      last checkpoint: boot:qwen:deferred \u00b7 957ms into the action \u00b7 alive 0ms after it\n",
+      "      launch: died 1031ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\n  \u2022 2026-09-03T00:49:33.538Z (75m ago) \u2014 PROCESS KILLED \u2014 no JS ran\n      build 4.32.11 \u00b7 2026-09-02-1634-the-aside-yields \u00b7 stage rendered\n      Process died with no orderly exit while: tap \"take / salvage\"\n",
+      "      doing: tap \"take / salvage\" \u00b7 room mud_flood_nexus \u00b7 screen exploration\n      last checkpoint: rendered \u00b7 221ms into the action \u00b7 alive 9133ms after it\n      launch: died 3096833ms into the process \u00b7 not an OTA-apply boot\n      its own model ledger at the last stamp: o0/r0/l0/p0/dn0\nCrash delivery: ON \u2014 reports go to Sentry when you crash.\nRuntime pressure\n",
+      "  Memory warnings: none this session\n  Freeze watch: no stalls seen (JS clocks only \u2014 see the native queue below)\n  Native queue: worst wait 0.0s \u00b7 0 job kinds queued >3s \u00b7 worst 0.0ms/prompt-token\n  App state trail: (none recorded)\nModel contexts\n  Live now: 0\n  Opened: 0 \u00b7 Released: 0 \u00b7 Peak live: 0\n  Narration engine: idle\n"
+    ],
+    "chunkChars": 1731
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-03-1642-every-drop-has-a-name-in-the-book #mtkvtzmb9qii [inline 28/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtkvtzmb9qii"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-03-1642-every-drop-has-a-name-in-the-book"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "28"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-03-1642-every-drop-has-a-name-in-the-book"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "3"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:dba5:7266:ad2:ae57:4fda:d815",
+      "query": "user.ip:\"2607:fb90:dba5:7266:ad2:ae57:4fda:d815\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-03T12:09:59.381288Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-03T12:10:00.209000Z",
+  "fingerprints": [
+    "3c27d77f5d9c2d489de88e5962e23a69"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1952890889,
+    "commitCount": 20,
+    "data": {},
+    "dateCreated": "2026-09-03T12:10:00.204000Z",
+    "dateReleased": "2026-09-03T14:02:00.424207Z",
+    "deployCount": 1,
+    "ref": null,
+    "lastCommit": {
+      "id": "1fc5ac79d97859fb19c740742255089af058654c",
+      "message": "golem republish of OTA-1642 to exercise the Sentry release step (task #109)\n\nSame bundle as c72cdbec \u2014 no app change, one note beside the stamp. The\nActions dispatch is not reachable from this session (403 on the dispatch\nendpoint), and the new Sentry step only runs inside a publish, so this\nmarkerless golem push is the measurement: the run log will say whether\nSENTRY_READ_TOKEN already carries project:releases or a SENTRY_AUTH_TOKEN\nsecret is needed.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-03T13:59:43Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-03-1642-every-drop-has-a-name-in-the-book",
+          "shortVersion": "tartaria@4.32.11+2026-09-03-1642-every-drop-has-a-name-in-the-book",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-03T14:02:00.424207Z",
+          "dateCreated": "2026-09-03T12:10:00.204000Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155183521",
+      "environment": "golem",
+      "dateStarted": null,
+      "dateFinished": "2026-09-03T14:02:00.682876Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": null,
+    "version": "tartaria@4.32.11+2026-09-03-1642-every-drop-has-a-name-in-the-book",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-03-1642-every-drop-has-a-name-in-the-book",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-03-1642-every-drop-has-a-name-in-the-book",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-03-1642-every-drop-has-a-name-in-the-book)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "61a31e68e7bb49c096e3465c13ba83a7",
+  "previousEventID": "5941a05f498b4ad3aa87bbc31172e4dc"
+}

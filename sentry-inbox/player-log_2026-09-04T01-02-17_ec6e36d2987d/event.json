@@ -1,0 +1,303 @@
+{
+  "id": "ec6e36d2987d415fa110448450da7b92",
+  "groupID": "7710845046",
+  "eventID": "ec6e36d2987d415fa110448450da7b92",
+  "projectID": "4511945117532160",
+  "size": 17745,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-04-1657-the-healing-pouch #mtm6enrfz3iy [inline 9/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1657-the-healing-pouch",
+  "message": "player-log 2026-09-04-1657-the-healing-pouch #mtm6enrfz3iy [inline 9/28]",
+  "title": "player-log 2026-09-04-1657-the-healing-pouch #mtm6enrfz3iy [inline 9/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "660230bbb4654cea944b5ced5e11ec5c",
+      "span_id": "b155f8ce88db87d1",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "OTA session start: 2026-09-02-1634-the-aside-yields.\n[2026-09-03T00:49:33.306Z] [world] You step back into Mud Flood Nexus. The world waits for your move.\n[2026-09-03T00:49:33.306Z] [arbiter] The Arbiter sets the quiet aside. \"Welcome back, Cheddar Bob. I kept watch while you were gone.\"\n",
+      "[2026-09-03T00:49:33.580Z] [debug] \u2550\u2550\u2550 SESSION 2026-09-03T00:49:33.578Z \u00b7 build 2026-09-02-1634-the-aside-yields \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-09-03T00:49:33.581Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-03T00:49:33.581Z] [debug] missions: hunt:hunt_bog_dragon stage 4/7 [diplomacy] @monarch_waystation npc=\"Old Mira\" needs=The Boy's Locket\u2713 gives=Eshren's Name-Token\n[2026-09-03T00:49:33.582Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n",
+      "[2026-09-03T00:49:33.582Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n[2026-09-03T00:49:33.582Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n",
+      "[2026-09-03T00:49:33.582Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n[2026-09-03T00:49:33.582Z] [debug] missions: \u00b7 at=mud_flood_nexus travelTo=monarch_waystation\n",
+      "[2026-09-03T00:49:33.582Z] [debug] boot: life bmtkrau75kr started 2026-09-02T23:57:56.705Z \u00b7 FOLLOWED AN OTA APPLY 315ms ago via boot-front \u00b7 prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)\n[2026-09-03T00:49:36.336Z] [debug] persist sizes(KB): total=328 player=81 wm=161[rooms=91 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=83 scene=3\n",
+      "[2026-09-03T00:49:38.870Z] [debug] send-log: #mtkt5bixx0qy \u2014 DELIVERED (inline, no attachments): beacon out, 28/28 parts accepted (406864 chars) \u2014 flush said yes\n[2026-09-03T00:49:38.871Z] [debug] send-log: all parts accepted by the SDK \u2014 bundle #mtkt5bixx0qy kept on disk, boots retry up to 5 sends total\n",
+      "[2026-09-03T02:04:41.759Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a0648b-3311-768e-a326-38dbb615b795\n[2026-09-03T02:04:41.760Z] [debug] ota: Checking\u2026\n[2026-09-03T02:04:42.804Z] [debug] ota: Downloading update\u2026 (a large update can take a minute)\n[2026-09-03T02:04:42.908Z] [debug] ota: Saving progress\u2026\n[2026-09-03T02:04:42.909Z] [debug] ota: Restarting to apply\u2026\n",
+      "[2026-09-03T02:04:43.110Z] [debug] ota: boot check \u2014 enabled=true channel=hal2001 rt=2.4.1 updateId=01a064fd-03c0-7037-bc8f-10b7e367a2e2\n[2026-09-03T02:04:43.110Z] [debug] ota: Checking\u2026\n[2026-09-03T02:04:43.196Z] [debug] ota: Already up to date\n[2026-09-03T02:04:43.196Z] [debug] ota: boot check result = noUpdate\n[2026-09-03T02:04:43.282Z] [debug] voice: engine=bundled tts=off voice=am_michael\n",
+      "[2026-09-03T02:04:43.282Z] [debug] voice: bundled idle\n[2026-09-03T02:04:43.734Z] [debug] send-log: bundle #mtkt5bixx0qy attempt 2/5 delivered to Sentry\n[2026-09-03T02:04:47.878Z] [debug] OTA applied: 2026-09-02-1634-the-aside-yields \u2192 2026-09-03-1637-this-is-the-place-means-the-cell.\n[2026-09-03T02:04:47.878Z] [debug] OTA session start: 2026-09-03-1637-this-is-the-place-means-the-cell.\n",
+      "[2026-09-03T02:04:47.878Z] [world] You step back into Mud Flood Nexus. The world waits for your move.\n[2026-09-03T02:04:47.878Z] [arbiter] The Arbiter sets the quiet aside. \"Welcome back, Cheddar Bob. I kept watch while you were gone.\"\n",
+      "[2026-09-03T02:04:48.311Z] [debug] \u2550\u2550\u2550 SESSION 2026-09-03T02:04:48.309Z \u00b7 build 2026-09-03-1637-this-is-the-place-means-the-cell \u00b7 updated from 2026-09-02-1634-the-aside-yields \u00b7 previous entry moments earlier \u2550\u2550\u2550\n[2026-09-03T02:04:48.312Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-03T02:04:48.312Z] [debug] missions: hunt:hunt_bog_dragon stage 4/7 [diplomacy] @monarch_waystation npc=\"Old Mira\" needs=The Boy's Locket\u2713 gives=Eshren's Name-Token\n[2026-09-03T02:04:48.312Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n",
+      "[2026-09-03T02:04:48.312Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n[2026-09-03T02:04:48.312Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n",
+      "[2026-09-03T02:04:48.313Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n[2026-09-03T02:04:48.313Z] [debug] missions: \u00b7 at=mud_flood_nexus travelTo=monarch_waystation\n",
+      "[2026-09-03T02:04:48.313Z] [debug] boot: life bmtkvtvakmw started 2026-09-03T02:04:43.052Z \u00b7 FOLLOWED AN OTA APPLY 142ms ago via boot-front \u00b7 prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)\n[2026-09-03T02:04:49.320Z] [debug] send-log: crash on record (2026-09-03T00:49:33.538Z) \u2014 game log pushed automatically, delivered to Sentry, kept on disk as #mtkvtzmb9qii\n",
+      "[2026-09-03T02:04:51.020Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-09-03T02:04:51.070Z] [debug] spawn: gear=[Bone Shiv (Stealth)] window=10 roster=new\n[2026-09-03T02:04:51.071Z] [world] You walk west through open silt. The compass points west into open ground.\n",
+      "[2026-09-03T02:04:51.072Z] [world] Someone in a long black coat is two ridges back, matching your pace. They have been there for a while.\n[2026-09-03T02:04:52.387Z] [debug] ui: tap \"take / salvage\"\n[2026-09-03T02:04:53.964Z] [world] You take the Bone Shiv (Stealth) from where it lay.\n[2026-09-03T02:04:53.965Z] [reward] \u2726 Bone Shiv (Stealth) (Common).\n",
+      "[Filtered]",
+      "[2026-09-03T02:04:55.106Z] [world] You work the gear assembly over. A part of it comes loose, intact.\n[2026-09-03T02:04:55.106Z] [world] You work the reactor hum over. A part of it comes loose, intact.\n[2026-09-03T02:04:55.107Z] [reward] \u2726 Salvage haul:\n[2026-09-03T02:04:55.107Z] [reward]     \u2022 Knotted Sinew Braid (Common)\n[2026-09-03T02:04:55.107Z] [reward]     \u2022 Salt-Cured Dowel (Common)\n",
+      "[2026-09-03T02:04:55.108Z] [reward]     \u2022 Bent Nail (Common)\n[2026-09-03T02:04:55.108Z] [reward]     \u2022 Automaton Circuit (Common)\n[2026-09-03T02:04:55.108Z] [reward]     \u2022 Scrap Metal x3 (Common)\n[2026-09-03T02:04:56.872Z] [debug] ui: tap \"investigate\"\n[2026-09-03T02:04:58.664Z] [debug] qwen: SKIPPED this session \u2014 completion-crash guard tripped (1 crash inside a Qwen completion)\n",
+      "[2026-09-03T02:04:58.688Z] [player] investigate the ground\n[2026-09-03T02:04:58.688Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1\n[2026-09-03T02:04:58.693Z] [reward] You scrape at the silt with the bent nail. \u2726 Recovered Big Rock (Common).\n[2026-09-03T02:04:58.701Z] [system] \u23f3 Time passed: 24 min\n",
+      "[2026-09-03T02:04:59.087Z] [cognitive] CLIMB  (385ms)\n[2026-09-03T02:04:59.607Z] [debug] ui: tap \"\u2192 THE MONARCH'S WAYSTATION\"\n[2026-09-03T02:04:59.620Z] [debug] spawn: gear=[Architect's Mask of Vision, Plasma Cutter, Mud Long Axe] window=10 roster=new\n",
+      "[2026-09-03T02:04:59.622Z] [world] The flat silt heaves, and a hand breaks the surface, then an arm, then a face caked grey with a thousand years of it.\n[2026-09-03T02:04:59.622Z] [arbiter] This is one of the Aetherkin, then \u2014 not a story after all. The dead of old Tartaria, still walking because the Aether in them never stopped.\n",
+      "[2026-09-03T02:04:59.622Z] [world] In life it was a soldier of an army nobody remembers losing \u2014 they could be anyone's \u2014 a neighbour, a stranger, the person you'd have been. The ground gave them back without warning \u2014 one moment mud, the next a person who should be dead.\n",
+      "[2026-09-03T02:04:59.622Z] [world] It doesn't lunge. It cringes back, arms up over its face \u2014 remembering, dimly, that living things once meant harm. It will only fight if you make it.\n[2026-09-03T02:04:59.623Z] [world] You walk west through open silt. The compass points west into open ground.\n[2026-09-03T02:04:59.623Z] [world] The thread you were following waits where you left it.\n",
+      "[2026-09-03T02:06:03.789Z] [debug] ui: tap \"\ud83d\udd25\u2623 choir-bound launcher \u2605 \u2726\"\n[2026-09-03T02:06:03.840Z] [player] attack with the off-hand choir-bound launcher\n[2026-09-03T02:06:03.841Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand choir bound launcher resolved=Choir-Bound Launcher range=mid enemies=1 hooks=1\n",
+      "[2026-09-03T02:06:03.842Z] [debug] attack: target=Mud-Wracked Aetherkin range=mid reach.bands=[distant,far,mid,close] reach.label=Choir-Bound Launcher bareHand=false\n[2026-09-03T02:06:03.843Z] [debug] attack: status mods tired -1\n[2026-09-03T02:06:03.915Z] [world] You raise the searing corrupted choir-bound launcher toward Mud-Wracked Aetherkin. The room narrows around the both of you.\n",
+      "[2026-09-03T02:06:03.916Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T02:06:12.263Z] [world] You seize the initiative. Mud-Wracked Aetherkin has no time to react.\n[2026-09-03T02:06:12.264Z] [combat] You \u2014 d20 \u2192 8 + INT 12 tired -1 = 19 vs Mud-Wracked Aetherkin AC 11 \u2014 \u2713 HIT\n[2026-09-03T02:06:12.264Z] [combat] The Corrupted coating fails to take on Mud-Wracked Aetherkin.\n",
+      "[2026-09-03T02:06:12.265Z] [combat] Aetheric flares \u2014 +1 on hit (weak \u2014 bites deep!).\n[2026-09-03T02:06:12.265Z] [combat] Weakness exposed \u2014 Mud-Wracked Aetherkin flinches. (aetheric \u00d71.5 for 19)\n[2026-09-03T02:06:12.266Z] [combat] Mud-Wracked Aetherkin takes 19 with the searing corrupted choir-bound launcher. It reels: 97 left. Then it fights back.\n",
+      "[2026-09-03T02:06:12.267Z] [combat] Searing Corrupted Choir-Bound Launcher \u2014 9 burn bites in and festers (3 turns).\n[2026-09-03T02:06:12.267Z] [combat] Mud-Wracked Aetherkin is left exposed \u2014 easier to hit.\n",
+      "[2026-09-03T02:06:12.268Z] [combat] The light around Mud-Wracked Aetherkin bends and declines to leave. It spends the beat VEILED \u2014 the next strike will come from somewhere you are not watching.\n[2026-09-03T02:06:18.780Z] [debug] ui: tap \"approach\"\n[2026-09-03T02:06:18.837Z] [player] approach Mud-Wracked Aetherkin\n",
+      "[2026-09-03T02:06:18.837Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud wracked aetherkin resolved=Mud-Wracked Aetherkin range=mid enemies=1 hooks=1\n[2026-09-03T02:06:18.840Z] [debug] move: advance from range=mid enemies=1 weather=Black Rain cost=1 partial=0\n[2026-09-03T02:06:18.840Z] [debug] move: field advance target=Mud-Wracked Aetherkin d 1.50->0.50 band mid->close\n",
+      "[2026-09-03T02:06:18.841Z] [world] You close the gap with Mud-Wracked Aetherkin. (range: close / arm's reach)\n[2026-09-03T02:06:18.841Z] [combat] Mud-Wracked Aetherkin blisters \u2014 clinging fire sears 9. (88/116 HP, 2 turns left)\n[2026-09-03T02:06:18.841Z] [combat] Mud-Wracked Aetherkin strikes OUT OF THE VEIL \u2014 the blow comes from nowhere you were watching (+5).\n",
+      "[2026-09-03T02:06:18.843Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 11 + ATK 10 = 21 vs your AC 22 \u2014 \u2717 MISS\n[2026-09-03T02:06:19.195Z] [cognitive] SWIM \u00b7 RETREAT \u00b7 REST \u00b7 SEARCH  (349ms)\n[2026-09-03T02:06:19.578Z] [debug] persist sizes(KB): total=318 player=81 wm=149[rooms=79 events=5 memos=1 npcs=6 defeated=1 tags=1 discovered=0] log=83 scene=4\n[2026-09-03T02:06:19.901Z] [debug] ui: tap \"dodge\"\n",
+      "[2026-09-03T02:06:19.904Z] [player] dodge\n[2026-09-03T02:06:19.904Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=1\n[2026-09-03T02:06:19.905Z] [world] You commit to the dodge. Slip Mud-Wracked Aetherkin's swing and your next strike lands double \u2014 read it wrong and you simply take the hit like any other, no opening.\n",
+      "[2026-09-03T02:06:19.905Z] [combat] Mud-Wracked Aetherkin blisters \u2014 clinging fire sears 9. (79/116 HP, 1 turn left)\n[2026-09-03T02:06:19.975Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 12 + ATK 5 = 17 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 EVADED\n[2026-09-03T02:06:19.975Z] [combat] Dodge \u2014 d20 \u2192 3 + DEX 20 = 23 vs ATK 17. \u2713 You slip the arc \u2014 PERFECT OPENING (next strike \u00d72 dice).\n",
+      "[2026-09-03T02:06:20.045Z] [reward] \u2726 The shadows move with you. +1 STE (base 6, 8 as you stand).\n[2026-09-03T02:06:20.046Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T02:06:20.708Z] [cognitive] neutral  (662ms)\n[2026-09-03T02:06:21.347Z] [debug] ui: tap \"\u2697\u2623 auralite talon \u2605 \u2726\"\n[2026-09-03T02:06:21.367Z] [player] attack with the auralite talon\n",
+      "[2026-09-03T02:06:21.367Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=1 hooks=1\n[2026-09-03T02:06:21.368Z] [combat] Mud-Wracked Aetherkin blisters \u2014 clinging fire sears 9. (70/116 HP, 0 turns left)\n",
+      "[2026-09-03T02:06:21.368Z] [combat] Mud-Wracked Aetherkin shakes off the last of the fire \u2014 the Choir-Bound Launcher has run its course.\n[2026-09-03T02:06:21.368Z] [debug] attack: target=Mud-Wracked Aetherkin range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false\n[2026-09-03T02:06:21.369Z] [debug] attack: status mods perfect opening (2\u00d7 dice)\n",
+      "[2026-09-03T02:06:21.439Z] [world] You commit forward with the acid-etched corrupted auralite talon. Mud-Wracked Aetherkin watches your hands.\n[2026-09-03T02:06:21.440Z] [system] \u23f3 Time passed: 6 min\n[2026-09-03T02:06:21.769Z] [cognitive] AGGRESSION \u00b7 ATTACK \u00b7 USE_ITEM \u00b7 DISENGAGE \u00b7 TAKE_COVER \u00b7 HIDE  (329ms)\n",
+      "[2026-09-03T02:06:30.028Z] [world] You seize the initiative. Mud-Wracked Aetherkin has no time to react.\n[2026-09-03T02:06:30.029Z] [combat] You \u2014 d20 \u2192 2 + INT 12 perfect opening (2\u00d7 dice) = 14 vs Mud-Wracked Aetherkin AC 11 \u2014 \u2713 HIT\n[2026-09-03T02:06:30.029Z] [combat] Weakness exposed \u2014 Mud-Wracked Aetherkin flinches. (aetheric \u00d71.5 for 22)\n",
+      "[2026-09-03T02:06:30.031Z] [combat] Mud-Wracked Aetherkin takes 22 with the acid-etched corrupted auralite talon. It reels: 48 left. Then it fights back.\n[2026-09-03T02:06:30.031Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 4 acid bites in and festers (3 turns). Its guard pits and hisses \u2014 easier to hit now (\u22121 AC, 1 total).\n",
+      "[2026-09-03T02:06:30.032Z] [combat] Acid-Etched Corrupted Auralite Talon \u2014 1 corruption bites in and festers (3 turns). The rot deepens (1 stack).\n[2026-09-03T02:06:30.034Z] [combat] Mud-Wracked Aetherkin \u2014 d20 \u2192 12 + ATK 5 = 17 vs your AC 22 (needs nat 16+ \u2014 AC capped) \u2014 \u2717 MISS\n",
+      "[2026-09-03T02:06:30.034Z] [arbiter] The Arbiter watches the mud-wracked aetherkin. \"It is not the first thing here that decided to"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-04-1657-the-healing-pouch #mtm6enrfz3iy [inline 9/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtm6enrfz3iy"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1657-the-healing-pouch"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "9"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1657-the-healing-pouch"
+    },
+    {
+      "key": "sendAttempt",
+      "value": "2"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T01:02:15.723000Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": {
+      "chunkBlocks": {
+        "18": {
+          "": {
+            "rem": [
+              [
+                "@password:filter",
+                "s",
+                0,
+                10
+              ]
+            ],
+            "len": 394,
+            "chunks": [
+              {
+                "type": "redaction",
+                "text": "[Filtered]",
+                "rule_id": "@password:filter",
+                "remark": "s"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T01:02:17.217000Z",
+  "fingerprints": [
+    "b8836b9cdc04ed394ec6ffc5df292ab3"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1954353365,
+    "commitCount": 3,
+    "data": {},
+    "dateCreated": "2026-09-04T00:59:26.615127Z",
+    "dateReleased": "2026-09-04T01:00:59.146953Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "32f104d12f8d1c1459be026d4060eb5e1c4a9a36",
+      "message": "[ota-hal] OTA-1657: the healing pouch, and three racks that fold\n\nOwner: \"battle gets slowed down when you have to heal. let's make it available\nfrom the exploration screen. let's make another bandolier and call it the healing\npouch or something. and we can load it with any three healing items they want so\nin an out 5 trauma kits, say 3 trail rations and maybe 10 blueberries in it. and\nwe open it like a bandolier during combat and can use the preloaded heals from\nthere. and when you use it, it acts like they do when being used from inventory.\"\n\nAnd, a moment later: \"when you are in inventory let's make the bandolier, tool\npouch and healing pouch collapsable like inventory categories to save space.\"\n\n\u26a0 THREE POCKETS, AND A POCKET IS A STACK. That distinction is the whole feature\nand it is why his exact load-out fits in three: a racked id points at an\ninventory STACK, so \"Blueberries \u00d710\" is ONE pocket you can tap ten times, not\nten pockets. It is the same storage contract the bandolier has had since arb110 \u2014\nthe items never leave `player.inventory`, the rack only records WHICH STACKS are\nwithin reach \u2014 so nothing is duplicated, nothing can be lost by racking, and a\nstack spent by any other path simply stops resolving instead of holding a pocket\nhostage as a ghost (OTA-1005's lesson from the tool pouch, applied up front).\n\n\u26a0\u26a0 THE TAP CALLS `useInventoryItem`, AND THAT IS THE POINT. He said it should act\n\"like they do when being used from inventory\" \u2014 so it is not \"like\", it is the\nSAME action the pack's USE button fires. The heal, the stamina, the cure, the\nstack decrement, the Arbiter's line and every downstream hook stay one\nimplementation. A second copy of \"what eating a Trauma Kit does\" is precisely the\nclass of drift the last three OTAs have been spent removing.\n\n\u26a0 AND ELIGIBILITY DELEGATES RATHER THAN DECIDING. `consumableDoesSomething`\nalready answers \"does this mend, restore, cleanse or cure?\", and it exists\nbecause a pure antivenom (healHP 0, cure yes) was once accepted by the combat bar\nand refused by the inventory screen. Restating \"what is a heal\" in a third place\nwould have rebuilt that split. All three items he named pass it \u2014 Trauma Kit\n(45 HP + cure bleed), Trail Rations (6 + 3), Blueberries (4 + 1) \u2014 and a pure\nstat buff does not. The effect is read from the CATALOG, not the instance, so an\nold saved kit racks exactly like a fresh one (the OTA-997 bug on the bandolier).\n\n\u26a0 THE \u271a heals BUTTON IS ON BOTH ROWS and its popup is NOT gated on combat, which\nis the half he asked for by name. The bandolier stays combat-only because a throw\nneeds something to throw at; a heal is exactly as useful on the walk home, and\nthe walk home is when you actually patch up. Green where the bandolier is orange:\none rack throws things away from you, one puts you back together, and mid-fight\nnobody should have to read the label to know which popup opened.\n\n\u26a0\u26a0 ALL THREE RACKS NOW FOLD, THROUGH ONE `RackFrame`. Three banners above the\npack cost real screen on a phone and the healing pouch has just made it three, so\nthey collapse \u2014 but through ONE shared frame rather than three copies of a\nchevron, and in the SAME \u25b8/\u25be grammar arb108 gave the inventory categories, so a\nplayer who has learned to fold a category learns nothing new to fold a rack.\n\n  \u2022 \u26a0 THE COUNT STAYS ON THE HEADER WHEN FOLDED (\"2/3 loaded\"), which is what\n    makes folding safe: the space saved costs no information he was reading the\n    banner for. A rack you must unfold to trust is a rack you stop folding.\n  \u2022 Defaults OPEN, unlike categories, which default closed. A category is one of\n    a dozen above a long pack; a rack is one of three whose whole job is to be\n    glanceable. Folding is something he does, not a state he inherits.\n  \u2022 All THREE fill modes are now mutually exclusive \u2014 two armed tap modes at once\n    is a coin flip over which rack receives the item.\n\n\u26a0 THE CHEVRON GATE CAUGHT THIS AND WAS RIGHT TO. `RackFrame`'s prop is `open`, so\ntrue means OPEN \u2014 the OPPOSITE polarity to the category headers a few hundred\nlines above it in the same file, which is exactly the collision check:chevrons\nwas written for. Registered rather than worked around.\n\n\u26a0 TWO SUITES WENT RED ON THE FIRST FULL RUN, BOTH FOR THE SAME REASON: ota1097\nand ota1100 each hand-typed the TWO-flag fill-mode guard into a string, so making\nit three broke tests about fusion-select and the group gesture. Their actual claim\nis \"a rack fill mode beats this gesture\", however many racks exist \u2014 both now\nassert that over EVERY known fill flag instead of pinning the arity, so the fourth\nrack will not break them.\n\nGates: all 18 green by exit code. Full suite green \u2014 1120 suites, 11,604 tests.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T00:57:14Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1657-the-healing-pouch",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1657-the-healing-pouch",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T01:00:59.146953Z",
+          "dateCreated": "2026-09-04T00:59:26.615127Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155389086",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T01:00:59.447835Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1657-the-healing-pouch",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1657-the-healing-pouch",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1657-the-healing-pouch",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1657-the-healing-pouch)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "efb6aabc4c784b9694ba67ab0d67b343",
+  "previousEventID": "e1dec4b6ad1a4eceb2c9df749f686792"
+}

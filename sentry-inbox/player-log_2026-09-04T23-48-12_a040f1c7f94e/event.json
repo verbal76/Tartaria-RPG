@@ -1,0 +1,274 @@
+{
+  "id": "a040f1c7f94e49aba2de70a24b82bdd3",
+  "groupID": "7712848145",
+  "eventID": "a040f1c7f94e49aba2de70a24b82bdd3",
+  "projectID": "4511945117532160",
+  "size": 18065,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-04-1674-the-dead-life-answers #mtnlu0casj0h [inline 9/28]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-04-1674-the-dead-life-answers",
+  "message": "player-log 2026-09-04-1674-the-dead-life-answers #mtnlu0casj0h [inline 9/28]",
+  "title": "player-log 2026-09-04-1674-the-dead-life-answers #mtnlu0casj0h [inline 9/28]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "c5b67a9338b7442887fcbe9331ce1a85",
+      "span_id": "be7cafa4edcda137",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "38:20.744Z] [debug] flourish: \u2713 5054ms\n[2026-09-04T17:38:21.080Z] [world] You let the conversation go and Wysh Coincatcher gets back to it.\n[2026-09-04T17:38:22.806Z] [debug] qwen\u23f1 investigate_lore ok 5884ms wait 3823ms read 1474ms/write 571ms in 128t\u2192out 18t 11.5ms/t (84ch)\n[2026-09-04T17:38:23.022Z] [debug] homework: intro-fill armed after 6000ms idle\n",
+      "[2026-09-04T17:38:35.706Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 12487ms read 8554ms/write 3910ms in 754t\u2192out 33t 11.3ms/t HIT-CAP (158ch)\n[2026-09-04T17:38:35.713Z] [debug] homework: scene_intro \"Tartarian Pilgrim Camp\" \u2713 12691ms\n[2026-09-04T17:38:36.798Z] [debug] appstate: active \u2192 background (was active for 144087ms)\n",
+      "[2026-09-04T17:39:35.693Z] [debug] appstate: background \u2192 active (was background for 58886ms)\n[2026-09-04T17:39:35.952Z] [debug] homework: intro-fill armed after 6000ms idle\n[2026-09-04T17:39:42.787Z] [debug] qwen\u23f1 narration:scene_intro_fill ok 6671ms read 0ms/write 6566ms in 754t\u2192out 34t HIT-CAP (149ch)\n[2026-09-04T17:39:42.800Z] [debug] homework: scene_intro \"Tartarian Pilgrim Camp\" \u2713 6848ms\n",
+      "[2026-09-04T17:39:47.937Z] [debug] appstate: active \u2192 background (was active for 12253ms)\n[2026-09-04T17:40:49.388Z] [debug] appstate: background \u2192 active (was background for 61451ms)\n[2026-09-04T17:40:55.216Z] [reward] Sold Reclaimer's Salvage Vest (Common) to Wysh Coincatcher for 5 TC. (1281 TC on hand)\n",
+      "[2026-09-04T17:40:55.293Z] [reward] Sold Mud-Bound Cloak (Common) to Wysh Coincatcher for 5 TC. (1286 TC on hand)\n[2026-09-04T17:40:55.362Z] [reward] Sold Mud-Bound Cloak (Common) to Wysh Coincatcher for 5 TC. (1291 TC on hand)\n[2026-09-04T17:40:55.431Z] [reward] Sold Mud-Bound Cloak (Common) to Wysh Coincatcher for 5 TC. (1296 TC on hand)\n",
+      "[2026-09-04T17:40:55.499Z] [reward] Sold Reclaimer's Salvage Vest (Common) to Wysh Coincatcher for 5 TC. (1301 TC on hand)\n[2026-09-04T17:40:55.567Z] [reward] Sold Mud-Warden's Vest (Common) to Wysh Coincatcher for 5 TC. (1306 TC on hand)\n[2026-09-04T17:40:55.635Z] [reward] Sold Mud-Bound Cloak (Common) to Wysh Coincatcher for 5 TC. (1311 TC on hand)\n",
+      "[2026-09-04T17:40:55.703Z] [reward] Sold Reclaimer's Salvage Vest (Common) to Wysh Coincatcher for 5 TC. (1316 TC on hand)\n[2026-09-04T17:40:55.770Z] [reward] Sold Mud-Warden's Vest (Common) to Wysh Coincatcher for 5 TC. (1321 TC on hand)\n[2026-09-04T17:40:57.621Z] [debug] persist sizes(KB): total=335 player=74 wm=174[rooms=99 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=84 scene=2\n",
+      "[2026-09-04T17:41:04.470Z] [reward] Bought the Warden's Aegis working for 500 TC. \u2726 Recipe learned (Legendary)! Open Crafting to forge it \u2014 you'll still need the materials.\n[2026-09-04T17:41:11.489Z] [reward] Bought the Warden's Bulwark Pendant working for 200 TC. \u2726 Recipe learned (Rare)! Open Crafting to forge it \u2014 you'll still need the materials.\n",
+      "[2026-09-04T17:41:21.116Z] [debug] ui: tap \"investigate\"\n[2026-09-04T17:41:22.884Z] [player] investigate the mud\n[2026-09-04T17:41:22.885Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=mud resolved=- range=- enemies=0 hooks=0\n[2026-09-04T17:41:22.890Z] [reward] You scrape at the silt with the sentinel cleaver. \u2726 Recovered Golem Core (Rare).\n",
+      "[2026-09-04T17:41:22.908Z] [system] \u23f3 Time passed: 24 min\n[2026-09-04T17:41:23.130Z] [cognitive] SWIM  (220ms)\n[2026-09-04T17:41:25.746Z] [debug] ui: tap \"ENTER OUTPOST\"\n[2026-09-04T17:41:25.757Z] [player] enter outpost\n[2026-09-04T17:41:25.757Z] [world] You cross to the gate and step through.\n[2026-09-04T17:41:25.757Z] [debug] scene: loc=pilgrim_waycamp hub=- arrival=n opening=n passing=y\n",
+      "[2026-09-04T17:41:25.758Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n[2026-09-04T17:41:25.758Z] [debug] missions: hunt:hunt_bog_dragon stage 5/7 [attack_provoke\u2192attack] @mud_seas needs=Eshren's Name-Token\u2713 spawn=Mud Harpy\u00d73 AMBUSH\n",
+      "[2026-09-04T17:41:25.758Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n[2026-09-04T17:41:25.758Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc=\"the Order envoy\" gives=Sealed Reliquary Box PAUSED\n",
+      "[2026-09-04T17:41:25.758Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n[2026-09-04T17:41:25.759Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n",
+      "[2026-09-04T17:41:25.759Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n[2026-09-04T17:41:25.759Z] [debug] missions: \u00b7 at=pilgrim_waycamp travelTo=mud_seas\n[2026-09-04T17:41:25.790Z] [world] Rain the color of old oil. It pools on Aetherstone and refuses to soak in.\n\n",
+      "You are at Tartarian Pilgrim Camp. A rest-camp of True Tartarian pilgrims on the frontier track, where the faithful gather before the long descent into the deep buried cities.\n\nThe horizon shimmers, settles, shimmers again.\n[2026-09-04T17:41:25.790Z] [world] Something about this ground is already familiar. The bodies you left are still here. Nothing has moved in to replace them.\n",
+      "[2026-09-04T17:41:25.795Z] [world] [Tartarian Pilgrim Camp] north: Garrin (return the folio) (17 tiles, 1 day, 19 hours) \u00b7 east: Sinking Cathedral (3 tiles, 8 hours) \u00b7 south: The Buried Cities (3 tiles, 8 hours) \u00b7 west: Dynasty Border Post (4 tiles, 10 hours)\n[2026-09-04T17:41:25.797Z] [arbiter] You continue to investigate the mud pond, the only water body accessible in the north exit.\n",
+      "[2026-09-04T17:41:25.799Z] [debug] arbiter: intro \u2713 0ms (banked, 1 left)\n[2026-09-04T17:41:26.088Z] [debug] qwen\u23f1 ambient preempted 2778ms read 0ms/write 0ms in 366t\u2192out 0t (0ch)\n[2026-09-04T17:41:26.264Z] [debug] arbiter: ambient cut short 3356ms \u2014 yielded to the player\n[2026-09-04T17:41:26.265Z] [debug] qwen\u23f1 \u2702 DISCARDED ambient after 2778ms \u2014 ambient:preempted\n",
+      "[2026-09-04T17:41:30.039Z] [debug] ui: tap \"ENTER OUTPOST\"\n[2026-09-04T17:41:30.042Z] [player] enter outpost\n[2026-09-04T17:41:30.044Z] [world] You cross to the gate and step through.\n[2026-09-04T17:41:30.044Z] [debug] scene: loc=pilgrim_waycamp hub=- arrival=n opening=n passing=y\n",
+      "[2026-09-04T17:41:30.046Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n[2026-09-04T17:41:30.047Z] [debug] missions: hunt:hunt_bog_dragon stage 5/7 [attack_provoke\u2192attack] @mud_seas needs=Eshren's Name-Token\u2713 spawn=Mud Harpy\u00d73 AMBUSH\n",
+      "[2026-09-04T17:41:30.047Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n[2026-09-04T17:41:30.048Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc=\"the Order envoy\" gives=Sealed Reliquary Box PAUSED\n",
+      "[2026-09-04T17:41:30.048Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n[2026-09-04T17:41:30.048Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n",
+      "[2026-09-04T17:41:30.048Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n[2026-09-04T17:41:30.049Z] [debug] missions: \u00b7 at=pilgrim_waycamp travelTo=mud_seas\n[2026-09-04T17:41:30.085Z] [world] Rain the color of old oil. It pools on Aetherstone and refuses to soak in.\n\n",
+      "You are at Tartarian Pilgrim Camp. A rest-camp of True Tartarian pilgrims on the frontier track, where the faithful gather before the long descent into the deep buried cities.\n\nHazard: Awakening Defenses. Dormant Tartarian sentinels register your heat signature. Old gears begin to grind.\n",
+      "[2026-09-04T17:41:30.085Z] [world] You know this place. Not well, but you know it. The bodies you left are still here. Nothing has moved in to replace them.\n[2026-09-04T17:41:30.089Z] [world] [Tartarian Pilgrim Camp] north: Garrin (return the folio) (17 tiles, 1 day, 19 hours) \u00b7 east: Sinking Cathedral (3 tiles, 8 hours) \u00b7 south: The Buried Cities (3 tiles, 8 hours) \u00b7 west: Dynasty Border Post (4 ",
+      "tiles, 10 hours)\n[2026-09-04T17:41:30.343Z] [debug] persist sizes(KB): total=333 player=72 wm=174[rooms=99 events=6 memos=1 npcs=6 defeated=1 tags=1 discovered=1] log=85 scene=2\n[2026-09-04T17:41:33.069Z] [debug] ui: tap \"ENTER OUTPOST\"\n[2026-09-04T17:41:33.072Z] [player] enter outpost\n[2026-09-04T17:41:33.072Z] [world] You cross to the gate and step through.\n",
+      "[2026-09-04T17:41:33.072Z] [debug] scene: loc=pilgrim_waycamp hub=- arrival=n opening=n passing=y\n[2026-09-04T17:41:33.073Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-04T17:41:33.074Z] [debug] missions: hunt:hunt_bog_dragon stage 5/7 [attack_provoke\u2192attack] @mud_seas needs=Eshren's Name-Token\u2713 spawn=Mud Harpy\u00d73 AMBUSH\n[2026-09-04T17:41:33.074Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n",
+      "[2026-09-04T17:41:33.074Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc=\"the Order envoy\" gives=Sealed Reliquary Box PAUSED\n[2026-09-04T17:41:33.074Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n",
+      "[2026-09-04T17:41:33.074Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n[2026-09-04T17:41:33.074Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n",
+      "[2026-09-04T17:41:33.075Z] [debug] missions: \u00b7 at=pilgrim_waycamp travelTo=mud_seas\n[2026-09-04T17:41:33.108Z] [world] Rain the color of old oil. It pools on Aetherstone and refuses to soak in.\n\nYou are at Tartarian Pilgrim Camp. A rest-camp of True Tartarian pilgrims on the frontier track, where the faithful gather before the long descent into the deep buried cities.\n",
+      "[2026-09-04T17:41:33.108Z] [world] You could walk this stretch with your eyes shut, and nearly do. The bodies you left are still here. Nothing has moved in to replace them.\n[2026-09-04T17:41:33.111Z] [world] [Tartarian Pilgrim Camp] north: Garrin (return the folio) (17 tiles, 1 day, 19 hours) \u00b7 east: Sinking Cathedral (3 tiles, 8 hours) \u00b7 south: The Buried Cities (3 tiles, 8 hours) \u00b7 west: Dynasty",
+      " Border Post (4 tiles, 10 hours)\n[2026-09-04T17:41:34.787Z] [debug] ui: tap \"ENTER OUTPOST\"\n[2026-09-04T17:41:34.790Z] [player] enter outpost\n[2026-09-04T17:41:34.791Z] [world] You cross to the gate and step through.\n[2026-09-04T17:41:34.792Z] [debug] scene: loc=pilgrim_waycamp hub=- arrival=n opening=n passing=y\n",
+      "[2026-09-04T17:41:34.795Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n[2026-09-04T17:41:34.796Z] [debug] missions: hunt:hunt_bog_dragon stage 5/7 [attack_provoke\u2192attack] @mud_seas needs=Eshren's Name-Token\u2713 spawn=Mud Harpy\u00d73 AMBUSH\n",
+      "[2026-09-04T17:41:34.796Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n[2026-09-04T17:41:34.796Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc=\"the Order envoy\" gives=Sealed Reliquary Box PAUSED\n",
+      "[2026-09-04T17:41:34.797Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n[2026-09-04T17:41:34.797Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n",
+      "[2026-09-04T17:41:34.797Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n[2026-09-04T17:41:34.797Z] [debug] missions: \u00b7 at=pilgrim_waycamp travelTo=mud_seas\n[2026-09-04T17:41:34.827Z] [world] Rain the color of old oil. It pools on Aetherstone and refuses to soak in.\n\n",
+      "You are at Tartarian Pilgrim Camp. A rest-camp of True Tartarian pilgrims on the frontier track, where the faithful gather before the long descent into the deep buried cities.\n[2026-09-04T17:41:34.827Z] [world] This ground has stopped being a place and started being a route. The bodies you left are still here. Nothing has moved in to replace them.\n",
+      "[2026-09-04T17:41:34.832Z] [world] [Tartarian Pilgrim Camp] north: Garrin (return the folio) (17 tiles, 1 day, 19 hours) \u00b7 east: Sinking Cathedral (3 tiles, 8 hours) \u00b7 south: The Buried Cities (3 tiles, 8 hours) \u00b7 west: Dynasty Border Post (4 tiles, 10 hours)\n[2026-09-04T17:41:35.837Z] [debug] ui: tap \"ENTER OUTPOST\"\n[2026-09-04T17:41:35.841Z] [player] enter outpost\n",
+      "[2026-09-04T17:41:35.842Z] [world] You cross to the gate and step through.\n[2026-09-04T17:41:35.843Z] [debug] scene: loc=pilgrim_waycamp hub=- arrival=n opening=n passing=y\n[2026-09-04T17:41:35.844Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss\u2192attack] @reavers_crest needs=Raider's Ridge-Sign\u2713 PAUSED\n",
+      "[2026-09-04T17:41:35.844Z] [debug] missions: hunt:hunt_bog_dragon stage 5/7 [attack_provoke\u2192attack] @mud_seas needs=Eshren's Name-Token\u2713 spawn=Mud Harpy\u00d73 AMBUSH\n[2026-09-04T17:41:35.844Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc=\"the True Tartarian agent\" gives=Enclave Writ PAUSED\n",
+      "[2026-09-04T17:41:35.844Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc=\"the Order envoy\" gives=Sealed Reliquary Box PAUSED\n[2026-09-04T17:41:35.845Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading\u2713 gives=Temporal Distortion Watch PAUSED\n",
+      "[2026-09-04T17:41:35.845Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc=\"the Mud Monarch courier\" gives=Monarch Courier Writ PAUSED\n[2026-09-04T17:41:35.845Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc=\"Halem the Trader\" gives=Halem's Broken Compass PAUSED\n",
+      "[2026-09-04T17:41:35.845Z] [debug] missions: \u00b7 at=pilgrim_waycamp travelTo=mud_seas\n[2026-09-04T17:41:35.873Z] [world] Rain the color of old oil. It pools on Aetherstone and refuses to soak in.\n\nYou are at Tartarian Pilgrim Camp. A rest-camp of True Tartarian pilgrims on the frontier track, where the faithful gather before the long descent into the deep buried cities.\n\n",
+      "Hazard: Temporal Loop. You walk the same corridor and find yourself walking it again. The Aetheric field has caught the moment in a fold.\n[2026-09-0"
+    ],
+    "chunkChars": 15000
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-04-1674-the-dead-life-answers #mtnlu0casj0h [inline 9/28]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtnlu0casj0h"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-04-1674-the-dead-life-answers"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "9"
+    },
+    {
+      "key": "parts",
+      "value": "28"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-04-1674-the-dead-life-answers"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-04T23:48:10.102303Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-04T23:48:12.283000Z",
+  "fingerprints": [
+    "9a539618ef59f5fbf89b2d9bec7d1bb6"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1956404347,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-04T23:47:35.927290Z",
+    "dateReleased": "2026-09-04T23:48:24.735279Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "cc2abf544a2897d2e91a0d613af8eea6b385a38a",
+      "message": "[ota-hal] OTA-1674: the dead life answers for itself\n\nItem one of \"fix all existing issues one through six\": #110, the process kill\non nearly every boot. This is not the fix for the kill. It is the instrument\nthat the previous instrument turned out to be missing \u2014 and, by the owner's own\nrule recorded in contextLedger.ts, that is the correct thing to ship: measure\nthe cause, or ship an instrument.\n\nWHAT THE 19:40 LEDGER SAID, ENTRY BY ENTRY\nTen records. Eight at `stage boot:qwen:deferred`. Six of those dead 670\u20131006ms\ninto the process, `alive 0ms` after the stamp, `(no action yet)` \u2014 sub-second,\nbefore the first screen, before Qwen has loaded (it is DEFERRED). And every one\nof the eight: `not an OTA-apply boot`.\n\nThree things ruled out before anything was written:\n- a boot-front race \u2014 App.tsx AWAITS the OTA check and RETURNS on 'applied',\n  so `qwen:deferred` is unreachable on an apply. My first hypothesis, and wrong;\n- anything heavy at that stage \u2014 `armQwenWarm` stores a closure and returns;\n- ML init \u2014 mlHealth reports crash count 0.\n\nAND THE ONE THING THAT COULD NOT BE RULED EITHER WAY\nOTA-1587 asked of every death: did the process that died boot on the far side\nof `reloadAsync`? It stored the answer in the wrong life. The handoff that\ncarries it is consumed on read \u2014 correctly; a handoff is a fact about ONE boot\n\u2014 by the life that then dies, taking the only copy with it. The next boot finds\nno handoff, computes `afterOtaApply: false` about ITSELF, and bootSlice wrote\nthat onto the dead life's record. Structurally, a death record could never say\n\"yes\". \"Not an OTA-apply boot\" on eight of ten was not a finding; it was the\nonly value the field could take. The ota1587 suite pinned the exact line \u2014\n`afterOtaApply: launch.afterOtaApply,` \u2014 as correct.\n\nSo the fact now rides the CRUMB. `bootStampFields()` (the one writer every\ncrumb passes through) adds `afterOta` / `otaPath` / `otaGapMs` / `prevCtx` once\n`noteLaunchFacts` has run \u2014 early in hydrate, before any stage that matters \u2014\nand the record reads the dead life's own answer off its own crumb. A crumb from\nthe first milliseconds, before the launch resolved, leaves it UNDEFINED, and\nevery reader prints that as \"not known\", never as a cold start. \"Not known\" is\na fact; \"false\" is a lie, and it is exactly the lie that hid this for two OTAs.\n\nTWO MORE THINGS THE SAME READ TURNED UP\n- The ledger label keyed on `kind` alone, so the idle reclaims OTA-1567 already\n  made non-fatal (`isFatal: false`, and Sentry has honoured that as level\n  `error` since) still printed PROCESS KILLED \u2014 no JS ran in About and in every\n  bug report, and were counted in \"N recorded\". Two of the owner's ten were\n  that. A ledger that overstates kills to the one person reading it sends the\n  hunt at the wrong thing \u2014 OTA-1521's own words. The label now says what the\n  record knew, and the header says \"10 recorded, 8 fatal\".\n- The whole `launch` block \u2014 which life died, how old it was, what it inherited\n  \u2014 has been on every record since OTA-1587 and forwarded to Sentry on none.\n  The rollup it exists for could only ever be done by hand, on a device. It is\n  in `extra` now, three-valued.\n\nThe OTA-1587 rollup counts FATAL kills and only a true \"yes\"; an idle reclaim\non an apply boot is not the signal, and `undefined` is not a \"no\" \u2014 counting it\nas one would be the same defect one layer down. It also says out loud how many\ndied before their launch resolved, because the absence of that line is how the\nhole hid.\n\n\u26a0 NO BOOT-PHASE EXEMPTION, DELIBERATELY. Six sub-second no-action deaths look\nexactly like a force-close during the splash \u2014 the owner's recorded habit. They\nalso look exactly like OTA-1587's candidate (b): a reload-boot killed by a\nnative context the previous life never released, in a process `reloadAsync`\ndoes not restart. This instrument is what tells those two apart. Filing them as\nnon-fatal today would hide (b) if it is real \u2014 the blind-spot trade OTA-1377 and\nOTA-1413 both refused. The next log closes #110 one way or the other.\n\n- app/diagnostics/bootIdentity.ts \u2014 `BootStamp`, `bootStampFields` carries the\n  launch facts once resolved.\n- app/engine/saveSystem.ts \u2014 `LiveBreadcrumb` gains the four fields.\n- app/state/slices/bootSlice.ts \u2014 the record reads the crumb, not the reader.\n- app/diagnostics/crashLedger.ts \u2014 `recordLabel`, `isFatalRecord`, the header,\n  the rollup over fatal with `=== true` and the unresolved line, the three-way\n  launch line, `launch.otaPath`.\n- app/diagnostics/sentryTransport.ts \u2014 `launch*` in `extra`.\n- __tests__/ota1674TheDeadLifeAnswers.test.ts \u2014 19 tests.\n- __tests__/ota1587WhichLifeDied.test.ts \u2014 the pin on the defect repointed to\n  the fix, with the reason.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-04T23:45:16Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-04-1674-the-dead-life-answers",
+          "shortVersion": "tartaria@4.32.11+2026-09-04-1674-the-dead-life-answers",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-04T23:48:24.735279Z",
+          "dateCreated": "2026-09-04T23:47:35.927290Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155722001",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-04T23:48:25.072821Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-04-1674-the-dead-life-answers",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-04-1674-the-dead-life-answers",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-04-1674-the-dead-life-answers",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-04-1674-the-dead-life-answers)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "bd425b942ff6422ea33d97c3be45741b",
+  "previousEventID": "9a6bb8f3cb8b427a9a4aef695a110684"
+}
