@@ -54,7 +54,7 @@ import { pluralizeNoun } from '../app/engine/grammar';
 import { placedAt } from '../test-utils/placePlayer';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { walkObedient, walkPremature, walkContrary, walkInterrupted, formatContrary, punchList, BOG_DRAGON_ID, type ContraryReport, type MissionLike } from '../test-utils/contraryWalker';
+import { walkObedient, walkPremature, walkContrary, walkInterrupted, formatContrary, punchList, huntRoadmap, huntNouns, BOG_DRAGON_ID, type ContraryReport, type MissionLike } from '../test-utils/contraryWalker';
 import { appendFileSync } from 'node:fs';
 
 jest.setTimeout(900000);
@@ -120,6 +120,21 @@ describe('OTA-1686 — ⚠⚠⚠ three defects the road turned up, fixed here', 
   });
 });
 
+describe('OTA-1699 — the roadmap reads the Bog Dragon the way OTA-1686 wrote it by hand', () => {
+  it('reeve at 0, Mira at 2 wanting the token, the Cradle at 1, the harpies at 5, the steeple at 6, the token and the map by the abandon', () => {
+    const m = huntRoadmap(def);
+    expect([m.firstAsk, m.laterAsk, m.wrongVerb, m.brood, m.apex, m.abandonAt]).toEqual([0, 2, 1, 5, 6, 3]);
+    expect(m.items).toEqual(["Reeve's Brass Token", 'Obsidian-Edged Scale', "Mira's Shrine-Map"]);
+    expect([m.apexName, m.broodName, m.broodCount]).toEqual(['Bog Dragon (hunted)', 'Mud Harpy', 3]);
+    expect([m.firstAskNpc, m.laterAskNpc, m.laterAskRequires]).toEqual(['the Drakovan reeve', 'Old Mira', "Reeve's Brass Token"]);
+    const nouns = huntNouns(def, ['Reeve Halvard']);
+    for (const l of ['The Bog Dragon of Old Drakova wants you here', 'the Dragon stalls', 'Old Mira looks up', 'Reeve Halvard nods', 'three Mud Harpies wheel', "Eshren's Name-Token", 'the brass token', 'the trophy is the proof']) {
+      expect(nouns.test(l)).toBe(true);
+    }
+    for (const l of ['You walk north.', 'The Broken Steeple is two tiles west.', 'Halem counts coin']) expect(nouns.test(l)).toBe(false);
+  });
+});
+
 describe('OTA-1686 — the contrary walker on the Bog Dragon of Old Drakova', () => {
   beforeAll(async () => {
     console.log = () => {}; console.warn = () => {}; console.error = () => {};
@@ -162,8 +177,8 @@ describe('OTA-1686 — the contrary walker on the Bog Dragon of Old Drakova', ()
     // (the grader's ceiling for that probe is 'partial'), names the reeve at
     // Mira's, and the proper visits end "You have stood here before".
     expect(grades(r)).toEqual([
-      { step: 'the steeple before the reeve', handled: 'yes', acknowledged: 'partial', prior: 'n/a' },
-      { step: 'Old Mira before the reeve', handled: 'yes', acknowledged: 'yes', prior: 'n/a' },
+      { step: 'the apex ground before the first ask', handled: 'yes', acknowledged: 'partial', prior: 'n/a' },
+      { step: 'a later door before the first ask', handled: 'yes', acknowledged: 'yes', prior: 'n/a' },
       { step: 'the proper visits, after the early ones', handled: 'yes', acknowledged: 'n/a', prior: 'yes' },
     ]);
   });
@@ -176,7 +191,7 @@ describe('OTA-1686 — the contrary walker on the Bog Dragon of Old Drakova', ()
     expect(grades(r)).toEqual([
       { step: 'the trophy before the hunt', handled: 'yes', acknowledged: 'yes', prior: 'n/a' },
       // ⚠ OTA-1688 — the reeve reads the `walked_out` deed: "Back, then."
-      { step: 'walking out on the reeve', handled: 'yes', acknowledged: 'yes', prior: 'yes' },
+      { step: 'walking out on the first ask', handled: 'yes', acknowledged: 'yes', prior: 'yes' },
       // ⚠ OTA-1687 flipped two pins: the wrong verb on the right ground now draws
       // "Not that. … wants you to search this ground here", and ABANDON drops the
       // mission's encounter records so the reeve's card comes back on re-accept.
@@ -195,8 +210,8 @@ describe('OTA-1686 — the contrary walker on the Bog Dragon of Old Drakova', ()
     // `fled` deed now brings the brood back one short and the Dragon back at
     // the hit points it was left with; the name is read once.
     expect(grades(r)).toEqual([
-      { step: 'one harpy down, then run', handled: 'yes', acknowledged: 'yes', prior: 'yes' },
-      { step: 'the Dragon wounded, then run', handled: 'yes', acknowledged: 'yes', prior: 'yes' },
+      { step: 'one of the brood down, then run', handled: 'yes', acknowledged: 'yes', prior: 'yes' },
+      { step: 'the apex wounded, then run', handled: 'yes', acknowledged: 'yes', prior: 'yes' },
     ]);
   });
 

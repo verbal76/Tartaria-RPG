@@ -6,8 +6,10 @@
 // The owner's next question is the one every real player asks the game
 // without meaning to: what happens when I do it wrong, early, or halfway?
 //
-// This walker takes ONE hunt — the Bog Dragon of Old Drakova, seven stages,
-// two people, three fights — down four roads:
+// This walker took ONE hunt first — the Bog Dragon of Old Drakova, seven
+// stages, two people, three fights (OTA-1686). OTA-1699 reads the roadmap from
+// the hunt definition instead (huntRoadmap / huntNouns below), so every hunt in
+// the catalog walks the same four roads:
 //
 //   obedient     the baseline: playMission, nothing deviates.
 //   premature    reads the poster ("cathedral steeple roost … Mud Seas"),
@@ -74,6 +76,11 @@ export interface Probe {
 
 export interface ContraryReport {
   path: ContraryPath;
+  /** OTA-1699 — the hunt this road was walked on, and its noun set (regex source) for the formatter. */
+  hunt?: string;
+  nouns?: string;
+  /** OTA-1699 — probes this hunt has no ground for (no brood, no later ask), named so a skip is not read as a pass. */
+  skipped?: string[];
   probes: Probe[];
   /** The obedient finish that follows the deviations — its breaks are the
    *  "handled?" evidence for the whole path. */
@@ -93,11 +100,6 @@ export const BOG_DRAGON_ID = 'hunt_bog_dragon';
  *  "runes", "left" matched "You've left Drakova" on the first pass, and a bare
  *  "already" matched the Arbiter's combat quip "It already has." on the eighth. */
 const RETURN_WORDS = /\b(again|you already|already (been|here|seen|done|met|stood|read|tried)|last time|second time|once more|returned|come back|came back|back for more|changed your mind|walked off|walked away|you left|you ran|you fled|here before)\b/i;
-/** The hunt's own nouns — a line has to be ABOUT the hunt to count as an
- *  acknowledgement. ⚠ Place names and common nouns are out on purpose: the
- *  scene generator says "steeple", "roost" and "locket" of its own accord and
- *  the compass names The Broken Steeple on every Drakova arrival. */
-const HUNT_NOUNS = /\b(bog dragon|the dragon|eshren|reeve|halvard|old mira|mira's|mud harp|mud wraith|boy's locket|brass token|name-token|the bounty|the trophy|this hunt|the hunt)\b/i;
 /** Lines the walker's own movement writes — never an acknowledgement of anything. */
 const TRAVEL_LINE = /^(You walk|You've left|You set course|You arrive|You step out|\[[A-Z]|ui: )/;
 
@@ -139,11 +141,26 @@ export class ContraryWalker extends Walker {
   readonly path: ContraryPath;
   readonly probes: Probe[] = [];
   readonly ground: string[];
+  /** OTA-1699 — the roadmap read from the definition, and the hunt's nouns. */
+  readonly map: HuntRoadmap;
+  nouns: RegExp;
+  readonly skipped: string[] = [];
+  private readonly learned: string[] = [];
 
   constructor(path: ContraryPath, def: MissionLike) {
     super('hunt', def);
     this.path = path;
     this.ground = grounds(def);
+    this.map = huntRoadmap(def);
+    this.nouns = huntNouns(def);
+  }
+
+  /** A name the road taught us (the card's roster name for the reeve) joins the nouns. */
+  learnNoun(name: string | undefined | null): void {
+    const t = (name ?? '').trim();
+    if (t.length < 3 || this.learned.includes(t)) return;
+    this.learned.push(t);
+    this.nouns = huntNouns(this.def, this.learned);
   }
 
   // ── the probe ────────────────────────────────────────────────────────────
@@ -168,11 +185,11 @@ export class ContraryWalker extends Walker {
   }
 
   aboutTheHunt(saw: string[]): string[] {
-    return linesOf(saw).filter((l) => HUNT_NOUNS.test(l) && !l.startsWith('(walker)'));
+    return linesOf(saw).filter((l) => this.nouns.test(l) && !l.startsWith('(walker)'));
   }
   /** A line about the hunt that also knows it has happened before. */
   remembers(saw: string[]): string[] {
-    return linesOf(saw).filter((l) => HUNT_NOUNS.test(l) && RETURN_WORDS.test(l) && !l.startsWith('(walker)'));
+    return linesOf(saw).filter((l) => this.nouns.test(l) && RETURN_WORDS.test(l) && !l.startsWith('(walker)'));
   }
   /** Any line that knows you have been here before — vendors' "You again",
    *  the room's "The bodies you left are still here" — the world's memory,
@@ -183,7 +200,7 @@ export class ContraryWalker extends Walker {
 
   report(path: ContraryPath, finish: WalkReport | null): ContraryReport {
     return {
-      path, probes: this.probes, finish, taps: this.taps,
+      path, hunt: this.def.id, nouns: this.nouns.source, skipped: [...this.skipped], probes: this.probes, finish, taps: this.taps,
       worldMemory: this.worldRemembers(this.feed()),
       ...(process.env.PLAYER_WALKER_FEED === '1' ? { feed: [...this.feed()] } : {}),
     };
@@ -415,20 +432,124 @@ export class ContraryWalker extends Walker {
 
 // ── the four roads ──────────────────────────────────────────────────────────
 
+// ⚠⚠ OTA-1699 — THE ROADS, FOR EVERY HUNT. The four roads used to name the Bog
+// Dragon's stages by number (the reeve at 0, Mira at 2, the harpies at 5, the
+// steeple at 6) and its nouns by hand. Every hunt in the catalog follows one of
+// two templates (standard_7 / bait_switch_5), so the roadmap is READ from the
+// definition: the first ask (an npc stage), a later ask that requires an item,
+// the first "investigate" ground, the first brood (a spawn of two or more), the
+// apex (the last stage), and the items held by the abandon point. A road whose
+// probe has no ground on this hunt (no brood, no later ask) skips that probe
+// and says so — a skipped probe is not a grade.
+
+export interface HuntRoadmap {
+  /** The last stage — always the apex on both templates. */
+  apex: number;
+  /** The first npc stage — the person who hands out the ask (stage 0 on every hunt today). */
+  firstAsk: number | null;
+  /** The first npc stage after firstAsk that REQUIRES an item — the door that should stay shut early. */
+  laterAsk: number | null;
+  /** The first stage whose check is "investigate" — where a wrong verb should draw the ground's own ask. */
+  wrongVerb: number | null;
+  /** The first stage whose spawn stands up two or more — where one can die and the rest be run from. */
+  brood: number | null;
+  /** The stage the contrary road abandons at: after three closes, or two on the short template. */
+  abandonAt: number;
+  /** Items granted before the abandon point — what the pack holds when the posting is dropped. */
+  items: string[];
+  apexName: string;
+  broodName: string | null;
+  broodCount: number;
+  firstAskNpc: string | null;
+  laterAskNpc: string | null;
+  laterAskRequires: string | null;
+}
+
+const STOP_WORDS = new Set(['the', 'old', 'and', 'of', 'a', 'an', 'to', 'in', 'at', 'on', 'under', 'with', 'for', 'master', 'brother', 'sister']);
+
+function words(s: string | undefined | null, min: number): string[] {
+  if (!s) return [];
+  return s.toLowerCase().replace(/'s\b/g, '').split(/[^a-z0-9-]+/).filter((w) => w.length >= min && !STOP_WORDS.has(w));
+}
+
+function stripThe(s: string): string { return s.replace(/^the\s+/i, '').trim(); }
+
+function esc(s: string): string { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+export function huntRoadmap(def: MissionLike): HuntRoadmap {
+  const hunt = findHuntById(def.id);
+  const stages = def.stages;
+  const apex = stages.length - 1;
+  const npcIdx = stages.map((s, i) => (s.npcName ? i : -1)).filter((i) => i >= 0);
+  const firstAsk = npcIdx.length ? npcIdx[0]! : null;
+  const laterAsk = npcIdx.find((i) => firstAsk !== null && i > firstAsk && !!stages[i]!.requires) ?? null;
+  const wrongVerb = stages.findIndex((s) => s.checkKind === 'investigate');
+  const brood = stages.findIndex((s) => (s.spawn?.count ?? 0) >= 2);
+  const abandonAt = Math.min(3, Math.max(1, stages.length - 2));
+  const items = stages.slice(0, abandonAt).map((s) => s.grants?.item).filter((x): x is string => !!x);
+  return {
+    apex,
+    firstAsk,
+    laterAsk,
+    wrongVerb: wrongVerb >= 0 ? wrongVerb : null,
+    brood: brood >= 0 ? brood : null,
+    abandonAt,
+    items,
+    apexName: `${hunt?.targetEnemyName ?? def.title} (hunted)`,
+    broodName: brood >= 0 ? stages[brood]!.spawn!.enemyName : null,
+    broodCount: brood >= 0 ? stages[brood]!.spawn!.count ?? 1 : 0,
+    firstAskNpc: firstAsk !== null ? stages[firstAsk]!.npcName ?? null : null,
+    laterAskNpc: laterAsk !== null ? stages[laterAsk]!.npcName ?? null : null,
+    laterAskRequires: laterAsk !== null ? stages[laterAsk]!.requires?.item ?? null : null,
+  };
+}
+
+/** The hunt's own nouns, read from its definition — a line has to be ABOUT the
+ *  hunt to count as an acknowledgement. Place names are out on purpose (the
+ *  compass names them on every arrival); people, beasts, items and the title
+ *  are in. Roster names learned on the road (the reeve is "Halvard" to the
+ *  card) are added by `learnNoun`. */
+export function huntNouns(def: MissionLike, extra: readonly string[] = []): RegExp {
+  const hunt = findHuntById(def.id);
+  const set = new Set<string>(['the bounty', 'the trophy', 'this hunt', 'the hunt']);
+  const add = (s: string | undefined | null) => { const t = (s ?? '').toLowerCase().trim(); if (t.length >= 3) set.add(t); };
+  add(def.title);
+  // A beast's name and its plural — "Mud Harpy" is on the feed as "Mud Harpies" as often as not.
+  const addBeast = (name: string) => { add(name); add(/y$/i.test(name) ? name.replace(/y$/i, 'ies') : `${name}s`); };
+  if (hunt) {
+    addBeast(hunt.targetEnemyName);
+    const tw = hunt.targetEnemyName.split(/\s+/);
+    if (tw.length > 1) add(`the ${tw[tw.length - 1]}`);
+    add(hunt.trophyName);
+  }
+  for (const st of def.stages) {
+    if (st.npcName) { add(stripThe(st.npcName)); for (const w of words(st.npcName, 4)) add(w); }
+    if (st.spawn?.enemyName) addBeast(st.spawn.enemyName);
+    for (const item of [st.requires?.item, st.grants?.item]) {
+      if (!item) continue;
+      add(item);
+      for (const w of words(item, 5)) add(w);
+    }
+  }
+  for (const e of extra) add(e);
+  const alts = [...set].filter(Boolean).sort((a, b) => b.length - a.length).map(esc);
+  return new RegExp(`\\b(${alts.join('|')})\\b`, 'i');
+}
+
 export async function walkObedient(def: MissionLike): Promise<ContraryReport> {
   const finish = await playMission('hunt', def);
   const w = new ContraryWalker('obedient', def);
   const noCard = finish.stages.filter((s) => !s.closeCard).map((s) => s.stage);
   w.probes.push({
     path: 'obedient', step: 'the whole hunt, as asked', did: 'accept at the gate, follow every course, type every arrival line, answer every card, hand in',
-    expected: 'seven stages close, each with a card, the purse moves',
+    expected: `${def.stages.length} stages close, each with a card, the purse moves`,
     saw: finish.stages.map((s) => `stage ${s.stage} via=${s.via}${s.closeCard ? ` card: ${s.closeCard.split('\n')[0]}` : ' NO CARD'}`),
     handled: finish.outcome === 'complete' ? 'yes' : 'no',
     acknowledged: noCard.length === 0 ? 'yes' : 'partial',
     priorKnowledge: 'n/a',
     verdict: finish.outcome === 'complete' ? `complete in ${finish.taps} taps${noCard.length ? `; stages ${noCard.join(',')} closed without a card` : ''}` : finish.breaks.join(' | '),
   });
-  return { path: 'obedient', probes: w.probes, finish, taps: finish.taps, worldMemory: [], ...(finish.feed ? { feed: finish.feed } : {}) };
+  return { path: 'obedient', hunt: def.id, nouns: w.nouns.source, probes: w.probes, finish, taps: finish.taps, worldMemory: [], ...(finish.feed ? { feed: finish.feed } : {}) };
 }
 
 export async function walkPremature(def: MissionLike): Promise<ContraryReport> {
@@ -436,89 +557,97 @@ export async function walkPremature(def: MissionLike): Promise<ContraryReport> {
   resetForRoad(w);
   const report = (finish: WalkReport | null): ContraryReport => w.report('premature', finish);
   if (!(await w.accept())) return report(w.done0());
-  const steeple = w.ground[6]!;
-  const mira = w.ground[2]!;
+  const m = w.map;
+  const apexGround = w.ground[m.apex]!;
+  const firstAsk = m.firstAskNpc ?? 'the first ask';
 
-  // 1. Straight to the roost the poster names, before the reeve.
   await w.probe(
-    'the steeple before the reeve',
-    `SET COURSE to ${steeple} at stage 0, arrive, type "attack" (the apex's own verb) and "investigate the area"`,
-    'the slate says this is the roost but not yet — the Drakovan reeve first; nothing stands up',
+    'the apex ground before the first ask',
+    `SET COURSE to ${apexGround} at stage 0, arrive, type "attack" (the apex's own verb) and "investigate the area"`,
+    `the slate says this is the apex's ground but not yet — ${firstAsk} first; nothing stands up`,
     async () => {
-      if (!(await w.walkTo(steeple, 'to the roost, early'))) return;
+      if (!(await w.walkTo(apexGround, 'to the apex ground, early'))) return;
       w.dismissCards();
       w.tap('type "attack"'); await w.type('attack');
-      if (w.enemiesUp() > 0) await w.fightOut('at the steeple, early');
+      if (w.enemiesUp() > 0) await w.fightOut('on the apex ground, early');
       w.tap('type "investigate the area"'); await w.type('investigate the area');
-      if (w.enemiesUp() > 0) await w.fightOut('at the steeple, early');
+      if (w.enemiesUp() > 0) await w.fightOut('on the apex ground, early');
     },
     (saw) => {
       const about = w.aboutTheHunt(saw).filter((l) => !/^\[/.test(l));
-      const stoodUp = saw.some((l) => /Bog Dragon \(hunted\)/.test(l));
+      const stoodUp = saw.some((l) => l.includes(m.apexName));
       const stillStage0 = w.stage() === 0;
       return {
         handled: stillStage0 && !stoodUp ? 'yes' : 'no',
         acknowledged: about.length ? 'partial' : 'no',
         priorKnowledge: 'n/a',
-        verdict: stoodUp ? 'the apex stood up with no name-token in hand' : about.length ? `the hunt was named: ${about[0]}` : 'nothing on screen mentioned the hunt or the roost; the early visit is invisible',
+        verdict: stoodUp ? 'the apex stood up with the hunt at stage 0' : about.length ? `the hunt was named: ${about[0]}` : 'nothing on screen mentioned the hunt or its ground; the early visit is invisible',
       };
     },
   );
   if (w.breaks.length) return report(w.done0());
 
-  // 2. Old Mira before the reeve — no token to show her.
-  await w.probe(
-    'Old Mira before the reeve',
-    `SET COURSE to ${mira} at stage 0, arrive, type "negotiate" and "talk to old mira"`,
-    'Mira (or the slate) says she wants the reeve\'s token before she talks; no card opens for a beat two stages away',
-    async () => {
-      if (!(await w.walkTo(mira, 'to Old Mira, early'))) return;
-      w.dismissCards();
-      const armed = armedEncounter(get().player);
-      if (armed) get().appendLog('system', `(walker) a card is armed here: ${armed.key} with ${armed.person.name}`);
-      w.tap('type "negotiate"'); await w.type('negotiate');
-      if (w.enemiesUp() > 0) await w.fightOut("at Mira's, early");
-      w.tap('type "talk to old mira"'); await w.type('talk to old mira');
-      if (w.enemiesUp() > 0) await w.fightOut("at Mira's, early");
-    },
-    (saw) => {
-      const about = w.aboutTheHunt(saw).filter((l) => !/^\[/.test(l));
-      const notHere = saw.find((l) => /Not here\.|points elsewhere/.test(l));
-      const namesReeve = saw.some((l) => /reeve|token/i.test(l));
-      const cardArmed = saw.some((l) => /a card is armed here/.test(l));
-      return {
-        handled: w.stage() === 0 && !cardArmed ? 'yes' : 'partial',
-        acknowledged: namesReeve ? 'yes' : notHere ? 'partial' : about.length ? 'partial' : 'no',
-        priorKnowledge: 'n/a',
-        verdict: cardArmed ? 'a conversation card armed for a beat the record has not reached' : namesReeve ? 'the refusal names the reeve or the token' : notHere ? `the refusal is generic: ${notHere}` : 'nothing about the hunt was said at all',
-      };
-    },
-  );
-  if (w.breaks.length) return report(w.done0());
+  if (m.laterAsk !== null && m.laterAskNpc) {
+    const laterGround = w.ground[m.laterAsk]!;
+    const npc = stripThe(m.laterAskNpc);
+    const earlierWords = [...words(m.firstAskNpc, 4), ...words(m.laterAskRequires, 4)];
+    const namesEarlier = earlierWords.length ? new RegExp(`\\b(${earlierWords.map(esc).join('|')})\\b`, 'i') : null;
+    await w.probe(
+      'a later door before the first ask',
+      `SET COURSE to ${laterGround} at stage 0, arrive, type "negotiate" and "talk to ${npc.toLowerCase()}"`,
+      `${npc} (or the slate) says the earlier ask comes first — names ${firstAsk} or the ${m.laterAskRequires ?? 'item'}; no card opens for a beat stages away`,
+      async () => {
+        if (!(await w.walkTo(laterGround, 'to the later door, early'))) return;
+        w.dismissCards();
+        const armed = armedEncounter(get().player);
+        if (armed) get().appendLog('system', `(walker) a card is armed here: ${armed.key} with ${armed.person.name}`);
+        w.tap('type "negotiate"'); await w.type('negotiate');
+        if (w.enemiesUp() > 0) await w.fightOut('at the later door, early');
+        w.tap(`type "talk to ${npc.toLowerCase()}"`); await w.type(`talk to ${npc.toLowerCase()}`);
+        if (w.enemiesUp() > 0) await w.fightOut('at the later door, early');
+      },
+      (saw) => {
+        const about = w.aboutTheHunt(saw).filter((l) => !/^\[/.test(l));
+        const notHere = saw.find((l) => /Not here\.|points elsewhere/.test(l));
+        const earlier = namesEarlier ? saw.some((l) => namesEarlier.test(l)) : false;
+        const cardArmed = saw.some((l) => /a card is armed here/.test(l));
+        return {
+          handled: w.stage() === 0 && !cardArmed ? 'yes' : 'partial',
+          acknowledged: earlier ? 'yes' : notHere ? 'partial' : about.length ? 'partial' : 'no',
+          priorKnowledge: 'n/a',
+          verdict: cardArmed ? 'a conversation card armed for a beat the record has not reached' : earlier ? 'the refusal names the earlier ask or its item' : notHere ? `the refusal is generic: ${notHere}` : 'nothing about the hunt was said at all',
+        };
+      },
+    );
+    if (w.breaks.length) return report(w.done0());
+  } else {
+    w.skipped.push('a later door before the first ask — this hunt has no later ask that requires an item');
+  }
 
-  // 3. Now do it properly, and watch the two grounds for a memory of the early visit.
+  const stops = [...new Set([m.laterAsk ?? -1, m.apex, def.stages.length].filter((x) => x >= 0))].sort((a, b) => a - b);
   const marks: Record<number, number> = {};
   const finish = await (async () => {
     let r: WalkReport | null = null;
-    for (const until of [2, 6, 7]) {
+    for (const until of stops) {
       marks[until] = w.feedMark();
       r = await w.playOn(until);
       if (r.breaks.length) return r;
     }
     return r;
   })();
-  const sawAtMira = w.feedSince(marks[2] ?? 0);
-  const sawAtSteeple = w.feedSince(marks[6] ?? 0);
+  const sawLater = m.laterAsk !== null ? w.feedSince(marks[m.laterAsk] ?? 0) : [];
+  const sawApex = w.feedSince(marks[m.apex] ?? 0);
+  const remembered = [...w.remembers(sawLater), ...w.remembers(sawApex)];
   w.probes.push({
     path: 'premature', step: 'the proper visits, after the early ones',
-    did: 'play stages 0–6 as asked after having stood at Mira\'s door and on the roost already',
-    expected: 'Mira or the Arbiter notes you came by once already; the steeple arrival notes you have seen the roost',
-    saw: [...w.remembers(sawAtMira), ...w.remembers(sawAtSteeple)],
+    did: `play stages 0–${m.apex} as asked after having stood on the early grounds already`,
+    expected: 'the person or the Arbiter notes you came by once already; the apex arrival notes you have seen the ground',
+    saw: remembered,
     handled: finish && finish.outcome === 'complete' ? 'yes' : 'no',
     acknowledged: 'n/a',
-    priorKnowledge: w.remembers(sawAtMira).length || w.remembers(sawAtSteeple).length ? 'yes' : 'no',
+    priorKnowledge: remembered.length ? 'yes' : 'no',
     verdict: finish && finish.outcome === 'complete'
-      ? (w.remembers(sawAtMira).length || w.remembers(sawAtSteeple).length ? 'a line remembered the early visit' : 'the hunt finished exactly as if the early visits never happened')
+      ? (remembered.length ? 'a line remembered the early visit' : 'the hunt finished exactly as if the early visits never happened')
       : (finish?.breaks.join(' | ') ?? 'no finish'),
   });
   return report(finish);
@@ -529,8 +658,8 @@ export async function walkContrary(def: MissionLike): Promise<ContraryReport> {
   resetForRoad(w);
   const report = (finish: WalkReport | null): ContraryReport => w.report('contrary', finish);
   if (!(await w.accept())) return report(w.done0());
+  const m = w.map;
 
-  // 1. Hand the bounty in with nothing to show, at the gate you just took it from.
   await w.probe(
     'the trophy before the hunt',
     'TURN IN at Halem\'s counter straight after accepting',
@@ -552,96 +681,113 @@ export async function walkContrary(def: MissionLike): Promise<ContraryReport> {
     },
   );
 
-  // 2. Walk away from the reeve mid-conversation, then come back to him.
-  const drakova = w.ground[0]!;
-  await w.probe(
-    'walking out on the reeve',
-    'on the reeve\'s card tap the walk-away button, step off the tile and back, tap SUMMON, then PROCEED',
-    'the walk-away is said; the reeve is still there on return; a line notes you came back',
-    async () => {
-      if (!(await w.walkTo(drakova, 'to the reeve'))) return;
-      w.dismissCards();
-      const armed = armedEncounter(get().player);
-      if (!armed || armed.key !== `hunt:${def.id}:0`) { w.breaks.push(`no card armed at the reeve (${armed?.key ?? 'none'})`); return; }
-      const enc = get().player!.missionEncounters?.[armed.key] ?? freshEncounter(armed.key);
-      const offered = choicesFor(enc, { hasFight: armed.hasFight, canPersuade: armed.canPersuade, canKill: armed.person.canKill });
-      if (!offered.includes('flee')) { w.breaks.push(`the reeve's card offers no walk-away (${offered.join('/')})`); return; }
-      w.tap('card: FLEE (walk away)');
-      get().answerMissionEncounter('flee');
-      await tick();
-      if (!(await w.stepOffAndBack())) return;
-      const again = armedEncounter(get().player);
-      const phase = again ? (get().player!.missionEncounters?.[again.key]?.phase ?? 'fresh') : 'no card';
-      get().appendLog('system', `(walker) back on the tile: card ${again?.key ?? 'none'}, phase ${phase}`);
-      w.tap('▸ SUMMON THE DRAKOVAN REEVE');
-      get().summonMissionEncounter();
-      await tick();
-      const reopened = armedEncounter(get().player);
-      const st = reopened ? (get().player!.missionEncounters?.[reopened.key] ?? freshEncounter(reopened.key)) : null;
-      const fwd = reopened && st ? choicesFor(st, { hasFight: reopened.hasFight, canPersuade: reopened.canPersuade, canKill: reopened.person.canKill }).find((c) => c !== 'flee') : null;
-      if (!fwd) { w.breaks.push(`after SUMMON the reeve's card offers no way forward (phase ${st?.phase ?? 'none'})`); return; }
-      w.tap(`card: ${fwd.toUpperCase()}`);
-      get().answerMissionEncounter(fwd as never);
-      await tick();
-      w.dismissCards();
-    },
-    (saw) => {
-      const left = saw.find((l) => /break off and step away/.test(l));
-      const back = w.remembers(saw);
-      return {
-        handled: w.stage() >= 1 ? 'yes' : 'no',
-        acknowledged: left ? 'yes' : 'no',
-        priorKnowledge: back.length ? 'yes' : 'no',
-        verdict: w.stage() >= 1 ? (back.length ? `the return was noted: ${back[0]}` : 'the walk-away was said; the reeve picked up as if nothing happened') : 'the beat did not close after the walk-away',
-      };
-    },
-  );
-  if (w.breaks.length) return report(w.done0());
+  if (m.firstAsk === 0 && m.firstAskNpc) {
+    const askGround = w.ground[0]!;
+    const npc = stripThe(m.firstAskNpc);
+    await w.probe(
+      'walking out on the first ask',
+      `on ${npc}'s card tap the walk-away button, step off the tile and back, tap SUMMON, then PROCEED`,
+      `the walk-away is said; ${npc} is still there on return; a line notes you came back`,
+      async () => {
+        if (!(await w.walkTo(askGround, 'to the first ask'))) return;
+        w.dismissCards();
+        const armed = armedEncounter(get().player);
+        if (!armed || armed.key !== `hunt:${def.id}:0`) { w.breaks.push(`no card armed at the first ask (${armed?.key ?? 'none'})`); return; }
+        w.learnNoun(armed.person.name);
+        const enc = get().player!.missionEncounters?.[armed.key] ?? freshEncounter(armed.key);
+        const offered = choicesFor(enc, { hasFight: armed.hasFight, canPersuade: armed.canPersuade, canKill: armed.person.canKill });
+        if (!offered.includes('flee')) { w.breaks.push(`the first ask's card offers no walk-away (${offered.join('/')})`); return; }
+        w.tap('card: FLEE (walk away)');
+        get().answerMissionEncounter('flee');
+        await tick();
+        if (!(await w.stepOffAndBack())) return;
+        const again = armedEncounter(get().player);
+        const phase = again ? (get().player!.missionEncounters?.[again.key]?.phase ?? 'fresh') : 'no card';
+        get().appendLog('system', `(walker) back on the tile: card ${again?.key ?? 'none'}, phase ${phase}`);
+        w.tap(`▸ SUMMON ${npc.toUpperCase()}`);
+        get().summonMissionEncounter();
+        await tick();
+        const reopened = armedEncounter(get().player);
+        const st = reopened ? (get().player!.missionEncounters?.[reopened.key] ?? freshEncounter(reopened.key)) : null;
+        const fwd = reopened && st ? choicesFor(st, { hasFight: reopened.hasFight, canPersuade: reopened.canPersuade, canKill: reopened.person.canKill }).find((c) => c !== 'flee') : null;
+        if (!fwd) { w.breaks.push(`after SUMMON the first ask's card offers no way forward (phase ${st?.phase ?? 'none'})`); return; }
+        w.tap(`card: ${fwd.toUpperCase()}`);
+        get().answerMissionEncounter(fwd as never);
+        await tick();
+        w.dismissCards();
+      },
+      (saw) => {
+        const left = saw.find((l) => /break off and step away/.test(l));
+        const back = w.remembers(saw);
+        return {
+          handled: w.stage() >= 1 ? 'yes' : 'no',
+          acknowledged: left ? 'yes' : 'no',
+          priorKnowledge: back.length ? 'yes' : 'no',
+          verdict: w.stage() >= 1 ? (back.length ? `the return was noted: ${back[0]}` : 'the walk-away was said; the person picked up as if nothing happened') : 'the beat did not close after the walk-away',
+        };
+      },
+    );
+    if (w.breaks.length) return report(w.done0());
+  } else {
+    w.skipped.push('walking out on the first ask — stage 0 is not a person on this hunt');
+  }
 
-  // 3. The wrong verb on the right ground (stage 1 wants a search; type a parley and a swing).
-  await w.probe(
-    'the wrong verb on the right ground',
-    'on the Cradle of Dusk (stage 1, "investigate") type "negotiate" and "attack" first',
-    'the slate says what this ground wants instead ("search this ground"), not silence or a generic nothing',
-    async () => {
-      if (!(await w.walkTo(w.ground[1]!, 'to the Cradle of Dusk'))) return;
-      w.dismissCards();
-      if (w.enemiesUp() > 0) await w.fightOut('on arrival at the Cradle');
-      w.tap('type "negotiate"'); await w.type('negotiate');
-      w.tap('type "attack"'); await w.type('attack');
-      if (w.enemiesUp() > 0) await w.fightOut('after the wrong swing');
-    },
-    (saw) => {
-      const about = w.aboutTheHunt(saw).filter((l) => !/^\[|^▸/.test(l));
-      const arrival = saw.find((l) => l.startsWith(`▸ ${def.title}: this is the place`));
-      return {
-        handled: w.stage() === 1 ? 'yes' : 'no',
-        acknowledged: about.length ? 'yes' : arrival ? 'partial' : 'no',
-        priorKnowledge: 'n/a',
-        verdict: about.length ? `the wrong verb drew a line about the hunt: ${about[0]}` : arrival ? 'only the arrival line (printed before the wrong verbs) spoke for the hunt; the wrong verbs themselves drew nothing about it' : 'nothing about the hunt was said',
-      };
-    },
-  );
-  if (w.breaks.length) return report(w.done0());
+  if (m.wrongVerb !== null && m.wrongVerb > w.stage() - 1) {
+    if (w.stage() < m.wrongVerb) {
+      const r = await w.playOn(m.wrongVerb);
+      if (r.breaks.length) return report(r);
+    }
+    const wv = m.wrongVerb;
+    await w.probe(
+      'the wrong verb on the right ground',
+      `on ${w.ground[wv]} (stage ${wv}, "investigate") type "negotiate" and "attack" first`,
+      'the slate says what this ground wants instead ("search this ground"), not silence or a generic nothing',
+      async () => {
+        if (!(await w.walkTo(w.ground[wv]!, 'to the investigate ground'))) return;
+        w.dismissCards();
+        if (w.enemiesUp() > 0) await w.fightOut('on arrival at the investigate ground');
+        w.tap('type "negotiate"'); await w.type('negotiate');
+        w.tap('type "attack"'); await w.type('attack');
+        if (w.enemiesUp() > 0) await w.fightOut('after the wrong swing');
+      },
+      (saw) => {
+        const about = w.aboutTheHunt(saw).filter((l) => !/^\[|^▸/.test(l));
+        const arrival = saw.find((l) => l.startsWith(`▸ ${def.title}: this is the place`));
+        return {
+          handled: w.stage() === wv ? 'yes' : 'no',
+          acknowledged: about.length ? 'yes' : arrival ? 'partial' : 'no',
+          priorKnowledge: 'n/a',
+          verdict: about.length ? `the wrong verb drew a line about the hunt: ${about[0]}` : arrival ? 'only the arrival line (printed before the wrong verbs) spoke for the hunt; the wrong verbs themselves drew nothing about it' : 'nothing about the hunt was said',
+        };
+      },
+    );
+    if (w.breaks.length) return report(w.done0());
+  } else {
+    w.skipped.push('the wrong verb on the right ground — this hunt has no "investigate" stage ahead of the walker');
+  }
 
-  // 4. Do stages 1 and 2 as asked, then throw the hunt away with the token and the map in the pack.
-  const r12 = await w.playOn(3);
-  if (r12.breaks.length) return report(r12);
-  const held = () => (get().player?.inventory ?? []).filter((i) => /Reeve's Brass Token|Mira's Shrine-Map/.test(i.name)).map((i) => `${i.name}×${i.quantity}`);
+  if (w.stage() < m.abandonAt) {
+    const r = await w.playOn(m.abandonAt);
+    if (r.breaks.length) return report(r);
+  }
+  const itemRe = m.items.length ? new RegExp(m.items.map(esc).join('|')) : null;
+  const held = () => (get().player?.inventory ?? []).filter((i) => itemRe?.test(i.name)).map((i) => `${i.name}×${i.quantity}`);
   const before = held();
+  const askGround = w.ground[m.firstAsk ?? 0]!;
+  const askNpc = stripThe(m.firstAskNpc ?? 'the first ask');
   await w.probe(
     'abandon with the items, take it up again',
-    `ABANDON at stage 3 holding ${before.join(', ')}; ACCEPT again at the gate; return to the reeve`,
-    'the slate says what is dropped; the re-accept resumes or says it starts over; the reeve\'s card comes back (or he says "back again") and the pack is not doubled',
+    `ABANDON at stage ${m.abandonAt} holding ${before.join(', ') || 'nothing'}; ACCEPT again at the gate; return to ${askNpc}`,
+    `the slate says what is dropped; the re-accept resumes or says it starts over; ${askNpc}'s card comes back (or they say "back again") and the pack is not doubled`,
     async () => {
       if (!(await w.abandonAndReaccept())) return;
       get().appendLog('system', `(walker) re-accepted at stage ${w.stage()}; pack: ${held().join(', ') || 'nothing'}`);
-      if (!(await w.walkTo(drakova, 'back to the reeve'))) return;
+      if (!(await w.walkTo(askGround, 'back to the first ask'))) return;
       w.dismissCards();
       const armed = armedEncounter(get().player);
+      if (armed) w.learnNoun(armed.person.name);
       const st = armed ? get().player!.missionEncounters?.[armed.key] : undefined;
-      get().appendLog('system', `(walker) at the reeve again: card ${armed?.key ?? 'none'}, phase ${st?.phase ?? 'fresh'}`);
-      // The card, if it is there; else the arrival line's own words (the typed door).
+      get().appendLog('system', `(walker) at the first ask again: card ${armed?.key ?? 'none'}, phase ${st?.phase ?? 'fresh'}`);
       const offered = armed && armed.key === `hunt:${def.id}:0`
         ? choicesFor(st ?? freshEncounter(armed.key), { hasFight: armed.hasFight, canPersuade: armed.canPersuade, canKill: armed.person.canKill })
         : [];
@@ -653,7 +799,7 @@ export async function walkContrary(def: MissionLike): Promise<ContraryReport> {
       } else {
         const line = w.arrivalLine(w.prevCloseMark);
         const ask = line ? w.askFrom(line) : null;
-        if (!ask) { w.breaks.push('no card and no arrival line at the reeve after re-accept'); return; }
+        if (!ask) { w.breaks.push('no card and no arrival line at the first ask after re-accept'); return; }
         w.tap(`type "${ask}"`); await w.type(ask);
       }
       w.dismissCards();
@@ -672,8 +818,8 @@ export async function walkContrary(def: MissionLike): Promise<ContraryReport> {
         verdict: [
           dropped ? 'the drop was said' : 'the drop was silent',
           resumed ? 'the re-accept resumed' : `the re-accept started over at stage ${saw.find((l) => /re-accepted at stage/.test(l))?.match(/stage (\d+)/)?.[1] ?? '?'}`,
-          cardBack ? 'the reeve\'s card came back' : 'the reeve\'s card stayed shut (its record says resolved) — only the typed verb paid',
-          doubled ? `the pack DOUBLED: ${after.join(', ')}` : `pack intact: ${after.join(', ')}`,
+          cardBack ? 'the first ask\'s card came back' : 'the first ask\'s card stayed shut (its record says resolved) — only the typed verb paid',
+          doubled ? `the pack DOUBLED: ${after.join(', ')}` : `pack intact: ${after.join(', ') || 'nothing held'}`,
         ].join('; '),
       };
     },
@@ -688,91 +834,95 @@ export async function walkInterrupted(def: MissionLike): Promise<ContraryReport>
   resetForRoad(w);
   const report = (finish: WalkReport | null): ContraryReport => w.report('interrupted', finish);
   if (!(await w.accept())) return report(w.done0());
-  const r05 = await w.playOn(5);
-  if (r05.breaks.length) return report(r05);
-  const hunt = findHuntById(def.id)!;
-  const harpy = hunt.stages[5]!.spawn!.enemyName;
-  const apex = `${hunt.targetEnemyName} (hunted)`;
+  const m = w.map;
 
-  // 1. The harpies: kill one, run, come back.
-  let killed = 0;
-  await w.probe(
-    'one harpy down, then run',
-    `arrive on the Mud Seas (stage 5), let the ${harpy} ambush land, kill one, FLEE, step off and back`,
-    'the flee is said; nothing re-summons on the fled tile; on return the brood is one short (the kill is remembered) and a line says they are back for more',
-    async () => {
-      if (!(await w.walkTo(w.ground[5]!, 'to the Mud Seas'))) return;
-      w.dismissCards();
-      w.fieldReport('on the Mud Seas');
-      const n0 = await w.clearAmbient(harpy, 'on the Mud Seas');
-      if (n0 === 0) { w.breaks.push(`no ${harpy} stood up on arrival at stage 5 — ${w.fieldReport('no brood')}`); return; }
-      await w.fightUntil(() => w.livingNamed(harpy) < n0, 'to thin the brood');
-      killed = n0 - w.livingNamed(harpy);
-      get().appendLog('system', `(walker) killed ${killed} of ${n0} ${harpy}, fleeing`);
-      if (!(await w.flee())) { w.breaks.push('the flee from the harpies did not clear the field'); return; }
-      w.tap('type "investigate the area" (on the fled tile)'); await w.type('investigate the area');
-      get().appendLog('system', `(walker) after investigate on the fled tile: ${w.livingNamed(harpy)} ${harpy} up`);
-      if (!(await w.stepOffAndBack())) return;
-      w.dismissCards();
-      const back = await w.clearAmbient(harpy, 'on the way back');
-      get().appendLog('system', `(walker) back on the tile: ${back} ${harpy} up`);
-    },
-    (saw) => {
-      const fledLine = saw.find((l) => /break for|You run|open ground|escape/i.test(l));
-      const resummoned = /after investigate on the fled tile: ([1-9])/.exec(saw.join('\n'));
-      const backCount = Number(/back on the tile: (\d+)/.exec(saw.join('\n'))?.[1] ?? '0');
-      const back = w.remembers(saw);
-      return {
-        handled: !resummoned && backCount > 0 ? 'yes' : 'no',
-        acknowledged: fledLine ? 'yes' : 'no',
-        priorKnowledge: killed > 0 && backCount === 3 - killed ? 'yes' : back.length ? 'partial' : 'no',
-        verdict: [
-          fledLine ? 'the flee was said' : 'the flee was silent',
-          resummoned ? 'investigate on the fled tile RE-SUMMONED the brood' : 'the fled tile held',
-          backCount === 0 ? 'nothing stood up on return' : `on return ${backCount} ${harpy} stood up after ${killed} had died`,
-          back.length ? `the return was noted: ${back[0]}` : 'the return drew the same stinger as the first arrival',
-        ].join('; '),
-      };
-    },
-  );
-  if (w.breaks.length) return report(w.done0());
-  if (w.enemiesUp() > 0 && !(await w.fightOut('the brood, second time'))) return report(w.done0());
-  await new Promise((r) => setTimeout(r, 300));
-  w.dismissCards();
-  w.fieldReport('after the brood');
-  if (w.stage() !== 6) {
-    // The escort clear should have moved the stage; give the parent's door a turn.
-    const r = await w.playOn(6);
+  if (m.brood !== null && m.broodName) {
+    const r0 = await w.playOn(m.brood);
+    if (r0.breaks.length) return report(r0);
+    const brood = m.broodName;
+    const broodGround = w.ground[m.brood]!;
+    let killed = 0;
+    let n0 = 0;
+    await w.probe(
+      'one of the brood down, then run',
+      `arrive on ${broodGround} (stage ${m.brood}), let the ${brood} ambush land, kill one, FLEE, step off and back`,
+      'the flee is said; nothing re-summons on the fled tile; on return the brood is one short (the kill is remembered) and a line says they are back for more',
+      async () => {
+        if (!(await w.walkTo(broodGround, 'to the brood ground'))) return;
+        w.dismissCards();
+        w.fieldReport('on the brood ground');
+        n0 = await w.clearAmbient(brood, 'on the brood ground');
+        if (n0 === 0) { w.breaks.push(`no ${brood} stood up on arrival at stage ${m.brood} — ${w.fieldReport('no brood')}`); return; }
+        await w.fightUntil(() => w.livingNamed(brood) < n0, 'to thin the brood');
+        killed = n0 - w.livingNamed(brood);
+        get().appendLog('system', `(walker) killed ${killed} of ${n0} ${brood}, fleeing`);
+        if (!(await w.flee())) { w.breaks.push('the flee from the brood did not clear the field'); return; }
+        w.tap('type "investigate the area" (on the fled tile)'); await w.type('investigate the area');
+        get().appendLog('system', `(walker) after investigate on the fled tile: ${w.livingNamed(brood)} ${brood} up`);
+        if (!(await w.stepOffAndBack())) return;
+        w.dismissCards();
+        const back = await w.clearAmbient(brood, 'on the way back');
+        get().appendLog('system', `(walker) back on the tile: ${back} ${brood} up`);
+      },
+      (saw) => {
+        const fledLine = saw.find((l) => /break for|You run|open ground|escape/i.test(l));
+        const resummoned = /after investigate on the fled tile: ([1-9])/.exec(saw.join('\n'));
+        const backCount = Number(/back on the tile: (\d+)/.exec(saw.join('\n'))?.[1] ?? '0');
+        const back = w.remembers(saw);
+        return {
+          handled: !resummoned && backCount > 0 ? 'yes' : 'no',
+          acknowledged: fledLine ? 'yes' : 'no',
+          priorKnowledge: killed > 0 && backCount === n0 - killed ? 'yes' : back.length ? 'partial' : 'no',
+          verdict: [
+            fledLine ? 'the flee was said' : 'the flee was silent',
+            resummoned ? 'investigate on the fled tile RE-SUMMONED the brood' : 'the fled tile held',
+            backCount === 0 ? 'nothing stood up on return' : `on return ${backCount} ${brood} stood up after ${killed} of ${n0} had died`,
+            back.length ? `the return was noted: ${back[0]}` : 'the return drew the same stinger as the first arrival',
+          ].join('; '),
+        };
+      },
+    );
+    if (w.breaks.length) return report(w.done0());
+    if (w.enemiesUp() > 0 && !(await w.fightOut('the brood, second time'))) return report(w.done0());
+    await new Promise((r) => setTimeout(r, 300));
+    w.dismissCards();
+    w.fieldReport('after the brood');
+  } else {
+    w.skipped.push('one of the brood down, then run — this hunt stands up no brood of two or more');
+  }
+
+  if (w.stage() !== m.apex) {
+    const r = await w.playOn(m.apex);
     if (r.breaks.length) return report(r);
   }
 
-  // 2. The Dragon: wound it, run, come back.
+  const apex = m.apexName;
+  const apexGround = w.ground[m.apex]!;
   let hpAtFlee: number | null = null;
   let hpMax: number | null = null;
   await w.probe(
-    'the Dragon wounded, then run',
-    'arrive on the Broken Steeple (the apex fires at arrival), take three swings, FLEE, step off and back',
-    'the flee is said; on return the Dragon is still wounded (or a line says it healed), and the name-token trick is not offered a second time as if new',
+    'the apex wounded, then run',
+    `arrive on ${apexGround} (the apex fires at arrival), wound it, FLEE, step off and back`,
+    'the flee is said; on return the apex is still wounded (or a line says it healed), and its first-arrival stinger is not replayed as if new',
     async () => {
-      w.fieldReport('before the steeple walk');
-      if (!(await w.walkTo(w.ground[6]!, 'to the steeple'))) return;
+      w.fieldReport('before the apex walk');
+      if (!(await w.walkTo(apexGround, 'to the apex ground'))) return;
       w.dismissCards();
-      w.fieldReport('on the steeple');
-      if ((await w.clearAmbient(apex, 'on the steeple')) === 0) { w.breaks.push(`the apex did not stand up on arrival at the steeple — ${w.fieldReport('no apex')}`); return; }
+      w.fieldReport('on the apex ground');
+      if ((await w.clearAmbient(apex, 'on the apex ground')) === 0) { w.breaks.push(`the apex did not stand up on arrival at its ground — ${w.fieldReport('no apex')}`); return; }
       hpMax = w.hpOf(apex);
-      await w.fightUntil(() => (w.hpOf(apex) ?? 0) < (hpMax ?? 0), 'to wound the Dragon');
+      await w.fightUntil(() => (w.hpOf(apex) ?? 0) < (hpMax ?? 0), 'to wound the apex');
       hpAtFlee = w.hpOf(apex);
-      get().appendLog('system', `(walker) Dragon at ${hpAtFlee}/${hpMax}, fleeing`);
-      if (!(await w.flee())) { w.breaks.push('the flee from the Dragon did not clear the field'); return; }
+      get().appendLog('system', `(walker) apex at ${hpAtFlee}/${hpMax}, fleeing`);
+      if (!(await w.flee())) { w.breaks.push('the flee from the apex did not clear the field'); return; }
       if (!(await w.stepOffAndBack())) return;
       w.dismissCards();
-      await w.clearAmbient(apex, 'on the way back to the steeple');
-      get().appendLog('system', `(walker) back on the steeple: Dragon ${w.livingNamed(apex) ? `up at ${w.hpOf(apex)}` : 'not up'}`);
+      await w.clearAmbient(apex, 'on the way back to the apex ground');
+      get().appendLog('system', `(walker) back on the apex ground: apex ${w.livingNamed(apex) ? `up at ${w.hpOf(apex)}` : 'not up'}`);
     },
     (saw) => {
       const fledLine = saw.find((l) => /break for|You run|open ground|escape/i.test(l));
-      const backHp = Number(/back on the steeple: Dragon up at (\d+)/.exec(saw.join('\n'))?.[1] ?? '-1');
-      const stalls = saw.filter((l) => /ESHREN/.test(l) && /stalls/.test(l)).length;
+      const backHp = Number(/back on the apex ground: apex up at (\d+)/.exec(saw.join('\n'))?.[1] ?? '-1');
       const back = w.remembers(saw);
       return {
         handled: backHp > 0 ? 'yes' : 'no',
@@ -780,15 +930,14 @@ export async function walkInterrupted(def: MissionLike): Promise<ContraryReport>
         priorKnowledge: hpAtFlee !== null && backHp === hpAtFlee ? 'yes' : back.length ? 'partial' : 'no',
         verdict: [
           fledLine ? 'the flee was said' : 'the flee was silent',
-          backHp < 0 ? 'the Dragon did not stand up again' : backHp === hpAtFlee ? 'the wound held' : `the Dragon came back at ${backHp} after being left at ${hpAtFlee} of ${hpMax}`,
-          stalls >= 2 ? 'the name stalled it a second time, word for word' : stalls === 1 ? 'the name was read once' : 'the name line did not print',
+          backHp < 0 ? 'the apex did not stand up again' : backHp === hpAtFlee ? 'the wound held' : `the apex came back at ${backHp} after being left at ${hpAtFlee} of ${hpMax}`,
           back.length ? `the return was noted: ${back[0]}` : 'no line knew you had run',
         ].join('; '),
       };
     },
   );
   if (w.breaks.length) return report(w.done0());
-  if (w.enemiesUp() > 0 && !(await w.fightOut('the Dragon, second time'))) return report(w.done0());
+  if (w.enemiesUp() > 0 && !(await w.fightOut('the apex, second time'))) return report(w.done0());
   await new Promise((r) => setTimeout(r, 300));
   w.dismissCards();
   const finish = await w.playOn();
@@ -799,34 +948,41 @@ export async function walkAllFour(def: MissionLike): Promise<ContraryReport[]> {
   return [await walkObedient(def), await walkPremature(def), await walkContrary(def), await walkInterrupted(def)];
 }
 
+function nounsOf(r: ContraryReport): RegExp {
+  try { return r.nouns ? new RegExp(r.nouns, 'i') : /\b(the bounty|the trophy|this hunt|the hunt)\b/i; } catch { return /\b(the bounty|the trophy|this hunt|the hunt)\b/i; }
+}
+
 export function formatContrary(r: ContraryReport): string {
-  const head = `── ${r.path.toUpperCase()} ── ${r.finish ? (r.finish.outcome === 'complete' ? 'finished clean' : `finished BROKEN: ${r.finish.breaks.length}`) : 'no finish'} (${r.taps} taps)`;
+  const nouns = nounsOf(r);
+  const head = `── ${r.path.toUpperCase()}${r.hunt ? ` · ${r.hunt}` : ''} ── ${r.finish ? (r.finish.outcome === 'complete' ? 'finished clean' : `finished BROKEN: ${r.finish.breaks.length}`) : 'no finish'} (${r.taps} taps)`;
   const probes = r.probes.map((p) => [
     `  • ${p.step}`,
     `      did:       ${p.did}`,
     `      expected:  ${p.expected}`,
     `      handled=${p.handled} acknowledged=${p.acknowledged} prior=${p.priorKnowledge}`,
     `      verdict:   ${p.verdict}`,
-    ...linesOf(p.saw).filter((l) => HUNT_NOUNS.test(l) || /^\(walker\)|^\[|^▸/.test(l)).slice(0, 14).map((l) => `      | ${l}`),
+    ...linesOf(p.saw).filter((l) => nouns.test(l) || /^\(walker\)|^\[|^▸/.test(l)).slice(0, 14).map((l) => `      | ${l}`),
   ].join('\n'));
+  const skipped = (r.skipped ?? []).map((s) => `  ○ skipped: ${s}`);
   const breaks = (r.finish?.breaks ?? []).map((b) => `    ✗ ${b.split('\n').join('\n      ')}`);
   const memory = r.worldMemory.length ? [`  world memory on the road (${r.worldMemory.length}):`, ...r.worldMemory.slice(0, 8).map((l) => `      | ${l}`)] : [];
   const feed = r.feed ? ['    ── feed ──', ...r.feed.map((l) => `    | ${l.split('\n').join('\n    |   ')}`)] : [];
-  return [head, ...probes, ...breaks, ...memory, ...feed].join('\n');
+  return [head, ...probes, ...skipped, ...breaks, ...memory, ...feed].join('\n');
 }
 
 /** The punch list: every grade that is not a yes, one line each. */
 export function punchList(reports: ContraryReport[]): string[] {
   const out: string[] = [];
   for (const r of reports) {
+    const tag = r.hunt ? `${r.hunt} · ${r.path}` : r.path;
     for (const p of r.probes) {
       const misses: string[] = [];
       if (p.handled !== 'yes') misses.push(`handled=${p.handled}`);
       if (p.acknowledged === 'no' || p.acknowledged === 'partial') misses.push(`acknowledged=${p.acknowledged}`);
       if (p.priorKnowledge === 'no' || p.priorKnowledge === 'partial') misses.push(`prior knowledge=${p.priorKnowledge}`);
-      if (misses.length) out.push(`[${r.path}] ${p.step} — ${misses.join(', ')} — ${p.verdict}`);
+      if (misses.length) out.push(`[${tag}] ${p.step} — ${misses.join(', ')} — ${p.verdict}`);
     }
-    if (r.finish && r.finish.outcome !== 'complete') out.push(`[${r.path}] the finish broke: ${r.finish.breaks[0]?.split('\n')[0]}`);
+    if (r.finish && r.finish.outcome !== 'complete') out.push(`[${tag}] the finish broke: ${r.finish.breaks[0]?.split('\n')[0]}`);
   }
   return out;
 }

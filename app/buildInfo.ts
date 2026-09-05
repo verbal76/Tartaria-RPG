@@ -28124,7 +28124,21 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // counter, and only when the last exchange is thirty real minutes old
 // (npcMemory.lastAskedLine, LAST_ASKED_MIN_GAP_MS), so flicking between two
 // stalls does not make them parrot it.
-export const OTA_BUILD_ID = '2026-09-05-1698-the-counter-remembers-the-question';
+// 2026-09-05 OTA-1699 — EVERY HUNT WALKS THE FOUR ROADS. Step 3 of the
+// Narrative Agency plan (task #197). The contrary walker (OTA-1686) named the
+// Bog Dragon's stages by number and its nouns by hand; every hunt in the
+// catalog follows one of two templates, so the roadmap is now READ from the
+// definition — the first ask, the later ask that requires an item, the first
+// "investigate" ground, the first brood of two or more, the apex, the items
+// held at the abandon point — and the hunt's nouns come from its people,
+// beasts, items and title (test-utils/contraryWalker.ts huntRoadmap /
+// huntNouns; roster names learned on the road). A probe with no ground on a
+// hunt is skipped and says so. The Bog Dragon suite keeps its measured grades
+// under generic step names; the new sweep (heavy CI: ota1699ContraryWalkerSweep)
+// walks all eighteen hunts down all four roads and prints the punch list
+// every "no" goes on. No game code changes in this OTA.
+export const OTA_BUILD_ID = '2026-09-05-1699-every-hunt-walks-the-four-roads';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1698-the-counter-remembers-the-question';
 // golem catch-up 2026-09-05: markerless publish of OTA-1698 - the counter
 // remembers the question. On a return visit the person names the last thing
 // you asked them, after the greeting and the absence beat. hal took the marker.
