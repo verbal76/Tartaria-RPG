@@ -28416,7 +28416,27 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // render nothing at all. It says what your equipped gear is short of, summed
 // across the kit. Third time this session that same silent-absence shape has cost
 // a report (OTA-1715 the dog, OTA-1719 the log row).
-export const OTA_BUILD_ID = '2026-09-06-1720-repair-my-kit';
+// 2026-09-06 OTA-1721 - YOUR NAME WAS THE THREE DOTS. Owner, with a screenshot:
+// "why does my player health look like that, why are there 3 dots on the top left
+// corner". The three dots were his character's NAME. The name row gives its two
+// sides opposite instructions - name flexShrink:1 (gives up width),
+// nameRowRight flexShrink:0 (never does) - which is fine while the right side
+// holds BADGES. The downed-dog countdown was stacked into that same column and it
+// is not a badge, it is a sentence: "Rust (hourglass) 24h - feed to save".
+// numberOfLines=1 means it cannot wrap and flexShrink:0 means it will not yield,
+// so it took the row and the name, the only shrinkable thing left, collapsed to a
+// bare ellipsis. For as long as his dog was bleeding out his character had no
+// name on his own screen - the warning that shipped to save the dog is what
+// erased the player. The sentence gets its own full-width row now, the same shape
+// the golem line has used since OTA-145, and its 200pt corner-chip cap is gone so
+// a long dog name cannot clip the words "feed to save" off the one warning with a
+// deadline attached. Then a floor: minWidth 64 on the name makes the CLASS
+// unreachable, so whatever is stacked on the right next leaves a truncated name
+// rather than three dots. An instrument checks nothing in that column renders a
+// sentence - and it caught my own first cut, which scanned raw source and flagged
+// the comment explaining the fix.
+export const OTA_BUILD_ID = '2026-09-06-1721-your-name-was-three-dots';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-06-1720-repair-my-kit';
 // golem catch-up 2026-09-06: markerless publish of OTA-1720 - repair my kit.
 // REPAIR MY KIT mends everything equipped in one tap, the tab badge counts the
 // kit instead of the loot pile, and a button that cannot be offered says what you

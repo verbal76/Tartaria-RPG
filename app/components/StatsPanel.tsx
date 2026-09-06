@@ -283,12 +283,17 @@ export function StatsPanel({ player, enemyPower }: Props) {
               {powerDelta > 0 ? `▲ +${powerDelta}` : `▼ ${powerDelta}`}
             </Text>
           )}
-          {dogShows && player.dog ? (
-            dogDowned ? (
-              <Text style={styles.dogDown} numberOfLines={1} accessibilityLabel={`${player.dog.name} is down — about ${dogHoursLeft} hours to feed before it dies`}>
-                {player.dog.name} ⏳ {dogHoursLeft}h — feed to save
-              </Text>
-            ) : (
+          {/* ⚠⚠⚠ OTA-1721 — THE DOWNED-DOG COUNTDOWN USED TO SIT HERE, and it is
+              why the owner's own name rendered as "..." on his screen. This
+              column is `flexShrink: 0` — it never gives up width — and the name
+              beside it is `flexShrink: 1`, so it gives up ALL of it. A compact
+              badge ("◆ 58 PWR", "Rust (16/16)") leaves the name room. A SENTENCE
+              — "Rust ⏳ 24h — feed to save" — does not, and the name collapsed to
+              a bare ellipsis for as long as the dog was bleeding out. It has its
+              own full-width row below now, the same shape the golem line has
+              used all along. */}
+          {dogShows && player.dog && !dogDowned ? (
+            (
               <Text
                 style={styles.dogName}
                 numberOfLines={1}
@@ -301,6 +306,18 @@ export function StatsPanel({ player, enemyPower }: Props) {
           ) : null}
         </View>
       </View>
+      {/* ⚠⚠ OTA-1721 — the bleed-out countdown, full width, where a sentence
+          belongs. It is the loudest thing on the card for 24 game-hours and it
+          no longer buys that at the cost of the player's own name. */}
+      {dogShows && player.dog && dogDowned ? (
+        <Text
+          style={styles.dogDown}
+          numberOfLines={1}
+          accessibilityLabel={`${player.dog.name} is down — about ${dogHoursLeft} hours to feed before it dies`}
+        >
+          {player.dog.name} ⏳ {dogHoursLeft}h — feed to save
+        </Text>
+      ) : null}
       {golemShows && player.golem ? (
         <View style={styles.golemRow}>
           <Text
@@ -432,7 +449,12 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     backgroundColor: HP_PULSE_COLOR,
   },
-  name: { color: '#e6d8b3', fontSize: 14, fontWeight: '700', flexShrink: 1 },
+  // ⚠ OTA-1721 — `minWidth` is the guard, not the fix. Moving the countdown out
+  // of the corner solved the reported case; this makes the CLASS unreachable, so
+  // the next thing anyone stacks on the right cannot erase the player's name
+  // however wide it gets. 64pt is roughly seven characters plus the ellipsis —
+  // a truncated name is a compromise, a bare "..." is a broken card.
+  name: { color: '#e6d8b3', fontSize: 14, fontWeight: '700', flexShrink: 1, minWidth: 64 },
   // OTA-145 — row holds player name (left, growing) + dog name
   // (right, fixed). flex layout pins the dog to the right edge.
   nameRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 },
@@ -449,7 +471,11 @@ const styles = StyleSheet.create({
   powerDown: { color: '#e07a5f' },
   dogName: { color: '#c9a86a', fontSize: 13, fontWeight: '600', flexShrink: 0, maxWidth: 160 },
   // OTA-915 — downed-dog bleed-out countdown: urgent red, wider to fit the "feed to save" call.
-  dogDown: { color: '#e5484d', fontSize: 12, fontWeight: '700', flexShrink: 0, maxWidth: 200 },
+  // OTA-1721 — full-width row now; see the name-row comment above.
+  // ⚠ The 200pt cap was a CORNER chip's cap. On its own row the sentence gets
+  // the card, so a 16-character dog name cannot clip the words 'feed to save'
+  // off the one warning that has a deadline attached.
+  dogDown: { color: '#e5484d', fontSize: 12, fontWeight: '700', marginTop: 2 },
   // OTA-145 — golem row sits right-aligned beneath the dog name row.
   // Slightly muted color (slate-mauve) so it reads as a secondary
   // companion vs the dog's warm-gold.
