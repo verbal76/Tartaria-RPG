@@ -28182,6 +28182,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // bootQwen — the one door the boot warms, the re-warm and the watchdog all
 // use — asks the gate before it allocates and leaves the watchdog unstarted.
 export const OTA_BUILD_ID = '2026-09-06-1704-the-guard-that-counts-is-the-guard-that-stops';
+// golem catch-up 2026-09-06: markerless publish of OTA-1704 - the guard that
+// counts is the guard that stops. A past model load no longer exempts a device
+// from the crash guard forever, and bootQwen asks the gate before it allocates.
+// hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-06-1703-the-stage-counts-its-own-bodies';
 // golem catch-up 2026-09-06: markerless publish of OTA-1703 - the stage counts
 // its own bodies. Escort bodies carry the encounter key; a same-named wanderer
