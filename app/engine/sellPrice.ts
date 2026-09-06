@@ -72,6 +72,24 @@ const GEAR_KINDS = new Set(['weapon', 'armor', 'dog_armor', 'runecaster']);
 
 const SELL_FRACTION = 0.4;
 
+/** ⚠⚠ OTA-1706 — WHAT THE VENDOR ASKS FOR THE THING YOU JUST SOLD THEM.
+ *
+ *  Owner: "whatever we sell to a vendor is added to their available buy
+ *  inventory so we have a chance to buy it back, but of course whatever we buy
+ *  back is going to be at a loss."
+ *
+ *  The loss needs no special rule, because the margin is already the whole
+ *  shape of this file: a sale pays SELL_FRACTION of an item's worth, so undoing
+ *  the sale costs that fraction back out. Reconstructing the ask from the price
+ *  ACTUALLY PAID (rather than re-deriving it from the catalog) keeps every
+ *  modifier that shaped the sale — war premium, rapport, regard, the caps — in
+ *  the number the shelf shows, so the two halves of the trade can never drift.
+ *  Buy it back the same minute and you are out the vendor's cut; that is the
+ *  point, and it is arithmetic rather than a penalty bolted on. */
+export function buyBackAskFor(paidPerUnit: number): number {
+  return Math.max(1, Math.round(paidPerUnit / SELL_FRACTION));
+}
+
 /** OTA-802 (B1a) — the raw SELL value of a named material/item, for costing a
  *  recipe's ingredients. Mirrors sellPriceFor's own base logic (catalog rarity →
  *  base table × SELL_FRACTION) so a crafted item's sell cap is grounded in what

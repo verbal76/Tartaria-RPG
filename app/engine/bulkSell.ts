@@ -29,6 +29,9 @@
 // here; it is inherited by taking the caller's already-filtered list.
 import type { InventoryItem } from './types';
 import { WEAPONS, ARMOR } from './crafting';
+// OTA-1706 — the forge's own answer to "is this junk?", reused rather than
+// re-derived. See isSweepableLoot.
+import { isForgeableLootReagent } from './itemFusion';
 
 const WEAPON_NAMES = new Set(WEAPONS.map((w) => w.name.toLowerCase()));
 const ARMOR_NAMES = new Set(ARMOR.map((a) => a.name.toLowerCase()));
@@ -118,6 +121,52 @@ export interface BulkSellPlan {
  *
  *  Takes the caller's ALREADY-FILTERED sellable rows (equipped instances and
  *  unsellables removed, prices computed) and narrows to Common gear. */
+/**
+ * ⚠⚠⚠ OTA-1706 — "SELL ALL LOOT", AND THE LINE IT MUST NOT CROSS.
+ *
+ * Owner: *"add the sell all loot button with an 'are you sure' prompt."*
+ *
+ * Loot is the pile that grows fastest and is worth the least per piece, so a
+ * sweep is exactly right for it. But loot is ALSO what the Crucible eats and
+ * what recipes are made of, and this module has learned the same lesson three
+ * times already (isForged, isRunecaster, isCoatedGear): never sweep the thing
+ * the player is about to use.
+ *
+ * ⚠ So the boundary is not re-invented here. `isForgeableLootReagent` is the
+ * forge's OWN definition of meltable junk — loot by stamp or by catalog
+ * identity, minus equip kinds, minus edibles, minus quest/relic/sigil/currency/
+ * keepsake/throwable, and minus anything named by a recipe. If the forge would
+ * not burn it, this will not sell it, and the two can never drift apart.
+ *
+ * ⚠ On top of that, three of the player's OWN marks are honoured: a piece
+ * reserved for fusion, a piece reserved for a quest, and anything already
+ * forged. Those are held back and COUNTED, so the confirm can say why the
+ * number is smaller than the pile looks — a hold-out nobody explains reads as
+ * the button being broken (OTA-1349's lesson, same as sparedCoated).
+ */
+export function isSweepableLoot(item: InventoryItem): boolean {
+  if (isForged(item)) return false;
+  if (item.reservedForFusion || item.reservedForQuest) return false;
+  return isForgeableLootReagent(item);
+}
+
+/** Held back from the loot sweep by the player's own mark (reserved or forged),
+ *  as opposed to by the forge's junk test. Counted for the confirm. */
+export function isReservedLoot(item: InventoryItem): boolean {
+  if (!isForgeableLootReagent(item)) return false;
+  return !!(item.reservedForFusion || item.reservedForQuest || isForged(item));
+}
+
+/** ⚠ Same contract as planCommonGearSale: the plan is RETURNED, not executed,
+ *  so the confirm can show the count and the total before anything is sold. */
+export function planLootSale(sellable: readonly BulkSellCandidate[]): BulkSellPlan {
+  const rows = sellable.filter(({ item }) => isSweepableLoot(item));
+  const sparedCoated = sellable.filter(({ item }) => isReservedLoot(item)).length;
+  const count = rows.reduce((n, r) => n + Math.max(1, r.item.quantity ?? 1), 0);
+  const total = rows.reduce((n, r) => n + r.price * Math.max(1, r.item.quantity ?? 1), 0);
+  return { rows, count, total, sparedCoated };
+}
+
 export function planCommonGearSale(sellable: readonly BulkSellCandidate[]): BulkSellPlan {
   const commonGear = sellable.filter(({ item }) =>
     item.rarity === 'Common'      // explicit — never the colour, never a default

@@ -8,7 +8,7 @@ import { getItemPreview, getItemPreviewForInstance, lootPurposeLine } from '../c
 import { validSlotsForItem, SLOT_LABEL, equippedInstanceIds, effectiveStats } from '../engine/equipment';
 import type { EquipSlot, InventoryItem } from '../engine/types';
 import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
-import { planCommonGearSale, bulkSellHeldBackNote } from '../engine/bulkSell'; // OTA-1232 — one-tap Common gear clear-out
+import { planCommonGearSale, planLootSale, bulkSellHeldBackNote } from '../engine/bulkSell'; // OTA-1232 — one-tap Common gear clear-out
 import { rarityHexColor } from '../components/InventoryCategorize';
 import { vendorPriceMod } from '../engine/factionRapport';
 import { getStanding } from '../engine/factions'; // OTA-1341 — the ladder reaches the display too
@@ -46,6 +46,7 @@ type Pending =
   // ⚠ OTA-1232 — the count and the total ARE the safety on a bulk sell, so they
   // are carried into the confirm rather than recomputed when it fires.
   | { mode: 'bulkSellCommonGear'; count: number; total: number }
+  | { mode: 'bulkSellLoot'; count: number; total: number }
   | { mode: 'accept'; kind: 'faction' | 'hunt' | 'mystery' | 'storyline'; title: string; reward: string }
   | null;
 
@@ -280,6 +281,17 @@ export function VendorScreen() {
         const reps = Math.max(1, row.item.quantity ?? 1);
         sellToVendor(row.item.name, row.item.id, { social: bulkRowIdx === 0, units: reps });
         bulkRowIdx++;
+      }
+    }
+    else if (pending.mode === 'bulkSellLoot') {
+      // ⚠ OTA-1706 — same contract as the gear sweep above: re-plan at fire time
+      // against the LIVE list, one call per row with the whole stack as `units`,
+      // and only the first row negotiates.
+      let lootRowIdx = 0;
+      for (const row of planLootSale(bulkSellable).rows) {
+        const reps = Math.max(1, row.item.quantity ?? 1);
+        sellToVendor(row.item.name, row.item.id, { social: lootRowIdx === 0, units: reps });
+        lootRowIdx++;
       }
     }
     else if (pending.mode === 'accept') {
@@ -918,6 +930,29 @@ export function VendorScreen() {
                 </TouchableOpacity>
               );
             })()}
+            {/* ⚠⚠ OTA-1706 — SELL ALL LOOT, beside it. Owner: "add the sell all
+                loot button with an 'are you sure' prompt." Same shape as the
+                sweep above for the same reasons: the count and the total live in
+                the BUTTON so the size of the action is known before committing
+                to look, and the whole thing is hidden at zero rather than shown
+                disabled. */}
+            {(() => {
+              const lootPlan = planLootSale(bulkSellable);
+              if (lootPlan.count === 0) return null;
+              return (
+                <TouchableOpacity
+                  onPress={() => setPending({ mode: 'bulkSellLoot', count: lootPlan.count, total: lootPlan.total })}
+                  style={styles.bulkSellBtn}
+                  activeOpacity={0.7}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Sell all ${lootPlan.count} loot pieces for ${lootPlan.total} coin`}
+                >
+                  <Text style={styles.bulkSellText}>
+                    SELL ALL LOOT — {lootPlan.count} for {lootPlan.total} TC
+                  </Text>
+                </TouchableOpacity>
+              );
+            })()}
             {/* OTA-1101 — the group bar moved OUT of this scrolling list and up
                 into the tab row's slot, where it stays anchored. It used to sit
                 here and scroll away the moment you started ticking rows further
@@ -1028,6 +1063,8 @@ export function VendorScreen() {
             ? `Dismiss ${vendor.name}?`
             : pending?.mode === 'bulkSellCommonGear'
               ? `Sell ${pending.count} Common ${pending.count === 1 ? 'piece' : 'pieces'}?`
+            : pending?.mode === 'bulkSellLoot'
+              ? `Sell ${pending.count} loot ${pending.count === 1 ? 'piece' : 'pieces'}?`
             : pending?.mode === 'sell'
               ? `Sell to ${vendor.name}`
               : pending?.mode === 'steal'
@@ -1061,6 +1098,16 @@ export function VendorScreen() {
         contextLine={
           pending?.mode === 'dismiss'
             ? 'They leave the scene. New offers will come from the next vendor who shows up.'
+            : pending?.mode === 'bulkSellLoot'
+              // ⚠ OTA-1706 — the count and the total lead, as on the gear sweep,
+              // and the second line names the boundary: this sells the junk the
+              // Crucible would burn and nothing a recipe needs. The third names
+              // what the player's OWN marks held back, because a hold-out nobody
+              // explains reads as the button missing pieces (OTA-1349).
+              ? `+${pending.total} TC   ·   You have: ${player.tc} TC   →   After: ${player.tc + pending.total} TC\n\nLoot only — the scrap the Crucible melts. Anything a recipe calls for, anything you reserved for fusion or a quest, and anything you already forged is left alone.${(() => {
+                const spared = planLootSale(bulkSellable).sparedCoated;
+                return spared > 0 ? `\n\n⚠ ${spared} ${spared === 1 ? 'piece' : 'pieces'} held back — you reserved ${spared === 1 ? 'it' : 'them'}.` : '';
+              })()}`
             : pending?.mode === 'bulkSellCommonGear'
               // ⚠ OTA-1232 — the COUNT and the TOTAL are the safety on a one-tap
               // sweep, so they lead. The second line names what is deliberately
@@ -1111,7 +1158,7 @@ export function VendorScreen() {
           // screen could call it. A title and a body were written for this mode
           // and a button was not, so the sweep looked implemented from every
           // angle except the one that does the work.
-          pending?.mode === 'bulkSellCommonGear'
+          pending?.mode === 'bulkSellCommonGear' || pending?.mode === 'bulkSellLoot'
             ? [
                 { label: 'Cancel', onPress: cancel, tone: 'neutral' as const },
                 { label: `Sell ${pending.count} for ${pending.total} TC`, onPress: confirmAction, tone: 'primary' as const },

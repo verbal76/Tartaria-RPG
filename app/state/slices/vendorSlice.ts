@@ -44,7 +44,7 @@ import { pick } from '../../engine/rng';
 import { grantItem } from '../../engine/inventory';
 import { lookupCraftedItem, RECIPES, findDogGearByName, type Recipe } from '../../engine/crafting';
 import { trainStat } from '../../engine/statTraining';
-import { sellPriceFor, isUnsellable, applySellCaps } from '../../engine/sellPrice';
+import { sellPriceFor, isUnsellable, applySellCaps, buyBackAskFor } from '../../engine/sellPrice';
 import { vendorPriceMod } from '../../engine/factionRapport';
 import { SLOT_LABEL, effectiveStats, equippedInstanceIds, RING_ID_KEYS } from '../../engine/equipment';
 import { canScrap } from '../../engine/scrapEngine';
@@ -631,6 +631,33 @@ export const createVendorSlice = (
     // line never SAID so: `Sold Aetherium Spear … for 14 TC` reads like a Rare
     // going for pocket change, because several Commons have Rare-sounding names.
     // One word closes a question the receipt was always able to answer.
+    // ⚠⚠⚠ OTA-1706 — AND NOW IT IS ON THEIR SHELF. Owner: "whatever we sell to
+    // a vendor is added to their available buy inventory so we have a chance to
+    // buy it back, but of course whatever we buy back is going to be at a loss."
+    //
+    // Measured before building: `sellToVendor` never touched `vendor.offers` —
+    // the item left the pack, the coin arrived, and the thing stopped existing.
+    // A regretted sale was unrecoverable and a vendor's stock never showed a
+    // trace of the town's own trade.
+    //
+    // ⚠ `VendorInstance.offers` is already per-instance and mutable (vendors.ts
+    // rolls a fresh array when you meet them), so this needs no new state — the
+    // shelf is where it always was. The ask comes from what they actually PAID
+    // (buyBackAskFor), so every modifier that shaped the sale is carried into
+    // the price, and the vendor's cut is the loss the owner described rather
+    // than a penalty invented here.
+    //
+    // ⚠ An existing line item KEEPS ITS PRICE and only grows in quantity:
+    // selling a vendor one more Bone Knife must not re-price the ones they had.
+    set((sBuy) => {
+      const scBuy = sBuy.currentScene;
+      if (!scBuy?.vendor) return {};
+      const offers = [...scBuy.vendor.offers];
+      const at = offers.findIndex((o) => o.itemName.toLowerCase() === item.name.toLowerCase());
+      if (at >= 0) offers[at] = { ...offers[at]!, quantity: (offers[at]!.quantity ?? 1) + units };
+      else offers.push({ itemName: item.name, price: buyBackAskFor(price), quantity: units });
+      return { currentScene: { ...scBuy, vendor: { ...scBuy.vendor, offers } } };
+    });
     const rarityTag = item.rarity ? ` (${item.rarity})` : '';
     const soldWhat = units === 1 ? `${item.name}${rarityTag}` : `${units}× ${item.name}${rarityTag}`;
     const forWhat = units === 1 ? `${total} TC` : `${total} TC (${price} TC each)`;
