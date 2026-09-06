@@ -40,12 +40,18 @@ jest.mock('expo-updates', () => ({}));
  * "no" is a line on the punch list (afterAll) that becomes a task.
  *
  *   PLAYER_WALKER_REPORT=/path   appends every report + the punch list
- *   CONTRARY_HUNTS=a,b            walk only these hunt ids
+ *   CONTRARY_HUNTS=a,b            walk only these mission ids
+ *   CONTRARY_FAMILY=mystery       walk the mysteries (or `storyline`) instead of
+ *                                 the hunts — step 3b: the roads read every
+ *                                 family's definition, not just the hunts'
  */
 import { useGameStore } from '../app/state/gameStore';
 import { getRaces, getFactions } from '../app/engine/character';
 import { HUNTS } from '../app/engine/hunts';
-import { walkObedient, walkPremature, walkContrary, walkInterrupted, formatContrary, punchList, huntRoadmap, type ContraryReport, type MissionLike } from '../test-utils/contraryWalker';
+import { MYSTERIES } from '../app/engine/mysteries';
+import { STORYLINES } from '../app/engine/factionStorylines';
+import type { MissionFamily } from '../app/engine/questStage';
+import { walkObedient, walkPremature, walkContrary, walkInterrupted, formatContrary, punchList, huntRoadmap, roadmap, type ContraryReport, type MissionLike } from '../test-utils/contraryWalker';
 import { walkerControl } from '../test-utils/playerWalker';
 import { appendFileSync } from 'node:fs';
 
@@ -59,6 +65,8 @@ jest.setTimeout(4 * ROAD_MS + 10 * 60_000);
 const store = useGameStore;
 const REPORT = process.env.PLAYER_WALKER_REPORT;
 const ONLY = (process.env.CONTRARY_HUNTS ?? '').split(',').map((s: string) => s.trim()).filter(Boolean);
+const FAMILY: MissionFamily = (['hunt', 'mystery', 'storyline'] as const).find((f) => f === process.env.CONTRARY_FAMILY) ?? 'hunt';
+const CATALOG: ReadonlyArray<{ id: string; stages: readonly unknown[] }> = FAMILY === 'hunt' ? HUNTS : FAMILY === 'mystery' ? MYSTERIES : STORYLINES;
 const reports: ContraryReport[] = [];
 const STALL_MS = 15 * 60_000;
 
@@ -82,11 +90,33 @@ describe('OTA-1699 — the roadmap is readable for every hunt', () => {
       expect(m.abandonAt).toBeGreaterThan(0);
       expect(m.abandonAt).toBeLessThan(m.apex);
       expect(m.apexName.endsWith(' (hunted)')).toBe(true);
+      // A hunt always has a body to wound, and it is the apex's own.
+      expect(m.apexBody).toEqual({ stage: m.apex, name: m.apexName });
+    }
+  });
+
+  it('⚠⚠ step 3b — every mystery and storyline reads to a roadmap too', () => {
+    for (const [fam, defs] of [['mystery', MYSTERIES], ['storyline', STORYLINES]] as const) {
+      for (const d of defs) {
+        const m = roadmap(fam, d as unknown as MissionLike);
+        const stages = d.stages as ReadonlyArray<{ checkKind: string | null; spawn?: { enemyName: string } }>;
+        let lastBoss = stages.length - 1;
+        for (let i = stages.length - 1; i >= 0; i--) if (stages[i]!.checkKind === 'boss') { lastBoss = i; break; }
+        expect({ id: d.id, apex: m.apex, firstAsk: m.firstAsk }).toEqual({ id: d.id, apex: lastBoss, firstAsk: 0 });
+        expect(m.abandonAt).toBeGreaterThan(0);
+        expect(m.abandonAt).toBeLessThan(m.apex);
+        // ⚠ No beast is named on these two families, so a body exists only where a
+        // stage actually spawns one — and the wound-and-run probe skips the rest
+        // rather than grading a fight nobody authored.
+        const spawnStages = stages.map((s, i) => (s.spawn ? i : -1)).filter((i) => i >= 0);
+        const last = spawnStages[spawnStages.length - 1];
+        expect(m.apexBody).toEqual(last === undefined ? null : { stage: last, name: stages[last]!.spawn!.enemyName });
+      }
     }
   });
 });
 
-describe('OTA-1699 — the contrary walker on every hunt', () => {
+describe(`OTA-1699 — the contrary walker on every ${FAMILY}`, () => {
   beforeAll(async () => {
     console.log = () => {}; console.warn = () => {}; console.error = () => {};
     await store.getState().hydrate();
@@ -104,7 +134,7 @@ describe('OTA-1699 — the contrary walker on every hunt', () => {
     process.stdout.write(text);
   });
 
-  for (const h of HUNTS) {
+  for (const h of CATALOG) {
     if (ONLY.length && !ONLY.includes(h.id)) continue;
     const def = h as unknown as MissionLike;
     it(`⚠⚠ ${h.id} — four roads, every one finishes`, async () => {
@@ -125,7 +155,7 @@ describe('OTA-1699 — the contrary walker on every hunt', () => {
         let giveUp: ReturnType<typeof setTimeout> | null = null;
         const deadline = new Promise<'abandoned'>((resolve) => { giveUp = setTimeout(() => resolve('abandoned'), ROAD_MS); });
         walkerControl.abort = false;
-        const r = await Promise.race([walk(def).catch((e: unknown) => ({ error: String(e) })), deadline]);
+        const r = await Promise.race([walk(def, FAMILY).catch((e: unknown) => ({ error: String(e) })), deadline]);
         clearTimeout(stall);
         if (giveUp) clearTimeout(giveUp);
         if (r === 'abandoned') {

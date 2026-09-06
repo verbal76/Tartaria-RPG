@@ -40,6 +40,9 @@
 import { useGameStore } from '../app/state/gameStore';
 import type { GameStore } from '../app/state/gameStore';
 import { findHuntById } from '../app/engine/hunts';
+import { findMysteryById } from '../app/engine/mysteries';
+import { findStorylineById } from '../app/engine/factionStorylines';
+import type { MissionFamily } from '../app/engine/questStage';
 import { armedEncounter } from '../app/engine/missionEncounterArm';
 import { choicesFor, freshEncounter } from '../app/engine/missionEncounter';
 import { FLEE_OPEN_LINES, FLEE_INDOOR_LINES } from '../app/engine/voicePools';
@@ -77,8 +80,11 @@ export interface Probe {
 
 export interface ContraryReport {
   path: ContraryPath;
-  /** OTA-1699 — the hunt this road was walked on, and its noun set (regex source) for the formatter. */
+  /** OTA-1699 — the mission this road was walked on (the field keeps its first
+   *  name), and its noun set (regex source) for the formatter. */
   hunt?: string;
+  /** STEP 3b — which catalog it came from. */
+  family?: MissionFamily;
   nouns?: string;
   /** OTA-1699 — probes this hunt has no ground for (no brood, no later ask), named so a skip is not read as a pass. */
   skipped?: string[];
@@ -95,6 +101,33 @@ export interface ContraryReport {
 }
 
 export const BOG_DRAGON_ID = 'hunt_bog_dragon';
+
+// ⚠⚠ STEP 3b — EVERY FAMILY WALKS THE FOUR ROADS. The walker read one family's
+// definition (findHuntById, `hunt:` keys, completedHuntIds, turnInHunt); the
+// mysteries and storylines share the stage grammar (npc / requires / grants /
+// spawn / checkKind) and the mission-encounter cards, so the roads generalise
+// by reading the raw definition through the family. What differs is the APEX:
+// a hunt's last stage stands up `<target> (hunted)`; a mystery's "boss" is a
+// synthesis paid by the artifact in hand and stands nothing up; a storyline's
+// is usually a person, and two storylines stand up a single body on a spawn
+// stage. So the wound-and-run probe targets the LAST STAGE THAT STANDS UP A
+// BODY, and is skipped — and says so — when the mission has none.
+export type ContraryFamily = MissionFamily;
+type RawDef = { id: string; title: string; stages: readonly unknown[]; targetEnemyName?: string; trophyName?: string };
+function defOf(family: MissionFamily, id: string): RawDef | null {
+  const d = family === 'hunt' ? findHuntById(id) : family === 'mystery' ? findMysteryById(id) : findStorylineById(id);
+  return (d as unknown as RawDef | undefined) ?? null;
+}
+const COMPLETED_KEY: Record<MissionFamily, 'completedHuntIds' | 'completedMysteryIds' | 'completedStorylineIds'> = {
+  hunt: 'completedHuntIds', mystery: 'completedMysteryIds', storyline: 'completedStorylineIds',
+};
+const FAMILY_WORDS: Record<MissionFamily, string[]> = {
+  hunt: ['the bounty', 'the trophy', 'this hunt', 'the hunt'],
+  mystery: ['the mystery', 'this mystery', 'the trophy', 'the artifact'],
+  storyline: ['the chapter', 'this chapter', 'the storyline', 'the story'],
+};
+/** The turn-in refusal each family speaks with the work unfinished (questSlice). */
+const TURN_IN_REFUSED = /trophy|artifact is the proof|isn't finished|not on your slate|don't have it yet/i;
 
 /** Words a line uses when it knows you have been here, or done this, before.
  *  ⚠ Measured tight: "before" matched "stands before you", "ran" matched
@@ -121,21 +154,26 @@ function linesOf(saw: string[]): string[] {
 function resetForRoad(w: ContraryWalker): void {
   resetForMission();
   const p = get().player!;
-  const done = p.completedHuntIds ?? [];
+  const key = COMPLETED_KEY[w.family];
+  const done = (p[key] ?? []) as string[];
   if (done.includes(w.def.id)) {
-    w.allowances.add('the finished hunt struck from the completed ledger so the posting can be taken again');
-    store.setState({ player: { ...p, completedHuntIds: done.filter((id) => id !== w.def.id) } as never });
+    w.allowances.add(`the finished ${w.family} struck from the completed ledger so the posting can be taken again`);
+    store.setState({ player: { ...p, [key]: done.filter((id) => id !== w.def.id) } as never });
   }
   w.allowances.add('HP 600 / STR 20 / DEX 20 / standing 100 with every faction');
 }
 
-function grounds(def: MissionLike): string[] {
+function grounds(family: MissionFamily, def: MissionLike): string[] {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const QS = require('../app/engine/questStage') as typeof import('../app/engine/questStage');
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const CM = require('../app/engine/contractMarkers') as typeof import('../app/engine/contractMarkers');
-  const hunt = findHuntById(def.id)!;
-  return hunt.stages.map((st) => QS.stageLocationId(st, CM.huntAnchorId(hunt), CM.resolvePosterLocation));
+  const raw = defOf(family, def.id)!;
+  // The same anchor the store's own ground readers use per family
+  // (stageArrival.noteMissionGroundsUnderfoot: huntAnchorId for hunts,
+  // contractAnchorId for the other two).
+  const anchor = family === 'hunt' ? CM.huntAnchorId(raw as never) : CM.contractAnchorId(raw as never);
+  return def.stages.map((st) => QS.stageLocationId(st as never, anchor, CM.resolvePosterLocation));
 }
 
 export class ContraryWalker extends Walker {
@@ -148,12 +186,12 @@ export class ContraryWalker extends Walker {
   readonly skipped: string[] = [];
   private readonly learned: string[] = [];
 
-  constructor(path: ContraryPath, def: MissionLike) {
-    super('hunt', def);
+  constructor(path: ContraryPath, def: MissionLike, family: MissionFamily = 'hunt') {
+    super(family, def);
     this.path = path;
-    this.ground = grounds(def);
-    this.map = huntRoadmap(def);
-    this.nouns = huntNouns(def);
+    this.ground = grounds(family, def);
+    this.map = roadmap(family, def);
+    this.nouns = missionNouns(family, def);
   }
 
   /** A name the road taught us (the card's roster name for the reeve) joins the nouns. */
@@ -161,7 +199,7 @@ export class ContraryWalker extends Walker {
     const t = (name ?? '').trim();
     if (t.length < 3 || this.learned.includes(t)) return;
     this.learned.push(t);
-    this.nouns = huntNouns(this.def, this.learned);
+    this.nouns = missionNouns(this.family, this.def, this.learned);
   }
 
   // ── the probe ────────────────────────────────────────────────────────────
@@ -201,7 +239,7 @@ export class ContraryWalker extends Walker {
 
   report(path: ContraryPath, finish: WalkReport | null): ContraryReport {
     return {
-      path, hunt: this.def.id, nouns: this.nouns.source, skipped: [...this.skipped], probes: this.probes, finish, taps: this.taps,
+      path, hunt: this.def.id, family: this.family, nouns: this.nouns.source, skipped: [...this.skipped], probes: this.probes, finish, taps: this.taps,
       worldMemory: this.worldRemembers(this.feed()),
       ...(process.env.PLAYER_WALKER_FEED === '1' ? { feed: [...this.feed()] } : {}),
     };
@@ -222,7 +260,7 @@ export class ContraryWalker extends Walker {
     const s = this.stage();
     const armed = armedEncounter(get().player);
     const st = armed ? get().player!.missionEncounters?.[armed.key] : undefined;
-    if (armed && armed.key === `hunt:${this.def.id}:${s}` && st?.phase === 'resolved') {
+    if (armed && armed.key === `${this.family}:${this.def.id}:${s}` && st?.phase === 'resolved') {
       this.shutCards.push(s);
       return this.playStageTyped();
     }
@@ -233,7 +271,7 @@ export class ContraryWalker extends Walker {
       if (!(await this.walkTo(pin.anchorId, `stage ${s}`))) return false;
       const armedNow = armedEncounter(get().player);
       const stNow = armedNow ? get().player!.missionEncounters?.[armedNow.key] : undefined;
-      if (armedNow && armedNow.key === `hunt:${this.def.id}:${s}` && stNow?.phase === 'resolved') {
+      if (armedNow && armedNow.key === `${this.family}:${this.def.id}:${s}` && stNow?.phase === 'resolved') {
         this.shutCards.push(s);
         return this.playStageTyped(arriveMark);
       }
@@ -266,7 +304,7 @@ export class ContraryWalker extends Walker {
   // ── the parent's play, resumable ─────────────────────────────────────────
   done0(): WalkReport {
     return {
-      family: 'hunt', id: this.def.id, title: this.def.title,
+      family: this.family, id: this.def.id, title: this.def.title,
       outcome: this.breaks.length === 0 ? 'complete' : 'broken',
       breaks: this.breaks, allowances: [...this.allowances], stages: this.stages, taps: this.taps,
     };
@@ -341,8 +379,7 @@ export class ContraryWalker extends Walker {
     if (!st || !sc) return false;
     const names = new Set<string>();
     if (st.spawn) names.add(st.spawn.enemyName);
-    const hunt = findHuntById(this.def.id);
-    if (hunt) names.add(`${hunt.targetEnemyName} (hunted)`);
+    if (this.map.apexBody) names.add(this.map.apexBody.name);
     return sc.enemies.some((e, i) => (sc.enemyHps[i] ?? 0) > 0 && names.has(e.name));
   }
 
@@ -422,7 +459,7 @@ export class ContraryWalker extends Walker {
   /** The Contracts screen's ABANDON, then a fresh ACCEPT at the gate. */
   async abandonAndReaccept(): Promise<boolean> {
     this.tap(`ABANDON "${this.def.title}"`);
-    get().abandonContract('hunt', this.def.id);
+    get().abandonContract(this.family, this.def.id);
     await tick();
     if (this.record()) { this.breaks.push('ABANDON left the record on the slate'); return false; }
     return this.accept();
@@ -486,6 +523,10 @@ export interface HuntRoadmap {
   abandonAt: number;
   /** Items granted before the abandon point — what the pack holds when the posting is dropped. */
   items: string[];
+  /** The body the wound-and-run probe wounds — a hunt's `<target> (hunted)` on
+   *  the apex, else the last spawn stage's body; null when the mission stands
+   *  nothing up (a mystery's synthesis, a storyline's person). */
+  apexBody: { stage: number; name: string } | null;
   apexName: string;
   broodName: string | null;
   broodCount: number;
@@ -505,16 +546,32 @@ function stripThe(s: string): string { return s.replace(/^the\s+/i, '').trim(); 
 
 function esc(s: string): string { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
 
-export function huntRoadmap(def: MissionLike): HuntRoadmap {
-  const hunt = findHuntById(def.id);
+export function huntRoadmap(def: MissionLike): HuntRoadmap { return roadmap('hunt', def); }
+
+export function roadmap(family: MissionFamily, def: MissionLike): HuntRoadmap {
+  const raw = defOf(family, def.id);
   const stages = def.stages;
-  const apex = stages.length - 1;
+  // The apex: the last "boss" stage (a mystery's synthesis, a storyline's
+  // reckoning, a hunt's kill), else the last stage. Hunts end on their boss.
+  let apex = stages.length - 1;
+  for (let i = stages.length - 1; i >= 0; i--) if (stages[i]!.checkKind === 'boss') { apex = i; break; }
+  const lastSpawn = (() => { for (let i = stages.length - 1; i >= 0; i--) if (stages[i]!.spawn?.enemyName) return i; return -1; })();
+  const apexBody = family === 'hunt' && raw?.targetEnemyName
+    ? { stage: apex, name: `${raw.targetEnemyName} (hunted)` }
+    : lastSpawn >= 0 ? { stage: lastSpawn, name: stages[lastSpawn]!.spawn!.enemyName } : null;
   const npcIdx = stages.map((s, i) => (s.npcName ? i : -1)).filter((i) => i >= 0);
   const firstAsk = npcIdx.length ? npcIdx[0]! : null;
   const laterAsk = npcIdx.find((i) => firstAsk !== null && i > firstAsk && !!stages[i]!.requires) ?? null;
   const wrongVerb = stages.findIndex((s) => s.checkKind === 'investigate');
   const brood = stages.findIndex((s) => (s.spawn?.count ?? 0) >= 2);
-  const abandonAt = Math.min(3, Math.max(1, stages.length - 2));
+  // ⚠ STEP 3b — MEASURED FROM THE APEX, NOT THE STAGE COUNT. `stages.length - 2`
+  // assumes the apex is the last stage, which is true of every hunt and false of
+  // a mystery or storyline that carries a trailing epilogue after its boss beat:
+  // mystery_drowned_bell_samarran is four stages with its boss on 2, so the old
+  // formula put the abandon point ON the apex and the probe abandoned the beat it
+  // was about to walk. For a hunt `apex - 1` IS `stages.length - 2`, so this is
+  // the same number it always was there.
+  const abandonAt = Math.min(3, Math.max(1, apex - 1));
   const items = stages.slice(0, abandonAt).map((s) => s.grants?.item).filter((x): x is string => !!x);
   return {
     apex,
@@ -524,7 +581,8 @@ export function huntRoadmap(def: MissionLike): HuntRoadmap {
     brood: brood >= 0 ? brood : null,
     abandonAt,
     items,
-    apexName: `${hunt?.targetEnemyName ?? def.title} (hunted)`,
+    apexBody,
+    apexName: apexBody?.name ?? '',
     broodName: brood >= 0 ? stages[brood]!.spawn!.enemyName : null,
     broodCount: brood >= 0 ? stages[brood]!.spawn!.count ?? 1 : 0,
     firstAskNpc: firstAsk !== null ? stages[firstAsk]!.npcName ?? null : null,
@@ -538,19 +596,22 @@ export function huntRoadmap(def: MissionLike): HuntRoadmap {
  *  compass names them on every arrival); people, beasts, items and the title
  *  are in. Roster names learned on the road (the reeve is "Halvard" to the
  *  card) are added by `learnNoun`. */
-export function huntNouns(def: MissionLike, extra: readonly string[] = []): RegExp {
-  const hunt = findHuntById(def.id);
-  const set = new Set<string>(['the bounty', 'the trophy', 'this hunt', 'the hunt']);
+export function huntNouns(def: MissionLike, extra: readonly string[] = []): RegExp { return missionNouns('hunt', def, extra); }
+
+export function missionNouns(family: MissionFamily, def: MissionLike, extra: readonly string[] = []): RegExp {
+  const raw = defOf(family, def.id);
+  const set = new Set<string>(FAMILY_WORDS[family]);
   const add = (s: string | undefined | null) => { const t = (s ?? '').toLowerCase().trim(); if (t.length >= 3) set.add(t); };
   add(def.title);
   // A beast's name and its plural — "Mud Harpy" is on the feed as "Mud Harpies" as often as not.
   const addBeast = (name: string) => { add(name); add(/y$/i.test(name) ? name.replace(/y$/i, 'ies') : `${name}s`); };
-  if (hunt) {
-    addBeast(hunt.targetEnemyName);
-    const tw = hunt.targetEnemyName.split(/\s+/);
+  if (raw?.targetEnemyName) {
+    addBeast(raw.targetEnemyName);
+    const tw = raw.targetEnemyName.split(/\s+/);
     if (tw.length > 1) add(`the ${tw[tw.length - 1]}`);
-    add(hunt.trophyName);
   }
+  // Mysteries carry a trophyName too, and it is the thing every later line names.
+  if (raw?.trophyName) { add(raw.trophyName); for (const w of words(raw.trophyName, 5)) add(w); }
   for (const st of def.stages) {
     if (st.npcName) { add(stripThe(st.npcName)); for (const w of words(st.npcName, 4)) add(w); }
     if (st.spawn?.enemyName) addBeast(st.spawn.enemyName);
@@ -565,12 +626,12 @@ export function huntNouns(def: MissionLike, extra: readonly string[] = []): RegE
   return new RegExp(`\\b(${alts.join('|')})\\b`, 'i');
 }
 
-export async function walkObedient(def: MissionLike): Promise<ContraryReport> {
-  const finish = await playMission('hunt', def);
-  const w = new ContraryWalker('obedient', def);
+export async function walkObedient(def: MissionLike, family: MissionFamily = 'hunt'): Promise<ContraryReport> {
+  const finish = await playMission(family, def);
+  const w = new ContraryWalker('obedient', def, family);
   const noCard = finish.stages.filter((s) => !s.closeCard).map((s) => s.stage);
   w.probes.push({
-    path: 'obedient', step: 'the whole hunt, as asked', did: 'accept at the gate, follow every course, type every arrival line, answer every card, hand in',
+    path: 'obedient', step: `the whole ${family}, as asked`, did: 'accept at the gate, follow every course, type every arrival line, answer every card, hand in',
     expected: `${def.stages.length} stages close, each with a card, the purse moves`,
     saw: finish.stages.map((s) => `stage ${s.stage} via=${s.via}${s.closeCard ? ` card: ${s.closeCard.split('\n')[0]}` : ' NO CARD'}`),
     handled: finish.outcome === 'complete' ? 'yes' : 'no',
@@ -578,33 +639,36 @@ export async function walkObedient(def: MissionLike): Promise<ContraryReport> {
     priorKnowledge: 'n/a',
     verdict: finish.outcome === 'complete' ? `complete in ${finish.taps} taps${noCard.length ? `; stages ${noCard.join(',')} closed without a card` : ''}` : finish.breaks.join(' | '),
   });
-  return { path: 'obedient', hunt: def.id, nouns: w.nouns.source, probes: w.probes, finish, taps: finish.taps, worldMemory: [], ...(finish.feed ? { feed: finish.feed } : {}) };
+  return { path: 'obedient', hunt: def.id, family, nouns: w.nouns.source, probes: w.probes, finish, taps: finish.taps, worldMemory: [], ...(finish.feed ? { feed: finish.feed } : {}) };
 }
 
-export async function walkPremature(def: MissionLike): Promise<ContraryReport> {
-  const w = new ContraryWalker('premature', def);
+export async function walkPremature(def: MissionLike, family: MissionFamily = 'hunt'): Promise<ContraryReport> {
+  const w = new ContraryWalker('premature', def, family);
   resetForRoad(w);
   const report = (finish: WalkReport | null): ContraryReport => w.report('premature', finish);
   if (!(await w.accept())) return report(w.done0());
   const m = w.map;
   const apexGround = w.ground[m.apex]!;
   const firstAsk = m.firstAskNpc ?? 'the first ask';
+  // The apex's own verb — "attack" on a hunt, the synthesis or the reckoning
+  // phrase on the others (stageVerbLabel, through the parent's contractsLabel).
+  const apexVerb = w.contractsLabel(m.apex) ?? 'attack';
 
   await w.probe(
     'the apex ground before the first ask',
-    `SET COURSE to ${apexGround} at stage 0, arrive, type "attack" (the apex's own verb) and "investigate the area"`,
+    `SET COURSE to ${apexGround} at stage 0, arrive, type "${apexVerb}" (the apex's own verb) and "investigate the area"`,
     `the slate says this is the apex's ground but not yet — ${firstAsk} first; nothing stands up`,
     async () => {
       if (!(await w.walkTo(apexGround, 'to the apex ground, early'))) return;
       w.dismissCards();
-      w.tap('type "attack"'); await w.type('attack');
+      w.tap(`type "${apexVerb}"`); await w.type(apexVerb);
       if (w.enemiesUp() > 0) await w.fightOut('on the apex ground, early');
       w.tap('type "investigate the area"'); await w.type('investigate the area');
       if (w.enemiesUp() > 0) await w.fightOut('on the apex ground, early');
     },
     (saw) => {
       const about = w.aboutTheHunt(saw).filter((l) => !/^\[/.test(l));
-      const stoodUp = saw.some((l) => l.includes(m.apexName));
+      const stoodUp = !!m.apexName && saw.some((l) => l.includes(m.apexName));
       const stillStage0 = w.stage() === 0;
       // ⚠ OTA-1700 walker — 'yes' when the slate says "not yet" AND names the first
       // ask (the OTA-1688 arrival reader's exact shape); 'partial' when the hunt is
@@ -655,7 +719,7 @@ export async function walkPremature(def: MissionLike): Promise<ContraryReport> {
     );
     if (w.breaks.length) return report(w.done0());
   } else {
-    w.skipped.push('a later door before the first ask — this hunt has no later ask that requires an item');
+    w.skipped.push(`a later door before the first ask — this ${family} has no later ask that requires an item`);
   }
 
   const stops = [...new Set([m.laterAsk ?? -1, m.apex, def.stages.length].filter((x) => x >= 0))].sort((a, b) => a - b);
@@ -687,25 +751,27 @@ export async function walkPremature(def: MissionLike): Promise<ContraryReport> {
   return report(finish);
 }
 
-export async function walkContrary(def: MissionLike): Promise<ContraryReport> {
-  const w = new ContraryWalker('contrary', def);
+export async function walkContrary(def: MissionLike, family: MissionFamily = 'hunt'): Promise<ContraryReport> {
+  const w = new ContraryWalker('contrary', def, family);
   resetForRoad(w);
   const report = (finish: WalkReport | null): ContraryReport => w.report('contrary', finish);
   if (!(await w.accept())) return report(w.done0());
   const m = w.map;
 
   await w.probe(
-    'the trophy before the hunt',
+    family === 'hunt' ? 'the trophy before the hunt' : 'the hand-in before the work',
     'TURN IN at Halem\'s counter straight after accepting',
-    'a refusal that says what is missing (the trophy) — not a silent button',
+    'a refusal that says what is missing (the trophy, the artifact, the unfinished chapter) — not a silent button',
     async () => {
       w.tap(`TURN IN "${def.title}"`);
-      get().turnInHunt(def.id);
+      if (family === 'hunt') get().turnInHunt(def.id);
+      else if (family === 'mystery') get().turnInMystery(def.id);
+      else get().turnInStoryline(def.id);
       await tick();
       if (get().player?.hubRoomId) { w.tap('EXIT'); await w.type('leave outpost'); }
     },
     (saw) => {
-      const refused = saw.find((l) => /trophy|not on your slate|don't have it yet/i.test(l));
+      const refused = saw.find((l) => TURN_IN_REFUSED.test(l));
       return {
         handled: w.record() ? 'yes' : 'no',
         acknowledged: refused ? 'yes' : 'no',
@@ -726,7 +792,7 @@ export async function walkContrary(def: MissionLike): Promise<ContraryReport> {
         if (!(await w.walkTo(askGround, 'to the first ask'))) return;
         w.dismissCards();
         const armed = armedEncounter(get().player);
-        if (!armed || armed.key !== `hunt:${def.id}:0`) { w.breaks.push(`no card armed at the first ask (${armed?.key ?? 'none'})`); return; }
+        if (!armed || armed.key !== `${family}:${def.id}:0`) { w.breaks.push(`no card armed at the first ask (${armed?.key ?? 'none'})`); return; }
         w.learnNoun(armed.person.name);
         const enc = get().player!.missionEncounters?.[armed.key] ?? freshEncounter(armed.key);
         const offered = choicesFor(enc, { hasFight: armed.hasFight, canPersuade: armed.canPersuade, canKill: armed.person.canKill });
@@ -763,7 +829,7 @@ export async function walkContrary(def: MissionLike): Promise<ContraryReport> {
     );
     if (w.breaks.length) return report(w.done0());
   } else {
-    w.skipped.push('walking out on the first ask — stage 0 is not a person on this hunt');
+    w.skipped.push(`walking out on the first ask — stage 0 is not a person on this ${family}`);
   }
 
   if (m.wrongVerb !== null && m.wrongVerb > w.stage() - 1) {
@@ -797,7 +863,7 @@ export async function walkContrary(def: MissionLike): Promise<ContraryReport> {
     );
     if (w.breaks.length) return report(w.done0());
   } else {
-    w.skipped.push('the wrong verb on the right ground — this hunt has no "investigate" stage ahead of the walker');
+    w.skipped.push(`the wrong verb on the right ground — this ${family} has no "investigate" stage ahead of the walker`);
   }
 
   if (w.stage() < m.abandonAt) {
@@ -822,7 +888,7 @@ export async function walkContrary(def: MissionLike): Promise<ContraryReport> {
       if (armed) w.learnNoun(armed.person.name);
       const st = armed ? get().player!.missionEncounters?.[armed.key] : undefined;
       get().appendLog('system', `(walker) at the first ask again: card ${armed?.key ?? 'none'}, phase ${st?.phase ?? 'fresh'}`);
-      const offered = armed && armed.key === `hunt:${def.id}:0`
+      const offered = armed && armed.key === `${family}:${def.id}:0`
         ? choicesFor(st ?? freshEncounter(armed.key), { hasFight: armed.hasFight, canPersuade: armed.canPersuade, canKill: armed.person.canKill })
         : [];
       const fwd = offered.find((c) => c !== 'flee');
@@ -863,8 +929,8 @@ export async function walkContrary(def: MissionLike): Promise<ContraryReport> {
   return report(finish);
 }
 
-export async function walkInterrupted(def: MissionLike): Promise<ContraryReport> {
-  const w = new ContraryWalker('interrupted', def);
+export async function walkInterrupted(def: MissionLike, family: MissionFamily = 'hunt'): Promise<ContraryReport> {
+  const w = new ContraryWalker('interrupted', def, family);
   resetForRoad(w);
   const report = (finish: WalkReport | null): ContraryReport => w.report('interrupted', finish);
   if (!(await w.accept())) return report(w.done0());
@@ -885,6 +951,10 @@ export async function walkInterrupted(def: MissionLike): Promise<ContraryReport>
         if (!(await w.walkTo(broodGround, 'to the brood ground'))) return;
         w.dismissCards();
         w.fieldReport('on the brood ground');
+        // ⚠ The arrival door arms HUNT spawns only (stageArrival.armSpawnStagesAtArrival
+        // returns early on any other family); a mystery or storyline stands its
+        // pack up when the stage's own verb is typed. A player types it; so does this.
+        if (family !== 'hunt' && w.livingNamed(brood) === 0) { const v = w.contractsLabel(m.brood!) ?? 'attack'; w.tap(`type "${v}"`); await w.type(v); }
         n0 = await w.clearAmbient(brood, 'on the brood ground');
         if (n0 === 0) { w.breaks.push(`no ${brood} stood up on arrival at stage ${m.brood} — ${w.fieldReport('no brood')}`); return; }
         // ⚠ MEASURED (second sweep, sludge behemoth + harpy cradle): STR 20 with
@@ -929,27 +999,39 @@ export async function walkInterrupted(def: MissionLike): Promise<ContraryReport>
     w.dismissCards();
     w.fieldReport('after the brood');
   } else {
-    w.skipped.push('one of the brood down, then run — this hunt stands up no brood of two or more');
+    w.skipped.push(`one of the brood down, then run — this ${family} stands up no brood of two or more`);
   }
 
-  if (w.stage() !== m.apex) {
-    const r = await w.playOn(m.apex);
+  // ⚠ STEP 3b — the wound-and-run probe wounds the last body the mission stands
+  // up. A mystery's "boss" is the artifact in hand and a storyline's is usually
+  // a person; neither stands anything up, so the probe is skipped and says so
+  // rather than grading a fight that was never authored.
+  if (!m.apexBody) {
+    w.skipped.push(`the apex wounded, then run — this ${family} stands up no body to wound (its last step is a synthesis or a person)`);
+    const finish = await w.playOn();
+    return report(finish);
+  }
+  const apexStage = m.apexBody.stage;
+  if (w.stage() !== apexStage) {
+    const r = await w.playOn(apexStage);
     if (r.breaks.length) return report(r);
   }
 
-  const apex = m.apexName;
-  const apexGround = w.ground[m.apex]!;
+  const apex = m.apexBody.name;
+  const apexGround = w.ground[apexStage]!;
+  const apexVerb = w.contractsLabel(apexStage) ?? 'attack';
   let hpAtFlee: number | null = null;
   let hpMax: number | null = null;
   await w.probe(
     'the apex wounded, then run',
-    `arrive on ${apexGround} (the apex fires at arrival), wound it, FLEE, step off and back`,
+    `arrive on ${apexGround} (a hunt's apex fires at arrival; the other families stand up on "${apexVerb}"), wound it, FLEE, step off and back`,
     'the flee is said; on return the apex is still wounded (or a line says it healed), and its first-arrival stinger is not replayed as if new',
     async () => {
       w.fieldReport('before the apex walk');
       if (!(await w.walkTo(apexGround, 'to the apex ground'))) return;
       w.dismissCards();
       w.fieldReport('on the apex ground');
+      if (family !== 'hunt' && w.livingNamed(apex) === 0) { w.tap(`type "${apexVerb}"`); await w.type(apexVerb); }
       if ((await w.clearAmbient(apex, 'on the apex ground')) === 0) { w.breaks.push(`the apex did not stand up on arrival at its ground — ${w.fieldReport('no apex')}`); return; }
       hpMax = w.hpOf(apex);
       await w.fightUntil(() => (w.hpOf(apex) ?? 0) < (hpMax ?? 0), 'to wound the apex');
@@ -959,6 +1041,11 @@ export async function walkInterrupted(def: MissionLike): Promise<ContraryReport>
       if (!(await w.stepOffAndBack())) return;
       w.dismissCards();
       await w.clearAmbient(apex, 'on the way back to the apex ground');
+      if (family !== 'hunt' && w.livingNamed(apex) === 0) {
+        get().appendLog('system', `(walker) back on the apex ground: nothing stood up by itself; typing "${apexVerb}" again`);
+        w.tap(`type "${apexVerb}"`); await w.type(apexVerb);
+        await w.clearAmbient(apex, 'on the way back, after the verb');
+      }
       get().appendLog('system', `(walker) back on the apex ground: apex ${w.livingNamed(apex) ? `up at ${w.hpOf(apex)}` : 'not up'}`);
     },
     (saw) => {
@@ -985,8 +1072,8 @@ export async function walkInterrupted(def: MissionLike): Promise<ContraryReport>
   return report(finish);
 }
 
-export async function walkAllFour(def: MissionLike): Promise<ContraryReport[]> {
-  return [await walkObedient(def), await walkPremature(def), await walkContrary(def), await walkInterrupted(def)];
+export async function walkAllFour(def: MissionLike, family: MissionFamily = 'hunt'): Promise<ContraryReport[]> {
+  return [await walkObedient(def, family), await walkPremature(def, family), await walkContrary(def, family), await walkInterrupted(def, family)];
 }
 
 function nounsOf(r: ContraryReport): RegExp {
