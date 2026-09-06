@@ -1,0 +1,660 @@
+Bug Report — Cheddar Bob · (2026-09-06-1711-the-escort-has-to-go-somewhere) · Why don't I have the just send a log option. On Android, only on apple
+=== TARTARIA BUG REPORT ===
+Submitted: 2026-09-06T15:58:39.698Z
+Character: Cheddar Bob
+Slot ID: slot_mtdifdmg_g2si12
+Race: Reclaimers
+Location: Voronov
+HP: 31/47
+
+--- DESCRIPTION ---
+Why don't I have the just send a log option. On Android, only on apple
+
+--- DEVICE / BUILD ---
+Device
+  Name: Pixel 10 Pro XL
+  Platform: android 37
+  Hermes: yes
+  Locale: en-US
+  Timezone: America/New_York
+  Screen: window 443×986 / screen 443×986 @ 2.4375x density
+  Captured at: 2026-09-06T15:58:39.470Z
+
+Install
+  App ID: com.hotatticgames.tartarprim
+  App version: 4.32.11
+  APK build version: 2.4.1
+  APK build: 293
+  AAB: (build 293)
+  OTA: (2026-09-06-1711-the-escort-has-to-go-somewhere)
+  Boot stage: qwen:done
+
+ML runtime health
+  Status: active (no crashes detected)
+  Crash count: 0
+  Last init attempt: 2026-09-06T15:45:16.462Z
+  Last init success: 2026-09-06T15:45:17.891Z
+  Crashes-before-disable threshold: 2
+  Qwen completion guard: RECOVERED — a retry survived a clean run; AI narration re-enabled
+  Qwen kernel variant: rnllama_v8_2_fp16_dotprod
+  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k
+  Voice (TTS) guard: clean (no voice crashes on this build)
+Save-load health
+  Status: clean (no load-crash flags)
+Last JS crash
+  Status: none recorded
+This launch
+  Life: bmtpzgbesm6 · started 2026-09-06T15:45:00.100Z
+  Followed an OTA apply 136ms ago (boot-front)
+  The previous life released its model contexts before reloading (o0/r0/l0/p0/dn0)
+Crash ledger — 10 recorded (newest last)
+  ⚠⚠ 8 of 10 process kills landed on an OTA-apply boot
+  • 2026-09-05T02:27:20.651Z (2251m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1679-the-part-fits-the-wire · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 974ms into the action · alive 0ms after it
+      launch: died 1047ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 254ms earlier via boot-front
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-05T04:22:19.915Z (2136m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1681-the-outpost-lets-go · stage homework-done
+      Process died with no orderly exit while: tap "craft"
+      doing: tap "craft" · room voronov · screen exploration
+      last checkpoint: homework-done · 13450ms into the action · alive 0ms after it
+      launch: died 515390ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 154ms earlier via boot-front
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o1/r0/l1/p1/dn0
+  • 2026-09-05T08:31:21.524Z (1887m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1687-the-mission-layer-remembers-itself · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 870ms into the action · alive 0ms after it
+      launch: died 904ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 187ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-05T13:16:47.707Z (1602m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1690-the-cap-speaks · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 782ms into the action · alive 10351ms after it
+      launch: died 11166ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 208ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-05T16:18:32.776Z (1420m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1696-the-fight-sheds-its-passengers · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 1898ms into the action · alive 0ms after it
+      launch: died 1965ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 413ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-05T17:22:04.013Z (1357m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1698-the-counter-remembers-the-question · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 2285ms into the action · alive 0ms after it
+      launch: died 2341ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 222ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-05T18:28:33.919Z (1290m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1699-every-hunt-walks-the-four-roads · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 772ms into the action · alive 0ms after it
+      launch: died 811ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 163ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-05T19:15:20.497Z (1243m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1699-every-hunt-walks-the-four-roads · stage mid-action
+      Process died with no orderly exit while: tap "missions"
+      doing: tap "missions" · room voronov · screen exploration
+      launch: died 842671ms into the process · not an OTA-apply boot
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-05T20:20:16.991Z (1178m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1700-the-world-runs-while-you-learn · stage rendered
+      Process died with no orderly exit while: tap "◈ LORE"
+      doing: tap "◈ LORE" · room voronov · screen exploration
+      last checkpoint: rendered · 5887ms into the action · alive 3237ms after it
+      launch: died 30204ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 204ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-05T23:07:59.629Z (1011m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1700-the-world-runs-while-you-learn · stage mid-action
+      Process died with no orderly exit while: tap "craft"
+      doing: tap "craft" · room iskan_veil · screen exploration
+      launch: died 9564ms into the process · not an OTA-apply boot
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+Crash delivery: ON — reports go to Sentry when you crash.
+Runtime pressure
+  Memory warnings: none this session
+  ⚠ Freeze watch: 1 render stall (worst: frames quiet 2820ms while logic ran)
+  ⚠ Worst logic stall: 3775ms
+  ⚠ Native queue: worst wait 2.4s · 0 job kinds queued >3s · worst 14.4ms/prompt-token · 6 generations thrown away (39.1s)
+     The JS thread was healthy and the native model queue was not. A stall the freeze watch above is structurally blind to.
+  App state trail: background → active
+Model contexts
+  Live now: 1
+  Opened: 1 · Released: 0 · Peak live: 1
+  Narration engine: ready
+
+--- VOICE ---
+  TTS enabled: no
+  Engine: bundled
+  Rate: 1.05 · Pitch: 1.00
+  System voice id: (default)
+  Kokoro voice: am_michael
+  Kokoro state: idle
+
+--- INVENTORY ---
+Inventory (Cheddar Bob)
+  HP: 31/47  Stamina: 21/22  TC: 831  Corruption: 6
+  Pack: 203 distinct rows / 1430 total
+
+Weapons (28)
+  Aether Axe ×3 (Legendary, 2d8 aetheric, dur 59/59, [weapon,melee,two_handed,axe,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Aetheric Crystal Blade (Uncommon, 1d8 slashing, dur 25/25, [weapon,blade,melee,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Aetheric Rod (1d6 electrical, dur 41/41, [weapon,melee,dual_wield,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Frost-Rimed Aetheric Shield-Hammer (Uncommon, 2d6 bludgeoning, +1d6 cold coat, dur 40/41, [weapon,melee,two_handed,hammer,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Acid-Etched Auralite Talon (Rare, +1d4 acid coat, dur 34/35, equipped:main, 2d6 aetheric, resist:aetheric, unique, [fused,unique,aetheric])
+    actions: equip:off, unequip:main, use(off), repair
+  Bone Shortsword (1d6 slashing, dur 33/33, [weapon,melee,single_handed,blade,giants])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bone Siege Crossbow (Uncommon, 2d6 piercing, dur 26/26, [weapon,ranged,two_handed,crossbow,giants])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Cantor's Tuning Fork (Legendary, dur 50/50, 2d6+2 aetheric, unique, [core_guardian_set,aether_born,exotic,sonic,armor_ignore_partial])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Searing Choir-Bound Launcher (Rare, +1d4 burn coat, dur 35/35, 2d6 aetheric, resist:aetheric, unique, [fused,unique,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Cold-Iron Rosary (Legendary, dur 45/45, 1d8+3 aetheric, unique, [core_guardian_set,aether_born,exotic,corruption_damage,aether_drain])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Crude Golem Sledge (2d6 bludgeoning, dur 51/51, [weapon,melee,golem_weapon,two_handed])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Giant-Watch Greatspear (Uncommon, 2d6 piercing, dur 25/26, ♥reserved, [weapon,melee,two_handed,faction_gear,servants_of_giants])
+    actions: equip:main, equip:off, use(off), scrap, repair, release-from-fusion, drop
+  Golem Sledge (Rare, 2d8 bludgeoning, dur 32/32, [weapon,melee,golem_weapon,two_handed])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Litany Maul (Legendary, dur 75/75, 1d12+2 bludgeoning, unique, [core_guardian_set,aether_born,blunt,two_handed,stagger_chance])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Magnetic Axe (Rare, 2d6 electrical, dur 41/41, [weapon,melee,single_handed,axe,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Armor Rod (Uncommon, 1d8 bludgeoning, dur 39/39, [runecaster,rune_power,mud_dwellers,ward])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Long Axe (1d8 slashing, dur 28/28, [weapon,melee,two_handed,axe,mud_dwellers])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Shell Wand (1d6 bludgeoning, dur 22/22, [runecaster,rune_power,mud_dwellers,ward])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Spear (Runecaster) (Uncommon, 2d6 piercing, dur 27/27, [runecaster,rune_power,mud_dwellers,loot])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Venom Blade (Rare, 2d6 poison, dur 25/25, [weapon,melee,dual_wield,blade,mud_dwellers])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Frost-Rimed Mud-Iron Greatblade (Rare, 2d8 slashing, +1d6 cold coat, dur 16/16, [weapon,melee,two_handed,blade,mud])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Pillar Brand (Uncommon, dur 25/25, 1d8 bludgeoning, unique, [fused,unique])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Pulse-Woven Edge (Legendary, dur 45/45, ♥reserved, 2d8 aetheric, resist:aetheric, unique, [fused,unique,faction_gear,servants_of_giants,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, release-from-fusion, drop
+  Corrupted Reclaimers Guild Shroud-Spun Slinger (Legendary, +1d4 corruption coat, dur 33/35, ♥reserved, 2d6 bludgeoning, unique, [fused,unique,faction_gear,reclaimers_guild])
+    actions: equip:main, equip:off, use(off), scrap, repair, release-from-fusion, drop
+  Sentinel Cleaver (Rare, 2d8 slashing, dur 22/34, equipped:off, [weapon,blade,melee,sentinel])
+    actions: equip:main, unequip:off, use, repair
+  Frost-Rimed Sentinel Cleaver (Rare, 2d8 slashing, +1d6 cold coat, dur 22/25, [weapon,blade,melee,sentinel])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Tooth-Set Warstaff (Uncommon, dur 25/25, 1d8 bludgeoning, resist:poison, unique, [fused,unique,poison])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Void Pulse Rod (Uncommon, 2d6 aetheric, dur 13/13, [weapon,runecaster,rune_power,aetheric,crafted])
+    actions: equip:main, equip:off, use(off), scrap, drop
+
+Armor (20)
+  Aether-Walker's Boots (Uncommon, dur 26/27, equipped:feet, AC +4 · Resists: aetheric, acid (coated), cold (coated) · Regen: +1 stamina per action · DEX +4 · STR +2, [armor,feet,boots,tartarian_giants])
+    actions: unequip:feet, repair
+  Aether-Walker's Boots (Uncommon, dur 22/22, AC +4 · Resists: aetheric · Regen: +1 stamina per action · DEX +4 · STR +2, [armor,feet,boots,tartarian_giants])
+    actions: equip:feet, use, scrap, drop
+  Anvil-Struck Bulwark (Rare, dur 25/25, AC+2, resist:degradation, unique, [fused,unique,faction_gear,reclaimers_guild,degradation])
+    actions: equip:head, use, scrap, drop
+  Architect's Sight Enhancer (Uncommon, dur 33/35, equipped:head, AC +3 · Resists: cold, cold (coated) · Regen: +1 HP per action · WIS +3 · INT +1, [armor,head,cloth,helmet,architectural_sentinels])
+    actions: unequip:head, repair
+  Auralite Greaves (Rare, dur 35/35, AC+3, resist:aetheric, unique, [fused,unique,aetheric])
+    actions: equip:legs, use, scrap, drop
+  Cantor's Robe (Legendary, dur 55/55, AC+4, resist:aetheric, unique, [core_guardian_set,aether_born,ac:4,chest,light])
+    actions: equip:chest, use, scrap, drop
+  Cobble-Set Aegis (Uncommon, dur 25/25, AC+2, unique, [fused,unique])
+    actions: equip:chest, use, scrap, drop
+  Cobble-Set Bulwark (Uncommon, dur 25/25, AC+2, unique, [fused,unique])
+    actions: equip:chest, use, scrap, drop
+  Forgotten Seeker's Mask (Rare, dur 45/45, AC +3 · Resists: slashing, aetheric · INT +3, [armor,head,mask,face,reclaimers])
+    actions: equip:head, use, scrap, drop
+  Hammer-Folded Stompers (Rare, dur 35/35, AC+3, resist:degradation, unique, [fused,unique,degradation])
+    actions: equip:feet, use, scrap, drop
+  Litany Greaves (Legendary, dur 68/85, equipped:legs, AC+3, unique, [core_guardian_set,aether_born,ac:3,legs,heavy])
+    actions: unequip:legs, repair
+  Lumenforged Stompers (Rare, dur 35/35, AC+3, resist:aetheric, unique, [fused,unique,aetheric])
+    actions: equip:feet, use, scrap, drop
+  Mask of the Aether Seeker (Uncommon, dur 12/12, AC +5 · Resists: aetheric · CHA +5 · DEX +2, [armor,head,mask,face,aetherborn])
+    actions: equip:head, use, scrap, drop
+  Matriarch's Aegis (Legendary, dur 60/60, AC+2, resist:aetheric, unique, [core_guardian_set,aether_born,ac:2,head,will_save])
+    actions: equip:head, use, scrap, drop
+  Mud-glass Scales (Uncommon, dur 48/49, equipped:chest, AC +4 · Resists: piercing, burn (coated) · Regen: +2 stamina per action · Bites back: 1 damage to whatever hits you, in its own element, [armor,chest,scale,mud_glass,true_tartarians])
+    actions: unequip:chest, repair
+  Mudstone Bulwark (Rare, dur 61/61, AC +4 · Resists: bludgeoning, piercing · HP +30 · Bites back: 2 damage to whatever hits you, in its own element, [armor,chest,heavy,stone,mud])
+    actions: equip:chest, use, scrap, drop
+  Reclaimer's Cloak (dur 13/13, AC +2 · Resists: cold, burn (coated), acid (coated) · DEX +2 · STE +2, [armor,cloak,outer,reclaimers,stealth])
+    actions: equip:cloak, use, scrap, drop
+  Relic Hunter's Gauntlets (Uncommon, dur 27/27, AC +4 · Resists: slashing, cold (coated), burn (coated) · DEX +4 · STR +2, [armor,hands,gauntlets,reclaimers])
+    actions: equip:hands, use, scrap, drop
+  Singing Hood (Uncommon, dur 25/25, AC+2, resist:aetheric, unique, [fused,unique,aetheric])
+    actions: equip:head, use, scrap, drop
+  Titan's Gauntlets (dur 14/16, AC +2 · STR +2, [armor,hands,gauntlets,tartarian_giants])
+    actions: equip:hands, use, scrap, repair, drop
+
+Shields (2)
+  Grounded Buckler (Uncommon, 1d6 bludgeoning, dur 323/323, [weapon,shield,dual_wield,unknowing_masses])
+    actions: equip:off, use(off), scrap, drop
+  Iron Buckler (1d4 bludgeoning, dur 169/169, [weapon,shield,dual_wield,mud_dwellers])
+    actions: equip:off, use(off), scrap, drop
+
+Dog Armor (1)
+  ◆ Aetheric Padded Vest (Rare, dur 25/28, AC +3 (dog) · Bites back: 1 aetheric to whatever hits the dog, [dog_armor,vest,aether,padded,loot])
+    actions: scrap, repair, save-for-fusion, drop
+
+Amulets & Rings (12)
+  Aether-Shard Ring (Uncommon, dur 30/30, INT +1 · Resists aetheric: −10% incoming damage of each, on top of armour, [ring,aether,crafted])
+    actions: equip:ring, use, scrap, drop
+  Aetheric Locket ×2 (dur 30/30, WIS +1 · Resists aetheric: −9% incoming damage of each, on top of armour, [detection,amulet,relic])
+    actions: equip:amulet, use, scrap, drop
+  Aetheric Locket (dur 30/30, WIS +1 · Resists aetheric: −9% incoming damage of each, on top of armour, [amulet,relic,detection])
+    actions: equip:amulet, use, scrap, drop
+  Amulet of the Silt Warden (Rare, dur 40/40, equipped:amulet, WIS +2 · Resists poison, corruption: −20% incoming damage of each, on top of armour, [amulet,mud,crafted])
+    actions: unequip:amulet
+  Golem Controller Ring (Uncommon, dur 35/35, INT +1, [ring,construct])
+    actions: equip:ring, use, scrap, drop
+  Minor Aetheric Amulet (dur 30/30, WIS +1 · Resists aetheric: −9% incoming damage of each, on top of armour, [amulet,aether])
+    actions: equip:amulet, use, scrap, drop
+  Rustbane Charm (dur 30/30, Resists degradation: −9% incoming damage of each, on top of armour, [amulet,charm,crafted])
+    actions: equip:amulet, use, scrap, drop
+  Rusted Band of Knowledge (dur 25/25, INT +1, [ring,scholarly])
+    actions: equip:ring, use, scrap, drop
+  Scribe's Signet ×2 (Uncommon, dur 35/35, INT +2 · WIS +1, [ring,signet,scholarly,crafted])
+    actions: equip:ring, use, scrap, drop
+  Tartarian Oath-Band ×2 (Uncommon, dur 35/35, equipped:ring, ♥reserved, STR +2, [ring,faction_gear,true_tartarians,oath])
+    actions: unequip:ring, release-from-fusion
+  Tin Ward Ring ×2 (Rare, dur 40/40, Resists acid: −15% incoming damage of each, on top of armour · Everything you wear or wield lasts 15% longer, [ring,crafted,defensive])
+    actions: equip:ring, use, scrap, drop
+  Tin Ward Ring (Rare, dur 40/40, Resists acid: −15% incoming damage of each, on top of armour · Everything you wear or wield lasts 15% longer, [ring,crafted,defensive])
+    actions: equip:ring, use, scrap, drop
+
+Consumables (19)
+  Bioluminescent Fungus (Uncommon, [food,foraged,mushroom,light,aether])
+    actions: use(eat), drop
+  Bioluminescent Fungus (Uncommon, [fungus,light,gear,food,foraged])
+    actions: use(eat), drop
+  Blue Aetheric Fungus ([fungus,blue,distillable,food,foraged])
+    actions: use(eat), drop
+  Blueberries ×7 (Uncommon, [food,foraged,fruit])
+    actions: use(eat), drop
+  Field Dressing ×8 ([healing,crafted])
+    actions: use(eat), drop
+  First Aid Kit ×3 (Uncommon, [healing,crafted])
+    actions: use(apply), drop
+  Forager's Stew ×3 (Uncommon, [food,cooked,stew])
+    actions: use(eat), drop
+  Orange Sporecap ([food,foraged,mushroom,orange])
+    actions: use(eat), drop
+  Raspberries ×4 (Uncommon, [food,foraged,fruit])
+    actions: use(eat), drop
+  Reclaimer's Mud-Beer ×2 ([alcohol,drink])
+    actions: use(drink), drop
+  Smoke-Cured Jerky Strip ×6 ([food,treat,dog_treat])
+    actions: use(eat), drop
+  Trail Rations ×26 ([food])
+    actions: use(eat), drop
+  Trauma Kit ×2 (Rare, [healing,crafted])
+    actions: use(eat),
+(pack listing trimmed at 12000 characters)
+
+--- CHARACTER LOG (newest first) ---
+(Newest entry at top — showing the most recent 329 of 3596 entries; older trimmed to fit a single email paste)
+
+[2026-09-06T15:57:48.566Z] [debug] homework: item_desc "Giant-Watch Greatspear" ✓ 2252ms
+[2026-09-06T15:57:48.560Z] [debug] qwen⏱ item_synthesis_hw ok 2233ms read 448ms/write 1758ms in 338t→out 37t thr1 1.3ms/t (138ch)
+[2026-09-06T15:57:42.020Z] [debug] persist sizes(KB): total=364 player=77 wm=200[rooms=113 events=7 memos=1 npcs=7 defeated=1 tags=1 discovered=1] log=85 scene=2
+[2026-09-06T15:57:41.196Z] [debug] ui: tap "inventory" ⏱+28ms
+[2026-09-06T15:57:31.770Z] [reward] ✦ Boss spoils: a Resurrection Gem, prised from the wreckage where Voronov-Beneath High Cantor fell. Yours — the buried world is one boss lighter. (26 held)
+[2026-09-06T15:57:31.261Z] [combat] Voronov-Beneath High Cantor deals 16 bludgeoning damage. You have 30 HP remaining.
+[2026-09-06T15:57:31.039Z] [system] ⏳ Time passed: 6 min
+[2026-09-06T15:57:31.030Z] [debug] puppy vendor queued for next outdoor scene
+[2026-09-06T15:57:31.030Z] [arbiter] A Mud Monarch Inquisitor corners you at the Outpost. "Three Cores already. We do not interfere with salvage — until salvage gets to four. After that we have to. Be aware that we are aware. Decide accordingly."
+[2026-09-06T15:57:31.029Z] [arbiter] The Voronov Core comes loose under your trowel — pried clean from its Tartarian seat. 6 Cores still to recover.
+[2026-09-06T15:57:31.029Z] [reward] ✦ Cantor's Tuning Fork taken from Voronov-Beneath High Cantor. ✦ Cantor's Robe taken from Voronov-Beneath High Cantor.
+[2026-09-06T15:57:31.029Z] [arbiter] The chord cracks once and dies. The Cantor settles to one knee, the tuning-fork ringing flat against the stone. "...so. six seats still stand. Hold them." The Core lifts itself out of the housing and into your hand. The silence afterwards is the loudest sound in Tartaria.
+[2026-09-06T15:57:31.028Z] [arbiter] The Arbiter eyes your new pieces. "You could make a Mud-Iron Greatblade now, if you wanted."
+[2026-09-06T15:57:30.975Z] [reward] +54 TC pried from the dust.
+[2026-09-06T15:57:30.974Z] [reward] ✦ You feel hardier from your trials. +1 max HP (now 47). [213 enemies defeated]
+[2026-09-06T15:57:30.974Z] [reward] ✦ Hard-won spoils — Sentinel Core Plate (Uncommon).
+[2026-09-06T15:57:30.974Z] [reward] ✦ Boss spoils: Mud-Iron Heart, Chimera Claw.
+[2026-09-06T15:57:30.973Z] [reward] Voronov-Beneath High Cantor defeated.
+[2026-09-06T15:57:30.973Z] [world] Voronov-Beneath High Cantor drops, undone by what it spent on you.
+[2026-09-06T15:57:30.973Z] [combat] Your armour turns the blow back — Voronov-Beneath High Cantor takes 1 bludgeoning. (0 HP left)
+[2026-09-06T15:57:30.833Z] [combat] Voronov-Beneath High Cantor — d20 → 16 + ATK 9 = 25 vs your AC 24 — ✓ HIT
+[2026-09-06T15:57:30.763Z] [combat] Voronov-Beneath High Cantor presses the second strike — bosses do not yield the tempo.
+[2026-09-06T15:57:30.419Z] [combat] Dodge — d20 → 9 + DEX 23 = 32 vs ATK 12. ✓ You slip the arc — PERFECT OPENING (next strike ×2 dice).
+[2026-09-06T15:57:30.350Z] [combat] Voronov-Beneath High Cantor — d20 → 3 + ATK 9 = 12 vs your AC 24 — ✗ EVADED
+[2026-09-06T15:57:30.073Z] [world] You commit to the dodge. Slip Voronov-Beneath High Cantor's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-09-06T15:57:29.935Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=0
+[2026-09-06T15:57:29.865Z] [player] dodge
+[2026-09-06T15:57:29.623Z] [debug] ui: tap "dodge" ⏱+25ms
+[2026-09-06T15:57:27.668Z] [combat] Voronov-Beneath High Cantor — d20 → 8 + ATK 9 = 17 vs your AC 24 — ✗ MISS
+[2026-09-06T15:57:27.664Z] [combat] Voronov-Beneath High Cantor presses the second strike — bosses do not yield the tempo.
+[2026-09-06T15:57:27.664Z] [combat] Voronov-Beneath High Cantor — d20 → 5 + ATK 9 = 14 vs your AC 24 — ✗ MISS
+[2026-09-06T15:57:27.661Z] [combat] Frost-Rimed Sentinel Cleaver — 9 cold bites in and festers (3 turns).
+[2026-09-06T15:57:27.660Z] [combat] Your strike with the frost-rimed sentinel cleaver lands for 21. Voronov-Beneath High Cantor staggers — 1 HP remaining. It answers.
+[2026-09-06T15:57:27.656Z] [combat] You — d20 → 14 + STR 21 = 35 vs Voronov-Beneath High Cantor AC 19 — ✓ HIT
+[2026-09-06T15:57:27.656Z] [world] You seize the initiative. Voronov-Beneath High Cantor has no time to react.
+[2026-09-06T15:57:27.591Z] [debug] dice⏱ coating: shown +290ms, tapped +481ms, settled +1133ms (hold late 333ms) = 1904ms
+[2026-09-06T15:57:26.457Z] [debug] ui: tap "roll" ⏱+19ms
+[2026-09-06T15:57:25.685Z] [debug] dice⏱ damage: shown +335ms, tapped +455ms, settled +1245ms (hold late 445ms) = 2035ms
+[2026-09-06T15:57:24.440Z] [debug] ui: tap "roll" ⏱+22ms
+[2026-09-06T15:57:23.648Z] [debug] dice⏱ attack: shown +309ms, tapped +524ms, settled +1134ms (hold late 334ms) = 1967ms
+[2026-09-06T15:57:22.514Z] [debug] ui: tap "roll" ⏱+25ms
+[2026-09-06T15:57:21.680Z] [debug] dice⏱ initiative: shown +646ms, tapped +2580ms, settled +1149ms (hold late 349ms) = 4375ms
+[2026-09-06T15:57:20.530Z] [debug] ui: tap "roll" ⏱+19ms
+[2026-09-06T15:57:17.442Z] [system] ⏳ Time passed: 6 min
+[2026-09-06T15:57:17.373Z] [world] Your frost-rimed sentinel cleaver comes around in an arc; Voronov-Beneath High Cantor squares up to meet it.
+[2026-09-06T15:57:17.095Z] [debug] attack: target=Voronov-Beneath High Cantor range=close reach.bands=[close] reach.label=Sentinel Cleaver bareHand=false
+[2026-09-06T15:57:16.887Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand sentinel cleaver resolved=Sentinel Cleaver range=close enemies=1 hooks=0
+[2026-09-06T15:57:16.816Z] [player] attack with the off-hand sentinel cleaver
+[2026-09-06T15:57:16.622Z] [debug] ui: tap "❄ sentinel cleaver ⚔ ★" ⏱+32ms
+[2026-09-06T15:57:14.077Z] [world] You use 1× Trail Rations. +6 HP (46/46).
+[2026-09-06T15:57:12.801Z] [debug] ui: tap "✚ heals (3)" ⏱+26ms
+[2026-09-06T15:57:10.880Z] [world] You use 1× Trail Rations. +6 HP (40/46).
+[2026-09-06T15:57:09.237Z] [debug] ui: tap "✚ heals (3)" ⏱+16ms
+[2026-09-06T15:57:07.242Z] [world] You use 1× Trail Rations. +6 HP (34/46), +1 stamina.
+[2026-09-06T15:57:05.166Z] [debug] ui: tap "✚ heals (3)" ⏱+20ms
+[2026-09-06T15:57:02.412Z] [combat] Voronov-Beneath High Cantor deals 12 bludgeoning damage. You have 28 HP remaining.
+[2026-09-06T15:57:01.924Z] [combat] Voronov-Beneath High Cantor — d20 → 8 + ATK 9 = 17 vs your AC 24 — ✗ MISS
+[2026-09-06T15:57:01.916Z] [combat] Voronov-Beneath High Cantor presses the second strike — bosses do not yield the tempo.
+[2026-09-06T15:57:01.916Z] [combat] Your armour turns the blow back — Voronov-Beneath High Cantor takes 1 bludgeoning. (22 HP left)
+[2026-09-06T15:57:01.915Z] [combat] Voronov-Beneath High Cantor — d20 → 16 + ATK 9 = 25 vs your AC 24 — ✓ HIT
+[2026-09-06T15:57:01.911Z] [combat] Frost-Rimed Sentinel Cleaver — 3 cold bites in and festers (3 turns).
+[2026-09-06T15:57:01.911Z] [combat] Voronov-Beneath High Cantor takes 21 with the frost-rimed sentinel cleaver. It reels: 23 left. Then it fights back.
+[2026-09-06T15:57:01.906Z] [combat] You — d20 → 7 + STR 21 perfect opening (2× dice) = 28 vs Voronov-Beneath High Cantor AC 19 — ✓ HIT
+[2026-09-06T15:57:01.906Z] [world] You seize the initiative. Voronov-Beneath High Cantor has no time to react.
+[2026-09-06T15:57:01.848Z] [debug] dice⏱ coating: shown +333ms, tapped +607ms, settled +1135ms (hold late 335ms) = 2075ms
+[2026-09-06T15:57:00.713Z] [debug] ui: tap "roll" ⏱+20ms
+[2026-09-06T15:56:59.764Z] [debug] dice⏱ damage: shown +335ms, tapped +582ms, settled +1147ms (hold late 347ms) = 2064ms
+[2026-09-06T15:56:58.617Z] [debug] ui: tap "roll" ⏱+15ms
+[2026-09-06T15:56:57.694Z] [debug] dice⏱ attack: shown +291ms, tapped +510ms, settled +1145ms (hold late 345ms) = 1946ms
+[2026-09-06T15:56:56.550Z] [debug] ui: tap "roll" ⏱+27ms
+[2026-09-06T15:56:55.748Z] [debug] dice⏱ initiative: shown +648ms, tapped +946ms, settled +1420ms (hold late 620ms) = 3014ms
+[2026-09-06T15:56:54.328Z] [debug] ui: tap "roll" ⏱+14ms
+[2026-09-06T15:56:53.457Z] [debug] persist sizes(KB): total=363 player=75 wm=199[rooms=113 events=7 memos=1 npcs=7 defeated=1 tags=1 discovered=1] log=86 scene=3
+[2026-09-06T15:56:52.872Z] [system] ⏳ Time passed: 6 min
+[2026-09-06T15:56:52.803Z] [world] You commit forward with the frost-rimed sentinel cleaver. Voronov-Beneath High Cantor watches your hands.
+[2026-09-06T15:56:52.594Z] [debug] attack: status mods perfect opening (2× dice)
+[2026-09-06T15:56:52.455Z] [debug] attack: target=Voronov-Beneath High Cantor range=close reach.bands=[close] reach.label=Sentinel Cleaver bareHand=false
+[2026-09-06T15:56:52.248Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand sentinel cleaver resolved=Sentinel Cleaver range=close enemies=1 hooks=0
+[2026-09-06T15:56:52.179Z] [player] attack with the off-hand sentinel cleaver
+[2026-09-06T15:56:51.845Z] [debug] ui: tap "❄ sentinel cleaver ⚔ ★" ⏱+16ms
+[2026-09-06T15:56:49.815Z] [debug] render⏱ 441ms after engine-done · feed 500
+[2026-09-06T15:56:49.156Z] [system] ⏳ Time passed: 6 min
+[2026-09-06T15:56:49.084Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-06T15:56:49.013Z] [debug] arbiter: template (reason=combat)
+[2026-09-06T15:56:48.943Z] [combat] Voronov-Beneath High Cantor — d20 → 9 + ATK 9 = 18 vs your AC 24 — ✗ MISS
+[2026-09-06T15:56:48.865Z] [combat] Voronov-Beneath High Cantor presses the second strike — bosses do not yield the tempo.
+[2026-09-06T15:56:48.521Z] [combat] Dodge — d20 → 4 + DEX 23 = 27 vs ATK 15. ✓ You slip the arc — PERFECT OPENING (next strike ×2 dice).
+[2026-09-06T15:56:48.453Z] [combat] Voronov-Beneath High Cantor — d20 → 6 + ATK 9 = 15 vs your AC 24 — ✗ EVADED
+[2026-09-06T15:56:48.179Z] [world] You commit to the dodge. Slip Voronov-Beneath High Cantor's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-09-06T15:56:48.040Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=0
+[2026-09-06T15:56:47.971Z] [player] dodge
+[2026-09-06T15:56:47.711Z] [debug] ui: tap "dodge" ⏱+24ms
+[2026-09-06T15:56:43.676Z] [combat] Voronov-Beneath High Cantor reads the motion and slips it — the frost-rimed sentinel cleaver carves only air. The counter is already coming.
+[2026-09-06T15:56:43.674Z] [combat] You — d20 → 1 + STR 21 = 22 vs Voronov-Beneath High Cantor AC 19 — ✗ FUMBLE
+[2026-09-06T15:56:43.674Z] [combat] Voronov-Beneath High Cantor — d20 → 5 + ATK 9 = 14 vs your AC 24 — ✗ MISS
+[2026-09-06T15:56:43.672Z] [combat] Voronov-Beneath High Cantor presses the second strike — bosses do not yield the tempo.
+[2026-09-06T15:56:43.672Z] [combat] Voronov-Beneath High Cantor — d20 → 4 + ATK 9 = 13 vs your AC 24 — ✗ MISS
+[2026-09-06T15:56:43.669Z] [world] Voronov-Beneath High Cantor moves first. The pressure is immediate.
+[2026-09-06T15:56:43.644Z] [debug] dice⏱ attack: shown +337ms, tapped +538ms, settled +1351ms (hold late 551ms) = 2226ms
+[2026-09-06T15:56:42.293Z] [debug] ui: tap "roll" ⏱+24ms
+[2026-09-06T15:56:41.410Z] [debug] dice⏱ initiative: shown +650ms, tapped +704ms, settled +1149ms (hold late 349ms) = 2503ms
+[2026-09-06T15:56:40.261Z] [debug] ui: tap "roll" ⏱+18ms
+[2026-09-06T15:56:39.045Z] [system] ⏳ Time passed: 6 min
+[2026-09-06T15:56:38.976Z] [world] You commit forward with the frost-rimed sentinel cleaver. Voronov-Beneath High Cantor watches your hands.
+[2026-09-06T15:56:38.698Z] [debug] attack: target=Voronov-Beneath High Cantor range=close reach.bands=[close] reach.label=Sentinel Cleaver bareHand=false
+[2026-09-06T15:56:38.490Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand sentinel cleaver resolved=Sentinel Cleaver range=close enemies=1 hooks=0
+[2026-09-06T15:56:38.417Z] [player] attack with the off-hand sentinel cleaver
+[2026-09-06T15:56:38.209Z] [debug] ui: tap "❄ sentinel cleaver ⚔ ★" ⏱+31ms
+[2026-09-06T15:56:34.127Z] [world] You use 1× First Aid Kit. +25 HP (40/46), +1 stamina.
+[2026-09-06T15:56:31.993Z] [debug] ui: tap "✚ heals (3)" ⏱+286ms late 281ms
+[2026-09-06T15:56:29.415Z] [combat] Voronov-Beneath High Cantor deals 18 bludgeoning damage. You have 15 HP remaining.
+[2026-09-06T15:56:28.927Z] [combat] Your armour turns the blow back — Voronov-Beneath High Cantor takes 1 bludgeoning. (44 HP left)
+[2026-09-06T15:56:28.925Z] [combat] Voronov-Beneath High Cantor — d20 → 15 + ATK 9 = 24 vs your AC 24 — ✓ HIT
+[2026-09-06T15:56:28.923Z] [combat] Voronov-Beneath High Cantor presses the second strike — bosses do not yield the tempo.
+[2026-09-06T15:56:28.922Z] [combat] Voronov-Beneath High Cantor — d20 → 13 + ATK 9 = 22 vs your AC 24 — ✗ MISS
+[2026-09-06T15:56:28.919Z] [combat] Frost-Rimed Sentinel Cleaver — 5 cold bites in and festers (3 turns).
+[2026-09-06T15:56:28.919Z] [combat] The blow with the frost-rimed sentinel cleaver finds purchase — 30 damage, 45 HP standing. Voronov-Beneath High Cantor commits to the counter.
+[2026-09-06T15:56:28.918Z] [combat] Slashing flares — +1 on hit.
+[2026-09-06T15:56:28.914Z] [combat] You — d20 → 13 + STR 21 perfect opening (2× dice) = 34 vs Voronov-Beneath High Cantor AC 19 — ✓ HIT
+[2026-09-06T15:56:28.914Z] [world] You seize the initiative. Voronov-Beneath High Cantor has no time to react.
+[2026-09-06T15:56:28.864Z] [debug] dice⏱ coating: shown +329ms, tapped +536ms, settled +1151ms (hold late 351ms) = 2016ms
+[2026-09-06T15:56:27.713Z] [debug] ui: tap "roll" ⏱+23ms
+[2026-09-06T15:56:26.847Z] [debug] dice⏱ damage: shown +332ms, tapped +597ms, settled +1097ms (hold late 297ms) = 2026ms
+[2026-09-06T15:56:25.750Z] [debug] ui: tap "roll" ⏱+321ms late 316ms
+[2026-09-06T15:56:24.812Z] [debug] dice⏱ attack: shown +321ms, tapped +509ms, settled +1151ms (hold late 351ms) = 1981ms
+[2026-09-06T15:56:23.661Z] [debug] ui: tap "roll" ⏱+25ms
+[2026-09-06T15:56:22.829Z] [debug] dice⏱ initiative: shown +587ms, tapped +901ms, settled +1151ms (hold late 351ms) = 2639ms
+[2026-09-06T15:56:21.678Z] [debug] ui: tap "roll" ⏱+19ms
+[2026-09-06T15:56:20.334Z] [system] ⏳ Time passed: 6 min
+[2026-09-06T15:56:20.263Z] [world] You bring the frost-rimed sentinel cleaver to bear on Voronov-Beneath High Cantor.
+[2026-09-06T15:56:20.050Z] [debug] attack: status mods perfect opening (2× dice)
+[2026-09-06T15:56:19.910Z] [debug] attack: target=Voronov-Beneath High Cantor range=close reach.bands=[close] reach.label=Sentinel Cleaver bareHand=false
+[2026-09-06T15:56:19.771Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand sentinel cleaver resolved=Sentinel Cleaver range=close enemies=1 hooks=0
+[2026-09-06T15:56:19.701Z] [player] attack with the off-hand sentinel cleaver
+[2026-09-06T15:56:19.395Z] [debug] ui: tap "❄ sentinel cleaver ⚔ ★" ⏱+371ms late 366ms
+[2026-09-06T15:56:18.867Z] [combat] Voronov-Beneath High Cantor deals 13 bludgeoning damage. You have 33 HP remaining.
+[2026-09-06T15:56:18.364Z] [debug] render⏱ 473ms after engine-done · feed 500
+[2026-09-06T15:56:17.673Z] [system] ⏳ Time passed: 6 min
+[2026-09-06T15:56:17.602Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-06T15:56:17.531Z] [debug] arbiter: template (reason=combat)
+[2026-09-06T15:56:17.462Z] [combat] Your armour turns the blow back — Voronov-Beneath High Cantor takes 1 bludgeoning. (75 HP left)
+[2026-09-06T15:56:17.255Z] [combat] Voronov-Beneath High Cantor — d20 → 15 + ATK 9 = 24 vs your AC 24 — ✓ HIT
+[2026-09-06T15:56:17.185Z] [combat] Voronov-Beneath High Cantor presses the second strike — bosses do not yield the tempo.
+[2026-09-06T15:56:16.841Z] [combat] Dodge — d20 → 15 + DEX 23 = 38 vs ATK 24. ✓ You slip the arc — PERFECT OPENING (next strike ×2 dice).
+[2026-09-06T15:56:16.772Z] [combat] Voronov-Beneath High Cantor — d20 → 15 + ATK 9 = 24 vs your AC 24 — ✗ EVADED
+[2026-09-06T15:56:16.565Z] [world] You commit to the dodge. Slip Voronov-Beneath High Cantor's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-09-06T15:56:16.426Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=0
+[2026-09-06T15:56:16.356Z] [player] dodge
+[2026-09-06T15:56:16.168Z] [debug] ui: tap "dodge" ⏱+19ms
+[2026-09-06T15:56:12.949Z] [debug] render⏱ 439ms after engine-done · feed 500
+[2026-09-06T15:56:12.362Z] [combat] Voronov-Beneath High Cantor — d20 → 10 + ATK 9 = 19 vs your AC 24 — ✗ MISS
+[2026-09-06T15:56:12.291Z] [combat] Voronov-Beneath High Cantor presses the second strike — bosses do not yield the tempo.
+[2026-09-06T15:56:12.223Z] [combat] Voronov-Beneath High Cantor — d20 → 11 + ATK 9 = 20 vs your AC 24 — ✗ MISS
+[2026-09-06T15:56:12.152Z] [world] You close the gap with Voronov-Beneath High Cantor. (range: close / arm's reach)
+[2026-09-06T15:56:12.085Z] [debug] move: field advance target=Voronov-Beneath High Cantor d 1.50->0.50 band mid->close
+[2026-09-06T15:56:11.948Z] [debug] move: advance from range=mid enemies=1 weather=Silent Blizzard cost=1 partial=0
+[2026-09-06T15:56:11.807Z] [debug] parser: intent=advance conf=1.00 verb=approach target=voronov beneath high cantor resolved=Voronov-Beneath High Cantor range=mid enemies=1 hooks=0
+[2026-09-06T15:56:11.736Z] [player] approach Voronov-Beneath High Cantor
+[2026-09-06T15:56:11.518Z] [debug] ui: tap "approach" ⏱+16ms
+[2026-09-06T15:56:05.492Z] [debug] dedup: suppressed arbiter repeat — "A pure tone fills the chamber — one chord, held, the kind of…"
+[2026-09-06T15:56:05.492Z] [arbiter] A pure tone fills the chamber — one chord, held, the kind of sound that re-arranges the dust in your lungs. The Voronov-Beneath High Cantor steps from the Core's housing in robes the colour of old gold, a tuning-fork the length of your forearm in one hand. "The Order has watched two Capitals fall to you," he says, voice both unhurried and very close. "This one does not fall. Stand and prove me wrong, or turn and live another hour."
+[2026-09-06T15:56:05.419Z] [combat] Voronov-Beneath High Cantor closes — Tuning Fork Chord ready, 1d10+6+1d6 damage on a hit, twice per round. (range: mid) ★ CORE GUARDIAN
+[2026-09-06T15:56:05.332Z] [world] You lay a hand on the cold Core seat and call its Guardian up.
+[2026-09-06T15:56:01.995Z] [debug] homework: item_desc "Nimari Core" ✓ 5828ms
+[2026-09-06T15:56:01.616Z] [debug] qwen⏱ item_synthesis_hw ok 5441ms read 3724ms/write 1686ms in 330t→out 52t js-late 869ms thr1 11.3ms/t (191ch)
+[2026-09-06T15:55:58.990Z] [debug] persist sizes(KB): total=363 player=75 wm=199[rooms=113 events=7 memos=1 npcs=7 defeated=1 tags=1 discovered=1] log=87 scene=2
+[2026-09-06T15:55:51.264Z] [reward] ✦ The forging finishes — the Aether names it Tooth-Set Warstaff (Uncommon).
+[2026-09-06T15:55:51.049Z] [debug] qwen⏱ forge_name ok 4571ms read 2216ms/write 2321ms in 210t→out 63t thr2 10.6ms/t HIT-CAP (241ch)
+[2026-09-06T15:55:46.256Z] [world] The Crucible exhales slow. The shape is set, but the Aether hasn't named it yet — let it finish. You'll know it the moment it announces itself.
+[2026-09-06T15:55:46.256Z] [reward] ✦ The Crucible forges an Uncommon reach weapon (mid range and closer) from your reserved pieces — and it's in your pack, still cooling.
+[2026-09-06T15:55:46.254Z] [world] You set your reserved pieces on the three pedestals. The Crucible takes them in.
+[2026-09-06T15:55:26.036Z] [debug] homework: item_desc "Litany Greaves" ✓ 4897ms
+[2026-09-06T15:55:25.839Z] [debug] qwen⏱ item_synthesis_hw ok 4687ms read 3661ms/write 992ms in 338t→out 31t js-late 691ms thr1 10.8ms/t (120ch)
+[2026-09-06T15:55:16.055Z] [reward] ✦ The forging finishes — the Aether names it Cobble-Set Bulwark (Uncommon).
+[2026-09-06T15:55:15.833Z] [debug] qwen⏱ forge_name ok 2888ms read 862ms/write 1996ms in 206t→out 63t js-late 348ms thr2 4.2ms/t HIT-CAP (236ch)
+[2026-09-06T15:55:14.801Z] [reward] Korr Stonefoot fires up a portable Crucible for you. (−25 TC)
+[2026-09-06T15:55:12.717Z] [world] The Crucible exhales slow. The shape is set, but the Aether hasn't named it yet — let it finish. You'll know it the moment it announces itself.
+[2026-09-06T15:55:12.717Z] [reward] ✦ The Crucible forges an Uncommon piece of armor from your reserved pieces — and it's in your pack, still cooling.
+[2026-09-06T15:55:12.714Z] [world] You set your reserved pieces on the three pedestals. The Crucible takes them in.
+[2026-09-06T15:55:03.619Z] [player] fuse
+[2026-09-06T15:54:27.760Z] [reward] Korr Stonefoot fires up a portable Crucible for you. (−25 TC)
+[2026-09-06T15:54:21.952Z] [debug] persist sizes(KB): total=363 player=75 wm=199[rooms=113 events=7 memos=1 npcs=7 defeated=1 tags=1 discovered=1] log=87 scene=2
+[2026-09-06T15:54:17.555Z] [reward] ✦ The forging finishes — the Aether names it Hammer-Folded Stompers (Rare).
+[2026-09-06T15:54:17.344Z] [debug] qwen⏱ forge_name ok 4188ms read 2106ms/write 2053ms in 204t→out 63t thr2 10.3ms/t (211ch)
+[2026-09-06T15:54:12.933Z] [world] The Crucible exhales slow. The shape is set, but the Aether hasn't named it yet — let it finish. You'll know it the moment it announces itself.
+[2026-09-06T15:54:12.932Z] [reward] ✦ The Crucible forges a Rare piece of armor from your reserved pieces — and it's in your pack, still cooling.
+[2026-09-06T15:54:12.930Z] [world] You set your reserved pieces on the three pedestals. The Crucible takes them in.
+[2026-09-06T15:54:08.495Z] [debug] homework: item_desc "Litany Maul" ✓ 6771ms
+[2026-09-06T15:54:08.267Z] [debug] qwen⏱ item_synthesis_hw ok 6524ms read 4910ms/write 1581ms in 340t→out 37t js-late 959ms thr1 14.4ms/t (145ch)
+[2026-09-06T15:54:06.579Z] [reward] Korr Stonefoot fires up a portable Crucible for you. (−25 TC)
+[2026-09-06T15:53:56.928Z] [reward] ✦ The forging finishes — the Aether names it Singing Hood (Uncommon).
+[2026-09-06T15:53:56.746Z] [debug] qwen⏱ forge_name ok 2883ms read 641ms/write 2203ms in 205t→out 63t thr2 3.1ms/t HIT-CAP (266ch)
+[2026-09-06T15:53:53.634Z] [world] The Crucible exhales slow. The shape is set, but the Aether hasn't named it yet — let it finish. You'll know it the moment it announces itself.
+[2026-09-06T15:53:53.634Z] [reward] ✦ The Crucible forges an Uncommon piece of armor from your reserved pieces — and it's in your pack, still cooling.
+[2026-09-06T15:53:53.632Z] [world] You set your reserved pieces on the three pedestals. The Crucible takes them in.
+[2026-09-06T15:53:46.976Z] [reward] Korr Stonefoot fires up a portable Crucible for you. (−25 TC)
+[2026-09-06T15:53:33.295Z] [debug] persist sizes(KB): total=363 player=74 wm=199[rooms=113 events=7 memos=1 npcs=7 defeated=1 tags=1 discovered=1] log=87 scene=2
+[2026-09-06T15:53:32.977Z] [reward] ✦ The forging finishes — the Aether names it Cobble-Set Aegis (Uncommon).
+[2026-09-06T15:53:32.760Z] [debug] qwen⏱ forge_name ok 4161ms read 2075ms/write 2056ms in 201t→out 63t js-late 273ms thr2 10.3ms/t HIT-CAP (307ch)
+[2026-09-06T15:53:28.372Z] [world] The Crucible exhales slow. The shape is set, but the Aether hasn't named it yet — let it finish. You'll know it the moment it announces itself.
+[2026-09-06T15:53:28.371Z] [reward] ✦ The Crucible forges an Uncommon piece of armor from your reserved pieces — and it's in your pack, still cooling.
+[2026-09-06T15:53:28.370Z] [world] You set your reserved pieces on the three pedestals. The Crucible takes them in.
+[2026-09-06T15:53:22.936Z] [reward] Korr Stonefoot fires up a portable Crucible for you. (−25 TC)
+[2026-09-06T15:53:20.986Z] [debug] homework: item_desc "Throne Shard" ✓ 4976ms
+[2026-09-06T15:53:20.979Z] [debug] qwen⏱ stats — item_synthesis_hw n7 avg3.4s max5.7s read2.2s/write1.1s ⚠1unusable in326t→out29t ms/tok 0.8-13.3 ⏸1 ✂1/3.6s | narration:scene_intro_fill n6 avg7.4s max10.8s read6.9s/write1.1s ⚠2unusable in823t→out22t ms/tok 2.5-12.0 cap4 ⏸2 ✂4/31.2s | investigate_lore n4 avg3.2s max4.9s read0.3s/write1.0s ⚠2unusable in126t→out32t ms/tok 2.4-2.4 wait1.1s | ambient n1 avg4.3s max4.3s ⚠1unusable in364t→out0t ⏸1 ✂1/4.3s | narration:scene_intro n1 avg10.7s max10.7s read7.0s/write0.8s in896t→out21t ms/tok 7.8-7.8 | forge_name n1 avg3.7s max3.7s ⚠1unusable in201t→out47t || WASTED 6 calls / 39.1s
+[2026-09-06T15:53:20.976Z] [debug] qwen⏱ item_synthesis_hw ok 4955ms read 3492ms/write 1433ms in 328t→out 43t thr1 10.6ms/t (172ch)
+[2026-09-06T15:53:08.979Z] [reward] ✦ The forging finishes — the Aether names it Auralite Greaves (Rare).
+[2026-09-06T15:53:08.768Z] [debug] qwen⏱ forge_name ok 3703ms read/write unusable (native mis-reported 29910ms/1545ms — llama.rn split bug, not this call) in 201t→out 47t thr2 (171ch)
+[2026-09-06T15:53:04.838Z] [world] The Crucible exhales slow. The shape is set, but the Aether hasn't named it yet — let it finish. You'll know it the moment it announces itself.
+[2026-09-06T15:53:04.838Z] [reward] ✦ The Crucible forges a Rare piece of armor from your reserved pieces — and it's in your pack, still cooling.
+[2026-09-06T15:53:04.835Z] [world] You set your reserved pieces on the three pedestals. The Crucible takes them in.
+[2026-09-06T15:52:58.098Z] [reward] Korr Stonefoot fires up a portable Crucible for you. (−25 TC)
+[2026-09-06T15:52:51.405Z] [debug] stats: STR21 DEX23 INT15 WIS17 CHA13 STE8 | gear: WIS+5,INT+4,DEX+10,STR+8,STE+2 | worn: main=Auralite Talon off=Sentinel Cleaver head=Architect's Sight Enhancer chest=Mud-glass Scales hands=Relic Hunter's Gauntlets legs=Litany Greaves feet=Aether-Walker's Boots cloak=Reclaimer's Cloak amulet=Amulet of the Silt Warden ring=Tartarian Oath-Band ring2=Tin Ward Ring ring3=Tin Ward Ring ring4=Scribe's Signet
+[2026-09-06T15:52:40.843Z] [debug] homework: item_desc "Throne Shard" ∅ 4443ms
+[2026-09-06T15:52:40.842Z] [debug] qwen⏱ ✂ DISCARDED item_synthesis_hw after 3553ms — item_synth:preempted
+[2026-09-06T15:52:40.836Z] [debug] qwen⏱ item_synthesis_hw preempted 3553ms read 0ms/write 0ms in 328t→out 0t thr1 (0ch)
+[2026-09-06T15:52:33.572Z] [debug] ui: tap "inventory" ⏱+23ms
+[2026-09-06T15:52:31.274Z] [debug] persist sizes(KB): total=362 player=73 wm=200[rooms=113 events=7 memos=1 npcs=7 defeated=1 tags=1 discovered=1] log=87 scene=2
+[2026-09-06T15:52:30.982Z] [debug] appstate: background → active (was background for 1595ms)
+[2026-09-06T15:52:29.387Z] [debug] appstate: active → background (was active for 431497ms)
+[2026-09-06T15:52:28.847Z] [debug] homework: scene_intro "The Conduit Line" ✓ 3289ms
+[2026-09-06T15:52:28.837Z] [debug] qwen⏱ narration:scene_intro_fill ok 3274ms read 2118ms/write 1121ms in 835t→out 33t thr1 2.5ms/t HIT-CAP (152ch)
+[2026-09-06T15:52:25.559Z] [debug] homework: intro-fill armed after 10335ms idle (strike 2/3)
+[2026-09-06T15:52:06.380Z] [reward] Sold 7× Worn Tartarian Coin (Common) to Korr Stonefoot for 28 TC (4 TC each). (927 TC on hand)
+[2026-09-06T15:51:49.573Z] [debug] homework: scene_intro "The Conduit Line" ∅ 9072ms
+[2026-09-06T15:51:49.573Z] [debug] qwen⏱ ✂ DISCARDED narration:scene_intro_fill after 9066ms — intro-fill:∅
+[2026-09-06T15:51:49.569Z] [debug] qwen⏱ narration:scene_intro_fill ok 9066ms wait 1148ms read 6713ms/write 1182ms in 835t→out 33t thr1 8.0ms/t HIT-CAP (153ch)
+[2026-09-06T15:51:44.245Z] [reward] Bought the Golem Pike working for 200 TC. ✦ Recipe learned (Rare)! Open Crafting to forge it — you'll still need the materials.
+[2026-09-06T15:51:42.429Z] [reward] Bought the Golem Greatsword working for 200 TC. ✦ Recipe learned (Rare)! Open Crafting to forge it — you'll still need the materials.
+[2026-09-06T15:51:40.501Z] [debug] homework: intro-fill armed after 10086ms idle
+[2026-09-06T15:51:37.964Z] [debug] arbiter: qwen ✓ 11387ms (intent=scene_intro)
+[2026-09-06T15:51:37.964Z] [arbiter] You've found a dead Reclaimer at the end of a track. Their compass now points for you.
+[2026-09-06T15:51:37.540Z] [debug] qwen⏱ narration:scene_intro ok 10734ms read 6950ms/write 847ms in 896t→out 21t js-late 2299ms thr2 7.8ms/t (86ch)
+[2026-09-06T15:51:35.836Z] [world] You let the conversation go and Korr Stonefoot gets back to it.
+[2026-09-06T15:51:33.296Z] [world] Korr Stonefoot glances at what you are carrying and his mouth does something small.
+[2026-09-06T15:51:33.296Z] [world] "Waiting," Korr Stonefoot says flatly. "Nine parts waiting, one part everything at once. The stories keep the one part and sell it as the whole trade." A shrug. "Nobody sings about standing in the rain outside a door. The rain is the job."
+[2026-09-06T15:51:33.295Z] [player] Ask what the work is really like
+[2026-09-06T15:51:32.475Z] [world] There is half a nod in it — you are a face now, if not much more than one.
+[2026-09-06T15:51:32.472Z] [world] "Heavy weapons," Korr says. "Things that solve a problem by being heavier than it. I do not stock anything clever."
+[2026-09-06T15:51:32.463Z] [player] Ask about their trade
+[2026-09-06T15:51:27.179Z] [debug] persist sizes(KB): total=360 player=73 wm=198[rooms=113 events=7 memos=1 npcs=7 defeated=1 tags=1 discovered=1] log=86 scene=2
+[2026-09-06T15:51:26.584Z] [arbiter] The Arbiter waits until the Aetherstone has settled. "Voronov-Beneath High Cantor put you in the ground. It will do it again if you go back the same. The Towers are still standing. The Hunts are still posted."
+[2026-09-06T15:51:26.584Z] [reward] ✦ Resurrection. Cheddar Bob returns to Tartaria, restored. The Aetherstone hums in recognition.
+[2026-09-06T15:51:26.575Z] [world] Rare workings for sale: Golem Greatsword (200 TC), Golem Pike (200 TC) — buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem — just ask.
+[2026-09-06T15:51:26.567Z] [arbiter] The Arbiter inclines their head toward the newcomer. "Korr Stonefoot, Heavy Weapons Dealer. Stoic and slow to trust. Carries large two-handed weapons and heavy armor pieces."
+[2026-09-06T15:51:26.566Z] [world] A figure crests the rise — Korr Stonefoot, Heavy Weapons Dealer, pack heavy across the shoulders. They set down to trade.
+[2026-09-06T15:51:26.566Z] [world] [Voronov] north: The Parley Ground (11 tiles, 1 day, 4 hours) · east: The Conduit Line (1 tile, 3 hours) · south: Yulka (return the Discs) (14 tiles, 1 day, 11 hours) · west: Endless Stair (4 tiles, 10 hours)
+[2026-09-06T15:51:26.564Z] [world] You could walk this stretch with your eyes shut, and nearly do. The Aetheric Leeches and Aetherbats you left are still here. Nothing has moved in to replace them.
+You are at Voronov. A significant Tartarian city deeply scarred by the Mud Flood. Rumored to hide intact remnants of Tartarian technology.
+[2026-09-06T15:51:26.563Z] [world] Snow that absorbs all sound. Your footsteps make no noise. Your screams make less.
+[2026-09-06T15:51:26.563Z] [arbiter] "That Aetheric Locket you've got — I've been needing one of those for a season. You hand me that, I hand you a pup. Fair? Type 'accept puppy' or 'decline puppy'."
+[2026-09-06T15:51:26.563Z] [arbiter] A stranger waits at the roadside with a wicker basket. Three pups inside — some breed you don't recognize. They look up at you. "I'd trade one for the right kind of help," the stranger says, eyeing your pack.
+[2026-09-06T15:51:26.451Z] [debug] missions: · at=voronov
+[2026-09-06T15:51:26.451Z] [debug] missions: mystery:mystery_cradle_compass stage 0/3 [diplomacy] @hidden_market npc="Halem the Trader" gives=Halem's Broken Compass PAUSED
+[2026-09-06T15:51:26.451Z] [debug] missions: mystery:mystery_obsidian_orb stage 0/4 [diplomacy] @monarch_waystation npc="the Mud Monarch courier" gives=Monarch Courier Writ PAUSED
+[2026-09-06T15:51:26.451Z] [debug] missions: mystery:mystery_temporal_watch stage 2/4 [stealth] @buried_cities needs=Eddy-Zone Reading✗MISSING gives=Temporal Distortion Watch PAUSED
+[2026-09-06T15:51:26.450Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc="the Order envoy" gives=Sealed Reliquary Box PAUSED
+[2026-09-06T15:51:26.450Z] [debug] missions: hunt:hunt_mud_titan stage 0/7 [diplomacy] @tartarian_enclave npc="the True Tartarian agent" gives=Enclave Writ
+[2026-09-06T15:51:26.450Z] [debug] missions: hunt:hunt_bog_dragon stage 6/7 [boss→attack] @broken_steeple needs=Eshren's Name-Token✓ PAUSED
+[2026-09-06T15:51:26.450Z] [debug] missions: hunt:hunt_servants_doubter stage 4/5 [boss→attack] @reavers_crest needs=Raider's Ridge-Sign✓ PAUSED
+[2026-09-06T15:51:26.444Z] [debug] scene: loc=voronov hub=- arrival=n opening=n passing=n
+[2026-09-06T15:51:20.663Z] [system] You join the Fallen of Tartaria — 19 names the buried world keeps now. Read the roll from the Lore Codex.
+[2026-09-06T15:51:18.969Z] [combat] Mercy falls beside you. The buried world claims them too.
+[2026-09-06T15:51:18.831Z] [system] Cheddar Bob has fallen. A Resurrection Gem from the title screen can bring them back.
+[2026-09-06T15:51:18.762Z] [combat] Cheddar Bob does not rise. The ruins remember another.
+[2026-09-06T15:51:18.693Z] [combat] Voronov-Beneath High Cantor deals 20 bludgeoning damage. You fall.
+[2026-09-06T15:51:18.198Z] [combat] Voronov-Beneath High Cantor — d20 → 14 + ATK 9 = 23 vs your AC 23 — ✓ HIT
+[2026-09-06T15:51:18.196Z] [combat] Voronov-Beneath High Cantor presses the second strike — bosses do not yield the tempo.
+[2026-09-06T15:51:18.196Z] [combat] Voronov-Beneath High Cantor — d20 → 8 + ATK 9 = 17 vs your AC 23 — ✗ MISS
+[2026-09-06T15:51:18.192Z] [world] Voronov-Beneath High Cantor moves first. The pressure is immediate.
+[2026-09-06T15:51:18.128Z] [debug] dice⏱ coating: shown +317ms, tapped +566ms, settled +1133ms (hold late 333ms) = 2016ms
+[2026-09-06T15:51:16.994Z] [debug] ui: tap "roll" ⏱+16ms
+[2026-09-06T15:51:16.109Z] [debug] dice⏱ damage: shown +311ms, tapped +436ms, settled +1133ms (hold late 333ms) = 1880ms
+[2026-09-06T15:51:14.977Z] [debug] ui: tap "roll" ⏱+24ms
+[2026-09-06T15:51:14.228Z] [debug] dice⏱ attack: shown +330ms, tapped +581ms, settled +1102ms (hold late 302ms) = 2013ms
+[2026-09-06T15:51:13.125Z] [debug] ui: tap "roll" ⏱+254ms
+[2026-09-06T15:51:12.834Z] [debug] freeze watch: recovered — painting again after 2820ms quiet.
+[2026-09-06T15:51:12.212Z] [debug] dice⏱ initiative: shown +561ms, tapped +1139ms, settled +1138ms (hold late 338ms) = 2838ms
+[2026-09-06T15:51:11.074Z] [debug] ui: tap "roll" ⏱+20ms
+[2026-09-06T15:51:09.510Z] [system] ⏳ Time passed: 6 min
+[2026-09-06T15:51:09.442Z] [world] Your frost-rimed sentinel cleaver comes around in an arc; Voronov-Beneath High Cantor squares up to meet it.
+[2026-09-06T15:51:09.168Z] [debug] attack: target=Voronov-Beneath High Cantor range=close reach.bands=[close] reach.label=Sentinel Cleaver bareHand=false
+[2026-09-06T15:51:09.026Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand sentinel cleaver resolved=Sentinel Cleaver range=close enemies=1 hooks=0
+[2026-09-06T15:51:08.956Z] [player] attack with the off-hand sentinel cleaver
+[2026-09-06T15:51:08.791Z] [debug] ui: tap "❄ sentinel cleaver ⚔ ★" ⏱+50ms
+[2026-09-06T15:51:07.639Z] [debug] ⚠ FREEZE WATCH: both clocks stopped (js 3775ms · frames 2820ms). Whole app wedged, or it was backgrounded — check the appstate trail beside this line. · crumb before: homework-done +31564ms → now: engine-done +1471ms · doing: action "approach Voronov-Beneath High Cantor" · native: idle · heap 24MB · gc +0ms/555 · feed 500
+[2026-09-06T15:51:07.133Z] [combat] Voronov-Beneath High Cantor deals 18 bludgeoning damage. You have 20 HP remaining.
+[2026-09-06T15:51:06.635Z] [debug] render⏱ 467ms after engine-done · feed 500
+[2026-09-06T15:51:06.029Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-06T15:51:05.960Z] [debug] arbiter: template (reason=combat)
+[2026-09-06T15:51:05.892Z] [combat] Your armour turns the blow back — Voronov-Beneath High Cantor takes 1 bludgeoning. (73 HP left)
+[2026-09-06T15:51:05.683Z] [combat] Voronov-Beneath High Cantor — d20 → 14 + ATK 9 = 23 vs your AC 23 — ✓ HIT
+[2026-09-06T15:51:05.608Z] [combat] Voronov-Beneath High Cantor presses the second strike — bosses do not yield the tempo.
+[2026-09-06T15:51:05.541Z] [combat] Voronov-Beneath High Cantor — d20 → 6 + ATK 9 = 15 vs your AC 23 — ✗ MISS
+[2026-09-06T15:51:05.470Z] [world] You close the gap with Voronov-Beneath High Cantor. (range: close / arm's reach)
+[2026-09-06T15:51:05.403Z] [debug] move: field advance target=Voronov-Beneath High Cantor d 1.50->0.50 band mid->close
+[2026-09-06T15:51:05.268Z] [debug] move: advance from range=mid enemies=1 weather=Silent Blizzard cost=1 partial=0
+[2026-09-06T15:51:05.131Z] [debug] parser: intent=advance conf=1.00 verb=approach target=voronov beneath high cantor resolved=Voronov-Beneath High Cantor range=mid enemies=1 hooks=0
+[2026-09-06T15:51:05.062Z] [player] approach Voronov-Beneath High Cantor
+[2026-09-06T15:51:04.820Z] [debug] ui: tap "approach" ⏱+572ms late 567ms
+[2026-09-06T15:51:04.318Z] [combat] Voronov-Beneath High Cantor deals 6 bludgeoning damage [edge of reach — halved]. You have 38 HP remaining.
+[2026-09-06T15:51:04.249Z] [combat] Voronov-Beneath High Cantor deals 7 bludgeoning damage [edge of reach — halved]. You have 44 HP remaining.
+[2026-09-06T15:51:03.755Z] [debug] render⏱ 470ms after engine-done · feed 500
+[2026-09-06T15:51:02.674Z] [system] ⏳ Time passed: 6 min
+[2026-09-06T15:51:02.606Z] [combat] Your armour turns the blow back — Voronov-Beneath High Cantor takes 1 bludgeoning. (74 HP left)
+[2026-09-06T15:51:02.401Z] [combat] Voronov-Beneath High Cantor — d20 → 16 + ATK 9 = 25 vs your AC 23 — ✓ HIT
+[2026-09-06T15:51:02.332Z] [combat] Voronov-Beneath High Cantor presses the second strike — bosses do not yield the tempo.
+[2026-09-06T15:51:02.264Z] [combat] Your armour turns the blow back — Voronov-Beneath High Cantor takes 1 bludgeoning. (75 HP left)
+[2026-09-06T15:51:02.060Z] [world] Your read is a beat off — you fail to make the opening, and the swing lands the way it always meant to.
+[2026-09-06T15:51:01.992Z] [combat] Dodge — d20 → 5 + DEX 19 = 24 vs ATK 27. ✗ You misread it — no opening, and the blow lands as it normally would (armor still counts).
+[2026-09-06T15:51:01.924Z] [combat] Voronov-Beneath High Cantor — d20 → 18 + ATK 9 = 27 vs your AC 23 — ✓ HIT
+[2026-09-06T15:51:01.719Z] [world] You commit to the dodge. Slip Voronov-Beneath High Cantor's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-09-06T15:51:01.583Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=mid enemies=1 hooks=0
+[2026-09-06T15:51:01.515Z] [player] dodge
+[2026-09-06T15:51:01.375Z] [debug] ui: tap "dodge" ⏱+724ms late 719ms
+[2026-09-06T15:50:57.470Z] [arbiter] A pure tone fills the chamber — one chord, held, the kind of sound that re-arranges the dust in your lungs. The Voronov-Beneath High Cantor steps from the Core's housing in robes the colour of old gold, a tuning-fork the length of your forearm in one hand. "The Order has watched two Capitals fall to you," he says, voice both unhurried and very close. "This one does not fall. Stand and prove me wrong, or turn and live another hour."
+[2026-09-06T15:50:57.400Z] [combat] Voronov-Beneath High Cantor closes — Tuning Fork Chord ready, 1d10+6+1d6 damage on a hit, twice per round. (range: mid) ★ CORE GUARDIAN
+[2026-09-06T15:50:57.314Z] [world] You lay a hand on the cold Core seat and call its Guardian up.
+[2026-09-06T15:50:36.594Z] [world] You use 1× Trail Rations. +3 HP (51/51).
+[2026-09-06T15:50:35.920Z] [debug] homework: scene_intro "The Conduit Line" ✓ 10469ms
+[2026-09-06T15:50:35.741Z] [debug] qwen⏱ narration:scene_intro_fill ok 10113ms read 8966ms/write 1114ms in 819t→out 33t js-late 255ms thr1 10.9ms/t HIT-CAP (145ch)
+[2026-09-06T15:50:34.860Z] [debug] ui: tap "✚ heals (3)" ⏱+24ms
+[2026-09-06T15:50:32.741Z] [world] You use 1× Trail Rations. +6 HP (48/51).
+[2026-09-06T15:50:30.857Z] [debug] ui: tap "✚ heals (3)" ⏱+10ms
+[2026-09-06T15:50:29.157Z] [world] You use 1× Trail Rations. +6 HP (42/51), +1 stamina.
+[2026-09-06T15:50:27.172Z] [debug] ui: tap "✚ heals (3)" ⏱+11ms
+[2026-09-06T15:50:25.453Z] [debug] homework: intro-fill armed after 9234ms idle
+[2026-09-06T15:50:24.173Z] [world] You use 1× Trail Rations. +6 HP (36/51), +3 stamina.
+[2026-09-06T15:50:18.563Z] [debug] ui: tap "✚ heals (3)" ⏱+17ms
+
+=== END REPORT ===

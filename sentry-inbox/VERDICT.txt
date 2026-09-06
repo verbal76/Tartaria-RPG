@@ -11,16 +11,8 @@
     1 page(s), 22 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7703396482/events/?full=false
     1 page(s), 2 rows — COMPLETE — ended short of a full page
-  /organizations/hot-attic-games-llc/issues/7709458959/events/?full=false
-    1 page(s), 100 rows — SUSPECT — ended on a full page of 100 with no next cursor; this endpoint caps rather than paginates
-  /organizations/hot-attic-games-llc/issues/7709459397/events/?full=false
-    1 page(s), 4 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7709732459/events/?full=false
     1 page(s), 4 rows — COMPLETE — ended short of a full page
-  /organizations/hot-attic-games-llc/issues/7709891197/events/?full=false
-    1 page(s), 56 rows — COMPLETE — ended short of a full page
-  /organizations/hot-attic-games-llc/issues/7709891349/events/?full=false
-    1 page(s), 2 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7710022647/events/?full=false
     1 page(s), 28 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7710022759/events/?full=false
@@ -201,6 +193,14 @@
     1 page(s), 97 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7714709792/events/?full=false
     1 page(s), 3 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7715491277/events/?full=false
+    1 page(s), 9 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7715491334/events/?full=false
+    1 page(s), 1 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7715724289/events/?full=false
+    1 page(s), 6 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7715724353/events/?full=false
+    1 page(s), 1 rows — COMPLETE — ended short of a full page
   /projects/hot-attic-games-llc/tartaria/events/?full=false
     1 page(s), 100 rows — SUSPECT — ended on a full page of 100 with no next cursor; this endpoint caps rather than paginates
   /projects/hot-attic-games-llc/tartaria/issues/?query=&statsPeriod=

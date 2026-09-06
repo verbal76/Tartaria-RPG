@@ -1,0 +1,501 @@
+Bug Report — Merlyn · (2026-09-06-1716-every-row-says-what-it-is) · log
+=== TARTARIA BUG REPORT ===
+Submitted: 2026-09-06T18:46:24.496Z
+Character: Merlyn
+Slot ID: slot_mpvue7ca_xph4hm
+Race: Aetherborn
+Location: Varakush
+HP: 22/34
+
+--- DESCRIPTION ---
+log
+
+--- DEVICE / BUILD ---
+Device
+  Name: iPhone
+  Platform: ios 26.4.2
+  Hermes: yes
+  Locale: en-US
+  Timezone: America/New_York
+  Screen: window 390×844 / screen 390×844 @ 3x density
+  Captured at: 2026-09-06T18:46:24.467Z
+
+Install
+  App ID: com.hotatticgames.tartarprim
+  App version: 4.32.11
+  APK build version: 2.4.1
+  APK build: 33
+  AAB: (build 33)
+  OTA: (2026-09-06-1716-every-row-says-what-it-is)
+  Boot stage: qwen:deferred
+
+ML runtime health
+  Status: active (no crashes detected)
+  Crash count: 0
+  Last init attempt: 2026-09-06T18:45:51.571Z
+  Last init success: 2026-09-06T18:46:00.515Z
+  Crashes-before-disable threshold: 2
+  Qwen completion guard: clean (no completion crashes)
+  Qwen kernel variant: (not yet loaded this install)
+  Qwen CPU/SoC: (not yet loaded this install)
+  Voice (TTS) guard: clean (no voice crashes on this build)
+Save-load health
+  Status: clean (no load-crash flags)
+Last JS crash
+  Status: none recorded
+This launch
+  Life: bmtq5wwb4hb · started 2026-09-06T18:45:51.376Z
+  Cold start — this boot did not follow an OTA apply
+Crash ledger
+  No crashes recorded.
+Crash delivery: ON — reports go to Sentry when you crash.
+Runtime pressure
+  · Last boot exited cleanly, then the OS reclaimed it — not a crash.
+     A ~400MB model app is what Android drops first when it needs memory.
+     Kept because the phase is still evidence if a real freeze lands here.
+     Last checkpoint: ctx-release-done at 2026-09-06T18:45:46.563Z (1 min before this boot)
+  Memory warnings: none this session
+  Freeze watch: no stalls seen (JS clocks only — see the native queue below)
+  Native queue: worst wait 0.0s · 0 job kinds queued >3s · worst 0.0ms/prompt-token
+  App state trail: (none recorded)
+Model contexts
+  Live now: 0
+  Opened: 0 · Released: 0 · Peak live: 0
+  Narration engine: idle
+
+--- VOICE ---
+  TTS enabled: yes
+  Engine: bundled
+  Rate: 1.20 · Pitch: 1.00
+  System voice id: (default)
+  Kokoro voice: am_michael
+  Kokoro state: ready
+  Last TTS routes (newest first):
+    • route=bundled-kokoro · kokoro=ready · "Choose your character."
+
+--- INVENTORY ---
+Inventory
+  (no active character)
+
+--- CHARACTER LOG (newest first) ---
+(Newest entry at top — showing the most recent 417 of 783 entries; older trimmed to fit a single email paste)
+
+[2026-09-06T18:46:00.229Z] [debug] voice⏱ gap 1892ms (wait 59ms + synth 1830ms, live) "Choose your character."
+[2026-09-06T18:45:58.290Z] [debug] voice: bundled ready
+[2026-09-06T18:45:51.872Z] [debug] voice: bundled loading
+[2026-09-06T18:45:51.871Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-09-06T18:45:51.534Z] [debug] ota: boot check result = noUpdate
+[2026-09-06T18:45:51.533Z] [debug] ota: Already up to date
+[2026-09-06T18:45:51.450Z] [debug] ota: Checking…
+[2026-09-06T18:45:51.450Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=01a077f9-bdfc-7232-ae14-ae586dfc049e
+[2026-09-06T18:45:46.563Z] [debug] ctx: RELEASED — live=0 (opened=1 released=1)
+[2026-09-06T18:45:46.481Z] [debug] appstate: inactive → background (was inactive for 666ms)
+[2026-09-06T18:45:45.815Z] [debug] appstate: active → inactive (was active for 15578ms)
+[2026-09-06T18:45:30.237Z] [debug] appstate: inactive → active (was inactive for 2307ms)
+[2026-09-06T18:45:27.930Z] [debug] appstate: active → inactive (was active for 79445ms)
+[2026-09-06T18:44:15.407Z] [arbiter] The Arbiter marks the ledger without looking up. "The Calling. So that is why you came down. The mud had its own guess; yours is the one that counts. Walk on."
+[2026-09-06T18:44:08.398Z] [debug] ctx: OPENED — live=1 (opened=1 released=0) ≈425MB est
+[2026-09-06T18:43:59.247Z] [arbiter] The Arbiter looks up as you return. "Welcome back, Merlyn. I wondered when you'd take up the thread again. The waste did not sleep while you were gone — blood was spilled and ground changed hands. Read the World for the account."
+[2026-09-06T18:43:59.237Z] [world] Mud Monarch heralds left a sigil-mark on a stone you don't remember being marked. The faction is paying attention.
+[2026-09-06T18:43:59.237Z] [world] You step back into Varakush. The world waits for your move.
+[2026-09-06T18:43:59.237Z] [debug] OTA session start: 2026-08-21-1427-x-of-y-names-the-x.
+[2026-08-21T21:36:56.393Z] [debug] ctx: OPENED — live=1 (opened=1 released=0) ≈425MB est
+[2026-08-21T21:36:40.905Z] [debug] voice⏱ gap 1139ms (wait 56ms + synth 1078ms, live) "Choose your character."
+[2026-08-21T21:36:39.738Z] [debug] voice: bundled ready
+[2026-08-21T21:36:36.010Z] [debug] voice: bundled loading
+[2026-08-21T21:36:36.010Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-08-21T21:36:35.878Z] [debug] ota: boot check result = noUpdate
+[2026-08-21T21:36:35.878Z] [debug] ota: Already up to date
+[2026-08-21T21:36:35.696Z] [debug] ota: Checking…
+[2026-08-21T21:36:35.696Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=01a02615-eba9-7aa7-8d35-4658d9503234
+[2026-06-16T04:41:03.595Z] [debug] voice: bundled ready
+[2026-06-16T04:40:59.973Z] [debug] voice: bundled loading
+[2026-06-16T04:40:59.973Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-06-06T17:32:45.777Z] [cognitive] REST  (60ms)
+[2026-06-06T17:32:45.716Z] [system] ⏳ Time passed: 8h
+[2026-06-06T17:32:45.715Z] [arbiter] The Arbiter watches. "I saw the way you came at that."
+[2026-06-06T17:32:45.706Z] [world] You rest for 8 hours. +4 stamina recovered. (Day 3, morning)
+[2026-06-06T17:32:45.705Z] [world] name dog circles three times and curls beside you. Their breathing slows to yours.
+[2026-06-06T17:32:45.704Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0
+[2026-06-06T17:32:45.704Z] [player] rest
+[2026-06-06T17:32:31.416Z] [cognitive] neutral  (65ms)
+[2026-06-06T17:32:31.348Z] [arbiter] The Arbiter tilts their head. "Drink what? You'd need a water source nearby, or a Water Bottle in your pack."
+[2026-06-06T17:32:31.346Z] [debug] parser: intent=drink conf=1.00 verb=drink target=- resolved=- range=- enemies=0 hooks=0
+[2026-06-06T17:32:31.346Z] [player] drink
+[2026-06-06T17:32:15.179Z] [cognitive] neutral  (38ms)
+[2026-06-06T17:32:15.141Z] [system] ⏳ Time passed: 30 min
+[2026-06-06T17:32:15.140Z] [arbiter] The Arbiter glances at the Trail Rations. "Tea, here, is a small ritual against the Aether. Drink the tea."
+[2026-06-06T17:32:15.135Z] [world] You eat the Trail Rations. +5 HP.
+[2026-06-06T17:32:15.134Z] [debug] parser: intent=rest conf=1.00 verb=eat target=trail rations resolved=Trail Rations range=- enemies=0 hooks=0
+[2026-06-06T17:32:15.134Z] [player] eat Trail Rations
+[2026-06-06T17:31:52.493Z] [cognitive] REST  (62ms)
+[2026-06-06T17:31:52.430Z] [system] ⏳ Time passed: 8h
+[2026-06-06T17:31:52.421Z] [world] You rest for 8 hours. +8 stamina recovered. (Day 3, night)
+[2026-06-06T17:31:52.420Z] [world] name dog circles three times and curls beside you. Their breathing slows to yours.
+[2026-06-06T17:31:52.417Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=0
+[2026-06-06T17:31:52.416Z] [player] rest
+[2026-06-06T17:31:41.098Z] [cognitive] neutral  (58ms)
+[2026-06-06T17:31:41.038Z] [arbiter] "Eat something," the Arbiter says, almost gentle. "Stamina doesn't refill on grit. You've got rations."
+[2026-06-06T17:31:41.037Z] [world] The metal is cold and unresponsive. A faint Aetheric hum, fading, says the mechanism was alive within the last decade.
+[2026-06-06T17:31:41.036Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=anvil resolved=anvil range=- enemies=0 hooks=0
+[2026-06-06T17:31:41.035Z] [player] investigate anvil
+[2026-06-06T17:31:41.007Z] [world] An Aetheric arc finds you — copper taste, blue afterimage, and a bite of damage.
+[2026-06-06T17:31:26.516Z] [dog_quest] The Arbiter studies the new pair. "name dog, then. The chain is off. The road is open."
+[2026-06-06T17:31:26.515Z] [world] name dog circles three times and settles at your boot. Their breathing slows to yours.
+[2026-06-06T17:31:26.514Z] [player] pepper
+[2026-06-06T17:31:01.983Z] [dog_quest] The Arbiter nods again. "Boy or girl?"
+[2026-06-06T17:31:01.982Z] [world] name dog. The name settles on the dog like a coat.
+[2026-06-06T17:31:01.981Z] [player] name dog
+[2026-06-06T17:30:18.773Z] [reward]     • Bent Nail x4 (Common)
+[2026-06-06T17:30:18.773Z] [reward] ✦ Salvage haul:
+[2026-06-06T17:30:18.772Z] [world] You salvage the workbench. The take is small but real.
+[2026-06-06T17:30:18.771Z] [world] You work the rack over. A part of it comes loose, intact.
+[2026-06-06T17:29:58.620Z] [dog_quest] The Arbiter nods. "What will you name them?"
+[2026-06-06T17:29:58.619Z] [world] You name the breed: salvage rack.
+[2026-06-06T17:29:58.617Z] [player] salvage rack
+[2026-06-06T17:29:48.598Z] [reward] ✦ Bolt-Caster (Uncommon).
+[2026-06-06T17:29:48.597Z] [world] You take the Bolt-Caster from where it lay.
+[2026-06-06T17:28:53.639Z] [reward] +4 TC pried from the dust.
+[2026-06-06T17:28:53.638Z] [dog_quest] The dog watches you with the flat unread look of an animal that has just had one ownership scratched off its name. The Arbiter steps in. "What kind of dog is that?"
+[2026-06-06T17:28:53.638Z] [dog_quest] The Reclaimer deserter falls into the slag. The dog is still chained, watching you with the wary level look of an animal that has read its odds. They were keeping the dog illegally. No faction reckoning falls on you for this.
+[2026-06-06T17:28:53.637Z] [reward] Reclaimer Deserter defeated. You recover Scrap Metal ×3.
+[2026-06-06T17:28:53.637Z] [combat] The killing blow with the bolt-caster: 10. Reclaimer Deserter drops where it stood.
+[2026-06-06T17:28:53.637Z] [combat] You — d20 → 9 + DEX 5 = 14 vs Reclaimer Deserter AC 8 — ✓ HIT
+[2026-06-06T17:28:53.636Z] [world] Reclaimer Deserter moves first. The pressure is immediate.
+[2026-06-06T17:28:49.447Z] [cognitive] AGGRESSION · AIM · RELOAD · ATTACK · DISENGAGE  (38ms)
+[2026-06-06T17:28:49.409Z] [system] ⏳ Time passed: 6 min
+[2026-06-06T17:28:49.409Z] [world] You raise the bolt-caster toward Reclaimer Deserter. The room narrows around the both of you.
+[2026-06-06T17:28:49.405Z] [debug] attack: target=Reclaimer Deserter range=close reach.bands=[arm,close,far] reach.label=Bolt-Caster bareHand=false
+[2026-06-06T17:28:49.400Z] [world] You stow the Pyric Wand and equip Bolt-Caster (Main hand).
+[2026-06-06T17:28:49.400Z] [world] You shift grip and bring up the Bolt-Caster.
+[2026-06-06T17:28:49.400Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bolt caster resolved=bolt-caster range=close enemies=1 hooks=0
+[2026-06-06T17:28:49.399Z] [player] attack with the off-hand bolt-caster
+[2026-06-06T17:28:41.981Z] [combat] Reclaimer Deserter deals 4 damage. You have 22 HP remaining.
+[2026-06-06T17:28:41.934Z] [combat] Reclaimer Deserter — d20 → 17 + ATK 4 = 21 vs your AC 12 — ✓ HIT
+[2026-06-06T17:28:41.934Z] [combat] Your strike with the pyric wand lands for 4. Reclaimer Deserter staggers — 7 HP remaining. It answers.
+[2026-06-06T17:28:41.933Z] [combat] You — d20 → 18 + INT 11 = 29 vs Reclaimer Deserter AC 8 — ✓ HIT
+[2026-06-06T17:28:41.933Z] [world] You seize the initiative. Reclaimer Deserter has no time to react.
+[2026-06-06T17:28:36.782Z] [cognitive] AGGRESSION · ATTACK · AIM · THROW  (42ms)
+[2026-06-06T17:28:36.739Z] [system] ⏳ Time passed: 6 min
+[2026-06-06T17:28:36.739Z] [world] Your pyric wand comes around in an arc; Reclaimer Deserter reads it but does not move yet.
+[2026-06-06T17:28:36.735Z] [debug] attack: target=Reclaimer Deserter range=close reach.bands=[arm,close,far] reach.label=Pyric Wand bareHand=false
+[2026-06-06T17:28:36.734Z] [debug] parser: intent=attack conf=1.00 verb=attack target=pyric wand resolved=Pyric Wand range=close enemies=1 hooks=0
+[2026-06-06T17:28:36.734Z] [player] attack with the pyric wand
+[2026-06-06T17:28:26.449Z] [combat] Reclaimer Deserter — d20 → 1 + ATK 4 = 5 vs your AC 12 — ✗ FUMBLE
+[2026-06-06T17:28:26.449Z] [combat] Reclaimer Deserter takes 3 with the pyric wand. It reels: 11 left. Then it fights back.
+[2026-06-06T17:28:26.448Z] [combat] You — d20 → 10 + INT 11 = 21 vs Reclaimer Deserter AC 8 — ✓ HIT
+[2026-06-06T17:28:26.448Z] [world] You seize the initiative. Reclaimer Deserter has no time to react.
+[2026-06-06T17:28:15.252Z] [cognitive] AGGRESSION · ATTACK · AIM · THROW  (42ms)
+[2026-06-06T17:28:15.209Z] [system] ⏳ Time passed: 6 min
+[2026-06-06T17:28:15.209Z] [world] You commit forward with the pyric wand. Reclaimer Deserter watches your hands.
+[2026-06-06T17:28:15.202Z] [debug] attack: target=Reclaimer Deserter range=close reach.bands=[arm,close,far] reach.label=Pyric Wand bareHand=false
+[2026-06-06T17:28:15.202Z] [debug] parser: intent=attack conf=1.00 verb=attack target=pyric wand resolved=Pyric Wand range=close enemies=1 hooks=0
+[2026-06-06T17:28:15.201Z] [player] attack with the pyric wand
+[2026-06-06T17:27:49.535Z] [world] You equip Forgotten Leggings (Legs).
+[2026-06-06T17:27:38.040Z] [world] You stow the Rusted Blade and equip Bolt-Caster (Off hand).
+[2026-06-06T17:27:22.897Z] [world] You stow the Rusted Blade and equip Pyric Wand (Main hand).
+[2026-06-06T17:26:03.523Z] [dog_quest] You step into the smelter's ruin. The Reclaimer Deserter is here, working a chain that ends in a dog's collar. Reclaimer Deserter sees you. "Walk on. This one's not yours."
+[2026-06-06T17:26:03.518Z] [player] investigate anvil
+[2026-06-06T17:25:54.041Z] [cognitive] AGGRESSION · DISENGAGE · TAKE_COVER  (35ms)
+[2026-06-06T17:25:54.006Z] [debug] dedup: suppressed arbiter repeat — "The Arbiter looks around. "The Forgotten Order keeps a door …"
+[2026-06-06T17:25:54.006Z] [arbiter] The Arbiter looks around. "The Forgotten Order keeps a door open here for those who know how to knock."
+[2026-06-06T17:25:54.005Z] [world] You turn the shield in your hands and find no answer. The silence here is patient; whatever it knew, it has decided to keep.
+[2026-06-06T17:25:54.005Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=shield resolved=shield range=- enemies=0 hooks=0
+[2026-06-06T17:25:54.005Z] [player] investigate shield
+[2026-06-06T17:25:49.334Z] [cognitive] neutral  (49ms)
+[2026-06-06T17:25:49.284Z] [world] You give the floor a once-over. Clean enough to fail you.
+[2026-06-06T17:25:49.280Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=floor resolved=- range=- enemies=0 hooks=0
+[2026-06-06T17:25:49.280Z] [player] investigate the floor
+[2026-06-06T17:25:33.486Z] [arbiter] The Arbiter inclines their head. "Welcome back, friend."
+[2026-06-06T17:25:33.486Z] [arbiter] "A name came back to me in the night-of-your-absence. I'll know it when we meet whoever wears it."
+[2026-06-06T17:25:33.486Z] [world] You step back into Varakush. The world waits for your move.
+[2026-06-06T17:25:33.485Z] [debug] OTA session start: 2026-06-06-313.
+[2026-06-06T17:25:33.485Z] [debug] OTA applied: 2026-06-02-281 → 2026-06-06-313.
+[2026-06-06T17:25:25.025Z] [debug] voice: bundled ready
+[2026-06-06T17:25:22.958Z] [debug] voice: bundled loading
+[2026-06-06T17:25:02.088Z] [debug] voice: bundled downloading
+[2026-06-06T17:25:00.067Z] [debug] voice: bundled loading
+[2026-06-06T17:25:00.067Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-06-02T01:34:06.574Z] [system] True Tartarians standing +1 (now 1)
+[2026-06-02T01:34:06.573Z] [reward] Bought Forgotten Leggings from Irma Ironhand for 95 TC. (81 TC left)
+[2026-06-02T01:33:44.493Z] [cognitive] AGGRESSION · DISENGAGE · TAKE_COVER  (116ms)
+[2026-06-02T01:33:44.375Z] [arbiter] The Arbiter looks around. "The Forgotten Order keeps a door open here for those who know how to knock."
+[2026-06-02T01:33:44.374Z] [world] You turn the shield in your hands and find no answer. The silence here is patient; whatever it knew, it has decided to keep.
+[2026-06-02T01:33:44.373Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=shield resolved=shield range=- enemies=0 hooks=0
+[2026-06-02T01:33:44.372Z] [player] investigate shield
+[2026-06-02T01:33:44.350Z] [world] An Aetheric arc finds you — copper taste, blue afterimage, and a bite of damage.
+[2026-06-02T01:33:39.371Z] [arbiter] The Arbiter inclines their head. "Welcome back, Merlyn."
+[2026-06-02T01:33:39.371Z] [world] You step back into Varakush. The world waits for your move.
+[2026-06-02T01:33:39.371Z] [debug] OTA session start: 2026-06-02-281.
+[2026-06-02T01:33:39.371Z] [debug] OTA applied: 2026-06-02-277 → 2026-06-02-281.
+[2026-06-02T01:05:36.466Z] [arbiter] The Arbiter inclines their head. "Welcome back, friend."
+[2026-06-02T01:05:36.466Z] [world] You step back into Varakush. The world waits for your move.
+[2026-06-02T01:05:36.465Z] [debug] OTA session start: 2026-06-02-277.
+[2026-06-02T01:04:20.595Z] [arbiter] The Arbiter inclines their head. "Welcome back, friend."
+[2026-06-02T01:04:20.595Z] [world] You step back into Varakush. The world waits for your move.
+[2026-06-02T01:04:20.595Z] [debug] OTA session start: 2026-06-02-277.
+[2026-06-02T01:03:14.153Z] [system] The Arbiter considers your words…
+[2026-06-02T01:03:14.152Z] [debug] parse-fallback: handing "water" to qwen
+[2026-06-02T01:03:14.152Z] [debug] parser: intent=unknown conf=0.10 verb=- target=- resolved=- range=- enemies=0 hooks=0
+[2026-06-02T01:03:14.152Z] [player] water
+[2026-06-02T01:03:05.607Z] [cognitive] neutral  (54ms)
+[2026-06-02T01:03:05.551Z] [arbiter] The Arbiter tilts their head. "Drink what? You'd need a water source nearby, or a Water Bottle in your pack."
+[2026-06-02T01:03:05.550Z] [debug] parser: intent=drink conf=1.00 verb=drink target=- resolved=- range=- enemies=0 hooks=0
+[2026-06-02T01:03:05.549Z] [player] drink
+[2026-06-02T01:02:55.642Z] [reward]     • Aether Crystal (Common)
+[2026-06-02T01:02:55.642Z] [reward]     • Bent Nail x2 (Common)
+[2026-06-02T01:02:55.641Z] [reward] ✦ Salvage haul:
+[2026-06-02T01:02:55.641Z] [world] You break the leaning engine chamber scaffolding apart. Among the pieces, something worth keeping.
+[2026-06-02T01:02:55.641Z] [world] You strip the workbench carefully. Something usable comes free in your hand.
+[2026-06-02T01:02:50.640Z] [world] You break for the entrance. Behind you the chamber settles back into silence.
+[2026-06-02T01:02:48.713Z] [cognitive] FEAR · RETREAT · HIDE  (60ms)
+[2026-06-02T01:02:48.653Z] [system] ⏳ Time passed: 15 min
+[2026-06-02T01:02:48.640Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=close enemies=1 hooks=0
+[2026-06-02T01:02:48.639Z] [player] flee
+[2026-06-02T01:02:42.696Z] [cognitive] neutral  (57ms)
+[2026-06-02T01:02:42.638Z] [combat] Mudling — Mud Whip ready, 1D6 damage on a hit.
+[2026-06-02T01:02:42.638Z] [world] Something shifted while you were turned away — a Mudling breaks cover, fast and low. (range: close)
+[2026-06-02T01:02:42.636Z] [debug] parser: intent=investigate conf=1.00 verb=salvage target=workbench resolved=workbench range=- enemies=0 hooks=0
+[2026-06-02T01:02:42.635Z] [player] salvage workbench
+[2026-06-02T01:02:40.630Z] [cognitive] neutral  (53ms)
+[2026-06-02T01:02:40.576Z] [system] ⏳ Time passed: 15 min
+[2026-06-02T01:02:40.575Z] [reward] ✦ Bent Nail x2 (Common).
+[2026-06-02T01:02:40.573Z] [world] You work the rack over. A part of it comes loose, intact.
+[2026-06-02T01:02:40.572Z] [debug] parser: intent=investigate conf=1.00 verb=salvage target=rack resolved=rack range=- enemies=0 hooks=0
+[2026-06-02T01:02:40.571Z] [player] salvage rack
+[2026-06-02T01:02:38.253Z] [cognitive] neutral  (38ms)
+[2026-06-02T01:02:38.216Z] [system] ⏳ Time passed: 15 min
+[2026-06-02T01:02:38.214Z] [reward] ✦ Aetheric Locket (Common).
+[2026-06-02T01:02:38.213Z] [world] You strip the broken submerged library shelf carefully. Something usable comes free in your hand.
+[2026-06-02T01:02:38.212Z] [debug] parser: intent=investigate conf=1.00 verb=salvage target=broken submerged library shelf resolved=broken submerged library shelf range=- enemies=0 hooks=0
+[2026-06-02T01:02:38.212Z] [player] salvage broken submerged library shelf
+[2026-06-02T01:02:32.986Z] [reward] ✦ Bolt-Caster (Uncommon).
+[2026-06-02T01:02:32.985Z] [world] You take the Bolt-Caster from where it lay.
+[2026-06-02T01:02:22.317Z] [arbiter] You step back, your blade still in hand, as you feel the weight of your new responsibilities. The air around you seems to contract, creating an atmosphere of anticipation.
+[2026-06-02T01:02:09.684Z] [cognitive] neutral  (51ms)
+[2026-06-02T01:02:09.633Z] [system] ⏳ Time passed: 1h
+[2026-06-02T01:02:09.627Z] [world] Irma Ironhand nods at a mystery notice: "Cradle of Dusk Compass." (Say 'accept compass' or open Contracts.)
+[2026-06-02T01:02:09.627Z] [world] Irma Ironhand points at the bounty board: "The Bog Dragon of Old Drakova." (Say 'accept drakova' or open Contracts.)
+[2026-06-02T01:02:09.627Z] [world] Irma Ironhand offers a contract: "Walk the buried road." (Say 'accept road' or open Contracts for details.)
+[2026-06-02T01:02:09.626Z] [world] Irma Ironhand is still at their post — pack open, wares laid out. They nod without looking up.
+[2026-06-02T01:02:09.626Z] [world] [Varakush] north: Tartarian Outskirts (16 days' travel) · east: Varakush (a day's travel) · south: open ground · west: Grand Spire of Etheria (38 days' travel)
+[2026-06-02T01:02:09.597Z] [system] Weather effect — Etheric Storm: +1 INT · -1 WIS
+[2026-06-02T01:02:09.597Z] [world] Paths: north to Workshop · west to Sanctum. (Type 'leave outpost' to head into the wilds.)
+[2026-06-02T01:02:09.596Z] [world] You've stood here before. (visit 2)
+[2026-06-02T01:02:09.596Z] [world] Order Cloister — The Reliquary Armory. A locked vault of restored pre-flood weapons, each tagged with provenance. Irma keeps the older steel oiled and the Aether-touched blades behind silk drape.
+[2026-06-02T01:02:09.591Z] [world] You head on to the Armory.
+[2026-06-02T01:02:09.588Z] [debug] parser: intent=travel conf=1.00 verb=go target=east resolved=- range=- enemies=0 hooks=1
+[2026-06-02T01:02:09.588Z] [player] go east
+[2026-06-02T01:01:52.652Z] [cognitive] REST  (62ms)
+[2026-06-02T01:01:52.590Z] [system] ⏳ Time passed: 8h
+[2026-06-02T01:01:52.580Z] [arbiter] The Arbiter, near the embers: "I remembered a name in the night. It'll come back to me when the road needs it."
+[2026-06-02T01:01:52.580Z] [world] You rest for 8 hours. +12 HP, +5 stamina, −1 corruption recovered. (Day 2, afternoon)
+[2026-06-02T01:01:52.579Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1
+[2026-06-02T01:01:52.578Z] [player] rest
+[2026-06-02T01:01:49.802Z] [arbiter] The Arbiter inclines their head. "Welcome back, friend."
+[2026-06-02T01:01:49.802Z] [world] You step back into Varakush. The world waits for your move.
+[2026-06-02T01:01:49.802Z] [debug] OTA session start: 2026-06-02-277.
+[2026-06-02T00:59:05.395Z] [world] You break for the entrance. Behind you the chamber settles back into silence.
+[2026-06-02T00:59:03.729Z] [cognitive] FEAR · RETREAT · HIDE  (58ms)
+[2026-06-02T00:59:03.671Z] [system] ⏳ Time passed: 15 min
+[2026-06-02T00:59:03.660Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=arm enemies=1 hooks=1
+[2026-06-02T00:59:03.659Z] [player] flee
+[2026-06-02T00:58:56.758Z] [cognitive] SWIM  (42ms)
+[2026-06-02T00:58:56.715Z] [world] You are already at arm's reach with Swamp Crab.
+[2026-06-02T00:58:56.715Z] [debug] move: advance from range=arm enemies=1 weather=Eerie Calm cost=1 partial=0
+[2026-06-02T00:58:56.713Z] [debug] parser: intent=advance conf=1.00 verb=approach target=swamp crab resolved=Swamp Crab range=arm enemies=1 hooks=1
+[2026-06-02T00:58:56.712Z] [player] approach Swamp Crab
+[2026-06-02T00:58:50.656Z] [combat] Swamp Crab deals 7 damage. You have 22 HP remaining.
+[2026-06-02T00:58:50.575Z] [combat] Swamp Crab — d20 → 20 + ATK 1 = 21 vs your AC 11 — ✓ CRITICAL HIT
+[2026-06-02T00:58:50.574Z] [combat] Your strike lands for 1. Swamp Crab staggers — 8 HP remaining. It answers.
+[2026-06-02T00:58:50.573Z] [combat] You — d20 → 10 + STR 2 = 12 vs Swamp Crab AC 10 — ✓ HIT
+[2026-06-02T00:58:50.572Z] [world] Swamp Crab moves first. The pressure is immediate.
+[2026-06-02T00:58:46.273Z] [cognitive] DISENGAGE  (56ms)
+[2026-06-02T00:58:46.217Z] [system] ⏳ Time passed: 6 min
+[2026-06-02T00:58:46.216Z] [world] You drive toward Swamp Crab before it can choose first.
+[2026-06-02T00:58:46.205Z] [debug] attack: target=Swamp Crab range=arm reach.bands=[arm] reach.label=Bare hands bareHand=true
+[2026-06-02T00:58:46.204Z] [debug] parser: intent=attack conf=1.00 verb=punch target=- resolved=- range=arm enemies=1 hooks=1
+[2026-06-02T00:58:46.203Z] [player] punch
+[2026-06-02T00:58:34.588Z] [combat] Swamp Crab — d20 → 4 + ATK 1 = 5 vs your AC 11 — ✗ MISS
+[2026-06-02T00:58:34.588Z] [combat] The blow with the rusted blade finds purchase — 4 damage, 9 HP standing. Swamp Crab commits to the counter.
+[2026-06-02T00:58:34.588Z] [combat] You — d20 → 8 + STR 2 = 10 vs Swamp Crab AC 10 — ✓ HIT
+[2026-06-02T00:58:34.588Z] [world] Swamp Crab moves first. The pressure is immediate.
+[2026-06-02T00:58:29.197Z] [cognitive] AGGRESSION · DISENGAGE · ATTACK  (30ms)
+[2026-06-02T00:58:29.167Z] [system] ⏳ Time passed: 6 min
+[2026-06-02T00:58:29.167Z] [world] Your rusted blade comes around in an arc; Swamp Crab reads it but does not move yet.
+[2026-06-02T00:58:29.165Z] [debug] attack: target=Swamp Crab range=arm reach.bands=[arm] reach.label=Rusted Blade bareHand=false
+[2026-06-02T00:58:29.164Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand rusted blade resolved=Rusted Blade range=arm enemies=1 hooks=1
+[2026-06-02T00:58:29.164Z] [player] attack with the off-hand rusted blade
+[2026-06-02T00:58:26.752Z] [cognitive] AGGRESSION · ATTACK · DISENGAGE  (60ms)
+[2026-06-02T00:58:26.722Z] [combat] Swamp Crab deals 3 damage. You have 29 HP remaining.
+[2026-06-02T00:58:26.690Z] [combat] Swamp Crab — d20 → 13 + ATK 1 = 14 vs your AC 11 — ✓ HIT
+[2026-06-02T00:58:26.690Z] [world] You close the gap with Swamp Crab. (range: arm's reach)
+[2026-06-02T00:58:26.690Z] [debug] move: range close -> arm
+[2026-06-02T00:58:26.690Z] [debug] move: advance from range=close enemies=1 weather=Eerie Calm cost=1 partial=0
+[2026-06-02T00:58:26.690Z] [debug] dedup: suppressed arbiter repeat — "The Arbiter nods at the distance. "Rusted Blade needs arm's …"
+[2026-06-02T00:58:26.690Z] [arbiter] The Arbiter nods at the distance. "Rusted Blade needs arm's reach — closing the gap for you."
+[2026-06-02T00:58:26.690Z] [debug] attack: target=Swamp Crab range=close reach.bands=[arm] reach.label=Rusted Blade bareHand=false
+[2026-06-02T00:58:26.690Z] [debug] parser: intent=attack conf=1.00 verb=attack target=rusted blade resolved=Rusted Blade range=close enemies=1 hooks=1
+[2026-06-02T00:58:26.690Z] [player] attack with the rusted blade
+[2026-06-02T00:58:25.935Z] [cognitive] AGGRESSION · DISENGAGE · ATTACK  (63ms)
+[2026-06-02T00:58:25.909Z] [combat] Swamp Crab deals 2 damage. You have 32 HP remaining.
+[2026-06-02T00:58:25.870Z] [arbiter] The Arbiter watches the swamp crab. "It is not the first thing here that decided to keep its distance, then changed its mind."
+[2026-06-02T00:58:25.870Z] [combat] Swamp Crab — d20 → 12 + ATK 1 = 13 vs your AC 11 — ✓ HIT
+[2026-06-02T00:58:25.870Z] [world] You close the gap with Swamp Crab. (range: close)
+[2026-06-02T00:58:25.870Z] [debug] move: range far -> close
+[2026-06-02T00:58:25.870Z] [debug] move: advance from range=far enemies=1 weather=Eerie Calm cost=1 partial=0
+[2026-06-02T00:58:25.869Z] [arbiter] The Arbiter nods at the distance. "Rusted Blade needs arm's reach — closing the gap for you."
+[2026-06-02T00:58:25.869Z] [debug] attack: target=Swamp Crab range=far reach.bands=[arm] reach.label=Rusted Blade bareHand=false
+[2026-06-02T00:58:25.866Z] [world] You stow the Pyric Wand and equip Rusted Blade (Main hand).
+[2026-06-02T00:58:25.866Z] [world] You shift grip and bring up the Rusted Blade.
+[2026-06-02T00:58:25.866Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand rusted blade resolved=Rusted Blade range=far enemies=1 hooks=1
+[2026-06-02T00:58:25.866Z] [player] attack with the off-hand rusted blade
+[2026-06-02T00:58:25.810Z] [system] dodging (parry) fades.
+[2026-06-02T00:58:19.958Z] [world] You equip Rusted Blade (Off hand).
+[2026-06-02T00:58:07.463Z] [combat] The pyric wand cuts air. Swamp Crab answers immediately.
+[2026-06-02T00:58:07.463Z] [combat] You — d20 → 1 + INT 10 = 11 vs Swamp Crab AC 10 — ✗ FUMBLE
+[2026-06-02T00:58:07.463Z] [world] Swamp Crab moves first. The pressure is immediate.
+[2026-06-02T00:58:04.575Z] [cognitive] AGGRESSION · ATTACK · AIM · THROW  (34ms)
+[2026-06-02T00:58:04.540Z] [system] ⏳ Time passed: 6 min
+[2026-06-02T00:58:04.540Z] [world] The pyric wand is already moving when Swamp Crab sees it coming.
+[2026-06-02T00:58:04.536Z] [debug] attack: target=Swamp Crab range=far reach.bands=[arm,close,far] reach.label=Pyric Wand bareHand=false
+[2026-06-02T00:58:04.536Z] [debug] parser: intent=attack conf=1.00 verb=attack target=pyric wand resolved=Pyric Wand range=far enemies=1 hooks=1
+[2026-06-02T00:58:04.536Z] [player] attack with the pyric wand
+[2026-06-02T00:58:04.489Z] [system] dodging (parry) fades.
+[2026-06-02T00:57:59.097Z] [cognitive] neutral  (60ms)
+[2026-06-02T00:57:59.035Z] [world] You set your stance. The next Swamp Crab swing — you intend to turn into your own.
+[2026-06-02T00:57:59.034Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=far enemies=1 hooks=1
+[2026-06-02T00:57:59.034Z] [player] dodge
+[2026-06-02T00:57:40.599Z] [arbiter] The Arbiter watches the blow land or fail. "Both are answers."
+[2026-06-02T00:57:40.599Z] [combat] Swamp Crab takes 2 with the pyric wand. It reels: 13 left. Then it fights back.
+[2026-06-02T00:57:40.596Z] [combat] You — d20 → 11 + INT 10 = 21 vs Swamp Crab AC 10 — ✓ HIT
+[2026-06-02T00:57:40.595Z] [world] Swamp Crab moves first. The pressure is immediate.
+[2026-06-02T00:57:36.071Z] [cognitive] AGGRESSION · ATTACK · AIM · THROW  (41ms)
+[2026-06-02T00:57:36.029Z] [system] ⏳ Time passed: 6 min
+[2026-06-02T00:57:36.029Z] [world] The pyric wand is already moving when Swamp Crab sees it coming.
+[2026-06-02T00:57:36.025Z] [debug] attack: target=Swamp Crab range=far reach.bands=[arm,close,far] reach.label=Pyric Wand bareHand=false
+[2026-06-02T00:57:36.025Z] [debug] parser: intent=attack conf=1.00 verb=attack target=pyric wand resolved=Pyric Wand range=far enemies=1 hooks=1
+[2026-06-02T00:57:36.024Z] [player] attack with the pyric wand
+[2026-06-02T00:57:19.033Z] [cognitive] REST  (58ms)
+[2026-06-02T00:57:18.974Z] [system] ⏳ Time passed: 8h
+[2026-06-02T00:57:18.973Z] [arbiter] "Threads in Tartaria don't wait long," the Arbiter says quietly. "The construct won't either."
+[2026-06-02T00:57:18.966Z] [world] A Swamp Crab closes the distance through the dark. The rest is over.
+[2026-06-02T00:57:18.966Z] [arbiter] The Arbiter goes still. "You weren't alone. Something circled while you were out — and it stopped circling."
+[2026-06-02T00:57:18.962Z] [world] You rest for 8 hours. +5 stamina, −1 corruption recovered. (Day 2, morning)
+[2026-06-02T00:57:18.961Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1
+[2026-06-02T00:57:18.960Z] [player] rest
+[2026-06-02T00:56:34.270Z] [cognitive] CLIMB · TRAVEL  (53ms)
+[2026-06-02T00:56:34.217Z] [system] ⏳ Time passed: 1h
+[2026-06-02T00:56:34.216Z] [world] After a while you set down on the next stretch of ground.  The thread you were following waits where you left it.
+[2026-06-02T00:56:34.214Z] [debug] parser: intent=travel conf=1.00 verb=walk target=- resolved=- range=- enemies=0 hooks=1
+[2026-06-02T00:56:34.213Z] [player] walk
+[2026-06-02T00:56:27.057Z] [arbiter] The Arbiter inclines their head. "Welcome back, friend."
+[2026-06-02T00:56:27.057Z] [world] You step back into Varakush. The world waits for your move.
+[2026-06-02T00:56:27.057Z] [debug] OTA session start: 2026-06-02-277.
+[2026-06-02T00:55:53.758Z] [world] ★ STORY THREAD (step 1) — You crouch over the construct. Its arm still moves, but the core flickers — a few more hours, then nothing. Salvage now or never.
+[2026-06-02T00:55:53.758Z] [debug] route: hook intercept (kind=wreck_construct, target="construct") — original intent=investigate
+[2026-06-02T00:55:53.758Z] [debug] parser: intent=investigate conf=1.00 verb=salvage target=construct resolved=construct range=- enemies=0 hooks=1
+[2026-06-02T00:55:53.758Z] [player] salvage construct
+[2026-06-02T00:55:51.769Z] [cognitive] neutral  (31ms)
+[2026-06-02T00:55:51.738Z] [system] ⏳ Time passed: 15 min
+[2026-06-02T00:55:51.738Z] [reward] ✦ Worn Tartarian Coin x3 (Common).
+[2026-06-02T00:55:51.737Z] [world] You break the gate apart. Among the pieces, something worth keeping.
+[2026-06-02T00:55:51.737Z] [debug] parser: intent=investigate conf=1.00 verb=salvage target=gate resolved=gate range=- enemies=0 hooks=1
+[2026-06-02T00:55:51.737Z] [player] salvage gate
+[2026-06-02T00:55:49.112Z] [cognitive] neutral  (47ms)
+[2026-06-02T00:55:49.065Z] [system] ⏳ Time passed: 15 min
+[2026-06-02T00:55:49.064Z] [arbiter] The Arbiter looks around. "Lamps burn steady in Varakush. Steady lamps are rare in Tartaria. Notice them."
+[2026-06-02T00:55:49.063Z] [reward] ✦ Stick (Common).
+[2026-06-02T00:55:49.062Z] [world] You salvage the table. The take is small but real.
+[2026-06-02T00:55:49.061Z] [debug] parser: intent=investigate conf=1.00 verb=salvage target=table resolved=table range=- enemies=0 hooks=1
+[2026-06-02T00:55:49.060Z] [player] salvage table
+[2026-06-02T00:55:43.665Z] [cognitive] RESOLVE  (31ms)
+[2026-06-02T00:55:43.634Z] [system] ⏳ Time passed: 15 min
+[2026-06-02T00:55:43.633Z] [reward] ✦ Aether Dust x3 (Common).
+[2026-06-02T00:55:43.633Z] [world] You salvage the mud-glazed tartarian power conduit. The take is small but real.
+[2026-06-02T00:55:43.632Z] [debug] parser: intent=investigate conf=1.00 verb=salvage target=mud glazed tartarian power conduit resolved=mud-glazed tartarian power conduit range=- enemies=0 hooks=1
+[2026-06-02T00:55:43.632Z] [player] salvage mud-glazed tartarian power conduit
+[2026-06-02T00:55:30.839Z] [cognitive] neutral  (48ms)
+[2026-06-02T00:55:30.790Z] [world] Tartarian stone. Granular, slightly warm where the Aether saturated the matrix decades ago — not enough to be useful, just enough to remind you the Aether is everywhere.
+[2026-06-02T00:55:30.789Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=brick resolved=brick range=- enemies=0 hooks=1
+[2026-06-02T00:55:30.788Z] [player] investigate brick
+[2026-06-02T00:55:15.148Z] [reward] Bought Trail Rations from Halem the Trader for 6 TC. (176 TC left)
+[2026-06-02T00:55:10.079Z] [reward] Bought Rusted Blade from Halem the Trader for 26 TC. (182 TC left)
+[2026-06-02T00:55:02.650Z] [reward] Bought First Aid Kit from Halem the Trader for 28 TC. (208 TC left)
+[2026-06-02T00:54:34.748Z] [cognitive] TALK · SEARCH  (51ms)
+[2026-06-02T00:54:34.695Z] [arbiter] "Threads in Tartaria don't wait long," the Arbiter says quietly. "The construct won't either."
+[2026-06-02T00:54:34.695Z] [world] The frame is warped where the hinge anchored — long-dried iron, blooming with patient rust.
+[2026-06-02T00:54:34.693Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=arch resolved=arch range=- enemies=0 hooks=1
+[2026-06-02T00:54:34.692Z] [player] investigate arch
+[2026-06-02T00:54:22.184Z] [reward] ✦ Aetheric Torch (Common).
+[2026-06-02T00:54:22.184Z] [world] You take the Aetheric Torch from where it lay.
+[2026-06-02T00:54:10.759Z] [cognitive] neutral  (33ms)
+[2026-06-02T00:54:10.724Z] [world] Your study of the ancient grand spire capacitor draws your eye to something past it — An Aetheric construct lies half-toppled in the mud, one arm still flexing weakly, its core dim but unbroken.
+[2026-06-02T00:54:10.723Z] [world] You study the ancient grand spire capacitor. The Aetheric haze around it thickens, then settles.
+[2026-06-02T00:54:10.720Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ancient grand spire capacitor resolved=ancient grand spire capacitor range=- enemies=0 hooks=0
+[2026-06-02T00:54:10.720Z] [player] investigate ancient grand spire capacitor
+[2026-06-02T00:54:03.444Z] [reward] ✦ Resurrection. Merlyn returns to Tartaria, restored. The Aetherstone hums in recognition.
+[2026-06-02T00:54:03.442Z] [world] Halem the Trader is still at their post — pack open, wares laid out. They nod without looking up.
+[2026-06-02T00:54:03.442Z] [world] [Varakush] north: Tartarian Outskirts (16 days' travel) · east: Varakush (a day's travel) · south: open ground · west: Grand Spire of Etheria (38 days' travel)
+[2026-06-02T00:54:03.424Z] [system] Weather effect — Eerie Calm: +1 WIS
+[2026-06-02T00:54:03.423Z] [world] Paths: north to Sanctum · east to Armory · west to Refectory. (Type 'leave outpost' to head into the wilds.)
+[2026-06-02T00:54:03.423Z] [world] You've stood here before. (visit 2)
+[2026-06-02T00:54:03.423Z] [world] Order Cloister — The Threshold. A vestibule of vault-stone and silent bookshelves. The Order brother at the desk marks your name in a ledger he will not show you.
+[2026-06-02T00:50:19.932Z] [system] Merlyn has fallen. A Resurrection Gem from the title screen can bring them back.
+[2026-06-02T00:50:19.932Z] [combat] Merlyn does not rise. The ruins remember another.
+[2026-06-02T00:50:19.932Z] [combat] Mud Wasp deals 4 damage. You fall.
+[2026-06-02T00:50:19.895Z] [combat] Mud Wasp — d20 → 11 + ATK 4 = 15 vs your AC 11 — ✓ HIT
+[2026-06-02T00:50:19.895Z] [combat] Clean hit with the pyric wand for 3. Mud Wasp has 1 left and does not back away.
+[2026-06-02T00:50:19.894Z] [combat] You — d20 → 7 + INT 10 + 2 (point blank) = 19 vs Mud Wasp AC 8 — ✓ HIT
+[2026-06-02T00:50:19.894Z] [world] Mud Wasp moves first. The pressure is immediate.
+[2026-06-02T00:50:16.061Z] [cognitive] AGGRESSION · ATTACK · AIM · THROW  (22ms)
+[2026-06-02T00:50:16.038Z] [system] ⏳ Time passed: 6 min
+[2026-06-02T00:50:16.038Z] [world] You commit forward with the pyric wand. Mud Wasp watches your hands.
+[2026-06-02T00:50:16.037Z] [debug] attack: target=Mud Wasp range=arm reach.bands=[arm,close,far] reach.label=Pyric Wand bareHand=false
+[2026-06-02T00:50:16.037Z] [debug] parser: intent=attack conf=1.00 verb=attack target=pyric wand resolved=Pyric Wand range=arm enemies=1 hooks=1
+[2026-06-02T00:50:16.037Z] [player] attack with the pyric wand
+[2026-06-02T00:50:15.297Z] [cognitive] neutral  (52ms)
+[2026-06-02T00:50:15.243Z] [arbiter] The Arbiter does not look away from the mud wasp. "Decide quickly. It already has."
+[2026-06-02T00:50:15.243Z] [world] You're already poised to parry — no need to spend another beat on it.
+[2026-06-02T00:50:15.242Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=arm enemies=1 hooks=1
+[2026-06-02T00:50:15.242Z] [player] dodge
+[2026-06-02T00:50:15.229Z] [system] dodging (parry) fades.
+[2026-06-02T00:50:15.228Z] [system] poisoned fades.
+[2026-06-02T00:50:13.008Z] [combat] Mud Wasp — d20 → 4 + ATK 4 = 8 vs your AC 11 — ✗ MISS
+[2026-06-02T00:50:13.008Z] [combat] Mud Wasp reads the swing and twists clear — the blow finds nothing. (dodged, quick)
+[2026-06-02T00:50:13.008Z] [combat] You — d20 → 15 + INT 10 + 2 (point blank) = 27 vs Mud Wasp AC 8 — ✓ HIT
+[2026-06-02T00:50:13.007Z] [world] Mud Wasp moves first. The pressure is immediate.
+[2026-06-02T00:50:08.956Z] [cognitive] AGGRESSION · ATTACK · AIM · THROW  (31ms)
+[2026-06-02T00:50:08.924Z] [system] ⏳ Time passed: 6 min
+[2026-06-02T00:50:08.924Z] [world] The pyric wand is already moving when Mud Wasp sees it coming.
+[2026-06-02T00:50:08.922Z] [debug] attack: target=Mud Wasp range=arm reach.bands=[arm,close,far] reach.label=Pyric Wand bareHand=false
+[2026-06-02T00:50:08.922Z] [debug] parser: intent=attack conf=1.00 verb=attack target=pyric wand resolved=Pyric Wand range=arm enemies=1 hooks=1
+[2026-06-02T00:50:08.921Z] [player] attack with the pyric wand
+[2026-06-02T00:50:08.876Z] [system] dodging (parry) fades.
+[2026-06-02T00:50:08.875Z] [system] poisoned fades.
+[2026-06-02T00:50:07.875Z] [cognitive] neutral  (51ms)
+[2026-06-02T00:50:07.822Z] [combat] Mud Wasp — d20 → 1 + ATK 4 = 5 vs your AC 11 — ✗ FUMBLE
+[2026-06-02T00:50:07.821Z] [world] You set your stance. The next Mud Wasp swing — you intend to turn into your own.
+[2026-06-02T00:50:07.821Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=arm enemies=1 hooks=1
+[2026-06-02T00:50:07.820Z] [player] dodge
+[2026-06-02T00:50:04.656Z] [combat] Mud Wasp — d20 → 6 + ATK 4 = 10 vs your AC 11 — ✗ MISS
+[2026-06-02T00:50:04.655Z] [combat] Mud Wasp takes 3 with the pyric wand. It reels: 4 left. Then it fights back.
+[2026-06-02T00:50:04.655Z] [combat] You — d20 → 18 + INT 10 + 2 (point blank) = 30 vs Mud Wasp AC 8 — ✓ HIT
+[2026-06-02T00:50:04.655Z] [world] Mud Wasp moves first. The pressure is immediate.
+[2026-06-02T00:50:00.005Z] [cognitive] AGGRESSION · ATTACK · AIM · THROW  (21ms)
+[2026-06-02T00:49:59.983Z] [system] ⏳ Time passed: 6 min
+[2026-06-02T00:49:59.983Z] [world] The pyric wand is already moving when Mud Wasp sees it coming.
+[2026-06-02T00:49:59.982Z] [debug] attack: target=Mud Wasp range=arm reach.bands=[arm,close,far] reach.label=Pyric Wand bareHand=false
+[2026-06-02T00:49:59.982Z] [debug] parser: intent=attack conf=1.00 verb=attack target=pyric wand resolved=Pyric Wand range=arm enemies=1 hooks=1
+[2026-06-02T00:49:59.981Z] [player] attack with the pyric wand
+[2026-06-02T00:49:59.007Z] [cognitive] DISENGAGE  (59ms)
+[2026-06-02T00:49:58.946Z] [combat] Mud Wasp — d20 → 2 + ATK 4 = 6 vs your AC 11 — ✗ MISS
+[2026-06-02T00:49:58.945Z] [world] You close the gap with Mud Wasp. (range: arm's reach)
+[2026-06-02T00:49:58.945Z] [debug] move: range close -> arm
+[2026-06-02T00:49:58.944Z] [debug] move: advance from range=close enemies=1 weather=Black Rain cost=1 partial=0
+[2026-06-02T00:49:58.943Z] [arbiter] The Arbiter nods at the distance. "Bare hands needs arm's reach — closing the gap for you."
+[2026-06-02T00:49:58.943Z] [debug] attack: target=Mud Wasp range=close reach.bands=[arm] reach.label=Bare hands bareHand=true
+[2026-06-02T00:49:58.942Z] [debug] parser: intent=attack conf=1.00 verb=punch target=- resolved=- range=close enemies=1 hooks=1
+[2026-06-02T00:49:58.942Z] [player] punch
+
+=== END REPORT ===
