@@ -28398,6 +28398,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // A caller from before this ships says "not recorded" rather than zeroes, which
 // would read as a device with no saves.
 export const OTA_BUILD_ID = '2026-09-06-1719-the-missing-row-says-why';
+// golem catch-up 2026-09-06: markerless publish of OTA-1719 - the missing row
+// says why. The SEND FULL LOG row explains its own absence, and every report
+// carries what the report screen could see. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-06-1718-the-keyboard-ate-send';
 // golem catch-up 2026-09-06: markerless publish of OTA-1718 - the keyboard ate
 // the send button. Report A Bug, Designer Note, Invite a Playtester and both
