@@ -102,6 +102,23 @@ the ARBITER knows, not for what the engine does.
 
 ## Playtest-log triage
 
+**⚠⚠⚠ READ THE OWNER'S OWN COMMENTS FIRST — BEFORE ANY OTHER PASS.** Owner
+directive, 2026-09-06: *"the main thing from the logs that I push first should
+always be my comments of game issues or changes. so always look for my comments
+first."* He types into the game WHILE playing, and those lines are the reason
+the log was pushed at all. They live in three places, all of which must be read
+before the arithmetic:
+
+  1. the bug report's `--- DESCRIPTION ---` block (the words he typed on the
+     report screen);
+  2. the `feedback` channel — DESIGNER NOTE entries, dictated or typed mid-play;
+  3. any `[player]` notation in the game log itself.
+
+Enumerate every one of them, verbatim, and answer each explicitly. A log pass
+that opens with combat arithmetic and never quotes what he actually wrote has
+buried the payload under the packaging — and a comment he had to repeat because
+it was missed costs him a whole round trip.
+
 When the owner pastes a device log (the `=== TARTARIA LOG · PART N ===`
 envelope): DIAGNOSE FIRST. Produce observations — bugs, exploits, balance
 evidence, lore/narration incoherence, things working as intended — and do
