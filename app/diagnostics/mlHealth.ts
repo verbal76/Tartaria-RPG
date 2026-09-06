@@ -146,6 +146,23 @@ const KEY_QWEN_RETRY_PENDING = 'tartaria.ml.qwenRetryPending';
 const KEY_QWEN_BACKOFF = 'tartaria.ml.qwenBackoffBoots';
 const QWEN_RETRY_BASE_BOOTS = 5;  // first cooldown after a disable
 const QWEN_RETRY_MAX_BOOTS = 40;  // cap — a bad device retries at most every 40 boots
+// ⚠⚠⚠ OTA-1705 — THE DEVICE TRIES AGAIN BY ITSELF. Owner: "devices should try
+// to reset the AI themselves periodically."
+//
+// OTA-414 built exactly this ladder for the COMPLETION guard — disable, cool
+// down N cold boots, spend ONE boot trying, then recover or relapse with a
+// doubling backoff — and the GENERAL init guard never got one. Before OTA-1704
+// that did not show, because a single past success exempted a device forever.
+// Now that the general guard genuinely benches a device, a phone that recovers
+// (an OS update, a lighter build, more free memory) would have sat on template
+// narration until somebody found RELOAD AI on the About screen. So the general
+// guard gets the same ladder on its OWN three keys — two state machines sharing
+// one set of keys is how you get a bug nobody can read.
+const KEY_GEN_RETRY_AT = 'tartaria.ml.genRetryAtBoot';
+const KEY_GEN_RETRY_PENDING = 'tartaria.ml.genRetryPending';
+const KEY_GEN_BACKOFF = 'tartaria.ml.genBackoffBoots';
+const GEN_RETRY_BASE_BOOTS = 5;
+const GEN_RETRY_MAX_BOOTS = 40;
 
 interface MLHealthState {
   lastAttemptAt: string | null;
@@ -190,6 +207,11 @@ interface MLHealthState {
   /** Cold boots until the next Qwen retry while disabled, or null when enabled /
    *  retrying this boot. */
   qwenNextRetryInBoots: number | null;
+  /** OTA-1705 — this boot is the general guard's amnesty run: the gate opens for
+   *  one session so a device that recovered can prove it. */
+  genRetryingThisBoot: boolean;
+  /** OTA-1705 — cold boots until the next amnesty, when one is scheduled. */
+  genNextRetryInBoots: number | null;
   /** arb129 — last-loaded Qwen native kernel variant (e.g. rnllama_v8_4_fp16_dotprod_i8mm)
    *  + the one-line CPU/SoC/kernel diagnostic, reported by LlamaRuntime after init.
    *  Persisted so the copyable bug report names the variant even after a crash. */
@@ -223,8 +245,11 @@ export async function loadMLHealth(): Promise<MLHealthState> {
   let qwenRetryAtStr: string | null = null;
   let qwenRetryPendingStr: string | null = null;
   let qwenBackoffStr: string | null = null;
+  let genRetryAtStr: string | null = null;
+  let genRetryPendingStr: string | null = null;
+  let genBackoffStr: string | null = null;
   try {
-    [attempted, succeeded, crashCountStr, disabledStr, completionInProgress, qwenCrashCountStr, qwenDisabledStr, ttsInProgress, ttsCrashCountStr, ttsDisabledStr, ttsCountBuildStr, bootCountStr, qwenRetryAtStr, qwenRetryPendingStr, qwenBackoffStr] = await Promise.all([
+    [attempted, succeeded, crashCountStr, disabledStr, completionInProgress, qwenCrashCountStr, qwenDisabledStr, ttsInProgress, ttsCrashCountStr, ttsDisabledStr, ttsCountBuildStr, bootCountStr, qwenRetryAtStr, qwenRetryPendingStr, qwenBackoffStr, genRetryAtStr, genRetryPendingStr, genBackoffStr] = await Promise.all([
       AsyncStorage.getItem(KEY_ATTEMPTED),
       AsyncStorage.getItem(KEY_SUCCEEDED),
       AsyncStorage.getItem(KEY_CRASH_COUNT),
@@ -240,6 +265,9 @@ export async function loadMLHealth(): Promise<MLHealthState> {
       AsyncStorage.getItem(KEY_QWEN_RETRY_AT),
       AsyncStorage.getItem(KEY_QWEN_RETRY_PENDING),
       AsyncStorage.getItem(KEY_QWEN_BACKOFF),
+      AsyncStorage.getItem(KEY_GEN_RETRY_AT),
+      AsyncStorage.getItem(KEY_GEN_RETRY_PENDING),
+      AsyncStorage.getItem(KEY_GEN_BACKOFF),
     ]);
   } catch {
     // AsyncStorage failed — defensive default to "all clean, attempt ML."
@@ -419,6 +447,57 @@ export async function loadMLHealth(): Promise<MLHealthState> {
     try { await AsyncStorage.removeItem(KEY_QWEN_RETRY_PENDING); } catch { /* ignore */ }
   }
 
+  // ⚠⚠ OTA-1705 — THE GENERAL GUARD'S OWN AMNESTY. Same shape as the ladder
+  // above, its own keys, and it reads the ONE condition that actually benches a
+  // device after OTA-1704: the general guard is disabled and no past success is
+  // still vouching for it. `genAmnesty` is what shouldAttemptQwen consults.
+  //
+  // ⚠ A success is not judged here. markMLInitSucceeded() zeroes crashCount and
+  // clears KEY_DISABLED the moment a load lands, so a recovered device simply
+  // stops meeting `benched` on the next boot and the pending flag is cleared
+  // below. Relapse is the case that needs the ladder, and it is the case that
+  // gets it: still benched with the flag set means the amnesty boot did not
+  // reach a success, so the backoff doubles.
+  let genRetryingThisBoot = false;
+  let genNextRetryInBoots: number | null = null;
+  {
+    const exemptBySuccess = !!succeeded && crashCount < QWEN_FAILURES_AFTER_SUCCESS_CEILING;
+    const benched = disabledByCrash && !exemptBySuccess;
+    const genPending = genRetryPendingStr === '1';
+    let genBackoff = Number.parseInt(genBackoffStr ?? '0', 10);
+    if (!Number.isFinite(genBackoff) || genBackoff < GEN_RETRY_BASE_BOOTS) genBackoff = GEN_RETRY_BASE_BOOTS;
+    if (!benched) {
+      // Healthy (or healed) — drop any pending flag so a later disable starts clean.
+      if (genPending) { try { await AsyncStorage.removeItem(KEY_GEN_RETRY_PENDING); } catch { /* ignore */ } }
+    } else if (genPending) {
+      // The amnesty boot ran and the device is STILL benched → relapse. Grow the
+      // backoff and push the next one out.
+      genBackoff = Math.min(genBackoff * 2, GEN_RETRY_MAX_BOOTS);
+      const at = bootCount + genBackoff;
+      try {
+        await AsyncStorage.setItem(KEY_GEN_BACKOFF, String(genBackoff));
+        await AsyncStorage.setItem(KEY_GEN_RETRY_AT, String(at));
+        await AsyncStorage.removeItem(KEY_GEN_RETRY_PENDING);
+      } catch { /* ignore */ }
+      genNextRetryInBoots = at - bootCount;
+    } else {
+      let at = Number.parseInt(genRetryAtStr ?? '0', 10);
+      if (!Number.isFinite(at) || at <= 0) {
+        at = bootCount + genBackoff;
+        try {
+          await AsyncStorage.setItem(KEY_GEN_RETRY_AT, String(at));
+          await AsyncStorage.setItem(KEY_GEN_BACKOFF, String(genBackoff));
+        } catch { /* ignore */ }
+      }
+      if (bootCount >= at) {
+        genRetryingThisBoot = true;
+        try { await AsyncStorage.setItem(KEY_GEN_RETRY_PENDING, '1'); } catch { /* ignore */ }
+      } else {
+        genNextRetryInBoots = at - bootCount;
+      }
+    }
+  }
+
   // OTA-413 — voice (TTS) completion-crash detection. If the TTS breadcrumb
   // survived to this boot, a voice utterance crashed the process last session.
   let ttsCrashCount = Number.parseInt(ttsCrashCountStr ?? '0', 10);
@@ -494,6 +573,8 @@ export async function loadMLHealth(): Promise<MLHealthState> {
     lastTtsOpBeforeCrash,
     ttsCountResetThisBoot,
     qwenRetryingThisBoot,
+    genRetryingThisBoot,
+    genNextRetryInBoots,
     qwenRecoveredThisBoot,
     qwenNextRetryInBoots,
     qwenVariant,
@@ -542,8 +623,14 @@ export function qwenGateReason(): string {
     return `loaded once on this install (${cached.lastSuccessAt}) but ${cached.crashCount} boots have attempted and failed since — past the ${QWEN_FAILURES_AFTER_SUCCESS_CEILING} that a past success buys`;
   }
   if (cached.lastSuccessAt) return `ok — ML has loaded on this install (last ${cached.lastSuccessAt})`;
+  if (cached.genRetryingThisBoot) {
+    return `retrying this session — the general guard is disabled (${cached.crashCount} boot crash${cached.crashCount === 1 ? '' : 'es'}) and this is its periodic attempt`;
+  }
   if (cached.disabledByCrash) {
-    return `never loaded on this install and the general boot guard is disabled (${cached.crashCount} boot crash${cached.crashCount === 1 ? '' : 'es'})`;
+    const when = cached.genNextRetryInBoots !== null
+      ? `; trying again on its own in ${cached.genNextRetryInBoots} launch${cached.genNextRetryInBoots === 1 ? '' : 'es'}`
+      : '';
+    return `never loaded on this install and the general boot guard is disabled (${cached.crashCount} boot crash${cached.crashCount === 1 ? '' : 'es'})${when}`;
   }
   return 'ok — never loaded on this install, general boot guard open';
 }
@@ -564,6 +651,8 @@ export function shouldAttemptQwen(): boolean {
   // only while the failures since that success stay under the ceiling; see the
   // constant for the iPhone that proved an unbounded exemption never lets go.
   if (cached?.lastSuccessAt && (cached.crashCount ?? 0) < QWEN_FAILURES_AFTER_SUCCESS_CEILING) return true;
+  // ⚠⚠ OTA-1705 — and this is the boot the device gets to prove it recovered.
+  if (cached?.genRetryingThisBoot) return true;
   // Never succeeded, or succeeded once and failed steadily since → honor the
   // general boot-resilience guard.
   return shouldAttemptMLInit();
@@ -742,6 +831,10 @@ export async function resetMLHealth(): Promise<void> {
       AsyncStorage.removeItem(KEY_QWEN_RETRY_AT),
       AsyncStorage.removeItem(KEY_QWEN_RETRY_PENDING),
       AsyncStorage.removeItem(KEY_QWEN_BACKOFF),
+      // OTA-1705 — and the general guard's ladder, so RELOAD AI really is a clean slate.
+      AsyncStorage.removeItem(KEY_GEN_RETRY_AT),
+      AsyncStorage.removeItem(KEY_GEN_RETRY_PENDING),
+      AsyncStorage.removeItem(KEY_GEN_BACKOFF),
     ]);
   } catch {
     // ignore
@@ -760,7 +853,26 @@ export async function resetMLHealth(): Promise<void> {
     cached.qwenRetryingThisBoot = false;
     cached.qwenRecoveredThisBoot = false;
     cached.qwenNextRetryInBoots = null;
+    cached.genRetryingThisBoot = false;
+    cached.genNextRetryInBoots = null;
   }
+}
+
+/**
+ * ⚠⚠ OTA-1705 — WHAT THIS DEVICE CAN CARRY, IN A SENTENCE A PLAYER READS.
+ * Owner, on the old iPhone: "if that phone doesn't have full capability make it
+ * know to the user somewhere." The health summary below is triage prose written
+ * for us; this is the one line written for THEM — what they are getting, why,
+ * and that the game is whole either way. Null when the device is running
+ * everything, so nothing is said when there is nothing to say.
+ */
+export function deviceCapabilityLine(): string | null {
+  if (!cached) return null;
+  if (shouldAttemptQwen()) return null;
+  const back = cached.genNextRetryInBoots !== null
+    ? ` The game will try it again on its own in ${cached.genNextRetryInBoots} launch${cached.genNextRetryInBoots === 1 ? '' : 'es'}, or you can force it now with RELOAD AI on the About screen.`
+    : ' You can try it again any time with RELOAD AI on the About screen.';
+  return `This device is running the Arbiter on written lines rather than the generative model — it could not be loaded here.${back} Nothing in the game is closed to you; only the phrasing is.`;
 }
 
 /**

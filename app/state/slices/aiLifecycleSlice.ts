@@ -36,7 +36,7 @@ import { cognitive, qwen } from '../../ai/engines';
  */
 import type { GameStore } from '../gameStore';
 // OTA-1704 — the crash guard's own answer, read at the one door every load uses.
-import { shouldAttemptQwen, qwenGateReason } from '../../diagnostics/mlHealth';
+import { shouldAttemptQwen, qwenGateReason, deviceCapabilityLine } from '../../diagnostics/mlHealth';
 
 /** The slice's public surface — exactly the store keys this file owns. */
 export interface AiLifecycleSlice {
@@ -146,6 +146,16 @@ export const createAiLifecycleSlice = (
           'debug',
           `qwen: SKIPPED — ${qwenGateReason()}. The Arbiter speaks templates; tap RELOAD AI on the About screen to try again.`,
         );
+      } catch { /* ignore */ }
+      // ⚠⚠ OTA-1705 — AND SAY IT WHERE THE PLAYER IS ACTUALLY LOOKING. The line
+      // above is the debug channel: it reaches us in a bug report and reaches the
+      // player nowhere. Owner: "if that phone doesn't have full capability make
+      // it know to the user somewhere." Once per session, on the system channel,
+      // in the player's language — bootQwen leaves the status on 'skipped', so
+      // every later call early-returns and this cannot repeat.
+      try {
+        const cap = deviceCapabilityLine();
+        if (cap) get().appendLog('system', cap);
       } catch { /* ignore */ }
       return;
     }

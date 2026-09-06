@@ -28181,7 +28181,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // The exemption is now bounded by the failures since that success, and
 // bootQwen — the one door the boot warms, the re-warm and the watchdog all
 // use — asks the gate before it allocates and leaves the watchdog unstarted.
-export const OTA_BUILD_ID = '2026-09-06-1704-the-guard-that-counts-is-the-guard-that-stops';
+// 2026-09-06 OTA-1705 — THE DEVICE TRIES AGAIN BY ITSELF. Owner: "devices
+// should try to reset the AI themselves periodically" and "if that phone
+// doesn't have full capability make it know to the user somewhere." OTA-1704
+// made the general init guard real, so it needed a way back that does not
+// depend on the player finding a button: it gets the boot-count amnesty
+// OTA-414 built for the completion guard — cool down, spend ONE boot trying,
+// recover or relapse with a doubling backoff to a 40-boot cap — on its own
+// three keys. And a benched device now says so once per session on the system
+// channel, in the player's language, with the countdown and RELOAD AI in it.
+export const OTA_BUILD_ID = '2026-09-06-1705-the-device-tries-again-by-itself';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-06-1704-the-guard-that-counts-is-the-guard-that-stops';
 // golem catch-up 2026-09-06: markerless publish of OTA-1704 - the guard that
 // counts is the guard that stops. A past model load no longer exempts a device
 // from the crash guard forever, and bootQwen asks the gate before it allocates.
