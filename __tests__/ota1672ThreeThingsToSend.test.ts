@@ -152,7 +152,16 @@ describe('OTA-1672 — ⚠⚠ the text box gates two of the three', () => {
   it('⚠⚠⚠ and it is not offered when there is no log to send', () => {
     // A row that promises a push it cannot perform is the claims-success-
     // without-checking class, on the one control a stuck player reaches for.
-    expect(MODAL.includes('{fullLogSlot !== null && (')).toBe(true);
+    // ⚠ OTA-1719 — was pinned as `{fullLogSlot !== null && (`. The claim here is
+    // unchanged and still true: the row is not OFFERED without a log behind it.
+    // What changed is that its absence now says so instead of rendering nothing,
+    // because a silently missing control cost a playtester report nobody could
+    // act on. The gate is the same gate; the else arm is a note, never a
+    // selectable row.
+    expect(MODAL.includes('{fullLogSlot !== null ? (')).toBe(true);
+    const elseArm = MODAL.slice(MODAL.indexOf(') : ('), MODAL.indexOf('{/* ⚠⚠⚠ OTA-1672 — NO TEXT BOX'));
+    expect(elseArm.includes('<SlotRow')).toBe(false);
+    expect(elseArm.includes('Send full log — not available here')).toBe(true);
   });
 
   it('the full-log push does not arrive with an empty description field', () => {

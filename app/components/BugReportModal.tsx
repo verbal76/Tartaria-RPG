@@ -57,7 +57,26 @@ interface Props {
     logSlot?: SlotSummary | null;
     description: string;
     mode: BugReportMode;
+    /** ⚠⚠⚠ OTA-1719 — WHAT THIS SCREEN COULD SEE WHEN THE PLAYER SENT. A tester
+     *  on a Pixel 10 Pro XL reported "Why don't I have the just send a log
+     *  option. On Android, only on apple" and I could not answer it: the row is
+     *  gated on a slot being resolvable, its absence rendered as nothing at all,
+     *  and the report carried no record of what the screen had been handed. So
+     *  the only evidence was a player saying a control was missing, which is not
+     *  something a source read can confirm or refute. This rides along on every
+     *  report from now on, so the next one answers the question itself. */
+    screen: ReportScreenState;
   }) => void;
+}
+
+/** ⚠⚠ OTA-1719 — the report screen's own view of the world, sent with the
+ *  report. Deliberately the RAW inputs rather than a verdict: `saveSlotsSeen`
+ *  is what the caller actually handed this modal, which is the number that
+ *  would have explained the Pixel report in one line. */
+export interface ReportScreenState {
+  saveSlotsSeen: number;
+  activeSlotKnown: boolean;
+  fullLogRowOffered: boolean;
 }
 
 /** ⚠⚠⚠ OTA-1672 — the sentinel for the third choice. Owner: *"it should just say
@@ -93,6 +112,14 @@ export function BugReportModal({ visible, slots, activeSlotId, onCancel, onSend 
 
   const isFullLog = selectedId === FULL_LOG;
 
+  // OTA-1719 — assembled once, read by the send and by the note below, so the
+  // line the player reads and the line the report carries cannot disagree.
+  const screen: ReportScreenState = {
+    saveSlotsSeen: slots.length,
+    activeSlotKnown: !!activeSlotId,
+    fullLogRowOffered: fullLogSlot !== null,
+  };
+
   // ⚠⚠⚠ THE TEXT GATE APPLIES TO THE DESCRIBED REPORTS ONLY, which is exactly
   // the line the owner drew: *"there should still be a text box gate on the send
   // button for general bugs or character bugs, because I need to know what
@@ -104,13 +131,13 @@ export function BugReportModal({ visible, slots, activeSlotId, onCancel, onSend 
   const handleSend = (): void => {
     if (!canSend) return;
     if (isFullLog) {
-      onSend({ slot: fullLogSlot, description: '', mode: 'fulllog' });
+      onSend({ slot: fullLogSlot, description: '', mode: 'fulllog', screen });
       return;
     }
     const slot = selectedId === 'general'
       ? null
       : slots.find((s) => s.slotId === selectedId) ?? null;
-    onSend({ slot, logSlot: fullLogSlot, description: description.trim(), mode: slot ? 'character' : 'general' });
+    onSend({ slot, logSlot: fullLogSlot, description: description.trim(), mode: slot ? 'character' : 'general', screen });
   };
 
   return (
@@ -196,17 +223,26 @@ export function BugReportModal({ visible, slots, activeSlotId, onCancel, onSend 
             that promises to send one and then cannot is the
             claims-success-without-checking defect this project has fixed
             repeatedly, and the sub-line NAMES whose log goes. */}
-        {fullLogSlot !== null && (
+        {fullLogSlot !== null ? (
           <SlotRow
             label="Send full log for analysis"
             sub={`${fullLogSlot.playerName}'s log · no description needed`}
             selected={isFullLog}
             onPress={() => setSelectedId(FULL_LOG)}
           />
-        )}
-        {slots.length === 0 && (
+        ) : (
+          // ⚠⚠⚠ OTA-1719 — IT SAYS WHY IT IS NOT HERE. This was `&&`, so when the
+          // row could not be offered it rendered NOTHING: a player who expected
+          // it had nothing to report but "it isn't there", and I had nothing to
+          // diagnose with. A missing control that explains itself turns the next
+          // report into evidence — the count below is the exact number that
+          // would have answered the Pixel report in one line.
           <Text style={styles.emptyHint}>
-            (no characters yet — only a general bug can be sent)
+            Send full log — not available here: this screen was handed{' '}
+            {screen.saveSlotsSeen} saved character{screen.saveSlotsSeen === 1 ? '' : 's'}
+            {screen.activeSlotKnown ? ' and knows which one you are playing' : ' and no active character'}.
+            {'\n'}It appears once there is a save whose log can be pushed. Send this
+            as a general bug and the report will carry these numbers.
           </Text>
         )}
       </View>

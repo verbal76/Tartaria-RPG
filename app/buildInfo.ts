@@ -28378,7 +28378,27 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // enumerated with its mechanism, and a new one fails the suite. The layout
 // arithmetic is a pure module, so "can the player reach SEND on an iPhone SE 3"
 // is run as a test on five device profiles rather than claimed.
-export const OTA_BUILD_ID = '2026-09-06-1718-the-keyboard-ate-send';
+// 2026-09-06 OTA-1719 - THE MISSING ROW SAYS WHY. A tester on a Pixel 10 Pro XL:
+// "Why don't I have the just send a log option. On Android, only on apple". I
+// could not answer it, and that - not the missing row - is what this fixes. The
+// SEND FULL LOG row is gated on a save whose log can be pushed, the gate was
+// written with &&, so an unsatisfied gate rendered NOTHING: the player has only
+// "it isn't there" to report, and the payload recorded the character, device,
+// pack and log while recording nothing about what the report screen itself had
+// been handed. The source read does not settle it either - that same report
+// carries a picked Slot ID, which the payload only prints when a character row
+// was chosen, so their list was NOT empty and the row should have rendered.
+// Absent, present-and-unnoticed, or absent on an earlier bundle are all still
+// live, and patching the gate on that evidence would be a fix for a cause nobody
+// has established. So the gate is untouched: the row now explains its own
+// absence with the count that separates those cases, and every report from here
+// carries a REPORT SCREEN block - saves seen, whether the active character was
+// known, whether the row was offered - above the device block, because a triager
+// reading "the control was missing" needs that before anything about the phone.
+// A caller from before this ships says "not recorded" rather than zeroes, which
+// would read as a device with no saves.
+export const OTA_BUILD_ID = '2026-09-06-1719-the-missing-row-says-why';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-06-1718-the-keyboard-ate-send';
 // golem catch-up 2026-09-06: markerless publish of OTA-1718 - the keyboard ate
 // the send button. Report A Bug, Designer Note, Invite a Playtester and both
 // naming modals stay actionable with the keyboard open; the card's ceiling is the

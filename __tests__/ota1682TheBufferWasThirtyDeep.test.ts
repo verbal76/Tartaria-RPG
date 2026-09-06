@@ -339,7 +339,13 @@ describe('OTA-1682 — ⚠⚠ a general report carries the last-played character
   });
 
   it('⚠⚠ the modal hands the general report the same slot a full push would carry, and the title screen passes it through', () => {
-    expect(MODAL.includes("onSend({ slot, logSlot: fullLogSlot, description: description.trim(), mode: slot ? 'character' : 'general' });")).toBe(true);
+    // ⚠ OTA-1719 appended `screen` to this call (what the report screen could
+    // see, so a "the control is missing" report can be diagnosed). The claim
+    // this test makes — the general report rides the same slot a full push
+    // would — is untouched, so it is pinned by its parts rather than by one
+    // exact line that any later field addition breaks again.
+    expect(MODAL.includes('onSend({ slot, logSlot: fullLogSlot, description: description.trim(),')).toBe(true);
+    expect(MODAL.includes("mode: slot ? 'character' : 'general', screen });")).toBe(true);
     expect(MODAL.includes('logSlot?: SlotSummary | null;')).toBe(true);
     const at = TITLE.indexOf('const sendBugReport = async (args: {');
     expect(TITLE.slice(at, at + 200).includes('logSlot?: SlotSummary | null;')).toBe(true);

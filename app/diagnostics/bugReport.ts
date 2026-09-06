@@ -171,6 +171,11 @@ export async function composeAndSendBugReport(args: {
    *  played, else the newest save); a general report rides the same answer and
    *  the report says whose it is. `slot` still wins when the player picked one. */
   logSlot?: SlotSummary | null;
+  /** ⚠⚠⚠ OTA-1719 — WHAT THE REPORT SCREEN COULD SEE. Optional, because the
+   *  older call sites are still valid and a report with no screen state is
+   *  better than no report; when it is absent the block below says so rather
+   *  than inventing zeroes, which would read as a device with no saves. */
+  screen?: { saveSlotsSeen: number; activeSlotKnown: boolean; fullLogRowOffered: boolean };
 }): Promise<BugReportOutcome> {
   const { slot } = args;
   const logSource: SlotSummary | null = slot ?? args.logSlot ?? null;
@@ -271,6 +276,20 @@ export async function composeAndSendBugReport(args: {
     ``,
     `--- DESCRIPTION ---`,
     description,
+    ``,
+    // ⚠⚠ OTA-1719 — ABOVE THE DEVICE BLOCK, because it explains the report
+    // screen itself and a triager reading "the control was missing" needs it
+    // before anything about the phone. A tester reported the full-log row absent
+    // on Android and present on iOS; the row is gated on a resolvable save, its
+    // absence rendered as nothing, and nothing in the payload recorded what the
+    // screen had been handed — so the claim could be neither confirmed nor
+    // refuted from here. It can now.
+    `--- REPORT SCREEN ---`,
+    args.screen
+      ? `  Saved characters this screen could see: ${args.screen.saveSlotsSeen}\n`
+        + `  Knew which character was being played: ${args.screen.activeSlotKnown ? 'yes' : 'no'}\n`
+        + `  "Send full log" row offered: ${args.screen.fullLogRowOffered ? 'yes' : 'NO — the row was not on screen'}`
+      : '  (not recorded — sent by a caller from before OTA-1719)',
     ``,
     `--- DEVICE / BUILD ---`,
     deviceBlock,
