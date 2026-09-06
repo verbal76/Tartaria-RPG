@@ -28260,6 +28260,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // inventing 29 of them - and it reads the acceptedAtCell the long-haul bonus
 // already prices, so the gate and the reward cannot disagree about the journey.
 export const OTA_BUILD_ID = '2026-09-06-1711-the-escort-has-to-go-somewhere';
+// golem catch-up 2026-09-06: markerless publish of OTA-1711 - the escort has to
+// go somewhere. An escort contract can no longer be handed back where it was
+// picked up, or couriered by runner. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-06-1710-the-ledger-is-audited';
 // golem catch-up 2026-09-06: markerless publish of OTA-1710 - the ledger is
 // audited. Step 3c: faction contracts get a probe set of their own, and the
