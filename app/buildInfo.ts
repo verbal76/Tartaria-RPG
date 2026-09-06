@@ -28417,6 +28417,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // across the kit. Third time this session that same silent-absence shape has cost
 // a report (OTA-1715 the dog, OTA-1719 the log row).
 export const OTA_BUILD_ID = '2026-09-06-1720-repair-my-kit';
+// golem catch-up 2026-09-06: markerless publish of OTA-1720 - repair my kit.
+// REPAIR MY KIT mends everything equipped in one tap, the tab badge counts the
+// kit instead of the loot pile, and a button that cannot be offered says what you
+// are short of. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-06-1719-the-missing-row-says-why';
 // golem catch-up 2026-09-06: markerless publish of OTA-1719 - the missing row
 // says why. The SEND FULL LOG row explains its own absence, and every report
