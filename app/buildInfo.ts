@@ -28191,6 +28191,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // three keys. And a benched device now says so once per session on the system
 // channel, in the player's language, with the countdown and RELOAD AI in it.
 export const OTA_BUILD_ID = '2026-09-06-1705-the-device-tries-again-by-itself';
+// golem catch-up 2026-09-06: markerless publish of OTA-1705 - the device tries
+// again by itself. The general model guard gets a periodic amnesty on its own
+// keys, and a benched device tells the player where it stands. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-06-1704-the-guard-that-counts-is-the-guard-that-stops';
 // golem catch-up 2026-09-06: markerless publish of OTA-1704 - the guard that
 // counts is the guard that stops. A past model load no longer exempts a device
