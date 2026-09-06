@@ -28171,7 +28171,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the hunt on when the wanderer died. Stage bodies now carry Enemy.stageKey
 // (the encounter key) and only a keyed body closes the stage; the deferred arm
 // stands the real pack up on the clear field. Contrary walker, harpy interrupted.
-export const OTA_BUILD_ID = '2026-09-06-1703-the-stage-counts-its-own-bodies';
+// 2026-09-06 OTA-1704 — THE GUARD THAT COUNTS IS THE GUARD THAT STOPS. The
+// owner's old iPhone (iOS 18.7.10) reported "auto-disabled after 8 crashes"
+// and loaded the 400MB model anyway, every session: shouldAttemptQwen let ONE
+// past success (2026-08-23, thirteen days earlier) exempt the device from the
+// general guard forever, and the settled-foreground re-warm called bootQwen
+// with no gate at all. 3.5s of blocking work and a doomed allocation per
+// session on a phone at the jetsam line; iOS killed it at voice:play:unload.
+// The exemption is now bounded by the failures since that success, and
+// bootQwen — the one door the boot warms, the re-warm and the watchdog all
+// use — asks the gate before it allocates and leaves the watchdog unstarted.
+export const OTA_BUILD_ID = '2026-09-06-1704-the-guard-that-counts-is-the-guard-that-stops';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-06-1703-the-stage-counts-its-own-bodies';
 // golem catch-up 2026-09-06: markerless publish of OTA-1703 - the stage counts
 // its own bodies. Escort bodies carry the encounter key; a same-named wanderer
 // no longer closes a spawn stage. hal took the marker.

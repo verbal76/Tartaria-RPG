@@ -49,7 +49,24 @@ describe('arb124 — Qwen false-disable recovery', () => {
     mockStore[K.succeeded] = '2026-06-10T22:38:19.323Z'; // proved it can load the model
     const g = await bootAndGates();
     expect(g.mlInit).toBe(false); // general guard is still disabled…
-    expect(g.qwen).toBe(true);    // …but Qwen no longer honors it (no real Qwen failure)
+    // ⚠⚠ PIN FLIPPED BY OTA-1704 — DELIBERATELY. arb124's exemption was
+    // unbounded, and the owner's old iPhone rode it into the ground: one
+    // success on 2026-08-23, eight failed boots after it, and the loader still
+    // allocating ~400MB every session against its own "auto-disabled" record
+    // until iOS killed the process. A past success now buys a bounded number of
+    // failures (QWEN_FAILURES_AFTER_SUCCESS_CEILING), and 74 is far past it.
+    // arb124's ACTUAL protection — a proven device riding OS-kill noise — is
+    // still tested, by the case directly below and by ota1704.
+    expect(g.qwen).toBe(false);
+  });
+
+  it('arb124 (bounded by OTA-1704) — a proven device under the ceiling still ignores the polluted counter', async () => {
+    mockStore[K.crash] = '3'; // OS-kill noise, not real Qwen failures
+    mockStore[K.disabled] = 'true';
+    mockStore[K.succeeded] = '2026-06-10T22:38:19.323Z';
+    const g = await bootAndGates();
+    expect(g.mlInit).toBe(false); // general guard still disabled…
+    expect(g.qwen).toBe(true);    // …and Qwen still overrides it, as arb124 intended
   });
 
   it('still benches Qwen when ML has NEVER succeeded (boot-resilience preserved)', async () => {

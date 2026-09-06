@@ -35,6 +35,8 @@ import { cognitive, qwen } from '../../ai/engines';
  * VALUE import from gameStore here would be one — see `app/ai/engines.ts`.
  */
 import type { GameStore } from '../gameStore';
+// OTA-1704 — the crash guard's own answer, read at the one door every load uses.
+import { shouldAttemptQwen, qwenGateReason } from '../../diagnostics/mlHealth';
 
 /** The slice's public surface — exactly the store keys this file owns. */
 export interface AiLifecycleSlice {
@@ -117,6 +119,36 @@ export const createAiLifecycleSlice = (
   async bootQwen() {
     const current = get().qwenStatus;
     if (current !== 'idle' && current !== 'failed') return;
+    // ⚠⚠⚠ OTA-1704 — THE GUARD THAT COUNTS HAS TO BE THE GUARD THAT STOPS, AND
+    // THIS IS THE DOOR EVERY LOAD COMES THROUGH.
+    //
+    // App.tsx checks `shouldAttemptQwen()` at its two boot warms. It does NOT
+    // check it at the settled-foreground re-warm — `qwen: re-warming after
+    // 8000ms settled foreground` then calls this function directly — and the
+    // watchdog's revival lands here too. On the owner's old iPhone that is the
+    // recurring ~400MB: the app is put away and brought back all day, and every
+    // return bought another doomed load of a model whose own health record read
+    // "auto-disabled after 8 crashes". One check here covers the boot warms, the
+    // re-warm and the watchdog at once, and it costs one cached boolean.
+    //
+    // ⚠ RELOAD AI still works: the About screen calls resetMLHealth() first,
+    // which zeroes the counters this reads, and an unloaded health cache reads
+    // as permissive — the gate can never be the reason a healthy device is
+    // benched.
+    //
+    // ⚠ And the early return leaves the watchdog UNSTARTED (it is started at the
+    // foot of this function and nowhere else), so a gated device stops asking
+    // entirely instead of retrying on a timer.
+    if (!shouldAttemptQwen()) {
+      set({ qwenStatus: 'skipped', qwenFraction: 0, qwenError: null });
+      try {
+        get().appendLog(
+          'debug',
+          `qwen: SKIPPED — ${qwenGateReason()}. The Arbiter speaks templates; tap RELOAD AI on the About screen to try again.`,
+        );
+      } catch { /* ignore */ }
+      return;
+    }
     set({ qwenStatus: 'downloading', qwenFraction: 0, qwenError: null });
     // ⚠⚠ OTA-1635 — SAY THAT THE LOAD STARTED, AND SAY IF IT NEVER ENDS. The
     // owner's 2026-09-03 session ran fifty minutes on template narration —

@@ -51,6 +51,36 @@ const KEY_SUCCEEDED = 'tartaria.ml.lastInitSuccess';
 const KEY_CRASH_COUNT = 'tartaria.ml.crashCount';
 const KEY_DISABLED = 'tartaria.ml.disabledByCrash';
 const MAX_CRASHES_BEFORE_DISABLE = 2;
+// ⚠⚠⚠ OTA-1704 — HOW MUCH ROPE ONE PAST SUCCESS BUYS.
+//
+// arb124 gave a device that has EVER loaded the model a permanent exemption
+// from the general boot guard, because that guard's "attempted, never recorded
+// a success" breadcrumb false-positives every time the OS kills the app
+// mid-load. Sound for the case it fixed. Wrong forever, and the owner's old
+// iPhone is the proof (2026-09-06 bundles #mtp4z19wukma / #mtp58dsz2z9x):
+//
+//     Status: auto-disabled after 8 crashes (template narration in use)
+//     Last init success: 2026-08-23T17:58:47.877Z      ← thirteen days earlier
+//     Last init attempt: 2026-09-06T01:32:39.497Z      ← forty-seven seconds earlier
+//     qwen: LOAD FAILED — Failed to load the model (after 3489ms; gguf 468.6MB)
+//
+// The app's own health said DISABLED and it loaded anyway, every session,
+// because one success in August exempted it in September. HAS LOADED IS NOT
+// CAN LOAD. Each attempt costs 3.5s of blocking work and a ~400MB allocation
+// on a 3GB phone already at the jetsam line, and the OS answered the way iOS
+// answers: it killed the process (crash ledger, 01:38:34, at voice:play:unload).
+// Owner: "a freeze that I had to do a hard reset on."
+//
+// So the exemption is now RENTED, not owned. `crashCount` is already exactly
+// "boots that attempted and never reached a success SINCE the last success" —
+// markMLInitSucceeded() zeroes it on every real load — so it is the honest
+// meter for whether the past success still describes this device. Three times
+// the general threshold of 2 is generous room for the OS-kill noise arb124
+// was protecting; past it, the device has told us eight different ways that it
+// cannot hold the model, and we stop asking. The way back is a real success
+// (which re-zeroes the count) or RELOAD AI on the About screen, which the skip
+// line names.
+const QWEN_FAILURES_AFTER_SUCCESS_CEILING = 6;
 
 // OTA-351 — Qwen COMPLETION-crash guard. The init guard above only catches
 // crashes during init. But on newer high-end ARM cores (e.g. Pixel 10 Pro XL /
@@ -506,6 +536,11 @@ export function qwenGateReason(): string {
   if (cached.qwenDisabledByCrash) {
     return `completion-crash guard tripped (${cached.qwenCompletionCrashCount} crash${cached.qwenCompletionCrashCount === 1 ? '' : 'es'} inside a Qwen completion)`;
   }
+  // ⚠ OTA-1704 — the exemption is bounded; say so, with both numbers, because
+  // this is the line the next bug report will be read for.
+  if (cached.lastSuccessAt && (cached.crashCount ?? 0) >= QWEN_FAILURES_AFTER_SUCCESS_CEILING) {
+    return `loaded once on this install (${cached.lastSuccessAt}) but ${cached.crashCount} boots have attempted and failed since — past the ${QWEN_FAILURES_AFTER_SUCCESS_CEILING} that a past success buys`;
+  }
   if (cached.lastSuccessAt) return `ok — ML has loaded on this install (last ${cached.lastSuccessAt})`;
   if (cached.disabledByCrash) {
     return `never loaded on this install and the general boot guard is disabled (${cached.crashCount} boot crash${cached.crashCount === 1 ? '' : 'es'})`;
@@ -525,8 +560,12 @@ export function shouldAttemptQwen(): boolean {
   // has EVER initialized successfully on this install, the device demonstrably
   // CAN load it — so don't let the polluted general counter permanently bench
   // Qwen. (markMLInitSucceeded also resets that counter on each success.)
-  if (cached?.lastSuccessAt) return true;
-  // Never succeeded → honor the general boot-resilience guard.
+  // ⚠⚠ OTA-1704 — bounded. A past success excuses the polluted general counter
+  // only while the failures since that success stay under the ceiling; see the
+  // constant for the iPhone that proved an unbounded exemption never lets go.
+  if (cached?.lastSuccessAt && (cached.crashCount ?? 0) < QWEN_FAILURES_AFTER_SUCCESS_CEILING) return true;
+  // Never succeeded, or succeeded once and failed steadily since → honor the
+  // general boot-resilience guard.
   return shouldAttemptMLInit();
 }
 
