@@ -516,7 +516,40 @@ export function CraftingScreen() {
     ).length;
     return { craft, recipes, aetheric };
   }, [player?.inventory]);
+  // ⚠⚠⚠ OTA-1720 — "EVERYTHING I NEED FOR THIS NEXT FIGHT". Owner: *"when you say
+  // repair all ready that also repairs stuff that I've scavenged off and killed
+  // enemies. I'm not going to use the seven cudgels that I'm going to repair by
+  // accident. what I'm really concerned about is everything that I'm going to
+  // wear into combat — all my gear, weapons and armor and shields and everything
+  // like that that is equipped on my body. that's the quick fix."*
+  //
+  // `worn` is already stamped on every row by wornInstanceIds (OTA-1094), and the
+  // tab's default sort axis already floats it — the number was simply never asked
+  // for. It costs one filter, and it is the only count on this screen that
+  // answers "am I about to walk into a fight in broken gear".
+  //
+  // ⚠ It INCLUDES the dog's vest and the golem's weapon (offInventoryRepairables
+  // stamps those `worn`). They are not on your body, but they are in the fight,
+  // and a button that mends your boots and leaves your dog's vest split is not
+  // the button he asked for.
   const repairReady = useMemo(() => repairable.filter((r) => r.available).length, [repairable]);
+  const repairEquippedReady = useMemo(
+    () => repairable.filter((r) => r.worn && r.available).length,
+    [repairable],
+  );
+  // ⚠⚠ WHAT IS WORN, DAMAGED, AND NOT AFFORDABLE — the honest reason a button is
+  // not offered. Owner: *"if you can't repair it cuz you don't have enough pieces
+  // then it shouldn't be highlighted."* Right, and the other half of that is that
+  // a control which simply vanishes teaches nobody anything; this is the same
+  // silent-absence defect OTA-1719 closed on the report screen.
+  const equippedShortOf = useMemo(() => {
+    const short = new Map<string, number>();
+    for (const r of repairable) {
+      if (!r.worn || r.available) continue;
+      for (const m of r.missing) short.set(m.name, (short.get(m.name) ?? 0) + m.short);
+    }
+    return [...short.entries()].map(([name, qty]) => `${qty}× ${name}`);
+  }, [repairable]);
   // OTA-1098 — what REPAIR ALL would actually touch: the READY rows in the
   // CURRENT view, in display order. Reading off repairableView (not repairable)
   // is what lets the search box act as the selection — filter to what you mean,
@@ -535,6 +568,16 @@ export function CraftingScreen() {
   // group into one card rather than spraying the log.
   const repairAllReady = () => {
     repairInventoryItems(repairReadyInView);
+  };
+  // OTA-1720 — same single code path, filtered to the kit. Order carries through
+  // from the view, so on the default EQUIPPED axis the gear you are standing in
+  // is mended first when materials run out partway.
+  const repairEquippedInView = useMemo(
+    () => repairableView.filter((r) => r.worn && r.available).map((r) => r.item.id),
+    [repairableView],
+  );
+  const repairKitNow = () => {
+    repairInventoryItems(repairEquippedInView);
   };
 
   // OTA-1102 — THE RUNNING MATERIAL BUDGET. This is the part that makes a repair
@@ -671,7 +714,11 @@ export function CraftingScreen() {
           accessibilityState={{ selected: tab === 'repair' }}
         >
           <Text style={[styles.tabBtnText, tab === 'repair' && styles.tabBtnTextActive]}>
-            REPAIR {repairReady > 0 ? `(${repairReady})` : ''}
+            {/* ⚠⚠ OTA-1720 — the badge counts what you are WEARING. It used to
+                count every affordable row, so seven scavenged cudgels made the
+                tab shout REPAIR (9) when nothing you fight in needed a thing.
+                A number that is mostly junk is a number you learn to ignore. */}
+            REPAIR {repairEquippedReady > 0 ? `(${repairEquippedReady})` : ''}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -977,19 +1024,55 @@ export function CraftingScreen() {
                 <Text style={styles.groupBarGoText}>⚒ REPAIR GROUP ({repairPlan.picked.length})</Text>
               </TouchableOpacity>
             </View>
-          ) : repairReadyInView.length > 0 ? (
-            <TouchableOpacity
-              style={styles.repairAllBtn}
-              activeOpacity={0.7}
-              onPress={() => repairAllReady()}
-              accessibilityRole="button"
-              accessibilityLabel={`Repair all ${repairReadyInView.length} ready ${repairReadyInView.length === 1 ? 'piece' : 'pieces'}${repairQuery.trim() ? ' matching your search' : ''}`}
-            >
-              <Text style={styles.repairAllText}>
-                ⚒ REPAIR ALL READY ({repairReadyInView.length}){repairQuery.trim() ? ' — matching search' : ''}
-              </Text>
-            </TouchableOpacity>
-          ) : null}
+          ) : (
+            <>
+              {/* ⚠⚠⚠ OTA-1720 — THE BUTTON HE ASKED FOR, and it leads. Everything
+                  you are wearing, wielding, or fighting beside, mended in one
+                  tap. The all-ready sweep stays underneath it, smaller and
+                  honestly labelled, because filtering by search and sweeping is
+                  still the right tool for a pack full of loot — it is just not
+                  the thing you reach for between fights. */}
+              {repairEquippedInView.length > 0 && (
+                <TouchableOpacity
+                  style={styles.repairAllBtn}
+                  activeOpacity={0.7}
+                  onPress={() => repairKitNow()}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Repair the ${repairEquippedInView.length} damaged ${repairEquippedInView.length === 1 ? 'piece' : 'pieces'} you have equipped, including your companions' gear`}
+                >
+                  <Text style={styles.repairAllText}>
+                    ⚒ REPAIR MY KIT ({repairEquippedInView.length}) — everything equipped
+                  </Text>
+                </TouchableOpacity>
+              )}
+              {/* Only offered when it would actually do MORE than the kit button,
+                  so the two never sit there as a redundant pair. */}
+              {repairReadyInView.length > repairEquippedInView.length && (
+                <TouchableOpacity
+                  style={styles.repairSweepBtn}
+                  activeOpacity={0.7}
+                  onPress={() => repairAllReady()}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Also repair the ${repairReadyInView.length - repairEquippedInView.length} damaged pieces you are not using${repairQuery.trim() ? ', matching your search' : ''}`}
+                >
+                  <Text style={styles.repairSweepText}>
+                    ⚒ repair everything listed ({repairReadyInView.length}) — includes {repairReadyInView.length - repairEquippedInView.length} you are not wearing{repairQuery.trim() ? ' · matching search' : ''}
+                  </Text>
+                </TouchableOpacity>
+              )}
+              {/* ⚠⚠ AND WHEN THERE IS NO BUTTON, IT SAYS WHY. This whole row used
+                  to render `null`: short on materials and the control simply was
+                  not there, which is the defect OTA-1719 closed on the report
+                  screen and OTA-1715 closed on the dog. */}
+              {repairReadyInView.length === 0 && repairableView.length > 0 && (
+                <Text style={styles.repairNothingReady}>
+                  {equippedShortOf.length > 0
+                    ? `Nothing can be mended yet — your equipped gear is short ${equippedShortOf.join(', ')}.`
+                    : 'Nothing listed can be mended yet — you are short the materials each piece asks for.'}
+                </Text>
+              )}
+            </>
+          )}
 
           <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
             {repairableView.length === 0 ? (
@@ -1390,6 +1473,21 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   repairAllText: { color: '#9ec96a', fontSize: 12, fontWeight: '700', letterSpacing: 1 },
+  // ⚠ OTA-1720 — the sweep is SECONDARY now: same green family, quieter frame and
+  // no fill, so the eye lands on the kit button first. It is still a real
+  // control, not a hint.
+  repairSweepBtn: {
+    borderColor: '#4a5a38',
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingVertical: 7,
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  repairSweepText: { color: '#7f9a5e', fontSize: 10, fontWeight: '600', letterSpacing: 0.5, textAlign: 'center' },
+  repairNothingReady: {
+    color: '#a89a7a', fontSize: 11, fontStyle: 'italic', marginBottom: 8, textAlign: 'center',
+  },
   // OTA-1102 — the repair group bar. Same trade-gold frame as the vendor's
   // group-sell bar (1122/1124) because it is the same gesture doing the same
   // job in a different room; it stacks rather than sits in one row because the

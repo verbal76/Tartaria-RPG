@@ -106,8 +106,14 @@ describe('OTA-1102 — the same grip as SELL and DROP', () => {
     expect(branch).toContain('REPAIR GROUP');
     // REPAIR ALL is the ELSE arm — it is not even rendered while a group is
     // open, so there is no second bulk button to fight the one you are building.
-    expect(branch).toContain(') : repairReadyInView.length > 0 ? (');
-    expect(branch).toContain('REPAIR ALL READY');
+    // ⚠ OTA-1720 — the else arm became a fragment (kit button + sweep + the
+    // short-of line). The claim is the same one: neither bulk button is rendered
+    // while a group is open, because they live in the arm the group branch is
+    // not taking.
+    expect(branch).toContain(') : (');
+    expect(branch).toContain('REPAIR MY KIT');
+    expect(branch.indexOf('REPAIR GROUP')).toBeLessThan(branch.indexOf('REPAIR MY KIT'));
+    expect(branch).toContain('repair everything listed');
   });
 
   it('the group reuses the single-row repair, not a second path', () => {

@@ -228,8 +228,16 @@ describe('OTA-1094 #3 — source locks on the lists that must not regress', () =
     // the group bar took this slot: `{repairSelectMode ? (bar) : readyInView > 0
     // ? (REPAIR ALL) : null}`. The guarded condition is unchanged — REPAIR ALL
     // still only exists when there is something ready to mend.
-    expect(src).toContain(') : repairReadyInView.length > 0 ? (');
-    expect(src).toMatch(/repairReadyInView\.length > 0 \? \([\s\S]{0,600}REPAIR ALL READY[\s\S]{0,400}\) : null\}/);
+    // ⚠ OTA-1720 — RETARGETED AGAIN. The else arm is now a fragment holding
+    // REPAIR MY KIT, the (secondary) all-ready sweep, and a line saying what you
+    // are short of when neither can be offered. The CLAIM is unchanged and is
+    // pinned on the guards themselves: each button exists only when it has
+    // something to do.
+    expect(src).toContain('{repairEquippedInView.length > 0 && (');
+    expect(src).toContain('{repairReadyInView.length > repairEquippedInView.length && (');
+    // The sweep's label spells out what it adds over the kit button, so nobody
+    // taps it expecting the quick fix and mends seven cudgels.
+    expect(src).toMatch(/repairReadyInView\.length > repairEquippedInView\.length && \([\s\S]{0,900}repair everything listed/);
   });
 
   it('the ★ worn marker still shows on EVERY axis, so gear stays findable after a re-sort', () => {

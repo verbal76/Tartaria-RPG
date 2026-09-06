@@ -28397,7 +28397,27 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // reading "the control was missing" needs that before anything about the phone.
 // A caller from before this ships says "not recorded" rather than zeroes, which
 // would read as a device with no saves.
-export const OTA_BUILD_ID = '2026-09-06-1719-the-missing-row-says-why';
+// 2026-09-06 OTA-1720 - REPAIR MY KIT. Owner: "when you say repair all ready that
+// also repairs stuff that I've scavenged off and killed enemies. I'm not going to
+// use the seven cudgels that I'm going to repair by accident. what I'm really
+// concerned about is everything that I'm going to wear into combat - all my gear,
+// weapons and armor and shields and everything equipped on my body. that's the
+// quick fix. get on it. I need that button." The data was already there:
+// wornInstanceIds has stamped `worn` on every repair row since OTA-1094 and the
+// tab already floats worn gear to the top - the ACTION on that set was the one
+// thing never built, so the screen could show you your kit and then only offer to
+// mend the whole pile. REPAIR MY KIT leads now; the all-ready sweep survives
+// underneath it, smaller, and is only offered when it would do more than the kit
+// button. It includes the dog's vest and the golem's weapon, which are not on
+// your body but are in the fight. The tab BADGE also counted the pile - seven
+// cudgels made it shout REPAIR (9) when nothing you fight in needed anything, and
+// a number that is mostly junk is a number you learn to ignore - so it counts the
+// kit now. And the third thing he named: a button that cannot be offered used to
+// render nothing at all. It says what your equipped gear is short of, summed
+// across the kit. Third time this session that same silent-absence shape has cost
+// a report (OTA-1715 the dog, OTA-1719 the log row).
+export const OTA_BUILD_ID = '2026-09-06-1720-repair-my-kit';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-06-1719-the-missing-row-says-why';
 // golem catch-up 2026-09-06: markerless publish of OTA-1719 - the missing row
 // says why. The SEND FULL LOG row explains its own absence, and every report
 // carries what the report screen could see. hal took the marker.
