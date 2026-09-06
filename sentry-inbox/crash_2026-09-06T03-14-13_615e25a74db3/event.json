@@ -1,0 +1,237 @@
+{
+  "id": "615e25a74db3480a91e80a13f279261a",
+  "groupID": "7709732459",
+  "eventID": "615e25a74db3480a91e80a13f279261a",
+  "projectID": "4511945117532160",
+  "size": 3147,
+  "entries": [
+    {
+      "data": {
+        "formatted": "Process died with no orderly exit while: tap \"inventory\""
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-06-1705-the-device-tries-again-by-itself",
+  "message": "Process died with no orderly exit while: tap \"inventory\"",
+  "title": "Process died with no orderly exit while: tap \"inventory\"",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "6534403145cf481eabdf2f9900954bf8",
+      "span_id": "9dedb3efba5b98a1",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "id": "1788664453632_native-death",
+    "lastAction": "tap \"inventory\"",
+    "lastRoom": "builders_survey_camp",
+    "lastScreen": "exploration",
+    "launchAfterOta": false,
+    "launchAgeMs": 14995,
+    "launchCtx": "o0/r0/l0/p0/dn0",
+    "nativeSdkSawCrash": "unknown",
+    "sinceBootMs": 14995,
+    "stack": "(none \u2014 the process died without one)"
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "Process died with no orderly exit while: tap \"inventory\""
+  },
+  "tags": [
+    {
+      "key": "build",
+      "value": "2026-09-06-1705-the-device-tries-again-by-itself"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-06-1705-the-device-tries-again-by-itself"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "native-death"
+    },
+    {
+      "key": "level",
+      "value": "fatal"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-06-1705-the-device-tries-again-by-itself"
+    },
+    {
+      "key": "stage",
+      "value": "mid-action"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    },
+    {
+      "key": "version",
+      "value": "4.32.11"
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-06T03:14:58.543676Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-06T03:14:13.632000Z",
+  "fingerprints": [
+    "7c380e83d7521cac43645921c2703ea5"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1957469127,
+    "commitCount": 1,
+    "data": {},
+    "dateCreated": "2026-09-06T02:59:24.528328Z",
+    "dateReleased": "2026-09-06T03:01:12.154611Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "8869ca46f3747e23849508f7d95cd6ddf2dbb12d",
+      "message": "[ota-hal] OTA-1705: the device tries again by itself\n\nOwner, after the old iPhone's logs: \"devices should try to reset the AI\nthemselves periodically\" and \"if that phone doesn't have full capability\nmake it know to the user somewhere.\"\n\nOTA-1704 made the general init guard real. Before it, one past success\nexempted a device forever, and that iPhone rode the exemption into eight\nfailed loads and a process kill. But a guard that genuinely benches a\ndevice needs a way back that does not depend on the player finding a\nbutton, and the general guard had none: RELOAD AI on the About screen, or\na success it was no longer allowed to attempt.\n\nSo it gets the ladder OTA-414 already built for the COMPLETION guard \u2014\ncool down N cold boots, spend exactly ONE boot trying, then recover or\nrelapse with a doubling backoff capped at 40 boots \u2014 on its OWN three\nkeys (genRetryAtBoot / genRetryPending / genBackoffBoots). Two state\nmachines sharing one set of keys is how you get a bug nobody can read.\n\nThe condition it watches is the one OTA-1704 actually benches on: the\ngeneral guard disabled AND no past success still vouching for it. A\nrecovery needs no judgement here \u2014 markMLInitSucceeded() zeroes the count\nand clears the disable the moment a load lands, so a healed device simply\nstops meeting that condition and the pending flag is dropped. Relapse is\nwhat needs the ladder and is what gets it.\n\nAND THE PLAYER IS TOLD. deviceCapabilityLine() is the one sentence\nwritten for them rather than for us \u2014 what the device is doing, when it\nwill try again on its own, that RELOAD AI forces it now, and that nothing\nin the game is closed to them, only the phrasing. It goes on the SYSTEM\nchannel from bootQwen's skip branch, once per session (the status is left\non 'skipped', so every later call early-returns), and it returns null on\na healthy device so nothing is said when there is nothing to say.\n\nSuite ota1705TheDeviceTriesAgainByItself: a benched device counts 5, 4,\n3, 2, 1 and takes its amnesty on the sixth boot with the gate open for\nthat session only; a failed amnesty relapses to a 10-boot backoff and the\ndoubling stops at the cap; an amnesty that loads heals the device and\nleaves nothing pending; the two ladders never touch each other's keys;\nRELOAD AI wipes the new ladder too; and the player's sentence carries the\ncountdown, the button and the reassurance, with a healthy device told\nnothing at all. The three existing health suites pass unchanged.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-06T02:57:17Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-06-1705-the-device-tries-again-by-itself",
+          "shortVersion": "tartaria@4.32.11+2026-09-06-1705-the-device-tries-again-by-itself",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-06T03:01:12.154611Z",
+          "dateCreated": "2026-09-06T02:59:24.528328Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155901289",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-06T03:01:12.446292Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-06-1705-the-device-tries-again-by-itself",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-06-1705-the-device-tries-again-by-itself",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-06-1705-the-device-tries-again-by-itself",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-06-1705-the-device-tries-again-by-itself)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": "bf4bf7c9e4854f21be640f16ebfcbfbf"
+}
