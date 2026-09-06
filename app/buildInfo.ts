@@ -28492,6 +28492,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // labels with skill annotations that nobody types, so requiring those to parse
 // would be a rule that fails on correct content. 36 checked, zero mismatches.
 export const OTA_BUILD_ID = '2026-09-06-1724-the-cards-own-title';
+// golem catch-up 2026-09-06: markerless publish of OTA-1724 - the card's own
+// title. "give ground" reaches the range-opening intent instead of the gifting
+// system, and a command-shaped card heading is now checked against its own
+// keywords. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-06-1723-the-kitchen-opens';
 // golem catch-up 2026-09-06: markerless publish of OTA-1723 - the kitchen opens.
 // Five new dishes made of what the ground actually drops (three need no water,
