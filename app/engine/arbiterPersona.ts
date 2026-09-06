@@ -38,7 +38,12 @@
 // conduct, not of a coin. Callers supply a rotation counter for variety; the
 // same state always yields the same line.
 import type { PlayerCharacter, WorldMemory } from './types';
-import { choiceKeys, optionById } from './storyForks';
+import { choiceKeys, optionById, forkById } from './storyForks';
+// ⚠ OTA-1716 — the roster, so a standing row can name WHO vouches for you or
+// wants you dead. `factionDisplayName` lives in contractRefusal, which imports
+// half the contract stack; this needs one name lookup, so it reads the roster
+// directly rather than dragging that in.
+import { FACTIONS } from './factions';
 import { pressureOf } from './pressure';
 import personaData from '../data/lore/arbiter-persona.json';
 
@@ -118,12 +123,36 @@ export interface RegardPart {
    *  wrong and what clears it (see npcMemory.wrongsLedger). Absent = a plain,
    *  flat row. */
   kind?: 'gifts' | 'wrongs';
+  /** ⚠⚠ OTA-1716 — WHAT THIS ROW IS, IN THE PLAYER'S OWN SHEET. Owner: *"in the
+   *  'what moved it' section... everything listed in it should be able to be
+   *  tapped on to see what it is. as of now, only wrongs and gifts do."* He is
+   *  right, and the two that did drill were the two that happened to own a
+   *  ledger — which made tappability an accident of implementation rather than
+   *  a promise. Every row now carries its own explanation, BUILT AT THE SAME
+   *  SITE AS ITS NUMBER from the same values, so the drill-down cannot drift
+   *  from the arithmetic the way a hand-written help screen would. Lines are
+   *  rendered in order; the first names the quantity, the last names the rule
+   *  and the cap. */
+  detail?: string[];
 }
 
 const FORK_REGARD: Record<string, number> = personaData.forkRegard as Record<string, number>;
 
 function clamp(v: number, lo: number, hi: number): number {
   return Math.max(lo, Math.min(hi, v));
+}
+
+/** OTA-1716 — a faction's own name for the two standing rows. Falls back to the
+ *  de-underscored id, which reads as the defect it would be. */
+function factionName(id: string | undefined): string {
+  if (!id) return 'someone';
+  return FACTIONS.find((f) => f.id === id)?.name ?? id.replace(/_/g, ' ');
+}
+
+/** OTA-1716 — "+4 each, to a ceiling of +12", written once so a row's rule and
+ *  its cap always agree with the clamp directly above it. */
+function ruleLine(per: string, cap: number): string {
+  return `${per} ${cap >= 0 ? `Ceiling +${cap}` : `Floor ${cap}`}.`;
 }
 
 /** The itemised opinion. Exported so the character sheet can render exactly
@@ -139,13 +168,24 @@ export function regardParts(
 
   // ── What you did to people ──
   let outstanding = 0, cleared = 0, gifts = 0;
+  // OTA-1716 — who each cleared debt was cleared WITH. Same pass, same numbers.
+  const clearedWith: string[] = [];
   for (const r of rels) {
     cleared += r.amendsCleared ?? 0;
+    if ((r.amendsCleared ?? 0) > 0) {
+      clearedWith.push(`${r.name}${r.role ? ` (${r.role})` : ''} — ${r.amendsCleared} cleared`);
+    }
     outstanding += Math.max(0, (r.wrongs ?? 0) - (r.amendsCleared ?? 0));
     gifts += (r.gifts ?? []).length;
   }
   if (outstanding > 0) parts.push({ label: `${outstanding} wrong${outstanding === 1 ? '' : 's'} still standing`, value: clamp(outstanding * -6, -24, 0), kind: 'wrongs' });
-  if (cleared > 0) parts.push({ label: `${cleared} debt${cleared === 1 ? '' : 's'} made good`, value: clamp(cleared * 4, 0, 12) });
+  if (cleared > 0) {
+    parts.push({
+      label: `${cleared} debt${cleared === 1 ? '' : 's'} made good`,
+      value: clamp(cleared * 4, 0, 12),
+      detail: [...clearedWith, ruleLine('A wrong you paid off at its holder\u2019s own counter. +4 each.', 12)],
+    });
+  }
   // ⚠ OTA-1161 — "things given away" → "gifts given". The owner's wording, and the
   // better one: "given away" reads as loss or charity when the mechanic is a gift
   // with a named recipient and a reaction. It is also the word every OTHER surface
@@ -158,25 +198,80 @@ export function regardParts(
 
   // ── What you carry ──
   const corruption = p.corruption ?? 0;
-  if (corruption > 40) parts.push({ label: 'the Aether is in you', value: clamp(-Math.floor((corruption - 40) / 10), -15, 0) });
+  if (corruption > 40) {
+    parts.push({
+      label: 'the Aether is in you',
+      value: clamp(-Math.floor((corruption - 40) / 10), -15, 0),
+      detail: [
+        `Corruption ${corruption}. Nothing counts until 40; you are ${corruption - 40} past it.`,
+        ruleLine('1 against you for every 10 over 40.', -15),
+      ],
+    });
+  }
   const menace = p.menace ?? 0;
-  if (menace >= 10) parts.push({ label: 'you rule by fear', value: clamp(-Math.floor(menace / 10), -12, 0) });
+  if (menace >= 10) {
+    parts.push({
+      label: 'you rule by fear',
+      value: clamp(-Math.floor(menace / 10), -12, 0),
+      detail: [`Menace ${menace}, earned by threat and by what you did in front of people.`,
+        ruleLine('1 against you for every 10.', -12)],
+    });
+  }
 
   // ── How the world reads you ──
   const standings = p.factionStanding ?? [];
   const best = standings.reduce((m, s) => Math.max(m, s.standing ?? 0), 0);
   const worst = standings.reduce((m, s) => Math.min(m, s.standing ?? 0), 0);
-  if (best >= 50) parts.push({ label: 'someone down here vouches for you', value: 6 });
-  if (worst <= -50) parts.push({ label: 'someone down here wants you dead', value: -6 });
+  // ⚠ OTA-1716 — "someone" is exactly the word the row could not previously
+  // cash. It can now: same reduce, carrying the id alongside the number.
+  const bestId = standings.find((x) => (x.standing ?? 0) === best)?.factionId;
+  const worstId = standings.find((x) => (x.standing ?? 0) === worst)?.factionId;
+  if (best >= 50) {
+    parts.push({
+      label: 'someone down here vouches for you',
+      value: 6,
+      detail: [`${factionName(bestId)} stands at +${best} with you.`,
+        'Any faction at +50 or better is worth +6. It does not stack.'],
+    });
+  }
+  if (worst <= -50) {
+    parts.push({
+      label: 'someone down here wants you dead',
+      value: -6,
+      detail: [`${factionName(worstId)} stands at ${worst} with you.`,
+        'Any faction at \u221250 or worse costs 6. It does not stack.'],
+    });
+  }
 
   // ── What you did with the past ──
   const tp = p.titleProgress;
   const loreRead = tp?.loreRead ?? 0;
-  if (loreRead >= 3) parts.push({ label: 'you read what the dead wrote', value: clamp(Math.floor(loreRead / 3), 0, 8) });
+  if (loreRead >= 3) {
+    parts.push({
+      label: 'you read what the dead wrote',
+      value: clamp(Math.floor(loreRead / 3), 0, 8),
+      detail: [`${loreRead} lore entries read.`,
+        ruleLine('+1 for every 3 \u2014 reading is free, so it saturates early.', 8)],
+    });
+  }
   const preserved = tp?.relicsPreserved ?? 0;
-  if (preserved > 0) parts.push({ label: `${preserved} relic${preserved === 1 ? '' : 's'} left where it stood`, value: clamp(preserved * 2, 0, 8) });
+  if (preserved > 0) {
+    parts.push({
+      label: `${preserved} relic${preserved === 1 ? '' : 's'} left where it stood`,
+      value: clamp(preserved * 2, 0, 8),
+      detail: [`${preserved} relic${preserved === 1 ? '' : 's'} you found and did not take.`,
+        ruleLine('+2 each.', 8)],
+    });
+  }
   const traded = tp?.relicsTraded ?? 0;
-  if (traded >= 2) parts.push({ label: `${traded} relics sold on`, value: clamp(-Math.floor(traded / 2), -8, 0) });
+  if (traded >= 2) {
+    parts.push({
+      label: `${traded} relics sold on`,
+      value: clamp(-Math.floor(traded / 2), -8, 0),
+      detail: [`${traded} relics sold across a vendor\u2019s table. The first one is free \u2014 he counts pairs.`,
+        ruleLine('1 against you for every 2.', -8)],
+    });
+  }
 
   // ── What you ANSWERED (Phase 3). The heaviest single input, deliberately:
   //    these are the only places the game ever asked you a question with no
@@ -194,14 +289,30 @@ export function regardParts(
     if (typeof d !== 'number' || d === 0) continue;
     const [forkId = '', optionId = ''] = key.split(':');
     const opt = optionById(forkId, optionId);
-    parts.push({ label: opt ? `your answer: ${opt.label}` : 'an answer he was standing there for', value: d });
+    const fork = forkById(forkId);
+    // ⚠ OTA-1716 — the row names the option; the drill names the QUESTION. A
+    // player reading "your answer: Sell the bundle to a Tomekeeper -5" months
+    // later has no way to recall what was being asked, which is the whole
+    // reason OTA-1085 itemised these in the first place.
+    parts.push({
+      label: opt ? `your answer: ${opt.label}` : 'an answer he was standing there for',
+      value: d,
+      detail: [
+        ...(fork ? [`${fork.title} \u2014 \u201c${fork.question}\u201d`] : []),
+        ...(opt ? [`You chose: ${opt.label}`] : []),
+        ...(opt?.hint ? [opt.hint] : []),
+        ...(opt?.epilogue ? [`On your ending screen: \u201c${opt.epilogue}\u201d`] : []),
+        'Asked once, answered once. Nothing here can be re-rolled or farmed.',
+      ],
+    });
   }
 
   // ── What you asked the mud for (Phase 4). He notices. ──
   const tier = pressureOf(p);
-  if (tier === 'bury_me') parts.push({ label: 'you asked for no mercy', value: 5 });
-  else if (tier === 'let_it_come') parts.push({ label: 'you asked for none of the easy road', value: 2 });
-  else if (tier === 'salvage') parts.push({ label: 'you came for the salvage', value: -2 });
+  const pressureWhy = 'Your difficulty choice, which you can ease at any time and never raise again. He respects the harder road and says so.';
+  if (tier === 'bury_me') parts.push({ label: 'you asked for no mercy', value: 5, detail: ['Pressure: BURY ME \u2014 the hardest setting in the game.', pressureWhy] });
+  else if (tier === 'let_it_come') parts.push({ label: 'you asked for none of the easy road', value: 2, detail: ['Pressure: LET IT COME.', pressureWhy] });
+  else if (tier === 'salvage') parts.push({ label: 'you came for the salvage', value: -2, detail: ['Pressure: SALVAGE \u2014 the gentlest setting.', pressureWhy] });
 
   return parts;
 }

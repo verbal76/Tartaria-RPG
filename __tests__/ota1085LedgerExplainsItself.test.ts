@@ -71,7 +71,15 @@ describe('OTA-1085 — every judged answer is its own named row', () => {
   it("the owner's mystery row now names the deed (sell_them, -5)", () => {
     const parts = regardParts(pc({ storyChoices: { missing_letters: 'sell_them' } } as never), wm());
     const rows = parts.filter((x) => /^your answer:/.test(x.label));
-    expect(rows).toEqual([{ label: 'your answer: Sell the bundle to a Tomekeeper', value: -5 }]);
+    expect(rows).toHaveLength(1);
+    // ⚠ OTA-1716 — was a whole-object deep equality, which broke the moment the
+    // row grew a `detail`. What this test is about is the LABEL and the VALUE:
+    // one row per judged answer, named with the words the player chose. The row
+    // now also opens into the question he was asked, which is the same argument
+    // this OTA made one level down — see ota1716.
+    expect({ label: rows[0]!.label, value: rows[0]!.value })
+      .toEqual({ label: 'your answer: Sell the bundle to a Tomekeeper', value: -5 });
+    expect(rows[0]!.detail!.join('\n')).toContain('What do you do with the fifth letter?');
   });
 
   it('an answer he does not judge (delta 0) adds no row', () => {

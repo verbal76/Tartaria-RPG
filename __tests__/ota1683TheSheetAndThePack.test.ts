@@ -152,10 +152,15 @@ describe('OTA-1683 — ⚠⚠ the wrongs row opens', () => {
     expect(wrongsLedger(null)).toEqual([]);
   });
 
-  it('the sheet drills the wrongs row on the gifts row\'s mechanism, and prints the rule', () => {
-    expect(SHEET.includes("const open = part.kind === 'gifts' ? giftsOpen : part.kind === 'wrongs' ? wrongsOpen : null;")).toBe(true);
+  it('the sheet drills the wrongs row, and prints the rule', () => {
+    // ⚠ OTA-1716 — the two hand-rolled booleans this used to pin (`giftsOpen` /
+    // `wrongsOpen`) are gone. Keeping a row tappable meant adding state and a
+    // branch per row, which is precisely why every OTHER row in the section
+    // stayed flat until the owner tapped it and reported it. One open-set keyed
+    // by row index replaced them; the wrongs LEDGER, which is what this test is
+    // actually about, is unchanged.
     expect(SHEET.includes("if (part.kind === 'wrongs') {")).toBe(true);
-    expect(SHEET.includes('setWrongsOpen((v) => !v)')).toBe(true);
+    expect(SHEET.includes('onPress={() => togglePart(i)}')).toBe(true);
     expect(SHEET.includes('spend {e.owed} TC at their counter to clear the next')).toBe(true);
     expect(SHEET.includes('{AMENDS_TC_PER_WRONG} TC per wrong')).toBe(true);
   });

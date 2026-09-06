@@ -100,12 +100,15 @@ export function CharacterScreen() {
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
   // OTA-848 — tap-to-expand: the AC breakdown, and which title's provenance is open.
   const [openTitle, setOpenTitle] = useState<string | null>(null);
-  // OTA-1161 — the gift ledger drills into the Arbiter's "N gifts given" row.
-  const [giftsOpen, setGiftsOpen] = useState(false);
-  // ⚠ OTA-1683 — the wrongs ledger drills into "N wrongs still standing". Owner:
-  // "when I tap on it, it doesn't expand to show what they are." It did not,
-  // because only the gifts row had ever been given a drill.
-  const [wrongsOpen, setWrongsOpen] = useState(false);
+  // ⚠⚠ OTA-1716 — ONE OPEN SET FOR THE WHOLE "WHAT MOVED IT" LIST. This was two
+  // hand-rolled booleans, one per row that happened to own a ledger (gifts,
+  // OTA-1161; wrongs, OTA-1683), which is why every OTHER row was flat: making a
+  // row tappable meant adding another piece of state and another branch, so it
+  // only ever happened when the owner reported the row he had just tapped.
+  // Keyed by row index, so a row is tappable because it EXISTS, not because
+  // somebody remembered it. Several can be open at once, as before.
+  const [openParts, setOpenParts] = useState<Record<number, boolean>>({});
+  const togglePart = (i: number) => setOpenParts((m) => ({ ...m, [i]: !m[i] }));
 
   if (!player) {
     return (
@@ -414,11 +417,14 @@ export function CharacterScreen() {
               {arbiter.parts.length > 0 && (
                 <View style={{ marginTop: 10 }}>
                   {arbiter.parts.map((part, i) => {
-                    // ⚠ OTA-1683 — TWO rows drill now, on one mechanism: the
-                    // gifts row (OTA-1161) and the wrongs row, which the owner
-                    // tapped and found flat. `open` is whichever ledger this row
-                    // owns; a row with no kind stays flat, as before.
-                    const open = part.kind === 'gifts' ? giftsOpen : part.kind === 'wrongs' ? wrongsOpen : null;
+                    // ⚠⚠⚠ OTA-1716 — EVERY ROW DRILLS. Owner: *"everything listed
+                    // in it should be able to be tapped on to see what it is. as
+                    // of now, only wrongs and gifts do."* Those two drilled
+                    // because they owned a ledger; the rest were flat because
+                    // nobody had written one. `regardParts` now ships a `detail`
+                    // with every number it produces, built from the same values,
+                    // so the drill-down cannot drift from the arithmetic.
+                    const open = openParts[i] ?? false;
                     const row = (
                       <View style={styles.kvRow}>
                         <Text style={styles.kvValue}>
@@ -427,7 +433,7 @@ export function CharacterScreen() {
                               identical to a flat one is a feature nobody finds. */}
                           {/* ⚠ OTA-1456 — was `›`, a THIRD pair on this screen. Same
                               vocabulary as everything else now: ▸ closed, ▾ open. */}
-                          {open !== null ? <Text style={styles.tapHint}>{open ? '  ▾' : '  ▸'}</Text> : null}
+                          <Text style={styles.tapHint}>{open ? '  ▾' : '  ▸'}</Text>
                         </Text>
                         <Text style={[styles.kvValue, { color: part.value >= 0 ? '#7a8a5a' : '#a85a3a' }]}>
                           {part.value >= 0 ? '+' : ''}{part.value}
@@ -437,10 +443,11 @@ export function CharacterScreen() {
                     if (part.kind === 'wrongs') {
                       return (
                         <View key={i}>
-                          <TouchableOpacity activeOpacity={0.7} onPress={() => setWrongsOpen((v) => !v)} accessibilityRole="button">
+                          <TouchableOpacity activeOpacity={0.7} onPress={() => togglePart(i)} accessibilityRole="button"
+                            accessibilityLabel={`${part.label}, ${part.value >= 0 ? '+' : ''}${part.value}. Tap to see what it is.`}>
                             {row}
                           </TouchableOpacity>
-                          {wrongsOpen && (
+                          {open && (
                             <View style={styles.giftLedger}>
                               {wrongs.length === 0
                                 ? <Text style={styles.kvSub}>Nothing recorded yet.</Text>
@@ -466,13 +473,37 @@ export function CharacterScreen() {
                         </View>
                       );
                     }
-                    if (part.kind !== 'gifts') return <View key={i}>{row}</View>;
+                    // ⚠ Every OTHER row: its own `detail`, in the same drawer
+                    // the two ledgers use, so the whole list reads as one
+                    // affordance rather than two special cases and a wall of
+                    // flat text. A row with no detail at all still opens and
+                    // says so — silence on tap is the defect being fixed.
+                    if (part.kind !== 'gifts') {
+                      return (
+                        <View key={i}>
+                          <TouchableOpacity activeOpacity={0.7} onPress={() => togglePart(i)} accessibilityRole="button"
+                            accessibilityLabel={`${part.label}, ${part.value >= 0 ? '+' : ''}${part.value}. Tap to see what it is.`}>
+                            {row}
+                          </TouchableOpacity>
+                          {open && (
+                            <View style={styles.giftLedger}>
+                              {(part.detail ?? []).length === 0
+                                ? <Text style={styles.kvSub}>He has not said more than this.</Text>
+                                : part.detail!.map((line, j) => (
+                                  <Text key={j} style={j === part.detail!.length - 1 ? styles.giftMeta : styles.giftLine}>{line}</Text>
+                                ))}
+                            </View>
+                          )}
+                        </View>
+                      );
+                    }
                     return (
                       <View key={i}>
-                        <TouchableOpacity activeOpacity={0.7} onPress={() => setGiftsOpen((v) => !v)} accessibilityRole="button">
+                        <TouchableOpacity activeOpacity={0.7} onPress={() => togglePart(i)} accessibilityRole="button"
+                            accessibilityLabel={`${part.label}, ${part.value >= 0 ? '+' : ''}${part.value}. Tap to see what it is.`}>
                           {row}
                         </TouchableOpacity>
-                        {giftsOpen && (
+                        {open && (
                           <View style={styles.giftLedger}>
                             {ledger.length === 0
                               ? <Text style={styles.kvSub}>Nothing recorded yet.</Text>

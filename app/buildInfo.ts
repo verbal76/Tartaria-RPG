@@ -28313,7 +28313,25 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // already uses. The latch now picks the WORDING, never whether to speak. Rides
 // along: the fifth "they" line, "before they is gone for good", in the first beat
 // of the bleed-out ladder - the class OTA-1714's scanner skipped, now instrumented.
-export const OTA_BUILD_ID = '2026-09-06-1715-the-dog-that-was-greyed-out';
+// 2026-09-06 OTA-1716 - EVERY ROW IN "WHAT MOVED IT" SAYS WHAT IT IS. Owner: "in
+// the 'what moved it' section of the expanded character screen, everything listed
+// in it should be able to be tapped on to see what it is. as of now, only wrongs
+// and gifts do." Those two were tappable not because anyone chose them but
+// because each happened to own a ledger, and each got its own useState boolean
+// and its own renderer branch when he tapped it and found it flat - so making a
+// row tappable was a bespoke job that only ever happened in response to a report.
+// Twelve kinds of row, two of them answering. Fixed where the NUMBER is made:
+// regardParts now returns a `detail` with every value it pushes, built at the
+// same site from the same variables, so the drill-down cannot drift from the
+// arithmetic the way a separately-written help screen would. The screen trades
+// its two booleans for one open-set keyed by row index, so a row is tappable
+// because it exists. The details earn the tap: "someone down here vouches for
+// you" names the faction and its standing, and an answer row quotes the question
+// he asked, the hint the option carried, and the sentence it bought on your
+// ending screen. A source instrument counts all 14 push sites and fails if one
+// arrives without a detail.
+export const OTA_BUILD_ID = '2026-09-06-1716-every-row-says-what-it-is';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-06-1715-the-dog-that-was-greyed-out';
 // golem catch-up 2026-09-06: markerless publish of OTA-1715 - the dog that was
 // greyed out forever. A healed dog now comes off the bench instead of staying
 // benched and refused for the rest of the save, and a benched dog answers every
