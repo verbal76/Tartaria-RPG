@@ -1,0 +1,242 @@
+{
+  "id": "86d8177a36f64d1293721c1fb7a87b0b",
+  "groupID": "7700061579",
+  "eventID": "86d8177a36f64d1293721c1fb7a87b0b",
+  "projectID": "4511945117532160",
+  "size": 3310,
+  "entries": [
+    {
+      "data": {
+        "formatted": "Process died with no orderly exit while: (no action yet)"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-06-1714-the-dog-is-called-they",
+  "message": "Process died with no orderly exit while: (no action yet)",
+  "title": "Process died with no orderly exit while: (no action yet)",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db97:b688:ad2:ae57:4e30:9faa",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "4bfb100b4a614d87b4461118f6403652",
+      "span_id": "93823f823e51421a",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "actionAgeMs": 98853,
+    "id": "1788716748683_native-death",
+    "lastAction": "(no action yet)",
+    "lastPhase": "native:cognition:done",
+    "lastPhaseAgeMs": 0,
+    "lastPhaseDetail": "q0",
+    "launchAfterOta": true,
+    "launchAgeMs": 98905,
+    "launchCtx": "o0/r0/l0/p0/dn0",
+    "launchOtaGapMs": 185,
+    "launchOtaPath": "boot-front",
+    "launchPrevCtx": "o0/r0/l0/p0/dn0",
+    "nativeSdkSawCrash": "unknown",
+    "sinceBootMs": 98905,
+    "stack": "(none \u2014 the process died without one)"
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "Process died with no orderly exit while: (no action yet)"
+  },
+  "tags": [
+    {
+      "key": "build",
+      "value": "2026-09-06-1714-the-dog-is-called-they"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-06-1714-the-dog-is-called-they"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "native-death"
+    },
+    {
+      "key": "level",
+      "value": "fatal"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-06-1714-the-dog-is-called-they"
+    },
+    {
+      "key": "stage",
+      "value": "native:cognition:done"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db97:b688:ad2:ae57:4e30:9faa",
+      "query": "user.ip:\"2607:fb90:db97:b688:ad2:ae57:4e30:9faa\""
+    },
+    {
+      "key": "version",
+      "value": "4.32.11"
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-06T20:18:20.813147Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-06T17:45:48.683000Z",
+  "fingerprints": [
+    "28123d1e1fdb4dfb5fc06e893f9568a8"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1957899844,
+    "commitCount": 3,
+    "data": {},
+    "dateCreated": "2026-09-06T16:54:08.778353Z",
+    "dateReleased": "2026-09-06T16:56:05.938192Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "b65900e08db8cfc30f5cba7ae8d9116732173799",
+      "message": "[ota-hal] OTA-1714 \u2014 the dog is called \"they\"\n\nFrom the dog-system review.\n\nThe dog onboarding asks the player for its sex and accepts three answers, so\n`they` is a first-class option rather than an edge case \u2014 and anything the\nparser cannot read as he or she lands there too. The machinery for it is\ncomplete and correct: `applyDogPronouns` carries {object} for object slots and\n{verbS} / {verbES} for the plural verb, and most of the dog's 24 pronoun\ntemplates use them properly (\"Feed {object}, soon.\" has been right all along).\n\n\u26a0 FOUR LINES DID NOT, and they are the four a player reads while their dog is\nstarving or bleeding out \u2014 the moments the whole system exists for:\n\n    \"{Pronoun} {isOrAre} hungry \u2014 feed {pronoun} \u2026\"   \u2192  \"feed they\"\n    \"{Pronoun} needs food or a poultice, soon.\"        \u2192  \"They needs food\"\n    \"feed {object} now or {pronoun} does not see \u2026\"    \u2192  \"or they does not\"\n    \"One more empty day and {pronoun} walks.\"          \u2192  \"and they walks\"\n\nThe first is a CASE error \u2014 a subject pronoun standing in an object slot \u2014 and\nit reads badly for all three pronouns: \"feed he\", \"feed she\", \"feed they\". It is\nthe loyalty-50 beat, the first hunger warning anyone with a dog ever sees.\n\nThe other three are AGREEMENT errors that read correctly for he and she and\nbreak only for they. That is the quietest way for a defect like this to survive:\nit is invisible unless you play the option the game itself offered you, and it\nlands on the player in the middle of the dog's death clock.\n\n\u26a0 Found by review rather than by report, and confirmed in rendered output \u2014 the\ngame printed \"Cinder keeps eyeing your pack. They are hungry \u2014 feed they before\nthe bond frays.\" into a probe's feed while I was measuring something else.\n\nTwo instruments ship with it, both walking every pronoun template in the\ndog-bearing files rather than spot-checking: one fails on a subject pronoun in\nan object slot, the other on a subject pronoun followed by a hard-coded singular\nverb. Both assert the population they walk is non-empty first \u2014 a scanner\npointed at nothing passes forever, which is the mistake the faction probes made\none OTA ago when a reader was wired to the wrong store field.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-06T16:52:05Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-06-1714-the-dog-is-called-they",
+          "shortVersion": "tartaria@4.32.11+2026-09-06-1714-the-dog-is-called-they",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-06T16:56:05.938192Z",
+          "dateCreated": "2026-09-06T16:54:08.778353Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155976682",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-06T16:56:06.408879Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-06-1714-the-dog-is-called-they",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-06-1714-the-dog-is-called-they",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-06-1714-the-dog-is-called-they",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-06-1714-the-dog-is-called-they)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": "a8c7ca1666fe494a91a7205260f495d4"
+}
