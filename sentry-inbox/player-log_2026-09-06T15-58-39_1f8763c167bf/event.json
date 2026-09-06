@@ -1,0 +1,222 @@
+{
+  "id": "1f8763c167bf42c5bdda0682e626e248",
+  "groupID": "7715491334",
+  "eventID": "1f8763c167bf42c5bdda0682e626e248",
+  "projectID": "4511945117532160",
+  "size": 2819,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log-beacon 2026-09-06-1711-the-escort-has-to-go-somewhere #mtpzxvtgflmu"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-06-1711-the-escort-has-to-go-somewhere",
+  "message": "player-log-beacon 2026-09-06-1711-the-escort-has-to-go-somewhere #mtpzxvtgflmu",
+  "title": "player-log-beacon 2026-09-06-1711-the-escort-has-to-go-somewhere #mtpzxvtgflmu",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db97:b688:ad2:ae57:4e30:9faa",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "87152ca2409a4b10a25e29c357fc4a6a",
+      "span_id": "918cfc629604f1d0",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {},
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log-beacon 2026-09-06-1711-the-escort-has-to-go-somewhere #mtpzxvtgflmu"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtpzxvtgflmu"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-06-1711-the-escort-has-to-go-somewhere"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-beacon"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "parts",
+      "value": "9"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-06-1711-the-escort-has-to-go-somewhere"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db97:b688:ad2:ae57:4e30:9faa",
+      "query": "user.ip:\"2607:fb90:db97:b688:ad2:ae57:4e30:9faa\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-06T15:58:39.072181Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-06T15:58:39.730000Z",
+  "fingerprints": [
+    "725ff8270a34d356ef3723622ad3e468"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1957758428,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-06T13:14:54.857737Z",
+    "dateReleased": "2026-09-06T13:16:58.560577Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "52e078dd942f78c8b5c6ed880f260712987e0388",
+      "message": "[ota-hal] OTA-1711 \u2014 the escort has to go somewhere\n\nStep 3d. OTA-1710 audited the fetch counter, the staged beats and the wealth\ngate, and said out loud that ESCORT was not reached \u2014 29 of the 65 faction\ncontracts, the largest family in the game, whose ledger is a party of bodies\ntaking collateral damage across real fights rather than a number you can set.\n\n\u26a0 THE FIRST PROBE FOUND THAT THE WORK WAS OPTIONAL.\n\nAccept an escort from an agent, hand it straight back to THAT SAME AGENT\nwithout moving a step:\n\n    \u2726 Faction contract complete \u2014 The Survey Line. +70 TC, +8 rep.\n\nThe party spawns at full health, so the scaled-pay multiplier is 1, and nothing\non the turn-in path ever asked where anybody had been. `send word` did the same\nthing from anywhere on the map. Every one of the 29 could be closed for full\npay and full rep without escorting anyone anywhere.\n\nTwo refusals now, and both mirror rules this file already keeps:\n\n  \u00b7 YOU CANNOT COURIER PEOPLE. The clause beside it already refuses to mail a\n    FETCH deed because \"you cannot mail the goods\". An escort is the same\n    objection with more of it.\n\n  \u00b7 YOU CANNOT HAND A PARTY BACK ON THE SPOT YOU COLLECTED THEM FROM.\n\n\u26a0 THE RULE IS DELIBERATELY THE WEAKEST ONE THAT CLOSES IT. Every escort\nobjective reads \"escort them to a <faction> agent\" \u2014 not to a named place, and\nnone of the 29 carries a `targetLocationName` or an `objectiveLocationId`. So\nthere is no destination to check against, and inventing one would be redesigning\n29 contracts on my own authority. What can be said without inventing anything is\nthat the party has to have GONE somewhere.\n\nIt reads `acceptedAtCell`, which is already stamped at accept and already read\none line below the turn-in for the long-haul bonus \u2014 so it needs no new state,\nand the gate cannot disagree with the reward that prices the same walk. It FAILS\nOPEN on a contract accepted before this OTA: a save with no stamped cell\ndelivers exactly as it does today, because stranding a party the player is\nalready carrying would be a worse bug than the one being fixed.\n\nAnd the positive case is tested as hard as the refusal, because a rule that\ncloses an exploit by making 29 contracts unfinishable is not a fix: walk them to\na different cell and the contract completes and pays MORE than its base, since\nthe long-haul bonus reads the same journey. The refusal also leaves the contract\non the slate \u2014 refused, not failed. Nobody loses a party for asking too early.\n\n\u26a0 TWO THINGS THE AUDIT FOUND AND DID NOT CHANGE, both written into the suite.\n\nA DEAD POOL PAYS IN FULL on an all-or-nothing contract, because the pay code\nskips the scaling for that mode entirely and OTA-964's \"or lose everything when\nthe pool dies\" is not in that branch. It is UNREACHABLE IN PLAY \u2014 the only path\nthat damages a pool fails the contract the moment it hits zero and drops the\nrecord, so there is no contract left to hand in \u2014 and I did not rewrite pay code\non the strength of a state I had to build by hand. The unreachability is pinned\ninstead, so a future damage path that forgets to fail the quest gets named\nrather than quietly making the full payout reachable.\n\nPARKING PROTECTS THE PARTY BY DESIGN. `setFactionQuestActive(id, false)` parks\nthem \u2014 OTA-962's own words, \"off the HUD, no combat damage\" \u2014 so walking every\nfight with the party parked and delivering them pristine is currently the\noptimal play, and the collateral mechanic is opt-in. That is a balance call\nrather than a defect, so this OTA does not touch it; it is recorded because the\nalternative is that nobody notices until a player does. The delivery gate is\nunaffected either way: parked or not, they still have to have gone somewhere.\n\n\u26a0 AND IT MOVED WHAT \"COURIERABLE\" MEANS, which two suites caught. The audit\nharness accepts and hands in on the spot, so all 29 escorts failed it \u2014 fixed\nthe way that harness already handles a fetch requirement: satisfy the\nprecondition (stand the pickup cell elsewhere) rather than simulate the walk.\nAnd OTA-1403's `courierableDeed()` selected \"no fetch, no stages\", which is\nexactly the shape of an escort \u2014 EVERY stage-less, fetch-less contract in the\ncatalog is one, so that selector could now only pick something a runner may not\ncarry. What a runner can still carry is a staged deed whose work is behind it:\ngoods cannot be mailed, people cannot be mailed, and what is left is the\ncontract whose only remaining act is the word itself. That test's claim is\nuntouched; only the deed it is made on.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-06T13:12:42Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-06-1711-the-escort-has-to-go-somewhere",
+          "shortVersion": "tartaria@4.32.11+2026-09-06-1711-the-escort-has-to-go-somewhere",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-06T13:16:58.560577Z",
+          "dateCreated": "2026-09-06T13:14:54.857737Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155952250",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-06T13:16:58.906716Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-06-1711-the-escort-has-to-go-somewhere",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-06-1711-the-escort-has-to-go-somewhere",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-06-1711-the-escort-has-to-go-somewhere",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-06-1711-the-escort-has-to-go-somewhere)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": null
+}

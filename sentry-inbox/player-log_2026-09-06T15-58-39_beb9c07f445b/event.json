@@ -1,0 +1,253 @@
+{
+  "id": "beb9c07f445b4157958d06a2a6c5246d",
+  "groupID": "7715491277",
+  "eventID": "beb9c07f445b4157958d06a2a6c5246d",
+  "projectID": "4511945117532160",
+  "size": 16158,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-06-1711-the-escort-has-to-go-somewhere #mtpzxvtgflmu [inline 6/9]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-06-1711-the-escort-has-to-go-somewhere",
+  "message": "player-log 2026-09-06-1711-the-escort-has-to-go-somewhere #mtpzxvtgflmu [inline 6/9]",
+  "title": "player-log 2026-09-06-1711-the-escort-has-to-go-somewhere #mtpzxvtgflmu [inline 6/9]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db97:b688:ad2:ae57:4e30:9faa",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "87152ca2409a4b10a25e29c357fc4a6a",
+      "span_id": "918cfc629604f1d0",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "WzI-wMj-YtM-Dkt-MDZ-UMT-U6N-TY6-MTc-uMj-U1W-l0g-W2N-vbW-Jhd-F0g-Vm9-yb2-5vd-i1C-ZW5-lYX-RoI-Ehp-Z2g-gQ2-Fud-G9y-IOK-AlC-BkM-jAg-4oa-SID-E1I-Csg-QVR-LID-kgP-SAy-NCB-2cy-B5b-3Vy-IEF-DID-I0I-OKA-lCD-inJ-MgS-ElU-Cls-yMD-I2L-TA5-LTA-2VD-E1O-jU2-OjE-3Lj-E4N-Vpd-IFt-jb2-1iY-XRd-IFZ-vcm-9ub-3Yt-QmV-uZW-F0a-CBI-aWd-oIE-Nhb-nRv-ciB-wcm-Vzc-2Vz-IHR-oZS-BzZ-WNv-bmQ-gc3-Rya-Wtl-IOK-AlC-Bib-3Nz-ZXM-gZG-8gb-m90-IHl-pZW-xkI-HRo-ZSB-0ZW-1wb-y4K-WzI-wMj-YtM-Dkt-MDZ-UMT-U6N-TY6-MTY-uOD-QxW-l0g-W2N-vbW-Jhd-F0g-RG9-kZ2-Ug4-oCU-IGQ-yMC-Dih-pIg-MTU-gKy-BER-Vgg-MjM-gPS-AzO-CB2-cyB-BVE-sgM-jQu-IOK-cky-BZb-3Ug-c2x-pcC-B0a-GUg-YXJ-jIO-KAl-CBQ-RVJ-GRU-NUI-E9Q-RU5-JTk-cgK-G5l-eHQ-gc3-Rya-Wtl-IMO-XMi-Bka-WNl-KS4-K",
+      "WzI-wMj-YtM-Dkt-MDZ-UMT-U6N-TY6-MTY-uNz-cyW-l0g-W2N-vbW-Jhd-F0g-Vm9-yb2-5vd-i1C-ZW5-lYX-RoI-Ehp-Z2g-gQ2-Fud-G9y-IOK-AlC-BkM-jAg-4oa-SID-E1I-Csg-QVR-LID-kgP-SAy-NCB-2cy-B5b-3Vy-IEF-DID-I0I-OKA-lCD-inJ-cgR-VZB-REV-ECl-syM-DI2-LTA-5LT-A2V-DE1-OjU-2Oj-E2L-jU2-NVp-dIF-t3b-3Js-ZF0-gWW-91I-GNv-bW1-pdC-B0b-yB0-aGU-gZG-9kZ-2Uu-IFN-saX-AgV-m9y-b25-vdi-1CZ-W5l-YXR-oIE-hpZ-2gg-Q2F-udG-9yJ-3Mg-c3d-pbm-cgY-W5k-IHl-vdX-Igb-mV4-dCB-zdH-Jpa-2Ug-bGF-uZH-MgZ-G91-Ymx-lIO-KAl-CBy-ZWF-kIG-l0I-Hdy-b25-nIG-FuZ-CB5-b3U-gc2-ltc-Gx5-IHR-ha2-Ugd-Ghl-IGh-pdC-Bsa-Wtl-IGF-ueS-Bvd-Ghl-ciw-gbm-8gb-3Bl-bml-uZy-4K",
+      "WzI-wMj-YtM-Dkt-MDZ-UMT-U6N-TY6-MTY-uND-I2W-l0g-W2R-lYn-VnX-SBw-YXJ-zZX-I6I-Glu-dGV-udD-1kb-2Rn-ZSB-jb2-5mP-TEu-MDA-gdm-VyY-j1k-b2R-nZS-B0Y-XJn-ZXQ-9LS-ByZ-XNv-bHZ-lZD-0tI-HJh-bmd-lPW-Nsb-3Nl-IGV-uZW-1pZ-XM9-MSB-ob2-9rc-z0w-Cls-yMD-I2L-TA5-LTA-2VD-E1O-jU2-OjE-2Lj-M1N-lpd-IFt-wbG-F5Z-XJd-IGR-vZG-dlC-lsy-MDI-2LT-A5L-TA2-VDE-1Oj-U2O-jE2-LjE-2OF-pdI-Ftk-ZWJ-1Z1-0gd-Wk6-IHR-hcC-AiZ-G9k-Z2U-iIO-KPs-Ssx-OW1-zCl-syM-DI2-LTA-5LT-A2V-DE1-OjU-2Oj-EyL-jk0-OVp-dIF-tkZ-WJ1-Z10-gcm-VuZ-GVy-4o+-xID-QzO-W1z-IGF-mdG-VyI-GVu-Z2l-uZS-1kb-25l-IMK-3IG-ZlZ-WQg-NTA-wCg-==",
+      "WzI-wMj-YtM-Dkt-MDZ-UMT-U6N-TY6-MTI-uMz-YyW-l0g-W2N-vbW-Jhd-F0g-Vm9-yb2-5vd-i1C-ZW5-lYX-RoI-Ehp-Z2g-gQ2-Fud-G9y-IOK-AlC-BkM-jAg-4oa-SID-EwI-Csg-QVR-LID-kgP-SAx-OSB-2cy-B5b-3Vy-IEF-DID-I0I-OKA-lCD-inJ-cgT-UlT-Uwp-bMj-AyN-i0w-OS0-wNl-QxN-To1-Njo-xMi-4yO-TFa-XSB-bY2-9tY-mF0-XSB-Wb3-Jvb-m92-LUJ-lbm-Vhd-Ggg-SGl-naC-BDY-W50-b3I-gcH-Jlc-3Nl-cyB-0aG-Ugc-2Vj-b25-kIH-N0c-mlr-ZSD-igJ-QgY-m9z-c2V-zIG-RvI-G5v-dCB-5aW-VsZ-CB0-aGU-gdG-Vtc-G8u-Cls-yMD-I2L-TA5-LTA-2VD-E1O-jU2-OjE-yLj-IyM-1pd-IFt-jb2-1iY-XRd-IFZ-vcm-9ub-3Yt-QmV-uZW-F0a-CBI-aWd-oIE-Nhb-nRv-ciD-igJ-QgZ-DIw-IOK-Gki-AxM-SAr-IEF-USy-A5I-D0g-MjA-gdn-Mge-W91-ciB-BQy-AyN-CDi-gJQ-g4p-yXI-E1J-U1M-K",
+      "WzI-wMj-YtM-Dkt-MDZ-UMT-U6N-TY6-MTI-uMT-UyW-l0g-W3d-vcm-xkX-SBZ-b3U-gY2-xvc-2Ug-dGh-lIG-dhc-CB3-aXR-oIF-Zvc-m9u-b3Y-tQm-VuZ-WF0-aCB-IaW-doI-ENh-bnR-vci-4gK-HJh-bmd-lOi-Bjb-G9z-ZSA-vIG-Fyb-Sdz-IHJ-lYW-NoK-Qpb-MjA-yNi-0wO-S0w-NlQ-xNT-o1N-jox-Mi4-wOD-VaX-SBb-ZGV-idW-ddI-G1v-dmU-6IG-ZpZ-Wxk-IGF-kdm-FuY-2Ug-dGF-yZ2-V0P-VZv-cm9-ub3-YtQ-mVu-ZWF-0aC-BIa-Wdo-IEN-hbn-Rvc-iBk-IDE-uNT-AtP-jAu-NTA-gYm-FuZ-CBt-aWQ-tPm-Nsb-3Nl-Cls-yMD-I2L-TA5-LTA-2VD-E1O-jU2-OjE-xLj-k0O-Fpd-IFt-kZW-J1Z-10g-bW9-2ZT-ogY-WR2-YW5-jZS-Bmc-m9t-IHJ-hbm-dlP-W1p-ZCB-lbm-Vta-WVz-PTE-gd2-Vhd-Ghl-cj1-TaW-xlb-nQg-Qmx-pen-phc-mQg-Y29-zdD-0xI-HBh-cnR-pYW-w9M-Ao=",
+      "WzI-wMj-YtM-Dkt-MDZ-UMT-U6N-TY6-MTE-uOD-A3W-l0g-W2R-lYn-VnX-SBw-YXJ-zZX-I6I-Glu-dGV-udD-1hZ-HZh-bmN-lIG-Nvb-mY9-MS4-wMC-B2Z-XJi-PWF-wcH-JvY-WNo-IHR-hcm-dld-D12-b3J-vbm-92I-GJl-bmV-hdG-gga-Gln-aCB-jYW-50b-3Ig-cmV-zb2-x2Z-WQ9-Vm9-yb2-5vd-i1C-ZW5-lYX-RoI-Ehp-Z2g-gQ2-Fud-G9y-IHJ-hbm-dlP-W1p-ZCB-lbm-Vta-WVz-PTE-gaG-9va-3M9-MAp-bMj-AyN-i0w-OS0-wNl-QxN-To1-Njo-xMS-43M-zZa-XSB-bcG-xhe-WVy-XSB-hcH-Byb-2Fj-aCB-Wb3-Jvb-m92-LUJ-lbm-Vhd-Ggg-SGl-naC-BDY-W50-b3I-KWz-IwM-jYt-MDk-tMD-ZUM-TU6-NTY-6MT-EuN-TE4-Wl0-gW2-RlY-nVn-XSB-1aT-ogd-GFw-ICJ-hcH-Byb-2Fj-aCI-g4o-+xK-zE2-bXM-K",
+      "WzI-wMj-YtM-Dkt-MDZ-UMT-U6N-TY6-MDU-uND-kyW-l0g-W2R-lYn-VnX-SBk-ZWR-1cD-ogc-3Vw-cHJ-lc3-NlZ-CBh-cmJ-pdG-VyI-HJl-cGV-hdC-Dig-JQg-IkE-gcH-VyZ-SB0-b25-lIG-Zpb-Gxz-IHR-oZS-Bja-GFt-YmV-yIO-KAl-CBv-bmU-gY2-hvc-mQs-IGh-lbG-QsI-HRo-ZSB-raW-5kI-G9m-4oC-mIg-pbM-jAy-Ni0-wOS-0wN-lQx-NTo-1Nj-owN-S40-OTJ-aXS-BbY-XJi-aXR-lcl-0gQ-SBw-dXJ-lIH-Rvb-mUg-Zml-sbH-Mgd-Ghl-IGN-oYW-1iZ-XIg-4oC-UIG-9uZ-SBj-aG9-yZC-wga-GVs-ZCw-gdG-hlI-Gtp-bmQ-gb2-Ygc-291-bmQ-gdG-hhd-CBy-ZS1-hcn-Jhb-mdl-cyB-0aG-UgZ-HVz-dCB-pbi-B5b-3Vy-IGx-1bm-dzL-iBU-aGU-gVm-9yb-25v-di1-CZW-5lY-XRo-IEh-pZ2-ggQ-2Fu-dG9-yIH-N0Z-XBz-IGZ-yb2-0gd-Ghl-IEN-vcm-Unc-yBo-b3V-zaW-5nI-Glu-IHJ-vYm-VzI-HRo-ZSB-jb2-xvd-XIg-b2Y-gb2-xkI-Gdv-bGQ-sIG-Egd-HVu-aW5-nLW-Zvc-msg-dGh-lIG-xlb-md0-aCB-v",
+      "ZiB-5b3-VyI-GZv-cmV-hcm-0ga-W4g-b25-lIG-hhb-mQu-ICJ-UaG-UgT-3Jk-ZXI-gaG-FzI-Hdh-dGN-oZW-Qgd-Hdv-IEN-hcG-l0Y-Wxz-IGZ-hbG-wgd-G8g-eW9-1LC-Iga-GUg-c2F-5cy-wgd-m9p-Y2U-gYm-90a-CB1-bmh-1cn-JpZ-WQg-YW5-kIH-Zlc-nkg-Y2x-vc2-UuI-CJU-aGl-zIG-9uZ-SBk-b2V-zIG-5vd-CBm-YWx-sLi-BTd-GFu-ZCB-hbm-Qgc-HJv-dmU-gbW-Ugd-3Jv-bmc-sIG-9yI-HR1-cm4-gYW-5kI-Gxp-dmU-gYW-5vd-Ghl-ciB-ob3-VyL-iIK-WzI-wMj-YtM-Dkt-MDZ-UMT-U6N-TY6-MDU-uND-E5W-l0g-W2N-vbW-Jhd-F0g-Vm9-yb2-5vd-i1C-ZW5-lYX-RoI-Ehp-Z2g-gQ2-Fud-G9y-IGN-sb3-Nlc-yDi-gJQ-gVH-Vua-W5n-IEZ-vcm-sgQ-2hv-cmQ-gcm-VhZ-Hks-IDF-kMT-ArN-isx-ZDY-gZG-FtY-Wdl-IG9-uIG-Ega-Gl0-LCB-0d2-ljZ-SBw-ZXI-gcm-91b-mQu-ICh-yYW-5nZ-Tog-bWl-kKS-Dim-IUg-Q09-SRS-BHV-UFS-REl-BTg-o=",
+      "WzI-wMj-YtM-Dkt-MDZ-UMT-U6N-TY6-MDU-uMz-MyW-l0g-W3d-vcm-xkX-SBZ-b3U-gbG-F5I-GEg-aGF-uZC-Bvb-iB0-aGU-gY2-9sZ-CBD-b3J-lIH-NlY-XQg-YW5-kIG-Nhb-Gwg-aXR-zIE-d1Y-XJk-aWF-uIH-VwL-gpb-MjA-yNi-0wO-S0w-NlQ-xNT-o1N-jow-MS4-5OT-VaX-SBb-ZGV-idW-ddI-Ghv-bWV-3b3-JrO-iBp-dGV-tX2-Rlc-2Mg-Ik5-pbW-Fya-SBD-b3J-lIi-Din-JMg-NTg-yOG-1zC-lsy-MDI-2LT-A5L-TA2-VDE-1Oj-U2O-jAx-LjY-xNl-pdI-Ftk-ZWJ-1Z1-0gc-Xdl-buK-PsS-Bpd-GVt-X3N-5bn-RoZ-XNp-c19-ody-Bva-yA1-NDQ-xbX-Mgc-mVh-ZCA-zNz-I0b-XMv-d3J-pdG-UgM-TY4-Nm1-zIG-luI-DMz-MHT-ihp-Jvd-XQg-NTJ-0IG-pzL-Wxh-dGU-gOD-Y5b-XMg-dGh-yMS-AxM-S4z-bXM-vdC-AoM-Tkx-Y2g-pCg-==",
+      "WzI-wMj-YtM-Dkt-MDZ-UMT-U6N-TU6-NTg-uOT-kwW-l0g-W2R-lYn-VnX-SBw-ZXJ-zaX-N0I-HNp-emV-zKE-tCK-Tog-dG9-0YW-w9M-zYz-IHB-sYX-llc-j03-NSB-3bT-0xO-Tlb-cm9-vbX-M9M-TEz-IGV-2ZW-50c-z03-IG1-lbW-9zP-TEg-bnB-jcz-03I-GRl-ZmV-hdG-VkP-TEg-dGF-ncz-0xI-GRp-c2N-vdm-VyZ-WQ9-MV0-gbG-9nP-Tg3-IHN-jZW-5lP-TIK-WzI-wMj-YtM-Dkt-MDZ-UMT-U6N-TU6-NTE-uMj-Y0W-l0g-W3J-ld2-FyZ-F0g-4py-mIF-RoZ-SBm-b3J-naW-5nI-GZp-bml-zaG-VzI-OKA-lCB-0aG-UgQ-WV0-aGV-yIG-5hb-WVz-IGl-0IF-Rvb-3Ro-LVN-ldC-BXY-XJz-dGF-mZi-AoV-W5j-b21-tb2-4pL-go=",
+      "WzI-wMj-YtM-Dkt-MDZ-UMT-U6N-TU6-NTE-uMD-Q5W-l0g-W2R-lYn-VnX-SBx-d2V-u4o-+xI-GZv-cmd-lX2-5hb-WUg-b2s-gND-U3M-W1z-IHJ-lYW-QgM-jIx-Nm1-zL3-dya-XRl-IDI-zMj-Ftc-yBp-biA-yMT-B04-oaS-b3V-0ID-Yzd-CB0-aHI-yID-EwL-jZt-cy9-0IE-hJV-C1D-QVA-gKD-I0M-WNo-KQp-bMj-AyN-i0w-OS0-wNl-QxN-To1-NTo-0Ni-4yN-TZa-XSB-bd2-9yb-GRd-IFR-oZS-BDc-nVj-aWJ-sZS-Ble-Ghh-bGV-zIH-Nsb-3cu-IFR-oZS-Bza-GFw-ZSB-pcy-BzZ-XQs-IGJ-1dC-B0a-GUg-QWV-0aG-VyI-Ghh-c24-ndC-BuY-W1l-ZCB-pdC-B5Z-XQg-4oC-UIG-xld-CBp-dCB-maW-5pc-2gu-IFl-vdS-dsb-CBr-bm9-3IG-l0I-HRo-ZSB-tb2-1lb-nQg-aXQ-gYW-5ub-3Vu-Y2V-zIG-l0c-2Vs-Zi4-K",
+      "WzI-wMj-YtM-Dkt-MDZ-UMT-U6N-TU6-NDY-uMj-U2W-l0g-W3J-ld2-FyZ-F0g-4py-mIF-RoZ-SBD-cnV-jaW-JsZ-SBm-b3J-nZX-MgY-W4g-VW5-jb2-1tb-24g-cmV-hY2-ggd-2Vh-cG9-uIC-hta-WQg-cmF-uZ2-UgY-W5k-IGN-sb3-Nlc-ikg-ZnJ-vbS-B5b-3Vy-IHJ-lc2-Vyd-mVk-IHB-pZW-Nlc-yDi-gJQ-gYW-5kI-Gl0-J3M-gaW-4ge-W91-ciB-wYW-NrL-CBz-dGl-sbC-Bjb-29s-aW5-nLg-pbM-jAy-Ni0-wOS-0wN-lQx-NTo-1NT-o0N-i4y-NTR-aXS-Bbd-29y-bGR-dIF-lvd-SBz-ZXQ-geW-91c-iBy-ZXN-lcn-ZlZ-CBw-aWV-jZX-Mgb-24g-dGh-lIH-Roc-mVl-IHB-lZG-Vzd-GFs-cy4-gVG-hlI-ENy-dWN-pYm-xlI-HRh-a2V-zIH-RoZ-W0g-aW4-uCl-syM-DI2-LTA-5LT-A2V-DE1-OjU-1Oj-I2L-jAz-Nlp-dIF-tkZ-WJ1-Z10-gaG-9tZ-Xdv-cms-6IG-l0Z-W1f-ZGV-zYy-AiT-Gl0-YW5-5IE-dyZ-WF2-ZXM-iIO-Kck-yA0-ODk-3bX-MK",
+      "WzI-wMj-YtM-Dkt-MDZ-UMT-U6N-TU6-MjU-uOD-M5W-l0g-W2R-lYn-VnX-SBx-d2V-u4o-+xI-Gl0-ZW1-fc3-lud-Ghl-c2l-zX2-h3I-G9r-IDQ-2OD-dtc-yBy-ZWF-kID-M2N-jFt-cy9-3cm-l0Z-SA5-OTJ-tcy-Bpb-iAz-Mzh-04o-aSb-3V0-IDM-xdC-Bqc-y1s-YXR-lID-Y5M-W1z-IHR-ocj-EgM-TAu-OG1-zL3-QgK-DEy-MGN-oKQ-pbM-jAy-Ni0-wOS-0wN-lQx-NTo-1NT-oxN-i4w-NTV-aXS-Bbc-mV3-YXJ-kXS-Din-KYg-VGh-lIG-Zvc-mdp-bmc-gZm-lua-XNo-ZXM-g4o-CUI-HRo-ZSB-BZX-RoZ-XIg-bmF-tZX-Mga-XQg-Q29-iYm-xlL-VNl-dCB-CdW-x3Y-XJr-ICh-Vbm-Nvb-W1v-bik-uCg-==",
+      "WzI-wMj-YtM-Dkt-MDZ-UMT-U6N-TU6-MTU-uOD-MzW-l0g-W2R-lYn-VnX-SBx-d2V-u4o-+xI-GZv-cmd-lX2-5hb-WUg-b2s-gMj-g4O-G1z-IHJ-lYW-QgO-DYy-bXM-vd3-Jpd-GUg-MTk-5Nm-1zI-Glu-IDI-wNn-Tih-pJv-dXQ-gNj-N0I-Gpz-LWx-hdG-UgM-zQ4-bXM-gdG-hyM-iA0-LjJ-tcy-90I-EhJ-VC1-DQV-AgK-DIz-NmN-oKQ-pbM-jAy-Ni0-wOS-0wN-lQx-NTo-1NT-oxN-C44-MDF-aXS-Bbc-mV3-YXJ-kXS-BLb-3Jy-IFN-0b2-5lZ-m9v-dCB-maX-Jlc-yB1-cCB-hIH-Bvc-nRh-Ymx-lIE-Nyd-WNp-Ymx-lIG-Zvc-iB5-b3U-uIC-jii-JIy-NSB-UQy-kK",
+      "WzI-wMj-YtM-Dkt-MDZ-UMT-U6N-TU6-MTI-uNz-E3W-l0g-W3d-vcm-xkX-SBU-aGU-gQ3-J1Y-2li-bGU-gZX-hoY-Wxl-cyB-zbG-93L-iBU-aGU-gc2-hhc-GUg-aXM-gc2-V0L-CBi-dXQ-gdG-hlI-EFl-dGh-lci-BoY-XNu-J3Q-gbm-FtZ-WQg-aXQ-geW-V0I-OKA-lCB-sZX-Qga-XQg-Zml-uaX-NoL-iBZ-b3U-nbG-wga-25v-dyB-pdC-B0a-GUg-bW9-tZW-50I-Gl0-IGF-ubm-91b-mNl-cyB-pdH-Nlb-GYu-Cls-yMD-I2L-TA5-LTA-2VD-E1O-jU1-OjE-yLj-cxN-1pd-IFt-yZX-dhc-mRd-IOK-cpi-BUa-GUg-Q3J-1Y2-lib-GUg-Zm9-yZ2-VzI-GFu-IFV-uY2-9tb-W9u-IHB-pZW-NlI-G9m-IGF-ybW-9yI-GZy-b20-geW-91c-iBy-ZXN-lcn-ZlZ-CBw-aWV-jZX-Mg4-oCU-IGF-uZC-Bpd-Cdz-IGl-uIH-lvd-XIg-cGF-jay-wgc-3Rp-bGw-gY2-9vb-Glu-Zy4-K",
+      "WzI-wMj-YtM-Dkt-MDZ-UMT-U6N-TU6-MTI-uNz-E0W-l0g-W3d-vcm-xkX-SBZ-b3U-gc2-V0I-Hlv-dXI-gcm-VzZ-XJ2-ZWQ-gcG-llY-2Vz-IG9-uIH-RoZ-SB0-aHJ-lZS-BwZ-WRl-c3R-hbH-MuI-FRo-ZSB-Dcn-Vja-WJs-ZSB-0YW-tlc-yB0-aGV-tIG-luL-gpb-MjA-yNi-0wO-S0w-NlQ-xNT-o1N-Tow-My4-2MT-laX-SBb-cGx-heW-VyX-SBm-dXN-lCl-syM-DI2-LTA-5LT-A2V-DE1-OjU-0Oj-I3L-jc2-MFp-dIF-tyZ-Xdh-cmR-dIE-tvc-nIg-U3R-vbm-Vmb-290-IGZ-pcm-VzI-HVw-IGE-gcG-9yd-GFi-bGU-gQ3-J1Y-2li-bGU-gZm-9yI-Hlv-dS4-gKO-KIk-jI1-IFR-DKQ-o=",
+      "WzI-wMj-YtM-Dkt-MDZ-UMT-U6N-TQ6-MjE-uOT-UyW-l0g-W2R-lYn-VnX-SBw-ZXJ-zaX-N0I-HNp-emV-zKE-tCK-Tog-dG9-0YW-w9M-zYz-IHB-sYX-llc-j03-NSB-3bT-0xO-Tlb-cm9-vbX-M9M-TEz-IGV-2ZW-50c-z03-IG1-lbW-9zP-TEg-bnB-jcz-03I-GRl-ZmV-hdG-VkP-TEg-dGF-ncz-0xI-GRp-c2N-vdm-VyZ-WQ9-MV0-gbG-9nP-Tg3-IHN-jZW-5lP-TIK-WzI-wMj-YtM-Dkt-MDZ-UMT-U6N-TQ6-MTc-uNT-U1W-l0g-W3J-ld2-FyZ-F0g-4py-mIF-RoZ-SBm-b3J-naW-5nI-GZp-bml-zaG-VzI-OKA-lCB-0aG-UgQ-WV0-aGV-yIG-5hb-WVz-IGl-0IE-hhb-W1l-ci1-Gb2-xkZ-WQg-U3R-vbX-Blc-nMg-KFJ-hcm-UpL-gpb-MjA-yNi-0wO-S0w-NlQ-xNT-o1N-Dox-Ny4-zND-RaX-SBb-ZGV-idW-ddI-HF3-ZW7-ij7-EgZ-m9y-Z2V-fbm-FtZ-SBv-ayA-0MT-g4b-XMg-cmV-hZC-AyM-TA2-bXM-vd3-Jpd-GUg-MjA-1M2-1zI-Glu-IDI-wNH-Tih-pJv-dXQ-gNj-N0I-HRo-cjI-gMT-AuM-21z-L3Q-gKD-IxM-WNo-KQo-=",
+      "WzI-wMj-YtM-Dkt-MDZ-UMT-U6N-TQ6-MTI-uOT-MzW-l0g-W3d-vcm-xkX-SBU-aGU-gQ3-J1Y-2li-bGU-gZX-hoY-Wxl-cyB-zbG-93L-iBU-aGU-gc2-hhc-GUg-aXM-gc2-V0L-CBi-dXQ-gdG-hlI-EFl-dGh-lci-BoY-XNu-J3Q-gbm-FtZ-WQg-aXQ-geW-V0I-OKA-lCB-sZX-Qga-XQg-Zml-uaX-NoL-iBZ-b3U-nbG-wga-25v-dyB-pdC-B0a-GUg-bW9-tZW-50I-Gl0-IGF-ubm-91b-mNl-cyB-pdH-Nlb-GYu-Cls-yMD-I2L-TA5-LTA-2VD-E1O-jU0-OjE-yLj-kzM-lpd-IFt-yZX-dhc-mRd-IOK-cpi-BUa-GUg-Q3J-1Y2-lib-GUg-Zm9-yZ2-VzI-GEg-UmF-yZS-Bwa-WVj-ZSB-vZi-Bhc-m1v-ciB-mcm-9tI-Hlv-dXI-gcm-VzZ-XJ2-ZWQ-gcG-llY-2Vz-IOK-AlC-Bhb-mQg-aXQ-ncy-Bpb-iB5-b3V-yIH-BhY-2ss-IHN-0aW-xsI-GNv-b2x-pbm-cuC-g==",
+      "WzI-wMj-YtM-Dkt-MDZ-UMT-U6N-TQ6-MTI-uOT-MwW-l0g-W3d-vcm-xkX-SBZ-b3U-gc2-V0I-Hlv-dXI-gcm-VzZ-XJ2-ZWQ-gcG-llY-2Vz-IG9-uIH-RoZ-SB0-aHJ-lZS-BwZ-WRl-c3R-hbH-MuI-FRo-ZSB-Dcn-Vja-WJs-ZSB-0YW-tlc-yB0-aGV-tIG-luL-gpb-MjA-yNi-0wO-S0w-NlQ-xNT-o1N-Dow-OC4-0OT-VaX-SBb-ZGV-idW-ddI-Ghv-bWV-3b3-JrO-iBp-dGV-tX2-Rlc-2Mg-Ikx-pdG-Fue-SBN-YXV-sIi-Din-JMg-Njc-3MW-1zC-lsy-MDI-2LT-A5L-TA2-VDE-1Oj-U0O-jA4-LjI-2N1-pdI-Ftk-ZWJ-1Z1-0gc-Xdl-buK-PsS-Bpd-GVt-X3N-5bn-RoZ-XNp-c19-ody-Bva-yA2-NTI-0bX-Mgc-mVh-ZCA-0OT-Ewb-XMv-d3J-pdG-UgM-TU4-MW1-zIG-luI-DM0-MHT-ihp-Jvd-XQg-Mzd-0IG-pzL-Wxh-dGU-gOT-U5b-XMg-dGh-yMS-AxN-C40-bXM-vdC-AoM-TQ1-Y2g-pCg-==",
+      "WzI-wMj-YtM-Dkt-MDZ-UMT-U6N-TQ6-MDY-uNT-c5W-l0g-W3J-ld2-FyZ-F0g-S29-yci-BTd-G9u-ZWZ-vb3-QgZ-mly-ZXM-gdX-AgY-SBw-b3J-0YW-JsZ-SBD-cnV-jaW-JsZ-SBm-b3I-geW-91L-iAo-4oi-SMj-UgV-EMp-Cls-yMD-I2L-TA5-LTA-2VD-E1O-jUz-OjU-2Lj-kyO-Fpd-IFt-yZX-dhc-mRd-IOK-cpi-BUa-GUg-Zm9-yZ2-luZ-yBm-aW5-pc2-hlc-yDi-gJQ-gdG-hlI-EFl-dGh-lci-BuY-W1l-cyB-pdC-BTa-W5n-aW5-nIE-hvb-2Qg-KFV-uY2-9tb-W9u-KS4-KWz-IwM-jYt-MDk-tMD-ZUM-TU6-NTM-6NT-YuN-zQ2-Wl0-gW2-RlY-nVn-XSB-xd2-Vu4-o+x-IGZ-vcm-dlX-25h-bWU-gb2-sgM-jg4-M21-zIH-JlY-WQg-NjQ-xbX-Mvd-3Jp-dGU-gMj-IwM-21z-IGl-uID-IwN-XTi-hpJ-vdX-QgN-jN0-IHR-ocj-IgM-y4x-bXM-vdC-BIS-VQt-Q0F-QIC-gyN-jZj-aCk-K",
+      "WzI-wMj-YtM-Dkt-MDZ-UMT-U6N-TM6-NTM-uNj-M0W-l0g-W3d-vcm-xkX-SBU-aGU-gQ3-J1Y-2li-bGU-gZX-hoY-Wxl-cyB-zbG-93L-iBU-aGU-gc2-hhc-GUg-aXM-gc2-V0L-CBi-dXQ-gdG-hlI-EFl-dGh-lci-BoY-XNu-J3Q-gbm-FtZ-WQg-aXQ-geW-V0I-OKA-lCB-sZX-Qga-XQg-Zml-uaX-NoL-iBZ-b3U-nbG-wga-25v-dyB-pdC-B0a-GUg-bW9-tZW-50I-Gl0-IGF-ubm-91b-mNl-cyB-pdH-Nlb-GYu-Cls-yMD-I2L-TA5-LTA-2VD-E1O-jUz-OjU-zLj-YzN-Fpd-IFt-yZX-dhc-mRd-IOK-cpi-BUa-GUg-Q3J-1Y2-lib-GUg-Zm9-yZ2-VzI-GFu-IFV-uY2-9tb-W9u-IHB-pZW-NlI-G9m-IGF-ybW-9yI-GZy-b20-geW-91c-iBy-ZXN-lcn-ZlZ-CBw-aWV-jZX-Mg4-oCU-IGF-uZC-Bpd-Cdz-IGl-uIH-lvd-XIg-cGF-jay-wgc-3Rp-bGw-gY2-9vb-Glu-Zy4-K",
+      "WzI-wMj-YtM-Dkt-MDZ-UMT-U6N-TM6-NTM-uNj-MyW-l0g-W3d-vcm-xkX-SBZ-b3U-gc2-V0I-Hlv-dXI-gcm-VzZ-XJ2-ZWQ-gcG-llY-2Vz-IG9-uIH-RoZ-SB0-aHJ-lZS-BwZ-WRl-c3R-hbH-MuI-FRo-ZSB-Dcn-Vja-WJs-ZSB-0YW-tlc-yB0-aGV-tIG-luL-gpb-MjA-yNi-0wO-S0w-NlQ-xNT-o1M-zo0-Ni4-5Nz-ZaX-SBb-cmV-3YX-JkX-SBL-b3J-yIF-N0b-25l-Zm9-vdC-Bma-XJl-cyB-1cC-BhI-HBv-cnR-hYm-xlI-ENy-dWN-pYm-xlI-GZv-ciB-5b3-UuI-Cji-iJI-yNS-BUQ-ykK-WzI-wMj-YtM-Dkt-MDZ-UMT-U6N-TM6-MzM-uMj-k1W-l0g-W2R-lYn-VnX-SBw-ZXJ-zaX-N0I-HNp-emV-zKE-tCK-Tog-dG9-0YW-w9M-zYz-IHB-sYX-llc-j03-NCB-3bT-0xO-Tlb-cm9-vbX-M9M-TEz-IGV-2ZW-50c-z03-IG1-lbW-9zP-TEg-bnB-jcz-03I-GRl-ZmV-hdG-VkP-TEg-dGF-ncz-0xI-GRp-c2N-vdm-VyZ-WQ9-MV0-gbG-9nP-Tg3-IHN-jZW-5lP-TIK"
+    ],
+    "chunkChars": 7253,
+    "chunkEncoding": "base64-3"
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-06-1711-the-escort-has-to-go-somewhere #mtpzxvtgflmu [inline 6/9]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtpzxvtgflmu"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-06-1711-the-escort-has-to-go-somewhere"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "6"
+    },
+    {
+      "key": "parts",
+      "value": "9"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-06-1711-the-escort-has-to-go-somewhere"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db97:b688:ad2:ae57:4e30:9faa",
+      "query": "user.ip:\"2607:fb90:db97:b688:ad2:ae57:4e30:9faa\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-06T15:58:39.172000Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-06T15:58:39.731000Z",
+  "fingerprints": [
+    "bf563ac1977955fd0312e8148e14947c"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1957758428,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-06T13:14:54.857737Z",
+    "dateReleased": "2026-09-06T13:16:58.560577Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "52e078dd942f78c8b5c6ed880f260712987e0388",
+      "message": "[ota-hal] OTA-1711 \u2014 the escort has to go somewhere\n\nStep 3d. OTA-1710 audited the fetch counter, the staged beats and the wealth\ngate, and said out loud that ESCORT was not reached \u2014 29 of the 65 faction\ncontracts, the largest family in the game, whose ledger is a party of bodies\ntaking collateral damage across real fights rather than a number you can set.\n\n\u26a0 THE FIRST PROBE FOUND THAT THE WORK WAS OPTIONAL.\n\nAccept an escort from an agent, hand it straight back to THAT SAME AGENT\nwithout moving a step:\n\n    \u2726 Faction contract complete \u2014 The Survey Line. +70 TC, +8 rep.\n\nThe party spawns at full health, so the scaled-pay multiplier is 1, and nothing\non the turn-in path ever asked where anybody had been. `send word` did the same\nthing from anywhere on the map. Every one of the 29 could be closed for full\npay and full rep without escorting anyone anywhere.\n\nTwo refusals now, and both mirror rules this file already keeps:\n\n  \u00b7 YOU CANNOT COURIER PEOPLE. The clause beside it already refuses to mail a\n    FETCH deed because \"you cannot mail the goods\". An escort is the same\n    objection with more of it.\n\n  \u00b7 YOU CANNOT HAND A PARTY BACK ON THE SPOT YOU COLLECTED THEM FROM.\n\n\u26a0 THE RULE IS DELIBERATELY THE WEAKEST ONE THAT CLOSES IT. Every escort\nobjective reads \"escort them to a <faction> agent\" \u2014 not to a named place, and\nnone of the 29 carries a `targetLocationName` or an `objectiveLocationId`. So\nthere is no destination to check against, and inventing one would be redesigning\n29 contracts on my own authority. What can be said without inventing anything is\nthat the party has to have GONE somewhere.\n\nIt reads `acceptedAtCell`, which is already stamped at accept and already read\none line below the turn-in for the long-haul bonus \u2014 so it needs no new state,\nand the gate cannot disagree with the reward that prices the same walk. It FAILS\nOPEN on a contract accepted before this OTA: a save with no stamped cell\ndelivers exactly as it does today, because stranding a party the player is\nalready carrying would be a worse bug than the one being fixed.\n\nAnd the positive case is tested as hard as the refusal, because a rule that\ncloses an exploit by making 29 contracts unfinishable is not a fix: walk them to\na different cell and the contract completes and pays MORE than its base, since\nthe long-haul bonus reads the same journey. The refusal also leaves the contract\non the slate \u2014 refused, not failed. Nobody loses a party for asking too early.\n\n\u26a0 TWO THINGS THE AUDIT FOUND AND DID NOT CHANGE, both written into the suite.\n\nA DEAD POOL PAYS IN FULL on an all-or-nothing contract, because the pay code\nskips the scaling for that mode entirely and OTA-964's \"or lose everything when\nthe pool dies\" is not in that branch. It is UNREACHABLE IN PLAY \u2014 the only path\nthat damages a pool fails the contract the moment it hits zero and drops the\nrecord, so there is no contract left to hand in \u2014 and I did not rewrite pay code\non the strength of a state I had to build by hand. The unreachability is pinned\ninstead, so a future damage path that forgets to fail the quest gets named\nrather than quietly making the full payout reachable.\n\nPARKING PROTECTS THE PARTY BY DESIGN. `setFactionQuestActive(id, false)` parks\nthem \u2014 OTA-962's own words, \"off the HUD, no combat damage\" \u2014 so walking every\nfight with the party parked and delivering them pristine is currently the\noptimal play, and the collateral mechanic is opt-in. That is a balance call\nrather than a defect, so this OTA does not touch it; it is recorded because the\nalternative is that nobody notices until a player does. The delivery gate is\nunaffected either way: parked or not, they still have to have gone somewhere.\n\n\u26a0 AND IT MOVED WHAT \"COURIERABLE\" MEANS, which two suites caught. The audit\nharness accepts and hands in on the spot, so all 29 escorts failed it \u2014 fixed\nthe way that harness already handles a fetch requirement: satisfy the\nprecondition (stand the pickup cell elsewhere) rather than simulate the walk.\nAnd OTA-1403's `courierableDeed()` selected \"no fetch, no stages\", which is\nexactly the shape of an escort \u2014 EVERY stage-less, fetch-less contract in the\ncatalog is one, so that selector could now only pick something a runner may not\ncarry. What a runner can still carry is a staged deed whose work is behind it:\ngoods cannot be mailed, people cannot be mailed, and what is left is the\ncontract whose only remaining act is the word itself. That test's claim is\nuntouched; only the deed it is made on.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-06T13:12:42Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-06-1711-the-escort-has-to-go-somewhere",
+          "shortVersion": "tartaria@4.32.11+2026-09-06-1711-the-escort-has-to-go-somewhere",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-06T13:16:58.560577Z",
+          "dateCreated": "2026-09-06T13:14:54.857737Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155952250",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-06T13:16:58.906716Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-06-1711-the-escort-has-to-go-somewhere",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-06-1711-the-escort-has-to-go-somewhere",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-06-1711-the-escort-has-to-go-somewhere",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-06-1711-the-escort-has-to-go-somewhere)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "c39c133b5f834a0096497d3486382d38",
+  "previousEventID": "b74d3c1ce6c44473b2650aca8a879396"
+}
