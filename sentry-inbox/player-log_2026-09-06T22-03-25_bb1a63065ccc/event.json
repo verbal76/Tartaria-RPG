@@ -1,0 +1,238 @@
+{
+  "id": "bb1a63065ccc402294f609ea61ea5f6a",
+  "groupID": "7715960018",
+  "eventID": "bb1a63065ccc402294f609ea61ea5f6a",
+  "projectID": "4511945117532160",
+  "size": 7062,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-06-1721-your-name-was-three-dots #mtqcyz6sfp3n [inline 9/9]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-06-1721-your-name-was-three-dots",
+  "message": "player-log 2026-09-06-1721-your-name-was-three-dots #mtqcyz6sfp3n [inline 9/9]",
+  "title": "player-log 2026-09-06-1721-your-name-was-three-dots #mtqcyz6sfp3n [inline 9/9]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "8a29add0ae6647aeb98f9c70c81d3851",
+      "span_id": "bb48a99ba7d340f3",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "WzI-wMj-YtM-Dkt-MDZ-UMj-E6M-zM6-Mzg-uMj-I4W-l0g-W2R-lYn-VnX-SBh-dHR-hY2-s6I-HRh-cmd-ldD-1Ta-Wx0-IFR-oaW-VmI-HJh-bmd-lPW-Nsb-3Nl-IHJ-lYW-NoL-mJh-bmR-zPV-tjb-G9z-ZV0-gcm-VhY-2gu-bGF-iZW-w9Q-XVy-YWx-pdG-UgV-GFs-b24-gYm-FyZ-Uhh-bmQ-9Zm-Fsc-2UK-WzI-wMj-YtM-Dkt-MDZ-UMj-E6M-zM6-Mzc-uOT-k1W-l0g-W2R-lYn-VnX-SBw-YXJ-zZX-I6I-Glu-dGV-udD-1hd-HRh-Y2s-gY2-9uZ-j0x-LjA-wIH-Zlc-mI9-YXR-0YW-NrI-HRh-cmd-ldD-1hd-XJh-bGl-0ZS-B0Y-Wxv-biB-yZX-Nvb-HZl-ZD1-BdX-Jhb-Gl0-ZSB-UYW-xvb-iBy-YW5-nZT-1jb-G9z-ZSB-lbm-Vta-WVz-PTE-gaG-9va-3M9-MQp-bMj-AyN-i0w-OS0-wNl-QyM-Toz-Mzo-zNy-45M-Tda-XSB-bcG-xhe-WVy-XSB-hdH-RhY-2sg-d2l-0aC-B0a-GUg-YXV-yYW-xpd-GUg-dGF-sb2-4K",
+      "WzI-wMj-YtM-Dkt-MDZ-UMj-E6M-zM6-Mzc-uNz-Q1W-l0g-W3N-5c3-Rlb-V0g-ZG9-kZ2-luZ-yAo-cGF-ycn-kpI-GZh-ZGV-zLg-pbM-jAy-Ni0-wOS-0wN-lQy-MTo-zMz-ozN-y40-Njh-aXS-BbZ-GVi-dWd-dIH-VpO-iB0-YXA-gIu-Kal-+KY-oyB-hdX-Jhb-Gl0-ZSB-0YW-xvb-iDi-nKY-g4p-iFI-iDi-j7E-rMj-Ftc-wpb-MjA-yNi-0wO-S0w-NlQ-yMT-ozM-zoz-My4-2NT-laX-SBb-ZGV-idW-ddI-HJl-bmR-lcu-KPs-SA1-MDJ-tcy-BhZ-nRl-ciB-lbm-dpb-mUt-ZG9-uZS-DCt-yBm-ZWV-kID-UwM-Apb-MjA-yNi-0wO-S0w-NlQ-yMT-ozM-zoz-Mi4-4Mz-haX-SBb-c3l-zdG-VtX-SDi-j7M-gVG-ltZ-SBw-YXN-zZW-Q6I-DYg-bWl-uCl-syM-DI2-LTA-5LT-A2V-DIx-OjM-zOj-MyL-jc2-MVp-dIF-tjb-21i-YXR-dIF-J1c-3Qg-dGF-rZX-MgN-C4g-KDU-vMT-cgS-FAg-bGV-mdC-kK",
+      "WzI-wMj-YtM-Dkt-MDZ-UMj-E6M-zM6-MzI-uNj-A3W-l0g-W2N-vbW-Jhd-F0g-U2l-sdC-BUa-Gll-ZiB-0dX-Juc-yBv-biB-SdX-N0I-OKA-lCB-kMj-AgM-TYg-KyB-BVE-sgN-iA9-IDI-yIH-ZzI-FJ1-c3Q-ncy-BBQ-yA5-IOK-AlC-Din-JMg-SEl-UCl-syM-DI2-LTA-5LT-A2V-DIx-OjM-zOj-MyL-jQ1-Mlp-dIF-t3b-3Js-ZF0-gWW-91I-GNv-bW1-pdC-B0b-yB0-aGU-gZG-9kZ-2Uu-IFN-saX-AgU-2ls-dCB-UaG-llZ-idz-IHN-3aW-5nI-GFu-ZCB-5b3-VyI-G5l-eHQ-gc3-Rya-Wtl-IGx-hbm-RzI-GRv-dWJ-sZS-Dig-JQg-cmV-hZC-Bpd-CB3-cm9-uZy-Bhb-mQg-eW9-1IH-Npb-XBs-eSB-0YW-tlI-HRo-ZSB-oaX-Qgb-Glr-ZSB-hbn-kgb-3Ro-ZXI-sIG-5vI-G9w-ZW5-pbm-cuC-g==",
+      "WzI-wMj-YtM-Dkt-MDZ-UMj-E6M-zM6-MzI-uMj-k3W-l0g-W2R-lYn-VnX-SBw-YXJ-zZX-I6I-Glu-dGV-udD-1kb-2Rn-ZSB-jb2-5mP-TEu-MDA-gdm-VyY-j1k-b2R-nZS-B0Y-XJn-ZXQ-9LS-ByZ-XNv-bHZ-lZD-0tI-HJh-bmd-lPW-Nsb-3Nl-IGV-uZW-1pZ-XM9-MSB-ob2-9rc-z0x-Cls-yMD-I2L-TA5-LTA-2VD-IxO-jMz-OjM-yLj-IyM-Fpd-IFt-wbG-F5Z-XJd-IGR-vZG-dlC-lsy-MDI-2LT-A5L-TA2-VDI-xOj-MzO-jMx-Ljk-zOV-pdI-Ftk-ZWJ-1Z1-0gd-Wk6-IHR-hcC-AiZ-G9k-Z2U-iIO-KPs-Ssy-Nm1-zCl-syM-DI2-LTA-5LT-A2V-DIx-OjM-zOj-I4L-jQy-MFp-dIF-t3b-3Js-ZF0-gVG-hlI-HRo-cmV-hZC-B5b-3Ug-d2V-yZS-Bmb-2xs-b3d-pbm-cgd-2Fp-dHM-gd2-hlc-mUg-eW9-1IG-xlZ-nQg-aXQ-uCg-==",
+      "WzI-wMj-YtM-Dkt-MDZ-UMj-E6M-zM6-Mjg-uMj-U1W-l0g-W2N-vbW-Jhd-F0g-U2l-sdC-BUa-Gll-ZiB-jbG-9zZ-XMg-4oC-UIF-F1a-WNr-IEt-uaW-ZlI-HJl-YWR-5LC-AxR-Dgg-ZGF-tYW-dlI-G9u-IGE-gaG-l0L-iAo-cmF-uZ2-U6I-GNs-b3N-lKQ-pbM-jAy-Ni0-wOS-0wN-lQy-MTo-zMz-oyO-C4w-OTh-aXS-Bbd-29y-bGR-dIE-Zvb-3Rz-dGV-wcy-BiZ-Whp-bmQ-geW-91I-HRo-ZSB-3cm-9uZ-yB3-YXk-g4o-CUI-HRv-byB-jbG-9zZ-Swg-dG9-vIG-Zhc-3Qu-IEE-gU2-lsd-CBU-aGl-lZi-BwZ-WVs-cyB-vdX-Qgb-2Yg-YSB-zaW-RlI-HBh-c3N-hZ2-UsI-Ghh-bmQ-gYW-xyZ-WFk-eSB-pbi-B5b-3Vy-IGx-pbm-Ugb-2Yg-c2l-naH-Qgd-2hl-cmU-geW-91c-iBj-b2l-uLX-Bvd-WNo-IGh-hbm-dzL-iBU-aGV-5IH-Rob-3Vn-aHQ-geW-91J-2Qg-c2x-lZX-AgZ-GVl-cGV-yIH-RoY-W4g-eW9-1IG-RpZ-C4K",
+      "WzI-wMj-YtM-Dkt-MDZ-UMj-E6M-zM6-Mjg-uMD-k3W-l0g-W3d-vcm-xkX-SBZ-b3U-gd2-Fsa-yB3-ZXN-0IH-Roc-m91-Z2g-gb3-Blb-iBz-aWx-0Li-BUa-GUg-Y29-tcG-Fzc-yBw-b2l-udH-Mgd-2Vz-dCB-pbn-RvI-G9w-ZW4-gZ3-Jvd-W5k-Lgp-bMj-AyN-i0w-OS0-wNl-QyM-Toz-Mzo-yOC-4wO-TZa-XSB-bZG-Vid-Wdd-IHN-wYX-duO-iBn-ZWF-yPV-tBZ-XRo-ZXJ-pYy-BIZ-Wxt-IG9-mIE-Nvb-W1h-bmQ-sIF-Nja-G9s-YXI-ncy-BIZ-WFk-YmF-uZC-BvZ-iBL-bm9-3bG-VkZ-2Us-IEd-pYW-50I-EJv-bmU-gTG-9uZ-2Jv-d10-gd2-luZ-G93-PTE-wIH-Jvc-3Rl-cj1-uZX-cKW-zIw-MjY-tMD-ktM-DZU-MjE-6Mz-M6M-jgu-MDk-1Wl-0gW-3Jl-d2F-yZF-0g4-pym-IFR-oZS-BwY-WNr-IG9-uIH-lvd-XIg-YmF-jay-BtY-Wtl-cyB-5b3-Ugc-3Ry-b25-nZX-IuI-Csx-IFN-UUi-AoY-mFz-ZSA-xNC-wgM-jIg-YXM-geW-91I-HN0-YW5-kKS-4K",
+      "WzI-wMj-YtM-Dkt-MDZ-UMj-E6M-zM6-Mjc-uOT-cwW-l0g-W2R-lYn-VnX-SB1-aTo-gdG-FwI-CLi-hpI-gQV-NHQ-VJE-QVI-iIO-KPs-Ssy-MW1-zCl-syM-DI2-LTA-5LT-A2V-DIx-OjM-zOj-I1L-jcy-NVp-dIF-tjb-2du-aXR-pdm-VdI-ENM-SU1-CIC-AoM-jE5-bXM-pCl-syM-DI2-LTA-5LT-A2V-DIx-OjM-zOj-I1L-jUw-NVp-dIF-tze-XN0-ZW1-dIO-KPs-yBU-aW1-lIH-Bhc-3Nl-ZDo-gMj-Qgb-Wlu-Cls-yMD-I2L-TA5-LTA-2VD-IxO-jMz-OjI-1Lj-Q5N-lpd-IFt-yZX-dhc-mRd-IFl-vdS-BzY-3Jh-cGU-gYX-Qgd-Ghl-IHN-pbH-Qgd-2l0-aCB-0aG-Ugc-2Vu-dGl-uZW-wgY-2xl-YXZ-lci-4g4-pym-IFJ-lY2-92Z-XJl-ZCB-Ecm-9uZ-SBD-b3J-lIC-hVb-mNv-bW1-vbi-kuC-go9-PT0-gRU-5EI-FJF-UE9-SVC-A9P-T0="
+    ],
+    "chunkChars": 2347,
+    "chunkEncoding": "base64-3"
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-06-1721-your-name-was-three-dots #mtqcyz6sfp3n [inline 9/9]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtqcyz6sfp3n"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-06-1721-your-name-was-three-dots"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "9"
+    },
+    {
+      "key": "parts",
+      "value": "9"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-06-1721-your-name-was-three-dots"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-06T22:03:25.278717Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-06T22:03:25.765000Z",
+  "fingerprints": [
+    "49b5904adbf5d12e6755985e46d47f7c"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1958094452,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-06T21:56:14.144902Z",
+    "dateReleased": "2026-09-06T21:57:24.119850Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "ab4ad585a05ffc3af23c80973fdcd4709315fb8d",
+      "message": "[ota-hal] OTA-1721 \u2014 your name was the three dots\n\n*\"why are there 3 dots on the top left corner\"* \u2014 that is your character's name.\n\n\u26a0\u26a0\u26a0 THE NAME ROW GIVES ITS TWO SIDES OPPOSITE INSTRUCTIONS:\n\n    name:         { flexShrink: 1 }   \u2192 gives up width\n    nameRowRight: { flexShrink: 0 }   \u2192 never gives up width\n\nWhich is correct while the right side holds BADGES \u2014 \"\u25c6 58 PWR\", \"Rust (16/16)\".\nThose are short, the name has room, and nobody notices the asymmetry. But the\nDOWNED-DOG COUNTDOWN was stacked into that same column, and it is not a badge, it\nis a sentence: \"Rust \u23f3 24h \u2014 feed to save\". `numberOfLines={1}` means it cannot\nwrap and `flexShrink: 0` means it will not yield, so it took the row, and the name\n\u2014 the only thing left that shrinks \u2014 collapsed to a bare ellipsis.\n\nFor as long as Rust was bleeding out, your character had no name on your own\nscreen. The warning that shipped to save the dog is what erased the player. Your\nscreenshot shows it exactly as the arithmetic predicts: line one `...` and\n`\u25c6 58 PWR`, line two the countdown.\n\n\u26a0\u26a0 THE FIX IS THE SHAPE. The sentence gets a full-width row of its own \u2014 the same\nshape the golem line has used since OTA-145 \u2014 so the corner holds only badges\nagain. Its 200pt cap goes with it: that was a right-aligned chip's cap, and on its\nown row a 16-character dog name must not be able to clip \"feed to save\" off the\none warning in the game with a deadline attached. The healthy-dog badge stays\nwhere it is; it was never the problem.\n\n\u26a0 THEN A FLOOR, so the CLASS cannot come back. `minWidth: 64` on the name means\nwhatever anyone stacks in that column next leaves a truncated name rather than\nthree dots. I left the right column at `flexShrink: 0` deliberately \u2014 making it\nshrink would truncate the POWER rating instead, which is the worse trade.\n\nAn instrument checks that nothing in the badge column renders a sentence. It\ncaught my own first cut: I scanned raw source and it flagged the comment\nexplaining the fix, because that comment quotes the string it moved. A scanner\nthat cannot tell its subject from its own notes measures nothing, so it strips\ncomments now.\n\n\u26a0 ON THE HEALTH ITSELF: your HP row is correct \u2014 43/47, and the numbers agree\nwith the feed. What is missing next to it is a BAR. The enemy card has one and\nyour card does not, which is most of why the panel reads as broken at a glance\neven when the numbers are fine. That is a design call rather than a defect, so I\nhave not added one; say the word and it is a small change.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-06T21:54:04Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-06-1721-your-name-was-three-dots",
+          "shortVersion": "tartaria@4.32.11+2026-09-06-1721-your-name-was-three-dots",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-06T21:57:24.119850Z",
+          "dateCreated": "2026-09-06T21:56:14.144902Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "156012435",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-06T21:57:24.392391Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-06-1721-your-name-was-three-dots",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-06-1721-your-name-was-three-dots",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-06-1721-your-name-was-three-dots",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-06-1721-your-name-was-three-dots)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "e346280822c54b9594678c43bb68fb31",
+  "previousEventID": "b7acb330081c45288bde4291075e09cb"
+}

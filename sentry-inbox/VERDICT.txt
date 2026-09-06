@@ -13,10 +13,6 @@
     1 page(s), 2 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7709732459/events/?full=false
     1 page(s), 4 rows — COMPLETE — ended short of a full page
-  /organizations/hot-attic-games-llc/issues/7710441096/events/?full=false
-    1 page(s), 100 rows — SUSPECT — ended on a full page of 100 with no next cursor; this endpoint caps rather than paginates
-  /organizations/hot-attic-games-llc/issues/7710441160/events/?full=false
-    1 page(s), 6 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7710650004/events/?full=false
     1 page(s), 56 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7710650047/events/?full=false
@@ -201,6 +197,10 @@
     1 page(s), 9 rows — COMPLETE — ended short of a full page
   /organizations/hot-attic-games-llc/issues/7715872102/events/?full=false
     1 page(s), 1 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7715960018/events/?full=false
+    1 page(s), 18 rows — COMPLETE — ended short of a full page
+  /organizations/hot-attic-games-llc/issues/7715960076/events/?full=false
+    1 page(s), 2 rows — COMPLETE — ended short of a full page
   /projects/hot-attic-games-llc/tartaria/events/?full=false
     1 page(s), 100 rows — SUSPECT — ended on a full page of 100 with no next cursor; this endpoint caps rather than paginates
   /projects/hot-attic-games-llc/tartaria/issues/?query=&statsPeriod=

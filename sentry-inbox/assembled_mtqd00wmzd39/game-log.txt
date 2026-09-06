@@ -1,0 +1,677 @@
+Full Log — Great Scott · (2026-09-06-1721-your-name-was-three-dots) · (full log pushed for analysis — no description asked for)
+=== TARTARIA BUG REPORT ===
+Submitted: 2026-09-06T22:04:14.612Z
+Character: Great Scott
+Slot ID: slot_mt52mm21_5mcq3a
+Race: Tartarian Giants
+Location: Iskan-Veil
+HP: 62/62
+
+--- DESCRIPTION ---
+(full log pushed for analysis — no description asked for)
+
+--- REPORT SCREEN ---
+  Saved characters this screen could see: 2
+  Knew which character was being played: yes
+  "Send full log" row offered: yes
+
+--- DEVICE / BUILD ---
+Device
+  Name: Pixel 10 Pro XL
+  Platform: android 37
+  Hermes: yes
+  Locale: en-US
+  Timezone: America/New_York
+  Screen: window 443×986 / screen 443×986 @ 2.4375x density
+  Captured at: 2026-09-06T22:04:14.436Z
+
+Install
+  App ID: com.hotatticgames.tartarprim
+  App version: 4.32.11
+  APK build version: 2.4.1
+  APK build: 293
+  AAB: (build 293)
+  OTA: (2026-09-06-1721-your-name-was-three-dots)
+  Boot stage: qwen:deferred
+
+ML runtime health
+  Status: active (no crashes detected)
+  Crash count: 0
+  Last init attempt: 2026-09-06T22:03:13.400Z
+  Last init success: 2026-09-06T22:03:14.046Z
+  Crashes-before-disable threshold: 2
+  Qwen completion guard: clean (no completion crashes)
+  Qwen kernel variant: rnllama_v8_2_fp16_dotprod
+  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k
+  Voice (TTS) guard: clean (no voice crashes on this build)
+Save-load health
+  Status: clean (no load-crash flags)
+Last JS crash
+  Status: none recorded
+This launch
+  Life: bmtqcyph077 · started 2026-09-06T22:03:13.140Z
+  Followed an OTA apply 207ms ago (boot-front)
+  The previous life released its model contexts before reloading (o0/r0/l0/p0/dn0)
+Crash ledger — 10 recorded (newest last)
+  ⚠⚠ 8 of 10 process kills landed on an OTA-apply boot
+  • 2026-09-05T04:22:19.915Z (2502m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1681-the-outpost-lets-go · stage homework-done
+      Process died with no orderly exit while: tap "craft"
+      doing: tap "craft" · room voronov · screen exploration
+      last checkpoint: homework-done · 13450ms into the action · alive 0ms after it
+      launch: died 515390ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 154ms earlier via boot-front
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o1/r0/l1/p1/dn0
+  • 2026-09-05T08:31:21.524Z (2253m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1687-the-mission-layer-remembers-itself · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 870ms into the action · alive 0ms after it
+      launch: died 904ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 187ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-05T13:16:47.707Z (1967m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1690-the-cap-speaks · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 782ms into the action · alive 10351ms after it
+      launch: died 11166ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 208ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-05T16:18:32.776Z (1786m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1696-the-fight-sheds-its-passengers · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 1898ms into the action · alive 0ms after it
+      launch: died 1965ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 413ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-05T17:22:04.013Z (1722m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1698-the-counter-remembers-the-question · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 2285ms into the action · alive 0ms after it
+      launch: died 2341ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 222ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-05T18:28:33.919Z (1656m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1699-every-hunt-walks-the-four-roads · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 772ms into the action · alive 0ms after it
+      launch: died 811ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 163ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-05T19:15:20.497Z (1609m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1699-every-hunt-walks-the-four-roads · stage mid-action
+      Process died with no orderly exit while: tap "missions"
+      doing: tap "missions" · room voronov · screen exploration
+      launch: died 842671ms into the process · not an OTA-apply boot
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-05T20:20:16.991Z (1544m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1700-the-world-runs-while-you-learn · stage rendered
+      Process died with no orderly exit while: tap "◈ LORE"
+      doing: tap "◈ LORE" · room voronov · screen exploration
+      last checkpoint: rendered · 5887ms into the action · alive 3237ms after it
+      launch: died 30204ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 204ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-05T23:07:59.629Z (1376m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1700-the-world-runs-while-you-learn · stage mid-action
+      Process died with no orderly exit while: tap "craft"
+      doing: tap "craft" · room iskan_veil · screen exploration
+      launch: died 9564ms into the process · not an OTA-apply boot
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-06T17:45:48.683Z (258m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-06-1714-the-dog-is-called-they · stage native:cognition:done
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: native:cognition:done [q0] · 98853ms into the action · alive 0ms after it
+      launch: died 98905ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 185ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+Crash delivery: ON — reports go to Sentry when you crash.
+Runtime pressure
+  Memory warnings: none this session
+  Freeze watch: no stalls seen (JS clocks only — see the native queue below)
+  Native queue: worst wait 0.0s · 0 job kinds queued >3s · worst 0.0ms/prompt-token
+  App state trail: (none recorded)
+Model contexts
+  Live now: 0
+  Opened: 0 · Released: 0 · Peak live: 0
+  Narration engine: idle
+
+--- VOICE ---
+  TTS enabled: no
+  Engine: bundled
+  Rate: 1.05 · Pitch: 1.00
+  System voice id: (default)
+  Kokoro voice: am_michael
+  Kokoro state: idle
+
+--- INVENTORY ---
+Inventory (Great Scott)
+  HP: 62/62  Stamina: 19/19  TC: 459  Corruption: 18
+  Pack: 149 distinct rows / 506 total
+
+Weapons (24)
+  Aetheric Touch Wand (1d6 aetheric, dur 32/32, [runecaster,rune_power,aetheric,healing])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Searing Bone Crossbow (Uncommon, 2d6 piercing, +1d4 burn coat, dur 1/10, equipped:off, [weapon,ranged,crossbow,bolt-caster,loot])
+    actions: equip:main, unequip:off, use, repair
+  Bone Crossbow (Uncommon, 2d6 piercing, dur 10/10, [weapon,ranged,crossbow,bolt-caster,loot])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bone Crossbow (Uncommon, 2d6 piercing, dur 10/10, [weapon,ranged,crossbow,bolt-caster,loot])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bone Crossbow (Uncommon, 2d6 piercing, dur 10/10, [weapon,ranged,crossbow,bolt-caster,loot])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bone Knife (1d4 piercing, dur 4/10, [weapon,melee,dual_wield,knife,giants])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Bone Knife (1d4 piercing, dur 2/10, [weapon,melee,dual_wield,knife,giants])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Bone Knife (1d4 piercing, dur 2/10, [weapon,melee,dual_wield,knife,giants])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Bone Knife (1d4 piercing, dur 2/10, [weapon,melee,dual_wield,knife,giants])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Bone Knife (1d4 piercing, dur 2/10, [weapon,melee,dual_wield,knife,giants])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Searing Cantor's Tuning Fork (Legendary, +1d4 burn coat, dur 10/50, 2d6+2 aetheric, unique, [core_guardian_set,aether_born,exotic,sonic,armor_ignore_partial])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Cold-Iron Rosary (Legendary, dur 45/45, 1d8+3 aetheric, unique, [core_guardian_set,aether_born,exotic,corruption_damage,aether_drain])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Compact Blaster (1d6 burn, dur 39/39, [weapon,ranged,dual_wield,firearm,unknowing_masses])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Cudgel (1d8 bludgeoning, dur 2/12, [weapon,club,melee,improvised,weighted])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Cudgel (1d8 bludgeoning, dur 2/12, [weapon,club,melee,improvised,weighted])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Earthshaker Wand (1d6 bludgeoning, dur 13/13, [weapon,runecaster,rune_power,mud_dwellers,crafted])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Iron Spear (1d8 piercing, dur 3/18, [weapon,spear,melee,two_handed,thrown])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Searing Knot-Grained Gouge (Legendary, +1d4 burn coat, dur 37/45, equipped:main, 2d8 bludgeoning, unique, [fused,unique])
+    actions: equip:off, unequip:main, use(off), repair
+  Litany Maul (Legendary, dur 75/75, 1d12+2 bludgeoning, unique, [core_guardian_set,aether_born,blunt,two_handed,stagger_chance])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Grip Wand (1d6 bludgeoning, dur 38/38, [runecaster,rune_power,mud_dwellers,restrain])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Reaver's Greatsword (Legendary, 2d10 slashing, dur 50/50, [weapon,melee,two_handed,blade,reaver])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Resonant Talon (Legendary, dur 45/45, 2d8 aetheric, resist:aetheric, unique, [fused,unique,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Rust Dagger (1d4 slashing, dur 33/33, [weapon,melee,dual_wield,knife,mud_dwellers])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Throwing Knife (1d4 piercing, dur 20/20, [throwable,weapon,ranged,knife,thrown])
+    actions: equip:main, equip:off, use(off), scrap, drop
+
+Armor (28)
+  Aetheric Scout Greaves (dur 26/26, AC +1 · Resists: aetheric · Regen: +1 stamina per action · WIS +1, [armor,legs,greaves,tartarian_giants])
+    actions: equip:legs, use, scrap, drop
+  Anvil-Struck Footguards (Legendary, dur 45/45, AC+5, resist:degradation, unique, [fused,unique,degradation])
+    actions: equip:feet, use, scrap, drop
+  Burl Aegis (Legendary, dur 42/45, equipped:chest, AC+5, unique, [fused,unique])
+    actions: unequip:chest, repair
+  Cantor's Robe (Legendary, dur 55/55, AC+4, resist:aetheric, unique, [core_guardian_set,aether_born,ac:4,chest,light])
+    actions: equip:chest, use, scrap, drop
+  Choir-Bound Boots (Legendary, dur 44/45, equipped:feet, AC+5, resist:aetheric, unique, [fused,unique,aetheric])
+    actions: unequip:feet, repair
+  Forge-Black Cowl (Legendary, dur 37/45, equipped:head, AC+5, resist:degradation, unique, [fused,unique,degradation])
+    actions: unequip:head, repair
+  Ichor-Slick Casque (Legendary, dur 45/45, AC+5, resist:poison, unique, [fused,unique,poison])
+    actions: equip:head, use, scrap, drop
+  Litany Greaves (Legendary, dur 85/85, AC+3, unique, [core_guardian_set,aether_born,ac:3,legs,heavy])
+    actions: equip:legs, use, scrap, drop
+  Mud-Bound Cloak (dur 3/20, AC +1 · STE +1, [armor,cloak,outer,mud_dwellers,stealth])
+    actions: equip:cloak, use, scrap, repair, drop
+  Mud-Bound Cloak (dur 3/20, AC +1 · STE +1, [armor,cloak,outer,mud_dwellers,stealth])
+    actions: equip:cloak, use, scrap, repair, drop
+  Mud-Bound Cloak (dur 3/20, AC +1 · STE +1, [armor,cloak,outer,mud_dwellers,stealth])
+    actions: equip:cloak, use, scrap, repair, drop
+  Mud-Warden's Vest (dur 20/20, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,mud_dwellers,loot])
+    actions: equip:chest, use, scrap, drop
+  Mud-Warden's Vest (dur 9/20, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,mud_dwellers,loot])
+    actions: equip:chest, use, scrap, repair, drop
+  Mud-Warden's Vest (dur 3/20, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,mud_dwellers,loot])
+    actions: equip:chest, use, scrap, repair, drop
+  Mud-Warden's Vest (dur 3/20, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,mud_dwellers,loot])
+    actions: equip:chest, use, scrap, repair, drop
+  Mud-Warden's Vest (dur 3/20, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,mud_dwellers,loot])
+    actions: equip:chest, use, scrap, repair, drop
+  Reaver's Pauldron ×3 (Legendary, dur 40/40, AC +5 · Resists: slashing, bludgeoning, burn · STR +5 · DEX +5, [armor,chest,plate,reaver,boss])
+    actions: equip:chest, use, scrap, drop
+  Reclaimer's Mask (dur 13/13, AC +2 · Resists: slashing · STE +2, [armor,head,mask,face,reclaimers])
+    actions: equip:head, use, scrap, drop
+  Reclaimer's Salvage Vest (dur 3/20, AC +1 · HP +1, [armor,chest,plate,reclaimers,loot])
+    actions: equip:chest, use, scrap, repair, drop
+  Rough Hewn Mask (dur 34/34, AC +1 · STE +1, [armor,head,mask,face,mud_golems])
+    actions: equip:head, use, scrap, drop
+  Salvager's Mask of Secrets (dur 14/14, AC +2 · WIS +2, [armor,head,mask,face,reclaimers])
+    actions: equip:head, use, scrap, drop
+  Salvager's Worn Greaves (dur 27/27, AC +1 · Resists: slashing · INT +1, [armor,legs,greaves,reclaimers])
+    actions: equip:legs, use, scrap, drop
+  Shaman's Warden Gloves (dur 32/32, AC +1 · WIS +1, [armor,hands,gauntlets,mud_dwellers])
+    actions: equip:hands, use, scrap, drop
+  Spore-Crusted Tassets (Legendary, dur 45/45, equipped:legs, AC+5, resist:poison, unique, [fused,unique,poison])
+    actions: unequip:legs
+  Traveler's Cloak (dur 16/17, AC +2 · DEX +2 · STE +2 · Resists: burn (coated), [armor,cloak,outer,unknowing_masses,stealth])
+    actions: equip:cloak, use, scrap, repair, drop
+  Vest of the Forgotten Hero (Legendary, dur 65/65, AC +4 · Resists: slashing, cold, burn · CHA +3, [armor,chest,plate,reclaimers,loot])
+    actions: equip:chest, use, scrap, drop
+  Wanderer's Footwraps (dur 13/13, AC +2 · DEX +2 · STE +2, [armor,feet,boots,unknowing_masses,stealth])
+    actions: equip:feet, use, scrap, drop
+  Wanderer's Worn Gauntlets (dur 14/18, AC +2 · STR +2 · Resists: burn (coated), [armor,hands,gauntlets,unknowing_masses])
+    actions: equip:hands, use, scrap, repair, drop
+
+Dog Armor (3)
+  ◆ Burlap Vest (dur 18/18, AC +1 (dog), [dog_armor,vest,burlap,loot,improvised])
+    actions: scrap, save-for-fusion, drop
+  Pith-Cored Saddle (Legendary, dur 45/45, AC+5, unique, [fused,unique])
+    actions: scrap, drop
+  Tendon-Lashed Saddle (Legendary, dur 45/45, AC+5, resist:poison, unique, [fused,unique,poison])
+    actions: scrap, drop
+
+Amulets & Rings (2)
+  Aetheric Locket ×2 (dur 30/30, equipped:amulet, WIS +1 · Resists aetheric: −9% incoming damage of each, on top of armour, [detection,amulet,relic])
+    actions: unequip:amulet
+  Noble's Signet Ring (dur 8/8, equipped:ring, [ring,relic,tartarian])
+    actions: unequip:ring
+
+Consumables (8)
+  Blue Aetheric Fungus ×2 ([fungus,blue,distillable,food,foraged])
+    actions: use(eat), drop
+  Blueberries ×3 (Uncommon, [food,foraged,fruit])
+    actions: use(eat), drop
+  First Aid Kit ×3 (Uncommon, [healing,crafted])
+    actions: use(apply), drop
+  Honey-Glazed Knuckle (Rare, [food,treat,dog_treat,baker])
+    actions: use(eat), drop
+  Wild Carrot ×4 ([food,foraged,vegetable])
+    actions: use(eat), drop
+  Wild Chicken (Rare, [food,foraged,meat])
+    actions: use(eat), drop
+  Wild Lettuce ×4 ([food,foraged,leafy])
+    actions: use(eat), drop
+  Wild Oats ×2 ([food,foraged,grain])
+    actions: use(eat), drop
+
+Coatings (4)
+  Acid Flask ×9 (Uncommon, [potion,weapon_coating,acid,crafted])
+    actions: drop
+  Frost Paste ×2 (Uncommon, [potion,weapon_coating,cold,aether,crafted])
+    actions: use(eat), drop
+  Incendiary Paste ×5 (Uncommon, [potion,weapon_coating,burn,aether,crafted])
+    actions: use(eat), drop
+  Smoldering Paste ×19 (Uncommon, [potion,weapon_coating,burn,aether,crafted])
+    actions: use(eat), drop
+
+Tools (9)
+  Aetheric Scanner (Uncommon, [exploration,relic,uncommon,architectural_sentinel])
+    actions: equip:off, use(off), scrap, drop
+  Aetheric Torch (dur 25/25, Reveals hidden scene hooks, [light,relic])
+    actions: use, scrap, drop
+  Aetheric Vision Lens ([exploration,relic,common,race_starter,tartarian_giant])
+    actions: equip:lens, use, scrap, drop
+  Climbing Rope ×6 (dur 150/150, [utility,gate,rope])
+    actions: use, drop
+  Hardened Climbing Strap ([exploration,common,race_starter,tartarian_giant,wardrobe])
+    actions: equip:legs, use, scrap, drop
+  Mud Scanner ([exploration,relic,common,mud_dweller])
+    actions: equip:off, use(off), scrap, drop
+  Pry Bar (dur 111/120, [tool,pry,utility,metal])
+    actions: scrap, repair, drop
+  Pulse Scanner ([exploration,relic,common,race_starter,architectural_sentinel])
+    actions: equip:off, use(off), scrap, drop
+  Reclaimer's Rope (dur 300/300, [climb,rope,fiber,exploration,tool])
+    actions: use, scrap, drop
+
+Materials (49)
+  Aether Crystal ×6 ([aether,crystal])
+    actions: drop
+  Aether Residue ×2 ([aether,loot])
+    actions: drop
+  ◆ Aether Venom ([trophy,loot,organic,aether,alchemy])
+    actions: scrap, save-for-fusion, drop
+  ◆ Aetheric Cog ([metal,automation,aether,salvage,loot])
+    actions: scrap, save-for-fusion, drop
+  Aetheric Dust ×4 (Uncommon, [aether])
+    actions: scrap, drop
+  ◆ Aetheric Mud Fragment (Uncommon, [mud,aether,stone,loot])
+    actions: scrap, save-for-fusion, drop
+  Aetheric Pelt (Rare, [organic,aether,loot])
+    actions: scrap, drop
+  Aetheric Shard ×32 (Uncommon, [aether,crystal])
+    actions: drop
+  ◆ Aetheric Teeth ([trophy,loot,organic,aether,bone])
+    actions: scrap, save-for-fusion, drop
+  Automaton Circuit ×4 ([automation,tech,scrap])
+    actions: drop
+  Bent Nail ×26 ([metal,junk,scrap])
+    actions: scrap, drop
+  Big Rock ×5 ([thrown,stone,improvised,heavy])
+    actions: drop
+  Blank Runecaster Casing (Common) ([runecaster,casing,blank,loot])
+    actions: drop
+  Blank Runecaster Casing (Legendary) (Legendary, [runecaster,casing,blank,loot])
+    actions: drop
+  Blank Runecaster Casing (Rare) ×2 (Rare, [r
+(pack listing trimmed at 12000 characters)
+
+--- CHARACTER LOG (newest first) ---
+(Newest entry at top — showing the most recent 305 of 3587 entries; older trimmed to fit a single email paste)
+
+[2026-09-06T22:04:06.336Z] [debug] boot: life bmtqcyph077 started 2026-09-06T22:03:13.140Z · FOLLOWED AN OTA APPLY 207ms ago via boot-front · prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)
+[2026-09-06T22:04:06.335Z] [debug] missions: · at=iskan_veil travelTo=hidden_market
+[2026-09-06T22:04:06.335Z] [debug] missions: faction:fq_true_tartarians_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-06T22:04:06.335Z] [debug] missions: faction:fq_forgotten_order_novices_escort [single objective] PAUSED
+[2026-09-06T22:04:06.335Z] [debug] missions: faction:fq_forgotten_order_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-06T22:04:06.335Z] [debug] missions: faction:fq_order_relic stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-06T22:04:06.335Z] [debug] missions: faction:fq_builders_survey stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-06T22:04:06.335Z] [debug] missions: faction:fq_builders_starter [fetch=Big Rock×4] PAUSED
+[2026-09-06T22:04:06.335Z] [debug] missions: faction:fq_servants_tribute stage 0/3 [advanceOn=travel] PAUSED
+[2026-09-06T22:04:06.335Z] [debug] missions: faction:fq_servants_starter [fetch=Stick×6] PAUSED
+[2026-09-06T22:04:06.334Z] [debug] missions: faction:fq_dynasty_seal stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-06T22:04:06.334Z] [debug] missions: faction:fq_dynasty_starter [fetch=Patched Cloth×4] PAUSED
+[2026-09-06T22:04:06.334Z] [debug] missions: faction:fq_tartarians_pilgrimage stage 0/4 [advanceOn=travel] PAUSED
+[2026-09-06T22:04:06.334Z] [debug] missions: faction:fq_tartarians_starter [fetch=Mud Fragment×5] PAUSED
+[2026-09-06T22:04:06.334Z] [debug] missions: faction:fq_order_field stage 0/3 [advanceOn=travel] PAUSED
+[2026-09-06T22:04:06.334Z] [debug] missions: faction:fq_order_starter [fetch=Aether Residue×4] PAUSED
+[2026-09-06T22:04:06.334Z] [debug] missions: faction:fq_reclaimers_haul stage 0/2 [advanceOn=any] PAUSED
+[2026-09-06T22:04:06.333Z] [debug] missions: faction:fq_reclaimers_starter [fetch=Scrap Metal×3] PAUSED
+[2026-09-06T22:04:06.333Z] [debug] missions: faction:fq_monarchs_standard stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-06T22:04:06.333Z] [debug] missions: faction:fq_monarchs_silence stage 0/4 [advanceOn=kill] PAUSED
+[2026-09-06T22:04:06.333Z] [debug] missions: faction:fq_monarchs_starter [fetch=Aether Mud×4]
+[2026-09-06T22:04:06.333Z] [debug] missions: storyline:story_truetart_descent_karoksa stage 1/7 [investigate] @karok_sa needs=Enclave-Mother's Ash Mark✗MISSING gives=The Holding Seam PAUSED
+[2026-09-06T22:04:06.333Z] [debug] missions: storyline:story_order_red_tower stage 1/9 [investigate] @great_tartary_plains needs=Vesryn's Fragment Map✗MISSING gives=First Fragment PAUSED
+[2026-09-06T22:04:06.333Z] [debug] missions: storyline:story_monarch_ledger_of_silence stage 1/6 [investigate] @ostragar needs=Factor's Name and Route✗MISSING gives=Empty Field-Book Case PAUSED
+[2026-09-06T22:04:06.333Z] [debug] missions: storyline:story_monarch_silence stage 1/8 [diplomacy] @reclaimer_stake npc="the talkative Reclaimer" needs=Kincaid's List of Six✗MISSING gives=A Reasonable Man's Note PAUSED
+[2026-09-06T22:04:06.332Z] [debug] missions: mystery:mystery_leviathan_eye stage 1/4 [investigate] @mud_seas needs=Jar of Aetherstone Packing✗MISSING gives=Fossilised Leviathan Scale PAUSED
+[2026-09-06T22:04:06.332Z] [debug] missions: mystery:mystery_ashen_codex stage 1/4 [investigate] @nimari needs=Ash-Frame✗MISSING gives=Framed Char-Block PAUSED
+[2026-09-06T22:04:06.332Z] [debug] missions: mystery:mystery_weeping_core stage 1/4 [investigate] @buried_cities needs=Sealed Catch-Vial✗MISSING gives=A Single Core-Tear PAUSED
+[2026-09-06T22:04:06.332Z] [debug] missions: mystery:mystery_servants_hum stage 1/5 [investigate] @obsidian_pillars needs=Vael's Three Listening Stones✗MISSING gives=First Note — the Pillars PAUSED
+[2026-09-06T22:04:06.332Z] [debug] missions: mystery:mystery_red_tower stage 1/4 [investigate] @cradle_of_dusk needs=Scholar's Survey Chit✗MISSING gives=Warm Hexagonal Plate PAUSED
+[2026-09-06T22:04:06.332Z] [debug] missions: mystery:mystery_hollow_crown stage 1/4 [investigate] @giant_vault needs=Hoard Manifest✗MISSING gives=Assayer's Note PAUSED
+[2026-09-06T22:04:06.332Z] [debug] missions: mystery:mystery_obsidian_orb stage 1/4 [investigate] @obsidian_pillars needs=Monarch Courier Writ✗MISSING gives=Storm-Scored Shard PAUSED
+[2026-09-06T22:04:06.331Z] [debug] missions: mystery:mystery_pale_signal stage 1/4 [investigate] @mud_flood_nexus needs=Beat-Counter✗MISSING gives=The Counted Sequence PAUSED
+[2026-09-06T22:04:06.331Z] [debug] missions: mystery:mystery_drowned_bell_samarran stage 1/4 [investigate] @samarran needs=Founder's Tuning-Rod✗MISSING gives=Wreck Bearing PAUSED
+[2026-09-06T22:04:06.331Z] [debug] missions: mystery:mystery_cradle_compass stage 1/3 [stealth] @cradle_of_dusk needs=Halem's Broken Compass✗MISSING gives=Cradle of Dusk Compass PAUSED
+[2026-09-06T22:04:06.331Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc="the Order envoy" gives=Sealed Reliquary Box PAUSED
+[2026-09-06T22:04:06.331Z] [debug] missions: hunt:hunt_mud_titan stage 1/7 [investigate] @buried_cities gives=Collapsed Gantry Log PAUSED
+[2026-09-06T22:04:06.331Z] [debug] missions: hunt:hunt_salamander_voronov stage 1/5 [investigate] @buried_cities needs=Engineer's Conduit Chit✓ gives=Cracked Conduit Reading PAUSED
+[2026-09-06T22:04:06.331Z] [debug] missions: hunt:hunt_mud_hound_alpha_yuldra stage 1/5 [investigate] @great_tartary_plains needs=Reeve's Road-Writ✓ gives=Lame-Hound Bait Sign PAUSED
+[2026-09-06T22:04:06.331Z] [debug] missions: hunt:hunt_plague_moth_enclave stage 1/5 [investigate] @giant_vault needs=Physician's Rot-Ward Mask✓ gives=Salvager's Dying Testimony PAUSED
+[2026-09-06T22:04:06.330Z] [debug] missions: hunt:hunt_mud_golem_thametan stage 1/7 [investigate] @thametans_tower needs=Lodge Survey Warrant✓ gives=Builders' Scattered Tools PAUSED
+[2026-09-06T22:04:06.330Z] [debug] missions: hunt:hunt_dust_fiend_plains stage 1/7 [investigate] @great_tartary_plains needs=Caravan-Mother's Grit-Token✓ gives=Scoured Wheel-Warning PAUSED
+[2026-09-06T22:04:06.330Z] [debug] missions: hunt:hunt_mud_harpy_cradle stage 1/7 [investigate] @cradle_of_dusk needs=Warden's Dusk-Warrant✓ gives=Three Grey Pinions PAUSED
+[2026-09-06T22:04:06.330Z] [debug] missions: hunt:hunt_apparition_red_tower stage 1/7 [investigate] @red_tower_of_nimari needs=Archivist's Requisition✓ gives=Core-Casing Rubbing PAUSED
+[2026-09-06T22:04:06.330Z] [debug] missions: hunt:hunt_iron_spider_obsidian stage 1/7 [investigate] @obsidian_pillars needs=Coil of Tartarian Filament✓ gives=Wire-Marked Toolkit PAUSED
+[2026-09-06T22:04:06.330Z] [debug] missions: hunt:hunt_mud_siren_drakova stage 1/7 [investigate] @mud_seas needs=Ferryman's Crossing-Token✓ gives=Boot-Trail Cast PAUSED
+[2026-09-06T22:04:06.330Z] [debug] missions: hunt:hunt_shade_endless_stair stage 1/7 [investigate] @endless_stair needs=Warden's Tally of the Missing✓ gives=Pilgrim's Still-Burning Lantern PAUSED
+[2026-09-06T22:04:06.329Z] [debug] missions: hunt:hunt_silt_serpent_cathedral stage 1/7 [investigate] @sinking_cathedral needs=Dive-Boss's Mooring Chit✓ gives=Wren's Cut Line PAUSED
+[2026-09-06T22:04:06.329Z] [debug] missions: hunt:hunt_steam_walker_zharak stage 1/7 [investigate] @zharaks_teeth needs=Caravan-Master's Pass-Chit✓ gives=Scalded Glass Shard PAUSED
+[2026-09-06T22:04:06.329Z] [debug] missions: hunt:hunt_servants_doubter stage 1/5 [boss→attack] @great_tartary_plains needs=Servants' Mark of Sanction✓ spawn=Tartarian Raider×3 PAUSED
+[2026-09-06T22:04:06.329Z] [debug] missions: hunt:hunt_mud_siren_queen stage 1/5 [boss→attack] @mud_seas needs=Drifter's South-Spire Poster✓ spawn=Mud Siren×3 PAUSED
+[2026-09-06T22:04:06.329Z] [debug] missions: hunt:hunt_sludge_behemoth stage 1/7 [boss→attack] @mud_seas needs=Sealed Coordinate Tube✓ gives=Dive-Camp Tally spawn=Swamp Crab×1 PAUSED
+[2026-09-06T22:04:06.328Z] [debug] missions: hunt:hunt_bog_dragon stage 1/7 [investigate] @cradle_of_dusk gives=Obsidian-Edged Scale PAUSED
+[2026-09-06T22:04:06.323Z] [debug] ═══ SESSION 2026-09-06T22:04:06.321Z · build 2026-09-06-1721-your-name-was-three-dots · previous entry moments earlier ═══
+[2026-09-06T22:04:06.065Z] [arbiter] The Arbiter looks up as you return. "Welcome back, Great Scott. I wondered when you'd take up the thread again. The waste did not sleep while you were gone — blood was spilled and ground changed hands. Read the World for the account."
+[2026-09-06T22:04:06.060Z] [world] The Reclaimers' Guild updated its standing-board while you were gone. Your name is on it.
+[2026-09-06T22:04:06.060Z] [world] You step back into Iskan-Veil. The world waits for your move.
+[2026-09-06T22:04:06.060Z] [debug] OTA session start: 2026-09-06-1721-your-name-was-three-dots.
+[2026-09-05T23:23:52.173Z] [debug] persist sizes(KB): total=254 player=64 wm=104[rooms=47 events=7 memos=0 npcs=6 defeated=1 tags=1 discovered=0] log=83 scene=3
+[2026-09-05T23:23:48.502Z] [debug] send-log: #mtp0ehhg6dwl — DELIVERED (inline, no attachments): beacon out, 9/9 parts accepted (61583 chars) — flush said yes, transport took every part
+[2026-09-05T23:23:31.406Z] [debug] render⏱ 8834ms after engine-done · feed 500
+[2026-09-05T23:23:31.225Z] [reward] ✦ Resurrection. Great Scott returns to Tartaria, restored. The Aetherstone hums in recognition.
+[2026-09-05T23:23:31.219Z] [world] Rare workings for sale: Hearty Stew (200 TC), Helm of the Great Architect (200 TC) — buy one by name to learn it. This one also mends worn gear, trains a stat for coin, and patches up a hurt dog or golem — just ask.
+[2026-09-05T23:23:31.211Z] [arbiter] The Arbiter inclines their head toward the newcomer. "Odar Flameforge, Fire-Weaponsmith. Proud and loud. Known for crafting fire-imbued weapons and armor with fire resistance."
+[2026-09-05T23:23:31.210Z] [world] A figure crests the rise — Odar Flameforge, Fire-Weaponsmith, pack heavy across the shoulders. They set down to trade.
+[2026-09-05T23:23:31.210Z] [world] [Dynasty Border Post Outskirts] north: open ground · east: Tartarian Pilgrim Camp (2 tiles, 5 hours) · south: The Buried Cities (5 tiles, 13 hours) · west: Dynasty Border Post (3 tiles, 8 hours)
+[2026-09-05T23:23:31.208Z] [system] Weather effect — Glass Hail: -1 DEX
+Hazard: Flooded Tunnel. Standing water laced with Aether residue. Things move beneath the surface.
+You are at Iskan-Veil. A far-northwestern Lost Capital. The Conspiracy Architects' hidden city — a maze of false doors and overlaid corridors. Every map of Iskan-Veil is wrong by design; the true Core seat is behind the door you didn't see.
+[2026-09-05T23:23:31.208Z] [world] Crystalline shards rain down like a windowpane shattering in slow motion. Aetherstone hums where they strike.
+[2026-09-05T23:23:31.207Z] [world] An empty freeholding stands off the path here — weathered and quiet, a way in still clear. (You’re on a route — type ENTER to step inside, or keep traveling.)
+[2026-09-05T23:23:31.128Z] [debug] missions: · at=iskan_veil travelTo=hidden_market
+[2026-09-05T23:23:31.128Z] [debug] missions: faction:fq_true_tartarians_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-05T23:23:31.128Z] [debug] missions: faction:fq_forgotten_order_novices_escort [single objective] PAUSED
+[2026-09-05T23:23:31.127Z] [debug] missions: faction:fq_forgotten_order_rapport [fetch=Golem Core×1] PAUSED
+[2026-09-05T23:23:31.127Z] [debug] missions: faction:fq_order_relic stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-05T23:23:31.127Z] [debug] missions: faction:fq_builders_survey stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-05T23:23:31.127Z] [debug] missions: faction:fq_builders_starter [fetch=Big Rock×4] PAUSED
+[2026-09-05T23:23:31.127Z] [debug] missions: faction:fq_servants_tribute stage 0/3 [advanceOn=travel] PAUSED
+[2026-09-05T23:23:31.127Z] [debug] missions: faction:fq_servants_starter [fetch=Stick×6] PAUSED
+[2026-09-05T23:23:31.127Z] [debug] missions: faction:fq_dynasty_seal stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-05T23:23:31.127Z] [debug] missions: faction:fq_dynasty_starter [fetch=Patched Cloth×4] PAUSED
+[2026-09-05T23:23:31.126Z] [debug] missions: faction:fq_tartarians_pilgrimage stage 0/4 [advanceOn=travel] PAUSED
+[2026-09-05T23:23:31.126Z] [debug] missions: faction:fq_tartarians_starter [fetch=Mud Fragment×5] PAUSED
+[2026-09-05T23:23:31.126Z] [debug] missions: faction:fq_order_field stage 0/3 [advanceOn=travel] PAUSED
+[2026-09-05T23:23:31.126Z] [debug] missions: faction:fq_order_starter [fetch=Aether Residue×4] PAUSED
+[2026-09-05T23:23:31.126Z] [debug] missions: faction:fq_reclaimers_haul stage 0/2 [advanceOn=any] PAUSED
+[2026-09-05T23:23:31.126Z] [debug] missions: faction:fq_reclaimers_starter [fetch=Scrap Metal×3] PAUSED
+[2026-09-05T23:23:31.126Z] [debug] missions: faction:fq_monarchs_standard stage 0/3 [advanceOn=kill] PAUSED
+[2026-09-05T23:23:31.125Z] [debug] missions: faction:fq_monarchs_silence stage 0/4 [advanceOn=kill] PAUSED
+[2026-09-05T23:23:31.125Z] [debug] missions: faction:fq_monarchs_starter [fetch=Aether Mud×4]
+[2026-09-05T23:23:31.125Z] [debug] missions: storyline:story_truetart_descent_karoksa stage 1/7 [investigate] @karok_sa needs=Enclave-Mother's Ash Mark✗MISSING gives=The Holding Seam PAUSED
+[2026-09-05T23:23:31.125Z] [debug] missions: storyline:story_order_red_tower stage 1/9 [investigate] @great_tartary_plains needs=Vesryn's Fragment Map✗MISSING gives=First Fragment PAUSED
+[2026-09-05T23:23:31.125Z] [debug] missions: storyline:story_monarch_ledger_of_silence stage 1/6 [investigate] @ostragar needs=Factor's Name and Route✗MISSING gives=Empty Field-Book Case PAUSED
+[2026-09-05T23:23:31.125Z] [debug] missions: storyline:story_monarch_silence stage 1/8 [diplomacy] @reclaimer_stake npc="the talkative Reclaimer" needs=Kincaid's List of Six✗MISSING gives=A Reasonable Man's Note PAUSED
+[2026-09-05T23:23:31.125Z] [debug] missions: mystery:mystery_leviathan_eye stage 1/4 [investigate] @mud_seas needs=Jar of Aetherstone Packing✗MISSING gives=Fossilised Leviathan Scale PAUSED
+[2026-09-05T23:23:31.124Z] [debug] missions: mystery:mystery_ashen_codex stage 1/4 [investigate] @nimari needs=Ash-Frame✗MISSING gives=Framed Char-Block PAUSED
+[2026-09-05T23:23:31.123Z] [debug] missions: mystery:mystery_weeping_core stage 1/4 [investigate] @buried_cities needs=Sealed Catch-Vial✗MISSING gives=A Single Core-Tear PAUSED
+[2026-09-05T23:23:31.123Z] [debug] missions: mystery:mystery_servants_hum stage 1/5 [investigate] @obsidian_pillars needs=Vael's Three Listening Stones✗MISSING gives=First Note — the Pillars PAUSED
+[2026-09-05T23:23:31.123Z] [debug] missions: mystery:mystery_red_tower stage 1/4 [investigate] @cradle_of_dusk needs=Scholar's Survey Chit✗MISSING gives=Warm Hexagonal Plate PAUSED
+[2026-09-05T23:23:31.123Z] [debug] missions: mystery:mystery_hollow_crown stage 1/4 [investigate] @giant_vault needs=Hoard Manifest✗MISSING gives=Assayer's Note PAUSED
+[2026-09-05T23:23:31.123Z] [debug] missions: mystery:mystery_obsidian_orb stage 1/4 [investigate] @obsidian_pillars needs=Monarch Courier Writ✗MISSING gives=Storm-Scored Shard PAUSED
+[2026-09-05T23:23:31.123Z] [debug] missions: mystery:mystery_pale_signal stage 1/4 [investigate] @mud_flood_nexus needs=Beat-Counter✗MISSING gives=The Counted Sequence PAUSED
+[2026-09-05T23:23:31.122Z] [debug] missions: mystery:mystery_drowned_bell_samarran stage 1/4 [investigate] @samarran needs=Founder's Tuning-Rod✗MISSING gives=Wreck Bearing PAUSED
+[2026-09-05T23:23:31.122Z] [debug] missions: mystery:mystery_cradle_compass stage 1/3 [stealth] @cradle_of_dusk needs=Halem's Broken Compass✗MISSING gives=Cradle of Dusk Compass PAUSED
+[2026-09-05T23:23:31.122Z] [debug] missions: hunt:hunt_iron_titan stage 0/7 [diplomacy] @varakush npc="the Order envoy" gives=Sealed Reliquary Box PAUSED
+[2026-09-05T23:23:31.122Z] [debug] missions: hunt:hunt_mud_titan stage 1/7 [investigate] @buried_cities gives=Collapsed Gantry Log PAUSED
+[2026-09-05T23:23:31.122Z] [debug] missions: hunt:hunt_salamander_voronov stage 1/5 [investigate] @buried_cities needs=Engineer's Conduit Chit✓ gives=Cracked Conduit Reading PAUSED
+[2026-09-05T23:23:31.122Z] [debug] missions: hunt:hunt_mud_hound_alpha_yuldra stage 1/5 [investigate] @great_tartary_plains needs=Reeve's Road-Writ✓ gives=Lame-Hound Bait Sign PAUSED
+[2026-09-05T23:23:31.121Z] [debug] missions: hunt:hunt_plague_moth_enclave stage 1/5 [investigate] @giant_vault needs=Physician's Rot-Ward Mask✓ gives=Salvager's Dying Testimony PAUSED
+[2026-09-05T23:23:31.121Z] [debug] missions: hunt:hunt_mud_golem_thametan stage 1/7 [investigate] @thametans_tower needs=Lodge Survey Warrant✓ gives=Builders' Scattered Tools PAUSED
+[2026-09-05T23:23:31.121Z] [debug] missions: hunt:hunt_dust_fiend_plains stage 1/7 [investigate] @great_tartary_plains needs=Caravan-Mother's Grit-Token✓ gives=Scoured Wheel-Warning PAUSED
+[2026-09-05T23:23:31.121Z] [debug] missions: hunt:hunt_mud_harpy_cradle stage 1/7 [investigate] @cradle_of_dusk needs=Warden's Dusk-Warrant✓ gives=Three Grey Pinions PAUSED
+[2026-09-05T23:23:31.121Z] [debug] missions: hunt:hunt_apparition_red_tower stage 1/7 [investigate] @red_tower_of_nimari needs=Archivist's Requisition✓ gives=Core-Casing Rubbing PAUSED
+[2026-09-05T23:23:31.120Z] [debug] missions: hunt:hunt_iron_spider_obsidian stage 1/7 [investigate] @obsidian_pillars needs=Coil of Tartarian Filament✓ gives=Wire-Marked Toolkit PAUSED
+[2026-09-05T23:23:31.120Z] [debug] missions: hunt:hunt_mud_siren_drakova stage 1/7 [investigate] @mud_seas needs=Ferryman's Crossing-Token✓ gives=Boot-Trail Cast PAUSED
+[2026-09-05T23:23:31.120Z] [debug] missions: hunt:hunt_shade_endless_stair stage 1/7 [investigate] @endless_stair needs=Warden's Tally of the Missing✓ gives=Pilgrim's Still-Burning Lantern PAUSED
+[2026-09-05T23:23:31.120Z] [debug] missions: hunt:hunt_silt_serpent_cathedral stage 1/7 [investigate] @sinking_cathedral needs=Dive-Boss's Mooring Chit✓ gives=Wren's Cut Line PAUSED
+[2026-09-05T23:23:31.120Z] [debug] missions: hunt:hunt_steam_walker_zharak stage 1/7 [investigate] @zharaks_teeth needs=Caravan-Master's Pass-Chit✓ gives=Scalded Glass Shard PAUSED
+[2026-09-05T23:23:31.117Z] [debug] missions: hunt:hunt_servants_doubter stage 1/5 [boss→attack] @great_tartary_plains needs=Servants' Mark of Sanction✓ spawn=Tartarian Raider×3 PAUSED
+[2026-09-05T23:23:31.117Z] [debug] missions: hunt:hunt_mud_siren_queen stage 1/5 [boss→attack] @mud_seas needs=Drifter's South-Spire Poster✓ spawn=Mud Siren×3 PAUSED
+[2026-09-05T23:23:31.116Z] [debug] missions: hunt:hunt_sludge_behemoth stage 1/7 [boss→attack] @mud_seas needs=Sealed Coordinate Tube✓ gives=Dive-Camp Tally spawn=Swamp Crab×1 PAUSED
+[2026-09-05T23:23:31.116Z] [debug] missions: hunt:hunt_bog_dragon stage 1/7 [investigate] @cradle_of_dusk gives=Obsidian-Edged Scale PAUSED
+[2026-09-05T23:23:31.109Z] [debug] scene: loc=iskan_veil hub=- arrival=n opening=n passing=y
+[2026-09-05T23:23:28.974Z] [debug] freeze watch: recovered — painting again after 1439ms quiet.
+[2026-09-05T23:23:24.332Z] [system] You join the Fallen of Tartaria — 18 names the buried world keeps now. Read the roll from the Lore Codex.
+[2026-09-05T23:23:23.898Z] [debug] ⚠ FREEZE WATCH: LOGIC stalled while frames kept coming (js 2361ms · frames 1439ms). Something blocked the JS thread — look for a long synchronous run. · crumb before: rendered +7741ms → now: engine-done +1326ms · doing: action "flee" · native: idle · heap 24MB · gc +0ms/392 · feed 500
+[2026-09-05T23:23:22.941Z] [debug] render⏱ 369ms after engine-done · feed 500
+[2026-09-05T23:23:22.461Z] [debug] ui: tap "flee 23%" ⏱+454ms late 446ms
+[2026-09-05T23:23:21.988Z] [combat] Pike falls beside you. The buried world claims them too.
+[2026-09-05T23:23:21.881Z] [system] Great Scott has fallen. A Resurrection Gem from the title screen can bring them back.
+[2026-09-05T23:23:21.827Z] [combat] The buried world claims Great Scott. Tartaria keeps the body count.
+[2026-09-05T23:23:21.772Z] [combat] Eternal Dynasty Patrol 4 deals 11 bludgeoning damage [armor −12%]. You fall.
+[2026-09-05T23:23:21.660Z] [arbiter] The Arbiter holds your gaze. "You're badly injured. Take a moment — eat what you have, open the first-aid kit, or rest somewhere safe. The Outskirts do not return what they take."
+[2026-09-05T23:23:21.603Z] [combat] Eternal Dynasty Patrol 3 deals 12 bludgeoning damage [armor −12%]. You have 1 HP remaining.
+[2026-09-05T23:23:21.550Z] [combat] Eternal Dynasty Patrol 2 deals 16 bludgeoning damage [armor −12%]. You have 13 HP remaining.
+[2026-09-05T23:23:21.148Z] [debug] render⏱ 383ms after engine-done · feed 500
+[2026-09-05T23:23:20.658Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-05T23:23:20.605Z] [debug] arbiter: template (reason=combat)
+[2026-09-05T23:23:20.501Z] [combat] Eternal Dynasty Patrol 4 — d20 → 17 + ATK 16 = 33 vs your AC 26 — ✓ HIT
+[2026-09-05T23:23:20.394Z] [combat] Eternal Dynasty Patrol 3 — d20 → 18 + ATK 16 = 34 vs your AC 26 — ✓ HIT
+[2026-09-05T23:23:20.288Z] [combat] Eternal Dynasty Patrol 2 — d20 → 16 + ATK 16 = 32 vs your AC 26 — ✓ HIT
+[2026-09-05T23:23:20.183Z] [combat] Eternal Dynasty Patrol 1 blisters — clinging fire sears 4. (6/35 HP, 2 turns left)
+[2026-09-05T23:23:20.130Z] [world] The field shifts around you — Eternal Dynasty Patrol 3 now close / arm's reach; Eternal Dynasty Patrol 4 now close / arm's reach.
+[2026-09-05T23:23:20.077Z] [world] You close the gap with the Eternal Dynasty Patrol 2 and 3 others. (range: close / arm's reach)
+[2026-09-05T23:23:20.023Z] [debug] move: field advance target=Eternal Dynasty Patrol 2 d 1.71->0.71 band mid->close
+[2026-09-05T23:23:19.917Z] [debug] move: advance from range=mid enemies=4 weather=Aether Lightning cost=1 partial=0
+[2026-09-05T23:23:19.812Z] [debug] parser: intent=advance conf=1.00 verb=approach target=eternal dynasty patrol 2 resolved=Eternal Dynasty Patrol 2 range=mid enemies=4 hooks=1
+[2026-09-05T23:23:19.759Z] [player] approach Eternal Dynasty Patrol 2
+[2026-09-05T23:23:19.574Z] [debug] ui: tap "approach" ⏱+193ms
+[2026-09-05T23:23:19.174Z] [combat] Eternal Dynasty Patrol 2's strike leaves you bleeding.
+[2026-09-05T23:23:19.123Z] [combat] Eternal Dynasty Patrol 2 deals 8 bludgeoning damage [armor −12%] [edge of reach — halved]. You have 29 HP remaining.
+[2026-09-05T23:23:18.742Z] [combat] Eternal Dynasty Patrol 3 — d20 → 9 + ATK 16 = 25 vs your AC 26 — ✗ MISS
+[2026-09-05T23:23:18.738Z] [combat] Eternal Dynasty Patrol 2 — d20 → 13 + ATK 16 = 29 vs your AC 26 — ✓ HIT
+[2026-09-05T23:23:18.736Z] [combat] Eternal Dynasty Patrol 4 — d20 → 3 + ATK 18 = 21 vs your AC 26 — ✗ MISS
+[2026-09-05T23:23:18.735Z] [debug] ac-shift 29→26: race/base 12 + gear 24 + title 0 → trimmed 26 + status 0 | worn: head=Forge-Black Cowl chest=Burl Aegis hands=Wanderer's Worn Gauntlets legs=Spore-Crusted Tassets feet=Choir-Bound Boots cloak=Traveler's Cloak
+[2026-09-05T23:23:18.732Z] [combat] Eternal Dynasty Patrol 1 is left exposed — easier to hit.
+[2026-09-05T23:23:18.732Z] [combat] Searing Knot-Grained Gouge — 4 burn bites in and festers (3 turns).
+[2026-09-05T23:23:18.732Z] [combat] Eternal Dynasty Patrol 1 is out of it. Eternal Dynasty Patrol 2 now in your sights.
+[2026-09-05T23:23:18.731Z] [combat] You crack the Eternal Dynasty Patrol 1 with the Searing Knot-Grained Gouge for 25 — the better part of their fight, gone in one blow. They crumple, out cold. (10/35 HP) Loot them before they come to.
+[2026-09-05T23:23:18.729Z] [combat] Bludgeoning flares — +2 on hit.
+[2026-09-05T23:23:18.728Z] [combat] You — d20 → 12 + DEX 16 perfect opening (2× dice) = 28 vs Eternal Dynasty Patrol 1 AC 20 — ✓ HIT
+[2026-09-05T23:23:18.728Z] [world] You seize the initiative. Eternal Dynasty Patrol 1 has no time to react.
+[2026-09-05T23:23:18.688Z] [debug] dice⏱ coating: shown +257ms, tapped +389ms, settled +1067ms (hold late 267ms) = 1713ms
+[2026-09-05T23:23:17.621Z] [debug] ui: tap "roll" ⏱+19ms
+[2026-09-05T23:23:16.973Z] [debug] dice⏱ damage: shown +257ms, tapped +441ms, settled +1069ms (hold late 269ms) = 1767ms
+[2026-09-05T23:23:15.903Z] [debug] ui: tap "roll" ⏱+12ms
+[2026-09-05T23:23:15.203Z] [debug] dice⏱ attack: shown +266ms, tapped +428ms, settled +1067ms (hold late 267ms) = 1761ms
+[2026-09-05T23:23:14.136Z] [debug] ui: tap "roll" ⏱+23ms
+[2026-09-05T23:23:13.436Z] [debug] dice⏱ initiative: shown +449ms, tapped +855ms, settled +1066ms (hold late 266ms) = 2370ms
+[2026-09-05T23:23:12.370Z] [debug] ui: tap "roll" ⏱+20ms
+[2026-09-05T23:23:11.169Z] [system] ⏳ Time passed: 6 min
+[2026-09-05T23:23:11.118Z] [world] Your searing knot-grained gouge comes around in an arc; Eternal Dynasty Patrol 1 squares up to meet it.
+[2026-09-05T23:23:10.962Z] [debug] attack: status mods perfect opening (2× dice)
+[2026-09-05T23:23:10.858Z] [debug] attack: target=Eternal Dynasty Patrol 1 range=close reach.bands=[close] reach.label=Knot-Grained Gouge bareHand=false
+[2026-09-05T23:23:10.703Z] [debug] parser: intent=attack conf=1.00 verb=attack target=knot grained gouge resolved=Knot-Grained Gouge range=close enemies=4 hooks=1
+[2026-09-05T23:23:10.650Z] [player] attack with the knot-grained gouge
+[2026-09-05T23:23:10.576Z] [system] evasive — harder to hit fades.
+[2026-09-05T23:23:10.415Z] [debug] ui: tap "🔥 knot-grained gouge ⚒" ⏱+429ms late 421ms
+[2026-09-05T23:23:09.512Z] [combat] Eternal Dynasty Patrol 3's strike leaves you bleeding.
+[2026-09-05T23:23:09.459Z] [combat] Eternal Dynasty Patrol 3 deals 6 bludgeoning damage [armor −12%] [edge of reach — halved]. You have 37 HP remaining.
+[2026-09-05T23:23:09.064Z] [debug] render⏱ 371ms after engine-done · feed 500
+[2026-09-05T23:23:08.530Z] [system] ⏳ Time passed: 6 min
+[2026-09-05T23:23:08.478Z] [combat] Eternal Dynasty Patrol 4 closes the distance.
+[2026-09-05T23:23:08.317Z] [combat] Eternal Dynasty Patrol 3 — d20 → 15 + ATK 18 = 33 vs your AC 29 — ✓ HIT
+[2026-09-05T23:23:08.208Z] [combat] Eternal Dynasty Patrol 2 — d20 → 5 + ATK 16 = 21 vs your AC 29 — ✗ MISS
+[2026-09-05T23:23:08.155Z] [debug] ac-shift 26→29: race/base 12 + gear 24 + title 0 → trimmed 26 + status 3 | worn: head=Forge-Black Cowl chest=Burl Aegis hands=Wanderer's Worn Gauntlets legs=Spore-Crusted Tassets feet=Choir-Bound Boots cloak=Traveler's Cloak
+[2026-09-05T23:23:08.049Z] [world] You slip Eternal Dynasty Patrol 1's arc clean and stay light on your feet — the rest of the pack still swings, but you're a harder mark for the moment.
+[2026-09-05T23:23:07.944Z] [combat] Dodge — d20 → 6 + DEX 16 = 22 vs ATK 19. ✓ You slip the arc — PERFECT OPENING (next strike ×2 dice).
+[2026-09-05T23:23:07.892Z] [combat] Eternal Dynasty Patrol 1 — d20 → 3 + ATK 16 = 19 vs your AC 26 — ✗ EVADED
+[2026-09-05T23:23:07.690Z] [world] You commit to the dodge. Slip Eternal Dynasty Patrol 1's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-09-05T23:23:07.589Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=4 hooks=1
+[2026-09-05T23:23:07.539Z] [player] dodge
+[2026-09-05T23:23:07.352Z] [debug] ui: tap "dodge" ⏱+20ms
+[2026-09-05T23:23:06.251Z] [debug] freeze watch: recovered — painting again after 1070ms quiet.
+[2026-09-05T23:23:05.482Z] [debug] qwen⏱ investigate_lore ok 4248ms wait 1387ms read/write unusable (native mis-reported 10981ms/1061ms — llama.rn split bug, not this call) in 128t→out 29t js-late 1245ms thr2 (129ch)
+[2026-09-05T23:23:04.161Z] [combat] Eternal Dynasty Patrol 2's strike leaves you bleeding.
+[2026-09-05T23:23:04.102Z] [combat] Eternal Dynasty Patrol 2 deals 4 bludgeoning damage [armor −12%] [edge of reach — halved]. You have 43 HP remaining.
+[2026-09-05T23:23:03.560Z] [arbiter] The Arbiter looks around. "The far-northwestern light comes in flat and grey and lies about the hour."
+[2026-09-05T23:23:03.559Z] [combat] Eternal Dynasty Patrol 3 and 1 other close the distance.
+[2026-09-05T23:23:03.555Z] [combat] Eternal Dynasty Patrol 2 — d20 → 14 + ATK 18 = 32 vs your AC 26 — ✓ HIT
+[2026-09-05T23:23:03.553Z] [combat] Eternal Dynasty Patrol 1 — d20 → 7 + ATK 18 = 25 vs your AC 26 — ✗ MISS
+[2026-09-05T23:23:03.550Z] [world] They have your measure now. The next break will be harder.
+[2026-09-05T23:23:03.550Z] [world] You break to run — and turning your back hands them the opening. Try 'dodge' to set a parry, 'attack' to commit, or another 'retreat' to break contact.
+[2026-09-05T23:23:03.549Z] [debug] stats: STR20 DEX16 INT12 WIS12 CHA12 STE4 | gear: STR+6,DEX+8,STE+2,WIS+1,CHA+1,INT+2 | worn: main=Knot-Grained Gouge off=Bone Crossbow head=Forge-Black Cowl chest=Burl Aegis hands=Wanderer's Worn Gauntlets legs=Spore-Crusted Tassets feet=Choir-Bound Boots cloak=Traveler's Cloak amulet=Aetheric Locket ring=Noble's Signet Ring
+[2026-09-05T23:23:03.471Z] [debug] skillcheck: escape d20=1 DEX 16 = 17 vs Pursuit 22 — Eternal Dynasty Patrol 1 (d20 1 + 21: SPD 14, danger +4, Legendary +3) → FAIL
+[2026-09-05T23:23:03.469Z] [debug] dice⏱ skill_check: shown +336ms, tapped +1611ms, settled +1316ms (hold late 516ms) = 3263ms
+[2026-09-05T23:23:02.621Z] [cognitive] SEARCH  (8128ms)
+[2026-09-05T23:23:02.388Z] [debug] arbiter: ambient-fill banked (2/3) 13226ms
+[2026-09-05T23:23:02.153Z] [debug] ui: tap "roll" ⏱+1020ms late 1012ms
+[2026-09-05T23:23:01.464Z] [debug] qwen⏱ ambient_fill preempted 12020ms read 2551ms/write 1085ms in 364t→out 30t js-late 7825ms thr1 7.0ms/t (163ch)
+[2026-09-05T23:23:01.235Z] [debug] ⚠ FREEZE WATCH: LOGIC stalled while frames kept coming (js 6176ms · frames 462ms). Something blocked the JS thread — look for a long synchronous run. · crumb before: native:homework:start +11791ms → now: engine-done +925ms · doing: action "flee" · native: homework running · q2 · heap 32MB · gc +0ms/658 · feed 500
+[2026-09-05T23:23:00.258Z] [system] ⏳ Time passed: 15 min
+[2026-09-05T23:23:00.049Z] [debug] parser: intent=escape conf=1.00 verb=flee target=- resolved=- range=close enemies=4 hooks=1
+[2026-09-05T23:22:59.995Z] [player] flee
+[2026-09-05T23:22:59.887Z] [debug] ui: tap "flee 30%" ⏱+797ms late 789ms
+[2026-09-05T23:22:55.091Z] [debug] render⏱ 380ms after engine-done · feed 500
+[2026-09-05T23:22:54.652Z] [debug] dedup: suppressed arbiter repeat — ""Eternal Dynasty riders," the Arbiter says. "They've marked …"
+[2026-09-05T23:22:54.652Z] [arbiter] "Eternal Dynasty riders," the Arbiter says. "They've marked you. No outrunning this one."
+[2026-09-05T23:22:54.599Z] [world] An Eternal Dynasty patrol crosses your path in the open — and turns toward you.
+[2026-09-05T23:22:54.492Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-05T23:22:54.492Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-09-05T23:22:54.491Z] [world] You give the architect's mark your full attention. It returns the gesture by being exactly what it appears to be.
+[2026-09-05T23:22:54.490Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=architect mark resolved=architect's mark range=- enemies=0 hooks=1
+[2026-09-05T23:22:54.489Z] [player] investigate architect's mark
+[2026-09-05T23:22:50.577Z] [debug] ui: tap "investigate" ⏱+90ms
+[2026-09-05T23:22:49.856Z] [debug] persist sizes(KB): total=238 player=57 wm=97[rooms=41 events=6 memos=0 npcs=6 defeated=1 tags=1 discovered=0] log=80 scene=3
+[2026-09-05T23:22:49.317Z] [cognitive] REST  (142ms)
+[2026-09-05T23:22:49.174Z] [system] ⏳ Time passed: 8h
+[2026-09-05T23:22:49.173Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-05T23:22:49.173Z] [debug] arbiter: template (reason=busy)
+[2026-09-05T23:22:49.163Z] [arbiter] The Arbiter, near the embers: "I remembered a name in the night. It'll come back to me when the road needs it."
+[2026-09-05T23:22:49.160Z] [world] You rest for 8 hours. +10 HP, +8 stamina recovered. (Day 37, evening)
+[2026-09-05T23:22:49.159Z] [debug] parser: intent=rest conf=1.00 verb=rest target=- resolved=- range=- enemies=0 hooks=1
+[2026-09-05T23:22:49.158Z] [player] rest
+[2026-09-05T23:22:49.144Z] [debug] ui: tap "rest" ⏱+28ms
+[2026-09-05T23:22:45.846Z] [arbiter] The Arbiter eyes your new pieces. "You could make a Sparkwright Band now, if you wanted."
+[2026-09-05T23:22:45.792Z] [reward] +18 TC pried from the dust.
+[2026-09-05T23:22:45.791Z] [system] Word moves through the buried world — many people view you differently now.
+[2026-09-05T23:22:45.790Z] [reward] ✦ Hard-won spoils — Energy Fragment (Uncommon).
+[2026-09-05T23:22:45.789Z] [reward] You strip the body: Mud-Bound Cloak (+15 TC). The kit took the fight badly.
+[2026-09-05T23:22:45.788Z] [world] You crouch for the blade — the Hollow Edge, the black mark of the Forgotten Order's enforcers, its steel weeping a faint corruption that fogs the air. But the grip is wrong. It's honed: razored along the inner curve so the handle itself is a second blade, and only one of its edges is meant for the enemy. Take it up untrained and you flay your own palm to the bone. Only a hand that knows the Order's hold — that two-finger grip they teach behind sealed doors — can carry it. You leave it where it fell.
+[2026-09-05T23:22:45.788Z] [reward] Eternal Dynasty Patrol 4 defeated. You recover Patched Cloth ×2.
+[2026-09-05T23:22:45.787Z] [combat] Final strike with the searing bone crossbow for 25. Eternal Dynasty Patrol 4 is still. The Aetherstone hums on, indifferent.
+[2026-09-05T23:22:45.786Z] [combat] Weakness exposed — Eternal Dynasty Patrol 4 flinches. (piercing ×2.25 for 25)
+[2026-09-05T23:22:45.785Z] [combat] Piercing flares — +4 on hit (weak — bites deep!).
+[2026-09-05T23:22:45.782Z] [combat] You — d20 → 15 + DEX 16 + 2 (point blank) exhausted -2 perfect opening (2× dice) = 31 vs Eternal Dynasty Patrol 4 AC 13 — ✓ HIT
+[2026-09-05T23:22:45.782Z] [combat] Eternal Dynasty Patrol 4 — d20 → 10 + ATK 9 = 19 vs your AC 26 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-05T23:22:45.779Z] [world] Eternal Dynasty Patrol 4 moves first. The pressure is immediate.
+[2026-09-05T23:22:45.735Z] [debug] dice⏱ coating: shown +258ms, tapped +455ms, settled +1067ms (hold late 267ms) = 1780ms
+[2026-09-05T23:22:44.669Z] [debug] ui: tap "roll" ⏱+15ms
+[2026-09-05T23:22:43.951Z] [debug] dice⏱ damage: shown +259ms, tapped +455ms, settled +1065ms (hold late 265ms) = 1779ms
+[2026-09-05T23:22:42.886Z] [debug] ui: tap "roll" ⏱+16ms
+[2026-09-05T23:22:42.169Z] [debug] dice⏱ attack: shown +251ms, tapped +397ms, settled +1051ms (hold late 251ms) = 1699ms
+[2026-09-05T23:22:41.118Z] [debug] ui: tap "roll" ⏱+22ms
+[2026-09-05T23:22:40.467Z] [debug] dice⏱ initiative: shown +476ms, tapped +666ms, settled +1051ms (hold late 251ms) = 2193ms
+[2026-09-05T23:22:39.416Z] [debug] ui: tap "roll" ⏱+24ms
+[2026-09-05T23:22:38.373Z] [system] ⏳ Time passed: 6 min
+[2026-09-05T23:22:38.323Z] [world] You commit forward with the searing bone crossbow. Eternal Dynasty Patrol 4 watches your hands.
+[2026-09-05T23:22:38.175Z] [debug] attack: status mods exhausted -2 · perfect opening (2× dice)
+[2026-09-05T23:22:38.075Z] [debug] attack: target=Eternal Dynasty Patrol 4 range=close reach.bands=[distant,far,mid,close] reach.label=Bone Crossbow bareHand=false
+[2026-09-05T23:22:37.926Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand bone crossbow resolved=Bone Crossbow range=close enemies=1 hooks=1
+[2026-09-05T23:22:37.875Z] [player] attack with the off-hand bone crossbow
+[2026-09-05T23:22:37.666Z] [debug] ui: tap "🔥 bone crossbow ▲" ⏱+24ms
+[2026-09-05T23:22:34.260Z] [debug] render⏱ 329ms after engine-done · feed 500
+[2026-09-05T23:22:33.775Z] [system] ⏳ Time passed: 6 min
+[2026-09-05T23:22:33.676Z] [combat] Dodge — d20 → 11 + DEX 16 = 27 vs ATK 27. ✓ You slip the arc — PERFECT OPENING (next strike ×2 dice).
+[2026-09-05T23:22:33.627Z] [combat] Eternal Dynasty Patrol 4 — d20 → 18 + ATK 9 = 27 vs your AC 26 (needs nat 16+ — AC capped) — ✗ EVADED
+[2026-09-05T23:22:33.430Z] [world] You commit to the dodge. Slip Eternal Dynasty Patrol 4's swing and your next strike lands double — read it wrong and you simply take the hit like any other, no opening.
+[2026-09-05T23:22:33.330Z] [debug] parser: intent=dodge conf=1.00 verb=dodge target=- resolved=- range=close enemies=1 hooks=1
+[2026-09-05T23:22:33.280Z] [player] dodge
+[2026-09-05T23:22:33.227Z] [system] unseen — next strike +5 fades.
+[2026-09-05T23:22:33.048Z] [debug] ui: tap "dodge" ⏱+24ms
+[2026-09-05T23:22:30.306Z] [combat] Eternal Dynasty Patrol 4 — d20 → 5 + ATK 9 = 14 vs your AC 26 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-05T23:22:30.304Z] [debug] stealth: reset WIN init 23 vs 15 (dust, +5 1r)
+[2026-09-05T23:22:30.304Z] [world] You fling a fistful of grit into Eternal Dynasty Patrol 4's eyes and slip their line of sight. Half-blind, they swing at where you were. (+5 next attack)
+[2026-09-05T23:22:30.304Z] [world] The daylight leaves you little cover. (stealth −1, day)
+[2026-09-05T23:22:30.303Z] [debug] train: stealth (stealth check) → progress 77/100
+[2026-09-05T23:22:30.303Z] [debug] stats: STR20 DEX16 INT12 WIS12 CHA12 STE4 | gear: STR+6,DEX+8,STE+2,WIS+1,CHA+1,INT+2 | worn: main=Knot-Grained Gouge off=Bone Crossbow head=Forge-Black Cowl chest=Burl Aegis hands=Wanderer's Worn Gauntlets legs=Spore-Crusted Tassets feet=Choir-Bound Boots cloak=Traveler's Cloak amulet=Aetheric Locket ring=Noble's Signet Ring
+[2026-09-05T23:22:30.217Z] [debug] skillcheck: stealth d20=17 STE 4 + 1 (title: Shadow Diver) = 22 vs DC 12 — Hard → (resolved below)
+[2026-09-05T23:22:30.214Z] [debug] dice⏱ skill_check: shown +420ms, tapped +560ms, settled +1050ms (hold late 250ms) = 2030ms
+[2026-09-05T23:22:29.163Z] [debug] ui: tap "roll" ⏱+15ms
+[2026-09-05T23:22:28.233Z] [system] ⏳ Time passed: 15 min
+[2026-09-05T23:22:28.033Z] [debug] parser: intent=stealth conf=1.00 verb=sneak target=- resolved=- range=close enemies=1 hooks=1
+[2026-09-05T23:22:27.981Z] [player] sneak
+[2026-09-05T23:22:27.796Z] [debug] ui: tap "stealth" ⏱+21ms
+[2026-09-05T23:22:24.140Z] [combat] Eternal Dynasty Patrol 4 — d20 → 11 + ATK 9 = 20 vs your AC 26 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-05T23:22:24.140Z] [debug] ac-shift 29→26: race/base 12 + gear 24 + title 0 → trimmed 26 + status 0 | worn: head=Forge-Black Cowl chest=Burl Aegis hands=Wanderer's Worn Gauntlets legs=Spore-Crusted Tassets feet=Choir-Bound Boots cloak=Traveler's Cloak
+[2026-09-05T23:22:24.132Z] [arbiter] The Arbiter eyes your new pieces. "You could make an Aetheric Torch now, if you wanted."
+[2026-09-05T23:22:24.074Z] [reward] +18 TC pried from the dust.
+[2026-09-05T23:22:24.074Z] [system] Word moves through the buried world — many people view you differently now.
+[2026-09-05T23:22:24.073Z] [reward] ✦ You feel hardier from your trials. +1 max HP (now 62). [56 enemies defeated]
+[2026-09-05T23:22:24.073Z] [combat] 1 attacker remains. Eternal Dynasty Patrol 4 now in your sights.
+[2026-09-05T23:22:24.073Z] [reward] ✦ Hard-won spoils — Drone Core (Uncommon).
+[2026-09-05T23:22:24.072Z] [reward] You strip the body: Bone Knife, Mud-Bound Cloak (+14 TC). The kit took the fight badly.
+[2026-09-05T23:22:24.071Z] [reward] Eternal Dynasty Patrol 3 defeated. You recover Aether Residue ×2, Eternal Dynasty Sigil.
+[2026-09-05T23:22:24.070Z] [combat] Your blow with the searing knot-grained gouge lands clean — 20 damage. Eternal Dynasty Patrol 3 crumples in the dust. The Aetherstone settles.
+[2026-09-05T23:22:24.069Z] [combat] Bludgeoning flares — +2 on hit.
+[2026-09-05T23:22:24.068Z] [combat] You — d20 → 7 + DEX 16 exhausted -2 perfect opening (2× dice) = 21 vs Eternal Dynasty Patrol 3 AC 14 — ✓ HIT
+[2026-09-05T23:22:24.067Z] [world] You seize the initiative. Eternal Dynasty Patrol 3 has no time to react.
+[2026-09-05T23:22:24.012Z] [debug] dice⏱ coating: shown +252ms, tapped +478ms, settled +1050ms (hold late 250ms) = 1780ms
+[2026-09-05T23:22:22.962Z] [debug] ui: tap "roll" ⏱+16ms
+[2026-09-05T23:22:22.229Z] [debug] dice⏱ damage: shown +216ms, tapped +432ms, settled +1052ms (hold late 252ms) = 1700ms
+[2026-09-05T23:22:21.177Z] [debug] ui: tap "roll" ⏱+16ms
+[2026-09-05T23:22:20.529Z] [debug] dice⏱ attack: shown +259ms, tapped +463ms, settled +1086ms (hold late 286ms) = 1808ms
+
+=== END REPORT ===
