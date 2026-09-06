@@ -218,7 +218,7 @@ describe('OTA-1578 — the escort has to be dealt with, not walked away from', (
     // without it a player who wins by mercy could never close the stage). The
     // rule 1578 pinned is unchanged and is what is checked: the count comes off
     // the LIVE scene, excludes the body being resolved, and matches by name.
-    expect(QS).toContain("(e, i) => i !== activeIdx && e.name === enemy.name && (live!.enemyHps[i] ?? 0) > 0");
+    expect(QS).toContain("(e, i) => i !== activeIdx && e.name === enemy.name && e.stageKey === enemy.stageKey && (live!.enemyHps[i] ?? 0) > 0");
     expect(QS).toContain("&& !(live!.enemyKnockedOut?.[i] ?? false),");
     expect(QS).toContain('if (!stillUp) {');
   });

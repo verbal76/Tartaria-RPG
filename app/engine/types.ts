@@ -289,6 +289,15 @@ export interface Enemy {
    *  body, and paying less for a harder fight is the fake-difficulty trap the
    *  dial exists to avoid. Absent on every ordinary enemy. */
   eliteReplaced?: number;
+  /** ⚠⚠ OTA-1703 — THE STAGE COUNTS ITS OWN BODIES. The encounter key
+   *  (`family:id:stage`) of the mission stage that stood this body up, written
+   *  by spawnStageEscort. The escort clear credits a death ONLY when the body
+   *  carries the stage's key — a corruption apparition that happened to be an
+   *  Aetheric Raven closed the harpy hunt's four-raven stage before the ravens
+   *  existed. Absent on every wanderer, and on bodies saved mid-fight before
+   *  this OTA (those no longer close a stage; once they fall the arrival door
+   *  stands the stage's own pack up, so nothing is left unfinishable). */
+  stageKey?: string;
   /** OTA-897 (SA-5) — one-line codex "voice": a short, evocative field
    *  description shown in the bestiary (once the foe is recorded) and, briefly,
    *  on the combat enemy panel. Pure flavor — never read by combat logic. */

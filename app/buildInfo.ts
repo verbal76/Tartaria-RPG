@@ -28165,7 +28165,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // stack sample inside size()). Per-room sizes feed a running estimate now and
 // the blob is measured once per pass to confirm. The owner's save is at ~46%
 // of the budget, so this is the freeze that was waiting, not one he has met.
-export const OTA_BUILD_ID = '2026-09-05-1702-the-trim-measures-once';
+// 2026-09-06 OTA-1703 — THE STAGE COUNTS ITS OWN BODIES. A corruption apparition
+// named Aetheric Raven stood on the Cradle of Dusk before the harpy hunt's four
+// ravens could arm; the escort clear matched the stage by name alone and moved
+// the hunt on when the wanderer died. Stage bodies now carry Enemy.stageKey
+// (the encounter key) and only a keyed body closes the stage; the deferred arm
+// stands the real pack up on the clear field. Contrary walker, harpy interrupted.
+export const OTA_BUILD_ID = '2026-09-06-1703-the-stage-counts-its-own-bodies';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-05-1702-the-trim-measures-once';
 // golem catch-up 2026-09-05: markerless publish of OTA-1702 - the trim measures
 // once. Per-room sizes feed the save trimmer; the blob is measured once per
 // pass instead of once per visited room. hal took the marker.

@@ -205,7 +205,7 @@ describe('OTA-1598 — the class, measured and guarded', () => {
     const QSL = readFileSync(join(__dirname, '..', 'app', 'state', 'slices', 'questSlice.ts'), 'utf8');
     const fn = QSL.indexOf('function spawnStageEscort(');
     const belt = QSL.indexOf('if (get().player?.hubRoomId || get().activeBuildingId) return false;', fn);
-    const write = QSL.indexOf('enemies: escort,', fn);
+    const write = QSL.indexOf('enemies: escort.map((e) => ({ ...e, stageKey })),', fn); // OTA-1703 — the bodies carry the stage's key
     expect(belt).toBeGreaterThan(fn);
     expect(write).toBeGreaterThan(belt);
   });

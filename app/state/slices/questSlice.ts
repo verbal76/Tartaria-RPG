@@ -226,7 +226,7 @@ export function resolveStageEscortClear(
   get: () => GameStore,
   set: SetState,
   player: PlayerCharacter,
-  enemy: { name: string },
+  enemy: { name: string; stageKey?: string },
   activeIdx: number,
 ): void {
   // ⚠⚠⚠ OTA-1578 — CLEARING THE ESCORT IS WHAT RESOLVES A FALSE SUMMIT. OTA-1576
@@ -254,7 +254,18 @@ export function resolveStageEscortClear(
       ...(player.activeHunts ?? []).map((rec) => ({ family: 'hunt' as const, rec, def: findHuntById(rec.id) })),
       ...(player.activeMysteries ?? []).map((rec) => ({ family: 'mystery' as const, rec, def: findMysteryById(rec.id) })),
       ...(player.activeStorylines ?? []).map((rec) => ({ family: 'storyline' as const, rec, def: findStorylineById(rec.id) })),
-    ].find(({ rec, def }) => def?.stages[rec.stage]?.spawn?.enemyName === enemy.name) as EscortHit | undefined;
+    ].find(({ family, rec, def }) =>
+      // ⚠⚠⚠ OTA-1703 — THE STAGE COUNTS ITS OWN BODIES. The name alone let a
+      // corruption apparition that happened to be an Aetheric Raven close the
+      // harpy hunt's four-raven stage on the Cradle of Dusk before the four
+      // ravens existed (the arrival arm waits while a live hostile is on the
+      // tile; the wanderer died; "The last of them is down"). A body counts
+      // for a stage only when it carries that stage's key — spawnStageEscort
+      // stamps every body it stands up. Bodies saved mid-fight before this OTA
+      // carry none and no longer close the stage; the arrival door stands the
+      // stage's own pack up once they fall.
+      def?.stages[rec.stage]?.spawn?.enemyName === enemy.name
+        && enemy.stageKey === `${family}:${rec.id}:${rec.stage}`) as EscortHit | undefined;
     if (escortRec?.def) {
       // Is this the LAST of them? The scene is read live because the corpse
       // count is what decides, not the spawn count — a fight can be joined by
@@ -273,7 +284,7 @@ export function resolveStageEscortClear(
       // player who wins by mercy, which is exactly the win 1612 legitimizes.
       const live = get().currentScene;
       const stillUp = (live?.enemies ?? []).some(
-        (e, i) => i !== activeIdx && e.name === enemy.name && (live!.enemyHps[i] ?? 0) > 0
+        (e, i) => i !== activeIdx && e.name === enemy.name && e.stageKey === enemy.stageKey && (live!.enemyHps[i] ?? 0) > 0
           && !(live!.enemyKnockedOut?.[i] ?? false),
       );
       if (!stillUp) {
@@ -556,6 +567,8 @@ function spawnStageEscort(
   deps: QuestSliceDeps,
   player: PlayerCharacter,
   spawn: { enemyName: string; count?: number; ambush?: boolean } | null | undefined,
+  /** ⚠ OTA-1703 — the encounter key every body is stamped with (Enemy.stageKey). */
+  stageKey: string,
 ): boolean {
   if (!spawn) return false;
   // ⚠ OTA-1598 belt — never write bodies into a hub room or a building
@@ -575,7 +588,9 @@ function spawnStageEscort(
           currentScene: {
             ...s.currentScene,
             ...deps.FRESH_ENEMY_ARRAYS,
-            enemies: escort,
+            // ⚠⚠ OTA-1703 — stamped with the stage that owes them, so the clear
+            // can tell the stage's ravens from a wandering raven.
+            enemies: escort.map((e) => ({ ...e, stageKey })),
             enemyHps: escort.map((e) => e.hp),
             activeEnemyIdx: 0,
             range: ambush ? 'close' : 'mid',
@@ -2054,7 +2069,7 @@ export const createQuestSlice = (
       : (stageDef.spawn && fledHere && fledHere.n !== undefined && fledHere.n > 0
         ? { ...stageDef.spawn, count: Math.min(stageDef.spawn.count ?? 1, fledHere.n), ambush: false }
         : stageDef.spawn);
-    let stoodUp = spawnStageEscort(get, set, deps, player, override);
+    let stoodUp = spawnStageEscort(get, set, deps, player, override, `hunt:${record.id}:${record.stage}`);
     if (stoodUp && override && stageDef.spawn && override !== stageDef.spawn) {
       // (a flee with none standing — every body out cold — comes back to the
       // authored count: the sleepers woke; nothing is owed for a knockout.)
@@ -2550,7 +2565,7 @@ export const createQuestSlice = (
     // nothing on the stair. Same writer as the hunts now, so the freeze-for-kill
     // and the conversation card's FIGHT branch behave identically in all three
     // families.
-    const spawnedM = spawnStageEscort(get, set, deps, player, stageDef.spawn);
+    const spawnedM = spawnStageEscort(get, set, deps, player, stageDef.spawn, `mystery:${record.id}:${record.stage}`);
     if (spawnedM) {
       // ⚠ OTA-1622 — a mystery that stands bodies up gets the FIGHT card too;
       // it had no stinger and its stand-up was two feed lines.
@@ -2902,7 +2917,7 @@ export const createQuestSlice = (
     // ⚠⚠⚠ OTA-1583 — see the mystery path above and spawnStageEscort's note. A
     // storyline stage that authors a `spawn` now stands it up, and the chapter
     // holds until it is cleared.
-    if (spawnStageEscort(get, set, deps, player, stageDef.spawn)) {
+    if (spawnStageEscort(get, set, deps, player, stageDef.spawn, `storyline:${record.id}:${record.stage}`)) {
       // ⚠ OTA-1622 — the FIGHT card for a storyline stand-up (the Ooze on the
       // stair had none).
       raiseMissionClose(get, set, {
