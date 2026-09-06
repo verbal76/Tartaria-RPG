@@ -372,15 +372,27 @@ export class ContraryWalker extends Walker {
     return this.livingNamed(name);
   }
 
-  /** Are the bodies on the field the stage's own (a spawn or the apex)? */
+  /** Are the bodies on the field the stage's own (a spawn or the apex)?
+   *
+   *  ⚠ OTA-1712 — by the OTA-1703 STAMP where a body carries one, falling back
+   *  to the name where it does not. The walker asking this by name had the same
+   *  hole the engine did, one layer up: a wandering pack that happens to share
+   *  the stage's spawn name reads as "the stage is already up", and the road
+   *  then skips the fight it was built to measure — a walker that mis-sees is
+   *  worse than no walker, because its report still looks clean. */
   enemiesAreTheStage(): boolean {
     const st = this.def.stages[this.stage()];
     const sc = get().currentScene;
     if (!st || !sc) return false;
+    const key = `${this.family}:${this.def.id}:${this.stage()}`;
     const names = new Set<string>();
     if (st.spawn) names.add(st.spawn.enemyName);
     if (this.map.apexBody) names.add(this.map.apexBody.name);
-    return sc.enemies.some((e, i) => (sc.enemyHps[i] ?? 0) > 0 && names.has(e.name));
+    return sc.enemies.some((e, i) => {
+      if ((sc.enemyHps[i] ?? 0) <= 0) return false;
+      const stamped = (e as { stageKey?: string }).stageKey;
+      return stamped ? stamped === key : names.has(e.name);
+    });
   }
 
   /** What the store holds right now — the field, the boots, and every modal

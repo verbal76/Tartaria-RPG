@@ -28259,7 +28259,21 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // destination, so "you went somewhere" is all that can be checked without
 // inventing 29 of them - and it reads the acceptedAtCell the long-haul bonus
 // already prices, so the gate and the reward cannot disagree about the journey.
-export const OTA_BUILD_ID = '2026-09-06-1711-the-escort-has-to-go-somewhere';
+// 2026-09-06 OTA-1712 - THE STAMP, NOT THE NAME. OTA-1703 stamped every body a
+// mission stage stands up with an encounter key, because a name is not an
+// identity - a corruption apparition that happened to be an Aetheric Raven
+// closed the harpy hunt's four-raven stage before the ravens existed. It wired
+// that stamp into the escort clear and left two readers counting by name. The
+// engine one, noteMissionFlee, writes the deed ledger entry for a flight, so a
+// same-named wanderer could inflate how many of the stage's own were recorded
+// still standing. The walker one decides whether the road has to fight, so a
+// wandering pack sharing the spawn name read as "the stage is already up" and
+// the road skipped the fight it exists to measure, with a clean report. Both
+// ask bodyBelongsToStage now, which prefers the stamp and falls back to the
+// name for unstamped legacy bodies - only a body stamped for ANOTHER stage is
+// excluded. Also corrects a doc that had stopped being true.
+export const OTA_BUILD_ID = '2026-09-06-1712-the-stamp-not-the-name';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-06-1711-the-escort-has-to-go-somewhere';
 // golem catch-up 2026-09-06: markerless publish of OTA-1711 - the escort has to
 // go somewhere. An escort contract can no longer be handed back where it was
 // picked up, or couriered by runner. hal took the marker.

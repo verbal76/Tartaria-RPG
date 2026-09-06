@@ -355,9 +355,38 @@ export function laterStageLine(
  * spawn, or the apex), with the names those bodies carry — so a flee can be
  * written down against the stage it belongs to.
  */
+/** ⚠⚠⚠ OTA-1712 — DOES THIS BODY BELONG TO THIS STAGE? ASK THE STAMP, NOT THE NAME.
+ *
+ *  OTA-1703 put an encounter key (`family:id:stage`) on every body a mission
+ *  stage stands up, because a name is not an identity: *"a corruption apparition
+ *  that happened to be an Aetheric Raven closed the harpy hunt's four-raven
+ *  stage before the ravens existed."* It wired that key into the escort clear
+ *  and left two readers still counting by name — this is the one in the engine.
+ *
+ *  ⚠ WHAT IT COSTS TO GET WRONG HERE. `noteMissionFlee` writes the deed ledger
+ *  entry for a flight: how many of the stage's own bodies were still standing
+ *  when the player ran. Counting by name lets any same-named wanderer inflate
+ *  that number, so the world remembers a retreat that never happened at that
+ *  size — and the ledger is what later prose reads back to the player.
+ *
+ *  ⚠⚠ AND IT DEGRADES, RATHER THAN GETTING STRICTER. A body with NO stamp is
+ *  matched on its name exactly as before: bodies saved mid-fight before OTA-1703
+ *  carry no key, and refusing them would silently start recording `n: 0` for
+ *  every legacy save — swapping a number that is sometimes too high for one that
+ *  is always wrong. Only a body stamped for a DIFFERENT stage is excluded, which
+ *  is precisely the case name-matching could never see. */
+export function bodyBelongsToStage(
+  body: { name: string; stageKey?: string },
+  stageKey: string,
+  name: string,
+): boolean {
+  if (body.stageKey) return body.stageKey === stageKey;
+  return body.name === name;
+}
+
 export function missionFightUnderfoot(
   player: PlayerCharacter | null | undefined,
-): { missionId: string; title: string; stage: number; groundId: string; spawnName: string | null; spawnCount: number; apexName: string | null } | null {
+): { missionId: string; title: string; stage: number; groundId: string; spawnName: string | null; spawnCount: number; apexName: string | null; stageKey: string } | null {
   if (!player?.currentLocationId) return null;
   for (const rec of player.activeHunts ?? []) {
     if (rec.tracked === false) continue;
@@ -373,6 +402,10 @@ export function missionFightUnderfoot(
     return {
       missionId: def.id, title: def.title, stage: rec.stage, groundId: ground,
       spawnName: st.spawn?.enemyName ?? null, spawnCount: st.spawn?.count ?? 1, apexName: apex,
+      // ⚠ OTA-1712 — the key the SPAWNER stamps, built here so a reader never
+      // has to reconstruct it. This walk only ever reads activeHunts, so the
+      // family is 'hunt' by construction.
+      stageKey: `hunt:${def.id}:${rec.stage}`,
     };
   }
   return null;

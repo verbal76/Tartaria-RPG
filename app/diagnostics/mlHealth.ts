@@ -1028,9 +1028,14 @@ export async function markMLInitSucceeded(): Promise<void> {
 }
 
 /**
- * Manual re-enable. Resets crashCount + disabledByCrash. Called
- * from a future Settings toggle ("Restore AI features"); not wired
- * to any UI yet (flagged for OTA-273).
+ * Manual re-enable. Resets crashCount + disabledByCrash.
+ *
+ * ⚠ OTA-1712 — this used to say *"not wired to any UI yet (flagged for
+ * OTA-273)"*, and that stopped being true a long time ago: it is the RELOAD AI
+ * button on the About screen (AboutScreen.tsx). The comment mattered because
+ * OTA-1705's player-facing line tells a benched device *"you can force it now
+ * with RELOAD AI on the About screen"* — a doc claiming the button does not
+ * exist is one reading away from someone deleting that promise as dead.
  */
 export async function resetMLHealth(): Promise<void> {
   try {

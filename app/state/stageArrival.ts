@@ -307,7 +307,8 @@ export function noteMissionFlee(
   get: Get,
   set: Set,
   scene: {
-    enemies: ReadonlyArray<{ name: string; hp: number }>;
+    // ⚠ OTA-1712 — `stageKey` is the OTA-1703 stamp; see bodyBelongsToStage.
+    enemies: ReadonlyArray<{ name: string; hp: number; stageKey?: string }>;
     enemyHps: ReadonlyArray<number>;
     enemyKnockedOut?: ReadonlyArray<boolean>;
   },
@@ -319,12 +320,16 @@ export function noteMissionFlee(
   const MT = require('../engine/missionTrace') as typeof import('../engine/missionTrace');
   const fight = MT.missionFightUnderfoot(fledPl);
   if (!fight) return;
-  const bodies = scene.enemies.map((e, i) => ({ name: e.name, hp: scene.enemyHps[i] ?? 0, ko: scene.enemyKnockedOut?.[i] ?? false }));
+  const bodies = scene.enemies.map((e, i) => ({ name: e.name, stageKey: e.stageKey, hp: scene.enemyHps[i] ?? 0, ko: scene.enemyKnockedOut?.[i] ?? false }));
   const hourNow = fledPl?.hoursElapsed ?? 0;
   const base = { kind: 'fled' as const, hour: hourNow, missionId: fight.missionId, stage: fight.stage, title: fight.title };
-  const apex = fight.apexName ? bodies.find((b) => b.name === fight.apexName) : undefined;
+  // ⚠ OTA-1712 — by the stamp where there is one. A same-named wanderer used to
+  // be able to stand in for the apex here.
+  const apex = fight.apexName
+    ? bodies.find((b) => MT.bodyBelongsToStage(b, fight.stageKey, fight.apexName!))
+    : undefined;
   if (fight.apexName && apex) {
-    const apexMax = scene.enemies.find((e) => e.name === fight.apexName)?.hp ?? apex.hp;
+    const apexMax = scene.enemies.find((e) => MT.bodyBelongsToStage(e, fight.stageKey, fight.apexName!))?.hp ?? apex.hp;
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const PH = require('../engine/progressionHints') as typeof import('../engine/progressionHints');
     const priorApexWalls = PH.apexWallsSoFar(get().worldMemory);
@@ -333,7 +338,12 @@ export function noteMissionFlee(
     // says where else the power is. Never a gate: the flee has already landed.
     if (fledPl) { const ph = PH.afterApexWall(PH.wallContext(get().worldMemory, fledPl, priorApexWalls)); if (ph) get().appendLog('arbiter', ph); }
   } else if (fight.spawnName) {
-    const standing = bodies.filter((b) => b.name === fight.spawnName && b.hp > 0 && !b.ko).length;
+    // ⚠⚠ OTA-1712 — THE COUNT THIS OTA IS ABOUT. This number goes into the deed
+    // ledger as "how many of the stage's own were still up when you ran", and by
+    // name it counted every same-named body on the field, mission or not.
+    const standing = bodies.filter(
+      (b) => MT.bodyBelongsToStage(b, fight.stageKey, fight.spawnName!) && b.hp > 0 && !b.ko,
+    ).length;
     set((s) => ({ worldMemory: D.recordDeed(s.worldMemory, fight.groundId, { ...base, who: fight.spawnName!, n: standing }) }));
   }
 }
