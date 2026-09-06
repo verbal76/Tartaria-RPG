@@ -2108,6 +2108,16 @@ export interface CanonLocation {
 
 export interface WorldMemory {
   tagCounts: Record<string, number>;
+  /** ⚠⚠⚠ OTA-1722 — the names of the roadside traders most recently met, newest
+   *  first, capped at ROADSIDE_NAME_MEMORY. Owner: *"the stores and crucibles
+   *  don't seem anchored to a tile anymore, when I go into the next tile they
+   *  are still there."* The anchoring was fine — a 118-tile probe found ZERO
+   *  vendors surviving a step — but the roadside name pool is twelve names per
+   *  archetype, so the same NAME lands on the next tile often enough to be
+   *  indistinguishable from a store that followed you. This ring is what the
+   *  picker avoids. Absent on a pre-feature save, which reads as "nothing to
+   *  avoid" and costs nothing. */
+  recentRoadsideNames?: string[];
   /** OTA-991 — #122: the CURRENT local sky. Weather persists per location visit —
    *  a scene rebuild at the same spot inside ~6 game-hours reuses this instead
    *  of re-rolling, so conditions read as weather, not a slot machine. */

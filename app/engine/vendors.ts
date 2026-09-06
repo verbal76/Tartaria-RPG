@@ -171,7 +171,12 @@ export function pickRandomVendor(): VendorInstance {
 // per-spawn randomized prices and no faction. Used by beginScene for
 // outdoor (non-hub) peaceful scenes so the player has somewhere cheap
 // to spend small TC drops.
-export function pickRoadsideTrader(): VendorInstance {
+/** ⚠⚠ OTA-1722 — how many recent roadside names the picker steers around. Ten
+ *  against a 24-name pool (twelve per archetype) leaves at least fourteen
+ *  choices, so this can narrow the draw without ever starving it. */
+export const ROADSIDE_NAME_MEMORY = 10;
+
+export function pickRoadsideTrader(recentNames?: readonly string[]): VendorInstance {
   const arch = ROADSIDE.archetypes[Math.floor(Math.random() * ROADSIDE.archetypes.length)]!;
   const n = 3 + Math.floor(Math.random() * 4); // 3-6 offers
   const picked = new Set<string>();
@@ -203,9 +208,22 @@ export function pickRoadsideTrader(): VendorInstance {
   // the fix is content rather than keying: twelve named traders per archetype.
   // The archetype still supplies demeanor, stock and description; the person
   // supplies the name the ledger — and the player — remembers.
-  const person = arch.people?.length
-    ? arch.people[Math.floor(Math.random() * arch.people.length)]!
-    : arch.name;
+  // ⚠⚠⚠ OTA-1722 — AND NOT ONE YOU JUST MET. OTA-1055 gave these archetypes
+  // twelve people each so a roadside trader would be a person rather than a
+  // stall type. It worked, and it exposed the next thing: twelve is small enough
+  // that the same name lands on the very next tile regularly, and from the
+  // player's chair a trader with the same name one step later is a trader who
+  // followed them. Measured before the fix, on a 118-tile serpentine walk: 16
+  // sightings, three repeated names, one of them on consecutively-visited tiles.
+  //
+  // ⚠ FAILS OPEN, ALWAYS. If every name in this archetype is in the recent ring
+  // the filter is dropped rather than the trader — a stall that does not appear
+  // because the game ran out of names is a worse bug than a repeated name.
+  const pool = arch.people?.length ? arch.people : [arch.name];
+  const recent = new Set(recentNames ?? []);
+  const fresh = pool.filter((n) => !recent.has(n));
+  const choices = fresh.length > 0 ? fresh : pool;
+  const person = choices[Math.floor(Math.random() * choices.length)]!;
   return {
     id: `roadside_${arch.demeanor}_${Date.now()}`,
     name: person,

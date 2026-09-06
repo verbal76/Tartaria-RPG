@@ -484,7 +484,7 @@ import { reachBandsFor, reachFiresDown, RANGE_ORDER, RANGE_LABELS } from '../eng
 import { knocksOutHumanoid } from '../engine/knockout';
 import { coatingStatusKind, coatingDotPerTurn, COATING_DOT_TURNS, COATING_RESIST_LAND_CHANCE, ACID_SHRED_PER_HIT, ACID_SHRED_DECAY_PER_ROUND, acidShredCap, corruptionStackCap, rollLootCoating, secondCoatRolled } from '../engine/weaponCoating';
 import { inferWeapon, inferArmor } from '../engine/itemDefaults';
-import { pickRandomVendor, findVendorByName, pickRoadsideTrader, buildTraderEnemy, buildStallVendor, factionGearOffers, VENDORS, type VendorInstance } from '../engine/vendors';
+import { pickRandomVendor, findVendorByName, pickRoadsideTrader, buildTraderEnemy, buildStallVendor, factionGearOffers, VENDORS, ROADSIDE_NAME_MEMORY, type VendorInstance } from '../engine/vendors';
 import { effectiveAC, barehandDamageFor, barehandGateBlocks, raceLootBias, raceSearchHookBonus, resurrectionGemDropChance } from '../engine/raceMechanics';
 import { trainStat, type StatKey } from '../engine/statTraining';
 import { findQuestFactionHint } from '../engine/factionHint';
@@ -5198,6 +5198,19 @@ function sightVendor(
       firstMetAt: Date.now(),
     }, { nowMs: Date.now(), hoursElapsed }),
   }));
+  // ⚠⚠ OTA-1722 — AND THE ROADSIDE RING IS WRITTEN HERE, in the one funnel
+  // OTA-1055 built precisely so the next vendor source could not half-copy the
+  // pattern. Recording it at the two spawn sites instead would have been two
+  // copies of one rule, which is the shape this file keeps paying for.
+  if ((vendor.id ?? '').startsWith('roadside_')) {
+    set((s) => ({
+      worldMemory: {
+        ...s.worldMemory,
+        recentRoadsideNames: [vendor.name, ...(s.worldMemory.recentRoadsideNames ?? [])
+          .filter((n) => n !== vendor.name)].slice(0, ROADSIDE_NAME_MEMORY),
+      },
+    }));
+  }
   if (greet) emitVendorGreeting(get, set, vendor);
 }
 
@@ -9881,7 +9894,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               : (findVendorByName(hubRoom.anchorNpc) ?? null))
           // OTA-411 — a capital never falls to the roadside roll; it always
           // gets a NAMED vendor below. Only NON-capital outdoor tiles roll roadside.
-          : (!hasEnemies && !hubRoom && !atCoreCapital && Math.random() < roadsideRate ? withSkyreacherChartOffer(pickRoadsideTrader(), get().worldMemory) : null);
+          : (!hasEnemies && !hubRoom && !atCoreCapital && Math.random() < roadsideRate ? withSkyreacherChartOffer(pickRoadsideTrader(get().worldMemory.recentRoadsideNames), get().worldMemory) : null);
       // OTA-410/411 — capital named-vendor greeting. RNG-rolled which non-defeated
       // VENDORS entry arrives, re-rolled each arrival (intended). Always fires at a
       // capital (the roadside roll above is suppressed there), so a capital begin-
@@ -27450,7 +27463,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // it, pacing two tiles re-spawned a FRESH stall every step (unlimited rare
       // stock). Now a stall only appears on ground you haven't just walked.
       if (!whisperBeatFired && outdoorPeaceful && !inAnyHubRoom && tileIsNovel && Math.random() < 0.20) {
-        const stall = withSkyreacherChartOffer(pickRoadsideTrader(), get().worldMemory)!;
+        const stall = withSkyreacherChartOffer(pickRoadsideTrader(get().worldMemory.recentRoadsideNames), get().worldMemory)!;
         set((s) => s.currentScene ? { currentScene: { ...s.currentScene, vendor: stall } } : s);
         // OTA-1055 — SIGHT THE TRADER. stepDirection never calls beginScene (its
         // own comment says so), so this path — which the code itself calls the

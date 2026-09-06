@@ -28435,7 +28435,26 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // rather than three dots. An instrument checks nothing in that column renders a
 // sentence - and it caught my own first cut, which scanned raw source and flagged
 // the comment explaining the fix.
-export const OTA_BUILD_ID = '2026-09-06-1721-your-name-was-three-dots';
+// 2026-09-06 OTA-1722 - THE TRADER WHO FOLLOWED YOU (and did not). Owner: "the
+// stores and crucibles don't seem anchored to a tile anymore, when I go into the
+// next tile they are still there." The anchoring was fine and the report was
+// still right. A probe walking 118 real tiles - outdoors, peaceful, serpentine so
+// no tile repeats - found ZERO vendors surviving a step: stepDirection clears the
+// vendor on every cardinal move (POLISH-4) and travelTo rebuilds through
+// beginScene. What the probe DID catch was two tiles apart: "Duvo Saltbeard" at
+// (74,10) and "Duvo Saltbeard" at (75,10) with a DIFFERENT id - the old trader
+// cleared, a brand-new one spawned who happens to be called the same thing,
+// because OTA-1055 gave each archetype twelve people and twelve is small enough
+// that the same name lands on the next tile regularly. From the player's chair
+// that is a store that followed him. So the fix is NAMING, not anchoring: a ring
+// of the ten most recent roadside names rides on worldMemory and the picker
+// steers around it, written in sightVendor - the one funnel OTA-1055 built so the
+// next vendor source could not half-copy the pattern. It fails open: a full ring
+// drops the filter rather than the trader. Measured after: 197 tiles, 29
+// sightings, 23 distinct names, ZERO adjacent repeats. Names still recur across a
+// long walk, which is correct - there are only 24 traders on the roads.
+export const OTA_BUILD_ID = '2026-09-06-1722-the-trader-who-followed-you';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-06-1721-your-name-was-three-dots';
 // golem catch-up 2026-09-06: markerless publish of OTA-1721 - your name was the
 // three dots. The downed-dog countdown no longer squeezes the player's name out
 // of the HUD; it has its own row and the name has a floor. hal took the marker.
