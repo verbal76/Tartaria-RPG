@@ -133,6 +133,11 @@ const KEY_TTS_DISABLED = 'tartaria.ml.ttsDisabledByCrash';
 // so it is re-zeroed. See the block in loadMLHealth for why this is safe here and
 // deliberately NOT done for the Qwen / init guards.
 const KEY_TTS_COUNT_BUILD = 'tartaria.ml.ttsCrashCountBuild';
+/** ⚠ OTA-1707 — voice crashes ON THIS BUILD before the bundled neural voice
+ *  steps aside for the system voice. Two, not OTA-463's one: the count is
+ *  build-scoped and background-safe now, so the only false positive left is a
+ *  swipe-away mid-utterance, and two of those on one build is a real pattern. */
+const MAX_TTS_CRASHES_BEFORE_DISABLE = 2;
 
 // OTA-414 — AUTO-RETRY with backoff for the Qwen completion guard. The disable is
 // no longer permanent: once it trips, Qwen gets another attempt after a cooldown
@@ -529,7 +534,37 @@ export async function loadMLHealth(): Promise<MLHealthState> {
   // the system voice. We keep COUNTING + naming for the diagnostic, but never
   // disable. ttsDisabledByCrash is pinned false, and any stale disable flag a
   // device picked up under OTA-463 is cleared here so Kokoro self-heals on load.
-  const ttsDisabledByCrash = false;
+  // ⚠⚠⚠ OTA-1707 — RE-ARMED, AND THE TWO REASONS 464 PULLED IT ARE BOTH GONE.
+  //
+  // OTA-464's comment above names three ways the breadcrumb could survive
+  // without a real Kokoro crash: an OTA reload mid-utterance, an OS
+  // backgrounding, and a user swipe-away. Two of the three have been closed by
+  // later work, which is what makes this safe to turn back on:
+  //
+  //   · the OTA reload — OTA-985 scopes this count to the BUILD and drops the
+  //     surviving breadcrumb in the same breath (the block directly above), so
+  //     the reload that applies an update can no longer count;
+  //   · the backgrounding — arb126's clearInFlightBreadcrumbs() wipes the TTS
+  //     breadcrumb when the app goes to background, so a benign put-away leaves
+  //     nothing behind to find.
+  //
+  // Only the swipe-away is left, and requiring TWO on the SAME BUILD makes one
+  // stray force-quit mid-sentence harmless.
+  //
+  // ⚠ MEASURED — the owner's iPhone, 2026-09-06, on OTA-1705. The narration
+  // model is no longer the memory story ("NOTHING TO RELEASE — no model was
+  // loaded (qwen='idle'), so this freed 0 bytes. The pressure is coming from
+  // something else."), and the process kills moved to the voice: one at
+  // `voice:play:unload`, one at `native:voice:start` with ALIVE 0ms AFTER IT,
+  // and this very guard reporting "⚠ VOICE CRASH detected on previous launch
+  // (1 total) — last voice: kokoro:am_michael".
+  //
+  // ⚠ NO SEPARATE DISABLE FLAG. The verdict is derived from the build-scoped
+  // count alone, so there is no durable flag to go stale — a device carrying a
+  // KEY_TTS_DISABLED from the OTA-463 era is not punished for it, and every new
+  // build starts the voice with a clean slate (a build that fixes Kokoro should
+  // get to prove it). The legacy key is still cleared as hygiene.
+  let ttsDisabledByCrash = false;
   if (ttsDisabledStr === 'true') {
     try { await AsyncStorage.removeItem(KEY_TTS_DISABLED); } catch { /* ignore */ }
   }
@@ -544,6 +579,11 @@ export async function loadMLHealth(): Promise<MLHealthState> {
       await AsyncStorage.removeItem(KEY_TTS_IN_PROGRESS);
     } catch { /* re-detected next launch if the write fails */ }
   }
+  // ⚠ OTA-1707 — DERIVED AFTER THE INCREMENT ABOVE, not before it. Read first,
+  // the verdict lags a boot: the crash that reaches the threshold is counted
+  // here and would not be acted on until the NEXT launch, which is one more
+  // freeze than the player should have to sit through.
+  ttsDisabledByCrash = ttsCrashCount >= MAX_TTS_CRASHES_BEFORE_DISABLE;
 
   // arb129 — last-loaded Qwen kernel variant + CPU/SoC diag (best-effort; read
   // separately so a failure here can't disturb the core health load).
@@ -666,7 +706,16 @@ export function shouldAttemptQwen(): boolean {
  * still counted + named in the diagnostic, just never acted on.
  */
 export function shouldAttemptBundledTTS(): boolean {
-  return true;
+  return !(cached?.ttsDisabledByCrash ?? false);
+}
+
+/** ⚠⚠ OTA-1707 — the voice half of deviceCapabilityLine: one sentence for the
+ *  PLAYER when the bundled voice has been stood down. Null when it is running,
+ *  so nothing is said when there is nothing to say. The Arbiter still speaks —
+ *  that is the whole point of falling back rather than going silent. */
+export function voiceCapabilityLine(): string | null {
+  if (!cached?.ttsDisabledByCrash) return null;
+  return `The narrator has moved to your device's built-in voice — the bundled one closed the game ${cached.ttsCrashCount} times on this version. Nothing goes unspoken; only the voice changes. The next update starts it fresh, and Settings can switch it back.`;
 }
 
 /** OTA-351 — call BEFORE each Qwen completion. AWAITED so the breadcrumb is

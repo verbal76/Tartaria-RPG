@@ -328,6 +328,15 @@ export function startTTSController(): void {
   {
     const vs = getVoiceSettings();
     logVoice(`voice: engine=${vs.engine} tts=${vs.ttsEnabled ? 'on' : 'off'} voice=${vs.kokoroVoice ?? 'default'}`);
+    // ⚠⚠ OTA-1707 — and if the bundled voice has been stood down, the PLAYER is
+    // told, once, where the voice announces itself. The line above is the debug
+    // channel and reaches them nowhere.
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const ml = require('../diagnostics/mlHealth') as typeof import('../diagnostics/mlHealth');
+      const vc = ml.voiceCapabilityLine();
+      if (vc) useGameStore.getState().appendLog('system', vc);
+    } catch { /* log not ready */ }
     unsubKokoro = onKokoroStateChange((s) => {
       if (s.phase === 'downloading' && lastVoicePhase === 'downloading') return; // skip fraction spam
       if (s.phase === lastVoicePhase && s.phase !== 'error') return;

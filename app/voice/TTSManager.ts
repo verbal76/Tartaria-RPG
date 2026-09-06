@@ -24,6 +24,35 @@ import {
   getKokoroState,
 } from './PiperTTSManager';
 
+// ⚠⚠⚠ OTA-1707 — THE CRASH GUARD IS READ LAZILY, AND THAT IS DELIBERATE.
+//
+// mlHealth imports AsyncStorage at module scope. A top-level import here would
+// therefore drag the native AsyncStorage module into the graph of EVERY caller
+// of TTSManager — which is most of the voice layer — and a consumer that has no
+// reason to know about diagnostics would fail at load rather than at use.
+// (Measured, not feared: importing it eagerly took `ttsLanguagePinnedEnglish`
+// from passing to "test suite failed to run — NativeModule: AsyncStorage is
+// null", before it executed a line.)
+//
+// ⚠ FAIL OPEN. If the module cannot be reached at all, the answer is `true` —
+// the bundled voice keeps speaking. A diagnostics module that cannot load must
+// never be the reason a player loses the narrator; the guard exists to move the
+// voice aside on MEASURED crashes, and no measurement means no verdict.
+//
+// ⚠ Re-read per call rather than cached, for the same reason the gate below is
+// not latched: `loadMLHealth()` runs asynchronously at boot and `resetMLHealth()`
+// (RELOAD AI) can clear the count mid-session, so a value captured once would be
+// stale in both directions.
+function shouldAttemptBundledTTS(): boolean {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const ml = require('../diagnostics/mlHealth') as typeof import('../diagnostics/mlHealth');
+    return ml.shouldAttemptBundledTTS();
+  } catch {
+    return true;
+  }
+}
+
 interface QueuedUtterance {
   /** Monotonic id so callers can debounce / dedupe if needed. */
   id: number;
@@ -131,7 +160,9 @@ export async function getTTSVoices(): Promise<Speech.Voice[]> {
  *  fires correctly regardless of which engine is active. */
 export function isSpeaking(): boolean {
   const settings = getVoiceSettings();
-  if (settings.engine === 'bundled') return piperIsSpeaking();
+  // OTA-1707 — when the guard has stood the bundled voice down, the utterance
+  // went out on the system engine, so that is the queue to ask.
+  if (settings.engine === 'bundled' && shouldAttemptBundledTTS()) return piperIsSpeaking();
   return currentlySpeaking !== null || queue.length > 0;
 }
 
@@ -158,7 +189,13 @@ export function speak(text: string, channel?: string, voiceId?: string | null, o
     // of 1 false-tripped on reload churn and dropped a perfectly healthy Kokoro to
     // the system voice. The bundled neural voice is now ALWAYS used (unless its
     // model genuinely failed to install — the original error-state fallthrough).
-    if (getKokoroState().phase !== 'error') {
+    // ⚠⚠ OTA-1707 — AND THE SAME FALLTHROUGH CARRIES THE CRASH GUARD. A voice
+    // that has killed the process twice on this build steps aside for the system
+    // engine here, by the identical route arb54 built for a failed install: the
+    // Arbiter keeps narrating, in the device's own voice, and nothing goes
+    // silent. Re-checked per utterance rather than latched, so a new build (which
+    // resets the build-scoped count) speaks in Kokoro again from its first line.
+    if (getKokoroState().phase !== 'error' && shouldAttemptBundledTTS()) {
       // arb68 diagnostic — record which engine actually voiced this line so
       // COPY VOICE INFO can confirm the route. The title-line clip behaves
       // identically across Kokoro-playback OTAs, which only makes sense if the
@@ -355,7 +392,9 @@ export async function initTTSManager(): Promise<void> {
   // making a character, so the first narration line doesn't wait
   // on cold-start.
   const initial = getVoiceSettings();
-  if (initial.ttsEnabled && initial.engine === 'bundled') {
+  // ⚠ OTA-1707 — and do not spend the ~100MB warming a voice the guard has stood
+  // down; the load itself is what has been killing the process.
+  if (initial.ttsEnabled && initial.engine === 'bundled' && shouldAttemptBundledTTS()) {
     void prewarmKokoro();
   }
   let lastKokoroVoice = getVoiceSettings().kokoroVoice;
@@ -372,7 +411,7 @@ export async function initTTSManager(): Promise<void> {
       try { disposeStickyArbiterVoice(); } catch { /* ignore */ }
       lastKokoroVoice = s.kokoroVoice;
     }
-    if (s.engine === 'bundled') {
+    if (s.engine === 'bundled' && shouldAttemptBundledTTS()) {
       void prewarmKokoro();
     }
   });

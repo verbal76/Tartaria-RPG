@@ -30,7 +30,15 @@ async function setup(seed: Record<string, string> = {}) {
   return { AS, m };
 }
 
-describe('OTA-464 — voice (TTS) guard is detection-only (no auto-disable)', () => {
+// ⚠ OTA-1707 — RE-ARMED AT TWO, AND EVERY ASSERTION BELOW STILL HOLDS. The
+// bundled voice now steps aside after TWO voice crashes on the SAME build
+// (mlHealth's MAX_TTS_CRASHES_BEFORE_DISABLE), because OTA-985 build-scoped the
+// count and arb126 clears the crumb on backgrounding — two of the three false
+// positives OTA-464 pulled the guard for. Every case in this describe uses ONE
+// crash, which is exactly the noise 464 was protecting, so it is still `true`
+// here and this file remains that protection's regression guard. The two-crash
+// behaviour is pinned in ota1707TheVoiceStepsAside.
+describe('OTA-464 — one voice crash never disables Kokoro (OTA-1707 acts at two)', () => {
   it('a clean run keeps the bundled voice enabled', async () => {
     const { m } = await setup();
     expect(m.shouldAttemptBundledTTS()).toBe(true);

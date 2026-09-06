@@ -28198,7 +28198,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // fraction inverted, so the vendor's cut IS the loss, carrying every modifier
 // that shaped the sale. Plus the loot sweep, bounded by the forge's own junk
 // test so it can never sell what a recipe needs or what you reserved.
-export const OTA_BUILD_ID = '2026-09-06-1706-the-shelf-remembers-what-you-sold';
+// 2026-09-06 OTA-1707 — THE VOICE STEPS ASIDE. The owner's iPhone answered the
+// Kokoro question itself: with the narration model gated off by OTA-1704 the
+// phone still died, and it died on the VOICE (kills at voice:play:unload and
+// at native:voice:start with alive 0ms after it; the TTS guard naming
+// kokoro:am_michael; a memory warning with 'NOTHING TO RELEASE'). Not
+// co-residency. shouldAttemptBundledTTS has returned an unconditional true
+// since OTA-464 pulled the auto-disable over false positives - two of whose
+// three causes OTA-985 and arb126 have since closed - so it is re-armed at
+// TWO crashes on the same build, falling through to the system voice by the
+// route arb54 already proved. Nothing goes unspoken; only the voice changes.
+export const OTA_BUILD_ID = '2026-09-06-1707-the-voice-steps-aside';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-06-1706-the-shelf-remembers-what-you-sold';
 // golem catch-up 2026-09-06: markerless publish of OTA-1706 - the shelf
 // remembers what you sold. Buy-back at the vendor's margin, and SELL ALL LOOT
 // with a confirm. hal took the marker.
