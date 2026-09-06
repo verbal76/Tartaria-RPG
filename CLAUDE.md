@@ -119,6 +119,29 @@ that opens with combat arithmetic and never quotes what he actually wrote has
 buried the payload under the packaging — and a comment he had to repeat because
 it was missed costs him a whole round trip.
 
+**⚠⚠⚠ A TILE MOVE AND A REGION MOVE ARE TWO DIFFERENT THINGS.** Owner directive,
+2026-09-06, after a log read that counted the wrong one: *"moving from tile to
+tile and moving from region to region are two separate things."* They log
+differently, they run different code, and conflating them makes a log say the
+opposite of what happened. There are THREE movements, not two:
+
+| what happened | the line it writes | the code | what is rebuilt |
+|---|---|---|---|
+| **TILE STEP** — one grid cell to the next | `You walk <dir> …` | `stepDirection` | does NOT call `beginScene`; clears `vendor` + `elevatedOn` (POLISH-4), then rolls a fresh roadside stall at 20% on a novel tile |
+| **REGION CHANGE** — crossing a location boundary | `You've left X and entered Y.` | `travelTo` → `beginScene` | everything: vendor, enemies, hooks, arrival narration |
+| **HUB ROOM entry/exit** — in and out of a building | `You step back into <region>.` | neither of the above | nothing; a hub's anchor NPC legitimately stays put |
+
+⚠ COUNT THE RIGHT ONE. `You've left … and entered` counts REGION changes only —
+in a session with 24 tile steps it can read as low as 3, and a vendor question
+answered off that number is answered off a twentieth of the evidence. To count
+tile movement, count `You walk`. To ask "did a vendor follow me", key each
+sighting to the number of `You walk` lines before it: a vendor that appears at
+two different walk-counts followed; one confined to a single count did not.
+
+⚠ AND A HUB RE-ENTRY IS NOT A MOVE. "You step back into Voronov" looks like
+travel in the feed and is not — the same anchor vendor being there afterwards is
+correct behaviour, and reading it as following invents a bug.
+
 When the owner pastes a device log (the `=== TARTARIA LOG · PART N ===`
 envelope): DIAGNOSE FIRST. Produce observations — bugs, exploits, balance
 evidence, lore/narration incoherence, things working as intended — and do
