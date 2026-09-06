@@ -28436,6 +28436,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // sentence - and it caught my own first cut, which scanned raw source and flagged
 // the comment explaining the fix.
 export const OTA_BUILD_ID = '2026-09-06-1721-your-name-was-three-dots';
+// golem catch-up 2026-09-06: markerless publish of OTA-1721 - your name was the
+// three dots. The downed-dog countdown no longer squeezes the player's name out
+// of the HUD; it has its own row and the name has a floor. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-06-1720-repair-my-kit';
 // golem catch-up 2026-09-06: markerless publish of OTA-1720 - repair my kit.
 // REPAIR MY KIT mends everything equipped in one tap, the tab badge counts the
