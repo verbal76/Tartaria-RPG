@@ -28454,6 +28454,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // sightings, 23 distinct names, ZERO adjacent repeats. Names still recur across a
 // long walk, which is correct - there are only 24 traders on the roads.
 export const OTA_BUILD_ID = '2026-09-06-1722-the-trader-who-followed-you';
+// golem catch-up 2026-09-06: markerless publish of OTA-1722 - the trader who
+// followed you. Roadside traders no longer reuse a name you met within the last
+// ten sightings, so a fresh stall on the next tile stops reading as the same
+// store following you. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-06-1721-your-name-was-three-dots';
 // golem catch-up 2026-09-06: markerless publish of OTA-1721 - your name was the
 // three dots. The downed-dog countdown no longer squeezes the player's name out
