@@ -81,6 +81,20 @@ describe('OTA-1718 — ⚠⚠⚠ the acceptance test, as arithmetic', () => {
     expect(footerIsReachable(se, BUG_REPORT_CHROME)).toBe(true);
   });
 
+  it('⚠⚠ THE iPhone 14 PROFILE IS CONFIRMED AGAINST THE REPORTING DEVICE', () => {
+    // The tester caught the edge of the covered button and a log went. It
+    // carries the device's own metrics: "Screen: window 390×844 / screen 390×844
+    // @ 3x density", ios 26.4.2, on OTA-1716. So the window height this suite
+    // reasons about is the number the phone reports, not one read off a spec
+    // page — the difference between a measurement and a plausible table.
+    //
+    // ⚠ The same log carries the report's DESCRIPTION field, and it is three
+    // characters long: "log". That is the defect writing its own summary. She
+    // could reach the field, and could not reach SEND well enough to write
+    // anything into it first.
+    expect(DEVICE_PROFILES['iPhone 14']!.windowHeight).toBe(844);
+  });
+
   it('⚠ and the answer does not depend on how much was typed', () => {
     // The body scrolls, so a one-line report and a twelve-line report resolve to
     // the same layout. That is the difference between this and a fix that only
