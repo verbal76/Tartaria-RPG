@@ -1,0 +1,222 @@
+{
+  "id": "2d434266bf6848408ccfe0dc3b08a056",
+  "groupID": "7715724353",
+  "eventID": "2d434266bf6848408ccfe0dc3b08a056",
+  "projectID": "4511945117532160",
+  "size": 2702,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log-beacon 2026-09-06-1716-every-row-says-what-it-is #mtq5xlv4az11"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-06-1716-every-row-says-what-it-is",
+  "message": "player-log-beacon 2026-09-06-1716-every-row-says-what-it-is #mtq5xlv4az11",
+  "title": "player-log-beacon 2026-09-06-1716-every-row-says-what-it-is #mtq5xlv4az11",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "a35afa99df7547fa92a617698cf96a16",
+      "span_id": "be00312643ff0286",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {},
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log-beacon 2026-09-06-1716-every-row-says-what-it-is #mtq5xlv4az11"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtq5xlv4az11"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-06-1716-every-row-says-what-it-is"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-beacon"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "parts",
+      "value": "6"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-06-1716-every-row-says-what-it-is"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-06T18:46:24.677772Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-06T18:46:24.531000Z",
+  "fingerprints": [
+    "bdd763d22904f02024c84a462f7d6164"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1957959548,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-06T18:26:06.129290Z",
+    "dateReleased": "2026-09-06T18:27:36.200124Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "7ae8100b2d44aba6a79e202f8b5770028f71446b",
+      "message": "[ota-hal] OTA-1716 \u2014 every row in \"what moved it\" says what it is\n\nYour notation: *\"in the 'what moved it' section of the expanded character screen,\neverything listed in it should be able to be tapped on to see what it is. as of\nnow, only wrongs and gifts do.\"*\n\n\u26a0\u26a0\u26a0 WHY THOSE TWO AND NOTHING ELSE \u2014 which is the part worth fixing rather than\npatching. Neither of them was tappable because anyone decided that row deserved a\ndrill-down. They were tappable because each happened to own a LEDGER \u2014 the gifts\narrays for one, the wrongs ledger for the other \u2014 and each got its own useState\nboolean and its own branch in the renderer at the moment you tapped it and found\nit flat. OTA-1161 was the first; OTA-1683 was you reporting the second. Under\nthat shape, making a row tappable is a bespoke job, so it only ever happened in\nresponse to a notation. Fourteen kinds of row, two of them answering.\n\n\u26a0\u26a0 SO THE FIX IS WHERE THE NUMBER IS MADE, not in the screen. `regardParts` now\nreturns a `detail` alongside every value it pushes, written in the same branch,\nfrom the same variables \u2014 the corruption row's explanation is composed inside the\n`if` that reads corruption, using corruption. A help screen written separately\nfrom the arithmetic is a second copy of the rules, and this project has paid for\ncopied thresholds three times (OTA-1156, OTA-1158, OTA-1448). The screen drops\nits two booleans for one open-set keyed by row index, so a row is tappable\nbecause it exists, and all three render paths go through the same toggle.\n\n\u26a0 AND THE DETAILS EARN THE TAP. A drill-down that restates the row is the tap you\nalready had, so:\n\n  \u00b7 \"someone down here vouches for you\" names the faction and its standing. That\n    word \"someone\" is exactly what the row could not previously cash.\n  \u00b7 \"your answer: Sell the letters on  \u22125\" opens into the QUESTION he asked, the\n    hint that option carried, and the sentence it bought on your ending screen.\n    That row is the heaviest single input in the whole score and the one most\n    unreadable months later, which is why OTA-1085 itemised it in the first place.\n  \u00b7 \"N debts made good\" names who each one was cleared with.\n  \u00b7 Corruption and menace show the raw number, where the count starts, and the\n    floor. Lore, relics kept and relics sold show the count and the cap, so you\n    can see when a dial has saturated and stop feeding it.\n  \u00b7 The pressure row names your difficulty tier outright.\n\nThe two ledger rows keep their ledgers \u2014 they read live data the score does not\nhold, and duplicating them into `detail` would have been the second copy this\nwhole change is about avoiding.\n\n\u26a0 TWO INSTRUMENTS. One drives a character who has done one of everything and\nasserts no row comes back flat. The other reads the source and requires each of\nthe 14 push sites to carry a ledger kind or a detail, so row fifteen fails the\nbuild even if no fixture reaches it. That second one caught my own first attempt:\na line-shaped regex silently skipped the three rows written on one line, which\nwould have left the instrument agreeing with itself while measuring two thirds of\nthe file.\n\nA row that somehow reaches the screen with nothing to add still opens and says\nso. Silence on tap is the defect.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-06T18:23:44Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-06-1716-every-row-says-what-it-is",
+          "shortVersion": "tartaria@4.32.11+2026-09-06-1716-every-row-says-what-it-is",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-06T18:27:36.200124Z",
+          "dateCreated": "2026-09-06T18:26:06.129290Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "155987328",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-06T18:27:36.549606Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-06-1716-every-row-says-what-it-is",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-06-1716-every-row-says-what-it-is",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-06-1716-every-row-says-what-it-is",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-06-1716-every-row-says-what-it-is)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": null
+}
