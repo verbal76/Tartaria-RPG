@@ -788,6 +788,44 @@
       ]
     },
     {
+      "result": "Berry Mash",
+      "ingredients": [
+        { "name": "Blueberries", "quantity": 1 },
+        { "name": "Raspberries", "quantity": 1 }
+      ]
+    },
+    {
+      "result": "Green Fold",
+      "ingredients": [
+        { "name": "Wild Lettuce", "quantity": 1 },
+        { "name": "Wild Carrot", "quantity": 1 },
+        { "name": "Rhubarb Stalk", "quantity": 1 }
+      ]
+    },
+    {
+      "result": "Oat Cake",
+      "ingredients": [
+        { "name": "Wild Oats", "quantity": 2 },
+        { "name": "Firewood", "quantity": 1 }
+      ]
+    },
+    {
+      "result": "Forager's Skillet",
+      "ingredients": [
+        { "name": "Speckled Egg", "quantity": 1 },
+        { "name": "Wild Onion", "quantity": 1 },
+        { "name": "Firewood", "quantity": 1 }
+      ]
+    },
+    {
+      "result": "Sporecap Skewer",
+      "ingredients": [
+        { "name": "Orange Sporecap", "quantity": 1 },
+        { "name": "Red Cap Mushroom", "quantity": 1 },
+        { "name": "Firewood", "quantity": 1 }
+      ]
+    },
+    {
       "result": "Forager's Stew",
       "ingredients": [
         {

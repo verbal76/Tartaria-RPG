@@ -346,6 +346,96 @@
       }
     },
     {
+      "name": "Berry Mash",
+      "kind": "consumable",
+      "rarity": "Common",
+      "tags": [
+        "food",
+        "cooked",
+        "trail"
+      ],
+      "description": "Blueberries and raspberries crushed together in a cup with the flat of a knife. No fire, no water, no waiting — the first thing anyone learns to make down here.",
+      "effect": {
+        "kind": "consumable",
+        "healHP": 5,
+        "restoreStamina": 3,
+        "buffStat": "intelligence",
+        "buffBonus": 1,
+        "buffDuration": 4
+      }
+    },
+    {
+      "name": "Green Fold",
+      "kind": "consumable",
+      "rarity": "Common",
+      "tags": [
+        "food",
+        "cooked",
+        "trail"
+      ],
+      "description": "Wild lettuce wrapped around shaved carrot and a length of rhubarb, folded over twice. Cold, sharp, and it travels.",
+      "effect": {
+        "kind": "consumable",
+        "healHP": 4,
+        "restoreStamina": 5,
+        "buffStat": "dexterity",
+        "buffBonus": 1,
+        "buffDuration": 5
+      }
+    },
+    {
+      "name": "Oat Cake",
+      "kind": "consumable",
+      "rarity": "Common",
+      "tags": [
+        "food",
+        "cooked"
+      ],
+      "description": "Wild oats ground against a stone, wetted with spit if it comes to it, and baked flat on a hot rock. Dense enough to walk a day on.",
+      "effect": {
+        "kind": "consumable",
+        "healHP": 6,
+        "restoreStamina": 6
+      }
+    },
+    {
+      "name": "Forager's Skillet",
+      "kind": "consumable",
+      "rarity": "Uncommon",
+      "tags": [
+        "food",
+        "cooked"
+      ],
+      "description": "A speckled egg broken over sliced onion and cooked hard in the pan. The smell carries further than the fire does — mind who is downwind.",
+      "effect": {
+        "kind": "consumable",
+        "healHP": 9,
+        "restoreStamina": 5,
+        "buffStat": "strength",
+        "buffBonus": 1,
+        "buffDuration": 6
+      }
+    },
+    {
+      "name": "Sporecap Skewer",
+      "kind": "consumable",
+      "rarity": "Uncommon",
+      "tags": [
+        "food",
+        "cooked",
+        "mushroom"
+      ],
+      "description": "Orange sporecap and red cap threaded onto a stripped stick and held over the flame until they stop weeping. Charring is what makes them safe.",
+      "effect": {
+        "kind": "consumable",
+        "healHP": 7,
+        "restoreStamina": 7,
+        "buffStat": "wisdom",
+        "buffBonus": 1,
+        "buffDuration": 5
+      }
+    },
+    {
       "name": "Forager's Stew",
       "kind": "consumable",
       "rarity": "Uncommon",

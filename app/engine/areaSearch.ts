@@ -190,7 +190,15 @@ const SMALL_FINDS: { name: string; rarity: Rarity; weight: number }[] = [
   // Empty bottles — water-bottle Phase 3 (OTA 004). Low weight so
   // the player has to do some looking before bottle stock outpaces
   // the new fill-bottle verb's water-source detection.
-  { name: 'Empty Water Bottle', rarity: 'Common', weight: 4 },
+  // ⚠⚠⚠ OTA-1723 — 4 -> 12. THE BOTTLE WAS THE BOTTLENECK ALL THREE STEWS
+  // SHARED. A filled Water Bottle is an ingredient of every cooked stew in the
+  // game and it NEVER drops — what drops is the EMPTY, which you then carry to a
+  // water source and fill (5 min, per-room cooldown). At weight 4 of 270 that
+  // first step was a 1.5% draw, so the whole cooked-food economy hung off the
+  // rarest thing in the pool, and the filled bottle is also the drink you heal
+  // with, so cooking competed with survival for the same object. Owner: *"let's
+  // fix the spawn rate of the water bottle."*
+  { name: 'Empty Water Bottle', rarity: 'Common', weight: 12 },
 
   // Rare trinkets — "every now and then you'll find a trinket
   // like a locket or ring or something good but rarely."

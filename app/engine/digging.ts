@@ -169,7 +169,10 @@ const DIG_LOOT: DigEntry[] = [
   { name: 'Red Cap Mushroom', rarity: 'Common', baseWeight: 5 },
   { name: 'Blue Cap Mushroom', rarity: 'Common', baseWeight: 5 },
   { name: 'Orange Sporecap', rarity: 'Common', baseWeight: 5 },
-  { name: 'Empty Water Bottle', rarity: 'Common', baseWeight: 4 },
+  // OTA-1723 — 4 -> 12, matching the forage table. Digging is where the owner's
+  // own log shows him foraging ("investigate the ground"), so a bottle that is
+  // rare here is rare in practice however common it looks elsewhere.
+  { name: 'Empty Water Bottle', rarity: 'Common', baseWeight: 12 },
   // Uncommon — relic-grade finds.
   { name: 'Aetheric Shard', rarity: 'Uncommon', baseWeight: 5 },
   { name: 'Aetheric Dust', rarity: 'Uncommon', baseWeight: 4 },

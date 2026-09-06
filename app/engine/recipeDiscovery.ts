@@ -56,7 +56,22 @@ export function isDiscoverableRecipe(recipe: RecipeLike): boolean {
     // never walls its downstream tree for long (see pickRecipeToLearn).
     return materialIsFoundRecipe(recipe.result);
   }
-  const r = lookupCraftedItem(recipe.result).rarity;
+  // ⚠⚠⚠ OTA-1723 — FOOD IS NEVER LOCKED, on exactly the argument the material
+  // carve-out above already makes. Owner: *"yes, unlock Hearty Stew."* It is the
+  // only Rare-result food, so it was the only dish gated behind a random recipe
+  // note — a player could hold every ingredient and be told nothing, with no way
+  // to learn that cooking was even the reason. Cooking is a survival basic, not
+  // aspirational loot: locking a stew behind a find soft-blocks the food economy
+  // the same way locking Mudstone soft-blocked the refine chain.
+  //
+  // ⚠ Done as a RULE rather than by dropping Hearty Stew to Uncommon, because
+  // its rarity is what its stew is WORTH; changing that to dodge a gate would
+  // have quietly nerfed the dish to fix the door. The five dishes OTA-1723 adds
+  // are Common and Uncommon and would not have tripped this either way — the
+  // rule is here so the next Rare dish does not have to rediscover the problem.
+  const look = lookupCraftedItem(recipe.result);
+  if ((look.tags ?? []).includes('food')) return false;
+  const r = look.rarity;
   return r === 'Rare' || r === 'Legendary';
 }
 

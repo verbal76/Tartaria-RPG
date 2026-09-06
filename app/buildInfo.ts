@@ -28453,7 +28453,28 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // drops the filter rather than the trader. Measured after: 197 tiles, 29
 // sightings, 23 distinct names, ZERO adjacent repeats. Names still recur across a
 // long walk, which is correct - there are only 24 traders on the roads.
-export const OTA_BUILD_ID = '2026-09-06-1722-the-trader-who-followed-you';
+// 2026-09-06 OTA-1723 - THE KITCHEN OPENS. Owner, typed into the game itself:
+// "Why is food and health crafting so rare now?" Measured before writing: the
+// game has TWENTY-SIX food items and THREE recipes, all three of them stews, and
+// all three need a filled Water Bottle - which never drops. What drops is the
+// EMPTY, at weight 4 of 270 (1.5%), which you then carry to a water source and
+// fill on a per-room cooldown. So the whole cooked-food economy hung off the
+// rarest object in the pool, and the filled bottle is also the drink you heal
+// with, so cooking competed with survival for the same item. Meanwhile the pantry
+// was already full: Wild Oats, Wild Lettuce, Rhubarb Stalk, Orange Sporecap,
+// Blueberries, Raspberries, Speckled Egg all drop and not one was named by a
+// recipe - his own log shows him scraping silt, pulling up Raspberries and a
+// Speckled Egg, while the cookbook asked for onions. FIVE new dishes built on
+// what the ground actually gives: Berry Mash, Green Fold, Oat Cake, Forager's
+// Skillet, Sporecap Skewer. None needs the bottle and two need no fire either, so
+// they can be made anywhere. HEARTY STEW is unlocked - it was the only
+// Rare-result food and so the only dish locked behind a random recipe note, and
+// it is fixed as a RULE (food is never discovery-locked, the carve-out materials
+// have had since OTA-731) rather than by dropping its rarity, because its rarity
+// is what the stew is worth. And the empty bottle goes 4 -> 12 in BOTH the forage
+// and dig tables, 1.5% -> 4.3%, because the owner forages by digging.
+export const OTA_BUILD_ID = '2026-09-06-1723-the-kitchen-opens';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-06-1722-the-trader-who-followed-you';
 // golem catch-up 2026-09-06: markerless publish of OTA-1722 - the trader who
 // followed you. Roadside traders no longer reuse a name you met within the last
 // ten sightings, so a fresh stall on the next tile stops reading as the same
