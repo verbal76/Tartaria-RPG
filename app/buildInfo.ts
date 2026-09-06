@@ -28473,7 +28473,26 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // have had since OTA-731) rather than by dropping its rarity, because its rarity
 // is what the stew is worth. And the empty bottle goes 4 -> 12 in BOTH the forage
 // and dig tables, 1.5% -> 4.3%, because the owner forages by digging.
-export const OTA_BUILD_ID = '2026-09-06-1723-the-kitchen-opens';
+// 2026-09-06 OTA-1724 - THE CARD'S OWN TITLE. Found in the pre-Fable audit, in
+// ground OTA-1713 had already been over. That OTA named this concept GIVE GROUND
+// on the ACTIONS screen and shipped an instrument asserting every KEYWORD on a
+// card routes to the intent the card is about - because "a card that teaches a
+// word the parser does not know is worse than no card". It passed, and still
+// does. But a card's TITLE is not one of its keywords, so the phrase printed
+// LARGEST on the card was the only string on it nobody tested. Measured: "give
+// ground" parsed to intent=GIFT with target "ground" - a player who read the
+// heading and typed it was routed into the gifting system to hand somebody the
+// floor. Not a dead end, which is worse: a no-op teaches you the phrase was
+// wrong, a wrong action teaches you the game is broken. Declared WITH the space
+// so MULTI_WORD_COLLAPSES builds the rule and the collapse beats verb matching -
+// the same shape that fixed `take cover` losing to `take` and `close in` being
+// unreachable. The owner's canon from the audit brief is now pinned on both
+// halves: RETREAT leaves the fight, GIVE GROUND / BACK OFF open one band. And the
+// instrument generalises to command-shaped headings only - most card titles are
+// labels with skill annotations that nobody types, so requiring those to parse
+// would be a rule that fails on correct content. 36 checked, zero mismatches.
+export const OTA_BUILD_ID = '2026-09-06-1724-the-cards-own-title';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-06-1723-the-kitchen-opens';
 // golem catch-up 2026-09-06: markerless publish of OTA-1723 - the kitchen opens.
 // Five new dishes made of what the ground actually drops (three need no water,
 // two need no fire), Hearty Stew unlocked, and the empty water bottle roughly

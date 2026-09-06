@@ -238,6 +238,19 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
     // "stepback" as one token, which nobody does.
     'back off', 'back away', 'pull back', 'step back', 'reposition', 'recoil', 'edge back',
     'pace back', 'fall away', 'inch back',
+    // ⚠⚠⚠ OTA-1724 — 'give ground' IS THE CARD'S OWN TITLE. OTA-1713 named this
+    // concept GIVE GROUND on the ACTIONS screen and pinned every KEYWORD to a
+    // real synonym — but a card's TITLE is not one of its keywords, so the one
+    // phrase printed largest on the card was never checked. Measured: "give
+    // ground" parsed to intent=GIFT with target "ground", so a player who read
+    // the heading and typed it was routed into the gifting system to hand
+    // somebody the floor. Not a no-op, which is worse — a wrong action.
+    //
+    // ⚠ Declared WITH the space so MULTI_WORD_COLLAPSES makes the rule; the
+    // collapse pass runs before verb matching, which is exactly how 'take cover'
+    // stopped losing to 'take' (see take_cover below). Without the space this
+    // would only fire for a player who typed "giveground".
+    'give ground',
   ],
   repair: ['repair', 'mend', 'restore', 'refurbish', 'patch', 'fix', 'rebuild', 'renew', 'overhaul', 'tune'],
   // 'take' was here originally — playtest log surfaced the failure mode:
