@@ -31470,7 +31470,7 @@ export function desiredMissionLeg(
   const countItem = (name: string) =>
     (player.inventory ?? []).filter((i) => i.name.toLowerCase() === name.toLowerCase())
       .reduce((n, i) => n + (i.quantity ?? 1), 0);
-  const ready = factionQuestReady(def, rec.stage, countItem);
+  const ready = factionQuestReady(def, rec.stage, countItem, player.tc ?? 0);
   const home = startingLocationForFaction(def.factionId);
   if (ready) return { loc: home, phase: 'to_turnin' };
   return { loc: missionObjectiveLocationId(def) ?? home, phase: 'to_objective' };
@@ -33074,7 +33074,7 @@ function autoSubmitReadyFactionQuests(
   // home building). No longer requires the exact board room.
   const ready = (player.activeFactionQuests ?? [])
     .map((rec) => ({ rec, def: findFactionQuestById(rec.id) }))
-    .filter(({ rec, def }) => !!def && factionQuestReady(def, rec.stage, countItem) && atFactionTurnInBuilding(get, def.factionId));
+    .filter(({ rec, def }) => !!def && factionQuestReady(def, rec.stage, countItem, player.tc ?? 0) && atFactionTurnInBuilding(get, def.factionId));
   if (ready.length === 0) return;
   const lines: string[] = [];
   const rewards: string[] = [];

@@ -28233,7 +28233,21 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // markQwenLoadFailed records it durably with its cause, clears the attempt
 // breadcrumb so one failure cannot be counted twice, and the guards weigh the
 // observed half beside the inferred one. Never on a CANCELLED load - OTA-1405.
-export const OTA_BUILD_ID = '2026-09-06-1709-the-failure-we-watched-is-written-down';
+// 2026-09-06 OTA-1710 - THE LEDGER IS AUDITED. Step 3c of the walker work.
+// Faction quests are mostly NOT the object the four roads walk: of 65 authored
+// contracts, escort is 29, fetch 18, staged 17 - only the staged quarter has
+// beats. The rest keep a ledger (items in the pack, a party that must arrive
+// alive, a purse that must hold a number), so they are audited rather than
+// walked. The audit is mostly good news: the fetch counter re-reads live at
+// turn-in, takes exactly the requirement out of a bigger stack, survives
+// abandon-and-re-accept, and every refusal already names its number. One real
+// hole: OTA-1594's tcThreshold gate lived on the stage-ADVANCE path alone, so
+// it enforced "you held 100 TC at one particular moment" - earn it, close the
+// stages, spend the money, hand in, and it paid out in full. The gate moved to
+// factionQuestReady, where the READY pill, the route swap, the auto-submit
+// sweep and the turn-in all read one answer, and the refusal says the number.
+export const OTA_BUILD_ID = '2026-09-06-1710-the-ledger-is-audited';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-06-1709-the-failure-we-watched-is-written-down';
 // golem catch-up 2026-09-06: markerless publish of OTA-1709 - the failure we
 // watched is written down. An observed model-load failure is now recorded with
 // its cause instead of being re-inferred a boot later. hal took the marker.

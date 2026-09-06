@@ -30,6 +30,10 @@ export type TurnInSubject =
       def: FactionQuestDef;
       stage: number;
       countItem: (name: string) => number;
+      /** OTA-1710 — the player's TC, for a `tcThreshold` contract. Required for
+       *  the same reason it is required downstream: a wealth gate nobody passes
+       *  is a wealth gate nobody enforces. */
+      purse: number;
     }
   /** The broker's Parley of Factions: every demanded relic in hand. */
   | {
@@ -48,7 +52,7 @@ export function missionTurnInReady(subject: TurnInSubject): boolean {
     case 'storyline':
       return subject.stage >= subject.stageCount;
     case 'faction_quest':
-      return factionQuestReady(subject.def, subject.stage, subject.countItem);
+      return factionQuestReady(subject.def, subject.stage, subject.countItem, subject.purse);
     case 'broker':
       return subject.legs.length > 0 && subject.legs.every((l) => subject.hasItem(l.itemName));
   }

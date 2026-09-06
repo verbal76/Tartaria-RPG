@@ -112,15 +112,45 @@ export function findFactionQuestById(id: string): FactionQuestDef | null {
 /** arb171 — is this quest's WORK finished (only the turn-in remains)?
  *  Mirrors the gates in turnInFactionQuest so the UI tag, the auto-submit-on-
  *  arrival path, and the turn-in itself all agree on "ready". `countItem` counts
- *  the player's held quantity of a name (passed in so this stays store-free).
+ *  the player's held quantity of a name and `purse` is their TC (both passed in
+ *  so this stays store-free).
  *    • staged  → every stage played (stage >= stages.length)
  *    • fetch   → the required items are in hand
- *    • legacy  → single objective, always turn-in-able */
+ *    • tc      → and, on top of staged, the purse holds the number
+ *    • legacy  → single objective, always turn-in-able
+ *
+ *  ⚠⚠⚠ STEP 3c / OTA-1710 — THE PURSE WAS MISSING HERE, AND THAT IS HOW A
+ *  WEALTH-GATED CONTRACT PAID OUT BROKE.
+ *
+ *  OTA-1594 put a `tcThreshold` gate on "Run the haul" (*"Reach 100 TC, then
+ *  complete the quest"*) because two arbitrary taps had been closing it with 3
+ *  TC in hand. But it put the gate on the STAGE-ADVANCE path only, so what it
+ *  actually enforced was *"you held 100 TC at the moment of one particular
+ *  action"* — and the docstring above claimed this function mirrored the
+ *  turn-in's gates while neither of them knew about the purse at all.
+ *
+ *  ⚠ MEASURED on a plain player path, no cheat anywhere in it: earn 500 TC,
+ *  close both stages by travelling (every stage is `advanceOn: 'any'`), spend
+ *  down to 3 TC — which is the ordinary thing to do with money between
+ *  finishing work and finding an agent — and hand it in. It completed and paid
+ *  +100 TC. The requirement the objective names had simply stopped being
+ *  checked.
+ *
+ *  ⚠ `purse` IS REQUIRED, not optional with a default. An optional argument
+ *  would let a call site forget it and quietly re-open this exact hole; a
+ *  required one makes the compiler name every reader. That is the difference
+ *  between a fix and a fix that holds.
+ *
+ *  ⚠ It is a THRESHOLD, not a price: the coin is not consumed on turn-in, and
+ *  this OTA does not change that. The contract pays 40 TC; taking 100 would
+ *  make completing it a net loss, which is a balance decision nobody made. */
 export function factionQuestReady(
   def: FactionQuestDef,
   stage: number,
   countItem: (name: string) => number,
+  purse: number,
 ): boolean {
+  if (def.tcThreshold && purse < def.tcThreshold) return false;
   if (def.stages && def.stages.length > 0) return stage >= def.stages.length;
   if (def.fetch) return countItem(def.fetch.itemName) >= def.fetch.quantity;
   return true;

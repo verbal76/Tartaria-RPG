@@ -484,7 +484,7 @@ export function ContractsScreen() {
     rec: { stage: number },
     def: FactionQuestDef | null | undefined,
   ): boolean =>
-    !!def && missionTurnInReady({ kind: 'faction_quest', def, stage: rec.stage, countItem });
+    !!def && missionTurnInReady({ kind: 'faction_quest', def, stage: rec.stage, countItem, purse: player?.tc ?? 0 });
   const brokerReady = missionTurnInReady({
     kind: 'broker',
     legs: brokerLegs,

@@ -1374,6 +1374,32 @@ export const createQuestSlice = (
         return;
       }
     }
+    // ⚠⚠⚠ STEP 3c / OTA-1710 — AND THE PURSE, WHICH NOTHING ON THIS PATH WAS
+    // COUNTING.
+    //
+    // OTA-1594 gated "Run the haul" (*"Reach 100 TC, then complete the
+    // quest"*) on the STAGE-ADVANCE path, and only there. So the rule it really
+    // enforced was "you held 100 TC at the moment of one particular action" —
+    // and spending your money is the ordinary thing to do with it between
+    // finishing the work and finding an agent to hand it to.
+    //
+    // ⚠ MEASURED by the step-3c probe, on a plain player path with no cheat in
+    // it: earn 500 TC, close both stages by travelling, spend down to 3, hand it
+    // in — complete, +100 TC paid. The number the objective names had stopped
+    // being checked at exactly the moment it mattered.
+    //
+    // The gate lives in `factionQuestReady` now, so the READY pill, the route's
+    // objective→turn-in swap, the auto-submit-on-arrival sweep and this refusal
+    // all read one answer. This branch is what the PLAYER meets, so it says the
+    // number — the habit the rest of this family already keeps ("needs 3× Scrap
+    // Metal — you've brought 0").
+    if (candidate.tcThreshold && (player.tc ?? 0) < candidate.tcThreshold) {
+      get().appendLog(
+        'arbiter',
+        `${sourceLabel} taps the slip. "${candidate.title} pays out at ${candidate.tcThreshold} TC in hand — you carry ${player.tc ?? 0}."`,
+      );
+      return;
+    }
     // OTA-456 — a FETCH quest is a PHYSICAL delivery: it can't be couriered
     // remotely (you can't mail the goods). Refuse a remote turn-in for a fetch
     // contract; it has to change hands in person. (Non-fetch contracts may still

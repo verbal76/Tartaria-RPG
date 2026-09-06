@@ -684,7 +684,7 @@ function factionCard(rec: Rec, player: PlayerCharacter): MissionStatusCard | nul
     (player.inventory ?? [])
       .filter((it) => it.name.toLowerCase() === name.toLowerCase())
       .reduce((n, it) => n + (it.quantity ?? 1), 0);
-  const ready = missionTurnInReady({ kind: 'faction_quest', def, stage: rec.stage, countItem });
+  const ready = missionTurnInReady({ kind: 'faction_quest', def, stage: rec.stage, countItem, purse: player.tc ?? 0 });
   // ⚠ The same swap the Contracts card makes (OTA-1152): en route the ground is
   // the OBJECTIVE, done it is the faction's own hall, which is the pay window.
   const home = startingLocationForFaction(def.factionId);

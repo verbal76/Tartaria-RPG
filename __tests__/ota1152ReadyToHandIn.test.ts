@@ -71,25 +71,45 @@ describe('OTA-1152 — the stage kinds (hunts / mysteries / storylines)', () => 
 
 describe('OTA-1152 — faction contracts keep all three of their shapes', () => {
   const none = () => 0;
+  // ⚠ OTA-1710 — `purse` joined the subject, because a `tcThreshold` contract's
+  // wealth gate lives in this predicate now (it used to live only on the
+  // stage-advance path, which meant it stopped being checked the moment the
+  // player spent anything). Rich here so these three cases keep measuring
+  // exactly what they always measured; the gate has its own case below.
+  const rich = 10_000;
 
   it('STAGED — ready when every stage is played', () => {
     const def = fq({ stages: [stage, stage] });
-    expect(missionTurnInReady({ kind: 'faction_quest', def, stage: 1, countItem: none })).toBe(false);
-    expect(missionTurnInReady({ kind: 'faction_quest', def, stage: 2, countItem: none })).toBe(true);
+    expect(missionTurnInReady({ kind: 'faction_quest', def, stage: 1, countItem: none, purse: rich })).toBe(false);
+    expect(missionTurnInReady({ kind: 'faction_quest', def, stage: 2, countItem: none, purse: rich })).toBe(true);
   });
 
   it('FETCH — ready on held quantity, not on the stage counter', () => {
     const def = fq({ fetch: { itemName: 'Golem Core', quantity: 2 } });
     const held = (n: number) => (name: string) => (name === 'Golem Core' ? n : 0);
-    expect(missionTurnInReady({ kind: 'faction_quest', def, stage: 0, countItem: held(1) })).toBe(false);
-    expect(missionTurnInReady({ kind: 'faction_quest', def, stage: 0, countItem: held(2) })).toBe(true);
+    expect(missionTurnInReady({ kind: 'faction_quest', def, stage: 0, countItem: held(1), purse: rich })).toBe(false);
+    expect(missionTurnInReady({ kind: 'faction_quest', def, stage: 0, countItem: held(2), purse: rich })).toBe(true);
     // A fetch quest carries no stages, so a stage-driven answer would have
     // called it ready from the moment it was accepted.
-    expect(missionTurnInReady({ kind: 'faction_quest', def, stage: 5, countItem: held(0) })).toBe(false);
+    expect(missionTurnInReady({ kind: 'faction_quest', def, stage: 5, countItem: held(0), purse: rich })).toBe(false);
   });
 
   it('LEGACY — a single-objective def is always turn-in-able', () => {
-    expect(missionTurnInReady({ kind: 'faction_quest', def: fq(), stage: 0, countItem: none })).toBe(true);
+    expect(missionTurnInReady({ kind: 'faction_quest', def: fq(), stage: 0, countItem: none, purse: rich })).toBe(true);
+  });
+
+  it('⚠⚠ TC — a wealth-gated contract is not ready while the purse is short', () => {
+    // OTA-1710. The gate belongs HERE rather than only on the advance path, so
+    // the READY pill, the route swap, the auto-submit sweep and the turn-in all
+    // read one answer — and none of them can be talked past by spending the
+    // money after the last stage closes.
+    const def = fq({ stages: [stage, stage], tcThreshold: 100 });
+    const at = (purse: number) =>
+      missionTurnInReady({ kind: 'faction_quest', def, stage: 2, countItem: none, purse });
+    expect(at(99)).toBe(false);
+    expect(at(100)).toBe(true);
+    // And it does not substitute for the stage counter — both have to hold.
+    expect(missionTurnInReady({ kind: 'faction_quest', def, stage: 1, countItem: none, purse: rich })).toBe(false);
   });
 });
 
