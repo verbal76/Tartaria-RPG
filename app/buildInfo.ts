@@ -28513,6 +28513,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // had). Catalog-wide sweep: 288 rows checked, zero hiding a paid bonus, zero
 // promising one the engine does not pay.
 export const OTA_BUILD_ID = '2026-09-06-1725-the-card-pays-what-the-fight-pays';
+// golem catch-up 2026-09-06: markerless publish of OTA-1725 - the card pays what
+// the fight pays. The armour item card read the single legacy statBonus field
+// while the engine sums statBonuses ?? [statBonus]; across 288 stat-bearing rows
+// 185 hid a paid bonus and 54 named the wrong stat. One authority now
+// (armorBonusList / armorPaidBonuses in equipment.ts) and every reader, engine
+// and display, goes through it. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-06-1724-the-cards-own-title';
 // golem catch-up 2026-09-06: markerless publish of OTA-1724 - the card's own
 // title. "give ground" reaches the range-opening intent instead of the gifting
