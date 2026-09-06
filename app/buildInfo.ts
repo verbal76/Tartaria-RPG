@@ -28273,6 +28273,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // name for unstamped legacy bodies - only a body stamped for ANOTHER stage is
 // excluded. Also corrects a doc that had stopped being true.
 export const OTA_BUILD_ID = '2026-09-06-1712-the-stamp-not-the-name';
+// golem catch-up 2026-09-06: markerless publish of OTA-1712 - the stamp, not
+// the name. The two readers OTA-1703 left counting bodies by name now ask the
+// encounter stamp. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-06-1711-the-escort-has-to-go-somewhere';
 // golem catch-up 2026-09-06: markerless publish of OTA-1711 - the escort has to
 // go somewhere. An escort contract can no longer be handed back where it was
