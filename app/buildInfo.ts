@@ -28209,6 +28209,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // TWO crashes on the same build, falling through to the system voice by the
 // route arb54 already proved. Nothing goes unspoken; only the voice changes.
 export const OTA_BUILD_ID = '2026-09-06-1707-the-voice-steps-aside';
+// golem catch-up 2026-09-06: markerless publish of OTA-1707 - the voice steps
+// aside. The bundled neural voice yields to the system voice after two crashes
+// on one build, and the player is told. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-06-1706-the-shelf-remembers-what-you-sold';
 // golem catch-up 2026-09-06: markerless publish of OTA-1706 - the shelf
 // remembers what you sold. Buy-back at the vendor's margin, and SELL ALL LOOT
