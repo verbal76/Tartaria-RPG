@@ -28331,6 +28331,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ending screen. A source instrument counts all 14 push sites and fails if one
 // arrives without a detail.
 export const OTA_BUILD_ID = '2026-09-06-1716-every-row-says-what-it-is';
+// golem catch-up 2026-09-06: markerless publish of OTA-1716 - every row in "what
+// moved it" says what it is. Every contribution to the Arbiter's regard now opens
+// into its own explanation, built where the number is made. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-06-1715-the-dog-that-was-greyed-out';
 // golem catch-up 2026-09-06: markerless publish of OTA-1715 - the dog that was
 // greyed out forever. A healed dog now comes off the bench instead of staying
