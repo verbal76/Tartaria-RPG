@@ -28199,6 +28199,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // that shaped the sale. Plus the loot sweep, bounded by the forge's own junk
 // test so it can never sell what a recipe needs or what you reserved.
 export const OTA_BUILD_ID = '2026-09-06-1706-the-shelf-remembers-what-you-sold';
+// golem catch-up 2026-09-06: markerless publish of OTA-1706 - the shelf
+// remembers what you sold. Buy-back at the vendor's margin, and SELL ALL LOOT
+// with a confirm. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-06-1705-the-device-tries-again-by-itself';
 // golem catch-up 2026-09-06: markerless publish of OTA-1705 - the device tries
 // again by itself. The general model guard gets a periodic amnesty on its own
