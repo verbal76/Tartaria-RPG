@@ -151,7 +151,34 @@ export function LoreCodexBody() {
     [],
   );
   const beatenCount = enemyCatalog.filter((e) => defeatedSet.has(e.name.toLowerCase())).length;
-  const concepts = (conceptsData as { concepts: LoreConcept[] }).concepts;
+  // ⚠⚠⚠ OTA-1713 — DEDUPED BY ID, AND THE COUNT COUNTS WHAT IS SHOWN.
+  //
+  // Four faction ids are authored TWICE in concepts.json —
+  // conspiracy_architects, servants_of_giants, stone_builders and
+  // tartarian_revivalists — each with a different write-up. Every other reader
+  // in the app resolves a concept with `concepts.find((c) => c.id === id)`, so
+  // the second card of each pair is already dead to them; only this list, which
+  // maps the whole bank, showed both. That cost two things:
+  //
+  //   · the player saw the same faction twice, under two titles ("Stone
+  //     Builders" and "The Stone Builders"), saying different things — and had
+  //     no way to know which one the game meant;
+  //   · `key={c.id}` on a mapped list got FOUR duplicate keys, which is a React
+  //     reconciliation hazard rather than a cosmetic one.
+  //
+  // ⚠ THIS DELETES NOTHING. Which of each pair is the good text is a content
+  // call, and not mine to make silently; both stay in the file. The list simply
+  // agrees with every other reader by keeping the first, so the codex can never
+  // contradict what the rest of the app resolves. ota1713 pins these four as
+  // KNOWN and fails on a fifth.
+  const concepts = ((): LoreConcept[] => {
+    const seen = new Set<string>();
+    return (conceptsData as { concepts: LoreConcept[] }).concepts.filter((c) => {
+      if (seen.has(c.id)) return false;
+      seen.add(c.id);
+      return true;
+    });
+  })();
   // OTA-845 [The Fallen] — install-wide roll of the dead, loaded async from the global
   // stash. Newest first (most recent death at the top of the memorial).
   const [fallen, setFallen] = useState<FallenHero[]>([]);

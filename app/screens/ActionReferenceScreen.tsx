@@ -33,7 +33,13 @@ const concepts = (conceptsData.concepts as Concept[]);
 const SECTIONS: { title: string; ids: string[] }[] = [
   {
     title: 'Movement Actions',
-    ids: ['move_action', 'sprint_action', 'take_cover_action', 'perform_action', 'assist_action_combat', 'hold_action', 'flee_action'],
+    // ⚠⚠ OTA-1713 — `advance_action` / `retreat_action` ADDED. Every other
+    // combat manoeuvre the parser knows is taught on this screen — dash,
+    // disengage, take cover, aim, reload, maneuver, quick fire, burst fire,
+    // fight back — and these two, which share one handler, were the only pair
+    // that fell out. They have no button either (none of the manoeuvres do;
+    // that is the design), so nothing anywhere told a player they exist.
+    ids: ['move_action', 'advance_action', 'retreat_action', 'sprint_action', 'take_cover_action', 'perform_action', 'assist_action_combat', 'hold_action', 'flee_action'],
   },
   {
     title: 'Move Types',

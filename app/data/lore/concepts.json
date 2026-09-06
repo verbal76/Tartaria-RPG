@@ -1087,6 +1087,32 @@
       "keywords": ["mud flood nexus", "nexus", "the nexus"],
       "title": "Mud Flood Nexus",
       "answer": "The empire-killer site. The original Aethercraft engine that failed and drowned Tartaria when its nine regulator Cores went out of sync. Reachable via the Endless Stair, gated on the player carrying all nine Cores. At the Nexus you make the Choice: SEAL, UNLEASH, or PRESERVE."
+    },
+    {
+      "id": "advance_action",
+      "keywords": [
+        "advance",
+        "approach",
+        "close in",
+        "lunge",
+        "forward",
+        "charge in"
+      ],
+      "title": "Advance",
+      "answer": "Close the ground toward whoever you are fighting, one range band at a time \u2014 far to near, near to close, close to arm's reach. Heavy armour and foul weather make the step cost more. In a fight with more than one enemy you can name your target (\"advance on the human\"), which shifts your focus to them as you close \u2014 that is how you choose who you are toe to toe with, instead of taking whoever the fight handed you. Out of a fight it simply walks you up to something you can see."
+    },
+    {
+      "id": "retreat_action",
+      "keywords": [
+        "back off",
+        "back away",
+        "pull back",
+        "step back",
+        "reposition",
+        "edge back"
+      ],
+      "title": "Give Ground",
+      "answer": "Give ground the same way you take it \u2014 one range band out, arm's reach to close, close to near, near to far. Opening the distance is how you break contact without leaving the fight. Say \"back off\", \"pull back\", \"step back\" or \"reposition\"; naming an enemy shifts your focus to them as you move. Weather and heavy armour slow the step. \u26a0 The word \"retreat\" is read as FLEEING the encounter outright, not as this \u2014 if you mean to stay in the fight and open the range, use one of the phrases above. If enemies are already on you and you need to break off cleanly, see Disengage."
     }
   ]
 }

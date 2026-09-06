@@ -220,7 +220,14 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
     // 'press' removed — clashes with "press the button" / "press on the
     // wound" / "press my luck". Players who want the combat beat say
     // advance/approach/lunge/forward.
-    'advance', 'approach', 'closein', 'lunge', 'forward',
+    // ⚠⚠ OTA-1713 — `closein` → `close in`, the SAME fix retreat and take_cover
+    // each needed. MULTI_WORD_COLLAPSES is built only from synonyms that
+    // CONTAIN a space (`if (!verb.includes(' ')) continue;`), so an
+    // already-collapsed form generates no collapse rule and can only ever match
+    // a player who types it as one token — which, as the retreat comment above
+    // says, nobody does. Declared with the space, the collapse pass does the
+    // work and "close in on the dragon" finally reaches this intent.
+    'advance', 'approach', 'close in', 'lunge', 'forward',
     'charge in', 'near',
   ],
   retreat: [

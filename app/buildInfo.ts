@@ -28272,7 +28272,19 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ask bodyBelongsToStage now, which prefers the stamp and falls back to the
 // name for unstamped legacy bodies - only a body stamped for ANOTHER stage is
 // excluded. Also corrects a doc that had stopped being true.
-export const OTA_BUILD_ID = '2026-09-06-1712-the-stamp-not-the-name';
+// 2026-09-06 OTA-1713 - THE VERBS THE GAME NEVER TAUGHT. Hand-verification of
+// the shortlist check:verbreach deliberately refuses to judge (29 verbs with no
+// control found). The right question is not "is there a button" - typed-only is
+// the design here, and the ACTIONS screen teaches typed verbs - so a verb is
+// discoverable if it has a control OR the screen teaches a phrase that PARSES to
+// it. Measured that way: advance and retreat were the only two combat manoeuvres
+// never taught, while all nine of their siblings have cards, and neither has a
+// button. They now have cards. Two things fell out of writing them: `closein`
+// was an already-collapsed synonym that could never match player input (the same
+// defect retreat and take_cover were each fixed for), and four faction concepts
+// are authored twice, so the codex showed them twice with duplicate React keys.
+export const OTA_BUILD_ID = '2026-09-06-1713-the-verbs-the-game-never-taught';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-06-1712-the-stamp-not-the-name';
 // golem catch-up 2026-09-06: markerless publish of OTA-1712 - the stamp, not
 // the name. The two readers OTA-1703 left counting bodies by name now ask the
 // encounter stamp. hal took the marker.
