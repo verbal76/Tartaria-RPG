@@ -28474,6 +28474,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // is what the stew is worth. And the empty bottle goes 4 -> 12 in BOTH the forage
 // and dig tables, 1.5% -> 4.3%, because the owner forages by digging.
 export const OTA_BUILD_ID = '2026-09-06-1723-the-kitchen-opens';
+// golem catch-up 2026-09-06: markerless publish of OTA-1723 - the kitchen opens.
+// Five new dishes made of what the ground actually drops (three need no water,
+// two need no fire), Hearty Stew unlocked, and the empty water bottle roughly
+// tripled in both the forage and dig tables. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-06-1722-the-trader-who-followed-you';
 // golem catch-up 2026-09-06: markerless publish of OTA-1722 - the trader who
 // followed you. Roadside traders no longer reuse a name you met within the last
