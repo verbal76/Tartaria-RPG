@@ -28284,6 +28284,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // defect retreat and take_cover were each fixed for), and four faction concepts
 // are authored twice, so the codex showed them twice with duplicate React keys.
 export const OTA_BUILD_ID = '2026-09-06-1713-the-verbs-the-game-never-taught';
+// golem catch-up 2026-09-06: markerless publish of OTA-1713 - the verbs the game
+// never taught. Advance and give-ground get ACTIONS cards, `close in` reaches the
+// parser, and the codex stops showing four factions twice. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-06-1712-the-stamp-not-the-name';
 // golem catch-up 2026-09-06: markerless publish of OTA-1712 - the stamp, not
 // the name. The two readers OTA-1703 left counting bodies by name now ask the
