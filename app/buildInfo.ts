@@ -28330,7 +28330,32 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // he asked, the hint the option carried, and the sentence it bought on your
 // ending screen. A source instrument counts all 14 push sites and fails if one
 // arrives without a detail.
-export const OTA_BUILD_ID = '2026-09-06-1716-every-row-says-what-it-is';
+// 2026-09-06 OTA-1717 - ONE DOG, ONE CLOCK. The dog had TWO loyalty systems,
+// written a year apart, running in the same action and not knowing about each
+// other: dogThresholdCheck (synchronous, crossing-based, its own 50/30/15/0
+// table, abandoning without an owed puppy) and tickDogStatus (a post-action
+// microtask, level-based and latched, bands 50/30/15, abandoning WITH one).
+// Measured before deleting anything, by walking a dog from 60 loyalty to 0
+// through the real action loop: at band 15 the player read "Cinder won't meet
+// your eye. He is thin as wire and falling behind on the trail." and then,
+// immediately, the Arbiter saying "Cinder won't meet your eye. One more empty
+// day and he walks." The same opening clause twice, and the same doubling at 50
+// and 30 in different words. At 0 they disagreed outright, and whichever ran
+// first won - the synchronous one always did, so the owed puppy in the other
+// branch was the losing half of a race nobody knew was a race. tickDogStatus
+// survives because its latch is strictly stronger: a band crossed during a
+// silent re-dispatch, or a save loaded below a band it never announced, still
+// gets its beat, one per action, until it catches up. On the owed puppy the repo
+// held BOTH answers at once, each with its own passing test: "no bail-out"
+// (OTA-124, enforced by the sweep) and "hunger-abandonment NOW owes a
+// replacement" (Poplar Anvil, written into the tick and superseding it). The
+// newer rule never reached a single player, because the sweep ran first and
+// synchronously - it was dead on that path from the day it landed. The owner
+// settled the tie: the owed puppy was a one-time repair for an earlier broken
+// OTA, and neglect must not pay. Bleed-out DEATH keeps its owed replacement until
+// the dog market exists. 62 lines back on the gameStore ceiling.
+export const OTA_BUILD_ID = '2026-09-06-1717-one-dog-one-clock';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-06-1716-every-row-says-what-it-is';
 // golem catch-up 2026-09-06: markerless publish of OTA-1716 - every row in "what
 // moved it" says what it is. Every contribution to the Arbiter's regard now opens
 // into its own explanation, built where the number is made. hal took the marker.

@@ -152,8 +152,9 @@ describe('OTA-120 Phase 4 — dog loyalty decay', () => {
   it('threshold beat fires when loyalty crosses 50 down via the full action loop', async () => {
     const store = await bootWithDog(51);
     const logBefore = store.getState().gameLog.length;
-    // Drive via a real submitPlayerAction (rest) so the post-action
-    // dogThresholdCheck runs. Rest advances 8h → 2 decay ticks → 49.
+    // ⚠ OTA-1717 — dogThresholdCheck is gone; tickDogStatus (the microtask
+    // after every non-silent action) is the only thing that narrates loyalty
+    // now. Rest advances 8h → 2 decay ticks → 49.
     // Rest also bumps loyalty +5 → 54. Net: 54. Threshold won't cross.
     // So instead manually drop to 49 then drive any 0-cost action to
     // trigger the threshold check.
@@ -169,9 +170,9 @@ describe('OTA-120 Phase 4 — dog loyalty decay', () => {
     // real action. Spend many waits to drift hoursElapsed.
     // Simpler approach: directly invoke the threshold check helper by
     // setting loyaltyBefore=60 then mutating to 49 then issuing wait.
-    // Since dogThresholdCheck reads loyaltyBefore from the submitPlayerAction
-    // closure, the cleanest path is to set loyalty to 60 first, then
-    // run an action that decays it to <=50.
+    // OTA-1717 — the surviving system is LEVEL-based and latched, so it does
+    // not need a before-snapshot at all: set loyalty to 60 first, then run an
+    // action that decays it to <=50.
     store.setState({
       player: {
         ...store.getState().player!,

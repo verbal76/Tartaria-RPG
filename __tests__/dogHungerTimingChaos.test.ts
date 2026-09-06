@@ -170,8 +170,8 @@ describe('OTA-124 vandalistic — hunger/abandonment timing chaos', () => {
     const dog = store.getState().player?.dog;
     expect(dog?.loyalty).toBe(0);
     // Note: pure decay (without going through the action loop's
-    // dogThresholdCheck) doesn't flip status to 'abandoned' — that
-    // flip happens in the per-action sweep when crossing 0 down.
+    // tickDogStatus) doesn't flip status to 'abandoned' — OTA-1717 collapsed
+    // the two sweeps into one, and that one runs as a post-action microtask.
     expect(['with_player', 'abandoned']).toContain(dog?.status);
   });
 
@@ -240,8 +240,8 @@ describe('OTA-124 vandalistic — hunger/abandonment timing chaos', () => {
 
   it('threshold beats fire ONCE per crossover (50/30/15/0)', async () => {
     // Helper that drives a chain of decay events with the player loop
-    // running its action-time, so the post-action dogThresholdCheck
-    // sweep fires. We use 'wait' (a 0-cost action that advances time).
+    // running its action-time, so the post-action tickDogStatus fires.
+    // We use 'wait' (a 0-cost action that advances time).
     const store = await bootWithDog({ loyalty: 55 });
     const beats: string[] = [];
     // The threshold-cross strings can vary in copy; check for the dog
@@ -249,7 +249,7 @@ describe('OTA-124 vandalistic — hunger/abandonment timing chaos', () => {
     // didn't fire MORE than once per threshold over a long stretch.
     const logBefore = store.getState().gameLog.length;
     // Run 800 hours via repeated decays (simulates the sweep) but flip
-    // the status check ourselves via direct mutation since dogThresholdCheck
+    // the status check ourselves via direct mutation since tickDogStatus
     // requires a sub-tick from the live action loop.
     for (let h = 0; h < 800; h++) {
       advanceHoursAndDecay(store, 1);

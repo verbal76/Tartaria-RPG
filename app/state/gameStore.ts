@@ -12832,12 +12832,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // for time tracking ("how long does each encounter take? time is
     // important"). The engine has the data — just wasn't logging it.
     const hoursBefore = player.hoursElapsed ?? 0;
-    // OTA-120 Phase 4 — snapshot dog loyalty so the post-action sweep
-    // can detect threshold crossings (50/30/15/0) the advanceTime call
-    // chain causes. advanceTime itself stays pure (no logging) since it
-    // runs in dozens of code paths; threshold beats fire once here at
-    // the end of submitPlayerAction.
-    const dogLoyaltyBefore = player.dog?.loyalty ?? 0;
 
     // Tick all active status effects one round. Bleed-style DOTs deal
     // damage, expired effects drop off, and incapacitation (stun / paralyze)
@@ -22011,12 +22005,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           : `${Math.floor(dt / 24)}d ${Math.round(dt % 24)}h`;
       get().appendLog('system', `⏳ Time passed: ${label}`);
     }
-    // OTA-120 Phase 4 — dog loyalty threshold check. Fires AFTER all
-    // advanceTime calls in the action have settled, so a single action
-    // that pushes loyalty across multiple thresholds (e.g. an 8h rest
-    // while at 32 loyalty drops to 30 and emits the 30-beat) fires
-    // exactly once.
-    dogThresholdCheck(get, set, dogLoyaltyBefore);
+    // ⚠⚠⚠ OTA-1717 — dogThresholdCheck USED TO RUN HERE, beside tickDogStatus,
+    // narrating the SAME loyalty bands in different words. Both are gone into
+    // one: tickDogStatus owns the dog's whole clock now. See ota1717.
     // OTA-844 [world pulse] — advance the world's slow heartbeat. No-op unless a full
     // pulse of in-game time has accrued since the last one.
     worldTideCheck(get, set);
@@ -35427,71 +35418,14 @@ function rejoinDogOnDescent(
   );
 }
 
-// Loyalty thresholds we narrate when the dog crosses DOWN through them.
-// 50 / 30 / 15 / 0; 0 fires the abandonment flow once.
-const DOG_LOYALTY_THRESHOLDS = [50, 30, 15, 0] as const;
-
-/** Inspect the dog's loyalty after an advanceTime tick. If it has
- *  crossed one of the threshold values DOWN (oldLoyalty > T && newLoyalty <= T),
- *  emit the matching beat. At 0, mark the dog 'abandoned' and surface
- *  the goodbye line. Idempotent on already-abandoned / dead dogs.
- *  Caller is responsible for snapshotting oldLoyalty before the
- *  advanceTime call. The store hooks this into every turn via the
- *  post-action sweep below. */
-function dogThresholdCheck(
-  get: () => GameStore,
-  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
-  oldLoyalty: number,
-): void {
-  const player = get().player;
-  const dog = player?.dog;
-  if (!dog) return;
-  if (dog.status === 'abandoned' || dog.status === 'dead') return;
-  const newLoyalty = dog.loyalty;
-  if (newLoyalty >= oldLoyalty) return;
-  for (const t of DOG_LOYALTY_THRESHOLDS) {
-    if (oldLoyalty > t && newLoyalty <= t) {
-      if (t === 50) {
-        get().appendLog(
-          'world',
-          applyDogPronouns(
-            `${dog.name} starts ranging wider. {Pronoun} {isOrAre} hungry — the trail bends toward anything that smells like food.`,
-            dog.sex.pronoun,
-          ),
-        );
-      } else if (t === 30) {
-        get().appendLog(
-          'arbiter',
-          applyDogPronouns(
-            `The Arbiter glances at ${dog.name}. "{Pronoun} {hasOrHave} ribs showing. Feed {object}, soon."`,
-            dog.sex.pronoun,
-          ),
-        );
-      } else if (t === 15) {
-        get().appendLog(
-          'world',
-          applyDogPronouns(
-            `${dog.name} won't meet your eye. {Pronoun} {isOrAre} thin as wire and falling behind on the trail.`,
-            dog.sex.pronoun,
-          ),
-        );
-      } else if (t === 0) {
-        // Abandonment — set status, narrate goodbye, do NOT set
-        // puppyVendorOwed (user spec: no-bail-out).
-        set((s) => s.player && s.player.dog
-          ? { player: { ...s.player, dog: { ...s.player.dog, status: 'abandoned' as const } } }
-          : s);
-        get().appendLog(
-          'world',
-          applyDogPronouns(
-            `You wake to find no warm weight at your back. ${dog.name}{contraction} gone.`,
-            dog.sex.pronoun,
-          ),
-        );
-      }
-    }
-  }
-}
+// ⚠⚠⚠ OTA-1717 — dogThresholdCheck AND DOG_LOYALTY_THRESHOLDS LIVED HERE.
+// Fifty-four lines that narrated the dog's loyalty bands a second time, in
+// different words, on different channels, in the same action as tickDogStatus.
+// Measured before deleting: at band 15 the player got "Cinder won't meet your
+// eye. He is thin as wire and falling behind on the trail." on the world channel
+// and, immediately after, the Arbiter saying "Cinder won't meet your eye. One
+// more empty day and he walks." The identical opening clause, twice, from two
+// systems that did not know about each other. See ota1717.
 
 /** Apply ONE inventory item to the dog. Consumes 1 of the item; applies
  *  HP from the consumable effect (if any); bumps loyalty by +20 (regular
@@ -36576,13 +36510,18 @@ export function tickDogStatus(
   const floor = dog.loyaltyBeatFloor ?? 101;
 
   if (loy <= 0) {
+    // ⚠⚠ OTA-1717 — NEGLECT DOES NOT PAY A PUPPY, and this is not a new rule:
+    // it is the rule the project already recorded ("hunger-abandonment does NOT
+    // set puppyVendorOwed (spec: no bail-out)") and the one players already
+    // live, because dogThresholdCheck reached this crossing first and never set
+    // the flag. This branch was the losing half of the race and disagreed with
+    // the half that won. Now there is one branch, and it agrees with the spec.
+    // ⚠ Bleed-out DEATH keeps its owed replacement for the moment — pulling it
+    // before the dog market exists would leave a player with no road back to a
+    // companion at all. That is the owner's next piece of work, not a side
+    // effect of this collapse.
     set((s) => s.player?.dog
-      ? {
-          player: { ...s.player, dog: { ...s.player.dog, status: 'abandoned' as const } },
-          worldMemory: s.worldMemory.puppyVendorUsed
-            ? s.worldMemory
-            : { ...s.worldMemory, puppyVendorOwed: true },
-        }
+      ? { player: { ...s.player, dog: { ...s.player.dog, status: 'abandoned' as const } } }
       : s);
     get().appendLog(
       'world',
@@ -36591,7 +36530,6 @@ export function tickDogStatus(
         dog.sex.pronoun,
       ),
     );
-    queuePuppyVendor(get, set);
     void get().persist();
     return;
   }

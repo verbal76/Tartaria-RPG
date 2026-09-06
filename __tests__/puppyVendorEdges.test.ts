@@ -117,10 +117,15 @@ describe('OTA-124 vandalistic — puppy-vendor + rubble-puppy edges', () => {
     );
   });
 
-  describe('Poplar Anvil — hunger-abandonment NOW owes a replacement puppy', () => {
-    // Superseded the OTA-124 invariant. A with_player dog that decays to
-    // loyalty 0 walks off (status -> abandoned) AND owes a replacement
-    // (puppyVendorOwed), so the vendor / rubble-puppy arc finally fires.
+  describe('⚠⚠ OTA-1717 — hunger-abandonment owes NOTHING', () => {
+    // This block used to read "Poplar Anvil — hunger-abandonment NOW owes a
+    // replacement puppy", superseding the OTA-124 no-bail-out invariant. It was
+    // written into tickDogStatus and it never reached a player: dogThresholdCheck
+    // ran first, synchronously, on the same crossing, and abandoned the dog
+    // without the flag. Two systems, two opposite specs, each with its own test,
+    // for a year. The owner settled it — the owed puppy was a one-time repair
+    // for an earlier broken OTA, and neglect must not pay — so the OTA-124 rule
+    // stands and there is now only one system to enforce it.
     function mkDog(over: Record<string, unknown> = {}) {
       return {
         id: 'd', name: 'Lost', breed: 'mutt',
@@ -136,13 +141,13 @@ describe('OTA-124 vandalistic — puppy-vendor + rubble-puppy edges', () => {
       };
     }
 
-    it('a with_player dog at loyalty 0 abandons AND flips puppyVendorOwed true', async () => {
+    it('a with_player dog at loyalty 0 abandons and does NOT flip puppyVendorOwed', async () => {
       const store = await bootBase();
       const p0 = store.getState().player!;
       store.setState({ player: { ...p0, hoursElapsed: 1000, dog: mkDog() as never } });
       tickDogStatus(store.getState, (fn) => store.setState(fn as never));
       expect(store.getState().player!.dog!.status).toBe('abandoned');
-      expect(store.getState().worldMemory.puppyVendorOwed).toBe(true);
+      expect(store.getState().worldMemory.puppyVendorOwed).toBeFalsy();
     });
 
     it('an already-abandoned dog is inert — tick does not re-owe or mutate it', async () => {

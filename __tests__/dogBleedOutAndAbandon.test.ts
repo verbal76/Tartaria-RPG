@@ -101,11 +101,21 @@ describe('tickDogStatus — bleed-out', () => {
 });
 
 describe('tickDogStatus — loyalty', () => {
-  it('a dog at 0 loyalty abandons you and owes a replacement', () => {
+  it('a dog at 0 loyalty abandons you, and owes you nothing', () => {
+    // ⚠⚠ OTA-1717 — THIS USED TO ASSERT `puppyVendorOwed === true`, and the
+    // repo held BOTH answers at once: dogHungerTimingChaos asserted "no
+    // bail-out" (the OTA-124 rule, enforced by dogThresholdCheck) while this and
+    // puppyVendorEdges asserted the opposite (the Poplar Anvil rule, written
+    // into tickDogStatus). Both shipped. Neither noticed the other, and because
+    // dogThresholdCheck ran first and synchronously, the newer rule never
+    // reached a single player — it was dead on this path from the day it landed.
+    // The owner settled it: the owed puppy was a one-time repair for an earlier
+    // broken OTA, and neglect must not pay. So the surviving system owes nothing
+    // here, which is also exactly what players have always experienced.
     const h = harness(makeDog({ loyalty: 0 }), 100);
     tickDogStatus(h.get, h.set);
     expect(h.dog().status).toBe('abandoned');
-    expect(h.wm().puppyVendorOwed).toBe(true);
+    expect(h.wm().puppyVendorOwed).toBe(false);
     expect(h.text()).toMatch(/road is empty/i);
   });
 
