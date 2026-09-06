@@ -28355,6 +28355,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // OTA, and neglect must not pay. Bleed-out DEATH keeps its owed replacement until
 // the dog market exists. 62 lines back on the gameStore ceiling.
 export const OTA_BUILD_ID = '2026-09-06-1717-one-dog-one-clock';
+// golem catch-up 2026-09-06: markerless publish of OTA-1717 - one dog, one clock.
+// The dog's two loyalty systems are one; each band speaks once instead of twice,
+// and the owed-puppy contradiction is settled. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-06-1716-every-row-says-what-it-is';
 // golem catch-up 2026-09-06: markerless publish of OTA-1716 - every row in "what
 // moved it" says what it is. Every contribution to the Arbiter's regard now opens
