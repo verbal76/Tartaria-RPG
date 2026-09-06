@@ -28222,6 +28222,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // reachable that never could fire. The saved-gear migration was following
 // the unpaid field too, and on 42 rows that deleted a bonus outright.
 export const OTA_BUILD_ID = '2026-09-06-1708-the-armour-spread-reaches-the-player';
+// golem catch-up 2026-09-06: markerless publish of OTA-1708 - the armour
+// spread reaches the player. Stage 2 of the stat rebalance, plus the finding
+// that stage 1 was authored into a field the armour payout never reads.
+// hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-06-1707-the-voice-steps-aside';
 // golem catch-up 2026-09-06: markerless publish of OTA-1707 - the voice steps
 // aside. The bundled neural voice yields to the system voice after two crashes
