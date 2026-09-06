@@ -28247,6 +28247,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // factionQuestReady, where the READY pill, the route swap, the auto-submit
 // sweep and the turn-in all read one answer, and the refusal says the number.
 export const OTA_BUILD_ID = '2026-09-06-1710-the-ledger-is-audited';
+// golem catch-up 2026-09-06: markerless publish of OTA-1710 - the ledger is
+// audited. Step 3c: faction contracts get a probe set of their own, and the
+// wealth gate a player could walk past by spending is closed. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-06-1709-the-failure-we-watched-is-written-down';
 // golem catch-up 2026-09-06: markerless publish of OTA-1709 - the failure we
 // watched is written down. An observed model-load failure is now recorded with
