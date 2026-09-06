@@ -1,0 +1,693 @@
+Bug Report — Cheddar Bob · (2026-09-06-1718-the-keyboard-ate-send) · Why is food and health crafting so rare now?
+=== TARTARIA BUG REPORT ===
+Submitted: 2026-09-06T20:41:19.970Z
+Character: Cheddar Bob
+Slot ID: slot_mtdifdmg_g2si12
+Race: Reclaimers
+Location: Voronov
+HP: 36/47
+
+--- DESCRIPTION ---
+Why is food and health crafting so rare now?
+
+--- DEVICE / BUILD ---
+Device
+  Name: Pixel 10 Pro XL
+  Platform: android 37
+  Hermes: yes
+  Locale: en-US
+  Timezone: America/New_York
+  Screen: window 443×986 / screen 443×986 @ 2.4375x density
+  Captured at: 2026-09-06T20:41:19.727Z
+
+Install
+  App ID: com.hotatticgames.tartarprim
+  App version: 4.32.11
+  APK build version: 2.4.1
+  APK build: 293
+  AAB: (build 293)
+  OTA: (2026-09-06-1718-the-keyboard-ate-send)
+  Boot stage: qwen:done
+
+ML runtime health
+  Status: active (no crashes detected)
+  Crash count: 0
+  Last init attempt: 2026-09-06T20:22:36.064Z
+  Last init success: 2026-09-06T20:22:38.729Z
+  Crashes-before-disable threshold: 2
+  Qwen completion guard: clean (no completion crashes)
+  Qwen kernel variant: rnllama_v8_2_fp16_dotprod
+  Qwen CPU/SoC: variant=rnllama_v8_2_fp16_dotprod sveRaw=true sveUsed=false i8mm=true v84raw=true v84used=false blocklisted=false qwenSafeKernel=true soc=Tensor G5 hw=mustang model=Pixel 10 Pro XL sdk=37 kernel=6.6.118-android15-8-g1831c2a45d9b-ab15739706-4k
+  Voice (TTS) guard: clean (no voice crashes on this build)
+Save-load health
+  Status: clean (no load-crash flags)
+Last JS crash
+  Status: none recorded
+This launch
+  Life: bmtq97vy2ji · started 2026-09-06T20:18:22.970Z
+  Followed an OTA apply 174ms ago (boot-front)
+  The previous life released its model contexts before reloading (o0/r0/l0/p0/dn0)
+Crash ledger — 10 recorded (newest last)
+  ⚠⚠ 8 of 10 process kills landed on an OTA-apply boot
+  • 2026-09-05T04:22:19.915Z (2419m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1681-the-outpost-lets-go · stage homework-done
+      Process died with no orderly exit while: tap "craft"
+      doing: tap "craft" · room voronov · screen exploration
+      last checkpoint: homework-done · 13450ms into the action · alive 0ms after it
+      launch: died 515390ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 154ms earlier via boot-front
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o1/r0/l1/p1/dn0
+  • 2026-09-05T08:31:21.524Z (2170m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1687-the-mission-layer-remembers-itself · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 870ms into the action · alive 0ms after it
+      launch: died 904ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 187ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-05T13:16:47.707Z (1885m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1690-the-cap-speaks · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 782ms into the action · alive 10351ms after it
+      launch: died 11166ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 208ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-05T16:18:32.776Z (1703m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1696-the-fight-sheds-its-passengers · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 1898ms into the action · alive 0ms after it
+      launch: died 1965ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 413ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-05T17:22:04.013Z (1639m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1698-the-counter-remembers-the-question · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 2285ms into the action · alive 0ms after it
+      launch: died 2341ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 222ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-05T18:28:33.919Z (1573m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1699-every-hunt-walks-the-four-roads · stage boot:qwen:deferred
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: boot:qwen:deferred · 772ms into the action · alive 0ms after it
+      launch: died 811ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 163ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-05T19:15:20.497Z (1526m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1699-every-hunt-walks-the-four-roads · stage mid-action
+      Process died with no orderly exit while: tap "missions"
+      doing: tap "missions" · room voronov · screen exploration
+      launch: died 842671ms into the process · not an OTA-apply boot
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-05T20:20:16.991Z (1461m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1700-the-world-runs-while-you-learn · stage rendered
+      Process died with no orderly exit while: tap "◈ LORE"
+      doing: tap "◈ LORE" · room voronov · screen exploration
+      last checkpoint: rendered · 5887ms into the action · alive 3237ms after it
+      launch: died 30204ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 204ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-05T23:07:59.629Z (1293m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-05-1700-the-world-runs-while-you-learn · stage mid-action
+      Process died with no orderly exit while: tap "craft"
+      doing: tap "craft" · room iskan_veil · screen exploration
+      launch: died 9564ms into the process · not an OTA-apply boot
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+  • 2026-09-06T17:45:48.683Z (176m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-09-06-1714-the-dog-is-called-they · stage native:cognition:done
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: native:cognition:done [q0] · 98853ms into the action · alive 0ms after it
+      launch: died 98905ms into the process · THIS BOOT FOLLOWED AN OTA APPLY 185ms earlier via boot-front
+      the native SDK could not say whether that life crashed (no native module, or not initialised in time)
+      previous life released its contexts before reloading (o0/r0/l0/p0/dn0)
+      its own model ledger at the last stamp: o0/r0/l0/p0/dn0
+Crash delivery: ON — reports go to Sentry when you crash.
+Runtime pressure
+  Memory warnings: none this session
+  ⚠ Freeze watch: 1 render stall (worst: frames quiet 7852ms while logic ran)
+  ⚠ Worst logic stall: 15651ms
+  ⚠ Native queue: worst wait 4.6s · 2 job kinds queued >3s · worst 14.2ms/prompt-token · 8 generations thrown away (86.3s)
+     The JS thread was healthy and the native model queue was not. A stall the freeze watch above is structurally blind to.
+  App state trail: background → active → background → active → background → active
+Model contexts
+  Live now: 1
+  Opened: 1 · Released: 0 · Peak live: 1
+  Narration engine: ready
+
+--- VOICE ---
+  TTS enabled: no
+  Engine: bundled
+  Rate: 1.05 · Pitch: 1.00
+  System voice id: (default)
+  Kokoro voice: am_michael
+  Kokoro state: idle
+
+--- INVENTORY ---
+Inventory (Cheddar Bob)
+  HP: 36/47  Stamina: 22/22  TC: 981  Corruption: 6
+  Pack: 215 distinct rows / 1477 total
+  Dog: Rust (Mutt) loyalty 80 HP 9/17
+
+Weapons (30)
+  Aether Axe ×3 (Legendary, 2d8 aetheric, dur 59/59, [weapon,melee,two_handed,axe,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Aetheric Crystal Blade (Uncommon, 1d8 slashing, dur 25/25, [weapon,blade,melee,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Aetheric Rod (1d6 electrical, dur 41/41, [weapon,melee,dual_wield,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Frost-Rimed Aetheric Shield-Hammer (Uncommon, 2d6 bludgeoning, +1d6 cold coat, dur 40/41, [weapon,melee,two_handed,hammer,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Acid-Etched Auralite Talon (Rare, +1d4 acid coat, dur 35/35, equipped:main, 2d6 aetheric, resist:aetheric, unique, [fused,unique,aetheric])
+    actions: equip:off, unequip:main, use(off)
+  Bone Crossbow (Uncommon, 2d6 piercing, dur 2/10, [weapon,ranged,crossbow,bolt-caster,loot])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Bone Shortsword (1d6 slashing, dur 33/33, [weapon,melee,single_handed,blade,giants])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bone Siege Crossbow (Uncommon, 2d6 piercing, dur 26/26, [weapon,ranged,two_handed,crossbow,giants])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Cantor's Tuning Fork (Legendary, dur 50/50, 2d6+2 aetheric, unique, [core_guardian_set,aether_born,exotic,sonic,armor_ignore_partial])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Searing Choir-Bound Launcher (Rare, +1d4 burn coat, dur 35/35, 2d6 aetheric, resist:aetheric, unique, [fused,unique,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Cold-Iron Rosary (Legendary, dur 45/45, 1d8+3 aetheric, unique, [core_guardian_set,aether_born,exotic,corruption_damage,aether_drain])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Crude Golem Sledge (2d6 bludgeoning, dur 51/51, [weapon,melee,golem_weapon,two_handed])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Giant-Watch Greatspear (Uncommon, 2d6 piercing, dur 25/26, ♥reserved, [weapon,melee,two_handed,faction_gear,servants_of_giants])
+    actions: equip:main, equip:off, use(off), scrap, repair, release-from-fusion, drop
+  Golem Sledge (Rare, 2d8 bludgeoning, dur 32/32, [weapon,melee,golem_weapon,two_handed])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Litany Maul (Legendary, dur 75/75, 1d12+2 bludgeoning, unique, [core_guardian_set,aether_born,blunt,two_handed,stagger_chance])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Magnetic Axe (Rare, 2d6 electrical, dur 41/41, [weapon,melee,single_handed,axe,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Armor Rod (Uncommon, 1d8 bludgeoning, dur 39/39, [runecaster,rune_power,mud_dwellers,ward])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Long Axe (1d8 slashing, dur 28/28, [weapon,melee,two_handed,axe,mud_dwellers])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Shell Wand (1d6 bludgeoning, dur 22/22, [runecaster,rune_power,mud_dwellers,ward])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Spear (Runecaster) (Uncommon, 2d6 piercing, dur 27/27, [runecaster,rune_power,mud_dwellers,loot])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Venom Blade (Rare, 2d6 poison, dur 25/25, [weapon,melee,dual_wield,blade,mud_dwellers])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Frost-Rimed Mud-Iron Greatblade (Rare, 2d8 slashing, +1d6 cold coat, dur 16/16, [weapon,melee,two_handed,blade,mud])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Pillar Brand (Uncommon, dur 25/25, 1d8 bludgeoning, unique, [fused,unique])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Pulse-Woven Edge (Legendary, dur 45/45, ♥reserved, 2d8 aetheric, resist:aetheric, unique, [fused,unique,faction_gear,servants_of_giants,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, release-from-fusion, drop
+  Corrupted Reclaimers Guild Shroud-Spun Slinger (Legendary, +1d4 corruption coat, dur 33/35, ♥reserved, 2d6 bludgeoning, unique, [fused,unique,faction_gear,reclaimers_guild])
+    actions: equip:main, equip:off, use(off), scrap, repair, release-from-fusion, drop
+  Sentinel Cleaver (Rare, 2d8 slashing, dur 22/34, equipped:off, [weapon,blade,melee,sentinel])
+    actions: equip:main, unequip:off, use, repair
+  Frost-Rimed Sentinel Cleaver (Rare, 2d8 slashing, +1d6 cold coat, dur 25/25, [weapon,blade,melee,sentinel])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Slick Mud Wand (1d6 bludgeoning, dur 42/42, [runecaster,rune_power,mud_dwellers,terrain])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Tooth-Set Warstaff (Uncommon, dur 25/25, 1d8 bludgeoning, resist:poison, unique, [fused,unique,poison])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Void Pulse Rod (Uncommon, 2d6 aetheric, dur 13/13, [weapon,runecaster,rune_power,aetheric,crafted])
+    actions: equip:main, equip:off, use(off), scrap, drop
+
+Armor (25)
+  Aether-Walker's Boots (Uncommon, dur 27/27, equipped:feet, AC +4 · Resists: aetheric, acid (coated), cold (coated) · Regen: +1 stamina per action · DEX +4 · STR +2, [armor,feet,boots,tartarian_giants])
+    actions: unequip:feet
+  Aether-Walker's Boots (Uncommon, dur 22/22, AC +4 · Resists: aetheric · Regen: +1 stamina per action · DEX +4 · STR +2, [armor,feet,boots,tartarian_giants])
+    actions: equip:feet, use, scrap, drop
+  Anvil-Struck Bulwark (Rare, dur 25/25, AC+2, resist:degradation, unique, [fused,unique,faction_gear,reclaimers_guild,degradation])
+    actions: equip:head, use, scrap, drop
+  Architect's Sight Enhancer (Uncommon, dur 35/35, equipped:head, AC +3 · Resists: cold, cold (coated) · Regen: +1 HP per action · WIS +3 · INT +1, [armor,head,cloth,helmet,architectural_sentinels])
+    actions: unequip:head
+  Auralite Greaves (Rare, dur 35/35, AC+3, resist:aetheric, unique, [fused,unique,aetheric])
+    actions: equip:legs, use, scrap, drop
+  Cantor's Robe (Legendary, dur 55/55, AC+4, resist:aetheric, unique, [core_guardian_set,aether_born,ac:4,chest,light])
+    actions: equip:chest, use, scrap, drop
+  Cobble-Set Aegis (Uncommon, dur 25/25, AC+2, unique, [fused,unique])
+    actions: equip:chest, use, scrap, drop
+  Cobble-Set Bulwark (Uncommon, dur 25/25, AC+2, unique, [fused,unique])
+    actions: equip:chest, use, scrap, drop
+  Forge-Black Bulwark (Rare, dur 35/35, AC+3, resist:degradation, unique, [fused,unique,degradation])
+    actions: equip:feet, use, scrap, drop
+  Forgotten Seeker's Mask (Rare, dur 45/45, AC +3 · Resists: slashing, aetheric · INT +3, [armor,head,mask,face,reclaimers])
+    actions: equip:head, use, scrap, drop
+  Litany Greaves (Legendary, dur 67/85, equipped:legs, AC+3, unique, [core_guardian_set,aether_born,ac:3,legs,heavy])
+    actions: unequip:legs, repair
+  Lumenforged Stompers (Rare, dur 35/35, AC+3, resist:aetheric, unique, [fused,unique,aetheric])
+    actions: equip:feet, use, scrap, drop
+  Mask of the Aether Seeker (Uncommon, dur 12/12, AC +5 · Resists: aetheric · CHA +5 · DEX +2, [armor,head,mask,face,aetherborn])
+    actions: equip:head, use, scrap, drop
+  Matriarch's Aegis (Legendary, dur 60/60, AC+2, resist:aetheric, unique, [core_guardian_set,aether_born,ac:2,head,will_save])
+    actions: equip:head, use, scrap, drop
+  Mud-Bound Cloak (dur 3/20, AC +1 · STE +1, [armor,cloak,cloak,outer,mud_dwellers])
+    actions: equip:cloak, use, scrap, repair, drop
+  Mud-glass Scales (Uncommon, dur 49/49, equipped:chest, AC +4 · Resists: piercing, burn (coated) · Regen: +2 stamina per action · Bites back: 1 damage to whatever hits you, in its own element, [armor,chest,scale,mud_glass,true_tartarians])
+    actions: unequip:chest
+  Mud-Warden's Vest (dur 3/20, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,chest,mud_dwellers])
+    actions: equip:chest, use, scrap, repair, drop
+  Mud-Warden's Vest (dur 3/20, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,chest,mud_dwellers])
+    actions: equip:chest, use, scrap, repair, drop
+  Mud-Warden's Vest (dur 4/20, AC +1 · Resists: slashing · WIS +1, [armor,chest,plate,chest,mud_dwellers])
+    actions: equip:chest, use, scrap, repair, drop
+  Mudstone Bulwark (Rare, dur 61/61, AC +4 · Resists: bludgeoning, piercing · HP +30 · Bites back: 2 damage to whatever hits you, in its own element, [armor,chest,heavy,stone,mud])
+    actions: equip:chest, use, scrap, drop
+  Reclaimer's Cloak (dur 13/13, AC +2 · Resists: cold, burn (coated), acid (coated) · DEX +2 · STE +2, [armor,cloak,outer,reclaimers,stealth])
+    actions: equip:cloak, use, scrap, drop
+  Reclaimer's Salvage Vest (dur 3/20, AC +1 · HP +1, [armor,chest,plate,chest,reclaimers])
+    actions: equip:chest, use, scrap, repair, drop
+  Relic Hunter's Gauntlets (Uncommon, dur 27/27, AC +4 · Resists: slashing, cold (coated), burn (coated) · DEX +4 · STR +2, [armor,hands,gauntlets,reclaimers])
+    actions: equip:hands, use, scrap, drop
+  Singing Hood (Uncommon, dur 25/25, AC+2, resist:aetheric, unique, [fused,unique,aetheric])
+    actions: equip:head, use, scrap, drop
+  Titan's Gauntlets (dur 14/16, AC +2 · STR +2, [armor,hands,gauntlets,tartarian_giants])
+    actions: equip:hands, use, scrap, repair, drop
+
+Shields (1)
+  Grounded Buckler (Uncommon, 1d6 bludgeoning, dur 323/323, [weapon,shield,dual_wield,unknowing_masses])
+    actions: equip:off, use(off), scrap, drop
+
+Dog Armor (1)
+  ◆ Aetheric Padded Vest (Rare, dur 25/28, AC +3 (dog) · Bites back: 1 aetheric to whatever hits the dog, [dog_armor,vest,aether,padded,loot])
+    actions: scrap, repair, save-for-fusion, drop
+
+Amulets & Rings (12)
+  Aether-Shard Ring (Uncommon, dur 30/30, INT +1 · Resists aetheric: −10% incoming damage of each, on top of armour, [ring,aether,crafted])
+    actions: equip:ring, use, scrap, drop
+  Aetheric Locket ×2 (dur 30/30, WIS +1 · Resists aetheric: −9% incoming damage of each, on top of armour, [detection,amulet,relic])
+    actions: equip:amulet, use, scrap, drop
+  Aetheric Locket (dur 30/30, WIS +1 · Resists aetheric: −9% incoming damage of each, on top of armour, [amulet,relic,detection])
+    actions: equip:amulet, use, scrap, drop
+  Amulet of the Silt Warden (Rare, dur 40/40, equipped:amulet, WIS +2 · Resists poison, corruption: −20% incoming damage of each, on top of armour, [amulet,mud,crafted])
+    actions: unequip:amulet
+  Golem Controller Ring (Uncommon, dur 35/35, INT +1, [ring,construct])
+    actions: equip:ring, use, scrap, drop
+  Minor Aetheric Amulet (dur 30/30, WIS +1 · Resists aetheric: −9% incoming damage of each, on top of armour, [amulet,aether])
+    actions: equip:amulet, use, scrap, drop
+  Rustbane Charm (dur 30/30, Resists degradation: −9% incoming damage of each, on top of armour, [amulet,charm,crafted])
+    actions: equip:amulet, use, scrap, drop
+  Rusted Band of Knowledge (dur 25/25, INT +1, [ring,scholarly])
+    actions: equip:ring, use, scrap, drop
+  Scribe's Signet ×2 (Uncommon, dur 35/35, INT +2 · WIS +1, [ring,signet,scholarly,crafted])
+    actions: equip:ring, use, scrap, drop
+  Tartarian Oath-Band ×2 (Uncommon, dur 35/35, equipped:ring, ♥reserved, STR +2, [ring,faction_gear,true_tartarians,oath])
+    actions: unequip:ring, release-from-fusion
+  Tin Ward Ring ×2 (Rare, dur 40/40, Resists acid: −15% incoming damage of each, on top of armour · Everything you wear or wield lasts 15% longer, [ring,crafted,defensive])
+    actions: equip:ring, use, scrap, drop
+  Tin Ward Ring (Rare, dur 40/40, Resists acid: −15% incoming damage of each, on top of armour · Everything you wear or wield lasts 15% longer, [ring,crafted,defensive])
+    actions: equip:ring, use, scrap, drop
+
+Consumables (19)
+  Bioluminescent Fungus (Uncommon, [food,foraged,mushroom,light,aether])
+    actions: use(eat), drop
+  B
+(pack listing trimmed at 12000 characters)
+
+--- CHARACTER LOG (newest first) ---
+(Newest entry at top — showing the most recent 371 of 3595 entries; older trimmed to fit a single email paste)
+
+[2026-09-06T20:40:51.314Z] [debug] persist sizes(KB): total=358 player=79 wm=196[rooms=109 events=7 memos=1 npcs=7 defeated=1 tags=1 discovered=1] log=77 scene=5
+[2026-09-06T20:40:33.101Z] [debug] homework: item_desc "Bone Siege Crossbow" ∅ 9214ms
+[2026-09-06T20:40:33.100Z] [debug] qwen⏱ ✂ DISCARDED item_synthesis_hw after 8392ms — item_synth:unparseable (847ch) raw="{"kind":"weapon","description":"A sturdy bone crossbow, adorned with a giant's mark.","extraTags":["ranged","two_handed"],"effect":{"kind":"ranged","attackDamag"
+[2026-09-06T20:40:33.096Z] [debug] qwen⏱ item_synthesis_hw ok 8392ms read 0ms/write 8309ms in 331t→out 240t thr1 HIT-CAP (847ch)
+[2026-09-06T20:40:22.946Z] [world] Stick x1 from the scrap won't fit — your pack is already full of them.
+[2026-09-06T20:40:22.946Z] [world] Stick x1 from the scrap won't fit — your pack is already full of them.
+[2026-09-06T20:40:22.111Z] [world] You break the Iron Buckler down. ✦ Recovered: Scrap Metal x2, Stick.
+[2026-09-06T20:40:22.037Z] [world] You break the Mud Buckler down. ✦ Recovered: Scrap Metal x2, Stick.
+[2026-09-06T20:40:21.961Z] [world] You break the Cudgel down. ✦ Recovered: Small Rock x2, Stick.
+[2026-09-06T20:40:21.885Z] [world] You break the Cudgel down. ✦ Recovered: Small Rock x2, Stick.
+[2026-09-06T20:40:21.810Z] [world] You break the Cudgel down. ✦ Recovered: Small Rock x2, Stick.
+[2026-09-06T20:40:21.723Z] [world] You break the Cudgel down. ✦ Recovered: Small Rock x2, Stick.
+[2026-09-06T20:40:06.345Z] [debug] homework: item_desc "Bone Siege Crossbow" ∅ 12799ms
+[2026-09-06T20:40:06.343Z] [debug] qwen⏱ ✂ DISCARDED item_synthesis_hw after 12778ms — item_synth:unparseable (941ch) raw="{"kind":"weapon","description":"A sturdy crossbow with a bone handle, capable of wielding heavy weapons.","extraTags":["ranged","two_handed"],"effect":{"kind":""
+[2026-09-06T20:40:06.337Z] [debug] qwen⏱ item_synthesis_hw ok 12778ms read 507ms/write 12170ms in 331t→out 239t js-late 1262ms thr1 1.5ms/t HIT-CAP (941ch)
+[2026-09-06T20:39:28.529Z] [debug] appstate: background → active (was background for 3112ms)
+[2026-09-06T20:39:25.417Z] [debug] appstate: active → background (was active for 4382ms)
+[2026-09-06T20:39:25.060Z] [debug] homework: item_desc "Drone Processor" ✓ 3994ms
+[2026-09-06T20:39:23.829Z] [debug] qwen⏱ item_synthesis_hw ok 1859ms read 1252ms/write 554ms in 331t→out 16t js-late 554ms thr1 3.8ms/t (70ch)
+[2026-09-06T20:39:21.042Z] [debug] appstate: background → active (was background for 270672ms)
+[2026-09-06T20:34:55.057Z] [debug] homework: item_desc "Mud-glass Scales" ✓ 7566ms
+[2026-09-06T20:34:50.363Z] [debug] appstate: active → background (was active for 47948ms)
+[2026-09-06T20:34:50.311Z] [debug] qwen⏱ item_synthesis_hw ok 2804ms read 426ms/write 1404ms in 335t→out 44t js-late 1156ms thr1 1.3ms/t (180ch)
+[2026-09-06T20:34:19.805Z] [debug] homework: item_desc "Reclaimer Sigil" ✓ 6966ms
+[2026-09-06T20:34:19.790Z] [debug] qwen⏱ item_synthesis_hw ok 6943ms read 4687ms/write 1462ms in 331t→out 44t js-late 1995ms thr1 14.2ms/t (157ch)
+[2026-09-06T20:34:09.796Z] [debug] persist sizes(KB): total=358 player=81 wm=196[rooms=109 events=7 memos=1 npcs=7 defeated=1 tags=1 discovered=1] log=76 scene=5
+[2026-09-06T20:34:08.935Z] [debug] ui: tap "inventory" ⏱+24ms
+[2026-09-06T20:34:02.415Z] [debug] appstate: background → active (was background for 40184ms)
+[2026-09-06T20:33:22.232Z] [debug] appstate: active → background (was active for 9287ms)
+[2026-09-06T20:33:19.122Z] [world] You repair the Frost-Rimed Sentinel Cleaver. Back to full. (spent: Scrap Metal x4, Stick x2)
+[2026-09-06T20:33:18.097Z] [world] You repair the Reclaimer's Cloak. Back to full. (spent: Patched Cloth x4)
+[2026-09-06T20:33:17.058Z] [world] You repair the Mud-glass Scales. Back to full. (spent: Patched Cloth x4)
+[2026-09-06T20:33:16.008Z] [world] You repair the Acid-Etched Corrupted Auralite Talon. Back to full. (spent: Small Rock x2)
+[2026-09-06T20:33:14.808Z] [world] You repair the Architect's Sight Enhancer. Back to full. (spent: Patched Cloth x4)
+[2026-09-06T20:33:13.683Z] [world] You repair the Aether-Walker's Boots. Back to full. (spent: Patched Cloth x4)
+[2026-09-06T20:33:12.949Z] [debug] appstate: background → active (was background for 136933ms)
+[2026-09-06T20:30:56.129Z] [debug] persist sizes(KB): total=358 player=81 wm=196[rooms=109 events=7 memos=1 npcs=7 defeated=1 tags=1 discovered=1] log=76 scene=5
+[2026-09-06T20:30:56.011Z] [debug] appstate: active → background (was active for 157760ms)
+[2026-09-06T20:30:52.394Z] [debug] arbiter: ambient-empty reason=action-opener raw="You stand at the entrance to the Submerged Transit Hub (The Silt Wastes). Your eyes scan the surroundings, a testament t"
+[2026-09-06T20:30:52.393Z] [debug] arbiter: ambient ∅ 10425ms
+[2026-09-06T20:30:52.393Z] [debug] qwen⏱ ✂ DISCARDED ambient after 10063ms — ambient:∅
+[2026-09-06T20:30:52.388Z] [debug] qwen⏱ ambient ok 10063ms wait 4010ms read 5014ms/write 1014ms in 366t→out 31t thr1 13.7ms/t HIT-CAP (151ch)
+[2026-09-06T20:30:46.335Z] [debug] qwen⏱ stats — investigate_lore n5 avg3.3s max4.5s read0.7s/write0.8s ⚠2unusable in126t→out27t ms/tok 2.1-12.8 wait1.2s | narration:scene_intro_fill n3 avg8.5s max10.9s read8.8s/write1.1s ⚠1unusable in821t→out22t ms/tok 9.6-11.9 cap2 ⏸1 ✂3/25.5s | ambient n2 avg14.8s max26.9s read4.5s/write2.0s ⚠1unusable in365t→out16t ms/tok 12.5-12.5 cap1 wait2.3s ⏸1 ✂2/29.6s || WASTED 5 calls / 55.1s
+[2026-09-06T20:30:46.334Z] [debug] qwen⏱ investigate_lore ok 2496ms wait 1085ms read 265ms/write 824ms in 126t→out 27t js-late 642ms thr2 2.1ms/t (142ch)
+[2026-09-06T20:30:45.510Z] [debug] ui: tap "craft" ⏱+16ms
+[2026-09-06T20:30:44.738Z] [debug] qwen⏱ investigate_lore ok 2413ms read 1601ms/write 733ms in 125t→out 23t js-late 500ms thr2 12.8ms/t (106ch)
+[2026-09-06T20:30:43.543Z] [cognitive] SEARCH  (302ms)
+[2026-09-06T20:30:43.238Z] [world] The charcoal sketches resists your reading. Not hostile — just closed. Some things in the buried world don't open for the curious.
+[2026-09-06T20:30:43.237Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=charcoal sketches resolved=charcoal sketches range=- enemies=0 hooks=1
+[2026-09-06T20:30:43.236Z] [player] investigate charcoal sketches
+[2026-09-06T20:30:42.808Z] [debug] ui: tap "more ▸" ⏱+14ms
+[2026-09-06T20:30:42.155Z] [cognitive] JUMP · SEARCH · CLIMB · DISENGAGE  (187ms)
+[2026-09-06T20:30:41.967Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-06T20:30:41.967Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-09-06T20:30:41.966Z] [world] You study the ledge and find no answer. The silence here is patient; whatever it knew, it has decided to keep.
+[2026-09-06T20:30:41.963Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ledge resolved=ledge range=- enemies=0 hooks=1
+[2026-09-06T20:30:41.962Z] [player] investigate ledge
+[2026-09-06T20:30:40.193Z] [debug] ui: tap "investigate" ⏱+30ms
+[2026-09-06T20:30:37.840Z] [debug] homework: scene_intro "Voronov" ✓ 9426ms
+[2026-09-06T20:30:37.839Z] [debug] qwen⏱ ✂ DISCARDED narration:scene_intro_fill after 9021ms — intro-fill:action-opener
+[2026-09-06T20:30:37.623Z] [debug] qwen⏱ narration:scene_intro_fill ok 9021ms read 7858ms/write 1128ms in 822t→out 33t js-late 334ms thr1 9.6ms/t HIT-CAP (174ch)
+[2026-09-06T20:30:35.458Z] [world] You use 1× First Aid Kit. +25 HP (36/47), +1 stamina.
+[2026-09-06T20:30:29.851Z] [debug] ui: tap "✚ heals (3)" ⏱+21ms
+[2026-09-06T20:30:28.416Z] [debug] homework: intro-fill armed after 6000ms idle (strike 3/3)
+[2026-09-06T20:30:27.344Z] [combat] Mud Monarchs Raider 5 deals 2 bludgeoning damage. You have 11 HP remaining.
+[2026-09-06T20:30:27.123Z] [system] ⏳ Time passed: 6 min
+[2026-09-06T20:30:27.122Z] [combat] Frost-Rimed Sentinel Cleaver — 3 cold bites in and festers (3 turns).
+[2026-09-06T20:30:27.109Z] [reward] You strip the unconscious Mud Monarchs Raider 5 — Cudgel, Mud-Warden's Vest, Patched Cloth, +24 TC. The gear's seen better days (worn from the fight).
+[2026-09-06T20:30:27.108Z] [combat] Nobody left standing — the fight is yours.
+[2026-09-06T20:30:27.107Z] [combat] You crack the Mud Monarchs Raider 5 with the Frost-Rimed Sentinel Cleaver for 12 — the better part of their fight, gone in one blow. They crumple, out cold. (3/17 HP) Loot them before they come to.
+[2026-09-06T20:30:27.106Z] [combat] Slashing flares — +1 on hit.
+[2026-09-06T20:30:27.103Z] [combat] You — d20 → 14 + STR 21 = 35 vs Mud Monarchs Raider 5 AC 11 — ✓ HIT
+[2026-09-06T20:30:27.103Z] [combat] Your armour turns the blow back — Mud Monarchs Raider 5 takes 1 bludgeoning. (15 HP left)
+[2026-09-06T20:30:27.102Z] [debug] wear ward: Reclaimer's Cloak keeps its point (15%)
+[2026-09-06T20:30:27.101Z] [combat] Mud Monarchs Raider 5 — d20 → 17 + ATK 7 = 24 vs your AC 24 (needs nat 16+ — AC capped) — ✓ HIT
+[2026-09-06T20:30:27.096Z] [world] Mud Monarchs Raider 5 moves first. The pressure is immediate.
+[2026-09-06T20:30:27.033Z] [debug] dice⏱ coating: shown +362ms, tapped +471ms, settled +1166ms (hold late 366ms) = 1999ms
+[2026-09-06T20:30:25.866Z] [debug] ui: tap "roll" ⏱+18ms
+[2026-09-06T20:30:25.031Z] [debug] dice⏱ damage: shown +343ms, tapped +470ms, settled +1167ms (hold late 367ms) = 1980ms
+[2026-09-06T20:30:23.864Z] [debug] ui: tap "roll" ⏱+25ms
+[2026-09-06T20:30:23.049Z] [debug] dice⏱ attack: shown +357ms, tapped +537ms, settled +1167ms (hold late 367ms) = 2061ms
+[2026-09-06T20:30:21.882Z] [debug] ui: tap "roll" ⏱+16ms
+[2026-09-06T20:30:20.982Z] [debug] dice⏱ initiative: shown +629ms, tapped +1003ms, settled +1268ms (hold late 468ms) = 2900ms
+[2026-09-06T20:30:19.713Z] [debug] ui: tap "roll" ⏱+23ms
+[2026-09-06T20:30:18.710Z] [debug] render⏱ 319ms after engine-done · feed 500
+[2026-09-06T20:30:18.231Z] [system] ⏳ Time passed: 6 min
+[2026-09-06T20:30:18.156Z] [world] You bring the frost-rimed sentinel cleaver to bear on Mud Monarchs Raider 5.
+[2026-09-06T20:30:17.856Z] [debug] attack: target=Mud Monarchs Raider 5 range=close reach.bands=[close] reach.label=Sentinel Cleaver bareHand=false
+[2026-09-06T20:30:17.635Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand sentinel cleaver resolved=Sentinel Cleaver range=close enemies=1 hooks=1
+[2026-09-06T20:30:17.560Z] [player] attack with the off-hand sentinel cleaver
+[2026-09-06T20:30:17.280Z] [debug] ui: tap "❄ sentinel cleaver ⚔" ⏱+16ms
+[2026-09-06T20:30:15.184Z] [combat] Mud Monarchs Raider 5 — d20 → 15 + ATK 7 = 22 vs your AC 24 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-06T20:30:15.109Z] [reward] +18 TC pried from the dust.
+[2026-09-06T20:30:15.109Z] [system] Forgotten Order standing +1 (now 61)
+[2026-09-06T20:30:15.109Z] [combat] 1 attacker remains. Mud Monarchs Raider 5 now in your sights.
+[2026-09-06T20:30:15.109Z] [reward] You strip the body: Cudgel, Mud-Warden's Vest (+6 TC). The kit took the fight badly.
+[2026-09-06T20:30:15.108Z] [reward] Mud Monarchs Raider 4 defeated. You recover Patched Cloth ×3.
+[2026-09-06T20:30:15.107Z] [combat] Mud Monarchs Raider 4 folds under the frost-rimed sentinel cleaver. 12 damage was enough. The room exhales.
+[2026-09-06T20:30:15.101Z] [combat] You — d20 → 6 + STR 21 = 27 vs Mud Monarchs Raider 4 AC 10 — ✓ HIT
+[2026-09-06T20:30:15.101Z] [world] You seize the initiative. Mud Monarchs Raider 4 has no time to react.
+[2026-09-06T20:30:15.038Z] [debug] dice⏱ coating: shown +323ms, tapped +792ms, settled +1151ms (hold late 351ms) = 2266ms
+[2026-09-06T20:30:13.886Z] [debug] ui: tap "roll" ⏱+18ms
+[2026-09-06T20:30:12.770Z] [debug] dice⏱ damage: shown +361ms, tapped +2231ms, settled +1152ms (hold late 352ms) = 3744ms
+[2026-09-06T20:30:11.619Z] [debug] ui: tap "roll" ⏱+23ms
+[2026-09-06T20:30:09.020Z] [debug] dice⏱ attack: shown +352ms, tapped +581ms, settled +1168ms (hold late 368ms) = 2101ms
+[2026-09-06T20:30:07.852Z] [debug] ui: tap "roll" ⏱+16ms
+[2026-09-06T20:30:06.918Z] [debug] dice⏱ initiative: shown +627ms, tapped +1315ms, settled +1168ms (hold late 368ms) = 3110ms
+[2026-09-06T20:30:05.750Z] [debug] ui: tap "roll" ⏱+12ms
+[2026-09-06T20:30:04.848Z] [debug] persist sizes(KB): total=357 player=80 wm=194[rooms=107 events=7 memos=1 npcs=7 defeated=1 tags=1 discovered=1] log=77 scene=6
+[2026-09-06T20:30:04.435Z] [debug] render⏱ 319ms after engine-done · feed 500
+[2026-09-06T20:30:03.957Z] [system] ⏳ Time passed: 6 min
+[2026-09-06T20:30:03.882Z] [world] You bring the frost-rimed sentinel cleaver to bear on Mud Monarchs Raider 4.
+[2026-09-06T20:30:03.581Z] [debug] attack: target=Mud Monarchs Raider 4 range=close reach.bands=[close] reach.label=Sentinel Cleaver bareHand=false
+[2026-09-06T20:30:03.432Z] [combat] Mud Monarchs Raider 4 blackens — corruption eats 1. (5/18 HP, 2 turns left)
+[2026-09-06T20:30:03.358Z] [combat] Mud Monarchs Raider 4 smokes — acid eats 3. (6/18 HP, 2 turns left)
+[2026-09-06T20:30:03.208Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand sentinel cleaver resolved=Sentinel Cleaver range=close enemies=2 hooks=1
+[2026-09-06T20:30:03.132Z] [player] attack with the off-hand sentinel cleaver
+[2026-09-06T20:30:02.858Z] [debug] ui: tap "❄ sentinel cleaver ⚔" ⏱+17ms
+[2026-09-06T20:30:01.004Z] [combat] Acid-Etched Corrupted Auralite Talon — 1 corruption bites in and festers (3 turns). The rot deepens (1 stack).
+[2026-09-06T20:30:01.004Z] [combat] Acid-Etched Corrupted Auralite Talon — 3 acid bites in and festers (3 turns). Its guard pits and hisses — easier to hit now (−1 AC, 1 total).
+[2026-09-06T20:30:01.004Z] [combat] Your strike with the acid-etched corrupted auralite talon lands for 8. Mud Monarchs Raider 4 staggers — 9 HP remaining. It answers.
+[2026-09-06T20:30:01.001Z] [arbiter] The Arbiter watches the aetheric skid off. "Swap to the Giant-Watch Greatspear — piercing will bite where aetheric won't."
+[2026-09-06T20:30:00.998Z] [combat] Mud Monarchs Raider 4 shrugs off the aetheric. (resisted, ×0.5 for 8)
+[2026-09-06T20:30:00.997Z] [combat] You — d20 → 11 + INT 16 = 27 vs Mud Monarchs Raider 4 AC 11 — ✓ HIT
+[2026-09-06T20:30:00.997Z] [combat] Mud Monarchs Raider 5 — d20 → 9 + ATK 7 = 16 vs your AC 24 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-06T20:30:00.994Z] [combat] Mud Monarchs Raider 4 — d20 → 2 + ATK 7 = 9 vs your AC 24 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-06T20:30:00.990Z] [world] Mud Monarchs Raider 4 moves first. The pressure is immediate.
+[2026-09-06T20:30:00.941Z] [debug] dice⏱ coating2: shown +356ms, tapped +471ms, settled +1165ms (hold late 365ms) = 1992ms
+[2026-09-06T20:29:59.776Z] [debug] ui: tap "roll" ⏱+22ms
+[2026-09-06T20:29:58.942Z] [debug] dice⏱ coating: shown +363ms, tapped +566ms, settled +1150ms (hold late 350ms) = 2079ms
+[2026-09-06T20:29:57.791Z] [debug] ui: tap "roll" ⏱+18ms
+[2026-09-06T20:29:56.859Z] [debug] dice⏱ damage: shown +350ms, tapped +7986ms, settled +1153ms (hold late 353ms) = 9489ms
+[2026-09-06T20:29:55.706Z] [debug] ui: tap "roll" ⏱+23ms
+[2026-09-06T20:29:47.367Z] [debug] dice⏱ attack: shown +350ms, tapped +2951ms, settled +1170ms (hold late 370ms) = 4471ms
+[2026-09-06T20:29:46.196Z] [debug] ui: tap "roll" ⏱+17ms
+[2026-09-06T20:29:42.893Z] [debug] dice⏱ initiative: shown +1093ms, tapped +1132ms, settled +1151ms (hold late 351ms) = 3376ms
+[2026-09-06T20:29:41.742Z] [debug] ui: tap "roll" ⏱+48ms
+[2026-09-06T20:29:40.937Z] [debug] freeze watch: recovered — painting again after 7852ms quiet.
+[2026-09-06T20:29:40.611Z] [debug] render⏱ 328ms after engine-done · feed 500
+[2026-09-06T20:29:39.670Z] [system] ⏳ Time passed: 6 min
+[2026-09-06T20:29:39.594Z] [world] You raise the acid-etched corrupted auralite talon toward Mud Monarchs Raider 4. The room narrows around the both of you.
+[2026-09-06T20:29:39.288Z] [debug] attack: target=Mud Monarchs Raider 4 range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false
+[2026-09-06T20:29:39.059Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=2 hooks=1
+[2026-09-06T20:29:38.982Z] [player] attack with the auralite talon
+[2026-09-06T20:29:38.813Z] [debug] ui: tap "⚗☣ auralite talon ✦" ⏱+740ms late 730ms
+[2026-09-06T20:29:37.522Z] [combat] Mud Monarchs Raider 4 deals 4 bludgeoning damage. You have 13 HP remaining.
+[2026-09-06T20:29:36.962Z] [debug] render⏱ 512ms after engine-done · feed 500
+[2026-09-06T20:29:36.376Z] [combat] Mud Monarchs Raider 5 — d20 → 3 + ATK 7 = 10 vs your AC 24 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-06T20:29:36.300Z] [combat] Your armour turns the blow back — Mud Monarchs Raider 4 takes 1 bludgeoning. (17 HP left)
+[2026-09-06T20:29:36.076Z] [combat] Mud Monarchs Raider 4 — d20 → 19 + ATK 7 = 26 vs your AC 24 (needs nat 16+ — AC capped) — ✓ HIT
+[2026-09-06T20:29:35.926Z] [world] The field shifts around you — Mud Monarchs Raider 5 now close / arm's reach.
+[2026-09-06T20:29:35.852Z] [world] You close the gap with the Mud Monarchs Raider 4 and Mud Monarchs Raider 5. (range: close / arm's reach)
+[2026-09-06T20:29:35.778Z] [debug] move: field advance target=Mud Monarchs Raider 4 d 1.46->0.46 band mid->close
+[2026-09-06T20:29:35.629Z] [debug] move: advance from range=mid enemies=2 weather=Aetheric Storm cost=1 partial=0
+[2026-09-06T20:29:35.480Z] [debug] parser: intent=advance conf=1.00 verb=approach target=mud monarchs raider 4 resolved=Mud Monarchs Raider 4 range=mid enemies=2 hooks=1
+[2026-09-06T20:29:35.404Z] [player] approach Mud Monarchs Raider 4
+[2026-09-06T20:29:35.222Z] [debug] ui: tap "approach" ⏱+15ms
+[2026-09-06T20:29:34.034Z] [debug] ⚠ FREEZE WATCH: LOGIC stalled while frames kept coming (js 2070ms · frames 718ms). Something blocked the JS thread — look for a long synchronous run. · crumb before: engine-done +9490ms → now: engine-done +2370ms · doing: action "bite" · native: idle · heap 24MB · gc +0ms/396 · feed 500
+[2026-09-06T20:29:32.753Z] [combat] Mud Monarchs Raider 5 deals 5 bludgeoning damage [edge of reach — halved]. You have 17 HP remaining.
+[2026-09-06T20:29:32.201Z] [debug] render⏱ 537ms after engine-done · feed 500
+[2026-09-06T20:29:31.590Z] [combat] Your armour turns the blow back — Mud Monarchs Raider 5 takes 1 bludgeoning. (16 HP left)
+[2026-09-06T20:29:31.366Z] [combat] Mud Monarchs Raider 5 — d20 → 16 + ATK 7 = 23 vs your AC 24 (needs nat 16+ — AC capped) — ✓ HIT
+[2026-09-06T20:29:31.290Z] [combat] Mud Monarchs Raider 4 — d20 → 9 + ATK 7 = 16 vs your AC 24 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-06T20:29:31.019Z] [reward] +22 TC pried from the dust.
+[2026-09-06T20:29:30.871Z] [system] Forgotten Order standing +1 (now 60)
+[2026-09-06T20:29:30.724Z] [combat] 2 attackers remain. Mud Monarchs Raider 4 now in your sights.
+[2026-09-06T20:29:30.650Z] [reward] You strip the body: Cudgel, Mud-Bound Cloak (+6 TC). The kit took the fight badly.
+[2026-09-06T20:29:30.427Z] [reward] Mud Monarchs Raider 3 defeated. You recover Patched Cloth ×2.
+[2026-09-06T20:29:30.208Z] [world] Mud Monarchs Raider 3 falls under Rust's jaws.
+[2026-09-06T20:29:30.060Z] [reward] Rust sinks teeth into Mud Monarchs Raider 3 for 16 piercing. (0 HP left)
+[2026-09-06T20:29:29.986Z] [reward] Rust lunges at Mud Monarchs Raider 3 — d20 20 + STR 12 = 32 vs AC 10 — ✓ NAT 20
+[2026-09-06T20:29:29.911Z] [player] bite
+[2026-09-06T20:29:28.700Z] [debug] ui: tap "rust (9/17)" ⏱+14ms
+[2026-09-06T20:29:25.619Z] [combat] Mud Monarchs Raider 3 deals 3 bludgeoning damage [plate −1] [edge of reach — halved]. You have 22 HP remaining.
+[2026-09-06T20:29:25.073Z] [debug] render⏱ 529ms after engine-done · feed 500
+[2026-09-06T20:29:24.470Z] [combat] Mud Monarchs Raider 4 and 1 other close the distance.
+[2026-09-06T20:29:24.248Z] [combat] Your armour turns the blow back — Mud Monarchs Raider 3 takes 1 bludgeoning. (14 HP left)
+[2026-09-06T20:29:24.026Z] [debug] wear ward: Litany Greaves keeps its point (15%)
+[2026-09-06T20:29:23.952Z] [combat] Mud Monarchs Raider 3 — d20 → 19 + ATK 6 = 25 vs your AC 24 (needs nat 16+ — AC capped) — ✓ HIT
+[2026-09-06T20:29:23.680Z] [reward] +8 TC pried from the dust.
+[2026-09-06T20:29:23.532Z] [system] Forgotten Order standing +1 (now 59)
+[2026-09-06T20:29:23.384Z] [combat] 3 attackers remain. Mud Monarchs Raider 3 now in your sights.
+[2026-09-06T20:29:23.312Z] [reward] You strip the body: Bone Crossbow, Reclaimer's Salvage Vest (+8 TC). The kit took the fight badly.
+[2026-09-06T20:29:23.091Z] [reward] Mud Monarchs Raider 2 defeated. You recover Patched Cloth ×2, Bone Bolt.
+[2026-09-06T20:29:22.871Z] [world] Mud Monarchs Raider 2 falls under Rust's jaws.
+[2026-09-06T20:29:22.725Z] [reward] Rust sinks teeth into Mud Monarchs Raider 2 for 14 piercing. (0 HP left)
+[2026-09-06T20:29:22.651Z] [reward] Rust lunges at Mud Monarchs Raider 2 — d20 11 + STR 12 = 23 vs AC 11 — ✓ HIT
+[2026-09-06T20:29:22.578Z] [player] bite
+[2026-09-06T20:29:19.297Z] [debug] ui: tap "rust (9/17)" ⏱+89ms
+[2026-09-06T20:29:07.333Z] [arbiter] The Arbiter watches the blow land or fail. "Both are answers."
+[2026-09-06T20:29:07.262Z] [reward] +18 TC pried from the dust.
+[2026-09-06T20:29:07.261Z] [system] Forgotten Order standing +1 (now 58)
+[2026-09-06T20:29:07.261Z] [combat] 4 attackers remain. Mud Monarchs Raider 2 now in your sights.
+[2026-09-06T20:29:07.261Z] [reward] You strip the body: Cudgel, Mud-Warden's Vest (+6 TC). The kit took the fight badly.
+[2026-09-06T20:29:07.260Z] [reward] Mud Monarchs Raider 1 defeated. You recover Patched Cloth ×2, Mud Monarch Sigil.
+[2026-09-06T20:29:07.257Z] [combat] The killing blow with the frost-rimed sentinel cleaver: 28. Mud Monarchs Raider 1 drops where it stood.
+[2026-09-06T20:29:07.256Z] [combat] Weakness exposed — Mud Monarchs Raider 1 flinches. (slashing ×2.25 for 28)
+[2026-09-06T20:29:07.256Z] [combat] Slashing flares — +4 on hit (weak — bites deep!).
+[2026-09-06T20:29:07.252Z] [combat] You — d20 → 2 + STR 21 = 23 vs Mud Monarchs Raider 1 AC 11 — ✓ HIT
+[2026-09-06T20:29:07.252Z] [combat] Mud Monarchs Raider 5 and 2 others close the distance.
+[2026-09-06T20:29:07.252Z] [combat] Rust takes 3. (9/17 HP left)
+[2026-09-06T20:29:07.250Z] [combat] Mud Monarchs Raider 2 turns on Rust — d20 8 + ATK 7 = 15 vs Rust's AC 9 — ✓ HIT
+[2026-09-06T20:29:07.250Z] [combat] Rust takes 5. (12/17 HP left)
+[2026-09-06T20:29:07.249Z] [combat] Mud Monarchs Raider 1 turns on Rust — d20 8 + ATK 7 = 15 vs Rust's AC 9 — ✓ HIT
+[2026-09-06T20:29:07.249Z] [world] Mud Monarchs Raider 1 moves first. The pressure is immediate.
+[2026-09-06T20:29:07.190Z] [debug] dice⏱ coating: shown +364ms, tapped +8247ms, settled +1197ms (hold late 397ms) = 9808ms
+[2026-09-06T20:29:05.992Z] [debug] ui: tap "roll" ⏱+19ms
+[2026-09-06T20:28:57.379Z] [debug] dice⏱ damage: shown +334ms, tapped +500ms, settled +1185ms (hold late 385ms) = 2019ms
+[2026-09-06T20:28:56.194Z] [debug] ui: tap "roll" ⏱+17ms
+[2026-09-06T20:28:55.359Z] [debug] dice⏱ attack: shown +357ms, tapped +595ms, settled +1173ms (hold late 373ms) = 2125ms
+[2026-09-06T20:28:54.186Z] [debug] ui: tap "roll" ⏱+23ms
+[2026-09-06T20:28:53.233Z] [debug] dice⏱ initiative: shown +632ms, tapped +1510ms, settled +1197ms (hold late 397ms) = 3339ms
+[2026-09-06T20:28:52.035Z] [debug] ui: tap "roll" ⏱+13ms
+[2026-09-06T20:28:50.953Z] [debug] persist sizes(KB): total=360 player=79 wm=195[rooms=107 events=7 memos=1 npcs=7 defeated=1 tags=1 discovered=1] log=78 scene=8
+[2026-09-06T20:28:50.525Z] [debug] render⏱ 323ms after engine-done · feed 500
+[2026-09-06T20:28:50.041Z] [system] ⏳ Time passed: 6 min
+[2026-09-06T20:28:49.967Z] [world] You commit forward with the frost-rimed sentinel cleaver. Mud Monarchs Raider 1 watches your hands.
+[2026-09-06T20:28:49.669Z] [debug] attack: target=Mud Monarchs Raider 1 range=close reach.bands=[close] reach.label=Sentinel Cleaver bareHand=false
+[2026-09-06T20:28:49.447Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand sentinel cleaver resolved=Sentinel Cleaver range=close enemies=5 hooks=1
+[2026-09-06T20:28:49.372Z] [player] attack with the off-hand sentinel cleaver
+[2026-09-06T20:28:49.126Z] [debug] ui: tap "❄ sentinel cleaver ⚔" ⏱+374ms late 364ms
+[2026-09-06T20:28:46.277Z] [cognitive] CLIMB  (935ms)
+[2026-09-06T20:28:45.489Z] [arbiter] "The Mud Monarchs do not forgive a friend of the Forgotten Order," the Arbiter murmurs. "Stand, or run — but decide now."
+[2026-09-06T20:28:45.416Z] [world] A Mud Monarchs war party crests the rise — 5 of them, blades already out. They've marked you for standing with the Forgotten Order.
+[2026-09-06T20:28:45.265Z] [system] ⏳ Time passed: 24 min
+[2026-09-06T20:28:45.265Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-06T20:28:45.265Z] [arbiter] The Arbiter looks around. "Houses here are whole, in their fashion, only inverted into the mud."
+[2026-09-06T20:28:45.265Z] [debug] arbiter: template (reason=intent-not-allowed:investigate)
+[2026-09-06T20:28:45.255Z] [reward] You scrape at the silt with the sentinel cleaver. ✦ Recovered Aetheric Cloth (Rare).
+[2026-09-06T20:28:45.251Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ground resolved=- range=- enemies=0 hooks=1
+[2026-09-06T20:28:45.251Z] [player] investigate the ground
+[2026-09-06T20:28:43.625Z] [debug] ui: tap "investigate" ⏱+13ms
+[2026-09-06T20:28:41.851Z] [reward]     • Aether Crystal (Common)
+[2026-09-06T20:28:41.850Z] [reward]     • Scrap Metal (Common)
+[2026-09-06T20:28:41.850Z] [reward] ✦ Salvage haul:
+[2026-09-06T20:28:41.849Z] [world] You salvage the spent flare. The take is small but real.
+[2026-09-06T20:28:41.848Z] [world] You work the scope stand over. A part of it comes loose, intact.
+[2026-09-06T20:28:40.984Z] [reward] ✦ Slick Mud Wand (Common).
+[2026-09-06T20:28:40.983Z] [world] You pick up the Slick Mud Wand.
+[2026-09-06T20:28:40.961Z] [reward] ✦ Mud Buckler (Common).
+[2026-09-06T20:28:40.960Z] [world] You take the Mud Buckler from where it lay.
+[2026-09-06T20:28:39.691Z] [debug] ui: tap "take / salvage" ⏱+23ms
+[2026-09-06T20:28:37.869Z] [arbiter] The Arbiter eyes your new pieces. "You could make a Mud Scanner now, if you wanted."
+[2026-09-06T20:28:37.813Z] [reward] +4 TC pried from the dust.
+[2026-09-06T20:28:37.813Z] [reward] Mud Spider defeated. You recover Mud Poison.
+[2026-09-06T20:28:37.740Z] [combat] Mud Spider blackens — corruption eats 1. (0/18 HP, 2 turns left)
+[2026-09-06T20:28:37.667Z] [combat] Mud Spider smokes — acid eats 4. (1/18 HP, 2 turns left)
+[2026-09-06T20:28:37.595Z] [debug] parser: intent=attack conf=1.00 verb=punch target=- resolved=- range=close enemies=1 hooks=1
+[2026-09-06T20:28:37.522Z] [player] punch
+[2026-09-06T20:28:37.273Z] [debug] ui: tap "punch" ⏱+20ms
+[2026-09-06T20:28:35.109Z] [combat] Mud Spider — d20 → 8 + ATK 7 = 15 vs your AC 24 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-06T20:28:35.106Z] [combat] Acid-Etched Corrupted Auralite Talon — 1 corruption bites in and festers (3 turns). The rot deepens (1 stack).
+[2026-09-06T20:28:35.105Z] [combat] Acid-Etched Corrupted Auralite Talon — 4 acid bites in and festers (3 turns). Its guard pits and hisses — easier to hit now (−1 AC, 1 total).
+[2026-09-06T20:28:35.105Z] [combat] Clean hit with the acid-etched corrupted auralite talon for 13. Mud Spider has 5 left and does not back away.
+[2026-09-06T20:28:35.103Z] [combat] You — d20 → 2 + INT 16 = 18 vs Mud Spider AC 9 — ✓ HIT
+[2026-09-06T20:28:35.102Z] [world] You seize the initiative. Mud Spider has no time to react.
+[2026-09-06T20:28:35.054Z] [debug] dice⏱ coating2: shown +353ms, tapped +2736ms, settled +1148ms (hold late 348ms) = 4237ms
+[2026-09-06T20:28:33.906Z] [debug] ui: tap "roll" ⏱+23ms
+[2026-09-06T20:28:30.815Z] [debug] dice⏱ coating: shown +356ms, tapped +423ms, settled +1152ms (hold late 352ms) = 1931ms
+[2026-09-06T20:28:29.663Z] [debug] ui: tap "roll" ⏱+13ms
+[2026-09-06T20:28:28.879Z] [debug] dice⏱ damage: shown +353ms, tapped +460ms, settled +1149ms (hold late 349ms) = 1962ms
+[2026-09-06T20:28:27.729Z] [debug] ui: tap "roll" ⏱+24ms
+[2026-09-06T20:28:26.911Z] [debug] dice⏱ attack: shown +342ms, tapped +554ms, settled +1149ms (hold late 349ms) = 2045ms
+[2026-09-06T20:28:25.762Z] [debug] ui: tap "roll" ⏱+23ms
+[2026-09-06T20:28:24.865Z] [debug] dice⏱ initiative: shown +607ms, tapped +1571ms, settled +1155ms (hold late 355ms) = 3333ms
+[2026-09-06T20:28:23.711Z] [debug] ui: tap "roll" ⏱+24ms
+[2026-09-06T20:28:22.449Z] [world] Rust shakes off the worst of it and falls back in beside you.
+[2026-09-06T20:28:22.139Z] [debug] render⏱ 318ms after engine-done · feed 500
+[2026-09-06T20:28:21.677Z] [system] ⏳ Time passed: 6 min
+[2026-09-06T20:28:21.604Z] [world] Your acid-etched corrupted auralite talon comes around in an arc; Mud Spider squares up to meet it.
+[2026-09-06T20:28:21.312Z] [debug] attack: target=Mud Spider range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false
+[2026-09-06T20:28:21.097Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=1 hooks=1
+[2026-09-06T20:28:21.025Z] [player] attack with the auralite talon
+[2026-09-06T20:28:20.792Z] [debug] ui: tap "⚗☣ auralite talon ✦" ⏱+1045ms late 1035ms
+[2026-09-06T20:28:19.697Z] [debug] freeze watch: recovered — painting again after 7852ms quiet.
+[2026-09-06T20:28:18.251Z] [debug] appstate: background → active (was background for 98027ms)
+[2026-09-06T20:26:54.839Z] [debug] persist sizes(KB): total=356 player=78 wm=194[rooms=107 events=7 memos=1 npcs=7 defeated=1 tags=1 discovered=1] log=78 scene=5
+[2026-09-06T20:26:40.225Z] [debug] appstate: active → background (was active for 241495ms)
+[2026-09-06T20:26:34.437Z] [debug] arbiter: ambient-empty reason=action-opener raw="You step out of the house, its walls now a crumb of weathered brick, and your heart feels a little lighter, but also a l"
+[2026-09-06T20:26:33.758Z] [debug] arbiter: ambient stale:combat-started 53642ms
+[2026-09-06T20:26:33.082Z] [debug] qwen⏱ ✂ DISCARDED ambient after 26935ms — ambient:stale:combat-started
+[2026-09-06T20:26:07.982Z] [debug] ⚠ FREEZE WATCH: both clocks stopped (js 15651ms · frames 7852ms). Whole app wedged, or it was backgrounded — check the appstate trail beside this line. · crumb before: rendered +21543ms → now: native:homework:done +564ms · doing: tap "→ KAROK-SA" · native: idle · heap 28MB · gc +0ms/1322 · feed 500
+[2026-09-06T20:26:07.418Z] [debug] qwen⏱ ambient ok 26935ms wait 4644ms read 4544ms/write 1996ms in 364t→out 31t js-late 3798ms thr1 12.5ms/t HIT-CAP (130ch)
+[2026-09-06T20:25:45.584Z] [world] The horizon cracks — blue and purple lightning, an Aetheric storm walking on long legs across the plain.
+[2026-09-06T20:25:45.305Z] [combat] Mud Spider steps out of the shadows of the place — Web Trap ready, 2D6 damage on a hit. The loot you found will leave with whoever walks out alive. (range: close)
+[2026-09-06T20:25:45.140Z] [reward] ✦ Recovered Aether Crystal x4.
+[2026-09-06T20:25:45.139Z] [world] On a service desk near the bottom, a notebook of Order observations of the Core. The last entry, written in the same hand but more loosely: 'It is not powering the Tower. The Tower is what stops it. We were the wrong builders.'
+[2026-09-06T20:25:45.139Z] [world] A service door at the base of the Red Tower, the kind that does not appear on any of the published floor plans. It opens. Inside: a stairwell descending into red light that has weight. You go down a flight and stop counting. The walls hum at the same frequency as the Tower's Core, but quieter, the way a child hums a song they overheard.
+[2026-09-06T20:25:45.139Z] [world] You walk west through open silt. The compass points west into open ground.
+[2026-09-06T20:25:45.138Z] [debug] spawn: gear=[Slick Mud Wand, Mud Buckler] window=10 roster=new
+[2026-09-06T20:25:45.132Z] [debug] ui: tap "→ KAROK-SA" ⏱+216ms
+[2026-09-06T20:25:44.914Z] [debug] qwen⏱ investigate_lore ok 4430ms wait 3149ms read 282ms/write 977ms in 126t→out 29t thr2 2.2ms/t (131ch)
+[2026-09-06T20:25:43.414Z] [debug] qwen⏱ investigate_lore ok 4489ms wait 1560ms read/write unusable (native mis-reported 7696ms/1574ms — llama.rn split bug, not this call) in 125t→out 23t thr2 (123ch)
+[2026-09-06T20:25:40.485Z] [cognitive] SEARCH  (367ms)
+[2026-09-06T20:25:40.306Z] [cognitive] JUMP · SEARCH · CLIMB · DISENGAGE  (1652ms)
+[2026-09-06T20:25:40.115Z] [world] The charcoal sketches resists your reading. Not hostile — just closed. Some things in the buried world don't open for the curious.
+[2026-09-06T20:25:40.114Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=charcoal sketches resolved=charcoal sketches range=- enemies=0 hooks=0
+[2026-09-06T20:25:40.114Z] [player] investigate charcoal sketches
+[2026-09-06T20:25:39.907Z] [debug] homework: scene_intro "Voronov" ∅ 6147ms
+[2026-09-06T20:25:39.907Z] [debug] qwen⏱ ✂ DISCARDED narration:scene_intro_fill after 5607ms — intro-fill:∅
+[2026-09-06T20:25:39.716Z] [debug] qwen⏱ narration:scene_intro_fill preempted 5607ms read 0ms/write 0ms in 822t→out 0t js-late 331ms thr1 (0ch)
+[2026-09-06T20:25:38.651Z] [world] You study the ledge and find no answer. The silence here is patient; whatever it knew, it has decided to keep.
+[2026-09-06T20:25:38.650Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=ledge resolved=ledge range=- enemies=0 hooks=0
+[2026-09-06T20:25:38.649Z] [player] investigate ledge
+[2026-09-06T20:25:33.761Z] [debug] homework: intro-fill armed after 6000ms idle (strike 2/3)
+[2026-09-06T20:25:33.546Z] [debug] ui: tap "investigate" ⏱+23ms
+[2026-09-06T20:25:31.839Z] [reward]     • Aether Crystal x3 (Common)
+[2026-09-06T20:25:31.839Z] [reward] ✦ Salvage haul:
+[2026-09-06T20:25:31.839Z] [world] You salvage the spent flare. The take is small but real.
+[2026-09-06T20:25:31.838Z] [world] You break the scope stand apart. Among the pieces, something worth keeping.
+[2026-09-06T20:25:30.677Z] [debug] ui: tap "take / salvage" ⏱+20ms
+[2026-09-06T20:25:26.920Z] [arbiter] The Arbiter eyes your new pieces. "You could make a Mud Buckler now, if you wanted."
+[2026-09-06T20:25:26.865Z] [reward] +18 TC pried from the dust.
+[2026-09-06T20:25:26.865Z] [reward] ✦ Hard-won spoils — Mud Essence (Uncommon).
+[2026-09-06T20:25:26.864Z] [reward] Mud Harpy defeated. You recover Harpy Feather ×2.
+[2026-09-06T20:25:26.792Z] [combat] Mud Harpy blackens — corruption eats 4. (0/76 HP, 1 turn left)
+[2026-09-06T20:25:26.720Z] [combat] Mud Harpy smokes — acid eats 3. (1/76 HP, 1 turn left)
+[2026-09-06T20:25:26.577Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=1 hooks=0
+[2026-09-06T20:25:26.504Z] [player] attack with the auralite talon
+[2026-09-06T20:25:26.226Z] [debug] ui: tap "⚗☣ auralite talon ✦" ⏱+21ms
+[2026-09-06T20:25:24.161Z] [combat] Frost-Rimed Sentinel Cleaver — 1 cold bites in and festers (3 turns).
+[2026-09-06T20:25:24.161Z] [combat] The blow with the frost-rimed sentinel cleaver finds purchase — 5 damage, 4 HP standing. Mud Harpy commits to the counter.
+[2026-09-06T20:25:24.160Z] [arbiter] The Arbiter watches the slashing skid off. "Swap to the Mud Armor Rod — bludgeoning or electrical will bite where slashing won't."
+[2026-09-06T20:25:24.156Z] [combat] Mud Harpy shrugs off the slashing. (resisted, ×0.5 for 5)
+[2026-09-06T20:25:24.152Z] [combat] You — d20 → 9 + STR 21 = 30 vs Mud Harpy AC 9 — ✓ HIT
+[2026-09-06T20:25:24.152Z] [combat] Mud Harpy — d20 → 10 + ATK 6 = 16 vs your AC 24 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-06T20:25:24.148Z] [world] Mud Harpy moves first. The pressure is immediate.
+[2026-09-06T20:25:24.093Z] [debug] dice⏱ coating: shown +349ms, tapped +414ms, settled +1168ms (hold late 368ms) = 1931ms
+[2026-09-06T20:25:22.925Z] [debug] ui: tap "roll" ⏱+24ms
+[2026-09-06T20:25:22.158Z] [debug] dice⏱ damage: shown +349ms, tapped +7196ms, settled +1167ms (hold late 367ms) = 8712ms
+[2026-09-06T20:25:20.991Z] [debug] ui: tap "roll" ⏱+20ms
+[2026-09-06T20:25:13.438Z] [debug] dice⏱ attack: shown +355ms, tapped +540ms, settled +1168ms (hold late 368ms) = 2063ms
+[2026-09-06T20:25:12.269Z] [debug] ui: tap "roll" ⏱+18ms
+[2026-09-06T20:25:11.369Z] [debug] dice⏱ initiative: shown +620ms, tapped +1044ms, settled +1166ms (hold late 366ms) = 2830ms
+[2026-09-06T20:25:10.203Z] [debug] ui: tap "roll" ⏱+20ms
+[2026-09-06T20:25:09.159Z] [debug] render⏱ 321ms after engine-done · feed 500
+[2026-09-06T20:25:08.683Z] [system] ⏳ Time passed: 6 min
+[2026-09-06T20:25:08.611Z] [world] You raise the frost-rimed sentinel cleaver toward Mud Harpy. The room narrows around the both of you.
+[2026-09-06T20:25:08.320Z] [debug] attack: target=Mud Harpy range=close reach.bands=[close] reach.label=Sentinel Cleaver bareHand=false
+[2026-09-06T20:25:08.175Z] [combat] Mud Harpy blackens — corruption eats 4. (9/76 HP, 2 turns left)
+[2026-09-06T20:25:08.103Z] [combat] Mud Harpy smokes — acid eats 3. (13/76 HP, 2 turns left)
+[2026-09-06T20:25:07.959Z] [debug] parser: intent=attack conf=1.00 verb=attack target=hand sentinel cleaver resolved=Sentinel Cleaver range=close enemies=1 hooks=0
+[2026-09-06T20:25:07.886Z] [player] attack with the off-hand sentinel cleaver
+[2026-09-06T20:25:07.600Z] [debug] ui: tap "❄ sentinel cleaver ⚔" ⏱+18ms
+[2026-09-06T20:25:03.974Z] [combat] Acid-Etched Corrupted Auralite Talon — 2 corruption bites in and festers (3 turns). The rot deepens (3 stacks).
+[2026-09-06T20:25:03.974Z] [combat] Acid-Etched Corrupted Auralite Talon — 3 acid bites in and festers (3 turns). Its guard pits and hisses — easier to hit now (−1 AC, 2 total).
+[2026-09-06T20:25:03.973Z] [combat] Your strike with the acid-etched corrupted auralite talon lands for 12. Mud Harpy staggers — 16 HP remaining. It answers.
+[2026-09-06T20:25:03.972Z] [combat] You — d20 → 2 + INT 16 = 18 vs Mud Harpy AC 10 — ✓ HIT
+[2026-09-06T20:25:03.972Z] [combat] Mud Harpy — d20 → 10 + ATK 6 = 16 vs your AC 24 (needs nat 16+ — AC capped) — ✗ MISS
+[2026-09-06T20:25:03.968Z] [world] Mud Harpy moves first. The pressure is immediate.
+[2026-09-06T20:25:03.916Z] [debug] dice⏱ coating2: shown +352ms, tapped +422ms, settled +1167ms (hold late 367ms) = 1941ms
+[2026-09-06T20:25:02.749Z] [debug] ui: tap "roll" ⏱+20ms
+[2026-09-06T20:25:01.967Z] [debug] dice⏱ coating: shown +339ms, tapped +377ms, settled +1170ms (hold late 370ms) = 1886ms
+[2026-09-06T20:25:00.797Z] [debug] ui: tap "roll" ⏱+24ms
+[2026-09-06T20:25:00.080Z] [debug] dice⏱ damage: shown +349ms, tapped +510ms, settled +1164ms (hold late 364ms) = 2023ms
+[2026-09-06T20:24:58.915Z] [debug] ui: tap "roll" ⏱+20ms
+[2026-09-06T20:24:58.048Z] [debug] dice⏱ attack: shown +348ms, tapped +435ms, settled +1166ms (hold late 366ms) = 1949ms
+[2026-09-06T20:24:56.881Z] [debug] ui: tap "roll" ⏱+20ms
+[2026-09-06T20:24:56.095Z] [debug] dice⏱ initiative: shown +1116ms, tapped +1012ms, settled +1130ms (hold late 330ms) = 3258ms
+[2026-09-06T20:24:54.965Z] [debug] ui: tap "roll" ⏱+247ms
+[2026-09-06T20:24:54.651Z] [debug] persist sizes(KB): total=363 player=78 wm=201[rooms=115 events=7 memos=1 npcs=7 defeated=1 tags=1 discovered=1] log=79 scene=5
+[2026-09-06T20:24:53.953Z] [debug] render⏱ 313ms after engine-done · feed 500
+[2026-09-06T20:24:52.981Z] [system] ⏳ Time passed: 6 min
+[2026-09-06T20:24:52.909Z] [world] You raise the acid-etched corrupted auralite talon toward Mud Harpy. The room narrows around the both of you.
+[2026-09-06T20:24:52.620Z] [debug] attack: target=Mud Harpy range=close reach.bands=[close] reach.label=Auralite Talon bareHand=false
+[2026-09-06T20:24:52.479Z] [combat] Mud Harpy blackens — corruption eats 2. (28/76 HP, 2 turns left)
+[2026-09-06T20:24:52.408Z] [combat] Mud Harpy smokes — acid eats 3. (30/76 HP, 2 turns left)
+[2026-09-06T20:24:52.266Z] [debug] parser: intent=attack conf=1.00 verb=attack target=auralite talon resolved=Auralite Talon range=close enemies=1 hooks=0
+[2026-09-06T20:24:52.193Z] [player] attack with the auralite talon
+[2026-09-06T20:24:51.928Z] [debug] ui: tap "⚗☣ auralite talon ✦" ⏱+25ms
+[2026-09-06T20:24:50.304Z] [combat] Mud Harpy — d20 → 15 + ATK 6 = 21 vs your AC 24 (needs nat 16+ — AC capped) — ✗ MISS
+
+=== END REPORT ===
