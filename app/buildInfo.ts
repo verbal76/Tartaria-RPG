@@ -28295,6 +28295,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // way a defect survives - invisible unless you pick the option you were offered.
 // Two scanners ship with it so a fifth cannot slip in.
 export const OTA_BUILD_ID = '2026-09-06-1714-the-dog-is-called-they';
+// golem catch-up 2026-09-06: markerless publish of OTA-1714 - the dog is called
+// they. Four hunger/bleed-out lines now read correctly for every pronoun the
+// onboarding offers. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-06-1713-the-verbs-the-game-never-taught';
 // golem catch-up 2026-09-06: markerless publish of OTA-1713 - the verbs the game
 // never taught. Advance and give-ground get ACTIONS cards, `close in` reaches the
