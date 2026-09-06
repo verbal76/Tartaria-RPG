@@ -28491,7 +28491,29 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // instrument generalises to command-shaped headings only - most card titles are
 // labels with skill annotations that nobody types, so requiring those to parse
 // would be a rule that fails on correct content. 36 checked, zero mismatches.
-export const OTA_BUILD_ID = '2026-09-06-1724-the-cards-own-title';
+// 2026-09-06 OTA-1725 - THE CARD PAYS WHAT THE FIGHT PAYS. F3 from the pre-Fable
+// audit, repaired because the canonical answer was already proven: the engine
+// applies every authored bonus and one preview path displayed only the first. 195
+// armour rows carry more than one bonus and 185 of them HID at least one - the
+// Aetheric Crown of the Giants grants CHA+3, STR+2 and HP+40 (verified through
+// effectiveStatsBreakdown: CHA 13 / STR 12 on a base-10 character) and the card
+// said "CHA +3". Underneath that, a second lie: statBonus and statBonuses are
+// EITHER/OR, and across 288 stat-bearing rows 204 repeat the primary in the list
+// while 54 REPLACE it - on those the card named the WRONG stat, e.g. Reclaimer's
+// Salvage Cap authors wisdom+1, grants investigation+1 (which canonicalises to
+// INT), and read "WIS +1". Fixed as ONE authority rather than a third formatter:
+// armorBonusList / armorPaidBonuses live beside the summation in equipment.ts,
+// the engine's two open-coded copies of the ?? expression now call them, and the
+// preview calls them too. Two things measurement caught that assumption would
+// not: it must NOT be a union (that doubles 204 rows and resurrects 54 retired
+// values - the accessory formatter unions because it is a different rule for a
+// different catalog, so it was left alone), and labels must be CANONICALISED
+// (investigation IS intelligence, constitution IS hp; the first cut printed the
+// raw word and put "INV +1" on a card, inventing an attribute the game has never
+// had). Catalog-wide sweep: 288 rows checked, zero hiding a paid bonus, zero
+// promising one the engine does not pay.
+export const OTA_BUILD_ID = '2026-09-06-1725-the-card-pays-what-the-fight-pays';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-06-1724-the-cards-own-title';
 // golem catch-up 2026-09-06: markerless publish of OTA-1724 - the card's own
 // title. "give ground" reaches the range-opening intent instead of the gifting
 // system, and a command-shaped card heading is now checked against its own

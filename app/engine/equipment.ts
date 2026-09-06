@@ -576,8 +576,7 @@ export function aggregateEquippedStatBonuses(player: PlayerCharacter): Partial<S
     // the remaining non-attribute flavor stats (constitution / acrobatics /
     // investigation / aetheria, which have no PlayerCharacter field) are
     // dropped here — but a multi-base-stat piece like "INT+2, CHA+1" grants BOTH.
-    const bonuses = piece.statBonuses ?? (piece.statBonus ? [piece.statBonus] : []);
-    for (const b of bonuses) add(b.stat, b.amount);
+    for (const b of armorBonusList(piece)) add(b.stat, b.amount);
   }
   // OTA-349 — weapon slots (main/off) can carry stealth (finesse daggers,
   // quiet bows, balanced throwing knives). Same STAT_KEYS filter, so a weapon's
@@ -920,14 +919,56 @@ export function heldShieldAc(
   return best;
 }
 
+/** ⚠⚠⚠ OTA-1725 — WHAT AN ARMOUR PIECE ACTUALLY GRANTS, in one place.
+ *
+ *  `statBonuses ?? (statBonus ? [statBonus] : [])` is EITHER/OR, not a union —
+ *  OTA-1708's lesson — and it matters because the two fields disagree on most of
+ *  the catalog. Measured over all 288 stat-bearing rows: 204 repeat the primary
+ *  inside `statBonuses`, and 54 REPLACE it with something else (`Mud-Encrusted
+ *  Armor` authors `statBonus: hp+1` and `statBonuses: [constitution+1]`; the
+ *  Reclaimer's Salvage Cap authors `wisdom+1` and grants `investigation+1`). So
+ *  `statBonuses` is the live list and `statBonus` is a stale legacy mirror — a
+ *  union would double 204 rows and resurrect 54 retired values.
+ *
+ *  ⚠ This expression was written out three times in this file and a FOURTH,
+ *  different rule lived in the item preview. It is a function now, and every
+ *  reader — engine and display — goes through it, so the card cannot promise
+ *  what the fight does not pay. */
+export function armorBonusList(
+  piece: { statBonus?: { stat: string; amount: number }; statBonuses?: { stat: string; amount: number }[] } | null | undefined,
+): { stat: string; amount: number }[] {
+  if (!piece) return [];
+  return piece.statBonuses ?? (piece.statBonus ? [piece.statBonus] : []);
+}
+
+/** ⚠⚠ OTA-1725 — and the half of that list the game actually PAYS. `add()` below
+ *  filters to STAT_KEYS, and `hp` is paid separately through hpMax — so
+ *  constitution / acrobatics / investigation / aetheria entries have no
+ *  PlayerCharacter field and grant nothing at all. A preview that printed them
+ *  would be over-promising in the opposite direction from the bug this OTA
+ *  fixes. */
+export function armorPaidBonuses(
+  piece: { statBonus?: { stat: string; amount: number }; statBonuses?: { stat: string; amount: number }[] } | null | undefined,
+): { attributes: { stat: string; amount: number }[]; hp: number } {
+  const all = armorBonusList(piece);
+  return {
+    // ⚠ CANONICALISED, not raw. `investigation` IS intelligence and
+    // `constitution` IS hp (STAT_ALIAS above) — the summation canonicalises
+    // before it adds, so a card that printed the raw authored word would invent
+    // an attribute the player has never seen ("INV +1" for what the fight pays
+    // as INT +1). Same key the engine adds under.
+    attributes: all
+      .filter((b) => STAT_KEYS.includes(canonicalStatKey(b.stat) as StatKey))
+      .map((b) => ({ stat: canonicalStatKey(b.stat), amount: b.amount })),
+    hp: all.filter((b) => canonicalStatKey(b.stat) === 'hp').reduce((n, b) => n + (b.amount ?? 0), 0),
+  };
+}
+
 export function armorHpBonus(name: string | null | undefined): number {
   if (!name) return 0;
-  const piece = findArmorByName(name);
-  if (!piece) return 0;
-  const bonuses = piece.statBonuses ?? (piece.statBonus ? [piece.statBonus] : []);
-  return bonuses
-    .filter((b) => canonicalStatKey(b.stat) === 'hp')
-    .reduce((sum, b) => sum + (b.amount ?? 0), 0);
+  // OTA-1725 — through the shared list, so this cannot drift from the summation
+  // above or from what the card prints.
+  return armorPaidBonuses(findArmorByName(name)).hp;
 }
 
 // arb-fix — total max-HP bonus from a single equipped WEAPON, read from its

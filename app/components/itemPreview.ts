@@ -25,6 +25,7 @@ import {
 } from '../engine/itemDefaults';
 // OTA-1557 — the ranged sub-class ("Bolt-Caster", "Crossbow", "Bow", …), so the
 // stat line can say WHICH kind of ranged weapon this is.
+import { armorPaidBonuses } from '../engine/equipment';
 import { rangedClassLabel, reachClassFor } from '../engine/combatRules';
 // OTA-1562 — the range note and the armour-piercing rule, read off the SAME
 // parser the combat gate reads so the card can never promise a band or a pierce
@@ -490,7 +491,17 @@ function previewArmor(a: CatalogArmor): ItemPreview {
   // player reads on the piece is exactly what mitigates in combat.
   const resists = armorResistances(a);
   if (resists.length > 0) stats.push(`Resists: ${resists.join(', ')}`);
-  if (a.statBonus) stats.push(`${a.statBonus.stat.toUpperCase().slice(0, 3)} +${a.statBonus.amount}`);
+  // ⚠⚠⚠ OTA-1725 — EVERY BONUS THE PIECE PAYS, not just the first field on the
+  // row. This read `a.statBonus` alone, so 185 of the 195 multi-entry armour rows
+  // hid at least one bonus the wearer was already getting — the Aetheric Crown of
+  // the Giants grants CHA+3, STR+2 and HP+40 and the card said "CHA +3" — and on
+  // the 54 rows where `statBonuses` REPLACED the legacy field the card named a
+  // stat the fight does not grant at all (Reclaimer's Salvage Cap read "WIS +1";
+  // the engine gives investigation+1, which pays nothing). Same function the
+  // engine sums, so the card and the fight cannot disagree.
+  const paid = armorPaidBonuses(a);
+  for (const b of paid.attributes) stats.push(`${b.stat.toUpperCase().slice(0, 3)} +${b.amount}`);
+  if (paid.hp > 0) stats.push(`HP +${paid.hp}`);
   // ⚠ OTA-1160 — REGEN WAS INVISIBLE ON EVERY SURFACE. Owner: "how am I supposed to
   // know I had regen, I almost sold these." He was wearing Echoing Steps Boots —
   // hpRegen 2, which is the ENTIRE HP_REGEN_CAP — and the inventory row read
@@ -517,7 +528,10 @@ function previewArmor(a: CatalogArmor): ItemPreview {
     headline: composeHeadline(
       `${slotLabel} Armor`,
       `AC +${a.acBonus}`,
-      a.statBonus ? `${a.statBonus.stat.toUpperCase().slice(0, 3)} +${a.statBonus.amount}` : null,
+      // OTA-1725 — the headline names the first bonus the piece actually pays.
+      paid.attributes[0]
+        ? `${paid.attributes[0]!.stat.toUpperCase().slice(0, 3)} +${paid.attributes[0]!.amount}`
+        : paid.hp > 0 ? `HP +${paid.hp}` : null,
     ),
   };
 }
