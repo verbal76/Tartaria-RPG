@@ -1,0 +1,654 @@
+Full Log — Verbal · (2026-09-06-1703-the-stage-counts-its-own-bodies) · (full log pushed for analysis — no description asked for)
+=== TARTARIA BUG REPORT ===
+Submitted: 2026-09-06T01:31:45.331Z
+Character: Verbal
+Slot ID: slot_mskr1pr8_74okc8
+Race: Architectural Sentinels
+Location: Builders' Survey Camp
+HP: 45/45
+
+--- DESCRIPTION ---
+(full log pushed for analysis — no description asked for)
+
+--- DEVICE / BUILD ---
+Device
+  Name: iPhone
+  Platform: ios 18.7.10
+  Hermes: yes
+  Locale: en-US
+  Timezone: America/New_York
+  Screen: window 414×896 / screen 414×896 @ 2x density
+  Captured at: 2026-09-06T01:31:45.194Z
+
+Install
+  App ID: com.hotatticgames.tartarprim
+  App version: 4.32.11
+  APK build version: 2.4.1
+  APK build: 33
+  AAB: (build 33)
+  OTA: (2026-09-06-1703-the-stage-counts-its-own-bodies)
+  Boot stage: tts:done
+
+ML runtime health
+  Status: auto-disabled after 7 crashes (template narration in use)
+  Crash count: 7
+  Last init attempt: 2026-09-06T01:30:57.015Z
+  Last init success: 2026-08-23T17:58:47.877Z
+  Crashes-before-disable threshold: 2
+  Qwen completion guard: clean (no completion crashes)
+  Qwen kernel variant: (not yet loaded this install)
+  Qwen CPU/SoC: (not yet loaded this install)
+  Voice (TTS) guard: clean (no voice crashes on this build)
+Save-load health
+  Status: clean (no load-crash flags)
+Last JS crash
+  Status: none recorded
+This launch
+  Life: bmtp4yi9679 · started 2026-09-06T01:31:20.682Z
+  Cold start — this boot did not follow an OTA apply
+Crash ledger — 2 recorded (newest last)
+  • 2026-08-24T23:58:42.465Z (17373m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-08-24-1495-finish-this-fight-first · stage rendered
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: rendered · 0ms into the action
+  • 2026-08-25T02:07:22.853Z (17244m ago) — PROCESS KILLED — no JS ran
+      build 4.32.11 · 2026-08-25-1496-room-between-the-thrones · stage rendered
+      Process died with no orderly exit while: (no action yet)
+      doing: (no action yet) · room ? · screen ?
+      last checkpoint: rendered · 0ms into the action
+Crash delivery: ON — reports go to Sentry when you crash.
+Runtime pressure
+  · Last boot exited cleanly, then the OS reclaimed it — not a crash.
+     A ~400MB model app is what Android drops first when it needs memory.
+     Kept because the phase is still evidence if a real freeze lands here.
+     Last checkpoint: native:llm:done at 2026-09-06T01:31:14.119Z (1 min before this boot)
+  Memory warnings: none this session
+  Freeze watch: no stalls seen (JS clocks only — see the native queue below)
+  Native queue: worst wait 0.0s · 0 job kinds queued >3s · worst 0.0ms/prompt-token
+  App state trail: (none recorded)
+Model contexts
+  Live now: 0
+  Opened: 0 · Released: 0 · Peak live: 0
+  Narration engine: idle
+
+--- VOICE ---
+  TTS enabled: yes
+  Engine: bundled
+  Rate: 1.20 · Pitch: 1.00
+  System voice id: (default)
+  Kokoro voice: am_michael
+  Kokoro state: ready
+  Last TTS routes (newest first):
+    • route=bundled-kokoro · kokoro=ready · "Choose your character."
+
+--- INVENTORY ---
+Inventory (Verbal)
+  HP: 45/45  Stamina: 14/17  TC: 259  Corruption: 0
+  Pack: 75 distinct rows / 293 total
+
+Weapons (17)
+  Aetheric Spark Wand (1d6 aetheric, dur 14/14, [runecaster,rune_power,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Aetheric Spark Wand (1d6 aetheric, dur 27/27, [runecaster,rune_power,aetheric])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bolt-Caster (Uncommon, 2d6 piercing, dur 35/38, equipped:off, [weapon,ranged,bolt-caster,firearm])
+    actions: equip:main, unequip:off, use, repair
+  Bolt-Caster (Uncommon, 2d6 piercing, dur 21/21, [weapon,ranged,bolt-caster,firearm])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bone Club (1d6 bludgeoning, dur 34/34, [weapon,melee,single_handed,hammer,giants])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bone Crossbow (Uncommon, 2d6 piercing, dur 2/10, [weapon,ranged,crossbow,bolt-caster,loot])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Bone Crossbow (Uncommon, 2d6 piercing, dur 2/10, [weapon,ranged,crossbow,bolt-caster,loot])
+    actions: equip:main, equip:off, use(off), scrap, repair, drop
+  Bone Shiv (Stealth) (1d4 piercing, dur 24/24, [weapon,melee,dual_wield,knife,giants])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Bone Sling (1d4 bludgeoning, dur 24/24, [weapon,ranged,thrown,giants])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Compact Laser Pistol (Ranged) (1d6 burn, dur 26/26, [weapon,ranged,firearm,unknowing_masses])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Claymore (1d8 slashing, dur 39/39, [weapon,melee,two_handed,blade,mud_dwellers])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Mud Shell Wand (1d6 bludgeoning, dur 31/31, [runecaster,rune_power,mud_dwellers,ward])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Repeater Rifle (1d8 piercing, dur 41/41, [weapon,ranged,two_handed,firearm,mud_dwellers])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Rusted Blade (1d6 slashing, dur 37/37, [weapon,blade,melee])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Tartarian Spear (Uncommon, 2d6 piercing, dur 21/27, equipped:main, [weapon,starter,spear,melee])
+    actions: equip:off, unequip:main, use(off), repair
+  Throwing Knife (1d4 piercing, dur 32/32, [throwable,weapon,ranged,knife,thrown])
+    actions: equip:main, equip:off, use(off), scrap, drop
+  Throwing Knife (1d4 piercing, dur 30/30, [throwable,weapon,ranged,knife,thrown])
+    actions: equip:main, equip:off, use(off), scrap, drop
+
+Armor (15)
+  Aether-Weaver's Mantle (dur 33/33, AC +1 · Regen: +1 stamina per action · INT +1, [armor,cloak,outer,aetherborn])
+    actions: equip:cloak, use, scrap, drop
+  Aetheric Helm of Insight (dur 7/9, equipped:head, AC +2 · Resists: aetheric · Regen: +1 HP per action · WIS +2, [armor,head,cloth,helmet,aetherborn])
+    actions: unequip:head, repair
+  Aetheric Scout Greaves (dur 6/8, equipped:legs, AC +2 · Resists: aetheric · Regen: +1 stamina per action · WIS +2, [armor,legs,greaves,tartarian_giants])
+    actions: unequip:legs, repair
+  Arcane Sprinter's Legplates (dur 24/24, AC +1 · Resists: slashing · Regen: +1 HP per action · INT +1, [armor,legs,greaves,aetherborn])
+    actions: equip:legs, use, scrap, drop
+  Architect's Field Jacket (dur 32/32, AC +1 · Regen: +1 HP per action · INT +1, [armor,cloak,outer,tartarian_giants])
+    actions: equip:cloak, use, scrap, drop
+  Architect's Observer Visor (dur 14/14, AC +2 · Resists: cold · WIS +2, [armor,head,cloth,helmet,architectural_sentinels])
+    actions: equip:head, use, scrap, drop
+  Echoing Steps Boots (dur 17/17, AC +2 · Regen: +2 HP per action · DEX +2, [armor,feet,boots,race_starter,reclaimer])
+    actions: equip:feet, use, scrap, drop
+  Forgotten Leggings (dur 28/28, AC +1 · Resists: slashing · HP +1 · HP +1, [armor,legs,greaves,unknowing_masses])
+    actions: equip:legs, use, scrap, drop
+  Mud-Sealer Gauntlets (dur 33/33, AC +1 · Resists: slashing · Regen: +2 stamina per action · DEX +1, [armor,hands,gauntlets,race_starter,mud_golem])
+    actions: equip:hands, use, scrap, drop
+  Mud-Treader's Greaves (dur 16/16, AC +2 · DEX +2, [armor,legs,greaves,mud_dwellers])
+    actions: equip:legs, use, scrap, drop
+  Reclaimer's Salvage Vest (dur 3/20, equipped:chest, AC +1 · HP +1, [armor,chest,plate,reclaimers,loot])
+    actions: unequip:chest, repair
+  Salvager's Trench Coat (dur 19/19, AC +2 · Resists: cold · INT +2, [armor,cloak,outer,reclaimers,stealth])
+    actions: equip:cloak, use, scrap, drop
+  Salvager's Worn Gloves (dur 18/18, AC +2 · INT +2, [armor,hands,gauntlets,reclaimers])
+    actions: equip:hands, use, scrap, drop
+  Stone-Grip Gloves (dur 16/21, AC +2 · Resists: slashing · DEX +2, [armor,hands,gauntlets,mud_golems])
+    actions: equip:hands, use, scrap, repair, drop
+  Stone-Warden's Footwraps (Uncommon, dur 42/42, equipped:feet, AC +2 · Resists: cold · DEX +2 · STR +1, [armor,feet,boots,mud_golems])
+    actions: unequip:feet
+
+Shields (1)
+  Mud Heater Shield (1d4 bludgeoning, dur 39/39, [weapon,shield,dual_wield,mud_dwellers])
+    actions: equip:off, use(off), scrap, drop
+
+Amulets & Rings (1)
+  Aetheric Locket (dur 30/30, WIS +1 · Resists aetheric: −9% incoming damage of each, on top of armour, [detection,amulet,relic])
+    actions: equip:amulet, use, scrap, drop
+
+Consumables (5)
+  Bioluminescent Fungus ×20 (Uncommon, [food,foraged,mushroom,light,aether])
+    actions: use(eat), drop
+  First Aid Kit ×10 (Uncommon, [healing,crafted,gift])
+    actions: use(apply), drop
+  Smoke-Cured Jerky Strip ×20 ([food,treat,dog_treat,gift])
+    actions: use(eat), drop
+  Trail Rations ×24 ([food])
+    actions: use(eat), drop
+  Water Bottle ×2 ([drink,water,container])
+    actions: use(drink), drop
+
+Tools (4)
+  Aetheric Circuit Repair Kit (+1 INT (passive), [exploration,tool,common,race_starter,architectural_sentinel])
+    actions: use, scrap, drop
+  Aetheric Torch ×4 (dur 25/25, Reveals hidden scene hooks, [light,relic])
+    actions: use, scrap, drop
+  Pulse Scanner ([exploration,relic,common,race_starter,architectural_sentinel])
+    actions: equip:off, use(off), scrap, drop
+  Reclaimer's Rope (dur 135/300, [climb,rope,fiber,exploration,tool])
+    actions: use, scrap, repair, drop
+
+Materials (30)
+  Aether Crystal ×14 ([aether,crystal,climb_top])
+    actions: drop
+  Aether Dust ×27 ([aether,dust,distillable])
+    actions: drop
+  Aether Residue ([aether])
+    actions: drop
+  Aether Wing ([organic,aether,loot])
+    actions: scrap, drop
+  Aetheric Shard ×5 (Uncommon, [aether,crystal,climb_top])
+    actions: drop
+  ◆ Aetheric Teeth (♥reserved, [trophy,loot,organic,aether,bone])
+    actions: scrap, release-from-fusion, drop
+  Automaton Circuit ×12 ([automation,tech,scrap])
+    actions: drop
+  Bent Nail ×2 ([metal,junk,scrap])
+    actions: scrap, drop
+  ◆ Bone Bolt ×3 ([ammunition,bone,loot])
+    actions: save-for-fusion, drop
+  Cloth Scrap ×5 ([fiber,junk,scrap])
+    actions: scrap, drop
+  ◆ Dried Tendon Coil ([trophy,organic])
+    actions: scrap, save-for-fusion, drop
+  ◆ Flint Core Nodule ([trophy,stone])
+    actions: scrap, save-for-fusion, drop
+  ◆ Flint-and-Twine Bundle ([trophy,fiber,stone])
+    actions: scrap, save-for-fusion, drop
+  ◆ Glass-Beaded Strap ×2 (Uncommon, [trophy,crystal,cloth])
+    actions: scrap, save-for-fusion, drop
+  ◆ Hollow Quill Sheaf ×2 (Uncommon, [organic])
+    actions: scrap, save-for-fusion, drop
+  ◆ Iron-Pinned Plank Shard (Uncommon, ♥reserved, [crystal,metal,wood])
+    actions: scrap, release-from-fusion, drop
+  ◆ Knotted Sinew Braid ([trophy,fiber])
+    actions: scrap, save-for-fusion, drop
+  ◆ Mud Cloth (Uncommon, [trophy,loot,cloth])
+    actions: scrap, save-for-fusion, drop
+  Mud Fragment ×9 ([mud])
+    actions: drop
+  ◆ Mud-Frosted Bead (♥reserved, [crystal])
+    actions: scrap, release-from-fusion, drop
+  ◆ Obsidian Chip (♥reserved, [stone])
+    actions: scrap, release-from-fusion, drop
+  Patched Cloth ×2 ([fiber,cloth,loot])
+    actions: drop
+  ◆ Salt-Cured Dowel ([trophy,wood])
+    actions: scrap, save-for-fusion, drop
+  Scrap Metal ×19 ([metal])
+    actions: drop
+  ◆ Slate-Weighted Netting (♥reserved, [fiber,stone])
+    actions: scrap, release-from-fusion, drop
+  Smooth Stone ×6 ([stone,junk,scrap])
+    actions: scrap, drop
+  ◆ Split Slate Piece ([trophy,stone])
+    actions: scrap, save-for-fusion, drop
+  Stick ×4 ([wood,improvised,kindling])
+    actions: drop
+  ◆ Verdigris Bell Fragment ([trophy,metal])
+    actions: scrap, save-for-fusion, drop
+  Worn Tartarian Coin ×47 ([currency,metal,pre-flood])
+    actions: scrap, drop
+
+Loot (2)
+  Architect Sigil ([sigil,conspiracy_architects,keepsake,loot])
+    actions: drop
+  ◆ Hardtack (Uncommon, [trophy,loot,improvised])
+    actions: scrap, save-for-fusion, drop
+
+--- CHARACTER LOG (newest first) ---
+(Newest entry at top — showing the most recent 394 of 1975 entries; older trimmed to fit a single email paste)
+
+[2026-09-06T01:31:34.438Z] [debug] voice⏱ gap 3436ms (wait 0ms + synth 3432ms, live) "Choose your character."
+[2026-09-06T01:31:33.530Z] [debug] boot: life bmtp4yi9679 started 2026-09-06T01:31:20.682Z · not an OTA apply (no handoff on disk)
+[2026-09-06T01:31:33.530Z] [debug] missions: none active · at=builders_survey_camp
+[2026-09-06T01:31:33.529Z] [debug] ═══ SESSION 2026-09-06T01:31:33.524Z · build 2026-09-06-1703-the-stage-counts-its-own-bodies · previous entry moments earlier ═══
+[2026-09-06T01:31:32.658Z] [arbiter] The Arbiter looks up as you return. "Welcome back, Verbal. I wondered when you'd take up the thread again."
+[2026-09-06T01:31:32.658Z] [world] You step back into Builders' Survey Camp. The world waits for your move.
+[2026-09-06T01:31:32.657Z] [debug] OTA session start: 2026-09-06-1703-the-stage-counts-its-own-bodies.
+[2026-09-06T01:31:30.927Z] [debug] voice: bundled ready
+[2026-09-06T01:31:25.209Z] [debug] voice: bundled loading
+[2026-09-06T01:31:23.507Z] [debug] voice: bundled downloading
+[2026-09-06T01:31:21.116Z] [debug] voice: bundled loading
+[2026-09-06T01:31:21.116Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-09-06T01:31:20.995Z] [debug] ota: boot check result = noUpdate
+[2026-09-06T01:31:20.994Z] [debug] ota: Already up to date
+[2026-09-06T01:31:20.851Z] [debug] ota: Checking…
+[2026-09-06T01:31:20.851Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=01a07418-5683-7a23-8a50-36828787030f
+[2026-09-06T01:31:13.757Z] [reward] ✦ Mud-Sealer Gauntlets (Common).
+[2026-09-06T01:31:13.757Z] [world] You lift the Mud-Sealer Gauntlets clear.
+[2026-09-06T01:31:13.754Z] [reward] ✦ Compact Laser Pistol (Ranged) (Common).
+[2026-09-06T01:31:13.754Z] [world] You pick up the Compact Laser Pistol (Ranged).
+[2026-09-06T01:31:13.748Z] [reward] ✦ Throwing Knife (Common).
+[2026-09-06T01:31:13.747Z] [world] You take the Throwing Knife from where it lay.
+[2026-09-06T01:31:12.155Z] [reward]     • Aether Crystal (Common)
+[2026-09-06T01:31:12.155Z] [reward]     • Aether Dust (Common)
+[2026-09-06T01:31:12.155Z] [reward]     • Automaton Circuit (Common)
+[2026-09-06T01:31:12.154Z] [reward]     • Knotted Sinew Braid (Common)
+[2026-09-06T01:31:12.145Z] [reward] ✦ Salvage haul:
+[2026-09-06T01:31:12.144Z] [world] You work the step apart. Tucked inside, sealed against the silt: a folded note.
+[2026-09-06T01:31:12.144Z] [world] You salvage the sign. The take is small but real.
+[2026-09-06T01:31:12.144Z] [world] You work the shattered capacitor coil rack over. A part of it comes loose, intact.
+[2026-09-06T01:31:12.143Z] [world] Behind the lantern, where the floods didn't reach: a single page, in a hand you haven't read before.
+[2026-09-06T01:31:12.143Z] [world] You break the dust-buried library archive console apart. Among the pieces, something worth keeping.
+[2026-09-06T01:31:12.143Z] [world] Tucked inside the cracked submerged library shelf: an oddment that matches no quartermaster's list. The kind of thing that fuses well.
+[2026-09-06T01:31:12.140Z] [reward] ✦ Found Mother's Note — to her son — The Family in the Mud. (open Contracts → Collectibles to read)
+[2026-09-06T01:31:12.128Z] [reward] ✦ Found Verse One — The Siren of Zharak's Teeth. (open Contracts → Collectibles to read)
+[2026-09-06T01:31:10.310Z] [debug] ui: tap "take / salvage"
+[2026-09-06T01:31:08.097Z] [debug] persist sizes(KB): total=141 player=25 wm=32[rooms=10 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=82 scene=2
+[2026-09-06T01:31:07.749Z] [debug] arbiter: ambient held (he just spoke)
+[2026-09-06T01:31:07.743Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-09-06T01:31:07.742Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-06T01:31:07.742Z] [world] Paths: north to First Landing · south to Shallow Digs · east to Storage Halls · west to Pump Room. (Type 'leave outpost' to head into the wilds.)
+[2026-09-06T01:31:07.741Z] [world] Stone Builders' Workshop — Second Landing. Pumps west, materials east, the cuts south, the stair back north. Every direction carries a chalked figure beside it except south, which has a figure crossed out twice and re-chalked as a question mark.
+[2026-09-06T01:31:07.740Z] [debug] spawn: gear=[Mud-Sealer Gauntlets, Compact Laser Pistol (Ranged), Bone Knife] window=10 roster=new
+[2026-09-06T01:31:07.712Z] [debug] missions: none active · at=builders_survey_camp
+[2026-09-06T01:31:07.711Z] [debug] scene: loc=builders_survey_camp hub=buried_landing_two arrival=n opening=n passing=n
+[2026-09-06T01:31:07.711Z] [world] You head on to the Second Landing.
+[2026-09-06T01:31:07.708Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=0
+[2026-09-06T01:31:07.708Z] [player] go south
+[2026-09-06T01:31:07.693Z] [debug] ui: tap "↓ SECOND LANDING"
+[2026-09-06T01:31:07.349Z] [world] The corridor reads as ordinary, which down here is a small kind of relief. You leave it be.
+[2026-09-06T01:31:07.346Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=corridor resolved=corridor range=- enemies=0 hooks=0
+[2026-09-06T01:31:07.345Z] [player] investigate corridor
+[2026-09-06T01:31:06.113Z] [world] You sweep the floor with your eyes. Boards, dust, nothing on top of it worth pocketing.
+[2026-09-06T01:31:06.108Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=floor resolved=- range=- enemies=0 hooks=0
+[2026-09-06T01:31:06.107Z] [player] investigate the floor
+[2026-09-06T01:31:04.033Z] [debug] ui: tap "investigate"
+[2026-09-06T01:31:01.944Z] [world] Paths: north to Threshold · south to Second Landing. (Type 'leave outpost' to head into the wilds.)
+[2026-09-06T01:31:01.943Z] [world] Something about this ground is already familiar.
+[2026-09-06T01:31:01.943Z] [world] Stone Builders' Workshop — First Landing. A wide platform of cracked Tartarian stone, chalked with arrows and a load rating in a foreman's hand. The stair behind you climbs north to the threshold; ahead it keeps dropping south, and the chalk stops where the surveys do.
+[2026-09-06T01:31:01.908Z] [debug] missions: none active · at=builders_survey_camp
+[2026-09-06T01:31:01.908Z] [debug] scene: loc=builders_survey_camp hub=buried_landing_one arrival=n opening=n passing=n
+[2026-09-06T01:31:01.908Z] [world] You head on to the First Landing.
+[2026-09-06T01:31:01.907Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=0
+[2026-09-06T01:31:01.906Z] [player] go south
+[2026-09-06T01:31:01.893Z] [world] The ash burns your throat. The breath you spend on this action costs more than usual.
+[2026-09-06T01:31:01.888Z] [debug] ui: tap "↓ ✓ FIRST LANDING"
+[2026-09-06T01:30:57.155Z] [arbiter] "The south," the Arbiter says. "Tell me what you mean to do with it."
+[2026-09-06T01:30:57.155Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-09-06T01:30:57.144Z] [world] Halem the Trader picks up where you left off. "You were asking about ‘Ask about the acid trade’. I've had time to think on it."
+[2026-09-06T01:30:57.144Z] [world] Halem the Trader places you as you come in. "Verbal. What are you after?"
+[2026-09-06T01:30:57.143Z] [world] Paths: north to Plan Floor · south to First Landing. (Type 'leave outpost' to head into the wilds.)
+[2026-09-06T01:30:57.142Z] [world] You have been here. The shape of it comes back before the details do.
+[2026-09-06T01:30:57.140Z] [world] Stone Builders' Workshop — The Tool Threshold. An open shop entry with a chalkboard for jobs taken and a rack of clean Aethercraft instruments. The foreman waves you to the slate without looking up.
+[2026-09-06T01:30:57.062Z] [debug] missions: none active · at=builders_survey_camp
+[2026-09-06T01:30:57.062Z] [debug] scene: loc=builders_survey_camp hub=outpost_gate arrival=n opening=n passing=n
+[2026-09-06T01:30:57.061Z] [world] You head on to the Threshold.
+[2026-09-06T01:30:57.060Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=0
+[2026-09-06T01:30:57.059Z] [player] go south
+[2026-09-06T01:30:57.017Z] [debug] qwen: loading (was idle) — the Arbiter speaks templates until it is ready
+[2026-09-06T01:30:57.009Z] [debug] ui: tap "↓ ✓ THRESHOLD"
+[2026-09-06T01:30:42.143Z] [debug] ui: tap "map"
+[2026-09-06T01:30:40.655Z] [debug] voice⏱ gap 4710ms (wait 0ms + synth 4698ms, live) "Choose your character."
+[2026-09-06T01:30:39.814Z] [debug] boot: life bmtp4xb99qo started 2026-09-06T01:30:24.957Z · not an OTA apply (no handoff on disk)
+[2026-09-06T01:30:39.814Z] [debug] missions: none active · at=builders_survey_camp
+[2026-09-06T01:30:39.814Z] [debug] ═══ SESSION 2026-09-06T01:30:39.810Z · build 2026-09-06-1703-the-stage-counts-its-own-bodies · previous entry moments earlier ═══
+[2026-09-06T01:30:39.236Z] [arbiter] The Arbiter inclines their head, the closest it comes to a smile. "Welcome back, Verbal. The road kept your place."
+[2026-09-06T01:30:39.232Z] [world] You step back into Builders' Survey Camp. The world waits for your move.
+[2026-09-06T01:30:39.228Z] [debug] OTA session start: 2026-09-06-1703-the-stage-counts-its-own-bodies.
+[2026-09-06T01:30:35.886Z] [debug] voice: bundled ready
+[2026-09-06T01:30:25.255Z] [debug] voice: bundled loading
+[2026-09-06T01:30:25.254Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-09-06T01:30:25.145Z] [debug] ota: boot check result = noUpdate
+[2026-09-06T01:30:25.145Z] [debug] ota: Already up to date
+[2026-09-06T01:30:25.060Z] [debug] ota: Checking…
+[2026-09-06T01:30:25.060Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=01a07418-5683-7a23-8a50-36828787030f
+[2026-09-06T01:30:13.543Z] [debug] ui: tap "map"
+[2026-09-06T01:30:12.106Z] [world] Paths: north to Materials · south to Threshold · east to Forge · west to Bench. (Type 'leave outpost' to head into the wilds.)
+[2026-09-06T01:30:12.106Z] [world] Something about this ground is already familiar.
+[2026-09-06T01:30:12.105Z] [world] Stone Builders' Workshop — The Plan Floor. A workshop floor of laid blueprints and stacked stone. The center stone has the Buried Cities' load-bearing tunnels chalked across it in three layers.
+[2026-09-06T01:30:12.096Z] [debug] missions: none active · at=builders_survey_camp
+[2026-09-06T01:30:12.096Z] [debug] scene: loc=builders_survey_camp hub=outpost_central arrival=n opening=n passing=n
+[2026-09-06T01:30:12.096Z] [world] You head on to the Plan Floor.
+[2026-09-06T01:30:12.095Z] [debug] parser: intent=travel conf=1.00 verb=go target=east resolved=- range=- enemies=0 hooks=0
+[2026-09-06T01:30:12.094Z] [player] go east
+[2026-09-06T01:30:12.079Z] [debug] ui: tap "→ ✓ PLAN FLOOR"
+[2026-09-06T01:30:09.380Z] [world] Halem the Trader picks up where you left off. "You were asking about ‘Ask about the acid trade’. I've had time to think on it."
+[2026-09-06T01:30:09.380Z] [world] Halem the Trader places you as you come in. "Verbal. What are you after?"
+[2026-09-06T01:30:09.380Z] [system] Weather effect — Ash Storm: -1 STR
+[2026-09-06T01:30:09.380Z] [world] Paths: south to Plan Room · east to Plan Floor · west to Crew. (Type 'leave outpost' to head into the wilds.)
+[2026-09-06T01:30:09.379Z] [world] You have been here. The shape of it comes back before the details do.
+[2026-09-06T01:30:09.379Z] [world] Stone Builders' Workshop — The Mess Bench. A workshop break-room with iron-leg tables and tin plates. Halem feeds whoever can hold a tool; the food is hot, plenty, and gone in an hour.
+[2026-09-06T01:30:09.378Z] [arbiter] A charcoal thumbprint signs a note by the mess hatch: "Coal by the sack. Brann, west, daylight. My harvest walked off — reward for walking it back."
+[2026-09-06T01:30:09.312Z] [debug] missions: none active · at=builders_survey_camp
+[2026-09-06T01:30:09.312Z] [debug] scene: loc=builders_survey_camp hub=outpost_messhall arrival=n opening=n passing=n
+[2026-09-06T01:30:09.311Z] [world] You head on to the Bench.
+[2026-09-06T01:30:09.310Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=1
+[2026-09-06T01:30:09.309Z] [player] go north
+[2026-09-06T01:30:09.281Z] [debug] qwen: loading (was idle) — the Arbiter speaks templates until it is ready
+[2026-09-06T01:30:09.278Z] [debug] ui: tap "↑ ✓ BENCH"
+[2026-09-06T01:30:06.041Z] [debug] boot: life bmtp4wea99j started 2026-09-06T01:29:42.225Z · FOLLOWED AN OTA APPLY 153ms ago via boot-front · prev ctx o0/r0/l0/p0/dn0 (previous life released its contexts first)
+[2026-09-06T01:30:06.040Z] [debug] missions: none active · at=builders_survey_camp
+[2026-09-06T01:30:06.040Z] [debug] ═══ SESSION 2026-09-06T01:30:06.038Z · build 2026-09-06-1703-the-stage-counts-its-own-bodies · updated from 2026-09-05-1701-the-world-tells-you-where-the-power-is · previous entry moments earlier ═══
+[2026-09-06T01:30:05.715Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. "Welcome back, Verbal. We've still got ground to cover, you and I."
+[2026-09-06T01:30:05.714Z] [world] You step back into Builders' Survey Camp. The world waits for your move.
+[2026-09-06T01:30:05.714Z] [debug] OTA session start: 2026-09-06-1703-the-stage-counts-its-own-bodies.
+[2026-09-06T01:30:05.713Z] [debug] OTA applied: 2026-09-05-1701-the-world-tells-you-where-the-power-is → 2026-09-06-1703-the-stage-counts-its-own-bodies.
+[2026-09-06T01:29:50.528Z] [debug] voice⏱ gap 1614ms (wait 0ms + synth 1611ms, live) "Choose your character."
+[2026-09-06T01:29:48.874Z] [debug] voice: bundled ready
+[2026-09-06T01:29:42.451Z] [debug] voice: bundled loading
+[2026-09-06T01:29:42.451Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-09-06T01:29:42.402Z] [debug] ota: boot check result = noUpdate
+[2026-09-06T01:29:42.402Z] [debug] ota: Already up to date
+[2026-09-06T01:29:42.267Z] [debug] ota: Checking…
+[2026-09-06T01:29:42.267Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=01a07418-5683-7a23-8a50-36828787030f
+[2026-09-06T01:29:42.071Z] [debug] ota: Restarting to apply…
+[2026-09-06T01:29:42.071Z] [debug] ota: Saving progress…
+[2026-09-06T01:29:41.899Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-06T01:29:40.484Z] [debug] ota: Checking…
+[2026-09-06T01:29:40.484Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=01a073ed-dc56-75a6-919d-a546e2f71f2d
+[2026-09-05T23:44:29.164Z] [debug] send-log: crash on record (2026-08-25T02:07:22.853Z) — game log pushed automatically, delivered to Sentry, #mtp152psyjr4 cleared from disk
+[2026-09-05T23:44:28.484Z] [debug] boot: life bmtp14lgg4p started 2026-09-05T23:44:06.304Z · not an OTA apply (no handoff on disk)
+[2026-09-05T23:44:28.484Z] [debug] missions: none active · at=builders_survey_camp
+[2026-09-05T23:44:28.484Z] [debug] ═══ SESSION 2026-09-05T23:44:28.481Z · build 2026-09-05-1701-the-world-tells-you-where-the-power-is · updated from 2026-08-25-1496-room-between-the-thrones · previous entry moments earlier ═══
+[2026-09-05T23:44:28.145Z] [debug] dog: rescue amnesty applied at load — no active companion, quest gates reopened
+[2026-09-05T23:44:28.145Z] [arbiter] The Arbiter sets the quiet aside. "Welcome back, Verbal. I kept watch while you were gone. The waste did not sleep while you were gone — blood was spilled and ground changed hands. Read the World for the account."
+[2026-09-05T23:44:28.135Z] [world] Whispers carried while you slept off the world. Something that was rumour the last time you walked here is closer to fact now.
+[2026-09-05T23:44:28.134Z] [world] You step back into Builders' Survey Camp. The world waits for your move.
+[2026-09-05T23:44:28.134Z] [debug] OTA session start: 2026-09-05-1701-the-world-tells-you-where-the-power-is.
+[2026-09-05T23:44:28.134Z] [debug] OTA applied: 2026-08-25-1496-room-between-the-thrones → 2026-09-05-1701-the-world-tells-you-where-the-power-is.
+[2026-09-05T23:44:14.879Z] [debug] voice⏱ gap 1576ms (wait 0ms + synth 1567ms, live) "Choose your character."
+[2026-09-05T23:44:13.242Z] [debug] voice: bundled ready
+[2026-09-05T23:44:06.549Z] [debug] voice: bundled loading
+[2026-09-05T23:44:06.549Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-09-05T23:44:06.486Z] [debug] ota: boot check result = noUpdate
+[2026-09-05T23:44:06.486Z] [debug] ota: Already up to date
+[2026-09-05T23:44:06.347Z] [debug] ota: Checking…
+[2026-09-05T23:44:06.346Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=01a073ed-dc56-75a6-919d-a546e2f71f2d
+[2026-09-05T23:44:06.181Z] [debug] ota: Restarting to apply…
+[2026-09-05T23:44:06.181Z] [debug] ota: Saving progress…
+[2026-09-05T23:44:06.040Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-09-05T23:44:04.692Z] [debug] ota: Checking…
+[2026-09-05T23:44:04.692Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=01a03662-7a63-7b7f-a861-08bbca105b45
+[2026-08-25T02:07:27.410Z] [debug] send-log: flushed to Sentry
+[2026-08-25T02:07:22.961Z] [debug] ═══ SESSION 2026-08-25T02:07:22.958Z · build 2026-08-25-1496-room-between-the-thrones · updated from 2026-08-24-1495-finish-this-fight-first · previous entry moments earlier ═══
+[2026-08-25T02:07:22.639Z] [arbiter] The Arbiter nods, the way you nod at someone you've missed. "Welcome back, Verbal. We've still got ground to cover, you and I."
+[2026-08-25T02:07:22.638Z] [world] You step back into Builders' Survey Camp. The world waits for your move.
+[2026-08-25T02:07:22.638Z] [debug] OTA session start: 2026-08-25-1496-room-between-the-thrones.
+[2026-08-25T02:07:22.638Z] [debug] OTA applied: 2026-08-24-1495-finish-this-fight-first → 2026-08-25-1496-room-between-the-thrones.
+[2026-08-25T02:07:20.524Z] [debug] voice⏱ gap 1862ms (wait 0ms + synth 1848ms, live) "Choose your character."
+[2026-08-25T02:07:18.638Z] [debug] voice: bundled ready
+[2026-08-25T02:07:12.751Z] [debug] voice: bundled loading
+[2026-08-25T02:07:12.751Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-08-25T02:07:12.676Z] [debug] ota: boot check result = noUpdate
+[2026-08-25T02:07:12.676Z] [debug] ota: Already up to date
+[2026-08-25T02:07:12.547Z] [debug] ota: Checking…
+[2026-08-25T02:07:12.547Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=01a03662-7a63-7b7f-a861-08bbca105b45
+[2026-08-25T02:07:12.378Z] [debug] ota: Restarting to apply…
+[2026-08-25T02:07:12.378Z] [debug] ota: Saving progress…
+[2026-08-25T02:07:12.213Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-08-25T02:07:10.897Z] [debug] ota: Checking…
+[2026-08-25T02:07:10.897Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=01a03601-bbaa-7063-87e8-949212604775
+[2026-08-24T23:58:51.009Z] [debug] voice⏱ gap 1583ms (wait 0ms + synth 1576ms, live) "Choose your character."
+[2026-08-24T23:58:46.443Z] [debug] send-log: flushed to Sentry
+[2026-08-24T23:58:42.578Z] [debug] ═══ SESSION 2026-08-24T23:58:42.576Z · build 2026-08-24-1495-finish-this-fight-first · previous entry moments earlier ═══
+[2026-08-24T23:58:42.251Z] [arbiter] The Arbiter meets your eyes. "Welcome back, Verbal. The buried country is no place to walk alone."
+[2026-08-24T23:58:42.251Z] [world] You step back into Builders' Survey Camp. The world waits for your move.
+[2026-08-24T23:58:42.251Z] [debug] OTA session start: 2026-08-24-1495-finish-this-fight-first.
+[2026-08-24T23:58:41.363Z] [debug] voice⏱ gap 1705ms (wait 0ms + synth 1692ms, live) "Choose your character."
+[2026-08-24T23:58:39.632Z] [debug] voice: bundled ready
+[2026-08-24T23:58:34.251Z] [debug] voice: bundled loading
+[2026-08-24T23:58:34.251Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-08-24T23:58:34.175Z] [debug] ota: boot check result = noUpdate
+[2026-08-24T23:58:34.174Z] [debug] ota: Already up to date
+[2026-08-24T23:58:34.047Z] [debug] ota: Checking…
+[2026-08-24T23:58:34.047Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=01a03601-bbaa-7063-87e8-949212604775
+[2026-08-24T23:58:03.304Z] [debug] appstate: inactive → background (was inactive for 937ms)
+[2026-08-24T23:58:02.367Z] [debug] appstate: active → inactive (was active for 1653ms)
+[2026-08-24T23:58:00.714Z] [debug] appstate: background → active (was background for 21847ms)
+[2026-08-24T23:58:00.416Z] [debug] qwen-watchdog: app is backgrounded — holding revival until foreground (status='idle').
+[2026-08-24T23:57:38.867Z] [debug] appstate: inactive → background (was inactive for 886ms)
+[2026-08-24T23:57:37.981Z] [debug] appstate: active → inactive (was active for 797ms)
+[2026-08-24T23:57:37.184Z] [debug] appstate: background → active (was background for 61283ms)
+[2026-08-24T23:57:37.183Z] [debug] qwen-watchdog: holding reinit — foreground has not settled (8000ms). App-switching must not cost a ~425MB load.
+[2026-08-24T23:56:36.146Z] [debug] qwen-watchdog: app is backgrounded — holding revival until foreground (status='idle').
+[2026-08-24T23:56:36.039Z] [debug] persist sizes(KB): total=140 player=24 wm=32[rooms=10 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=82 scene=2
+[2026-08-24T23:56:35.901Z] [debug] appstate: inactive → background (was inactive for 915ms)
+[2026-08-24T23:56:34.986Z] [debug] appstate: active → inactive (was active for 18976ms)
+[2026-08-24T23:56:16.010Z] [debug] appstate: background → active (was background for 14368ms)
+[2026-08-24T23:56:01.642Z] [debug] appstate: inactive → background (was inactive for 888ms)
+[2026-08-24T23:56:01.443Z] [debug] qwen-watchdog: app is backgrounded — holding revival until foreground (status='idle').
+[2026-08-24T23:56:00.754Z] [debug] appstate: active → inactive (was active for 4314ms)
+[2026-08-24T23:55:56.440Z] [debug] appstate: background → active (was background for 55273ms)
+[2026-08-24T23:55:56.439Z] [debug] qwen-watchdog: holding reloads for 90s — the OS just asked for memory back and a reload is the biggest thing we could do to it.
+[2026-08-24T23:55:01.531Z] [debug] memory: NOTHING TO RELEASE — no model was loaded (qwen='failed'), so this freed 0 bytes. The pressure is coming from something else.
+[2026-08-24T23:55:01.398Z] [debug] ⚠⚠ MEMORY WARNING #1 from the OS (first this session) — app=background · qwen='failed' · voice='ready' · reloads=0. The system is asking for memory back; a freeze or a kill can follow.
+[2026-08-24T23:55:01.167Z] [debug] appstate: inactive → background (was inactive for 980ms)
+[2026-08-24T23:55:00.189Z] [debug] appstate: active → inactive (was active for 3321ms)
+[2026-08-24T23:54:56.865Z] [debug] qwen: LOAD FAILED — Load failed: Failed to load the model
+[2026-08-24T23:54:50.821Z] [reward] ✦ Trail Rations, Aether Residue, +12 TC.
+[2026-08-24T23:54:50.821Z] [world] ★★ STORY THREAD COMPLETE — You wedge yourself into the gap. At the bottom — a small antechamber, half-flooded, with three sealed jars on a shelf. You take what you can carry.
+[2026-08-24T23:54:50.819Z] [debug] route: hook intercept (kind=thread, target="bench") — original intent=investigate
+[2026-08-24T23:54:50.818Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=bench resolved=bench range=- enemies=0 hooks=1
+[2026-08-24T23:54:50.817Z] [player] investigate bench
+[2026-08-24T23:54:49.545Z] [debug] ui: tap "take / salvage"
+[2026-08-24T23:54:47.302Z] [debug] send-log: flushed to Sentry
+[2026-08-24T23:54:42.454Z] [debug] ═══ SESSION 2026-08-24T23:54:42.452Z · build 2026-08-24-1495-finish-this-fight-first · previous entry moments earlier ═══
+[2026-08-24T23:54:42.145Z] [arbiter] The Arbiter looks up as you return. "Welcome back, Verbal. I wondered when you'd take up the thread again."
+[2026-08-24T23:54:42.145Z] [world] You step back into Builders' Survey Camp. The world waits for your move.
+[2026-08-24T23:54:42.145Z] [debug] OTA session start: 2026-08-24-1495-finish-this-fight-first.
+[2026-08-24T23:54:39.663Z] [debug] voice⏱ gap 1491ms (wait 0ms + synth 1482ms, live) "Choose your character."
+[2026-08-24T23:54:38.139Z] [debug] voice: bundled ready
+[2026-08-24T23:54:32.845Z] [debug] voice: bundled loading
+[2026-08-24T23:54:32.845Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-08-24T23:54:32.722Z] [debug] ota: boot check result = noUpdate
+[2026-08-24T23:54:32.722Z] [debug] ota: Already up to date
+[2026-08-24T23:54:32.615Z] [debug] ota: Checking…
+[2026-08-24T23:54:32.615Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=01a03601-bbaa-7063-87e8-949212604775
+[2026-08-24T23:53:39.545Z] [debug] appstate: inactive → background (was inactive for 958ms)
+[2026-08-24T23:53:38.587Z] [debug] appstate: active → inactive (was active for 1895ms)
+[2026-08-24T23:53:36.692Z] [debug] appstate: background → active (was background for 1727ms)
+[2026-08-24T23:53:35.178Z] [debug] persist sizes(KB): total=140 player=24 wm=32[rooms=10 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=82 scene=2
+[2026-08-24T23:53:34.965Z] [debug] appstate: inactive → background (was inactive for 109ms)
+[2026-08-24T23:53:34.856Z] [debug] appstate: active → inactive (was active for 3277ms)
+[2026-08-24T23:53:31.580Z] [debug] appstate: background → active (was background for 744ms)
+[2026-08-24T23:53:30.835Z] [debug] appstate: inactive → background (was inactive for 926ms)
+[2026-08-24T23:53:29.909Z] [debug] appstate: active → inactive (was active for 855ms)
+[2026-08-24T23:53:29.054Z] [debug] appstate: background → active (was background for 6638ms)
+[2026-08-24T23:53:28.829Z] [debug] qwen-watchdog: app is backgrounded — holding revival until foreground (status='idle').
+[2026-08-24T23:53:22.416Z] [debug] appstate: inactive → background (was inactive for 910ms)
+[2026-08-24T23:53:21.506Z] [debug] appstate: active → inactive (was active for 722ms)
+[2026-08-24T23:53:20.784Z] [debug] appstate: background → active (was background for 10572ms)
+[2026-08-24T23:53:20.784Z] [debug] qwen-watchdog: holding reinit — foreground has not settled (8000ms). App-switching must not cost a ~425MB load.
+[2026-08-24T23:53:10.212Z] [debug] appstate: inactive → background (was inactive for 990ms)
+[2026-08-24T23:53:09.223Z] [debug] appstate: active → inactive (was active for 8000ms)
+[2026-08-24T23:53:01.222Z] [debug] appstate: background → active (was background for 564ms)
+[2026-08-24T23:53:00.658Z] [debug] appstate: inactive → background (was inactive for 1099ms)
+[2026-08-24T23:52:59.563Z] [debug] appstate: active → inactive (was active for 13776ms)
+[2026-08-24T23:52:47.478Z] [debug] persist sizes(KB): total=141 player=24 wm=32[rooms=10 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=83 scene=2
+[2026-08-24T23:52:47.243Z] [world] ★ STORY THREAD (step 1) — You pull the rubble aside. A draft of cold, old air, and a tight passage angling down into the dark.
+[2026-08-24T23:52:47.240Z] [debug] route: hook intercept (kind=thread, target="bench") — original intent=investigate
+[2026-08-24T23:52:47.239Z] [debug] parser: intent=investigate conf=1.00 verb=investigate target=bench resolved=bench range=- enemies=0 hooks=1
+[2026-08-24T23:52:47.238Z] [player] investigate bench
+[2026-08-24T23:52:46.039Z] [reward]     • Worn Tartarian Coin x5 (Common)
+[2026-08-24T23:52:46.039Z] [reward]     • Aether Dust x3 (Common)
+[2026-08-24T23:52:46.039Z] [reward]     • Hollow Quill Sheaf (Uncommon)
+[2026-08-24T23:52:46.038Z] [reward]     • Automaton Circuit x2 (Common)
+[2026-08-24T23:52:46.038Z] [reward]     • Aether Crystal x2 (Common)
+[2026-08-24T23:52:46.038Z] [reward] ✦ Salvage haul:
+[2026-08-24T23:52:46.037Z] [world] You break the stripped vault relic pedestal apart. Among the pieces, something worth keeping.
+[2026-08-24T23:52:46.037Z] [world] You break the leaning engine chamber scaffolding apart. Among the pieces, something worth keeping.
+[2026-08-24T23:52:46.037Z] [world] You strip the lantern carefully. Something usable comes free in your hand.
+[2026-08-24T23:52:46.036Z] [world] You work the cushion apart and come away with a curiosity — no catalog name, but real weight in the hand.
+[2026-08-24T23:52:46.036Z] [world] You salvage the cracked sentinel diagnostic console. The take is small but real.
+[2026-08-24T23:52:46.036Z] [world] You strip the broken royal vault pedestal carefully. Something usable comes free in your hand.
+[2026-08-24T23:52:45.781Z] [debug] qwen: LOAD FAILED — Load failed: Failed to load the model
+[2026-08-24T23:52:44.560Z] [reward] ✦ Echoing Steps Boots (Common).
+[2026-08-24T23:52:44.560Z] [world] You lift the Echoing Steps Boots clear.
+[2026-08-24T23:52:44.554Z] [reward] ✦ Bone Sling (Common).
+[2026-08-24T23:52:44.550Z] [world] You pick up the Bone Sling.
+[2026-08-24T23:52:41.781Z] [debug] stats: STR14 DEX13 INT8 WIS6 CHA9 STE3 | gear: INT+2,DEX+8,STR+2 | worn: main=Tartarian Spear off=Bolt-Caster head=Aetheric Helm of Insight chest=Reclaimer's Salvage Vest hands=Stone-Grip Gloves legs=Aetheric Scout Greaves feet=Stone-Warden's Footwraps cloak=Architect's Field Jacket
+[2026-08-24T23:52:41.703Z] [debug] take&wear: equipping "Stone-Warden's Footwraps" -> feet
+[2026-08-24T23:52:41.668Z] [reward] ✦ Stone-Warden's Footwraps (Uncommon).
+[2026-08-24T23:52:41.649Z] [world] You take the Stone-Warden's Footwraps from where it lay.
+[2026-08-24T23:52:41.480Z] [debug] ui: tap "⬆ Take & wear Stone-Warden's Footwraps"
+[2026-08-24T23:52:41.309Z] [debug] ui: tap "take / salvage"
+[2026-08-24T23:52:32.823Z] [arbiter] "You could rest here," the Arbiter says. "Or push on. Tartaria does not insist."
+[2026-08-24T23:52:32.822Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-24T23:52:32.822Z] [world] You think back to the bench from earlier — the salvage you pulled from it. Something here reminds you of it.
+[2026-08-24T23:52:32.822Z] [world] Paths: north to Bench. (Type 'leave outpost' to head into the wilds.)
+[2026-08-24T23:52:32.822Z] [world] You have been here. The shape of it comes back before the details do.
+[2026-08-24T23:52:32.821Z] [world] Stone Builders' Workshop — The Plan Room. A room with one drafting table and a single Aether-lamp. The Builders sit here when a structural problem refuses to yield on the workshop floor.
+[2026-08-24T23:52:32.780Z] [debug] scene: loc=builders_survey_camp hub=outpost_chapel arrival=n opening=n passing=n
+[2026-08-24T23:52:32.780Z] [world] You head on to the Plan Room.
+[2026-08-24T23:52:32.768Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=0
+[2026-08-24T23:52:32.754Z] [player] go south
+[2026-08-24T23:52:32.611Z] [debug] ui: tap "↓ ✓ PLAN ROOM"
+[2026-08-24T23:52:26.332Z] [debug] send-log: flushed to Sentry
+[2026-08-24T23:52:12.675Z] [debug] voice⏱ gap 3379ms (wait 0ms + synth 3376ms, live) "Choose your character."
+[2026-08-24T23:52:10.519Z] [debug] ═══ SESSION 2026-08-24T23:52:10.516Z · build 2026-08-24-1495-finish-this-fight-first · updated from 2026-08-24-1494-the-log-says-which-era · previous entry moments earlier ═══
+[2026-08-24T23:52:10.055Z] [arbiter] The Arbiter sets the quiet aside. "Welcome back, Verbal. I kept watch while you were gone."
+[2026-08-24T23:52:10.054Z] [world] You step back into Builders' Survey Camp. The world waits for your move.
+[2026-08-24T23:52:10.053Z] [debug] OTA session start: 2026-08-24-1495-finish-this-fight-first.
+[2026-08-24T23:52:10.053Z] [debug] OTA applied: 2026-08-24-1494-the-log-says-which-era → 2026-08-24-1495-finish-this-fight-first.
+[2026-08-24T23:52:09.260Z] [debug] voice: bundled ready
+[2026-08-24T23:52:04.167Z] [debug] voice: bundled loading
+[2026-08-24T23:51:59.566Z] [debug] voice: bundled downloading
+[2026-08-24T23:51:56.678Z] [debug] voice: bundled loading
+[2026-08-24T23:51:56.662Z] [debug] voice: engine=bundled tts=on voice=am_michael
+[2026-08-24T23:51:56.178Z] [debug] ota: boot check result = noUpdate
+[2026-08-24T23:51:56.177Z] [debug] ota: Already up to date
+[2026-08-24T23:51:55.456Z] [debug] ota: Checking…
+[2026-08-24T23:51:55.456Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=01a03601-bbaa-7063-87e8-949212604775
+[2026-08-24T23:51:51.010Z] [debug] ota: Restarting to apply…
+[2026-08-24T23:51:50.956Z] [debug] ota: Saving progress…
+[2026-08-24T23:51:50.253Z] [debug] ota: Downloading update… (a large update can take a minute)
+[2026-08-24T23:51:43.151Z] [debug] ota: Checking…
+[2026-08-24T23:51:43.151Z] [debug] ota: boot check — enabled=true channel=preview rt=2.4.1 updateId=01a035de-f1e7-7c82-b17e-0e3c57db80a5
+[2026-08-24T23:51:36.591Z] [reward]     • Salt-Cured Dowel (Common)
+[2026-08-24T23:51:36.591Z] [reward] ✦ Salvage haul:
+[2026-08-24T23:51:36.591Z] [world] Tucked inside the bench: an oddment that matches no quartermaster's list. The kind of thing that fuses well.
+[2026-08-24T23:51:36.481Z] [debug] qwen-watchdog: Qwen not ready (status='idle'); reinitializing (attempt #2).
+[2026-08-24T23:51:35.069Z] [debug] ui: tap "take / salvage"
+[2026-08-24T23:51:33.542Z] [debug] persist sizes(KB): total=138 player=20 wm=32[rooms=10 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=84 scene=2
+[2026-08-24T23:51:33.428Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-24T23:51:33.428Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-24T23:51:33.428Z] [world] Halem the Trader sets down what they're holding. "Didn't expect you today, Verbal."
+[2026-08-24T23:51:33.427Z] [world] Paths: south to Plan Room · east to Plan Floor · west to Crew. (Type 'leave outpost' to head into the wilds.)
+[2026-08-24T23:51:33.427Z] [world] Same silt, same lean, same everything.
+[2026-08-24T23:51:33.427Z] [world] Stone Builders' Workshop — The Mess Bench. A workshop break-room with iron-leg tables and tin plates. Halem feeds whoever can hold a tool; the food is hot, plenty, and gone in an hour.
+[2026-08-24T23:51:33.391Z] [debug] scene: loc=builders_survey_camp hub=outpost_messhall arrival=n opening=n passing=n
+[2026-08-24T23:51:33.391Z] [world] You head on to the Bench.
+[2026-08-24T23:51:33.390Z] [debug] parser: intent=travel conf=1.00 verb=go target=north resolved=- range=- enemies=0 hooks=0
+[2026-08-24T23:51:33.390Z] [player] go north
+[2026-08-24T23:51:33.365Z] [debug] ui: tap "↑ ✓ BENCH"
+[2026-08-24T23:51:32.289Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-24T23:51:32.289Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-24T23:51:32.281Z] [world] Paths: north to Bench. (Type 'leave outpost' to head into the wilds.)
+[2026-08-24T23:51:32.281Z] [world] Stone Builders' Workshop — The Plan Room. A room with one drafting table and a single Aether-lamp. The Builders sit here when a structural problem refuses to yield on the workshop floor.
+[2026-08-24T23:51:32.279Z] [debug] spawn: gear=[Stone-Warden's Footwraps, Bone Sling, Echoing Steps Boots] window=10 roster=new
+[2026-08-24T23:51:32.274Z] [debug] scene: loc=builders_survey_camp hub=outpost_chapel arrival=n opening=n passing=n
+[2026-08-24T23:51:32.274Z] [world] You head on to the Plan Room.
+[2026-08-24T23:51:32.273Z] [debug] parser: intent=travel conf=1.00 verb=go target=south resolved=- range=- enemies=0 hooks=0
+[2026-08-24T23:51:32.272Z] [player] go south
+[2026-08-24T23:51:32.219Z] [debug] ui: tap "↓ PLAN ROOM"
+[2026-08-24T23:51:29.195Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-24T23:51:29.195Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-24T23:51:29.195Z] [world] Halem the Trader sets down what they're holding. "Didn't expect you today, Verbal."
+[2026-08-24T23:51:29.195Z] [world] Paths: south to Plan Room · east to Plan Floor · west to Crew. (Type 'leave outpost' to head into the wilds.)
+[2026-08-24T23:51:29.194Z] [world] Nothing here has bothered to change on your account.
+[2026-08-24T23:51:29.194Z] [world] Stone Builders' Workshop — The Mess Bench. A workshop break-room with iron-leg tables and tin plates. Halem feeds whoever can hold a tool; the food is hot, plenty, and gone in an hour.
+[2026-08-24T23:51:29.150Z] [debug] scene: loc=builders_survey_camp hub=outpost_messhall arrival=n opening=n passing=n
+[2026-08-24T23:51:29.149Z] [world] You head on to the Bench.
+[2026-08-24T23:51:29.148Z] [debug] parser: intent=travel conf=1.00 verb=go target=east resolved=- range=- enemies=0 hooks=0
+[2026-08-24T23:51:29.147Z] [player] go east
+[2026-08-24T23:51:29.103Z] [debug] ui: tap "→ ✓ BENCH"
+[2026-08-24T23:51:27.132Z] [reward]     • Aetheric Shard (Uncommon)
+[2026-08-24T23:51:27.132Z] [reward]     • Worn Tartarian Coin x2 (Common)
+[2026-08-24T23:51:27.132Z] [reward]     • Dried Tendon Coil (Common)
+[2026-08-24T23:51:27.131Z] [reward]     • Aether Dust x3 (Common)
+[2026-08-24T23:51:27.131Z] [reward]     • Smooth Stone x2 (Common)
+[2026-08-24T23:51:27.131Z] [reward]     • Cloth Scrap (Common)
+[2026-08-24T23:51:27.130Z] [reward] ✦ Salvage haul:
+[2026-08-24T23:51:27.130Z] [world] You work the shelf over. A part of it comes loose, intact.
+[2026-08-24T23:51:27.129Z] [world] You break the shattered forgotten order reliquary apart. Among the pieces, something worth keeping.
+[2026-08-24T23:51:27.129Z] [world] The pack gives up something irregular. Nobody authored this piece; the forge will take it all the same.
+[2026-08-24T23:51:27.128Z] [world] You salvage the mud-glazed royal display case. The take is small but real.
+[2026-08-24T23:51:27.128Z] [world] You strip the lantern carefully. Something usable comes free in your hand.
+[2026-08-24T23:51:27.127Z] [world] You salvage the half-buried maintenance tunnel ladder. The take is small but real.
+[2026-08-24T23:51:27.127Z] [world] You salvage the curtain. The take is small but real.
+[2026-08-24T23:51:26.202Z] [reward] ✦ Forgotten Leggings (Common).
+[2026-08-24T23:51:26.201Z] [world] Where the Forgotten Leggings was, the ground is a shade darker.
+[2026-08-24T23:51:26.185Z] [reward] ✦ Bone Shiv (Stealth) (Common).
+[2026-08-24T23:51:26.185Z] [world] The Bone Shiv (Stealth) leaves a shape behind it in the mud, filling slowly.
+[2026-08-24T23:51:24.933Z] [debug] ui: tap "take / salvage"
+[2026-08-24T23:51:23.571Z] [debug] arbiter: flavor held (budget — one per tile, 25s apart)
+[2026-08-24T23:51:23.571Z] [debug] arbiter: template (reason=qwen-not-ready)
+[2026-08-24T23:51:23.562Z] [world] Paths: east to Bench. (Type 'leave outpost' to head into the wilds.)
+[2026-08-24T23:51:23.561Z] [world] Stone Builders' Workshop — The Crew Bunks. Sturdy bunks with tool-racks at the foot of each. Sawdust on the floor. The Builders sleep when the day's set work is mortared.
+[2026-08-24T23:51:23.559Z] [debug] spawn: gear=[Forgotten Leggings, Bone Shiv (Stealth)] window=10 roster=new
+[2026-08-24T23:51:23.551Z] [debug] scene: loc=builders_survey_camp hub=outpost_quarters arrival=n opening=n passing=n
+[2026-08-24T23:51:23.550Z] [world] You head on to the Crew.
+[2026-08-24T23:51:23.549Z] [debug] parser: intent=travel conf=1.00 verb=go target=west resolved=- range=- enemies=0 hooks=0
+[2026-08-24T23:51:23.549Z] [player] go west
+[2026-08-24T23:51:23.503Z] [debug] ui: tap "← CREW"
+[2026-08-24T23:51:22.100Z] [debug] persist sizes(KB): total=138 player=20 wm=32[rooms=10 events=0 memos=0 npcs=1 defeated=0 tags=0 discovered=0] log=84 scene=2
+[2026-08-24T23:51:21.590Z] [reward]     • Split Slate Piece (Common)
+[2026-08-24T23:51:21.590Z] [reward]     • Scrap Metal x6 (Common)
+[2026-08-24T23:51:21.590Z] [reward]     • Mud Fragment (Common)
+[2026-08-24T23:51:21.589Z] [reward] ✦ Salvage haul:
+[2026-08-24T23:51:21.589Z] [world] You break the weathered forgotten order reliquary down. Among the pieces, a fragment of someone's writing — held against the world by stubbornness alone.
+[2026-08-24T23:51:21.588Z] [world] Behind the tilting grand spire capacitor, where the floods didn't reach: a single page, in a hand you haven't read before.
+[2026-08-24T23:51:21.588Z] [world] You salvage the stripped maintenance panel. The take is small but real.
+[2026-08-24T23:51:21.587Z] [world] You crack the shelf open. A page slides out — paper somehow dry, ink somehow still legible.
+[2026-08-24T23:51:21.587Z] [world] The rusted royal vault pedestal gives up something irregular. Nobody authored this piece; the forge will take it all the same.
+
+=== END REPORT ===
