@@ -28314,6 +28314,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // along: the fifth "they" line, "before they is gone for good", in the first beat
 // of the bleed-out ladder - the class OTA-1714's scanner skipped, now instrumented.
 export const OTA_BUILD_ID = '2026-09-06-1715-the-dog-that-was-greyed-out';
+// golem catch-up 2026-09-06: markerless publish of OTA-1715 - the dog that was
+// greyed out forever. A healed dog now comes off the bench instead of staying
+// benched and refused for the rest of the save, and a benched dog answers every
+// tap instead of going silent after the first. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-06-1714-the-dog-is-called-they';
 // golem catch-up 2026-09-06: markerless publish of OTA-1714 - the dog is called
 // they. Four hunger/bleed-out lines now read correctly for every pronoun the
