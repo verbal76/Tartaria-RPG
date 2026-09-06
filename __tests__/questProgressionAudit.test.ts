@@ -68,6 +68,7 @@ const _origErr = console.error;
 import { useGameStore } from '../app/state/gameStore';
 import { getRaces, getFactions } from '../app/engine/character';
 import { FACTION_QUESTS } from '../app/engine/factionQuests';
+import { escortSpecForQuest } from '../app/engine/escort';
 import { missionObjectiveLocationId } from '../app/engine/missionRouting';
 import { HUNTS } from '../app/engine/hunts';
 import { MYSTERIES } from '../app/engine/mysteries';
@@ -509,6 +510,21 @@ describe('Quest progression audit', () => {
               ...s.player.inventory,
               { id: `fetch_${q.id}`, name: fetchReq.itemName, kind: 'misc' as const, rarity: 'Common' as const, quantity: fetchReq.quantity, tags: [] },
             ],
+          },
+        } : s));
+      }
+
+      // ⚠ OTA-1711 — an ESCORT will not be handed back on the spot it was picked
+      // up from, because that means nobody was escorted anywhere. Same shape as
+      // the fetch block above: satisfy the precondition rather than simulate it,
+      // by standing the pickup cell somewhere other than here — which is what
+      // "you carried these people" means to the turn-in.
+      if (escortSpecForQuest(q)) {
+        store.setState((s) => (s.player ? {
+          player: {
+            ...s.player,
+            activeFactionQuests: (s.player.activeFactionQuests ?? []).map((r) =>
+              r.id === q.id ? { ...r, acceptedAtCell: { x: -99, y: -99 } } : r),
           },
         } : s));
       }

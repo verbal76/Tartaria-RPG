@@ -28246,7 +28246,21 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // stages, spend the money, hand in, and it paid out in full. The gate moved to
 // factionQuestReady, where the READY pill, the route swap, the auto-submit
 // sweep and the turn-in all read one answer, and the refusal says the number.
-export const OTA_BUILD_ID = '2026-09-06-1710-the-ledger-is-audited';
+// 2026-09-06 OTA-1711 - THE ESCORT HAS TO GO SOMEWHERE. Step 3d, and the probe
+// found the work was optional. Escort is 29 of the 65 faction contracts, the
+// largest family in the game. Accept one from an agent, hand it straight back
+// to THAT SAME AGENT without moving a step, and it completed and paid in full -
+// the party spawns at full health so the scaled multiplier is 1, and nothing on
+// the turn-in path asked where anybody had been. `send word` did the same from
+// anywhere on the map. Two refusals now, both mirroring rules this file already
+// keeps: you cannot courier people (the fetch rule's own objection, with more of
+// it), and you cannot hand a party back on the spot you collected them from. The
+// rule is deliberately the weakest one that closes it - no escort names a
+// destination, so "you went somewhere" is all that can be checked without
+// inventing 29 of them - and it reads the acceptedAtCell the long-haul bonus
+// already prices, so the gate and the reward cannot disagree about the journey.
+export const OTA_BUILD_ID = '2026-09-06-1711-the-escort-has-to-go-somewhere';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-06-1710-the-ledger-is-audited';
 // golem catch-up 2026-09-06: markerless publish of OTA-1710 - the ledger is
 // audited. Step 3c: faction contracts get a probe set of their own, and the
 // wealth gate a player could walk past by spending is closed. hal took the marker.

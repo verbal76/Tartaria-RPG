@@ -127,3 +127,36 @@ export function escortToggleLabel(tracked: boolean, party: { label: string } | n
   if (tracked) return party ? `▮▮ DEACTIVATE (stand down your ${party.label})` : '▮▮ DEACTIVATE';
   return party ? `▶ SET ACTIVE (recall your ${party.label})` : '▶ SET ACTIVE — the mission you’re on';
 }
+
+/** ⚠⚠⚠ OTA-1711 — AN ESCORT IS A DELIVERY, AND NOTHING WAS CHECKING THAT.
+ *
+ *  Measured by the step-3d probe, on the plainest path there is: accept an
+ *  escort from an agent, hand it straight back to THAT SAME AGENT without
+ *  moving, and the contract completes and pays in full — 70 TC and 8 rep on
+ *  "The Survey Line", 160 on "The Founder's Bones". The party spawns at full
+ *  health, so the scaled-pay multiplier is 1, and turn-in never asked where
+ *  anybody had been. 29 of the 65 faction contracts are this shape, which makes
+ *  it the largest family in the game and the one whose work is skippable.
+ *
+ *  ⚠ THE RULE IS THE WEAKEST ONE THAT CLOSES IT, deliberately. Every escort
+ *  objective reads *"escort them to a <faction> agent"* — not to a NAMED place;
+ *  none of the 29 carries a `targetLocationName` or an `objectiveLocationId`.
+ *  So there is no destination to check against, and inventing one would rewrite
+ *  29 contracts on my own authority. What CAN be said without inventing
+ *  anything is that the party has to have gone somewhere: you may not hand
+ *  people back on the spot you collected them from.
+ *
+ *  ⚠ It reads `acceptedAtCell`, which is already stamped at accept and already
+ *  read one line below the turn-in for the long-haul bonus — so this needs no
+ *  new state, and it cannot disagree with the bonus that prices the same walk.
+ *
+ *  ⚠ FAILS OPEN ON MISSING DATA. A contract accepted before this OTA has no
+ *  cell stamped, and refusing those would strand a party the player is already
+ *  carrying. An un-stamped escort delivers exactly as it does today. */
+export function escortWasCarried(
+  acceptedAtCell: { x: number; y: number } | null | undefined,
+  hereCell: { x: number; y: number },
+): boolean {
+  if (!acceptedAtCell) return true;
+  return Math.abs(hereCell.x - acceptedAtCell.x) + Math.abs(hereCell.y - acceptedAtCell.y) > 0;
+}

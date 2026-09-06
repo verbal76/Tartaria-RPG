@@ -71,6 +71,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { useGameStore } from '../app/state/gameStore';
 import { FACTION_QUESTS } from '../app/engine/factionQuests';
+import { escortSpecForQuest } from '../app/engine/escort';
 import { possessive, wrongCounterpartyBody } from '../app/engine/contractRefusal';
 import { FACTIONS } from '../app/engine/factions';
 import { blockAt } from '../test-utils/srcBlock';
@@ -82,10 +83,28 @@ const screen = src('app', 'screens', 'ContractsScreen.tsx');
 
 /** A non-fetch, non-staged deed — the kind a runner is allowed to carry. */
 function courierableDeed() {
-  const def = FACTION_QUESTS.find((q) => !q.fetch && (!q.stages || q.stages.length === 0));
+  // ⚠⚠ OTA-1711 — AND NOT AN ESCORT, WHICH MOVED WHAT "COURIERABLE" MEANS.
+  //
+  // The selector used to be "no fetch, no stages", and this helper's own name
+  // stopped being true the moment escorts were barred from the courier: EVERY
+  // stage-less, fetch-less faction contract in the catalog is an escort, so
+  // that selector could only ever pick one. (Measured — swapping the old
+  // predicate in throws "no courierable deed in the catalog".)
+  //
+  // What a runner can still carry is a STAGED deed whose work is behind you:
+  // fetch is barred because you cannot mail the goods, escort because you
+  // cannot mail people, and that leaves the contracts whose only remaining act
+  // is the word itself. The CLAIM under test is unchanged — a remote hand-in
+  // reaches the payout rather than printing the wrong-counterparty refusal.
+  const def = FACTION_QUESTS.find(
+    (q) => !q.fetch && !escortSpecForQuest(q) && !q.tcThreshold && (q.stages?.length ?? 0) > 0,
+  );
   if (!def) throw new Error('no courierable deed in the catalog');
   return def;
 }
+
+/** The stage a courierable deed has to be at for its work to be done. */
+const finishedStage = (def: { stages?: readonly unknown[] }): number => def.stages?.length ?? 0;
 
 function standOnMismatchedGround(deedId: string): void {
   useGameStore.setState({
@@ -103,7 +122,10 @@ function standOnMismatchedGround(deedId: string): void {
       // theirs. hubRoomId null = standing OUTSIDE, which is where the owner was.
       ...placedAt('architect_blind'), hubRoomId: null,
       activeFactionQuestIds: [deedId],
-      activeFactionQuests: [{ id: deedId, stage: 0, tracked: true }],
+      // ⚠ OTA-1711 — at the FINAL beat. A courierable deed is one whose work is
+      // behind you; stage 0 would now be refused by the stage gate, which is a
+      // different refusal from the one this file is about.
+      activeFactionQuests: [{ id: deedId, stage: finishedStage(courierableDeed()), tracked: true }],
       activeQuests: [], activeHunts: [], activeMysteries: [], activeStorylines: [],
     } as never,
     currentScene: null, contractsNotice: null, gameLog: [],

@@ -77,6 +77,7 @@ import {
   wrongCounterpartyLine,
 } from '../../engine/contractRefusal';
 import { findFactionQuestById, availableFactionQuests, factionOfFactionQuest } from '../../engine/factionQuests';
+import { escortSpecForQuest, escortWasCarried } from '../../engine/escort';
 import { HUNTS, findHuntById, availableHunts, fuzzyFindHunt, scaleHuntBoss, scaleHuntEscort, firstActionableHuntStage, huntBlockReason, emptyBoardTally, emptyBoardLine } from '../../engine/hunts';
 import { firstActionableStage as QS_firstActionableStage } from '../../engine/questStage';
 import { MYSTERIES, findMysteryById, availableMysteries, fuzzyFindMystery } from '../../engine/mysteries';
@@ -1404,6 +1405,35 @@ export const createQuestSlice = (
     // remotely (you can't mail the goods). Refuse a remote turn-in for a fetch
     // contract; it has to change hands in person. (Non-fetch contracts may still
     // be couriered for a reduced cut — handled by their own turn-in paths.)
+    // ⚠⚠⚠ OTA-1711 — AND YOU CANNOT MAIL PEOPLE EITHER.
+    //
+    // The clause below refuses to courier a FETCH deed because "you cannot mail
+    // the goods". An escort is the same objection with more of it: measured by
+    // the step-3d probe, `send word` on a freshly accepted escort completed it
+    // and paid, from anywhere, with the party still standing where you left
+    // them. Whatever a runner can carry, it is not a party of people.
+    if (remote && escortSpecForQuest(candidate)) {
+      get().appendLog(
+        'arbiter',
+        `The Arbiter shakes their head. "${candidate.title} is people, not paper. Walk them in yourself — no runner is carrying that."`,
+      );
+      return;
+    }
+    // ⚠⚠ AND AN ESCORT CANNOT BE HANDED BACK WHERE IT WAS PICKED UP. See
+    // escortWasCarried for the measurement and for why the rule is this weak:
+    // no escort names a destination, so "you went somewhere" is the strongest
+    // thing that can be checked without inventing 29 of them.
+    if (escortSpecForQuest(candidate) && activeRecord) {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const WM = require('../../engine/worldMap') as typeof import('../../engine/worldMap');
+      if (!escortWasCarried(activeRecord.acceptedAtCell, WM.canonicalCellOf(player.currentLocationId))) {
+        get().appendLog(
+          'arbiter',
+          `${sourceLabel} looks past you at the ${escortSpecForQuest(candidate)!.label}. "You have not taken them anywhere. Walk them somewhere they need to be, then we will settle."`,
+        );
+        return;
+      }
+    }
     if (remote && candidate.fetch) {
       const fLabel = factionDisplayName(candidate.factionId);
       get().appendLog(
