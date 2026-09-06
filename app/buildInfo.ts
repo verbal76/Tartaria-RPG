@@ -28234,6 +28234,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // breadcrumb so one failure cannot be counted twice, and the guards weigh the
 // observed half beside the inferred one. Never on a CANCELLED load - OTA-1405.
 export const OTA_BUILD_ID = '2026-09-06-1709-the-failure-we-watched-is-written-down';
+// golem catch-up 2026-09-06: markerless publish of OTA-1709 - the failure we
+// watched is written down. An observed model-load failure is now recorded with
+// its cause instead of being re-inferred a boot later. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-06-1708-the-armour-spread-reaches-the-player';
 // golem catch-up 2026-09-06: markerless publish of OTA-1708 - the armour
 // spread reaches the player. Stage 2 of the stat rebalance, plus the finding
