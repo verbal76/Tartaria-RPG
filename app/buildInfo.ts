@@ -28379,6 +28379,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // arithmetic is a pure module, so "can the player reach SEND on an iPhone SE 3"
 // is run as a test on five device profiles rather than claimed.
 export const OTA_BUILD_ID = '2026-09-06-1718-the-keyboard-ate-send';
+// golem catch-up 2026-09-06: markerless publish of OTA-1718 - the keyboard ate
+// the send button. Report A Bug, Designer Note, Invite a Playtester and both
+// naming modals stay actionable with the keyboard open; the card's ceiling is the
+// keyboard's measured top edge and the buttons are pinned. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-06-1717-one-dog-one-clock';
 // golem catch-up 2026-09-06: markerless publish of OTA-1717 - one dog, one clock.
 // The dog's two loyalty systems are one; each band speaks once instead of twice,
