@@ -28208,7 +28208,21 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // three causes OTA-985 and arb126 have since closed - so it is re-armed at
 // TWO crashes on the same build, falling through to the system voice by the
 // route arb54 already proved. Nothing goes unspoken; only the voice changes.
-export const OTA_BUILD_ID = '2026-09-06-1707-the-voice-steps-aside';
+// 2026-09-06 OTA-1708 — THE ARMOUR SPREAD REACHES THE PLAYER. Stage 2 of the
+// owner's rebalance, and the measurement that came with it: stage 1 was never
+// arriving. Armour pays `statBonuses` (equipment.ts uses `?? `, and all 288
+// rows have that field), while OTA-1670 authored only `statBonus` - so the
+// spread the player actually received was still dexterity 46.9%, the very
+// pile stage 1 was written to break up. The rule now authors both, never
+// across the attribute/hp line, so no amount changes meaning: 405 attribute
+// entries and 134 hp entries before and after, and the paid spread closes
+// from 46.9-5.7% to 27.9-12.3%. Stage 2 itself adds a GARMENT tier between
+// identity and slot - a mask conceals, a robe is worn to be seen - three
+// missing identity words, and a word-boundary fix that makes two entries
+// reachable that never could fire. The saved-gear migration was following
+// the unpaid field too, and on 42 rows that deleted a bonus outright.
+export const OTA_BUILD_ID = '2026-09-06-1708-the-armour-spread-reaches-the-player';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-06-1707-the-voice-steps-aside';
 // golem catch-up 2026-09-06: markerless publish of OTA-1707 - the voice steps
 // aside. The bundled neural voice yields to the system voice after two crashes
 // on one build, and the player is told. hal took the marker.

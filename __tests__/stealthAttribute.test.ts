@@ -48,7 +48,14 @@ describe('createCharacter — every new character gets a race-rolled Stealth', (
   });
 });
 
-describe('Salvager\'s Trench Coat feeds the Stealth attribute', () => {
+// ⚠ OTA-1708 RE-ANCHORED, and the CLAIM is unchanged: a cloak can feed the
+// Stealth attribute, which is what OTA-348 built and what this guards. The
+// example moved because the rebalance moved it — "Salvager's" is an identity
+// noun on the intelligence line ("the ones who sort salvage"), so that coat now
+// reads intelligence, while stealth as a channel grew from 23 paid entries to
+// 44. A cloak that still says stealth by name is the better example anyway: it
+// tests the wiring rather than one row's authoring.
+describe('a stealth cloak feeds the Stealth attribute', () => {
   function playerWith(stealthBase: number, cloak?: string): PlayerCharacter {
     const p = createCharacter({ name: 'Tester', raceId: 'reclaimer', factionId: 'mud_monarchs' } as never);
     p.stats.stealth = stealthBase;
@@ -56,9 +63,9 @@ describe('Salvager\'s Trench Coat feeds the Stealth attribute', () => {
     return p;
   }
 
-  it('equipping the coat adds +1 effective Stealth (was dropped as flavor pre-348)', () => {
+  it('equipping the cloak adds +1 effective Stealth (was dropped as flavor pre-348)', () => {
     const without = effectiveStats(playerWith(5)).stealth;
-    const withCoat = effectiveStats(playerWith(5, "Salvager's Trench Coat")).stealth;
+    const withCoat = effectiveStats(playerWith(5, 'Mud-Bound Cloak')).stealth;
     expect(withCoat - without).toBe(1);
   });
 });

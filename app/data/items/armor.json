@@ -42,7 +42,7 @@
       },
       "statBonuses": [
         {
-          "stat": "intelligence",
+          "stat": "wisdom",
           "amount": 1
         }
       ],
@@ -142,7 +142,7 @@
       },
       "statBonuses": [
         {
-          "stat": "wisdom",
+          "stat": "charisma",
           "amount": 3
         },
         {
@@ -171,12 +171,12 @@
       "acBonus": 1,
       "resistances": [],
       "statBonus": {
-        "stat": "wisdom",
+        "stat": "charisma",
         "amount": 1
       },
       "statBonuses": [
         {
-          "stat": "intelligence",
+          "stat": "charisma",
           "amount": 1
         }
       ],
@@ -310,7 +310,7 @@
       },
       "statBonuses": [
         {
-          "stat": "intelligence",
+          "stat": "charisma",
           "amount": 3
         },
         {
@@ -409,7 +409,7 @@
       },
       "statBonuses": [
         {
-          "stat": "investigation",
+          "stat": "wisdom",
           "amount": 2
         },
         {
@@ -443,7 +443,7 @@
       },
       "statBonuses": [
         {
-          "stat": "intelligence",
+          "stat": "charisma",
           "amount": 3
         },
         {
@@ -541,7 +541,7 @@
       },
       "statBonuses": [
         {
-          "stat": "intelligence",
+          "stat": "wisdom",
           "amount": 1
         }
       ],
@@ -571,7 +571,7 @@
       },
       "statBonuses": [
         {
-          "stat": "wisdom",
+          "stat": "intelligence",
           "amount": 2
         },
         {
@@ -708,7 +708,7 @@
       },
       "statBonuses": [
         {
-          "stat": "wisdom",
+          "stat": "intelligence",
           "amount": 1
         },
         {
@@ -818,7 +818,7 @@
       },
       "statBonuses": [
         {
-          "stat": "intelligence",
+          "stat": "charisma",
           "amount": 3
         },
         {
@@ -856,7 +856,7 @@
       },
       "statBonuses": [
         {
-          "stat": "intelligence",
+          "stat": "wisdom",
           "amount": 1
         }
       ],
@@ -952,7 +952,7 @@
       },
       "statBonuses": [
         {
-          "stat": "wisdom",
+          "stat": "charisma",
           "amount": 3
         },
         {
@@ -1021,7 +1021,7 @@
       },
       "statBonuses": [
         {
-          "stat": "wisdom",
+          "stat": "intelligence",
           "amount": 1
         }
       ],
@@ -1149,7 +1149,7 @@
       },
       "statBonuses": [
         {
-          "stat": "wisdom",
+          "stat": "charisma",
           "amount": 3
         },
         {
@@ -1213,7 +1213,7 @@
       },
       "statBonuses": [
         {
-          "stat": "charisma",
+          "stat": "stealth",
           "amount": 1
         }
       ],
@@ -1243,7 +1243,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "wisdom",
           "amount": 2
         },
         {
@@ -1312,7 +1312,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "charisma",
           "amount": 3
         },
         {
@@ -1380,7 +1380,7 @@
       "acBonus": 1,
       "resistances": [],
       "statBonus": {
-        "stat": "intelligence",
+        "stat": "charisma",
         "amount": 1
       },
       "statBonuses": [
@@ -1453,7 +1453,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "strength",
           "amount": 3
         },
         {
@@ -1520,12 +1520,12 @@
       "acBonus": 1,
       "resistances": [],
       "statBonus": {
-        "stat": "intelligence",
+        "stat": "stealth",
         "amount": 1
       },
       "statBonuses": [
         {
-          "stat": "charisma",
+          "stat": "stealth",
           "amount": 1
         }
       ],
@@ -1555,7 +1555,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "wisdom",
           "amount": 1
         }
       ],
@@ -1585,7 +1585,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "wisdom",
           "amount": 2
         },
         {
@@ -1619,7 +1619,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "intelligence",
           "amount": 3
         },
         {
@@ -1653,7 +1653,7 @@
       },
       "statBonuses": [
         {
-          "stat": "charisma",
+          "stat": "intelligence",
           "amount": 3
         },
         {
@@ -1721,7 +1721,7 @@
       },
       "statBonuses": [
         {
-          "stat": "charisma",
+          "stat": "intelligence",
           "amount": 1
         }
       ],
@@ -1746,12 +1746,12 @@
       "acBonus": 2,
       "resistances": [],
       "statBonus": {
-        "stat": "wisdom",
+        "stat": "stealth",
         "amount": 2
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "stealth",
           "amount": 2
         },
         {
@@ -1825,7 +1825,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "intelligence",
           "amount": 3
         },
         {
@@ -1858,12 +1858,12 @@
       "acBonus": 1,
       "resistances": [],
       "statBonus": {
-        "stat": "wisdom",
+        "stat": "stealth",
         "amount": 1
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "stealth",
           "amount": 1
         }
       ],
@@ -1922,7 +1922,7 @@
       "acBonus": 2,
       "resistances": [],
       "statBonus": {
-        "stat": "intelligence",
+        "stat": "hp",
         "amount": 2
       },
       "statBonuses": [
@@ -1965,7 +1965,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "intelligence",
           "amount": 3
         },
         {
@@ -2003,7 +2003,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "charisma",
           "amount": 3
         },
         {
@@ -2036,12 +2036,12 @@
       "acBonus": 1,
       "resistances": [],
       "statBonus": {
-        "stat": "wisdom",
+        "stat": "stealth",
         "amount": 1
       },
       "statBonuses": [
         {
-          "stat": "charisma",
+          "stat": "stealth",
           "amount": 1
         }
       ],
@@ -2072,7 +2072,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "wisdom",
           "amount": 1
         }
       ],
@@ -2102,7 +2102,7 @@
       },
       "statBonuses": [
         {
-          "stat": "charisma",
+          "stat": "intelligence",
           "amount": 2
         },
         {
@@ -2136,7 +2136,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "wisdom",
           "amount": 3
         },
         {
@@ -2171,7 +2171,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "charisma",
           "amount": 3
         },
         {
@@ -2205,7 +2205,7 @@
       },
       "statBonuses": [
         {
-          "stat": "charisma",
+          "stat": "stealth",
           "amount": 1
         }
       ],
@@ -2235,7 +2235,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "stealth",
           "amount": 1
         }
       ],
@@ -2260,12 +2260,12 @@
       "acBonus": 2,
       "resistances": [],
       "statBonus": {
-        "stat": "intelligence",
+        "stat": "stealth",
         "amount": 2
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "stealth",
           "amount": 2
         },
         {
@@ -2299,7 +2299,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "stealth",
           "amount": 3
         },
         {
@@ -2329,12 +2329,12 @@
       "acBonus": 4,
       "resistances": [],
       "statBonus": {
-        "stat": "intelligence",
+        "stat": "stealth",
         "amount": 3
       },
       "statBonuses": [
         {
-          "stat": "charisma",
+          "stat": "stealth",
           "amount": 3
         },
         {
@@ -2368,7 +2368,7 @@
       },
       "statBonuses": [
         {
-          "stat": "strength",
+          "stat": "wisdom",
           "amount": 1
         }
       ],
@@ -2602,7 +2602,7 @@
       },
       "statBonuses": [
         {
-          "stat": "strength",
+          "stat": "intelligence",
           "amount": 2
         },
         {
@@ -2667,7 +2667,7 @@
       "acBonus": 4,
       "resistances": [],
       "statBonus": {
-        "stat": "strength",
+        "stat": "hp",
         "amount": 3
       },
       "statBonuses": [
@@ -2770,7 +2770,7 @@
       },
       "statBonuses": [
         {
-          "stat": "strength",
+          "stat": "wisdom",
           "amount": 2
         },
         {
@@ -2833,7 +2833,7 @@
       "acBonus": 4,
       "resistances": [],
       "statBonus": {
-        "stat": "strength",
+        "stat": "charisma",
         "amount": 3
       },
       "statBonuses": [
@@ -3009,7 +3009,7 @@
       },
       "statBonuses": [
         {
-          "stat": "constitution",
+          "stat": "hp",
           "amount": 3
         },
         {
@@ -3151,7 +3151,7 @@
       },
       "statBonuses": [
         {
-          "stat": "constitution",
+          "stat": "hp",
           "amount": 3
         },
         {
@@ -3451,12 +3451,12 @@
       "acBonus": 2,
       "resistances": [],
       "statBonus": {
-        "stat": "strength",
+        "stat": "hp",
         "amount": 2
       },
       "statBonuses": [
         {
-          "stat": "constitution",
+          "stat": "hp",
           "amount": 2
         },
         {
@@ -3564,7 +3564,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "stealth",
           "amount": 1
         }
       ],
@@ -3624,7 +3624,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "wisdom",
           "amount": 2
         },
         {
@@ -3733,7 +3733,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "wisdom",
           "amount": 1
         }
       ],
@@ -3764,7 +3764,7 @@
       },
       "statBonuses": [
         {
-          "stat": "acrobatics",
+          "stat": "strength",
           "amount": 1
         },
         {
@@ -3798,7 +3798,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "strength",
           "amount": 2
         },
         {
@@ -3836,7 +3836,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "intelligence",
           "amount": 3
         },
         {
@@ -3872,7 +3872,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "strength",
           "amount": 3
         },
         {
@@ -3940,7 +3940,7 @@
       },
       "statBonuses": [
         {
-          "stat": "acrobatics",
+          "stat": "intelligence",
           "amount": 1
         }
       ],
@@ -3970,7 +3970,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "wisdom",
           "amount": 2
         },
         {
@@ -4106,7 +4106,7 @@
       },
       "statBonuses": [
         {
-          "stat": "acrobatics",
+          "stat": "intelligence",
           "amount": 1
         }
       ],
@@ -4280,7 +4280,7 @@
       },
       "statBonuses": [
         {
-          "stat": "acrobatics",
+          "stat": "wisdom",
           "amount": 1
         },
         {
@@ -4461,7 +4461,7 @@
       },
       "statBonuses": [
         {
-          "stat": "acrobatics",
+          "stat": "intelligence",
           "amount": 1
         }
       ],
@@ -4626,7 +4626,7 @@
       },
       "statBonuses": [
         {
-          "stat": "acrobatics",
+          "stat": "dexterity",
           "amount": 1
         }
       ],
@@ -4685,12 +4685,12 @@
       "acBonus": 3,
       "resistances": [],
       "statBonus": {
-        "stat": "dexterity",
+        "stat": "charisma",
         "amount": 3
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "charisma",
           "amount": 3
         },
         {
@@ -4791,7 +4791,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "wisdom",
           "amount": 1
         }
       ],
@@ -4821,7 +4821,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "wisdom",
           "amount": 2
         },
         {
@@ -4852,7 +4852,7 @@
       "acBonus": 1,
       "resistances": [],
       "statBonus": {
-        "stat": "strength",
+        "stat": "charisma",
         "amount": 1
       },
       "statBonuses": [
@@ -4926,7 +4926,7 @@
       },
       "statBonuses": [
         {
-          "stat": "intelligence",
+          "stat": "charisma",
           "amount": 2
         },
         {
@@ -4961,7 +4961,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "wisdom",
           "amount": 3
         },
         {
@@ -5000,7 +5000,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "charisma",
           "amount": 3
         },
         {
@@ -5074,7 +5074,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "intelligence",
           "amount": 1
         }
       ],
@@ -5182,7 +5182,7 @@
       },
       "statBonuses": [
         {
-          "stat": "strength",
+          "stat": "intelligence",
           "amount": 3
         },
         {
@@ -5216,7 +5216,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "charisma",
           "amount": 1
         },
         {
@@ -5251,7 +5251,7 @@
       },
       "statBonuses": [
         {
-          "stat": "stealth",
+          "stat": "intelligence",
           "amount": 1
         }
       ],
@@ -5282,7 +5282,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "stealth",
           "amount": 2
         },
         {
@@ -5316,7 +5316,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "intelligence",
           "amount": 3
         },
         {
@@ -5356,7 +5356,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "wisdom",
           "amount": 3
         },
         {
@@ -5485,7 +5485,7 @@
       },
       "statBonuses": [
         {
-          "stat": "constitution",
+          "stat": "hp",
           "amount": 3
         },
         {
@@ -5524,7 +5524,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "stealth",
           "amount": 3
         },
         {
@@ -5589,7 +5589,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "stealth",
           "amount": 1
         }
       ],
@@ -5619,7 +5619,7 @@
       },
       "statBonuses": [
         {
-          "stat": "strength",
+          "stat": "wisdom",
           "amount": 2
         },
         {
@@ -5691,7 +5691,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "charisma",
           "amount": 3
         },
         {
@@ -5729,7 +5729,7 @@
       },
       "statBonuses": [
         {
-          "stat": "charisma",
+          "stat": "intelligence",
           "amount": 1
         }
       ],
@@ -5791,7 +5791,7 @@
       },
       "statBonuses": [
         {
-          "stat": "charisma",
+          "stat": "intelligence",
           "amount": 2
         },
         {
@@ -5825,7 +5825,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "charisma",
           "amount": 3
         },
         {
@@ -5894,7 +5894,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "stealth",
           "amount": 1
         },
         {
@@ -5960,7 +5960,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "charisma",
           "amount": 2
         },
         {
@@ -5994,7 +5994,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "charisma",
           "amount": 3
         },
         {
@@ -6028,7 +6028,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "charisma",
           "amount": 3
         },
         {
@@ -6059,12 +6059,12 @@
       "acBonus": 1,
       "resistances": [],
       "statBonus": {
-        "stat": "dexterity",
+        "stat": "stealth",
         "amount": 1
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "stealth",
           "amount": 1
         },
         {
@@ -6130,7 +6130,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "wisdom",
           "amount": 2
         },
         {
@@ -6269,7 +6269,7 @@
       },
       "statBonuses": [
         {
-          "stat": "acrobatics",
+          "stat": "strength",
           "amount": 1
         },
         {
@@ -6338,7 +6338,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "strength",
           "amount": 3
         },
         {
@@ -6446,7 +6446,7 @@
       },
       "statBonuses": [
         {
-          "stat": "acrobatics",
+          "stat": "intelligence",
           "amount": 1
         },
         {
@@ -6481,7 +6481,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "wisdom",
           "amount": 2
         },
         {
@@ -6550,7 +6550,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "intelligence",
           "amount": 3
         },
         {
@@ -6615,7 +6615,7 @@
       },
       "statBonuses": [
         {
-          "stat": "acrobatics",
+          "stat": "intelligence",
           "amount": 1
         }
       ],
@@ -6824,7 +6824,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "wisdom",
           "amount": 2
         },
         {
@@ -6969,7 +6969,7 @@
       },
       "statBonuses": [
         {
-          "stat": "acrobatics",
+          "stat": "intelligence",
           "amount": 1
         }
       ],
@@ -7128,12 +7128,12 @@
       "acBonus": 1,
       "resistances": [],
       "statBonus": {
-        "stat": "dexterity",
+        "stat": "stealth",
         "amount": 1
       },
       "statBonuses": [
         {
-          "stat": "acrobatics",
+          "stat": "stealth",
           "amount": 1
         },
         {
@@ -7197,12 +7197,12 @@
       "acBonus": 3,
       "resistances": [],
       "statBonus": {
-        "stat": "dexterity",
+        "stat": "charisma",
         "amount": 3
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "charisma",
           "amount": 3
         },
         {
@@ -7303,7 +7303,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "wisdom",
           "amount": 1
         }
       ],
@@ -7367,7 +7367,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "wisdom",
           "amount": 3
         },
         {
@@ -7475,7 +7475,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "intelligence",
           "amount": 1
         }
       ],
@@ -7505,7 +7505,7 @@
       },
       "statBonuses": [
         {
-          "stat": "strength",
+          "stat": "intelligence",
           "amount": 2
         },
         {
@@ -7646,7 +7646,7 @@
       },
       "statBonuses": [
         {
-          "stat": "strength",
+          "stat": "intelligence",
           "amount": 1
         }
       ],
@@ -7676,7 +7676,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "wisdom",
           "amount": 2
         },
         {
@@ -7745,7 +7745,7 @@
       },
       "statBonuses": [
         {
-          "stat": "strength",
+          "stat": "intelligence",
           "amount": 3
         },
         {
@@ -7814,7 +7814,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "intelligence",
           "amount": 1
         }
       ],
@@ -8058,7 +8058,7 @@
       },
       "statBonuses": [
         {
-          "stat": "strength",
+          "stat": "wisdom",
           "amount": 3
         },
         {
@@ -8166,7 +8166,7 @@
       },
       "statBonuses": [
         {
-          "stat": "strength",
+          "stat": "intelligence",
           "amount": 1
         }
       ],
@@ -8303,7 +8303,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "intelligence",
           "amount": 1
         }
       ],
@@ -8358,12 +8358,12 @@
       "acBonus": 2,
       "resistances": [],
       "statBonus": {
-        "stat": "dexterity",
+        "stat": "charisma",
         "amount": 2
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "charisma",
           "amount": 2
         },
         {
@@ -8501,7 +8501,7 @@
       },
       "statBonuses": [
         {
-          "stat": "strength",
+          "stat": "charisma",
           "amount": 3
         },
         {
@@ -8615,7 +8615,7 @@
         "poison"
       ],
       "statBonus": {
-        "stat": "hp",
+        "stat": "charisma",
         "amount": 3
       },
       "statBonuses": [
@@ -8697,7 +8697,7 @@
       },
       "statBonuses": [
         {
-          "stat": "intelligence",
+          "stat": "strength",
           "amount": 3
         },
         {
@@ -8734,7 +8734,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "strength",
           "amount": 3
         },
         {
@@ -8902,7 +8902,7 @@
       },
       "statBonuses": [
         {
-          "stat": "intelligence",
+          "stat": "charisma",
           "amount": 2
         }
       ],
@@ -8996,7 +8996,7 @@
       },
       "statBonuses": [
         {
-          "stat": "wisdom",
+          "stat": "charisma",
           "amount": 1
         }
       ],
@@ -9099,7 +9099,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "intelligence",
           "amount": 1
         }
       ],
@@ -9270,12 +9270,12 @@
         "aetheric"
       ],
       "statBonus": {
-        "stat": "wisdom",
+        "stat": "stealth",
         "amount": 1
       },
       "statBonuses": [
         {
-          "stat": "wisdom",
+          "stat": "stealth",
           "amount": 1
         }
       ],
@@ -9308,12 +9308,12 @@
         "aetheric"
       ],
       "statBonus": {
-        "stat": "intelligence",
+        "stat": "stealth",
         "amount": 1
       },
       "statBonuses": [
         {
-          "stat": "wisdom",
+          "stat": "stealth",
           "amount": 1
         }
       ],
@@ -9353,7 +9353,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "stealth",
           "amount": 1
         }
       ],
@@ -9387,7 +9387,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "charisma",
           "amount": 1
         }
       ],
@@ -9421,7 +9421,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "stealth",
           "amount": 1
         }
       ],
@@ -9558,7 +9558,7 @@
       },
       "statBonuses": [
         {
-          "stat": "intelligence",
+          "stat": "stealth",
           "amount": 2
         },
         {
@@ -9627,7 +9627,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "strength",
           "amount": 3
         },
         {
@@ -9695,7 +9695,7 @@
       },
       "statBonuses": [
         {
-          "stat": "dexterity",
+          "stat": "strength",
           "amount": 3
         },
         {
@@ -9729,7 +9729,7 @@
       },
       "statBonuses": [
         {
-          "stat": "intelligence",
+          "stat": "strength",
           "amount": 3
         },
         {
@@ -9764,7 +9764,7 @@
       },
       "statBonuses": [
         {
-          "stat": "wisdom",
+          "stat": "dexterity",
           "amount": 2
         },
         {
@@ -9901,7 +9901,7 @@
       },
       "statBonuses": [
         {
-          "stat": "strength",
+          "stat": "dexterity",
           "amount": 2
         },
         {
@@ -10006,7 +10006,7 @@
       },
       "statBonuses": [
         {
-          "stat": "intelligence",
+          "stat": "charisma",
           "amount": 1
         }
       ],

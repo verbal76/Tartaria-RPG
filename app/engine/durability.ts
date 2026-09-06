@@ -98,7 +98,15 @@ function lookupBaseDurability(name: string): number | null {
 // (base stats incl. stealth). Deliberately EXCLUDES `hp` — hp bonuses stay
 // catalog-driven because they're baked into hpMax on equip (gearHpBonus); an
 // instance-varied hp would drift that bookkeeping.
-const ATTRIBUTE_STATS = new Set([
+//
+// ⚠ OTA-1708 — EXPORTED, because a second reader needs the identical answer.
+// `followCatalogStat` (itemBackfill) rewrites the channel on a saved instance
+// perk, and it must refuse exactly the channels this gate refuses to create:
+// writing an `hp` into instanceStats does not move a bonus to max-HP, it
+// deletes it (aggregateEquipmentBonuses takes the instanceStats branch and
+// never consults the catalog for that slot). Two copies of this list would
+// eventually disagree, and the disagreement would be silent.
+export const ATTRIBUTE_STATS = new Set([
   'strength', 'dexterity', 'intelligence', 'wisdom', 'charisma', 'stealth',
 ]);
 

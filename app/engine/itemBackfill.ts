@@ -23,7 +23,10 @@ import {
   findMaterialByName,
 } from './crafting';
 import { canonicalItemRarity, lookupCraftedItem } from './crafting';
-import { stampDurability, resealUtilityDurability } from './durability';
+// OTA-1708 — the same attribute gate rollInstancePerks seeds through, so the
+// migration can never write a channel the roll could not have created.
+import { stampDurability, resealUtilityDurability, ATTRIBUTE_STATS } from './durability';
+import { canonicalStatKey } from './equipment';
 import { healLegacyDogVest } from './dogCompanion';
 import { inferGear, inferWeapon, inferArmor, inferAccessory } from './itemDefaults';
 
@@ -250,14 +253,40 @@ export function restampInventory(inventory: readonly InventoryItem[]): Inventory
  *  channels are its own history, not a catalog echo, and there is no honest way
  *  to tell which of three rolled channels was once the catalog's. Those keep
  *  what they have. Idempotent: a save already migrated matches on the first
- *  comparison and returns unchanged. */
+ *  comparison and returns unchanged.
+ *
+ *  ⚠⚠⚠ OTA-1708 — IT FOLLOWED THE WRONG FIELD, AND ON 42 CATALOG ROWS THAT
+ *  DELETED A BONUS THE PLAYER HAD EARNED.
+ *
+ *  Two measured defects, one line apart:
+ *
+ *  · IT READ `statBonus`. `rollInstancePerks` seeds an instance's channels from
+ *    `statBonuses` — the field `aggregateEquipmentBonuses` also pays — so the
+ *    migration was chasing a row the roll never came from. Now both ends read
+ *    the same field, and they cannot drift.
+ *
+ *  · IT COULD WRITE `hp` INTO `instanceStats`. Instance perks are
+ *    ATTRIBUTE-ONLY by construction (rollInstancePerks gates on
+ *    ATTRIBUTE_STATS, so constitution/hp falls out and stays catalog-driven),
+ *    and `aggregateEquipmentBonuses` takes the instanceStats branch and
+ *    `continue`s — it never consults the catalog for that slot. So renaming a
+ *    saved piece's rolled `dexterity` to the catalog's `hp` did not move the
+ *    bonus to max-HP; it dropped it on the floor. 42 catalog rows could do
+ *    this — every Sentinel, Guardian and Titan piece whose name says "stands"
+ *    while its roll was an attribute. The attribute gate below is the fix.
+ *
+ *  Between them these are why the OTA-1670 spread never reached a save file. */
 function followCatalogStat(item: InventoryItem): InventoryItem {
   const rolled = item.instanceStats?.statBonuses;
   if (!rolled || rolled.length !== 1) return item;
   if (item.uniqueStats || (item.tags ?? []).some((t) => t.toLowerCase() === 'fused')) return item;
   const row = findArmorByName(item.name);
-  const want = row?.statBonus?.stat;
+  // ⚠ The PAID field, not the authored one — see the note above.
+  const want = row?.statBonuses?.[0]?.stat ?? row?.statBonus?.stat;
   if (!want) return item;
+  // ⚠ And never a channel instanceStats cannot carry: an hp/constitution write
+  // here is not a relabel, it is a deletion.
+  if (!ATTRIBUTE_STATS.has(canonicalStatKey(want))) return item;
   const have = rolled[0]!;
   if (have.stat === want) return item;
   return {
