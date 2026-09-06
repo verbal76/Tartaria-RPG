@@ -397,7 +397,17 @@ export function ActionReferenceScreen() {
           </TouchableOpacity>
         )}
       </View>
-      <ScrollView style={styles.scroll} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+      {/* ⚠ OTA-1718 — a SCREEN-level ScrollView can use iOS's own keyboard
+          inset, which is the correct mechanism here and needs no measurement.
+          (It is unreliable inside a native <Modal>, which is why the cards
+          measure instead.) Without it the bottom of the reference list is
+          unreachable while the search field is focused. */}
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
+        automaticallyAdjustKeyboardInsets
+      >
         {q.length > 0 ? (
           // Flat search results.
           searchResults.length === 0 ? (

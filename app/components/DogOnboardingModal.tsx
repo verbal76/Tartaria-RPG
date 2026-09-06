@@ -26,6 +26,8 @@
 //      MissionCompleteModal, which is the house reference.
 import React, { useEffect, useState } from 'react';
 import { Modal, View, Text, TextInput, Pressable, StyleSheet, ScrollView } from 'react-native';
+import { useCardViewport } from './KeyboardSafeCard';
+import { keyboardInset } from '../engine/keyboardSafeCard';
 import { useGameStore } from '../state/gameStore';
 import { defaultDogName } from '../engine/dogCompanion';
 // ⚠⚠⚠ OTA-1525 — THE OWNER WANTED THE SWITCH HERE TOO: "push the dog card tips
@@ -79,6 +81,17 @@ export function DogOnboardingModal() {
     return () => clearTimeout(t);
   }, [armed, blocked]);
 
+  // ⚠⚠ OTA-1718 — THIS MODAL HAD NO KEYBOARD AWARENESS AT ALL. The whole card
+  // sits in a ScrollView, which looks like it solves the problem and does not:
+  // a ScrollView inside a native <Modal> gets no keyboard inset on iOS, so its
+  // content can only ever scroll until the last element sits at the BOTTOM of
+  // the frame — which is under the keyboard. The name field is the one thing you
+  // type here, so the confirm button was what got covered.
+  // ⚠ Measured ABOVE the early returns below: a hook called after a `return
+  // null` guard is a conditional hook, which is a different bug from the one
+  // being fixed.
+  const kbInset = keyboardInset(useCardViewport());
+
   if (!pending || !player) return null;
   if (!ready) return null;
   const breedVal = breed ?? pending.breed ?? '';
@@ -97,7 +110,7 @@ export function DogOnboardingModal() {
     <Modal visible transparent animationType="fade" onRequestClose={commit}>
       <View style={styles.backdrop}>
         <ScrollView
-          contentContainerStyle={styles.scroll}
+          contentContainerStyle={[styles.scroll, { paddingBottom: 32 + kbInset }]}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >

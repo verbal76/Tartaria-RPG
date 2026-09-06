@@ -28354,7 +28354,32 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // settled the tie: the owed puppy was a one-time repair for an earlier broken
 // OTA, and neglect must not pay. Bleed-out DEATH keeps its owed replacement until
 // the dog market exists. 62 lines back on the gameStore ceiling.
-export const OTA_BUILD_ID = '2026-09-06-1717-one-dog-one-clock';
+// 2026-09-06 OTA-1718 - THE KEYBOARD ATE THE SEND BUTTON. iPhone 14, with a
+// screenshot: on REPORT A BUG the keyboard covers SEND and the form cannot be
+// scrolled far enough to expose it. Owner's framing, and the one this was built
+// on: "this is not really a 'keyboard won't collapse' bug. The Report Bug screen
+// is failing to remain actionable when the iOS keyboard is open. The user
+// shouldn't have to know how to dismiss the keyboard just to submit." The
+// mechanism was exact: a KeyboardAvoidingView with maxHeight 90% around a card
+// with NO height limit and no scroll, so the card kept its natural height,
+// overflowed the wrapper, and the buttons landed under the keyboard with no
+// scroll path to them. Fixed as a shape, not a patch - HEADER fixed, BODY
+// scrolls (flexShrink), FOOTER pinned - inside a card whose ceiling is the
+// keyboard's MEASURED top edge (endCoordinates.screenY, which already carries
+// the predictive bar and the home indicator; no fixed offsets anywhere). DONE
+// bars and tap-outside-to-dismiss ship too, as courtesies, never as the fix -
+// and tap-outside closes the KEYBOARD first, because the scrim's handler cancels
+// and a stray tap would otherwise have thrown away a paragraph. The audit was
+// the ask and it found more: FeedbackModal had the same wrapper defect, and the
+// dog and golem NAMING modals had no keyboard handling of any kind - the whole
+// card in a ScrollView, which gets no keyboard inset inside a native Modal, so
+// the confirm button on the screen where you name your dog was unreachable and
+// had simply never been reported. Every text-entry surface in the app is now
+// enumerated with its mechanism, and a new one fails the suite. The layout
+// arithmetic is a pure module, so "can the player reach SEND on an iPhone SE 3"
+// is run as a test on five device profiles rather than claimed.
+export const OTA_BUILD_ID = '2026-09-06-1718-the-keyboard-ate-send';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-06-1717-one-dog-one-clock';
 // golem catch-up 2026-09-06: markerless publish of OTA-1717 - one dog, one clock.
 // The dog's two loyalty systems are one; each band speaks once instead of twice,
 // and the owed-puppy contradiction is settled. hal took the marker.

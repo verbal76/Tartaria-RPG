@@ -6,17 +6,8 @@
 // whitelists + replies with the install link (advertised as up
 // to 24 hours, usually within the hour).
 import React, { useEffect, useState } from 'react';
-import {
-  Modal,
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  TextInput,
-  TouchableWithoutFeedback,
-  KeyboardAvoidingView,
-  Platform,
-} from 'react-native';
+import { View, Text, StyleSheet, Pressable, TextInput } from 'react-native';
+import { KeyboardSafeCard } from './KeyboardSafeCard';
 
 interface Props {
   visible: boolean;
@@ -64,117 +55,87 @@ export function InvitePlaytesterModal({ visible, onCancel, onSend }: Props) {
   };
 
   return (
-    <Modal
+    // ⚠ OTA-1718 — same wrapper shape as REPORT A BUG: a KeyboardAvoidingView
+    // with a maxHeight around a card that had none, so INVITE could sit under
+    // the keyboard on a short screen. The field is single-line and carries
+    // `returnKeyType="send"`, so this one was survivable — but "survivable if
+    // you know the return key sends" is the same bargain the report objected to.
+    <KeyboardSafeCard
       visible={visible}
-      transparent
-      animationType="fade"
       onRequestClose={onCancel}
-      statusBarTranslucent
-    >
-      <TouchableWithoutFeedback onPress={onCancel}>
-        <View style={styles.scrim} accessibilityViewIsModal={true}>
-          <TouchableWithoutFeedback>
-            <KeyboardAvoidingView
-              behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-              style={styles.cardWrap}
-            >
-              <View style={styles.card}>
-                <View style={styles.headerRow}>
-                  <Text style={styles.title} accessibilityRole="header">INVITE A PLAYTESTER</Text>
-                  <View style={styles.ruleLine} />
-                </View>
-
-                <Text style={styles.body}>
-                  Type the Gmail address of someone you'd like added to
-                  the Tartaria Realms playtest. We'll whitelist them
-                  and email them an install link — usually within the
-                  hour, up to 24 hours.
-                </Text>
-
-                <Text style={styles.sectionLabel}>GMAIL ADDRESS</Text>
-                <TextInput
-                  style={[styles.input, showError && styles.inputError]}
-                  placeholder="friend@gmail.com"
-                  placeholderTextColor="#5c5345"
-                  value={gmail}
-                  onChangeText={setGmail}
-                  onBlur={() => setTouched(true)}
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  keyboardType="email-address"
-                  inputMode="email"
-                  returnKeyType="send"
-                  onSubmitEditing={handleSend}
-                />
-                {showError && (
-                  <Text style={styles.errorLine}>
-                    Needs to be a valid @gmail.com address.
-                  </Text>
-                )}
-
-                <Text style={styles.body}>
-                  Tapping INVITE opens your email app with a draft to
-                  hotatticgames@gmail.com — just tap Send.
-                </Text>
-
-                <View style={styles.buttonRow}>
-                  <Pressable
-                    style={({ pressed }) => [
-                      styles.btn,
-                      styles.btnNeutral,
-                      pressed && styles.btnPressed,
-                    ]}
-                    onPress={onCancel}
-                    accessibilityRole="button"
-                  >
-                    <Text style={[styles.btnText, styles.btnTextNeutral]}>CANCEL</Text>
-                  </Pressable>
-                  <Pressable
-                    style={({ pressed }) => [
-                      styles.btn,
-                      valid ? styles.btnPrimary : styles.btnDisabled,
-                      pressed && styles.btnPressed,
-                    ]}
-                    onPress={handleSend}
-                    disabled={!valid}
-                    accessibilityRole="button"
-                    accessibilityState={{ disabled: !valid }}
-                  >
-                    <Text
-                      style={[
-                        styles.btnText,
-                        valid ? styles.btnTextPrimary : styles.btnTextDisabled,
-                      ]}
-                    >
-                      INVITE
-                    </Text>
-                  </Pressable>
-                </View>
-              </View>
-            </KeyboardAvoidingView>
-          </TouchableWithoutFeedback>
+      maxWidth={420}
+      testID="invite-playtester-card"
+      header={(
+        <View style={styles.headerRow}>
+          <Text style={styles.title} accessibilityRole="header">INVITE A PLAYTESTER</Text>
+          <View style={styles.ruleLine} />
         </View>
-      </TouchableWithoutFeedback>
-    </Modal>
+      )}
+      footer={(
+        <View style={styles.buttonRow}>
+          <Pressable
+            style={({ pressed }) => [styles.btn, styles.btnNeutral, pressed && styles.btnPressed]}
+            onPress={onCancel}
+            accessibilityRole="button"
+          >
+            <Text style={[styles.btnText, styles.btnTextNeutral]}>CANCEL</Text>
+          </Pressable>
+          <Pressable
+            style={({ pressed }) => [
+              styles.btn,
+              valid ? styles.btnPrimary : styles.btnDisabled,
+              pressed && styles.btnPressed,
+            ]}
+            onPress={handleSend}
+            disabled={!valid}
+            accessibilityRole="button"
+            accessibilityState={{ disabled: !valid }}
+          >
+            <Text style={[styles.btnText, valid ? styles.btnTextPrimary : styles.btnTextDisabled]}>
+              INVITE
+            </Text>
+          </Pressable>
+        </View>
+      )}
+    >
+      <Text style={styles.body}>
+        Type the Gmail address of someone you&apos;d like added to
+        the Tartaria Realms playtest. We&apos;ll whitelist them
+        and email them an install link — usually within the
+        hour, up to 24 hours.
+      </Text>
+
+      <Text style={styles.sectionLabel}>GMAIL ADDRESS</Text>
+      <TextInput
+        style={[styles.input, showError && styles.inputError]}
+        placeholder="friend@gmail.com"
+        placeholderTextColor="#5c5345"
+        value={gmail}
+        onChangeText={setGmail}
+        onBlur={() => setTouched(true)}
+        autoCapitalize="none"
+        autoCorrect={false}
+        keyboardType="email-address"
+        inputMode="email"
+        returnKeyType="send"
+        onSubmitEditing={handleSend}
+      />
+      {showError && (
+        <Text style={styles.errorLine}>
+          Needs to be a valid @gmail.com address.
+        </Text>
+      )}
+
+      <Text style={styles.body}>
+        Tapping INVITE opens your email app with a draft to
+        hotatticgames@gmail.com — just tap Send.
+      </Text>
+    </KeyboardSafeCard>
   );
 }
 
 const styles = StyleSheet.create({
-  scrim: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.7)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  cardWrap: { width: '100%', maxWidth: 420 },
-  card: {
-    backgroundColor: '#13110f',
-    borderColor: '#c9a86a',
-    borderWidth: 1,
-    borderRadius: 4,
-    padding: 14,
-  },
+  // ⚠ OTA-1718 — scrim / cardWrap / card are KeyboardSafeCard's job now.
   headerRow: { marginBottom: 10 },
   title: {
     color: '#c9a86a',

@@ -34,17 +34,20 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  Modal,
   View,
   Text,
   TextInput,
   StyleSheet,
   Pressable,
-  TouchableWithoutFeedback,
   Keyboard,
-  KeyboardAvoidingView,
+  InputAccessoryView,
+  Platform,
 } from 'react-native';
+import { KeyboardSafeCard } from './KeyboardSafeCard';
 import { startListening, stopListening, isListening } from '../voice/STTManager';
+
+// ⚠ OTA-1718 — the DONE bar's id for the multiline note field. iOS only.
+const NOTE_ACCESSORY = 'designerNoteAccessory';
 
 interface Props {
   visible: boolean;
@@ -191,116 +194,127 @@ export function FeedbackModal({ visible, onSubmit, onCancel }: Props) {
   };
 
   return (
-    <Modal
+    // ⚠⚠ OTA-1718 — WAS `KeyboardAvoidingView behavior="padding"` AROUND A CARD
+    // WITH NO HEIGHT LIMIT. That view shrinks its own content box; a card sized
+    // by its content simply overflows it, so SAVE NOTE went under the keyboard
+    // exactly as SEND did on REPORT A BUG. Same shell, same fix: measured
+    // keyboard top, scrolling middle, pinned buttons.
+    <KeyboardSafeCard
       visible={visible}
-      transparent
-      animationType="fade"
       onRequestClose={handleCancel}
-      statusBarTranslucent
+      maxWidth={380}
+      testID="designer-note-card"
+      header={(
+        <>
+          <Text style={styles.title} accessibilityRole="header">DESIGNER NOTE</Text>
+          <View style={styles.rule} />
+        </>
+      )}
+      footer={(
+        <View style={styles.btnRow}>
+          <Pressable
+            style={({ pressed }) => [styles.btn, styles.btnNeutral, pressed && styles.btnPressed]}
+            onPress={handleCancel}
+            accessibilityRole="button"
+          >
+            <Text style={styles.btnTextNeutral}>CANCEL</Text>
+          </Pressable>
+          <Pressable
+            style={({ pressed }) => [
+              styles.btn,
+              styles.btnPrimary,
+              !text.trim() && styles.btnDisabled,
+              pressed && styles.btnPressed,
+            ]}
+            onPress={handleSave}
+            disabled={!text.trim()}
+            accessibilityRole="button"
+            accessibilityState={{ disabled: !text.trim() }}
+          >
+            <Text style={styles.btnTextPrimary}>SAVE NOTE</Text>
+          </Pressable>
+        </View>
+      )}
     >
-      <TouchableWithoutFeedback onPress={handleCancel}>
-        <KeyboardAvoidingView style={styles.scrim} behavior="padding">
-          <TouchableWithoutFeedback>
-            <View style={styles.card} accessibilityViewIsModal={true}>
-              <Text style={styles.title} accessibilityRole="header">DESIGNER NOTE</Text>
-              <View style={styles.rule} />
-              <Text style={styles.body}>
-                Drops straight into the game log on the `feedback`
-                channel — bypasses the action parser. Speak now;
-                tap the field if you'd rather type. Nothing saves
-                until you press SAVE NOTE.
-              </Text>
+      <Text style={styles.body}>
+        Drops straight into the game log on the `feedback`
+        channel — bypasses the action parser. Speak now;
+        tap the field if you&apos;d rather type. Nothing saves
+        until you press SAVE NOTE.
+      </Text>
 
-              {/* Live status row — green pulse while listening, amber
-                  if the mic failed, neutral once the player has tapped
-                  in to type. */}
-              <View style={styles.statusRow}>
-                <View
-                  style={[
-                    styles.statusDot,
-                    listening
-                      ? styles.statusDotLive
-                      : micError
-                        ? styles.statusDotError
-                        : styles.statusDotIdle,
-                  ]}
-                />
-                <Text style={styles.statusText}>
-                  {listening
-                    ? 'Listening — speak; pauses are fine'
-                    : micError
-                      ? `Mic: ${micError}`
-                      : manualMode.current
-                        ? 'Typing — mic stopped'
-                        : 'Mic idle'}
-                </Text>
-              </View>
+      {/* Live status row — green pulse while listening, amber if the mic
+          failed, neutral once the player has tapped in to type. */}
+      <View style={styles.statusRow}>
+        <View
+          style={[
+            styles.statusDot,
+            listening
+              ? styles.statusDotLive
+              : micError
+                ? styles.statusDotError
+                : styles.statusDotIdle,
+          ]}
+        />
+        <Text style={styles.statusText}>
+          {listening
+            ? 'Listening — speak; pauses are fine'
+            : micError
+              ? `Mic: ${micError}`
+              : manualMode.current
+                ? 'Typing — mic stopped'
+                : 'Mic idle'}
+        </Text>
+      </View>
 
-              <Pressable onPress={switchToManual}>
-                <TextInput
-                  ref={inputRef}
-                  style={styles.input}
-                  value={text}
-                  onChangeText={setText}
-                  onFocus={switchToManual}
-                  placeholder='Type your note. e.g. "vendor chips disappeared after I purchased"'
-                  placeholderTextColor="#c9a86a"
-                  multiline
-                  numberOfLines={4}
-                  textAlignVertical="top"
-                  autoCorrect={false}
-                  autoCapitalize="sentences"
-                />
-              </Pressable>
-
-              <View style={styles.btnRow}>
-                <Pressable
-                  style={({ pressed }) => [styles.btn, styles.btnNeutral, pressed && styles.btnPressed]}
-                  onPress={handleCancel}
-                  accessibilityRole="button"
-                >
-                  <Text style={styles.btnTextNeutral}>CANCEL</Text>
-                </Pressable>
-                <Pressable
-                  style={({ pressed }) => [
-                    styles.btn,
-                    styles.btnPrimary,
-                    !text.trim() && styles.btnDisabled,
-                    pressed && styles.btnPressed,
-                  ]}
-                  onPress={handleSave}
-                  disabled={!text.trim()}
-                  accessibilityRole="button"
-                  accessibilityState={{ disabled: !text.trim() }}
-                >
-                  <Text style={styles.btnTextPrimary}>SAVE NOTE</Text>
-                </Pressable>
-              </View>
-            </View>
-          </TouchableWithoutFeedback>
-        </KeyboardAvoidingView>
-      </TouchableWithoutFeedback>
-    </Modal>
+      <Pressable onPress={switchToManual}>
+        <TextInput
+          ref={inputRef}
+          style={styles.input}
+          value={text}
+          onChangeText={setText}
+          onFocus={switchToManual}
+          placeholder='Type your note. e.g. "vendor chips disappeared after I purchased"'
+          placeholderTextColor="#c9a86a"
+          multiline
+          numberOfLines={4}
+          textAlignVertical="top"
+          autoCorrect={false}
+          autoCapitalize="sentences"
+          inputAccessoryViewID={Platform.OS === 'ios' ? NOTE_ACCESSORY : undefined}
+        />
+      </Pressable>
+      {/* ⚠ The courtesy, not the fix — a multiline field has no return key. */}
+      {Platform.OS === 'ios' && (
+        <InputAccessoryView nativeID={NOTE_ACCESSORY}>
+          <View style={styles.accessoryBar}>
+            <Pressable
+              onPress={() => Keyboard.dismiss()}
+              accessibilityRole="button"
+              accessibilityLabel="Done — close the keyboard"
+              style={({ pressed }) => [styles.accessoryBtn, pressed && styles.btnPressed]}
+            >
+              <Text style={styles.accessoryText}>DONE</Text>
+            </Pressable>
+          </View>
+        </InputAccessoryView>
+      )}
+    </KeyboardSafeCard>
   );
 }
 
 const styles = StyleSheet.create({
-  scrim: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.7)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
+  // ⚠ OTA-1718 — scrim / card are KeyboardSafeCard's job now.
+  accessoryBar: {
+    backgroundColor: '#1a1714',
+    borderTopColor: '#3a342c',
+    borderTopWidth: 1,
+    alignItems: 'flex-end',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
   },
-  card: {
-    width: '100%',
-    maxWidth: 380,
-    backgroundColor: '#13110f',
-    borderColor: '#c9a86a',
-    borderWidth: 1,
-    borderRadius: 4,
-    padding: 14,
-  },
+  accessoryBtn: { paddingHorizontal: 14, paddingVertical: 6 },
+  accessoryText: { color: '#c9a86a', fontSize: 12, fontWeight: '800', letterSpacing: 2 },
   title: { color: '#c9a86a', fontSize: 14, fontWeight: '800', letterSpacing: 4 },
   rule: { height: 1, backgroundColor: '#3a342c', marginTop: 6, marginBottom: 10 },
   body: { color: '#cdbf99', fontSize: 12, lineHeight: 17, marginBottom: 10, fontStyle: 'italic' },

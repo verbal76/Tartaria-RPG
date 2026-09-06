@@ -18,17 +18,22 @@
 // copy that still described it went with it.
 import React, { useEffect, useState } from 'react';
 import {
-  Modal,
   View,
   Text,
   StyleSheet,
   Pressable,
-  ScrollView,
   TextInput,
-  TouchableWithoutFeedback,
-  KeyboardAvoidingView,
+  InputAccessoryView,
+  Keyboard,
   Platform,
 } from 'react-native';
+import { KeyboardSafeCard } from './KeyboardSafeCard';
+
+// ⚠ OTA-1718 — the id that ties the multiline field to its DONE bar. A multiline
+// field has no return key to close with, so without this there is genuinely no
+// gesture a player is expected to know. iOS only; Android's back gesture already
+// closes the keyboard.
+const DESCRIBE_ACCESSORY = 'bugReportDescribeAccessory';
 import type { SlotSummary } from '../engine/saveSystem';
 import type { BugReportMode } from '../diagnostics/bugReport';
 
@@ -109,146 +114,148 @@ export function BugReportModal({ visible, slots, activeSlotId, onCancel, onSend 
   };
 
   return (
-    <Modal
+    <KeyboardSafeCard
       visible={visible}
-      transparent
-      animationType="fade"
       onRequestClose={onCancel}
-      statusBarTranslucent
-    >
-      <TouchableWithoutFeedback onPress={onCancel}>
-        <View style={styles.scrim} accessibilityViewIsModal={true}>
-          <TouchableWithoutFeedback>
-            <KeyboardAvoidingView
-              behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-              style={styles.cardWrap}
-            >
-              <View style={styles.card}>
-                <View style={styles.headerRow}>
-                  <Text style={styles.title} accessibilityRole="header">REPORT A BUG</Text>
-                  <View style={styles.ruleLine} />
-                </View>
-
-                {/* ⚠⚠ OTA-1672 — THIS COPY WAS DESCRIBING A ROUTE THAT NO LONGER
-                    EXISTS. It told the player their report would be "copied to
-                    your clipboard — paste them into the email body before
-                    sending", which OTA-1665 retired when REPORT A BUG became the
-                    push. Stale instructions on the one screen a confused player
-                    reads are worse than none: they send someone hunting for an
-                    email that never opens. It says what actually happens now. */}
-                <Text style={styles.body}>
-                  Pick what this is about, then send. It goes straight from here —
-                  no email, no copy-and-paste.
-                </Text>
-
-                <Text style={styles.sectionLabel}>WHAT IS THIS?</Text>
-                <ScrollView
-                  style={styles.slotList}
-                  contentContainerStyle={styles.slotListContent}
-                  showsVerticalScrollIndicator
-                >
-                  {/* ⚠ OTA-1672 — the characters lead now. The owner listed the
-                      three choices in this order, and it is also the order of
-                      use: a bug almost always happened to somebody. */}
-                  {slots.map((s) => (
-                    <SlotRow
-                      key={s.slotId}
-                      label={`${s.playerName}${s.dead ? ' (fallen)' : ''}`}
-                      sub={`HP ${s.hp}/${s.hpMax} · saved ${formatAgo(s.savedAt)}`}
-                      selected={selectedId === s.slotId}
-                      onPress={() => setSelectedId(s.slotId)}
-                    />
-                  ))}
-                  <SlotRow
-                    label="General bug — no character"
-                    sub="Title-screen / startup / setup issues"
-                    selected={selectedId === 'general'}
-                    onPress={() => setSelectedId('general')}
-                  />
-                  {/* ⚠⚠⚠ THE THIRD MODE. Only offered when there is a log to
-                      push — a row that promises to send one and then cannot is
-                      the claims-success-without-checking defect this project has
-                      fixed repeatedly, and the sub-line NAMES whose log goes. */}
-                  {fullLogSlot !== null && (
-                    <SlotRow
-                      label="Send full log for analysis"
-                      sub={`${fullLogSlot.playerName}'s log · no description needed`}
-                      selected={isFullLog}
-                      onPress={() => setSelectedId(FULL_LOG)}
-                    />
-                  )}
-                  {slots.length === 0 && (
-                    <Text style={styles.emptyHint}>
-                      (no characters yet — only a general bug can be sent)
-                    </Text>
-                  )}
-                </ScrollView>
-
-                {/* ⚠⚠⚠ OTA-1672 — NO TEXT BOX ON THE FULL-LOG PUSH. Owner: *"in
-                    there there really shouldn't be a text box."* Disabling it
-                    would have been the smaller edit and the wrong one: a greyed
-                    field still reads as something you are failing to fill in. */}
-                {isFullLog ? (
-                  <Text style={styles.body}>
-                    Nothing to type. This sends {fullLogSlot?.playerName}&apos;s
-                    whole log, pack, device and voice state as-is, for me to read
-                    through.
-                  </Text>
-                ) : (
-                  <>
-                    <Text style={styles.sectionLabel}>DESCRIBE THE ISSUE</Text>
-                    <TextInput
-                      style={styles.input}
-                      multiline
-                      numberOfLines={4}
-                      placeholder="What did you expect? What actually happened? Any reproduction steps?"
-                      placeholderTextColor="#5c5345"
-                      value={description}
-                      onChangeText={setDescription}
-                      textAlignVertical="top"
-                    />
-                  </>
-                )}
-
-                <View style={styles.buttonRow}>
-                  <Pressable
-                    style={({ pressed }) => [
-                      styles.btn,
-                      styles.btnNeutral,
-                      pressed && styles.btnPressed,
-                    ]}
-                    onPress={onCancel}
-                    accessibilityRole="button"
-                  >
-                    <Text style={[styles.btnText, styles.btnTextNeutral]}>CANCEL</Text>
-                  </Pressable>
-                  <Pressable
-                    style={({ pressed }) => [
-                      styles.btn,
-                      canSend ? styles.btnPrimary : styles.btnDisabled,
-                      pressed && styles.btnPressed,
-                    ]}
-                    onPress={handleSend}
-                    disabled={!canSend}
-                    accessibilityRole="button"
-                    accessibilityState={{ disabled: !canSend }}
-                  >
-                    <Text
-                      style={[
-                        styles.btnText,
-                        canSend ? styles.btnTextPrimary : styles.btnTextDisabled,
-                      ]}
-                    >
-                      {isFullLog ? 'SEND LOG' : 'SEND'}
-                    </Text>
-                  </Pressable>
-                </View>
-              </View>
-            </KeyboardAvoidingView>
-          </TouchableWithoutFeedback>
+      maxWidth={420}
+      testID="bug-report-card"
+      header={(
+        <View style={styles.headerRow}>
+          <Text style={styles.title} accessibilityRole="header">REPORT A BUG</Text>
+          <View style={styles.ruleLine} />
         </View>
-      </TouchableWithoutFeedback>
-    </Modal>
+      )}
+      footer={(
+        // ⚠⚠⚠ OTA-1718 — PINNED. This row used to be the tail of a card that had
+        // no height limit inside a wrapper that did, so it simply overflowed and
+        // landed under the keyboard with no scroll path to it. It is now outside
+        // the scrolling body: the card gives up BODY height as the keyboard
+        // rises, never the buttons, so SEND is on screen at every size without
+        // the player scrolling at all.
+        <View style={styles.buttonRow}>
+          <Pressable
+            style={({ pressed }) => [styles.btn, styles.btnNeutral, pressed && styles.btnPressed]}
+            onPress={onCancel}
+            accessibilityRole="button"
+          >
+            <Text style={[styles.btnText, styles.btnTextNeutral]}>CANCEL</Text>
+          </Pressable>
+          <Pressable
+            style={({ pressed }) => [
+              styles.btn,
+              canSend ? styles.btnPrimary : styles.btnDisabled,
+              pressed && styles.btnPressed,
+            ]}
+            onPress={handleSend}
+            disabled={!canSend}
+            accessibilityRole="button"
+            accessibilityState={{ disabled: !canSend }}
+          >
+            <Text style={[styles.btnText, canSend ? styles.btnTextPrimary : styles.btnTextDisabled]}>
+              {isFullLog ? 'SEND LOG' : 'SEND'}
+            </Text>
+          </Pressable>
+        </View>
+      )}
+    >
+      {/* ⚠⚠ OTA-1672 — THIS COPY WAS DESCRIBING A ROUTE THAT NO LONGER EXISTS.
+          It told the player their report would be "copied to your clipboard —
+          paste them into the email body before sending", which OTA-1665 retired
+          when REPORT A BUG became the push. Stale instructions on the one screen
+          a confused player reads are worse than none. */}
+      <Text style={styles.body}>
+        Pick what this is about, then send. It goes straight from here —
+        no email, no copy-and-paste.
+      </Text>
+
+      <Text style={styles.sectionLabel}>WHAT IS THIS?</Text>
+      {/* ⚠ OTA-1718 — this was a ScrollView with its own maxHeight, nested inside
+          a card that could not scroll. One scrolling surface now: the list grows,
+          the card's body scrolls, and there is no inner scroll for a thumb to get
+          caught in on a 4.7" screen. */}
+      <View style={styles.slotList}>
+        {/* ⚠ OTA-1672 — the characters lead. The owner listed the three choices
+            in this order, and it is also the order of use: a bug almost always
+            happened to somebody. */}
+        {slots.map((s) => (
+          <SlotRow
+            key={s.slotId}
+            label={`${s.playerName}${s.dead ? ' (fallen)' : ''}`}
+            sub={`HP ${s.hp}/${s.hpMax} · saved ${formatAgo(s.savedAt)}`}
+            selected={selectedId === s.slotId}
+            onPress={() => setSelectedId(s.slotId)}
+          />
+        ))}
+        <SlotRow
+          label="General bug — no character"
+          sub="Title-screen / startup / setup issues"
+          selected={selectedId === 'general'}
+          onPress={() => setSelectedId('general')}
+        />
+        {/* ⚠⚠⚠ THE THIRD MODE. Only offered when there is a log to push — a row
+            that promises to send one and then cannot is the
+            claims-success-without-checking defect this project has fixed
+            repeatedly, and the sub-line NAMES whose log goes. */}
+        {fullLogSlot !== null && (
+          <SlotRow
+            label="Send full log for analysis"
+            sub={`${fullLogSlot.playerName}'s log · no description needed`}
+            selected={isFullLog}
+            onPress={() => setSelectedId(FULL_LOG)}
+          />
+        )}
+        {slots.length === 0 && (
+          <Text style={styles.emptyHint}>
+            (no characters yet — only a general bug can be sent)
+          </Text>
+        )}
+      </View>
+
+      {/* ⚠⚠⚠ OTA-1672 — NO TEXT BOX ON THE FULL-LOG PUSH. Owner: *"in there
+          there really shouldn't be a text box."* Disabling it would have been
+          the smaller edit and the wrong one: a greyed field still reads as
+          something you are failing to fill in. */}
+      {isFullLog ? (
+        <Text style={styles.body}>
+          Nothing to type. This sends {fullLogSlot?.playerName}&apos;s
+          whole log, pack, device and voice state as-is, for me to read
+          through.
+        </Text>
+      ) : (
+        <>
+          <Text style={styles.sectionLabel}>DESCRIBE THE ISSUE</Text>
+          <TextInput
+            style={styles.input}
+            multiline
+            numberOfLines={4}
+            placeholder="What did you expect? What actually happened? Any reproduction steps?"
+            placeholderTextColor="#5c5345"
+            value={description}
+            onChangeText={setDescription}
+            textAlignVertical="top"
+            inputAccessoryViewID={Platform.OS === 'ios' ? DESCRIBE_ACCESSORY : undefined}
+          />
+          {/* ⚠ OTA-1718 — the courtesy, not the fix. SEND is reachable with the
+              keyboard up either way; this is here because a multiline field has
+              no return key to close with, and asking a tester to know an
+              undocumented gesture is its own defect. */}
+          {Platform.OS === 'ios' && (
+            <InputAccessoryView nativeID={DESCRIBE_ACCESSORY}>
+              <View style={styles.accessoryBar}>
+                <Pressable
+                  onPress={() => Keyboard.dismiss()}
+                  accessibilityRole="button"
+                  accessibilityLabel="Done — close the keyboard"
+                  style={({ pressed }) => [styles.accessoryBtn, pressed && styles.btnPressed]}
+                >
+                  <Text style={styles.accessoryText}>DONE</Text>
+                </Pressable>
+              </View>
+            </InputAccessoryView>
+          )}
+        </>
+      )}
+    </KeyboardSafeCard>
   );
 }
 
@@ -296,21 +303,18 @@ function formatAgo(ts: number): string {
 }
 
 const styles = StyleSheet.create({
-  scrim: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.7)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
+  // ⚠ OTA-1718 — scrim / cardWrap / card are gone: KeyboardSafeCard owns the
+  // frame now, and owning it in one place is the point of that component.
+  accessoryBar: {
+    backgroundColor: '#1a1714',
+    borderTopColor: '#3a342c',
+    borderTopWidth: 1,
+    alignItems: 'flex-end',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
   },
-  cardWrap: { width: '100%', maxWidth: 420, maxHeight: '90%' },
-  card: {
-    backgroundColor: '#13110f',
-    borderColor: '#c9a86a',
-    borderWidth: 1,
-    borderRadius: 4,
-    padding: 14,
-  },
+  accessoryBtn: { paddingHorizontal: 14, paddingVertical: 6 },
+  accessoryText: { color: '#c9a86a', fontSize: 12, fontWeight: '800', letterSpacing: 2 },
   headerRow: { marginBottom: 10 },
   title: {
     color: '#c9a86a',
@@ -329,7 +333,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   slotList: {
-    maxHeight: 180,
+    padding: 4,
     borderColor: '#3a342c',
     borderWidth: 1,
     borderRadius: 3,

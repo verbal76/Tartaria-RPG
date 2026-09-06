@@ -124,7 +124,12 @@ describe('OTA-1672 — ⚠⚠ the text box gates two of the three', () => {
     // Disabling it would have been the smaller edit and the wrong one: a greyed
     // field still reads as something the player is failing to fill in, which is
     // the confusion this OTA is removing rather than restyling.
-    const branch = MODAL.slice(MODAL.indexOf('isFullLog ?'), MODAL.indexOf('buttonRow'));
+    // ⚠ OTA-1718 — the end marker was `buttonRow`, which now appears EARLIER in
+    // the file than this ternary: the buttons moved into the card's pinned
+    // `footer` prop when the modal was made keyboard-aware, so the slice ran
+    // backwards and read nothing. The claim is unchanged; the landmark is the
+    // close of the card's children.
+    const branch = MODAL.slice(MODAL.indexOf('isFullLog ?', MODAL.indexOf('DESCRIBE THE ISSUE') - 400), MODAL.indexOf('</KeyboardSafeCard>'));
     expect(branch.includes('<TextInput')).toBe(true);
     const beforeInput = branch.slice(0, branch.indexOf('<TextInput'));
     // The TextInput that survives lives in the ELSE arm — the full-log arm ends
