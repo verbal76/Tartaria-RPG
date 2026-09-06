@@ -36522,8 +36522,8 @@ export function tickDogStatus(
       const marks = [DOG_BLEED_OUT_HOURS * 0.25, DOG_BLEED_OUT_HOURS * 0.5, DOG_BLEED_OUT_HOURS * 0.75];
       const lines = [
         `${dog.name} is down and bleeding — about ${hoursLeft}h before {pronoun} is gone for good. Feed {object} or work a poultice to bring {object} back up.`,
-        `${dog.name} is fading — only about ${hoursLeft}h left. {Pronoun} needs food or a poultice, soon.`,
-        `The Arbiter grips your arm. "${dog.name} has maybe ${hoursLeft}h. Last window — feed {object} now or {pronoun} does not get up again."`,
+        `${dog.name} is fading — only about ${hoursLeft}h left. {Pronoun} need{verbS} food or a poultice, soon.`,
+        `The Arbiter grips your arm. "${dog.name} has maybe ${hoursLeft}h. Last window — feed {object} now or {pronoun} do{verbES} not get up again."`,
       ];
       let stage = dog.bleedWarnStage ?? 0;
       let fired = false;
@@ -36599,9 +36599,9 @@ export function tickDogStatus(
   // Escalating warning beats at 50 / 30 / 15 — latched so each fires
   // once per crossing, not every tick.
   const bands: Array<{ at: number; line: string }> = [
-    { at: 50, line: `${dog.name} keeps eyeing your pack. {Pronoun} {isOrAre} hungry — feed {pronoun} before the bond frays.` },
+    { at: 50, line: `${dog.name} keeps eyeing your pack. {Pronoun} {isOrAre} hungry — feed {object} before the bond frays.` },
     { at: 30, line: `${dog.name} lags a pace behind, ribs showing. {Pronoun} won't follow a starving road forever.` },
-    { at: 15, line: `${dog.name} won't meet your eye. One more empty day and {pronoun} walks.` },
+    { at: 15, line: `${dog.name} won't meet your eye. One more empty day and {pronoun} walk{verbS}.` },
   ];
   for (const b of bands) {
     if (loy <= b.at && floor > b.at) {

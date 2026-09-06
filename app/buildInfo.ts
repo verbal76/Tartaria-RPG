@@ -28283,7 +28283,19 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // was an already-collapsed synonym that could never match player input (the same
 // defect retreat and take_cover were each fixed for), and four faction concepts
 // are authored twice, so the codex showed them twice with duplicate React keys.
-export const OTA_BUILD_ID = '2026-09-06-1713-the-verbs-the-game-never-taught';
+// 2026-09-06 OTA-1714 - THE DOG IS CALLED THEY. From the dog-system review. The
+// onboarding asks for the dog's sex and accepts three answers, so `they` is a
+// first-class option and anything unparseable lands there too. The pronoun
+// machinery for it is complete - {object} for object slots, {verbS}/{verbES} for
+// the plural verb - and most of the 24 dog templates use it correctly. Four did
+// not, and they are the four a player reads while their dog is starving or
+// bleeding out: "feed they" (a case error, wrong for ALL THREE pronouns),
+// "They needs food", "or they does not see morning", "and they walks". The last
+// three read fine for he and she and break only for they, which is the quietest
+// way a defect survives - invisible unless you pick the option you were offered.
+// Two scanners ship with it so a fifth cannot slip in.
+export const OTA_BUILD_ID = '2026-09-06-1714-the-dog-is-called-they';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-06-1713-the-verbs-the-game-never-taught';
 // golem catch-up 2026-09-06: markerless publish of OTA-1713 - the verbs the game
 // never taught. Advance and give-ground get ACTIONS cards, `close in` reaches the
 // parser, and the codex stops showing four factions twice. hal took the marker.
