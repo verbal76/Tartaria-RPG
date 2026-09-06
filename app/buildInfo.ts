@@ -28294,7 +28294,27 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // three read fine for he and she and break only for they, which is the quietest
 // way a defect survives - invisible unless you pick the option you were offered.
 // Two scanners ship with it so a fifth cannot slip in.
-export const OTA_BUILD_ID = '2026-09-06-1714-the-dog-is-called-they';
+// 2026-09-06 OTA-1715 - THE DOG THAT WAS GREYED OUT FOREVER. Owner, mid-playtest:
+// "I haven't seemed to be able to use my dog for like the last 25 battles. it was
+// always just grayed out even though I had healed it." Reproduced and traced. A
+// dog knocked to 0 hp is benched (status waiting_at_base) and stamped with the
+// bleed-out hour. Healing restores the hp and the next tick clears the stamps.
+// NOTHING RESTORED THE STATUS - and the dog handler refuses every command from a
+// benched dog at ANY hp, so from that moment the dog was alive, at full health,
+// walking beside you, and permanently unusable. The only path back in the whole
+// codebase fires when you climb DOWN off a ledge; a player never up one never got
+// their dog back. The second half is why it looked like nothing at all: the
+// refusal was the climb joke, latched to fire once per install, so the first tap
+// printed a line about climbing on flat ground and every tap after was silent.
+// Fixed as an INVARIANT (a healthy dog is never benched on flat ground), not as a
+// heal hook - the stamps are long gone on saves already stuck, so a stamp-keyed
+// repair would never reach them. Saves repair themselves on the next action. The
+// climb bench is untouched: elevatedOn is the discriminator, the same one the UI
+// already uses. The latch now picks the WORDING, never whether to speak. Rides
+// along: the fifth "they" line, "before they is gone for good", in the first beat
+// of the bleed-out ladder - the class OTA-1714's scanner skipped, now instrumented.
+export const OTA_BUILD_ID = '2026-09-06-1715-the-dog-that-was-greyed-out';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-06-1714-the-dog-is-called-they';
 // golem catch-up 2026-09-06: markerless publish of OTA-1714 - the dog is called
 // they. Four hunger/bleed-out lines now read correctly for every pronoun the
 // onboarding offers. hal took the marker.

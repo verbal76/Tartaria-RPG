@@ -35158,16 +35158,13 @@ function handleDogCombat(
     if (dog.hp <= 0) {
       get().appendLog('arbiter', `The Arbiter shakes their head. "${dog.name} is still down. Let them rest before you ask for teeth."`);
     } else {
-      if (!get().worldMemory.dogClimbNoticeShown) {
-        get().appendLog(
-          'arbiter',
-          applyDogPronouns(
-            `The Arbiter peers over the edge. "I don't think ${dog.name} has learned to climb. {Pronoun} {isOrAre} holding the ground below."`,
-            dog.sex.pronoun,
-          ),
-        );
-        set((s) => ({ worldMemory: { ...s.worldMemory, dogClimbNoticeShown: true } }));
-      }
+      // ⚠⚠ OTA-1715 — the latch chooses the WORDING, never whether to speak.
+      const firstClimb = !get().worldMemory.dogClimbNoticeShown;
+      get().appendLog('arbiter', applyDogPronouns(firstClimb
+        ? `The Arbiter peers over the edge. "I don't think ${dog.name} has learned to climb. {Pronoun} {isOrAre} holding the ground below."`
+        : `The Arbiter nods down the slope. "{Pronoun} {isOrAre} still holding the ground below — climb down for {object}."`,
+        dog.sex.pronoun));
+      if (firstClimb) set((s) => ({ worldMemory: { ...s.worldMemory, dogClimbNoticeShown: true } }));
     }
     return;
   }
@@ -36521,7 +36518,7 @@ export function tickDogStatus(
       const hoursLeft = Math.max(1, Math.ceil(DOG_BLEED_OUT_HOURS - downFor));
       const marks = [DOG_BLEED_OUT_HOURS * 0.25, DOG_BLEED_OUT_HOURS * 0.5, DOG_BLEED_OUT_HOURS * 0.75];
       const lines = [
-        `${dog.name} is down and bleeding — about ${hoursLeft}h before {pronoun} is gone for good. Feed {object} or work a poultice to bring {object} back up.`,
+        `${dog.name} is down and bleeding — about ${hoursLeft}h before {pronoun} {isOrAre} gone for good. Feed {object} or work a poultice to bring {object} back up.`,
         `${dog.name} is fading — only about ${hoursLeft}h left. {Pronoun} need{verbS} food or a poultice, soon.`,
         `The Arbiter grips your arm. "${dog.name} has maybe ${hoursLeft}h. Last window — feed {object} now or {pronoun} do{verbES} not get up again."`,
       ];
@@ -36562,12 +36559,15 @@ export function tickDogStatus(
     return; // still down, still inside the window
   }
 
-  // Healed back above 0 since a down — clear the bleed-out stamp + warn
-  // latch so a later knockdown starts a fresh clock.
-  if (dog.downedAtHour != null || dog.bleedWarned || (dog.bleedWarnStage ?? 0) > 0) {
+  // ⚠⚠⚠ OTA-1715 — OFF THE BENCH, not just off the clock: a healed dog kept
+  // `waiting_at_base` and was refused by every command for the rest of the save.
+  // An invariant, not a heal hook, so saves already stuck repair. See ota1715.
+  const offBench = dog.status === 'waiting_at_base' && dog.hp > 0 && !get().currentScene?.elevatedOn;
+  if (offBench || dog.downedAtHour != null || dog.bleedWarned || (dog.bleedWarnStage ?? 0) > 0) {
     set((s) => s.player?.dog
-      ? { player: { ...s.player, dog: { ...s.player.dog, downedAtHour: undefined, bleedWarned: false, bleedWarnStage: 0 } } }
+      ? { player: { ...s.player, dog: { ...s.player.dog, downedAtHour: undefined, bleedWarned: false, bleedWarnStage: 0, ...(offBench ? { status: 'with_player' as const } : {}) } } }
       : s);
+    if (offBench) get().appendLog('world', `${dog.name} shakes off the worst of it and falls back in beside you.`);
   }
 
   // --- 2. Loyalty: warning beats + abandonment -----------------------
