@@ -49,6 +49,47 @@ import { OTA_BUILD_ID } from '../buildInfo';
 const KEY_ATTEMPTED = 'tartaria.ml.lastInitAttempt';
 const KEY_SUCCEEDED = 'tartaria.ml.lastInitSuccess';
 const KEY_CRASH_COUNT = 'tartaria.ml.crashCount';
+/** ⚠⚠⚠ OTA-1709 — THE FAILURE THE APP WATCHED HAPPEN, WRITTEN DOWN.
+ *
+ *  Everything above this line is INFERRED: the guard reads a breadcrumb that
+ *  says "init was attempted and never marked succeeded" and concludes the
+ *  process died. That inference is the only evidence it has for a NATIVE crash,
+ *  and it is the right tool for one.
+ *
+ *  But a load can also fail in the open. `qwen.initialize()` swallows its errors
+ *  and reports `status: 'failed'` with a cause, and bootQwen logs it —
+ *  `qwen: LOAD FAILED — Failed to load the model (after 3489ms; gguf 468.6MB)`.
+ *  Nothing died. The app is running, it KNOWS the model did not load, and it
+ *  knows why. Until now it wrote none of that down, so:
+ *
+ *   · the guard could not act until the NEXT boot rebuilt, by inference, a fact
+ *     it had already been told directly — a whole session on templates with the
+ *     counter still reading 0;
+ *   · the OTA-1261 alibi FORGAVE it. That rule clears the dangling breadcrumb
+ *     when a fatal JS error is on record after the attempt, which is correct
+ *     when the missing success is an inference — but an observed load failure is
+ *     not explained by a later unrelated crash, and any JS fatal bought it a
+ *     full pardon;
+ *   · and the diagnostic called it a crash. A caught, diagnosed, non-fatal
+ *     failure was reported as "crashes detected this install", which is the
+ *     instrument lying in exactly the place we read it from.
+ *
+ *  These keys are the direct observation. See markQwenLoadFailed. */
+const KEY_LOAD_FAIL_COUNT = 'tartaria.ml.qwenLoadFailCount';
+const KEY_LOAD_FAIL_AT = 'tartaria.ml.qwenLoadFailAt';
+const KEY_LOAD_FAIL_WHY = 'tartaria.ml.qwenLoadFailWhy';
+
+/** ⚠⚠ ONE PER SESSION, AND THE UNIT IS WHY.
+ *
+ *  Every number this guard weighs means "a launch that tried and did not get
+ *  there" — crashCount is incremented once per boot, and the thresholds (2 to
+ *  disable, 6 to spend a past success) are calibrated in launches. bootQwen can
+ *  run several times in one session, though: App.tsx re-warms on a settled
+ *  foreground, and qwenWatchdog will drive up to 8 re-inits in a stretch. Left
+ *  uncapped, one bad session would count 8 "failures" and blow through a ceiling
+ *  meant to take six launches — the same number meaning two different things
+ *  depending on which path incremented it. The cap keeps the unit honest. */
+let loadFailCountedThisSession = false;
 const KEY_DISABLED = 'tartaria.ml.disabledByCrash';
 const MAX_CRASHES_BEFORE_DISABLE = 2;
 // ⚠⚠⚠ OTA-1704 — HOW MUCH ROPE ONE PAST SUCCESS BUYS.
@@ -217,6 +258,15 @@ interface MLHealthState {
   genRetryingThisBoot: boolean;
   /** OTA-1705 — cold boots until the next amnesty, when one is scheduled. */
   genNextRetryInBoots: number | null;
+  /** ⚠ OTA-1709 — load failures this install that the app OBSERVED, as against
+   *  the boots it inferred from a dangling breadcrumb. Counted separately
+   *  because they are different evidence, and weighed together because the
+   *  device is making one statement either way: the model does not load here. */
+  qwenLoadFailCount: number;
+  /** When the last observed load failure happened, and the cause the engine
+   *  gave for it — the single most useful line in a bug report about narration. */
+  lastLoadFailAt: string | null;
+  lastLoadFailWhy: string | null;
   /** arb129 — last-loaded Qwen native kernel variant (e.g. rnllama_v8_4_fp16_dotprod_i8mm)
    *  + the one-line CPU/SoC/kernel diagnostic, reported by LlamaRuntime after init.
    *  Persisted so the copyable bug report names the variant even after a crash. */
@@ -253,8 +303,11 @@ export async function loadMLHealth(): Promise<MLHealthState> {
   let genRetryAtStr: string | null = null;
   let genRetryPendingStr: string | null = null;
   let genBackoffStr: string | null = null;
+  let loadFailCountStr: string | null = null;
+  let loadFailAt: string | null = null;
+  let loadFailWhy: string | null = null;
   try {
-    [attempted, succeeded, crashCountStr, disabledStr, completionInProgress, qwenCrashCountStr, qwenDisabledStr, ttsInProgress, ttsCrashCountStr, ttsDisabledStr, ttsCountBuildStr, bootCountStr, qwenRetryAtStr, qwenRetryPendingStr, qwenBackoffStr, genRetryAtStr, genRetryPendingStr, genBackoffStr] = await Promise.all([
+    [attempted, succeeded, crashCountStr, disabledStr, completionInProgress, qwenCrashCountStr, qwenDisabledStr, ttsInProgress, ttsCrashCountStr, ttsDisabledStr, ttsCountBuildStr, bootCountStr, qwenRetryAtStr, qwenRetryPendingStr, qwenBackoffStr, genRetryAtStr, genRetryPendingStr, genBackoffStr, loadFailCountStr, loadFailAt, loadFailWhy] = await Promise.all([
       AsyncStorage.getItem(KEY_ATTEMPTED),
       AsyncStorage.getItem(KEY_SUCCEEDED),
       AsyncStorage.getItem(KEY_CRASH_COUNT),
@@ -273,6 +326,9 @@ export async function loadMLHealth(): Promise<MLHealthState> {
       AsyncStorage.getItem(KEY_GEN_RETRY_AT),
       AsyncStorage.getItem(KEY_GEN_RETRY_PENDING),
       AsyncStorage.getItem(KEY_GEN_BACKOFF),
+      AsyncStorage.getItem(KEY_LOAD_FAIL_COUNT),
+      AsyncStorage.getItem(KEY_LOAD_FAIL_AT),
+      AsyncStorage.getItem(KEY_LOAD_FAIL_WHY),
     ]);
   } catch {
     // AsyncStorage failed — defensive default to "all clean, attempt ML."
@@ -281,6 +337,10 @@ export async function loadMLHealth(): Promise<MLHealthState> {
   let crashCount = Number.parseInt(crashCountStr ?? '0', 10);
   if (!Number.isFinite(crashCount) || crashCount < 0) crashCount = 0;
   let disabledByCrash = disabledStr === 'true';
+  // ⚠ OTA-1709 — the observed half of the same ledger. Parsed here so every
+  // guard below can weigh it beside the inferred half.
+  let qwenLoadFailCount = Number.parseInt(loadFailCountStr ?? '0', 10);
+  if (!Number.isFinite(qwenLoadFailCount) || qwenLoadFailCount < 0) qwenLoadFailCount = 0;
 
   // Detect previous-session crash: attempted exists and either
   // succeeded doesn't exist, OR succeeded predates attempted.
@@ -316,6 +376,20 @@ export async function loadMLHealth(): Promise<MLHealthState> {
   let initCrashExplainedByJsThisBoot = false;
   if (attempted && (!succeeded || succeeded < attempted)) {
     const attemptedAt = Date.parse(attempted);
+    // ⚠⚠⚠ OTA-1709 — AND THE ALIBI ONLY COVERS AN INFERENCE.
+    //
+    // OTA-1261's rule is sound for what it was built for: a dangling breadcrumb
+    // means "the process died in the init window", a fatal JS error recorded
+    // after the attempt explains that death, and the native guard must not take
+    // the blame for a render bug.
+    //
+    // ⚠ It does not extend to a load we WATCHED FAIL. markQwenLoadFailed clears
+    // KEY_ATTEMPTED at the moment it records the failure, precisely so this
+    // block never sees that attempt — so if a breadcrumb IS still dangling here,
+    // no observed failure claimed it and the alibi applies as before. The
+    // ordering is the guard; this comment is here because reversing it would
+    // silently hand every diagnosed load failure a pardon, which is what the
+    // code did before this OTA.
     const explained = jsFatalAt !== null
       && Number.isFinite(attemptedAt)
       && jsFatalAt >= attemptedAt;
@@ -466,7 +540,10 @@ export async function loadMLHealth(): Promise<MLHealthState> {
   let genRetryingThisBoot = false;
   let genNextRetryInBoots: number | null = null;
   {
-    const exemptBySuccess = !!succeeded && crashCount < QWEN_FAILURES_AFTER_SUCCESS_CEILING;
+    // ⚠ OTA-1709 — failuresSinceSuccess, not crashCount: an observed load
+    // failure spends the same budget as an inferred one.
+    const exemptBySuccess = !!succeeded
+      && crashCount + qwenLoadFailCount < QWEN_FAILURES_AFTER_SUCCESS_CEILING;
     const benched = disabledByCrash && !exemptBySuccess;
     const genPending = genRetryPendingStr === '1';
     let genBackoff = Number.parseInt(genBackoffStr ?? '0', 10);
@@ -617,6 +694,9 @@ export async function loadMLHealth(): Promise<MLHealthState> {
     genNextRetryInBoots,
     qwenRecoveredThisBoot,
     qwenNextRetryInBoots,
+    qwenLoadFailCount,
+    lastLoadFailAt: loadFailAt,
+    lastLoadFailWhy: loadFailWhy,
     qwenVariant,
     qwenCpuDiag,
   };
@@ -652,6 +732,31 @@ export async function recordQwenRuntime(variant: string, diag: string): Promise<
  *  log carried no qwen line at all: the boot path's skip branches only
  *  console.warn, which never reaches the device log. Same three tests as
  *  shouldAttemptQwen, in the same order, spelled out. */
+/** ⚠⚠ OTA-1709 — the two kinds of evidence, added. `crashCount` is INFERRED
+ *  (a boot attempted and never came back); `qwenLoadFailCount` is OBSERVED (the
+ *  app watched the load fail and holds the reason). They are counted apart
+ *  because they are different facts and a bug report should say which it has —
+ *  and weighed together because the device is making one statement either way.
+ *  One definition, so the gate and the prose can never disagree. */
+function failuresSinceSuccess(): number {
+  return (cached?.crashCount ?? 0) + (cached?.qwenLoadFailCount ?? 0);
+}
+
+/** ⚠ OTA-1709 — "6 failures" with no account of what they were is the kind of
+ *  number that sends a reader down the wrong path. This says which half they
+ *  came from, and names the last cause we actually recorded. */
+function failureLedgerPhrase(): string {
+  const inferred = cached?.crashCount ?? 0;
+  const observed = cached?.qwenLoadFailCount ?? 0;
+  const parts: string[] = [];
+  if (inferred > 0) parts.push(`${inferred} boot${inferred === 1 ? '' : 's'} that never came back`);
+  if (observed > 0) {
+    const why = cached?.lastLoadFailWhy ? ` — last: ${cached.lastLoadFailWhy}` : '';
+    parts.push(`${observed} load${observed === 1 ? '' : 's'} that failed in the open${why}`);
+  }
+  return parts.length ? parts.join(' + ') : 'no failures on record';
+}
+
 export function qwenGateReason(): string {
   if (!cached) return 'health not loaded yet';
   if (cached.qwenDisabledByCrash) {
@@ -659,18 +764,18 @@ export function qwenGateReason(): string {
   }
   // ⚠ OTA-1704 — the exemption is bounded; say so, with both numbers, because
   // this is the line the next bug report will be read for.
-  if (cached.lastSuccessAt && (cached.crashCount ?? 0) >= QWEN_FAILURES_AFTER_SUCCESS_CEILING) {
-    return `loaded once on this install (${cached.lastSuccessAt}) but ${cached.crashCount} boots have attempted and failed since — past the ${QWEN_FAILURES_AFTER_SUCCESS_CEILING} that a past success buys`;
+  if (cached.lastSuccessAt && failuresSinceSuccess() >= QWEN_FAILURES_AFTER_SUCCESS_CEILING) {
+    return `loaded once on this install (${cached.lastSuccessAt}) but ${failuresSinceSuccess()} failures since (${failureLedgerPhrase()}) — past the ${QWEN_FAILURES_AFTER_SUCCESS_CEILING} that a past success buys`;
   }
   if (cached.lastSuccessAt) return `ok — ML has loaded on this install (last ${cached.lastSuccessAt})`;
   if (cached.genRetryingThisBoot) {
-    return `retrying this session — the general guard is disabled (${cached.crashCount} boot crash${cached.crashCount === 1 ? '' : 'es'}) and this is its periodic attempt`;
+    return `retrying this session — the general guard is disabled (${failureLedgerPhrase()}) and this is its periodic attempt`;
   }
   if (cached.disabledByCrash) {
     const when = cached.genNextRetryInBoots !== null
       ? `; trying again on its own in ${cached.genNextRetryInBoots} launch${cached.genNextRetryInBoots === 1 ? '' : 'es'}`
       : '';
-    return `never loaded on this install and the general boot guard is disabled (${cached.crashCount} boot crash${cached.crashCount === 1 ? '' : 'es'})${when}`;
+    return `never loaded on this install and the general boot guard is disabled (${failureLedgerPhrase()})${when}`;
   }
   return 'ok — never loaded on this install, general boot guard open';
 }
@@ -690,7 +795,10 @@ export function shouldAttemptQwen(): boolean {
   // ⚠⚠ OTA-1704 — bounded. A past success excuses the polluted general counter
   // only while the failures since that success stay under the ceiling; see the
   // constant for the iPhone that proved an unbounded exemption never lets go.
-  if (cached?.lastSuccessAt && (cached.crashCount ?? 0) < QWEN_FAILURES_AFTER_SUCCESS_CEILING) return true;
+  // ⚠ OTA-1709 — both halves of the ledger. An observed load failure is the
+  // better evidence of the two (we watched it, and we hold the reason), so it
+  // would be strange for it to be the one the exemption ignores.
+  if (cached?.lastSuccessAt && failuresSinceSuccess() < QWEN_FAILURES_AFTER_SUCCESS_CEILING) return true;
   // ⚠⚠ OTA-1705 — and this is the boot the device gets to prove it recovered.
   if (cached?.genRetryingThisBoot) return true;
   // Never succeeded, or succeeded once and failed steadily since → honor the
@@ -813,6 +921,61 @@ export function shouldAttemptMLInit(): boolean {
   return !(cached?.disabledByCrash ?? false);
 }
 
+/** ⚠⚠⚠ OTA-1709 — THE LOAD FAILED AND WE SAW IT. WRITE IT DOWN.
+ *
+ *  Called from bootQwen's two OBSERVED-failure branches — `LOAD FAILED` (the
+ *  engine reports `status: 'failed'` with a cause) and `LOAD THREW` (initLlama
+ *  threw outright, which means llama.rn is missing from the build). Both are
+ *  direct evidence, gathered while the app is alive and holding the reason.
+ *
+ *  ⚠⚠ NOT CALLED FOR A CANCELLED LOAD, and that boundary is the whole of
+ *  OTA-1405's lesson. A load abandoned because the player switched away has
+ *  `getLastError() === null` — the engine has no complaint — and OTA-1405 cost
+ *  the owner a wrong reading of his own log by inventing one. Counting a
+ *  cancellation here would be the same error with a durable counter behind it:
+ *  every backgrounded load would spend the guard's budget, and a device that
+ *  merely gets used would bench itself. ota1709 pins that this is never reached
+ *  from that branch.
+ *
+ *  ⚠⚠ IT CLEARS THE ATTEMPT BREADCRUMB, and that is load-bearing twice over.
+ *  The attempt is now accounted for by direct observation, so leaving it would
+ *  let the next boot ALSO count it as an inferred native crash — one failure,
+ *  two marks, which is exactly the phantom-recount arb125 had to fix. And
+ *  because the breadcrumb is gone, the OTA-1261 JS-fatal alibi can no longer
+ *  reach this failure and pardon it.
+ *
+ *  Best-effort throughout: a device whose AsyncStorage is failing still gets a
+ *  correct in-memory `cached`, so the gate is right for this session even when
+ *  nothing can be persisted for the next one. */
+export async function markQwenLoadFailed(why: string): Promise<void> {
+  if (loadFailCountedThisSession) return;   // see the constant — the unit is launches
+  loadFailCountedThisSession = true;
+  const now = new Date().toISOString();
+  // ⚠ Trimmed: this rides in the bug-report header, and an engine can return a
+  // very long native error. The first line is where the cause always is.
+  const reason = String(why ?? '').split('\n')[0]!.slice(0, 240);
+  const next = (cached?.qwenLoadFailCount ?? 0) + 1;
+  if (cached) {
+    cached.qwenLoadFailCount = next;
+    cached.lastLoadFailAt = now;
+    cached.lastLoadFailWhy = reason;
+    // ⚠ The gate is asked again THIS session (App.tsx re-warms on a settled
+    // foreground, and the watchdog re-inits), so the verdict has to move now
+    // rather than at the next boot — that delay was the defect.
+    if (cached.crashCount + next >= MAX_CRASHES_BEFORE_DISABLE) cached.disabledByCrash = true;
+    cached.lastAttemptAt = null;
+  }
+  try {
+    await AsyncStorage.setItem(KEY_LOAD_FAIL_COUNT, String(next));
+    await AsyncStorage.setItem(KEY_LOAD_FAIL_AT, now);
+    await AsyncStorage.setItem(KEY_LOAD_FAIL_WHY, reason);
+    await AsyncStorage.removeItem(KEY_ATTEMPTED);
+    if ((cached?.crashCount ?? 0) + next >= MAX_CRASHES_BEFORE_DISABLE) {
+      await AsyncStorage.setItem(KEY_DISABLED, 'true');
+    }
+  } catch { /* best effort — cached above still carries the verdict this session */ }
+}
+
 /**
  * Call BEFORE attempting ML init. Writes a breadcrumb that, if not
  * followed by markMLInitSucceeded before next launch, will be
@@ -845,6 +1008,11 @@ export async function markMLInitSucceeded(): Promise<void> {
     // The Qwen-COMPLETION guard (KEY_QWEN_*) is intentionally left intact.
     await AsyncStorage.removeItem(KEY_CRASH_COUNT);
     await AsyncStorage.removeItem(KEY_DISABLED);
+    // ⚠ OTA-1709 — and the OBSERVED half, for arb124's own reason: a load that
+    // landed proves this device can load the model, so the failures before it
+    // describe a device that no longer exists. Leaving them would let six old
+    // failures spend a fresh success's exemption the moment it was earned.
+    await AsyncStorage.removeItem(KEY_LOAD_FAIL_COUNT);
   } catch {
     // ignore — best effort
   }
@@ -852,7 +1020,11 @@ export async function markMLInitSucceeded(): Promise<void> {
     cached.lastSuccessAt = now;
     cached.crashCount = 0;
     cached.disabledByCrash = false;
+    cached.qwenLoadFailCount = 0;
   }
+  // ⚠ And the session cap lifts: a later failure in this same session is a new
+  // statement about a device that has now demonstrably loaded once.
+  loadFailCountedThisSession = false;
 }
 
 /**
@@ -884,13 +1056,24 @@ export async function resetMLHealth(): Promise<void> {
       AsyncStorage.removeItem(KEY_GEN_RETRY_AT),
       AsyncStorage.removeItem(KEY_GEN_RETRY_PENDING),
       AsyncStorage.removeItem(KEY_GEN_BACKOFF),
+      // ⚠ OTA-1709 — and the OBSERVED load failures, with the cause we recorded
+      // for the last one. RELOAD AI means "forget what you decided about this
+      // device"; a counter that survived it would keep the verdict alive after
+      // the player asked for it to be dropped.
+      AsyncStorage.removeItem(KEY_LOAD_FAIL_COUNT),
+      AsyncStorage.removeItem(KEY_LOAD_FAIL_AT),
+      AsyncStorage.removeItem(KEY_LOAD_FAIL_WHY),
     ]);
   } catch {
     // ignore
   }
+  loadFailCountedThisSession = false;
   if (cached) {
     cached.crashCount = 0;
     cached.disabledByCrash = false;
+    cached.qwenLoadFailCount = 0;
+    cached.lastLoadFailAt = null;
+    cached.lastLoadFailWhy = null;
     cached.qwenCompletionCrashCount = 0;
     cached.qwenDisabledByCrash = false;
     cached.qwenPermaDisabled = false;
@@ -939,9 +1122,22 @@ export function mlHealthSummary(): string {
       `  Status: not yet loaded`,
     ].join('\n');
   }
+  // ⚠⚠⚠ OTA-1709 — AND IT STOPS CALLING A DIAGNOSED FAILURE A CRASH.
+  //
+  // Every branch below used to read `crashCount` alone and describe it as
+  // "crashes detected this install". A load that failed in the open — caught,
+  // named, nothing died — arrived here one boot later as an inferred crash and
+  // was reported as one. That is the instrument misleading its reader in the
+  // exact place we go to read it, and this file has been bitten by that before.
+  // failureLedgerPhrase() says which evidence there is and what the last cause
+  // actually was.
   let status: string;
   if (state.disabledByCrash) {
-    status = `auto-disabled after ${state.crashCount} crashes (template narration in use)`;
+    status = `auto-disabled after ${failuresSinceSuccess()} failures — ${failureLedgerPhrase()} (template narration in use)`;
+  } else if (state.qwenLoadFailCount > 0 && !state.detectedCrashThisBoot) {
+    // The load failed where we could see it. That is the most useful thing this
+    // block can say, so it outranks the inferred wording.
+    status = `degraded — ${failureLedgerPhrase()} (${failuresSinceSuccess()}/${MAX_CRASHES_BEFORE_DISABLE} before auto-disable)`;
   } else if (state.detectedCrashThisBoot) {
     status = `recovering — detected a crash on previous launch (${state.crashCount}/${MAX_CRASHES_BEFORE_DISABLE} before auto-disable)`;
   } else if (state.initCrashExplainedByJsThisBoot) {
@@ -951,7 +1147,7 @@ export function mlHealthSummary(): string {
       ? `active — an init breadcrumb was explained by a JS crash, not counted (${state.crashCount}/${MAX_CRASHES_BEFORE_DISABLE} from earlier)`
       : `active — an init breadcrumb was explained by a JS crash, not counted against ML`;
   } else if (state.crashCount > 0) {
-    status = `degraded — ${state.crashCount}/${MAX_CRASHES_BEFORE_DISABLE} crashes detected this install`;
+    status = `degraded — ${state.crashCount}/${MAX_CRASHES_BEFORE_DISABLE} boots that never came back, this install`;
   } else {
     status = `active (no crashes detected)`;
   }
@@ -994,6 +1190,14 @@ export function mlHealthSummary(): string {
     `  Last init attempt: ${state.lastAttemptAt ?? 'never'}`,
     `  Last init success: ${state.lastSuccessAt ?? 'never'}`,
     `  Crashes-before-disable threshold: ${MAX_CRASHES_BEFORE_DISABLE}`,
+    // ⚠ OTA-1709 — the cause the ENGINE gave, verbatim, for the last load that
+    // failed in the open. When narration is on templates and nobody knows why,
+    // this is the line that says whether the model is missing, out of memory or
+    // out of disk — and it now survives the launch it happened on.
+    ...(state.qwenLoadFailCount > 0
+      ? [`  Observed load failures: ${state.qwenLoadFailCount}${state.lastLoadFailAt ? ` (last ${state.lastLoadFailAt})` : ''}`,
+         `  Last load failure cause: ${state.lastLoadFailWhy ?? 'not recorded'}`]
+      : []),
     `  Qwen completion guard: ${qwenStatus}`,
     // arb129 — which native kernel variant this device loaded + its CPU/SoC
     // signature. `sveUsed=false` with `sveRaw=true` confirms the SVE-disable

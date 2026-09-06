@@ -28221,7 +28221,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // missing identity words, and a word-boundary fix that makes two entries
 // reachable that never could fire. The saved-gear migration was following
 // the unpaid field too, and on 42 rows that deleted a bonus outright.
-export const OTA_BUILD_ID = '2026-09-06-1708-the-armour-spread-reaches-the-player';
+// 2026-09-06 OTA-1709 - THE FAILURE WE WATCHED IS WRITTEN DOWN. The model guard
+// ran on one kind of evidence: a breadcrumb meaning "init was attempted and
+// never marked succeeded". That is an INFERENCE, and the right one for a native
+// crash. But a load also fails in the open - initialize() swallows its error and
+// reports a cause, bootQwen logs `qwen: LOAD FAILED - ...`, and nothing dies.
+// The app knew the model had not loaded and knew why, and wrote none of it down:
+// the guard could not act until the NEXT boot reconstructed by inference a fact
+// it had been told outright; the OTA-1261 JS-fatal alibi pardoned it wholesale;
+// and the diagnostic reported a caught, non-fatal failure as a process crash.
+// markQwenLoadFailed records it durably with its cause, clears the attempt
+// breadcrumb so one failure cannot be counted twice, and the guards weigh the
+// observed half beside the inferred one. Never on a CANCELLED load - OTA-1405.
+export const OTA_BUILD_ID = '2026-09-06-1709-the-failure-we-watched-is-written-down';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-06-1708-the-armour-spread-reaches-the-player';
 // golem catch-up 2026-09-06: markerless publish of OTA-1708 - the armour
 // spread reaches the player. Stage 2 of the stat rebalance, plus the finding
 // that stage 1 was authored into a field the armour payout never reads.

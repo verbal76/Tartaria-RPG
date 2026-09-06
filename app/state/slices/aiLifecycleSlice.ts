@@ -36,7 +36,7 @@ import { cognitive, qwen } from '../../ai/engines';
  */
 import type { GameStore } from '../gameStore';
 // OTA-1704 — the crash guard's own answer, read at the one door every load uses.
-import { shouldAttemptQwen, qwenGateReason, deviceCapabilityLine } from '../../diagnostics/mlHealth';
+import { shouldAttemptQwen, qwenGateReason, deviceCapabilityLine, markQwenLoadFailed } from '../../diagnostics/mlHealth';
 
 /** The slice's public surface — exactly the store keys this file owns. */
 export interface AiLifecycleSlice {
@@ -203,6 +203,13 @@ export const createAiLifecycleSlice = (
         // including one about something else entirely. This is the single line that says
         // whether the narration engine is missing, out of memory, or out of disk.
         try { get().appendLog('debug', `qwen: LOAD FAILED — ${why}`); } catch { /* ignore */ }
+        // ⚠⚠⚠ OTA-1709 — AND WRITE IT DOWN, because the log is not a guard.
+        // The line above ships in a bug report; it does not reach the code that
+        // decides whether to try again. Before this, the guard learned about
+        // this failure only on the NEXT boot, by inferring it from a breadcrumb
+        // that had not been cleared — reconstructing something it had just been
+        // told outright, one launch late, and calling the result a crash.
+        void markQwenLoadFailed(why);
       } else {
         // ⚠⚠ OTA-1405 — A CANCELLED LOAD IS NOT A FAILED ONE, and calling it one
         // cost the owner a wrong reading of his own log. From the 2026-08-20
@@ -236,6 +243,10 @@ export const createAiLifecycleSlice = (
       // missing native module throws outright, and that is the one answer that no OTA can
       // fix: it means llama.rn is not in the installed build.
       try { get().appendLog('debug', `qwen: LOAD THREW — ${message}`); } catch { /* ignore */ }
+      // ⚠ OTA-1709 — the throwing path is an observed failure too, and the most
+      // conclusive one there is: a missing native module means llama.rn is not
+      // in the installed build, which no retry and no OTA can change.
+      void markQwenLoadFailed(message);
     }
     clearTimeout(stallTimer); // OTA-1635 — settled one way or the other; the line is only for a load that never does
     // OTA-223 — start the background dormancy watchdog after the

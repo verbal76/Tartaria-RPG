@@ -88,7 +88,13 @@ describe('OTA-1704 — a past success rents the exemption, it does not own it', 
     mockStore[K.succeeded] = IPHONE.lastSuccess;
     const { reason } = await gates();
     expect(reason.includes(IPHONE.lastSuccess)).toBe(true);
-    expect(reason.includes('8 boots have attempted and failed since')).toBe(true);
+    // ⚠ OTA-1709 RE-ANCHORED — the CLAIM is unchanged (the reason names the past
+    // success and the failures since, so a bug report reads itself); the wording
+    // got more precise. It now says which KIND of evidence those failures are,
+    // because there are two kinds: boots that never came back, and loads the app
+    // watched fail in the open.
+    expect(reason.includes('8 failures since')).toBe(true);
+    expect(reason.includes('8 boots that never came back')).toBe(true);
   });
 
   it('⚠ arb124 is PRESERVED under the ceiling: a proven device riding OS-kill noise still loads', async () => {
