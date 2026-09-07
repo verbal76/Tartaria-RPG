@@ -177,7 +177,10 @@ export function seedRelationsFromMet(memory: WorldMemory): WorldMemory {
   return { ...memory, npcRelations: rels };
 }
 
-export function getRelation(memory: WorldMemory, id: string): NpcRelation | null {
+/** ⚠ LAG-2 — takes the ONE field it reads, so a caller can subscribe to
+ *  `npcRelations` alone instead of the whole memory (which the 6s world
+ *  heartbeat replaces). `WorldMemory` still satisfies the parameter. */
+export function getRelation(memory: Pick<WorldMemory, 'npcRelations'>, id: string): NpcRelation | null {
   return memory.npcRelations?.[id] ?? null;
 }
 
@@ -830,7 +833,9 @@ export function dealingsSummary(rel: NpcRelation | null | undefined): string {
 /** Everyone the player has actually met, best-regarded first, for the
  *  Chronicle. Ties break on meeting count so the list is stable. */
 const REGARD_RANK: NpcRegard[] = ['wronged', 'trusted', 'familiar', 'known', 'met', 'stranger'];
-export function knownPeople(memory: WorldMemory): NpcRelation[] {
+/** ⚠ LAG-2 — takes the ONE field it reads (see getRelation above), so a screen
+ *  can subscribe to `npcRelations` instead of the whole heartbeat-churned memory. */
+export function knownPeople(memory: Pick<WorldMemory, 'npcRelations'>): NpcRelation[] {
   const all = Object.values(memory.npcRelations ?? {}).filter((r) => r.meetings > 0);
   return all.sort((a, b) => {
     const d = REGARD_RANK.indexOf(npcRegard(a)) - REGARD_RANK.indexOf(npcRegard(b));

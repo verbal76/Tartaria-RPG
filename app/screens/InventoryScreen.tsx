@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect, useRef } from 'react';
+import React, { useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import {
@@ -328,6 +328,62 @@ export function InventoryScreen() {
     { coatId: string; coatName: string; armorId: string; armorName: string; coatType: string; resists: string[] } | null
   >(null);
 
+  /* ⚠⚠⚠ LAG-2 — ONE MEMO FOR THE WHOLE PACK PIPELINE.
+   *
+   *  Search → fill-mode filter → FUSABLE filter → sort → group ran on EVERY
+   *  render of this screen: five passes over a 250+ item array to redraw a
+   *  modal, toggle a chip, or absorb any unrelated store change. It now runs
+   *  when one of its real inputs moves and not otherwise.
+   *
+   *  ⚠ IT SITS ABOVE THE GUARD BELOW ON PURPOSE — the same rule VendorScreen's
+   *  OTA-022 note states: every hook must unconditionally precede any return, or
+   *  a render that takes the early path sees a different hook count and React
+   *  throws. That is why the body is written to tolerate a null player rather
+   *  than being placed after the guard where `player` is already narrowed. */
+  const wornIds = useMemo(
+    // OTA-1094 — one worn-instance set for the whole screen: the sort pre-key AND
+    // the coating pickers below read it, so what floats to the top and what carries
+    // the EQUIPPED tag can never disagree.
+    () => (player ? wornInstanceIds(player) : new Set<string>()),
+    [player],
+  );
+  const { sorted, grouped } = useMemo(() => {
+    // OTA-087 — apply search filter + sort BEFORE grouping by
+    // category. The category sections still render in the same
+    // CATEGORY_ORDER; only the items within each section get
+    // filtered/sorted by the user's choices. Empty sections
+    // collapse automatically via the `items.length === 0` check
+    // further down.
+    const queryLower = searchQuery.trim().toLowerCase();
+    const inventory = player?.inventory ?? [];
+    // OTA-269 — pouch filter narrows the list to pouch-eligible items
+    // when the player has tapped an empty slot above. Layered AFTER
+    // the text-search filter so both can coexist (rare but cleanly
+    // composable).
+    const queryFiltered = queryLower.length > 0
+      ? inventory.filter((i) => i.name.toLowerCase().includes(queryLower))
+      : inventory;
+    const filtered = !player ? queryFiltered
+      : pouchFilterActive
+        ? queryFiltered.filter((i) => isPouchEligible(i, player).eligible)
+        // arb110 — bandolier fill mode narrows the list to throwables.
+        : bandolierFilterActive
+          ? queryFiltered.filter((i) => isBandolierEligible(i, player).eligible)
+          // OTA-1657 — healing-pouch fill mode narrows to what actually mends, so he
+          // is not scrolling a forty-row pack for the one kit he meant.
+          : medkitFilterActive
+            ? queryFiltered.filter((i) => isMedkitEligible(i, player).eligible)
+            : queryFiltered;
+    // arb-fix — the FUSABLE tab is a filter, not just a sort: narrow to items
+    // that qualify for the Crucible (reserved or not).
+    const fusionFiltered = sortKey === 'fusionable'
+      ? filtered.filter(isFusionEligible)
+      : filtered;
+    const inOrder = sortInventoryItems(fusionFiltered, sortKey, sortDirection, wornIds);
+    return { sorted: inOrder, grouped: groupInventoryByCategory(inOrder) };
+  }, [player, searchQuery, pouchFilterActive, bandolierFilterActive, medkitFilterActive,
+    sortKey, sortDirection, wornIds]);
+
   if (!player) {
     return (
       <View style={styles.container}>
@@ -336,35 +392,6 @@ export function InventoryScreen() {
     );
   }
 
-  // OTA-087 — apply search filter + sort BEFORE grouping by
-  // category. The category sections still render in the same
-  // CATEGORY_ORDER; only the items within each section get
-  // filtered/sorted by the user's choices. Empty sections
-  // collapse automatically via the `items.length === 0` check
-  // further down.
-  const queryLower = searchQuery.trim().toLowerCase();
-  // OTA-269 — pouch filter narrows the list to pouch-eligible items
-  // when the player has tapped an empty slot above. Layered AFTER
-  // the text-search filter so both can coexist (rare but cleanly
-  // composable).
-  const queryFiltered = queryLower.length > 0
-    ? player.inventory.filter((i) => i.name.toLowerCase().includes(queryLower))
-    : player.inventory;
-  const filtered = pouchFilterActive
-    ? queryFiltered.filter((i) => isPouchEligible(i, player).eligible)
-    // arb110 — bandolier fill mode narrows the list to throwables.
-    : bandolierFilterActive
-      ? queryFiltered.filter((i) => isBandolierEligible(i, player).eligible)
-      // OTA-1657 — healing-pouch fill mode narrows to what actually mends, so he
-      // is not scrolling a forty-row pack for the one kit he meant.
-      : medkitFilterActive
-        ? queryFiltered.filter((i) => isMedkitEligible(i, player).eligible)
-        : queryFiltered;
-  // arb-fix — the FUSABLE tab is a filter, not just a sort: narrow to items
-  // that qualify for the Crucible (reserved or not).
-  const fusionFiltered = sortKey === 'fusionable'
-    ? filtered.filter(isFusionEligible)
-    : filtered;
   // OTA-1097 — the FUSABLE view is a SELECTION surface, not a browsing one: every
   // row in it is Crucible stock, and the only question is in or out. In this mode
   // a tap toggles the reserve directly (owner: "if you tap on an item that has
@@ -384,10 +411,6 @@ export function InventoryScreen() {
       allSelected: actionable.length > 0 && actionable.every((i) => i.reservedForFusion === true),
     };
   };
-  // OTA-1094 — one worn-instance set for the whole screen: the sort pre-key AND
-  // the coating pickers below read it, so what floats to the top and what carries
-  // the EQUIPPED tag can never disagree.
-  const wornIds = wornInstanceIds(player);
   // OTA-1100 — THE INVENTORY LEARNS THE SAME GRIP. Owner, after OTA-1099's group
   // sell: "yes wire drop, fusable select and scrap the same way." Same contract
   // as the vendor list, which is the whole point — one gesture, one meaning,
@@ -456,8 +479,6 @@ export function InventoryScreen() {
     }
     exitInvSelect();
   };
-  const sorted = sortInventoryItems(fusionFiltered, sortKey, sortDirection, wornIds);
-  const grouped = groupInventoryByCategory(sorted);
   // Map equipped item name → the slot(s) it's currently in. Used so the
   // modal can offer Unequip on items already worn.
   const slotsByEquippedName = new Map<string, EquipSlot[]>();
@@ -632,7 +653,11 @@ export function InventoryScreen() {
   // valid slot (e.g. amulet) made the player think the tap did nothing —
   // and left no path to unequip. Modal always opens; player picks Equip
   // (specific slot) or Unequip (if currently worn) or Close.
-  const handleItemTap = (item: InventoryItem) => {
+  /* ⚠ LAG-2 — ONE handler for every row, not one per row. These are handed
+   *  straight to `ItemRow`, which is memoized: a fresh closure per row per
+   *  render would change every row's props on every render and the memo would
+   *  never hold. The dependency lists are the modes each handler branches on. */
+  const handleItemTap = useCallback((item: InventoryItem) => {
     // OTA-1100 — once a group is open, a tap adds or removes. Checked FIRST so
     // it beats every other tap meaning on this screen, including the FUSABLE
     // reserve-toggle below: while you are building a group, that is what taps do.
@@ -678,7 +703,8 @@ export function InventoryScreen() {
     }
     setScrapResult(null); // fresh modal — clear any prior result
     setPending({ item, slots: validSlotsForItem(item) });
-  };
+  }, [invSelectMode, toggleInvSelect, pouchFilterActive, stowInPouch, bandolierFilterActive,
+    stowInBandolier, medkitFilterActive, stowInMedkit, fusionSelectMode, toggleReserveForFusion]);
 
   // OTA-1100 — HOLD starts a group, everywhere in the inventory. This replaces
   // OTA-1097's FUSABLE-only "long-press opens the item sheet" escape hatch: one
@@ -686,13 +712,14 @@ export function InventoryScreen() {
   // than that hatch was. The single-unit "Save 1 for fusion" it used to reach is
   // still there — switch off the FUSABLE axis and tap the item, which is what
   // the FUSABLE banner now says.
-  const handleItemLongPress = (item: InventoryItem) => {
+  const handleItemLongPress = useCallback((item: InventoryItem) => {
     // The pouch / bandolier fill modes own the tap while they're armed; letting
     // a hold start a group underneath them would leave two live modes fighting.
     if (pouchFilterActive || bandolierFilterActive || medkitFilterActive) return;
     if (invSelectMode) { toggleInvSelect(item.id); return; }
     beginInvSelect(item.id);
-  };
+  }, [pouchFilterActive, bandolierFilterActive, medkitFilterActive, invSelectMode,
+    toggleInvSelect, beginInvSelect]);
 
   const closeModal = () => {
     setPending(null);
@@ -1855,6 +1882,35 @@ export function InventoryScreen() {
             )}
           </View>
         )}
+        {/* ⚠⚠⚠ LAG-2 — WHY THIS IS STILL A ScrollView, AND WHAT WAS DONE INSTEAD.
+            Virtualization (FlatList / SectionList) was the obvious answer to a
+            250-row pack and was evaluated and declined, on three measurements
+            rather than taste:
+
+            ⚠ THE SECTIONS OPEN CLOSED. `collapsedSections[cat] ?? true` — a
+            player with 258 items renders ZERO rows until they choose a category,
+            so the eager list is already bounded by what they asked to see.
+
+            ⚠ THE SCROLL BEHAVIOUR THE TASK REQUIRES PRESERVING IS BUILT ON THE
+            EAGER LAYOUT. Every row records its own y through `onLayout` into
+            `rowInfoRef`, and every section into `sectionYRef`; the "scroll deep →
+            mutate → come back to the item" jump (the effect near the top of this
+            file) adds the two and calls `scrollTo`. A virtualized list never
+            measures a row it has not mounted, so that jump would have to be
+            rebuilt on `scrollToIndex` + `onScrollToIndexFailed` — a behaviour
+            change to the exact interaction that had to survive.
+
+            ⚠ AND IT WOULD BLIND THE TEST SURFACE. Under react-test-renderer
+            `onLayout` never fires, so VirtualizedList renders `initialNumToRender`
+            rows and stops — every existing suite that finds an inventory row by
+            name would silently stop seeing most of the pack.
+
+            SO THE SCALING REPAIR IS MEMOIZATION, and it is measured: `ItemRow` is
+            React.memo with two stable handlers, and the whole search → filter →
+            sort → group pipeline is one memo above the guard. Mount at 258 items
+            316ms → 90ms; opening every category 61ms → 8ms. If the owner wants
+            true virtualization later, it is a separate task with the scroll-jump
+            rebuild and a test-surface decision in its scope. */}
         {CATEGORY_ORDER.map((cat) => {
           const items = grouped[cat];
           if (items.length === 0) return null;
@@ -1951,8 +2007,8 @@ export function InventoryScreen() {
                   // a scanner's off-hand being full is irrelevant — so suppress it.
                   slotTaken={!pouchFilterActive && !bandolierFilterActive && !medkitFilterActive && itemSlotTaken(item)}
                   stripeColor={companionStripeColor(item)}
-                  onPress={() => handleItemTap(item)}
-                  onLongPress={() => handleItemLongPress(item)}
+                  onPress={handleItemTap}
+                  onLongPress={handleItemLongPress}
                   // OTA-1100 — the checkbox affordance now belongs to the GROUP
                   // mode; the FUSABLE view keeps its own ♥ tick through
                   // item.reservedForFusion, which is a different thing.
@@ -2627,7 +2683,19 @@ function CompanionStripes({ color }: { color: string }) {
   );
 }
 
-function ItemRow({
+/* ⚠⚠⚠ LAG-2 — THE ROWS DO NOT RE-RENDER FOR SOMETHING THAT IS NOT ABOUT THEM.
+ *
+ *  A 250+ item pack renders 250+ of these, and every one of them re-rendered on
+ *  every render of the screen — so spending a coin, taking a point of damage, or
+ *  any other player mutation redrew the whole pack. Memoized here and given a
+ *  stable identity for its two callbacks below (`onPress`/`onLongPress` now take
+ *  the item, so the parent hands each row THE SAME function rather than a fresh
+ *  closure per row per render), a row re-renders only when one of its own props
+ *  changes — every one of which is a primitive or the item instance itself.
+ *
+ *  ⚠ This is the scaling repair the pack actually needed. Virtualization is the
+ *  other half and is NOT taken here: see the note over the section list below. */
+const ItemRow = React.memo(function ItemRow({
   item,
   color,
   highlight,
@@ -2654,10 +2722,12 @@ function ItemRow({
   isBandoliered: boolean;
   slotTaken: boolean;
   stripeColor: string | null;
-  onPress: () => void;
+  /** ⚠ LAG-2 — takes the row's item so the parent can pass one stable handler
+   *  to every row instead of a closure per row (which would defeat the memo). */
+  onPress: (item: InventoryItem) => void;
   /** OTA-1097 — FUSABLE view only: opens the ordinary item modal, since the tap
    *  is spent on the reserve toggle there. */
-  onLongPress?: () => void;
+  onLongPress?: (item: InventoryItem) => void;
   /** OTA-1097 — true in the FUSABLE view, where the row behaves as a checkbox.
    *  A reserved row gets a lit border so "selected" reads at a glance rather
    *  than resting entirely on the small ♥ at the end of the meta line. */
@@ -2694,8 +2764,8 @@ function ItemRow({
         // open, that is the question the screen is asking.
         grouped && groupPicked && styles.rowGrouped,
       ]}
-      onPress={onPress}
-      onLongPress={onLongPress}
+      onPress={() => onPress(item)}
+      onLongPress={onLongPress ? () => onLongPress(item) : undefined}
       delayLongPress={350}
       activeOpacity={0.7}
       accessibilityRole={grouped || selectable ? 'checkbox' : 'button'}
@@ -2929,7 +2999,7 @@ function ItemRow({
       </View>
     </TouchableOpacity>
   );
-}
+});
 
 // OTA-199 — rarity-to-hex palette mirrors BrandedModal.tsx so the
 // inferred-item diamond on the inventory row matches the color the

@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { asLogOnlyWrite, coalesceLogNotifications } from './storeNotify';
 import { withArticle, withArticleCap, anOrA, theCap, theLower, describeEnemyPartyCap } from '../engine/grammar';
 import type {
   PlayerCharacter,
@@ -2881,7 +2882,14 @@ export function logUiTap(label: string): void {
   try {
     // OTA-1695 — the touch's own wait (noteTouchDown at onPressIn) rides the line:
     // `ui: tap "dodge" ⏱+4237ms late 4200ms` says the screen held the finger, not the player.
-    useGameStore.getState().appendLog('debug', `ui: tap "${label}"${takeTouchLateSuffix()}`);
+    // ⚠⚠⚠ LAG-2 — STRAIGHT TO THE LEDGER, NOT THROUGH THE GAME STORE. Running
+    // `appendLog` here swept every mounted selector BEFORE the gameplay the
+    // player asked for began, to record a line no surface draws (`debug` is in
+    // gameLog.ts's HIDDEN_LOG_CHANNELS). `persistEntry` is the exact sink
+    // `appendLog` persists through, so the line still reaches the disk log in
+    // the same format — COPY LOG and the LogScreen read `readFullLog`, never
+    // `gameLog`. The synchronous breadcrumb below is untouched.
+    void persistEntry(makeEntry('debug', `ui: tap "${label}"${takeTouchLateSuffix()}`));
     // ⚠⚠ OTA-1276 — AND STAMP IT WHERE A WEDGE CANNOT SWALLOW IT. The line
     // above goes into the BATCHED disk log, which drains on a promise chain —
     // and a wedged JS thread never drains it, so the last lines before a freeze
@@ -8051,7 +8059,11 @@ const POST_BOSS_GRACE_HOURS = 3;
 // slices/persistSlice.ts.
 
 
-export const useGameStore = create<GameStore>((set, get) => ({
+// ⚠⚠⚠ LAG-2 — `coalesceLogNotifications` (state/storeNotify.ts, read it before
+// touching this line) lets an ordinary GAME-LOG write ride the next sweep this
+// action was going to perform anyway. The STATE is unchanged: every write below
+// still lands synchronously and every `get()` in the same turn reads it.
+export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get) => ({
   player: null,
   worldMemory: emptyMemory(),
   gameLog: [],
@@ -9373,7 +9385,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
       }
     }
-    set((state) => {
+    // ⚠⚠ LAG-2 — THE ONE LOG-ONLY WRITE: both branches below return `gameLog`
+    // and nothing else, which is what makes it safe to publish with the next
+    // notification. Return a second key here and the marker must come off — a
+    // gameplay mutation is never folded into a log sweep.
+    asLogOnlyWrite(() => set((state) => {
       const nextLog = [...state.gameLog, entry].slice(-MAX_LOG_IN_MEMORY);
       // HANDOFF #4 — same-channel debounce. When two `world` entries land
       // within 500ms (typical: dig outcome + hook callback firing in the
@@ -9440,7 +9456,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // MicroMicroLocation.interactables (Phase 2) is canonical;
       // extractAmbientNouns() is the fallback only.
       return { gameLog: nextLog };
-    });
+    }));
   },
 
   // 2026-05-27 OTA-084 — hardened refusal helper. See the
@@ -30720,7 +30736,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   // defined in THIS file, and importing it there as a value would make the two
   // modules import each other. Passing it keeps the dependency one-way.
   ...createPersistSlice(set, get, { makeRoomKey }),
-}));
+})));
 
 
 // Apply a single HookEffect to player + world state. Returns true if the

@@ -109,7 +109,12 @@ describe('OTA-1695 — the wiring', () => {
     expect(dice.includes("tappedAt.current = Date.now(); // OTA-1694 — before any work, like logUiTap\n    logUiTap('roll');")).toBe(true);
     const store = src('app', 'state', 'gameStore.ts');
     expect(store.includes('export function logUiTap(label: string): void {')).toBe(true);
-    expect(store.includes('appendLog(\'debug\', `ui: tap "${label}"${takeTouchLateSuffix()}`)')).toBe(true);
+    // ⚠ LAG-2 — THE LEDGER MOVED HOUSE, THE LINE DID NOT. `logUiTap` no longer
+    // goes through `appendLog` (recording hidden diagnostic text swept every
+    // mounted store subscriber before the tapped handler had begun); it writes
+    // through `persistEntry`, the same sink `appendLog` persists through, in the
+    // same format. The suffix this OTA added still rides the line.
+    expect(store.includes('persistEntry(makeEntry(\'debug\', `ui: tap "${label}"${takeTouchLateSuffix()}`))')).toBe(true);
     // The unbatched breadcrumb keeps its exact shape (OTA-1276 reads it at boot).
     expect(store.includes('what: `tap "${label}"`')).toBe(true);
     expect(store.split('\n').length).toBeLessThan(37000);
@@ -127,13 +132,22 @@ describe('OTA-1695 — the line in the log', () => {
     resetTapClock();
   });
 
-  it('a prompt touch prints its wait; a five-second wait is flagged late; a tap with no touch noted stays exactly the OTA-1172 line', () => {
+  it('a prompt touch prints its wait; a five-second wait is flagged late; a tap with no touch noted stays exactly the OTA-1172 line', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const save = require('../app/engine/saveSystem') as {
+      setActiveSlot(id: string): Promise<void>; flushLogWrites(): Promise<void>; readFullLog(): Promise<string>;
+    };
+    await save.setActiveSlot('ota1695_tap_clock');
     noteTouchDown({ nativeEvent: { timestamp: performance.now() - 30 } });
     logUiTap('dodge');
     noteTouchDown({ nativeEvent: { timestamp: performance.now() - 5000 } });
     logUiTap('approach');
     logUiTap('dodge');
-    const tail = get().gameLog.slice(-8).filter((e) => e.text.startsWith('ui: tap')).map((e) => e.text);
+    // ⚠ LAG-2 — read where the ordinary tap ledger now lives: the disk log.
+    await save.flushLogWrites();
+    const tail = (await save.readFullLog()).split('\n')
+      .map((l) => l.slice(l.indexOf('[debug] ') + 8))
+      .filter((t) => t.startsWith('ui: tap'));
     expect(tail.length).toBe(3);
     expect(/^ui: tap "dodge" ⏱\+\d+ms$/.test(tail[0]!)).toBe(true);
     expect(/^ui: tap "approach" ⏱\+\d+ms late \d+ms$/.test(tail[1]!)).toBe(true);

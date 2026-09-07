@@ -28842,7 +28842,48 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // stage → readback → backup → live sequence, the trailing drain and every
 // cross-turn durability boundary (the roll modal, OTA-1737's throwSettlement)
 // are unchanged.
-export const OTA_BUILD_ID = '2026-09-07-1739-nothing-heavy-inside-a-tap';
+// ⚠⚠⚠ OTA-1740 — NOTHING WAKES A SCREEN THAT IS NOT ABOUT IT (task list LAG-2-5E91).
+// The second half of Fable's 91C4B8 findings: the React/Zustand cost around an
+// action rather than inside it. Five repairs, no gameplay change. (1) THE 6s
+// WORLD HEARTBEAT STOPS RE-RENDERING SCREENS IT DOES NOT FEED. worldRealtimeTick
+// replaces the `worldMemory` object several times per beat as patrols roam, and
+// Exploration, Vendor, Contracts, Character and GiftModal all subscribed to that
+// OBJECT — so four screens re-rendered on a wall-clock timer while the player sat
+// still (Vendor ~196-200ms per commit at 258 items, Exploration ~93ms). Each now
+// subscribes to the fields it actually reads, and where a field IS realtime, to
+// the DERIVED value it draws: the vendor takes the war-heat number and the tide
+// PRICE MULTIPLIER rather than the patrol array, the character sheet takes the
+// stepped tide LABEL rather than the momentum. Five idle heartbeats that move no
+// consumed field now render nothing at all on any of the five screens; a genuine
+// world change still redraws them, and no world state was duplicated. WorldScreen
+// keeps its whole-memory subscription — it is the board the heartbeat is for.
+// (2) ONE ACTION'S LOG LINES ARE ONE SUBSCRIBER SWEEP. appendLog was its own
+// zustand set, so a movement step swept every mounted selector 21 times and an
+// attack 10. A store middleware (state/storeNotify.ts) lets an ordinary GAME-LOG
+// write ride along with the next notification the action was going to perform
+// anyway, or with a microtask at the end of the turn. The STATE stays synchronous
+// — the ~30 "have I said this line" guards that read gameLog mid-turn are
+// untouched — and nothing is suppressed: a gameplay set publishes the log lines
+// held behind it, in order. Movement 21 → 10 sweeps, attack 27 → 16 for the
+// settled round, six lines in one turn 6 → 1. (3) THE COUNTER STOPS RE-PRICING
+// THE PACK FOR THINGS THAT CANNOT MOVE A PRICE: reinforceQuote per weapon,
+// sellPriceFor twice per row and the recipe menu ran on every render; they are
+// now memos keyed on the inventory array, the vendor, the rapport modifier, the
+// war multiplier and the sort — every input that can move a price, and nothing
+// wider, so a projection can never outlive its authority. (4) THE ORDINARY TAP
+// LEDGER IS OFF THE GAME STORE: logUiTap ran appendLog before every handler in
+// the game, sweeping every subscriber to record a line the feed hides (`debug` is
+// a HIDDEN channel). It writes to the disk log through the same sink appendLog
+// persists through, so COPY LOG and the LogScreen are unchanged; the synchronous
+// crash breadcrumb is untouched, and still stamped before the handler runs.
+// (5) THE PACK SCALES: ItemRow is memoized and takes two stable handlers instead
+// of a closure per row per render, and the search → filter → sort → group
+// pipeline is one memo above the guard rather than five passes per render.
+// Inventory mount at 258 items 316ms → 90ms; opening every category 61ms → 8ms.
+// ⚠ VIRTUALIZATION WAS EVALUATED AND DELIBERATELY NOT FORCED — see the note over
+// the section list in InventoryScreen.
+export const OTA_BUILD_ID = '2026-09-07-1740-nothing-wakes-a-screen-that-is-not-about-it';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-07-1739-nothing-heavy-inside-a-tap';
 // golem catch-up 2026-09-07: markerless publish of OTA-1739 - the player-action
 // hot-path repair (LAG-1-7C42). Ambient generation is armed by an action and
 // started by the existing 5s idle tick instead of beginning inside a settling

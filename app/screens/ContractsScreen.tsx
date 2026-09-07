@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable, Modal, Dimensions } from 'react-native';
 // ⚠⚠ OTA-1458 — "am I standing at X?" is a grid-cell question, asked once.
 import { standingAtLocation, stationedAtNamedLocation } from '../engine/standingAt';
@@ -204,7 +204,33 @@ export function ContractsScreen() {
   const [milestoneExpanded, setMilestoneExpanded] = useState<
     null | 'enemies' | 'travels' | 'checks' | 'npcs'
   >(null);
-  const worldMemory = useGameStore((s) => s.worldMemory);
+  /* ⚠⚠⚠ LAG-2 — EIGHT FIELDS, NOT THE WHOLE MEMORY. This board subscribed to
+   *  the `worldMemory` object, which the 6s `worldRealtimeTick` replaces several
+   *  times per beat as patrols roam — so it re-rendered on a wall-clock timer
+   *  for data it never reads. Below is every part of world memory this screen
+   *  and its four helpers (`questionMarkerNumbers`, `canStayAtTheNexus` →
+   *  regard, `knownPeople`) actually consume; not one of them is realtime, so
+   *  the heartbeat no longer reaches this screen and a genuine world change
+   *  still does. */
+  const wmMemorableEvents = useGameStore((s) => s.worldMemory.memorableEvents);
+  const wmUnlockedGreatClimbs = useGameStore((s) => s.worldMemory.unlockedGreatClimbs);
+  const wmSummitBossesDefeated = useGameStore((s) => s.worldMemory.summitBossesDefeated);
+  const wmNpcsMet = useGameStore((s) => s.worldMemory.npcsMet);
+  const wmNpcRelations = useGameStore((s) => s.worldMemory.npcRelations);
+  const wmDefeatedEnemies = useGameStore((s) => s.worldMemory.defeatedEnemies);
+  const wmDiscoveredLocationIds = useGameStore((s) => s.worldMemory.discoveredLocationIds);
+  const wmCanonLocations = useGameStore((s) => s.worldMemory.canonLocations);
+  const worldMemory = useMemo(() => ({
+    memorableEvents: wmMemorableEvents,
+    unlockedGreatClimbs: wmUnlockedGreatClimbs,
+    summitBossesDefeated: wmSummitBossesDefeated,
+    npcsMet: wmNpcsMet,
+    npcRelations: wmNpcRelations,
+    defeatedEnemies: wmDefeatedEnemies,
+    discoveredLocationIds: wmDiscoveredLocationIds,
+    canonLocations: wmCanonLocations,
+  }), [wmMemorableEvents, wmUnlockedGreatClimbs, wmSummitBossesDefeated, wmNpcsMet,
+    wmNpcRelations, wmDefeatedEnemies, wmDiscoveredLocationIds, wmCanonLocations]);
   // arb99 — same "?" numbering the atlas + map rows use, so a whisper's SET COURSE
   // block here shows the same number as its mark on the map.
   const questionNumbers = questionMarkerNumbers(worldMemory);

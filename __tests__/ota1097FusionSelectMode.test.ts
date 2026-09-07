@@ -207,8 +207,13 @@ describe('OTA-1097 — source locks on the selection surface', () => {
   // that hatch reached is still reachable (switch off the FUSABLE axis and tap),
   // and the FUSABLE banner says so, which is what the assertion moved to.
   it('long-press starts a GROUP now; the per-unit route is still signposted', () => {
-    expect(view).toContain('const handleItemLongPress = ');
-    expect(view).toContain('onLongPress={() => handleItemLongPress(item)}');
+    // ⚠ LAG-2 — the two handlers are `useCallback`s and are handed to the memoized
+    // ItemRow BY IDENTITY (the row calls them with its own item), so a fresh
+    // closure per row per render cannot defeat the memo. Same handlers, same
+    // meanings — only where the item is supplied moved.
+    expect(view).toContain('const handleItemLongPress = useCallback((item: InventoryItem) => {');
+    expect(view).toContain('onLongPress={handleItemLongPress}');
+    expect(view).toContain('onLongPress={onLongPress ? () => onLongPress(item) : undefined}');
     expect(view).toContain('beginInvSelect(item.id);');
     // The hatch was not dropped silently — the banner names where it went.
     expect(view).toContain('switch sort and tap the item');

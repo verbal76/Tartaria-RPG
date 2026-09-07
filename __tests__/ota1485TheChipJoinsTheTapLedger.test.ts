@@ -130,15 +130,25 @@ describe('OTA-1485 — the feed has exactly one pressable, and it is the logged 
 });
 
 describe('OTA-1485 — live: the tap line actually lands in the log', () => {
-  it('⚠⚠ logUiTap writes `ui: tap "<label>"` on the debug channel', () => {
+  // ⚠ LAG-2 — THE LEDGER MOVED HOUSE, THE CLAIM DID NOT. `logUiTap` used to go
+  // through `appendLog`, which meant recording a line of hidden diagnostic text
+  // swept every mounted store subscriber before the tapped handler had begun.
+  // It now writes straight to the DISK log — the same sink `appendLog` persists
+  // through, the same file COPY LOG and the LogScreen read — so the line is
+  // still there in the same format; this test just reads it where it lives.
+  it('⚠⚠ logUiTap writes `ui: tap "<label>"` on the debug channel', async () => {
     // The pins above prove the wiring; this proves the sink. The same call the
     // chip now makes, against the real store.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { useGameStore, logUiTap } = require('../app/state/gameStore');
+    const { logUiTap } = require('../app/state/gameStore');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const save = require('../app/engine/saveSystem') as {
+      setActiveSlot(id: string): Promise<void>; flushLogWrites(): Promise<void>; readFullLog(): Promise<string>;
+    };
+    await save.setActiveSlot('ota1485_tap_ledger');
     logUiTap('⬆ Take & wear Scrap Vest');
-    const hit = (useGameStore.getState().gameLog as { channel: string; text: string }[])
-      .find((e) => e.text === 'ui: tap "⬆ Take & wear Scrap Vest"');
-    expect(hit).toBeTruthy();
-    expect(hit!.channel).toBe('debug');
+    await save.flushLogWrites();
+    const disk = await save.readFullLog();
+    expect(disk).toContain('[debug] ui: tap "⬆ Take & wear Scrap Vest"');
   });
 });

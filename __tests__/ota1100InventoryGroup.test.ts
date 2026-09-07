@@ -98,8 +98,13 @@ describe('OTA-1100 — one gesture, one meaning', () => {
     expect(view).toContain('const beginInvSelect = (id: string) => { setInvSelectMode(true); setInvSelected([id]); };');
     // Checked FIRST in the tap handler so it beats every other tap meaning on
     // this screen — including the FUSABLE reserve-toggle.
-    expect(view).toMatch(/const handleItemTap = \(item: InventoryItem\) => \{[\s\S]{0,400}?if \(invSelectMode\) \{ toggleInvSelect\(item\.id\); return; \}/);
-    expect(view).toContain('onLongPress={() => handleItemLongPress(item)}');
+    // ⚠ LAG-2 — the two handlers are `useCallback`s and are handed to the memoized
+    // ItemRow BY IDENTITY (the row calls them with its own item), so a fresh
+    // closure per row per render cannot defeat the memo. Same handlers, same
+    // meanings — only where the item is supplied moved.
+    expect(view).toMatch(/const handleItemTap = useCallback\(\(item: InventoryItem\) => \{[\s\S]{0,400}?if \(invSelectMode\) \{ toggleInvSelect\(item\.id\); return; \}/);
+    expect(view).toContain('onLongPress={handleItemLongPress}');
+    expect(view).toContain('onLongPress={onLongPress ? () => onLongPress(item) : undefined}');
   });
 
   it('EVERY rack fill mode still owns the tap — no two live modes', () => {

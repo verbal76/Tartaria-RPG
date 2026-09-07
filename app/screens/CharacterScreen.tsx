@@ -4,7 +4,7 @@
 // show *what you are right now*, with every number broken down into
 // its sources so the player can audit any surprising value.
 
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 // ⚠ OTA-1404 — combat resolution moved out of gameStore into its own leaf.
@@ -94,7 +94,45 @@ const SLOT_LABEL: Record<string, string> = {
 export function CharacterScreen() {
   const player = useGameStore((s) => s.player);
   const scene = useGameStore((s) => s.currentScene);
-  const worldMemory = useGameStore((s) => s.worldMemory);
+  /* ⚠⚠ LAG-2 — FOUR FIELDS, NOT THE WHOLE MEMORY. The 6s `worldRealtimeTick`
+   *  replaces the `worldMemory` object several times per beat; subscribing to
+   *  the object meant this sheet re-rendered on a wall-clock timer while the
+   *  player read it. Three of the four below never move on the heartbeat, and
+   *  the tide — which does move on the heartbeat — is subscribed as the LABEL
+   *  the rows actually draw, not the raw momentum. `tideLabel` sorts momentum
+   *  into five buckets (ascendant / rising / — / waning / collapsing), so the
+   *  sheet redraws when a faction's fortunes visibly turn and not every time a
+   *  skirmish nudges a number the player is not being shown. */
+  const memorableEvents = useGameStore((s) => s.worldMemory?.memorableEvents);
+  const defeatedEnemies = useGameStore((s) => s.worldMemory?.defeatedEnemies);
+  const tideLabelKey = useGameStore((s) => {
+    const tides = s.worldMemory?.factionTides ?? {};
+    return Object.keys(tides).sort()
+      .map((id) => { const t = tideLabel(tides[id]); return `${id}=${t ? `${t.glyph}|${t.word}` : ''}`; })
+      .join('\u0000');
+  });
+  const tideLabels = useMemo(() => {
+    const out: Record<string, { glyph: string; word: string } | null> = {};
+    for (const pair of tideLabelKey === '' ? [] : tideLabelKey.split('\u0000')) {
+      const eq = pair.indexOf('=');
+      const body = pair.slice(eq + 1);
+      out[pair.slice(0, eq)] = body === '' ? null : { glyph: body.split('|')[0]!, word: body.split('|')[1]! };
+    }
+    return out;
+  }, [tideLabelKey]);
+  const discoveredLocationIds = useGameStore((s) => s.worldMemory?.discoveredLocationIds);
+  /* ⚠ Five engine helpers below take a memory-shaped argument rather than a
+   *  field. Each declares the exact `Pick<WorldMemory, …>` it reads, and this
+   *  object is the union of those picks — nothing wider, so the heartbeat's
+   *  patrols and tick counter still cannot reach them. */
+  const npcRelations = useGameStore((s) => s.worldMemory?.npcRelations);
+  const soldMapIds = useGameStore((s) => s.worldMemory?.soldMapIds);
+  const unlockedGreatClimbs = useGameStore((s) => s.worldMemory?.unlockedGreatClimbs);
+  const greatClimbsCrested = useGameStore((s) => s.worldMemory?.greatClimbsCrested);
+  const worldMemory = useMemo(
+    () => ({ npcRelations, defeatedEnemies, soldMapIds, unlockedGreatClimbs, greatClimbsCrested }),
+    [npcRelations, defeatedEnemies, soldMapIds, unlockedGreatClimbs, greatClimbsCrested],
+  );
   const setScreen = useGameStore((s) => s.setScreen);
   const replayStoryIntro = useGameStore((s) => s.replayStoryIntro); // OTA-1023
   // arb119 — per-section collapse (hook must precede the early return below).
@@ -158,10 +196,10 @@ export function CharacterScreen() {
 
   // OTA-843 [Chronicle] — assemble the character's legend from accreted state
   // (memorable beats + milestones + titles + corruption + main-quest progress).
-  const chronicle = buildChronicle(player, worldMemory?.memorableEvents, {
+  const chronicle = buildChronicle(player, memorableEvents, {
     raceName: race?.name,
     factionName: faction?.name,
-    distinctFoes: new Set(worldMemory?.defeatedEnemies ?? []).size,
+    distinctFoes: new Set(defeatedEnemies ?? []).size,
     coresRecovered: player.mainQuest?.coresRecovered?.length ?? 0,
     coresTotal: player.mainQuest ? 9 : 0,
   });
@@ -724,7 +762,7 @@ export function CharacterScreen() {
                 : '#e07a5f';
               // OTA-844 [world pulse] — the world moves on its own; show whether this
               // faction is rising or waning in the balance of power right now.
-              const tide = tideLabel(worldMemory?.factionTides?.[row.factionId]);
+              const tide = tideLabels[row.factionId] ?? null;
               return (
                 <View key={row.factionId} style={styles.kvRow}>
                   <Text style={[styles.kvKey, isOwn && styles.factionOwn]}>
@@ -1107,7 +1145,7 @@ export function CharacterScreen() {
           </View>
           <View style={styles.kvRow}>
             <Text style={styles.kvKey}>Locations discovered</Text>
-            <Text style={styles.kvValue}>{worldMemory?.discoveredLocationIds?.length ?? 0}</Text>
+            <Text style={styles.kvValue}>{discoveredLocationIds?.length ?? 0}</Text>
           </View>
         </View>
         )}

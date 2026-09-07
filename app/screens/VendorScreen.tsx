@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore, vendorNpcId } from '../state/gameStore';
 import { FirstTimeHint } from '../components/FirstTimeHint';
@@ -77,11 +77,48 @@ type Pending =
   | { mode: 'reinforceDone'; itemName: string; itemId: string; text: string }
   | null;
 
+/** Sort order for the SELL list's "by rarity" mode. Module scope so the sell
+ *  projection's memo does not depend on a table rebuilt every render. */
+const RARITY_ORDER: Record<string, number> = { Legendary: 0, Rare: 1, Uncommon: 2, Common: 3 };
+
 export function VendorScreen() {
   const player = useGameStore((s) => s.player);
   const activeBuildingId = useGameStore((s) => s.activeBuildingId);
   const scene = useGameStore((s) => s.currentScene);
-  const worldMemory = useGameStore((s) => s.worldMemory);
+  /* ⚠⚠⚠ LAG-2 — WHAT THE COUNTER READS, NOT THE WHOLE WORLD. This screen
+   *  subscribed to the `worldMemory` object, which `worldRealtimeTick` replaces
+   *  several times every ~6 real seconds as patrols roam — and this is the most
+   *  expensive screen in the game to re-render (Fable: ~196-200ms per commit at
+   *  258 inventory items). A shopper standing at a stall paid that every six
+   *  seconds for a war being fought somewhere else.
+   *
+   *  ⚠ TWO OF THESE ARE REALTIME AND STAY, because the counter genuinely
+   *  charges by them: the faction tide and LOCAL WAR HEAT both move real prices
+   *  (`buyFromVendor` / `sellToVendor`). They are subscribed as the DERIVED
+   *  VALUE rather than the patrol array, so the screen redraws when the price
+   *  actually changes and not when a patrol two provinces away takes a step. */
+  // The tide reaches the price as a MULTIPLIER; subscribing to that number
+  // rather than the momentum map means a skirmish that does not move the price
+  // does not redraw the counter.
+  const vendorTideMult = useGameStore((s) => {
+    const f = s.currentScene?.vendor?.faction;
+    return f ? tideVendorPriceMult(s.worldMemory?.factionTides?.[f]) : 1;
+  });
+  const npcRelations = useGameStore((s) => s.worldMemory?.npcRelations);
+  const warHeat = useGameStore((s) => {
+    const loc = s.player?.currentLocationId;
+    if (!loc) return 0;
+    const c = canonicalCellOf(loc);
+    return localWarHeat(s.worldMemory?.patrols ?? [], c.x, c.y);
+  });
+  // A stable key, so an unchanged pair of contesting factions is an unchanged
+  // subscription value (an array would be a new reference on every tick).
+  const contestKey = useGameStore((s) => {
+    const loc = s.player?.currentLocationId;
+    if (!loc) return '';
+    const c = canonicalCellOf(loc);
+    return contestedFactions(s.worldMemory?.patrols ?? [], c.x, c.y).join('\u0000');
+  });
   const setScreen = useGameStore((s) => s.setScreen);
   const appendLog = useGameStore((s) => s.appendLog);
   const buyFromVendor = useGameStore((s) => s.buyFromVendor);
@@ -136,6 +173,67 @@ export function VendorScreen() {
   const [groupSellConfirm, setGroupSellConfirm] = useState(false);
 
   const vendor = scene?.vendor ?? null;
+
+  /* ⚠⚠⚠ LAG-2 — THE PROJECTIONS ARE MEMOIZED, AND THEY SIT ABOVE THE GUARD.
+   *
+   *  This screen rebuilt three whole-inventory projections on EVERY render —
+   *  `reinforceQuote` per weapon, `sellPriceFor` twice per sellable row, and
+   *  the recipe menu — so an unrelated store notification (a log line, a world
+   *  heartbeat, a tick of anything) cost a full re-pricing of a 258-item pack.
+   *  Fable measured the commit at ~200ms.
+   *
+   *  ⚠ THE DEPENDENCIES ARE THE REAL AUTHORITIES, not conveniences. Every input
+   *  that can move a price or an eligibility is listed: the inventory array
+   *  (any mutation replaces it), the vendor, the rapport/standing modifier, the
+   *  war multiplier, TC and knownRecipes. Nothing here is cached beyond the
+   *  state that produced it — change any of them and the projection is rebuilt
+   *  before the next paint. Prices and options can never go stale; they can
+   *  only stop being recomputed for changes that could not have moved them.
+   *
+   *  ⚠⚠ AND THEY ARE HOOKS, so they obey OTA-022's rule above: all hooks
+   *  unconditionally precede the `!player || !vendor` return below. They are
+   *  written null-safe for that reason, not defensively for its own sake. */
+  const rapportMod = useMemo(() => (player ? vendorPriceMod(
+    effectiveStats(player).charisma,
+    player.completedFactionQuestIds,
+    vendor?.faction,
+    // OTA-1341 — the standing ladder: same fourth argument the store passes, so
+    // the shown price and the charged price keep agreeing (vendorPricing's rule).
+    vendor?.faction ? getStanding(player.factionStanding ?? [], vendor.faction) : 0,
+  ) : 0), [player, vendor]);
+  const { buyMult: warBuyMult, sellMult: warSellMult } = useMemo(() => warPriceFactor(warHeat), [warHeat]);
+  const equippedItemIds = useMemo(() => (player ? equippedInstanceIds(player) : new Set<string>()), [player]);
+  const reinforceRows = useMemo(() => (player ? player.inventory
+    .filter((i) => !!i.durability && categorizeItem(i) === 'weapon')
+    .map((i) => ({ item: i, quote: reinforceQuote(i) }))
+    .sort((a, b) =>
+      (equippedItemIds.has(a.item.id) ? 0 : 1) - (equippedItemIds.has(b.item.id) ? 0 : 1)
+      || a.item.name.localeCompare(b.item.name)) : []),
+  [player?.inventory, equippedItemIds]);
+  const recipeOffers = useMemo(() => (player && vendor
+    ? vendorRecipeMenu(RECIPES, player.knownRecipes, vendorSeed(vendor.name))
+    : []), [player?.knownRecipes, vendor]);
+  const sellable = useMemo(() => (player ? player.inventory
+    .filter((i) => i.quantity > 0 && !equippedItemIds.has(i.id) && !isUnsellable(i))
+    // OTA-865 — display the war-premium sell price (matches sellToVendor); carry the plain
+    // catalogue value as `base` so the ▲/▼ ticker can show whether you're getting more.
+    .map((i) => ({
+      item: i,
+      price: Math.round(sellPriceFor(i, vendor, rapportMod) * warSellMult),
+      base: sellPriceFor(i, vendor, 0),
+    }))
+    .filter((x) => x.price > 0)
+    .sort((a, b) => {
+      if (sellSort === 'name') return a.item.name.localeCompare(b.item.name);
+      if (sellSort === 'rarity') {
+        const ra = RARITY_ORDER[a.item.rarity ?? 'Common'] ?? 99;
+        const rb = RARITY_ORDER[b.item.rarity ?? 'Common'] ?? 99;
+        if (ra !== rb) return ra - rb;
+        return b.price - a.price;
+      }
+      return b.price - a.price; // default: most valuable first
+    }) : []),
+  [player?.inventory, equippedItemIds, vendor, rapportMod, warSellMult, sellSort]);
 
   // OTA-791 — a fight can start while the trade screen is open (hook-spawned
   // combat, caught stealing). The player kept trading blind: every sell bounced
@@ -423,19 +521,10 @@ export function VendorScreen() {
   // OTA-805 — CHA-scaled faction rapport price break (0..0.20), once you've earned
   // dealing with this vendor's faction. Cheaper buys, better sell-backs. Mirrors the
   // gameStore buy/sell math so the displayed prices match what actually transacts.
-  const rapportMod = vendorPriceMod(
-    effectiveStats(player).charisma,
-    player.completedFactionQuestIds,
-    vendor?.faction,
-    // OTA-1341 — the standing ladder: same fourth argument the store passes, so
-    // the shown price and the charged price keep agreeing (vendorPricing's rule).
-    vendor?.faction ? getStanding(player.factionStanding ?? [], vendor.faction) : 0,
-  );
   const rapportPct = Math.round(rapportMod * 100);
   // OTA-849/865 — the two modifiers that also move the REAL transaction price but the
   // display used to omit: the vendor faction's fortunes (tide teeth) and LOCAL WAR HEAT.
   // Computed here so the screen shows exactly what buyFromVendor / sellToVendor charge.
-  const vendorTideMult = vendor?.faction ? tideVendorPriceMult(worldMemory?.factionTides?.[vendor.faction]) : 1;
   // ⚠ OTA-1156 — THE TWO THIS SCREEN STILL DROPPED, and the comment above has been
   // wrong since they landed. `buyFromVendor` multiplies in SIX factors; this screen
   // passed FOUR. Missing: OTA-1053's per-person regard (a vendor who likes or
@@ -443,8 +532,8 @@ export function VendorScreen() {
   // price and the charged price silently disagreed for any non-neutral vendor —
   // inside `vendorPricing.ts`, whose entire stated purpose is that these two can
   // never drift. Computed from the same helpers the store uses, not re-derived.
-  const vendorRegardMult = vendor && worldMemory
-    ? regardPriceMult(npcRegard(getRelation(worldMemory, vendorNpcId(vendor))))
+  const vendorRegardMult = vendor
+    ? regardPriceMult(npcRegard(getRelation({ npcRelations }, vendorNpcId(vendor))))
     : 1;
   const pressureTideMult = player
     ? tidePriceMultiplier(tideStage(player.hoursElapsed ?? 0, profileOf(player)))
@@ -453,11 +542,8 @@ export function VendorScreen() {
   const vendorMenaceMult = player
     ? menacePriceMult(decayedMenace(player.menace ?? 0, player.menaceUpdatedHour ?? 0, player.hoursElapsed ?? 0))
     : 1;
-  const warCell = player ? canonicalCellOf(player.currentLocationId) : { x: 0, y: 0 };
-  const warHeat = localWarHeat(worldMemory?.patrols ?? [], warCell.x, warCell.y);
-  const { buyMult: warBuyMult, sellMult: warSellMult } = warPriceFactor(warHeat);
   // The two factions whose war-parties are thickest here — for the "prices are up" line.
-  const contestNames = contestedFactions(worldMemory?.patrols ?? [], warCell.x, warCell.y)
+  const contestNames = (contestKey === '' ? [] : contestKey.split('\u0000'))
     .map((id) => (factionsData as { id: string; name: string }[]).find((f) => f.id === id)?.name ?? null)
     .filter((n): n is string => !!n);
   // Show the war-market note once the ground is meaningfully contested (not on one patrol).
@@ -476,14 +562,10 @@ export function VendorScreen() {
   // ⚠ The second `.filter` on knownRecipes that stood here is gone with it: it
   // repeated a rule the engine had already applied, which is how the display and
   // the shelf ended up with two opinions about the same three rows.
-  const recipeOffers = vendor
-    ? vendorRecipeMenu(RECIPES, player.knownRecipes, vendorSeed(vendor.name))
-    : [];
   // Inventory items the player can sell — exclude the EXACT equipped instances +
   // unsellable. OTA-687 — exclude by INSTANCE ID (equippedInstanceIds), not name,
   // so a spare copy of an equipped item's name is a different instance and stays
   // sellable (before, one equipped "Stone-Grip Gloves" hid every copy you owned).
-  const equippedItemIds = equippedInstanceIds(player);
   /* ⚠⚠⚠ OTA-1734 — WHAT THIS COUNTER CAN STRENGTHEN, quoted once per row.
    *
    *  ⚠ WEAPONS. The engine refuses only "no durability" and "already +3", so it
@@ -500,12 +582,6 @@ export function VendorScreen() {
    *
    *  ⚠ THE ONE IN YOUR HAND FIRST — a player who came here to strengthen a weapon
    *  came about the weapon they are carrying. */
-  const reinforceRows = player.inventory
-    .filter((i) => !!i.durability && categorizeItem(i) === 'weapon')
-    .map((i) => ({ item: i, quote: reinforceQuote(i) }))
-    .sort((a, b) =>
-      (equippedItemIds.has(a.item.id) ? 0 : 1) - (equippedItemIds.has(b.item.id) ? 0 : 1)
-      || a.item.name.localeCompare(b.item.name));
   // arb120 — bandolier (quick-throwables) and tool-pouch items aren't "equipped"
   // by slot, so they DON'T get filtered out of the sell list — but they're part
   // of the player's working loadout and selling one by accident stings. Flag
@@ -527,28 +603,6 @@ export function VendorScreen() {
   // HANDOFF #12 — sell-back UI polish. Sort options so the player can
   // surface the most valuable junk first (default), alphabetize for
   // hunting, or group by rarity for clearing low-tier clutter.
-  const RARITY_ORDER: Record<string, number> = { Legendary: 0, Rare: 1, Uncommon: 2, Common: 3 };
-  const sellable = player.inventory
-    .filter((i) => i.quantity > 0 && !equippedItemIds.has(i.id) && !isUnsellable(i))
-    // OTA-865 — display the war-premium sell price (matches sellToVendor); carry the plain
-    // catalogue value as `base` so the ▲/▼ ticker can show whether you're getting more.
-    .map((i) => ({
-      item: i,
-      price: Math.round(sellPriceFor(i, vendor, rapportMod) * warSellMult),
-      base: sellPriceFor(i, vendor, 0),
-    }))
-    .filter((x) => x.price > 0)
-    .sort((a, b) => {
-      if (sellSort === 'name') return a.item.name.localeCompare(b.item.name);
-
-      if (sellSort === 'rarity') {
-        const ra = RARITY_ORDER[a.item.rarity ?? 'Common'] ?? 99;
-        const rb = RARITY_ORDER[b.item.rarity ?? 'Common'] ?? 99;
-        if (ra !== rb) return ra - rb;
-        return b.price - a.price;
-      }
-      return b.price - a.price; // default: most valuable first
-    });
 
   // OTA-1099 — the group-sell working set. Derived from `sellable` every render
   // rather than stored, so a selected row that stops being sellable (sold,

@@ -36,7 +36,10 @@ function knownTastesLine(tastes: readonly string[] | undefined): string | null {
 
 export function GiftModal() {
   const ctx = useGameStore((s) => s.pendingGift);
-  const worldMemory = useGameStore((s) => s.worldMemory);
+  // ⚠ LAG-2 — the one field this sheet reads. It is mounted by ExplorationScreen
+  // on every render, so a whole-`worldMemory` subscription here re-rendered the
+  // exploration tree on the 6s world heartbeat even with the sheet closed.
+  const npcRelations = useGameStore((s) => s.worldMemory.npcRelations);
   const choose = useGameStore((s) => s.chooseGiftRecipient);
   const close = useGameStore((s) => s.closeGift);
 
@@ -65,7 +68,7 @@ export function GiftModal() {
         // choice is being made, since that is when it is useful.
         ...ctx.candidates
           .map((c) => {
-            const line = knownTastesLine(getRelation(worldMemory, c.id)?.giftTastes);
+            const line = knownTastesLine(getRelation({ npcRelations }, c.id)?.giftTastes);
             return line ? `${c.name}: ${line.replace('You know of them: ', '')}` : null;
           })
           .filter((l): l is string => !!l),

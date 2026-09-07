@@ -552,7 +552,32 @@ export function ExplorationScreen() {
   // OTA-180 — appendFeedback selector dropped; store action still
   // exists for any non-UI emit site.
   const takeAmbientNoun = useGameStore((s) => s.takeAmbientNoun);
-  const worldMemory = useGameStore((s) => s.worldMemory);
+  /* ⚠⚠⚠ LAG-2 — THREE FIELDS, NOT THE WHOLE MEMORY. This screen subscribed to
+   *  the entire `worldMemory` object, and `worldRealtimeTick` (App.tsx, every
+   *  ~6 real seconds, whatever screen is open) replaces that object several
+   *  times per beat as patrols roam and tides turn. So the busiest screen in
+   *  the game re-rendered on a wall-clock timer while the player sat still,
+   *  for data it does not read: Fable measured ~93ms per commit, five commits
+   *  per five ticks, forever.
+   *
+   *  ⚠ The three fields below are every part of world memory this screen
+   *  consumes, and NONE of them is realtime — they move when the player
+   *  searches a room, meets a dog, or learns something about an enemy. The
+   *  heartbeat can no longer reach this screen; a genuine world change still
+   *  can, because the field that carries it is still subscribed. */
+  const visitedRooms = useGameStore((s) => s.worldMemory.visitedRooms);
+  const pendingDogOnboarding = useGameStore((s) => s.worldMemory.pendingDogOnboarding);
+  const enemyIntel = useGameStore((s) => s.worldMemory.enemyIntel);
+  const canonLocations = useGameStore((s) => s.worldMemory.canonLocations);
+  /* ⚠ The screen and its two memory-shaped helpers (`digSpotWorkedOut`,
+   *  `questionMarkerNumbers`) keep reading `worldMemory.<field>` exactly as they
+   *  did — this object IS those fields and nothing else, so every call site is
+   *  unchanged and the heartbeat's patrols / tides / tick counter simply are not
+   *  in it to change. */
+  const worldMemory = useMemo(
+    () => ({ visitedRooms, pendingDogOnboarding, enemyIntel, canonLocations, discoveredLocationIds: discoveredIds }),
+    [visitedRooms, pendingDogOnboarding, enemyIntel, canonLocations, discoveredIds],
+  );
 
   // OTA-930 — the old merged consumedAmbientNouns memo (searched + flavor in ONE set) is gone:
   // the two pools now match differently (searched keeps the historical loose substring rule;

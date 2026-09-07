@@ -96,6 +96,18 @@ function mount(el: React.ReactElement) {
 }
 const buttonsOf = (tree: any) => tree.root.findAll((n: any) => typeof n.props.onPress === 'function' && n.props.accessibilityRole === 'button');
 const logTexts = () => store.getState().gameLog.map((e: any) => e.text as string);
+/** ⚠ LAG-2 — the ordinary tap ledger lives on the disk log (see logUiTap). */
+const tapLedger = async (): Promise<string> => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const save = require('../app/engine/saveSystem') as {
+    setActiveSlot(id: string): Promise<void>; flushLogWrites(): Promise<void>; readFullLog(): Promise<string>;
+  };
+  if (!(require('../app/engine/saveSystem') as { getActiveSlotId(): string | null }).getActiveSlotId()) {
+    await save.setActiveSlot('ota1700_tap_ledger');
+  }
+  await save.flushLogWrites();
+  return save.readFullLog();
+};
 
 describe('OTA-1700 — isTutorialLocked is the one rule', () => {
   it('locks on a lockdown beat until the stay/leave choice, never outside the tutorial', () => {
@@ -161,16 +173,18 @@ describe('OTA-1700 — a new character, tutorial running', () => {
     expect(beat.includes('if (s.tutorialStep !== null) return;')).toBe(false);
   });
 
-  it('⚠⚠ the minimap opens the Atlas under the lock, and the tap is on the log', () => {
+  it('⚠⚠ the minimap opens the Atlas under the lock, and the tap is on the log', async () => {
     const tree = mount(<ExplorationScreen />);
     const mini = buttonsOf(tree).find((b: any) => String(b.props.accessibilityLabel ?? '').startsWith('Map'));
     expect(mini).toBeTruthy();
     const n0 = store.getState().gameLog.length;
     renderer.act(() => { mini.props.onPress(); });
     expect(store.getState().currentScreen).toBe('map');
-    const fresh = logTexts().slice(n0);
-    expect(fresh.some((t) => t.startsWith('ui: tap "map"'))).toBe(true);
-    expect(fresh.some((t) => /Not that/.test(t))).toBe(false);
+    // ⚠ LAG-2 — the ordinary tap ledger writes straight to the DISK log now (it
+    // no longer sweeps every store subscriber to record hidden diagnostic text),
+    // so the tap line is asserted there; the feed assertions stay in memory.
+    expect(await tapLedger()).toContain('ui: tap "map"');
+    expect(logTexts().slice(n0).some((t) => /Not that/.test(t))).toBe(false);
   });
 
   it('⚠⚠ the Atlas travel rows refuse under the lock with the Arbiter nudge, and no course is set', () => {
@@ -185,19 +199,18 @@ describe('OTA-1700 — a new character, tutorial running', () => {
     expect(logTexts().slice(n0).some((t) => /Not that/.test(t))).toBe(true);
   });
 
-  it('WORLD and LORE taps write ui: tap lines carrying the rendered label, and open their screens', () => {
+  it('WORLD and LORE taps write ui: tap lines carrying the rendered label, and open their screens', async () => {
     store.getState().setScreen('exploration');
     const tree = mount(<ExplorationScreen />);
     const world = buttonsOf(tree).find((b: any) => textOf(b).includes('WORLD'));
     const lore = buttonsOf(tree).find((b: any) => textOf(b).includes('LORE'));
-    const n0 = store.getState().gameLog.length;
     renderer.act(() => { world.props.onPress(); });
     expect(store.getState().currentScreen).toBe('world');
     store.getState().setScreen('exploration');
     renderer.act(() => { lore.props.onPress(); });
     expect(store.getState().currentScreen).toBe('lore');
-    const fresh = logTexts().slice(n0);
-    expect(fresh.some((t) => t.startsWith('ui: tap "⚑ WORLD"'))).toBe(true);
-    expect(fresh.some((t) => t.startsWith('ui: tap "◈ LORE"'))).toBe(true);
+    const fresh = [await tapLedger()];
+    expect(fresh.some((t) => t.includes('ui: tap "⚑ WORLD"'))).toBe(true);
+    expect(fresh.some((t) => t.includes('ui: tap "◈ LORE"'))).toBe(true);
   });
 });

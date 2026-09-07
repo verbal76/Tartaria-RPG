@@ -198,14 +198,22 @@ function onState(state: GameState): void {
   // bulk replacement (save-load): there are two signals.
   //   (a) ID mismatch: the entry that USED to sit at lastLogIndex - 1
   //       is no longer there → the log was wholesale replaced.
-  //   (b) Cold-boot bulk arrival: the log was empty when we last
-  //       synced (lastLogIndex === 0), and suddenly contains multiple
-  //       entries in a single tick. Normal new-character play appends
-  //       one entry per tick (each appendLog is its own zustand set);
-  //       only a wholesale replacement (e.g. loadSlotIntoGame setting
-  //       gameLog to the saved array) lands many at once.
+  //   (b) Cold-boot restore: the log was empty when we last synced
+  //       (lastLogIndex === 0) and the entries that arrived were
+  //       WRITTEN BEFORE THIS APP RUN STARTED — i.e. loadSlotIntoGame
+  //       put a previous session's log back.
   // In either case we resync silently — the next legitimate appendLog
   // (e.g. "you step back into ...") falls through the speak path.
+  //
+  // ⚠⚠⚠ LAG-2 — (b) USED TO COUNT ARRIVALS, AND MUST NOT. It read "two or
+  // more entries in one tick means a restore", resting on a comment that said
+  // "each appendLog is its own zustand set". That is no longer true: the store
+  // now folds an action's log lines into one sweep (state/storeNotify.ts), so a
+  // fresh character's opening beat can legitimately deliver several entries at
+  // once and would have been mistaken for a save load — the intro silently
+  // unspoken. The AGE of the arriving log is the honest signal and always was:
+  // a restored log was written in a previous run, so it predates this one; a
+  // log this run wrote cannot. No counting, no 30-second slop.
   const log = state.gameLog;
   const expectedPrev = lastLogIndex > 0 ? log[lastLogIndex - 1] : null;
   const idMismatch =
@@ -213,25 +221,20 @@ function onState(state: GameState): void {
     (lastLogIndex > log.length ||
       !expectedPrev ||
       expectedPrev.id !== lastSpokenEntryId);
-  // Cold-boot bulk arrival: log was empty at the last sync and we're
-  // now seeing 2+ new entries in one tick. Normal new-character play
-  // appends one entry per appendLog (each its own zustand set), so
-  // 2+ at once is always a save load.
-  const coldBootBulk = lastLogIndex === 0 && log.length >= 2;
-  // Cold-boot single-entry load: log was empty + we get exactly one
-  // entry. Could be new-character first line (legitimate to speak),
-  // or a save load where the slot only had one logged action. Check
-  // the entry's timestamp — saved entries carry the timestamp of
-  // when they were originally written (often hours/days old), so
-  // anything older than ~30s after boot is clearly a restore.
+  // Cold-boot restore: the log was empty at the last sync and the first entry
+  // that arrived carries a timestamp from before this run booted. Saved entries
+  // keep the timestamp of when they were originally written, so a restored log
+  // always predates `controllerStartedAt` and a log this run produced never can.
+  // (A save loaded WITHIN one run is caught by `idMismatch` above instead —
+  // lastSpokenEntryId is set by then.)
   const bootedAt = controllerStartedAt;
-  const onlyEntry = lastLogIndex === 0 && log.length === 1 ? log[0] : null;
-  const coldBootSingleAged =
-    onlyEntry != null &&
-    typeof onlyEntry.ts === 'number' &&
+  const firstArrival = lastLogIndex === 0 ? log[0] : undefined;
+  const coldBootRestore =
+    firstArrival != null &&
+    typeof firstArrival.ts === 'number' &&
     bootedAt != null &&
-    onlyEntry.ts < bootedAt - 30_000;
-  if (idMismatch || coldBootBulk || coldBootSingleAged) {
+    firstArrival.ts < bootedAt;
+  if (idMismatch || coldBootRestore) {
     // Realign to current tail without speaking anything. The next
     // appendLog after this tick (e.g. the "you step back into ..."
     // resume cue) will fall through the normal speak path.
