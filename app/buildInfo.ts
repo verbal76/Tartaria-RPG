@@ -28609,7 +28609,30 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // used it correctly: one module, two answers to "does this player have a tower to
 // climb". TEXT WRONG / ENGINE RIGHT; the engine's stricter answer is now the only
 // one any hint decides on. knowsATower survives as an exported helper.
-export const OTA_BUILD_ID = '2026-09-07-1730-the-hint-points-somewhere-you-can-go';
+// ⚠⚠ OTA-1731 - the pack sorts by where it goes, and the vendor admits what you
+// own. Two owner asks. (1) ARMOR and AMULETS & RINGS now divide into labelled runs
+// by the body part the piece is for, the way Weapons have divided by reach class
+// since OTA-1683 - and the mechanism was REUSED rather than copied: the screen's
+// `cat === 'weapon' ? weaponRuns(...) : [one run]` ternary became one
+// `categoryRuns(cat, items)` so a third category cannot mean a third branch in a
+// render body. The authority is validSlotsForItem, the same function
+// slotFillLabelFor already calls to print "Head"/"Chest" on the row itself and the
+// one the equip router obeys, so a heading can never disagree with its own rows or
+// claim a slot the game will not use; it also resolves fused pieces off uniqueStats.
+// Measured first: 297 armour rows split head 77 / chest 60 / cloak 43 / hands 41 /
+// feet 39 / legs 37 and 48 accessories split ring 28 / amulet 20, ZERO unresolved.
+// (2) A "working to learn" the player already owns used to VANISH from the vendor
+// list - three rows became two - so an absence had to mean "you own this", which no
+// absence can. The vendor genuinely still stocks it (OTA-802 made the slice fixed so
+// it cannot reroll), so the row stays and reads ✓ KNOWN, greyed and not tappable.
+// vendorRecipeMenu is the slice with an owned flag and vendorRecipeOffers is now
+// DERIVED from it, so "which three" has one answer and OTA-802's contract is
+// untouched. ⚠ It also made a dead message live: buyFromVendor looked the typed name
+// up in the sales list, which had already dropped everything known, so its
+// "You already know the X working." branch could never be true - typing the name of
+// a working you own answered "doesn't carry any X", the opposite of the truth.
+export const OTA_BUILD_ID = '2026-09-07-1731-sorted-by-where-it-goes';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-07-1730-the-hint-points-somewhere-you-can-go';
 // golem catch-up 2026-09-07: markerless publish of OTA-1730 - the hint points
 // somewhere you can still go. The Arbiter's two "try something else" wall hints
 // named the climbs while branching on knowsATower, which is true of a tower the

@@ -178,7 +178,14 @@ export const createVendorSlice = (
       const rd = require('../../engine/recipeDiscovery') as typeof import('../../engine/recipeDiscovery');
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { RECIPES } = require('../../engine/crafting') as typeof import('../../engine/crafting');
-      const recipeOffers = rd.vendorRecipeOffers(RECIPES, player.knownRecipes, rd.vendorSeed(scene.vendor.name));
+      // ⚠⚠ OTA-1731 — THE MENU, NOT THE SALES LIST, AND THAT MAKES A DEAD
+      // MESSAGE LIVE. This read `vendorRecipeOffers`, which has already dropped
+      // everything the player knows — so the `knownRecipes.includes(...)` branch
+      // three lines down could NEVER be true and "You already know the X working."
+      // was unreachable text. Typing the name of a working you own fell through to
+      // the item lookup and answered "doesn't carry any X", which is the opposite
+      // of the truth: they carry it, you own it.
+      const recipeOffers = rd.vendorRecipeMenu(RECIPES, player.knownRecipes, rd.vendorSeed(scene.vendor.name));
       const rOffer = recipeOffers.find((o) => o.result.toLowerCase() === itemName.toLowerCase());
       if (rOffer) {
         if ((player.knownRecipes ?? []).includes(rOffer.result)) {

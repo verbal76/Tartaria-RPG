@@ -7,6 +7,7 @@ import { isWeaponCoatingItem } from '../engine/weaponCoating';
 import { itemIsThrowable } from '../engine/bandolierEligibility';
 import { canonicalItemKind, canonicalItemTags, itemIsShield } from '../engine/crafting';
 import { reachClassFor } from '../engine/combatRules'; // OTA-1683 — weapon sub-headings by reach class
+import { validSlotsForItem } from '../engine/equipment'; // OTA-1731 — body sub-headings by the slot the equip router obeys
 
 export type InventoryCategory =
   | 'weapon'
@@ -307,6 +308,85 @@ export function weaponRuns(items: InventoryItem[]): Array<{ sub: WeaponSubsectio
   return WEAPON_SUBSECTION_ORDER
     .filter((sub) => (buckets.get(sub)?.length ?? 0) > 0)
     .map((sub) => ({ sub, items: buckets.get(sub)! }));
+}
+
+/** ⚠⚠⚠ OTA-1731 — ARMOR AND ACCESSORIES SPLIT BY WHERE THEY GO ON THE BODY.
+ *
+ *  Owner: *"armor should also be split up into subcategories like the weapons,
+ *  but just by what part of the body it is for, same as for the rings/amulets
+ *  category."*
+ *
+ *  ⚠ THE AUTHORITY IS `validSlotsForItem`, and that is the whole point rather
+ *  than a convenience. It is the same function `slotFillLabelFor` already calls
+ *  to print "Head" / "Chest" / "One-handed" on the row itself, so the SUBSECTION
+ *  HEADING and the ROW'S OWN LABEL cannot disagree — and it is the function the
+ *  equip router obeys, so a heading can never claim a slot the game will not put
+ *  the piece in. It also resolves FUSED pieces off `uniqueStats` (OTA-224)
+ *  instead of a name lookup that would miss them.
+ *
+ *  Measured across the catalog before this was written: 297 armour rows split
+ *  head 77 · chest 60 · cloak 43 · hands 41 · feet 39 · legs 37, and 48
+ *  accessories split ring 28 · amulet 20 — with ZERO rows failing to resolve, so
+ *  there is no "Other" bucket and none is authored. */
+export type BodySubsection = 'head' | 'chest' | 'hands' | 'legs' | 'feet' | 'cloak' | 'amulet' | 'ring';
+
+/** Head down to feet, then the cloak over the top; jewellery last, amulet before
+ *  rings the way the character sheet reads. */
+export const BODY_SUBSECTION_ORDER: BodySubsection[] = [
+  'head', 'chest', 'hands', 'legs', 'feet', 'cloak', 'amulet', 'ring',
+];
+
+export const BODY_SUBSECTION_LABEL: Record<BodySubsection, string> = {
+  head: 'Head', chest: 'Chest', hands: 'Hands', legs: 'Legs', feet: 'Feet',
+  cloak: 'Cloaks', amulet: 'Amulets', ring: 'Rings',
+};
+
+/** Which body subsection a piece belongs to, or null when it fills no slot the
+ *  player has (which the measurement says nothing in these two categories does). */
+export function bodySubsectionOf(item: InventoryItem): BodySubsection | null {
+  for (const slot of validSlotsForItem(item)) {
+    // ⚠ A ring occupies several physical slots (`ring1`, `ring2`, …); they are
+    //   one heading. Trim the index rather than listing the slots by hand, so a
+    //   raised MAX_RINGS cannot quietly create a heading nobody authored.
+    const base = String(slot).replace(/\d+$/, '') as BodySubsection;
+    if (BODY_SUBSECTION_ORDER.includes(base)) return base;
+  }
+  return null;
+}
+
+/** ⚠⚠ ONE ENTRY POINT FOR "HOW DOES THIS SECTION DIVIDE". The screen used to
+ *  carry `cat === 'weapon' ? weaponRuns(...) : [one run]` inline; adding armour
+ *  and accessories there would have made three special cases in a render body.
+ *  Categories with no subdivision return a single unlabelled run, which is
+ *  exactly what the screen already rendered for them. */
+export function categoryRuns(
+  cat: InventoryCategory,
+  items: InventoryItem[],
+): Array<{ label: string | null; items: InventoryItem[] }> {
+  if (cat === 'weapon') {
+    return weaponRuns(items).map((r) => ({ label: WEAPON_SUBSECTION_LABEL[r.sub], items: r.items }));
+  }
+  if (cat === 'armor' || cat === 'accessory') {
+    const buckets = new Map<BodySubsection, InventoryItem[]>();
+    const rest: InventoryItem[] = [];
+    for (const it of items) {
+      const sub = bodySubsectionOf(it);
+      if (!sub) { rest.push(it); continue; }
+      const arr = buckets.get(sub);
+      if (arr) arr.push(it); else buckets.set(sub, [it]);
+    }
+    const runs = BODY_SUBSECTION_ORDER
+      .filter((sub) => (buckets.get(sub)?.length ?? 0) > 0)
+      .map((sub) => ({ label: BODY_SUBSECTION_LABEL[sub], items: buckets.get(sub)! }));
+    // ⚠ A row that fills no slot still has to be REACHABLE. The catalog produces
+    //   none today, but a fused oddity or a future authored row must never fall
+    //   out of the list just because it did not fit a heading.
+    if (rest.length > 0) runs.push({ label: 'Other', items: rest });
+    // ⚠ One run is not a subdivision — do not head a section that has only one
+    //   kind of thing in it with a label repeating what the section already says.
+    return runs.length <= 1 ? [{ label: null, items }] : runs;
+  }
+  return [{ label: null, items }];
 }
 
 export function groupInventoryByCategory(

@@ -14,7 +14,7 @@ import { vendorPriceMod } from '../engine/factionRapport';
 import { getStanding } from '../engine/factions'; // OTA-1341 — the ladder reaches the display too
 import { resolveItemEffect, type GateKind } from '../engine/itemEffect';
 import { findGearByName, findMaterialByName, findExplorationItemByName, findCatalogItem, RECIPES } from '../engine/crafting';
-import { vendorRecipeOffers, vendorSeed } from '../engine/recipeDiscovery';
+import { vendorRecipeMenu, vendorSeed } from '../engine/recipeDiscovery';
 import { corruptionTierOf, corruptionPriceMultiplier } from '../engine/corruption';
 import { warPriceFactor, finalBuyPrice, priceArrow } from '../engine/vendorPricing';
 import { localWarHeat, contestedFactions } from '../engine/worldEvents';
@@ -364,9 +364,18 @@ export function VendorScreen() {
   // player doesn't have to know the typed "buy <name>" command. Same source the
   // store's buy path checks; tapping LEARN calls buyFromVendor(result) which routes
   // through the recipe-learn branch. Filtered to the ones not yet known.
+  // ⚠⚠⚠ OTA-1731 — THE WHOLE MENU, OWNED ROWS INCLUDED. Owner: *"ensure that if
+  // I have already bought a 'working to learn' I can see that I own it if someone
+  // tries to sell it to me again."* A learned row used to vanish — three workings
+  // became two — so an absence had to carry the meaning "you own this", which no
+  // absence can. The vendor genuinely still stocks it (OTA-802 fixed the slice so
+  // it cannot reroll), so the row stays and says so.
+  //
+  // ⚠ The second `.filter` on knownRecipes that stood here is gone with it: it
+  // repeated a rule the engine had already applied, which is how the display and
+  // the shelf ended up with two opinions about the same three rows.
   const recipeOffers = vendor
-    ? vendorRecipeOffers(RECIPES, player.knownRecipes, vendorSeed(vendor.name))
-        .filter((o) => !(player.knownRecipes ?? []).includes(o.result))
+    ? vendorRecipeMenu(RECIPES, player.knownRecipes, vendorSeed(vendor.name))
     : [];
   // Inventory items the player can sell — exclude the EXACT equipped instances +
   // unsellable. OTA-687 — exclude by INSTANCE ID (equippedInstanceIds), not name,
@@ -836,18 +845,30 @@ export function VendorScreen() {
                     <View key={`recipe_${o.result}`} style={styles.offerRow}>
                       <View style={[styles.offerStripe, { backgroundColor: rarityColor(preview.rarity) }]} />
                       <TouchableOpacity
-                        style={[styles.offerBody, !canAfford && styles.offerRowBroke]}
-                        onPress={() => openLearnRecipe(o.result, o.price)}
+                        // ⚠ OTA-1731 — an owned working is NOT a button. Tapping it
+                        // would open a confirm sheet for a purchase the store then
+                        // refuses, which is the "a control that does nothing" defect
+                        // OTA-220 rules out. It reads as owned and does not act.
+                        style={[styles.offerBody, (o.known || !canAfford) && styles.offerRowBroke]}
+                        onPress={o.known ? undefined : () => openLearnRecipe(o.result, o.price)}
+                        disabled={o.known}
                         activeOpacity={0.7}
                         accessibilityRole="button"
+                        accessibilityState={{ disabled: o.known }}
+                        accessibilityLabel={o.known ? `${o.result} — already known` : undefined}
                       >
                         <View style={styles.offerHead}>
                           <Text style={styles.offerName} numberOfLines={1}>{o.result}</Text>
-                          <Text style={[styles.offerPrice, !canAfford && styles.offerPriceBroke]}>{o.price} TC</Text>
+                          {/* ⚠ the price is REPLACED, not struck through: what the
+                              player needs here is "I own this", not a number they
+                              will never pay. */}
+                          <Text style={[styles.offerPrice, o.known ? styles.offerPriceKnown : (!canAfford && styles.offerPriceBroke)]}>
+                            {o.known ? '✓ KNOWN' : `${o.price} TC`}
+                          </Text>
                         </View>
                         <View style={styles.offerSubHead}>
                           <Text style={styles.offerKind} numberOfLines={1}>
-                            recipe{preview.rarity ? ` · ${preview.rarity}` : ''} · learn to craft
+                            recipe{preview.rarity ? ` · ${preview.rarity}` : ''}{o.known ? ' · already in your book' : ' · learn to craft'}
                           </Text>
                         </View>
                         {/* ⚠⚠⚠ OTA-1668 — WHAT THE WORKING MAKES, on the row.
@@ -1510,6 +1531,10 @@ const styles = StyleSheet.create({
   loadoutTag: { color: '#e0a85f', fontSize: 11, fontWeight: '700' },
   offerPrice: { color: '#c9a86a', fontSize: 12, fontWeight: '700' },
   offerPriceBroke: { color: '#a2977b' },
+  // ⚠ OTA-1731 — a working you already own. Completion-green, the same colour the
+  // READY sort and the COMPLETE button use, so "this one is done" reads the same
+  // everywhere in the game rather than looking like a price you cannot afford.
+  offerPriceKnown: { color: '#9ec96a', fontWeight: '700' as const, letterSpacing: 1 },
   offerSubHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginTop: 2 },
   offerKind: { color: '#a2977b', fontSize: 10, letterSpacing: 1, flex: 1 },
   // arb-fix — right-hand stack: "×N in stock" over "you have N".

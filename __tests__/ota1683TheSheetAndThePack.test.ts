@@ -224,9 +224,33 @@ describe('OTA-1683 — ⚠⚠ the Weapons section reads in runs', () => {
     expect(WEAPON_SUBSECTION_LABEL.long).toBe('Spears & polearms');
   });
 
-  it('the pack renders the runs under the Weapons header, and every other section is one unlabelled run', () => {
-    expect(PACK.includes("? weaponRuns(items).map((run) => ({ label: WEAPON_SUBSECTION_LABEL[run.sub], items: run.items }))")).toBe(true);
-    expect(PACK.includes(': [{ label: null as string | null, items }]')).toBe(true);
+  it('the pack renders the runs under the Weapons header, through the one runs helper', () => {
+    // ⚠⚠ OTA-1731 — RE-POINTED, AND THE CLAIM NARROWED HONESTLY. This pinned the
+    // literal ternary `cat === 'weapon' ? weaponRuns(...) : [one unlabelled run]`
+    // and its title said "every other section is one unlabelled run". That second
+    // half is no longer true: ARMOR and AMULETS & RINGS divide by body part now.
+    // Re-pointing the string without touching the title would have left this test
+    // asserting a sentence the game had stopped meaning.
+    //
+    // The property OTA-1683 actually cared about is intact and is what is checked:
+    // the Weapons section renders in LABELLED RUNS by reach class, a section with
+    // nothing to divide renders as ONE UNLABELLED run, and the heading uses the
+    // sub-label style. The ternary became `categoryRuns` so a third dividing
+    // category could not mean a third branch inside a render body.
+    expect(PACK.includes('categoryRuns(cat, items).map((run) => (')).toBe(true);
     expect(PACK.includes('styles.weaponSubLabel')).toBe(true);
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const IC = require('../app/components/InventoryCategorize') as typeof import('../app/components/InventoryCategorize');
+    const w = [
+      { id: 'w1', name: 'Stone Spear', kind: 'weapon', rarity: 'Common', quantity: 1, tags: [] },
+      { id: 'w2', name: 'Rusted Blade', kind: 'weapon', rarity: 'Common', quantity: 1, tags: [] },
+    ] as never;
+    const weaponRunsOut = IC.categoryRuns('weapon', w);
+    expect(weaponRunsOut.length).toBeGreaterThanOrEqual(1);
+    expect(weaponRunsOut.every((r) => typeof r.label === 'string')).toBe(true);
+    const plain = IC.categoryRuns('material',
+      [{ id: 'm1', name: 'Scrap Metal', kind: 'material', rarity: 'Common', quantity: 1, tags: [] }] as never);
+    expect(plain).toHaveLength(1);
+    expect(plain[0]!.label).toBeNull();
   });
 });

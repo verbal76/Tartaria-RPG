@@ -185,24 +185,55 @@ export function allDiscoverableRecipes(allRecipes: readonly RecipeLike[]): strin
  *  (player could buy recipes until broke). Already-learned recipes in the fixed menu
  *  simply drop out of the buyable list (their menu slot doesn't slide), so once you've
  *  bought this trader's whole menu there's nothing left — no reroll, bounded supply. */
+/** ⚠⚠⚠ OTA-1731 — THE WHOLE SLICE, INCLUDING WHAT YOU ALREADY OWN.
+ *
+ *  Owner: *"ensure that if I have already bought a 'working to learn' I can see
+ *  that I own it if someone tries to sell it to me again."*
+ *
+ *  ⚠ THE VENDOR STILL HAS IT — that is OTA-802's design and it is right. A
+ *  vendor's menu is a FIXED seeded slice of the full discoverable pool
+ *  ("learning one just drops it, the rest keep their identity"), so the slice
+ *  does not reroll and the trader you learned Hearty Stew from still stands over
+ *  the same three workings tomorrow. What was missing is that the LEARNED row
+ *  simply vanished from the list: three rows became two, and nothing told the
+ *  player whether this trader never carried it or whether they already own it.
+ *  An absence is not an answer.
+ *
+ *  So the slice is computed ONCE, here, and marked. `vendorRecipeOffers` below is
+ *  this list filtered to what is buyable — the exact rows it always returned, so
+ *  every existing caller and OTA-802's stability contract are untouched — and the
+ *  vendor screen reads the MENU so it can show the owned ones greyed and ticked. */
+export function vendorRecipeMenu(
+  allRecipes: readonly RecipeLike[],
+  knownRecipes: readonly string[] | undefined,
+  seed: number,
+  count = 3,
+): { result: string; price: number; known: boolean }[] {
+  const full = allDiscoverableRecipes(allRecipes);          // STABLE — not filtered by known
+  if (full.length === 0) return [];
+  const start = ((seed % full.length) + full.length) % full.length;
+  const n = Math.min(count, full.length);
+  const known = new Set(knownRecipes ?? []);
+  const out: { result: string; price: number; known: boolean }[] = [];
+  for (let i = 0; i < n; i++) {
+    const result = full[(start + i) % full.length]!;
+    out.push({ result, price: recipeVendorPrice(result), known: known.has(result) });
+  }
+  return out;
+}
+
+/** What this vendor will actually SELL you: the menu minus what you know.
+ *  ⚠ OTA-1731 — defined in terms of the menu rather than repeating the slice
+ *  arithmetic, so "which three" can never have two answers. */
 export function vendorRecipeOffers(
   allRecipes: readonly RecipeLike[],
   knownRecipes: readonly string[] | undefined,
   seed: number,
   count = 3,
 ): { result: string; price: number }[] {
-  const full = allDiscoverableRecipes(allRecipes);          // STABLE — not filtered by known
-  if (full.length === 0) return [];
-  const start = ((seed % full.length) + full.length) % full.length;
-  const n = Math.min(count, full.length);
-  const known = new Set(knownRecipes ?? []);
-  const out: { result: string; price: number }[] = [];
-  for (let i = 0; i < n; i++) {
-    const result = full[(start + i) % full.length]!;
-    if (known.has(result)) continue;                         // learned → not buyable, but the menu slice stays fixed
-    out.push({ result, price: recipeVendorPrice(result) });
-  }
-  return out;
+  return vendorRecipeMenu(allRecipes, knownRecipes, seed, count)
+    .filter((r) => !r.known)
+    .map(({ result, price }) => ({ result, price }));
 }
 
 /** Tiny stable string hash → a vendor seed for vendorRecipeOffers. */

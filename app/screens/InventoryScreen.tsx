@@ -8,7 +8,7 @@ import {
   CATEGORY_LABEL,
   CATEGORY_ORDER,
   groupInventoryByCategory,
-  weaponRuns, WEAPON_SUBSECTION_LABEL, // OTA-1683 — sub-headings inside Weapons
+  categoryRuns, // OTA-1731 — one answer to "how does this section divide" (weapons by reach, armour + jewellery by body part)
 } from '../components/InventoryCategorize';
 import type { InventoryItem, EquipSlot, PlayerCharacter } from '../engine/types';
 import { validSlotsForItem, SLOT_LABEL, wornInstanceIds, byWornFirst, planGroupEquip, RING_SLOTS, RING_ID_KEYS } from '../engine/equipment';
@@ -1962,10 +1962,11 @@ export function InventoryScreen() {
                   on." Each run is headed by the reach class combat already
                   resolves the weapon to (InventoryCategorize.weaponRuns); every
                   other section is one unlabelled run, exactly as before. */}
-              {!collapsed && (cat === 'weapon'
-                ? weaponRuns(items).map((run) => ({ label: WEAPON_SUBSECTION_LABEL[run.sub], items: run.items }))
-                : [{ label: null as string | null, items }]
-              ).map((run) => (
+              {/* ⚠ OTA-1731 — and ARMOR + AMULETS & RINGS divide the same way, by
+                  the body part they go on. The ternary that used to live here
+                  became `categoryRuns`, so the screen asks one question instead of
+                  growing a branch per category. */}
+              {!collapsed && categoryRuns(cat, items).map((run) => (
                 <View key={run.label ?? '_'}>
                   {run.label !== null && (
                     <Text style={[styles.weaponSubLabel, { color: CATEGORY_COLORS[cat] }]}>
