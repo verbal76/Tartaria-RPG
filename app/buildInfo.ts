@@ -28782,6 +28782,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // loads by settling the throw through settleThrowRestore('cancelled'): nothing
 // spent, the off-hand restored, the next throw normal.
 export const OTA_BUILD_ID = '2026-09-07-1737-the-mystery-does-not-starve-the-lead';
+// golem catch-up 2026-09-07: markerless publish of OTA-1737 - three bounded
+// repairs from audit pass #3. The mystery and storyline wrong-ground branches of
+// advanceStagesOnIntent fall through instead of returning (a parked mystery
+// starved every investigate-lead); inventory.stackCompatible keys the merge on
+// every behaviour-bearing row property (flags, coatings, instance stats, rarity,
+// the value tags) and not on catalog tags; the dog amnesty keeps a market
+// purchase; throwSettlement is saved and an interrupted throw is settled as
+// cancelled on load through settleThrowRestore.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-07-1736-the-vendor-knows-what-you-carry';
 // golem catch-up 2026-09-07: markerless publish of OTA-1736 - the vendor as a
 // projection of authoritative state. app/engine/itemIdentity.ts holds the
