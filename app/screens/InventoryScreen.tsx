@@ -13,6 +13,10 @@ import {
 import type { InventoryItem, EquipSlot, PlayerCharacter } from '../engine/types';
 import { validSlotsForItem, SLOT_LABEL, wornInstanceIds, byWornFirst, planGroupEquip, RING_SLOTS, RING_ID_KEYS } from '../engine/equipment';
 import { canScrap } from '../engine/scrapEngine';
+// ⚠ OTA-1734 — the level is READ from the durability authority, never derived
+//   from the numbers on the card: temper randomises `max`, so nothing about the
+//   ceiling can tell you how many times a weapon has been over the anvil.
+import { reinforceLevel } from '../engine/durability';
 import { findWeaponByName, isFusedInventoryItem } from '../engine/crafting';
 import { resolveDisplayWeapon } from '../engine/itemResolution';
 import { isPouchEligible } from '../engine/pouchEligibility';
@@ -2807,7 +2811,25 @@ function ItemRow({
           <Text style={styles.rowQty}>×{item.quantity}</Text>
         </View>
         <View style={styles.rowMetaRow}>
-          {item.rarity && <Text style={styles.rowMeta}>{item.rarity}</Text>}
+          {/* ⚠⚠⚠ OTA-1734 — THE REINFORCEMENT LEVEL RIDES THE RARITY CHIP.
+              Owner: *"Add the reinforcement level to the weapon item card in a
+              compact way… Example: `Legendary +2` rather than adding another long
+              metadata phrase"*, and *"without worsening the weapon-card
+              clipping/layout problem we just fixed."*
+
+              ⚠ It is THREE CHARACTERS ON A CHIP THAT ALREADY EXISTS. A new chip
+              would be a new wrap point in Row 1, which is the row OTA-1727 was
+              called in to unclog; " +2" cannot introduce one because it cannot
+              break away from the word it is appended to.
+
+              ⚠ ABSENT AT +0, so the 99% of gear that has never seen an anvil reads
+              exactly as it did yesterday. The card only starts saying this once
+              there is something to say. */}
+          {item.rarity && (
+            <Text style={styles.rowMeta}>
+              {item.rarity}{reinforceLevel(item) > 0 ? ` +${reinforceLevel(item)}` : ''}
+            </Text>
+          )}
           {/* OTA-194 — heart marker on items the player has reserved
               for the fusion bench. Tiny, fits in the meta row next to
               rarity / dog tags. No marker when un-reserved so the row

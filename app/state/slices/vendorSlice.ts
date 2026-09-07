@@ -80,7 +80,12 @@ export interface VendorSlice {
    *  a 155-coin dump was 155 full persists — the owner's 2355ms JS stall. */
   sellToVendor: (itemName: string, itemId?: string, opts?: { social?: boolean; units?: number }) => void;
   useVendorCrucible: () => void;
-  reinforceWithVendor: (itemName: string) => void;
+  /** ⚠ OTA-1734 — `itemId` targets ONE COPY. The screen lists instances, and two
+   *  copies of a name can sit at different reinforcement levels; without an id the
+   *  name resolution below would strengthen whichever the counter prefers rather
+   *  than the row the player tapped. Optional, so the typed `reinforce <name>`
+   *  path and every existing caller are unchanged. */
+  reinforceWithVendor: (itemName: string, itemId?: string) => void;
   repairWithVendor: (itemName: string) => void;
 }
 
@@ -913,7 +918,7 @@ export const createVendorSlice = (
    *  refusals (no vendor, no such item, cannot afford). Costs go through the two
    *  ladders in the engine and the materials through `consumeIngredientsList` —
    *  the crafting drain, not a second one. */
-  reinforceWithVendor(itemName) {
+  reinforceWithVendor(itemName, itemId) {
     const state = get();
     const scene = state.currentScene;
     const player = state.player;
@@ -924,8 +929,6 @@ export const createVendorSlice = (
     }
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const D = require('../../engine/durability') as typeof import('../../engine/durability');
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const SE = require('../../engine/scrapEngine') as typeof import('../../engine/scrapEngine');
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const CR = require('../../engine/crafting') as typeof import('../../engine/crafting');
 
@@ -943,19 +946,26 @@ export const createVendorSlice = (
       get().appendLog('system', `You are not carrying a ${itemName} that can be reinforced.`);
       return;
     }
+    // ⚠ OTA-1734 — an id names ONE COPY and beats every heuristic below. It falls
+    //   back rather than refusing: the row could have been sold or consumed between
+    //   the tap and the yes, and "reinforce your blade" is still a sane reading.
     const item =
-      candidates.find((i) => equippedIds.has(i.id))
+      (itemId ? candidates.find((i) => i.id === itemId) : undefined)
+      ?? candidates.find((i) => equippedIds.has(i.id))
       ?? [...candidates].sort(
         (a, b) => (a.durability!.current / a.durability!.max) - (b.durability!.current / b.durability!.max),
       )[0]!;
 
-    const refusal = D.reinforceRefusal(item);
-    if (refusal) {
-      get().appendLog('arbiter', `${scene.vendor.name} turns your ${item.name} over. "This one ${refusal}."`);
+    // ⚠⚠ OTA-1734 — THE BILL COMES FROM THE QUOTE THE SCREEN SHOWED. One call
+    //   answers refusal, coin and materials, so the confirmation the player read
+    //   and the transaction they authorised cannot be two different sums.
+    const quote = D.reinforceQuote(item);
+    if (quote.refusal) {
+      get().appendLog('arbiter', `${scene.vendor.name} turns your ${item.name} over. "This one ${quote.refusal}."`);
       return;
     }
-    const tc = D.reinforceTcCost(item);
-    const mats = SE.reinforceCostMaterials(item, D.reinforceLevel(item));
+    const tc = quote.tc;
+    const mats = quote.materials;
     // ⚠ CHECK BOTH BEFORE SPENDING EITHER. OTA-984's lesson at this same counter:
     //   charging the fee and then discovering the work cannot be done sells a fire
     //   that will not light.

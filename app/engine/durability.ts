@@ -8,7 +8,7 @@ import {
   findExplorationItemByName,
   GEAR,
 } from './crafting';
-import { scrapOutputFor } from './scrapEngine';
+import { scrapOutputFor, reinforceCostMaterials } from './scrapEngine';
 import { canonicalStatKey } from './equipment';
 
 // OTA-188 — when a durability-tracked item breaks, drop ONE low-tier
@@ -307,6 +307,60 @@ export function reinforceItem(item: InventoryItem): InventoryItem {
       baseMax,
       reinforced: level,
     },
+  };
+}
+
+/** ⚠⚠⚠ OTA-1734 — ONE QUOTE, READ BY THE COUNTER **AND** BY THE PREVIEW.
+ *
+ *  Owner: *"The preview/confirmation must use the same pricing and durability
+ *  authorities as the actual transaction. Do not duplicate the pricing
+ *  calculation in UI code."*
+ *
+ *  So the screen computes NOTHING. It asks this once per eligible row, renders
+ *  the numbers it is handed, and `reinforceWithVendor` charges from the SAME
+ *  call — which is the only way a shown price and a charged price cannot drift,
+ *  and the only way a shown ceiling and a written ceiling cannot drift.
+ *
+ *  ⚠ `to` is not arithmetic performed here. It is `reinforceItem`'s own output,
+ *  so the preview is not a model of the result — it IS the result, computed by
+ *  the function that will do the work.
+ *
+ *  ⚠ On a REFUSAL every field still describes the item's present state (`to`
+ *  equals `from`, `tc` is 0) so a caller that renders before checking `refusal`
+ *  shows the truth rather than a bill for work that will not happen. */
+export interface ReinforceQuote {
+  /** Reinforcements already on this copy, 0..REINFORCE_MAX_LEVEL. */
+  level: number;
+  /** The level this quote buys. Equals `level` when refused. */
+  nextLevel: number;
+  /** Points added to the ceiling — and carried onto `current`, per OTA-1654. */
+  step: number;
+  from: { current: number; max: number };
+  to: { current: number; max: number };
+  tc: number;
+  materials: Array<{ name: string; quantity: number }>;
+  refusal: string | null;
+}
+
+export function reinforceQuote(item: InventoryItem): ReinforceQuote {
+  const level = reinforceLevel(item);
+  const from = { current: item.durability?.current ?? 0, max: item.durability?.max ?? 0 };
+  // ⚠ The materials ladder is asked with the CURRENT level, which is what
+  //   `reinforceCostMaterials` multiplies by (level+1). Stated here once so the
+  //   off-by-one cannot be re-derived differently by a second caller.
+  const materials = item.durability ? reinforceCostMaterials(item, level) : [];
+  const refusal = reinforceRefusal(item);
+  if (refusal) return { level, nextLevel: level, step: 0, from, to: from, tc: 0, materials, refusal };
+  const after = reinforceItem(item).durability!;
+  return {
+    level,
+    nextLevel: after.reinforced ?? level + 1,
+    step: reinforceStep(item),
+    from,
+    to: { current: after.current, max: after.max },
+    tc: reinforceTcCost(item),
+    materials,
+    refusal: null,
   };
 }
 

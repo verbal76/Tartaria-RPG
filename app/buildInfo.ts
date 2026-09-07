@@ -28675,7 +28675,36 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // reinforceCostMaterials, built on repairCostMaterials rather than a new table.
 // Fused/generated pieces have no catalog row, so their own temper roll is the base;
 // legacy saves lacking both fields read as unreinforced with no migration.
-export const OTA_BUILD_ID = '2026-09-07-1733-raise-the-ceiling-keep-the-damage';
+// ⚠⚠⚠ OTA-1734 - the counter sells the anvil. OTA-1733 shipped the mechanic with
+// no way in but a typed `reinforce <name>` nobody is told about - the same shape
+// the workings were in before OTA-812. The vendor's BUY tab now carries a
+// REINFORCE YOUR GEAR section built from the WORKINGS TO LEARN pattern exactly:
+// a collapsible list of offerRows, the ONE shared confirm sheet, and a finished
+// row that reads as finished instead of vanishing. Each row states where the copy
+// stands on the ladder, its current and resulting ceiling, the TC and the
+// materials, before anything is committed; the confirm restates all of it plus
+// what it does NOT do (raise the ceiling, not mend - OTA-1654's carry-across),
+// and a success sheet names the new maximum, which matters because the store's
+// log line lands on a screen the player is not looking at.
+// ⚠⚠ ONE SUM. reinforceQuote(item) in durability.ts answers refusal, step, coin,
+// materials and the RESULT - and `to` is reinforceItem's own output rather than
+// arithmetic, so the preview is the result. reinforceWithVendor prices from the
+// same call, so a shown price cannot become a different charged price; the screen
+// carries no ladder constant at all and a test pins their absence.
+// ⚠ reinforceWithVendor gained an OPTIONAL itemId - not a second implementation
+// but the same one told WHICH COPY, because two blades at +0 and +2 are two rows
+// and a name could only ever reach one of them. The typed path is unchanged.
+// ⚠ THE DOUBLE-SUBMIT GUARD IS A REF, NOT STATE: setPending(null) is async, so a
+// second tap in the same frame reads the stale pending and would buy a second
+// level nobody asked for. Verified non-vacuously - with the latch removed, two
+// taps buy +2 and charge 440 TC. It clears on OPEN, so +1 -> +2 -> +3 from three
+// separate sheets still works.
+// ⚠ The card says `Common +1` on the chip that already carries the rarity: three
+// characters on an existing chip rather than a new one, because Row 1 is the row
+// OTA-1727 was called in to unclog and " +1" cannot break away from its word.
+// Absent at +0, so gear that has never seen an anvil reads exactly as before.
+export const OTA_BUILD_ID = '2026-09-07-1734-the-counter-sells-the-anvil';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-07-1733-raise-the-ceiling-keep-the-damage';
 // golem catch-up 2026-09-07: markerless publish of OTA-1733 - reinforcement.
 // Option B: each level adds 20% of the CATALOG BASE to that copy's temper-rolled
 // max, three levels, at a smith for TC (140/300/640 x rarity) plus materials

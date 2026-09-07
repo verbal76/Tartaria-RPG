@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore, vendorNpcId } from '../state/gameStore';
 import { FirstTimeHint } from '../components/FirstTimeHint';
@@ -13,8 +13,12 @@ import { rarityHexColor } from '../components/InventoryCategorize';
 import { vendorPriceMod } from '../engine/factionRapport';
 import { getStanding } from '../engine/factions'; // OTA-1341 — the ladder reaches the display too
 import { resolveItemEffect, type GateKind } from '../engine/itemEffect';
-import { findGearByName, findMaterialByName, findExplorationItemByName, findCatalogItem, RECIPES } from '../engine/crafting';
+import { findGearByName, findMaterialByName, findExplorationItemByName, findCatalogItem, missingIngredientsList, RECIPES } from '../engine/crafting';
 import { vendorRecipeMenu, vendorSeed } from '../engine/recipeDiscovery';
+// ⚠ OTA-1734 — the reinforcement AUTHORITIES, imported to be READ. The screen
+//   renders what `reinforceQuote` hands it and never computes a price or a
+//   ceiling of its own; `reinforceWithVendor` charges from the same call.
+import { reinforceQuote, REINFORCE_MAX_LEVEL } from '../engine/durability';
 import { corruptionTierOf, corruptionPriceMultiplier } from '../engine/corruption';
 import { warPriceFactor, finalBuyPrice, priceArrow } from '../engine/vendorPricing';
 import { localWarHeat, contestedFactions } from '../engine/worldEvents';
@@ -48,6 +52,18 @@ type Pending =
   | { mode: 'bulkSellCommonGear'; count: number; total: number }
   | { mode: 'bulkSellLoot'; count: number; total: number }
   | { mode: 'accept'; kind: 'faction' | 'hunt' | 'mystery' | 'storyline'; title: string; reward: string }
+  // ⚠⚠ OTA-1734 — REINFORCEMENT IS A SERVICE THE COUNTER SELLS, so it rides the
+  // same `pending` sheet every other purchase does rather than a screen of its
+  // own. Owner: *"Do not create a special standalone reinforcement screen if the
+  // existing vendor architecture can represent the service cleanly."*
+  //
+  // ⚠ It carries the INSTANCE ID, not just the name: two copies of one blade can
+  // sit at different levels, and the sheet must quote the copy that was tapped.
+  | { mode: 'reinforce'; itemName: string; itemId: string }
+  // ⚠ The outcome is its own arm because the player is standing at a vendor and
+  // never sees the log line the store writes. "Receive a clear success message
+  // showing the new maximum durability" has to happen HERE.
+  | { mode: 'reinforceDone'; itemName: string; itemId: string; text: string }
   | null;
 
 export function VendorScreen() {
@@ -62,6 +78,7 @@ export function VendorScreen() {
   const sellToVendor = useGameStore((s) => s.sellToVendor);
   const stealFromVendor = useGameStore((s) => s.stealFromVendor);
   const dismissVendor = useGameStore((s) => s.dismissVendor);
+  const reinforceWithVendor = useGameStore((s) => s.reinforceWithVendor);
   const acceptFactionQuest = useGameStore((s) => s.acceptFactionQuest);
   const acceptHunt = useGameStore((s) => s.acceptHunt);
   const acceptMystery = useGameStore((s) => s.acceptMystery);
@@ -143,6 +160,44 @@ export function VendorScreen() {
   // (buying the Aetheric Vest working doesn't put a vest on you).
   const openLearnRecipe = (result: string, price: number) => { setBuyQty(1); setPending({ mode: 'buy', itemName: result, price, isRecipe: true }); };
   const openSell = (itemName: string, price: number, itemId?: string) => { setSellQty(1); setPending({ mode: 'sell', itemName, price, itemId }); };
+
+  /* ⚠⚠⚠ OTA-1734 — ONE SHEET, ONE REINFORCEMENT.
+   *
+   *  `setPending(null)` is a React state update, so a second tap landing in the
+   *  same frame reads the STALE `pending` and would buy a second level the player
+   *  never asked for — the shape doSell/doBuy live with because a duplicate sale
+   *  is at least visible in the log; a duplicate reinforcement is a permanent,
+   *  paid-for change to one object. The latch is SYNCHRONOUS (a ref, not state)
+   *  and is cleared when a sheet is OPENED, so "one confirm sheet spends at most
+   *  once" holds while +1 → +2 → +3 from three separate sheets stays possible. */
+  const reinforceLatch = useRef<string | null>(null);
+  const openReinforce = (item: InventoryItem) => {
+    reinforceLatch.current = null;
+    setPending({ mode: 'reinforce', itemName: item.name, itemId: item.id });
+  };
+  const doReinforce = () => {
+    if (pending?.mode !== 'reinforce') return;
+    if (reinforceLatch.current === pending.itemId) return;
+    reinforceLatch.current = pending.itemId;
+    const { itemName, itemId } = pending;
+    const readDur = () => useGameStore.getState().player?.inventory.find((i) => i.id === itemId)?.durability;
+    const before = readDur();
+    reinforceWithVendor(itemName, itemId);
+    const after = readDur();
+    // ⚠ The success line is read back off the ITEM, not predicted from the quote.
+    //   If the counter refused for a reason the sheet could not see, there is no
+    //   change to report and no message claiming one.
+    setPending(
+      before && after && (after.reinforced ?? 0) > (before.reinforced ?? 0)
+        ? {
+            mode: 'reinforceDone',
+            itemName,
+            itemId,
+            text: `+${after.reinforced} of ${REINFORCE_MAX_LEVEL}. Maximum durability ${before.max} → ${after.max}, permanently.\n\nIt holds ${after.current}/${after.max} now — the ${after.max - after.current} points it was already down are still down. Reinforcing raises the ceiling; mending is what fills it.`,
+          }
+        : null,
+    );
+  };
 
   // OTA-178 — gate-loss warning helper. Returns the GateKind label
   // when selling THIS item would leave the player with no other
@@ -303,11 +358,43 @@ export function VendorScreen() {
     setPending(null);
   };
 
+  /* ⚠⚠ OTA-1734 — the SHEET's quote, re-read from the LIVE item on every render.
+   *  The row's quote was a snapshot; between the tap and the yes the player can
+   *  have spent the materials elsewhere, so what the confirm shows and what the
+   *  buttons allow are computed from the inventory as it stands right now. */
+  const pendingReinforce = pending?.mode === 'reinforce'
+    ? (() => {
+        const it = player.inventory.find((i) => i.id === pending.itemId);
+        if (!it) return null;
+        const quote = reinforceQuote(it);
+        return {
+          item: it,
+          quote,
+          missing: missingIngredientsList(quote.materials, player.inventory) as Array<{ name: string; quantity: number }>,
+        };
+      })()
+    : null;
+  /** Which refusal the sheet is showing, or null when the work can be bought.
+   *  ⚠ Ordered the way the counter itself checks (OTA-984's rule: know that BOTH
+   *  can be paid before either is spent), so the sheet names the same obstacle
+   *  `reinforceWithVendor` would name. */
+  const reinforceBlocked: 'gone' | 'refused' | 'tc' | 'materials' | null =
+    pending?.mode !== 'reinforce' ? null
+    : !pendingReinforce ? 'gone'
+    : pendingReinforce.quote.refusal ? 'refused'
+    : player.tc < pendingReinforce.quote.tc ? 'tc'
+    : pendingReinforce.missing.length > 0 ? 'materials'
+    : null;
+
   // arb150 — the SELL confirm previews the SPECIFIC instance (by id) so its
   // rolled stats/durability match the row tapped; BUY previews the catalog row.
   const preview = pending?.mode === 'buy'
     ? getItemPreview(pending.itemName)
-    : pending?.mode === 'sell'
+    : pending?.mode === 'sell' || pending?.mode === 'reinforce' || pending?.mode === 'reinforceDone'
+      // ⚠ OTA-1734 — the reinforcement arms preview the INSTANCE for the same
+      //   reason the sell arm does, and on the DONE arm that is the point: the
+      //   preview the player is looking at is re-read after the work, so the new
+      //   ceiling shows on the card in the sheet as well as in the message.
       ? getItemPreviewForInstance(
           player.inventory.find((i) => i.id === pending.itemId) ?? { name: pending.itemName },
         )
@@ -382,6 +469,28 @@ export function VendorScreen() {
   // so a spare copy of an equipped item's name is a different instance and stays
   // sellable (before, one equipped "Stone-Grip Gloves" hid every copy you owned).
   const equippedItemIds = equippedInstanceIds(player);
+  /* ⚠⚠⚠ OTA-1734 — WHAT THIS COUNTER CAN STRENGTHEN, quoted once per row.
+   *
+   *  ⚠ WEAPONS. The engine refuses only "no durability" and "already +3", so it
+   *  would happily strengthen a helm; the SERVICE offered here is the weapon
+   *  ladder the owner specified, and the list is where that scope is expressed
+   *  rather than in a second refusal the engine would then disagree with.
+   *
+   *  ⚠ ONE ROW PER INSTANCE, keyed by id — two copies of a blade at +0 and +2 are
+   *  two different offers, and picking by name could only ever reach one of them.
+   *
+   *  ⚠ MAXED ROWS STAY. OTA-1731's lesson at this same screen: an absence cannot
+   *  carry the meaning "this one is finished". The row reads ✓ +3 MAX and does not
+   *  act, exactly as an owned working does.
+   *
+   *  ⚠ THE ONE IN YOUR HAND FIRST — a player who came here to strengthen a weapon
+   *  came about the weapon they are carrying. */
+  const reinforceRows = player.inventory
+    .filter((i) => !!i.durability && categorizeItem(i) === 'weapon')
+    .map((i) => ({ item: i, quote: reinforceQuote(i) }))
+    .sort((a, b) =>
+      (equippedItemIds.has(a.item.id) ? 0 : 1) - (equippedItemIds.has(b.item.id) ? 0 : 1)
+      || a.item.name.localeCompare(b.item.name));
   // arb120 — bandolier (quick-throwables) and tool-pouch items aren't "equipped"
   // by slot, so they DON'T get filtered out of the sell list — but they're part
   // of the player's working loadout and selling one by accident stings. Flag
@@ -899,6 +1008,93 @@ export function VendorScreen() {
               </View>
             );
           })()}
+          {/* ⚠⚠⚠ OTA-1734 — REINFORCE YOUR GEAR. The mechanic shipped in OTA-1733
+              had no way in but a typed command nobody is told about, which is the
+              same shape the workings were in before OTA-812.
+
+              ⚠ IT IS THE WORKINGS ROW, REUSED — a service the counter offers, listed
+              as tappable rows, confirmed through the ONE shared sheet. Owner: *"use
+              its established interaction pattern… do not create a special standalone
+              reinforcement screen."* Nothing here is a new kind of control.
+
+              ⚠⚠ AND NOTHING HERE IS ARITHMETIC. Every number on these rows comes off
+              `reinforceQuote`, which is the call `reinforceWithVendor` prices from.
+              The row, the confirm sheet and the transaction are one sum read three
+              times, so a shown price cannot become a different charged price.
+
+              ⚠ SHOWN AT ANY VENDOR, exactly as `repairWithVendor` is: the counter is
+              the gate, and there is one rule about who can do this work rather than
+              a screen rule and an engine rule that can disagree. What it is NOT is
+              free from the pack — that was the owner's line. */}
+          {reinforceRows.length > 0 && (() => {
+            const secKey = 'buy_reinforce';
+            const collapsed = collapsedSections[secKey] ?? false;
+            const FORGE_ACCENT = '#7fb0a8';
+            return (
+              <View style={styles.section}>
+                <TouchableOpacity
+                  style={[styles.sectionHeader, { borderLeftColor: FORGE_ACCENT }]}
+                  activeOpacity={0.7}
+                  onPress={() => setCollapsedSections((s2) => ({ ...s2, [secKey]: !(s2[secKey] ?? false) }))}
+                  accessibilityRole="button"
+                  accessibilityState={{ expanded: !collapsed }}
+                >
+                  <View style={styles.sectionHeaderLeft}>
+                    <Text style={[styles.sectionChevron, { color: FORGE_ACCENT }]}>{collapsed ? '\u25b8' : '\u25be'}</Text>
+                    <Text style={[styles.sectionLabel, { color: FORGE_ACCENT }]}>REINFORCE YOUR GEAR</Text>
+                  </View>
+                  <Text style={styles.sectionCount}>{reinforceRows.length}</Text>
+                </TouchableOpacity>
+                {!collapsed && reinforceRows.map(({ item, quote }) => {
+                  const maxed = quote.refusal !== null;
+                  const short = maxed ? [] : missingIngredientsList(quote.materials, player.inventory);
+                  const cannotPay = !maxed && (player.tc < quote.tc || short.length > 0);
+                  return (
+                    <View key={`reinforce_${item.id}`} style={styles.offerRow}>
+                      <View style={[styles.offerStripe, { backgroundColor: rarityColor(item.rarity) }]} />
+                      <TouchableOpacity
+                        // ⚠ A maxed row is NOT a button (OTA-220: no control that
+                        //   does nothing). A row you cannot yet AFFORD still is —
+                        //   the sheet is where the shortfall is named, exactly as
+                        //   an unaffordable ware behaves two sections up.
+                        style={[styles.offerBody, (maxed || cannotPay) && styles.offerRowBroke]}
+                        onPress={maxed ? undefined : () => openReinforce(item)}
+                        disabled={maxed}
+                        activeOpacity={0.7}
+                        accessibilityRole="button"
+                        accessibilityState={{ disabled: maxed }}
+                        accessibilityLabel={maxed
+                          ? `${item.name} — already reinforced +${quote.level}, the maximum`
+                          : `Reinforce ${item.name} to plus ${quote.nextLevel} for ${quote.tc} coin`}
+                      >
+                        <View style={styles.offerHead}>
+                          <Text style={styles.offerName} numberOfLines={1}>{item.name}</Text>
+                          <Text style={[styles.offerPrice, maxed ? styles.offerPriceKnown : (cannotPay && styles.offerPriceBroke)]}>
+                            {maxed ? `\u2713 +${quote.level} MAX` : `${quote.tc} TC`}
+                          </Text>
+                        </View>
+                        <View style={styles.offerSubHead}>
+                          {/* ⚠ The whole point of the row: where this copy stands on
+                              the ladder, and where the next rung puts its ceiling. */}
+                          <Text style={styles.offerKind} numberOfLines={1}>
+                            {`+${quote.level} of ${REINFORCE_MAX_LEVEL} \u00b7 ${quote.from.current}/${quote.from.max}`}
+                            {maxed ? '' : ` \u2192 ${quote.to.current}/${quote.to.max}`}
+                          </Text>
+                        </View>
+                        {!maxed && (
+                          <Text style={styles.offerStats} numberOfLines={2}>
+                            {quote.materials.length > 0
+                              ? quote.materials.map((m) => `${m.name} \u00d7${m.quantity}`).join(' \u00b7 ')
+                              : 'no materials needed'}
+                          </Text>
+                        )}
+                      </TouchableOpacity>
+                    </View>
+                  );
+                })}
+              </View>
+            );
+          })()}
           </>
         ) : (
           // SELL mode — inventory list with sell prices.
@@ -1090,6 +1286,15 @@ export function VendorScreen() {
               ? `Sell to ${vendor.name}`
               : pending?.mode === 'steal'
                 ? `Steal ${pending.itemName}?`
+              : pending?.mode === 'reinforceDone'
+                ? `${pending.itemName} reinforced`
+              : pending?.mode === 'reinforce'
+                // ⚠ OTA-1734 — the title names the OBSTACLE when there is one, the
+                //   way the buy sheet says "Not enough TC" instead of pretending.
+                ? (reinforceBlocked === 'tc' ? 'Not enough TC'
+                  : reinforceBlocked === 'materials' ? 'Not enough materials'
+                  : reinforceBlocked ? `Cannot reinforce ${pending.itemName}`
+                  : `Reinforce ${pending.itemName} to +${pendingReinforce?.quote.nextLevel ?? 1}`)
                 : pending?.mode === 'accept'
                   ? `Accept "${pending.title}"`
                   : canAffordPending
@@ -1146,6 +1351,35 @@ export function VendorScreen() {
               ? (pendingGateLoss
                   ? `Price: +${pending.price} TC   ·   You have: ${player.tc} TC   →   After: ${player.tc + pending.price} TC\n\n⚠ This is your ONLY way to ${pendingGateLoss.label}. Selling it leaves you with no other tool that satisfies the gate — actions that need it will refuse until you find or craft a replacement.`
                   : `Price: +${pending.price}${sellRepsClamped > 1 ? ` × ${sellRepsClamped} = +${pending.price * sellRepsClamped}` : ''} TC   ·   You have: ${player.tc} TC   →   After: ${player.tc + pending.price * sellRepsClamped} TC`)
+              : pending?.mode === 'reinforceDone'
+                ? pending.text
+              : pending?.mode === 'reinforce'
+                // ⚠⚠ OTA-1734 — LEVEL, CEILING, COIN, MATERIALS, in that order,
+                //    and every one of them off the quote. The last paragraph is
+                //    the promise the mechanic actually makes: OTA-1654's rule is
+                //    that a raised ceiling carries the SAME points of damage
+                //    across, so a player who reads "→ 17/33" and expects a mended
+                //    weapon has been misled by the arrow alone.
+                ? (() => {
+                      const q = pendingReinforce?.quote;
+                      if (!q) return 'That piece is no longer in your pack.';
+                      if (q.refusal) return `${vendor.name} turns it over. "This one ${q.refusal}."`;
+                      const mats = q.materials.map((m) => `${m.name} \u00d7${m.quantity}`).join(', ') || 'none';
+                      const missing = pendingReinforce?.missing ?? [];
+                      const down = q.to.max - q.to.current;
+                      return [
+                        `Reinforcement: +${q.level} \u2192 +${q.nextLevel} of ${REINFORCE_MAX_LEVEL}`,
+                        `Durability: ${q.from.current}/${q.from.max}   \u2192   ${q.to.current}/${q.to.max}`,
+                        '',
+                        `Cost: ${q.tc} TC   \u00b7   You have: ${player.tc} TC   \u2192   After: ${player.tc - q.tc} TC`,
+                        `Materials: ${mats}`,
+                        player.tc < q.tc ? `\n\u26a0 You are ${q.tc - player.tc} TC short.` : '',
+                        missing.length > 0
+                          ? `\n\u26a0 You are short ${missing.map((m) => `${m.name} \u00d7${m.quantity}`).join(', ')}.`
+                          : '',
+                        `\nThis raises THIS copy's ceiling for good \u2014 the catalog and every other ${pending.itemName} you own are untouched. It does not mend it: the ${down} ${down === 1 ? 'point' : 'points'} it is down stay down.`,
+                      ].filter((l) => l !== '').join('\n');
+                    })()
               : pending?.mode === 'steal'
                 ? `DEX ${player.stats.dexterity} vs DC ${pending.dc}. On a miss, ${vendor.name} draws steel and the deal becomes a fight.${vendor.faction ? ` Caught theft tanks rep with ${vendor.faction.replace(/_/g, ' ')}.` : ''}`
                 : pending?.mode === 'accept'
@@ -1205,6 +1439,23 @@ export function VendorScreen() {
                     ? [{ label: `Sell All (${pendingSellStack})`, onPress: () => doSell(pendingSellStack), tone: 'primary' as const }]
                     : []),
                 ]
+              : pending?.mode === 'reinforceDone'
+                ? [{ label: 'Good', onPress: cancel, tone: 'primary' as const }]
+              : pending?.mode === 'reinforce'
+                // ⚠ OTA-1734 — a blocked sheet gets ONE dismissal and no live
+                //   Reinforce button, because a button that can only be refused is
+                //   the dead control OTA-1307 was about. The live label carries the
+                //   price so the last thing read before committing is the cost.
+                ? (reinforceBlocked
+                    ? [{ label: 'OK', onPress: cancel, tone: 'neutral' as const }]
+                    : [
+                        { label: 'Cancel', onPress: cancel, tone: 'neutral' as const },
+                        {
+                          label: `Reinforce for ${pendingReinforce?.quote.tc ?? 0} TC`,
+                          onPress: doReinforce,
+                          tone: 'primary' as const,
+                        },
+                      ])
               : pending?.mode === 'steal'
                 ? [
                     { label: 'Back off', onPress: cancel, tone: 'neutral' },

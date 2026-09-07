@@ -7118,7 +7118,7 @@ export interface GameStore {
   sellToVendor: (itemName: string, itemId?: string, opts?: { social?: boolean; units?: number }) => void;
   stealFromVendor: (itemName: string) => void;
   // OTA-1733 — raise THIS copy's ceiling at a smith; separate from repair.
-  reinforceWithVendor: (itemName: string) => void;
+  reinforceWithVendor: (itemName: string, itemId?: string) => void;
   repairWithVendor: (itemName: string) => void;
   acceptFactionQuest: (titleOrId: string) => void;
   turnInFactionQuest: (titleOrId: string, remote?: boolean) => void;
