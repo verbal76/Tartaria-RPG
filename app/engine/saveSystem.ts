@@ -713,11 +713,29 @@ export function clearLastLogWriteError(): void {
 // chain — the flush link is scheduled synchronously with the first pending
 // line, so the chain always covers every appended line.
 let pendingLogLines: string[] = [];
-export function appendLogToDisk(line: string): Promise<void> {
-  if (!activeSlotId) return Promise.resolve();
-  pendingLogLines.push(line);
-  // A flush link is already queued and hasn't drained yet — ride along.
-  if (pendingLogLines.length > 1) return logWriteChain;
+
+/** ⚠⚠⚠ LAG-1 — THE ORDINARY GAME LOG BATCHES; THE CRASH EVIDENCE DOES NOT.
+ *
+ *  Every line on the disk log costs a READ-MODIFY-WRITE of the WHOLE file, and
+ *  the file is capped at 400,000 characters — so one append moves up to 800KB
+ *  across the storage bridge to add sixty. The old batching only merged lines
+ *  that arrived while a write was already in flight, which is why it worked in
+ *  a test (a whole combat round resolves in one synchronous turn) and did not
+ *  work on a phone: there the round is spread over seconds, each roll tap lands
+ *  in its own turn, and Fable measured 10-16 of these cycles for a single attack
+ *  round — megabytes of bridge traffic for diagnostic text.
+ *
+ *  A short trailing window merges the lines a whole beat produces into one write.
+ *  ⚠ WHAT IT DOES NOT TOUCH: `stampLiveBreadcrumb` / `stampBreadcrumbPhase` are a
+ *  different key and a different path and stay exactly as immediate as they were
+ *  — the OTA / process-death investigation reads them and must keep reading them.
+ *  This window governs the verbose game log only, and the accepted cost is the
+ *  tail of ordinary diagnostic lines from the last {@link DISK_LOG_BATCH_MS} if
+ *  the process is killed outright. Every deliberate exit flushes first. */
+export const DISK_LOG_BATCH_MS = 100;
+let logBatchTimer: ReturnType<typeof setTimeout> | null = null;
+
+function queueDiskLogDrain(): void {
   logWriteChain = logWriteChain.then(async () => {
     const lines = pendingLogLines;
     pendingLogLines = [];
@@ -733,6 +751,29 @@ export function appendLogToDisk(line: string): Promise<void> {
       lastLogWriteError = msg.slice(0, 200);
     }
   });
+}
+
+export function appendLogToDisk(line: string): Promise<void> {
+  if (!activeSlotId) return Promise.resolve();
+  pendingLogLines.push(line);
+  if (logBatchTimer === null) {
+    logBatchTimer = setTimeout(() => {
+      logBatchTimer = null;
+      queueDiskLogDrain();
+    }, DISK_LOG_BATCH_MS);
+  }
+  return logWriteChain;
+}
+
+/** ⚠ Write the buffered lines NOW and settle. Every reader and every deliberate
+ *  exit goes through this, so nothing that asks for the log can be handed a
+ *  snapshot missing the last beat. */
+export function flushDiskLogNow(): Promise<void> {
+  if (logBatchTimer !== null) {
+    clearTimeout(logBatchTimer);
+    logBatchTimer = null;
+  }
+  if (pendingLogLines.length > 0) queueDiskLogDrain();
   return logWriteChain;
 }
 
@@ -1111,14 +1152,14 @@ export async function clearLiveBreadcrumb(): Promise<void> {
 // LogScreen before reading so COPY ALL captures the entire history,
 // not whatever snapshot won the race at unmount time.
 export async function flushLogWrites(): Promise<void> {
-  await logWriteChain;
+  await flushDiskLogNow(); // LAG-1 — buffered lines land before the caller reads
 }
 
 export async function readFullLog(): Promise<string> {
   if (!activeSlotId) return '';
   // Drain any in-flight writes before reading so the snapshot includes
   // everything that fired up to this moment.
-  await logWriteChain;
+  await flushDiskLogNow(); // LAG-1 — including the current batch window
   try {
     return (await AsyncStorage.getItem(slotLogKey(activeSlotId))) ?? '';
   } catch {
@@ -1143,6 +1184,11 @@ export async function readFullLog(): Promise<string> {
 // every write after is appended to a fresh (empty) key.
 export async function clearActiveSlotLog(): Promise<void> {
   if (!activeSlotId) return;
+  // ⚠ LAG-1 — lines still in the batch window belong to the log being cleared,
+  // so they are dropped rather than written back in after the removal. Same net
+  // effect as before, where they were written and then removed by the same chain.
+  if (logBatchTimer !== null) { clearTimeout(logBatchTimer); logBatchTimer = null; }
+  pendingLogLines = [];
   logWriteChain = logWriteChain.then(async () => {
     if (!activeSlotId) return;
     try {

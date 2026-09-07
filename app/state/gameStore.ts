@@ -202,6 +202,9 @@ import {
   takeArbiterFlavorBudget,
   inScriptedTutorialPhase,
   introPrefetchCandidates,
+  armAmbientArbiter,
+  ambientArbiterTickIfArmed,
+  ambientArmPending,
   maybeGenerateAmbientArbiter,
   narrateViaArbiter,
   sceneIntroBank,
@@ -295,6 +298,9 @@ export {
   _ARBITER_FLAVOR_GAP_MS,
   _ARBITER_FLAVOR_PER_TILE,
   inScriptedTutorialPhase,
+  ambientArbiterTickIfArmed,
+  armAmbientArbiter,
+  ambientArmPending,
   introPrefetchCandidates,
   narrateViaArbiter,
   sceneIntroBank,
@@ -8668,8 +8674,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     unlockGreatClimbFromChart,
   }),
   ...createBootSlice(set, get, {
-    INTRO_BANK_PER_LOC, inScriptedTutorialPhase, introPrefetchCandidates,
-    narrateViaArbiter, sceneIntroBank, setHomeworkTick,
+    INTRO_BANK_PER_LOC, ambientArbiterTickIfArmed, inScriptedTutorialPhase,
+    introPrefetchCandidates, narrateViaArbiter, sceneIntroBank, setHomeworkTick,
   }),
 
 
@@ -22036,6 +22042,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // background, and speaks when ready (its internal guards handle combat /
       // lock / the wide cooldown). chance() just adds jitter so it doesn't fire
       // like clockwork the instant the cooldown expires.
+      // ⚠⚠⚠ LAG-1 — AND THE EXPENSIVE HALF NO LONGER STARTS HERE. This call was
+      // the single biggest measured source of player-visible lag: 96% of the 429
+      // device JS stalls sat beside the generation it opened, on ~35% of all
+      // actions, while the action it was "decoupled from" was still settling.
+      // ⚠ THE CALL STAYS, and deliberately: everything above the admission guard
+      // inside it is FREE, and that includes spending a BANKED musing — the bank
+      // exists so the Arbiter can still speak while Qwen is reloading, and moving
+      // this call wholesale to the idle tick would have silently taken that away
+      // (the tick's first line is `!qwen.isReady() → return`). What the guard
+      // defers is generation alone: it arms, and the existing 5s homework tick
+      // starts it at the first quiet moment.
       if (chance(35)) void maybeGenerateAmbientArbiter(get, set);
     }
 

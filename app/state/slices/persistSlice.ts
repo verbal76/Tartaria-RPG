@@ -98,6 +98,32 @@ let persistSizeSampleCounter = 0;
 let persistInFlight: Promise<boolean> | null = null;
 let persistTrailingQueued = false;
 
+/** ⚠⚠⚠ LAG-1 — ONE SETTLED TURN, ONE SAVE.
+ *
+ *  `persist()` has ~145 call sites and a single player action reaches a lot of
+ *  them: Fable measured EIGHT requests from one attack round (seven inside
+ *  submitPlayerAction's own synchronous turn, one from concludeRolls) landing as
+ *  THREE full saves — because the in-flight guard below turns N concurrent
+ *  requests into TWO runs, not one, and a slow phone spreads the rest far enough
+ *  apart to start fresh ones. Each run is a full serialize plus five storage
+ *  round trips on a 147KB blob.
+ *
+ *  ⚠ THIS IS NOT A DEBOUNCE, AND DELIBERATELY NOT. Nothing is deferred by any
+ *  amount of wall-clock time: the request is deferred by exactly one microtask,
+ *  which resolves at the end of the CURRENT synchronous turn. No timer, no
+ *  window, and no lifecycle event can interleave — so there is no moment at
+ *  which a player could background or force-close the app and find a save an
+ *  un-coalesced build would have written. What collapses is only duplicate work
+ *  inside one turn, and the state that lands is the state at the END of that
+ *  turn — strictly fresher than the first request's snapshot.
+ *
+ *  ⚠⚠ WHAT IT DOES NOT TOUCH: `saveSlot`'s stage → readback → backup → live
+ *  sequence, the trailing drain, the size telemetry, the trim, or any durability
+ *  boundary that spans turns. A roll modal opening mid-action still saves before
+ *  it opens (OTA-1737's persisted `throwSettlement` depends on exactly that),
+ *  because that is a different turn. */
+let persistTurn: Promise<boolean> | null = null;
+
 // OTA-440 — [audit #25] proactive save-size warning. trimSaveStateToFit only
 // acts at 100% of SAFE_BLOB_CHARS (and silently sheds data); the player never
 // learns their save is bloating until items start vanishing from the saved
@@ -120,6 +146,7 @@ export function _resetPersistStateForTest(): void {
   persistSizeSampleCounter = 0;
   persistInFlight = null;
   persistTrailingQueued = false;
+  persistTurn = null;
   saveSizeWarnedThisSession = false;
 }
 
@@ -179,8 +206,8 @@ export const createPersistSlice = (
   ) => void,
   get: () => GameStore,
   deps: PersistSliceDeps,
-): PersistSlice => ({
-  async persist() {
+): PersistSlice => {
+  const persistNow = async (): Promise<boolean> => {
     // OTA-627 — coalescing guard (see persistInFlight note above). If a write is
     // already running, request ONE trailing write (to capture any state that
     // changes before it finishes) and return the in-flight promise instead of
@@ -334,5 +361,22 @@ export const createPersistSlice = (
     } finally {
       persistInFlight = null;
     }
-  },
-});
+  };
+
+  return {
+    async persist() {
+      // LAG-1 — every request made in THIS turn joins the one save the turn
+      // performs. Callers that await still await a real, completed write.
+      if (persistTurn) return persistTurn;
+      let release!: (v: boolean | PromiseLike<boolean>) => void;
+      const scheduled = new Promise<boolean>((resolve) => { release = resolve; });
+      persistTurn = scheduled;
+      // A microtask, not a timer: it runs the moment this synchronous turn ends.
+      void Promise.resolve().then(() => {
+        if (persistTurn === scheduled) persistTurn = null;
+        release(persistNow());
+      });
+      return scheduled;
+    },
+  };
+};

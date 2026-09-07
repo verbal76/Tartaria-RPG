@@ -111,6 +111,8 @@ export interface BootSliceDeps {
   // calls is a lie about coupling, so it was dropped once the compiler agreed
   // nothing referenced it. Same call as `arbiterAddress` in slice 3.
   INTRO_BANK_PER_LOC: typeof Store.INTRO_BANK_PER_LOC;
+  /** LAG-1 — starts an ambient musing an action armed, once the action settled. */
+  ambientArbiterTickIfArmed: typeof Store.ambientArbiterTickIfArmed;
   inScriptedTutorialPhase: typeof Store.inScriptedTutorialPhase;
   introPrefetchCandidates: typeof Store.introPrefetchCandidates;
   narrateViaArbiter: typeof Store.narrateViaArbiter;
@@ -675,6 +677,12 @@ export const createBootSlice = (
           // wins. (It sits above the `witholdIdentity` gate too — that dial is
           // about not solving a hard run's CURIOS for it, and has nothing to
           // say about narrating a room.)
+          // ⚠⚠⚠ LAG-1 — THE ARMED AMBIENT MUSING GOES FIRST. An action asked for
+          // it and was refused because the action was still settling; this tick
+          // is the quiet moment it was waiting for. Above intro-fill because a
+          // musing is player-facing and a prefetched intro is not, and it obeys
+          // the same one-native-job-per-tick rule everything else here does.
+          if (deps.ambientArbiterTickIfArmed(get, set)) return;
           if (introFillTick()) return;
           if (profileOf(get().player).witholdIdentity) return;
           if (synthInFlight) return;

@@ -28811,7 +28811,39 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // button, no ACTIONS screen), FIRST-USE (every registry card, grouped, ✓ seen,
 // read-only) and REFERENCE (the Action Reference, reachable at last). No
 // mechanic, price, yield, cap or balance rule touched.
-export const OTA_BUILD_ID = '2026-09-07-1738-the-game-teaches-what-it-runs';
+// ⚠⚠⚠ OTA-1739 — NOTHING HEAVY RUNS INSIDE A TAP (task list LAG-1-7C42). Fable's
+// 91C4B8 audit measured the infrastructure AROUND a player action rather than the
+// RPG logic inside it: game logic is 5-48ms, while one action could open a 6-11s
+// optional Qwen generation, re-render a 3,500-line screen once per streamed token
+// nobody sees, read-modify-write a 400KB log file per line, and serialize the save
+// twice for one turn. On the owner's device that showed up as 429 JS-thread stalls
+// (mean 3.4s, max 8.0s), 415 of them — 96% — beside an ambient or homework line.
+// Four repairs, no gameplay, combat, movement, narration-content, save-safety or
+// deliberate-pacing change. (1) AMBIENT GENERATION IS ARMED, NOT STARTED: an
+// admission guard inside maybeGenerateAmbientArbiter refuses to begin generating
+// while the player's action is still settling, arms the request instead, and the
+// existing 5s homework tick starts it at the first quiet moment — using the idle
+// authority that already exists (`lastPlayerActionAt`, the field introFillTick
+// reads), with no new timer and no polling. The guard sits ABOVE the model gate
+// so no caller can reintroduce a mid-action generation, and BELOW the bank spend
+// so a banked musing still lands instantly while Qwen reloads. Cooldowns, the
+// shared-silence rule and the epoch/discard contract are untouched. (2) THE SCREEN READS A BOOLEAN:
+// ExplorationScreen subscribed to `partialArbiterText`, rewritten on every token
+// and rendered nowhere — 34 tokens cost 34 commits and ~850ms; it now maps both
+// fields to one boolean and commits twice a generation, while still telling a
+// reactive line apart from a bank-only fill. (3) THE ORDINARY LOG BATCHES: disk
+// log lines buffer for 100ms and drain as one read+write instead of one 400KB
+// read-modify-write per line (12 lines over 12 turns: 12 cycles/4.2MB → 3/1.0MB);
+// every reader and every deliberate exit — background, OTA reload, COPY LOG —
+// flushes first, and the crash breadcrumb path is deliberately NOT batched.
+// (4) ONE SETTLED TURN, ONE SAVE: persist requests made in one synchronous turn
+// join one save via a microtask — not a debounce, no wall-clock deferral, so no
+// lifecycle event can interleave; a movement step goes 2 saves → 1. saveSlot's
+// stage → readback → backup → live sequence, the trailing drain and every
+// cross-turn durability boundary (the roll modal, OTA-1737's throwSettlement)
+// are unchanged.
+export const OTA_BUILD_ID = '2026-09-07-1739-nothing-heavy-inside-a-tap';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-07-1738-the-game-teaches-what-it-runs';
 // golem catch-up 2026-09-07: markerless publish of OTA-1738 - the player
 // teaching repair pass (task list 4E91C7). One teaching registry with rules
 // quoted from the engine's constants; the first-fight primer once per install

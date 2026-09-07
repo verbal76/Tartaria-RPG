@@ -58,6 +58,15 @@ async function markOrderlyExitForReload(path: 'boot-front' | 'mid-session'): Pro
     await boot.noteOtaHandoff(path);
   } catch { /* an instrument may never break the thing it measures */ }
   try {
+    // ⚠ LAG-1 — the batched game log is a deliberate exit's last chance to land.
+    // Ordinary log lines now buffer for a beat (saveSystem.DISK_LOG_BATCH_MS);
+    // a reload that did not flush them would drop the final lines of the session
+    // the next boot's report is about. Same lazy require, same never-throws rule.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const save = require('../engine/saveSystem') as typeof import('../engine/saveSystem');
+    await save.flushLogWrites();
+  } catch { /* a dropped diagnostic tail must never block the reload */ }
+  try {
     // ⚠ `require`, not `await import()` — this project's tsconfig rejects
     // dynamic import expressions (TS1323), and Metro resolves the require at
     // call time just the same. The `typeof import(...)` is a TYPE position,

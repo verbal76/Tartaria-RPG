@@ -193,6 +193,70 @@ let lastQwenGenStartMs = 0;
 // is a 20-55s LLM call on the shared native-ML lock; halving how often they fire
 // frees that lock for interactive narration + voice. (Still muzzled in combat.)
 const AMBIENT_GEN_COOLDOWN_MS = 90000;
+
+// ⚠⚠⚠ LAG-1 — AMBIENT GENERATION DOES NOT START INSIDE A SETTLING PLAYER ACTION.
+//
+// Fable's 91C4B8 audit measured 429 JS-thread stalls on the owner's device (mean
+// 3.4s, max 8.0s) and found 415 of them — 96% — sitting beside a Qwen ambient or
+// homework line. The trigger was `if (chance(35)) void maybeGenerateAmbientArbiter`
+// INSIDE submitPlayerAction: roughly a third of every player action opened an
+// optional 6-11s generation whose prompt read alone measured 8.7-10.9s at
+// 11.8-13.6ms/prompt-token. The player's own turn was never blocked (the reactive
+// path sees `isGenerating` and falls to the template), but the native lane was,
+// and the phone was.
+//
+// ⚠ THE FIX IS ADMISSION TIMING, NOT A LIFECYCLE REWRITE. Nothing about what
+// ambient says, when it is WANTED, its bank, its cooldown, the shared-silence
+// rule or the epoch/discard contract changes. Only the moment generation is
+// allowed to BEGIN moves: the action ARMS it, and the existing 5s homework tick
+// (bootSlice — the same timer that already runs idle-gated item synthesis and
+// intro fills) STARTS it at the first quiet moment.
+//
+// ⚠⚠ AND IT USES THE IDLE AUTHORITY THAT ALREADY EXISTS. `lastPlayerActionAt` is
+// stamped by `submitPlayerAction` — "the one door every action passes through"
+// (OTA-1129) — and is already what `introFillTick` reads for exactly this
+// question. `uiIdleSince` is the WRONG one here and would have been a silent
+// feature kill: it is stamped only by stationary screens (the pack), so gating
+// ambient on it would confine the Arbiter's musings to the inventory screen.
+// No new idle definition, no new timer, no polling.
+const AMBIENT_ACTION_SETTLE_MS = 1_500;
+type AmbientArm = 'speak' | 'bank';
+let ambientArm: AmbientArm | null = null;
+
+/** True while the player's last action is still settling: a roll is open, or the
+ *  action landed less than {@link AMBIENT_ACTION_SETTLE_MS} ago. */
+function playerActionIsSettling(get: () => GameStore): boolean {
+  if (get().pendingRolls) return true;
+  const last = get().lastPlayerActionAt;
+  return last !== null && Date.now() - last < AMBIENT_ACTION_SETTLE_MS;
+}
+
+/** Ask for an ambient musing. Never generates here — the next quiet tick does. */
+export function armAmbientArbiter(mode: AmbientArm = 'speak'): void {
+  // A spoken musing outranks a bank fill: the bank is opportunistic, the line is
+  // the feature. Never accumulates — this is a request, not a queue.
+  if (mode === 'speak' || ambientArm === null) ambientArm = mode;
+}
+
+/** Tests / diagnostics: is an ambient musing waiting for a quiet moment? */
+export function ambientArmPending(): AmbientArm | null { return ambientArm; }
+/** Tests only. */
+export function _resetAmbientArmForTest(): void { ambientArm = null; }
+
+/** ⚠ The consumer, called from the existing 5s homework tick. Returns true when
+ *  it started a generation, so the tick stops there (one native job per tick,
+ *  the rule intro-fill and item synthesis already follow). */
+export function ambientArbiterTickIfArmed(
+  get: () => GameStore,
+  set: (partial: Partial<GameStore> | ((s: GameStore) => Partial<GameStore>)) => void,
+): boolean {
+  if (ambientArm === null) return false;
+  if (playerActionIsSettling(get)) return false;
+  const mode = ambientArm;
+  ambientArm = null;
+  void maybeGenerateAmbientArbiter(get, set, mode === 'bank' ? { bankOnly: true } : undefined);
+  return true;
+}
 let lastAmbientGenStartMs = 0;
 
 // OTA-1051 — ARBITER COOLDOWN DISCIPLINE. Owner: interjections that don't
@@ -1316,6 +1380,18 @@ export async function maybeGenerateAmbientArbiter(
       get().appendLog('debug', `arbiter: ambient ✓ 0ms (banked, ${musingBank.length} left)`);
       return;
     }
+  }
+  // ⚠⚠⚠ LAG-1 — THE ADMISSION GUARD. Everything above this line is free: the
+  // muzzles cost nothing and a BANKED musing is spoken with zero model time, so
+  // it still lands inside an action exactly as before. Below this line is the
+  // expensive half, and it does not begin while the player's action is still
+  // settling — it re-arms and the next quiet homework tick starts it instead.
+  // The guard lives here rather than at the call site so no future caller can
+  // reintroduce a mid-action generation by accident.
+  if (playerActionIsSettling(get)) {
+    armAmbientArbiter(opts?.bankOnly ? 'bank' : 'speak');
+    get().appendLog('debug', 'arbiter: ambient held (action settling — armed for the next quiet tick)');
+    return;
   }
   if (!qwen.isReady() || get().isGenerating) return;
   if (Date.now() - lastAmbientGenStartMs < AMBIENT_GEN_COOLDOWN_MS) return;

@@ -287,7 +287,11 @@ describe('OTA-1123 — the wiring, and the first homework job', () => {
     // action resolved is not a line anyone is waiting on. See ota1634.
     const amb = src('app/ai/narration.ts');
     const fn = amb.slice(amb.indexOf('async function maybeGenerateAmbientArbiter('));
-    expect(fn.slice(0, 6000)).toContain('homework: true');
+    // ⚠ LAG-1 widened this window from 6000 to 8000: the OTA-1739 admission guard
+    // (generation does not start inside a settling action) sits above the model
+    // gate and pushed the flag to ~6.4k. The CLAIM is unchanged — this function's
+    // own call is still filed as homework — only the slice that reaches it.
+    expect(fn.slice(0, 8000)).toContain('homework: true');
     expect(fn).toContain("noteQwenDiscarded('ambient:preempted')");
   });
 });

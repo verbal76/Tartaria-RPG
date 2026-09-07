@@ -182,8 +182,20 @@ export function ExplorationScreen() {
     } catch { /* an instrument never breaks the screen */ }
     stampBreadcrumbPhase('rendered');
   });
-  const partialArbiterText = useGameStore((s) => s.partialArbiterText);
-  const isGenerating = useGameStore((s) => s.isGenerating);
+  // ⚠⚠⚠ LAG-1 — ONE BOOLEAN, NOT THE TOKEN STREAM. This screen subscribed to
+  // `partialArbiterText`, which narration rewrites on EVERY token — and it does
+  // not render a character of it (OTA-1512 removed the tail; only the "choosing
+  // their words" sign remains). Fable measured the cost in the render harness:
+  // 34 streamed tokens → 45 commits of this 3,500-line screen → ~3.2s of render
+  // work for text nobody sees.
+  //
+  // ⚠ THE SELECTOR STILL READS THE FIELD, AND MUST. `isGenerating` alone is not
+  // the condition: narration sets `partialArbiterText: ''` for a REACTIVE line
+  // and leaves it null for a bank-only fill (narration.ts), which is exactly how
+  // the sign stays off during background homework. Mapping both fields to a
+  // boolean here keeps that distinction and re-renders only when the SIGN
+  // changes — twice a generation instead of once a token.
+  const arbiterComposing = useGameStore((s) => s.isGenerating && typeof s.partialArbiterText === 'string');
   const submit = useGameStore((s) => s.submitPlayerAction);
   // ⚠⚠ OTA-1497 — A SHEET FINISHES CLOSING BEFORE ITS ACTION CAN RAISE A POPUP.
   //
@@ -1983,7 +1995,7 @@ export function ExplorationScreen() {
             working, and measured on-device generations run 6.6-10.9 SECONDS. Dropping it
             entirely buys silence at the price of looking frozen. No words, no cursor —
             just a sign that someone is composing. */}
-        {isGenerating && (partialArbiterText || partialArbiterText === '') && (
+        {arbiterComposing && (
           <View style={styles.streamingTail}>
             <Text style={styles.streamingPrefix}>The Arbiter is choosing their words…</Text>
           </View>

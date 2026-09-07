@@ -18,7 +18,7 @@ import {
   clearInFlightBreadcrumbs,
   qwenGateReason, // OTA-1635 — the skip branches say why, in the log
 } from './app/diagnostics/mlHealth';
-import { clearLiveBreadcrumb } from './app/engine/saveSystem'; // OTA-1276
+import { clearLiveBreadcrumb, flushLogWrites } from './app/engine/saveSystem'; // OTA-1276 · LAG-1
 import { TitleScreen } from './app/screens/TitleScreen';
 import { SplashOverlay } from './app/components/SplashOverlay';
 // ⚠ OTA-1382 — controller navigation. GamepadNav.tsx is an 8-line native stub
@@ -824,6 +824,9 @@ export default function App() {
         // this is the single highest-value autosave point. persist()
         // self-guards on no-slot / no-player / invalid record.
         void useGameStore.getState().persist();
+        // LAG-1 — the batched game log lands with the save, so a player who
+        // backgrounds mid-beat still ships a complete log in a bug report.
+        void flushLogWrites();
         void shutdownCognitive();
         // arb140 — only DUMP the ~400MB Qwen model on a REAL `background`
         // (the process may be reclaimed). A transient `inactive` — notification
