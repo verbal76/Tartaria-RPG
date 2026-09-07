@@ -28598,6 +28598,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // but a fight between the two steps spent it, and the break message said "landed
 // elsewhere" when the boots had not moved at all).
 export const OTA_BUILD_ID = '2026-09-07-1729-the-guardian-payout-guards-itself';
+// golem catch-up 2026-09-07: markerless publish of OTA-1729 - the Guardian payout
+// guards itself. The Core Guardian's signature drops now check the same
+// guardiansDefeated flag their own block writes, so the payout stops borrowing its
+// safety from a gate in another function keyed on another field (no behaviour
+// change today; the hazard was a future design where core-granting becomes a
+// separate action). Also carried: the full dog transition matrix, escort delivery
+// added to the reward idempotency probe (four families, four doors each), a
+// deterministic harness proving the TTS stale-callback race (fix HELD pending
+// device evidence), the contraryWalker stamina flake repaired, and the ship gate's
+// exemption list AUDITED - all 30 timed and the fast ones run 3x for determinism,
+// promoting 13 suites and 59 tests that were exempt only because of their names.
+// hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-07-1728-the-parley-stone-ate-the-mission';
 // golem catch-up 2026-09-07: markerless publish of OTA-1728 - the parley stone ate
 // the mission. Found by DRIVING all 32 storylines and mysteries stage by stage:

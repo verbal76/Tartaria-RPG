@@ -1,82 +1,80 @@
 /**
  * ⚠⚠⚠ WHICH SUITES DO **NOT** BLOCK A SHIP, AND WHY EACH ONE DOESN'T.
  *
- * Before this file, the split was seven bare words matched as SUBSTRINGS against
+ * Before OTA-1728 the split was seven bare words matched as SUBSTRINGS against
  * every test path:
  *
  *     jest --testPathIgnorePatterns /node_modules/ Stress stressMode Chaos Probe Smoke Sweep Sim
  *
  * So whether a suite guarded a ship was decided by what someone had NAMED it.
  * Nothing declared "this is a heavy sim"; a file simply had the word in it. Three
- * OTA REGRESSION suites — written to pin shipped, player-facing fixes — were
- * silently outside the gate for that reason alone, and two of them were RED:
+ * OTA REGRESSION suites were silently outside the gate for that reason alone, and
+ * two of them were RED — ota1483ThreeFromTheSecondSweep (2s) and
+ * ota1268InvestigateAllActuallySweeps (5s), both broken instruments rather than
+ * broken game, both red since roughly OTA-1497. Nobody could know, because nothing
+ * ever ran them.
  *
- *   · ota1483ThreeFromTheSecondSweep (2s). Its scanner sliced the sweep closure
- *     with `indexOf('step();')`. OTA-1497 changed that call to
- *     `setTimeout(step, SHEET_SETTLE_MS)`, the anchor stopped matching, and the
- *     slice silently swallowed 19,200 characters of unrelated code — then failed
- *     on bare `return;` statements in other functions entirely.
- *   · ota1268InvestigateAllActuallySweeps (5s). It walked the tutorial beat by
- *     beat to reach a testable room; the tutorial moved, the walk stopped
- *     landing, and a live tutorial override made the INVESTIGATE chip submit a
- *     beat instead of opening the search sheet. Its `await tick(0)` also predated
- *     that same OTA-1497 settle delay, so it measured a sweep that had not begun.
+ * ⚠⚠ THE RULE IS: BLOCKING BY DEFAULT. A suite is non-blocking only if it is named
+ * here, with a reason. Adding a file to `__tests__` puts it in the gate; opting out
+ * is a decision someone has to write down. `check:testsplit` fails if a name here
+ * no longer exists, and refuses package.json if it goes back to splitting by name.
  *
- * Both were instrument failures, not game defects — the sweep and the chip both
- * work — but nobody could know that, because nothing ever ran them. They are
- * repaired and BLOCKING now.
+ * ⚠⚠⚠ OTA-1729 — AND THEN THE EXEMPTIONS THEMSELVES WERE AUDITED, because a list
+ * nobody has measured is just a longer version of the old guess. Every one of the
+ * 30 was TIMED, with a 200s ceiling, and the fast ones were then run THREE TIMES
+ * each to prove they were deterministic rather than merely lucky:
  *
- * ⚠⚠ THE RULE IS NOW: BLOCKING BY DEFAULT. A suite is non-blocking only if it is
- * named here, with a reason. Adding a file to `__tests__` puts it in the gate;
- * opting out is a decision someone has to write down. `check:testsplit` fails if
- * a name here no longer exists, so the list cannot rot into a lie.
+ *     ≤10s and green ......... 13 suites, 59 tests, 3/3 green each  → PROMOTED
+ *     11–61s and green ....... 10 suites                            → still exempt
+ *     red ....................  4 suites                            → still exempt
+ *     over the 200s ceiling ..  4 suites                            → still exempt
  *
- * ⚠ WHAT LEGITIMATELY BELONGS HERE: long-run world/persist simulations and
- * balance probes. They exercise the engine's known super-linear world/persist
- * tail growth, so they are memory- and time-sensitive by nature — one of them
- * (ota1699ContraryWalkerSweep) runs over twenty minutes on its own. That tail
- * growth, not the tests, is the thing to fix before this set can be required.
+ * THIRTEEN SUITES CARRYING 59 TESTS WERE COSTING THE GATE ABOUT 57 SECONDS AND
+ * WERE EXEMPT ONLY BECAUSE OF THEIR NAMES: statGrowthBalanceSim (2s),
+ * stressMode_chaos (3s), stressMode_drunkSpelling (3s), craftingInventoryChaosSim
+ * (4s, 15 tests), dogHungerTimingChaos (4s, 11 tests), encounterStress (4s),
+ * golemStressSweep (4s), travelSceneBarChaos (4s), stressMode_collectAll (5s),
+ * edgeCaseSweepPostCleanup (6s, 17 tests), stressMode_cartographer (6s),
+ * engagementSmoke (8s), metaNavStress (8s). They block now.
+ *
+ * ⚠ NOT EVERYTHING WAS PROMOTED, deliberately. The 11–61s tier is real regression
+ * coverage too, but it costs about five more minutes of blocking CI and that is the
+ * owner's call rather than mine — the measured cost is written against each one
+ * below so the decision can be made from numbers.
+ *
+ * ⚠⚠ FOUR EXEMPT SUITES ARE CURRENTLY RED, and that is worth knowing rather than
+ * hiding: engineStateChaosSim (10s, 2 failing), completionistOutcomeSweep (48s, 5),
+ * interactionStress (123s, 1), yearSimulation (124s, 1). All four predate this
+ * pass. None can be promoted while red, and each is a separate investigation.
  */
 
-/** Non-blocking suites, by exact basename. Reported in CI, never a merge gate. */
+/** Non-blocking suites, by exact basename, with the measured reason. */
 export const HEAVY_SUITES = [
-  // ── long-run world / persistence simulations ──────────────────────────
-  'craftingInventoryChaosSim.ts',
-  'engineStateChaosSim.ts',
-  'playerInputChaosSim.ts',
-  'playerWalkerSim.test.ts',
-  'thousandDayStressSim.test.ts',
-  'twoYearChaosSim.test.ts',
-  'yearSimulation.test.ts',
-  'travelSceneBarChaos.test.ts',
-  // ── stress: many actions against one subsystem ────────────────────────
-  'combatStress.test.ts',
-  'crossSystemRegressionStress.test.ts',
-  'dogGolemCombatStress.test.ts',
-  'dogHungerTimingChaos.test.ts',
-  'domesticStress.test.ts',
-  'encounterStress.test.ts',
-  'golemStressSweep.test.ts',
-  'interactionStress.test.ts',
-  'metaNavStress.test.ts',
-  'movementStress.test.ts',
-  'stressMode_cartographer.test.ts',
-  'stressMode_chaos.test.ts',
-  'stressMode_collectAll.test.ts',
-  'stressMode_craftALot.test.ts',
-  'stressMode_drunkSpelling.test.ts',
-  // ── balance probes: measure numbers, do not assert pass/fail behaviour ─
-  'combatBalanceProbe.test.ts',
-  'statGrowthBalanceSim.test.ts',
-  'dogSystemPerfSmoke.test.ts',
-  'engagementSmoke.test.ts',
-  // ── whole-content sweeps: every quest / every surface, minutes each ────
-  'completionistOutcomeSweep.test.ts',
-  'completionistSpineSweep.test.ts',
-  'edgeCaseSweepPostCleanup.test.ts',
-  // ⚠ over TWENTY MINUTES on its own — the one suite in this file whose cost is
-  // not an estimate. It walks every contrary road of every mission family.
-  'ota1699ContraryWalkerSweep.test.ts',
+  // ── over the 200s ceiling: genuinely expensive, promote nothing here ──
+  'combatStress.test.ts',            // >200s
+  'completionistSpineSweep.test.ts', // >200s — walks every quest spine
+  'ota1699ContraryWalkerSweep.test.ts', // >200s — every contrary road of every family
+  'playerWalkerSim.test.ts',         // >200s
+
+  // ── currently RED. Exempt because they fail, not because they are slow.
+  //    Each needs its own investigation; none may be promoted while red. ──
+  'engineStateChaosSim.ts',          //  10s · 2 failing
+  'completionistOutcomeSweep.test.ts', //  48s · 5 failing
+  'interactionStress.test.ts',       // 123s · 1 failing
+  'yearSimulation.test.ts',          // 124s · 1 failing
+
+  // ── 11–61s and green. Promotable on the owner's word; the cost is the
+  //    reason they are still here, roughly five minutes of blocking CI. ──
+  'dogSystemPerfSmoke.test.ts',      //  11s · 3 tests
+  'dogGolemCombatStress.test.ts',    //  13s · 9 tests
+  'movementStress.test.ts',          //  18s · 1 test
+  'domesticStress.test.ts',          //  19s · 1 test
+  'playerInputChaosSim.ts',          //  22s · 15 tests
+  'crossSystemRegressionStress.test.ts', // 23s · 4 tests
+  'combatBalanceProbe.test.ts',      //  28s · 1 test — measures numbers, not behaviour
+  'thousandDayStressSim.test.ts',    //  48s · 1 test
+  'stressMode_craftALot.test.ts',    //  51s · 1 test
+  'twoYearChaosSim.test.ts',         //  61s · 1 test
 ];
 
 /** A jest --testPathIgnorePatterns / --testPathPattern fragment for the list. */
