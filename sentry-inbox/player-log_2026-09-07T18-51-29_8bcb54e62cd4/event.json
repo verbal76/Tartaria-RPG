@@ -1,0 +1,236 @@
+{
+  "id": "8bcb54e62cd4411988564049ff9548f9",
+  "groupID": "7717707028",
+  "eventID": "8bcb54e62cd4411988564049ff9548f9",
+  "projectID": "4511945117532160",
+  "size": 5720,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-07-1738-the-game-teaches-what-it-runs #mtrljzio8ztr [inline 24/24]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-07-1738-the-game-teaches-what-it-runs",
+  "message": "player-log 2026-09-07-1738-the-game-teaches-what-it-runs #mtrljzio8ztr [inline 24/24]",
+  "title": "player-log 2026-09-07-1738-the-game-teaches-what-it-runs #mtrljzio8ztr [inline 24/24]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "c16ba3d2dbc6476ea5724a41fdb089c5",
+      "span_id": "9d25c243010cb413",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "ICA-gIC-Aga-XRz-IG9-3bi-Btb-2Rl-bCB-sZW-RnZ-XIg-YXQ-gdG-hlI-Gxh-c3Q-gc3-Rhb-XA6-IG8-wL3-IwL-2ww-L3A-wL2-RuM-Aog-IOK-Aoi-AyM-DI2-LTA-5LT-A3V-DE4-OjQ-xOj-MzL-jIy-N1o-gKD-Ewb-SBh-Z28-pIO-KAl-CBQ-Uk9-DRV-NTI-EtJ-TEx-FRC-Dig-JQg-bm8-gSl-Mgc-mFu-CiA-gIC-AgI-GJ1-aWx-kID-QuM-zIu-MTE-gwr-cgM-jAy-Ni0-wOS-0wN-y0x-NzM-4LX-RoZ-S1n-YW1-lLX-RlY-WNo-ZXM-td2-hhd-C1p-dC1-ydW-5zI-MK3-IHN-0YW-dlI-GFw-cHN-0YX-RlO-mFj-dGl-2Ze-KGk-mJh-Y2t-ncm-91b-mQK-ICA-gIC-AgU-HJv-Y2V-zcy-Bka-WVk-IHd-pdG-ggb-m8g-b3J-kZX-Jse-SBl-eGl-0IH-doa-Wxl-OiA-obm-8gY-WN0-aW9-uIH-lld-CkK-ICA-gIC-AgZ-G9p-bmc-6IC-hub-yBh-Y3R-pb2-4ge-WV0-KSD-Cty-Byb-29t-ID8-gwr-cgc-2Ny-ZWV-uID-8K",
+      "ICA-gIC-Agb-GFz-dCB-jaG-Vja-3Bv-aW5-0Oi-Bhc-HBz-dGF-0ZT-phY-3Rp-dmX-ihp-JiY-WNr-Z3J-vdW-5kI-MK3-IDk-yMD-Rtc-yBp-bnR-vIH-RoZ-SBh-Y3R-pb2-4gw-rcg-YWx-pdm-UgM-G1z-IGF-mdG-VyI-Gl0-CiA-gIC-AgI-Gxh-dW5-jaD-ogZ-Gll-ZCA-5Mj-k0b-XMg-aW5-0by-B0a-GUg-cHJ-vY2-Vzc-yDC-tyB-ub3-QgY-W4g-T1R-BLW-Fwc-Gx5-IGJ-vb3-QKI-CAg-ICA-gdG-hlI-G5h-dGl-2ZS-BTR-Esg-Y29-1bG-Qgb-m90-IHN-heS-B3a-GV0-aGV-yIH-RoY-XQg-bGl-mZS-Bjc-mFz-aGV-kIC-hub-yBu-YXR-pdm-Ugb-W9k-dWx-lLC-Bvc-iBu-b3Q-gaW-5pd-Glh-bGl-zZW-Qga-W4g-dGl-tZS-kKI-CAg-ICA-gaX-RzI-G93-biB-tb2-Rlb-CBs-ZWR-nZX-IgY-XQg-dGh-lIG-xhc-3Qg-c3R-hbX-A6I-G8w-L3I-wL2-wwL-3Aw-L2R-uMA-pDc-mFz-aCB-kZW-xpd-mVy-eTo-gT0-4g4-oCU-IHJ-lcG-9yd-HMg-Z28-gdG-8gU-2Vu-dHJ-5IH-doZ-W4g-eW9-1IG-NyY-XNo-Lgo-=",
+      "UnV-udG-ltZ-SBw-cmV-zc3-VyZ-Qog-IOK-aoO-Kao-CBM-QVN-UIE-JPT-1Qg-REl-FRC-BNS-UQt-QUN-USU-9OI-OKA-lCB-uby-Bvc-mRl-cmx-5IG-V4a-XQg-d2F-zIH-JlY-29y-ZGV-kLg-ogI-CAg-IEx-hc3-Qgd-Ghp-bmc-gdG-hlI-GFw-cCB-kaW-Q6I-Chu-byB-hY3-Rpb-24g-eWV-0KQ-ogI-CAg-IFd-oZX-JlO-iAo-dW5-rbm-93b-ikg-b24-gKH-Vua-25v-d24-pIH-Njc-mVl-bgo-gIC-AgI-Exh-c3Q-gc2-Vlb-iBh-bGl-2ZT-ogM-jAy-Ni0-wOS-0wN-1Qx-ODo-0MT-ozM-y4y-Mjd-aIC-gxM-CBt-aW4-gYm-Vmb-3Jl-IHR-oaX-MgY-m9v-dCD-igJ-Qgd-Ghl-IGt-pbG-wgb-GFu-ZGV-kIH-Nvb-WV3-aGV-yZS-Bpb-iB0-aGF-0IG-dhc-CkK-ICA-gIC-BMY-XN0-IGN-oZW-Nrc-G9p-bnQ-gcm-VhY-2hl-ZDo-gYX-Bwc-3Rh-dGU-6YW-N0a-XZl-4oa-SYm-Fja-2dy-b3V-uZC-AoK-zky-MDR-tcy-BhZ-nRl-ciB-pdC-kK",
+      "ICA-gIC-Dim-qAg-VGh-lIG-Rpc-2sg-bG9-nJ3-Mgd-GFp-bCB-pcy-BVT-lJF-TEl-BQk-xFI-GZv-ciB-0aG-F0I-HNl-c3N-pb2-4g4-oCU-IGJ-hdG-NoZ-WQg-bGl-uZX-MKI-CAg-ICA-gIG-RpZ-SBp-biB-tZW-1vc-nkg-d2h-lbi-B0a-GUg-SlM-gdG-hyZ-WFk-IHd-lZG-dlc-y4g-VHJ-1c3-Qgd-Ghp-cyB-saW-5lI-G92-ZXI-gaX-QuC-iAg-TWV-tb3-J5I-Hdh-cm5-pbm-dzO-iBu-b25-lIH-Roa-XMg-c2V-zc2-lvb-gog-IEZ-yZW-V6Z-SB3-YXR-jaD-ogb-m8g-c3R-hbG-xzI-HNl-ZW4-gKE-pTI-GNs-b2N-rcy-Bvb-mx5-IOK-AlC-BzZ-WUg-dGh-lIG-5hd-Gl2-ZSB-xdW-V1Z-SBi-ZWx-vdy-kKI-CBO-YXR-pdm-Ugc-XVl-dWU-6IH-dvc-nN0-IHd-haX-QgM-C4w-cyD-Cty-AwI-Gpv-YiB-raW-5kc-yBx-dWV-1ZW-QgP-jNz-IMK-3IH-dvc-nN0-IDA-uMG-1zL-3By-b21-wdC-10b-2tl-bgo-gIE-Fwc-CBz-dGF-0ZS-B0c-mFp-bDo-gKG-5vb-mUg-cmV-jb3-JkZ-WQp-Ck1-vZG-VsI-GNv-bnR-leH-RzC-g==",
+      "ICB-MaX-ZlI-G5v-dzo-gMA-ogI-E9w-ZW5-lZD-ogM-CDC-tyB-SZW-xlY-XNl-ZDo-gMC-DCt-yBQ-ZWF-rIG-xpd-mU6-IDA-KIC-BOY-XJy-YXR-pb2-4gZ-W5n-aW5-lOi-BpZ-Gxl-Cg=-="
+    ],
+    "chunkChars": 1567,
+    "chunkEncoding": "base64-3"
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-07-1738-the-game-teaches-what-it-runs #mtrljzio8ztr [inline 24/24]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtrljzio8ztr"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-07-1738-the-game-teaches-what-it-runs"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "24"
+    },
+    {
+      "key": "parts",
+      "value": "24"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-07-1738-the-game-teaches-what-it-runs"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-07T18:51:27.730492Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-07T18:51:29.153000Z",
+  "fingerprints": [
+    "d5c9132f06a3d48b3eaa7225f5a88498"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1959458614,
+    "commitCount": 3,
+    "data": {},
+    "dateCreated": "2026-09-07T17:10:04.252676Z",
+    "dateReleased": "2026-09-07T17:11:18.447893Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "ed7995107da8fe1f5b513cd307b593768334ec55",
+      "message": "[ota-hal] OTA-1738 \u2014 the game teaches what it runs (task list 4E91C7)\n\nPlayer-teaching repair pass under the eleven locked owner decisions. No\nmechanic, price, yield, cap or balance rule is touched; every teaching\nsurface now describes the rule the engine actually runs, and no two\noptional cards can land on one beat.\n\nCopy, in one place\n- app/components/teachingRegistry.ts holds every first-use card (id,\n  title, body, group, trigger line). Rules are quoted from the constants\n  that run them: REINFORCE_MAX_LEVEL, REPLACEMENT_DOG_PRICE /\n  FACTION_DOG_PRICE, scrapSuccessChance, COATING_DOT_TURNS,\n  LOYALTY_DECAY_HOURS + DOG_LOYALTY_BANDS (new, dogCompanion),\n  STAMINA_COSTS.wander (moved to app/engine/staminaCosts.ts, re-exported by\n  the store), PITY_KILL_INTERVAL (app/engine/resurrectionRules.ts).\n- Cards whose rule changed carry new ids: torch_first_v2 (each USE spends\n  one torch \u2014 not a lamp burning while lit), golem_first_v2 (fed its own\n  parts, or a trader; kits do not heal it), combat_throw_spear_v2 (one\n  spear spent on every concluded throw, hit or miss), contracts_first_open_v3\n  (a hunt's trophy is shown in person), crafting_tab_repair_v2 (MATERIALS at\n  the bench; the trader mends for TC).\n- New cards: reinforce_first, workings_first, repair_vendor_first,\n  dog_replacement_first, scrap_first, throwables_first, race_ability_first.\n\nThe first fight\n- The primer is once per INSTALL through useFirstTimeHint (combat_primer_v1):\n  the global tips switch and SHOW ALL TIPS AGAIN govern it; closing it still\n  latches the per-save milestone. The kill-count gate is gone.\n- POWER is taught in the primer (the power_number card is retired); the\n  readout card waits for the fight after the first, once the primer is seen.\n- FLEE row quotes FLEE_STAMINA_COST and states the failure half; DODGE\n  quotes DODGE_COOLDOWN_ROUNDS; STEALTH is rewritten to the handler: before\n  contact a passed roll is a free opening (no volley, +5, once per scene),\n  once engaged a contest they answer either way.\n\nOne optional surface per beat\n- useTeachingSlot (useFirstTimeHint.ts) picks the ONE unseen, eligible\n  card from a fixed candidate list; presentation order only, each `when` is\n  the control's own predicate. ExplorationScreen renders a single\n  FirstTimeHint from it; the primer, the mission stinger and the beat card\n  defer every candidate. Inventory and Vendor screens do the same.\n- climb_first waits for the tutorial to end; torch_first_v2 keys on the\n  charged lead; THROW SPEAR keys on spareThrowingSpear (new in\n  bandolierEligibility, shared with InputBox).\n\nThe outpost and the replay\n- Door beat carries one movement-cost sentence; the close names Ask the\n  Arbiter once. TutorialOverlay asks isTutorialLocked, so SKIP is offered\n  on look / armor / screen_pick too.\n- Settings \u2192 GUIDANCE \u2192 REPLAY TEACHING opens GuidanceScreen ('guidance'\n  route): CORE (outpost beats + the corrected screen tour: pity 100, no\n  first-install gem, no MAP button, no ACTIONS screen), FIRST-USE (every\n  card, grouped, \u2713 seen \u2014 read-only), REFERENCE (ActionReferenceBody, the\n  Action Reference reachable at last).\n- Dog onboarding teaches feeding, the decay clock and the permanent walk.\n- The bounty primer obeys the tips switch and the reset (install flag via\n  isHintSeen / markHintSeen; bountyPrimerSeen still written).\n\nTests\n- New: ota1738TheGameTeachesWhatItRuns (runtime-proven stealth opener,\n  spear spend on hit and miss, torch spend, scrap failure yield, tile-step\n  cost, dog decay, bounty primer under switch/reset; registry ids; source\n  structure of the slot) and ota1738TheReplayAndTheSlot (teaching slot,\n  primer \"turn off tips\", GuidanceScreen read-only with tips off, SKIP pill\n  on every locked beat).\n- Nine pin suites re-anchored to the registry and the slot (1163, 1205,\n  1245, 1249, 1321, 1511, 1523, 1524, 1531).\n\nReported, not fixed: the typed verb \"stealth\" parses as `steal` (\"Nothing\nto steal here\"); the STEALTH button submits `sneak`.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-07T17:07:17Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-07-1738-the-game-teaches-what-it-runs",
+          "shortVersion": "tartaria@4.32.11+2026-09-07-1738-the-game-teaches-what-it-runs",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-07T17:11:18.447893Z",
+          "dateCreated": "2026-09-07T17:10:04.252676Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "156239482",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-07T17:11:18.715501Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-07-1738-the-game-teaches-what-it-runs",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-07-1738-the-game-teaches-what-it-runs",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-07-1738-the-game-teaches-what-it-runs",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-07-1738-the-game-teaches-what-it-runs)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "99fe8f5b8ca14bca8124665cdac4c4d7",
+  "previousEventID": "82ee8caa34114566a6f5cc9c7f7ea477"
+}
