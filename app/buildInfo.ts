@@ -28512,7 +28512,28 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // raw word and put "INV +1" on a card, inventing an attribute the game has never
 // had). Catalog-wide sweep: 288 rows checked, zero hiding a paid bonus, zero
 // promising one the engine does not pay.
-export const OTA_BUILD_ID = '2026-09-06-1725-the-card-pays-what-the-fight-pays';
+// ⚠⚠⚠ OTA-1726 — the road back to a dog. Audit item D1, closed against the
+// owner's canon rather than left as a question. The ONLY route to another dog
+// was the puppy vendor, and it was a dead end BY CONSTRUCTION: it told the
+// player to type a phrase that has no parser verb and no handler anywhere in
+// the app, wrote a trade memo nothing reads, cleared its queued flag without
+// retiring the offer (so it re-fired forever on any mention of a basket), and
+// on an empty pack set its used-flag PERMANENTLY - locking that save out of
+// dogs for good, which is the exact opposite of the canon. Superseded, not
+// repaired: wiring it up would have made a mechanism reachable that contradicts
+// the canon three ways (single-shot, near-free, death-gated). The replacement is
+// a market - Kennel Dog at 600 TC on any vendor, faction dogs at 900 behind
+// rapport - and it needed NO architecture change, because acquisition already
+// funnels through one field (pendingDogOnboarding, which rebuilds player.dog
+// wholesale, so "a replacement inherits nothing" was already true), five stat
+// profiles were already authored (so "faction dogs are better" needed no new
+// content), buyFromVendor already had two branches for buying a non-item, and
+// conditional vendor rows already had two precedents. Third instance of each.
+// 600 is not a new rung: techniqueTextPrice has charged exactly that for a Rare
+// procedure since OTA-1195, and the owner's own log shows him holding 459 TC.
+// gameStore lost 60 lines net.
+export const OTA_BUILD_ID = '2026-09-07-1726-the-road-back-to-a-dog';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-06-1725-the-card-pays-what-the-fight-pays';
 // golem catch-up 2026-09-06: markerless publish of OTA-1725 - the card pays what
 // the fight pays. The armour item card read the single legacy statBonus field
 // while the engine sums statBonuses ?? [statBonus]; across 288 stat-bearing rows

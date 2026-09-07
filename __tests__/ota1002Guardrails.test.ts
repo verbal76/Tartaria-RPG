@@ -67,7 +67,12 @@ describe('OTA-1002 — the last routing reads are canonical, and the fallback is
   it('deep-link files by categorizeItem; relic-trade + trade-away read canonical', () => {
     expect(STORE).toContain('inventoryCategory: categorizeItem(item)');
     expect(STORE).toContain("const isRelicTrade = canonicalItemKind(item) === 'relic';");
-    expect(STORE).toContain("canonicalItemRarity(i) === 'Common' &&");
+    // ⚠ OTA-1726 — the third example this pinned, the puppy vendor's
+    // `canonicalItemRarity(i) === 'Common'` trade-item filter, is GONE: the trade
+    // it served could never be completed (it asked the player to type a phrase
+    // with no parser verb), so the whole mechanism was superseded by the dog
+    // market. The RULE is unchanged and the two reads above still enforce it;
+    // there is simply one fewer site to point at.
   });
   it('getLocationById warns before falling back', () => {
     const en = fs.readFileSync(path.join(ROOT, 'app', 'engine', 'encounter.ts'), 'utf8');

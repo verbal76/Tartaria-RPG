@@ -2303,6 +2303,58 @@ export function withTechniqueTextOffer(
   return { ...vendor, offers: [...vendor.offers, offer] };
 }
 
+/** ⚠⚠⚠ OTA-1726 — THE ROAD BACK TO A DOG. Owner's canon: *"once dog gameplay is
+ *  unlocked, loss of an individual dog does not permanently remove access to
+ *  dogs"* — ordinary replacements bought through market / random-vendor
+ *  mechanisms at substantial cost, faction dogs better and gated on faction
+ *  access as well as coin.
+ *
+ *  ⚠ THIRD INSTANCE OF A TWICE-DOCUMENTED PATTERN, not a new system. Same shape
+ *  as `withSkyreacherChartOffer` and `withTechniqueTextOffer` directly above:
+ *  append one conditional row to a vendor's offers, gates in a pure engine
+ *  function so they can be tested without a store. Like the technique text and
+ *  unlike the chart there is NO die roll — a route into a whole feature that
+ *  appears 18% of the time is indistinguishable from a route that does not
+ *  exist, and this is the only route back to a companion.
+ *
+ *  ⚠⚠ WHAT IT REPLACES. The old road back was the puppy vendor: a single-shot
+ *  flag (`puppyVendorOwed`) that flipped on the dog's death, offered you a pup
+ *  for one Common item, and told you to type `accept puppy` — a phrase with no
+ *  parser verb and no handler anywhere in the app. It could not be completed by
+ *  anyone. Worse, its no-tradeable-item branch set `puppyVendorUsed: true` and
+ *  retired itself FOREVER, so a player whose pack happened to be empty when it
+ *  fired lost access to dogs for the rest of that save. Every part of that
+ *  contradicts the canon; none of it was worth repairing. */
+export function withReplacementDogOffer(
+  vendor: VendorInstance | null,
+  player: PlayerCharacter | null,
+  wm: WorldMemory,
+): VendorInstance | null {
+  if (!vendor || !player) return vendor;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const DM = require('../engine/dogMarket') as typeof import('../engine/dogMarket');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { hasFactionRapport } = require('../engine/factionRapport') as typeof import('../engine/factionRapport');
+  // ⚠ nativeFaction first, for the reason withTechniqueTextOffer states: OTA-1186
+  // skins a site to its OWNER, and a dog belongs to whoever the vendor really
+  // answers for.
+  const faction = vendor.nativeFaction ?? vendor.faction;
+  const offer = DM.dogOfferFor({
+    vendorFaction: faction,
+    hasRapport: hasFactionRapport(player.completedFactionQuestIds, faction),
+    // ⚠⚠ THE FIRST-DOG ENCOUNTER IS STILL THE INTRODUCTION. `player.dog` is
+    // non-null for a dead or abandoned dog too (OTA-346 keeps the record), so
+    // this reads "has ever had a dog" — exactly the canon gate. Without it a
+    // fresh character could buy past five authored rescue scenarios.
+    hadDogEver: !!player.dog,
+    hasActiveDog: hasActiveDog(player),
+    onboardingPending: !!wm.pendingDogOnboarding,
+  });
+  if (!offer) return vendor;
+  if (vendor.offers.some((o) => o.itemName === offer.itemName)) return vendor;
+  return { ...vendor, offers: [...vendor.offers, offer] };
+}
+
 // arb48 — Labyrinth of Shadows (Wayfarer of the Lost Paths). Both helpers are
 // store-driving wrappers around the pure engine in engine/labyrinth.ts.
 type StoreGet = () => GameStore;
@@ -8546,6 +8598,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   ...createVendorSlice(set, get, {
     SKYREACHER_CHART_NAMES,
     freshInstanceId,
+    hasActiveDog,
     logRepChanges,
     recordTitleProgress,
     statNowClause,
@@ -9885,7 +9938,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // the IIFE, because the IIFE has two returns and a stamp at one of them is a row that
     // silently never appears on the other path. (The identical mistake is written up in
     // OTA-1187's accept-cell stamp: eight sites of nine.)
-    const vendor: VendorInstance | null = withTechniqueTextOffer(((): VendorInstance | null => {
+    const vendor: VendorInstance | null = withReplacementDogOffer(withTechniqueTextOffer(((): VendorInstance | null => {
       let base: VendorInstance | null = opts?.isOpening
         ? null
         : hubRoom && hubRoom.anchorNpc
@@ -9939,7 +9992,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         return { ...base, faction: player.factionId, nativeFaction: base.faction, offers };
       }
       return base;
-    })(), player);
+    })(), player), player, get().worldMemory);
     // OTA-550 — enemies open at 'mid' range: close enough to be a problem but
     // not already swinging. The player advances (distant→far→mid→close) to
     // land melee, or holds the gap for a ranged/throwable shot. (This is the
@@ -10952,23 +11005,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
         },
       }));
     }
-    // OTA-120 — Phase 6 puppy-vendor spawn. Fires when the vendor
-    // was queued by a Guardian-defeat handler and we just landed in
-    // an outdoor scene. Skip in hubs and combat scenes.
+    // ⚠ OTA-1726 — the puppy-vendor spawn that stood here is gone. It offered a
+    // trade the player was told to accept by typing `accept puppy`, a phrase with
+    // no parser verb and no handler; the replacement road is the dog market
+    // (withReplacementDogOffer). The rubble puppy below is a one-off story beat
+    // and stays.
     {
       const wm = get().worldMemory;
       const isOutdoor = !hubRoom && enemies.length === 0;
-      if (
-        wm.puppyVendorQueued &&
-        wm.puppyVendorOwed &&
-        !wm.puppyVendorUsed &&
-        !wm.pendingDogOnboarding &&
-        isOutdoor &&
-        player &&
-        !hasActiveDog(player)
-      ) {
-        triggerPuppyVendor(get, set);
-      }
       // OTA-120 — Phase 6 rubble-puppy fallback. Late-game outdoor
       // wasteland scene; ~5% per scene-entry once Guardians are all
       // cleared. Plant a "rubble" investigation noun the player can
@@ -13641,17 +13685,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
     {
       const lower = (parsed.resolvedNoun ?? parsed.target ?? '').toLowerCase();
       const wm = get().worldMemory;
-      if (
-        wm.puppyVendorOwed &&
-        !wm.puppyVendorUsed &&
-        !wm.pendingDogOnboarding &&
-        !hasActiveDog(get().player) &&
-        /\b(basket|wicker basket|stranger|pups|puppies)\b/.test(lower)
-      ) {
-        triggerPuppyVendor(get, set);
-        void get().persist();
-        return;
-      }
       if (
         wm.puppyVendorOwed &&
         !wm.puppyVendorUsed &&
@@ -25385,26 +25418,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
             locationName: def.capitalName,
             hoursElapsed: get().player?.hoursElapsed ?? 0,
           });
-          // OTA-120 — Phase 6 puppy-vendor safety net. If the dog
-          // died in combat AND the safety-net hasn't been used,
-          // queue the vendor for the player's NEXT outdoor scene.
-          // The rubble-puppy fallback handles the case where all
-          // Guardians are already cleared.
-          {
-            const liveWm = get().worldMemory;
-            const livePlayer = get().player;
-            const livePlayerGuardiansDef = (livePlayer?.mainQuest?.guardiansDefeated ?? []).length;
-            // eslint-disable-next-line @typescript-eslint/no-require-imports
-            const cgRef = require('../engine/coreGuardians');
-            const total = cgRef.totalGuardiansCount();
-            if (
-              liveWm.puppyVendorOwed &&
-              !liveWm.puppyVendorUsed &&
-              livePlayerGuardiansDef < total
-            ) {
-              queuePuppyVendor(get, set);
-            }
-          }
         }
       }
     }
@@ -27463,7 +27476,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // it, pacing two tiles re-spawned a FRESH stall every step (unlimited rare
       // stock). Now a stall only appears on ground you haven't just walked.
       if (!whisperBeatFired && outdoorPeaceful && !inAnyHubRoom && tileIsNovel && Math.random() < 0.20) {
-        const stall = withSkyreacherChartOffer(pickRoadsideTrader(get().worldMemory.recentRoadsideNames), get().worldMemory)!;
+        // ⚠ OTA-1726 — and the roadside stall too. This is the "random-vendor
+        // mechanism" the canon names, and it is the vendor source the player
+        // meets most often (the file's own comment: "a stall every ~5 travel
+        // steps"). A market that only appeared at named hubs would be a market
+        // most players never walk into.
+        const stall = withReplacementDogOffer(
+          withSkyreacherChartOffer(pickRoadsideTrader(get().worldMemory.recentRoadsideNames), get().worldMemory),
+          get().player,
+          get().worldMemory,
+        )!;
         set((s) => s.currentScene ? { currentScene: { ...s.currentScene, vendor: stall } } : s);
         // OTA-1055 — SIGHT THE TRADER. stepDirection never calls beginScene (its
         // own comment says so), so this path — which the code itself calls the
@@ -35127,7 +35149,7 @@ function finalizeDogOnboarding(
   // from confrontation through naming.
   get().appendLog(
     'dog_quest',
-    `The Arbiter studies the new pair. "${dog.name}, then. ${pending.rescueData.scenario === 'puppy_vendor' || pending.rescueData.scenario === 'puppy_rubble' ? 'You owe the pup nothing yet. Earn its trust on the road.' : 'The chain is off. The road is open.'}"`,
+    `The Arbiter studies the new pair. "${dog.name}, then. ${pending.rescueData.scenario === 'market' ? 'Money bought the dog. It does not buy what comes after.' : pending.rescueData.scenario === 'puppy_vendor' || pending.rescueData.scenario === 'puppy_rubble' ? 'You owe the pup nothing yet. Earn its trust on the road.' : 'The chain is off. The road is open.'}"`,
   );
   void get().persist();
 }
@@ -36382,9 +36404,6 @@ function tryDogCallVerb(
   return true;
 }
 
-/** Phase 6: queue the puppy vendor for the next outdoor scene. Called
- *  from the Core-Guardian-defeat path when puppyVendorOwed is set and
- *  not all Guardians are cleared. */
 /** Poplar Anvil — in-game hours a downed (hp 0, benched) dog survives
  *  before it bleeds out and dies for real. Matches the "24h recovery
  *  window" the OTA-120 DogCompanion doc already referenced: heal it
@@ -36499,7 +36518,6 @@ export function tickDogStatus(
           dog.sex.pronoun,
         ),
       );
-      queuePuppyVendor(get, set);
       void get().persist();
       return;
     }
@@ -36580,84 +36598,6 @@ export function tickDogStatus(
 export function hasActiveDog(player: PlayerCharacter | null | undefined): boolean {
   const dog = player?.dog;
   return !!dog && (dog.status === 'with_player' || dog.status === 'waiting_at_base');
-}
-
-function queuePuppyVendor(
-  get: () => GameStore,
-  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
-): void {
-  const wm = get().worldMemory;
-  if (!wm.puppyVendorOwed || wm.puppyVendorUsed) return;
-  set((s) => ({
-    worldMemory: { ...s.worldMemory, puppyVendorQueued: true },
-  }));
-  get().appendLog('debug', `puppy vendor queued for next outdoor scene`);
-}
-
-/** Phase 6: spawn the puppy vendor encounter. Fires from the next
- *  outdoor scene entry when puppyVendorQueued is true. The trade
- *  is accept/decline; both retire the flag. */
-function triggerPuppyVendor(
-  get: () => GameStore,
-  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
-): void {
-  const player = get().player;
-  if (!player) return;
-  // Pick a Common-rarity, non-equipped, non-weapon/armor item.
-  const candidates = player.inventory.filter(
-    (i) =>
-      canonicalItemRarity(i) === 'Common' &&
-      i.quantity >= 1 &&
-      canonicalItemKind(i) !== 'weapon' &&
-      canonicalItemKind(i) !== 'armor' &&
-      i.id !== player.equipped?.mainId &&
-      i.id !== player.equipped?.offId &&
-      i.id !== player.equipped?.chestId &&
-      i.id !== player.equipped?.headId &&
-      i.id !== player.equipped?.legsId &&
-      i.id !== player.equipped?.feetId &&
-      i.id !== player.equipped?.amuletId &&
-      i.id !== player.equipped?.ringId,
-  );
-  const fallback = player.inventory.find((i) => i.quantity >= 1);
-  const tradeItem = candidates[0] ?? fallback ?? null;
-  if (!tradeItem) {
-    // No tradeable item — surface flavor and retire the flag so the
-    // path doesn't loop.
-    get().appendLog(
-      'arbiter',
-      `A stranger at the roadside lifts a wicker basket of pups, eyes your empty pack, then walks on. "Some other road, friend."`,
-    );
-    set((s) => ({
-      worldMemory: {
-        ...s.worldMemory,
-        puppyVendorQueued: false,
-        puppyVendorUsed: true,
-        puppyVendorOwed: false,
-      },
-    }));
-    return;
-  }
-  // Record the trade item id on a memo for the ACCEPT/DECLINE handlers
-  // to consume.
-  set((s) => ({
-    worldMemory: {
-      ...s.worldMemory,
-      puppyVendorQueued: false,
-      chainMemos: [
-        ...(s.worldMemory.chainMemos ?? []),
-        { text: `puppy_vendor_trade_id:${tradeItem.id}`, ts: Date.now() },
-      ].slice(-20),
-    },
-  }));
-  get().appendLog(
-    'arbiter',
-    `A stranger waits at the roadside with a wicker basket. Three pups inside — some breed you don't recognize. They look up at you. "I'd trade one for the right kind of help," the stranger says, eyeing your pack.`,
-  );
-  get().appendLog(
-    'arbiter',
-    `"That ${tradeItem.name} you've got — I've been needing one of those for a season. You hand me that, I hand you a pup. Fair? Type 'accept puppy' or 'decline puppy'."`,
-  );
 }
 
 /** Rubble-puppy fallback: only fires when ALL Guardians are cleared

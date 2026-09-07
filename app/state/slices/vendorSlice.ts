@@ -86,6 +86,7 @@ export interface VendorSlice {
 export interface VendorSliceDeps {
   SKYREACHER_CHART_NAMES: typeof Store.SKYREACHER_CHART_NAMES;
   freshInstanceId: typeof Store.freshInstanceId;
+  hasActiveDog: typeof Store.hasActiveDog;
   logRepChanges: typeof Store.logRepChanges;
   recordTitleProgress: typeof Store.recordTitleProgress;
   statNowClause: typeof Store.statNowClause;
@@ -190,6 +191,62 @@ export const createVendorSlice = (
         }
         set((s) => (s.player ? { player: { ...s.player, tc: s.player.tc - rOffer.price, knownRecipes: [...(s.player.knownRecipes ?? []), rOffer.result] } } : s));
         get().appendLog('reward', `Bought the ${rOffer.result} working for ${rOffer.price} TC. ✦ Recipe learned (${lookupCraftedItem(rOffer.result).rarity})! Open Crafting to forge it — you'll still need the materials.`);
+        void get().persist();
+        return;
+      }
+    }
+
+    // ⚠⚠⚠ OTA-1726 — A DOG IS NOT AN ITEM. Third branch of the same shape as the
+    // two above, and here for the reason the procedure branch already spells out:
+    // a thing that mints into the pack needs a catalog row, a `use` handler and a
+    // read path before it does anything, which is three more places for the loop
+    // to end in nothing. What you buy at this counter is a companion, so the
+    // purchase writes `pendingDogOnboarding` — the SAME funnel all five rescue
+    // scenarios use — and the naming card opens on the next render. It therefore
+    // inherits nothing from the dog it replaces: `finishDogOnboarding` builds a
+    // fresh `createDogCompanion` and overwrites `player.dog` wholesale, which is
+    // the owner's "a replacement does not inherit identity, bond, progression,
+    // equipment, history or status" already true in the code that was there.
+    {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const DM = require('../../engine/dogMarket') as typeof import('../../engine/dogMarket');
+      const dogRow = DM.dogMarketRowByName(itemName);
+      if (dogRow) {
+        // ⚠ The vendor must actually be OFFERING it — the same guard the procedure
+        // branch carries, and for the same reason: without it `buy tartarian war
+        // shepherd` would work at any stall in the world and delete the rapport
+        // gate that is half of what a faction dog costs.
+        const row = scene.vendor.offers.find((o) => o.itemName.toLowerCase() === dogRow.itemName.toLowerCase());
+        if (!row) {
+          get().appendLog('system', `${scene.vendor.name} has no ${dogRow.itemName} to sell.`);
+          return;
+        }
+        // ⚠ Re-checked at the counter, not just at the shelf. The offer row was
+        // built when the scene began; a dog acquired since then (a rescue that
+        // resolved, a naming card still open) must not be able to buy a second.
+        if (deps.hasActiveDog(player)) {
+          get().appendLog('system', `You already have a dog at your side.`);
+          return;
+        }
+        if (get().worldMemory.pendingDogOnboarding) {
+          get().appendLog('system', `You're still settling the dog you just took on.`);
+          return;
+        }
+        if (player.tc < row.price) {
+          get().appendLog('system', `${scene.vendor.name} keeps a hand on the lead. "${row.price} TC, and I don't come down on a good dog. Come back heavier."`);
+          return;
+        }
+        set((s) => (s.player ? {
+          player: { ...s.player, tc: s.player.tc - row.price },
+          worldMemory: {
+            ...s.worldMemory,
+            pendingDogOnboarding: {
+              stage: 'breed' as const,
+              rescueData: { scenario: 'market' as const, startingProfile: dogRow.profile },
+            },
+          },
+        } : s));
+        get().appendLog('reward', `Bought ${dogRow.itemName} for ${row.price} TC. ✦ ${dogRow.blurb}`);
         void get().persist();
         return;
       }

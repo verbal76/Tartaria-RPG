@@ -160,26 +160,14 @@ describe('OTA-124 vandalistic — puppy-vendor + rubble-puppy edges', () => {
   });
 
   describe('puppyVendorUsed=true blocks both vendor and rubble paths', () => {
-    it('vendor scene-entry hook bails when puppyVendorUsed=true', async () => {
-      const store = await bootBase();
-      // Set the safety flags as if a prior vendor was already used.
-      store.setState((s) => ({
-        worldMemory: {
-          ...s.worldMemory,
-          puppyVendorOwed: true,
-          puppyVendorUsed: true, // permanently locked
-          puppyVendorQueued: true,
-        },
-      }));
-      // Simulate the player landing on an outdoor scene (we can't
-      // beginScene without a real location/setup, so we test the
-      // guard directly): the gameStore check is
-      //   wm.puppyVendorQueued && wm.puppyVendorOwed && !wm.puppyVendorUsed
-      const wm = store.getState().worldMemory;
-      const shouldFire = !!(wm.puppyVendorQueued && wm.puppyVendorOwed && !wm.puppyVendorUsed);
-      expect(shouldFire).toBe(false);
-    });
-
+    // ⚠⚠⚠ OTA-1726 — THE VENDOR HALF OF THIS BLOCK IS DELETED, and deliberately
+    // not replaced. It asserted that `puppyVendorUsed` permanently blocks the
+    // replacement vendor. That was the shipped behaviour and it is exactly what
+    // the owner's canon forbids: *"once dog gameplay is unlocked, loss of an
+    // individual dog does not permanently remove access to dogs."* The market
+    // suite (ota1726TheRoadBackToADog) pins the OPPOSITE property — a save
+    // carrying puppyVendorUsed=true can still buy a dog. Two tests asserting
+    // opposite rules is how OTA-1717 got its contradiction; only the canon lives.
     it('rubble-puppy hook bails when puppyVendorUsed=true', async () => {
       const store = await bootBase();
       store.setState((s) => ({
@@ -245,73 +233,11 @@ describe('OTA-124 vandalistic — puppy-vendor + rubble-puppy edges', () => {
     });
   });
 
-  describe('puppy vendor trade item selection — Common rarity preference + fallback', () => {
-    // Mirror the selection logic at gameStore.ts:18181-18197 directly
-    // (the spawn path requires a live scene; this validates the math).
-    interface PickItem { id: string; name: string; kind: string; quantity: number; rarity?: string; }
-    function pickTradeItem(
-      inventory: PickItem[],
-      equippedIds: string[],
-    ): PickItem | null {
-      const candidates = inventory.filter(
-        (i) =>
-          i.rarity === 'Common' &&
-          i.quantity >= 1 &&
-          i.kind !== 'weapon' &&
-          i.kind !== 'armor' &&
-          !equippedIds.includes(i.id),
-      );
-      const fallback = inventory.find((i) => i.quantity >= 1);
-      return candidates[0] ?? fallback ?? null;
-    }
-
-    it('Common consumable + Common misc → picks the first Common non-equipped non-weapon/armor', () => {
-      const inv = [
-        { id: '1', name: 'Trail Rations', kind: 'consumable', quantity: 3, rarity: 'Common' },
-        { id: '2', name: 'Rusty Sword', kind: 'weapon', quantity: 1, rarity: 'Common' },
-      ];
-      const picked = pickTradeItem(inv, []);
-      expect(picked?.name).toBe('Trail Rations');
-    });
-
-    it('No Common items → falls back to ANY 1-stack non-equipped item', () => {
-      const inv = [
-        { id: '1', name: 'Aether Crystal', kind: 'material', quantity: 2, rarity: 'Uncommon' },
-        { id: '2', name: 'Rare Pendant', kind: 'amulet', quantity: 1, rarity: 'Rare' },
-      ];
-      const picked = pickTradeItem(inv, []);
-      expect(picked).toBeTruthy();
-      expect(picked?.name).toBe('Aether Crystal');
-    });
-
-    it('Equipped Common items are skipped', () => {
-      const inv = [
-        { id: '1', name: 'Burlap Shirt', kind: 'armor', quantity: 1, rarity: 'Common' },
-        { id: '2', name: 'Trail Rations', kind: 'consumable', quantity: 1, rarity: 'Common' },
-        { id: '3', name: 'Equipped Ring', kind: 'ring', quantity: 1, rarity: 'Common' },
-      ];
-      const picked = pickTradeItem(inv, ['3']);
-      expect(picked?.name).toBe('Trail Rations');
-    });
-
-    it('Empty inventory → null', () => {
-      expect(pickTradeItem([], [])).toBeNull();
-    });
-
-    it('Only weapons/armor → fallback picks one anyway', () => {
-      const inv = [
-        { id: '1', name: 'Iron Sword', kind: 'weapon', quantity: 1, rarity: 'Common' },
-      ];
-      // Spec says "fall back to ANY 1-stack item except equipped gear" —
-      // the engine's fallback does pick the weapon (the kind!=weapon
-      // filter only applies to the Common-preference candidates). The
-      // fallback line says `player.inventory.find((i) => i.quantity >= 1)`
-      // with no kind check.
-      const picked = pickTradeItem(inv, []);
-      expect(picked?.name).toBe('Iron Sword');
-    });
-  });
-
+  // ⚠⚠ OTA-1726 — the "trade item selection" block that stood here is deleted. It
+  // re-implemented gameStore's candidate filter INSIDE the test body and asserted
+  // against its own copy, so it would have gone on passing after the real filter
+  // was removed — which is precisely what happened. A test that cannot fail when
+  // its subject is deleted was never testing the subject.
   describe('rubble-puppy rate — ~5% per outdoor scene roll', () => {
     // Pure simulation of the random gate: Math.random() < 0.05.
     it('1000 simulated outdoor scene rolls → ~50 fires (within 30-80)', () => {
@@ -324,22 +250,10 @@ describe('OTA-124 vandalistic — puppy-vendor + rubble-puppy edges', () => {
     });
   });
 
-  describe('Hard cap — ONE puppy vendor per save', () => {
-    it('puppyVendorUsed acts as the permanent latch', () => {
-      // Once flipped true, no path can un-flip it (no source assignment
-      // sets puppyVendorUsed back to false).
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const src = require('fs').readFileSync(
-        require('path').resolve(__dirname, '../app/state/gameStore.ts'),
-        'utf-8',
-      );
-      const matches = src.match(/puppyVendorUsed\s*:\s*false/g) ?? [];
-      // Only the loadSlotIntoGame migration default sets it to false.
-      // We expect at most 1 such match (the migration line) — if there
-      // were more, some code path would be flipping the latch back.
-      expect(matches.length).toBeLessThanOrEqual(1);
-    });
-  });
+  // ⚠⚠⚠ OTA-1726 — "Hard cap — ONE puppy vendor per save" is deleted. It pinned
+  // `puppyVendorUsed` as a latch nothing can un-flip — that is, it enforced the
+  // permanent lock-out the owner's canon exists to forbid. The flag still rides
+  // on old saves; it is simply no longer a gate on anything.
 });
 
 // OTA-346 — 338 hardening #3: clear-the-slot, status-based. A dog that died or
@@ -370,8 +284,22 @@ describe('OTA-346 — hasActiveDog gates the puppy-vendor replacement arc', () =
     // hasActiveDog now.
     const fs = require('fs');
     const src = fs.readFileSync(require.resolve('../app/state/gameStore'), 'utf8') as string;
-    // Every puppy-vendor / rubble spawn guard uses hasActiveDog(...)
-    expect((src.match(/!hasActiveDog\(/g) ?? []).length).toBeGreaterThanOrEqual(4);
+    // ⚠ OTA-1726 — was `>= 4`, when there were four spawn guards. Two belonged to
+    // the puppy-vendor trade, which is gone (it could not be completed: it told
+    // the player to type a phrase with no parser verb behind it). The RULE is what
+    // this test is for, and it now holds across MORE of the codebase than before,
+    // not less — so the count states what is actually there and the replacement
+    // acquisition path is pinned by name below.
+    expect((src.match(/!hasActiveDog\(/g) ?? []).length).toBeGreaterThanOrEqual(3);
+    // ⚠⚠ AND THE REPLACEMENT PATH OBEYS IT TOO — the market's shelf gate and its
+    // counter gate both ASK hasActiveDog rather than re-deriving "has a dog" from
+    // a raw field, which is the whole point of OTA-346's rule.
+    expect(src).toContain('hasActiveDog: hasActiveDog(player),');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const slice = require('fs').readFileSync(
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      require('path').resolve(__dirname, '../app/state/slices/vendorSlice.ts'), 'utf-8') as string;
+    expect(slice).toContain('deps.hasActiveDog(player)');
     // ...and the old raw truthy dog guards are gone from those spawn sites.
     expect(src).not.toMatch(/!wm\.pendingDogOnboarding &&\s*\n\s*!get\(\)\.player\?\.dog &&/);
   });

@@ -1874,7 +1874,13 @@ export type DogOnboardingStage = 'breed' | 'name' | 'sex';
 export interface PendingDogOnboarding {
   stage: DogOnboardingStage;
   rescueData: {
-    scenario: 'smelter' | 'wagon' | 'cellar' | 'snare' | 'puppy_vendor' | 'puppy_rubble';
+    // ⚠ OTA-1726 — 'market' is the SIXTH scenario and the only one you pay for.
+    // It writes through this same field for the reason every acquisition does:
+    // `pendingDogOnboarding` is the one funnel, so a bought dog is named, sexed
+    // and built by exactly the code that builds a rescued one — and inherits
+    // nothing from the dog it replaces, because `finishDogOnboarding` overwrites
+    // `player.dog` wholesale from a fresh `createDogCompanion`.
+    scenario: 'smelter' | 'wagon' | 'cellar' | 'snare' | 'puppy_vendor' | 'puppy_rubble' | 'market';
     startingProfile: DogStartingProfile;
   };
   breed?: string;

@@ -82,6 +82,41 @@ are LORE COPIES of the doc tables — they feed Qwen narration and the
 Ask the Arbiter MiniLM lookup. Treat them as authoritative for what
 the ARBITER knows, not for what the engine does.
 
+## The dog system — owner canon (binding, OTA-1726)
+
+Stated by the owner as a decision, not a discussion. Do NOT build a
+parallel dog system; extend these rules.
+
+1. **The first-dog encounter is the introduction.** The five authored
+   rescue scenarios are how a player meets the dog system. Nothing may
+   let a character who has never had a dog skip past them.
+2. **Losing a dog never permanently removes access to dogs.** Once dog
+   gameplay is unlocked it stays unlocked. Any one-shot "you are owed a
+   replacement" flag is a bug, not a feature — that was the OTA-120
+   puppy vendor, and OTA-1726 removed it.
+3. **An individual dog's death is permanent, and a replacement inherits
+   nothing** — not identity, bond, progression, equipment, history or
+   status. This is already structurally true: acquisition funnels through
+   `worldMemory.pendingDogOnboarding`, and `confirmDogOnboarding` rebuilds
+   `player.dog` wholesale from a fresh `createDogCompanion`. Keep it that
+   way; do not add a path that carries anything across.
+4. **Ordinary replacements are BOUGHT**, through market / random-vendor
+   mechanisms, at substantial cost — 600 TC (`REPLACEMENT_DOG_PRICE`),
+   the same rung `techniqueTextPrice` charges for a Rare procedure.
+5. **Faction dogs are better and specialised**, and cost faction access
+   as well as coin (900 TC behind a completed rapport quest). The five
+   `DogStartingProfile` rows already carry the differentiation — use
+   them rather than authoring new stat blocks.
+6. **Neglect-abandonment grants nothing.** Starving a dog until it walks
+   off must never pay out a replacement. (OTA-1717 collapsed the two
+   branches that disagreed about this.)
+
+Acquisition writers to know about: `withReplacementDogOffer` (the shelf),
+the dog branch in `vendorSlice.buyFromVendor` (the counter),
+`tryFireRescueScenario` (the five rescues), `tryFireRubblePuppy` (a
+one-off late-game story beat, deliberately kept). All five end in the
+same place: a write to `pendingDogOnboarding`.
+
 ## Shipping quick-truths (details: HANDOFF §2–§6)
 
 - **Everything ships as an OTA** unless it genuinely needs a native build

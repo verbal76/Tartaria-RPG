@@ -141,7 +141,12 @@ describe('OTA-1195 / P16 — acquisition', () => {
     // A stamp inside would silently skip whichever return it was not on — the OTA-1187
     // accept-cell defect, one file over.
     expect(STORE).toContain('withTechniqueTextOffer(((): VendorInstance | null => {');
-    expect(STORE).toContain('})(), player);');
+    // ⚠ OTA-1726 — the close moved because a THIRD conditional-offer helper now
+    // wraps this one (`withReplacementDogOffer`, the dog market). The property
+    // this test exists for is unchanged and is what is asserted: the append still
+    // happens OUTSIDE the two-return IIFE, so neither return can skip it.
+    expect(STORE).toContain('})(), player), player, get().worldMemory);');
+    expect(STORE).toContain('withReplacementDogOffer(withTechniqueTextOffer(');
   });
 
   test('⚠⚠ the buy path requires the vendor to actually be OFFERING it', () => {
