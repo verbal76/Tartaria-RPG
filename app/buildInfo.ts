@@ -28843,6 +28843,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // cross-turn durability boundary (the roll modal, OTA-1737's throwSettlement)
 // are unchanged.
 export const OTA_BUILD_ID = '2026-09-07-1739-nothing-heavy-inside-a-tap';
+// golem catch-up 2026-09-07: markerless publish of OTA-1739 - the player-action
+// hot-path repair (LAG-1-7C42). Ambient generation is armed by an action and
+// started by the existing 5s idle tick instead of beginning inside a settling
+// action (the free banked musing still lands immediately); ExplorationScreen
+// subscribes to a boolean rather than the token stream (34 tokens: 34 commits to
+// 0); ordinary disk-log lines batch for 100ms and drain as one read+write while
+// the crash breadcrumb path stays immediate; persist requests made in one
+// synchronous turn become one save via a microtask, leaving saveSlot's staged
+// transactional write and every cross-turn durability boundary untouched.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-07-1738-the-game-teaches-what-it-runs';
 // golem catch-up 2026-09-07: markerless publish of OTA-1738 - the player
 // teaching repair pass (task list 4E91C7). One teaching registry with rules
