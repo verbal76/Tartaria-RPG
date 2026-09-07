@@ -28532,7 +28532,30 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // 600 is not a new rung: techniqueTextPrice has charged exactly that for a Rare
 // procedure since OTA-1195, and the owner's own log shows him holding 459 TC.
 // gameStore lost 60 lines net.
-export const OTA_BUILD_ID = '2026-09-07-1726-the-road-back-to-a-dog';
+// ⚠⚠⚠ OTA-1727 - the weapon card stops cutting the warning off. Owner asked for
+// three fixed semantic rows (rarity/damage/durability/proc, then explicit
+// One-handed or Two-handed with the equip state, then scaling stat followed by
+// resists and special properties), with the hand + equip text OUT of row 1, and
+// explicitly: do not fix overflow by shrinking type, and stop clipping combat
+// information off the right edge. Measured before writing anything, and there
+// were TWO silent clipping sites. Row 1 was a flexDirection row with NO flexWrap,
+// which React Native defaults to nowrap - 185 of 301 weapons overflowed a 320pt
+// row in the plainest case and 301 of 301 once coated and reserved (worst:
+// Shockwave Club, 488pt). Row 3 was numberOfLines={1}, truncating 138 of 301
+// weapons; what it cut was 15 "cannot be coated", 3 PERMANENT unlocks, 3 on-hit
+// riders, 1 "it eventually EXPLODES in your hands", 1 armour pierce, and 2 copies
+// of the friendly-fire line that OTA-1565 added with the note that this card is
+// the only warning before buying a weapon that can kill your own dog. The Ember
+// Storm Stave carried four lines of rules and showed one. Fixed as LAYOUT: the
+// hand and equip chips move to their own row (most of row 1's budget back), both
+// meta rows get flexWrap so neither can silently cut again, row 3 simply wraps,
+// row 3 hoists the scaling stat so the owner's order belongs to the row rather
+// than another file's push order, and the hand label reads One-handed/Two-handed
+// through resolveDisplayWeapon (the OTA-705 rule) instead of a name lookup that
+// could read a fused piece's style off a colliding catalog row. No font size
+// changed; the suite pins all five at their current values.
+export const OTA_BUILD_ID = '2026-09-07-1727-the-card-stops-cutting-the-warning';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-07-1726-the-road-back-to-a-dog';
 // golem catch-up 2026-09-07: markerless publish of OTA-1726 - the road back to a
 // dog. The puppy vendor could never be completed (it told the player to type
 // `accept puppy`, a phrase with no parser verb or handler anywhere in the app)

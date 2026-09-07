@@ -625,8 +625,19 @@ export function InventoryScreen() {
   const slotFillLabelFor = (item: InventoryItem): string => {
     const slots = validSlotsForItem(item);
     if (slots.length === 0) return '';
-    if (findWeaponByName(item.name)?.style === 'two_handed') return 'Two-handed';
-    if (slots.every((s) => s === 'main' || s === 'off')) return 'Hand';
+    // ⚠⚠⚠ OTA-1727 — "One-handed", not "Hand". Owner: *"Row 2 = explicit
+    // One-handed or Two-handed."* "Hand" was the odd half of a pair: a
+    // two-hander announced its hand COUNT and a one-hander announced only that
+    // it went in a hand, so the two rows did not read as answers to the same
+    // question and the player had to know that "Hand" meant "not the other one".
+    //
+    // ⚠ resolveDisplayWeapon, NOT findWeaponByName — the OTA-705 rule. A FUSED
+    // piece is catalog-absent by design and its name can collide with an
+    // unrelated catalog row, so the name lookup could read a two-hander's style
+    // off a fused vest that merely shares its name. The resolver answers from
+    // uniqueStats for fused items and never falls through to the name catalog.
+    if (resolveDisplayWeapon(item)?.style === 'two_handed') return 'Two-handed';
+    if (slots.every((s) => s === 'main' || s === 'off')) return 'One-handed';
     const labels = [...new Set(slots.map((s) => SLOT_LABEL[s] ?? s))];
     return labels.join(' / ');
   };
@@ -2869,24 +2880,41 @@ function ItemRow({
               +{item.coating.dice} {item.coating.kind}
             </Text>
           )}
-          {/* arb-fix — show the slot the piece fills (esp. armor: "Chest",
-              "Feet"…) right on the row so the player sees where it goes. */}
-          {canEquip && !isEquipped && (
-            <Text style={styles.rowEquippable}>
-              {fillSlotLabel ? `${fillSlotLabel} · tap to equip` : 'tap to equip'}
-            </Text>
-          )}
-          {!canEquip && !isEquipped && <Text style={styles.rowEquippable}>tap for details</Text>}
-          {isEquipped && (
-            // 2026-05-26 OTA-056 — show the slot the item occupies so the
-            // player sees it at a glance: weapons read "(main hand)" /
-            // "(off hand)" / "(both hands)" / "(two-handed)"; armor reads
-            // its slot label. Computed in the parent (equippedSlotLabelFor).
-            <Text style={styles.rowEquipped}>
-              EQUIPPED{equippedSlotLabel ? ` (${equippedSlotLabel})` : ''}
-            </Text>
-          )}
         </View>
+        {/* ⚠⚠⚠ OTA-1727 — ROW 2: HOW IT IS HELD, AND WHAT YOU CAN DO ABOUT IT.
+            Owner: *"Row 2 = explicit One-handed or Two-handed plus equip
+            state/action. Remove the existing Hand/Two-handed and equip text from
+            Row 1 so it is not duplicated."*
+
+            ⚠ This is a LAYOUT fix, not a cosmetic one. Row 1 is a
+            `flexDirection: 'row'` with no wrap, so anything past the right edge
+            was CLIPPED, silently — and the equip text was the last chip on the
+            line, sitting behind durability and the coating proc. Measured across
+            the weapon catalog at a 320pt row: 185 of 301 weapons overflowed Row 1
+            in the plainest case (rarity · dice · durability · equip text), and
+            301 of 301 once the weapon was coated and reserved. Moving these two
+            chips down is what makes Row 1 fit; wrapping (below) is what stops it
+            ever silently cutting again.
+
+            ⚠ Both states live on ONE row because they are the same fact in two
+            tenses — where this goes, or where it already is. Splitting them was
+            what let the equip text ride along in Row 1 in the first place. */}
+        {(fillSlotLabel || canEquip || isEquipped) && (
+          <View style={styles.rowHoldRow}>
+            {fillSlotLabel ? <Text style={styles.rowHold}>{fillSlotLabel}</Text> : null}
+            {canEquip && !isEquipped && <Text style={styles.rowEquippable}>tap to equip</Text>}
+            {!canEquip && !isEquipped && <Text style={styles.rowEquippable}>tap for details</Text>}
+            {isEquipped && (
+              // 2026-05-26 OTA-056 — show the slot the item occupies so the
+              // player sees it at a glance: weapons read "(main hand)" /
+              // "(off hand)" / "(both hands)" / "(two-handed)"; armor reads
+              // its slot label. Computed in the parent (equippedSlotLabelFor).
+              <Text style={styles.rowEquipped}>
+                EQUIPPED{equippedSlotLabel ? ` (${equippedSlotLabel})` : ''}
+              </Text>
+            )}
+          </View>
+        )}
         {/* arb87 — at-a-glance stat line for EVERY item ("so you know what
             you're picking"). Pulls the same preview stats the details modal
             shows (AC, resists, stat bonuses, consumable restores, passives),
@@ -2897,9 +2925,28 @@ function ItemRow({
             (s) => !s.startsWith('Damage:') && !s.startsWith('Durability:') && !s.startsWith('Tags:'),
           );
           if (extra.length === 0) return null;
+          // ⚠⚠ OTA-1727 — ROW 3 LEADS WITH THE SCALING STAT, then the resistances
+          // and the special properties. It already did for most weapons, but only
+          // by the accident of `previewWeapon` pushing `Scales with` second and
+          // the filter above removing the first entry. Hoisting it makes the
+          // owner's row order a property of this row rather than of another
+          // file's push order.
+          const lead = extra.filter((x) => x.startsWith('Scales with'));
+          const rest = extra.filter((x) => !x.startsWith('Scales with'));
           return (
-            <Text style={styles.rowStat} numberOfLines={1}>
-              {extra.join(' · ')}
+            // ⚠⚠⚠ NO `numberOfLines` CAP, and no smaller font. Owner: *"Do not fix
+            // overflow by reducing font size. Important combat information should
+            // not be silently clipped off the right edge."* This was
+            // `numberOfLines={1}`, which truncated Row 3 on 138 of 301 weapons —
+            // and what it cut was not decoration. Fifteen weapons never showed
+            // that they cannot be coated; three never showed a PERMANENT unlock;
+            // one never showed that it eventually EXPLODES in your hands; and TWO
+            // never showed the friendly-fire line that OTA-1565 added with the
+            // note that this card "is the only warning a player gets before they
+            // buy a weapon that can kill their own dog." The Ember Storm Stave
+            // carries four lines of rules and showed one.
+            <Text style={styles.rowStat}>
+              {[...lead, ...rest].join(' · ')}
             </Text>
           );
         })()}
@@ -3034,7 +3081,23 @@ const styles = StyleSheet.create({
   // OTA-688 — Crucible-forged marker: a magical ❖ star, rarity-colored.
   rowFusedMark: { fontSize: 12, fontWeight: '700' },
   rowQty: { color: '#cdbf99', fontSize: 12 },
-  rowMetaRow: { flexDirection: 'row', gap: 8, marginTop: 2 },
+  // ⚠⚠⚠ OTA-1727 — flexWrap, which this never had. React Native defaults a row
+  // to `nowrap`, so every chip past the right edge was clipped with no ellipsis
+  // and no scroll — the player simply never saw it. Measured: 185 of 301 weapons
+  // overflowed this row in the plainest case and 301 of 301 when coated and
+  // reserved. Moving the hand + equip chips to Row 2 is most of the budget back;
+  // this is the guarantee that a long rarity, a big damage die and a proc chip
+  // can never silently cut each other again. rowGap keeps a wrapped second line
+  // from crowding Row 2.
+  rowMetaRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 8, rowGap: 2, marginTop: 2 },
+  // ⚠⚠ OTA-1727 — ROW 2: how the thing is held, and the equip verb. Wraps for the
+  // same reason Row 1 does; a long armour slot pair ("Head / Chest") next to
+  // "EQUIPPED (both hands)" is wider than a phone row.
+  rowHoldRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 8, rowGap: 2, marginTop: 2 },
+  // ⚠ Same size and tracking as the Row 1 metadata, deliberately: this is
+  // metadata that moved, not a new kind of thing. The owner ruled out shrinking
+  // type to buy width, so nothing here gets smaller.
+  rowHold: { color: '#a2977b', fontSize: 10, letterSpacing: 1, fontWeight: '700' },
   rowMeta: { color: '#a2977b', fontSize: 10, letterSpacing: 1 },
   // arb87 — per-item stat line (AC / resists / bonuses / restores).
   rowStat: { color: '#bfa86a', fontSize: 11, marginTop: 3 },
