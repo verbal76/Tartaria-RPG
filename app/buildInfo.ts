@@ -28704,6 +28704,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // OTA-1727 was called in to unclog and " +1" cannot break away from its word.
 // Absent at +0, so gear that has never seen an anvil reads exactly as before.
 export const OTA_BUILD_ID = '2026-09-07-1734-the-counter-sells-the-anvil';
+// golem catch-up 2026-09-07: markerless publish of OTA-1734 - the reinforcement
+// service reaches the player. The vendor's BUY tab carries a REINFORCE YOUR GEAR
+// section built from the WORKINGS TO LEARN pattern - collapsible offerRows into
+// the one shared confirm sheet - so nothing here is a new kind of control. Every
+// number on the row and in the sheet comes from reinforceQuote(item), the same
+// call reinforceWithVendor prices from, and `to` is reinforceItem's own output
+// rather than arithmetic; the screen carries no ladder constant and a test pins
+// their absence. reinforceWithVendor takes an optional itemId so the row that was
+// tapped is the copy that is strengthened. The confirm states level, both
+// ceilings, TC and materials before anything is committed, and says plainly that
+// this raises the ceiling and does NOT mend - the arrow alone reads as a repair.
+// Double submit is latched with a ref, not state: verified non-vacuously at two
+// taps -> +2 and 440 TC with the latch removed. The card shows `Common +1` on the
+// rarity chip that already exists, absent at +0.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-07-1733-raise-the-ceiling-keep-the-damage';
 // golem catch-up 2026-09-07: markerless publish of OTA-1733 - reinforcement.
 // Option B: each level adds 20% of the CATALOG BASE to that copy's temper-rolled
