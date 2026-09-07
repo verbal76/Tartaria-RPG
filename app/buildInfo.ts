@@ -28812,6 +28812,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // read-only) and REFERENCE (the Action Reference, reachable at last). No
 // mechanic, price, yield, cap or balance rule touched.
 export const OTA_BUILD_ID = '2026-09-07-1738-the-game-teaches-what-it-runs';
+// golem catch-up 2026-09-07: markerless publish of OTA-1738 - the player
+// teaching repair pass (task list 4E91C7). One teaching registry with rules
+// quoted from the engine's constants; the first-fight primer once per install
+// under the tips switch, teaching Power, a truthful flee line and the stealth
+// opener as the handler runs it; one optional card per beat through
+// useTeachingSlot on the exploration, pack and trader screens; new reinforce /
+// workings / trader-repair / dog-replacement / scrap / throwables / race-ability
+// cards; SKIP on every locked beat; Settings -> GUIDANCE -> REPLAY TEACHING
+// (core beats, first-use cards with seen marks, the Action Reference).
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-07-1737-the-mystery-does-not-starve-the-lead';
 // golem catch-up 2026-09-07: markerless publish of OTA-1737 - three bounded
 // repairs from audit pass #3. The mystery and storyline wrong-ground branches of
