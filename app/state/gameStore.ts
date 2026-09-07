@@ -25364,7 +25364,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const capitalId = cg.capitalIdFromGuardian(enemy);
         if (capitalId) {
           const def = cg.GUARDIANS_BY_CAPITAL[capitalId];
-          const drops = cg.dropsForCapital(capitalId);
+          // ⚠⚠⚠ OTA-1729 — THE REWARD WRITER GUARDS ITSELF NOW.
+          //
+          //  The signature weapon + armour below were granted unconditionally,
+          //  while the `guardiansDefeated` write eight lines down explicitly
+          //  de-dupes through a Set. Two adjacent writes in one block, one
+          //  idempotent and one not.
+          //
+          //  ⚠ IT IS NOT REACHABLE TODAY, and this is not a bug report. The
+          //  summon refuses on `mqState.coresRecovered.includes(capitalId)`, and
+          //  the Core lands in this SAME synchronous block, so a beaten Guardian
+          //  can never be called up again. The drops were safe — by a gate in a
+          //  DIFFERENT function keyed on a DIFFERENT field.
+          //
+          //  ⚠⚠ THAT IS THE HAZARD WORTH CLOSING. Make core-granting a separate
+          //  player action (a natural design change: "you beat it, now TAKE the
+          //  Core") and the drops double silently, with nothing here to say so.
+          //  The guard costs one lookup, changes nothing today — `guardiansDefeated`
+          //  cannot already contain this capital when this line runs — and means
+          //  the payout no longer borrows its safety from somewhere else.
+          const alreadyBeaten = (get().player?.mainQuest?.guardiansDefeated ?? []).includes(capitalId);
+          const drops = alreadyBeaten ? null : cg.dropsForCapital(capitalId);
           // Log the defeat line + the signature gear drop before
           // the Core itself lands so the chamber narration reads
           // in order.

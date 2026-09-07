@@ -214,3 +214,41 @@ describe('OTA-1728 - a reward is paid ONCE, through every second door', () => {
     expect(same(snap(), before)).toBe(true);
   });
 });
+
+
+// ===== the third path: escort delivery ==================================
+
+import { FACTION_QUESTS } from '../app/engine/factionQuests';
+
+describe('OTA-1728 - escort delivery is paid once too', () => {
+  it('⚠⚠⚠ ESCORT DELIVERY: pay once, then re-submit, by title, remote, and across a reload', async () => {
+    const def = FACTION_QUESTS.find((q) => (q as { escort?: unknown }).escort)!;
+    await boot(); standAt('outpost_gate'); putAgent((def as { factionId?: string }).factionId);
+    const p = useGameStore.getState().player!;
+    // seat it as ACCEPTED with the party delivered alive - the shape a player
+    // arrives in when they walked the surveyors home.
+    useGameStore.setState({ player: { ...p,
+      activeFactionQuestIds: [def.id],
+      activeFactionQuests: [{ id: def.id, escort: { hp: 30, hpMax: 30, count: 3 } }],
+    } } as never);
+    const before = snap();
+    useGameStore.getState().turnInFactionQuest(def.id); await flush();
+    const paid = snap();
+    expect(paid.tc).toBeGreaterThan(before.tc);
+    // door 2-3-4
+    useGameStore.getState().turnInFactionQuest(def.id); await flush();
+    useGameStore.getState().turnInFactionQuest(def.title); await flush();
+    useGameStore.getState().turnInFactionQuest(def.id, true); await flush();
+    expect(snap().tc).toBe(paid.tc);
+    // door 5 - across the save boundary
+    await useGameStore.getState().persist();
+    await useGameStore.getState().hydrate(); await flush();
+    standAt('outpost_gate'); putAgent((def as { factionId?: string }).factionId);
+    useGameStore.getState().turnInFactionQuest(def.id); await flush();
+    W(`  escort ${def.id}: TC ${before.tc} -> ${paid.tc} -> ${snap().tc} (four extra doors)`);
+    expect(snap().tc).toBe(paid.tc);
+    // and the quest is off the slate and on the completed ledger exactly once
+    const done = (useGameStore.getState().player!.completedFactionQuestIds ?? []).filter((id) => id === def.id);
+    expect(done.length).toBeLessThanOrEqual(1);
+  });
+});

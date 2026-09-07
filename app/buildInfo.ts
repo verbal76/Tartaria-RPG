@@ -28574,7 +28574,31 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // yields today and a retuned label moves the guard with it. Both verb regexes moved
 // into broker.ts; the store had its own copies. Gamut after: 32 missions, 165 stage
 // advances, 0 stalls, plus wrong-ground / missing-item / double-submit / reload.
-export const OTA_BUILD_ID = '2026-09-07-1728-the-parley-stone-ate-the-mission';
+// ⚠⚠ OTA-1729 - the Guardian payout guards itself. Audit item 2's last question:
+// should a reward writer be idempotent locally, or is it enough that something
+// upstream makes duplication unreachable? The Core Guardian's signature weapon +
+// armour were granted unconditionally while the guardiansDefeated write EIGHT
+// LINES BELOW de-duped through a Set - two adjacent writes, one idempotent and one
+// not. It was safe, but by a gate in a DIFFERENT function keyed on a DIFFERENT
+// field (summonCoreGuardian refuses on coresRecovered, and the Core lands in the
+// same synchronous block). Make core-granting a separate player action - a natural
+// design change - and the drops double silently. The payout now checks the same
+// flag its own block writes: no behaviour change today (the flag cannot already
+// contain this capital when the line runs), and the safety stops being borrowed.
+// Proven non-vacuously: a first defeat hands over 2 signature pieces, a re-run
+// against an already-flagged Guardian hands over 0 with the body confirmed down.
+// Also in this commit, verification only: the whole dog transition matrix (9 tests
+// - every status, double-buy charged once, no duplicate dog, no resurrection, no
+// lockout on an empty purse, repeatable market, faction gate across a reload,
+// pendingDogOnboarding cannot strand a save, inherits nothing); escort delivery
+// added to the reward idempotency probe (four families now, four doors each); a
+// deterministic harness that PROVES the TTS stale-callback race leaves isSpeaking()
+// reporting idle while a new line is live (the fix is held - see the Fable queue);
+// and the contraryWalker stamina flake repaired (it topped up before the first step
+// but a fight between the two steps spent it, and the break message said "landed
+// elsewhere" when the boots had not moved at all).
+export const OTA_BUILD_ID = '2026-09-07-1729-the-guardian-payout-guards-itself';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-07-1728-the-parley-stone-ate-the-mission';
 // golem catch-up 2026-09-07: markerless publish of OTA-1728 - the parley stone ate
 // the mission. Found by DRIVING all 32 storylines and mysteries stage by stage:
 // two stalled dead on the same tile with the same check kind, and mystery_pale_signal

@@ -343,13 +343,44 @@ export class ContraryWalker extends Walker {
     // return.
     if (get().activeBuildingId) { this.tap('EXIT (the building)'); get().exitBuilding(); await tick(); }
     if (get().player?.hubRoomId) { this.tap('EXIT'); await this.type('leave outpost'); }
-    const p = get().player!;
-    if (p.stamina < (p.staminaMax ?? 50)) { this.allowances.add('stamina restored by fiat instead of resting'); store.setState({ player: { ...p, stamina: p.staminaMax ?? 50 } }); }
+    // ⚠⚠⚠ OTA-1729 — TOP UP BEFORE **EACH** STEP, not once before both.
+    //
+    //  This restored stamina here and then took TWO steps, with a FIGHT possible
+    //  between them (`fightOut` below). A fight spends stamina, so the SOUTH step
+    //  could be refused outright — "You have no stamina left — you can't travel."
+    //  — and whether it was refused depended on whether a wandering pack happened
+    //  to spawn. That is the whole of this suite's flake: it failed one of three
+    //  full runs on 2026-09-07 and passed in isolation, which is exactly the shape
+    //  an RNG-gated resource produces. The game was right every time; movement
+    //  costs stamina and an exhausted walker cannot travel.
+    const topUp = (): void => {
+      const q = get().player!;
+      if (q.stamina < (q.staminaMax ?? 50)) {
+        this.allowances.add('stamina restored by fiat instead of resting');
+        store.setState({ player: { ...q, stamina: q.staminaMax ?? 50 } });
+      }
+    };
+    topUp();
     this.tap('NORTH'); await this.type('north');
     if (at() === from) { this.breaks.push(`typed "north" to step off the tile and the boots did not move. last lines:\n${this.lastLines(3)}`); return false; }
+    const off = at();
     if (this.enemiesUp() > 0) await this.fightOut('stepping off');
+    topUp(); // ⚠ the fight above may have spent everything the first top-up gave
     this.tap('SOUTH'); await this.type('south');
-    if (at() !== from) { this.breaks.push(`typed "south" to step back and the boots landed elsewhere (${at()} vs ${from}). last lines:\n${this.lastLines(3)}`); return false; }
+    // ⚠⚠ AND SAY WHICH FAILURE IT IS. This reported "the boots landed elsewhere"
+    //  for BOTH shapes — a step that went to the wrong cell AND a step that was
+    //  refused and never happened. The refused case is the common one and the
+    //  message pointed away from it; it cost a real investigation to find that the
+    //  log underneath said "no stamina" while the break said "landed elsewhere".
+    if (at() !== from) {
+      const stuck = at() === off;
+      this.breaks.push(
+        stuck
+          ? `typed "south" to step back and the boots did not move at all — still on ${off}. last lines:\n${this.lastLines(3)}`
+          : `typed "south" to step back and the boots landed elsewhere (${at()} vs ${from}). last lines:\n${this.lastLines(3)}`,
+      );
+      return false;
+    }
     if (this.enemiesUp() > 0 && !this.enemiesAreTheStage()) await this.fightOut('stepping back');
     return true;
   }
