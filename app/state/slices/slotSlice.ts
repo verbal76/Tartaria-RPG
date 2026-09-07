@@ -358,6 +358,9 @@ export const createSlotSlice = (
         buildingRevealed: [],
         currentScene: restoredScene,
         pendingRolls: null,
+        // ⚠ OTA-1737 — read back, then settled as CANCELLED below through the
+        //   normal authority: the modal it was waiting on is gone with pendingRolls.
+        throwSettlement: (saved as { throwSettlement?: GameStore['throwSettlement'] }).throwSettlement ?? null,
   pendingHookContinue: null,
         // OTA-1018 — a loaded save never reopens the crawl mid-game.
         storyIntro: null,
@@ -385,6 +388,16 @@ export const createSlotSlice = (
         // get a fresh warning otherwise.
         lowHpWarned: false,
       });
+      // ⚠⚠⚠ OTA-1737 — AN INTERRUPTED THROW IS CANCELLED, NOT ABANDONED. The dice
+      //   modal does not survive a load (pendingRolls is nulled two lines up), so
+      //   the roll can never resolve; the settlement it armed would have sat
+      //   forever with the throwable racked in the off hand and the real weapon
+      //   never restored. Measured before this: shard still 3 (not consumed),
+      //   off-hand = the shard, blade gone from the hand. Settled here through
+      //   `settleThrowRestore('cancelled')` — the same authority the in-session
+      //   cancel uses — so nothing is spent, the hand is restored, and no field is
+      //   edited by hand during hydration.
+      if (get().throwSettlement) get().settleThrowRestore('cancelled');
       // OTA-500 — re-sync the install's canonized locations into the world-map
       // module on load so dynamically-mentioned places stay plotted + routable
       // (the module state is per-JS-process; the registry is the persisted truth).

@@ -1183,8 +1183,17 @@ function advanceStagesOnIntent(
       const line = wrongGroundLine(player, ground, mysteryMatch.def.title);
       const recent = get().gameLog.slice(-30).some((e) => e.text === line);
       if (!recent && !namesChip) get().appendLog('arbiter', line);
-      return false; // nothing granted — the generic beat may still play
-    }
+      // ⚠⚠⚠ OTA-1737 — NO `return` HERE. This branch used to `return false`, which
+      //   read as "this mystery did not advance" and MEANT "stop evaluating
+      //   everything below": the storyline matcher and the lead loop never ran.
+      //   Measured: a tracked mystery parked on an investigate stage anywhere
+      //   else on the map made every investigate-lead in the game uncompletable
+      //   (control: lead completes, +50 TC; with the mystery: stays open, 0).
+      //   The hunt branch above always fell through; this one now does too, and
+      //   everything a mystery on its own ground would do sits in the `else`.
+      //   "This contract did not advance" and "stop the world" are different
+      //   sentences, and only the first was ever true.
+    } else {
     // ⚠ Same heal-then-refuse the hunts got: a record already in flight when this shipped
     // never received the earlier stages' grants, and refusing it forever would brick a
     // mystery that used to work. Award the missing prefix, re-check, and only then refuse.
@@ -1208,6 +1217,7 @@ function advanceStagesOnIntent(
         try { get().advanceMystery(mysteryMatch.rec.id); } finally { stageAdvancesInFlight.delete(flightKey); }
       });
     }
+    } // OTA-1737 — end of the on-ground branch
   }
 
   const storyMatch = (player.activeStorylines ?? [])
@@ -1236,8 +1246,17 @@ function advanceStagesOnIntent(
       const line = wrongGroundLine(player, ground, storyMatch.def.title);
       const recent = get().gameLog.slice(-30).some((e) => e.text === line);
       if (!recent && !namesChip) get().appendLog('arbiter', line);
-      return false; // nothing granted — the generic beat may still play
-    }
+      // ⚠⚠⚠ OTA-1737 — NO `return` HERE. This branch used to `return false`, which
+      //   read as "this storyline did not advance" and MEANT "stop evaluating
+      //   everything below": the storyline matcher and the lead loop never ran.
+      //   Measured: a tracked mystery parked on an investigate stage anywhere
+      //   else on the map made every investigate-lead in the game uncompletable
+      //   (control: lead completes, +50 TC; with the mystery: stays open, 0).
+      //   The hunt branch above always fell through; this one now does too, and
+      //   everything a storyline on its own ground would do sits in the `else`.
+      //   "This contract did not advance" and "stop the world" are different
+      //   sentences, and only the first was ever true.
+    } else {
     // ⚠ Heal-then-refuse, and the heal HANDS OVER AND STOPS — granting mid-action races
     // the caller's own inventory write and loses what it just gave. See the hunt branch.
     if (!QS.stageRequirementMet(stageNow, player.inventory)) {
@@ -1258,6 +1277,7 @@ function advanceStagesOnIntent(
         try { get().advanceStoryline(storyMatch.rec.id); } finally { stageAdvancesInFlight.delete(flightKey); }
       });
     }
+    } // OTA-1737 — end of the on-ground branch
   }
 
   // ⚠⚠ OTA-1687 — THE WRONG VERB ON THE RIGHT GROUND SAYS WHAT THE GROUND

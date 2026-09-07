@@ -69,11 +69,20 @@ export function dogRescueAmnesty(
 ): Partial<WorldMemory> | null {
   if (hasDog) return null;
   if (memory.dogRescueAmnestyDone) return null;
+  // ⚠⚠⚠ OTA-1737 — A PAID DOG IS NOT A WEDGED RESCUE. Measured: buy a Kennel Dog
+  //   (600 TC), save before the naming card, load → this cleared the pending,
+  //   the coin stayed spent and the shelf offered another dog. The amnesty was
+  //   written for onboardings the broken gates could never finish; a market
+  //   purchase (OTA-1726) never had that defect and must keep its pending. The
+  //   rumour flag and the latch still apply, so the amnesty's own purpose is
+  //   untouched for every scenario it was built for.
+  const pending = memory.pendingDogOnboarding ?? null;
+  const isPurchase = pending?.rescueData?.scenario === 'market';
   return {
     // A rescue that was interrupted — or that the broken gates could never let
     // finish — leaves this standing, and every gate downstream reads it as "a dog
     // is already on the way."
-    pendingDogOnboarding: null,
+    pendingDogOnboarding: isPurchase ? pending : null,
     // Let the Arbiter's rumour be findable again by a player who has no dog.
     dogRescueTipFired: false,
     dogRescueAmnestyDone: true,

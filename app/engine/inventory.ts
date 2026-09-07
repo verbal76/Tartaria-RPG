@@ -84,6 +84,51 @@ export function mergeOrPushItem(
  *               narrate "your pack is full of rocks")
  *   - cap:     the active cap for this item (Infinity = uncapped)
  */
+/** ⚠⚠⚠ OTA-1737 — ITEMS MAY STACK ONLY WHEN EVERY PROPERTY THAT AFFECTS THEIR
+ *  FUTURE BEHAVIOUR IS STACK-COMPATIBLE.
+ *
+ *  Owner: *"The merge predicate must not collapse two mechanically different
+ *  instances merely because their name and kind match."*
+ *
+ *  ⚠ THE DEFECT THIS CLOSES, measured: `grantItem` merged by name + kind and
+ *  kept the EXISTING row's fields. A crafted Plague Tonic landing on a bought
+ *  stack shed its `selfCrafted` flag and sold at 36 instead of the 19 cap
+ *  OTA-802 built (+17/unit); a 60 TC bought tonic landing on a crafted stack
+ *  was devalued to 19. The same collapse loses a quest earmark, a fusion
+ *  reservation, or a stolen mark — anything that rides the row.
+ *
+ *  Every field below is one whose disagreement changes what the row is WORTH
+ *  (selfCrafted, stolen, rarity, the value tags trophy / unsellable / fused),
+ *  what it may be USED for (reservedForQuest, reservedForFusion), or what it
+ *  IS (coating, instanceStats, uniqueStats, golemCore, a Crucible forging still
+ *  taking its name, added resists). Durability is handled by the caller's
+ *  full-vs-worn rule, which predates this and is kept.
+ *
+ *  ⚠ The REST of `tags` is deliberately NOT in the key. Catalog tags are the
+ *  catalog's opinion of the NAME, not state of the row, and they drift across
+ *  OTAs (the starter Aetheric Torch carries ['light']; the catalog grant of the
+ *  same torch carries ['light','relic']). Keying on the whole set would split
+ *  every existing pack from every new grant the first time a catalog revision
+ *  adds a tag — measured on ota958 the moment the full set was compared. */
+const STACK_FLAGS = ['selfCrafted', 'stolen', 'reservedForFusion', 'reservedForQuest', 'materializing'] as const;
+/** The tags sellPrice / scrap read PER ROW — the ones whose presence changes worth. */
+const STACK_TAGS = ['trophy', 'unsellable', 'fused'] as const;
+export function stackCompatible(a: InventoryItem, b: InventoryItem): boolean {
+  if (a.name !== b.name || a.kind !== b.kind) return false;
+  // per-instance identity — never merged, whichever side carries it
+  if (a.coating || b.coating || a.coating2 || b.coating2) return false;
+  if (a.instanceStats || b.instanceStats || a.uniqueStats || b.uniqueStats) return false;
+  if (a.golemCore || b.golemCore || a.formingName || b.formingName) return false;
+  if ((a.addedResists?.length ?? 0) > 0 || (b.addedResists?.length ?? 0) > 0) return false;
+  // behaviour-bearing flags must AGREE (both set or both clear)
+  for (const f of STACK_FLAGS) if (!!a[f] !== !!b[f]) return false;
+  // value-bearing classification must agree
+  if ((a.rarity ?? null) !== (b.rarity ?? null)) return false;
+  const hasTag = (i: InventoryItem, t: string) => (i.tags ?? []).some((x) => x.toLowerCase() === t);
+  for (const t of STACK_TAGS) if (hasTag(a, t) !== hasTag(b, t)) return false;
+  return true;
+}
+
 export function grantItem(
   inventory: readonly InventoryItem[],
   newItem: InventoryItem,
@@ -93,8 +138,10 @@ export function grantItem(
   const stackable = alwaysStackable(newItem.kind);
   const newItemFull = isFullyDurable(newItem);
   const mergeIdx = inventory.findIndex((existing) => {
-    if (existing.name !== newItem.name) return false;
-    if (existing.kind !== newItem.kind) return false;
+    // ⚠ OTA-1737 — one predicate for "are these the same kind of thing"; the
+    //   name/kind/coating/instanceStats/uniqueStats checks that stood here are
+    //   inside it, joined by the flags and classification that were missing.
+    if (!stackCompatible(existing, newItem)) return false;
     // OTA-363 — a weapon coating makes an instance unique; never merge a
     // coated weapon (it would silently drop the coating on the incoming
     // item or fuse two differently-coated blades).

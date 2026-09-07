@@ -2808,4 +2808,12 @@ export interface SaveState {
    *  reset the counter and delayed the next encounter by `threshold`
    *  cardinal steps. */
   wastelandStepsSinceEncounter?: number;
+  /** ⚠⚠ OTA-1737 — a throw whose dice modal was open at save time. The modal
+   *  (`pendingRolls`) is never persisted, so on load the roll is gone; without
+   *  this the settlement that restores the previous off-hand and spends the
+   *  unit was gone too — the throwable stayed racked in the hand forever and
+   *  was never consumed. Load reads it back and settles it as CANCELLED through
+   *  `settleThrowRestore`, the same authority the in-session cancel uses. Optional
+   *  for back-compat; absent means nothing was in flight. */
+  throwSettlement?: { itemId: string; qtyAtThrow: number; prevOff?: string; prevOffId?: string } | null;
 }

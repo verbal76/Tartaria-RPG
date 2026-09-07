@@ -242,6 +242,8 @@ export const createPersistSlice = (
       // 2026-05-25 — persist the wasteland encounter step counter so a save-load
       // round trip can't reset it (cheese).
       wastelandStepsSinceEncounter,
+      // ⚠ OTA-1737 — see SaveState.throwSettlement.
+      throwSettlement: get().throwSettlement ?? undefined,
     };
     // OTA-413 — PROACTIVELY drop regenerable per-room lore tables from every room
     // except the one the player is standing in, on EVERY save. visitedRooms's

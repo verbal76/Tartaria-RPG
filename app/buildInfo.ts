@@ -28762,7 +28762,27 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // perks and coating procs, the rung and its materials; the confirm sheet's first
 // line is the instance and where it is worn; row to sheet to spend rides the
 // instance id. No pricing, cap, temper, consignment or recipe rule touched.
-export const OTA_BUILD_ID = '2026-09-07-1736-the-vendor-knows-what-you-carry';
+// ⚠⚠⚠ OTA-1737 — THREE REPAIRS FROM AUDIT PASS #3, BOUNDED TO WHAT WAS PROVEN.
+// (1) advanceStagesOnIntent: the mystery and storyline wrong-ground branches
+// `return false`d — read as "this contract did not advance", meant "stop
+// evaluating everything below". A tracked mystery parked on an investigate
+// stage anywhere else on the map made EVERY investigate-lead in the game
+// uncompletable (36 mystery x stage and 16 storyline x stage cases measured red,
+// now green; the mystery itself still does not advance). The two branches fall
+// through like the hunt branch always did. (2) inventory.stackCompatible is the
+// one answer to "may these two rows share a stack": name, kind, coatings,
+// instance/unique stats, golem core, forming name, added resists, rarity, tags,
+// and the flags selfCrafted / stolen / reservedForFusion / reservedForQuest /
+// materializing. grantItem asks it before the durability rule, so a bought unit
+// can no longer land on a crafted stack (and lose its worth) or a crafted unit
+// on a bought one (and lose its cap); save/load keeps them apart. (3A) the dog
+// rescue amnesty clears only a wedged RESCUE — a 600 TC market purchase saved
+// before naming survives the load and still names a dog; no refund, no second
+// dog. (3B) throwSettlement is persisted; a save taken with the throw modal open
+// loads by settling the throw through settleThrowRestore('cancelled'): nothing
+// spent, the off-hand restored, the next throw normal.
+export const OTA_BUILD_ID = '2026-09-07-1737-the-mystery-does-not-starve-the-lead';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-07-1736-the-vendor-knows-what-you-carry';
 // golem catch-up 2026-09-07: markerless publish of OTA-1736 - the vendor as a
 // projection of authoritative state. app/engine/itemIdentity.ts holds the
 // instance display name, worn-where and hold-label logic extracted verbatim from
