@@ -28740,6 +28740,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // logs which one, because a `false` (SDK up, saw no crash) would mean an OS kill
 // and a `threw`/`non-boolean` would mean the native init race - opposite fixes.
 export const OTA_BUILD_ID = '2026-09-07-1735-the-instrument-was-off';
+// golem catch-up 2026-09-07: markerless publish of OTA-1735 - instrumentation
+// only, from the task #30 investigation of 11 native deaths (9 on an OTA-apply
+// boot). The finding is in the measuring, not yet in the game: the runtime
+// pressure watch (memory-warning listener, AppState listener, freeze clock) is
+// started at the end of bootQwen, which OTA-1493 deferred to the FIRST PLAYER
+// ACTION - so every boot-time kill, all of which read "(no action yet)", was
+// recorded with the listeners never installed. The boot now arms the same
+// wrapper before hydrate: one watch, a second caller, idempotent, counters
+// preserved. `boot:qwen:deferred` also named a subsystem that had done nothing
+// AND was the last stamp of a successful boot (the sync tail reaches
+// boot:complete before the ML chain resolves), so arming now stamps
+// `boot:idle:awaiting-first-action`. Qwen, the orphaned-llama-context
+// hypothesis, Kokoro and the inventory screen are all ruled out by the data.
+// No fix: causality is not established, and Qwen never runs in that window.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-07-1734-the-counter-sells-the-anvil';// golem catch-up 2026-09-07: markerless publish of OTA-1734 - the reinforcement
 // service reaches the player. The vendor's BUY tab carries a REINFORCE YOUR GEAR
 // section built from the WORKINGS TO LEARN pattern - collapsible offerRows into
