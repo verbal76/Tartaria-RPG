@@ -35,6 +35,11 @@ import { SearchSortBar, type SortDirection } from '../components/SearchSortBar';
 import { FirstTimeHint } from '../components/FirstTimeHint';
 import { consumeVerb } from '../engine/consumeVerb';
 import { itemIsDogArmor, wornDogVestInstanceId } from '../engine/dogCompanion';
+// ⚠⚠⚠ OTA-1736 — THE NAME, THE WORN-WHERE AND THE HOLD LABEL LIVE IN THE ENGINE
+//   NOW. They were closures in this render body, which is why the vendor's
+//   reinforcement rows could not reach them and grew their own (OTA-1734).
+//   Extracted verbatim; this screen calls them so there is one body, not two.
+import { instanceDisplayName, equippedWhereLabel, holdLabelFor } from '../engine/itemIdentity';
 import { activeFetchItemNames } from '../engine/factionQuests';
 import { isGolemRepairPart, isGolemSubstitutePart, isGolemWeapon, golemRepairHeal, golemSubstituteHeal } from '../engine/golems';
 import { healBatchCount, HEAL_BATCH_NOTE } from '../engine/healBatch';
@@ -544,51 +549,9 @@ export function InventoryScreen() {
   // resolved exactly and must never be re-matched by name. Same discipline
   // the EQUIPPED badge's own `hasIdForThisName` guard uses two blocks up —
   // this reader was simply the one that never got it.
-  const legacySlotsByName = new Map<string, EquipSlot[]>();
-  const nameIdSlotTriples: Array<[EquipSlot, string | undefined, string | undefined]> = [
-    ['main', player.equipped?.main, eq.mainId],
-    ['off', player.equipped?.off, eq.offId],
-    ['head', player.equipped?.head, eq.headId],
-    ['chest', player.equipped?.chest, eq.chestId],
-    ['hands', player.equipped?.hands, eq.handsId],
-    ['legs', player.equipped?.legs, eq.legsId],
-    ['feet', player.equipped?.feet, eq.feetId],
-    ['cloak', player.equipped?.cloak, eq.cloakId],
-    ['amulet', player.equipped?.amulet, eq.amuletId],
-    ...RING_SLOTS.map((k, i): [EquipSlot, string | undefined, string | undefined] => ['ring', player.equipped?.[k], eq[RING_ID_KEYS[i]!]]),
-  ];
-  for (const [slot, name, id] of nameIdSlotTriples) {
-    if (!name || id) continue; // an id-bearing slot is settled — never by name
-    const list = legacySlotsByName.get(name) ?? [];
-    list.push(slot);
-    legacySlotsByName.set(name, list);
-  }
-  const equippedSlotLabelFor = (item: InventoryItem): string => {
-    // OTA-685 — a dog vest reads "(on <dogname>)", since it's worn on the dog,
-    // not in a player slot. OTA — matched by INSTANCE ID via the shared
-    // resolver (name comparison broke when a still-cooling fused vest was
-    // renamed by the settle).
-    if (wornVestId && item.id === wornVestId) {
-      return dogForVest?.name ? `on ${dogForVest.name}` : 'on your dog';
-    }
-    let slots = equippedSlotsById.get(item.id);
-    // ⚠ OTA-1550 — the LEGACY-ONLY map (slots with no instance id). Using the
-    // full by-name map here tagged a pack duplicate as equipped whenever the
-    // held instance shared its stored name — the owner's two Cudgels, both
-    // reading EQUIPPED (MAIN HAND).
-    if (!slots || slots.length === 0) slots = legacySlotsByName.get(item.name) ?? [];
-    if (slots.length === 0) return '';
-    // Two-handed weapons take both hands by design — keep the existing wording.
-    if (findWeaponByName(item.name)?.style === 'two_handed') return 'two-handed';
-    const hasMain = slots.includes('main');
-    const hasOff = slots.includes('off');
-    if (hasMain && hasOff) return 'both hands';
-    if (hasMain) return 'main hand';
-    if (hasOff) return 'off hand';
-    // Armor / accessory: the human slot label(s), deduped (e.g. a ring → "ring").
-    const labels = [...new Set(slots.map((s) => SLOT_LABEL[s] ?? s))];
-    return labels.join(' + ');
-  };
+  // ⚠ OTA-1736 — one authority for "where is THIS instance worn". The id-first /
+  //   legacy-name-fallback discipline of OTA-1550 moved with it, unchanged.
+  const equippedSlotLabelFor = (item: InventoryItem): string => equippedWhereLabel(player, item);
   // OTA-1008 — the coating pickers (weapon vials AND armor vials) tag each candidate
   // that is CURRENTLY EQUIPPED, via the same resolver as the EQUIPPED badge —
   // one source of truth, no divergent copy. Owner: "when you are applying
@@ -626,30 +589,8 @@ export function InventoryScreen() {
   // arb-fix — the slot an item FILLS, shown on every equippable row (esp. armor:
   // "Chest", "Head", "Feet"…) whether worn or not, so the player can see where a
   // piece goes at a glance. Weapons collapse to "Hand" / "Two-handed".
-  const slotFillLabelFor = (item: InventoryItem): string => {
-    const slots = validSlotsForItem(item);
-    if (slots.length === 0) return '';
-    // ⚠⚠⚠ OTA-1727 — "One-handed", not "Hand". Owner: *"Row 2 = explicit
-    // One-handed or Two-handed."* "Hand" was the odd half of a pair: a
-    // two-hander announced its hand COUNT and a one-hander announced only that
-    // it went in a hand, so the two rows did not read as answers to the same
-    // question and the player had to know that "Hand" meant "not the other one".
-    //
-    // ⚠ resolveDisplayWeapon, NOT findWeaponByName — the OTA-705 rule. A FUSED
-    // piece is catalog-absent by design and its name can collide with an
-    // unrelated catalog row, so the name lookup could read a two-hander's style
-    // off a fused vest that merely shares its name. The resolver answers from
-    // uniqueStats for fused items and never falls through to the name catalog.
-    if (resolveDisplayWeapon(item)?.style === 'two_handed') return 'Two-handed';
-    if (slots.every((s) => s === 'main' || s === 'off')) return 'One-handed';
-    const labels = [...new Set(slots.map((s) => SLOT_LABEL[s] ?? s))];
-    return labels.join(' / ');
-  };
-
-
-  // OTHER inventory item that competes for that slot gets a red ✗ (you'd
-  // have to unequip first). Rings have several physical slots, so a ring only
-  // counts as blocked when every one of them is worn.
+  // ⚠ OTA-1736 — same extraction for the hold label (One-handed / Two-handed / slot).
+  const slotFillLabelFor = (item: InventoryItem): string => holdLabelFor(item);
   const slotIsFull = (slot: EquipSlot): boolean => {
     // ⚠ OTA-1648 — MAX_RINGS, never a literal: a hard-coded 3 here would grey
     // out the fourth finger the equip router is perfectly willing to fill.
@@ -2804,9 +2745,7 @@ function ItemRow({
                 ("Corrupted Battle Axe"); the underlying name is
                 unchanged for stat lookup. OTA-873 — a dual-coat weapon
                 shows both adjectives ("Corrupted Venomous Battle Axe"). */}
-            {[item.coating?.label, item.coating2?.label].filter(Boolean).length
-              ? `${[item.coating?.label, item.coating2?.label].filter(Boolean).join(' ')} ${item.name}`
-              : item.name}
+            {instanceDisplayName(item)}
           </Text>
           <Text style={styles.rowQty}>×{item.quantity}</Text>
         </View>

@@ -31,6 +31,15 @@ const INV = src('app', 'screens', 'InventoryScreen.tsx');
 const codeOnly = (s: string) =>
   s.split('\n').filter((l) => !l.trim().startsWith('//') && !l.trim().startsWith('*')).join('\n');
 const CODE = codeOnly(INV);
+// ⚠⚠ OTA-1736 — THE WIRING MOVED, VERBATIM. `equippedSlotLabelFor` and its two
+// maps were closures in InventoryScreen's render body, which is why the vendor's
+// reinforcement rows could not reach them and grew their own name/equipped logic.
+// They now live in app/engine/itemIdentity.ts as `equippedWhereLabel`, and the
+// inventory CALLS it. The four wiring pins below read that file; the by-name
+// Unequip map stayed in the screen and its pin still reads the screen. The
+// behavioural test at the end proves the OTA-1550 rule survived the move.
+const IDENTITY = codeOnly(src('app', 'engine', 'itemIdentity.ts'));
+import { equippedWhereLabel } from '../app/engine/itemIdentity';
 
 /** The shipped rule, mirrored so the ARITHMETIC is pinned and not just the
  *  source text. Kept in step with equippedSlotLabelFor's fallback. */
@@ -86,20 +95,20 @@ describe('OTA-1550 — an id-bearing slot is never re-matched by name', () => {
 
 describe('OTA-1550 — the wiring', () => {
   it('⚠⚠⚠ the fallback reads the LEGACY map, never the all-slots by-name map', () => {
-    expect(CODE).toContain('if (!slots || slots.length === 0) slots = legacySlotsByName.get(item.name) ?? [];');
-    expect(CODE).not.toContain('if (!slots || slots.length === 0) slots = slotsByEquippedName.get(item.name) ?? [];');
+    expect(IDENTITY).toContain('if (!slots || slots.length === 0) slots = legacySlotsByName.get(item.name) ?? [];');
+    expect(IDENTITY).not.toContain('if (!slots || slots.length === 0) slots = slotsByEquippedName.get(item.name) ?? [];');
   });
 
   it('⚠⚠⚠ the legacy map SKIPS every slot that carries an instance id', () => {
-    expect(CODE).toContain('if (!name || id) continue;');
+    expect(IDENTITY).toContain('if (!name || id) continue;');
   });
 
   it('⚠⚠ every slot is represented in the triples — a missed one silently loses its badge', () => {
     // Scoped to the triples block: the older all-slots by-name list carries its
     // own copy of every slot (including three rings), so an unscoped count
     // measures both lists and proves nothing about this one.
-    const start = CODE.indexOf('const nameIdSlotTriples');
-    const block = CODE.slice(start, CODE.indexOf('];', start));
+    const start = IDENTITY.indexOf('const nameIdSlotTriples');
+    const block = IDENTITY.slice(start, IDENTITY.indexOf('];', start));
     expect(start).toBeGreaterThan(-1);
     for (const slot of ['main', 'off', 'head', 'chest', 'hands', 'legs', 'feet', 'cloak', 'amulet']) {
       expect({ slot, present: block.includes(`['${slot}', player.equipped?.${slot},`) })
@@ -117,11 +126,29 @@ describe('OTA-1550 — the wiring', () => {
   it('⚠ it is built AFTER `eq`, or the render throws before the screen mounts', () => {
     // The first cut of this fix read `eq.mainId` above `const eq = …` and took
     // the whole inventory screen down with a TDZ ReferenceError.
-    expect(CODE.indexOf('const eq = player.equipped ?? {};'))
-      .toBeLessThan(CODE.indexOf('const legacySlotsByName = new Map'));
+    expect(IDENTITY.indexOf('const eq = player.equipped ?? {};'))
+      .toBeLessThan(IDENTITY.indexOf('const legacySlotsByName = new Map'));
   });
 
   it('⚠ the old all-slots by-name map still exists for the Unequip offer it was built for', () => {
     expect(CODE).toContain('const slotsByEquippedName = new Map<string, EquipSlot[]>();');
+  });
+});
+
+describe('OTA-1736 — the rule still holds where the code now lives', () => {
+  it('⚠⚠⚠ two Cudgels, one held BY ID: only that instance reads main hand', () => {
+    const held = { id: 'inst_coated_1', name: 'Cudgel', kind: 'weapon', quantity: 1, tags: ['weapon'] } as never;
+    const spare = { id: 'inst_spare_2', name: 'Cudgel', kind: 'weapon', quantity: 1, tags: ['weapon'] } as never;
+    const player = {
+      inventory: [held, spare],
+      equipped: { main: 'Cudgel', mainId: 'inst_coated_1' },
+    } as never;
+    expect(equippedWhereLabel(player, held)).toBe('main hand');
+    expect(equippedWhereLabel(player, spare)).toBe('');
+  });
+  it('⚠⚠ a legacy save (name, no id) still resolves by name — and only then', () => {
+    const one = { id: 'x', name: 'Cudgel', kind: 'weapon', quantity: 1, tags: ['weapon'] } as never;
+    const player = { inventory: [one], equipped: { main: 'Cudgel' } } as never;
+    expect(equippedWhereLabel(player, one)).toBe('main hand');
   });
 });

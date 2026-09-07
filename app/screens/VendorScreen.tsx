@@ -18,7 +18,15 @@ import { vendorRecipeMenu, vendorSeed } from '../engine/recipeDiscovery';
 // ⚠ OTA-1734 — the reinforcement AUTHORITIES, imported to be READ. The screen
 //   renders what `reinforceQuote` hands it and never computes a price or a
 //   ceiling of its own; `reinforceWithVendor` charges from the same call.
-import { reinforceQuote, REINFORCE_MAX_LEVEL } from '../engine/durability';
+import { reinforceQuote, REINFORCE_MAX_LEVEL, reinforceLevel } from '../engine/durability';
+// ⚠⚠⚠ OTA-1736 — A VENDOR SCREEN IS A PROJECTION OF AUTHORITATIVE STATE, NOT AN
+//   APPROXIMATION OF IT. The item's name, where it is worn and how it is held
+//   come from the same engine authority the inventory reads; whether a shelf
+//   row is knowledge the character already holds comes from the shelf's own
+//   predicate, which the counter refuses through. Nothing here is derived twice.
+import { instanceDisplayName, equippedWhereLabel, holdLabelFor } from '../engine/itemIdentity';
+import { shelfKnowledge } from '../engine/vendors';
+import { resolveDisplayWeapon } from '../engine/itemResolution';
 import { corruptionTierOf, corruptionPriceMultiplier } from '../engine/corruption';
 import { warPriceFactor, finalBuyPrice, priceArrow } from '../engine/vendorPricing';
 import { localWarHeat, contestedFactions } from '../engine/worldEvents';
@@ -395,9 +403,13 @@ export function VendorScreen() {
       //   reason the sell arm does, and on the DONE arm that is the point: the
       //   preview the player is looking at is re-read after the work, so the new
       //   ceiling shows on the card in the sheet as well as in the message.
-      ? getItemPreviewForInstance(
-          player.inventory.find((i) => i.id === pending.itemId) ?? { name: pending.itemName },
-        )
+      ? (() => {
+          const it = player.inventory.find((i) => i.id === pending.itemId);
+          const base = getItemPreviewForInstance(it ?? { name: pending.itemName });
+          // ⚠ OTA-1736 — the sheet's headline is the INSTANCE's name (coating in
+          //   front), the same string the row and the pack card show for it.
+          return it ? { ...base, name: instanceDisplayName(it) } : base;
+        })()
       : null;
   const canAffordPending = pending?.mode === 'buy' ? player.tc >= pending.price : true;
   // OTA 039 — corruption-tier markup. Multiplied into every BUY
@@ -852,6 +864,10 @@ export function VendorScreen() {
               const buyTick = priceArrow(effPrice, o.price, 'buy');
               const canAfford = player.tc >= effPrice;
               const itemPreview = getItemPreview(o.itemName);
+              // ⚠ OTA-1736 — knowledge the character already holds is not for sale.
+              //   Same treatment as an owned working (OTA-1731): the price is
+              //   REPLACED by ✓ KNOWN, the row is greyed and is not a button.
+              const knownRow = !!shelfKnowledge(o.itemName, player)?.known;
               const owned = player.inventory
                 .filter((inv) => inv.name.toLowerCase() === o.itemName.toLowerCase())
                 .reduce((sum, inv) => sum + inv.quantity, 0);
@@ -871,20 +887,23 @@ export function VendorScreen() {
                 >
                   <View style={[styles.offerStripe, { backgroundColor: rarityColor(itemPreview.rarity) }]} />
                   <TouchableOpacity
-                    style={[styles.offerBody, !canAfford && styles.offerRowBroke]}
-                    onPress={() => openBuy(o.itemName, effPrice)}
+                    style={[styles.offerBody, (knownRow || !canAfford) && styles.offerRowBroke]}
+                    onPress={knownRow ? undefined : () => openBuy(o.itemName, effPrice)}
+                    disabled={knownRow}
                     activeOpacity={0.7}
                     accessibilityRole="button"
+                    accessibilityState={{ disabled: knownRow }}
+                    accessibilityLabel={knownRow ? `${o.itemName} — already known` : undefined}
                   >
                     <View style={styles.offerHead}>
                       <Text style={styles.offerName} numberOfLines={1}>{o.itemName}</Text>
-                      <Text style={[styles.offerPrice, !canAfford && styles.offerPriceBroke]}>
-                        {effPrice} TC{buyTick ? <Text style={buyTick.good ? styles.tickGood : styles.tickBad}> {buyTick.glyph}</Text> : null}
+                      <Text style={[styles.offerPrice, knownRow ? styles.offerPriceKnown : (!canAfford && styles.offerPriceBroke)]}>
+                        {knownRow ? '\u2713 KNOWN' : <>{effPrice} TC{buyTick ? <Text style={buyTick.good ? styles.tickGood : styles.tickBad}> {buyTick.glyph}</Text> : null}</>}
                       </Text>
                     </View>
                     <View style={styles.offerSubHead}>
                       <Text style={styles.offerKind} numberOfLines={1}>
-                        {itemPreview.kindLabel}{itemPreview.rarity ? ` · ${itemPreview.rarity}` : ''}
+                        {itemPreview.kindLabel}{itemPreview.rarity ? ` · ${itemPreview.rarity}` : ''}{knownRow ? ' · already in your hands' : ''}
                       </Text>
                       {/* arb-fix — stock count and owned count stack one above
                           the other (right-aligned), not jammed on one line. */}
@@ -1064,25 +1083,56 @@ export function VendorScreen() {
                         accessibilityRole="button"
                         accessibilityState={{ disabled: maxed }}
                         accessibilityLabel={maxed
-                          ? `${item.name} — already reinforced +${quote.level}, the maximum`
-                          : `Reinforce ${item.name} to plus ${quote.nextLevel} for ${quote.tc} coin`}
+                          ? `${instanceDisplayName(item)} — already reinforced +${quote.level}, the maximum`
+                          : `Reinforce ${instanceDisplayName(item)}${equippedWhereLabel(player, item) ? `, equipped ${equippedWhereLabel(player, item)},` : ''} to plus ${quote.nextLevel} for ${quote.tc} coin`}
                       >
+                        {/* ⚠⚠⚠ OTA-1736 — THE ROW SAYS WHICH COPY. Owner: *"similarly
+                            named instances can be difficult or impossible to
+                            distinguish before spending TC and materials."* The
+                            name is the inventory's own (coating in front), it may
+                            take two lines rather than be cut, and every line below
+                            is one the pack card already carries — rarity + level,
+                            durability, damage, how it is held, WHERE IT IS WORN,
+                            and the rolled/paid properties — read from the same
+                            authorities, keyed on the instance id, never the name. */}
                         <View style={styles.offerHead}>
-                          <Text style={styles.offerName} numberOfLines={1}>{item.name}</Text>
+                          <Text style={styles.offerName} numberOfLines={2}>{instanceDisplayName(item)}</Text>
                           <Text style={[styles.offerPrice, maxed ? styles.offerPriceKnown : (cannotPay && styles.offerPriceBroke)]}>
                             {maxed ? `\u2713 +${quote.level} MAX` : `${quote.tc} TC`}
                           </Text>
                         </View>
-                        <View style={styles.offerSubHead}>
-                          {/* ⚠ The whole point of the row: where this copy stands on
-                              the ladder, and where the next rung puts its ceiling. */}
-                          <Text style={styles.offerKind} numberOfLines={1}>
-                            {`+${quote.level} of ${REINFORCE_MAX_LEVEL} \u00b7 ${quote.from.current}/${quote.from.max}`}
-                            {maxed ? '' : ` \u2192 ${quote.to.current}/${quote.to.max}`}
-                          </Text>
-                        </View>
+                        {(() => {
+                          const w = resolveDisplayWeapon(item);
+                          const lvl = reinforceLevel(item);
+                          const where = equippedWhereLabel(player, item);
+                          const held = holdLabelFor(item);
+                          const traits = getItemPreviewForInstance(item).stats
+                            .filter((line) => /^(AC \+|[A-Z]{3} \+|Resists:|Special:|Scales with)/.test(line));
+                          if (item.coating) traits.push(`+${item.coating.dice} ${item.coating.kind}`);
+                          if (item.coating2) traits.push(`+${item.coating2.dice} ${item.coating2.kind}`);
+                          return (
+                            <>
+                              {/* rarity + level · durability now → after · damage */}
+                              <Text style={styles.offerKind}>
+                                {[
+                                  item.rarity ? `${item.rarity}${lvl > 0 ? ` +${lvl}` : ''}` : null,
+                                  `${quote.from.current}/${quote.from.max}${maxed ? '' : ` \u2192 ${quote.to.current}/${quote.to.max}`}`,
+                                  w ? `${w.damageDice} ${w.damageType}` : null,
+                                ].filter(Boolean).join(' \u00b7 ')}
+                              </Text>
+                              {/* how it is held · where it is worn */}
+                              <Text style={[styles.offerKind, where ? styles.offerOwned : undefined]}>
+                                {[held || null, where ? `EQUIPPED (${where})` : 'in your pack'].filter(Boolean).join(' \u00b7 ')}
+                              </Text>
+                              {traits.length > 0 && (
+                                <Text style={styles.offerStats}>{traits.join(' \u00b7 ')}</Text>
+                              )}
+                            </>
+                          );
+                        })()}
                         {!maxed && (
-                          <Text style={styles.offerStats} numberOfLines={2}>
+                          <Text style={styles.offerStats}>
+                            {`+${quote.level} \u2192 +${quote.nextLevel} of ${REINFORCE_MAX_LEVEL} \u00b7 `}
                             {quote.materials.length > 0
                               ? quote.materials.map((m) => `${m.name} \u00d7${m.quantity}`).join(' \u00b7 ')
                               : 'no materials needed'}
@@ -1287,14 +1337,14 @@ export function VendorScreen() {
               : pending?.mode === 'steal'
                 ? `Steal ${pending.itemName}?`
               : pending?.mode === 'reinforceDone'
-                ? `${pending.itemName} reinforced`
+                ? `${instanceDisplayName(player.inventory.find((i) => i.id === pending.itemId) ?? { name: pending.itemName })} reinforced`
               : pending?.mode === 'reinforce'
                 // ⚠ OTA-1734 — the title names the OBSTACLE when there is one, the
                 //   way the buy sheet says "Not enough TC" instead of pretending.
                 ? (reinforceBlocked === 'tc' ? 'Not enough TC'
                   : reinforceBlocked === 'materials' ? 'Not enough materials'
                   : reinforceBlocked ? `Cannot reinforce ${pending.itemName}`
-                  : `Reinforce ${pending.itemName} to +${pendingReinforce?.quote.nextLevel ?? 1}`)
+                  : `Reinforce ${pendingReinforce ? instanceDisplayName(pendingReinforce.item) : pending.itemName} to +${pendingReinforce?.quote.nextLevel ?? 1}`)
                 : pending?.mode === 'accept'
                   ? `Accept "${pending.title}"`
                   : canAffordPending
@@ -1367,7 +1417,13 @@ export function VendorScreen() {
                       const mats = q.materials.map((m) => `${m.name} \u00d7${m.quantity}`).join(', ') || 'none';
                       const missing = pendingReinforce?.missing ?? [];
                       const down = q.to.max - q.to.current;
+                      // ⚠ OTA-1736 — the FIRST line of the sheet says which copy this
+                      //   is and where it is worn, keyed on the instance id, so the
+                      //   final spend never happens against a name the player has
+                      //   two of.
+                      const where = pendingReinforce ? equippedWhereLabel(player, pendingReinforce.item) : '';
                       return [
+                        `${pendingReinforce ? instanceDisplayName(pendingReinforce.item) : pending.itemName} \u2014 ${where ? `EQUIPPED (${where})` : 'in your pack'}`,
                         `Reinforcement: +${q.level} \u2192 +${q.nextLevel} of ${REINFORCE_MAX_LEVEL}`,
                         `Durability: ${q.from.current}/${q.from.max}   \u2192   ${q.to.current}/${q.to.max}`,
                         '',

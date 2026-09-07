@@ -44,6 +44,7 @@ import { pick } from '../../engine/rng';
 import { grantItem } from '../../engine/inventory';
 import { lookupCraftedItem, RECIPES, findDogGearByName, type Recipe } from '../../engine/crafting';
 import { trainStat } from '../../engine/statTraining';
+import { shelfKnowledge } from '../../engine/vendors'; // OTA-1736 — the shelf's own knowledge predicate
 import { sellPriceFor, isUnsellable, applySellCaps, buyBackAskFor } from '../../engine/sellPrice';
 import { vendorPriceMod } from '../../engine/factionRapport';
 import { SLOT_LABEL, effectiveStats, equippedInstanceIds, RING_ID_KEYS } from '../../engine/equipment';
@@ -149,7 +150,9 @@ export const createVendorSlice = (
           get().appendLog('system', `${scene.vendor.name} doesn't carry the ${tech.name} procedure.`);
           return;
         }
-        if ((player.knownTechniques ?? []).includes(tech.id)) {
+        // ⚠ OTA-1736 — the SAME predicate the screen marks ✓ KNOWN with, so the
+        //   row and the refusal cannot drift. Checked BEFORE the purse.
+        if (shelfKnowledge(rowName, player)?.known) {
           get().appendLog('system', `You already carry the ${tech.name} in your hands.`);
           return;
         }

@@ -28739,8 +28739,31 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // and picking neither. Its four decline paths are recorded apart now and the boot
 // logs which one, because a `false` (SDK up, saw no crash) would mean an OS kill
 // and a `threw`/`non-boolean` would mean the native init race - opposite fixes.
-export const OTA_BUILD_ID = '2026-09-07-1735-the-instrument-was-off';
-// golem catch-up 2026-09-07: markerless publish of OTA-1735 - instrumentation
+// ⚠⚠⚠ OTA-1736 - THE VENDOR KNOWS WHAT YOU CARRY, WEAR AND KNOW. Owner, from the
+// device: the REINFORCE YOUR GEAR rows did not say which copy was equipped nor
+// show the complete player-facing name, so two like-named instances could not be
+// told apart before a permanent spend; and learned workings/procedures could
+// still look purchasable. ONE CAUSE, TWO SYMPTOMS - the vendor screen was
+// approximating state instead of projecting it. The inventory's name /
+// worn-where / hold-label logic lived as closures in its render body where no
+// other screen could reach it, so the reinforcement rows built a name from bare
+// item.name and used the equipment authority to SORT and never to LABEL. A
+// Procedure Text is appended to vendor.offers once at scene build and the shelf
+// is a persisted snapshot, so a learned text stayed on the BUY list, tappable,
+// refused only by a log line the screen never shows (engine already refused
+// before the purse - presentation-only, no double charge; recipes were already a
+// live projection since OTA-1731). Repair: app/engine/itemIdentity.ts holds the
+// extracted-verbatim instanceDisplayName / equippedWhereLabel / holdLabelFor and
+// InventoryScreen now CALLS them (OTA-1550's id-first rule moved intact);
+// vendors.shelfKnowledge answers "is this row knowledge the character holds" and
+// BOTH the screen (checkmark KNOWN, disabled) and buyFromVendor (refuse first) read
+// it. Reinforce rows: full name on two lines, rarity +level, durability now to
+// after, damage, One-/Two-handed, EQUIPPED (main hand) or in your pack, rolled
+// perks and coating procs, the rung and its materials; the confirm sheet's first
+// line is the instance and where it is worn; row to sheet to spend rides the
+// instance id. No pricing, cap, temper, consignment or recipe rule touched.
+export const OTA_BUILD_ID = '2026-09-07-1736-the-vendor-knows-what-you-carry';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-07-1735-the-instrument-was-off';// golem catch-up 2026-09-07: markerless publish of OTA-1735 - instrumentation
 // only, from the task #30 investigation of 11 native deaths (9 on an OTA-apply
 // boot). The finding is in the measuring, not yet in the game: the runtime
 // pressure watch (memory-warning listener, AppState listener, freeze clock) is

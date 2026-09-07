@@ -8,7 +8,7 @@ import gearData from '../data/items/gear.json';
 import dogGearData from '../data/items/dogGear.json';
 import recipesData from '../data/items/recipes.json';
 import { pickWeighted } from './rng';
-import type { Enemy, InventoryItem } from './types';
+import type { Enemy, InventoryItem, PlayerCharacter } from './types';
 import type { StallCategory } from './buildings';
 
 export interface VendorOffer {
@@ -734,4 +734,35 @@ export function findVendorByName(name: string): VendorInstance | null {
     voiceId: v.voiceId,
     gender: v.gender,
   };
+}
+
+/** ⚠⚠⚠ OTA-1736 — IS THIS SHELF ROW KNOWLEDGE THE CHARACTER ALREADY HAS?
+ *
+ *  Owner: *"recipes/workings I have already purchased and learned can still
+ *  appear as though they are available for purchase again."*
+ *
+ *  ⚠ WHY: a Procedure Text is appended to `vendor.offers` ONCE, when the scene
+ *  is built (`withTechniqueTextOffer`, which already skips a known technique).
+ *  The shelf is then a persisted SNAPSHOT — buying the text teaches it and
+ *  leaves the row standing, and nothing ever re-asked the question. The store
+ *  refused a second purchase with a log line the vendor screen never shows, so
+ *  the row read as buyable and did nothing: the dead control OTA-220 rules out.
+ *
+ *  ⚠ ONE PREDICATE, TWO READERS. The screen marks the row ✓ KNOWN and disables
+ *  it; `buyFromVendor` refuses through THIS call. Neither derives "known" on its
+ *  own, so a shelf and its counter cannot disagree. The authority underneath is
+ *  the character's `knownTechniques` — never vendor purchase history, which
+ *  would let a second vendor sell what the first one taught.
+ *
+ *  ⚠ Recipes are NOT shelf rows (they are the WORKINGS TO LEARN menu, which
+ *  projects `knownRecipes` live — OTA-1731); nothing to do for them here. */
+export function shelfKnowledge(
+  itemName: string,
+  player: PlayerCharacter | null | undefined,
+): { kind: 'technique'; known: boolean } | null {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const AT = require('./aetherTechniques') as typeof import('./aetherTechniques');
+  const tech = AT.findTechniqueByTextName(itemName);
+  if (!tech) return null;
+  return { kind: 'technique', known: AT.knowsTechnique(player, tech.id) };
 }

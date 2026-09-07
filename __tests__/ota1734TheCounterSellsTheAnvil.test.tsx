@@ -271,7 +271,8 @@ describe('OTA-1734 - vendor → choose → preview → confirm → changed once'
     expect(listed).toContain('REINFORCE YOUR GEAR');
     expect(listed).toContain('Rusted Blade');
     expect(listed).toContain(`${q.tc} TC`);
-    expect(listed).toContain(`+0 of ${REINFORCE_MAX_LEVEL}`);
+    // OTA-1736 — the ladder line reads `+0 → +1 of 3` now, beside the materials.
+    expect(listed).toContain(`+0 \u2192 +1 of ${REINFORCE_MAX_LEVEL}`);
     expect(listed).toContain(`${q.from.current}/${q.from.max}`);
     expect(listed).toContain(`${q.to.current}/${q.to.max}`);
     W(`  row: Rusted Blade · +0 of 3 · ${q.from.current}/${q.from.max} → ${q.to.current}/${q.to.max} · ${q.tc} TC`);
@@ -412,7 +413,9 @@ describe('OTA-1734 - the sheet names the obstacle instead of failing quietly', (
     // ⚠ OTA-1731's rule: an ABSENCE cannot carry the meaning "this one is done".
     expect(listed).toContain('Rusted Blade');
     expect(listed).toContain('✓ +3 MAX');
-    expect(listed).toContain(`+3 of ${REINFORCE_MAX_LEVEL}`);
+    // OTA-1736 — a maxed row carries its level on the rarity chip (`Common +3`); the
+    // ladder line is for a rung that can still be bought.
+    expect(listed).toContain('Common +3');
     // and it is not a control — no confirm sheet can be opened from it
     const row = tree.root.findAll((n) => textOf(n).includes('✓ +3 MAX') && n.props?.accessibilityRole === 'button')[0];
     expect(row).toBeDefined();
