@@ -12547,9 +12547,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
         enemyCount: get().currentScene?.enemies?.length ?? 0,
         currentLocationId: pl.currentLocationId,
         challengeOn: challengeActive('parley_of_factions'),
+        // ⚠⚠⚠ OTA-1728 — ASK WHETHER A MISSION STAGE CLAIMS THIS GROUND FIRST.
+        // `stageUnderfoot` is the existing authority for "the tracked contract
+        // whose current stage stands on this cell" — the same stageLocationId +
+        // standingAtLocation + payingIntent the three verb matchers use. Reusing
+        // it means there is no second answer to that question to drift.
+        missionAskHere: (require('../engine/missionTrace') as typeof import('../engine/missionTrace')).stageUnderfoot(pl)?.ask ?? null,
       })) {
-        const sealVerb = /\b(seal|forge|complete|finish)\b.*\b(alliance|pact|peace|deal|truce|accord)\b|^(seal|forge)\b|\bbroker\s+(the\s+)?(alliance|pact|peace|deal)\b/i;
-        const parleyVerb = /\b(parley|approach|examine|inspect|survey|meet|talk|speak|leaders?|factions?|broker)\b/i;
+        // ⚠ OTA-1728 — the two regexes moved into broker.ts, which is where the
+        // rule lives. They were written out here, so nothing could consult them
+        // without a third copy.
+        const sealVerb = broker.SEAL_VERB_RE;
+        const parleyVerb = broker.PARLEY_VERB_RE;
         if (sealVerb.test(trimmed) || parleyVerb.test(trimmed)) {
           if (!_opts?.silent) get().appendLog('player', trimmed);
           handleBroker(get, set, trimmed, sealVerb.test(trimmed));

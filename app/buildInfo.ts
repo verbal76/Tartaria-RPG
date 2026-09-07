@@ -28554,7 +28554,28 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // through resolveDisplayWeapon (the OTA-705 rule) instead of a name lookup that
 // could read a fused piece's style off a colliding catalog row. No font size
 // changed; the suite pins all five at their current values.
-export const OTA_BUILD_ID = '2026-09-07-1727-the-card-stops-cutting-the-warning';
+// ⚠⚠⚠ OTA-1728 - the parley stone ate the mission. Found by DRIVING every
+// storyline and mystery stage by stage (stand on the stage's ground, carry what
+// it requires, type the verb the card asks for) rather than by checking that the
+// data parses. 30 of 32 walked their whole chain; two stalled dead, both on the
+// SAME tile with the SAME check kind - a `diplomacy` stage whose ground is the
+// Parley Ground. story_dynasty_blood_aetherborn stalled 3 of 6 and
+// mystery_pale_signal stalled at its FIRST stage, so that mystery could not be
+// completed by anybody. Cause: parleyInterceptEligible hands any parley-ish verb
+// typed on that tile to the Guild Broker and the store RETURNS before the mission
+// matcher runs, and its verb list contains `talk` - which is the word the game
+// itself prints for a diplomacy stage ("talk it through"). Causation isolated
+// rather than argued: one predicate forced false, nothing else changed, 3/6 -> 6/6
+// and 0/4 -> 4/4. Fixed by making the stone yield to a mission stage that claims
+// this ground, asked through stageUnderfoot (the existing authority, same
+// stageLocationId + standingAtLocation + payingIntent the verb matchers use, so no
+// second answer was written), and only where the collision is real - the guard
+// tests the stage's own ASK against the same regex, so exactly one of seven asks
+// yields today and a retuned label moves the guard with it. Both verb regexes moved
+// into broker.ts; the store had its own copies. Gamut after: 32 missions, 165 stage
+// advances, 0 stalls, plus wrong-ground / missing-item / double-submit / reload.
+export const OTA_BUILD_ID = '2026-09-07-1728-the-parley-stone-ate-the-mission';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-07-1727-the-card-stops-cutting-the-warning';
 // golem catch-up 2026-09-07: markerless publish of OTA-1727 - the card stops
 // cutting the warning off. The weapon inventory row is three fixed semantic rows
 // now (rarity/damage/durability/proc; One-handed or Two-handed with the equip

@@ -167,6 +167,12 @@ describe('placedAt — fixtures can no longer invent impossible coordinates', ()
       });
     }
     expect(bare).toBeGreaterThan(30); // the scan still finds its subjects
-    expect(bare).toBeLessThanOrEqual(50); // the baseline — shrink-only
+    // ⚠ OTA-1728 — 50 → 52. Two new sites, both in the class this test's own note
+    //   already names: "minimal argument objects for pure predicates … not player
+    //   state; coords would be dead weight", and it lists parleyInterceptGuard by
+    //   name. ota1728's two are arguments to that same predicate, which takes a
+    //   location ID and never a player. Re-baselined per the instruction above
+    //   ("say which one at the site and re-baseline"), and said at both sites.
+    expect(bare).toBeLessThanOrEqual(52); // the baseline — shrink-only
   });
 });
