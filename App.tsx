@@ -386,6 +386,12 @@ export default function App() {
           const verdict = await st.nativeSdkSawCrashLastRun();
           const line = await cl.applyNativeSdkVerdict(verdict);
           if (line) useGameStore.getState().appendLog('debug', line);
+          // ⚠ OTA-1735 — and WHY, when it has no opinion. Ten records in a row
+          //   have said "could not say"; that sentence names two causes and picks
+          //   neither, so the next cycle gets the actual one.
+          try {
+            useGameStore.getState().appendLog('debug', `native-sdk verdict: ${st.nativeSdkVerdictReason()}`);
+          } catch { /* ignore */ }
         } catch { /* an instrument may never break the boot */ }
         await cr.loadReportingPref();
         // ⚠ OTA-1488 — the FIRST send waits for the one-time opt-out notice:
@@ -443,6 +449,25 @@ export default function App() {
         useGameStore.setState({ otaBootResolved: true });
       }
     }, 8000);
+    // ⚠⚠⚠ OTA-1735 — THE INSTRUMENT IS ARMED BEFORE THE THING IT MEASURES.
+    //
+    // `startRuntimePressureWatch` is started at the end of `bootQwen`, and since
+    // OTA-1493 bootQwen waits for the FIRST PLAYER ACTION. Every boot-time process
+    // kill in the owner's ledger reads `(no action yet)` — so every one of them
+    // was recorded by an instrument that had not been switched on. The memory
+    // warning listener, the AppState listener (which stamps the crumb on every
+    // background/foreground transition) and the freeze clock all arrive too late
+    // to see the only window they are needed for.
+    //
+    // ⚠ HERE, not after hydrate: the OTA apply itself happens inside the hydrate
+    //   chain below, and the reload-target boot is the case under investigation.
+    //   Arming first means the AppState trail covers the apply and the reload.
+    //
+    // ⚠ COST: one rAF timestamp per frame and one 5s setTimeout — measured
+    //   thresholds are 2000ms, so a 700ms native load at boot cannot trip a false
+    //   stall. Deliberately NOT a heavier probe: an instrument that changes the
+    //   boot it is measuring invalidates its own result.
+    try { useGameStore.getState().startBootPressureWatch(); } catch { /* never block boot */ }
     setStage('hydrate:start');
     void hydrate()
       .then(async () => {

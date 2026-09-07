@@ -363,13 +363,36 @@ export function toSentryEvent(rec: CrashRecord): Record<string, unknown> {
  * after init, and the ledger writes the answer onto the death it just minted.
  * Three answers, never two: `null` is "could not say", not "no".
  */
+/** ⚠⚠⚠ OTA-1735 — WHY THE VERDICT HAS NO OPINION, because it has had none TEN
+ *  TIMES OUT OF TEN. Every native-death record in the owner's ledger reads *"the
+ *  native SDK could not say whether that life crashed (no native module, or not
+ *  initialised in time)"* — a sentence that names two causes and distinguishes
+ *  neither, on the one instrument that could separate a SIGNAL CRASH from an OS
+ *  MEMORY KILL. Those two have opposite fixes.
+ *
+ *  ⚠ The four ways this returns null were collapsed into one value, so a wrong
+ *  guess about which was in play could not be corrected by reading the log. They
+ *  are recorded apart now. A `false` is a real finding (the SDK was up and saw no
+ *  crash → an OS kill); `sdk-absent` and `not-a-function` are build facts;
+ *  `threw` and `non-boolean` point at the native init race, which is the one this
+ *  code can actually do something about later. */
+let lastVerdictReason = 'not asked';
+export function nativeSdkVerdictReason(): string { return lastVerdictReason; }
+
 export async function nativeSdkSawCrashLastRun(): Promise<boolean | null> {
   try {
     const s = loadSdk();
-    if (!s || typeof s.crashedLastRun !== 'function') return null;
+    if (!s) { lastVerdictReason = 'sdk-absent (require failed, or init/captureEvent missing)'; return null; }
+    if (typeof s.crashedLastRun !== 'function') { lastVerdictReason = 'not-a-function (SDK present, method missing)'; return null; }
     const v = await s.crashedLastRun();
-    return typeof v === 'boolean' ? v : null;
-  } catch {
+    if (typeof v === 'boolean') { lastVerdictReason = `answered ${v}`; return v; }
+    // ⚠ The native signature is `Promise<boolean | undefined | null>`: the SDK
+    //   returning nothing is the native side saying it has not read the previous
+    //   run's marker yet, which is a TIMING answer, not an absence of one.
+    lastVerdictReason = `non-boolean (${v === undefined ? 'undefined' : String(v)}) — native side had not resolved the last run yet`;
+    return null;
+  } catch (e) {
+    lastVerdictReason = `threw (${e instanceof Error ? e.message : String(e)})`;
     return null;
   }
 }

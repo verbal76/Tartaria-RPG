@@ -28,6 +28,25 @@ let fired = false;
 export function armQwenWarm(warm: () => void): void {
   if (fired) { warm(); return; } // the action beat the arm — warm right now
   armedWarm = warm;
+  // ⚠⚠⚠ OTA-1735 — AND SAY WHAT IS ACTUALLY TRUE NOW, because `qwen:deferred` was
+  // the last word on five death records and it names a subsystem that has done
+  // NOTHING. Arming stores a closure; bootQwen is not called until the player acts.
+  //
+  // ⚠ Worse, it is the LAST stamp of a fully successful boot — `boot:complete`,
+  // `audio:*` and `tts:*` are all stamped synchronously before the mlhealth chain
+  // resolves, so `qwen:deferred` lands after them and then nothing writes again
+  // until the player reaches the exploration screen (the heartbeat's only home).
+  // It is an absorbing state: a death one second later and a death five minutes
+  // later both read `boot:qwen:deferred`, and it points the reader at Qwen for
+  // both. Two investigations have now started at the wrong subsystem because of
+  // this string.
+  //
+  // ⚠ Lazy require + swallow: an instrument may never break the thing it measures.
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    (require('../engine/saveSystem') as typeof import('../engine/saveSystem'))
+      .stampBreadcrumbPhase('boot:idle:awaiting-first-action');
+  } catch { /* ignore */ }
 }
 
 /** The action door: the first call runs the armed warm; every later call is

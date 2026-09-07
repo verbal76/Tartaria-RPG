@@ -7120,6 +7120,21 @@ export interface GameStore {
   // OTA-1733 — raise THIS copy's ceiling at a smith; separate from repair.
   reinforceWithVendor: (itemName: string, itemId?: string) => void;
   repairWithVendor: (itemName: string) => void;
+  /** ⚠⚠⚠ OTA-1735 — ARM THE PRESSURE INSTRUMENT AT BOOT.
+   *
+   *  It has always been started at the END of `bootQwen`, and OTA-1493 deferred
+   *  bootQwen to the FIRST PLAYER ACTION — so on a launch where the player never
+   *  acts, the memory-warning listener, the AppState listener and the freeze
+   *  clock are never installed at all. Every one of the owner's boot-time process
+   *  kills reads `(no action yet)`, which means every one of them happened with
+   *  the instrument switched off. "Memory warnings: none this session" on those
+   *  records is not a measurement; it is the absence of a listener.
+   *
+   *  Idempotent by construction (`startRuntimePressureWatch` calls its own stop
+   *  first), so bootQwen restarting it later is exactly the re-hydrate case it
+   *  already handles, and the counters it keeps are NOT reset by a restart —
+   *  a warning seen at boot survives into the session's report. */
+  startBootPressureWatch: () => void;
   acceptFactionQuest: (titleOrId: string) => void;
   turnInFactionQuest: (titleOrId: string, remote?: boolean) => void;
   /** OTA-850 — accept a faction bounty: store it and set course for the quarry's
@@ -30433,6 +30448,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     startQwenWatchdog,
     startRuntimePressureWatch: startPressureWatchWithHooks,
   }),
+
+  // ⚠ OTA-1735 — the same wrapper the AI lifecycle is handed, exposed so the BOOT
+  //   can arm the instrument before anything it is supposed to be watching runs.
+  //   One starter, one hook set; this is a second CALLER, never a second watch.
+  startBootPressureWatch() {
+    startPressureWatchWithHooks(get, set);
+  },
 
   cancelGeneration() {
     // Drops the streaming buffer + flag. The in-flight inference call keeps

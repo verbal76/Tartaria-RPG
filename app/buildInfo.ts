@@ -28703,8 +28703,44 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // characters on an existing chip rather than a new one, because Row 1 is the row
 // OTA-1727 was called in to unclog and " +1" cannot break away from its word.
 // Absent at +0, so gear that has never seen an anvil reads exactly as before.
-export const OTA_BUILD_ID = '2026-09-07-1734-the-counter-sells-the-anvil';
-// golem catch-up 2026-09-07: markerless publish of OTA-1734 - the reinforcement
+// ⚠⚠⚠ OTA-1735 - THE INSTRUMENT WAS OFF FOR THE WINDOW IT EXISTS TO WATCH.
+// Investigation of 11 native deaths (9 on an OTA-apply boot). INSTRUMENTATION
+// ONLY - no behaviour change to the boot under investigation, on the owner's
+// standing rule: measure the cause, or ship an instrument.
+// ⚠⚠ THE DEFECT IS IN THE MEASURING, NOT (YET) IN THE GAME.
+// `startRuntimePressureWatch` - memory-warning listener, AppState listener (which
+// stamps the crumb on every background/foreground transition) and freeze clock -
+// is started at the END of bootQwen, and OTA-1493 deferred bootQwen to the FIRST
+// PLAYER ACTION. Every boot-time kill reads "(no action yet)", so every one was
+// recorded with the listeners not installed. "Memory warnings: none this session"
+// on those records is not a measurement; it is the absence of a listener, ten
+// times out of ten. The boot now arms the same wrapper the AI lifecycle is handed
+// - one watch, a second CALLER - before hydrate, so the OTA apply and the
+// reload-target boot are both covered. Idempotent by construction, and neither
+// stop nor start resets the counters, so what the boot sees survives.
+// ⚠⚠ `boot:qwen:deferred` NAMED AN INNOCENT SUBSYSTEM. Arming stores a closure;
+// bootQwen is never called. And it is the LAST stamp of a SUCCESSFUL boot -
+// audio:*, tts:* and boot:complete are stamped synchronously while the mlhealth
+// chain is still pending, so it lands after them and nothing writes again until
+// the exploration heartbeat starts. An absorbing state: a death 1s later and one
+// 5 minutes later read identically and both accuse Qwen. Arming now stamps
+// `boot:idle:awaiting-first-action`.
+// ⚠ RULED OUT BY THE DATA, not by argument: Qwen (o0, closure never called);
+// OTA-1587's orphaned-llama-context (the handoff says o0/r0 on boot-front and
+// o1/r1 - genuinely released - on mid-session); Kokoro (prewarm is gated on
+// ttsEnabled and the device has tts=off); OTA-1731/the inventory screen (that
+// crash's action was 51s stale and lastScreen was exploration).
+// ⚠ A READING CORRECTED BEFORE IT SHIPPED: the apparent 34-64ms gap between the
+// last checkpoint and death is NOT a survival window. ageMs is lastAlive-bootAt
+// while "into the action" is phaseAt-at; the difference is an epoch offset. And
+// "alive 0ms after it" proves nothing at boot, because the heartbeat runs on the
+// exploration screen only. Both traps are pinned by the suite.
+// ⚠ The native-SDK verdict has declined 10/10 with a sentence naming two causes
+// and picking neither. Its four decline paths are recorded apart now and the boot
+// logs which one, because a `false` (SDK up, saw no crash) would mean an OS kill
+// and a `threw`/`non-boolean` would mean the native init race - opposite fixes.
+export const OTA_BUILD_ID = '2026-09-07-1735-the-instrument-was-off';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-07-1734-the-counter-sells-the-anvil';// golem catch-up 2026-09-07: markerless publish of OTA-1734 - the reinforcement
 // service reaches the player. The vendor's BUY tab carries a REINFORCE YOUR GEAR
 // section built from the WORKINGS TO LEARN pattern - collapsible offerRows into
 // the one shared confirm sheet - so nothing here is a new kind of control. Every
