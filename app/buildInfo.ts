@@ -28555,6 +28555,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // could read a fused piece's style off a colliding catalog row. No font size
 // changed; the suite pins all five at their current values.
 export const OTA_BUILD_ID = '2026-09-07-1727-the-card-stops-cutting-the-warning';
+// golem catch-up 2026-09-07: markerless publish of OTA-1727 - the card stops
+// cutting the warning off. The weapon inventory row is three fixed semantic rows
+// now (rarity/damage/durability/proc; One-handed or Two-handed with the equip
+// state; scaling stat then resists and special properties). Two SILENT clipping
+// sites are closed: row 1 was a flex row with no flexWrap (185 of 301 weapons
+// overflowed bare, 301 of 301 coated+reserved) and row 3 was numberOfLines={1}
+// (138 of 301 truncated, hiding 15 "cannot be coated", 3 permanent unlocks, 1
+// "it EXPLODES in your hands" and 2 friendly-fire warnings). Fixed as layout;
+// no font shrank and the suite pins all five sizes. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-07-1726-the-road-back-to-a-dog';
 // golem catch-up 2026-09-07: markerless publish of OTA-1726 - the road back to a
 // dog. The puppy vendor could never be completed (it told the player to type
