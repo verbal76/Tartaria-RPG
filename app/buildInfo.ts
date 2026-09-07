@@ -28610,6 +28610,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // climb". TEXT WRONG / ENGINE RIGHT; the engine's stricter answer is now the only
 // one any hint decides on. knowsATower survives as an exported helper.
 export const OTA_BUILD_ID = '2026-09-07-1730-the-hint-points-somewhere-you-can-go';
+// golem catch-up 2026-09-07: markerless publish of OTA-1730 - the hint points
+// somewhere you can still go. The Arbiter's two "try something else" wall hints
+// named the climbs while branching on knowsATower, which is true of a tower the
+// player has already topped - so an all-crested player was sent back to finished
+// content. They branch on knowsAnUncrestedTower now, the strict predicate that sat
+// in the same module and was already used correctly by the vendor rumour. hal took
+// the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-07-1729-the-guardian-payout-guards-itself';
 // golem catch-up 2026-09-07: markerless publish of OTA-1729 - the Guardian payout
 // guards itself. The Core Guardian's signature drops now check the same
