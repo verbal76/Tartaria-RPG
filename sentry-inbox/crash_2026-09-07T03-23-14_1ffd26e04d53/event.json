@@ -1,0 +1,243 @@
+{
+  "id": "1ffd26e04d53462489cc74884ac604eb",
+  "groupID": "7689752968",
+  "eventID": "1ffd26e04d53462489cc74884ac604eb",
+  "projectID": "4511945117532160",
+  "size": 3311,
+  "entries": [
+    {
+      "data": {
+        "formatted": "Process died with no orderly exit while: tap \"inventory\""
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-07-1731-sorted-by-where-it-goes",
+  "message": "Process died with no orderly exit while: tap \"inventory\"",
+  "title": "Process died with no orderly exit while: tap \"inventory\"",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db94:d742:ad2:ae57:5032:4dbb",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "afe3086a7c174bbb8d44ffc0ec9e3a39",
+      "span_id": "8534dc97dbc2706f",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "actionAgeMs": 51030,
+    "id": "1788751394327_native-death",
+    "lastAction": "tap \"inventory\"",
+    "lastPhase": "rendered",
+    "lastPhaseAgeMs": 1883,
+    "lastRoom": "monarch_waystation",
+    "lastScreen": "exploration",
+    "launchAfterOta": true,
+    "launchAgeMs": 59661,
+    "launchCtx": "o0/r0/l0/p0/dn0",
+    "launchOtaGapMs": 189,
+    "launchOtaPath": "boot-front",
+    "launchPrevCtx": "o0/r0/l0/p0/dn0",
+    "nativeSdkSawCrash": "unknown",
+    "sinceBootMs": 59661,
+    "stack": "(none \u2014 the process died without one)"
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "Process died with no orderly exit while: tap \"inventory\""
+  },
+  "tags": [
+    {
+      "key": "build",
+      "value": "2026-09-07-1731-sorted-by-where-it-goes"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-07-1731-sorted-by-where-it-goes"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "native-death"
+    },
+    {
+      "key": "level",
+      "value": "fatal"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-07-1731-sorted-by-where-it-goes"
+    },
+    {
+      "key": "stage",
+      "value": "rendered"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db94:d742:ad2:ae57:5032:4dbb",
+      "query": "user.ip:\"2607:fb90:db94:d742:ad2:ae57:5032:4dbb\""
+    },
+    {
+      "key": "version",
+      "value": "4.32.11"
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-07T04:42:29.742644Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-07T03:23:14.327000Z",
+  "fingerprints": [
+    "d2a856763bc7c5254aad1c4fed660793"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1958350021,
+    "commitCount": 3,
+    "data": {},
+    "dateCreated": "2026-09-07T03:21:55.981904Z",
+    "dateReleased": "2026-09-07T03:23:30.391751Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "19475c4a6258662541d5f43bdd63624e4fc01fe6",
+      "message": "[ota-hal] OTA-1731 \u2014 sorted by where it goes, and the vendor admits what you own\n\nBoth of your asks. The second one turned out to have a dead message behind it.\n\n\u2500\u2500 1. ARMOR AND JEWELLERY DIVIDE BY BODY PART \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\n*\"armor should also be split up into subcategories like the weapons, but just by\nwhat part of the body it is for, same as for the rings/amulets category.\"*\n\n    ARMOR                 AMULETS & RINGS\n      HEAD \u00b7 n              AMULETS \u00b7 n\n      CHEST \u00b7 n             RINGS \u00b7 n\n      HANDS \u00b7 n\n      LEGS \u00b7 n\n      FEET \u00b7 n\n      CLOAKS \u00b7 n\n\n\u26a0\u26a0 THE MECHANISM WAS REUSED, NOT COPIED. OTA-1683 already built labelled runs\ninside a section for Weapons. The screen carried\n`cat === 'weapon' ? weaponRuns(...) : [one unlabelled run]` inline \u2014 adding two\nmore dividing categories there would have been three special cases in a render\nbody. That ternary is now one `categoryRuns(cat, items)`, so the screen asks one\nquestion and a fourth category later cannot mean a fourth branch.\n\n\u26a0\u26a0\u26a0 THE AUTHORITY IS `validSlotsForItem`, and that is the point rather than a\nconvenience. It is the SAME function `slotFillLabelFor` already calls to print\n\"Head\" / \"Chest\" on the row itself, and the one the equip router obeys \u2014 so a\nsubsection heading can never disagree with the rows under it, and can never claim\na slot the game will not actually put the piece in. It also resolves FUSED pieces\noff `uniqueStats` (OTA-224) instead of a name lookup that misses them entirely.\n\n\u26a0 MEASURED BEFORE ANY OF IT WAS WRITTEN, because a heading nothing lands under is\nworse than no heading:\n\n    297 armour rows ....  head 77 \u00b7 chest 60 \u00b7 cloak 43 \u00b7 hands 41 \u00b7 feet 39 \u00b7 legs 37\n     48 accessories ....  ring 28 \u00b7 amulet 20\n    rows that fail to resolve to a slot ......... 0\n\nThere is no \"Other\" bucket in the data. One exists in the code anyway, so a fused\noddity or a future authored row stays REACHABLE instead of falling out of the list\nbecause it did not fit a heading.\n\n\u26a0 A SECTION WITH ONLY ONE KIND IN IT GETS NO SUB-HEADING. Three helms under a\nheading reading \"HEAD\" inside a section already titled ARMOR is a label repeating\nits own parent.\n\n\u2500\u2500 2. THE VENDOR ADMITS WHAT YOU ALREADY OWN \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\n*\"ensure that if I have already bought a 'working to learn' I can see that I own\nit if someone tries to sell it to me again.\"*\n\n\u26a0\u26a0 THE ROW VANISHED. Three workings became two, and an ABSENCE had to carry the\nmeaning \"you own this\" \u2014 which no absence can. You could not tell whether the\ntrader never stocked it or whether it was already in your book.\n\n\u26a0 THE VENDOR GENUINELY STILL HAS IT, and that is OTA-802's design working\ncorrectly: a vendor's menu is a FIXED seeded slice of the full discoverable pool\nso it cannot reroll (\"learning one just drops it, the rest keep their identity\").\nThe stock was right; only the display was lying by omission. The row stays now and\nreads \u2713 KNOWN in completion-green, greyed, and NOT tappable \u2014 tapping would open a\nconfirm sheet for a purchase the store then refuses, which is the dead-control\ndefect OTA-220 rules out.\n\n\u26a0\u26a0 ONE SLICE, TWO VIEWS. `vendorRecipeMenu` computes the three rows and marks the\nowned ones; `vendorRecipeOffers` is now DERIVED from it as \"the menu minus what you\nknow\" \u2014 byte-identical output to what it always returned, so every existing caller\nand OTA-802's stability contract are untouched, and \"which three\" has exactly one\nanswer instead of the slice arithmetic existing twice. The screen's own duplicate\n`.filter` on knownRecipes went with it: it re-applied a rule the engine had already\napplied, which is how the shelf and the display ended up with two opinions.\n\n\u26a0\u26a0\u26a0 AND IT MADE A DEAD MESSAGE LIVE. `buyFromVendor` looks the typed name up in\nthe recipe list and then checks `knownRecipes.includes(...)` to say\n\n    \"You already know the Hearty Stew working.\"\n\nIt was reading `vendorRecipeOffers`, which has ALREADY dropped everything you know\n\u2014 so that branch could never be true. Typing the name of a working you own fell\nthrough to the ordinary item lookup and answered *\"doesn't carry any Hearty Stew\"*,\nwhich is the exact opposite of the truth: they carry it, you own it. It reads the\nMENU now, so the message the game already had can finally be said.\n\n\u2500\u2500 ONE EXISTING PIN RE-POINTED, AND ITS CLAIM NARROWED \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\nOTA-1683's suite pinned the literal ternary, and its title read \"\u2026and every other\nsection is one unlabelled run\". That second half is no longer true. Re-pointing the\nstring alone would have left a test asserting a sentence the game had stopped\nmeaning, so the title and the assertions now state the property OTA-1683 actually\ncared about \u2014 Weapons render in labelled runs, a section with nothing to divide\nrenders as one unlabelled run \u2014 checked against `categoryRuns` itself rather than\nagainst a source literal.\n\n11 tests including a REAL RENDER that opens both sections and reads all six body\nheadings plus Amulets and Rings off the tree. 19 gates green, complete surface\nclean.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-07T03:19:34Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-07-1731-sorted-by-where-it-goes",
+          "shortVersion": "tartaria@4.32.11+2026-09-07-1731-sorted-by-where-it-goes",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-07T03:23:30.391751Z",
+          "dateCreated": "2026-09-07T03:21:55.981904Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "156058428",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-07T03:23:30.705862Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-07-1731-sorted-by-where-it-goes",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-07-1731-sorted-by-where-it-goes",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-07-1731-sorted-by-where-it-goes",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-07-1731-sorted-by-where-it-goes)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": "14064b930d5f49e79735fb49a3f467ce"
+}

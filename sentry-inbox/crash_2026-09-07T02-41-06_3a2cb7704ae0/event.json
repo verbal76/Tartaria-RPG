@@ -1,0 +1,241 @@
+{
+  "id": "3a2cb7704ae04d67a1f5a58e60afaa18",
+  "groupID": "7703017060",
+  "eventID": "3a2cb7704ae04d67a1f5a58e60afaa18",
+  "projectID": "4511945117532160",
+  "size": 3339,
+  "entries": [
+    {
+      "data": {
+        "formatted": "Process died with no orderly exit while: (no action yet)"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-07-1729-the-guardian-payout-guards-itself",
+  "message": "Process died with no orderly exit while: (no action yet)",
+  "title": "Process died with no orderly exit while: (no action yet)",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db94:d742:ad2:ae57:5032:4dbb",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "10ab896a7e384d71a67c5303bede1a92",
+      "span_id": "bfe2780ff2b62f6a",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "actionAgeMs": 1030,
+    "id": "1788748866328_native-death",
+    "lastAction": "(no action yet)",
+    "lastPhase": "boot:qwen:deferred",
+    "lastPhaseAgeMs": 0,
+    "launchAfterOta": true,
+    "launchAgeMs": 1094,
+    "launchCtx": "o0/r0/l0/p0/dn0",
+    "launchOtaGapMs": 222,
+    "launchOtaPath": "mid-session",
+    "launchPrevCtx": "o1/r1/l0/p1/dn0",
+    "nativeSdkSawCrash": "unknown",
+    "sinceBootMs": 1094,
+    "stack": "(none \u2014 the process died without one)"
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "Process died with no orderly exit while: (no action yet)"
+  },
+  "tags": [
+    {
+      "key": "build",
+      "value": "2026-09-07-1729-the-guardian-payout-guards-itself"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-07-1729-the-guardian-payout-guards-itself"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "native-death"
+    },
+    {
+      "key": "level",
+      "value": "fatal"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-07-1729-the-guardian-payout-guards-itself"
+    },
+    {
+      "key": "stage",
+      "value": "boot:qwen:deferred"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db94:d742:ad2:ae57:5032:4dbb",
+      "query": "user.ip:\"2607:fb90:db94:d742:ad2:ae57:5032:4dbb\""
+    },
+    {
+      "key": "version",
+      "value": "4.32.11"
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-07T03:13:26.893125Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-07T02:41:06.328000Z",
+  "fingerprints": [
+    "ded7ba861a46476d883cdebd335596a0"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1958282860,
+    "commitCount": 3,
+    "data": {},
+    "dateCreated": "2026-09-07T02:09:47.452562Z",
+    "dateReleased": "2026-09-07T02:31:25.693470Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "8aef7b125c9900a93fafdbf3a7045a53199d61d2",
+      "message": "audit the ship gate's own exemptions, and promote the 13 that were only names\n\nMarkerless publish so the golem line picks up OTA-1729. hal took the marker.\n\n\u26a0\u26a0\u26a0 A LIST NOBODY HAS MEASURED IS A LONGER VERSION OF THE OLD GUESS. OTA-1728\nreplaced the filename regex with an explicit list of 30, each with a reason. This\npass tested the reasons. Every suite was TIMED with a 200s ceiling, and every fast\none was then run THREE TIMES to prove it was deterministic rather than lucky:\n\n    \u226410s and green ......... 13 suites \u00b7 59 tests \u00b7 3/3 green each  \u2192 PROMOTED\n    11\u201361s and green ....... 10 suites                              \u2192 still exempt\n    red ....................  4 suites                              \u2192 still exempt\n    over the 200s ceiling ..  4 suites                              \u2192 still exempt\n\nTHIRTEEN SUITES CARRYING 59 TESTS WERE EXEMPT ONLY BECAUSE OF THEIR NAMES, at a\ntotal cost of about 57 seconds:\n\n    statGrowthBalanceSim 2s \u00b7 stressMode_chaos 3s \u00b7 stressMode_drunkSpelling 3s\n    craftingInventoryChaosSim 4s/15 \u00b7 dogHungerTimingChaos 4s/11 \u00b7 encounterStress 4s/7\n    golemStressSweep 4s \u00b7 travelSceneBarChaos 4s/5 \u00b7 stressMode_collectAll 5s\n    edgeCaseSweepPostCleanup 6s/17 \u00b7 stressMode_cartographer 6s \u00b7 engagementSmoke 8s/3\n    metaNavStress 8s\n\n\u26a0 NOT EVERYTHING WAS PROMOTED, deliberately \u2014 you said not to. The 11\u201361s tier is\nreal coverage but costs about five more minutes of blocking CI, and that trade is\nyours to make, so its measured cost is written against each entry.\n\n\u26a0\u26a0 FOUR EXEMPT SUITES ARE RED and the list now says so out loud rather than\nletting the exemption hide it: engineStateChaosSim (10s, 2 failing),\ncompletionistOutcomeSweep (48s, 5), interactionStress (123s, 1), yearSimulation\n(124s, 1). All four predate this pass. None may be promoted while red, and each is\nits own investigation.\n\n    blocking 1207 \u00b7 non-blocking 18 \u00b7 total 1225\n\nFull surface with the promotions in: 1207 suites, 12463 tests, 0 failures.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-07T02:29:12Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-07-1729-the-guardian-payout-guards-itself",
+          "shortVersion": "tartaria@4.32.11+2026-09-07-1729-the-guardian-payout-guards-itself",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-07T02:31:25.693470Z",
+          "dateCreated": "2026-09-07T02:09:47.452562Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "156050136",
+      "environment": "golem",
+      "dateStarted": null,
+      "dateFinished": "2026-09-07T02:31:26.094354Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-07-1729-the-guardian-payout-guards-itself",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-07-1729-the-guardian-payout-guards-itself",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-07-1729-the-guardian-payout-guards-itself",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-07-1729-the-guardian-payout-guards-itself)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": "35eebb68b2e443f88ea767538e0a6458"
+}
