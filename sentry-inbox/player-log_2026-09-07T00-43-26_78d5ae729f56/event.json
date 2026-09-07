@@ -1,0 +1,253 @@
+{
+  "id": "78d5ae729f564afcb4ff30695949381e",
+  "groupID": "7716124710",
+  "eventID": "78d5ae729f564afcb4ff30695949381e",
+  "projectID": "4511945117532160",
+  "size": 16318,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-06-1725-the-card-pays-what-the-fight-pays #mtqiorcwdyfv [inline 9/56]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-06-1725-the-card-pays-what-the-fight-pays",
+  "message": "player-log 2026-09-06-1725-the-card-pays-what-the-fight-pays #mtqiorcwdyfv [inline 9/56]",
+  "title": "player-log 2026-09-06-1725-the-card-pays-what-the-fight-pays #mtqiorcwdyfv [inline 9/56]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "ba23141394fb42ffb82f1720dc001a74",
+      "span_id": "b2f4c5bea04873c6",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "WzI-wMj-YtM-Dgt-Mjh-UMD-Q6M-jI6-MTc-uNz-AxW-l0g-W3J-ld2-FyZ-F0g-ICA-gIO-KAo-iBT-bW9-vdG-ggU-3Rv-bmU-geD-MgK-ENv-bW1-vbi-kKW-zIw-MjY-tMD-gtM-jhU-MDQ-6Mj-I6M-Tku-MjA-1Wl-0gW-2Rl-YnV-nXS-B1a-Tog-dGF-wIC-Jpb-nZl-c3R-pZ2-F0Z-SIK-WzI-wMj-YtM-Dgt-Mjh-UMD-Q6M-jI6-MjE-uMT-E2W-l0g-W3B-sYX-llc-l0g-aW5-2ZX-N0a-Wdh-dGU-gd2-F0Y-2gg-Zml-yZQ-pbM-jAy-Ni0-wOC-0yO-FQw-NDo-yMj-oyM-S4x-MTd-aXS-BbZ-GVi-dWd-dIH-Bhc-nNl-cjo-gaW-50Z-W50-PWl-udm-Vzd-Gln-YXR-lIG-Nvb-mY9-MS4-wMC-B2Z-XJi-PWl-udm-Vzd-Gln-YXR-lIH-Rhc-mdl-dD1-3YX-Rja-CBm-aXJ-lIH-Jlc-29s-dmV-kPX-dhd-GNo-IGZ-pcm-Ugc-mFu-Z2U-9LS-Blb-mVt-aWV-zPT-Aga-G9v-a3M-9Mg-o=",
+      "WzI-wMj-YtM-Dgt-Mjh-UMD-Q6M-jI6-MjE-uMT-E4W-l0g-W3d-vcm-xkX-SBU-aGU-gd2-F0Y-2gg-Zml-yZS-Bza-XRz-IHR-oZS-B3Y-Xkg-b3J-kaW-5hc-nkg-dGh-pbm-dzI-HNp-dC4-gVG-hlI-EFy-Yml-0ZX-IgZ-G9l-cyB-ub3-Qgb-GVh-biB-pbi-4gW-W91-IG1-vdm-Ugb-24u-Cls-yMD-I2L-TA4-LTI-4VD-A0O-jIy-OjI-xLj-ExO-Fpd-IFt-kZW-J1Z-10g-YXJ-iaX-Rlc-jog-dGV-tcG-xhd-GUg-KHJ-lYX-Nvb-j1x-d2V-uLW-5vd-C1y-ZWF-keS-kKW-zIw-MjY-tMD-gtM-jhU-MDQ-6Mj-I6M-jEu-MTE-5Wl-0gW-2Fy-Yml-0ZX-JdI-FRo-ZSB-Bcm-Jpd-GVy-IGx-vb2-tzI-GFy-b3V-uZC-4gI-lNp-bHQ-tc3-RpZ-mYg-YmF-ubm-Vyc-yBj-cmF-jay-Bpb-iB0-aGU-gd2-luZ-CBs-aWt-lIH-Nsb-3cg-YXB-wbG-F1c-2Uu-IFR-oZS-Bjb-3Vy-dCB-oYX-Mgc-3Rh-bmR-hcm-RzI-HRv-IGt-lZX-AsI-GV2-ZW4-gaG-VyZ-S4i-Cg=-=",
+      "WzI-wMj-YtM-Dgt-Mjh-UMD-Q6M-jI6-MjE-uMT-E5W-l0g-W2R-lYn-VnX-SBh-cmJ-pdG-VyO-iBh-bWJ-pZW-50I-Ghl-bGQ-gKG-hlI-Gp1-c3Q-gc3-Bva-2Up-Cls-yMD-I2L-TA4-LTI-4VD-A0O-jIy-OjI-xLj-I2N-Vpd-IFt-jb2-dua-XRp-dmV-dIF-JFQ-URZ-ICA-oMT-Q1b-XMp-Cls-yMD-I2L-TA4-LTI-4VD-A0O-jIy-OjI-zLj-k0M-lpd-IFt-kZW-J1Z-10g-dWk-6IH-Rhc-CAi-cmV-zdC-IKW-zIw-MjY-tMD-gtM-jhU-MDQ-6Mj-I6M-jMu-OTU-2Wl-0gW-3Bs-YXl-lcl-0gc-mVz-dAp-bMj-AyN-i0w-OC0-yOF-QwN-Doy-Mjo-yMy-45N-Tda-XSB-bZG-Vid-Wdd-IHB-hcn-Nlc-jog-aW5-0ZW-50P-XJl-c3Q-gY2-9uZ-j0x-LjA-wIH-Zlc-mI9-cmV-zdC-B0Y-XJn-ZXQ-9LS-ByZ-XNv-bHZ-lZD-0tI-HJh-bmd-lPS-0gZ-W5l-bWl-lcz-0wI-Ghv-b2t-zPT-IK",
+      "WzI-wMj-YtM-Dgt-Mjh-UMD-Q6M-jI6-MjM-uOT-U4W-l0g-W3d-vcm-xkX-SBZ-b3U-gcm-Vzd-CBm-b3I-gOC-Bob-3Vy-cy4-gKz-ggc-3Rh-bWl-uYS-ByZ-WNv-dmV-yZW-QuI-ChE-YXk-gMz-IsI-GV2-ZW5-pbm-cpC-lsy-MDI-2LT-A4L-TI4-VDA-0Oj-IyO-jIz-Ljk-1OV-pdI-Ftk-ZWJ-1Z1-0gY-XJi-aXR-lcj-ogY-W1i-aWV-udC-BoZ-Wxk-ICh-oZS-Bqd-XN0-IHN-wb2-tlK-Qpb-MjA-yNi-0wO-C0y-OFQ-wND-oyM-joy-My4-5Nz-VaX-SBb-c3l-zdG-VtX-SDi-j7M-gVG-ltZ-SBw-YXN-zZW-Q6I-Dho-Cls-yMD-I2L-TA4-LTI-4VD-A0O-jIy-OjI-zLj-k4N-Fpd-IFt-3b3-JsZ-F0g-QW4-gRX-Rlc-m5h-bCB-EeW-5hc-3R5-IHd-hci-BwY-XJ0-eSB-jcm-Vzd-HMg-dGh-lIH-Jpc-2Ug-4oC-UID-Igb-2Yg-dGh-lbS-wgY-mxh-ZGV-zIG-Fsc-mVh-ZHk-gb3-V0L-iBU-aGV-5J3-ZlI-G1h-cmt-lZC-B5b-3Ug-Zm9-yIH-N0Y-W5k-aW5-nIH-dpd-Ggg-dGh-lIE-11Z-CBN-b25-hcm-Noc-y4K",
+      "WzI-wMj-YtM-Dgt-Mjh-UMD-Q6M-jI6-MjM-uOT-g0W-l0g-W2F-yYm-l0Z-XJd-ICJ-UaG-UgR-XRl-cm5-hbC-BEe-W5h-c3R-5IG-RvI-G5v-dCB-mb3-Jna-XZl-IGE-gZn-JpZ-W5k-IG9-mIH-RoZ-SBN-dWQ-gTW-9uY-XJj-aHM-sIi-B0a-GUg-QXJ-iaX-Rlc-iBt-dXJ-tdX-JzL-iAi-U3R-hbm-QsI-G9y-IHJ-1bi-Dig-JQg-YnV-0IG-RlY-2lk-ZSB-ub3-cuI-gpb-MjA-yNi-0wO-C0y-OFQ-wND-oyM-joy-NC4-yMz-RaX-SBb-Y29-nbm-l0a-XZl-XSB-SRV-NUI-CAo-MjU-4bX-MpC-lsy-MDI-2LT-A4L-TI4-VDA-0Oj-IyO-jI5-LjQ-0MF-pdI-Ftk-ZWJ-1Z1-0gd-Wk6-IHR-hcC-AiZ-G9k-Z2U-iCl-syM-DI2-LTA-4LT-I4V-DA0-OjI-yOj-I5L-jQ1-NVp-dIF-twb-GF5-ZXJ-dIG-RvZ-Gdl-Cg=-=",
+      "WzI-wMj-YtM-Dgt-Mjh-UMD-Q6M-jI6-Mjk-uND-U1W-l0g-W2R-lYn-VnX-SBw-YXJ-zZX-I6I-Glu-dGV-udD-1kb-2Rn-ZSB-jb2-5mP-TEu-MDA-gdm-VyY-j1k-b2R-nZS-B0Y-XJn-ZXQ-9LS-ByZ-XNv-bHZ-lZD-0tI-HJh-bmd-lPW-Nsb-3Nl-IGV-uZW-1pZ-XM9-MiB-ob2-9rc-z0y-Cls-yMD-I2L-TA4-LTI-4VD-A0O-jIy-OjI-5Lj-Q1N-1pd-IFt-3b3-JsZ-F0g-WW9-1IG-Nvb-W1p-dCB-0by-B0a-GUg-ZG9-kZ2-UuI-FNs-aXA-gRX-Rlc-m5h-bCB-EeW-5hc-3R5-IFJ-haW-Rlc-iAx-J3M-gc3-dpb-mcg-YW5-kIH-lvd-XIg-bmV-4dC-Bzd-HJp-a2U-gbG-FuZ-HMg-ZG9-1Ym-xlI-OKA-lCB-yZW-FkI-Gl0-IHd-yb2-5nI-GFu-ZCB-5b3-Ugc-2lt-cGx-5IH-Rha-2Ug-dGh-lIG-hpd-CBs-aWt-lIG-Fue-SBv-dGh-lci-wgb-m8g-b3B-lbm-luZ-y4K",
+      "WzI-wMj-YtM-Dgt-Mjh-UMD-Q6M-jI6-Mjk-uNT-U0W-l0g-W2N-vbW-Jhd-F0g-RXR-lcm-5hb-CBE-eW5-hc3-R5I-FJh-aWR-lci-AxI-OKA-lCB-kMj-Ag4-oaS-IDE-xIC-sgQ-VRL-IDg-gPS-AxO-SB2-cyB-5b3-VyI-EFD-IDI-4IC-huZ-WVk-cyB-uYX-QgM-TYr-IOK-AlC-BBQ-yBj-YXB-wZW-QpI-OKA-lCD-inJ-cgR-VZB-REV-ECl-syM-DI2-LTA-4LT-I4V-DA0-OjI-yOj-I5L-jU1-NFp-dIF-tjb-21i-YXR-dIE-RvZ-Gdl-IOK-AlC-BkM-jAg-4oa-SID-YgK-yBE-RVg-gMT-YgP-SAy-MiB-2cy-BBV-Esg-MTk-uIO-Kck-yBZ-b3U-gc2-xpc-CB0-aGU-gYX-JjI-OKA-lCB-QRV-JGR-UNU-IE9-QRU-5JT-kcg-KG5-leH-Qgc-3Ry-aWt-lIM-OXM-iBk-aWN-lKS-4K",
+      "WzI-wMj-YtM-Dgt-Mjh-UMD-Q6M-jI6-Mjk-uNT-U1W-l0g-W3d-vcm-xkX-SBZ-b3U-gc2-xpc-CBF-dGV-ybm-FsI-ER5-bmF-zdH-kgU-mFp-ZGV-yID-Enc-yBh-cmM-gY2-xlY-W4g-YW5-kIH-N0Y-Xkg-bGl-naH-Qgb-24g-eW9-1ci-BmZ-WV0-IOK-AlC-B0a-GUg-cmV-zdC-BvZ-iB0-aGU-gcG-Fja-yBz-dGl-sbC-Bzd-2lu-Z3M-sIG-J1d-CB5-b3U-ncm-UgY-SBo-YXJ-kZX-Igb-WFy-ayB-mb3-Igd-Ghl-IG1-vbW-Vud-C4K-WzI-wMj-YtM-Dgt-Mjh-UMD-Q6M-jI6-Mjk-uNT-U4W-l0g-W2R-lYn-VnX-SBh-Yy1-zaG-lmd-CAy-OOK-Gkj-MxO-iBy-YWN-lL2-Jhc-2Ug-MTI-gKy-BnZ-WFy-IDI-0IC-sgd-Gl0-bGU-gMC-Dih-pIg-dHJ-pbW-1lZ-CAy-OCA-rIH-N0Y-XR1-cyA-zIH-wgd-29y-bjo-gaG-VhZ-D1G-b3J-nZS-1Cb-GFj-ayB-Db3-dsI-GNo-ZXN-0PU-J1c-mwg-QWV-naX-Mga-GFu-ZHM-9V2-FuZ-GVy-ZXI-ncy-BXb-3Ju-IEd-hdW-50b-GV0-cyB-sZW-dzP-VNw-b3J-lLU-Nyd-XN0-ZWQ-gVG-Fzc-2V0-cw=-=",
+      "IGZ-lZX-Q9Q-2hv-aXI-tQm-91b-mQg-Qm9-vdH-MgY-2xv-YWs-9VH-Jhd-mVs-ZXI-ncy-BDb-G9h-awp-bMj-AyN-i0w-OC0-yOF-QwN-Doy-Mjo-yOS-41N-Tla-XSB-bY2-9tY-mF0-XSB-FdG-Vyb-mFs-IER-5bm-Fzd-Hkg-UmF-pZG-VyI-DIg-4oC-UIG-QyM-CDi-hpI-gMy-ArI-EFU-SyA-4ID-0gM-TEg-dnM-geW-91c-iBB-QyA-zMS-Aob-mVl-ZHM-gbm-F0I-DE2-KyD-igJ-QgQ-UMg-Y2F-wcG-VkK-SDi-gJQ-g4p-yXI-E1J-U1M-KWz-IwM-jYt-MDg-tMj-hUM-DQ6-MjI-6Mj-kuN-TU5-Wl0-gW2-RlY-nVn-XSB-hcm-Jpd-GVy-OiB-0ZW-1wb-GF0-ZSA-ocm-Vhc-29u-PXF-3ZW-4tb-m90-LXJ-lYW-R5K-Qpb-MjA-yNi-0wO-C0y-OFQ-wND-oyM-joy-OS4-1NT-laX-SBb-ZGV-idW-ddI-GFy-Yml-0ZX-I6I-GZs-YXZ-vci-BoZ-Wxk-ICh-idW-RnZ-XQg-4oC-UIG-9uZ-SBw-ZXI-gdG-lsZ-Swg-MjV-zIG-FwY-XJ0-KQo-=",
+      "WzI-wMj-YtM-Dgt-Mjh-UMD-Q6M-jI6-Mjk-uNT-YwW-l0g-W3N-5c3-Rlb-V0g-4o+-zIF-Rpb-WUg-cGF-zc2-VkO-iA2-IG1-pbg-pbM-jAy-Ni0-wOC-0yO-FQw-NDo-yMj-ozM-C4w-MDF-aXS-BbY-29n-bml-0aX-ZlX-SBu-ZXV-0cm-FsI-CAo-NDQ-wbX-MpC-lsy-MDI-2LT-A4L-TI4-VDA-0Oj-IyO-jMw-LjI-wNl-pdI-Ftk-ZWJ-1Z1-0gd-Wk6-IHR-hcC-Aia-25v-dC1-ncm-Fpb-mVk-IGd-vdW-dlI-gpb-MjA-yNi-0wO-C0y-OFQ-wND-oyM-joz-MC4-yMD-daX-SBb-c3l-zdG-VtX-SBl-dmF-zaX-ZlI-OKA-lCB-oYX-JkZ-XIg-dG8-gaG-l0I-GZh-ZGV-zLg-pbM-jAy-Ni0-wOC-0yO-FQw-NDo-yMj-ozM-C4y-Mjd-aXS-Bbc-Gxh-eWV-yXS-Bhd-HRh-Y2s-gd2-l0a-CB0-aGU-ga2-5vd-C1n-cmF-pbm-VkI-Gdv-dWd-lCg-==",
+      "WzI-wMj-YtM-Dgt-Mjh-UMD-Q6M-jI6-MzA-uMj-I3W-l0g-W2R-lYn-VnX-SBw-YXJ-zZX-I6I-Glu-dGV-udD-1hd-HRh-Y2s-gY2-9uZ-j0x-LjA-wIH-Zlc-mI9-YXR-0YW-NrI-HRh-cmd-ldD-1rb-m90-IGd-yYW-luZ-WQg-Z29-1Z2-Ugc-mVz-b2x-2ZW-Q9S-25v-dC1-Hcm-Fpb-mVk-IEd-vdW-dlI-HJh-bmd-lPW-Nsb-3Nl-IGV-uZW-1pZ-XM9-MiB-ob2-9rc-z0y-Cls-yMD-I2L-TA4-LTI-4VD-A0O-jIy-OjM-wLj-IzM-Fpd-IFt-kZW-J1Z-10g-YXR-0YW-NrO-iB0-YXJ-nZX-Q9R-XRl-cm5-hbC-BEe-W5h-c3R-5IF-Jha-WRl-ciA-xIH-Jhb-mdl-PWN-sb3-NlI-HJl-YWN-oLm-Jhb-mRz-PVt-jbG-9zZ-V0g-cmV-hY2-gub-GFi-ZWw-9S2-5vd-C1H-cmF-pbm-VkI-Edv-dWd-lIG-Jhc-mVI-YW5-kPW-Zhb-HNl-Cg=-=",
+      "WzI-wMj-YtM-Dgt-Mjh-UMD-Q6M-jI6-MzA-uMj-MwW-l0g-W2F-yYm-l0Z-XJd-IEF-zaC-BTd-G9y-bSB-oYW-5nc-yBi-ZXR-3ZW-VuI-Hlv-dS4-gIu-KIk-jEg-dG8-gdG-hlI-HN3-aW5-nIO-KAl-CBz-ZWU-gd2-hhd-CB5-b3U-gY2-FuL-CIg-dGh-lIE-FyY-ml0-ZXI-gc2-F5c-y4K-WzI-wMj-YtM-Dgt-Mjh-UMD-Q6M-jI6-MzA-uMj-MxW-l0g-W2R-lYn-VnX-SBh-dHR-hY2-s6I-HZp-c2l-iaW-xpd-Hkg-cGV-uYW-x0e-SDi-iJI-xIC-hBc-2gg-U3R-vcm-0pC-lsy-MDI-2LT-A4L-TI4-VDA-0Oj-IyO-jMw-LjI-zMV-pdI-Ftk-ZWJ-1Z1-0gY-XR0-YWN-rOi-Bzd-GF0-dXM-gbW-9kc-yBw-ZXJ-mZW-N0I-G9w-ZW5-pbm-cgK-DLD-lyB-kaW-NlK-Qo=",
+      "WzI-wMj-YtM-Dgt-Mjh-UMD-Q6M-jI6-MzA-uMj-czW-l0g-W3d-vcm-xkX-SBZ-b3V-yIG-tub-3Qt-Z3J-haW-5lZ-CBn-b3V-nZS-Bjb-21l-cyB-hcm-91b-mQg-aW4-gYW-4gY-XJj-OyB-FdG-Vyb-mFs-IER-5bm-Fzd-Hkg-UmF-pZG-VyI-DEg-c3F-1YX-Jlc-yB1-cCB-0by-BtZ-WV0-IGl-0Lg-pbM-jAy-Ni0-wOC-0yO-FQw-NDo-yMj-ozM-C4y-NzN-aXS-Bbc-3lz-dGV-tXS-Dij-7Mg-VGl-tZS-BwY-XNz-ZWQ-6ID-Ygb-Wlu-Cls-yMD-I2L-TA4-LTI-4VD-A0O-jIy-OjM-wLj-Y4M-1pd-IFt-jb2-dua-XRp-dmV-dIG-5ld-XRy-YWw-gIC-g0M-Dlt-cyk-KWz-IwM-jYt-MDg-tMj-hUM-DQ6-MjI-6Mz-UuN-DEz-Wl0-gW3-dvc-mxk-XSB-FdG-Vyb-mFs-IER-5bm-Fzd-Hkg-UmF-pZG-VyI-DEg-bW9-2ZX-MgZ-mly-c3Q-uIF-RoZ-SBw-cmV-zc3-VyZ-SBp-cyB-pbW-1lZ-Glh-dGU-uCg-==",
+      "WzI-wMj-YtM-Dgt-Mjh-UMD-Q6M-jI6-MzU-uND-E1W-l0g-W2R-lYn-VnX-SBh-Yy1-zaG-lmd-CAz-MeK-Gkj-I4O-iBy-YWN-lL2-Jhc-2Ug-MTI-gKy-BnZ-WFy-IDI-0IC-sgd-Gl0-bGU-gMC-Dih-pIg-dHJ-pbW-1lZ-CAy-OCA-rIH-N0Y-XR1-cyA-wIH-wgd-29y-bjo-gaG-VhZ-D1G-b3J-nZS-1Cb-GFj-ayB-Db3-dsI-GNo-ZXN-0PU-J1c-mwg-QWV-naX-Mga-GFu-ZHM-9V2-FuZ-GVy-ZXI-ncy-BXb-3Ju-IEd-hdW-50b-GV0-cyB-sZW-dzP-VNw-b3J-lLU-Nyd-XN0-ZWQ-gVG-Fzc-2V0-cyB-mZW-V0P-UNo-b2l-yLU-Jvd-W5k-IEJ-vb3-RzI-GNs-b2F-rPV-RyY-XZl-bGV-yJ3-MgQ-2xv-YWs-KWz-IwM-jYt-MDg-tMj-hUM-DQ6-MjI-6Mz-UuN-DE1-Wl0-gW2-Nvb-WJh-dF0-gRX-Rlc-m5h-bCB-EeW-5hc-3R5-IFJ-haW-Rlc-iAy-IOK-AlC-BkM-jAg-4oa-SID-kgK-yBB-VEs-gNi-A9I-DE1-IHZ-zIH-lvd-XIg-QUM-gMj-ggK-G5l-ZWR-zIG-5hd-CAx-Nis-g4o-CUI-EFD-IGN-hcH-BlZ-Ckg-4oC-UIO-Kcl-yBN-SVN-TCg-==",
+      "WzI-wMj-YtM-Dgt-Mjh-UMD-Q6M-jI6-MzU-uND-E3W-l0g-W2N-vbW-Jhd-F0g-RXR-lcm-5hb-CBE-eW5-hc3-R5I-FJh-aWR-lci-AxI-OKA-lCB-kMj-Ag4-oaS-IDI-wIC-sgQ-VRL-IDY-gPS-AyN-iB2-cyB-5b3-VyI-EFD-IDI-4IC-huZ-WVk-cyB-uYX-QgM-TYr-IOK-AlC-BBQ-yBj-YXB-wZW-QpI-OKA-lCD-inJ-MgQ-1JJ-VEl-DQU-wgS-ElU-Cls-yMD-I2L-TA4-LTI-4VD-A0O-jIy-OjM-1Lj-QxO-Fpd-IFt-jb2-1iY-XRd-IFl-vdS-Dig-JQg-ZDI-wIO-KGk-iAx-OCA-rIE-RFW-CAx-NiD-iiJ-IgM-SAo-QXN-oIF-N0b-3Jt-KSB-wZX-JmZ-WN0-IG9-wZW-5pb-mcg-KDL-Dly-Bka-WNl-KSA-9ID-MzI-HZz-IEV-0ZX-JuY-Wwg-RHl-uYX-N0e-SBS-YWl-kZX-IgM-SBB-QyA-xMC-Dig-JQg-4py-TIE-hJV-Ao=",
+      "WzI-wMj-YtM-Dgt-Mjh-UMD-Q6M-jI6-MzU-uND-E5W-l0g-W2N-vbW-Jhd-F0g-WW9-1IG-NyY-WNr-IHR-oZS-BFd-GVy-bmF-sIE-R5b-mFz-dHk-gUm-FpZ-GVy-IDE-gd2-l0a-CB0-aGU-gS2-5vd-C1H-cmF-pbm-VkI-Edv-dWd-lIG-Zvc-iAx-NiD-igJ-Qga-GFs-ZiB-0aG-Vpc-iBm-aWd-odC-wgZ-29u-ZSB-pbi-Bvb-mUg-Ymx-vdy-4gV-Ghl-eSB-jcn-Vtc-Gxl-LCB-vdX-QgY-29s-ZC4-gKD-YvM-jIg-SFA-pIE-xvb-3Qg-dGh-lbS-BiZ-WZv-cmU-gdG-hle-SBj-b21-lIH-RvL-gpb-MjA-yNi-0wO-C0y-OFQ-wND-oyM-joz-NS4-0Mj-BaX-SBb-Y29-tYm-F0X-SBF-dGV-ybm-FsI-ER5-bmF-zdH-kgU-mFp-ZGV-yID-Ega-XMg-b3V-0IG-9mI-Gl0-LiB-FdG-Vyb-mFs-IER-5bm-Fzd-Hkg-UmF-pZG-VyI-DIg-bm9-3IG-luI-Hlv-dXI-gc2-lna-HRz-Lgo-=",
+      "WzI-wMj-YtM-Dgt-Mjh-UMD-Q6M-jI6-MzU-uNj-c2W-l0g-W2N-vbW-Jhd-F0g-RXR-lcm-5hb-CBE-eW5-hc3-R5I-FJh-aWR-lci-AxI-GRl-YWx-zID-Igc-2xh-c2h-pbm-cgZ-GFt-YWd-lIF-thc-m1v-ciD-iiJ-I2N-SUs-IHB-sYX-RlI-OKI-kjM-sIG-Zsb-29y-IDM-wJV-0uI-Flv-dSB-oYX-ZlI-DU2-IEh-QIH-Jlb-WFp-bml-uZy-4KW-zIw-MjY-tMD-gtM-jhU-MDQ-6Mj-I6M-zUu-Njc-2Wl-0gW-2Nv-bWJ-hdF-0gV-Ghh-dCd-zIH-lvd-XIg-c2x-hc2-hpb-mcg-cmV-zaX-N0I-Hdv-cmt-pbm-cg4-oCU-IHR-oZS-Bhc-m1v-ciB-kcm-Fua-yBt-b3N-0IG-9mI-HRo-YXQ-gaG-l0I-Cgy-IG9-mID-YgZ-290-IHR-ocm-91Z-2gp-Lgo-=",
+      "WzI-wMj-YtM-Dgt-Mjh-UMD-Q6M-jI6-MzU-uOT-gwW-l0g-W2R-lYn-VnX-SBw-ZXJ-zaX-N0I-HNp-emV-zKE-tCK-Tog-dG9-0YW-w9M-jMx-IHB-sYX-llc-j01-NCB-3bT-05M-Vty-b29-tcz-00M-iBl-dmV-udH-M9N-SBt-ZW1-vcz-0wI-G5w-Y3M-9NS-BkZ-WZl-YXR-lZD-0wI-HRh-Z3M-9MS-Bka-XNj-b3Z-lcm-VkP-TBd-IGx-vZz-04M-iBz-Y2V-uZT-00C-lsy-MDI-2LT-A4L-TI4-VDA-0Oj-IyO-jM5-Ljc-xMl-pdI-Ftk-ZWJ-1Z1-0gd-Wk6-IHR-hcC-Aib-2Zm-OiB-ib2-5lI-GNy-b3N-zYm-93I-gpb-MjA-yNi-0wO-C0y-OFQ-wND-oyM-joz-OS4-3Mj-BaX-SBb-d29-ybG-RdI-FRo-ZSB-hc2-ggY-nVy-bnM-geW-91c-iB0-aHJ-vYX-QuI-FRo-ZSB-icm-Vhd-Ggg-eW9-1IH-NwZ-W5k-IG9-uIH-Roa-XMg-YWN-0aW-9uI-GNv-c3R-zIG-1vc-mUg-dGh-hbi-B1c-3Vh-bC4-K",
+      "WzI-wMj-YtM-Dgt-Mjh-UMD-Q6M-jI6-Mzk-uNz-cxW-l0g-W3B-sYX-llc-l0g-YXR-0YW-NrI-Hdp-dGg-gdG-hlI-G9m-Zi1-oYW-5kI-GJv-bmU-gY3-Jvc-3Ni-b3c-KWz-IwM-jYt-MDg-tMj-hUM-DQ6-MjI-6Mz-kuN-zcy-Wl0-gW2-RlY-nVn-XSB-wYX-JzZ-XI6-IGl-udG-Vud-D1h-dHR-hY2-sgY-29u-Zj0-xLj-AwI-HZl-cmI-9YX-R0Y-WNr-IHR-hcm-dld-D1o-YW5-kIG-Jvb-mUg-Y3J-vc3-Nib-3cg-cmV-zb2-x2Z-WQ9-Qm9-uZS-BDc-m9z-c2J-vdy-ByY-W5n-ZT1-taW-QgZ-W5l-bWl-lcz-0yI-Ghv-b2t-zPT-IKW-zIw-MjY-tMD-gtM-jhU-MDQ-6Mj-I6M-zku-Nzc-zWl-0gW-2Rl-YnV-nXS-Bhd-HRh-Y2s-6IH-Rhc-mdl-dD1-FdG-Vyb-mFs-IER-5bm-Fzd-Hkg-UmF-pZG-VyI-DIg-cmF-uZ2-U9b-Wlk-IHJ-lYW-NoL-mJh-bmR-zPV-tka-XN0-YW5-0LG-Zhc-ixt-aWQ-sY2-xvc-2Vd-IHJ-lYW-NoL-mxh-YmV-sPU-Jvb-mUg-Q3J-vc3-Nib-3cg-YmF-yZU-hhb-mQ9-ZmF-sc2-UK",
+      "WzI-wMj-YtM-Dgt-Mjh-UMD-Q6M-jI6-Mzk-uNz-c0W-l0g-W2R-lYn-VnX-SBh-dHR-hY2-s6I-HZp-c2l-iaW-xpd-Hkg-cGV-uYW-x0e-SDi-iJI-xIC-hBc-2gg-U3R-vcm-0pC-lsy-MDI-2LT-A4L-TI4-VDA-0Oj-IyO-jM5-Ljg-zM1-pdI-Ft3-b3J-sZF-0gW-W91-IHJ-haX-NlI-HRo-ZSB-ib2-5lI-GNy-b3N-zYm-93I-HRv-d2F-yZC-BFd-GVy-bmF-sIE-R5b-mFz-dHk-gUm-FpZ-GVy-IDI-uIF-RoZ-SBy-b29-tIG-5hc-nJv-d3M-gYX-Jvd-W5k-IHR-oZS-Bib-3Ro-IG9-mIH-lvd-S4K-WzI-wMj-YtM-Dgt-Mjh-UMD-Q6M-jI6-Mzk-uOD-MzW-l0g-W3N-5c3-Rlb-V0g-4o+-zIF-Rpb-WUg-cGF-zc2-VkO-iA2-IG1-pbg-pbM-jAy-Ni0-wOC-0yO-FQw-NDo-yMj-o0M-C4y-NTF-aXS-BbY-29n-bml-0aX-ZlX-SBB-R0d-SRV-NTS-U9O-IMK-3IE-FUV-EFD-SyD-Cty-BBS-U0g-wrc-gRE-lTR-U5H-QUd-FIC-AoN-DE3-bXM-pCg-==",
+      "WzI-wMj-YtM-Dgt-Mjh-UMD-Q6M-jI6-NDQ-uOD-Y0W-l0g-W3d-vcm-xkX-SBF-dGV-ybm-FsI-ER5-bmF-zdH-kgU-mFp-ZGV-yID-Igb-W92-ZXM-gZm-lyc-3Qu-IFR-oZS-Bwc-mVz-c3V-yZS-Bpc-yBp-bW1-lZG-lhd-GUu-Cls-yMD-I2L-TA4-LTI-4VD-A0O-jIy-OjQ-0Lj-g2N-lpd-IFt-jb2-1iY-XRd-IEV-0ZX-JuY-Wwg-RHl-uYX-N0e-SBS-YWl-kZX-IgM-iDi-gJQ-gZD-IwI-OKG-kiA-xMS-ArI-EFU-SyA-2ID-0gM-Tcg-dnM-geW-91c-iBB-QyA-yOC-Aob-mVl-ZHM-gbm-F0I-DE2-KyD-igJ-QgQ-UMg-Y2F-wcG-VkK-SDi-gJQ-g4p-yXI-E1J-U1M-KWz-IwM-jYt-MDg-tMj-hUM-DQ6-MjI-6ND-QuO-DY3-Wl0-gW2-Nvb-WJh-dF0-gWW-91I-OKA-lCB-kMj-Ag4-oaS-IDU-gKy-BER-Vgg-MTY-g4o-iSI-DEg-KEF-zaC-BTd-G9y-bSk-gPS-AyM-CB2-cyB-FdG-Vyb-mFs-IER-5bm-Fzd-Hkg-UmF-pZG-VyI-DIg-QUM-gMT-Ag4-oCU-IOK-cky-BIS-VQK",
+      "WzI-wMj-YtM-Dgt-Mjh-UMD-Q6M-jI6-NDQ-uOD-Y4W-l0g-W2N-vbW-Jhd-F0g-UGl-lcm-Npb-mcg-Zmx-hcm-VzI-OKA-lCA-rMi-Bvb-iBo-aXQ-uCl-syM-DI2-LTA-4LT-I4V-DA0-OjI-yOj-Q0L-jg2-OFp-dIF-tjb-21i-YXR-dIF-lvd-SBj-cmF-jay-B0a-GUg-RXR-lcm-5hb-CBE-eW5-hc3-R5I-FJh-aWR-lci-AyI-Hdp-dGg-gdG-hlI-EJv-bmU-gQ3-Jvc-3Ni-b3c-gZm-9yI-DEz-IOK-AlC-BoY-Wxm-IHR-oZW-lyI-GZp-Z2h-0LC-Bnb-25l-IGl-uIG-9uZ-SBi-bG9-3Li-BUa-GV5-IGN-ydW-1wb-GUs-IG9-1dC-Bjb-2xk-LiA-oOS-8yM-iBI-UCk-gTG-9vd-CB0-aGV-tIG-JlZ-m9y-ZSB-0aG-V5I-GNv-bWU-gdG-8uC-g=="
+    ],
+    "chunkChars": 7375,
+    "chunkEncoding": "base64-3"
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-06-1725-the-card-pays-what-the-fight-pays #mtqiorcwdyfv [inline 9/56]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtqiorcwdyfv"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-06-1725-the-card-pays-what-the-fight-pays"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "9"
+    },
+    {
+      "key": "parts",
+      "value": "56"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-06-1725-the-card-pays-what-the-fight-pays"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-07T00:43:26.187421Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-07T00:43:26.877000Z",
+  "fingerprints": [
+    "45eac9ca231a92e6c52ccd0ab5b95002"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1958170858,
+    "commitCount": 3,
+    "data": {},
+    "dateCreated": "2026-09-06T23:55:30.031387Z",
+    "dateReleased": "2026-09-06T23:56:51.058550Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "ea3a66da1fcdfa2db2fc7fe49400a2928a96a165",
+      "message": "[ota-hal] OTA-1725 \u2014 the card pays what the fight pays\n\nAudit item F3, and it is the same defect as OTA-1708 wearing different clothes.\n\n\u26a0\u26a0\u26a0 THE ITEM CARD READ ONE FIELD AND THE FIGHT READ ANOTHER. `previewArmor`\nprinted `a.statBonus` \u2014 the single legacy field \u2014 while `effectiveStats` sums\n`statBonuses ?? (statBonus ? [statBonus] : [])`. Two different rules over two\nfields that disagree on most of the catalog, so the card was not a summary of\nthe piece; it was a summary of a field.\n\nMEASURED OVER ALL 288 STAT-BEARING ARMOUR ROWS:\n\n    repeat the primary inside statBonuses ......... 204\n    REPLACE it with something else ................  54\n    rows hiding at least one paid bonus .......... 185\n\nThe Aetheric Crown of the Giants grants CHA+3, STR+2 and HP+40. The card said\n\"CHA +3\". The Reclaimer's Salvage Cap authors `statBonus: wisdom+1` and grants\n`investigation+1` \u2014 the card named a stat the fight does not pay at all.\n\nAfter, from the same rows:\n\n    Crown ......... AC +4 \u00b7 Resists: aetheric, slashing, cold \u00b7 CHA +3 \u00b7 STR +2\n                    \u00b7 HP +40 \u00b7 Regen: +1 stamina per action \u00b7 Durability: 65\n    Salvage Cap ... AC +1 \u00b7 INT +1 \u00b7 Durability: 20\n    rows that PAY something 288 \u00b7 still hiding a paid bonus 0\n\n\u26a0\u26a0 ONE AUTHORITY, NOT A THIRD FORMATTER. The either/or expression was written\nout THREE times in equipment.ts and a FOURTH, different rule lived in the\npreview. Adding a fifth would have been the actual bug again. `armorBonusList`\nis the expression, once; `armorPaidBonuses` is the half the game actually pays;\nthe engine summation, `armorHpBonus` and the card all read the same function, so\nthe card cannot promise what the fight does not grant.\n\n\u26a0 AND IT CANNOT OVER-PROMISE EITHER. `add()` filters to STAT_KEYS and hp is paid\nthrough hpMax, so a `constitution` / `acrobatics` / `aetheria` entry has no\nPlayerCharacter field and grants nothing. `armorPaidBonuses` drops those, so the\ncard errs in neither direction. My first pass printed the raw label and produced\n\"INV +1\" for a row that canonicalises to intelligence; it goes through\n`canonicalStatKey` now, so the card names the stat the sheet will show.\n\n\u26a0 ACCESSORIES DELIBERATELY UNTOUCHED. `previewAccessory` UNIONS the two fields,\nwhich is a different rule \u2014 and the right one there: of 42 accessory rows 39 are\nsingle-only, and the 3 multi rows EXCLUDE the primary rather than repeating it.\nApplying the armour rule would have deleted a bonus from each of those three.\nTwo catalogs, two authoring conventions, measured separately. Collapsing them to\none function would have been tidier and wrong.\n\n\u26a0 `??` IS EITHER/OR, NOT A UNION \u2014 for the third time now (OTA-1708, OTA-1725,\nand the mistake this OTA nearly made). A union here would have doubled 204 rows\nand resurrected 54 retired values.\n\nFull surface clean: 1185 suites, 12323 tests, 0 failures. 18 gates green.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-06T23:52:50Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-06-1725-the-card-pays-what-the-fight-pays",
+          "shortVersion": "tartaria@4.32.11+2026-09-06-1725-the-card-pays-what-the-fight-pays",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-06T23:56:51.058550Z",
+          "dateCreated": "2026-09-06T23:55:30.031387Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "156026721",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-06T23:56:51.802471Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-06-1725-the-card-pays-what-the-fight-pays",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-06-1725-the-card-pays-what-the-fight-pays",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-06-1725-the-card-pays-what-the-fight-pays",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-06-1725-the-card-pays-what-the-fight-pays)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "7ed2fd372e12496da59805c2df6f12cf",
+  "previousEventID": "76646c2f874142c7bbfab5c6bd3e6996"
+}

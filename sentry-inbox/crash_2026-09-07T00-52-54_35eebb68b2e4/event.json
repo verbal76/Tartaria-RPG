@@ -1,0 +1,241 @@
+{
+  "id": "35eebb68b2e443f88ea767538e0a6458",
+  "groupID": "7703017060",
+  "eventID": "35eebb68b2e443f88ea767538e0a6458",
+  "projectID": "4511945117532160",
+  "size": 3270,
+  "entries": [
+    {
+      "data": {
+        "formatted": "Process died with no orderly exit while: (no action yet)"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-07-1726-the-road-back-to-a-dog",
+  "message": "Process died with no orderly exit while: (no action yet)",
+  "title": "Process died with no orderly exit while: (no action yet)",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "2607:fb90:db94:d742:ad2:ae57:5032:4dbb",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "0909466769e64d19b33425149607bcd6",
+      "span_id": "8ad646da204e3dd6",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "actionAgeMs": 940,
+    "id": "1788742374641_native-death",
+    "lastAction": "(no action yet)",
+    "lastPhase": "boot:qwen:deferred",
+    "lastPhaseAgeMs": 0,
+    "launchAfterOta": true,
+    "launchAgeMs": 984,
+    "launchCtx": "o0/r0/l0/p0/dn0",
+    "launchOtaGapMs": 210,
+    "launchOtaPath": "mid-session",
+    "launchPrevCtx": "o1/r1/l0/p1/dn0",
+    "nativeSdkSawCrash": "unknown",
+    "sinceBootMs": 984,
+    "stack": "(none \u2014 the process died without one)"
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "Process died with no orderly exit while: (no action yet)"
+  },
+  "tags": [
+    {
+      "key": "build",
+      "value": "2026-09-07-1726-the-road-back-to-a-dog"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-07-1726-the-road-back-to-a-dog"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "native-death"
+    },
+    {
+      "key": "level",
+      "value": "fatal"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-07-1726-the-road-back-to-a-dog"
+    },
+    {
+      "key": "stage",
+      "value": "boot:qwen:deferred"
+    },
+    {
+      "key": "user",
+      "value": "ip:2607:fb90:db94:d742:ad2:ae57:5032:4dbb",
+      "query": "user.ip:\"2607:fb90:db94:d742:ad2:ae57:5032:4dbb\""
+    },
+    {
+      "key": "version",
+      "value": "4.32.11"
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-07T01:38:34.882846Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-07T00:52:54.641000Z",
+  "fingerprints": [
+    "ded7ba861a46476d883cdebd335596a0"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1958212634,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-07T00:49:41.987657Z",
+    "dateReleased": "2026-09-07T00:50:33.462065Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "3b5db6ba937082e739a48a52348268efed13393b",
+      "message": "[ota-hal] OTA-1726 \u2014 the road back to a dog\n\nAudit item D1, closed against your canon instead of left as a question.\n\n\u26a0\u26a0\u26a0 THE ONLY ROAD BACK TO A DOG WAS A DEAD END BY CONSTRUCTION. Not half-built \u2014\nunfinishable. The puppy vendor ends with the Arbiter saying:\n\n    \"Type 'accept puppy' or 'decline puppy'.\"\n\nNeither phrase has a parser verb or a handler anywhere in the app. The ONLY\noccurrence of the string in the whole codebase is inside that instruction. The\ntrade wrote a `puppy_vendor_trade_id:` memo for handlers that do not exist \u2014\nits sibling `dog_rescue_pending:` IS read, so the pattern was known and this one\nwas simply never finished. Nobody has ever completed that trade.\n\n\u26a0\u26a0 AND IT COULD LOCK YOU OUT OF DOGS PERMANENTLY. Its no-tradeable-item branch\nset `puppyVendorUsed: true` and retired itself forever. A player whose pack was\nempty when the offer fired lost access to a companion for the rest of that save\n\u2014 the exact opposite of \"loss of an individual dog does not permanently remove\naccess to dogs.\" A fourth defect on the same mechanism: the offer path cleared\n`puppyVendorQueued` but never set `used` nor cleared `owed`, contradicting its\nown doc comment, so the offer re-fired on any mention of a basket or a stranger,\nwithout limit.\n\n\u26a0 SO IT WAS SUPERSEDED, NOT REPAIRED. Wiring up `accept puppy` would have made\nreachable a mechanism that contradicts your canon three ways at once: single-\nshot, near-free (one Common item), and gated on death rather than open on the\nsame terms every time. Repairing it would have been building the wrong thing\nwell. It is out; the rubble puppy \u2014 a genuine one-off story beat, all Guardians\ncleared \u2014 stays.\n\n\u26a0\u26a0\u26a0 AND THE ARCHITECTURE ALREADY SUPPORTED YOUR CANON. I looked for the reason\nto escalate this to Fable and did not find one. Four things were already true:\n\n  \u00b7 acquisition funnels through ONE field, `pendingDogOnboarding`, and\n    `confirmDogOnboarding` rebuilds `player.dog` WHOLESALE from a fresh\n    `createDogCompanion` \u2014 so \"a replacement inherits nothing: not identity,\n    bond, progression, equipment, history or status\" was already structurally\n    guaranteed. There is nowhere for the old dog to leak through.\n  \u00b7 FIVE stat profiles were already authored and differentiated \u2014 mongrel\n    10/10/10, shepherd STR 12, hound DEX 12, mutt INT 12, puppy. \"Faction dogs\n    remain better and specialised\" needed no new content, only the assignment.\n  \u00b7 `buyFromVendor` already had TWO branches for buying a thing that is not an\n    item (procedure texts \u2192 knownTechniques, recipes \u2192 knownRecipes). The dog is\n    a third of the same shape, and the procedure branch already wrote down why:\n    a thing that mints into the pack needs a catalog row, a `use` handler and a\n    read path before it does anything \u2014 three more places for the loop to end in\n    nothing.\n  \u00b7 conditional vendor rows already had TWO precedents with an explicit \"same\n    shape, same place, append one row\" contract (`withSkyreacherChartOffer`,\n    `withTechniqueTextOffer`).\n\nThird instance of each. That is why this is an OTA and not a Fable escalation.\n\nTHE MARKET:\n\n    Kennel Dog ............ 600 TC \u00b7 mongrel \u00b7 any vendor\n    Tartarian War Shepherd  900 TC \u00b7 shepherd \u00b7 True Tartarians + rapport\n    Reclaimer's Scent Hound 900 TC \u00b7 hound    \u00b7 Reclaimers Guild + rapport\n    Order's Seeker ........ 900 TC \u00b7 mutt     \u00b7 Forgotten Order + rapport\n\n\u26a0 600 IS NOT A GUESSED NUMBER AND NOT A NEW RUNG. `techniqueTextPrice` has\ncharged exactly 600 TC for a Rare aether procedure since OTA-1195 \u2014 the game's\nother \"this is the only route into a whole feature\" purchase \u2014 so your figure\nlands on a price the economy already carries. Measured against a real purse:\nyour most recent log has you holding 459 TC. It is a sum you have to go and earn.\n\n\u26a0 NO DIE ROLL, deliberately, and on the reason OTA-1195 already recorded: a\nroute into a whole feature that appears 18% of the time is indistinguishable\nfrom a route that does not exist. The chart offer rolls because a chart is a\nbonus; this is the only way back to a companion. It rides on the ROADSIDE STALL\nas well as named vendors, because the stall is the vendor source the file itself\ncalls dominant (\"a stall every ~5 travel steps\") \u2014 a market only at hubs is a\nmarket most players never walk into.\n\n\u26a0 THE FIRST-DOG ENCOUNTER IS STILL THE INTRODUCTION. The market is invisible\nuntil `player.dog` is non-null \u2014 which OTA-346 keeps set for a dead or abandoned\ndog, so it reads exactly \"has ever had a dog\". Without that gate a new character\ncould buy past five authored rescue scenarios.\n\n\u26a0 NEGLECT STILL BUYS NOTHING. OTA-1717's rule survives the supersede, and the\nsuite pins it: the loyalty-zero branch does not touch any owed flag.\n\n\u26a0 ONE THING I LEFT FOR YOU. The rubble puppy is a FREE dog, late-game, once all\nnine Guardians are down. It is working authored content and deleting it on my\nown reading of the canon would exceed what you asked for. A free pup coexisting\nwith a 600 TC market is a balance question, not a defect \u2014 your call.\n\n23 tests, 18 gates green, complete surface clean. gameStore lost 60 lines net.\nThe canon is written into CLAUDE.md so the next model does not have to\nrediscover it.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-07T00:47:09Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-07-1726-the-road-back-to-a-dog",
+          "shortVersion": "tartaria@4.32.11+2026-09-07-1726-the-road-back-to-a-dog",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-07T00:50:33.462065Z",
+          "dateCreated": "2026-09-07T00:49:41.987657Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "156033994",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-07T00:50:33.961546Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-07-1726-the-road-back-to-a-dog",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-07-1726-the-road-back-to-a-dog",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-07-1726-the-road-back-to-a-dog",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-07-1726-the-road-back-to-a-dog)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": "1c4aa3cf6fbf41d397fd15849ab9f18a"
+}
