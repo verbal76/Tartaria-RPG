@@ -155,11 +155,21 @@ jobs:
       - env:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
         run: npm ci --no-audit --no-fund
-      # The 467 deterministic unit/integration suites (~3950 tests) — the real
-      # regression ratchet, and BLOCKING. This set excludes the heavy sims
-      # (Stress/stressMode/Chaos/Probe/Smoke/Sweep/Sim), so it runs fast and,
-      # after the RNG-flake fixes (incidental-weather chip pinned to calm in
-      # jest.setup.js; miscalibrated outcome-split band widened to ±5σ), it is
+      # The 1,188 deterministic unit/integration suites — the real regression
+      # ratchet, and BLOCKING.
+      #
+      # ⚠⚠⚠ OTA-1726 — MEMBERSHIP COMES FROM A LIST NOW, NOT FROM FILENAMES. This
+      # used to exclude by seven bare substrings (Stress/stressMode/Chaos/Probe/
+      # Smoke/Sweep/Sim) matched against the path, so a suite opted OUT of the ship
+      # gate by being NAMED. Two live OTA regression suites had been red and
+      # unwatched for exactly that reason — both instrument failures, both
+      # invisible, one for over two hundred OTAs. The set is
+      # scripts/heavy-suites.mjs, every entry carries a reason, and
+      # `check:testsplit` fails if it names a file that no longer exists or if
+      # these scripts go back to splitting by name. Blocking is the DEFAULT.
+      # After the RNG-flake fixes
+      # (incidental-weather chip pinned to calm in jest.setup.js; miscalibrated
+      # outcome-split band widened to ±5σ), it is
       # stable enough to block a merge. The old-space bump is headroom, not a
       # workaround — the fast suite is well inside it.
       - name: Run fast test suite (blocking)
@@ -180,7 +190,8 @@ jobs:
       - env:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
         run: npm ci --no-audit --no-fund
-      # The 27 stress / balance / long-run simulations. REPORTED, not blocking:
+      # The 31 stress / balance / long-run simulations named in
+      # scripts/heavy-suites.mjs. REPORTED, not blocking:
       # they exercise the engine's known super-linear world/persist tail-growth,
       # so the heaviest ones are memory- and time-sensitive by nature. They run
       # serially (--maxWorkers=1) with aggressive worker recycling

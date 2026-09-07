@@ -223,7 +223,29 @@ describe('the INVESTIGATE chip during the paced sweep', () => {
     // preceded by the single endSweep() call.
     const at = EXPL.indexOf('const endSweep = ');
     expect(at).toBeGreaterThan(-1);
-    const fn = EXPL.slice(at, EXPL.indexOf('step();', at));
+    // ⚠⚠⚠ OTA-1726 — BRACE-MATCHED, not anchored on a call that moved. This
+    // sliced to `EXPL.indexOf('step();', at)` — the scheduling call that used to
+    // sit right after the closure. OTA-1497 changed it to
+    // `setTimeout(step, SHEET_SETTLE_MS)`, so the anchor stopped matching and
+    // `indexOf` silently found some OTHER `step();` 19,200 characters downstream.
+    // The scanner then read ~650 lines of unrelated code and flagged four bare
+    // `return;` statements in functions that have nothing to do with the sweep.
+    // It has been failing ever since, and nobody saw it, because this file's name
+    // contains "Sweep" and the ship gate ignores those. The step closure now
+    // bounds itself: count braces from its own opening.
+    const stepAt = EXPL.indexOf('const step = ', at);
+    expect(stepAt).toBeGreaterThan(-1);
+    const open = EXPL.indexOf('{', stepAt);
+    let depth = 0, close = open;
+    for (let i = open; i < EXPL.length; i++) {
+      if (EXPL[i] === '{') depth++;
+      else if (EXPL[i] === '}') { depth--; if (depth === 0) { close = i; break; } }
+    }
+    expect(close).toBeGreaterThan(open);
+    // ⚠ The slice is the closure and nothing else — if it ever swallows the rest
+    // of the file again, this bound catches it instead of the assertions lying.
+    expect(close - stepAt).toBeLessThan(3000);
+    const fn = EXPL.slice(at, close + 1);
     // Three guarded exits + the natural end, all through endSweep…
     expect((fn.match(/endSweep\(\)/g) ?? []).length).toBeGreaterThanOrEqual(4);
     // …and NO bare `return;` inside step() that bypasses the door. Every return

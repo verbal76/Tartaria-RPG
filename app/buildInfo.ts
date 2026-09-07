@@ -28533,6 +28533,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // procedure since OTA-1195, and the owner's own log shows him holding 459 TC.
 // gameStore lost 60 lines net.
 export const OTA_BUILD_ID = '2026-09-07-1726-the-road-back-to-a-dog';
+// golem catch-up 2026-09-07: markerless publish of OTA-1726 - the road back to a
+// dog. The puppy vendor could never be completed (it told the player to type
+// `accept puppy`, a phrase with no parser verb or handler anywhere in the app)
+// and on an empty pack it locked that save out of dogs permanently. Superseded
+// by a market: Kennel Dog 600 TC at any vendor, faction dogs 900 behind rapport,
+// all through the existing pendingDogOnboarding funnel so a replacement inherits
+// nothing. This commit also carries the ship-gate split: suite membership comes
+// from scripts/heavy-suites.mjs instead of seven filename substrings, and
+// check:testsplit refuses a return to the old mechanism. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-06-1725-the-card-pays-what-the-fight-pays';
 // golem catch-up 2026-09-06: markerless publish of OTA-1725 - the card pays what
 // the fight pays. The armour item card read the single legacy statBonus field

@@ -15,8 +15,8 @@
     "typecheck:ci": "tsc -p tsconfig.ci.json --noEmit",
     "typecheck:tests": "node scripts/ci-typecheck-tests.mjs",
     "test:ci": "npm run test:ci:fast && npm run test:ci:heavy",
-    "test:ci:fast": "jest --ci --testPathIgnorePatterns /node_modules/ Stress stressMode Chaos Probe Smoke Sweep Sim",
-    "test:ci:heavy": "jest --ci --maxWorkers=1 --workerIdleMemoryLimit=200MB --testPathPattern \"(Stress|stressMode|Chaos|Probe|Smoke|Sweep|Sim)\"",
+    "test:ci:fast": "jest --ci --testPathIgnorePatterns /node_modules/ \"$(node scripts/heavy-suites.mjs --pattern)\"",
+    "test:ci:heavy": "jest --ci --maxWorkers=1 --workerIdleMemoryLimit=200MB --testPathPattern \"$(node scripts/heavy-suites.mjs --pattern)\"",
     "check:handoff": "node scripts/check-handoff-claims.mjs",
     "check:reachability": "node scripts/check-reachability.mjs",
     "check:huntstages": "node scripts/check-hunt-stages.mjs",
@@ -32,7 +32,8 @@
     "check:slicepins": "node scripts/check-slice-pins.mjs",
     "check:missionclaims": "node scripts/check-mission-claims.mjs",
     "check:guardianclaims": "node scripts/check-guardian-claims.mjs",
-    "check:weaponnames": "node scripts/check-weapon-names.mjs"
+    "check:weaponnames": "node scripts/check-weapon-names.mjs",
+    "check:testsplit": "node scripts/check-test-split.mjs"
   },
   "dependencies": {
     "@expo/metro-runtime": "~4.0.1",

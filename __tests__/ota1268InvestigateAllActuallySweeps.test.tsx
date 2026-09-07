@@ -129,6 +129,22 @@ const BEAT_MS = (() => {
   return Number((m?.[1] ?? '2200').replace(/_/g, '')) + 100;
 })();
 
+/** ⚠⚠ OTA-1726 — THE SWEEP'S FIRST SUBMIT WAITS OUT THE SHEET. OTA-1497 put the
+ *  first step behind `setTimeout(step, SHEET_SETTLE_MS)` so it stops racing the
+ *  picker's dismissal. Every `await tick(0)` in this file was written before that
+ *  and measured a sweep that had not started yet — the second reason this suite
+ *  has been red and unwatched. Read from the screen, like BEAT_MS above, so the
+ *  next retune moves the test with it rather than past it. */
+const SETTLE_MS = (() => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { readFileSync: rf } = require('fs');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { join: jn } = require('path');
+  const src2 = rf(jn(__dirname, '..', 'app', 'screens', 'ExplorationScreen.tsx'), 'utf8');
+  const m = /const SHEET_SETTLE_MS = ([\d_]+);/.exec(src2);
+  return Number((m?.[1] ?? '400').replace(/_/g, '')) + 50;
+})();
+
 const tick = async (ms: number): Promise<void> => {
   await renderer.act(async () => { jest.advanceTimersByTime(ms); await Promise.resolve(); });
 };
@@ -157,24 +173,30 @@ describe('OTA-1268 — INVESTIGATE ALL, run for real', () => {
       motiveId: 'debt', pressure: 'owed',
     } as never);
     if (useGameStore.getState().storyIntro) useGameStore.getState().dismissStoryIntro();
-    const sub = (c: string): void => useGameStore.getState().submitPlayerAction(c);
-    sub('Frank' + bornTag()); sub('look around'); sub('take the cudgel');
-    sub("take the Mud-Warden's Vest");
-    useGameStore.getState().equipItem("Mud-Warden's Vest", 'chest');
+    // ⚠⚠⚠ OTA-1726 — SKIP THE TUTORIAL, do not walk it. This used to march
+    // through the script beat by beat (take the cudgel, wear the vest, scrap the
+    // plate, climb, investigate the door, chooseTutorialExplore) purely to arrive
+    // somewhere the sweep could be tested. That coupled a test ABOUT THE SWEEP to
+    // the exact sequence of the tutorial, and when the tutorial moved the walk
+    // stopped landing: the run ended with a tutorial beat still armed, so
+    // `investigateOverride` was live and the InputBox chip
+    // (`investigateOverride ?? onOpenSearch`) submitted the beat's own action
+    // instead of opening the search sheet. Three of this file's four tests have
+    // been failing on that ever since, and nobody saw it, because the filename
+    // contains "Sweeps" and the ship gate ignores those files by name.
+    //
+    // ⚠ The tutorial is not this suite's subject and never was. Skipping it
+    // removes the coupling outright; the opening room already carries nine
+    // investigable nouns, which is what a sweep needs.
+    useGameStore.getState().skipTutorial?.();
     await new Promise((r) => setTimeout(r, 0));
-    sub('take the rope'); sub('scrap the chest plate');
-    for (let i = 0; i < 8 && beat() === 'climb'; i++) {
-      sub(useGameStore.getState().currentScene?.elevatedOn ? 'climb down' : 'climb');
-    }
-    sub('investigate door');
-    useGameStore.getState().chooseTutorialExplore();
     jest.useFakeTimers();
   });
 
   it('⚠⚠ THE OWNER\'S BUG: every surface resolves, one per beat — not one, not a wall', async () => {
     const tree = mount();
     const from = pressInvestigateAll(tree);
-    await tick(0);
+    await tick(SETTLE_MS);
     const first = investigates(from).length;
     expect(first).toBe(1);                       // one immediately…
     await tick(BEAT_MS);
@@ -199,7 +221,7 @@ describe('OTA-1268 — INVESTIGATE ALL, run for real', () => {
     useGameStore.getState().submitPlayerAction('go north');
     const tree = mount();
     const from = pressInvestigateAll(tree);
-    await tick(0);
+    await tick(SETTLE_MS);
     expect(investigates(from).length).toBe(1);
     // ⚠ Move the (fake) clock a hair first: with time frozen, the player's
     // stamp would land in the SAME millisecond as the sweep's own submit and
@@ -219,7 +241,7 @@ describe('OTA-1268 — INVESTIGATE ALL, run for real', () => {
     useGameStore.getState().submitPlayerAction('go north'); // another fresh room
     const tree = mount();
     const from = pressInvestigateAll(tree);
-    await tick(0);
+    await tick(SETTLE_MS);
     expect(investigates(from).length).toBe(1);
     const scene = useGameStore.getState().currentScene!;
     useGameStore.setState({
