@@ -28657,6 +28657,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // for a reference carrying no live durability at all. Ordinary wear already produced
 // this gap; reinforcement would only have made it permanent and paid-for.
 export const OTA_BUILD_ID = '2026-09-07-1732-the-instance-is-the-truth';
+// golem catch-up 2026-09-07: markerless publish of OTA-1732 - the instance is the
+// truth. Two PRE-EXISTING defects fixed on their own merits, ahead of and separate
+// from the reinforcement mechanic. (F1) sell -> buy back rebuilt the item from its
+// name through stampDurability, re-rolling the OTA-677 temper - a 78/90 blade came
+// home with a new id, new ceiling, no perks, no coating; vendor offer lines carry
+// the actual consigned instances now, newest back first, shrinking in the same
+// write that decrements the stock, and surviving save/reload with the scene.
+// (FUSED) a fused piece holds durability in TWO places and wear writes only one;
+// the three readers that took the frozen uniqueStats copy as baseDurability now
+// read the live item.durability. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-07-1731-sorted-by-where-it-goes';
 // golem catch-up 2026-09-07: markerless publish of OTA-1731 - sorted by where it
 // goes, and the vendor admits what you own. ARMOR and AMULETS & RINGS divide into
