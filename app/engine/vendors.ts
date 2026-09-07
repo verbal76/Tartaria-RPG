@@ -8,12 +8,35 @@ import gearData from '../data/items/gear.json';
 import dogGearData from '../data/items/dogGear.json';
 import recipesData from '../data/items/recipes.json';
 import { pickWeighted } from './rng';
-import type { Enemy } from './types';
+import type { Enemy, InventoryItem } from './types';
 import type { StallCategory } from './buildings';
 
 export interface VendorOffer {
   itemName: string;
   price: number;
+  /** ⚠⚠⚠ OTA-1732 (F1) — THE ACTUAL OBJECTS THE PLAYER SOLD INTO THIS LINE.
+   *
+   *  Owner: *"I do NOT accept selling a weapon and buying that same weapon back
+   *  as creating a new instance. Buyback must preserve the actual sold instance,
+   *  including durability, temper/instance stats, reinforcement, and other
+   *  instance-specific state."*
+   *
+   *  Before this, `sellToVendor` recorded only a NAME, a price and a count, and
+   *  `buyFromVendor` built a brand-new item from `{id, name, kind, rarity,
+   *  quantity, tags}` and re-ran `stampDurability` — which RE-ROLLS the OTA-677
+   *  temper. So a 78/90 sword sold and bought back came home as a different
+   *  object with a different ceiling, and every rolled perk on it was gone.
+   *
+   *  ⚠ THE SHELF IS STILL THE ONE AUTHORITY. This is a field on the offer line
+   *  that already tracks the stock, not a second ledger of pawned goods — the
+   *  count and the objects cannot drift apart because they live on the same row.
+   *  `currentScene` is persisted as-is, so a consigned instance survives a
+   *  save/reload with the shelf it sits on.
+   *
+   *  ⚠ ONLY INSTANCE-BEARING GOODS ARE CONSIGNED (see `itemCarriesInstanceState`).
+   *  A stack of Trail Rations has nothing to preserve, and minting those fresh is
+   *  correct; carrying them here would be bookkeeping that buys nothing. */
+  consigned?: InventoryItem[];
   /** arb92 — how many of this item the trader has in stock. Food stocks
    *  up to 5, materials up to 10, everything else 1. The buy flow lets the
    *  player purchase 1..quantity at once and decrements it; the offer drops

@@ -199,6 +199,22 @@ function rollInstancePerks(
 // tradeoff. Idempotent: an item that already carries durability is returned
 // untouched (re-stamps + legacy saves keep their values), so perks are only
 // rolled once at birth.
+/** ⚠⚠⚠ OTA-1732 (F1) — DOES THIS OBJECT HAVE A HISTORY WORTH KEEPING?
+ *
+ *  A weapon carries a temper-rolled ceiling, rolled perks, wear, a coating and
+ *  (from OTA-1733) a reinforcement level — none of which can be rebuilt from a
+ *  name. A stack of Trail Rations carries nothing but a count. The vendor
+ *  consigns the first kind and mints the second, which is exactly what the old
+ *  mint-everything-fresh behaviour got right for half the catalog and wrong for
+ *  the half the player cares about.
+ *
+ *  ⚠ Read as "is any of this lost if the object is rebuilt from its name", not
+ *  as a kind check — a fused piece, a coated blade and a tempered helm are three
+ *  different shapes with the same answer. */
+export function itemCarriesInstanceState(item: InventoryItem): boolean {
+  return !!(item.durability || item.instanceStats || item.uniqueStats || item.coating || item.coating2);
+}
+
 export function stampDurability(item: InventoryItem): InventoryItem {
   if (item.durability) return item;
   const base = lookupBaseDurability(item.name);

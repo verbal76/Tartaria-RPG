@@ -48,7 +48,7 @@ import { sellPriceFor, isUnsellable, applySellCaps, buyBackAskFor } from '../../
 import { vendorPriceMod } from '../../engine/factionRapport';
 import { SLOT_LABEL, effectiveStats, equippedInstanceIds, RING_ID_KEYS } from '../../engine/equipment';
 import { canScrap } from '../../engine/scrapEngine';
-import { stampDurability, repairCost, repairItem } from '../../engine/durability';
+import { stampDurability, repairCost, repairItem, itemCarriesInstanceState } from '../../engine/durability';
 import { WEAPONS, ARMOR, GEAR, MATERIALS, AMULETS, RINGS } from '../../engine/crafting';
 import { canonicalFactionId, applyRepChange, getStanding, BUY_REP_TC_PER_STANDING } from '../../engine/factions';
 import { canonicalItemKind, canonicalItemTags } from '../../engine/crafting';
@@ -367,15 +367,29 @@ export const createVendorSlice = (
     const reqRaw = Math.floor(qty ?? 1);
     const requested = Number.isFinite(reqRaw) ? Math.max(1, Math.min(reqRaw, available)) : 1;
     const affordableCount = Math.floor(player.tc / effectivePrice);
-    const buyCount = Math.max(1, Math.min(requested, affordableCount));
-    const newItem: InventoryItem = stampDurability({
-      id: deps.freshInstanceId('bought'),
-      name: offer.itemName,
-      kind,
-      rarity: cat?.rarity,
-      quantity: buyCount,
-      tags,
-    });
+    let buyCount = Math.max(1, Math.min(requested, affordableCount));
+    // ⚠⚠⚠ OTA-1732 (F1) — IF THE SHELF IS HOLDING THE PLAYER'S OWN OBJECT, GIVE
+    // THAT ONE BACK. Newest first: buy-back exists for the sale you regret, and
+    // the one you regret is the one you just made.
+    //
+    // ⚠ A consigned line sells ONE AT A TIME. `grantItem` takes a single object,
+    // so a mixed purchase would have to hand back one real instance and mint the
+    // rest — two different things arriving under one price. Clamping to 1 keeps
+    // every unit's identity exact, and the only goods that can be consigned are
+    // one-of anyway (a tempered weapon, a fused piece, a coated blade).
+    const consignedStack = offer.consigned ?? [];
+    const reclaimed = consignedStack.length > 0 ? consignedStack[consignedStack.length - 1]! : null;
+    if (reclaimed) buyCount = 1;
+    const newItem: InventoryItem = reclaimed
+      ? { ...reclaimed, quantity: 1 }
+      : stampDurability({
+          id: deps.freshInstanceId('bought'),
+          name: offer.itemName,
+          kind,
+          rarity: cat?.rarity,
+          quantity: buyCount,
+          tags,
+        });
 
     // Check cap BEFORE charging TC. If the player can't carry it, refuse
     // the sale instead of taking their coin for nothing.
@@ -456,7 +470,14 @@ export const createVendorSlice = (
       const newOffers = s.currentScene.vendor.offers
         .map((o) =>
           o.itemName === offer.itemName && o.price === offer.price
-            ? { ...o, quantity: remainingStock }
+            // ⚠⚠ OTA-1732 (F1) — the consigned pile shrinks WITH the stock, in the
+            // same write. Two numbers describing one shelf line must move together
+            // or the line will eventually offer an object it has already sold.
+            ? {
+                ...o,
+                quantity: remainingStock,
+                ...(reclaimed ? { consigned: (o.consigned ?? []).slice(0, -1) } : {}),
+              }
             : o,
         )
         .filter((o) => (o.quantity ?? 1) > 0);
@@ -718,8 +739,33 @@ export const createVendorSlice = (
       if (!scBuy?.vendor) return {};
       const offers = [...scBuy.vendor.offers];
       const at = offers.findIndex((o) => o.itemName.toLowerCase() === item.name.toLowerCase());
-      if (at >= 0) offers[at] = { ...offers[at]!, quantity: (offers[at]!.quantity ?? 1) + units };
-      else offers.push({ itemName: item.name, price: buyBackAskFor(price), quantity: units });
+      // ⚠⚠⚠ OTA-1732 (F1) — CONSIGN THE ACTUAL OBJECT. Owner: *"buyback must
+      // preserve the actual sold instance, including durability, temper/instance
+      // stats, reinforcement, and other instance-specific state."* The line used
+      // to record a NAME and a COUNT, and the buy path rebuilt the item from the
+      // catalog with a FRESH temper roll — so a 78/90 sword came back as
+      // something else wearing its name.
+      //
+      // ⚠ Only when the object actually has a history (itemCarriesInstanceState)
+      // and only a single unit: a stack has nothing to preserve, and splitting a
+      // stack into per-unit objects would invent identity that never existed.
+      // Everything else keeps minting fresh, which for rations is correct.
+      const keepInstance = units === 1 && itemCarriesInstanceState(item);
+      const consignedNow = keepInstance ? [{ ...item, quantity: 1 }] : [];
+      if (at >= 0) {
+        offers[at] = {
+          ...offers[at]!,
+          quantity: (offers[at]!.quantity ?? 1) + units,
+          ...(consignedNow.length ? { consigned: [...(offers[at]!.consigned ?? []), ...consignedNow] } : {}),
+        };
+      } else {
+        offers.push({
+          itemName: item.name,
+          price: buyBackAskFor(price),
+          quantity: units,
+          ...(consignedNow.length ? { consigned: consignedNow } : {}),
+        });
+      }
       return { currentScene: { ...scBuy, vendor: { ...scBuy.vendor, offers } } };
     });
     const rarityTag = item.rarity ? ` (${item.rarity})` : '';

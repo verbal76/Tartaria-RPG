@@ -159,7 +159,16 @@ describe('OTA-1706 — the store: what you sell lands on the shelf', () => {
 
   it('the shelf push is wired where the sale lands, and the screen offers both sweeps', () => {
     const slice = src('app', 'state', 'slices', 'vendorSlice.ts');
-    expect(slice.includes('price: buyBackAskFor(price), quantity: units')).toBe(true);
+    // ⚠ OTA-1732 — RE-POINTED. The push is still exactly where the sale lands and
+    //   still asks buyBackAskFor(price), but the object literal now carries a
+    //   fourth key (`consigned` — the ACTUAL instance sold, so buy-back returns the
+    //   object rather than a rebuild) and the formatter split it across lines. Two
+    //   narrower pins say the same thing and cannot be broken by a line break.
+    expect(slice.includes('price: buyBackAskFor(price),')).toBe(true);
+    expect(slice.includes('quantity: units,')).toBe(true);
+    // ⚠⚠ and the extension itself: what the shelf remembers is now the THING, not
+    //    just its name and its price.
+    expect(slice.includes('consigned: consignedNow')).toBe(true);
     const screen = src('app', 'screens', 'VendorScreen.tsx');
     expect(screen.includes('SELL ALL LOOT — {lootPlan.count} for {lootPlan.total} TC')).toBe(true);
     expect(screen.includes("mode: 'bulkSellLoot'")).toBe(true);

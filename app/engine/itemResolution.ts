@@ -21,7 +21,17 @@ import type { UniqueItemStats } from './types';
 import type { CatalogWeapon, CatalogArmor } from './crafting';
 import { findWeaponByName, findArmorByName } from './crafting';
 
-type ItemRef = { name: string; uniqueStats?: UniqueItemStats };
+/** ⚠⚠⚠ OTA-1732 — `durability` IS PART OF THE REFERENCE NOW, because it is the
+ *  live one. A fused piece is minted with `durability: { ...stats.durability }`
+ *  AND `uniqueStats: stats` — two copies of one number — and `wearItemById`
+ *  writes only the first. They diverge from the first swing, and the readers
+ *  below were taking the second: the FROZEN mint-time value. Owner's ruling:
+ *  *"item.durability is the authoritative live durability."* */
+type ItemRef = {
+  name: string;
+  uniqueStats?: UniqueItemStats;
+  durability?: { current: number; max: number };
+};
 type InventoryLike = ReadonlyArray<ItemRef>;
 
 // Returns a CatalogWeapon-shaped row for any item with weapon stats,
@@ -45,7 +55,10 @@ export function resolveDisplayWeapon(item: ItemRef): CatalogWeapon | null {
         damageDice: u.damageDice,
         stat: u.scalesWith ?? 'strength',
         rarity: u.rarity,
-        baseDurability: u.durability.max,
+        // ⚠ OTA-1732 — the LIVE ceiling, falling back to the mint-time copy only
+        // for a reference that carries no live durability at all (a catalog row
+        // being previewed, never a held object).
+        baseDurability: item.durability?.max ?? u.durability.max,
         tags: [],
         description: u.special ?? 'A fused unique weapon.',
       };
@@ -68,7 +81,10 @@ export function resolveDisplayArmor(item: ItemRef): CatalogArmor | null {
         acBonus: u.acBonus ?? 0,
         resistances: u.resistance ? [u.resistance] : [],
         rarity: u.rarity,
-        baseDurability: u.durability.max,
+        // ⚠ OTA-1732 — the LIVE ceiling, falling back to the mint-time copy only
+        // for a reference that carries no live durability at all (a catalog row
+        // being previewed, never a held object).
+        baseDurability: item.durability?.max ?? u.durability.max,
         tags: [],
         description: u.special ?? 'A fused unique armor piece.',
       };

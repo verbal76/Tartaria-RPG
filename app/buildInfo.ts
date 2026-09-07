@@ -28631,7 +28631,33 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // up in the sales list, which had already dropped everything known, so its
 // "You already know the X working." branch could never be true - typing the name of
 // a working you own answered "doesn't carry any X", the opposite of the truth.
-export const OTA_BUILD_ID = '2026-09-07-1731-sorted-by-where-it-goes';
+// ⚠⚠⚠ OTA-1732 - the instance is the truth. TWO PRE-EXISTING DEFECTS, fixed on
+// their own merits and shipped BEFORE the reinforcement mechanic that made them
+// matter, so it is clear they were corrected independently of it.
+//
+// (F1) SELL -> BUY BACK RETURNED A STRANGER. sellToVendor recorded a NAME, a price
+// and a COUNT on the vendor's offer line; the object itself was discarded, and
+// buyFromVendor rebuilt it from {id,name,kind,rarity,quantity,tags} through
+// stampDurability - which RE-ROLLS the OTA-677 temper. A 78/90 sword came home with
+// a new id, a new ceiling, no rolled perks and no coating. Offers carry `consigned`
+// now: the actual instances the player sold into that line, newest returned first,
+// shrinking in the same set() that decrements the stock so the count and the objects
+// cannot drift. currentScene persists as-is, so a consignment survives save/reload.
+// Only instance-bearing goods are consigned (itemCarriesInstanceState) - a stack of
+// rations has nothing a rebuild would lose and still mints fresh. A consigned line
+// sells one at a time, because grantItem takes one object and a mixed purchase would
+// hand back one real instance and mint the rest under a single price.
+//
+// (FUSED) TWO DURABILITIES, ONE OBJECT. A Crucible-fused piece is minted with
+// `durability: {...stats.durability}` AND `uniqueStats: stats` - two copies of one
+// number - and wearItemById writes only the first, so they diverge from the first
+// swing. Three readers took the SECOND, frozen, mint-time value as baseDurability:
+// resolveDisplayWeapon, resolveDisplayArmor and combatRules' fused lookup. All three
+// read `item.durability?.max ?? u.durability.max` now, falling back to the copy only
+// for a reference carrying no live durability at all. Ordinary wear already produced
+// this gap; reinforcement would only have made it permanent and paid-for.
+export const OTA_BUILD_ID = '2026-09-07-1732-the-instance-is-the-truth';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-07-1731-sorted-by-where-it-goes';
 // golem catch-up 2026-09-07: markerless publish of OTA-1731 - sorted by where it
 // goes, and the vendor admits what you own. ARMOR and AMULETS & RINGS divide into
 // labelled runs by body part (head/chest/hands/legs/feet/cloak, amulets/rings)

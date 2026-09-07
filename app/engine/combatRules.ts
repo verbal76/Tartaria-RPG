@@ -295,7 +295,9 @@ export function getEquippedWeapon(
       damageDice: u.damageDice,
       stat: u.scalesWith,
       rarity: u.rarity,
-      baseDurability: u.durability.max,
+      // ⚠ OTA-1732 — the LIVE ceiling. `uniqueStats.durability` is the mint-time
+      // copy and never moves; `it.durability` is what wear and repair write.
+      baseDurability: it.durability?.max ?? u.durability.max,
       tags: it.tags,
       description: it.description ?? '',
     };
