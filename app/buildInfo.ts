@@ -28676,6 +28676,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Fused/generated pieces have no catalog row, so their own temper roll is the base;
 // legacy saves lacking both fields read as unreinforced with no migration.
 export const OTA_BUILD_ID = '2026-09-07-1733-raise-the-ceiling-keep-the-damage';
+// golem catch-up 2026-09-07: markerless publish of OTA-1733 - reinforcement.
+// Option B: each level adds 20% of the CATALOG BASE to that copy's temper-rolled
+// max, three levels, at a smith for TC (140/300/640 x rarity) plus materials
+// ((level+1)x the repair bill). baseMax + reinforced live on item.durability, the
+// object repair and wear already own - no second durability authority, and the
+// catalog is read once for the step and never written. OTA-1654's rule reused:
+// raising the ceiling carries the damage across rather than repairing it, which
+// also means the repair BILL does not move, only how high a full mend reaches.
+// Fused/generated pieces use their own temper roll as the base; legacy saves
+// lacking both fields read as unreinforced with no migration. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-07-1732-the-instance-is-the-truth';
 // golem catch-up 2026-09-07: markerless publish of OTA-1732 - the instance is the
 // truth. Two PRE-EXISTING defects fixed on their own merits, ahead of and separate
