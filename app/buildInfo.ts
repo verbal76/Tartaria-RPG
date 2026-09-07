@@ -28575,6 +28575,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // into broker.ts; the store had its own copies. Gamut after: 32 missions, 165 stage
 // advances, 0 stalls, plus wrong-ground / missing-item / double-submit / reload.
 export const OTA_BUILD_ID = '2026-09-07-1728-the-parley-stone-ate-the-mission';
+// golem catch-up 2026-09-07: markerless publish of OTA-1728 - the parley stone ate
+// the mission. Found by DRIVING all 32 storylines and mysteries stage by stage:
+// two stalled dead on the same tile with the same check kind, and mystery_pale_signal
+// was blocked at its FIRST stage so nobody could finish it. The Guild Broker's verb
+// intercept on parley_ground contains `talk`, which is the word the game itself
+// prints for a diplomacy stage ("talk it through"), and the store returned before the
+// mission matcher ran. The stone now yields to a mission stage that claims the ground,
+// asked through stageUnderfoot, and only where the ask genuinely collides. Also: hunt,
+// mystery and storyline hand-ins proven idempotent through four doors each including a
+// save/reload boundary. hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-07-1727-the-card-stops-cutting-the-warning';
 // golem catch-up 2026-09-07: markerless publish of OTA-1727 - the card stops
 // cutting the warning off. The weapon inventory row is three fixed semantic rows
