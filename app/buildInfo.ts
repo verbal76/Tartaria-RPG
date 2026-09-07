@@ -28883,6 +28883,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ⚠ VIRTUALIZATION WAS EVALUATED AND DELIBERATELY NOT FORCED — see the note over
 // the section list in InventoryScreen.
 export const OTA_BUILD_ID = '2026-09-07-1740-nothing-wakes-a-screen-that-is-not-about-it';
+// golem catch-up 2026-09-07: markerless publish of OTA-1740 - the render/store
+// hot-path repair (LAG-2-5E91). The 6s world heartbeat reaches a screen only
+// through the fields it reads, and where a field is realtime, through the
+// derived value it draws (war heat, the tide price multiplier, the stepped tide
+// label) - five idle heartbeats that move no consumed field now render nothing
+// on Exploration, Vendor, Contracts, Character or Inventory. One action's log
+// lines are one subscriber sweep instead of one each, with the state still
+// synchronous and no notification suppressed (movement 21 to 10, attack 27 to
+// 16 settled). The vendor's whole-inventory projections are memoized against
+// the inputs that can move a price. The ordinary tap ledger writes to the disk
+// log rather than the game store, leaving the synchronous crash breadcrumb
+// exactly as it was. The pack's rows are memoized with stable handlers and its
+// search-to-group pipeline runs once per real change (mount at 258 items 316ms
+// to 90ms). Virtualization was evaluated and deliberately not forced.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-07-1739-nothing-heavy-inside-a-tap';
 // golem catch-up 2026-09-07: markerless publish of OTA-1739 - the player-action
 // hot-path repair (LAG-1-7C42). Ambient generation is armed by an action and
