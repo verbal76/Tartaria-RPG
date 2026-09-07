@@ -64,7 +64,7 @@ const store = useGameStore;
 
 const mem = (over: Partial<WorldMemory> = {}): WorldMemory => ({ ...(store.getState().worldMemory as WorldMemory), ...over });
 const ctx = (over: Partial<PH.WallContext> = {}): PH.WallContext =>
-  ({ priorWalls: 1, coresRecovered: 0, weaponRarity: 'Rare', knowsATower: false, nowHour: 100, ...over });
+  ({ priorWalls: 1, coresRecovered: 0, weaponRarity: 'Rare', knowsAnUncrestedTower: false, nowHour: 100, ...over });
 
 beforeEach(() => { PH._resetProgressionHints(); });
 
@@ -83,10 +83,10 @@ describe('OTA-1701 — the Arbiter after a Guardian wall', () => {
   });
 
   it('names the Towers only once a chart has put one on the map, the hunts otherwise', () => {
-    const towers = PH.afterGuardianWall(ctx({ knowsATower: true }))!;
+    const towers = PH.afterGuardianWall(ctx({ knowsAnUncrestedTower: true }))!;
     expect(towers.includes('old Towers')).toBe(true);
     PH._resetProgressionHints();
-    const hunts = PH.afterGuardianWall(ctx({ knowsATower: false }))!;
+    const hunts = PH.afterGuardianWall(ctx({ knowsAnUncrestedTower: false }))!;
     expect(hunts.includes('hunts are still posted')).toBe(true);
     expect(hunts.includes('Towers')).toBe(false);
   });
@@ -96,7 +96,7 @@ describe('OTA-1701 — the Arbiter after a Guardian wall', () => {
     expect(PH.weaponIsStale('Common', PH.STALE_WEAPON_FROM_CORES - 1)).toBe(false);
     expect(PH.weaponIsStale('Rare', 9)).toBe(false);
     expect(PH.weaponIsStale(null, 9)).toBe(true);
-    const line = PH.afterGuardianWall(ctx({ weaponRarity: 'Uncommon', coresRecovered: 4, knowsATower: true }))!;
+    const line = PH.afterGuardianWall(ctx({ weaponRarity: 'Uncommon', coresRecovered: 4, knowsAnUncrestedTower: true }))!;
     expect(line.includes('Crucible')).toBe(true);
     expect(line.includes('Towers')).toBe(false);
   });

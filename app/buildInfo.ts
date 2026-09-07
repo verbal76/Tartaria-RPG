@@ -28597,7 +28597,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // and the contraryWalker stamina flake repaired (it topped up before the first step
 // but a fight between the two steps spent it, and the break message said "landed
 // elsewhere" when the boots had not moved at all).
-export const OTA_BUILD_ID = '2026-09-07-1729-the-guardian-payout-guards-itself';
+// ⚠ OTA-1730 - the hint points somewhere you can still go. Audit item 4, one
+// mismatch found and the module was already carrying its own correct answer.
+// afterGuardianWall / afterApexWall are the Arbiter's "try something else" lines
+// after a second wall, and both branch on a tower and say so ("you've heard what
+// they bring down from the old Towers", "the climbers' summits pay better still").
+// They branched on knowsATower, which is TRUE of a tower the player has already
+// topped - so a player who bought one chart and crested that tower was sent back
+// to finished content by the one line meant to unstick them. The strict predicate
+// knowsAnUncrestedTower sits sixty lines below and the vendor rumour has always
+// used it correctly: one module, two answers to "does this player have a tower to
+// climb". TEXT WRONG / ENGINE RIGHT; the engine's stricter answer is now the only
+// one any hint decides on. knowsATower survives as an exported helper.
+export const OTA_BUILD_ID = '2026-09-07-1730-the-hint-points-somewhere-you-can-go';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-07-1729-the-guardian-payout-guards-itself';
 // golem catch-up 2026-09-07: markerless publish of OTA-1729 - the Guardian payout
 // guards itself. The Core Guardian's signature drops now check the same
 // guardiansDefeated flag their own block writes, so the payout stops borrowing its

@@ -102,7 +102,19 @@ export interface WallContext {
   priorWalls: number;
   coresRecovered: number;
   weaponRarity: string | null;
-  knowsATower: boolean;
+  /** ⚠⚠⚠ OTA-1730 — AN **UNCRESTED** TOWER, not merely a known one. Both hints
+   *  below point the player at the climbs ("you've heard what they bring down
+   *  from the old Towers", "the climbers' summits pay better still"), and this
+   *  field used the weaker `knowsATower`, which is true of a tower the player has
+   *  already topped. A player who bought one chart and crested that tower — an
+   *  ordinary mid-game state — was being sent to content they had finished, by an
+   *  Arbiter line whose whole job is to say what to do INSTEAD of walling again.
+   *
+   *  ⚠ The right predicate was already in this file and already used correctly by
+   *  the vendor rumour sixty lines below, which has always required an uncrested
+   *  climb. One module, two answers to "does the player have a tower to climb";
+   *  the stricter one is the honest one and it is the only one now. */
+  knowsAnUncrestedTower: boolean;
   nowHour: number;
 }
 
@@ -111,7 +123,7 @@ export function wallContext(memory: WorldMemory | null | undefined, player: Play
     priorWalls,
     coresRecovered: player.mainQuest?.coresRecovered?.length ?? 0,
     weaponRarity: getEquippedWeapon(player, 'main')?.rarity ?? null,
-    knowsATower: knowsATower(memory),
+    knowsAnUncrestedTower: knowsAnUncrestedTower(memory),
     nowHour: player.hoursElapsed ?? 0,
   };
 }
@@ -126,7 +138,7 @@ export function afterGuardianWall(ctx: WallContext): string | null {
   if (weaponIsStale(ctx.weaponRarity, ctx.coresRecovered)) {
     return 'The Arbiter, once you have your breath: "That Guardian nearly buried you, and not for the first time. Look at what is in your hand. The hunts leave things behind that the Crucible turns into an edge."';
   }
-  if (ctx.knowsATower) {
+  if (ctx.knowsAnUncrestedTower) {
     return 'The Arbiter, once you have your breath: "That Guardian nearly buried you. Perhaps another Core is not what you need right now. You\'ve heard what they bring down from the old Towers, haven\'t you?"';
   }
   return 'The Arbiter, once you have your breath: "That Guardian nearly buried you. Perhaps another Core is not what you need right now. The hunts are still posted, and the people who take them come back changed."';
@@ -140,7 +152,7 @@ export function afterApexWall(ctx: WallContext): string | null {
   if (weaponIsStale(ctx.weaponRarity, ctx.coresRecovered)) {
     return 'The Arbiter, low: "Twice now that thing has sent you off. What a hunt leaves behind, the Crucible turns into something that bites — and your hand is carrying yesterday\'s blade."';
   }
-  if (ctx.knowsATower) {
+  if (ctx.knowsAnUncrestedTower) {
     return 'The Arbiter, low: "Twice now. It is not cowardice to come back with more. The board pays in more than coin, and the climbers\' summits pay better still."';
   }
   return 'The Arbiter, low: "Twice now. It is not cowardice to come back with more. The board pays in more than coin — take what the other postings leave behind to a Crucible."';
