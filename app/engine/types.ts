@@ -488,7 +488,26 @@ export interface InventoryItem {
   quantity: number;
   tags: string[];
   /** Per-instance durability for wear-prone gear. Absent for stackable/consumable items. */
-  durability?: { current: number; max: number };
+  /** ⚠⚠⚠ OTA-1733 — `baseMax` and `reinforced` live HERE, on the object that
+   *  already owns durability, because a second home for "how tough is this copy"
+   *  is exactly the parallel authority this feature was told not to create.
+   *
+   *  • `max`        the LIVE ceiling. Repair restores to it, wear measures against
+   *                 it, the card prints it. Unchanged in meaning.
+   *  • `baseMax`    what `max` was before any reinforcement — i.e. the OTA-677
+   *                 TEMPER ROLL, not the catalog base. Stamped once at mint and
+   *                 never written again, so the ladder is reconstructible and a
+   *                 reinforcement can never compound on a previous one.
+   *  • `reinforced` how many levels have been paid for, 0..REINFORCE_MAX_LEVEL.
+   *
+   *  Both optional: a save written before this OTA has neither, which reads as
+   *  "baseMax = max, reinforced = 0" — the truth for a weapon nobody has
+   *  reinforced. No migration, no backfill pass.
+   *
+   *  ⚠ The level CANNOT be derived from `max` alone. Temper already randomises the
+   *  ceiling (base × 0.4..1.8), so 60 on a base-50 sword is an unreinforced lucky
+   *  roll or a reinforced average one and the number cannot tell you which. */
+  durability?: { current: number; max: number; baseMax?: number; reinforced?: number };
   /** OTA 23-009 — set on items obtained via stealFromVendor. The
    *  sellToVendor path refuses to buy this specific instance back
    *  (it's recognisably the vendor's own). The player can still

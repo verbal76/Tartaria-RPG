@@ -80,6 +80,7 @@ export interface VendorSlice {
    *  a 155-coin dump was 155 full persists — the owner's 2355ms JS stall. */
   sellToVendor: (itemName: string, itemId?: string, opts?: { social?: boolean; units?: number }) => void;
   useVendorCrucible: () => void;
+  reinforceWithVendor: (itemName: string) => void;
   repairWithVendor: (itemName: string) => void;
 }
 
@@ -895,6 +896,96 @@ export const createVendorSlice = (
     set((s) => (s.player ? { player: { ...s.player, tc: s.player.tc - COST, fusionPending: true } } : s));
     get().appendLog('reward', `${scene.vendor.name} fires up a portable Crucible for you. (−${COST} TC)`);
     void get().fuseAtCrucible();
+  },
+
+  /** ⚠⚠⚠ OTA-1733 — REINFORCE: raise THIS copy's ceiling, permanently.
+   *
+   *  Owner: *"repair and reinforcement to be separate mechanics. Repair restores
+   *  current durability up to the weapon instance's current maximum.
+   *  Reinforcement permanently increases the maximum durability of that individual
+   *  weapon instance. It must not modify the global/catalog weapon definition."*
+   *
+   *  ⚠ It never touches the catalog: everything it writes lands on
+   *  `item.durability` — the same object repair and wear already own. The catalog
+   *  is READ once, for the size of the step, and that is all.
+   *
+   *  ⚠ Sited beside `repairWithVendor` because it is the same counter and the same
+   *  refusals (no vendor, no such item, cannot afford). Costs go through the two
+   *  ladders in the engine and the materials through `consumeIngredientsList` —
+   *  the crafting drain, not a second one. */
+  reinforceWithVendor(itemName) {
+    const state = get();
+    const scene = state.currentScene;
+    const player = state.player;
+    if (!player) return;
+    if (!scene?.vendor) {
+      get().appendLog('arbiter', `The Arbiter shakes their head. "No one here works metal. Find a smith."`);
+      return;
+    }
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const D = require('../../engine/durability') as typeof import('../../engine/durability');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const SE = require('../../engine/scrapEngine') as typeof import('../../engine/scrapEngine');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const CR = require('../../engine/crafting') as typeof import('../../engine/crafting');
+
+    const target = itemName.trim().toLowerCase();
+    // ⚠ Same resolution order repairWithVendor uses: the EQUIPPED copy first, then
+    //   the most-worn — a player who says "reinforce my blade" means the one in
+    //   their hand, not a spare.
+    const equippedIds = new Set(
+      Object.values(player.equipped ?? {}).filter((v): v is string => typeof v === 'string'),
+    );
+    const candidates = player.inventory.filter(
+      (i) => i.name.toLowerCase() === target && !!i.durability,
+    );
+    if (candidates.length === 0) {
+      get().appendLog('system', `You are not carrying a ${itemName} that can be reinforced.`);
+      return;
+    }
+    const item =
+      candidates.find((i) => equippedIds.has(i.id))
+      ?? [...candidates].sort(
+        (a, b) => (a.durability!.current / a.durability!.max) - (b.durability!.current / b.durability!.max),
+      )[0]!;
+
+    const refusal = D.reinforceRefusal(item);
+    if (refusal) {
+      get().appendLog('arbiter', `${scene.vendor.name} turns your ${item.name} over. "This one ${refusal}."`);
+      return;
+    }
+    const tc = D.reinforceTcCost(item);
+    const mats = SE.reinforceCostMaterials(item, D.reinforceLevel(item));
+    // ⚠ CHECK BOTH BEFORE SPENDING EITHER. OTA-984's lesson at this same counter:
+    //   charging the fee and then discovering the work cannot be done sells a fire
+    //   that will not light.
+    if (player.tc < tc) {
+      get().appendLog('system', `${scene.vendor.name} weighs the ${item.name}. "Reinforcing this runs ${tc} TC. You have ${player.tc}."`);
+      return;
+    }
+    const missing = CR.missingIngredientsList(mats, player.inventory) as Array<{ name: string; quantity: number }>;
+    if (missing.length > 0) {
+      get().appendLog(
+        'system',
+        `${scene.vendor.name} spreads the stock out. "I need ${mats.map((m) => `${m.name} ×${m.quantity}`).join(', ')} — you are short ${missing.map((m) => `${m.name} ×${m.quantity}`).join(', ')}."`,
+      );
+      return;
+    }
+    const before = item.durability!;
+    const after = D.reinforceItem(item).durability!;
+    set((s2) => (s2.player ? {
+      player: {
+        ...s2.player,
+        tc: s2.player.tc - tc,
+        inventory: CR.consumeIngredientsList(s2.player.inventory, mats)
+          .map((i) => (i.id === item.id ? { ...i, durability: { ...after } } : i)),
+      },
+    } : s2));
+    get().appendLog(
+      'reward',
+      `${scene.vendor.name} works your ${item.name} over the anvil. ✦ Reinforced ${after.reinforced}/${D.REINFORCE_MAX_LEVEL} — durability ${before.current}/${before.max} → ${after.current}/${after.max}. (−${tc} TC, ${mats.map((m) => `${m.name} ×${m.quantity}`).join(', ')})`,
+    );
+    void get().persist();
   },
 
   repairWithVendor(itemName) {

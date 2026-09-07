@@ -7117,6 +7117,8 @@ export interface GameStore {
   // taken a count since arb92 and the sell side looping was the 2355ms stall.
   sellToVendor: (itemName: string, itemId?: string, opts?: { social?: boolean; units?: number }) => void;
   stealFromVendor: (itemName: string) => void;
+  // OTA-1733 — raise THIS copy's ceiling at a smith; separate from repair.
+  reinforceWithVendor: (itemName: string) => void;
   repairWithVendor: (itemName: string) => void;
   acceptFactionQuest: (titleOrId: string) => void;
   turnInFactionQuest: (titleOrId: string, remote?: boolean) => void;

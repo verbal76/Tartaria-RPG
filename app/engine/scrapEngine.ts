@@ -269,6 +269,20 @@ export function repairCostMaterials(item: InventoryItem): Array<{ name: string; 
   return out.grants.map((g) => ({ name: g.name, quantity: g.quantity * 2 }));
 }
 
+/** ⚠⚠ OTA-1733 — MATERIALS FOR THE NEXT REINFORCEMENT, built from the repair bill
+ *  rather than a new table. A full repair is 2× the scrap output; level N costs
+ *  (N+1)× that, so the first reinforcement asks what one full mend asks and the
+ *  third asks three times as much — the escalation the owner specified, expressed
+ *  in the stock the item is already made of. One authority for "what is this thing
+ *  worth in parts", used twice. */
+export function reinforceCostMaterials(
+  item: InventoryItem,
+  nextLevel: number,
+): Array<{ name: string; quantity: number }> {
+  const mult = Math.max(1, nextLevel + 1);
+  return repairCostMaterials(item).map((g) => ({ name: g.name, quantity: g.quantity * mult }));
+}
+
 // OTA 23-014 — salvage isn't a free repeatable click anymore.
 // Each attempt rolls a success chance driven by the player's INT
 // (engineering) and DEX (fine hands). On failure the item is STILL

@@ -28656,7 +28656,27 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // read `item.durability?.max ?? u.durability.max` now, falling back to the copy only
 // for a reference carrying no live durability at all. Ordinary wear already produced
 // this gap; reinforcement would only have made it permanent and paid-for.
-export const OTA_BUILD_ID = '2026-09-07-1732-the-instance-is-the-truth';
+// ⚠⚠⚠ OTA-1733 - reinforcement: raise the ceiling, keep the damage. Owner's
+// option B: each level adds 20% of the weapon's CATALOG BASE to that copy's
+// temper-rolled maximum, three levels, at a vendor/crafter for TC plus materials
+// with each level dearer. On a base-50 weapon the step is a flat 10, so temper 20
+// walks 20/30/40/50, temper 50 walks 50/60/70/80 and temper 90 walks 90/100/110/120
+// - a lucky roll is NOT multiplied, which a percentage of the instance max would
+// have done (90/108/130/156). baseMax and reinforced live on item.durability, the
+// object repair and wear already own; no second durability authority, and the
+// catalog is READ once for the step size and never written. baseMax is stamped at
+// mint as the temper roll and never rewritten, so the ladder is a pure function of
+// two stored numbers and cannot compound. OTA-1654's rule is reused: raising a
+// ceiling CARRIES the damage rather than repairing it (7/23 + 10 = 17/33, still 16
+// down) - and a measurement corrected me there, because that also means the repair
+// BILL does not move, only how high a full mend reaches. Costs: TC 140/300/640
+// through REPAIR_RARITY_MULT (the same rarity opinion repair uses, hoisted so one
+// table serves both) and materials at (level+1)x the repair bill via
+// reinforceCostMaterials, built on repairCostMaterials rather than a new table.
+// Fused/generated pieces have no catalog row, so their own temper roll is the base;
+// legacy saves lacking both fields read as unreinforced with no migration.
+export const OTA_BUILD_ID = '2026-09-07-1733-raise-the-ceiling-keep-the-damage';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-07-1732-the-instance-is-the-truth';
 // golem catch-up 2026-09-07: markerless publish of OTA-1732 - the instance is the
 // truth. Two PRE-EXISTING defects fixed on their own merits, ahead of and separate
 // from the reinforcement mechanic. (F1) sell -> buy back rebuilt the item from its

@@ -289,7 +289,16 @@ describe('OTA-1654 — the other load heals are undisturbed', () => {
 
   it('stampDurability still gives a fresh ring the catalog ceiling, undamaged', () => {
     const fresh = stampDurability(staleRing({ durability: undefined }));
-    expect(fresh.durability).toEqual({ current: 40, max: 40 });
+    // ⚠ OTA-1733 — NARROWED FROM WHOLE-OBJECT EQUALITY. `stampDurability` now also
+    //   stamps `baseMax` (this copy's ceiling before any reinforcement) and
+    //   `reinforced: 0`. The claim here is about the CEILING and the DAMAGE, and
+    //   both are unchanged; a strict toEqual made this test fail for a field it
+    //   never meant to police, and would do so again for the next one.
+    expect(fresh.durability!.current).toBe(40);
+    expect(fresh.durability!.max).toBe(40);
+    // and the new fields say "untouched", which is what a fresh ring is
+    expect(fresh.durability!.baseMax).toBe(40);
+    expect(fresh.durability!.reinforced).toBe(0);
   });
 });
 

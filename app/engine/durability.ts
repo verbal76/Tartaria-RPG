@@ -211,6 +211,105 @@ function rollInstancePerks(
  *  ⚠ Read as "is any of this lost if the object is rebuilt from its name", not
  *  as a kind check — a fused piece, a coated blade and a tempered helm are three
  *  different shapes with the same answer. */
+/** ⚠⚠⚠ OTA-1733 — REINFORCEMENT. Owner's ruling, option B:
+ *
+ *  *"Each reinforcement adds 20% of the weapon's CATALOG BASE durability to that
+ *  individual weapon's temper-rolled maximum … Temper remains meaningful, but
+ *  reinforcement must not multiply the advantage of a lucky temper roll."*
+ *
+ *  So the step is a FLAT number derived from the catalog row, added to whatever
+ *  this copy rolled. On a catalog base of 50 the step is 10, and every copy gains
+ *  the same 10 per level:
+ *
+ *      temper 20 → 30 → 40 → 50
+ *      temper 50 → 60 → 70 → 80
+ *      temper 90 → 100 → 110 → 120
+ *
+ *  A percentage of the INSTANCE max would have paid the lucky roll three times
+ *  over (90 → 108 → 130 → 156) — which is the thing the ruling rules out. */
+// ⚠ OTA-1733 — hoisted from below: repair and reinforcement now both price by
+// rarity, and one table serving two callers must be declared before either.
+const REPAIR_RARITY_MULT: Record<Rarity, number> = { Common: 1, Uncommon: 1.5, Rare: 2, Legendary: 3 };
+
+export const REINFORCE_MAX_LEVEL = 3;
+
+/** ⚠⚠ WHAT EACH LEVEL COSTS IN COIN, before rarity. Owner: *"each reinforcement
+ *  level more expensive than the previous one."* Roughly doubling, the shape the
+ *  economy already uses for a three-rung ladder (techniqueTextPrice: 250/600/1400).
+ *  Rarity multiplies it through REPAIR_RARITY_MULT — the SAME ladder repair uses,
+ *  so a Legendary costs more to strengthen for the same reason it costs more to
+ *  mend, and there is one rarity opinion rather than two. */
+export const REINFORCE_TC_BY_LEVEL = [140, 300, 640];
+export const REINFORCE_STEP_FRACTION = 0.2;
+
+/** The instance's ceiling before any reinforcement — its temper roll.
+ *  ⚠ A pre-OTA-1733 save has no `baseMax`; its `max` IS its temper roll, because
+ *  nothing could have reinforced it. Reading the fallback that way means legacy
+ *  weapons need no migration and cannot be mistaken for reinforced ones. */
+export function instanceBaseMax(item: InventoryItem): number {
+  return item.durability?.baseMax ?? item.durability?.max ?? 0;
+}
+
+export function reinforceLevel(item: InventoryItem): number {
+  return item.durability?.reinforced ?? 0;
+}
+
+/** How many points ONE reinforcement adds to this weapon. Flat, from the catalog.
+ *  ⚠ A FUSED or otherwise catalog-absent piece has no catalog base to take 20% of
+ *  — `lookupBaseDurability` misses by design (OTA-705: a fused name may collide
+ *  with an unrelated row, so it is never looked up). Its own temper roll IS its
+ *  base, so the step comes off `baseMax`. That keeps the promise "20% of what this
+ *  kind of weapon is worth" true for a piece whose kind is one of a kind. */
+export function reinforceStep(item: InventoryItem): number {
+  const catalog = item.uniqueStats ? null : lookupBaseDurability(item.name);
+  const from = catalog ?? instanceBaseMax(item);
+  return Math.max(1, Math.round(from * REINFORCE_STEP_FRACTION));
+}
+
+/** Why this item cannot be reinforced, or null when it can. */
+/** TC for the NEXT reinforcement of this item, rarity applied. 0 when it cannot
+ *  take another. */
+export function reinforceTcCost(item: InventoryItem): number {
+  const next = reinforceLevel(item);
+  if (next >= REINFORCE_MAX_LEVEL) return 0;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const rarity = (require('./crafting') as typeof import('./crafting')).canonicalItemRarity(item);
+  const mult = rarity ? (REPAIR_RARITY_MULT[rarity] ?? 1) : 1;
+  return Math.max(1, Math.round((REINFORCE_TC_BY_LEVEL[next] ?? 0) * mult));
+}
+
+export function reinforceRefusal(item: InventoryItem): string | null {
+  if (!item.durability) return 'has nothing to reinforce';
+  if (reinforceLevel(item) >= REINFORCE_MAX_LEVEL) return 'is already reinforced as far as it will go';
+  return null;
+}
+
+/** ⚠⚠ RAISE THE CEILING, KEEP THE DAMAGE. OTA-1654's rule, which this file already
+ *  applies when a CATALOG base rises: *"the extra headroom is the item getting
+ *  better, not the player's copy getting chipped, so carry the SAME NUMBER OF
+ *  POINTS OF DAMAGE across."* Owner, in the same words: reinforcement must not
+ *  magically repair the weapon. A 7/23 blade reinforced by 10 becomes 17/33 — still
+ *  16 points down, and still needing a repair it now costs more to buy. */
+export function reinforceItem(item: InventoryItem): InventoryItem {
+  if (reinforceRefusal(item)) return item;
+  const d = item.durability!;
+  const step = reinforceStep(item);
+  const baseMax = instanceBaseMax(item);
+  const level = reinforceLevel(item) + 1;
+  return {
+    ...item,
+    durability: {
+      // ⚠ Recomputed from baseMax + level × step, never `max + step`. An accumulator
+      //   would drift on rounding and would carry any other max change into the
+      //   ladder; this way the ladder is a pure function of the two stored numbers.
+      max: baseMax + step * level,
+      current: d.current + step,
+      baseMax,
+      reinforced: level,
+    },
+  };
+}
+
 export function itemCarriesInstanceState(item: InventoryItem): boolean {
   return !!(item.durability || item.instanceStats || item.uniqueStats || item.coating || item.coating2);
 }
@@ -227,14 +326,19 @@ export function stampDurability(item: InventoryItem): InventoryItem {
   // — plus nonsensical rolled stat perks, and every fresh instance re-rolled it.
   // Non-weapon/armor items now stamp a FIXED max = base, no perks: stable + sensible.
   if (item.kind !== 'weapon' && item.kind !== 'armor') {
-    return { ...item, durability: { current: base, max: base } };
+    // ⚠ OTA-1733 — baseMax is stamped even here, so every stamped object answers
+    //   instanceBaseMax the same way and nothing has to special-case a tool.
+    return { ...item, durability: { current: base, max: base, baseMax: base, reinforced: 0 } };
   }
   const temper = Math.random(); // 0 = fragile (strong perks), 1 = sturdy (weak perks)
   const max = Math.max(1, Math.round(base * lerp(0.4, 1.8, temper)));
   const instanceStats = rollInstancePerks(item, temper);
   return {
     ...item,
-    durability: { current: max, max },
+    // ⚠⚠ OTA-1733 — the TEMPER ROLL is this copy's baseMax. Reinforcement adds to
+    //    it and never rewrites it, so the ladder can always be reconstructed and a
+    //    lucky roll is never multiplied.
+    durability: { current: max, max, baseMax: max, reinforced: 0 },
     ...(instanceStats ? { instanceStats } : {}),
   };
 }
@@ -330,7 +434,6 @@ export function wearItemById(
 // overshoots) — a full Legendary repair goes ~65 → ~195 TC, real but not punishing
 // against late income. Composes with the Architect's Eye repair discount, which is
 // applied on top of this at the call site.
-const REPAIR_RARITY_MULT: Record<Rarity, number> = { Common: 1, Uncommon: 1.5, Rare: 2, Legendary: 3 };
 
 // Compute the TC cost to fully restore an item's durability. Base 1 TC per point
 // missing, scaled by the item's rarity, with a minimum of 1.

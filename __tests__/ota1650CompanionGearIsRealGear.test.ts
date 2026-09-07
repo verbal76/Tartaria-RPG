@@ -96,7 +96,11 @@ describe('OTA-1650 — the companions’ gear is real gear', () => {
       for (const v of VESTS) {
         expect(v.baseDurability).toBeGreaterThan(0);
         const inst = stampDurability(item({ name: v.name, kind: 'dog_armor' }));
-        expect(inst.durability).toEqual({ current: v.baseDurability, max: v.baseDurability });
+        // ⚠ OTA-1733 — narrowed from whole-object equality: the stamp now also
+        //   carries `baseMax` / `reinforced`. The claim is that a vest gets its
+        //   PRINTED value undamaged, and it still does.
+        expect(inst.durability!.current).toBe(v.baseDurability);
+        expect(inst.durability!.max).toBe(v.baseDurability);
       }
     });
 
