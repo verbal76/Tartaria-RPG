@@ -28632,6 +28632,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // "You already know the X working." branch could never be true - typing the name of
 // a working you own answered "doesn't carry any X", the opposite of the truth.
 export const OTA_BUILD_ID = '2026-09-07-1731-sorted-by-where-it-goes';
+// golem catch-up 2026-09-07: markerless publish of OTA-1731 - sorted by where it
+// goes, and the vendor admits what you own. ARMOR and AMULETS & RINGS divide into
+// labelled runs by body part (head/chest/hands/legs/feet/cloak, amulets/rings)
+// through the same validSlotsForItem the row's own slot label uses; the screen's
+// weapon-only ternary became one categoryRuns(cat, items). And a "working to
+// learn" you already own no longer VANISHES from a vendor's list - it stays,
+// greyed, reading ✓ KNOWN. vendorRecipeMenu is the slice with an owned flag and
+// vendorRecipeOffers derives from it, so OTA-802's fixed-slice contract is intact.
+// That also made a dead message live: buyFromVendor read the sales list, which had
+// already dropped everything known, so "You already know the X working." could
+// never fire and typing an owned working answered "doesn't carry any X" instead.
+// hal took the marker.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-07-1730-the-hint-points-somewhere-you-can-go';
 // golem catch-up 2026-09-07: markerless publish of OTA-1730 - the hint points
 // somewhere you can still go. The Arbiter's two "try something else" wall hints
