@@ -17,6 +17,7 @@ import { computeInventoryDelta, type InventoryDelta } from '../components/invent
 import { MAX_CAST_BATCH } from '../state/aethercraftBatch';
 import { SearchSortBar, type SortDirection } from '../components/SearchSortBar';
 import { FirstTimeHint } from '../components/FirstTimeHint';
+import { TEACHINGS as TEACH } from '../components/teachingRegistry'; // OTA-1738
 import type { InventoryItem, PlayerCharacter } from '../engine/types';
 // OTA-1195 — PUNCHLIST P16. The Aetheric tab is where the disciplines already live, so it
 // is where the techniques belong: same energy, same fuel, same corruption ledger.
@@ -302,26 +303,13 @@ type Tab = 'craft' | 'repair' | 'recipes' | 'aetheric';
 // stale for a full feature wave (it described only the three disciplines while the
 // tab's headline became the four techniques), and nothing could notice.
 export const TAB_HINTS: Record<Tab, { title: string; body: string; id?: string }> = {
-  craft: {
-    title: 'Craft tab',
-    body: 'Every gear / relic blueprint. Ready-to-craft ones are highlighted; the rest list what you\'re missing.',
-  },
-  repair: {
-    title: 'Repair tab',
-    body: 'Damaged weapons, armor, and relics. Tap one to spend TC and restore durability — cost scales with missing points.',
-  },
-  recipes: {
-    title: 'Recipes tab',
-    body: 'Food, tonics, elixirs. Tap a recipe with materials in hand to fire it. Same craftable-highlight rule as Craft.',
-  },
-  aetheric: {
-    // ⚠ v2 id, deliberately: hint dismissals are per-install, so an edited body under
-    // the old id would never be seen by a tester who dismissed the pre-technique card.
-    // Bump the id again if this card is ever rewritten again.
-    id: 'crafting_tab_aetheric_v2',
-    title: 'Aetheric tab',
-    body: 'Your aether techniques live here — tap Channel to raise one; each channel costs a dose, and practice raises your rank. Techniques are learned from Procedure Texts: bought from a faction that trusts you, found at aether-heavy ruins, or earned in stories. Below them, the three disciplines — shape stone, summon golem, mend wounds.',
-  },
+  // ⚠ OTA-1738 — the copy lives in the teaching registry (one body, replayable).
+  // REPAIR is v2: the old card said this tab "spends TC" — this tab has charged
+  // MATERIALS (repairCostMaterials) since OTA-059; TC repair is the trader's.
+  craft: { id: TEACH.crafting_tab_craft.id, title: TEACH.crafting_tab_craft.title, body: TEACH.crafting_tab_craft.body },
+  repair: { id: TEACH.crafting_tab_repair_v2.id, title: TEACH.crafting_tab_repair_v2.title, body: TEACH.crafting_tab_repair_v2.body },
+  recipes: { id: TEACH.crafting_tab_recipes.id, title: TEACH.crafting_tab_recipes.title, body: TEACH.crafting_tab_recipes.body },
+  aetheric: { id: TEACH.crafting_tab_aetheric_v2.id, title: TEACH.crafting_tab_aetheric_v2.title, body: TEACH.crafting_tab_aetheric_v2.body },
 };
 
 export function CraftingScreen() {

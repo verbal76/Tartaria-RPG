@@ -56,19 +56,32 @@ describe('OTA-1531 — the pill waits for the opening to finish', () => {
   it('⚠⚠ the suppression runs BEFORE the lock-beat check, so no beat can leak past it', () => {
     const code = codeOnly(OVERLAY);
     const cards = code.indexOf('if (storyIntro || chapterCard');
-    const beat = code.indexOf('const beatId = TUTORIAL_STEPS[tutorialStep]');
+    // ⚠ OTA-1738 — the lock-beat check is the shared authority now.
+    const beat = code.indexOf('if (!isTutorialLocked(tutorialStep, tutorialExploreChosen)) return null;');
     expect(cards).toBeGreaterThan(-1);
+    expect(beat).toBeGreaterThan(-1);
     expect(cards).toBeLessThan(beat);
   });
 
   it('⚠⚠ arb108\'s contract is intact — same lock beats, same exits', () => {
-    // The fix adds a precondition; it must not quietly re-scope the pill.
-    expect(OVERLAY).toContain(
-      "const TUT_LOCK_BEATS = ['name', 'cudgel', 'rope', 'scrap', 'climb', 'investigate', 'explore_or_leave'];",
-    );
+    // ⚠⚠ OTA-1738 — THE PILL'S OWN LIST IS GONE. It held seven beats while the
+    // canonical TUT_LOCK_BEATS (tutorialSteps) holds ten: `look`, `armor` and
+    // `screen_pick` locked the input row with no escape hatch on screen. One
+    // authority — `isTutorialLocked` — the same function InputBox reads.
+    expect(OVERLAY).toContain("import { isTutorialLocked } from './tutorialSteps';");
     const code = codeOnly(OVERLAY);
-    expect(code).toContain('TUT_LOCK_BEATS.includes(beatId) && !tutorialExploreChosen');
-    expect(code).toContain('if (tutorialStep === null) return null;');
+    expect(code).not.toContain('const TUT_LOCK_BEATS');
+    expect(code).toContain('if (!isTutorialLocked(tutorialStep, tutorialExploreChosen)) return null;');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { TUT_LOCK_BEATS, isTutorialLocked, TUTORIAL_STEPS } = require('../app/components/tutorialSteps') as typeof import('../app/components/tutorialSteps');
+    for (const b of ['name', 'cudgel', 'rope', 'scrap', 'climb', 'investigate', 'explore_or_leave', 'look', 'armor', 'screen_pick']) {
+      expect(TUT_LOCK_BEATS).toContain(b);
+      const idx = TUTORIAL_STEPS.findIndex((st) => st.id === b);
+      expect(idx).toBeGreaterThan(-1);
+      expect(isTutorialLocked(idx, false)).toBe(true);
+    }
+    expect(isTutorialLocked(null, false)).toBe(false);
+    expect(isTutorialLocked(TUTORIAL_STEPS.findIndex((st) => st.id === 'explore_or_leave'), true)).toBe(false);
   });
 
   it('⚠⚠ it is the same card set the store already calls a busy screen', () => {

@@ -222,10 +222,12 @@ describe('OTA-1249 — RENDERED: one lit button on the look beat', () => {
 describe('OTA-1249 — the colour card waits for the picker to close', () => {
   it('⚠⚠ it is gated on a CLOSE latch, not on arrival in the room', () => {
     const screen = src('app', 'screens', 'ExplorationScreen.tsx');
-    expect(screen).toContain('id="picker_colour_lanes"');
-    expect(screen).toContain('{pickerLanesTaught && (');
+    // ⚠ OTA-1738 — the card is one candidate of the screen's single teaching slot;
+    // the gate is still the close latch, now as the candidate's `when`.
+    expect(screen).toContain('{ id: TEACH.picker_colour_lanes.id, when: !modalOwnsBeat && pickerLanesTaught }');
     // The old gate fired the moment the room rendered.
     expect(screen).not.toContain('{gatherLaneCount >= 2 && (');
+    expect(screen).not.toContain('when: !modalOwnsBeat && gatherLaneCount >= 2');
   });
 
   it('⚠⚠ the lane count is a HIGH-WATER MARK taken while open, not a reading at close', () => {

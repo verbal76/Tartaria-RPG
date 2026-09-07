@@ -12,9 +12,9 @@
 // primitive; the FirstTimeHint component renders the popup.
 //
 // Persistence is per-install (not per-save-slot). A player rolling
-// a second character doesn't want to re-see every hint. Tutorial
-// Replay (Phase 2) will list every hint as a flat doc for players
-// who want a refresher.
+// a second character doesn't want to re-see every hint. OTA-1738 —
+// Settings → GUIDANCE → REPLAY TEACHING (GuidanceScreen) lists every
+// card, seen or not, without writing a flag.
 
 import { useEffect, useState, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -125,10 +125,10 @@ export function useFirstTimeHint(id: string): HintState {
 }
 
 // Test / dev helper — reset a hint so it shows again on next mount.
-// Reachable from Tutorial Replay (Phase 2).
 export async function resetFirstTimeHint(id: string): Promise<void> {
   try {
     await AsyncStorage.removeItem(KEY_PREFIX + id);
+    seenCache.delete(id);
   } catch {
     // best-effort
   }
@@ -140,7 +140,72 @@ export async function resetAllFirstTimeHints(): Promise<void> {
     const keys = await AsyncStorage.getAllKeys();
     const toRemove = keys.filter((k) => k.startsWith(KEY_PREFIX));
     if (toRemove.length > 0) await AsyncStorage.multiRemove(toRemove);
+    seenCache.clear();
   } catch {
     // best-effort
   }
+}
+
+// ⚠⚠ OTA-1738 — THE SAME FLAGS, READABLE FROM THE STORE. The bounty primer is
+// raised inside a slice action (no hook can run there), so it needs a
+// synchronous answer to "has this install seen it" and a synchronous way to
+// say "it has now". Same key prefix as every card, so SHOW ALL TIPS AGAIN and
+// the per-id reset above govern it exactly as they govern a FirstTimeHint.
+const seenCache = new Set<string>();
+let seenPrimed = false;
+
+/** Load the seen set once (App boot). Safe to call repeatedly. */
+export async function primeSeenHints(): Promise<void> {
+  if (seenPrimed) return;
+  try {
+    const keys = await AsyncStorage.getAllKeys();
+    for (const k of keys) if (k.startsWith(KEY_PREFIX)) seenCache.add(k.slice(KEY_PREFIX.length));
+    seenPrimed = true;
+  } catch {
+    // best-effort: an unprimed cache reads "unseen", which shows a card at most once more
+  }
+}
+
+/** Synchronous read for store-side surfaces. */
+export function isHintSeen(id: string): boolean {
+  return seenCache.has(id);
+}
+
+/** Mark seen from store-side code — writes the same flag a card's dismiss writes. */
+export function markHintSeen(id: string): void {
+  seenCache.add(id);
+  void AsyncStorage.setItem(KEY_PREFIX + id, '1').catch(() => { /* worst case: shows again next launch */ });
+}
+
+/** ⚠ OTA-1738 — READ-ONLY listing for the replay screen: which ids this install has
+ *  dismissed. Never writes, so opening the replay marks nothing seen. */
+export async function readSeenHintIds(): Promise<Set<string>> {
+  try {
+    const keys = await AsyncStorage.getAllKeys();
+    return new Set(keys.filter((k) => k.startsWith(KEY_PREFIX)).map((k) => k.slice(KEY_PREFIX.length)));
+  } catch {
+    return new Set();
+  }
+}
+
+// ⚠⚠⚠ OTA-1738 — ONE OPTIONAL TEACHING SURFACE PER PLAYER BEAT. A screen that can
+// raise several first-use cards on the same state (a first fight with a shield
+// on and a spare spear in the pack; a trader whose counter also repairs,
+// reinforces and teaches workings) hands them here in priority order with each
+// one's own eligibility, and gets back the ONE id that should render now: the
+// first candidate whose mechanic is actionable and whose card is unseen. When
+// that card is dismissed the next eligible one takes the beat on the following
+// render — a sequence of beats, never a stack.
+//
+// ⚠ ELIGIBILITY STAYS WHERE IT LIVES. This picks presentation order only; each
+// `when` is the mechanic's own predicate (the same one its control reads).
+// ⚠ Hooks need a fixed call count, so the candidate list must be the same
+// length on every render of a given call site.
+export function useTeachingSlot(candidates: ReadonlyArray<{ id: string; when: boolean }>): string | null {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const states = candidates.map((c) => useFirstTimeHint(c.id));
+  for (let i = 0; i < candidates.length; i++) {
+    if (candidates[i]!.when && states[i]!.shouldShow === true) return candidates[i]!.id;
+  }
+  return null;
 }

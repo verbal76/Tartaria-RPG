@@ -24,6 +24,8 @@
 // FirstTimeHint. This is just a doc, not the play loop.
 
 import type { ScreenName } from '../engine/types';
+import { MOVEMENT_COST_LINE } from './teachingRegistry'; // OTA-1738 — quoted from STAMINA_COSTS
+import { PITY_KILL_INTERVAL } from '../engine/resurrectionRules'; // OTA-1738
 
 export type HighlightArea =
   // World screen regions (the main exploration view — the player's
@@ -273,9 +275,11 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     screen: 'exploration',
     area: 'fullscreen',
     title: 'The Door Is Open',
-    body: 'The outpost door stands open. Explore what remains, or head out and begin your journey.',
+    // ⚠ OTA-1738 — the one movement-cost sentence (owner decision 3), quoted from
+    // the table the store charges so the number cannot drift.
+    body: `The outpost door stands open. Explore what remains, or head out and begin your journey. ${MOVEMENT_COST_LINE}`,
     arbiter:
-      '"The way\'s open. Pick this place over, or step out and begin. Your call."',
+      `"The way's open. Pick this place over, or step out and begin. Your call. ${MOVEMENT_COST_LINE}"`,
   },
   {
     id: 'main_quest',
@@ -292,9 +296,10 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     screen: 'contracts',
     area: 'fullscreen',
     title: 'Choose a Capital',
-    body: 'Tap the primary objective box at the top to open the list of nine Capitals, then choose one. Any works — distance varies, but the Aether marks the road.',
+    // ⚠ OTA-1738 — Ask Arbiter, mentioned once, at the close (owner decision).
+    body: 'Tap the primary objective box at the top to open the list of nine Capitals, then choose one. Any works — distance varies, but the Aether marks the road. Lost later? Type ask about anything — the Arbiter explains the rules.',
     arbiter:
-      '"Tap the objective box up top. Pick a Capital; the Aether marks the road."',
+      '"Tap the objective box up top. Pick a Capital; the Aether marks the road. And if you lose the thread out there, ask me — type ask about anything."',
   },
 ];
 
@@ -368,13 +373,14 @@ export const TUTORIAL_DOCS_FULL: TutorialStep[] = [
     title: 'The gear corner',
     body:
       'Tap the ⚙ in the bottom-right corner — it\'s your one hub for everything outside the world. ' +
-      'Four tabs inside: ' +
-      '\n\n• SESSION — save & exit, copy / clear the log, slot management. ' +
+      'Inside: ' +
+      '\n\n• SESSION — save & exit, report a bug, slot management. ' +
       '\n• SFX — music + voice toggles. ' +
+      '\n• DISPLAY — scale, motion, and GUIDANCE (first-time tips on/off, show them again, REPLAY TEACHING). ' +
       '\n• LORE — the full codex. It opens on BEASTS (everything you have fought), with FALLEN ' +
       'next to it; PLACES, FACTIONS, RACES, LORE and TIMELINE follow. Tap any Place to plan ' +
       'a travel route straight there. ' +
-      '\n• ABOUT — build info, diagnostics, build identifier.',
+      '\n• NOTICES — third-party notices and the build identifier.',
   },
   {
     screen: 'exploration',
@@ -383,7 +389,7 @@ export const TUTORIAL_DOCS_FULL: TutorialStep[] = [
     body:
       'Where you are right now: location · weather · hazard. The line below shows in-game time ' +
       '(Day N · morning / afternoon / evening / night). ' +
-      '\n\nACTIONS on the right opens a full reference of every verb the engine understands.' +
+      '\n\nEvery verb the engine understands is listed under Settings → GUIDANCE → REPLAY TEACHING → REFERENCE.' +
       '\n\nThe MAIN QUEST chip just below the scene bar shows the next concrete step in your ' +
       'core arc and doubles as the entry to the full Contracts screen.',
   },
@@ -403,8 +409,8 @@ export const TUTORIAL_DOCS_FULL: TutorialStep[] = [
       'NORTH / SOUTH / EAST / WEST — one tap = one step in that direction on the world map. ' +
       'Inside a building (outpost, hub, structure) the same row shows room-name chips for the ' +
       'rooms attached to the one you\'re in, plus an OUT chip to leave.' +
-      '\n\nFor long hauls: type "travel to <city>" OR tap MAP and pick a row from the TRAVEL TO ' +
-      'panel below the atlas.',
+      '\n\nFor long hauls: type "travel to <city>" OR tap the mini-map to open the Atlas and pick a row ' +
+      'from the TRAVEL TO panel below it.',
   },
   {
     screen: 'exploration',
@@ -412,9 +418,9 @@ export const TUTORIAL_DOCS_FULL: TutorialStep[] = [
     title: 'Quick actions',
     body:
       'Tappable shortcuts for the most common actions. In peace: "look around you", rest, ' +
-      'investigate, approach, take, salvage, climb, craft, inventory, ask arbiter.' +
-      '\n\nIn combat the row splits into 3 lines: weapons + bare-hand, dodge / flee / companions, ' +
-      'and approach / step-back / inventory.',
+      'take / salvage, climb, investigate, missions, pickpocket, craft, inventory, fuse — and ✦ ability when a gift is ready.' +
+      '\n\nIn combat the row splits into 3 lines: weapons + bare-hand, dodge / stealth / flee / companions, ' +
+      'and approach / step-back / inventory. Some buttons appear only with the kit that earns them.',
   },
   {
     screen: 'exploration',
@@ -444,8 +450,8 @@ export const TUTORIAL_DOCS_FULL: TutorialStep[] = [
     body:
       'Death isn\'t a hard wipe. Resurrection Gems are stored install-wide — they survive across ' +
       'characters — and one Gem revives a fallen character from the title screen.' +
-      '\n\nYou already have 1 (granted on first install). Boss kills and Core Guardian kills ' +
-      'each grant one, plus a pity timer every 50 non-boss kills and a 0.5% drop per non-boss.',
+      `\n\nBoss kills and Core Guardian kills each grant one, and a pity gem lands every ${PITY_KILL_INTERVAL} ` +
+      'non-boss kills; the odd one also turns up on an ordinary kill.',
   },
   {
     screen: 'exploration',

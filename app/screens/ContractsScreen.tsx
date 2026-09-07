@@ -4,6 +4,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable, Modal,
 import { standingAtLocation, stationedAtNamedLocation } from '../engine/standingAt';
 import { useGameStore } from '../state/gameStore';
 import { FirstTimeHint } from '../components/FirstTimeHint';
+import { TEACHINGS as TEACH } from '../components/teachingRegistry'; // OTA-1738
 import { bountyKey, bountyHoursLeft, BOUNTY_DEADLINE_HOURS } from '../engine/factionBounty';
 import { findHuntById, HUNTS, checkKindLabel, biomeLabel, stageTypeLabel, weaponRarityMeets } from '../engine/hunts';
 import { getItemPreview } from '../components/itemPreview';
@@ -101,6 +102,7 @@ type Tab = 'contracts' | 'collectables';
 
 export function ContractsScreen() {
   const player = useGameStore((s) => s.player);
+  const missionCompleteNotice = useGameStore((s) => s.missionCompleteNotice); // OTA-1738 — the bounty primer owns the beat
   const setScreen = useGameStore((s) => s.setScreen);
   const completeContractFromUI = useGameStore((s) => s.completeContractFromUI);
   const contractsNotice = useGameStore((s) => s.contractsNotice);
@@ -601,11 +603,13 @@ export function ContractsScreen() {
     <View style={styles.container}>
       {/* OTA-1205 — v2 id: the body gained the host hand-in rule (OTA-1201) and dismissals
           are per-install, so the old id would hide the new line from existing testers. */}
-      <FirstTimeHint
-        id="contracts_first_open_v2"
-        title="Your missions"
-        body="Everything you've taken on lives here — hunts, faction work, and bounties. Tap one to set a course or check your progress. Hand-ins answer to whoever owns the ground you stand on — if they won't take your work, a broker, courier, or the Hidden Market will, for a cut."
-      />
+      {/* ⚠ OTA-1738 — v3: the v2 body promised a courier for ANY work; a hunt's
+          trophy is face-to-face only (turnInHunt refuses `remote`). And it waits
+          while the bounty primer (a spotlight notice) owns the screen, so a first
+          bounty never lands two cards on one beat. */}
+      {!missionCompleteNotice && (
+        <FirstTimeHint id={TEACH.contracts_first_open_v3.id} title={TEACH.contracts_first_open_v3.title} body={TEACH.contracts_first_open_v3.body} />
+      )}
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => setScreen('exploration')}

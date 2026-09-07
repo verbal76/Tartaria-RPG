@@ -322,6 +322,14 @@ const DOG_HP_BONUS: Record<DogStartingProfile, number> = {
 /** The dog's answer to `rollStartingHP` — 2d4 plus the profile's bonus. Exported
  *  for the same reason the player's is: it is the one place the number comes
  *  from, and a test that re-implements it is not testing anything. */
+/** ⚠ OTA-1738 — the decay clock, named. Every LOYALTY_DECAY_HOURS in-game hours
+ *  without a feed costs the dog one loyalty (the store's advanceTime reads this);
+ *  the onboarding card quotes it, so the number the player is told is the number
+ *  the clock runs on. */
+export const LOYALTY_DECAY_HOURS = 4;
+/** The warning crossings the store's loyalty tick speaks at (one beat per crossing). */
+export const DOG_LOYALTY_BANDS = [50, 30, 15] as const;
+
 export function rollStartingDogHP(profile: DogStartingProfile): number {
   return rollDice(DOG_HP_DICE.count, DOG_HP_DICE.sides) + DOG_HP_BONUS[profile];
 }

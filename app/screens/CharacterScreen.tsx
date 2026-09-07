@@ -10,6 +10,7 @@ import { useGameStore } from '../state/gameStore';
 // ⚠ OTA-1404 — combat resolution moved out of gameStore into its own leaf.
 import { effectiveACBreakdown, playerArmorResistKinds, dogVestAcBonus } from '../state/combatResolution';
 import { FirstTimeHint } from '../components/FirstTimeHint';
+import { TEACHINGS as TEACH } from '../components/teachingRegistry'; // OTA-1738
 // OTA-1434 — who you are, at the top of the sheet.
 import { CharacterPortrait } from '../components/CharacterPortrait';
 // OTA-1444 — the one-time veteran ♂/♀ ask, raised here because this sheet is
@@ -194,11 +195,7 @@ export function CharacterScreen() {
 
   return (
     <View style={styles.container}>
-      <FirstTimeHint
-        id="character_first_open"
-        title="Your character"
-        body="Tap any stat or number to see exactly what feeds it. Scroll down for your Chronicle — the legend of what you've done."
-      />
+      <FirstTimeHint id={TEACH.character_first_open.id} title={TEACH.character_first_open.title} body={TEACH.character_first_open.body} />
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => setScreen('exploration')}

@@ -266,8 +266,12 @@ const EXPLORE_SECTIONS = new Set([
   'Social Interactions', 'Skill-Based Actions', 'Preparation and Planning',
 ]);
 
-export function ActionReferenceScreen() {
-  const setScreen = useGameStore((s) => s.setScreen);
+/** ⚠ OTA-1738 — THE BODY, EMBEDDABLE. The audit found this screen reachable from
+ *  nowhere (no `setScreen('actions')` caller anywhere). The Guidance screen
+ *  (Settings → GUIDANCE → REPLAY TEACHING → REFERENCE) now hosts it, so there
+ *  is one reference and one door. The standalone screen wrapper stays for the
+ *  route table. */
+export function ActionReferenceBody() {
   const queueInputDraft = useGameStore((s) => s.queueInputDraft);
   // arb88 — drives the context-first ordering of the reference.
   const inCombat = useGameStore((s) => (s.currentScene?.enemies?.length ?? 0) > 0);
@@ -363,21 +367,7 @@ export function ActionReferenceScreen() {
   );
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => setScreen('exploration')}
-          style={styles.backBtn}
-          hitSlop={8}
-          activeOpacity={0.7}
-          accessibilityRole="button"
-          accessibilityLabel="Go back"
-        >
-          <Text style={styles.backText}>← BACK</Text>
-        </TouchableOpacity>
-        <Text style={styles.title} accessibilityRole="header">ACTIONS</Text>
-        <View style={{ width: 80 }} />
-      </View>
+    <>
       {/* arb88 — search box. Filters every card by name / what-it-does /
           example phrasing / concept keywords. */}
       <View style={styles.searchWrap}>
@@ -436,6 +426,29 @@ export function ActionReferenceScreen() {
           </>
         )}
       </ScrollView>
+    </>
+  );
+}
+
+export function ActionReferenceScreen() {
+  const setScreen = useGameStore((s) => s.setScreen);
+  return (
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity
+          onPress={() => setScreen('exploration')}
+          style={styles.backBtn}
+          hitSlop={8}
+          activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
+        >
+          <Text style={styles.backText}>← BACK</Text>
+        </TouchableOpacity>
+        <Text style={styles.title} accessibilityRole="header">ACTIONS</Text>
+        <View style={{ width: 80 }} />
+      </View>
+      <ActionReferenceBody />
     </View>
   );
 }

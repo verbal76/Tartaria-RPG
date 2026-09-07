@@ -133,13 +133,14 @@ describe('OTA-1245 — taught where it is true', () => {
     // ⚠ The right question is not "is the tutorial running" but "is the picker
     // showing a narrowed list", and only two beats narrow it.
     const screen = src('app', 'screens', 'ExplorationScreen.tsx');
-    expect(screen).toContain('id="picker_colour_lanes"');
+    // ⚠ OTA-1738 — the card is a candidate of the screen's teaching slot, keyed on
+    // the same close latch.
+    expect(screen).toContain('{ id: TEACH.picker_colour_lanes.id, when: !modalOwnsBeat && pickerLanesTaught }');
     // ⚠ OTA-1248: with the picker fully populated in every beat, the gate is the
     // lane count alone — there is no longer a state where it would over-promise.
     // ⚠ OTA-1249: and it is latched at picker CLOSE rather than on arrival, so
     // the gate expression moved into the effect. Still the lane count, still one
     // source; ota1249 pins the timing.
-    expect(screen).toContain('{pickerLanesTaught && (');
     expect(screen).not.toContain('{!tutBeat && gatherLaneCount >= 2 && (');
   });
 
@@ -194,13 +195,13 @@ describe('OTA-1245 — taught where it is true', () => {
     // FirstTimeHint's authoring rule (OTA-229): ~25 words, 2 sentences. The owner
     // has already pushed back once on tutorial verbosity ("way too much text for
     // the salvage button", OTA-1075).
-    const screen = src('app', 'screens', 'ExplorationScreen.tsx');
-    const i = screen.indexOf('id="picker_colour_lanes"');
-    const body = /body="([^"]+)"/.exec(blockAt(screen, 'id="picker_colour_lanes"'));
-    expect(body).not.toBeNull();
-    expect(body![1]!.split(/\s+/).length).toBeLessThanOrEqual(30);
+    // ⚠ OTA-1738 — the copy lives in the teaching registry.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { TEACHINGS } = require('../app/components/teachingRegistry') as typeof import('../app/components/teachingRegistry');
+    const body = TEACHINGS.picker_colour_lanes.body;
+    expect(body.split(/\s+/).length).toBeLessThanOrEqual(30);
     // It names the colours, because the colours ARE the system.
-    for (const w of ['orange', 'green', 'yellow']) expect(body![1]!.toLowerCase()).toContain(w);
+    for (const w of ['orange', 'green', 'yellow']) expect(body.toLowerCase()).toContain(w);
   });
 });
 

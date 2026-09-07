@@ -83,7 +83,7 @@ const ANCHOR_PATTERNS = [
 const ALLOW = [
   {
     file: 'app/screens/MapScreen.tsx',
-    line: 662, // OTA-1700 moved it (the Atlas's travel rows took the tutorial lock)
+    line: 663, // OTA-1700 moved it (the Atlas's travel rows took the tutorial lock); OTA-1738's registry import moved it one more
     // RESOLVING THE CURRENT LOCATION'S RECORD, not testing a position. This is the
     // "which place's rules apply to me" question — it looks up the row for the last
     // named place so the screen can read its name, tags and description. Nothing

@@ -36,6 +36,14 @@ import { Modal, View, Text, Pressable, StyleSheet, ScrollView } from 'react-nati
 // in their face and had no way to say no from inside it. An opt-out that some cards
 // ignore is not an opt-out.
 import { setHintsDisabled } from './useFirstTimeHint';
+// ⚠⚠ OTA-1738 — THE NUMBERS ARE THE ENGINE'S, NOT THE COPY'S. The flee cost, the
+// dodge reset and the stealth rule are quoted from the constants and the handler
+// that run them (combatRules FLEE_STAMINA_COST, dodgeCooldown, the stealth
+// opener at gameStore's `stealth` branch), so this card cannot drift the way the
+// old STEALTH row did — it said "costs your turn" for a pre-contact opener that
+// costs nothing and lets nothing swing back.
+import { FLEE_STAMINA_COST } from '../engine/combatRules';
+import { DODGE_COOLDOWN_ROUNDS } from '../engine/dodgeCooldown';
 
 export function CombatPrimerModal({
   visible, enemyName, onClose,
@@ -63,15 +71,17 @@ export function CombatPrimerModal({
             <Text style={styles.row}>
               <Text style={styles.term}>DODGE — </Text>
               read the incoming swing. Slip it and your next strike lands double;
-              read it wrong and you take the hit like any other. It needs a moment
+              read it wrong and you take the hit like any other. It takes {DODGE_COOLDOWN_ROUNDS} rounds
               to reset between uses.
             </Text>
             <Text style={styles.row}>
               <Text style={styles.term}>STEALTH — </Text>
-              gets you out of their line. Used before you have closed, it is a free
-              opening drop; used once they are on you, it costs your turn and they
-              get to answer. Win it and your next strike lands +5; lose it and you
-              are caught exposed. Daylight and open ground count against you.
+              before contact — while they are still out of reach — is a roll for a free
+              opening: pass it and nothing swings at you and your next strike lands +5
+              for two rounds; fail it and they get their swing. It works once per
+              scene. Once they are on you it is a contest of reflexes and they answer
+              either way: win and your next strike lands +5, lose and you are caught
+              exposed. Night helps; daylight counts against you.
             </Text>
             <Text style={styles.row}>
               <Text style={styles.term}>APPROACH — </Text>
@@ -81,6 +91,18 @@ export function CombatPrimerModal({
               ground — not that you swing too weak. <Text style={styles.btnRef}>approach</Text>
               {' '}lights up whenever you are not yet in close. Moving costs you a beat,
               and anything already in reach gets a swing at you.
+            </Text>
+            {/* ⚠ OTA-1738 — owner decision 2: Power is taught HERE, on the first
+                fight, where both badges are on screen; the `power_number` card that
+                used to land beside this modal is gone. Colours are the badge's own
+                (powerRating: favored / even / danger). */}
+            <Text style={styles.row}>
+              <Text style={styles.term}>POWER — </Text>
+              the ◆ number by your name is a quick gauge of your stats, weapon, armour
+              and health. In a fight your number and each foe's take the colour of the
+              matchup: green, you outclass it; gold, an even fight; red, it outclasses
+              you. Your stats still decide the rolls — Power only tells you where you
+              stand at a glance.
             </Text>
             <Text style={styles.row}>
               <Text style={styles.term}>WEAPONS &amp; ARMOR — </Text>
@@ -99,14 +121,23 @@ export function CombatPrimerModal({
               some buttons only appear once you are carrying the thing that earns them.
               Put a shield on your off arm and <Text style={styles.btnRef}>block</Text> and
               {' '}<Text style={styles.btnRef}>shield bash</Text> turn up; keep a spare spear
-              and <Text style={styles.btnRef}>throw spear</Text> does. Each is explained the
-              first time it appears — so check the row again after you change kit.
+              and <Text style={styles.btnRef}>throw spear</Text> does — and every throw spends
+              one spear, hit or miss. Each is explained the first time it appears — so
+              check the row again after you change kit.
             </Text>
             <Text style={styles.row}>
               <Text style={styles.term}>NOT EVERY FIGHT — </Text>
               you can also type what you want instead of tapping it, and some foes can be
-              talked down, scared off, or simply outrun. <Text style={styles.btnRef}>flee</Text> is
-              always there.
+              talked down or scared off.
+            </Text>
+            {/* ⚠ OTA-1738 — the truthful flee line (no mechanic change): the cost is
+                charged once you are clear; a failed break hands them a swing; in the
+                wilds each failed try raises the bar for the next. */}
+            <Text style={styles.row}>
+              <Text style={styles.term}>FLEE — </Text>
+              always there. Getting clear costs {FLEE_STAMINA_COST} stamina; a break that fails
+              hands them a swing, and out in the wilds every failed try makes the next
+              one harder. Wounded pursuers give up sooner.
             </Text>
             <Text style={styles.footnote}>
               You can lose. Losing is part of it — the buried world keeps a roll of

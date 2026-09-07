@@ -31,9 +31,13 @@ import {
   trainDogStat,
   dogHpGainClause,
   healLegacyDogVest,
+  LOYALTY_DECAY_HOURS,
+  DOG_LOYALTY_BANDS,
   type RescueScenarioId,
   type RescueScenario,
 } from '../engine/dogCompanion';
+import { STAMINA_COSTS } from '../engine/staminaCosts'; // OTA-1738
+import { PITY_KILL_INTERVAL } from '../engine/resurrectionRules'; // OTA-1738
 import { buildingNameFor, buildingHookLabel, buildingArrow } from '../engine/buildingMaps';
 // ⚠ OTA-1588 — TYPE-ONLY, so the lazy `require` this file uses for questStage is
 // untouched: `import type` is erased at compile time and cannot create the module
@@ -2944,12 +2948,9 @@ const ARBITER_ENGAGED_INTENTS: ReadonlySet<string> = new Set([
   'drink', 'fill',
 ]);
 
-export const STAMINA_COSTS = {
-  travel: 2,
-  wander: 1,
-  attack: 1,
-  skillCheck: 1,
-} as const;
+// ⚠ OTA-1738 — the table lives in engine/staminaCosts (the tutorial quotes it);
+// re-exported here so every existing reader keeps its import.
+export { STAMINA_COSTS };
 
 // OTA-847 (STEALTH SYSTEM) — Stealth at or above this value makes a FAILED
 // pickpocket against a vendor fail QUIETLY (you feel the mark's attention turn
@@ -6198,8 +6199,8 @@ export function advanceTime(player: PlayerCharacter, hours: number): PlayerChara
     const lastFed = dog.lastFedAtHour ?? 0;
     const oldGap = Math.max(0, oldHours - lastFed);
     const newGap = Math.max(0, newHours - lastFed);
-    const oldDecayBucket = Math.floor(oldGap / 4);
-    const newDecayBucket = Math.floor(newGap / 4);
+    const oldDecayBucket = Math.floor(oldGap / LOYALTY_DECAY_HOURS);
+    const newDecayBucket = Math.floor(newGap / LOYALTY_DECAY_HOURS);
     const decayTicks = Math.max(0, newDecayBucket - oldDecayBucket);
     if (decayTicks > 0) {
       const newLoyalty = Math.max(0, dog.loyalty - decayTicks);
@@ -25563,7 +25564,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // a 50-kill pity gem made gems pile up faster than a careful player could
     // ever spend them, draining death of its stakes. 100 keeps the safety net
     // for grinders without flooding the stash.
-    const PITY_KILL_INTERVAL = 100;
     const pityHit = !enemy.boss && newKills > 0 && newKills % PITY_KILL_INTERVAL === 0;
     // OTA-613 — the boss guarantee fires once per distinct boss. If a boss can
     // be re-fought (respawn / re-rolled encounter), a guaranteed gem every kill
@@ -36641,9 +36641,9 @@ export function tickDogStatus(
   // Escalating warning beats at 50 / 30 / 15 — latched so each fires
   // once per crossing, not every tick.
   const bands: Array<{ at: number; line: string }> = [
-    { at: 50, line: `${dog.name} keeps eyeing your pack. {Pronoun} {isOrAre} hungry — feed {object} before the bond frays.` },
-    { at: 30, line: `${dog.name} lags a pace behind, ribs showing. {Pronoun} won't follow a starving road forever.` },
-    { at: 15, line: `${dog.name} won't meet your eye. One more empty day and {pronoun} walk{verbS}.` },
+    { at: DOG_LOYALTY_BANDS[0], line: `${dog.name} keeps eyeing your pack. {Pronoun} {isOrAre} hungry — feed {object} before the bond frays.` },
+    { at: DOG_LOYALTY_BANDS[1], line: `${dog.name} lags a pace behind, ribs showing. {Pronoun} won't follow a starving road forever.` },
+    { at: DOG_LOYALTY_BANDS[2], line: `${dog.name} won't meet your eye. One more empty day and {pronoun} walk{verbS}.` },
   ];
   for (const b of bands) {
     if (loy <= b.at && floor > b.at) {

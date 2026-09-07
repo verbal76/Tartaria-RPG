@@ -28781,7 +28781,38 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // dog. (3B) throwSettlement is persisted; a save taken with the throw modal open
 // loads by settling the throw through settleThrowRestore('cancelled'): nothing
 // spent, the off-hand restored, the next throw normal.
-export const OTA_BUILD_ID = '2026-09-07-1737-the-mystery-does-not-starve-the-lead';
+// ⚠⚠⚠ OTA-1738 — THE GAME TEACHES WHAT IT RUNS (task list 4E91C7, eleven owner
+// decisions locked). The 11B4DF audit found teaching that described a game the
+// engine no longer ran, cards stacking on the first fight, a SKIP pill missing
+// from three locked beats, and no place to reread anything. Copy: one registry
+// (app/components/teachingRegistry.ts) holds every first-use card; rules are
+// quoted from the constants that run them (REINFORCE_MAX_LEVEL, the dog prices,
+// scrapSuccessChance, COATING_DOT_TURNS, LOYALTY_DECAY_HOURS + DOG_LOYALTY_BANDS,
+// STAMINA_COSTS.wander, PITY_KILL_INTERVAL, FLEE_STAMINA_COST,
+// DODGE_COOLDOWN_ROUNDS); a card whose rule changed carries a new id (torch v2:
+// each USE spends one torch, not a lamp burning; golem v2: fed its own parts;
+// throw spear v2: spent on every concluded throw, hit or miss; contracts v3: a
+// hunt's trophy is shown in person; crafting repair v2: MATERIALS, the trader
+// mends for TC). First fight: the primer is once per INSTALL (useFirstTimeHint,
+// so the tips switch and SHOW ALL TIPS AGAIN govern it), teaches POWER and a
+// truthful FLEE line and the stealth opener as the handler runs it (free before
+// contact, once per scene; a contest once engaged); the `power_number` card is
+// gone and the readout waits for the fight after the first. One optional
+// surface per beat: every card on the exploration, pack and trader screens goes
+// through useTeachingSlot (presentation order only; each `when` is the control's
+// own predicate; the primer, stinger and beat card defer all of them). New
+// cards: reinforce, workings, trader repair, dog replacement, pack scrap,
+// throwables + coatings, race ability. The dog onboarding card teaches feeding,
+// the decay clock and the permanent zero-loyalty walk. The tutorial's door beat
+// carries one movement-cost sentence and the close names Ask the Arbiter once;
+// the SKIP pill asks isTutorialLocked (look / armor / screen_pick now offer it).
+// Settings → GUIDANCE → REPLAY TEACHING opens GuidanceScreen: CORE (outpost
+// beats + the corrected screen tour: pity 100, no first-install gem, no MAP
+// button, no ACTIONS screen), FIRST-USE (every registry card, grouped, ✓ seen,
+// read-only) and REFERENCE (the Action Reference, reachable at last). No
+// mechanic, price, yield, cap or balance rule touched.
+export const OTA_BUILD_ID = '2026-09-07-1738-the-game-teaches-what-it-runs';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-07-1737-the-mystery-does-not-starve-the-lead';
 // golem catch-up 2026-09-07: markerless publish of OTA-1737 - three bounded
 // repairs from audit pass #3. The mystery and storyline wrong-ground branches of
 // advanceStagesOnIntent fall through instead of returning (a parked mystery

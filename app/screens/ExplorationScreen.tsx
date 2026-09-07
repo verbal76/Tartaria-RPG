@@ -13,7 +13,12 @@ import { stationedAtNamedLocation } from '../engine/standingAt';
 import { readFullLog, flushLogWrites, clearActiveSlotLog, getLastLogWriteError, clearLastLogWriteError, stampBreadcrumbPhase, peekLiveBreadcrumb } from '../engine/saveSystem';
 import { StatsPanel } from '../components/StatsPanel';
 import { FirstTimeHint } from '../components/FirstTimeHint';
-import { useHintsDisabled } from '../components/useFirstTimeHint'; // OTA-1524 — the primer honours the tips switch
+// ⚠ OTA-1738 — the primer is a per-install card like every other (useFirstTimeHint
+// already folds in the OTA-1524 tips switch), and every optional card on this
+// screen goes through ONE teaching slot so no two can land on the same beat.
+import { useFirstTimeHint, useTeachingSlot } from '../components/useFirstTimeHint';
+import { TEACHINGS as TEACH, type TeachingId } from '../components/teachingRegistry';
+import { spareThrowingSpear } from '../engine/bandolierEligibility'; // OTA-1738 — the THROW SPEAR rule, shared with InputBox
 import { AdventureFeed } from '../components/AdventureFeed';
 import { renderLagAfterEngine } from '../diagnostics/renderClock'; // OTA-1696
 import { InputBox } from '../components/InputBox';
@@ -389,16 +394,17 @@ export function ExplorationScreen() {
   // clause a character 200 kills deep would be handed a card headed YOUR FIRST FIGHT on
   // their next encounter. A veteran who genuinely has no kills yet still gets it.
   const markCombatPrimerSeen = useGameStore((s) => s.markCombatPrimerSeen);
-  const combatPrimerSeen = useGameStore((s) => !!s.player?.milestones?.firstCombatPrimerShown);
   const enemiesDefeatedEver = useGameStore((s) => s.player?.milestones?.enemiesDefeated ?? 0);
-  // ⚠⚠⚠ OTA-1524 — AND IT HONOURS THE GLOBAL TIPS SWITCH, WHICH IT NEVER DID.
-  // `setHintsDisabled` has gated every FirstTimeHint since OTA-860, and this
-  // modal ignored it outright: a player who turned tips off still met this card
-  // on their first fight with no way to refuse it. An opt-out that some cards
-  // ignore is not an opt-out. `useHintsDisabled` is the reactive read, so
-  // flipping the Settings toggle or tapping "turn off tips" inside any card
-  // takes effect here live.
-  const hintsOff = useHintsDisabled();
+  // ⚠⚠⚠ OTA-1738 — ONE PRIMER PER INSTALL, GOVERNED LIKE EVERY OTHER CARD. The
+  // milestone gate above (`firstCombatPrimerShown` + `enemiesDefeated === 0`) was
+  // per CHARACTER: a second character met the card again, and a veteran with
+  // kills could never reach it at all. Owner's call: the primer fires once per
+  // install, SHOW ALL TIPS AGAIN brings it back, and the global tips switch
+  // (OTA-1524) governs it — all three of which `useFirstTimeHint` already does.
+  // The milestone is still latched on close, so the old per-save readers keep a
+  // truthful answer; it just no longer decides visibility.
+  const primerHint = useFirstTimeHint(TEACH.combat_primer_v1.id);
+  const combatPrimerSeen = primerHint.shouldShow === false;
   // ⚠ OTA-1600 — the stinger: the mission's own fight announces itself. Story
   // content, not a tip — no hints gate. While it is up, the first-fight primer
   // holds back (two cards on one beat is the OTA-1321 noise rule); the primer's
@@ -409,7 +415,10 @@ export function ExplorationScreen() {
   // when a stage closes on its own tile with no fight stood up.
   const pendingMissionBeat = useGameStore((s) => s.pendingMissionBeat);
   const dismissMissionBeat = useGameStore((s) => s.dismissMissionBeat);
-  const combatPrimerOpen = liveEnemyCount > 0 && !pendingMissionStinger && !combatPrimerSeen && enemiesDefeatedEver === 0 && !hintsOff;
+  // ⚠ The beat card (OTA-1602) defers the primer exactly as the stinger does:
+  // story content owns the beat, and the primer's own condition still holds after.
+  const combatPrimerOpen = liveEnemyCount > 0 && !pendingMissionStinger && !pendingMissionBeat && primerHint.shouldShow === true;
+  const closeCombatPrimer = useCallback(() => { primerHint.dismiss(); markCombatPrimerSeen(); }, [primerHint, markCombatPrimerSeen]);
   // OTA 031 — climb-target picker. Opens to a chip list of every
   // climbable noun in the current scene; tapping one fires `climb
   // <noun>` which resolves one tier in the climb handler.
@@ -465,7 +474,7 @@ export function ExplorationScreen() {
     // it, and the fight underneath is fully playable. It must latch the milestone
     // on the way out, though — visibility is derived, so a close that didn't latch
     // would put the card straight back up on the next render.
-    if (combatPrimerOpen) { markCombatPrimerSeen(); return true; }
+    if (combatPrimerOpen) { closeCombatPrimer(); return true; }
     if (torchChooserOpen) { setTorchChooserOpen(false); return true; }
     if (takeOpen) { setTakeOpen(false); return true; }
     if (salvageOpen) { setSalvageOpen(false); return true; }
@@ -978,8 +987,6 @@ export function ExplorationScreen() {
   // was built to dodge. Latch on open, render once the sheet is gone.
   const [pickpocketTaught, setPickpocketTaught] = useState(false);
   useEffect(() => { if (pickpocketOpen) setPickpocketTaught(true); }, [pickpocketOpen]);
-  const [torchTaught, setTorchTaught] = useState(false);
-  useEffect(() => { if (torchChooserOpen) setTorchTaught(true); }, [torchChooserOpen]);
   const [climbTaught, setClimbTaught] = useState(false);
   useEffect(() => { if (climbOpen) setClimbTaught(true); }, [climbOpen]);
   // ⚠ These three live in the STORE rather than in screen state, so the latch
@@ -1005,6 +1012,52 @@ export function ExplorationScreen() {
     if (lanesWhileOpen.current >= 2) setPickerLanesTaught(true);
     lanesWhileOpen.current = 0;
   }, [takeOpen, gatherLaneCount]);
+
+  // ⚠⚠⚠ OTA-1738 — ONE OPTIONAL SURFACE PER BEAT. Every first-use card this
+  // screen can raise is a candidate here, in priority order, each keyed on the
+  // MECHANIC'S OWN STATE (the predicate its control reads) — and the slot hands
+  // back the single id to render. Nothing in this list renders while the primer,
+  // a mission stinger or a beat card owns the screen; each card takes its turn on
+  // the render after the one above it is dismissed. Collision cases this closes:
+  // first fight + shield / spare spear / readout, stinger + first fight, tutorial
+  // climb + `climb_first`, golem or a Procedure Text arriving mid-fight.
+  const modalOwnsBeat = combatPrimerOpen || !!pendingMissionStinger || !!pendingMissionBeat;
+  const inFightNow = liveEnemyCount > 0;
+  const shieldOnArm = (() => {
+    const eq = player?.equipped;
+    const offInst = eq?.offId
+      ? player?.inventory.find((i) => i.id === eq.offId)
+      : (eq?.off ? player?.inventory.find((i) => i.name === eq.off) : undefined);
+    return !!offInst && itemIsShield(offInst);
+  })();
+  const spareSpearInPack = !!player && !!spareThrowingSpear(player.inventory ?? [], player.equipped);
+  const raceAbilityReadyNow = (() => {
+    if (!player) return false;
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { availableRaceAbilities } = require('../engine/raceAbilities') as typeof import('../engine/raceAbilities');
+    return availableRaceAbilities(player, inFightNow).length > 0;
+  })();
+  const screenTeaching = useTeachingSlot([
+    // combat — the primer (a Modal) has already had its beat; these follow it
+    { id: TEACH.elevation_first_fight.id, when: !modalOwnsBeat && inFightNow && !!currentScene?.elevatedOn && !!currentScene?.enemiesAtBase },
+    { id: TEACH.combat_shield_block.id, when: !modalOwnsBeat && inFightNow && shieldOnArm },
+    { id: TEACH.combat_throw_spear_v2.id, when: !modalOwnsBeat && inFightNow && spareSpearInPack },
+    // ⚠ owner decision 2: Power is taught IN the primer; the readout waits for the
+    // fight after the first, once the primer has been seen on this install.
+    { id: TEACH.combat_readout.id, when: !modalOwnsBeat && inFightNow && combatPrimerSeen && enemiesDefeatedEver >= 1 },
+    // exploration — each keyed on the sheet the player was actually shown, or on
+    // a durable fact of the scene / pack
+    { id: TEACH.picker_colour_lanes.id, when: !modalOwnsBeat && pickerLanesTaught },
+    { id: TEACH.climb_first.id, when: !modalOwnsBeat && climbTaught && tutorialStep === null },
+    { id: TEACH.torch_first_v2.id, when: !modalOwnsBeat && (currentScene?.hooks ?? []).some((h) => !!h.torchCharged) },
+    { id: TEACH.pickpocket_first.id, when: !modalOwnsBeat && pickpocketTaught },
+    { id: TEACH.parley_first.id, when: !modalOwnsBeat && parleyTaught },
+    { id: TEACH.gift_first.id, when: !modalOwnsBeat && giftTaught },
+    { id: TEACH.fusion_first.id, when: !modalOwnsBeat && fusionTaught },
+    { id: TEACH.race_ability_first.id, when: !modalOwnsBeat && raceAbilityReadyNow },
+    { id: TEACH.golem_first_v2.id, when: !modalOwnsBeat && !!player?.golem },
+    { id: TEACH.procedure_text_first.id, when: !modalOwnsBeat && (player?.inventory ?? []).some((i) => i.name.startsWith('Procedure Text:') && i.quantity > 0) },
+  ]) as TeachingId | null;
 
   // Build one view per enemy in the scene. Tap-to-cycle is wired through
   // the store's setActiveEnemyIdx so combat handlers always target the
@@ -1188,156 +1241,16 @@ export function ExplorationScreen() {
           overlay that renders BELOW an RN Modal (OTA-234), so a card raised over
           the open picker would be invisible. Naming the colours right after the
           player has seen them is the whole point. */}
-      {pickerLanesTaught && (
-        <FirstTimeHint
-          id="picker_colour_lanes"
-          title="The room, by colour"
-          body="TAKE / SALVAGE opens the whole room grouped by colour — orange gear, green items, yellow salvage. Sweep a colour with its button, or tap one line."
-        />
-      )}
-      {/* ⚠ OTA-1321 — the OTA-860 `combat_first_fight` hint WAS HERE AND IS GONE. It
-          fired on this exact condition (a fight is on-screen) and taught a strict
-          subset of what CombatPrimerModal now teaches; its one unique idea — you can
-          talk a foe down or run — moved into the primer's NOT EVERY FIGHT line. Two
-          cards on the same beat is how a player learns to reach for "turn off tips".
-          The id is retired, not reused: a player who already dismissed the old hint
-          still gets the primer, which is new material. */}
-      {/* OTA-1205 — the first Procedure Text in the pack. The vendor-buy door teaches
-          instantly and the storyline door says "read it" in its reward line, but the
-          FOUND door (site loot) drops the text with no instruction at all — and it is
-          the one door open at zero standing, so for many players it comes first. */}
-      {(player?.inventory ?? []).some((i) => i.name.startsWith('Procedure Text:') && i.quantity > 0) && (
-        <FirstTimeHint
-          id="procedure_text_first"
-          title="A procedure text"
-          body="You're carrying a Procedure Text — an aether technique, written down. READ it to learn the technique: tap it in your pack, or type read and its name. If it's beyond you today, it keeps — nothing is wasted."
-        />
-      )}
-      {/* OTA-928 — introduce the Power rating the first time a fight is on-screen, when
-          both the player badge (top-right) and the enemy badge (top-left) are visible. */}
-      {(currentScene?.enemies?.length ?? 0) > 0 && (
-        <FirstTimeHint
-          id="power_number"
-          title="Power rating"
-          body="The ◆ number by your name is your Power — a quick gauge built from your stats, weapon, armour, and health. In a fight, your number AND each foe's are coloured by the matchup: green means you outclass it, gold is an even fight, red means it outclasses you. Your individual stats still matter — Power just tells you at a glance where you stand. Make your character stronger and watch it climb."
-        />
-      )}
-      {/* ⚠⚠⚠ OTA-1523 — THE BUTTON ROW GREW AND NOTHING EVER SAID SO. An audit of
-          every tutorial beat and first-time card found three controls with zero
-          onboarding: BLOCK and SHIELD BASH (OTA-1510, the owner's own request —
-          "should have a block button up here during combat") and THROW SPEAR
-          (OTA-1511). CombatPrimerModal is OTA-1321 and predates all three.
-          ⚠⚠ AND THE PRIMER CANNOT BE THE FIX FOR ANYONE ALREADY PLAYING. It is
-          gated `enemiesDefeatedEver === 0`, so a character past their first kill
-          can never see it again however much copy is added. These buttons appear
-          the moment a shield rides the off arm or a spare spear is in the pack —
-          which for an existing character is the ONLY moment left to teach them.
-          So the teaching goes where the control does. */}
-      {(currentScene?.enemies?.length ?? 0) > 0 && (() => {
-        const eq = player?.equipped;
-        const offInst = eq?.offId
-          ? player?.inventory.find((i) => i.id === eq.offId)
-          : (eq?.off ? player?.inventory.find((i) => i.name === eq.off) : undefined);
-        return !!offInst && itemIsShield(offInst);
-      })() && (
-        <FirstTimeHint
-          id="combat_shield_block"
-          title="The shield on your arm"
-          body="A shield on the off arm adds two buttons. BLOCK sets you behind it — the first blow that comes breaks on it — but you hold position for the round, so everything else in reach gets a swing. SHIELD BASH is the same shield turned offensive: it goes through the normal attack, and a solid hit staggers them. BLOCK wants a shield; bare-armed, DODGE is the read."
-        />
-      )}
-      {/* ⚠ OTA-1523 — THROW SPEAR only exists when a SPARE is in the pack: a long
-          shaft that is either unequipped or stacked deep enough that hurling one
-          does not empty your hand. Taught on the same rule the button lights by. */}
-      {(currentScene?.enemies?.length ?? 0) > 0
-        && (player?.inventory ?? []).some((i) => /spear|lance|javelin|pike/i.test(i.name) && (i.quantity ?? 0) > 0) && (
-        <FirstTimeHint
-          id="combat_throw_spear"
-          title="Throwing a spear"
-          body="Carry a spare long shaft and THROW SPEAR appears in a fight. It hurls the spare at its own throwing range — much further than you can stab with it — and the spear is spent on a hit, so it is a way to open on something before it closes, not a move to lean on. Keep one back if you want it twice."
-        />
-      )}
-      {/* ⚠⚠⚠ OTA-1523 — HIGH GROUND CUTS BOTH WAYS, AND ONLY ONE WAY WAS EVER SAID.
-          The game already narrates the half that helps — "Below, X circles the base
-          — it cannot reach you up here" — and says nothing about the half that
-          hurts: from up here most weapons cannot reach DOWN either, so the attack
-          button simply refuses. That gap cost the OWNER a debugging session (the
-          tuning-fork case behind OTA-1517: the strike button read green on a climb
-          because reach-band and elevation were being answered by the same test).
-          If it confused the person who wrote it, it will confuse a player. */}
-      {!!currentScene?.elevatedOn && !!currentScene?.enemiesAtBase
-        && (currentScene?.enemies?.length ?? 0) > 0 && (
-        <FirstTimeHint
-          id="elevation_first_fight"
-          title="Fighting from up here"
-          body="Height cuts both ways. Nothing on the ground can reach you — but most of what you carry cannot reach DOWN either, and a weapon that cannot will just refuse when you tap it. Bows, slings and thrown weapons work from up here; a blade needs you back on the ground. Your golem cannot climb, so it waits at the base. Climb down to close, or fight with something that carries."
-        />
-      )}
-      {/* ⚠⚠ OTA-1523 — THE COMBAT LOG IS DENSE AND NOTHING DECODES IT. A player
-          reads `d20 → 18 + ATK 8 = 26 vs your AC 28 (needs nat 16+ — AC capped) —
-          HIT` and sees a hit on a total BELOW their armour with no way to learn
-          why. Same for `[plate −2]`, `35% resisted`, `[edge of reach — halved]`.
-          Fires on the first fight, beside the Power card that already reads the
-          top badges — both are "how to read what you are looking at". */}
-      {(currentScene?.enemies?.length ?? 0) > 0 && (
-        <FirstTimeHint
-          id="combat_readout"
-          title="Reading the fight"
-          body="Every swing shows its arithmetic. `d20 → 14 + ATK 8 = 22 vs your AC 28` is their roll against your armour. `needs nat 16+ — AC capped` means your armour is high enough that only the die itself can beat you — a high enough raw roll lands regardless of the total, so no armour makes you untouchable. On damage, `[plate −2]` is flat armour soak, `35% resisted` is your resistance to that damage type, and `[edge of reach — halved]` means they were barely close enough. Coatings tick on their own line — burn and acid keep eating for a set number of turns after the hit that started them."
-        />
-      )}
-      {/* ⚠⚠⚠ OTA-1524 — THE SEVEN, each fired off a durable fact rather than off
-          the sheet that taught nothing. A modal explains WHAT to pick; none of
-          them explains what the system COSTS or when it refuses, which is the
-          part players learn by losing something. */}
-      {pickpocketTaught && (
-        <FirstTimeHint
-          id="pickpocket_first"
-          title="Lifting a pocket"
-          body="PICKPOCKET goes for what someone is carrying, not what they have laid out to sell — their table is a TAKE or a trade. It is a check against them, and failing it is not free: get caught and the mark turns on you, and the whole faction hears about it. Standing you spent hours earning can go in one bad roll."
-        />
-      )}
-      {parleyTaught && (
-        <FirstTimeHint
-          id="parley_first"
-          title="Talking instead of swinging"
-          body="Not every fight has to be one. A parley opens two ways out — leaning on them or winning them over — and which one works depends on who they are and what you have already done to their people. You can skip the choice entirely by typing the verb you want: intimidate, persuade, calm. A parley that fails still costs you the beat, and they act."
-        />
-      )}
-      {giftTaught && (
-        <FirstTimeHint
-          id="gift_first"
-          title="Giving something away"
-          body="GIVE hands an item over for nothing and buys standing instead. What it is worth to them depends on who they are — a Mud Monarch cares about different things than a Tomekeep — and giving to one faction can cool another that hates them. The item is gone either way, so give what you can spare, not what you might need."
-        />
-      )}
-      {torchTaught && (
-        <FirstTimeHint
-          id="torch_first"
-          title="Burning your light"
-          body="A torch, lantern or lamp burns down while it is lit — light is a consumable, not a switch. Some things in the dark can only be found with one burning, so carry a spare before you go deep. When more than one thing here could use the flame, the game asks which; pick the one you actually came for."
-        />
-      )}
-      {fusionTaught && (
-        <FirstTimeHint
-          id="fusion_first"
-          title="The Fusing Crucible"
-          body="The Crucible pushes one item into another and keeps the result. It consumes both — there is no undoing it and no separating them again afterwards — so fuse the spare into the keeper, never the other way round. If a pairing is refused, the Crucible says why rather than wasting the pair."
-        />
-      )}
-      {player?.golem && (
-        <FirstTimeHint
-          id="golem_first"
-          title="Your golem"
-          body="A golem fights beside you and takes hits meant for you, but it is not a second you: it cannot climb, so it waits at the base of anything you go up, and it cannot be healed with your kit. Name it when you raise it — the name sticks, and it is what the log will call it when it goes down for you."
-        />
-      )}
-      {climbTaught && (
-        <FirstTimeHint
-          id="climb_first"
-          title="Going up"
-          body="A climb goes in tiers, and each one costs stamina — the taller the thing, the more it takes to reach the top, and coming down costs again. What is up there is usually worth it, but check your stamina before the last tier: running out partway is how a fall happens. Rope makes every tier cheaper."
-        />
+      {/* ⚠⚠⚠ OTA-1738 — THE ONE CARD. Every first-use card this screen owns renders
+          here from the registry, and only the id the teaching slot chose. The old
+          block stood fourteen independent `<FirstTimeHint>`s side by side, each an
+          absolute overlay, so a first fight with a shield on and a spare spear in
+          the pack drew three cards on top of each other on top of the primer. The
+          `power_number` card is gone: Power is taught in the primer (owner
+          decision 2). Copy lives in teachingRegistry so the Guidance screen can
+          replay it. */}
+      {screenTeaching && (
+        <FirstTimeHint id={TEACH[screenTeaching].id} title={TEACH[screenTeaching].title} body={TEACH[screenTeaching].body} />
       )}
       <View style={styles.topRow}>
         <TutorialTarget area="top-left-stats" style={styles.statsCol}>
@@ -2502,13 +2415,7 @@ export function ExplorationScreen() {
               if (d.status === 'with_player' && enemyIsAerial(activeEnemy)) return 'aerial';
               return null;
             })()}
-            raceAbilityReady={(() => {
-              if (!player) return false;
-              // eslint-disable-next-line @typescript-eslint/no-require-imports
-              const { availableRaceAbilities } = require('../engine/raceAbilities');
-              const inCombat = (currentScene?.enemies?.length ?? 0) > 0;
-              return availableRaceAbilities(player, inCombat).length > 0;
-            })()}
+            raceAbilityReady={raceAbilityReadyNow}
             onOpenRaceAbilities={() => useGameStore.getState().openRaceAbilityPicker()}
             travelTargetName={(() => {
               // OTA-465 — a whisper/lead course shows in the same travel row.
@@ -2913,7 +2820,7 @@ export function ExplorationScreen() {
       <CombatPrimerModal
         visible={combatPrimerVisible}
         enemyName={currentScene?.enemies?.[0]?.name ?? null}
-        onClose={markCombatPrimerSeen}
+        onClose={closeCombatPrimer}
       />
 
       {/* ⚠ OTA-1600 — the stinger: mission title up top, the shouted line, one

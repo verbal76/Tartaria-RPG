@@ -33,6 +33,8 @@ import { coatingItemDrinkable } from '../engine/coatingRemedy';
 import { computeInventoryDelta, type InventoryDelta } from '../components/inventoryDelta';
 import { SearchSortBar, type SortDirection } from '../components/SearchSortBar';
 import { FirstTimeHint } from '../components/FirstTimeHint';
+import { useTeachingSlot } from '../components/useFirstTimeHint'; // OTA-1738
+import { TEACHINGS as TEACH } from '../components/teachingRegistry'; // OTA-1738
 import { consumeVerb } from '../engine/consumeVerb';
 import { itemIsDogArmor, wornDogVestInstanceId } from '../engine/dogCompanion';
 // ⚠⚠⚠ OTA-1736 — THE NAME, THE WORN-WHERE AND THE HOLD LABEL LIVE IN THE ENGINE
@@ -168,6 +170,17 @@ export function InventoryScreen() {
   const dropInventoryItem = useGameStore((s) => s.dropInventoryItem);
   const useInventoryItem = useGameStore((s) => s.useInventoryItem);
   const scrapInventoryItem = useGameStore((s) => s.scrapInventoryItem);
+  // ⚠ OTA-1738 — teaching keyed on the pack's own state (the same predicates the
+  // actions read), never on a route: any scrappable piece, any bandolier-eligible
+  // throwable or coating. The tutorial's salvage beat teaches room salvage, so
+  // the pack-scrap card waits until the tutorial is over.
+  const tutorialStepForTeaching = useGameStore((s) => s.tutorialStep);
+  const invForTeaching = player?.inventory ?? [];
+  const packTeaching = useTeachingSlot([
+    { id: TEACH.inventory_first_open.id, when: true },
+    { id: TEACH.scrap_first.id, when: tutorialStepForTeaching === null && invForTeaching.some((i) => !isQuestLockedItem(i) && canScrap(i)) },
+    { id: TEACH.throwables_first.id, when: !!player && invForTeaching.some((i) => isBandolierEligible(i, player).eligible || isWeaponCoatingItem(i)) },
+  ]) as keyof typeof TEACH | null;
   const toggleReserveForFusion = useGameStore((s) => s.toggleReserveForFusion);
   const reserveManyForFusion = useGameStore((s) => s.reserveManyForFusion);
   const toggleReserveForQuest = useGameStore((s) => s.toggleReserveForQuest);
@@ -1667,11 +1680,12 @@ export function InventoryScreen() {
       {/* OTA-230 — first-time inventory hint. Pops once per install
           when the player first opens the pack; dismissable.
           Authoring rule: ~25 words, 2 sentences max. */}
-      <FirstTimeHint
-        id="inventory_first_open"
-        title="Your pack"
-        body="Tap any item to equip, use, salvage, or drop. The green line shows damage; the diamond means engine-named."
-      />
+      {/* ⚠ OTA-1738 — ONE card per visit, in this order: the pack itself, then
+          salvage (the first scrappable piece, after the tutorial), then throwables
+          and coatings (the first eligible item). Each waits its turn. */}
+      {packTeaching && (
+        <FirstTimeHint id={TEACH[packTeaching].id} title={TEACH[packTeaching].title} body={TEACH[packTeaching].body} />
+      )}
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => setScreen('exploration')}

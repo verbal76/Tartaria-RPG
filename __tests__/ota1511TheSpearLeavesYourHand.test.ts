@@ -229,9 +229,14 @@ describe('OTA-1511 — THE THROW ITSELF', () => {
 
 describe('OTA-1511 — the wiring (source claims)', () => {
   it('⚠⚠ the THROW SPEAR button rides the spare-spear predicate and calls the dedicated hurl', () => {
-    expect(INPUT).toContain("import { itemIsHandThrownSpear } from '../engine/bandolierEligibility';");
+    // ⚠ OTA-1738 — the spare rule moved out of InputBox into `spareThrowingSpear`
+    // so the THROW SPEAR card (ExplorationScreen) reads the same predicate the
+    // button lights by. Same rule, one owner.
+    expect(INPUT).toContain("import { spareThrowingSpear } from '../engine/bandolierEligibility';");
     expect(INPUT).toContain('useGameStore.getState().throwHeldWeapon(throwSpearItem.name, throwSpearItem.id)');
-    expect(INPUT).toContain("((i.id !== eq?.mainId && i.id !== eq?.offId) || i.quantity > 1)) ?? null;");
+    expect(INPUT).toContain('spareThrowingSpear(reachPlayer?.inventory ?? [], reachPlayer?.equipped)');
+    const ELIG = readFileSync(join(__dirname, '..', 'app', 'engine', 'bandolierEligibility.ts'), 'utf8');
+    expect(ELIG).toContain("((i.id !== equipped?.mainId && i.id !== equipped?.offId) || i.quantity > 1)) ?? null;");
   });
 
   it('⚠⚠ throwHeldWeapon rides the SAME settlement dance as the bandolier tail (no second consume path)', () => {

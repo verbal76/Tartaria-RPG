@@ -18,6 +18,7 @@ import { bountyCourseState, bountyCourseLabel, bountyCourseIsButton } from '../e
 import { formatWindow } from '../engine/bountyPrimer';
 import { FACTION_STARTING_LOCATION } from '../engine/character';
 import { FirstTimeHint } from '../components/FirstTimeHint';
+import { TEACHINGS as TEACH } from '../components/teachingRegistry'; // OTA-1738
 import { getLocationById } from '../engine/encounter';
 import { topGrudges, topAlliances, relationLabel } from '../engine/factionRelations';
 
@@ -130,11 +131,7 @@ export function WorldScreen() {
 
   return (
     <View style={styles.container}>
-      <FirstTimeHint
-        id="world_first_open"
-        title="The living world"
-        body="This board is alive — factions fight, gain, and lose ground on their own. Take bounties here; tap a header to unfold the standings."
-      />
+      <FirstTimeHint id={TEACH.world_first_open.id} title={TEACH.world_first_open.title} body={TEACH.world_first_open.body} />
       <View style={styles.header}>
         <TouchableOpacity onPress={() => setScreen('exploration')} style={styles.backBtn} hitSlop={8} activeOpacity={0.7} accessibilityRole="button">
           <Text style={styles.backText}>← BACK</Text>

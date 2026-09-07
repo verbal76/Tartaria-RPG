@@ -31,6 +31,7 @@ import {
 import { useGameStore, playerGridCell } from '../state/gameStore';
 import { isTutorialLocked } from '../components/tutorialSteps'; // OTA-1700
 import { FirstTimeHint } from '../components/FirstTimeHint';
+import { TEACHINGS as TEACH } from '../components/teachingRegistry'; // OTA-1738
 // OTA-171 — Location + locationsData are already imported below for
 // the existing LOCATIONS const; reused here for the Places list
 // panel so a player can tap any known location and start travel
@@ -980,11 +981,7 @@ export function MapScreen() {
 
   return (
     <View style={styles.container}>
-      <FirstTimeHint
-        id="map_first_open"
-        title="The map"
-        body="Tap a known place to set a course; travel burns stamina and time. Your dot shows where you stand."
-      />
+      <FirstTimeHint id={TEACH.map_first_open.id} title={TEACH.map_first_open.title} body={TEACH.map_first_open.body} />
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => setScreen('exploration')}

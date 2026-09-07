@@ -2783,6 +2783,7 @@ export type ScreenName =
   | 'crafting'
   | 'vendor'
   | 'actions'
+  | 'guidance'
   | 'contracts'
   | 'world'
   | 'ending';

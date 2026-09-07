@@ -26,7 +26,7 @@ import { itemIsShield, findWeaponByName } from '../engine/crafting';
 // OTA-1562 — the bandolier button has to give the SAME reach answer the throw
 // gate will give; see the note at its `inRange` below.
 import { parseWeaponEffect, applyRangeNote } from '../engine/weaponEffects';
-import { itemIsHandThrownSpear } from '../engine/bandolierEligibility';
+import { spareThrowingSpear } from '../engine/bandolierEligibility';
 import { useReduceMotion } from '../state/accessibility';
 import { hubRoomFor, hubSkinFactionFor, isLeaveHubCommand, roomIsExit, hubDefinesExitRoom, isHubLocation } from '../engine/hub';
 import { WORLD_MAP_CENTER_X, WORLD_MAP_CENTER_Y } from '../engine/worldMap';
@@ -367,13 +367,8 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   // spare is a long-shaft hand throwable (throwable+spear — the population
   // OTA-605 keeps off the bandolier) that is either unequipped or a stack
   // deep enough that hurling one does not empty the hand.
-  const throwSpearItem = (() => {
-    const inv = reachPlayer?.inventory ?? [];
-    const eq = reachPlayer?.equipped;
-    return inv.find((i) =>
-      itemIsHandThrownSpear(i) && i.quantity > 0
-      && ((i.id !== eq?.mainId && i.id !== eq?.offId) || i.quantity > 1)) ?? null;
-  })();
+  // ⚠ OTA-1738 — one predicate, shared with the card that teaches the button.
+  const throwSpearItem = spareThrowingSpear(reachPlayer?.inventory ?? [], reachPlayer?.equipped);
   // OTA-1170 — rounds left on the dodge lockout; 0/absent = ready (full blue).
   // ⚠⚠ OTA-1458 — EMPTY LEGS. Drives the travel row's spent state so a move the
   // store is about to refuse never looks tappable. See TravelBtn's `spent`.

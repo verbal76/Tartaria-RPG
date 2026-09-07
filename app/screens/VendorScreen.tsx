@@ -2,6 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore, vendorNpcId } from '../state/gameStore';
 import { FirstTimeHint } from '../components/FirstTimeHint';
+import { useTeachingSlot } from '../components/useFirstTimeHint'; // OTA-1738
+import { TEACHINGS as TEACH } from '../components/teachingRegistry'; // OTA-1738
+import { dogMarketRowByName } from '../engine/dogMarket'; // OTA-1738 — the dog row, by the market's own lookup
 import { BrandedModal } from '../components/BrandedModal';
 import { VendorContractsModal } from '../components/VendorContractsModal';
 import { getItemPreview, getItemPreviewForInstance, lootPurposeLine } from '../components/itemPreview';
@@ -508,6 +511,17 @@ export function VendorScreen() {
   // of the player's working loadout and selling one by accident stings. Flag
   // them in the row so the player sees what they're about to give up. (Keyed by
   // instance id, so a spare of the same name stays cleanly sellable.)
+  // ⚠ OTA-1738 — the counter's teaching, one card at a time, each keyed on the
+  // rows this screen is about to render (reinforceRows, recipeOffers, the pack's
+  // worn pieces, the dog market lookup), so a card can never describe a service
+  // that is not on the table in front of the player.
+  const counterTeaching = useTeachingSlot([
+    { id: TEACH.vendor_first_open_v2.id, when: true },
+    { id: TEACH.reinforce_first.id, when: reinforceRows.length > 0 },
+    { id: TEACH.workings_first.id, when: recipeOffers.some((o) => !o.known && player.tc >= o.price) },
+    { id: TEACH.repair_vendor_first.id, when: player.inventory.some((i) => !!i.durability && i.durability.current < i.durability.max) },
+    { id: TEACH.dog_replacement_first.id, when: (vendor?.offers ?? []).some((o) => !!dogMarketRowByName(o.itemName)) },
+  ]) as keyof typeof TEACH | null;
   const bandolierIds = new Set(player.equipped?.bandolierIds ?? []);
   const toolPouchIds = new Set(player.equipped?.toolPouchIds ?? []);
   // HANDOFF #12 — sell-back UI polish. Sort options so the player can
@@ -633,11 +647,13 @@ export function VendorScreen() {
     <View style={styles.container}>
       {/* OTA-1205 — v2 id: the body gained the host-gear rule (OTA-1201) and dismissals
           are per-install, so the old id would hide the new line from existing testers. */}
-      <FirstTimeHint
-        id="vendor_first_open_v2"
-        title="The trader"
-        body="Buy and sell here. Prices swing with the seller's faction power and your standing — a favored trader deals kinder. At a faction's own site, the armory only racks faction gear for people the host trusts."
-      />
+      {/* ⚠ OTA-1738 — ONE card per visit. The trader card first; then, on later
+          visits or once it is dismissed, the service whose rows are actually on
+          this counter and actionable: reinforce, workings, repair, a dog. Each
+          keys on the same state that renders its rows — never on which vendor. */}
+      {counterTeaching && (
+        <FirstTimeHint id={TEACH[counterTeaching].id} title={TEACH[counterTeaching].title} body={TEACH[counterTeaching].body} />
+      )}
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => setScreen('exploration')}

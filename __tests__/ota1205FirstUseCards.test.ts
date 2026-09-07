@@ -69,7 +69,13 @@ describe('OTA-1205 — the Aetheric tab card tells the current truth', () => {
   });
   it('⚠ carries a bumped id — edited copy under the old id is invisible to installs that dismissed it', () => {
     expect(TAB_HINTS.aetheric.id).toBe('crafting_tab_aetheric_v2');
-    expect(TAB_HINTS.craft.id).toBeUndefined(); // unedited cards keep their ids
+    // ⚠ OTA-1738 — every tab card now carries its registry id explicitly; the
+    // unedited ones keep the SAME key the `crafting_tab_${tab}` fallback produced,
+    // so no install re-sees a card it dismissed.
+    expect(TAB_HINTS.craft.id).toBe('crafting_tab_craft');
+    expect(TAB_HINTS.recipes.id).toBe('crafting_tab_recipes');
+    // REPAIR is v2: the old card said the tab spends TC; it spends materials.
+    expect(TAB_HINTS.repair.id).toBe('crafting_tab_repair_v2');
   });
 });
 
@@ -79,10 +85,12 @@ describe('OTA-1205 — the refreshed screen cards carry new ids', () => {
   it('vendor and contracts render their v2 ids', () => {
     const vendor = readFileSync(join(__dirname, '..', 'app', 'screens', 'VendorScreen.tsx'), 'utf8');
     const contracts = readFileSync(join(__dirname, '..', 'app', 'screens', 'ContractsScreen.tsx'), 'utf8');
-    expect(vendor).toContain('id="vendor_first_open_v2"');
-    expect(contracts).toContain('id="contracts_first_open_v2"');
+    // ⚠ OTA-1738 — ids are read from the registry rather than typed at the site.
+    expect(vendor).toContain('TEACH.vendor_first_open_v2.id');
+    // contracts is v3: the v2 card told a hunt's trophy to go by courier.
+    expect(contracts).toContain('TEACH.contracts_first_open_v3.id');
     const exploration = readFileSync(join(__dirname, '..', 'app', 'screens', 'ExplorationScreen.tsx'), 'utf8');
-    expect(exploration).toContain('id="procedure_text_first"');
+    expect(exploration).toContain('TEACH.procedure_text_first.id');
   });
 });
 

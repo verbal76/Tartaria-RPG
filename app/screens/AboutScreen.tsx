@@ -1329,6 +1329,18 @@ export function AboutScreen() {
           >
             <Text style={styles.sessionBtnSecondaryText}>{tipsReset ? 'TIPS RESET ✓' : 'SHOW ALL TIPS AGAIN'}</Text>
           </TouchableOpacity>
+          {/* ⚠ OTA-1738 — REPLAY TEACHING: every tutorial beat, every first-use card and
+              the action reference, readable on purpose, tips on or off. Opening it
+              writes no flag. */}
+          <TouchableOpacity
+            style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 10 }]}
+            onPress={() => setScreen('guidance')}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel="Replay teaching"
+          >
+            <Text style={styles.sessionBtnSecondaryText}>REPLAY TEACHING</Text>
+          </TouchableOpacity>
         </View>
         )}
 

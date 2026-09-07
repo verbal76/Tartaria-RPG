@@ -8,6 +8,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { FirstTimeHint } from '../components/FirstTimeHint';
+import { TEACHINGS as TEACH } from '../components/teachingRegistry'; // OTA-1738
 import { LoreCodexBody } from '../components/LoreCodexBody';
 
 export function LoreScreen() {
@@ -23,11 +24,7 @@ export function LoreScreen() {
 
   return (
     <View style={styles.container}>
-      <FirstTimeHint
-        id="lore_first_open"
-        title="The codex"
-        body="Your reference for Tartaria's factions, races, and history. New entries unlock here as you discover them in play."
-      />
+      <FirstTimeHint id={TEACH.lore_first_open.id} title={TEACH.lore_first_open.title} body={TEACH.lore_first_open.body} />
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => setScreen(inSession ? 'exploration' : 'title')}

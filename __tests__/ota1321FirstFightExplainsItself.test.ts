@@ -86,7 +86,8 @@ beforeAll(() => { console.log = () => {}; console.warn = () => {}; });
 describe('OTA-1321 — the primer is raised once, from one place', () => {
   it('⚠⚠ RULE 1: the screen derives it from a live enemy + the milestone, and nothing else raises it', () => {
     expect(SCREEN).toContain('const combatPrimerOpen = liveEnemyCount > 0');
-    expect(SCREEN).toContain('!combatPrimerSeen');
+    // ⚠ OTA-1738 — the "seen" half is the per-install card flag, not the milestone.
+    expect(SCREEN).toContain('primerHint.shouldShow === true');
     expect(SCREEN).toContain('<CombatPrimerModal');
     // The engine never opens it. If a spawn site ever starts pushing the card,
     // the other two spawn sites are already out of date.
@@ -95,16 +96,23 @@ describe('OTA-1321 — the primer is raised once, from one place', () => {
   });
 
   it('⚠⚠ a veteran is never handed a card headed YOUR FIRST FIGHT', () => {
-    // The milestone is NEW, so every save in the wild reads it as undefined. The
-    // kill count is the second clause that keeps the card off their screen.
-    expect(SCREEN).toContain('enemiesDefeatedEver === 0');
+    // ⚠ OTA-1738 SUPERSEDED THE KILL-COUNT CLAUSE. It kept the card off a
+    // veteran's screen by keying on the CHARACTER, which also re-showed it to
+    // every second character and hid it forever from a veteran with kills and
+    // no primer. Owner decision 1: once per INSTALL, brought back only by SHOW ALL
+    // TIPS AGAIN — `useFirstTimeHint` on the registry id, like every other card.
+    expect(SCREEN).toContain('useFirstTimeHint(TEACH.combat_primer_v1.id)');
+    expect(SCREEN_CODE).not.toContain('enemiesDefeatedEver === 0');
     expect(CARD_PROSE).toContain('YOUR FIRST FIGHT');
   });
 
   it('⚠ every exit from the card lands on the SAME latch', () => {
     // FIGHT, Android hardware back (onRequestClose), and the PC right-click.
-    expect(SCREEN).toContain('onClose={markCombatPrimerSeen}');
-    expect(SCREEN).toContain('if (combatPrimerOpen) { markCombatPrimerSeen(); return true; }');
+    // ⚠ OTA-1738 — one closer, which dismisses the install flag AND latches the
+    // milestone (older readers of the save keep a truthful answer).
+    expect(SCREEN).toContain('onClose={closeCombatPrimer}');
+    expect(SCREEN).toContain('if (combatPrimerOpen) { closeCombatPrimer(); return true; }');
+    expect(SCREEN).toContain('const closeCombatPrimer = useCallback(() => { primerHint.dismiss(); markCombatPrimerSeen(); }');
     expect(CARD).toContain('onRequestClose={onClose}');
   });
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { useGameStore } from '../state/gameStore';
-import { TUTORIAL_STEPS } from './tutorialSteps';
+import { isTutorialLocked } from './tutorialSteps';
 
 // Tungsten Spire rewrite: the welcome-card overlay is gone. Tutorial
 // dialogue lives inline in the world feed (Arbiter channel) and the
@@ -15,7 +15,11 @@ import { TUTORIAL_STEPS } from './tutorialSteps';
 // taps SKIP (tutorialStep → null) OR makes the stay/leave choice
 // (tutorialExploreChosen, or the beat advances past explore_or_leave to
 // main_quest / pick_city, which are post-choice and not locked).
-const TUT_LOCK_BEATS = ['name', 'cudgel', 'rope', 'scrap', 'climb', 'investigate', 'explore_or_leave'];
+// ⚠⚠ OTA-1738 — THE LIST LIVED HERE TOO, AND DRIFTED. This copy lacked `look`,
+// `armor` and `screen_pick`, so the pill vanished for three beats the lockdown
+// still held: the escape hatch was gone exactly where a first-timer stalls.
+// One authority now — `isTutorialLocked`, the same function InputBox and the
+// Atlas read.
 //
 // ⚠⚠⚠ OTA-1531 — AND NOT WHILE THE OPENING IS STILL TALKING. The owner, starting
 // a new character: *"first thing I notice is the skip tutorial button is
@@ -56,9 +60,7 @@ export function TutorialOverlay() {
   // ⚠ Same set the store already treats as "the screen is busy" (announceTide and
   // its neighbours), so one idea of an interrupted opening, not two.
   if (storyIntro || chapterCard || dedicationCard || motivePickerPending || pendingFork) return null;
-  const beatId = TUTORIAL_STEPS[tutorialStep]?.id ?? null;
-  const locked = beatId !== null && TUT_LOCK_BEATS.includes(beatId) && !tutorialExploreChosen;
-  if (!locked) return null;
+  if (!isTutorialLocked(tutorialStep, tutorialExploreChosen)) return null;
 
   return (
     <View style={styles.root} pointerEvents="box-none" accessibilityViewIsModal={true}>

@@ -33,11 +33,15 @@ const DOG = readFileSync(join(ROOT, 'app', 'components', 'DogOnboardingModal.tsx
 const HINT = readFileSync(join(ROOT, 'app', 'components', 'FirstTimeHint.tsx'), 'utf8');
 describe('OTA-1524 — the seven the audit skipped are covered', () => {
   it('⚠⚠⚠ ALL SEVEN HAVE A HINT', () => {
+    // ⚠ OTA-1738 — each is a candidate of the screen's single teaching slot,
+    // read from the registry. torch and golem are v2: the old torch card said a
+    // light "burns down while lit" (each USE spends one torch), the old golem card
+    // said it "cannot be healed" (its own parts mend it).
     for (const id of [
-      'pickpocket_first', 'parley_first', 'gift_first', 'torch_first',
-      'fusion_first', 'golem_first', 'climb_first',
+      'pickpocket_first', 'parley_first', 'gift_first', 'torch_first_v2',
+      'fusion_first', 'golem_first_v2', 'climb_first',
     ]) {
-      expect(EXPLORE2).toContain(`id="${id}"`);
+      expect(EXPLORE2).toContain(`{ id: TEACH.${id}.id, when: !modalOwnsBeat && `);
     }
   });
 
@@ -46,25 +50,32 @@ describe('OTA-1524 — the seven the audit skipped are covered', () => {
     // (OTA-234) — a card raised while the sheet is open is invisible. Each of
     // these latches on open and renders once the sheet is gone, which is the
     // trap `pickerLanesTaught` was built to dodge.
-    for (const latch of ['pickpocketTaught', 'torchTaught', 'climbTaught', 'fusionTaught', 'parleyTaught', 'giftTaught']) {
+    for (const latch of ['pickpocketTaught', 'climbTaught', 'fusionTaught', 'parleyTaught', 'giftTaught']) {
       expect(EXPLORE2).toContain(`const [${latch}, set`);
       expect(EXPLORE2).toMatch(new RegExp(`set${latch[0]!.toUpperCase()}${latch.slice(1)}\\(true\\)`));
     }
+    // ⚠ OTA-1738 — the torch card keys on the CHARGED LEAD itself (the durable
+    // fact the chooser produces), not on the chooser having opened: a single-lead
+    // room never opens the chooser, and it is the common case.
+    expect(EXPLORE2).not.toContain('const [torchTaught, set');
+    expect(EXPLORE2).toContain('(currentScene?.hooks ?? []).some((h) => !!h.torchCharged)');
   });
 
   it('⚠⚠ each teaches the COST, which is what the modal never says', () => {
     // A modal explains what to pick. None of them explains what the system
     // costs or when it refuses — the part players learn by losing something.
-    const body = (id: string) => {
-      const at = EXPLORE2.indexOf(`id="${id}"`);
-      return EXPLORE2.slice(at, EXPLORE2.indexOf('/>', at));
-    };
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { TEACHINGS } = require('../app/components/teachingRegistry') as typeof import('../app/components/teachingRegistry');
+    const body = (id: keyof typeof TEACHINGS) => TEACHINGS[id].body;
     expect(body('pickpocket_first')).toMatch(/caught/i);      // standing lost on a fail
     expect(body('gift_first')).toMatch(/gone|spare/i);         // the item does not come back
     expect(body('fusion_first')).toMatch(/consumes both|no undoing/i);
-    expect(body('torch_first')).toMatch(/burns down|consumable/i);
+    // ⚠ OTA-1738 — applyTorchToHook decrements the torch by one per charge; the
+    // cost is a spent torch, not a lamp burning while lit.
+    expect(body('torch_first_v2')).toMatch(/spends one torch/i);
+    expect(body('torch_first_v2')).not.toMatch(/burns down/i);
     expect(body('climb_first')).toMatch(/stamina/i);
-    expect(body('golem_first')).toMatch(/cannot climb/i);
+    expect(body('golem_first_v2')).toMatch(/cannot climb/i);
     expect(body('parley_first')).toMatch(/costs you the beat|still costs/i);
   });
 });
@@ -82,8 +93,13 @@ describe('OTA-1524 — the turn-off switch is real everywhere it should be', () 
   it('⚠⚠⚠ AND IT HONOURS THE FLAG — ignoring it was the actual defect', () => {
     // Offering the switch is half of it. A card that still fires after the
     // player has thrown the switch is the reason they stop trusting it.
-    expect(EXPLORE2).toContain('const hintsOff = useHintsDisabled();');
-    expect(EXPLORE2).toMatch(/combatPrimerOpen =[^;]*&& !hintsOff;/);
+    // ⚠ OTA-1738 — the primer is a `useFirstTimeHint` card now, and that hook is
+    // where the flag is honoured for every card (shouldShow folds `disabled` in),
+    // so the screen no longer carries its own copy of the switch.
+    expect(EXPLORE2).toContain('useFirstTimeHint(TEACH.combat_primer_v1.id)');
+    expect(EXPLORE2).toMatch(/combatPrimerOpen =[^;]*primerHint\.shouldShow === true;/);
+    const HOOK = readFileSync(join(ROOT, 'app', 'components', 'useFirstTimeHint.ts'), 'utf8');
+    expect(HOOK).toContain('(!dismissed && !disabled)');
   });
 
   it('⚠⚠ every FirstTimeHint already carried it, which is why they were fine', () => {

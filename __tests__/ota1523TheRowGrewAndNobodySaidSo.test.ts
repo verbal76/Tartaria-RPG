@@ -58,23 +58,31 @@ const EXPLORE = readFileSync(join(ROOT, 'app', 'screens', 'ExplorationScreen.tsx
 const PRIMER = readFileSync(join(ROOT, 'app', 'components', 'CombatPrimerModal.tsx'), 'utf8');
 const INPUT = readFileSync(join(ROOT, 'app', 'components', 'InputBox.tsx'), 'utf8');
 
-/** One <FirstTimeHint …/> element, by id. */
-function hint(id: string): string {
-  const at = EXPLORE.indexOf(`id="${id}"`);
+// ⚠ OTA-1738 — the copy moved into the teaching registry (one body, replayable
+// from Settings → GUIDANCE), and the screen renders ONE card at a time from a
+// teaching slot. `hint` reads the registry; `candidate` reads the slot line the
+// screen keys the card on. THROW SPEAR is v2: the old card said the spear is
+// "spent on a hit" — settleThrowRestore spends it on every concluded throw.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const { TEACHINGS } = require('../app/components/teachingRegistry') as typeof import('../app/components/teachingRegistry');
+function hint(id: keyof typeof TEACHINGS): string {
+  return TEACHINGS[id].body;
+}
+function candidate(id: keyof typeof TEACHINGS): string {
+  const at = EXPLORE.indexOf(`{ id: TEACH.${id}.id, when:`);
   expect(at).toBeGreaterThan(-1);
-  const open = EXPLORE.lastIndexOf('<FirstTimeHint', at);
-  return EXPLORE.slice(open, EXPLORE.indexOf('/>', at) + 2);
+  return EXPLORE.slice(at, EXPLORE.indexOf('},', at) + 2);
 }
 
 describe('OTA-1523 — every control that exists has somewhere that teaches it', () => {
   it('⚠⚠⚠ THE THREE UNTAUGHT BUTTONS NOW HAVE HINTS', () => {
-    for (const id of ['combat_shield_block', 'combat_throw_spear']) {
-      expect(EXPLORE).toContain(`id="${id}"`);
+    for (const id of ['combat_shield_block', 'combat_throw_spear_v2'] as const) {
+      candidate(id);
     }
     // Both name the controls by the labels InputBox actually renders.
     expect(hint('combat_shield_block')).toMatch(/BLOCK/);
     expect(hint('combat_shield_block')).toMatch(/SHIELD BASH/);
-    expect(hint('combat_throw_spear')).toMatch(/THROW SPEAR/);
+    expect(hint('combat_throw_spear_v2')).toMatch(/THROW SPEAR/);
   });
 
   it('⚠⚠⚠ AND THOSE LABELS ARE READ OFF InputBox, NOT OFF MEMORY', () => {
@@ -94,7 +102,11 @@ describe('OTA-1523 — every control that exists has somewhere that teaches it',
     // button the player has not been shown.
     expect(INPUT).toContain('itemIsShield(inst)');
     expect(EXPLORE).toContain('itemIsShield(offInst)');
-    expect(hint('combat_shield_block')).not.toContain('itemIsShield'); // gate is outside the element
+    expect(candidate('combat_shield_block')).toContain('shieldOnArm');
+    // ⚠ OTA-1738 — and THROW SPEAR keys on the very function InputBox lights by.
+    expect(candidate('combat_throw_spear_v2')).toContain('spareSpearInPack');
+    expect(EXPLORE).toContain('spareThrowingSpear(player.inventory ?? [], player.equipped)');
+    expect(INPUT).toContain('spareThrowingSpear(reachPlayer?.inventory ?? [], reachPlayer?.equipped)');
   });
 
   it('⚠⚠ the BLOCK copy states the COST, not just the benefit', () => {
@@ -108,9 +120,11 @@ describe('OTA-1523 — every control that exists has somewhere that teaches it',
   });
 
   it('⚠⚠ the SPEAR copy states that the throw SPENDS the spear', () => {
-    // consume-on-hit. Without this the player throws their only spear and
-    // wonders where it went.
-    expect(hint('combat_throw_spear')).toMatch(/spent|consumed/i);
+    // ⚠ OTA-1738 — spent on every concluded throw, hit OR miss (settleThrowRestore
+    // 'resolved' decrements one unit whichever way the roll fell). The old card said
+    // "spent on a hit", which a missed throw contradicted.
+    expect(hint('combat_throw_spear_v2')).toMatch(/spent on every throw, hit or miss/i);
+    expect(hint('combat_throw_spear_v2')).not.toMatch(/spent on a hit/i);
   });
 });
 
@@ -125,11 +139,10 @@ describe('OTA-1523 — elevation is taught in BOTH directions', () => {
   it('⚠⚠ and it fires only when the player is actually up with foes below', () => {
     // The same three scene facts the engine's own elevation gate reads, so the
     // card cannot appear on a climb with nothing at the bottom.
-    const at = EXPLORE.indexOf('id="elevation_first_fight"');
-    const guard = EXPLORE.slice(EXPLORE.lastIndexOf('{!!currentScene?.elevatedOn', at), at);
+    const guard = candidate('elevation_first_fight');
     expect(guard).toContain('elevatedOn');
     expect(guard).toContain('enemiesAtBase');
-    expect(guard).toContain('enemies?.length');
+    expect(guard).toContain('inFightNow');
   });
 });
 
@@ -170,16 +183,18 @@ describe('OTA-1523 — the primer teaches the rule, not the mechanics', () => {
     // check:quotedpins bans outright and rightly: a comment pin fails on a
     // reword and passes when the behaviour it describes is deleted.
     //
-    // The behaviour: the primer is gated on having killed nothing, so a
-    // character past their first fight is out of reach of it forever. The three
-    // hints must therefore NOT share that gate — none of their conditions may
-    // mention the kill counter, or they inherit the same blind spot.
-    expect(EXPLORE).toContain('enemiesDefeatedEver === 0');
-    for (const id of ['combat_shield_block', 'combat_throw_spear', 'elevation_first_fight', 'combat_readout']) {
-      const at = EXPLORE.indexOf(`id="${id}"`);
-      const guard = EXPLORE.slice(EXPLORE.lastIndexOf('{', EXPLORE.lastIndexOf('<FirstTimeHint', at)), at);
-      expect(guard).not.toContain('enemiesDefeatedEver');
-      expect(guard).not.toContain('combatPrimerSeen');
+    // ⚠ OTA-1738 — the primer's kill-count gate is GONE (once per install, like
+    // every card), so the three control hints no longer need to dodge it; they
+    // still must not key on the kill counter, because a control is taught when
+    // it lights, not when a milestone says so.
+    expect(EXPLORE).not.toContain('enemiesDefeatedEver === 0');
+    for (const id of ['combat_shield_block', 'combat_throw_spear_v2', 'elevation_first_fight'] as const) {
+      expect(candidate(id)).not.toContain('enemiesDefeatedEver');
+      expect(candidate(id)).not.toContain('combatPrimerSeen');
     }
+    // Owner decision 2: the READOUT is the exception by design — Power is taught
+    // in the primer, and the readout waits for the fight after the first, once
+    // the primer has been seen on this install.
+    expect(candidate('combat_readout')).toContain('combatPrimerSeen && enemiesDefeatedEver >= 1');
   });
 });

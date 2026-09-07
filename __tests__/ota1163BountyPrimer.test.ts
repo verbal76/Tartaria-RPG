@@ -59,6 +59,8 @@ import { bountyPrimerCard, formatWindow, BOUNTY_BROKER } from '../app/engine/bou
 import { killCountsForBounty, bountyTerms, giverDifficulty } from '../app/engine/factionBounty';
 import type { FactionBounty } from '../app/engine/factionBounty';
 import { useGameStore } from '../app/state/gameStore';
+import { resetFirstTimeHint } from '../app/components/useFirstTimeHint';
+import { BOUNTY_PRIMER_HINT_ID } from '../app/state/slices/boardSlice';
 
 import * as fs from 'fs';
 import * as path from 'path';
@@ -186,6 +188,10 @@ describe('OTA-1163 — it fires once, on the first contract', () => {
     await useGameStore.getState().startNewGame({ name: 'Ropes', raceId: 'reclaimer', factionId: 'reclaimers_guild' });
     useGameStore.getState().skipTutorial?.();
     useGameStore.getState().clearMissionCompleteNotice();
+    // ⚠ OTA-1738 — the primer is seen PER INSTALL now (owner decision 7: it obeys
+    // the tips switch and SHOW ALL TIPS AGAIN), so a fresh character alone does not
+    // un-see it; each case starts from a reset install flag.
+    await resetFirstTimeHint(BOUNTY_PRIMER_HINT_ID);
     // ⚠ OTA-1165 — accepting now requires a FROZEN BOARD: the contract stamps the
     // politics it was signed under, so there must be a snapshot to stamp. The freeze
     // AUTO-RELEASES on accept, which is why it is re-taken before each one.

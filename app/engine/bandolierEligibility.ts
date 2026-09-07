@@ -42,6 +42,21 @@ export function itemIsHandThrownSpear(item: InventoryItem): boolean {
   return tags.includes('throwable') && tags.includes('spear');
 }
 
+/** ⚠ OTA-1738 — THE SPARE, decided once. The THROW SPEAR button (InputBox) and
+ *  the card that teaches it used to answer "is there a spare to throw" with two
+ *  different tests — the button by this rule, the card by a name regex — so the
+ *  card could fire for a fight with no button. A spare is a hand-thrown spear
+ *  that is either not in a hand, or stacked deep enough that hurling one does
+ *  not empty the hand. Returns the item the button would throw, or null. */
+export function spareThrowingSpear(
+  inventory: ReadonlyArray<InventoryItem>,
+  equipped: { mainId?: string; offId?: string } | null | undefined,
+): InventoryItem | null {
+  return inventory.find((i) =>
+    itemIsHandThrownSpear(i) && i.quantity > 0
+    && ((i.id !== equipped?.mainId && i.id !== equipped?.offId) || i.quantity > 1)) ?? null;
+}
+
 export interface BandolierEligibility {
   eligible: boolean;
   reason: string;

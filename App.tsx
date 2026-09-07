@@ -38,6 +38,8 @@ import { MapScreen } from './app/screens/MapScreen';
 import { CraftingScreen } from './app/screens/CraftingScreen';
 import { VendorScreen } from './app/screens/VendorScreen';
 import { ActionReferenceScreen } from './app/screens/ActionReferenceScreen';
+import { GuidanceScreen } from './app/screens/GuidanceScreen'; // OTA-1738 — replay + reference
+import { primeSeenHints } from './app/components/useFirstTimeHint';
 import { ContractsScreen } from './app/screens/ContractsScreen';
 import { WorldScreen } from './app/screens/WorldScreen';
 import { TutorialOverlay } from './app/components/TutorialOverlay';
@@ -468,6 +470,7 @@ export default function App() {
     //   stall. Deliberately NOT a heavier probe: an instrument that changes the
     //   boot it is measuring invalidates its own result.
     try { useGameStore.getState().startBootPressureWatch(); } catch { /* never block boot */ }
+    void primeSeenHints(); // OTA-1738 — store-side surfaces (the bounty primer) read the hint flags synchronously
     setStage('hydrate:start');
     void hydrate()
       .then(async () => {
@@ -1394,6 +1397,7 @@ function AppShell({ screen }: { screen: ReturnType<typeof useGameStore.getState>
           {screen === 'crafting' && <CraftingScreen />}
           {screen === 'vendor' && <VendorScreen />}
           {screen === 'actions' && <ActionReferenceScreen />}
+          {screen === 'guidance' && <GuidanceScreen />}
           {screen === 'contracts' && <ContractsScreen />}
           {screen === 'world' && <WorldScreen />}
           {screen === 'ending' && <EndingScreen />}

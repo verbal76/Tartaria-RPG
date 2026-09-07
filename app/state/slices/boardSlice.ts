@@ -26,6 +26,9 @@ import { availableFactionQuests, neutralBoardPostings } from '../../engine/facti
 import { refusalLine } from '../../engine/portability';
 import { canonicalDistanceFromGrid, canonicalCellOf, canonicalCellFor } from '../../engine/worldMap';
 
+/** OTA-1738 — the bounty primer's install-wide hint id (governed by the tips switch and reset). */
+export const BOUNTY_PRIMER_HINT_ID = 'bounty_primer_v1';
+
 /**
  * ⚠ `import type * as` is fully erased at compile time, so this is NOT a runtime
  * cycle. It lets every dep below be typed `typeof Store.fn`, which means their
@@ -318,10 +321,17 @@ export const createBoardSlice = (
     // routing, and gated on a one-shot flag rather than `slate.length === 0` — a player
     // who finished a contract has still seen the ropes, and an empty slate would show them
     // the card again every time they cleared it.
-    if (!player.bountyPrimerSeen) {
+    // ⚠⚠ OTA-1738 — owner decision 7: the primer obeys the global tips switch and
+    // SHOW ALL TIPS AGAIN. Seen-ness is the install-wide hint flag (same prefix as
+    // every FirstTimeHint), not the per-character field; `bountyPrimerSeen` is
+    // still written so older readers of the save keep their meaning.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const tips = require('../../components/useFirstTimeHint') as typeof import('../../components/useFirstTimeHint');
+    if (!tips.getHintsDisabled() && !tips.isHintSeen(BOUNTY_PRIMER_HINT_ID)) {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { bountyPrimerCard } = require('../../engine/bountyPrimer') as typeof import('../../engine/bountyPrimer');
       const card = bountyPrimerCard(bounty, deadlineHours, getStanding(player.factionStanding, bounty.giverFactionId));
+      tips.markHintSeen(BOUNTY_PRIMER_HINT_ID);
       set((s) => (s.player ? { player: { ...s.player, bountyPrimerSeen: true } } : s));
       get().raiseSpotlightNotice(card.heading, card.title, card.flavor, card.rewards, {
         takeLabel: card.takeLabel,

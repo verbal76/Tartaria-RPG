@@ -30,6 +30,7 @@ import { useCardViewport } from './KeyboardSafeCard';
 import { keyboardInset } from '../engine/keyboardSafeCard';
 import { useGameStore } from '../state/gameStore';
 import { defaultDogName } from '../engine/dogCompanion';
+import { DOG_FEEDING_LINE } from './teachingRegistry'; // OTA-1738 — quoted from the loyalty clock
 // ⚠⚠⚠ OTA-1525 — THE OWNER WANTED THE SWITCH HERE TOO: "push the dog card tips
 // button too." OTA-1524 had exempted this card because it ASKS rather than tells
 // — its own contract is "No dismiss-without-answering: the dog is already
@@ -180,6 +181,12 @@ export function DogOnboardingModal() {
             </Pressable>
             <Text style={styles.hint}>
               A blank breed or name is fine — the mud fills in. Boy or girl needs an answer.
+            </Text>
+            {/* ⚠ OTA-1738 — owner decision 5: the card that hands you the dog says how to
+                keep it. The clock and the crossings are read from the constants the
+                store's loyalty tick runs on, never retyped. */}
+            <Text style={styles.hint} accessibilityLabel="How to keep your dog">
+              {DOG_FEEDING_LINE}
             </Text>
             {/* ⚠⚠ OTA-1525 — the same escape hatch every other card offers, in the
                 same words and writing the same global flag — but WITHOUT the
