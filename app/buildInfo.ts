@@ -28763,6 +28763,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // line is the instance and where it is worn; row to sheet to spend rides the
 // instance id. No pricing, cap, temper, consignment or recipe rule touched.
 export const OTA_BUILD_ID = '2026-09-07-1736-the-vendor-knows-what-you-carry';
+// golem catch-up 2026-09-07: markerless publish of OTA-1736 - the vendor as a
+// projection of authoritative state. app/engine/itemIdentity.ts holds the
+// instance display name, worn-where and hold-label logic extracted verbatim from
+// the inventory (which now calls it); the REINFORCE YOUR GEAR rows show the full
+// coated name on two lines, rarity +level, durability now to after, damage,
+// One-/Two-handed, EQUIPPED (main hand) or in your pack, perks and coating procs,
+// keyed on the instance id from row to sheet to spend. vendors.shelfKnowledge is
+// the one predicate the screen (checkmark KNOWN, disabled) and buyFromVendor
+// (refuse before the purse) both read for a learned Procedure Text; the engine
+// already refused a second purchase, so this was presentation-only.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-07-1735-the-instrument-was-off';// golem catch-up 2026-09-07: markerless publish of OTA-1735 - instrumentation
 // only, from the task #30 investigation of 11 native deaths (9 on an OTA-apply
 // boot). The finding is in the measuring, not yet in the game: the runtime
