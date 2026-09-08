@@ -29273,6 +29273,25 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // differently inside their own frames, so one window shows a different part of
 // each. Moving the window cannot align nine different compositions.
 export const OTA_BUILD_ID = '2026-09-08-1752-left-of-centre';
+// golem catch-up 2026-09-08: markerless publish of OTA-1752 - left of centre.
+// OTA-1751 put the roster tile's faction emblem on the row's geometric centre at
+// the owner's request; on the device it still read as too far right. The
+// arithmetic was never wrong - it really was centred - but the premise was: a
+// tile is not an empty rectangle. Its weight is all on the left, a 32px name
+// with an objective line beneath it, against nothing but a small timestamp on
+// the right, so an emblem on the geometric centre reads right of centre because
+// the eye balances it against the text rather than the border. Centring a mark
+// on a one-sided surface is the wrong operation however correctly performed.
+// It moves to 17-59%, centred on 38% of the tile, and that is the only change:
+// width stays 42%, the vertical crop stays 2.5x the tile height, the alpha stays
+// at the approved 0.22. That was the payoff for OTA-1750 asserting coverage
+// independently of position - the box could slide without reopening the size
+// argument. The emblem now overlaps the name outright rather than merely
+// reaching it, which the contrast arithmetic already covered: measured against
+// the brightest part of the artwork, the name clears about 9:1 and the objective
+// line about 6:1. The per-faction offset table remains unbuilt and remains the
+// real answer to the original observation - moving one window cannot align nine
+// differently composed crests.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-08-1751-centred-on-the-row';
 // golem catch-up 2026-09-08: markerless publish of OTA-1751 - centred on the
 // row. Owner on OTA-1750: bump to 0.22, and since the emblems are not symmetrical
