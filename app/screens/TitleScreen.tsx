@@ -1527,19 +1527,26 @@ const styles = StyleSheet.create({
    *
    * ⚠ It sits from 40% to 82% of the tile, which clears the name column and
    * stops short of the timestamp. */
-  /* ⚠⚠ OTA-1751 — CENTRED ON THE ROW, AND STRONGER AGAIN.
-   * Owner, seeing OTA-1750 on the device: bump to 0.22, and *"we might need a
-   * custom position for each emblem since they are all not symmetrical — let's
-   * center the emblem on the line for now and see what that does."*
-   * He is right about the asymmetry: the nine crests are composed differently
-   * inside their own frames, so the same window shows a different PART of each
-   * one. Centring is the honest uniform default to judge that from, and it
-   * moves the emblem from 40-82% (right of centre) to 29-71%.
-   * ⚠ It now sits BEHIND the name rather than beside it. That was my own caution
-   * in OTA-1750, not a measured limit — and it is measured now: at 0.22 over the
-   * brightest part of the artwork the name still clears ~9:1 and the objective
-   * line ~6:1, so the tile reads exactly as well as it did. */
-  dossierFieldCompact: { position: 'absolute', top: '-250%', bottom: '-250%', right: '29%', left: '29%', opacity: 0.22 },
+  /* ⚠⚠⚠ OTA-1752 — LEFT OF CENTRE, BECAUSE THE TILE IS NOT SYMMETRICAL EITHER.
+   * OTA-1751 put the emblem on the row's geometric centre (29-71%) at the
+   * owner's request, and on the device it STILL read as sitting too far right.
+   * It was not an error in the arithmetic: the emblem was exactly centred. The
+   * mistake was treating the tile as an empty rectangle. Its own weight is all
+   * on the LEFT — the name at 32px, the objective line under it — and the only
+   * thing on the right is a small timestamp. An emblem centred against that
+   * reads right-of-centre, because the eye balances it against the text, not
+   * against the border.
+   * So it sits at 17-59%, centred on 38% of the tile. Same 42% width, same
+   * vertical crop, same alpha: only the horizontal centre moved.
+   * ⚠ It now overlaps the name outright rather than merely reaching it, and the
+   * contrast arithmetic (ota1751/ota1752) is what says that is safe: at 0.22
+   * over the brightest part of the artwork the name clears ~9:1 and the
+   * objective line ~6:1.
+   * ⚠ THE PER-FACTION OFFSET IS STILL UNBUILT and is still the real answer to
+   * the owner's original observation — the nine crests are composed differently
+   * inside their own frames, so one window shows a different part of each. This
+   * moves the window; it cannot align nine different compositions. */
+  dossierFieldCompact: { position: 'absolute', top: '-250%', bottom: '-250%', right: '41%', left: '17%', opacity: 0.22 },
   dossierNameRule: { marginTop: 6, marginBottom: 6 },
   /* ⚠ PHONE-FIX — INDEX TICKS: three hairlines machined across the spine, the
    * way a real filed plate carries a position mark. Fine technical engraving is

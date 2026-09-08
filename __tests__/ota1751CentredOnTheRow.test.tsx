@@ -45,23 +45,36 @@ const contrast = (a: [number, number, number], b: [number, number, number]) => {
 };
 
 describe('the emblem sits on the row\'s centre line', () => {
-  test('⚠⚠ left and right insets are equal — that IS the centring', () => {
+  /* ⚠⚠⚠ SUPERSEDED BY OTA-1752, ONE DEVICE LOOK LATER — REASONING KEPT.
+   * This asserted equal insets, because "centred on the line" is what the owner
+   * asked for and equal insets is what that means. He then saw it on the device
+   * and said it STILL sat too far right. The arithmetic was never wrong; the
+   * PREMISE was. A tile is not an empty rectangle — its weight is all on the
+   * left (a 32px name, an objective line under it) against a small timestamp on
+   * the right, so an emblem on the geometric centre reads right-of-centre
+   * because the eye balances it against the text.
+   * The durable claim is therefore the opposite of the original one: the emblem
+   * must sit LEFT of the tile's centre, by enough to be deliberate. */
+  test('⚠⚠ it sits LEFT of the tile\'s centre, to balance against the text', () => {
     const b = styleBlock('dossierFieldCompact');
-    expect(num(b, 'left')).toBe(num(b, 'right'));
-    // and it is the middle of the tile, not merely symmetric about something else
-    expect(num(b, 'left') + num(b, 'right')).toBeLessThan(100);
+    const centre = num(b, 'left') + (100 - num(b, 'left') - num(b, 'right')) / 2;
+    expect(centre).toBeLessThan(45);          // decisively left of 50%
+    expect(centre).toBeGreaterThan(25);       // ...but not pinned to the edge
+    expect(num(b, 'left')).toBeGreaterThan(0); // whole width still on the tile
+    expect(num(b, 'right')).toBeGreaterThan(0);
   });
 
-  test('centring did not cost coverage — still 42% of the tile', () => {
+  test('moving it did not cost coverage — still 42% of the tile', () => {
     // The owner's floor from OTA-1750 was a third. Moving the box must not
-    // quietly shrink it, so the width is asserted independently of position.
+    // quietly shrink it, so the width is asserted independently of position —
+    // which is what let OTA-1752 slide it left without re-arguing the size.
     const b = styleBlock('dossierFieldCompact');
     const width = 100 - num(b, 'left') - num(b, 'right');
     expect(width).toBe(42);
     expect(width / 100).toBeGreaterThanOrEqual(1 / 3);
   });
 
-  test('it is vertically centred too, so "centred" means centred on both axes', () => {
+  test('it stays vertically centred — only the HORIZONTAL centre moved', () => {
     const b = styleBlock('dossierFieldCompact');
     expect(num(b, 'top')).toBe(num(b, 'bottom'));
     expect(num(b, 'top')).toBeLessThan(0); // ...and still cropped by the tile

@@ -29253,7 +29253,27 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // clears about 9:1 and the objective line about 6:1 - so the tile reads exactly
 // as well as it did while the emblem reads considerably better. Coverage is
 // unchanged at 42% of the tile, and the expanded card is untouched.
-export const OTA_BUILD_ID = '2026-09-08-1751-centred-on-the-row';
+// ── OTA-1752 — LEFT OF CENTRE ────────────────────────────────────────────────
+// OTA-1751 put the roster tile's faction emblem on the row's geometric centre at
+// the owner's request. On the device it still read as sitting too far right.
+// The arithmetic was never wrong - the emblem was exactly centred. The PREMISE
+// was: a tile is not an empty rectangle. Its own weight is all on the left, a
+// 32px name with an objective line under it, against nothing but a small
+// timestamp on the right. An emblem on the geometric centre reads right of
+// centre because the eye balances it against the text, not against the border.
+// So it moves to 17-59%, centred on 38% of the tile. Same 42% width, same
+// vertical crop, same 0.22: the horizontal centre is the only thing that moved,
+// and the coverage assertion was already written independently of position so
+// the slide did not have to re-argue the size.
+// It now overlaps the name outright rather than merely reaching it, and the
+// contrast arithmetic is what says that is safe - at 0.22 over the brightest
+// part of the artwork the name clears about 9:1 and the objective line about
+// 6:1. The per-faction offset table is still unbuilt and is still the real
+// answer to the owner's original observation: the nine crests are composed
+// differently inside their own frames, so one window shows a different part of
+// each. Moving the window cannot align nine different compositions.
+export const OTA_BUILD_ID = '2026-09-08-1752-left-of-centre';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-08-1751-centred-on-the-row';
 // golem catch-up 2026-09-08: markerless publish of OTA-1751 - centred on the
 // row. Owner on OTA-1750: bump to 0.22, and since the emblems are not symmetrical
 // we may need a custom position for each, so centre it on the line for now and
