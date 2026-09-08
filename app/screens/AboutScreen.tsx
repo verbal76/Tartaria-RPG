@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform, Linking } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import * as Updates from 'expo-updates';
 import { useGameStore } from '../state/gameStore';
@@ -38,6 +38,13 @@ import {
 } from '../engine/saveSystem';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // OTA-1666 — the dedupe mark on CLEAR LOG
 import { BugReportModal } from '../components/BugReportModal';
+/* ⚠⚠⚠ PHONE-FIX (VIS-1-PHONE-FIX-4D8A) — TWO TOOLS ARRIVED FROM THE TITLE SCREEN.
+ * Owner, after seeing Visual #1 on the Pixel: RESTORE FROM BACKUP and INVITE
+ * PLAYTESTER are not title-screen furniture. RESTORE is an old failsafe from a
+ * risky transition years of OTAs ago; INVITE is a developer errand. Both belong
+ * where a player looks for a TOOL. Neither capability changed — only its door. */
+import { InvitePlaytesterModal } from '../components/InvitePlaytesterModal';
+import { restoreCharacterFromClipboard, restoreOutcomeLine } from '../ui/restoreCharacter';
 import { BrandedModal } from '../components/BrandedModal'; // OTA-1672 — the outcome popup
 import {
   composeAndSendBugReport, bugReportOutcomeTitle,
@@ -154,6 +161,13 @@ export function AboutScreen() {
   // OTA-1665's dedupe gate had to exist in the first place.
   const [bugReportPopup, setBugReportPopup] =
     useState<{ title: string; body: string } | null>(null);
+  // ⚠ PHONE-FIX — RESTORE's outcome, in the same shape every other tool on this
+  // screen reports in: one line, verbatim, that stays until the next attempt.
+  const [restoreBusy, setRestoreBusy] = useState(false);
+  const [restoreMsg, setRestoreMsg] = useState<string | null>(null);
+  // ⚠ PHONE-FIX — INVITE PLAYTESTER, moved whole (modal, mailto and flash).
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [inviteSent, setInviteSent] = useState(false);
   // OTA-1490 — device-sticky owner unlock: seeing an unlock-named character
   // marks the device, then EVERY character on it gets the owner tools.
   const [ownerTools, setOwnerTools] = useState(false);
@@ -241,6 +255,57 @@ export function AboutScreen() {
     }
     setSaveState(ok ? 'saved' : 'failed');
     setTimeout(() => setSaveState('idle'), 3000);
+  };
+
+  /* ⚠⚠ PHONE-FIX — RESTORE, THE PARTNER OF BACK UP, NOW STANDS BESIDE IT.
+   * OTA-1178's rule is intact and is the reason this needs no confirm dialog:
+   * an import ALWAYS mints a new slot, so a mis-tap cannot cost a character.
+   * The flow itself lives in app/ui/restoreCharacter.ts so the two surfaces that
+   * have ever hosted it cannot drift on what "restore" means. */
+  const handleRestore = async () => {
+    setRestoreBusy(true);
+    setRestoreMsg('Reading the clipboard…');
+    const outcome = await restoreCharacterFromClipboard();
+    if (outcome.ok) {
+      // The roster is what the player will go back to; re-read it here so the
+      // restored character is already there when they do.
+      try { await useGameStore.getState().refreshSlots(); } catch { /* the title screen re-reads on appear anyway */ }
+    }
+    setRestoreMsg(restoreOutcomeLine(outcome));
+    setRestoreBusy(false);
+  };
+
+  /* ⚠ PHONE-FIX — INVITE PLAYTESTER, moved verbatim from the title screen.
+   * It still opens a mailto and it still should: OTA-1665 retired the mail
+   * route for BUG REPORTS because those are payloads, and drew the distinction
+   * in as many words — "that one is a short human request to a person". */
+  const sendPlaytesterInvite = async (gmail: string): Promise<void> => {
+    const subject = 'New Playtester';
+    const body =
+      `Please add the following Gmail address to the Tartaria\n` +
+      `Realms playtester whitelist:\n` +
+      `\n` +
+      `  ${gmail}\n` +
+      `\n` +
+      `Requested at: ${new Date().toISOString()}\n` +
+      // OTA-267 — codename instead of raw OTA id, so a tester's mail client
+      // never carries the build number itself.
+      `Requester's build: ${getBuildCodename(OTA_BUILD_ID)}\n` +
+      `\n` +
+      `(Sent from INVITE PLAYTESTER in Tartaria's settings.)\n`;
+    const mailto =
+      `mailto:hotatticgames@gmail.com` +
+      `?subject=${encodeURIComponent(subject)}` +
+      `&body=${encodeURIComponent(body)}`;
+    try {
+      await Linking.openURL(mailto);
+    } catch {
+      // No mail client installed — silent, as before. The ✓ SENT flash still
+      // fires and the player can see their mail app did not open.
+    }
+    setInviteOpen(false);
+    setInviteSent(true);
+    setTimeout(() => setInviteSent(false), 2200);
   };
 
   // ⚠ OTA-1208 — BACK UP moved HERE from every title-screen character row
@@ -887,6 +952,25 @@ export function AboutScreen() {
             </TouchableOpacity>
           )}
 
+          {/* ⚠⚠ PHONE-FIX — RESTORE FROM BACKUP, arrived from the title screen.
+              Directly under BACK UP CHARACTER because they are one pair: this
+              reads what that wrote. It never overwrites — a restore always
+              arrives as an ADDITIONAL character (OTA-1178), which is why it
+              needs no confirm. */}
+          <TouchableOpacity
+            style={[styles.sessionBtn, styles.sessionBtnSecondary]}
+            onPress={() => { void handleRestore(); }}
+            activeOpacity={0.7}
+            disabled={restoreBusy}
+            accessibilityRole="button"
+            accessibilityState={{ disabled: restoreBusy }}
+          >
+            <Text style={styles.sessionBtnSecondaryText}>
+              {restoreBusy ? 'RESTORING…' : 'RESTORE FROM BACKUP (paste a backup first)'}
+            </Text>
+          </TouchableOpacity>
+          {restoreMsg ? <Text style={styles.sessionFootnote}>{restoreMsg}</Text> : null}
+
           <TouchableOpacity
             style={[styles.sessionBtn, styles.sessionBtnPrimary]}
             onPress={() => { void saveAndExitToTitle(); }}
@@ -959,6 +1043,19 @@ export function AboutScreen() {
             accessibilityRole="button"
           >
             <Text style={styles.sessionBtnPrimaryText}>REPORT A BUG</Text>
+          </TouchableOpacity>
+          {/* ⚠ PHONE-FIX — INVITE PLAYTESTER, arrived from the title screen. It
+              sits with REPORT A BUG because both are ways of reaching the people
+              who make this, and neither is a thing a player does while playing. */}
+          <TouchableOpacity
+            style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 }]}
+            onPress={() => setInviteOpen(true)}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+          >
+            <Text style={styles.sessionBtnSecondaryText}>
+              {inviteSent ? '✓ SENT' : 'INVITE A PLAYTESTER'}
+            </Text>
           </TouchableOpacity>
           {/* ⚠⚠⚠ OTA-1665 — SEND LOG IS GONE. Owner: *"I've removed the send
               log"*, and *"report a bug should be the button that pushed the
@@ -1803,6 +1900,12 @@ export function AboutScreen() {
       {/* arb75 — in-game bug report. OTA-1665 made it the push (the clipboard
           and mailto this comment used to describe are retired); OTA-1672 gave
           it three modes and made the outcome a popup. */}
+      <InvitePlaytesterModal
+        visible={inviteOpen}
+        onCancel={() => setInviteOpen(false)}
+        onSend={(gmail) => { void sendPlaytesterInvite(gmail); }}
+      />
+
       <BugReportModal
         visible={bugReportOpen}
         slots={bugReportSlots}

@@ -126,6 +126,7 @@ const AUTO = readFileSync(join(ROOT, 'app', 'diagnostics', 'autoBundle.ts'), 'ut
 const BUTTON = readFileSync(join(ROOT, 'app', 'diagnostics', 'bugReport.ts'), 'utf8');
 const MODAL = readFileSync(join(ROOT, 'app', 'components', 'BugReportModal.tsx'), 'utf8');
 const TITLE = readFileSync(join(ROOT, 'app', 'screens', 'TitleScreen.tsx'), 'utf8');
+const ABOUT = readFileSync(join(ROOT, 'app', 'screens', 'AboutScreen.tsx'), 'utf8');
 const SAVE = readFileSync(join(ROOT, 'app', 'engine', 'saveSystem.ts'), 'utf8');
 
 const URI = 'file:///doc/' + PENDING_BUNDLE_FILE;
@@ -347,7 +348,13 @@ describe('OTA-1682 — ⚠⚠ a general report carries the last-played character
     expect(MODAL.includes('onSend({ slot, logSlot: fullLogSlot, description: description.trim(),')).toBe(true);
     expect(MODAL.includes("mode: slot ? 'character' : 'general', screen });")).toBe(true);
     expect(MODAL.includes('logSlot?: SlotSummary | null;')).toBe(true);
-    const at = TITLE.indexOf('const sendBugReport = async (args: {');
-    expect(TITLE.slice(at, at + 200).includes('logSlot?: SlotSummary | null;')).toBe(true);
+    /* ⚠⚠ VIS-1-PHONE-FIX RE-AIMED THE "AND THE SCREEN PASSES IT THROUGH" HALF.
+     * The title screen's report button and its handler moved to Settings, so
+     * the screen that hosts the modal is AboutScreen — and it passes the whole
+     * `args` object straight into the shared helper without unpacking it, which
+     * is a stronger version of the same claim: there is no field it can drop. */
+    expect(ABOUT.includes('onSend={(args) => {')).toBe(true);
+    expect(ABOUT.includes('composeAndSendBugReport(args)')).toBe(true);
+    expect(TITLE.includes('const sendBugReport')).toBe(false);
   });
 });

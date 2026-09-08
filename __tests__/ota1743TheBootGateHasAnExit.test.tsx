@@ -79,6 +79,18 @@ jest.mock('expo-constants', () => ({ default: { expoConfig: {} } }));
 jest.mock('expo-font', () => ({ loadAsync: jest.fn(async () => {}) }));
 jest.mock('expo-speech-recognition', () => ({}));
 jest.mock('expo-updates', () => ({}));
+/* ⚠⚠ App.tsx's boot installs the crash transport, which `require`s the native
+ * Sentry SDK. Leaving that require to fail for real poisons the worker's
+ * resolver for every LATER test file that registers the same module virtually —
+ * measured: ota1685/ota1735/ota1489/ota1505/ota1682 all pass alone and fail
+ * behind this one. A virtual stub here keeps the resolution local to this file.
+ * ⚠ It is inert: nothing in this suite asserts on Sentry. */
+jest.mock('@sentry/react-native', () => ({
+  init: jest.fn(),
+  captureEvent: jest.fn(),
+  crashedLastRun: jest.fn(async () => null),
+  flush: jest.fn(async () => true),
+}), { virtual: true });
 jest.mock('../app/state/accessibility', () => ({
   ...jest.requireActual('../app/state/accessibility'),
   useReduceMotion: () => true,

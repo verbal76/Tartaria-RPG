@@ -25,16 +25,28 @@
 const read = (...p: string[]) =>
   require('fs').readFileSync(require('path').join(__dirname, '..', ...p), 'utf8') as string;
 const TITLE = read('app', 'screens', 'TitleScreen.tsx');
+const ABOUT = read('app', 'screens', 'AboutScreen.tsx');
 const KIT = read('app', 'ui', 'tartariaKit.tsx');
 
 describe('OTA-1445 — the order', () => {
-  it('⚠⚠ New Tartarian, then CHECK FOR OTA UPDATE, then Restore from backup', () => {
+  it('⚠⚠ New Tartarian, then CHECK FOR OTA UPDATE — and RESTORE is off this screen', () => {
+    /* ⚠⚠ VIS-1-PHONE-FIX TOOK THE THIRD BUTTON, AND THAT IS OWNER ORDER TOO.
+     * OTA-1445's instruction ordered three controls; after seeing Visual #1 on
+     * the Pixel the owner removed one of them from this surface entirely —
+     * *"Move RESTORE FROM BACKUP into Settings/Recovery. This was an old
+     * failsafe from a much earlier risky transition and does not belong on the
+     * normal title screen anymore."* The RANK claim OTA-1445 exists for is
+     * untouched: NEW TARTARIAN leads, the OTA button follows it, and nothing
+     * else competes. RESTORE's continued existence is pinned where it lives. */
     const newBtn = TITLE.indexOf("'NEW TARTARIAN'");
     const ota = TITLE.indexOf("'CHECK FOR OTA UPDATE'");
-    const restore = TITLE.indexOf('"RESTORE FROM BACKUP"');
     expect(newBtn).toBeGreaterThan(-1);
     expect(ota).toBeGreaterThan(newBtn);
-    expect(restore).toBeGreaterThan(ota);
+    // ⚠ The BUTTON, not the word — the note recording why it went names it.
+    expect(TITLE).not.toContain('label="RESTORE FROM BACKUP"');
+    expect(TITLE).not.toContain('restoreFromClipboard');
+    expect(ABOUT).toContain('RESTORE FROM BACKUP (paste a backup first)');
+    expect(ABOUT).toContain('restoreCharacterFromClipboard');
   });
 });
 
@@ -47,7 +59,8 @@ describe('OTA-1445 → VIS-1 — the rank', () => {
     const body = footer.slice(0, footer.indexOf('styles.cornerGear'));
     expect(body.length).toBeGreaterThan(0);
     expect((body.match(/variant="primary"/g) ?? []).length).toBe(1);
-    expect((body.match(/variant="utility"/g) ?? []).length).toBe(2);
+    // ⚠ ONE utility now, not two: RESTORE moved to Settings (see above).
+    expect((body.match(/variant="utility"/g) ?? []).length).toBe(1);
     // And the primary is the LEAD one, not whichever happened to sort first.
     const lead = body.indexOf("label={bootGateOpen ? 'NEW TARTARIAN' : bootGateReason}");
     expect(lead).toBeGreaterThan(-1);

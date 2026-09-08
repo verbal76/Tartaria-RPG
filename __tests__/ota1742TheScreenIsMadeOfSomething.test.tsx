@@ -207,15 +207,22 @@ describe('OTA-1742 — the player owns the hue, and the kit respects it', () => 
       const g = parseInt(h.slice(2, 4), 16);
       const b = parseInt(h.slice(4, 6), 16);
       const chroma = Math.max(r, g, b) - Math.min(r, g, b);
-      // A warm neutral metal, not a colour: low chroma, and never green- or
-      // blue-dominant (which is what "hard-coded around the current theme"
-      // would look like).
-      // A warm aged metal tops out around 58 (the lit rim) — a real hue would
-      // be far past that, and this is what fails if someone reaches for one.
-      expect({ h, chroma }).toEqual({ h, chroma: expect.any(Number) });
+      /* ⚠⚠ VIS-1-PHONE-FIX WIDENED THIS BY ONE CATEGORY, ON PURPOSE. The rule
+       * was "warm neutral or the brand gold" (r >= g >= b), which is right for
+       * bronze and wrong for what the owner actually asked for after seeing the
+       * screen on the Pixel: *"precise ancient alloys, composites ... not
+       * medieval fantasy"*. Machined alloy is COOL. So a colour now qualifies if
+       * it is a warm neutral (as before) OR near-neutral of any temperature —
+       * chroma <= 18, which is grey with a bias, not a hue. Everything the rule
+       * was built to catch still fails it: a green, a blue or a purple keyed to
+       * the current theme is far past 18 and is not warm-ordered either. */
+      const warmOrdered = r >= g && g >= b;
+      const nearNeutral = chroma <= 18;
+      expect({ h, chroma, warmOrdered, nearNeutral })
+        .toEqual({ h, chroma: expect.any(Number), warmOrdered: expect.any(Boolean), nearNeutral: expect.any(Boolean) });
+      expect(warmOrdered || nearNeutral).toBe(true);
+      // A warm aged metal tops out around 58 (the lit rim); a real hue is past it.
       expect(chroma).toBeLessThanOrEqual(60);
-      expect(r).toBeGreaterThanOrEqual(g);
-      expect(g).toBeGreaterThanOrEqual(b);
     }
   });
 
@@ -310,7 +317,12 @@ describe('OTA-1742 — do not give the lag back', () => {
     const btn = KIT.slice(KIT.indexOf('const run = useCallback'), KIT.indexOf('const translateY'));
     expect(btn).toContain('if (reduceMotion) { depth.setValue(to); return; }');
     const settle = KIT.slice(KIT.indexOf('export function TSettle'), KIT.indexOf('const kit = StyleSheet.create'));
-    expect(settle).toContain('if (reduce) { v.setValue(to); return; }');
+    // ⚠ VIS-1-PHONE-FIX: the settle's REST is now 1 for both states (an
+    // inactive card used to sit parked at the start of its own entrance, which
+    // is what produced the dark seam above every record on the Pixel), so
+    // reduce-motion sets 1 rather than a computed target. Still SET, not
+    // animated, which is the claim.
+    expect(settle).toContain('if (!active || reduce) { v.setValue(1); return; }');
   });
 
   it('⚠⚠ the settle is inside the brief’s 150-220ms window and the press inside 80-140ms', () => {
@@ -536,14 +548,27 @@ describe('OTA-1742 — gameplay and gestures survived the restyle', () => {
   it('⚠⚠ every peripheral control the owner asked for is still on the screen', async () => {
     const tree = await mountTitle([slot()]);
     const text = allText(tree);
-    for (const label of ['NEW TARTARIAN', 'CHECK FOR OTA UPDATE', 'RESTORE FROM BACKUP', 'INVITE PLAYTESTER', 'REPORT BUG', 'Thank you for helping us test our new game']) {
+    /* ⚠⚠⚠ VIS-1-PHONE-FIX — THE LIST GOT SHORTER BY OWNER ORDER, AND THE
+     * CAPABILITIES DID NOT. Seeing Visual #1 on the Pixel, the owner asked for
+     * RESTORE FROM BACKUP, EXIT GAME, REPORT BUG and INVITE PLAYTESTER to come
+     * off this screen. EXIT GAME is deleted outright (on Android it only
+     * backgrounds the app — a control that lied about what it did); the other
+     * three are in Settings, which is asserted below rather than taken on
+     * trust. What must still be HERE is the game's own two actions. */
+    for (const label of ['NEW TARTARIAN', 'CHECK FOR OTA UPDATE']) {
       expect(text).toContain(label);
     }
-    // EXIT GAME is Android-only (OTA-251 — App Store review rejects a
-    // programmatic quit), and the renderer runs as iOS, so it is pinned in
-    // source rather than in the tree.
-    expect(TITLE).toContain("{Platform.OS === 'android' && (");
-    expect(TITLE).toContain('EXIT GAME');
+    for (const gone of ['RESTORE FROM BACKUP', 'INVITE PLAYTESTER', 'REPORT BUG', 'EXIT GAME',
+      'Thank you for helping us test our new game']) {
+      expect({ gone, onTitle: text.includes(gone) }).toEqual({ gone, onTitle: false });
+    }
+    const about = read('app', 'screens', 'AboutScreen.tsx');
+    expect(about).toContain('RESTORE FROM BACKUP (paste a backup first)');
+    expect(about).toContain('INVITE A PLAYTESTER');
+    expect(about).toContain('REPORT A BUG');
+    // ⚠ EXIT GAME is the one that is GONE, not moved.
+    expect(TITLE).not.toContain('BackHandler.exitApp');
+    expect(about).not.toContain('BackHandler.exitApp');
     // Settings still reachable from the corner gear.
     expect(TITLE).toContain('accessibilityLabel="Settings"');
   });

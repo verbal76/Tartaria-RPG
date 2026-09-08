@@ -29018,7 +29018,53 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // NOTHING ELSE MOVED: no gameplay, no save schema, no migration, no OTA order,
 // no model lifecycle, no LAG-3 repair other than the grouping construct, and the
 // VIS-1 title screen is untouched.
-export const OTA_BUILD_ID = '2026-09-08-1743-the-boot-gate-has-an-exit';
+// ⚠⚠⚠ OTA-1744 — THE OWNER HELD IT IN HIS HAND (task VIS-1-PHONE-FIX-4D8A).
+// Visual #1 met a Pixel 10 Pro XL, and five things the phone said are corrected
+// here. Nothing is redesigned: OTA-1742's language stands.
+// 1. DOUBLE SCROLL. Owner: *"when the character roster is scrolled, the whole
+//    lower portion of the screen moves with it."* It did — NEW TARTARIAN and the
+//    OTA button were the FlatList's ListFooterComponent and the roster label was
+//    its ListHeaderComponent, so all of it was scroll CONTENT. The heading is
+//    fixed above the list, the actions are fixed below it, the list is data
+//    only: ONE vertical scroller on the screen, measured on the rendered tree,
+//    and nothing nested. Swipe-delete and the two-tap contract are untouched.
+// 2. THE EMBLEM WAS A THUMBNAIL at 58pt — the one thing expanding a record
+//    exists to reveal, unreadable on the device. 96pt now (+65% across, ~2.7x
+//    the area), same canonical assets/crests art, same `contain` fit, still in
+//    its own layout column so it cannot cover text or take a tap.
+// 3. THE BLACK LINE above each dossier's gold rim had TWO causes and both are
+//    fixed. ⚠ The real one: TSettle rested an INACTIVE card at the START of its
+//    own entrance — `translateY 4`, `scale 0.994`, permanently, on every
+//    collapsed record — so the shadow-casting parent stayed put while its
+//    content sat four pixels lower, and the uncovered strip IS the seam. Rest is
+//    1 now for both states; becoming active replays the entrance from 0. ⚠ The
+//    belt: Android's `elevation` paints its shadow on every side and ignores
+//    shadowOffset, so it drew a second dark line on top of the rim. The record
+//    keeps the iOS shadow (which respects the offset) and drops elevation; the
+//    depth was never the drop shadow, it is the lit-top / black-bottom rim.
+// 4. THE UTILITY SEDIMENT IS OFF THE TITLE SCREEN, by owner order. RESTORE FROM
+//    BACKUP → Settings, beside BACK UP CHARACTER (its own partner; the flow is
+//    now app/ui/restoreCharacter.ts and STILL never overwrites — an import
+//    always mints a new slot, OTA-1178). INVITE PLAYTESTER → Settings, beside
+//    REPORT A BUG. REPORT BUG → deleted from this screen; Settings has filed the
+//    identical report through the same helper since arb75, and files it better
+//    because in there the app knows which character is being played. EXIT GAME →
+//    DELETED outright: on Android it only backgrounds the app, so it was a
+//    control that lied about what it did. ⚠ The recovered space is not refilled.
+//    CHECK FOR OTA UPDATE stays, subordinate, because OTA testing is live.
+// 5. RECOVERED TECHNOLOGY, NOT BRONZE. Owner: *"precise ancient alloys,
+//    composites, fine technical engraving ... not medieval fantasy."* Structural
+//    rims went to cool machined alloy and the brand gold is now spent ONLY where
+//    something is selected or asked for — which is what makes gold read as "this
+//    one is live" instead of as decoration. Index ticks are machined across each
+//    spine. ⚠ The palette is still theme-neutral and the suite still measures it:
+//    the rule widened from "warm neutral" to "warm neutral OR near-neutral
+//    (chroma <= 18)", which still fails any colour keyed to the owner's green.
+// ⚠⚠ NO GAMEPLAY, SAVE, LOADING OR BOOT CHANGE. OTA-1743's boot repair is not
+// touched, the kit has not propagated to any other screen, and the title screen
+// still commits nothing at all while it is being looked at.
+export const OTA_BUILD_ID = '2026-09-08-1744-the-owner-held-it-in-his-hand';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-08-1743-the-boot-gate-has-an-exit';
 // golem catch-up 2026-09-08: markerless publish of OTA-1743 - the OTA-1741 boot
 // hang repair. The device symptom was a near-black screen with one small gold
 // spinner, forever, on every cold start: App.tsx's pre-hydration state, which is

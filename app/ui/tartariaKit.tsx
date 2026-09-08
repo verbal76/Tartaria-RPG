@@ -53,10 +53,21 @@ export const T = {
   faceLit: 'rgba(30,24,19,0.94)',
   /** A subordinate (utility) face: flatter, cooler, quieter. */
   faceUtility: 'rgba(10,9,8,0.84)',
-  /** Structural rim — the plate's outline. */
-  rim: '#3A342C',
-  /** A lit rim: the plate is selected or primary. */
+  /* ⚠⚠⚠ PHONE-FIX — THE STRUCTURE IS ALLOY; THE GOLD IS THE SIGNAL.
+   * Owner, on the device: keep steering away from medieval/bronze. Tartaria is
+   * RECOVERED ADVANCED TECHNOLOGY that has survived thousands of years —
+   * precise ancient alloys, fine technical engraving, damaged coatings,
+   * excavation wear. A warm bronze rim on every plate reads as a castle door.
+   * So the STRUCTURAL greys went cool and slightly desaturated (machined alloy
+   * under a dead coating), and the brand gold is now spent only where something
+   * is ALIVE or ASKED FOR: the selected record's spine and rim, the primary
+   * action, the resource mark. Restraint is what makes it read as technology. */
+  /** Structural rim — the plate's outline. Cool alloy, not bronze. */
+  rim: '#3C3E3F',
+  /** A lit rim: the plate is selected or primary. Still the brand gold. */
   rimLit: '#7A6640',
+  /** A rim that is merely present, not chosen — the alloy caught by the light. */
+  rimAlloy: '#5C6062',
   /** The top edge catching light. */
   edgeLit: 'rgba(214,190,140,0.20)',
   /** The lower edge in shadow. */
@@ -313,10 +324,14 @@ export function TResourceChit({ count, label, glyph = '◈' }: { count: number; 
 export const FACTION_PLATE_TEST_ID = 'tartaria-faction-plate';
 
 export function TFactionPlate({
-  source, size = 64, style,
+  source, size = 96, style,
 }: { source: number; size?: number; style?: StyleProp<ViewStyle> }) {
   const box = useMemo(() => ({ width: size, height: size }), [size]);
-  const inner = useMemo(() => ({ width: size - 14, height: size - 14 }), [size]);
+  // ⚠ PHONE-FIX — the well's inset scales with the plate instead of being a
+  // fixed 14px. At 96 a fixed inset left the art swimming in its own frame;
+  // proportional keeps the emblem the subject at every size.
+  const inset = useMemo(() => Math.max(8, Math.round(size * 0.14)), [size]);
+  const inner = useMemo(() => ({ width: size - inset, height: size - inset }), [size, inset]);
   return (
     <View style={[kit.plateOuter, box, style]} pointerEvents="none" testID={FACTION_PLATE_TEST_ID}>
       <View style={[kit.plateRim, box]}>
@@ -375,13 +390,25 @@ export function TStrata() {
 export function TSettle({
   active, children, style,
 }: { active: boolean; children: React.ReactNode; style?: StyleProp<ViewStyle> }) {
+  /* ⚠⚠⚠ PHONE-FIX — REST IS 1, NOT 0, AND THAT WAS THE BLACK LINE.
+   *
+   * This settled to 0 when `active` was false — so an INACTIVE card did not sit
+   * still, it sat PARKED AT THE START OF ITS OWN ENTRANCE: `translateY: 4` and
+   * `scale: 0.994`, permanently, on every collapsed record in the roster. The
+   * shadow-casting parent stayed where the layout put it while its content sat
+   * four pixels lower, and the strip of parent left uncovered above each card is
+   * the thin dark seam the owner photographed immediately above the gold rim.
+   *
+   * ⚠ 1 IS THE ONLY CORRECT REST for both states: an entrance animation has no
+   * business having a resting pose of its own. Becoming active replays it from
+   * 0; becoming inactive simply stops being displaced. */
   const reduce = useReduceMotion();
-  const v = useRef(new Animated.Value(active ? 1 : 0)).current;
+  const v = useRef(new Animated.Value(1)).current;
   useEffect(() => {
-    const to = active ? 1 : 0;
-    if (reduce) { v.setValue(to); return; }
+    if (!active || reduce) { v.setValue(1); return; }
+    v.setValue(0);
     const anim = Animated.timing(v, {
-      toValue: to,
+      toValue: 1,
       duration: SETTLE_MS,
       easing: Easing.out(Easing.cubic),
       useNativeDriver: true,
@@ -406,7 +433,9 @@ const kit = StyleSheet.create({
   dividerLine: { flex: 1 },
   dividerMark: { color: T.goldDim, fontSize: 8, opacity: 0.9 },
   dividerLabel: { color: T.inkQuiet, fontSize: 10, letterSpacing: 3, fontWeight: '700' },
-  corner: { position: 'absolute', width: 7, height: 7, borderColor: 'rgba(214,190,140,0.22)' },
+  // ⚠ PHONE-FIX — registration marks are engraved into alloy, so they are a
+  // cool near-white at low alpha rather than a warm bronze tick.
+  corner: { position: 'absolute', width: 7, height: 7, borderColor: 'rgba(206,212,214,0.22)' },
   cornerLit: { position: 'absolute', width: 8, height: 8, borderColor: 'rgba(201,168,106,0.55)' },
   cornerTL: { top: 3, left: 3, borderTopWidth: 1, borderLeftWidth: 1 },
   cornerTR: { top: 3, right: 3, borderTopWidth: 1, borderRightWidth: 1 },
@@ -436,7 +465,9 @@ const kit = StyleSheet.create({
   btnOuterPrimary: { shadowOpacity: 0.7, shadowRadius: 9, shadowOffset: { width: 0, height: 5 }, elevation: 7 },
   btnRim: {
     borderWidth: 1, borderColor: T.rim, borderRadius: 3,
-    borderTopColor: 'rgba(122,102,64,0.7)', borderBottomColor: 'rgba(0,0,0,0.75)',
+    // ⚠ PHONE-FIX — alloy, not bronze. A subordinate control is machined metal
+    // catching light; only the primary spends the gold.
+    borderTopColor: 'rgba(140,146,150,0.55)', borderBottomColor: 'rgba(0,0,0,0.75)',
     backgroundColor: T.well, overflow: 'hidden',
   },
   btnRimPrimary: { borderWidth: 1, borderColor: T.rimLit, borderTopColor: T.gold, borderBottomColor: 'rgba(0,0,0,0.85)' },
@@ -489,7 +520,10 @@ const kit = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth, borderColor: 'rgba(0,0,0,0.9)',
     alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
   },
-  plateArt: { width: '92%', height: '92%' },
+  // ⚠ PHONE-FIX — the art fills the well. `contain` still guarantees the
+  // aspect ratio (the source PNGs are 1145x1374 to 1254x1254, none of them
+  // square), so a larger box makes the emblem larger, never stretched.
+  plateArt: { width: '96%', height: '96%' },
   rivet: { position: 'absolute', width: 3, height: 3, borderRadius: 1.5, backgroundColor: 'rgba(201,168,106,0.55)' },
   rivetTL: { top: 4, left: 4 },
   rivetTR: { top: 4, right: 4 },

@@ -187,20 +187,23 @@ describe('OTA-1672 — ⚠⚠ the outcome is impossible to miss', () => {
     expect(bugReportOutcomeTitle('sent')).toBe('REPORT SENT');
   });
 
-  it('⚠⚠ BOTH surfaces raise it, from the same helper', () => {
-    // Two screens file the identical report (arb75); they must also say the
-    // identical thing about what happened to it.
-    for (const [name, s] of [['About', ABOUT], ['Title', TITLE]] as const) {
-      expect({ name, calls: s.includes('bugReportOutcomeTitle(') }).toEqual({ name, calls: true });
-      expect({ name, pops: s.includes('setBugReportPopup(') }).toEqual({ name, pops: true });
-    }
+  it('⚠⚠ THE surface raises it, from the same helper — and there is only one now', () => {
+    /* ⚠⚠ VIS-1-PHONE-FIX: there were two screens filing this report and the
+     * risk this test existed for was that they would say different things about
+     * the same outcome. The owner has since taken REPORT BUG off the title
+     * screen, which closes that risk at the source rather than policing it —
+     * so the assertion is now that the ONE surface still speaks, and that the
+     * other one has no copy left to drift. */
+    expect(ABOUT.includes('bugReportOutcomeTitle(')).toBe(true);
+    expect(ABOUT.includes('setBugReportPopup(')).toBe(true);
+    expect(TITLE.includes('setBugReportPopup(')).toBe(false);
+    expect(TITLE.includes('composeAndSendBugReport(')).toBe(false);
   });
 
   it('⚠ the quiet line SURVIVES alongside it — the popup adds, it does not replace', () => {
     // The line is the record you can scroll back to after dismissing the card,
     // and it costs nothing to keep.
     expect(ABOUT.includes('{bugReportResult}')).toBe(true);
-    expect(TITLE.includes('{bugReportNote}')).toBe(true);
   });
 });
 

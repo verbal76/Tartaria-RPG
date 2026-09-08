@@ -161,38 +161,48 @@ describe('OTA-1665 — ⚠⚠ SEND LOG is gone', () => {
 });
 
 describe('OTA-1665 — ⚠ every outcome speaks', () => {
-  it('the Title screen no longer claims COPIED, and renders the real message', () => {
-    const src = title();
-    // ⚠ Scoped to the BUG REPORT button. This screen has several legitimate
-    // COPY affordances (COPY URL, COPY CRASHED SAVE, the per-slot copy) that
-    // still say COPIED and should — a blanket scan would have condemned them.
-    expect(src).toContain("{bugReportSent ? '✓ SENT' : 'REPORT BUG'}");
-    expect(src).not.toContain("{bugReportSent ? '✓ COPIED' : 'REPORT BUG'}");
-    expect(src).toContain('setBugReportNote(outcome.message)');
-    expect(src).toContain('{bugReportNote}');
+  it('the report button no longer claims COPIED, and renders the real message', () => {
+    /* ⚠⚠ VIS-1-PHONE-FIX RE-AIMED THIS AT SETTINGS, AND THE CLAIM IS UNCHANGED.
+     * The owner took REPORT BUG off the title screen on the Pixel ("clean up
+     * title-screen utilities"), so the surface this test guards is the one that
+     * still has the button — and it is the better one, because in Settings the
+     * app knows which character is being played. What is asserted is exactly
+     * what it always was: the button does not say COPIED (nothing is copied),
+     * and the push's own words are rendered rather than a guess. */
+    const src = about();
+    expect(src).toContain('REPORT A BUG');
+    expect(src).not.toContain("'✓ COPIED'");
+    expect(src).toContain('setBugReportResult(r.message)');
+    expect(src).toContain('{bugReportResult}');
+    // And the title screen has no bug-report land left to drift. ⚠ The IMPORT
+    // and the CALL, not the bare names — the comment recording why they went
+    // names both, which is the OTA-1659 lesson arriving in a third file.
+    expect(title()).not.toContain("from '../components/BugReportModal'");
+    expect(title()).not.toContain('composeAndSendBugReport(');
   });
 
   it('⚠ and the dead legacy copy of the email flow is gone from the screen', () => {
     // It sat unreferenced behind an eslint-disable, still holding a clipboard
     // stage, a READ-ME-FIRST body and a mailto — the exact land the owner asked
     // to archive, and the first place it would grow back.
-    const src = title();
     // ⚠ The DECLARATION, not the word — the comment that records why it went
     // names it, exactly as the loreLexicon comments name the respellings they
     // retired. A scan for the bare identifier would fail against its own
     // obituary, which is the OTA-1659 lesson arriving in a second file.
-    expect(src).not.toContain('const _legacySendBugReport');
-    expect(src).not.toContain('PASTE BELOW');
-    // ⚠ Scoped to the handler's own BODY by brace matching. The INVITE
-    // PLAYTESTER handler sits a few lines below and still opens a mailto, as it
-    // should — that one is a short human request to a person, not a payload.
-    // A window drawn to the next `const` swallowed it and condemned the wrong
-    // feature; the fix is to read the function, not the neighbourhood.
-    const at = src.indexOf('const sendBugReport');
-    // ⚠ Match from the ARROW's brace, not the first `{` after the name — that
-    // one opens the destructured argument type and closes three lines later,
-    // which is how the previous attempt "read" an empty function and passed
-    // nothing but its own signature.
+    for (const src of [title(), about()]) {
+      expect(src).not.toContain('const _legacySendBugReport');
+      expect(src).not.toContain('PASTE BELOW');
+    }
+    /* ⚠⚠ AND THE SEND PATH IS READ WHERE IT NOW LIVES. VIS-1-PHONE-FIX removed
+     * the title screen's copy of this handler with its button; Settings' send is
+     * the modal's `onSend`, and the claim is the same one — it PUSHES: no
+     * mailto, no clipboard stage, the shared helper called with the args the
+     * modal handed it. ⚠ The INVITE PLAYTESTER handler moved to Settings too and
+     * still opens a mailto, as it should, so the window is scoped to this
+     * callback's own braces rather than to the neighbourhood. */
+    const src = about();
+    const at = src.indexOf('onSend={(args) => {');
+    expect(at).toBeGreaterThan(-1);
     let depth = 0; let end = at;
     for (let i = src.indexOf('=> {', at) + 3; i < src.length; i += 1) {
       if (src[i] === '{') depth += 1;

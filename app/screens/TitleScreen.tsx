@@ -9,7 +9,6 @@ import {
   RefreshControl,
   Linking,
   Share,
-  BackHandler,
   Platform,
 } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
@@ -33,18 +32,15 @@ import {
 import { useGameStore } from '../state/gameStore';
 import { SwipeableRow } from '../components/SwipeableRow';
 import { BrandedModal } from '../components/BrandedModal';
-import { BugReportModal } from '../components/BugReportModal';
-import { InvitePlaytesterModal } from '../components/InvitePlaytesterModal';
 import { buildBasicDeviceSummary, stampLogExport } from '../diagnostics/aboutSummary';
-import {
-  composeAndSendBugReport, bugReportOutcomeTitle, type BugReportMode,
-} from '../diagnostics/bugReport';
 import { loadCrashSave, clearCrashSave, buildCrashSaveExport, type CrashSaveCapture } from '../diagnostics/crashSave';
 import racesData from '../data/races/races.json';
 import locationsData from '../data/locations/locations.json';
-import { readSlotLog, loadSlot, importSaveAsNewSlot, type SlotSummary } from '../engine/saveSystem';
-// OTA-1178 — character backup / restore.
-import { encodeSaveExport, decodeSaveExport } from '../engine/saveExport';
+import { readSlotLog, loadSlot, type SlotSummary } from '../engine/saveSystem';
+// ⚠ PHONE-FIX — `importSaveAsNewSlot` / `decodeSaveExport` went to Settings with
+// RESTORE (see app/ui/restoreCharacter.ts). `encodeSaveExport` stays: the dead
+// rows' COPY LOG / BACK UP still write one here.
+import { encodeSaveExport } from '../engine/saveExport';
 import { OTA_BUILD_ID, MINIMUM_RECOMMENDED_APK_BUILD } from '../buildInfo';
 import { getBuildCodename, getBuildCodenameOrNull, getApkCodename } from '../buildCodename';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -126,12 +122,10 @@ export function TitleScreen() {
     | { kind: 'delete'; slot: SlotSummary }
     | { kind: 'resurrect'; slot: SlotSummary }
     | { kind: 'fallen'; slot: SlotSummary }
-    | { kind: 'exit' }
-    // OTA-1178 — restore result. One modal for both outcomes: a restore that
-    // failed has to say WHY in words the player can act on (almost always
-    // "something truncated your paste"), and a restore that worked has to name
-    // the character so they know the right one came back.
-    | { kind: 'restored'; playerName: string; trimmed: boolean }
+    // ⚠ PHONE-FIX — `restored` went with RESTORE (Settings owns that outcome
+    // now). `restoreFailed` STAYS: it is also what the dead rows' BACK UP
+    // button reports through, which is its only remaining producer here, so it
+    // is titled for what it actually says now.
     | { kind: 'restoreFailed'; reason: string }
     | null
   >(null);
@@ -294,26 +288,8 @@ export function TitleScreen() {
   // mailto so the player's email app composes a new message to
   // hotatticgames@gmail.com. The brief flash on the bottom bar
   // confirms the clipboard was populated.
-  const [bugReportOpen, setBugReportOpen] = useState(false);
-  const [bugReportSent, setBugReportSent] = useState(false);
-  // ⚠ OTA-1665 — the push's own words. Every outcome of composeAndSendBugReport
-  // carries a player-facing message, and this is where it is shown: a refusal
-  // ("nothing has happened in the log since") has to be as visible as a success,
-  // or the button looks broken to the person it just correctly said no to.
-  const [bugReportNote, setBugReportNote] = useState<string | null>(null);
-  // ⚠⚠ OTA-1672 — and it POPS UP as well as printing. The note above is a small
-  // line under a button on a busy screen, and the owner missed it his first few
-  // sends. Same treatment on both surfaces, from the same helper, so the title
-  // screen and the in-game settings screen cannot drift apart on what a push
-  // said. The note stays as the record; the popup is what makes it land.
-  const [bugReportPopup, setBugReportPopup] =
-    useState<{ title: string; body: string } | null>(null);
-  // OTA-065 — invite-playtester modal state. Same UX pattern as
-  // bug-report: open modal, collect input, open mailto, flash
-  // a "✓ SENT" confirmation on the button so the player has
-  // visual feedback that the draft actually opened.
-  const [inviteOpen, setInviteOpen] = useState(false);
-  const [inviteSent, setInviteSent] = useState(false);
+  // ⚠ PHONE-FIX — the bug-report and invite state went to Settings with their
+  // buttons; nothing on this screen reads them any more.
   // v2.4.1 (OTA 051) — auto-check for an OTA on every TitleScreen
   // mount. Save-and-exit drops the player back here, which re-mounts
   // TitleScreen and re-fires this effect — so the player picks up
@@ -526,113 +502,22 @@ export function TitleScreen() {
     }
   };
 
-  // ⚠⚠ OTA-1178 — RESTORE. Reads the clipboard, and NEVER overwrites: an import
-  // always mints a new slot (importSaveAsNewSlot). A player restoring a backup
-  // has already lost a character once, and no confirm dialog is a good enough
-  // guard against a mis-tap costing them a second one.
-  const restoreFromClipboard = async () => {
-    try {
-      const text = await Clipboard.getStringAsync();
-      const decoded = decodeSaveExport(text ?? '');
-      if (!decoded.ok) {
-        setPendingAction({ kind: 'restoreFailed', reason: decoded.reason });
-        return;
-      }
-      const written = await importSaveAsNewSlot(decoded.state);
-      if (!written.ok) {
-        setPendingAction({ kind: 'restoreFailed', reason: written.reason });
-        return;
-      }
-      await refreshSlots();
-      setPendingAction({ kind: 'restored', playerName: decoded.playerName, trimmed: written.trimmed });
-    } catch {
-      setPendingAction({ kind: 'restoreFailed', reason: 'The clipboard could not be read.' });
-    }
-  };
+  /* ⚠⚠⚠ PHONE-FIX — THE BUG-REPORT HANDLER LEFT WITH ITS BUTTON.
+   *
+   * `sendBugReport`, `BugReportModal`, the outcome note and the outcome popup
+   * all lived here to serve a REPORT BUG button in the title-screen footer, and
+   * the owner has taken that button off this surface. Settings already files
+   * the IDENTICAL report through the same shared helper
+   * (`diagnostics/bugReport.composeAndSendBugReport`) — and files it better,
+   * because in there the app knows which character is being played and can send
+   * that character's log rather than the newest save's. Deleting the copy here
+   * removes a second call site, not a capability.
+   *
+   * ⚠ `_legacySendBugReport` was deleted at OTA-1665 and does not come back. */
 
-  // ⚠⚠⚠ OTA-1665 — BUG REPORT SEND HANDLER. It PUSHES; it does not compose mail.
-  //
-  // This comment used to describe the clipboard-staging workaround in loving
-  // detail — mailto's ~2KB body limit, 50-200KB character logs that would
-  // silently truncate inline, the player pasting the report in before sending.
-  // Every word of that was true and it was all in service of a route the owner
-  // has now retired: *"report a bug should be the button that pushed the log, so
-  // we don't need the email route anymore."* The staging, the READ-ME-FIRST
-  // body and the mailto are gone from `composeAndSendBugReport`, and the dead
-  // `_legacySendBugReport` copy that still held all three is deleted below.
-  //
-  // ⚠ The INVITE PLAYTESTER button further down still opens a mailto, and
-  // should: that one is a short human request to a person, not a payload.
-  const sendBugReport = async (args: {
-    slot: SlotSummary | null;
-    logSlot?: SlotSummary | null; // OTA-1682 — whose log a general report carries
-    description: string;
-    mode: BugReportMode;
-  }): Promise<void> => {
-    // arb75 — compose+send lives in the shared diagnostics/bugReport module so
-    // this screen and the in-game Settings screen file the identical report.
-    // ⚠⚠ OTA-1665 — IT PUSHES NOW, and it can REFUSE. The old call always
-    // "succeeded" because opening a mailto cannot fail meaningfully, so this
-    // flashed SENT unconditionally. A push has real outcomes — queued, refused
-    // as a duplicate of the last report, refused because reporting is off — and
-    // flashing SENT over any of those would be a lie told by a bug button, which
-    // is the one control that must never lie. The outcome's own words are shown.
-    setBugReportOpen(false);
-    setBugReportNote('Sending…');
-    const outcome = await composeAndSendBugReport(args);
-    setBugReportNote(outcome.message);
-    // OTA-1672 — and the same words take the screen, so the outcome cannot be
-    // missed on a title screen with six other things on it.
-    setBugReportPopup({ title: bugReportOutcomeTitle(outcome.status), body: outcome.message });
-    setBugReportSent(outcome.status === 'sent' || outcome.status === 'queued');
-    setTimeout(() => { setBugReportSent(false); setBugReportNote(null); }, 6000);
-  };
-  // ⚠ OTA-1665 — `_legacySendBugReport` DELETED HERE. It was the pre-arb75 copy
-  // of this flow, kept unreferenced behind an eslint-disable, and it still
-  // carried the whole retired apparatus: a clipboard stage, a READ-ME-FIRST
-  // body and a mailto. The owner asked to "archive that bug report land"; a dead
-  // function holding the exact code we just removed from the live path is the
-  // first place that land grows back.
-
-  // OTA-065 — invite-playtester send handler. Opens a mailto to
-  // hotatticgames@gmail.com with subject "New Playtester" and a
-  // small body containing the suggested address + the requester's
-  // OTA build so the owner has version context when whitelisting.
-  // No clipboard staging — the body fits comfortably under iOS
-  // Mail's mailto body cap. Owner replies with the install link
-  // (up to 24 hours per the modal copy, usually within the hour).
-  const sendPlaytesterInvite = async (gmail: string): Promise<void> => {
-    const subject = 'New Playtester';
-    const body =
-      `Please add the following Gmail address to the Tartaria\n` +
-      `Realms playtester whitelist:\n` +
-      `\n` +
-      `  ${gmail}\n` +
-      `\n` +
-      `Requested at: ${new Date().toISOString()}\n` +
-      // OTA-267 — codename instead of raw OTA id. Same obfuscation
-      // reason as the bug-report email above.
-      `Requester's build: ${getBuildCodename(OTA_BUILD_ID)}\n` +
-      `\n` +
-      `(Sent from the INVITE PLAYTESTER button on the Tartaria\n` +
-      `title screen.)\n`;
-    const mailto =
-      `mailto:hotatticgames@gmail.com` +
-      `?subject=${encodeURIComponent(subject)}` +
-      `&body=${encodeURIComponent(body)}`;
-
-    try {
-      await Linking.openURL(mailto);
-    } catch {
-      // No mail client installed — silent. The ✓ SENT flash below
-      // still fires; the player will notice their email app didn't
-      // open and can reach out manually.
-    }
-
-    setInviteOpen(false);
-    setInviteSent(true);
-    setTimeout(() => setInviteSent(false), 2200);
-  };
+  // ⚠ PHONE-FIX — `sendPlaytesterInvite` moved to Settings with its button.
+  // It is still a mailto, and should be: a short human request to a person is
+  // not a payload (OTA-1665's own distinction).
 
   // ⚠⚠ OTA-1491 — TWO-STAGE SLOT CARDS. Owner: "shrink the character blocks on
   // the character selection screen to a block that just has the name and the
@@ -673,6 +558,8 @@ export function TitleScreen() {
             <View style={[styles.dossierRim, item.dead && styles.dossierRimDead]}>
               <View style={[styles.dossierFace, styles.dossierFaceCompact, item.dead && styles.dossierFaceDead]}>
                 <View style={[styles.spine, item.dead && styles.spineDead]} pointerEvents="none" />
+                <View style={[styles.spineTick, { top: '30%' }]} pointerEvents="none" />
+                <View style={[styles.spineTick, { top: '70%' }]} pointerEvents="none" />
                 <TCorners />
                 <View style={styles.dossierBody}>
                   <View style={styles.slotHead}>
@@ -726,6 +613,9 @@ export function TitleScreen() {
         <View style={[styles.dossierRim, styles.dossierRimOpen, item.dead && styles.dossierRimDead]}>
           <View style={[styles.dossierFace, styles.dossierFaceOpen, item.dead && styles.dossierFaceDead]}>
             <View style={[styles.spine, styles.spineOpen, item.dead && styles.spineDead]} pointerEvents="none" />
+            <View style={[styles.spineTick, { top: '22%', width: 9 }]} pointerEvents="none" />
+            <View style={[styles.spineTick, { top: '50%', width: 9 }]} pointerEvents="none" />
+            <View style={[styles.spineTick, { top: '78%', width: 9 }]} pointerEvents="none" />
             <TCorners lit />
             <View style={styles.dossierBody}>
               {/* ⚠ VIS-1 — the record splits into the written column and the
@@ -875,7 +765,14 @@ export function TitleScreen() {
                   in its own column, so it cannot cover text or take a tap. */}
               {crest !== undefined && (
                 <View style={styles.dossierSeal} pointerEvents="none">
-                  <TFactionPlate source={crest} size={58} />
+                  {/* ⚠⚠ PHONE-FIX — 58 WAS A THUMBNAIL. On the Pixel the
+                      faction could not be read at all, which made the one thing
+                      the expansion exists to reveal illegible. 96 makes the
+                      emblem the subject of its column while the written record
+                      keeps the rest of the width; the art is still the game's
+                      own file, drawn with `contain`, so nothing about it changes
+                      but its size. */}
+                  <TFactionPlate source={crest} size={96} />
                 </View>
               )}
               </View>
@@ -1141,6 +1038,27 @@ export function TitleScreen() {
         </TouchableOpacity>
       )}
 
+      {/* ⚠⚠⚠ PHONE-FIX — THE ROSTER IS THE ONLY THING THAT SCROLLS.
+          Owner, on the Pixel: *"it feels like it has double/page scrolling …
+          when the character roster is scrolled, the whole lower portion of the
+          screen moves with it."* It did: NEW TARTARIAN and the OTA button were
+          the FlatList's `ListFooterComponent` and the roster label was its
+          `ListHeaderComponent`, so all of it was scroll CONTENT. The label is a
+          fixed heading now, the list is data only, and the actions are a fixed
+          footer below it — one scroll region on the screen, no nesting. */}
+      {slots.length > 0 ? (
+        <View style={styles.rosterHeader}>
+          <TDivider
+            color={mutedColor}
+            label={bootGateOpen
+              ? 'YOUR TARTARIANS'
+              : `${bootGateReason.toUpperCase()}  ·  ONE MOMENT`}
+          />
+          {bootGateOpen ? (
+            <Text style={[styles.listLabel, { color: mutedColor }]}>swipe left to delete</Text>
+          ) : null}
+        </View>
+      ) : null}
       <FlatList
         style={styles.list}
         contentContainerStyle={styles.listContent}
@@ -1156,131 +1074,95 @@ export function TitleScreen() {
             No Tartarians yet. Swipe down to refresh — or pull a New Expedition below.
           </Text>
         }
-        ListHeaderComponent={
-          slots.length > 0
-            ? (
-              /* ⚠ VIS-1 — the roster gets the same broken rule the title plinth
-                 uses, so the crest and the records read as one designed face.
-                 Same two strings as before: the roster label, or the boot-gate
-                 reason while the gate is shut. */
-              <View style={styles.rosterHeader}>
-                <TDivider
-                  color={mutedColor}
-                  label={bootGateOpen
-                    ? 'YOUR TARTARIANS'
-                    : `${bootGateReason.toUpperCase()}  ·  ONE MOMENT`}
-                />
-                {bootGateOpen ? (
-                  <Text style={[styles.listLabel, { color: mutedColor }]}>swipe left to delete</Text>
-                ) : null}
-              </View>
-            )
-            : null
-        }
-        ListFooterComponent={
-          <View style={styles.footerActions}>
-            {/* ⚠⚠⚠ VIS-1 — THE PRIMARY ACTION. Starting a new Tartarian is the
-                one thing this screen exists to offer a player who has nothing to
-                resume, so it gets the full treatment — lit rim, raised face, top
-                bevel, survey diamonds, gold plate type — and it is the only
-                control on the screen that gets it. It DEPRESSES on touch (90ms
-                down, 120ms release, transform-only, skipped under reduced
-                motion) and it still navigates on the same tap. The gate string
-                is unchanged; it just no longer has to be a whole button label to
-                be read. */}
-            <TButton
-              label={bootGateOpen ? 'NEW TARTARIAN' : bootGateReason}
-              sub={bootGateOpen ? 'BEGIN A NEW EXPEDITION' : undefined}
-              variant="primary"
-              disabled={!bootGateOpen}
-              onPress={() => setScreen('character_creation')}
-            />
-            {/* 2026-05-25 — manual CHECK FOR OTA UPDATE button restored.
-                Removed in v2.4.1 (OTA 051) on the theory that the auto-
-                check in useEffect was sufficient. Playtester report:
-                "the manual pool OTA button is no longer on the cover
-                screen ... I cold started about 10 times and finally
-                it pulled the OTA." The auto-check uses fetchOnly so a
-                staged OTA needs ANOTHER cold-start to apply (download
-                pass N → apply pass N+1). The manual button fires the
-                full fetch+apply pipeline so a single tap pulls AND
-                applies in one go. Disabled while an apply is already
-                in flight to avoid a double-fetch. */}
-            {/* ⚠ VIS-1 — utility variant: the same material family (rim, face,
-                bevel, depress) at a quieter weight, so it reads as subordinate to
-                NEW TARTARIAN without becoming a different design language. */}
-            <TButton
-              label={applyingOTA
-                ?? (modelsLoading ? 'MODELS LOADING — PLEASE WAIT' : 'CHECK FOR OTA UPDATE')}
-              variant="utility"
-              disabled={applyingOTA !== null || modelsLoading}
-              onPress={() => {
-                // OTA-294 — should be unreachable because disabled=true
-                // when modelsLoading, but guard defensively. Killing
-                // OTA apply mid-model-load corrupts the cached GGUF
-                // and Kokoro state, requiring uninstall+reinstall.
-                if (modelsLoading) {
-                  setApplyingOTA('Wait for models to finish loading');
-                  setTimeout(() => setApplyingOTA(null), 2500);
-                  return;
-                }
-                setApplyingOTA('Checking…');
-                // 2026-05-25 — quiet failure + timeout-aware. Playtester
-                // reported the check "runs a prolonged time and doesn't
-                // always resolve." Root cause: expo-updates has no
-                // built-in timeout on checkForUpdateAsync; OTA-025 added
-                // a 10s/60s timeout inside checkAndApplyOTA so the
-                // promise can't hang forever. .catch() handler below is
-                // belt-and-suspenders for any truly unexpected
-                // rejection.
-                void checkAndApplyOTA({
-                  onStatus: (s) => setApplyingOTA(s),
-                  onError: () => {
-                    setApplyingOTA('Failed — try later');
-                    setTimeout(() => setApplyingOTA(null), 2500);
-                  },
-                }).then((result) => {
-                  if (result === 'noUpdate') {
-                    setApplyingOTA('Up to date');
-                    setTimeout(() => setApplyingOTA(null), 2000);
-                  } else if (result === 'skipped') {
-                    setApplyingOTA('Updates disabled');
-                    setTimeout(() => setApplyingOTA(null), 2000);
-                  } else if (result === 'errored') {
-                    // onError already fired with the detail. Make sure
-                    // the button label clears even if onError was
-                    // skipped for any reason.
-                    setTimeout(() => setApplyingOTA(null), 2500);
-                  }
-                  // 'applied' triggers reloadAsync — no further UI.
-                  // 'pending' is only set in fetchOnly mode which the
-                  // manual button doesn't use.
-                }).catch(() => {
-                  // checkAndApplyOTA wraps everything in try/catch so
-                  // this should be unreachable, but if some new code
-                  // path ever rejects directly we still want the
-                  // button to recover.
-                  setApplyingOTA('Failed — try later');
-                  setTimeout(() => setApplyingOTA(null), 2500);
-                });
-              }}
-            />
-            {/* OTA-1178 — restore a backed-up character from the clipboard. It
-                never overwrites: a restore always arrives as an additional
-                character. ⚠ OTA-1445 — moved BELOW the OTA button by owner
-                order ("new tartarian first, check for OTA update second and
-                restore from backup third"): restoring is the rarest of the
-                three actions, so it takes the last slot. */}
-            <TButton
-              label="RESTORE FROM BACKUP"
-              variant="utility"
-              disabled={!bootGateOpen}
-              onPress={() => { void restoreFromClipboard(); }}
-            />
-          </View>
-        }
       />
-
+      <View style={styles.footerActions}>
+        {/* ⚠⚠⚠ VIS-1 — THE PRIMARY ACTION. Starting a new Tartarian is the
+            one thing this screen exists to offer a player who has nothing to
+            resume, so it gets the full treatment — lit rim, raised face, top
+            bevel, survey diamonds, gold plate type — and it is the only
+            control on the screen that gets it. It DEPRESSES on touch (90ms
+            down, 120ms release, transform-only, skipped under reduced
+            motion) and it still navigates on the same tap. The gate string
+            is unchanged; it just no longer has to be a whole button label to
+            be read. */}
+        <TButton
+          label={bootGateOpen ? 'NEW TARTARIAN' : bootGateReason}
+          sub={bootGateOpen ? 'BEGIN A NEW EXPEDITION' : undefined}
+          variant="primary"
+          disabled={!bootGateOpen}
+          onPress={() => setScreen('character_creation')}
+        />
+        {/* 2026-05-25 — manual CHECK FOR OTA UPDATE button restored.
+            Removed in v2.4.1 (OTA 051) on the theory that the auto-
+            check in useEffect was sufficient. Playtester report:
+            "the manual pool OTA button is no longer on the cover
+            screen ... I cold started about 10 times and finally
+            it pulled the OTA." The auto-check uses fetchOnly so a
+            staged OTA needs ANOTHER cold-start to apply (download
+            pass N → apply pass N+1). The manual button fires the
+            full fetch+apply pipeline so a single tap pulls AND
+            applies in one go. Disabled while an apply is already
+            in flight to avoid a double-fetch. */}
+        {/* ⚠ VIS-1 — utility variant: the same material family (rim, face,
+            bevel, depress) at a quieter weight, so it reads as subordinate to
+            NEW TARTARIAN without becoming a different design language. */}
+        <TButton
+          label={applyingOTA
+            ?? (modelsLoading ? 'MODELS LOADING — PLEASE WAIT' : 'CHECK FOR OTA UPDATE')}
+          variant="utility"
+          disabled={applyingOTA !== null || modelsLoading}
+          onPress={() => {
+            // OTA-294 — should be unreachable because disabled=true
+            // when modelsLoading, but guard defensively. Killing
+            // OTA apply mid-model-load corrupts the cached GGUF
+            // and Kokoro state, requiring uninstall+reinstall.
+            if (modelsLoading) {
+              setApplyingOTA('Wait for models to finish loading');
+              setTimeout(() => setApplyingOTA(null), 2500);
+              return;
+            }
+            setApplyingOTA('Checking…');
+            // 2026-05-25 — quiet failure + timeout-aware. Playtester
+            // reported the check "runs a prolonged time and doesn't
+            // always resolve." Root cause: expo-updates has no
+            // built-in timeout on checkForUpdateAsync; OTA-025 added
+            // a 10s/60s timeout inside checkAndApplyOTA so the
+            // promise can't hang forever. .catch() handler below is
+            // belt-and-suspenders for any truly unexpected
+            // rejection.
+            void checkAndApplyOTA({
+              onStatus: (s) => setApplyingOTA(s),
+              onError: () => {
+                setApplyingOTA('Failed — try later');
+                setTimeout(() => setApplyingOTA(null), 2500);
+              },
+            }).then((result) => {
+              if (result === 'noUpdate') {
+                setApplyingOTA('Up to date');
+                setTimeout(() => setApplyingOTA(null), 2000);
+              } else if (result === 'skipped') {
+                setApplyingOTA('Updates disabled');
+                setTimeout(() => setApplyingOTA(null), 2000);
+              } else if (result === 'errored') {
+                // onError already fired with the detail. Make sure
+                // the button label clears even if onError was
+                // skipped for any reason.
+                setTimeout(() => setApplyingOTA(null), 2500);
+              }
+              // 'applied' triggers reloadAsync — no further UI.
+              // 'pending' is only set in fetchOnly mode which the
+              // manual button doesn't use.
+            }).catch(() => {
+              // checkAndApplyOTA wraps everything in try/catch so
+              // this should be unreachable, but if some new code
+              // path ever rejects directly we still want the
+              // button to recover.
+              setApplyingOTA('Failed — try later');
+              setTimeout(() => setApplyingOTA(null), 2500);
+            });
+          }}
+        />
+      </View>
       {/* v2.4.1 (OTA 051) — gear icon hoisted to the top-right corner
           for UI uniformity with the in-game ExplorationScreen, which
           places its gear in the same spot. The footer text (version
@@ -1295,79 +1177,16 @@ export function TitleScreen() {
       >
         <Text style={styles.gear}>⚙</Text>
       </TouchableOpacity>
+      {/* ⚠⚠⚠ PHONE-FIX — THE UTILITY SEDIMENT IS OFF THE TITLE SCREEN.
+          Owner: remove RESTORE FROM BACKUP, EXIT GAME, REPORT BUG and INVITE
+          PLAYTESTER. EXIT GAME is DELETED outright — on Android it only
+          backgrounds the app, so it was a button that lied about what it did.
+          The other three moved to Settings, which is where a player looks for a
+          tool rather than for a game: RESTORE beside BACK UP CHARACTER (its own
+          partner), INVITE and REPORT beside the reporting section that already
+          owns REPORT A BUG. Nothing was deleted except the misleading one.
+          ⚠ And the space is NOT refilled. The roster gets it. */}
       <View style={styles.bottomBar}>
-        {/* OTA-068 — playtester thank-you line above the action
-            row. Sized between the action buttons and the
-            version footer in visual weight so it reads as a
-            standalone message, not a button label or a diag
-            string. */}
-        <Text style={[styles.thankYou, { color: mutedColor }]}>
-          Thank you for helping us test our new game, enjoy Tartaria!
-        </Text>
-        {/* OTA-068 — three centered action buttons (INVITE
-            PLAYTESTER, REPORT BUG, EXIT GAME). Was flex-end /
-            right-aligned in OTA-065; centered now so the
-            three-button row reads as a balanced cluster above
-            the centered footer. */}
-        <View style={styles.bottomBtnRow}>
-          {/* OTA-065 — INVITE PLAYTESTER button. Opens the
-              InvitePlaytesterModal which collects a Gmail
-              address and opens a mailto draft to
-              hotatticgames@gmail.com with subject "New
-              Playtester" for owner-side whitelisting. */}
-          <TouchableOpacity
-            style={styles.inviteBtn}
-            activeOpacity={0.7}
-            onPress={() => setInviteOpen(true)}
-            accessibilityRole="button"
-          >
-            <Text style={styles.inviteBtnText}>
-              {inviteSent ? '✓ SENT' : 'INVITE PLAYTESTER'}
-            </Text>
-          </TouchableOpacity>
-          {/* OTA-063 — REPORT BUG button. Same footer-bar visual
-              weight as EXIT GAME because both are peripheral,
-              not primary, actions. Opens the BugReportModal
-              which collects a character + description.
-              ⚠ OTA-1665 — the report now PUSHES to the same
-              destination crash records go to; the clipboard +
-              mailto route is retired, and the label no longer
-              says COPIED because nothing is copied. */}
-          <TouchableOpacity
-            style={styles.bugReportBtn}
-            activeOpacity={0.7}
-            onPress={() => setBugReportOpen(true)}
-            accessibilityRole="button"
-          >
-            <Text style={styles.bugReportBtnText}>
-              {bugReportSent ? '✓ SENT' : 'REPORT BUG'}
-            </Text>
-          </TouchableOpacity>
-          {bugReportNote ? (
-            <Text style={styles.bugReportNote}>{bugReportNote}</Text>
-          ) : null}
-          {/* 2026-05-25 — EXIT GAME button. Per playtester
-              request: full app exit from the title screen
-              (Android only — iOS App Store guidelines forbid
-              programmatic exit, but RN's BackHandler.exitApp()
-              is the standard call and is a no-op safely on
-              iOS). Confirm modal prevents an accidental tap
-              mid-character-creation.
-              OTA-251 — iOS now HIDES the button entirely. App
-              Store review will reject any UI that programmatically
-              terminates the app, even if the underlying call is a
-              no-op. Wrapped the button in Platform.OS === 'android'. */}
-          {Platform.OS === 'android' && (
-            <TouchableOpacity
-              style={styles.exitBtn}
-              activeOpacity={0.7}
-              onPress={() => setPendingAction({ kind: 'exit' })}
-              accessibilityRole="button"
-            >
-              <Text style={styles.exitBtnText}>EXIT GAME</Text>
-            </TouchableOpacity>
-          )}
-        </View>
         {/* OTA-237 — surface last crash diagnostic if a previous launch
             died. App.tsx's global error handler writes to
             @tartaria/lastCrash on any fatal error or hydrate failure.
@@ -1429,39 +1248,13 @@ export function TitleScreen() {
         </View>
       </View>
 
-      <BugReportModal
-        visible={bugReportOpen}
-        slots={slots}
-        onCancel={() => setBugReportOpen(false)}
-        onSend={(args) => { void sendBugReport(args); }}
-      />
-
-      {/* ⚠⚠ OTA-1672 — the push's outcome, as a card. Same helper as the About
-          screen's, so the two surfaces cannot say different words about the same
-          result. Dismiss-only: this is a receipt, not a decision. */}
-      <BrandedModal
-        visible={bugReportPopup !== null}
-        title={bugReportPopup?.title ?? ''}
-        body={bugReportPopup?.body}
-        buttons={[{ label: 'OK', tone: 'primary', onPress: () => setBugReportPopup(null) }]}
-        onRequestClose={() => setBugReportPopup(null)}
-      />
-
-      <InvitePlaytesterModal
-        visible={inviteOpen}
-        onCancel={() => setInviteOpen(false)}
-        onSend={(gmail) => { void sendPlaytesterInvite(gmail); }}
-      />
-
       <BrandedModal
         visible={pendingAction !== null}
         title={
           pendingAction?.kind === 'delete' ? 'Delete Tartarian'
           : pendingAction?.kind === 'resurrect' ? 'Resurrect Tartarian'
           : pendingAction?.kind === 'fallen' ? 'Fallen'
-          : pendingAction?.kind === 'exit' ? 'Exit Game'
-          : pendingAction?.kind === 'restored' ? 'Character restored'
-          : pendingAction?.kind === 'restoreFailed' ? 'Restore failed'
+          : pendingAction?.kind === 'restoreFailed' ? 'That did not work'
           : ''
         }
         body={
@@ -1471,17 +1264,6 @@ export function TitleScreen() {
             ? `${pendingAction.slot.playerName} has fallen. Spend 1 Resurrection Gem (you hold ${resurrectionGems}) to bring them back?`
           : pendingAction?.kind === 'fallen'
             ? `${pendingAction.slot.playerName} has fallen and you hold no Resurrection Gems. The buried world keeps them for now.`
-          : pendingAction?.kind === 'exit'
-            ? 'Close Tartaria Realms? Any unsaved progress will be lost — use SAVE & EXIT from in-game to keep it.'
-          : pendingAction?.kind === 'restored'
-            // ⚠ Says "added" rather than "restored over", because that is what
-            // happened — the restore never replaces an existing character, and
-            // the player should not go looking for one that vanished.
-            ? `${pendingAction.playerName} has been added to your characters.${
-                pendingAction.trimmed
-                  ? ' The save was large, so some regenerable world detail was trimmed to fit. Your character, gear and progress are intact.'
-                  : ''
-              }`
           : pendingAction?.kind === 'restoreFailed'
             ? pendingAction.reason
           : undefined
@@ -1496,11 +1278,6 @@ export function TitleScreen() {
             ? [
                 { label: 'Cancel', onPress: closeModal, tone: 'neutral' },
                 { label: 'Resurrect', onPress: () => { void resurrectSlot(pendingAction.slot.slotId); closeModal(); }, tone: 'primary' },
-              ]
-          : pendingAction?.kind === 'exit'
-            ? [
-                { label: 'Stay', onPress: closeModal, tone: 'neutral' },
-                { label: 'Exit', onPress: () => { closeModal(); BackHandler.exitApp(); }, tone: 'destructive' },
               ]
           : [{ label: 'OK', onPress: closeModal, tone: 'neutral' }]
         }
@@ -1595,27 +1372,41 @@ const styles = StyleSheet.create({
   // content. The rim's top border is lighter than its sides and its bottom is
   // near-black: that one asymmetry is what stops these reading as a rectangle
   // with a border, and it is repeated by every control in the kit.
+  /* ⚠⚠⚠ PHONE-FIX — NO `elevation` ON A RECORD, AND THAT IS DELIBERATE.
+   * Android's elevation shadow is drawn on EVERY side and ignores
+   * `shadowOffset`, so it paints a dark halo ABOVE the plate as well as below —
+   * a second, unintended line sitting directly on top of the gold rim the card
+   * is supposed to be defined by. That is the belt half of the black-line fix
+   * (the buckle is TSettle's resting pose; see tartariaKit). The iOS shadow
+   * props stay because they DO respect the offset and only fall downward.
+   * ⚠ NOTHING IS LOST ON ANDROID: the depth here was never the drop shadow, it
+   * is the rim — top edge lit, bottom edge near-black — over a recessed face,
+   * which is the construction the whole kit is built on. */
   dossierOuter: {
     marginVertical: 3,
     shadowColor: '#000',
     shadowOpacity: 0.5,
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 3 },
-    elevation: 3,
   },
   dossierOuterOpen: {
     shadowOpacity: 0.62,
     shadowRadius: 11,
     shadowOffset: { width: 0, height: 6 },
-    elevation: 7,
   },
+  /* ⚠⚠ PHONE-FIX — A RECORD AT REST IS ALLOY. Owner: keep steering away from
+   * medieval/bronze. An unselected record is a machined plate under a dead
+   * coating — cool grey rim, light on the top edge, near-black at the bottom —
+   * and the warm gold is saved for the one that is SELECTED. That contrast is
+   * what makes the gold read as "this one is live" rather than as decoration,
+   * which is the difference between recovered technology and a treasure chest. */
   dossierRim: {
     borderRadius: 4,
     borderWidth: 1,
     borderColor: T.rim,
-    borderTopColor: '#4A4238',
-    borderBottomColor: '#100E0B',
-    backgroundColor: '#22201B',
+    borderTopColor: T.rimAlloy,
+    borderBottomColor: '#0D0E0E',
+    backgroundColor: '#232527',
     padding: 1,
   },
   dossierRimOpen: { borderColor: T.rimLit, borderTopColor: '#B08F55', borderBottomColor: '#1E170F', backgroundColor: '#443925' },
@@ -1635,9 +1426,15 @@ const styles = StyleSheet.create({
   dossierMain: { flex: 1, minWidth: 0 },
   dossierSeal: { marginLeft: 10, marginTop: -13, marginRight: -13 },
   dossierNameRule: { marginTop: 6, marginBottom: 6 },
+  /* ⚠ PHONE-FIX — INDEX TICKS: three hairlines machined across the spine, the
+   * way a real filed plate carries a position mark. Fine technical engraving is
+   * the note the owner asked for ("precise ancient alloys ... geometric/glyph
+   * markings"), and it costs three static Views that never move. */
+  spineTick: { position: 'absolute', left: 0, width: 7, height: StyleSheet.hairlineWidth, backgroundColor: 'rgba(0,0,0,0.65)' },
   // THE IDENTITY SPINE — the engraved edge of a filed record, and the only
   // vertical the eye can use to line a stack of them up.
-  spine: { position: 'absolute', left: 0, top: 0, bottom: 0, width: 3, backgroundColor: T.goldDim, opacity: 0.5 },
+  // ⚠ PHONE-FIX — the resting spine is alloy; only the selected one is gold.
+  spine: { position: 'absolute', left: 0, top: 0, bottom: 0, width: 3, backgroundColor: T.rimAlloy, opacity: 0.75 },
   spineOpen: { width: 5, backgroundColor: T.gold, opacity: 1 },
   spineDead: { backgroundColor: '#8A473C', opacity: 0.8 },
   slotNameOpen: { fontSize: 18, letterSpacing: 0.5 },
@@ -1973,54 +1770,12 @@ const styles = StyleSheet.create({
     paddingTop: 8,
     gap: 6,
   },
-  exitBtn: {
-    backgroundColor: '#1a1714',
-    borderColor: '#8a3a3a',
-    borderWidth: 1,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 4,
-  },
-  exitBtnText: { color: '#c97a7a', fontSize: 10, letterSpacing: 1.5, fontWeight: '700' },
-  // OTA-068 — centered three-button row (INVITE PLAYTESTER,
-  // REPORT BUG, EXIT GAME). Was flex-end / right-aligned in
-  // OTA-065; the centered cluster reads better above the
-  // centered footer + thank-you lines and feels less crowded
-  // on the right edge of the screen.
-  bottomBtnRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-  },
-  // OTA-063 — REPORT BUG button. Visually equal-weight to EXIT
-  // GAME (same paddings + font) but uses the brand amber instead
-  // of the destructive red so the two are distinguishable at a
-  // glance. The COPIED-flash state swaps in a green border so
-  // the player sees confirmation.
-  bugReportBtn: {
-    backgroundColor: '#1a1714',
-    borderColor: '#c9a86a',
-    borderWidth: 1,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 4,
-  },
-  bugReportNote: { color: '#a2977b', fontSize: 11, lineHeight: 16, marginTop: 6, textAlign: 'center', paddingHorizontal: 18 },
-  bugReportBtnText: { color: '#c9a86a', fontSize: 10, letterSpacing: 1.5, fontWeight: '700' },
-  // OTA-065 — INVITE PLAYTESTER button. Cool-blue accent so it
-  // doesn't compete with REPORT BUG (amber) or EXIT GAME (red).
-  // Three distinct tones in the action row keep the buttons
-  // glanceable.
-  inviteBtn: {
-    backgroundColor: '#1a1714',
-    borderColor: '#6a9ec9',
-    borderWidth: 1,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 4,
-  },
-  inviteBtnText: { color: '#6a9ec9', fontSize: 10, letterSpacing: 1.5, fontWeight: '700' },
+  // ⚠ PHONE-FIX — exitBtn / bottomBtnRow / bugReportBtn / inviteBtn and their
+  // text styles are DELETED. Four bespoke bordered pills in four accent colours
+  // (red, amber, cool blue) is the sediment the owner asked to clear: three of
+  // those controls moved to Settings, where they wear Settings' own buttons, and
+  // EXIT GAME went altogether. Deleting the styles is what stops them growing
+  // back the next time somebody needs "a small button on the title screen".
   // v2.4.1 (OTA 051) — top-right gear matches ExplorationScreen's
   // cornerGear placement so the player always finds settings in the
   // same spot. Absolute over the title section; the crest + headers
@@ -2048,17 +1803,9 @@ const styles = StyleSheet.create({
   // so the version line reads at a glance.
   footer: { color: '#c9a86a', fontSize: 10, textAlign: 'center' },
   // OTA-068 — thank-you message above the action row. Color
-  // sits between the action button text (#c9a86a / #6a9ec9 /
-  // #c97a7a — bright accents) and the footer (#3a342c — deep
-  // muted) so the message reads as warm-but-secondary.
-  thankYou: {
-    color: '#8a7d5c',
-    fontSize: 11,
-    fontStyle: 'italic',
-    textAlign: 'center',
-    letterSpacing: 0.3,
-    paddingHorizontal: 8,
-  },
+  // ⚠ PHONE-FIX — `thankYou` deleted with the playtester line. It sat above an
+  // action row that no longer exists, and the owner's instruction for the
+  // recovered space was explicit: do not refill it, let the roster have it.
   kokoroBanner: {
     backgroundColor: '#1a1714',
     borderColor: '#3a342c',
