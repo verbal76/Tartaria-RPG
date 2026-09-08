@@ -29138,6 +29138,37 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // combat call site moved. Nothing was animated, no timer, no measurement, no store
 // subscription and no elevation was added.
 export const OTA_BUILD_ID = '2026-09-08-1746-the-shape-comes-before-the-detail';
+// golem catch-up 2026-09-08: markerless publish of OTA-1746 - Visual #3, the
+// commercial-finish pass, graded by the squint test rather than by how much
+// ornament is on the screen. Exploration was the last surface still built
+// entirely out of backgroundColor + borderColor + borderRadius 4 and it is the
+// screen the game is played on: eight near-identical bordered rectangles on one
+// plane, with the brand gold declared twenty times across the place, the day,
+// the weather, two nav buttons, the settings gear, a parser's guess, the trader,
+// the main quest and three controls that no longer exist. The kit gains a second
+// shape - a housing with one machined corner, an integral rail split from its
+// face by an engraved line, and two tones that establish a plane stack from the
+// player's own background up through housing, inset surface, active element and
+// result. The depth carries no shadow and no elevation: a housing reads raised
+// because its face is lighter and its light sits on the top edge, an inset reads
+// cut in because its face is darker and its light sits on the bottom, which is
+// free to render and avoids the Android all-round elevation seam. Four material
+// families separate structure from information, and their alphas must be
+// monotone in plane order or a light theme inverts the whole stack - a bug this
+// pass shipped twice and its own suite caught twice. Gold has left the chrome
+// entirely and now marks a live obligation or a live process; the main-quest chip
+// became the screen's focal point without a pixel being added to it. WORLD and
+// LORE are the kit's own button at a new compact density rather than an eighth
+// style, the settings gear is a socket set into the rail at an unchanged hit
+// area, and five dead style keys left behind by earlier passes are deleted. The
+// expanded dossier keeps its riveted seal plate and now also prints the same
+// faction art into the record's field, oversized and bleeding off the edge, from
+// a single shared decode. The housing costs the feed twelve points, computed from
+// the shipped styles rather than estimated. Combat density, gameplay, combat
+// authority, the boot protections, the title scrolling and the Settings placement
+// are all untouched, and a real performance defect went out with the pass: the
+// kit's button rebuilt its animated interpolation every render, so every
+// re-render of a screen containing one cost two commits.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-08-1745-the-result-before-the-sentence';
 // golem catch-up 2026-09-08: markerless publish of OTA-1745 - Visual #2, combat
 // inside Exploration as information design. Combat authority always knew who
