@@ -10,6 +10,7 @@ import {
   Linking,
   Share,
   Platform,
+  type ImageStyle,
 } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import * as Application from 'expo-application';
@@ -59,7 +60,7 @@ import { modelBootPercent, modelsStillLoading } from '../ui/modelBootProgress'; 
 // ⚠⚠⚠ VIS-1 — the Tartaria interface kit. This screen is its first reference
 // implementation; read app/ui/tartariaKit.tsx before adding anything visual here.
 import { T, TType, TButton, TDivider, TRule, TCorners, TResourceChit, TFactionPlate, TGear, TSettle, TStrata } from '../ui/tartariaKit';
-import { factionCrest } from '../engine/factionCrests';
+import { factionCrest, crestArt, crestFactionIds, type CrestArt } from '../engine/factionCrests';
 
 const races = racesData as { id: string; name: string }[];
 const locations = locationsData as { id: string; name: string }[];
@@ -121,13 +122,99 @@ function resumeObjectiveLine(phase: MainQuestPhase, cores: number): string {
  * seal plate above it, so RN decodes the asset once and both draw from one cache
  * entry; on a collapsed card it is the only draw. No animation, no measurement,
  * no state, no subscription. */
-function DossierField({ crest, compact = false }: { crest: number | undefined; compact?: boolean }) {
+/* ⚠⚠⚠ AND WHERE THAT WINDOW SITS ON THE ARTWORK — OTA-1753.
+ *
+ * `engine/factionCrests` measures where each emblem lives inside its own file.
+ * This converts that art fact into a nudge for THESE two boxes, which is layout
+ * and therefore belongs here rather than beside the measurement.
+ *
+ * ⚠⚠ THE ARITHMETIC. Both boxes fit the emblem BY WIDTH, so the drawn height is
+ * `boxWidthFraction × cardWidth × aspect`. To bring a focus at `focusY` to the
+ * middle of the window the image must move DOWN by `(0.5 − focusY) × drawnHeight`
+ * pixels. The box's `top`/`bottom` are percentages of the CARD'S HEIGHT, and
+ * making them asymmetric by `d` while keeping their sum constant moves the image
+ * down by exactly `d%` of the card's height without changing the box's size. So
+ *     d = 100 × (0.5 − focusY) × aspect × (boxWidthFraction × cardW ÷ cardH)
+ * and the trailing ratio is the only part that is not universal — it is the
+ * card's own shape. K below is that ratio, measured on the Pixel.
+ *
+ * ⚠ SO K IS DEVICE-CALIBRATED AND SAYS SO. Percentages of width and percentages
+ * of height cannot be linked in RN, so a watermark nudge cannot be made
+ * resolution-independent without measuring the card at runtime — which is a
+ * layout pass on every row, for a decoration. Calibrating on the phone the owner
+ * plays on and writing the formula down is the honest trade; on a tablet the
+ * nudge lands short rather than wrong, and the emblem is merely less
+ * well-centred, never displaced.
+ *
+ * ⚠⚠ AND IT COSTS NOTHING AT RENDER. Every style is built ONCE at module load,
+ * keyed by faction — nine entries, two each. `DossierField` does a lookup, not a
+ * computation, so this adds no per-row work to a FlatList that OTA-1739 fought
+ * to keep quiet. */
+const TILE_NUDGE_K = 246;   // 42% of a 340dp card, over a ~58dp collapsed tile
+const OPEN_NUDGE_K = 129;   // 76% of a 340dp card, over a ~200dp expanded card
+
+/** Recentre the window on the artwork's own focus, in % of the card's height. */
+function fieldNudge(k: number, art: CrestArt | undefined): number {
+  if (!art) return 0;                                   // no measurement, no guess
+  return Math.round(k * (0.5 - art.focusY) * art.aspect);
+}
+
+/* ⚠ The two resting boxes. `dossierField` / `dossierFieldCompact` in the
+ * StyleSheet below hold everything a nudge does NOT touch; these constants are
+ * the vertical extents the nudge splits. Kept beside the formula so the pair
+ * cannot drift apart. */
+const TILE_SPREAD = 250;    // top/bottom of the collapsed tile's box
+const OPEN_SPREAD = 80;     // top/bottom of the expanded card's box
+
+type FieldStyles = { compact: ImageStyle; open: ImageStyle };
+const FIELD_STYLES: Record<string, FieldStyles> = {};
+for (const id of crestFactionIds()) {
+  const art = crestArt(id);
+  const dTile = fieldNudge(TILE_NUDGE_K, art);
+  const dOpen = fieldNudge(OPEN_NUDGE_K, art);
+  FIELD_STYLES[id] = {
+    // a POSITIVE nudge moves the emblem down: less inset above, more below.
+    compact: { top: `${-(TILE_SPREAD - dTile)}%`, bottom: `${-(TILE_SPREAD + dTile)}%` },
+    open: { top: `${-(OPEN_SPREAD - dOpen)}%`, bottom: `${-(OPEN_SPREAD + dOpen)}%` },
+  };
+}
+
+/* ⚠⚠⚠ THE FACTION FIELD — ONE TREATMENT, EVERY CARD, EACH ITS OWN EMBLEM.
+ *
+ * VIS-3 (OTA-1746) printed a Tartarian's faction art into the record's ground:
+ * the canonical `assets/crests/<factionId>.png`, dramatically oversized and
+ * cropped by the card's own edges — a ghosted fragment embedded in the plate
+ * rather than a logo placed on it. OTA-1747 put it on both card states, and
+ * OTA-1753 gave each faction its own window onto its own artwork.
+ *
+ * ⚠⚠ BOTH STATES NOW WEAR THE SAME TREATMENT. They previously did not: the
+ * expanded card sat at 0.13 against the tile's 0.22 and fit by a different axis
+ * depending on the crest, so beside a tile it read as absent — which is what the
+ * owner saw when he asked for the image "in both". They now share the alpha, the
+ * fit axis and the focus table, and differ only in the box each surface has room
+ * for. A tile is a 58dp strip; a record is four times that.
+ *
+ * ⚠ WHAT IT REFUSES TO DO. A faction the game ships no art for renders NOTHING —
+ * no placeholder, no substitute emblem, no generic mark, and no borrowed offset.
+ * `pointerEvents="none"` throughout, so the tap, the second tap that loads, the
+ * swipe-to-delete and the scroll all pass straight through. `contain` always:
+ * the emblem is cropped by its container and NEVER stretched.
+ *
+ * ⚠ AND IT IS FREE. On an expanded card this is the same `source` as the riveted
+ * seal plate above it, so RN decodes the asset once and both draw from one cache
+ * entry. No animation, no measurement, no state, no subscription. */
+function DossierField({
+  crest, factionId, compact = false,
+}: { crest: number | undefined; factionId?: string; compact?: boolean }) {
   if (crest === undefined) return null;
+  const tuned = factionId ? FIELD_STYLES[factionId] : undefined;
   return (
     <View style={styles.dossierFieldClip} pointerEvents="none">
       <Image
         source={crest}
-        style={compact ? styles.dossierFieldCompact : styles.dossierField}
+        style={compact
+          ? [styles.dossierFieldCompact, tuned?.compact]
+          : [styles.dossierField, tuned?.open]}
         resizeMode="contain"
       />
     </View>
@@ -611,7 +698,7 @@ export function TitleScreen() {
             <TSettle active={false}>
             <View style={[styles.dossierRim, item.dead && styles.dossierRimDead]}>
               <View style={[styles.dossierFace, styles.dossierFaceCompact, item.dead && styles.dossierFaceDead]}>
-                <DossierField crest={crest} compact />
+                <DossierField crest={crest} factionId={summaryFactionId(item)} compact />
                 <View style={[styles.spine, item.dead && styles.spineDead]} pointerEvents="none" />
                 <View style={[styles.spineTick, { top: '30%' }]} pointerEvents="none" />
                 <View style={[styles.spineTick, { top: '70%' }]} pointerEvents="none" />
@@ -666,7 +753,7 @@ export function TitleScreen() {
         <TSettle active>
         <View style={[styles.dossierRim, styles.dossierRimOpen, item.dead && styles.dossierRimDead]}>
           <View style={[styles.dossierFace, styles.dossierFaceOpen, item.dead && styles.dossierFaceDead]}>
-            <DossierField crest={crest} />
+            <DossierField crest={crest} factionId={summaryFactionId(item)} />
             <View style={[styles.spine, styles.spineOpen, item.dead && styles.spineDead]} pointerEvents="none" />
             <View style={[styles.spineTick, { top: '22%', width: 9 }]} pointerEvents="none" />
             <View style={[styles.spineTick, { top: '50%', width: 9 }]} pointerEvents="none" />
@@ -1494,7 +1581,17 @@ const styles = StyleSheet.create({
    * at this weight the name and the objective are never composited over more
    * than the emblem's outer edge, so no text loses contrast on any theme. */
   dossierFieldClip: { ...StyleSheet.absoluteFillObject, borderRadius: 3, overflow: 'hidden' },
-  dossierField: { position: 'absolute', top: '-18%', bottom: '-18%', right: '-8%', left: '32%', opacity: 0.13 },
+  /* ⚠⚠ OTA-1753 — THE EXPANDED CARD JOINS THE TILE'S TREATMENT.
+   * It had drifted into a different thing: 0.13 against the tile's 0.22, and a
+   * box (-18%/-18%) shallow enough that `contain` fit it by HEIGHT for the tall
+   * crests and by WIDTH for the square ones — so the emblem's size and placement
+   * changed with the faction, and beside a tile it read as absent. That is what
+   * the owner saw when he asked for the image "in both".
+   * ⚠ Its HORIZONTAL framing is untouched: left 32%, bleeding 8% off the right,
+   * exactly the composition approved on the device. Only the vertical spread
+   * (-80%, deep enough that every crest now fits by WIDTH, so placement is
+   * deterministic and the focus nudge is meaningful) and the alpha have moved. */
+  dossierField: { position: 'absolute', top: '-80%', bottom: '-80%', right: '-8%', left: '32%', opacity: 0.2 },
   /* ⚠⚠⚠ THE COLLAPSED CARD NEEDS DIFFERENT NUMBERS TO GET THE SAME LOOK — AND
    * OTA-1747 GOT THEM WRONG IN THE OTHER DIRECTION. Recorded because the error
    * is instructive and I would otherwise repeat it.

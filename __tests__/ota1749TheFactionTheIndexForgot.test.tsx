@@ -272,7 +272,16 @@ describe('one reader, one encoding', () => {
   test('the screen no longer reads the optional field directly', () => {
     expect(TITLE).toContain('const crest = factionCrest(summaryFactionId(item));');
     expect(TITLE).not.toContain('factionCrest(item.factionId)');
-    expect((TITLE.match(/summaryFactionId\(/g) ?? []).length).toBe(1);
+    /* ⚠ The claim is that NOTHING reads the optional field directly — not that
+     * the helper is called exactly once. OTA-1753 gave the field per-faction
+     * offsets, so both call sites now pass the recovered id too. */
+    expect((TITLE.match(/summaryFactionId\(/g) ?? []).length).toBeGreaterThanOrEqual(1);
+    /* ⚠ THE CALL FORM, NOT THE BARE IDENTIFIER — and I walked into this trap in
+     * the same file that warns about it. `item.factionId` still appears in
+     * TitleScreen, inside the comment explaining why it must not be READ, so a
+     * bare-identifier assertion grades the obituary rather than the code. */
+    expect(TITLE).not.toMatch(/factionCrest\(\s*item\.factionId/);
+    expect(TITLE).not.toMatch(/=\s*item\.factionId\b/);
   });
 
   test('the decoder sits beside the encoder it inverts', () => {

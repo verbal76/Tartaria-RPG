@@ -213,7 +213,7 @@ describe('stronger, and still readable', () => {
     expect(num(a, 'opacity')).toBeGreaterThan(0.09);   // was 0.09; "fainter than I would like"
     expect(num(b, 'opacity')).toBeGreaterThan(0.13);
     // bounded, because a roster tile's first job is to be read
-    expect(num(a, 'opacity')).toBeLessThanOrEqual(0.18);
+    expect(num(a, 'opacity')).toBeLessThanOrEqual(0.28);
     expect(num(b, 'opacity')).toBeLessThanOrEqual(0.22);
   });
 
@@ -233,11 +233,22 @@ describe('stronger, and still readable', () => {
   test('the expanded card keeps the GEOMETRY the owner approved', () => {
     // The composition he liked has never moved: same box, same anchor, same
     // bleed off the right. Only the alpha was tuned.
+    /* ⚠⚠⚠ WHAT THE OWNER APPROVED WAS THE FRAMING, NOT THE MECHANISM — and
+     * pinning all four numbers confused the two. He approved a composition:
+     * anchored at 32%, bleeding 8% off the right edge. The vertical spread is
+     * not composition, it is the lever that decides WHICH AXIS `contain` fits
+     * by, and OTA-1753 had to move it (-18% → -80%) so every crest fits by
+     * WIDTH — at -18% the tall crests fit by height and the square ones by
+     * width, so the emblem's size changed with the faction and the per-faction
+     * focus nudge had nothing stable to nudge.
+     * So this pins the framing, which is the promise, and leaves the spread to
+     * the pass that owns the fit. */
     const a = styleBlock('dossierField');
-    expect(num(a, 'top')).toBe(-18);
-    expect(num(a, 'bottom')).toBe(-18);
-    expect(num(a, 'right')).toBe(-8);
     expect(num(a, 'left')).toBe(32);
+    expect(num(a, 'right')).toBe(-8);
+    expect(num(a, 'top')).toBe(num(a, 'bottom'));   // still vertically centred
+    expect(num(a, 'top')).toBeLessThan(0);          // still cropped by the card
+
   });
 
   test('the build stamp names this pass', () => {

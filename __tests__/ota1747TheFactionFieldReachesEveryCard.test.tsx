@@ -337,11 +337,21 @@ describe('the Cheddar Bob card is the reference, so it is byte-identical', () =>
      * anchor, same bleed off the right. OTA-1750 raised only the opacity, on the
      * owner's note that the designs read fainter than he wanted — so this pins
      * the four numbers that make the composition and lets the alpha be tuned. */
+    /* ⚠⚠⚠ WHAT THE OWNER APPROVED WAS THE FRAMING, NOT THE MECHANISM — and
+     * pinning all four numbers confused the two. He approved a composition:
+     * anchored at 32%, bleeding 8% off the right edge. The vertical spread is
+     * not composition, it is the lever that decides WHICH AXIS `contain` fits
+     * by, and OTA-1753 had to move it (-18% → -80%) so every crest fits by
+     * WIDTH — at -18% the tall crests fit by height and the square ones by
+     * width, so the emblem's size changed with the faction and the per-faction
+     * focus nudge had nothing stable to nudge.
+     * So this pins the framing, which is the promise, and leaves the spread to
+     * the pass that owns the fit. */
     const a = styleBlock('dossierField');
-    expect(num(a, 'top')).toBe(-18);
-    expect(num(a, 'bottom')).toBe(-18);
-    expect(num(a, 'right')).toBe(-8);
     expect(num(a, 'left')).toBe(32);
+    expect(num(a, 'right')).toBe(-8);
+    expect(num(a, 'top')).toBe(num(a, 'bottom'));   // still vertically centred
+    expect(num(a, 'top')).toBeLessThan(0);          // still cropped by the card
     expect(a).toContain("position: 'absolute'");
   });
 
@@ -384,7 +394,9 @@ describe('one generalised treatment, not a second unrelated effect', () => {
   test('it sits behind everything the card draws', async () => {
     // Source order: the field is the first child of the face in BOTH branches,
     // ahead of the spine, the registration corners and the body.
-    for (const anchor of ['<DossierField crest={crest} compact />', '<DossierField crest={crest} />']) {
+    // ⚠ Anchored on the component, not on its full prop list — OTA-1753 added
+    // `factionId` and an exact-string anchor would have failed for that alone.
+    for (const anchor of ['<DossierField crest={crest} factionId=']) {
       const at = TITLE.indexOf(anchor);
       expect(at).toBeGreaterThan(-1);
       const spineAt = TITLE.indexOf('styles.spine', at);
@@ -414,7 +426,12 @@ describe('one generalised treatment, not a second unrelated effect', () => {
   });
 
   test('it costs no state, no timer, no measurement and no subscription', () => {
-    const fn = /function DossierField\([\s\S]*?\n\}/.exec(TITLE)?.[0] ?? '';
+    /* ⚠ Slice to the next top-level declaration, not to the first `\n}` — the
+     * component's signature is destructured across lines now, so the lazy
+     * pattern stopped at the props type and graded four lines of nothing. */
+    const at = TITLE.indexOf('function DossierField(');
+    expect(at).toBeGreaterThan(-1);
+    const fn = TITLE.slice(at, TITLE.indexOf('\nexport function TitleScreen', at));
     expect(fn).not.toMatch(/useState|useEffect|useRef|setInterval|setTimeout|onLayout|Animated/);
     // one Image on a collapsed card; the expanded card's second is the seal
     // plate that has been there since VIS-1.

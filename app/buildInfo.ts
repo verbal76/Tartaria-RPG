@@ -29272,7 +29272,37 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // answer to the owner's original observation: the nine crests are composed
 // differently inside their own frames, so one window shows a different part of
 // each. Moving the window cannot align nine different compositions.
-export const OTA_BUILD_ID = '2026-09-08-1752-left-of-centre';
+// ── OTA-1753 — EACH EMBLEM GETS ITS OWN WINDOW ───────────────────────────────
+// The owner, three passes ago: "we might need a custom position for each emblem
+// since they are all not symmetrical." He was right, and this is the measurement
+// that proves it. Each crest was drawn to a 128x128 canvas and reduced to the
+// luminance-weighted centroid of its artwork, with the near-black ground
+// discounted so the figure follows the device rather than its frame.
+// The result is systematic, which is the part worth knowing: EVERY ONE of the
+// nine sits ABOVE the middle of its file - focusY runs 0.339 to 0.466, mean
+// 0.40, and not one is at 0.5. So a window on the vertical centre of these files
+// shows the LOWER part of every emblem, the ground and the plinth, never the
+// device. That is not per-faction noise to be tuned away, it is how the set was
+// drawn, and it is why the roster fragments read as rubble.
+// `engine/factionCrests` now carries focusY and aspect per faction - art facts,
+// true wherever the file is drawn - and TitleScreen converts them into a nudge
+// for its own two boxes, which is layout. Both boxes fit by width, so the drawn
+// height is known, the shift is (0.5 - focusY) x drawn height, and making the
+// box's top and bottom asymmetric by d moves the image down by d% of the card's
+// height without changing the box. The conversion constant is the card's own
+// width-over-height ratio, calibrated on the Pixel and written down, because
+// percentages of width and of height cannot be linked in RN without measuring
+// the card at runtime - a layout pass per row, for a decoration.
+// Both card states now wear ONE treatment. They had drifted apart: the expanded
+// card sat at 0.13 against the tile's 0.22, and its box was shallow enough that
+// contain fit it by height for tall crests and by width for square ones, so size
+// and placement changed with the faction and beside a tile it read as absent -
+// which is what the owner saw when he asked for the image in both. Its
+// horizontal framing is untouched; only the vertical spread and the alpha moved.
+// Every style is built once at module load, keyed by faction, so this adds no
+// per-row work to a FlatList that OTA-1739 fought to keep quiet.
+export const OTA_BUILD_ID = '2026-09-08-1753-each-emblem-gets-its-own-window';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-08-1752-left-of-centre';
 // golem catch-up 2026-09-08: markerless publish of OTA-1752 - left of centre.
 // OTA-1751 put the roster tile's faction emblem on the row's geometric centre at
 // the owner's request; on the device it still read as too far right. The

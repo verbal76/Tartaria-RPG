@@ -75,10 +75,15 @@ describe('the emblem balances against the text, not against the border', () => {
   test('the expanded card did not move with it', () => {
     // Only the collapsed tile has one-sided weight. The expanded card is a
     // two-column record and its composition was approved as it is.
+    /* ⚠ The claim that survives is that the expanded card did not adopt the
+     * TILE'S left-of-centre bias — a record is a two-column layout and does not
+     * have one-sided weight. Its alpha and vertical spread are OTA-1753's
+     * business, not this pass's. */
     const a = styleBlock('dossierField');
     expect(num(a, 'left')).toBe(32);
     expect(num(a, 'right')).toBe(-8);
-    expect(num(a, 'opacity')).toBe(0.13);
+    const openCentre = num(a, 'left') + (100 - num(a, 'left') - num(a, 'right')) / 2;
+    expect(openCentre).toBeGreaterThan(50);   // right of centre, unlike the tile
   });
 
   test('the build stamp names this pass', () => {

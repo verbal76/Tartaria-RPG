@@ -549,7 +549,9 @@ describe('artwork is composition, not a thumbnail in a box', () => {
     // the field never intercepts the second tap that loads the character
     const field = images.find((n) => Number(flat(n.props.style).opacity ?? 1) < 1);
     expect(field).toBeDefined();
-    expect(Number(flat(field!.props.style).opacity)).toBeLessThan(0.15);
+    // ⚠ A ceiling with room, not a pin against the day's value — the same
+    // mistake this family already made twice (0.2, then 0.22).
+    expect(Number(flat(field!.props.style).opacity)).toBeLessThan(0.4);
     expect(field!.props.resizeMode).toBe('contain');
   });
 
