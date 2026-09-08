@@ -29379,7 +29379,44 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // emblem was floating with a 15dp bare strip above it, so it is enlarged just
 // enough to keep bleeding past both edges. The approved treatment is untouched
 // - same alphas, same right-hand column with a 3% margin, same bands.
-export const OTA_BUILD_ID = '2026-09-08-1756-the-card-is-measured';
+// - OTA-1757 - THE COLOURS THAT MEAN SOMETHING HAVE NAMES -------------------
+// First step of the interface rollout, and deliberately one nobody can see.
+// The owner's amendment settled that rarity and other semantic colours are not
+// accent colours: gold stays reserved for a live obligation or a live process,
+// while HP, danger, rarity, positive/negative results and faction identity may
+// keep meaningful colour. That ruling could not be ENFORCED, because #c9a86a is
+// doing four jobs at once - the interface accent, the Common rarity, the
+// material category, and the middle band of the HP/stamina ramp. Three of the
+// four are semantic and are to be kept, so a ratchet on the bare hex is a number
+// that cannot legitimately fall.
+// ui/semanticColor names the vitality ramp (152 uses of the green alone, and the
+// three-stop ternary written out by hand in 22 places), the standing ladder and
+// the stamina gauge, and RE-EXPORTS the rarity and category tables from the
+// existing authority rather than copying them - OTA-1312 consolidated rarity out
+// of four files and a fifth copy here would undo that. Every value is the hex
+// the game already drew; CharacterScreen's three ramps are routed through the
+// helpers as identity substitutions, so no pixel moves.
+// check:gold is the twentieth gate: 377 declarations at birth, counted over CODE
+// ONLY and split 372 interface / 4 semantic / 1 kit. The interface number is the
+// one the rollout drives down. Its first run failed on its own companion
+// module's header comment - the third time in a day that a check graded the
+// prose describing a fix rather than the fix - so it tokenises instead, keeping
+// string contents and dropping both comment forms.
+// Two colours that fail the kit's warm-neutral palette rule (#8aa0a4 cool label
+// ink, 41 uses; #6a9bbf the armour category blue) are RECORDED as open questions
+// rather than silently imported, to be classified in the final legacy hunt.
+// One legacy-hunt item was closed on the spot: app/theme/colors.ts, an 18-line
+// "aged artifact" palette from arb76 declaring its own gold, ink, border and
+// surface, with a header promising a Phase 2 rollout that never happened. VIS-1's
+// kit superseded it and nothing imported it. A dead palette reads as a live
+// design system to the next person who opens the folder, so it is deleted.
+// Also recorded, not fixed: the hex has two spellings - the kit writes #C9A86A
+// while 374 screen declarations write #c9a86a. Invisible to a renderer, but a
+// case-sensitive count would have missed the kit's own declaration, so the
+// gate's case-insensitivity is load-bearing. Normalising is a whole-tree edit
+// for no visible gain and belongs to the legacy hunt.
+export const OTA_BUILD_ID = '2026-09-08-1757-colours-that-mean-something';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-08-1756-the-card-is-measured';
 // golem catch-up 2026-09-08: markerless publish of OTA-1756 - the card is
 // measured, not assumed. The owner asked, after four passes that each moved the
 // roster watermark and each landed wrong, exactly how the placement was being

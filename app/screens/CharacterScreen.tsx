@@ -63,6 +63,7 @@ import { weatherStatModifiers } from '../engine/weatherEffects';
 import { findFactionQuestById } from '../engine/factionQuests';
 import { findHuntById } from '../engine/hunts';
 import { findMysteryById } from '../engine/mysteries';
+import { vitalityColor, gaugeColor, standingColor } from '../ui/semanticColor';
 
 const STAT_LABEL: Record<keyof Stats, string> = {
   strength: 'STR',
@@ -162,8 +163,11 @@ export function CharacterScreen() {
   const factionStanding = player.factionStanding.find((f) => f.factionId === player.factionId)?.standing ?? 0;
   const hpPct = player.hpMax > 0 ? player.hp / player.hpMax : 0;
   const stamPct = player.staminaMax > 0 ? player.stamina / player.staminaMax : 0;
-  const hpColor = hpPct > 0.5 ? '#9ec96a' : hpPct > 0.25 ? '#c9a86a' : '#e07a5f';
-  const stamColor = stamPct > 0.4 ? '#9ec96a' : '#c9a86a';
+  /* ⚠ OTA-1757 — the same three hexes, now named. `vitalityColor` carries the
+   * 0.5 / 0.25 cuts this line has shipped with, so the ramp cannot drift apart
+   * from the twenty-one other places that wrote it out by hand. */
+  const hpColor = vitalityColor(hpPct);
+  const stamColor = gaugeColor(stamPct);
 
   const breakdown = effectiveStatsBreakdown(player, weatherStatModifiers(scene?.weather ?? null, playerArmorResistKinds(player)));
   // OTA-836 — full AC breakdown (base + armor + title + stance), matching what
@@ -756,10 +760,9 @@ export function CharacterScreen() {
               // actually worth having, since one contract for their rival moves you 4.
               const hunted = standing <= HOSTILE_STANDING;
               const nearHunted = !hunted && standing <= HOSTILE_STANDING + 10;
-              const color = standing >= JOIN_THRESHOLD ? '#9ec96a'
-                : standing >= 0 ? '#cdbf99'
-                : standing >= -10 ? '#c9a86a'
-                : '#e07a5f';
+              // ⚠ OTA-1757 — same four bands, same thresholds, now named. The
+              // engine's JOIN_THRESHOLD stays the authority and is passed in.
+              const color = standingColor(standing, JOIN_THRESHOLD);
               // OTA-844 [world pulse] — the world moves on its own; show whether this
               // faction is rising or waning in the balance of power right now.
               const tide = tideLabels[row.factionId] ?? null;
