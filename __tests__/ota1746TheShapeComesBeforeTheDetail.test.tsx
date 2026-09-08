@@ -68,7 +68,8 @@ import { join } from 'path';
 import { useGameStore } from '../app/state/gameStore';
 import { getRaces, getFactions } from '../app/engine/character';
 import { TitleScreen } from '../app/screens/TitleScreen';
-import { factionCrest } from '../app/engine/factionCrests';
+import { factionCrest, crestArt, crestFactionIds } from '../app/engine/factionCrests';
+import { placeCrestField } from '../app/ui/crestField';
 import { T, TType, TSurface, TButton, tartariaKitStyles, FACTION_PLATE_TEST_ID } from '../app/ui/tartariaKit';
 import { STRIP_METRICS } from '../app/components/CombatStrip';
 import type { SlotSummary } from '../app/engine/saveSystem';
@@ -170,6 +171,32 @@ const textOf = (n: TestNode): string => {
 const allText = (tree: ReturnType<typeof renderer.create>) =>
   tree.root.findAll(() => true).map((n) => textOf(n)).join('\n');
 
+
+/* ⚠⚠⚠ OTA-1756 — THE FIELD DOES NOT EXIST UNTIL THE CARD IS MEASURED.
+ * Placement now comes from the clip's own `onLayout` instead of percentage
+ * insets calibrated against an assumed 340x58 card, so a test that mounts and
+ * looks straight away finds a mounted-but-empty clip. Feeding the clips a box
+ * is the test's job now, exactly as the layout engine does on a device.
+ * ⚠ The numbers are the REAL card, read out of the running app at 411dp:
+ * 375x55 collapsed, 375x143.5 expanded. They are measurements, not the kind of
+ * assumption this OTA exists to delete — and nothing here depends on their
+ * exact values, only on the placement tracking whatever it is told. */
+const COLLAPSED_CARD = { width: 375, height: 55 };
+const EXPANDED_CARD = { width: 375, height: 143.5 };
+async function measureCards(
+  tree: ReturnType<typeof renderer.create>,
+  box: { width: number; height: number } = COLLAPSED_CARD,
+) {
+  const clips = tree.root.findAll((n) => typeof n.type === 'string'
+    && typeof n.props.onLayout === 'function' && n.props.pointerEvents === 'none');
+  await renderer.act(async () => {
+    for (const c of clips) {
+      (c.props.onLayout as (e: unknown) => void)({ nativeEvent: { layout: { x: 0, y: 0, ...box } } });
+    }
+  });
+  await flush();
+}
+
 async function mountTitle(slots: SlotSummary[]) {
   // ⚠ Same gate as OTA-1742: the boot gate (OTA-405) holds load/create until
   // the OTA check resolves and the classifier settles, and the screen re-reads
@@ -182,6 +209,7 @@ async function mountTitle(slots: SlotSummary[]) {
   useGameStore.setState({ slots, otaBootResolved: true, cognitiveStatus: 'ready' } as never);
   await flush();
   mounted.push(tree);
+  await measureCards(tree);
   return tree;
 }
 /** Tap the row that names this Tartarian — the expansion is what reveals the art. */
@@ -190,6 +218,7 @@ async function expandRow(tree: ReturnType<typeof renderer.create>, name: string)
   expect(row).toBeDefined();
   await renderer.act(async () => { (row!.props.onPress as () => void)(); });
   await flush();
+  await measureCards(tree, EXPANDED_CARD);
 }
 
 // ═══ 1. THE LARGE COMPOSITION ════════════════════════════════════════════════
@@ -578,23 +607,28 @@ describe('artwork is composition, not a thumbnail in a box', () => {
 
   test('the field is CROPPED by the record rather than sitting centred in it', () => {
     /* A print is cropped by the thing it is printed on; a picture centred in a
-     * box is the failure this replaces. The crop is still the claim — but it is
-     * now VERTICAL only. OTA-1754 retired the sideways bleed: the owner asked
-     * for a contained column on the far right, so the emblem no longer runs past
-     * the border, and pinning `left` in the 30s would forbid the column. */
-    const block = /dossierField:\s*\{[^}]*\}/.exec(TITLE)?.[0] ?? '';
-    expect(block).toContain("position: 'absolute'");
-    expect(block).toMatch(/top: '-\d+%'/);
-    expect(block).toMatch(/bottom: '-\d+%'/);
-    // ...and its whole width is on the card, both edges inset
-    expect(block).toMatch(/right: '\d+%'/);
-    expect(block).toMatch(/left: '\d+%'/);
+     * box is the failure this replaces. The crop is VERTICAL only — OTA-1754
+     * retired the sideways bleed in favour of a contained right-hand column.
+     * ⚠⚠⚠ OTA-1756 — ASKED OF THE PLACEMENT, NOT OF THE STYLESHEET. This used
+     * to read `top: '-80%'` out of the style block, which proved only that a
+     * string was present. The percentages are gone; what makes the claim true
+     * is where the emblem actually lands on a MEASURED card, so that is what is
+     * asked. The card below is the real one, read out of the running app. */
+    const card = { width: 375, height: 143.5 };
+    const comp = { coverage: 0.62, focusAtX: 0.66, focusAtY: 0.5 };
+    for (const id of crestFactionIds()) {
+      const p = placeCrestField(card, crestArt(id)!, comp)!;
+      expect(p).not.toBeNull();
+      expect(p.top).toBeLessThan(0);                              // cropped above
+      expect(p.top + p.height).toBeGreaterThan(card.height);      // and below
+      expect(p.left).toBeGreaterThan(0);                          // contained left
+      expect(p.left + p.width).toBeLessThanOrEqual(card.width);   // and right
+    }
     // clipping is local, so it cannot crop the seal plate that sits proud of the
     // record's corner (VIS-1's own composition, kept)
     expect(TITLE).toContain('dossierFieldClip');
     expect(/dossierFieldClip:\s*\{[^}]*\}/.exec(TITLE)?.[0]).toContain("overflow: 'hidden'");
   });
-
   /* ⚠⚠⚠ SUPERSEDED BY OTA-1747, REASONING KEPT RATHER THAN DELETED WITH IT.
    *
    * As written this asserted a collapsed record showed NEITHER the seal plate

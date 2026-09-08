@@ -136,6 +136,29 @@ const legacySlot = (factionId: string, over: Partial<SlotSummary> = {}): SlotSum
   return { ...s, characterSeed: `${s.playerName}|${s.raceId}|${factionId}|1699999999999` };
 };
 
+
+/* ⚠⚠⚠ OTA-1756 — THE FIELD DOES NOT EXIST UNTIL THE CARD IS MEASURED.
+ * Placement comes from the clip's own `onLayout` now instead of percentage
+ * insets calibrated against an assumed 340x58 card, so a test that mounts and
+ * looks straight away finds a mounted-but-empty clip. Feeding the clips a box
+ * is the test's job, exactly as the layout engine does on a device.
+ * ⚠ These are the REAL card sizes, read out of the running app at 411dp. */
+const COLLAPSED_CARD = { width: 375, height: 55 };
+const EXPANDED_CARD = { width: 375, height: 143.5 };
+async function measureCards(
+  tree: ReturnType<typeof renderer.create>,
+  box: { width: number; height: number } = COLLAPSED_CARD,
+) {
+  const clips = tree.root.findAll((n) => typeof n.type === 'string'
+    && typeof n.props.onLayout === 'function' && n.props.pointerEvents === 'none');
+  await renderer.act(async () => {
+    for (const c of clips) {
+      (c.props.onLayout as (e: unknown) => void)({ nativeEvent: { layout: { x: 0, y: 0, ...box } } });
+    }
+  });
+  await flush();
+}
+
 async function mountTitle(slots: SlotSummary[]) {
   useGameStore.setState({ slots, crashedSlotIds: [], otaBootResolved: true, cognitiveStatus: 'ready' } as never);
   let tree!: ReturnType<typeof renderer.create>;
@@ -144,6 +167,7 @@ async function mountTitle(slots: SlotSummary[]) {
   useGameStore.setState({ slots, otaBootResolved: true, cognitiveStatus: 'ready' } as never);
   await flush();
   mounted.push(tree);
+  await measureCards(tree);
   return tree;
 }
 async function expandRow(tree: ReturnType<typeof renderer.create>, name: string) {
@@ -151,6 +175,7 @@ async function expandRow(tree: ReturnType<typeof renderer.create>, name: string)
   expect(row).toBeDefined();
   await renderer.act(async () => { (row!.props.onPress as () => void)(); });
   await flush();
+  await measureCards(tree, EXPANDED_CARD);
 }
 /* ⚠⚠ A DETECTOR, NOT AN ASSERTION — SO IT IS DELIBERATELY LOOSE. This finds the
  * faded field among the card's images; it must match whatever alpha the design

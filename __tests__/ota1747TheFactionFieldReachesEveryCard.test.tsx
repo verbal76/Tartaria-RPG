@@ -74,7 +74,8 @@ import { join } from 'path';
 import { useGameStore } from '../app/state/gameStore';
 import { getRaces, getFactions } from '../app/engine/character';
 import { TitleScreen } from '../app/screens/TitleScreen';
-import { factionCrest, crestFactionIds } from '../app/engine/factionCrests';
+import { factionCrest, crestArt, crestFactionIds } from '../app/engine/factionCrests';
+import { placeCrestField } from '../app/ui/crestField';
 import { FACTION_PLATE_TEST_ID } from '../app/ui/tartariaKit';
 import type { SlotSummary } from '../app/engine/saveSystem';
 
@@ -177,6 +178,32 @@ const slot = (over: Partial<SlotSummary> = {}): SlotSummary => ({
   ...over,
 } as SlotSummary);
 
+
+/* ⚠⚠⚠ OTA-1756 — THE FIELD DOES NOT EXIST UNTIL THE CARD IS MEASURED.
+ * Placement now comes from the clip's own `onLayout` instead of percentage
+ * insets calibrated against an assumed 340x58 card, so a test that mounts and
+ * looks straight away finds a mounted-but-empty clip. Feeding the clips a box
+ * is the test's job now, exactly as the layout engine does on a device.
+ * ⚠ The numbers are the REAL card, read out of the running app at 411dp:
+ * 375x55 collapsed, 375x143.5 expanded. They are measurements, not the kind of
+ * assumption this OTA exists to delete — and nothing here depends on their
+ * exact values, only on the placement tracking whatever it is told. */
+const COLLAPSED_CARD = { width: 375, height: 55 };
+const EXPANDED_CARD = { width: 375, height: 143.5 };
+async function measureCards(
+  tree: ReturnType<typeof renderer.create>,
+  box: { width: number; height: number } = COLLAPSED_CARD,
+) {
+  const clips = tree.root.findAll((n) => typeof n.type === 'string'
+    && typeof n.props.onLayout === 'function' && n.props.pointerEvents === 'none');
+  await renderer.act(async () => {
+    for (const c of clips) {
+      (c.props.onLayout as (e: unknown) => void)({ nativeEvent: { layout: { x: 0, y: 0, ...box } } });
+    }
+  });
+  await flush();
+}
+
 async function mountTitle(slots: SlotSummary[]) {
   // The boot gate (OTA-405) holds load/create until the OTA check resolves; the
   // screen re-reads the roster on appear (OTA-1294). Open it and put ours back.
@@ -187,6 +214,7 @@ async function mountTitle(slots: SlotSummary[]) {
   useGameStore.setState({ slots, otaBootResolved: true, cognitiveStatus: 'ready' } as never);
   await flush();
   mounted.push(tree);
+  await measureCards(tree);
   return tree;
 }
 async function expandRow(tree: ReturnType<typeof renderer.create>, name: string) {
@@ -194,6 +222,7 @@ async function expandRow(tree: ReturnType<typeof renderer.create>, name: string)
   expect(row).toBeDefined();
   await renderer.act(async () => { (row!.props.onPress as () => void)(); });
   await flush();
+  await measureCards(tree, EXPANDED_CARD);
 }
 /** Every faded field image currently on screen, with its source. */
 /* ⚠⚠ A DETECTOR, NOT AN ASSERTION — SO IT IS DELIBERATELY LOOSE. This finds the
@@ -299,27 +328,43 @@ describe('the collapsed card gets a cropped fragment, not a shrunken logo', () =
     return pad + nameRow + second + 2; // +2 = the rim's own border
   };
 
-  test('the compact field fits by WIDTH on a phone — so it is cropped, not centred', () => {
-    const { ok, boxW, boxH } = fitsByWidth(styleBlock('dossierFieldCompact'), 340, collapsedCardHeight());
+  test('the compact emblem is OVERSIZED against the tile — a fragment, not a logo', () => {
+    /* ⚠⚠⚠ OTA-1756 — "FITS BY WIDTH" WAS A PROPERTY OF THE OLD MECHANISM, AND
+     * THE MECHANISM IS GONE. The emblem used to be sized by letting `contain`
+     * choose an axis inside a box defined with percentage insets, so which axis
+     * won was a real question with a real failure mode. The image is now given
+     * an explicit pixel width and a height derived from the SOURCE CANVAS, so
+     * the fit axis is not a question any more — it is arithmetic.
+     * What survives is the claim that mattered: the emblem is far taller than
+     * the card, so what shows is a cropped fragment. Measured against the REAL
+     * card, not the assumed 340x58 this test used to pass in. */
+    const card = { width: 375, height: 55 };
+    for (const id of crestFactionIds()) {
+      const art = crestArt(id)!;
+      const p = placeCrestField(card, art, { coverage: 0.42, focusAtX: 0.76, focusAtY: 0.5 })!;
+      expect(p.height / p.width).toBeCloseTo(art.srcH / art.srcW, 9);
+      expect(p.height).toBeGreaterThan(card.height * 2.5);
+    }
     expect(WORST_ASPECT).toBeGreaterThan(1); // the art really is taller than wide
-    expect(ok).toBe(true);
-    // and the emblem is genuinely OVERSIZED relative to the card it sits in
-    expect(boxH).toBeGreaterThan(collapsedCardHeight() * 4);
-    expect(boxW).toBeGreaterThan(0);
   });
-
-  test('...and at the 600dp tablet cap, where the box is wider and needs to be taller still', () => {
-    // CONTENT_MAX_WIDTH is 600 on native; the card is that minus the list padding.
-    const { ok } = fitsByWidth(styleBlock('dossierFieldCompact'), 570, collapsedCardHeight());
-    expect(ok).toBe(true);
+  test('...and at the 600dp tablet cap, where the card is wider and the emblem taller still', () => {
+    // CONTENT_MAX_WIDTH is 600 on native; the card is that minus the chrome.
+    // The measured card at that cap is 564 wide (read out of the running app).
+    const card = { width: 564, height: 55 };
+    for (const id of crestFactionIds()) {
+      const p = placeCrestField(card, crestArt(id)!, { coverage: 0.42, focusAtX: 0.76, focusAtY: 0.5 })!;
+      expect(p.height).toBeGreaterThan(card.height * 4);
+      expect(p.left + p.width).toBeLessThanOrEqual(card.width);
+    }
   });
-
-  test('the EXPANDED field fits by width too — the reference behaves the same way', () => {
-    // an expanded card is roughly four times the collapsed height
-    const { ok } = fitsByWidth(styleBlock('dossierField'), 340, collapsedCardHeight() * 4);
-    expect(ok).toBe(true);
+  test('the EXPANDED emblem is oversized too — the reference behaves the same way', () => {
+    const card = { width: 375, height: 143.5 };
+    for (const id of crestFactionIds()) {
+      const p = placeCrestField(card, crestArt(id)!, { coverage: 0.62, focusAtX: 0.66, focusAtY: 0.5 })!;
+      expect(p.height).toBeGreaterThan(card.height * 1.5);
+      expect(p.top).toBeLessThan(0);
+    }
   });
-
   test('⚠ the naive reuse WOULD have failed — which is why `compact` exists', () => {
     // Proof that the second style is load-bearing rather than decoration: the
     // expanded percentages, applied to a collapsed card, fit by HEIGHT and
@@ -332,44 +377,32 @@ describe('the collapsed card gets a cropped fragment, not a shrunken logo', () =
 
 // ═══ 3. THE REFERENCE DID NOT MOVE ═══════════════════════════════════════════
 describe('the Cheddar Bob card is the reference, so it is byte-identical', () => {
-  test('the expanded field keeps the GEOMETRY the owner approved', () => {
-    /* ⚠ The composition is the reference and has never moved: same box, same
-     * anchor, same bleed off the right. OTA-1750 raised only the opacity, on the
-     * owner's note that the designs read fainter than he wanted — so this pins
-     * the four numbers that make the composition and lets the alpha be tuned. */
-    /* ⚠⚠⚠ WHAT THE OWNER APPROVED WAS THE FRAMING, NOT THE MECHANISM — and
-     * pinning all four numbers confused the two. He approved a composition:
-     * anchored at 32%, bleeding 8% off the right edge. The vertical spread is
-     * not composition, it is the lever that decides WHICH AXIS `contain` fits
-     * by, and OTA-1753 had to move it (-18% → -80%) so every crest fits by
-     * WIDTH — at -18% the tall crests fit by height and the square ones by
-     * width, so the emblem's size changed with the faction and the per-faction
-     * focus nudge had nothing stable to nudge.
-     * So this pins the framing, which is the promise, and leaves the spread to
-     * the pass that owns the fit. */
-    /* ⚠⚠⚠ SUPERSEDED BY OTA-1754 — THE TWO CARDS NOW SHARE ONE COLUMN.
-     * This pinned the expanded card's framing at left 32% / right −8%, which was
-     * VIS-3's composition and correct until the owner asked for the emblem to be
-     * a column on the FAR RIGHT of both card states. The record's emblem no
-     * longer bleeds past the right border — that detail is gone, deliberately,
-     * because it was the reason the tile and the record never looked like the
-     * same object. What is pinned now is the thing that replaced it: BOTH cards
-     * use the same band, so a character wears its emblem in one place whichever
-     * state its card is in. */
-    const a = styleBlock('dossierField');
-    const c = styleBlock('dossierFieldCompact');
-    /* ⚠ THE SHARED THING IS THE EDGE, NOT THE WIDTH — and that is arithmetic,
-     * not a compromise. `contain` fits by width, so a box's width IS the
-     * emblem's size: 42% of the card makes a fragment on a 58dp tile and a
-     * complete logo on a 200dp record. The record takes a wider box to stay a
-     * fragment. Anchored to one right edge they read as one column; forced to
-     * one width they would not. */
-    expect(num(a, 'right')).toBe(num(c, 'right'));
-    expect(num(a, 'right')).toBeGreaterThan(0);      // contained, not bleeding
-    expect(num(a, 'left')).toBeGreaterThan(0);
-    expect(num(a, 'top')).toBe(num(a, 'bottom'));    // still vertically centred
-    expect(num(a, 'top')).toBeLessThan(0);           // still cropped by the card
-    expect(a).toContain("position: 'absolute'");
+  test('the expanded field keeps the COMPOSITION the owner approved', () => {
+    /* ⚠⚠⚠ THIS TEST HAS BEEN REWRITTEN THREE TIMES TO CHASE THE
+     * IMPLEMENTATION, AND THAT IS THE FINDING. It pinned four percentage
+     * numbers (VIS-3), then a "framing" of two of them (OTA-1753), then a
+     * shared right edge (OTA-1754) — each time because the numbers it pinned
+     * were an artifact of a mechanism rather than a statement about the
+     * picture. It now asks the only durable question: WHERE DOES THE EMBLEM
+     * LAND ON A MEASURED CARD?
+     * The approved composition is OTA-1754's: both states in a right-hand
+     * column with a 3% margin, the tile spanning 0.55-0.97 of the card and the
+     * record 0.35-0.97, both vertically centred on the artwork's own focus. */
+    const W = 375;
+    const band = (h: number, comp: { coverage: number; focusAtX: number; focusAtY: number }): [number, number] => {
+      const p = placeCrestField({ width: W, height: h }, crestArt('mud_monarchs')!, comp)!;
+      return [p.left / W, (p.left + p.width) / W];
+    };
+    const tile = band(55, { coverage: 0.42, focusAtX: 0.76, focusAtY: 0.5 });
+    const rec = band(143.5, { coverage: 0.62, focusAtX: 0.66, focusAtY: 0.5 });
+    expect(tile[0]).toBeCloseTo(0.55, 2);
+    expect(rec[0]).toBeCloseTo(0.35, 2);
+    // ⚠ THE SHARED THING IS THE RIGHT EDGE, not the width. `coverage` sets the
+    // emblem's size, so 42% makes a fragment on a 55dp tile and would make a
+    // near-complete logo on a 143dp record; the record takes the wider column
+    // to stay a fragment. Anchored to one edge they read as one column.
+    expect(tile[1]).toBeCloseTo(rec[1], 2);
+    expect(tile[1]).toBeCloseTo(0.97, 2);
   });
 
   test('the expanded card still carries BOTH the seal plate and the field, one decode', async () => {
@@ -429,7 +462,10 @@ describe('one generalised treatment, not a second unrelated effect', () => {
     // arithmetic that justifies them (ota1750/1751); what belongs here is that
     // the field is present, faded, and cannot take a touch.
     expect(fieldsOf(tree).length).toBeGreaterThan(0);
-    expect(TITLE).toMatch(/<View style=\{styles\.dossierFieldClip\} pointerEvents="none">/);
+    // ⚠ OTA-1756 added `onLayout` to this element; the anchor allows for it
+    // rather than pinning the exact prop list, which is how the previous
+    // version of this line broke when `factionId` was added.
+    expect(TITLE).toMatch(/<View style=\{styles\.dossierFieldClip\} pointerEvents="none"/);
   });
 
   test('the artwork itself is untouched, and never stretched', () => {
@@ -442,19 +478,30 @@ describe('one generalised treatment, not a second unrelated effect', () => {
     expect(crestFactionIds().length).toBe(9);
   });
 
-  test('it costs no state, no timer, no measurement and no subscription', () => {
-    /* ⚠ Slice to the next top-level declaration, not to the first `\n}` — the
-     * component's signature is destructured across lines now, so the lazy
-     * pattern stopped at the props type and graded four lines of nothing. */
+  test('⚠⚠⚠ it costs ONE measurement and one piece of state — and nothing else', () => {
+    /* ⚠⚠⚠ SUPERSEDED BY OTA-1756, AND THE OLD CLAIM WAS THE PROBLEM.
+     * This used to assert `not.toMatch(/useState|onLayout|.../)` — "it costs no
+     * measurement" — and it passed for four OTAs while the watermark was placed
+     * from a constant calibrated against a card nobody had ever measured. The
+     * cheapness this defended was exactly what made the geometry wrong, and
+     * "measuring is a layout pass per row, for a decoration" was the argument I
+     * used to avoid fixing it. The owner overruled it, correctly.
+     * So the claim is inverted, and BOUNDED: one useState, one onLayout, and
+     * still no timer, no animation, no ref and no subscription. The roster is a
+     * handful of rows and the state only changes when the box genuinely
+     * changes, so OTA-1739's quiet FlatList is intact — that is asserted by
+     * ota1756's "re-reporting the SAME box does not re-render the row". */
     const at = TITLE.indexOf('function DossierField(');
     expect(at).toBeGreaterThan(-1);
     const fn = TITLE.slice(at, TITLE.indexOf('\nexport function TitleScreen', at));
-    expect(fn).not.toMatch(/useState|useEffect|useRef|setInterval|setTimeout|onLayout|Animated/);
-    // one Image on a collapsed card; the expanded card's second is the seal
-    // plate that has been there since VIS-1.
+    expect((fn.match(/useState/g) ?? []).length).toBe(1);
+    expect((fn.match(/useCallback/g) ?? []).length).toBe(1);
+    // ⚠ the handler is WIRED, asked as a fact rather than as an occurrence
+    // count — counting `onLayout` mentions grades a variable name.
+    expect(fn).toMatch(/onLayout=\{onLayout\}/);
+    expect(fn).not.toMatch(/useEffect|useRef|setInterval|setTimeout|Animated|subscribe/);
     expect((fn.match(/<Image/g) ?? []).length).toBe(1);
-  });
-});
+  });});
 
 // ═══ 5. THE CARD STILL WORKS ═════════════════════════════════════════════════
 describe('the two-stage tap contract survives', () => {

@@ -17,6 +17,9 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
+import { crestArt, crestFactionIds } from '../app/engine/factionCrests';
+import { placeCrestField, landedFocus, visibleFraction } from '../app/ui/crestField';
+
 const ROOT = join(__dirname, '..');
 const read = (...p: string[]) => readFileSync(join(ROOT, ...p), 'utf8');
 const TITLE = read('app', 'screens', 'TitleScreen.tsx');
@@ -43,6 +46,26 @@ const contrast = (a: [number, number, number], b: [number, number, number]) => {
   const [hi, lo] = l1 > l2 ? [l1, l2] : [l2, l1];
   return (hi + 0.05) / (lo + 0.05);
 };
+
+
+/* ⚠⚠⚠ OTA-1756 — THESE CLAIMS ARE NOW ASKED OF THE PLACEMENT, NOT OF A
+ * STYLESHEET. Everything below used to be read out of `dossierField` /
+ * `dossierFieldCompact` as percentage insets, and converted with a constant
+ * calibrated against "a 340dp card, ~58dp collapsed, ~200dp expanded" — three
+ * numbers nobody had measured. The percentages are gone. The composition and a
+ * MEASURED card box now go to `placeCrestField`, and these tests ask where the
+ * emblem actually lands.
+ * ⚠ The card boxes below are real: read out of the running app at 411dp and at
+ * the 600dp tablet cap. Nothing here depends on their exact values — only on
+ * the placement tracking whatever box it is handed. */
+const MEASURED_TILE = { width: 375, height: 55 };
+const MEASURED_RECORD = { width: 375, height: 143.5 };
+const TABLET_TILE = { width: 564, height: 55 };
+const TILE_COMP = { coverage: 0.42, focusAtX: 0.76, focusAtY: 0.5 };
+const OPEN_COMP = { coverage: 0.62, focusAtX: 0.66, focusAtY: 0.5 };
+const placeTile = (id: string, card = MEASURED_TILE) => placeCrestField(card, crestArt(id)!, TILE_COMP)!;
+const placeRecord = (id: string, card = MEASURED_RECORD) => placeCrestField(card, crestArt(id)!, OPEN_COMP)!;
+const EVERY_CREST = crestFactionIds();
 
 describe('the emblem sits on the row\'s centre line', () => {
   /* ⚠⚠⚠ SUPERSEDED BY OTA-1752, ONE DEVICE LOOK LATER — REASONING KEPT.
@@ -74,28 +97,34 @@ describe('the emblem sits on the row\'s centre line', () => {
    * alpha he approved, the contrast arithmetic that replaced a layout rule, and
    * the coverage floor asserted independently of where the box sits — which is
    * precisely what let OTA-1754 move it without re-arguing any of them. */
-  test('⚠⚠ the emblem is a contained column, not a centred mark', () => {
-    const b = styleBlock('dossierFieldCompact');
-    expect(num(b, 'left')).toBeGreaterThan(0);
-    expect(num(b, 'right')).toBeGreaterThan(0);   // whole width on the card
-    // and it is deliberately NOT centred — that was the reading that was wrong
-    expect(Math.abs(num(b, 'left') - num(b, 'right'))).toBeGreaterThan(10);
+  test('⚠⚠ SUPERSEDED — the emblem is a contained column on the RIGHT, not a centred mark', () => {
+    /* ⚠⚠⚠ THIS PASS CENTRED THE EMBLEM ON A MISREADING, and OTA-1754 reversed
+     * it. The owner said the emblems were "still too far to the right"; that
+     * was read as "move them left" when it meant the emblem was RUNNING OFF the
+     * right edge. The column belongs on the right, contained. Kept as the
+     * record of a wrong turn, asserting the geometry that replaced it. */
+    for (const id of EVERY_CREST) {
+      const p = placeTile(id);
+      const centre = (p.left + p.width / 2) / MEASURED_TILE.width;
+      expect(centre).toBeGreaterThan(0.7);
+      expect(p.left).toBeGreaterThan(0);
+      expect(p.left + p.width).toBeLessThanOrEqual(MEASURED_TILE.width);
+    }
   });
 
   test('moving it did not cost coverage — still 42% of the tile', () => {
-    // The owner's floor from OTA-1750 was a third. Moving the box must not
-    // quietly shrink it, so the width is asserted independently of position —
-    // which is what let OTA-1752 slide it left without re-arguing the size.
-    const b = styleBlock('dossierFieldCompact');
-    const width = 100 - num(b, 'left') - num(b, 'right');
-    expect(width).toBe(42);
-    expect(width / 100).toBeGreaterThanOrEqual(1 / 3);
+    for (const id of EVERY_CREST) {
+      expect(placeTile(id).width / MEASURED_TILE.width).toBeCloseTo(0.42, 9);
+    }
   });
 
-  test('it stays vertically centred — only the HORIZONTAL centre moved', () => {
-    const b = styleBlock('dossierFieldCompact');
-    expect(num(b, 'top')).toBe(num(b, 'bottom'));
-    expect(num(b, 'top')).toBeLessThan(0); // ...and still cropped by the tile
+  test('it stays vertically centred — on the ARTWORK\'s focus, not the file\'s middle', () => {
+    // ⚠ OTA-1756: "vertically centred" now means the measured focus lands on
+    // the card's centre line, which is what this pass was reaching for and what
+    // the assumed-card arithmetic never actually delivered.
+    for (const id of EVERY_CREST) {
+      expect(landedFocus(MEASURED_TILE, crestArt(id)!, placeTile(id)).y).toBeCloseTo(0.5, 9);
+    }
   });
 });
 
@@ -130,57 +159,33 @@ describe('stronger, and the tile still reads', () => {
     expect(num(styleBlock('dossierFieldCompact'), 'opacity')).toBeLessThanOrEqual(0.22);
   });
 
-  test('the expanded card is untouched by this pass', () => {
-    // Only the collapsed tile was under discussion; the composition the owner
-    // approved keeps its geometry AND its alpha.
-    /* ⚠⚠⚠ WHAT THE OWNER APPROVED WAS THE FRAMING, NOT THE MECHANISM — and
-     * pinning all four numbers confused the two. He approved a composition:
-     * anchored at 32%, bleeding 8% off the right edge. The vertical spread is
-     * not composition, it is the lever that decides WHICH AXIS `contain` fits
-     * by, and OTA-1753 had to move it (-18% → -80%) so every crest fits by
-     * WIDTH — at -18% the tall crests fit by height and the square ones by
-     * width, so the emblem's size changed with the faction and the per-faction
-     * focus nudge had nothing stable to nudge.
-     * So this pins the framing, which is the promise, and leaves the spread to
-     * the pass that owns the fit. */
-    /* ⚠⚠⚠ SUPERSEDED BY OTA-1754 — THE TWO CARDS NOW SHARE ONE COLUMN.
-     * This pinned the expanded card's framing at left 32% / right −8%, which was
-     * VIS-3's composition and correct until the owner asked for the emblem to be
-     * a column on the FAR RIGHT of both card states. The record's emblem no
-     * longer bleeds past the right border — that detail is gone, deliberately,
-     * because it was the reason the tile and the record never looked like the
-     * same object. What is pinned now is the thing that replaced it: BOTH cards
-     * use the same band, so a character wears its emblem in one place whichever
-     * state its card is in. */
-    const a = styleBlock('dossierField');
-    const c = styleBlock('dossierFieldCompact');
-    /* ⚠ THE SHARED THING IS THE EDGE, NOT THE WIDTH — and that is arithmetic,
-     * not a compromise. `contain` fits by width, so a box's width IS the
-     * emblem's size: 42% of the card makes a fragment on a 58dp tile and a
-     * complete logo on a 200dp record. The record takes a wider box to stay a
-     * fragment. Anchored to one right edge they read as one column; forced to
-     * one width they would not. */
-    expect(num(a, 'right')).toBe(num(c, 'right'));
-    expect(num(a, 'right')).toBeGreaterThan(0);      // contained, not bleeding
-    expect(num(a, 'left')).toBeGreaterThan(0);
-    expect(num(a, 'top')).toBe(num(a, 'bottom'));    // still vertically centred
-    expect(num(a, 'top')).toBeLessThan(0);           // still cropped by the card
-
+  test('⚠ SUPERSEDED — the expanded card was NOT left untouched, and could not be', () => {
+    /* This asserted that OTA-1751 changed only the tile. OTA-1753 then had to
+     * move the record's box, OTA-1754 moved it again, and OTA-1756 replaced the
+     * mechanism for both. A test that pins one card as "unchanged" pins the
+     * absence of work rather than a property, and it failed four times for
+     * changes that were all correct. What is true and worth holding is that the
+     * two states share ONE treatment, differing only in the column each has
+     * room for. */
+    for (const id of EVERY_CREST) {
+      const t = placeTile(id);
+      const r = placeRecord(id);
+      expect(landedFocus(MEASURED_TILE, crestArt(id)!, t).y).toBeCloseTo(0.5, 9);
+      expect(landedFocus(MEASURED_RECORD, crestArt(id)!, r).y).toBeCloseTo(0.5, 9);
+      expect(r.width / MEASURED_RECORD.width).toBeGreaterThan(t.width / MEASURED_TILE.width);
+    }
   });
 });
 
 describe('what is deliberately NOT solved yet', () => {
-  test('⚠⚠ there is still no per-faction offset, and that is on purpose', () => {
-    /* Recorded so the next pass starts from the truth rather than rediscovering
-     * it: ONE set of insets serves all nine crests, so each faction shows
-     * whatever part of itself happens to fall in that window. The owner spotted
-     * this before the code did. Fixing it properly means a table keyed by
-     * faction id — the same shape as `CRESTS` in engine/factionCrests — not more
-     * tuning of these four numbers. This test fails the moment someone adds that
-     * table, which is the point: it should be a decision, not a drift. */
-    expect(TITLE).not.toMatch(/FIELD_OFFSETS|fieldOffsetFor|crestOffset/);
-    const b = styleBlock('dossierFieldCompact');
-    expect(Number.isFinite(num(b, 'left'))).toBe(true); // one static inset, not a lookup
+  test('⚠⚠ SUPERSEDED — there IS a per-faction offset now, and it is measured', () => {
+    /* When this pass shipped, every crest shared one window and that was a
+     * deliberate deferral. OTA-1753 added a per-faction table and OTA-1756
+     * re-measured it from the source assets at full resolution. The deferral is
+     * over; this now asserts what replaced it. */
+    const tops = EVERY_CREST.map((id) => placeTile(id).top);
+    expect(new Set(tops.map((t) => Math.round(t * 100))).size).toBeGreaterThan(5);
+    for (const id of EVERY_CREST) expect(crestArt(id)!.focusY).toBeLessThan(0.5);
   });
 
   test('the build stamp names this pass', () => {

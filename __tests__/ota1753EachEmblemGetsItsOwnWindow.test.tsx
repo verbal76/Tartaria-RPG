@@ -21,6 +21,8 @@ import { readFileSync, readdirSync } from 'fs';
 import { join } from 'path';
 import { crestArt, crestFactionIds, factionCrest } from '../app/engine/factionCrests';
 
+import { placeCrestField, landedFocus, visibleFraction } from '../app/ui/crestField';
+
 const ROOT = join(__dirname, '..');
 const read = (...p: string[]) => readFileSync(join(ROOT, ...p), 'utf8');
 const TITLE = read('app', 'screens', 'TitleScreen.tsx');
@@ -45,6 +47,26 @@ function pngSize(f: string) {
 }
 
 // ═══ 1. THE ART DATA IS REAL, COMPLETE, AND SAYS WHAT IT CLAIMS ══════════════
+
+/* ⚠⚠⚠ OTA-1756 — THESE CLAIMS ARE NOW ASKED OF THE PLACEMENT, NOT OF A
+ * STYLESHEET. Everything below used to be read out of `dossierField` /
+ * `dossierFieldCompact` as percentage insets, and converted with a constant
+ * calibrated against "a 340dp card, ~58dp collapsed, ~200dp expanded" — three
+ * numbers nobody had measured. The percentages are gone. The composition and a
+ * MEASURED card box now go to `placeCrestField`, and these tests ask where the
+ * emblem actually lands.
+ * ⚠ The card boxes below are real: read out of the running app at 411dp and at
+ * the 600dp tablet cap. Nothing here depends on their exact values — only on
+ * the placement tracking whatever box it is handed. */
+const MEASURED_TILE = { width: 375, height: 55 };
+const MEASURED_RECORD = { width: 375, height: 143.5 };
+const TABLET_TILE = { width: 564, height: 55 };
+const TILE_COMP = { coverage: 0.42, focusAtX: 0.76, focusAtY: 0.5 };
+const OPEN_COMP = { coverage: 0.62, focusAtX: 0.66, focusAtY: 0.5 };
+const placeTile = (id: string, card = MEASURED_TILE) => placeCrestField(card, crestArt(id)!, TILE_COMP)!;
+const placeRecord = (id: string, card = MEASURED_RECORD) => placeCrestField(card, crestArt(id)!, OPEN_COMP)!;
+const EVERY_CREST = crestFactionIds();
+
 describe('the measurement', () => {
   test('every faction with art has a focus, and nothing else does', () => {
     const ids = crestFactionIds();
@@ -56,115 +78,111 @@ describe('the measurement', () => {
     expect(crestArt(null)).toBeUndefined();
   });
 
-  test('⚠⚠ each recorded aspect matches the actual PNG', () => {
-    /* The one number in the table that can be checked against ground truth
-     * without re-running the harness — so if art is replaced and the table is
-     * not updated, this says so rather than the layout silently drifting. */
-    const files = readdirSync(join(ROOT, 'assets', 'crests')).filter((f) => f.endsWith('.png'));
-    expect(files).toHaveLength(9);
-    for (const f of files) {
-      const id = f.replace('.png', '');
-      const { w, h } = pngSize(f);
-      expect(crestArt(id)!.aspect).toBeCloseTo(h / w, 2);
+  test('⚠⚠ each recorded CANVAS matches the actual PNG, exactly', () => {
+    // ⚠ OTA-1756 replaced the rounded `aspect` with the exact `srcW`/`srcH`,
+    // so the aspect is DERIVED and can no longer disagree with the file it
+    // describes — the precise drift that shipped in OTA-1754.
+    for (const id of crestFactionIds()) {
+      const art = crestArt(id)!;
+      const { w, h } = pngSize(`${id}.png`);
+      expect([art.srcW, art.srcH]).toEqual([w, h]);
     }
   });
 
-  test('⚠⚠⚠ ALL NINE sit above centre — the finding, pinned as a fact', () => {
+  test('⚠⚠⚠ ALL NINE sit above centre — the finding, and it survived re-measurement', () => {
+    /* ⚠ THE FINDING HELD; THE NUMBERS DID NOT. OTA-1753 measured focusY at
+     * 0.339-0.466 by weighting alpha x max(0, luminance - 0.18) on a 128x128
+     * downsample. Discounting dim ink drags the centroid toward the brightest
+     * region, so every value came out too high — by 0.061 on true_tartarians.
+     * OTA-1756 re-measured at full resolution with alpha x luminance and no
+     * threshold: 0.398-0.494. Still every one above centre, which is why a
+     * window on the file's middle shows plinth rather than device. */
     const ys = crestFactionIds().map((id) => crestArt(id)!.focusY);
-    for (const y of ys) {
-      expect(y).toBeGreaterThan(0);
-      expect(y).toBeLessThan(0.5);          // above the middle, every one
-    }
-    // and the spread is real, which is why one shared offset would not do
-    expect(Math.max(...ys) - Math.min(...ys)).toBeGreaterThan(0.1);
+    for (const y of ys) expect(y).toBeLessThan(0.5);
+    expect(Math.min(...ys)).toBeGreaterThan(0.35);   // the old table went to 0.339
+    expect(Math.max(...ys)).toBeGreaterThan(0.47);
   });
 
   test('⚠ the harness that produced these numbers is COMMITTED, not just named', () => {
-    /* A measurement whose harness lives in an untracked scratchpad cannot be
-     * redone, which makes the table unmaintainable the moment art changes. So
-     * the harness ships, the source points at it, and this checks both. */
-    expect(CRESTS).toContain('scripts/measure-crest-focus.html');
-    expect(CRESTS.toLowerCase()).toContain('luminance');
-    const harness = read('scripts', 'measure-crest-focus.html');
-    expect(harness).toContain('focusY');
-    expect(harness).toContain('aspect');
-    for (const id of crestFactionIds()) expect(harness).toContain(`${id}.png`);
+    // ⚠ OTA-1756 replaced the browser/canvas harness with a dependency-free
+    // Python one, for two reasons: the old one needed a local web server to get
+    // canvas readback at all, and its 0.18 threshold silently biased the table.
+    const h = read('scripts', 'measure-crest-art.py');
+    expect(h).toContain('crests');
+    expect(h).toMatch(/def measure\(/);
+    expect(h.slice(h.indexOf('def measure('), h.indexOf('def main('))).not.toMatch(/0\.18/);
   });
 });
 
 // ═══ 2. THE CONVERSION FROM ART FACT TO LAYOUT NUDGE ═════════════════════════
 describe('the nudge', () => {
-  /** Mirrors the shipped formula, reading its constants from the source. */
-  const nudge = (k: number, id: string) => {
-    const a = crestArt(id)!;
-    return Math.round(k * (0.5 - a.focusY) * a.aspect);
-  };
+  /* ⚠ THE `nudge` HELPER IS GONE. It mirrored the shipped formula
+   * `round(K x (0.5 − focusY) x aspect)` so the test could check it — which
+   * meant the test could only ever confirm that the code equalled itself. It
+   * did exactly that, faithfully, while K was calibrated against a card nobody
+   * had measured. The tests below ask the PLACEMENT where the emblem landed on
+   * a measured card instead, which is a question the implementation cannot
+   * answer wrongly and still pass. */
 
-  test('⚠⚠ a focus above centre produces a DOWNWARD nudge — the whole point', () => {
-    // A positive nudge means less inset above and more below, which moves the
-    // image down and brings the subject into the window. Every crest qualifies.
-    const k = constant('TILE_NUDGE_K');
-    expect(k).toBeGreaterThan(0);
-    for (const id of crestFactionIds()) expect(nudge(k, id)).toBeGreaterThan(0);
-  });
-
-  test('the nudges differ per faction, or the table would be pointless', () => {
-    const k = constant('TILE_NUDGE_K');
-    const all = crestFactionIds().map((id) => nudge(k, id));
-    expect(new Set(all).size).toBeGreaterThanOrEqual(7);
-    // the extremes are far apart: the flattest crest barely moves, the highest
-    // one moves nearly half the tile's height
-    expect(Math.max(...all) - Math.min(...all)).toBeGreaterThan(25);
-  });
-
-  test('⚠⚠⚠ the nudge never uncovers the window', () => {
-    /* The failure this would cause is visible and ugly: shift too far and the
-     * emblem's edge walks into the tile, leaving a hard horizontal line. The
-     * image is ~3x the tile's height and the box is 6x, so there is slack — but
-     * it has to be checked against the LARGEST nudge, not assumed. */
-    const k = constant('TILE_NUDGE_K');
-    const spread = constant('TILE_SPREAD');
-    const tileW = 340; const tileH = 58;
-    const boxW = (1 - num(styleBlock('dossierFieldCompact'), 'left') / 100
-      - num(styleBlock('dossierFieldCompact'), 'right') / 100) * tileW;
+  test('⚠⚠ a focus above centre pushes the emblem DOWN — the whole point', () => {
+    /* The artwork's weight sits above the middle of its own file, so putting
+     * that weight on the card's centre line means the image must sit LOWER than
+     * a naively centred one. Asked of the placement rather than of a nudge
+     * constant: compare against where a centred image would have gone. */
     for (const id of crestFactionIds()) {
-      const a = crestArt(id)!;
-      const imgH = boxW * a.aspect;
-      const d = nudge(k, id);
-      const boxTop = -((spread - d) / 100) * tileH;
-      const boxH = (1 + (2 * spread) / 100) * tileH;
-      const imgTop = boxTop + (boxH - imgH) / 2;      // centred in its box
-      expect(imgTop).toBeLessThanOrEqual(0);          // covers the tile's top
-      expect(imgTop + imgH).toBeGreaterThanOrEqual(tileH); // ...and its bottom
+      const p = placeTile(id);
+      const naiveTop = MEASURED_TILE.height / 2 - p.height / 2;
+      expect(p.top).toBeGreaterThan(naiveTop);
+      expect(landedFocus(MEASURED_TILE, crestArt(id)!, p).y).toBeCloseTo(0.5, 9);
     }
   });
 
-  test('the device calibration is declared rather than hidden', () => {
-    // Percentages of width and of height cannot be linked in RN, so the
-    // conversion constant is the card's own shape. That is a real limitation and
-    // the source says so instead of presenting the number as universal.
-    expect(TITLE).toMatch(/K IS DEVICE-CALIBRATED/);
-    expect(constant('OPEN_NUDGE_K')).toBeGreaterThan(0);
-    expect(constant('OPEN_NUDGE_K')).toBeLessThan(constant('TILE_NUDGE_K'));
+  test('the placements differ per faction, or the table would be pointless', () => {
+    const tops = crestFactionIds().map((id) => Math.round(placeTile(id).top * 100));
+    expect(new Set(tops).size).toBeGreaterThan(5);
+  });
+
+  test('⚠⚠⚠ the placement never uncovers the window — the visible failure this could cause', () => {
+    // Pushing the emblem down to find the device must never pull its top edge
+    // onto the card. OTA-1756 makes this a guarantee rather than a hope: the
+    // coverage is raised, if it must be, until the emblem bleeds both edges.
+    for (const card of [MEASURED_TILE, MEASURED_RECORD, TABLET_TILE, { width: 286.5, height: 200.2 }]) {
+      for (const id of crestFactionIds()) {
+        const comp = card.height > 100 ? OPEN_COMP : TILE_COMP;
+        const p = placeCrestField(card, crestArt(id)!, comp)!;
+        expect(p.top).toBeLessThanOrEqual(1e-9);
+        expect(p.top + p.height).toBeGreaterThanOrEqual(card.height - 1e-9);
+      }
+    }
+  });
+
+  test('⚠⚠⚠ SUPERSEDED — THERE IS NO DEVICE CALIBRATION LEFT TO DECLARE', () => {
+    /* ⚠⚠⚠ THIS IS THE TEST THAT MATTERED, AND IT WAS SATISFIED BY A COMMENT.
+     * It asserted that the conversion constant "is declared rather than hidden"
+     * — and it passed, because the constant WAS declared. What it could not
+     * check was whether the declared numbers were true. They were not: "a 340dp
+     * card, ~58dp collapsed, ~200dp expanded" against a real 375x55 and
+     * 375x143.5, and the mock-ups that were supposed to catch it were drawn at
+     * those same assumed ratios.
+     * The honest replacement is not a better-declared constant. It is no
+     * constant: the card reports its own box and the placement is computed from
+     * that. This asserts the absence. */
+    const placement = TITLE.slice(TITLE.indexOf('TILE_FIELD'), TITLE.indexOf('export function TitleScreen'));
+    expect(placement).not.toMatch(/\b340\b|\b58dp\b|\b200dp\b/);
+    expect(TITLE).not.toMatch(/const\s+(TILE|OPEN)_NUDGE_K\s*=/);
+    expect(TITLE).toMatch(/onLayout=\{onLayout\}/);
   });
 });
 
 // ═══ 3. ONE TREATMENT, BOTH STATES ═══════════════════════════════════════════
 describe('the two card states stopped being two treatments', () => {
-  test('⚠⚠ both boxes now fit by WIDTH, for every crest', () => {
-    /* This is what makes the nudge meaningful. At the expanded card's old -18%
-     * spread, `contain` fit the tall crests by HEIGHT and the square ones by
-     * WIDTH — so the emblem's drawn size changed with the faction and there was
-     * no stable height to shift. Both boxes are now deep enough that width
-     * always runs out first. */
-    const cases: Array<[string, number]> = [['dossierFieldCompact', 58], ['dossierField', 200]];
-    for (const [name, cardH] of cases) {
-      const b = styleBlock(name);
-      const boxW = (1 - num(b, 'left') / 100 - num(b, 'right') / 100) * 340;
-      const boxH = (1 + Math.abs(num(b, 'top')) / 100 + Math.abs(num(b, 'bottom')) / 100) * cardH;
-      for (const id of crestFactionIds()) {
-        expect(boxH / boxW).toBeGreaterThanOrEqual(crestArt(id)!.aspect);
-      }
+  test('⚠⚠ RETIRED — the fit axis is not a question any more', () => {
+    // The drawn size is explicit pixels derived from the source canvas, so
+    // there is no axis for `contain` to choose. See ota1750's note.
+    for (const id of crestFactionIds()) {
+      const art = crestArt(id)!;
+      expect(placeTile(id).height / placeTile(id).width).toBeCloseTo(art.srcH / art.srcW, 9);
+      expect(placeRecord(id).height / placeRecord(id).width).toBeCloseTo(art.srcH / art.srcW, 9);
     }
   });
 
@@ -181,22 +199,25 @@ describe('the two card states stopped being two treatments', () => {
     expect((TITLE.match(/<DossierField crest=\{crest\} factionId=/g) ?? []).length).toBe(2);
   });
 
-  test('the styles are built ONCE at module load, not per row', () => {
-    /* A roster is a FlatList and OTA-1739 fought to keep it quiet. Nine factions
-     * x two states is eighteen objects, computed at import and looked up after.
-     * The component must do a lookup, never a computation. */
-    const at = TITLE.indexOf('function DossierField(');
-    const fn = TITLE.slice(at, TITLE.indexOf('\nexport function TitleScreen', at));
-    expect(fn).toContain('FIELD_STYLES[factionId]');
-    expect(fn).not.toMatch(/fieldNudge\(|crestArt\(|Math\./);
-    expect(TITLE).toMatch(/for \(const id of crestFactionIds\(\)\) \{/);
+  test('⚠⚠ SUPERSEDED — the styles CANNOT be built at module load any more', () => {
+    /* This asserted that eighteen style objects were built once at import and
+     * looked up by key, so the FlatList did no per-row work. That was true, and
+     * it was only possible because the geometry was a constant — which is
+     * exactly what made it wrong on every card. Placement now depends on a
+     * measurement that does not exist until the row lays out.
+     * ⚠ The cost is bounded and asserted elsewhere: one useState and one
+     * onLayout per row (ota1747), and re-reporting the same box changes nothing
+     * (ota1756), so a scroll or a recycle is still free. */
+    expect(TITLE).not.toMatch(/const FIELD_STYLES/);
+    expect(TITLE).toMatch(/useState<CardBox \| null>/);
   });
 
-  test('a faction with no art borrows nobody else\'s offsets', () => {
-    expect(crestArt('no_such_faction')).toBeUndefined();
-    expect(factionCrest('no_such_faction')).toBeUndefined();
-    // the lookup is keyed, so an unknown id simply finds nothing
-    expect(TITLE).toContain('const tuned = factionId ? FIELD_STYLES[factionId] : undefined;');
+  test('a faction with no art borrows nobody else\'s numbers', () => {
+    expect(crestArt('not_a_faction')).toBeUndefined();
+    expect(crestArt(undefined)).toBeUndefined();
+    expect(crestArt(null)).toBeUndefined();
+    // and the screen renders nothing rather than falling back to a guess
+    expect(TITLE).toMatch(/const place = card && art/);
   });
 
   test('the build stamp names this pass', () => {

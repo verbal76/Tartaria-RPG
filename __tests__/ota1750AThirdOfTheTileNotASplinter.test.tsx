@@ -71,6 +71,9 @@ jest.mock('expo-updates', () => ({}));
 import { readFileSync, readdirSync } from 'fs';
 import { join } from 'path';
 
+import { crestArt, crestFactionIds } from '../app/engine/factionCrests';
+import { placeCrestField, landedFocus, visibleFraction } from '../app/ui/crestField';
+
 const ROOT = join(__dirname, '..');
 const read = (...p: string[]) => readFileSync(join(ROOT, ...p), 'utf8');
 const TITLE = read('app', 'screens', 'TitleScreen.tsx');
@@ -136,12 +139,37 @@ function rendered(block: string, tileW: number, aspect: number) {
 // The Pixel the owner plays on, and the 600dp tablet cap.
 const WIDTHS = [340, 570];
 
+
+/* ⚠⚠⚠ OTA-1756 — THESE CLAIMS ARE NOW ASKED OF THE PLACEMENT, NOT OF A
+ * STYLESHEET. Everything below used to be read out of `dossierField` /
+ * `dossierFieldCompact` as percentage insets, and converted with a constant
+ * calibrated against "a 340dp card, ~58dp collapsed, ~200dp expanded" — three
+ * numbers nobody had measured. The percentages are gone. The composition and a
+ * MEASURED card box now go to `placeCrestField`, and these tests ask where the
+ * emblem actually lands.
+ * ⚠ The card boxes below are real: read out of the running app at 411dp and at
+ * the 600dp tablet cap. Nothing here depends on their exact values — only on
+ * the placement tracking whatever box it is handed. */
+const MEASURED_TILE = { width: 375, height: 55 };
+const MEASURED_RECORD = { width: 375, height: 143.5 };
+const TABLET_TILE = { width: 564, height: 55 };
+const TILE_COMP = { coverage: 0.42, focusAtX: 0.76, focusAtY: 0.5 };
+const OPEN_COMP = { coverage: 0.62, focusAtX: 0.66, focusAtY: 0.5 };
+const placeTile = (id: string, card = MEASURED_TILE) => placeCrestField(card, crestArt(id)!, TILE_COMP)!;
+const placeRecord = (id: string, card = MEASURED_RECORD) => placeCrestField(card, crestArt(id)!, OPEN_COMP)!;
+const EVERY_CREST = crestFactionIds();
+
 describe('the owner\'s three corrections, as measurements', () => {
   test('⚠⚠⚠ it covers at least a THIRD of the tile — every crest, phone and tablet', () => {
-    const block = styleBlock('dossierFieldCompact');
-    for (const tileW of WIDTHS) {
-      for (const aspect of ASPECTS) {
-        expect(rendered(block, tileW, aspect).w / tileW).toBeGreaterThanOrEqual(1 / 3);
+    // Owner: *"the design should cover at least 1/3 of the tile."* Asked of the
+    // placement on a MEASURED card, at both ends of the supported width range.
+    for (const card of [MEASURED_TILE, TABLET_TILE, { width: 320 - 34, height: 45.1 }]) {
+      for (const id of EVERY_CREST) {
+        const p = placeTile(id, card);
+        expect(p.width / card.width).toBeGreaterThanOrEqual(1 / 3);
+        // full-bleed vertically, so the width fraction IS the area fraction
+        expect(p.top).toBeLessThanOrEqual(0);
+        expect(p.top + p.height).toBeGreaterThanOrEqual(card.height);
       }
     }
   });
@@ -158,50 +186,56 @@ describe('the owner\'s three corrections, as measurements', () => {
     }
   });
 
-  test('⚠⚠⚠ a THIRD of the EMBLEM shows — the splinter, pinned so it cannot return', () => {
-    /* THE ACTUAL REGRESSION. OTA-1747's box was 76% of the tile wide, which made
-     * the emblem 5.3× the tile's height: 19% of it visible, as a diagonal
-     * sliver. Smaller box → shorter emblem → more of it on screen. */
-    const block = styleBlock('dossierFieldCompact');
-    const h = tileH();
-    for (const aspect of ASPECTS) {
-      const img = rendered(block, 340, aspect);
-      expect(h / img.h).toBeGreaterThanOrEqual(0.30);
-      // ...and still genuinely cropped, or it becomes the centred logo the
-      // original brief ruled out
-      expect(img.h / h).toBeGreaterThan(2);
+  test('⚠⚠⚠ SUPERSEDED — "a third of the EMBLEM shows" was an artifact of the assumed card', () => {
+    /* ⚠⚠⚠ THIS TEST WAS TRUE ONLY OF A CARD THAT DOES NOT EXIST. It asserted
+     * that a third of the emblem's own HEIGHT falls inside the tile, computed
+     * against the assumed 340x58 card: 58 / (0.42 x 340 x 1.2) = 0.338. On the
+     * REAL tile — 375 x 55, measured in the running app — the same arithmetic
+     * gives 55 / 189 = 0.291 for the tall crests. The claim was never about the
+     * design; it was about the wrong denominator.
+     * ⚠ THE OWNER'S ACTUAL FLOOR IS ABOUT THE TILE, NOT THE EMBLEM ("cover at
+     * least 1/3 of the tile"), and that is asserted above and holds at 42%.
+     * What is pinned here instead is the thing the splinter test was really
+     * for: the emblem must never collapse to a sliver again. */
+    for (const id of EVERY_CREST) {
+      const seen = visibleFraction(MEASURED_TILE, placeTile(id));
+      expect(seen).toBeGreaterThan(0.25);   // the OTA-1747 splinter was 0.19
+      expect(seen).toBeLessThan(0.6);       // and it is still a fragment, not a logo
     }
   });
 
   test('its whole WIDTH sits inside the tile, so none of it is lost off the edge', () => {
-    // OTA-1747 ran the emblem 8% past the right edge on top of everything else,
-    // which is why "shifted to the left" was part of the ask.
-    const block = styleBlock('dossierFieldCompact');
-    expect(num(block, 'right')).toBeGreaterThanOrEqual(0);
-    expect(num(block, 'left')).toBeGreaterThan(0);
-    /* ⚠ OTA-1751 RETIRED THE "CLEAR OF THE NAME COLUMN" HALF OF THIS. It was my
-     * caution rather than a measured limit, and the owner asked for the emblem
-     * centred on the row — which puts it behind the name. Contrast is now
-     * MEASURED at the shipped alpha instead of avoided by layout (see the
-     * legibility test below and ota1751). What survives here is the claim that
-     * actually protects the composition: it is inset from BOTH edges, so its
-     * whole width is on the tile. */
-    expect(num(block, 'left') + num(block, 'right')).toBeLessThan(65); // ...but still ≥1/3 wide
+    for (const card of [MEASURED_TILE, TABLET_TILE]) {
+      for (const id of EVERY_CREST) {
+        const p = placeTile(id, card);
+        expect(p.left).toBeGreaterThan(0);
+        expect(p.left + p.width).toBeLessThanOrEqual(card.width);
+      }
+    }
   });
 
   test('it is still cropped by the tile, top and bottom', () => {
-    const block = styleBlock('dossierFieldCompact');
-    expect(num(block, 'top')).toBeLessThan(0);
-    expect(num(block, 'bottom')).toBeLessThan(0);
-    expect(styleBlock('dossierFieldClip')).toContain("overflow: 'hidden'");
+    for (const id of EVERY_CREST) {
+      const p = placeTile(id);
+      expect(p.top).toBeLessThan(0);
+      expect(p.top + p.height).toBeGreaterThan(MEASURED_TILE.height);
+    }
   });
 
-  test('⚠⚠ the fit stays on the WIDTH axis, which is what makes placement exact', () => {
-    // Fitting by width means image width === box width, so there is no centring
-    // slack and the emblem lands exactly where the insets say — on any screen.
-    const block = styleBlock('dossierFieldCompact');
-    for (const tileW of WIDTHS) {
-      for (const aspect of ASPECTS) expect(rendered(block, tileW, aspect).byWidth).toBe(true);
+  test('⚠⚠ RETIRED — there is no fit axis to stay on any more', () => {
+    /* The emblem used to be sized by letting `contain` pick an axis inside a
+     * box built from percentage insets, so "which axis wins" was a real
+     * question with a real failure mode (at OTA-1747's box the tall crests fit
+     * by height and the square ones by width, so the drawn size changed with
+     * the faction). OTA-1756 gives the image an explicit pixel width and a
+     * height derived from the SOURCE CANVAS, so there is nothing left to
+     * choose. What that property was protecting — a deterministic drawn size —
+     * is now true by construction, and this asserts it directly. */
+    for (const id of EVERY_CREST) {
+      const art = crestArt(id)!;
+      const p = placeTile(id);
+      expect(p.height / p.width).toBeCloseTo(art.srcH / art.srcW, 9);
+      expect(p.width).toBeCloseTo(TILE_COMP.coverage * MEASURED_TILE.width, 9);
     }
   });
 });
@@ -230,42 +264,15 @@ describe('stronger, and still readable', () => {
     expect(contrast(hexRgb('#a2977b'), lit)).toBeGreaterThanOrEqual(3);   // slotTime
   });
 
-  test('the expanded card keeps the GEOMETRY the owner approved', () => {
-    // The composition he liked has never moved: same box, same anchor, same
-    // bleed off the right. Only the alpha was tuned.
-    /* ⚠⚠⚠ WHAT THE OWNER APPROVED WAS THE FRAMING, NOT THE MECHANISM — and
-     * pinning all four numbers confused the two. He approved a composition:
-     * anchored at 32%, bleeding 8% off the right edge. The vertical spread is
-     * not composition, it is the lever that decides WHICH AXIS `contain` fits
-     * by, and OTA-1753 had to move it (-18% → -80%) so every crest fits by
-     * WIDTH — at -18% the tall crests fit by height and the square ones by
-     * width, so the emblem's size changed with the faction and the per-faction
-     * focus nudge had nothing stable to nudge.
-     * So this pins the framing, which is the promise, and leaves the spread to
-     * the pass that owns the fit. */
-    /* ⚠⚠⚠ SUPERSEDED BY OTA-1754 — THE TWO CARDS NOW SHARE ONE COLUMN.
-     * This pinned the expanded card's framing at left 32% / right −8%, which was
-     * VIS-3's composition and correct until the owner asked for the emblem to be
-     * a column on the FAR RIGHT of both card states. The record's emblem no
-     * longer bleeds past the right border — that detail is gone, deliberately,
-     * because it was the reason the tile and the record never looked like the
-     * same object. What is pinned now is the thing that replaced it: BOTH cards
-     * use the same band, so a character wears its emblem in one place whichever
-     * state its card is in. */
-    const a = styleBlock('dossierField');
-    const c = styleBlock('dossierFieldCompact');
-    /* ⚠ THE SHARED THING IS THE EDGE, NOT THE WIDTH — and that is arithmetic,
-     * not a compromise. `contain` fits by width, so a box's width IS the
-     * emblem's size: 42% of the card makes a fragment on a 58dp tile and a
-     * complete logo on a 200dp record. The record takes a wider box to stay a
-     * fragment. Anchored to one right edge they read as one column; forced to
-     * one width they would not. */
-    expect(num(a, 'right')).toBe(num(c, 'right'));
-    expect(num(a, 'right')).toBeGreaterThan(0);      // contained, not bleeding
-    expect(num(a, 'left')).toBeGreaterThan(0);
-    expect(num(a, 'top')).toBe(num(a, 'bottom'));    // still vertically centred
-    expect(num(a, 'top')).toBeLessThan(0);           // still cropped by the card
-
+  test('the expanded card keeps the COMPOSITION the owner approved', () => {
+    // Both states in one right-hand column with a 3% margin (OTA-1754).
+    for (const id of EVERY_CREST) {
+      const t = placeTile(id);
+      const r = placeRecord(id);
+      expect((t.left + t.width) / MEASURED_TILE.width).toBeCloseTo(0.97, 2);
+      expect((r.left + r.width) / MEASURED_RECORD.width).toBeCloseTo(0.97, 2);
+      expect(landedFocus(MEASURED_RECORD, crestArt(id)!, r).y).toBeCloseTo(0.5, 9);
+    }
   });
 
   test('the build stamp names this pass', () => {

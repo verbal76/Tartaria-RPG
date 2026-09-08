@@ -105,10 +105,15 @@ const WEB_NATIVE_STUBS = new Set([
   'expo-speech-recognition',
 ]);
 const WEB_STUB_FILE = path.resolve(__dirname, 'web-stubs/native-noop.js');
+const HARNESS = process.env.TARTARIA_WEB_HARNESS === '1';
+const HARNESS_STORE = path.resolve(__dirname, 'web-harness/gameStoreStub.js');
 const __priorResolveRequest = config.resolver.resolveRequest;
 config.resolver.resolveRequest = (context, moduleName, platform) => {
   if (platform === 'web' && WEB_NATIVE_STUBS.has(moduleName)) {
     return { type: 'sourceFile', filePath: WEB_STUB_FILE };
+  }
+  if (HARNESS && platform === 'web' && /(^|\/)state\/gameStore$/.test(moduleName)) {
+    return { type: 'sourceFile', filePath: HARNESS_STORE };
   }
   const next = __priorResolveRequest ?? context.resolveRequest;
   return next(context, moduleName, platform);

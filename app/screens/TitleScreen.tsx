@@ -10,7 +10,7 @@ import {
   Linking,
   Share,
   Platform,
-  type ImageStyle,
+  type LayoutChangeEvent,
 } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import * as Application from 'expo-application';
@@ -60,7 +60,8 @@ import { modelBootPercent, modelsStillLoading } from '../ui/modelBootProgress'; 
 // ⚠⚠⚠ VIS-1 — the Tartaria interface kit. This screen is its first reference
 // implementation; read app/ui/tartariaKit.tsx before adding anything visual here.
 import { T, TType, TButton, TDivider, TRule, TCorners, TResourceChit, TFactionPlate, TGear, TSettle, TStrata } from '../ui/tartariaKit';
-import { factionCrest, crestArt, crestFactionIds, type CrestArt } from '../engine/factionCrests';
+import { factionCrest, crestArt } from '../engine/factionCrests';
+import { placeCrestField, type CardBox, type FieldComposition } from '../ui/crestField';
 
 const races = racesData as { id: string; name: string }[];
 const locations = locationsData as { id: string; name: string }[];
@@ -122,62 +123,41 @@ function resumeObjectiveLine(phase: MainQuestPhase, cores: number): string {
  * seal plate above it, so RN decodes the asset once and both draw from one cache
  * entry; on a collapsed card it is the only draw. No animation, no measurement,
  * no state, no subscription. */
-/* ⚠⚠⚠ AND WHERE THAT WINDOW SITS ON THE ARTWORK — OTA-1753.
+/* ⚠⚠⚠ WHAT THE TWO CARDS WANT TO LOOK LIKE — AND NOTHING ABOUT HOW BIG THEY ARE.
  *
- * `engine/factionCrests` measures where each emblem lives inside its own file.
- * This converts that art fact into a nudge for THESE two boxes, which is layout
- * and therefore belongs here rather than beside the measurement.
+ * OTA-1756. Everything that used to live here — TILE_NUDGE_K, OPEN_NUDGE_K, a
+ * percentage-inset nudge and the "340dp card, ~58dp tile, ~200dp record" it was
+ * derived from — is DELETED. Those numbers were typed, not measured. The real
+ * card on a 411dp phone is 375dp wide and about 136dp tall expanded, so the
+ * constant was a quarter out; and when OTA-1754 changed the box width, the
+ * constant derived from that width was left behind, still carrying a comment
+ * describing the geometry that had just been replaced.
  *
- * ⚠⚠ THE ARITHMETIC. Both boxes fit the emblem BY WIDTH, so the drawn height is
- * `boxWidthFraction × cardWidth × aspect`. To bring a focus at `focusY` to the
- * middle of the window the image must move DOWN by `(0.5 − focusY) × drawnHeight`
- * pixels. The box's `top`/`bottom` are percentages of the CARD'S HEIGHT, and
- * making them asymmetric by `d` while keeping their sum constant moves the image
- * down by exactly `d%` of the card's height without changing the box's size. So
- *     d = 100 × (0.5 − focusY) × aspect × (boxWidthFraction × cardW ÷ cardH)
- * and the trailing ratio is the only part that is not universal — it is the
- * card's own shape. K below is that ratio, measured on the Pixel.
+ * ⚠⚠ THE OWNER'S DIAGNOSIS, WHICH IS THE REAL LESSON: the mock-ups that were
+ * meant to catch this were drawn at 595x101.5 and 595x350 — the SAME assumed
+ * ratios the code used — so they were not an independent check, they were an
+ * echo. Two artifacts sharing one unverified input cannot disagree.
  *
- * ⚠ SO K IS DEVICE-CALIBRATED AND SAYS SO. Percentages of width and percentages
- * of height cannot be linked in RN, so a watermark nudge cannot be made
- * resolution-independent without measuring the card at runtime — which is a
- * layout pass on every row, for a decoration. Calibrating on the phone the owner
- * plays on and writing the formula down is the honest trade; on a tablet the
- * nudge lands short rather than wrong, and the emblem is merely less
- * well-centred, never displaced.
+ * ⚠⚠ SO THESE ARE COMPOSITION, NOT ARITHMETIC. Fractions of whatever the card
+ * actually measures at runtime, which means they mean the same thing on a 320dp
+ * phone, the owner's Pixel, and the 600dp tablet cap. `ui/crestField` turns them
+ * into pixels using the MEASURED box; nothing here or there knows a device.
  *
- * ⚠⚠ AND IT COSTS NOTHING AT RENDER. Every style is built ONCE at module load,
- * keyed by faction — nine entries, two each. `DossierField` does a lookup, not a
- * computation, so this adds no per-row work to a FlatList that OTA-1739 fought
- * to keep quiet. */
-const TILE_NUDGE_K = 246;   // 42% of a 340dp card, over a ~58dp collapsed tile
-const OPEN_NUDGE_K = 129;   // 76% of a 340dp card, over a ~200dp expanded card
-
-/** Recentre the window on the artwork's own focus, in % of the card's height. */
-function fieldNudge(k: number, art: CrestArt | undefined): number {
-  if (!art) return 0;                                   // no measurement, no guess
-  return Math.round(k * (0.5 - art.focusY) * art.aspect);
-}
-
-/* ⚠ The two resting boxes. `dossierField` / `dossierFieldCompact` in the
- * StyleSheet below hold everything a nudge does NOT touch; these constants are
- * the vertical extents the nudge splits. Kept beside the formula so the pair
- * cannot drift apart. */
-const TILE_SPREAD = 250;    // top/bottom of the collapsed tile's box
-const OPEN_SPREAD = 80;     // top/bottom of the expanded card's box
-
-type FieldStyles = { compact: ImageStyle; open: ImageStyle };
-const FIELD_STYLES: Record<string, FieldStyles> = {};
-for (const id of crestFactionIds()) {
-  const art = crestArt(id);
-  const dTile = fieldNudge(TILE_NUDGE_K, art);
-  const dOpen = fieldNudge(OPEN_NUDGE_K, art);
-  FIELD_STYLES[id] = {
-    // a POSITIVE nudge moves the emblem down: less inset above, more below.
-    compact: { top: `${-(TILE_SPREAD - dTile)}%`, bottom: `${-(TILE_SPREAD + dTile)}%` },
-    open: { top: `${-(OPEN_SPREAD - dOpen)}%`, bottom: `${-(OPEN_SPREAD + dOpen)}%` },
-  };
-}
+ * ⚠ THE VALUES ARE THE APPROVED TREATMENT, CARRIED OVER UNCHANGED. Both cards
+ * keep the right-hand column with a 3% margin from OTA-1754: the tile's emblem
+ * is 42% of the card wide and centred at 0.76 (so it spans 0.55–0.97), the
+ * record's is 62% and centred at 0.66 (spanning 0.35–0.97). Identical bands to
+ * what shipped. The only thing that changes is that they now land where the
+ * arithmetic always claimed they would.
+ *
+ * ⚠ THE TWO STATES ARE SEPARATE ON PURPOSE. They share one faction's art and one
+ * focus measurement, but a 56dp strip and a ~136dp record are not the same
+ * picture: the tile needs the narrower column precisely BECAUSE a wider one
+ * makes a taller emblem and shows less of it (the trap OTA-1750 documented).
+ * Vertically both centre the artwork's focus, which is what every pass since
+ * OTA-1751 has been trying and failing to do. */
+const TILE_FIELD: FieldComposition = { coverage: 0.42, focusAtX: 0.76, focusAtY: 0.5 };
+const OPEN_FIELD: FieldComposition = { coverage: 0.62, focusAtX: 0.66, focusAtY: 0.5 };
 
 /* ⚠⚠⚠ THE FACTION FIELD — ONE TREATMENT, EVERY CARD, EACH ITS OWN EMBLEM.
  *
@@ -187,36 +167,63 @@ for (const id of crestFactionIds()) {
  * rather than a logo placed on it. OTA-1747 put it on both card states, and
  * OTA-1753 gave each faction its own window onto its own artwork.
  *
- * ⚠⚠ BOTH STATES NOW WEAR THE SAME TREATMENT. They previously did not: the
- * expanded card sat at 0.13 against the tile's 0.22 and fit by a different axis
- * depending on the crest, so beside a tile it read as absent — which is what the
- * owner saw when he asked for the image "in both". They now share the alpha, the
- * fit axis and the focus table, and differ only in the box each surface has room
- * for. A tile is a 58dp strip; a record is four times that.
+ * ⚠⚠ BOTH STATES WEAR THE SAME TREATMENT — one alpha family, one focus table,
+ * one placement rule — and differ only in the column each surface has room for.
+ *
+ * ⚠⚠⚠ OTA-1756 — IT MEASURES THE CARD INSTEAD OF ASSUMING IT. The clip reports
+ * its own box through `onLayout`; that box, the faction's measured art and the
+ * state's composition go to `placeCrestField`, which returns absolute pixels.
+ * There is no reference device left in this file. The emblem is not drawn at all
+ * until the card has been measured, so it can never flash at a guessed position
+ * and then correct itself.
+ *
+ * ⚠⚠ AND THAT IS ALSO WHY THIS IS NOW RENDERABLE ANYWHERE. The percentage
+ * `top`/`bottom` insets it replaces are a Yoga-only trick: on react-native-web
+ * they do not resolve at all and the emblem lands at its full 1145x1374 asset
+ * size across the whole screen. Pixel placement behaves identically on every
+ * target — which is what finally made it possible to PHOTOGRAPH this treatment
+ * in the real app instead of arguing about it from a mock-up.
  *
  * ⚠ WHAT IT REFUSES TO DO. A faction the game ships no art for renders NOTHING —
  * no placeholder, no substitute emblem, no generic mark, and no borrowed offset.
  * `pointerEvents="none"` throughout, so the tap, the second tap that loads, the
- * swipe-to-delete and the scroll all pass straight through. `contain` always:
- * the emblem is cropped by its container and NEVER stretched.
+ * swipe-to-delete and the scroll all pass straight through. `contain` stays on
+ * even though the box now matches the source aspect exactly: if a recorded
+ * canvas size ever went stale the emblem would letterbox rather than stretch.
  *
- * ⚠ AND IT IS FREE. On an expanded card this is the same `source` as the riveted
- * seal plate above it, so RN decodes the asset once and both draw from one cache
- * entry. No animation, no measurement, no state, no subscription. */
+ * ⚠ THE COST IS ONE EXTRA RENDER PER ROW, ONCE. `onLayout` fires on mount and
+ * the state only changes when the box genuinely changes size, so a scroll, a
+ * re-render or a FlatList recycle costs nothing. That is the price of not
+ * guessing, and OTA-1739's quiet FlatList survives it. */
 function DossierField({
   crest, factionId, compact = false,
 }: { crest: number | undefined; factionId?: string; compact?: boolean }) {
+  // ⚠ Hooks run before the `crest` guard — a row that gains or loses art on
+  // recycle must not change how many hooks this component calls.
+  const [card, setCard] = useState<CardBox | null>(null);
+  const onLayout = useCallback((e: LayoutChangeEvent) => {
+    const { width, height } = e.nativeEvent.layout;
+    if (!(width > 0) || !(height > 0)) return;
+    setCard((prev) => (prev && prev.width === width && prev.height === height
+      ? prev                       // same box: no state change, no re-render
+      : { width, height }));
+  }, []);
+
+  const art = crestArt(factionId);
+  const place = card && art
+    ? placeCrestField(card, art, compact ? TILE_FIELD : OPEN_FIELD)
+    : null;
+
   if (crest === undefined) return null;
-  const tuned = factionId ? FIELD_STYLES[factionId] : undefined;
   return (
-    <View style={styles.dossierFieldClip} pointerEvents="none">
-      <Image
-        source={crest}
-        style={compact
-          ? [styles.dossierFieldCompact, tuned?.compact]
-          : [styles.dossierField, tuned?.open]}
-        resizeMode="contain"
-      />
+    <View style={styles.dossierFieldClip} pointerEvents="none" onLayout={onLayout}>
+      {place && (
+        <Image
+          source={crest}
+          style={[compact ? styles.dossierFieldCompact : styles.dossierField, place]}
+          resizeMode="contain"
+        />
+      )}
     </View>
   );
 }
@@ -1615,7 +1622,11 @@ const styles = StyleSheet.create({
    * what makes the placement exact and the per-faction focus nudge meaningful
    * (OTA-1753). At 52% of the card's width the emblem is still taller than the
    * record, so it stays a cropped fragment rather than a logo. */
-  dossierField: { position: 'absolute', top: '-80%', bottom: '-80%', right: '3%', left: '35%', opacity: 0.2 },
+  /* ⚠ OTA-1756 — GEOMETRY LEFT THIS STYLE ENTIRELY. Position and size arrive
+   * per-row from `placeCrestField`, computed against the card's MEASURED box.
+   * What stays here is the visual treatment the owner approved and asked to
+   * be frozen: the alpha, and nothing else. */
+  dossierField: { position: 'absolute', opacity: 0.2 },
   /* ⚠⚠⚠ THE COLLAPSED CARD NEEDS DIFFERENT NUMBERS TO GET THE SAME LOOK — AND
    * OTA-1747 GOT THEM WRONG IN THE OTHER DIRECTION. Recorded because the error
    * is instructive and I would otherwise repeat it.
@@ -1664,7 +1675,9 @@ const styles = StyleSheet.create({
    * height still a fragment cropped top and bottom. A wider column would make
    * the emblem TALLER and therefore show LESS of it — the trap OTA-1750
    * documented, which is why this is not simply widened to match the record. */
-  dossierFieldCompact: { position: 'absolute', top: '-250%', bottom: '-250%', right: '3%', left: '55%', opacity: 0.22 },
+  /* ⚠ OTA-1756 — likewise. The tile's 0.22 is the value the owner asked for
+   * by name ("bump to .22"); it is untouched. */
+  dossierFieldCompact: { position: 'absolute', opacity: 0.22 },
   dossierNameRule: { marginTop: 6, marginBottom: 6 },
   /* ⚠ PHONE-FIX — INDEX TICKS: three hairlines machined across the spine, the
    * way a real filed plate carries a position mark. Fine technical engraving is

@@ -56,48 +56,73 @@ export function crestFactionIds(): string[] {
  * *"we might need a custom position for each emblem since they are all not
  * symmetrical."* He was right, and this is the measurement that proves it.
  *
- * ⚠⚠ THE NUMBERS ARE MEASURED, NOT CHOSEN. Each crest was drawn to a 128x128
- * canvas and reduced to the LUMINANCE-WEIGHTED CENTROID of its artwork, with the
- * near-black ground discounted so the figure follows the device rather than the
- * frame around it. `scripts/measure-crest-focus.html` is the harness — committed
- * precisely so this table can be redone; re-run it after replacing any art, and
- * note that `aspect` is checked against the real PNG headers by ota1753, so a
- * stale table fails CI rather than drifting silently.
+ * ⚠⚠ THE NUMBERS ARE MEASURED FROM THE SOURCE PNGs, AT FULL RESOLUTION.
+ * `scripts/measure-crest-art.py` decodes each file (a small exact PNG reader —
+ * no browser, no image library, no downsample) and reduces it to the centroid of
+ * ALPHA x LUMINANCE. That weighting is not a taste call: the watermark is
+ * composited at low opacity over a dark plate, so a pixel's contribution to what
+ * the eye actually sees IS its alpha times its brightness. Re-run the harness
+ * after replacing any art; `srcW`/`srcH` are checked against the real PNG
+ * headers by ota1756, so a stale table fails CI instead of drifting silently.
  *
- * ⚠⚠⚠ AND THE RESULT IS SYSTEMATIC, WHICH IS THE PART WORTH KNOWING: every one
- * of the nine sits ABOVE the middle of its frame — focusY runs 0.339 to 0.466,
- * mean 0.40, and not one is at 0.5. So a window on the vertical CENTRE of these
- * files shows the LOWER part of every emblem: the ground and the plinth, never
- * the device. That is not a per-faction quirk to be tuned away, it is how this
- * set was drawn, and it explains why the roster fragments read as rubble.
+ * ⚠⚠⚠ THIS TABLE REPLACES A MEASUREMENT THAT WAS SUBTLY WRONG, AND THE REASON
+ * MATTERS. The previous one (OTA-1753) weighted by alpha x max(0, luminance −
+ * 0.18) on a 128x128 downsample. Discounting dim ink drags the centroid toward
+ * the brightest region, so every focusY came out too high — by 0.013 on
+ * `forgotten_order`, by 0.061 on `true_tartarians`. That 0.18 was a magic number
+ * that silently changed the answer; alpha x luminance has none to tune.
  *
- * ⚠ THIS FILE OWNS ART FACTS, NOT LAYOUT. `focusY` and `aspect` are properties
- * of the PNG and are true wherever it is drawn; how far a given surface must
- * nudge its window to put that focus on screen depends on that surface's own box
- * and belongs to the screen (see TitleScreen's FIELD_NUDGE). Keeping the two
- * apart is what stops a second consumer having to re-measure the artwork. */
+ * ⚠⚠ TWO FINDINGS WORTH MORE THAN THE TABLE ITSELF:
+ *   1. focusX is 0.500 on all nine (spread 0.497–0.505). These emblems are
+ *      horizontally SYMMETRIC — the asymmetry the owner spotted is purely
+ *      vertical. focusX is carried anyway, measured, so a future crest that is
+ *      NOT centred falls out of the same arithmetic instead of needing a case.
+ *   2. The ink bounding box is dead centre and full-frame on all nine (0.500
+ *      across, 0.498–0.500 down): THE ARTWORK TOUCHES EVERY EDGE. So "where the
+ *      emblem is" is a question about brightness, never about extent — there is
+ *      no empty margin to trim, which is why cropping alone never found the
+ *      device.
+ * Every focusY still sits above the middle (0.398–0.494, mean 0.435), so a
+ * window on the vertical centre of these files still shows ground and plinth
+ * rather than device. That finding survived re-measurement; its size changed.
+ *
+ * ⚠ THIS FILE OWNS ART FACTS, NOT LAYOUT. These are properties of the PNG and
+ * are true wherever it is drawn. Turning them into a position needs the target
+ * surface's own MEASURED box — that is `ui/crestField` and the screen that calls
+ * it. Keeping the two apart is what stops a second consumer re-measuring the
+ * artwork, and it is why this table did not have to change when the broken
+ * layout arithmetic was replaced. */
 export interface CrestArt {
-  /** Vertical centroid of the artwork, 0 (top) to 1 (bottom). */
+  /** SOURCE CANVAS BOUNDS — the PNG's own pixel dimensions, exact. */
+  srcW: number;
+  srcH: number;
+  /** Where the artwork's visible weight sits INSIDE that canvas, 0..1. */
+  focusX: number;
   focusY: number;
-  /** The file's own height / width. None of the nine are square. */
-  aspect: number;
 }
 
 const CREST_ART: Readonly<Record<string, CrestArt>> = {
-  conspiracy_architects: { focusY: 0.398, aspect: 1.05 },
-  eternal_dynasty: { focusY: 0.425, aspect: 1.175 },
-  forgotten_order: { focusY: 0.444, aspect: 1.034 },
-  mud_monarchs: { focusY: 0.399, aspect: 1.0 },
-  reclaimers_guild: { focusY: 0.369, aspect: 1.033 },
-  servants_of_giants: { focusY: 0.409, aspect: 1.011 },
-  stone_builders: { focusY: 0.466, aspect: 1.2 },
-  tartarian_revivalists: { focusY: 0.339, aspect: 1.2 },
-  true_tartarians: { focusY: 0.355, aspect: 1.092 },
+  conspiracy_architects: { srcW: 1224, srcH: 1285, focusX: 0.503, focusY: 0.422 },
+  eternal_dynasty: { srcW: 1157, srcH: 1360, focusX: 0.498, focusY: 0.450 },
+  forgotten_order: { srcW: 1233, srcH: 1275, focusX: 0.502, focusY: 0.458 },
+  mud_monarchs: { srcW: 1254, srcH: 1254, focusX: 0.501, focusY: 0.446 },
+  reclaimers_guild: { srcW: 1234, srcH: 1275, focusX: 0.497, focusY: 0.400 },
+  servants_of_giants: { srcW: 1247, srcH: 1261, focusX: 0.502, focusY: 0.433 },
+  stone_builders: { srcW: 1145, srcH: 1374, focusX: 0.505, focusY: 0.494 },
+  tartarian_revivalists: { srcW: 1145, srcH: 1374, focusX: 0.499, focusY: 0.398 },
+  true_tartarians: { srcW: 1200, srcH: 1310, focusX: 0.500, focusY: 0.416 },
 };
 
 /** The measured art facts for a faction, or undefined when it has none.
- *  ⚠ A caller that gets `undefined` must fall back to treating the emblem as
- *  centred — never to a guess, and never to another faction's numbers. */
+ *  ⚠ A caller that gets `undefined` must render NOTHING — never a guess, never
+ *  a centred fallback, and never another faction's numbers. */
 export function crestArt(factionId: string | null | undefined): CrestArt | undefined {
   return factionId ? CREST_ART[factionId] : undefined;
+}
+
+/** The file's own height ÷ width. Derived, so it can never disagree with the
+ *  recorded canvas bounds the way a separately-stored `aspect` could — that
+ *  particular drift is what OTA-1754 shipped. */
+export function crestAspect(art: CrestArt): number {
+  return art.srcH / art.srcW;
 }

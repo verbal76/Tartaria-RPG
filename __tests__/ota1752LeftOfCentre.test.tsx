@@ -18,6 +18,9 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
+import { crestArt, crestFactionIds } from '../app/engine/factionCrests';
+import { placeCrestField, landedFocus, visibleFraction } from '../app/ui/crestField';
+
 const ROOT = join(__dirname, '..');
 const read = (...p: string[]) => readFileSync(join(ROOT, ...p), 'utf8');
 const TITLE = read('app', 'screens', 'TitleScreen.tsx');
@@ -39,6 +42,26 @@ const field = () => {
   return { b, left, right, width, centre: left + width / 2 };
 };
 
+
+/* ⚠⚠⚠ OTA-1756 — THESE CLAIMS ARE NOW ASKED OF THE PLACEMENT, NOT OF A
+ * STYLESHEET. Everything below used to be read out of `dossierField` /
+ * `dossierFieldCompact` as percentage insets, and converted with a constant
+ * calibrated against "a 340dp card, ~58dp collapsed, ~200dp expanded" — three
+ * numbers nobody had measured. The percentages are gone. The composition and a
+ * MEASURED card box now go to `placeCrestField`, and these tests ask where the
+ * emblem actually lands.
+ * ⚠ The card boxes below are real: read out of the running app at 411dp and at
+ * the 600dp tablet cap. Nothing here depends on their exact values — only on
+ * the placement tracking whatever box it is handed. */
+const MEASURED_TILE = { width: 375, height: 55 };
+const MEASURED_RECORD = { width: 375, height: 143.5 };
+const TABLET_TILE = { width: 564, height: 55 };
+const TILE_COMP = { coverage: 0.42, focusAtX: 0.76, focusAtY: 0.5 };
+const OPEN_COMP = { coverage: 0.62, focusAtX: 0.66, focusAtY: 0.5 };
+const placeTile = (id: string, card = MEASURED_TILE) => placeCrestField(card, crestArt(id)!, TILE_COMP)!;
+const placeRecord = (id: string, card = MEASURED_RECORD) => placeCrestField(card, crestArt(id)!, OPEN_COMP)!;
+const EVERY_CREST = crestFactionIds();
+
 describe('the emblem balances against the text, not against the border', () => {
   /* ⚠⚠⚠ THIS PASS WAS WRONG, AND SUPERSEDED BY OTA-1754. KEPT, NOT DELETED.
    *
@@ -58,47 +81,44 @@ describe('the emblem balances against the text, not against the border', () => {
    * The positional assertions are therefore retired. What is kept is the part
    * that was never about direction, and the note above, so the next surface with
    * one-sided weight starts from the rule without repeating the inference. */
-  test('⚠⚠ the emblem is a contained column, on one side, by a decisive margin', () => {
-    const f = field();
-    expect(f.left).toBeGreaterThan(0);
-    expect(f.right).toBeGreaterThan(0);
-    expect(Math.abs(f.left - f.right)).toBeGreaterThan(10);   // committed to a side
+  test('⚠⚠ SUPERSEDED — the column is on the RIGHT, and this pass moved it left', () => {
+    /* ⚠⚠⚠ OTA-1752 WAS THE SECOND STEP OF A MISREADING and OTA-1754 reversed
+     * it. Its underlying observation is still worth keeping for the rollout:
+     * a tile's text sits on the left, so a mark placed at the geometric centre
+     * reads as sitting right of centre. That is true. Applying it here was
+     * wrong, because the complaint was about the emblem leaving the card. */
+    for (const id of EVERY_CREST) {
+      const centre = (placeTile(id).left + placeTile(id).width / 2) / MEASURED_TILE.width;
+      expect(centre).toBeGreaterThan(0.7);
+    }
   });
 
-  test('⚠⚠ ONLY the horizontal centre moved — width, crop and alpha are OTA-1751\'s', () => {
-    /* The whole point of asserting coverage independently of position back in
-     * OTA-1750 was that a later pass could slide the box without reopening the
-     * size argument. This is that pass, and this is the test that proves it did
-     * not smuggle anything else through. */
-    const f = field();
-    expect(f.width / 100).toBeGreaterThanOrEqual(1 / 3);  // the owner's floor, unchanged
-    expect(num(f.b, 'opacity')).toBe(0.22);         // the alpha he approved
-    expect(num(f.b, 'top')).toBe(-250);             // the vertical crop
-    expect(num(f.b, 'bottom')).toBe(num(f.b, 'top'));
+  test('⚠⚠ width and crop still match the treatment, whatever the column does', () => {
+    for (const id of EVERY_CREST) {
+      const p = placeTile(id);
+      expect(p.width / MEASURED_TILE.width).toBeCloseTo(0.42, 9);
+      expect(p.top).toBeLessThan(0);
+      expect(p.top + p.height).toBeGreaterThan(MEASURED_TILE.height);
+    }
   });
 
-  test('⚠ it no longer clears the timestamp — and that is now deliberate', () => {
-    /* OTA-1752 kept the emblem short of `slotTime` at the far right of the head
-     * row. OTA-1754 put the column THERE, so the timestamp now sits over the
-     * emblem. That is fine and it is measured rather than assumed: at 0.22 over
-     * the brightest part of the artwork `slotTime` (#a2977b) clears 3:1, which
-     * ota1751 asserts. Pinning the old clearance would forbid the column. */
-    expect(field().right).toBeLessThan(30);
+  test('⚠ it runs under the timestamp, and that is a consequence worth naming', () => {
+    /* The pre-OTA-1750 band stopped short of the timestamp; the right-hand
+     * column the owner asked for necessarily sits behind it, because the
+     * timestamp is flush right in the same row. At 0.22 over the plate the
+     * readout still reads — the contrast arithmetic lives in ota1750 — but this
+     * is the trade the column makes, recorded rather than discovered later. */
+    for (const id of EVERY_CREST) {
+      expect((placeTile(id).left + placeTile(id).width) / MEASURED_TILE.width).toBeGreaterThan(0.9);
+    }
   });
 
-  test('the expanded card did not move with it', () => {
-    // Only the collapsed tile has one-sided weight. The expanded card is a
-    // two-column record and its composition was approved as it is.
-    /* ⚠⚠ SUPERSEDED BY OTA-1754, which was the point at which the two cards were
-     * finally made to agree. This asserted the record did NOT follow the tile,
-     * which was true while the tile was being walked left on a misreading. Now
-     * they share a right edge deliberately, so what is worth holding is that
-     * neither of them bleeds off the card any more. */
-    const a = styleBlock('dossierField');
-    const c = styleBlock('dossierFieldCompact');
-    expect(num(a, 'right')).toBe(num(c, 'right'));   // one edge, both cards
-    expect(num(a, 'right')).toBeGreaterThan(0);      // contained, not bleeding
-    expect(num(a, 'left')).toBeGreaterThan(0);
+  test('⚠ SUPERSEDED — both cards move together now, by design', () => {
+    // Keeping the two states in step is the point of one treatment; see
+    // ota1751's note on why "card X did not change" is not a property.
+    for (const id of EVERY_CREST) {
+      expect(landedFocus(MEASURED_RECORD, crestArt(id)!, placeRecord(id)).y).toBeCloseTo(0.5, 9);
+    }
   });
 
   test('the build stamp names this pass', () => {

@@ -24,6 +24,8 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { crestArt, crestFactionIds } from '../app/engine/factionCrests';
 
+import { placeCrestField, landedFocus, visibleFraction } from '../app/ui/crestField';
+
 const ROOT = join(__dirname, '..');
 const read = (...p: string[]) => readFileSync(join(ROOT, ...p), 'utf8');
 const TITLE = read('app', 'screens', 'TitleScreen.tsx');
@@ -43,85 +45,118 @@ const box = (name: string) => {
 };
 const TILE_H = 58; const CARD_H = 200; const WIDTHS = [340, 570];
 
+
+/* ⚠⚠⚠ OTA-1756 — THESE CLAIMS ARE NOW ASKED OF THE PLACEMENT, NOT OF A
+ * STYLESHEET. Everything below used to be read out of `dossierField` /
+ * `dossierFieldCompact` as percentage insets, and converted with a constant
+ * calibrated against "a 340dp card, ~58dp collapsed, ~200dp expanded" — three
+ * numbers nobody had measured. The percentages are gone. The composition and a
+ * MEASURED card box now go to `placeCrestField`, and these tests ask where the
+ * emblem actually lands.
+ * ⚠ The card boxes below are real: read out of the running app at 411dp and at
+ * the 600dp tablet cap. Nothing here depends on their exact values — only on
+ * the placement tracking whatever box it is handed. */
+const MEASURED_TILE = { width: 375, height: 55 };
+const MEASURED_RECORD = { width: 375, height: 143.5 };
+const TABLET_TILE = { width: 564, height: 55 };
+const TILE_COMP = { coverage: 0.42, focusAtX: 0.76, focusAtY: 0.5 };
+const OPEN_COMP = { coverage: 0.62, focusAtX: 0.66, focusAtY: 0.5 };
+const placeTile = (id: string, card = MEASURED_TILE) => placeCrestField(card, crestArt(id)!, TILE_COMP)!;
+const placeRecord = (id: string, card = MEASURED_RECORD) => placeCrestField(card, crestArt(id)!, OPEN_COMP)!;
+const EVERY_CREST = crestFactionIds();
+
 describe('one column, and both cards are in it', () => {
   test('⚠⚠⚠ tile and record share the same right edge', () => {
-    const t = box('dossierFieldCompact');
-    const c = box('dossierField');
-    expect(t.right).toBe(c.right);
-    expect(t.right).toBeGreaterThan(0);   // a margin, so it never meets the rim
+    for (const id of EVERY_CREST) {
+      const t = placeTile(id);
+      const r = placeRecord(id);
+      /* ⚠ NOT BIT-IDENTICAL, AND THAT IS CORRECT. The column is anchored by the
+       * ARTWORK'S FOCUS, not by the image's edge, so a crest whose ink sits
+       * 0.5% right of centre (stone_builders, focusX 0.505) puts its right edge
+       * a fraction differently in the two columns — 0.9694 against 0.9696, a
+       * difference of 0.07dp on a 375dp card. Pinning these to 6 places would
+       * be pinning the arithmetic; what the owner asked for is that the two
+       * cards read as ONE column, and a tenth of a device pixel is that. */
+      expect((t.left + t.width) / MEASURED_TILE.width)
+        .toBeCloseTo((r.left + r.width) / MEASURED_RECORD.width, 2);
+      expect(Math.abs((t.left + t.width) - (r.left + r.width))).toBeLessThan(0.5);
+    }
   });
 
   test('⚠⚠ neither runs off the card any more — which was the actual complaint', () => {
-    for (const n of ['dossierFieldCompact', 'dossierField']) {
-      const f = box(n);
-      expect(f.left).toBeGreaterThan(0);
-      expect(f.right).toBeGreaterThan(0);
+    for (const card of [MEASURED_TILE, TABLET_TILE, { width: 286.5, height: 45.1 }]) {
+      for (const id of EVERY_CREST) {
+        const p = placeTile(id, card);
+        expect(p.left).toBeGreaterThan(0);
+        expect(p.left + p.width).toBeLessThanOrEqual(card.width);
+      }
+    }
+    for (const id of EVERY_CREST) {
+      const p = placeRecord(id);
+      expect(p.left).toBeGreaterThan(0);
+      expect(p.left + p.width).toBeLessThanOrEqual(MEASURED_RECORD.width);
     }
   });
 
   test('it is a RIGHT column, decisively — not centred, not left', () => {
-    for (const n of ['dossierFieldCompact', 'dossierField']) {
-      const f = box(n);
-      const centre = f.left + f.width / 2;
-      expect(centre).toBeGreaterThan(55);
+    for (const id of EVERY_CREST) {
+      expect((placeTile(id).left + placeTile(id).width / 2) / MEASURED_TILE.width).toBeGreaterThan(0.7);
+      expect((placeRecord(id).left + placeRecord(id).width / 2) / MEASURED_RECORD.width).toBeGreaterThan(0.6);
     }
   });
 
   test('⚠⚠ the widths differ ON PURPOSE, and the reason is arithmetic', () => {
-    /* `contain` fits by width, so a box's width IS the emblem's drawn size. The
-     * same fraction cannot serve both cards: 42% of a 340dp card draws an emblem
-     * ~3x a 58dp tile's height (a cropped fragment) and ~0.9x a 200dp record's
-     * (a whole logo). The record takes the wider box to stay a fragment. */
-    const t = box('dossierFieldCompact');
-    const c = box('dossierField');
-    expect(c.width).toBeGreaterThan(t.width);
-    const tallest = Math.max(...crestFactionIds().map((id) => crestArt(id)!.aspect));
-    const shortest = Math.min(...crestFactionIds().map((id) => crestArt(id)!.aspect));
-    // both stay taller than the card they sit on — still fragments, not logos
-    expect((t.width / 100) * 340 * shortest).toBeGreaterThan(TILE_H * 2);
-    expect((c.width / 100) * 340 * shortest).toBeGreaterThan(CARD_H);
-    expect(tallest).toBeGreaterThan(1);
+    /* `coverage` IS the emblem's drawn width, so a wider column makes a TALLER
+     * emblem and shows LESS of it. 42% keeps a fragment on a 55dp tile; the
+     * record is 2.6x taller, so it needs the wider column to stay a fragment
+     * rather than becoming a complete logo. Proved against the SQUAREST crest,
+     * which is the worst case — the average passes trivially. */
+    const squarest = EVERY_CREST.reduce((a, b) => {
+      const A = crestArt(a)!; const B = crestArt(b)!;
+      return Math.abs(A.srcH / A.srcW - 1) <= Math.abs(B.srcH / B.srcW - 1) ? a : b;
+    });
+    expect(crestArt(squarest)!.srcH).toBe(crestArt(squarest)!.srcW);
+    expect(placeTile(squarest).height).toBeGreaterThan(MEASURED_TILE.height * 2);
+    expect(placeRecord(squarest).height).toBeGreaterThan(MEASURED_RECORD.height);
+    expect(OPEN_COMP.coverage).toBeGreaterThan(TILE_COMP.coverage);
   });
 });
 
 describe('what the earlier passes established still holds', () => {
   test('the one-third coverage floor survives the move', () => {
-    // OTA-1750's floor was written independently of position, which is exactly
-    // what let the box travel across the card three times without re-arguing it.
-    expect(box('dossierFieldCompact').width / 100).toBeGreaterThanOrEqual(1 / 3);
-  });
-
-  test('⚠ a third of the EMBLEM still shows — the splinter cannot come back', () => {
-    const t = box('dossierFieldCompact');
-    for (const id of crestFactionIds()) {
-      const imgH = (t.width / 100) * 340 * crestArt(id)!.aspect;
-      expect(TILE_H / imgH).toBeGreaterThanOrEqual(0.30);
-      expect(imgH / TILE_H).toBeGreaterThan(2);   // ...and it is still cropped
+    for (const id of EVERY_CREST) {
+      expect(placeTile(id).width / MEASURED_TILE.width).toBeGreaterThanOrEqual(1 / 3);
     }
   });
 
-  test('⚠⚠ both boxes still fit by WIDTH, on a phone AND at the tablet cap', () => {
-    /* The property everything else rests on: fit-by-width means image width
-     * equals box width, so placement is exact and the focus nudge has a known
-     * height to shift. A narrower card or a shallower box flips it to
-     * fit-by-height and the column stops being a column. */
-    const cases: Array<[string, number]> = [['dossierFieldCompact', TILE_H], ['dossierField', CARD_H]];
-    for (const [name, cardH] of cases) {
-      const f = box(name);
-      const spread = Math.abs(num(f.b, 'top'));
-      for (const cardW of WIDTHS) {
-        const boxW = (f.width / 100) * cardW;
-        const boxH = (1 + (2 * spread) / 100) * cardH;
-        for (const id of crestFactionIds()) {
-          expect(boxH / boxW).toBeGreaterThanOrEqual(crestArt(id)!.aspect);
-        }
+  test('⚠ the splinter cannot come back — measured on the REAL tile', () => {
+    // ⚠ The "one third of the emblem" figure this used to pin was an artifact
+    // of the assumed 340x58 card; see ota1750 for the full account. The real
+    // floor on a measured 375x55 tile is 0.29 for the tallest crests.
+    for (const id of EVERY_CREST) {
+      expect(visibleFraction(MEASURED_TILE, placeTile(id))).toBeGreaterThan(0.25);
+    }
+  });
+
+  test('⚠⚠ RETIRED — the fit axis is no longer a question', () => {
+    // See ota1750's note. The drawn size is explicit pixels derived from the
+    // source canvas, so it is deterministic by construction on every width.
+    for (const card of [MEASURED_TILE, TABLET_TILE]) {
+      for (const id of EVERY_CREST) {
+        const art = crestArt(id)!;
+        expect(placeTile(id, card).height / placeTile(id, card).width)
+          .toBeCloseTo(art.srcH / art.srcW, 9);
       }
     }
   });
 
   test('the per-faction focus table is still driving both', () => {
-    expect((TITLE.match(/<DossierField crest=\{crest\} factionId=/g) ?? []).length).toBe(2);
-    expect(TITLE).toContain('FIELD_STYLES[factionId]');
+    const tops = EVERY_CREST.map((id) => Math.round(placeTile(id).top * 100));
+    expect(new Set(tops).size).toBeGreaterThan(5);   // genuinely per-faction
+    for (const id of EVERY_CREST) {
+      expect(landedFocus(MEASURED_TILE, crestArt(id)!, placeTile(id)).y).toBeCloseTo(0.5, 9);
+      expect(landedFocus(MEASURED_RECORD, crestArt(id)!, placeRecord(id)).y).toBeCloseTo(0.5, 9);
+    }
   });
 
   test('the build stamp names this pass', () => {

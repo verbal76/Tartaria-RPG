@@ -29346,7 +29346,41 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // font glyph - so the gold reads as one small key on an instrument instead of
 // one more shouting element among six. Both gears change together, so the two
 // screens keep the single mark in a single colour that OTA-1748 gave them.
-export const OTA_BUILD_ID = '2026-09-08-1755-the-settings-key-is-gold';
+// ── OTA-1756 — THE CARD IS MEASURED, NOT ASSUMED ─────────────────────────────
+// Owner, after four passes that each moved the roster watermark and each landed
+// wrong: explain exactly how the placement was calculated, because it looks
+// nothing like the mock-ups.
+// The answer was that nothing had ever been measured. Placement ran through
+// K = 100 x (cardWidth / cardHeight) x boxWidthFraction, evaluated on "a 340dp
+// card, ~58dp collapsed, ~200dp expanded" - three numbers typed from memory.
+// The real card is 375 x 55 collapsed and 375 x 143.5 expanded on a 411dp
+// phone, both read out of the running app. And when OTA-1754 changed the box
+// width from 76% to 62%, the constant DERIVED from that width was left at its
+// old value, still carrying a comment describing the geometry it had replaced.
+// The mock-ups could not have caught either fault: they were drawn at 595x101.5
+// and 595x350, exactly 340/58 and 340/200 - the same assumed ratios the code
+// used. Two artifacts sharing one unverified input cannot disagree.
+// So the constants are deleted and the clip reports its own box through
+// onLayout. ui/crestField turns a measured box, the faction's measured art and
+// the state's composition into absolute pixels, keeping four things apart that
+// are easy to conflate: the source PNG canvas, the rendered image bounds, the
+// artwork's own focus point, and where on the card that focus is wanted. There
+// is no reference device left anywhere in the placement path, so a 320dp phone,
+// the owner's Pixel and the 600dp tablet cap all just arrive as a different box.
+// The art table was re-measured from the source assets at full resolution and
+// gained focusX and exact canvas bounds. The old measurement weighted alpha x
+// max(0, luminance - 0.18); discounting dim ink drags the centroid toward the
+// brightest region, so every focusY was too high - by 0.061 on true_tartarians.
+// Two findings came out of it: all nine crests are horizontally symmetric
+// (focusX 0.497-0.505), so no crest ever needed the sideways nudges three
+// earlier passes went looking for; and the ink touches every edge on all nine,
+// so "where the emblem is" is a question about brightness, never about extent.
+// Coverage is now a minimum: on the tallest card the roster can build the
+// emblem was floating with a 15dp bare strip above it, so it is enlarged just
+// enough to keep bleeding past both edges. The approved treatment is untouched
+// - same alphas, same right-hand column with a 3% margin, same bands.
+export const OTA_BUILD_ID = '2026-09-08-1756-the-card-is-measured';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-08-1755-the-settings-key-is-gold';
 // golem catch-up 2026-09-08: markerless publish of OTA-1755 - the settings key
 // is gold. Owner: use our gold for the gear, not the gunmetal. This overrides a
 // rule the project otherwise keeps, so the exception is written down rather than
