@@ -252,8 +252,12 @@ export function VendorScreen() {
     return (
       <View style={styles.container}>
         <Text style={styles.placeholder}>You're not as fast as you think you are.</Text>
+        {/* ⚠ OTA-1760 — `alignSelf: 'center'`. Everywhere else this button lives
+            in a header row and is sized by its label; here there is no header,
+            so the container's default `stretch` blew it to the full 387pt
+            column and it read as a banner rather than a control. */}
         <TouchableOpacity
-          style={styles.backBtn}
+          style={[styles.backBtn, styles.placeholderBtn]}
           onPress={() => setScreen('exploration')}
           activeOpacity={0.7}
           accessibilityRole="button"
@@ -1689,6 +1693,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   backText: { color: '#c9a86a', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
+  placeholderBtn: { alignSelf: 'center' },
   dismissBtn: {
     backgroundColor: '#1a1714',
     borderColor: '#7a4040',
@@ -1916,7 +1921,18 @@ const styles = StyleSheet.create({
   offerStock: { color: '#7fb0a8', fontSize: 10, letterSpacing: 1, fontWeight: '700' },
   offerStats: { color: '#cdbf99', fontSize: 11, marginTop: 4 },
   empty: { color: '#a2977b', fontStyle: 'italic', textAlign: 'center', marginTop: 40 },
-  placeholder: { color: '#a2977b', textAlign: 'center', marginTop: 80 },
+  /* ⚠⚠ OTA-1760 — `marginBottom` AND `alignSelf`, BOTH MEASURED FROM THE RENDER.
+   * Owner, on a screenshot of this state: *"the border covers the top sentence."*
+   * It does, and the render says exactly why — the text's line box ends at y=122
+   * and the button's box starts at y=122. ZERO gap, so the button's 1px top
+   * border lands on the descenders of "You're not as fast as you think you are."
+   * and slices them. The style had a `marginTop` and no `marginBottom`.
+   * ⚠ This `placeholder` is BYTE-IDENTICAL in seven screens, and Vendor is the
+   * only one with a sibling after it, so it is the only one where the missing
+   * gap is visible. The other six are fixed here by not being broken; the
+   * duplication itself is a Tier 1 item, not something to convert under a
+   * two-line fix. */
+  placeholder: { color: '#a2977b', textAlign: 'center', marginTop: 80, marginBottom: 20 },
   // OTA 030 — steal button sits at the right edge of every BUY row.
   // Darker tone than BUY so the player reads it as the risky path.
   stealBtn: {

@@ -117,10 +117,36 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: 0.5,
   },
-  // OTA-860 — quiet secondary link; reads as a toggle-off, not a primary action.
+  /* OTA-860 — quiet secondary link; reads as a toggle-off, not a primary action.
+   *
+   * ⚠⚠ OTA-1760 — THE TAP TARGET WAS OFF-CENTRE ON ITS OWN LABEL, and the
+   * render measured it. Owner: *"the turn off tips button isn't centered."*
+   *     Got it         box x284.2 w72.3 · text x303.2 w34.3 → 19.0 / 19.0  ✓
+   *     Turn off tips  box x 54.5 w71.4 · text x 54.5 w61.4 →  0.0 / 10.0  ✗
+   * `paddingRight: 10` with no `paddingLeft` put every pixel of slack on one
+   * side: no tap forgiveness at all to the LEFT of the label, and the moment
+   * anything draws a box — a pressed state, a focus ring — the label sits hard
+   * against its edge. The other three "Turn off tips" controls in the game
+   * (CombatPrimer, WandererEncounter, DogOnboarding) all use a symmetric
+   * `paddingHorizontal: 12`; this one was the outlier.
+   * ⚠⚠ AND THE FIRST FIX FOR IT WAS WRONG, WHICH THE OWNER CAUGHT: *"now the
+   * turn off tips button is too close to the outer edge."* It was. I had added
+   * `marginLeft: -10` to keep the LABEL flush with the card's body text, which
+   * pulled the box 10pt into the card's padding:
+   *     Got it         box right 356.5 · card inner right 374.5 → 18.0
+   *     Turn off tips  box left   44.5 · card inner left   36.5 →  8.0
+   * Symmetric on its own label, crowded against the card. Two problems traded.
+   *
+   * ⚠⚠⚠ THE RULE WAS ALREADY IN THE ROW, IN THE BUTTON NEXT TO IT. `Got it`'s
+   * BOX sits on the card's padding edge and its LABEL sits inside its own
+   * padding — the label is not flush with the body text either, and nobody has
+   * ever thought it looked wrong. Boxes align to the card; labels align to their
+   * boxes. So the answer is neither shrinking the control nor growing the card:
+   * it is dropping the offset and letting this control obey the rule its sibling
+   * already obeys. Both boxes now sit 18.0 from their side of the card. */
   linkBtn: {
     paddingVertical: 8,
-    paddingRight: 10,
+    paddingHorizontal: 10,
   },
   linkText: {
     color: '#a2977b',

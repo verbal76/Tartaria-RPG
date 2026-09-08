@@ -29477,7 +29477,38 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // moving is measured rather than asserted. Vendor could not be reached - the
 // harness has no vendor NPC - and the gap is asserted in the suite rather than
 // left as a sentence.
-export const OTA_BUILD_ID = '2026-09-08-1759-one-row';
+// SUPERSEDED: '2026-09-08-1759-one-row'
+// OTA-1760 - two the owner saw in a screenshot, both measured before touching.
+// Owner: "the deal with your choices image needs work, the border covers the top
+// sentence, also the turn off tips button isn't centered."
+// The border did cover the sentence and the render says why: the placeholder
+// text's line box ends at y=122 and the back button's box starts at y=122, zero
+// gap, so the button's 1px top border landed on the descenders and sliced them.
+// The style carried a marginTop and no marginBottom. That placeholder style is
+// byte-identical in seven screens and Vendor is the only one with a sibling
+// after it, which is why it is the only one where the gap was visible. The same
+// button was also stretched to the full column - there is no header row in this
+// branch, so the container's default stretch blew it to 387pt and it read as a
+// banner rather than a control; it is now sized by its label.
+// The tips link was off-centre on its own label and the numbers say by how much:
+// Got it sits 19.0 left and 19.0 right of its box, Turn off tips sat 0.0 and
+// 10.0. paddingRight with no paddingLeft put every pixel of slack on one side
+// and left no tap forgiveness at all to the left of the label. The other three
+// turn-off-tips controls in the game already use symmetric padding. The negative
+// margin keeps the label flush with the card's body text, which is the job the
+// zero left padding was really doing, so the text does not move - only the
+// invisible box around it does.
+// The first fix for the link was wrong and the owner caught it before it
+// shipped: a negative margin kept the label flush with the card's body text but
+// pulled the box 10pt into the card's padding, leaving 8 on that side against
+// Got it's 18 on the other. The answer was neither shrinking the control nor
+// growing the card - the rule was already in the same row, because Got it's box
+// sits on the card's padding edge while its label is inset by its own padding.
+// Boxes align to the card, labels align to their boxes. The offset was deleted
+// and nothing was resized; both controls now sit 18 from their side.
+// The gold box seen around that link in the harness shot is the headless
+// browser's focus ring and does not ship; the asymmetry under it was real.
+export const OTA_BUILD_ID = '2026-09-08-1760-two-in-a-screenshot';
 // golem catch-up 2026-09-08: markerless publish of OTA-1759 - four screens
 // invented four rows and three of them were the same row. Tier 0 step 3. The
 // kit gains a row CHASSIS - styles plus a tRowStyle() helper - and deliberately
