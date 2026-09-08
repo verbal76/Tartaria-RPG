@@ -29416,6 +29416,26 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // gate's case-insensitivity is load-bearing. Normalising is a whole-tree edit
 // for no visible gain and belongs to the legacy hunt.
 export const OTA_BUILD_ID = '2026-09-08-1757-colours-that-mean-something';
+// golem catch-up 2026-09-08: markerless publish of OTA-1757 - the colours that
+// mean something have names. Tier 0 step 1 of the interface rollout, and
+// deliberately a step nobody can see: the owner said plainly that the scale of
+// the redesign is alarming, so the first move changes no pixels. The owner's
+// amendment settled that semantic colour is not accent colour, and this makes
+// that ruling enforceable - it could not be before, because #c9a86a is doing
+// four jobs at once (interface accent, Common rarity, material category, and the
+// middle band of the HP/stamina ramp) and three of the four are meant to stay,
+// so a ratchet on the bare hex is a number that cannot legitimately fall.
+// ui/semanticColor names the vitality ramp, the stamina gauge and the standing
+// ladder using the exact hexes already drawn, and re-exports rarity and category
+// from the existing authority instead of copying them. CharacterScreen's three
+// ramps are routed as identity substitutions. check:gold is the twentieth gate,
+// 377 at birth with no headroom, split 372 interface / 4 semantic / 1 kit; it
+// tokenises rather than regexing whole files, after its first run failed on its
+// own companion module's header comment - the third time in a day a check graded
+// the prose describing a fix rather than the fix. Two legacy items surfaced: a
+// dead rival palette (app/theme/colors.ts, an abandoned arb76 prototype nothing
+// imported) is deleted, and the two spellings of the brand hex are recorded for
+// the legacy hunt rather than normalised here.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-08-1756-the-card-is-measured';
 // golem catch-up 2026-09-08: markerless publish of OTA-1756 - the card is
 // measured, not assumed. The owner asked, after four passes that each moved the
