@@ -258,7 +258,14 @@ describe('the shape comes before the detail — the large composition', () => {
     // AFTER: border 1+1 | rail pad + the tallest thing in it (the gear socket,
     // which is why its padding was tightened) | the engraved rule | face pad +
     // the readout line.
-    const gear = px('sceneBarBtn', 'paddingVertical') * 2 + 2 + line(px('sceneBarGear', 'fontSize'));
+    /* ⚠⚠ OTA-1748 — the gear became a DRAWN icon, so its height is a size in dp
+     * rather than a font size, and this reads the shipped constant. Stated
+     * because the failure mode was silent: `sceneBarGear` no longer exists, so
+     * the old `px(...) → 0` would have made the rail look SHORTER than it is
+     * and this test would have gone on passing while understating the cost. */
+    const gearSize = Number(/const SCENE_GEAR_SIZE = (\d+);/.exec(EXP)?.[1] ?? NaN);
+    expect(Number.isFinite(gearSize)).toBe(true);
+    const gear = px('sceneBarBtn', 'paddingVertical') * 2 + 2 + gearSize;
     const rail = k.surfRail!.paddingTop! + k.surfRail!.paddingBottom! + Math.max(gear, line(13));
     const face = k.surfFaceHousing!.paddingVertical! * 2 + line(10);
     const after = 2 + rail + 1 + face;
@@ -302,13 +309,20 @@ describe('gold is a live obligation or a live process — and nothing else', () 
     ['sceneTime', 'a clock is technical detail'],
     ['sceneDot', 'a separator is not information'],
     ['sceneBarBtn', 'settings must not compete'],
-    ['sceneBarGear', 'settings must not compete'],
     ['crestNavBtn', 'navigation is not a call to action'],
     ['didYouMeanChip', 'a parser guess is not an obligation'],
   ])('%s has left the gold (%s)', (name) => {
     const block = styleBlock(name);
     expect(block).not.toBe('');
     expect(block.toLowerCase()).not.toContain('c9a86a');
+  });
+
+  test('the settings key is still not gold, now that it is drawn', () => {
+    // ⚠ OTA-1748 retired the `sceneBarGear` text style with the glyph it
+    // styled; the colour claim moved to the call site, so that is where it is
+    // checked. Ceramic, as VIS-3 left it — Settings does not compete.
+    expect(EXP).toContain('<TGear size={SCENE_GEAR_SIZE} color={T.ceramic} />');
+    expect(EXP).not.toContain('sceneBarGear');
   });
 
   test('the two things that KEEP gold are the two live ones', () => {

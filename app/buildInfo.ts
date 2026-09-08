@@ -29161,7 +29161,34 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // borders, spacing, hierarchy, colours and the two-stage tap contract are all
 // untouched; the field is pointerEvents="none" and adds no state, timer,
 // measurement or subscription.
-export const OTA_BUILD_ID = '2026-09-08-1747-the-faction-field-reaches-every-card';
+// ── OTA-1748 — THE SETTINGS MARK IS DRAWN ────────────────────────────────────
+// Both settings buttons rendered U+2699 as TEXT, which means the icon was never
+// ours: it was whatever the device's symbol font happened to contain, at that
+// font's weight — and U+2699 has an emoji presentation variant, so on an Android
+// build whose fallback chain reaches the colour emoji font first the glyph
+// renders in colour and ignores the colour the app sets.
+// The alternatives were not available. Native builds are parked, so
+// react-native-svg and any icon-font package cannot ship - an OTA carries JS and
+// assets, not new native modules. Swapping to the gear-without-hub codepoint
+// dodges the emoji variant but trades it for a tofu box on a device whose symbol
+// font lacks it. Drawing it is the only font-independent option.
+// So TGear is a ring and eight teeth, nine static Views. Each tooth is placed by
+// rotate-then-translateY, so the translate runs along the already-rotated axis
+// and pushes the tooth out along its own radius - one View per tooth rather than
+// a wrapper and a child, the same trick the housing chamfer uses. The body is an
+// annulus, so the hub is a real hole showing whatever is behind it instead of a
+// disc painted in a colour this file would have to guess, and the ring paints
+// over the teeth's inner ends to weld them into one object. Every dimension
+// derives from `size`, so one primitive serves a 14dp key in the exploration
+// header and a 20dp one in the title corner.
+// The header's vertical budget does not move: the glyph it replaces laid out at
+// 14dp and the drawn key is 14dp, which OTA-1746's measured 12dp header cost
+// still holds to. Touch targets are unchanged - both were always the pressable
+// plus its hitSlop, never the glyph. No image, no font, no animation, no state,
+// no measurement. Colours are unchanged at each site: ceramic in the exploration
+// rail so Settings does not compete, the brand gold in the title corner.
+export const OTA_BUILD_ID = '2026-09-08-1748-the-settings-mark-is-drawn';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-08-1747-the-faction-field-reaches-every-card';
 // golem catch-up 2026-09-08: markerless publish of OTA-1747 - the faction field
 // reaches every card. OTA-1746 printed a Tartarian's faction art into the
 // expanded record's ground: the canonical crest, dramatically oversized,

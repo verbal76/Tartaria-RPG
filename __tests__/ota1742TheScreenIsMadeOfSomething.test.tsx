@@ -609,8 +609,17 @@ describe('OTA-1742 — the language is reusable, and the first pass stayed in it
      * (TSurface) plus its type export. The point of this number is unchanged:
      * a kit that grows a component per screen is not a language, it is a
      * junk drawer. Raising it again needs a brief that asks for a shape the
-     * existing ones cannot make. */
-    expect(exported.length).toBeLessThanOrEqual(16);
+     * existing ones cannot make.
+     *
+     * ⚠ 16 → 17 BY OTA-1748, AND THAT IS THE RULE BEING FOLLOWED RATHER THAN
+     * BENT. The settings mark was `⚙` rendered as TEXT — so the icon belonged to
+     * whichever symbol font the device shipped, and U+2699 has an emoji
+     * presentation variant that can render in colour and ignore the colour we
+     * set. Native builds are parked, so `react-native-svg` and icon fonts cannot
+     * ship at all; drawing it was the only font-independent option. A ring and
+     * eight radial teeth is genuinely a shape none of the primitives above can
+     * make, which is exactly the brief this ceiling asks for. */
+    expect(exported.length).toBeLessThanOrEqual(17);
   });
 
   /* ⚠⚠⚠ SUPERSEDED BY VIS-3 (OTA-1746) — AND THE REASONING IS KEPT HERE RATHER

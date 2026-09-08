@@ -25,7 +25,7 @@ import { AdventureFeed } from '../components/AdventureFeed';
  * it is the screen the player spends the game on. What it takes from the kit is
  * the PLANE LANGUAGE (a housing you can cut things into) and the ONE CONTROL
  * FAMILY — not a restyling of everything it contains. */
-import { TSurface, TButton, T } from '../ui/tartariaKit';
+import { TSurface, TButton, TGear, T } from '../ui/tartariaKit';
 import { renderLagAfterEngine } from '../diagnostics/renderClock'; // OTA-1696
 import { InputBox } from '../components/InputBox';
 import { DiceRoller } from '../components/DiceRoller';
@@ -1475,7 +1475,7 @@ export function ExplorationScreen() {
                   accessibilityRole="button"
                   accessibilityLabel="Settings"
                 >
-                  <Text style={styles.sceneBarGear}>⚙</Text>
+                  <TGear size={SCENE_GEAR_SIZE} color={T.ceramic} />
                 </TouchableOpacity>
               </View>
               {/* v2.4.1 (OTA 045) — QUESTS button removed per player
@@ -3376,6 +3376,15 @@ export function ExplorationScreen() {
   );
 }
 
+/* ⚠⚠ OTA-1748 — 14, AND THAT NUMBER IS THE HEADER'S BUDGET, NOT A LOOK.
+ * The settings key is the TALLEST object in the scene header's rail, so it alone
+ * sets the height the FEED pays for (OTA-1746 measured that cost at 12dp and
+ * pinned it). The glyph it replaces was `fontSize: 11`, which RN laid out at 14
+ * — so a 14dp drawn gear occupies EXACTLY the same box and the budget does not
+ * move. The touch target never depended on either: it is the socket plus
+ * `hitSlop={8}`. */
+const SCENE_GEAR_SIZE = 14;
+
 const styles = StyleSheet.create({
   // OTA-841 [did-you-mean] — tappable disambiguation chip row above the input.
   didYouMeanRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 6, paddingHorizontal: 4, paddingBottom: 4 },
@@ -3407,7 +3416,8 @@ const styles = StyleSheet.create({
   // ask. EnemyCard's `head` style no longer needs paddingRight
   // reservation since the gear no longer overlaps the enemy name
   // / range tag area.
-  // OTA-748 — settings gear now lives in the scene bar next to MAP (sceneBarGear).
+  // OTA-748 — settings gear now lives in the scene bar next to MAP; OTA-1748
+  // replaced its glyph with the kit's drawn TGear, so it has no text style.
   /* ⚠⚠⚠ VIS-3 — THE HEADER'S TYPE ROLES, WHICH ARE THE HIERARCHY.
    * BEFORE, three of these were `#c9a86a` and the fourth was `#a2977b`; the
    * only hierarchy on the header was 10px versus 9px, which is no hierarchy at
@@ -3488,11 +3498,6 @@ const styles = StyleSheet.create({
   // estate.
   controls: { gap: 6 },
   // OTA-748 — gear sized to sit inline in the scene bar next to MAP.
-  // ⚠ VIS-3 — ceramic, not gold. Settings does not compete. And 13 → 11,
-  // because the gear was the tallest object in the header's rail and was
-  // therefore setting the height the FEED pays for; the hit target is
-  // unchanged (this box plus hitSlop 8).
-  sceneBarGear: { color: '#8C8E8B', fontSize: 11, lineHeight: 13, fontWeight: '700' },
   // v2.4.1 (OTA 045) — Main Quest chip + Contracts menu entry.
   // Sits above the vendor banner, below the scene bar. Now the only
   // entry to Contracts (QUESTS header button removed). Two-line

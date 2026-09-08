@@ -483,6 +483,95 @@ export function TFactionPlate({
   );
 }
 
+// ─── GEAR ────────────────────────────────────────────────────────────────────
+/* ⚠⚠⚠ THE SETTINGS MARK IS DRAWN, NOT TYPED — AND THE REASON IS NOT TASTE.
+ *
+ * Both settings buttons rendered `⚙` (U+2699) as TEXT, which means the icon was
+ * never actually ours: it was whatever the device's symbol font happened to
+ * contain, at whatever weight that font drew it, and U+2699 has an EMOJI
+ * PRESENTATION VARIANT — so on an Android build whose fallback chain reaches the
+ * colour emoji font first, the glyph renders as a colour emoji and ignores the
+ * `color` we set entirely. A settings key that can spontaneously turn into a
+ * blue-and-white sticker is not a designed icon.
+ *
+ * ⚠⚠ AND THE ALTERNATIVES ARE NOT AVAILABLE. Native builds are PARKED, so
+ * `react-native-svg` and any icon-font package cannot ship — an OTA carries JS
+ * and assets, not new native modules. Swapping to `⛭` (gear without hub) dodges
+ * the emoji variant but trades it for a tofu box on any device whose symbol font
+ * lacks the codepoint. Drawing it is the only option that is font-independent.
+ *
+ * ⚠ SO: A RING AND EIGHT TEETH, NINE STATIC VIEWS.
+ * Each tooth is placed by `[{ rotate }, { translateY }]` — the rotation happens
+ * first, so the translate runs along the ALREADY-ROTATED axis and pushes the
+ * tooth straight out along its own radius. That is one View per tooth instead of
+ * a wrapper-plus-child pair, and it is the same trick the housing's chamfer uses.
+ * The body is an ANNULUS (borderWidth on a circle, transparent centre), so the
+ * hub is a real hole that shows whatever is behind it rather than a disc painted
+ * in a colour this file would have to guess. The teeth render first and the ring
+ * paints over their inner ends, which is what welds them into one object.
+ *
+ * ⚠ IT COSTS NOTHING AND IT SCALES. Every dimension is derived from `size`, so
+ * one primitive serves a 14px key in a header rail and a 20px one in a corner
+ * button without a second asset or a second set of numbers. No image, no font,
+ * no animation, no state, no measurement. `pointerEvents="none"` — the pressable
+ * that owns it keeps the whole target. */
+const GEAR_TEETH = [0, 45, 90, 135, 180, 225, 270, 315] as const;
+
+export function TGear({ size = 16, color = T.inkDim }: { size?: number; color?: string }) {
+  const g = useMemo(() => {
+    // ⚠ Proportions, once. The tooth's INNER end must land between the ring's
+    // inner and outer radius, or the teeth either float free of the body or
+    // poke into the hub hole. ring outer 0.31·s, ring inner 0.18·s, tooth inner
+    // end 0.37·s − 0.105·s = 0.265·s — inside the stroke, hidden by it.
+    const ring = Math.round(size * 0.62);
+    const border = Math.max(1, Math.round(size * 0.13));
+    const toothW = Math.max(1, Math.round(size * 0.17));
+    const toothH = Math.max(1, Math.round(size * 0.21));
+    return {
+      ring,
+      border,
+      toothW,
+      toothH,
+      radius: size * 0.37,
+      ringOffset: (size - ring) / 2,
+      toothTop: (size - toothH) / 2,
+      toothLeft: (size - toothW) / 2,
+    };
+  }, [size]);
+
+  return (
+    <View style={{ width: size, height: size }} pointerEvents="none">
+      {GEAR_TEETH.map((deg) => (
+        <View
+          key={deg}
+          style={{
+            position: 'absolute',
+            top: g.toothTop,
+            left: g.toothLeft,
+            width: g.toothW,
+            height: g.toothH,
+            backgroundColor: color,
+            borderRadius: 1,
+            transform: [{ rotate: `${deg}deg` }, { translateY: -g.radius }],
+          }}
+        />
+      ))}
+      <View
+        style={{
+          position: 'absolute',
+          top: g.ringOffset,
+          left: g.ringOffset,
+          width: g.ring,
+          height: g.ring,
+          borderRadius: g.ring / 2,
+          borderWidth: g.border,
+          borderColor: color,
+        }}
+      />
+    </View>
+  );
+}
+
 // ─── STRATA ──────────────────────────────────────────────────────────────────
 /** ⚠ THE BURIED-WORLD LAYER, AND IT IS DELIBERATELY ALMOST INVISIBLE. Three
  *  survey rules and four registration marks at very low alpha — excavation

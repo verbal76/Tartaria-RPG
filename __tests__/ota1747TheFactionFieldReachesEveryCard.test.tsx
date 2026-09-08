@@ -425,9 +425,14 @@ describe('the two-stage tap contract survives', () => {
     expect(fieldsOf(tree)).toHaveLength(1);
   });
 
-  test('the build stamp names this pass', () => {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { OTA_BUILD_ID } = require('../app/buildInfo') as { OTA_BUILD_ID: string };
-    expect(OTA_BUILD_ID).toBe('2026-09-08-1747-the-faction-field-reaches-every-card');
+  test('this pass has a stamp of its own, live or superseded', () => {
+    /* ⚠ DURABLE CLAIM, NOT A ONE-RELEASE PIN — and I made this exact mistake
+     * twice. Asserting OTA_BUILD_ID *equals* this pass's stamp is true for
+     * exactly one release; OTA-1748 superseded it hours later and the suite went
+     * red for no defect at all. The house rule is one OTA, one stamp, with the
+     * previous preserved on a `// SUPERSEDED:` line — so what is worth holding
+     * is that this pass's stamp EXISTS in the ledger, live or superseded. */
+    const BUILD = read('app', 'buildInfo.ts');
+    expect(BUILD).toContain("'2026-09-08-1747-the-faction-field-reaches-every-card'");
   });
 });

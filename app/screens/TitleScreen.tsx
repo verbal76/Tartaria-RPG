@@ -58,7 +58,7 @@ import { CONTENT_MAX_WIDTH } from '../ui/displayScale'; // OTA-1227 — one colu
 import { modelBootPercent, modelsStillLoading } from '../ui/modelBootProgress'; // OTA-1228 — the 51% bar, made testable
 // ⚠⚠⚠ VIS-1 — the Tartaria interface kit. This screen is its first reference
 // implementation; read app/ui/tartariaKit.tsx before adding anything visual here.
-import { T, TType, TButton, TDivider, TRule, TCorners, TResourceChit, TFactionPlate, TSettle, TStrata } from '../ui/tartariaKit';
+import { T, TType, TButton, TDivider, TRule, TCorners, TResourceChit, TFactionPlate, TGear, TSettle, TStrata } from '../ui/tartariaKit';
 import { factionCrest } from '../engine/factionCrests';
 
 const races = racesData as { id: string; name: string }[];
@@ -1210,7 +1210,14 @@ export function TitleScreen() {
       {/* v2.4.1 (OTA 051) — gear icon hoisted to the top-right corner
           for UI uniformity with the in-game ExplorationScreen, which
           places its gear in the same spot. The footer text (version
-          + build) stays at the bottom as a quiet diagnostic strip. */}
+          + build) stays at the bottom as a quiet diagnostic strip.
+          ⚠⚠ OTA-1748 — AND NOW IT IS THE SAME MARK IN THE SAME COLOUR AS THE
+          ONE IN EXPLORATION. "UI uniformity" was the stated goal of putting it
+          here, but the two were never actually uniform: different glyph sizes,
+          and this one gold while the in-game one went ceramic in VIS-3. Ceramic
+          is the principled half of that pair — on this project gold marks a live
+          obligation or a live process, and a settings key is neither. One
+          primitive, one colour, two sizes chosen by the space each sits in. */}
       <TouchableOpacity
         style={styles.cornerGear}
         onPress={() => setScreen('about')}
@@ -1219,7 +1226,7 @@ export function TitleScreen() {
         accessibilityRole="button"
         accessibilityLabel="Settings"
       >
-        <Text style={styles.gear}>⚙</Text>
+        <TGear size={20} color={T.ceramic} />
       </TouchableOpacity>
       {/* ⚠⚠⚠ PHONE-FIX — THE UTILITY SEDIMENT IS OFF THE TITLE SCREEN.
           Owner: remove RESTORE FROM BACKUP, EXIT GAME, REPORT BUG and INVITE
@@ -1877,7 +1884,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     zIndex: 10,
   },
-  gear: { color: '#c9a86a', fontSize: 18, lineHeight: 18, textAlign: 'center' },
   // OTA-068 — footer now centered (was left-aligned with a
   // small marginLeft) so it sits under the centered action row
   // and thank-you message as the third centered line.
