@@ -28936,6 +28936,25 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (8) The allocation candidate was re-checked and is already resolved in source
 // (allLocations is a module constant; the narration allow-list is cached).
 export const OTA_BUILD_ID = '2026-09-08-1741-the-work-nobody-will-read-gets-out-of-the-way';
+// golem catch-up 2026-09-08: markerless publish of OTA-1741 - the native AI,
+// lifecycle, hydration and long-session tranche (LAG-3-8D27). Obsolete narration
+// no longer holds the one native-ML lock or takes a slot ahead of work the
+// player is waiting on: moving the epoch is now the signal, a running job whose
+// reader has gone is ended, and an obsolete waiter loses its place at the same
+// rank without anything being promoted - the epoch/discard contract stays the
+// final guard. The queue's waits, refusals and cuts are bounded scalars on the
+// diagnostics that already reach the bug report, so a native stall is legible
+// where a clean JS freeze watch used to say nothing. Five independent hydration
+// reads run as one group (75ms to 49ms at 6ms per storage op) while the
+// first-install seed still runs strictly before the stash read. The room ledger
+// is bounded at arrival and a legacy save's rumour array on load; the caps the
+// audit thought missing are measured and in place. An utterance encodes in
+// slices, so the longest block it holds the JS thread for is 8-10ms instead of
+// up to 148ms, with identical bytes. The alive beat runs app-wide, so a
+// title-screen reclaim is no longer recorded as a death one second into the
+// process, each OTA teardown component stamps its own outcome, and the native
+// crash verdict is asked again when the SDK has not resolved the last run. A
+// typed action refused by a pending roll now says why.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-07-1740-nothing-wakes-a-screen-that-is-not-about-it';
 // golem catch-up 2026-09-07: markerless publish of OTA-1740 - the render/store
 // hot-path repair (LAG-2-5E91). The 6s world heartbeat reaches a screen only
