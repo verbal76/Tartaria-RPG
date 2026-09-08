@@ -94,6 +94,46 @@ function resumeObjectiveLine(phase: MainQuestPhase, cores: number): string {
   }
 }
 
+/* ⚠⚠⚠ THE FACTION FIELD — ONE TREATMENT, EVERY CARD, EACH ITS OWN EMBLEM.
+ *
+ * VIS-3 (OTA-1746) printed a Tartarian's faction art into the EXPANDED record's
+ * ground: the canonical `assets/crests/<factionId>.png`, dramatically oversized,
+ * anchored right and cropped by the card's own edges, at 0.09 — a ghosted
+ * fragment embedded in the plate rather than a logo placed on it. The owner
+ * confirmed that treatment on the device and asked for it on every card.
+ *
+ * ⚠⚠ SO IT IS NOW ONE COMPONENT, DRIVEN BY THE TARTARIAN'S OWN FACTION, and the
+ * EXPANDED geometry is untouched — that card is the reference, and a "reuse"
+ * that quietly restyled it would have thrown away the thing being extended.
+ * The only new thing is `compact`, and it exists for a measurable reason, not a
+ * taste one (see `dossierFieldCompact`).
+ *
+ * ⚠ WHAT IT REFUSES TO DO. A faction the game ships no art for renders NOTHING —
+ * no placeholder, no substitute emblem, no generic mark. A stand-in would be
+ * lore this file is not entitled to invent, and a single shared watermark is the
+ * exact outcome the brief rules out. `pointerEvents="none"` throughout, so the
+ * tap, the second tap that loads, the swipe-to-delete and the scroll all pass
+ * straight through. `contain` always: the source PNGs run 1145x1374 to 1254x1254
+ * and none are square, so the emblem is cropped by its container and NEVER
+ * stretched.
+ *
+ * ⚠ AND IT IS FREE. On an expanded card this is the same `source` as the riveted
+ * seal plate above it, so RN decodes the asset once and both draw from one cache
+ * entry; on a collapsed card it is the only draw. No animation, no measurement,
+ * no state, no subscription. */
+function DossierField({ crest, compact = false }: { crest: number | undefined; compact?: boolean }) {
+  if (crest === undefined) return null;
+  return (
+    <View style={styles.dossierFieldClip} pointerEvents="none">
+      <Image
+        source={crest}
+        style={compact ? styles.dossierFieldCompact : styles.dossierField}
+        resizeMode="contain"
+      />
+    </View>
+  );
+}
+
 export function TitleScreen() {
   // The title screen renders directly on the player's tuned background (the
   // container is transparent), so the muted secondary text washed out when a
@@ -529,6 +569,9 @@ export function TitleScreen() {
   // expanded at a time; expanding one collapses the last. Swipe-to-delete
   // works in both states (SwipeableRow wraps both).
   const renderItem = ({ item }: { item: SlotSummary }) => {
+    // ⚠ VIS-3 / OTA-1747 — hoisted out of the expanded branch, because BOTH
+    // states wear the field now. One lookup, one source, either card.
+    const crest = factionCrest(item.factionId);
     if (expandedSlotId !== item.slotId) {
       /* ⚠⚠⚠ VIS-1 — A RECOVERED RECORD, NOT AN APPLICATION ROW. The collapsed
          dossier keeps exactly the two lines it always showed (name + time, then
@@ -557,6 +600,7 @@ export function TitleScreen() {
             <TSettle active={false}>
             <View style={[styles.dossierRim, item.dead && styles.dossierRimDead]}>
               <View style={[styles.dossierFace, styles.dossierFaceCompact, item.dead && styles.dossierFaceDead]}>
+                <DossierField crest={crest} compact />
                 <View style={[styles.spine, item.dead && styles.spineDead]} pointerEvents="none" />
                 <View style={[styles.spineTick, { top: '30%' }]} pointerEvents="none" />
                 <View style={[styles.spineTick, { top: '70%' }]} pointerEvents="none" />
@@ -597,7 +641,6 @@ export function TitleScreen() {
        the faction plate, the ENTER TARTARIA band — is `pointerEvents="none"`, so
        no new layer can intercept the tap, the second tap, the swipe-to-delete
        or the scroll. */
-    const crest = factionCrest(item.factionId);
     return (
     <SwipeableRow onDelete={() => confirmDelete(item)}>
       <TouchableOpacity
@@ -612,27 +655,7 @@ export function TitleScreen() {
         <TSettle active>
         <View style={[styles.dossierRim, styles.dossierRimOpen, item.dead && styles.dossierRimDead]}>
           <View style={[styles.dossierFace, styles.dossierFaceOpen, item.dead && styles.dossierFaceDead]}>
-            {/* ⚠⚠⚠ VIS-3 — THE ARTWORK IS THE RECORD'S GROUND, NOT AN ICON ON IT.
-                Brief: *"crests should not be thumbnails in boxes; artwork should
-                sometimes determine the composition around it."* VIS-1 gave the
-                emblem a riveted plate in its own gutter, which was right and is
-                kept — but the plate is still a picture placed INTO a layout.
-                This is the other half: the same canonical faction art, printed
-                into the record's own field, oversized and bleeding off the right
-                edge, so the file a Tartarian is filed in is visibly THEIR
-                FACTION'S file. The written column is unchanged and untouched by
-                it; the art occupies the width the text was never using.
-                ⚠ It costs nothing: identical `source` to the plate above it, so
-                RN decodes the asset once and both draw from the same cache; no
-                animation, no measurement, `pointerEvents="none"`, and it exists
-                only on the ONE expanded record. ⚠ Clipping is local to this
-                layer so it cannot crop the seal plate, which is meant to sit
-                proud of the record's corner. */}
-            {crest !== undefined && (
-              <View style={styles.dossierFieldClip} pointerEvents="none">
-                <Image source={crest} style={styles.dossierField} resizeMode="contain" />
-              </View>
-            )}
+            <DossierField crest={crest} />
             <View style={[styles.spine, styles.spineOpen, item.dead && styles.spineDead]} pointerEvents="none" />
             <View style={[styles.spineTick, { top: '22%', width: 9 }]} pointerEvents="none" />
             <View style={[styles.spineTick, { top: '50%', width: 9 }]} pointerEvents="none" />
@@ -1454,6 +1477,37 @@ const styles = StyleSheet.create({
    * than the emblem's outer edge, so no text loses contrast on any theme. */
   dossierFieldClip: { ...StyleSheet.absoluteFillObject, borderRadius: 3, overflow: 'hidden' },
   dossierField: { position: 'absolute', top: '-18%', bottom: '-18%', right: '-8%', left: '32%', opacity: 0.09 },
+  /* ⚠⚠⚠ THE COLLAPSED CARD NEEDS DIFFERENT NUMBERS TO GET THE SAME LOOK, and
+   * this is the whole reason `compact` exists. The percentages above are
+   * relative to the CARD, and a collapsed card is roughly a quarter the height
+   * of an expanded one — so reusing them literally would have produced the
+   * opposite of what was asked.
+   *
+   * ⚠⚠ THE ARITHMETIC, because it is not obvious and it is the thing that breaks.
+   * `contain` scales the emblem to fit whichever axis runs out first. The source
+   * crests are TALLER THAN WIDE (1145x1374 and friends), so the emblem only
+   * comes out oversized-and-cropped when the box fits it BY WIDTH:
+   *     box_h  >=  box_w x (1374 / 1145)  ~=  1.2 x box_w
+   * On the expanded card the box is near-square and that holds comfortably. On a
+   * ~56dp collapsed card the same -18%/+18% gives a box about 76 tall and 258
+   * wide — WIDE AND SHORT — so `contain` fits by HEIGHT instead and centres a
+   * tiny complete logo in the middle of the card. That is precisely the
+   * "shrink it into a centered background logo" outcome the brief rules out.
+   *
+   * ⚠ So the vertical extent is the ONLY thing that changes: 500% above and
+   * below makes the box ~11x the card's height, the fit flips back to width, and
+   * the card's short window shows a horizontal slice through the emblem's middle
+   * — a huge ghosted fragment running off both the top and the right, exactly
+   * like the expanded card. The horizontal framing (left 32%, right -8%) and the
+   * opacity (0.09) are IDENTICAL to the expanded field on purpose: same
+   * treatment, same material, one adapted dimension.
+   *
+   * ⚠ 500 is not arbitrary — it clears the inequality on a 340dp phone AND on
+   * the 600dp tablet cap (where the box is wider, so it needs to be taller
+   * still) with headroom. The OTA-1747 suite computes both cases; if anyone
+   * retunes these numbers and the fit flips back to height, that test fails and
+   * says so rather than letting a centred logo ship. */
+  dossierFieldCompact: { position: 'absolute', top: '-500%', bottom: '-500%', right: '-8%', left: '32%', opacity: 0.09 },
   dossierNameRule: { marginTop: 6, marginBottom: 6 },
   /* ⚠ PHONE-FIX — INDEX TICKS: three hairlines machined across the spine, the
    * way a real filed plate carries a position mark. Fine technical engraving is

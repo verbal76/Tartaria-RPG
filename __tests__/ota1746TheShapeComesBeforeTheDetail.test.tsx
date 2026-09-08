@@ -554,12 +554,31 @@ describe('artwork is composition, not a thumbnail in a box', () => {
     expect(/dossierFieldClip:\s*\{[^}]*\}/.exec(TITLE)?.[0]).toContain("overflow: 'hidden'");
   });
 
-  test('a collapsed record shows neither the plate nor the field', async () => {
+  /* ⚠⚠⚠ SUPERSEDED BY OTA-1747, REASONING KEPT RATHER THAN DELETED WITH IT.
+   *
+   * As written this asserted a collapsed record showed NEITHER the seal plate
+   * nor the field, because VIS-1 made the emblem the EXPANSION REWARD — the
+   * thing that made opening a record feel like pulling a file — and VIS-3 put
+   * the field on the expanded card only, beside it.
+   *
+   * The owner then saw the expanded card on the device and asked for the field
+   * on every card, collapsed included, each wearing its own faction. So the half
+   * of this rule about the FIELD is retired on his instruction.
+   *
+   * ⚠ THE OTHER HALF IS NOT, AND THAT IS THE POINT OF REWRITING RATHER THAN
+   * DELETING: the riveted SEAL PLATE is still expansion-only. It is the reward;
+   * the field is the card's material. Putting the plate on a collapsed row would
+   * undo VIS-1's two-stage design and there is no instruction to do that, so the
+   * assertion stays — now stated as the distinction it always was. */
+  test('a collapsed record wears its faction FIELD but not the seal PLATE', async () => {
     const tree = await mountTitle([slot(), slot({ slotId: 'slot-b', playerName: 'Vessa' })]);
-    // nothing expanded yet
+    // the plate is still the expansion reward — nothing expanded, no plate
     expect(hosts(tree, (n) => n.props.testID === FACTION_PLATE_TEST_ID)).toHaveLength(0);
+    // ...but the card material now carries the faction, on every row (OTA-1747)
     const crest = factionCrest(getFactions()[0]!.id);
-    expect(hosts(tree, (n) => n.props.source === crest)).toHaveLength(0);
+    const drawn = hosts(tree, (n) => n.props.source === crest);
+    expect(drawn).toHaveLength(2); // one field per collapsed row
+    for (const n of drawn) expect(Number(flat(n.props.style).opacity)).toBeLessThan(0.15);
   });
 
   test('a faction the game ships no art for renders NOTHING, not a stand-in', async () => {
@@ -643,10 +662,16 @@ describe('the polish did not break the screen it polished', () => {
     expect(text).not.toContain('ENTER TARTARIA');
   });
 
-  test('the build stamp names this pass', () => {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { OTA_BUILD_ID } = require('../app/buildInfo') as { OTA_BUILD_ID: string };
-    expect(OTA_BUILD_ID).toBe('2026-09-08-1746-the-shape-comes-before-the-detail');
+  test('this pass has a stamp of its own, live or superseded', () => {
+    /* ⚠ WRITTEN AS A DURABLE CLAIM, NOT A ONE-RELEASE PIN. The original form
+     * asserted OTA_BUILD_ID *equalled* 1746, which was true for exactly one
+     * release: OTA-1747 superseded it the next day and the test failed for a
+     * reason that was not a defect. The house rule is one OTA, one stamp, with
+     * the previous one preserved on a `// SUPERSEDED:` line — so what is
+     * actually worth holding is that this pass's stamp EXISTS in the ledger,
+     * whether it is the live one or a superseded one. */
+    const BUILD = read('app', 'buildInfo.ts');
+    expect(BUILD).toContain("'2026-09-08-1746-the-shape-comes-before-the-detail'");
     expect(S).toBeDefined();
   });
 });

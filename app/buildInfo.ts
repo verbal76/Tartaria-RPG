@@ -29137,7 +29137,32 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ⚠ COMBAT DENSITY IS UNTOUCHED: no CombatStrip metric, no STRIP_METRICS value and no
 // combat call site moved. Nothing was animated, no timer, no measurement, no store
 // subscription and no elevation was added.
-export const OTA_BUILD_ID = '2026-09-08-1746-the-shape-comes-before-the-detail';
+// ── OTA-1747 — THE FACTION FIELD REACHES EVERY CARD ──────────────────────────
+// OTA-1746 printed a Tartarian's faction art into the EXPANDED record's ground -
+// the canonical crest, dramatically oversized, anchored right and cropped by the
+// card's own edges at 0.09, a ghosted fragment embedded in the plate rather than
+// a logo placed on it. The owner confirmed it on the device and asked for it on
+// every card, each wearing ITS OWN faction's emblem.
+// It is now one component driven by the Tartarian's faction, used by both card
+// states. The expanded geometry is byte-identical: that card is the reference,
+// and a "reuse" that quietly restyled it would have thrown away the thing being
+// extended. Only the vertical extent adapts, and for a measurable reason -
+// `contain` scales to whichever axis runs out first, the crests are taller than
+// wide, and on a ~56dp collapsed card the expanded percentages give a wide-short
+// box that fits by HEIGHT and centres a tiny complete logo, which is the exact
+// outcome the brief rules out. Extending the box to ~11x the card's height flips
+// the fit back to width, so the short window shows a horizontal slice through a
+// huge emblem running off the top and the right. Horizontal framing and opacity
+// are unchanged, so it is the same treatment with one adapted dimension, and the
+// suite computes the fit on a 340dp phone and at the 600dp tablet cap rather
+// than trusting the numbers.
+// A faction the game ships no art for still renders NOTHING - no placeholder, no
+// substitute, and never one shared watermark. Card dimensions, typography,
+// borders, spacing, hierarchy, colours and the two-stage tap contract are all
+// untouched; the field is pointerEvents="none" and adds no state, timer,
+// measurement or subscription.
+export const OTA_BUILD_ID = '2026-09-08-1747-the-faction-field-reaches-every-card';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-08-1746-the-shape-comes-before-the-detail';
 // golem catch-up 2026-09-08: markerless publish of OTA-1746 - Visual #3, the
 // commercial-finish pass, graded by the squint test rather than by how much
 // ornament is on the screen. Exploration was the last surface still built
