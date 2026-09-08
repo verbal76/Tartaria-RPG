@@ -29064,6 +29064,25 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // touched, the kit has not propagated to any other screen, and the title screen
 // still commits nothing at all while it is being looked at.
 export const OTA_BUILD_ID = '2026-09-08-1744-the-owner-held-it-in-his-hand';
+// golem catch-up 2026-09-08: markerless publish of OTA-1744 - the Visual #1
+// correction pass, driven entirely by what the owner saw on the Pixel. The
+// roster is the only thing that scrolls now: the primary action and the OTA
+// button were the list's own footer and the roster label was its header, so all
+// of it travelled with the scroll; heading and actions are fixed siblings of the
+// list and exactly one vertical scroller is left on the screen. The faction
+// emblem went from 58pt to 96pt - the same canonical art, contained, in the same
+// column that keeps it clear of the text and inert to touch. The thin dark line
+// above every record had two causes and both are gone: the selection settle
+// rested an inactive card at the start of its own entrance, so every collapsed
+// record sat four pixels below its own shadow-casting parent, and Android's
+// elevation painted a second shadow on top of the rim. RESTORE FROM BACKUP and
+// INVITE PLAYTESTER moved into Settings, REPORT BUG left a screen where Settings
+// already files the identical report, and EXIT GAME was deleted because on
+// Android it only backgrounded the app; their handlers, modals and styles went
+// with them, and the recovered space was given to the roster rather than
+// refilled. Structural rims are cool machined alloy now and the brand gold is
+// spent only where something is selected or asked for. No gameplay, save,
+// loading or boot change; the OTA-1743 boot repair is untouched.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-08-1743-the-boot-gate-has-an-exit';
 // golem catch-up 2026-09-08: markerless publish of OTA-1743 - the OTA-1741 boot
 // hang repair. The device symptom was a near-black screen with one small gold
