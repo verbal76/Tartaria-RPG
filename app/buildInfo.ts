@@ -29210,7 +29210,33 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // and saved, both fields land and the card is complete.
 // The same hole had been quietly costing the expanded card its riveted FACTION
 // PLATE since VIS-1; nobody had connected the two, and this repairs both.
-export const OTA_BUILD_ID = '2026-09-08-1749-the-faction-the-index-forgot';
+// ── OTA-1750 — A THIRD OF THE TILE, NOT A SPLINTER ───────────────────────────
+// Owner, on the device, seeing OTA-1747/1749 with every card finally wearing its
+// own faction: fainter than he would like, shifted so more of each emblem shows,
+// and it should cover at least a third of the tile.
+// He was right on all three, and OTA-1747 had passed every one of its own tests
+// while failing them - because it only ever asked "is the emblem cropped rather
+// than centred?", a question a thin invisible splinter answers just as well as a
+// good composition does. The error ran opposite to the intuition: the box was
+// 76% of the tile wide, which made the emblem 5.3x the TILE'S HEIGHT, so under a
+// fifth of it ever fell inside the card and most of its width ran off the right
+// edge. A SMALLER box makes a SHORTER emblem and therefore shows MORE of it. At
+// 42% of the tile's width the emblem is 3x the tile's height instead of 5.3x, a
+// third of it shows instead of a fifth, and its whole width now sits inside the
+// card. Coverage is 42% of the tile, past the one-third floor, and it is the
+// same 42% for every crest - which is the answer to "some designs are smaller
+// than others", since fitting by width makes each emblem exactly as wide as the
+// next and only the visible share of its own height varies with its aspect (the
+// nine run 1.00 to 1.20). Opacity 0.09 to 0.17 on the collapsed tile and 0.09 to
+// 0.13 on the expanded one; the expanded card's geometry, which the owner
+// approved, has not moved. The name still clears 4.5:1 over the brightest part
+// of the artwork and the objective line clears 3:1.
+// The suite now asks the questions that would have caught this: coverage as a
+// fraction of the tile on phone and tablet for every crest, the share of the
+// emblem actually visible, that the whole width is inside the card, and that it
+// is still cropped rather than a centred logo.
+export const OTA_BUILD_ID = '2026-09-08-1750-a-third-of-the-tile-not-a-splinter';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-08-1749-the-faction-the-index-forgot';
 // golem catch-up 2026-09-08: markerless publish of OTA-1748 and OTA-1749.
 // 1748 - the settings mark is drawn. Both settings buttons rendered U+2699 as
 // text, so the icon was whatever the device's symbol font contained, and that

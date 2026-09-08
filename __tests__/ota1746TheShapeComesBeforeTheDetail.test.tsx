@@ -592,7 +592,9 @@ describe('artwork is composition, not a thumbnail in a box', () => {
     const crest = factionCrest(getFactions()[0]!.id);
     const drawn = hosts(tree, (n) => n.props.source === crest);
     expect(drawn).toHaveLength(2); // one field per collapsed row
-    for (const n of drawn) expect(Number(flat(n.props.style).opacity)).toBeLessThan(0.15);
+    // ⚠ bound raised with OTA-1750: the owner asked for these to read stronger
+    // than the 0.09 VIS-3 shipped. Still a ghost, not a picture.
+    for (const n of drawn) expect(Number(flat(n.props.style).opacity)).toBeLessThan(0.22);
   });
 
   test('a faction the game ships no art for renders NOTHING, not a stand-in', async () => {

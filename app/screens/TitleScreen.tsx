@@ -1494,38 +1494,40 @@ const styles = StyleSheet.create({
    * at this weight the name and the objective are never composited over more
    * than the emblem's outer edge, so no text loses contrast on any theme. */
   dossierFieldClip: { ...StyleSheet.absoluteFillObject, borderRadius: 3, overflow: 'hidden' },
-  dossierField: { position: 'absolute', top: '-18%', bottom: '-18%', right: '-8%', left: '32%', opacity: 0.09 },
-  /* ⚠⚠⚠ THE COLLAPSED CARD NEEDS DIFFERENT NUMBERS TO GET THE SAME LOOK, and
-   * this is the whole reason `compact` exists. The percentages above are
-   * relative to the CARD, and a collapsed card is roughly a quarter the height
-   * of an expanded one — so reusing them literally would have produced the
-   * opposite of what was asked.
+  dossierField: { position: 'absolute', top: '-18%', bottom: '-18%', right: '-8%', left: '32%', opacity: 0.13 },
+  /* ⚠⚠⚠ THE COLLAPSED CARD NEEDS DIFFERENT NUMBERS TO GET THE SAME LOOK — AND
+   * OTA-1747 GOT THEM WRONG IN THE OTHER DIRECTION. Recorded because the error
+   * is instructive and I would otherwise repeat it.
    *
-   * ⚠⚠ THE ARITHMETIC, because it is not obvious and it is the thing that breaks.
-   * `contain` scales the emblem to fit whichever axis runs out first. The source
-   * crests are TALLER THAN WIDE (1145x1374 and friends), so the emblem only
-   * comes out oversized-and-cropped when the box fits it BY WIDTH:
-   *     box_h  >=  box_w x (1374 / 1145)  ~=  1.2 x box_w
-   * On the expanded card the box is near-square and that holds comfortably. On a
-   * ~56dp collapsed card the same -18%/+18% gives a box about 76 tall and 258
-   * wide — WIDE AND SHORT — so `contain` fits by HEIGHT instead and centres a
-   * tiny complete logo in the middle of the card. That is precisely the
-   * "shrink it into a centered background logo" outcome the brief rules out.
+   * `contain` scales the emblem until the first axis runs out. Fitting by WIDTH
+   * is right — it fixes the emblem's width as an exact fraction of the tile on
+   * every screen size, with no centring slack, so placement is deterministic.
+   * What I got wrong was the SIZE OF THE BOX. At 76% of the tile's width the
+   * emblem came out 5.3x THE TILE'S HEIGHT, so barely a fifth of it ever fell
+   * inside the card: what the owner saw on the device was a thin diagonal
+   * splinter, different on every crest, and mostly off the right edge. I had
+   * optimised for "oversized and cropped" and overshot into "invisible".
    *
-   * ⚠ So the vertical extent is the ONLY thing that changes: 500% above and
-   * below makes the box ~11x the card's height, the fit flips back to width, and
-   * the card's short window shows a horizontal slice through the emblem's middle
-   * — a huge ghosted fragment running off both the top and the right, exactly
-   * like the expanded card. The horizontal framing (left 32%, right -8%) and the
-   * opacity (0.09) are IDENTICAL to the expanded field on purpose: same
-   * treatment, same material, one adapted dimension.
+   * ⚠⚠ SMALLER BOX = SHORTER EMBLEM = MORE OF IT VISIBLE. At 42% of the tile's
+   * width the emblem is ~3x the tile's height instead of 5.3x, so a THIRD of it
+   * shows rather than a fifth, and the whole of its width sits inside the card
+   * instead of running off the edge. Measured, phone and tablet cap:
+   *     BEFORE  76% wide, 5.3x tall, 19% of the emblem visible
+   *     AFTER   42% wide, 3.0x tall, 34% of the emblem visible
+   * It covers 42% of the tile — comfortably past the owner's one-third floor —
+   * and it covers the SAME 42% whichever crest it is, which is the answer to
+   * "some designs are smaller than others": fitting by width makes every emblem
+   * exactly as wide, and only the amount of its HEIGHT on show varies with the
+   * artwork's own aspect (the nine run 1.00 to 1.20).
    *
-   * ⚠ 500 is not arbitrary — it clears the inequality on a 340dp phone AND on
-   * the 600dp tablet cap (where the box is wider, so it needs to be taller
-   * still) with headroom. The OTA-1747 suite computes both cases; if anyone
-   * retunes these numbers and the fit flips back to height, that test fails and
-   * says so rather than letting a centred logo ship. */
-  dossierFieldCompact: { position: 'absolute', top: '-500%', bottom: '-500%', right: '-8%', left: '32%', opacity: 0.09 },
+   * ⚠ `top`/`bottom` are deliberately far larger than the emblem needs. They are
+   * not the emblem's size — they only have to be tall enough that the fit stays
+   * on the WIDTH axis at the 600dp tablet width, where the box is wider and so
+   * the emblem would otherwise be taller than the box. Excess is inert slack.
+   *
+   * ⚠ It sits from 40% to 82% of the tile, which clears the name column and
+   * stops short of the timestamp. */
+  dossierFieldCompact: { position: 'absolute', top: '-250%', bottom: '-250%', right: '18%', left: '40%', opacity: 0.17 },
   dossierNameRule: { marginTop: 6, marginBottom: 6 },
   /* ⚠ PHONE-FIX — INDEX TICKS: three hairlines machined across the spine, the
    * way a real filed plate carries a position mark. Fine technical engraving is

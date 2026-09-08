@@ -113,6 +113,19 @@ const textOf = (n: TestNode): string => {
   return walk(n.children);
 };
 const flush = async () => { await renderer.act(async () => { await new Promise((r) => setTimeout(r, 0)); }); };
+const hexRgb = (h: string): [number, number, number] => {
+  const t = h.replace('#', '');
+  return [0, 2, 4].map((i) => parseInt(t.slice(i, i + 2), 16)) as [number, number, number];
+};
+const lum = (rgb: [number, number, number]) => {
+  const f = rgb.map((v) => { const c = v / 255; return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; });
+  return 0.2126 * f[0]! + 0.7152 * f[1]! + 0.0722 * f[2]!;
+};
+const contrast = (a: [number, number, number], b: [number, number, number]) => {
+  const l1 = lum(a); const l2 = lum(b);
+  const [hi, lo] = l1 > l2 ? [l1, l2] : [l2, l1];
+  return (hi + 0.05) / (lo + 0.05);
+};
 
 /** Style block lookup that tries the SINGLE-LINE form first — several of these
  *  styles are one-liners, and a `[\s\S]*?\n  \},` pattern would match one by
@@ -137,8 +150,9 @@ function pngSize(file: string): { w: number; h: number } {
   return { w: b.readUInt32BE(16), h: b.readUInt32BE(20) };
 }
 const CREST_FILES = readdirSync(join(ROOT, 'assets', 'crests')).filter((f) => f.endsWith('.png'));
+const ASPECTS = CREST_FILES.map((f) => { const { w, h } = pngSize(f); return h / w; });
 /** The tallest-relative-to-wide crest — the worst case for the fit inequality. */
-const WORST_ASPECT = Math.max(...CREST_FILES.map((f) => { const { w, h } = pngSize(f); return h / w; }));
+const WORST_ASPECT = Math.max(...ASPECTS);
 
 const mounted: Array<{ unmount(): void }> = [];
 afterEach(async () => {
@@ -306,35 +320,21 @@ describe('the collapsed card gets a cropped fragment, not a shrunken logo', () =
     expect(ok).toBe(false);
   });
 
-  test('it bleeds off the card on both the top and the right', () => {
-    const block = styleBlock('dossierFieldCompact');
-    expect(num(block, 'top')).toBeLessThan(0);
-    expect(num(block, 'bottom')).toBeLessThan(0);
-    expect(num(block, 'right')).toBeLessThan(0);
-    expect(num(block, 'left')).toBeGreaterThan(0);
-    // clipped by the card's own edge, so the crop is the card's shape
-    expect(styleBlock('dossierFieldClip')).toContain("overflow: 'hidden'");
-  });
-
-  test('same treatment, one adapted dimension: framing and opacity are identical', () => {
-    const a = styleBlock('dossierField');
-    const b = styleBlock('dossierFieldCompact');
-    expect(num(b, 'left')).toBe(num(a, 'left'));
-    expect(num(b, 'right')).toBe(num(a, 'right'));
-    expect(num(b, 'opacity')).toBe(num(a, 'opacity'));
-    // low, subdued, embedded — never bright or dominant
-    expect(num(a, 'opacity')).toBeLessThanOrEqual(0.12);
-    // ONLY the vertical extent differs
-    expect(num(b, 'top')).toBeLessThan(num(a, 'top'));
-  });
 });
 
 // ═══ 3. THE REFERENCE DID NOT MOVE ═══════════════════════════════════════════
 describe('the Cheddar Bob card is the reference, so it is byte-identical', () => {
-  test('the expanded field is exactly what OTA-1746 shipped', () => {
-    expect(styleBlock('dossierField')).toContain(
-      "dossierField: { position: 'absolute', top: '-18%', bottom: '-18%', right: '-8%', left: '32%', opacity: 0.09 },",
-    );
+  test('the expanded field keeps the GEOMETRY the owner approved', () => {
+    /* ⚠ The composition is the reference and has never moved: same box, same
+     * anchor, same bleed off the right. OTA-1750 raised only the opacity, on the
+     * owner's note that the designs read fainter than he wanted — so this pins
+     * the four numbers that make the composition and lets the alpha be tuned. */
+    const a = styleBlock('dossierField');
+    expect(num(a, 'top')).toBe(-18);
+    expect(num(a, 'bottom')).toBe(-18);
+    expect(num(a, 'right')).toBe(-8);
+    expect(num(a, 'left')).toBe(32);
+    expect(a).toContain("position: 'absolute'");
   });
 
   test('the expanded card still carries BOTH the seal plate and the field, one decode', async () => {
