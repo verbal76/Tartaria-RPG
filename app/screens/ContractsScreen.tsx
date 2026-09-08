@@ -44,6 +44,7 @@ import {
 } from '../engine/mainQuest';
 import { GUARDIANS_BY_CAPITAL } from '../engine/coreGuardians';
 
+import { TScreenHeader } from '../ui/tartariaKit';
 function MilestoneStat({
   label,
   value,
@@ -636,20 +637,12 @@ export function ContractsScreen() {
       {!missionCompleteNotice && (
         <FirstTimeHint id={TEACH.contracts_first_open_v3.id} title={TEACH.contracts_first_open_v3.title} body={TEACH.contracts_first_open_v3.body} />
       )}
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => setScreen('exploration')}
-          style={styles.backBtn}
-          hitSlop={8}
-          activeOpacity={0.7}
-          accessibilityRole="button"
+      <TScreenHeader
+          title="CONTRACTS"
+          onBack={() => setScreen('exploration')}
+          density="tight"
           accessibilityLabel="Back"
-        >
-          <Text style={styles.backText}>← BACK</Text>
-        </TouchableOpacity>
-        <Text style={styles.title} accessibilityRole="header">CONTRACTS</Text>
-        <View style={{ width: 80 }} />
-      </View>
+        />
 
       {(() => {
         // v2.4.1 (OTA 033) — Primary Objective card. Renders above
@@ -2553,24 +2546,6 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontStyle: 'italic',
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  backBtn: {
-    backgroundColor: '#1a1714',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderColor: '#3a342c',
-    borderWidth: 1,
-    borderRadius: 4,
-    width: 80,
-    alignItems: 'center',
-  },
-  backText: { color: '#c9a86a', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
-  title: { color: '#e6d8b3', letterSpacing: 4, fontSize: 14 },
   placeholder: { color: '#a2977b', textAlign: 'center', marginTop: 80 },
   emptyWrap: {
     flex: 1,

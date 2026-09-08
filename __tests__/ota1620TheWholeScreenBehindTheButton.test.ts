@@ -78,8 +78,13 @@ describe('OTA-1620 — MISSIONS opens the Contracts screen itself', () => {
     expect(body).toContain("setScreen('contracts');");
     // And App still mounts that screen for that id — one object, one door.
     expect(APP).toContain("{screen === 'contracts' && <ContractsScreen />}");
-    // Its own BACK returns to the world: hit the button, do your thing, back.
-    expect(CONTRACTS).toContain("onPress={() => setScreen('exploration')}");
+    /* Its own BACK returns to the world: hit the button, do your thing, back.
+     * ⚠ OTA-1758 — ANCHORED ON THE CLAIM, NOT ON A PROP NAME. This read
+     * `onPress={() => setScreen('exploration')}` and broke when the screen
+     * adopted `TScreenHeader`, whose handler prop is `onBack`. Nothing about
+     * the door changed; only the spelling of the hinge. What matters is that
+     * the back affordance goes to exploration, however it is wired. */
+    expect(CONTRACTS).toMatch(/on(Press|Back)=\{\(\) => setScreen\('exploration'\)\}/);
   });
 
   it('⚠⚠⚠ THE CARD IS GONE — component, state, import, wiring', () => {

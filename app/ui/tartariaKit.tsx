@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import { Animated, Easing, Image, Pressable, StyleSheet, Text, View, type ViewStyle, type StyleProp } from 'react-native';
+import { Animated, Easing, Image, Pressable, StyleSheet, Text, TouchableOpacity, View, type ViewStyle, type StyleProp } from 'react-native';
 import { useReduceMotion } from '../state/accessibility';
 
 /* ⚠⚠⚠ VIS-1 — THE TARTARIA INTERFACE KIT.
@@ -647,7 +647,115 @@ export function TSettle({
   return <Animated.View style={[style, { transform }]}>{children}</Animated.View>;
 }
 
+/* ⚠⚠⚠ TSCREENHEADER — THIRTEEN HAND-ROLLED BACK BARS, ONE PRIMITIVE.
+ *
+ * Tier 0 of the interface rollout. Every screen but Exploration, Title and
+ * Ending built its own `← BACK` / title / spacer row, and they agreed almost
+ * completely — which is what makes this worth extracting rather than a matter
+ * of taste. Measured across the twelve that have one:
+ *
+ *   backText   IDENTICAL in all twelve, byte for byte.
+ *   backBtn    identical but for padding: 14/10 on eight, 12/6 on three,
+ *              16/12 on CharacterCreation.
+ *   header row `row · space-between · center`, differing only in whether it
+ *              carries `paddingVertical: 8` and by how much it margins below.
+ *   title      ⚠ SPLIT SIX / FIVE — gold on About, Character, Crafting, Map,
+ *              Vendor and World; ink on ActionReference, Contracts, Guidance,
+ *              Log and Lore.
+ *
+ * ⚠⚠ AND THE SPLIT IS NOT A DRAW — VIS-3 ALREADY SETTLED IT. Gold marks a LIVE
+ * OBLIGATION or a LIVE PROCESS. A screen's own name is neither; it is the least
+ * urgent text on the screen, and making it the brightest thing competes with
+ * whatever the screen is actually for. That is the same reasoning that took gold
+ * off Exploration's place name in OTA-1746. So `ink` is the default here, and a
+ * gold title has to be asked for by name.
+ *
+ * ⚠ THE RIGHT SLOT IS A SLOT, NOT A SPACER. Eight screens balance the row with
+ * `<View style={{ width: 80 }} />`; Map and Vendor put real controls there. Both
+ * are the same shape — something on the right that is `minWidth` matched to the
+ * back button so the title sits centred — so `right` takes a node and falls back
+ * to reserving the width.
+ *
+ * ⚠ WHAT IT DOES NOT DO: it is a row, not a chrome bar. No background, no
+ * border, no plane of its own. Screens sit it on their own substrate exactly as
+ * the hand-rolled versions did, so adopting it moves nothing.
+ *
+ * ⚠⚠ AND THE BACK CONTROL IS STILL A `TouchableOpacity`, NOT A `TButton`, WHICH
+ * IS A DEFERRAL RATHER THAN AN OVERSIGHT. The kit's control family presses with
+ * a depth translate; these twelve press with `activeOpacity={0.7}`. Routing them
+ * through `TButton` is the right end state and it is a VISIBLE change to how the
+ * control feels — so it is a decision for the screen passes, not something to
+ * smuggle in under a primitive whose whole claim is that nothing moves. */
+export function TScreenHeader({
+  title, onBack, right, tone = 'ink', backLabel = '← BACK',
+  density = 'regular', accessibilityLabel = 'Go back', hitSlop = 8, style,
+}: {
+  title: string;
+  onBack?: () => void;
+  right?: React.ReactNode;
+  /** ⚠ `gold` is a deliberate exception, not a style choice — see above. */
+  tone?: 'ink' | 'gold';
+  backLabel?: string;
+  density?: 'regular' | 'tight';
+  accessibilityLabel?: string;
+  hitSlop?: number;
+  style?: StyleProp<ViewStyle>;
+}) {
+  return (
+    <View style={[kit.schRow, density === 'tight' && kit.schRowTight, style]}>
+      {onBack ? (
+        <TouchableOpacity
+          onPress={onBack}
+          style={[kit.schBack, density === 'tight' && kit.schBackTight]}
+          hitSlop={hitSlop}
+          activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityLabel={accessibilityLabel}
+        >
+          <Text style={kit.schBackText}>{backLabel}</Text>
+        </TouchableOpacity>
+      ) : (
+        <View style={kit.schSlot} />
+      )}
+      <Text
+        style={[kit.schTitle, tone === 'gold' && kit.schTitleGold]}
+        accessibilityRole="header"
+        numberOfLines={1}
+      >
+        {title}
+      </Text>
+      {/* ⚠ The right slot always occupies the back button's width even when it
+          is empty, or the title stops being centred and drifts as the back
+          label changes length. That is what the eight `width: 80` spacers were
+          doing by hand. */}
+      <View style={kit.schSlot}>{right}</View>
+    </View>
+  );
+}
+
 const kit = StyleSheet.create({
+  // ── TScreenHeader ─────────────────────────────────────────────────────────
+  // ⚠ These are the shipped values, not new ones: the row, the back button and
+  // its text are what twelve screens already agreed on.
+  schRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 8, marginBottom: 4 },
+  schRowTight: { paddingVertical: 0, marginBottom: 8 },
+  schBack: {
+    backgroundColor: '#1a1714',
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    minWidth: 80,
+    alignItems: 'center',
+  },
+  schBackTight: { paddingHorizontal: 12, paddingVertical: 6 },
+  schBackText: { color: T.gold, fontSize: 14, letterSpacing: 2, fontWeight: '700' },
+  // ⚠ A screen's own name is not a live obligation. Ink by default; see TScreenHeader.
+  schTitle: { color: T.ink, fontSize: 14, letterSpacing: 4, fontWeight: '700', flexShrink: 1, textAlign: 'center' },
+  schTitleGold: { color: T.gold },
+  /** Reserves the back button's width so the title stays centred. */
+  schSlot: { minWidth: 80, alignItems: 'flex-end' },
   // ornament
   ruleCut: { height: StyleSheet.hairlineWidth, backgroundColor: 'rgba(0,0,0,0.55)' },
   ruleCutLit: { backgroundColor: 'rgba(0,0,0,0.65)' },

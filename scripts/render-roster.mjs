@@ -33,6 +33,8 @@ import WebSocket from 'ws';
 const ROOT = process.env.TARTARIA_WEB_BUILD ?? path.resolve('scratchpad/webbuild3');
 const CHROME = '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
 const [outPrefix, dims, expandIdx] = process.argv.slice(2);
+/** Which screen to open. `--screen=contracts` etc.; defaults to the roster. */
+const SCREEN = (process.argv.find((a) => a.startsWith('--screen=')) ?? '--screen=title').slice(9);
 const [VW, VH] = (dims ?? '411x915').split('x').map(Number);
 
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.json': 'application/json',
@@ -135,14 +137,15 @@ await new Promise((r) => setTimeout(r, 1500));
 await S('Runtime.evaluate', {
   expression: `localStorage.setItem('tartaria.slots.index.v2', ${JSON.stringify(JSON.stringify(slots))});
                localStorage.setItem('@tartaria/crashNoticeSeen','true');
-               localStorage.setItem('@tartaria/crashReporting','1'); 'ok'`,
+               localStorage.setItem('@tartaria/crashReporting','1');
+               localStorage.setItem('harness.screen', ${JSON.stringify(SCREEN)}); 'ok'`,
 });
 await S('Page.navigate', { url: `http://127.0.0.1:${PORT}/index.html` });
 
 // Wait for the roster to actually paint a card, rather than a fixed sleep.
-const deadline = Date.now() + 60000;
-let ready = false;
-while (Date.now() < deadline) {
+const deadline = Date.now() + (SCREEN === 'title' ? 60000 : 25000);
+let ready = SCREEN !== 'title';
+while (!ready && Date.now() < deadline) {
   const { result } = await S('Runtime.evaluate', {
     expression: `(() => { const t = document.body ? document.body.innerText : '';
                  return t.includes('Johnny Blaze') ? 'yes' : t.slice(0, 80); })()`,
@@ -217,38 +220,24 @@ await new Promise((r) => setTimeout(r, 3000));
 
 const { result: probe } = await S('Runtime.evaluate', {
   expression: `(() => {
-    const FOCUS = { tartarian_revivalists:[0.499,0.397], mud_monarchs:[0.501,0.446],
-                    stone_builders:[0.505,0.494], forgotten_order:[0.502,0.457] };
+    const r = (e) => { const b = e.getBoundingClientRect();
+      return [Math.round(b.x*10)/10, Math.round(b.y*10)/10, Math.round(b.width*10)/10, Math.round(b.height*10)/10]; };
     const out = [];
-    for (const el of document.querySelectorAll('div')) {
-      const m = (getComputedStyle(el).backgroundImage || '')
-        .match(/(tartarian_revivalists|mud_monarchs|stone_builders|forgotten_order)/);
-      if (!m) continue;
-      // RNW renders <Image> as: placementDiv > (hidden <img> + backgroundImage div).
-      // So the element carrying the background is a CHILD of our placed box, and
-      // the clip is that box's parent. Walk up until the ancestor is genuinely
-      // wider than the emblem — that is the card face, never an Image wrapper.
-      const imgRoot = el.parentElement;
-      let clip = imgRoot ? imgRoot.parentElement : null;
-      while (clip && clip.getBoundingClientRect().width <= imgRoot.getBoundingClientRect().width + 1) {
-        clip = clip.parentElement;
+    for (const e of document.querySelectorAll('div,span')) {
+      const t = (e.textContent || '').trim();
+      const leaf = ![...e.children].some((c) => (c.textContent || '').trim() === t);
+      if (leaf && /^(← BACK|CONTRACTS|ACTIONS)$/.test(t)) {
+        const cs = getComputedStyle(e);
+        out.push({ t, box: r(e), color: cs.color, size: cs.fontSize,
+                   spacing: cs.letterSpacing, weight: cs.fontWeight });
+        const btn = e.parentElement;
+        if (t === '← BACK' && btn) {
+          const b = getComputedStyle(btn);
+          out.push({ t: 'backBtn', box: r(btn), bg: b.backgroundColor,
+                     border: b.borderTopColor + ' ' + b.borderTopWidth,
+                     radius: b.borderTopLeftRadius, pad: b.paddingTop + '/' + b.paddingLeft });
+        }
       }
-      if (!clip) continue;
-      const i = imgRoot.getBoundingClientRect(), c = clip.getBoundingClientRect();
-      const [fx, fy] = FOCUS[m[1]];
-      const r = (n) => Math.round(n * 1000) / 1000;
-      out.push({
-        crest: m[1],
-        card: [r(c.width), r(c.height)],
-        img: [r(i.x - c.x), r(i.y - c.y), r(i.width), r(i.height)],
-        landedFocus: [r((i.x - c.x + fx * i.width) / c.width),
-                      r((i.y - c.y + fy * i.height) / c.height)],
-        coverage: r(i.width / c.width),
-        opacity: getComputedStyle(imgRoot).opacity,
-        innerOpacity: getComputedStyle(el).opacity,
-        visible: r((Math.min(c.height, i.y - c.y + i.height) - Math.max(0, i.y - c.y)) / i.height),
-        bleedsRight: r((i.x - c.x + i.width) - c.width),
-      });
     }
     return JSON.stringify(out, null, 1);
   })()`,

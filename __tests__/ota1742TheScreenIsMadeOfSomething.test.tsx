@@ -655,9 +655,16 @@ describe('OTA-1742 — the language is reusable, and the first pass stayed in it
    * EXACT list. A third screen joining it is a real decision that shows up as a
    * failing test, which is exactly what should happen. */
   it('⚠⚠⚠ propagation is by instruction, never by drift — the consumer list is exact', () => {
-    // Still off, and still by name: these were never asked for.
+    /* Still off, and still by name: these were never asked for.
+     * ⚠⚠⚠ OTA-1758 REMOVED `ContractsScreen` FROM THIS LIST, DELIBERATELY, AND
+     * THAT IS THE MECHANISM WORKING. This test is the guardrail that stops a
+     * second design system forming by drift, and it caught the Tier 0 header
+     * rollout the moment two screens imported a primitive without the list
+     * being updated in the same commit. Widening it is an ACT, recorded here;
+     * a screen that appears in `consumers` below without a line in this comment
+     * is drift, and drift is what this test exists to fail on. */
     const off = ['CombatScreen', 'InventoryScreen', 'VendorScreen',
-      'ContractsScreen', 'CharacterScreen', 'CraftingScreen', 'GuidanceScreen'];
+      'CharacterScreen', 'CraftingScreen', 'GuidanceScreen'];
     for (const name of off) {
       const p = join(ROOT, 'app', 'screens', `${name}.tsx`);
       if (!existsSync(p)) continue;
@@ -666,8 +673,18 @@ describe('OTA-1742 — the language is reusable, and the first pass stayed in it
     const screens = require('fs').readdirSync(join(ROOT, 'app', 'screens')) as string[];
     const consumers = screens.filter((f) => f.endsWith('.tsx')
       && readFileSync(join(ROOT, 'app', 'screens', f), 'utf8').includes('tartariaKit')).sort();
-    // VIS-1's reference implementation, and VIS-3's polish target. Two.
-    expect(consumers).toEqual(['ExplorationScreen.tsx', 'TitleScreen.tsx']);
+    /* VIS-1's reference implementation, VIS-3's polish target, and the two
+     * screens that adopted `TScreenHeader` in OTA-1758 — chosen for their
+     * regression cover (31 and 9 referencing suites), not for convenience.
+     * ⚠ The four thin-cover screens (Log, Lore, Guidance, World) are NOT here
+     * and must not be added until the owner's open decision about writing
+     * cover first is settled. */
+    expect(consumers).toEqual([
+      'ActionReferenceScreen.tsx',
+      'ContractsScreen.tsx',
+      'ExplorationScreen.tsx',
+      'TitleScreen.tsx',
+    ]);
   });
 
   it('⚠ typography is a handful of functional roles, not a pile of decorative fonts', () => {

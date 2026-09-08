@@ -11,6 +11,7 @@ import * as Clipboard from 'expo-clipboard';
 import { useGameStore } from '../state/gameStore';
 import conceptsData from '../data/lore/concepts.json';
 
+import { TScreenHeader } from '../ui/tartariaKit';
 interface Concept {
   id: string;
   title: string;
@@ -434,20 +435,12 @@ export function ActionReferenceScreen() {
   const setScreen = useGameStore((s) => s.setScreen);
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => setScreen('exploration')}
-          style={styles.backBtn}
-          hitSlop={8}
-          activeOpacity={0.7}
-          accessibilityRole="button"
+      <TScreenHeader
+          title="ACTIONS"
+          onBack={() => setScreen('exploration')}
+          density="tight"
           accessibilityLabel="Go back"
-        >
-          <Text style={styles.backText}>← BACK</Text>
-        </TouchableOpacity>
-        <Text style={styles.title} accessibilityRole="header">ACTIONS</Text>
-        <View style={{ width: 80 }} />
-      </View>
+        />
       <ActionReferenceBody />
     </View>
   );
@@ -455,24 +448,6 @@ export function ActionReferenceScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'transparent', padding: 12 },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  backBtn: {
-    backgroundColor: '#1a1714',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderColor: '#3a342c',
-    borderWidth: 1,
-    borderRadius: 4,
-    width: 80,
-    alignItems: 'center',
-  },
-  backText: { color: '#c9a86a', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
-  title: { color: '#e6d8b3', letterSpacing: 4, fontSize: 14 },
   scroll: { flex: 1 },
   content: { paddingBottom: 32 },
   // arb88 — search box.

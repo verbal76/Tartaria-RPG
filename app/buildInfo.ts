@@ -29415,7 +29415,30 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // case-sensitive count would have missed the kit's own declaration, so the
 // gate's case-insensitivity is load-bearing. Normalising is a whole-tree edit
 // for no visible gain and belongs to the legacy hunt.
-export const OTA_BUILD_ID = '2026-09-08-1757-colours-that-mean-something';
+// - OTA-1758 - THIRTEEN HAND-ROLLED BACK BARS, ONE PRIMITIVE ----------------
+// Tier 0 step 2. Twelve screens each built their own back/title/spacer row and
+// they agreed almost completely, which is what makes this an extraction rather
+// than a redesign: backText was byte-identical in all twelve, backBtn differed
+// only in padding, the row was the same everywhere. The title split six gold /
+// five ink, and VIS-3 already settles that - gold marks a live obligation or a
+// live process, and a screen's own name is neither - so TScreenHeader defaults
+// to ink and a gold title has to be asked for by name.
+// The claim was that nothing moves. Photographing ContractsScreen from the REAL
+// bundle before and after proved otherwise, and the difference is a bug being
+// fixed: three screens gave the back button a FIXED width: 80 with 12px of
+// padding, leaving 56px for a label that needs about 70, so "back" wrapped onto
+// two lines with the arrow alone on the row above. The primitive uses minWidth,
+// so the label fits: 80x46 becomes 96x30. The other nine never wrapped.
+// Adopted on ContractsScreen and ActionReferenceScreen - both well covered, both
+// plain back/title/spacer rows - and their orphaned header styles are deleted
+// rather than left behind. GuidanceScreen still carries the wrapping button and
+// is deliberately untouched: it is one of the four thin-cover screens, and the
+// owner has an open decision about writing cover before touching those.
+// The render harness gained the ability to open any screen and to build a real
+// player from the game's own createCharacter, which is what made the before/after
+// comparison possible at all.
+export const OTA_BUILD_ID = '2026-09-08-1758-one-header';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-08-1757-colours-that-mean-something';
 // golem catch-up 2026-09-08: markerless publish of OTA-1757 - the colours that
 // mean something have names. Tier 0 step 1 of the interface rollout, and
 // deliberately a step nobody can see: the owner said plainly that the scale of

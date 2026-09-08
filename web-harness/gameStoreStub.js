@@ -10,6 +10,17 @@
  * stylesheet and the real layout engine. This only supplies the roster rows
  * and keeps the shell out of its boot states.
  */
+/* ⚠⚠ A REAL PLAYER, FROM THE GAME'S OWN FACTORY. The screens beyond the roster
+ * read deeply into `player` — ContractsScreen wants `memorableEvents`, the sheet
+ * wants a full stat breakdown — and a hand-rolled fixture would be a second
+ * source of truth about what a character IS. `engine/character.createCharacter`
+ * is a pure module with no store dependency, so the harness uses it and gets
+ * whatever the game currently considers a fresh character.
+ * ⚠ It is only built when a non-title screen is being photographed; the roster
+ * needs no player and paying for one would slow every run. */
+// eslint-disable-next-line no-undef, @typescript-eslint/no-require-imports
+const { createCharacter } = require('../app/engine/character');
+
 const now = Date.now();
 
 // The owner's calibration fixtures. Factions chosen to span BOTH extremes of
@@ -53,8 +64,17 @@ const SLOTS = [
   createdAt: now - i * 864e5 * 9,
 }));
 
+/* ⚠ WHICH SCREEN TO PHOTOGRAPH. The harness could only ever see the title
+ * screen, which made it useless for the rest of the rollout. `harness.screen` in
+ * localStorage is seeded by scripts/render-roster.mjs before the app boots, so
+ * any screen can be opened without touching shipped code. */
+const START = (() => {
+  try { return globalThis.localStorage?.getItem('harness.screen') || 'title'; }
+  catch { return 'title'; }
+})();
+
 const DATA = {
-  currentScreen: 'title',
+  currentScreen: START,
   hydrated: true,
   otaBootResolved: true,
   slots: SLOTS,
@@ -68,7 +88,16 @@ const DATA = {
   qwenStatus: 'ready',
   qwenFraction: 1,
   cognitiveStatus: 'ready',
-  player: null,
+  /* ⚠ Noun-shaped store slices the screens read INTO. The Proxy below returns
+   * `undefined` for unknown nouns, which is right for "absent" but wrong for a
+   * container the screen immediately indexes — `s.worldMemory.memorableEvents`
+   * throws on undefined rather than degrading. Empty containers, not fixtures. */
+  worldMemory: { memorableEvents: [] },
+  arbiterMemory: {},
+  vendorState: {},
+  player: START === 'title' ? null : createCharacter({
+    name: 'Cheddar Bob', raceId: 'mud_dweller', factionId: 'mud_monarchs',
+  }),
   currentScene: null,
 };
 
