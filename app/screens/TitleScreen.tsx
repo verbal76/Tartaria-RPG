@@ -60,6 +60,10 @@ import { checkAndApplyOTA } from '../updates/checkAndApplyOTA';
 import { useReadableMuted } from '../ui/displaySettings';
 import { CONTENT_MAX_WIDTH } from '../ui/displayScale'; // OTA-1227 — one column width, platform-aware
 import { modelBootPercent, modelsStillLoading } from '../ui/modelBootProgress'; // OTA-1228 — the 51% bar, made testable
+// ⚠⚠⚠ VIS-1 — the Tartaria interface kit. This screen is its first reference
+// implementation; read app/ui/tartariaKit.tsx before adding anything visual here.
+import { T, TType, TButton, TDivider, TRule, TCorners, TResourceChit, TFactionPlate, TSettle, TStrata } from '../ui/tartariaKit';
+import { factionCrest } from '../engine/factionCrests';
 
 const races = racesData as { id: string; name: string }[];
 const locations = locationsData as { id: string; name: string }[];
@@ -641,56 +645,103 @@ export function TitleScreen() {
   // works in both states (SwipeableRow wraps both).
   const renderItem = ({ item }: { item: SlotSummary }) => {
     if (expandedSlotId !== item.slotId) {
+      /* ⚠⚠⚠ VIS-1 — A RECOVERED RECORD, NOT AN APPLICATION ROW. The collapsed
+         dossier keeps exactly the two lines it always showed (name + time, then
+         the resume objective or the HP line) and gains the material the rest of
+         Tartaria will be built from: an outer drop shadow so the plate sits ON
+         the world, a structural rim whose top edge catches light and whose
+         bottom falls into shadow, a recessed face, corner registration marks,
+         and a left IDENTITY SPINE — the engraved edge of a filed record.
+         Compact enough to browse a stack of them, which was the point of the
+         two-stage card (OTA-1491) and is unchanged here. */
       return (
         <SwipeableRow onDelete={() => confirmDelete(item)}>
           <TouchableOpacity
-            style={[styles.slot, styles.slotCompact, item.dead && styles.slotDead, !bootGateOpen && styles.btnDisabled]}
+            style={[styles.dossierOuter, !bootGateOpen && styles.btnDisabled]}
             onPress={() => setExpandedSlotId(item.slotId)}
-            activeOpacity={0.7}
+            activeOpacity={0.85}
             disabled={!bootGateOpen}
             accessibilityRole="button"
             accessibilityState={{ disabled: !bootGateOpen, expanded: false }}
             accessibilityHint={`Shows ${item.playerName}'s full details`}
           >
-            <View style={styles.slotHead}>
-              <View style={styles.slotNameRow}>
-                <Text style={[styles.slotName, item.dead && styles.slotNameDead]}>{item.playerName}</Text>
-                {item.dead && <Text style={styles.deadBadge}>DEAD</Text>}
+            {/* ⚠ VIS-1 — the same TSettle wraps BOTH states, so React keeps one
+                instance across the expand and the animation runs on the change
+                rather than on a mount that never happens (FlatList reuses the
+                row). A collapsed record simply sits at rest. */}
+            <TSettle active={false}>
+            <View style={[styles.dossierRim, item.dead && styles.dossierRimDead]}>
+              <View style={[styles.dossierFace, styles.dossierFaceCompact, item.dead && styles.dossierFaceDead]}>
+                <View style={[styles.spine, item.dead && styles.spineDead]} pointerEvents="none" />
+                <TCorners />
+                <View style={styles.dossierBody}>
+                  <View style={styles.slotHead}>
+                    <View style={styles.slotNameRow}>
+                      <Text style={[styles.slotName, item.dead && styles.slotNameDead]} numberOfLines={1}>{item.playerName}</Text>
+                      {item.dead && <Text style={styles.deadBadge}>DEAD</Text>}
+                    </View>
+                    <Text style={styles.slotTime}>{timeAgo(item.savedAt)}</Text>
+                  </View>
+                  {item.mainQuestPhase ? (
+                    <Text style={styles.slotObjective} numberOfLines={1}>
+                      {resumeObjectiveLine(
+                        item.mainQuestPhase as MainQuestPhase,
+                        item.mainQuestCoresRecovered ?? 0,
+                      )}
+                    </Text>
+                  ) : (
+                    <Text style={styles.slotMeta}>HP {item.hp}/{item.hpMax}</Text>
+                  )}
+                </View>
               </View>
-              <Text style={styles.slotTime}>{timeAgo(item.savedAt)}</Text>
             </View>
-            {item.mainQuestPhase ? (
-              <Text style={styles.slotObjective} numberOfLines={1}>
-                {resumeObjectiveLine(
-                  item.mainQuestPhase as MainQuestPhase,
-                  item.mainQuestCoresRecovered ?? 0,
-                )}
-              </Text>
-            ) : (
-              <Text style={styles.slotMeta}>HP {item.hp}/{item.hpMax}</Text>
-            )}
+            </TSettle>
           </TouchableOpacity>
         </SwipeableRow>
       );
     }
+    /* ⚠⚠⚠ VIS-1 — THE SELECTED DOSSIER IS THE SCREEN'S VISUAL MOMENT. Same
+       tap contract as ever (OTA-1491: first tap expanded it, this second tap
+       LOADS it) — what changed is that the plate now lifts: a lit rim, a warmer
+       face, a brighter top bevel, a wider gold-lit spine, brighter corner marks,
+       a deeper shadow, and an engraved rule under the name. Unselected records
+       recede by face tone alone, never by dimming their text.
+       ⚠ The whole plate remains the one tap target. Everything added below —
+       the faction plate, the ENTER TARTARIA band — is `pointerEvents="none"`, so
+       no new layer can intercept the tap, the second tap, the swipe-to-delete
+       or the scroll. */
+    const crest = factionCrest(item.factionId);
     return (
     <SwipeableRow onDelete={() => confirmDelete(item)}>
       <TouchableOpacity
-        style={[styles.slot, item.dead && styles.slotDead, !bootGateOpen && styles.btnDisabled]}
+        style={[styles.dossierOuter, styles.dossierOuterOpen, !bootGateOpen && styles.btnDisabled]}
         onPress={() => onSlotTap(item)}
-        activeOpacity={0.7}
+        activeOpacity={0.9}
         disabled={!bootGateOpen}
         accessibilityRole="button"
         accessibilityState={{ disabled: !bootGateOpen, expanded: true }}
         accessibilityHint={`Loads ${item.playerName}`}
       >
+        <TSettle active>
+        <View style={[styles.dossierRim, styles.dossierRimOpen, item.dead && styles.dossierRimDead]}>
+          <View style={[styles.dossierFace, styles.dossierFaceOpen, item.dead && styles.dossierFaceDead]}>
+            <View style={[styles.spine, styles.spineOpen, item.dead && styles.spineDead]} pointerEvents="none" />
+            <TCorners lit />
+            <View style={styles.dossierBody}>
+              {/* ⚠ VIS-1 — the record splits into the written column and the
+                  seal gutter, so the emblem can never land on top of a name, a
+                  wrapped objective or a dead-row button. Layout does the
+                  clearing; nothing is absolutely positioned over the text. */}
+              <View style={styles.dossierSplit}>
+              <View style={styles.dossierMain}>
         <View style={styles.slotHead}>
           <View style={styles.slotNameRow}>
-            <Text style={[styles.slotName, item.dead && styles.slotNameDead]}>{item.playerName}</Text>
+            <Text style={[styles.slotName, styles.slotNameOpen, item.dead && styles.slotNameDead]} numberOfLines={1}>{item.playerName}</Text>
             {item.dead && <Text style={styles.deadBadge}>DEAD</Text>}
           </View>
           <Text style={styles.slotTime}>{timeAgo(item.savedAt)}</Text>
         </View>
+        <TRule lit style={styles.dossierNameRule} />
         {/* arb38 — load-crash warning. Surfaces BEFORE the player taps
             so they know this character closed the app last time and a
             tap opens the recovery options rather than the game. */}
@@ -811,6 +862,41 @@ export function TitleScreen() {
             </TouchableOpacity>
           </View>
         )}
+              </View>
+              {/* ⚠⚠⚠ VIS-1 — THE EXPANSION REWARD. The Tartarian's canonical
+                  faction emblem, stamped on a riveted plate that breaks the
+                  record's top-right boundary the way a wax seal sits proud of
+                  the paper it closed. It appears ONLY here — never on a
+                  collapsed record — which is what makes opening one feel like
+                  pulling a file. The art is the game's own
+                  `assets/crests/<factionId>.png` (all nine factions have one);
+                  a save with no faction, or a faction with no art, renders
+                  NOTHING rather than a stand-in. It is inert to touch and lives
+                  in its own column, so it cannot cover text or take a tap. */}
+              {crest !== undefined && (
+                <View style={styles.dossierSeal} pointerEvents="none">
+                  <TFactionPlate source={crest} size={58} />
+                </View>
+              )}
+              </View>
+        {/* ⚠⚠ VIS-1 — THE THRESHOLD. Visual affordance only: the plate itself is
+            still the second-tap target (`pointerEvents="none"`), so nothing about
+            the load path changes. A dead Tartarian cannot be entered — that tap
+            opens the resurrection prompt — so the band says what will actually
+            happen instead of promising a door that is not there. */}
+        <View style={styles.enterBand} pointerEvents="none">
+          <TRule lit />
+          <View style={styles.enterRow}>
+            <Text style={item.dead ? styles.enterTextDead : styles.enterText}>
+              {item.dead ? 'RESURRECT THIS TARTARIAN' : 'ENTER TARTARIA'}
+            </Text>
+            <Text style={item.dead ? styles.enterChevronDead : styles.enterChevron}>›</Text>
+          </View>
+        </View>
+            </View>
+          </View>
+        </View>
+        </TSettle>
       </TouchableOpacity>
     </SwipeableRow>
     );
@@ -818,51 +904,45 @@ export function TitleScreen() {
 
   return (
     <View style={styles.container}>
-      <Image
-        source={require('../../assets/icon.png')}
-        style={styles.crest}
-        resizeMode="contain"
-        accessibilityElementsHidden={true}
-        importantForAccessibility="no-hide-descendants"
-      />
-      <Text style={styles.title} accessibilityRole="header">TARTARIA</Text>
-      <Text style={styles.subtitle}>REALMS</Text>
-      <Text style={[styles.flavor, { color: mutedColor }]}>A procedural narrative of the buried world.</Text>
-      {(() => {
-        // arb132 — build-line marker, right above the gem line, so the
-        // side-by-side installs are instantly distinguishable. Derived from the
-        // App ID (correct regardless of OTA-channel state) and mapped PER LINE,
-        // since each line is now its own package: .arbiters → ARBITER,
-        // .golem → GOLEM, .engine → ENGINE, base (.tartarprim) → TARTARIA.
-        // (Previously everything that wasn't .arbiters fell through to "GOLEM",
-        // so the HaL / Tartaria build mislabeled itself as GOLEM.)
-        // ⚠ OTA-1228 — THE DESKTOP LINE NEEDS ITS OWN NAME. Owner, on the PC
-        // build: *"this says Tartaria Build, that's HAL — this should be Steam
-        // Beta Build."* Right, and the reason it said TARTARIA is that the
-        // mapping above reads `Application.applicationId`, which on desktop is
-        // the empty string (the owner's copied diagnostic: `App ID: (unknown)`).
-        // Every unrecognised id fell through to the base label, so the PC build
-        // claimed to be the phone build. Platform is checked FIRST because it is
-        // the one fact desktop actually knows about itself.
-        const appId = Application.applicationId ?? '';
-        const isSteam = Platform.OS === 'web';
-        const isArb = !isSteam && appId.endsWith('.arbiters');
-        const isGolem = !isSteam && appId.endsWith('.golem');
-        const isEngine = !isSteam && appId.endsWith('.engine');
-        const buildLine = isSteam ? '⟁ STEAM BETA BUILD'
-          : isArb ? '⟁ ARBITER BUILD'
-          : isGolem ? '⟁ GOLEM BUILD'
-          : isEngine ? '⟁ ENGINE BUILD'
-          : '⟁ TARTARIA BUILD';
-        const buildColor = isSteam ? '#d08bd0' : isArb ? '#7ec8e3' : isEngine ? '#9ec96a' : '#c9a86a';
-        return (
-          <Text style={[styles.buildMarker, { color: buildColor }]}>
-            {buildLine}
-          </Text>
-        );
-      })()}
+      {/* ⚠ VIS-1 — the buried-world strata: three excavation bands and three
+          registration ticks, behind everything, drawing nothing that moves. Each
+          is the kit's own engraved rule at ~28% — a hairline of shadow over a
+          hairline of light — so it reads faintly on a dark theme AND on a light
+          one, and no text depends on it to be legible. */}
+      <TStrata />
+      {/* ⚠⚠ VIS-1 — THE TITLE PLINTH. The crest was a logo sitting above a list
+          of application controls; it is now the head of one composed face. The
+          engraved rule under the wordmark is the same ornament every plate below
+          uses, which is what binds the two halves of the screen together. */}
+      <View style={styles.titleBlock}>
+        <Image
+          source={require('../../assets/icon.png')}
+          style={styles.crest}
+          resizeMode="contain"
+          accessibilityElementsHidden={true}
+          importantForAccessibility="no-hide-descendants"
+        />
+        <Text style={styles.title} accessibilityRole="header">TARTARIA</Text>
+        <View style={styles.subtitleRow}>
+          <View style={styles.subtitleRule}><TRule /></View>
+          <Text style={styles.subtitle}>REALMS</Text>
+          <View style={styles.subtitleRule}><TRule /></View>
+        </View>
+        <Text style={[styles.flavor, { color: mutedColor }]}>A procedural narrative of the buried world.</Text>
+      </View>
+      {/* ⚠⚠ VIS-1 — Resurrection Gems are an in-world resource, not an
+          application status string. Stamped chit: recessed well, rim, the survey
+          diamond as the resource's own mark, count large and name quiet. It sits
+          with the roster because that is where it is spent (resurrecting a
+          fallen Tartarian), and it is deliberately small — a held resource, not
+          a headline. */}
       {resurrectionGems > 0 && (
-        <Text style={styles.gems}>✦ {resurrectionGems} Resurrection Gem{resurrectionGems === 1 ? '' : 's'} held</Text>
+        <View style={styles.gemsRow}>
+          <TResourceChit
+            count={resurrectionGems}
+            label={`RESURRECTION GEM${resurrectionGems === 1 ? '' : 'S'}`}
+          />
+        </View>
       )}
 
       {/* v2.4.1 (OTA 043) — completion badges. Shows the player's
@@ -1078,27 +1158,43 @@ export function TitleScreen() {
         }
         ListHeaderComponent={
           slots.length > 0
-            ? <Text style={[styles.listLabel, { color: mutedColor }]}>
-                {bootGateOpen
-                  ? 'YOUR TARTARIANS  ·  swipe left to delete'
-                  : `⟳ ${bootGateReason.toUpperCase()}  ·  ONE MOMENT`}
-              </Text>
+            ? (
+              /* ⚠ VIS-1 — the roster gets the same broken rule the title plinth
+                 uses, so the crest and the records read as one designed face.
+                 Same two strings as before: the roster label, or the boot-gate
+                 reason while the gate is shut. */
+              <View style={styles.rosterHeader}>
+                <TDivider
+                  color={mutedColor}
+                  label={bootGateOpen
+                    ? 'YOUR TARTARIANS'
+                    : `${bootGateReason.toUpperCase()}  ·  ONE MOMENT`}
+                />
+                {bootGateOpen ? (
+                  <Text style={[styles.listLabel, { color: mutedColor }]}>swipe left to delete</Text>
+                ) : null}
+              </View>
+            )
             : null
         }
         ListFooterComponent={
           <View style={styles.footerActions}>
-            <TouchableOpacity
-              style={[styles.primaryBtn, !bootGateOpen && styles.btnDisabled]}
-              onPress={() => setScreen('character_creation')}
-              activeOpacity={0.7}
+            {/* ⚠⚠⚠ VIS-1 — THE PRIMARY ACTION. Starting a new Tartarian is the
+                one thing this screen exists to offer a player who has nothing to
+                resume, so it gets the full treatment — lit rim, raised face, top
+                bevel, survey diamonds, gold plate type — and it is the only
+                control on the screen that gets it. It DEPRESSES on touch (90ms
+                down, 120ms release, transform-only, skipped under reduced
+                motion) and it still navigates on the same tap. The gate string
+                is unchanged; it just no longer has to be a whole button label to
+                be read. */}
+            <TButton
+              label={bootGateOpen ? 'NEW TARTARIAN' : bootGateReason}
+              sub={bootGateOpen ? 'BEGIN A NEW EXPEDITION' : undefined}
+              variant="primary"
               disabled={!bootGateOpen}
-              accessibilityRole="button"
-              accessibilityState={{ disabled: !bootGateOpen }}
-            >
-              <Text style={styles.primaryBtnText}>
-                {bootGateOpen ? 'New Tartarian' : `${bootGateReason}`}
-              </Text>
-            </TouchableOpacity>
+              onPress={() => setScreen('character_creation')}
+            />
             {/* 2026-05-25 — manual CHECK FOR OTA UPDATE button restored.
                 Removed in v2.4.1 (OTA 051) on the theory that the auto-
                 check in useEffect was sufficient. Playtester report:
@@ -1110,11 +1206,14 @@ export function TitleScreen() {
                 full fetch+apply pipeline so a single tap pulls AND
                 applies in one go. Disabled while an apply is already
                 in flight to avoid a double-fetch. */}
-            <TouchableOpacity
-              style={[styles.secondaryBtn, (applyingOTA !== null || modelsLoading) && styles.btnDisabled]}
+            {/* ⚠ VIS-1 — utility variant: the same material family (rim, face,
+                bevel, depress) at a quieter weight, so it reads as subordinate to
+                NEW TARTARIAN without becoming a different design language. */}
+            <TButton
+              label={applyingOTA
+                ?? (modelsLoading ? 'MODELS LOADING — PLEASE WAIT' : 'CHECK FOR OTA UPDATE')}
+              variant="utility"
               disabled={applyingOTA !== null || modelsLoading}
-              accessibilityRole="button"
-              accessibilityState={{ disabled: applyingOTA !== null || modelsLoading }}
               onPress={() => {
                 // OTA-294 — should be unreachable because disabled=true
                 // when modelsLoading, but guard defensively. Killing
@@ -1165,29 +1264,19 @@ export function TitleScreen() {
                   setTimeout(() => setApplyingOTA(null), 2500);
                 });
               }}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.secondaryBtnText}>
-                {applyingOTA
-                  ?? (modelsLoading ? 'Models loading — please wait' : 'CHECK FOR OTA UPDATE')}
-              </Text>
-            </TouchableOpacity>
+            />
             {/* OTA-1178 — restore a backed-up character from the clipboard. It
                 never overwrites: a restore always arrives as an additional
                 character. ⚠ OTA-1445 — moved BELOW the OTA button by owner
                 order ("new tartarian first, check for OTA update second and
                 restore from backup third"): restoring is the rarest of the
                 three actions, so it takes the last slot. */}
-            <TouchableOpacity
-              style={[styles.secondaryBtn, !bootGateOpen && styles.btnDisabled]}
-              onPress={() => { void restoreFromClipboard(); }}
-              activeOpacity={0.7}
+            <TButton
+              label="RESTORE FROM BACKUP"
+              variant="utility"
               disabled={!bootGateOpen}
-              accessibilityRole="button"
-              accessibilityState={{ disabled: !bootGateOpen }}
-            >
-              <Text style={styles.secondaryBtnText}>Restore from backup</Text>
-            </TouchableOpacity>
+              onPress={() => { void restoreFromClipboard(); }}
+            />
           </View>
         }
       />
@@ -1294,7 +1383,50 @@ export function TitleScreen() {
         {/* OTA-377 — the trailing "2148" is the in-world year (Tartaria's
             "Present Day" — see data/events/timeline.json), not a build
             number. Labelled "Year 2148" so it no longer reads like one. */}
-        <Text style={[styles.footer, { color: mutedColor }]}>v{APP_VERSION}  ·  Year 2148</Text>
+        {/* ⚠⚠ VIS-1 — THE META ROW. Build identity, app version and the
+            in-world year are all diagnostics, and they now read as one quiet
+            strip at the foot of the screen instead of the build line shouting
+            from under the crest. Nothing about what any of them SAY changed —
+            the build mapping below is byte-for-byte the arb132/OTA-1228 one,
+            moved. */}
+        <View style={styles.metaRow}>
+        {(() => {
+          // arb132 — build-line marker (VIS-1 moved it from under the crest to
+          // the meta row; the mapping below is unchanged), so the
+          // side-by-side installs are instantly distinguishable. Derived from the
+          // App ID (correct regardless of OTA-channel state) and mapped PER LINE,
+          // since each line is now its own package: .arbiters → ARBITER,
+          // .golem → GOLEM, .engine → ENGINE, base (.tartarprim) → TARTARIA.
+          // (Previously everything that wasn't .arbiters fell through to "GOLEM",
+          // so the HaL / Tartaria build mislabeled itself as GOLEM.)
+          // ⚠ OTA-1228 — THE DESKTOP LINE NEEDS ITS OWN NAME. Owner, on the PC
+          // build: *"this says Tartaria Build, that's HAL — this should be Steam
+          // Beta Build."* Right, and the reason it said TARTARIA is that the
+          // mapping above reads `Application.applicationId`, which on desktop is
+          // the empty string (the owner's copied diagnostic: `App ID: (unknown)`).
+          // Every unrecognised id fell through to the base label, so the PC build
+          // claimed to be the phone build. Platform is checked FIRST because it is
+          // the one fact desktop actually knows about itself.
+          const appId = Application.applicationId ?? '';
+          const isSteam = Platform.OS === 'web';
+          const isArb = !isSteam && appId.endsWith('.arbiters');
+          const isGolem = !isSteam && appId.endsWith('.golem');
+          const isEngine = !isSteam && appId.endsWith('.engine');
+          const buildLine = isSteam ? '⟁ STEAM BETA BUILD'
+            : isArb ? '⟁ ARBITER BUILD'
+            : isGolem ? '⟁ GOLEM BUILD'
+            : isEngine ? '⟁ ENGINE BUILD'
+            : '⟁ TARTARIA BUILD';
+          const buildColor = isSteam ? '#d08bd0' : isArb ? '#7ec8e3' : isEngine ? '#9ec96a' : '#c9a86a';
+          // ⚠ VIS-1 — the line itself is unchanged; only where it sits moved.
+          return (
+            <Text style={[styles.buildMarker, { color: buildColor }]}>
+              {buildLine}
+            </Text>
+          );
+        })()}
+          <Text style={[styles.footer, { color: mutedColor }]}>v{APP_VERSION}  ·  Year 2148</Text>
+        </View>
       </View>
 
       <BugReportModal
@@ -1443,17 +1575,85 @@ const styles = StyleSheet.create({
   list: { flex: 1 },
   listContent: { paddingVertical: 4 },
   listLabel: { color: '#a2977b', fontSize: 10, letterSpacing: 2, marginBottom: 6 },
-  empty: { color: '#a2977b', fontStyle: 'italic', fontSize: 12, textAlign: 'center', marginTop: 24, paddingHorizontal: 16 },
-  slot: {
-    backgroundColor: '#13110f',
-    borderColor: '#3a342c',
-    borderWidth: 1,
-    borderRadius: 4,
-    padding: 12,
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // ⚠⚠⚠ VIS-1 — THE TARTARIA MATERIAL, AS USED BY THIS SCREEN.
+  // The shapes live in app/ui/tartariaKit.tsx; these are the screen-local
+  // measurements that place them. Every colour here is a NEUTRAL grey-black or
+  // a warm metal — nothing is keyed to a hue — because the player owns the
+  // background colour (displaySettings bgHue/bgSat/bgLight) and this language
+  // has to sit on olive, purple, blue or slate without being redesigned.
+  // ══════════════════════════════════════════════════════════════════════════
+  titleBlock: { marginBottom: 6 },
+  subtitleRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 2 },
+  subtitleRule: { flex: 1 },
+  gemsRow: { alignItems: 'center', marginBottom: 10 },
+  rosterHeader: { marginBottom: 8 },
+  metaRow: { alignItems: 'center', marginTop: 6 },
+
+  // A RECORD, IN LAYERS — outer shadow, structural rim, recessed face, then
+  // content. The rim's top border is lighter than its sides and its bottom is
+  // near-black: that one asymmetry is what stops these reading as a rectangle
+  // with a border, and it is repeated by every control in the kit.
+  dossierOuter: {
+    marginVertical: 3,
+    shadowColor: '#000',
+    shadowOpacity: 0.5,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 3,
   },
-  slotDead: { borderColor: '#5a2a26', opacity: 0.75 },
-  // OTA-1491 — the collapsed two-line card: tighter padding, same frame.
-  slotCompact: { paddingVertical: 8 },
+  dossierOuterOpen: {
+    shadowOpacity: 0.62,
+    shadowRadius: 11,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 7,
+  },
+  dossierRim: {
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: T.rim,
+    borderTopColor: '#4A4238',
+    borderBottomColor: '#100E0B',
+    backgroundColor: '#22201B',
+    padding: 1,
+  },
+  dossierRimOpen: { borderColor: T.rimLit, borderTopColor: '#B08F55', borderBottomColor: '#1E170F', backgroundColor: '#443925' },
+  dossierRimDead: { borderColor: T.rustRim, borderTopColor: '#7A3B34', borderBottomColor: '#170C0A', backgroundColor: '#33201D' },
+  dossierFace: { borderRadius: 3, backgroundColor: T.face, borderTopWidth: 1, borderTopColor: T.edgeLit },
+  // The selected record is not "the same card with a different border": the
+  // face itself warms and lifts, the top bevel brightens, and the shadow above
+  // deepens. An unselected record recedes by TONE — its text never dims.
+  dossierFaceOpen: { backgroundColor: T.faceLit, borderTopColor: 'rgba(214,190,140,0.36)' },
+  dossierFaceDead: { backgroundColor: 'rgba(26,13,11,0.82)' },
+  // ⚠ A record at rest catches LESS light than the base plate, and a selected
+  // one catches more: three values on one edge is the whole hierarchy, and it
+  // is why a stack of records reads calmly instead of as a row of buttons.
+  dossierFaceCompact: { borderTopColor: 'rgba(214,190,140,0.12)' },
+  dossierBody: { paddingVertical: 9, paddingLeft: 14, paddingRight: 12 },
+  dossierSplit: { flexDirection: 'row', alignItems: 'flex-start' },
+  dossierMain: { flex: 1, minWidth: 0 },
+  dossierSeal: { marginLeft: 10, marginTop: -13, marginRight: -13 },
+  dossierNameRule: { marginTop: 6, marginBottom: 6 },
+  // THE IDENTITY SPINE — the engraved edge of a filed record, and the only
+  // vertical the eye can use to line a stack of them up.
+  spine: { position: 'absolute', left: 0, top: 0, bottom: 0, width: 3, backgroundColor: T.goldDim, opacity: 0.5 },
+  spineOpen: { width: 5, backgroundColor: T.gold, opacity: 1 },
+  spineDead: { backgroundColor: '#8A473C', opacity: 0.8 },
+  slotNameOpen: { fontSize: 18, letterSpacing: 0.5 },
+  // THE THRESHOLD — the second tap's affordance. pointerEvents="none" in the
+  // JSX, so it is a label on the door, never the door itself.
+  enterBand: { marginTop: 10 },
+  enterRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 7 },
+  enterText: { color: T.gold, fontSize: 12, fontWeight: '800', letterSpacing: 2 },
+  enterTextDead: { color: T.rust, fontSize: 12, fontWeight: '800', letterSpacing: 2 },
+  enterChevron: { color: T.gold, fontSize: 18, fontWeight: '800' },
+  enterChevronDead: { color: T.rust, fontSize: 18, fontWeight: '800' },
+  empty: { color: '#a2977b', fontStyle: 'italic', fontSize: 12, textAlign: 'center', marginTop: 24, paddingHorizontal: 16 },
+  // ⚠ VIS-1 — `slot` / `slotDead` / `slotCompact` DELETED. They were the whole
+  // record: one background, one border, one radius. The layered construction
+  // above replaced them; leaving the flat originals behind is how a screen ends
+  // up with two visual languages and no way to tell which one is live.
   slotHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
   slotNameRow: { flexDirection: 'row', alignItems: 'baseline', gap: 8, flexShrink: 1 },
   slotName: { color: '#e6d8b3', fontSize: 16, fontWeight: '700' },
@@ -1508,9 +1708,11 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: 2,
   },
-  gems: { color: '#c9a86a', fontSize: 12, textAlign: 'center', marginBottom: 8, letterSpacing: 1 },
-  // arb132 — build-line marker (GOLEM vs ARBITER), shown above the gem line.
-  buildMarker: { fontSize: 11, fontWeight: '800', textAlign: 'center', marginBottom: 8, letterSpacing: 3 },
+  // ⚠ VIS-1 — `gems` DELETED: the count is a stamped chit (TResourceChit) now,
+  // not a sentence. arb132's build-line marker keeps its words and its colours
+  // and loses its prominence — it reads at the foot of the screen, in the meta
+  // row, not under the crest.
+  buildMarker: { fontSize: 10, fontWeight: '800', textAlign: 'center', letterSpacing: 3, marginBottom: 3 },
   // v2.4.1 (OTA 043) — completion-badges row styles.
   badgesContainer: { marginBottom: 8, paddingHorizontal: 8 },
   badgesTag: { color: '#a2977b', fontSize: 10, letterSpacing: 2, textAlign: 'center', marginBottom: 6 },
@@ -1744,28 +1946,19 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   footerActions: { gap: 8, marginTop: 12 },
-  // ⚠ OTA-1445 — SAME THICKNESS AS THE OTA LINE, by owner order: padding and
-  // font size are the secondaryBtn's exact metrics, so all three footer
-  // buttons stand the same height. The lead action keeps its amber border and
-  // lighter fill — rank shows in colour now, not in size.
-  primaryBtn: {
-    backgroundColor: '#3a342c',
-    paddingVertical: 12,
-    alignItems: 'center',
-    borderRadius: 4,
-    borderColor: '#c9a86a',
-    borderWidth: 1,
-  },
-  primaryBtnText: { color: '#e6d8b3', fontSize: 12, letterSpacing: 2, fontWeight: '700' },
-  secondaryBtn: {
-    backgroundColor: '#1a1714',
-    borderColor: '#3a342c',
-    borderWidth: 1,
-    paddingVertical: 12,
-    alignItems: 'center',
-    borderRadius: 4,
-  },
-  secondaryBtnText: { color: '#cdbf99', fontSize: 12, letterSpacing: 1, fontWeight: '700' },
+  // ⚠⚠ VIS-1 SUPERSEDES OTA-1445's METRIC RULE — and keeps its ORDER rule.
+  // OTA-1445's owner instruction was "all of them the same thickness ... rank
+  // shows in colour, not in size", decided when all three were the same flat
+  // rectangle and the lead one being taller just looked misaligned. VIS-1's
+  // instruction is the opposite for a different reason: NEW TARTARIAN "should
+  // become the strongest standalone action on the screen ... full primary
+  // treatment", with OTA and RESTORE as its subordinate utility family. Rank now
+  // reads in MATERIAL — lit rim, raised face, bevel, plate type, survey diamonds
+  // — of which height is one part. The ORDER OTA-1445 fixed (new first, OTA
+  // second, restore third) is untouched and still pinned.
+  // primaryBtn / primaryBtnText / secondaryBtn / secondaryBtnText DELETED:
+  // the three buttons are <TButton variant="primary" | "utility"> now, so their
+  // material lives in app/ui/tartariaKit.tsx where every screen can reach it.
   btnDisabled: { opacity: 0.55 },
   // OTA-065 — bottomBar now stacks vertically so the action
   // button row (INVITE PLAYTESTER + REPORT BUG + EXIT GAME) has

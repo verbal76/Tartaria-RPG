@@ -28935,7 +28935,49 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SAYS SO instead of returning in silence; the roll keeps its authority.
 // (8) The allocation candidate was re-checked and is already resolved in source
 // (allLocations is a module constant; the narration allow-list is cached).
-export const OTA_BUILD_ID = '2026-09-08-1741-the-work-nobody-will-read-gets-out-of-the-way';
+// ⚠⚠⚠ OTA-1742 — THE SCREEN IS MADE OF SOMETHING (task VIS-1-A7E4).
+// The first visual-overhaul pass, and its deliverable is a LANGUAGE rather than
+// a restyle: app/ui/tartariaKit.tsx now holds the Tartaria surface/panel,
+// button (primary / utility / destructive), ornament, resource chit, faction
+// plate, registration corners, strata and selection-settle vocabulary, and the
+// title / character-selection screen is its first reference implementation. A
+// later screen is meant to be told "use the kit", not to invent an aesthetic.
+// WHAT THE MATERIAL IS: outer depth → structural rim (top edge lit, bottom edge
+// near-black) → recessed or raised face → controlled top highlight → content.
+// Never a backgroundColor with a borderColor. Controls physically depress on
+// touch (90ms down / 120ms release, transform-only, native driver).
+// ⚠⚠⚠ THE PLAYER STILL OWNS THE HUE. displaySettings' bgHue/bgSat/bgLight is
+// sacred: every colour in the kit is a warm NEUTRAL metal or a translucent
+// black/white that darkens or lifts whatever the player chose — plus the brand
+// gold the game has always used. Nothing is keyed to green, and the suite
+// enforces it by measuring the chroma of every hex in the file.
+// THE SCREEN: the crest and TARTARIA REALMS are preserved and given a plinth
+// with the same engraved rule the records use; character cards became recovered
+// RECORDS (drop shadow, lit rim, recessed face, registration corners, an
+// engraved identity spine) with the collapsed one still two lines; the selected
+// record lifts — warmer face, brighter bevel, wider gold spine, deeper shadow,
+// larger name — rather than merely changing border colour; the canonical
+// faction emblem is stamped on a riveted plate that breaks the record's
+// top-right boundary, revealed ONLY on expansion, in its own layout column so
+// it can never cover a name or take a tap; an ENTER TARTARIA band (RESURRECT
+// THIS TARTARIAN when the character is dead) labels the second tap without
+// being it; NEW TARTARIAN is the screen's one primary action; OTA and RESTORE
+// are its utility family; Resurrection Gems read as a stamped resource chit
+// instead of a status sentence; and the build marker keeps arb132/OTA-1228's
+// exact words while moving to the quiet meta row at the foot of the screen.
+// ⚠⚠ NOTHING ABOUT PLAY CHANGED. OTA-1491's first-tap-expands / second-tap-
+// loads contract, swipe-to-delete on both states, OTA-1445's button ORDER,
+// OTA-1294's re-read of the roster, backup / restore / OTA / invite / report /
+// exit, saves, factions, gems and navigation are all untouched — OTA-1445's
+// equal-HEIGHT rule is the one thing deliberately superseded, and its own suite
+// says why.
+// ⚠⚠ AND THE LAG DID NOT COME BACK: no per-frame JS, no timers, no polling, no
+// blur, no gradients, no runtime image work, no new store subscription; two
+// animations in the whole kit, both useNativeDriver and both SET rather than
+// animated under reduce-motion. Scope held: the kit has exactly one consumer
+// today, and the suite fails if a second screen imports it.
+export const OTA_BUILD_ID = '2026-09-08-1742-the-screen-is-made-of-something';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-08-1741-the-work-nobody-will-read-gets-out-of-the-way';
 // golem catch-up 2026-09-08: markerless publish of OTA-1741 - the native AI,
 // lifecycle, hydration and long-session tranche (LAG-3-8D27). Obsolete narration
 // no longer holds the one native-ML lock or takes a slot ahead of work the
