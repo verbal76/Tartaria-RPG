@@ -29235,7 +29235,26 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // fraction of the tile on phone and tablet for every crest, the share of the
 // emblem actually visible, that the whole width is inside the card, and that it
 // is still cropped rather than a centred logo.
-export const OTA_BUILD_ID = '2026-09-08-1750-a-third-of-the-tile-not-a-splinter';
+// ── OTA-1751 — CENTRED ON THE ROW ────────────────────────────────────────────
+// Owner, on OTA-1750: bump to 0.22, and "we might need a custom position for each
+// emblem since they are all not symmetrical - let's center the emblem on the line
+// for now and see what that does."
+// He is right about the asymmetry and it is worth stating precisely, because it
+// is the next piece of work: the nine crests are each composed differently inside
+// their own frame, so a single window into all of them shows a different PART of
+// each - one offers a spear and a wing, another the middle of a shield, another
+// mostly ground. Uniform geometry cannot fix that; only a per-faction offset can,
+// keyed the same way the crest table itself is. Centring is the honest default to
+// judge that from, so it is what ships now: the emblem moves from 40-82% of the
+// tile to 29-71%, dead on the row's centre line, at 0.22.
+// It now sits BEHIND the name rather than beside it. That boundary was my own
+// caution in OTA-1750 rather than a measured limit, and it is measured now: at
+// 0.22, over the BRIGHTEST part of the artwork rather than its average, the name
+// clears about 9:1 and the objective line about 6:1 - so the tile reads exactly
+// as well as it did while the emblem reads considerably better. Coverage is
+// unchanged at 42% of the tile, and the expanded card is untouched.
+export const OTA_BUILD_ID = '2026-09-08-1751-centred-on-the-row';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-08-1750-a-third-of-the-tile-not-a-splinter';
 // golem catch-up 2026-09-08: markerless publish of OTA-1750 - a third of the
 // tile, not a splinter. With every card finally wearing its own faction, the
 // owner reported the designs read fainter than he wanted, that some looked

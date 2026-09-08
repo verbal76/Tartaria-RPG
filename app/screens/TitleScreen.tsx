@@ -1527,7 +1527,19 @@ const styles = StyleSheet.create({
    *
    * ⚠ It sits from 40% to 82% of the tile, which clears the name column and
    * stops short of the timestamp. */
-  dossierFieldCompact: { position: 'absolute', top: '-250%', bottom: '-250%', right: '18%', left: '40%', opacity: 0.17 },
+  /* ⚠⚠ OTA-1751 — CENTRED ON THE ROW, AND STRONGER AGAIN.
+   * Owner, seeing OTA-1750 on the device: bump to 0.22, and *"we might need a
+   * custom position for each emblem since they are all not symmetrical — let's
+   * center the emblem on the line for now and see what that does."*
+   * He is right about the asymmetry: the nine crests are composed differently
+   * inside their own frames, so the same window shows a different PART of each
+   * one. Centring is the honest uniform default to judge that from, and it
+   * moves the emblem from 40-82% (right of centre) to 29-71%.
+   * ⚠ It now sits BEHIND the name rather than beside it. That was my own caution
+   * in OTA-1750, not a measured limit — and it is measured now: at 0.22 over the
+   * brightest part of the artwork the name still clears ~9:1 and the objective
+   * line ~6:1, so the tile reads exactly as well as it did. */
+  dossierFieldCompact: { position: 'absolute', top: '-250%', bottom: '-250%', right: '29%', left: '29%', opacity: 0.22 },
   dossierNameRule: { marginTop: 6, marginBottom: 6 },
   /* ⚠ PHONE-FIX — INDEX TICKS: three hairlines machined across the spine, the
    * way a real filed plate carries a position mark. Fine technical engraving is

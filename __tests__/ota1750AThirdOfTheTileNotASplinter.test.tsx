@@ -179,7 +179,13 @@ describe('the owner\'s three corrections, as measurements', () => {
     const block = styleBlock('dossierFieldCompact');
     expect(num(block, 'right')).toBeGreaterThanOrEqual(0);
     expect(num(block, 'left')).toBeGreaterThan(0);
-    expect(num(block, 'left')).toBeGreaterThanOrEqual(35); // clear of the name column
+    /* ⚠ OTA-1751 RETIRED THE "CLEAR OF THE NAME COLUMN" HALF OF THIS. It was my
+     * caution rather than a measured limit, and the owner asked for the emblem
+     * centred on the row — which puts it behind the name. Contrast is now
+     * MEASURED at the shipped alpha instead of avoided by layout (see the
+     * legibility test below and ota1751). What survives here is the claim that
+     * actually protects the composition: it is inset from BOTH edges, so its
+     * whole width is on the tile. */
     expect(num(block, 'left') + num(block, 'right')).toBeLessThan(65); // ...but still ≥1/3 wide
   });
 

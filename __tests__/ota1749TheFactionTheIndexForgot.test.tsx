@@ -152,8 +152,16 @@ async function expandRow(tree: ReturnType<typeof renderer.create>, name: string)
   await renderer.act(async () => { (row!.props.onPress as () => void)(); });
   await flush();
 }
+/* ⚠⚠ A DETECTOR, NOT AN ASSERTION — SO IT IS DELIBERATELY LOOSE. This finds the
+ * faded field among the card's images; it must match whatever alpha the design
+ * currently uses, not the one it used the day it was written. At 0.2 it stopped
+ * matching the moment OTA-1751 raised the field to 0.22, and three suites failed
+ * for a tuning change rather than a defect. A predicate that has to be re-tuned
+ * alongside the value it looks for is not finding anything — it is restating it.
+ * 0.5 is far below any alpha this treatment could take and far above any it
+ * would. The BOUNDS on the alpha are asserted where they belong (ota1750/1751). */
 const fieldsOf = (tree: ReturnType<typeof renderer.create>) =>
-  hosts(tree, (n) => n.props.source !== undefined && Number(flat(n.props.style).opacity ?? 1) < 0.2);
+  hosts(tree, (n) => n.props.source !== undefined && Number(flat(n.props.style).opacity ?? 1) < 0.5);
 
 // ═══ 1. THE HELPER, ON EVERY SHAPE THE INDEX CAN ACTUALLY HOLD ═══════════════
 describe('summaryFactionId reads what the index has', () => {

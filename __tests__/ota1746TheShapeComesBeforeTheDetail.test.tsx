@@ -592,9 +592,12 @@ describe('artwork is composition, not a thumbnail in a box', () => {
     const crest = factionCrest(getFactions()[0]!.id);
     const drawn = hosts(tree, (n) => n.props.source === crest);
     expect(drawn).toHaveLength(2); // one field per collapsed row
-    // ⚠ bound raised with OTA-1750: the owner asked for these to read stronger
-    // than the 0.09 VIS-3 shipped. Still a ghost, not a picture.
-    for (const n of drawn) expect(Number(flat(n.props.style).opacity)).toBeLessThan(0.22);
+    /* ⚠ The claim is "a ghost, not a picture", and the bound is set with room
+     * rather than against today's number: at 0.22 — exactly the value OTA-1751
+     * shipped — this failed for a tuning change rather than a defect. The real
+     * ceiling lives in ota1750/1751 beside the contrast arithmetic that decides
+     * it; here it only has to catch someone turning the field into an image. */
+    for (const n of drawn) expect(Number(flat(n.props.style).opacity)).toBeLessThan(0.4);
   });
 
   test('a faction the game ships no art for renders NOTHING, not a stand-in', async () => {

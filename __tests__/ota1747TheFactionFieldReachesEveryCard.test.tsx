@@ -196,8 +196,16 @@ async function expandRow(tree: ReturnType<typeof renderer.create>, name: string)
   await flush();
 }
 /** Every faded field image currently on screen, with its source. */
+/* ⚠⚠ A DETECTOR, NOT AN ASSERTION — SO IT IS DELIBERATELY LOOSE. This finds the
+ * faded field among the card's images; it must match whatever alpha the design
+ * currently uses, not the one it used the day it was written. At 0.2 it stopped
+ * matching the moment OTA-1751 raised the field to 0.22, and three suites failed
+ * for a tuning change rather than a defect. A predicate that has to be re-tuned
+ * alongside the value it looks for is not finding anything — it is restating it.
+ * 0.5 is far below any alpha this treatment could take and far above any it
+ * would. The BOUNDS on the alpha are asserted where they belong (ota1750/1751). */
 const fieldsOf = (tree: ReturnType<typeof renderer.create>) =>
-  hosts(tree, (n) => n.props.source !== undefined && Number(flat(n.props.style).opacity ?? 1) < 0.2);
+  hosts(tree, (n) => n.props.source !== undefined && Number(flat(n.props.style).opacity ?? 1) < 0.5);
 
 // ═══ 1. IDENTITY — EACH CARD WEARS ITS OWN FACTION ═══════════════════════════
 describe('every card is manufactured for its own Tartarian\'s faction', () => {
@@ -386,7 +394,12 @@ describe('one generalised treatment, not a second unrelated effect', () => {
     }
     // and it is inert to touch, so it cannot eat the tap or the swipe
     const tree = await mountTitle([slot()]);
-    for (const n of fieldsOf(tree)) expect(flat(n.props.style).opacity).toBeLessThan(0.2);
+    // ⚠ This test is about LAYERING. It used to re-assert the alpha here too,
+    // with a bound pinned just above the day's value — so tuning the design
+    // failed a test about z-order. The alpha's bounds live with the contrast
+    // arithmetic that justifies them (ota1750/1751); what belongs here is that
+    // the field is present, faded, and cannot take a touch.
+    expect(fieldsOf(tree).length).toBeGreaterThan(0);
     expect(TITLE).toMatch(/<View style=\{styles\.dossierFieldClip\} pointerEvents="none">/);
   });
 
