@@ -55,13 +55,31 @@ describe('the emblem sits on the row\'s centre line', () => {
    * because the eye balances it against the text.
    * The durable claim is therefore the opposite of the original one: the emblem
    * must sit LEFT of the tile's centre, by enough to be deliberate. */
-  test('⚠⚠ it sits LEFT of the tile\'s centre, to balance against the text', () => {
+  /* ⚠⚠⚠ SUPERSEDED TWICE, AND THE SECOND TIME REVERSED IT — RECORDED, BECAUSE
+   * THE MISTAKE IS THE LESSON.
+   *
+   * This suite first asserted equal insets ("centred on the line", which is what
+   * the owner asked for). OTA-1752 then asserted the centre must sit LEFT of the
+   * tile's, after he said the emblems were "still too far to the right". Both
+   * were faithful implementations of a reading I never checked.
+   *
+   * ⚠⚠ HE MEANT THE EMBLEM WAS RUNNING OFF THE RIGHT EDGE — that only a sliver
+   * of it was on the card — not that it should move left. The fix was to CONTAIN
+   * it at the right. Four words, two opposite readings, and I marched the emblem
+   * across the card twice before showing him a picture and asking. The cost was
+   * two OTAs; the avoidable part was inferring a direction from an ambiguous
+   * report instead of rendering both and letting him point.
+   *
+   * What survives from this pass is everything that was not about position: the
+   * alpha he approved, the contrast arithmetic that replaced a layout rule, and
+   * the coverage floor asserted independently of where the box sits — which is
+   * precisely what let OTA-1754 move it without re-arguing any of them. */
+  test('⚠⚠ the emblem is a contained column, not a centred mark', () => {
     const b = styleBlock('dossierFieldCompact');
-    const centre = num(b, 'left') + (100 - num(b, 'left') - num(b, 'right')) / 2;
-    expect(centre).toBeLessThan(45);          // decisively left of 50%
-    expect(centre).toBeGreaterThan(25);       // ...but not pinned to the edge
-    expect(num(b, 'left')).toBeGreaterThan(0); // whole width still on the tile
-    expect(num(b, 'right')).toBeGreaterThan(0);
+    expect(num(b, 'left')).toBeGreaterThan(0);
+    expect(num(b, 'right')).toBeGreaterThan(0);   // whole width on the card
+    // and it is deliberately NOT centred — that was the reading that was wrong
+    expect(Math.abs(num(b, 'left') - num(b, 'right'))).toBeGreaterThan(10);
   });
 
   test('moving it did not cost coverage — still 42% of the tile', () => {
@@ -125,11 +143,28 @@ describe('stronger, and the tile still reads', () => {
      * focus nudge had nothing stable to nudge.
      * So this pins the framing, which is the promise, and leaves the spread to
      * the pass that owns the fit. */
+    /* ⚠⚠⚠ SUPERSEDED BY OTA-1754 — THE TWO CARDS NOW SHARE ONE COLUMN.
+     * This pinned the expanded card's framing at left 32% / right −8%, which was
+     * VIS-3's composition and correct until the owner asked for the emblem to be
+     * a column on the FAR RIGHT of both card states. The record's emblem no
+     * longer bleeds past the right border — that detail is gone, deliberately,
+     * because it was the reason the tile and the record never looked like the
+     * same object. What is pinned now is the thing that replaced it: BOTH cards
+     * use the same band, so a character wears its emblem in one place whichever
+     * state its card is in. */
     const a = styleBlock('dossierField');
-    expect(num(a, 'left')).toBe(32);
-    expect(num(a, 'right')).toBe(-8);
-    expect(num(a, 'top')).toBe(num(a, 'bottom'));   // still vertically centred
-    expect(num(a, 'top')).toBeLessThan(0);          // still cropped by the card
+    const c = styleBlock('dossierFieldCompact');
+    /* ⚠ THE SHARED THING IS THE EDGE, NOT THE WIDTH — and that is arithmetic,
+     * not a compromise. `contain` fits by width, so a box's width IS the
+     * emblem's size: 42% of the card makes a fragment on a 58dp tile and a
+     * complete logo on a 200dp record. The record takes a wider box to stay a
+     * fragment. Anchored to one right edge they read as one column; forced to
+     * one width they would not. */
+    expect(num(a, 'right')).toBe(num(c, 'right'));
+    expect(num(a, 'right')).toBeGreaterThan(0);      // contained, not bleeding
+    expect(num(a, 'left')).toBeGreaterThan(0);
+    expect(num(a, 'top')).toBe(num(a, 'bottom'));    // still vertically centred
+    expect(num(a, 'top')).toBeLessThan(0);           // still cropped by the card
 
   });
 });

@@ -243,11 +243,28 @@ describe('stronger, and still readable', () => {
      * focus nudge had nothing stable to nudge.
      * So this pins the framing, which is the promise, and leaves the spread to
      * the pass that owns the fit. */
+    /* ⚠⚠⚠ SUPERSEDED BY OTA-1754 — THE TWO CARDS NOW SHARE ONE COLUMN.
+     * This pinned the expanded card's framing at left 32% / right −8%, which was
+     * VIS-3's composition and correct until the owner asked for the emblem to be
+     * a column on the FAR RIGHT of both card states. The record's emblem no
+     * longer bleeds past the right border — that detail is gone, deliberately,
+     * because it was the reason the tile and the record never looked like the
+     * same object. What is pinned now is the thing that replaced it: BOTH cards
+     * use the same band, so a character wears its emblem in one place whichever
+     * state its card is in. */
     const a = styleBlock('dossierField');
-    expect(num(a, 'left')).toBe(32);
-    expect(num(a, 'right')).toBe(-8);
-    expect(num(a, 'top')).toBe(num(a, 'bottom'));   // still vertically centred
-    expect(num(a, 'top')).toBeLessThan(0);          // still cropped by the card
+    const c = styleBlock('dossierFieldCompact');
+    /* ⚠ THE SHARED THING IS THE EDGE, NOT THE WIDTH — and that is arithmetic,
+     * not a compromise. `contain` fits by width, so a box's width IS the
+     * emblem's size: 42% of the card makes a fragment on a 58dp tile and a
+     * complete logo on a 200dp record. The record takes a wider box to stay a
+     * fragment. Anchored to one right edge they read as one column; forced to
+     * one width they would not. */
+    expect(num(a, 'right')).toBe(num(c, 'right'));
+    expect(num(a, 'right')).toBeGreaterThan(0);      // contained, not bleeding
+    expect(num(a, 'left')).toBeGreaterThan(0);
+    expect(num(a, 'top')).toBe(num(a, 'bottom'));    // still vertically centred
+    expect(num(a, 'top')).toBeLessThan(0);           // still cropped by the card
 
   });
 

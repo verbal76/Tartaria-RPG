@@ -29301,7 +29301,35 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // horizontal framing is untouched; only the vertical spread and the alpha moved.
 // Every style is built once at module load, keyed by faction, so this adds no
 // per-row work to a FlatList that OTA-1739 fought to keep quiet.
-export const OTA_BUILD_ID = '2026-09-08-1753-each-emblem-gets-its-own-window';
+// ── OTA-1754 — ONE COLUMN, ON THE RIGHT ──────────────────────────────────────
+// Owner: "if we can get the column on the far right we are done, especially if
+// it is on the expanded and collapsed character tiles."
+// The two cards had never shared a column. The tile had been walked LEFT over
+// three passes to a centre of 38%; the record stayed where VIS-3 first put it,
+// centre 70% with 8% of the emblem hanging off the right border. Two cards for
+// the same character, two different places to look.
+// AND "TOO FAR RIGHT" NEVER MEANT "MOVE IT LEFT". The complaint was that the
+// emblem RAN OFF the right edge, so only a sliver of it was on the card. The
+// answer was to contain it at the right, not to march it across to the left,
+// which is what OTA-1751 and OTA-1752 did on a reading I inferred from four
+// words instead of checking with a rendered picture. Those passes are not wasted
+// - they produced the coverage floor, the contrast arithmetic and the focus
+// table this column rests on - but the direction was mine, not his.
+// Both cards now anchor to the SAME RIGHT EDGE with a 3% margin, so the column
+// never touches the rim and its whole width is on the card. The widths differ,
+// 42% on the tile and 52% on the record, and that is arithmetic rather than
+// inconsistency: contain fits by width, so the box's width IS the emblem's size.
+// 42% of the card makes an emblem about three times a 58dp tile's height, a
+// cropped fragment, but only nine tenths of a 200dp record's, a complete logo.
+// The record needs the wider box to stay a fragment. Anchored to one edge they
+// read as one column; forced to one width they would not. A wider tile column
+// would also make its emblem TALLER and show LESS of it, which is the trap
+// OTA-1750 documented.
+// Per-faction focus offsets, both alphas and the one-third coverage floor are
+// unchanged; six neighbouring suites are re-aimed, including two whose central
+// claims this reverses.
+export const OTA_BUILD_ID = '2026-09-08-1754-one-column-on-the-right';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-08-1753-each-emblem-gets-its-own-window';
 // golem catch-up 2026-09-08: markerless publish of OTA-1753 - each emblem gets
 // its own window. Two asks: the per-faction offset table, and the image on both
 // card states. The second was already true since OTA-1747 - the call sites are

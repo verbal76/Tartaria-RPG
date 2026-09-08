@@ -1581,17 +1581,33 @@ const styles = StyleSheet.create({
    * at this weight the name and the objective are never composited over more
    * than the emblem's outer edge, so no text loses contrast on any theme. */
   dossierFieldClip: { ...StyleSheet.absoluteFillObject, borderRadius: 3, overflow: 'hidden' },
-  /* ⚠⚠ OTA-1753 — THE EXPANDED CARD JOINS THE TILE'S TREATMENT.
-   * It had drifted into a different thing: 0.13 against the tile's 0.22, and a
-   * box (-18%/-18%) shallow enough that `contain` fit it by HEIGHT for the tall
-   * crests and by WIDTH for the square ones — so the emblem's size and placement
-   * changed with the faction, and beside a tile it read as absent. That is what
-   * the owner saw when he asked for the image "in both".
-   * ⚠ Its HORIZONTAL framing is untouched: left 32%, bleeding 8% off the right,
-   * exactly the composition approved on the device. Only the vertical spread
-   * (-80%, deep enough that every crest now fits by WIDTH, so placement is
-   * deterministic and the focus nudge is meaningful) and the alpha have moved. */
-  dossierField: { position: 'absolute', top: '-80%', bottom: '-80%', right: '-8%', left: '32%', opacity: 0.2 },
+  /* ⚠⚠⚠ OTA-1754 — ONE COLUMN, ON THE RIGHT, BOTH CARDS.
+   * Owner: *"if we can get the column on the far right we are done, especially
+   * if it is on the expanded and collapsed character tiles."*
+   * The two cards had never shared a column. The tile was walked LEFT over three
+   * passes to a centre of 38%; the expanded card stayed where VIS-3 first put
+   * it, centre 70% with 8% of the emblem hanging off the right border. Two cards
+   * for the same character, two different places to look.
+   * ⚠⚠ AND "TOO FAR RIGHT" NEVER MEANT "MOVE IT LEFT". Re-read against this: the
+   * complaint was that the emblem RAN OFF the right edge, so only a sliver of it
+   * was on the card. The answer was to contain it at the right, not to march it
+   * across to the left — which is what OTA-1751 and OTA-1752 did, twice, on a
+   * misreading I should have checked rather than inferred.
+   * So both cards anchor to the SAME RIGHT EDGE — a 3% margin, so the column
+   * never touches the rim and its whole width is on the card.
+   * ⚠ The widths differ, 42% on the tile and 62% on the record, and that is
+   * arithmetic rather than inconsistency: `contain` fits by width, so the box's
+   * width IS the emblem's size. 42% of the card makes an emblem ~3x a 58dp
+   * tile's height (a cropped fragment) but under 0.9x a 200dp record's (a
+   * complete logo). The record needs the wider box to stay a fragment — and it
+   * has to clear the SQUAREST crest, not the average: at 52% the tall crests
+   * cropped and mud_monarchs, which is 1254x1254, did not. Anchored to one edge
+   * they read as one column; matched in width they would not.
+   * ⚠ The vertical spread (-80%) keeps every crest fitting by WIDTH, which is
+   * what makes the placement exact and the per-faction focus nudge meaningful
+   * (OTA-1753). At 52% of the card's width the emblem is still taller than the
+   * record, so it stays a cropped fragment rather than a logo. */
+  dossierField: { position: 'absolute', top: '-80%', bottom: '-80%', right: '3%', left: '35%', opacity: 0.2 },
   /* ⚠⚠⚠ THE COLLAPSED CARD NEEDS DIFFERENT NUMBERS TO GET THE SAME LOOK — AND
    * OTA-1747 GOT THEM WRONG IN THE OTHER DIRECTION. Recorded because the error
    * is instructive and I would otherwise repeat it.
@@ -1624,26 +1640,23 @@ const styles = StyleSheet.create({
    *
    * ⚠ It sits from 40% to 82% of the tile, which clears the name column and
    * stops short of the timestamp. */
-  /* ⚠⚠⚠ OTA-1752 — LEFT OF CENTRE, BECAUSE THE TILE IS NOT SYMMETRICAL EITHER.
-   * OTA-1751 put the emblem on the row's geometric centre (29-71%) at the
-   * owner's request, and on the device it STILL read as sitting too far right.
-   * It was not an error in the arithmetic: the emblem was exactly centred. The
-   * mistake was treating the tile as an empty rectangle. Its own weight is all
-   * on the LEFT — the name at 32px, the objective line under it — and the only
-   * thing on the right is a small timestamp. An emblem centred against that
-   * reads right-of-centre, because the eye balances it against the text, not
-   * against the border.
-   * So it sits at 17-59%, centred on 38% of the tile. Same 42% width, same
-   * vertical crop, same alpha: only the horizontal centre moved.
-   * ⚠ It now overlaps the name outright rather than merely reaching it, and the
-   * contrast arithmetic (ota1751/ota1752) is what says that is safe: at 0.22
-   * over the brightest part of the artwork the name clears ~9:1 and the
-   * objective line ~6:1.
-   * ⚠ THE PER-FACTION OFFSET IS STILL UNBUILT and is still the real answer to
-   * the owner's original observation — the nine crests are composed differently
-   * inside their own frames, so one window shows a different part of each. This
-   * moves the window; it cannot align nine different compositions. */
-  dossierFieldCompact: { position: 'absolute', top: '-250%', bottom: '-250%', right: '41%', left: '17%', opacity: 0.22 },
+  /* ⚠⚠⚠ OTA-1754 — THE TILE JOINS THE RECORD'S COLUMN, ON THE RIGHT.
+   * This is the same 45%-to-97% band the expanded card now uses, so a character
+   * wears its emblem in one place whichever state its card is in.
+   * ⚠⚠ IT REVERSES OTA-1751 AND OTA-1752, AND THE REASON IS WORTH KEEPING. The
+   * owner said the emblems sat "too far to the right"; I read that as "move them
+   * left" and moved them twice — first to the geometric centre, then past it to
+   * 38%. What he meant was that the emblem was running OFF the right edge, so
+   * only a sliver of it was on the card. Containing it at the right was the fix
+   * all along. The two passes were not wasted — they are what produced the
+   * coverage floor, the contrast arithmetic and the focus table this column
+   * rests on — but the direction was mine, not his, and I should have shown a
+   * picture and asked rather than inferred it from four words.
+   * ⚠ 42% wide: past the one-third floor from OTA-1750, and at ~3x the tile's
+   * height still a fragment cropped top and bottom. A wider column would make
+   * the emblem TALLER and therefore show LESS of it — the trap OTA-1750
+   * documented, which is why this is not simply widened to match the record. */
+  dossierFieldCompact: { position: 'absolute', top: '-250%', bottom: '-250%', right: '3%', left: '55%', opacity: 0.22 },
   dossierNameRule: { marginTop: 6, marginBottom: 6 },
   /* ⚠ PHONE-FIX — INDEX TICKS: three hairlines machined across the spine, the
    * way a real filed plate carries a position mark. Fine technical engraving is

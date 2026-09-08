@@ -555,15 +555,19 @@ describe('artwork is composition, not a thumbnail in a box', () => {
     expect(field!.props.resizeMode).toBe('contain');
   });
 
-  test('the field bleeds off the record rather than sitting centred in it', () => {
-    // A print is CROPPED by the thing it is printed on. A picture centred in a
-    // box is the failure this replaces, so the geometry is pinned.
+  test('the field is CROPPED by the record rather than sitting centred in it', () => {
+    /* A print is cropped by the thing it is printed on; a picture centred in a
+     * box is the failure this replaces. The crop is still the claim — but it is
+     * now VERTICAL only. OTA-1754 retired the sideways bleed: the owner asked
+     * for a contained column on the far right, so the emblem no longer runs past
+     * the border, and pinning `left` in the 30s would forbid the column. */
     const block = /dossierField:\s*\{[^}]*\}/.exec(TITLE)?.[0] ?? '';
     expect(block).toContain("position: 'absolute'");
     expect(block).toMatch(/top: '-\d+%'/);
     expect(block).toMatch(/bottom: '-\d+%'/);
-    // ...and it stays out of the written column by LAYOUT, before opacity
-    expect(block).toMatch(/left: '3\d%'/);
+    // ...and its whole width is on the card, both edges inset
+    expect(block).toMatch(/right: '\d+%'/);
+    expect(block).toMatch(/left: '\d+%'/);
     // clipping is local, so it cannot crop the seal plate that sits proud of the
     // record's corner (VIS-1's own composition, kept)
     expect(TITLE).toContain('dossierFieldClip');

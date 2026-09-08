@@ -40,18 +40,29 @@ const field = () => {
 };
 
 describe('the emblem balances against the text, not against the border', () => {
-  test('⚠⚠⚠ its centre sits left of the tile\'s centre, and decisively so', () => {
+  /* ⚠⚠⚠ THIS PASS WAS WRONG, AND SUPERSEDED BY OTA-1754. KEPT, NOT DELETED.
+   *
+   * The reasoning below was sound and the conclusion was still wrong, which is
+   * the useful kind of failure to leave in the tree. The premise — that a tile's
+   * weight is on the left, so a geometrically centred mark reads right-of-centre
+   * — is TRUE, and it is a rule the rest of the rollout will need. What was
+   * wrong was applying it to a report it did not explain.
+   *
+   * ⚠⚠ The owner said the emblems were "still too far to the right". I read that
+   * as "move them left" and did, twice — to the centre in OTA-1751, past it to
+   * 38% in OTA-1752. He meant the emblem was RUNNING OFF the right edge, so only
+   * a sliver of it was on the card, and asked for it to be a contained column on
+   * the far right. One rendered picture would have settled it before either
+   * pass. Two OTAs of travel, and the direction was mine, not his.
+   *
+   * The positional assertions are therefore retired. What is kept is the part
+   * that was never about direction, and the note above, so the next surface with
+   * one-sided weight starts from the rule without repeating the inference. */
+  test('⚠⚠ the emblem is a contained column, on one side, by a decisive margin', () => {
     const f = field();
-    expect(f.centre).toBeLessThan(45);
-    // ...and not merely a nudge — OTA-1751 was at 50 and the owner still called it right
-    expect(50 - f.centre).toBeGreaterThanOrEqual(8);
-  });
-
-  test('but not shoved against the edge either', () => {
-    const f = field();
-    expect(f.centre).toBeGreaterThan(25);
     expect(f.left).toBeGreaterThan(0);
     expect(f.right).toBeGreaterThan(0);
+    expect(Math.abs(f.left - f.right)).toBeGreaterThan(10);   // committed to a side
   });
 
   test('⚠⚠ ONLY the horizontal centre moved — width, crop and alpha are OTA-1751\'s', () => {
@@ -60,30 +71,34 @@ describe('the emblem balances against the text, not against the border', () => {
      * size argument. This is that pass, and this is the test that proves it did
      * not smuggle anything else through. */
     const f = field();
-    expect(f.width).toBe(42);                       // the owner's ≥1/3 floor, unchanged
+    expect(f.width / 100).toBeGreaterThanOrEqual(1 / 3);  // the owner's floor, unchanged
     expect(num(f.b, 'opacity')).toBe(0.22);         // the alpha he approved
     expect(num(f.b, 'top')).toBe(-250);             // the vertical crop
     expect(num(f.b, 'bottom')).toBe(num(f.b, 'top'));
   });
 
-  test('it still clears the timestamp on the right', () => {
-    // `slotTime` sits at the far right of the head row; the emblem stopping
-    // short of it is why moving left costs nothing on that side.
-    expect(field().right).toBeGreaterThanOrEqual(30);
+  test('⚠ it no longer clears the timestamp — and that is now deliberate', () => {
+    /* OTA-1752 kept the emblem short of `slotTime` at the far right of the head
+     * row. OTA-1754 put the column THERE, so the timestamp now sits over the
+     * emblem. That is fine and it is measured rather than assumed: at 0.22 over
+     * the brightest part of the artwork `slotTime` (#a2977b) clears 3:1, which
+     * ota1751 asserts. Pinning the old clearance would forbid the column. */
+    expect(field().right).toBeLessThan(30);
   });
 
   test('the expanded card did not move with it', () => {
     // Only the collapsed tile has one-sided weight. The expanded card is a
     // two-column record and its composition was approved as it is.
-    /* ⚠ The claim that survives is that the expanded card did not adopt the
-     * TILE'S left-of-centre bias — a record is a two-column layout and does not
-     * have one-sided weight. Its alpha and vertical spread are OTA-1753's
-     * business, not this pass's. */
+    /* ⚠⚠ SUPERSEDED BY OTA-1754, which was the point at which the two cards were
+     * finally made to agree. This asserted the record did NOT follow the tile,
+     * which was true while the tile was being walked left on a misreading. Now
+     * they share a right edge deliberately, so what is worth holding is that
+     * neither of them bleeds off the card any more. */
     const a = styleBlock('dossierField');
-    expect(num(a, 'left')).toBe(32);
-    expect(num(a, 'right')).toBe(-8);
-    const openCentre = num(a, 'left') + (100 - num(a, 'left') - num(a, 'right')) / 2;
-    expect(openCentre).toBeGreaterThan(50);   // right of centre, unlike the tile
+    const c = styleBlock('dossierFieldCompact');
+    expect(num(a, 'right')).toBe(num(c, 'right'));   // one edge, both cards
+    expect(num(a, 'right')).toBeGreaterThan(0);      // contained, not bleeding
+    expect(num(a, 'left')).toBeGreaterThan(0);
   });
 
   test('the build stamp names this pass', () => {
