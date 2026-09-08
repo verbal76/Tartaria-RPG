@@ -29508,7 +29508,24 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // and nothing was resized; both controls now sit 18 from their side.
 // The gold box seen around that link in the harness shot is the headless
 // browser's focus ring and does not ship; the asymmetry under it was real.
-export const OTA_BUILD_ID = '2026-09-08-1760-two-in-a-screenshot';
+// SUPERSEDED: '2026-09-08-1760-two-in-a-screenshot'
+// OTA-1761 - the one that was not broken. Owner, on the corrected screenshot:
+// "those 2 images have the misalignment again, the one before it was fine." It
+// was. This reverts OTA-1760's change to the tips link and leaves the file
+// exactly as it shipped. The mistake is worth writing down: I measured the
+// link's label sitting at the left edge of its own padding box and called it an
+// off-centre tap target, and both halves of that reading were wrong. The box in
+// the screenshot was the headless browser's focus ring, which does not ship, and
+// hitSlop 8 on that control already extended the touchable area on all four
+// sides - a line four lines from the style I changed, in JSX I had already read.
+// OTA-1760's own note says the ring is an artifact and then acts on it anyway;
+// naming an artifact is not the same as not being fooled by it. The shipped
+// values were right on both things a player can see: the label flush with the
+// card's body text, and the box 18 from the card's inner edge matching Got it on
+// the other side. There is no third value that satisfies both, which is why two
+// attempts each broke the half the other preserved. OTA-1760's VendorScreen
+// half was a real defect and is untouched.
+export const OTA_BUILD_ID = '2026-09-08-1761-not-broken';
 // golem catch-up 2026-09-08: markerless publish of OTA-1760 - two the owner saw
 // in a screenshot, both measured from the real bundle before anything was
 // touched. The back button's border was covering the sentence above it because

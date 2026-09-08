@@ -119,34 +119,36 @@ const styles = StyleSheet.create({
   },
   /* OTA-860 — quiet secondary link; reads as a toggle-off, not a primary action.
    *
-   * ⚠⚠ OTA-1760 — THE TAP TARGET WAS OFF-CENTRE ON ITS OWN LABEL, and the
-   * render measured it. Owner: *"the turn off tips button isn't centered."*
-   *     Got it         box x284.2 w72.3 · text x303.2 w34.3 → 19.0 / 19.0  ✓
-   *     Turn off tips  box x 54.5 w71.4 · text x 54.5 w61.4 →  0.0 / 10.0  ✗
-   * `paddingRight: 10` with no `paddingLeft` put every pixel of slack on one
-   * side: no tap forgiveness at all to the LEFT of the label, and the moment
-   * anything draws a box — a pressed state, a focus ring — the label sits hard
-   * against its edge. The other three "Turn off tips" controls in the game
-   * (CombatPrimer, WandererEncounter, DogOnboarding) all use a symmetric
-   * `paddingHorizontal: 12`; this one was the outlier.
-   * ⚠⚠ AND THE FIRST FIX FOR IT WAS WRONG, WHICH THE OWNER CAUGHT: *"now the
-   * turn off tips button is too close to the outer edge."* It was. I had added
-   * `marginLeft: -10` to keep the LABEL flush with the card's body text, which
-   * pulled the box 10pt into the card's padding:
-   *     Got it         box right 356.5 · card inner right 374.5 → 18.0
-   *     Turn off tips  box left   44.5 · card inner left   36.5 →  8.0
-   * Symmetric on its own label, crowded against the card. Two problems traded.
+   * ⚠⚠⚠ OTA-1761 — REVERTED TO EXACTLY THIS, AFTER TWO WRONG FIXES. DO NOT
+   * "CENTRE" IT AGAIN. The asymmetric padding is not a defect and the record of
+   * why is worth more than the four lines it costs.
    *
-   * ⚠⚠⚠ THE RULE WAS ALREADY IN THE ROW, IN THE BUTTON NEXT TO IT. `Got it`'s
-   * BOX sits on the card's padding edge and its LABEL sits inside its own
-   * padding — the label is not flush with the body text either, and nobody has
-   * ever thought it looked wrong. Boxes align to the card; labels align to their
-   * boxes. So the answer is neither shrinking the control nor growing the card:
-   * it is dropping the offset and letting this control obey the rule its sibling
-   * already obeys. Both boxes now sit 18.0 from their side of the card. */
+   * OTA-1760 read a harness screenshot, saw the label sitting hard against the
+   * left of its own padding box, and called it an off-centre tap target:
+   *     Got it         box x284.2 w72.3 · text x303.2 w34.3 → 19.0 / 19.0
+   *     Turn off tips  box x 54.5 w71.4 · text x 54.5 w61.4 →  0.0 / 10.0
+   * ⚠ BOTH HALVES OF THAT READING WERE WRONG.
+   *   1. The box in the screenshot was the HEADLESS BROWSER'S FOCUS RING. On a
+   *      device this control has no border at all, so nothing was visibly
+   *      off-centre. OTA-1760's own commit message SAYS the ring is an artifact,
+   *      and then acts on it anyway.
+   *   2. The tap target was never asymmetric. The `hitSlop={8}` on the
+   *      TouchableOpacity below already extends the touchable area 8pt on ALL
+   *      FOUR sides, including the left. The claim "no tap forgiveness at all to
+   *      the left of the label" was made without reading the JSX it was about.
+   *
+   * ⚠⚠ AND THE SHIPPED VALUES WERE ALREADY RIGHT ON BOTH THINGS A PLAYER SEES:
+   *      the LABEL is flush with the card's body text above it (x 54.5), and
+   *      the BOX sits 18.0 from the card's inner edge — the card's own padding,
+   *      matching `Got it`'s 18.0 on the other side.
+   * Two attempts each broke one of those. `marginLeft: -10` kept the label
+   * aligned and pulled the box to 8.0 from the card edge. Deleting the offset
+   * fixed the box and indented the label 10pt from the body text. Owner, both
+   * times, and right both times: *"too close to the outer edge"*, then *"the one
+   * before it was fine."* It was. There was no defect here to fix. */
   linkBtn: {
     paddingVertical: 8,
-    paddingHorizontal: 10,
+    paddingRight: 10,
   },
   linkText: {
     color: '#a2977b',

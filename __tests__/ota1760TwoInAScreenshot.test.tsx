@@ -20,18 +20,15 @@
  *      has no header row for it to sit in, so the container's default
  *      `alignItems: 'stretch'` blew it out and it read as a banner.
  *
- *   2. THE LINK OFF-CENTRE ON ITS OWN LABEL — 0.0 left, 10.0 right.
- *      ⚠ And the FIRST fix for this was wrong — see the second describe block.
- *        Got it         box x284.2 w72.3 · text x303.2 w34.3 → 19.0 / 19.0  ✓
- *        Turn off tips  box x 54.5 w71.4 · text x 54.5 w61.4 →  0.0 / 10.0  ✗
- *      `paddingRight: 10` with no `paddingLeft`: every pixel of slack on one
- *      side, and no tap forgiveness at all to the LEFT of the label.
+ *   2. ⚠⚠⚠ THE LINK — REVERTED BY OTA-1761, BECAUSE IT WAS NOT A DEFECT.
+ *      Kept named here rather than edited out: this pass shipped two changes
+ *      and only one of them survived, which is worth being able to see.
  *
- * ⚠⚠⚠ AND ONE THING IN THAT SCREENSHOT DOES NOT SHIP, WHICH IS WORTH SAYING
- * PLAINLY RATHER THAN QUIETLY FIXING. The gold rounded box drawn around "Turn
- * off tips" is the HEADLESS BROWSER'S FOCUS RING. On a device that control is
- * bare underlined text with no border at all. The asymmetry underneath it was
- * real and is fixed; the box was not ours and there was nothing to fix.
+ * ⚠⚠⚠ AND ONE THING IN THAT SCREENSHOT DOES NOT SHIP. The gold rounded box drawn
+ * around "Turn off tips" is the HEADLESS BROWSER'S FOCUS RING. On a device that
+ * control is bare underlined text with no border at all.
+ * ⚠ THIS PASS WROTE THAT SENTENCE AND THEN ACTED ON THE RING ANYWAY. Naming an
+ * artifact is not the same as not being fooled by it. See OTA-1761.
  */
 import { readFileSync } from 'fs';
 import { join } from 'path';
@@ -110,79 +107,17 @@ describe('the back button no longer sits on the sentence above it', () => {
   });
 });
 
-// ═══ 2. THE OFF-CENTRE TARGET ════════════════════════════════════════════════
-describe('the tips link is centred on its own label', () => {
-  test('⚠⚠⚠ the padding is symmetric, which it was not', () => {
-    const r = rule(HINT, 'linkBtn');
-    expect(r).toContain('paddingHorizontal: 10');
-    expect(r).not.toMatch(/paddingRight: \d/);
-    expect(r).not.toMatch(/paddingLeft: \d/);
-  });
-
-  test('⚠⚠⚠ and it is NOT pulled back out of the card — the first fix for this was wrong', () => {
-    /* Owner, on the fix: *"now the turn off tips button is too close to the
-     * outer edge."* It was. I had added `marginLeft: -10` to keep the LABEL
-     * flush with the card's body text, which pulled the box into the padding:
-     *     Got it         box right 356.5 · card inner right 374.5 → 18.0
-     *     Turn off tips  box left   44.5 · card inner left   36.5 →  8.0
-     * Symmetric on its own label and crowded against the card: two problems
-     * traded, not one solved.
-     * ⚠ The rule was already sitting in the same row. `Got it`'s BOX is on the
-     * card's padding edge and its LABEL is inset by its own padding — it does
-     * not align with the body text either, and it has never looked wrong. Boxes
-     * align to the card; labels align to their boxes. No offset. */
-    const r = rule(HINT, 'linkBtn');
-    expect(r).not.toContain('marginLeft');
-    expect(r).not.toContain('marginRight');
-    const pad = Number(/paddingHorizontal: (\d+)/.exec(r)?.[1] ?? NaN);
-    expect(Number.isFinite(pad)).toBe(true);
-    expect(pad).toBeGreaterThan(0);
-  });
-
-  test('⚠⚠ both controls now sit the SAME distance from their side of the card', () => {
-    /* Measured from the real bundle after the correction: the link's box left is
-     * 18.0 from the card's inner edge and `Got it`'s box right is 18.0 from the
-     * other, which is the card's own padding on both sides. That equality is the
-     * claim; the card's padding is where it comes from. */
-    expect(rule(HINT, 'card')).toContain('padding: 18');
-    // and neither control cancels it with a margin of its own
-    for (const n of ['linkBtn', 'btn']) expect(rule(HINT, n)).not.toContain('margin');
-  });
-
-  test('⚠ it now matches the three sibling controls that were already right', () => {
-    // Same control, same words, three other places — all symmetric already.
-    for (const c of ['CombatPrimerModal', 'WandererEncounterModal', 'DogOnboardingModal']) {
-      const src = read('app', 'components', `${c}.tsx`);
-      expect(src).toMatch(/turnOffBtn: \{[^}]*paddingHorizontal: \d+/);
-      expect(src).toContain('Turn off tips');
-    }
-  });
-
-  test('the primary button beside it was already symmetric and is untouched', () => {
-    const r = rule(HINT, 'btn');
-    expect(r).toContain('paddingHorizontal: 18');
-    expect(r).toContain('paddingVertical: 8');
-  });
-
-  test('⚠ the link is still a quiet link, not promoted to a second button', () => {
-    /* OTA-860 made this deliberately quiet — it reads as a toggle-off, not a
-     * primary action. Fixing a tap target is not licence to restyle it, and the
-     * owner's amendment is explicit: do not homogenize. */
-    const r = rule(HINT, 'linkText');
-    expect(r).toContain("textDecorationLine: 'underline'");
-    expect(r).toContain("color: '#a2977b'");
-    expect(rule(HINT, 'linkBtn')).not.toContain('borderWidth');
-  });
-
-  test('⚠⚠⚠ the gold box in the screenshot was the browser, and that is recorded', () => {
-    /* Worth a test because the record is the only thing stopping a later reader
-     * from "fixing" a border that does not exist. The control has no border in
-     * the stylesheet; what was photographed was a focus ring. */
-    expect(HINT).toContain('focus ring');
-    const sheet = StyleSheet.create({ probe: { paddingHorizontal: 10, marginLeft: -10 } });
-    expect(StyleSheet.flatten(sheet.probe).marginLeft).toBe(-10);
-  });
-});
+/* ═══ 2. ⚠⚠⚠ MOVED OUT — AND THAT MOVE IS THE RECORD ═════════════════════════
+ * This block used to assert a "fix" to FirstTimeHint's tips link. OTA-1761
+ * REVERTED that change: it was not a defect. The link's cover now lives in
+ * __tests__/ota1761TheOneThatWasNotBroken.test.tsx, where it DEFENDS the
+ * shipped values instead of changing them.
+ *
+ * ⚠ The block is not silently deleted, because the two halves of this pass had
+ * very different fates and a suite that quietly dropped one would read as if it
+ * had always been about VendorScreen alone. Section 1 above was a real defect
+ * measured and fixed. Section 2 was a browser focus ring mistaken for a layout
+ * bug, twice. Both are worth keeping visible. */
 
 describe('the stamp', () => {
   test('names this pass', () => {
