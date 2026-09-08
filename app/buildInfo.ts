@@ -29236,6 +29236,26 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // emblem actually visible, that the whole width is inside the card, and that it
 // is still cropped rather than a centred logo.
 export const OTA_BUILD_ID = '2026-09-08-1750-a-third-of-the-tile-not-a-splinter';
+// golem catch-up 2026-09-08: markerless publish of OTA-1750 - a third of the
+// tile, not a splinter. With every card finally wearing its own faction, the
+// owner reported the designs read fainter than he wanted, that some looked
+// smaller than others, that they should shift left so more of each emblem shows,
+// and that the design should cover at least a third of the tile. He was right on
+// all three and OTA-1747 had passed every one of its own tests while failing
+// them, because that suite asked only whether the emblem was cropped rather than
+// centred - a question a thin invisible splinter answers just as well as a good
+// composition does. The error ran opposite to the intuition: the box was 76% of
+// the tile's width, which contain turns into an emblem 5.3 times the tile's
+// height, so under a fifth of it fell inside the card and most of its width ran
+// off the right edge. A smaller box makes a shorter emblem and therefore shows
+// more of it - 42% of the tile's width, 3 times its height, a third of the emblem
+// visible, whole width inside the card, sitting from 40% to 82% clear of the name
+// and short of the timestamp. Fitting by width makes every crest exactly as wide
+// as the next, which answers the "some are smaller" half, and leaves image width
+// equal to box width so placement is exact on phone and tablet alike. Opacity
+// went 0.09 to 0.17 collapsed and 0.09 to 0.13 expanded; the expanded card's
+// geometry, the composition the owner approved, has not moved. Text contrast is
+// measured against the brightest part of the artwork rather than its average.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-08-1749-the-faction-the-index-forgot';
 // golem catch-up 2026-09-08: markerless publish of OTA-1748 and OTA-1749.
 // 1748 - the settings mark is drawn. Both settings buttons rendered U+2699 as
