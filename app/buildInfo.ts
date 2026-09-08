@@ -28977,6 +28977,26 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // animated under reduce-motion. Scope held: the kit has exactly one consumer
 // today, and the suite fails if a second screen imports it.
 export const OTA_BUILD_ID = '2026-09-08-1742-the-screen-is-made-of-something';
+// golem catch-up 2026-09-08: markerless publish of OTA-1742 - the first visual
+// overhaul pass (VIS-1-A7E4). The deliverable is a reusable interface language
+// in app/ui/tartariaKit.tsx - surface, button, ornament, resource chit, faction
+// plate, registration corners, strata, selection settle - with the title and
+// character-selection screen as its first reference implementation. Everything
+// is layered material now: outer depth, a structural rim lit on its top edge
+// and near-black on its bottom, a recessed or raised face, a controlled
+// highlight, then content; never a background colour with a border. Character
+// cards read as recovered records with an engraved identity spine, and a
+// selected one lifts rather than merely changing colour. The canonical faction
+// emblem is stamped on a riveted plate that breaks the record's corner, shown
+// only on expansion, in its own column so it can never cover text or take a
+// tap. NEW TARTARIAN is the screen's one primary action, OTA and RESTORE its
+// utility family, gems a stamped resource chit, and the build line keeps its
+// exact words at the foot of the screen. The player's chosen background hue is
+// untouched: every colour is a warm neutral or the brand gold, and the plate
+// alphas were set from measured contrast across seven themes including light
+// ones. The two-tap load contract, swipe-to-delete, the roster, backup, restore
+// and every dev control are unchanged, and the screen still commits nothing at
+// all while it is being looked at.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-08-1741-the-work-nobody-will-read-gets-out-of-the-way';
 // golem catch-up 2026-09-08: markerless publish of OTA-1741 - the native AI,
 // lifecycle, hydration and long-session tranche (LAG-3-8D27). Obsolete narration
