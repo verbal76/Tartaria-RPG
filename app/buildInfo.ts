@@ -29478,6 +29478,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // harness has no vendor NPC - and the gap is asserted in the suite rather than
 // left as a sentence.
 export const OTA_BUILD_ID = '2026-09-08-1759-one-row';
+// golem catch-up 2026-09-08: markerless publish of OTA-1759 - four screens
+// invented four rows and three of them were the same row. Tier 0 step 3. The
+// kit gains a row CHASSIS - styles plus a tRowStyle() helper - and deliberately
+// not a <TRow> component, because unlike the twelve headers of OTA-1758 these
+// rows have four different interactions and a component owning the container
+// would lose behaviour. Adopted on Vendor and Crafting, whose base rows were
+// byte-identical; their orphaned styles are deleted and Vendor's broke-dim is
+// renamed offerBodyBroke because OTA-258 scoped it to the buy body and it never
+// applied to a row. The kit's own palette rule refused Inventory's two extra row
+// states at chroma 110 and 84 against the 58 it allows a non-brand hex, which is
+// the finding: Inventory has two off-brand golds doing row-state work that
+// check:gold cannot see. Crafting's REPAIR tab photographed before and after
+// from the real bundle reports identical geometry element for element; Vendor
+// could not be reached and the gap is asserted in the suite. Gold 375 to 373.
 // golem catch-up 2026-09-08: markerless publish of OTA-1758 - thirteen
 // hand-rolled back bars, one primitive. Tier 0 step 2. Twelve screens each built
 // their own back/title/spacer row and already agreed almost completely, which is
