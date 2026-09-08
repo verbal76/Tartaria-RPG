@@ -29509,6 +29509,26 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // The gold box seen around that link in the harness shot is the headless
 // browser's focus ring and does not ship; the asymmetry under it was real.
 export const OTA_BUILD_ID = '2026-09-08-1760-two-in-a-screenshot';
+// golem catch-up 2026-09-08: markerless publish of OTA-1760 - two the owner saw
+// in a screenshot, both measured from the real bundle before anything was
+// touched. The back button's border was covering the sentence above it because
+// there was ZERO gap - the text's line box ended at y=122 and the button's began
+// at y=122, so the border landed on the descenders; the placeholder had a top
+// margin and no bottom one. That same button was also stretched to the full
+// column because this branch has no header row for it to sit in, and is now
+// sized by its label. The turn-off-tips link was off-centre on its own label
+// with all its slack on one side and no tap forgiveness at all to the left.
+// The first fix for the link was wrong and the owner caught it: a negative
+// margin kept the label aligned with the body text but pulled the box into the
+// card's padding. The rule was already in the same row - Got it's box sits on
+// the card's padding edge while its label is inset by its own padding - so the
+// offset was deleted rather than anything being resized, and both controls now
+// sit 18 from their side of the card. Counting the neighbours found that the
+// same placeholder style exists nine times and that CharacterScreen's is the
+// brand gold on an empty state, which is interface gold the rollout should drive
+// down; recorded for that screen's own pass, not fixed here. Eight of those nine
+// empty states have no on-screen way out at all, which is reported and is an
+// owner call.
 // golem catch-up 2026-09-08: markerless publish of OTA-1759 - four screens
 // invented four rows and three of them were the same row. Tier 0 step 3. The
 // kit gains a row CHASSIS - styles plus a tRowStyle() helper - and deliberately
