@@ -29162,6 +29162,33 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // untouched; the field is pointerEvents="none" and adds no state, timer,
 // measurement or subscription.
 export const OTA_BUILD_ID = '2026-09-08-1747-the-faction-field-reaches-every-card';
+// golem catch-up 2026-09-08: markerless publish of OTA-1747 - the faction field
+// reaches every card. OTA-1746 printed a Tartarian's faction art into the
+// expanded record's ground: the canonical crest, dramatically oversized,
+// anchored right and cropped by the card's own edges at 0.09, a ghosted fragment
+// embedded in the plate rather than a logo placed on it. The owner confirmed
+// that card on the device and asked for the same treatment on every card, each
+// wearing its own faction's emblem and never one shared watermark. It is now a
+// single component driven by the Tartarian's faction, used by both card states,
+// with the faction lookup hoisted above the branch so one row does one lookup.
+// The expanded geometry is byte-identical, because that card is the reference
+// being extended and a reuse that restyled it would have discarded the thing it
+// was asked to copy. Only the vertical extent adapts, for a reason that is
+// arithmetic rather than taste: contain scales to whichever axis runs out first,
+// the crests are taller than wide, and on a collapsed card a quarter the height
+// the expanded percentages give a wide-short box that fits by height and centres
+// a small complete logo - the exact outcome ruled out. Extending the box to
+// about eleven times the card's height flips the fit back to width, so the short
+// window shows a horizontal slice through a huge emblem running off the top and
+// the right; horizontal framing and opacity are unchanged. The suite computes
+// that fit on a 340dp phone and at the 600dp tablet cap from the shipped styles
+// and the real PNG headers, verifies all nine factions in both states, proves a
+// mixed roster does not share a watermark, and proves the naive reuse would have
+// failed. A faction with no art still renders nothing. The riveted seal plate
+// stays expansion-only: it is the reward the two-stage card was designed around,
+// while the field is the card's material. Card dimensions, typography, borders,
+// spacing, hierarchy, colours and the two-stage tap contract are untouched, and
+// the field costs no state, timer, measurement or subscription.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-08-1746-the-shape-comes-before-the-detail';
 // golem catch-up 2026-09-08: markerless publish of OTA-1746 - Visual #3, the
 // commercial-finish pass, graded by the squint test rather than by how much
