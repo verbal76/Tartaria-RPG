@@ -603,23 +603,46 @@ describe('OTA-1742 — the language is reusable, and the first pass stayed in it
     expect(exported).toContain('TPanel');
     expect(exported).toContain('TButton');
     expect(exported).toContain('TFactionPlate');
-    expect(exported.length).toBeLessThanOrEqual(14);
+    /* ⚠ CEILING RAISED 14 → 16 BY VIS-3 (OTA-1746), NOT RELAXED. That pass was
+     * asked for a second SHAPE — a housing you can cut things into, as opposed
+     * to a plate that sits on the world — and it cost exactly one new component
+     * (TSurface) plus its type export. The point of this number is unchanged:
+     * a kit that grows a component per screen is not a language, it is a
+     * junk drawer. Raising it again needs a brief that asks for a shape the
+     * existing ones cannot make. */
+    expect(exported.length).toBeLessThanOrEqual(16);
   });
 
-  it('⚠⚠⚠ NOT propagated into any other screen yet — first pass, by explicit instruction', () => {
-    // The brief lists these by name as out of scope for this pass.
-    const off = ['ExplorationScreen', 'CombatScreen', 'InventoryScreen', 'VendorScreen',
+  /* ⚠⚠⚠ SUPERSEDED BY VIS-3 (OTA-1746) — AND THE REASONING IS KEPT HERE RATHER
+   * THAN DELETED WITH IT.
+   *
+   * As written, this asserted the kit had EXACTLY ONE consumer, because VIS-1's
+   * brief said the first pass was to establish a language and use ONE screen as
+   * its reference implementation — not to redecorate the game. That was right
+   * for OTA-1742 and it is not right now: VIS-3 was explicitly asked to make
+   * every major surface feel purpose-designed, and Exploration was the screen
+   * still built entirely out of backgroundColor + borderColor.
+   *
+   * ⚠ SO THE RULE IS NOT DROPPED, IT IS RE-AIMED. What this test was really
+   * protecting is that propagation happens BY INSTRUCTION and never by drift —
+   * one screen quietly importing the kit for one control is how a design system
+   * becomes a second, inconsistent one. The consumer list therefore stays an
+   * EXACT list. A third screen joining it is a real decision that shows up as a
+   * failing test, which is exactly what should happen. */
+  it('⚠⚠⚠ propagation is by instruction, never by drift — the consumer list is exact', () => {
+    // Still off, and still by name: these were never asked for.
+    const off = ['CombatScreen', 'InventoryScreen', 'VendorScreen',
       'ContractsScreen', 'CharacterScreen', 'CraftingScreen', 'GuidanceScreen'];
     for (const name of off) {
       const p = join(ROOT, 'app', 'screens', `${name}.tsx`);
       if (!existsSync(p)) continue;
       expect(readFileSync(p, 'utf8')).not.toContain('tartariaKit');
     }
-    // Exactly one consumer today: the reference implementation.
     const screens = require('fs').readdirSync(join(ROOT, 'app', 'screens')) as string[];
     const consumers = screens.filter((f) => f.endsWith('.tsx')
-      && readFileSync(join(ROOT, 'app', 'screens', f), 'utf8').includes('tartariaKit'));
-    expect(consumers).toEqual(['TitleScreen.tsx']);
+      && readFileSync(join(ROOT, 'app', 'screens', f), 'utf8').includes('tartariaKit')).sort();
+    // VIS-1's reference implementation, and VIS-3's polish target. Two.
+    expect(consumers).toEqual(['ExplorationScreen.tsx', 'TitleScreen.tsx']);
   });
 
   it('⚠ typography is a handful of functional roles, not a pile of decorative fonts', () => {
@@ -627,7 +650,16 @@ describe('OTA-1742 — the language is reusable, and the first pass stayed in it
     const typeBlock = KIT.slice(KIT.indexOf('export const TType'), KIT.indexOf('// ─── ORNAMENT'));
     const declared = [...typeBlock.matchAll(/^\s{2}(\w+):/gm)].map((m) => m[1]!);
     expect(declared.length).toBeGreaterThanOrEqual(4);
-    expect(declared.length).toBeLessThanOrEqual(6);
+    /* ⚠ 6 → 8 BY VIS-3 (OTA-1746). The brief asked for typography to be a
+     * SYSTEM with named roles, and found two that every screen was already
+     * faking by re-colouring `body` or `meta` inline at the call site: an
+     * instrument readout (technical) and a condition the player is under
+     * (status). Naming a role that already exists in practice shrinks the
+     * vocabulary; it does not grow it. The ceiling is still low on purpose —
+     * the failure this guards against is a pile of decorative sizes, and the
+     * OTA-1746 suite adds the sharper version of the same rule: exactly one
+     * role may be large, so hierarchy can never be bought with font size. */
+    expect(declared.length).toBeLessThanOrEqual(8);
     // And no custom font is loaded — the roles are weight, size and tracking.
     expect(KIT).not.toContain('fontFamily');
     void roles;

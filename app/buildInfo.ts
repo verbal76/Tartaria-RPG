@@ -29102,7 +29102,43 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // is byte-identical, an entry with no event renders exactly as before, and the
 // LAG-list boundaries (the memoised row, the windowed feed, no new store
 // subscription, no timers, no per-frame work) all still hold.
-export const OTA_BUILD_ID = '2026-09-08-1745-the-result-before-the-sentence';
+// ── OTA-1746 — THE SHAPE COMES BEFORE THE DETAIL (VIS-3-COMMERCIAL-POLISH-5E82) ──
+// Visual #3: the commercial-finish pass, graded by the squint test rather than by
+// how much ornament is on the screen. Exploration was the last surface still built
+// entirely out of backgroundColor + borderColor + borderRadius 4, and it is the
+// screen the player spends the game on: at arm's length it was eight near-identical
+// bordered rectangles on one plane, with #c9a86a spent on the place, the danger, the
+// weather, two nav buttons, the settings gear and a parser guess alike — so nothing
+// on it was emphatic, because everything was.
+// THE KIT GAINS A SECOND SHAPE. TPanel is a plate that sits ON the world; TSurface is
+// a HOUSING with things cut INTO it — one machined corner, an integral rail split from
+// the face by an engraved line, and two tones that establish the plane stack (world
+// substrate → housing → inset surface → active element → result). The depth is free:
+// no shadow and no elevation on either tone. A housing reads raised because its face
+// is lighter and its light is on the top edge; an inset reads cut-in because its face
+// is darker and its light is on the bottom. Four material families (composite, glass,
+// ceramic, damaged coating) stop structure and information being the same substance,
+// and two type roles (technical, status) name what every screen was already faking.
+// GOLD NOW MEANS ONE THING: a live obligation or a live process. It stays on the main
+// quest chip and the arbiter's composing indicator and leaves the scene header, the
+// nav keys, the settings gear and the did-you-mean chips — which is why the objective
+// chip is now the screen's focal point without a pixel being added to it.
+// THE ARTWORK PARTICIPATES. The expanded dossier's faction crest is still the riveted
+// plate VIS-1 gave it, and the same canonical art is now also printed into the
+// record's field, oversized and bleeding off the right edge — one decode, shared with
+// the plate, on the one expanded record.
+// A REAL PERFORMANCE DEFECT CAME OUT WITH IT, found by moving the kit's button onto a
+// screen that actually re-renders: TButton built a fresh interpolate node and a fresh
+// transform object every render, so RN's AnimatedProps detached, re-attached and
+// scheduled another update — every re-render of a screen containing one cost TWO
+// commits. Invisible on the title screen; OTA-1739's commit-count suite failed the
+// instant the control reached Exploration. Both halves are memoised and pinned. This
+// had been shipped since OTA-1742.
+// ⚠ COMBAT DENSITY IS UNTOUCHED: no CombatStrip metric, no STRIP_METRICS value and no
+// combat call site moved. Nothing was animated, no timer, no measurement, no store
+// subscription and no elevation was added.
+export const OTA_BUILD_ID = '2026-09-08-1746-the-shape-comes-before-the-detail';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-08-1745-the-result-before-the-sentence';
 // golem catch-up 2026-09-08: markerless publish of OTA-1745 - Visual #2, combat
 // inside Exploration as information design. Combat authority always knew who
 // swung, what they rolled, whether it landed and what was left standing; the

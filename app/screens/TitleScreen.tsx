@@ -612,6 +612,27 @@ export function TitleScreen() {
         <TSettle active>
         <View style={[styles.dossierRim, styles.dossierRimOpen, item.dead && styles.dossierRimDead]}>
           <View style={[styles.dossierFace, styles.dossierFaceOpen, item.dead && styles.dossierFaceDead]}>
+            {/* ⚠⚠⚠ VIS-3 — THE ARTWORK IS THE RECORD'S GROUND, NOT AN ICON ON IT.
+                Brief: *"crests should not be thumbnails in boxes; artwork should
+                sometimes determine the composition around it."* VIS-1 gave the
+                emblem a riveted plate in its own gutter, which was right and is
+                kept — but the plate is still a picture placed INTO a layout.
+                This is the other half: the same canonical faction art, printed
+                into the record's own field, oversized and bleeding off the right
+                edge, so the file a Tartarian is filed in is visibly THEIR
+                FACTION'S file. The written column is unchanged and untouched by
+                it; the art occupies the width the text was never using.
+                ⚠ It costs nothing: identical `source` to the plate above it, so
+                RN decodes the asset once and both draw from the same cache; no
+                animation, no measurement, `pointerEvents="none"`, and it exists
+                only on the ONE expanded record. ⚠ Clipping is local to this
+                layer so it cannot crop the seal plate, which is meant to sit
+                proud of the record's corner. */}
+            {crest !== undefined && (
+              <View style={styles.dossierFieldClip} pointerEvents="none">
+                <Image source={crest} style={styles.dossierField} resizeMode="contain" />
+              </View>
+            )}
             <View style={[styles.spine, styles.spineOpen, item.dead && styles.spineDead]} pointerEvents="none" />
             <View style={[styles.spineTick, { top: '22%', width: 9 }]} pointerEvents="none" />
             <View style={[styles.spineTick, { top: '50%', width: 9 }]} pointerEvents="none" />
@@ -1425,6 +1446,14 @@ const styles = StyleSheet.create({
   dossierSplit: { flexDirection: 'row', alignItems: 'flex-start' },
   dossierMain: { flex: 1, minWidth: 0 },
   dossierSeal: { marginLeft: 10, marginTop: -13, marginRight: -13 },
+  /* ⚠⚠ VIS-3 — the faction field. Anchored to the right edge and taller than
+   * the record so it bleeds off top and bottom: the art is a PRINT on the file,
+   * not a picture centred in a box, and cropping is what makes it read that way.
+   * ⚠ `left: '32%'` keeps it clear of the written column even before opacity —
+   * at this weight the name and the objective are never composited over more
+   * than the emblem's outer edge, so no text loses contrast on any theme. */
+  dossierFieldClip: { ...StyleSheet.absoluteFillObject, borderRadius: 3, overflow: 'hidden' },
+  dossierField: { position: 'absolute', top: '-18%', bottom: '-18%', right: '-8%', left: '32%', opacity: 0.09 },
   dossierNameRule: { marginTop: 6, marginBottom: 6 },
   /* ⚠ PHONE-FIX — INDEX TICKS: three hairlines machined across the spine, the
    * way a real filed plate carries a position mark. Fine technical engraving is

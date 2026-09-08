@@ -394,12 +394,33 @@ function renderEnemyMissLine(text: string): React.ReactNode {
 }
 
 const styles = StyleSheet.create({
+  /* ⚠⚠⚠ VIS-3 — THE FEED IS A RECESS, AND IT IS THE SCREEN'S FOCAL PLANE.
+   *
+   * This is the biggest object on the screen the player spends the game in, and
+   * it was drawn exactly like the four small chips above it: `#3a342c` at 1px,
+   * radius 4, one plane. Squint at the old screen and it was five identical
+   * rectangles with no way to tell which one you were supposed to be reading.
+   *
+   * ⚠⚠ THE DEPTH IS FREE. There is no shadow and no elevation here: the face is
+   * DARKER than the housing and the substrate around it, the shadow hairline is
+   * on the TOP edge and the light hairline on the BOTTOM — the exact inverse of
+   * a raised plate, and what the eye reads as "cut into". Zero render cost, no
+   * Android all-round shadow seam of the kind the owner photographed on the
+   * dossiers, and it holds on a light player theme as well as a dark one
+   * because BOTH hairlines are present.
+   *
+   * ⚠ The material is the kit's `glass` / `glassRim`, quoted rather than
+   * imported: this file is on the feed's hot render path and the values freeze
+   * into a StyleSheet at module load either way. If the kit's inset material
+   * moves, this comment is the pointer. */
   container: {
     flex: 1,
-    backgroundColor: '#0a0908',
-    borderColor: '#3a342c',
+    backgroundColor: 'rgba(6,7,8,0.94)',
     borderWidth: 1,
-    borderRadius: 4,
+    borderColor: '#242829',
+    borderTopColor: 'rgba(0,0,0,0.80)',
+    borderBottomColor: 'rgba(180,186,190,0.16)',
+    borderRadius: 2,
     padding: 8,
   },
   // Each entry gets its own "paragraph" — a generous bottom margin

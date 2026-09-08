@@ -20,6 +20,12 @@ import { useFirstTimeHint, useTeachingSlot } from '../components/useFirstTimeHin
 import { TEACHINGS as TEACH, type TeachingId } from '../components/teachingRegistry';
 import { spareThrowingSpear } from '../engine/bandolierEligibility'; // OTA-1738 — the THROW SPEAR rule, shared with InputBox
 import { AdventureFeed } from '../components/AdventureFeed';
+/* ⚠⚠⚠ VIS-3 — EXPLORATION JOINS THE KIT. This screen was the last one still
+ * built entirely out of `backgroundColor + borderColor + borderRadius: 4`, and
+ * it is the screen the player spends the game on. What it takes from the kit is
+ * the PLANE LANGUAGE (a housing you can cut things into) and the ONE CONTROL
+ * FAMILY — not a restyling of everything it contains. */
+import { TSurface, TButton, T } from '../ui/tartariaKit';
 import { renderLagAfterEngine } from '../diagnostics/renderClock'; // OTA-1696
 import { InputBox } from '../components/InputBox';
 import { DiceRoller } from '../components/DiceRoller';
@@ -134,11 +140,27 @@ function describeTime(hours: number): string {
 
 /** arb95 — danger readout for the scene-bar location line. Surfaces the
  *  location's danger tier (1-5) so the player can read at a glance how
- *  lethal the ground is — capitals (5) vs frontier outposts (2). */
-function dangerLabel(danger: number): string {
+ *  lethal the ground is — capitals (5) vs frontier outposts (2).
+ *
+ *  ⚠ VIS-3 — SAME TIER, STAMPED RATHER THAN NARRATED. `Danger 3 (Dangerous)`
+ *  is a sentence about a number; on a header rail it wants to be a MARK. The
+ *  tier and its word both survive — nothing was dropped, it stopped being
+ *  prose. */
+function dangerStamp(danger: number): string {
   const d = Math.max(1, Math.min(5, Math.round(danger || 1)));
-  const tier = d <= 1 ? 'Calm' : d === 2 ? 'Uneasy' : d === 3 ? 'Dangerous' : d === 4 ? 'Deadly' : 'Lethal';
-  return `Danger ${d} (${tier})`;
+  const tier = d <= 1 ? 'CALM' : d === 2 ? 'UNEASY' : d === 3 ? 'DANGEROUS' : d === 4 ? 'DEADLY' : 'LETHAL';
+  return `D${d} ${tier}`;
+}
+
+/** ⚠⚠ VIS-3 — DANGER IS THE ONE THING ON THIS HEADER THAT ESCALATES, so it is
+ *  the one thing allowed to change colour. Quiet ground reads as metadata; a
+ *  deadly tier takes the game's existing warning tone (#e07a5f, the same red
+ *  the combat channel and the destructive control already use). ⚠ IT IS NEVER
+ *  GOLD: gold on this screen now means a live obligation or a live process, and
+ *  a danger tier is neither. */
+function dangerTone(danger: number): string {
+  const d = Math.max(1, Math.min(5, Math.round(danger || 1)));
+  return d <= 2 ? '#8b8578' : d === 3 ? '#cdbf99' : '#e07a5f';
 }
 
 /** Subtle background tint per time-of-day. Always darker than the base
@@ -1333,9 +1355,22 @@ export function ExplorationScreen() {
             // Both vanish the instant an enemy is staged (the panel flips to
             // EnemyPanel), so they never cost permanent space or clutter combat.
             <>
-              <TouchableOpacity style={styles.crestNavBtn} activeOpacity={0.7} onPress={() => { logUiTap(CREST_WORLD_LABEL); setScreen('world'); }} accessibilityRole="button">
-                <Text style={styles.crestNavText}>{CREST_WORLD_LABEL}</Text>
-              </TouchableOpacity>
+              {/* ⚠⚠⚠ VIS-3 — ONE CONTROL FAMILY. These were gold-bordered,
+                  gold-lettered rectangles bracketing a live mini-map, and they
+                  won every squint test against the map they exist to frame.
+                  They are now the kit's own button — same rim, same face, same
+                  press depression, same reduce-motion behaviour as every
+                  control on the title screen and in Settings — at the compact
+                  density and in the utility variant, because navigation is not
+                  a call to action. Label, handler, tap ledger and role are
+                  untouched. */}
+              <TButton
+                label={CREST_WORLD_LABEL}
+                variant="utility"
+                compact
+                style={styles.crestNavBtn}
+                onPress={() => { logUiTap(CREST_WORLD_LABEL); setScreen('world'); }}
+              />
               {/* ⚠⚠ OTA-1370 — the crest tile is now a live, player-centred
                   mini-map: the outpost interior while you are inside one, the
                   world atlas otherwise. Owner's ask, and his two conditions
@@ -1361,9 +1396,13 @@ export function ExplorationScreen() {
                   setScreen('map');
                 }}
               />
-              <TouchableOpacity style={styles.crestNavBtn} activeOpacity={0.7} onPress={() => { logUiTap(CREST_LORE_LABEL); setScreen('lore'); }} accessibilityRole="button">
-                <Text style={styles.crestNavText}>{CREST_LORE_LABEL}</Text>
-              </TouchableOpacity>
+              <TButton
+                label={CREST_LORE_LABEL}
+                variant="utility"
+                compact
+                style={styles.crestNavBtn}
+                onPress={() => { logUiTap(CREST_LORE_LABEL); setScreen('lore'); }}
+              />
             </>
           )}
           {/* v2.4.1 (OTA 048) — gear icon overlaid in the right column.
@@ -1382,22 +1421,32 @@ export function ExplorationScreen() {
         </TutorialTarget>
       </View>
 
-      <TutorialTarget area="scene-bar" style={styles.sceneBar}>
-        <View style={{ flex: 1, minWidth: 0 }}>
-          <Text style={styles.sceneText} numberOfLines={1} ellipsizeMode="tail">
-            {currentScene
-              ? `${currentScene.transitArea ?? currentScene.location.name} · ${dangerLabel(currentScene.location.danger)}${currentScene.hazard ? `  /  ${currentScene.hazard.name}` : ''}`
-              : 'No scene'}
-          </Text>
-          <Text style={styles.timeText} numberOfLines={1}>
-            {describeTime(player.hoursElapsed ?? 0)}
-            {currentScene?.weather ? (
-              <Text style={styles.weatherText}>{` · ${currentScene.weather.name}`}</Text>
-            ) : null}
-          </Text>
-        </View>
-        <View style={styles.sceneBarBtns}>
-          {/* ⚠⚠ OTA-1375 — THE MAP BUTTON IS GONE. Owner: *"since tapping on
+      {/* ⚠⚠⚠ VIS-3 — THE SCENE HEADER IS AN INSTRUMENT, NOT A STRIP OF TEXT.
+          BEFORE: one 1px-bordered rectangle holding two lines, in which the
+          place, the danger tier, the hazard, the day, the hour and the weather
+          were SIX classes of information wearing ONE colour (#c9a86a) at two
+          sizes. At squint distance it was a grey bar with a gold smear on it,
+          indistinguishable from the four other bars beneath it.
+          AFTER: a housing with a machined corner, split by an engraved line
+          into a RAIL — where the place is named, its danger stamped, and the
+          screen's one utility key sits — and a READOUT, where the technical
+          detail lives. The place is now the largest, brightest thing on the
+          header, because the place is what the header is FOR.
+          ⚠ NOTHING WAS DROPPED: place, danger tier + word, hazard, day-part and
+          weather are all still here. They stopped being one sentence. */}
+      <TutorialTarget area="scene-bar" style={styles.sceneBarSlot}>
+        <TSurface
+          rail={(
+            <View style={styles.sceneRail}>
+              <Text style={styles.sceneName} numberOfLines={1} ellipsizeMode="tail">
+                {currentScene ? (currentScene.transitArea ?? currentScene.location.name) : 'No scene'}
+              </Text>
+              {currentScene ? (
+                <Text style={[styles.sceneDanger, { color: dangerTone(currentScene.location.danger) }]} numberOfLines={1}>
+                  {dangerStamp(currentScene.location.danger)}
+                </Text>
+              ) : null}
+              {/* ⚠⚠ OTA-1375 — THE MAP BUTTON IS GONE. Owner: *"since tapping on
               the minimap opens the atlas, I don't think we need the map button
               anymore."* Right — arb99 put MAP here so the map was always one
               tap away, and the corner mini-map is now that one tap AND shows
@@ -1410,22 +1459,47 @@ export function ExplorationScreen() {
               longer reachable mid-fight. That reads correct (you should not be
               browsing the map with a blade out) but it IS a change, and if it
               ever wants undoing the button is one commit back. */}
-          {/* OTA-748 — settings gear, relocated here from the enemy card. */}
-          <TouchableOpacity
-            onPress={() => setScreen('about')}
-            hitSlop={8}
-            style={styles.sceneBarBtn}
-            accessibilityRole="button"
-            accessibilityLabel="Settings"
-          >
-            <Text style={styles.sceneBarGear}>⚙</Text>
-          </TouchableOpacity>
-          {/* v2.4.1 (OTA 045) — QUESTS button removed per player
-              direction. The main-quest objective chip below the
-              scene bar is now the single entry to Contracts (which
-              holds the main quest + all side quests + collectibles).
-              The chip's relabeling makes that dual role explicit. */}
-        </View>
+              {/* OTA-748 — settings gear, relocated here from the enemy card.
+                  ⚠⚠ VIS-3 — AND IT IS NOW A KEY SET INTO THE RAIL, NOT A GOLD
+                  CHIP. Owner's brief: *"Settings must not compete."* It was a
+                  bordered #c9a86a glyph sitting at the same visual weight as
+                  the place it was beside. It is now a ceramic-toned mark in a
+                  recess — findable in exactly the same corner, at exactly the
+                  same hit area (hitSlop 8), and no longer arguing with the
+                  content. */}
+              <View style={styles.sceneBarBtns}>
+                <TouchableOpacity
+                  onPress={() => setScreen('about')}
+                  hitSlop={8}
+                  style={styles.sceneBarBtn}
+                  accessibilityRole="button"
+                  accessibilityLabel="Settings"
+                >
+                  <Text style={styles.sceneBarGear}>⚙</Text>
+                </TouchableOpacity>
+              </View>
+              {/* v2.4.1 (OTA 045) — QUESTS button removed per player
+                  direction. The main-quest objective chip below the
+                  scene bar is now the single entry to Contracts (which
+                  holds the main quest + all side quests + collectibles).
+                  The chip's relabeling makes that dual role explicit. */}
+            </View>
+          )}
+        >
+          {/* ⚠ THE READOUT. Technical detail, one row, all of it the same
+              class of information and therefore all of it the same tone —
+              which is the point: it is the ONLY row on the header that is
+              allowed to be uniform, because it genuinely is. */}
+          <View style={styles.sceneReadout}>
+            <Text style={styles.sceneTime} numberOfLines={1}>{describeTime(player.hoursElapsed ?? 0)}</Text>
+            {currentScene?.weather ? (
+              <><Text style={styles.sceneDot}>·</Text><Text style={styles.sceneTime} numberOfLines={1}>{currentScene.weather.name}</Text></>
+            ) : null}
+            {currentScene?.hazard ? (
+              <><Text style={styles.sceneDot}>·</Text><Text style={styles.sceneHazard} numberOfLines={1}>{currentScene.hazard.name}</Text></>
+            ) : null}
+          </View>
+        </TSurface>
       </TutorialTarget>
 
       {/* v2.4.1 (OTA 045) — Main Quest chip + entry to all Contracts.
@@ -3306,7 +3380,11 @@ const styles = StyleSheet.create({
   // OTA-841 [did-you-mean] — tappable disambiguation chip row above the input.
   didYouMeanRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 6, paddingHorizontal: 4, paddingBottom: 4 },
   didYouMeanLabel: { color: '#a2977b', fontSize: 11, letterSpacing: 1, fontStyle: 'italic' },
-  didYouMeanChip: { backgroundColor: '#1a1714', borderColor: '#c9a86a', borderWidth: 1, borderRadius: 4, paddingHorizontal: 10, paddingVertical: 6 },
+  // ⚠ VIS-3 — A GUESS IS NOT AN OBLIGATION. This wore the same gold border as
+  // the main-quest chip, so the screen's loudest signal was sometimes the
+  // parser admitting it did not understand you. Alloy rim, ink label: still
+  // obviously tappable, no longer the brightest thing on the screen.
+  didYouMeanChip: { backgroundColor: '#1a1714', borderColor: T.rimAlloy, borderWidth: 1, borderRadius: 3, paddingHorizontal: 10, paddingVertical: 6 },
   didYouMeanChipText: { color: '#e6d8b3', fontSize: 12, letterSpacing: 0.5 },
   // OTA-275 — tablet width cap. Phones unchanged; iPad centers at 600pt.
   container: { flex: 1, backgroundColor: 'transparent', padding: 8, gap: 6, width: '100%', maxWidth: CONTENT_MAX_WIDTH, alignSelf: 'center' },
@@ -3318,8 +3396,9 @@ const styles = StyleSheet.create({
   statsCol: { flex: 1 },
   rightCol: { flex: 1, position: 'relative' },
   // OTA-852 — WORLD / LORE nav buttons bracketing the peaceful crest.
-  crestNavBtn: { backgroundColor: '#1a1714', borderColor: '#c9a86a', borderWidth: 1, borderRadius: 4, paddingVertical: 5, alignItems: 'center', marginVertical: 3 },
-  crestNavText: { color: '#c9a86a', fontSize: 11, fontWeight: '800', letterSpacing: 2 },
+  // ⚠ VIS-3 — the face, rim, type and press behaviour all come from the kit's
+  // TButton now; this is only the slot it sits in.
+  crestNavBtn: { marginVertical: 3 },
   // v2.4.1 (OTA 048) — gear icon floats over the right column
   // (EnemyPanel or CrestPlaceholder). 32×32 hit area, semi-
   // transparent backdrop so it stays legible on top of either
@@ -3329,34 +3408,59 @@ const styles = StyleSheet.create({
   // reservation since the gear no longer overlaps the enemy name
   // / range tag area.
   // OTA-748 — settings gear now lives in the scene bar next to MAP (sceneBarGear).
-  sceneBar: {
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    paddingHorizontal: 8, paddingVertical: 6, backgroundColor: '#13110f',
-    borderColor: '#3a342c', borderWidth: 1, borderRadius: 4,
-    gap: 6,
-  },
-  sceneText: { color: '#c9a86a', fontSize: 10, letterSpacing: 1 },
-  timeText: { color: '#a2977b', fontSize: 9, letterSpacing: 1, marginTop: 1 },
-  // OTA-914 — weather pops on the day line: the location line's bright gold + a bold weight,
-  // instead of inheriting the faded day-counter color.
-  weatherText: { color: '#c9a86a', fontWeight: '700' },
+  /* ⚠⚠⚠ VIS-3 — THE HEADER'S TYPE ROLES, WHICH ARE THE HIERARCHY.
+   * BEFORE, three of these were `#c9a86a` and the fourth was `#a2977b`; the
+   * only hierarchy on the header was 10px versus 9px, which is no hierarchy at
+   * all at arm's length. Now the place is ENTITY IDENTITY (largest, brightest,
+   * on the rail), danger is STATUS (stamped, and the one element that
+   * escalates), and the day/weather/hazard are TECHNICAL DETAIL (small, even,
+   * on the readout). Same six facts, four ranks instead of one. */
+  sceneBarSlot: {},
+  sceneRail: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  /** ENTITY IDENTITY — where you are. The header's subject, so it gets the size. */
+  sceneName: { color: '#e6d8b3', fontSize: 13, fontWeight: '700', letterSpacing: 0.6, flex: 1, minWidth: 0 },
+  /** STATUS — the one escalating element; colour comes from dangerTone(). */
+  sceneDanger: { fontSize: 9, letterSpacing: 1.4, fontWeight: '700', flexShrink: 0 },
+  /** TECHNICAL — the readout row. Uniform on purpose: it is one class of fact. */
+  sceneReadout: { flexDirection: 'row', alignItems: 'center', gap: 5, flexWrap: 'nowrap' },
+  sceneTime: { color: '#a2977b', fontSize: 10, letterSpacing: 0.8, flexShrink: 1 },
+  sceneDot: { color: '#5e5849', fontSize: 10 },
+  // OTA-914 — weather used to be gold + bold to pop off the day line. VIS-3
+  // retires that: it popped because everything around it was the same colour,
+  // and the readout row now separates its facts by position rather than by
+  // shouting one of them. A HAZARD, though, is a live condition on the ground
+  // and keeps the warning tone the rest of the game uses for one.
+  sceneHazard: { color: '#e07a5f', fontSize: 10, letterSpacing: 0.8, fontWeight: '700', flexShrink: 1 },
+  /* ⚠ VIS-3 — FIVE DEAD STYLE KEYS WENT WITH THIS PASS, and that is polish
+   * too: `sceneBtn`, `sceneBarBtnText`, `sceneBarBtnBlocked` (left behind when
+   * OTA-1375 removed the MAP button) and `streamingText` / `streamingCursor`
+   * (left behind when OTA-1168 stopped rendering live tokens). Three of them
+   * were still declaring #c9a86a, so the screen's gold budget was partly being
+   * spent on controls that no longer exist. */
   sceneBarBtns: { flexDirection: 'row', gap: 4, flexShrink: 0 },
-  sceneBtn: { color: '#cdbf99', fontSize: 16, paddingHorizontal: 8 },
   // Compact bordered chips on the scene bar — 'ACTS' opens the action
   // reference, 'QUESTS' opens the active hunts / mysteries / storylines /
   // faction quests board. Short labels keep the row from crowding the
   // location + weather text on narrow Android screens. Settings stays
   // accessible via the gear in the bottom menu row.
+  // ⚠ VIS-3 — a key set into the rail: a recess (darker than the rail it sits
+  // in) with a light hairline on its lower edge, which is what a socket looks
+  // like. Same 6/3 padding and same hitSlop as before, so the target is
+  // unchanged; only the material moved.
   sceneBarBtn: {
-    backgroundColor: '#1a1612',
-    borderColor: '#3a342c',
+    backgroundColor: 'rgba(6,7,8,0.94)',
     borderWidth: 1,
-    borderRadius: 3,
+    borderColor: '#242829',
+    borderTopColor: 'rgba(0,0,0,0.80)',
+    borderBottomColor: 'rgba(180,186,190,0.16)',
+    borderRadius: 2,
     paddingHorizontal: 6,
-    paddingVertical: 3,
+    // ⚠ VIS-3 — 3 → 2. The gear was the tallest object in the rail and was
+    // therefore setting the whole header's height. The VISUAL socket shrinks by
+    // two points; the TOUCH TARGET does not move at all, because it was never
+    // this box — it is this box plus `hitSlop={8}`.
+    paddingVertical: 2,
   },
-  sceneBarBtnBlocked: { opacity: 0.4, borderColor: '#2a2620' },
-  sceneBarBtnText: { color: '#c9a86a', fontSize: 9, fontWeight: '700', letterSpacing: 1 },
   // OTA-179 — flex:1 alone wasn't shrinking the feed enough when
   // the OTA-172 combat row went 3 lines tall, so the bottom action
   // button row clipped below the safe-area bottom edge. Adding
@@ -3376,8 +3480,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   streamingPrefix: { color: '#a2977b', fontSize: 10, letterSpacing: 1, marginBottom: 2 },
-  streamingText: { color: '#cdbf99', fontSize: 13, lineHeight: 18 },
-  streamingCursor: { color: '#c9a86a', fontSize: 13 },
   // v2.4.1 (OTA 048) — the bottom menu row (save & exit, copy/clear
   // log, gear) was removed; gear is the cornerGear above and the
   // session controls all live in the gear screen's SESSION tab. The
@@ -3386,7 +3488,11 @@ const styles = StyleSheet.create({
   // estate.
   controls: { gap: 6 },
   // OTA-748 — gear sized to sit inline in the scene bar next to MAP.
-  sceneBarGear: { color: '#c9a86a', fontSize: 13, lineHeight: 13, fontWeight: '700' },
+  // ⚠ VIS-3 — ceramic, not gold. Settings does not compete. And 13 → 11,
+  // because the gear was the tallest object in the header's rail and was
+  // therefore setting the height the FEED pays for; the hit target is
+  // unchanged (this box plus hitSlop 8).
+  sceneBarGear: { color: '#8C8E8B', fontSize: 11, lineHeight: 13, fontWeight: '700' },
   // v2.4.1 (OTA 045) — Main Quest chip + Contracts menu entry.
   // Sits above the vendor banner, below the scene bar. Now the only
   // entry to Contracts (QUESTS header button removed). Two-line

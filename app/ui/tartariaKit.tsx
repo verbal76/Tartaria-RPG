@@ -87,6 +87,46 @@ export const T = {
   /** Destructive / fallen. */
   rust: '#E07A5F',
   rustRim: '#5A2A26',
+  /* ⚠⚠⚠ VIS-3 — FOUR MATERIALS, SO THAT "STRUCTURE" AND "INFORMATION" STOP
+   * BEING THE SAME SUBSTANCE. Everything above this line is ONE aged alloy, and
+   * a screen built entirely out of it has no way to say "this is the chassis"
+   * versus "this is the readout cut into the chassis" except by drawing another
+   * border. Four is the whole list and it is meant to stay four — a fifth
+   * material is a new claim about what Tartaria is made of.
+   *
+   *   COMPOSITE  the structural housing. Non-metallic, matte, recedes.
+   *   GLASS      the inset technical surface. Darker than anything around it,
+   *              because a readout is a HOLE in the chassis, not a plate on it.
+   *   CERAMIC    an inert pale insert — a key, a legend mark. Never a face.
+   *   COATING    damaged dark paint over alloy: utility that must recede. */
+  /** COMPOSITE — the recovered chassis. */
+  composite: 'rgba(18,17,16,0.90)',
+  compositeRim: '#2A2C2D',
+  /** GLASS — an inset technical surface. The one thing allowed to be darker
+   *  than the world behind it, which is what makes it read as cut IN.
+   *  ⚠⚠⚠ ITS ALPHA IS THE HIGHEST IN THE FAMILY, AND THAT IS A RULE, NOT A
+   *  PREFERENCE. A recess is defined by being the darkest plane on the screen;
+   *  a MORE transparent material admits MORE of the player's background, so on
+   *  a light theme the recess simply rises. At 0.90 the feed's own well was
+   *  brighter than the utility coating beside it for any player who tuned their
+   *  background bright — the recess stopped being a recess. So the family's
+   *  alphas must be monotone in its plane order:
+   *    composite (housing) ≤ coating (utility) ≤ glass (recess)
+   *  which is exactly what the OTA-1746 suite now asserts. */
+  glass: 'rgba(6,7,8,0.94)',
+  glassRim: '#242829',
+  /** CERAMIC — an inert pale insert. */
+  ceramic: '#8C8E8B',
+  /** COATING — damaged paint. Utility surfaces wear this and go quiet.
+   *  ⚠⚠ THE ALPHA IS NOT A TASTE CALL, AND THIS ONE WAS CAUGHT BY ITS OWN TEST.
+   *  It was 0.82, which is darker than `composite` on a DARK player theme and
+   *  LIGHTER than it on a light one — so the material ordering the whole plane
+   *  stack rests on silently inverted for any player who tuned their background
+   *  bright, and a utility control became the most prominent thing in its
+   *  housing. Every material in this family must hold its rank on both
+   *  extremes, which means none of them may be more transparent than the
+   *  housing they sit in. */
+  coating: 'rgba(11,10,10,0.92)',
 } as const;
 
 // ─── TYPOGRAPHY ──────────────────────────────────────────────────────────────
@@ -107,6 +147,18 @@ export const TType = StyleSheet.create({
   /** META — labels, stamps, provenance. Quiet and wide, but still READ, so it
    *  takes inkDim rather than the ornament tone. */
   meta: { fontSize: 10, letterSpacing: 2, color: T.inkDim },
+  /* ⚠⚠ VIS-3 — THE TWO ROLES EVERY SCREEN WAS ALREADY FAKING.
+   * Exploration's day counter, weather and danger band were being drawn with
+   * `body` or `meta` and then re-coloured inline at each call site, which is how
+   * a type system quietly stops being one. They are not body and not metadata:
+   * one is an INSTRUMENT READOUT and one is a STATE. Naming them is what stops
+   * the next screen inventing a ninth size. */
+  /** TECHNICAL — an instrument readout. Tight, tabular, unemphatic. */
+  technical: { fontSize: 10, letterSpacing: 0.8, color: T.inkDim, fontVariant: ['tabular-nums'] as const },
+  /** STATUS — a condition the player is currently under. Wide and stamped, and
+   *  it takes its colour from the CALLER, because a status without its own
+   *  severity is just a label. */
+  status: { fontSize: 9, letterSpacing: 1.6, fontWeight: '700', color: T.inkDim },
 });
 
 // ─── ORNAMENT ────────────────────────────────────────────────────────────────
@@ -202,6 +254,67 @@ export function TPanel({
   );
 }
 
+// ─── HOUSING ─────────────────────────────────────────────────────────────────
+/* ⚠⚠⚠ VIS-3 — THE SHAPE THAT IS NOT A RECTANGLE WITH A BORDER.
+ *
+ * `TPanel` is a plate: a thing that sits ON the world. `TSurface` is the other
+ * half of the vocabulary — a HOUSING, a piece of recovered chassis with things
+ * cut INTO it. The difference is the whole reason Exploration read as developer
+ * UI: eight elements that were all plates, all on one plane, distinguishable
+ * only by which of two greys their 1px border used.
+ *
+ * ⚠⚠ THE PLANE STACK, WHICH IS THE ACTUAL DELIVERABLE.
+ *   1 WORLD SUBSTRATE   the player's tuned background + AppShell's texture
+ *   2 HOUSING           `TSurface tone="housing"` — composite, keyed corner
+ *   3 INSET SURFACE     `TSurface tone="inset"`  — glass, darker than the world
+ *   4 ACTIVE ELEMENT    `TPanel tone="raised"` / a primary `TButton`
+ *   5 RESULT            the combat strip, a modal, a settle
+ * A screen that uses 2 and 3 has depth without a single extra shadow. This
+ * costs one static View tree and no shadow at all on the inset — the recess is
+ * made by the face being DARKER than its surroundings, which is how a recess
+ * actually looks and is free.
+ *
+ * ⚠⚠ THE KEYED CORNER IS ONE CORNER, ONCE. A machined chamfer on the top-right
+ * says "this object was manufactured, and it has an orientation". Fifteen exotic
+ * shapes on one screen is not more polished — it is noise — so the cut is on the
+ * housing only, always the same corner, and `keyed={false}` exists for the cases
+ * where a surface must stay square (anything that tiles, anything in a row).
+ *
+ * ⚠ AND IT IS THEME-SAFE. The cut is drawn between two things this file already
+ * owns — the housing's own face and a near-black — never against the player's
+ * background, so it cannot produce a bright wedge on a light theme. */
+export function TSurface({
+  children, tone = 'housing', keyed = true, rail, style, contentStyle, testID,
+}: {
+  children?: React.ReactNode;
+  /** `housing` recovered chassis · `inset` a technical surface cut into it */
+  tone?: 'housing' | 'inset';
+  keyed?: boolean;
+  /** The integral top rail. ⚠ It is PART OF THE HOUSING, not a second panel
+   *  stacked on one: it shares the rim, and is separated from the face by an
+   *  engraved line rather than by another border. */
+  rail?: React.ReactNode;
+  style?: StyleProp<ViewStyle>;
+  contentStyle?: StyleProp<ViewStyle>;
+  testID?: string;
+}) {
+  const inset = tone === 'inset';
+  return (
+    <View style={[kit.surfRim, inset ? kit.surfRimInset : kit.surfRimHousing, style]} testID={testID}>
+      {rail ? (
+        <>
+          <View style={kit.surfRail}>{rail}</View>
+          <TRule />
+        </>
+      ) : null}
+      <View style={[kit.surfFace, inset ? kit.surfFaceInset : kit.surfFaceHousing, contentStyle]}>
+        {children}
+      </View>
+      {keyed ? <View style={kit.surfKey} pointerEvents="none" /> : null}
+    </View>
+  );
+}
+
 // ─── CONTROLS ────────────────────────────────────────────────────────────────
 export type TButtonVariant = 'primary' | 'utility' | 'destructive';
 
@@ -214,11 +327,17 @@ const PRESS_MS = 90;
 const RELEASE_MS = 120;
 
 export function TButton({
-  label, onPress, variant = 'primary', disabled = false, sub, accessibilityLabel, accessibilityHint, style, testID,
+  label, onPress, variant = 'primary', compact = false, disabled = false, sub, accessibilityLabel, accessibilityHint, style, testID,
 }: {
   label: string;
   onPress: () => void;
   variant?: TButtonVariant;
+  /** ⚠ VIS-3 — A DENSITY, NOT AN EIGHTH BUTTON STYLE. Exploration's WORLD/LORE
+   *  keys bracket a live mini-map inside a 165px column; at the full utility
+   *  height they eat the map. Every other property — rim, face, press
+   *  depression, type role, reduce-motion behaviour — is the same control, so
+   *  the family stays a family and the screen does not sprout a new one. */
+  compact?: boolean;
   disabled?: boolean;
   /** A quiet second line — status, a hint, a count. */
   sub?: string;
@@ -233,7 +352,21 @@ export function TButton({
     if (reduceMotion) { depth.setValue(to); return; }
     Animated.timing(depth, { toValue: to, duration, useNativeDriver: true }).start();
   }, [depth, reduceMotion]);
-  const translateY = depth.interpolate({ inputRange: [0, 1], outputRange: [0, 1.5] });
+  /* ⚠⚠⚠ VIS-3 — THE INTERPOLATION IS MEMOISED, AND THAT IS A PERFORMANCE FIX,
+   * NOT A TIDY-UP. As written by VIS-1 this built a NEW `interpolate` node —
+   * and a new `{ transform: [...] }` object — on every render. RN's
+   * `AnimatedProps` treats a new animated node as new props, detaches, attaches
+   * and SCHEDULES ANOTHER UPDATE, so every re-render of a screen containing a
+   * TButton cost TWO commits instead of one. It went unnoticed on the title
+   * screen (which re-renders rarely); Exploration re-renders on the arbiter's
+   * every state change, and OTA-1739's commit-count suite caught it the moment
+   * this control reached that screen. `TSettle` already did this correctly —
+   * the button simply never had the same treatment. */
+  const translateY = useMemo(
+    () => depth.interpolate({ inputRange: [0, 1], outputRange: [0, 1.5] }),
+    [depth],
+  );
+  const lift = useMemo(() => ({ transform: [{ translateY }] }), [translateY]);
 
   const primary = variant === 'primary';
   const destructive = variant === 'destructive';
@@ -254,13 +387,14 @@ export function TButton({
         <Animated.View style={[kit.btnRim,
           primary && kit.btnRimPrimary,
           destructive && kit.btnRimDestructive,
-          { transform: [{ translateY }] }]}
+          lift]}
         >
           <View style={[
             kit.btnFace,
             primary && kit.btnFacePrimary,
             variant === 'utility' && kit.btnFaceUtility,
             destructive && kit.btnFaceDestructive,
+            compact && kit.btnFaceCompact,
             pressed && kit.btnFacePressed,
           ]}>
             {primary && <View style={kit.btnTopLight} pointerEvents="none" />}
@@ -272,6 +406,7 @@ export function TButton({
                   primary && kit.btnTextPrimary,
                   variant === 'utility' && kit.btnTextUtility,
                   destructive && kit.btnTextDestructive,
+                  compact && kit.btnTextCompact,
                 ]}
                 numberOfLines={1}
               >
@@ -458,6 +593,47 @@ const kit = StyleSheet.create({
   panelFaceRaised: { backgroundColor: T.faceLit, borderTopColor: 'rgba(214,190,140,0.30)' },
   panelFaceRecessed: { backgroundColor: T.faceUtility, borderTopWidth: 0, borderBottomWidth: 0 },
 
+  // ⚠⚠ VIS-3 — housing / inset surface. Note what is ABSENT: no shadow, no
+  // elevation on either tone. The housing reads as raised because its face is
+  // LIGHTER than the substrate and its top edge catches light; the inset reads
+  // as cut in because its face is DARKER than everything touching it and the
+  // light is on its BOTTOM edge, which is what a recess does. Two plane changes
+  // for zero rendering cost — and no elevation means no Android all-round
+  // shadow seam of the kind the owner photographed on the dossiers.
+  surfRim: { borderWidth: 1, borderRadius: 2, overflow: 'hidden' },
+  surfRimHousing: {
+    borderColor: T.compositeRim,
+    borderTopColor: 'rgba(150,156,160,0.34)',
+    borderBottomColor: 'rgba(0,0,0,0.70)',
+  },
+  surfRimInset: {
+    borderColor: T.glassRim,
+    borderTopColor: 'rgba(0,0,0,0.80)',
+    borderBottomColor: 'rgba(180,186,190,0.16)',
+  },
+  /* ⚠⚠ THE PADDINGS ARE A VERTICAL BUDGET, NOT A LOOK. A housing costs more
+   * height than the single bordered strip it replaces — a rail, an engraved
+   * split and a face where there used to be two lines of text in one box — and
+   * on this screen the FEED is `flex: 1`, so every pixel the header takes comes
+   * straight out of what the player can read. These numbers are the tightest
+   * that still let the rail and the readout read as two separate registers;
+   * the OTA-1746 suite computes the resulting delta from them and holds it. */
+  surfRail: { paddingHorizontal: 9, paddingTop: 4, paddingBottom: 3, backgroundColor: 'rgba(26,25,24,0.90)' },
+  surfFace: {},
+  surfFaceHousing: { backgroundColor: T.composite, paddingHorizontal: 9, paddingVertical: 4 },
+  surfFaceInset: { backgroundColor: T.glass, flex: 1 },
+  /* ⚠ THE CHAMFER. A 20px square centred exactly on the top-right corner and
+   * rotated 45°, so its BR→BL edge lands as a diagonal across the corner and
+   * the rest is clipped by the rim's overflow. Filled near-black (the shadow
+   * inside a cut) with a single lit hairline on that edge (the machined face
+   * catching light). `pointerEvents="none"` — it must never eat a tap. */
+  surfKey: {
+    position: 'absolute', top: -10, right: -10, width: 20, height: 20,
+    backgroundColor: 'rgba(4,4,5,0.94)',
+    borderBottomWidth: 1, borderBottomColor: 'rgba(150,156,160,0.45)',
+    transform: [{ rotate: '45deg' }],
+  },
+
   // button
   btnOuter: {
     shadowColor: '#000', shadowOpacity: 0.5, shadowRadius: 5, shadowOffset: { width: 0, height: 3 }, elevation: 3, borderRadius: 3,
@@ -479,6 +655,9 @@ const kit = StyleSheet.create({
   btnFacePrimary: { backgroundColor: 'rgba(46,37,27,0.94)', paddingVertical: 16 },
   btnFaceUtility: { backgroundColor: T.faceUtility, paddingVertical: 10, borderTopWidth: 0 },
   btnFaceDestructive: { backgroundColor: 'rgba(28,17,15,0.85)' },
+  // ⚠ VIS-3 — a navigation key. Damaged coating, so it recedes behind whatever
+  // it is bracketing instead of outshouting it.
+  btnFaceCompact: { paddingVertical: 5, paddingHorizontal: 8, backgroundColor: T.coating, borderTopWidth: 0 },
   /** the light that catches the top of a primary plate */
   btnTopLight: { position: 'absolute', top: 0, left: 0, right: 0, height: 1, backgroundColor: 'rgba(214,190,140,0.34)' },
   btnFacePressed: { backgroundColor: 'rgba(6,5,4,0.85)', borderTopColor: 'rgba(0,0,0,0.5)' },
@@ -489,6 +668,7 @@ const kit = StyleSheet.create({
   // ⚠ inkDim, not inkQuiet: the sub-line sits on a plate that may be composited
   // over a LIGHT player background, where the quietest ink falls under 3:1.
   btnTextDestructive: { color: T.rust, letterSpacing: 2 },
+  btnTextCompact: { fontSize: 10, letterSpacing: 1.8, fontWeight: '800', color: T.inkDim },
   btnSub: { color: T.inkDim, fontSize: 9, letterSpacing: 1, marginTop: 3 },
   disabled: { opacity: 0.5 },
 
