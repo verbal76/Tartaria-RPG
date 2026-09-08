@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 'react-native';
 import { useGameStore } from '../state/gameStore';
+import { tRowStyle } from '../ui/tartariaKit'; // OTA-1759 — the list-row chassis
 import { repairCostMaterials } from '../engine/scrapEngine';
 // OTA-1650 — the golem's weapon lives outside the pack; the repair list needs it.
 import { offInventoryRepairables } from '../engine/companionGear';
@@ -1103,16 +1104,15 @@ export function CraftingScreen() {
                 return (
                   <TouchableOpacity
                     key={r.item.id}
-                    style={[
-                      styles.recipeRow,
-                      !r.available && styles.recipeRowMuted,
-                      // OTA-1102 — a picked row is outlined; a row the group has
-                      // already spent the materials for is DIMMED. Owner: "dim
-                      // make items in selectable if the items you selected
-                      // consume the items needed."
-                      groupPicked && styles.recipeRowPicked,
-                      groupStarved && styles.recipeRowStarved,
-                    ]}
+                    // OTA-1102 — a picked row is outlined; a row the group has
+                    // already spent the materials for is DIMMED. Owner: "dim
+                    // make items in selectable if the items you selected
+                    // consume the items needed."
+                    style={tRowStyle({
+                      muted: !r.available,
+                      blocked: groupStarved,
+                      selected: groupPicked,
+                    })}
                     activeOpacity={rowTappable ? 0.7 : 1}
                     disabled={!rowTappable}
                     onPress={() => (repairSelectMode
@@ -1427,16 +1427,6 @@ const styles = StyleSheet.create({
   },
   sectionLabel: { fontSize: 11, fontWeight: '700', letterSpacing: 2 },
   sectionCount: { color: '#a2977b', fontSize: 11 },
-  recipeRow: {
-    flexDirection: 'row',
-    backgroundColor: '#13110f',
-    borderColor: '#3a342c',
-    borderWidth: 1,
-    borderRadius: 4,
-    marginBottom: 6,
-    overflow: 'hidden',
-  },
-  recipeRowMuted: { opacity: 0.6 },
   recipeStripe: { width: 4 },
   recipeBody: { flex: 1, padding: 10 },
   recipeHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
@@ -1512,10 +1502,11 @@ const styles = StyleSheet.create({
   },
   groupBarGoOff: { opacity: 0.4 },
   groupBarGoText: { color: '#9ec96a', fontSize: 11, fontWeight: '700', letterSpacing: 1 },
-  // A picked row is outlined in the same gold as the bar, so a group reads as
-  // one block down the list; a starved one is pushed back behind it.
-  recipeRowPicked: { borderColor: '#c9a86a', backgroundColor: '#1e1a12' },
-  recipeRowStarved: { opacity: 0.45 },
+  // ⚠ The picked and starved ROW states MOVED to the kit in OTA-1759 as
+  // `rowSelected` and `rowBlocked` — the same declarations in three screens.
+  // The reasoning survives with them: a picked row is outlined in the same gold
+  // as the bar so a group reads as one block down the list, and a starved one
+  // is pushed back behind it. What follows is the TEXT inside such a row.
   repairStarved: { color: '#c9a86a', fontSize: 10, marginTop: 3, lineHeight: 14, fontStyle: 'italic' },
   // OTA-165 — stats line on REPAIR rows. Same style as RecipesView's
   // recipeStats so the REPAIR tab matches CRAFT / RECIPES visually.

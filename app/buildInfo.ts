@@ -29437,7 +29437,47 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // The render harness gained the ability to open any screen and to build a real
 // player from the game's own createCharacter, which is what made the before/after
 // comparison possible at all.
-export const OTA_BUILD_ID = '2026-09-08-1758-one-header';
+// SUPERSEDED: '2026-09-08-1758-one-header'
+// OTA-1759 - four screens invented four rows, and three of them were the same
+// row. Tier 0 step 3. Inventory's row, Vendor's offerRow and Crafting's
+// recipeRow are the same ground, rim, radius and clip; Vendor's and Crafting's
+// are byte-identical, and Inventory differs only in marginBottom (4 against 6).
+// Their states converged harder still: the picked-row outline is the SAME TWO
+// declarations in three files, and the dim states land on exactly two levels.
+// So the kit gains a chassis - styles plus a tRowStyle() helper - and NOT a
+// <TRow> component, deliberately a different conclusion from OTA-1758's header.
+// The twelve headers had one interaction; these rows have four. Vendor's row is
+// a checkbox inside group-select and a button outside it with a long-press that
+// starts the group, and three of its four rows are not pressable at all. A
+// component owning the container would have to plumb every one of those
+// contracts through props and would lose behaviour doing it. The shared thing
+// here is the material, so the material is what is shared.
+// The first draft of the helper was WRONG and the check that caught it is the
+// point of the pass. It ordered the states by guessed loudness; Inventory ships
+// [row, highlighted, reserved, grouped] with a comment saying group membership
+// outranks the flash, and last wins, so the shipped precedence was the exact
+// reverse. The suite now proves the helper against Inventory's own array for all
+// eight combinations - before Inventory adopts, not after.
+// Adopted on VendorScreen (four rows) and CraftingScreen (three states), whose
+// base rows were byte-identical; their orphaned styles are deleted. Vendor's
+// broke-dim is renamed offerBodyBroke because it applies to the buy body and
+// never applied to a row - OTA-258 scoped it there so a broke player's STEAL
+// button stays bright, and a body style called Row beside a row chassis is how
+// the next reader gets it wrong. Inventory and Contracts are deliberately not
+// adopted: Contracts' card is a padded block rather than a line, and Inventory
+// disagrees on two measured points that belong to the pass that owns it.
+// The kit's own palette rule refused two states and that is the finding: the two
+// extra row states Inventory carries are chroma 110 and 84, past the 58 the kit
+// allows a non-brand hex, while the brand gold at 95 is exempt by name. Neither
+// is the brand gold - one is a brighter gold, one darker - so Inventory has two
+// off-brand golds doing row-state work that check:gold cannot see, and that is a
+// question for its own adoption pass rather than a colour to copy across.
+// Photographed before and after from the real exported bundle: Crafting's REPAIR
+// tab reports the same geometry element for element, so for that screen nothing
+// moving is measured rather than asserted. Vendor could not be reached - the
+// harness has no vendor NPC - and the gap is asserted in the suite rather than
+// left as a sentence.
+export const OTA_BUILD_ID = '2026-09-08-1759-one-row';
 // golem catch-up 2026-09-08: markerless publish of OTA-1758 - thirteen
 // hand-rolled back bars, one primitive. Tier 0 step 2. Twelve screens each built
 // their own back/title/spacer row and already agreed almost completely, which is

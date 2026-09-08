@@ -198,7 +198,19 @@ describe('OTA-1742 — the player owns the hue, and the kit respects it', () => 
     // The player picks bgHue/bgSat/bgLight in displaySettings and AppShell
     // paints it under every screen. A kit with a hard-coded hue would fight
     // that on olive, purple, blue and slate alike.
-    const hexes = [...KIT.matchAll(/#([0-9A-Fa-f]{6})\b/g)].map((m) => m[1]!.toUpperCase());
+    /* ⚠⚠⚠ IT GRADES CODE, NOT PROSE — AND IT DID NOT UNTIL OTA-1759.
+     * This rule is about the colours the kit PAINTS. It was reading the raw
+     * file, so a comment that NAMES a colour tripped it — and the comment that
+     * tripped it was `tRowStyle`'s, which exists precisely to record two hexes
+     * the kit REFUSED to adopt because of this rule. A check that fails on the
+     * write-up of its own enforcement teaches people to delete the write-up.
+     * ⚠ That is the FOURTH time in two days: twice during OTA-1756, once when
+     * `check:gold` was born, and here. `scripts/check-gold.mjs` grew a proper
+     * tokeniser for the same reason; the two implementations are a legacy-hunt
+     * item (extract one authority), NOT a reason to leave this one reading
+     * comments in the meantime. */
+    const code = KIT.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
+    const hexes = [...code.matchAll(/#([0-9A-Fa-f]{6})\b/g)].map((m) => m[1]!.toUpperCase());
     expect(hexes.length).toBeGreaterThan(0);
     const BRAND = new Set(['C9A86A', '8E7548', 'E07A5F', '5A2A26']); // gold, dim gold, rust, rust rim
     for (const h of hexes) {
@@ -634,8 +646,29 @@ describe('OTA-1742 — the language is reusable, and the first pass stayed in it
      * set. Native builds are parked, so `react-native-svg` and icon fonts cannot
      * ship at all; drawing it was the only font-independent option. A ring and
      * eight radial teeth is genuinely a shape none of the primitives above can
-     * make, which is exactly the brief this ceiling asks for. */
-    expect(exported.length).toBeLessThanOrEqual(17);
+     * make, which is exactly the brief this ceiling asks for.
+     *
+     * ⚠⚠⚠ OTA-1759 SPLIT THE COUNT INSTEAD OF RAISING IT, AND THE DISTINCTION IS
+     * THE ONE THIS COMMENT ALREADY MAKES. Everything above argues about
+     * COMPONENTS — "a kit that grows a component per SCREEN is not a language",
+     * "raising it needs a brief that asks for a SHAPE the existing ones cannot
+     * make". `tRowStyle` is neither: it is a style helper, and TRow is
+     * deliberately NOT a component because the four list screens' interactions
+     * do not converge. Under this ceiling's own stated rule it therefore cannot
+     * justify a raise — so the component budget is UNCHANGED at 12, and the
+     * non-component exports (tokens, type scale, two constants, the stylesheet,
+     * and now this helper) get their own tighter bound. That is stricter than
+     * the single number was, not looser: the drawer can no longer fill up with
+     * helpers while the component count sits still. */
+    /* ⚠ A component is an exported FUNCTION with a `T`-prefixed name. The kind
+     * matters: `TType` is a StyleSheet and would otherwise be counted as a
+     * thirteenth component by its name alone. */
+    const decls = [...KIT.matchAll(/^export (function|const) (\w+)/gm)];
+    const components = decls.filter((m) => m[1] === 'function' && /^T[A-Z]/.test(m[2]!));
+    const helpers = decls.filter((m) => !(m[1] === 'function' && /^T[A-Z]/.test(m[2]!)));
+    expect(components.length).toBeLessThanOrEqual(12);
+    expect(helpers.length).toBeLessThanOrEqual(6);
+    expect(exported.length).toBeLessThanOrEqual(18);
   });
 
   /* ⚠⚠⚠ SUPERSEDED BY VIS-3 (OTA-1746) — AND THE REASONING IS KEPT HERE RATHER
@@ -662,9 +695,14 @@ describe('OTA-1742 — the language is reusable, and the first pass stayed in it
      * rollout the moment two screens imported a primitive without the list
      * being updated in the same commit. Widening it is an ACT, recorded here;
      * a screen that appears in `consumers` below without a line in this comment
-     * is drift, and drift is what this test exists to fail on. */
-    const off = ['CombatScreen', 'InventoryScreen', 'VendorScreen',
-      'CharacterScreen', 'CraftingScreen', 'GuidanceScreen'];
+     * is drift, and drift is what this test exists to fail on.
+     * ⚠⚠ OTA-1759 REMOVED `VendorScreen` AND `CraftingScreen` for `TRow` — the
+     * two screens whose base row was BYTE-IDENTICAL to the other's, which is
+     * what made the chassis an extraction rather than a preference. Inventory
+     * stays off: its row disagrees on `marginBottom` (4 against 6) and carries a
+     * third border state, so its adoption is a decision, not a substitution. */
+    const off = ['CombatScreen', 'InventoryScreen',
+      'CharacterScreen', 'GuidanceScreen'];
     for (const name of off) {
       const p = join(ROOT, 'app', 'screens', `${name}.tsx`);
       if (!existsSync(p)) continue;
@@ -673,17 +711,20 @@ describe('OTA-1742 — the language is reusable, and the first pass stayed in it
     const screens = require('fs').readdirSync(join(ROOT, 'app', 'screens')) as string[];
     const consumers = screens.filter((f) => f.endsWith('.tsx')
       && readFileSync(join(ROOT, 'app', 'screens', f), 'utf8').includes('tartariaKit')).sort();
-    /* VIS-1's reference implementation, VIS-3's polish target, and the two
-     * screens that adopted `TScreenHeader` in OTA-1758 — chosen for their
-     * regression cover (31 and 9 referencing suites), not for convenience.
+    /* VIS-1's reference implementation, VIS-3's polish target, the two screens
+     * that adopted `TScreenHeader` in OTA-1758 (chosen for their regression
+     * cover — 31 and 9 referencing suites — not for convenience), and the two
+     * that adopted `tRowStyle` in OTA-1759.
      * ⚠ The four thin-cover screens (Log, Lore, Guidance, World) are NOT here
      * and must not be added until the owner's open decision about writing
      * cover first is settled. */
     expect(consumers).toEqual([
       'ActionReferenceScreen.tsx',
       'ContractsScreen.tsx',
+      'CraftingScreen.tsx',
       'ExplorationScreen.tsx',
       'TitleScreen.tsx',
+      'VendorScreen.tsx',
     ]);
   });
 

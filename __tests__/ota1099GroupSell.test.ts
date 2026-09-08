@@ -66,7 +66,10 @@ describe('OTA-1099 — hold to pick, tap to add', () => {
   });
 
   it('a picked row is ticked AND outlined, and reads as a checkbox', () => {
-    expect(view).toContain("sellSelected.includes(item.id) && styles.offerRowPicked");
+    /* ⚠ RE-ANCHORED BY OTA-1759. This pinned the spelling of the outline; the
+     * row moved to the kit's shared chassis and the spelling changed while the
+     * claim — a ticked row is outlined, from this exact flag — did not. */
+    expect(view).toMatch(/selected: sellSelected\.includes\(item\.id\)|sellSelected\.includes\(item\.id\) && styles\.offerRowPicked/);
     expect(view).toContain("sellSelected.includes(item.id) ? '☑ ' : '☐ '");
     expect(view).toContain("accessibilityRole={sellSelectMode ? 'checkbox' : 'button'}");
   });

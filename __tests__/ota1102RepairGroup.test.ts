@@ -84,7 +84,12 @@ describe('OTA-1102 — the same grip as SELL and DROP', () => {
 
   it('a picked row is ticked, outlined, and reads as a checkbox', () => {
     expect(view).toContain("{repairSelectMode ? (groupPicked ? '☑ ' : '☐ ') : ''}");
-    expect(view).toContain('groupPicked && styles.recipeRowPicked');
+    /* ⚠ RE-ANCHORED BY OTA-1759, WHICH IS THE GUARDRAIL WORKING. This pinned the
+     * SPELLING — `groupPicked && styles.recipeRowPicked` — and the row moved to
+     * the kit's shared chassis, so the spelling changed while the CLAIM did not:
+     * a picked row is still outlined, in the same gold, from the same flag. The
+     * claim is what this suite is for, so the claim is what it now reads. */
+    expect(view).toMatch(/selected: groupPicked|groupPicked && styles\.recipeRowPicked/);
     expect(view).toContain("accessibilityRole={repairSelectMode ? 'checkbox' : 'button'}");
   });
 
@@ -164,7 +169,9 @@ describe('OTA-1102 — the running material budget', () => {
     // cloth is a lie — they get their existing "Missing:" line instead.
     expect(view).toContain('const groupStarved = groupBlocked && r.available;');
     expect(view).toContain('The pieces you already picked are spending the materials this needs.');
-    expect(view).toContain('groupStarved && styles.recipeRowStarved');
+    // ⚠ Re-anchored by OTA-1759 (see above): the starved row is still dimmed
+    // from the same flag, now through the kit's `blocked` state.
+    expect(view).toMatch(/blocked: groupStarved|groupStarved && styles\.recipeRowStarved/);
     expect(view).toContain('Cannot be added — you do not have the materials it needs.');
   });
 

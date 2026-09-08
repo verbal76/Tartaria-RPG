@@ -73,6 +73,24 @@ const START = (() => {
   catch { return 'title'; }
 })();
 
+/* ⚠ OTA-1759 — A FRESH CHARACTER HAS NOTHING TO MEND, so Crafting's REPAIR tab
+ * (where the list rows this pass is about live) renders its empty state and
+ * photographs nothing. Knocking the durability off the first two damageable
+ * pieces is the smallest fixture that makes the rows exist. It edits the
+ * character the game's OWN factory produced rather than hand-rolling one, so
+ * the rows are shaped by real items. */
+function damageSomeGear(p) {
+  let hit = 0;
+  for (const it of p.inventory ?? []) {
+    if (hit >= 2) break;
+    if (typeof it.durability !== 'object' || it.durability === null) continue;
+    if (!(it.durability.max > 1)) continue;
+    it.durability.current = Math.max(1, Math.floor(it.durability.max * (hit === 0 ? 0.3 : 0.7)));
+    hit += 1;
+  }
+  return p;
+}
+
 const DATA = {
   currentScreen: START,
   hydrated: true,
@@ -95,9 +113,9 @@ const DATA = {
   worldMemory: { memorableEvents: [] },
   arbiterMemory: {},
   vendorState: {},
-  player: START === 'title' ? null : createCharacter({
+  player: START === 'title' ? null : damageSomeGear(createCharacter({
     name: 'Cheddar Bob', raceId: 'mud_dweller', factionId: 'mud_monarchs',
-  }),
+  })),
   currentScene: null,
 };
 
@@ -108,13 +126,19 @@ const noop = () => Promise.resolve();
  * noun-shaped field (pendingLacing, storyFork, deathReport ...) read as
  * "present" and the shell opened every modal it owns on top of the roster.
  * Verb-shaped names get the no-op; everything else is absent, which is what an
- * unset piece of state actually looks like. */
+ * unset piece of state actually looks like.
+ *
+ * ⚠⚠ AND "ABSENT" IS `null`, NOT `undefined` — OTA-1759. The screens spell the
+ * absent test BOTH ways, and `undefined !== null` is TRUE, so an unknown noun
+ * still opened every modal guarded by `visible={x !== null}`. Crafting's
+ * "Strip these for parts?" sat over the whole screen and made the list rows
+ * unphotographable. `null` satisfies both spellings: falsy AND equal to null. */
 const ACTIONish = /^(set|clear|dismiss|refresh|load|delete|resurrect|boot|shut|resume|hydrate|apply|start|stop|cancel|submit|toggle|mark|flush|open|close|begin|end|advance|choose|select|reset|save|add|remove|update|handle|request|accept|decline|confirm|retry|abort|on[A-Z])/;
 const state = new Proxy(DATA, {
   get(t, k) {
     if (k in t) return t[k];
     if (typeof k === 'symbol') return undefined;
-    return ACTIONish.test(String(k)) ? noop : undefined;
+    return ACTIONish.test(String(k)) ? noop : null;
   },
   has: () => true,
 });

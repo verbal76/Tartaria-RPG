@@ -216,6 +216,41 @@ if (expandIdx !== undefined) {
   await new Promise((r) => setTimeout(r, 1500));
 }
 
+/* ⚠ OTA-1759 — `--tap=LABEL`, REPEATABLE. The roster's cards were the only thing
+ * the harness could reach, so any row, tab or state behind a control was
+ * invisible to it — and the list rows this pass is about live behind a TAB. Same
+ * untrusted-event trick as the card expand above; React's delegated listeners do
+ * not care. Matching is on the leaf's exact text, so `--tap=REPAIR` finds the
+ * tab and not the word inside a row. */
+for (const arg of process.argv.filter((a) => a.startsWith('--tap='))) {
+  const label = arg.slice(6);
+  const { result: t } = await S('Runtime.evaluate', {
+    expression: '(() => {'
+      + 'const want = ' + JSON.stringify(label) + ';'
+      + 'let leaf = null;'
+      + 'for (const e of document.querySelectorAll("div,span")) {'
+      + '  if (!e.children.length && (e.textContent || "").trim() === want) { leaf = e; break; }'
+      + '}'
+      + 'if (!leaf) return "no leaf for " + want;'
+      + 'let btn = leaf;'
+      + 'while (btn && btn.getAttribute("role") !== "button") btn = btn.parentElement;'
+      + 'btn = btn || leaf;'
+      + 'const r = btn.getBoundingClientRect();'
+      + 'const x = r.x + r.width / 2, y = r.y + r.height / 2;'
+      + 'const opt = { bubbles: true, cancelable: true, clientX: x, clientY: y, pointerId: 1, isPrimary: true, button: 0, buttons: 1 };'
+      + 'btn.dispatchEvent(new PointerEvent("pointerdown", opt));'
+      + 'btn.dispatchEvent(new MouseEvent("mousedown", opt));'
+      + 'btn.dispatchEvent(new PointerEvent("pointerup", Object.assign({}, opt, { buttons: 0 })));'
+      + 'btn.dispatchEvent(new MouseEvent("mouseup", Object.assign({}, opt, { buttons: 0 })));'
+      + 'btn.click();'
+      + 'return "tapped " + want;'
+      + '})()',
+    returnByValue: true,
+  });
+  console.error('tap:', t.value);
+  await new Promise((r) => setTimeout(r, 1200));
+}
+
 await new Promise((r) => setTimeout(r, 3000));
 
 const { result: probe } = await S('Runtime.evaluate', {
@@ -244,6 +279,69 @@ const { result: probe } = await S('Runtime.evaluate', {
   returnByValue: true,
 });
 console.log(probe.value);
+
+/* ⚠ OTA-1759 — THE ROW PROBE. `--probe=rows` reports every element painted on
+ * the list ground (#13110f = rgb(19,17,15)) with the declarations the chassis
+ * owns. That is the before/after check for TRow: a chassis that reproduced the
+ * shipped values in the STYLESHEET but composed wrong at the CALL SITE would
+ * pass every unit test and still move the screen. OTA-1758 proved that risk is
+ * not theoretical — its "nothing moves" claim was false, and only the render
+ * said so. */
+const ROW = (process.argv.find((a) => a.startsWith('--row=')) ?? '--row=Rusted Blade').slice(6);
+if (process.argv.includes('--probe=rows')) {
+  const { result: rows } = await S('Runtime.evaluate', {
+    expression: `(() => {
+      const r = (e) => { const b = e.getBoundingClientRect();
+        return [Math.round(b.x*10)/10, Math.round(b.y*10)/10, Math.round(b.width*10)/10, Math.round(b.height*10)/10]; };
+      const out = [];
+      /* The row is the pressable itself (or, for Vendor's three non-pressable
+       * rows, the outermost box carrying the list ground). Match on the row's
+       * own text and take the SMALLEST match, so an ancestor scroll view whose
+       * textContent happens to start with the same words is not mistaken for it. */
+      const want = ${JSON.stringify(ROW)};
+      for (const e of document.querySelectorAll('div')) {
+        const t = (e.textContent || '').trim();
+        if (!t.includes(want)) continue;
+        const c = getComputedStyle(e);
+        out.push({ box: r(e), bg: c.backgroundColor, cls: (e.className || '').slice(0, 60),
+                   border: c.borderTopColor + ' ' + c.borderTopWidth, radius: c.borderTopLeftRadius,
+                   mb: c.marginBottom, dir: c.flexDirection, clip: c.overflow, op: c.opacity,
+                   role: e.getAttribute('role') || '-', head: t.slice(0, 24) });
+      }
+      return JSON.stringify({ rows: out.length, out }, null, 1);
+    })()`,
+    returnByValue: true,
+  });
+  console.log(rows.value);
+}
+
+/* ⚠ OTA-1760 — THE LABEL PROBE. `--probe=labels --label=X` reports a leaf's own
+ * box beside its pressable parent's, which is what you need to see whether a
+ * control's tap target is centred on its label, or whether two stacked things
+ * overlap. */
+if (process.argv.includes('--probe=labels')) {
+  const LABELS = process.argv.filter((a) => a.startsWith('--label=')).map((a) => a.slice(8));
+  const { result: labs } = await S('Runtime.evaluate', {
+    expression: `(() => {
+      const r = (e) => { const b = e.getBoundingClientRect();
+        return [Math.round(b.x*10)/10, Math.round(b.y*10)/10, Math.round(b.width*10)/10, Math.round(b.height*10)/10]; };
+      const want = ${JSON.stringify(LABELS)};
+      const out = [];
+      for (const e of document.querySelectorAll('div,span')) {
+        const t = (e.textContent || '').trim();
+        if (e.children.length || !want.includes(t)) continue;
+        const par = e.parentElement;
+        const pc = par ? getComputedStyle(par) : null;
+        out.push({ t, text: r(e), parent: par ? r(par) : null,
+                   pad: pc ? [pc.paddingTop, pc.paddingRight, pc.paddingBottom, pc.paddingLeft].join('/') : null,
+                   pborder: pc ? pc.borderTopWidth + ' ' + pc.borderTopColor : null });
+      }
+      return JSON.stringify(out, null, 1);
+    })()`,
+    returnByValue: true,
+  });
+  console.log(labs.value);
+}
 
 const { data } = await S('Page.captureScreenshot', { format: 'png', captureBeyondViewport: false });
 fs.writeFileSync(`${outPrefix}.png`, Buffer.from(data, 'base64'));

@@ -41,6 +41,7 @@ import { decayedMenace, menacePriceMult } from '../engine/menace';
 import { canonicalCellOf } from '../engine/worldMap';
 import factionsData from '../data/factions/factions.json';
 import { CONTENT_MAX_WIDTH } from '../ui/displayScale'; // OTA-1227 — one column width, platform-aware
+import { tRowStyle } from '../ui/tartariaKit'; // OTA-1759 — the list-row chassis
 import {
   CATEGORY_ORDER,
   CATEGORY_LABEL,
@@ -943,7 +944,7 @@ export function VendorScreen() {
                 .reduce((sum, inv) => sum + inv.quantity, 0);
               return (
                 // OTA-258 — broke-dim is now scoped to the BUY body only,
-                // NOT the parent row. Previously the `offerRowBroke` opacity
+                // NOT the parent row. Previously that opacity
                 // was applied here, which dimmed everything inside the row
                 // including the STEAL button on the right — backwards
                 // affordance, since stealing is what a broke player would
@@ -953,11 +954,11 @@ export function VendorScreen() {
                 // unaffordable, STEAL stays full bright.
                 <View
                   key={`buy_${o.itemName}_${i}`}
-                  style={styles.offerRow}
+                  style={tRowStyle()}
                 >
                   <View style={[styles.offerStripe, { backgroundColor: rarityColor(itemPreview.rarity) }]} />
                   <TouchableOpacity
-                    style={[styles.offerBody, (knownRow || !canAfford) && styles.offerRowBroke]}
+                    style={[styles.offerBody, (knownRow || !canAfford) && styles.offerBodyBroke]}
                     onPress={knownRow ? undefined : () => openBuy(o.itemName, effPrice)}
                     disabled={knownRow}
                     activeOpacity={0.7}
@@ -1040,14 +1041,14 @@ export function VendorScreen() {
                   const preview = getItemPreview(o.result);
                   const canAfford = player.tc >= o.price;
                   return (
-                    <View key={`recipe_${o.result}`} style={styles.offerRow}>
+                    <View key={`recipe_${o.result}`} style={tRowStyle()}>
                       <View style={[styles.offerStripe, { backgroundColor: rarityColor(preview.rarity) }]} />
                       <TouchableOpacity
                         // ⚠ OTA-1731 — an owned working is NOT a button. Tapping it
                         // would open a confirm sheet for a purchase the store then
                         // refuses, which is the "a control that does nothing" defect
                         // OTA-220 rules out. It reads as owned and does not act.
-                        style={[styles.offerBody, (o.known || !canAfford) && styles.offerRowBroke]}
+                        style={[styles.offerBody, (o.known || !canAfford) && styles.offerBodyBroke]}
                         onPress={o.known ? undefined : () => openLearnRecipe(o.result, o.price)}
                         disabled={o.known}
                         activeOpacity={0.7}
@@ -1139,14 +1140,14 @@ export function VendorScreen() {
                   const short = maxed ? [] : missingIngredientsList(quote.materials, player.inventory);
                   const cannotPay = !maxed && (player.tc < quote.tc || short.length > 0);
                   return (
-                    <View key={`reinforce_${item.id}`} style={styles.offerRow}>
+                    <View key={`reinforce_${item.id}`} style={tRowStyle()}>
                       <View style={[styles.offerStripe, { backgroundColor: rarityColor(item.rarity) }]} />
                       <TouchableOpacity
                         // ⚠ A maxed row is NOT a button (OTA-220: no control that
                         //   does nothing). A row you cannot yet AFFORD still is —
                         //   the sheet is where the shortfall is named, exactly as
                         //   an unaffordable ware behaves two sections up.
-                        style={[styles.offerBody, (maxed || cannotPay) && styles.offerRowBroke]}
+                        style={[styles.offerBody, (maxed || cannotPay) && styles.offerBodyBroke]}
                         onPress={maxed ? undefined : () => openReinforce(item)}
                         disabled={maxed}
                         activeOpacity={0.7}
@@ -1324,7 +1325,7 @@ export function VendorScreen() {
                   key={`sell_${item.id}`}
                   // OTA-1099 — a ticked row is outlined so the group reads at a
                   // glance down the list, not just from the ✓ at its head.
-                  style={[styles.offerRow, sellSelected.includes(item.id) && styles.offerRowPicked]}
+                  style={tRowStyle({ selected: sellSelected.includes(item.id) })}
                   // Hold to start a group; once in the mode a plain tap adds or
                   // removes. Outside the mode a tap is the ordinary single sale.
                   onPress={() => (sellSelectMode ? toggleSellSelect(item.id) : openSell(item.name, price, item.id))}
@@ -1829,19 +1830,14 @@ const styles = StyleSheet.create({
   sectionChevron: { fontSize: 11, fontWeight: '900', marginRight: 7, width: 11, textAlign: 'center' },
   sectionLabel: { fontSize: 11, fontWeight: '700', letterSpacing: 2 },
   sectionCount: { color: '#9a8e74', fontSize: 11 },
-  offerRow: {
-    flexDirection: 'row',
-    backgroundColor: '#13110f',
-    borderColor: '#3a342c',
-    borderWidth: 1,
-    borderRadius: 4,
-    marginBottom: 6,
-    overflow: 'hidden',
-  },
-  offerRowBroke: { opacity: 0.45 },
-  // OTA-1099 — group-sell selection. The ticked row is outlined in the same
-  // trade-gold the sell prices use, so a group reads as one block down the list.
-  offerRowPicked: { borderColor: '#c9a86a', backgroundColor: '#1e1a12' },
+  // ⚠ OTA-258 scoped this to the BUY BODY, not the row — see the call site. The
+  // name said `row` for 1500 commits and meant `body`; OTA-1759 renamed it so
+  // the scoping is legible rather than a trap for the next reader.
+  offerBodyBroke: { opacity: 0.45 },
+  // ⚠ OTA-1099's group-sell outline MOVED to the kit as `rowSelected` in
+  // OTA-1759 — its two declarations were byte-identical in three screens. The
+  // reason it is trade-gold survives with it: a group reads as one block down
+  // the list, not as a scatter of ticks.
   pickTick: { color: '#c9a86a', fontWeight: '700' },
   pickTickOff: { color: '#6b5c3a' },
   // The bar only exists while a group does; it states the pay-out up front,

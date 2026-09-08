@@ -733,7 +733,107 @@ export function TScreenHeader({
   );
 }
 
+/* ⚠⚠⚠ TROW — THE LIST-ROW CHASSIS, AND WHY IT IS NOT A COMPONENT.
+ *
+ * Tier 0. Four screens are lists and all four invented a row. Measured before
+ * writing anything, the MATERIAL turned out to be the same thing four times:
+ *
+ *   Inventory `row`      #13110f · #3a342c 1px · radius 4 · overflow hidden
+ *   Vendor    `offerRow` IDENTICAL, but marginBottom 6 against Inventory's 4
+ *   Crafting  `recipeRow` BYTE-IDENTICAL to Vendor's
+ *   Contracts `card`     the same ground and rim, but PADDED and not a row —
+ *                        a block, not a line. A different shape; left alone.
+ *
+ * And the states converged even harder. `rowGrouped`, `offerRowPicked` and
+ * `recipeRowPicked` are the SAME TWO DECLARATIONS in three files, and the dim
+ * states land on exactly two levels — 0.6 for "de-emphasised but usable" and
+ * 0.45 for "you cannot have this".
+ *
+ * ⚠ ONE NUMBER DID NOT AGREE, AND IT IS NOT SETTLED HERE. Inventory's row sits
+ * on `marginBottom: 4`, Vendor's and Crafting's on 6. The chassis takes 6 —
+ * the value of the two screens adopting it today — so Inventory's adoption will
+ * have to either move 2px or argue for a denser variant. That is a decision for
+ * the screen that owns it, made in the open, not a number averaged away now.
+ *
+ * ⚠⚠ SO WHY STYLES AND NOT A `<TRow>` WRAPPER? Because the INTERACTION does not
+ * converge at all. Vendor's row is a checkbox in group-select mode and a button
+ * outside it, with a long-press that begins the group. Crafting's is a plain
+ * button. Inventory's varies by section. Some rows are not pressable at all and
+ * render as a bare `View`. A component owning the container would have to plumb
+ * every one of those contracts through props, and would either lose behaviour or
+ * become a worse version of `TouchableOpacity`.
+ * The shared thing is the MATERIAL. That is what this exports.
+ *
+ * ⚠ THE GOLD IN `rowSelected` STAYS. VIS-3 reserves gold for a live obligation
+ * or a live process — and the row the player is acting on right now is exactly
+ * that. It is also what three screens already shipped; this changes no pixels. */
+export interface TRowState {
+  /** De-emphasised but still usable — a recipe you have not unlocked. */
+  muted?: boolean;
+  /** You cannot have this: too poor, or its materials already spent. */
+  blocked?: boolean;
+  /** The row the player is acting on right now. Gold rim, warm ground. */
+  selected?: boolean;
+}
+
+/**
+ * The row chassis, plus whichever states apply.
+ *
+ * ⚠ The two opacity states come first and compose so the harsher one wins. They
+ * touch no property `selected` touches, so a blocked row still shows it is
+ * selected — which is what Crafting already draws, and why the shipped order
+ * there (blocked AFTER selected) and this one paint the same thing.
+ *
+ * ⚠⚠⚠ THE VOCABULARY STOPS AT THREE, AND THAT IS A FINDING RATHER THAN A GAP.
+ * Inventory carries two MORE row states and both were going to be imported here
+ * until this file's own palette rule refused them:
+ *
+ *     rowHighlighted  #d8b46a   chroma 110   OTA-684, the deep-link flash
+ *     rowSelected     #9c8348   chroma  84   OTA-1097, the reserved tick
+ *
+ * The kit permits a warm neutral up to chroma 58; the brand gold (95) is past
+ * that and is exempt BY NAME. These two are not the brand gold — they are a
+ * brighter gold and a darker one — so Inventory has quietly invented two
+ * off-brand golds for row states, and `check:gold` cannot see either because it
+ * counts `#c9a86a` alone. Under the owner's ruling that gold is reserved for a
+ * meaning already defined, that is a question, not a colour to copy across.
+ * It belongs to Inventory's own adoption pass, argued in the open.
+ *
+ * ⚠⚠ AND THE ORDER THOSE TWO WOULD NEED IS ALREADY KNOWN, because the first
+ * draft of this helper got it wrong. I ordered by guessed loudness. Inventory
+ * ships `[row, highlighted, reserved, grouped]` and says why — OTA-1100: "group
+ * membership outranks it visually: while a group is open, that is the question
+ * the screen is asking." Last wins, so the real precedence is the reverse of my
+ * guess: selected > reserved > flash. Written down here so the next pass
+ * inherits the ruling instead of re-deriving it wrong.
+ */
+export function tRowStyle(state: TRowState = {}): StyleProp<ViewStyle> {
+  return [
+    kit.rowChassis,
+    state.muted && kit.rowMuted,
+    state.blocked && kit.rowBlocked,
+    state.selected && kit.rowSelected,
+  ];
+}
+
 const kit = StyleSheet.create({
+  // ── TRow ──────────────────────────────────────────────────────────────────
+  // ⚠ The shipped values. `#13110f` is the game's list ground in seven screens
+  // and was never named; `marginBottom: 6` is Vendor's and Crafting's, against
+  // Inventory's 4 — the one number the three did not agree on.
+  rowChassis: {
+    flexDirection: 'row',
+    backgroundColor: '#13110f',
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    borderRadius: 4,
+    marginBottom: 6,
+    overflow: 'hidden',
+  },
+  rowMuted: { opacity: 0.6 },
+  rowBlocked: { opacity: 0.45 },
+  // Byte-identical in rowGrouped / offerRowPicked / recipeRowPicked.
+  rowSelected: { borderColor: T.gold, backgroundColor: '#1e1a12' },
   // ── TScreenHeader ─────────────────────────────────────────────────────────
   // ⚠ These are the shipped values, not new ones: the row, the back button and
   // its text are what twelve screens already agreed on.

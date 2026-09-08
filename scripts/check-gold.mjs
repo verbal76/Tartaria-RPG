@@ -42,12 +42,23 @@ import path from 'node:path';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 
-/** ⚠ The ratchet baseline — the EXACT measured count at gate birth (2026-09-08,
- *  OTA-1757), counted over CODE ONLY, after CharacterScreen's vitality and
- *  standing ramps moved into `ui/semanticColor`. Deliberately no headroom.
- *  ⚠ 372 interface · 4 semantic authorities · 1 kit. The interface number is the
- *  one the rollout drives down; the other two are the rule working. */
-const BASELINE = 377;
+/** ⚠ The ratchet baseline. Born at 377 (2026-09-08, OTA-1757), counted over CODE
+ *  ONLY, after CharacterScreen's vitality and standing ramps moved into
+ *  `ui/semanticColor`. Deliberately no headroom: every step down is a real
+ *  conversion, and the number never goes back up without an owner decision.
+ *
+ *    377  OTA-1757  birth (372/4/1)
+ *    375  OTA-1758  TScreenHeader — two `backText` golds became `T.gold`
+ *    373  OTA-1759  TRow — Vendor's and Crafting's picked-row golds became
+ *                   `rowSelected`, which reads the same `T.gold`
+ *
+ *  ⚠ THE CURRENT SPLIT, and the only line in this file written in the form
+ *  OTA-1757's suite parses — the ledger above is deliberately terse so a
+ *  HISTORICAL total cannot be mistaken for today's:
+ *      368 interface · 4 semantic authorities · 1 kit
+ *  The INTERFACE number is the one the rollout drives down; the other two are
+ *  the rule working. */
+const BASELINE = 373;
 
 /** The brand gold, the only hex this gate is about. */
 const GOLD = /'#c9a86a'/gi;
