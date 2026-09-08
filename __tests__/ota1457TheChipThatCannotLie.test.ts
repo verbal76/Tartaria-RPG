@@ -193,7 +193,10 @@ describe('OTA-1457 — it cannot yank the feed', () => {
     // Pinned positionally rather than by comment: the chip's JSX must appear
     // AFTER the map closes.
     // OTA-1696 — the map is one memoised row per entry now; it closes on that line.
-    const mapCloses = FEED.indexOf('<FeedRow key={entry.id} entry={entry} names={names} />)}');
+    // ⚠ VIS-2 — same claim, new map expression: the entries are rendered from
+    // `rows` now (adjacent loot drops collapse into one cluster), and the chip
+    // must still sit AFTER all of it.
+    const mapCloses = FEED.indexOf('<FeedRow key={r.key} entry={r.entry!} names={names} />))}');
     const chipAt = FEED.indexOf('{actionChipLabel ? (');
     expect(mapCloses).toBeGreaterThan(-1);
     expect(chipAt).toBeGreaterThan(mapCloses);

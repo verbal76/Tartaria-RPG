@@ -72,7 +72,13 @@ describe('OTA-1696 — the feed', () => {
     expect(FEED_WINDOW).toBe(150);
     expect(feed.includes("const visible = entries.filter((e) => !HIDDEN_CHANNELS.has(e.channel)).slice(-FEED_WINDOW);")).toBe(true);
     expect(feed.includes('const FeedRow = React.memo(function FeedRow({ entry, names }: { entry: GameLogEntry; names: string[] }) {')).toBe(true);
-    expect(feed.includes('{visible.map((entry) => <FeedRow key={entry.id} entry={entry} names={names} />)}')).toBe(true);
+    /* ⚠⚠ VIS-2 RE-AIMED THIS PIN AND THE CLAIM IS UNCHANGED. The map now walks
+     * `rows` — the same `visible` window, with an adjacent run of loot events
+     * collapsed into one cluster (see AdventureFeed) — and it still renders the
+     * SAME memoised `FeedRow` per entry with the entry's own id as its key,
+     * which is the property this test exists to hold. */
+    expect(feed.includes('const rows = useMemo(')).toBe(true);
+    expect(feed.includes('<FeedRow key={r.key} entry={r.entry!} names={names} />')).toBe(true);
     // The enemy-name list is keyed on its contents, not the array the screen rebuilds every render.
     expect(feed.includes("const names = useMemo(() => (namesKey ? namesKey.split('\\u0000') : []), [namesKey]);")).toBe(true);
     // Nothing that rendered before stopped rendering: the four row shapes are all inside the row.

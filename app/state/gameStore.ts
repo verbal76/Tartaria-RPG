@@ -419,6 +419,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { OTA_BUILD_ID } from '../buildInfo';
 import { rollDie, rollFromNotation, pick, chance, rotatingPick } from '../engine/rng';
 import { buildCombatSteps, buildSkillSteps, rollMods, classifyManeuver, fleeGraceApplies, FLEE_STAMINA_COST, beginnersLuck } from '../engine/combatRules';
+// ⚠⚠ VIS-2 — the structured result beside the sentence (engine/combatEvent): copied from the values the resolver used, never parsed back out of prose.
+import { cmb, type CombatOutcome } from '../engine/combatEvent';
 // ⚠ OTA-1678 — the escape bar escalates on RANDOM ground only. The four world
 // rolls stamp their bodies; the dispatch reads the bar through fleeOdds, the
 // same reader the FLEE chip prints its odds from.
@@ -2882,10 +2884,8 @@ export function logUiTap(label: string): void {
   try {
     // OTA-1695 — the touch's own wait (noteTouchDown at onPressIn) rides the line:
     // `ui: tap "dodge" ⏱+4237ms late 4200ms` says the screen held the finger, not the player.
-    // ⚠⚠⚠ LAG-2 — STRAIGHT TO THE LEDGER, NOT THROUGH THE GAME STORE. `appendLog`
-    // here swept every mounted selector BEFORE the gameplay began, for a line no
-    // surface draws (`debug` is hidden — gameLog.ts). `persistEntry` is the sink
-    // it persists through, so the disk log is unchanged; so is the breadcrumb.
+    // ⚠⚠⚠ LAG-2 — STRAIGHT TO THE LEDGER, NOT THROUGH THE GAME STORE: `appendLog`
+    // here swept every mounted selector for a line no surface draws (`debug` is hidden). Same sink, same disk log, same breadcrumb.
     void persistEntry(makeEntry('debug', `ui: tap "${label}"${takeTouchLateSuffix()}`));
     // ⚠⚠ OTA-1276 — AND STAMP IT WHERE A WEDGE CANNOT SWALLOW IT. The line
     // above goes into the BATCHED disk log, which drains on a promise chain —
@@ -3214,8 +3214,7 @@ export function backfillEnemyIntelFromDefeats(
 export function migrateLoadedWorldMemory(wm: WorldMemory): WorldMemory {
   return {
     ...wm,
-    // ⚠⚠ LAG-3 — nothing has appended to `worldRumors` since the board moved to
-    // `worldEvents` (cap 50); an older save can carry an unbounded one. Same cap.
+    // ⚠⚠ LAG-3 — nothing has appended to `worldRumors` since the board moved to `worldEvents` (cap 50); an older save can carry an unbounded one. Same cap.
     worldRumors: wm.worldRumors ? wm.worldRumors.slice(-50) : wm.worldRumors,
     puppyVendorOwed: wm.puppyVendorOwed ?? false,
     puppyVendorUsed: wm.puppyVendorUsed ?? false,
@@ -9383,8 +9382,7 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
         }
       }
     }
-    // ⚠⚠ LAG-2 — THE ONE LOG-ONLY WRITE: both branches below return `gameLog`
-    // and nothing else. Return a second key here and the marker must come off.
+    // ⚠⚠ LAG-2 — THE ONE LOG-ONLY WRITE: both branches below return `gameLog` and nothing else. Return a second key and the marker must come off.
     asLogOnlyWrite(() => set((state) => {
       const nextLog = [...state.gameLog, entry].slice(-MAX_LOG_IN_MEMORY);
       // HANDOFF #4 — same-channel debounce. When two `world` entries land
@@ -11579,8 +11577,7 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
     set((s) => ({
       worldMemory: {
         ...s.worldMemory,
-        // ⚠⚠ LAG-3 — the one place a new room key is born, so the one place the
-        // ledger is bounded (worldMemory.pruneVisitedRooms). saveTrim stays.
+        // ⚠⚠ LAG-3 — the one seam a new room key is born, so the one place the ledger is bounded (worldMemory.pruneVisitedRooms). saveTrim stays.
         visitedRooms: {
           ...pruneVisitedRooms(s.worldMemory.visitedRooms ?? {}, roomKey),
           // ⚠ OTA-1104 — SPREAD, then override. This literal used to rebuild
@@ -12083,9 +12080,7 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
   submitPlayerAction(text, _opts) {
     const trimmed = text.trim();
     if (!trimmed) return;
-    // ⚠⚠ LAG-3 — BLOCKED INPUT EXPLAINS WHY. As strict as it was (nothing
-    // bypasses it, no action runs, the roll keeps its authority) — it stops
-    // being SILENT, which read as a frozen input box rather than as a rule.
+    // ⚠⚠ LAG-3 — BLOCKED INPUT EXPLAINS WHY. As strict as it was (nothing bypasses it, no action runs, the roll keeps its authority) — it stops being SILENT, which read as a frozen input box rather than a rule.
     if (get().pendingRolls) { get().appendLog('system', 'Settle the roll first — tap ROLL, then take your action.'); return; }
     // ⚠ OTA-1356 — the whole action body runs under one try/finally so EVERY
     // exit path (dozens of early returns) stamps `engine-done` on the dying-
@@ -23328,9 +23323,12 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
         : naturalRoll === 1
           ? '✗ FUMBLE'
           : attack.success ? '✓ HIT' : '✗ MISS';
+      const cmbOutcome: CombatOutcome = enemySlipped ? 'slipped' : enemyDodged ? 'dodged' : attack.critical ? 'crit' : naturalRoll === 1 ? 'fumble' : attack.success ? 'hit' : 'miss';
       get().appendLog(
         'combat',
         `You — d20 → ${naturalRoll} + ${attack.bonusLabel} = ${attack.total} ${acTag} — ${outcome}`,
+        cmb({ kind: 'swing', side: 'player', target: enemy.name, outcome: cmbOutcome,
+          roll: { d20: naturalRoll, bonus: attack.bonus, bonusLabel: attack.bonusLabel, total: attack.total, vs: attack.target, vsLabel: `${enemy.name} AC` } }),
       );
       // OTA-1676 — the wielder's own share, owed by the SWING: a ward you raise lands on a miss too.
       const swung = getEquippedWeapon(player, /\boff[- ]?hand\b/.test(actionText) ? 'off' : 'main');
@@ -24232,7 +24230,7 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
         // damage-out-to-enemy narration green for at-a-glance
         // scannability. Playtester: red text on red background made
         // it hard to spot "did I land damage" mid-fight.
-        get().appendLog('combat', attackKill(weaponName, enemy.name, dmg), { combatOutcome: 'player_dmg' });
+        get().appendLog('combat', attackKill(weaponName, enemy.name, dmg), cmb({ kind: 'defeat', side: 'player', defeated: enemy.name, dmg, weapon: weaponName ?? undefined, remaining: Math.max(0, (get().currentScene?.enemies ?? []).filter((e) => e !== enemy && (e.hp ?? 0) > 0).length) }, { combatOutcome: 'player_dmg' }));
         // Splice this enemy out of the scene (loot + scene clear handled
         // in resolveEnemyDefeat which now operates per-active-enemy).
         get().resolveEnemyDefeat();
@@ -24332,7 +24330,7 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
             }
           }
         } else {
-          get().appendLog('combat', attackHit(weaponName, enemy.name, dmg, newEnemyHp), { combatOutcome: 'player_dmg' });
+          get().appendLog('combat', attackHit(weaponName, enemy.name, dmg, newEnemyHp), cmb({ kind: 'damage', side: 'player', target: enemy.name, outcome: 'hit', dmg, weapon: weaponName ?? undefined, hp: { now: newEnemyHp, max: enemy.hp } }, { combatOutcome: 'player_dmg' }));
         }
         // OTA-362 — the enemy survived the blow, so apply the coating's
         // ONGOING effects: seed/refresh the DOT; acid also shreds the
@@ -24466,7 +24464,7 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
         if (!enemiesActedFirst) runEnemyGroupCounters(get, set, player, { skipDotTick: true });
       }
     } else {
-      get().appendLog('combat', attackMiss(weaponName, enemy.name));
+      get().appendLog('combat', attackMiss(weaponName, enemy.name), cmb({ kind: 'damage', side: 'player', target: enemy.name, outcome: 'miss', weapon: weaponName ?? undefined }));
       // OTA-1017 — one volley per round; skipped if initiative already spent it.
       if (!enemiesActedFirst) runEnemyGroupCounters(get, set, player, { skipDotTick: true });
     }
@@ -25298,7 +25296,7 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
           ...(bossTag.motive === 'missing' ? { missingResolved: bossTag.kind } : {}),
           inventory: mergeOrPushItem(s2.player.inventory, keep),
         } } : s2));
-        get().appendLog('reward', `✦ ${keep.name} — carried out of the dark, and yours now.`);
+        get().appendLog('reward', `✦ ${keep.name} — carried out of the dark, and yours now.`, cmb({ kind: 'reward', side: 'player', loot: [{ name: keep.name, qty: keep.quantity }] }));
       }
     }
     // OTA-991 — putting a revenant to rest is a mercy, never a hunt. Guarded by
@@ -25404,7 +25402,7 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
     const rarityMul = enemy.rarity === 'Legendary' ? 6 : enemy.rarity === 'Rare' ? 3 : enemy.rarity === 'Uncommon' ? 2 : 1;
     const tcGained = (rollDie(6) + rollDie(6)) * rarityMul;
     set((s) => (s.player ? { player: { ...s.player, tc: s.player.tc + tcGained } } : s));
-    get().appendLog('reward', `+${tcGained} TC pried from the dust.`);
+    get().appendLog('reward', `+${tcGained} TC pried from the dust.`, cmb({ kind: 'reward', side: 'player', tc: tcGained }));
 
     // Arbiter watches the pack: did the new loot just unlock a recipe?
     const before = listCraftableRecipes(player.inventory);
@@ -25844,7 +25842,7 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
     }
     if (stillFighting) {
       const next = standingAfterLoot[0]!;
-      get().appendLog('combat', `${standingAfterLoot.length} still standing. ${next.name} now in your sights.`);
+      get().appendLog('combat', `${standingAfterLoot.length} still standing. ${next.name} now in your sights.`, cmb({ kind: 'status', side: 'enemy', remaining: standingAfterLoot.length }));
     }
     void get().persist();
   },

@@ -29063,7 +29063,47 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ⚠⚠ NO GAMEPLAY, SAVE, LOADING OR BOOT CHANGE. OTA-1743's boot repair is not
 // touched, the kit has not propagated to any other screen, and the title screen
 // still commits nothing at all while it is being looked at.
-export const OTA_BUILD_ID = '2026-09-08-1744-the-owner-held-it-in-his-hand';
+// ⚠⚠⚠ OTA-1745 — THE RESULT BEFORE THE SENTENCE (task VIS-2-COMBAT-91D6).
+// Visual #2: combat inside Exploration, as information design rather than as a
+// skin. Combat authority always knew who swung, what they rolled, whether it
+// landed, for how much and what was left standing — the FEED only ever received
+// a SENTENCE, so the player read a paragraph to answer questions the engine had
+// already answered, and one exchange filled the visible transcript.
+// ⚠⚠ THE SMALLEST STRUCTURED METADATA, AT THE AUTHORITY BOUNDARY. A new
+// `engine/combatEvent` shape rides `GameLogEntry.meta` (which already carried
+// OTA-221's colour tag and OTA-1051's story flag) and is written at the SAME
+// call site, from the SAME values, as the sentence beside it — the player's
+// to-hit verdict, the landed blow, the miss, the defeat, each drop, the TC and
+// the standing count on one side; the enemy's verdict and the damage the player
+// takes on the other. No event bus, no reducer, no new lifecycle. ⚠⚠⚠ AND
+// NOTHING PARSES PROSE: Qwen is presentation, the resolver is truth, and the
+// suite fails on any inspection primitive appearing in the renderer.
+// ⚠⚠ ONE RESULT, ONE ROW. A tagged entry renders as a fixed-height instrument
+// row that cannot wrap — who acted on whom on the left, the outcome stamp and
+// the damage on the right — with the weapon and resulting HP on a second short
+// row only when they say something the first could not. Direction is
+// STRUCTURAL, not chromatic: a player swing carries its spine on the left and
+// reads YOU ▸ Raider, an incoming one is indented, reversed, and reads Raider ▸
+// YOU, so it survives a monochrome screen and any background hue. Roll math is
+// KEPT and DEMOTED — one tap, one line, local state that cannot wake the feed.
+// An ordinary HIT is weighted exactly like an ordinary MISS; only CRIT, FUMBLE,
+// DODGE, EVADE and SLIP get the engraved stamp, and even those do not change the
+// row's height. A defeat is the one event allowed two rows, with the remaining
+// count on it. A run of drops is grouped into ONE cluster in the feed rather
+// than one full-width row each — presentation, so the disk log and TTS are
+// unchanged.
+// ⚠⚠⚠ MEASURED, NOT ASSERTED. The 24px paragraph margin is right for prose and
+// was wrong for four log lines that are one moment; combat rows carry 3px.
+// At Pixel feed width: ordinary exchange 204px → 87px, hit+miss 272 → 128,
+// enemy+player 272 → 128, defeat+loot 522 → 143, multi-enemy 340 → 151. Nothing
+// grew. A combat viewport that held two exchanges now holds five.
+// ⚠ NO MECHANIC MOVED: rolls, hit probabilities, damage, targeting, rewards,
+// enemy persistence, flee and death are untouched, every existing log sentence
+// is byte-identical, an entry with no event renders exactly as before, and the
+// LAG-list boundaries (the memoised row, the windowed feed, no new store
+// subscription, no timers, no per-frame work) all still hold.
+export const OTA_BUILD_ID = '2026-09-08-1745-the-result-before-the-sentence';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-08-1744-the-owner-held-it-in-his-hand';
 // golem catch-up 2026-09-08: markerless publish of OTA-1744 - the Visual #1
 // correction pass, driven entirely by what the owner saw on the Pixel. The
 // roster is the only thing that scrolls now: the primary action and the OTA

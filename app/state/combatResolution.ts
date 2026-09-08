@@ -82,6 +82,10 @@ import { findFactionQuestById } from '../engine/factionQuests';
 import { weatherRepositionCost } from '../engine/weatherEffects';
 import { traitAttackBonus, traitAmbushBonus, traitDamageMultiplier, traitOnHitStatus, traitRegen, combineDamageTypeMatch, enemyIntelKey } from '../engine/enemyTraits';
 import { incomingHitCue, soakCueLine, leakCueLine } from '../engine/combatCues';
+/* ⚠⚠ VIS-2 — the incoming half of the structured result. Same discipline as the
+ * player's: copied from the values this resolver just used, at the site that
+ * used them. Nothing here reads a sentence to find out what happened. */
+import { cmb, type CombatOutcome } from '../engine/combatEvent';
 import { rollIncomingStatusEffect, applyEffect, statusAcAdjustment, hasFullCover, aethericVulnerabilityMultiplier } from '../engine/statusEffects';
 import { isSkipControl, controlLabel, tickControl } from '../engine/enemyControl';
 import type { EnemyControlState } from '../engine/enemyControl';
@@ -2151,10 +2155,16 @@ function applyEnemyCounter(
   // outcome marker (MISS / FUMBLE) green at the end of the line.
   // Playtester wanted at-a-glance confirmation that an enemy attack
   // didn't land without scanning the whole red roll line.
+  const cmbOutcome: CombatOutcome = slipped ? 'slipped' : dodgeWin === true ? 'evaded'
+    : enemyCrit ? 'crit' : enemyFumble ? 'fumble' : hit ? 'hit' : 'miss';
   get().appendLog(
     'combat',
     `${enemy.name} — d20 → ${atkRoll}${advLabel} + ATK ${atkBonus} = ${atkTotal} vs your AC ${effectiveAc}${acCapEngaged ? ` (needs nat ${acHitNat}+ — AC capped)` : ''} — ${outcomeTag}`,
-    hit ? undefined : { combatOutcome: 'enemy_miss' },
+    cmb(
+      { kind: 'swing', side: 'enemy', actor: enemy.name, outcome: cmbOutcome,
+        roll: { d20: atkRoll, bonus: atkBonus, bonusLabel: `ATK ${atkBonus}`, total: atkTotal, vs: effectiveAc, vsLabel: 'your AC' } },
+      hit ? undefined : { combatOutcome: 'enemy_miss' },
+    ),
   );
   if (slipped) {
     // OTA-1195 — say it in the world, not only in the roll line. A blow that connects on
@@ -2617,7 +2627,11 @@ function applyEnemyCounter(
       const prevHpForWarn = nextPlayer.hp;
       const hpMaxForWarn = nextPlayer.hpMax ?? 1;
       void Promise.resolve().then(() => {
-        get().appendLog('combat', msg);
+        // ⚠ VIS-2 — the consequence, structured: how much arrived, of what, and
+        // what the player has left. `hp.max` is the player's own maximum, so the
+        // feed can show the reading without the panels being asked twice.
+        get().appendLog('combat', msg, cmb({ kind: 'damage', side: 'enemy', actor: enemy.name, outcome: 'hit',
+          dmg, weapon: enemyDamageType, hp: { now: newHp, max: hpMaxForWarn } }));
         // OTA 228 — low-HP latch fires AFTER the combat line so the
         // narrative reads "X damage. 1 HP." then "Arbiter: eat /
         // first-aid kit." Skip when killed — falling already speaks

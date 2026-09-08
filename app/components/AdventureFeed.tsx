@@ -1,5 +1,13 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import { ScrollView, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+/* ⚠⚠⚠ VIS-2 — THE STRUCTURED COMBAT RESULT COMES FIRST. An entry whose meta
+ * carries a `cmb` event (engine/combatEvent) is drawn as a compact instrument
+ * row instead of a paragraph of prose; everything else in the feed renders
+ * exactly as it did. Qwen's narration is untouched and still arrives on its own
+ * channels — what changed is that the RESULT no longer has to be read out of a
+ * sentence to be known. */
+import { combatEventOf, type CombatEvent } from '../engine/combatEvent';
+import { CombatStrip, RewardCluster, STRIP_METRICS } from './CombatStrip';
 import type { GameLogEntry, LogChannel } from '../engine/types';
 import { HIDDEN_LOG_CHANNELS } from '../engine/gameLog';
 
@@ -181,6 +189,19 @@ const FeedRow = React.memo(function FeedRow({ entry, names }: { entry: GameLogEn
           storyBeat?: boolean;
         } | undefined;
         const isStoryBeat = meta?.storyBeat === true;
+        /* ⚠⚠ AHEAD OF EVERY PROSE BRANCH, INCLUDING OTA-221's COLOUR TAGS. A
+         * combat line that carries an authoritative event is drawn from the
+         * event; the colour override below is what the SAME line used to get
+         * when all the feed had was its sentence. Both still ride the same meta
+         * bag, so an entry with no `cmb` is completely unaffected. */
+        const cmbEvent = combatEventOf(entry.meta);
+        if (cmbEvent) {
+          return (
+            <View style={styles.combatEntry}>
+              <CombatStrip event={cmbEvent} text={entry.text} />
+            </View>
+          );
+        }
         const outcome = entry.channel === 'combat' ? meta?.combatOutcome : undefined;
         const tag = tagForChannel(entry.channel);
         // Enemy highlighting only applies to ambient narration — skip it
@@ -238,6 +259,38 @@ const FeedRow = React.memo(function FeedRow({ entry, names }: { entry: GameLogEn
 export function AdventureFeed({ entries, enemyNames, actionChipLabel, actionChipA11yLabel, onActionChipPress, packChipLabel, packChipA11yLabel, onPackChipPress }: Props) {
   const scrollRef = useRef<ScrollView>(null);
   const visible = entries.filter((e) => !HIDDEN_CHANNELS.has(e.channel)).slice(-FEED_WINDOW); // OTA-1696
+  /* ⚠⚠⚠ VIS-2 — A DEFEAT'S DROPS ARE ONE BLOCK, NOT ONE ROW EACH.
+   * The resolver writes one entry per recovered item, which is right for the
+   * disk log and for TTS and must not change. In the FEED that was four
+   * full-width lines and four paragraph margins for what is a single moment, so
+   * a RUN of adjacent reward events is collapsed into one cluster here — the
+   * brief's "group rewards compactly ... do not turn each loot item into its
+   * own giant full-width row", solved in presentation rather than by rewriting
+   * what the authority logs.
+   * ⚠ Adjacent only. A reward separated from the pile by any other line keeps
+   * its own place, because the order the feed shows is the order things
+   * happened and grouping across a gap would be a lie about sequence. */
+  const rows = useMemo(() => {
+    const out: Array<{ key: string; entry?: GameLogEntry; cluster?: CombatEvent[] }> = [];
+    let run: CombatEvent[] | null = null;
+    let runKey = '';
+    const flush = () => {
+      if (run && run.length > 0) out.push({ key: `cmbr_${runKey}`, cluster: run });
+      run = null;
+    };
+    for (const e of visible) {
+      const ev = combatEventOf(e.meta);
+      if (ev && ev.kind === 'reward') {
+        if (!run) { run = []; runKey = e.id; }
+        run.push(ev);
+        continue;
+      }
+      flush();
+      out.push({ key: e.id, entry: e });
+    }
+    flush();
+    return out;
+  }, [visible]);
   // OTA-1696 — keyed on the CONTENTS: the screen builds a fresh `enemyNames`
   // array every render, so a dependency on the array itself changed every time
   // and every memoised row re-rendered with it.
@@ -268,7 +321,9 @@ export function AdventureFeed({ entries, enemyNames, actionChipLabel, actionChip
       contentContainerStyle={styles.content}
       onContentSizeChange={handleAutoScroll}
     >
-      {visible.map((entry) => <FeedRow key={entry.id} entry={entry} names={names} />)}
+      {rows.map((r) => (r.cluster
+        ? <View key={r.key} style={styles.combatEntry}><RewardCluster events={r.cluster} /></View>
+        : <FeedRow key={r.key} entry={r.entry!} names={names} />))}
 
       {/* ⚠⚠⚠ OTA-1457 — THE TRAILING ACTION CHIP, AND WHY IT IS *HERE*.
           It renders AFTER the entry map, outside it, so it is structurally
@@ -354,6 +409,16 @@ const styles = StyleSheet.create({
   // entries should feel like three paragraphs of a single story.
   content: { paddingBottom: 16 },
   entry: { marginBottom: 24 },
+  /* ⚠⚠⚠ VIS-2 — THE PARAGRAPH MARGIN IS THE DENSITY BUG, AND THIS IS THE FIX.
+   * `entry`'s 24px bottom margin is right for prose: OTA-471's three opening
+   * world lines should read as three paragraphs. It is badly wrong for a swing
+   * and its counter, which are ONE moment split across four log lines — four
+   * paragraph gaps plus four wrapped bodies is most of the visible feed for a
+   * single exchange. A structured combat row is not a paragraph, so it does not
+   * get a paragraph's air. Measured: an ordinary exchange goes from ~290px to
+   * under 100px of feed, which is the difference between seeing one exchange
+   * and seeing several. */
+  combatEntry: { marginBottom: STRIP_METRICS.entry },
   tag: { fontSize: 10, fontWeight: '700', letterSpacing: 2, marginBottom: 4 },
   body: { fontSize: 14, lineHeight: 22 },
   // OTA-1051 — story beats. Extra air above and below so the beat sits in its
