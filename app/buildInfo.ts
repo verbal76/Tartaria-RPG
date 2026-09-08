@@ -29302,6 +29302,28 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Every style is built once at module load, keyed by faction, so this adds no
 // per-row work to a FlatList that OTA-1739 fought to keep quiet.
 export const OTA_BUILD_ID = '2026-09-08-1753-each-emblem-gets-its-own-window';
+// golem catch-up 2026-09-08: markerless publish of OTA-1753 - each emblem gets
+// its own window. Two asks: the per-faction offset table, and the image on both
+// card states. The second was already true since OTA-1747 - the call sites are
+// twenty lines apart - but the two states had drifted into different effects:
+// the expanded card sat at 0.13 against the tile's 0.22, and its box was shallow
+// enough that contain fit it by height for tall crests and by width for square
+// ones, so size and placement changed with the faction and beside a tile it read
+// as absent. Its horizontal framing is untouched; only the vertical spread and
+// the alpha moved. The table is measured rather than chosen: each crest drawn to
+// a 128x128 canvas and reduced to the luminance-weighted centroid of its
+// artwork, with the near-black ground discounted so the figure follows the
+// device rather than the frame. The result is systematic and worth more than the
+// table itself - every one of the nine sits above the middle of its own file,
+// focusY 0.339 to 0.466, mean 0.40, not one at 0.5 - so a window on the vertical
+// centre shows the lower part of every emblem, which is why the roster fragments
+// read as rubble through four passes of moving one box. Art facts live in
+// engine/factionCrests as focusY and aspect; the screen converts them into a
+// nudge for its own boxes, with the conversion constant device-calibrated and
+// declared because percentages of width and height cannot be linked in RN. The
+// measurement harness ships at scripts/measure-crest-focus.html so the table can
+// be redone. Eighteen style objects are built once at module load and looked up
+// by key, so nothing per-row is added to the roster list.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-08-1752-left-of-centre';
 // golem catch-up 2026-09-08: markerless publish of OTA-1752 - left of centre.
 // OTA-1751 put the roster tile's faction emblem on the row's geometric centre at
