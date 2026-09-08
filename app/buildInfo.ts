@@ -29019,6 +29019,25 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // no model lifecycle, no LAG-3 repair other than the grouping construct, and the
 // VIS-1 title screen is untouched.
 export const OTA_BUILD_ID = '2026-09-08-1743-the-boot-gate-has-an-exit';
+// golem catch-up 2026-09-08: markerless publish of OTA-1743 - the OTA-1741 boot
+// hang repair. The device symptom was a near-black screen with one small gold
+// spinner, forever, on every cold start: App.tsx's pre-hydration state, which is
+// released only by the `hydrated: true` at the very end of hydrate(), and which
+// nothing sets when hydrate rejects. OTA-1741 put Promise.allSettled on the
+// launch path - the only use of that builtin in the app, on one of the four
+// awaits in hydrate that nothing catches - and React Native's own Promise
+// fallback does not provide it, nor do older Hermes builds, while the appVersion
+// runtime policy lets a bundle published today run on an APK compiled months
+// ago. Reproduced by deleting the builtin from the runtime and running the real
+// boot. The grouping is now Promise.all over a local settled() helper, so the
+// reads still run together and the group has no rejection path at all. The class
+// is closed too: a boot that fails, or that says nothing for 25 seconds, hands
+// over to a screen naming the last boot stage with TRY STARTING AGAIN, CHECK FOR
+// AN UPDATE and COPY DIAGNOSTIC on it - hydrated stays false, the title screen
+// is not shown and no save is touched, so nothing pretends the boot succeeded.
+// App.tsx is rendered by a test for the first time; nothing in 1248 suites had
+// ever imported it, which is why a green run shipped a bundle that could not
+// start.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-08-1742-the-screen-is-made-of-something';
 // golem catch-up 2026-09-08: markerless publish of OTA-1742 - the first visual
 // overhaul pass (VIS-1-A7E4). The deliverable is a reusable interface language
