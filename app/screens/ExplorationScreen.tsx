@@ -1463,10 +1463,20 @@ export function ExplorationScreen() {
                   ⚠⚠ VIS-3 — AND IT IS NOW A KEY SET INTO THE RAIL, NOT A GOLD
                   CHIP. Owner's brief: *"Settings must not compete."* It was a
                   bordered #c9a86a glyph sitting at the same visual weight as
-                  the place it was beside. It is now a ceramic-toned mark in a
-                  recess — findable in exactly the same corner, at exactly the
-                  same hit area (hitSlop 8), and no longer arguing with the
-                  content. */}
+                  the place it was beside. It is now a mark in a RECESS —
+                  findable in exactly the same corner, at exactly the same hit
+                  area (hitSlop 8).
+                  ⚠⚠⚠ OTA-1755 — THE MARK IS GOLD AGAIN, BY THE OWNER'S CALL, AND
+                  "must not compete" IS STILL SATISFIED BY THE OTHER HALF OF THE
+                  VIS-3 CHANGE. What made the old gear shout was not only its
+                  colour: it was a BORDERED CHIP at the same weight as the place
+                  name beside it, on a header where six classes of information
+                  all wore the same gold. The chip is now a socket, the header's
+                  place name is ink, its readout is technical grey, and the gear
+                  is a 14dp drawn mark rather than a glyph — so the gold reads as
+                  one small key on an instrument instead of one more shouting
+                  element among six. See TitleScreen for the rule's stated
+                  exception. */}
               <View style={styles.sceneBarBtns}>
                 <TouchableOpacity
                   onPress={() => setScreen('about')}
@@ -1475,7 +1485,7 @@ export function ExplorationScreen() {
                   accessibilityRole="button"
                   accessibilityLabel="Settings"
                 >
-                  <TGear size={SCENE_GEAR_SIZE} color={T.ceramic} />
+                  <TGear size={SCENE_GEAR_SIZE} color={T.gold} />
                 </TouchableOpacity>
               </View>
               {/* v2.4.1 (OTA 045) — QUESTS button removed per player

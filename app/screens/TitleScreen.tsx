@@ -1312,10 +1312,18 @@ export function TitleScreen() {
           ⚠⚠ OTA-1748 — AND NOW IT IS THE SAME MARK IN THE SAME COLOUR AS THE
           ONE IN EXPLORATION. "UI uniformity" was the stated goal of putting it
           here, but the two were never actually uniform: different glyph sizes,
-          and this one gold while the in-game one went ceramic in VIS-3. Ceramic
-          is the principled half of that pair — on this project gold marks a live
-          obligation or a live process, and a settings key is neither. One
-          primitive, one colour, two sizes chosen by the space each sits in. */}
+          and different colours.
+          ⚠⚠⚠ OTA-1755 — AND THE COLOUR IS GOLD, BY THE OWNER'S CALL, WHICH IS A
+          STATED EXCEPTION TO A RULE THIS PROJECT OTHERWISE KEEPS. VIS-3
+          established that gold marks a live obligation or a live process and
+          nothing else, and on that rule a settings key is neither — which is why
+          OTA-1748 made both gears ceramic. The owner has looked at it on the
+          device and wants the brand gold. That is his call on his game, and the
+          right thing to do with an overridden rule is to write the exception
+          down rather than let the code quietly contradict the principle: GOLD ON
+          THIS PROJECT MEANS A LIVE OBLIGATION, A LIVE PROCESS, OR THE SETTINGS
+          KEY. Everything else the rule refuses still stands, and Exploration's
+          scene header is still stripped of it. */}
       <TouchableOpacity
         style={styles.cornerGear}
         onPress={() => setScreen('about')}
@@ -1324,7 +1332,7 @@ export function TitleScreen() {
         accessibilityRole="button"
         accessibilityLabel="Settings"
       >
-        <TGear size={20} color={T.ceramic} />
+        <TGear size={20} color={T.gold} />
       </TouchableOpacity>
       {/* ⚠⚠⚠ PHONE-FIX — THE UTILITY SEDIMENT IS OFF THE TITLE SCREEN.
           Owner: remove RESTORE FROM BACKUP, EXIT GAME, REPORT BUG and INVITE

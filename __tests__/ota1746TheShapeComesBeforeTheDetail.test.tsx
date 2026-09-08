@@ -317,12 +317,33 @@ describe('gold is a live obligation or a live process — and nothing else', () 
     expect(block.toLowerCase()).not.toContain('c9a86a');
   });
 
-  test('the settings key is still not gold, now that it is drawn', () => {
-    // ⚠ OTA-1748 retired the `sceneBarGear` text style with the glyph it
-    // styled; the colour claim moved to the call site, so that is where it is
-    // checked. Ceramic, as VIS-3 left it — Settings does not compete.
-    expect(EXP).toContain('<TGear size={SCENE_GEAR_SIZE} color={T.ceramic} />');
+  /* ⚠⚠⚠ OVERRIDDEN BY THE OWNER IN OTA-1755 — AND THE RULE KEEPS ITS SHAPE BY
+   * NAMING THE EXCEPTION RATHER THAN PRETENDING IT DID NOT HAPPEN.
+   *
+   * VIS-3 established that gold marks a live obligation or a live process, and
+   * a settings key is neither — so OTA-1748 made both gears ceramic. The owner
+   * looked at that on the device and asked for the brand gold. His game, his
+   * call. The honest record is: GOLD MEANS A LIVE OBLIGATION, A LIVE PROCESS, OR
+   * THE SETTINGS KEY.
+   *
+   * ⚠⚠ AND "Settings must not compete" IS STILL SATISFIED, by the other half of
+   * the VIS-3 change. What made the old gear shout was not only its colour: it
+   * was a BORDERED CHIP at the same weight as the place name beside it, on a
+   * header where six classes of information all wore the same gold. The chip is
+   * a socket now, the place name is ink, the readout is technical grey, and the
+   * gear is a drawn mark rather than a glyph. So the test that matters is not
+   * "the gear is not gold" — it is that the header AROUND it stayed demoted. */
+  test('the settings key is gold by exception, and the header around it did not follow', () => {
+    expect(EXP).toContain('<TGear size={SCENE_GEAR_SIZE} color={T.gold} />');
     expect(EXP).not.toContain('sceneBarGear');
+    // the socket it sits in is still a recess, not a gold-bordered chip
+    expect(styleBlock('sceneBarBtn').toLowerCase()).not.toContain('c9a86a');
+    // and the header's own information is still stripped of gold
+    for (const n of ['sceneName', 'sceneTime', 'sceneDot']) {
+      expect(styleBlock(n).toLowerCase()).not.toContain('c9a86a');
+    }
+    // the exception is written down where the change was made
+    expect(TITLE).toContain('STATED EXCEPTION TO A RULE');
   });
 
   test('the two things that KEEP gold are the two live ones', () => {

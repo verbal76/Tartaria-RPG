@@ -29328,7 +29328,26 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Per-faction focus offsets, both alphas and the one-third coverage floor are
 // unchanged; six neighbouring suites are re-aimed, including two whose central
 // claims this reverses.
-export const OTA_BUILD_ID = '2026-09-08-1754-one-column-on-the-right';
+// ── OTA-1755 — THE SETTINGS KEY IS GOLD ──────────────────────────────────────
+// Owner: use our gold for the gear, not the gunmetal.
+// This overrides a rule this project otherwise keeps, so the exception is
+// written down rather than left as a quiet contradiction in the code. VIS-3
+// established that gold marks a live obligation or a live process and nothing
+// else, and on that rule a settings key is neither - which is why OTA-1748 made
+// both gears ceramic. The owner has looked at it on the device and wants the
+// brand gold. The record now reads: gold means a live obligation, a live
+// process, or the settings key.
+// And "Settings must not compete" is still satisfied, by the other half of the
+// VIS-3 change rather than by the colour. What made the old gear shout was not
+// only that it was gold: it was a BORDERED CHIP at the same visual weight as the
+// place name beside it, on a header where six classes of information all wore
+// the same gold. The chip is a recessed socket now, the place name is ink, the
+// readout is technical grey, and the gear is a 14dp drawn mark rather than a
+// font glyph - so the gold reads as one small key on an instrument instead of
+// one more shouting element among six. Both gears change together, so the two
+// screens keep the single mark in a single colour that OTA-1748 gave them.
+export const OTA_BUILD_ID = '2026-09-08-1755-the-settings-key-is-gold';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-08-1754-one-column-on-the-right';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-08-1753-each-emblem-gets-its-own-window';
 // golem catch-up 2026-09-08: markerless publish of OTA-1753 - each emblem gets
 // its own window. Two asks: the per-faction offset table, and the image on both

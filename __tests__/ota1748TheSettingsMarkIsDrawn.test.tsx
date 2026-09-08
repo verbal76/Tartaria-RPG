@@ -180,8 +180,8 @@ describe('the icon is ours, not the device symbol font\'s', () => {
   });
 
   test('both sites use the ONE primitive, at their own size and colour', () => {
-    expect(EXP).toContain('<TGear size={SCENE_GEAR_SIZE} color={T.ceramic} />');
-    expect(TITLE).toContain('<TGear size={20} color={T.ceramic} />');
+    expect(EXP).toContain('<TGear size={SCENE_GEAR_SIZE} color={T.gold} />');
+    expect(TITLE).toContain('<TGear size={20} color={T.gold} />');
     /* ⚠⚠ ONE MARK, ONE COLOUR, TWO SIZES. OTA-051 moved the title's gear to the
      * top-right corner explicitly "for UI uniformity with the ExplorationScreen"
      * — and then the two were never uniform: different glyph sizes, and one gold
@@ -194,7 +194,7 @@ describe('the icon is ours, not the device symbol font\'s', () => {
     expect(new Set(colors).size).toBe(1);
     // one drawn gear in the codebase, not two independent ones
     expect((KIT.match(/export function TGear/g) ?? []).length).toBe(1);
-    expect(T.ceramic).toBeDefined();
+    expect(T.gold).toBeDefined();
   });
 
   test('it renders no Text and loads no font', async () => {
