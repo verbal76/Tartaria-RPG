@@ -29103,6 +29103,27 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // LAG-list boundaries (the memoised row, the windowed feed, no new store
 // subscription, no timers, no per-frame work) all still hold.
 export const OTA_BUILD_ID = '2026-09-08-1745-the-result-before-the-sentence';
+// golem catch-up 2026-09-08: markerless publish of OTA-1745 - Visual #2, combat
+// inside Exploration as information design. Combat authority always knew who
+// swung, what they rolled, whether it landed and what was left standing; the
+// feed only ever got a sentence, so the player read a paragraph to learn what
+// the engine had already decided. A small structured event now rides the log
+// entry's existing meta bag, written at the same call site and from the same
+// values as the sentence beside it - the player's verdict, the landed blow, the
+// miss, the defeat, each drop, the TC and the standing count, plus the enemy's
+// verdict and the damage the player takes. Nothing parses prose: Qwen stays
+// presentation and the resolver stays truth. A tagged line renders as a
+// fixed-height row that cannot wrap, with direction carried structurally - spine
+// edge, row direction and name order - rather than by colour, so it reads on any
+// theme and in monochrome. Roll math is kept and demoted to one tap and one
+// line; an ordinary hit is weighted like an ordinary miss and only the
+// exceptional outcomes take a stamp; a defeat gets two rows and its remaining
+// count; a run of drops becomes one cluster in the feed while the disk log and
+// TTS keep every line they had. Measured at Pixel feed width: an ordinary
+// exchange falls from 204px to 87px and a defeat with four drops from 522px to
+// 143px, so a viewport that held two exchanges now holds five. No roll, damage,
+// targeting, reward, flee or death rule moves, and the feed's memoised row,
+// windowing and store boundaries are unchanged.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-08-1744-the-owner-held-it-in-his-hand';
 // golem catch-up 2026-09-08: markerless publish of OTA-1744 - the Visual #1
 // correction pass, driven entirely by what the owner saw on the Pixel. The
