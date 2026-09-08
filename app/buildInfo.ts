@@ -29526,6 +29526,19 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // attempts each broke the half the other preserved. OTA-1760's VendorScreen
 // half was a real defect and is untouched.
 export const OTA_BUILD_ID = '2026-09-08-1761-not-broken';
+// golem catch-up 2026-09-08: markerless publish of OTA-1761 - the one that was
+// not broken. Reverts OTA-1760's change to the tips link and leaves the file as
+// it shipped. Both halves of that diagnosis were wrong: the box that looked
+// off-centre was the headless browser's focus ring, which does not exist on a
+// device, and the tap target was never asymmetric because hitSlop 8 on that same
+// control already extended it on all four sides - a line four lines from the
+// style I changed, in JSX I had already read. The shipped values were right on
+// both things a player can see, the label flush with the card's body text and
+// the box 18 from the card's inner edge matching Got it, and no third value
+// satisfies both, so each attempt broke the half the other preserved. The
+// linkBtn comment now says not to centre it again and why, because the focus
+// ring is still in every harness shot and will still look wrong to the next
+// reader. OTA-1760's VendorScreen fix was a real defect and is untouched.
 // golem catch-up 2026-09-08: markerless publish of OTA-1760 - two the owner saw
 // in a screenshot, both measured from the real bundle before anything was
 // touched. The back button's border was covering the sentence above it because
