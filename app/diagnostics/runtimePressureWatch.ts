@@ -56,7 +56,7 @@ import {
   type PressureSnapshot,
 } from './runtimePressure';
 import { clearLiveBreadcrumb, stampBreadcrumbPhase, noteForegrounded, peekLiveBreadcrumb } from '../engine/saveSystem';
-import { nativeMlSnapshot } from '../ai/nativeMlLock';
+import { nativeMlSnapshot, nativeQueuePressure } from '../ai/nativeMlLock';
 import { qwen } from '../ai/engines';
 import { nativePressure } from '../ai/generation/qwenTelemetry';
 import { APPROX_CONTEXT_MB, contextLedger } from '../ai/generation/contextLedger';
@@ -125,6 +125,10 @@ export function runtimePressureSnapshot(): PressureSnapshot {
     // OTA-1368 — the native-ML queue, so the report can say why a session
     // felt wedged while both JS clocks read clean.
     native: (() => { try { return nativePressure(); } catch { return undefined; } })(),
+    // ⚠ LAG-3 — the queue's own books. Separate from `native` above because it
+    // answers a different question: that one prices the calls that finished,
+    // this one prices the waiting, the refusals and the cuts.
+    nativeQueue: (() => { try { return nativeQueuePressure(); } catch { return undefined; } })(),
     lastVerdict: rpLastVerdict,
     worstFrameGapMs: rpWorstFrameGapMs,
     worstJsGapMs: rpWorstJsGapMs,

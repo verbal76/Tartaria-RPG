@@ -149,10 +149,15 @@ export const createBootSlice = (
       // naming the pattern. The note the reloading life left carries its id and
       // its model ledger. `launchLine` prints "not an OTA apply" just as loudly,
       // because an absent line is not an answer.
-      const launch = launchFacts(await readOtaHandoff());
+      // ⚠ LAG-3 — TWO KEYS, TWO READS, NO ORDER BETWEEN THEM. The handoff note
+      // and the surviving breadcrumb are written by different paths to different
+      // keys and neither is read to decide the other; sequencing them only ever
+      // cost one storage round trip of boot latency. The USE below is unchanged
+      // and still ordered: the launch line prints first, exactly as it did.
+      const [handoff, crumb] = await Promise.all([readOtaHandoff(), readSurvivingBreadcrumb()]);
+      const launch = launchFacts(handoff);
       noteLaunchFacts(launch);
       get().appendLog('debug', launchLine(launch));
-      const crumb = await readSurvivingBreadcrumb();
       // ⚠⚠ OTA-1413 — AN OS RECLAIM OF A BACKGROUNDED APP IS NOT A CRASH.
       // The owner's golem ledger: `PROCESS KILLED — no JS ran · stage
       // ctx-release-done · while: (no action yet)`. Nothing died. He backgrounded
@@ -225,14 +230,28 @@ export const createBootSlice = (
           // the ledger, in About and in the bug report; what changes is that it
           // stops paging as a crash, so the seven deaths that DID happen with
           // native work in flight are no longer buried under it.
-          const idle = crumb.phase === 'rendered' && crumb.what === '(no action yet)';
+          // ⚠⚠⚠ LAG-3 — AND A TITLE-SCREEN RECLAIM IS ITS OWN THING, NAMED.
+          // F7: the alive beat used to be stamped by ExplorationScreen alone,
+          // so a process that idled on the title and was reclaimed later had no
+          // sign of life after boot and was filed as "died ~1s in" — 14 of 27
+          // cold boots. The beat is now app-wide (diagnostics/aliveBeat) and
+          // carries the screen it was on, so the record can finally say WHICH
+          // idle this was. Neither is fatal; the difference matters because one
+          // of them is a player being reclaimed mid-play and the other is a
+          // launcher-screen process Android was always entitled to reap.
+          const onTitle = crumb.screen === 'title' || crumb.screen === 'character_creation';
+          const idle = (crumb.phase === 'rendered' && crumb.what === '(no action yet)') || onTitle;
           // eslint-disable-next-line @typescript-eslint/no-require-imports
           (require('../../diagnostics/crashLedger') as typeof import('../../diagnostics/crashLedger')).recordCrash({
             kind: 'native-death',
             ts: lastAlive,
             stage: crumb.phase ?? 'mid-action',
             message: idle
-              ? `Process reclaimed while idle at a rendered screen — nothing was in flight (${Math.round((lastAlive - (crumb.phaseAt ?? lastAlive)) / 1000)}s since the last checkpoint)`
+              ? (onTitle
+                ? `Process reclaimed while idle on the ${crumb.screen === 'title' ? 'title' : 'character-creation'} screen`
+                  + ` — no game was in progress (${Math.round(Math.max(0, lastAlive - (crumb.bootAt ?? lastAlive)) / 1000)}s after boot`
+                  + `${crumb.appState ? `, app ${crumb.appState}` : ''}${crumb.aliveStage ? `, stage ${crumb.aliveStage}` : ''})`
+                : `Process reclaimed while idle at a rendered screen — nothing was in flight (${Math.round((lastAlive - (crumb.phaseAt ?? lastAlive)) / 1000)}s since the last checkpoint)`)
               : `Process died with no orderly exit while: ${crumb.what}`
                 + (staleMs > 120_000
                   ? ` — begun ${Math.round(staleMs / 60_000)}m before the last sign of life; treat the action label as stale, not as the killer`
@@ -368,6 +387,17 @@ export const createBootSlice = (
       get().appendLog('debug', `qwen⏱ ${r.job} ${r.outcome} ${r.totalMs}ms${wait}${split}${sizes}${starve}${thr}${msPerTok}${stop} (${r.chars}ch)`);
       if (qwenCallCount() % 10 === 0) {
         get().appendLog('debug', `qwen⏱ stats — ${qwenTelemetrySummary()}`);
+        // ⚠⚠ LAG-3 — AND THE QUEUE'S OWN LINE BESIDE THE GENERATIONS'. The
+        // rollup above prices the calls that ran; F7's Johnny session proved
+        // that leaves the wait invisible — a 4.4s worst wait with a clean JS
+        // freeze watch and no line anywhere naming it. Same cadence (every
+        // tenth call), bounded to the counters the lock already keeps, and
+        // silent when nothing has run.
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const line = (require('../../ai/nativeMlLock') as typeof import('../../ai/nativeMlLock')).nativeQueuePressureLine();
+          if (line) get().appendLog('debug', line);
+        } catch { /* an instrument never breaks the thing it measures */ }
       }
     });
     // OTA-1107 — wasted work, named as it happens. A discarded line cost the
@@ -389,14 +419,52 @@ export const createBootSlice = (
     // be loaded. If last session died mid-load (native abort on a
     // stale cross-version save), this flags the offending slot so the
     // title screen can offer Retry / Delete instead of re-crashing.
+    /* ⚠⚠⚠ LAG-3 — THE INDEPENDENT BOOT READS RUN TOGETHER, AND ONLY THOSE.
+     *
+     * Fable's 91C4B8 audit measured hydration as ~12 sequential AsyncStorage
+     * awaits — ~288ms in the Node harness, ~1s on the device — and the save
+     * itself was never the cost: it was the round trips, taken one at a time
+     * for keys that have nothing to say to each other.
+     *
+     * ⚠ WHAT IS PARALLEL: the save-load health record, the last JS crash, the
+     * active slot id, the slot list and the item-synthesis cache. Five different
+     * keys; none is read to decide any of the others.
+     *
+     * ⚠⚠ WHAT IS DELIBERATELY NOT: `ensureFirstInstallSeed` WRITES the global
+     * stash and `loadGlobalStash` READS it — OTA 454's note says so in as many
+     * words ("the seed lands in the global stash before loadGlobalStash reads
+     * it so the resulting count includes the gem"). Running those two together
+     * would be a read/write race on one key for one Resurrection Gem, so they
+     * stay strictly ordered, after the group. `migrateLegacySlotIfPresent`
+     * likewise still runs BEFORE all of this: it can create the very slot
+     * `listSlots` is about to enumerate.
+     *
+     * ⚠ EACH MEMBER KEEPS ITS OWN FAILURE ISOLATION. `allSettled`, not `all`:
+     * the health pair was already inside a "never block boot on it" try, and a
+     * rejection there must not now take the slot list down with it. The
+     * hydrated state this produces is identical to the sequential path's. */
     let crashedSlotIds: string[] = [];
-    try {
-      await loadSaveLoadHealth();
-      await loadLastCrash(); // arb172 — cache last JS crash for the diagnostic export
-      crashedSlotIds = getCrashedSlotIds();
-    } catch { /* health is best-effort — never block boot on it */ }
-    const activeId = await loadActiveSlotId();
-    const slots = await listSlots();
+    const [healthR, crashR, activeR, slotsR] = await Promise.allSettled([
+      loadSaveLoadHealth(),
+      loadLastCrash(), // arb172 — cache last JS crash for the diagnostic export
+      loadActiveSlotId(),
+      listSlots(),
+      // OTA-191 — the Qwen-synthesis cache: inferred-gear lookups reuse
+      // previously-balanced overlays instead of firing the LLM again. Its own
+      // key, read by nothing else here, so it rides the same group.
+      (async () => {
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-var-requires
+          const synthCache = require('../../engine/itemSynthesisCache');
+          if (typeof synthCache.loadSynthCache === 'function') await synthCache.loadSynthCache();
+        } catch { /* ignore — cache stays empty + the LLM path no-ops */ }
+      })(),
+    ]);
+    if (healthR.status === 'fulfilled' && crashR.status === 'fulfilled') {
+      try { crashedSlotIds = getCrashedSlotIds(); } catch { /* health is best-effort */ }
+    }
+    const activeId = activeR.status === 'fulfilled' ? activeR.value : null;
+    const slots = slotsR.status === 'fulfilled' ? slotsR.value : [];
     // OTA 454 — first-install Resurrection Gem seed. Idempotent: only
     // fires once per install. The seed lands in the global stash
     // before loadGlobalStash reads it so the resulting count
@@ -428,18 +496,12 @@ export const createBootSlice = (
       }
     } catch { /* ignore — module is small + always present */ }
 
-    // OTA-191 — load the Qwen-synthesis cache so inferred-gear lookups
-    // can pick up previously-balanced overlays without firing the
-    // LLM again. The cache survives app restarts (AsyncStorage) so a
-    // tester who synthesized 30 unique item names on day 1 doesn't
-    // re-spend the model on day 2.
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const synthCache = require('../../engine/itemSynthesisCache');
-      if (typeof synthCache.loadSynthCache === 'function') {
-        await synthCache.loadSynthCache();
-      }
-    } catch { /* ignore — cache stays empty + the LLM path no-ops */ }
+    // OTA-191 — the Qwen-synthesis cache (so inferred-gear lookups reuse
+    // previously-balanced overlays instead of re-spending the model) is loaded
+    // ⚠ LAG-3 — in the parallel read group above, not here: it is a read of its
+    // own key that nothing between then and now depends on, and it was one more
+    // sequential round trip in a boot made of them. It is awaited before this
+    // point, so every consumer below sees exactly what it saw before.
 
     // OTA-191 — wire the fire-and-forget Qwen synth requester. When
     // inferGear sees an item it can't classify confidently (no

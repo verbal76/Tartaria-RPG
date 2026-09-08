@@ -62,6 +62,7 @@ import { GolemNamingModal } from './app/components/GolemNamingModal'; // OTA-102
 import { KeyboardInputBar } from './app/components/KeyboardInputBar';
 import { bootAudio, disposeAudio } from './app/audio/AudioManager';
 import { startAudioController, stopAudioController } from './app/audio/AudioController';
+import { setAliveBeatContext, startAliveBeat, stopAliveBeat } from './app/diagnostics/aliveBeat';
 import { initTTSManager } from './app/voice/TTSManager';
 import { startTTSController, stopTTSController } from './app/voice/TTSController';
 import { createExpoFileSystemAdapter } from './app/voice/executorchAdapter';
@@ -295,6 +296,29 @@ export default function App() {
     void useAccessibility.getState().hydrateAccessibility();
   }, []);
 
+  // ⚠⚠⚠ LAG-3 — THE APP SAYS "STILL HERE" FROM WHEREVER IT IS.
+  //
+  // F7 disproved the "OTA kills the process ~1 second in" reading and named the
+  // instrument bug behind it: the alive beat was stamped by ExplorationScreen's
+  // render effect ALONE, and hydration lands on the title screen. A boot that
+  // idles on the title and is reclaimed twenty minutes later therefore had one
+  // sign of life — the boot — and was recorded as dying a second into its life.
+  // Fourteen of twenty-seven cold boots wore that signature.
+  //
+  // ⚠ Mounted here, at the app root, so it covers the title, character
+  // creation, every screen and every modal. It writes no store state (no render
+  // churn), runs only while the app is ACTIVE, and reuses the same throttled
+  // crumb heartbeat the exploration screen already drove — which keeps its own
+  // stamp, so a screen that renders keeps naming itself as before.
+  useEffect(() => {
+    setAliveBeatContext(
+      () => { try { return useGameStore.getState().currentScreen; } catch { return undefined; } },
+      () => (globalThis as unknown as { __TARTARIA_BOOT_STAGE?: string }).__TARTARIA_BOOT_STAGE,
+    );
+    startAliveBeat();
+    return () => { stopAliveBeat(); };
+  }, []);
+
   useEffect(() => {
     if (Platform.OS !== 'android') return;
     const NB = loadNavigationBar();
@@ -385,7 +409,19 @@ export default function App() {
         // one sentry-android already holds. Written onto the death record the
         // ledger minted (or will mint) this boot; see crashLedger.applyNativeSdkVerdict.
         try {
-          const verdict = await st.nativeSdkSawCrashLastRun();
+          // ⚠⚠ LAG-3 — ASK AGAIN ONCE IF THE NATIVE SIDE HAS NOT RESOLVED YET.
+          // OTA-1735 made the reason legible and the answer it kept producing
+          // was the timing one: *"non-boolean … native side had not resolved the
+          // last run yet"*. That is not "no opinion", it is "not yet" — the
+          // Android SDK reads the previous run's marker on its own init, and
+          // this call lands in the same tick as `installSentryIfAvailable`
+          // above. One short retry is the whole repair; a null after it is a
+          // real absence, and either way the REASON is recorded below.
+          let verdict = await st.nativeSdkSawCrashLastRun();
+          if (verdict === null) {
+            await new Promise((r) => setTimeout(r, 750));
+            verdict = await st.nativeSdkSawCrashLastRun();
+          }
           const line = await cl.applyNativeSdkVerdict(verdict);
           if (line) useGameStore.getState().appendLog('debug', line);
           // ⚠ OTA-1735 — and WHY, when it has no opinion. Ten records in a row

@@ -219,7 +219,7 @@ describe('OTA-1526 — the boot path reads the snapshot and only the snapshot', 
   it('⚠⚠⚠ hydrate takes the survivor, not the live key', () => {
     const i = BOOT.indexOf('async hydrate() {');
     const block = BOOT.slice(i, BOOT.indexOf('forensics must never block a boot', i));
-    expect(block).toContain('await readSurvivingBreadcrumb()');
+    expect(block).toContain('readSurvivingBreadcrumb()');
     // ⚠ COMMENTS STRIPPED FIRST — the OTA-1377 lesson, and this suite tripped on
     // it: the note above the fixed line NAMES the call it replaced, so a raw
     // search finds the old reader in prose and calls the fix undone.
@@ -231,7 +231,7 @@ describe('OTA-1526 — the boot path reads the snapshot and only the snapshot', 
     // The OTA-1276/1380 ordering, restated here because this OTA moved the read.
     const i = BOOT.indexOf('async hydrate() {');
     const block = BOOT.slice(i, BOOT.indexOf('forensics must never block a boot', i));
-    const read = block.indexOf('await readSurvivingBreadcrumb()');
+    const read = block.indexOf('readSurvivingBreadcrumb()');
     const promote = block.indexOf("kind: 'native-death'");
     const clear = block.indexOf('await clearLiveBreadcrumb()');
     expect(read).toBeGreaterThan(-1);

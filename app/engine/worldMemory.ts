@@ -1,4 +1,4 @@
-import type { NpcMet, WorldMemory, CanonLocation } from './types';
+import type { NpcMet, WorldMemory, CanonLocation, VisitedRoom } from './types';
 
 export function emptyMemory(): WorldMemory {
   return {
@@ -267,6 +267,49 @@ export function recordNothingSearch(
     },
     exhausted,
   };
+}
+
+/* ⚠⚠⚠ LAG-3 — THE ROOM LEDGER IS BOUNDED AT THE DOOR, NOT ONLY AT THE SAVE.
+ *
+ * `saveTrim` already drops rooms, but only once the whole blob crosses its byte
+ * budget — and OTA-1702 recorded what that cost when it finally engaged: an
+ * 830K save with 838 visited rooms spent ~7 seconds of synchronous JS per
+ * persist before the trim was made to measure once. That is a defensive layer
+ * doing a job growth control should have done first, and it stays exactly where
+ * it is: this cap runs at the ONE place a NEW room key is created (the arrival
+ * recorder in beginScene), so the ledger stops growing without bound instead of
+ * being cut back after it already has.
+ *
+ * ⚠ THE CAP IS GENEROUS ON PURPOSE, and the brief said so: *do not arbitrarily
+ * choose tiny caps; determine how much history downstream actually needs.* What
+ * reads a room record is per-room memory — searched nouns, dig counts,
+ * investigation tables, cleared enemies — and every one of those is about a
+ * place the player might walk back into. Measured on this project's own
+ * long-session fixture, three thousand moves of open-world travel reach FIVE
+ * rooms; the 838 in OTA-1702's report came from a synthetic dev sweep. A
+ * thousand rooms is far past any real character and still bounds the pathology.
+ *
+ * ⚠ THE ROOM BEING ENTERED IS NEVER DROPPED, whatever its age, and the oldest
+ * go first — the same oldest-first order saveTrim uses, so the two layers agree
+ * about what history is worth least. */
+export const VISITED_ROOMS_CAP = 1000;
+
+export function pruneVisitedRooms(
+  rooms: Record<string, VisitedRoom>,
+  keepKey: string,
+  cap: number = VISITED_ROOMS_CAP,
+): Record<string, VisitedRoom> {
+  const keys = Object.keys(rooms);
+  if (keys.length <= cap) return rooms;
+  const oldestFirst = keys
+    .filter((k) => k !== keepKey)
+    .sort((a, b) => (rooms[a]?.lastVisitAt ?? rooms[a]?.firstVisitAt ?? 0)
+      - (rooms[b]?.lastVisitAt ?? rooms[b]?.firstVisitAt ?? 0));
+  const drop = keys.length - cap;
+  if (drop <= 0) return rooms;
+  const next: Record<string, VisitedRoom> = { ...rooms };
+  for (let i = 0; i < drop && i < oldestFirst.length; i++) delete next[oldestFirst[i]!];
+  return next;
 }
 
 /** OTA 454 — record a named-NPC encounter. Idempotent on `id`: a

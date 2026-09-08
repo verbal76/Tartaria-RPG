@@ -117,6 +117,22 @@ export function arbiterAddress(player: PlayerCharacter | null | undefined, fallb
  *  slice 5. Keep this surface at two. */
 export function bumpArbiterGeneration(): void {
   arbiterGenerationEpoch += 1;
+  // ⚠⚠⚠ LAG-3 — MOVING THE EPOCH IS THE MOMENT WORK BECOMES OBSOLETE, SO IT IS
+  // THE MOMENT TO SAY SO. Until now the epoch was only ever READ — by the token
+  // callback, by the door at the lock, and by the discard at the end — so a
+  // narration already inside a native call learned it was unwanted no earlier
+  // than its next token, and F7 measured that a travel narration spends 8.7-10.9
+  // seconds before there IS a next token. Telling the lock here lets it end the
+  // running job the instant its reader leaves, and lets the scheduler stop
+  // preferring the ones still queued (see nativeMlLock.preemptObsoleteNativeWork).
+  //
+  // ⚠ Best-effort and lazily required: the epoch is correctness, this is
+  // economy, and a scheduler that could throw must never be able to break the
+  // discard contract that depends on the line above having run.
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    (require('./nativeMlLock') as typeof import('./nativeMlLock')).preemptObsoleteNativeWork();
+  } catch { /* the epoch has moved either way — that is the guarantee */ }
 }
 
 /** ⚠⚠ OTA-1405 — BURNED ONCE, BACK OFF. When was the last LIVE narration thrown

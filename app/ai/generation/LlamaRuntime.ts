@@ -1,6 +1,7 @@
 import * as FileSystem from 'expo-file-system';
 import {
   runExclusiveNativeMl, ML_PRIORITY_LLM, ML_PRIORITY_HOMEWORK, ML_PRIORITY_TEARDOWN,
+  noteRejectedBeforePrefill,
 } from '../nativeMlLock';
 import { recordQwenCall } from './qwenTelemetry';
 import { startJsHeartbeat, threadsForLane } from './jsHeartbeat';
@@ -511,6 +512,11 @@ export class LlamaRuntime {
         // epoch check it already has was going to turn into a discard anyway.
         if (wantsAbort()) {
           preempted = true;
+          // ⚠ LAG-3 — the queue's own count of work refused before any prefill.
+          // OTA-1368 built this door; nothing was counting how often it saves a
+          // generation, which is the number that says whether the admission
+          // repair is working on a real device.
+          try { noteRejectedBeforePrefill(); } catch { /* never break a generation */ }
           return Promise.resolve({ text: '', tokens_predicted: 0 } as LlamaCompletionResult);
         }
         const beat = startJsHeartbeat();
@@ -540,6 +546,29 @@ export class LlamaRuntime {
             } catch { /* unsupported / nothing running — the job just finishes normally */ }
           }
         : undefined,
+      // ⚠⚠⚠ LAG-3 — WHAT THIS JOB IS, AND WHETHER IT IS STILL WANTED. The lock
+      // schedules with these two: a job whose consumer has written it off never
+      // takes a slot ahead of live work of the same rank (F7 measured
+      // `investigate_lore` waiting 3.3-4.4s behind exactly that), and one that
+      // goes obsolete WHILE RUNNING can be cut by `preemptObsoleteNativeWork`.
+      //
+      // ⚠ `onObsolete` IS NOT `onPreempt`, and the separation is the whole
+      // safety argument. OTA-1134 decided narration does not yield to rank;
+      // that is untouched — the hook above is still undefined for it. This one
+      // fires only when the job's OWN `shouldAbort` says its reader has gone,
+      // which is a state in which finishing has no value to anyone.
+      {
+        kind: opts.job,
+        isObsolete: opts.shouldAbort ? wantsAbort : undefined,
+        onObsolete: opts.shouldAbort
+          ? () => {
+              preempted = true;
+              try {
+                void (ctx as unknown as { stopCompletion?: () => unknown }).stopCompletion?.();
+              } catch { /* unsupported / nothing running — it just finishes */ }
+            }
+          : undefined,
+      },
       );
       // Prefer assembled tokens (already stripped of prompt) but fall back to
       // the final text the native side returns.

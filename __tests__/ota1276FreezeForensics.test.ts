@@ -135,15 +135,15 @@ describe('OTA-1276 — it is stamped at the doors a freeze happens behind', () =
     // against this session's own phase stamps. Read → report → promote → clear
     // is the invariant this test has always guarded, and it still holds, so the
     // pin is re-aimed rather than relaxed or deleted.
-    expect(block).toContain('await readSurvivingBreadcrumb()');
+    expect(block).toContain('readSurvivingBreadcrumb()');
     expect(block).toContain('setLastBootBreadcrumb(crumb)');
     expect(block).toContain('freeze forensics: last boot ended mid-action');
     // Cleared AFTER it is read and reported — never before.
-    expect(block.indexOf('await readSurvivingBreadcrumb()')).toBeLessThan(block.indexOf('await clearLiveBreadcrumb()'));
+    expect(block.indexOf('readSurvivingBreadcrumb()')).toBeLessThan(block.indexOf('await clearLiveBreadcrumb()'));
     // ⚠ And the OTA-1380 crash record lands between them: recorded before the
     // clear, so a failure clearing cannot cost the one crash class that has no
     // other evidence anywhere.
-    expect(block.indexOf("kind: 'native-death'")).toBeGreaterThan(block.indexOf('await readSurvivingBreadcrumb()'));
+    expect(block.indexOf("kind: 'native-death'")).toBeGreaterThan(block.indexOf('readSurvivingBreadcrumb()'));
     expect(block.indexOf("kind: 'native-death'")).toBeLessThan(block.indexOf('await clearLiveBreadcrumb()'));
   });
 

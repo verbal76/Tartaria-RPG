@@ -316,17 +316,39 @@ export async function checkAndApplyOTA(opts: CheckAndApplyOptions = {}): Promise
       // full 3s after the work had already finished; harmless in production
       // (reloadAsync follows immediately) but it kept four dangling handles
       // alive and made the jest run warn about unstopped async work.
+      // ⚠⚠⚠ LAG-3 — EACH DISPOSE NOW TESTIFIES, AND NOTHING ABOUT THE OTA MOVES.
+      // Every one of the four resolves `null` on its deadline rather than
+      // failing, by design (OTA-243), so `ota:teardown:done` has never meant
+      // "the native handles are gone" — its own note says so. The teardown is
+      // also the last window before the process is replaced, which is where the
+      // OTA-apply deaths sit. So each component stamps its OWN outcome:
+      //   ota:teardown:shutdownQwen:complete   — it finished, and how long it took
+      //   ota:teardown:disposeAudio:timeout    — the deadline won; the handle is still held
+      //   ota:teardown:disposePiperEngine:failed
+      // A death mid-teardown now names the component that had not come back,
+      // instead of leaving the reader to infer it. Order, deadlines, concurrency
+      // and every disposal call are untouched.
+      const t0 = Date.now();
+      const mark = (outcome: string): void => {
+        try { stampOtaPhase(`ota:teardown:${label}:${outcome}`, `${Date.now() - t0}ms`); } catch { /* never block a reload */ }
+      };
       let timer: ReturnType<typeof setTimeout> | undefined;
+      let settled = false;
       return Promise.race([
-        Promise.resolve(p).catch((e) => {
-          // eslint-disable-next-line no-console
-          console.warn(`OTA dispose failed: ${label}:`, e);
-          return null as unknown as T;
-        }),
+        Promise.resolve(p).then(
+          (v) => { if (!settled) { settled = true; mark('complete'); } return v; },
+          (e) => {
+            // eslint-disable-next-line no-console
+            console.warn(`OTA dispose failed: ${label}:`, e);
+            if (!settled) { settled = true; mark('failed'); }
+            return null as unknown as T;
+          },
+        ),
         new Promise<null>((resolve) => {
           timer = setTimeout(() => {
             // eslint-disable-next-line no-console
             console.warn(`OTA dispose timed out after ${ms}ms: ${label}`);
+            if (!settled) { settled = true; mark('timeout'); }
             resolve(null);
           }, ms);
         }),

@@ -28882,7 +28882,61 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Inventory mount at 258 items 316ms → 90ms; opening every category 61ms → 8ms.
 // ⚠ VIRTUALIZATION WAS EVALUATED AND DELIBERATELY NOT FORCED — see the note over
 // the section list in InventoryScreen.
-export const OTA_BUILD_ID = '2026-09-07-1740-nothing-wakes-a-screen-that-is-not-about-it';
+// ⚠⚠⚠ OTA-1741 — THE WORK NOBODY WILL READ GETS OUT OF THE WAY (task LAG-3-8D27).
+// The last performance tranche: the native-AI queue, the lifecycle instrument,
+// hydration and the long-session collections. No RPG mechanic, narration
+// content, model setting, save-integrity rule or deliberate pacing changes, and
+// no OTA apply order moves. (1) OBSOLETE NARRATION STOPS PAYING FOR ITSELF.
+// F7 measured reactive travel narration spending 8.7-10.9s in native prefill for
+// output the player's next action had already invalidated, and investigate_lore
+// waiting 3.3-4.4s behind it. OTA-1368 built two doors — refuse at the lock,
+// stop at the first token — and named the limit: prefill is uninterruptible. So
+// the third door is a signal from OUTSIDE, at the moment work BECOMES obsolete:
+// `bumpArbiterGeneration` now tells the lock, which ends a running job whose own
+// `shouldAbort` says its reader has gone, and which stops preferring obsolete
+// waiters over live ones AT THE SAME RANK (nothing is promoted — the brief's own
+// guard). ⚠ This is NOT OTA-1123's rank preemption and uses a separate hook:
+// OTA-1134's rule that narration does not yield to rank is untouched, and the
+// epoch/discard contract remains the final guard — stale output still never
+// surfaces. Prompt cost was measured, not cut: OTA-1121's stable prefix is 57%
+// of a peaceful prompt and already reusable, so no content was traded for a
+// smaller benchmark. (2) THE QUEUE KEEPS ITS OWN BOOKS. The Johnny session had a
+// 4.4s worst wait, two job kinds past 3s and 11 discarded generations while the
+// JS freeze watch read clean — structurally blind. Depth, oldest wait, running
+// lane and job, worst wait and its job, long waits, refusals before prefill,
+// obsolete cuts and obsolete yields are now bounded scalars on the runtime-
+// pressure snapshot that already lands in the bug-report header, and on the
+// telemetry rollup line. No per-token telemetry. (3) HYDRATION READS TOGETHER
+// WHERE IT CAN. The health record, last crash, active slot id, slot list and
+// synthesis cache are five independent keys and now run as one allSettled group;
+// the first-install seed still runs strictly BEFORE the stash read (a race there
+// costs a Resurrection Gem) and the legacy migration still runs first of all.
+// 12 sequential storage round trips → 8. (4) THE COLLECTIONS ARE BOUNDED, AND
+// THE AUDIT'S PREMISE IS CORRECTED: recentCells is capped at 8, recentRoadsideNames
+// at 10, and worldRumors has no living writer at all — measured, three thousand
+// moves of open-world travel leave worldMemory at 35KB with every array at its
+// cap. What was genuinely open: the room ledger, now capped at 1000 at the ONE
+// seam that creates a new room (arrival), oldest first, never the room being
+// entered — saveTrim stays the defensive layer beneath it; and a legacy save's
+// worldRumors array, bounded to 50 on load. (5) AN UTTERANCE STOPS HOLDING THE
+// JS THREAD: WAV + base64 encoding was one unbroken block of 18ms / 63ms / 143ms
+// for a 1.5s / 6s / 14s line; it now yields between ~1-second slices. Identical
+// bytes — same header, same samples, same base64 — so nothing about the voice
+// changes. (6) THE ALIVE BEAT IS THE APP'S, NOT ONE SCREEN'S. F7 DISPROVED the
+// "OTA kills the process a second in" reading: the beat was stamped by
+// ExplorationScreen alone and hydration lands on the title, so a title-idle
+// reclaim was recorded as a death 1s into the life — 14 of 27 cold boots. The
+// beat now runs app-wide every 3s while active, carries screen / AppState / boot
+// stage, writes no store state, and a title reclaim is classified and named as
+// one. Each OTA teardown component stamps its own outcome
+// (ota:teardown:<component>:complete|timeout|failed) without changing the
+// teardown, and the native crash verdict is asked once more when the SDK has not
+// resolved the previous run yet. (7) A TYPED ACTION REFUSED BY A PENDING ROLL
+// SAYS SO instead of returning in silence; the roll keeps its authority.
+// (8) The allocation candidate was re-checked and is already resolved in source
+// (allLocations is a module constant; the narration allow-list is cached).
+export const OTA_BUILD_ID = '2026-09-08-1741-the-work-nobody-will-read-gets-out-of-the-way';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-07-1740-nothing-wakes-a-screen-that-is-not-about-it';
 // golem catch-up 2026-09-07: markerless publish of OTA-1740 - the render/store
 // hot-path repair (LAG-2-5E91). The 6s world heartbeat reaches a screen only
 // through the fields it reads, and where a field is realtime, through the

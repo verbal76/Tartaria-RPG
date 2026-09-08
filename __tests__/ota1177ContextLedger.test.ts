@@ -389,7 +389,11 @@ describe('OTA-1177 — structure', () => {
     const install = src.indexOf('setContextLedgerSink(');
     expect(h).toBeGreaterThan(0);
     expect(install).toBeGreaterThan(h);
-    expect(install - h).toBeLessThan(4000);
+    // ⚠ LAG-3 — 4000 → 5000. The claim is unchanged (the sink is armed inside
+    // hydrate, near its top, before anything can load a context); the number is a
+    // proxy for that and moved because the forensics block above it gained the
+    // parallel-read note. hydrate() is 547 lines, so this window is still its head.
+    expect(install - h).toBeLessThan(5000);
   });
 
   test('OTA-1177 changes no behaviour — the instrument is additive only', () => {

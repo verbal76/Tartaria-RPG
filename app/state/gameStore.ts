@@ -53,7 +53,7 @@ import { landControl, controlLabel } from '../engine/enemyControl';
 // dispatch, the bulk-salvage guard, the loot picker's lead lane and the
 // INVESTIGATE ALL ordering. See engine/storyNouns.ts for why they must agree.
 import { rescueScenarioForNoun } from '../engine/storyNouns';
-import { emptyMemory, recordTags, discoverLocation, recordEnemyDefeat, recordNothingSearch, registerCanonLocation, setCanonLocationMarker, pickResolvedEvent, waterSourceReady, recordWaterUse, spireMoveNoticeLine } from '../engine/worldMemory';
+import { emptyMemory, recordTags, discoverLocation, recordEnemyDefeat, recordNothingSearch, registerCanonLocation, setCanonLocationMarker, pickResolvedEvent, pruneVisitedRooms, waterSourceReady, recordWaterUse, spireMoveNoticeLine } from '../engine/worldMemory';
 // OTA-1049 — Phase 1: the per-person ledger the greeting layer reads.
 import {
   spokenName, rememberNpcMeeting, recordNpcDealing, getRelation, npcGreeting, npcAbsenceLine, npcAddress, knowsPlayerName, vendorLedgerId, pocketLossMumble, lastAskedLine } from '../engine/npcMemory';
@@ -2882,13 +2882,10 @@ export function logUiTap(label: string): void {
   try {
     // OTA-1695 — the touch's own wait (noteTouchDown at onPressIn) rides the line:
     // `ui: tap "dodge" ⏱+4237ms late 4200ms` says the screen held the finger, not the player.
-    // ⚠⚠⚠ LAG-2 — STRAIGHT TO THE LEDGER, NOT THROUGH THE GAME STORE. Running
-    // `appendLog` here swept every mounted selector BEFORE the gameplay the
-    // player asked for began, to record a line no surface draws (`debug` is in
-    // gameLog.ts's HIDDEN_LOG_CHANNELS). `persistEntry` is the exact sink
-    // `appendLog` persists through, so the line still reaches the disk log in
-    // the same format — COPY LOG and the LogScreen read `readFullLog`, never
-    // `gameLog`. The synchronous breadcrumb below is untouched.
+    // ⚠⚠⚠ LAG-2 — STRAIGHT TO THE LEDGER, NOT THROUGH THE GAME STORE. `appendLog`
+    // here swept every mounted selector BEFORE the gameplay began, for a line no
+    // surface draws (`debug` is hidden — gameLog.ts). `persistEntry` is the sink
+    // it persists through, so the disk log is unchanged; so is the breadcrumb.
     void persistEntry(makeEntry('debug', `ui: tap "${label}"${takeTouchLateSuffix()}`));
     // ⚠⚠ OTA-1276 — AND STAMP IT WHERE A WEDGE CANNOT SWALLOW IT. The line
     // above goes into the BATCHED disk log, which drains on a promise chain —
@@ -3217,6 +3214,9 @@ export function backfillEnemyIntelFromDefeats(
 export function migrateLoadedWorldMemory(wm: WorldMemory): WorldMemory {
   return {
     ...wm,
+    // ⚠⚠ LAG-3 — nothing has appended to `worldRumors` since the board moved to
+    // `worldEvents` (cap 50); an older save can carry an unbounded one. Same cap.
+    worldRumors: wm.worldRumors ? wm.worldRumors.slice(-50) : wm.worldRumors,
     puppyVendorOwed: wm.puppyVendorOwed ?? false,
     puppyVendorUsed: wm.puppyVendorUsed ?? false,
     gemBossDefeatedKeys: wm.gemBossDefeatedKeys ?? [],
@@ -8059,10 +8059,8 @@ const POST_BOSS_GRACE_HOURS = 3;
 // slices/persistSlice.ts.
 
 
-// ⚠⚠⚠ LAG-2 — `coalesceLogNotifications` (state/storeNotify.ts, read it before
-// touching this line) lets an ordinary GAME-LOG write ride the next sweep this
-// action was going to perform anyway. The STATE is unchanged: every write below
-// still lands synchronously and every `get()` in the same turn reads it.
+// ⚠⚠⚠ LAG-2 — `coalesceLogNotifications` (state/storeNotify.ts — read it first)
+// lets a GAME-LOG write ride the next sweep; the state stays synchronous.
 export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get) => ({
   player: null,
   worldMemory: emptyMemory(),
@@ -9386,9 +9384,7 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
       }
     }
     // ⚠⚠ LAG-2 — THE ONE LOG-ONLY WRITE: both branches below return `gameLog`
-    // and nothing else, which is what makes it safe to publish with the next
-    // notification. Return a second key here and the marker must come off — a
-    // gameplay mutation is never folded into a log sweep.
+    // and nothing else. Return a second key here and the marker must come off.
     asLogOnlyWrite(() => set((state) => {
       const nextLog = [...state.gameLog, entry].slice(-MAX_LOG_IN_MEMORY);
       // HANDOFF #4 — same-channel debounce. When two `world` entries land
@@ -11583,8 +11579,10 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
     set((s) => ({
       worldMemory: {
         ...s.worldMemory,
+        // ⚠⚠ LAG-3 — the one place a new room key is born, so the one place the
+        // ledger is bounded (worldMemory.pruneVisitedRooms). saveTrim stays.
         visitedRooms: {
-          ...(s.worldMemory.visitedRooms ?? {}),
+          ...pruneVisitedRooms(s.worldMemory.visitedRooms ?? {}, roomKey),
           // ⚠ OTA-1104 — SPREAD, then override. This literal used to rebuild
           // the record field-by-field, and the arb107 comment it replaced was
           // its own indictment: "any un-spread field is dropped." Fields kept
@@ -12084,7 +12082,11 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
 
   submitPlayerAction(text, _opts) {
     const trimmed = text.trim();
-    if (!trimmed || get().pendingRolls) return;
+    if (!trimmed) return;
+    // ⚠⚠ LAG-3 — BLOCKED INPUT EXPLAINS WHY. As strict as it was (nothing
+    // bypasses it, no action runs, the roll keeps its authority) — it stops
+    // being SILENT, which read as a frozen input box rather than as a rule.
+    if (get().pendingRolls) { get().appendLog('system', 'Settle the roll first — tap ROLL, then take your action.'); return; }
     // ⚠ OTA-1356 — the whole action body runs under one try/finally so EVERY
     // exit path (dozens of early returns) stamps `engine-done` on the dying-
     // breath crumb. A crumb that survives a freeze WITHOUT this phase says the

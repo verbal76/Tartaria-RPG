@@ -189,6 +189,28 @@ export interface PressureSnapshot {
     wastedCalls: number;
     wastedMs: number;
   };
+  /** ⚠⚠⚠ LAG-3 — THE QUEUE ITSELF, not the generations that came out of it.
+   *  `native` above prices completed calls; F7's Johnny session showed the gap
+   *  that leaves: worst wait 4.4s, two job kinds past 3s, eleven generations
+   *  discarded — and a freeze watch reporting no stalls at all, because the JS
+   *  thread really was healthy. This is what the queue was doing, bounded to a
+   *  handful of scalars, so the wait is legible on the report's own face
+   *  instead of being reconstructed from unrelated log lines. */
+  nativeQueue?: {
+    depth: number;
+    oldestWaitMs: number;
+    runningLane: string;
+    runningKind: string | null;
+    runningForMs: number;
+    queuedLanes: string;
+    jobsRun: number;
+    worstWaitMs: number;
+    worstWaitKind: string | null;
+    longWaits: number;
+    rejectedBeforePrefill: number;
+    obsoleteCut: number;
+    obsoleteDeferred: number;
+  };
   lastVerdict: FreezeVerdict;
   worstFrameGapMs: number;
   worstJsGapMs: number;
@@ -293,6 +315,23 @@ export function runtimePressureSummary(s: PressureSnapshot): string {
       out.push(`     The JS thread was healthy and the native model queue was not.`
         + ` A stall the freeze watch above is structurally blind to.`);
     }
+  }
+  // ⚠⚠ LAG-3 — the queue's own books beside the generations' (see nativeQueue).
+  // Printed whenever any job has run, because "0 refused, 0 cut, worst wait
+  // 0.2s" is itself the answer to "was the queue the problem this session".
+  const q = s.nativeQueue;
+  if (q && q.jobsRun > 0) {
+    const qBits = [
+      `${q.jobsRun} job${q.jobsRun === 1 ? '' : 's'}`,
+      `worst wait ${(q.worstWaitMs / 1000).toFixed(1)}s${q.worstWaitKind ? ` (${q.worstWaitKind})` : ''}`,
+      `${q.longWaits} past 3s`,
+    ];
+    if (q.rejectedBeforePrefill > 0) qBits.push(`${q.rejectedBeforePrefill} refused before prefill`);
+    if (q.obsoleteCut > 0) qBits.push(`${q.obsoleteCut} cut as obsolete`);
+    if (q.obsoleteDeferred > 0) qBits.push(`${q.obsoleteDeferred} yielded to live work`);
+    if (q.depth > 0) qBits.push(`queued now q${q.depth}, oldest ${(q.oldestWaitMs / 1000).toFixed(1)}s (${q.queuedLanes})`);
+    if (q.runningLane !== 'idle') qBits.push(`running ${q.runningKind ?? q.runningLane} for ${(q.runningForMs / 1000).toFixed(1)}s`);
+    out.push(`  ${q.longWaits > 0 ? '⚠ ' : ''}Native queue admission: ${qBits.join(' · ')}`);
   }
   const trail = s.appStateTrail.slice(-6);
   out.push(`  App state trail: ${trail.length ? trail.join(' → ') : '(none recorded)'}`);

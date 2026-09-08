@@ -167,7 +167,10 @@ describe('OTA-1567 — an idle reclaim is recorded, but is not a crash', () => {
   const BOOT = src('app/state/slices/bootSlice.ts');
 
   it('⚠⚠⚠ THE IDLE SIGNATURE IS NAMED, AND IT IS 78% OF THE LEDGER', () => {
-    expect(BOOT).toContain("const idle = crumb.phase === 'rendered' && crumb.what === '(no action yet)';");
+    // ⚠ LAG-3 — the same signature, now OR'd with the title-screen one: F7 proved
+    // an idle title reclaim was being recorded as a death 1s into the process
+    // because only ExplorationScreen beat. Both are idle; neither is fatal.
+    expect(BOOT).toContain("(crumb.phase === 'rendered' && crumb.what === '(no action yet)') || onTitle;");
     expect(BOOT).toContain('isFatal: !idle,');
   });
 

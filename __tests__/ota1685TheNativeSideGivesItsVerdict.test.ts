@@ -142,7 +142,11 @@ describe('OTA-1685 — ⚠⚠ the verdict is printed and carried', () => {
   it('the boot asks AFTER Sentry is installed and the ledger is loaded, inside a guard', () => {
     const install = APP.indexOf('st.installSentryIfAvailable();');
     const load = APP.indexOf('await cl.loadCrashLedger();');
-    const ask = APP.indexOf('const verdict = await st.nativeSdkSawCrashLastRun();');
+    // ⚠ LAG-3 — `let`, not `const`: the verdict is asked again once when the SDK
+    // answers non-boolean ("the native side had not resolved the last run yet"),
+    // which is a timing answer rather than an absence of one. Same position in
+    // the boot, same guard, same reason recorded either way.
+    const ask = APP.indexOf('let verdict = await st.nativeSdkSawCrashLastRun();');
     const apply = APP.indexOf('const line = await cl.applyNativeSdkVerdict(verdict);');
     expect(install).toBeGreaterThan(-1);
     expect(load).toBeGreaterThan(install);

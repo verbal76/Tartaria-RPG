@@ -218,6 +218,23 @@ interface PendingMl {
    *  interruptible work (homework) supplies one; everything else is work
    *  someone is waiting for, and finishing it IS the point. */
   onPreempt?: () => void;
+  /** ⚠ LAG-3 — the job's own name (`narration:travel`, `voice:line`, …). The
+   *  lane says which KIND of native work; this says which job, which is what a
+   *  device report needs to read a 4-second wait without reconstructing it. */
+  kind?: string;
+  /** LAG-3 — when it joined the queue, for the wait metrics below. */
+  at: number;
+  /** ⚠⚠ LAG-3 — "is this work still wanted?" Answered by the consumer, asked by
+   *  the SCHEDULER. An obsolete job is not merely discardable at the end — it
+   *  must not be preferred over live work of the same rank, and if it is already
+   *  running it may be cut. Never assumed: absent means "still wanted". */
+  isObsolete?: () => boolean;
+  /** ⚠⚠ LAG-3 — cut this op short because it went OBSOLETE, which is a
+   *  different question from OTA-1123's "something outranks you". Kept separate
+   *  on purpose: OTA-1134 decided narration is not preemptible by rank, and
+   *  that decision stands. A narration nobody will ever read is not the work
+   *  that decision was protecting. */
+  onObsolete?: () => void;
 }
 
 const pending: PendingMl[] = [];
@@ -227,6 +244,34 @@ let seqCounter = 0;
  *  Exactly one op runs at a time, so a single slot is the whole registry. */
 let runningPriority = ML_PRIORITY_LLM;
 let runningPreempt: (() => void) | null = null;
+/** LAG-3 — the running op's identity, obsolescence test and start time. */
+let runningKind: string | null = null;
+let runningStartedAt = 0;
+let runningIsObsolete: (() => boolean) | null = null;
+let runningOnObsolete: (() => void) | null = null;
+
+/* ⚠⚠⚠ LAG-3 — THE NATIVE QUEUE KEEPS ITS OWN BOOKS.
+ *
+ * Fable's device audit found the diagnostic surface structurally blind to half
+ * the lag a player feels: the Johnny session's JS freeze watch was clean while
+ * the native queue's worst wait was 4.4 seconds, two job kinds waited past three
+ * seconds, and eleven generations were thrown away after 77.9 seconds of work.
+ * `qwenTelemetry` prices the GENERATIONS; nothing priced the QUEUE, so a report
+ * showing a three-second wait had to be reconstructed by hand from unrelated
+ * lines. These counters are bounded (a handful of integers and one string), they
+ * never allocate per token, and they are read by the runtime-pressure snapshot
+ * that already lands in the bug report header. */
+let mlJobsRun = 0;
+let mlWorstWaitMs = 0;
+let mlWorstWaitKind: string | null = null;
+let mlLongWaits = 0;
+let mlObsoleteCut = 0;
+let mlObsoleteDeferred = 0;
+let mlRejectedBeforePrefill = 0;
+/** A wait past this is not queueing, it is the player waiting (the same
+ *  threshold qwenTelemetry's NATIVE_WAIT_WARN_MS uses; kept local so this file
+ *  stays the pure leaf `app/state/sprint.ts` relies on it being). */
+export const ML_WAIT_WARN_MS = 3_000;
 /** OTA-1144 — epoch (ms) until which a queued-but-not-yet-arrived voice line
  *  holds the lock open. 0 = no reservation. */
 let voiceReservedUntil = 0;
@@ -296,11 +341,33 @@ function pumpMl(): void {
   // Pick the highest priority; FIFO (lowest seq) within the same priority. A
   // native call already in flight can't be preempted — `running` guards that —
   // so priority only reorders the WAITING set, never overlaps execution.
+  // ⚠⚠⚠ LAG-3 — OBSOLETE WORK LOSES ITS PLACE IN LINE, WITHOUT PROMOTING
+  // ANYTHING. Fable measured `investigate_lore` — work the player is waiting on
+  // — sitting 3.3-4.4 seconds behind other Qwen work at the SAME rank, where
+  // FIFO decides. Raising a rank would have been the wrong tool (the task's own
+  // guard: *do not simply raise everything to high priority*); the honest fix is
+  // semantic, and it costs nothing: a job whose consumer has already written it
+  // off is not equal work, so at equal rank the live job goes first. Ordering
+  // between two live jobs, and between ranks, is untouched — and if EVERY
+  // waiter is obsolete the queue still runs them, where each meets the door in
+  // LlamaRuntime and settles for nothing.
+  const obsolete = (t: PendingMl): boolean => {
+    try { return t.isObsolete?.() === true; } catch { return false; }
+  };
   let bestIdx = 0;
+  let bestDead = obsolete(pending[0]!);
   for (let i = 1; i < pending.length; i++) {
     const a = pending[i]!;
     const b = pending[bestIdx]!;
-    if (a.priority > b.priority || (a.priority === b.priority && a.seq < b.seq)) bestIdx = i;
+    const aDead = obsolete(a);
+    const better = a.priority > b.priority
+      || (a.priority === b.priority && bestDead && !aDead)
+      || (a.priority === b.priority && bestDead === aDead && a.seq < b.seq);
+    if (better) {
+      if (a.priority === b.priority && bestDead && !aDead) mlObsoleteDeferred += 1;
+      bestIdx = i;
+      bestDead = aDead;
+    }
   }
   // ⚠ OTA-1144 — hold the slot for a voice line that is on its way but has not
   // reached the lock yet (see VOICE_RESERVATION_MS). Only work BELOW voice
@@ -322,6 +389,15 @@ function pumpMl(): void {
   running = true;
   runningPriority = task.priority;
   runningPreempt = task.onPreempt ?? null;
+  // LAG-3 — the queue's own books (see the counters above).
+  runningKind = task.kind ?? null;
+  runningStartedAt = Date.now();
+  runningIsObsolete = task.isObsolete ?? null;
+  runningOnObsolete = task.onObsolete ?? null;
+  mlJobsRun += 1;
+  const waited = runningStartedAt - task.at;
+  if (waited > mlWorstWaitMs) { mlWorstWaitMs = waited; mlWorstWaitKind = task.kind ?? laneOf(task.priority); }
+  if (waited >= ML_WAIT_WARN_MS) mlLongWaits += 1;
   stampNativePhase('start', task.priority, pending.length); // OTA-1546
   // ⚠⚠⚠ OTA-1675 — `done` IS STAMPED BEFORE THE CALLER IS RESOLVED. It used to
   // ride the `.then` AFTER `task.resolve`, one microtask late — and the caller's
@@ -344,6 +420,9 @@ function pumpMl(): void {
     .then(() => {
       running = false;
       runningPreempt = null;
+      runningKind = null;
+      runningIsObsolete = null;
+      runningOnObsolete = null;
       pumpMl();
     });
 }
@@ -355,6 +434,10 @@ export function runExclusiveNativeMl<T>(
   fn: () => Promise<T>,
   priority: number = ML_PRIORITY_LLM,
   onPreempt?: () => void,
+  /** ⚠ LAG-3 — optional and additive: the job's name for the queue books, the
+   *  test that says whether it is still wanted, and the hook that ends it early
+   *  when it is not. Every existing caller keeps its exact behaviour. */
+  meta?: { kind?: string; isObsolete?: () => boolean; onObsolete?: () => void },
 ): Promise<T> {
   return new Promise<T>((resolve, reject) => {
     pending.push({
@@ -364,6 +447,10 @@ export function runExclusiveNativeMl<T>(
       priority,
       seq: seqCounter++,
       onPreempt,
+      kind: meta?.kind,
+      at: Date.now(),
+      isObsolete: meta?.isObsolete,
+      onObsolete: meta?.onObsolete,
     });
     // ⚠ OTA-1123 — ask the running op to finish early if this one outranks it.
     // Fired on ENQUEUE, not on pump: the whole point is to shorten a wait that
@@ -427,6 +514,132 @@ export function preemptHomeworkForPlayer(): boolean {
   homeworkCutsForPlayer += 1;
   try { cut(); } catch { /* a broken hook must never wedge the chain */ }
   return true;
+}
+
+/**
+ * ⚠⚠⚠ LAG-3 — WORK THAT NOBODY WILL READ YIELDS TO WORK SOMEBODY IS WAITING FOR.
+ *
+ * F7 measured reactive travel narration spending 8.7-10.9 seconds in native
+ * prompt/prefill for output the player's next action had already invalidated,
+ * and `investigate_lore` waiting 3.3-4.4 seconds behind it. OTA-1368 built two
+ * of the three doors — refuse at the lock, stop at the first token — and stated
+ * the limit itself: *prefill is uninterruptible, and prefill is where this model
+ * spends its time*. So the third door cannot be another check inside the job. It
+ * has to be a signal from OUTSIDE, at the moment the work BECOMES obsolete —
+ * which is the moment the epoch moves.
+ *
+ * ⚠ THIS IS NOT OTA-1123's PREEMPTION, AND IT DELIBERATELY USES A DIFFERENT
+ * HOOK. That one answers "something outranks you"; OTA-1134 decided narration
+ * must not yield to rank, and nothing here disturbs that. This answers "your
+ * reader has gone", which no rank can express: a narration the player has
+ * already walked past is not work being cut short, it is work that has already
+ * failed. Only a job that supplies `isObsolete` AND `onObsolete` can be cut, and
+ * only when its own test says so.
+ *
+ * ⚠ EXCLUSIVITY IS UNTOUCHED — this asks the running op to finish early exactly
+ * as OTA-1123 does; it never overlaps two native ops. And on a job still in
+ * PREFILL, llama.cpp's stopCompletion lands only once decode starts, so the win
+ * is bounded by where the job actually is: full on a writing job, partial on a
+ * reading one. The scheduler change above is the half that covers prefill.
+ *
+ * Returns whether a job was actually cut, so a test can tell a real preemption
+ * from a no-op.
+ */
+export function preemptObsoleteNativeWork(): boolean {
+  if (!running || !runningOnObsolete || !runningIsObsolete) return false;
+  let dead = false;
+  try { dead = runningIsObsolete() === true; } catch { return false; }
+  if (!dead) return false;
+  const cut = runningOnObsolete;
+  runningOnObsolete = null;
+  mlObsoleteCut += 1;
+  try { cut(); } catch { /* a broken hook must never wedge the chain */ }
+  return true;
+}
+
+/** ⚠ LAG-3 — LlamaRuntime's door (OTA-1368) fired: a job reached the lock and
+ *  was written off before any prefill happened. Counted here rather than in the
+ *  generation telemetry because it is a QUEUE fact — it is the number that says
+ *  whether the admission repair is working at all. */
+export function noteRejectedBeforePrefill(): void {
+  mlRejectedBeforePrefill += 1;
+}
+
+/** ⚠⚠ LAG-3 — WHAT THE NATIVE QUEUE IS DOING, BOUNDED. Read by the runtime-
+ *  pressure snapshot (which lands in the bug-report header) and by the freeze
+ *  watch, so a device report showing a multi-second native wait says so on its
+ *  own face. Every field is a scalar or a short string: no per-token telemetry,
+ *  no growth with session length. */
+export interface NativeQueuePressure {
+  /** Waiters right now, and how long the oldest has been waiting. */
+  depth: number;
+  oldestWaitMs: number;
+  /** What is on the CPU: its lane, its job name, and for how long. */
+  runningLane: string;
+  runningKind: string | null;
+  runningForMs: number;
+  /** The lanes waiting behind it, deduped and ordered — a short string. */
+  queuedLanes: string;
+  /** Session worsts and totals. */
+  jobsRun: number;
+  worstWaitMs: number;
+  worstWaitKind: string | null;
+  longWaits: number;
+  /** LAG-3's own three numbers: work refused at the door before any prefill,
+   *  work cut because it went obsolete while running, and times a live job was
+   *  chosen over an obsolete one of the same rank. */
+  rejectedBeforePrefill: number;
+  obsoleteCut: number;
+  obsoleteDeferred: number;
+}
+
+export function nativeQueuePressure(): NativeQueuePressure {
+  const now = Date.now();
+  let oldest = 0;
+  const lanes: string[] = [];
+  for (const t of pending) {
+    const w = now - t.at;
+    if (w > oldest) oldest = w;
+    const l = laneOf(t.priority);
+    if (!lanes.includes(l)) lanes.push(l);
+  }
+  return {
+    depth: pending.length,
+    oldestWaitMs: oldest,
+    runningLane: running ? laneOf(runningPriority) : 'idle',
+    runningKind: running ? runningKind : null,
+    runningForMs: running ? Math.max(0, now - runningStartedAt) : 0,
+    queuedLanes: lanes.join('+'),
+    jobsRun: mlJobsRun,
+    worstWaitMs: Math.round(mlWorstWaitMs),
+    worstWaitKind: mlWorstWaitKind,
+    longWaits: mlLongWaits,
+    rejectedBeforePrefill: mlRejectedBeforePrefill,
+    obsoleteCut: mlObsoleteCut,
+    obsoleteDeferred: mlObsoleteDeferred,
+  };
+}
+
+/** ⚠ One line for the log / freeze watch. Empty when the queue has never been
+ *  under pressure, so a clean session does not carry a line saying so. */
+export function nativeQueuePressureLine(): string {
+  const p = nativeQueuePressure();
+  if (p.jobsRun === 0) return '';
+  const parts = [`native queue: ${p.jobsRun} jobs`];
+  if (p.worstWaitMs >= 250) parts.push(`worst wait ${(p.worstWaitMs / 1000).toFixed(1)}s${p.worstWaitKind ? ` (${p.worstWaitKind})` : ''}`);
+  if (p.longWaits > 0) parts.push(`${p.longWaits} past ${ML_WAIT_WARN_MS / 1000}s`);
+  if (p.rejectedBeforePrefill > 0) parts.push(`${p.rejectedBeforePrefill} refused before prefill`);
+  if (p.obsoleteCut > 0) parts.push(`${p.obsoleteCut} cut as obsolete`);
+  if (p.obsoleteDeferred > 0) parts.push(`${p.obsoleteDeferred} yielded to live work`);
+  if (p.depth > 0) parts.push(`q${p.depth} oldest ${(p.oldestWaitMs / 1000).toFixed(1)}s`);
+  if (p.runningLane !== 'idle') parts.push(`running ${p.runningKind ?? p.runningLane} ${(p.runningForMs / 1000).toFixed(1)}s`);
+  return parts.join(' · ');
+}
+
+/** Tests only — the queue books are module state. */
+export function _resetNativeQueueStatsForTest(): void {
+  mlJobsRun = 0; mlWorstWaitMs = 0; mlWorstWaitKind = null; mlLongWaits = 0;
+  mlObsoleteCut = 0; mlObsoleteDeferred = 0; mlRejectedBeforePrefill = 0;
 }
 
 /** ⚠ How many times a player action has cut a homework job this session. The

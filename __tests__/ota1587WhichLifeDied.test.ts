@@ -217,7 +217,11 @@ describe('OTA-1587 — wired where a dying process will actually reach it', () =
   });
 
   it('⚠⚠ boot reads the handoff and files it on the death record', () => {
-    expect(BOOT).toContain('const launch = launchFacts(await readOtaHandoff());');
+    // ⚠ LAG-3 — the handoff and the surviving crumb are two independent keys
+    // and now read together; the ORDER OF USE below is unchanged, which is what
+    // this claim has always been about.
+    expect(BOOT).toContain('await Promise.all([readOtaHandoff(), readSurvivingBreadcrumb()]);');
+    expect(BOOT).toContain('const launch = launchFacts(handoff);');
     expect(BOOT).toContain('get().appendLog(\'debug\', launchLine(launch));');
     // ⚠⚠⚠ OTA-1674 — THIS PIN USED TO READ `afterOtaApply: launch.afterOtaApply,`
     // AND IT WAS PINNING THE DEFECT. `launch` is the READING life's facts. The

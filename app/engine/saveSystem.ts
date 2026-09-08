@@ -802,6 +802,12 @@ export interface LiveBreadcrumb {
   at: number;
   what: string;
   screen?: string;
+  /** ⚠ LAG-3 — the AppState the alive beat last saw, and the boot stage it was
+   *  in. Together with `screen` these are what separate "reclaimed while idling
+   *  on the title" from "died during play", which F7 proved the record could
+   *  not previously say. */
+  appState?: string;
+  aliveStage?: string;
   room?: string;
   /** ⚠ OTA-1356 — the last checkpoint this activity reached (see
    *  stampBreadcrumbPhase). Absent on crumbs written before the phase system. */
@@ -1035,6 +1041,37 @@ export function stampBreadcrumbPhase(phase: string, detail?: string): void {
     _lastLiveCrumb = withBootIdentity(next);
     _lastPhaseWriteAt = now;
     void AsyncStorage.setItem(LAST_BREADCRUMB_KEY, JSON.stringify(_lastLiveCrumb)).catch(() => { /* ignore */ });
+  } catch { /* never let instrumentation break the game */ }
+}
+
+/** ⚠⚠⚠ LAG-3 — THE APP-LEVEL SIGN OF LIFE, WITH THE CONTEXT A DEATH RECORD NEEDS.
+ *
+ *  `stampBreadcrumbPhase(HEARTBEAT_PHASE)` above already dates the last sign of
+ *  life, and everything it does — the 500ms throttle, the orderly-exit
+ *  reconciliation that must never be throttled, leaving a real checkpoint's
+ *  `phase` standing — is exactly right and is reused verbatim. What it could not
+ *  do is say WHERE the app was, because its one caller was a single screen.
+ *
+ *  F7's finding: hydration lands on the TITLE screen, only ExplorationScreen
+ *  beat, so a process that idled on the title and was later reclaimed recorded
+ *  "died ~1 second into the process" — the same signature on 14 of 27 cold
+ *  boots. The beat now runs app-wide (diagnostics/aliveBeat) and carries the
+ *  screen, the AppState and the boot stage, so an idle-title reclaim is
+ *  distinguishable from a death during active play instead of looking identical.
+ *
+ *  ⚠ It refreshes those three fields and NOTHING else — the phase, the action
+ *  label and every ledger field keep whatever the last real checkpoint set. */
+export function stampAliveBeat(ctx: { screen?: string; appState?: string; stage?: string }): void {
+  try {
+    const base = _lastLiveCrumb;
+    if (base) {
+      const next: LiveBreadcrumb = { ...base };
+      if (ctx.screen) next.screen = ctx.screen;
+      if (ctx.appState) next.appState = ctx.appState;
+      if (ctx.stage) next.aliveStage = ctx.stage;
+      _lastLiveCrumb = next;
+    }
+    stampBreadcrumbPhase(HEARTBEAT_PHASE);
   } catch { /* never let instrumentation break the game */ }
 }
 
