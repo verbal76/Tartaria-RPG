@@ -364,8 +364,13 @@ describe('one generalised treatment, not a second unrelated effect', () => {
     expect(TITLE).toContain('function DossierField(');
     expect((TITLE.match(/<DossierField/g) ?? []).length).toBe(2);   // collapsed + expanded
     expect((TITLE.match(/styles\.dossierFieldClip/g) ?? []).length).toBe(1);
-    // the faction lookup happens ONCE per row, above the branch
-    expect((TITLE.match(/const crest = factionCrest\(item\.factionId\);/g) ?? []).length).toBe(1);
+    /* the faction lookup happens ONCE per row, above the branch.
+     * ⚠ WHICH FIELD it reads is not this suite's business — OTA-1749 changed it
+     * from the summary's optional `factionId` to a helper that also recovers the
+     * id from `characterSeed`, because older saves have no faction recorded at
+     * all. The claim here is only that there is exactly ONE lookup serving both
+     * card states, which is what makes this one treatment rather than two. */
+    expect((TITLE.match(/const crest = factionCrest\(/g) ?? []).length).toBe(1);
   });
 
   test('it sits behind everything the card draws', async () => {

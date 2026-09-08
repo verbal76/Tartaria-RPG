@@ -374,9 +374,18 @@ describe('OTA-1742 — the faction emblem is the expansion reward', () => {
   it('⚠⚠ a save with no faction, or a faction with no art, renders NOTHING — never a stand-in', () => {
     expect(factionCrest(undefined)).toBeUndefined();
     expect(factionCrest('no_such_faction')).toBeUndefined();
-    // And the screen guards on exactly that, rather than falling back to a glyph.
+    /* And the screen guards on exactly that, rather than falling back to a glyph.
+     * ⚠ ANCHORED ON THE GUARD, NOT ON THE LOOKUP. This used to also pin the
+     * literal `factionCrest(item.factionId)` call, which broke twice for no
+     * defect: OTA-1747 moved the lookup above the collapsed/expanded branch, and
+     * OTA-1749 changed WHICH field it reads (the summary's faction is optional
+     * and older saves have none, so it now recovers the id from characterSeed).
+     * Both were legitimate changes to a line this test only cared about as a
+     * landmark. What the test is actually about is the REFUSAL — no art, no
+     * emblem, never a stand-in — so that is what it pins. */
     expect(TITLE).toContain('{crest !== undefined && (');
-    expect(TITLE).toContain('const crest = factionCrest(item.factionId);');
+    expect(TITLE).toContain('if (crest === undefined) return null;');
+    expect(TITLE).toMatch(/const crest = factionCrest\(/);
   });
 
   it('⚠⚠⚠ the emblem appears on the EXPANDED record and never on a collapsed one', async () => {
@@ -408,7 +417,14 @@ describe('OTA-1742 — the faction emblem is the expansion reward', () => {
   });
 
   it('⚠⚠ the emblem cannot take a tap, cover text, or sit over the gesture layer', () => {
-    const openBranch = TITLE.slice(TITLE.indexOf('const crest = factionCrest(item.factionId);'), TITLE.indexOf('const styles = StyleSheet.create'));
+    /* ⚠ THE SLICE ANCHOR IS A STRUCTURAL MARKER, NOT A LINE THAT CHURNS.
+     * `styles.dossierOuterOpen` is what MAKES this the expanded branch, so it
+     * cannot drift without the branch itself changing. The previous anchor was
+     * the faction-lookup line, which two later OTAs legitimately rewrote — and
+     * when an anchor misses, `slice` returns '' and every assertion under it
+     * fails for a reason that has nothing to do with what it tests. */
+    const openBranch = TITLE.slice(TITLE.indexOf('styles.dossierOuterOpen,'), TITLE.indexOf('const styles = StyleSheet.create'));
+    expect(openBranch).not.toBe('');
     // It lives in its own layout column beside the written column — not
     // absolutely positioned over the record — so it cannot land on a name, a
     // wrapped objective or a dead-row button.

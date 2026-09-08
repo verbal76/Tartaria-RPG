@@ -36,7 +36,7 @@ import { buildBasicDeviceSummary, stampLogExport } from '../diagnostics/aboutSum
 import { loadCrashSave, clearCrashSave, buildCrashSaveExport, type CrashSaveCapture } from '../diagnostics/crashSave';
 import racesData from '../data/races/races.json';
 import locationsData from '../data/locations/locations.json';
-import { readSlotLog, loadSlot, type SlotSummary } from '../engine/saveSystem';
+import { readSlotLog, loadSlot, summaryFactionId, type SlotSummary } from '../engine/saveSystem';
 // ⚠ PHONE-FIX — `importSaveAsNewSlot` / `decodeSaveExport` went to Settings with
 // RESTORE (see app/ui/restoreCharacter.ts). `encodeSaveExport` stays: the dead
 // rows' COPY LOG / BACK UP still write one here.
@@ -569,9 +569,20 @@ export function TitleScreen() {
   // expanded at a time; expanding one collapses the last. Swipe-to-delete
   // works in both states (SwipeableRow wraps both).
   const renderItem = ({ item }: { item: SlotSummary }) => {
-    // ⚠ VIS-3 / OTA-1747 — hoisted out of the expanded branch, because BOTH
-    // states wear the field now. One lookup, one source, either card.
-    const crest = factionCrest(item.factionId);
+    /* ⚠⚠⚠ OTA-1749 — `summaryFactionId`, NOT `item.factionId`, AND THAT WAS THE
+       "SPORADIC" BUG. Owner, on the device: the faded emblem shows on some cards
+       and not others. It was never sporadic — `SlotSummary.factionId` is
+       OPTIONAL and is written into the index at SAVE time (since OTA-036), so a
+       character not saved since then has a summary with no faction on it, and
+       this row drew nothing while the row beside it drew correctly. The id is
+       recoverable for free: `characterSeed` IS `name|raceId|factionId|<created>`
+       (OTA-1311), so the helper reads it back out of the encoding its own
+       `characterSeedOf` writes. No save migration, no extra disk read.
+       ⚠ This also repairs the FACTION PLATE on the expanded card, which has had
+       the identical hole since VIS-1 and nobody had connected the two.
+       ⚠ VIS-3 / OTA-1747 — hoisted out of the expanded branch, because BOTH
+       states wear the field now. One lookup, one source, either card. */
+    const crest = factionCrest(summaryFactionId(item));
     if (expandedSlotId !== item.slotId) {
       /* ⚠⚠⚠ VIS-1 — A RECOVERED RECORD, NOT AN APPLICATION ROW. The collapsed
          dossier keeps exactly the two lines it always showed (name + time, then

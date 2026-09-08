@@ -29187,7 +29187,31 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // plus its hitSlop, never the glyph. No image, no font, no animation, no state,
 // no measurement. Colours are unchanged at each site: ceramic in the exploration
 // rail so Settings does not compete, the brand gold in the title corner.
-export const OTA_BUILD_ID = '2026-09-08-1748-the-settings-mark-is-drawn';
+// ── OTA-1749 — THE FACTION THE INDEX FORGOT ──────────────────────────────────
+// Owner, on the device: the faded faction emblem shows on some character cards
+// and not others. It was never sporadic. `SlotSummary.factionId` is OPTIONAL and
+// always was - it is written into the roster index at SAVE time, and only
+// started being written at OTA-036 - so a character who has not been saved since
+// then has a summary carrying no faction at all, and every reader that branched
+// on it silently drew nothing for that row while the row beside it drew
+// correctly. OTA-1747 made the watermark reach every card; this makes every card
+// know which faction it belongs to.
+// No save migration was needed, because the id was already there. `characterSeed`
+// IS that encoding - name|raceId|factionId|<created-at>, minted once at creation
+// and carried in the index since OTA-1311 - so `summaryFactionId` reads the third
+// field back out of the string that `characterSeedOf` writes. The two live
+// together so the format is stated once and a change to either has the other in
+// view. It costs no disk read and no extra state.
+// It cannot make anything worse: the helper returns a string, not a promise that
+// the string means anything, so a seed in some older shape yields a value that
+// resolves to no art - exactly today's behaviour - and a summary with neither
+// field still returns undefined, which is the honest answer rather than loading
+// every save off disk to draw a watermark. The moment such a character is played
+// and saved, both fields land and the card is complete.
+// The same hole had been quietly costing the expanded card its riveted FACTION
+// PLATE since VIS-1; nobody had connected the two, and this repairs both.
+export const OTA_BUILD_ID = '2026-09-08-1749-the-faction-the-index-forgot';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-08-1748-the-settings-mark-is-drawn';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-08-1747-the-faction-field-reaches-every-card';
 // golem catch-up 2026-09-08: markerless publish of OTA-1747 - the faction field
 // reaches every card. OTA-1746 printed a Tartarian's faction art into the

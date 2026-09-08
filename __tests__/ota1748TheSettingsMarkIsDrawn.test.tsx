@@ -241,9 +241,13 @@ describe('nine static Views, and the header is the height it was', () => {
     expect(size).toBe(Math.round(11 * 1.25));
   });
 
-  test('the build stamp names this pass', () => {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { OTA_BUILD_ID } = require('../app/buildInfo') as { OTA_BUILD_ID: string };
-    expect(OTA_BUILD_ID).toBe('2026-09-08-1748-the-settings-mark-is-drawn');
+  test('this pass has a stamp of its own, live or superseded', () => {
+    /* ⚠ DURABLE CLAIM, NOT A ONE-RELEASE PIN. I wrote the equality form three
+     * times in one day and it went red three times, never once for a defect:
+     * the next OTA supersedes the stamp within hours. The house rule is one OTA,
+     * one stamp, with the previous kept on a `// SUPERSEDED:` line — so the
+     * durable claim is that this pass's stamp is IN the ledger, live or not. */
+    const BUILD = read('app', 'buildInfo.ts');
+    expect(BUILD).toContain("'2026-09-08-1748-the-settings-mark-is-drawn'");
   });
 });

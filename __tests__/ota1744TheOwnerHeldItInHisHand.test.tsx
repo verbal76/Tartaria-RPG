@@ -243,7 +243,10 @@ describe('OTA-1744 — 2. the emblem is legible', () => {
   });
 
   it('⚠ and it still cannot cover the record or take a tap', () => {
-    const open = TITLE.slice(TITLE.indexOf('const crest = factionCrest(item.factionId);'), TITLE.indexOf('const styles = StyleSheet.create'));
+    // ⚠ Same anchor repair as ota1742: slice on the marker that DEFINES the
+    // expanded branch, not on the faction-lookup line that later OTAs rewrote.
+    const open = TITLE.slice(TITLE.indexOf('styles.dossierOuterOpen,'), TITLE.indexOf('const styles = StyleSheet.create'));
+    expect(open).not.toBe('');
     expect(open).toContain('styles.dossierSplit');
     expect(open).toContain('<View style={styles.dossierSeal} pointerEvents="none">');
     expect(KIT).toContain('pointerEvents="none" testID={FACTION_PLATE_TEST_ID}');

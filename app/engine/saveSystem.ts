@@ -169,6 +169,43 @@ export function characterSeedOf(
   return p.mapSeed ?? `${p.name}|${p.raceId}|${p.factionId}|legacy`;
 }
 
+/** ⚠⚠⚠ THE SUMMARY'S FACTION, RECOVERED WHEN THE INDEX NEVER RECORDED IT.
+ *
+ *  `SlotSummary.factionId` is OPTIONAL and always was: it is written into the
+ *  index at SAVE time, and only started being written at OTA-036. So a character
+ *  who has not been saved since then has a summary carrying no faction at all —
+ *  and every reader that branched on `item.factionId` silently got nothing for
+ *  that character while working perfectly for the one beside it. That is exactly
+ *  how the roster's faction artwork came to appear on some cards and not others,
+ *  which is what the owner saw on the device.
+ *
+ *  ⚠⚠ AND IT NEEDS NO SAVE MIGRATION, because the id is already there.
+ *  `characterSeed` IS this encoding — `name|raceId|factionId|<created-at>` —
+ *  minted once at creation and carried in the index since OTA-1311. Reading the
+ *  third field back out is the exact inverse of `characterSeedOf` above, which
+ *  is why the two live together: the format is stated ONCE, and a change to
+ *  either has the other in view.
+ *
+ *  ⚠ IT CANNOT MAKE ANYTHING WORSE. This returns a STRING, not a promise that
+ *  the string means anything: callers still resolve it (`factionCrest` returns
+ *  undefined for an id it has no art for), so a seed in some older shape yields
+ *  a value that resolves to nothing — precisely today's behaviour. A summary
+ *  with NEITHER field still returns undefined, which is the honest answer: that
+ *  id is not recoverable without loading the whole save, and the roster is not
+ *  going to read every slot off disk to draw a watermark. The moment such a
+ *  character is played and saved, both fields land and the card is complete. */
+export function summaryFactionId(
+  s: { factionId?: string; characterSeed?: string },
+): string | undefined {
+  if (s.factionId) return s.factionId;
+  const seed = s.characterSeed;
+  if (!seed) return undefined;
+  // name | raceId | factionId | <created-at>. Anything shorter is a seed in a
+  // shape this function does not know, and guessing at it is worse than nothing.
+  const parts = seed.split('|');
+  return parts.length >= 4 && parts[2] ? parts[2] : undefined;
+}
+
 /** ⚠⚠ OTA-1311 — THE ROLL OF THE FALLEN, THE PART THAT MUST NEVER FORGET.
  *
  *  `stash.fallen` is the memorial and it is CAPPED at 25 — by design, it is a
