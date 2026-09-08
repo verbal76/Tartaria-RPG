@@ -29380,6 +29380,30 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // enough to keep bleeding past both edges. The approved treatment is untouched
 // - same alphas, same right-hand column with a 3% margin, same bands.
 export const OTA_BUILD_ID = '2026-09-08-1756-the-card-is-measured';
+// golem catch-up 2026-09-08: markerless publish of OTA-1756 - the card is
+// measured, not assumed. The owner asked, after four passes that each moved the
+// roster watermark and each landed wrong, exactly how the placement was being
+// calculated, because it looked nothing like the mock-ups. The answer was that
+// nothing had ever been measured: the conversion constant was evaluated on "a
+// 340dp card, ~58dp collapsed, ~200dp expanded", three numbers typed from
+// memory, against a real 375x55 and 375x143.5. And the mock-ups could not have
+// caught it, because they were drawn at 595x101.5 and 595x350 - the same
+// assumed ratios - so they were an echo of the code rather than a check on it.
+// The constants are deleted rather than recalibrated. The clip reports its own
+// box through onLayout and ui/crestField turns that box, the faction's measured
+// art and the state's composition into absolute pixels, keeping the source
+// canvas, the rendered bounds, the artwork's focus and the card's desired focus
+// apart. Verified in the REAL exported app driven by Chromium at six widths
+// from 320 to 600, where the card's own aspect changes from 290x45 to 564x55 -
+// a range no single calibration could have covered. The art table was
+// re-measured at full resolution with alpha x luminance instead of a 0.18
+// threshold that had biased every focusY upward; two findings fell out, that
+// all nine crests are horizontally symmetric and that their ink touches every
+// edge. Coverage became a minimum after the measurement found a case nobody had
+// reported: on the tallest card the roster can build, the emblem floated with a
+// 15dp bare strip above it instead of bleeding off the card. The approved
+// treatment - alphas, artwork, card styling, the right-hand column with its 3%
+// margin - is untouched; this pass was geometry only.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-08-1755-the-settings-key-is-gold';
 // golem catch-up 2026-09-08: markerless publish of OTA-1755 - the settings key
 // is gold. Owner: use our gold for the gear, not the gunmetal. This overrides a
