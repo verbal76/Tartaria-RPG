@@ -63,10 +63,13 @@ import { KeyboardInputBar } from './app/components/KeyboardInputBar';
 import { bootAudio, disposeAudio } from './app/audio/AudioManager';
 import { startAudioController, stopAudioController } from './app/audio/AudioController';
 import { setAliveBeatContext, startAliveBeat, stopAliveBeat } from './app/diagnostics/aliveBeat';
+// ⚠⚠⚠ BOOT-HANG-1741 — the screen a boot that never finished is allowed to have.
+import { BootTroubleScreen } from './app/components/BootTroubleScreen';
 import { initTTSManager } from './app/voice/TTSManager';
 import { startTTSController, stopTTSController } from './app/voice/TTSController';
 import { createExpoFileSystemAdapter } from './app/voice/executorchAdapter';
 import { checkAndApplyOTA } from './app/updates/checkAndApplyOTA';
+import { OTA_BUILD_ID } from './app/buildInfo';
 // OTA-1174 — read what expo thinks it is running, for the boot-check log line.
 import * as Updates from 'expo-updates';
 import { useUiScale } from './app/ui/uiScale';
@@ -256,9 +259,25 @@ function SummonRefusalGate() {
   return <SummonRefusalModal message={message} onDismiss={dismiss} />;
 }
 
+/* ⚠⚠⚠ BOOT-HANG-1741 — HOW LONG A BOOT IS ALLOWED TO SAY NOTHING.
+ *
+ * Hydration is ~12 storage round trips; the audit measured it at ~1s on the
+ * device and the owner had gone four months without ever noticing the spinner.
+ * 25s is therefore twenty-five times the worst honest boot, comfortably past
+ * OTA-405's own 8s gate cap and the 5s OTA budget, and still inside the minute
+ * a stuck player will actually wait.
+ *
+ * ⚠ IT SETS NO GAME STATE. When it fires, `hydrated` is still false and stays
+ * false; all it does is replace a spinner that says nothing with a screen that
+ * says where the boot stopped and offers the update door. */
+const BOOT_WATCHDOG_MS = 25_000;
+
 export default function App() {
   const screen = useGameStore((s) => s.currentScreen);
   const hydrated = useGameStore((s) => s.hydrated);
+  /** Set when the boot rejected, or when the gate never opened. Never cleared
+   *  by anything but a hydration that actually succeeded. */
+  const [bootTrouble, setBootTrouble] = useState<{ stage: string; message: string | null; stalled: boolean } | null>(null);
   const hydrate = useGameStore((s) => s.hydrate);
   const bootCognitive = useGameStore((s) => s.bootCognitive);
   const shutdownCognitive = useGameStore((s) => s.shutdownCognitive);
@@ -508,6 +527,22 @@ export default function App() {
     try { useGameStore.getState().startBootPressureWatch(); } catch { /* never block boot */ }
     void primeSeenHints(); // OTA-1738 — store-side surfaces (the bounty primer) read the hint flags synchronously
     setStage('hydrate:start');
+    // ⚠⚠⚠ BOOT-HANG-1741 — A BOOT THAT NEVER FINISHES MUST STILL SAY SO.
+    // `Promise.allSettled` on the launch path threw on the owner's runtime, the
+    // rejection landed in the `.catch` below, and because `hydrated` is set
+    // only at the END of `hydrate` the app rendered its pre-hydration spinner
+    // for as long as anyone was willing to look at it — no Settings, no log
+    // push, no bug report, no update check (that runs AFTER hydrate resolves).
+    // The rejection path is covered by the catch; this timer covers the other
+    // half, a step that never settles at all, which no catch can see.
+    const bootWatchdog = setTimeout(() => {
+      if (useGameStore.getState().hydrated) return;
+      setBootTrouble((cur) => cur ?? {
+        stage: (globalThis as unknown as { __TARTARIA_BOOT_STAGE?: string }).__TARTARIA_BOOT_STAGE ?? 'hydrate:start',
+        message: null,
+        stalled: true,
+      });
+    }, BOOT_WATCHDOG_MS);
     void hydrate()
       .then(async () => {
         setStage('hydrate:done');
@@ -819,6 +854,14 @@ export default function App() {
         // window and leave the player with a black screen. Catch +
         // log so the next launch's TitleScreen can show the message.
         setStage('hydrate:failed');
+        // ⚠⚠ BOOT-HANG-1741 — and the player is told, on a screen with doors on
+        // it, instead of being left with a spinner. `hydrated` stays false: this
+        // reports the failure, it does not pretend past it.
+        setBootTrouble({
+          stage: (globalThis as unknown as { __TARTARIA_BOOT_STAGE?: string }).__TARTARIA_BOOT_STAGE ?? 'hydrate:failed',
+          message: ((e as Error)?.message ?? String(e)).slice(0, 300),
+          stalled: false,
+        });
         // eslint-disable-next-line no-console
         console.error('hydrate failed:', e);
         try {
@@ -844,6 +887,7 @@ export default function App() {
         } catch { /* ignore */ }
       });
     return () => {
+      clearTimeout(bootWatchdog);
       clearTimeout(otaGateSafetyCap);
       stopAudioController();
       stopTTSController();
@@ -1054,6 +1098,48 @@ export default function App() {
   }, []);
 
   if (!hydrated) {
+    // ⚠⚠⚠ BOOT-HANG-1741 — the spinner is still the NORMAL pre-hydration state
+    // and is unchanged; what is new is that it now has an end. A boot that
+    // rejected, or that has said nothing for BOOT_WATCHDOG_MS, hands over to a
+    // screen that names the stage and offers RETRY / CHECK FOR UPDATE / COPY.
+    // ⚠ `hydrated` is still false on that screen. The title screen is not shown,
+    // no save is read or written, and the game cannot be entered from it.
+    if (bootTrouble) {
+      return (
+        <BootTroubleScreen
+          stage={bootTrouble.stage}
+          message={bootTrouble.message}
+          stalled={bootTrouble.stalled}
+          onRetry={() => {
+            setBootTrouble(null);
+            // Hydration is idempotent — every write in it is a set or an
+            // upsert, and the reads are reads. A second attempt is free.
+            void hydrate().catch((e) => {
+              setBootTrouble({
+                stage: (globalThis as unknown as { __TARTARIA_BOOT_STAGE?: string }).__TARTARIA_BOOT_STAGE ?? 'hydrate:failed',
+                message: ((e as Error)?.message ?? String(e)).slice(0, 300),
+                stalled: false,
+              });
+            });
+          }}
+          onCheckForUpdate={async () => {
+            const r = await checkAndApplyOTA({ silent: true });
+            return r === 'applied' ? 'Update found — restarting…'
+              : r === 'pending' ? 'Update downloaded — close Tartaria and open it again.'
+                : r === 'noUpdate' ? 'No update available yet.'
+                  : r === 'skipped' ? 'Updates are disabled on this build.'
+                    : 'Update check failed — try again on a better connection.';
+          }}
+          onCopyDiagnostic={() => {
+            const line = `Tartaria boot failure\nbuild ${OTA_BUILD_ID}\nstage ${bootTrouble.stage}\n${bootTrouble.message ?? '(no error — the step never finished)'}`;
+            try {
+              // eslint-disable-next-line @typescript-eslint/no-var-requires
+              void require('expo-clipboard').setStringAsync(line);
+            } catch { /* nothing else to try — the text is on screen either way */ }
+          }}
+        />
+      );
+    }
     return (
       <View style={styles.loading}>
         <ActivityIndicator color="#c9a86a" />

@@ -293,22 +293,32 @@ describe('OTA-1741 — a native queue wait is legible without forensic reconstru
 
 describe('OTA-1741 — independent hydration reads run together, dependent ones do not', () => {
   it('⚠⚠⚠ the seed still runs BEFORE the stash read — a race there would cost a Resurrection Gem', () => {
+    // ⚠⚠ OTA-1743 RE-AIMED THIS PIN, AND ONLY THE SHAPE MOVED. The group was
+    // written with `Promise.allSettled`, which turned out to be the OTA-1741
+    // boot hang: RN's Promise fallback and older Hermes builds do not provide
+    // it, so on the owner's device that line threw and `hydrate()` never
+    // reached its `hydrated: true`. The grouping is now `Promise.all` over a
+    // local `settled()` — same concurrency, same isolation, no new builtin.
+    // The ORDERING claim this test exists for is unchanged and still true.
     const src = read('app', 'state', 'slices', 'bootSlice.ts');
-    expect(src).toContain('Promise.allSettled([');
+    expect(src).toContain('settled(loadActiveSlotId())');
     expect(src.indexOf('const seedResult = await ensureFirstInstallSeed();'))
       .toBeLessThan(src.indexOf('const stash = await loadGlobalStash();'));
     // and both come AFTER the parallel group, not inside it
-    expect(src.indexOf('Promise.allSettled(['))
+    expect(src.indexOf('settled(loadActiveSlotId())'))
       .toBeLessThan(src.indexOf('const seedResult = await ensureFirstInstallSeed();'));
     // the legacy migration still precedes everything that enumerates slots
     expect(src.indexOf('await migrateLegacySlotIfPresent();'))
-      .toBeLessThan(src.indexOf('Promise.allSettled(['));
+      .toBeLessThan(src.indexOf('settled(listSlots())'));
   });
 
-  it('⚠⚠ allSettled, not all: one failing read must not take the slot list down with it', () => {
+  it('⚠⚠ isolation, not `all`: one failing read must not take the slot list down with it', () => {
+    // Same claim, same guarantee — `settled()` resolves a rejection into a
+    // value, so the `Promise.all` below it has no rejection path at all.
     const src = read('app', 'state', 'slices', 'bootSlice.ts');
-    expect(src).toContain("const activeId = activeR.status === 'fulfilled' ? activeR.value : null;");
-    expect(src).toContain("const slots = slotsR.status === 'fulfilled' ? slotsR.value : [];");
+    expect(src).toContain('if (activeR.ok) activeId = activeR.value;');
+    expect(src).toContain('if (slotsR.ok) slots = slotsR.value;');
+    expect(src).toContain('let slots: SlotSummary[] = [];');
   });
 
   it('⚠⚠⚠ hydration produces the same authoritative state, and a real save still loads', async () => {

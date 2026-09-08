@@ -71,6 +71,7 @@ import {
   readSurvivingBreadcrumb,
   setActiveSlot,
   stampBreadcrumbPhase,
+  type SlotSummary,
 } from '../../engine/saveSystem';
 import { introPagesFor } from '../../engine/story';
 import { discoverLocation, emptyMemory } from '../../engine/worldMemory';
@@ -118,6 +119,44 @@ export interface BootSliceDeps {
   narrateViaArbiter: typeof Store.narrateViaArbiter;
   sceneIntroBank: typeof Store.sceneIntroBank;
   setHomeworkTick: typeof Store.setHomeworkTick;
+}
+
+/* ⚠⚠⚠ BOOT-HANG-1741 — THE BOOT GATE USES NOTHING IT HAS NOT PROVEN ON A PHONE.
+ *
+ * OTA-1741 put `Promise.allSettled` on the launch path. It was the only use of
+ * that builtin in the entire app, it had never run on a device, and it sat on
+ * the one `await` in `hydrate` that nothing catches. On a runtime that does not
+ * provide it, that line throws `TypeError` SYNCHRONOUSLY, `hydrate()` rejects,
+ * `hydrated` is never set, and App.tsx renders its pre-hydration spinner
+ * forever — which is exactly what the Pixel 10 Pro XL did, on every cold start,
+ * for as long as the owner was willing to wait.
+ *
+ * ⚠ AND THE RUNTIME IS NOT OURS TO ASSUME. `runtimeVersion` is the `appVersion`
+ * policy, so an OTA bundle published today is accepted by an APK compiled
+ * months ago — the same hazard OTA-1401 wrote down when it made the Sentry
+ * require lazy ("this OTA reaches devices running an APK compiled before it
+ * existed"). React Native's own Promise fallback
+ * (`promise/setimmediate/es6-extensions`, used whenever
+ * `HermesInternal.hasPromise()` is false) has `all` and `race` and does NOT
+ * have `allSettled`; older Hermes builds are the same. Node, which every test
+ * runs on, has had it since v12 — so no suite could ever have seen this.
+ *
+ * ⚠⚠ THIS IS NOT A REVERT OF LAG-3. The reads still run together and the boot
+ * still saves the round trips. What changes is that the grouping is built out
+ * of `Promise.all` and `.then`, which this app has shipped on this device for a
+ * year, and that a member can no longer reject the group — each one is settled
+ * into a value first, so the `Promise.all` below cannot reject at all.
+ *
+ * ⚠ STANDING RULE THIS LEAVES BEHIND: the launch path takes no dependency on a
+ * JS builtin newer than the oldest APK we still serve OTAs to. If a newer one
+ * is genuinely wanted, it gets a local implementation like this one. */
+export type Settled<T> = { ok: true; value: T } | { ok: false; reason: unknown };
+
+export function settled<T>(p: Promise<T>): Promise<Settled<T>> {
+  return Promise.resolve(p).then(
+    (value): Settled<T> => ({ ok: true, value }),
+    (reason): Settled<T> => ({ ok: false, reason }),
+  );
 }
 
 export const createBootSlice = (
@@ -443,28 +482,43 @@ export const createBootSlice = (
      * the health pair was already inside a "never block boot on it" try, and a
      * rejection there must not now take the slot list down with it. The
      * hydrated state this produces is identical to the sequential path's. */
+    /* ⚠⚠⚠ BOOT-HANG-1741 — AND THE GROUP CANNOT TAKE THE BOOT DOWN, BY SHAPE.
+     * `settled()` above turns every member into a promise that RESOLVES either
+     * way, so this `Promise.all` has no rejection path left, and the whole thing
+     * sits inside a try so that even a member function that is somehow not
+     * callable ends as an empty roster rather than as a spinner with no exit.
+     * Every fallback below is the same one the previous line produced for a
+     * rejected read; nothing new is invented from a failure. */
     let crashedSlotIds: string[] = [];
-    const [healthR, crashR, activeR, slotsR] = await Promise.allSettled([
-      loadSaveLoadHealth(),
-      loadLastCrash(), // arb172 — cache last JS crash for the diagnostic export
-      loadActiveSlotId(),
-      listSlots(),
-      // OTA-191 — the Qwen-synthesis cache: inferred-gear lookups reuse
-      // previously-balanced overlays instead of firing the LLM again. Its own
-      // key, read by nothing else here, so it rides the same group.
-      (async () => {
-        try {
-          // eslint-disable-next-line @typescript-eslint/no-var-requires
-          const synthCache = require('../../engine/itemSynthesisCache');
-          if (typeof synthCache.loadSynthCache === 'function') await synthCache.loadSynthCache();
-        } catch { /* ignore — cache stays empty + the LLM path no-ops */ }
-      })(),
-    ]);
-    if (healthR.status === 'fulfilled' && crashR.status === 'fulfilled') {
-      try { crashedSlotIds = getCrashedSlotIds(); } catch { /* health is best-effort */ }
+    let activeId: string | null = null;
+    let slots: SlotSummary[] = [];
+    try {
+      const [healthR, crashR, activeR, slotsR] = await Promise.all([
+        settled(loadSaveLoadHealth()),
+        settled(loadLastCrash()), // arb172 — cache last JS crash for the diagnostic export
+        settled(loadActiveSlotId()),
+        settled(listSlots()),
+        // OTA-191 — the Qwen-synthesis cache: inferred-gear lookups reuse
+        // previously-balanced overlays instead of firing the LLM again. Its own
+        // key, read by nothing else here, so it rides the same group.
+        settled((async () => {
+          try {
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            const synthCache = require('../../engine/itemSynthesisCache');
+            if (typeof synthCache.loadSynthCache === 'function') await synthCache.loadSynthCache();
+          } catch { /* ignore — cache stays empty + the LLM path no-ops */ }
+        })()),
+      ]);
+      if (healthR.ok && crashR.ok) {
+        try { crashedSlotIds = getCrashedSlotIds(); } catch { /* health is best-effort */ }
+      }
+      if (activeR.ok) activeId = activeR.value;
+      if (slotsR.ok) slots = slotsR.value;
+    } catch (e) {
+      // Unreachable by construction; recorded rather than swallowed so that if
+      // it ever IS reached, the next boot can say so instead of guessing.
+      try { get().appendLog('debug', `boot: parallel read group failed — ${String(e)}`); } catch { /* never block boot */ }
     }
-    const activeId = activeR.status === 'fulfilled' ? activeR.value : null;
-    const slots = slotsR.status === 'fulfilled' ? slotsR.value : [];
     // OTA 454 — first-install Resurrection Gem seed. Idempotent: only
     // fires once per install. The seed lands in the global stash
     // before loadGlobalStash reads it so the resulting count

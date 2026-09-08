@@ -28976,7 +28976,50 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // animations in the whole kit, both useNativeDriver and both SET rather than
 // animated under reduce-motion. Scope held: the kit has exactly one consumer
 // today, and the suite fails if a second screen imports it.
-export const OTA_BUILD_ID = '2026-09-08-1742-the-screen-is-made-of-something';
+// ⚠⚠⚠ OTA-1743 — THE BOOT GATE HAS AN EXIT (incident BOOT-HANG-1741-7C42).
+// A RELEASE BLOCKER, REPORTED FROM A REAL PHONE. Pixel 10 Pro XL / Android 17 on
+// OTA-1741: near-black screen, one small gold spinner, centred, no text —
+// forever, through a minute of waiting, a force close and another cold start.
+// Four months on that phone had never shown that spinner at all.
+// THE SPINNER is App.tsx's pre-hydration state (`if (!hydrated)`), and
+// `hydrated` is set at the very END of `hydrate()`. App.tsx's `.catch` recorded
+// the failure and set nothing — so a `hydrate()` that rejects renders that
+// spinner for the life of the process, with no Settings, no log push, no bug
+// report and NO UPDATE CHECK (that is chained after hydrate resolves).
+// THE TRIGGER: OTA-1741 put `Promise.allSettled` on the launch path. It was the
+// only use of that builtin in the whole app, it had never run on a device, and
+// it sat on the one `await` in `hydrate` that nothing catches. React Native's
+// Promise fallback (`promise/setimmediate/es6-extensions`, used whenever
+// HermesInternal.hasPromise() is false) has `all` and `race` and does NOT have
+// `allSettled`; older Hermes builds are the same — and `runtimeVersion` is the
+// `appVersion` policy, so a bundle published today is accepted by an APK
+// compiled months ago (the hazard OTA-1401 wrote down). Reproduced by deleting
+// `Promise.allSettled` from the runtime and running the real boot: TypeError,
+// rejection, `hydrated` false, spinner.
+// ⚠⚠ THE REPAIR IS NOT A REVERT OF LAG-3. The reads still run together and the
+// boot still saves the round trips; the grouping is now `Promise.all` over a
+// local `settled()` helper built from `.then` — both shipped on this device for
+// a year — and every member is resolved into a value first, so the group has no
+// rejection path left at all. STANDING RULE: the launch path takes no
+// dependency on a JS builtin newer than the oldest APK we still serve OTAs to.
+// ⚠⚠⚠ AND THE CLASS IS CLOSED, WHICH MATTERS MORE THAN THE TRIGGER. A boot that
+// rejects, or that says nothing for 25 seconds, now hands over to a screen that
+// names the last boot stage and offers TRY STARTING AGAIN / CHECK FOR AN UPDATE
+// / COPY DIAGNOSTIC. ⚠ It does NOT fake hydration: `hydrated` stays false, the
+// title screen is not shown, no save is read or written, and the game cannot be
+// entered from it. It converts an unreportable brick into a reported, retryable,
+// updatable one — and the update button exists precisely because a build that
+// cannot boot cannot reach the boot check on its own.
+// ⚠⚠ App.tsx IS NOW RENDERED BY A TEST, for the first time. Nothing in 1248
+// suites had ever imported it; every App.tsx assertion was a source pin. That is
+// the OTA-1246 rule ("a screen with no render test has no guard at all") left
+// open on the one file whose failure costs the whole app, and it is why a green
+// 19/19 + 12772-test run shipped a bundle that could not start.
+// NOTHING ELSE MOVED: no gameplay, no save schema, no migration, no OTA order,
+// no model lifecycle, no LAG-3 repair other than the grouping construct, and the
+// VIS-1 title screen is untouched.
+export const OTA_BUILD_ID = '2026-09-08-1743-the-boot-gate-has-an-exit';
+// SUPERSEDED: export const OTA_BUILD_ID = '2026-09-08-1742-the-screen-is-made-of-something';
 // golem catch-up 2026-09-08: markerless publish of OTA-1742 - the first visual
 // overhaul pass (VIS-1-A7E4). The deliverable is a reusable interface language
 // in app/ui/tartariaKit.tsx - surface, button, ornament, resource chit, faction
