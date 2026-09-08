@@ -29211,6 +29211,33 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // The same hole had been quietly costing the expanded card its riveted FACTION
 // PLATE since VIS-1; nobody had connected the two, and this repairs both.
 export const OTA_BUILD_ID = '2026-09-08-1749-the-faction-the-index-forgot';
+// golem catch-up 2026-09-08: markerless publish of OTA-1748 and OTA-1749.
+// 1748 - the settings mark is drawn. Both settings buttons rendered U+2699 as
+// text, so the icon was whatever the device's symbol font contained, and that
+// codepoint has an emoji presentation variant that can render in colour and
+// ignore the colour the app sets. Native builds are parked, so react-native-svg
+// and icon fonts cannot ship over an OTA at all, and swapping to the
+// gear-without-hub codepoint only trades an emoji for a tofu box. So the gear is
+// drawn: a ring and eight teeth, nine static Views, each tooth placed by
+// rotate-then-translate so it swings out along its own radius, with an annulus
+// body whose hub is a real hole rather than a disc painted in a guessed colour.
+// One primitive at two sizes and one colour, replacing two independently styled
+// glyphs; the exploration header's measured 12dp cost is unmoved because the new
+// key occupies exactly the box the old glyph laid out in.
+// 2. 1749 - the faction the index forgot. Owner, on the device: the faded emblem
+// showed on some cards and not others. It was never sporadic. SlotSummary's
+// factionId is optional and is written into the roster index at save time, only
+// since OTA-036, so a character not saved since then carries no faction at all
+// and every reader that branched on it drew nothing for that row while drawing
+// correctly for the row beside it - the same hole had also been costing those
+// cards their riveted faction plate since VIS-1. No migration was needed because
+// characterSeed already IS name|raceId|factionId|created, so the new helper reads
+// the id back out of the string characterSeedOf writes, and the two live together
+// so the format is stated once. It returns nothing rather than guessing: an
+// unknown or shorter seed resolves to no art, which is exactly the old behaviour,
+// and a summary with neither field is still blank because that id cannot be
+// recovered without loading the save. Read-side only: no save is written, no save
+// shape changes, and no state, timer or disk access is added.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-08-1748-the-settings-mark-is-drawn';
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-08-1747-the-faction-field-reaches-every-card';
 // golem catch-up 2026-09-08: markerless publish of OTA-1747 - the faction field
