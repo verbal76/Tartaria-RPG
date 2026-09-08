@@ -29347,7 +29347,47 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // one more shouting element among six. Both gears change together, so the two
 // screens keep the single mark in a single colour that OTA-1748 gave them.
 export const OTA_BUILD_ID = '2026-09-08-1755-the-settings-key-is-gold';
+// golem catch-up 2026-09-08: markerless publish of OTA-1755 - the settings key
+// is gold. Owner: use our gold for the gear, not the gunmetal. This overrides a
+// rule the project otherwise keeps, so the exception is written down rather than
+// left as a quiet contradiction: VIS-3 established that gold marks a live
+// obligation or a live process and nothing else, which is why OTA-1748 made both
+// gears ceramic, and the amended record now reads - gold means a live
+// obligation, a live process, or the settings key. An exception that is named is
+// still a rule; one that is merely broken is not. "Settings must not compete" is
+// still satisfied by the other half of the VIS-3 change, which is the half that
+// did the work: what made the old gear shout was not only its colour but that it
+// was a bordered chip at the same visual weight as the place name beside it, on
+// a header where six classes of information all wore the same gold. The chip is
+// a recessed socket now, the place name is ink, the readout is technical grey,
+// and the gear is a drawn 14dp mark rather than a font glyph. Because the mark
+// is drawn it declares no colour in a StyleSheet, so Exploration still spends
+// exactly the 12 quoted gold declarations OTA-1746 left it with. Both gears move
+// together, keeping one primitive in one colour at two sizes.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-08-1754-one-column-on-the-right';
+// golem catch-up 2026-09-08: markerless publish of OTA-1754 - one column, on the
+// right. Owner: get the column on the far right, on both the expanded and
+// collapsed tiles. The important part of this pass is that "still too far to the
+// right" never meant "move it left". It was read as a direction to move and the
+// emblem was walked to centre in OTA-1751 and past it in OTA-1752; what was
+// actually being reported is that the emblem RAN OFF the right edge, so only a
+// sliver of it was on the card, and the fix was to CONTAIN it at the right - the
+// opposite of the inferred direction, twice, from four words. One rendered
+// picture would have settled it before either pass. Those two passes are not
+// wasted: the one-third coverage floor, the contrast arithmetic and the
+// per-faction focus table came out of them and all hold here, because none of it
+// was written in terms of where the box sits. The two card states had also never
+// shared a column - the tile had been walked to a centre of 38% while the record
+// stayed at 70% with 8% hanging off its border - and both now anchor to the same
+// right edge with a 3% margin. Their widths differ on purpose: contain fits by
+// width, so a box's width is the emblem's drawn size, and the record needs the
+// wider box to stay a fragment rather than becoming a complete logo. That claim
+// was first set at 52% and asserted to hold for both cards; its own test caught
+// the overclaim, because at 52% the tall crests cropped and the squarest, at
+// 1254x1254, did not. 62% clears the squarest, so the statement is true of all
+// nine rather than of the average. Widening the tile to match was refused for
+// the same reason: a wider column makes a TALLER emblem and therefore shows LESS
+// of it, which is the trap OTA-1750 documented.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-08-1753-each-emblem-gets-its-own-window';
 // golem catch-up 2026-09-08: markerless publish of OTA-1753 - each emblem gets
 // its own window. Two asks: the per-faction offset table, and the image on both
