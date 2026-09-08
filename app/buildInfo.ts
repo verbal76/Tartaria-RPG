@@ -29438,6 +29438,21 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // player from the game's own createCharacter, which is what made the before/after
 // comparison possible at all.
 export const OTA_BUILD_ID = '2026-09-08-1758-one-header';
+// golem catch-up 2026-09-08: markerless publish of OTA-1758 - thirteen
+// hand-rolled back bars, one primitive. Tier 0 step 2. Twelve screens each built
+// their own back/title/spacer row and already agreed almost completely, which is
+// what makes this an extraction rather than a redesign; the title's six-gold /
+// five-ink split was already settled by VIS-3, since a screen's own name is
+// neither a live obligation nor a live process, so TScreenHeader defaults to ink.
+// The pass claimed nothing would move. Photographing ContractsScreen from the
+// real bundle before and after proved otherwise, and the difference is a fix:
+// three screens gave the back button a fixed width too small for its own label,
+// so it wrapped onto two lines with the arrow alone above the word. Adopted on
+// two well-covered screens; GuidanceScreen keeps the wrap deliberately, being one
+// of the four thin-cover screens with an owner decision outstanding. Two
+// neighbouring suites failed and both failures were the system working - the
+// consumer-list guardrail caught the new imports, and a test that pinned a prop
+// name rather than the claim behind it was re-anchored.
 // SUPERSEDED: export const OTA_BUILD_ID = '2026-09-08-1757-colours-that-mean-something';
 // golem catch-up 2026-09-08: markerless publish of OTA-1757 - the colours that
 // mean something have names. Tier 0 step 1 of the interface rollout, and
