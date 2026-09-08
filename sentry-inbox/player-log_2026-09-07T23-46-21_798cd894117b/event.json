@@ -1,0 +1,222 @@
+{
+  "id": "798cd894117b402595691dae15c7d4e5",
+  "groupID": "7718092274",
+  "eventID": "798cd894117b402595691dae15c7d4e5",
+  "projectID": "4511945117532160",
+  "size": 2846,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log-beacon 2026-09-07-1740-nothing-wakes-a-screen-that-is-not-about-it #mtrw36x8ozr7"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-07-1740-nothing-wakes-a-screen-that-is-not-about-it",
+  "message": "player-log-beacon 2026-09-07-1740-nothing-wakes-a-screen-that-is-not-about-it #mtrw36x8ozr7",
+  "title": "player-log-beacon 2026-09-07-1740-nothing-wakes-a-screen-that-is-not-about-it #mtrw36x8ozr7",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "fdd77590ee9247939c900d8bf968a190",
+      "span_id": "b82cb318563603a6",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {},
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log-beacon 2026-09-07-1740-nothing-wakes-a-screen-that-is-not-about-it #mtrw36x8ozr7"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mtrw36x8ozr7"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-07-1740-nothing-wakes-a-screen-that-is-not-about-it"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-beacon"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "parts",
+      "value": "9"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-07-1740-nothing-wakes-a-screen-that-is-not-about-it"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-07T23:46:20.613129Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-07T23:46:21.286000Z",
+  "fingerprints": [
+    "d97123ce26b160c7f47b8c44e74ded05"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1959837658,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-07T23:38:32.399669Z",
+    "dateReleased": "2026-09-07T23:39:20.851759Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "1e94726a4b4114aa49b97b20f0ecea5aba12025e",
+      "message": "[ota-hal] OTA-1740 \u2014 nothing wakes a screen that is not about it (LAG-2-5E91)\n\nThe second half of Fable's 91C4B8 findings: the React/Zustand cost AROUND a\nplayer action, where LAG-1 took the cost inside one. Five repairs. No gameplay,\ncombat, movement, economy, vendor-pricing, persistence-cadence, crash-breadcrumb\nor deliberate-pacing change, and no world state duplicated.\n\n1. THE 6-SECOND WORLD HEARTBEAT STOPS RE-RENDERING SCREENS IT DOES NOT FEED\n   `worldRealtimeTick` runs every ~6 real seconds whatever screen is open and\n   replaces the `worldMemory` object several times per beat (patrols, tides,\n   faction relations, the war feed, the raid ledger). Exploration, Vendor,\n   Contracts, Character \u2014 and GiftModal, which Exploration mounts on every\n   render \u2014 all subscribed to that OBJECT, so four screens re-rendered on a\n   wall-clock timer while the player sat still.\n   - Each now subscribes to the fields it actually reads. None of Exploration's\n     three (visitedRooms / pendingDogOnboarding / enemyIntel) or Contracts'\n     eight is realtime, so the heartbeat cannot reach them at all.\n   - Where a field IS realtime and IS consumed, the subscription is the DERIVED\n     VALUE the screen draws rather than the raw array: the counter takes the\n     war-heat number and the tide PRICE MULTIPLIER, not the patrol list; the\n     character sheet takes the stepped tide LABEL, not the momentum. So a\n     skirmish that does not move a price or turn a fortune does not redraw.\n   - Three engine helpers that took a whole `WorldMemory` to read one field\n     (getRelation, knownPeople) now declare the Pick they use, which is what\n     lets a screen hold the narrow subscription.\n   - WorldScreen keeps its whole-memory subscription: it is the live war board\n     the heartbeat exists for.\n   idle, 5 ticks, 258 items:  Exploration 5 commits/222ms \u2192 0/0\n                              Contracts   5/24ms \u2192 0/0\n                              Vendor      5/952ms \u2192 4/515ms (real price moves)\n                              Character   5/158ms \u2192 5/133ms (displayed tide label)\n   a heartbeat that moves only fields nobody reads: all five screens 5 \u2192 0.\n\n2. ONE ACTION'S LOG LINES ARE ONE SUBSCRIBER SWEEP, NOT ONE EACH\n   Every `appendLog` was its own zustand set, and a movement step makes many \u2014\n   each one a full sweep of every mounted selector (Exploration holds ~57).\n   `state/storeNotify.ts` is a store middleware that lets an ordinary GAME-LOG\n   write ride along with the next notification the action was going to perform\n   anyway, or with a microtask at the end of the turn.\n   - \u26a0 THE STATE STAYS SYNCHRONOUS. Roughly thirty call sites read `get().gameLog`\n     in the same turn they wrote to it \u2014 the \"have I already said this line\"\n     guards, the arbiter dedup inside appendLog itself, the talk transcript\n     window. A staged log would have broken every one; only the NOTIFICATION is\n     deferred.\n   - \u26a0 NOTHING IS SUPPRESSED. An ordinary gameplay set publishes itself AND the\n     log lines held behind it, in order, so a subscriber sees every state change\n     it saw before \u2014 it just stops being woken once per line of text.\n   - TTSController's cold-boot restore check counted arrivals (\"2+ entries in one\n     tick means a save load\"), resting on the one-entry-per-set assumption. It\n     now tests the AGE of the arriving log, which is the honest signal and always\n     was: a restored log was written in a previous run.\n   movement step  21 sweeps in the sync turn \u2192 10   (22 \u2192 11 settled)\n   attack round   10 \u2192 5                            (27 \u2192 16 settled)\n   five rapid steps  45 \u2192 26      six log lines in one turn  6 \u2192 1\n\n3. THE COUNTER STOPS RE-PRICING THE PACK FOR THINGS THAT CANNOT MOVE A PRICE\n   VendorScreen had no memo at all: `reinforceQuote` per weapon, `sellPriceFor`\n   twice per sellable row and the recipe menu were rebuilt on every render.\n   They are now memos keyed on the inventory array, the vendor, the rapport /\n   standing modifier, the war multiplier and the sort \u2014 every input that can\n   move a price or an eligibility and nothing wider, so a projection can never\n   outlive its authority. The hooks sit above the `!player || !vendor` return,\n   per OTA-022's rule that every hook precede it.\n   the projection work alone, 258 items: 16.6ms per render, now skipped on any\n   re-render that could not have moved a price. Vendor mount 1366ms \u2192 909ms.\n\n4. THE ORDINARY TAP LEDGER IS OFF THE GAME STORE\n   `logUiTap` ran `appendLog` before every handler in the game, so recording a\n   line of diagnostic text swept every mounted subscriber BEFORE the gameplay the\n   player asked for began \u2014 and `debug` is a HIDDEN channel, so no surface ever\n   drew it. It now writes through `persistEntry`, the exact sink appendLog\n   persists through, in the same format: COPY LOG and the LogScreen read\n   `readFullLog` and are unchanged. `stampLiveBreadcrumb` is untouched and still\n   stamped before the handler runs \u2014 the crash evidence the OTA/process-death\n   investigation reads is exactly as immediate as it was.\n   one ordinary tap: 1 store notification before the handler \u2192 0.\n\n5. THE PACK SCALES\n   `ItemRow` is memoized and takes two stable handlers (the row's item is passed\n   TO them) instead of a fresh closure per row per render, and the whole search \u2192\n   fill-mode filter \u2192 FUSABLE filter \u2192 sort \u2192 group pipeline is one memo above\n   the guard instead of five passes over a 250-item array on every render.\n   \u26a0 VIRTUALIZATION WAS EVALUATED AND DELIBERATELY NOT FORCED \u2014 the reasoning is\n   written over the section list: sections open collapsed so the eager list is\n   already bounded; the scroll-to-item jump the task requires preserving is built\n   on the per-row `onLayout` offsets a virtualized list never records; and under\n   react-test-renderer a VirtualizedList would render `initialNumToRender` rows\n   and blind every existing inventory suite.\n   Inventory mount, 258 items: 316ms \u2192 90ms.  Opening all 16 categories: 61 \u2192 8ms.\n\nTests: __tests__/ota1740NothingWakesAScreenThatIsNotAboutIt.test.tsx (18 tests)\ncovers all five \u2014 the inert-heartbeat invariant on all five screens, that a\nconsumed world change still redraws, the one-sweep-per-turn claim with its order\nand its synchronous readability, that a gameplay set still notifies and carries\nthe lines behind it, vendor freshness across inventory / TC / sale / vendor swap,\nthat a tap notifies nobody while the breadcrumb and the disk line survive, and\nthat 50 / 100 / 258 rows render, act and absorb a mutation. ota1485, ota1695 and\nota1700 now read the tap ledger from the disk log \u2014 same claim, the ledger moved\nhouse; ota1097 and ota1100 pin the row handlers in their useCallback form.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-07T23:35:48Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-07-1740-nothing-wakes-a-screen-that-is-not-about-it",
+          "shortVersion": "tartaria@4.32.11+2026-09-07-1740-nothing-wakes-a-screen-that-is-not-about-it",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-07T23:39:20.851759Z",
+          "dateCreated": "2026-09-07T23:38:32.399669Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "156308720",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-07T23:39:21.188996Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-07-1740-nothing-wakes-a-screen-that-is-not-about-it",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-07-1740-nothing-wakes-a-screen-that-is-not-about-it",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-07-1740-nothing-wakes-a-screen-that-is-not-about-it",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-07-1740-nothing-wakes-a-screen-that-is-not-about-it)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": null
+}
