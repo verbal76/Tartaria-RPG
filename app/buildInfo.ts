@@ -29854,7 +29854,34 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // The census closes to two, and neither is a backlog item: ApproachModal is
 // HOLD 4 (no scrolling middle to absorb the kit's ceiling) and KeyboardSafeCard
 // is a second shell whose height is measured from the real keyboard edge.
-export const OTA_BUILD_ID = '2026-09-09-1774-two-of-the-seven';
+// SUPERSEDED: '2026-09-09-1774-two-of-the-seven'
+// OTA-1775 - the combat chip vocabulary, written down and enforced. The owner
+// asked whether the combat action colours encode real categories or are ad-hoc
+// styling, and said that if they are semantic the meanings must be documented
+// exactly. Traced across every call site: SEMANTIC, and argued in OTA-1454.
+// THE GROUPING IS NOT THE ONE IN THE QUESTION. There are five tones and a
+// neutral default, not three colour families: strike (FILLED sage - this weapon
+// lands from where you stand, the only turn-ending commitment and the only
+// filled chip), ready (sage BORDER - available modifier or setup tool: golem,
+// dog, bandolier, heals, ability, loot), defensive (blue - dodge, stealth,
+// flee), needs-approach (amber - cannot land from HERE, a reach problem rather
+// than an availability one) and unavailable (red).
+// So the tan family in the question is the DEFAULT CHIP. STEP BACK and THROW
+// SPEAR pass no tone at all, and APPROACH passes one only while it is out of
+// range - which is the tone doing its job, since the control that FIXES the
+// reach problem is coloured by the problem. Nothing there is legacy styling, so
+// the instruction not to preserve colours merely because the old UI used them
+// does not bite: no third colour was ever chosen for those three.
+// This pass is documentation and enforcement, not a restyle - not one pixel
+// moves. The vocabulary now lives beside the type it describes, and the suite
+// fails if a later pass paints a chip a colour the vocabulary does not name, or
+// leaves a tone with a container style and no readable text style.
+// ONE THING IS RECORDED RATHER THAN FIXED: an unclassified chip is
+// indistinguishable from a chip nobody has thought about. Giving STEP BACK and
+// THROW SPEAR a tone would change what the player sees, so it belongs with the
+// weapon-button composition decision. The pin on their current toneless state is
+// expected to die the day that is decided, which is the point of it.
+export const OTA_BUILD_ID = '2026-09-09-1775-the-chip-vocabulary';
 // golem catch-up 2026-09-09: markerless publish of OTA-1774 - two of the seven
 // are Family A. The moment-modal ruling released HOLD 3, and measuring the seven
 // split them: only CraftResult (400) and WhisperComplete (420) are the shell the

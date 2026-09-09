@@ -1348,6 +1348,50 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
  *  the quietest control on the row, and Dodge, Stealth and the bandolier all
  *  outshouted it. That is why the groups did not read: not because they were
  *  absent, but because the most important one was wearing the default. */
+
+/**
+ * ⚠⚠⚠ OTA-1775 — THE COMBAT CHIP VOCABULARY, WRITTEN DOWN.
+ *
+ * The owner asked why APPROACH / STEP BACK / THROW SPEAR read tan while DODGE /
+ * STEALTH / FLEE read blue and GOLEM / BANDOLIER / HEALS read green —
+ * *"determine whether these differences encode intentional semantic/action
+ * categories or are legacy/ad-hoc styling ... if semantic, document exactly what
+ * each family means."* Traced across every call site: SEMANTIC, and argued at
+ * length in OTA-1454 above. This is that answer, kept beside the type it
+ * describes rather than in a chat log nobody can grep.
+ *
+ *   (no tone)        the default chip — parchment lettering on soot. NOT a
+ *                    fourth colour family: it is the ABSENCE of a claim. "An
+ *                    ordinary action with no state worth reporting."
+ *   'strike'         FILLED sage, soot lettering. "This weapon lands from where
+ *                    you stand." The only turn-ending commitment on the row and
+ *                    the only filled chip — OTA-1454 gave it WEIGHT rather than a
+ *                    new hue, because a sixth colour in a parchment-and-soot game
+ *                    buys separation by spending meaning.
+ *   'ready'          sage BORDER on near-black. "Available." The modifiers and
+ *                    setup tools: golem, dog, bandolier, heals, ability, loot.
+ *                    Same hue as `strike` deliberately — one axis (fill against
+ *                    outline), one job.
+ *   'defensive'      blue border and label. "Defensive, or escape." Dodge,
+ *                    stealth, flee. Dodge's cooldown bar reuses the same blue so
+ *                    a full bar reads as the chip's ordinary ready state rather
+ *                    than as a new colour.
+ *   'needs-approach' amber. "Cannot land from HERE" — a reach problem, not an
+ *                    availability one. APPROACH itself wears it while you are not
+ *                    close, which is the tone doing its job: the control that
+ *                    FIXES the reach problem is coloured by the problem.
+ *   'unavailable'    red. "Cannot be used at all."
+ *
+ * ⚠⚠ SO WHAT READS AS A TAN FAMILY IS THE DEFAULT CHIP, NOT A FAMILY. STEP BACK
+ * and THROW SPEAR pass no tone at all, and APPROACH passes one only when it is
+ * out of range. Nothing there is legacy styling.
+ *
+ * ⚠ BUT NOTHING THERE IS A CLASSIFICATION EITHER, AND THOSE ARE DIFFERENT. An
+ * unclassified chip is indistinguishable from a chip nobody has thought about.
+ * Worth deciding when the weapon-button composition is revisited; RECORDED
+ * rather than fixed here, because giving them a tone changes what the player
+ * sees and that is a visual call, not a documentation pass.
+ */
 type QuickBtnTone = 'strike' | 'ready' | 'needs-approach' | 'defensive' | 'unavailable';
 
 /**
