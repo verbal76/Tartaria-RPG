@@ -30045,7 +30045,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // four must not be added until the cover-first decision was settled; it is
 // settled, the cover shipped, the migration followed, and Guidance moved off the
 // deny-list it sat on for being under-covered.
-export const OTA_BUILD_ID = '2026-09-09-1780-the-thin-four-migrate';
+// SUPERSEDED: '2026-09-09-1780-the-thin-four-migrate'
+export const OTA_BUILD_ID = '2026-09-09-1781-the-name-grew-with-the-mark';
 // golem catch-up 2026-09-09: markerless publish of OTA-1780.
 // OTA-1780 - the thin four migrate. Log, Lore, Guidance and World take
 // TScreenHeader; Guidance takes TTabBar with it. World's title goes INK by

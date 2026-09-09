@@ -45,7 +45,7 @@ import {
 // instruction: *"Keep the icon mapping centralized rather than creating separate
 // Lore and combat mappings."* The two surfaces draw at different SIZES (the chip
 // is smaller than the legend row) and that is the only thing they disagree on.
-import { glyphArt, DISCOVERY_STAR_ART, GLYPH_ART_SIZE } from '../engine/combatGlyphArt';
+import { glyphArt, DISCOVERY_STAR_ART, GLYPH_ART_SIZE, GLYPH_NAME_TYPE } from '../engine/combatGlyphArt';
 import { reachBandsFor, reachFiresDown } from '../engine/types';
 // ⚠ OTA-1423 — the three Arbiter refusals below name the dog, so they also
 // have to gender it. Without this they read "bring it up" about a companion
@@ -874,14 +874,14 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 const raw = resolveDisplayWeaponByName(equippedMain, inventory)?.damageType ?? null;
                 const label = combatWeaponLabel(equippedMain, equippedMainItem, raw, activeEnemyKnownWeak ?? []);
                 const parts = combatWeaponLabelParts(equippedMain, equippedMainItem, raw, activeEnemyKnownWeak ?? []);
-                return <QuickBtn label={label} glyphs={parts.glyphs} glyphText={parts.text} baseGlyph={parts.base} star={parts.star} onPress={() => onSubmit(`attack with the ${equippedMain.toLowerCase()}`)} tone={mainT} outOfRange={mainT === 'needs-approach'} />;
+                return <QuickBtn label={label} glyphs={parts.glyphs} glyphText={parts.text} baseGlyph={parts.base} star={parts.star} weapon onPress={() => onSubmit(`attack with the ${equippedMain.toLowerCase()}`)} tone={mainT} outOfRange={mainT === 'needs-approach'} />;
               })() : null}
               {equippedOff ? (() => {
                 const offT = weaponTone(reachPlayer, 'off', range, groundedFoesBelow);
                 const raw = resolveDisplayWeaponByName(equippedOff, inventory)?.damageType ?? null;
                 const label = combatWeaponLabel(equippedOff, equippedOffItem, raw, activeEnemyKnownWeak ?? []);
                 const parts = combatWeaponLabelParts(equippedOff, equippedOffItem, raw, activeEnemyKnownWeak ?? []);
-                return <QuickBtn label={label} glyphs={parts.glyphs} glyphText={parts.text} baseGlyph={parts.base} star={parts.star} onPress={() => onSubmit(`attack with the off-hand ${equippedOff.toLowerCase()}`)} tone={offT} outOfRange={offT === 'needs-approach'} />;
+                return <QuickBtn label={label} glyphs={parts.glyphs} glyphText={parts.text} baseGlyph={parts.base} star={parts.star} weapon onPress={() => onSubmit(`attack with the off-hand ${equippedOff.toLowerCase()}`)} tone={offT} outOfRange={offT === 'needs-approach'} />;
               })() : null}
             </View>
 
@@ -1467,6 +1467,7 @@ function QuickBtn({
   glyphText,
   baseGlyph,
   star,
+  weapon,
 }: {
   label: string;
   onPress: () => void;
@@ -1497,6 +1498,16 @@ function QuickBtn({
   baseGlyph?: BaseGlyphPart | null;
   /** OTA-1638 — the discovery star, painted LAST, after the base glyph. */
   star?: boolean;
+  /** ⚠⚠ OTA-1781 — THIS CHIP CARRIES A WEAPON NAME, and it is an EXPLICIT flag
+   *  rather than `glyphs.length > 0 || baseGlyph`. That derivation is true of
+   *  every weapon chip today only by accident: `combatWeaponLabelParts` returns
+   *  `base: null` for a weapon whose damage type is unknown, and the coat list
+   *  is empty on an uncoated one, so a plain weapon falls through to the flat
+   *  label below and would have kept the 12pt name the owner is objecting to.
+   *  Only the two weapon call sites pass it, so PUNCH, DODGE, FLEE, APPROACH,
+   *  the travel chips and the companion controls are untouched — which is the
+   *  instruction: *"Do not simply increase the globally shared quickText size."* */
+  weapon?: boolean;
 }) {
   const resolvedTone: QuickBtnTone | undefined = blocked
     ? undefined
@@ -1624,7 +1635,11 @@ function QuickBtn({
               textStyle={textStyle}
             />
           ))}
-          <Text style={[textStyle, (glyphs && glyphs.length > 0) ? styles.quickGlyphName : null]}>
+          <Text style={[
+            textStyle,
+            (glyphs && glyphs.length > 0) ? styles.quickGlyphName : null,
+            weapon ? styles.quickWeaponName : null,
+          ]}>
             {(glyphText ?? '').toUpperCase()}
           </Text>
           {baseGlyph ? (
@@ -1655,7 +1670,7 @@ function QuickBtn({
           ) : null}
         </View>
       ) : (
-        <Text style={textStyle}>{label.toUpperCase()}</Text>
+        <Text style={[textStyle, weapon ? styles.quickWeaponName : null]}>{label.toUpperCase()}</Text>
       )}
     </TouchableOpacity>
   );
@@ -1904,6 +1919,22 @@ const styles = StyleSheet.create({
   // dimmer border + dimmed text instead, so the chip stays solid on any hue.
   quickDisabled: { borderColor: '#2a2620', backgroundColor: '#141210' },
   quickText: { color: '#cdbf99', fontSize: 12 },
+  /* ⚠⚠⚠ OTA-1781 — THE WEAPON NAME, AND IT IS NOT `quickText` GROWN.
+   * `quickText` is the chassis type for every chip in the game — punch, dodge,
+   * flee, approach, travel, the dog, the golem — and raising it would resize all
+   * of them to fix a proportion only the two weapon buttons have. Owner: *"Do
+   * not simply increase the globally shared quickText size if that unnecessarily
+   * changes Punch, Dodge, Flee, Approach, companion controls, etc. Trace
+   * ownership first and solve this at the narrowest appropriate level."*
+   * ⚠ NO COLOUR HERE, DELIBERATELY. The tone styles are applied BEFORE this one
+   * and each sets its own `color`; this style carries size and weight only, so
+   * depth-of-name is orthogonal to the strike/ready/needs-approach/unavailable
+   * vocabulary exactly as the 28dp mark is.
+   * ⚠ COSTS NO HEIGHT. The chip is already 46dp tall because it holds a 28dp
+   * mark (28 + 4 row padding + 12 chip padding + 2 border); a 15pt line is ~19dp
+   * and still sits inside the mark's own box. The name grows, the button does
+   * not. */
+  quickWeaponName: GLYPH_NAME_TYPE,
   quickDisabledText: { color: '#6a6253' },
   // Soot on the solid block — the dark-on-light inversion is what makes it read
   // as FILLED at a glance rather than as another outlined chip.

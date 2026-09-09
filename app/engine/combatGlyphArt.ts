@@ -150,3 +150,34 @@ export const GLYPH_ART_SIZE = {
   /** Weapon buttons in combat. The SAME size; the chip grows to hold it. */
   combat: 28,
 } as const;
+
+/** ⚠⚠⚠ OTA-1781 — THE TYPE THAT STANDS BESIDE A 28dp MARK, AND THE GAME ALREADY
+ *  KNEW IT.
+ *
+ *  Owner: *"The artwork grew but the weapon-name typography did not, so the name
+ *  now looks undersized and visually disconnected from the glyph."* True, and
+ *  the correction did not need to be invented — it was already drawn.
+ *
+ *  Lore ▸ Glyphs ends with a PICTURE OF A WEAPON BUTTON (`WeaponGlyphKey`'s
+ *  example row: two coats, LAUNCHER, the weapon's own damage, the star). That
+ *  mock has been setting its name at 15/700/1 beside a `GLYPH_ART_SIZE.combat`
+ *  mark since the artwork landed, while the LIVE button set the same name at
+ *  12/400/0 beside the same mark. The teaching surface and the control it
+ *  teaches disagreed, and the mock was the one the owner approved.
+ *
+ *  ⚠ SO THIS IS ONE AUTHORITY RATHER THAN TWO AGREEING NUMBERS. Both the mock
+ *  and the real chip now read it. A pairing kept in two files is a pairing that
+ *  drifts — which is precisely how a 12pt name ended up beside a 28dp mark in
+ *  the first place, and exactly what `GLYPH_ART_SIZE`'s own note says about
+ *  splitting one number into two.
+ *
+ *  ⚠ SIZE AND WEIGHT ONLY. Every combat COLOUR is a tone and stays at its call
+ *  site: this authority must never grow a `color`, or the chip vocabulary
+ *  (strike / ready / needs-approach / defensive / unavailable) would start
+ *  being decided by a typography table.
+ */
+export const GLYPH_NAME_TYPE = {
+  fontSize: 15,
+  fontWeight: '700',
+  letterSpacing: 1,
+} as const;

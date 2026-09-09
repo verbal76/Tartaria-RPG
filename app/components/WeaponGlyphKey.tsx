@@ -19,7 +19,7 @@ import { View, Text, StyleSheet, Image } from 'react-native';
 // ⚠⚠ OTA-1766 — the ONE art table, shared with the combat weapon buttons. The
 // trial's `damageIcons` went with the trial; see `combatGlyphArt.ts` for why
 // this file and `InputBox` deliberately read the same table.
-import { glyphArt, DISCOVERY_STAR_ART, GLYPH_ART_SIZE } from '../engine/combatGlyphArt';
+import { glyphArt, DISCOVERY_STAR_ART, GLYPH_ART_SIZE, GLYPH_NAME_TYPE } from '../engine/combatGlyphArt';
 import {
   BASE_DAMAGE_GLYPH, BASE_GLYPH_COLOR, COATING_GLYPH, COATING_GLYPH_COLOR,
 } from '../engine/weaponGlyphs';
@@ -264,7 +264,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#0d0b09',
     borderRadius: 3,
   },
-  exampleText: { color: '#e6dcc3', fontSize: 15, fontWeight: '700', letterSpacing: 1, marginLeft: 4 },
+  /* ⚠ OTA-1781 — THE PAIRING COMES FROM THE AUTHORITY NOW. These three values
+   * were typed here first and the live weapon button never got them; both read
+   * `GLYPH_NAME_TYPE` so the picture of the button and the button cannot drift
+   * apart again. Colour and margin stay local — they are this row's, not the
+   * control family's. */
+  exampleText: { color: '#e6dcc3', ...GLYPH_NAME_TYPE, marginLeft: 4 },
   /* ⚠ COMBAT size, not Lore's — this is a picture of a weapon button. */
   exampleMark: { width: GLYPH_ART_SIZE.combat, height: GLYPH_ART_SIZE.combat, marginRight: 3 },
   exampleBase: { marginLeft: 7 },

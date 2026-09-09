@@ -325,7 +325,20 @@ describe('the weapon buttons in combat', () => {
     const code = codeOf(INPUTBOX);
     expect(code).toContain('combatWeaponLabel(');
     expect(code).toContain('accessibilityLabel={cooldownFill !== undefined && cooldownFill < 1');
-    expect(code).toContain('<Text style={textStyle}>{label.toUpperCase()}</Text>');
+    /* ⚠⚠⚠ RE-AIMED BY OTA-1781 — PIN THE CLAIM, NEVER THE MECHANISM.
+     * This line used to pin the whole element, character for character:
+     *   `<Text style={textStyle}>{label.toUpperCase()}</Text>`
+     * The claim it makes is that the FLAT LABEL is what the fallback path
+     * paints — the breadcrumb and the screen-reader string, untouched. The style
+     * array beside it was never part of that claim, and when OTA-1781 added the
+     * weapon-name style to the same element this test went red on a change that
+     * left the claim perfectly intact. That is the rollout's own hardest-won
+     * rule, and this is what breaking it costs: a red suite pointing at the
+     * wrong thing.
+     * So: the fallback branch must still paint `label.toUpperCase()` and must
+     * still be styled off `textStyle`. WHAT ELSE styles it is OTA-1781's
+     * business, not this pass's. */
+    expect(code).toMatch(/<Text style=\{\[?textStyle[\s\S]{0,90}?\}>\{label\.toUpperCase\(\)\}<\/Text>/);
   });
 
   test('⚠ no gameplay, damage, weakness, coat or discovery logic moved', () => {

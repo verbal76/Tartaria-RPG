@@ -189,7 +189,16 @@ describe('OTA-1568 — the wiring', () => {
     // Every non-weapon chip (dodge, golem, the dog, travel) passes no glyphs, so
     // it must take the untouched path. This is what makes the OTA cheap to roll
     // back: the change is confined to weapon chips that carry a coating.
-    expect(INPUT).toContain('<Text style={textStyle}>{label.toUpperCase()}</Text>');
+    /* ⚠⚠⚠ RE-AIMED BY OTA-1781 — PIN THE CLAIM, NEVER THE MECHANISM.
+     * This pinned the fallback element character for character:
+     *   `<Text style={textStyle}>{label.toUpperCase()}</Text>`
+     * The claim is that a chip with no glyphs still paints the FLAT LABEL off
+     * `textStyle` — nothing about what ELSE may style it. OTA-1781 added the
+     * weapon-name size to that same element and THREE suites went red on a
+     * change that left all three claims intact: this one, and OTA-1569's or
+     * OTA-1568's, and OTA-1766's. One literal pinned in three places is three
+     * chances to be wrong about the same thing. */
+    expect(INPUT).toMatch(/<Text style=\{\[?textStyle[\s\S]{0,90}?\}>\{label\.toUpperCase\(\)\}<\/Text>/);
     // OTA-1636: a base-typed weapon with no coats takes the painted path too,
     // so the guard now reads `(glyphs && glyphs.length > 0) || baseGlyph`.
     expect(INPUT).toContain('{(glyphs && glyphs.length > 0) || baseGlyph ? (');
