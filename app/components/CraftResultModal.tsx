@@ -9,7 +9,15 @@ import {
   ScrollView,
   Dimensions,
 } from 'react-native';
+import { tModalCard, tartariaKitStyles as kit } from '../ui/tartariaKit';
+
 import type { InventoryDelta } from './inventoryDelta';
+
+// ⚠ OTA-1774 — the modal sweep, batch 2. A "moment" modal by intent, but a
+// FAMILY A dialog by construction: standard scrim, `#13110f` on the brand gold
+// at radius 4. It adopts with zero pixel change; the beat is in its content and
+// its copy, not in a private copy of the shell.
+const CARD = tModalCard(400);
 
 // OTA-264 — Post-craft confirmation popup. Player feedback: "every
 // time I craft something, a popup should show up saying that I
@@ -64,9 +72,9 @@ export function CraftResultModal({ visible, items, onContinue, onClose }: Props)
       statusBarTranslucent
     >
       <TouchableWithoutFeedback onPress={onContinue}>
-        <View style={styles.scrim} accessibilityViewIsModal={true}>
+        <View style={kit.modalScrim} accessibilityViewIsModal={true}>
           <TouchableWithoutFeedback>
-            <View style={styles.card}>
+            <View style={CARD}>
               <Text style={styles.title} accessibilityRole="header">✓ CRAFTED</Text>
               <View style={styles.rule} />
               <Text style={styles.lead}>Added to your inventory:</Text>
@@ -112,26 +120,16 @@ export function CraftResultModal({ visible, items, onContinue, onClose }: Props)
 }
 
 const styles = StyleSheet.create({
-  scrim: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.7)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  card: {
-    width: '100%',
-    maxWidth: 400,
-    backgroundColor: '#13110f',
-    borderColor: '#c9a86a',
-    borderWidth: 1,
-    borderRadius: 4,
-    padding: 14,
-  },
+  // ⚠ OTA-1774 — `scrim` and `card` moved to the kit (`modalScrim` /
+  // `tModalCard(400)`). Same values, one source; the 400 is preserved.
   title: { color: '#c9a86a', fontSize: 14, fontWeight: '800', letterSpacing: 4 },
   rule: { height: 1, backgroundColor: '#3a342c', marginTop: 6, marginBottom: 10 },
   lead: { color: '#cdbf99', fontSize: 13, lineHeight: 18, marginBottom: 8 },
-  itemScroll: { },
+  // ⚠⚠ OTA-1774 — `flexShrink` is what makes the kit's 85% ceiling safe to adopt
+  // (OTA-1614, so the scrim stays tappable). An RN view holds its height unless
+  // told to yield, so without this a long craft result would push KEEP CRAFTING
+  // out of the bottom instead of scrolling.
+  itemScroll: { flexShrink: 1, flexGrow: 0 },
   itemList: { gap: 6, paddingVertical: 2 },
   itemRow: {
     flexDirection: 'row',

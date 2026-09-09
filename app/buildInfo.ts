@@ -29829,7 +29829,32 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the kit rather than tidied away: a reader who sees only the finished exemption
 // learns "bright golds are fine here", where a reader who sees that the previous
 // pass refused it and escalated learns the actual rule.
-export const OTA_BUILD_ID = '2026-09-09-1773-the-frame-gets-a-name';
+// SUPERSEDED: '2026-09-09-1773-the-frame-gets-a-name'
+// OTA-1774 - two of the seven are Family A. The modal sweep, batch 2.
+// The owner's ruling released HOLD 3: DiscoveryReveal and MissionStinger stay
+// EXPERIENTIAL and the other seven moment modals take the standard shell.
+// MEASURING THEM SPLIT THE SEVEN, which the ruling could not have known. Only
+// TWO are the shell it names - CraftResult (400) and WhisperComplete (420) are
+// Family A by construction and adopt with zero pixel change, taking two more rim
+// golds with them and the ratchet 327 to 325. The other FIVE - DogOnboarding,
+// GolemNaming, CombatPrimer, WandererEncounter and MissionComplete - are FAMILY
+// B: a 0.78 backdrop, a warmer #17150f ground, radius 6, padding 20, width 440.
+// Forcing those onto Family A is not re-addressing them, it is RESTYLING five
+// beats in four visible properties at once, and the plan's own governing
+// principle is that a death, a chapter card and a tutorial moment are supposed
+// to feel unlike a quantity picker - it says in as many words that "adopt the
+// language" is not the same instruction as "use the shell".
+// AND FAMILY B IS NOT "THE MOMENT FAMILY", which is the tell: MissionStinger is
+// built exactly like the five held here and the SAME ruling keeps it
+// experiential. Construction does not track intent, so the ground question and
+// the beat question are separate and only the owner can answer the first.
+// So the five are held with the measurement written down and their pixels
+// untouched, and MissionComplete's green rim is pinned as a SUCCESS that is not
+// swept either way whatever happens to the ground.
+// The census closes to two, and neither is a backlog item: ApproachModal is
+// HOLD 4 (no scrolling middle to absorb the kit's ceiling) and KeyboardSafeCard
+// is a second shell whose height is measured from the real keyboard edge.
+export const OTA_BUILD_ID = '2026-09-09-1774-two-of-the-seven';
 // golem catch-up 2026-09-09: markerless publish of OTA-1772 and OTA-1773.
 // OTA-1772 - the stamp cannot touch the name. Reported off the device as
 // MISSConspiracy Archit... The cause was structural: in CombatStrip's result row

@@ -240,7 +240,14 @@ describe('what is left, counted by predicate', () => {
     expect(left).not.toContain('HookContinueModal.tsx');
   });
 
-  test('⚠⚠⚠ the remaining FOUR are NAMED, so the sweep cannot quietly grow', () => {
+  test('⚠⚠⚠ the remaining TWO are NAMED, so the sweep cannot quietly grow', () => {
+    /* ⚠⚠ FOUR → TWO ON OTA-1774. The owner's moment-modal ruling released
+     * CraftResult and WhisperComplete from HOLD 3, and both turned out to be
+     * Family A by construction, so they adopted with no pixel change. What is
+     * left is not a backlog: `ApproachModal` is HOLD 4 (no scrolling middle to
+     * absorb the kit's ceiling) and `KeyboardSafeCard` is a genuine second shell
+     * (darker scrim, and a height measured from the real keyboard edge). The
+     * census is finished except for one decision and one deliberate exception. */
     /* ⚠⚠ EIGHT → FOUR ON OTA-1771, the modal sweep's first batch. ClimbModal,
      * TorchProbeModal, SearchModal and CraftRefusalModal now import the kit's
      * scrim and card and no longer declare either, so they fall out of this
@@ -255,15 +262,13 @@ describe('what is left, counted by predicate', () => {
      * out of the census — correctly, and without the modal sweep touching it.
      * ⚠ Worth seeing rather than just re-counting: two primitives were measuring
      * overlapping ground, and the census is the thing that noticed. */
-    /* This is the guardrail the consumer list is for `TPanel`: a FIFTH file
+    /* This is the guardrail the consumer list is for `TPanel`: a THIRD file
      * appearing here means a new dialog hand-copied the shell instead of
      * importing it, and that shows up as a failing test rather than as another
      * copy nobody notices for a year. */
     expect(handCopies()).toEqual([
       'ApproachModal.tsx',
-      'CraftResultModal.tsx',
       'KeyboardSafeCard.tsx',
-      'WhisperCompleteModal.tsx',
     ]);
   });
 

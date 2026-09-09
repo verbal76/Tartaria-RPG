@@ -9,6 +9,12 @@ import {
   ScrollView,
   Dimensions,
 } from 'react-native';
+import { tModalCard, tartariaKitStyles as kit } from '../ui/tartariaKit';
+
+// ⚠ OTA-1774 — the modal sweep, batch 2. Family A by construction (standard
+// scrim, `#13110f` on the brand gold at radius 4), so it adopts with zero pixel
+// change and keeps its shipped 420.
+const CARD = tModalCard(420);
 
 // arb120 — completion popup for a finished side-contract (whisper). Player
 // report: a whisper paid out at the end of a long auto-travel run, but the
@@ -39,15 +45,15 @@ export function WhisperCompleteModal({ visible, title, lines, rewards, onClose }
       statusBarTranslucent
     >
       <TouchableWithoutFeedback onPress={onClose}>
-        <View style={styles.scrim} accessibilityViewIsModal={true}>
+        <View style={kit.modalScrim} accessibilityViewIsModal={true}>
           <TouchableWithoutFeedback>
-            <View style={styles.card}>
+            <View style={CARD}>
               <Text style={styles.title} accessibilityRole="header">✦✦ CONTRACT COMPLETE</Text>
               <Text style={styles.subtitle}>{title}</Text>
               <View style={styles.rule} />
 
               <ScrollView
-                style={{ maxHeight: BODY_SCROLL_MAX_HEIGHT }}
+                style={[styles.bodyScroll, { maxHeight: BODY_SCROLL_MAX_HEIGHT }]}
                 contentContainerStyle={styles.body}
               >
                 {lines.map((line, i) => (
@@ -80,22 +86,11 @@ export function WhisperCompleteModal({ visible, title, lines, rewards, onClose }
 }
 
 const styles = StyleSheet.create({
-  scrim: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.7)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  card: {
-    width: '100%',
-    maxWidth: 420,
-    backgroundColor: '#13110f',
-    borderColor: '#c9a86a',
-    borderWidth: 1,
-    borderRadius: 4,
-    padding: 14,
-  },
+  // ⚠ OTA-1774 — `scrim` and `card` moved to the kit (`modalScrim` /
+  // `tModalCard(420)`). Same values, one source; the 420 is preserved.
+  // ⚠⚠ And the body gains `flexShrink`, without which the kit's 85% ceiling
+  // would clip CLOSE off the bottom rather than let the transcript scroll.
+  bodyScroll: { flexShrink: 1, flexGrow: 0 },
   title: { color: '#9ec96a', fontSize: 13, fontWeight: '800', letterSpacing: 3 },
   subtitle: { color: '#c9a86a', fontSize: 12, marginTop: 3, fontStyle: 'italic', letterSpacing: 1 },
   rule: { height: 1, backgroundColor: '#3a342c', marginTop: 8, marginBottom: 8 },

@@ -224,7 +224,12 @@ describe('the census is the ledger, and it fell by four', () => {
     for (const [n] of ADOPTERS) {
       expect([n, census.includes(`'${n}.tsx',`)]).toEqual([n, false]);
     }
-    for (const n of ['ApproachModal', 'CraftResultModal', 'KeyboardSafeCard', 'WhisperCompleteModal']) {
+    /* ⚠ OTA-1774 took two more off this list, so what THIS suite can honestly
+     * assert is that ITS OWN four adopters left — not a fixed remainder. Pinning
+     * the remainder would make a later correct adoption fail an earlier pass's
+     * test, which is this rollout's most-repeated mistake. The two that remain
+     * for a stated reason are pinned in ota1774's suite, where they belong. */
+    for (const n of ['ApproachModal', 'KeyboardSafeCard']) {
       expect([n, census.includes(`'${n}.tsx',`)]).toEqual([n, true]);
     }
   });

@@ -69,13 +69,21 @@ const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..')
  *                   kit's 85% ceiling would have nothing to give way and would
  *                   clip the button row rather than keep it reachable.
  *
+ *    325  OTA-1774  the modal sweep, batch 2 — the two "moment" modals that are
+ *                   FAMILY A BY CONSTRUCTION (CraftResult 400, WhisperComplete
+ *                   420) took `tModalCard`, and two more rim golds with them.
+ *                   ⚠ TWO OF THE SEVEN THE RULING NAMED, NOT SEVEN: the other
+ *                   five are Family B — a different ground, radius and padding —
+ *                   and forcing them onto Family A would restyle five beats
+ *                   rather than re-address them. Held for the owner.
+ *
  *  ⚠ THE CURRENT SPLIT, and the only line in this file written in the form
  *  OTA-1757's suite parses — the ledger above is deliberately terse so a
  *  HISTORICAL total cannot be mistaken for today's:
- *      322 interface · 4 semantic authorities · 1 kit
+ *      320 interface · 4 semantic authorities · 1 kit
  *  The INTERFACE number is the one the rollout drives down; the other two are
  *  the rule working. */
-const BASELINE = 327;
+const BASELINE = 325;
 
 /** The brand gold, the only hex this gate is about. */
 const GOLD = /'#c9a86a'/gi;
