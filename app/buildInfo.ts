@@ -30051,6 +30051,27 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SUPERSEDED: '2026-09-09-1783-the-legend-is-one-tap-away'
 // SUPERSEDED: '2026-09-09-1784-six-traders-six-voices'
 export const OTA_BUILD_ID = '2026-09-09-1785-one-authority-per-ratchet';
+// golem catch-up 2026-09-09: markerless publish of OTA-1785.
+// OTA-1785 - one authority per ratchet. Two corrections first, both worse than
+// reported: there were THIRTEEN gameStore ceiling authorities, not four (twelve
+// at 37000 and ota1717 at 36999, so the tightest governed silently and its
+// failure named an unrelated OTA), and writing the guard found NINE MORE from
+// the extraction campaign's own ladder - 22 assertions on one file's size. And
+// check:lines was never a line-count gate: it is verify-lines.mjs, about the
+// four PRODUCT lines. There was no gate at all, so every one of these rules was
+// enforceable only by a fourteen-minute surface run.
+// Three gates now: check:storeceiling, check:kitpalette, check:kitexports.
+// Nothing true was deleted. All 13 store suites are kept and re-pointed,
+// because they are 13 different sentences that merely shared a number - the
+// campaign ratchet, and twelve 'this OTA moved X out and it stayed out' claims.
+// The palette rule existed twice and the WEAKER copy (four exempt names, no
+// chroma ceiling) is the one that goes; three suites had been reading that rule
+// off a test file. ota1717 is preserved but re-expressed: its claim is that a
+// collapse returned 62 lines, already proved by the assertions above it.
+// The nine historical records stand. The guard against a fourteenth authority
+// is BINDING vs HISTORICAL: a literal bound must sit strictly above the
+// governed ceiling, so the ceiling always fails first and always names itself.
+// The extraction that follows lowers ONE number instead of thirteen.
 // golem catch-up 2026-09-09: markerless publish of OTA-1784.
 // OTA-1784 - six traders, six voices. class:roadside held six topics with ONE
 // authored line each, so all 24 roadside traders read from the same six
