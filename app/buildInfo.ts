@@ -30053,6 +30053,26 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SUPERSEDED: '2026-09-09-1785-one-authority-per-ratchet'
 // SUPERSEDED: '2026-09-09-1786-the-name-column-fits-its-vocabulary'
 export const OTA_BUILD_ID = '2026-09-09-1787-the-row-reads-its-own-hierarchy';
+// golem catch-up 2026-09-09: markerless publish of OTA-1787.
+// OTA-1787 - the combat row reads its own hierarchy. Two device findings, one
+// subject. PUNCH read as a peer filled weapon beside the illustrated controls,
+// so it takes the sage OUTLINE instead of the sage FILL - a re-classification
+// inside the five tones that already exist, on OTA-1454's own argument that a
+// solid block is a decisive commitment and the outline is what is merely
+// available. weaponTone returned strike for bare hands only because they reach
+// close, which answers 'can it land', not 'is it your weapon'. Only the strike
+// case moves: the amber warning and OTA-1591's out-of-range buzz read the RAW
+// tone and are byte-identical, and the weapon buttons are untouched.
+// The glyph reference is renamed GLYPH KEY - no question mark, which reads as
+// help-about-the-interface rather than a key to the world's vocabulary - and
+// moves off the weapon line onto the utility row beside inventory. OTA-1783 put
+// it beside the weapons because it decodes their marks; on glass that adjacency
+// made it read as a failed member of that family. OTA-1783's navigation and
+// return architecture are preserved verbatim.
+// Grade the code, not the prose, 26th sighting: re-aiming the placement test,
+// the first cut anchored the weapon row on a string that lives in a COMMENT,
+// and the suite reads stripped source - so indexOf returned -1 and the slice
+// ran to end-of-file and 'proved' the opposite. Re-anchored on real code.
 // golem catch-up 2026-09-09: markerless publish of OTA-1786.
 // OTA-1786 - the name column fits its vocabulary. Device finding: Lore's glyph
 // key wrapped BLUDGEONING onto a second line. The column was 92dp; the label
