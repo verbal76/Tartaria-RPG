@@ -947,6 +947,45 @@ export function tModalCard(maxWidth = 380): StyleProp<ViewStyle> {
   return [kit.modalCard, { maxWidth }];
 }
 
+/**
+ * ⚠⚠⚠ THE MOMENT CARD — FAMILY B, NAMED AND GOVERNED RATHER THAN MERGED.
+ *
+ * OTA-1765 measured a SECOND modal lineage and refused to sweep it: a deeper
+ * backdrop and a warmer ground, on the beats rather than the dialogs. OTA-1774
+ * then found the owner's "the other seven take the standard shell" ruling could
+ * not be executed literally, because five of the seven are this lineage and
+ * forcing them onto Family A would restyle five beats in four visible properties
+ * at once. The owner ruled, and the sentence is the one this helper exists for:
+ *
+ *     *"Name and govern Family B as a legitimate second shell. Do not force
+ *     those five experiential beats onto Family A and restyle them merely for
+ *     uniformity. The kit governs interface, not world expression."*
+ *
+ * So there are two shells, deliberately, and they are not variants of one thing:
+ *   FAMILY A `tModalCard` — a DIALOG. You are being asked something.
+ *     scrim 0.70 · ground #13110f · radius 4 · padding 14 · width 380–420
+ *   FAMILY B `tMomentCard` — a BEAT. Something happened to you.
+ *     scrim 0.78 · ground #17150f · radius 6 · padding 20 · width 440
+ * The deeper scrim and the warmer, rounder, roomier card are the difference
+ * between a quantity picker and a mission ending, and that difference is the
+ * product rather than debt.
+ *
+ * ⚠⚠ THE RIM IS A PARAMETER, AND THAT IS NOT COSMETIC. Five of the six measured
+ * cards are byte-identical; `MissionCompleteModal` differs in exactly one
+ * property — it rims in the success green and swaps to the brand gold for its
+ * victory escalation. That is SEMANTIC colour, which the owner's amendment
+ * reserves, so a card that hard-coded the gold could not have taken it and a
+ * sweep that normalised it would have deleted a meaning. Defaulting to `T.gold`
+ * keeps every other adopter's call site free of an argument.
+ *
+ * ⚠ AND THE SCRIM IS DELIBERATELY NOT BUNDLED IN — see `momentScrim` below.
+ * Three of the six pad and centre their backdrop and three do not, which is a
+ * real visible difference and not this helper's business to settle.
+ */
+export function tMomentCard(rim: string = T.gold): StyleProp<ViewStyle> {
+  return [kit.momentCard, { borderColor: rim }];
+}
+
 export interface TRowState {
   /** De-emphasised but still usable — a recipe you have not unlocked. */
   muted?: boolean;
@@ -1034,6 +1073,45 @@ const kit = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 4,
     padding: 14,
+  },
+  // ── TMoment (Family B) ────────────────────────────────────────────────────
+  /* ⚠⚠⚠ THE SECOND SHELL, NAMED ON AN OWNER RULING — see `tMomentCard` above.
+   * These are the shipped values, measured brace-balanced across all six files
+   * before a line was written.
+   *
+   * ⚠⚠ THE CARD AGREED AND THE SCRIM DID NOT, WHICH IS WHY THEY ARE SEPARATE.
+   * Five of six cards are byte-identical (the sixth differs only in its semantic
+   * rim, which is the parameter). The BACKDROPS split three and three:
+   *     CombatPrimer · MissionComplete · MissionStinger
+   *         flex 1 · 0.78 · alignItems center · justifyContent center · padding 24
+   *     DogOnboarding · GolemNaming · WandererEncounter
+   *         flex 1 · 0.78 · justifyContent center          ← no centring, no gutter
+   * That is not a formatting difference. Without `alignItems: 'center'` a card
+   * declaring `width: '100%'` with a 440 cap sits at the START of the cross axis
+   * rather than centred, and without `padding: 24` it runs to the bezel on any
+   * screen narrower than 440 — which is every phone this game ships on. So three
+   * moment cards are full-bleed and three have a 24pt gutter.
+   *
+   * ⚠ `momentScrim` IS THEREFORE THE PADDED, CENTRED ONE, and only the three
+   * that already draw it adopt here. Moving the other three would be a visible
+   * change to three beats on my own judgement, which is the thing the ruling
+   * above explicitly forbids. Reported, not fixed: HOLD 6. */
+  momentScrim: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.78)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 24,
+  },
+  /** ⚠ The rim is NOT here — it is `tMomentCard`'s parameter, so a card can keep
+   *  a semantic rim (MissionComplete's success green) without a second style. */
+  momentCard: {
+    width: '100%',
+    maxWidth: 440,
+    backgroundColor: '#17150f',
+    borderWidth: 1,
+    borderRadius: 6,
+    padding: 20,
   },
   // ── TSheet ────────────────────────────────────────────────────────────────
   /* ⚠⚠⚠ TSHEET — AND THE MEASUREMENT FOUND TWO PATTERNS, NOT THE ONE THE PLAN

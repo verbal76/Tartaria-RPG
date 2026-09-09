@@ -31,8 +31,8 @@ interface Props {
   onCancel: () => void;
 }
 
-// ⚠⚠⚠ OTA-1771 — HELD OUT OF THE MODAL SWEEP, DELIBERATELY, PENDING AN OWNER
-// RULING. Four of the five Family-A dialogs in this batch adopted the kit's
+// ⚠⚠⚠ OTA-1771 — HELD OUT OF THE MODAL SWEEP, AND OTA-1777 MADE THAT PERMANENT.
+// Four of the five Family-A dialogs in this batch adopted the kit's
 // `modalScrim` + `tModalCard`. This one did not, and the reason is structural
 // rather than cosmetic:
 //
@@ -55,8 +55,20 @@ interface Props {
 //
 //   Giving it a scrolling middle would fix it, and would also change what the
 //   player sees — the chips would scroll instead of all being visible at once.
-//   That is a layout decision, not a material extraction, so the shipped pixels
-//   stay exactly as they are until the owner rules. HOLD 4.
+//
+// ⚠⚠⚠ THE OWNER RULED, AND THE ANSWER IS THAT THIS FILE STAYS OUT:
+//     *"Leave it outside the shared shell. Do not introduce scrolling/chip
+//     behavior changes merely to make it qualify for the primitive.
+//     Document/govern the intentional exception."*
+//
+// So this is no longer a hold, and it is not an oversight either — it is a
+// GOVERNED EXCEPTION, and the governance is the point of this block. The rule
+// it records, for whoever writes the next chip-picker: a card may only adopt
+// the kit's shell if something inside it can yield to the shell's height
+// ceiling. A card whose whole content is fixed-height chips cannot, and
+// bending the content to fit the primitive is the tail wagging the dog.
+// ⚠ Pinned in ota1777's suite, which asserts this file still draws its own
+// scrim and card — the opposite of the assertion every adopter gets.
 //
 // Approach modal. The player picks a target (or types one) and the
 // engine resolves "approach <target>" — in combat, it switches focus

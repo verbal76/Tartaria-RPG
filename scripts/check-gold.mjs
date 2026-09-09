@@ -77,13 +77,19 @@ const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..')
  *                   and forcing them onto Family A would restyle five beats
  *                   rather than re-address them. Held for the owner.
  *
+ *    321  OTA-1777  Family B named and governed on the owner's ruling — the five
+ *                   moment modals took `tMomentCard`, and four rim golds went
+ *                   with them. ⚠ MissionComplete's card rims in SEMANTIC green,
+ *                   so the rim is a PARAMETER: a shell that hard-coded the gold
+ *                   could not have taken that card at all.
+ *
  *  ⚠ THE CURRENT SPLIT, and the only line in this file written in the form
  *  OTA-1757's suite parses — the ledger above is deliberately terse so a
  *  HISTORICAL total cannot be mistaken for today's:
- *      320 interface · 4 semantic authorities · 1 kit
+ *      316 interface · 4 semantic authorities · 1 kit
  *  The INTERFACE number is the one the rollout drives down; the other two are
  *  the rule working. */
-const BASELINE = 325;
+const BASELINE = 321;
 
 /** The brand gold, the only hex this gate is about. */
 const GOLD = /'#c9a86a'/gi;

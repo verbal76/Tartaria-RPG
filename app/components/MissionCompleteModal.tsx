@@ -10,6 +10,14 @@
 // their escort's name vanishing from the HUD.
 import React, { useEffect } from 'react';
 import { Modal, View, Text, Pressable, StyleSheet, ScrollView } from 'react-native';
+import { tMomentCard, tartariaKitStyles as kit } from '../ui/tartariaKit';
+
+// ⚠⚠ OTA-1777 — Family B, named on the owner's ruling. The rim is passed
+// because it is SEMANTIC: green is the ordinary completion and the brand gold
+// is the victory escalation. A shell that hard-coded gold could not have taken
+// this card, and normalising it would have deleted a meaning.
+const CARD = tMomentCard('#9ec96a');
+
 import { useGameStore } from '../state/gameStore';
 
 /** Safety valve only. The modal is meant to be DISMISSED, not waited out — the
@@ -54,8 +62,8 @@ export function MissionCompleteModal() {
   const victory = !!notice.heading;
   return (
     <Modal visible transparent animationType="fade" onRequestClose={clear}>
-      <View style={styles.backdrop}>
-        <View style={[styles.card, victory && styles.cardVictory]}>
+      <View style={kit.momentScrim}>
+        <View style={[CARD, victory && styles.cardVictory]}>
           <Text style={[styles.kicker, victory && styles.kickerVictory]}>{heading}</Text>
           <Text style={styles.title} accessibilityRole="header">{notice.title}</Text>
           <View style={[styles.rule, victory && styles.ruleVictory]} />
@@ -91,14 +99,7 @@ export function MissionCompleteModal() {
 }
 
 const styles = StyleSheet.create({
-  backdrop: {
-    flex: 1, backgroundColor: 'rgba(0,0,0,0.78)',
-    alignItems: 'center', justifyContent: 'center', padding: 24,
-  },
-  card: {
-    width: '100%', maxWidth: 440, backgroundColor: '#17150f',
-    borderWidth: 1, borderColor: '#9ec96a', borderRadius: 6, padding: 20,
-  },
+  // ⚠ OTA-1777 — `card` and `backdrop` moved to the kit (`tMomentCard` / `momentScrim`). Same values, one source.
   kicker: { color: '#9ec96a', fontSize: 11, letterSpacing: 2 },
   title: { color: '#f0e6cc', fontSize: 17, marginTop: 8, lineHeight: 23 },
   rule: { height: 1, backgroundColor: '#6b5c3a', marginVertical: 14 },

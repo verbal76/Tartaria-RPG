@@ -26,6 +26,12 @@
 //      MissionCompleteModal, which is the house reference.
 import React, { useEffect, useState } from 'react';
 import { Modal, View, Text, TextInput, Pressable, StyleSheet, ScrollView } from 'react-native';
+import { tMomentCard } from '../ui/tartariaKit';
+
+// ⚠ OTA-1777 — Family B, named on the owner's ruling: a BEAT, not a dialog.
+// Deeper scrim, warmer and rounder card. Zero pixels move.
+const CARD = tMomentCard();
+
 import { useCardViewport } from './KeyboardSafeCard';
 import { keyboardInset } from '../engine/keyboardSafeCard';
 import { useGameStore } from '../state/gameStore';
@@ -115,7 +121,7 @@ export function DogOnboardingModal() {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          <View style={styles.card}>
+          <View style={CARD}>
             <Text style={styles.kicker}>THE RESCUE IS DONE</Text>
             <Text style={styles.title} accessibilityRole="header">The dog is yours</Text>
             <View style={styles.rule} />
@@ -220,21 +226,17 @@ export function DogOnboardingModal() {
 // gold border and accents, cream title. The previous cold slate/cyan scheme
 // belonged to no other screen in the game.
 const styles = StyleSheet.create({
+  // ⚠ OTA-1777 — `card` moved to the kit (`tMomentCard`). Same values, one source.
+  // ⚠⚠ The backdrop STAYS LOCAL: it neither centres nor pads, so this card is
+  // full-bleed to the bezel on any screen under 440. That is a visible
+  // difference from its three siblings, not a formatting one, and changing it
+  // is an owner call rather than a side effect of naming a shell. HOLD 6.
   backdrop: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.78)',
     justifyContent: 'center',
   },
   scroll: { paddingHorizontal: 20, paddingVertical: 32, alignItems: 'center' },
-  card: {
-    width: '100%',
-    maxWidth: 440,
-    backgroundColor: '#17150f',
-    borderWidth: 1,
-    borderColor: '#c9a86a',
-    borderRadius: 6,
-    padding: 20,
-  },
   kicker: { color: '#c9a86a', fontSize: 11, letterSpacing: 2 },
   title: { color: '#f0e6cc', fontSize: 17, marginTop: 8, lineHeight: 23 },
   rule: { height: 1, backgroundColor: '#7a6640', marginVertical: 14 },

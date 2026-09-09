@@ -29910,7 +29910,43 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // player on the character select, and TScreenHeader takes a callback precisely
 // so that survives. Guidance's read-only guarantee is pinned as well - listing a
 // card there must never write its seen flag.
-export const OTA_BUILD_ID = '2026-09-09-1776-cover-before-the-thin-four';
+// SUPERSEDED: '2026-09-09-1776-cover-before-the-thin-four'
+// OTA-1777 - Family B is named and governed. The modal sweep, finished.
+// OTA-1774 could not execute "the other seven take the standard shell" literally
+// because five of the seven are a second lineage. The owner ruled: name and
+// govern Family B as a legitimate second shell, do not force those five
+// experiential beats onto Family A merely for uniformity, the kit governs
+// interface and not world expression.
+// So there are TWO shells on purpose and they mean different things: tModalCard
+// is a DIALOG (you are being asked something) and tMomentCard is a BEAT
+// (something happened to you). The deeper scrim and the warmer, rounder, roomier
+// card are the difference between a quantity picker and a mission ending.
+// THE RIM IS A PARAMETER, and that is the strongest form of the semantic rule
+// rather than a convenience. MissionComplete rims in the success green, so a
+// shell that hard-coded the brand gold could not have taken that card at all -
+// the kit owns MATERIAL, never MEANING. Its victory escalation survives intact.
+// Four more rim golds left with the adoption and check:gold falls 325 to 321.
+// AND MEASURING THE BACKDROPS FOUND WHAT THE CARD MEASUREMENT HID. Brace-
+// balanced across all six files the scrims split three and three: CombatPrimer,
+// MissionComplete and MissionStinger centre and pad theirs; DogOnboarding,
+// GolemNaming and WandererEncounter do neither. That is not formatting. Without
+// alignItems center a card declaring width 100% under a 440 cap sits at the
+// START of the cross axis, and without padding 24 it runs to the bezel on any
+// screen narrower than 440 - which is every phone this game ships on. So three
+// moment cards are full-bleed and three have a gutter, and only the ones that
+// already drew the padded scrim adopt it. Moving the other three would be
+// changing three beats on my own judgement, which is the thing the ruling
+// forbids. Reported, not fixed.
+// MissionStinger is the sharpest case: built exactly like the five, and the same
+// ruling keeps it EXPERIENTIAL, so it keeps a private copy of values the kit now
+// owns. That looks like an oversight and is not - construction does not track
+// intent. Pinned so nobody finishes the job by sweeping it in.
+// ApproachModal becomes a GOVERNED EXCEPTION rather than an open hold, on the
+// owner's ruling to leave it outside the shared shell and document the
+// exception. Its heading said "pending an owner ruling" and now says what was
+// ruled; the rule it records is general - a card may only adopt the shell if
+// something inside it can yield to the shell's height ceiling.
+export const OTA_BUILD_ID = '2026-09-09-1777-family-b-is-named';
 // golem catch-up 2026-09-09: markerless publish of OTA-1776 - cover before the
 // four thin screens. No code changed; this is the before picture for step 8,
 // written first on the owner's ruling. The measurement is the value: Log, Lore

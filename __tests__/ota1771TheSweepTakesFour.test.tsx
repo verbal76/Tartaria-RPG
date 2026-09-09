@@ -173,8 +173,12 @@ describe('⚠⚠⚠ ApproachModal is HELD, and holding is not the same as skippi
     /* ⚠ Matched on fragments that cannot wrap — OTA-1769 learned that asserting a
      * whole phrase grades the formatter's line breaks. */
     const src = cmp('ApproachModal');
+    /* ⚠ OTA-1777 replaced `HOLD 4` with `GOVERNED EXCEPTION` — the owner ruled
+     * this file stays out permanently. The claim here was always "the reason is
+     * written in the file", not "the file says HOLD", so it follows the ruling
+     * rather than pinning the word that happened to be there first. */
     expect(src).toContain('HELD OUT OF THE MODAL SWEEP');
-    expect(src).toContain('HOLD 4');
+    expect(src).toContain('GOVERNED EXCEPTION');
     expect(src).toContain('HORIZONTALLY');
   });
 });

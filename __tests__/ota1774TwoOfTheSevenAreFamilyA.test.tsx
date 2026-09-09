@@ -123,31 +123,52 @@ describe('the two Family A moment modals took the shell', () => {
 describe('⚠⚠⚠ the other five are Family B, and that is measured, not asserted', () => {
   test('all five carry the deeper backdrop and the warmer card', () => {
     /* The measurement the ruling was made without. Each of these differs from
-     * Family A in FOUR properties at once, and every one of them is visible. */
+     * Family A in FOUR properties at once, and every one of them is visible.
+     * ⚠ RE-AIMED ON OTA-1777: the card values now live in the kit, so the test
+     * reads them from there and asserts each file REACHES it. The deeper scrim
+     * is still read per file, because three of them still declare their own. */
+    const { StyleSheet } = require('react-native');
+    const { tMomentCard, tartariaKitStyles } = require('../app/ui/tartariaKit');
+    const card = StyleSheet.flatten(tMomentCard()) as Record<string, unknown>;
+    expect(card.backgroundColor).toBe('#17150f');
+    expect(card.borderRadius).toBe(6);
+    expect(card.padding).toBe(20);
+    expect(card.maxWidth).toBe(440);
+    expect((StyleSheet.flatten(tartariaKitStyles.momentScrim) as Record<string, unknown>)
+      .backgroundColor).toBe('rgba(0,0,0,0.78)');
     for (const n of HELD_B) {
-      const backdrop = bodyOf(cmp(n), 'backdrop');
-      const card = bodyOf(cmp(n), 'card');
-      expect([n, /rgba\(0,0,0,0\.78\)/.test(backdrop)]).toEqual([n, true]);
-      expect([n, /backgroundColor: '#17150f'/.test(card)]).toEqual([n, true]);
-      expect([n, /borderRadius: 6/.test(card)]).toEqual([n, true]);
-      expect([n, /padding: 20/.test(card)]).toEqual([n, true]);
-      expect([n, /maxWidth: 440/.test(card)]).toEqual([n, true]);
+      const code = codeOf(cmp(n));
+      const scrim = code.includes('kit.momentScrim') ? 'rgba(0,0,0,0.78)' : bodyOf(cmp(n), 'backdrop');
+      expect([n, /rgba\(0,0,0,0\.78\)/.test(scrim)]).toEqual([n, true]);
+      expect([n, code.includes('tMomentCard')]).toEqual([n, true]);
     }
   });
 
-  test('⚠⚠ their pixels are UNTOUCHED — a hold preserves shipped behaviour', () => {
+  test('⚠⚠ their pixels are UNTOUCHED — and they still are, one shell later', () => {
+    /* ⚠⚠⚠ RE-AIMED ON OTA-1777. This test used to assert the five kept PRIVATE
+     * copies, which was the correct claim while they were held. The owner then
+     * ruled Family B a legitimate second shell, so they now read `tMomentCard`
+     * — and the claim worth defending was never "they are unmigrated", it was
+     * "NOT ONE PIXEL MOVED WHILE THE QUESTION WAS OPEN, AND NONE MOVED WHEN IT
+     * CLOSED EITHER". That survives the ruling, so it is what this asserts now.
+     *
+     * ⚠ The Family A half is the part that must stay false: whatever happened to
+     * these five, they did NOT end up on the dialog shell, which is the outcome
+     * this suite was written to prevent. */
+    const { StyleSheet } = require('react-native');
+    const { tMomentCard } = require('../app/ui/tartariaKit');
     for (const n of HELD_B) {
       const code = codeOf(cmp(n));
       expect([n, code.includes('tModalCard')]).toEqual([n, false]);
       expect([n, code.includes('kit.modalScrim')]).toEqual([n, false]);
-      expect([n, code.includes('style={styles.backdrop}')]).toEqual([n, true]);
-      /* ⚠ `styles.card` REFERENCED, not `style={styles.card}` exactly — my first
-       * draft asserted the literal JSX and went red on `MissionCompleteModal`,
-       * which composes `[styles.card, victory && styles.cardVictory]`. The claim
-       * is that the file still paints from its own local card, and a composed
-       * style satisfies that just as well as a bare one. */
-      expect([n, /styles\.card\b/.test(code)]).toEqual([n, true]);
+      expect([n, code.includes('tMomentCard')]).toEqual([n, true]);
     }
+    // and the shell they took resolves to the values they all drew
+    const flat = StyleSheet.flatten(tMomentCard()) as Record<string, unknown>;
+    expect(flat.maxWidth).toBe(440);
+    expect(flat.backgroundColor).toBe('#17150f');
+    expect(flat.borderRadius).toBe(6);
+    expect(flat.padding).toBe(20);
   });
 
   test('⚠⚠⚠ MissionComplete rims in a SEMANTIC PAIR, and neither half is swept', () => {
@@ -161,7 +182,11 @@ describe('⚠⚠⚠ the other five are Family B, and that is measured, not asser
      * The kit's standing rule (and the owner's amendment behind it) is that
      * semantic colour is kept, so BOTH halves survive whatever is decided about
      * Family B's ground. Pinned so a later decision cannot take them along. */
-    expect(bodyOf(cmp('MissionCompleteModal'), 'card')).toContain("borderColor: '#9ec96a'");
+    /* ⚠ RE-AIMED ON OTA-1777: the rim is a PARAMETER now, which is the strongest
+     * possible form of this claim — a shell that hard-coded the brand gold could
+     * not have taken this card at all, so the semantic colour is not merely
+     * preserved, it is the reason the helper has an argument. */
+    expect(codeOf(cmp('MissionCompleteModal'))).toContain("tMomentCard('#9ec96a')");
     expect(bodyOf(cmp('MissionCompleteModal'), 'cardVictory')).toContain("borderColor: '#c9a86a'");
     const code = codeOf(cmp('MissionCompleteModal'));
     expect(code).toContain('victory && styles.cardVictory');
@@ -171,7 +196,8 @@ describe('⚠⚠⚠ the other five are Family B, and that is measured, not asser
     }
     // and the four siblings have no such pair — this is one file's construction
     for (const n of HELD_B.filter((x) => x !== 'MissionCompleteModal')) {
-      expect([n, /borderColor: '#c9a86a'/.test(bodyOf(cmp(n), 'card'))]).toEqual([n, true]);
+      // they take the DEFAULT rim, which is the brand gold they each declared
+      expect([n, codeOf(cmp(n)).includes('tMomentCard()')]).toEqual([n, true]);
       expect([n, codeOf(cmp(n)).includes('cardVictory')]).toEqual([n, false]);
     }
   });
@@ -215,8 +241,13 @@ describe('what is left, and why each one is left', () => {
      * no vertical scroll to absorb the ceiling (HOLD 4); KeyboardSafeCard is a
      * second shell whose height is measured from the real keyboard edge. Both
      * reasons are in the files, asserted rather than trusted. */
+    /* ⚠ OTA-1777: `HOLD 4` became `GOVERNED EXCEPTION` when the owner ruled
+     * *"leave it outside the shared shell ... document/govern the intentional
+     * exception."* A hold is a question; a governed exception is an answer, and
+     * the file has to say which it is or the next reader re-opens it. */
     expect(cmp('ApproachModal')).toContain('HELD OUT OF THE MODAL SWEEP');
-    expect(cmp('ApproachModal')).toContain('HOLD 4');
+    expect(cmp('ApproachModal')).toContain('GOVERNED EXCEPTION');
+    expect(cmp('ApproachModal')).not.toContain('PENDING AN OWNER');
     expect(codeOf(cmp('KeyboardSafeCard'))).toContain('cardMaxHeight(vp)');
     expect(codeOf(cmp('KeyboardSafeCard'))).not.toContain("maxHeight: '85%'");
   });

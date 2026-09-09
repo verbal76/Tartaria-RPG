@@ -30,6 +30,12 @@
 // is the noise that gets tips switched off.
 import React from 'react';
 import { Modal, View, Text, Pressable, StyleSheet, ScrollView } from 'react-native';
+import { tMomentCard, tartariaKitStyles as kit } from '../ui/tartariaKit';
+
+// ⚠ OTA-1777 — Family B, named on the owner's ruling: a BEAT, not a dialog.
+// Deeper scrim, warmer and rounder card. Zero pixels move.
+const CARD = tMomentCard();
+
 // ⚠⚠⚠ OTA-1524 — THIS CARD IGNORED THE GLOBAL TIPS SWITCH ENTIRELY. `setHintsDisabled`
 // has existed since OTA-860 and every FirstTimeHint honours it and offers it; the two
 // dedicated primers did neither, so a player who turned tips off still got this modal
@@ -54,8 +60,8 @@ export function CombatPrimerModal({
 }) {
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent>
-      <View style={styles.backdrop} accessibilityViewIsModal={true}>
-        <View style={styles.card}>
+      <View style={kit.momentScrim} accessibilityViewIsModal={true}>
+        <View style={CARD}>
           <Text style={styles.kicker} accessibilityRole="header">YOUR FIRST FIGHT</Text>
           <Text style={styles.title}>
             {enemyName ? `${enemyName} is on you.` : 'Something is on you.'} Here is what the buttons do.
@@ -175,14 +181,7 @@ export function CombatPrimerModal({
 // backdrop. OTA-1043 established that a popup off this palette reads as a
 // different game.
 const styles = StyleSheet.create({
-  backdrop: {
-    flex: 1, backgroundColor: 'rgba(0,0,0,0.78)',
-    alignItems: 'center', justifyContent: 'center', padding: 24,
-  },
-  card: {
-    width: '100%', maxWidth: 440, backgroundColor: '#17150f',
-    borderWidth: 1, borderColor: '#c9a86a', borderRadius: 6, padding: 20,
-  },
+  // ⚠ OTA-1777 — `card` and `backdrop` moved to the kit (`tMomentCard` / `momentScrim`). Same values, one source.
   kicker: { color: '#c9a86a', fontSize: 11, letterSpacing: 2 },
   title: { color: '#f0e6cc', fontSize: 16, marginTop: 8, lineHeight: 22 },
   rule: { height: 1, backgroundColor: '#6b5c3a', marginVertical: 14 },

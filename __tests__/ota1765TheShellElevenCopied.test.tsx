@@ -272,14 +272,25 @@ describe('what is left, counted by predicate', () => {
     ]);
   });
 
-  test('⚠ Family B and the semantic rims are untouched, by instruction', () => {
+  test('⚠ the semantic rims are untouched, and Family B is now GOVERNED', () => {
     /* `#9ec96a` on MissionComplete is a SUCCESS and `#8aa0a4` on FusionPicker is
      * a CATEGORY — the owner's amendment reserves semantic colour, so neither is
-     * an accent to sweep. Family B's `#17150f` ground is a real second lineage;
-     * merging it is a decision for the sweep, not a side effect of this. */
+     * an accent to sweep. Family B's `#17150f` ground was called "a real second
+     * lineage" here and left alone; OTA-1777 is the decision that admitted it,
+     * as a SHELL rather than as a merge. */
+    /* ⚠⚠⚠ RE-AIMED ON OTA-1777, AND THE TWO HALVES CAME APART — which is the
+     * finding worth keeping. This test used to make ONE claim ("the kit owns
+     * neither the success green nor Family B's ground"), and the owner's ruling
+     * split it: Family B was named as a legitimate second shell, so the kit DOES
+     * own `#17150f` now. The semantic green did NOT move, and could not have —
+     * `tMomentCard` takes the rim as a PARAMETER precisely so a card can keep a
+     * meaning the kit must not learn.
+     * So the surviving claim is the one that was always the real one: the kit
+     * owns MATERIAL, never MEANING. */
     expect(read('app', 'components', 'MissionCompleteModal.tsx')).toContain('#9ec96a');
-    expect(codeOf(KIT)).not.toContain('#9ec96a');
-    expect(codeOf(KIT)).not.toContain('#17150f');
+    expect(codeOf(KIT)).not.toContain('#9ec96a');   // meaning: still not the kit's
+    expect(codeOf(KIT)).toContain('#17150f');       // material: now the kit's, by ruling
+    expect(codeOf(KIT)).toContain('momentCard');
   });
 });
 

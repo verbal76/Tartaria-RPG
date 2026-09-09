@@ -89,8 +89,15 @@ describe('the two shapes are in the kit', () => {
     const decls = [...KIT.matchAll(/^export (function|const) (\w+)/gm)];
     const components = decls.filter((m) => m[1] === 'function' && /^T[A-Z]/.test(m[2]!));
     const helpers = decls.filter((m) => !(m[1] === 'function' && /^T[A-Z]/.test(m[2]!)));
+    /* ⚠ THE HELPER CEILING MOVED 7 → 8 ON OTA-1777, AND A CEILING THAT MOVES ON
+     * A RULING IS WORKING RATHER THAN FAILING. `tMomentCard` was added when the
+     * owner ruled Family B a legitimate second shell; it takes a parameter (the
+     * semantic rim), so it earns its place by the same test TSheet failed —
+     * TSheet added zero exports precisely because neither of its shapes varied.
+     * The claim this test defends is "a helper exists only where something
+     * varies", not "there are exactly seven of them". */
     expect(components.length).toBeLessThanOrEqual(13);
-    expect(helpers.length).toBeLessThanOrEqual(7);
+    expect(helpers.length).toBeLessThanOrEqual(8);
     expect(codeOf(KIT)).not.toMatch(/export function tSheet/);
   });
 });

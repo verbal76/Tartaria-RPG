@@ -712,10 +712,26 @@ describe('OTA-1742 — the language is reusable, and the first pass stayed in it
      * component owning the container would have to own that too.
      * ⚠ Tier 0 is a FINITE, NAMED list and one primitive is left (TSheet), so
      * this number is not open-ended. A helper that is not on that list still has
-     * to make its case from scratch. */
+     * to make its case from scratch.
+     *
+     * ⚠⚠⚠ HELPERS 7 → 8 BY OTA-1777 (`tMomentCard`), AND IT MADE ITS CASE FROM
+     * SCRATCH BECAUSE IT IS NOT ON TIER 0'S LIST. It arrives BY INSTRUCTION —
+     * the owner ruled *"name and govern Family B as a legitimate second
+     * shell"* — and it replaces copies rather than adding a choice: five files
+     * hand-drew that card. And it is a helper rather than a stylesheet entry for
+     * the reason TSheet was NOT one: it takes a parameter. The rim is passed
+     * because `MissionCompleteModal` rims in the success green, so a constant
+     * could not have served it.
+     *
+     * ⚠⚠ AND THIS BOUND IS ASSERTED IN TWO SUITES, WHICH IS HOW I MISSED IT.
+     * `ota1769` carries the same ceiling, and OTA-1777 raised that one while
+     * this one stayed at 7 — a full surface run caught it, a single-suite run
+     * would not have. Recorded rather than deduplicated: consolidating them is a
+     * legacy-hunt item (one authority for one invariant), not something to do
+     * inside a pass that is already changing the number. */
     expect(components.length).toBeLessThanOrEqual(13);
-    expect(helpers.length).toBeLessThanOrEqual(7);
-    expect(exported.length).toBeLessThanOrEqual(20);
+    expect(helpers.length).toBeLessThanOrEqual(8);
+    expect(exported.length).toBeLessThanOrEqual(21);
   });
 
   /* ⚠⚠⚠ SUPERSEDED BY VIS-3 (OTA-1746) — AND THE REASONING IS KEPT HERE RATHER
