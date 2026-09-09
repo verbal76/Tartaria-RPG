@@ -50,6 +50,7 @@ import { glyphArt, DISCOVERY_STAR_ART, GLYPH_ART_SIZE, GLYPH_NAME_TYPE } from '.
  * control-depth language. This is the ONLY thing InputBox takes from the kit;
  * every colour on these chips is still the combat vocabulary's own. */
 import { tControlDepth } from '../ui/tartariaKit';
+import { armLoreJump } from '../ui/loreJump';
 import { reachBandsFor, reachFiresDown } from '../engine/types';
 // ⚠ OTA-1423 — the three Arbiter refusals below name the dog, so they also
 // have to gender it. Without this they read "bring it up" about a companion
@@ -887,6 +888,49 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 const parts = combatWeaponLabelParts(equippedOff, equippedOffItem, raw, activeEnemyKnownWeak ?? []);
                 return <QuickBtn label={label} glyphs={parts.glyphs} glyphText={parts.text} baseGlyph={parts.base} star={parts.star} weapon onPress={() => onSubmit(`attack with the off-hand ${equippedOff.toLowerCase()}`)} tone={offT} outOfRange={offT === 'needs-approach'} />;
               })() : null}
+              {/* ⚠⚠⚠ OTA-1783 — THE GLYPH REFERENCE, AND EVERY CHOICE IN IT IS A
+                  CONSTRAINT THE OWNER SET.
+                  *"Add a compact, neutral reference control in the combat
+                  action/weapon area that takes the player directly to Lore ->
+                  Glyphs... Tap reference -> Glyph legend -> Back -> continue the
+                  fight."*
+
+                  ⚠ THE SYMBOL IS NOT A GLYPH. *"Do NOT use one of the actual
+                  damage/coat glyphs as the reference-control symbol. That would
+                  imply that particular damage type."* So there is no artwork on
+                  this chip at all — no `glyphs`, no `baseGlyph`, no Image. It is
+                  a question mark and the destination's own name. `?` is the
+                  reference mark and belongs to no damage family; GLYPHS is the
+                  literal label of the Lore tab it opens, so what the player taps
+                  and where they land say the same word. A bare KEY would have
+                  been shorter and worse — this game has keys, and they are items.
+
+                  ⚠ IT IS THE EXISTING FAMILY, NOT A NEW ONE. Same `QuickBtn`,
+                  same chassis, default neutral tone, so it inherits OTA-1782's
+                  control depth exactly like every other chip and introduces no
+                  visual family of its own. It carries no tone, which is what
+                  keeps it subordinate: every chip beside it is coloured by what
+                  it can DO right now, and this one can never do anything to the
+                  enemy.
+
+                  ⚠ LAST ON THE LINE, AFTER THE WEAPONS. It decodes the marks on
+                  the two chips to its left, so it sits with them; and it is the
+                  smallest thing on the row rather than a primary button, because
+                  *"Do not make it a large primary combat button simply because
+                  KICK previously occupied space."*
+
+                  ⚠ IT DOES NOT SUBMIT A COMMAND. Every other chip here goes
+                  through `onSubmit` and costs the player a turn's worth of
+                  engine. This is navigation: it spends no stamina, no time and
+                  no round, and the fight it leaves is still there when the codex
+                  closes. */}
+              <QuickBtn
+                label="? glyphs"
+                onPress={() => {
+                  armLoreJump({ section: 'glyphs', returnTo: useGameStore.getState().currentScreen });
+                  useGameStore.getState().setScreen('lore');
+                }}
+              />
             </View>
 
             <View style={styles.quickRowLine}>

@@ -4,13 +4,16 @@
 // "always accessible from the gear icon"). The standalone screen
 // stays for any external navigation path that lands on 'lore'.
 
-import React from 'react';
+import React, { useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { TScreenHeader } from '../ui/tartariaKit';
 import { useGameStore } from '../state/gameStore';
 import { FirstTimeHint } from '../components/FirstTimeHint';
 import { TEACHINGS as TEACH } from '../components/teachingRegistry'; // OTA-1738
 import { LoreCodexBody } from '../components/LoreCodexBody';
+import type { Section } from '../components/LoreCodexBody';
+import { takeLoreJump } from '../ui/loreJump';
+import type { LoreJump } from '../ui/loreJump';
 
 export function LoreScreen() {
   const setScreen = useGameStore((s) => s.setScreen);
@@ -22,17 +25,37 @@ export function LoreScreen() {
   // and it dropped me to the character selection screen." With a live
   // character, BACK returns to the game; only the true title-menu path leaves.
   const inSession = useGameStore((s) => s.player !== null);
+  /* ⚠⚠⚠ OTA-1783 — A LOOK-UP JUMP GOES BACK EXACTLY WHERE IT CAME FROM.
+   * Owner, on the combat glyph reference: *"Back must return cleanly to the
+   * exact active combat state. Do not dump the player onto another screen,
+   * character selection, exploration, or the Lore root."*
+   * The rule above is a good DEFAULT and a bad promise: it re-derives the
+   * destination from whether a character exists, which is a guess. `loreJump`
+   * carries the screen the player actually left, captured at the jump, so BACK
+   * is a recorded fact rather than a rule that has to be right about every
+   * path. The default stays for every ordinary visit — OTA-1292's fix is
+   * untouched — and the jump wins only when there is one.
+   * ⚠ NOTHING HERE RESTORES A FIGHT, because nothing has to: combat is store
+   * state and `exploration` is the screen it is fought on, so the round trip
+   * never touched it. That is the whole reason this could be a navigation
+   * change rather than a combat one. */
+  /* ⚠ READ ONCE PER MOUNT. `takeLoreJump` clears as it reads, and the ref is
+   * what keeps a second render of the SAME mount from finding it already gone.
+   * `undefined` means "not looked yet"; `null` means "looked, nothing there". */
+  const jump = useRef<LoreJump | null | undefined>(undefined);
+  if (jump.current === undefined) jump.current = takeLoreJump();
+  const loreJump = jump.current;
 
   return (
     <View style={styles.container}>
       <FirstTimeHint id={TEACH.lore_first_open.id} title={TEACH.lore_first_open.title} body={TEACH.lore_first_open.body} />
       <TScreenHeader
         title="LORE CODEX"
-        onBack={() => setScreen(inSession ? 'exploration' : 'title')}
+        onBack={() => setScreen(loreJump?.returnTo ?? (inSession ? 'exploration' : 'title'))}
           accessibilityLabel="Back"
       />
 
-      <LoreCodexBody />
+      <LoreCodexBody openAt={loreJump?.section as Section | undefined} />
     </View>
   );
 }

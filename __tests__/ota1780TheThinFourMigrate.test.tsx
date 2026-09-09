@@ -101,7 +101,15 @@ describe('⚠⚠⚠ BACK still goes where each screen sent it', () => {
      * precisely so this survives — a migration that "tidied" it to a constant
      * would have re-opened a shipped bug, and OTA-1776 pinned it for that reason. */
     const code = codeOf(scr('LoreScreen'));
-    expect(code).toContain("onBack={() => setScreen(inSession ? 'exploration' : 'title')}");
+    /* ⚠⚠ RE-AIMED BY OTA-1783 — PIN THE CLAIM, NEVER THE MECHANISM. This used
+     * to pin the whole expression. The claim is that BACK is CONDITIONAL on a
+     * live session rather than hard-wired to the title screen — OTA-1292's fix,
+     * which is still exactly what the code says. OTA-1783 wrapped it in a
+     * `loreJump?.returnTo ?? (...)` so a look-up jump from combat can return to
+     * the screen it actually left; the conditional is the FALLBACK and every
+     * ordinary visit still takes it. Pinning the outer shape turned this red on
+     * a change that strengthened the very thing it guards. */
+    expect(code).toMatch(/onBack=\{\(\) => setScreen\([^)]*inSession \? 'exploration' : 'title'/);
     expect(code).toContain('s.player !== null');
   });
 

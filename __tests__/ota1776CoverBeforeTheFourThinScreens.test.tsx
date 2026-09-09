@@ -207,7 +207,15 @@ describe('⚠⚠⚠ what BACK does, screen by screen — the easiest thing to fl
      * this with a constant re-opens that bug, and `TScreenHeader` takes a
      * callback precisely so it does not have to. */
     const code = codeOf(scr('LoreScreen'));
-    expect(code).toContain("setScreen(inSession ? 'exploration' : 'title')");
+    /* ⚠⚠ RE-AIMED BY OTA-1783 — PIN THE CLAIM, NEVER THE MECHANISM. This used
+     * to pin the whole expression. The claim is that BACK is CONDITIONAL on a
+     * live session rather than hard-wired to the title screen — OTA-1292's fix,
+     * which is still exactly what the code says. OTA-1783 wrapped it in a
+     * `loreJump?.returnTo ?? (...)` so a look-up jump from combat can return to
+     * the screen it actually left; the conditional is the FALLBACK and every
+     * ordinary visit still takes it. Pinning the outer shape turned this red on
+     * a change that strengthened the very thing it guards. */
+    expect(code).toContain("inSession ? 'exploration' : 'title'");
     expect(code).toContain('s.player !== null');
   });
 

@@ -51,7 +51,7 @@ import {
 // OTA-845 — the FALLEN tab: an install-wide, cross-character memorial. Every character
 // who dies is remembered here (saveSystem.loadFallen), so a run ending is never a clean
 // wipe — later characters (and the title screen, between runs) can read who came before.
-type Section = 'races' | 'factions' | 'places' | 'timeline' | 'bestiary' | 'lore' | 'fallen' | 'glyphs';
+export type Section = 'races' | 'factions' | 'places' | 'timeline' | 'bestiary' | 'lore' | 'fallen' | 'glyphs';
 
 /** ⚠⚠ OTA-1365 — TAB ORDER IS A GAMEPLAY DECISION, NOT AN ALPHABET.
  *  Owner: *"they are not organized in a fashion where the most used one for
@@ -107,7 +107,7 @@ interface CodexEnemy {
 }
 interface LoreConcept { id: string; title: string; answer: string }
 
-export function LoreCodexBody() {
+export function LoreCodexBody({ openAt }: { openAt?: Section } = {}) {
   // ⚠⚠ OTA-1376 — THE CODEX OPENS ON THE TAB YOU CAME FOR. Owner: *"when we
   // reorganized the lore tabs we need it to open when you hit the lore button
   // and have the beasts tab the one that opens."* It was still opening on
@@ -118,7 +118,12 @@ export function LoreCodexBody() {
   // ⚠ Read from TAB_ORDER rather than hard-coded, so the opening tab and the
   // top-left tab are the same fact. Reorder the row again and the landing
   // follows; they cannot drift apart.
-  const [section, setSection] = useState<Section>(TAB_ORDER[0]!);
+  /* ⚠⚠ OTA-1783 — AND A DEEP LINK OVERRIDES THAT LANDING. The combat glyph
+   * reference opens the codex ON `glyphs`, because the player tapped it mid-
+   * fight to look ONE thing up. `openAt` is the destination and `TAB_ORDER[0]`
+   * is still the default, so an ordinary visit is unchanged and the two facts
+   * remain one line apart rather than in two files. */
+  const [section, setSection] = useState<Section>(openAt ?? TAB_ORDER[0]!);
   const [pendingRoute, setPendingRoute] = useState<Location | null>(null);
   // 2026-05-25 — branded refusal modal for the hub-room gate.
   // Replaces the native Alert.alert that was breaking the dark

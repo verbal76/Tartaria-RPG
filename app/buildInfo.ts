@@ -30047,7 +30047,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // deny-list it sat on for being under-covered.
 // SUPERSEDED: '2026-09-09-1780-the-thin-four-migrate'
 // SUPERSEDED: '2026-09-09-1781-the-name-grew-with-the-mark'
-export const OTA_BUILD_ID = '2026-09-09-1782-the-control-sits-proud';
+// SUPERSEDED: '2026-09-09-1782-the-control-sits-proud'
+export const OTA_BUILD_ID = '2026-09-09-1783-the-legend-is-one-tap-away';
 // golem catch-up 2026-09-09: markerless publish of OTA-1782.
 // OTA-1782 - the control sits proud of the plane. One governed control-depth
 // language: the upper edge catches light, the lower edge falls to shadow, and

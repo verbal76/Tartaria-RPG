@@ -403,7 +403,13 @@ describe('OTA-1376 — the codex opens on BEASTS, and the tutorial teaches the c
     // the lore button and have the beasts tab the one that opens." It was still
     // opening on RACES — the tab that happened to ship first, and the reason
     // the row was reordered at all.
-    expect(codex).toContain('useState<Section>(TAB_ORDER[0]!)');
+    /* ⚠ RE-AIMED BY OTA-1783 — the claim is that the codex LANDS on the first
+     * tab in the row rather than on RACES, and that the landing is read from
+     * TAB_ORDER rather than hard-coded. OTA-1783 added a deep-link destination
+     * (`openAt ?? TAB_ORDER[0]!`) so the combat glyph reference can open the
+     * codex ON the glyph legend; the default is untouched and is still the row's
+     * own first entry. */
+    expect(codex).toMatch(/useState<Section>\((?:openAt \?\? )?TAB_ORDER\[0\]!\)/);
     expect(codex).not.toContain("useState<Section>('races')");
   });
 

@@ -104,7 +104,15 @@ async function freshAtExplore(): Promise<void> {
 describe("OTA-1292 — lore's BACK stays in the game", () => {
   it('⚠⚠ the source rule: BACK is conditional on a live session, not hard-wired', () => {
     const lore = src('app', 'screens', 'LoreScreen.tsx');
-    expect(lore).toContain("setScreen(inSession ? 'exploration' : 'title')");
+    /* ⚠⚠ RE-AIMED BY OTA-1783 — PIN THE CLAIM, NEVER THE MECHANISM. This used
+     * to pin the whole expression. The claim is that BACK is CONDITIONAL on a
+     * live session rather than hard-wired to the title screen — OTA-1292's fix,
+     * which is still exactly what the code says. OTA-1783 wrapped it in a
+     * `loreJump?.returnTo ?? (...)` so a look-up jump from combat can return to
+     * the screen it actually left; the conditional is the FALLBACK and every
+     * ordinary visit still takes it. Pinning the outer shape turned this red on
+     * a change that strengthened the very thing it guards. */
+    expect(lore).toContain("inSession ? 'exploration' : 'title'");
     expect(lore).not.toContain("onPress={() => setScreen('title')}");
     // The session flag reads the one authority — a loaded player.
     expect(lore).toContain('useGameStore((s) => s.player !== null)');
