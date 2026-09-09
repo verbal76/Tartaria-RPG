@@ -251,6 +251,24 @@ for (const arg of process.argv.filter((a) => a.startsWith('--tap='))) {
   await new Promise((r) => setTimeout(r, 1200));
 }
 
+/* ⚠ OTA-1763 — `--scrollto=<testID>`. The trial block sits below the fold of a
+ * long codex card, so a viewport screenshot photographs the wrong part of the
+ * page. This scrolls the named node into view before the shot. */
+for (const arg of process.argv.filter((a) => a.startsWith('--scrollto='))) {
+  const id = arg.slice(11);
+  const { result: t } = await S('Runtime.evaluate', {
+    expression: '(() => {'
+      + 'const e = document.querySelector(' + JSON.stringify(`[data-testid="${id}"]`) + ');'
+      + 'if (!e) return "no node " + ' + JSON.stringify(id) + ';'
+      + 'e.scrollIntoView({ block: "center" });'
+      + 'return "scrolled to " + ' + JSON.stringify(id) + ';'
+      + '})()',
+    returnByValue: true,
+  });
+  console.error('scrollto:', t.value);
+  await new Promise((r) => setTimeout(r, 800));
+}
+
 await new Promise((r) => setTimeout(r, 3000));
 
 const { result: probe } = await S('Runtime.evaluate', {
@@ -288,6 +306,32 @@ console.log(probe.value);
  * not theoretical — its "nothing moves" claim was false, and only the render
  * said so. */
 const ROW = (process.argv.find((a) => a.startsWith('--row=')) ?? '--row=Rusted Blade').slice(6);
+
+/* ⚠ OTA-1763 — THE ICON PROBE. `--probe=icons` reports the ACTUAL rendered
+ * bounds of every trial image, which is what the owner asked for: *"Report the
+ * ACTUAL measured image bounds from the rendered surface for each candidate, not
+ * merely stylesheet values."* It reads the natural size too, so a 64x64 source
+ * being upscaled or downscaled is visible as a ratio rather than a guess. */
+if (process.argv.includes('--probe=icons')) {
+  const { result: icons } = await S('Runtime.evaluate', {
+    expression: `(() => {
+      const out = [];
+      for (const e of document.querySelectorAll('[data-testid^="damage-icon-"]')) {
+        const b = e.getBoundingClientRect();
+        if (b.width === 0) continue;
+        const cs = getComputedStyle(e);
+        out.push({ id: e.getAttribute('data-testid'),
+          box: [Math.round(b.width*10)/10, Math.round(b.height*10)/10],
+          natural: e.naturalWidth ? [e.naturalWidth, e.naturalHeight] : null,
+          fit: cs.objectFit || cs.backgroundSize || '-',
+          tint: cs.filter || 'none' });
+      }
+      return JSON.stringify({ n: out.length, out }, null, 0);
+    })()`,
+    returnByValue: true,
+  });
+  console.log(icons.value);
+}
 
 /* ⚠ OTA-1762 — THE TAB PROBE. `--probe=tabs` reports every chip in the row with
  * the declarations the bar owns, so the ONE property this pass changes —

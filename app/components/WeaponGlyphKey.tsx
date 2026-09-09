@@ -15,7 +15,9 @@
 // that every type in the table has a meaning here.
 
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
+// ⚠ OTA-1763 — the illustrated-icon TRIAL. Nothing else in the game reads this.
+import { DAMAGE_ICON_IDS, DAMAGE_ICON_LABEL, damageIcon } from '../engine/damageIcons';
 import {
   BASE_DAMAGE_GLYPH, BASE_GLYPH_COLOR, COATING_GLYPH, COATING_GLYPH_COLOR,
 } from '../engine/weaponGlyphs';
@@ -159,6 +161,83 @@ export function WeaponGlyphKey() {
       {STAR_EXPLAINED.map((line, i) => (
         <Text key={i} style={styles.star}>{line}</Text>
       ))}
+
+      <IconTrial />
+    </View>
+  );
+}
+
+/* ⚠⚠⚠ OTA-1763 — THE ILLUSTRATED-ICON TRIAL BLOCK. A LAB, NOT A MIGRATION.
+ *
+ * Owner: *"We are going to test the new illustrated icon library in ONE isolated
+ * surface first... The immediate deliverable is the Lore cheat sheet displaying
+ * them so I can LOOK AT THEM ON MY PHONE."*
+ *
+ * ⚠ EVERYTHING ABOVE THIS LINE IS UNTOUCHED. The text-glyph key still reads the
+ * live `weaponGlyphs` tables the combat buttons paint from, and live combat,
+ * InputBox, the weapon buttons, inventory and the engine are not modified at all.
+ * This block is additive and deleting it removes the entire experiment.
+ *
+ * ⚠⚠ THREE SIZES IN ONE PASS, WHICH IS THE POINT. The owner asked for A/current,
+ * B/+4 and C/+8 *"without requiring three unrelated redesigns of the screen"*.
+ * So one row per concept, three boxes per row, sharing the label — the artwork is
+ * the only thing that varies across a row, which is what makes it a comparison
+ * rather than three screenshots of three layouts.
+ *
+ * ⚠⚠⚠ THE BASE SIZE IS NOT ASSUMED FROM THE 15pt TEXT GLYPH. The owner warned
+ * against exactly that: *"Do not blindly assume that the old 15pt Text glyph
+ * dimension translates directly into the correct Image dimension."* A 15pt glyph
+ * sits in a 28pt-wide cell whose HEIGHT is the line box, not 28. So A is the
+ * cell's measured WIDTH (28) as a square, which is the honest reading of "the
+ * footprint the glyph currently occupies", and the render reports what each box
+ * actually measures rather than what this file asked for. */
+const TRIAL_SIZES = [
+  { key: 'A', px: 28, note: 'current' },
+  { key: 'B', px: 32, note: '+4' },
+  { key: 'C', px: 36, note: '+8' },
+] as const;
+
+function IconTrial() {
+  return (
+    <View style={styles.trial}>
+      <Text style={styles.sub} accessibilityRole="header">
+        ⚠ ILLUSTRATED ICON TRIAL — PROVISIONAL
+      </Text>
+      <Text style={styles.trialHint}>
+        Artwork under evaluation. Not wired into combat. The text glyphs above are
+        still what the game paints. Three sizes per row: A {TRIAL_SIZES[0].px}dp ·
+        B {TRIAL_SIZES[1].px}dp · C {TRIAL_SIZES[2].px}dp.
+      </Text>
+      <View style={styles.trialHead}>
+        <Text style={styles.trialHeadName}> </Text>
+        {TRIAL_SIZES.map((s) => (
+          <Text key={s.key} style={[styles.trialHeadCell, { width: s.px }]}>{s.key}</Text>
+        ))}
+      </View>
+      {DAMAGE_ICON_IDS.map((id) => {
+        const src = damageIcon(id);
+        if (src === undefined) return null;
+        return (
+          <View key={id} style={styles.trialRow} testID={`damage-icon-row-${id}`}>
+            {/* ⚠ The label is PRESERVED beside the art, never replaced by it. */}
+            <Text style={styles.trialName} numberOfLines={1}>{DAMAGE_ICON_LABEL[id]}</Text>
+            {TRIAL_SIZES.map((s) => (
+              <View key={s.key} style={[styles.trialCell, { width: s.px, height: s.px }]}>
+                {/* ⚠⚠ NO `tintColor`. These are illustrated RGBA artwork, not
+                    monochrome glyphs, and `contain` on a square box keeps the
+                    1:1 source unstretched and uncropped. */}
+                <Image
+                  source={src}
+                  style={{ width: s.px, height: s.px }}
+                  resizeMode="contain"
+                  accessibilityLabel={`${DAMAGE_ICON_LABEL[id]} icon, ${s.px} density pixels`}
+                  testID={`damage-icon-${id}-${s.key}`}
+                />
+              </View>
+            ))}
+          </View>
+        );
+      })}
     </View>
   );
 }
@@ -190,18 +269,52 @@ const styles = StyleSheet.create({
   exampleHint: { color: '#a2977b', fontSize: 10, letterSpacing: 2, textAlign: 'center', marginTop: 4, marginBottom: 6 },
   sub: { color: '#c9a86a', fontSize: 10, fontWeight: '700', letterSpacing: 2, marginTop: 12, marginBottom: 6 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 3 },
-  // The same dark cell and halo the buttons paint the glyph on (OTA-1568/1569).
+  /* ⚠⚠⚠ OTA-1763 — THE DARK CELL AND THE HALO CAME OFF HERE, AND ONLY HERE.
+   * Owner: *"if we have these I don't think we need the black outline anymore"*
+   * and, when asked which of the two surviving places that meant, *"not the ones
+   * on the weapons during combat yet."* So: this key, not the buttons.
+   *
+   * ⚠⚠ AND THAT COSTS SOMETHING, WHICH IS WORTH KNOWING RATHER THAN DISCOVERING.
+   * OTA-1568/1569 gave this cell the buttons' own dark inlay and black halo
+   * precisely so the key would SHOW the player what a button looks like — the
+   * file's header is on record that the key must not drift from the buttons.
+   * While combat keeps its halo and this key does not, the key no longer mirrors
+   * them exactly. That is a DELIBERATE, TEMPORARY state of a provisional
+   * experiment, in the same way the trial artwork is not in combat either, and
+   * it resolves whichever way the owner's call goes: combat loses its halo too,
+   * or this one comes back. It is one line either way.
+   *
+   * ⚠ The 15pt and the width 28 STAY. Those are the measurements the trial's
+   * A/B/C sizes are calibrated against, and moving them would silently change
+   * what the comparison means. */
   cell: {
     width: 28,
     textAlign: 'center',
     fontSize: 15,
-    backgroundColor: '#0d0b09',
-    borderRadius: 3,
-    textShadowColor: '#000000',
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 3,
   },
   name: { color: '#cdbf99', fontSize: 11, letterSpacing: 1, width: 92 },
   meaning: { color: '#a2977b', fontSize: 11, flex: 1, lineHeight: 15 },
   star: { color: '#cdbf99', fontSize: 12, lineHeight: 18, marginBottom: 6 },
+  // ── OTA-1763 trial block ──────────────────────────────────────────────────
+  // ⚠ Its own rule above it so the experiment is visibly separate from the key.
+  trial: { marginTop: 14, borderTopColor: '#3a342c', borderTopWidth: 1, paddingTop: 10 },
+  trialHint: { color: '#a2977b', fontSize: 11, lineHeight: 16, marginBottom: 8 },
+  trialHead: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 2 },
+  trialHeadName: { width: 92 },
+  trialHeadCell: { color: '#a2977b', fontSize: 9, letterSpacing: 1, textAlign: 'center' },
+  trialRow: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 3 },
+  trialName: { color: '#cdbf99', fontSize: 11, letterSpacing: 1, width: 92 },
+  /* ⚠⚠ THE DARK INLAY IS GONE, AND THAT IS THE OWNER'S CALL ON SEEING THE ART.
+   * Owner: *"if we have these I don't think we need the black outline anymore.
+   * I like how those render."*
+   * The `#0d0b09` cell and the black halo exist because a TEXT GLYPH is a bare
+   * shape in one colour and needs a ground to stay legible against whatever the
+   * player has tuned the background to. Illustrated artwork brings its own
+   * ground, so the inlay is doing nothing for seven of the nine — and for the
+   * three that sit on transparency it was adding a black tile the artwork never
+   * asked for. The box stays, because it is what keeps the three sizes aligned
+   * in their columns; only the paint is removed.
+   * ⚠ The text-glyph rows ABOVE still use `cell`, halo and all. Those are the
+   * live combat vocabulary and are untouched. */
+  trialCell: { alignItems: 'center', justifyContent: 'center' },
 });

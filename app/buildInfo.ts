@@ -29555,7 +29555,34 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // other screen's, and its selected label is #e0c179, a third off-brand gold
 // after the two OTA-1759 found in Inventory, none of which check:gold can see.
 // Gold 373 to 369.
-export const OTA_BUILD_ID = '2026-09-08-1762-one-tab-bar';
+// SUPERSEDED: '2026-09-08-1762-one-tab-bar'
+// OTA-1763 - the illustrated damage icons, on trial in ONE surface. Nine 64x64
+// RGBA PNGs supplied by the owner land in assets/damage with a README recording
+// what each shows and which source pack ID it came from; app/engine/damageIcons
+// keys them by concept, following the factionCrests pattern rather than
+// inventing a second art-lookup shape. Ten concepts, nine binaries - gas shares
+// noxious by instruction. They are wired into exactly one place: a trial block
+// at the bottom of the Lore cheat sheet, three sizes per row (28, 32, 36) so the
+// A/B/C comparison is one screen rather than three redesigns. No tint, contain
+// on a square box against a 1:1 source, so nothing is stretched or cropped.
+// ⚠ NOTHING ELSE CHANGED. Live combat, InputBox, the weapon buttons, inventory,
+// weapon cards and the engine are untouched, and a test walks app/ to prove the
+// trial art has exactly one consumer.
+// The trace the owner asked for first: the Lore cheat sheet paints its glyphs at
+// 15pt in a fixed 28-wide cell, live combat paints them at 12pt INHERITED from
+// the button label, inline, with no box at all and hair-space padding because an
+// inline Text takes no padding in RN. Combat is 20% smaller and has nowhere to
+// put an image, so this trial is NOT a 1:1 proxy for it - the combat container
+// is a separate design once the artwork and size are approved.
+// The black outline then came off the whole Lore key on the owner's call - the
+// trial icons' dark tile and the text glyph rows' cell and halo both - while
+// live combat keeps its own, which the owner excluded by name. That costs
+// something worth stating: OTA-1568/1569 gave this key the buttons' inlay and
+// halo so it would SHOW what a button looks like, so while combat keeps its halo
+// the key no longer mirrors it. Deliberate and temporary, like the artwork not
+// being in combat, and one line to reverse whichever way the call goes.
+// Provisional pending actual-device approval; nothing is selected or replaced.
+export const OTA_BUILD_ID = '2026-09-09-1763-icons-on-trial';
 // golem catch-up 2026-09-09: markerless publish of OTA-1762 - five tab rows,
 // fifteen tabs, one bar. Tier 0 step 4. Crafting, Guidance and Vendor agree on
 // the chip byte for byte, so the shape is an extraction; a COMPONENT this time
