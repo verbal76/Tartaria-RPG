@@ -32,7 +32,7 @@
 // competing to own one exchange.
 import React, { useEffect, useState } from 'react';
 import { Modal, View, Text, Pressable, StyleSheet, ScrollView } from 'react-native';
-import { tMomentCard } from '../ui/tartariaKit';
+import { tMomentCard, tartariaKitStyles as kit } from '../ui/tartariaKit';
 
 // ⚠ OTA-1777 — Family B, named on the owner's ruling: a BEAT, not a dialog.
 // Deeper scrim, warmer and rounder card. Zero pixels move.
@@ -91,7 +91,7 @@ export function WandererEncounterModal() {
 
   return (
     <Modal visible transparent animationType="fade" onRequestClose={dismiss}>
-      <View style={styles.backdrop}>
+      <View style={kit.momentScrim}>
         <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
           <View style={CARD}>
             <Text style={styles.kicker}>SOMEONE ON THE ROAD</Text>
@@ -164,12 +164,17 @@ export function WandererEncounterModal() {
 // House palette, matched to MissionCompleteModal / DogOnboardingModal: warm body
 // on a translucent backdrop, gold border and accents, cream title.
 const styles = StyleSheet.create({
+  // ⚠⚠ OTA-1778 — `backdrop` moved to the kit (`momentScrim`). This card USED to run
+  // bezel to bezel: its backdrop declared neither `alignItems` nor `padding`, so
+  // `width: '100%'` under a 440 cap sat left and touched both edges on every
+  // phone. Owner: *"I do not consider the current full-bleed behavior of those
+  // three to be intentional world expression."* It now centres and keeps the
+  // 24pt gutter, like its five siblings.
   // ⚠ OTA-1777 — `card` moved to the kit (`tMomentCard`). Same values, one source.
   // ⚠⚠ The backdrop STAYS LOCAL: it neither centres nor pads, so this card is
   // full-bleed to the bezel on any screen under 440. That is a visible
   // difference from its three siblings, not a formatting one, and changing it
   // is an owner call rather than a side effect of naming a shell. HOLD 6.
-  backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.78)', justifyContent: 'center' },
   scroll: { paddingHorizontal: 20, paddingVertical: 32, alignItems: 'center' },
   kicker: { color: '#c9a86a', fontSize: 11, letterSpacing: 2 },
   title: { color: '#f0e6cc', fontSize: 17, marginTop: 8, lineHeight: 23 },

@@ -171,25 +171,31 @@ describe('⚠⚠⚠ three backdrops adopted and three are held, and the reason i
     }
   });
 
-  test('⚠⚠⚠ the other three still declare a backdrop that neither centres nor pads', () => {
-    /* THE FINDING. Not a formatting difference — a layout one. These three cards
-     * run to the bezel on any phone narrower than 440 while their three siblings
-     * get a 24pt gutter, and above 440 they sit left rather than centred.
-     * Asserted as the ABSENCE of the two properties rather than as the string,
-     * so a reformat cannot fake a pass. */
+  test('⚠⚠⚠ the other three were HELD here, and OTA-1778 normalised them', () => {
+    /* ⚠⚠⚠ RE-AIMED, AND THIS ONE IS THE HOLD DOING ITS JOB RATHER THAN FAILING.
+     * This test used to assert the three still declared a bezel-running backdrop
+     * — which was the correct claim for a pass that FOUND the difference and
+     * refused to settle it. The owner then ruled: *"I do not consider the
+     * current full-bleed behavior of those three to be intentional world
+     * expression."* So they adopted, and the claim worth keeping is not "they
+     * are unmigrated" — it is that this pass measured the difference, reported
+     * it, and changed nothing until someone with the authority answered.
+     * What survives is the finding itself, asserted as the RESOLUTION. */
     for (const n of SCRIM_HELD) {
-      const b = bodyOf(cmp(n), 'backdrop');
-      expect([n, b === null]).toEqual([n, false]);
-      expect([n, b!.includes('rgba(0,0,0,0.78)')]).toEqual([n, true]);
-      expect([n, b!.includes('alignItems')]).toEqual([n, false]);
-      expect([n, b!.includes('padding')]).toEqual([n, false]);
-      expect([n, codeOf(cmp(n)).includes('kit.momentScrim')]).toEqual([n, false]);
+      expect([n, codeOf(cmp(n)).includes('kit.momentScrim')]).toEqual([n, true]);
+      expect([n, bodyOf(cmp(n), 'backdrop')]).toEqual([n, null]);
     }
+    // and the kit's scrim is the padded, centred one they were missing
+    const { StyleSheet } = require('react-native');
+    const flat = StyleSheet.flatten(kit.momentScrim) as Record<string, unknown>;
+    expect(flat.alignItems).toBe('center');
+    expect(flat.padding).toBe(24);
   });
 
-  test('⚠⚠ the kit\'s scrim IS the padded, centred one — the held three would change', () => {
-    /* Which is exactly why they did not adopt. Stated as an assertion so the
-     * next reader does not have to re-derive why three files half-adopted. */
+  test('⚠⚠ the kit\'s scrim IS the padded, centred one — which is why they changed', () => {
+    /* Stated as an assertion so the next reader does not have to re-derive what
+     * the three files gained. ⚠ The `HOLD 6` marker below stays in the kit as
+     * the record of the question; OTA-1778 answered it. */
     const { StyleSheet } = require('react-native');
     expect(StyleSheet.flatten(kit.momentScrim)).toEqual({
       flex: 1,
@@ -211,11 +217,17 @@ describe('⚠⚠ the exceptions are governed rather than merely skipped', () => 
      * That looks like an oversight and is not: construction does not track
      * intent, and the ruling was about the beat, not the bytes. Pinned so
      * nobody "finishes the job" by sweeping it in. */
+    /* ⚠ RE-AIMED ON OTA-1778, AND THE DISTINCTION GOT SHARPER RATHER THAN
+     * WEAKER. Two instructions had to be reconciled: *"MissionStinger remains
+     * EXPERIENTIAL"* and *"use momentScrim across all six"*. Consistent outer
+     * geometry is not the same instruction as taking the shell — so it adopts
+     * the SCRIM (zero pixels; it already centred and padded) and still refuses
+     * the CARD. That is a better statement of "stays out" than the original,
+     * because it names WHAT it stays out of. */
     const code = codeOf(cmp('MissionStingerModal'));
     expect(code).not.toContain('tMomentCard');
-    expect(code).not.toContain('kit.momentScrim');
+    expect(code).toContain('style={kit.momentScrim}');
     expect(bodyOf(cmp('MissionStingerModal'), 'card')).toContain("backgroundColor: '#17150f'");
-    expect(bodyOf(cmp('MissionStingerModal'), 'backdrop')).toContain('padding: 24');
   });
 
   test('⚠ DiscoveryReveal is untouched too, and has no shell at all', () => {

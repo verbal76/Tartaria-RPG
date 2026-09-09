@@ -29946,7 +29946,38 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // exception. Its heading said "pending an owner ruling" and now says what was
 // ruled; the rule it records is general - a card may only adopt the shell if
 // something inside it can yield to the shell's height ceiling.
-export const OTA_BUILD_ID = '2026-09-09-1777-family-b-is-named';
+// SUPERSEDED: '2026-09-09-1777-family-b-is-named'
+// OTA-1778 - no moment card touches the bezel. HOLD 6, normalised on the owner's
+// ruling: the full-bleed behaviour of three moment beats was not intentional
+// world expression, and the outer safe presentation geometry should be
+// consistent while the moment stays unique through content, semantic rim and
+// artwork.
+// WHY IT WAS A DEFECT RATHER THAN A STYLE, IN ONE SENTENCE: a card declaring
+// width 100% under a maxWidth 440 cap, inside a scrim with no padding, is
+// full-bleed on every screen narrower than 440 - and the cap makes it worse
+// rather than better, because above 440 the un-centred card also stops being
+// centred. Both halves come from the scrim, so the fix is one adopted style
+// rather than six edits.
+// DogOnboarding, GolemNaming and WandererEncounter now read kit.momentScrim and
+// gain the 24pt gutter their three siblings always had. MissionStinger adopts
+// the scrim too and NOT the card - two instructions had to be reconciled rather
+// than one overriding the other, since consistent outer geometry is not the same
+// instruction as taking the shell. For it the change is zero pixels; what it
+// loses is a private copy of values the kit owns.
+// THE COVERAGE IS A PROPERTY AND NOT A FILE LIST, which is what the owner asked
+// for: a list of six names cannot catch the seventh moment modal somebody writes
+// next year, and the seventh is exactly the one that would reintroduce this. The
+// scan states the rule - any file whose scrim is a black wash AND whose card
+// caps its width must take that scrim from the kit or declare both the centring
+// and the gutter itself - and asserts the offender set is empty. The geometry is
+// also proved arithmetically across nine screen widths rather than asserted, and
+// the same arithmetic on the old scrim shows the gutter was exactly zero on
+// every phone.
+// THE BLAST RADIUS IS EXACTLY SIX. Three other files omit alignItems and are NOT
+// this defect - they pad and their cards are uncapped, so the card fills the
+// padded box and centring is moot. Recorded so nobody fixes three files that are
+// already correct.
+export const OTA_BUILD_ID = '2026-09-09-1778-no-card-touches-the-bezel';
 // golem catch-up 2026-09-09: markerless publish of OTA-1777 - Family B is named
 // and governed, and the modal sweep is finished. Two shells on purpose:
 // tModalCard is a DIALOG (you are being asked something), tMomentCard is a BEAT

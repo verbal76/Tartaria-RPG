@@ -30,6 +30,7 @@
 // goes. Same component, same palette: one curtain for the missions.
 import React from 'react';
 import { Modal, View, Text, Pressable, StyleSheet } from 'react-native';
+import { tartariaKitStyles as kit } from '../ui/tartariaKit';
 
 // ⚠⚠⚠ OTA-1622 — EVERY CLOSE COMES THROUGH HERE NOW, and the card carries what
 // the close handed over (`granted`) above the next line. Owner: *"I spent so
@@ -43,7 +44,7 @@ export function MissionStingerModal({
 }) {
   return (
     <Modal visible={!!stinger} transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent>
-      <View style={styles.backdrop} accessibilityViewIsModal={true}>
+      <View style={kit.momentScrim} accessibilityViewIsModal={true}>
         <View style={styles.card}>
           <Text style={styles.kicker} accessibilityRole="header">
             {(stinger?.title ?? '').toUpperCase()}
@@ -69,10 +70,11 @@ export function MissionStingerModal({
 }
 
 const styles = StyleSheet.create({
-  backdrop: {
-    flex: 1, backgroundColor: 'rgba(0,0,0,0.78)',
-    alignItems: 'center', justifyContent: 'center', padding: 24,
-  },
+  // ⚠⚠ OTA-1778 — `backdrop` moved to the kit (`momentScrim`). Zero pixels: this
+  // file already centred and padded; what it loses is a private copy of values
+  // the kit owns. The owner asked for momentScrim across ALL SIX beats, and
+  // consistent outer geometry is not the same instruction as taking the card —
+  // this modal stays experiential in its card treatment.
   card: {
     width: '100%', maxWidth: 440, backgroundColor: '#17150f',
     borderWidth: 1, borderColor: '#c9a86a', borderRadius: 6, padding: 20,

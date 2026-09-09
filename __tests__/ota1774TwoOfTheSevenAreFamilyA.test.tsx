@@ -208,15 +208,26 @@ describe('⚠⚠⚠ the other five are Family B, and that is measured, not asser
      * `MissionStinger` is built exactly like the five held here and the SAME
      * ruling keeps it experiential. Construction does not track intent, so the
      * ground question and the beat question have to be answered separately. */
+    /* ⚠ RE-AIMED ON OTA-1778: its backdrop is the kit's now (the owner asked for
+     * `momentScrim` across all six), so the Family-B evidence moved to the CARD,
+     * which is the half that still proves the point — it is built exactly like
+     * the five and still refuses the shell. The scrim adoption sharpened the
+     * observation rather than softening it: outer GEOMETRY is governed for
+     * everything, and the SHELL is a separate question the ruling answered
+     * differently for this file. */
     const stinger = cmp('MissionStingerModal');
-    expect(bodyOf(stinger, 'backdrop')).toContain('rgba(0,0,0,0.78)');
+    expect(codeOf(stinger)).toContain('style={kit.momentScrim}');
     expect(bodyOf(stinger, 'card')).toContain("backgroundColor: '#17150f'");
     expect(bodyOf(stinger, 'card')).toContain('borderRadius: 6');
-    // experiential: untouched, exactly like the five
+    // experiential: takes neither shell's CARD
     expect(codeOf(stinger)).not.toContain('tModalCard');
+    expect(codeOf(stinger)).not.toContain('tMomentCard');
   });
 
-  test('⚠ the two experiential modals are untouched, as ruled', () => {
+  test('⚠ the two experiential modals take no card, as ruled', () => {
+    /* ⚠ "Untouched" was true until OTA-1778 governed the outer geometry. What
+     * the ruling actually reserves is the CARD — the beat's own treatment — so
+     * that is what this asserts. */
     for (const n of ['DiscoveryRevealModal', 'MissionStingerModal']) {
       expect([n, codeOf(cmp(n)).includes('tModalCard')]).toEqual([n, false]);
       expect([n, codeOf(cmp(n)).includes('kit.modalScrim')]).toEqual([n, false]);
