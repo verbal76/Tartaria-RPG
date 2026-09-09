@@ -30048,6 +30048,28 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SUPERSEDED: '2026-09-09-1780-the-thin-four-migrate'
 // SUPERSEDED: '2026-09-09-1781-the-name-grew-with-the-mark'
 export const OTA_BUILD_ID = '2026-09-09-1782-the-control-sits-proud';
+// golem catch-up 2026-09-09: markerless publish of OTA-1782.
+// OTA-1782 - the control sits proud of the plane. One governed control-depth
+// language: the upper edge catches light, the lower edge falls to shadow, and
+// on press the two swap while the face settles 1.5dp. Nothing else - no
+// gradient, texture, gloss, bevel, elevation or drop shadow, and the suite
+// asserts those absences rather than trusting them.
+// It is ADDITIVE: it overrides only the top and bottom colours of a ring the
+// tone already coloured, so the semantic hue still says what the control means
+// and depth rides on top of it. A second edge pair was needed because the panel
+// pair is tuned for a dark plate and the control family includes a light sage
+// fill and a light gold one - the same structural problem OTA-1569 hit with the
+// coat glyphs, and the same answer: composite instead of hunting one value.
+// The pair turns out to be self-balancing: on a light fill the shadow carries
+// the depth, on a dark fill the light does, and all four representative faces
+// end with a real top-to-bottom gradient (96, 93, 58, 56 luminance) that
+// INVERTS under press rather than fading.
+// Adopters: the combat chip family and TButton, the control that invented this
+// construction in VIS-1 and was the only one that had it. Plates keep the panel
+// pair, because the claim is that a control sits proud OF the plane.
+// An inert (blocked) chip is handed no depth at all - an absence, not a third
+// variant. The filled-gold family is ten hand-copied btnPrimary blocks in ten
+// files and is batch 2, proved here by arithmetic and not yet painted.
 // golem catch-up 2026-09-09: markerless publish of OTA-1781.
 // OTA-1781 - the name grew with the mark. The weapon-name typography beside
 // the 28dp combat artwork was 12/400/0 while the MOCK of that same button in
