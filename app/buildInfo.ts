@@ -29633,6 +29633,24 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // bundles, so the phone still ships one resolution rather than four.
 // Provisional pending actual-device approval.
 export const OTA_BUILD_ID = '2026-09-09-1765-the-shell-eleven-copied';
+// golem catch-up 2026-09-09: markerless publish of OTA-1765 - TModal, the shell
+// eleven dialogs hand-copied. Thirty-three modal files; the ones that look like
+// the game's dialogs all draw the same material, a scrim at rgba(0,0,0,0.7) and
+// a card in #13110f rimmed with the brand gold. That material was written once
+// in BrandedModal and then re-typed by hand. The kit exports it as modalScrim
+// and tModalCard(maxWidth); BrandedModal and HookContinueModal adopt it, and a
+// predicate in the suite names the nine files still carrying their own copy so a
+// tenth cannot appear quietly. It is styles and not a component because arb73
+// makes the presentation mechanic - a native Modal against an in-tree overlay -
+// a per-call-site choice, and a component owning the container would own that
+// too. BrandedModal moves no pixel. HookContinueModal's card differed in TWO
+// things, not the one first reported: maxWidth 420, and no maxHeight at all, so
+// adopting the shell adds OTA-1614's 85% cap - and a capped card whose scroll
+// will not shrink pushes CONTINUE and ABANDON out of the bottom, so BrandedModal's
+// flexShrink answer comes with it. The gold ratchet fell 369 to 367. Two older
+// suites went red and both were pins written as file-local literals: OTA-1614
+// asserted the cap by reading BrandedModal, and OTA-1762 pinned the ratchet's
+// current value - the second time in this rollout for that one.
 // golem catch-up 2026-09-09: markerless publish of OTA-1764 - a new storm, and
 // two drawers that now start shut. WORKINGS TO LEARN and REINFORCE YOUR GEAR
 // were the only two vendor sections defaulting open; both the render default and
