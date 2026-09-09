@@ -101,6 +101,17 @@ import { getRaces, getFactions } from '../app/engine/character';
 import { createDogCompanion } from '../app/engine/dogCompanion';
 import type { DogCompanion } from '../app/engine/types';
 
+/* ⚠⚠⚠ OTA-1785 — THE STORE CEILING IS READ, NOT RETYPED. See
+ * `scripts/check-store-ceiling.mjs`, which is now a real gate as well as the
+ * one authority; this suite keeps its own sentence and shares only the number. */
+function storeCeiling(): number {
+  const gate = require('fs').readFileSync(require('path').join(__dirname, '..', 'scripts', 'check-store-ceiling.mjs'), 'utf8');
+  const m = /export const CEILING = (\d+);/.exec(gate);
+  if (!m) throw new Error('check-store-ceiling.mjs no longer declares CEILING');
+  return parseInt(m[1]!, 10);
+}
+
+
 const src = (...p: string[]): string => readFileSync(join(__dirname, '..', ...p), 'utf8');
 const flush = () => new Promise((r) => setTimeout(r, 0));
 
@@ -232,9 +243,23 @@ describe('OTA-1717 — the second system is gone, not disabled', () => {
   });
 
   it('⚠ and the collapse paid the line ceiling back', () => {
-    // 62 lines returned to a file that had none to spare — the budget the dog
-    // market will be built out of.
-    const n = STORE.split('\n').length;
-    expect(n).toBeLessThan(36999);
+    /* ⚠⚠⚠ RE-EXPRESSED BY OTA-1785 — THIS WAS THE ODD ONE OUT, AND IT IS NOT A
+     * DUPLICATE. Twelve suites asserted `< 37000`; this one asserted `< 36999`,
+     * because its claim is different: the dog-clock collapse RETURNED 62 lines
+     * to a file that had none to spare. That is a real and separate thing to
+     * protect, so it is preserved rather than folded away.
+     *
+     * ⚠ BUT A SECOND HARD NUMBER WAS THE WRONG WAY TO SAY IT. Written as its own
+     * ceiling it silently governed everything else: a pass comfortably under
+     * 37,000 could still be red, and the failure named a dog-market OTA from
+     * weeks earlier instead of the rule it had broken. That happened three times
+     * in one session.
+     *
+     * ⚠ THE CLAIM IS PROVED ABOVE, NOT HERE. `dogThresholdCheck` and
+     * `DOG_LOYALTY_THRESHOLDS` leaving this file is what the 62 lines WERE, and
+     * the two assertions above assert exactly that. What is left for this line
+     * to say is that the collapse's gain has not since been spent — which is a
+     * comparison against the governed ceiling, not a number of its own. */
+    expect(STORE.split('\n').length).toBeLessThanOrEqual(storeCeiling());
   });
 });

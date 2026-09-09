@@ -370,35 +370,24 @@ describe('OTA-1744 — 5. recovered technology, not bronze', () => {
   });
 
   it('⚠⚠⚠ and none of it is keyed to the owner’s green — the palette is theme-neutral', () => {
-    // The same rule OTA-1742 set, re-checked after the alloy shift: every hex
-    // in the kit is a warm neutral or a near-neutral, never a hue.
-    /* ⚠⚠⚠ COMMENT-STRIPPED BY OTA-1782 — GRADE THE CODE, NOT THE PROSE, and
-     * this is the twenty-fourth sighting of that mistake in this rollout, the
-     * first inside a suite that was already shipped and green.
-     * OTA-1782 wrote the measured luminance of the four representative control
-     * faces into the kit's own comment, so a reader can see why one edge pair
-     * covers a light sage fill and a near-black one. One of those four faces is
-     * `#9ec96a` — the combat strike chip — which is a GREEN and correctly fails
-     * this rule. But it is not in the palette. It is a sentence ABOUT a colour
-     * that lives in `InputBox`, in a file that does not paint it. A rule that
-     * can be tripped by describing a measurement teaches people not to write
-     * the measurement down, which is the opposite of what this file is for.
-     * ⚠ SCOPED TO THIS TEST ON PURPOSE. `KIT` is used raw by the assertions
-     * above, several of which legitimately read structure; only the palette
-     * census wants code alone.
-     * ⚠⚠ AND NOTE THE DUPLICATION, because it is the second instance today:
-     * `ota1742` owns this same rule WITH a by-name exemption list that this
-     * copy does not have, exactly as `ota1742` and `ota1769` both carry the kit
-     * export ceiling. One authority for one invariant is a legacy-hunt item. */
-    const paletteOnly = KIT.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
-    const hexes = [...paletteOnly.matchAll(/#([0-9A-Fa-f]{6})\b/g)].map((m) => m[1]!.toUpperCase());
-    const BRAND = new Set(['C9A86A', '8E7548', 'E07A5F', '5A2A26']);
-    for (const h of hexes) {
-      if (BRAND.has(h)) continue;
-      const [r, g, b] = [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16));
-      const chroma = Math.max(r!, g!, b!) - Math.min(r!, g!, b!);
-      expect({ h, ok: (r! >= g! && g! >= b!) || chroma <= 18 }).toEqual({ h, ok: true });
-    }
+    /* ⚠⚠⚠ RE-POINTED BY OTA-1785 — THIS COPY WAS THE WEAKER ONE, AND THAT IS
+     * WHY IT GOES. It restated OTA-1742's palette rule with FOUR exempt names
+     * instead of five and NO chroma ceiling, so a colour could pass here and
+     * fail there, and which you learned about depended on suite ordering. It
+     * also read the kit raw until today, which meant a sentence describing a
+     * measurement could fail it.
+     * The rule now lives in `scripts/check-kit-palette.mjs` — the STRONGER
+     * version, kept whole, and a gate as well as an authority. This suite keeps
+     * its own claim, which was never the arithmetic: that the ALLOY SHIFT did
+     * not sneak a hue into the kit. It asserts that by holding the gate to the
+     * shape it must have, and letting the gate do the counting. */
+    const gate = read('scripts', 'check-kit-palette.mjs');
+    expect(gate).toContain('export const CHROMA_CEILING = 60');
+    expect(gate).toContain('export const NEAR_NEUTRAL = 18');
+    expect(gate).toContain('r >= g && g >= b');
+    // and it is wired, so it actually runs
+    const pkg = JSON.parse(read('package.json')) as { scripts: Record<string, string> };
+    expect(pkg.scripts['check:kitpalette']).toBe('node scripts/check-kit-palette.mjs');
   });
 
   it('⚠⚠ no new per-frame work, no timers, no polling came in with the correction', () => {

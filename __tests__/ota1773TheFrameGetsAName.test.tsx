@@ -75,7 +75,13 @@ describe('⚠⚠⚠ the colour has an address now', () => {
 
 // ═══ 2. THE EXEMPTION IS GOVERNED ════════════════════════════════════════════
 describe('⚠⚠⚠ a named exemption, not a loosened rule', () => {
-  const GATE = read('__tests__', 'ota1742TheScreenIsMadeOfSomething.test.tsx');
+  /* ⚠⚠⚠ RE-POINTED BY OTA-1785, AND THE HEADING WAS ALREADY TRUE-IN-INTENT.
+   * "the palette gate" pointed at a TEST FILE, because there was no gate — and
+   * a second, WEAKER copy of the rule lived in `ota1744` with four exempt names
+   * and no chroma ceiling. `scripts/check-kit-palette.mjs` is a real gate now,
+   * carrying the stronger rule, and this is the third suite that was reading the
+   * rule off `ota1742`'s source. */
+  const GATE = read('scripts', 'check-kit-palette.mjs');
 
   test('the hex is listed BY NAME in the palette gate', () => {
     expect(GATE).toContain("'F0C96A'");
@@ -87,7 +93,7 @@ describe('⚠⚠⚠ a named exemption, not a loosened rule', () => {
      * the frame passes on arithmetic. That would paint identical pixels today
      * and silently admit every bright hue tomorrow. The rule stays at 60; the
      * frame passes because a person decided it should. */
-    expect(GATE).toContain('toBeLessThanOrEqual(60)');
+    expect(GATE).toContain('CHROMA_CEILING = 60');
     const chroma = (h: string) => {
       const [r, g, b] = [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
       return Math.max(r!, g!, b!) - Math.min(r!, g!, b!);

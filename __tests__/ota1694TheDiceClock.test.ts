@@ -45,6 +45,21 @@ import { rollTimingLine, AUTO_RESOLVE_HOLD_MS, HOLD_LATE_MS } from '../app/diagn
 import type { RollStep } from '../app/engine/types';
 import { beginnersLuck } from '../app/engine/combatRules';
 
+/* ⚠⚠⚠ OTA-1785 — THE STORE CEILING IS READ, NOT RETYPED.
+ * Thirteen suites carried this number and one of them disagreed, so the tightest
+ * silently governed and its failure named an unrelated OTA. The number now lives
+ * in `scripts/check-store-ceiling.mjs` — a real gate, so it is caught in seconds
+ * rather than only by a fourteen-minute surface run — and every suite reads it
+ * from there. This suite keeps its own SENTENCE about what it was protecting;
+ * only the number is shared. */
+function storeCeiling(): number {
+  const gate = require('fs').readFileSync(require('path').join(__dirname, '..', 'scripts', 'check-store-ceiling.mjs'), 'utf8');
+  const m = /export const CEILING = (\d+);/.exec(gate);
+  if (!m) throw new Error('check-store-ceiling.mjs no longer declares CEILING');
+  return parseInt(m[1]!, 10);
+}
+
+
 jest.setTimeout(120000);
 
 const src = (...p: string[]) => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
@@ -114,7 +129,7 @@ describe('OTA-1694 — the wiring', () => {
     expect(at).toBeGreaterThan(-1);
     expect(math).toBeGreaterThan(at);
     expect(src('app', 'engine', 'types.ts').includes('openedAt?: number;')).toBe(true);
-    expect(store.split('\n').length).toBeLessThan(37000);
+    expect(store.split('\n').length).toBeLessThanOrEqual(storeCeiling());
   });
 
   it("Beginner's Luck left the store whole: the extracted helper rerolls a failed targeted throw for a token-holder only, and the store burns the token", () => {

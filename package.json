@@ -34,6 +34,9 @@
     "check:missionclaims": "node scripts/check-mission-claims.mjs",
     "check:guardianclaims": "node scripts/check-guardian-claims.mjs",
     "check:weaponnames": "node scripts/check-weapon-names.mjs",
+    "check:storeceiling": "node scripts/check-store-ceiling.mjs",
+    "check:kitpalette": "node scripts/check-kit-palette.mjs",
+    "check:kitexports": "node scripts/check-kit-exports.mjs",
     "check:testsplit": "node scripts/check-test-split.mjs"
   },
   "dependencies": {

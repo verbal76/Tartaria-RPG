@@ -76,6 +76,39 @@ import { factionCrest, crestFactionIds } from '../app/engine/factionCrests';
 import { FACTION_PLATE_TEST_ID } from '../app/ui/tartariaKit';
 import type { SlotSummary } from '../app/engine/saveSystem';
 
+/* ⚠⚠⚠ OTA-1785 — THE GATE IS PARSED, NOT IMPORTED, and that is a constraint
+ * rather than a preference: the gates are `.mjs` and jest transforms these
+ * suites as CommonJS, so `require()` on one throws. This is the same shape
+ * `ota1757` already uses to read `check-gold.mjs`'s baseline.
+ * ⚠ WHAT IS SHARED IS WHAT ACTUALLY DRIFTED: the exempt NAMES and the two
+ * thresholds. The four lines of arithmetic below are written twice, and that is
+ * a deliberate, stated cost — nobody has ever mistyped `Math.max - Math.min`,
+ * but a fifth exempt name and a chroma ceiling went missing from the second
+ * copy for weeks. */
+function kitPaletteRule(): { brand: Set<string>; chromaCeiling: number; nearNeutral: number } {
+  const gate = require('fs').readFileSync(require('path').join(__dirname, '..', 'scripts', 'check-kit-palette.mjs'), 'utf8');
+  const list = /export const BRAND = new Set\(\[([\s\S]*?)\]\);/.exec(gate);
+  const ceil = /export const CHROMA_CEILING = (\d+);/.exec(gate);
+  const near = /export const NEAR_NEUTRAL = (\d+);/.exec(gate);
+  if (!list || !ceil || !near) throw new Error('check-kit-palette.mjs no longer declares the rule');
+  return {
+    brand: new Set((list[1]!.match(/'([0-9A-Fa-f]{6})'/g) ?? []).map((q) => q.replace(/'/g, '').toUpperCase())),
+    chromaCeiling: parseInt(ceil[1]!, 10),
+    nearNeutral: parseInt(near[1]!, 10),
+  };
+}
+
+function kitExportBudget(): { components: number; helpers: number; total: number } {
+  const gate = require('fs').readFileSync(require('path').join(__dirname, '..', 'scripts', 'check-kit-exports.mjs'), 'utf8');
+  const one = (k: string) => {
+    const m = new RegExp(`export const ${k} = (\\d+);`).exec(gate);
+    if (!m) throw new Error(`check-kit-exports.mjs no longer declares ${k}`);
+    return parseInt(m[1]!, 10);
+  };
+  return { components: one('COMPONENTS'), helpers: one('HELPERS'), total: one('TOTAL') };
+}
+
+
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const renderer = require('react-test-renderer') as {
   act(cb: () => void | Promise<void>): Promise<void> & void;
@@ -228,35 +261,31 @@ describe('OTA-1742 — the player owns the hue, and the kit respects it', () => 
      * mechanism rather than creating an ungoverned exception."*
      * A fifth name is therefore the CORRECT resolution and an ungoverned literal
      * would not have been, even though both would paint the same pixels. */
-    const BRAND = new Set([
-      'C9A86A', // the brand gold
-      '8E7548', // dim gold
-      'E07A5F', // rust
-      '5A2A26', // rust rim
-      'F0C96A', // OTA-1773 — the conversation frame; louder than the brand gold BY DESIGN
-    ]);
+    /* ⚠⚠⚠ RE-POINTED BY OTA-1785 — THE RULE IS READ, NOT RESTATED.
+     * This block used to spell out the five exempt names and the arithmetic in
+     * full, and `ota1744` spelled out a WEAKER version of the same thing: four
+     * exemptions, no chroma ceiling. Which one you found out about depended on
+     * suite ordering. `scripts/check-kit-palette.mjs` now owns the rule — the
+     * STRONGER one, so this is a strengthening rather than a compromise — and is
+     * a gate as well, so a wrong-temperature hex fails in milliseconds instead
+     * of only in a fourteen-minute surface run.
+     * ⚠ The long rationale for WHY the list is a list, and why `F0C96A` had to
+     * be refused before it could be named, lives in that file beside the names
+     * it explains. */
+    const rule = kitPaletteRule();
+    expect(rule.brand.size).toBe(5);
+    expect(rule.chromaCeiling).toBe(60);
+    expect(rule.nearNeutral).toBe(18);
     for (const h of hexes) {
-      if (BRAND.has(h)) continue;
+      if (rule.brand.has(h)) continue;
       const r = parseInt(h.slice(0, 2), 16);
       const g = parseInt(h.slice(2, 4), 16);
       const b = parseInt(h.slice(4, 6), 16);
       const chroma = Math.max(r, g, b) - Math.min(r, g, b);
-      /* ⚠⚠ VIS-1-PHONE-FIX WIDENED THIS BY ONE CATEGORY, ON PURPOSE. The rule
-       * was "warm neutral or the brand gold" (r >= g >= b), which is right for
-       * bronze and wrong for what the owner actually asked for after seeing the
-       * screen on the Pixel: *"precise ancient alloys, composites ... not
-       * medieval fantasy"*. Machined alloy is COOL. So a colour now qualifies if
-       * it is a warm neutral (as before) OR near-neutral of any temperature —
-       * chroma <= 18, which is grey with a bias, not a hue. Everything the rule
-       * was built to catch still fails it: a green, a blue or a purple keyed to
-       * the current theme is far past 18 and is not warm-ordered either. */
       const warmOrdered = r >= g && g >= b;
-      const nearNeutral = chroma <= 18;
-      expect({ h, chroma, warmOrdered, nearNeutral })
-        .toEqual({ h, chroma: expect.any(Number), warmOrdered: expect.any(Boolean), nearNeutral: expect.any(Boolean) });
-      expect(warmOrdered || nearNeutral).toBe(true);
-      // A warm aged metal tops out around 58 (the lit rim); a real hue is past it.
-      expect(chroma).toBeLessThanOrEqual(60);
+      const nearNeutral = chroma <= rule.nearNeutral;
+      expect({ h, chroma, ok: (warmOrdered || nearNeutral) && chroma <= rule.chromaCeiling })
+        .toEqual({ h, chroma, ok: true });
     }
   });
 
@@ -744,9 +773,14 @@ describe('OTA-1742 — the language is reusable, and the first pass stayed in it
      * `kit.controlPressed` and is read back through `tartariaKitStyles`, for
      * exactly the reason this bound exists: a constant that never varies is a
      * stylesheet entry, not an export. */
-    expect(components.length).toBeLessThanOrEqual(13);
-    expect(helpers.length).toBeLessThanOrEqual(9);
-    expect(exported.length).toBeLessThanOrEqual(22);
+    /* ⚠⚠ RE-POINTED BY OTA-1785 — the three numbers live in
+     * `scripts/check-kit-exports.mjs`, which `ota1769` also reads. OTA-1777
+     * raised one copy and left the other; only a full surface caught it. The
+     * ledger of WHY each budget moved is in that file. */
+    const budget = kitExportBudget();
+    expect(components.length).toBeLessThanOrEqual(budget.components);
+    expect(helpers.length).toBeLessThanOrEqual(budget.helpers);
+    expect(exported.length).toBeLessThanOrEqual(budget.total);
   });
 
   /* ⚠⚠⚠ SUPERSEDED BY VIS-3 (OTA-1746) — AND THE REASONING IS KEPT HERE RATHER

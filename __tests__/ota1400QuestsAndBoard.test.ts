@@ -27,6 +27,21 @@ import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 import { storeSource, sliceNames } from '../test-utils/storeSource';
 
+/* ⚠⚠⚠ OTA-1785 — THE STORE CEILING IS READ, NOT RETYPED.
+ * Thirteen suites carried this number and one of them disagreed, so the tightest
+ * silently governed and its failure named an unrelated OTA. The number now lives
+ * in `scripts/check-store-ceiling.mjs` — a real gate, so it is caught in seconds
+ * rather than only by a fourteen-minute surface run — and every suite reads it
+ * from there. This suite keeps its own SENTENCE about what it was protecting;
+ * only the number is shared. */
+function storeCeiling(): number {
+  const gate = require('fs').readFileSync(require('path').join(__dirname, '..', 'scripts', 'check-store-ceiling.mjs'), 'utf8');
+  const m = /export const CEILING = (\d+);/.exec(gate);
+  if (!m) throw new Error('check-store-ceiling.mjs no longer declares CEILING');
+  return parseInt(m[1]!, 10);
+}
+
+
 const path = (...p: string[]) => join(__dirname, '..', ...p);
 const src = (...p: string[]) => readFileSync(path(...p), 'utf8');
 
@@ -186,7 +201,7 @@ describe('OTA-1400 — nine slices in, and Part 4 is done', () => {
   it('gameStore is under 37,000 lines', () => {
     // 45,050 → 44,891 → 44,816 → 44,160 → 43,542 → 43,281 → 42,956 → 41,650
     //        → 39,470 → here.
-    expect(store.split('\n').length).toBeLessThan(37000);
+    expect(store.split('\n').length).toBeLessThanOrEqual(storeCeiling());
   });
 
   it('⚠ there are nine slices, and the policy suite covers every one', () => {

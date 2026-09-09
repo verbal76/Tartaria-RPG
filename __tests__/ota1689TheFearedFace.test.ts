@@ -45,6 +45,21 @@ import { useGameStore } from '../app/state/gameStore';
 import { menacePriceMult, menaceGreetingBeat, menaceTier, MENACE_PRICE_FEARED, MENACE_PRICE_DREADED } from '../app/engine/menace';
 import { finalBuyPrice, strangerBuyPrice } from '../app/engine/vendorPricing';
 
+/* ⚠⚠⚠ OTA-1785 — THE STORE CEILING IS READ, NOT RETYPED.
+ * Thirteen suites carried this number and one of them disagreed, so the tightest
+ * silently governed and its failure named an unrelated OTA. The number now lives
+ * in `scripts/check-store-ceiling.mjs` — a real gate, so it is caught in seconds
+ * rather than only by a fourteen-minute surface run — and every suite reads it
+ * from there. This suite keeps its own SENTENCE about what it was protecting;
+ * only the number is shared. */
+function storeCeiling(): number {
+  const gate = require('fs').readFileSync(require('path').join(__dirname, '..', 'scripts', 'check-store-ceiling.mjs'), 'utf8');
+  const m = /export const CEILING = (\d+);/.exec(gate);
+  if (!m) throw new Error('check-store-ceiling.mjs no longer declares CEILING');
+  return parseInt(m[1]!, 10);
+}
+
+
 jest.setTimeout(120000);
 
 const src = (...p: string[]) => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
@@ -92,7 +107,7 @@ describe('OTA-1689 — the two readers', () => {
     const store = src('app', 'state', 'gameStore.ts');
     expect(store.split('menaceGreetingBeat(decayedMenace(').length - 1).toBe(2);
     expect(store.includes('vendor.name, npcRegard(rel)); if (mb) get().appendLog(\'world\', mb); }')).toBe(true);
-    expect(store.split('\n').length).toBeLessThan(37000);
+    expect(store.split('\n').length).toBeLessThanOrEqual(storeCeiling());
   });
 });
 

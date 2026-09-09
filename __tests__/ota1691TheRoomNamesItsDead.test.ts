@@ -10,6 +10,21 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { clearedBodiesNote } from '../app/engine/voicePools';
 
+/* ⚠⚠⚠ OTA-1785 — THE STORE CEILING IS READ, NOT RETYPED.
+ * Thirteen suites carried this number and one of them disagreed, so the tightest
+ * silently governed and its failure named an unrelated OTA. The number now lives
+ * in `scripts/check-store-ceiling.mjs` — a real gate, so it is caught in seconds
+ * rather than only by a fourteen-minute surface run — and every suite reads it
+ * from there. This suite keeps its own SENTENCE about what it was protecting;
+ * only the number is shared. */
+function storeCeiling(): number {
+  const gate = require('fs').readFileSync(require('path').join(__dirname, '..', 'scripts', 'check-store-ceiling.mjs'), 'utf8');
+  const m = /export const CEILING = (\d+);/.exec(gate);
+  if (!m) throw new Error('check-store-ceiling.mjs no longer declares CEILING');
+  return parseInt(m[1]!, 10);
+}
+
+
 const src = (...p: string[]) => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
 
 describe('OTA-1691 — the clause', () => {
@@ -49,6 +64,6 @@ describe('OTA-1691 — the return line carries it', () => {
   });
 
   it('the store stays under the line ratchet', () => {
-    expect(store.split('\n').length).toBeLessThan(37000);
+    expect(store.split('\n').length).toBeLessThanOrEqual(storeCeiling());
   });
 });

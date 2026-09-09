@@ -61,6 +61,21 @@ import { buildLlmContext, buildSystemPrompt } from '../app/engine/contextInjecto
 import { placedAt } from '../test-utils/placePlayer';
 import type { Deed, WorldMemory } from '../app/engine/types';
 
+/* ⚠⚠⚠ OTA-1785 — THE STORE CEILING IS READ, NOT RETYPED.
+ * Thirteen suites carried this number and one of them disagreed, so the tightest
+ * silently governed and its failure named an unrelated OTA. The number now lives
+ * in `scripts/check-store-ceiling.mjs` — a real gate, so it is caught in seconds
+ * rather than only by a fourteen-minute surface run — and every suite reads it
+ * from there. This suite keeps its own SENTENCE about what it was protecting;
+ * only the number is shared. */
+function storeCeiling(): number {
+  const gate = require('fs').readFileSync(require('path').join(__dirname, '..', 'scripts', 'check-store-ceiling.mjs'), 'utf8');
+  const m = /export const CEILING = (\d+);/.exec(gate);
+  if (!m) throw new Error('check-store-ceiling.mjs no longer declares CEILING');
+  return parseInt(m[1]!, 10);
+}
+
+
 jest.setTimeout(120000);
 
 const store = useGameStore;
@@ -391,7 +406,7 @@ describe('OTA-1688 — the writers and the readers on Drakova and the Mud Seas',
 
   it('the writers live outside gameStore (the line ratchet) and the store calls each once', () => {
     const store_ = src('app', 'state', 'gameStore.ts');
-    expect(store_.split('\n').length).toBeLessThan(37000);
+    expect(store_.split('\n').length).toBeLessThanOrEqual(storeCeiling());
     expect(store_.includes('noteMissionFlee(get, set, currentScene);')).toBe(true);
     expect(store_.includes('noteMissionGroundsUnderfoot(get, set);')).toBe(true);
     expect(store_.includes('missionArrivalLines(get().player, get().worldMemory)')).toBe(true);

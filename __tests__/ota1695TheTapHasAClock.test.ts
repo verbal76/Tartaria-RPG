@@ -43,9 +43,23 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { useGameStore, logUiTap } from '../app/state/gameStore';
 import {
+
   touchLateMs, noteTouchDown, takeTouchLateSuffix, tapLateSuffix, resetTapClock,
   TAP_LATE_FLAG_MS, TOUCH_FRESH_MS,
 } from '../app/diagnostics/tapClock';
+/* ⚠⚠⚠ OTA-1785 — THE STORE CEILING IS READ, NOT RETYPED.
+ * Thirteen suites carried this number and one of them disagreed, so the tightest
+ * silently governed and its failure named an unrelated OTA. The number now lives
+ * in `scripts/check-store-ceiling.mjs` — a real gate, so it is caught in seconds
+ * rather than only by a fourteen-minute surface run — and every suite reads it
+ * from there. This suite keeps its own SENTENCE about what it was protecting;
+ * only the number is shared. */
+function storeCeiling(): number {
+  const gate = require('fs').readFileSync(require('path').join(__dirname, '..', 'scripts', 'check-store-ceiling.mjs'), 'utf8');
+  const m = /export const CEILING = (\d+);/.exec(gate);
+  if (!m) throw new Error('check-store-ceiling.mjs no longer declares CEILING');
+  return parseInt(m[1]!, 10);
+}
 
 jest.setTimeout(120000);
 
@@ -117,7 +131,7 @@ describe('OTA-1695 — the wiring', () => {
     expect(store.includes('persistEntry(makeEntry(\'debug\', `ui: tap "${label}"${takeTouchLateSuffix()}`))')).toBe(true);
     // The unbatched breadcrumb keeps its exact shape (OTA-1276 reads it at boot).
     expect(store.includes('what: `tap "${label}"`')).toBe(true);
-    expect(store.split('\n').length).toBeLessThan(37000);
+    expect(store.split('\n').length).toBeLessThanOrEqual(storeCeiling());
   });
 });
 

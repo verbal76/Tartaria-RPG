@@ -30049,7 +30049,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SUPERSEDED: '2026-09-09-1781-the-name-grew-with-the-mark'
 // SUPERSEDED: '2026-09-09-1782-the-control-sits-proud'
 // SUPERSEDED: '2026-09-09-1783-the-legend-is-one-tap-away'
-export const OTA_BUILD_ID = '2026-09-09-1784-six-traders-six-voices';
+// SUPERSEDED: '2026-09-09-1784-six-traders-six-voices'
+export const OTA_BUILD_ID = '2026-09-09-1785-one-authority-per-ratchet';
 // golem catch-up 2026-09-09: markerless publish of OTA-1784.
 // OTA-1784 - six traders, six voices. class:roadside held six topics with ONE
 // authored line each, so all 24 roadside traders read from the same six

@@ -67,6 +67,21 @@ import {
 } from '../app/engine/fleeEscalation';
 import { fleePursuitFor, fleeOddsFor, escapeRollBonus } from '../app/state/fleeOdds';
 
+/* ⚠⚠⚠ OTA-1785 — THE STORE CEILING IS READ, NOT RETYPED.
+ * Thirteen suites carried this number and one of them disagreed, so the tightest
+ * silently governed and its failure named an unrelated OTA. The number now lives
+ * in `scripts/check-store-ceiling.mjs` — a real gate, so it is caught in seconds
+ * rather than only by a fourteen-minute surface run — and every suite reads it
+ * from there. This suite keeps its own SENTENCE about what it was protecting;
+ * only the number is shared. */
+function storeCeiling(): number {
+  const gate = require('fs').readFileSync(require('path').join(__dirname, '..', 'scripts', 'check-store-ceiling.mjs'), 'utf8');
+  const m = /export const CEILING = (\d+);/.exec(gate);
+  if (!m) throw new Error('check-store-ceiling.mjs no longer declares CEILING');
+  return parseInt(m[1]!, 10);
+}
+
+
 const ROOT = join(__dirname, '..');
 const src = (...p: string[]): string => readFileSync(join(ROOT, ...p), 'utf8');
 
@@ -340,6 +355,6 @@ describe('OTA-1678 — the store: four producers stamp, every scripted site does
     expect(PARTY.includes('export function injectFactionParty(')).toBe(true);
     expect((STORE.match(/injectFactionParty\(get, set, \{/g) ?? []).length).toBe(3);
     expect((STORE.match(/\{ scalePowerOf \}\)/g) ?? []).length).toBe(3);
-    expect(STORE.split('\n').length).toBeLessThan(37000);
+    expect(STORE.split('\n').length).toBeLessThanOrEqual(storeCeiling());
   });
 });

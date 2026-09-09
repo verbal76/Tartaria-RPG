@@ -35,6 +35,21 @@ import { heldShieldAc } from '../app/engine/equipment';
 import { planSelfBuff } from '../app/state/weaponRiderEffects';
 import type { Enemy, PlayerCharacter, StatusEffect } from '../app/engine/types';
 
+/* ⚠⚠⚠ OTA-1785 — THE STORE CEILING IS READ, NOT RETYPED.
+ * Thirteen suites carried this number and one of them disagreed, so the tightest
+ * silently governed and its failure named an unrelated OTA. The number now lives
+ * in `scripts/check-store-ceiling.mjs` — a real gate, so it is caught in seconds
+ * rather than only by a fourteen-minute surface run — and every suite reads it
+ * from there. This suite keeps its own SENTENCE about what it was protecting;
+ * only the number is shared. */
+function storeCeiling(): number {
+  const gate = require('fs').readFileSync(require('path').join(__dirname, '..', 'scripts', 'check-store-ceiling.mjs'), 'utf8');
+  const m = /export const CEILING = (\d+);/.exec(gate);
+  if (!m) throw new Error('check-store-ceiling.mjs no longer declares CEILING');
+  return parseInt(m[1]!, 10);
+}
+
+
 type Row = { name: string; effect?: string; tags?: string[] };
 const WEAPONS = (weaponsJson as unknown as { weapons: Row[] }).weapons;
 const row = (name: string): Row => {
@@ -400,6 +415,6 @@ describe('OTA-1676 — wired where the promise is paid', () => {
   });
 
   it('gameStore stays under the OTA-1400 ratchet after absorbing the family', () => {
-    expect(src('app', 'state', 'gameStore.ts').split('\n').length).toBeLessThan(37000);
+    expect(src('app', 'state', 'gameStore.ts').split('\n').length).toBeLessThanOrEqual(storeCeiling());
   });
 });

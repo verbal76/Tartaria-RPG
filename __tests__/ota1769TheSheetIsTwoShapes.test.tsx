@@ -33,6 +33,39 @@ import { join } from 'path';
 
 import { tartariaKitStyles as kit } from '../app/ui/tartariaKit';
 
+/* ⚠⚠⚠ OTA-1785 — THE GATE IS PARSED, NOT IMPORTED, and that is a constraint
+ * rather than a preference: the gates are `.mjs` and jest transforms these
+ * suites as CommonJS, so `require()` on one throws. This is the same shape
+ * `ota1757` already uses to read `check-gold.mjs`'s baseline.
+ * ⚠ WHAT IS SHARED IS WHAT ACTUALLY DRIFTED: the exempt NAMES and the two
+ * thresholds. The four lines of arithmetic below are written twice, and that is
+ * a deliberate, stated cost — nobody has ever mistyped `Math.max - Math.min`,
+ * but a fifth exempt name and a chroma ceiling went missing from the second
+ * copy for weeks. */
+function kitPaletteRule(): { brand: Set<string>; chromaCeiling: number; nearNeutral: number } {
+  const gate = require('fs').readFileSync(require('path').join(__dirname, '..', 'scripts', 'check-kit-palette.mjs'), 'utf8');
+  const list = /export const BRAND = new Set\(\[([\s\S]*?)\]\);/.exec(gate);
+  const ceil = /export const CHROMA_CEILING = (\d+);/.exec(gate);
+  const near = /export const NEAR_NEUTRAL = (\d+);/.exec(gate);
+  if (!list || !ceil || !near) throw new Error('check-kit-palette.mjs no longer declares the rule');
+  return {
+    brand: new Set((list[1]!.match(/'([0-9A-Fa-f]{6})'/g) ?? []).map((q) => q.replace(/'/g, '').toUpperCase())),
+    chromaCeiling: parseInt(ceil[1]!, 10),
+    nearNeutral: parseInt(near[1]!, 10),
+  };
+}
+
+function kitExportBudget(): { components: number; helpers: number; total: number } {
+  const gate = require('fs').readFileSync(require('path').join(__dirname, '..', 'scripts', 'check-kit-exports.mjs'), 'utf8');
+  const one = (k: string) => {
+    const m = new RegExp(`export const ${k} = (\\d+);`).exec(gate);
+    if (!m) throw new Error(`check-kit-exports.mjs no longer declares ${k}`);
+    return parseInt(m[1]!, 10);
+  };
+  return { components: one('COMPONENTS'), helpers: one('HELPERS'), total: one('TOTAL') };
+}
+
+
 const ROOT = join(__dirname, '..');
 const read = (...p: string[]) => readFileSync(join(ROOT, ...p), 'utf8');
 const KIT = read('app', 'ui', 'tartariaKit.tsx');
@@ -101,8 +134,13 @@ describe('the two shapes are in the kit', () => {
      * raised one and left the other, which only a full surface run caught. The
      * duplication is still a legacy-hunt item; until it is resolved, moving one
      * without the other is the known way to be wrong here. */
-    expect(components.length).toBeLessThanOrEqual(13);
-    expect(helpers.length).toBeLessThanOrEqual(9);
+    /* ⚠⚠ RE-POINTED BY OTA-1785 — ONE AUTHORITY AT LAST. This suite and
+     * `ota1742` both carried these numbers, OTA-1777 raised one and left the
+     * other, and a full surface run was what found it. Both now read
+     * `scripts/check-kit-exports.mjs`, which is also a gate. */
+    const budget = kitExportBudget();
+    expect(components.length).toBeLessThanOrEqual(budget.components);
+    expect(helpers.length).toBeLessThanOrEqual(budget.helpers);
     expect(codeOf(KIT)).not.toMatch(/export function tSheet/);
   });
 });
@@ -191,11 +229,18 @@ describe('⚠⚠⚠ the contested frame was held, then ruled on — never smuggl
      * chroma at 60; this colour is 134 and only passes because it is listed.
      * A pass that instead loosened the ceiling would let every future bright hue
      * through unremarked, which is the failure mode the list exists to prevent. */
-    const gate = read('__tests__', 'ota1742TheScreenIsMadeOfSomething.test.tsx');
+    /* ⚠⚠ RE-POINTED BY OTA-1785, AND THE SENTENCE IS FINALLY LITERAL. This test
+     * said "in the gate" while reading `ota1742`'s TEST FILE — there was no gate.
+     * The palette rule was enforceable only by a full surface run, and a second,
+     * WEAKER copy of it lived in `ota1744` with four exemptions and no chroma
+     * ceiling. `scripts/check-kit-palette.mjs` is the gate now, it carries the
+     * stronger rule, and this reads the exemption where the exemption actually
+     * is. */
+    const gate = read('scripts', 'check-kit-palette.mjs');
     expect(gate).toContain("'F0C96A'");
     expect(gate).toContain('OTA-1773');
     // the ceiling itself did NOT move
-    expect(gate).toContain('toBeLessThanOrEqual(60)');
+    expect(gate).toContain('CHROMA_CEILING = 60');
   });
 
   test('⚠ the decision is written down at both ends, or the next reader re-decides it', () => {
