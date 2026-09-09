@@ -30051,7 +30051,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SUPERSEDED: '2026-09-09-1783-the-legend-is-one-tap-away'
 // SUPERSEDED: '2026-09-09-1784-six-traders-six-voices'
 // SUPERSEDED: '2026-09-09-1785-one-authority-per-ratchet'
-export const OTA_BUILD_ID = '2026-09-09-1786-the-name-column-fits-its-vocabulary';
+// SUPERSEDED: '2026-09-09-1786-the-name-column-fits-its-vocabulary'
+export const OTA_BUILD_ID = '2026-09-09-1787-the-row-reads-its-own-hierarchy';
 // golem catch-up 2026-09-09: markerless publish of OTA-1786.
 // OTA-1786 - the name column fits its vocabulary. Device finding: Lore's glyph
 // key wrapped BLUDGEONING onto a second line. The column was 92dp; the label

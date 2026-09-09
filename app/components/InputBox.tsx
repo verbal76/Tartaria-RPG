@@ -860,7 +860,31 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 !!resolveDisplayWeaponByName(equippedOff ?? '', inventory)?.tags?.includes('barehanded')
               ) && (() => {
                 const punchT = weaponTone(reachPlayer, null, range, groundedFoesBelow);
-                return <QuickBtn label="punch" onPress={() => onSubmit('punch')} tone={punchT} outOfRange={punchT === 'needs-approach'} />;
+                /* ⚠⚠⚠ OTA-1787 — PUNCH IS SAGE OUTLINE, NOT SAGE FILL, AND THE
+                 * VOCABULARY ALREADY SAID SO.
+                 * Owner, from the device: *"PUNCH now looks visually odd beside
+                 * the illustrated weapon controls. It reads too much like
+                 * another primary filled weapon even though it is the
+                 * basic/fallback unarmed action."*
+                 * ⚠ THE FIX IS A RE-CLASSIFICATION INSIDE THE EXISTING FIVE
+                 * TONES, NOT A NEW TREATMENT. OTA-1454 defined the fill/outline
+                 * axis in its own words: *"A SOLID green block with soot
+                 * lettering is a decisive, turn-ending commitment; the same
+                 * green as a thin border on near-black is the ready pool's
+                 * modifiers and setup tools."* Your fists are not a decisive
+                 * commitment — they are what is available when nothing better
+                 * is. `weaponTone` has always returned `strike` for them purely
+                 * because bare hands reach `close`, which answers "can it land"
+                 * and not "is it your weapon".
+                 * ⚠⚠ ONLY THE `strike` CASE MOVES. `needs-approach` is a WARNING
+                 * and is untouched, so the amber that says "your fists cannot
+                 * reach from here" reads exactly as before — and `outOfRange`
+                 * still keys off the raw tone, so the buzz-and-speak behaviour
+                 * OTA-1591 built is byte-identical.
+                 * ⚠ NO ARTWORK, NO NEW COLOUR, NO SIZE CHANGE, and nothing on
+                 * the weapon buttons is touched — all four by instruction. */
+                const punchTone = punchT === 'strike' ? 'ready' : punchT;
+                return <QuickBtn label="punch" onPress={() => onSubmit('punch')} tone={punchTone} outOfRange={punchT === 'needs-approach'} />;
               })()}
               {/* ⚠⚠⚠ OTA-1553 — `🔥 ❄ cudgel ★`. The owner's format, exactly:
                   *"fire glyph then a snowflake glyph then the word cudgel and
@@ -888,49 +912,6 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 const parts = combatWeaponLabelParts(equippedOff, equippedOffItem, raw, activeEnemyKnownWeak ?? []);
                 return <QuickBtn label={label} glyphs={parts.glyphs} glyphText={parts.text} baseGlyph={parts.base} star={parts.star} weapon onPress={() => onSubmit(`attack with the off-hand ${equippedOff.toLowerCase()}`)} tone={offT} outOfRange={offT === 'needs-approach'} />;
               })() : null}
-              {/* ⚠⚠⚠ OTA-1783 — THE GLYPH REFERENCE, AND EVERY CHOICE IN IT IS A
-                  CONSTRAINT THE OWNER SET.
-                  *"Add a compact, neutral reference control in the combat
-                  action/weapon area that takes the player directly to Lore ->
-                  Glyphs... Tap reference -> Glyph legend -> Back -> continue the
-                  fight."*
-
-                  ⚠ THE SYMBOL IS NOT A GLYPH. *"Do NOT use one of the actual
-                  damage/coat glyphs as the reference-control symbol. That would
-                  imply that particular damage type."* So there is no artwork on
-                  this chip at all — no `glyphs`, no `baseGlyph`, no Image. It is
-                  a question mark and the destination's own name. `?` is the
-                  reference mark and belongs to no damage family; GLYPHS is the
-                  literal label of the Lore tab it opens, so what the player taps
-                  and where they land say the same word. A bare KEY would have
-                  been shorter and worse — this game has keys, and they are items.
-
-                  ⚠ IT IS THE EXISTING FAMILY, NOT A NEW ONE. Same `QuickBtn`,
-                  same chassis, default neutral tone, so it inherits OTA-1782's
-                  control depth exactly like every other chip and introduces no
-                  visual family of its own. It carries no tone, which is what
-                  keeps it subordinate: every chip beside it is coloured by what
-                  it can DO right now, and this one can never do anything to the
-                  enemy.
-
-                  ⚠ LAST ON THE LINE, AFTER THE WEAPONS. It decodes the marks on
-                  the two chips to its left, so it sits with them; and it is the
-                  smallest thing on the row rather than a primary button, because
-                  *"Do not make it a large primary combat button simply because
-                  KICK previously occupied space."*
-
-                  ⚠ IT DOES NOT SUBMIT A COMMAND. Every other chip here goes
-                  through `onSubmit` and costs the player a turn's worth of
-                  engine. This is navigation: it spends no stamina, no time and
-                  no round, and the fight it leaves is still there when the codex
-                  closes. */}
-              <QuickBtn
-                label="? glyphs"
-                onPress={() => {
-                  armLoreJump({ section: 'glyphs', returnTo: useGameStore.getState().currentScreen });
-                  useGameStore.getState().setScreen('lore');
-                }}
-              />
             </View>
 
             <View style={styles.quickRowLine}>
@@ -1040,6 +1021,40 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 <QuickBtn label="step back" onPress={() => onSubmit('step back')} />
               )}
               <QuickBtn label="inventory" onPress={onOpenInventory} />
+              {/* ⚠⚠⚠ OTA-1787 — THE GLYPH KEY MOVES OFF THE WEAPON LINE.
+                  Owner, from the device: *"The current small dark button sitting
+                  directly beside the illustrated weapon controls looks bolted
+                  onto that family. Move/recompose it as a compact NEUTRAL
+                  REFERENCE/UTILITY control associated with combat, not as
+                  another weapon/action."*
+
+                  ⚠ SO IT SITS WITH `inventory`, WHICH IS THE ROW IT ALWAYS
+                  BELONGED ON. This line is the combat stack's UTILITY row —
+                  approach, step back, inventory, abilities, heals. Every chip
+                  here either navigates or prepares; none of them is a swing.
+                  A legend is navigation, so this is where it reads correctly,
+                  and being two rows below the weapons is what makes it
+                  subordinate without shrinking it.
+
+                  ⚠⚠ AND THE `?` IS GONE. Owner: *"Change the player-facing
+                  concept to GLYPH KEY. Do not use a question mark as its
+                  identity."* A question mark reads as help-about-the-interface;
+                  this is a KEY to a vocabulary the world uses. The label is now
+                  the thing itself, and it still names the Lore tab it opens, so
+                  what the player taps and where they land say the same words.
+
+                  ⚠ THE NAVIGATION IS OTA-1783's, UNCHANGED — arm the jump with
+                  the screen we are on, then navigate; BACK returns to the exact
+                  combat state because a fight is store state on `exploration`.
+                  Still no tone, so it is the neutral chassis and inherits
+                  OTA-1782's control depth like everything else. */}
+              <QuickBtn
+                label="glyph key"
+                onPress={() => {
+                  armLoreJump({ section: 'glyphs', returnTo: useGameStore.getState().currentScreen });
+                  useGameStore.getState().setScreen('lore');
+                }}
+              />
             </View>
           </>
         ) : (

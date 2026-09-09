@@ -113,8 +113,15 @@ describe('OTA-1783 — the control is neutral, compact and not a glyph', () => {
     expect(chip).not.toMatch(/\soutOfRange/);
   });
 
-  it('its label is the reference mark and the destination, not a damage word', () => {
-    expect(chip).toContain('label="? glyphs"');
+  it('its label is the destination itself, and carries no question mark', () => {
+    /* ⚠⚠⚠ CHANGED BY OTA-1787, ON A DEVICE RULING. This pass shipped `? glyphs`;
+     * the owner saw it and ruled: *"Change the player-facing concept to GLYPH
+     * KEY. Do not use a question mark as its identity."* He is right about why —
+     * a question mark reads as help-about-the-interface, and this is a KEY to a
+     * vocabulary the world uses. The claim the test defends is unchanged: the
+     * label is not a damage word and not a glyph. */
+    expect(chip).toContain('label="glyph key"');
+    expect(chip).not.toContain('?');
   });
 
   /* ⚠⚠ NAVIGATION, NOT AN ACTION. Every other chip goes through `onSubmit` and
@@ -127,14 +134,35 @@ describe('OTA-1783 — the control is neutral, compact and not a glyph', () => {
 
   /* ⚠ PLACEMENT: it decodes the marks on the weapon chips, so it sits on their
    * line, after them, and it is the last thing there. */
-  it('it sits last on the weapon line, after both hands', () => {
-    const line = code.slice(code.indexOf('const mainT = weaponTone'), code.indexOf('OTA-912'));
-    const iMain = line.indexOf('attack with the ');
-    const iOff = line.indexOf('attack with the off-hand ');
-    const iRef = line.indexOf('armLoreJump');
-    expect(iMain).toBeGreaterThan(-1);
-    expect(iOff).toBeGreaterThan(iMain);
-    expect(iRef).toBeGreaterThan(iOff);
+  it('it is NOT on the weapon line — it sits with the utility controls', () => {
+    /* ⚠⚠⚠ MOVED BY OTA-1787, ON A DEVICE RULING, AND THIS TEST IS NOW ITS
+     * OPPOSITE. OTA-1783 put the control last on the WEAPON line, reasoning
+     * that it decodes the marks on the two chips beside it. On hardware that
+     * adjacency did the opposite of what was intended — owner: *"The current
+     * small dark button sitting directly beside the illustrated weapon controls
+     * looks bolted onto that family."*
+     * It now sits on the combat stack's UTILITY row, beside `inventory`: every
+     * chip on that line navigates or prepares, and none of them is a swing. */
+    /* ⚠⚠ ANCHORED ON CODE, NOT ON AN OTA NUMBER IN A COMMENT — the first cut of
+     * this used `OTA-912` as the weapon line's closing marker and `code` here is
+     * COMMENT-STRIPPED, so that anchor did not exist, `indexOf` returned -1, and
+     * the slice silently ran to the end of the file and "found" the chip on the
+     * weapon line. Grade the code, not the prose, applied to the SCANNER as well
+     * as to the target. The row boundary is `styles.quickRowLine`, which is real
+     * code and cannot be stripped. */
+    const rowStarts = [...code.matchAll(/styles\.quickRowLine/g)].map((m) => m.index!);
+    expect(rowStarts.length).toBeGreaterThanOrEqual(3);
+    const weaponRow = rowStarts.find((i) => i < code.indexOf('const mainT = weaponTone'))!;
+    const afterWeaponRow = rowStarts.find((i) => i > code.indexOf('const mainT = weaponTone'))!;
+    const weaponLine = code.slice(weaponRow, afterWeaponRow);
+    expect(weaponLine).toContain('attack with the off-hand ');
+    expect(weaponLine).not.toContain('armLoreJump');
+    // and it is on the row that carries `inventory`
+    const iInv = code.indexOf('label="inventory"');
+    const utilityRow = rowStarts.find((i) => i < iInv && !rowStarts.some((j) => j > i && j < iInv))!;
+    const utilityLine = code.slice(utilityRow);
+    expect(utilityLine).toContain('label="inventory"');
+    expect(utilityLine).toContain('armLoreJump');
   });
 });
 
