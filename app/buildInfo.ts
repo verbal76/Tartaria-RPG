@@ -30056,6 +30056,29 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SUPERSEDED: '2026-09-09-1788-the-utility-marks-are-ours'
 // SUPERSEDED: '2026-09-09-1789-one-weapon-family-resolver'
 export const OTA_BUILD_ID = '2026-09-09-1790-the-exchange-reads-as-a-sentence';
+// golem catch-up 2026-09-09: markerless publish of OTA-1790.
+// OTA-1790 - the exchange reads as a sentence. The transcript said
+// `YOU > Raider  HIT` on one row and `YOU > Raider  HIT  25` on the next, with
+// the damage marooned in its own column: duplicated actors, a duplicated stamp,
+// an arrow, and a number with nothing joining it to the words. It is now ONE
+// SENTENCE - `YOU HIT Conspiracy Architect 1 for 25 HP` - built once by
+// engine/combatSentence and coloured, not composed, by the renderer.
+// A to-hit verdict is folded into the damage line it belongs to, in
+// presentation only: both lines still reach the disk log with every number in
+// them. A defensive outcome reports from the DEFENDER's side (`Raider DODGED
+// YOU`); crit and fumble keep their emphasis as a trailing note rather than
+// becoming ungrammatical verbs; a landed blow that did nothing says ARMOUR
+// ABSORBED instead of printing a silent zero.
+// OTA-1789's resolver got its first consumer: a 20dp weapon mark in a reserved
+// column, sized off the event line's own 14/20 box rather than off a
+// screenshot. The enemy side deliberately shows none - the engine has no enemy
+// weapon family, and inferring one from the damage type would make the mark a
+// damage-type icon, which the mark is not.
+// The store paid for the wiring by shrinking: five pure display functions went
+// to engine/combatProse, which was already named for them, and the ceiling came
+// down 36998 -> 36963. First time that number has fallen as a condition of work
+// rather than as tidying.
+//
 // golem catch-up 2026-09-09: markerless publish of OTA-1789.
 // OTA-1789 - one weapon-family resolver. The taxonomy was already in the game:
 // a census of all 301 catalog weapons found the family words in `tags` already
