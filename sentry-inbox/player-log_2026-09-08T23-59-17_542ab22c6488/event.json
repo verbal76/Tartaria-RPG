@@ -1,0 +1,222 @@
+{
+  "id": "542ab22c64884b9598edb3cef7ef7ce0",
+  "groupID": "7720492015",
+  "eventID": "542ab22c64884b9598edb3cef7ef7ce0",
+  "projectID": "4511945117532160",
+  "size": 2579,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log-beacon 2026-09-08-1761-not-broken #mttbzopym292"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-08-1761-not-broken",
+  "message": "player-log-beacon 2026-09-08-1761-not-broken #mttbzopym292",
+  "title": "player-log-beacon 2026-09-08-1761-not-broken #mttbzopym292",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "0542cceb5540487d8fb0fd1366f99fd4",
+      "span_id": "bafd42eefe99bd7c",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {},
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log-beacon 2026-09-08-1761-not-broken #mttbzopym292"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mttbzopym292"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-08-1761-not-broken"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-beacon"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "parts",
+      "value": "9"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-08-1761-not-broken"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-08T23:59:17.903000Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-08T23:59:17.779000Z",
+  "fingerprints": [
+    "58c37f46182789bde8480fccf580342a"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1962002724,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-08T23:43:54.431891Z",
+    "dateReleased": "2026-09-08T23:45:32.994900Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "3102694334cbe3e6d9182daf152da0a1fc4fe30a",
+      "message": "[ota-hal] OTA-1761 \u2014 the one that was not broken\n\nOwner, on the corrected screenshot: *\"those 2 images have the misalignment\nagain, the one before it was fine.\"* It was. This reverts OTA-1760's change to\nFirstTimeHint's tips link and leaves the file exactly as it shipped.\n\n1. \u26a0\u26a0\u26a0 BOTH HALVES OF MY DIAGNOSIS WERE WRONG, AND THAT IS THE PASS\n   OTA-1760 measured the link's label sitting at the left edge of its own\n   padding box and called it an off-centre tap target:\n       Got it         box x284.2 w72.3 \u00b7 text x303.2 w34.3 \u2192 19.0 / 19.0\n       Turn off tips  box x 54.5 w71.4 \u00b7 text x 54.5 w61.4 \u2192  0.0 / 10.0\n   \u00b7 THE BOX IN THE SCREENSHOT WAS THE HEADLESS BROWSER'S FOCUS RING. On a\n     device that control has no border at all, so nothing was visibly\n     off-centre. \u26a0 OTA-1760's own commit message SAYS the ring is an artifact\n     and warns against acting on it \u2014 and then acts on it. Naming an artifact is\n     not the same as not being fooled by it.\n   \u00b7 THE TAP TARGET WAS NEVER ASYMMETRIC. `hitSlop={8}` on that\n     TouchableOpacity already extends the touchable area 8pt on ALL FOUR sides.\n     \"No tap forgiveness at all to the left of the label\" was asserted without\n     reading the JSX it was about \u2014 the line sits four lines from the style I\n     changed, in a block I had already read in this same session.\n\n2. \u26a0\u26a0 THE SHIPPED VALUES WERE RIGHT ON BOTH THINGS A PLAYER CAN SEE\n       label x 54.5 \u2014 FLUSH with the card's body text above it\n       box   x 54.5 \u2014 18.0 from the card's inner edge, matching `Got it`'s\n                      18.0 on the other side\n   Both fall out of `paddingLeft` being absent and the card's padding being 18.\n   There is no third value that satisfies both, which is why each attempt broke\n   the half the other preserved:\n       marginLeft: -10    label stayed flush \u00b7 box fell to 8.0 from the card\n       offset deleted     box back to 18.0   \u00b7 label indented 10pt from the body\n   The owner caught each one from the render, and was right each time. The\n   second report came with both screenshots side by side, pointing at each\n   failure mode in turn.\n\n3. WHAT THIS DOES NOT REVERT\n   \u26a0 OTA-1760's VendorScreen half stays. That was a real defect \u2014 the\n   placeholder's line box ended at y=122 and the back button's began at y=122,\n   so a 1px border sliced the sentence above it \u2014 and the same button was\n   stretched to the full column with no header row to sit in. Both fixed, both\n   measured, both untouched here. A revert of one half is not a reason to lose\n   the other, and a test in the new suite asserts that it survived.\n\n4. THE RECORD, NOT JUST THE REVERT\n   `linkBtn`'s comment now says DO NOT centre it again, and why: the focus ring\n   is still in every harness shot and it will still look off-centre to the next\n   reader. A silent revert would invite the same \"fix\" a third time. The suite\n   asserts the note is present, asserts `hitSlop` is on the same control the\n   claim was about, and pins the shipped padding byte for byte.\n   \u26a0 `__tests__/ota1760\u2026` keeps a comment where its second block used to be,\n   rather than dropping it: that pass shipped two changes and only one survived,\n   and a suite that quietly lost the other would read as though it had always\n   been about VendorScreen alone.\n\n\u26a0\u26a0 THE LESSON, STATED SO IT OUTLIVES THIS COMMIT: the harness is a MEASUREMENT\ntool, and a measurement of the wrong thing is still a number. Everything I\nmeasured here was accurate \u2014 the boxes really are 0.0/10.0 \u2014 and the conclusion\nwas still wrong, because the box being measured is not drawn on a device and the\nproperty being fixed was already provided by a prop I did not read. Two passes\nof confident, numerically-supported work on a defect that did not exist. The\nowner's amendment says actual-device appearance is the final visual acceptance\nauthority; this is what it looks like when the harness is treated as more than\nthat.\n\nTests: __tests__/ota1761TheOneThatWasNotBroken.test.tsx (7 tests) \u2014 the shipped\npadding pinned byte for byte with the two attempted values asserted absent;\n\u26a0 `hitSlop={8}` proved to sit on the SAME control the asymmetry claim was about,\nwhich is the fact that made the whole diagnosis wrong; the card's 18 proved to be\nwhere both the label's flush alignment and the box's inset come from, so a later\nreader can see why no third value exists; the link proved still quiet, still\nunderlined, still borderless; the DO-NOT note proved present in the file where\nthe next reader will be rather than only in this message; and OTA-1760's Vendor\nfix proved to have survived the revert.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-08T23:41:16Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-08-1761-not-broken",
+          "shortVersion": "tartaria@4.32.11+2026-09-08-1761-not-broken",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-08T23:45:32.994900Z",
+          "dateCreated": "2026-09-08T23:43:54.431891Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "156684952",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-08T23:45:33.419050Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-08-1761-not-broken",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-08-1761-not-broken",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-08-1761-not-broken",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-08-1761-not-broken)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": null
+}

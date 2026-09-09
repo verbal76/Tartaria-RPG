@@ -1,0 +1,243 @@
+{
+  "id": "d1a3bbcbf74f4eb0a13f3a302b73fd45",
+  "groupID": "7720699931",
+  "eventID": "d1a3bbcbf74f4eb0a13f3a302b73fd45",
+  "projectID": "4511945117532160",
+  "size": 3453,
+  "entries": [
+    {
+      "data": {
+        "formatted": "Process reclaimed while idle on the title screen \u2014 no game was in progress (0s after boot, app active, stage hydrate:start)"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-09-1764-storm-and-shut-drawers",
+  "message": "Process reclaimed while idle on the title screen \u2014 no game was in progress (0s after boot, app active, stage hydrate:start)",
+  "title": "Process reclaimed while idle on the title screen \u2014 no game was in progress (0s after boot, app active, stage hydrate:start)",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "38b36dc67b104eb29f43deab2224c29c",
+      "span_id": "8f465889e0c36561",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "actionAgeMs": 422,
+    "id": "1788920948695_native-death",
+    "lastAction": "(no action yet)",
+    "lastPhase": "native:cognition:start",
+    "lastPhaseAgeMs": 0,
+    "lastPhaseDetail": "q0",
+    "lastScreen": "title",
+    "launchAfterOta": true,
+    "launchAgeMs": 479,
+    "launchCtx": "o0/r0/l0/p0/dn0",
+    "launchOtaGapMs": 127,
+    "launchOtaPath": "mid-session",
+    "launchPrevCtx": "o0/r0/l0/p0/dn0",
+    "nativeSdkSawCrash": "unknown",
+    "sinceBootMs": 479,
+    "stack": "(none \u2014 the process died without one)"
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "Process reclaimed while idle on the title screen \u2014 no game was in progress (0s after boot, app active, stage hydrate:start)"
+  },
+  "tags": [
+    {
+      "key": "build",
+      "value": "2026-09-09-1764-storm-and-shut-drawers"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-09-1764-storm-and-shut-drawers"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "native-death"
+    },
+    {
+      "key": "level",
+      "value": "error"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-09-1764-storm-and-shut-drawers"
+    },
+    {
+      "key": "stage",
+      "value": "native:cognition:start"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    },
+    {
+      "key": "version",
+      "value": "4.32.11"
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-09T02:42:10.226755Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-09T02:29:08.695000Z",
+  "fingerprints": [
+    "8f166c5c35cf53e20bfddda91f021069"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1962170714,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-09T01:54:16.278586Z",
+    "dateReleased": "2026-09-09T01:55:39.646658Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "31e4ed61bb7eaa3cb5e9a88f9c3723083d74880b",
+      "message": "[ota-hal] OTA-1764 \u2014 a new storm, and two drawers that now start shut\n\nTwo owner instructions, unrelated, both small, arriving together.\n\n1. THE COUNTER NOW OPENS WITH EVERY DRAWER SHUT\n   Owner: *\"workings to learn and reinforce your gear should start collapsed like\n   the rest of the categories when it shops and vendors.\"*\n   They were the only two sections on the vendor counter defaulting OPEN. The\n   wares above them have opened collapsed since OTA-686, and so has the SELL\n   tab's category list \u2014 measured, not assumed: four `collapsedSections[secKey]\n   ?? \u2026` sites, two `true` and two `false`, and the two `false` ones were exactly\n   the two the owner named.\n   \u26a0 WORKINGS TO LEARN carried the note *\"open by default \u2014 this is the\n   discoverable bit\"*. That was a real intention and it is OVERRIDDEN rather than\n   quietly deleted: a section that opens itself while its neighbours stay shut\n   does not read as discoverable, it reads as the odd one out, and it spends the\n   first screen \u2014 the part the player came to the counter for \u2014 on something they\n   did not ask to see. The count in the header already advertises it, which is\n   the same job without costing the fold.\n   \u26a0\u26a0 THE TOGGLES MOVED TOO, AND THAT IS THE HALF THAT WOULD HAVE BITTEN. A\n   header that RENDERS from `?? true` but TOGGLES from `!(s[key] ?? false)`\n   writes `true` on the first tap \u2014 the section is already shut, so tapping it\n   shuts it again and the control reads as dead. Both halves of both sections\n   now read the same default, and a test asserts the toggles and the renders\n   agree rather than just checking the renders.\n\n2. ENVIRONMENTAL IS A THUNDERSTORM. L544 IS RETIRED.\n   The trial's own first report said `L544` *\"reads as a container / kit, not as\n   an environment or a hazard. Its silhouette is a rectangle.\"* The owner reached\n   the same verdict \u2014 *\"it visually reads as a suitcase/case rather than an\n   environmental hazard\"* \u2014 and supplied a custom Tartaria thunderstorm.\n   \u26a0\u26a0\u26a0 AND NO CODE CHANGED, WHICH WAS THE ACTUAL TEST. Owner: *\"So if the\n   architecture is correct, this should require no UI behavior change.\"*\n   It required none. `app/engine/damageIcons.ts` is untouched. The trial block is\n   untouched. The semantic key, the mapping, the layout, the size experiment and\n   live combat are all untouched. The diff for this half is one binary and two\n   documents \u2014 because a correct art table means swapping a picture is swapping\n   a FILE. A test asserts the table still says\n   `environmental: require('../../assets/damage/environmental.png')`, that the\n   word `L544` appears nowhere in it, and that no special case for one icon crept\n   into the trial block.\n\n   \u26a0 THE MASTERS ARE TRACKED AND NOT BUNDLED, WHICH IS A REAL DISTINCTION HERE.\n   `app.json` bundles `assets/**/*` into the app. Dropping 64/128/256/512 into\n   `assets/damage/` would have shipped 750KB of one icon to a phone that only\n   ever draws the 64. They go to `art/12-damage-icons/` instead \u2014 the drop-folder\n   tree `art/README.md` already describes, tracked in git, invisible to the\n   bundler. Owner: *\"Do not load all four resolutions into the mobile runtime\n   merely because they exist.\"*\n   The runtime copy is proved md5-identical to the 64 master, so the two cannot\n   silently drift into a stale export nobody can tell apart by looking, and a\n   test walks all of `app/` to prove nothing `require()`s a master.\n\n   PROVENANCE, recorded in `assets/damage/README.md` and `art/12-damage-icons/`:\n     Source ................ Custom Tartaria Environmental Thunderstorm\n     Asset family .......... custom\n     Semantic filename ..... environmental.png (UNCHANGED)\n     Master resolutions .... 64 / 128 / 256 / 512\n     Runtime test .......... 64x64\n     Status ................ PROVISIONAL, pending actual-device approval\n     Retired ............... L544, no longer Environmental, kept nowhere\n\n\u26a0\u26a0\u26a0 TWELVE TESTS FAILED ON THE COLLAPSE, ACROSS THREE SUITES, AND EVERY ONE WAS\nTHE CHANGE WORKING RATHER THAN A REGRESSION. `ota1734`, `ota1736` and `ota1740`\nall drive the REINFORCE flow, and a row inside a shut drawer is not mounted at\nall \u2014 so \"find the Rusted Blade\" found nothing. The fix is what a PLAYER now\ndoes: the mount helpers tap the closed headers open. Not one assertion was\nweakened; the flows still prove what they proved.\n\u26a0\u26a0 AND THE FIRST FIX FOR IT WAS WRONG IN TWO WAYS AT ONCE, BOTH WORTH KEEPING:\n  \u00b7 `TouchableOpacity` is a COMPOSITE that forwards its props, so `findAll`\n    returns the composite AND the host node for one control. Pressing every\n    match toggled each header an EVEN number of times \u2014 open, then shut \u2014 and\n    the render came back looking untouched, as if the taps had done nothing.\n    Same trap OTA-1762's suite hit counting tabs. Deduped by rendered text.\n  \u00b7 `CONTRACTS \u25b8` carries a chevron IN ITS LABEL and is not a section header at\n    all \u2014 it opens the mission board. Matching on the chevron alone tapped it\n    and buried the counter under a modal, which is what the failure output\n    actually showed before I read it properly.\n`ota1736` already had a working `expandAll` that deduped by text; the two suites\nthat did not are the two that broke.\n\n\u26a0 ONE OBSERVATION FOR THE OWNER, ACTED ON IN NO WAY: the replacement is a\nfull-bleed tile like seven of the others, where `L544` was one of three objects\non transparency. So the framed/unframed split this trial reported has narrowed\nfrom 3-vs-6 to 2-vs-7 \u2014 `impact` and `rupture` are now the only two sitting on\nthe card ground. That is a consequence of the swap worth seeing before the set is\njudged as a set, not a request to change anything.\n\nTests: __tests__/ota1764TheStormAndTheShutDrawers.test.tsx (12 tests) \u2014 all four\nsection defaults counted and proved to agree, which is a stronger claim than \"the\ntwo I changed are now true\" and fails if a fifth is ever added open; \u26a0 the\ntoggles proved to read the same default as the renders; the overridden\n\"discoverable bit\" reasoning proved still present; the new binary proved 64x64\nRGBA and proved NOT to be the rejected hash; \u26a0\u26a0 the art table proved untouched\nand free of `L544`; the masters proved tracked, correctly sized, outside the\nbundled tree, byte-identical to the runtime copy at 64, and required by nothing\nin `app/`.\n\u26a0 That last one first failed on `buildInfo.ts` \u2014 the stamp ledger NAMES what each\npass did, so of course it says \"12-damage-icons\". Grading it would be grading the\nwrite-up instead of the fix, which is the trap five checks in this rollout have\nalready hit, so it is excluded by name and the file count is asserted so the walk\ncannot quietly find nothing.\n\u26a0 And I first asserted THREE section defaults and forgot the SELL tab's, which is\nthe argument for counting them rather than listing the ones I touched.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-09T01:51:54Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-09-1764-storm-and-shut-drawers",
+          "shortVersion": "tartaria@4.32.11+2026-09-09-1764-storm-and-shut-drawers",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-09T01:55:39.646658Z",
+          "dateCreated": "2026-09-09T01:54:16.278586Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "156715447",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-09T01:55:39.873878Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-09-1764-storm-and-shut-drawers",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-09-1764-storm-and-shut-drawers",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-09-1764-storm-and-shut-drawers",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-09-1764-storm-and-shut-drawers)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": null,
+  "previousEventID": null
+}

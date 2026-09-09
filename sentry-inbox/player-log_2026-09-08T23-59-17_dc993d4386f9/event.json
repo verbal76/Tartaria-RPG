@@ -1,0 +1,252 @@
+{
+  "id": "dc993d4386f9461a9fa8fc0f84b9d29d",
+  "groupID": "7720491958",
+  "eventID": "dc993d4386f9461a9fa8fc0f84b9d29d",
+  "projectID": "4511945117532160",
+  "size": 15808,
+  "entries": [
+    {
+      "data": {
+        "formatted": "player-log 2026-09-08-1761-not-broken #mttbzopym292 [inline 7/9]"
+      },
+      "type": "message"
+    }
+  ],
+  "dist": "2026-09-08-1761-not-broken",
+  "message": "player-log 2026-09-08-1761-not-broken #mttbzopym292 [inline 7/9]",
+  "title": "player-log 2026-09-08-1761-not-broken #mttbzopym292 [inline 7/9]",
+  "location": null,
+  "user": {
+    "id": null,
+    "email": null,
+    "username": null,
+    "ip_address": "96.235.33.72",
+    "name": null,
+    "geo": {
+      "country_code": "US",
+      "city": "Pittsburgh",
+      "region": "United States"
+    },
+    "data": null
+  },
+  "contexts": {
+    "react_native_context": {
+      "expo": true,
+      "fabric": true,
+      "hermes_debug_info": true,
+      "hermes_version": "for RN 0.76.3",
+      "js_engine": "hermes",
+      "react_native_version": "0.76.3",
+      "turbo_module": true,
+      "type": "default"
+    },
+    "trace": {
+      "trace_id": "0542cceb5540487d8fb0fd1366f99fd4",
+      "span_id": "bafd42eefe99bd7c",
+      "status": "unknown",
+      "type": "trace"
+    }
+  },
+  "sdk": {
+    "name": "sentry.javascript.react-native",
+    "version": "6.10.0"
+  },
+  "context": {
+    "chunkBlocks": [
+      "WzI-wMj-YtM-Dkt-MDh-UMj-M6N-TY6-MDg-uMz-k0W-l0g-W3J-ld2-FyZ-F0g-4py-mIE-Rpc-Gxv-bWF-0J3-MgT-WFz-ayB-vZi-B0a-GUg-R2l-hbn-RzI-ChD-b21-tb2-4pL-gpb-MjA-yNi-0wO-S0w-OFQ-yMz-o1N-jow-OC4-zOT-NaX-SBb-d29-ybG-RdI-FRo-ZSB-EaX-Bsb-21h-dCd-zIE-1hc-2sg-b2Y-gdG-hlI-Edp-YW5-0cy-Bjb-21l-cyB-1cC-Bvd-XQg-b2Y-gdG-hlI-HNp-bHQ-gd2-l0a-CBh-IHN-tYW-xsI-HN1-Y2t-pbm-cgc-HJv-dGV-zdC-4KW-zIw-MjY-tMD-ktM-DhU-MjM-6NT-Y6M-Dgu-Mzk-wWl-0gW-3Jl-d2F-yZF-0g4-pym-IEN-ydW-RlI-Edv-bGV-tIF-Bpa-2Ug-KEN-vbW-1vb-iku-Cls-yMD-I2L-TA5-LTA-4VD-IzO-jU2-OjA-4Lj-M4O-Vpd-IFt-3b3-JsZ-F0g-WW9-1IG-NsY-Wlt-IHR-oZS-BDc-nVk-ZSB-Hb2-xlb-SBQ-aWt-lLg-o=",
+      "WzI-wMj-YtM-Dkt-MDh-UMj-M6N-TY6-MDc-uMT-k5W-l0g-W2R-lYn-VnX-SB1-aTo-gdG-FwI-CJ0-YWt-lIC-8gc-2Fs-dmF-nZS-Ig4-o+x-KzI-2bX-MKW-zIw-MjY-tMD-ktM-DhU-MjM-6NT-Y6M-DYu-MjM-wWl-0gW-2Rl-YnV-nXS-Bxd-2Vu-4o+-xIG-lud-mVz-dGl-nYX-RlX-2xv-cmU-gb2-sgM-jM3-Mm1-zIH-JlY-WQg-MTI-0OW-1zL-3dy-aXR-lID-EwM-DJt-cyB-pbi-AxM-jZ0-4oa-Sb3-V0I-DMx-dCB-0aH-IyI-Dku-OW1-zL3-QgK-DE0-NGN-oKQ-pbM-jAy-Ni0-wOS-0wO-FQy-Mzo-1Nj-owN-S41-MzR-aXS-Bbd-29y-bGR-dIF-RoZ-SBs-b29-zZS-Blb-mQg-aXM-gZX-hhY-3Rs-eSB-hcy-Bsb-29z-ZSB-hcy-B5b-3Ug-bGV-mdC-Bpd-C4K-WzI-wMj-YtM-Dkt-MDh-UMj-M6N-TY6-MDU-uNT-MzW-l0g-W3d-vcm-xkX-SBZ-b3U-gd2-Fsa-yB3-ZXN-0IH-Roc-m91-Z2g-gb3-Blb-iBz-aWx-0Li-BUa-GUg-Y29-tcG-Fzc-yBw-b2l-udH-Mgd-2Vz-dCB-pbn-RvI-G9w-ZW4-gZ3-Jvd-W5k-Lgo-=",
+      "WzI-wMj-YtM-Dkt-MDh-UMj-M6N-TY6-MDU-uNT-MyW-l0g-W2R-lYn-VnX-SBz-cGF-3bj-ogZ-2Vh-cj1-bUm-Vjb-GFp-bWV-yJ3-MgR-2xv-dmV-zLC-BDc-nVk-ZSB-Hb2-xlb-SBQ-aWt-lLC-BEa-XBs-b21-hdC-dzI-E1h-c2s-gb2-Ygd-Ghl-IEd-pYW-50c-10g-d2l-uZG-93P-TEw-IHJ-vc3-Rlc-j1u-ZXc-KWz-IwM-jYt-MDk-tMD-hUM-jM6-NTY-6MD-UuN-TE1-Wl0-gW2-RlY-nVn-XSB-1aT-ogd-GFw-ICL-ihp-IgQ-VNH-QVJ-EQV-IiI-OKP-sSs-xM2-1zC-lsy-MDI-2LT-A5L-TA4-VDI-zOj-U2O-jAz-Ljg-2MV-pdI-Ftj-b2d-uaX-Rpd-mVd-IG5-ldX-RyY-Wwg-ICg-0Mj-Vtc-ykK-WzI-wMj-YtM-Dkt-MDh-UMj-M6N-TY6-MDM-uND-MyW-l0g-W2R-lYn-VnX-SBh-cmJ-pdG-VyO-iBm-bGF-2b3-Iga-GVs-ZCA-oYn-VkZ-2V0-IOK-AlC-Bvb-mUg-cGV-yIH-Rpb-GUs-IDI-1cy-Bhc-GFy-dCk-K",
+      "WzI-wMj-YtM-Dkt-MDh-UMj-M6N-TY6-MDM-uND-MyW-l0g-W2R-lYn-VnX-SBh-cmJ-pdG-VyO-iB0-ZW1-wbG-F0Z-SAo-cmV-hc2-9uP-Wlu-dGV-udC-1ub-3Qt-YWx-sb3-dlZ-Dpp-bnZ-lc3-RpZ-2F0-ZSk-KWz-IwM-jYt-MDk-tMD-hUM-jM6-NTY-6MD-MuN-DMw-Wl0-gW3-dvc-mxk-XSB-Zb3-Ugb-G9v-ayB-0aG-Ugd-2lu-ZG9-3IG-92Z-XIu-IE5-vdG-hpb-mcg-YWJ-vdX-Qga-XQg-c2l-uZ3-MsI-G5v-dGh-pbm-cgY-WJv-dXQ-gaX-Qgd-2Fy-bnM-g4o-CUI-FRh-cnR-hcm-lhI-Glz-IGZ-1bG-wgb-2Yg-dGh-pbm-dzI-Hdh-aXR-pbm-cgd-G8g-YmU-gcm-VtZ-W1i-ZXJ-lZC-4K",
+      "WzI-wMj-YtM-Dkt-MDh-UMj-M6N-TY6-MDM-uND-I1W-l0g-W2R-lYn-VnX-SBw-YXJ-zZX-I6I-Glu-dGV-udD-1pb-nZl-c3R-pZ2-F0Z-SBj-b25-mPT-EuM-DAg-dmV-yYj-1pb-nZl-c3R-pZ2-F0Z-SB0-YXJ-nZX-Q9d-2lu-ZG9-3IH-Jlc-29s-dmV-kPX-dpb-mRv-dyB-yYW-5nZ-T0t-IGV-uZW-1pZ-XM9-MCB-ob2-9rc-z0y-Cls-yMD-I2L-TA5-LTA-4VD-IzO-jU2-OjA-zLj-QyN-Fpd-IFt-wbG-F5Z-XJd-IGl-udm-Vzd-Gln-YXR-lIH-dpb-mRv-dwp-bMj-AyN-i0w-OS0-wOF-QyM-zo1-Njo-wMi-42M-DNa-XSB-bY2-9nb-ml0-aXZ-lXS-BDT-ElN-QiA-gKD-IzO-G1z-KQp-bMj-AyN-i0w-OS0-wOF-QyM-zo1-Njo-wMi-4xO-DBa-XSB-bc3-lzd-GVt-XSD-ij7-MgV-Glt-ZSB-wYX-NzZ-WQ6-IDI-0IG-1pb-gpb-MjA-yNi-0wO-S0w-OFQ-yMz-o1N-jow-Mi4-xOD-BaX-SBb-ZGV-idW-ddI-GFy-Yml-0ZX-I6I-GFt-Yml-lbn-Qga-GVs-ZCA-oaG-Uga-nVz-dCB-zcG-9rZ-SkK",
+      "WzI-wMj-YtM-Dkt-MDh-UMj-M6N-TY6-MDI-uMT-gwW-l0g-W2R-lYn-VnX-SBk-ZWR-1cD-ogc-3Vw-cHJ-lc3-NlZ-CBh-cmJ-pdG-VyI-HJl-cGV-hdC-Dig-JQg-IlR-oZS-BBc-mJp-dGV-yIG-xvb-2tz-IGF-yb3-VuZ-C4g-IlR-oZS-Bha-XIg-dGF-zdG-VzI-G9m-IGN-vbG-Qga-XJv-biB-hbm-Qgb-+KA-piI-KWz-IwM-jYt-MDk-tMD-hUM-jM6-NTY-6MD-IuM-Tgw-Wl0-gW2-FyY-ml0-ZXJ-dIF-RoZ-SBB-cmJ-pdG-VyI-Gxv-b2t-zIG-Fyb-3Vu-ZC4-gIl-RoZ-SBh-aXI-gdG-Fzd-GVz-IG9-mIG-Nvb-GQg-aXJ-vbi-Bhb-mQg-b2x-kIH-Jpd-HVh-bC4-gVG-hlI-E9y-ZGV-yIG-Nhb-Gxz-IHR-oYX-QgY-2xl-YW4-uIg-pbM-jAy-Ni0-wOS-0wO-FQy-Mzo-1Nj-owM-i4x-ODB-aXS-BbZ-GVi-dWd-dIG-FyY-ml0-ZXI-6IH-Rlb-XBs-YXR-lIC-hyZ-WFz-b24-9aW-50Z-W50-LW5-vdC-1hb-Gxv-d2V-kOm-lud-mVz-dGl-nYX-RlK-Qo=",
+      "WzI-wMj-YtM-Dkt-MDh-UMj-M6N-TY6-MDI-uMT-c5W-l0g-W3J-ld2-FyZ-F0g-WW9-1IH-Njc-mFw-ZSB-hdC-B0a-GUg-c2l-sdC-B3a-XRo-IHR-oZS-BzZ-W50-aW5-lbC-Bjb-GVh-dmV-yLi-Din-KYg-UmV-jb3-Zlc-mVk-IEF-ldG-hlc-iBD-cnl-zdG-FsI-ChD-b21-tb2-4pL-gpb-MjA-yNi-0wO-S0w-OFQ-yMz-o1N-jow-Mi4-xNz-VaX-SBb-ZGV-idW-ddI-HBh-cnN-lcj-oga-W50-ZW5-0PW-lud-mVz-dGl-nYX-RlI-GNv-bmY-9MS-4wM-CB2-ZXJ-iPW-lud-mVz-dGl-nYX-RlI-HRh-cmd-ldD-1nc-m91-bmQ-gcm-Vzb-2x2-ZWQ-9LS-ByY-W5n-ZT0-tIG-VuZ-W1p-ZXM-9MC-Bob-29r-cz0-yCl-syM-DI2-LTA-5LT-A4V-DIz-OjU-2Oj-AyL-jE3-NVp-dIF-twb-GF5-ZXJ-dIG-lud-mVz-dGl-nYX-RlI-HRo-ZSB-ncm-91b-mQK-WzI-wMj-YtM-Dkt-MDh-UMj-M6N-TY6-MDA-uND-Y2W-l0g-W2R-lYn-VnX-SB1-aTo-gdG-FwI-CJp-bnZ-lc3-RpZ-2F0-ZSI-g4o-+xK-zIz-bXM-K",
+      "WzI-wMj-YtM-Dkt-MDh-UMj-M6N-TU6-NTg-uNz-EzW-l0g-W3J-ld2-FyZ-F0g-ICA-gIO-KAo-iBT-Y3J-hcC-BNZ-XRh-bCA-oQ2-9tb-W9u-KQp-bMj-AyN-i0w-OS0-wOF-QyM-zo1-NTo-1OC-43M-TNa-XSB-bcm-V3Y-XJk-XSA-gIC-Ag4-oCi-IFd-vcm-4gV-GFy-dGF-yaW-FuI-ENv-aW4-gKE-Nvb-W1v-bik-KWz-IwM-jYt-MDk-tMD-hUM-jM6-NTU-6NT-guN-zEz-Wl0-gW3-Jld-2Fy-ZF0-gIC-AgI-OKA-oiB-CZW-50I-E5h-aWw-gKE-Nvb-W1v-bik-KWz-IwM-jYt-MDk-tMD-hUM-jM6-NTU-6NT-guN-zEz-Wl0-gW3-Jld-2Fy-ZF0-gIC-AgI-OKA-oiB-DbG-90a-CBT-Y3J-hcC-AoQ-29t-bW9-uKQ-pbM-jAy-Ni0-wOS-0wO-FQy-Mzo-1NT-o1O-C43-MTN-aXS-Bbc-mV3-YXJ-kXS-Din-KYg-U2F-sdm-FnZ-SBo-YXV-sOg-o=",
+      "WzI-wMj-YtM-Dkt-MDh-UMj-M6N-TU6-NTg-uNz-EyW-l0g-W3d-vcm-xkX-SBZ-b3U-gYn-JlY-Wsg-dGh-lIH-N0Y-W5k-aW5-nIH-dhd-GVy-IGF-wYX-J0L-iBB-bW9-uZy-B0a-GUg-cGl-lY2-VzL-CBz-b21-ldG-hpb-mcg-d29-ydG-gga-2Vl-cGl-uZy-4KW-zIw-MjY-tMD-ktM-DhU-MjM-6NT-U6N-Tgu-NzE-yWl-0gW-3dv-cmx-kXS-BZb-3Ug-c2F-sdm-FnZ-SB0-aGU-gc2-Vhb-GVk-IGR-vb3-IuI-FRo-ZSB-0YW-tlI-Glz-IHN-tYW-xsI-GJ1-dCB-yZW-FsL-gpb-MjA-yNi-0wO-S0w-OFQ-yMz-o1N-To1-OC4-3MT-JaX-SBb-d29-ybG-RdI-FRo-ZSB-pbm-sgY-mFz-aW4-geW-llb-GRz-IGx-pdH-RsZ-SBv-ZiB-2YW-x1Z-Swg-dGh-vdW-doI-GEg-QmV-udC-BOY-Wls-IGV-uZH-Mgd-XAg-aW4-geW-91c-iBw-YWN-rLg-o=",
+      "WzI-wMj-YtM-Dkt-MDh-UMj-M6N-TU6-NTg-uNz-EyW-l0g-W3d-vcm-xkX-SBZ-b3U-gYn-JlY-Wsg-dGh-lIG-Jpb-mRp-bmc-gY2-9yZ-CBh-cGF-ydC-4gQ-W1v-bmc-gdG-hlI-HBp-ZWN-lcy-wgc-29t-ZXR-oaW-5nI-Hdv-cnR-oIG-tlZ-XBp-bmc-uCl-syM-DI2-LTA-5LT-A4V-DIz-OjU-1Oj-U3L-jQ2-NVp-dIF-tyZ-Xdh-cmR-dIO-Kcp-iBH-b2x-lbS-1Cb-3Vu-ZCB-Bcm-1vc-iAo-Q29-tbW-9uK-S4K-WzI-wMj-YtM-Dkt-MDh-UMj-M6N-TU6-NTc-uND-Y1W-l0g-W3d-vcm-xkX-SBZ-b3U-gZ2-V0I-GEg-aGF-uZC-B1b-mRl-ciB-0aG-UgR-29s-ZW0-tQm-91b-mQg-QXJ-tb3-IgY-W5k-IHR-ha2-Uga-XQu-Cls-yMD-I2L-TA5-LTA-4VD-IzO-jU1-OjU-3Lj-Q2N-Fpd-IFt-yZX-dhc-mRd-IOK-cpi-BFY-XJ0-aHN-oYW-tlc-iBX-YW5-kIC-hDb-21t-b24-pLg-o=",
+      "WzI-wMj-YtM-Dkt-MDh-UMj-M6N-TU6-NTc-uND-YzW-l0g-W3d-vcm-xkX-SBZ-b3U-gbG-lmd-CB0-aGU-gRW-Fyd-Ghz-aGF-rZX-IgV-2Fu-ZCB-jbG-Vhc-i4K-WzI-wMj-YtM-Dkt-MDh-UMj-M6N-TU6-NTY-uMj-UyW-l0g-W2R-lYn-VnX-SB1-aTo-gdG-FwI-CJ0-YWt-lIC-8gc-2Fs-dmF-nZS-Ig4-o+x-KzM-wbX-MKW-zIw-MjY-tMD-ktM-DhU-MjM-6NT-U6N-TQu-MDc-0Wl-0gW-3dv-cmx-kXS-BXa-GF0-IHl-vdS-Bzd-GFy-dGV-kIG-hlc-mUg-aGF-zIG-5vd-CBm-aW5-pc2-hlZ-CBp-dHN-lbG-Yga-W4g-eW9-1ci-BhY-nNl-bmN-lLg-pbM-jAy-Ni0-wOS-0wO-FQy-Mzo-1NT-o1N-C4w-NzR-aXS-Bbd-29y-bGR-dIF-lvd-SB3-YWx-rIH-dlc-3Qg-dGh-yb3-Vna-CBv-cGV-uIH-Npb-HQu-IFR-oZS-Bjb-21w-YXN-zIH-Bva-W50-cyB-3ZX-N0I-Glu-dG8-gb3-Blb-iBn-cm9-1bm-QuC-g==",
+      "WzI-wMj-YtM-Dkt-MDh-UMj-M6N-TU6-NTQ-uMD-cyW-l0g-W2R-lYn-VnX-SBz-cGF-3bj-ogZ-2Vh-cj1-bR2-9sZ-W0t-Qm9-1bm-QgQ-XJt-b3I-sIE-Vhc-nRo-c2h-ha2-VyI-Fdh-bmR-dIH-dpb-mRv-dz0-xMC-Byb-3N0-ZXI-9bm-V3C-lsy-MDI-2LT-A5L-TA4-VDI-zOj-U1O-jU0-LjA-0OF-pdI-Ftk-ZWJ-1Z1-0gd-Wk6-IHR-hcC-Ai4-oaS-IEF-TR0-FSR-EFS-IiD-ij7-ErM-jJt-cwp-bMj-AyN-i0w-OS0-wOF-QyM-zo1-NTo-0Mi-4wN-zZa-XSB-bZG-Vid-Wdd-IHB-lcn-Npc-3Qg-c2l-6ZX-MoS-0Ip-OiB-0b3-Rhb-D0z-ODI-gcG-xhe-WVy-PTk-xIH-dtP-TIw-M1t-yb2-9tc-z0x-MTM-gZX-Zlb-nRz-PTc-gbW-Vtb-3M9-MSB-ucG-NzP-Tgg-ZGV-mZW-F0Z-WQ9-MSB-0YW-dzP-TEg-ZGl-zY2-92Z-XJl-ZD0-xXS-Bsb-2c9-ODQ-gc2-Nlb-mU9-Mwp-bMj-AyN-i0w-OS0-wOF-QyM-zo1-NTo-0MS-43O-DVa-XSB-bY2-9nb-ml0-aXZ-lXS-BDT-ElN-QiA-gKD-QxO-G1z-KQo-=",
+      "WzI-wMj-YtM-Dkt-MDh-UMj-M6N-TU6-NDE-uMz-Y2W-l0g-W3N-5c3-Rlb-V0g-4o+-zIF-Rpb-WUg-cGF-zc2-VkO-iAy-NCB-taW-4KW-zIw-MjY-tMD-ktM-DhU-MjM-6NT-U6N-DEu-MzY-1Wl-0gW-3Jl-d2F-yZF-0gW-W91-IHN-jcm-FwZ-SBh-dCB-0aG-Ugc-2ls-dCB-3aX-RoI-HRo-ZSB-zZW-50a-W5l-bCB-jbG-Vhd-mVy-LiD-inK-YgU-mVj-b3Z-lcm-VkI-FNw-aWR-lci-BTa-Wxr-ICh-Db2-1tb-24p-Lgp-bMj-AyN-i0w-OS0-wOF-QyM-zo1-NTo-0MS-4zN-jBa-XSB-bZG-Vid-Wdd-IHB-hcn-Nlc-jog-aW5-0ZW-50P-Wlu-dmV-zdG-lnY-XRl-IGN-vbm-Y9M-S4w-MCB-2ZX-JiP-Wlu-dmV-zdG-lnY-XRl-IHR-hcm-dld-D1n-cm9-1bm-Qgc-mVz-b2x-2ZW-Q9L-SBy-YW5-nZT-0tI-GVu-ZW1-pZX-M9M-CBo-b29-rcz-0yC-lsy-MDI-2LT-A5L-TA4-VDI-zOj-U1O-jQx-LjM-1OV-pdI-Ftw-bGF-5ZX-JdI-Glu-dmV-zdG-lnY-XRl-IHR-oZS-Bnc-m91-bmQ-K",
+      "WzI-wMj-YtM-Dkt-MDh-UMj-M6N-TU6-Mzk-uMz-c3W-l0g-W2R-lYn-VnX-SB1-aTo-gdG-FwI-CJp-bnZ-lc3-RpZ-2F0-ZSI-g4o-+xK-zIw-bXM-KWz-IwM-jYt-MDk-tMD-hUM-jM6-NTU-6Mz-YuM-Dcx-Wl0-gW2-RlY-nVn-XSB-ob2-1ld-29y-azo-gc2-Nlb-mVf-aW5-0cm-8gI-kth-cm9-rLV-NhI-iDi-nJM-gMT-EyN-zJt-cwp-bMj-AyN-i0w-OS0-wOF-QyM-zo1-NTo-zNS-44M-zNa-XSB-bZG-Vid-Wdd-IHF-3ZW-7ij-7Eg-bmF-ycm-F0a-W9u-OnN-jZW-5lX-2lu-dHJ-vX2-Zpb-Gwg-b2s-gMT-A4M-Dht-cyB-yZW-FkI-Dk1-Mjh-tcy-93c-ml0-ZSA-xMj-Mzb-XMg-aW4-gOD-I5d-OKG-km9-1dC-AzM-3Qg-dGh-yMS-AxM-S41-bXM-vdC-BIS-VQt-Q0F-QIC-gxN-TNj-aCk-KWz-IwM-jYt-MDk-tMD-hUM-jM6-NTU-6Mj-QuO-DAw-Wl0-gW2-RlY-nVn-XSB-ob2-1ld-29y-azo-gaW-50c-m8t-Zml-sbC-Bhc-m1l-ZCB-hZn-Rlc-iA2-MDA-wbX-Mga-WRs-ZQo-=",
+      "WzI-wMj-YtM-Dkt-MDh-UMj-M6N-TU6-MTY-uND-QxW-l0g-W2N-vZ2-5pd-Gl2-ZV0-gVV-NFX-0lU-RU0-gwr-cgU-0VB-UkN-IIC-AoN-DUy-bXM-pCl-syM-DI2-LTA-5LT-A4V-DIz-OjU-1Oj-E1L-jk4-OFp-dIF-tkZ-WJ1-Z10-gYX-Jia-XRl-cjo-gZm-xhd-m9y-IGh-lbG-QgK-GJ1-ZGd-ldC-Dig-JQg-b25-lIH-Blc-iB0-aWx-lLC-AyN-XMg-YXB-hcn-QpC-lsy-MDI-2LT-A5L-TA4-VDI-zOj-U1O-jE1-Ljk-4OF-pdI-Ftk-ZWJ-1Z1-0gY-XJi-aXR-lcj-ogd-GVt-cGx-hdG-UgK-HJl-YXN-vbj-1pb-nRl-bnQ-tbm-90L-WFs-bG9-3ZW-Q6Y-2Fz-dCk-KWz-IwM-jYt-MDk-tMD-hUM-jM6-NTU-6MT-UuO-Tg2-Wl0-gW2-FyY-ml0-ZXJ-dIC-JPb-mx5-IG9-uZS-Bnb-2xl-bSB-jYW-4gd-2Vh-ciB-0aG-Ugc-2Ft-ZSB-BZX-RoZ-XJp-YyB-0ZX-RoZ-XIs-IiB-0aG-UgQ-XJi-aXR-lci-BzY-Xlz-LiA-iRG-lzb-Wlz-cyB-0aG-UgU-mFt-cGF-ydC-Bma-XJz-dC4-iCg-==",
+      "WzI-wMj-YtM-Dkt-MDh-UMj-M6N-TU6-MTU-uOT-gzW-l0g-W2R-lYn-VnX-SBw-YXJ-zZX-I6I-Glu-dGV-udD-1jY-XN0-IGN-vbm-Y9M-S4w-MCB-2ZX-JiP-XN1-bW1-vbi-B0Y-XJn-ZXQ-9YW-V0a-GVy-IGd-vbG-VtI-HJl-c29-sdm-VkP-S0g-cmF-uZ2-U9L-SBl-bmV-taW-VzP-TAg-aG9-va3-M9M-gpb-MjA-yNi-0wO-S0w-OFQ-yMz-o1N-Tox-NS4-5OD-JaX-SBb-cGx-heW-VyX-SBz-dW1-tb2-4gY-WV0-aGV-yIG-dvb-GVt-Cls-yMD-I2L-TA5-LTA-4VD-IzO-jU1-OjE-0Lj-c3O-Fpd-IFt-kZW-J1Z-10g-YXJ-iaX-Rlc-jog-YW1-iaW-Vud-CBo-ZWx-kIC-hoZ-SBq-dXN-0IH-Nwb-2tl-KQp-bMj-AyN-i0w-OS0-wOF-QyM-zo1-NTo-wOS-41N-zda-XSB-bY2-9nb-ml0-aXZ-lXS-BuZ-XV0-cmF-sIC-AoN-DAw-bXM-pCg-==",
+      "WzI-wMj-YtM-Dkt-MDh-UMj-M6N-TU6-MDk-uMT-c2W-l0g-W2F-yYm-l0Z-XJd-ICJ-UaG-UgY-29s-ZCD-igJ-Qgc-3Rp-bGw-gd2-Fpd-Glu-Zyw-iIH-RoZ-SBB-cmJ-pdG-VyI-HNh-eXM-uIC-JEZ-WNp-ZGU-gaW-Yga-XQg-bWF-0dG-Vyc-y4i-Cls-yMD-I2L-TA5-LTA-4VD-IzO-jU1-OjA-5Lj-E3N-lpd-IFt-kZW-J1Z-10g-YXJ-iaX-Rlc-jog-dGV-tcG-xhd-GUg-KHJ-lYX-Nvb-j1p-bnR-lbn-Qtb-m90-LWF-sbG-93Z-WQ6-Y3J-hZn-QpC-lsy-MDI-2LT-A5L-TA4-VDI-zOj-U1O-jA5-LjE-3Nl-pdI-Fty-ZXd-hcm-RdI-OKc-piB-Dcm-Fmd-GVk-IEJ-lcn-J5I-E1h-c2g-gw5-c0L-iBU-aGU-gQX-Jia-XRl-ciB-3YX-Rja-GVz-IHl-vdS-BzZ-XQg-dGh-lIG-xhc-3Qg-cGl-lY2-UuC-g==",
+      "WzI-wMj-YtM-Dkt-MDh-UMj-M6N-TU6-MDk-uMD-IyW-l0g-W2R-lYn-VnX-SBw-YXJ-zZX-I6I-Glu-dGV-udD-1jc-mFm-dCB-jb2-5mP-TEu-MDA-gdm-VyY-j1j-cmF-mdC-B0Y-XJn-ZXQ-9Ym-Vyc-nkg-bWF-zaC-ByZ-XNv-bHZ-lZD-0tI-HJh-bmd-lPS-0gZ-W5l-bWl-lcz-0wI-Ghv-b2t-zPT-IKW-zIw-MjY-tMD-ktM-DhU-MjM-6NT-U6M-Dku-MDI-yWl-0gW-3Bs-YXl-lcl-0gY-3Jh-ZnQ-gQm-Vyc-nkg-TWF-zaA-pbM-jAy-Ni0-wOS-0wO-FQy-Mzo-1NT-owN-i40-MTJ-aXS-BbZ-GVi-dWd-dIG-N0e-Dog-T1B-FTk-VEI-OKA-lCB-saX-ZlP-TEg-KG9-wZW-5lZ-D0x-IHJ-lbG-Vhc-2Vk-PTA-pIO-KJi-DQy-NU1-CIG-Vzd-Apb-MjA-yNi-0wO-S0w-OFQ-yMz-o1N-Tow-NS4-1MD-BaX-SBb-Y29-nbm-l0a-XZl-XSB-uZX-V0c-mFs-ICA-oND-A3b-XMp-Cg=-=",
+      "WzI-wMj-YtM-Dkt-MDh-UMj-M6N-TU6-MDU-uMD-kzW-l0g-W3J-ld2-FyZ-F0g-4py-mIF-RoZ-SBt-aWx-lcy-BoY-XZl-IGR-vbm-Ugd-Ghl-aXI-gd2-9ya-yDi-gJQ-geW-91I-GNh-cnJ-5IH-RoZ-SBy-b2F-kIG-Jld-HRl-ciB-0aG-FuI-Hlv-dSB-kaW-QuI-Csx-IG1-heC-Bzd-GFt-aW5-hIC-hub-3cg-MjM-pLi-BbM-zYw-IG9-uIH-RoZ-SBv-ZG9-tZX-Rlc-l0K-WzI-wMj-YtM-Dkt-MDh-UMj-M6N-TU6-MDU-uMD-kzW-l0g-W2R-lYn-VnX-SBh-cmJ-pdG-VyO-iBh-bWJ-pZW-50I-Ghl-bGQ-gKG-Fjd-Glv-biB-zZX-R0b-Glu-ZyD-igJ-QgY-XJt-ZWQ-gZm-9yI-HRo-ZSB-uZX-h0I-HF1-aWV-0IH-RpY-2sp-Cls-yMD-I2L-TA5-LTA-4VD-IzO-jU1-OjA-1Lj-A5M-lpd-IFt-yZX-dhc-mRd-IOK-cpi-BDc-mFm-dGV-kIE-9hd-CBD-YWt-lIM-OXN-i4g-VGh-lIE-FyY-ml0-ZXI-gd2-F0Y-2hl-cyB-5b3-Ugc-2V0-IHR-oZS-BsY-XN0-IHB-pZW-NlL-go=",
+      "WzI-wMj-YtM-Dkt-MDh-UMj-M6N-TU6-MDQ-uOD-U4W-l0g-W2R-lYn-VnX-SBw-YXJ-zZX-I6I-Glu-dGV-udD-1jc-mFm-dCB-jb2-5mP-TEu-MDA-gdm-VyY-j1j-cmF-mdC-B0Y-XJn-ZXQ-9b2-F0I-GNh-a2U-gcm-Vzb-2x2-ZWQ-9LS-ByY-W5n-ZT0-tIG-VuZ-W1p-ZXM-9MC-Bob-29r-cz0-yCl-syM-DI2-LTA-5LT-A4V-DIz-OjU-1Oj-A0L-jg1-OFp-dIF-twb-GF5-ZXJ-dIG-NyY-WZ0-IE9-hdC-BDY-Wtl-Cls-yMD-I2L-TA5-LTA-4VD-IzO-jU1-OjA-0Lj-c5N-lpd-IFt-kZW-J1Z-10g-cXd-lbj-ogb-G9h-ZGl-uZy-Aod-2Fz-IGl-kbG-UpI-OKA-lCB-0aG-UgQ-XJi-aXR-lci-Bzc-GVh-a3M-gdG-Vtc-Gxh-dGV-zIH-Vud-Gls-IGl-0IG-lzI-HJl-YWR-5Cg-==",
+      "WzI-wMj-YtM-Dkt-MDh-UMj-M6N-TQ6-NTQ-uMz-k3W-l0g-W3d-vcm-xkX-SBZ-b3U-gcm-VwY-Wly-IHR-oZS-BGc-m9z-dC1-SaW-1lZ-CBT-ZW5-0aW-5lb-CBD-bGV-hdm-VyL-iBC-YWN-rIH-RvI-GZ1-bGw-uIC-hzc-GVu-dDo-gU2-NyY-XAg-TWV-0YW-wge-DQs-IFN-0aW-NrI-Hgy-KQp-bMj-AyN-i0w-OS0-wOF-QyM-zo1-NDo-1NC-4zN-zZa-XSB-bd2-9yb-GRd-IFl-vdS-ByZ-XBh-aXI-gdG-hlI-FJl-bGl-jIE-h1b-nRl-cid-zIE-dhd-W50-bGV-0cy-4gQ-mFj-ayB-0by-Bmd-Wxs-LiA-oc3-Blb-nQ6-IFB-hdG-NoZ-WQg-Q2x-vdG-gge-DQp-Cls-yMD-I2L-TA5-LTA-4VD-IzO-jU0-OjU-0Lj-M1N-Fpd-IFt-3b3-JsZ-F0g-WW9-1IH-Jlc-GFp-ciB-0aG-UgT-XVk-LWd-sYX-NzI-FNj-YWx-lcy-4gQ-mFj-ayB-0by-Bmd-Wxs-LiA-oc3-Blb-nQ6-IFB-hdG-NoZ-WQg-Q2x-vdG-gge-DQp-Cg=-="
+    ],
+    "chunkChars": 7247,
+    "chunkEncoding": "base64-3"
+  },
+  "packages": {},
+  "type": "default",
+  "metadata": {
+    "title": "player-log 2026-09-08-1761-not-broken #mttbzopym292 [inline 7/9]"
+  },
+  "tags": [
+    {
+      "key": "bundleId",
+      "value": "mttbzopym292"
+    },
+    {
+      "key": "dist",
+      "value": "2026-09-08-1761-not-broken"
+    },
+    {
+      "key": "environment",
+      "value": "hal"
+    },
+    {
+      "key": "event.environment",
+      "value": "javascript"
+    },
+    {
+      "key": "event.origin",
+      "value": "javascript"
+    },
+    {
+      "key": "hermes",
+      "value": "true"
+    },
+    {
+      "key": "interface_type",
+      "value": "contexts"
+    },
+    {
+      "key": "kind",
+      "value": "player-log-inline"
+    },
+    {
+      "key": "level",
+      "value": "info"
+    },
+    {
+      "key": "line",
+      "value": "hal"
+    },
+    {
+      "key": "part",
+      "value": "7"
+    },
+    {
+      "key": "parts",
+      "value": "9"
+    },
+    {
+      "key": "release",
+      "value": "tartaria@4.32.11+2026-09-08-1761-not-broken"
+    },
+    {
+      "key": "user",
+      "value": "ip:96.235.33.72",
+      "query": "user.ip:\"96.235.33.72\""
+    }
+  ],
+  "platform": "javascript",
+  "dateReceived": "2026-09-08T23:59:18.012334Z",
+  "errors": [],
+  "occurrence": null,
+  "_meta": {
+    "entries": {},
+    "message": null,
+    "user": null,
+    "contexts": null,
+    "sdk": null,
+    "context": null,
+    "packages": null,
+    "tags": {}
+  },
+  "crashFile": null,
+  "culprit": "",
+  "dateCreated": "2026-09-08T23:59:17.781000Z",
+  "fingerprints": [
+    "de463202058d9c1d00b0ce67304ab18c"
+  ],
+  "groupingConfig": {
+    "enhancements": "KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA#KLUv_SAd6QAAkwORuGFsbC1wbGF0Zm9ybXM6MjAyNi0wMS0yMJA",
+    "id": "newstyle:2026-01-20"
+  },
+  "release": {
+    "id": 1962002724,
+    "commitCount": 2,
+    "data": {},
+    "dateCreated": "2026-09-08T23:43:54.431891Z",
+    "dateReleased": "2026-09-08T23:45:32.994900Z",
+    "deployCount": 2,
+    "ref": null,
+    "lastCommit": {
+      "id": "3102694334cbe3e6d9182daf152da0a1fc4fe30a",
+      "message": "[ota-hal] OTA-1761 \u2014 the one that was not broken\n\nOwner, on the corrected screenshot: *\"those 2 images have the misalignment\nagain, the one before it was fine.\"* It was. This reverts OTA-1760's change to\nFirstTimeHint's tips link and leaves the file exactly as it shipped.\n\n1. \u26a0\u26a0\u26a0 BOTH HALVES OF MY DIAGNOSIS WERE WRONG, AND THAT IS THE PASS\n   OTA-1760 measured the link's label sitting at the left edge of its own\n   padding box and called it an off-centre tap target:\n       Got it         box x284.2 w72.3 \u00b7 text x303.2 w34.3 \u2192 19.0 / 19.0\n       Turn off tips  box x 54.5 w71.4 \u00b7 text x 54.5 w61.4 \u2192  0.0 / 10.0\n   \u00b7 THE BOX IN THE SCREENSHOT WAS THE HEADLESS BROWSER'S FOCUS RING. On a\n     device that control has no border at all, so nothing was visibly\n     off-centre. \u26a0 OTA-1760's own commit message SAYS the ring is an artifact\n     and warns against acting on it \u2014 and then acts on it. Naming an artifact is\n     not the same as not being fooled by it.\n   \u00b7 THE TAP TARGET WAS NEVER ASYMMETRIC. `hitSlop={8}` on that\n     TouchableOpacity already extends the touchable area 8pt on ALL FOUR sides.\n     \"No tap forgiveness at all to the left of the label\" was asserted without\n     reading the JSX it was about \u2014 the line sits four lines from the style I\n     changed, in a block I had already read in this same session.\n\n2. \u26a0\u26a0 THE SHIPPED VALUES WERE RIGHT ON BOTH THINGS A PLAYER CAN SEE\n       label x 54.5 \u2014 FLUSH with the card's body text above it\n       box   x 54.5 \u2014 18.0 from the card's inner edge, matching `Got it`'s\n                      18.0 on the other side\n   Both fall out of `paddingLeft` being absent and the card's padding being 18.\n   There is no third value that satisfies both, which is why each attempt broke\n   the half the other preserved:\n       marginLeft: -10    label stayed flush \u00b7 box fell to 8.0 from the card\n       offset deleted     box back to 18.0   \u00b7 label indented 10pt from the body\n   The owner caught each one from the render, and was right each time. The\n   second report came with both screenshots side by side, pointing at each\n   failure mode in turn.\n\n3. WHAT THIS DOES NOT REVERT\n   \u26a0 OTA-1760's VendorScreen half stays. That was a real defect \u2014 the\n   placeholder's line box ended at y=122 and the back button's began at y=122,\n   so a 1px border sliced the sentence above it \u2014 and the same button was\n   stretched to the full column with no header row to sit in. Both fixed, both\n   measured, both untouched here. A revert of one half is not a reason to lose\n   the other, and a test in the new suite asserts that it survived.\n\n4. THE RECORD, NOT JUST THE REVERT\n   `linkBtn`'s comment now says DO NOT centre it again, and why: the focus ring\n   is still in every harness shot and it will still look off-centre to the next\n   reader. A silent revert would invite the same \"fix\" a third time. The suite\n   asserts the note is present, asserts `hitSlop` is on the same control the\n   claim was about, and pins the shipped padding byte for byte.\n   \u26a0 `__tests__/ota1760\u2026` keeps a comment where its second block used to be,\n   rather than dropping it: that pass shipped two changes and only one survived,\n   and a suite that quietly lost the other would read as though it had always\n   been about VendorScreen alone.\n\n\u26a0\u26a0 THE LESSON, STATED SO IT OUTLIVES THIS COMMIT: the harness is a MEASUREMENT\ntool, and a measurement of the wrong thing is still a number. Everything I\nmeasured here was accurate \u2014 the boxes really are 0.0/10.0 \u2014 and the conclusion\nwas still wrong, because the box being measured is not drawn on a device and the\nproperty being fixed was already provided by a prop I did not read. Two passes\nof confident, numerically-supported work on a defect that did not exist. The\nowner's amendment says actual-device appearance is the final visual acceptance\nauthority; this is what it looks like when the harness is treated as more than\nthat.\n\nTests: __tests__/ota1761TheOneThatWasNotBroken.test.tsx (7 tests) \u2014 the shipped\npadding pinned byte for byte with the two attempted values asserted absent;\n\u26a0 `hitSlop={8}` proved to sit on the SAME control the asymmetry claim was about,\nwhich is the fact that made the whole diagnosis wrong; the card's 18 proved to be\nwhere both the label's flush alignment and the box's inset come from, so a later\nreader can see why no third value exists; the link proved still quiet, still\nunderlined, still borderless; the DO-NOT note proved present in the file where\nthe next reader will be rather than only in this message; and OTA-1760's Vendor\nfix proved to have survived the revert.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01LGFtzR6AQJbu4XdR28y3fX",
+      "dateCreated": "2026-09-08T23:41:16Z",
+      "pullRequest": null,
+      "suspectCommitType": "",
+      "releases": [
+        {
+          "version": "tartaria@4.32.11+2026-09-08-1761-not-broken",
+          "shortVersion": "tartaria@4.32.11+2026-09-08-1761-not-broken",
+          "ref": null,
+          "url": null,
+          "dateReleased": "2026-09-08T23:45:32.994900Z",
+          "dateCreated": "2026-09-08T23:43:54.431891Z"
+        }
+      ],
+      "repository": {
+        "id": "6929770",
+        "name": "verbal76/Tartaria-RPG",
+        "url": "https://github.com/verbal76/Tartaria-RPG",
+        "provider": {
+          "id": "integrations:github",
+          "name": "GitHub"
+        },
+        "status": "active",
+        "dateCreated": "2026-08-20T20:42:38.041550Z",
+        "integrationId": "494990",
+        "externalSlug": "verbal76/Tartaria-RPG",
+        "externalId": "1239812261"
+      },
+      "author": {
+        "name": "Claude",
+        "email": "noreply@anthropic.com"
+      }
+    },
+    "lastDeploy": {
+      "id": "156684952",
+      "environment": "hal",
+      "dateStarted": null,
+      "dateFinished": "2026-09-08T23:45:33.419050Z",
+      "name": null,
+      "url": null
+    },
+    "status": "open",
+    "url": null,
+    "userAgent": "sentry-cli/2.42.4",
+    "version": "tartaria@4.32.11+2026-09-08-1761-not-broken",
+    "versionInfo": {
+      "package": "tartaria",
+      "version": {
+        "raw": "4.32.11+2026-09-08-1761-not-broken",
+        "major": 4,
+        "minor": 32,
+        "patch": 11,
+        "pre": null,
+        "buildCode": "2026-09-08-1761-not-broken",
+        "components": 3
+      },
+      "description": "4.32.11 (2026-09-08-1761-not-broken)",
+      "buildHash": null
+    }
+  },
+  "userReport": null,
+  "sdkUpdates": [
+    {
+      "type": "updateSdk",
+      "sdkName": "sentry.javascript.react-native",
+      "newSdkVersion": "8.25.0",
+      "sdkUrl": "https://docs.sentry.io/platforms/react-native",
+      "enables": []
+    }
+  ],
+  "resolvedWith": [],
+  "nextEventID": "f8dc38276f2248a0895f7e98ebcd1fd4",
+  "previousEventID": "d886d8eb2ea54fcf9c927d7aec5a4c3a"
+}
