@@ -29830,6 +29830,29 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // learns "bright golds are fine here", where a reader who sees that the previous
 // pass refused it and escalated learns the actual rule.
 export const OTA_BUILD_ID = '2026-09-09-1773-the-frame-gets-a-name';
+// golem catch-up 2026-09-09: markerless publish of OTA-1772 and OTA-1773.
+// OTA-1772 - the stamp cannot touch the name. Reported off the device as
+// MISSConspiracy Archit... The cause was structural: in CombatStrip's result row
+// the outcome column was pushed to the far end by marginLeft auto and nothing
+// else separated it from the name column, and an auto margin is whatever space
+// is left over - zero exactly when the row is full, which is exactly when a long
+// name gets truncated. Fixed with a columnGap on the row, a minimum the flex
+// algorithm satisfies before it distributes anything; the spine's own margins
+// fold into it so spine-to-who stays 7 and who-to-result goes 0 to 7. It had to
+// survive row-reverse, which is what the report shows - incoming swings lay out
+// right to left, which is why MISS appeared to the LEFT of the name - so a
+// one-sided margin would have fixed the wrong case. Covers all seven stamps, and
+// the sub-row's identical defect was fixed with it.
+// OTA-1773 - the frame gets a name. The ruling that closes HOLD-2. The
+// conversation overlay's frame gold is past the palette ceiling and OTA-1769
+// refused it rather than exempting it quietly; the owner ruled APPROVED. It is
+// T.goldFrame now, listed BY NAME in the gate with the ceiling untouched, and
+// the panel is kit.sheetPanel - the piece OTA-1769 withheld. Both overlay files
+// adopt it and neither keeps a private copy. Not one pixel moves.
+// The ruling turned out NARROWER than the hex: WhisperTalkSheet paints the same
+// value a second time as a FILL inside the sheet, beside a third gold brighter
+// still, and that is not what was ruled on - so it stays local and stays on the
+// queue, written into the kit and pinned in the suite.
 // golem catch-up 2026-09-09: markerless publish of OTA-1771 - the modal sweep,
 // batch 1. OTA-1765's census named eight files still hand-copying the Family A
 // shell; ClimbModal, TorchProbeModal, SearchModal and CraftRefusalModal adopt
