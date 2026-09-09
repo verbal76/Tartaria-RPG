@@ -29855,6 +29855,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // HOLD 4 (no scrolling middle to absorb the kit's ceiling) and KeyboardSafeCard
 // is a second shell whose height is measured from the real keyboard edge.
 export const OTA_BUILD_ID = '2026-09-09-1774-two-of-the-seven';
+// golem catch-up 2026-09-09: markerless publish of OTA-1774 - two of the seven
+// are Family A. The moment-modal ruling released HOLD 3, and measuring the seven
+// split them: only CraftResult (400) and WhisperComplete (420) are the shell the
+// ruling names, and both adopt with zero pixel change (ratchet 327 to 325). The
+// other five are Family B - 0.78 backdrop, #17150f ground, radius 6, padding 20,
+// width 440 - and forcing them onto Family A would restyle five beats in four
+// visible properties rather than re-address them. Held with the measurement
+// written down. The tell that the two questions are separate: MissionStinger is
+// built exactly like the five and the same ruling keeps it experiential.
+// MissionComplete carries a two-state card - green for the ordinary completion,
+// brand gold for the victory escalation - and both halves are pinned as semantic
+// colour that survives whatever is decided about the ground.
+// The census closes to two, each for a stated reason: ApproachModal (HOLD 4) and
+// KeyboardSafeCard (a second shell measured from the real keyboard edge).
 // golem catch-up 2026-09-09: markerless publish of OTA-1772 and OTA-1773.
 // OTA-1772 - the stamp cannot touch the name. Reported off the device as
 // MISSConspiracy Archit... The cause was structural: in CombatStrip's result row
