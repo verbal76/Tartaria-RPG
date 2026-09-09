@@ -82,6 +82,36 @@ export function vitalityColor(
   return VITALITY.bad;
 }
 
+/**
+ * ⚠⚠ OTA-1770 — THE CORRUPTION TIER, NAMED. Four stops rather than a ramp,
+ * because corruption is a TIER the game already computes and not a fraction:
+ * the colour climbs with the tier so the bar reads before the label does.
+ *
+ * ⚠ It is here because the legacy hunt's own classification says so — a
+ * meaningful colour under the owner's ruling is KEPT and *named in the kit*,
+ * not left as a literal. It was the last bare `#c9a86a` in CharacterScreen, and
+ * leaving it there would have meant the gold ratchet counting a semantic use as
+ * interface debt forever.
+ *
+ * ⚠ `tainted` IS the brand gold, which is correct and worth stating: caution is
+ * gold in `VITALITY` too. Same colour, same meaning, arrived at independently.
+ */
+export const CORRUPTION = {
+  hollowed: VITALITY.bad,
+  corrupted: '#d08a4a',
+  tainted: VITALITY.warn,
+  clean: '#7a8a5a',
+} as const;
+
+/** The bar colour for a corruption tier. Unknown tiers read as clean, which is
+ *  the safe direction: a tier this file has not heard of must not paint alarm. */
+export function corruptionColor(tier: string | null | undefined): string {
+  if (tier === 'hollowed') return CORRUPTION.hollowed;
+  if (tier === 'corrupted') return CORRUPTION.corrupted;
+  if (tier === 'tainted') return CORRUPTION.tainted;
+  return CORRUPTION.clean;
+}
+
 /** A two-stop ramp for gauges that have no danger band — stamina is the case
  *  the game already ships. Above the cut is good; at or below it is caution. */
 export function gaugeColor(fraction: number, cut: number = STAMINA_CUT): string {

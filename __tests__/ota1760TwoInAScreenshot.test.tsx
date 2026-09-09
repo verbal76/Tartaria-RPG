@@ -98,12 +98,21 @@ describe('the back button no longer sits on the sentence above it', () => {
     expect(read('app', 'screens', 'EndingScreen.tsx')).toContain(`${grey.slice(0, -2)}, fontSize: 14 }`);
   });
 
-  test('⚠⚠⚠ CharacterScreen spends the BRAND GOLD on an empty state, and that is logged', () => {
-    /* This test fails the day someone fixes it, which is the point: the record
-     * must not outlive the defect. `check:gold` counts this declaration in its
-     * interface total, so converting it is a real step down the ratchet. */
-    expect(read('app', 'screens', 'CharacterScreen.tsx'))
-      .toContain("placeholder: { color: '#c9a86a', textAlign: 'center', marginTop: 80 }");
+  test('⚠⚠⚠ CharacterScreen no longer spends the BRAND GOLD on an empty state — FIXED', () => {
+    /* ⚠⚠ THE RECORD DID NOT OUTLIVE THE DEFECT, WHICH IS EXACTLY WHAT IT
+     * PROMISED. OTA-1760 logged this and wrote: "This test fails the day someone
+     * fixes it, which is the point." OTA-1770 fixed it — the empty state is
+     * ink-dim now — and this went red on that pass, on schedule.
+     * ⚠ It is REAIMED rather than deleted. A defect that has been fixed once and
+     * has no test is a defect that can come back silently; the assertion now
+     * defends the fix, and the reasoning above stays so the next reader knows
+     * why this colour is not a choice anyone should revisit casually.
+     * Gold is reserved for a live obligation or a live process. An empty state
+     * is the absence of both — the loudest colour in the game announcing that
+     * there is nothing to do. */
+    const src = read('app', 'screens', 'CharacterScreen.tsx');
+    expect(src).toContain('placeholder: { color: T.inkDim');
+    expect(src).not.toContain("placeholder: { color: '#c9a86a'");
   });
 });
 

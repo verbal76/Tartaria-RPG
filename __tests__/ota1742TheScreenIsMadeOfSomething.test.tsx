@@ -726,8 +726,15 @@ describe('OTA-1742 — the language is reusable, and the first pass stayed in it
      * what made the chassis an extraction rather than a preference. Inventory
      * stays off: its row disagrees on `marginBottom` (4 against 6) and carries a
      * third border state, so its adoption is a decision, not a substitution. */
-    const off = ['CombatScreen', 'InventoryScreen',
-      'CharacterScreen', 'GuidanceScreen'];
+    /* ⚠⚠⚠ OTA-1770 REMOVED `CharacterScreen`, AND THAT IS THE ROLLOUT'S STEP 2
+     * ARRIVING RATHER THAN DRIFT. This screen is the PROOF that the schema
+     * transfers — chosen for it because it had the worst gold density in the
+     * game (36 declarations, now 0 bare) and no tabs or modals of its own to
+     * confound the result. It adopts `TScreenHeader`, routes its interface gold
+     * through `T.gold`, its three hand-typed vitality ramps through
+     * `vitalityColor`, and its corruption tier through a newly named
+     * `corruptionColor`. Widening this list is an act, and this is the record. */
+    const off = ['CombatScreen', 'InventoryScreen', 'GuidanceScreen'];
     for (const name of off) {
       const p = join(ROOT, 'app', 'screens', `${name}.tsx`);
       if (!existsSync(p)) continue;
@@ -743,8 +750,13 @@ describe('OTA-1742 — the language is reusable, and the first pass stayed in it
      * ⚠ The four thin-cover screens (Log, Lore, Guidance, World) are NOT here
      * and must not be added until the owner's open decision about writing
      * cover first is settled. */
+    /* ⚠⚠⚠ `CharacterScreen` ADDED BY OTA-1770 — the rollout's step 2, the PROOF.
+     * Chosen because it had the worst gold density in the game (36 declarations,
+     * now 0 bare) and no tabs or modals of its own to confound the result. It
+     * takes `TScreenHeader` and routes its interface gold through `T.gold`. */
     expect(consumers).toEqual([
       'ActionReferenceScreen.tsx',
+      'CharacterScreen.tsx',
       'ContractsScreen.tsx',
       'CraftingScreen.tsx',
       'ExplorationScreen.tsx',

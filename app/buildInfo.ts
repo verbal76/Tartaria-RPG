@@ -29588,6 +29588,28 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SUPERSEDED: '2026-09-09-1766-the-glyphs-are-artwork'
 // SUPERSEDED: '2026-09-09-1767-the-button-grows'
 // SUPERSEDED: '2026-09-09-1768-one-barehand-chip'
+// SUPERSEDED: '2026-09-09-1769-the-sheet-is-two-shapes'
+// OTA-1770 - CharacterScreen, the proof. The rollout's step 2, and the first
+// screen to adopt Tier 0. Chosen because it had the worst gold density in the
+// game (36 declarations) and no tabs or modals of its own to confound the result.
+// The hand-rolled header becomes TScreenHeader - measured first: its header,
+// backBtn and backText were BYTE-IDENTICAL to the kit's schRow, schBack and
+// schBackText, so the row, the pill and the label move no pixel. 29 interface
+// golds route through T.gold: same colour, one source, and the ratchet falls
+// 367 to 331, its biggest single drop. Three hand-typed vitality ramps route
+// through vitalityColor - and the finding worth keeping is that this file
+// ALREADY imported and used that function for the player's own HP since
+// OTA-1757, while three more ramps in the same file were it typed out by hand
+// and were missed. "The screen uses the authority" and "the screen uses the
+// authority everywhere" are different claims. The corruption tier is NAMED as
+// corruptionColor, which is what the legacy hunt's own classification
+// prescribes for a meaningful colour: keep it, and name it in the kit.
+// TWO THINGS MOVE ON SCREEN and both are the ruling rather than taste: the title
+// goes from brand gold to ink (a screen's own name is not a live obligation) and
+// the empty state goes from gold to ink-dim. That second one is a defect
+// OTA-1760 logged with the note "this test fails the day someone fixes it, which
+// is the point" - it did, on this pass, and the test now defends the fix.
+// Everything else is the same pixel from a better address.
 // OTA-1769 - TSheet, and the measurement found two shapes where the plan named
 // one. Tier 0's sixth and last primitive. Five files carry a sheet and they
 // split cleanly: three render an INLINE CARD (a plain View the parent renders in
@@ -29724,7 +29746,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // art/12-damage-icons, tracked in git and outside the assets tree app.json
 // bundles, so the phone still ships one resolution rather than four.
 // Provisional pending actual-device approval.
-export const OTA_BUILD_ID = '2026-09-09-1769-the-sheet-is-two-shapes';
+export const OTA_BUILD_ID = '2026-09-09-1770-character-is-the-proof';
 // golem catch-up 2026-09-09: markerless publish of OTA-1768 and OTA-1769.
 // 1768 - one bare-hand chip. Punch and kick are the SAME action in the engine,
 // not similar ones: isBareHandAttack is one regex alternation and nothing reads

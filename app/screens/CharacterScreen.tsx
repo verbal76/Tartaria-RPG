@@ -63,7 +63,18 @@ import { weatherStatModifiers } from '../engine/weatherEffects';
 import { findFactionQuestById } from '../engine/factionQuests';
 import { findHuntById } from '../engine/hunts';
 import { findMysteryById } from '../engine/mysteries';
-import { vitalityColor, gaugeColor, standingColor } from '../ui/semanticColor';
+import { vitalityColor, gaugeColor, standingColor, corruptionColor } from '../ui/semanticColor';
+// ⚠⚠⚠ OTA-1770 — CharacterScreen joins the kit. This is the rollout's step 2:
+// the PROOF that the schema transfers, chosen because this screen has the worst
+// gold density in the game (36 declarations) and no tabs or modals of its own to
+// confound the result.
+import { TScreenHeader, T } from '../ui/tartariaKit';
+// ⚠⚠ `vitalityColor` was ALREADY imported below and already used for the
+// player's own HP (OTA-1757). Three more ramps in this same file were the same
+// function typed out by hand and were missed — the dog's HP, the dog's loyalty
+// and the golem's HP. Converting them is this pass's cheapest real win, and it
+// is a reminder that "the screen uses the authority" and "the screen uses the
+// authority EVERYWHERE" are different claims.
 
 const STAT_LABEL: Record<keyof Stats, string> = {
   strength: 'STR',
@@ -184,10 +195,10 @@ export function CharacterScreen() {
   // "full" has to mean "the worst tier has been reached", and the fill clamps.
   // Colour climbs with the tier so the bar reads before the label does.
   const corrPct = (player.corruption ?? 0) / 61;
-  const corrColor = tier === 'hollowed' ? '#e07a5f'
-    : tier === 'corrupted' ? '#d08a4a'
-    : tier === 'tainted' ? '#c9a86a'
-    : '#7a8a5a';
+  // ⚠ OTA-1770 — the four stops are named in `semanticColor` now. Same pixels;
+  // the difference is that the gold in them is declared SEMANTIC rather than
+  // counted as interface debt by a gate that cannot tell the two apart.
+  const corrColor = corruptionColor(tier);
 
   // OTA-1067 [Phase 5] — where the Arbiter stands in the arc, what he thinks
   // of this character, and the itemised reasons for it.
@@ -238,32 +249,35 @@ export function CharacterScreen() {
   return (
     <View style={styles.container}>
       <FirstTimeHint id={TEACH.character_first_open.id} title={TEACH.character_first_open.title} body={TEACH.character_first_open.body} />
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => setScreen('exploration')}
-          style={styles.backBtn}
-          hitSlop={8}
-          activeOpacity={0.7}
-          accessibilityRole="button"
-        >
-          <Text style={styles.backText}>← BACK</Text>
-        </TouchableOpacity>
-        <Text style={styles.title} accessibilityRole="header">CHARACTER</Text>
-        {/* OTA-1023 — REPLAY OPENING lives here now (owner's placement:
-            "across the top is back, character, and then replay opening").
-            The crawl overlay mounts globally, so it plays right over this
-            screen — no navigation needed. */}
-        <TouchableOpacity
-          onPress={() => replayStoryIntro()}
-          style={styles.replayBtn}
-          hitSlop={8}
-          activeOpacity={0.7}
-          accessibilityRole="button"
-          accessibilityLabel="Replay the opening crawl"
-        >
-          <Text style={styles.replayText}>REPLAY{'\n'}OPENING</Text>
-        </TouchableOpacity>
-      </View>
+      {/* ⚠⚠⚠ OTA-1770 — THE HAND-ROLLED HEADER BECOMES `TScreenHeader`.
+          Measured before adopting: this screen's `header`, `backBtn` and
+          `backText` are BYTE-IDENTICAL to the kit's `schRow`, `schBack` and
+          `schBackText`. The row, the pill and the label move no pixel.
+          ⚠⚠ THE TITLE DOES MOVE, AND IT IS THE RULING RATHER THAN A PREFERENCE.
+          It shipped in brand gold; the kit's default is ink, because — in the
+          kit's own words — "a screen's own name is not a live obligation", and
+          the owner's ruling reserves gold for a live obligation or a live
+          process. A gold title has to be asked for BY NAME, and this screen has
+          no reason to ask.
+          ⚠ The REPLAY OPENING button keeps its place and its handler; it is the
+          header's `right` slot now. Owner's placement, OTA-1023: "across the top
+          is back, character, and then replay opening." */}
+      <TScreenHeader
+        title="CHARACTER"
+        onBack={() => setScreen('exploration')}
+        right={(
+          <TouchableOpacity
+            onPress={() => replayStoryIntro()}
+            style={styles.replayBtn}
+            hitSlop={8}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel="Replay the opening crawl"
+          >
+            <Text style={styles.replayText}>REPLAY{'\n'}OPENING</Text>
+          </TouchableOpacity>
+        )}
+      />
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
         {/* ⚠ OTA-1434 — THE PORTRAIT, FIRST THING. Owner: *"at the very top
@@ -876,8 +890,13 @@ export function CharacterScreen() {
           const sexGlyph = dog.sex.pronoun === 'he' ? '♂' : dog.sex.pronoun === 'she' ? '♀' : '⚥';
           const hpPctDog = dog.hpMax > 0 ? dog.hp / dog.hpMax : 0;
           const loyaltyPct = Math.max(0, Math.min(1, dog.loyalty / 100));
-          const hpColorDog = hpPctDog > 0.5 ? '#9ec96a' : hpPctDog > 0.25 ? '#c9a86a' : '#e07a5f';
-          const loyaltyColor = loyaltyPct > 0.5 ? '#9ec96a' : loyaltyPct > 0.3 ? '#c9a86a' : '#e07a5f';
+          // ⚠ Was this ramp typed out by hand; `vitalityColor`'s default cuts ARE [0.5,
+          // 0.25] and its stops ARE these three colours, so this is the same pixel
+          // from the authority instead of from a copy.
+          const hpColorDog = vitalityColor(hpPctDog);
+          // ⚠ Loyalty's lower cut is 0.3, not HP's 0.25 — passed explicitly rather than
+          // averaged away, because a dog at 28% loyalty is not yet in the red band.
+          const loyaltyColor = vitalityColor(loyaltyPct, [0.5, 0.3]);
           const vestName = dog.equipped?.vest;
           // OTA-1650 — the worn INSTANCE (bound by id), its AC, and its condition.
           const vestInst = dogVestInstance(player);
@@ -900,7 +919,7 @@ export function CharacterScreen() {
                 accessibilityRole="button"
               >
                 <Text style={styles.name}>
-                  {dog.name} <Text style={{ color: '#c9a86a' }}>{sexGlyph}</Text>
+                  {dog.name} <Text style={{ color: T.gold }}>{sexGlyph}</Text>
                 </Text>
                 <Text style={styles.subline}>
                   {dog.breed} · {dog.status === 'waiting_at_base' ? 'waiting at base' : 'with you'}
@@ -965,7 +984,7 @@ export function CharacterScreen() {
         {player.golem && player.golem.hp > 0 && (() => {
           const golem = player.golem;
           const hpPctG = golem.hpMax > 0 ? golem.hp / golem.hpMax : 0;
-          const hpColorG = hpPctG > 0.5 ? '#9ec96a' : hpPctG > 0.25 ? '#c9a86a' : '#e07a5f';
+          const hpColorG = vitalityColor(hpPctG);
           const gStats = golem.stats ?? { power: 0, resilience: 0 };
           const gProg = golem.statProgress ?? { power: 0, resilience: 0 };
           const typeLabel = golem.kind.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
@@ -1329,24 +1348,6 @@ function StatRow({
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'transparent', padding: 12 },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 8,
-    marginBottom: 4,
-  },
-  backBtn: {
-    backgroundColor: '#1a1714',
-    borderColor: '#3a342c',
-    borderWidth: 1,
-    borderRadius: 4,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    minWidth: 80,
-    alignItems: 'center',
-  },
-  backText: { color: '#c9a86a', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
   // OTA-1023 — header REPLAY OPENING button; sized to balance the BACK pill.
   replayBtn: {
     backgroundColor: '#1a1714',
@@ -1359,13 +1360,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   replayText: { color: '#8aa0a4', fontSize: 10, letterSpacing: 2, fontWeight: '700', textAlign: 'center', lineHeight: 14 },
-  title: { color: '#c9a86a', fontSize: 14, letterSpacing: 4, fontWeight: '700' },
-  placeholder: { color: '#c9a86a', textAlign: 'center', marginTop: 80 },
+  /* ⚠⚠⚠ OTA-1770 — THE DEFECT THIS SCREEN WAS CARRYING, FIXED IN PASSING.
+   * "No character loaded." was painted in BRAND GOLD. Gold is reserved for a
+   * live obligation or a live process; an empty state is the absence of both,
+   * and this is the loudest colour in the game announcing that there is nothing
+   * to do. It reads as an alert for a non-event.
+   * Ink-dim is what the rest of the game's quiet copy uses. */
+  placeholder: { color: T.inkDim, textAlign: 'center', marginTop: 80 },
   scroll: { flex: 1 },
   scrollContent: { paddingBottom: 24 },
 
   sectionTitle: {
-    color: '#c9a86a',
+    color: T.gold,
     fontSize: 11,
     letterSpacing: 3,
     fontWeight: '700',
@@ -1381,7 +1387,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(8,6,4,0.55)',
     borderLeftWidth: 4,
-    borderLeftColor: '#c9a86a',
+    borderLeftColor: T.gold,
     borderRadius: 3,
     paddingLeft: 8,
     paddingRight: 10,
@@ -1389,8 +1395,8 @@ const styles = StyleSheet.create({
     marginTop: 12,
     marginBottom: 6,
   },
-  sectionChevron: { color: '#c9a86a', fontSize: 11, fontWeight: '900', marginRight: 7, width: 11, textAlign: 'center' },
-  sectionHeaderLabel: { color: '#c9a86a', fontSize: 11, letterSpacing: 3, fontWeight: '700' },
+  sectionChevron: { color: T.gold, fontSize: 11, fontWeight: '900', marginRight: 7, width: 11, textAlign: 'center' },
+  sectionHeaderLabel: { color: T.gold, fontSize: 11, letterSpacing: 3, fontWeight: '700' },
   card: {
     backgroundColor: '#13110f',
     borderColor: '#3a342c',
@@ -1400,22 +1406,22 @@ const styles = StyleSheet.create({
   },
 
   name: { color: '#e6d8b3', fontSize: 18, fontWeight: '700', letterSpacing: 1 },
-  subline: { color: '#c9a86a', fontSize: 12, letterSpacing: 1, marginTop: 2, marginBottom: 10 },
+  subline: { color: T.gold, fontSize: 12, letterSpacing: 1, marginTop: 2, marginBottom: 10 },
 
   barRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 4 },
-  barLabel: { color: '#c9a86a', fontSize: 10, letterSpacing: 1, width: 30 },
+  barLabel: { color: T.gold, fontSize: 10, letterSpacing: 1, width: 30 },
   barBg: { flex: 1, height: 8, backgroundColor: '#1a1714', borderRadius: 4, overflow: 'hidden', marginHorizontal: 8 },
   barFill: { height: '100%' },
   barValue: { color: '#cdbf99', fontSize: 11, width: 64, textAlign: 'right' },
 
   statRow: { flexDirection: 'row', alignItems: 'flex-start', paddingVertical: 6, borderBottomColor: '#1f1c18', borderBottomWidth: 1 },
-  statKey: { color: '#c9a86a', fontSize: 12, fontWeight: '700', letterSpacing: 1, width: 44, paddingTop: 2 },
+  statKey: { color: T.gold, fontSize: 12, fontWeight: '700', letterSpacing: 1, width: 44, paddingTop: 2 },
   statBody: { flex: 1 },
   statTotal: { color: '#e6d8b3', fontSize: 14, fontWeight: '700' },
-  statBase: { color: '#c9a86a', fontSize: 11, fontWeight: '400' },
+  statBase: { color: T.gold, fontSize: 11, fontWeight: '400' },
   progressBar: { color: '#9ec96a', fontSize: 10, letterSpacing: 1, marginTop: 3 },
-  progressPct: { color: '#c9a86a', fontSize: 9, letterSpacing: 0.5 },
-  activityList: { color: '#c9a86a', fontSize: 9, marginTop: 2, lineHeight: 13, letterSpacing: 0.3 },
+  progressPct: { color: T.gold, fontSize: 9, letterSpacing: 0.5 },
+  activityList: { color: T.gold, fontSize: 9, marginTop: 2, lineHeight: 13, letterSpacing: 0.3 },
   // OTA-848 — tap-to-expand affordances + readable breakdown lists.
   tapHint: { color: '#a2977b', fontSize: 11, fontWeight: '400' },
   tapHintLine: { color: '#a2977b', fontSize: 9, fontStyle: 'italic', marginTop: 3, letterSpacing: 0.3 },
@@ -1427,11 +1433,11 @@ const styles = StyleSheet.create({
   ladderRow: { flexDirection: 'row', alignItems: 'flex-start', paddingVertical: 3 },
   ladderRowDim: { opacity: 0.38 },
   ladderMark: { color: '#5a6a6e', fontSize: 12, width: 14 },
-  ladderMarkOn: { color: '#c9a86a', fontWeight: '700' },
+  ladderMarkOn: { color: T.gold, fontWeight: '700' },
   ladderText: { color: '#cdbf99', fontSize: 12, flex: 1, lineHeight: 17 },
   ladderTextOn: { color: '#e6d8b3', fontWeight: '700' },
   ladderReq: { color: '#8aa0a4', fontSize: 10, marginLeft: 8, minWidth: 52, textAlign: 'right' },
-  ladderReqOn: { color: '#c9a86a', fontWeight: '700' },
+  ladderReqOn: { color: T.gold, fontWeight: '700' },
   breakdownList: { marginTop: 6, borderTopColor: '#2a2620', borderTopWidth: 1, paddingTop: 6 },
   breakdownRow: { flexDirection: 'row', alignItems: 'baseline', paddingVertical: 2 },
   breakdownDelta: { color: '#9ec96a', fontSize: 12, fontWeight: '700', width: 40 },
@@ -1441,21 +1447,21 @@ const styles = StyleSheet.create({
   breakdownTotalDelta: { color: '#e6d8b3', fontSize: 13, fontWeight: '800', width: 40 },
   breakdownTotalLabel: { color: '#e6d8b3', fontSize: 12, fontWeight: '700', flex: 1 },
   growsFrom: { marginTop: 6 },
-  growsFromHead: { color: '#c9a86a', fontSize: 10, letterSpacing: 0.5, marginBottom: 3, fontWeight: '700' },
+  growsFromHead: { color: T.gold, fontSize: 10, letterSpacing: 0.5, marginBottom: 3, fontWeight: '700' },
   growsFromItem: { color: '#bcae88', fontSize: 11, lineHeight: 16, marginLeft: 2 },
   titleDetail: { marginTop: 6, marginLeft: 14, borderLeftColor: '#3a342c', borderLeftWidth: 2, paddingLeft: 8 },
   titleDetailLine: { color: '#bcae88', fontSize: 11, lineHeight: 16, marginBottom: 2 },
-  titleDetailKey: { color: '#c9a86a', fontWeight: '700' },
+  titleDetailKey: { color: T.gold, fontWeight: '700' },
   // OTA-849 — WORLD view link on the faction section.
   worldLink: { marginTop: 8, borderTopColor: '#2a2620', borderTopWidth: 1, paddingTop: 8, alignItems: 'center' },
-  worldLinkText: { color: '#c9a86a', fontSize: 11, letterSpacing: 1, fontWeight: '700' },
+  worldLinkText: { color: T.gold, fontSize: 11, letterSpacing: 1, fontWeight: '700' },
   // OTA-843 — Chronicle section.
   chronicleTitle: { color: '#e6d8b3', fontSize: 15, fontWeight: '700', letterSpacing: 0.5 },
-  chronicleHeadline: { color: '#c9a86a', fontSize: 12, marginTop: 2, marginBottom: 8, letterSpacing: 0.5 },
+  chronicleHeadline: { color: T.gold, fontSize: 12, marginTop: 2, marginBottom: 8, letterSpacing: 0.5 },
   chronicleDeed: { color: '#cdbf99', fontSize: 12, lineHeight: 18 },
   chronicleTimeline: { marginTop: 10, borderTopColor: '#2a2620', borderTopWidth: 1, paddingTop: 8, gap: 6 },
   chronicleRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 8 },
-  chronicleGlyph: { color: '#c9a86a', fontSize: 13, width: 16, textAlign: 'center' },
+  chronicleGlyph: { color: T.gold, fontSize: 13, width: 16, textAlign: 'center' },
   chronicleEntryText: { color: '#bcae88', fontSize: 12, lineHeight: 18, flex: 1 },
   chronicleEmpty: { color: '#a2977b', fontSize: 12, fontStyle: 'italic', marginTop: 8 },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 },
@@ -1465,13 +1471,13 @@ const styles = StyleSheet.create({
   chipTextNeg: { color: '#e07a5f' },
 
   kvRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', paddingVertical: 4 },
-  kvKey: { color: '#c9a86a', fontSize: 12, letterSpacing: 1 },
+  kvKey: { color: T.gold, fontSize: 12, letterSpacing: 1 },
   factionOwn: { color: '#cdbf99', fontWeight: '700' },
   // OTA-844 — world-pulse tide tags on the faction standings.
   tideRising: { color: '#9ec96a', fontSize: 10, fontWeight: '400' },
   tideWaning: { color: '#c98a6a', fontSize: 10, fontWeight: '400' },
   kvValue: { color: '#e6d8b3', fontSize: 14, fontWeight: '700' },
-  kvSub: { color: '#c9a86a', fontSize: 10, fontStyle: 'italic', marginTop: -2, marginBottom: 4 },
+  kvSub: { color: T.gold, fontSize: 10, fontStyle: 'italic', marginTop: -2, marginBottom: 4 },
   // OTA-1161 — the HP provenance line and the gift ledger.
   hpBreakdown: { color: '#8a7a5a', fontSize: 10, marginTop: -2, marginBottom: 2, marginLeft: 46 },
   giftLedger: { marginTop: 6, marginBottom: 4, paddingLeft: 10, borderLeftWidth: 2, borderLeftColor: '#3a3226' },
@@ -1483,11 +1489,11 @@ const styles = StyleSheet.create({
   huntedTag: { color: '#e07a5f', fontSize: 10, fontWeight: '700' },
   nearHuntedTag: { color: '#c98a6a', fontSize: 10, fontWeight: '400' },
   kvWarn: { color: '#e07a5f', fontSize: 10, marginTop: 2, marginBottom: 4 },
-  warning: { color: '#c9a86a' },
+  warning: { color: T.gold },
   danger: { color: '#e07a5f' },
 
   slotRow: { flexDirection: 'row', alignItems: 'flex-start', paddingVertical: 6, borderBottomColor: '#1f1c18', borderBottomWidth: 1 },
-  slotLabel: { color: '#c9a86a', fontSize: 10, letterSpacing: 1, width: 80, paddingTop: 2 },
+  slotLabel: { color: T.gold, fontSize: 10, letterSpacing: 1, width: 80, paddingTop: 2 },
   slotBody: { flex: 1 },
   slotEmpty: { color: '#3a342c', fontSize: 12 },
   slotName: { color: '#e6d8b3', fontSize: 13, fontWeight: '700' },
@@ -1498,20 +1504,20 @@ const styles = StyleSheet.create({
 
   effectRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 4 },
   effectLabel: { color: '#e6d8b3', fontSize: 12 },
-  effectMeta: { color: '#c9a86a', fontSize: 10, letterSpacing: 0.5 },
+  effectMeta: { color: T.gold, fontSize: 10, letterSpacing: 0.5 },
 
   traitRow: { color: '#cdbf99', fontSize: 12, lineHeight: 17, marginBottom: 4 },
 
   contractRow: { color: '#cdbf99', fontSize: 12, lineHeight: 17, marginBottom: 2 },
-  contractTap: { color: '#c9a86a', fontSize: 10, letterSpacing: 1, marginTop: 6, fontStyle: 'italic', textAlign: 'right' },
+  contractTap: { color: T.gold, fontSize: 10, letterSpacing: 1, marginTop: 6, fontStyle: 'italic', textAlign: 'right' },
 
-  footerHint: { color: '#c9a86a', fontSize: 10, fontStyle: 'italic', textAlign: 'center', marginTop: 18 },
+  footerHint: { color: T.gold, fontSize: 10, fontStyle: 'italic', textAlign: 'center', marginTop: 18 },
   // OTA-236 — Arbiter Titles section.
-  titlesSummary: { color: '#c9a86a', fontSize: 11, fontStyle: 'italic', marginBottom: 8 },
+  titlesSummary: { color: T.gold, fontSize: 11, fontStyle: 'italic', marginBottom: 8 },
   titleRow: { marginBottom: 8 },
   titleName: { fontSize: 12, fontWeight: '700', letterSpacing: 0.3, marginBottom: 2 },
-  titleNameEarned: { color: '#c9a86a' },
-  titleNameLocked: { color: '#c9a86a' },
+  titleNameEarned: { color: T.gold },
+  titleNameLocked: { color: T.gold },
   titlePerk: { color: '#cdbf99', fontSize: 11, lineHeight: 15, marginLeft: 14 },
-  titleRequirement: { color: '#c9a86a', fontSize: 11, lineHeight: 15, marginLeft: 14, fontStyle: 'italic' },
+  titleRequirement: { color: T.gold, fontSize: 11, lineHeight: 15, marginLeft: 14, fontStyle: 'italic' },
 });

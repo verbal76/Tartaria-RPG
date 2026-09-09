@@ -55,14 +55,20 @@ const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..')
  *                   label golds, four declarations, became `T.gold` in the kit
  *    367  OTA-1765  TModal — BrandedModal's and HookContinueModal's card rims
  *                   became `T.gold` in the kit's `modalCard`
+ *    331  OTA-1770  CharacterScreen, the rollout's proof — 29 interface golds
+ *                   routed through `T.gold`, three hand-typed vitality ramps
+ *                   routed through `vitalityColor`, the corruption tier NAMED as
+ *                   `corruptionColor`, and one defect fixed: the empty state was
+ *                   painted in brand gold. Biggest single drop so far, from the
+ *                   screen with the worst density in the game.
  *
  *  ⚠ THE CURRENT SPLIT, and the only line in this file written in the form
  *  OTA-1757's suite parses — the ledger above is deliberately terse so a
  *  HISTORICAL total cannot be mistaken for today's:
- *      362 interface · 4 semantic authorities · 1 kit
+ *      326 interface · 4 semantic authorities · 1 kit
  *  The INTERFACE number is the one the rollout drives down; the other two are
  *  the rule working. */
-const BASELINE = 367;
+const BASELINE = 331;
 
 /** The brand gold, the only hex this gate is about. */
 const GOLD = /'#c9a86a'/gi;
