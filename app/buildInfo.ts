@@ -29911,6 +29911,19 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // so that survives. Guidance's read-only guarantee is pinned as well - listing a
 // card there must never write its seen flag.
 export const OTA_BUILD_ID = '2026-09-09-1776-cover-before-the-thin-four';
+// golem catch-up 2026-09-09: markerless publish of OTA-1776 - cover before the
+// four thin screens. No code changed; this is the before picture for step 8,
+// written first on the owner's ruling. The measurement is the value: Log, Lore
+// and World already declare exactly the kit's back pill and move no pixel on it;
+// World's header row is already the kit's while the other three will shift a few
+// points; World titles in brand gold where the kit defaults to ink, which is a
+// decision rather than a migration step. Three defects are pinned and all three
+// die on adoption - Guidance's fixed width: 80 back pill (the reported
+// wrapping), its tab label missing fontWeight 700, and its selected tab label
+// being a fourth off-brand gold check:gold cannot see. A third tab difference,
+// the selected chip's fill, was found by this pass rather than reported.
+// LoreScreen's conditional BACK and Guidance's read-only guarantee are pinned as
+// the two behaviours a layout pass would most easily flatten.
 // golem catch-up 2026-09-09: markerless publish of OTA-1775 - the combat chip
 // vocabulary, written down and enforced. Five tones and a neutral default, not
 // three colour families: strike (filled sage, the only turn-ending commitment),
