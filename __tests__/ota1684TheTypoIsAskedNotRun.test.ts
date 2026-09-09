@@ -167,7 +167,14 @@ describe('OTA-1684 — ⚠⚠ the 22:15 note is a note', () => {
 
 describe('OTA-1684 — ⚠ CONTRACTS ▸ is on every vendor', () => {
   it('the button is no longer gated on vendor.faction', () => {
-    const tabs = VENDOR.slice(VENDOR.indexOf("setMode('sell')"), VENDOR.indexOf('<ScrollView style={styles.list}'));
+    /* ⚠ RE-ANCHORED BY OTA-1762. This sliced from the literal `setMode('sell')`,
+     * which the tab row stopped containing when it moved to the kit's `TTabBar`
+     * (the handler now reads `setMode(k as 'buy' | 'sell')`). The CLAIM did not
+     * change: the button is in the tab row and is not gated on the vendor's
+     * faction. So the slice is anchored on the row itself. */
+    const start = VENDOR.indexOf('<TTabBar');
+    const tabs = VENDOR.slice(start >= 0 ? start : VENDOR.indexOf('styles.tabRow'),
+      VENDOR.indexOf('<ScrollView style={styles.list}'));
     expect(tabs.includes('CONTRACTS ▸')).toBe(true);
     expect(tabs.includes('{vendor.faction && (')).toBe(false);
   });

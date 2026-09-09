@@ -288,6 +288,41 @@ console.log(probe.value);
  * not theoretical — its "nothing moves" claim was false, and only the render
  * said so. */
 const ROW = (process.argv.find((a) => a.startsWith('--row=')) ?? '--row=Rusted Blade').slice(6);
+
+/* ⚠ OTA-1762 — THE TAB PROBE. `--probe=tabs` reports every chip in the row with
+ * the declarations the bar owns, so the ONE property this pass changes —
+ * Crafting's selected ground — can be photographed rather than asserted. */
+if (process.argv.includes('--probe=tabs')) {
+  const { result: tabs } = await S('Runtime.evaluate', {
+    expression: `(() => {
+      const r = (e) => { const b = e.getBoundingClientRect();
+        return [Math.round(b.x*10)/10, Math.round(b.y*10)/10, Math.round(b.width*10)/10, Math.round(b.height*10)/10]; };
+      const out = [];
+      /* ⚠ RNW does not stamp role="button" on the host div, so the chip is
+       * found the way the row probe finds a row: the SMALLEST element whose
+       * text is the tab's label and which actually paints a background. */
+      const seen = new Map();
+      for (const e of document.querySelectorAll('div')) {
+        const t = (e.textContent || '').trim();
+        if (!/^(CRAFT|REPAIR|RECIPES|AETHERIC|BUY|SELL|CONTRACTS)\b/.test(t)) continue;
+        const c = getComputedStyle(e);
+        const b = e.getBoundingClientRect();
+        if (b.width < 40 || b.height < 20) continue;   // the text node, not the chip
+        const prev = seen.get(t);
+        if (!prev || b.height * b.width < prev.a) {
+          seen.set(t, { a: b.height * b.width, o: { t, box: r(e), bg: c.backgroundColor,
+            border: c.borderTopColor + ' ' + c.borderTopWidth,
+            radius: c.borderTopLeftRadius, pv: c.paddingTop } });
+        }
+      }
+      for (const v of seen.values()) out.push(v.o);
+      out.sort((a, b2) => a.box[0] - b2.box[0]);
+      return JSON.stringify({ n: out.length, out }, null, 1);
+    })()`,
+    returnByValue: true,
+  });
+  console.log(tabs.value);
+}
 if (process.argv.includes('--probe=rows')) {
   const { result: rows } = await S('Runtime.evaluate', {
     expression: `(() => {

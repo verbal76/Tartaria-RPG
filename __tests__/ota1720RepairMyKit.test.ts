@@ -69,8 +69,12 @@ describe('OTA-1720 — ⚠⚠⚠ the button', () => {
 
 describe('OTA-1720 — ⚠⚠ the badge counts the kit, not the cudgels', () => {
   it('the tab number is the equipped-ready count', () => {
-    expect(SCREEN.includes('REPAIR {repairEquippedReady > 0 ? `(${repairEquippedReady})` : \'\'}')).toBe(true);
-    expect(SCREEN.includes('REPAIR {repairReady > 0 ?')).toBe(false);
+    /* ⚠ RE-ANCHORED BY OTA-1762: the tab moved to the kit's `TTabBar` and its
+     * count is a `badge` prop rather than interpolated JSX. The claim is
+     * unchanged and is what this now reads — REPAIR's number is the
+     * EQUIPPED-ready count, never the all-ready one. */
+    expect(SCREEN).toMatch(/label: 'REPAIR', badge: repairEquippedReady|REPAIR \{repairEquippedReady > 0/);
+    expect(SCREEN).not.toMatch(/label: 'REPAIR', badge: repairReady\b|REPAIR \{repairReady > 0/);
   });
 
   it('and the all-ready count still exists for the sweep that needs it', () => {

@@ -41,7 +41,7 @@ import { decayedMenace, menacePriceMult } from '../engine/menace';
 import { canonicalCellOf } from '../engine/worldMap';
 import factionsData from '../data/factions/factions.json';
 import { CONTENT_MAX_WIDTH } from '../ui/displayScale'; // OTA-1227 — one column width, platform-aware
-import { tRowStyle } from '../ui/tartariaKit'; // OTA-1759 — the list-row chassis
+import { tRowStyle, TTabBar, tartariaKitStyles as kit } from '../ui/tartariaKit'; // OTA-1759 rows · OTA-1762 tabs
 import {
   CATEGORY_ORDER,
   CATEGORY_LABEL,
@@ -866,47 +866,40 @@ export function VendorScreen() {
           </View>
         </View>
       ) : (
-      <View style={styles.tabRow}>
-        <TouchableOpacity
-          style={[styles.tab, mode === 'buy' && styles.tabActive]}
+      <TTabBar
+        density="tight"
+        value={mode}
+        onChange={(k) => {
           // OTA-1099 — leaving the SELL tab ends the group. A selection you can
-          // no longer see is a hidden mode waiting to surprise you on the way back.
-          // OTA-1101 — belt-and-braces now: while a group is open this row isn't
-          // even rendered, so BUY is unreachable until the group resolves.
-          onPress={() => { exitSellSelect(); setMode('buy'); }}
-          activeOpacity={0.7}
-          accessibilityRole="button"
-          accessibilityState={{ selected: mode === 'buy' }}
-        >
-          <Text style={[styles.tabText, mode === 'buy' && styles.tabTextActive]}>BUY</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.tab, mode === 'sell' && styles.tabActive]}
-          onPress={() => setMode('sell')}
-          activeOpacity={0.7}
-          accessibilityRole="button"
-          accessibilityState={{ selected: mode === 'sell' }}
-        >
-          <Text style={[styles.tabText, mode === 'sell' && styles.tabTextActive]}>SELL</Text>
-        </TouchableOpacity>
-        {/* arb151 — CONTRACTS opens a mission-board-style popup instead of an
-            inline tab (player preferred the Mission Board modal). It's a
-            button, not a tab, so it never holds the active state.
-            ⚠ OTA-1684 — ON EVERY VENDOR NOW. It was gated on `vendor.faction`,
-            so a roadside trader (Skiv, 09-04 22:10: "haven't seen the missions
-            button on a vendor in a while") simply had no button — and a
-            missing control reads as a broken one. The board is still empty
-            for them by design; the popup says so in words (B15: a refusal
-            always speaks). */}
-        <TouchableOpacity
-          style={styles.tab}
-          onPress={() => setContractsOpen(true)}
-          activeOpacity={0.7}
-          accessibilityRole="button"
-        >
-          <Text style={styles.tabText}>CONTRACTS ▸</Text>
-        </TouchableOpacity>
-      </View>
+          // no longer see is a hidden mode waiting to surprise you on the way
+          // back. OTA-1101 — belt-and-braces: while a group is open this row is
+          // not even rendered, so BUY is unreachable until the group resolves.
+          if (k === 'buy') exitSellSelect();
+          setMode(k as 'buy' | 'sell');
+        }}
+        tabs={[{ key: 'buy', label: 'BUY' }, { key: 'sell', label: 'SELL' }]}
+        right={(
+          /* arb151 — CONTRACTS opens a mission-board-style popup instead of an
+             inline tab (player preferred the Mission Board modal). It's a
+             button, not a tab, so it never holds the selected state — which is
+             exactly why it goes in `right` rather than in `tabs`. It wears the
+             kit's chip so the row still reads as one piece, as it always has.
+             ⚠ OTA-1684 — ON EVERY VENDOR NOW. It was gated on `vendor.faction`,
+             so a roadside trader (Skiv, 09-04 22:10: "haven't seen the missions
+             button on a vendor in a while") simply had no button — and a
+             missing control reads as a broken one. The board is still empty for
+             them by design; the popup says so in words (B15: a refusal always
+             speaks). */
+          <TouchableOpacity
+            style={kit.tabChip}
+            onPress={() => setContractsOpen(true)}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+          >
+            <Text style={kit.tabLabel}>CONTRACTS ▸</Text>
+          </TouchableOpacity>
+        )}
+      />
       )}
 
       <ScrollView style={styles.list} contentContainerStyle={styles.listContent}>
@@ -1705,26 +1698,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   dismissText: { color: '#e07a5f', fontSize: 12, letterSpacing: 2, fontWeight: '700' },
-  tabRow: {
-    flexDirection: 'row',
-    gap: 6,
-    marginBottom: 8,
-  },
-  tab: {
-    flex: 1,
-    backgroundColor: '#1a1714',
-    borderColor: '#3a342c',
-    borderWidth: 1,
-    borderRadius: 4,
-    paddingVertical: 8,
-    alignItems: 'center',
-  },
-  tabActive: {
-    backgroundColor: '#2a2520',
-    borderColor: '#c9a86a',
-  },
-  tabText: { color: '#a2977b', fontSize: 12, letterSpacing: 2, fontWeight: '700' },
-  tabTextActive: { color: '#c9a86a' },
   sellPrice: { color: '#9ec96a', fontSize: 12, fontWeight: '700' },
   // ⚠ OTA-1232 — deliberately NOT styled like the primary buy/sell actions. A
   // one-tap sweep should read as a convenience the player reaches for, not as the

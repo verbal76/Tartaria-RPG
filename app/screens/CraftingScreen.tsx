@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 'react-native';
 import { useGameStore } from '../state/gameStore';
-import { tRowStyle } from '../ui/tartariaKit'; // OTA-1759 — the list-row chassis
+import { tRowStyle, TTabBar } from '../ui/tartariaKit'; // OTA-1759 row chassis · OTA-1762 tab bar
 import { repairCostMaterials } from '../engine/scrapEngine';
 // OTA-1650 — the golem's weapon lives outside the pack; the repair list needs it.
 import { offInventoryRepairables } from '../engine/companionGear';
@@ -683,56 +683,20 @@ export function CraftingScreen() {
         <View style={{ width: 80 }} />
       </View>
 
-      <View style={styles.tabRow}>
-        <TouchableOpacity
-          onPress={() => setTab('craft')}
-          style={[styles.tabBtn, tab === 'craft' && styles.tabBtnActive]}
-          activeOpacity={0.7}
-          accessibilityRole="button"
-          accessibilityState={{ selected: tab === 'craft' }}
-        >
-          <Text style={[styles.tabBtnText, tab === 'craft' && styles.tabBtnTextActive]}>
-            CRAFT {craftableCounts.craft > 0 ? `(${craftableCounts.craft})` : ''}
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => setTab('repair')}
-          style={[styles.tabBtn, tab === 'repair' && styles.tabBtnActive]}
-          activeOpacity={0.7}
-          accessibilityRole="button"
-          accessibilityState={{ selected: tab === 'repair' }}
-        >
-          <Text style={[styles.tabBtnText, tab === 'repair' && styles.tabBtnTextActive]}>
-            {/* ⚠⚠ OTA-1720 — the badge counts what you are WEARING. It used to
-                count every affordable row, so seven scavenged cudgels made the
-                tab shout REPAIR (9) when nothing you fight in needed a thing.
-                A number that is mostly junk is a number you learn to ignore. */}
-            REPAIR {repairEquippedReady > 0 ? `(${repairEquippedReady})` : ''}
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => setTab('recipes')}
-          style={[styles.tabBtn, tab === 'recipes' && styles.tabBtnActive]}
-          activeOpacity={0.7}
-          accessibilityRole="button"
-          accessibilityState={{ selected: tab === 'recipes' }}
-        >
-          <Text style={[styles.tabBtnText, tab === 'recipes' && styles.tabBtnTextActive]}>
-            RECIPES {craftableCounts.recipes > 0 ? `(${craftableCounts.recipes})` : ''}
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => setTab('aetheric')}
-          style={[styles.tabBtn, tab === 'aetheric' && styles.tabBtnActive]}
-          activeOpacity={0.7}
-          accessibilityRole="button"
-          accessibilityState={{ selected: tab === 'aetheric' }}
-        >
-          <Text style={[styles.tabBtnText, tab === 'aetheric' && styles.tabBtnTextActive]}>
-            AETHERIC {craftableCounts.aetheric > 0 ? `(${craftableCounts.aetheric})` : ''}
-          </Text>
-        </TouchableOpacity>
-      </View>
+      {/* ⚠⚠ OTA-1720 — the REPAIR badge counts what you are WEARING. It used to
+          count every affordable row, so seven scavenged cudgels made the tab
+          shout REPAIR (9) when nothing you fight in needed a thing. A number
+          that is mostly junk is a number you learn to ignore. */}
+      <TTabBar
+        value={tab}
+        onChange={(k) => setTab(k as Tab)}
+        tabs={[
+          { key: 'craft', label: 'CRAFT', badge: craftableCounts.craft },
+          { key: 'repair', label: 'REPAIR', badge: repairEquippedReady },
+          { key: 'recipes', label: 'RECIPES', badge: craftableCounts.recipes },
+          { key: 'aetheric', label: 'AETHERIC', badge: craftableCounts.aetheric },
+        ]}
+      />
 
       {tab === 'craft' ? (
         <>
@@ -1399,19 +1363,6 @@ const styles = StyleSheet.create({
   },
   backText: { color: '#c9a86a', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
   title: { color: '#c9a86a', fontSize: 14, letterSpacing: 4, fontWeight: '700' },
-  tabRow: { flexDirection: 'row', gap: 6, marginBottom: 10 },
-  tabBtn: {
-    flex: 1,
-    paddingVertical: 8,
-    backgroundColor: '#1a1714',
-    borderColor: '#3a342c',
-    borderWidth: 1,
-    borderRadius: 4,
-    alignItems: 'center',
-  },
-  tabBtnActive: { borderColor: '#c9a86a' },
-  tabBtnText: { color: '#a2977b', fontSize: 12, fontWeight: '700', letterSpacing: 2 },
-  tabBtnTextActive: { color: '#c9a86a' },
   arbiterLine: { color: '#cdbf99', fontSize: 12, fontStyle: 'italic', marginBottom: 10, lineHeight: 17 },
   scroll: { flex: 1 },
   scrollContent: { paddingBottom: 16 },

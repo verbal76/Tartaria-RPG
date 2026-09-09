@@ -29525,7 +29525,37 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the other side. There is no third value that satisfies both, which is why two
 // attempts each broke the half the other preserved. OTA-1760's VendorScreen
 // half was a real defect and is untouched.
-export const OTA_BUILD_ID = '2026-09-08-1761-not-broken';
+// SUPERSEDED: '2026-09-08-1761-not-broken'
+// OTA-1762 - five tab rows, fifteen tabs, one bar. Tier 0 step 4. Crafting,
+// Guidance and Vendor agree on the chip byte for byte and the row differs only
+// in bottom margin, so the shape is an extraction. A COMPONENT this time, where
+// TRow deliberately was not one, and the reason is measured: the interaction
+// converges completely here - all fifteen are one TouchableOpacity, one onPress,
+// activeOpacity 0.7, role button, accessibilityState selected, one Text, with no
+// long-press or checkbox mode anywhere. The one thing a component had to make
+// room for is Vendor's CONTRACTS button, which shares the row but is not a tab
+// and never holds the selected state; that is the right slot, one prop.
+// The selected state does not converge - five screens, five treatments, from a
+// rim alone to a solid gold fill - so a choice had to be made rather than
+// extracted. Owner: "Go for uniformity for related items." The bar takes one
+// treatment, a gold rim and a lifted ground, with Vendor's own #2a2520 as the
+// ground so the change lands on one screen rather than two. Sampled from the
+// real bundle: the selected chip's interior was byte-identical to its
+// neighbours' before and is eight levels lighter after, with the resting chips
+// unmoved. That is measurable and NOT perceptible - the owner could not tell
+// the two shots apart - so the deliverable here is the uniformity, not a visual
+// change, and an earlier note calling this the first primitive to move a pixel
+// overstated what the render actually supports.
+// Left alone, each for its own reason: Contracts is a different shape, an
+// underlined bar rather than chips; About fills the chip with solid gold and
+// drops its label to near-black, which is the loudest treatment in the game
+// spent on the quietest question and belongs to About's own pass; and Guidance
+// is a thin-cover screen carrying two one-off defects this measurement found -
+// its tab text is missing fontWeight 700 so its tabs render lighter than every
+// other screen's, and its selected label is #e0c179, a third off-brand gold
+// after the two OTA-1759 found in Inventory, none of which check:gold can see.
+// Gold 373 to 369.
+export const OTA_BUILD_ID = '2026-09-08-1762-one-tab-bar';
 // golem catch-up 2026-09-08: markerless publish of OTA-1761 - the one that was
 // not broken. Reverts OTA-1760's change to the tips link and leaves the file as
 // it shipped. Both halves of that diagnosis were wrong: the box that looked

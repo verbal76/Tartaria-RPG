@@ -79,7 +79,12 @@ describe('OTA-1099 — hold to pick, tap to add', () => {
   });
 
   it('leaving the SELL tab ends the group — no hidden selection waiting on return', () => {
-    expect(view).toContain("onPress={() => { exitSellSelect(); setMode('buy'); }}");
+    /* ⚠ RE-ANCHORED BY OTA-1762. This pinned the inline handler; the tab row
+     * moved to the kit's `TTabBar` and the exit now lives in its `onChange`.
+     * The CLAIM is untouched and is what this reads: choosing BUY ends the
+     * group first, so no selection survives out of sight. */
+    expect(view).toMatch(/if \(k === 'buy'\) exitSellSelect\(\);|exitSellSelect\(\); setMode\('buy'\)/);
+    expect(view).toContain('exitSellSelect');
   });
 
   // OTA-1101 — RETARGETED. The bar was `{sellSelectMode && (…)}` inside the
@@ -110,7 +115,11 @@ describe('OTA-1099 — hold to pick, tap to add', () => {
     // the bar offers, which is what makes the mode honest.
     const branch = view.slice(barAt, scrollAt);
     expect(branch).toContain('SELL GROUP');
-    expect(branch).toMatch(/\) : \(\s*<View style=\{styles\.tabRow\}>/);
+    /* ⚠ Re-anchored by OTA-1762: the else branch is now `<TTabBar`, not a
+     * hand-rolled `<View style={styles.tabRow}>`. What matters is unchanged —
+     * the tab row is the ELSE branch, so BUY is not rendered at all while a
+     * group is open, and the only two ways out are the ones the bar offers. */
+    expect(branch).toMatch(/\) : \(\s*<TTabBar|\) : \(\s*<View style=\{styles\.tabRow\}>/);
     // …and the bar no longer lives inside the list it used to scroll with.
     const listBody = view.slice(scrollAt);
     expect(listBody).not.toContain('SELL GROUP');

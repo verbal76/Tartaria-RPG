@@ -733,6 +733,102 @@ export function TScreenHeader({
   );
 }
 
+/* ⚠⚠⚠ TTABBAR — AND THIS ONE MOVES A PIXEL, WHICH THE OTHERS DID NOT.
+ *
+ * Tier 0. Five screens carry a tab row; fifteen tabs between them. Measured
+ * before writing anything, and the shape agrees far more than the state does:
+ *
+ *              tabRow                    the chip                  SELECTED
+ *   About    gap 4 · ph 12 · mb 8   #1a1612 · ph 2 · justify   FILLED GOLD, ink #13110f
+ *   Contracts bar + bottom rule     underline · pv 10          bottom rule
+ *   Crafting gap 6 · mb 10          #1a1714 #3a342c r4 pv8     rim only
+ *   Guidance gap 6 · mb 10          IDENTICAL to Crafting      rim + #221d15
+ *   Vendor   gap 6 · mb 8           IDENTICAL to Crafting      rim + #2a2520
+ *
+ * ⚠⚠ SO WHY A COMPONENT, WHEN `TRow` DELIBERATELY WAS NOT? Because here the
+ * INTERACTION converges and there it did not. Every one of the fifteen is the
+ * same shape to the character: a `TouchableOpacity` with one `onPress`,
+ * `activeOpacity={0.7}`, `accessibilityRole="button"` and
+ * `accessibilityState={{ selected }}`, wrapping one `Text`. There is no second
+ * gesture, no long-press, no checkbox mode — nothing a component would have to
+ * plumb through props and nothing it would lose. TRow's four call sites
+ * disagreed about what a row DOES; these fifteen agree completely.
+ * The one thing a component has to make room for is Vendor's `CONTRACTS ▸`,
+ * which sits in the row but is NOT a tab — it opens a modal and never holds the
+ * selected state. That is the `right` slot, and it is one prop, not a rewrite.
+ *
+ * ⚠⚠⚠ THE SELECTED STATE DOES NOT CONVERGE, AND THAT IS THE HONEST PROBLEM.
+ * Five screens, five treatments. There is no value that reproduces all of them,
+ * so unlike OTA-1758 and OTA-1759 this primitive CANNOT claim nothing moves. It
+ * takes the majority reading — a gold rim AND a lifted ground — because two of
+ * the three chip-shaped screens already lift, and a rim alone on a dark chip is
+ * the weakest of the five at saying "you are here", which is the entire job of
+ * a tab bar.
+ * ⚠ The ground is `#2a2520`, VENDOR'S OWN SHIPPED VALUE, chosen so the change
+ * costs exactly one screen instead of two: Vendor moves zero pixels, and
+ * CRAFTING'S SELECTED TAB GAINS A GROUND IT DID NOT HAVE. That is the whole of
+ * the visible change in this pass, it is one property on one screen, and it is
+ * photographed before and after rather than asserted.
+ *
+ * ⚠ WHAT IS NOT ADOPTED, AND WHY — the same three reasons as OTA-1759:
+ *   · CONTRACTS is a different SHAPE. An underlined bar is not a row of chips,
+ *     exactly as its padded `card` was not a list row. Left alone, not forced.
+ *   · ABOUT fills the chip with solid gold and drops the label to `#13110f`.
+ *     That is a real divergence and a real question — gold is reserved for a
+ *     live obligation or a live process, and "which settings tab am I on" is
+ *     neither — but About has its own pass in the rollout and this belongs to
+ *     it, not to a primitive commit.
+ *   · GUIDANCE is one of the four thin-cover screens (3 referencing suites) the
+ *     owner asked to decide about before touching. It carries TWO one-off
+ *     defects that this measurement found, both recorded and neither fixed:
+ *     its `tabText` is MISSING `fontWeight: '700'`, so its tabs render lighter
+ *     than every other screen's, and its selected label is `#e0c179` rather
+ *     than the brand gold — a third off-brand gold, after the two OTA-1759
+ *     found in Inventory, and `check:gold` is blind to all three. */
+export interface TTab {
+  /** Stable identity — what `onChange` hands back. */
+  key: string;
+  label: string;
+  /** Appended in parentheses when > 0. Crafting's tabs carry ready-counts. */
+  badge?: number;
+}
+
+export function TTabBar({
+  tabs, value, onChange, right, density = 'regular', style,
+}: {
+  tabs: readonly TTab[];
+  value: string;
+  onChange: (key: string) => void;
+  /** A control that shares the row but is NOT a tab — Vendor's `CONTRACTS ▸`. */
+  right?: React.ReactNode;
+  /** `tight` is Vendor's 8pt bottom margin; `regular` is Crafting's 10. */
+  density?: 'regular' | 'tight';
+  style?: StyleProp<ViewStyle>;
+}) {
+  return (
+    <View style={[kit.tabRow, density === 'tight' && kit.tabRowTight, style]}>
+      {tabs.map((t) => {
+        const on = t.key === value;
+        return (
+          <TouchableOpacity
+            key={t.key}
+            onPress={() => onChange(t.key)}
+            style={[kit.tabChip, on && kit.tabChipOn]}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityState={{ selected: on }}
+          >
+            <Text style={[kit.tabLabel, on && kit.tabLabelOn]}>
+              {t.badge !== undefined && t.badge > 0 ? `${t.label} (${t.badge})` : t.label}
+            </Text>
+          </TouchableOpacity>
+        );
+      })}
+      {right}
+    </View>
+  );
+}
+
 /* ⚠⚠⚠ TROW — THE LIST-ROW CHASSIS, AND WHY IT IS NOT A COMPONENT.
  *
  * Tier 0. Four screens are lists and all four invented a row. Measured before
@@ -834,6 +930,25 @@ const kit = StyleSheet.create({
   rowBlocked: { opacity: 0.45 },
   // Byte-identical in rowGrouped / offerRowPicked / recipeRowPicked.
   rowSelected: { borderColor: T.gold, backgroundColor: '#1e1a12' },
+  // ── TTabBar ───────────────────────────────────────────────────────────────
+  // ⚠ The shipped values. Crafting, Guidance and Vendor agree on the chip byte
+  // for byte; the row differs only in bottom margin (10 against Vendor's 8).
+  tabRow: { flexDirection: 'row', gap: 6, marginBottom: 10 },
+  tabRowTight: { marginBottom: 8 },
+  tabChip: {
+    flex: 1,
+    backgroundColor: '#1a1714',
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingVertical: 8,
+    alignItems: 'center',
+  },
+  // ⚠⚠ THE ONE THING THAT MOVES IN THIS PASS. Vendor's shipped selected ground,
+  // taken as-is so Vendor does not shift; Crafting's selected tab gains it.
+  tabChipOn: { borderColor: T.gold, backgroundColor: '#2a2520' },
+  tabLabel: { color: '#a2977b', fontSize: 12, letterSpacing: 2, fontWeight: '700' },
+  tabLabelOn: { color: T.gold },
   // ── TScreenHeader ─────────────────────────────────────────────────────────
   // ⚠ These are the shipped values, not new ones: the row, the back button and
   // its text are what twelve screens already agreed on.

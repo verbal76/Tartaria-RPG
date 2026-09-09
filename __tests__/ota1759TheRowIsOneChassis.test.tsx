@@ -197,7 +197,12 @@ describe('the order is the shipped precedence', () => {
 describe('Vendor and Crafting adopted it and left nothing behind', () => {
   test('both import the chassis', () => {
     for (const s of [VENDOR, CRAFT]) {
-      expect(s).toMatch(/import \{ tRowStyle \} from '\.\.\/ui\/tartariaKit'/);
+      /* ⚠ LOOSENED BY OTA-1762, AND THIS ONE WAS MY OWN FAULT. I pinned the
+       * exact import LIST, so the next primitive either screen adopted broke a
+       * suite that has nothing to do with it. What this suite is entitled to
+       * claim is that the screen imports the chassis — not that it imports
+       * nothing else. */
+      expect(s).toMatch(/import \{[^}]*\btRowStyle\b[^}]*\} from '\.\.\/ui\/tartariaKit'/);
     }
   });
 
@@ -328,11 +333,17 @@ describe('the before/after render, and its honest limit', () => {
 
 describe('the gate and the stamp', () => {
   test('⚠ check:gold ratchets DOWN to the new measured count', () => {
+    /* ⚠⚠ LOOSENED BY OTA-1762, ALSO MY OWN FAULT AND THE MORE INSTRUCTIVE ONE.
+     * I pinned the ratchet's CURRENT VALUE (373) from a suite that is about
+     * rows. A ratchet is designed to keep falling, so pinning its value here
+     * guaranteed a false failure on the very next conversion — and `ota1757`
+     * already owns the baseline's correctness. What THIS suite is entitled to
+     * claim is that OTA-1759's step is recorded in the ledger and that the
+     * number has not gone back UP since. */
     const gate = read('scripts', 'check-gold.mjs');
-    expect(gate).toContain('const BASELINE = 373;');
-    // and the ledger of how it got there is in the file, so a later reader can
-    // see the ratchet is a record of conversions rather than a moving target
     expect(gate).toContain('OTA-1759');
+    const now = Number(/const BASELINE = (\d+);/.exec(gate)?.[1] ?? NaN);
+    expect(now).toBeLessThanOrEqual(373);
   });
 
   test('names this pass', () => {

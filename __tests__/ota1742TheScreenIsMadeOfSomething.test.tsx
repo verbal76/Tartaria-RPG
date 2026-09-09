@@ -666,9 +666,20 @@ describe('OTA-1742 — the language is reusable, and the first pass stayed in it
     const decls = [...KIT.matchAll(/^export (function|const) (\w+)/gm)];
     const components = decls.filter((m) => m[1] === 'function' && /^T[A-Z]/.test(m[2]!));
     const helpers = decls.filter((m) => !(m[1] === 'function' && /^T[A-Z]/.test(m[2]!)));
-    expect(components.length).toBeLessThanOrEqual(12);
+    /* ⚠⚠⚠ 12 → 13 BY OTA-1762 (TTabBar), AND THIS IS THE RULE BEING FOLLOWED.
+     * The ceiling says a raise "needs a brief that asks for a SHAPE the existing
+     * ones cannot make". A tab bar is a SEGMENTED SELECTOR — a row of mutually
+     * exclusive controls where exactly one holds a selected state — and nothing
+     * above expresses that. `TButton` is a single control; `TScreenHeader` is a
+     * fixed back/title/slot row. Neither can say "one of N".
+     * ⚠ And the arithmetic is the opposite of a junk drawer: ONE component
+     * replaces FIVE hand-rolled bars carrying FIFTEEN tabs. It is also named in
+     * the rollout's own Tier 0 list, so it arrives by instruction rather than by
+     * a screen quietly needing something. That is exactly the distinction this
+     * test was re-aimed at in VIS-3. */
+    expect(components.length).toBeLessThanOrEqual(13);
     expect(helpers.length).toBeLessThanOrEqual(6);
-    expect(exported.length).toBeLessThanOrEqual(18);
+    expect(exported.length).toBeLessThanOrEqual(19);
   });
 
   /* ⚠⚠⚠ SUPERSEDED BY VIS-3 (OTA-1746) — AND THE REASONING IS KEPT HERE RATHER
