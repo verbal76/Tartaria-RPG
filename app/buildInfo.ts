@@ -29725,6 +29725,27 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // bundles, so the phone still ships one resolution rather than four.
 // Provisional pending actual-device approval.
 export const OTA_BUILD_ID = '2026-09-09-1769-the-sheet-is-two-shapes';
+// golem catch-up 2026-09-09: markerless publish of OTA-1768 and OTA-1769.
+// 1768 - one bare-hand chip. Punch and kick are the SAME action in the engine,
+// not similar ones: isBareHandAttack is one regex alternation and nothing reads
+// which word matched, no branch gives either a different damage, stamina,
+// to-hit, reach or effect, and statTraining lists them as one entry. The KICK
+// chip is gone; the VERB is untouched in the parser, in isBareHandAttack and in
+// the no-enemy body-verb tables, so "kick the rubble" still narrates a foot.
+// 1769 - TSheet, Tier 0's sixth and last primitive, and the measurement found
+// TWO shapes where the plan named one: an inline card (three files, byte
+// identical) and a conversation overlay (two files, three call sites, byte
+// identical). The plan's "bottom-anchored" is stale - TalkSheet floats centred.
+// Not TPanel either: that is a three-layer depth construction and the sheet card
+// is flat. Styles again, and free this time - neither shape takes a parameter or
+// a state, so Tier 0's last primitive adds ZERO exports.
+// ONE PIECE IS HELD. The overlay's frame is a gold brighter than the brand gold
+// and the kit's own palette rule refuses it (chroma 134 against a ceiling of 60,
+// brand gold exempt by name). Admitting it means naming a second semantic
+// authority, which is an owner ruling; OTA-1759 set the precedent by refusing
+// two off-brand golds rather than exempting them quietly. The scrim and header
+// are extracted and adopted; the framed panel stays local with its pixels
+// untouched. A hold is not a rollback.
 // golem catch-up 2026-09-09: markerless publish of OTA-1767 - the button grows
 // to hold the glyph, not the other way round. Owner: "do NOT preserve the
 // current combat weapon button height at the expense of icon readability... Do
