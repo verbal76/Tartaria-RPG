@@ -30055,6 +30055,22 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SUPERSEDED: '2026-09-09-1787-the-row-reads-its-own-hierarchy'
 // SUPERSEDED: '2026-09-09-1788-the-utility-marks-are-ours'
 export const OTA_BUILD_ID = '2026-09-09-1789-one-weapon-family-resolver';
+// golem catch-up 2026-09-09: markerless publish of OTA-1789.
+// OTA-1789 - one weapon-family resolver. The taxonomy was already in the game:
+// a census of all 301 catalog weapons found the family words in `tags` already
+// (blade 49, runecaster 64, firearm 29, shield 28, spear 23, knife 19, thrown
+// 17, hammer 13, axe 12, bow 11, crossbow 5, barehanded 5). Nothing retagged.
+// ALL 301 resolve, zero fall through, and that census is a test.
+// Three owner rulings: firearm SHARES the energy-sidearm mark; shield is a
+// melee family in its own right whose ARTWORK is still owed, so it renders
+// nothing rather than a wrong silhouette; and the wand/staff picture is the
+// ENERGY WEAPON, derived from melee + electrical/aetheric rather than retagged.
+// A throw is the ACTION, not the item - sixteen weapons are both, and only the
+// action knows which happened. The narrow word wins over the broad one: a
+// throwing knife is a dagger, a bolt-caster is a crossbow though also a
+// firearm. Unknown fails safe to no glyph at all.
+// The authority lands before its consumer, stated rather than hidden; the
+// transcript rewrite adopts it next. It is proved over the whole catalog.
 // golem catch-up 2026-09-09: markerless publish of OTA-1788.
 // OTA-1788 - the utility marks are ours. First pass off the combat reference
 // pack. Two files SELECTED from the owner's own icon library and renamed
