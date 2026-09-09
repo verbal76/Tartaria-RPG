@@ -29882,6 +29882,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // weapon-button composition decision. The pin on their current toneless state is
 // expected to die the day that is decided, which is the point of it.
 export const OTA_BUILD_ID = '2026-09-09-1775-the-chip-vocabulary';
+// golem catch-up 2026-09-09: markerless publish of OTA-1775 - the combat chip
+// vocabulary, written down and enforced. Five tones and a neutral default, not
+// three colour families: strike (filled sage, the only turn-ending commitment),
+// ready (sage border, available tools), defensive (blue, dodge/stealth/flee),
+// needs-approach (amber, a reach problem rather than availability) and
+// unavailable (red). The tan "family" is the DEFAULT chip - step back and throw
+// spear pass no tone, and approach passes one only while out of range. Semantic
+// throughout, argued in OTA-1454, and no pixel moves here: the vocabulary moves
+// beside the type it describes and a suite now fails on a colour it does not
+// name. The toneless state of step back and throw spear is pinned so the day
+// someone classifies them it is a deliberate, visible change.
 // golem catch-up 2026-09-09: markerless publish of OTA-1774 - two of the seven
 // are Family A. The moment-modal ruling released HOLD 3, and measuring the seven
 // split them: only CraftResult (400) and WhisperComplete (420) are the shell the
