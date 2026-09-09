@@ -772,7 +772,21 @@ describe('OTA-1742 — the language is reusable, and the first pass stayed in it
      * through `T.gold`, its three hand-typed vitality ramps through
      * `vitalityColor`, and its corruption tier through a newly named
      * `corruptionColor`. Widening this list is an act, and this is the record. */
-    const off = ['CombatScreen', 'InventoryScreen', 'GuidanceScreen'];
+    /* ⚠⚠⚠ OTA-1780 ADDED ALL FOUR THIN SCREENS, AND THE ORDER IS THE RECORD.
+     * This list said, in the comment below, that Log, Lore, Guidance and World
+     * *"are NOT here and must not be added until the owner's open decision about
+     * writing cover first is settled."* It is settled: he approved cover-first,
+     * the cover shipped as OTA-1776 measuring exactly which of each screen's four
+     * header values would move, and the migration followed as OTA-1780. So this
+     * widening is the DECIDED SEQUENCE arriving, not drift — which is the only
+     * kind of widening this test permits.
+     * ⚠ `GuidanceScreen` moves OFF the deny-list in the same act. It sat there
+     * because it was under-covered; it is now the best-covered of the four, and
+     * adopting `TScreenHeader` + `TTabBar` killed the three defects OTA-1776
+     * pinned (a fixed-width back pill that could not fit its own label, a tab
+     * label missing its weight, and a fourth off-brand gold `check:gold` cannot
+     * see). */
+    const off = ['CombatScreen', 'InventoryScreen'];
     for (const name of off) {
       const p = join(ROOT, 'app', 'screens', `${name}.tsx`);
       if (!existsSync(p)) continue;
@@ -798,8 +812,12 @@ describe('OTA-1742 — the language is reusable, and the first pass stayed in it
       'ContractsScreen.tsx',
       'CraftingScreen.tsx',
       'ExplorationScreen.tsx',
+      'GuidanceScreen.tsx',   // OTA-1780 — cover first (1776), then migrate
+      'LogScreen.tsx',        // OTA-1780
+      'LoreScreen.tsx',       // OTA-1780
       'TitleScreen.tsx',
       'VendorScreen.tsx',
+      'WorldScreen.tsx',      // OTA-1780 — title went gold → ink, by ruling
     ]);
   });
 

@@ -6,6 +6,7 @@
 
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { TScreenHeader } from '../ui/tartariaKit';
 import { useGameStore } from '../state/gameStore';
 import { FirstTimeHint } from '../components/FirstTimeHint';
 import { TEACHINGS as TEACH } from '../components/teachingRegistry'; // OTA-1738
@@ -25,20 +26,11 @@ export function LoreScreen() {
   return (
     <View style={styles.container}>
       <FirstTimeHint id={TEACH.lore_first_open.id} title={TEACH.lore_first_open.title} body={TEACH.lore_first_open.body} />
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => setScreen(inSession ? 'exploration' : 'title')}
-          style={styles.backBtn}
-          hitSlop={8}
-          activeOpacity={0.7}
-          accessibilityRole="button"
+      <TScreenHeader
+        title="LORE CODEX"
+        onBack={() => setScreen(inSession ? 'exploration' : 'title')}
           accessibilityLabel="Back"
-        >
-          <Text style={styles.backText}>← BACK</Text>
-        </TouchableOpacity>
-        <Text style={styles.title} accessibilityRole="header">LORE CODEX</Text>
-        <View style={{ width: 80 }} />
-      </View>
+      />
 
       <LoreCodexBody />
     </View>
@@ -46,18 +38,9 @@ export function LoreScreen() {
 }
 
 const styles = StyleSheet.create({
+  // ⚠⚠ OTA-1780 — `header`, `backBtn`, `backText` and `title` moved to the kit
+  // (`TScreenHeader`). Cover was written FIRST, in OTA-1776, so the diff below
+  // is measured rather than hoped: see that suite for exactly which of these
+  // four values already matched the kit and which move.
   container: { flex: 1, backgroundColor: 'transparent', padding: 12 },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
-  backBtn: {
-    backgroundColor: '#1a1714',
-    borderColor: '#3a342c',
-    borderWidth: 1,
-    borderRadius: 4,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    minWidth: 80,
-    alignItems: 'center',
-  },
-  backText: { color: '#c9a86a', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
-  title: { color: '#e6d8b3', letterSpacing: 4, fontSize: 14 },
 });

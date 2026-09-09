@@ -83,13 +83,21 @@ const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..')
  *                   so the rim is a PARAMETER: a shell that hard-coded the gold
  *                   could not have taken that card at all.
  *
+ *    315  OTA-1780  the four thin screens — Log, Lore, Guidance and World took
+ *                   `TScreenHeader`, and Guidance took `TTabBar` with it. Six
+ *                   golds: four `backText` rims plus World's gold TITLE, which
+ *                   went ink by ruling, plus Guidance's selected-tab gold.
+ *                   ⚠ Guidance's `#e0c179` was a FOURTH off-brand gold this gate
+ *                   cannot see — it counts `#c9a86a` alone. A migration caught
+ *                   it, not a check; Inventory's two are still out there.
+ *
  *  ⚠ THE CURRENT SPLIT, and the only line in this file written in the form
  *  OTA-1757's suite parses — the ledger above is deliberately terse so a
  *  HISTORICAL total cannot be mistaken for today's:
- *      316 interface · 4 semantic authorities · 1 kit
+ *      310 interface · 4 semantic authorities · 1 kit
  *  The INTERFACE number is the one the rollout drives down; the other two are
  *  the rule working. */
-const BASELINE = 321;
+const BASELINE = 315;
 
 /** The brand gold, the only hex this gate is about. */
 const GOLD = /'#c9a86a'/gi;

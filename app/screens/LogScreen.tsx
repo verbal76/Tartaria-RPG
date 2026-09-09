@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform, Share } from 'react-native';
+import { TScreenHeader } from '../ui/tartariaKit';
 import * as Clipboard from 'expo-clipboard';
 import { useGameStore } from '../state/gameStore';
 import { readFullLog, flushLogWrites, getLastLogWriteError, clearLastLogWriteError } from '../engine/saveSystem';
@@ -121,19 +122,10 @@ export function LogScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => setScreen('exploration')}
-          style={styles.backBtn}
-          hitSlop={8}
-          activeOpacity={0.7}
-          accessibilityRole="button"
-        >
-          <Text style={styles.backText}>← BACK</Text>
-        </TouchableOpacity>
-        <Text style={styles.title} accessibilityRole="header">FULL GAME LOG</Text>
-        <View style={{ width: 80 }} />
-      </View>
+      <TScreenHeader
+        title="FULL GAME LOG"
+        onBack={() => setScreen('exploration')}
+      />
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
         {/* selectable={true} so long-press → Select All works as a
             third fallback alongside COPY / SHARE. iOS+Android both
@@ -175,20 +167,11 @@ export function LogScreen() {
 }
 
 const styles = StyleSheet.create({
+  // ⚠⚠ OTA-1780 — `header`, `backBtn`, `backText` and `title` moved to the kit
+  // (`TScreenHeader`). Cover was written FIRST, in OTA-1776, so the diff below
+  // is measured rather than hoped: see that suite for exactly which of these
+  // four values already matched the kit and which move.
   container: { flex: 1, backgroundColor: 'transparent', padding: 12 },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
-  backBtn: {
-    backgroundColor: '#1a1714',
-    borderColor: '#3a342c',
-    borderWidth: 1,
-    borderRadius: 4,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    minWidth: 80,
-    alignItems: 'center',
-  },
-  backText: { color: '#c9a86a', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
-  title: { color: '#e6d8b3', letterSpacing: 4, fontSize: 14 },
   scroll: { flex: 1, backgroundColor: '#13110f', borderColor: '#3a342c', borderWidth: 1, borderRadius: 4, padding: 8 },
   content: { paddingBottom: 24 },
   body: { color: '#cdbf99', fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace', fontSize: 11, lineHeight: 16 },

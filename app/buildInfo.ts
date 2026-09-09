@@ -30010,7 +30010,42 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // that wrong in only one place would be worse than being uniformly wrong. Two
 // implementations of one predicate is a legacy-hunt item; two different answers
 // would be a defect.
-export const OTA_BUILD_ID = '2026-09-09-1779-the-hand-that-is-already-full';
+// SUPERSEDED: '2026-09-09-1779-the-hand-that-is-already-full'
+// OTA-1780 - the thin four migrate. Rollout step 8, second half. OTA-1776 wrote
+// the cover first on the owner's ruling; this is the migration it was written
+// for, and the cover's whole value was knowing IN ADVANCE which of each screen's
+// four header values would move. Log and Lore were free but for the row; World's
+// row already matched the kit and its TITLE went gold to ink by ruling - "WORLD
+// is a screen title, not a live obligation/process", which is the kit's own rule
+// applied, and the same answer CharacterScreen gave.
+// THREE DEFECTS DIED ON ADOPTION, all three pinned in advance to fail the day
+// they were fixed. Guidance shipped a FIXED width 80 back pill where every other
+// screen used minWidth, so the label had nowhere to go - the wrapping the owner
+// reported. Its tab label was missing fontWeight 700, so its tabs rendered
+// lighter than every other screen's. And its selected tab label was #e0c179, a
+// FOURTH off-brand gold check:gold cannot see because it counts #c9a86a alone. A
+// third difference, the selected chip's fill, was found by the cover rather than
+// reported - a cover that named two while three moved would have been worse than
+// no cover. check:gold falls 321 to 315.
+// AND THE MIGRATION NEARLY COST SOMETHING NOBODY WAS WATCHING FOR. Guidance's
+// tabs print CORE, FIRST-USE and REFERENCE and ANNOUNCED "Core tutorial",
+// "First-use teaching" and "Action reference". TTabBar had no way to carry a
+// spoken name distinct from a printed one, so the first cut of the migration
+// silently dropped all three - trading an accessibility regression for three
+// cosmetic fixes. OTA-1738's EXISTING suite caught it, not this pass's own
+// tests, which is the argument for running the whole surface rather than the
+// pass's. The fix was to give the primitive the capability it lacked
+// (TTab.a11yLabel, defaulting to the printed label so Crafting and Vendor are
+// untouched) rather than to revert.
+// LoreScreen's CONDITIONAL back survived, which was the single easiest thing in
+// this pass to flatten: OTA-1292 fixed a real report where reading the bestiary
+// mid-game dumped the player on the character select, and TScreenHeader takes a
+// callback precisely so a migration cannot tidy it into a constant.
+// OTA-1742's anti-drift consumer list gained all four as an ACT. It said these
+// four must not be added until the cover-first decision was settled; it is
+// settled, the cover shipped, the migration followed, and Guidance moved off the
+// deny-list it sat on for being under-covered.
+export const OTA_BUILD_ID = '2026-09-09-1780-the-thin-four-migrate';
 // golem catch-up 2026-09-09: markerless publish of OTA-1778 and OTA-1779.
 // OTA-1778 - no moment card touches the bezel. HOLD 6 normalised: a card
 // declaring width 100% under a maxWidth 440 cap, in a scrim with no padding, is

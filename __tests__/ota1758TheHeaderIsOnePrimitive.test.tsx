@@ -191,14 +191,21 @@ describe('two well-covered screens adopted it, and left nothing behind', () => {
     for (const s of [CONTRACTS, ACTIONS]) expect(s).not.toMatch(/backBtn[\s\S]{0,200}?width: 80/);
   });
 
-  test('⚠ and it SURVIVES on GuidanceScreen, which is deliberately untouched', () => {
-    /* Guidance has three referencing suites — one of the four thin-cover
-     * screens the owner flagged. Adopting it here would be doing exactly what
-     * he asked to decide first: touching an under-covered screen during a pass
-     * rather than writing cover before one. So the defect is RECORDED, not
-     * quietly fixed, and this test fails the day it is fixed so the record
-     * cannot outlive the bug. */
-    expect(read('app', 'screens', 'GuidanceScreen.tsx')).toMatch(/backBtn[\s\S]{0,240}?width: 80/);
+  test('⚠⚠⚠ and it is GONE from GuidanceScreen — the pin fired as designed', () => {
+    /* ⚠ *"This test fails the day it is fixed so the record cannot outlive the
+     * bug."* It did, on OTA-1780. Guidance shipped a FIXED `width: 80` back
+     * pill where every other screen used `minWidth`, so the label had nowhere
+     * to go — the wrapping the owner reported. It was RECORDED here rather than
+     * fixed, because Guidance was one of the four thin-cover screens he asked
+     * to cover before touching; the order ran record → cover → migrate, and
+     * adopting `TScreenHeader` replaced the fixed width with the kit's
+     * grow-to-fit pill.
+     * Re-aimed rather than deleted so the record of the defect survives its
+     * own fix. */
+    const g = read('app', 'screens', 'GuidanceScreen.tsx');
+    expect(g).toContain('TScreenHeader');
+    expect(g).not.toMatch(/\n {2}backBtn: \{/);
+    expect(read('app', 'ui', 'tartariaKit.tsx')).toContain('minWidth: 80');
   });
 });
 

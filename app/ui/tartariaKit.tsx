@@ -813,6 +813,17 @@ export interface TTab {
   label: string;
   /** Appended in parentheses when > 0. Crafting's tabs carry ready-counts. */
   badge?: number;
+  /** ⚠⚠⚠ OTA-1780 — THE SPOKEN NAME, WHEN THE PRINTED ONE IS AN ABBREVIATION.
+   *  Added because migrating `GuidanceScreen` onto this bar would otherwise have
+   *  SILENTLY DROPPED its accessible labels: its tabs print `CORE`, `FIRST-USE`
+   *  and `REFERENCE` and announced "Core tutorial", "First-use teaching" and
+   *  "Action reference". The bar had no way to say that, so the migration would
+   *  have traded three defects for an accessibility regression — caught by
+   *  OTA-1738's existing suite, which is the argument for running the whole
+   *  surface rather than the pass's own tests.
+   *  ⚠ Defaults to the visible label, so Crafting and Vendor are untouched: a
+   *  tab whose printed name is already a word does not need a second one. */
+  a11yLabel?: string;
 }
 
 export function TTabBar({
@@ -839,6 +850,7 @@ export function TTabBar({
             activeOpacity={0.7}
             accessibilityRole="button"
             accessibilityState={{ selected: on }}
+            accessibilityLabel={t.a11yLabel ?? t.label}
           >
             <Text style={[kit.tabLabel, on && kit.tabLabelOn]}>
               {t.badge !== undefined && t.badge > 0 ? `${t.label} (${t.badge})` : t.label}

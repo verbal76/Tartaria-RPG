@@ -263,25 +263,46 @@ describe('the three that did not converge were left alone, each for its own reas
     expect(ABOUT).toMatch(/tabBtnTextActive: \{\s*color: '#13110f',/);
   });
 
-  test('⚠⚠⚠ Guidance carries TWO one-off defects this measurement found', () => {
-    /* Neither is fixed: Guidance is one of the four thin-cover screens (3
-     * referencing suites) the owner asked to decide about before touching, and
-     * it is the same screen still carrying OTA-1758's wrapping back button.
-     *   1. `tabText` is MISSING `fontWeight: '700'` — its tabs render lighter
-     *      than every other screen's, and nothing says that was intended.
-     *   2. its selected label is `#e0c179`, not the brand gold. That is a THIRD
+  test('⚠⚠⚠ Guidance carried TWO one-off defects, and OTA-1780 fixed both', () => {
+    /* ⚠⚠⚠ THIS TEST WAS WRITTEN TO DIE, AND IT DID — WHICH IS THE POINT OF IT.
+     * When this pass measured Guidance's tabs it found two things nobody chose:
+     *   1. `tabText` was MISSING `fontWeight: '700'`, so its tabs rendered
+     *      lighter than every other screen's;
+     *   2. its selected label was `#e0c179`, not the brand gold — a THIRD
      *      off-brand gold after the two OTA-1759 found in Inventory, and
-     *      `check:gold` is blind to all three because it counts `#c9a86a`. */
-    expect(GUIDANCE).not.toContain('TTabBar');
-    expect(GUIDANCE).toContain("tabText: { color: '#a2977b', fontSize: 12, letterSpacing: 2 }");
-    expect(GUIDANCE).not.toMatch(/tabText: \{[^}]*fontWeight/);
-    expect(GUIDANCE).toContain("tabTextActive: { color: '#e0c179' }");
+     *      `check:gold` is blind to all three because it counts `#c9a86a`.
+     * Neither was fixed HERE, because Guidance was one of the four thin-cover
+     * screens the owner asked to decide about before touching. The order was:
+     * record → cover (OTA-1776) → migrate (OTA-1780). Adopting `TTabBar` fixed
+     * both, plus a third the cover found (the selected chip's fill).
+     * ⚠ Re-aimed rather than deleted, so the record of WHAT was wrong outlives
+     * the bug — otherwise the next reader sees only a clean screen and learns
+     * nothing about why it is clean. */
+    expect(GUIDANCE).toContain('TTabBar');
+    expect(GUIDANCE).not.toMatch(/\n {2}tabText: \{/);
+    expect(GUIDANCE).not.toMatch(/\n {2}tabTextActive: \{/);
+    // the kit's values are the ones it draws now — weight present, brand gold
+    const KIT = read('app', 'ui', 'tartariaKit.tsx');
+    expect(KIT).toContain("tabLabel: { color: '#a2977b', fontSize: 12, letterSpacing: 2, fontWeight: '700' }");
+    expect(KIT).toContain('tabLabelOn: { color: T.gold }');
   });
 
-  test('⚠⚠ the three off-brand golds are counted, and the gate still cannot see them', () => {
+  test('⚠⚠ the gate still cannot see an off-brand gold — TWO of three remain', () => {
+    /* ⚠ The count moved and the blindness did not. `#e0c179` is gone from
+     * Guidance, but Inventory's two survive and the gate counts `#c9a86a`
+     * alone, so it would not have caught any of them. That is the finding worth
+     * keeping: this one was fixed by a MIGRATION noticing it, not by the gate. */
     const gate = read('scripts', 'check-gold.mjs');
     expect(gate).toContain("/'#c9a86a'/gi");
-    for (const h of ['#e0c179', '#d8b46a', '#9c8348']) expect(gate).not.toContain(h);
+    /* ⚠ STRIP THE GATE'S COMMENTS BEFORE ASSERTING — GRADE THE CODE, NOT THE
+     * PROSE, twenty-first time in this rollout and the sharpest instance yet:
+     * the gate's own LEDGER now records that `#e0c179` was a gold it could not
+     * see, so a naive `not.toContain` on the raw file trips on the sentence
+     * documenting the blindness. A check that fails on its own write-up teaches
+     * people to delete the write-up. */
+    const gateCode = gate.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+    for (const h of ['#e0c179', '#d8b46a', '#9c8348']) expect(gateCode).not.toContain(h);
+    expect(read('app', 'screens', 'GuidanceScreen.tsx')).not.toMatch(/color: '#e0c179'/);
   });
 });
 

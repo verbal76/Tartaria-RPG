@@ -18,6 +18,7 @@
 // needs a place to look things up.
 import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { TScreenHeader, TTabBar } from '../ui/tartariaKit';
 import { useGameStore } from '../state/gameStore';
 import { TUTORIAL_STEPS, TUTORIAL_DOCS_FULL } from '../components/tutorialSteps';
 import { ALL_TEACHINGS, type Teaching, type TeachingGroup } from '../components/teachingRegistry';
@@ -62,37 +63,34 @@ export function GuidanceScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => setScreen('about')}
-          style={styles.backBtn}
-          hitSlop={8}
-          activeOpacity={0.7}
-          accessibilityRole="button"
+      <TScreenHeader
+        title="GUIDANCE"
+        onBack={() => setScreen('about')}
           accessibilityLabel="Back to settings"
-        >
-          <Text style={styles.backText}>← BACK</Text>
-        </TouchableOpacity>
-        <Text style={styles.title} accessibilityRole="header">GUIDANCE</Text>
-        <View style={{ width: 80 }} />
-      </View>
+      />
 
-      <View style={styles.tabRow}>
-        {(['core', 'firstuse', 'reference'] as const).map((t) => (
-          <TouchableOpacity
-            key={t}
-            onPress={() => setTab(t)}
-            style={[styles.tab, tab === t && styles.tabActive]}
-            accessibilityRole="tab"
-            accessibilityState={{ selected: tab === t }}
-            accessibilityLabel={t === 'core' ? 'Core tutorial' : t === 'firstuse' ? 'First-use teaching' : 'Action reference'}
-          >
-            <Text style={[styles.tabText, tab === t && styles.tabTextActive]}>
-              {t === 'core' ? 'CORE' : t === 'firstuse' ? 'FIRST-USE' : 'REFERENCE'}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+      {/* ⚠⚠⚠ OTA-1780 — AND ADOPTING `TTabBar` IS WHERE THIS SCREEN'S THREE
+          PINNED DEFECTS DIE. OTA-1776 wrote them down before anything moved:
+            1. `tabText` was missing `fontWeight: '700'`, so these tabs rendered
+               LIGHTER than every other screen's for no reason anybody chose;
+            2. the selected label was `#e0c179` — a fourth off-brand gold that
+               `check:gold` is blind to, exactly as it was blind to the two in
+               Inventory. Nothing argued it was deliberate: no functional claim,
+               no comment defending it;
+            3. the selected chip's fill was `#221d15` against the kit's
+               `#2a2520` — found by that pass rather than reported.
+          All three are the kit's values now. This is the cover-first order
+          paying off: each was a pin written to DIE here, so the fixes are
+          visible in this diff instead of arriving as unremarked side effects. */}
+      <TTabBar
+        tabs={[
+          { key: 'core', label: 'CORE', a11yLabel: 'Core tutorial' },
+          { key: 'firstuse', label: 'FIRST-USE', a11yLabel: 'First-use teaching' },
+          { key: 'reference', label: 'REFERENCE', a11yLabel: 'Action reference' },
+        ]}
+        value={tab}
+        onChange={(k) => setTab(k as GuidanceTab)}
+      />
 
       {tab === 'core' && (
         <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
@@ -153,22 +151,11 @@ export function GuidanceScreen() {
 }
 
 const styles = StyleSheet.create({
+  // ⚠⚠ OTA-1780 — `header`, `backBtn`, `backText` and `title` moved to the kit
+  // (`TScreenHeader`). Cover was written FIRST, in OTA-1776, so the diff below
+  // is measured rather than hoped: see that suite for exactly which of these
+  // four values already matched the kit and which move.
   container: { flex: 1, backgroundColor: 'transparent', padding: 12 },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
-  backBtn: {
-    backgroundColor: '#1a1714', paddingHorizontal: 12, paddingVertical: 6,
-    borderColor: '#3a342c', borderWidth: 1, borderRadius: 4, width: 80, alignItems: 'center',
-  },
-  backText: { color: '#c9a86a', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
-  title: { color: '#e6d8b3', letterSpacing: 4, fontSize: 14 },
-  tabRow: { flexDirection: 'row', marginBottom: 10, gap: 6 },
-  tab: {
-    flex: 1, alignItems: 'center', paddingVertical: 8,
-    borderColor: '#3a342c', borderWidth: 1, borderRadius: 4, backgroundColor: '#1a1714',
-  },
-  tabActive: { borderColor: '#c9a86a', backgroundColor: '#221d15' },
-  tabText: { color: '#a2977b', fontSize: 12, letterSpacing: 2 },
-  tabTextActive: { color: '#e0c179' },
   scroll: { flex: 1 },
   content: { paddingBottom: 32 },
   intro: { color: '#a2977b', fontSize: 12, fontStyle: 'italic', marginBottom: 12, paddingHorizontal: 4, lineHeight: 17 },

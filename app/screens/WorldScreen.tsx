@@ -7,6 +7,7 @@
 
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { TScreenHeader } from '../ui/tartariaKit';
 import { useGameStore } from '../state/gameStore';
 import factionsData from '../data/factions/factions.json';
 import type { Faction } from '../engine/types';
@@ -132,13 +133,10 @@ export function WorldScreen() {
   return (
     <View style={styles.container}>
       <FirstTimeHint id={TEACH.world_first_open.id} title={TEACH.world_first_open.title} body={TEACH.world_first_open.body} />
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => setScreen('exploration')} style={styles.backBtn} hitSlop={8} activeOpacity={0.7} accessibilityRole="button">
-          <Text style={styles.backText}>← BACK</Text>
-        </TouchableOpacity>
-        <Text style={styles.title} accessibilityRole="header">THE WORLD</Text>
-        <View style={{ width: 80 }} />
-      </View>
+      <TScreenHeader
+        title="THE WORLD"
+        onBack={() => setScreen('exploration')}
+      />
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
         <Text style={styles.intro}>
@@ -379,11 +377,11 @@ export function WorldScreen() {
 }
 
 const styles = StyleSheet.create({
+  // ⚠⚠ OTA-1780 — `header`, `backBtn`, `backText` and `title` moved to the kit
+  // (`TScreenHeader`). Cover was written FIRST, in OTA-1776, so the diff below
+  // is measured rather than hoped: see that suite for exactly which of these
+  // four values already matched the kit and which move.
   container: { flex: 1, backgroundColor: 'transparent', padding: 12 },
-  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 8, marginBottom: 4 },
-  backBtn: { backgroundColor: '#1a1714', borderColor: '#3a342c', borderWidth: 1, borderRadius: 4, paddingHorizontal: 14, paddingVertical: 10, minWidth: 80, alignItems: 'center' },
-  backText: { color: '#c9a86a', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
-  title: { color: '#c9a86a', fontSize: 14, letterSpacing: 4, fontWeight: '700' },
   scroll: { flex: 1 },
   scrollContent: { paddingBottom: 24 },
   intro: { color: '#bcae88', fontSize: 12, lineHeight: 18, marginBottom: 12, fontStyle: 'italic' },
