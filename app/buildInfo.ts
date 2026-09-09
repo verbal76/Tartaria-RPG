@@ -29665,6 +29665,31 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // bundles, so the phone still ships one resolution rather than four.
 // Provisional pending actual-device approval.
 export const OTA_BUILD_ID = '2026-09-09-1766-the-glyphs-are-artwork';
+// golem catch-up 2026-09-09: markerless publish of OTA-1766 - the illustrated
+// glyphs ARE the glyphs now, and the trial is over. The approved pack replaced
+// the text glyphs in Lore > Glyphs, on the weapon damage/coating icons in
+// combat, and on the discovered-weakness star. Its files are named for the
+// game's OWN damage types, so the binding OTA-1763 deliberately left open as an
+// owner decision was closed by the pack rather than invented here; one table,
+// app/engine/combatGlyphArt.ts, keyed by canonical damage type, read by both
+// surfaces. Burn, cold, poison and electrical are one image whether base or
+// coat, which falls out of keying by type rather than by role.
+// Combat is a ROW OF BOXES now, not a string of inline text. An inline Text in
+// React Native has no box, which is the origin of OTA-1569's hair spaces and
+// OTA-1638's em space; a View row gives every mark a measured box and real
+// spacing, and both workarounds went with the thing they worked around. The
+// black #0d0b09 cell is gone from every mark a player can see and survives only
+// on the character fallback, whose problem is unchanged. Order, label,
+// breadcrumb and screen-reader string are untouched.
+// Only ONE type actually falls back: degradation aliases to acid before the
+// lookup and resolves the acid artwork, exactly as its text glyph prints the
+// alembic rather than the gear. I wrote "two" and walking the table corrected
+// me. The trial is retired - assets/damage and damageIcons.ts deleted, the
+// trial block out of Lore - but the commissioned thunderstorm masters stay,
+// because they are the only copy. Four older suites went red and every one had
+// pinned the MECHANISM rather than the claim; all four claims are still true
+// and still asserted.
+// Sizes are PROVISIONAL pending an actual-device look: Lore 28dp, combat 18dp.
 // golem catch-up 2026-09-09: markerless publish of OTA-1765 - TModal, the shell
 // eleven dialogs hand-copied. Thirty-three modal files; the ones that look like
 // the game's dialogs all draw the same material, a scrim at rgba(0,0,0,0.7) and
