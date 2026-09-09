@@ -84,11 +84,25 @@ describe('OTA-1517 — the button now answers the gate\'s question', () => {
     expect(bandAt).toBeGreaterThan(elevAt);
   });
 
-  it('⚠⚠ EVERY weapon button gets the fact — main, off, punch and kick', () => {
+  it('⚠⚠ EVERY weapon button gets the fact — however many there are', () => {
+    /* ⚠⚠⚠ THIS LISTED FOUR CHIPS BY NAME AND WENT RED WHEN ONE WAS REMOVED.
+     * OTA-1768 dropped the KICK chip — punch and kick are the same action in the
+     * engine, so two chips for one action were not worth the space. The pin
+     * enumerated `punchT, kickT, mainT, offT`, which is the MECHANISM (which
+     * chips exist) rather than OTA-1517's CLAIM (no weapon chip may be left out
+     * of the elevation fact). Fifth time in this rollout.
+     * ⚠ Stated as a claim it is stronger than the list ever was: it now covers a
+     * chip added tomorrow, which the hard-coded four never could. */
     const code = codeOnly(INPUT);
-    for (const call of ['punchT', 'kickT', 'mainT', 'offT']) {
-      expect(code).toMatch(new RegExp(`const ${call} = weaponTone\\([^)]*groundedFoesBelow\\)`));
+    const tones = [...code.matchAll(/const (\w+T) = weaponTone\(([^)]*)\)/g)];
+    expect(tones.length).toBeGreaterThanOrEqual(3);      // main, off, punch today
+    for (const [, name, args] of tones) {
+      expect([name, args!.includes('groundedFoesBelow')]).toEqual([name, true]);
     }
+    // and the two hands are definitely among them
+    const names = tones.map((m) => m[1]);
+    expect(names).toEqual(expect.arrayContaining(['mainT', 'offT', 'punchT']));
+    expect(names).not.toContain('kickT');                 // OTA-1768
   });
 
   it('⚠ the amber is reused, not replaced — no sixth colour on the busiest button', () => {

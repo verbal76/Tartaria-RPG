@@ -829,21 +829,34 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
               {/* OTA-932 — hide the bare-hand PUNCH/KICK buttons when a HAND weapon (gauntlets,
                   wraps, knuckles — tagged 'barehanded') is equipped: those hands ARE the weapon,
                   so you wouldn't take it off to punch. The weapon button below covers the swing. */}
+              {/* ⚠⚠⚠ OTA-1768 — ONE BARE-HAND CHIP, NOT TWO. THE SECOND WAS NEVER A
+                  SECOND ACTION.
+                  Owner: *"kick and punch are both weaponless attacks... can we drop
+                  the kick button and just use punch to save space?"* Traced before
+                  answering, and they are the SAME action in the engine, not merely
+                  similar ones: `combatRules.isBareHandAttack` is a single regex
+                  alternation over `punch|kick|fist|knee|headbutt|elbow`, and nothing
+                  downstream reads which word matched. No branch anywhere gives one a
+                  different damage, stamina cost, to-hit, reach or effect;
+                  `statTraining` already lists them as ONE entry ("Punch / kick
+                  attacks"). Two chips for one action read as depth and were not.
+                  ⚠⚠ AND `kick` LOSES NO CAPABILITY, WHICH IS WHY THIS IS A CHIP
+                  REMOVAL AND NOT A FEATURE REMOVAL. Owner: *"Keep 'kick' fully
+                  supported through typed input/parser behavior."* The verb is
+                  untouched in the parser, in `isBareHandAttack`, and in the
+                  no-enemy handler, where `BODY_VERB_PAST`/`BODY_VERB_PART` still
+                  narrate a kick with a foot rather than a punch with knuckles. That
+                  narration was the ONLY thing the two words ever did differently,
+                  and it lives where it is actually reachable: "kick the rubble".
+                  ⚠ The single cost, stated: an unarmed strike in COMBAT now
+                  narrates as a punch unless the player types otherwise. */}
               {!(
                 !!resolveDisplayWeaponByName(equippedMain ?? '', inventory)?.tags?.includes('barehanded') ||
                 !!resolveDisplayWeaponByName(equippedOff ?? '', inventory)?.tags?.includes('barehanded')
-              ) && (
-                <>
-                  {(() => {
-                    const punchT = weaponTone(reachPlayer, null, range, groundedFoesBelow);
-                    return <QuickBtn label="punch" onPress={() => onSubmit('punch')} tone={punchT} outOfRange={punchT === 'needs-approach'} />;
-                  })()}
-                  {(() => {
-                    const kickT = weaponTone(reachPlayer, null, range, groundedFoesBelow);
-                    return <QuickBtn label="kick" onPress={() => onSubmit('kick')} tone={kickT} outOfRange={kickT === 'needs-approach'} />;
-                  })()}
-                </>
-              )}
+              ) && (() => {
+                const punchT = weaponTone(reachPlayer, null, range, groundedFoesBelow);
+                return <QuickBtn label="punch" onPress={() => onSubmit('punch')} tone={punchT} outOfRange={punchT === 'needs-approach'} />;
+              })()}
               {/* ⚠⚠⚠ OTA-1553 — `🔥 ❄ cudgel ★`. The owner's format, exactly:
                   *"fire glyph then a snowflake glyph then the word cudgel and
                   then at the end if the enemy is weak to either the frost or the

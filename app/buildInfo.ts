@@ -29586,6 +29586,21 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SUPERSEDED: '2026-09-09-1764-storm-and-shut-drawers'
 // SUPERSEDED: '2026-09-09-1765-the-shell-eleven-copied'
 // SUPERSEDED: '2026-09-09-1766-the-glyphs-are-artwork'
+// SUPERSEDED: '2026-09-09-1767-the-button-grows'
+// OTA-1768 - one bare-hand chip. The second was never a second action.
+// Owner: "kick and punch are both weaponless attacks are both needed? ... can we
+// drop the kick button and just use punch to save space?" Traced before
+// answering: they are the SAME action, not similar ones. isBareHandAttack is one
+// regex alternation over punch|kick|fist|knee|headbutt|elbow and nothing reads
+// which word matched; no branch gives either a different damage, stamina, to-hit,
+// reach or effect; statTraining already lists them as one entry. Two chips for
+// one action read as depth and were not.
+// The VERB loses nothing, which is the owner's condition: "Keep 'kick' fully
+// supported through typed input/parser behavior." The parser, isBareHandAttack
+// and the no-enemy body-verb tables are untouched, so "kick the rubble" still
+// narrates a foot rather than knuckles. That narration was the only thing the two
+// words ever did differently and it lives where it is actually reachable. The one
+// stated cost: an unarmed strike in combat now narrates as a punch unless typed.
 // OTA-1767 - the button grows to hold the glyph, not the other way round.
 // Owner: "do NOT preserve the current combat weapon button height at the expense
 // of icon readability... The combat glyphs should be at least Lore size... Do
@@ -29686,7 +29701,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // art/12-damage-icons, tracked in git and outside the assets tree app.json
 // bundles, so the phone still ships one resolution rather than four.
 // Provisional pending actual-device approval.
-export const OTA_BUILD_ID = '2026-09-09-1767-the-button-grows';
+export const OTA_BUILD_ID = '2026-09-09-1768-one-barehand-chip';
 // golem catch-up 2026-09-09: markerless publish of OTA-1767 - the button grows
 // to hold the glyph, not the other way round. Owner: "do NOT preserve the
 // current combat weapon button height at the expense of icon readability... Do
