@@ -30046,6 +30046,22 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // settled, the cover shipped, the migration followed, and Guidance moved off the
 // deny-list it sat on for being under-covered.
 export const OTA_BUILD_ID = '2026-09-09-1780-the-thin-four-migrate';
+// golem catch-up 2026-09-09: markerless publish of OTA-1780.
+// OTA-1780 - the thin four migrate. Log, Lore, Guidance and World take
+// TScreenHeader; Guidance takes TTabBar with it. World's title goes INK by
+// ruling: a screen title is not a live obligation or a live process, which is
+// VIS-3's rule applied to the one screen that was breaking it. The migration
+// killed the three defects the cover pass had pinned on Guidance - a width 80
+// fixed back pill that wrapped a longer label, a selected tab with no bold, and
+// a tab rim in #e0c179, a fourth off-brand gold the ratchet cannot see because
+// it counts one hex. The cover suite is flipped to the after-picture rather
+// than deleted, so any of the three returning is a red test.
+// It nearly cost something: Guidance's tabs carried spoken labels distinct from
+// their printed ones, TTabBar had no way to carry one, and the first cut lost
+// all three. OTA-1738's suite caught it - a test written for the teaching pass,
+// guarding what this pass did not know it was touching. Fixed in the PRIMITIVE
+// (TTab.a11yLabel, defaulting to label) so no later adopter can lose one.
+// Gold ratchet 321 -> 315.
 // golem catch-up 2026-09-09: markerless publish of OTA-1778 and OTA-1779.
 // OTA-1778 - no moment card touches the bezel. HOLD 6 normalised: a card
 // declaring width 100% under a maxWidth 440 cap, in a scrim with no padding, is
