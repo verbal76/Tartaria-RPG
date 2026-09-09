@@ -53,14 +53,16 @@ const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..')
  *                   `rowSelected`, which reads the same `T.gold`
  *    369  OTA-1762  TTabBar — Crafting's and Vendor's selected-tab rim and
  *                   label golds, four declarations, became `T.gold` in the kit
+ *    367  OTA-1765  TModal — BrandedModal's and HookContinueModal's card rims
+ *                   became `T.gold` in the kit's `modalCard`
  *
  *  ⚠ THE CURRENT SPLIT, and the only line in this file written in the form
  *  OTA-1757's suite parses — the ledger above is deliberately terse so a
  *  HISTORICAL total cannot be mistaken for today's:
- *      364 interface · 4 semantic authorities · 1 kit
+ *      362 interface · 4 semantic authorities · 1 kit
  *  The INTERFACE number is the one the rollout drives down; the other two are
  *  the rule working. */
-const BASELINE = 369;
+const BASELINE = 367;
 
 /** The brand gold, the only hex this gate is about. */
 const GOLD = /'#c9a86a'/gi;

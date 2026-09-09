@@ -14,6 +14,15 @@ import {
 } from 'react-native';
 import type { ItemPreview } from './itemPreview';
 import { NumberStepper } from './NumberStepper';
+import { tModalCard, tartariaKitStyles as kit } from '../ui/tartariaKit';
+
+/* ⚠ OTA-1765 — the scrim and the card now come from the kit.
+ * This file is where those values were WRITTEN; nine other dialogs re-typed
+ * them by hand. The kit's `modalScrim` / `modalCard` are this file's own
+ * declarations moved up a level, character for character, so adopting them here
+ * moves nothing on screen — it just stops this being the copy everyone reads
+ * from and re-types. The width stays a parameter; 380 is this modal's. */
+const CARD = tModalCard(380);
 
 export interface BrandedModalButton {
   label: string;
@@ -200,9 +209,9 @@ export function BrandedModal({
     return (
       <View style={styles.inlineScrim} pointerEvents="box-none" accessibilityViewIsModal={true}>
         <TouchableWithoutFeedback onPress={onRequestClose}>
-          <KeyboardAvoidingView style={styles.scrim} behavior="padding">
+          <KeyboardAvoidingView style={kit.modalScrim} behavior="padding">
             <TouchableWithoutFeedback>
-              <View style={styles.card}>{cardChildren}</View>
+              <View style={CARD}>{cardChildren}</View>
             </TouchableWithoutFeedback>
           </KeyboardAvoidingView>
         </TouchableWithoutFeedback>
@@ -220,9 +229,9 @@ export function BrandedModal({
       <TouchableWithoutFeedback onPress={onRequestClose}>
         {/* 'padding' keeps the scrim full size and lifts the card above
             the soft keyboard so an open text field is always visible. */}
-        <KeyboardAvoidingView style={styles.scrim} behavior="padding">
+        <KeyboardAvoidingView style={kit.modalScrim} behavior="padding">
           <TouchableWithoutFeedback>
-            <View style={styles.card} accessibilityViewIsModal={true}>{cardChildren}</View>
+            <View style={CARD} accessibilityViewIsModal={true}>{cardChildren}</View>
           </TouchableWithoutFeedback>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
@@ -253,13 +262,9 @@ function toneText(tone: BrandedModalButton['tone']) {
 }
 
 const styles = StyleSheet.create({
-  scrim: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.7)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-  },
+  // ⚠ `scrim` and `card` moved to the kit (`modalScrim` / `tModalCard`) in
+  // OTA-1765. `inlineScrim` did NOT: it is the arb73 workaround, a positioning
+  // layer for THIS component's native-vs-in-tree choice, not modal material.
   // arb73 — absolute full-screen layer for the inline (non-Modal) path. Fills
   // the parent and floats above the scene content via a high zIndex so the
   // popup renders and is tappable without relying on iOS native Modal
@@ -272,18 +277,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     zIndex: 9999,
     elevation: 9999,
-  },
-  card: {
-    width: '100%',
-    maxWidth: 380,
-    // OTA-1614 — never taller than the screen, so the scrim (and the
-    // tap-outside escape) always stays reachable.
-    maxHeight: '85%',
-    backgroundColor: '#13110f',
-    borderColor: '#c9a86a',
-    borderWidth: 1,
-    borderRadius: 4,
-    padding: 14,
   },
   headerRow: { marginBottom: 8 },
   // OTA-1614 — the middle scrolls; shrink rather than push the buttons off.

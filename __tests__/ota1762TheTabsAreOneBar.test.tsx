@@ -288,7 +288,18 @@ describe('the three that did not converge were left alone, each for its own reas
 describe('the gate and the stamp', () => {
   test('⚠ check:gold ratchets down by the four declarations this removed', () => {
     const gate = read('scripts', 'check-gold.mjs');
-    expect(gate).toContain('const BASELINE = 369;');
+    /* ⚠⚠⚠ THIS PINNED `const BASELINE = 369;` AND WENT RED THREE OTAs LATER,
+     * WHICH IS THE SECOND TIME IN THIS ROLLOUT I HAVE MADE EXACTLY THIS MISTAKE.
+     * The first was OTA-1759 pinning the same gate's then-current value from a
+     * suite about ROWS. A ratchet's whole point is that it MOVES; a suite that
+     * pins today's number turns every correct future removal into a red test,
+     * which is the opposite of what a ratchet is for.
+     * What OTA-1762 can honestly claim is that its four declarations went and
+     * that the number never climbs back: at most 369, with its own line in the
+     * ledger. OTA-1765 took it to 367. */
+    const baseline = Number(/const BASELINE = (\d+);/.exec(gate)?.[1]);
+    expect(Number.isFinite(baseline)).toBe(true);
+    expect(baseline).toBeLessThanOrEqual(369);
     expect(gate).toContain('OTA-1762');
   });
 

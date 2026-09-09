@@ -29583,6 +29583,34 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // being in combat, and one line to reverse whichever way the call goes.
 // Provisional pending actual-device approval; nothing is selected or replaced.
 // SUPERSEDED: '2026-09-09-1763-icons-on-trial'
+// SUPERSEDED: '2026-09-09-1764-storm-and-shut-drawers'
+// OTA-1765 - TModal, the shell eleven dialogs hand-copied.
+// Tier 0 step 5. Thirty-three modal files, and the ones that look like the
+// game's dialogs all draw the same material: a scrim at rgba(0,0,0,0.7) and a
+// card in #13110f rimmed #c9a86a. That material was written once in
+// BrandedModal and then re-typed by hand. The kit now exports it as modalScrim
+// and tModalCard(maxWidth); BrandedModal and HookContinueModal adopt it, and a
+// predicate in the suite names the nine files still carrying their own copy, so
+// a tenth cannot appear quietly. Finishing those nine is the modal sweep, a
+// separate pass - this one extracts, it does not sweep.
+// It is STYLES and not a <TModal> component, and that is a finding rather than a
+// shortcut: arb73 records iPad/iOS presenting a native <Modal> invisibly while
+// its backdrop still ate touches, so BrandedModal chooses between a native
+// Modal and an in-tree overlay per call site. A component owning the container
+// would have to own that choice too. What every dialog agrees on is the
+// material, so the material is what is exported. Width stays a parameter - the
+// measured values are 380/400/420/440, four numbers with no shared vocabulary
+// behind them, and inventing compact/regular/wide would name a decision nobody
+// has made.
+// BrandedModal moves no pixel: the kit's values ARE its values. The second
+// adoption is not free, and that is the half worth reading. HookContinueModal's
+// card differed in TWO things, not the one first reported - maxWidth 420, and no
+// maxHeight at all - so taking the shell adds OTA-1614's 85% cap. RN views do
+// not shrink by default, so a capped card whose stage list will not yield pushes
+// CONTINUE and ABANDON out of the bottom of a modal whose only other exit is the
+// scrim behind them. BrandedModal's own answer (flexShrink 1, flexGrow 0) comes
+// with it, and a test asserts that line, because without it this pass would have
+// shipped a modal you cannot leave.
 // OTA-1764 - a new storm, and two drawers that now start shut.
 // Owner: "workings to learn and reinforce your gear should start collapsed like
 // the rest of the categories when it shops and vendors." They were the only two
@@ -29604,7 +29632,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // art/12-damage-icons, tracked in git and outside the assets tree app.json
 // bundles, so the phone still ships one resolution rather than four.
 // Provisional pending actual-device approval.
-export const OTA_BUILD_ID = '2026-09-09-1764-storm-and-shut-drawers';
+export const OTA_BUILD_ID = '2026-09-09-1765-the-shell-eleven-copied';
 // golem catch-up 2026-09-09: markerless publish of OTA-1764 - a new storm, and
 // two drawers that now start shut. WORKINGS TO LEARN and REINFORCE YOUR GEAR
 // were the only two vendor sections defaulting open; both the render default and

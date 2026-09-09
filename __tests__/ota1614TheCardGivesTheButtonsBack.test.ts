@@ -22,6 +22,8 @@ import { join } from 'path';
 
 const src = (...p: string[]) => readFileSync(join(__dirname, '..', ...p), 'utf8');
 const MODAL = src('app', 'components', 'BrandedModal.tsx');
+// ⚠ OTA-1765 — the scrim and the card moved to the kit. See the cap test below.
+const KIT = src('app', 'ui', 'tartariaKit.tsx');
 const INV = src('app', 'screens', 'InventoryScreen.tsx');
 
 describe('OTA-1614 — the card gives its buttons back', () => {
@@ -48,7 +50,20 @@ describe('OTA-1614 — the card gives its buttons back', () => {
   it('⚠⚠⚠ the card is capped below the screen, so the tap-outside escape survives', () => {
     // A card taller than the display leaves no scrim to tap and no way out on a
     // modal whose caller passes no dismiss button.
-    expect(MODAL).toContain("maxHeight: '85%',");
+    //
+    // ⚠⚠ OTA-1765 MOVED THE VALUE, NOT THE GUARANTEE, AND THIS PIN FOLLOWED IT.
+    // The card is now the kit's `modalCard`, taken here through `tModalCard(380)`
+    // — so asserting the literal against THIS file went red on a pass that
+    // strengthened the cap rather than dropping it. What OTA-1614 actually
+    // claims is "the card this modal draws is capped", and that is now two
+    // facts: the kit caps its card, and this modal uses the kit's card. Both
+    // are asserted, so neither half can quietly go missing. Third time in this
+    // rollout that a pin written as a file-local literal broke when the value
+    // it names moved up a level; the fix is to pin the claim, not the address.
+    expect(KIT).toContain("maxHeight: '85%',");
+    expect(MODAL).toContain('const CARD = tModalCard(380);');
+    expect(MODAL).toContain('style={CARD}');
+    expect(MODAL).not.toContain('maxHeight');   // no second, uncapped copy here
   });
 
   it('⚠⚠ the scroll area shrinks rather than squeezing the pinned rows', () => {

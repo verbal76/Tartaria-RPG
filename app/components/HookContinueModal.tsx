@@ -10,6 +10,27 @@ import {
   Dimensions,
 } from 'react-native';
 import type { HookContinueStage } from '../engine/types';
+import { tModalCard, tartariaKitStyles as kit } from '../ui/tartariaKit';
+
+/* ⚠⚠ OTA-1765 — the second adopter, and it is NOT a pure substitution. Stated
+ * rather than discovered later:
+ *   · the SCRIM is character-identical to the kit's, so it moves nothing.
+ *   · the CARD differed in TWO ways, not the one I first reported. `maxWidth`
+ *     420 against 380 — which is why width is a parameter. And this card had NO
+ *     `maxHeight` at all, so adopting the shell ADDS OTA-1614's 85% cap.
+ * That addition is the point rather than a side effect: this modal taps its own
+ * scrim to dismiss, and a card that grows past the screen takes that escape with
+ * it. Its existing guard is a module-load `Dimensions.get('window')` read — a
+ * number computed once, before rotation, before a split-screen resize — and it
+ * caps only the stage list, not the card. The percentage cap composes with it
+ * and outlives a rotation; both stay.
+ * ⚠⚠⚠ AND THE CAP NEEDS `flexShrink` ON THE SCROLLING CHILD, WHICH IS WHY THE
+ * ONE STYLE LINE BELOW MOVED TOO. RN views do not shrink by default, so a capped
+ * card whose ScrollView refuses to give way pushes CONTINUE / ABANDON out of the
+ * bottom — the exact bug OTA-1614 fixed in BrandedModal, whose answer
+ * (`flexShrink: 1, flexGrow: 0`) is copied here on purpose. Taking the cap
+ * without it would have shipped a modal you cannot leave. */
+const CARD = tModalCard(420);
 
 // OTA-259 / OTA-263 — CONTINUE popup for multi-stage investigation
 // hooks.
@@ -133,9 +154,9 @@ export function HookContinueModal({
           behind it doesn't need to stay readable. Bigger card so
           long stages have room to breathe. */}
       <TouchableWithoutFeedback onPress={completed ? onComplete : onAbandon}>
-        <View style={styles.scrim} accessibilityViewIsModal={true}>
+        <View style={kit.modalScrim} accessibilityViewIsModal={true}>
           <TouchableWithoutFeedback>
-            <View style={styles.card}>
+            <View style={CARD}>
               <Text style={styles.title} accessibilityRole="header">
                 {completed ? '★★ STORY THREAD COMPLETE' : '★ STORY THREAD'}
               </Text>
@@ -223,26 +244,14 @@ export function HookContinueModal({
 }
 
 const styles = StyleSheet.create({
-  scrim: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.7)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  card: {
-    width: '100%',
-    maxWidth: 420,
-    backgroundColor: '#13110f',
-    borderColor: '#c9a86a',
-    borderWidth: 1,
-    borderRadius: 4,
-    padding: 14,
-  },
+  // ⚠ `scrim` and `card` moved to the kit (`modalScrim` / `tModalCard(420)`)
+  // in OTA-1765. See the note at the top of this file for what the card gained.
   title: { color: '#c9a86a', fontSize: 13, fontWeight: '800', letterSpacing: 3 },
   subtitle: { color: '#a2977b', fontSize: 11, marginTop: 2, fontStyle: 'italic', letterSpacing: 1 },
   rule: { height: 1, backgroundColor: '#3a342c', marginTop: 8, marginBottom: 8 },
-  stageScroll: { },
+  // ⚠⚠ OTA-1765 — the card now caps its own height, and a child that will not
+  // shrink pushes the buttons out from under it. BrandedModal's own answer.
+  stageScroll: { flexShrink: 1, flexGrow: 0 },
   stageList: { gap: 12, paddingVertical: 4 },
   stageBlock: {
     backgroundColor: '#1a1714',

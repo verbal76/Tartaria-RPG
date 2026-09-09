@@ -863,6 +863,68 @@ export function TTabBar({
  * ⚠ THE GOLD IN `rowSelected` STAYS. VIS-3 reserves gold for a live obligation
  * or a live process — and the row the player is acting on right now is exactly
  * that. It is also what three screens already shipped; this changes no pixels. */
+/* ⚠⚠⚠ TMODAL — THE SHELL ELEVEN DIALOGS HAND-COPIED, AND WHY IT IS STYLES.
+ *
+ * Tier 0. Thirty-three modal files. Measured before writing anything, and they
+ * fall into two lineages that even NAME their scrim differently:
+ *
+ *   FAMILY A  `scrim`     ground #13110f · rim #c9a86a          9 files
+ *   FAMILY B  `backdrop`  ground #17150f · rim varies           9 files
+ *   neither   no bordered card at all (pickers, forms)          5 files
+ *   + `BrandedModal` and the five dialogs that already use it
+ *
+ * ⚠⚠ AND FAMILY A IS `BrandedModal`'S OWN CARD, COPIED BY HAND. Byte for byte:
+ *     width '100%' · maxWidth 380 · #13110f · #c9a86a 1 · radius 4 · padding 14
+ * Files re-typed a shell that already existed, which is exactly what this
+ * rollout is for.
+ *
+ * ⚠ THE CENSUS IS A PREDICATE, NOT A NUMBER I REMEMBER — a file that declares
+ * its own scrim/backdrop AND a card in #13110f rimmed #c9a86a. It counted 11
+ * before this pass and counts 9 after, because the two adopters below are the
+ * two it no longer matches. The suite runs the same predicate and NAMES the
+ * remaining nine, so the sweep that finishes them cannot quietly grow instead.
+ *
+ * ⚠ `HookContinueModal` differs in TWO things, not the one I first reported: its
+ * `maxWidth` is 420, AND its card carries no `maxHeight` at all. See the note in
+ * that file — the second difference is why adoption there is not free.
+ *
+ * ⚠⚠⚠ STYLES, NOT A COMPONENT — AND THE REASON IS `BrandedModal` ITSELF.
+ * A `<TModal>` owning the container would have to own the PRESENTATION mechanic
+ * too, and that is not cosmetic here: arb73 records that iPad/iOS can present a
+ * native `<Modal>` INVISIBLY — rendering nothing while its backdrop still eats
+ * touches — which both hid a popup and blocked the buttons under it. So
+ * `BrandedModal` chooses between a native `<Modal>` and an in-tree absolute
+ * overlay, per call site. A primitive that swallowed that choice would be
+ * re-fighting a shipped device bug for the sake of tidiness.
+ * What every one of them agrees on is the MATERIAL. That is what this exports.
+ *
+ * ⚠ WIDTH IS A PARAMETER, NOT A VARIANT SET. The measured values are 380, 400,
+ * 420 and 440 — four numbers with no shared vocabulary behind them, and
+ * inventing `compact/regular/wide` would be naming a decision nobody has made.
+ * The default is 380 because that is `BrandedModal`'s, which is the widest-used.
+ *
+ * ⚠⚠ THE CARD CAPS ITS OWN HEIGHT, SO A SCROLLING CHILD MUST BE ALLOWED TO
+ * SHRINK. `maxHeight: '85%'` is not decoration — it is what keeps the scrim, and
+ * with it the tap-outside escape, reachable (OTA-1614). But RN views do not
+ * shrink by default, so a card that stops growing while its ScrollView does not
+ * give way pushes the button row out of the bottom instead. Any adopter with a
+ * scrolling middle needs `flexShrink: 1, flexGrow: 0` on it. `BrandedModal`
+ * already shipped that; `HookContinueModal` gained it on adoption.
+ *
+ * ⚠ FAMILY B AND THE SEMANTIC RIMS ARE NOT SWEPT IN. `MissionComplete` rims in
+ * a green and `FusionPicker` in a slate — those are a SUCCESS and a CATEGORY,
+ * not accents, and the owner's amendment is explicit that semantic colour stays.
+ * Family B's darker ground is a real second lineage and merging it is a decision
+ * for the modal sweep, not a side effect of extracting Family A.
+ * ⚠⚠ AND THOSE THREE HEXES ARE DELIBERATELY NOT WRITTEN HERE. OTA-1757's gate
+ * asserts the semantic authorities' colours appear NOWHERE in this file, and it
+ * is right to: a kit that names a foreign palette in a comment is one careless
+ * copy-paste from owning it. Naming them by role says the same thing and cannot
+ * be pasted into a style. This comment failed that gate on its first draft. */
+export function tModalCard(maxWidth = 380): StyleProp<ViewStyle> {
+  return [kit.modalCard, { maxWidth }];
+}
+
 export interface TRowState {
   /** De-emphasised but still usable — a recipe you have not unlocked. */
   muted?: boolean;
@@ -930,6 +992,27 @@ const kit = StyleSheet.create({
   rowBlocked: { opacity: 0.45 },
   // Byte-identical in rowGrouped / offerRowPicked / recipeRowPicked.
   rowSelected: { borderColor: T.gold, backgroundColor: '#1e1a12' },
+  // ── TModal ────────────────────────────────────────────────────────────────
+  // ⚠ The shipped values — `BrandedModal`'s scrim and card, which nine other
+  // dialogs re-typed by hand.
+  modalScrim: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  modalCard: {
+    width: '100%',
+    // ⚠ OTA-1614 — never taller than the screen, so the scrim (and with it the
+    // tap-outside escape) always stays reachable.
+    maxHeight: '85%',
+    backgroundColor: '#13110f',
+    borderColor: T.gold,
+    borderWidth: 1,
+    borderRadius: 4,
+    padding: 14,
+  },
   // ── TTabBar ───────────────────────────────────────────────────────────────
   // ⚠ The shipped values. Crafting, Guidance and Vendor agree on the chip byte
   // for byte; the row differs only in bottom margin (10 against Vendor's 8).

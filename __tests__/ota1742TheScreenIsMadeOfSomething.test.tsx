@@ -677,9 +677,23 @@ describe('OTA-1742 — the language is reusable, and the first pass stayed in it
      * the rollout's own Tier 0 list, so it arrives by instruction rather than by
      * a screen quietly needing something. That is exactly the distinction this
      * test was re-aimed at in VIS-3. */
+    /* ⚠⚠ HELPERS 6 → 7 BY OTA-1765 (`tModalCard`), AND THE RAISE IS ARGUED THE
+     * SAME WAY THE SPLIT WAS. This bound exists so the drawer cannot fill with
+     * helpers while the component count sits still — so it should ask a new
+     * helper the same question the component budget asks a new component: does
+     * it arrive BY INSTRUCTION, and does it replace copies rather than add a
+     * choice? `tModalCard` does both. It is Tier 0's named step 5, and the
+     * material it exports was already hand-copied into nine dialogs.
+     * ⚠ It is a helper and not a `<TModal>` component for the reason written
+     * above it in the kit: arb73 makes the PRESENTATION mechanic (a native
+     * `<Modal>` against an in-tree overlay) a per-call-site choice, and a
+     * component owning the container would have to own that too.
+     * ⚠ Tier 0 is a FINITE, NAMED list and one primitive is left (TSheet), so
+     * this number is not open-ended. A helper that is not on that list still has
+     * to make its case from scratch. */
     expect(components.length).toBeLessThanOrEqual(13);
-    expect(helpers.length).toBeLessThanOrEqual(6);
-    expect(exported.length).toBeLessThanOrEqual(19);
+    expect(helpers.length).toBeLessThanOrEqual(7);
+    expect(exported.length).toBeLessThanOrEqual(20);
   });
 
   /* ⚠⚠⚠ SUPERSEDED BY VIS-3 (OTA-1746) — AND THE REASONING IS KEPT HERE RATHER
