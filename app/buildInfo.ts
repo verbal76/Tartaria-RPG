@@ -30011,6 +30011,27 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // implementations of one predicate is a legacy-hunt item; two different answers
 // would be a defect.
 export const OTA_BUILD_ID = '2026-09-09-1779-the-hand-that-is-already-full';
+// golem catch-up 2026-09-09: markerless publish of OTA-1778 and OTA-1779.
+// OTA-1778 - no moment card touches the bezel. HOLD 6 normalised: a card
+// declaring width 100% under a maxWidth 440 cap, in a scrim with no padding, is
+// full-bleed on every screen narrower than 440, and the cap makes it worse
+// because above 440 the un-centred card also stops being centred. All six moment
+// beats now take kit.momentScrim; MissionStinger takes the scrim and not the
+// card, because consistent outer geometry is not the same instruction as taking
+// the shell. The coverage is a PROPERTY rather than a file list - any file whose
+// scrim is a black wash and whose card caps its width must take that scrim from
+// the kit - and the geometry is proved arithmetically across nine screen widths.
+// OTA-1779 - the hand that is already full. Dual wield is KEPT by ruling; the
+// real defect is that a two-hander displaces the off hand, so the off slot reads
+// empty while both hands are full, and the free-hand offer fired anyway. Three
+// sites had the same blind spot: the offer, the slot router, and the spare-hand
+// fallback that the new suite caught only because it exercises the engine rather
+// than scanning it. Two of three would still have shipped the bug.
+// Accepting the old offer would have produced a two-hander AND an off-hand
+// weapon - a state the two-handed rule forbids - so the wrong destination
+// mattered more than the wrong sentence. Every one-handed-main case is asserted
+// to still offer the free hand, so the feature is proved intact rather than
+// promised.
 // golem catch-up 2026-09-09: markerless publish of OTA-1777 - Family B is named
 // and governed, and the modal sweep is finished. Two shells on purpose:
 // tModalCard is a DIALOG (you are being asked something), tMomentCard is a BEAT
