@@ -13,7 +13,18 @@ import {
   Platform,
 } from 'react-native';
 
+import { tModalCard, tartariaKitStyles as kit } from '../ui/tartariaKit';
+
 import type { InteractableChip } from './InteractableChip';
+
+// ⚠⚠ OTA-1771 — the modal sweep, and this is the one adopter where the card's
+// height cap CHANGES what the player sees, in the direction OTA-1614 ruled for.
+// This card has a `KeyboardAvoidingView` above it: with the keyboard up the
+// available height drops and, before this pass, the card simply overflowed and
+// took INVESTIGATE / CANCEL off the bottom of the screen with it. That is the
+// same defect OTA-1718 was reported for on REPORT A BUG. With the kit's ceiling
+// and a shrinking chip list, the buttons stay on screen and the list scrolls.
+const CARD = tModalCard(380);
 
 interface Props {
   visible: boolean;
@@ -152,7 +163,7 @@ export function SearchModal({ visible, chips, onSubmit, onCancel, onInvestigateA
     >
       <TouchableWithoutFeedback onPress={onCancel} accessibilityRole="button" accessibilityLabel="Close">
         <KeyboardAvoidingView
-          style={styles.scrim}
+          style={kit.modalScrim}
           accessibilityViewIsModal={true}
           // OTA 022 — see ExplorationScreen comment. 'height' on
           // Android double-shrinks; 'padding' keeps the scrim full
@@ -160,7 +171,7 @@ export function SearchModal({ visible, chips, onSubmit, onCancel, onInvestigateA
           behavior="padding"
         >
           <TouchableWithoutFeedback>
-            <View style={styles.card}>
+            <View style={CARD}>
               <Text style={styles.title} accessibilityRole="header">INVESTIGATE</Text>
               <View style={styles.rule} />
               <Text style={styles.body}>
@@ -310,22 +321,8 @@ export function SearchModal({ visible, chips, onSubmit, onCancel, onInvestigateA
 }
 
 const styles = StyleSheet.create({
-  scrim: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.7)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  card: {
-    width: '100%',
-    maxWidth: 380,
-    backgroundColor: '#13110f',
-    borderColor: '#c9a86a',
-    borderWidth: 1,
-    borderRadius: 4,
-    padding: 14,
-  },
+  // ⚠ OTA-1771 — `scrim` and `card` moved to the kit (`modalScrim` /
+  // `tModalCard(380)`). Same values, one source.
   title: { color: '#c9a86a', fontSize: 14, fontWeight: '800', letterSpacing: 4 },
   rule: { height: 1, backgroundColor: '#3a342c', marginTop: 6, marginBottom: 10 },
   body: { color: '#e6d8b3', fontSize: 13, lineHeight: 18, marginBottom: 10 },
@@ -349,7 +346,10 @@ const styles = StyleSheet.create({
   // four ambient-noun modals share one visual pattern. Bounded
   // scroll height keeps long lists from blowing past the screen
   // while short lists collapse to fit.
-  chipScroll: { maxHeight: 280 },
+  // ⚠⚠ OTA-1771 — `flexShrink` is the piece that makes the kit's 85% ceiling a
+  // fix here rather than a clip. The list gives way; the input, the sweep button
+  // and the button row do not.
+  chipScroll: { maxHeight: 280, flexShrink: 1, flexGrow: 0 },
   chipList: { gap: 6, paddingVertical: 4 },
   chipFull: {
     flexDirection: 'row',

@@ -29589,6 +29589,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SUPERSEDED: '2026-09-09-1767-the-button-grows'
 // SUPERSEDED: '2026-09-09-1768-one-barehand-chip'
 // SUPERSEDED: '2026-09-09-1769-the-sheet-is-two-shapes'
+// SUPERSEDED: '2026-09-09-1770-character-is-the-proof'
 // OTA-1770 - CharacterScreen, the proof. The rollout's step 2, and the first
 // screen to adopt Tier 0. Chosen because it had the worst gold density in the
 // game (36 declarations) and no tabs or modals of its own to confound the result.
@@ -29746,7 +29747,37 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // art/12-damage-icons, tracked in git and outside the assets tree app.json
 // bundles, so the phone still ships one resolution rather than four.
 // Provisional pending actual-device approval.
-export const OTA_BUILD_ID = '2026-09-09-1770-character-is-the-proof';
+// OTA-1771 - the modal sweep, batch 1. The rollout's step 3. OTA-1765's census
+// named eight files still declaring their own scrim next to a Family A card;
+// four of them adopt here and the census falls to four.
+// ClimbModal, TorchProbeModal and SearchModal take tModalCard(380);
+// CraftRefusalModal takes tModalCard(400), which is the whole reason the width
+// is a parameter rather than a variant set. Four rim golds go with them and the
+// ratchet falls 331 to 327.
+// THE PIECE THAT MAKES IT SAFE is one line per adopter, and it is the lesson
+// HookContinueModal taught on its own adoption: the kit's card carries
+// maxHeight 85% (OTA-1614) so the scrim, and with it the tap-outside escape,
+// stays reachable - but an RN view does not shrink unless told to, so a card
+// that stops growing while its list does not give way pushes the buttons out of
+// the bottom instead. Every adopter's scrolling middle gains flexShrink 1 /
+// flexGrow 0. On CraftRefusalModal that is belt-and-braces: its scroll already
+// reserves 380dp for the rest of the card, so it cannot reach the ceiling on any
+// screen shorter than 1827dp.
+// ONE THING CHANGES FOR THE PLAYER, in the direction OTA-1614 ruled for.
+// SearchModal sits under a KeyboardAvoidingView: with the keyboard up the
+// available height drops and, before this pass, the card simply overflowed and
+// took INVESTIGATE and CANCEL off the bottom of the screen - the same defect
+// OTA-1718 was reported for on REPORT A BUG. Now the chip list yields and the
+// buttons stay on screen.
+// AND THE FIFTH FAMILY A DIALOG IS HELD RATHER THAN FORCED. ApproachModal has
+// no vertical scroll at all: its two chip strips scroll horizontally, so
+// shrinking them clips chips instead of shortening the card, and the COMMON row
+// is a wrapping View. Capping a card with nothing to yield would clip the button
+// row - measured at roughly 496dp of content against a ceiling near 306dp with
+// the keyboard up. Giving it a scrolling middle would fix it AND change what the
+// player sees, so it is a layout decision rather than a material extraction. Its
+// pixels are untouched and the reason is written into the file. HOLD 4.
+export const OTA_BUILD_ID = '2026-09-09-1771-the-sweep-takes-four';
 // golem catch-up 2026-09-09: markerless publish of OTA-1770 - CharacterScreen,
 // the proof. The rollout's step 2 and the first screen on Tier 0. The
 // hand-rolled header becomes TScreenHeader and moves no pixel: its header,

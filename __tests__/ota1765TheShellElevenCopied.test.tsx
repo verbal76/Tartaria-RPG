@@ -240,7 +240,14 @@ describe('what is left, counted by predicate', () => {
     expect(left).not.toContain('HookContinueModal.tsx');
   });
 
-  test('⚠⚠⚠ the remaining EIGHT are NAMED, so the sweep cannot quietly grow', () => {
+  test('⚠⚠⚠ the remaining FOUR are NAMED, so the sweep cannot quietly grow', () => {
+    /* ⚠⚠ EIGHT → FOUR ON OTA-1771, the modal sweep's first batch. ClimbModal,
+     * TorchProbeModal, SearchModal and CraftRefusalModal now import the kit's
+     * scrim and card and no longer declare either, so they fall out of this
+     * predicate by doing the right thing rather than by being excused from it.
+     * The four that remain each remain for a stated reason, none of them
+     * "nobody got to it": two are moment modals (HOLD 3), one is a genuine
+     * second shell (KeyboardSafeCard, below), and ApproachModal is HOLD 4. */
     /* ⚠⚠ NINE → EIGHT, AND IT WAS *TSheet* THAT TOOK ONE, NOT THE MODAL SWEEP.
      * `WhisperTalkSheet` matched this predicate because it declared its own
      * `backdrop` next to a `#13110f`/`#c9a86a` card. OTA-1769 moved that backdrop
@@ -248,19 +255,14 @@ describe('what is left, counted by predicate', () => {
      * out of the census — correctly, and without the modal sweep touching it.
      * ⚠ Worth seeing rather than just re-counting: two primitives were measuring
      * overlapping ground, and the census is the thing that noticed. */
-    /* This is the guardrail the consumer list is for `TPanel`: a tenth file
+    /* This is the guardrail the consumer list is for `TPanel`: a FIFTH file
      * appearing here means a new dialog hand-copied the shell instead of
      * importing it, and that shows up as a failing test rather than as another
-     * copy nobody notices for a year. Finishing these nine is the modal sweep,
-     * a separate pass — this OTA extracts, it does not sweep. */
+     * copy nobody notices for a year. */
     expect(handCopies()).toEqual([
       'ApproachModal.tsx',
-      'ClimbModal.tsx',
-      'CraftRefusalModal.tsx',
       'CraftResultModal.tsx',
       'KeyboardSafeCard.tsx',
-      'SearchModal.tsx',
-      'TorchProbeModal.tsx',
       'WhisperCompleteModal.tsx',
     ]);
   });

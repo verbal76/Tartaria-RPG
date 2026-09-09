@@ -8,6 +8,11 @@ import {
   TouchableWithoutFeedback,
   Pressable,
 } from 'react-native';
+import { tModalCard, tartariaKitStyles as kit } from '../ui/tartariaKit';
+
+// ⚠ OTA-1771 — the modal sweep. Cloned from ClimbModal's shape, so it carried
+// ClimbModal's hand-copied scrim and card too; both are the kit's now.
+const CARD = tModalCard(380);
 
 export interface TorchLead {
   id: string;
@@ -38,9 +43,9 @@ export function TorchProbeModal({ visible, leads, onSubmit, onCancel }: Props) {
       statusBarTranslucent
     >
       <TouchableWithoutFeedback onPress={onCancel} accessibilityRole="button" accessibilityLabel="Close">
-        <View style={styles.scrim} accessibilityViewIsModal={true}>
+        <View style={kit.modalScrim} accessibilityViewIsModal={true}>
           <TouchableWithoutFeedback>
-            <View style={styles.card}>
+            <View style={CARD}>
               <Text style={styles.title} accessibilityRole="header">AIM THE TORCH</Text>
               <View style={styles.rule} />
               <Text style={styles.body}>
@@ -87,13 +92,16 @@ export function TorchProbeModal({ visible, leads, onSubmit, onCancel }: Props) {
 }
 
 const styles = StyleSheet.create({
-  scrim: { flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', alignItems: 'center', justifyContent: 'center', padding: 20 },
-  card: { width: '100%', maxWidth: 380, backgroundColor: '#13110f', borderColor: '#c9a86a', borderWidth: 1, borderRadius: 4, padding: 14 },
+  // ⚠ OTA-1771 — `scrim` and `card` moved to the kit (`modalScrim` /
+  // `tModalCard(380)`). Same values, one source.
   title: { color: '#c9a86a', fontSize: 14, fontWeight: '800', letterSpacing: 4 },
   rule: { height: 1, backgroundColor: '#3a342c', marginTop: 6, marginBottom: 10 },
   body: { color: '#e6d8b3', fontSize: 13, lineHeight: 18, marginBottom: 10 },
   empty: { color: '#a2977b', fontStyle: 'italic', textAlign: 'center', paddingVertical: 20, fontSize: 13 },
-  scroll: { maxHeight: 280 },
+  // ⚠⚠ OTA-1771 — the card now caps at 85% (OTA-1614), and an RN view holds its
+  // height unless told to yield. Without `flexShrink` a long lead list would push
+  // CANCEL out of the bottom rather than scroll.
+  scroll: { maxHeight: 280, flexShrink: 1, flexGrow: 0 },
   scrollContent: { paddingVertical: 2 },
   row: {
     flexDirection: 'row',

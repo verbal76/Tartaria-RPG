@@ -61,14 +61,21 @@ const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..')
  *                   `corruptionColor`, and one defect fixed: the empty state was
  *                   painted in brand gold. Biggest single drop so far, from the
  *                   screen with the worst density in the game.
+ *    327  OTA-1771  the modal sweep, batch 1 — ClimbModal, TorchProbeModal,
+ *                   SearchModal and CraftRefusalModal dropped their hand-copied
+ *                   cards for `tModalCard`, and four rim golds went with them.
+ *                   ⚠ FOUR ADOPTERS, NOT THE FIVE THAT MEASURED AS FAMILY A:
+ *                   `ApproachModal` is HELD. It has no scrolling middle, so the
+ *                   kit's 85% ceiling would have nothing to give way and would
+ *                   clip the button row rather than keep it reachable.
  *
  *  ⚠ THE CURRENT SPLIT, and the only line in this file written in the form
  *  OTA-1757's suite parses — the ledger above is deliberately terse so a
  *  HISTORICAL total cannot be mistaken for today's:
- *      326 interface · 4 semantic authorities · 1 kit
+ *      322 interface · 4 semantic authorities · 1 kit
  *  The INTERFACE number is the one the rollout drives down; the other two are
  *  the rule working. */
-const BASELINE = 331;
+const BASELINE = 327;
 
 /** The brand gold, the only hex this gate is about. */
 const GOLD = /'#c9a86a'/gi;

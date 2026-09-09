@@ -31,6 +31,33 @@ interface Props {
   onCancel: () => void;
 }
 
+// ⚠⚠⚠ OTA-1771 — HELD OUT OF THE MODAL SWEEP, DELIBERATELY, PENDING AN OWNER
+// RULING. Four of the five Family-A dialogs in this batch adopted the kit's
+// `modalScrim` + `tModalCard`. This one did not, and the reason is structural
+// rather than cosmetic:
+//
+//   The kit's card carries `maxHeight: '85%'` (OTA-1614) so the scrim — and with
+//   it the tap-outside escape — always stays reachable. A card that stops growing
+//   only stays whole if something INSIDE it can give way; every other adopter has
+//   a vertical ScrollView that took `flexShrink` and now yields.
+//
+//   This card has no vertical scroll at all. Its two chip strips scroll
+//   HORIZONTALLY, so shrinking them clips chips rather than shortening the card,
+//   and the COMMON row is a wrapping `View`. Adopting the ceiling here would cap
+//   a card with nothing to yield, and the first thing off the bottom is the
+//   CANCEL / APPROACH row.
+//
+//   Worst case measured on a 380-wide card: ~496dp of content (five body lines,
+//   the input, three labelled chip sections, the button row). That clears 85% of
+//   any ordinary screen — but this modal sits under a `KeyboardAvoidingView`, and
+//   with the keyboard up the container's content box drops to roughly 360dp, so
+//   the ceiling resolves near 306dp and the buttons go.
+//
+//   Giving it a scrolling middle would fix it, and would also change what the
+//   player sees — the chips would scroll instead of all being visible at once.
+//   That is a layout decision, not a material extraction, so the shipped pixels
+//   stay exactly as they are until the owner rules. HOLD 4.
+//
 // Approach modal. The player picks a target (or types one) and the
 // engine resolves "approach <target>" — in combat, it switches focus
 // to that enemy and closes the gap if reachable; out of combat, it
