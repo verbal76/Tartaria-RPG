@@ -30053,7 +30053,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SUPERSEDED: '2026-09-09-1785-one-authority-per-ratchet'
 // SUPERSEDED: '2026-09-09-1786-the-name-column-fits-its-vocabulary'
 // SUPERSEDED: '2026-09-09-1787-the-row-reads-its-own-hierarchy'
-export const OTA_BUILD_ID = '2026-09-09-1788-the-utility-marks-are-ours';
+// SUPERSEDED: '2026-09-09-1788-the-utility-marks-are-ours'
+export const OTA_BUILD_ID = '2026-09-09-1789-one-weapon-family-resolver';
 // golem catch-up 2026-09-09: markerless publish of OTA-1788.
 // OTA-1788 - the utility marks are ours. First pass off the combat reference
 // pack. Two files SELECTED from the owner's own icon library and renamed
