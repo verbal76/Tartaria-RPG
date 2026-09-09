@@ -30047,6 +30047,27 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // deny-list it sat on for being under-covered.
 // SUPERSEDED: '2026-09-09-1780-the-thin-four-migrate'
 export const OTA_BUILD_ID = '2026-09-09-1781-the-name-grew-with-the-mark';
+// golem catch-up 2026-09-09: markerless publish of OTA-1781.
+// OTA-1781 - the name grew with the mark. The weapon-name typography beside
+// the 28dp combat artwork was 12/400/0 while the MOCK of that same button in
+// Lore's glyph key was already 15/700/1. The teaching surface and the control
+// it teaches disagreed, and the mock was the approved one - so the mock's
+// numbers become one authority, GLYPH_NAME_TYPE, beside GLYPH_ART_SIZE, and
+// both surfaces read it. Size and weight only: a colour there would be applied
+// after the tone styles and would flatten the whole combat chip vocabulary.
+// quickText stays at 12, so punch, dodge, flee, approach, travel and the
+// companion controls are untouched; the new style reaches exactly two call
+// sites, through an explicit prop rather than a glyph-list derivation that
+// matches weapon chips only by accident. Costs no height - a 15pt line is ~19dp
+// inside a mark that is already 28.
+// The colour ruling is NOT applied: the message says keep the current sage and
+// names #87966A, which has never existed in this repository - the shipped fill
+// is #9ec96a. Keeping the current pixels satisfies both halves of the
+// instruction; the hex is a question.
+// Three older suites re-aimed: OTA-1568, 1569 and 1766 each pinned the fallback
+// element character for character when the claim was only that the flat label
+// is what that path paints. One literal pinned in three places is three chances
+// to be wrong about the same thing.
 // golem catch-up 2026-09-09: markerless publish of OTA-1780.
 // OTA-1780 - the thin four migrate. Log, Lore, Guidance and World take
 // TScreenHeader; Guidance takes TTabBar with it. World's title goes INK by
