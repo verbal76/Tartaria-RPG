@@ -658,6 +658,28 @@ export function gatherIcon(row: { kind: GatherKind; upgrade: boolean; verdict?: 
   return '⚒';
 }
 
+/** ⚠⚠⚠ OTA-1788 — WHICH ROWS HAVE ILLUSTRATED ARTWORK, AND IT IS A SEPARATE
+ *  QUESTION FROM `gatherIcon`.
+ *
+ *  Owner, from the device: the Take/Salvage marks *"do not belong to the
+ *  illustrated Tartaria glyph vocabulary"*; and from the reference pack: *"Use
+ *  util_salvage.png as the existing-pack candidate for salvage instead of
+ *  inventing new crossed-tools art."*
+ *
+ *  ⚠ SALVAGE ONLY, AND THE REST KEEP THEIR CHARACTERS ON PURPOSE. The pack is
+ *  explicit about the comparison marks: *"For superior/inferior comparison
+ *  marks: do NOT invent new art during this pass. Keep the current safe
+ *  comparison marks unless a clearly suitable EXISTING library glyph is found."*
+ *  The supplied set contains no up/down pair, so ▲ and ▼ are untouched and the
+ *  gap is reported rather than filled with something invented.
+ *
+ *  ⚠⚠ `gatherIcon` IS NOT REPLACED. It remains the answer for every row and the
+ *  FALLBACK for this one: a caller that cannot render an Image still has a
+ *  character, which is why this returns a kind rather than swapping the string. */
+export function gatherIconArt(row: { kind: GatherKind; upgrade: boolean; verdict?: EquipVerdict | null }): 'salvage' | null {
+  return gatherIcon(row) === '⚒' ? 'salvage' : null;
+}
+
 /** ⚠⚠ Can this row be ACTED ON in the loot picker at all? The picker filters on
  *  this, so a noun that neither takes nor salvages never reaches a button that
  *  would promise something it cannot deliver. */

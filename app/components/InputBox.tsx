@@ -51,6 +51,7 @@ import { glyphArt, DISCOVERY_STAR_ART, GLYPH_ART_SIZE, GLYPH_NAME_TYPE } from '.
  * every colour on these chips is still the combat vocabulary's own. */
 import { tControlDepth } from '../ui/tartariaKit';
 import { armLoreJump } from '../ui/loreJump';
+import { utilityArt, UTILITY_ART_SIZE } from '../engine/utilityGlyphArt';
 import { reachBandsFor, reachFiresDown } from '../engine/types';
 // ⚠ OTA-1423 — the three Arbiter refusals below name the dog, so they also
 // have to gender it. Without this they read "bring it up" about a companion
@@ -1050,6 +1051,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                   OTA-1782's control depth like everything else. */}
               <QuickBtn
                 label="glyph key"
+                utility="glyph_key"
                 onPress={() => {
                   armLoreJump({ section: 'glyphs', returnTo: useGameStore.getState().currentScreen });
                   useGameStore.getState().setScreen('lore');
@@ -1531,6 +1533,7 @@ function QuickBtn({
   baseGlyph,
   star,
   weapon,
+  utility,
 }: {
   label: string;
   onPress: () => void;
@@ -1561,6 +1564,17 @@ function QuickBtn({
   baseGlyph?: BaseGlyphPart | null;
   /** OTA-1638 — the discovery star, painted LAST, after the base glyph. */
   star?: boolean;
+  /** ⚠⚠⚠ OTA-1788 — AN OPTIONAL LEADING UTILITY MARK, AND IT IS NOT `glyphs`.
+   *  The damage/coating glyphs answer WHAT KIND OF HARM and are laid out by
+   *  `quickGlyphRow` with their own spacing, colours and star. A utility mark
+   *  answers WHAT THIS CONTROL DOES — it is not a damage family, it takes no
+   *  colour, and it must never be mistaken for one. Separate prop, separate
+   *  table (`utilityGlyphArt`), separate size.
+   *  ⚠ IT DOES NOT GROW THE CHIP. At `UTILITY_ART_SIZE.chip` the mark sits
+   *  inside the 12pt label's own line box, so a chip wearing one is the same
+   *  height as a chip beside it — the discipline OTA-1767 set when it refused to
+   *  widen `quick`'s padding for a problem only weapon chips had. */
+  utility?: 'salvage' | 'glyph_key';
   /** ⚠⚠ OTA-1781 — THIS CHIP CARRIES A WEAPON NAME, and it is an EXPLICIT flag
    *  rather than `glyphs.length > 0 || baseGlyph`. That derivation is true of
    *  every weapon chip today only by accident: `combatWeaponLabelParts` returns
@@ -1762,7 +1776,17 @@ function QuickBtn({
           ) : null}
         </View>
       ) : (
-        <Text style={[textStyle, weapon ? styles.quickWeaponName : null]}>{label.toUpperCase()}</Text>
+        <View style={styles.quickUtilityRow}>
+          {utility ? (
+            <Image
+              source={utilityArt(utility)}
+              style={styles.quickUtilityArt}
+              resizeMode="contain"
+              testID={`quick-utility-${utility}`}
+            />
+          ) : null}
+          <Text style={[textStyle, weapon ? styles.quickWeaponName : null]}>{label.toUpperCase()}</Text>
+        </View>
       )}
     </Pressable>
   );
@@ -2027,6 +2051,16 @@ const styles = StyleSheet.create({
    * and still sits inside the mark's own box. The name grows, the button does
    * not. */
   quickWeaponName: GLYPH_NAME_TYPE,
+  /* ⚠ OTA-1788 — the flat-label branch is a ROW now so a utility mark can lead
+   * the word. With no mark it is a row of one, which lays out identically to the
+   * bare `<Text>` it replaces — every chip in the game takes this path, so the
+   * change had to cost nothing when nothing is passed. */
+  quickUtilityRow: { flexDirection: 'row', alignItems: 'center' },
+  quickUtilityArt: {
+    width: UTILITY_ART_SIZE.chip,
+    height: UTILITY_ART_SIZE.chip,
+    marginRight: 5,
+  },
   quickDisabledText: { color: '#6a6253' },
   // Soot on the solid block — the dark-on-light inversion is what makes it read
   // as FILLED at a glance rather than as another outlined chip.

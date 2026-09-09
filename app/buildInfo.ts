@@ -30052,7 +30052,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SUPERSEDED: '2026-09-09-1784-six-traders-six-voices'
 // SUPERSEDED: '2026-09-09-1785-one-authority-per-ratchet'
 // SUPERSEDED: '2026-09-09-1786-the-name-column-fits-its-vocabulary'
-export const OTA_BUILD_ID = '2026-09-09-1787-the-row-reads-its-own-hierarchy';
+// SUPERSEDED: '2026-09-09-1787-the-row-reads-its-own-hierarchy'
+export const OTA_BUILD_ID = '2026-09-09-1788-the-utility-marks-are-ours';
 // golem catch-up 2026-09-09: markerless publish of OTA-1787.
 // OTA-1787 - the combat row reads its own hierarchy. Two device findings, one
 // subject. PUNCH read as a peer filled weapon beside the illustrated controls,

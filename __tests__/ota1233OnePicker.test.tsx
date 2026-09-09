@@ -87,7 +87,15 @@ function renderRoom(chips: { noun: string; consumed?: boolean }[], player = null
   const walk = (n: unknown): void => {
     if (typeof n === 'string') { out.push(n); return; }
     if (Array.isArray(n)) { n.forEach(walk); return; }
-    const node = n as { children?: unknown[] } | null;
+    const node = n as { children?: unknown[]; props?: { testID?: string } } | null;
+    /* ⚠⚠ OTA-1788 — AN IMAGE CONTRIBUTES NO STRING, SO THE WALKER SAYS ITS NAME.
+     * The salvage row's mark used to be the character `⚒` and is now artwork
+     * from the owner's own pack, which this text walker could not see at all —
+     * so a row that IS marked read as a row with no mark. Emitting the testID
+     * keeps the same pipe-joined shape and keeps the assertions about what the
+     * row SAYS rather than about which glyph family says it. */
+    const id = node?.props?.testID;
+    if (id && id.startsWith('gather-icon-art-')) { out.push(id); return; }
     if (node && node.children) node.children.forEach(walk);
   };
   walk(tree.toJSON());
@@ -118,8 +126,8 @@ describe('OTA-1235 — three lanes, three colours, all visible at once', () => {
     expect(text).toContain('⚔|Compact Blaster');
     expect(text).toContain('🛡|Aetherbound Mask');
     expect(text).toContain('▪|Aetheric Torch');
-    expect(text).toContain('⚒|bench');
-    expect(text).toContain('⚒|rusted royal vault pedestal');
+    expect(text).toContain('gather-icon-art-salvage|bench');
+    expect(text).toContain('gather-icon-art-salvage|rusted royal vault pedestal');
     expect(text).toContain('TAKE ALL GEAR (2)');
     expect(text).toContain('TAKE ALL ITEMS (1)');
     expect(text).toContain('⚒ SALVAGE ALL (2)');
@@ -438,7 +446,7 @@ describe('OTA-1234 — the picker never offers a verb that will find nothing', (
       { noun: 'banner' }, { noun: 'Aetheric Torch' },
     ]).join('|');
     expect(text).toContain('▪|Aetheric Torch');
-    expect(text).toContain('⚒|banner');
+    expect(text).toContain('gather-icon-art-salvage|banner');
     expect(text).toContain('TAKE ALL ITEMS (1)');
     expect(text).toContain('⚒ SALVAGE ALL (1)');
     expect(text).not.toContain('blood stain');

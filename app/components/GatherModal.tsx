@@ -63,16 +63,17 @@
 // A source pin proves a line exists; it cannot prove anything renders it.
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  Modal, View, Text, StyleSheet, ScrollView, TouchableWithoutFeedback, Pressable,
+  Modal, View, Text, StyleSheet, ScrollView, TouchableWithoutFeedback, Pressable, Image,
 } from 'react-native';
 import {
-  classifyGatherNoun, isUpgradeOverEquipped, sortGatherRows, gatherIcon,
+  classifyGatherNoun, isUpgradeOverEquipped, sortGatherRows, gatherIcon, gatherIconArt,
   equipVerdict, equipSlotWord,
   isActionableGatherKind, laneForKind, upgradeEquipSlot,
   type GatherRow, type GatherLane,
 } from '../engine/gatherSort';
 import type { PlayerCharacter } from '../engine/types';
 import { findCatalogItem } from '../engine/crafting';
+import { utilityArt, UTILITY_ART_SIZE } from '../engine/utilityGlyphArt';
 import { rarityHexColor } from './InventoryCategorize';
 
 /** ⚠⚠ OTA-1317 — the row's rarity edge, or nothing.
@@ -376,18 +377,40 @@ export function GatherModal({
                   : `${noun}. ${lane === 'scrap' ? 'Tap to salvage' : 'Tap to take'}`
         }
       >
-        <Text style={[
-          styles.icon,
-          lane === 'gear' && styles.iconGear,
-          lane === 'items' && styles.iconItems,
-          lane === 'scrap' && styles.iconScrap,
-          lane === 'lead' && styles.iconLead,
-          upgrade && lane !== 'lead' && styles.iconUpgrade,
-          verdict?.state === 'up' && lane !== 'lead' && styles.iconBetter,
-          verdict?.state === 'down' && lane !== 'lead' && styles.iconWorse,
-        ]}>
-          {gatherIcon({ kind, upgrade, verdict })}
-        </Text>
+        {/* ⚠⚠⚠ OTA-1788 — THE SALVAGE MARK IS ARTWORK; EVERY OTHER MARK IS STILL
+            A CHARACTER, AND BOTH SIT IN THE SAME CELL.
+            Owner, from the device: these marks *"do not belong to the illustrated
+            Tartaria glyph vocabulary"*. The reference pack answered with a file
+            from his own library rather than new art.
+            ⚠ THE BRANCH IS THE SHIPPED PATTERN, not a new one — `KeyRow` and
+            `GlyphMark` already read "art if there is art, otherwise the
+            character", and this is the third instance of it.
+            ⚠⚠ THE COMPARISON MARKS ARE UNTOUCHED BY INSTRUCTION: *"do NOT invent
+            new art during this pass. Keep the current safe comparison marks
+            unless a clearly suitable EXISTING library glyph is found."* The
+            supplied set has no up/down pair, so ▲/▼ keep their colours and their
+            characters, and the gap is reported instead of guessed at. */}
+        {gatherIconArt({ kind, upgrade, verdict }) ? (
+          <Image
+            source={utilityArt('salvage')}
+            style={styles.iconArt}
+            resizeMode="contain"
+            testID="gather-icon-art-salvage"
+          />
+        ) : (
+          <Text style={[
+            styles.icon,
+            lane === 'gear' && styles.iconGear,
+            lane === 'items' && styles.iconItems,
+            lane === 'scrap' && styles.iconScrap,
+            lane === 'lead' && styles.iconLead,
+            upgrade && lane !== 'lead' && styles.iconUpgrade,
+            verdict?.state === 'up' && lane !== 'lead' && styles.iconBetter,
+            verdict?.state === 'down' && lane !== 'lead' && styles.iconWorse,
+          ]}>
+            {gatherIcon({ kind, upgrade, verdict })}
+          </Text>
+        )}
         <Text
           style={[styles.rowText, consumed && styles.rowTextConsumed]}
           numberOfLines={1}
@@ -651,6 +674,16 @@ const styles = StyleSheet.create({
   // ⚠ 20px and bold. The OTA-1232 version was 13px in the same tan as the text
   // beside it, which is how a whole session went by without it registering.
   icon: { fontSize: 20, fontWeight: '700', width: 28 },
+  /* ⚠ OTA-1788 — THE SAME 28dp CELL THE CHARACTER HELD, so a salvage row lines
+   * up with the take rows above and below it exactly as before. The artwork is
+   * `UTILITY_ART_SIZE.row` inside that cell, centred: a utility mark labels a
+   * control whose WORD is the subject, so it is deliberately smaller than the
+   * 28dp DAMAGE glyph, which is a subject in its own right. */
+  iconArt: {
+    width: 28,
+    height: UTILITY_ART_SIZE.row,
+    alignSelf: 'center',
+  },
   iconGear: { color: GEAR },
   iconItems: { color: ITEMS },
   iconScrap: { color: SCRAP },

@@ -95,7 +95,15 @@ function renderRoom(chips: { noun: string }[], leadNouns: string[]) {
   const walk = (n: unknown): void => {
     if (typeof n === 'string') { out.push(n); return; }
     if (Array.isArray(n)) { n.forEach(walk); return; }
-    const node = n as { children?: unknown[] } | null;
+    const node = n as { children?: unknown[]; props?: { testID?: string } } | null;
+    /* ⚠⚠ OTA-1788 — AN IMAGE CONTRIBUTES NO STRING, SO THE WALKER SAYS ITS NAME.
+     * The salvage row's mark used to be the character `⚒` and is now artwork
+     * from the owner's own pack, which this text walker could not see at all —
+     * so a row that IS marked read as a row with no mark. Emitting the testID
+     * keeps the same pipe-joined shape and keeps the assertions about what the
+     * row SAYS rather than about which glyph family says it. */
+    const id = node?.props?.testID;
+    if (id && id.startsWith('gather-icon-art-')) { out.push(id); return; }
     if (node && node.children) node.children.forEach(walk);
   };
   walk(tree.toJSON());
@@ -208,7 +216,7 @@ describe('OTA-1236 — RENDERED: the lead is last, and no button touches it', ()
     // permanent tax on the salvage economy rather than a guard.
     const unguarded = renderRoom(SMELTER, []);
     expect(unguarded).not.toContain('WORTH A LOOK');
-    expect(unguarded).toContain('⚒|chain');
+    expect(unguarded).toContain('gather-icon-art-salvage|chain');
     expect(unguarded).toContain('⚒ SALVAGE ALL (2)');
   });
 
