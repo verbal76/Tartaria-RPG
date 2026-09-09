@@ -30050,6 +30050,28 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SUPERSEDED: '2026-09-09-1782-the-control-sits-proud'
 // SUPERSEDED: '2026-09-09-1783-the-legend-is-one-tap-away'
 export const OTA_BUILD_ID = '2026-09-09-1784-six-traders-six-voices';
+// golem catch-up 2026-09-09: markerless publish of OTA-1784.
+// OTA-1784 - six traders, six voices. class:roadside held six topics with ONE
+// authored line each, so all 24 roadside traders read from the same six
+// sentences. The pool is now six LANES per topic, not six repeats: lane k of
+// every topic is one temperament, and a stable FNV-1a hash of the persistent
+// npc id picks a person's lane once and forever. Cycling on timesAsked would
+// have walked one trader through six personalities as the player re-asked -
+// the exact instability the ruling forbids. Variety is BETWEEN vendors.
+// Lane 0 of every topic is the shipped line, byte-identical. No new state: the
+// salt is a pure function of an id that already exists. Irma and every other
+// authored person are exempt through usesClassSet, which is the same lookup
+// setFor already used, so anybody authored later exempts themselves.
+// npcGreeting takes an optional npc id too, so two traders at the same rung on
+// the same visit count stop opening with the same sentence. Optional, so every
+// existing call site keeps its exact line; a shift, not a roll.
+// A real defect this pass introduced, caught by OTA-1079's suite on the real
+// ask path: hasUnspokenTalk counted lines.length, so a laned trader's talk glow
+// would never have gone dark. Fixed at the second reader.
+// The gameStore line ratchet is now FULL - four suites assert it, they disagree
+// about the number, the tightest is under 36999, and the store sits at exactly
+// that with zero headroom. check:lines does not see it; only a full surface
+// does. The next pass touching the store has to remove lines first.
 // golem catch-up 2026-09-09: markerless publish of OTA-1783.
 // OTA-1783 - the legend is one tap away, and one tap back. A compact neutral
 // '? glyphs' chip at the end of the combat weapon line opens Lore's glyph
