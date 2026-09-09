@@ -29556,6 +29556,21 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // after the two OTA-1759 found in Inventory, none of which check:gold can see.
 // Gold 373 to 369.
 export const OTA_BUILD_ID = '2026-09-08-1762-one-tab-bar';
+// golem catch-up 2026-09-09: markerless publish of OTA-1762 - five tab rows,
+// fifteen tabs, one bar. Tier 0 step 4. Crafting, Guidance and Vendor agree on
+// the chip byte for byte, so the shape is an extraction; a COMPONENT this time
+// rather than styles, because unlike TRow the interaction converges completely -
+// all fifteen are one TouchableOpacity, one onPress, one Text, with no
+// long-press or checkbox mode anywhere. Vendor's CONTRACTS button shares the row
+// without being a tab and rides a right slot. The selected state did NOT
+// converge across the five, so a choice was made rather than extracted; owner:
+// "Go for uniformity for related items." Sampled from the real bundle, the
+// selected chip is eight levels lighter than before and the resting chips are
+// unmoved - measurable and not perceptible, which the owner confirmed by not
+// being able to tell the two shots apart. Six neighbouring pins failed, all of
+// them pinning a spelling rather than a claim, and two of those were my own from
+// OTA-1759 - one pinning an import list, one pinning the gold ratchet's current
+// value from a suite about rows. Gold 373 to 369.
 // golem catch-up 2026-09-08: markerless publish of OTA-1761 - the one that was
 // not broken. Reverts OTA-1760's change to the tips link and leaves the file as
 // it shipped. Both halves of that diagnosis were wrong: the box that looked
