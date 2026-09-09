@@ -29591,6 +29591,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SUPERSEDED: '2026-09-09-1769-the-sheet-is-two-shapes'
 // SUPERSEDED: '2026-09-09-1770-character-is-the-proof'
 // SUPERSEDED: '2026-09-09-1771-the-sweep-takes-four'
+// SUPERSEDED: '2026-09-09-1772-the-stamp-cannot-touch-the-name'
 // OTA-1770 - CharacterScreen, the proof. The rollout's step 2, and the first
 // screen to adopt Tier 0. Chosen because it had the worst gold density in the
 // game (36 declarations) and no tabs or modals of its own to confound the result.
@@ -29801,7 +29802,34 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // The sub-row carried the identical defect and was fixed in the same pass, found
 // by reading rather than by waiting for someone to hit it: a long weapon name
 // would weld itself to the HP readout on the same terms.
-export const OTA_BUILD_ID = '2026-09-09-1772-the-stamp-cannot-touch-the-name';
+// OTA-1773 - the frame gets a name. The owner ruling that closes HOLD-2.
+// OTA-1769 measured the conversation overlay's frame gold, found it past this
+// project's own palette ceiling, and REFUSED to adopt it - leaving the colour
+// local to two files with its pixels untouched and the question in the owner's
+// queue. The ruling landed APPROVED, and it named what has to survive: the outer
+// frame is deliberately louder and brighter than the gold hierarchy INSIDE the
+// conversation sheet, it must not be normalised to the brand gold, and it is to
+// be implemented through the named palette mechanism rather than as an
+// ungoverned exception.
+// THREE THINGS THAT ARE EASY TO CONFUSE AND ARE NOT THE SAME: a LITERAL (two
+// files each carrying the hex, which is what shipped); an UNGOVERNED EXCEPTION
+// (loosening the chroma ceiling so it slips past on arithmetic); and a NAMED
+// EXEMPTION (T.goldFrame, listed by name in the gate beside the brand gold, with
+// the ceiling untouched at 60). All three paint the same pixels. Only the third
+// is what was asked for, and that difference is the whole content of this pass -
+// raising the ceiling would admit every future bright hue unremarked.
+// So the palette gains T.goldFrame and the kit gains sheetPanel, the piece
+// OTA-1769 deliberately withheld. TalkSheet and BOTH of WhisperTalkSheet's call
+// sites adopt it and neither keeps a private copy. Not one pixel moves: the
+// value is byte-for-byte what both files already drew.
+// Three older suites had pins reading the panel out of the old file and went red
+// on a pass that moved nothing - ota1769, ota1742 and ota1095. Re-aimed to the
+// claim rather than the mechanism, which is the same lesson ota1095 already
+// learned once when TSheet took its scrim. The history of the hold is KEPT in
+// the kit rather than tidied away: a reader who sees only the finished exemption
+// learns "bright golds are fine here", where a reader who sees that the previous
+// pass refused it and escalated learns the actual rule.
+export const OTA_BUILD_ID = '2026-09-09-1773-the-frame-gets-a-name';
 // golem catch-up 2026-09-09: markerless publish of OTA-1771 - the modal sweep,
 // batch 1. OTA-1765's census named eight files still hand-copying the Family A
 // shell; ClimbModal, TorchProbeModal, SearchModal and CraftRefusalModal adopt

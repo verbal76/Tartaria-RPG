@@ -151,7 +151,7 @@ export function TalkSheet() {
         onRequestClose={() => setCollapsed(true)}
       >
         <View style={kit.sheetScrim}>
-          <View style={styles.sheet}>
+          <View style={kit.sheetPanel}>
             <View style={kit.sheetHeader}>
               <View style={styles.headerText}>
                 <Text style={styles.kicker}>CONVERSATION</Text>
@@ -272,26 +272,19 @@ export function TalkSheet() {
 // House tokens only — the same parchment-on-soot palette the DiceRoller and the
 // old bottom sheet used, so the tall view reads as the same game, just bigger.
 const styles = StyleSheet.create({
-  /* ⚠⚠ OTA-1769 — STAYS LOCAL, PENDING AN OWNER RULING. The scrim and the header
-   * moved to the kit; this did not. The `#f0c96a` frame is warm-ordered but its
-   * chroma is 134, and the kit's palette rule caps chroma at 60 with the brand
-   * gold exempt BY NAME — so admitting this colour means naming a second
-   * semantic authority, which is a decision rather than a refactor. The pixels
-   * are untouched; see the TSheet note in `tartariaKit.tsx`.
+  /* ⚠⚠ OTA-1773 — THE HOLD IS RESOLVED AND THE PANEL MOVED TO THE KIT.
+   * OTA-1769 left this style here deliberately: its frame gold is warm-ordered
+   * but its chroma is 134, and the kit's palette rule caps chroma at 60 with the
+   * brand gold exempt BY NAME, so admitting it meant naming a second authority —
+   * a ruling rather than a refactor. The owner ruled APPROVED, so the frame is
+   * `T.goldFrame` and the panel is `kit.sheetPanel`. Not a pixel moved.
+   * The reason the colour exists is the thing the ruling preserved: it is
+   * brighter than every gold INSIDE the sheet (the kicker gold, the topic-row
+   * gold), and 2px so it survives a mid-range phone's rounding. The frame is
+   * deliberately the loudest edge on screen, and normalising it to the brand
+   * gold would flatten the hierarchy rather than tidy it.
    * Was 88% welded to the bottom. Slightly shorter now that it floats, so the
-   * gutter is visible top AND bottom — the border has to be seen to work.
-   * Brighter than any gold inside the sheet (#c9a86a kicker, #6b5c3a topic
-   * rows), and 2px so it survives a mid-range phone's rounding. The frame is
-   * deliberately the loudest edge on screen. */
-  sheet: {
-    height: '92%',
-    backgroundColor: '#13110f',
-    borderColor: '#f0c96a',
-    borderWidth: 2,
-    borderRadius: 14,
-    padding: 14,
-    gap: 8,
-  },
+   * gutter is visible top AND bottom — the border has to be seen to work. */
   // OTA-1096 — the sheet is INSET from every edge rather than welded to the
   // bottom of the screen. Owner: "let's shrink the width of the talk screen so
   // it doesn't touch the edges of the screen and let's put the outside edge

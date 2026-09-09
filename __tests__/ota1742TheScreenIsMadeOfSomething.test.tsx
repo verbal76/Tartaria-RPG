@@ -212,7 +212,29 @@ describe('OTA-1742 — the player owns the hue, and the kit respects it', () => 
     const code = KIT.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
     const hexes = [...code.matchAll(/#([0-9A-Fa-f]{6})\b/g)].map((m) => m[1]!.toUpperCase());
     expect(hexes.length).toBeGreaterThan(0);
-    const BRAND = new Set(['C9A86A', '8E7548', 'E07A5F', '5A2A26']); // gold, dim gold, rust, rust rim
+    /* ⚠⚠⚠ EXEMPT BY NAME, WHICH IS THE WHOLE POINT OF THE MECHANISM. The rule
+     * is not "warm colours are fine" — it is "one short list of colours the
+     * owner has ruled on, and everything else obeys the arithmetic." A hex only
+     * lands here after a decision, and the decision is written next to it.
+     *
+     * ⚠⚠ F0C96A JOINED ON OTA-1773, BY OWNER RULING, AFTER OTA-1769 REFUSED IT.
+     * That order matters more than the outcome: the frame gold's chroma is 134
+     * against a ceiling of 60, so the pass that found it could have quietly
+     * added it here and nobody would have noticed. It did not — it held the
+     * question and left the colour local. The ruling: *"the outer frame is
+     * deliberately visually louder/brighter than the gold hierarchy inside the
+     * conversation sheet ... do not normalize it to standard T.gold and destroy
+     * that hierarchy ... implement this through the named semantic/palette
+     * mechanism rather than creating an ungoverned exception."*
+     * A fifth name is therefore the CORRECT resolution and an ungoverned literal
+     * would not have been, even though both would paint the same pixels. */
+    const BRAND = new Set([
+      'C9A86A', // the brand gold
+      '8E7548', // dim gold
+      'E07A5F', // rust
+      '5A2A26', // rust rim
+      'F0C96A', // OTA-1773 — the conversation frame; louder than the brand gold BY DESIGN
+    ]);
     for (const h of hexes) {
       if (BRAND.has(h)) continue;
       const r = parseInt(h.slice(0, 2), 16);

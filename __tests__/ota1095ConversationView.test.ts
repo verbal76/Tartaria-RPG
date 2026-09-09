@@ -204,10 +204,20 @@ describe('OTA-1095 — source locks on the view that fixes the report', () => {
   });
 
   it('it is a tall overlay, not a bottom strip fighting the feed for room', () => {
+    /* ⚠⚠ OTA-1773 MOVED THE PANEL UP A LEVEL AND THE PIN FOLLOWED THE CLAIM —
+     * the SECOND time this file has learned it, after OTA-1769 did the same to
+     * the scrim in the test below. The frame's brighter gold was HELD for an
+     * owner ruling; the ruling landed APPROVED, so the panel became the kit's
+     * `sheetPanel` and this file stopped declaring the height at all. Reading
+     * `92%` out of this file went red on a pass that moved no pixel.
+     * The claim is "the overlay is tall", and it is two facts now: the kit's
+     * panel carries the height, and this file uses that panel. Both asserted, so
+     * neither half can go missing. */
     expect(view).toContain('<Modal');
     // OTA-1096 — 88% welded to the bottom → 92% floating inside a gutter. The
     // number moved; the invariant (the exchange gets most of the screen) did not.
-    expect(view).toMatch(/height: '92%'/);
+    expect(src('app/ui/tartariaKit.tsx')).toMatch(/sheetPanel: \{[\s\S]*?height: '92%',/);
+    expect(view).toContain('style={kit.sheetPanel}');
   });
 
   // OTA-1096 — owner: "shrink the width of the talk screen so it doesn't touch
@@ -223,18 +233,24 @@ describe('OTA-1095 — source locks on the view that fixes the report', () => {
      * from every edge" — is now two facts: the kit's scrim carries the insets,
      * and this file uses that scrim. Both asserted, so neither half can go
      * missing.
-     * ⚠ The FRAME is still local and still read from here, deliberately: its
-     * `#f0c96a` is held out of the kit pending an owner ruling on the palette
-     * rule, so this file remains its home and its authority. */
+     * ⚠⚠ AND ON OTA-1773 THE FRAME FOLLOWED IT, once the owner ruled. The old
+     * note here read "the FRAME is still local ... this file remains its home
+     * and its authority" — true while the colour was held, stale the moment the
+     * ruling landed. The frame gold is `T.goldFrame` now, exempt BY NAME in the
+     * palette gate, and the geometry lives in `kit.sheetPanel`. So BOTH halves
+     * of this test read the kit and check that this file uses it. */
     const kit = src('app/ui/tartariaKit.tsx');
     expect(kit).toMatch(/sheetScrim: \{[\s\S]*?paddingHorizontal: 14,[\s\S]*?paddingVertical: 22,/);
     expect(view).toContain('style={kit.sheetScrim}');
     // A full radius (not just the two top corners a bottom-welded sheet had).
-    expect(view).toMatch(/borderRadius: 14,/);
-    expect(view).toMatch(/borderWidth: 2,/);
+    expect(kit).toMatch(/sheetPanel: \{[\s\S]*?borderRadius: 14,/);
+    expect(kit).toMatch(/sheetPanel: \{[\s\S]*?borderWidth: 2,/);
     // The frame must be BRIGHTER than any gold used inside the sheet, or it
-    // stops being the thing your eye finds first.
-    expect(view).toMatch(/borderColor: '#f0c96a'/);
+    // stops being the thing your eye finds first. Named rather than literal now,
+    // so the assertion follows the name to whatever value the owner rules for.
+    expect(kit).toMatch(/sheetPanel: \{[\s\S]*?borderColor: T\.goldFrame,/);
+    expect(kit).toMatch(/goldFrame: '#F0C96A'/);
+    expect(view).toContain('style={kit.sheetPanel}');
     expect(view).not.toMatch(/borderTopLeftRadius/);
   });
 

@@ -75,6 +75,28 @@ export const T = {
   /** The brand gold. The one chromatic note; unchanged since the game began. */
   gold: '#C9A86A',
   goldDim: '#8E7548',
+  /** ⚠⚠⚠ THE CONVERSATION FRAME. Brighter than the brand gold, ON PURPOSE, and
+   *  named here under an owner ruling rather than smuggled in as a literal.
+   *
+   *  OTA-1769 measured it and REFUSED to adopt it: warm-ordered, but chroma 134
+   *  against this file's own ceiling of 60, where the brand gold's 95 passes
+   *  only by being exempt BY NAME. Admitting a second bright gold is a decision
+   *  about semantic authorities, not a refactor, so the frame stayed local in
+   *  two files and the question went to the owner. OTA-1773 is the answer:
+   *  APPROVED, with the reason to preserve stated in as many words —
+   *      *"the outer frame is deliberately visually louder/brighter than the
+   *      gold hierarchy inside the conversation sheet"*
+   *  which is the same thing the colour was asked for in the first place
+   *  (OTA-1096: *"put the outside edge detail a brighter gold color so it pops
+   *  and you understand a border is there"*).
+   *
+   *  ⚠ SO IT IS A HIERARCHY, NOT A SHADE, and that is what must survive. It is
+   *  the OUTER edge of a conversation overlay and nothing else. Normalising it
+   *  to `gold` would not be a small colour change — it would flatten the frame
+   *  into the golds it is supposed to sit above. `T.gold` remains the interface
+   *  accent; this is louder than the accent by design, which is exactly why it
+   *  needed naming instead of an ungoverned exception. */
+  goldFrame: '#F0C96A',
   /** Ink. */
   ink: '#E6D8B3',
   inkDim: '#A2977B',
@@ -1051,24 +1073,52 @@ const kit = StyleSheet.create({
    * reachable through `tartariaKitStyles`, and Tier 0's last primitive adds ZERO
    * exports and moves no ceiling.
    *
-   * ⚠⚠⚠ AND THE OVERLAY'S PANEL IS DELIBERATELY *NOT* HERE — HELD FOR AN OWNER
-   * RULING RATHER THAN SMUGGLED IN. The conversation frame is a brighter gold
-   * than the brand gold, and this file's OWN palette rule refuses it: a hex must
-   * be warm-ordered or near-neutral AND under a hard chroma ceiling of 60. The
-   * frame is warm-ordered but its chroma is 134. The brand gold is 95 and only
-   * passes because it is exempt BY NAME, so admitting the frame means adding a
-   * second name to that list — which is a ruling about what counts as a semantic
-   * authority, not a refactor.
-   * The colour has a real argument behind it (`TalkSheet`: "brighter than any
-   * gold inside the sheet ... the frame is deliberately the loudest edge on
-   * screen"), and the owner's amendment does reserve semantic colour. But it is
-   * emphasis rather than HP, danger, rarity or faction identity, so it is not
-   * obviously covered. That is a decision, and OTA-1759 already set the
-   * precedent for this exact situation: two off-brand golds were REFUSED rather
-   * than exempted quietly.
-   * So the scrim and the header — which carry no contested colour — are
-   * extracted and adopted, and the framed panel stays local to its two files
-   * with its pixels untouched until the ruling lands. */
+   * ⚠⚠⚠ AND THE OVERLAY'S PANEL WAS HELD FOR AN OWNER RULING RATHER THAN
+   * SMUGGLED IN — OTA-1769. The history is kept because the process is the point:
+   * the conversation frame is a brighter gold than the brand gold, and this
+   * file's OWN palette rule refused it (warm-ordered or near-neutral AND under a
+   * hard chroma ceiling of 60; the frame is warm-ordered but its chroma is 134,
+   * where the brand gold's 95 passes only by being exempt BY NAME). Admitting it
+   * meant adding a second name to that list, which is a ruling about what counts
+   * as a semantic authority rather than a refactor — and OTA-1759 had already set
+   * the precedent by REFUSING two off-brand golds instead of exempting them
+   * quietly. So the scrim and the header were extracted and the framed panel
+   * stayed local, pixels untouched, until the owner ruled.
+   *
+   * ⚠⚠ THE RULING LANDED — OTA-1773, APPROVED, and it names what has to survive:
+   *     *"the outer frame is deliberately visually louder/brighter than the gold
+   *     hierarchy inside the conversation sheet"* … *"do not normalize it to
+   *     standard T.gold and destroy that hierarchy"* … *"implement this through
+   *     the named semantic/palette mechanism rather than creating an ungoverned
+   *     exception."*
+   * So the colour is `T.goldFrame` — named in the palette, exempt BY NAME in the
+   * gate exactly like the brand gold, and the panel comes in here. Not one pixel
+   * moves: the value below is byte-for-byte what both files already drew. What
+   * changed is that a second bright gold now has an address and a reason instead
+   * of being two literals nobody could account for.
+   *
+   * ⚠⚠ AND THE RULING IS NARROWER THAN THE HEX, WHICH THIS PASS FOUND THE HARD
+   * WAY — its own test asserted the two files no longer contain the value at all
+   * and went red, correctly. `WhisperTalkSheet` paints the SAME value a second
+   * time as the FILLED background of its deciding bar, beside a third gold
+   * brighter still. That is INSIDE the sheet and it is a fill rather than a rim,
+   * so the ruling — which is about the OUTER FRAME — does not reach it.
+   * Repointing it at `goldFrame` would be inventing an authority nobody granted,
+   * so it stays a local literal and stays on the queue. Pinned in ota1773's
+   * suite, so the next pass reads it rather than rediscovering it. */
+  /** The conversation overlay's framed panel. Byte-identical in `TalkSheet` and
+   *  in both of `WhisperTalkSheet`'s call sites. The frame is `T.goldFrame` and
+   *  must stay LOUDER than every gold inside the sheet — that hierarchy is the
+   *  reason the colour exists (OTA-1096, ruled again in OTA-1773). */
+  sheetPanel: {
+    height: '92%',
+    backgroundColor: '#13110f',
+    borderColor: T.goldFrame,
+    borderWidth: 2,
+    borderRadius: 14,
+    padding: 14,
+    gap: 8,
+  },
   sheetCard: {
     backgroundColor: '#13110f',
     borderColor: '#3a342c',

@@ -134,37 +134,67 @@ describe('all five sheets adopted, and nothing kept a private copy', () => {
   });
 });
 
-// ═══ 3. THE HELD PIECE ═══════════════════════════════════════════════════════
-describe('⚠⚠⚠ the contested frame is HELD, not smuggled and not deleted', () => {
-  test('the kit does NOT carry the brighter gold', () => {
-    /* The kit's own palette rule caps chroma at 60 with the brand gold exempt by
-     * name. This colour is 134. Admitting it is a ruling about semantic
-     * authorities; OTA-1759 refused two off-brand golds in exactly this spot. */
-    expect(codeOf(KIT)).not.toContain('#f0c96a');
-    expect(codeOf(KIT)).not.toContain('sheetPanel');
-  });
+// ═══ 3. THE PIECE THAT WAS HELD — AND THE RULING THAT RELEASED IT ════════════
+describe('⚠⚠⚠ the contested frame was held, then ruled on — never smuggled', () => {
+  /* ⚠⚠⚠ RE-AIMED ON OTA-1773, AND THE HISTORY IS THE VALUABLE PART.
+   * This block used to assert the kit did NOT carry the brighter gold. That was
+   * correct on OTA-1769 and is wrong now: the owner ruled APPROVED and the frame
+   * moved into the kit as `T.goldFrame` / `kit.sheetPanel`.
+   * ⚠ The tests are re-aimed rather than deleted, because what this suite is
+   * really defending is not "the kit lacks a colour" — it is "a contested colour
+   * gets a decision before it gets an address." That claim outlives the hold,
+   * and it is the claim below. */
 
-  test('⚠⚠ and the shipped pixels are UNCHANGED — a hold is not a rollback', () => {
-    /* The whole point of holding rather than guessing: the player sees exactly
-     * what they saw before, in both files, until the owner rules. */
+  test('the frame is NAMED in the palette, not a literal in two files', () => {
+    /* The ruling's own words: *"implement this through the named
+     * semantic/palette mechanism rather than creating an ungoverned
+     * exception."* So the test is that the value has an address — and that the
+     * two files no longer each carry their own copy of it. */
+    expect(codeOf(KIT)).toContain('goldFrame');
+    expect(codeOf(KIT)).toContain('sheetPanel');
     for (const n of OVERLAY) {
-      const code = codeOf(sheet(n));
-      expect([n, code.includes("borderColor: '#f0c96a'")]).toEqual([n, true]);
-      expect([n, code.includes('borderWidth: 2')]).toEqual([n, true]);
-      expect([n, code.includes("height: '92%'")]).toEqual([n, true]);
-      expect([n, code.includes('borderRadius: 14')]).toEqual([n, true]);
-      expect([n, code.includes('style={styles.sheet}')]).toEqual([n, true]);
+      expect([n, codeOf(sheet(n)).includes("borderColor: '#f0c96a'")]).toEqual([n, false]);
+      expect([n, codeOf(sheet(n)).includes('style={kit.sheetPanel}')]).toEqual([n, true]);
     }
   });
 
-  test('⚠ the hold is WRITTEN DOWN at both ends, or the next reader re-decides it', () => {
-    /* ⚠ Matched on a fragment that cannot wrap. The first draft asserted
-     * "HELD FOR AN OWNER RULING" and the comment breaks the line between OWNER
-     * and RULING — a test that fails on where the prose wraps is grading the
-     * formatter, which is a smaller cousin of grading the prose. */
-    expect(KIT).toContain('HELD FOR AN OWNER');
+  test('⚠⚠ and the shipped pixels are UNCHANGED — resolving a hold is not a restyle', () => {
+    /* The same guarantee the hold itself gave: the player sees exactly what they
+     * saw before. Read off the kit now rather than off the two files, because
+     * that is where the values live — but they are the same values. */
+    const { StyleSheet } = require('react-native');
+    expect(StyleSheet.flatten(kit.sheetPanel)).toEqual({
+      height: '92%',
+      backgroundColor: '#13110f',
+      borderColor: '#F0C96A',
+      borderWidth: 2,
+      borderRadius: 14,
+      padding: 14,
+      gap: 8,
+    });
+  });
+
+  test('⚠⚠⚠ the exemption is BY NAME in the gate — an exception with a reason on it', () => {
+    /* The difference between an exemption and a hole. The palette rule caps
+     * chroma at 60; this colour is 134 and only passes because it is listed.
+     * A pass that instead loosened the ceiling would let every future bright hue
+     * through unremarked, which is the failure mode the list exists to prevent. */
+    const gate = read('__tests__', 'ota1742TheScreenIsMadeOfSomething.test.tsx');
+    expect(gate).toContain("'F0C96A'");
+    expect(gate).toContain('OTA-1773');
+    // the ceiling itself did NOT move
+    expect(gate).toContain('toBeLessThanOrEqual(60)');
+  });
+
+  test('⚠ the decision is written down at both ends, or the next reader re-decides it', () => {
+    /* ⚠ Matched on fragments that cannot wrap. An earlier draft asserted a whole
+     * phrase and broke when the comment wrapped between two of its words — a
+     * test that fails on where prose wraps is grading the formatter, which is
+     * the smaller cousin of grading the prose. */
+    expect(KIT).toContain('HELD FOR AN OWNER');   // the history, kept
+    expect(KIT).toContain('OTA-1773');            // the ruling that released it
     expect(KIT).toContain('chroma');
-    for (const n of OVERLAY) expect([n, sheet(n).includes('PENDING AN OWNER RULING')]).toEqual([n, true]);
+    for (const n of OVERLAY) expect([n, sheet(n).includes('OTA-1773')]).toEqual([n, true]);
   });
 
   test('⚠ the frame is still brighter than the golds inside the sheet', () => {
