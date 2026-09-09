@@ -44,6 +44,7 @@ import { Modal, View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'rea
 import { useGameStore } from '../state/gameStore';
 import { findChain, pronounForms, whisperRouteTarget } from '../engine/whispers';
 import { playerGridCell } from '../state/playerGrid';
+import { tartariaKitStyles as kit } from '../ui/tartariaKit';
 
 export function WhisperTalkSheet() {
   const whispers = useGameStore((s) => s.player?.activeWhispers);
@@ -96,9 +97,9 @@ export function WhisperTalkSheet() {
   if (farewell) {
     return (
       <Modal visible transparent animationType="slide" onRequestClose={() => setFarewell(null)}>
-        <View style={styles.backdrop}>
+        <View style={kit.sheetScrim}>
           <View style={styles.sheet}>
-            <View style={styles.header}>
+            <View style={kit.sheetHeader}>
               <View style={styles.headerText}>
                 <Text style={styles.kicker}>{farewell.kicker}</Text>
                 <Text style={styles.npcName}>{farewell.npcName}</Text>
@@ -207,9 +208,9 @@ export function WhisperTalkSheet() {
         animationType="slide"
         onRequestClose={() => setOpen(false)}
       >
-        <View style={styles.backdrop}>
+        <View style={kit.sheetScrim}>
           <View style={styles.sheet}>
-            <View style={styles.header}>
+            <View style={kit.sheetHeader}>
               <View style={styles.headerText}>
                 <Text style={styles.kicker}>{c.kicker}</Text>
                 <Text style={styles.npcName}>{c.npcName}</Text>
@@ -350,6 +351,26 @@ export function WhisperTalkSheet() {
 // TalkSheet's palette, deliberately: the whisper conversation must read as the
 // same kind of place as a vendor conversation, just with a fire in it.
 const styles = StyleSheet.create({
+  /* ⚠⚠ OTA-1769 — STAYS LOCAL, PENDING AN OWNER RULING. The scrim and the header
+   * moved to the kit; this did not. The `#f0c96a` frame is warm-ordered but its
+   * chroma is 134, and the kit's palette rule caps chroma at 60 with the brand
+   * gold exempt BY NAME — so admitting this colour means naming a second
+   * semantic authority, which is a decision rather than a refactor. The pixels
+   * are untouched; see the TSheet note in `tartariaKit.tsx`.
+   * Was 88% welded to the bottom. Slightly shorter now that it floats, so the
+   * gutter is visible top AND bottom — the border has to be seen to work.
+   * Brighter than any gold inside the sheet (#c9a86a kicker, #6b5c3a topic
+   * rows), and 2px so it survives a mid-range phone's rounding. The frame is
+   * deliberately the loudest edge on screen. */
+  sheet: {
+    height: '92%',
+    backgroundColor: '#13110f',
+    borderColor: '#f0c96a',
+    borderWidth: 2,
+    borderRadius: 14,
+    padding: 14,
+    gap: 8,
+  },
   bar: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -377,23 +398,6 @@ const styles = StyleSheet.create({
   barHint: { color: '#a2977b', fontSize: 11, fontStyle: 'italic' },
   // The hint rides ON the filled plate while deciding, so it needs the dark ink.
   barHintDeciding: { color: '#4a3714', fontSize: 11, fontStyle: 'italic' },
-  backdrop: {
-    flex: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 14,
-    paddingVertical: 22,
-    backgroundColor: 'rgba(0,0,0,0.78)',
-  },
-  sheet: {
-    height: '92%',
-    backgroundColor: '#13110f',
-    borderColor: '#f0c96a',
-    borderWidth: 2,
-    borderRadius: 14,
-    padding: 14,
-    gap: 8,
-  },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   headerText: { flex: 1 },
   kicker: { color: '#c9a86a', fontSize: 10, fontWeight: '700', letterSpacing: 2 },
   npcName: { color: '#cdbf99', fontSize: 18, fontWeight: '700', letterSpacing: 1, marginTop: 2 },

@@ -216,7 +216,19 @@ describe('OTA-1095 — source locks on the view that fixes the report', () => {
   // to the bezel has no readable edge — it reads as the app rather than as a
   // layer over it.
   it('the sheet is INSET from every edge, with a border bright enough to see', () => {
-    expect(view).toMatch(/backdrop: \{[\s\S]*?paddingHorizontal: 14,[\s\S]*?paddingVertical: 22,/);
+    /* ⚠⚠ OTA-1769 MOVED THE INSET UP A LEVEL AND THE PIN FOLLOWED THE CLAIM.
+     * The backdrop was byte-identical across three call sites, so it became the
+     * kit's `sheetScrim`; the pin used to read the literal out of THIS file and
+     * went red on a pass that changed no pixel. The claim — "the sheet is inset
+     * from every edge" — is now two facts: the kit's scrim carries the insets,
+     * and this file uses that scrim. Both asserted, so neither half can go
+     * missing.
+     * ⚠ The FRAME is still local and still read from here, deliberately: its
+     * `#f0c96a` is held out of the kit pending an owner ruling on the palette
+     * rule, so this file remains its home and its authority. */
+    const kit = src('app/ui/tartariaKit.tsx');
+    expect(kit).toMatch(/sheetScrim: \{[\s\S]*?paddingHorizontal: 14,[\s\S]*?paddingVertical: 22,/);
+    expect(view).toContain('style={kit.sheetScrim}');
     // A full radius (not just the two top corners a bottom-welded sheet had).
     expect(view).toMatch(/borderRadius: 14,/);
     expect(view).toMatch(/borderWidth: 2,/);

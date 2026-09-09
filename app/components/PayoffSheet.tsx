@@ -15,6 +15,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { useGameStore } from '../state/gameStore';
+import { tartariaKitStyles as kit } from '../ui/tartariaKit';
 
 export function PayoffSheet() {
   const ctx = useGameStore((s) => s.pendingPayoff);
@@ -24,8 +25,8 @@ export function PayoffSheet() {
   if (!ctx) return null;
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
+    <View style={kit.sheetCard}>
+      <View style={kit.sheetHeader}>
         <Text style={styles.kicker}>CAUGHT</Text>
         <Text style={styles.hint}>your pouch holds {tc} TC</Text>
       </View>
@@ -60,19 +61,6 @@ export function PayoffSheet() {
 // Same skin as the other controls-slot sheets — house tokens only; the fight
 // row borrows the ember accent the dice use for a failed verdict.
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: '#13110f',
-    borderColor: '#3a342c',
-    borderWidth: 1,
-    borderRadius: 6,
-    padding: 14,
-    gap: 8,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
   kicker: {
     color: '#c9a86a',
     fontSize: 10,

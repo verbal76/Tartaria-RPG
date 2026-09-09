@@ -16,6 +16,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { choicesFor, temperamentReadout, temperamentTell } from '../engine/parley';
+import { tartariaKitStyles as kit } from '../ui/tartariaKit';
 
 export function ParleySheet() {
   const ctx = useGameStore((s) => s.pendingParley);
@@ -36,8 +37,8 @@ export function ParleySheet() {
     : 'Lean on them for what they carry — if it fails, they turn on you.';
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
+    <View style={kit.sheetCard}>
+      <View style={kit.sheetHeader}>
         <Text style={styles.kicker}>PARLEY</Text>
         <Text style={styles.hint}>how do you play it?</Text>
       </View>
@@ -101,19 +102,6 @@ export function ParleySheet() {
 // intimidate row borrows the ember accent the dice use for a failed verdict:
 // it marks risk, not decoration.
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: '#13110f',
-    borderColor: '#3a342c',
-    borderWidth: 1,
-    borderRadius: 6,
-    padding: 14,
-    gap: 8,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
   kicker: {
     color: '#c9a86a',
     fontSize: 10,

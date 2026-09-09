@@ -1013,6 +1013,79 @@ const kit = StyleSheet.create({
     borderRadius: 4,
     padding: 14,
   },
+  // ── TSheet ────────────────────────────────────────────────────────────────
+  /* ⚠⚠⚠ TSHEET — AND THE MEASUREMENT FOUND TWO PATTERNS, NOT THE ONE THE PLAN
+   * NAMED. Tier 0's last primitive. The rollout described it as "the
+   * bottom-anchored conversational pattern"; five files carry a sheet and they
+   * split cleanly down the middle into two things that are not variants of each
+   * other:
+   *
+   *   THE INLINE CARD        ParleySheet · PayoffSheet · PickpocketSheet
+   *     A plain `<View>` the parent renders in place. No Modal, no backdrop, no
+   *     visibility prop. `#13110f` on `#3a342c` 1, radius 6, padding 14, gap 8 —
+   *     BYTE-IDENTICAL in all three files.
+   *
+   *   THE CONVERSATION OVERLAY   TalkSheet · WhisperTalkSheet (twice)
+   *     `<Modal transparent>` → a 78%-black backdrop → a 92%-height panel framed
+   *     in `#f0c96a` at 2px. Also byte-identical, across three call sites.
+   *
+   * ⚠ AND THE PLAN'S DESCRIPTION IS OUT OF DATE, WHICH IS WORTH RECORDING RATHER
+   * THAN QUIETLY MATCHING. `TalkSheet`'s own comment: "Was 88% welded to the
+   * bottom. Slightly shorter now that it floats." It is CENTRED, not
+   * bottom-anchored. A primitive built to the plan's words would have re-welded
+   * it to an edge it deliberately left.
+   *
+   * ⚠⚠ NOT `TPanel`, AND THAT WAS CHECKED BEFORE ANY OF THIS WAS WRITTEN. The
+   * obvious move is "the inline card is just a panel" — it is not. `TPanel` is a
+   * three-layer depth construction (outer shadow, a rim with a lit top and a
+   * dark bottom, a face). The sheet card is FLAT: one border, one fill. Adopting
+   * TPanel there would change how those three sheets look, which is a redesign
+   * wearing an extraction's clothes.
+   *
+   * ⚠⚠⚠ STYLES AGAIN, AND THIS TIME IT COSTS NOTHING AT ALL. The presentation is
+   * per-call-site — the overlay's three sites pass different `animationType` and
+   * different `onRequestClose`, and the inline card has no presentation to own —
+   * so what converges is the MATERIAL, exactly as with `TRow` and `TModal`.
+   * Neither shape takes a parameter or a state, so unlike `tRowStyle` and
+   * `tModalCard` there is no helper to export: these are stylesheet entries
+   * reachable through `tartariaKitStyles`, and Tier 0's last primitive adds ZERO
+   * exports and moves no ceiling.
+   *
+   * ⚠⚠⚠ AND THE OVERLAY'S PANEL IS DELIBERATELY *NOT* HERE — HELD FOR AN OWNER
+   * RULING RATHER THAN SMUGGLED IN. The conversation frame is a brighter gold
+   * than the brand gold, and this file's OWN palette rule refuses it: a hex must
+   * be warm-ordered or near-neutral AND under a hard chroma ceiling of 60. The
+   * frame is warm-ordered but its chroma is 134. The brand gold is 95 and only
+   * passes because it is exempt BY NAME, so admitting the frame means adding a
+   * second name to that list — which is a ruling about what counts as a semantic
+   * authority, not a refactor.
+   * The colour has a real argument behind it (`TalkSheet`: "brighter than any
+   * gold inside the sheet ... the frame is deliberately the loudest edge on
+   * screen"), and the owner's amendment does reserve semantic colour. But it is
+   * emphasis rather than HP, danger, rarity or faction identity, so it is not
+   * obviously covered. That is a decision, and OTA-1759 already set the
+   * precedent for this exact situation: two off-brand golds were REFUSED rather
+   * than exempted quietly.
+   * So the scrim and the header — which carry no contested colour — are
+   * extracted and adopted, and the framed panel stays local to its two files
+   * with its pixels untouched until the ruling lands. */
+  sheetCard: {
+    backgroundColor: '#13110f',
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    borderRadius: 6,
+    padding: 14,
+    gap: 8,
+  },
+  sheetScrim: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 22,
+    backgroundColor: 'rgba(0,0,0,0.78)',
+  },
+  /** The header row all five sheets share, byte for byte. */
+  sheetHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   // ── TTabBar ───────────────────────────────────────────────────────────────
   // ⚠ The shipped values. Crafting, Guidance and Vendor agree on the chip byte
   // for byte; the row differs only in bottom margin (10 against Vendor's 8).

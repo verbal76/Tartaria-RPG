@@ -240,7 +240,14 @@ describe('what is left, counted by predicate', () => {
     expect(left).not.toContain('HookContinueModal.tsx');
   });
 
-  test('⚠⚠⚠ the remaining nine are NAMED, so the sweep cannot quietly grow', () => {
+  test('⚠⚠⚠ the remaining EIGHT are NAMED, so the sweep cannot quietly grow', () => {
+    /* ⚠⚠ NINE → EIGHT, AND IT WAS *TSheet* THAT TOOK ONE, NOT THE MODAL SWEEP.
+     * `WhisperTalkSheet` matched this predicate because it declared its own
+     * `backdrop` next to a `#13110f`/`#c9a86a` card. OTA-1769 moved that backdrop
+     * into the kit as `sheetScrim`, so the file no longer declares one and drops
+     * out of the census — correctly, and without the modal sweep touching it.
+     * ⚠ Worth seeing rather than just re-counting: two primitives were measuring
+     * overlapping ground, and the census is the thing that noticed. */
     /* This is the guardrail the consumer list is for `TPanel`: a tenth file
      * appearing here means a new dialog hand-copied the shell instead of
      * importing it, and that shows up as a failing test rather than as another
@@ -255,7 +262,6 @@ describe('what is left, counted by predicate', () => {
       'SearchModal.tsx',
       'TorchProbeModal.tsx',
       'WhisperCompleteModal.tsx',
-      'WhisperTalkSheet.tsx',
     ]);
   });
 

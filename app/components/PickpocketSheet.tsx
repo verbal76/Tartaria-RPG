@@ -16,6 +16,7 @@
 
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { tartariaKitStyles as kit } from '../ui/tartariaKit';
 
 interface Props {
   /** People in the scene with pockets worth trying — vendor and/or wanderer
@@ -31,8 +32,8 @@ interface Props {
 
 export function PickpocketSheet({ marks, onPick, onCancel }: Props) {
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
+    <View style={kit.sheetCard}>
+      <View style={kit.sheetHeader}>
         <Text style={styles.kicker}>PICKPOCKET</Text>
         <Text style={styles.hint}>the roll lands in the feed above</Text>
       </View>
@@ -69,19 +70,6 @@ export function PickpocketSheet({ marks, onPick, onCancel }: Props) {
 
 // Same skin as the DiceRoller/TalkSheet slot-mates — house tokens only.
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: '#13110f',
-    borderColor: '#3a342c',
-    borderWidth: 1,
-    borderRadius: 6,
-    padding: 14,
-    gap: 8,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
   kicker: {
     color: '#c9a86a',
     fontSize: 10,

@@ -29587,6 +29587,29 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SUPERSEDED: '2026-09-09-1765-the-shell-eleven-copied'
 // SUPERSEDED: '2026-09-09-1766-the-glyphs-are-artwork'
 // SUPERSEDED: '2026-09-09-1767-the-button-grows'
+// SUPERSEDED: '2026-09-09-1768-one-barehand-chip'
+// OTA-1769 - TSheet, and the measurement found two shapes where the plan named
+// one. Tier 0's sixth and last primitive. Five files carry a sheet and they
+// split cleanly: three render an INLINE CARD (a plain View the parent renders in
+// place, byte-identical) and two render a CONVERSATION OVERLAY (Modal, 78% black
+// backdrop, tall framed panel, byte-identical across three call sites). They are
+// not variants of each other.
+// The plan called it "the bottom-anchored conversational pattern" and that is
+// stale - TalkSheet's own comment says it was welded to the bottom and now
+// floats centred. A primitive built to those words would have re-welded it.
+// Not TPanel either, checked first: TPanel is a three-layer depth construction
+// and the sheet card is flat, so adopting it would have been a redesign wearing
+// an extraction's clothes.
+// Styles again, and this time free: neither shape takes a parameter or a state,
+// so there is no helper to export. Tier 0's last primitive adds ZERO exports.
+// ONE PIECE IS HELD. The overlay's frame is a gold brighter than the brand gold,
+// and the kit's own palette rule refuses it - chroma 134 against a ceiling of 60,
+// where the brand gold's 95 passes only by being exempt BY NAME. Admitting it
+// means naming a second semantic authority, which is an owner ruling, not a
+// refactor; OTA-1759 set the precedent by refusing two off-brand golds rather
+// than exempting them quietly. So the scrim and the header are extracted and
+// adopted and the framed panel stays local with its pixels untouched. A hold is
+// not a rollback: the player sees exactly what they saw before.
 // OTA-1768 - one bare-hand chip. The second was never a second action.
 // Owner: "kick and punch are both weaponless attacks are both needed? ... can we
 // drop the kick button and just use punch to save space?" Traced before
@@ -29701,7 +29724,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // art/12-damage-icons, tracked in git and outside the assets tree app.json
 // bundles, so the phone still ships one resolution rather than four.
 // Provisional pending actual-device approval.
-export const OTA_BUILD_ID = '2026-09-09-1768-one-barehand-chip';
+export const OTA_BUILD_ID = '2026-09-09-1769-the-sheet-is-two-shapes';
 // golem catch-up 2026-09-09: markerless publish of OTA-1767 - the button grows
 // to hold the glyph, not the other way round. Owner: "do NOT preserve the
 // current combat weapon button height at the expense of icon readability... Do

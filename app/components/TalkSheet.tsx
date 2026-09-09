@@ -48,6 +48,7 @@ import { Modal, View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'rea
 import { useGameStore } from '../state/gameStore';
 import { lockedTeaserLabel } from '../engine/dialogue';
 import { HIDDEN_LOG_CHANNELS } from '../engine/gameLog';
+import { tartariaKitStyles as kit } from '../ui/tartariaKit';
 
 export function TalkSheet() {
   const ctx = useGameStore((s) => s.pendingTalk);
@@ -149,9 +150,9 @@ export function TalkSheet() {
         animationType="slide"
         onRequestClose={() => setCollapsed(true)}
       >
-        <View style={styles.backdrop}>
+        <View style={kit.sheetScrim}>
           <View style={styles.sheet}>
-            <View style={styles.header}>
+            <View style={kit.sheetHeader}>
               <View style={styles.headerText}>
                 <Text style={styles.kicker}>CONVERSATION</Text>
                 <Text style={styles.npcName} numberOfLines={1}>{ctx.npcName}</Text>
@@ -271,6 +272,26 @@ export function TalkSheet() {
 // House tokens only — the same parchment-on-soot palette the DiceRoller and the
 // old bottom sheet used, so the tall view reads as the same game, just bigger.
 const styles = StyleSheet.create({
+  /* ⚠⚠ OTA-1769 — STAYS LOCAL, PENDING AN OWNER RULING. The scrim and the header
+   * moved to the kit; this did not. The `#f0c96a` frame is warm-ordered but its
+   * chroma is 134, and the kit's palette rule caps chroma at 60 with the brand
+   * gold exempt BY NAME — so admitting this colour means naming a second
+   * semantic authority, which is a decision rather than a refactor. The pixels
+   * are untouched; see the TSheet note in `tartariaKit.tsx`.
+   * Was 88% welded to the bottom. Slightly shorter now that it floats, so the
+   * gutter is visible top AND bottom — the border has to be seen to work.
+   * Brighter than any gold inside the sheet (#c9a86a kicker, #6b5c3a topic
+   * rows), and 2px so it survives a mid-range phone's rounding. The frame is
+   * deliberately the loudest edge on screen. */
+  sheet: {
+    height: '92%',
+    backgroundColor: '#13110f',
+    borderColor: '#f0c96a',
+    borderWidth: 2,
+    borderRadius: 14,
+    padding: 14,
+    gap: 8,
+  },
   // OTA-1096 — the sheet is INSET from every edge rather than welded to the
   // bottom of the screen. Owner: "let's shrink the width of the talk screen so
   // it doesn't touch the edges of the screen and let's put the outside edge
@@ -278,27 +299,6 @@ const styles = StyleSheet.create({
   // there." A panel that runs to the bezel has no readable edge — it reads as
   // the app, not as a thing laid over the app. The darkened world showing in
   // the gutter is what tells you the conversation is a layer you can leave.
-  backdrop: {
-    flex: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 14,
-    paddingVertical: 22,
-    backgroundColor: 'rgba(0,0,0,0.78)',
-  },
-  sheet: {
-    // Was 88% welded to the bottom. Slightly shorter now that it floats, so the
-    // gutter is visible top AND bottom — the border has to be seen to work.
-    height: '92%',
-    backgroundColor: '#13110f',
-    // Brighter than any gold inside the sheet (#c9a86a kicker, #6b5c3a topic
-    // rows), and 2px so it survives a mid-range phone's rounding. The frame is
-    // deliberately the loudest edge on screen.
-    borderColor: '#f0c96a',
-    borderWidth: 2,
-    borderRadius: 14,
-    padding: 14,
-    gap: 8,
-  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
