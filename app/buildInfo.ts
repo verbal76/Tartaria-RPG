@@ -30054,6 +30054,26 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SUPERSEDED: '2026-09-09-1786-the-name-column-fits-its-vocabulary'
 // SUPERSEDED: '2026-09-09-1787-the-row-reads-its-own-hierarchy'
 export const OTA_BUILD_ID = '2026-09-09-1788-the-utility-marks-are-ours';
+// golem catch-up 2026-09-09: markerless publish of OTA-1788.
+// OTA-1788 - the utility marks are ours. First pass off the combat reference
+// pack. Two files SELECTED from the owner's own icon library and renamed
+// semantically (salvage L569 tool_09, glyph key L119 document_07) - the pack's
+// asset policy overruled my reported plan to draw them in Views.
+// The characters they replace had a real defect: U+2692 has an emoji
+// presentation variant, exactly the case OTA-1748 documented for the gear, so
+// on some Android fallback chains it rendered as a colour sticker and ignored
+// the style's colour. A defect fix, not a restyle.
+// utilityGlyphArt is a SECOND one-require authority: a damage glyph answers
+// what kind of harm, a utility glyph answers what a control does, and a test
+// asserts neither table reaches into the other's asset directory. Sized below
+// the 28dp damage glyph on purpose - row 18 inside the cell the character held,
+// chip 16 so it fits a 12pt line box and grows no chip.
+// The up/down comparison marks are UNTOUCHED by instruction and the gap is
+// pinned, so a later pass cannot quietly invent one. Found in the trace: the
+// crossed-tools character also means REPAIR in crafting, so the two verbs are
+// now visually distinct for the first time.
+// Five picker suites taught to see artwork - their text walker collected only
+// strings, so a marked row read as unmarked.
 // golem catch-up 2026-09-09: markerless publish of OTA-1787.
 // OTA-1787 - the combat row reads its own hierarchy. Two device findings, one
 // subject. PUNCH read as a peer filled weapon beside the illustrated controls,
