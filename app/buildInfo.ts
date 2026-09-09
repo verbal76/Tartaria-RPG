@@ -29778,6 +29778,26 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // player sees, so it is a layout decision rather than a material extraction. Its
 // pixels are untouched and the reason is written into the file. HOLD 4.
 export const OTA_BUILD_ID = '2026-09-09-1771-the-sweep-takes-four';
+// golem catch-up 2026-09-09: markerless publish of OTA-1771 - the modal sweep,
+// batch 1. OTA-1765's census named eight files still hand-copying the Family A
+// shell; ClimbModal, TorchProbeModal, SearchModal and CraftRefusalModal adopt
+// the kit's modalScrim and tModalCard here, and the census falls to four. Three
+// take 380 and CraftRefusalModal keeps its 400, which is why the width is a
+// parameter. Four rim golds go with them and the ratchet falls 331 to 327.
+// The piece that makes the adoption safe is one line per file: the kit's card
+// caps at 85% so the scrim stays tappable (OTA-1614), and an RN view does not
+// shrink unless told to, so every adopter's scrolling middle gains flexShrink 1
+// and flexGrow 0. Without it the button row is what leaves the screen - the
+// lesson HookContinueModal paid for on its own adoption.
+// One thing changes for the player and it is the direction OTA-1614 ruled for:
+// SearchModal sits under a KeyboardAvoidingView and, with the keyboard up, used
+// to overflow and take INVESTIGATE and CANCEL off the bottom. Now the chip list
+// yields and the buttons stay.
+// ApproachModal is held rather than forced: it has no vertical scroll at all,
+// so a ceiling would have nothing to give way and would clip the button row.
+// Its pixels are untouched. KeyboardSafeCard is recorded as a genuine second
+// shell - darker scrim, and a height ceiling measured from the real keyboard
+// edge rather than a percentage of a screen that does not know it is there.
 // golem catch-up 2026-09-09: markerless publish of OTA-1770 - CharacterScreen,
 // the proof. The rollout's step 2 and the first screen on Tier 0. The
 // hand-rolled header becomes TScreenHeader and moves no pixel: its header,
