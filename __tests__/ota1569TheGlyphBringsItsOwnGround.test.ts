@@ -129,10 +129,26 @@ describe('OTA-1569 — the wiring', () => {
     expect(INPUT).toContain('textShadowOffset: { width: 0, height: 0 },');
   });
 
-  it('⚠⚠ the cell is padded, so it reads as an inlay and not as clipping', () => {
-    // Inline Text takes no padding in React Native; hair spaces are the only way
-    // to give the cell breathing room.
-    expect(INPUT).toContain('\\u200a${g.ch}\\u200a');
+  it('⚠⚠ a mark is never clamped to its own exact box — by a margin now, by hair spaces before', () => {
+    /* ⚠⚠⚠ OTA-1766 MOVED THE MECHANISM AND KEPT THE CLAIM, WHICH IS THE ONLY
+     * HONEST WAY TO UPDATE A PIN. The combat label stopped being one inline
+     * `<Text>` and became a `<View>` row of measured boxes, on the owner's
+     * instruction: *"handle the combat image layout appropriately rather than
+     * trying to force the images into the old inline text-glyph
+     * construction."* */
+    /* ⚠ THE CLAIM — "a mark clamped to the glyph's exact box reads as a clipping
+     * artifact rather than a deliberate inlay" — is unchanged. HAIR SPACES were
+     * the only way to say that inside a text flow, because an inline `Text` in
+     * React Native takes no padding. A box in a row takes a margin, so the
+     * artwork gets its breathing room as a layout property.
+     * ⚠⚠ THE HAIR SPACES SURVIVE ON THE FALLBACK, AND THAT IS NOT AN OVERSIGHT:
+     * `degradation` and `stun` have no artwork, so they still paint a CHARACTER,
+     * still inline, still with no box of its own. The workaround is kept exactly
+     * where the problem it solves still exists. */
+    expect(INPUT).toContain('quickGlyphArt: { width: GLYPH_ART_SIZE.combat');
+    expect(INPUT).toContain('marginRight: 3');
+    // the fallback character keeps its padding, because it is still inline text
+    expect(INPUT).toContain('\\u200a${ch}\\u200a');
   });
 
   it('⚠⚠⚠ THE BREADCRUMB IS STILL UNTOUCHED — the padding never reaches `label`', () => {

@@ -29584,6 +29584,38 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Provisional pending actual-device approval; nothing is selected or replaced.
 // SUPERSEDED: '2026-09-09-1763-icons-on-trial'
 // SUPERSEDED: '2026-09-09-1764-storm-and-shut-drawers'
+// SUPERSEDED: '2026-09-09-1765-the-shell-eleven-copied'
+// OTA-1766 - the illustrated glyphs are the glyphs now. The trial is over.
+// Owner: "The new combat glyph pack is approved. Go ahead and move from the test
+// to the actual implementation." Into three surfaces: Lore > Glyphs, the weapon
+// damage/coating icons in combat, and the discovered-weakness star.
+// The trial's open question was closed by the pack itself. OTA-1763 deliberately
+// refused to bind artwork to the game's damage vocabulary, because ruling that
+// "rupture" means slashing is a semantic decision about the game's language and
+// making it inside an art table would smuggle a design decision in under a
+// display experiment. The approved pack ships files named bludgeoning, slashing,
+// piercing, aetheric, radiation, burn, cold, poison, acid, corruption and
+// electrical - every one a key that already exists in weaponGlyphs. There was no
+// mapping left to invent, so app/engine/combatGlyphArt.ts is keyed by canonical
+// damage type and both surfaces read it. Burn, cold, poison and electrical are
+// one image whether they appear as base damage or a coat, which falls out of
+// keying by type rather than by role.
+// Combat is NOT a copy of Lore, which is the measurement OTA-1763 was asked to
+// make first. The weapon label stopped being one inline Text and became a row of
+// measured boxes - and OTA-1569's hair spaces and OTA-1638's em space went with
+// it, because both existed only to fake a box inside a text flow. The black
+// #0d0b09 cell is gone from every mark a player can see; it survives only on the
+// character fallback for degradation and stun, the two types the pack does not
+// draw and no catalog weapon deals. The discovery star is artwork now, still
+// last, still all the way to the right. No gameplay, damage, weakness, coat or
+// discovery logic moved: weaponGlyphs.ts is untouched.
+// Sizes are PROVISIONAL pending an actual-device look - Lore 28dp (the cell the
+// character held), combat 18dp (the chip's existing content box; 28 would add
+// about 12dp to every weapon button). Both live in GLYPH_ART_SIZE.
+// The trial is retired: assets/damage and app/engine/damageIcons.ts are deleted
+// and the trial block is out of Lore. The commissioned thunderstorm masters are
+// KEPT in art/12-damage-icons - they are the only copy, and a quiet folder is
+// easy to mistake for a dead one.
 // OTA-1765 - TModal, the shell eleven dialogs hand-copied.
 // Tier 0 step 5. Thirty-three modal files, and the ones that look like the
 // game's dialogs all draw the same material: a scrim at rgba(0,0,0,0.7) and a
@@ -29632,7 +29664,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // art/12-damage-icons, tracked in git and outside the assets tree app.json
 // bundles, so the phone still ships one resolution rather than four.
 // Provisional pending actual-device approval.
-export const OTA_BUILD_ID = '2026-09-09-1765-the-shell-eleven-copied';
+export const OTA_BUILD_ID = '2026-09-09-1766-the-glyphs-are-artwork';
 // golem catch-up 2026-09-09: markerless publish of OTA-1765 - TModal, the shell
 // eleven dialogs hand-copied. Thirty-three modal files; the ones that look like
 // the game's dialogs all draw the same material, a scrim at rgba(0,0,0,0.7) and

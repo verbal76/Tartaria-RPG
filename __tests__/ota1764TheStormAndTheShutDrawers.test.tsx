@@ -1,6 +1,14 @@
 /**
  * OTA-1764 — A NEW STORM, AND TWO DRAWERS THAT NOW START SHUT.
  *
+ * ⚠⚠⚠ HALF OF THIS PASS WAS SUPERSEDED BY OTA-1766 AND THE SUITE SAYS SO RATHER
+ * THAN BEING QUIETLY DELETED. The icon trial is retired: the owner approved a
+ * pack keyed to the game's OWN damage vocabulary, and `assets/damage/` plus
+ * `app/engine/damageIcons.ts` went with it. What survived is the part that
+ * outlived the experiment — the thunderstorm was COMMISSIONED, its masters are
+ * the only copy, and the second block below is the test that stops a future
+ * cleanup pass mistaking a quiet folder for a dead one.
+ *
  * Two unrelated owner instructions, both small, both arriving together.
  *
  * 1. *"workings to learn and reinforce your gear should start collapsed like the
@@ -24,7 +32,6 @@ const read = (...p: string[]) => readFileSync(join(ROOT, ...p), 'utf8');
 const bin = (...p: string[]) => readFileSync(join(ROOT, ...p));
 const md5 = (b: Buffer) => createHash('md5').update(b).digest('hex');
 const VENDOR = read('app', 'screens', 'VendorScreen.tsx');
-const ICONS = read('app', 'engine', 'damageIcons.ts');
 
 const png = (b: Buffer) => ({ w: b.readUInt32BE(16), h: b.readUInt32BE(20), depth: b[24], colour: b[25] });
 
@@ -72,43 +79,41 @@ describe('the counter opens with every drawer shut', () => {
   });
 });
 
-// ═══ 2. THE STORM ════════════════════════════════════════════════════════════
-describe('Environmental is a thunderstorm now, and L544 is retired', () => {
-  test('⚠⚠ the runtime binary is the new 64x64 RGBA', () => {
-    const b = bin('assets', 'damage', 'environmental.png');
-    const p = png(b);
-    expect([p.w, p.h]).toEqual([64, 64]);
-    expect(p.depth).toBe(8);
-    expect(p.colour).toBe(6);
-    // ⚠ and it is NOT the rejected one. That hash is the suitcase.
-    expect(md5(b)).not.toBe('da0995136be5e25cb2d93abb9df35bf8');
+// ═══ 2. THE STORM, NOW RETIRED ══════════════════════════════════════════════
+/* ⚠⚠⚠ OTA-1766 SUPERSEDED THIS HALF, AND THE ASSERTIONS FOLLOWED THE FACTS
+ * RATHER THAN BEING DELETED WITH THEM.
+ *
+ * OTA-1764 swapped the Environmental icon and its proudest claim was that NO
+ * CODE CHANGED — a correct art table means swapping a picture is swapping a
+ * file. That claim was true and is now moot: the whole trial is retired. The
+ * owner approved a different pack keyed to the game's OWN damage vocabulary,
+ * `assets/damage/` and `app/engine/damageIcons.ts` are deleted, and there is no
+ * "environmental" damage type for the thunderstorm to be.
+ *
+ * ⚠ SO WHAT IS STILL WORTH ASSERTING IS THE PART THAT OUTLIVED THE TRIAL: the
+ * commissioned masters are KEPT, they are still unbundled, and nothing reads
+ * them. Deleting an unused asset is tidy; deleting the only copy of a
+ * commissioned one is destructive, and a quiet folder makes those look alike.
+ * This is the test that stops a future cleanup pass getting it wrong. */
+describe('the thunderstorm masters outlived the trial that commissioned them', () => {
+  test('⚠⚠ the trial itself is GONE — table, runtime assets and trial block', () => {
+    expect(existsSync(join(ROOT, 'app', 'engine', 'damageIcons.ts'))).toBe(false);
+    expect(existsSync(join(ROOT, 'assets', 'damage'))).toBe(false);
+    /* ⚠ GRADE THE CODE, NOT THE PROSE — the seventh time in this rollout, and
+     * predictably: the file's header explains that `damageIcons` went with the
+     * trial, which means it says the word. Strip comments first. */
+    const codeOf = (src: string) =>
+      src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
+    const KEY = codeOf(read('app', 'components', 'WeaponGlyphKey.tsx'));
+    expect(KEY.length).toBeGreaterThan(500);          // the stripper still leaves code
+    expect(KEY).not.toContain('damageIcons');
+    expect(KEY).not.toContain('IconTrial');
+    expect(KEY).not.toContain('TRIAL_SIZES');
   });
 
-  test('⚠⚠⚠ NO CODE CHANGED FOR THE SWAP — that was the point of the test', () => {
-    /* Owner: *"So if the architecture is correct, this should require no UI
-     * behavior change."* The semantic filename did not change, so the art table
-     * did not either. A correct art table means swapping a picture is swapping
-     * a file. */
-    expect(ICONS).toContain("environmental: require('../../assets/damage/environmental.png')");
-    expect(ICONS).not.toContain('L544');
-    expect(ICONS).not.toContain('thunderstorm');
-    // no special-casing crept into the trial block for one icon
-    const KEY = read('app', 'components', 'WeaponGlyphKey.tsx');
-    expect(KEY).not.toContain('environmental');
-  });
-
-  test('⚠ the ten concepts and nine binaries are unchanged', () => {
-    const pngs = readdirSync(join(ROOT, 'assets', 'damage')).filter((f) => f.endsWith('.png'));
-    expect(pngs).toHaveLength(9);
-    expect(pngs).toContain('environmental.png');
-    expect(pngs).not.toContain('environmental_64.png');   // ⚠ masters do not ship
-  });
-
-  test('⚠⚠⚠ the masters are tracked but NOT bundled', () => {
-    /* `app.json` bundles `assets/**` into the app. Four resolutions of one icon
-     * sitting there would ship 750KB to a phone that only ever draws the 64.
-     * They live in the art tree, which git keeps and the bundler never sees. */
-    expect(read('app.json')).toContain('"assets/**/*"');
+  test('⚠⚠⚠ the COMMISSIONED masters are kept — they are the only copy', () => {
+    /* OTA-1764 commissioned this after the owner rejected `L544` for reading as
+     * a suitcase. The four files here are the whole of it. */
     const masters = join(ROOT, 'art', '12-damage-icons');
     expect(existsSync(masters)).toBe(true);
     const files = readdirSync(masters).filter((f) => f.endsWith('.png')).sort();
@@ -119,16 +124,20 @@ describe('Environmental is a thunderstorm now, and L544 is retired', () => {
       const p = png(bin('art', '12-damage-icons', f));
       expect([p.w, p.h]).toEqual([side, side]);
     }
+    // ⚠ and it is still NOT the rejected suitcase, which is why it was commissioned
+    expect(md5(bin('art', '12-damage-icons', 'environmental_64.png')))
+      .not.toBe('da0995136be5e25cb2d93abb9df35bf8');
   });
 
-  test('⚠⚠ the runtime copy IS the 64 master, byte for byte', () => {
-    /* If these ever diverge, one of them is a stale export and there is no way
-     * to tell which by looking. */
-    expect(md5(bin('assets', 'damage', 'environmental.png')))
-      .toBe(md5(bin('art', '12-damage-icons', 'environmental_64.png')));
+  test('⚠ the README says RETIRED, so nobody reads a dead folder as a live one', () => {
+    const art = read('art', '12-damage-icons', 'README.md');
+    expect(art).toContain('RETIRED AT OTA-1766');
+    expect(art).toContain('Not bundled');
+    expect(art).toContain('only copy');
   });
 
-  test('⚠ nothing requires a master, which is the whole reason they are separate', () => {
+  test('⚠ still unbundled, and still required by nothing', () => {
+    expect(read('app.json')).toContain('"assets/**/*"');
     const walk = (dir: string, out: string[] = []): string[] => {
       for (const e of readdirSync(dir, { withFileTypes: true })) {
         const p = join(dir, e.name);
@@ -137,10 +146,9 @@ describe('Environmental is a thunderstorm now, and L544 is retired', () => {
       }
       return out;
     };
-    /* ⚠ `buildInfo.ts` is excluded: it is the stamp ledger, a wall of prose that
-     * NAMES what each pass did, so of course it says "12-damage-icons". Grading
-     * it here would be grading the write-up of the fix instead of the fix — the
-     * same trap five checks in this rollout have already fallen into. */
+    /* ⚠ `buildInfo.ts` excluded: the stamp ledger NAMES what each pass did, so of
+     * course it says "12-damage-icons". Grading it would be grading the write-up
+     * instead of the fix — the trap this rollout has hit repeatedly. */
     const code = walk(join(ROOT, 'app')).filter((f) => !f.endsWith('buildInfo.ts'));
     expect(code.length).toBeGreaterThan(50);
     for (const f of code) {
@@ -148,17 +156,6 @@ describe('Environmental is a thunderstorm now, and L544 is retired', () => {
       expect(src).not.toContain('12-damage-icons');
       expect(src).not.toMatch(/environmental_\d+\.png/);
     }
-  });
-
-  test('the provenance is recorded in both places, and L544 is named as retired', () => {
-    const damage = read('assets', 'damage', 'README.md');
-    expect(damage).toContain('Custom Tartaria Environmental Thunderstorm');
-    expect(damage).toContain('RETIRED');
-    expect(damage).toContain('PROVISIONAL');
-    expect(damage).toContain('64 / 128 / 256 / 512');
-    const art = read('art', '12-damage-icons', 'README.md');
-    expect(art).toContain('Not bundled');
-    expect(art).toContain('PROVISIONAL');
   });
 });
 

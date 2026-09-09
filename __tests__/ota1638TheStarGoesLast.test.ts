@@ -83,14 +83,33 @@ describe('OTA-1638 — the star goes last', () => {
   it('⚠⚠ the painted button paints the star after the base glyph, and the spacer sits outside the cell', () => {
     const BOX = src('app/components/InputBox.tsx');
     expect((BOX.match(/star=\{parts\.star\}/g) ?? []).length).toBe(2);
+    /* ⚠⚠⚠ OTA-1766 MOVED THE MECHANISM AND KEPT THE CLAIM, WHICH IS THE ONLY
+     * HONEST WAY TO UPDATE A PIN. The combat label stopped being one inline
+     * `<Text>` and became a `<View>` row of measured boxes, on the owner's
+     * instruction: *"handle the combat image layout appropriately rather than
+     * trying to force the images into the old inline text-glyph
+     * construction."* */
+    /* ⚠ THE CLAIM — "the star is painted LAST, after the base glyph" — is
+     * unchanged and still asserted. What changed is that the star is ARTWORK
+     * now (`discovery_star.png`, the owner's instruction) rather than the ★
+     * character, and the em space that set the base apart is a `marginLeft`
+     * rather than an unstyled Text node, because a row has real spacing and an
+     * inline Text never did. The old assertions pinned the ★ literal and the
+     * escaped em space — both are the MECHANISM, and pinning a mechanism is how
+     * a suite goes red on a pass that kept its promise. */
     expect(BOX).toContain('star?: boolean;');
-    expect(BOX).toContain("{star ? <Text>{' ★'}</Text> : null}");
+    expect(BOX).toContain('DISCOVERY_STAR_ART');
     const painted = BOX.slice(BOX.indexOf('(glyphs && glyphs.length > 0) || baseGlyph ?'));
-    expect(painted.indexOf('baseGlyph.ch')).toBeLessThan(painted.indexOf("{star ? <Text>{' ★'}</Text> : null}"));
-    // his "weird black boxes": the em space is an unstyled node, not part of the dark cell
-    expect(BOX).toContain("<Text>{'\\u2003'}</Text>");
-    expect(BOX).toContain('{`\\u200a${baseGlyph.ch}\\u200a`}');
-    expect(BOX).not.toContain('{`\\u2003${baseGlyph.ch}');
+    expect(painted.indexOf('baseGlyph.ch')).toBeLessThan(painted.indexOf('DISCOVERY_STAR_ART'));
+    // ⚠ and the ★ CHARACTER no longer paints on a button at all
+    expect(BOX).not.toContain("{star ? <Text>{' ★'}</Text> : null}");
+    /* ⚠⚠ HIS "WEIRD BLACK BOXES" CANNOT RECUR, AND THE GUARD IS STRONGER THAN IT
+     * WAS. The old failure was a dark cell STRETCHING across the em space
+     * because the space sat inside it. The gap is a margin on a sibling box
+     * now — there is no cell for it to be inside — and the artwork carries no
+     * background at all. */
+    expect(/quickGlyphArt: \{([^}]*)\}/.exec(BOX)?.[1] ?? '').not.toContain('backgroundColor');
+    expect(BOX).toContain('quickMarkLead: { marginLeft: 7 }');
   });
 });
 

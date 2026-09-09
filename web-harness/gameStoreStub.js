@@ -73,6 +73,10 @@ const START = (() => {
   catch { return 'title'; }
 })();
 
+/* ⚠ OTA-1766 — 'combat' is a harness STATE, not a `ScreenName`. The app must be
+ * told 'exploration'; the fixture below is what makes that exploration a fight. */
+const SCREEN = START === 'combat' ? 'exploration' : START;
+
 /* ⚠ OTA-1759 — A FRESH CHARACTER HAS NOTHING TO MEND, so Crafting's REPAIR tab
  * (where the list rows this pass is about live) renders its empty state and
  * photographs nothing. Knocking the durability off the first two damageable
@@ -91,8 +95,79 @@ function damageSomeGear(p) {
   return p;
 }
 
+
+/* ⚠⚠⚠ OTA-1766 — A FIGHT, SO THE WEAPON BUTTONS CAN BE PHOTOGRAPHED.
+ *
+ * Owner asked to see "a weapon with damage icons, a weapon with a coat, a weapon
+ * with the discovery star". None of those exist on a fresh character standing in
+ * an empty room: `inCombat` is `enemyViews.length > 0`, the glyph row only draws
+ * when a weapon is equipped, and the star only draws when the player has
+ * DISCOVERED a weakness the weapon delivers.
+ *
+ * ⚠ SO THE FIXTURE FEEDS THE REAL DERIVATIONS RATHER THAN FAKING THEIR OUTPUT.
+ * It sets one scene enemy, equips two catalog weapons by NAME (so
+ * `resolveDisplayWeaponByName` finds their real `damageType`), and coats them.
+ * ExplorationScreen then computes `inCombat`, the label parts and the star
+ * through exactly the code the phone runs — the same discipline as
+ * `damageSomeGear` above, which knocks durability off items the real factory
+ * produced rather than hand-rolling a repair row.
+ *
+ * ⚠⚠ THE STAR IS EARNED, NOT SET. The enemy is a BOSS, and `knownEnemyWeaknesses`
+ * says a boss is always readable — its defenses are its character, not a secret.
+ * Its `vulnerable:` traits name types the equipped weapons actually deliver, so
+ * `weaponHitsKnownWeakness` returns true through its own arithmetic. Nothing
+ * here writes `star: true`; if the discovery rules changed, this fixture would
+ * stop showing a star, which is the point of feeding the real path.
+ *
+ * MAIN  Cudgel     bludgeoning, coated burn + cold  -> two coat marks, base mark, star
+ * OFF   Stone Spear piercing, uncoated              -> base mark only
+ */
+function pickFight(p) {
+  if (!p) return p;
+  const weapon = (name, coats) => ({
+    id: `harness_${name.replace(/\s+/g, '_').toLowerCase()}`,
+    name, kind: 'weapon', rarity: 'Common', quantity: 1,
+    ...(coats[0] ? { coating: { kind: coats[0], charges: 3 } } : {}),
+    ...(coats[1] ? { coating2: { kind: coats[1], charges: 3 } } : {}),
+  });
+  const main = weapon('Cudgel', ['burn', 'cold']);
+  const off = weapon('Stone Spear', []);
+  p.inventory = [...(p.inventory ?? []), main, off];
+  p.equipped = { ...(p.equipped ?? {}), main: main.name, mainId: main.id, off: off.name, offId: off.id };
+  // Wisdom is irrelevant against a boss, but set it so the read is unambiguous.
+  if (p.stats) p.stats.wisdom = 14;
+  return p;
+}
+
+/** The scene the fight happens in. `enemies.length > 0` is what `inCombat` reads. */
+const FIGHT_SCENE = {
+  id: 'harness_fight',
+  /* ⚠ EVERY REQUIRED FIELD OF `Enemy`, not just the ones the buttons read. The
+   * first draft carried five and the screen threw "Cannot read properties of
+   * undefined (reading '0')" — `loot` is a required ARRAY and something indexed
+   * it. A fixture that satisfies the type is the cheap way not to re-learn that
+   * per field. */
+  enemies: [{
+    id: 'harness_foe',
+    name: 'Bog Dragon',
+    type: 'beast',
+    boss: true,
+    hp: 40,
+    maxHp: 60,
+    rarity: 'Rare',
+    attack: '1d20+4',
+    damage: '2d8+3',
+    abilityPoint: 'strength',
+    loot: [],
+    pos: { bearing: 0, distance: 2 },
+    // ⚠ Named so the star is EARNED: the cudgel delivers bludgeoning, burn and
+    // cold, and this foe is soft to two of them.
+    traits: ['vulnerable:bludgeoning', 'vulnerable:burn', 'resist:piercing'],
+  }],
+};
+
 const DATA = {
-  currentScreen: START,
+  currentScreen: SCREEN,
   hydrated: true,
   otaBootResolved: true,
   slots: SLOTS,
@@ -113,10 +188,16 @@ const DATA = {
   worldMemory: { memorableEvents: [] },
   arbiterMemory: {},
   vendorState: {},
-  player: START === 'title' ? null : damageSomeGear(createCharacter({
-    name: 'Cheddar Bob', raceId: 'mud_dweller', factionId: 'mud_monarchs',
-  })),
-  currentScene: null,
+  player: START === 'title' ? null : (() => {
+    const p = damageSomeGear(createCharacter({
+      name: 'Cheddar Bob', raceId: 'mud_dweller', factionId: 'mud_monarchs',
+    }));
+    return START === 'combat' ? pickFight(p) : p;
+  })(),
+  /* ⚠ OTA-1766 — `--screen=combat` opens exploration WITH a fight on. The screen
+   * name itself is not a `ScreenName`, so it is mapped to 'exploration' below;
+   * the harness needed a way to ask for a STATE, not just a screen. */
+  currentScene: START === 'combat' ? FIGHT_SCENE : null,
 };
 
 // Actions are awaited all over the shell, so an unknown one must be thenable.

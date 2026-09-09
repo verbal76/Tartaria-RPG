@@ -142,13 +142,29 @@ describe('OTA-1636 — the wiring', () => {
     expect(painted.indexOf('glyphText ?? \'\'')).toBeLessThan(painted.indexOf('baseGlyph.ch'));
   });
 
-  it('⚠⚠ an em space, not a hair space, sets it apart from the name', () => {
-    // U+2003 before the glyph in the painted node; the flat label keeps a plain space.
-    // OTA-1638 — the em space is its own unstyled node, OUTSIDE the dark cell,
-    // so the cell no longer stretches across the gap (his "weird black boxes").
-    expect(BOX).toContain("<Text>{'\\u2003'}</Text>");
-    expect(BOX).toContain('{`\\u200a${baseGlyph.ch}\\u200a`}');
-    expect(BOX).not.toContain('{`\\u2003${baseGlyph.ch}');
+  it('⚠⚠ the base is SET APART from the name — a margin now, an em space before', () => {
+    /* ⚠⚠⚠ OTA-1766 MOVED THE MECHANISM AND KEPT THE CLAIM, WHICH IS THE ONLY
+     * HONEST WAY TO UPDATE A PIN. The combat label stopped being one inline
+     * `<Text>` and became a `<View>` row of measured boxes, on the owner's
+     * instruction: *"handle the combat image layout appropriately rather than
+     * trying to force the images into the old inline text-glyph
+     * construction."* */
+    /* ⚠ THE CLAIM — "the weapon's own damage is visibly set off from its name,
+     * so it can never read as a third coat" — is unchanged. The em space
+     * (U+2003) existed because an inline `Text` has no box and therefore no
+     * margin; OTA-1638 had already had to pull it OUT of the dark cell to stop
+     * the cell stretching across the gap into the black bar the owner
+     * photographed. A row makes the gap a property, and the failure mode goes
+     * with the workaround: there is no cell left for a spacer to be inside. */
+    expect(BOX).toContain('quickMarkLead: { marginLeft: 7 }');
+    expect(BOX).toContain('lead');
+    // ⚠ the workaround is gone because the thing it worked around is
+    expect(BOX).not.toContain("<Text>{'\\u2003'}</Text>");
+    /* ⚠⚠ AND THE FLAT LABEL STILL SPELLS IT WITH A SPACE. `combatWeaponLabel`
+     * is untouched — it is the breadcrumb and the screen-reader string — so the
+     * separation survives in BOTH renderings, which is the actual promise. */
+    expect(combatWeaponLabel('Choir-Bound Launcher', coated('burn', 'corruption'), 'aetheric', []))
+      .toContain(' ✦');
   });
 
   it('⚠ the flat label and the parts still agree — the breadcrumb is one string', () => {

@@ -10,7 +10,9 @@ import {
   Platform,
   Animated,
   Vibration,
+  Image,
 } from 'react-native';
+import type { StyleProp, TextStyle, ViewStyle } from 'react-native';
 import { TutorialTarget } from './TutorialTarget';
 import { visibleBuildingRooms, roomHasExitDoor } from '../engine/buildings';
 import type { ClimbBlockReason } from '../engine/climbReadiness';
@@ -39,6 +41,11 @@ import {
   combatWeaponLabelParts, COATING_GLYPH_COLOR, type CoatingGlyphPart,
   BASE_GLYPH_COLOR, type BaseGlyphPart, // OTA-1636 — the base type, far right
 } from '../engine/weaponGlyphs';
+// ⚠⚠ OTA-1766 — the illustrated glyphs. THE SAME table Lore ▸ Glyphs reads, by
+// instruction: *"Keep the icon mapping centralized rather than creating separate
+// Lore and combat mappings."* The two surfaces draw at different SIZES (the chip
+// is smaller than the legend row) and that is the only thing they disagree on.
+import { glyphArt, DISCOVERY_STAR_ART, GLYPH_ART_SIZE } from '../engine/combatGlyphArt';
 import { reachBandsFor, reachFiresDown } from '../engine/types';
 // ⚠ OTA-1423 — the three Arbiter refusals below name the dog, so they also
 // have to gender it. Without this they read "bring it up" about a companion
@@ -1330,6 +1337,67 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
  *  absent, but because the most important one was wearing the default. */
 type QuickBtnTone = 'strike' | 'ready' | 'needs-approach' | 'defensive' | 'unavailable';
 
+/**
+ * ⚠⚠⚠ OTA-1766 — ONE MARK ON A WEAPON BUTTON: A COAT, OR THE WEAPON'S OWN
+ * DAMAGE. Artwork when the approved pack draws that type, the old character
+ * when it does not.
+ *
+ * ⚠⚠ THE BLACK BOX IS GONE FROM THE ARTWORK PATH, WHICH IS AN OWNER
+ * INSTRUCTION: *"Remove the remaining black box/background behind the weapon
+ * icons. The new artwork should sit directly on the weapon UI without an
+ * additional black rectangle."* The `#0d0b09` cell and the black halo below it
+ * came from OTA-1568/1569, and their reason was specific: a TEXT glyph is a bare
+ * single-colour shape, the chip has two nearly opposite fills (light sage when
+ * it is a strike, near-black otherwise), and there is no set of six colours that
+ * reads on both — so the glyph was given a ground of its own and stopped caring.
+ * Illustrated artwork brings its own ground. The cell earns nothing behind it.
+ *
+ * ⚠ AND THE GROUND STAYS ON THE CHARACTER PATH, WHICH IS NOT AN INCONSISTENCY.
+ * The instruction is about the icons; the fallback is not an icon, it is the
+ * same bare glyph OTA-1569 was fixing, on the same two hostile chip fills. Its
+ * problem is unchanged, so its fix is unchanged. Today that path is unreachable
+ * — `degradation` and `stun` are the only types without art, no catalog weapon
+ * deals either, and `degradation` canonicalises to `acid` before the lookup — so
+ * no player sees a black cell on a weapon button at all.
+ */
+function GlyphMark({ type, ch, color, textStyle, lead }: {
+  /** Canonical damage type — the same key `weaponGlyphs` uses. */
+  type: string;
+  /** The text glyph for this type, drawn only when the pack has no art. */
+  ch: string;
+  color: string;
+  /** The chip's resolved label style, so a fallback character keeps the chip's
+   *  own size and weight exactly as it did before. */
+  textStyle: StyleProp<TextStyle>;
+  /** ⚠ Set this mark off from what precedes it — OTA-1638's em space, expressed
+   *  as an INTENT rather than as a style object. The two branches below are an
+   *  `Image` and a `Text`, and React Native types those styles differently
+   *  (`ImageStyle` narrows `overflow`), so one shared `StyleProp` cannot be
+   *  passed to both. A left margin is the only thing this ever needs to carry,
+   *  so the prop says that and each branch spends it in its own vocabulary. */
+  lead?: boolean;
+}) {
+  const art = glyphArt(type);
+  if (art !== undefined) {
+    return (
+      <Image
+        source={art}
+        style={[styles.quickGlyphArt, lead ? styles.quickMarkLead : null]}
+        resizeMode="contain"
+        testID={`quick-glyph-${type}`}
+      />
+    );
+  }
+  return (
+    <Text
+      style={[textStyle, styles.coatGlyph, { color }, lead ? styles.quickMarkLeadText : null]}
+      testID={`quick-glyph-text-${type}`}
+    >
+      {`\u200a${ch}\u200a`}
+    </Text>
+  );
+}
+
 function QuickBtn({
   label,
   onPress,
@@ -1468,42 +1536,67 @@ function QuickBtn({
           is on record that the breadcrumb is forensic evidence. This only
           changes how the same characters are PAINTED. */}
       {(glyphs && glyphs.length > 0) || baseGlyph ? (
-        <Text style={textStyle}>
+        /* ⚠⚠⚠ OTA-1766 — THIS IS A ROW OF BOXES NOW, NOT A STRING OF INLINE TEXT.
+         *
+         * Owner: *"handle the combat image layout appropriately rather than
+         * trying to force the images into the old inline text-glyph
+         * construction."* That warning is the whole reason this stopped being
+         * one `<Text>`. An inline `Text` in React Native takes NO padding and has
+         * no box of its own — which is precisely why OTA-1569 had to pad the
+         * glyph cell with HAIR SPACES, and why OTA-1638 had to move an em space
+         * OUTSIDE the cell to stop it stretching into a black bar across the gap.
+         * Both were workarounds for laying a mark out inside a text flow.
+         * A `<View>` row gives each mark a real measured box, vertical centring
+         * that is a property rather than a coincidence of the baseline, and
+         * spacing that is a margin instead of a Unicode space. The hair spaces
+         * and the em space are GONE, because the thing they worked around is.
+         *
+         * ⚠ THE ORDER IS UNCHANGED: coats · name · own damage · star. So is
+         * `label`, still the flat string, still the tap breadcrumb (logUiTap
+         * above) and still the screen-reader label — OTA-1172 is on record that
+         * the breadcrumb is forensic evidence in the freeze hunt. This changes
+         * how the same content is PAINTED and nothing about what it says or
+         * about what decided it. */
+        <View style={styles.quickGlyphRow}>
           {(glyphs ?? []).map((g, i) => (
-            <Text key={`${g.kind}${i}`} style={[styles.coatGlyph, { color: COATING_GLYPH_COLOR[g.kind] }]}>
-              {/* ⚠ OTA-1569 — hair spaces pad the dark cell. Inline Text takes no
-                  padding in React Native, and a cell clamped to the glyph's exact
-                  box reads as a clipping artifact rather than a deliberate inlay.
-                  They are added HERE and never to `label`, so the tap breadcrumb
-                  and the screen-reader string stay byte-for-byte what they were. */}
-              {`\u200a${g.ch}\u200a`}
-            </Text>
+            <GlyphMark
+              key={`${g.kind}${i}`}
+              type={g.kind}
+              ch={g.ch}
+              color={COATING_GLYPH_COLOR[g.kind]}
+              textStyle={textStyle}
+            />
           ))}
-          <Text>{`${glyphs && glyphs.length > 0 ? ' ' : ''}${glyphText ?? ''}`.toUpperCase()}</Text>
+          <Text style={[textStyle, (glyphs && glyphs.length > 0) ? styles.quickGlyphName : null]}>
+            {(glyphText ?? '').toUpperCase()}
+          </Text>
           {baseGlyph ? (
-            <>
-              {/* ⚠ OTA-1638 — THE SPACER LIVES OUTSIDE THE CELL. The em space that
-                  sets the base glyph off from the name used to sit INSIDE the dark
-                  cell, so the cell stretched across the gap and read as a black
-                  box on the sage chip (owner: "why the weird black boxes around
-                  the glyphs"). Unstyled here, the gap is just a gap; the glyph
-                  gets the same hair-space cell the coats get. */}
-              <Text>{'\u2003'}</Text>
-              <Text style={[styles.coatGlyph, { color: BASE_GLYPH_COLOR[baseGlyph.kind] ?? '#ffffff' }]}>
-                {/* ⚠ OTA-1636 — the weapon's OWN damage type, painted after the
-                    name so it can never be read as a third coat. Owner: "all the
-                    way to the right so it's not mixed in." Same halo as the coat
-                    cells (OTA-1568), its own colour, and — as with the coats —
-                    added HERE and never to `label`. */}
-                {`\u200a${baseGlyph.ch}\u200a`}
-              </Text>
-            </>
+            /* ⚠ OTA-1636/1638 — the weapon's OWN damage, after the name so it can
+               never be read as a third coat, and SET OFF from it. Owner: "all the
+               way to the right so it's not mixed in." The em space that used to
+               do that is a margin now. */
+            <GlyphMark
+              type={baseGlyph.kind}
+              ch={baseGlyph.ch}
+              color={BASE_GLYPH_COLOR[baseGlyph.kind] ?? '#ffffff'}
+              textStyle={textStyle}
+              lead
+            />
           ) : null}
-          {/* \u26a0 OTA-1638 \u2014 the discovery star, all the way to the right, after the
-              base glyph. Owner: "put the discovery star all the way to the right."
-              Plain text in the button's own colour: it is a verdict, not a type. */}
-          {star ? <Text>{' ★'}</Text> : null}
-        </Text>
+          {/* ⚠⚠ OTA-1766 — THE STAR IS ARTWORK NOW. Owner: *"Replace the existing
+              discovery ★ with discovery_star.png."* It is a VERDICT and not a
+              damage family, so it comes from its own export rather than the
+              damage table — nothing iterating the types can pick it up by
+              mistake. Still last, still all the way to the right. */}
+          {star ? (
+            <Image
+              source={DISCOVERY_STAR_ART}
+              style={styles.quickStarArt}
+              resizeMode="contain"
+              testID="quick-discovery-star"
+            />
+          ) : null}
+        </View>
       ) : (
         <Text style={textStyle}>{label.toUpperCase()}</Text>
       )}
@@ -1786,6 +1879,47 @@ const styles = StyleSheet.create({
   //
   // ⚠ The halo stays. On the sage chip it now softens the cell's hard edge; on
   // the dark chips it is what it always was — invisible and harmless.
+  /* ⚠⚠⚠ OTA-1766 — THE LABEL IS A ROW OF BOXES. See the render for why this
+   * stopped being one inline `<Text>`: an inline Text has no box, which is what
+   * forced OTA-1569's hair spaces and OTA-1638's escaped em space. A row gives
+   * each mark a measured box and real vertical centring.
+   * ⚠ `alignItems: 'center'` is the property that replaces "the baseline
+   * happened to line up". `flexShrink: 1` on the row lets a long weapon name
+   * give way inside a wrapped chip instead of pushing the star out of the
+   * right-hand end — the star is the piece that must never be the one to go. */
+  quickGlyphRow: { flexDirection: 'row', alignItems: 'center', flexShrink: 1 },
+  /** The artwork for one coat or one base type. `GLYPH_ART_SIZE.combat` is 18:
+   *  the chip is `paddingVertical: 6` around 12pt text, so 18 sits inside the
+   *  content box it already had. 28 — Lore's number — would add about 12dp to
+   *  the height of every weapon button in a fight, which is why the two surfaces
+   *  do NOT share one size. No ground behind it, by instruction. */
+  quickGlyphArt: { width: GLYPH_ART_SIZE.combat, height: GLYPH_ART_SIZE.combat, marginRight: 3 },
+  /** The gap between the last coat and the name. Was a literal space character
+   *  inside the old single Text. */
+  quickGlyphName: { marginLeft: 2 },
+  /** ⚠ OTA-1638's SET-OFF, now a margin. The em space that kept the weapon's own
+   *  damage from reading as a third coat used to be a `\u2003` between two Text
+   *  nodes — and before that it sat INSIDE the dark cell, which stretched it
+   *  into the black bar the owner photographed. It is a margin now, so it cannot
+   *  be inside anything. */
+  quickMarkLead: { marginLeft: 7 },
+  quickMarkLeadText: { marginLeft: 7 },
+  /** The discovery star, last and all the way to the right. Same box as a damage
+   *  mark so the row stays even; its own margin so it is visibly a verdict
+   *  sitting apart from the type it is a verdict about. */
+  quickStarArt: { width: GLYPH_ART_SIZE.combat, height: GLYPH_ART_SIZE.combat, marginLeft: 5 },
+  /* ⚠⚠⚠ OTA-1766 — THIS IS THE FALLBACK'S STYLE NOW, AND NOTHING A PLAYER CAN
+   * REACH USES IT. The owner asked for the black box behind the weapon icons to
+   * go, and for the artwork path it has: `quickGlyphArt` above has no ground at
+   * all. What is left here is the TEXT path, which fires only for a type the
+   * approved pack does not draw — `degradation` and `stun`, neither of which any
+   * catalog weapon deals, and `degradation` canonicalises to `acid` before the
+   * lookup so it cannot print in principle.
+   * ⚠ Its ground stays because ITS problem is unchanged, and the reasoning below
+   * is the record of that problem. A bare single-colour glyph on a chip with two
+   * nearly opposite fills has nowhere safe to be; artwork brings its own ground
+   * and does not. Removing this too would be tidying away a fix for a case it
+   * still covers. */
   coatGlyph: {
     backgroundColor: '#0d0b09',
     textShadowColor: '#000000',

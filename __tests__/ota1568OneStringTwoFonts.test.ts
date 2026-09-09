@@ -160,8 +160,29 @@ describe('OTA-1568 — the wiring', () => {
     expect(INPUT).toContain('accessibilityLabel={cooldownFill !== undefined && cooldownFill < 1');
   });
 
-  it('⚠⚠ each glyph gets its own colour from the shared table', () => {
-    expect(INPUT).toContain('style={[styles.coatGlyph, { color: COATING_GLYPH_COLOR[g.kind] }]}');
+  it('⚠⚠ each glyph still gets its own colour — on the path where colour is still ours to give', () => {
+    /* ⚠⚠⚠ OTA-1766 MOVED THE MECHANISM AND KEPT THE CLAIM, WHICH IS THE ONLY
+     * HONEST WAY TO UPDATE A PIN. The combat label stopped being one inline
+     * `<Text>` and became a `<View>` row of measured boxes, on the owner's
+     * instruction: *"handle the combat image layout appropriately rather than
+     * trying to force the images into the old inline text-glyph
+     * construction."* */
+    /* ⚠⚠⚠ AND THIS OTA'S WHOLE PROBLEM IS GONE, WHICH IS WHY THE ASSERTION MOVED
+     * RATHER THAN BEING WEAKENED. OTA-1568 existed because ONE STRING RENDERED IN
+     * TWO FONTS: Android picks a presentation per codepoint, so `❄` landed in a
+     * colour-emoji font (deaf to `color:`) while `⚗` landed in a monochrome one
+     * (borrowing the label's colour). Two mechanisms were needed — a halo for the
+     * emoji, a per-kind colour for the text — because neither could serve both.
+     * Illustrated artwork is neither: it is a PNG, its colour is in the pixels,
+     * and no font fallback gets a vote. That failure mode cannot occur on a mark
+     * the pack draws.
+     * ⚠ So the per-kind colour is asserted where it still applies — the character
+     * fallback for the two types with no artwork — and it is still read from the
+     * shared table rather than a local copy, which was this OTA's other claim. */
+    expect(INPUT).toContain('color={COATING_GLYPH_COLOR[g.kind]}');
+    expect(INPUT).toContain('styles.coatGlyph, { color }');
+    // ⚠ the artwork path takes NO colour at all: no tint, ever
+    expect(INPUT).not.toContain('tintColor');
   });
 
   it('⚠⚠ a chip with no glyphs renders exactly as it did before this OTA', () => {
