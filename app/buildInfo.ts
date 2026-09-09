@@ -29583,6 +29583,22 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // being in combat, and one line to reverse whichever way the call goes.
 // Provisional pending actual-device approval; nothing is selected or replaced.
 export const OTA_BUILD_ID = '2026-09-09-1763-icons-on-trial';
+// golem catch-up 2026-09-09: markerless publish of OTA-1763 - the illustrated
+// damage icons, on trial in one surface. Nine owner-supplied 64x64 RGBA PNGs in
+// assets/damage with a README recording what each shows and its source pack ID;
+// app/engine/damageIcons keys ten concepts to those nine, gas sharing noxious by
+// instruction. Wired into exactly one block at the bottom of the Lore cheat
+// sheet, three sizes per row so the A/B/C comparison is one screen rather than
+// three redesigns. Live combat, InputBox, weapon buttons, inventory and the
+// engine are untouched and a test walks app/ to prove the art has one consumer.
+// The trace that came first: Lore paints glyphs at 15pt in a fixed 28 cell,
+// combat at 12pt inherited, inline, with no box - so Lore is not a 1:1 proxy and
+// the combat container is a separate design once the artwork is approved. The
+// black outline then came off the whole Lore key on the owner's call while
+// combat keeps its own; that makes the key stop mirroring the buttons it exists
+// to explain, which is deliberate, temporary and one line to reverse. The suite
+// caught a false green of its own: a slice anchored on a style NAME rather than
+// its declaration came out empty, so three assertions were passing vacuously.
 // golem catch-up 2026-09-09: markerless publish of OTA-1762 - five tab rows,
 // fifteen tabs, one bar. Tier 0 step 4. Crafting, Guidance and Vendor agree on
 // the chip byte for byte, so the shape is an extraction; a COMPONENT this time
