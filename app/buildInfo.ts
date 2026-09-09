@@ -29977,7 +29977,40 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // this defect - they pad and their cards are uncapped, so the card fills the
 // padded box and centring is moot. Recorded so nobody fixes three files that are
 // already correct.
-export const OTA_BUILD_ID = '2026-09-09-1778-no-card-touches-the-bezel';
+// SUPERSEDED: '2026-09-09-1778-no-card-touches-the-bezel'
+// OTA-1779 - the hand that is already full. Reported from play as "Take & wield
+// Rust Dagger - your off hand is free" with a weapon already equipped. The first
+// trace read that as the game having outgrown a hand-slot model; it had not, and
+// the owner ruled after seeing the evidence: KEEP dual wield, OTA-1252
+// established it as an intentional shipped feature, and close the item unless a
+// separate state or offer bug exists under the actual dual-wield rules.
+// THERE IS ONE, AND IT IS THE TWO-HANDED CASE. Equipping a two-hander DISPLACES
+// the off hand, so resolveEquippedItem(player, 'off') returns null while both
+// hands are full - and the free-hand branch read that as a free hand. All three
+// two_handed reads on the equip path asked about the CANDIDATE weapon; not one
+// asked what the main hand was already holding. That is the owner's own expected
+// case: a two-handed weapon equipped must produce no free-off-hand offer.
+// AND THE SECOND HALF WAS WORSE THAN THE FIRST. upgradeEquipSlot routed a ranged
+// pickup to 'off' on the same reasoning, so ACCEPTING the offer would have
+// produced a two-hander AND an off-hand weapon - a state the two-handed rule
+// forbids. The wrong sentence was the visible half; the wrong destination was
+// the real one.
+// A THIRD SITE WAS FOUND BY THE NEW SUITE RATHER THAN BY READING. The spare-hand
+// fallback ("an empty hand is an empty slot", OTA-1252/1254) still reached past
+// both guards: with a two-hander in main and a weaker one-hander picked up, the
+// candidate lost the damage comparison and the fallback handed it the off hand,
+// which reads bare because the two-hander displaced it. That is exactly why the
+// suite exercises the engine instead of scanning it.
+// DUAL WIELD IS UNTOUCHED, and the suite proves it rather than promising it:
+// every case with a ONE-handed main asserts the offer still fires, the ranged
+// pickup still goes to the off hand per OTA-1512's rule, and an empty main still
+// takes anything. The fix removes a shortcut in one state, not a feature.
+// The guard is CATALOG-ONLY, matching equipment.takesBothHands word for word - a
+// fused weapon carries no style and reads one-handed everywhere, and getting
+// that wrong in only one place would be worse than being uniformly wrong. Two
+// implementations of one predicate is a legacy-hunt item; two different answers
+// would be a defect.
+export const OTA_BUILD_ID = '2026-09-09-1779-the-hand-that-is-already-full';
 // golem catch-up 2026-09-09: markerless publish of OTA-1777 - Family B is named
 // and governed, and the modal sweep is finished. Two shells on purpose:
 // tModalCard is a DIALOG (you are being asked something), tMomentCard is a BEAT

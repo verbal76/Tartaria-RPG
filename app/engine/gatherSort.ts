@@ -219,6 +219,22 @@ export function classifyGatherNoun(noun: string): GatherKind {
   return 'other';
 }
 
+/** ⚠⚠⚠ OTA-1779 — IS THE MAIN HAND ALREADY USING BOTH? The question three
+ *  `two_handed` reads on this path forgot to ask.
+ *
+ *  ⚠ CATALOG-ONLY, DELIBERATELY, matching `equipment.takesBothHands` word for
+ *  word: a FUSED weapon carries no style and is treated as one-handed here
+ *  exactly as it is everywhere else. Its comment is the reason — *"getting that
+ *  wrong in only this one place would be worse than being uniformly wrong."*
+ *  Two implementations of one predicate is a legacy-hunt item; two DIFFERENT
+ *  ANSWERS would be a defect, so this one matches rather than improves. */
+function mainHandTakesBothHands(player: PlayerCharacter | null): boolean {
+  if (!player) return false;
+  const held = resolveEquippedItem(player, 'main');
+  return !!held && findWeaponByName(held.name)?.style === 'two_handed';
+}
+
+
 /** ⚠⚠ Is this a straight improvement on what the player has equipped RIGHT NOW?
  *
  *  Deliberately strict — the mark is only worth having if it is trustworthy:
@@ -267,7 +283,28 @@ export function isUpgradeOverEquipped(player: PlayerCharacter | null, noun: stri
     // what is in the main hand, the same as before.
     const main = resolveEquippedItem(player, 'main');
     if (!main) return true;
-    if (weapon.style !== 'two_handed' && !resolveEquippedItem(player, 'off')) return true;
+    /* ⚠⚠⚠ OTA-1779 — AND THE FREE-HAND BRANCH HAS TO ASK ABOUT THE HAND THAT IS
+     * ALREADY FULL. Reported from play: *"Take & wield Rust Dagger — your off
+     * hand is free"* with a weapon already equipped.
+     *
+     * The owner's ruling is that DUAL WIELD STAYS — OTA-1252 established it and
+     * the off hand really does swing — so the offer is correct whenever the off
+     * hand is genuinely empty. What was wrong is narrower and worse: equipping a
+     * two-hander DISPLACES the off hand, so `resolveEquippedItem(player, 'off')`
+     * comes back null while both hands are full, and this branch read that as a
+     * free hand. Every one of the three `two_handed` reads on the equip path
+     * asked about the CANDIDATE; not one asked what the main hand was holding.
+     *
+     * The owner's own expected case: *"two-handed weapon equipped -> no
+     * second-weapon/free-off-hand offer."* This is that case.
+     *
+     * ⚠ It removes only the SHORTCUT. A one-hander that genuinely beats the
+     * two-hander still earns the chip through the damage comparison below and
+     * still displaces it — which is the right outcome and the one the player
+     * expects. */
+    if (weapon.style !== 'two_handed'
+        && !resolveEquippedItem(player, 'off')
+        && !mainHandTakesBothHands(player)) return true;
     const heldWeapon = wornWeaponFacts(main); // OTA-1512 — forged mains compare too
     if (!heldWeapon) return false;
     return averageDamage(weapon.damageDice) > averageDamage(heldWeapon.damageDice);
@@ -430,7 +467,17 @@ export function upgradeEquipSlot(
   const shootsRatherThanSwings = (cls: WeaponReachClass | null): boolean =>
     cls === 'ranged' || cls === 'runecaster' || cls === 'throwable';
   const newCls = reachClassFor({ weaponKind: weapon.weaponKind, name: weapon.name, tags: weapon.tags });
-  const wantedSlot: EquipSlot = shootsRatherThanSwings(newCls) ? 'off' : 'main';
+  /* ⚠⚠⚠ OTA-1779 — THE SECOND HALF OF THE SAME BUG, AND THE WORSE ONE. With a
+   * two-hander in the main hand the off slot reads empty, so a ranged pickup
+   * routed to `'off'` and the equip would have produced a two-hander AND an
+   * off-hand weapon — a state the two-handed rule forbids. The offer was wrong;
+   * this was the action behind it.
+   * When both hands are already committed there is exactly one legal
+   * destination, and it is the one that displaces: main. */
+  const bothHandsCommitted = mainHandTakesBothHands(player);
+  const wantedSlot: EquipSlot = bothHandsCommitted
+    ? 'main'
+    : (shootsRatherThanSwings(newCls) ? 'off' : 'main');
   const occupant = wantedSlot === 'main' ? heldWeapon : wornWeaponFacts(resolveEquippedItem(player, 'off'));
   // The named hand is free — take it, no comparison needed.
   if (!occupant) return { name: weapon.name, slot: wantedSlot };
@@ -446,7 +493,23 @@ export function upgradeEquipSlot(
     // your main; it is still better than a bare hand. The owner's rule names
     // the PREFERRED hand, and this only fires once that hand is spoken for.
     const spare: EquipSlot = wantedSlot === 'main' ? 'off' : 'main';
-    if (!resolveEquippedItem(player, spare)) return { name: weapon.name, slot: spare };
+    /* ⚠⚠⚠ OTA-1779 — AND THIS IS THE THIRD SITE WITH THE SAME BLIND SPOT, found
+     * by the new suite rather than by reading. The guard above fixed the OFFER
+     * and the primary routing; this fallback still reached past them. With a
+     * two-hander in main and a weaker one-hander picked up, the wanted hand is
+     * main, the candidate loses the damage comparison, and `spare` is the off
+     * hand — which reads bare because the two-hander displaced it. So the
+     * "an empty hand is an empty slot" rule handed it a hand that is not empty.
+     *
+     * ⚠ OTA-1252's rule survives intact for the case it was written for: a
+     * second melee that loses to a ONE-handed main still goes to the bare off
+     * hand, because that hand really is bare. It only stops firing when both
+     * hands are already committed to one weapon — and then the honest answer is
+     * `null`: a weapon worse than the two-hander you are holding has nowhere to
+     * go and should not be offered one. */
+    if (!bothHandsCommitted && !resolveEquippedItem(player, spare)) {
+      return { name: weapon.name, slot: spare };
+    }
     return null;
   }
   // The named hand is held by the WRONG kind (a bow in main, a blade in off).
