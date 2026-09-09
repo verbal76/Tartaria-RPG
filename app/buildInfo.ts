@@ -30049,6 +30049,29 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SUPERSEDED: '2026-09-09-1781-the-name-grew-with-the-mark'
 // SUPERSEDED: '2026-09-09-1782-the-control-sits-proud'
 export const OTA_BUILD_ID = '2026-09-09-1783-the-legend-is-one-tap-away';
+// golem catch-up 2026-09-09: markerless publish of OTA-1783.
+// OTA-1783 - the legend is one tap away, and one tap back. A compact neutral
+// '? glyphs' chip at the end of the combat weapon line opens Lore's glyph
+// legend and BACK returns to the exact screen it left. No artwork on the chip:
+// the ruling is that a damage glyph as the reference symbol would imply that
+// damage type, so it is the reference mark and the destination's own name. No
+// tone either, which is what keeps it subordinate and what lets it inherit
+// OTA-1782's depth with no special case. It does not submit a command, so
+// looking something up costs no stamina, no round and no turn.
+// The finding that made this small: there is no combat SCREEN. A fight is store
+// state shown on exploration, so the round trip never threatened it - nothing
+// here reads a combat field. What was missing was that the codex could not open
+// ON a tab, and that BACK was a rule rather than a record.
+// The jump is a module, not store state. gameStore sits at 36,995 lines against
+// a ratchet two suites assert at under 37,000 - four lines, and the first cut
+// came in at 37,033. But the better reason is that store state is SAVED state
+// and this is a hand-off between two renders: the read consumes it, so a jump
+// cannot outlive the screen it was armed for. giftMode needed OTA-1280 to add a
+// guard for exactly that failure; here it is unexpressable.
+// Four older suites re-aimed - three pinned LoreScreen's whole BACK expression
+// and one pinned the codex's landing call, when the claims were only that BACK
+// is conditional on a live session and that the codex lands on the row's first
+// tab. Both still true.
 // golem catch-up 2026-09-09: markerless publish of OTA-1782.
 // OTA-1782 - the control sits proud of the plane. One governed control-depth
 // language: the upper edge catches light, the lower edge falls to shadow, and
