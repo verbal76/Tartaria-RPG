@@ -30052,6 +30052,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SUPERSEDED: '2026-09-09-1784-six-traders-six-voices'
 // SUPERSEDED: '2026-09-09-1785-one-authority-per-ratchet'
 export const OTA_BUILD_ID = '2026-09-09-1786-the-name-column-fits-its-vocabulary';
+// golem catch-up 2026-09-09: markerless publish of OTA-1786.
+// OTA-1786 - the name column fits its vocabulary. Device finding: Lore's glyph
+// key wrapped BLUDGEONING onto a second line. The column was 92dp; the label
+// needs 91-102 depending on which face the device resolves, so 92 sat INSIDE
+// the range - fits on a narrow font, wraps on a wide one, the class of number
+// that survives review and fails on hardware. The width is derived now, at the
+// wide end of the ratio, from the longest label the key can ever print over the
+// WHOLE damage vocabulary rather than the subset in play - so a family added
+// later widens the column instead of wrapping in it. 92 -> 102.
+// Nothing abbreviated, type size untouched, description column still flex:1,
+// artwork cell still the approved 28dp. A layout fix, not an artwork reopen.
 // golem catch-up 2026-09-09: markerless publish of OTA-1785.
 // OTA-1785 - one authority per ratchet. Two corrections first, both worse than
 // reported: there were THIRTEEN gameStore ceiling authorities, not four (twelve
