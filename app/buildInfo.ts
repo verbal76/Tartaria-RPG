@@ -29590,6 +29590,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SUPERSEDED: '2026-09-09-1768-one-barehand-chip'
 // SUPERSEDED: '2026-09-09-1769-the-sheet-is-two-shapes'
 // SUPERSEDED: '2026-09-09-1770-character-is-the-proof'
+// SUPERSEDED: '2026-09-09-1771-the-sweep-takes-four'
 // OTA-1770 - CharacterScreen, the proof. The rollout's step 2, and the first
 // screen to adopt Tier 0. Chosen because it had the worst gold density in the
 // game (36 declarations) and no tabs or modals of its own to confound the result.
@@ -29777,7 +29778,30 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the keyboard up. Giving it a scrolling middle would fix it AND change what the
 // player sees, so it is a layout decision rather than a material extraction. Its
 // pixels are untouched and the reason is written into the file. HOLD 4.
-export const OTA_BUILD_ID = '2026-09-09-1771-the-sweep-takes-four';
+// OTA-1772 - the stamp cannot touch the name. Reported off the device as
+// MISSConspiracy Archit... - the combat outcome stamp welded to a truncated
+// enemy name with no space between them.
+// THE CAUSE IS STRUCTURAL, WHICH IS WHY THE FIX IS NOT A SPACE IN A STRING. The
+// result column was pushed to the far end of the row by marginLeft auto and
+// nothing else separated it from the name column. An auto margin is whatever
+// space is left over, so it is zero exactly when the row is full - which is
+// exactly when a long name gets truncated. The ellipsis in the report is the
+// tell: a short name never collides and a long one always does.
+// The fix is a columnGap on the row itself: a minimum the flex algorithm
+// satisfies before it distributes anything. The auto margin still does the
+// pushing; the gap guarantees the floor. Because the gap applies between every
+// pair, the spine's own 7px margins come off, so spine-to-who stays 7 and
+// who-to-result goes from 0 to 7. Nothing moves except the defect.
+// AND IT HAD TO SURVIVE row-reverse, which is what the report actually shows:
+// incoming swings lay out right to left, which is why MISS appears to the LEFT
+// of the name. A one-sided marginRight would have fixed the outgoing row and
+// left the reported one exactly as broken.
+// It covers all seven stamps, not the two that were seen - CRIT, HIT, MISS,
+// FUMBLE, DODGED, EVADED and SLIPPED all render through the one row.
+// The sub-row carried the identical defect and was fixed in the same pass, found
+// by reading rather than by waiting for someone to hit it: a long weapon name
+// would weld itself to the HP readout on the same terms.
+export const OTA_BUILD_ID = '2026-09-09-1772-the-stamp-cannot-touch-the-name';
 // golem catch-up 2026-09-09: markerless publish of OTA-1771 - the modal sweep,
 // batch 1. OTA-1765's census named eight files still hand-copying the Family A
 // shell; ClimbModal, TorchProbeModal, SearchModal and CraftRefusalModal adopt

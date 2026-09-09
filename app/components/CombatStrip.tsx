@@ -215,21 +215,52 @@ const styles = StyleSheet.create({
    * strip row is a fixed-height 18px line with a 2px margin and cannot wrap. An
    * exchange that cost ~290px of feed costs under 100px here, which is what
    * "several recent exchanges visible at once" actually requires. */
+  /* ⚠⚠⚠ OTA-1772 — THE GUTTER BELONGS TO THE ROW, NOT TO A MARGIN THE NAME CAN
+   * EAT. Reported off the device as `MISSConspiracy Archit…` — the outcome
+   * stamp welded to a truncated enemy name with no space between them at all.
+   *
+   * THE CAUSE IS STRUCTURAL, WHICH IS WHY THE FIX IS NOT A SPACE IN A STRING.
+   * `result` was pushed to the far end by `marginLeft: 'auto'` and NOTHING ELSE
+   * separated the two columns. An `auto` margin is defined as whatever space is
+   * left over, so the moment `who` grew wide enough to consume the row — which
+   * is precisely when a long name gets truncated — the gutter went to zero and
+   * the columns touched. The ellipsis in the report is the tell: the collision
+   * can only happen once the name is long enough to need one.
+   *
+   * ⚠ `columnGap` fixes it because it is a MINIMUM the flex algorithm satisfies
+   * before it distributes anything else. `auto` still does the pushing; the gap
+   * guarantees the floor. It applies between every pair in the row, which is
+   * why the spine's own margins come off here: spine→who was 7 and is still 7,
+   * who→result was 0 and is now 7. Nothing moves except the defect.
+   *
+   * ⚠⚠ AND IT HAD TO SURVIVE `row-reverse`. Incoming rows lay out right to left
+   * — that is what put MISS on the LEFT of the name in the report — so a
+   * one-sided `marginRight` would have fixed the outgoing case and left the
+   * reported one exactly as broken. `who` sits between the spine and the result
+   * in BOTH directions, so one direction-agnostic gap covers both.
+   *
+   * ⚠ ALL SEVEN STAMPS, not just the two that were seen: CRIT · HIT · MISS ·
+   * FUMBLE · DODGED · EVADED · SLIPPED all render through this same row. */
   row: {
-    flexDirection: 'row', alignItems: 'center',
+    flexDirection: 'row', alignItems: 'center', columnGap: 7,
     minHeight: STRIP_METRICS.row, marginBottom: STRIP_METRICS.gap, paddingRight: 2,
   },
   // Incoming rows are indented AND spined on the far side — direction without
   // depending on a colour anyone can fail to see.
   rowIncoming: { paddingLeft: 14, flexDirection: 'row-reverse' },
-  spine: { width: 2, alignSelf: 'stretch', marginRight: 7 },
+  spine: { width: 2, alignSelf: 'stretch' },
   spineOut: { backgroundColor: GOLD },
-  spineIn: { backgroundColor: INCOMING, marginRight: 0, marginLeft: 7 },
+  spineIn: { backgroundColor: INCOMING },
   who: { flexDirection: 'row', alignItems: 'center', flexShrink: 1, minWidth: 0 },
   actor: { color: INK, fontSize: 12, fontWeight: '800', letterSpacing: 0.6, flexShrink: 1 },
   arrow: { color: ALLOY, fontSize: 11, marginHorizontal: 5 },
   target: { color: INK_DIM, fontSize: 12, fontWeight: '600', flexShrink: 1 },
-  result: { flexDirection: 'row', alignItems: 'baseline', marginLeft: 'auto', gap: 8 },
+  // ⚠ OTA-1772 — `flexShrink: 0` says out loud what RN already defaults to: the
+  // outcome column is the thing the row exists to report, so it is the NAME that
+  // gives way, never the stamp. Written down because the next reader's instinct
+  // on a crowded row is to let both sides shrink, and half a stamp is worse than
+  // an ellipsised name.
+  result: { flexDirection: 'row', alignItems: 'baseline', marginLeft: 'auto', gap: 8, flexShrink: 0 },
   stamp: { fontSize: 11, fontWeight: '800', letterSpacing: 1.6 },
   stampLanded: { color: LANDED },
   stampMissed: { color: ALLOY },
@@ -244,8 +275,12 @@ const styles = StyleSheet.create({
   dmg: { fontSize: 15, fontWeight: '800', letterSpacing: 0.5 },
   dmgOut: { color: LANDED },
   dmgIn: { color: INCOMING },
+  // ⚠⚠ OTA-1772 — THE SAME DEFECT, ONE ROW DOWN, FOUND BY LOOKING RATHER THAN
+  // BY BEING REPORTED. `sub` (the weapon) shrinks and `hp` is pushed out by an
+  // `auto` margin, so a long weapon name would weld itself to the HP readout on
+  // exactly the same terms. Fixed the same way, before anyone had to see it.
   subRow: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', columnGap: 7,
     minHeight: STRIP_METRICS.sub, marginBottom: STRIP_METRICS.gap, paddingLeft: 9, paddingRight: 2,
   },
   sub: { color: INK_DIM, fontSize: 11, letterSpacing: 0.4, flexShrink: 1 },
