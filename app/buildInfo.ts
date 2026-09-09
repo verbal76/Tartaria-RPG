@@ -29687,6 +29687,21 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // bundles, so the phone still ships one resolution rather than four.
 // Provisional pending actual-device approval.
 export const OTA_BUILD_ID = '2026-09-09-1767-the-button-grows';
+// golem catch-up 2026-09-09: markerless publish of OTA-1767 - the button grows
+// to hold the glyph, not the other way round. Owner: "do NOT preserve the
+// current combat weapon button height at the expense of icon readability... Do
+// not shrink the artwork simply to preserve the old button dimensions." Combat
+// now draws at Lore's 28dp and the chip grows to 46dp; the extra 2dp of padding
+// sits on the glyph row so punch, kick, dodge and travel are untouched. The mark
+// stays square with contain, carries no ground, and shares one centre line with
+// the weapon name. OTA-1766's 18dp reasoning is kept in the file marked
+// OVERRULED - it was true as measurement and wrong as a decision, treating the
+// chip's height as the constraint and the artwork as the variable.
+// Three suites re-aimed one commit earlier broke again because those rewrites
+// pinned the literal margins while explaining that pinning a mechanism is the
+// mistake. They now assert the rule instead: a mark has breathing room, and the
+// base glyph's set-off is wider than the gap between coats, which is what stops
+// it reading as a third coat.
 // golem catch-up 2026-09-09: markerless publish of OTA-1766 - the illustrated
 // glyphs ARE the glyphs now, and the trial is over. The approved pack replaced
 // the text glyphs in Lore > Glyphs, on the weapon damage/coating icons in
