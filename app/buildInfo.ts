@@ -29605,6 +29605,22 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // bundles, so the phone still ships one resolution rather than four.
 // Provisional pending actual-device approval.
 export const OTA_BUILD_ID = '2026-09-09-1764-storm-and-shut-drawers';
+// golem catch-up 2026-09-09: markerless publish of OTA-1764 - a new storm, and
+// two drawers that now start shut. WORKINGS TO LEARN and REINFORCE YOUR GEAR
+// were the only two vendor sections defaulting open; both the render default and
+// the toggle default moved, because a header that renders collapsed but toggles
+// from the old default writes true on the first tap and reads as a dead control.
+// The Environmental icon is replaced by a custom Tartaria thunderstorm; L544 is
+// retired for reading as a suitcase. NO CODE CHANGED for that swap - the
+// semantic filename did not, so the art table did not - and the 128/256/512
+// masters go to art/12-damage-icons, tracked but outside the bundled assets
+// tree. Twelve tests failed on the collapse across three suites, every one of
+// them a reinforce flow that could no longer see rows inside a shut drawer; the
+// mount helpers now open the drawer as a player does and no assertion was
+// weakened. The first fix for that was itself wrong twice: findAll returns the
+// composite AND host node for a Touchable so every header was toggled twice and
+// netted to nothing, and CONTRACTS carries a chevron in its label and opened a
+// modal over the counter.
 // golem catch-up 2026-09-09: markerless publish of OTA-1763 - the illustrated
 // damage icons, on trial in one surface. Nine owner-supplied 64x64 RGBA PNGs in
 // assets/damage with a README recording what each shows and its source pack ID;
