@@ -48,13 +48,20 @@ import path from 'node:path';
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const STORE = 'app/state/gameStore.ts';
 
-/** ⚠ The measured count at OTA-1785, with no headroom.
+/** ⚠ The measured count, with no headroom.
  *
  *    45050  OTA-1400 era  before the extraction campaign
  *    39470  OTA-1400      nine slices in
  *    36998  OTA-1785      the count when the thirteen authorities became one
- */
-export const CEILING = 36998;
+ *    36963  OTA-1790      the four attack lines moved to engine/combatProse
+ *
+ * ⚠⚠ OTA-1790 IS THE FIRST TIME THIS NUMBER CAME DOWN AS A CONDITION OF WORK
+ * RATHER THAN AS TIDYING. The transcript pass needed lines the store did not
+ * have; the owner's ruling was *"EXTRACT, DO NOT JUST RAISE IT"*, so five pure
+ * display functions went to the file already named for them and the pass gave
+ * back more than it took. That is the intended pressure — the valve works by
+ * making somebody find a boundary, not by making them ask for a bigger number. */
+export const CEILING = 36963;
 
 const n = fs.readFileSync(path.join(ROOT, STORE), 'utf8').split('\n').length;
 

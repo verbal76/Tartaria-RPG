@@ -6,7 +6,13 @@ import { ScrollView, View, Text, StyleSheet, TouchableOpacity } from 'react-nati
  * exactly as it did. Qwen's narration is untouched and still arrives on its own
  * channels — what changed is that the RESULT no longer has to be read out of a
  * sentence to be known. */
-import { combatEventOf, type CombatEvent } from '../engine/combatEvent';
+import { type CombatEvent } from '../engine/combatEvent';
+/* ⚠⚠⚠ OTA-1790 — THE ROW SHAPE IS DECIDED IN THE ENGINE. `foldExchanges` pairs
+ * each to-hit verdict with the damage line that reports the same exchange, and
+ * collapses adjacent reward events exactly as the loop below it used to. It is a
+ * pure function over `{id, meta}`, so the claim "one exchange is one row" can be
+ * graded without mounting a renderer. */
+import { foldExchanges } from '../engine/combatSentence';
 import { CombatStrip, RewardCluster, STRIP_METRICS } from './CombatStrip';
 import type { GameLogEntry, LogChannel } from '../engine/types';
 import { HIDDEN_LOG_CHANNELS } from '../engine/gameLog';
@@ -171,7 +177,7 @@ export const FEED_WINDOW = 150;
 // bundle read that as engine lines 70–150ms apart and JS stalls of 2.5–5.2s
 // after every action. Entries are immutable objects, so a memoised row only
 // renders once; `names` is keyed on its contents (below) so it is stable too.
-const FeedRow = React.memo(function FeedRow({ entry, names }: { entry: GameLogEntry; names: string[] }) {
+const FeedRow = React.memo(function FeedRow({ entry, names, event }: { entry: GameLogEntry; names: string[]; event: CombatEvent | null }) {
         // OTA 221 — combat-outcome color override. Lines tagged with
         // meta.combatOutcome='player_dmg' (player landed damage)
         // render in green so the win pops out of the red roll math.
@@ -194,7 +200,11 @@ const FeedRow = React.memo(function FeedRow({ entry, names }: { entry: GameLogEn
          * event; the colour override below is what the SAME line used to get
          * when all the feed had was its sentence. Both still ride the same meta
          * bag, so an entry with no `cmb` is completely unaffected. */
-        const cmbEvent = combatEventOf(entry.meta);
+        /* ⚠ THE EVENT ARRIVES ALREADY FOLDED. It used to be re-read here from
+         * `entry.meta`; it now comes down from `foldExchanges`, which may have
+         * merged a verdict's roll into it. Reading the raw meta again at this
+         * depth would quietly undo the fold. */
+        const cmbEvent = event;
         if (cmbEvent) {
           return (
             <View style={styles.combatEntry}>
@@ -258,7 +268,20 @@ const FeedRow = React.memo(function FeedRow({ entry, names }: { entry: GameLogEn
 
 export function AdventureFeed({ entries, enemyNames, actionChipLabel, actionChipA11yLabel, onActionChipPress, packChipLabel, packChipA11yLabel, onPackChipPress }: Props) {
   const scrollRef = useRef<ScrollView>(null);
-  const visible = entries.filter((e) => !HIDDEN_CHANNELS.has(e.channel)).slice(-FEED_WINDOW); // OTA-1696
+  /* ⚠⚠⚠ OTA-1790 — MEMOISED, AND IT HAS TO BE NOW. This was recomputed on every
+   * render, which was already wasteful (LAG-2's whole subject) but harmless:
+   * `rows` only handed each memoised `FeedRow` its ENTRY, and entries are
+   * immutable objects, so identity held and nothing re-rendered.
+   * The fold changed that. A merged exchange is a NEW object built from a verdict
+   * and its damage line, so a fresh `rows` array means a fresh `event` prop on
+   * every folded row — every combat row in the window re-rendering on every log
+   * line, which is exactly the five-raider stall OTA-1696 measured and fixed.
+   * `entries` is the store's own array and is stable between appends, so keying
+   * on it makes `visible`, `rows` and every merged event stable with it. */
+  const visible = useMemo(
+    () => entries.filter((e) => !HIDDEN_CHANNELS.has(e.channel)).slice(-FEED_WINDOW), // OTA-1696
+    [entries],
+  );
   /* ⚠⚠⚠ VIS-2 — A DEFEAT'S DROPS ARE ONE BLOCK, NOT ONE ROW EACH.
    * The resolver writes one entry per recovered item, which is right for the
    * disk log and for TTS and must not change. In the FEED that was four
@@ -269,28 +292,13 @@ export function AdventureFeed({ entries, enemyNames, actionChipLabel, actionChip
    * what the authority logs.
    * ⚠ Adjacent only. A reward separated from the pile by any other line keeps
    * its own place, because the order the feed shows is the order things
-   * happened and grouping across a gap would be a lie about sequence. */
-  const rows = useMemo(() => {
-    const out: Array<{ key: string; entry?: GameLogEntry; cluster?: CombatEvent[] }> = [];
-    let run: CombatEvent[] | null = null;
-    let runKey = '';
-    const flush = () => {
-      if (run && run.length > 0) out.push({ key: `cmbr_${runKey}`, cluster: run });
-      run = null;
-    };
-    for (const e of visible) {
-      const ev = combatEventOf(e.meta);
-      if (ev && ev.kind === 'reward') {
-        if (!run) { run = []; runKey = e.id; }
-        run.push(ev);
-        continue;
-      }
-      flush();
-      out.push({ key: e.id, entry: e });
-    }
-    flush();
-    return out;
-  }, [visible]);
+   * happened and grouping across a gap would be a lie about sequence.
+   * ⚠ OTA-1790 — the loop that did this MOVED, unchanged in behaviour, into
+   * `combatSentence.foldExchanges`, which now also folds a to-hit verdict into
+   * the damage line reporting the same exchange. Both are the same kind of claim
+   * (one moment, one row) and both are presentation only, so they belong in one
+   * graded function rather than one here and one there. */
+  const rows = useMemo(() => foldExchanges(visible), [visible]);
   // OTA-1696 — keyed on the CONTENTS: the screen builds a fresh `enemyNames`
   // array every render, so a dependency on the array itself changed every time
   // and every memoised row re-rendered with it.
@@ -321,9 +329,9 @@ export function AdventureFeed({ entries, enemyNames, actionChipLabel, actionChip
       contentContainerStyle={styles.content}
       onContentSizeChange={handleAutoScroll}
     >
-      {rows.map((r) => (r.cluster
-        ? <View key={r.key} style={styles.combatEntry}><RewardCluster events={r.cluster} /></View>
-        : <FeedRow key={r.key} entry={r.entry!} names={names} />))}
+      {rows.map((r) => (r.kind === 'rewards'
+        ? <View key={r.key} style={styles.combatEntry}><RewardCluster events={r.events} /></View>
+        : <FeedRow key={r.key} entry={visible[r.index]!} names={names} event={r.event} />))}
 
       {/* ⚠⚠⚠ OTA-1457 — THE TRAILING ACTION CHIP, AND WHY IT IS *HERE*.
           It renders AFTER the entry map, outside it, so it is structurally

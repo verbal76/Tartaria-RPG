@@ -86,6 +86,7 @@ import { incomingHitCue, soakCueLine, leakCueLine } from '../engine/combatCues';
  * player's: copied from the values this resolver just used, at the site that
  * used them. Nothing here reads a sentence to find out what happened. */
 import { cmb, type CombatOutcome } from '../engine/combatEvent';
+import { enemyStrikeProse } from '../engine/combatProse';
 import { rollIncomingStatusEffect, applyEffect, statusAcAdjustment, hasFullCover, aethericVulnerabilityMultiplier } from '../engine/statusEffects';
 import { isSkipControl, controlLabel, tickControl } from '../engine/enemyControl';
 import type { EnemyControlState } from '../engine/enemyControl';
@@ -2630,8 +2631,19 @@ function applyEnemyCounter(
         // ⚠ VIS-2 — the consequence, structured: how much arrived, of what, and
         // what the player has left. `hp.max` is the player's own maximum, so the
         // feed can show the reading without the panels being asked twice.
+        /* ⚠⚠⚠ OTA-1790 — NO `family` HERE, AND THAT IS A FINDING RATHER THAN AN
+         * OMISSION. The pack: *"Enemy attacks should use the enemy's actual
+         * strike/weapon family where the engine knows it. If the enemy attack
+         * has no weapon-family information, use the narrowest existing generic
+         * family supported by real data; do not invent a weapon."*
+         * The engine does not know. `Enemy` carries `attack` and `damage` as
+         * dice strings and nothing that names an object; the only weapon-shaped
+         * fact in reach is `enemyDamageType`, and deriving a sword from
+         * "slashing" would make the mark a DAMAGE-TYPE icon — precisely what the
+         * pack says the weapon glyph is not. So the column stays reserved and
+         * stays empty on incoming blows, and the gap is reported. */
         get().appendLog('combat', msg, cmb({ kind: 'damage', side: 'enemy', actor: enemy.name, outcome: 'hit',
-          dmg, weapon: enemyDamageType, hp: { now: newHp, max: hpMaxForWarn } }));
+          dmg, weapon: enemyDamageType, prose: enemyStrikeProse(enemy.name, enemyDamageType, { armour: resisted.blocked || plateDr > 0, killed }), hp: { now: newHp, max: hpMaxForWarn } }));
         // OTA 228 — low-HP latch fires AFTER the combat line so the
         // narrative reads "X damage. 1 HP." then "Arbiter: eat /
         // first-aid kit." Skip when killed — falling already speaks

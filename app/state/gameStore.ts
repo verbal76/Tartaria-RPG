@@ -46,7 +46,7 @@ import { buildingNameFor, buildingHookLabel, buildingArrow } from '../engine/bui
 import type { MissionFamily } from '../engine/questStage';
 // OTA-1440 — the first reader of vendors.json's gender field.
 import { npcGenderFor } from '../engine/npcGender';
-import { koShare } from '../engine/combatProse';
+import { koShare, attackOpener, attackHit, attackMiss, attackKill, hitProse, missProse, killProse } from '../engine/combatProse';
 import { applyConsumableCures } from '../engine/consumableCures';
 import { landControl, controlLabel } from '../engine/enemyControl';
 // ⚠ OTA-1236 — ONE rule for "this noun carries a next step", shared by the engine
@@ -421,6 +421,7 @@ import { rollDie, rollFromNotation, pick, chance, rotatingPick } from '../engine
 import { buildCombatSteps, buildSkillSteps, rollMods, classifyManeuver, fleeGraceApplies, FLEE_STAMINA_COST, beginnersLuck } from '../engine/combatRules';
 // ⚠⚠ VIS-2 — the structured result beside the sentence (engine/combatEvent): copied from the values the resolver used, never parsed back out of prose.
 import { cmb, type CombatOutcome } from '../engine/combatEvent';
+import { swungFamily } from '../engine/weaponFamilyArt';
 // ⚠ OTA-1678 — the escape bar escalates on RANDOM ground only. The four world
 // rolls stamp their bodies; the dispatch reads the bar through fleeOdds, the
 // same reader the FLEE chip prints its odds from.
@@ -19385,7 +19386,7 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
             const hps = [...currentScene.enemyHps];
             hps[idx] = Math.max(0, (hps[idx] ?? enemyHit.hp) - dmg);
             set((s) => s.currentScene ? { currentScene: { ...s.currentScene, enemyHps: hps } } : s);
-            get().appendLog('combat', `The ${projectile}${wLabel} hits ${enemyHit.name} for ${dmg}${coatBonus > 0 ? ` (+${coatBonus} ${throwCoat!.kind} coating)` : ''}. (${hps[idx]}/${enemyHit.hp} HP)`, { combatOutcome: 'player_dmg' });
+            get().appendLog('combat', `The ${projectile}${wLabel} hits ${enemyHit.name} for ${dmg}${coatBonus > 0 ? ` (+${coatBonus} ${throwCoat!.kind} coating)` : ''}. (${hps[idx]}/${enemyHit.hp} HP)`, cmb({ kind: 'damage', side: 'player', target: enemyHit.name, outcome: 'hit', dmg, weapon: projectile, family: 'thrown', prose: `The ${projectile} finds ${enemyHit.name}.`, coating: coatBonus > 0 ? throwCoat!.kind : undefined, hp: { now: hps[idx] ?? 0, max: enemyHit.hp } }, { combatOutcome: 'player_dmg' }));
             // OTA-806 [Group-K audit] — coating PARITY on the typed-throw path. Pre-fix
             // this path folded in the coating's on-hit bonus but DROPPED the lingering
             // DOT (and acid armor-shred / corruption stacks), so a Poisoned/Acid/Corrupted
@@ -23239,7 +23240,17 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
       recentNouns: collectSceneNouns(currentScene),
       enemyPresent: true,
     });
-    const weaponName = coatedWeaponNoun(player, swingWeaponNoun(player, actionText, combatParse.resolvedNoun ?? null));
+    const swungNoun = swingWeaponNoun(player, actionText, combatParse.resolvedNoun ?? null);
+    const weaponName = coatedWeaponNoun(player, swungNoun);
+    /* ⚠⚠⚠ OTA-1790 — THE TRANSCRIPT'S WEAPON MARK IS RESOLVED HERE, WHERE THE
+     * SWING IS. `weaponName` above is a DISPLAY string and may already carry a
+     * coating prefix; the pack forbids deriving the mark from it — *"Use the
+     * actual resolved weapon/item family from combat state, not prose string
+     * matching."* `getEquippedWeapon` hands back the catalog row this swing
+     * actually fights with (tags, weaponKind, damageType), which is what the
+     * family resolver reads. A null noun is `swingWeaponNoun`'s bare-hand
+     * answer, and bare hands are a family rather than a missing weapon. */
+    const swingFamily = swungFamily(getEquippedWeapon(player, /\boff[- ]?hand\b/i.test(actionText) ? 'off' : 'main'), swungNoun === null) ?? undefined;
 
     if (initiative) {
       get().appendLog('world', initiative.success
@@ -23329,7 +23340,7 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
       get().appendLog(
         'combat',
         `You — d20 → ${naturalRoll} + ${attack.bonusLabel} = ${attack.total} ${acTag} — ${outcome}`,
-        cmb({ kind: 'swing', side: 'player', target: enemy.name, outcome: cmbOutcome,
+        cmb({ kind: 'swing', side: 'player', target: enemy.name, outcome: cmbOutcome, family: swingFamily,
           roll: { d20: naturalRoll, bonus: attack.bonus, bonusLabel: attack.bonusLabel, total: attack.total, vs: attack.target, vsLabel: `${enemy.name} AC` } }),
       );
       // OTA-1676 — the wielder's own share, owed by the SWING: a ward you raise lands on a miss too.
@@ -24232,7 +24243,7 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
         // damage-out-to-enemy narration green for at-a-glance
         // scannability. Playtester: red text on red background made
         // it hard to spot "did I land damage" mid-fight.
-        get().appendLog('combat', attackKill(weaponName, enemy.name, dmg), cmb({ kind: 'defeat', side: 'player', defeated: enemy.name, dmg, weapon: weaponName ?? undefined, remaining: Math.max(0, (get().currentScene?.enemies ?? []).filter((e) => e !== enemy && (e.hp ?? 0) > 0).length) }, { combatOutcome: 'player_dmg' }));
+        get().appendLog('combat', attackKill(weaponName, enemy.name, dmg), cmb({ kind: 'defeat', side: 'player', defeated: enemy.name, dmg, weapon: weaponName ?? undefined, family: swingFamily, prose: killProse(weaponName, enemy.name), remaining: Math.max(0, (get().currentScene?.enemies ?? []).filter((e) => e !== enemy && (e.hp ?? 0) > 0).length) }, { combatOutcome: 'player_dmg' }));
         // Splice this enemy out of the scene (loot + scene clear handled
         // in resolveEnemyDefeat which now operates per-active-enemy).
         get().resolveEnemyDefeat();
@@ -24332,7 +24343,7 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
             }
           }
         } else {
-          get().appendLog('combat', attackHit(weaponName, enemy.name, dmg, newEnemyHp), cmb({ kind: 'damage', side: 'player', target: enemy.name, outcome: 'hit', dmg, weapon: weaponName ?? undefined, hp: { now: newEnemyHp, max: enemy.hp } }, { combatOutcome: 'player_dmg' }));
+          get().appendLog('combat', attackHit(weaponName, enemy.name, dmg, newEnemyHp), cmb({ kind: 'damage', side: 'player', target: enemy.name, outcome: 'hit', dmg, weapon: weaponName ?? undefined, family: swingFamily, prose: hitProse(weaponName, enemy.name), hp: { now: newEnemyHp, max: enemy.hp } }, { combatOutcome: 'player_dmg' }));
         }
         // OTA-362 — the enemy survived the blow, so apply the coating's
         // ONGOING effects: seed/refresh the DOT; acid also shreds the
@@ -24402,7 +24413,16 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
           get().appendLog(
             'combat',
             `${weaponName ?? `${proc.label} weapon`} — ${proc.rolled} ${proc.kind} bites in and festers (${COATING_DOT_TURNS} turns).${extra}`,
-            { combatOutcome: 'player_dmg' },
+            /* ⚠ OTA-1790 — THE COATING IS NAMED ONLY WHERE IT ACTUALLY FIRED.
+             * The pack: *"Do not claim a coating effect merely because a weapon
+             * is coated if that effect did not trigger. If ongoing coating/status
+             * damage occurs separately, report it as its own consequence rather
+             * than folding hidden math into the weapon hit."* This site IS the
+             * proc — `applyCoatingProc` only runs on a roll that landed — and it
+             * has always been its own line. All it needed was to say which
+             * coating, so the transcript can draw the glyph that already exists
+             * for it instead of the player reading the word out of the sentence. */
+            cmb({ kind: 'status', side: 'player', coating: proc.kind, target: enemy.name }, { combatOutcome: 'player_dmg' }),
           );
         };
         // OTA-362 — the enemy survived the blow, so apply the coating's ONGOING
@@ -24466,7 +24486,7 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
         if (!enemiesActedFirst) runEnemyGroupCounters(get, set, player, { skipDotTick: true });
       }
     } else {
-      get().appendLog('combat', attackMiss(weaponName, enemy.name), cmb({ kind: 'damage', side: 'player', target: enemy.name, outcome: 'miss', weapon: weaponName ?? undefined }));
+      get().appendLog('combat', attackMiss(weaponName, enemy.name), cmb({ kind: 'damage', side: 'player', target: enemy.name, outcome: 'miss', weapon: weaponName ?? undefined, family: swingFamily, prose: missProse(weaponName, enemy.name) }));
       // OTA-1017 — one volley per round; skipped if initiative already spent it.
       if (!enemiesActedFirst) runEnemyGroupCounters(get, set, player, { skipDotTick: true });
     }
@@ -36797,10 +36817,6 @@ function swingWeaponNoun(
   return player?.equipped?.main ?? null;
 }
 
-function weaponPhrase(weapon: string | null): string {
-  return weapon ? ` with the ${weapon.toLowerCase()}` : '';
-}
-
 /** arb-fix (playtest) — a defeated/knocked-out enemy's UNLOOTABLE signature weapon
  *  (the Order's Hollow Edge) prints a long "you can't take it" paragraph. Clearing two
  *  enforcers in one scene fired it twice back-to-back. Emit the full `reason` the FIRST
@@ -36821,57 +36837,6 @@ function leaveSignatureWeapon(
   set((s) => (s.currentScene
     ? { currentScene: { ...s.currentScene, signatureWeaponsExplained: [...(s.currentScene.signatureWeaponsExplained ?? []), sig.name] } }
     : {}));
-}
-
-function attackOpener(enemyName: string, weapon?: string | null): string {
-  const w = weapon ?? null;
-  if (w) {
-    // arb-fix — these openers are picked at attack time, BEFORE initiative is
-    // rolled, so none of them may assert who acts first (the resolved
-    // "You seize the initiative" / "X moves first" line prints later and would
-    // contradict them). Keep the flavor turn-order-neutral.
-    return pick([
-      `You raise the ${w.toLowerCase()} toward ${enemyName}. The room narrows around the both of you.`,
-      `Your ${w.toLowerCase()} comes around in an arc; ${enemyName} squares up to meet it.`,
-      `You commit forward with the ${w.toLowerCase()}. ${enemyName} watches your hands.`,
-      `You bring the ${w.toLowerCase()} to bear on ${enemyName}.`,
-    ]);
-  }
-  return pick([
-    `You close on ${enemyName}. The room narrows around the both of you.`,
-    `${enemyName} fixes on you. You commit to the strike.`,
-    `You drive toward ${enemyName}, set to strike.`,
-  ]);
-}
-
-function attackHit(weapon: string | null, enemyName: string, dmg: number, remainingHp: number): string {
-  const wp = weaponPhrase(weapon);
-  return pick([
-    `Your strike${wp} lands for ${dmg}. ${enemyName} staggers — ${remainingHp} HP remaining. It answers.`,
-    `${enemyName} takes ${dmg}${wp}. It reels: ${remainingHp} left. Then it fights back.`,
-    `Clean hit${wp} for ${dmg}. ${enemyName} has ${remainingHp} left and does not back away.`,
-    `The blow${wp} finds purchase — ${dmg} damage, ${remainingHp} HP standing. ${enemyName} commits to the counter.`,
-  ]);
-}
-
-function attackMiss(weapon: string | null, enemyName: string): string {
-  const wp = weaponPhrase(weapon);
-  return pick([
-    `Your strike${wp} glances off. ${enemyName} seizes the opening.`,
-    `${enemyName} reads the motion and slips it${wp ? ` — the ${weapon!.toLowerCase()} carves only air` : ''}. The counter is already coming.`,
-    `${wp ? `The ${weapon!.toLowerCase()} cuts air` : 'Your strike cuts air'}. ${enemyName} answers immediately.`,
-    `Half a beat too slow. ${enemyName} steps inside your reach.`,
-  ]);
-}
-
-function attackKill(weapon: string | null, enemyName: string, dmg: number): string {
-  const wp = weaponPhrase(weapon);
-  return pick([
-    `Your blow${wp} lands clean — ${dmg} damage. ${enemyName} crumples in the dust. The Aetherstone settles.`,
-    `${enemyName} folds${wp ? ` under the ${weapon!.toLowerCase()}` : ''}. ${dmg} damage was enough. The room exhales.`,
-    `Final strike${wp} for ${dmg}. ${enemyName} is still. The Aetherstone hums on, indifferent.`,
-    `The killing blow${wp}: ${dmg}. ${enemyName} drops where it stood.`,
-  ]);
 }
 
 // Log faction-rep changes one line per affected faction so the player

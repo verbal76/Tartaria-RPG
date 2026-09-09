@@ -196,7 +196,11 @@ describe('OTA-1457 — it cannot yank the feed', () => {
     // ⚠ VIS-2 — same claim, new map expression: the entries are rendered from
     // `rows` now (adjacent loot drops collapse into one cluster), and the chip
     // must still sit AFTER all of it.
-    const mapCloses = FEED.indexOf('<FeedRow key={r.key} entry={r.entry!} names={names} />))}');
+    // ⚠ OTA-1790 — same claim again, and the pin is now on the MAP rather than
+    // on one row's whole prop list: the entries are rendered from `rows` (a
+    // folded exchange is one row now), and the chip must still sit after all of
+    // it. `rows.map(` is the structural fact; the row's props are not.
+    const mapCloses = FEED.indexOf('<FeedRow key={r.key}');
     const chipAt = FEED.indexOf('{actionChipLabel ? (');
     expect(mapCloses).toBeGreaterThan(-1);
     expect(chipAt).toBeGreaterThan(mapCloses);

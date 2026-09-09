@@ -30054,7 +30054,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SUPERSEDED: '2026-09-09-1786-the-name-column-fits-its-vocabulary'
 // SUPERSEDED: '2026-09-09-1787-the-row-reads-its-own-hierarchy'
 // SUPERSEDED: '2026-09-09-1788-the-utility-marks-are-ours'
-export const OTA_BUILD_ID = '2026-09-09-1789-one-weapon-family-resolver';
+// SUPERSEDED: '2026-09-09-1789-one-weapon-family-resolver'
+export const OTA_BUILD_ID = '2026-09-09-1790-the-exchange-reads-as-a-sentence';
 // golem catch-up 2026-09-09: markerless publish of OTA-1789.
 // OTA-1789 - one weapon-family resolver. The taxonomy was already in the game:
 // a census of all 301 catalog weapons found the family words in `tags` already

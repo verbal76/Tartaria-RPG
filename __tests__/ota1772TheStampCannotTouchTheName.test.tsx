@@ -22,11 +22,24 @@
  * ⚠ AND THE SUB-ROW HAD THE SAME DEFECT, found by reading rather than by waiting
  * for it: a long weapon name would weld itself to the HP readout on identical
  * terms. Fixed in the same pass.
+ *
+ * ⚠⚠⚠ OTA-1790 CLOSED THIS DEFECT CLASS STRUCTURALLY, SO THE TESTS BELOW WERE
+ * RE-AIMED AT THE CLAIM RATHER THAN DELETED. The two columns are gone: an
+ * exchange is now ONE SENTENCE built by `engine/combatSentence`, its parts are
+ * runs inside a single wrapping `<Text>`, and the name is never truncated. A
+ * stamp cannot weld itself to a name when there is no stamp column and no
+ * ellipsis — so the layout assertions become assertions about the SENTENCE, and
+ * they are stronger for it: the collision is now impossible for every name
+ * length and every one of the seven outcomes, tested against the builder rather
+ * than against a StyleSheet. What must never come back is a presentation where
+ * the outcome and the name are separately positioned; that is what these tests
+ * now guard.
  */
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
 import { outcomeLabel } from '../app/engine/combatEvent';
+import { eventLine, eventSentence } from '../app/engine/combatSentence';
 
 const ROOT = join(__dirname, '..');
 const read = (...p: string[]) => readFileSync(join(ROOT, ...p), 'utf8');
@@ -53,6 +66,17 @@ const CODE = codeOf(STRIP);
 const styleBody = (key: string): string =>
   new RegExp(`\\n {2}${key}: \\{([^}]*)\\}`).exec(CODE)?.[1] ?? '';
 
+/** The row's column gap, as a NUMBER, whether it is written inline or through a
+ *  named constant. ⚠ OTA-1790 moved it to `ROW_GAP` so the prose indent could be
+ *  computed from the same value; a test that only understood a literal digit
+ *  would have gone red on a refactor that changed nothing about the claim. */
+const rowGap = (): number => {
+  const raw = /columnGap: ([A-Za-z_0-9]+)/.exec(styleBody('row'))?.[1] ?? '';
+  if (/^\d+$/.test(raw)) return Number(raw);
+  const named = new RegExp(`const ${raw} = (\\d+)`).exec(CODE)?.[1];
+  return named ? Number(named) : NaN;
+};
+
 // ═══ 1. THE GUTTER EXISTS, AND IT IS NOT CONDITIONAL ═════════════════════════
 describe('⚠⚠⚠ the two columns cannot touch, however long the name is', () => {
   test('the row declares a real column gap', () => {
@@ -60,17 +84,17 @@ describe('⚠⚠⚠ the two columns cannot touch, however long the name is', () 
      * The claim is "there is an unconditional minimum between the columns", not
      * "the number is 7". A later pass that widens it must not turn this red; a
      * later pass that DELETES it must. So: a positive gap, whatever its size. */
-    const gap = /columnGap: (\d+)/.exec(styleBody('row'))?.[1];
-    expect(gap).toBeDefined();
-    expect(Number(gap)).toBeGreaterThan(0);
+    expect(rowGap()).toBeGreaterThan(0);
   });
 
-  test('⚠⚠ the auto margin is NOT the separation any more — it is only the push', () => {
-    /* The `auto` margin stays: it is what puts the result at the far end. What
-     * changed is that it is no longer the ONLY thing between the columns. This
-     * test exists so nobody "simplifies" by deleting the gap and leaving the
-     * auto margin, which is precisely the shipped defect. */
-    expect(styleBody('result')).toContain("marginLeft: 'auto'");
+  test('⚠⚠ OTA-1790 — there is no auto-pushed column left to collide with', () => {
+    /* The shipped defect was an `auto` margin doing double duty as the gutter.
+     * The whole column is gone: the outcome is the sentence's VERB and travels
+     * with the name in one text run. This asserts the mechanism cannot return —
+     * nothing in the row is positioned by leftover space. */
+    expect(styleBody('result')).toBe('');
+    const exchange = CODE.slice(CODE.indexOf('  row: {'), CODE.indexOf('  math: {'));
+    expect(exchange).not.toContain("marginLeft: 'auto'");
     expect(/columnGap/.test(styleBody('row'))).toBe(true);
   });
 
@@ -83,38 +107,61 @@ describe('⚠⚠⚠ the two columns cannot touch, however long the name is', () 
     expect(styleBody('spineIn')).not.toContain('marginRight');
   });
 
-  test('⚠⚠ spine→who is UNCHANGED at the value it always shipped', () => {
-    /* The one number this pass is allowed to preserve exactly, because it is the
-     * one that was already right. It moved from the spine's margin to the row's
-     * gap; if the gap is not 7 then this refactor silently restyled the row. */
-    expect(styleBody('row')).toContain('columnGap: 7');
+  test('⚠⚠ OTA-1790 — the gap survived the re-layout, at whatever the row now needs', () => {
+    /* This used to pin 7 exactly, on the grounds that the number was already
+     * right and a refactor must not restyle the row. OTA-1790 inserted a
+     * RESERVED GLYPH COLUMN between the spine and the words — the pack requires
+     * one — so the row genuinely has different neighbours than it did, and
+     * pinning the old number would be pinning the mechanism. The claim survives:
+     * an unconditional, positive minimum between every pair in the row. */
+    expect(rowGap()).toBeGreaterThan(0);
+    expect(styleBody('markCol')).toContain('width');
   });
 });
 
 // ═══ 2. WHICH SIDE GIVES WAY ═════════════════════════════════════════════════
-describe('⚠⚠ the name yields and the stamp does not', () => {
-  test('the name column shrinks and can ellipsise', () => {
-    /* `minWidth: 0` is the half people forget: without it a flex child will not
-     * shrink below its content and the ellipsis never appears. */
-    const who = styleBody('who');
-    expect(who).toContain('flexShrink: 1');
-    expect(who).toContain('minWidth: 0');
+describe('⚠⚠ OTA-1790 — nothing yields, because nothing competes', () => {
+  test('the sentence takes the rest of the row and wraps inside it', () => {
+    /* There is no name column and no stamp column to trade width between. One
+     * text node holds subject, verb, object and damage, and `flex: 1` gives it
+     * whatever the spine and the reserved mark column leave. */
+    expect(styleBody('line')).toContain('flex: 1');
+    expect(styleBody('who')).toBe('');
+    expect(styleBody('result')).toBe('');
   });
 
-  test('⚠ the result column is pinned against shrinking, said out loud', () => {
-    /* RN already defaults views to `flexShrink: 0`, so this is documentation
-     * rather than behaviour — and it is worth the line, because the instinct on
-     * a crowded row is to let both sides give, and half a stamp is worse than an
-     * ellipsised name. */
-    expect(styleBody('result')).toContain('flexShrink: 0');
+  test('⚠⚠⚠ the name is allowed a second line, which is what actually kills the defect', () => {
+    /* THE ONE CLAIM THIS PASS DELIBERATELY REVERSED, on the reference pack's own
+     * instruction: *"Allow long enemy names to wrap/truncate according to a
+     * governed rule without scrambling HIT/target/damage order."* VIS-2 clamped
+     * both names to one line so an exchange was a fixed height; the ellipsis
+     * that produced is precisely what `MISSConspiracy Archit…` was made of. The
+     * density argument survives because a one-line exchange is still one row —
+     * only a genuinely long name pays for a second. */
+    const row = CODE.slice(CODE.indexOf('function ExchangeRow'), CODE.indexOf('function DefeatRow'));
+    expect(row).toContain('<Text style={styles.line}>');
+    expect(/styles\.line[\s\S]{0,200}numberOfLines/.test(row)).toBe(false);
   });
 
-  test('⚠ both name Texts still cap at one line — the row must not grow', () => {
-    /* The whole density argument (VIS-2) is that an ordinary exchange is a fixed
-     * height. A wrapping name would fix the collision by breaking the thing the
-     * component exists for. */
-    expect(CODE).toContain('<Text style={styles.actor} numberOfLines={1}>');
-    expect(CODE).toContain('<Text style={styles.target} numberOfLines={1}>');
+  test('⚠⚠ and the outcome can no longer touch the name, at ANY length', () => {
+    /* Graded against the BUILDER rather than the StyleSheet, so it holds for
+     * every name the game can produce. The reported string was `MISSConspiracy
+     * Archit…`; the sentence puts a space between every part by construction and
+     * has no way to emit two adjacent words without one. */
+    const names = ['R', 'Raider', 'Conspiracy Architect 1',
+      'Thrice-Bound Architect of the Drowned Cartographic Assembly 11'];
+    const outcomes = ['crit', 'hit', 'miss', 'fumble', 'dodged', 'evaded', 'slipped'] as const;
+    for (const name of names) {
+      for (const o of outcomes) {
+        const l = eventLine({ kind: 'damage', side: 'player', target: name, outcome: o, dmg: 7 })!;
+        const sentence = eventSentence({ kind: 'damage', side: 'player', target: name, outcome: o, dmg: 7 });
+        // every part that exists is separated from its neighbour
+        expect([name, o, sentence.includes(`${l.verb}${l.object}`)]).toEqual([name, o, false]);
+        expect([name, o, sentence]).toEqual([name, o, sentence.replace(/\s+/g, ' ')]);
+        // and nothing is clipped
+        expect([name, o, sentence.includes('…')]).toEqual([name, o, false]);
+      }
+    }
   });
 });
 
@@ -133,30 +180,34 @@ describe('⚠⚠⚠ nothing was padded with literal whitespace', () => {
     }
   });
 
-  test('⚠ and all seven go through the one row that was fixed', () => {
-    /* The report named MISS and guessed HIT. Neither is special: `Stamp` renders
-     * whatever `outcomeLabel` returns, inside `styles.result`, for every kind.
-     * So the fix covers seven labels, not two — asserted by reading the single
-     * render path rather than by trusting that claim. */
-    expect(CODE).toContain('const label = outcomeLabel(ev.outcome)');
-    expect(CODE).toContain('<View style={styles.result}>');
-    expect(CODE).toContain('<Stamp ev={ev} />');
-    // exactly one Stamp render site, so there is no second unfixed path
-    expect((CODE.match(/<Stamp\b/g) ?? []).length).toBe(1);
+  test('⚠ and all seven still go through ONE render path (OTA-1790: the sentence)', () => {
+    /* The report named MISS and guessed HIT. Neither was ever special, and that
+     * is still the point: every outcome becomes a verb through `eventLine`, and
+     * the row draws whatever it returns. One path, so there is no second unfixed
+     * one — asserted by reading the render site rather than trusting the claim. */
+    expect(CODE).toContain('const line = eventLine(ev);');
+    expect(CODE).toContain('<Text style={styles.line}>');
+    expect((CODE.match(/eventLine\(/g) ?? []).length).toBe(1);
+    for (const o of ['crit', 'hit', 'miss', 'fumble', 'dodged', 'evaded', 'slipped'] as const) {
+      const l = eventLine({ kind: 'damage', side: 'player', target: 'Raider', outcome: o, dmg: 5 });
+      expect([o, l?.verb]).toEqual([o, l!.verb]);
+      expect([o, (l!.verb ?? '').length > 0]).toEqual([o, true]);
+    }
   });
 });
 
 // ═══ 4. THE SECOND ROW, FOUND RATHER THAN REPORTED ═══════════════════════════
-describe('⚠⚠ the sub-row had the identical defect and was fixed with it', () => {
-  test('weapon name vs HP readout now has the same guaranteed minimum', () => {
-    const sub = styleBody('subRow');
-    const gap = /columnGap: (\d+)/.exec(sub)?.[1];
-    expect(gap).toBeDefined();
-    expect(Number(gap)).toBeGreaterThan(0);
-    // and the same ingredients that made it vulnerable are still there —
-    // a shrinking left side and an auto-pushed right side
-    expect(styleBody('sub')).toContain('flexShrink: 1');
-    expect(styleBody('hp')).toContain("marginLeft: 'auto'");
+describe('⚠⚠ the sub-row had the identical defect, and OTA-1790 deleted the row', () => {
+  test('there is no second two-column row left to collide', () => {
+    /* The weapon moved into layer B's prose and the HP readout moved INSIDE the
+     * sentence, so the vulnerable shape — a shrinking left side and an
+     * auto-pushed right side — no longer exists anywhere in the file. */
+    expect(styleBody('subRow')).toBe('');
+    expect(styleBody('hp')).toBe('');
+    expect(styleBody('sub')).toBe('');
+    // and what it carried is still reachable: the standing readout rides the run
+    expect(eventLine({ kind: 'damage', side: 'player', target: 'Raider', outcome: 'hit', dmg: 3, hp: { now: 6, max: 24 } })!.standing)
+      .toBe(' · 6/24');
   });
 });
 
@@ -167,7 +218,8 @@ describe('the suite grades code', () => {
      * a one-line style and asserted against the next one's properties. */
     expect(styleBody('spineIn')).toContain('INCOMING');
     expect(styleBody('spineIn')).not.toContain('marginLeft');
-    expect(styleBody('result')).toContain('marginLeft');
+    expect(styleBody('markCol')).toContain('WEAPON_ART_SIZE');
+    expect(styleBody('markCol')).not.toContain('backgroundColor');
     expect(styleBody('row')).not.toContain('backgroundColor');
   });
 

@@ -385,15 +385,19 @@ describe('OTA-1745 — 2. the vertical budget, measured', () => {
     expect(FEED_WIDTH_DP).toBeGreaterThan(0);
   });
 
-  it('⚠⚠ an ordinary attack is one or two rows — never a card', () => {
+  it('⚠⚠ an ordinary attack is ONE row — never a card (OTA-1790: and never two)', () => {
     const swing = AFTER_SEQUENCES['ordinary exchange (player hit + enemy miss)']![0]!;
     const dmg = AFTER_SEQUENCES['ordinary exchange (player hit + enemy miss)']![1]!;
-    // A verdict with no weapon and no HP prints exactly ONE row.
+    /* ⚠⚠⚠ RE-AIMED, AND THE CLAIM GOT STRONGER. This used to allow a landed blow
+     * TWO rows — the result, then a second row for the weapon and the HP left.
+     * OTA-1790 folded the verdict into the blow and moved both of those facts
+     * into the sentence, so a landed blow is now exactly one row, same as a
+     * verdict. The density argument that motivated VIS-2 is unchanged and the
+     * measurement is simply better than it was. */
     expect(stripHeight(swing)).toBe(STRIP_METRICS.row + STRIP_METRICS.gap + STRIP_METRICS.entry);
-    // A landed blow prints two: the result, then the weapon and the HP it left.
-    expect(stripHeight(dmg)).toBe(STRIP_METRICS.row + STRIP_METRICS.sub + STRIP_METRICS.gap * 2 + STRIP_METRICS.entry);
+    expect(stripHeight(dmg)).toBe(STRIP_METRICS.row + STRIP_METRICS.gap + STRIP_METRICS.entry);
     // No borders, no shadows, no elevation per event.
-    const rowStyle = STRIP.slice(STRIP.indexOf('  row: {'), STRIP.indexOf('  rowIncoming:'));
+    const rowStyle = STRIP.slice(STRIP.indexOf('  row: {'), STRIP.indexOf('  spine: {'));
     expect(rowStyle).not.toContain('elevation');
     expect(rowStyle).not.toContain('shadow');
     expect(rowStyle).not.toContain('borderWidth');
@@ -452,7 +456,27 @@ describe('OTA-1745 — 3. the one-second read', () => {
     expect(text).toContain('HIT');       // what happened
     expect(text).toContain('18');        // how much
     expect(text).toContain('6/24');      // what it left
-    expect(text).toContain('Cudgel');    // with what
+  });
+
+  it('⚠⚠ WITH WHAT — answered by the mark and the prose since OTA-1790', () => {
+    /* ⚠ RE-AIMED. The weapon name used to be a second row of the strip. The
+     * reference pack moved it: the FAMILY becomes an illustrated mark in a
+     * reserved column (*"The small glyph to the left of a combat exchange
+     * identifies the weapon family used for that exchange"*) and the NAME goes
+     * into layer B's prose (*"The prose should mention the ACTUAL weapon used
+     * when known"*). Both are still on the exchange; neither is a bare column
+     * of text any more. */
+    const withWeapon = ev({
+      kind: 'damage', side: 'player', target: 'Raider', outcome: 'hit', dmg: 18,
+      weapon: 'Cudgel', family: 'mace', prose: 'The blow with the cudgel finds purchase.',
+      hp: { now: 6, max: 24 },
+    });
+    const t = mount(<CombatStrip event={withWeapon} text="" />);
+    expect(allText(t).toLowerCase()).toContain('cudgel');
+    const marks = t.root.findAll((n) =>
+      typeof n.type === 'string' && String(n.props.testID ?? '').startsWith('weapon-mark-'));
+    expect(marks.length).toBe(1);
+    expect(marks[0]!.props.testID).toBe('weapon-mark-mace');
   });
 
   it('⚠⚠⚠ DID SOMETHING DIE, AND HOW MANY REMAIN — on the defeat', () => {
@@ -471,15 +495,38 @@ describe('OTA-1745 — 3. the one-second read', () => {
     // 1. name order
     expect(allText(out).indexOf('YOU')).toBeLessThan(allText(out).indexOf('Raider'));
     expect(allText(inc).indexOf('Raider')).toBeLessThan(allText(inc).indexOf('YOU'));
-    // 2. the row's own direction, and 3. the indent — both in the style, not
-    //    in a hue, so a monochrome screenshot still reads correctly.
-    expect(STRIP).toContain("rowIncoming: { paddingLeft: 14, flexDirection: 'row-reverse' }");
-    const hasReversed = inc.root.findAll((n) => {
-      const st = n.props.style as unknown;
-      const flat = Array.isArray(st) ? st : [st];
-      return flat.some((x) => !!x && typeof x === 'object' && (x as { flexDirection?: string }).flexDirection === 'row-reverse');
-    });
-    expect(hasReversed.length).toBeGreaterThan(0);
+    /* ⚠⚠⚠ 2. WHICH EDGE IS LIT — RE-AIMED, SAME CLAIM, DIFFERENT MECHANISM.
+     * VIS-2 reversed the whole row to move the spine to the far side. The
+     * reference pack requires a RESERVED GLYPH COLUMN so successive exchanges
+     * align, and a reversed row moves that column to the opposite edge on every
+     * incoming blow. So both edges are now reserved and exactly one is lit: 4px
+     * buys the same non-chromatic "which way did this go", and the mark's x is
+     * identical in both directions rather than merely close.
+     * ⚠ The third cue — VIS-2's indent — is retired with it, and the sentence's
+     * word order replaces it. It is the strongest of the four: `YOU HIT Raider`
+     * versus `Raider HIT YOU` is English rather than a convention to learn, and
+     * it is asserted above as cue 1. */
+    expect(STRIP).not.toContain("flexDirection: 'row-reverse'");
+    /* ⚠ THE STYLE ARRAY MUST BE MERGED BEFORE IT IS READ. `[styles.spine,
+     * styles.spineOut]` keeps `width` in one object and `backgroundColor` in the
+     * other, so asking any single entry for both finds neither — the first draft
+     * of this check reported zero lit edges on a row that has one. */
+    const merged = (t: ReturnType<typeof mount>) => t.root.findAll((n) => typeof n.type === 'string')
+      .map((n) => {
+        const st = n.props.style as unknown;
+        return Object.assign({}, ...(Array.isArray(st) ? st : [st]).flat().filter((x) => !!x && typeof x === 'object')) as
+          { width?: number; backgroundColor?: string };
+      });
+    const spines = (t: ReturnType<typeof mount>) => merged(t).filter((x) => x.width === 2);
+    const lit = (t: ReturnType<typeof mount>) => spines(t)
+      .filter((x) => x.backgroundColor !== undefined && x.backgroundColor !== 'transparent');
+    // one lit edge each, and the unlit one still holds its place
+    expect(lit(out).length).toBe(1);
+    expect(lit(inc).length).toBe(1);
+    expect(spines(out).length).toBe(2);
+    expect(spines(inc).length).toBe(2);
+    // and the two directions light DIFFERENT colours, so the hue agrees with the edge
+    expect(lit(out)[0]!.backgroundColor).not.toBe(lit(inc)[0]!.backgroundColor);
   });
 
   it('⚠⚠ HIT and MISS read instantly; CRIT and DODGE are the only ones that shout', () => {

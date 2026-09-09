@@ -176,3 +176,58 @@ export function weaponFamilyArt(family: WeaponFamily | null | undefined): number
 export function weaponGlyphFor(input: WeaponFamilyInput | null | undefined): number | undefined {
   return weaponFamilyArt(weaponFamilyOf(input));
 }
+
+/**
+ * OTA-1790 — THE FAMILY A SWING USED.
+ *
+ * ⚠⚠⚠ BARE HANDS ARE A FAMILY, NOT A MISSING WEAPON, AND ONLY THE CALLER KNOWS.
+ * `gameStore.swingWeaponNoun` already answers "what did this swing use" and
+ * returns `null` for a genuine bare-hand strike — a typed `punch`, a `kick`, or
+ * simply nothing in either hand. That `null` is indistinguishable from "the row
+ * lookup failed" once it reaches a resolver, so the caller passes the fact
+ * itself rather than letting this function guess from an absence.
+ *
+ * The pack: *"Unarmed attacks use the unarmed mapping."* An unarmed attack that
+ * fell through to no mark at all would read as a bug on glass, and one that fell
+ * through to the main-hand sword would be a lie.
+ */
+export function swungFamily(
+  row: WeaponFamilyInput | null | undefined,
+  bareHanded: boolean,
+): WeaponFamily | null {
+  if (bareHanded) return 'unarmed';
+  return weaponFamilyOf(row);
+}
+
+/**
+ * ⚠⚠⚠ THE TRANSCRIPT'S DENSITY, DERIVED RATHER THAN CHOSEN.
+ *
+ * The pack: *"The weapon glyph must remain legible at phone size but subordinate
+ * to the event text. Start from the existing 28dp glyph language as the
+ * reference scale, then verify actual-device fit. Do not blindly force 28dp if
+ * this transcript context demonstrably requires a smaller governed density."*
+ *
+ * ⚠⚠ 28 IS THE SIZE OF A MARK THAT IS THE SUBJECT. `GLYPH_ART_SIZE` sets it for
+ * a weapon button and for Lore's legend — two surfaces where the picture is what
+ * you came to look at. In the transcript the SENTENCE is the subject and the
+ * mark labels it, which is the same relationship `UTILITY_ART_SIZE` reasoned
+ * about for a chip.
+ *
+ * ⚠ SO THE NUMBER COMES OFF THE LINE BOX, NOT OFF A SCREENSHOT. The event line
+ * is set at 14 with a 20 line height (see CombatStrip). A 20dp mark is exactly
+ * one line box tall: it can never make an exchange taller than the sentence it
+ * labels, and it aligns on the first line when a long enemy name wraps to two.
+ * That is the pack's *"a surface reports its own size"* rule applied to a mark —
+ * the glyph is sized by the type it sits beside, not by a magic constant.
+ *
+ * ⚠ `column` RESERVES THE GUTTER: *"Reserve a stable glyph column so successive
+ * exchanges align."* The column is held open whether or not this exchange has a
+ * picture, so an unarmed punch, a shield bash with no artwork yet and an enemy
+ * blow the engine cannot name all start their sentence on the same x.
+ */
+export const WEAPON_ART_SIZE = {
+  /** the mark itself, one event-line box tall */
+  transcript: 20,
+  /** the reserved column: the mark plus its gutter */
+  column: 26,
+} as const;

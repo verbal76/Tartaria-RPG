@@ -61,6 +61,26 @@ export interface CombatEvent {
   dmg?: number;
   /** The weapon or source, when the resolver knew one. */
   weapon?: string;
+  /** ⚠⚠⚠ OTA-1790 — THE FAMILY THAT DELIVERED THE BLOW, RESOLVED BY THE ENGINE
+   *  AND NEVER BY THE RENDERER. The pack: *"Use the actual resolved weapon/item
+   *  family from combat state, not prose string matching."* `weapon` above is a
+   *  DISPLAY NAME and may carry a coating prefix; it is not something to pattern
+   *  match. This is `weaponFamilyArt.WeaponFamily`, typed as a plain string here
+   *  so the event shape does not drag the artwork table into every importer.
+   *  ⚠ ABSENT IS A REAL ANSWER — the transcript draws no mark rather than a
+   *  wrong one, which is the pack's own fail-safe rule. */
+  family?: string;
+  /** ⚠⚠ OTA-1790 — LAYER B, THE CONSEQUENCE, IN WORDS. The pack asks for two
+   *  layers: a factual event line and *"natural-language narration"* naming the
+   *  weapon and any effect that actually fired. The narration rides HERE rather
+   *  than replacing `entry.text`, so the disk log keeps the complete sentence it
+   *  always had — every number in it — while the feed shows each fact once. */
+  prose?: string;
+  /** ⚠ OTA-1790 — the coating that ACTUALLY TRIGGERED, as a canonical damage
+   *  type (`combatGlyphArt.glyphArt` reads exactly these keys). The pack: *"Do
+   *  not claim a coating effect merely because a weapon is coated if that effect
+   *  did not trigger."* So it is written at the proc site and nowhere else. */
+  coating?: string;
   /** The target's HP AFTER this event. */
   hp?: { now: number; max: number };
   /** Name of whoever went down, on a `defeat`. */

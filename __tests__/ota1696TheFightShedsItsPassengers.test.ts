@@ -85,15 +85,27 @@ describe('OTA-1696 — the feed', () => {
 
   it('keeps a bounded window of memoised rows, keyed on stable inputs', () => {
     expect(FEED_WINDOW).toBe(150);
-    expect(feed.includes("const visible = entries.filter((e) => !HIDDEN_CHANNELS.has(e.channel)).slice(-FEED_WINDOW);")).toBe(true);
-    expect(feed.includes('const FeedRow = React.memo(function FeedRow({ entry, names }: { entry: GameLogEntry; names: string[] }) {')).toBe(true);
+    /* ⚠⚠⚠ OTA-1790 RE-AIMED THIS AND MADE THE CLAIM TRUER. The window is still
+     * `entries` filtered of hidden channels and clipped to FEED_WINDOW — and it
+     * is now MEMOISED on `entries`, which it was not before. That mattered the
+     * moment the feed started folding a to-hit verdict into its damage line: a
+     * merged exchange is a NEW object, so an unmemoised window would hand every
+     * folded row a fresh `event` prop on every log line and re-render the whole
+     * combat window — precisely the stall this suite exists to prevent.
+     * Pinned as the CLAIM (bounded, filtered, memoised on a stable input) rather
+     * than as the exact expression, which is what went red here. */
+    expect(/const visible = useMemo\(/.test(feed)).toBe(true);
+    expect(feed.includes('!HIDDEN_CHANNELS.has(e.channel)')).toBe(true);
+    expect(feed.includes('.slice(-FEED_WINDOW)')).toBe(true);
+    expect(/\[entries\],/.test(feed)).toBe(true);
+    expect(feed.includes('const FeedRow = React.memo(function FeedRow({ entry, names, event }')).toBe(true);
     /* ⚠⚠ VIS-2 RE-AIMED THIS PIN AND THE CLAIM IS UNCHANGED. The map now walks
      * `rows` — the same `visible` window, with an adjacent run of loot events
      * collapsed into one cluster (see AdventureFeed) — and it still renders the
      * SAME memoised `FeedRow` per entry with the entry's own id as its key,
      * which is the property this test exists to hold. */
     expect(feed.includes('const rows = useMemo(')).toBe(true);
-    expect(feed.includes('<FeedRow key={r.key} entry={r.entry!} names={names} />')).toBe(true);
+    expect(feed.includes('<FeedRow key={r.key} entry={visible[r.index]!} names={names} event={r.event} />')).toBe(true);
     // The enemy-name list is keyed on its contents, not the array the screen rebuilds every render.
     expect(feed.includes("const names = useMemo(() => (namesKey ? namesKey.split('\\u0000') : []), [namesKey]);")).toBe(true);
     // Nothing that rendered before stopped rendering: the four row shapes are all inside the row.
@@ -103,7 +115,7 @@ describe('OTA-1696 — the feed', () => {
     expect(row.includes('isStoryBeat')).toBe(true);
     expect(row.includes('renderBodyWithEnemyHighlight(entry.text, color, names)')).toBe(true);
     // The trailing chips stay OUTSIDE the map (OTA-1457's structural rule).
-    expect(feed.indexOf('testID="feed-action-chip"')).toBeGreaterThan(feed.indexOf('<FeedRow key={entry.id}'));
+    expect(feed.indexOf('testID="feed-action-chip"')).toBeGreaterThan(feed.indexOf('<FeedRow key={r.key}'));
   });
 });
 
