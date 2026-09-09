@@ -29947,6 +29947,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ruled; the rule it records is general - a card may only adopt the shell if
 // something inside it can yield to the shell's height ceiling.
 export const OTA_BUILD_ID = '2026-09-09-1777-family-b-is-named';
+// golem catch-up 2026-09-09: markerless publish of OTA-1777 - Family B is named
+// and governed, and the modal sweep is finished. Two shells on purpose:
+// tModalCard is a DIALOG (you are being asked something), tMomentCard is a BEAT
+// (something happened to you). The rim is a PARAMETER because MissionComplete
+// rims in the success green - the kit owns material, never meaning - and four
+// more rim golds left with the adoption (325 to 321).
+// Measuring the backdrops found what the card measurement hid: the scrims split
+// three and three, and the three that neither centre nor pad run full-bleed to
+// the bezel on any screen under 440. Only the three that already drew the padded
+// scrim adopt it; the others are reported, not moved.
+// MissionStinger stays experiential by ruling even though it is built exactly
+// like the five, and ApproachModal becomes a governed exception rather than an
+// open hold. Its heading still claimed to be pending a ruling that had already
+// landed - caught by this pass's own test.
 // golem catch-up 2026-09-09: markerless publish of OTA-1776 - cover before the
 // four thin screens. No code changed; this is the before picture for step 8,
 // written first on the owner's ruling. The measurement is the value: Log, Lore
