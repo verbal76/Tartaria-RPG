@@ -29881,7 +29881,36 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // THROW SPEAR a tone would change what the player sees, so it belongs with the
 // weapon-button composition decision. The pin on their current toneless state is
 // expected to die the day that is decided, which is the point of it.
-export const OTA_BUILD_ID = '2026-09-09-1775-the-chip-vocabulary';
+// SUPERSEDED: '2026-09-09-1775-the-chip-vocabulary'
+// OTA-1776 - cover before the four thin screens. Rollout step 8, first half, on
+// the owner's ruling to establish coverage BEFORE migrating rather than during -
+// doing it during the pass is how the watermark work went wrong.
+// THIS PASS MODIFIES NOTHING. It is the before picture, and it is worth more
+// than a snapshot because it is a MEASUREMENT: the migration is only free where
+// the shipped values already equal the kit's, and the four screens do not agree
+// about that. Log, Lore and World already declare exactly the kit's back pill;
+// GuidanceScreen does not. World's header row is already the kit's; the other
+// three carry a different spacing and will move a few points. Log, Lore and
+// Guidance title in ink, which is the kit's default; World titles in brand gold,
+// which the kit makes you ask for by name - the same question CharacterScreen
+// answered by going ink.
+// THREE DEFECTS ARE PINNED AND ALL THREE ARE EXPECTED TO DIE ON ADOPTION, which
+// is the point of pinning them: the fix should be visible in the diff rather
+// than an unremarked side effect. Guidance's back pill is a FIXED width: 80
+// rather than the minWidth every other screen uses, which is exactly the
+// reported wrapping - a fixed box cannot grow to fit its label. Its tab label is
+// missing fontWeight 700, so its tabs read lighter than every other screen's.
+// And its selected tab label is a fourth off-brand gold that check:gold is blind
+// to, exactly as it was blind to the two OTA-1759 found in Inventory. A THIRD
+// tab difference was found by this pass rather than reported - the selected
+// chip's fill - because a cover that reported two while three moved would be
+// worse than no cover.
+// The behaviour most easily flattened is pinned too: LoreScreen's BACK is
+// CONDITIONAL, from a real report where reading the bestiary mid-game dumped the
+// player on the character select, and TScreenHeader takes a callback precisely
+// so that survives. Guidance's read-only guarantee is pinned as well - listing a
+// card there must never write its seen flag.
+export const OTA_BUILD_ID = '2026-09-09-1776-cover-before-the-thin-four';
 // golem catch-up 2026-09-09: markerless publish of OTA-1775 - the combat chip
 // vocabulary, written down and enforced. Five tones and a neutral default, not
 // three colour families: strike (filled sage, the only turn-ending commitment),
