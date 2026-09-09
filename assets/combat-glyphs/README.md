@@ -11,13 +11,24 @@ that one table:
 | surface | what it draws | size |
 | --- | --- | --- |
 | Lore ▸ Glyphs (`WeaponGlyphKey`) | the legend rows, base types and coats | 28dp |
-| combat weapon buttons (`InputBox`) | coats, own damage, the discovery star | 18dp |
+| combat weapon buttons (`InputBox`) | coats, own damage, the discovery star | 28dp |
 
-The sizes differ **because the surfaces do**, not by preference. The legend row
-inherited a `width: 28` cell from the text glyph it replaced. A weapon chip is
-`paddingVertical: 6` around 12pt text, so 18dp sits inside the content box it
-already had; 28 would add about 12dp to the height of every weapon button in a
-fight. Both numbers live in `GLYPH_ART_SIZE` and nowhere else.
+**Both surfaces draw at 28dp, and the chip grows to hold it** (OTA-1767).
+
+OTA-1766 first shipped combat at 18, sized to fit inside the weapon chip's
+existing content box. The owner overturned that: *"do NOT preserve the current
+combat weapon button height at the expense of icon readability... The combat
+glyphs should be at least Lore size... Do not shrink the artwork simply to
+preserve the old button dimensions."* The priority order is **glyph readable →
+name readable → comfortable padding → compact height, in that order.**
+
+Measured on the live combat screen: the icons render 28×28, the glyph row is
+32dp (28 + 2 + 2 padding), so a weapon chip is **46dp** against a text-only
+chip's **28dp**. The extra 2dp of padding sits on the glyph ROW rather than on
+the chip chassis, so only chips carrying a mark pay for it — `punch`, `kick`,
+`dodge` and the travel chips are unchanged.
+
+The size lives in `GLYPH_ART_SIZE` and nowhere else.
 
 ## The twelve
 

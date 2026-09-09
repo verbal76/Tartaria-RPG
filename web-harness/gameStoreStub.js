@@ -139,9 +139,27 @@ function pickFight(p) {
   return p;
 }
 
-/** The scene the fight happens in. `enemies.length > 0` is what `inCombat` reads. */
+/** The scene the fight happens in. `enemies.length > 0` is what `inCombat` reads.
+ *
+ * ⚠⚠ THE PARALLEL ARRAYS ARE NOT OPTIONAL, WHICH IS WHAT THE FIRST TWO DRAFTS
+ * GOT WRONG. `enemyViews` maps the enemies and indexes `enemyHps[i]`,
+ * `enemyStatuses?.[i]` and the positions by the SAME index — so a scene with one
+ * enemy and no `enemyHps` throws "Cannot read properties of undefined (reading
+ * '0')" before anything renders. They are arrays in lockstep, and a fixture that
+ * supplies one without the others is not a smaller fixture, it is a broken one.
+ * ⚠ `activeEnemyIdx` and `range` are read by `derivedSceneRange`. */
 const FIGHT_SCENE = {
   id: 'harness_fight',
+  /* ⚠ `currentScene.location.name` is read UNGUARDED in the scene header, so a
+   * null location is a crash rather than a blank. The Proxy above makes absent
+   * nouns null, which is right for the ones that are genuinely optional — a
+   * required one still has to be there. */
+  location: { id: 'mire_flats', name: 'The Mire Flats' },
+  transitArea: null,
+  activeEnemyIdx: 0,
+  range: 'close',
+  enemyHps: [40],
+  enemyStatuses: [[]],
   /* ⚠ EVERY REQUIRED FIELD OF `Enemy`, not just the ones the buttons read. The
    * first draft carried five and the screen threw "Cannot read properties of
    * undefined (reading '0')" — `loot` is a required ARRAY and something indexed
@@ -186,6 +204,10 @@ const DATA = {
    * container the screen immediately indexes — `s.worldMemory.memorableEvents`
    * throws on undefined rather than degrading. Empty containers, not fixtures. */
   worldMemory: { memorableEvents: [] },
+  /* ⚠ OTA-1767 — another container the screen indexes rather than guards:
+   * `parseSuggestions.length` is read straight, so `null` throws. Same rule as
+   * `worldMemory` above — empty containers, not fixtures. */
+  parseSuggestions: [],
   arbiterMemory: {},
   vendorState: {},
   player: START === 'title' ? null : (() => {
@@ -197,8 +219,23 @@ const DATA = {
   /* ⚠ OTA-1766 — `--screen=combat` opens exploration WITH a fight on. The screen
    * name itself is not a `ScreenName`, so it is mapped to 'exploration' below;
    * the harness needed a way to ask for a STATE, not just a screen. */
-  currentScene: START === 'combat' ? FIGHT_SCENE : null,
+  currentScene: START === 'combat' ? sceneProxy(FIGHT_SCENE) : null,
 };
+
+/* ⚠⚠⚠ THE SCENE NEEDS THE SAME "ABSENT IS null" DISCIPLINE THE STORE HAS, AND
+ * FORGETTING THAT COST A THIRD REBUILD. The note further down explains why an
+ * unknown STORE key returns `null` rather than `undefined`: the screens spell
+ * the absent test both ways, and `undefined !== null` is true, so an unknown
+ * noun read as PRESENT. A plain object literal has exactly the same problem —
+ * `FIGHT_SCENE.vendor` is `undefined`, so a `!== null` guard let the screen walk
+ * into `.name` on nothing. The scene is a noun bag like the store is, so it gets
+ * the same Proxy: declared keys as written, everything else `null`. */
+function sceneProxy(scene) {
+  return new Proxy(scene, {
+    get: (t, k) => (k in t ? t[k] : (typeof k === 'symbol' ? undefined : null)),
+    has: () => true,
+  });
+}
 
 // Actions are awaited all over the shell, so an unknown one must be thenable.
 const noop = () => Promise.resolve();

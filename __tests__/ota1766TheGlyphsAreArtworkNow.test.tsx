@@ -154,14 +154,16 @@ describe('the mapping is centralized and semantic', () => {
     expect(requirers).toEqual(['app/engine/combatGlyphArt.ts']);
   });
 
-  test('⚠ the two sizes live here and nowhere else', () => {
-    /* So the owner's size call is two numbers in one file. They DIFFER because
-     * the surfaces do — see the file's own note on the chip's content box. */
-    expect(GLYPH_ART_SIZE.lore).toBe(28);
-    expect(GLYPH_ART_SIZE.combat).toBe(18);
-    expect(GLYPH_ART_SIZE.combat).toBeLessThan(GLYPH_ART_SIZE.lore);
+  test('⚠ the displayed size is centralized — the numbers themselves are OTA-1767\'s', () => {
+    /* ⚠⚠ THIS TEST USED TO PIN `combat` AT 18, AND OTA-1767 OVERTURNED THAT.
+     * What OTA-1766 can honestly claim is that the size is declared in ONE place
+     * and both surfaces read it from there — that is what makes an owner's size
+     * call one edit. The VALUES belong to the pass that set them; pinning them
+     * from here is the mistake this rollout keeps re-learning. */
+    expect(Object.keys(GLYPH_ART_SIZE).sort()).toEqual(['combat', 'lore']);
     for (const src of [codeOf(KEY), codeOf(INPUTBOX)]) {
       expect(src).toContain('GLYPH_ART_SIZE');
+      expect(src).not.toMatch(/width: 28, height: 28/);   // no hard-coded copy
     }
   });
 });

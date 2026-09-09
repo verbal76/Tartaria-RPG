@@ -156,7 +156,24 @@ describe('OTA-1636 — the wiring', () => {
      * the cell stretching across the gap into the black bar the owner
      * photographed. A row makes the gap a property, and the failure mode goes
      * with the workaround: there is no cell left for a spacer to be inside. */
-    expect(BOX).toContain('quickMarkLead: { marginLeft: 7 }');
+    /* ⚠⚠⚠ AND THIS ASSERTION ITSELF PINNED A NUMBER AND BROKE ONE OTA LATER,
+     * WHICH IS THE FOURTH TIME IN THIS ROLLOUT AND THE MOST EMBARRASSING. I
+     * rewrote it in OTA-1766 *while explaining that pinning a mechanism is how a
+     * suite goes red on a pass that kept its promise* — and then pinned the
+     * literal margin, which is mechanism. OTA-1767 scaled the gaps with the mark
+     * (18dp → 28dp) and this went red on a pass that made the thing MORE
+     * readable. The fix is to assert the RULE the gap exists to express. */
+    /* ⚠⚠ THE RULE IS A COMPARISON, NOT A NUMBER — and stating it that way is
+     * strictly stronger than the literal ever was. OTA-1636's whole point is
+     * that the weapon's own damage must be SET APART from the name so it cannot
+     * read as a third coat. What makes that true is that its gap is WIDER than
+     * the gap between two coats; if the two were ever equalised, the row would
+     * read as three coats no matter what either number was. */
+    const lead = Number(/quickMarkLead: \{ marginLeft: (\d+) \}/.exec(BOX)?.[1]);
+    const coatGap = Number(/quickGlyphArt: \{[^}]*marginRight: (\d+)/.exec(BOX)?.[1]);
+    expect(Number.isFinite(lead)).toBe(true);
+    expect(Number.isFinite(coatGap)).toBe(true);
+    expect(lead).toBeGreaterThan(coatGap);
     expect(BOX).toContain('lead');
     // ⚠ the workaround is gone because the thing it worked around is
     expect(BOX).not.toContain("<Text>{'\\u2003'}</Text>");

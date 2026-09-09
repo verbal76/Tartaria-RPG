@@ -110,30 +110,43 @@ export function glyphArt(type: string | null | undefined): number | undefined {
 export const GLYPH_ART_TYPES: readonly string[] = Object.keys(GLYPH_ART);
 
 /**
- * ⚠⚠⚠ THE TWO DISPLAYED SIZES, DECLARED HERE AND NOWHERE ELSE — so the owner's
- * size call is two numbers in one file rather than a hunt through two screens.
+ * ⚠⚠⚠ THE DISPLAYED SIZE. ONE NUMBER, NOT TWO — AND THAT IS AN OWNER RULING
+ * THAT OVERTURNED THIS FILE'S FIRST ANSWER.
  *
- * They are DIFFERENT on purpose, and the reason is the measurement OTA-1763 was
- * asked to make before any of this: the two surfaces were never the same size
- * and are not the same shape either.
+ * OTA-1766 shipped Lore at 28 and combat at 18, and argued for the 18 like this:
+ * *"the weapon chip is `paddingVertical: 6` around 12pt text, so its content box
+ * is about 16dp tall. An 18dp icon sits inside that without growing the chip; 28
+ * would add roughly 12dp to the height of every weapon button in a fight."*
  *
- *   LORE    the legend's glyph sat in a cell of `width: 28` at 15pt. 28 is the
- *           established footprint and the one the pack's own notes say to try
- *           first, so the artwork takes the cell the text glyph occupied.
+ * ⚠⚠ THAT REASONING IS OVERRULED, AND IT IS KEPT ABOVE RATHER THAN DELETED
+ * BECAUSE IT NAMES THE MISTAKE EXACTLY. Owner: *"do NOT preserve the current
+ * combat weapon button height at the expense of icon readability... Do not
+ * shrink the artwork simply to preserve the old button dimensions."* Every word
+ * of the old argument was true as measurement and wrong as a decision: I treated
+ * the chip's existing height as the constraint and the artwork as the variable,
+ * when the artwork is the thing the player has to read. The chip was never a
+ * requirement — it was just what happened to be there.
  *
- *   COMBAT  the weapon chip is `paddingVertical: 6` around 12pt text, so its
- *           content box is about 16dp tall. An 18dp icon sits inside that
- *           without growing the chip; 28 would add roughly 12dp to the height of
- *           every weapon button in a fight. The chip is the constraint, not a
- *           preference — and this is exactly why combat is not a 1:1 copy of
- *           Lore's number.
+ * ⚠ THE OWNER'S PRIORITY ORDER, WHICH IS WHAT THE NUMBER BELOW OBEYS:
+ *     1. glyph immediately readable
+ *     2. weapon name immediately readable
+ *     3. comfortable padding around both
+ *     4. compact button height AFTER those are satisfied
+ * So the size is Lore's 28 — *"The combat glyphs should be at least Lore size.
+ * Start with the exact displayed icon size used in Lore ▸ Glyphs"* — and the
+ * chip grows to fit it. Measured: a weapon chip goes from about 30dp tall to
+ * about 46dp. Owner: *"There is room on the combat screen for slightly taller
+ * weapon buttons if needed."*
  *
- * ⚠ PROVISIONAL, pending the owner's look at an actual device. Changing either
- * is one number here.
+ * ⚠ ONE NUMBER RATHER THAN TWO IS NOW THE HONEST SHAPE. While the surfaces
+ * disagreed, a `{ lore, combat }` pair said something real. They agree, so a
+ * pair would only be an invitation to let them drift apart again.
+ *
+ * ⚠ PROVISIONAL, pending the owner's look at an actual device.
  */
 export const GLYPH_ART_SIZE = {
-  /** Lore ▸ Glyphs legend rows. The cell the text glyph already occupied. */
+  /** Lore ▸ Glyphs legend rows — the cell the text glyph already occupied. */
   lore: 28,
-  /** Weapon buttons in combat. Fits the chip's existing content box. */
-  combat: 18,
+  /** Weapon buttons in combat. The SAME size; the chip grows to hold it. */
+  combat: 28,
 } as const;

@@ -29585,6 +29585,28 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SUPERSEDED: '2026-09-09-1763-icons-on-trial'
 // SUPERSEDED: '2026-09-09-1764-storm-and-shut-drawers'
 // SUPERSEDED: '2026-09-09-1765-the-shell-eleven-copied'
+// SUPERSEDED: '2026-09-09-1766-the-glyphs-are-artwork'
+// OTA-1767 - the button grows to hold the glyph, not the other way round.
+// Owner: "do NOT preserve the current combat weapon button height at the expense
+// of icon readability... The combat glyphs should be at least Lore size... Do
+// not shrink the artwork simply to preserve the old button dimensions." Priority
+// order given: glyph readable, then name readable, then comfortable padding,
+// then compact height.
+// OTA-1766 drew combat at 18dp and argued for it from a real measurement of the
+// chip's content box. The measurement was right and the decision was wrong: it
+// treated the chip's existing height as the constraint and the artwork as the
+// variable, when the artwork is the thing the player has to read. The chip was
+// never a requirement, only what happened to be there. That reasoning is kept in
+// the file rather than deleted, because it names the mistake exactly.
+// Combat now draws at Lore's 28dp and the chip grows. Measured on the live
+// combat screen: icons render 28x28, the glyph row is 32dp, so a weapon chip is
+// 46dp against a text chip's 28dp. The extra 2dp of padding sits on the glyph
+// ROW rather than the chip chassis, so punch, kick, dodge and the travel chips
+// are untouched - only a chip carrying a mark pays for it. The mark stays square
+// with contain, so aspect is preserved, there is no black box behind it, and
+// alignItems center puts the icon and the weapon name on one centre line.
+// The size is now ONE number: while the two surfaces disagreed a pair said
+// something real, and now a drift apart would be a regression.
 // OTA-1766 - the illustrated glyphs are the glyphs now. The trial is over.
 // Owner: "The new combat glyph pack is approved. Go ahead and move from the test
 // to the actual implementation." Into three surfaces: Lore > Glyphs, the weapon
@@ -29664,7 +29686,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // art/12-damage-icons, tracked in git and outside the assets tree app.json
 // bundles, so the phone still ships one resolution rather than four.
 // Provisional pending actual-device approval.
-export const OTA_BUILD_ID = '2026-09-09-1766-the-glyphs-are-artwork';
+export const OTA_BUILD_ID = '2026-09-09-1767-the-button-grows';
 // golem catch-up 2026-09-09: markerless publish of OTA-1766 - the illustrated
 // glyphs ARE the glyphs now, and the trial is over. The approved pack replaced
 // the text glyphs in Lore > Glyphs, on the weapon damage/coating icons in

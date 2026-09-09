@@ -39,4 +39,6 @@ back to its ✱. See `assets/combat-glyphs/README.md`.
 ## Status
 
 **PROVISIONAL** pending actual-device approval of displayed size and spacing.
-The artwork itself is approved.
+The artwork itself is approved. Displayed at **28dp on both surfaces** since
+OTA-1767 — the combat chip grows to hold the mark rather than the mark shrinking
+to fit the chip.

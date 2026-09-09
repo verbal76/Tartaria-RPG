@@ -145,8 +145,18 @@ describe('OTA-1569 — the wiring', () => {
      * `degradation` and `stun` have no artwork, so they still paint a CHARACTER,
      * still inline, still with no box of its own. The workaround is kept exactly
      * where the problem it solves still exists. */
+    /* ⚠⚠⚠ AND THIS ASSERTION ITSELF PINNED A NUMBER AND BROKE ONE OTA LATER,
+     * WHICH IS THE FOURTH TIME IN THIS ROLLOUT AND THE MOST EMBARRASSING. I
+     * rewrote it in OTA-1766 *while explaining that pinning a mechanism is how a
+     * suite goes red on a pass that kept its promise* — and then pinned the
+     * literal margin, which is mechanism. OTA-1767 scaled the gaps with the mark
+     * (18dp → 28dp) and this went red on a pass that made the thing MORE
+     * readable. The fix is to assert the RULE the gap exists to express. */
     expect(INPUT).toContain('quickGlyphArt: { width: GLYPH_ART_SIZE.combat');
-    expect(INPUT).toContain('marginRight: 3');
+    /* ⚠ The claim is that a mark HAS breathing room, not how much. */
+    const gap = Number(/quickGlyphArt: \{[^}]*marginRight: (\d+)/.exec(INPUT)?.[1]);
+    expect(Number.isFinite(gap)).toBe(true);
+    expect(gap).toBeGreaterThan(0);
     // the fallback character keeps its padding, because it is still inline text
     expect(INPUT).toContain('\\u200a${ch}\\u200a');
   });

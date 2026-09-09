@@ -109,7 +109,16 @@ describe('OTA-1638 — the star goes last', () => {
      * now — there is no cell for it to be inside — and the artwork carries no
      * background at all. */
     expect(/quickGlyphArt: \{([^}]*)\}/.exec(BOX)?.[1] ?? '').not.toContain('backgroundColor');
-    expect(BOX).toContain('quickMarkLead: { marginLeft: 7 }');
+    /* ⚠⚠⚠ AND THIS ASSERTION ITSELF PINNED A NUMBER AND BROKE ONE OTA LATER,
+     * WHICH IS THE FOURTH TIME IN THIS ROLLOUT AND THE MOST EMBARRASSING. I
+     * rewrote it in OTA-1766 *while explaining that pinning a mechanism is how a
+     * suite goes red on a pass that kept its promise* — and then pinned the
+     * literal margin, which is mechanism. OTA-1767 scaled the gaps with the mark
+     * (18dp → 28dp) and this went red on a pass that made the thing MORE
+     * readable. The fix is to assert the RULE the gap exists to express. */
+    const lead = Number(/quickMarkLead: \{ marginLeft: (\d+) \}/.exec(BOX)?.[1]);
+    expect(Number.isFinite(lead)).toBe(true);
+    expect(lead).toBeGreaterThan(0);
   });
 });
 

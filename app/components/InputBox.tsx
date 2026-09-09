@@ -1887,27 +1887,46 @@ const styles = StyleSheet.create({
    * happened to line up". `flexShrink: 1` on the row lets a long weapon name
    * give way inside a wrapped chip instead of pushing the star out of the
    * right-hand end — the star is the piece that must never be the one to go. */
-  quickGlyphRow: { flexDirection: 'row', alignItems: 'center', flexShrink: 1 },
+  /* ⚠⚠⚠ OTA-1767 — `paddingVertical: 2` IS THE "COMFORTABLE PADDING" AND IT IS
+   * ON THE ROW RATHER THAN ON THE CHIP, DELIBERATELY. The owner ranked padding
+   * third, above compactness — but `quick` is the chassis for EVERY chip
+   * (punch, kick, dodge, travel, the golem, the dog), and widening its padding
+   * would grow all of them to solve a problem only weapon chips have. Two dp
+   * here is paid by the chips that carry a 28dp mark and by nothing else.
+   * Measured: a weapon chip is 28 + 4 + 12 + 2 = 46dp against a text chip's 30.
+   * ⚠⚠ `alignItems: 'center'` IS THE VERTICAL CENTRING, and it is a property
+   * rather than a coincidence of the text baseline — which is exactly what the
+   * old inline construction could not offer. Owner: *"vertically center the icon
+   * with the weapon name."*
+   * ⚠ `flexShrink: 1` lets a long name give way inside a wrapped chip rather
+   * than pushing the star out of the right-hand end; the star is the piece that
+   * must never be the one to go. */
+  quickGlyphRow: { flexDirection: 'row', alignItems: 'center', flexShrink: 1, paddingVertical: 2 },
   /** The artwork for one coat or one base type. `GLYPH_ART_SIZE.combat` is 18:
    *  the chip is `paddingVertical: 6` around 12pt text, so 18 sits inside the
    *  content box it already had. 28 — Lore's number — would add about 12dp to
    *  the height of every weapon button in a fight, which is why the two surfaces
    *  do NOT share one size. No ground behind it, by instruction. */
-  quickGlyphArt: { width: GLYPH_ART_SIZE.combat, height: GLYPH_ART_SIZE.combat, marginRight: 3 },
+  /** The artwork for one coat or one base type. SQUARE, at `GLYPH_ART_SIZE`
+   *  — Lore's 28 — with `contain` on the Image, so the 1:1 source keeps its
+   *  aspect and is never stretched or cropped. No ground behind it. */
+  quickGlyphArt: { width: GLYPH_ART_SIZE.combat, height: GLYPH_ART_SIZE.combat, marginRight: 4 },
   /** The gap between the last coat and the name. Was a literal space character
    *  inside the old single Text. */
-  quickGlyphName: { marginLeft: 2 },
+  /* ⚠ The gap between the last coat and the name, scaled with the mark: 2 was
+   * right beside an 18dp icon and reads as a collision beside a 28. */
+  quickGlyphName: { marginLeft: 4 },
   /** ⚠ OTA-1638's SET-OFF, now a margin. The em space that kept the weapon's own
    *  damage from reading as a third coat used to be a `\u2003` between two Text
    *  nodes — and before that it sat INSIDE the dark cell, which stretched it
    *  into the black bar the owner photographed. It is a margin now, so it cannot
    *  be inside anything. */
-  quickMarkLead: { marginLeft: 7 },
-  quickMarkLeadText: { marginLeft: 7 },
+  quickMarkLead: { marginLeft: 9 },
+  quickMarkLeadText: { marginLeft: 9 },
   /** The discovery star, last and all the way to the right. Same box as a damage
    *  mark so the row stays even; its own margin so it is visibly a verdict
    *  sitting apart from the type it is a verdict about. */
-  quickStarArt: { width: GLYPH_ART_SIZE.combat, height: GLYPH_ART_SIZE.combat, marginLeft: 5 },
+  quickStarArt: { width: GLYPH_ART_SIZE.combat, height: GLYPH_ART_SIZE.combat, marginLeft: 7 },
   /* ⚠⚠⚠ OTA-1766 — THIS IS THE FALLBACK'S STYLE NOW, AND NOTHING A PLAYER CAN
    * REACH USES IT. The owner asked for the black box behind the weapon icons to
    * go, and for the artwork path it has: `quickGlyphArt` above has no ground at
