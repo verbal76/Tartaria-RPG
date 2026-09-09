@@ -29747,6 +29747,21 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // bundles, so the phone still ships one resolution rather than four.
 // Provisional pending actual-device approval.
 export const OTA_BUILD_ID = '2026-09-09-1770-character-is-the-proof';
+// golem catch-up 2026-09-09: markerless publish of OTA-1770 - CharacterScreen,
+// the proof. The rollout's step 2 and the first screen on Tier 0. The
+// hand-rolled header becomes TScreenHeader and moves no pixel: its header,
+// backBtn and backText were byte-identical to the kit's, measured before
+// adopting. 29 interface golds route through T.gold and the ratchet falls 367 to
+// 331, its biggest single drop; the screen now carries zero bare brand gold.
+// Three hand-typed vitality ramps route through vitalityColor - which this file
+// already imported and used for the player's own HP since OTA-1757, while three
+// more ramps in the same file were that function typed out by hand and were
+// missed. The corruption tier is named as corruptionColor, which is what the
+// legacy hunt's classification prescribes for a meaningful colour.
+// Two things move on screen and both are the ruling: the title goes gold to ink
+// (a screen's own name is not a live obligation) and the empty state goes gold
+// to ink-dim - a defect OTA-1760 logged with the note that its test would fail
+// the day someone fixed it. It did, and the test defends the fix now.
 // golem catch-up 2026-09-09: markerless publish of OTA-1768 and OTA-1769.
 // 1768 - one bare-hand chip. Punch and kick are the SAME action in the engine,
 // not similar ones: isBareHandAttack is one regex alternation and nothing reads
