@@ -30050,7 +30050,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SUPERSEDED: '2026-09-09-1782-the-control-sits-proud'
 // SUPERSEDED: '2026-09-09-1783-the-legend-is-one-tap-away'
 // SUPERSEDED: '2026-09-09-1784-six-traders-six-voices'
-export const OTA_BUILD_ID = '2026-09-09-1785-one-authority-per-ratchet';
+// SUPERSEDED: '2026-09-09-1785-one-authority-per-ratchet'
+export const OTA_BUILD_ID = '2026-09-09-1786-the-name-column-fits-its-vocabulary';
 // golem catch-up 2026-09-09: markerless publish of OTA-1785.
 // OTA-1785 - one authority per ratchet. Two corrections first, both worse than
 // reported: there were THIRTEEN gameStore ceiling authorities, not four (twelve

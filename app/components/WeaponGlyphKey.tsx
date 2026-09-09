@@ -96,6 +96,25 @@ export const BASE_TYPE_MEANING: Record<string, string> = {
 
 export const COAT_KEY_ORDER = ['burn', 'cold', 'poison', 'acid', 'corruption', 'electrical'] as const;
 
+/** ⚠ OTA-1786 — the widest label the key can ever print, over the WHOLE damage
+ *  vocabulary rather than the subset a given save has in play. BLUDGEONING and
+ *  DEGRADATION tie at 11. */
+export const LONGEST_GLYPH_NAME = Object.keys(BASE_DAMAGE_GLYPH)
+  .concat(COAT_KEY_ORDER as unknown as string[])
+  .reduce((a, b) => (b.length > a.length ? b : a), '');
+
+/** ⚠⚠ THE CAP RATIO IS DELIBERATELY THE WIDE END OF THE RANGE (0.75 em), not an
+ *  average. A column sized to the average font is a column that wraps on the
+ *  wide ones — which is the defect this replaces. Ten dp of the description
+ *  column is the whole price of never wrapping again. */
+const NAME_FONT = 11;
+const NAME_LETTER_SPACING = 1;
+const NAME_CAP_EM = 0.75;
+export const NAME_COL_W = Math.ceil(
+  LONGEST_GLYPH_NAME.length * (NAME_FONT * NAME_CAP_EM + NAME_LETTER_SPACING),
+);
+
+
 export const COAT_MEANING: Record<string, string> = {
   burn: 'incendiary coat — burns for a few turns',
   cold: 'frost coat — chills and slows',
@@ -300,7 +319,28 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 15,
   },
-  name: { color: '#cdbf99', fontSize: 11, letterSpacing: 1, width: 92 },
+  /* ⚠⚠⚠ OTA-1786 — THE COLUMN IS DERIVED FROM THE VOCABULARY, NOT TYPED.
+   * Owner, from the device: *"The Glyphs cheat sheet is wrapping BLUDGEONING so
+   * the final G sits alone on a second line... Give the damage-family name
+   * column sufficient governed width for its vocabulary while preserving useful
+   * room for the descriptions."*
+   *
+   * ⚠ WHY 92 LOOKED FINE AND WAS NOT. BLUDGEONING is 11 characters at 11pt with
+   * `letterSpacing: 1`. Uppercase in a system font runs about 0.66–0.75 em, so
+   * the label needs between 91 and 102dp depending on which font the device
+   * resolves. 92 sits INSIDE that range — it fits on a narrow face and wraps on
+   * a wide one, which is exactly the class of number that passes review and
+   * fails on hardware.
+   *
+   * ⚠⚠ SO IT IS COMPUTED, AT THE WIDE END, FROM THE REAL LABEL LIST. The width
+   * comes from the longest name the key can ever print — measured over the WHOLE
+   * vocabulary rather than the subset in play today, so a damage family added
+   * later widens the column instead of wrapping in it. Nothing is abbreviated
+   * and the type size is untouched, both by instruction.
+   *
+   * ⚠ THE DESCRIPTION COLUMN IS `flex: 1` and keeps everything left over. The
+   * cost of this fix is ten dp of it. */
+  name: { color: '#cdbf99', fontSize: 11, letterSpacing: 1, width: NAME_COL_W },
   meaning: { color: '#a2977b', fontSize: 11, flex: 1, lineHeight: 15 },
   star: { color: '#cdbf99', fontSize: 12, lineHeight: 18, marginBottom: 6 },
 });
