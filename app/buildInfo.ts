@@ -30048,7 +30048,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SUPERSEDED: '2026-09-09-1780-the-thin-four-migrate'
 // SUPERSEDED: '2026-09-09-1781-the-name-grew-with-the-mark'
 // SUPERSEDED: '2026-09-09-1782-the-control-sits-proud'
-export const OTA_BUILD_ID = '2026-09-09-1783-the-legend-is-one-tap-away';
+// SUPERSEDED: '2026-09-09-1783-the-legend-is-one-tap-away'
+export const OTA_BUILD_ID = '2026-09-09-1784-six-traders-six-voices';
 // golem catch-up 2026-09-09: markerless publish of OTA-1783.
 // OTA-1783 - the legend is one tap away, and one tap back. A compact neutral
 // '? glyphs' chip at the end of the combat weapon line opens Lore's glyph

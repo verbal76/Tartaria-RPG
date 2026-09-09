@@ -25,6 +25,7 @@
 // not engineering. Adding an NPC is a JSON entry; no code changes.
 import rawTopics from '../data/npcs/dialogue_topics.json';
 import type { NpcRegard } from './npcMemory';
+import { voiceSaltFor } from './npcMemory';
 import type { MainQuestPhase } from './types';
 
 /** OTA-1059 — the story's own order, for `minChapter`. The main quest is a
@@ -261,8 +262,52 @@ export function topicsFor(npcId: string, ctx: TalkContext): Topic[] {
  *  than rolled, for the same reason the greeting layer is indexed (OTA-1049):
  *  an NPC who answers the same question differently on a replay of the same
  *  state reads as broken, not as varied. */
-export function topicReply(topic: Topic, timesAsked: number): string {
+/** ⚠⚠⚠ OTA-1784 — TRUE FOR SOMEBODY THE CLASS SET SPEAKS FOR, FALSE FOR AN
+ *  AUTHORED PERSON. Irma has her own entry, so she is never voice-laned; a
+ *  procedurally-named roadside trader falls back to `class:roadside` and is.
+ *  Owner: *"existing named vendors such as Irma are not flattened into the
+ *  generic roadside voice."* This is the one line that guarantees it, and it is
+ *  the SAME lookup `setFor` already uses, so a person authored later stops
+ *  being laned the moment their entry lands, with no code change. */
+export function usesClassSet(npcId: string): boolean {
+  return !TOPICS[npcId] && classKeyFor(npcId) !== null;
+}
+
+/** ⚠⚠⚠ OTA-1784 — THE VOICE LANE.
+ *
+ *  A class set's `lines` are no longer a REPEAT sequence for one person. They
+ *  are PARALLEL VOICES, one per lane, written so that lane *k* of every topic
+ *  in the set belongs to the same temperament — so a trader who opens laconic
+ *  and watchful is still laconic and watchful four topics later. The salt picks
+ *  the lane from the persistent id, so it is that person's voice permanently.
+ *
+ *  ⚠⚠ AND IT IGNORES `timesAsked` ON PURPOSE. Cycling would walk one trader
+ *  through six different personalities as the player re-asked — the exact
+ *  instability the owner ruled out: *"If the same interaction with the same NPC
+ *  is replayed, the NPC should not suddenly sound like a different person
+ *  merely because RNG selected another line."* A person has ONE answer to a
+ *  question. Asking again gets OTA-1061's "I have told you that one", which is
+ *  also precisely the behaviour these topics had when each held a single line —
+ *  so nothing regresses, and all the new depth goes where the owner wanted it:
+ *  *"Variety should primarily exist BETWEEN vendors."*
+ */
+export function voiceLaneFor(npcId: string, lanes: number): number {
+  if (lanes <= 1) return 0;
+  return voiceSaltFor(npcId) % lanes;
+}
+
+/** How many answers THIS person has to this topic — which is one for anybody in
+ *  a voice lane, and the whole authored sequence for an authored person. The
+ *  caller's "already told you that" guard reads this rather than
+ *  `topic.lines.length`, or a laned trader would hand out five more voices
+ *  before admitting to a repeat. */
+export function answersAvailable(topic: Topic, npcId?: string): number {
+  return npcId && usesClassSet(npcId) ? 1 : topic.lines.length;
+}
+
+export function topicReply(topic: Topic, timesAsked: number, npcId?: string): string {
   if (topic.lines.length === 0) return '';
+  if (npcId && usesClassSet(npcId)) return topic.lines[voiceLaneFor(npcId, topic.lines.length)]!;
   return topic.lines[timesAsked % topic.lines.length]!;
 }
 

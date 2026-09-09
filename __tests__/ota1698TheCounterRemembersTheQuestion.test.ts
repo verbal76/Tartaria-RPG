@@ -65,7 +65,11 @@ describe('OTA-1698 — both greeting doors', () => {
     // Order on each door: greeting → menace beat → absence → last question.
     let from = 0;
     for (let i = 0; i < 2; i++) {
-      const greet = store.indexOf("get().appendLog('world', npcGreeting(rel, vendor.name, player.name, player.sex));", from);
+      /* ⚠ RE-AIMED BY OTA-1784 — the claim is about ORDER: the transcript line
+       * comes after the greeting and the absence beat. OTA-1784 added an optional
+       * npc id to the greeting call so two traders stop opening identically, and
+       * a pin on the whole call went red on a change that did not touch order. */
+      const greet = store.indexOf("appendLog('world', npcGreeting(rel, vendor.name, player.name, player.sex", from);
       const away = store.indexOf('if (awayLine) get().appendLog(\'world\', awayLine);', greet);
       const asked = store.indexOf(call, away);
       expect(greet).toBeGreaterThan(-1);

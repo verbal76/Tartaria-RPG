@@ -67,7 +67,7 @@ import { resolveGift, giftMemoryLine, GIFT_STANDING_FACTION_CAP, tasteDiscoverie
 import { giftBlockReason } from '../engine/giftEligibility';
 // OTA-1058 — Phase 2 slice: the topic-based talk exchange.
 import {
-  hasTopicsFor, topicsFor, topicReply, alreadySaidLine, nothingToSayLine,
+  hasTopicsFor, topicsFor, topicReply, answersAvailable, alreadySaidLine, nothingToSayLine,
   lockedTopicCount, teaserDeflectionLine,
   topicGrantWouldDefer,
   type Topic as TalkTopic,
@@ -6068,7 +6068,7 @@ function emitVendorGreeting(
   const rel = getRelation(get().worldMemory, vendorNpcId(vendor));
   if (!rel || rel.meetings <= 1) return; // a stranger gets the arrival line, not a greeting
   const hours = player.hoursElapsed ?? 0;
-  get().appendLog('world', npcGreeting(rel, vendor.name, player.name, player.sex));
+  get().appendLog('world', npcGreeting(rel, vendor.name, player.name, player.sex, vendorNpcId(vendor)));
   { const mb = menaceGreetingBeat(decayedMenace(player.menace ?? 0, player.menaceUpdatedHour ?? 0, hours), vendor.name, npcRegard(rel)); if (mb) get().appendLog('world', mb); } // OTA-1689
   { const awayLine = npcAbsenceLine(rel, vendor.name, player.name, hours, player.sex); if (awayLine) get().appendLog('world', awayLine); }
   { const la = lastAskedLine(get().worldMemory.npcTranscripts?.[vendorNpcId(vendor)], rel, vendor.name); if (la) get().appendLog('world', la); } // OTA-1698
@@ -8445,8 +8445,9 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
     if (!target || !hasTopicsFor(target.id)) return false;
     const ctx = talkContextFor(get, { id: target.id, name: target.name, faction: target.faction ?? null });
     const talked = get().worldMemory.talkedTopics ?? {};
+    // ⚠ OTA-1784 — `answersAvailable`: on `lines.length` a laned trader's glow never dims.
     return topicsFor(target.id, ctx).some(
-      (t) => (talked[`${target.id}:${t.id}`] ?? 0) < t.lines.length,
+      (t) => (talked[`${target.id}:${t.id}`] ?? 0) < answersAvailable(t, target.id),
     );
   },
   // OTA-1090 — the teaser answers IN VOICE, never in labels. Rotates through
@@ -8504,13 +8505,14 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
     // Repetition is acknowledged rather than replayed. An NPC who answers the
     // same question twice as though it were the first time is the exact
     // "checklist, not a relationship" failure Phase 1 was written against.
-    if (asked >= topic.lines.length) {
+    // ⚠ OTA-1784 — `answersAvailable`: a class set's lines are parallel VOICES now.
+    if (asked >= answersAvailable(topic, t.npcId)) {
       const dup = alreadySaidLine(t.npcName);
       get().appendLog('world', dup);
       recordTalkTurn(set, t.npcId, topic.label, dup);
       return;
     }
-    const reply = topicReply(topic, asked);
+    const reply = topicReply(topic, asked, t.npcId);
     get().appendLog('world', reply);
     recordTalkTurn(set, t.npcId, topic.label, reply);
     // ⚠ OTA-1061 — THE GRANT FIRES ON THE FIRST RAISE ONLY, and `asked === 0`
@@ -11767,7 +11769,7 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
         // off the meeting count, never rolled. An NPC who alternates between
         // knowing you and not reads as broken, not as varied.
         const rel = relNow;
-        get().appendLog('world', npcGreeting(rel, vendor.name, player.name, player.sex));
+        get().appendLog('world', npcGreeting(rel, vendor.name, player.name, player.sex, vendorNpcId(vendor)));
         { const mb = menaceGreetingBeat(decayedMenace(player.menace ?? 0, player.menaceUpdatedHour ?? 0, player.hoursElapsed ?? 0), vendor.name, npcRegard(rel)); if (mb) get().appendLog('world', mb); } // OTA-1689
         const awayLine = npcAbsenceLine(rel, vendor.name, player.name, player.hoursElapsed ?? 0, player.sex);
         if (awayLine) get().appendLog('world', awayLine);

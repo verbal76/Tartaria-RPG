@@ -104,7 +104,14 @@ describe('OTA-1439 — the pick itself', () => {
   it('⚠ every greeting call site passes the player\'s sex', () => {
     // Two vendor greetings, one wanderer, two absence lines — a site that
     // forgets the argument silently reverts its NPC to 'traveler'.
-    expect((STORE.match(/npcGreeting\([^)]*\.sex\)/g) ?? []).length).toBe(2);
+    /* ⚠⚠ RE-AIMED BY OTA-1784 — the claim is that every greeting call site
+     * PASSES the player's sex, not that sex is the LAST argument. OTA-1784 added
+     * an optional npc id after it so two traders at the same rung stop greeting
+     * you with the same sentence; `\.sex\)` — anchored on the closing paren —
+     * then matched nothing and this went red on a change that left the claim
+     * exactly true. The forgetting-the-argument failure it guards against is
+     * still caught: a site without `.sex` at all does not match. */
+    expect((STORE.match(/npcGreeting\([^)]*\.sex[,)]/g) ?? []).length).toBe(2);
     expect((STORE.match(/npcAbsenceLine\([^)]*\.sex\)/g) ?? []).length).toBe(2);
   });
 

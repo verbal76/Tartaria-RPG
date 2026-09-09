@@ -79,7 +79,12 @@ describe('OTA-1437 — the handler asks before it speaks', () => {
     const label = STORE.indexOf("get().appendLog('player', topic.label);");
     expect(label).toBeGreaterThan(-1);
     const check = STORE.indexOf('topicGrantWouldDefer(topic.grants,', label);
-    const reply = STORE.indexOf('const reply = topicReply(topic, asked);', label);
+    /* ⚠ RE-AIMED BY OTA-1784 — the claim is that the DEFERRAL CHECK comes before
+     * the reply is logged; which arguments `topicReply` takes is not part of it.
+     * The voice-lane pass added the npc id and this pin went red on an ordering
+     * test that still holds perfectly. */
+    const reply = STORE.indexOf('const reply = topicReply(topic, asked', label);
+    expect(reply).toBeGreaterThan(-1);
     expect(check).toBeGreaterThan(label);
     expect(reply).toBeGreaterThan(check);
   });

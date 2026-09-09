@@ -707,6 +707,44 @@ export function npcAddress(
   return first;
 }
 
+/* ⚠⚠⚠ OTA-1784 — THE STABLE PER-PERSON SALT, AND WHY IT LIVES IN THE LEDGER.
+ *
+ * Owner: *"Different roadside vendors should not all open on the same authored
+ * line. But the SAME vendor should remain recognizably the same person across
+ * encounters... Your proposed stable per-vendor salt from the persistent vendor
+ * ID is directionally approved. Use it to diversify which authored line a
+ * particular vendor naturally starts from while preserving deterministic
+ * identity."*
+ *
+ * ⚠ IT IS A HASH OF THE ID, NOT A ROLL, AND THAT IS THE ENTIRE POINT. OTA-1049
+ * built this module because *"an NPC who answers the same question differently
+ * on a replay of the same state reads as broken, not as varied"* — so every
+ * line choice in the game is INDEXED off something durable rather than rolled.
+ * A person's id is the most durable thing there is: it survives a save, a
+ * reload, a session and a device. Same person, same salt, forever; different
+ * people, different salts, without a byte of new state anywhere.
+ *
+ * ⚠ FNV-1a, WHICH IS A DELIBERATE CHOICE OF A BORING ONE. It needs to be fast,
+ * dependency-free, well spread over short ASCII ids like `roadside:...`, and
+ * — most importantly — IDENTICAL ON EVERY PLATFORM AND EVERY BUILD, because a
+ * salt that drifts would silently reassign every person's voice. `Math.imul`
+ * keeps the multiply in 32-bit integer space so it cannot become a float.
+ *
+ * ⚠ IT LIVES HERE RATHER THAN IN `dialogue` BECAUSE OF THE IMPORT GRAPH.
+ * `dialogue` already imports a TYPE from this module; this module imports
+ * nothing. Putting the salt here keeps the value dependency one-directional
+ * (dialogue → npcMemory), which matters in a codebase that already has one
+ * module-init cycle on the open ledger.
+ */
+export function voiceSaltFor(npcId: string): number {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < npcId.length; i += 1) {
+    h ^= npcId.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return h >>> 0;
+}
+
 /** Greeting variants per rung of the ladder. `{name}` is substituted with
  *  npcAddress(), so a tier the player has reached WITHOUT earning the name
  *  still reads correctly ("Back again, traveler."). */
@@ -758,10 +796,23 @@ export function npcGreeting(
   npcName: string,
   playerName: string | null | undefined,
   sex?: 'male' | 'female' | null,
+  /** ⚠⚠ OTA-1784 — OPTIONAL, AND THAT IS WHAT MAKES THIS SAFE. Every existing
+   *  call site and every existing test that omits it keeps the exact behaviour
+   *  it had. Passed, it offsets WHICH line of the tier's pool this person opens
+   *  with — so two vendors at the same rung on the same visit count no longer
+   *  greet you identically, which was the complaint. */
+  npcId?: string,
 ): string {
   const regard = npcRegard(rel);
   const pool = GREETINGS[regard];
-  const idx = pool.length > 0 ? Math.abs(rel?.meetings ?? 0) % pool.length : 0;
+  /* ⚠⚠⚠ THE SALT SHIFTS WHICH LINE, IT DOES NOT RANDOMISE IT. `meetings` still
+   * advances the index, so the same person still moves through their tier's
+   * pool visit by visit exactly as before; the salt only decides where in that
+   * pool they START. Replay the same save and you get the same greeting — the
+   * OTA-1049 property is preserved, because nothing here is rolled. */
+  const idx = pool.length > 0
+    ? Math.abs((rel?.meetings ?? 0) + (npcId ? voiceSaltFor(npcId) : 0)) % pool.length
+    : 0;
   return (pool[idx] ?? '')
     .replace(/\{npc\}/g, npcName)
     .replace(/\{name\}/g, npcAddress(rel, playerName, sex));
