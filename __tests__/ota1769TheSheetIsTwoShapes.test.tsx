@@ -95,9 +95,14 @@ describe('the two shapes are in the kit', () => {
      * semantic rim), so it earns its place by the same test TSheet failed —
      * TSheet added zero exports precisely because neither of its shapes varied.
      * The claim this test defends is "a helper exists only where something
-     * varies", not "there are exactly seven of them". */
+     * varies", not "there are exactly seven of them".
+     * ⚠⚠ 8 → 9 ON OTA-1782 (`tControlDepth`), AND THIS SUITE IS RAISED IN THE
+     * SAME BREATH AS `ota1742`'s — the two carry the same ceiling, and OTA-1777
+     * raised one and left the other, which only a full surface run caught. The
+     * duplication is still a legacy-hunt item; until it is resolved, moving one
+     * without the other is the known way to be wrong here. */
     expect(components.length).toBeLessThanOrEqual(13);
-    expect(helpers.length).toBeLessThanOrEqual(8);
+    expect(helpers.length).toBeLessThanOrEqual(9);
     expect(codeOf(KIT)).not.toMatch(/export function tSheet/);
   });
 });

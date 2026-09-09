@@ -30046,7 +30046,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // settled, the cover shipped, the migration followed, and Guidance moved off the
 // deny-list it sat on for being under-covered.
 // SUPERSEDED: '2026-09-09-1780-the-thin-four-migrate'
-export const OTA_BUILD_ID = '2026-09-09-1781-the-name-grew-with-the-mark';
+// SUPERSEDED: '2026-09-09-1781-the-name-grew-with-the-mark'
+export const OTA_BUILD_ID = '2026-09-09-1782-the-control-sits-proud';
 // golem catch-up 2026-09-09: markerless publish of OTA-1781.
 // OTA-1781 - the name grew with the mark. The weapon-name typography beside
 // the 28dp combat artwork was 12/400/0 while the MOCK of that same button in

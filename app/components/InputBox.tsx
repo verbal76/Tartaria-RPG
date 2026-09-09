@@ -46,6 +46,10 @@ import {
 // Lore and combat mappings."* The two surfaces draw at different SIZES (the chip
 // is smaller than the legend row) and that is the only thing they disagree on.
 import { glyphArt, DISCOVERY_STAR_ART, GLYPH_ART_SIZE, GLYPH_NAME_TYPE } from '../engine/combatGlyphArt';
+/* ⚠ OTA-1782 — the combat chips are the first adopters of the kit's governed
+ * control-depth language. This is the ONLY thing InputBox takes from the kit;
+ * every colour on these chips is still the combat vocabulary's own. */
+import { tControlDepth } from '../ui/tartariaKit';
 import { reachBandsFor, reachFiresDown } from '../engine/types';
 // ⚠ OTA-1423 — the three Arbiter refusals below name the dog, so they also
 // have to gender it. Without this they read "bring it up" about a companion
@@ -1512,7 +1516,21 @@ function QuickBtn({
   const resolvedTone: QuickBtnTone | undefined = blocked
     ? undefined
     : tone ?? (defensive ? 'defensive' : undefined);
-  const containerStyle = [
+  /* ⚠⚠⚠ OTA-1782 — DEPTH IS APPLIED LAST, AND THAT ORDER IS THE WHOLE DESIGN.
+   * Owner: *"COLOR / FILL / BORDER communicates semantic state or meaning.
+   * DEPTH communicates that the object is a pressable control... Depth must be
+   * orthogonal to those meanings."*
+   * The tone styles above set `borderColor`, which colours all four sides.
+   * `tControlDepth` then overrides only `borderTopColor` and
+   * `borderBottomColor`, so the semantic hue still rings the control and the
+   * light rides on top of it. Applied BEFORE the tone, the tone's flat
+   * `borderColor` would win and there would be no depth at all.
+   * ⚠ AND `blocked` GETS NONE OF IT. Owner: *"DISABLED / INERT must not falsely
+   * advertise the same physical readiness."* A blocked chip's tap buzzes and
+   * returns — it is not a control right now — so it keeps a flat, even ring.
+   * That is the absence of a claim rather than a third variant, which is the
+   * only honest way for a shell to say "this one does not move". */
+  const containerStyle = (pressed: boolean) => [
     styles.quick,
     resolvedTone === 'strike' && styles.quickStrike,
     resolvedTone === 'defensive' && styles.quickDefensive,
@@ -1520,6 +1538,7 @@ function QuickBtn({
     resolvedTone === 'needs-approach' && styles.quickNeedsApproach,
     resolvedTone === 'unavailable' && styles.quickUnavailable,
     blocked && styles.quickDisabled,
+    blocked ? null : tControlDepth(pressed),
   ];
   const textStyle = [
     styles.quickText,
@@ -1574,8 +1593,22 @@ function QuickBtn({
   return (
     // OTA-898 (SA-6) — screen-reader support for the quick-action chips: each
     // exposes a button role, its label, and a disabled state when blocked.
-    <TouchableOpacity
-      style={containerStyle}
+    /* ⚠⚠ OTA-1782 — `Pressable`, NOT `TouchableOpacity`, AND THAT IS THE POINT
+       RATHER THAN A TIDY-UP. `TouchableOpacity`'s only press feedback is a fade
+       of the WHOLE chip, fill included — which is the same technique arb86 had
+       to remove from the disabled state, because a translucent chip lets a
+       player-tuned background flood through it. The depth language replaces a
+       fade with a settle: nothing goes translucent, the light simply moves and
+       the face travels 1.5dp toward the interface plane. `Pressable`'s render
+       prop is what makes that state reachable at all.
+       ⚠ NO Animated VALUE HERE, deliberately. `TButton` tweens its 1.5dp
+       because it is one large primary control on a quiet screen; a combat row
+       holds up to eight of these and OTA-1739's commit-count suite is on record
+       about what per-instance animated nodes cost on a screen that re-renders
+       on every arbiter tick. Same geometry, same direction, same distance — the
+       tween is a density choice, not a second language. */
+    <Pressable
+      style={({ pressed }) => containerStyle(pressed)}
       onPressIn={noteTouchDown}
       onPress={handlePress}
       accessibilityRole="button"
@@ -1672,7 +1705,7 @@ function QuickBtn({
       ) : (
         <Text style={[textStyle, weapon ? styles.quickWeaponName : null]}>{label.toUpperCase()}</Text>
       )}
-    </TouchableOpacity>
+    </Pressable>
   );
 }
 

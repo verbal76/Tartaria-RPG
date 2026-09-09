@@ -72,6 +72,42 @@ export const T = {
   edgeLit: 'rgba(214,190,140,0.20)',
   /** The lower edge in shadow. */
   edgeDark: 'rgba(0,0,0,0.55)',
+  /* ⚠⚠⚠ OTA-1782 — THE CONTROL PAIR, AND IT IS A SECOND PAIR ON PURPOSE.
+   *
+   * Owner: *"COLOR / FILL / BORDER communicates semantic state or meaning.
+   * DEPTH communicates that the object is a pressable control. A button should
+   * feel as though it sits slightly proud of the interface plane, regardless of
+   * whether its semantic treatment is filled or outlined."*
+   *
+   * ⚠ WHY `edgeLit` COULD NOT SERVE. That pair is tuned for a PLATE — a dark,
+   * warm face that the light falls onto. The control family is not one face: it
+   * contains `quickStrike`'s LIGHT SAGE fill and the modals' LIGHT GOLD fill
+   * beside near-black outlined chips. A warm tan at 0.20 laid on light sage
+   * moves its luminance by about ONE level (185.0 → 186.4): on the loudest
+   * control in the game the top edge would simply not exist. It is the same
+   * structural problem OTA-1569 hit with the coat glyphs — *"a chip has TWO
+   * fills that are nearly opposite… There is no such set"* — and the same
+   * answer: stop hunting for one value that reads on both, and use a pair that
+   * COMPOSITES against whatever is behind it.
+   *
+   * ⚠⚠ THE PAIR IS SELF-BALANCING, WHICH IS WHY ONE PAIR COVERS FOUR
+   * TREATMENTS. Measured in Rec.709 luminance, resting:
+   *     filled sage   #9ec96a   top +13.1   bottom −83.2
+   *     filled gold   #c9a86a   top +15.9   bottom −76.8
+   *     semantic rim  #1b2417   top +43.5   bottom −14.8
+   *     neutral rim   #1a1714   top +45.4   bottom −10.5
+   * On a light fill the SHADOW carries the depth; on a dark fill the LIGHT
+   * does. Every control ends with a real top-to-bottom value gradient (96, 93,
+   * 58, 56) without a gradient, a texture, a gloss or a drop shadow anywhere.
+   *
+   * ⚠ AND IT NEVER TOUCHES MEANING. These are the TOP and BOTTOM border colours
+   * only; left and right keep the semantic `borderColor` the tone set. The ring
+   * still says what the control means. */
+  /** Depth: the upper edge of a PRESSABLE control, catching light. Warm white
+   *  rather than warm tan, so it lifts a light fill as well as a dark one. */
+  controlLit: 'rgba(255,250,240,0.20)',
+  /** Depth: the lower edge of a PRESSABLE control, in its own shadow. */
+  controlDark: 'rgba(0,0,0,0.45)',
   /** The brand gold. The one chromatic note; unchanged since the game began. */
   gold: '#C9A86A',
   goldDim: '#8E7548',
@@ -1038,6 +1074,47 @@ export interface TRowState {
  * guess: selected > reserved > flash. Written down here so the next pass
  * inherits the ruling instead of re-deriving it wrong.
  */
+/* ⚠⚠⚠ OTA-1782 — ONE GOVERNED CONTROL-DEPTH LANGUAGE.
+ *
+ * Owner: *"This should be ONE governed control-depth language. Do not
+ * independently style individual buttons. Trace the existing control
+ * primitives/families first and identify the smallest shared implementation
+ * point capable of giving filled, semantic-outline and neutral-outline controls
+ * the same physical construction WITHOUT changing their semantic colors."*
+ *
+ * ⚠ THE LANGUAGE IS THREE THINGS AND NOTHING ELSE:
+ *     1. the upper edge catches light            (`T.controlLit`)
+ *     2. the lower edge falls into shadow        (`T.controlDark`)
+ *     3. on press the two swap and the face settles `SETTLE_DP` toward the
+ *        interface plane
+ * No gradient, no texture, no gloss, no bevel, no elevation, no drop shadow, no
+ * face shading, and — the part that matters most — no second effect for a
+ * second colour. Every one of those is on the owner's do-not list, and the
+ * whole construction is two border colours and one translate.
+ *
+ * ⚠⚠ IT IS ADDITIVE, WHICH IS WHAT KEEPS DEPTH ORTHOGONAL TO MEANING. A control
+ * already carries `borderWidth: 1` and a semantic `borderColor`. This overrides
+ * the TOP and BOTTOM colours of that same ring and leaves left and right alone,
+ * so the semantic hue still rings the control and the depth rides on it. Apply
+ * it AFTER the tone style; never before, or the tone's `borderColor` would win.
+ *
+ * ⚠⚠ AN INERT CONTROL SIMPLY DOES NOT GET IT. Owner: *"DISABLED / INERT must
+ * not falsely advertise the same physical readiness."* There is no third
+ * variant here and there must not be: a control that is not pressable is one
+ * that never calls this, so its ring stays flat and even on all four sides.
+ * That is the absence of a claim rather than a new claim, which is the only
+ * honest way to say "this one does not move".
+ *
+ * ⚠ THE ANCESTOR. `TButton` has had exactly this construction since VIS-1 — a
+ * lit top edge, a dark bottom edge and a 1.5dp press depression — and it was
+ * the only control in the game that did. This names it, widens it to work on a
+ * light fill, and hands it to everything else. The combat chips are the first
+ * adopters because they are what the owner is looking at.
+ */
+export function tControlDepth(pressed = false): StyleProp<ViewStyle> {
+  return pressed ? kit.controlPressed : kit.controlResting;
+}
+
 export function tRowStyle(state: TRowState = {}): StyleProp<ViewStyle> {
   return [
     kit.rowChassis,
@@ -1052,6 +1129,21 @@ const kit = StyleSheet.create({
   // ⚠ The shipped values. `#13110f` is the game's list ground in seven screens
   // and was never named; `marginBottom: 6` is Vendor's and Crafting's, against
   // Inventory's 4 — the one number the three did not agree on.
+  /* ⚠ OTA-1782 — the resting and pressed halves of the control-depth language.
+   * `borderTopColor`/`borderBottomColor` override two sides of a ring the tone
+   * already coloured; there is no `borderWidth` here because every control in
+   * the family already has one, and setting it would be this style deciding a
+   * control's weight rather than its depth. */
+  controlResting: { borderTopColor: T.controlLit, borderBottomColor: T.controlDark },
+  /* ⚠⚠ PRESSED IS THE LIGHT MOVING, NOT A NEW COLOUR. The catch of light goes
+   * to the bottom edge and the shadow to the top — which is what an object
+   * pushed INTO a surface actually looks like — and the face travels 1.5dp
+   * down, the same distance `TButton` has settled since VIS-1. */
+  controlPressed: {
+    borderTopColor: T.controlDark,
+    borderBottomColor: T.controlLit,
+    transform: [{ translateY: 1.5 }],
+  },
   rowChassis: {
     flexDirection: 'row',
     backgroundColor: '#13110f',
@@ -1356,9 +1448,27 @@ const kit = StyleSheet.create({
   },
   btnRimPrimary: { borderWidth: 1, borderColor: T.rimLit, borderTopColor: T.gold, borderBottomColor: 'rgba(0,0,0,0.85)' },
   btnRimDestructive: { borderColor: T.rustRim, borderTopColor: 'rgba(224,122,95,0.55)' },
+  /* ⚠⚠⚠ OTA-1782 — THE ANCESTOR JOINS THE LANGUAGE IT STARTED.
+   * `btnFace` has carried a lit top edge and a dark bottom edge since VIS-1,
+   * and until now it was the only control in the game that did. Owner: *"This
+   * should be ONE governed control-depth language. Do not independently style
+   * individual buttons."* Leaving TButton on `edgeLit`/`edgeDark` while the
+   * chips took `controlLit`/`controlDark` would have been two languages that
+   * merely agreed about direction — the same drift OTA-1781 had just finished
+   * cleaning out of the weapon-name pairing.
+   * ⚠ THE DELTA IS MEASURED AND IT IS ONE HAIRLINE. Over the primary face
+   * (~#1c1814) the top edge composites #41392c under the old token and #433e37
+   * under the new — about three levels of luminance, very slightly less warm,
+   * on a 1dp line. Named here so it is a stated change rather than a silent
+   * one; the device is the final authority, as always.
+   * ⚠ PANELS ARE NOT CONTROLS AND KEEP THE OLD PAIR. `panelFace`/`panelRim`
+   * still read `edgeLit`/`edgeDark`: a plate is the interface PLANE, and the
+   * whole claim of this language is that a control sits proud OF that plane. If
+   * both wore the same edges there would be nothing for a control to be proud
+   * of. */
   btnFace: {
     backgroundColor: T.face, paddingVertical: 12, paddingHorizontal: 12, alignItems: 'center',
-    borderTopWidth: 1, borderTopColor: T.edgeLit, borderBottomWidth: 1, borderBottomColor: T.edgeDark,
+    borderTopWidth: 1, borderTopColor: T.controlLit, borderBottomWidth: 1, borderBottomColor: T.controlDark,
   },
   btnFacePrimary: { backgroundColor: 'rgba(46,37,27,0.94)', paddingVertical: 16 },
   btnFaceUtility: { backgroundColor: T.faceUtility, paddingVertical: 10, borderTopWidth: 0 },
@@ -1368,7 +1478,12 @@ const kit = StyleSheet.create({
   btnFaceCompact: { paddingVertical: 5, paddingHorizontal: 8, backgroundColor: T.coating, borderTopWidth: 0 },
   /** the light that catches the top of a primary plate */
   btnTopLight: { position: 'absolute', top: 0, left: 0, right: 0, height: 1, backgroundColor: 'rgba(214,190,140,0.34)' },
-  btnFacePressed: { backgroundColor: 'rgba(6,5,4,0.85)', borderTopColor: 'rgba(0,0,0,0.5)' },
+  /* ⚠ OTA-1782 — pressed is the light MOVING, which is what `controlPressed`
+   * says for every other control. This already darkened its top edge; it now
+   * lifts the bottom one too, so the ancestor and the adopters invert the same
+   * way. The face darkening is TButton's own and stays — it is a large primary
+   * control and can afford the extra beat. */
+  btnFacePressed: { backgroundColor: 'rgba(6,5,4,0.85)', borderTopColor: T.controlDark, borderBottomColor: T.controlLit },
   btnLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   btnFlank: { color: T.goldDim, fontSize: 8 },
   btnTextPrimary: { color: T.gold, fontSize: 13, letterSpacing: 3 },

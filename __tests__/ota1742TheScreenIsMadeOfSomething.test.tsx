@@ -728,10 +728,25 @@ describe('OTA-1742 — the language is reusable, and the first pass stayed in it
      * this one stayed at 7 — a full surface run caught it, a single-suite run
      * would not have. Recorded rather than deduplicated: consolidating them is a
      * legacy-hunt item (one authority for one invariant), not something to do
-     * inside a pass that is already changing the number. */
+     * inside a pass that is already changing the number.
+     *
+     * ⚠⚠⚠ HELPERS 8 → 9 BY OTA-1782 (`tControlDepth`), AND ITS CASE IS THE ONE
+     * THE OWNER MADE FOR IT: *"This should be ONE governed control-depth
+     * language. Do not independently style individual buttons. Trace the
+     * existing control primitives/families first and identify the smallest
+     * shared implementation point."* It takes a parameter — the pressed state —
+     * so it clears the same bar `tMomentCard` did and `TSheet` did not: a
+     * helper exists only where something VARIES. And it replaces copies rather
+     * than adding a choice, which is the other half of the bar: `TButton` had
+     * this construction hand-drawn into its own face styles and was the only
+     * control in the game that had it at all.
+     * ⚠ THE SETTLE DISTANCE IS NOT A SECOND EXPORT. It lives inside
+     * `kit.controlPressed` and is read back through `tartariaKitStyles`, for
+     * exactly the reason this bound exists: a constant that never varies is a
+     * stylesheet entry, not an export. */
     expect(components.length).toBeLessThanOrEqual(13);
-    expect(helpers.length).toBeLessThanOrEqual(8);
-    expect(exported.length).toBeLessThanOrEqual(21);
+    expect(helpers.length).toBeLessThanOrEqual(9);
+    expect(exported.length).toBeLessThanOrEqual(22);
   });
 
   /* ⚠⚠⚠ SUPERSEDED BY VIS-3 (OTA-1746) — AND THE REASONING IS KEPT HERE RATHER
