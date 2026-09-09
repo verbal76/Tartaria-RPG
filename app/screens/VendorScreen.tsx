@@ -1017,14 +1017,25 @@ export function VendorScreen() {
               routes through buyFromVendor's recipe-learn branch. */}
           {recipeOffers.length > 0 && (() => {
             const secKey = 'buy_recipes';
-            const collapsed = collapsedSections[secKey] ?? false; // open by default — this is the discoverable bit
+            /* ⚠⚠ OTA-1764 — COLLAPSED BY DEFAULT, LIKE EVERY OTHER SECTION ON THE
+             * COUNTER. Owner: *"workings to learn and reinforce your gear should
+             * start collapsed like the rest of the categories when it shops and
+             * vendors."*
+             * ⚠ This USED to read `?? false` with the note "open by default —
+             * this is the discoverable bit", and that reasoning is overridden
+             * rather than lost: a section that opens itself while its ten
+             * neighbours stay shut does not read as discoverable, it reads as
+             * the odd one out, and it pushes the wares the player came for off
+             * the first screen. The count in the header is what advertises it
+             * now — the same job, without spending the fold. */
+            const collapsed = collapsedSections[secKey] ?? true;
             const RECIPE_ACCENT = '#c9a86a';
             return (
               <View style={styles.section}>
                 <TouchableOpacity
                   style={[styles.sectionHeader, { borderLeftColor: RECIPE_ACCENT }]}
                   activeOpacity={0.7}
-                  onPress={() => setCollapsedSections((s) => ({ ...s, [secKey]: !(s[secKey] ?? false) }))}
+                  onPress={() => setCollapsedSections((s) => ({ ...s, [secKey]: !(s[secKey] ?? true) }))}
                   accessibilityRole="button"
                   accessibilityState={{ expanded: !collapsed }}
                 >
@@ -1115,14 +1126,15 @@ export function VendorScreen() {
               free from the pack — that was the owner's line. */}
           {reinforceRows.length > 0 && (() => {
             const secKey = 'buy_reinforce';
-            const collapsed = collapsedSections[secKey] ?? false;
+            // ⚠ OTA-1764 — collapsed by default, matching the wares above it.
+            const collapsed = collapsedSections[secKey] ?? true;
             const FORGE_ACCENT = '#7fb0a8';
             return (
               <View style={styles.section}>
                 <TouchableOpacity
                   style={[styles.sectionHeader, { borderLeftColor: FORGE_ACCENT }]}
                   activeOpacity={0.7}
-                  onPress={() => setCollapsedSections((s2) => ({ ...s2, [secKey]: !(s2[secKey] ?? false) }))}
+                  onPress={() => setCollapsedSections((s2) => ({ ...s2, [secKey]: !(s2[secKey] ?? true) }))}
                   accessibilityRole="button"
                   accessibilityState={{ expanded: !collapsed }}
                 >

@@ -323,6 +323,28 @@ describe('OTA-1740 — the vendor projections are memoized against their real au
     const tree = await mountCounted('vendor', <VendorScreen />);
     const shown = () => tree.root.findAll(() => true).map(textOf).join('\n');
 
+    /* ⚠⚠ OTA-1764 — OPEN THE DRAWER FIRST. The counter now opens with every
+     * section collapsed, REINFORCE YOUR GEAR included, so its rows are not
+     * mounted until a player taps the header. This test is about the projection
+     * being FRESH, not about which sections start shut (that is `ota1764`), so
+     * it does what a player does and opens it.
+     * ⚠ Deduped by text and skipping `CONTRACTS ▸`: a TouchableOpacity is a
+     * composite that forwards props, so pressing every `findAll` match toggles
+     * each header twice and nets to nothing — and CONTRACTS carries a chevron in
+     * its LABEL and opens a modal over the screen. Both were hit for real. */
+    await renderer.act(async () => {
+      const seen = new Set<string>();
+      for (const h of tree.root
+        .findAll((n) => typeof n.props?.onPress === 'function'
+          && n.props?.accessibilityRole === 'button'
+          && /\u25b8/.test(textOf(n))
+          && !textOf(n).includes('CONTRACTS'))
+        .filter((n) => { const t = textOf(n); if (seen.has(t)) return false; seen.add(t); return true; })) {
+        (h.props.onPress as () => void)();
+      }
+    });
+    await flush();
+
     // an inventory mutation reaches the REINFORCE projection
     expect(shown()).not.toContain('Lag2 Probe Blade');
     const blade = {

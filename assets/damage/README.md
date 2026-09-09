@@ -50,11 +50,41 @@ renamed on the way in.
 | Cold / Freezing | `cold.png` | 109 | A hand with frost-blackened, reddened fingers. |
 | Radiation | `radiation.png` | 99 | A framed card: the yellow-green trefoil. Light border. |
 | Gas / Fumes | *(reuses `noxious.png`)* | 98 | — see Noxious. Intentional for this trial. |
-| Environmental | `environmental.png` | L544 | An opened metal case / kit, grey. |
+| Environmental | `environmental.png` | ⚠ **custom** — see below | A thunderstorm. Replaced L544 at OTA-1764. |
 
 ⚠ **Ten concepts, nine binaries.** Gas / Fumes deliberately points at
 `noxious.png` rather than duplicating the bytes. That is the owner's
 instruction for this trial, not an oversight.
+
+## ⚠ Environmental was replaced — L544 is RETIRED
+
+The first observation this trial reported was that `L544` *"reads as a container
+/ kit, not as an environment or a hazard. Its silhouette is a rectangle."* The
+owner agreed and rejected it: *"it visually reads as a suitcase/case rather than
+an environmental hazard."*
+
+| | |
+|---|---|
+| Source | **Custom Tartaria Environmental Thunderstorm** |
+| Asset family | custom |
+| Semantic filename | `environmental.png` — **unchanged** |
+| Master resolutions | 64 / 128 / 256 / 512 |
+| Runtime test resolution | **64×64** |
+| Status | PROVISIONAL, pending actual-device visual approval |
+| Retired | `L544`, no longer Environmental and not retained anywhere |
+
+⚠ **This was an ASSET REPLACEMENT ONLY.** The semantic key, the mapping, the
+Lore layout, the display-size experiment and live combat are all untouched —
+`damageIcons.ts` was not edited at all, because the semantic filename did not
+change. That is the architecture working: a correct art table means swapping a
+picture is swapping a file.
+
+⚠ **The 128 / 256 / 512 masters are NOT in this folder, on purpose.**
+`app.json` bundles `assets/**/*` into the app, so a master sitting here would
+ship four copies of one icon to a phone that only ever draws the 64. They live
+in `art/12-damage-icons/` with the rest of the source art, which is tracked in
+git and not bundled — the same split `art/README.md` describes for every other
+family.
 
 ## ⚠ What the contact sheet showed, reported and NOT acted on
 

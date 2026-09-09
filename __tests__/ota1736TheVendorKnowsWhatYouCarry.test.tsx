@@ -124,12 +124,42 @@ function textOf(n: TestNode): string {
   const walk = (x: unknown): string => typeof x === 'string' ? x : typeof x === 'number' ? String(x) : Array.isArray(x) ? x.map(walk).join('') : ((x as TestNode | null)?.children ? walk((x as TestNode).children) : '');
   return walk(n.children);
 }
+
+/* ⚠⚠ OTA-1764 — OPEN THE DRAWERS. The vendor counter now opens with EVERY
+ * section collapsed, including WORKINGS TO LEARN and REINFORCE YOUR GEAR, which
+ * used to default open. This suite is about what the reinforce flow DOES, not
+ * about which sections start shut — that is pinned in `ota1764` — so the mount
+ * helper does what a player now does and taps the closed headers open. The
+ * chevron `▸` is the collapsed marker; three passes because opening one section
+ * can reveal another. */
+function expandSections(tree: ReturnType<typeof renderer.create>): void {
+  /* ⚠⚠⚠ TWO TRAPS HERE, BOTH HIT ON THE FIRST ATTEMPT.
+   * 1. `TouchableOpacity` is a COMPOSITE that forwards its props, so `findAll`
+   *    returns the composite AND the host node for one control. Pressing every
+   *    match toggled each header an EVEN number of times — open, then shut —
+   *    and the sections looked untouched. Dedupe by rendered text.
+   * 2. `CONTRACTS ▸` carries a chevron IN ITS LABEL and is not a section at
+   *    all — it opens a modal. Matching on the chevron alone tapped it and
+   *    buried the screen under the mission board. Match the two section names. */
+  for (let pass = 0; pass < 3; pass++) {
+    const seen = new Set<string>();
+    const closed = tree.root
+      .findAll((n) => typeof n.props?.onPress === 'function'
+        && n.props?.accessibilityRole === 'button'
+        && /\u25b8/.test(textOf(n))
+        && !textOf(n).includes('CONTRACTS'))
+      .filter((n) => { const t = textOf(n); if (seen.has(t)) return false; seen.add(t); return true; });
+    if (closed.length === 0) return;
+    for (const h of closed) renderer.act(() => { (h.props.onPress as () => void)(); });
+  }
+}
 function openVendor() {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { VendorScreen } = require('../app/screens/VendorScreen');
   let tree!: ReturnType<typeof renderer.create>;
   renderer.act(() => { tree = renderer.create(React.createElement(VendorScreen)); });
   mounted.push(tree);
+  expandSections(tree);
   return { tree, all: () => tree.root.findAll(() => true).map(textOf).join('\n') };
 }
 const shows = (hay: string, needle: string) => hay.toUpperCase().includes(needle.toUpperCase());

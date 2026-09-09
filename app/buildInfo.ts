@@ -29582,7 +29582,29 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the key no longer mirrors it. Deliberate and temporary, like the artwork not
 // being in combat, and one line to reverse whichever way the call goes.
 // Provisional pending actual-device approval; nothing is selected or replaced.
-export const OTA_BUILD_ID = '2026-09-09-1763-icons-on-trial';
+// SUPERSEDED: '2026-09-09-1763-icons-on-trial'
+// OTA-1764 - a new storm, and two drawers that now start shut.
+// Owner: "workings to learn and reinforce your gear should start collapsed like
+// the rest of the categories when it shops and vendors." They were the only two
+// sections on the counter defaulting open; the wares above them have opened
+// collapsed since OTA-686. WORKINGS TO LEARN carried the note "open by default -
+// this is the discoverable bit", and that reasoning is overridden rather than
+// lost: a section that opens itself while its neighbours stay shut does not read
+// as discoverable, it reads as the odd one out, and it pushes the wares the
+// player came for off the first screen. The header count advertises it instead.
+// Both the render default and the toggle default moved, which matters - a header
+// that renders collapsed but toggles from `?? false` writes true on the first
+// tap and reads as a dead control.
+// The Environmental icon is replaced. The trial's own first report said L544
+// reads as a container rather than a hazard; the owner rejected it in the same
+// words and supplied a custom Tartaria thunderstorm. L544 is retired. The
+// semantic filename is unchanged, so NO CODE CHANGED - damageIcons.ts is not
+// touched and neither is the trial block, which is what a correct art table
+// buys: swapping a picture is swapping a file. The 128/256/512 masters go to
+// art/12-damage-icons, tracked in git and outside the assets tree app.json
+// bundles, so the phone still ships one resolution rather than four.
+// Provisional pending actual-device approval.
+export const OTA_BUILD_ID = '2026-09-09-1764-storm-and-shut-drawers';
 // golem catch-up 2026-09-09: markerless publish of OTA-1763 - the illustrated
 // damage icons, on trial in one surface. Nine owner-supplied 64x64 RGBA PNGs in
 // assets/damage with a README recording what each shows and its source pack ID;
