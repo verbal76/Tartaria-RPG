@@ -9,7 +9,7 @@ import {
   ScrollView,
   Dimensions,
 } from 'react-native';
-import { tModalCard, tartariaKitStyles as kit } from '../ui/tartariaKit';
+import { tFilledGold, tModalCard, tartariaKitStyles as kit } from '../ui/tartariaKit';
 
 import type { InventoryDelta } from './inventoryDelta';
 
@@ -97,7 +97,7 @@ export function CraftResultModal({ visible, items, onContinue, onClose }: Props)
 
               <View style={styles.btnRow}>
                 <Pressable
-                  style={({ pressed }) => [styles.btn, styles.btnPrimary, pressed && styles.btnPressed]}
+                  style={({ pressed }) => [styles.btn, tFilledGold(pressed)]}
                   onPress={onContinue}
                   accessibilityRole="button"
                 >
@@ -154,7 +154,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   btnPressed: { opacity: 0.7 },
-  btnPrimary: { backgroundColor: '#c9a86a', borderColor: '#c9a86a' },
   btnNeutral: { backgroundColor: 'transparent', borderColor: '#3a342c' },
   btnTextPrimary: { color: '#13110f', fontWeight: '700', letterSpacing: 1.5, fontSize: 11 },
   btnTextNeutral: { color: '#cdbf99', fontWeight: '700', letterSpacing: 1.5, fontSize: 11 },

@@ -10,7 +10,7 @@ import {
   Dimensions,
 } from 'react-native';
 import type { HookContinueStage } from '../engine/types';
-import { tModalCard, tartariaKitStyles as kit } from '../ui/tartariaKit';
+import { tFilledGold, tModalCard, tartariaKitStyles as kit } from '../ui/tartariaKit';
 
 /* ⚠⚠ OTA-1765 — the second adopter, and it is NOT a pure substitution. Stated
  * rather than discovered later:
@@ -201,7 +201,7 @@ export function HookContinueModal({
               <View style={styles.btnRow}>
                 {completed ? (
                   <Pressable
-                    style={({ pressed }) => [styles.btn, styles.btnPrimary, pressed && styles.btnPressed]}
+                    style={({ pressed }) => [styles.btn, tFilledGold(pressed)]}
                     onPress={onComplete}
                     accessibilityRole="button"
                   >
@@ -210,7 +210,7 @@ export function HookContinueModal({
                 ) : (
                   <>
                     <Pressable
-                      style={({ pressed }) => [styles.btn, styles.btnPrimary, pressed && styles.btnPressed]}
+                      style={({ pressed }) => [styles.btn, tFilledGold(pressed)]}
                       onPress={onContinue}
                       accessibilityRole="button"
                     >
@@ -290,7 +290,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   btnPressed: { opacity: 0.7 },
-  btnPrimary: { backgroundColor: '#c9a86a', borderColor: '#c9a86a' },
   btnNeutral: { backgroundColor: 'transparent', borderColor: '#3a342c' },
   // OTA-284 — TRADE NOW button. Distinct treatment so it reads as
   // "alternative path" not "primary action" (CONTINUE is primary).

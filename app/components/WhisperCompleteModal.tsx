@@ -9,7 +9,7 @@ import {
   ScrollView,
   Dimensions,
 } from 'react-native';
-import { tModalCard, tartariaKitStyles as kit } from '../ui/tartariaKit';
+import { tFilledGold, tModalCard, tartariaKitStyles as kit } from '../ui/tartariaKit';
 
 // ⚠ OTA-1774 — the modal sweep, batch 2. Family A by construction (standard
 // scrim, `#13110f` on the brand gold at radius 4), so it adopts with zero pixel
@@ -70,7 +70,7 @@ export function WhisperCompleteModal({ visible, title, lines, rewards, onClose }
 
               <View style={styles.btnRow}>
                 <Pressable
-                  style={({ pressed }) => [styles.btn, styles.btnPrimary, pressed && styles.btnPressed]}
+                  style={({ pressed }) => [styles.btn, tFilledGold(pressed)]}
                   onPress={onClose}
                   accessibilityRole="button"
                 >
@@ -114,7 +114,5 @@ const styles = StyleSheet.create({
     minWidth: 96,
     alignItems: 'center',
   },
-  btnPressed: { opacity: 0.7 },
-  btnPrimary: { backgroundColor: '#c9a86a', borderColor: '#c9a86a' },
   btnTextPrimary: { color: '#13110f', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
 });

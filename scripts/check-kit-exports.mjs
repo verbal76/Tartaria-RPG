@@ -39,10 +39,12 @@ export const COMPONENTS = 13;
  *  with helpers while the component count sits still.
  *    6 → 7  OTA-1765  tModalCard
  *    7 → 8  OTA-1777  tMomentCard   (the rim is a parameter)
- *    8 → 9  OTA-1782  tControlDepth (the pressed state is a parameter) */
-export const HELPERS = 9;
+ *    8 → 9  OTA-1782  tControlDepth (the pressed state is a parameter)
+ *    9 → 10 OTA-1791  tFilledGold   (pressed / resting / inert is the parameter;
+ *                                    ten hand-copied fills became this one) */
+export const HELPERS = 10;
 /** The total, which is the thing that stops the two budgets being traded. */
-export const TOTAL = 22;
+export const TOTAL = 23;
 
 export function countExports(src) {
   const decls = [...src.matchAll(/^export (function|const) (\w+)/gm)];

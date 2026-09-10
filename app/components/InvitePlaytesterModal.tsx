@@ -8,6 +8,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, TextInput } from 'react-native';
 import { KeyboardSafeCard } from './KeyboardSafeCard';
+import { tFilledGold } from '../ui/tartariaKit';
 
 interface Props {
   visible: boolean;
@@ -83,8 +84,7 @@ export function InvitePlaytesterModal({ visible, onCancel, onSend }: Props) {
           <Pressable
             style={({ pressed }) => [
               styles.btn,
-              valid ? styles.btnPrimary : styles.btnDisabled,
-              pressed && styles.btnPressed,
+              valid ? tFilledGold(pressed) : styles.btnDisabled,
             ]}
             onPress={handleSend}
             disabled={!valid}
@@ -184,7 +184,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   btnPressed: { opacity: 0.7 },
-  btnPrimary: { backgroundColor: '#c9a86a', borderColor: '#c9a86a' },
   btnDisabled: { backgroundColor: 'transparent', borderColor: '#3a342c' },
   btnNeutral: { backgroundColor: 'transparent', borderColor: '#3a342c' },
   btnText: { fontSize: 12, fontWeight: '700', letterSpacing: 2 },

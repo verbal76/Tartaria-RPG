@@ -36,6 +36,7 @@ import { KeyboardSafeCard } from './KeyboardSafeCard';
 const DESCRIBE_ACCESSORY = 'bugReportDescribeAccessory';
 import type { SlotSummary } from '../engine/saveSystem';
 import type { BugReportMode } from '../diagnostics/bugReport';
+import { tFilledGold } from '../ui/tartariaKit';
 
 interface Props {
   visible: boolean;
@@ -170,8 +171,7 @@ export function BugReportModal({ visible, slots, activeSlotId, onCancel, onSend 
           <Pressable
             style={({ pressed }) => [
               styles.btn,
-              canSend ? styles.btnPrimary : styles.btnDisabled,
-              pressed && styles.btnPressed,
+              canSend ? tFilledGold(pressed) : styles.btnDisabled,
             ]}
             onPress={handleSend}
             disabled={!canSend}
@@ -430,7 +430,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   btnPressed: { opacity: 0.7 },
-  btnPrimary: { backgroundColor: '#c9a86a', borderColor: '#c9a86a' },
   btnDisabled: { backgroundColor: 'transparent', borderColor: '#3a342c' },
   btnNeutral: { backgroundColor: 'transparent', borderColor: '#3a342c' },
   btnText: { fontSize: 12, fontWeight: '700', letterSpacing: 2 },

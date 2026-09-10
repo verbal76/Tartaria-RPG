@@ -13,7 +13,7 @@ import {
   Platform,
 } from 'react-native';
 
-import { tModalCard, tartariaKitStyles as kit } from '../ui/tartariaKit';
+import { tFilledGold, tModalCard, tartariaKitStyles as kit } from '../ui/tartariaKit';
 
 import type { InteractableChip } from './InteractableChip';
 
@@ -266,7 +266,7 @@ export function SearchModal({ visible, chips, onSubmit, onCancel, onInvestigateA
                       number of things that will actually happen. */}
                   {onInvestigateAll && actionableChips.length >= 2 && (
                     <Pressable
-                      style={({ pressed }) => [styles.btn, styles.btnPrimary, pressed && styles.btnPressed, { marginTop: 8 }]}
+                      style={({ pressed }) => [styles.btn, tFilledGold(pressed), { marginTop: 8 }]}
                       onPress={() => onInvestigateAll(actionableChips.map((c) => c.noun))}
                       accessibilityRole="button"
                       accessibilityLabel={`Investigate all ${actionableChips.length} surfaces`}
@@ -292,8 +292,7 @@ export function SearchModal({ visible, chips, onSubmit, onCancel, onInvestigateA
                 <Pressable
                   style={({ pressed }) => [
                     styles.btn,
-                    text.trim() ? styles.btnPrimary : styles.btnNeutral,
-                    pressed && styles.btnPressed,
+                    text.trim() ? tFilledGold(pressed) : styles.btnNeutral,
                   ]}
                   onPress={handleSubmit}
                   disabled={!text.trim()}
@@ -396,7 +395,6 @@ const styles = StyleSheet.create({
   },
   btnPressed: { opacity: 0.7 },
   btnDisabled: { opacity: 0.3 },
-  btnPrimary: { backgroundColor: '#c9a86a', borderColor: '#c9a86a' },
   btnNeutral: { backgroundColor: 'transparent', borderColor: '#3a342c' },
   btnTextPrimary: { color: '#13110f', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
   btnTextNeutral: { color: '#cdbf99', fontWeight: '700', letterSpacing: 2, fontSize: 12 },

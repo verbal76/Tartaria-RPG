@@ -1115,6 +1115,44 @@ export function tControlDepth(pressed = false): StyleProp<ViewStyle> {
   return pressed ? kit.controlPressed : kit.controlResting;
 }
 
+/* ⚠⚠ OTA-1791 — THE FILLED-GOLD PRIMARY, AND THERE IS NOW ONE OF IT.
+ *
+ * Owner, approving control-depth batch 2: *"do not paint ten hand-copied
+ * implementations independently … Treat that duplication as the architectural
+ * problem it is. Trace ownership and consolidate the repeated filled-gold
+ * primary control into the smallest appropriate existing kit/control
+ * primitive. Then let those consumers receive the same governed depth
+ * construction through that authority."*
+ *
+ * The control was one four-line rule — the brand gold as fill AND ring, with
+ * ink lettering — written by hand into ten modal files (Approach, Branded,
+ * BugReport, CraftRefusal, CraftResult, Feedback, HookContinue,
+ * InvitePlaytester, Search, WhisperComplete). Ten copies is ten places to
+ * drift, and OTA-1782 could prove the pill's depth by arithmetic but not paint
+ * it, because there was no one place to paint. This is that place.
+ *
+ * ⚠ SMALLEST PRIMITIVE, NOT A NEW COMPONENT. `TButton` is a different control —
+ * flanks, a lit top strip, its own geometry — and the ruling preserves each
+ * modal's layout exactly. So this is a STYLE HELPER in the TRow/TModal sense:
+ * the fill and ring from `T.gold`, plus `tControlDepth` riding on top, and each
+ * consumer keeps its own `btn` chassis (padding, radius, width) untouched.
+ *
+ * ⚠ `pressed` IS THE PARAMETER, and `null` is the inert control: a disabled
+ * pill keeps the fill and is handed NO depth, which is OTA-1782's rule — an
+ * inert control does not advertise readiness. Consumers say `tFilledGold(null)`
+ * for that state rather than composing the fill themselves.
+ *
+ * ⚠ WHAT THIS DOES NOT TAKE, SAID PLAINLY: four more files declare a style of
+ * the same NAME and are not this control — Ending's dark plate, CraftQuantity's
+ * sage outline, DifficultyCustom's dark fill on a gold ring, and
+ * MissionEncounterCard's bright frame gold. They keep their own; the suite
+ * names them so the boundary is a claim, not an omission. The pills' ink
+ * lettering stays local too: it is the one colour all ten agree on and the one
+ * this helper does not own, because a ViewStyle cannot carry a Text colour. */
+export function tFilledGold(pressed: boolean | null = false): StyleProp<ViewStyle> {
+  return pressed === null ? kit.filledGold : [kit.filledGold, tControlDepth(pressed)];
+}
+
 export function tRowStyle(state: TRowState = {}): StyleProp<ViewStyle> {
   return [
     kit.rowChassis,
@@ -1135,6 +1173,10 @@ const kit = StyleSheet.create({
    * the family already has one, and setting it would be this style deciding a
    * control's weight rather than its depth. */
   controlResting: { borderTopColor: T.controlLit, borderBottomColor: T.controlDark },
+  /* ⚠ OTA-1791 — the filled-gold primary's material: the brand gold as fill AND
+   * ring. No `borderWidth` here for the same reason as the depth pair above —
+   * every pill already has one in its own chassis. See `tFilledGold`. */
+  filledGold: { backgroundColor: T.gold, borderColor: T.gold },
   /* ⚠⚠ PRESSED IS THE LIGHT MOVING, NOT A NEW COLOUR. The catch of light goes
    * to the bottom edge and the shadow to the top — which is what an object
    * pushed INTO a surface actually looks like — and the face travels 1.5dp

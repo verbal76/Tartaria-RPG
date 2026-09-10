@@ -91,13 +91,22 @@ const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..')
  *                   cannot see — it counts `#c9a86a` alone. A migration caught
  *                   it, not a check; Inventory's two are still out there.
  *
+ *    295  OTA-1791  control-depth batch 2 — the filled-gold confirm pill in
+ *                   ten modals (Approach, Branded, BugReport, CraftRefusal,
+ *                   CraftResult, Feedback, HookContinue, InvitePlaytester,
+ *                   Search, WhisperComplete) became `tFilledGold`, which reads
+ *                   `T.gold`: twenty hand-typed declarations, fill and ring in
+ *                   each, became one token read. ⚠ FOUR FILES OF THE SAME NAME
+ *                   ARE NOT THAT CONTROL and kept their own (Ending,
+ *                   CraftQuantity, DifficultyCustom, MissionEncounterCard).
+ *
  *  ⚠ THE CURRENT SPLIT, and the only line in this file written in the form
  *  OTA-1757's suite parses — the ledger above is deliberately terse so a
  *  HISTORICAL total cannot be mistaken for today's:
- *      310 interface · 4 semantic authorities · 1 kit
+ *      290 interface · 4 semantic authorities · 1 kit
  *  The INTERFACE number is the one the rollout drives down; the other two are
  *  the rule working. */
-const BASELINE = 315;
+const BASELINE = 295;
 
 /** The brand gold, the only hex this gate is about. */
 const GOLD = /'#c9a86a'/gi;

@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import type { ItemPreview } from './itemPreview';
 import { NumberStepper } from './NumberStepper';
-import { tModalCard, tartariaKitStyles as kit } from '../ui/tartariaKit';
+import { tFilledGold, tModalCard, tartariaKitStyles as kit } from '../ui/tartariaKit';
 
 /* ⚠ OTA-1765 — the scrim and the card now come from the kit.
  * This file is where those values were WRITTEN; nine other dialogs re-typed
@@ -174,8 +174,7 @@ export function BrandedModal({
             key={b.label}
             style={({ pressed }) => [
               styles.btn,
-              toneStyle(b.tone),
-              pressed && styles.btnPressed,
+              b.tone === 'primary' ? tFilledGold(pressed) : [toneStyle(b.tone), pressed && styles.btnPressed],
             ]}
             onPress={b.onPress}
             accessibilityRole="button"
@@ -247,7 +246,7 @@ function rarityColor(rarity: string) {
 
 function toneStyle(tone: BrandedModalButton['tone']) {
   switch (tone) {
-    case 'primary': return styles.btnPrimary;
+    case 'primary': return tFilledGold(null);
     case 'destructive': return styles.btnDestructive;
     default: return styles.btnNeutral;
   }
@@ -340,7 +339,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   btnPressed: { opacity: 0.7 },
-  btnPrimary: { backgroundColor: '#c9a86a', borderColor: '#c9a86a' },
   btnDestructive: { backgroundColor: 'transparent', borderColor: '#e07a5f' },
   btnNeutral: { backgroundColor: 'transparent', borderColor: '#3a342c' },
   btnText: { fontSize: 12, fontWeight: '700', letterSpacing: 2 },

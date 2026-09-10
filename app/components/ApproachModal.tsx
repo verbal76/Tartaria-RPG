@@ -11,6 +11,7 @@ import {
   Keyboard,
   KeyboardAvoidingView,
 } from 'react-native';
+import { tFilledGold } from '../ui/tartariaKit';
 
 interface Props {
   visible: boolean;
@@ -236,9 +237,7 @@ export function ApproachModal({
                 <Pressable
                   style={({ pressed }) => [
                     styles.btn,
-                    styles.btnPrimary,
-                    !text.trim() && styles.btnDisabled,
-                    pressed && styles.btnPressed,
+                    text.trim() ? tFilledGold(pressed) : [tFilledGold(null), styles.btnDisabled],
                   ]}
                   onPress={handleSubmit}
                   disabled={!text.trim()}
@@ -276,7 +275,6 @@ const styles = StyleSheet.create({
   btn: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 3, borderWidth: 1, minWidth: 80, alignItems: 'center' },
   btnPressed: { opacity: 0.7 },
   btnDisabled: { opacity: 0.3 },
-  btnPrimary: { backgroundColor: '#c9a86a', borderColor: '#c9a86a' },
   btnNeutral: { backgroundColor: 'transparent', borderColor: '#3a342c' },
   btnTextPrimary: { color: '#13110f', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
   btnTextNeutral: { color: '#cdbf99', fontWeight: '700', letterSpacing: 2, fontSize: 12 },

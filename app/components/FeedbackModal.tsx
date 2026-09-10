@@ -45,6 +45,7 @@ import {
 } from 'react-native';
 import { KeyboardSafeCard } from './KeyboardSafeCard';
 import { startListening, stopListening, isListening } from '../voice/STTManager';
+import { tFilledGold } from '../ui/tartariaKit';
 
 // ⚠ OTA-1718 — the DONE bar's id for the multiline note field. iOS only.
 const NOTE_ACCESSORY = 'designerNoteAccessory';
@@ -222,9 +223,7 @@ export function FeedbackModal({ visible, onSubmit, onCancel }: Props) {
           <Pressable
             style={({ pressed }) => [
               styles.btn,
-              styles.btnPrimary,
-              !text.trim() && styles.btnDisabled,
-              pressed && styles.btnPressed,
+              text.trim() ? tFilledGold(pressed) : [tFilledGold(null), styles.btnDisabled],
             ]}
             onPress={handleSave}
             disabled={!text.trim()}
@@ -346,7 +345,6 @@ const styles = StyleSheet.create({
   },
   btnPressed: { opacity: 0.7 },
   btnDisabled: { opacity: 0.3 },
-  btnPrimary: { backgroundColor: '#c9a86a', borderColor: '#c9a86a' },
   btnNeutral: { backgroundColor: 'transparent', borderColor: '#3a342c' },
   btnTextPrimary: { color: '#13110f', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
   btnTextNeutral: { color: '#cdbf99', fontWeight: '700', letterSpacing: 2, fontSize: 12 },

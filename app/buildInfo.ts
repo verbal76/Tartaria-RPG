@@ -30055,7 +30055,33 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SUPERSEDED: '2026-09-09-1787-the-row-reads-its-own-hierarchy'
 // SUPERSEDED: '2026-09-09-1788-the-utility-marks-are-ours'
 // SUPERSEDED: '2026-09-09-1789-one-weapon-family-resolver'
-export const OTA_BUILD_ID = '2026-09-09-1790-the-exchange-reads-as-a-sentence';
+// SUPERSEDED: '2026-09-09-1790-the-exchange-reads-as-a-sentence'
+export const OTA_BUILD_ID = '2026-09-10-1791-the-gold-pill-sits-proud';
+// OTA-1791 - the gold pill sits proud. Control-depth batch 2, on the owner's
+// approval: "do not paint ten hand-copied implementations independently ...
+// consolidate the repeated filled-gold primary control into the smallest
+// appropriate existing kit/control primitive." The modals' confirm pill - the
+// brand gold as fill and ring - was one four-line rule written by hand into
+// ten files. It is now tFilledGold(pressed) in the kit: the fill from T.gold,
+// with OTA-1782's depth language riding on top, and each modal keeps its own
+// chassis (padding, radius, width) untouched. A style helper rather than
+// TButton, because TButton is a different control with a different geometry
+// and the ruling preserves every modal's layout. `null` is the inert pill: the
+// fill stays, the depth is withheld - OTA-1782's rule that a disabled control
+// does not advertise readiness.
+// WHAT MOVES ON SCREEN: the pill's upper edge catches light, its lower edge
+// falls to shadow, and a press swaps the two and settles the face 1.5dp,
+// replacing the opacity fade that was the pill's only press feedback - the
+// same swap OTA-1782 made on the combat chips. Colour, size, lettering, copy,
+// accessibility and every modal's layout do not move.
+// FOUR FILES OF THE SAME NAME ARE NOT THIS CONTROL and are left alone, named in
+// the suite: Ending's dark plate, CraftQuantity's sage outline,
+// DifficultyCustom's dark fill on a gold ring, MissionEncounterCard's bright
+// frame gold. The neutral CANCEL beside each pill still fades on press; that is
+// the next family, not this one.
+// The gold ratchet falls 315 to 295: twenty hand-typed gold declarations became
+// one token read. The kit's helper budget moves 9 to 10 for a helper whose
+// parameter varies, which is the rule the budget states.
 // golem catch-up 2026-09-09: markerless publish of OTA-1790.
 // OTA-1790 - the exchange reads as a sentence. The transcript said
 // `YOU > Raider  HIT` on one row and `YOU > Raider  HIT  25` on the next, with
