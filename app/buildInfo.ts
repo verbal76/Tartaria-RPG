@@ -30062,6 +30062,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SUPERSEDED: '2026-09-10-1794-one-ceiling-per-tile'
 // SUPERSEDED: '2026-09-10-1795-retreat-gives-ground'
 export const OTA_BUILD_ID = '2026-09-10-1796-the-store-reads-its-leaves';
+// golem catch-up 2026-09-10: markerless publish of OTA-1796.
 // OTA-1796 - the store reads its leaves. Owner ruling: "Web-line boot/module-
 // init cycle: Fix it, surgically, with a regression test." OTA-1756 found the
 // web bundle throwing "Cannot access 'FRESH_ENEMY_ARRAYS' before
