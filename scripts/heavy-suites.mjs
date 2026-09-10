@@ -42,10 +42,25 @@
  * owner's call rather than mine — the measured cost is written against each one
  * below so the decision can be made from numbers.
  *
- * ⚠⚠ FOUR EXEMPT SUITES ARE CURRENTLY RED, and that is worth knowing rather than
- * hiding: engineStateChaosSim (10s, 2 failing), completionistOutcomeSweep (48s, 5),
- * interactionStress (123s, 1), yearSimulation (124s, 1). All four predate this
- * pass. None can be promoted while red, and each is a separate investigation.
+ * ⚠⚠⚠ 2026-09-10 CLOSEOUT — THE OWNER MADE THAT CALL, BY INVARIANT. Eight of the
+ * ten were promoted to blocking after three green passes each on the closeout tree:
+ * dogGolemCombatStress (NaN HP / stalls / status flips), movementStress (crashes,
+ * travel rate), domesticStress (inventory dupes and loss), playerInputChaosSim
+ * (parser honesty and refusal), crossSystemRegressionStress (cross-system
+ * violations), and the three long sims — thousandDayStressSim (uncaught
+ * exceptions, 28–30s), stressMode_craftALot (inventory corruption, 53–54s),
+ * twoYearChaosSim (crashes, 55–64s) — "the approximately three additional minutes
+ * is acceptable for invariants of this severity." Two stay exempt on purpose:
+ * dogSystemPerfSmoke measures TIMING, and combatBalanceProbe observes counts
+ * rather than enforcing a release-blocking invariant.
+ *
+ * ⚠⚠ THE FOUR RED SUITES were classified the same day, and nothing in production
+ * changed for them: engineStateChaosSim and completionistOutcomeSweep were TEST
+ * DEFECTS (a stale room-key shape and a stale legacy range field), repaired and
+ * green; yearSimulation was a BUDGET defect (passes in ~430–580s under a 15-minute
+ * budget; its own timeout was 120s), reconciled; interactionStress was a stale
+ * absolute floor, reconciled to the invariant it stood for. They stay in this list
+ * until the owner rules on promoting them — being green is not being promoted.
  */
 
 /** Non-blocking suites, by exact basename, with the measured reason. */
@@ -56,25 +71,16 @@ export const HEAVY_SUITES = [
   'ota1699ContraryWalkerSweep.test.ts', // >200s — every contrary road of every family
   'playerWalkerSim.test.ts',         // >200s
 
-  // ── currently RED. Exempt because they fail, not because they are slow.
-  //    Each needs its own investigation; none may be promoted while red. ──
-  'engineStateChaosSim.ts',          //  10s · 2 failing
-  'completionistOutcomeSweep.test.ts', //  48s · 5 failing
-  'interactionStress.test.ts',       // 123s · 1 failing
-  'yearSimulation.test.ts',          // 124s · 1 failing
+  // ── formerly RED, repaired 2026-09-10 (test defects and budgets; production
+  //    untouched). Green, and still here until the owner rules on promotion. ──
+  'engineStateChaosSim.ts',          //  13s · green since 2026-09-10 (room key, roll queue)
+  'completionistOutcomeSweep.test.ts', //  47s · green since 2026-09-10 (bullseye band)
+  'interactionStress.test.ts',       // ~150s · green since 2026-09-10 (floor reconciled)
+  'yearSimulation.test.ts',          // ~430–580s · green since 2026-09-10 (15-minute budget)
 
-  // ── 11–61s and green. Promotable on the owner's word; the cost is the
-  //    reason they are still here, roughly five minutes of blocking CI. ──
-  'dogSystemPerfSmoke.test.ts',      //  11s · 3 tests
-  'dogGolemCombatStress.test.ts',    //  13s · 9 tests
-  'movementStress.test.ts',          //  18s · 1 test
-  'domesticStress.test.ts',          //  19s · 1 test
-  'playerInputChaosSim.ts',          //  22s · 15 tests
-  'crossSystemRegressionStress.test.ts', // 23s · 4 tests
+  // ── exempt by what they are, not how long they take (owner ruling 2026-09-10) ──
+  'dogSystemPerfSmoke.test.ts',      //  11s · 3 tests — measures TIMING, not correctness
   'combatBalanceProbe.test.ts',      //  28s · 1 test — measures numbers, not behaviour
-  'thousandDayStressSim.test.ts',    //  48s · 1 test
-  'stressMode_craftALot.test.ts',    //  51s · 1 test
-  'twoYearChaosSim.test.ts',         //  61s · 1 test
 ];
 
 /** A jest --testPathIgnorePatterns / --testPathPattern fragment for the list. */

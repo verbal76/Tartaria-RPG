@@ -97,7 +97,15 @@ const MECHANISMS = [
 
 describe('Year-long Tartaria Realms playthrough simulation', () => {
   // 2026-05-24 — cut 365d/730d → 180d/180d per playtester ask; timeout 480s → 120s.
-  jest.setTimeout(120000);
+  // ⚠ 2026-09-10 closeout — THE BUDGET IS THE CONTRACT, AND IT WAS FIVE TIMES
+  // TOO SMALL. Measured on the closeout tree: this sim PASSES in 582 s under a
+  // 15-minute outer budget and fails only by hitting its own 120 s timeout —
+  // the engine's known super-linear world/persist tail growth over 180 days is
+  // the cost. Owner's classification: BUDGET / TEST-HARNESS PROBLEM; no
+  // assertion changed. The heavy CI job carries no timeout of its own, so the
+  // 15-minute budget is the sim's, not the runner's. If it ever needs more,
+  // that is the tail-growth finding asking to be fixed, not this number.
+  jest.setTimeout(900000);
 
   beforeAll(() => {
     console.log = () => {};

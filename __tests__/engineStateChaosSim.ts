@@ -12,11 +12,11 @@
 //   2. Elevated overlay edge cases — minTiers ≥ 2 default, trader
 //      gated at 4, ambient-noun seed is idempotent, descent round-
 //      trips the preserved scene cleanly.
-//   3. Hub interior collision probe — makeRoomKey omits hubRoomId,
-//      so two distinct hub rooms at the same (locationId, mapX,
-//      mapY) share VisitedRoom state. Test asserts the collision
-//      and is marked `test.failing` so the OTA-080 known-open issue
-//      is tracked, not silently re-introduced.
+//   3. Hub interior collision probe — makeRoomKey keys hub rooms apart (OTA-080
+//      closed, found 2026-09-10), so two distinct hub rooms at the same
+//      (locationId, mapX, mapY) no longer share VisitedRoom state. The test
+//      asserts the fixed world as a plain claim, so the collision cannot be
+//      silently re-introduced.
 //   4. Per-noun infinity — 100 investigate attempts on the same
 //      noun produce exactly ONE arbiter acknowledgement; the rest
 //      hit the dedup-refuse path.
@@ -66,7 +66,7 @@ jest.mock('expo-font', () => ({ loadAsync: jest.fn(async () => {}) }));
 jest.mock('expo-speech-recognition', () => ({}));
 jest.mock('expo-updates', () => ({}));
 
-import { useGameStore } from '../app/state/gameStore';
+import { useGameStore, makeRoomKey } from '../app/state/gameStore';
 import {
   rollElevatedOverlay,
   buildOverlayOverrides,
@@ -98,6 +98,28 @@ function mulberry32(seed: number): () => number {
 
 type Counter = Record<string, number>;
 function bump(c: Counter, k: string) { c[k] = (c[k] ?? 0) + 1; }
+
+/** ⚠ 2026-09-10 closeout — THE ROLL QUEUE. Since LAG-3 a dice-backed action
+ *  can open `pendingRolls`, and the NEXT action is refused with "Settle the
+ *  roll first" until it is resolved. This sim predates that and fires actions
+ *  back to back, so every action here settles whatever roll it opened, the way
+ *  the completionist sweep does — a flat 15 on every die, so the sim stays
+ *  deterministic. (The red claims' actual cause was the room key below; this
+ *  is the second stale assumption, closed in the same pass.) */
+function settleRolls(store: typeof useGameStore): void {
+  let guard = 0;
+  while (store.getState().pendingRolls) {
+    if (guard++ > 60) throw new Error('roll loop did not terminate');
+    const pr = store.getState().pendingRolls!;
+    const step = pr.steps[pr.currentStep]!;
+    store.getState().resolveRollStep(Array.from({ length: step.count ?? 1 }, () => 15));
+  }
+}
+/** submitPlayerAction, then settle whatever roll it opened. */
+function act(store: typeof useGameStore, text: string): void {
+  store.getState().submitPlayerAction(text);
+  settleRolls(store);
+}
 
 async function bootstrap() {
   const store = useGameStore;
@@ -175,7 +197,13 @@ function installScene(
     },
   });
   // Seed the investigation table the same way beginScene does.
-  const roomKey = `${player.currentLocationId}@${microMicroId ?? '_'}@${player.mapX ?? '_'},${player.mapY ?? '_'}`;
+  // ⚠ 2026-09-10 closeout — THE KEY IS THE ENGINE'S. Since OTA-1541 open-ground
+  // records are filed under `grid@<micro>@<absolute cell>`; this sim still built
+  // the pre-1541 `<location>@<micro>@<mapX>,<mapY>` shape, seeded its table under
+  // a key the engine never reads, and then watched that dead key for a flip that
+  // was happening one key over. Owner's classification: TEST DEFECT / stale
+  // assumption; production unchanged. One builder, the store's own.
+  const roomKey = makeRoomKey(player.currentLocationId, microMicroId, player.mapX, player.mapY, player.hubRoomId);
   store.setState((s) => {
     const prev = s.worldMemory.visitedRooms?.[roomKey];
     if (prev?.roomInvestigationTable) return s;
@@ -246,7 +274,7 @@ describe('engineStateChaosSim — adversarial regression', () => {
       // so we don't end up stuck on a tier waiting on rope/stamina.
       const sceneNow = store.getState().currentScene;
       if (sceneNow?.elevatedOn) {
-        try { store.getState().submitPlayerAction('climb down'); }
+        try { act(store, 'climb down'); }
         catch (e) { errors.push(String(e)); }
       }
       // Re-stamina/HP so the verbs don't refuse for non-table
@@ -260,7 +288,7 @@ describe('engineStateChaosSim — adversarial regression', () => {
       bump(verbCounter, cmd.split(' ')[0]!);
       try {
         store.setState({ gameLog: [] }); // isolate each step's log
-        store.getState().submitPlayerAction(cmd);
+        act(store, cmd);
       } catch (e) {
         errors.push(`iter ${i} "${cmd}": ${e instanceof Error ? e.message : String(e)}`);
       }
@@ -453,7 +481,7 @@ describe('engineStateChaosSim — adversarial regression', () => {
 
     // Now "climb down" — the engine should restore baseScene fields
     // and null out elevatedOn + clear the overlay meta + preserved.
-    store.getState().submitPlayerAction('climb down');
+    act(store, 'climb down');
     const restored = store.getState().currentScene!;
     expect(restored.ambientNouns).toEqual(baseScene.ambientNouns);
     expect(restored.elevatedOn).toBeNull();
@@ -491,12 +519,17 @@ describe('engineStateChaosSim — adversarial regression', () => {
   // noun in one room then walking to another room at the same tile
   // sees the noun as already-investigated.
   //
-  // This test EXPECTS the bug and is marked `test.failing` so it
-  // green-passes today (the bug exists) but flips to red the day the
-  // engine starts including hubRoomId in the key. When that happens,
-  // unflip + update HANDOFF.md.
-  test.failing(
-    'OTA-080 KNOWN OPEN — two hub rooms at same tile collide on VisitedRoom',
+  // This test EXPECTED the bug and was marked `test.failing` so it
+  // green-passed while the bug existed and would flip to red the day the
+  // engine started including hubRoomId in the key.
+  //
+  // ⚠ 2026-09-10 closeout — THAT DAY HAD COME, UNNOTICED. makeRoomKey has
+  // carried a `@<hubRoomId>` suffix for some time (gameStore's hubSuffix), so
+  // the collision is CLOSED in production; this claim only surfaced once the
+  // sim asked the engine's own key builder instead of a stale copy of the
+  // old shape. Unflipped: it now asserts the fixed world as a plain claim.
+  it(
+    'OTA-080 CLOSED — two hub rooms at the same tile are filed apart on VisitedRoom',
     async () => {
       const store = await bootstrap();
       const player = store.getState().player!;
@@ -510,12 +543,12 @@ describe('engineStateChaosSim — adversarial regression', () => {
       });
       // Seed scene A (chandelier study) and investigate "chandelier".
       const roomKeyA = installScene(store, ['chandelier', 'desk', 'tome'], null);
-      store.getState().submitPlayerAction('investigate chandelier');
+      act(store, 'investigate chandelier');
       const tableA = getRoom(store, roomKeyA)?.roomInvestigationTable;
       const chandConsumed = !!tableA?.['chandelier']?.consumed;
 
       // Now swap hubRoomId to a DIFFERENT room at the SAME tile.
-      // makeRoomKey ignores hubRoomId, so this resolves to the same
+      // makeRoomKey carries hubRoomId, so this resolves to a different
       // key. installScene with microMicroId=null will overwrite the
       // scene's nouns but the worldMemory entry persists.
       store.setState((s) => (s.player ? {
@@ -523,13 +556,10 @@ describe('engineStateChaosSim — adversarial regression', () => {
       } : s));
       const roomKeyB = installScene(store, ['rack', 'helm', 'sword'], null);
 
-      // The two keys should be DIFFERENT for the collision to be
-      // fixed. Today they're the same — assert "different" so the
-      // failing-test marker flips when the engine learns to include
-      // hubRoomId.
+      // The two keys are DIFFERENT — the collision is fixed.
       expect(roomKeyA).not.toBe(roomKeyB);
       // And the armory should NOT see "chandelier" as consumed —
-      // it's a different room. Today (bug present) the consumed
+      // it's a different room. While the bug was present the consumed
       // flag bleeds through. Assert the "fixed" world: the armory
       // table has no chandelier entry at all, or it's un-consumed.
       const tableB = getRoom(store, roomKeyB)?.roomInvestigationTable;
@@ -559,7 +589,7 @@ describe('engineStateChaosSim — adversarial regression', () => {
       store.setState({ player: { ...p, hp: p.hpMax, stamina: p.staminaMax }, gameLog: [] });
       const before = getRoom(store, roomKey)?.roomInvestigationTable?.['wooden bench'];
       const wasConsumed = !!before?.consumed;
-      store.getState().submitPlayerAction('investigate wooden bench');
+      act(store, 'investigate wooden bench');
       const after = getRoom(store, roomKey)?.roomInvestigationTable?.['wooden bench'];
       const isConsumed = !!after?.consumed;
       if (!wasConsumed && isConsumed) firstTouchFlips++;

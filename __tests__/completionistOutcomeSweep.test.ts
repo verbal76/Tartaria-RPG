@@ -52,6 +52,7 @@ jest.mock('expo-updates', () => ({}));
 // ⚠ "Sweep" keeps it out of test:ci:fast. On-demand:
 //     npx jest completionist --forceExit
 import { useGameStore } from '../app/state/gameStore';
+import { arrivalPos } from '../app/state/combatResolution';
 import { getRaces, getFactions } from '../app/engine/character';
 import { LOST_CAPITAL_LOCATIONS, endingLine } from '../app/engine/mainQuest';
 import { STORY_MOTIVE_IDS } from '../app/engine/story';
@@ -169,10 +170,16 @@ describe('COMPLETIONIST A — every motive through every resolution, live (15 ce
           await settle(() => (store.getState().currentScene?.enemies ?? []).some((e) => motiveBossFromEnemy(e)));
           const foe = store.getState().currentScene!.enemies.find((e) => motiveBossFromEnemy(e))!;
           expect(motiveBossFromEnemy(foe)).toEqual({ motive, kind });
+          // ⚠ 2026-09-10 closeout — OTA-1506 moved range to the BULLSEYE: the attack
+          // gate reads each enemy's own `pos` (enemyBandOf), and the legacy `range`
+          // field is only a fallback for a body with no position. The boss stood up
+          // at mid with a position, so `range: 'close'` here moved nothing and every
+          // swing was refused for reach. Owner's classification: TEST DEFECT / stale
+          // assumption; production unchanged. The fixture now places him at close.
           useGameStore.setState({
             currentScene: {
               ...store.getState().currentScene!,
-              enemies: [foe], enemyHps: [1], activeEnemyIdx: 0, range: 'close',
+              enemies: [{ ...foe, pos: arrivalPos('close', () => 0) }], enemyHps: [1], activeEnemyIdx: 0, range: 'close',
               enemyAmbushUsed: [false], enemyKnockedOut: [false], enemyStatuses: [[]],
               enemyArmorShred: [0], enemyCorruptionStacks: [0], enemiesAtBase: false,
             },
