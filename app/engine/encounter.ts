@@ -415,14 +415,14 @@ export function pickEnemyForLocation(location: Location): Enemy | null {
   // arrival; danger 3 capitals from 64% → 74%; danger 5 deep zones
   // already capped at 80% before, now 90%.
   if (!chance(50 + location.danger * 8)) return null;
-  const dangerCap: Rarity = location.danger >= 4 ? 'Legendary' : location.danger >= 3 ? 'Rare' : location.danger >= 2 ? 'Uncommon' : 'Common';
+  const dangerCap = rarityCapForDanger(location.danger);
   const allowed = enemies.filter((e) => rarityRank(e.rarity) <= rarityRank(dangerCap));
   if (allowed.length === 0) return null;
   return pickWeighted(allowed, (e) => rarityWeights[e.rarity]);
 }
 
 export function pickEnemyForLocationGuaranteed(location: Location, playerHpMax?: number): Enemy | null {
-  const dangerCap: Rarity = location.danger >= 4 ? 'Legendary' : location.danger >= 3 ? 'Rare' : location.danger >= 2 ? 'Uncommon' : 'Common';
+  const dangerCap = rarityCapForDanger(location.danger);
   // OTA-243 — player-tier cap. Playtest report: Day 16 player with
   // 48 HP got a Mud Giant (Legendary, 360 HP, 4d6 damage) rest-
   // ambush in Asgardar (danger 5). The legendary roll was correct
@@ -477,8 +477,20 @@ const GROUP_TEMPLATES: GroupTemplate[] = [
   { enemyName: 'Black Cloak Agent', count: 2, minDanger: 3, weight: 2 },
 ];
 
-/** The rarity ceiling a tile's danger allows (shared by the pickers). */
-function rarityCapForDanger(danger: number): Rarity {
+/** ⚠⚠ OTA-1794 — THE ONE RARITY CEILING A TILE'S DANGER ALLOWS. This rule was
+ *  written three times in this file — inline in `pickEnemyForLocation`, inline
+ *  in `pickEnemyForLocationGuaranteed`, and here for the pack roll — under a
+ *  comment calling it "shared by the pickers" when nothing shared it. Two
+ *  seeded mutations proved no suite read any copy: opening both inline copies
+ *  to Legendary at danger 1 passed 514 tests (audit M9b); opening THIS copy
+ *  passed the full fast surface, 1274 suites (2026-09-10). The owner's ruling:
+ *  adjudicate, then repair. So: one function, three readers, exported so the
+ *  ladder is a claim a suite can hold, and the suite below samples every
+ *  reader at every danger. Change the ladder HERE or not at all.
+ *
+ *    danger 0–1 → Common      danger 2 → Uncommon
+ *    danger 3   → Rare        danger 4+ → Legendary */
+export function rarityCapForDanger(danger: number): Rarity {
   return danger >= 4 ? 'Legendary' : danger >= 3 ? 'Rare' : danger >= 2 ? 'Uncommon' : 'Common';
 }
 

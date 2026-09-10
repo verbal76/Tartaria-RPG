@@ -30058,7 +30058,21 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SUPERSEDED: '2026-09-09-1790-the-exchange-reads-as-a-sentence'
 // SUPERSEDED: '2026-09-10-1791-the-gold-pill-sits-proud'
 // SUPERSEDED: '2026-09-10-1792-the-log-keeps-the-freeze'
-export const OTA_BUILD_ID = '2026-09-10-1793-stealth-is-not-steal';
+// SUPERSEDED: '2026-09-10-1793-stealth-is-not-steal'
+export const OTA_BUILD_ID = '2026-09-10-1794-one-ceiling-per-tile';
+// OTA-1794 - one ceiling per tile. The rarity ceiling a tile's danger allows
+// (0-1 Common, 2 Uncommon, 3 Rare, 4+ Legendary) was written three times in
+// encounter.ts - inline in pickEnemyForLocation, inline in
+// pickEnemyForLocationGuaranteed, and as rarityCapForDanger for the pack roll,
+// under a comment calling it "shared by the pickers" when nothing shared it.
+// The validation audit flagged it and the owner ruled: one final independent
+// seeded mutation, then decide. Audit M9b had opened both inline copies to
+// Legendary at danger 1 and 514 tests passed; today the third copy was opened
+// the same way and the FULL fast surface passed, 1274 suites. No protection
+// existed on any spelling. Repair: one exported rarityCapForDanger, three
+// readers; no game behaviour moves (the three copies agreed). Suite
+// ota1794OneCeilingPerTile pins the ladder and samples every reader at every
+// danger 0-5, so either mutation now fails where it stands.
 // golem catch-up 2026-09-10: markerless publish of OTA-1793.
 // OTA-1793 - stealth is not steal. Reported by OTA-1738 and left open: a typed
 // `stealth` answered "Nothing to steal here". The deterministic verb table had
