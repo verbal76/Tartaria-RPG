@@ -742,7 +742,7 @@ import {
 // ⚠ OTA-1581 — the mission conversation card. `armedEncounter` is a pure
 // selector over the save (see its file note: a selector, not a hook into
 // movement), and every button routes through `applyChoice`.
-import { missionTraceLines, missionArrivalLines } from '../engine/missionTrace';
+import { missionTraceArrivalLines, missionArrivalLines } from '../engine/missionTrace';
 import { armedEncounter } from '../engine/missionEncounterArm';
 import {
   applyChoice as applyEncounterChoice,
@@ -9731,7 +9731,7 @@ export const useGameStore = create<GameStore>(coalesceLogNotifications((set, get
     // every tile change in every log part carries the answer beside the question.
     // See missionTrace.ts — it is a READER, using the same resolvers the engine
     // decides with.
-    for (const l of missionTraceLines(get().player)) get().appendLog('debug', l);
+    for (const l of missionTraceArrivalLines(get().player)) get().appendLog('debug', l);
     // ⚠⚠ OTA-1596 — the debt is settled BEFORE the receipt prints, so the arrival
     // line reads "finish it", not an item with no road to it. See stageArrival.ts.
     healStageDebtsAtArrival(get, set, grantStageItems);

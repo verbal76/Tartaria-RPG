@@ -164,7 +164,9 @@ describe('OTA-1586 — it is wired where a log will actually see it', () => {
     // "Every part" is the requirement. Arrival covers a session that moves; the
     // seam covers one that loads in and reads the contracts screen without
     // moving, which no arrival line would ever catch.
-    expect(STORE).toContain("for (const l of missionTraceLines(get().player)) get().appendLog('debug', l);");
+    // OTA-1792: the arrival dump goes through the memoised variant - full when the
+    // slate changed, one line when it did not. Either way every arrival writes.
+    expect(STORE).toContain("for (const l of missionTraceArrivalLines(get().player)) get().appendLog('debug', l);");
     expect(STORE).toContain("for (const l of missionArrivalLines(get().player, get().worldMemory)) get().appendLog('world', l);");
     expect(SLOT).toContain('mt.missionTraceLines(get().player)');
   });

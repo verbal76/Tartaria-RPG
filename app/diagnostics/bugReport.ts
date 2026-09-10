@@ -84,7 +84,46 @@ function buildVoiceSummary(): string {
 
 // ~40KB log target (see the original TitleScreen note): Gmail Android compose
 // accepts ~64KB per paste, iOS Mail ~50KB; 40KB leaves room for the wrapper.
-const LOG_CHARS_CAP = 40_000;
+export const LOG_CHARS_CAP = 40_000;
+
+/** ⚠⚠ OTA-1792 — THE FULL-LOG PUSH IS NOT AN EMAIL PASTE, AND IT WAS TRIMMED
+ *  LIKE ONE. The 2026-09-10 iPhone SE freeze: the owner pressed "Send full log"
+ *  and the bundle carried 297 of 3,048 entries — 57 seconds of a nine-minute
+ *  session — because the same 40KB paste cap applied. The model release, the
+ *  first twelve memory warnings and everything the player did in between were
+ *  cut before they left the phone. The push goes to Sentry as packed inline
+ *  parts (OTA-1679), not into a mail composer, and the relay has reassembled
+ *  raw-log bundles of 24 and 30 parts (161k and 205k chars) intact, so the
+ *  cap for THIS mode is the bundle's, not the mailbox's. 200k chars is ~14
+ *  parts at the inline budget — well inside what has been measured to arrive.
+ *  The described bug report keeps its paste-sized cap: it is still read in
+ *  full by a person, and the log is context there, not the subject. */
+export const FULL_LOG_CHARS_CAP = 200_000;
+
+/** The newest lines of a slot log that fit the mode's cap, newest first, with
+ *  the header a triager reads before the lines. Pure, so the cap and the
+ *  trimming rule are a claim a suite can make without a store or a slot. */
+export function trimLogForReport(raw: string, mode: BugReportMode): { header: string; lines: string[]; truncated: boolean } {
+  const cap = mode === 'fulllog' ? FULL_LOG_CHARS_CAP : LOG_CHARS_CAP;
+  const allLines = raw.split('\n').filter((l) => l.length > 0);
+  const totalLines = allLines.length;
+  allLines.reverse();
+  const lines: string[] = [];
+  let accChars = 0;
+  let truncated = false;
+  for (const line of allLines) {
+    if (accChars + line.length + 1 > cap) { truncated = true; break; }
+    lines.push(line);
+    accChars += line.length + 1;
+  }
+  const why = mode === 'fulllog'
+    ? `older trimmed at the full-log cap of ${FULL_LOG_CHARS_CAP.toLocaleString('en-US')} characters`
+    : 'older trimmed to fit a single email paste';
+  const header = truncated
+    ? `(Newest entry at top — showing the most recent ${lines.length} of ${totalLines} entries; ${why})`
+    : `(Newest entry at top — full log, ${lines.length} entries)`;
+  return { header, lines, truncated };
+}
 
 /** ⚠ OTA-1666 — the pack's own ceiling, kept well under the log's. A hoarder's
  *  snapshot runs long (every instance, with durability, slot and stat lines),
@@ -239,21 +278,10 @@ export async function composeAndSendBugReport(args: {
       const raw = await readSlotLog(src.slotId);
       rawLog = raw ?? '';
       if (raw && raw.length > 0) {
-        const allLines = raw.split('\n').filter((l) => l.length > 0);
-        const totalLines = allLines.length;
-        allLines.reverse();
-        const accLines: string[] = [];
-        let accChars = 0;
-        let truncated = false;
-        for (const line of allLines) {
-          if (accChars + line.length + 1 > LOG_CHARS_CAP) { truncated = true; break; }
-          accLines.push(line);
-          accChars += line.length + 1;
-        }
-        const header = truncated
-          ? `(Newest entry at top — showing the most recent ${accLines.length} of ${totalLines} entries; older trimmed to fit a single email paste)`
-          : `(Newest entry at top — full log, ${accLines.length} entries)`;
-        logBlock = `${header}\n\n${accLines.join('\n')}`;
+        // OTA-1792 — the cap is the MODE's: a full-log push is a Sentry bundle,
+        // a described report is a paste. See trimLogForReport.
+        const trimmed = trimLogForReport(raw, mode);
+        logBlock = `${trimmed.header}\n\n${trimmed.lines.join('\n')}`;
       } else {
         logBlock = `(log empty for ${src.playerName})`;
       }

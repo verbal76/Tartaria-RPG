@@ -143,6 +143,13 @@ function factionLine(rec: Rec, def: FactionQuestDef | null, player: PlayerCharac
   return bits.join(' ');
 }
 
+/** OTA-1792 — the last full dump this process: what it said, when, how many. */
+let lastFullDump: { key: string; at: string; count: number } | null = null;
+const MISSION_TAIL_PREFIX = 'missions: · ';
+
+/** Tests only — a process-level memo needs a way to start over. */
+export function _resetMissionTraceMemoForTest(): void { lastFullDump = null; }
+
 /**
  * One line per live contract, plus the player's own position for comparison.
  * Empty slate returns a single line saying so — "no missions" is an answer, and
@@ -175,7 +182,70 @@ export function missionTraceLines(player: PlayerCharacter | null | undefined): s
   if (routed) tail.push(`routed=${routed.id}(${routed.phase})`);
   if (travel) tail.push(`travelTo=${travel}`);
   if (out.length === 0) return [`missions: none active · ${tail.join(' ')}`];
-  return [...out.map((l) => `missions: ${l}`), `missions: · ${tail.join(' ')}`];
+  // OTA-1792 — a full dump primes the memo the arrival variant reads. See below.
+  lastFullDump = { key: slateKey(out), at: new Date().toISOString(), count: out.length };
+  return [...out.map((l) => `missions: ${l}`), `${MISSION_TAIL_PREFIX}${tail.join(' ')}`];
+}
+
+/** The slate's identity for the memo: every contract line with its STANDING
+ *  marks (` HERE`, ` OFF-CELL(…)`) removed. Those marks are the player's
+ *  position seen from the contract's side, and the position is exactly what an
+ *  arrival changes; keying on them would dump 115 lines every time the player
+ *  stepped onto or off any contract's ground. The compact line carries the
+ *  standing facts itself (`here=`), so nothing is lost. */
+function slateKey(lines: string[]): string {
+  return lines.map((l) => l.replace(STANDING_MARK, '$1')).join('\n');
+}
+const STANDING_MARK = /(@\S+) (?:HERE|OFF-CELL\([^)]*\))(?= |$)/;
+
+/** ⚠⚠ OTA-1792 — THE SLATE, ON EVERY ARRIVAL, WITHOUT DROWNING THE LOG.
+ *
+ *  OTA-1586's rule stands: every part of every log must be able to say what
+ *  the player was carrying. What the 2026-09-10 iPhone SE log showed is the
+ *  cost of saying it in full every time: with the test kit's 115 open
+ *  contracts, one travel wrote 115 lines, and the "full log" that reached us
+ *  was 297 lines of which about 280 were this trace repeated — the freeze
+ *  itself had been trimmed off the front to make room for it.
+ *
+ *  So an ARRIVAL writes the full dump only when the slate CHANGED since the
+ *  last full dump this process (a stage advanced, a contract accepted or
+ *  finished, a pause toggled — anything that alters a contract line). When
+ *  nothing changed it writes ONE line that still answers the question in
+ *  place: how many contracts, when they were last dumped in full so the reader
+ *  knows where to look, the player's own position, which is the half of the
+ *  line that changes with every tile and must never be compacted away, and
+ *  which contracts' ground he is standing on (`here=`) — the one per-contract
+ *  fact an arrival changes, so it is not a change of slate but it is reported.
+ *
+ *  The session-start dump (slotSlice) still calls `missionTraceLines` and so
+ *  primes the memo; the memo is per process, so a cold start always begins
+ *  with a full dump. Not persisted, on purpose: a memo that outlived the
+ *  process could suppress the one dump a new log needs. */
+export function missionTraceArrivalLines(player: PlayerCharacter | null | undefined): string[] {
+  if (!player) return [];
+  const prev = lastFullDump;
+  const full = missionTraceLines(player);
+  if (full.length <= 1) return full; // "none active" is already one line, and primes nothing
+  // missionTraceLines just re-primed the memo with a fresh timestamp; the body it
+  // wrote is what the slate looks like NOW. Same body as before = nothing changed.
+  const now = lastFullDump;
+  if (!prev || !now || prev.key !== now.key) return full;
+  // Unchanged: keep the ORIGINAL dump's timestamp so the compact line points at
+  // the dump that actually exists in the log, not at this arrival.
+  lastFullDump = prev;
+  const tail = (full[full.length - 1] ?? '').slice(MISSION_TAIL_PREFIX.length);
+  // The standing facts the full lines would have carried — which contracts the
+  // player is on the ground of right now — are the arrival's own answer and
+  // ride on the compact line by id.
+  const here: string[] = [];
+  const offCell: string[] = [];
+  for (const l of full.slice(0, -1)) {
+    const m = /^missions: (\S+) .*?@\S+ (HERE|OFF-CELL\()/.exec(l);
+    if (!m) continue;
+    (m[2] === 'HERE' ? here : offCell).push(m[1] ?? '');
+  }
+  const standing = `here=${here.length ? here.join(',') : 'none'}${offCell.length ? ` offcell=${offCell.join(',')}` : ''}`;
+  return [`missions: unchanged since ${prev.at} — ${prev.count} contracts (dumped in full then) · ${tail} ${standing}`];
 }
 
 /**

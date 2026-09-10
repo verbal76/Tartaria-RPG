@@ -30056,8 +30056,33 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SUPERSEDED: '2026-09-09-1788-the-utility-marks-are-ours'
 // SUPERSEDED: '2026-09-09-1789-one-weapon-family-resolver'
 // SUPERSEDED: '2026-09-09-1790-the-exchange-reads-as-a-sentence'
-export const OTA_BUILD_ID = '2026-09-10-1791-the-gold-pill-sits-proud';
-// golem catch-up 2026-09-10: markerless publish of OTA-1791.
+// SUPERSEDED: '2026-09-10-1791-the-gold-pill-sits-proud'
+export const OTA_BUILD_ID = '2026-09-10-1792-the-log-keeps-the-freeze';
+// OTA-1792 - the log keeps the freeze. The 2026-09-10 iPhone SE freeze report
+// arrived as 297 of 3,048 entries - 57 seconds of a nine-minute session - and
+// about 280 of those 297 were the mission trace repeated: with the test kit's
+// 115 open contracts, every arrival wrote 115 lines, and the "Send full log"
+// push was cut at the same 40KB cap the email paste uses, so the freeze itself
+// had been trimmed off the front to make room for a slate that never changed.
+// Two instrument repairs, both authorised by the owner ("larger full-log
+// capacity and compact unchanged-mission tracing"; runtimePressureWatch stays
+// separate): (1) the full-log push gets its own cap, FULL_LOG_CHARS_CAP =
+// 200,000 chars, because it goes to Sentry as packed parts (OTA-1679) and the
+// relay has reassembled 205k-char bundles intact - the described bug report
+// keeps its paste-sized 40KB cap, and the trimming rule is now a pure function
+// (trimLogForReport) a suite can hold; (2) an ARRIVAL writes the full mission
+// dump only when the slate changed since the last full dump this process, and
+// otherwise ONE line - count, when the full dump was written, the player's own
+// position, which changes every tile and is never compacted, and which
+// contracts' ground he stands on (here=), because standing marks are position
+// seen from the contract's side and are keyed OUT of the memo. The session-
+// start dump (slotSlice) still writes in full and primes the memo; the memo is
+// per process and not persisted, so a new log always begins with a full dump.
+// OTA-1586's rule - every part of every log can say what the slate held -
+// stands: a reader who finds the compact line follows its timestamp to the
+// dump. Suite ota1792TheLogKeepsTheFreeze: the two caps by behaviour with the
+// header text; prime then arrival = one line carrying the timestamp; a stage
+// advance = full again; empty slate = one line; the reset hook.
 // OTA-1791 - the gold pill sits proud. Control-depth batch 2, on the owner's
 // approval: "do not paint ten hand-copied implementations independently ...
 // consolidate the repeated filled-gold primary control into the smallest
