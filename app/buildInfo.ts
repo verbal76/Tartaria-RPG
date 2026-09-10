@@ -30058,6 +30058,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SUPERSEDED: '2026-09-09-1790-the-exchange-reads-as-a-sentence'
 // SUPERSEDED: '2026-09-10-1791-the-gold-pill-sits-proud'
 export const OTA_BUILD_ID = '2026-09-10-1792-the-log-keeps-the-freeze';
+// golem catch-up 2026-09-10: markerless publish of OTA-1792.
 // OTA-1792 - the log keeps the freeze. The 2026-09-10 iPhone SE freeze report
 // arrived as 297 of 3,048 entries - 57 seconds of a nine-minute session - and
 // about 280 of those 297 were the mission trace repeated: with the test kit's
