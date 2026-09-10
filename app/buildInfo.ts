@@ -30057,6 +30057,7 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // SUPERSEDED: '2026-09-09-1789-one-weapon-family-resolver'
 // SUPERSEDED: '2026-09-09-1790-the-exchange-reads-as-a-sentence'
 export const OTA_BUILD_ID = '2026-09-10-1791-the-gold-pill-sits-proud';
+// golem catch-up 2026-09-10: markerless publish of OTA-1791.
 // OTA-1791 - the gold pill sits proud. Control-depth batch 2, on the owner's
 // approval: "do not paint ten hand-copied implementations independently ...
 // consolidate the repeated filled-gold primary control into the smallest
