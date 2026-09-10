@@ -57,6 +57,19 @@ import { checkAndApplyOTA } from '../updates/checkAndApplyOTA';
 import { useReadableMuted } from '../ui/displaySettings';
 import { CONTENT_MAX_WIDTH } from '../ui/displayScale'; // OTA-1227 — one column width, platform-aware
 import { modelBootPercent, modelsStillLoading } from '../ui/modelBootProgress'; // OTA-1228 — the 51% bar, made testable
+
+/** ⚠⚠ OTA-1799 — THE ROSTER'S FLOOR, IN CARDS RATHER THAN IN PIXELS.
+ *
+ *  A character card is ~73 pt with its border and gap. Two of them is the least
+ *  that still reads as a LIST you choose from rather than a window you scroll
+ *  one item at a time — which is precisely what the owner's iPhone SE
+ *  screenshot showed and what the audit measured at 87 pt.
+ *
+ *  ⚠ This is a floor, not a size. It never makes the roster smaller anywhere;
+ *  it only stops the masthead taking the roster's last usable inch on a short
+ *  screen. On 390×844 and up the roster is far above it and this number is
+ *  never reached. */
+const ROSTER_MIN_HEIGHT = 148;
 // ⚠⚠⚠ VIS-1 — the Tartaria interface kit. This screen is its first reference
 // implementation; read app/ui/tartariaKit.tsx before adding anything visual here.
 import { T, TType, TButton, TDivider, TRule, TCorners, TResourceChit, TFactionPlate, TGear, TSettle, TStrata } from '../ui/tartariaKit';
@@ -1509,11 +1522,48 @@ const styles = StyleSheet.create({
   // unchanged. iPad portrait (744-1024pt) + landscape (1024-1366pt)
   // get the layout centered at 600pt instead of edge-to-edge buttons.
   container: { flex: 1, backgroundColor: 'transparent', padding: 16, paddingTop: 24, width: '100%', maxWidth: CONTENT_MAX_WIDTH, alignSelf: 'center' },
-  crest: { width: 180, height: 180, alignSelf: 'center', marginBottom: 8 },
+  // ⚠⚠⚠ OTA-1799 — THE CREST IS THE BAND THAT GIVES, AND ONLY WHEN IT MUST.
+  //
+  // The audit's mechanism, measured: the roster FlatList carries `flex: 1` with
+  // a zero basis, so it does not SHRINK — it GROWS INTO WHAT IS LEFT. The
+  // masthead and the footer take their content heights first and the roster gets
+  // the remainder, whatever that turns out to be. On a 4.7" SE the remainder is
+  // 87 pt against 227 pt of roster: 1.2 of 3 characters, and on a 320-wide phone
+  // 81 pt for 1.0. At 390×844 the same code gives the roster all 238 pt it
+  // wants. Nothing was ever drawn on top of anything — a z-order fix would have
+  // moved nothing, which is why the owner's ruling names the allocation instead.
+  //
+  // ⚠⚠ SO GIVE THE ROSTER A FLOOR AND THE CREST PERMISSION TO YIELD. `list` now
+  // carries a `minHeight` of two cards. That is what makes the column genuinely
+  // over-tall on a short screen — and an over-tall column is the only condition
+  // under which Yoga's shrink rule runs at all. `flexShrink` on the crest is
+  // what it then runs on, and the crest is the ONLY band that gives: the
+  // wordmark, the flavour line, the gem count, NEW TARTARIAN, the OTA button and
+  // every character card keep their exact dimensions, typography and touch area.
+  //
+  // ⚠⚠ WHY THE SHRINK FACTOR IS 20 AND NOT 1. Yoga hands a shortfall to its
+  // shrinkable children in proportion to `flexShrink × flexBasis` — so "the
+  // crest is the band that gives" is only true if the crest OUT-WEIGHS its
+  // siblings inside the masthead. It does not automatically: react-native-web
+  // gives every Text a `flexShrink` of 1, so the wordmark, the REALMS rule and
+  // the flavour line would each take a slice of the deficit and the typography
+  // would move. At 20 the crest's weight (20 × 180) is two orders of magnitude
+  // above any of those line boxes, so it absorbs effectively the whole shortfall
+  // and every other band keeps its natural height. The number is not a device
+  // tuning constant — it is "large enough to win" — and the allocation it
+  // produces is checked in the suite rather than asserted here.
+  //
+  // ⚠ `resizeMode="contain"` means a shorter box does not distort the artwork —
+  // it draws it smaller and centred — and `minHeight` stops it vanishing. From
+  // 390×844 up there is no deficit, nothing shrinks, and the screen is
+  // pixel-for-pixel what it was. That is the negative control the suite keeps.
+  crest: { width: 180, height: 180, minHeight: 84, flexShrink: 20, alignSelf: 'center', marginBottom: 8 },
   title: { fontSize: 36, color: '#e6d8b3', letterSpacing: 8, fontWeight: '800', textAlign: 'center' },
   subtitle: { fontSize: 14, color: '#c9a86a', letterSpacing: 14, marginTop: -4, textAlign: 'center' },
   flavor: { color: '#a2977b', fontSize: 12, marginTop: 10, fontStyle: 'italic', textAlign: 'center', marginBottom: 14 },
-  list: { flex: 1 },
+  // ⚠ OTA-1799 — two cards is the floor. Below this the screen stops being a
+  // roster and becomes a peephole, which is the state the owner photographed.
+  list: { flex: 1, minHeight: ROSTER_MIN_HEIGHT },
   listContent: { paddingVertical: 4 },
   listLabel: { color: '#a2977b', fontSize: 10, letterSpacing: 2, marginBottom: 6 },
 
@@ -1525,7 +1575,14 @@ const styles = StyleSheet.create({
   // background colour (displaySettings bgHue/bgSat/bgLight) and this language
   // has to sit on olive, purple, blue or slate without being redesigned.
   // ══════════════════════════════════════════════════════════════════════════
-  titleBlock: { marginBottom: 6 },
+  // ⚠⚠ OTA-1799 — THE MASTHEAD HAS TO BE ALLOWED TO PASS THE DEFICIT DOWN.
+  // A `flexShrink` on the crest is inert while its PARENT refuses to shrink: a
+  // column hands a shortfall to its own children, and a child that will not take
+  // any never lets its own descendants see one. Measured at 375×667 with this
+  // band at the default `flexShrink: 0`, the crest sat at its full 180 pt, 25 pt
+  // of deficit went unresolved, and the build/version footer spilled to y=675 in
+  // a 667 pt window. This is the only band on the screen that opts in.
+  titleBlock: { marginBottom: 6, flexShrink: 1 },
   subtitleRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 2 },
   subtitleRule: { flex: 1 },
   gemsRow: { alignItems: 'center', marginBottom: 10 },

@@ -178,7 +178,17 @@ describe('OTA-1744 — 1. only the roster scrolls', () => {
     // `flex: 1` on the list is what makes the roster the part that runs out of
     // space; without it a long roster pushes the actions off the bottom, which
     // is the same complaint in a different shape.
-    expect(TITLE).toContain('list: { flex: 1 }');
+    //
+    // ⚠ OTA-1799 WIDENED THIS PIN, IT DID NOT WEAKEN IT. `flex: 1` answers
+    // "does the roster grow into what is left" but not "is what is left enough
+    // to be a roster at all" — and on a 4.7" SE what was left was 87 pt against
+    // 227 pt of cards: 1.2 of 3 characters, the peephole the owner photographed.
+    // The list now also carries a floor of two cards, and the masthead's crest
+    // yields to pay for it. Both halves are load-bearing, so both are pinned:
+    // drop the `flex` and a long roster pushes the actions off the bottom again;
+    // drop the floor and the small screen goes back to a peephole.
+    expect(TITLE).toContain('list: { flex: 1, minHeight: ROSTER_MIN_HEIGHT }');
+    expect(TITLE).toMatch(/const ROSTER_MIN_HEIGHT = \d+;/);
   });
 
   it('⚠ the roster heading and its swipe hint survive, and only show with a roster', async () => {
